@@ -1,0 +1,14 @@
+---
+description: Unreal Engine C++ conventions and programmatic-by-default policy for HomeWorld
+globs: "**/*.cpp, **/*.h"
+alwaysApply: false
+---
+
+# Unreal C++ (HomeWorld)
+
+- **Programmatic by default:** Gameplay systems (movement, input, camera, combat, building) and core logic live in C++. Prefer C++ for new behavior; use Blueprint for content and overrides.
+- **Naming:** PascalCase for types (classes, structs, enums); camelCase for locals and parameters. Unreal prefixes: `A` (Actor), `U` (Object), `F` (plain struct), `E` (enum), `I` (interface).
+- **UPROPERTY / UFUNCTION:** Use for reflection (Blueprint, serialization, replication). Document categories and meta where helpful (e.g. `EditDefaultsOnly`, `Category = "Input"`). Expose designer-facing APIs with `UFUNCTION(BlueprintCallable)` or `BlueprintNativeEvent` where appropriate; keep core logic in C++.
+- **Module boundaries:** Game code lives in the `HomeWorld` module. Do not depend on engine private headers or other game modules without explicit approval.
+- **Include order:** Own header first, then engine/public includes, then project includes. Keep includes minimal.
+- **Source layout:** C++ lives under `Source/HomeWorld/`. Core pawn is `AHomeWorldCharacter`; default game mode is `AHomeWorldGameMode`.
