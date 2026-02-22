@@ -1,0 +1,12 @@
+---
+description: When to use Blueprint vs C++ and Blueprint naming for HomeWorld
+globs: "**/*.uasset"
+alwaysApply: false
+---
+
+# Unreal Blueprint (HomeWorld)
+
+- **Programmatic by default:** Core movement, input, and camera are implemented in C++ (`AHomeWorldCharacter`). Use Blueprint for content, designer overrides, and one-off logic—not to reimplement systems that belong in code.
+- **When to use Blueprint:** Asset assignment (meshes, materials, input actions), level-specific behavior, rapid iteration on values, and subclassing C++ classes to plug in content. Use C++ for reusable gameplay systems and anything that should be consistent across the project.
+- **Naming:** Use a `BP_` prefix for Blueprint assets (e.g. `BP_Player`, `BP_MainGameMode`) so they are easy to distinguish from C++ classes and data assets.
+- **Input:** Input Actions (e.g. IA_Move, IA_Look) and Input Mapping Context (IMC_Default) are created once in the Editor and assigned on the character (C++ defaults or a Blueprint child of `HomeWorldCharacter`).

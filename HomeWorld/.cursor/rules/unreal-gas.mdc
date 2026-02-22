@@ -1,0 +1,11 @@
+---
+description: GAS (Gameplay Ability System) C++ base classes and Blueprint usage for HomeWorld
+globs: "**/*Ability*", "**/*Attribute*", "**/*GameplayEffect*"
+alwaysApply: false
+---
+
+# Unreal GAS (HomeWorld)
+
+- **Base classes in C++:** Ability and attribute logic live in C++. `UHomeWorldAttributeSet` (Health, Stamina, etc.) and `UHomeWorldGameplayAbility` are the base classes; add new attributes in the attribute set (or a second set if needed). See [docs/STACK_PLAN.md](docs/STACK_PLAN.md) Layer 3 – Combat and Abilities.
+- **Blueprint for content:** Concrete abilities (e.g. 3 survivor skills from Week 1) and GameplayEffects (duration, magnitude, tags) are authored as Blueprint children of the C++ base. Use Blueprint for VFX, animation montages, and designer-tweakable data.
+- **Character integration:** `AHomeWorldCharacter` owns `UAbilitySystemComponent` and implements `IAbilitySystemInterface`; default attribute set is `UHomeWorldAttributeSet`. Init in `PossessedBy`; grant abilities via Blueprint or C++ as needed.
