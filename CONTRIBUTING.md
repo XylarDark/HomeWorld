@@ -1,4 +1,4 @@
-# Contributing to HomeWorld (RealmBond)
+# Contributing to HomeWorld
 
 ## Workflow
 

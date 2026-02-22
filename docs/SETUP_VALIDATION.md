@@ -1,4 +1,4 @@
-# RealmBond – Setup Validation Checklist
+# HomeWorld – Setup Validation Checklist
 
 Use this to confirm first-phase setup is complete before starting Week 1.
 
@@ -6,7 +6,7 @@ Use this to confirm first-phase setup is complete before starting Week 1.
 
 ## 1. In-Repo Checks (No Editor Required)
 
-- [ ] **Plugins:** In `HomeWorld.uproject`, the `Plugins` array includes `PCG`, `GameplayAbilities`, and `MassEntity`, each with `"Enabled":true`.
+- [ ] **Plugins:** In `HomeWorld.uproject`, the `Plugins` array includes `PCG`, `GameplayAbilities`, `MassEntity`, `EnhancedInput`, `SteamSockets` (co-op; replaces SteamCore), and `DaySequence` (or `TimeOfDay` if that is the actual engine name), each with `"Enabled":true`.
 - [ ] **Open World default map:** In `Config/DefaultEngine.ini`, under `[/Script/EngineSettings.GameMapsSettings]`, `GameDefaultMap=/Engine/Maps/Templates/OpenWorld`.
 - [ ] **Prototype vision:** `docs/PROTOTYPE_VISION.md` exists and contains theme, Act 1 focus, Week 1 playtest goal, tech spine, success criteria.
 - [ ] **Developer setup:** `docs/SETUP.md` exists and lists Engine, Project, Plugins, Free assets, World, Roles.
@@ -19,7 +19,7 @@ Use this to confirm first-phase setup is complete before starting Week 1.
 ## 2. Developer Checks (Require Human / Editor)
 
 - [ ] UE 5.4+ (or 5.7) is installed and the project opens without plugin errors.
-- [ ] In Editor: **Edit > Plugins** shows PCG, Gameplay Abilities, and Mass Entity enabled.
+- [ ] In Editor: **Edit > Plugins** shows PCG, Gameplay Abilities, Mass Entity, Enhanced Input, Steam Sockets (co-op), and Day Night Sequencer enabled. Steam Sockets is required for Week 2 co-op.
 - [ ] FAB/Quixel assets (or equivalents) are acquired and available in the project.
 - [ ] Team has run through [TEAM_APPROVAL_CHECKLIST.md](TEAM_APPROVAL_CHECKLIST.md) and committed to Week 1.
 

@@ -1,4 +1,4 @@
-# HomeWorld (RealmBond)
+# HomeWorld
 
 **Co-op ARPG survival with family sim.** Players build and protect a life worth fighting for—explore, fight, build, then nurture bonds and defend together. Roles for casual (healer/home) and hardcore (protector) players. Target: 8–12h campaign + endgame; PC, Steam Early Access.
 

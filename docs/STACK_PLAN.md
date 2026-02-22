@@ -1,4 +1,4 @@
-# RealmBond – High-Level Stack Plan
+# HomeWorld – High-Level Stack Plan
 
 This document aligns the development group on engine, plugins, services, and content pipeline. Scope is driven by the prototype vision and roadmap: explore → fight → build (Act 1), then bonds, co-op, day/night defense, and leaderboards (Act 2–3).
 
@@ -28,7 +28,7 @@ flowchart TB
     DayNight[Day/Night]
   end
   subgraph net [Multiplayer]
-    SteamSessions[Steam Sessions]
+    SteamSockets[Steam Sockets]
   end
   subgraph services [Services]
     Leaderboards[Leaderboards]
@@ -40,8 +40,8 @@ flowchart TB
   Build --> FamilyAI
   FamilyAI --> Mass
   Mass --> DayNight
-  DayNight --> SteamSessions
-  SteamSessions --> Leaderboards
+  DayNight --> SteamSockets
+  SteamSockets --> Leaderboards
 ```
 
 ---
@@ -94,7 +94,7 @@ flowchart TB
 
 ## Layer 7 – Multiplayer and Co-op
 
-- **Recommended:** Steam Sessions (OSS or built-in) for 2–8p; replication for roles, buffs, and state. Optional: AWS GameLift (free tier) for dedicated servers if needed later.
+- **Recommended:** Steam Sockets (replaces SteamCore/Steam Sessions) for 2–8p; replication for roles, buffs, and state. Optional: AWS GameLift (free tier) for dedicated servers if needed later.
 - **Phase:** Week 2 – 2p; Weeks 3–4 – up to 8p clans.
 
 ---

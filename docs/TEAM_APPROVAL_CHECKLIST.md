@@ -1,4 +1,4 @@
-# RealmBond – Team Approval Checklist (Phase 0 Gate)
+# HomeWorld – Team Approval Checklist (Phase 0 Gate)
 
 Use this before committing to Week 1. See [ROADMAP.md](../ROADMAP.md) for phase details.
 
