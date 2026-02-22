@@ -1,8 +1,9 @@
 # create_pcg_forest.py
 # Run from Unreal Editor: Tools -> Execute Python Script, or run with -ExecutePythonScript=
-# Creates a PCG graph (Surface Sampler -> Density Filter -> Static Mesh Spawner),
-# saves it, places a 100x100m PCG Volume in the current level, assigns the graph,
-# and generates. Optionally reads mesh paths from Content/Python/pcg_forest_config.json.
+# Creates a PCG graph: Surface Sampler (0.05) -> Density Filter (0.3-1.0) -> Transform Points (0.8-1.2)
+# -> Static Mesh Spawner (trees). Optional second branch for rocks (0.01) when config has
+# static_mesh_spawner_meshes_rocks. Config: Content/Python/pcg_forest_config.json.
+# Optional: add a Height Filter in the Editor for terrain-only spawn (see docs/PCG_FOREST_SETUP.md).
 
 import json
 import os
@@ -29,21 +30,33 @@ def _log(msg):
     print("PCG Forest: " + str(msg))
 
 
-def _load_config_mesh_paths():
-    """Load mesh paths from Content/Python/pcg_forest_config.json. Returns list of asset path strings."""
+def _load_config():
+    """Load config from Content/Python/pcg_forest_config.json. Returns dict with trees, rocks, and optional height_filter_min/max."""
     try:
-        # Resolve path: project Content dir -> Python -> config
         proj_dir = unreal.SystemLibrary.get_project_directory()
         config_path = os.path.join(proj_dir, "Content", "Python", "pcg_forest_config.json")
         if not os.path.exists(config_path):
-            return []
+            return {"trees": [], "rocks": [], "height_filter_min": None, "height_filter_max": None}
         with open(config_path, "r") as f:
             data = json.load(f)
-        paths = data.get("static_mesh_spawner_meshes") or []
-        return [p for p in paths if p]
+        trees = [p for p in (data.get("static_mesh_spawner_meshes") or []) if p]
+        rocks = [p for p in (data.get("static_mesh_spawner_meshes_rocks") or []) if p]
+        h_min = data.get("height_filter_min")
+        h_max = data.get("height_filter_max")
+        if h_min is not None and h_max is not None:
+            try:
+                h_min, h_max = float(h_min), float(h_max)
+            except (TypeError, ValueError):
+                h_min, h_max = None, None
+        return {"trees": trees, "rocks": rocks, "height_filter_min": h_min, "height_filter_max": h_max}
     except Exception as e:
         _log("Config load warning: " + str(e))
-        return []
+        return {"trees": [], "rocks": [], "height_filter_min": None, "height_filter_max": None}
+
+
+def _load_config_mesh_paths():
+    """Load tree mesh paths from config. Returns list of asset path strings."""
+    return _load_config()["trees"]
 
 
 def _get_mesh_paths():
@@ -62,8 +75,15 @@ def _ensure_pcg_folder():
 
 
 def create_pcg_graph():
-    """Create PCG graph asset with Surface Sampler -> Density Filter -> Static Mesh Spawner. Returns graph asset or None."""
+    """Create PCG graph asset with Surface Sampler -> Density Filter (0.3-1.0) -> Transform Points (random rot/scale) -> Static Mesh Spawner. Returns graph asset or None."""
     _ensure_pcg_folder()
+    # Re-run: delete existing graph so create_asset succeeds (script is re-runnable)
+    try:
+        if unreal.EditorAssetLibrary.does_asset_exist(PCG_GRAPH_PACKAGE):
+            unreal.EditorAssetLibrary.delete_asset(PCG_GRAPH_PACKAGE)
+            _log("Removed existing PCG graph for re-run.")
+    except Exception as e:
+        _log("Could not remove existing graph (re-run may fail): " + str(e))
     asset_tools = unreal.AssetToolsHelpers.get_asset_tools()
     factory = unreal.PCGGraphFactory()
     graph_asset = asset_tools.create_asset(
@@ -76,22 +96,41 @@ def create_pcg_graph():
         _log("Failed to create PCG graph asset.")
         return None
 
-    # Add nodes: Surface Sampler, Density Filter, Static Mesh Spawner
+    # Add nodes: Surface Sampler, Density Filter, Transform Points, Static Mesh Spawner
     # add_node_of_type(settings_class) -> (node, default_node_settings)
     surface_node, surface_settings = graph_asset.add_node_of_type(unreal.PCGSurfaceSamplerSettings)
     density_node, density_settings = graph_asset.add_node_of_type(unreal.PCGDensityFilterSettings)
+    transform_node, transform_settings = graph_asset.add_node_of_type(unreal.PCGTransformPointsSettings)
     spawner_node, spawner_settings = graph_asset.add_node_of_type(unreal.PCGStaticMeshSpawnerSettings)
 
-    if not all([surface_node, density_node, spawner_node]):
+    if not all([surface_node, density_node, transform_node, spawner_node]):
         _log("Failed to add one or more nodes.")
         return None
 
-    # Optional: tune surface sampler (points per m^2, apply density for filter)
-    surface_settings.set_editor_property("points_per_squared_meter", 0.1)
+    # Surface sampler: 0.05 points/m^2 for trees not overlapping; bounds = PCG Volume
+    surface_settings.set_editor_property("points_per_squared_meter", 0.05)
     surface_settings.set_editor_property("apply_density_to_points", True)
-    # Optional: density filter range (keep points with density in range)
-    density_settings.set_editor_property("lower_bound", 0.2)
+    # Density filter range 0.3-1.0 (keep points with density in range)
+    density_settings.set_editor_property("lower_bound", 0.3)
     density_settings.set_editor_property("upper_bound", 1.0)
+
+    config = _load_config()
+    height_filter_node = None
+    h_min, h_max = config.get("height_filter_min"), config.get("height_filter_max")
+    if h_min is not None and h_max is not None:
+        try:
+            height_filter_node, height_filter_settings = graph_asset.add_node_of_type(unreal.PCGAttributeFilteringRangeSettings)
+            if height_filter_node and height_filter_settings:
+                if hasattr(height_filter_settings, "set_editor_property"):
+                    try:
+                        height_filter_settings.set_editor_property("min_threshold", h_min)
+                        height_filter_settings.set_editor_property("max_threshold", h_max)
+                    except Exception:
+                        pass
+                _log("Added optional height filter (Z range {}–{}). Set target attribute to Position.Z in Editor if needed.".format(h_min, h_max))
+        except (AttributeError, Exception) as e:
+            _log("Height filter skipped (API or config): " + str(e))
+            height_filter_node = None
 
     # Static mesh spawner: set mesh list via weighted selector if available
     mesh_paths = _get_mesh_paths()
@@ -110,14 +149,68 @@ def create_pcg_graph():
     except Exception as e:
         _log("Mesh selector setup warning (using defaults): " + str(e))
 
-    # Connect: Input -> Surface Sampler -> Density Filter -> Static Mesh Spawner -> Output
+    # Transform Points: random rotation (Yaw 0-360) and uniform scale (0.8-1.2)
+    transform_settings.set_editor_property("rotation_min", unreal.Rotator(0.0, 0.0, 0.0))
+    transform_settings.set_editor_property("rotation_max", unreal.Rotator(0.0, 359.0, 0.0))
+    transform_settings.set_editor_property("absolute_rotation", True)
+    transform_settings.set_editor_property("scale_min", unreal.Vector(0.8, 0.8, 0.8))
+    transform_settings.set_editor_property("scale_max", unreal.Vector(1.2, 1.2, 1.2))
+    transform_settings.set_editor_property("uniform_scale", True)
+    transform_settings.set_editor_property("absolute_scale", True)
+    transform_settings.set_editor_property("seed", 12345)
+
+    # Connect: Input -> Surface Sampler -> [optional Height Filter] -> Density Filter -> Transform Points -> Static Mesh Spawner -> Output
     input_node = graph_asset.get_input_node()
     output_node = graph_asset.get_output_node()
-    # Default pin names in PCG are typically "Out" and "In"
     graph_asset.add_edge(input_node, "Out", surface_node, "In")
-    graph_asset.add_edge(surface_node, "Out", density_node, "In")
-    graph_asset.add_edge(density_node, "Out", spawner_node, "In")
+    if height_filter_node:
+        graph_asset.add_edge(surface_node, "Out", height_filter_node, "In")
+        graph_asset.add_edge(height_filter_node, "Out", density_node, "In")
+    else:
+        graph_asset.add_edge(surface_node, "Out", density_node, "In")
+    graph_asset.add_edge(density_node, "Out", transform_node, "In")
+    graph_asset.add_edge(transform_node, "Out", spawner_node, "In")
     graph_asset.add_edge(spawner_node, "Out", output_node, "In")
+
+    # Optional: second branch for rocks (density 0.01) when static_mesh_spawner_meshes_rocks is set
+    rock_paths = config["rocks"]
+    if rock_paths:
+        surface_rock, surface_rock_settings = graph_asset.add_node_of_type(unreal.PCGSurfaceSamplerSettings)
+        density_rock, density_rock_settings = graph_asset.add_node_of_type(unreal.PCGDensityFilterSettings)
+        transform_rock, transform_rock_settings = graph_asset.add_node_of_type(unreal.PCGTransformPointsSettings)
+        spawner_rock, spawner_rock_settings = graph_asset.add_node_of_type(unreal.PCGStaticMeshSpawnerSettings)
+        if all([surface_rock, density_rock, transform_rock, spawner_rock]):
+            surface_rock_settings.set_editor_property("points_per_squared_meter", 0.01)
+            surface_rock_settings.set_editor_property("apply_density_to_points", True)
+            density_rock_settings.set_editor_property("lower_bound", 0.3)
+            density_rock_settings.set_editor_property("upper_bound", 1.0)
+            transform_rock_settings.set_editor_property("rotation_min", unreal.Rotator(0.0, 0.0, 0.0))
+            transform_rock_settings.set_editor_property("rotation_max", unreal.Rotator(0.0, 359.0, 0.0))
+            transform_rock_settings.set_editor_property("absolute_rotation", True)
+            transform_rock_settings.set_editor_property("scale_min", unreal.Vector(0.8, 0.8, 0.8))
+            transform_rock_settings.set_editor_property("scale_max", unreal.Vector(1.2, 1.2, 1.2))
+            transform_rock_settings.set_editor_property("uniform_scale", True)
+            transform_rock_settings.set_editor_property("absolute_scale", True)
+            transform_rock_settings.set_editor_property("seed", 54321)
+            try:
+                spawner_rock_settings.set_mesh_selector_type(unreal.PCGMeshSelectorWeighted)
+                selector_rock = spawner_rock_settings.get_editor_property("mesh_selector_parameters")
+                if selector_rock and rock_paths:
+                    entries = []
+                    for path in rock_paths:
+                        mesh_asset = unreal.load_asset(path)
+                        if mesh_asset:
+                            entries.append(unreal.PCGStaticMeshSpawnerEntry(weight=100, mesh=mesh_asset))
+                    if entries and hasattr(selector_rock, "set_editor_property"):
+                        selector_rock.set_editor_property("mesh_entries", entries)
+            except Exception as e:
+                _log("Rocks mesh selector warning: " + str(e))
+            graph_asset.add_edge(input_node, "Out", surface_rock, "In")
+            graph_asset.add_edge(surface_rock, "Out", density_rock, "In")
+            graph_asset.add_edge(density_rock, "Out", transform_rock, "In")
+            graph_asset.add_edge(transform_rock, "Out", spawner_rock, "In")
+            graph_asset.add_edge(spawner_rock, "Out", output_node, "In")
+            _log("Added optional rocks branch (density 0.01).")
 
     # Save graph asset
     try:

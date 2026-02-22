@@ -9,6 +9,7 @@
 - **Project layout:** The repository root is the project root. After cloning, open `HomeWorld.uproject` from the clone root (the folder that contains `HomeWorld.uproject`, `Source/`, `Config/`, and `Content/`).
 - **Engine:** Unreal Engine 5.7 (recommended); 5.4+ may work.
 - **Clone** this repo, then open `HomeWorld.uproject` in the Editor (first load may compile).
+- **PCG forest script:** If you run the forest setup script ([docs/PCG_FOREST_SETUP.md](docs/PCG_FOREST_SETUP.md)), have the default map **Main** open (create and save it once in `Content/HomeWorld/Maps/Main` if the repo does not include `Main.umap`).
 - Full steps: [docs/SETUP.md](docs/SETUP.md).
 
 ---

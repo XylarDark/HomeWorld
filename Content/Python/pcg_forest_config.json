@@ -1,4 +1,9 @@
 {
   "static_mesh_spawner_meshes": [],
-  "_comment": "Add Quixel tree/rock asset paths here, e.g. [\"/Game/Quixel/Trees/SM_Tree_01\", \"/Game/Quixel/Rocks/SM_Rock_01\"]. Leave empty to use engine placeholder meshes."
+  "static_mesh_spawner_meshes_rocks": [],
+  "height_filter_min": null,
+  "height_filter_max": null,
+  "_comment_trees": "Megascans trees: add paths from Content/Environments/. Right-click asset -> Copy Reference, paste here. Leave empty for placeholder.",
+  "_comment_rocks": "Optional rocks (second spawner): add paths for rock meshes. Leave empty to skip.",
+  "_comment_height": "Optional: set height_filter_min and height_filter_max (world Z in cm) to spawn only on terrain. E.g. -5000 to 5000. Leave null to skip."
 }
