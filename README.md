@@ -6,7 +6,8 @@
 
 ## Getting started
 
-- **Engine:** Unreal Engine 5.4+ (project uses 5.7).
+- **Project layout:** The repository root is the project root. After cloning, open `HomeWorld.uproject` from the clone root (the folder that contains `HomeWorld.uproject`, `Source/`, `Config/`, and `Content/`).
+- **Engine:** Unreal Engine 5.7 (recommended); 5.4+ may work.
 - **Clone** this repo, then open `HomeWorld.uproject` in the Editor (first load may compile).
 - Full steps: [docs/SETUP.md](docs/SETUP.md).
 

@@ -26,3 +26,5 @@ Content/DerivedDataCache/
 # IDE / tooling
 .vs/
 UpgradeLog.htm
+*.vcxproj.user
+*.sublime-*

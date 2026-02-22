@@ -2,7 +2,7 @@
 
 Do these steps once. Everything else for first-phase setup is already in the repo.
 
-1. **Engine:** Install Unreal Engine 5.4+ (or confirm 5.7 used by this project). The project targets UE 5.7 and is compatible with 5.7.x (including 5.7.3). Project is developed code-first; see [CONVENTIONS.md](CONVENTIONS.md).
+1. **Engine:** Install Unreal Engine 5.7 (recommended); 5.4+ may work. The project targets UE 5.7 and is compatible with 5.7.x (including 5.7.3). Project is developed code-first; see [CONVENTIONS.md](CONVENTIONS.md).
 2. **Project:** Open `HomeWorld.uproject`; allow first-time load/compile.
 3. **Plugins:** In Editor, **Edit > Plugins** – confirm these six are enabled (all are in .uproject):
    - **PCG**, **Gameplay Abilities**, **Mass Entity** (in .uproject).
@@ -13,7 +13,7 @@ Do these steps once. Everything else for first-phase setup is already in the rep
 4. **Free assets:**
    - **FAB:** Survival character (or equivalent).
    - **Quixel:** Biomes/vegetation for forest.
-   - *(Add exact asset names/links here as the team chooses.)*
+   - The team will add specific asset names/links here when chosen.
 5. **World:** Confirm the project uses Open World / World Partition (already set in `Config/DefaultEngine.ini`).
 6. **Roles (optional):** Note Designer / Artist / Programmer / Tester and who leads Week 1.
 
@@ -25,7 +25,7 @@ After this, follow [WEEK1_TASKS.md](WEEK1_TASKS.md) in the Editor.
 
 The project has a C++ game module (`Source/HomeWorld/`). To build from an IDE or command line:
 
-1. **Generate project files:** Right-click `HomeWorld.uproject` in Explorer and choose **Generate Visual Studio project files**, or run the Engine’s `Build.bat` with `-projectfiles -project="path\to\HomeWorld.uproject" -game -rocket -progress`. This produces the `.sln` and project files next to the `.uproject`.
+1. **Generate project files:** Right-click `HomeWorld.uproject` in Explorer and choose **Generate Visual Studio project files**, or run the Engine’s `Build.bat` with `-projectfiles -project="path/to/HomeWorld.uproject" -game -rocket -progress` (path to `HomeWorld.uproject` in the project root). This produces the `.sln` and project files next to the `.uproject`.
 2. **Build:**
    - **Game only (simplest):** Run **`Build-HomeWorld.bat`** from the project root. Uses the Engine’s Build.bat and bundled .NET; no SDK install needed.
    - **Full solution from command line:** Run **`Build-Solution-WithBundledDotNet.bat`** to build the whole solution (C++ + C#) using the Engine’s bundled .NET 8 SDK—no system .NET install required.

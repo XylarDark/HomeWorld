@@ -33,7 +33,7 @@ Use this checklist to confirm that the four setup steps (GitHub repo, Git LFS, t
 ## Step 4 – Team (all others)
 
 - [ ] **Clone:** Each team member has run `git clone [REPO]` and can open the project.
-- [ ] **Generate Visual Studio project files:** From the **Engine** folder run `Build.bat -projectfiles -project="path\to\HomeWorld.uproject" -game -rocket -progress`, or right-click **HomeWorld.uproject** → **Generate Visual Studio project files**; then open the .uproject or the solution.
+- [ ] **Generate Visual Studio project files:** From the **Engine** folder run `Build.bat -projectfiles -project="path/to/HomeWorld.uproject" -game -rocket -progress` (path to `HomeWorld.uproject` in the project root), or right-click **HomeWorld.uproject** → **Generate Visual Studio project files**; then open the .uproject or the solution.
 
 ---
 

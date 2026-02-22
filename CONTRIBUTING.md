@@ -1,5 +1,7 @@
 # Contributing to HomeWorld
 
+**Project root:** The repo root is the project root. All paths in docs and scripts (e.g. `HomeWorld.uproject`, `Build-HomeWorld.bat`) are relative to the clone root.
+
 ## Workflow
 
 1. Create a branch from `main` (or `master`): e.g. `feature/week1-pcg-biome`, `fix/plugin-load`.

@@ -1,2 +1,7 @@
+# Line endings: normalize text to LF for cross-platform consistency
+* text=auto eol=lf
+*.bat text eol=crlf
+
+# Unreal binary assets (LFS)
 *.uasset filter=lfs diff=lfs merge=lfs -text
 *.umap filter=lfs diff=lfs merge=lfs -text

@@ -41,8 +41,8 @@ This is the recommended manual step; conversion can also be done via **Tools →
 You can launch the Editor and run the script in one go (if your engine supports it):
 
 - **Batch file:** Edit `Run-PCGForestScript.bat` in the project root: set `UE_EDITOR` to your `UnrealEditor.exe` path, then run the batch. It will open the project and execute the Python script.
-- **Manual command:**  
-  `"path\to\UnrealEditor.exe" "path\to\HomeWorld\HomeWorld.uproject" -ExecutePythonScript="Content/Python/create_pcg_forest.py"`
+- **Manual command:** Use the path to `HomeWorld.uproject` in the project root (clone root). Example:  
+  `"path/to/UnrealEditor.exe" "path/to/HomeWorld.uproject" -ExecutePythonScript="Content/Python/create_pcg_forest.py"`
 
 Ensure the default map is already created; otherwise open the correct level first and run the script from **Tools → Execute Python Script**.
 
