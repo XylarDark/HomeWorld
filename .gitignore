@@ -1,0 +1,17 @@
+# Unreal Engine
+Binaries/
+Intermediate/
+Saved/
+DerivedDataCache/
+*.sln
+*.suo
+*.opensdf
+*.sdf
+*.VC.db
+*.VC.VC.opendb
+
+# Builds
+*.xcodeproj
+
+# Optional: keep Config in repo (defaults); ignore user-specific
+# Saved/ already ignored
