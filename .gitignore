@@ -13,5 +13,12 @@ DerivedDataCache/
 # Builds
 *.xcodeproj
 
-# Optional: keep Config in repo (defaults); ignore user-specific
-# Saved/ already ignored
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs (root or stray)
+*.log
+
+# Content-derived caches (if present later)
+Content/DerivedDataCache/

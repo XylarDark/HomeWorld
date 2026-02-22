@@ -1,0 +1,23 @@
+# Lightweight repo validation (no UE install required)
+name: Validate
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check HomeWorld.uproject exists and is valid JSON
+        run: |
+          if [ ! -f HomeWorld.uproject ]; then
+            echo "::error::HomeWorld.uproject not found"
+            exit 1
+          fi
+          python3 -c "import json; json.load(open('HomeWorld.uproject'))"
+          echo "HomeWorld.uproject is valid JSON"
