@@ -39,3 +39,13 @@ The default pawn is **AHomeWorldCharacter** (C++). Movement and look are driven 
    - On a **Blueprint child** of `HomeWorldCharacter` that you set as the default pawn (e.g. to also set the character mesh).
 
 If these are not set, the character will spawn and the camera will work, but movement and look input will do nothing until the assets are created and assigned.
+
+---
+
+## Camera & controls
+
+The default pawn uses a **third-person** setup:
+
+- **Camera:** A spring arm and follow camera are attached to the character capsule. The camera orbits with the mouse (Look) and stays behind the character. Pitch is clamped so the camera does not flip.
+- **Movement:** Movement is **camera-relative** — W moves toward where the camera looks, and the character orients to movement direction.
+- **Input:** IA_Move, IA_Look, and IMC_Default must be created in the Editor and assigned to the default pawn (or a Blueprint child) for movement and look to work. Camera settings (arm length, FOV, pitch limits, sensitivity) are exposed on the character for tuning.

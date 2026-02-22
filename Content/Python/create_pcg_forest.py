@@ -225,8 +225,10 @@ def create_pcg_graph():
     return graph_asset
 
 
-def place_volume_and_generate(graph_asset):
-    """Place a PCG Volume (100x100m) in the current level, assign graph, generate, save level."""
+def place_volume_and_generate(graph_asset, location=None, extent=None):
+    """Place a PCG Volume in the current level, assign graph, generate, save level.
+    location: unreal.Vector for volume center (default 0,0,0).
+    extent: unreal.Vector for half-extents in cm (default 5000,5000,500 => 100x100x10 m)."""
     if not graph_asset:
         _log("No graph asset; skipping volume placement.")
         return
@@ -236,8 +238,11 @@ def place_volume_and_generate(graph_asset):
         _log("No editor world. Open a level (e.g. Main) first.")
         return
 
-    # Spawn PCG Volume at origin
-    location = unreal.Vector(0.0, 0.0, 0.0)
+    if location is None:
+        location = unreal.Vector(0.0, 0.0, 0.0)
+    if extent is None:
+        extent = unreal.Vector(VOLUME_HALF_EXTENT_X, VOLUME_HALF_EXTENT_Y, VOLUME_HALF_EXTENT_Z)
+
     rotation = unreal.Rotator(0.0, 0.0, 0.0)
     volume = editor_subsystem.spawn_actor_from_class(unreal.PCGVolume, location, rotation)
     if not volume:
@@ -245,7 +250,6 @@ def place_volume_and_generate(graph_asset):
         return
 
     # Set bounds: PCGVolume may use BoxComponent or Brush; set half-extents (cm)
-    extent = unreal.Vector(VOLUME_HALF_EXTENT_X, VOLUME_HALF_EXTENT_Y, VOLUME_HALF_EXTENT_Z)
     root = volume.get_root_component()
     if root and hasattr(root, "set_box_extent"):
         root.set_box_extent(extent)

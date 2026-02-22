@@ -1,0 +1,13 @@
+{
+  "demo_level_path": "/Game/HomeWorld/Maps/Main",
+  "template_level_path": "/Game/StylizedProvencal/Maps/Main",
+  "volume_center_x": 0.0,
+  "volume_center_y": 0.0,
+  "volume_center_z": 0.0,
+  "volume_extent_x": 5000.0,
+  "volume_extent_y": 5000.0,
+  "volume_extent_z": 500.0,
+  "_comment_demo": "Target level for demo (village + forest). Script opens this level.",
+  "_comment_template": "Source level to duplicate if demo_level_path does not exist (medieval village).",
+  "_comment_volume": "PCG volume center and half-extents in cm (5000 = 50 m => 100 m box). Adjust to surround village."
+}
