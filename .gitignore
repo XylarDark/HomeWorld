@@ -28,3 +28,9 @@ Content/DerivedDataCache/
 UpgradeLog.htm
 *.vcxproj.user
 *.sublime-*
+
+# Secrets and debug logs
+.env
+.env.local
+.env.*.local
+debug-cb22d5.log

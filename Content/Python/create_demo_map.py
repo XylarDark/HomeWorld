@@ -32,7 +32,9 @@ def _debug_log(hypothesis_id, location, message, data):
     import time
     try:
         proj = unreal.SystemLibrary.get_project_directory()
-        path = os.path.join(proj, "debug-cb22d5.log")
+        logs_dir = os.path.join(proj, "Saved", "Logs")
+        os.makedirs(logs_dir, exist_ok=True)
+        path = os.path.join(logs_dir, "debug-cb22d5.log")
         line = '{"sessionId":"cb22d5","hypothesisId":"%s","location":"%s","message":"%s","data":%s,"timestamp":%d}\n' % (
             hypothesis_id, location, message, data, int(time.time() * 1000))
         with open(path, "a", encoding="utf-8") as f:

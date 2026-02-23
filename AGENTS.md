@@ -8,4 +8,6 @@
 
 **Stack (enabled plugins):** Enhanced Input, PCG, Gameplay Abilities, Steam Sockets, Day Sequence. Mass/swarms plugin TBD when swarms are added (Mass Entity is deprecated). Config in `Config/`; project layout and rules in `.cursor/rules/` (Unreal C++, Blueprint, project).
 
-**Setup and validation:** [docs/SETUP.md](docs/SETUP.md), [docs/SETUP_VALIDATION.md](docs/SETUP_VALIDATION.md). When editing C++, Blueprint, or project/config files, follow the corresponding `.cursor/rules/` conventions.
+**Setup and validation:** [docs/SETUP.md](docs/SETUP.md) (includes validation checklist). When editing C++, Blueprint, or project/config files, follow the corresponding `.cursor/rules/` conventions.
+
+**Current tasks:** [docs/TASKLIST.md](docs/TASKLIST.md) — master task list; each task links to a detailed doc in `docs/tasks/`.

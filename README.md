@@ -9,9 +9,8 @@
 - **Project layout:** The repository root is the project root. After cloning, open `HomeWorld.uproject` from the clone root (the folder that contains `HomeWorld.uproject`, `Source/`, `Config/`, and `Content/`).
 - **Engine:** Unreal Engine 5.7 (recommended); 5.4+ may work.
 - **Clone** this repo, then open `HomeWorld.uproject` in the Editor (first load may compile).
-- **PCG forest script:** If you run the forest setup script ([docs/PCG_FOREST_SETUP.md](docs/PCG_FOREST_SETUP.md)), have the default map **Main** open (create and save it once in `Content/HomeWorld/Maps/Main` if the repo does not include `Main.umap`).
-- **Demo map (village + forest):** Run [docs/DEMO_MAP_SETUP.md](docs/DEMO_MAP_SETUP.md) — one script (`Content/Python/create_demo_map.py`) generates the Main level with the medieval village and PCG forest.
-- Full steps: [docs/SETUP.md](docs/SETUP.md).
+- **Current tasks:** See [docs/TASKLIST.md](docs/TASKLIST.md). Each task links to a detailed doc in `docs/tasks/` (e.g. [Apply PCG forest to the map](docs/tasks/PCG_FOREST_ON_MAP.md) — run `Content/Python/create_demo_map.py` to generate Main with village + PCG forest; have Main open or the script will prompt).
+- Full setup: [docs/SETUP.md](docs/SETUP.md).
 
 ---
 
@@ -19,13 +18,14 @@
 
 | Doc | Description |
 |-----|-------------|
+| [docs/TASKLIST.md](docs/TASKLIST.md) | **Master task list** — current focus tasks; each links to a detailed doc in `docs/tasks/` |
 | [ROADMAP.md](ROADMAP.md) | Phases, pillars, campaign, approval gates |
 | [docs/PROTOTYPE_VISION.md](docs/PROTOTYPE_VISION.md) | Theme, Act 1 focus, Week 1 playtest goal |
 | [docs/STACK_PLAN.md](docs/STACK_PLAN.md) | Tech stack and recommended plugins |
-| [docs/WEEK1_TASKS.md](docs/WEEK1_TASKS.md) | Week 1 task breakdown (PCG, GAS, missions) |
-| [docs/SETUP_VALIDATION.md](docs/SETUP_VALIDATION.md) | Setup validation checklist |
-| [docs/DEMO_MAP_SETUP.md](docs/DEMO_MAP_SETUP.md) | Demo map: village + PCG forest (one script) |
+| [docs/SETUP.md](docs/SETUP.md) | Developer setup (Engine, Plugins, Git/LFS, Building, Validation) |
 | [docs/TEAM_APPROVAL_CHECKLIST.md](docs/TEAM_APPROVAL_CHECKLIST.md) | Phase 0 gate before Week 1 |
+
+**Task detail docs** (see [TASKLIST](docs/TASKLIST.md)): [Character animation](docs/tasks/CHARACTER_ANIMATION.md), [Character orientation](docs/tasks/CHARACTER_ORIENTATION.md), [Character ground](docs/tasks/CHARACTER_GROUND.md), [PCG forest on map](docs/tasks/PCG_FOREST_ON_MAP.md).
 
 ---
 

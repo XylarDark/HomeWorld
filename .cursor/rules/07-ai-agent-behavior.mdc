@@ -1,0 +1,106 @@
+---
+name: "AI Agent Behavior Rules"
+description: "Meta-rules for AI agent behavior and tool usage"
+alwaysApply: true
+priority: 9
+---
+
+# AI Agent Behavior Rules
+
+## Tool Usage
+
+- Use `@file` references for context, not full file dumps
+- Read files before editing (don't assume structure)
+- Use semantic search for understanding codebase
+- Batch related operations when possible
+- Verify changes with linter/tests
+- **Avoid PowerShell output limiting in terminal commands** - never use `Select-Object -First N` as it causes VPN/network issues
+  - Prefer direct commands or command-specific flags for output control
+  - Accept full output - modern terminals handle large output well
+
+## When to Ask for Confirmation
+
+- Breaking changes
+- Large refactorings (> 10 files)
+- Security-sensitive changes
+- Changes to core architecture
+- When user intent is unclear
+
+## Code Generation
+
+- Generate complete, working code (no TODOs)
+- Include error handling
+- Add comments for complex logic
+- Follow project patterns
+- Verify code compiles/runs
+
+## File Management
+
+- Read files before editing
+- Preserve existing structure when possible
+- Update related files (tests, docs)
+- Don't create unnecessary files
+- Clean up temporary files
+
+## Communication
+
+- Explain approach before implementing
+- Show reasoning for decisions
+- Flag uncertainties
+- Provide alternatives when blocked
+- Never apologize (be professional)
+
+## Terminal Command Patterns
+
+**PowerShell Compatibility:**
+- Always use `;` not `&&` for command chaining in PowerShell
+- Use separate commands when chaining is complex
+- Example: `cd project; npm install` not `cd project && npm install`
+
+**Path Navigation:**
+- Always check paths exist before navigating: `if (Test-Path "path") { Set-Location "path" }`
+- Use `Join-Path` for path construction
+- Use absolute paths from workspace root when possible
+
+## File Editing Patterns
+
+**When Files Are Blocked by Globalignore:**
+- If file creation/editing is blocked (e.g., `.env.example`):
+  1. Check if file exists and is gitignored
+  2. Use `git update-index --no-assume-unchanged <file>` to temporarily unignore
+  3. Make changes
+  4. Use `git update-index --assume-unchanged <file>` to re-ignore if needed
+  5. Alternative: Use programmatic file creation (Python/Node script) instead of direct editing
+
+## Validation Schema Alignment
+
+**When Creating Validation Schemas:**
+- Always verify API request types match validation schema structure
+- If API uses flat structure (e.g., `depth_min`, `depth_max`) but schema expects nested (e.g., `depth_range.min`), adapt schema to match API
+- Test validation with actual API request objects before finalizing
+- Document any structural differences between API types and validation schemas
+
+## Dependency Management
+
+**When Adding Testing Infrastructure:**
+- Add all testing dependencies to package.json before writing tests
+- Include: test framework, test utilities, type definitions, coverage tools
+- Verify dependencies are installed before running tests
+- Document required devDependencies in project setup instructions
+
+## Error Recurrence Prevention
+
+- **When an error occurs** (build, lint, test, or runtime): Clearly note what failed (command, file, or step), likely cause, and the fix applied. Do not continue as if the error was unimportant.
+- **Where to record:**
+  - If the project has `docs/KNOWN_ERRORS.md` or `docs/LESSONS_LEARNED.md`, add a short entry there (error summary + fix + context).
+  - If not, state the error and fix in the response and suggest creating `docs/KNOWN_ERRORS.md` for future reference.
+- **Before similar changes:** When about to make changes in the same area or of the same type (e.g., same build system, same API, same refactor), check `docs/KNOWN_ERRORS.md` or `docs/LESSONS_LEARNED.md` if present, and avoid repeating a previously encountered and documented error.
+
+## AI Agent Checklist
+
+- [ ] Context gathered before changes
+- [ ] Changes are complete
+- [ ] Related files updated
+- [ ] Code follows project patterns
+- [ ] User informed of approach
+- [ ] Errors encountered during the task are noted and recorded; known errors checked before repeating similar work

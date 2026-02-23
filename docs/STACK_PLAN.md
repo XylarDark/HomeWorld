@@ -136,5 +136,5 @@ flowchart TB
 
 - [PROTOTYPE_VISION.md](PROTOTYPE_VISION.md) – theme, Act 1 focus, Week 1 playtest goal
 - [../ROADMAP.md](../ROADMAP.md) – phases, pillars, campaign
-- [WEEK1_TASKS.md](WEEK1_TASKS.md) – Week 1 task breakdown
+- [TASKLIST.md](TASKLIST.md) – Current task list (links to task docs in docs/tasks/)
 - [SETUP.md](SETUP.md) – developer setup checklist

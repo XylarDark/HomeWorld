@@ -1,0 +1,14 @@
+{
+  "name": "homeworld",
+  "version": "0.0.1",
+  "private": true,
+  "description": "HomeWorld Unreal project - root scripts for DevEnvTemplate doctor",
+  "scripts": {
+    "doctor": "npm run doctor --prefix DevEnvTemplate",
+    "doctor:fix": "npm run doctor:fix --prefix DevEnvTemplate",
+    "doctor:build": "npm install --prefix DevEnvTemplate && npm run build --prefix DevEnvTemplate"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

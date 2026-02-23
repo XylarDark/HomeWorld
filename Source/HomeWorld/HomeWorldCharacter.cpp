@@ -16,11 +16,14 @@
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
 #include "Misc/DateTime.h"
+#include "HAL/PlatformFileManager.h"
 
 // #region agent log
 static void DebugLog(const char* HypothesisId, const char* Location, const char* Message, const FString& DataJson)
 {
-	FString Path = FPaths::ProjectDir() + TEXT("debug-cb22d5.log");
+	FString LogDir = FPaths::ProjectSavedDir() + TEXT("Logs");
+	IFileManager::Get().MakeDirectory(*LogDir, true);
+	FString Path = LogDir + TEXT("/debug-cb22d5.log");
 	FString Existing;
 	FFileHelper::LoadFileToString(Existing, *Path);
 	int64 Ts = (int64)FDateTime::UtcNow().ToUnixTimestamp() * 1000;
@@ -38,7 +41,7 @@ AHomeWorldCharacter::AHomeWorldCharacter(const FObjectInitializer& ObjectInitial
 
 	AttributeSet = CreateDefaultSubobject<UHomeWorldAttributeSet>(TEXT("AttributeSet"));
 
-	// Third-person camera: character orients to movement, not to camera
+	// Character orients to movement direction (not camera yaw) so third-person feels natural when moving with WASD.
 	bUseControllerRotationYaw = false;
 	if (UCharacterMovementComponent* Movement = GetCharacterMovement())
 	{
@@ -122,7 +125,7 @@ void AHomeWorldCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 void AHomeWorldCharacter::Move(const FInputActionValue& Value)
 {
 	const FVector2D Axis = Value.Get<FVector2D>();
-	// Camera-relative movement: W = move toward where the camera looks
+	// Camera-relative movement: W = move toward where the camera looks, so the character feels responsive to the camera.
 	const FRotator ControlRot = GetControlRotation();
 	FVector Forward = FRotationMatrix(FRotator(0.0f, ControlRot.Yaw, 0.0f)).GetUnitAxis(EAxis::X);
 	FVector Right = FRotationMatrix(FRotator(0.0f, ControlRot.Yaw, 0.0f)).GetUnitAxis(EAxis::Y);
@@ -153,6 +156,7 @@ void AHomeWorldCharacter::Look(const FInputActionValue& Value)
 	}
 	FRotator R = PC->GetControlRotation();
 	R.Yaw += Axis.X * LookSensitivity;
+	// Clamp pitch so the camera doesn't flip over the top or go below the horizon; keeps third-person feel consistent.
 	R.Pitch = FMath::Clamp(R.Pitch + Axis.Y * LookSensitivity, MinPitch, MaxPitch);
 	R.Roll = 0.0f;
 	// #region agent log

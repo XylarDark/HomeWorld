@@ -12,7 +12,7 @@ assignees: ''
 
 ## Roadmap / doc link
 
-(Which phase or doc does this relate to? e.g. Week 1, ROADMAP.md, docs/STACK_PLAN.md, docs/WEEK1_TASKS.md.)
+(Which phase or doc does this relate to? e.g. ROADMAP.md, docs/STACK_PLAN.md, docs/TASKLIST.md.)
 
 ## Acceptance criteria
 

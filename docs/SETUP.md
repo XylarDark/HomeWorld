@@ -15,7 +15,70 @@ Do these steps once. Everything else for first-phase setup is already in the rep
 5. **World:** Confirm the project uses Open World / World Partition (already set in `Config/DefaultEngine.ini`).
 6. **Roles (optional):** Note Designer / Artist / Programmer / Tester and who leads Week 1.
 
-After this, follow [WEEK1_TASKS.md](WEEK1_TASKS.md) in the Editor.
+After this, follow [TASKLIST.md](TASKLIST.md) for current tasks.
+
+---
+
+## Plugins
+
+All required plugins are enabled in `HomeWorld.uproject`. No Marketplace install is needed for co-op: **Steam Sockets** (in .uproject) replaces SteamCore/Steam Sessions.
+
+| Plugin | .uproject name | Purpose |
+|--------|----------------|---------|
+| PCG (Procedural Content Generation) | `PCG` | Worlds/biomes |
+| Gameplay Ability System (GAS) | `GameplayAbilities` | PoE-style combat |
+| Steam Sockets | `SteamSockets` | Co-op (replaces SteamCore) |
+| Enhanced Input | `EnhancedInput` | Better controls |
+| Day Night Sequencer (UE5.5+) | `DaySequence` | Day/night cycles |
+
+**Swarms (future):** Mass Entity is deprecated in UE 5.5+ and has been removed from this project. When implementing night swarms, enable and use whatever Mass-related plugin Epic documents as the replacement.
+
+**Python/PCG scripts:** For the demo map and PCG forest scripts, **PythonScriptPlugin** and **PCGPythonInterop** must also be enabled. Restart the Editor after first enable.
+
+---
+
+## Git and LFS
+
+Use this checklist to confirm Git and GitHub setup.
+
+- [ ] **Repo exists:** HomeWorld repo is created and accessible. **.gitignore:** Repo root `.gitignore` contains standard UE5 entries (Binaries/, Intermediate/, Saved/, DerivedDataCache/, IDE/OS entries).
+- [ ] **Git LFS:** In terminal, `git lfs version` returns a version. Repo root `.gitattributes` exists and contains LFS rules for `*.uasset` and `*.umap`.
+- [ ] **Terminal (project root):** `git init` done; `git lfs track ".uasset" ".umap"` run; `.gitattributes` has the LFS lines; `git remote -v` shows `origin`; branch is `main` (or `master`); pushed to remote.
+- [ ] **Team:** Each member can clone, then right-click **HomeWorld.uproject** → **Generate Visual Studio project files** (or run Engine Build.bat with -projectfiles), then open the .uproject or solution.
+
+**Troubleshooting:** If `git push -u origin main` fails with `src refspec main does not match any`, rename the branch: `git branch -M main` then `git push -u origin main`.
+
+---
+
+## Validation
+
+Use this to confirm first-phase setup is complete before starting tasks.
+
+**In-repo (no Editor):**
+
+- [ ] **Plugins:** In `HomeWorld.uproject`, the `Plugins` array includes `PCG`, `GameplayAbilities`, `EnhancedInput`, `SteamSockets`, and `DaySequence` (or `TimeOfDay`), each with `"Enabled":true`.
+- [ ] **Default map:** In `Config/DefaultEngine.ini`, under `[/Script/EngineSettings.GameMapsSettings]`, `GameDefaultMap` is set (e.g. `/Game/HomeWorld/Maps/Main.Main`).
+- [ ] **Docs:** `docs/PROTOTYPE_VISION.md`, `docs/SETUP.md`, `docs/TEAM_APPROVAL_CHECKLIST.md`, `docs/TASKLIST.md`, `ROADMAP.md` exist.
+
+**C++ and default pawn:**
+
+- [ ] **C++ builds:** After generating Visual Studio project files, **HomeWorld** and **HomeWorldEditor** targets build (see [Building (C++)](#building-c)).
+- [ ] **Default game mode:** **Project Settings → Maps & Modes** → Default GameMode is **HomeWorldGameMode**; Default Pawn Class is **HomeWorldCharacter** (or a Blueprint child). See [CONVENTIONS.md](CONVENTIONS.md#input-setup-enhanced-input).
+- [ ] **PIE:** Character moves with WASD, camera follows mouse (third-person). If not, create and assign **IA_Move**, **IA_Look**, **IMC_Default** per [CONVENTIONS.md](CONVENTIONS.md).
+
+**Developer (Editor):**
+
+- [ ] UE 5.4+ (or 5.7) installed; project opens without plugin errors. **Edit > Plugins** shows PCG, Gameplay Abilities, Enhanced Input, Steam Sockets, Day Night Sequencer enabled.
+- [ ] FAB/Quixel assets (or equivalents) acquired if needed.
+- [ ] Team has run through [TEAM_APPROVAL_CHECKLIST.md](TEAM_APPROVAL_CHECKLIST.md) if applicable.
+
+When all above are checked, proceed to [TASKLIST.md](TASKLIST.md) and the task docs in `docs/tasks/`.
+
+**Testing and validation:** There is no automated test suite yet. Validation is done via the checklist above (plugins, default map, C++ build, default pawn, PIE) and manual play in the Editor. When making changes, run through the relevant checklist items and play-test where applicable. Automated tests may be added later; the docs will be updated when they are.
+
+**Debug logs:** Agent/debug logs are written to `Saved/Logs/debug-cb22d5.log` (gitignored).
+
+When you fix a build, lint, or runtime error, record it in [KNOWN_ERRORS.md](KNOWN_ERRORS.md) so we don't repeat it.
 
 ---
 
