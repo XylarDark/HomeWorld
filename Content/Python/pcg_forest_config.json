@@ -1,9 +1,22 @@
 {
-  "static_mesh_spawner_meshes": [],
-  "static_mesh_spawner_meshes_rocks": [],
+  "static_mesh_spawner_meshes": [
+    "/Game/StylizedProvencal/Meshes/SM_Tree_01",
+    "/Game/StylizedProvencal/Meshes/SM_Tree_02",
+    "/Game/StylizedProvencal/Meshes/SM_Tree_03",
+    "/Game/StylizedProvencal/Meshes/SM_Tree_Cypress"
+  ],
+  "static_mesh_spawner_meshes_rocks": [
+    "/Game/StylizedProvencal/Meshes/SMF_Forest_Rock_1",
+    "/Game/StylizedProvencal/Meshes/SMF_Forest_Rock_2",
+    "/Game/StylizedProvencal/Meshes/SMF_Forest_Rock_3",
+    "/Game/StylizedProvencal/Meshes/SMF_Forest_Rock_4",
+    "/Game/StylizedProvencal/Meshes/SM_Rock_Small_01",
+    "/Game/StylizedProvencal/Meshes/SM_Rock_Small_02",
+    "/Game/StylizedProvencal/Meshes/SM_Rock_Small_03"
+  ],
   "height_filter_min": null,
   "height_filter_max": null,
-  "_comment_trees": "Megascans trees: add paths from Content/Environments/. Right-click asset -> Copy Reference, paste here. Leave empty for placeholder.",
-  "_comment_rocks": "Optional rocks (second spawner): add paths for rock meshes. Leave empty to skip.",
+  "_comment_trees": "Stylized Provencal trees by default. Replace with Megascans paths from Content/Environments/ if desired.",
+  "_comment_rocks": "Stylized Provencal forest/small rocks. Leave empty to skip rocks branch.",
   "_comment_height": "Optional: set height_filter_min and height_filter_max (world Z in cm) to spawn only on terrain. E.g. -5000 to 5000. Leave null to skip."
 }

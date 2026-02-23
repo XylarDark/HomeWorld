@@ -22,7 +22,13 @@ This doc describes how to create the forest island (PCG graph + volume + generat
 - **Rocks (optional):** `static_mesh_spawner_meshes_rocks` — add rock mesh paths for the optional second spawner. Leave empty to skip.
 - **Height filter (optional):** `height_filter_min` and `height_filter_max` — world Z in cm (e.g. `-5000` and `5000`) so instances spawn only on terrain. Set both to numbers to enable; leave `null` to skip. You may need to set the filter’s target attribute to **Position.Z** in the graph in the Editor.
 
-**Demo map only:** When using [create_demo_map.py](../Content/Python/create_demo_map.py), [demo_map_config.json](../Content/Python/demo_map_config.json) can include **exclusion_zones** (array of center + extent in cm) so trees are not generated in the village or other areas. See [PCG_TUTORIAL_REPLACE_MAIN_TREES.md](PCG_TUTORIAL_REPLACE_MAIN_TREES.md) (section 5).
+### Dead zones (exclusion – demo map)
+
+When using [create_demo_map.py](../Content/Python/create_demo_map.py), you can define **exclusion zones** (dead zones) so no trees spawn in the village or other areas:
+
+1. Edit [demo_map_config.json](../Content/Python/demo_map_config.json).
+2. Set **exclusion_zones** to an array of boxes. Each object: **center_x**, **center_y**, **center_z** and **extent_x**, **extent_y**, **extent_z** (all in cm; extents are half-sizes). Example for one 40×40×10 m zone at origin: `[{ "center_x": 0, "center_y": 0, "center_z": 0, "extent_x": 2000, "extent_y": 2000, "extent_z": 500 }]`.
+3. Save and re-run **create_demo_map.py**. The script adds a Difference node and spawns exclusion volume actors; if the log says the exclusion point source could not be wired, connect it in the graph (see [PCG_TUTORIAL_REPLACE_MAIN_TREES.md](PCG_TUTORIAL_REPLACE_MAIN_TREES.md) section 3, Step 6).
 
 ## How to run the script
 
@@ -79,4 +85,4 @@ Ensure the default map is already created; otherwise open the correct level firs
 
 ## See also
 
-For an in-depth tutorial on setting up the PCG graph and replacing trees on the Main map, see [PCG_TUTORIAL_REPLACE_MAIN_TREES.md](PCG_TUTORIAL_REPLACE_MAIN_TREES.md).
+For the full **Editor step-by-step guide** (add PCG volumes, wire the graph, customize density, meshes, and dead zones), see [PCG_TUTORIAL_REPLACE_MAIN_TREES.md](PCG_TUTORIAL_REPLACE_MAIN_TREES.md).

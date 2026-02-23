@@ -24,9 +24,26 @@ The demo level combines the **Stylized Provencal medieval village** with a **PCG
 - **demo_level_path:** Target level (default `/Game/HomeWorld/Maps/Main`).
 - **template_level_path:** Source level to duplicate if Main is missing (default `/Game/StylizedProvencal/Maps/Main`).
 - **volume_center_x/y/z**, **volume_extent_x/y/z:** PCG volume center and half-extents in cm (default: center 0,0,0; extent 5000,5000,500 ⇒ 100×100×10 m box). Adjust to surround or avoid the village as needed.
-- **exclusion_zones (optional):** Array of dead zones (no trees). Each object: **center_x**, **center_y**, **center_z**, **extent_x**, **extent_y**, **extent_z** (cm). The script adds a Difference node and spawns exclusion volume actors. See [PCG_TUTORIAL_REPLACE_MAIN_TREES.md](PCG_TUTORIAL_REPLACE_MAIN_TREES.md) (section 5).
+- **exclusion_zones (optional):** Array of dead zones where no trees spawn. See **Setting up dead zones** below.
 
 Forest meshes (trees, rocks) are still driven by [pcg_forest_config.json](../Content/Python/pcg_forest_config.json); add paths there and re-run the script or run [create_pcg_forest.py](../Content/Python/create_pcg_forest.py) to refresh the graph.
+
+### Setting up dead zones
+
+To keep trees out of the village (or roads, clearings, etc.):
+
+1. Open **Content/Python/demo_map_config.json**.
+2. Find **exclusion_zones** (default: `[]`). Add one object per dead zone with **center_x**, **center_y**, **center_z** and **extent_x**, **extent_y**, **extent_z** (all in cm; extents are half-sizes).
+3. Example – one zone covering the village at origin, 40 m × 40 m × 10 m:
+   ```json
+   "exclusion_zones": [
+     { "center_x": 0, "center_y": 0, "center_z": 0, "extent_x": 2000, "extent_y": 2000, "extent_z": 500 }
+   ]
+   ```
+4. Save the file and re-run **create_demo_map.py**. The script adds a **Difference** node to the graph and spawns exclusion volume actors in the level; no trees will generate inside the defined boxes.
+5. If the Output Log says the exclusion point source could not be wired automatically, open the PCG graph and connect the exclusion point source to the Difference node’s **Difference** pin (see [PCG_TUTORIAL_REPLACE_MAIN_TREES.md](PCG_TUTORIAL_REPLACE_MAIN_TREES.md) section 3, Step 6).
+
+Verify by flying around the village: there should be no tree instances inside the exclusion zones.
 
 ## One-time copy (if duplication fails)
 
@@ -41,4 +58,4 @@ After that, the script will find Main and only open it (if needed), create the g
 
 ## See also
 
-For an in-depth tutorial on setting up the PCG graph and replacing trees on the Main map, see [PCG_TUTORIAL_REPLACE_MAIN_TREES.md](PCG_TUTORIAL_REPLACE_MAIN_TREES.md).
+For **adding and customizing PCG volumes in the Editor** (step-by-step: create graph, add volume, customize density/meshes/dead zones), see [PCG_TUTORIAL_REPLACE_MAIN_TREES.md](PCG_TUTORIAL_REPLACE_MAIN_TREES.md).

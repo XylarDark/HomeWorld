@@ -99,6 +99,26 @@ def _ensure_demo_level_exists(demo_path, template_path):
     return False
 
 
+def _get_landscape_bounds():
+    """Return (location Vector, extent Vector) from the first Landscape in the level, or None if no landscape.
+    extent is half-extent (same as config volume_extent_*)."""
+    try:
+        world = unreal.EditorLevelLibrary.get_editor_world()
+        if not world:
+            return None
+        landscapes = unreal.GameplayStatics.get_all_actors_of_class(world, unreal.Landscape)
+        if not landscapes:
+            return None
+        land = landscapes[0]
+        origin = unreal.Vector()
+        box_extent = unreal.Vector()
+        land.get_actor_bounds(False, origin, box_extent, False)
+        return (origin, box_extent)
+    except Exception as e:
+        _log("Could not get landscape bounds: " + str(e))
+        return None
+
+
 def _get_current_level_path():
     """Return the asset path of the current editor level (e.g. /Game/HomeWorld/Maps/Main), or None."""
     try:
@@ -179,7 +199,7 @@ def main():
     _debug_log("H4", "create_demo_map.py:main", "Main is open", '{"ok":1}')
     # #endregion
 
-    # Build location and extent from config (Unreal units: cm)
+    # Build location and extent from config (Unreal units: cm); override with landscape bounds if present
     location = unreal.Vector(
         float(config.get("volume_center_x", 0)),
         float(config.get("volume_center_y", 0)),
@@ -190,8 +210,22 @@ def main():
         float(config.get("volume_extent_y", 5000)),
         float(config.get("volume_extent_z", 500)),
     )
+    landscape_bounds = _get_landscape_bounds()
+    if landscape_bounds is not None:
+        location, extent = landscape_bounds
+        _log("Using PCG volume bounds from landscape: center=%s half_extent=%s" % (location, extent))
 
     exclusion_zones = config.get("exclusion_zones") or []
+    if not exclusion_zones:
+        # Default: one exclusion zone in the center, 10% of volume size
+        ex_x = max(100.0, abs(extent.x) * 0.1)
+        ex_y = max(100.0, abs(extent.y) * 0.1)
+        ex_z = max(50.0, abs(extent.z) * 0.1)
+        exclusion_zones = [{
+            "center_x": location.x, "center_y": location.y, "center_z": location.z,
+            "extent_x": ex_x, "extent_y": ex_y, "extent_z": ex_z,
+        }]
+        _log("Added default center exclusion zone (10%% of volume): extent %s %s %s" % (ex_x, ex_y, ex_z))
     graph_asset = pcg_forest.create_pcg_graph(exclusion_zones=exclusion_zones)
     # #region agent log
     _debug_log("H4", "create_demo_map.py:main", "PCG graph created", '{"hasGraph":%d}' % (1 if graph_asset else 0))
@@ -203,7 +237,7 @@ def main():
         # #endregion
     pcg_forest.try_world_partition()
 
-    _log("Done. Demo map ready (medieval village + PCG forest). Add tree/rock paths in pcg_forest_config.json and re-run if desired.")
+    _log("Done. Demo map ready (medieval village + PCG forest). Trees/rocks from Stylized Provencal; edit pcg_forest_config.json to change.")
 
 
 if __name__ == "__main__":
