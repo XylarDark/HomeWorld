@@ -77,6 +77,15 @@ try {
 - Prefer a single project-wide place (e.g. `docs/KNOWN_ERRORS.md` or `docs/LESSONS_LEARNED.md`) for recurring or instructive errors.
 - Follow the process in `07-ai-agent-behavior.mdc` (error recurrence prevention) when working in the codebase.
 
+## UE 5.7 Migration Guard
+
+Before writing or reviewing C++ that touches engine APIs, check for deprecated patterns:
+
+- **Read `docs/KNOWN_ERRORS.md`** and the pitfalls table in `unreal-cpp.mdc` before using `FindObject`, image utilities, or global constants.
+- **Do not use `ANY_PACKAGE`** — it was removed in UE 5.7. Use `nullptr`.
+- **Avoid generic global names** (e.g. `BufferSize`) that collide with engine headers; prefix and use `static constexpr`.
+- When integrating third-party plugins targeting older UE versions, expect API breakage and apply known fixes before building.
+
 ## Concurrency & Async Patterns
 
 **Async/Await:**

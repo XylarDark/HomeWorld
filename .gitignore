@@ -29,6 +29,9 @@ UpgradeLog.htm
 *.vcxproj.user
 *.sublime-*
 
+# External plugins (installed via tools, not project code)
+Plugins/UnrealMCP/
+
 # Secrets and debug logs
 .env
 .env.local

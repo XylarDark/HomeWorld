@@ -1,108 +1,61 @@
 ---
-name: "DevEnvTemplate Project Context"
-description: "Project-specific context and conventions for DevEnvTemplate"
+name: "HomeWorld Project Context"
+description: "Project-specific context and conventions for HomeWorld"
 alwaysApply: true
 priority: 8
 ---
 
-# DevEnvTemplate Project Context
+# HomeWorld Project Context
 
 ## Project Purpose
 
-DevEnvTemplate is a "doctor" for development environments - it diagnoses issues, prescribes solutions, and keeps codebases healthy while coding with LLMs. It's optimized for indie developers and solo founders.
+HomeWorld is a co-op ARPG survival game with family sim elements, built in Unreal Engine 5.7. Players explore, fight, build, and nurture bonds. Target: 8-12h campaign + endgame; PC, Steam Early Access.
 
 ## Tech Stack
 
-- TypeScript (strict mode, ES2020, CommonJS)
-- Node.js 20+ LTS
-- Node.js test runner (no heavy frameworks)
-- GitHub Actions for CI/CD
-- Free-tier optimization (2000 min/month)
+- Unreal Engine 5.7 (C++ game module + Blueprint for content)
+- Enhanced Input, PCG, Gameplay Abilities, Steam Sockets, Day Sequence
+- Python Editor scripting for automation (`Content/Python/`)
+- MCP bridge for Cursor-to-Editor live control (UnrealMCP plugin)
+- Git + LFS for version control (.uasset, .umap tracked via LFS)
 
 ## Key Principles
 
-- **Free-tier first**: Optimize for GitHub Actions free tier
-- **Solo-friendly**: No team workflows, no approval gates
-- **Quality by default**: Automated testing, linting, CI/CD
-- **Ship fast**: Quick iteration and deployment
-- **Security baseline**: No credentials in repo, dependency scanning
+- **Programmatic by default**: Gameplay systems, movement, input, camera, combat in C++; Blueprint for content and designer overrides
+- **MCP-first**: When the Editor is running and MCP is connected, prefer live Editor manipulation via MCP tools
+- **Error recording**: Document errors in `docs/KNOWN_ERRORS.md` so they are not repeated; check it before similar work
+- **Code-first, then Editor**: Automate as much as possible (Python scripts, MCP); manual Editor steps documented in task guides
 
 ## Project Structure
 
-- `scripts/` - Core tooling (doctor, cleanup, agent)
-- `docs/` - Documentation
-- `config/` - Configuration files
-- `tests/` - Test files
-- `.devenv/` - Generated reports (gitignored)
+- `Source/HomeWorld/` - C++ game module (character, game mode, components)
+- `Content/` - UE content (maps, Blueprints, assets, Python scripts)
+- `Config/` - DefaultEngine.ini, DefaultInput.ini, etc.
+- `Plugins/` - Local plugins (UnrealMCP; gitignored)
+- `.cursor/rules/` - Cursor AI rules (shipped with the repo)
+- `docs/` - Setup, conventions, task guides, known errors
 
-## Key Commands
+## Key Files
 
-- `npm run doctor` - Health check
-- `npm run doctor:fix` - Auto-fix issues
-- `npm run test` - Run tests
-- `npm run build` - Compile TypeScript
-
-## Important Files
-
-- `.projectrules` - Project rules (legacy, being migrated)
-- `BOOTSTRAP.md` - Single-file-loads-all for LLMs
-- `README.md` - Human-readable overview
-- `package.json` - Dependencies and scripts
+- `HomeWorld.uproject` - Project descriptor (plugins, modules)
+- `AGENTS.md` - Top-level agent context
+- `docs/TASKLIST.md` - Master task list with links to detailed docs
+- `docs/SETUP.md` - Developer onboarding (Engine, plugins, MCP, rules, Git)
+- `docs/KNOWN_ERRORS.md` - Recorded errors and fixes
+- `docs/MCP_SETUP.md` - MCP bridge installation and troubleshooting
 
 ## Conventions
 
-- Conventional commits (feat/fix/docs/etc.)
-- TypeScript strict mode
-- Tests in `tests/` directory
-- Documentation in `docs/` directory
-- Cross-platform compatibility (Windows/macOS/Linux)
+- C++ naming: PascalCase types, camelCase locals; Unreal prefixes (A, U, F, E, I)
+- UE 5.7 target: check `unreal-cpp.mdc` API pitfalls table before using deprecated APIs
+- PowerShell shell: use `;` not `&&` for command chaining
+- Batch files in project root for common operations (build, open VS, run scripts, MCP setup)
+- Debug logs go to `Saved/Logs/` (gitignored)
 
-## PowerShell Compatibility
+## Onboarding Quick-Start
 
-- Use `;` not `&&` for command chaining
-- Test paths before navigation
-- Avoid emoji in commit messages
-- Use `Join-Path` for path construction
-
-## Testing Standards
-
-- Unit tests: < 5 seconds
-- Integration tests: < 60 seconds
-- All tests must have timeouts
-- Use real temp directories (not mock-fs)
-- Test cleanup in afterEach hooks
-
-## Import Path Management
-
-**After File Moves or Refactoring:**
-- Always verify import paths after structural changes
-- Run type checker (`tsc --noEmit`) to catch import errors
-- Update path aliases in tsconfig.json if needed
-- Verify test imports resolve correctly
-- Check for circular dependencies after moves
-
-**TypeScript/Next.js Boundaries:**
-- Never import Node.js modules (`fs`, `path`, `os`) in client components (`'use client'`)
-- Use API routes for server-side operations
-- Verify `'use client'` directive is present when needed
-- Check build output for boundary violations
-
-**Import Path Verification:**
-```typescript
-// After refactoring, verify:
-// 1. Type checking passes
-npx tsc --noEmit
-
-// 2. Build succeeds
-npm run build
-
-// 3. Tests pass
-npm test
-```
-
-## Performance
-
-- Parallel processing for I/O-bound operations
-- Caching enabled by default
-- Performance tracking with `--performance` flag
-- Memory efficiency (process in chunks)
+1. Clone repo, open `HomeWorld.uproject`
+2. Run `Setup-MCP.bat` (one-time MCP bridge install)
+3. Run `Build-HomeWorld.bat` (compile C++ module + plugins)
+4. Open Editor, restart Cursor, verify MCP green dot
+5. Follow `docs/TASKLIST.md` for current work

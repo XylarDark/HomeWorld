@@ -1,0 +1,43 @@
+---
+name: "MCP-First Workflow"
+description: "Prefer MCP tools for Unreal Editor tasks when connected"
+alwaysApply: true
+priority: 7
+---
+
+# MCP-First Workflow
+
+## When MCP tools are available
+
+When the Unreal Editor is running and MCP tools (unrealMCP) are connected:
+
+1. **Use MCP tools first** for any Editor task — spawning actors, setting properties, creating assets, configuring Blueprints, manipulating the level, reading Editor state.
+2. **Save reusable operations** as Python scripts in `Content/Python/` alongside MCP usage, so the same work can be re-run without MCP.
+3. **Verify changes** by querying Editor state after each MCP action (e.g. list actors, get property values) rather than assuming success.
+
+## Prioritization order
+
+| Priority | Method | When to use |
+|----------|--------|-------------|
+| 1 | MCP tools (live Editor) | Any Editor manipulation when connected |
+| 2 | Python Editor scripts | Batch/repeatable operations; offline-capable workflows |
+| 3 | Manual Editor instructions | Only when MCP and Python cannot accomplish the task (e.g. AnimGraph editing) |
+
+## When MCP is unavailable
+
+If MCP tools are not listed or connection fails (Editor closed, plugin not loaded):
+- Fall back to Python Editor scripts or manual step-by-step instructions.
+- Do not block on MCP; proceed with the next-best approach.
+
+## MCP connection details
+
+- **Plugin:** UnrealMCP (TCP server on port 55557, auto-starts with Editor)
+- **Python server:** `C:\tools\unreal-mcp\Python\unreal_mcp_server.py` (launched by Cursor via `uv run`)
+- **Config:** `.cursor/mcp.json` in workspace root
+- **Docs:** `docs/MCP_SETUP.md`
+
+## What MCP can and cannot do
+
+**Can do:** Actor CRUD, Blueprint creation and component setup, Blueprint node graph wiring, viewport control, property get/set, project settings, level manipulation.
+
+**Cannot do:** Animation Blueprint state machine editing (AnimGraph visual graph API is not exposed).

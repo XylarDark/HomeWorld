@@ -18,6 +18,18 @@ When adding new features, prefer C++ for the core implementation; use Blueprint 
 
 ---
 
+## MCP-first when Editor is running
+
+When the Unreal Editor is open and the MCP server is connected to Cursor:
+
+1. **Use MCP tools first** for Editor tasks (spawning actors, setting properties, creating assets, configuring Blueprints).
+2. **Save repeatable workflows** as Python scripts in `Content/Python/` alongside MCP usage, so operations can be re-run without MCP.
+3. **Fall back to manual instructions** only when MCP and Python cannot accomplish the task (e.g. AnimGraph state machine editing).
+
+See [MCP_SETUP.md](MCP_SETUP.md) for installation and `.cursor/rules/09-mcp-workflow.mdc` for full priority rules.
+
+---
+
 ## Code-first checklist
 
 - **New systems:** Implement in C++; expose designer-facing APIs with `UFUNCTION(BlueprintCallable)` or `BlueprintNativeEvent` where designers need to drive or extend behavior from Blueprint.

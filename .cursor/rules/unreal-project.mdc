@@ -10,4 +10,6 @@ alwaysApply: false
 - **Layout:** Code in `Source/HomeWorld/`. Content in `Content/` (e.g. `Content/HomeWorld/` for project-specific assets). Config in `Config/` (DefaultEngine.ini, DefaultInput.ini, etc.).
 - **Plugins (from .uproject):** Enhanced Input, PCG, Gameplay Abilities, Steam Sockets, Day Sequence (and others as listed). Do not disable Enhanced Input; the default pawn relies on it. Mass Entity is deprecated and not enabled; use Epic’s replacement when adding swarms.
 - **Default pawn and game mode:** Default pawn is `AHomeWorldCharacter` (C++). Default game mode is `AHomeWorldGameMode` (C++), set in `Config/DefaultEngine.ini` as `GlobalDefaultGameMode=/Script/HomeWorld.HomeWorldGameMode`.
-- **Docs:** Setup and conventions are in `docs/` (SETUP.md, CONVENTIONS.md, STACK_PLAN.md, PROTOTYPE_VISION.md).
+- **MCP (Cursor-to-Editor bridge):** `Setup-MCP.bat` installs the UnrealMCP plugin and Python server. The plugin starts a TCP listener on port 55557 when the Editor opens; Cursor connects via `.cursor/mcp.json`. See `docs/MCP_SETUP.md` and `.cursor/rules/09-mcp-workflow.mdc`.
+- **Cursor rules:** `.cursor/rules/` ships with the repo. Key rules: `unreal-cpp.mdc` (C++ conventions + UE 5.7 pitfalls), `unreal-project.mdc` (this file), `09-mcp-workflow.mdc` (MCP-first priorities), `05-error-handling.mdc` (error recording → `docs/KNOWN_ERRORS.md`).
+- **Docs:** Setup and conventions are in `docs/` (SETUP.md, CONVENTIONS.md, STACK_PLAN.md, PROTOTYPE_VISION.md, MCP_SETUP.md, KNOWN_ERRORS.md).

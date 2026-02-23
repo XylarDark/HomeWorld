@@ -12,3 +12,17 @@ alwaysApply: false
 - **Module boundaries:** Game code lives in the `HomeWorld` module. Do not depend on engine private headers or other game modules without explicit approval.
 - **Include order:** Own header first, then engine/public includes, then project includes. Keep includes minimal.
 - **Source layout:** C++ lives under `Source/HomeWorld/`. Core pawn is `AHomeWorldCharacter`; default game mode is `AHomeWorldGameMode`.
+
+## UE 5.7 API pitfalls
+
+These APIs changed or were removed in UE 5.7. Check `docs/KNOWN_ERRORS.md` for the full list.
+
+| Removed / Deprecated | Replacement |
+|---|---|
+| `ANY_PACKAGE` in `FindObject<T>()` | Pass `nullptr` as the outer |
+| `FImageUtils::CompressImageArray` | `FImageUtils::PNGCompressImageArray` with `TArray64<uint8>` |
+| Global names that collide with engine headers (e.g. `BufferSize`) | Prefix with module/context name and use `static constexpr` |
+| `UCollisionProfile::Pawn_ProfileName` (may need extra includes) | `FName("Pawn")` literal |
+| `SCENE_QUERY_STAT` macro (version-dependent includes) | `FCollisionQueryParams(NAME_None, false, OwnerActor)` |
+
+When writing or reviewing C++ that uses `FindObject`, image compression, or global constants, verify against this table first.

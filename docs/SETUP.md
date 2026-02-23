@@ -15,6 +15,14 @@ Do these steps once. Everything else for first-phase setup is already in the rep
 5. **World:** Confirm the project uses Open World / World Partition (already set in `Config/DefaultEngine.ini`).
 6. **Roles (optional):** Note Designer / Artist / Programmer / Tester and who leads Week 1.
 
+7. **MCP (Cursor-to-Editor bridge):** Run **`Setup-MCP.bat`** from the project root. This installs the tools that let Cursor's AI agent control the Unreal Editor directly (spawn actors, create Blueprints, set properties). See [MCP_SETUP.md](MCP_SETUP.md) for details and troubleshooting.
+8. **Cursor rules:** The repo ships a full `.cursor/rules/` directory that guides Cursor's AI agent. Open the project in Cursor and the rules are picked up automatically — no extra setup. Skim `.cursor/rules/` for an overview; key rules:
+   - `unreal-cpp.mdc` — C++ conventions and UE 5.7 API pitfalls.
+   - `unreal-project.mdc` — project layout, plugins, default pawn.
+   - `09-mcp-workflow.mdc` — MCP-first workflow priorities.
+   - `05-error-handling.mdc` — error recording policy (`docs/KNOWN_ERRORS.md`).
+   - `08-project-context.mdc` — HomeWorld-specific context and conventions.
+
 After this, follow [TASKLIST.md](TASKLIST.md) for current tasks.
 
 ---
@@ -102,6 +110,7 @@ The project has a C++ game module (`Source/HomeWorld/`). To build from an IDE or
 | Build the full solution from command line | **Build-Solution-WithBundledDotNet.bat** |
 | Run the PCG forest script (Editor opens and runs script) | **Run-PCGForestScript.bat** (set `UE_EDITOR` in the file first) |
 | Run the demo map script (village + PCG forest) | **Run-DemoMapScript.bat** (set `UE_EDITOR` in the file first) |
+| Set up MCP (Cursor-to-Editor bridge) | **Setup-MCP.bat** (one-time; installs uv, clones unreal-mcp, copies plugin) |
 
 `scripts/SetEnv-BundledDotNet.bat` is used by the two solution-related batch files; edit its UE path if the engine is installed elsewhere.
 
