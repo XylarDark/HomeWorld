@@ -16,6 +16,10 @@ class UInputAction;
 class UInputMappingContext;
 
 UCLASS(Blueprintable)
+/**
+ * Third-person character: movement and camera in C++; mesh and Animation Blueprint in Blueprint.
+ * AnimBP can use GetVelocity() or GetCharacterMovement()->Velocity for Idle/Locomotion blend.
+ */
 class HOMEWORLD_API AHomeWorldCharacter : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
@@ -84,6 +88,14 @@ protected:
 	/** Offset (degrees) applied to the mesh relative rotation so mesh forward matches movement direction. Use e.g. 90 or -90 if the mesh faces the wrong way. */
 	UPROPERTY(EditDefaultsOnly, Category = "Mesh", meta = (ClampMin = "-180.0", ClampMax = "180.0"))
 	float MeshForwardYawOffset = 0.0f;
+
+	/** Capsule radius (cm). Human-sized default; override in Blueprint for different characters. */
+	UPROPERTY(EditDefaultsOnly, Category = "Movement", meta = (ClampMin = "1.0", ClampMax = "200.0"))
+	float CapsuleRadius = 42.0f;
+
+	/** Capsule half-height (cm). Human-sized default; override in Blueprint for different characters. */
+	UPROPERTY(EditDefaultsOnly, Category = "Movement", meta = (ClampMin = "1.0", ClampMax = "500.0"))
+	float CapsuleHalfHeight = 88.0f;
 
 	virtual void BeginPlay() override;
 

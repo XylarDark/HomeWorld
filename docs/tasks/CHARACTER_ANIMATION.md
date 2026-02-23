@@ -30,4 +30,5 @@
 ## Reference
 
 - **C++ movement:** `AHomeWorldCharacter::Move()` adds movement input; `CharacterMovementComponent` handles velocity. Animation does not need to be changed in C++ for basic locomotion.
+- **Velocity for AnimBP:** The Animation Blueprint can drive Idle/Locomotion from the pawn owner’s **Get Velocity** (e.g. Vector Length on XY) or **Get Movement Component → Velocity**; no extra C++ API is required.
 - **Input:** IA_Move, IA_Look, IMC_Default must exist and be assigned per [CONVENTIONS.md](../CONVENTIONS.md#input-setup-enhanced-input).

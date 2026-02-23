@@ -17,6 +17,10 @@
 #include "Misc/Paths.h"
 #include "Misc/DateTime.h"
 #include "HAL/PlatformFileManager.h"
+#include "Engine/World.h"
+#include "Engine/HitResult.h"
+#include "CollisionQueryParams.h"
+#include "Components/CapsuleComponent.h"
 
 // #region agent log
 static void DebugLog(const char* HypothesisId, const char* Location, const char* Message, const FString& DataJson)
@@ -48,6 +52,12 @@ AHomeWorldCharacter::AHomeWorldCharacter(const FObjectInitializer& ObjectInitial
 		Movement->bOrientRotationToMovement = true;
 		Movement->RotationRate = FRotator(0.0f, RotationRateYaw, 0.0f);
 	}
+	// Human-sized capsule and Pawn collision so the character stands on the ground correctly (Task: Character touching the ground).
+	if (UCapsuleComponent* Capsule = GetCapsuleComponent())
+	{
+		Capsule->SetCapsuleSize(CapsuleRadius, CapsuleHalfHeight);
+		Capsule->SetCollisionProfileName(FName("Pawn"));
+	}
 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
@@ -68,6 +78,28 @@ UAbilitySystemComponent* AHomeWorldCharacter::GetAbilitySystemComponent() const
 void AHomeWorldCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	// Apply Blueprint/class defaults for rotation rate (constructor only sees base default).
+	if (UCharacterMovementComponent* Movement = GetCharacterMovement())
+	{
+		Movement->RotationRate = FRotator(0.0f, RotationRateYaw, 0.0f);
+	}
+	// Place character on ground if we hit something below (avoids floating when Player Start is slightly high).
+	if (UWorld* World = GetWorld())
+	{
+		UCapsuleComponent* Capsule = GetCapsuleComponent();
+		if (Capsule)
+		{
+			const float HalfHeight = Capsule->GetUnscaledCapsuleHalfHeight();
+			const FVector Start = GetActorLocation();
+			const FVector End = Start - FVector(0.0f, 0.0f, HalfHeight + 500.0f);
+			FHitResult Hit;
+			FCollisionQueryParams Params(NAME_None, false, this);
+			if (World->LineTraceSingleByChannel(Hit, Start, End, ECC_WorldStatic, Params))
+			{
+				SetActorLocation(FVector(Start.X, Start.Y, Hit.ImpactPoint.Z + HalfHeight));
+			}
+		}
+	}
 	// #region agent log
 	USkeletalMeshComponent* MeshComp = GetMesh();
 	DebugLog("H5", "HomeWorldCharacter.cpp:BeginPlay", "BeginPlay", FString::Printf(TEXT("{\"hasMesh\":%d,\"meshOffsetYaw\":%.1f}"), MeshComp ? 1 : 0, MeshForwardYawOffset));

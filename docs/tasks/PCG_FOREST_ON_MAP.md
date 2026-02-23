@@ -17,7 +17,7 @@
 1. Open the project in Unreal Editor.
 2. Open **Main** (Content/HomeWorld/Maps/Main).
 3. Run the demo map script in either way:
-   - **Command line:** Set `UE_EDITOR` in `Run-DemoMapScript.bat` to your UnrealEditor.exe path, then run the batch file. The Editor opens and runs `Content/Python/create_demo_map.py`.
+   - **Command line:** Set `UE_EDITOR` (and if needed `PROJECT`) in `Run-DemoMapScript.bat` to your UnrealEditor.exe and .uproject path, then run the batch file. The Editor opens and runs `Content/Python/create_demo_map.py`.
    - **In Editor:** **Tools → Execute Python Script**, then choose `Content/Python/create_demo_map.py`.
 
 4. The script will:

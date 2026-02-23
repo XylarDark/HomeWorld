@@ -6,6 +6,7 @@ if "%UE_EDITOR%"=="" (
     echo Set UE_EDITOR in this batch file to your UnrealEditor.exe path.
     exit /b 1
 )
+REM Point PROJECT to your .uproject: use HomeWorld.uproject if it sits next to this batch, or HomeWorld\HomeWorld.uproject if the project is in a subfolder.
 set PROJECT=%~dp0HomeWorld.uproject
 "%UE_EDITOR%" "%PROJECT%" -ExecutePythonScript="Content/Python/create_demo_map.py" %*
 pause
