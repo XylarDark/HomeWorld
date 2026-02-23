@@ -74,9 +74,81 @@ def _ensure_pcg_folder():
     pass
 
 
-def create_pcg_graph():
-    """Create PCG graph asset with Surface Sampler -> Density Filter (0.3-1.0) -> Transform Points (random rot/scale) -> Static Mesh Spawner. Returns graph asset or None."""
+def _connect_exclusion_points_to_difference(graph_asset, difference_node, exclusion_zones):
+    """Build exclusion point source and connect to Difference node's second input (Differences pin).
+    Tries Option A: create-points-in-box nodes per zone + merge. If API does not support it, leaves pin unconnected and logs."""
+    if not exclusion_zones or not difference_node:
+        return
+    merge_node = None
+    try:
+        merge_class = getattr(unreal, "PCGMergeSettings", None)
+        if merge_class:
+            merge_node, _ = graph_asset.add_node_of_type(merge_class)
+    except (AttributeError, Exception):
+        merge_node = None
+    created_point_nodes = []
+    for zone in exclusion_zones:
+        try:
+            cx = zone.get("center_x", 0)
+            cy = zone.get("center_y", 0)
+            cz = zone.get("center_z", 0)
+            ex = zone.get("extent_x", 1000)
+            ey = zone.get("extent_y", 1000)
+            ez = zone.get("extent_z", 500)
+            # Try PCGCreatePointsGridSettings or PCGCreatePointsSettings with bounds
+            create_class = getattr(unreal, "PCGCreatePointsGridSettings", None) or getattr(unreal, "PCGCreatePointsSettings", None)
+            if not create_class:
+                break
+            point_node, point_settings = graph_asset.add_node_of_type(create_class)
+            if not point_node:
+                break
+            # Try to set bounds (grid origin and size, or extent)
+            if hasattr(point_settings, "set_editor_property"):
+                origin = unreal.Vector(float(cx), float(cy), float(cz))
+                try:
+                    point_settings.set_editor_property("origin", origin)
+                    point_settings.set_editor_property("grid_step", unreal.Vector(100.0, 100.0, 100.0))
+                    point_settings.set_editor_property("grid_size", unreal.Vector(float(ex * 2), float(ey * 2), float(ez * 2)))
+                except Exception:
+                    try:
+                        point_settings.set_editor_property("extent", unreal.Vector(float(ex), float(ey), float(ez)))
+                        point_settings.set_editor_property("center", origin)
+                    except Exception:
+                        pass
+            created_point_nodes.append(point_node)
+        except Exception:
+            continue
+    if merge_node and created_point_nodes:
+        for node in created_point_nodes:
+            try:
+                graph_asset.add_edge(node, "Out", merge_node, "In")
+            except Exception:
+                pass
+        try:
+            graph_asset.add_edge(merge_node, "Out", difference_node, "Difference")
+        except Exception:
+            try:
+                graph_asset.add_edge(merge_node, "Out", difference_node, "Differences")
+            except Exception:
+                _log("Exclusion: could not connect merge to Difference (pin may be named differently). Connect exclusion point source to Difference node in Editor.")
+    elif created_point_nodes and len(created_point_nodes) == 1:
+        try:
+            graph_asset.add_edge(created_point_nodes[0], "Out", difference_node, "Difference")
+        except Exception:
+            try:
+                graph_asset.add_edge(created_point_nodes[0], "Out", difference_node, "Differences")
+            except Exception:
+                _log("Exclusion: connect the exclusion point node to Difference (Difference/Differences pin) in Editor.")
+    else:
+        _log("Exclusion zones defined but exclusion point source could not be created in graph. Spawn exclusion volume actors in level and connect a Surface Sampler (bounds = exclusion volume) to the Difference node's Difference pin in Editor. See docs/PCG_TUTORIAL_REPLACE_MAIN_TREES.md.")
+
+
+def create_pcg_graph(exclusion_zones=None):
+    """Create PCG graph asset with Surface Sampler -> Density Filter (0.3-1.0) -> [Difference when exclusion_zones] -> Transform Points -> Static Mesh Spawner.
+    exclusion_zones: optional list of dicts with center_x/y/z, extent_x/y/z (cm). When non-empty, adds a Difference node to remove points inside those boxes."""
     _ensure_pcg_folder()
+    if exclusion_zones is None:
+        exclusion_zones = []
     # Re-run: delete existing graph so create_asset succeeds (script is re-runnable)
     try:
         if unreal.EditorAssetLibrary.does_asset_exist(PCG_GRAPH_PACKAGE):
@@ -159,7 +231,18 @@ def create_pcg_graph():
     transform_settings.set_editor_property("absolute_scale", True)
     transform_settings.set_editor_property("seed", 12345)
 
-    # Connect: Input -> Surface Sampler -> [optional Height Filter] -> Density Filter -> Transform Points -> Static Mesh Spawner -> Output
+    # Optional: Difference node to remove points inside exclusion zones (dead zones)
+    difference_node = None
+    if exclusion_zones:
+        try:
+            difference_node, _ = graph_asset.add_node_of_type(unreal.PCGDifferenceSettings)
+            if difference_node:
+                _log("Added Difference node for {} exclusion zone(s).".format(len(exclusion_zones)))
+        except (AttributeError, Exception) as e:
+            _log("Difference node skipped: " + str(e))
+            difference_node = None
+
+    # Connect: Input -> Surface Sampler -> [optional Height Filter] -> Density Filter -> [Difference] -> Transform Points -> Static Mesh Spawner -> Output
     input_node = graph_asset.get_input_node()
     output_node = graph_asset.get_output_node()
     graph_asset.add_edge(input_node, "Out", surface_node, "In")
@@ -168,7 +251,12 @@ def create_pcg_graph():
         graph_asset.add_edge(height_filter_node, "Out", density_node, "In")
     else:
         graph_asset.add_edge(surface_node, "Out", density_node, "In")
-    graph_asset.add_edge(density_node, "Out", transform_node, "In")
+    if difference_node:
+        graph_asset.add_edge(density_node, "Out", difference_node, "In")
+        _connect_exclusion_points_to_difference(graph_asset, difference_node, exclusion_zones)
+        graph_asset.add_edge(difference_node, "Out", transform_node, "In")
+    else:
+        graph_asset.add_edge(density_node, "Out", transform_node, "In")
     graph_asset.add_edge(transform_node, "Out", spawner_node, "In")
     graph_asset.add_edge(spawner_node, "Out", output_node, "In")
 
@@ -225,10 +313,51 @@ def create_pcg_graph():
     return graph_asset
 
 
-def place_volume_and_generate(graph_asset, location=None, extent=None):
+def _spawn_exclusion_volumes(exclusion_zones):
+    """Spawn one PCGVolume (or box) actor per exclusion zone for Option B. Tag with PCG_Exclusion."""
+    if not exclusion_zones:
+        return
+    editor_subsystem = unreal.EditorLevelLibrary
+    world = editor_subsystem.get_editor_world()
+    if not world:
+        return
+    rotation = unreal.Rotator(0.0, 0.0, 0.0)
+    for i, zone in enumerate(exclusion_zones):
+        try:
+            loc = unreal.Vector(
+                float(zone.get("center_x", 0)),
+                float(zone.get("center_y", 0)),
+                float(zone.get("center_z", 0)),
+            )
+            ext = unreal.Vector(
+                float(zone.get("extent_x", 1000)),
+                float(zone.get("extent_y", 1000)),
+                float(zone.get("extent_z", 500)),
+            )
+            vol = editor_subsystem.spawn_actor_from_class(unreal.PCGVolume, loc, rotation)
+            if vol:
+                box_comp = vol.get_component_by_class(unreal.BoxComponent)
+                if box_comp and hasattr(box_comp, "set_box_extent"):
+                    box_comp.set_box_extent(ext)
+                elif vol.get_root_component() and hasattr(vol.get_root_component(), "set_box_extent"):
+                    vol.get_root_component().set_box_extent(ext)
+                try:
+                    if hasattr(vol, "tags") and isinstance(vol.tags, list):
+                        vol.tags.append("PCG_Exclusion")
+                    elif hasattr(vol, "add_tag"):
+                        vol.add_tag("PCG_Exclusion")
+                except Exception:
+                    pass
+                _log("Placed exclusion volume {} at ({}, {}, {}).".format(i + 1, loc.x, loc.y, loc.z))
+        except Exception as e:
+            _log("Exclusion volume {} spawn failed: {}.".format(i + 1, e))
+
+
+def place_volume_and_generate(graph_asset, location=None, extent=None, exclusion_zones=None):
     """Place a PCG Volume in the current level, assign graph, generate, save level.
     location: unreal.Vector for volume center (default 0,0,0).
-    extent: unreal.Vector for half-extents in cm (default 5000,5000,500 => 100x100x10 m)."""
+    extent: unreal.Vector for half-extents in cm (default 5000,5000,500 => 100x100x10 m).
+    exclusion_zones: optional list of dicts (center_*, extent_*); spawns exclusion volume actors when provided (Option B)."""
     if not graph_asset:
         _log("No graph asset; skipping volume placement.")
         return
@@ -242,6 +371,8 @@ def place_volume_and_generate(graph_asset, location=None, extent=None):
         location = unreal.Vector(0.0, 0.0, 0.0)
     if extent is None:
         extent = unreal.Vector(VOLUME_HALF_EXTENT_X, VOLUME_HALF_EXTENT_Y, VOLUME_HALF_EXTENT_Z)
+    if exclusion_zones is None:
+        exclusion_zones = []
 
     rotation = unreal.Rotator(0.0, 0.0, 0.0)
     volume = editor_subsystem.spawn_actor_from_class(unreal.PCGVolume, location, rotation)
@@ -259,6 +390,9 @@ def place_volume_and_generate(graph_asset, location=None, extent=None):
             box_comp.set_box_extent(extent)
         else:
             _log("Volume has no BoxComponent; set bounds manually in Details (10000 x 10000 cm).")
+
+    # Spawn exclusion volume actors (Option B) so they exist in the level for graph reference or manual wiring
+    _spawn_exclusion_volumes(exclusion_zones)
 
     # Assign graph to PCG component and generate
     pcg_comp = volume.get_component_by_class(unreal.PCGComponent)

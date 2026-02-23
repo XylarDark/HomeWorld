@@ -24,7 +24,7 @@ flowchart TB
   end
   subgraph ai [AI and Systems]
     FamilyAI[Family AI]
-    Mass[Mass Entity Swarms]
+    Mass[Mass or Epic replacement swarms]
     DayNight[Day/Night]
   end
   subgraph net [Multiplayer]
@@ -80,8 +80,8 @@ flowchart TB
 ## Layer 5 – AI and Simulation
 
 - **Family/NPCs:** Behavior Trees or State Trees (UE built-in); needs/morale can use GAS attributes.
-- **Swarms:** Mass Entity – already enabled; Mass Gameplay / Mass AI (optional) for night swarms scaling with family size.
-- **Phase:** Week 2 – family AI; Weeks 3–4 – Mass Entity swarms.
+- **Swarms:** Mass Entity is deprecated; when implementing swarms, use whatever Mass-related plugin Epic documents as the replacement. Mass Gameplay / Mass AI (optional) for night swarms scaling with family size.
+- **Phase:** Week 2 – family AI; Weeks 3–4 – Mass/replacement swarms.
 
 ---
 
@@ -127,7 +127,7 @@ flowchart TB
 
 ## Budget and “Free First”
 
-- **Free:** UE5, PCG, GAS, Mass Entity, Steam API, FAB/Quixel free assets, Open World template.
+- **Free:** UE5, PCG, GAS, Steam API, FAB/Quixel free assets, Open World template. Mass/replacement when adding swarms.
 - **Optional paid:** Advanced ARPG Template (~$50), SteamLead (~$20), GameLift if needed. Total optional ~$70–150; time is the main cost.
 
 ---

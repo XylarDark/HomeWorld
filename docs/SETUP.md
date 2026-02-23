@@ -4,12 +4,10 @@ Do these steps once. Everything else for first-phase setup is already in the rep
 
 1. **Engine:** Install Unreal Engine 5.7 (recommended); 5.4+ may work. The project targets UE 5.7 and is compatible with 5.7.x (including 5.7.3). Project is developed code-first; see [CONVENTIONS.md](CONVENTIONS.md).
 2. **Project:** Open `HomeWorld.uproject`; allow first-time load/compile.
-3. **Plugins:** In Editor, **Edit > Plugins** – confirm these six are enabled (all are in .uproject):
-   - **PCG**, **Gameplay Abilities**, **Mass Entity** (in .uproject).
-   - **Enhanced Input**, **Day Night Sequencer** (in .uproject).
-   - **Steam Sockets** (replaces SteamCore for co-op; in .uproject).
-   Optionally enable **Mass Gameplay** and **Mass AI** if the team wants them for Week 3–4 swarms. **Restart UE5 after enabling any new plugins.**  
-   Note: **Mass Entity** is deprecated as of 5.5 and will be removed in a future release; plan to migrate to the replacement (e.g. Mass Framework) when you adopt a later engine version.
+3. **Plugins:** In Editor, **Edit > Plugins** – confirm these are enabled (all are in .uproject):
+   - **PCG**, **Gameplay Abilities**, **Enhanced Input**, **Day Night Sequencer**, **Steam Sockets** (replaces SteamCore for co-op).
+   **Restart UE5 after enabling any new plugins.**  
+   Note: **Mass Entity** is deprecated (5.5+) and has been removed from this project. When you add swarms (e.g. Weeks 3–4), enable whatever Mass-related plugin Epic documents as the replacement.
 4. **Free assets:**
    - **FAB:** Survival character (or equivalent).
    - **Quixel:** Biomes/vegetation for forest.
@@ -31,6 +29,18 @@ The project has a C++ game module (`Source/HomeWorld/`). To build from an IDE or
    - **Full solution from command line:** Run **`Build-Solution-WithBundledDotNet.bat`** to build the whole solution (C++ + C#) using the Engine’s bundled .NET 8 SDK—no system .NET install required.
    - **Full solution in Visual Studio:** Run **`Open-HomeWorld-In-VS.bat`** to open the solution with `DOTNET_ROOT` set to the Engine’s bundled .NET 8 SDK; then build in VS as usual (no system .NET install needed). Optional: to open the .sln without the launcher, install the [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) and add it to PATH so the solution builds cleanly.
 3. **Run:** Launch the editor via the `.uproject` (double-click or from IDE). PIE (Play In Editor) uses the built game module.
+
+**Batch files (project root):**
+
+| When you want to… | Use this |
+|-------------------|----------|
+| Build the game only | **Build-HomeWorld.bat** |
+| Open the solution in Visual Studio (with bundled .NET) | **Open-HomeWorld-In-VS.bat** |
+| Build the full solution from command line | **Build-Solution-WithBundledDotNet.bat** |
+| Run the PCG forest script (Editor opens and runs script) | **Run-PCGForestScript.bat** (set `UE_EDITOR` in the file first) |
+| Run the demo map script (village + PCG forest) | **Run-DemoMapScript.bat** (set `UE_EDITOR` in the file first) |
+
+`scripts/SetEnv-BundledDotNet.bat` is used by the two solution-related batch files; edit its UE path if the engine is installed elsewhere.
 
 If you add or remove C++ files, regenerate project files so the solution stays in sync.
 

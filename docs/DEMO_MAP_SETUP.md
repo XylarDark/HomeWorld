@@ -24,6 +24,7 @@ The demo level combines the **Stylized Provencal medieval village** with a **PCG
 - **demo_level_path:** Target level (default `/Game/HomeWorld/Maps/Main`).
 - **template_level_path:** Source level to duplicate if Main is missing (default `/Game/StylizedProvencal/Maps/Main`).
 - **volume_center_x/y/z**, **volume_extent_x/y/z:** PCG volume center and half-extents in cm (default: center 0,0,0; extent 5000,5000,500 ⇒ 100×100×10 m box). Adjust to surround or avoid the village as needed.
+- **exclusion_zones (optional):** Array of dead zones (no trees). Each object: **center_x**, **center_y**, **center_z**, **extent_x**, **extent_y**, **extent_z** (cm). The script adds a Difference node and spawns exclusion volume actors. See [PCG_TUTORIAL_REPLACE_MAIN_TREES.md](PCG_TUTORIAL_REPLACE_MAIN_TREES.md) (section 5).
 
 Forest meshes (trees, rocks) are still driven by [pcg_forest_config.json](../Content/Python/pcg_forest_config.json); add paths there and re-run the script or run [create_pcg_forest.py](../Content/Python/create_pcg_forest.py) to refresh the graph.
 
@@ -37,3 +38,7 @@ If the script reports that level duplication is not supported:
 4. Open that Main level and run `create_demo_map.py` again.
 
 After that, the script will find Main and only open it (if needed), create the graph, place the volume, and generate.
+
+## See also
+
+For an in-depth tutorial on setting up the PCG graph and replacing trees on the Main map, see [PCG_TUTORIAL_REPLACE_MAIN_TREES.md](PCG_TUTORIAL_REPLACE_MAIN_TREES.md).

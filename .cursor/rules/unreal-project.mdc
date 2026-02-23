@@ -8,6 +8,6 @@ alwaysApply: false
 
 - **Project:** HomeWorld, Unreal Engine 5.7. Game module: **HomeWorld** (runtime, in `Source/HomeWorld/`).
 - **Layout:** Code in `Source/HomeWorld/`. Content in `Content/` (e.g. `Content/HomeWorld/` for project-specific assets). Config in `Config/` (DefaultEngine.ini, DefaultInput.ini, etc.).
-- **Plugins (from .uproject):** Enhanced Input, PCG, Gameplay Abilities, Mass Entity, Steam Sockets, Day Sequence (and others as listed). Do not disable Enhanced Input; the default pawn relies on it.
+- **Plugins (from .uproject):** Enhanced Input, PCG, Gameplay Abilities, Steam Sockets, Day Sequence (and others as listed). Do not disable Enhanced Input; the default pawn relies on it. Mass Entity is deprecated and not enabled; use Epic’s replacement when adding swarms.
 - **Default pawn and game mode:** Default pawn is `AHomeWorldCharacter` (C++). Default game mode is `AHomeWorldGameMode` (C++), set in `Config/DefaultEngine.ini` as `GlobalDefaultGameMode=/Script/HomeWorld.HomeWorldGameMode`.
 - **Docs:** Setup and conventions are in `docs/` (SETUP.md, CONVENTIONS.md, STACK_PLAN.md, PROTOTYPE_VISION.md).

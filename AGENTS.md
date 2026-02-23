@@ -6,6 +6,6 @@
 
 **Code:** C++ lives in `Source/HomeWorld/`. Default pawn: `AHomeWorldCharacter`; default game mode: `AHomeWorldGameMode`. Both use Enhanced Input for movement and look.
 
-**Stack (enabled plugins):** Enhanced Input, PCG, Gameplay Abilities, Mass Entity, Steam Sockets, Day Sequence. Config in `Config/`; project layout and rules in `.cursor/rules/` (Unreal C++, Blueprint, project).
+**Stack (enabled plugins):** Enhanced Input, PCG, Gameplay Abilities, Steam Sockets, Day Sequence. Mass/swarms plugin TBD when swarms are added (Mass Entity is deprecated). Config in `Config/`; project layout and rules in `.cursor/rules/` (Unreal C++, Blueprint, project).
 
 **Setup and validation:** [docs/SETUP.md](docs/SETUP.md), [docs/SETUP_VALIDATION.md](docs/SETUP_VALIDATION.md). When editing C++, Blueprint, or project/config files, follow the corresponding `.cursor/rules/` conventions.

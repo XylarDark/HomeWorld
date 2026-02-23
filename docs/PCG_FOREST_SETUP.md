@@ -22,6 +22,8 @@ This doc describes how to create the forest island (PCG graph + volume + generat
 - **Rocks (optional):** `static_mesh_spawner_meshes_rocks` — add rock mesh paths for the optional second spawner. Leave empty to skip.
 - **Height filter (optional):** `height_filter_min` and `height_filter_max` — world Z in cm (e.g. `-5000` and `5000`) so instances spawn only on terrain. Set both to numbers to enable; leave `null` to skip. You may need to set the filter’s target attribute to **Position.Z** in the graph in the Editor.
 
+**Demo map only:** When using [create_demo_map.py](../Content/Python/create_demo_map.py), [demo_map_config.json](../Content/Python/demo_map_config.json) can include **exclusion_zones** (array of center + extent in cm) so trees are not generated in the village or other areas. See [PCG_TUTORIAL_REPLACE_MAIN_TREES.md](PCG_TUTORIAL_REPLACE_MAIN_TREES.md) (section 5).
+
 ## How to run the script
 
 1. Open the project in Unreal Editor.
@@ -74,3 +76,7 @@ Ensure the default map is already created; otherwise open the correct level firs
 
 - **Second spawner (rocks):** Add a second Static Mesh Spawner branch with **Density 0.01** (e.g. a second Surface Sampler with `points_per_squared_meter=0.01`, same Density Filter and Transform Points, then a second Spawner for rock meshes). Populate `static_mesh_spawner_meshes_rocks` in the config if the script supports the rocks branch; otherwise add the second spawner and meshes manually in the PCG graph in the Editor.
 - **Height filter (terrain only):** Set `height_filter_min` and `height_filter_max` in `pcg_forest_config.json` (world Z in cm) and re-run the script to add a height filter node; then in the graph set the filter’s target attribute to **Position.Z** if needed. Alternatively add a **Height Filter** or **Attribute Filter** node manually in the Editor after Surface Sampler or Density Filter, set the height range to match your terrain, and connect the chain.
+
+## See also
+
+For an in-depth tutorial on setting up the PCG graph and replacing trees on the Main map, see [PCG_TUTORIAL_REPLACE_MAIN_TREES.md](PCG_TUTORIAL_REPLACE_MAIN_TREES.md).

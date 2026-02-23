@@ -27,13 +27,29 @@ def _log(msg):
     print("Demo Map: " + str(msg))
 
 
+# #region agent log
+def _debug_log(hypothesis_id, location, message, data):
+    import time
+    try:
+        proj = unreal.SystemLibrary.get_project_directory()
+        path = os.path.join(proj, "debug-cb22d5.log")
+        line = '{"sessionId":"cb22d5","hypothesisId":"%s","location":"%s","message":"%s","data":%s,"timestamp":%d}\n' % (
+            hypothesis_id, location, message, data, int(time.time() * 1000))
+        with open(path, "a", encoding="utf-8") as f:
+            f.write(line)
+    except Exception:
+        pass
+# #endregion
+
+
 def _load_demo_config():
-    """Load Content/Python/demo_map_config.json. Returns dict with paths and volume center/extent."""
+    """Load Content/Python/demo_map_config.json. Returns dict with paths, volume center/extent, and exclusion_zones."""
     defaults = {
         "demo_level_path": "/Game/HomeWorld/Maps/Main",
         "template_level_path": "/Game/StylizedProvencal/Maps/Main",
         "volume_center_x": 0.0, "volume_center_y": 0.0, "volume_center_z": 0.0,
         "volume_extent_x": 5000.0, "volume_extent_y": 5000.0, "volume_extent_z": 500.0,
+        "exclusion_zones": [],
     }
     try:
         proj_dir = unreal.SystemLibrary.get_project_directory()
@@ -43,8 +59,19 @@ def _load_demo_config():
         with open(config_path, "r") as f:
             data = json.load(f)
         for k in defaults:
-            if k in data and not k.startswith("_"):
-                defaults[k] = data[k]
+            if k not in data or k.startswith("_"):
+                continue
+            val = data[k]
+            if k == "exclusion_zones" and isinstance(val, list):
+                zones = []
+                for z in val:
+                    if isinstance(z, dict) and all(
+                        key in z for key in ("center_x", "center_y", "center_z", "extent_x", "extent_y", "extent_z")
+                    ):
+                        zones.append({key: float(z[key]) for key in ("center_x", "center_y", "center_z", "extent_x", "extent_y", "extent_z")})
+                defaults[k] = zones
+            else:
+                defaults[k] = val
         return defaults
     except Exception as e:
         _log("Demo config load warning: " + str(e))
@@ -128,14 +155,29 @@ def main():
     config = _load_demo_config()
     demo_path = config.get("demo_level_path", "/Game/HomeWorld/Maps/Main")
     template_path = config.get("template_level_path", "/Game/StylizedProvencal/Maps/Main")
+    # #region agent log
+    _debug_log("H4", "create_demo_map.py:main", "config loaded", json.dumps({"demo_path": demo_path}))
+    # #endregion
 
     if not _ensure_demo_level_exists(demo_path, template_path):
+        # #region agent log
+        _debug_log("H4", "create_demo_map.py:main", "demo level missing or duplicate failed", '{"ok":0}')
+        # #endregion
         _log("Stopping. Create or copy the Main level first (see message above).")
         return
+    # #region agent log
+    _debug_log("H4", "create_demo_map.py:main", "demo level exists", '{"ok":1}')
+    # #endregion
 
     if not _ensure_main_is_open(demo_path):
+        # #region agent log
+        _debug_log("H4", "create_demo_map.py:main", "could not open Main", '{"ok":0}')
+        # #endregion
         _log("Stopping. Open Main level and run the script again.")
         return
+    # #region agent log
+    _debug_log("H4", "create_demo_map.py:main", "Main is open", '{"ok":1}')
+    # #endregion
 
     # Build location and extent from config (Unreal units: cm)
     location = unreal.Vector(
@@ -149,9 +191,16 @@ def main():
         float(config.get("volume_extent_z", 500)),
     )
 
-    graph_asset = pcg_forest.create_pcg_graph()
+    exclusion_zones = config.get("exclusion_zones") or []
+    graph_asset = pcg_forest.create_pcg_graph(exclusion_zones=exclusion_zones)
+    # #region agent log
+    _debug_log("H4", "create_demo_map.py:main", "PCG graph created", '{"hasGraph":%d}' % (1 if graph_asset else 0))
+    # #endregion
     if graph_asset:
-        pcg_forest.place_volume_and_generate(graph_asset, location=location, extent=extent)
+        pcg_forest.place_volume_and_generate(graph_asset, location=location, extent=extent, exclusion_zones=exclusion_zones)
+        # #region agent log
+        _debug_log("H4", "create_demo_map.py:main", "volume placed and generated", '{"ok":1}')
+        # #endregion
     pcg_forest.try_world_partition()
 
     _log("Done. Demo map ready (medieval village + PCG forest). Add tree/rock paths in pcg_forest_config.json and re-run if desired.")

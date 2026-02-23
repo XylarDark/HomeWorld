@@ -10,7 +10,7 @@ Single place for the home team to track phases, owners, and approval gates. This
 | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | **Core loop**   | Day: build/nurture/explore → Night: family defends → Realm-hop for loot/heirs. Co-op 2–8p with role synergy (Protector / Healer / Home). |
 | **Campaign**    | Act 1 solo (2–3h) → Act 2 duo (3–4h) → Act 3 full co-op (3–5h+). Teaches combat → bonds → dynasty.                                       |
-| **Tech**        | UE5.4+, PCG biomes, GAS combat, Day/Night, Mass Entity swarms, Steam sessions + optional GameLift. ~$0–150 (templates).                 |
+| **Tech**        | UE5.4+, PCG biomes, GAS combat, Day/Night, Mass or Epic’s replacement for swarms, Steam sessions + optional GameLift. ~$0–150 (templates).                 |
 | **North stars** | Nurturing bonds, Protector mastery, Whimsical realm-hop, Day–night legacy, Co-op synergy, Prestige leaderboards, Meaningful progression. |
 
 ---
@@ -43,7 +43,7 @@ flowchart LR
 
 ## Phase 0: Pre-Production (Before Week 1)
 
-- **Everyone:** Install UE5.4+; enable PCG, GAS, Mass Entity. Download same template (e.g. Open World + World Partition).
+- **Everyone:** Install UE5.4+; enable PCG, GAS. Download same template (e.g. Open World + World Partition).
 - **Budget lock:** Confirm ~$0 (free) vs up to ~$150 (e.g. Advanced ARPG Template, SteamLead). Time = main cost.
 - **Roles:** Designer (loops/missions), Artist (mocks/whimsical style), Programmer (GAS/AI/PCG), Tester (PIE/multiplayer).
 - **Deliverables:** One-pager prototype vision; art mocks for one biome + character tone; Week 1 owner (e.g. Programmer leads first playable).
@@ -77,7 +77,7 @@ flowchart LR
 ## Phase 3: Weeks 3–4 – Alpha / Act 3 (Pillars 4, 6 + Act 3)
 
 - **Focus:** Dynasty Rising – expand realms, raise heir, endgame portals; swarms + leaderboards.
-- **Tech:** Day–night sequencer + PCG spawns; Mass Entity night swarms (scale with family); second biome (e.g. sand/crystal); leaderboards (Steam API or SteamLead).
+- **Tech:** Day–night sequencer + PCG spawns; Mass or Epic’s replacement for night swarms (scale with family); second biome (e.g. sand/crystal); leaderboards (Steam API or SteamLead).
 - **Art/Story:** Heir/home themes; strength → legacy.
 - **Success:** Clan raid (2–8p) + “Best Homes” leaderboard playtest (family size × happiness + clears).
 
@@ -109,5 +109,5 @@ flowchart LR
 
 - **Campaign** drives content: each week maps to an Act and its emotional beat.
 - **Pillars** drive scope: no week adds every pillar; Week 1 = combat/explore/progression, Week 2 = bonds/co-op, Week 3–4 = day–night/competition.
-- **Tech** is staged: PCG + GAS first, then family AI + Steam, then Mass + leaderboards.
+- **Tech** is staged: PCG + GAS first, then family AI + Steam, then Mass (or Epic’s replacement) + leaderboards.
 - **Approval checklist** = gate before Week 1; same checklist can be reused at end of Week 2 and Week 4 for go/no-go to next phase.
