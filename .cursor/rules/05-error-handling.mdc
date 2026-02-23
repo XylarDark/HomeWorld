@@ -86,6 +86,15 @@ Before writing or reviewing C++ that touches engine APIs, check for deprecated p
 - **Avoid generic global names** (e.g. `BufferSize`) that collide with engine headers; prefix and use `static constexpr`.
 - When integrating third-party plugins targeting older UE versions, expect API breakage and apply known fixes before building.
 
+## MCP Input Validation
+
+Before calling any MCP tool, validate the arguments to prevent Editor crashes:
+
+- **`blueprint_name`:** Must be a short name only (e.g. `BP_GameMode`). Never pass a full `/Game/...` asset path — the plugin prepends `/Game/Blueprints/` causing a double-slash fatal crash.
+- **`property_name`:** Inherited C++ UPROPERTY names may not resolve. If `set_blueprint_property` returns "Property not found", fall back to Python Editor scripts.
+- **`component_name`:** C++ constructor-created components (e.g. `CharacterMesh0`) are invisible to MCP. Use Python scripts instead.
+- **Always check `docs/KNOWN_ERRORS.md`** before using MCP tools on new Blueprint types.
+
 ## Concurrency & Async Patterns
 
 **Async/Await:**

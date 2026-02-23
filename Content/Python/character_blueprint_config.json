@@ -1,0 +1,8 @@
+{
+  "skeletal_mesh": "",
+  "anim_blueprint": "",
+  "mesh_forward_yaw_offset": 0.0,
+  "_comment_skeletal_mesh": "Content path to the skeletal mesh asset (e.g. /Game/Characters/Meshes/SK_Mannequin). Leave empty to skip.",
+  "_comment_anim_blueprint": "Content path to the Animation Blueprint asset (e.g. /Game/Characters/Animations/ABP_Character). Leave empty to skip.",
+  "_comment_yaw_offset": "Degrees to rotate the mesh so its forward matches movement direction. Use 90 or -90 if the mesh faces sideways."
+}

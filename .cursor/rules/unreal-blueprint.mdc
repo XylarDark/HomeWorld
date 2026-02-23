@@ -10,3 +10,12 @@ alwaysApply: false
 - **When to use Blueprint:** Asset assignment (meshes, materials, input actions), level-specific behavior, rapid iteration on values, and subclassing C++ classes to plug in content. Use C++ for reusable gameplay systems and anything that should be consistent across the project.
 - **Naming:** Use a `BP_` prefix for Blueprint assets (e.g. `BP_Player`, `BP_MainGameMode`) so they are easy to distinguish from C++ classes and data assets.
 - **Input:** Input Actions (e.g. IA_Move, IA_Look) and Input Mapping Context (IMC_Default) are created once in the Editor and assigned on the character (C++ defaults or a Blueprint child of `HomeWorldCharacter`).
+
+## MCP Blueprint name rules
+
+When using MCP tools (`set_blueprint_property`, `compile_blueprint`, etc.):
+
+- **Always pass the short name** (e.g. `BP_GameMode`), never a full asset path like `/Game/HomeWorld/GameMode/BP_GameMode`.
+- The MCP plugin's `FindBlueprintByName` prepends `/Game/Blueprints/`, so full paths create invalid double-slash package names that **crash the Editor**.
+- Blueprints stored outside `/Game/Blueprints/` may not be discoverable by MCP at all — use Python Editor scripts as fallback.
+- See `docs/KNOWN_ERRORS.md` for the full crash details.

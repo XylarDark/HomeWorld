@@ -41,3 +41,10 @@ If MCP tools are not listed or connection fails (Editor closed, plugin not loade
 **Can do:** Actor CRUD, Blueprint creation and component setup, Blueprint node graph wiring, viewport control, property get/set, project settings, level manipulation.
 
 **Cannot do:** Animation Blueprint state machine editing (AnimGraph visual graph API is not exposed).
+
+## Critical MCP safety rules (prevent Editor crashes)
+
+1. **Never pass full asset paths as `blueprint_name`** — `FindBlueprintByName` prepends `/Game/Blueprints/`, so passing `/Game/Foo/BP_Bar` creates the invalid path `/Game/Blueprints//Game/Foo/BP_Bar` which **crashes the Editor**. Always pass only the short name (e.g. `BP_GameMode`).
+2. **Inherited C++ properties are invisible** — `set_blueprint_property` cannot find `UPROPERTY` members inherited from C++ parent classes. Use Python Editor scripts for those.
+3. **Inherited C++ components are invisible** — `set_component_property` cannot find components created in the C++ constructor (e.g. `CharacterMesh0`). Use Python Editor scripts.
+4. **Blueprint search is path-limited** — If a Blueprint is stored outside `/Game/Blueprints/`, MCP may not find it by short name. Verify with `find_actors_by_name` first; fall back to Python scripts if not found.
