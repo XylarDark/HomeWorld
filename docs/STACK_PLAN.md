@@ -12,7 +12,7 @@ flowchart TB
     Steam[Steam EA]
   end
   subgraph client [Game Client]
-    UE[Unreal Engine 5.4+]
+    UE[Unreal Engine 5.7]
   end
   subgraph world [World and Content]
     PCG[PCG Biomes]
@@ -48,7 +48,7 @@ flowchart TB
 
 ## Layer 1 – Engine and Platform
 
-- **Engine:** Unreal Engine 5.4+ (project currently 5.7). Open World template, World Partition.
+- **Engine:** Unreal Engine 5.7. Open World template, World Partition.
 - **Platform:** PC, Steam Early Access. No console in MVP.
 - **Rationale:** Single codebase; Lumen/Nanite for whimsical look; World Partition for large proc-gen realms.
 

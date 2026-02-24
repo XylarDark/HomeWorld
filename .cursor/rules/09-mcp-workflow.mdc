@@ -1,8 +1,9 @@
 ---
 name: "MCP-First Workflow"
-description: "Prefer MCP tools for Unreal Editor tasks when connected"
+description: "Use MCP tools first when the Unreal Editor is running to automate Editor tasks and avoid manual steps"
 alwaysApply: true
-priority: 7
+priority: 10
+version: 1.0
 ---
 
 # MCP-First Workflow
@@ -58,6 +59,43 @@ This replaces the manual "Tools > Execute Python Script" step for all automated 
 **Idempotency requirement:** Scripts executed via MCP must be safe to re-run. Check for existing assets/actors before creating. See `00-core-principles.mdc` (Idempotency Protocol).
 
 **Cleanup requirement:** One-off diagnostic scripts (created to inspect state, fix a specific issue, or gather data for a single session) must be deleted before the task ends. Only keep scripts that are reusable and referenced by orchestrators like `bootstrap_project.py`. Result JSON files written to the project root by these scripts must also be deleted. See `07-ai-agent-behavior.mdc` (Session Cleanup).
+
+## Agent utility scripts
+
+These reusable scripts eliminate the need for one-off diagnostic scripts:
+
+| Script | Purpose | How to use |
+|--------|---------|------------|
+| `mcp_harness.py` | Structured command-response bridge | Write `Saved/mcp_request.json`, run via MCP, read `Saved/mcp_response.json` |
+| `pie_test_runner.py` | PIE validation checks (ground, character, PCG) | Run via MCP, read `Saved/pie_test_results.json` |
+| `blueprint_inspector.py` | Read Blueprint structure as JSON | Write `Saved/blueprint_inspect_request.json`, run via MCP, read `Saved/blueprint_inspect_result.json` |
+| `capture_viewport.py` | Screenshot capture | Run via MCP, read `Saved/screenshot_result.json` |
+
+**MCP harness commands:** `ping`, `asset_exists`, `get_actors`, `world_info`, `pawn_info`, `blueprint_defaults`, `pie_status`, `start_pie`, `stop_pie`.
+
+### Harness request/response schema
+
+All agent utility scripts that exchange data with the agent must follow this envelope so tooling stays consistent:
+
+**Request** (`Saved/<tool>_request.json`):
+```json
+{ "command": "<command_name>", "args": { ... } }
+```
+
+**Response** (`Saved/<tool>_response.json`):
+```json
+{ "ok": true, "command": "<command_name>", "result": { ... }, "error": null }
+```
+
+On failure, `ok` is `false` and `error` contains a human-readable message. New utility scripts must follow this format.
+
+## C++ build from agent
+
+The agent can trigger C++ builds via Shell: `Build-HomeWorld.bat`. Monitor `Build-HomeWorld.log` for completion (look for "Exit code:" at the end). The build must be run when PIE is not active.
+
+## Automated tests
+
+The `PythonAutomationTest` plugin is enabled. Test files in `Content/Python/tests/` (named `test_*.py`) are auto-discovered by the Editor's Test Automation window. Run from Editor (Tools > Test Automation) or command line.
 
 ## Critical MCP safety rules (prevent Editor crashes)
 

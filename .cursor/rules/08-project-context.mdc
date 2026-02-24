@@ -1,8 +1,9 @@
 ---
 name: "HomeWorld Project Context"
-description: "Project-specific context and conventions for HomeWorld"
+description: "Load HomeWorld project context when working in this repo to understand structure, stack, and conventions"
 alwaysApply: true
 priority: 8
+version: 1.0
 ---
 
 # HomeWorld Project Context

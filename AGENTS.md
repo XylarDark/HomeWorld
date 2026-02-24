@@ -8,8 +8,42 @@
 
 **Stack (enabled plugins):** Enhanced Input, PCG, Gameplay Abilities, Steam Sockets, Day Sequence. Mass/swarms plugin TBD when swarms are added (Mass Entity is deprecated). Config in `Config/`; project layout and rules in `.cursor/rules/` (Unreal C++, Blueprint, project).
 
-**Setup and validation:** [docs/SETUP.md](docs/SETUP.md) (includes validation checklist). Cursor rules ship with the repo in `.cursor/rules/` — they are loaded automatically when the project is opened in Cursor. Key rules: `unreal-cpp.mdc` (C++ conventions + UE 5.7 API pitfalls), `08-project-context.mdc` (HomeWorld overview), `09-mcp-workflow.mdc` (MCP-first priorities). Always check `docs/KNOWN_ERRORS.md` before making changes in areas where errors have been recorded.
-
 **MCP-first development:** When the Unreal Editor is running and MCP tools are connected (unrealMCP), prefer live Editor manipulation via MCP over writing scripts or giving manual instructions. See `.cursor/rules/09-mcp-workflow.mdc` and [docs/MCP_SETUP.md](docs/MCP_SETUP.md).
 
 **Current tasks:** [docs/TASKLIST.md](docs/TASKLIST.md) — master task list; each task links to a detailed doc in `docs/tasks/`.
+
+## Dev environment setup
+
+1. Install UE 5.7, clone this repo, open `HomeWorld.uproject`.
+2. Run `Setup-MCP.bat` (one-time MCP bridge install).
+3. Run `Build-HomeWorld.bat` to compile C++ (requires Editor closed or Live Coding off).
+4. Open Editor, restart Cursor, verify MCP green dot in status bar.
+5. See [docs/SETUP.md](docs/SETUP.md) for the full checklist.
+
+## Testing
+
+- **Automated (Python):** `PythonAutomationTest` plugin is enabled. Tests in `Content/Python/tests/` (named `test_*.py`) are auto-discovered. Run via Editor: Tools > Test Automation.
+- **PIE tests:** `Content/Python/pie_test_runner.py` validates character spawn, ground contact, animation, and PCG. Run via MCP: `execute_python_script("pie_test_runner.py")`, then read `Saved/pie_test_results.json`.
+- **CI:** GitHub Actions (`.github/workflows/validate.yml`) — Python lint, JSON schema checks, C++ header/source pairing, doc freshness.
+
+## Code style
+
+- **C++:** PascalCase types, camelCase locals; Unreal prefixes (`A`, `U`, `F`, `E`, `I`). Include own header first. See `.cursor/rules/unreal-cpp.mdc`.
+- **Python:** PEP 8, type hints, 4-space indent. UE scripts must be idempotent (check-before-create). See `.cursor/rules/12-python.mdc`.
+- **Commits:** Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`). See `.cursor/rules/04-git-workflow.mdc`.
+
+## PR and commit guidelines
+
+- Use Conventional Commits format for all commit messages.
+- PowerShell shell: use `;` not `&&` for command chaining; use here-strings for multi-line commit messages.
+- Pre-commit: lint, build check, no secrets, no `__pycache__` or temp JSON in tracked files.
+
+## Security
+
+- Never commit secrets, API keys, or `.env` files. Use `.env.example` for templates.
+- `Saved/`, `Plugins/UnrealMCP/`, and `__pycache__/` are gitignored.
+- Validate all external input at boundaries. See `.cursor/rules/02-security.mdc`.
+
+## Setup and validation
+
+[docs/SETUP.md](docs/SETUP.md) (includes validation checklist). Cursor rules ship with the repo in `.cursor/rules/` — they are loaded automatically when the project is opened in Cursor. Key rules: `unreal-cpp.mdc` (C++ conventions + UE 5.7 API pitfalls), `08-project-context.mdc` (HomeWorld overview), `09-mcp-workflow.mdc` (MCP-first priorities). Always check `docs/KNOWN_ERRORS.md` before making changes in areas where errors have been recorded.

@@ -82,9 +82,7 @@ Use this to confirm first-phase setup is complete before starting tasks.
 
 When all above are checked, proceed to [TASKLIST.md](TASKLIST.md) and the task docs in `docs/tasks/`.
 
-**Testing and validation:** There is no automated test suite yet. Validation is done via the checklist above (plugins, default map, C++ build, default pawn, PIE) and manual play in the Editor. When making changes, run through the relevant checklist items and play-test where applicable. Automated tests may be added later; the docs will be updated when they are.
-
-**Debug logs:** Agent/debug logs are written to `Saved/Logs/debug-cb22d5.log` (gitignored).
+**Testing and validation:** The `PythonAutomationTest` plugin is enabled. Test files in `Content/Python/tests/` (`test_*.py`) are auto-discovered by the Editor's Test Automation window. Run from Editor (Tools > Test Automation) or use the PIE test runner (`Content/Python/pie_test_runner.py`). For manual checks, run through the checklist above and play-test where applicable.
 
 When you fix a build, lint, or runtime error, record it in [KNOWN_ERRORS.md](KNOWN_ERRORS.md) so we don't repeat it.
 

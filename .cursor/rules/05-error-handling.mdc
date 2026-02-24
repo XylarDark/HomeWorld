@@ -1,8 +1,9 @@
 ---
 name: "Error Handling Standards"
-description: "Defensive programming and error handling patterns"
+description: "Apply defensive programming and error recording when handling failures to prevent regressions and data loss"
 alwaysApply: true
 priority: 6
+version: 1.0
 ---
 
 # Defensive Programming

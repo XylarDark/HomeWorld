@@ -1,7 +1,10 @@
 ---
-description: When to use Blueprint vs C++ and Blueprint naming for HomeWorld
+name: "Unreal Blueprint Standards"
+description: "Apply Blueprint naming and MCP safety rules when creating or editing Blueprint assets to prevent Editor crashes"
 globs: "**/*.uasset"
 alwaysApply: false
+priority: 17
+version: 1.0
 ---
 
 # Unreal Blueprint (HomeWorld)

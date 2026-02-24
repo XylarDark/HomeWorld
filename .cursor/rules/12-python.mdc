@@ -1,9 +1,10 @@
 ---
 name: "Python Standards"
-description: "Python-specific rules and best practices"
+description: "Follow Python style, type hints, and UE Editor scripting rules when editing .py files to ensure idempotency and correctness"
 alwaysApply: false
-glob: ["**/*.py"]
+globs: "**/*.py"
 priority: 12
+version: 1.0
 ---
 
 # Python Standards

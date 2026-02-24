@@ -1,7 +1,10 @@
 ---
-description: Unreal Engine C++ conventions and programmatic-by-default policy for HomeWorld
+name: "Unreal C++ Standards"
+description: "Follow UE5 C++ conventions and check the API pitfalls table when editing C++ source files to prevent deprecated API usage"
 globs: "**/*.cpp, **/*.h"
 alwaysApply: false
+priority: 16
+version: 1.0
 ---
 
 # Unreal C++ (HomeWorld)

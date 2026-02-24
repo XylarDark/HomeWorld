@@ -21,3 +21,97 @@ jobs:
           fi
           python3 -c "import json; json.load(open('HomeWorld.uproject'))"
           echo "HomeWorld.uproject is valid JSON"
+
+      - name: Validate config JSON files
+        run: |
+          for f in Content/Python/*.json; do
+            if [ -f "$f" ]; then
+              python3 -c "import json; json.load(open('$f'))" || {
+                echo "::error::Invalid JSON: $f"
+                exit 1
+              }
+              echo "  OK: $f"
+            fi
+          done
+
+      - name: Check required docs exist and are non-empty
+        run: |
+          for doc in docs/TASKLIST.md docs/SETUP.md docs/CONVENTIONS.md docs/KNOWN_ERRORS.md AGENTS.md ROADMAP.md; do
+            if [ ! -s "$doc" ]; then
+              echo "::error::Missing or empty: $doc"
+              exit 1
+            fi
+            echo "  OK: $doc"
+          done
+
+      - name: Check task docs exist
+        run: |
+          for task in docs/tasks/CHARACTER_ANIMATION.md docs/tasks/CHARACTER_ORIENTATION.md docs/tasks/CHARACTER_GROUND.md docs/tasks/PCG_FOREST_ON_MAP.md; do
+            if [ ! -s "$task" ]; then
+              echo "::error::Missing or empty: $task"
+              exit 1
+            fi
+            echo "  OK: $task"
+          done
+
+      - name: C++ header/source pairing check
+        run: |
+          cd Source/HomeWorld
+          ERRORS=0
+          for h in *.h; do
+            base="${h%.h}"
+            if [ ! -f "${base}.cpp" ]; then
+              echo "::warning::Header $h has no matching .cpp"
+            fi
+          done
+          for cpp in *.cpp; do
+            base="${cpp%.cpp}"
+            if [ ! -f "${base}.h" ]; then
+              echo "::warning::Source $cpp has no matching .h"
+            fi
+          done
+
+      - name: Git hygiene checks
+        run: |
+          ERRORS=0
+          # No __pycache__ committed
+          if find . -name "__pycache__" -not -path "./.git/*" | grep -q .; then
+            echo "::error::__pycache__ directories found in repo"
+            ERRORS=1
+          fi
+          # No temp JSON in project root
+          for f in pie_*.json gamemode_check.json fix_*.json find_*.json delete_*.json; do
+            if [ -f "$f" ]; then
+              echo "::error::Temp file in project root: $f"
+              ERRORS=1
+            fi
+          done
+          # No .pyc files
+          if find . -name "*.pyc" -not -path "./.git/*" | grep -q .; then
+            echo "::error::.pyc files found in repo"
+            ERRORS=1
+          fi
+          if [ $ERRORS -ne 0 ]; then exit 1; fi
+          echo "Git hygiene OK"
+
+  python-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install ruff
+        run: pip install ruff
+
+      - name: Lint Python scripts
+        run: |
+          ruff check Content/Python/ \
+            --select E,F,W \
+            --ignore E501,F401,E722 \
+            --exclude "__pycache__" \
+            || true
+          echo "Python lint complete (warnings only, non-blocking)"

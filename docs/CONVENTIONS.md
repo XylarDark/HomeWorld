@@ -40,17 +40,18 @@ See [MCP_SETUP.md](MCP_SETUP.md) for installation and `.cursor/rules/09-mcp-work
 
 ## Input setup (Enhanced Input)
 
-The default pawn is **AHomeWorldCharacter** (C++). Movement and look are driven by Enhanced Input. To have working WASD and mouse look:
+The default pawn is **AHomeWorldCharacter** (C++). Movement and look are driven by Enhanced Input.
 
-1. In the Editor, create Input Actions and a Mapping Context (once):
-   - **IA_Move** (Value Type: Axis2D) — for WASD
-   - **IA_Look** (Value Type: Axis2D) — for mouse
-   - **IMC_Default** — map W/S/A/D to Move and Mouse XY to Look
-2. Assign **MoveAction**, **LookAction**, and **DefaultMappingContext** on the default pawn:
-   - Either on the **AHomeWorldCharacter** class defaults (Editor), or
-   - On a **Blueprint child** of `HomeWorldCharacter` that you set as the default pawn (e.g. to also set the character mesh).
+**Automated setup:** Running `bootstrap_project.py` (via MCP or Editor Python console) creates all required input assets automatically:
+- **IA_Move** (Value Type: Axis2D) — for WASD
+- **IA_Look** (Value Type: Axis2D) — for mouse
+- **IMC_Default** — maps W/S/A/D to Move and Mouse XY to Look
 
-If these are not set, the character will spawn and the camera will work, but movement and look input will do nothing until the assets are created and assigned.
+These are then assigned to the default pawn by `setup_character_blueprint.py` (called by the bootstrap).
+
+**Manual creation (only if bootstrap hasn't run):** Create the assets above in the Editor and assign **MoveAction**, **LookAction**, and **DefaultMappingContext** on the default pawn (either on `AHomeWorldCharacter` class defaults or on a Blueprint child).
+
+If these are not set, the character will spawn and the camera will work, but movement and look input will do nothing.
 
 ---
 
@@ -60,4 +61,4 @@ The default pawn uses a **third-person** setup:
 
 - **Camera:** A spring arm and follow camera are attached to the character capsule. The camera orbits with the mouse (Look) and stays behind the character. Pitch is clamped so the camera does not flip.
 - **Movement:** Movement is **camera-relative** — W moves toward where the camera looks, and the character orients to movement direction.
-- **Input:** IA_Move, IA_Look, and IMC_Default must be created in the Editor and assigned to the default pawn (or a Blueprint child) for movement and look to work. Camera settings (arm length, FOV, pitch limits, sensitivity) are exposed on the character for tuning.
+- **Input:** IA_Move, IA_Look, and IMC_Default are created by `bootstrap_project.py` and assigned to the default pawn. If running manually, see the Input setup section above. Camera settings (arm length, FOV, pitch limits, sensitivity) are exposed on the character for tuning.

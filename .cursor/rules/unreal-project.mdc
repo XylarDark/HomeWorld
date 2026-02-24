@@ -1,7 +1,10 @@
 ---
-description: HomeWorld project layout, module, and plugin usage
+name: "Unreal Project Layout"
+description: "Reference HomeWorld project layout and plugin configuration when editing .uproject or Config .ini files to maintain project integrity"
 globs: "**/*.uproject, **/Config/*.ini"
 alwaysApply: false
+priority: 19
+version: 1.0
 ---
 
 # Unreal Project (HomeWorld)

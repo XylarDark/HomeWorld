@@ -1,7 +1,10 @@
 ---
-description: GAS (Gameplay Ability System) C++ base classes and Blueprint usage for HomeWorld
-globs: "**/*Ability*", "**/*Attribute*", "**/*GameplayEffect*"
+name: "Unreal GAS Standards"
+description: "Follow GAS architecture rules when editing Ability, Attribute, or GameplayEffect files to keep C++ base and Blueprint content correctly layered"
+globs: "**/*Ability*, **/*Attribute*, **/*GameplayEffect*"
 alwaysApply: false
+priority: 18
+version: 1.0
 ---
 
 # Unreal GAS (HomeWorld)

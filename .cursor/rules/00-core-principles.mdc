@@ -1,8 +1,9 @@
 ---
 name: "Core Principles"
-description: "Universal software engineering principles that apply to all code"
+description: "Apply core engineering principles when writing or reviewing any code to ensure quality, safety, and idempotency"
 alwaysApply: true
 priority: 1
+version: 1.0
 ---
 
 # Core Principles
