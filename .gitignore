@@ -32,8 +32,11 @@ UpgradeLog.htm
 # External plugins (installed via tools, not project code)
 Plugins/UnrealMCP/
 
+# Python
+__pycache__/
+*.pyc
+
 # Secrets and debug logs
 .env
 .env.local
 .env.*.local
-debug-cb22d5.log

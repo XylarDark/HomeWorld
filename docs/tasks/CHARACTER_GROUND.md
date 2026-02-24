@@ -2,48 +2,33 @@
 
 **Goal:** The character stands on the ground (no floating or sinking).
 
-**Status:** Done (C++) — verify in Editor.
+**Status:** Verified in PIE — character stands on ground correctly.
 
 ---
 
 ## What's already done (programmatic)
 
 - Capsule size set in C++ constructor: **Radius 42**, **Half-Height 88** (human-sized).
+- Collision preset set to **Pawn** in C++ constructor (`SetCollisionProfileName("Pawn")`).
 - `BeginPlay()` performs a downward line trace and snaps the character to the ground surface on spawn.
-- Player Start verified at **(-3700, -530, 742)** which is above the landscape.
 - `UCharacterMovementComponent` handles gravity and ground contact automatically.
 
 All ground-contact logic is handled in C++ in [HomeWorldCharacter.cpp](../../Source/HomeWorld/HomeWorldCharacter.cpp).
-
-## Context
-
-- The default pawn uses UE's **Character** movement: `AHomeWorldCharacter` extends `ACharacter`, which uses `UCharacterMovementComponent`. The capsule and movement component handle collision and grounding.
-- See [CONVENTIONS.md](../CONVENTIONS.md) and default pawn setup in [SETUP.md](../SETUP.md).
 
 ---
 
 ## Remaining manual steps
 
-### Step 1 — Verify collision preset
+### Step 1 — Test in PIE ✓
 
-1. Open `BP_HomeWorldCharacter` in the Editor.
-2. Select the **Capsule** (root) component.
-3. In Details, confirm **Collision Preset** is set to **Pawn** (or a custom preset that collides with WorldStatic/WorldDynamic).
-4. If not set, change it to **Pawn** and save.
+PIE automated check (2026-02-22):
+- `BP_HomeWorldCharacter_C` spawns at ground level (Z ≈ 681).
+- `MovementMode = MOVE_WALKING`, `IsFalling = false`.
+- Capsule: Half-height 88, Radius 42 (as configured in C++).
 
-### Step 2 — Verify the level has a floor with collision
+**Manual follow-up:** Walk around with WASD to confirm the character stays on terrain over varied elevation.
 
-1. Open the Main level.
-2. Confirm a Landscape or floor mesh exists and has collision enabled.
-3. The landscape should use a collision preset that blocks Pawn (e.g. BlockAll).
-
-### Step 3 — Test in PIE
-
-1. Press **Play** (Alt+P).
-2. The character should spawn standing on the ground, not floating or falling through.
-3. Walk around — the character should stay on the terrain surface.
-
-### Step 4 — Adjust spawn height (if needed)
+### Step 2 — Adjust spawn height (if needed)
 
 If the character still floats after spawning:
 
@@ -55,5 +40,5 @@ If the character still floats after spawning:
 
 ## Reference
 
-- Default pawn and game mode: [SETUP.md](../SETUP.md#building-c) and [SETUP.md](../SETUP.md#validation).
-- CONVENTIONS: [Code-first checklist](../CONVENTIONS.md#code-first-checklist).
+- Default pawn and game mode: [SETUP.md](../SETUP.md).
+- Capsule and collision are set in `AHomeWorldCharacter` constructor — no Editor configuration needed.

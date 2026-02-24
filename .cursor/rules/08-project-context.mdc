@@ -25,6 +25,7 @@ HomeWorld is a co-op ARPG survival game with family sim elements, built in Unrea
 - **MCP-first**: When the Editor is running and MCP is connected, prefer live Editor manipulation via MCP tools
 - **Error recording**: Document errors in `docs/KNOWN_ERRORS.md` so they are not repeated; check it before similar work
 - **Code-first, then Editor**: Automate as much as possible (Python scripts, MCP); manual Editor steps documented in task guides
+- **Idempotent scripts**: All Python setup/automation scripts must check for existing assets/actors before creating new ones; re-runs must be safe and produce the same result (see `00-core-principles.mdc` Idempotency Protocol)
 
 ## Project Structure
 

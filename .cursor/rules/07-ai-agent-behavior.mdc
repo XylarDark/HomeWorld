@@ -40,7 +40,20 @@ priority: 9
 - Preserve existing structure when possible
 - Update related files (tests, docs)
 - Don't create unnecessary files
-- Clean up temporary files
+
+## Session Cleanup (mandatory before ending a task)
+
+Temporary files created during a session **must be deleted** before the task is considered complete. This includes:
+
+1. **Diagnostic/result JSON files** in the project root (e.g. `pie_results.json`, `gamemode_check.json`, `fix_result.json`) — these are not project artifacts.
+2. **One-off Python scripts** in `Content/Python/` created for debugging, diagnostics, or one-time fixes (e.g. `find_pawn.py`, `check_gamemode.py`, `delete_stale_asset.py`). Keep only reusable/idempotent setup scripts.
+3. **Temporary log or dump files** anywhere in the workspace that were created for intermediate inspection.
+
+**How to distinguish keep vs. delete:**
+- **Keep:** Scripts referenced by `bootstrap_project.py` or other orchestrators, config JSON files in `Content/Python/`, project docs.
+- **Delete:** Scripts written to diagnose a specific issue in this session, result/output JSON files written by those scripts, any file whose only consumer was the agent in this conversation.
+
+**When to clean up:** After the task's objectives are verified and before reporting results to the user. Do not leave cleanup for a future session.
 
 ## Communication
 
@@ -112,3 +125,5 @@ Before any MCP call:
 - [ ] User informed of approach
 - [ ] Errors encountered during the task are noted and recorded; known errors checked before repeating similar work
 - [ ] MCP safety checklist passed before any MCP calls
+- [ ] Scripts that create assets/actors are idempotent (check-before-create, no duplicates on re-run)
+- [ ] **Session cleanup done** — temporary scripts, result JSON files, and diagnostic artifacts deleted (see Session Cleanup section)

@@ -15,33 +15,20 @@ except ImportError:
     print("ERROR: Run this script inside Unreal Editor (Python Editor Script Plugin).")
     sys.exit(1)
 
-# Import PCG forest logic so we don't duplicate it
+# Import PCG forest logic so we don't duplicate it.
+# Force reload to pick up disk changes in a long-lived Editor Python session.
+import importlib
 _script_dir = os.path.dirname(os.path.abspath(__file__))
 if _script_dir not in sys.path:
     sys.path.insert(0, _script_dir)
 import create_pcg_forest as pcg_forest
+importlib.reload(pcg_forest)
 
 
 def _log(msg):
     unreal.log("Demo Map: " + str(msg))
     print("Demo Map: " + str(msg))
 
-
-# #region agent log
-def _debug_log(hypothesis_id, location, message, data):
-    import time
-    try:
-        proj = unreal.SystemLibrary.get_project_directory()
-        logs_dir = os.path.join(proj, "Saved", "Logs")
-        os.makedirs(logs_dir, exist_ok=True)
-        path = os.path.join(logs_dir, "debug-cb22d5.log")
-        line = '{"sessionId":"cb22d5","hypothesisId":"%s","location":"%s","message":"%s","data":%s,"timestamp":%d}\n' % (
-            hypothesis_id, location, message, data, int(time.time() * 1000))
-        with open(path, "a", encoding="utf-8") as f:
-            f.write(line)
-    except Exception:
-        pass
-# #endregion
 
 
 def _load_demo_config():
@@ -112,9 +99,7 @@ def _get_landscape_bounds():
         if not landscapes:
             return None
         land = landscapes[0]
-        origin = unreal.Vector()
-        box_extent = unreal.Vector()
-        land.get_actor_bounds(False, origin, box_extent, False)
+        origin, box_extent = land.get_actor_bounds(False)
         return (origin, box_extent)
     except Exception as e:
         _log("Could not get landscape bounds: " + str(e))
@@ -172,36 +157,130 @@ def _ensure_main_is_open(demo_path):
     return False
 
 
+EXCLUSION_PADDING_CM = 500.0
+NATURE_MESH_PREFIXES = ("SM_Tree", "SMF_Forest_Rock", "SM_Rock_Small", "SM_Grass", "SM_Bush", "SM_Flower")
+SCATTER_MESH_PREFIXES = ("SM_Clouds", "SM_Water", "SM_River", "SM_Sky", "SM_Terrain", "SM_Ground", "SM_Ocean")
+
+
+def _cleanup_stale_pcg():
+    """Remove existing PCG graph asset and PCG Volume actors so the script can rebuild
+    with updated exclusion zones and volume size. Safe to call if nothing exists."""
+    if unreal.EditorAssetLibrary.does_asset_exist(pcg_forest.PCG_GRAPH_PACKAGE):
+        try:
+            unreal.EditorAssetLibrary.delete_asset(pcg_forest.PCG_GRAPH_PACKAGE)
+            _log("Deleted stale PCG graph for rebuild.")
+        except Exception as e:
+            _log("Could not delete PCG graph: " + str(e))
+    world = unreal.EditorLevelLibrary.get_editor_world()
+    if not world:
+        return
+    try:
+        volumes = unreal.GameplayStatics.get_all_actors_of_class(world, unreal.PCGVolume)
+        for vol in (volumes or []):
+            try:
+                unreal.EditorLevelLibrary.destroy_actor(vol)
+            except Exception:
+                try:
+                    vol.destroy_actor()
+                except Exception:
+                    pass
+        if volumes:
+            _log("Removed %d existing PCG Volume(s) from level." % len(volumes))
+    except Exception:
+        pass
+
+
+def _detect_village_exclusion_zones(padding=EXCLUSION_PADDING_CM):
+    """Scan the level for StylizedProvencal structure actors (buildings, walls, props, etc.)
+    and compute an exclusion zone around the dense village core using percentiles to
+    exclude outlier objects (clouds, distant fences, etc.).
+    Returns list of exclusion zone dicts ready for PCG."""
+    world = unreal.EditorLevelLibrary.get_editor_world()
+    if not world:
+        return []
+
+    skip_prefixes = NATURE_MESH_PREFIXES + SCATTER_MESH_PREFIXES
+    positions_x = []
+    positions_y = []
+    positions_z = []
+    try:
+        all_actors = unreal.GameplayStatics.get_all_actors_of_class(world, unreal.StaticMeshActor)
+    except Exception:
+        all_actors = []
+
+    for actor in (all_actors or []):
+        try:
+            comp = actor.get_component_by_class(unreal.StaticMeshComponent)
+            if not comp:
+                continue
+            mesh = comp.get_editor_property("static_mesh")
+            if not mesh:
+                continue
+            mesh_name = mesh.get_name()
+            mesh_path = mesh.get_path_name() if hasattr(mesh, "get_path_name") else ""
+            if "StylizedProvencal" not in mesh_path:
+                continue
+            if any(mesh_name.startswith(prefix) for prefix in skip_prefixes):
+                continue
+            origin, box_ext = actor.get_actor_bounds(False)
+            positions_x.append(origin.x)
+            positions_y.append(origin.y)
+            positions_z.append(origin.z)
+        except Exception:
+            continue
+
+    if not positions_x:
+        _log("No village structure actors detected.")
+        return []
+
+    _log("Found %d village structure actor(s). Using 10th/90th percentile to find village core..." % len(positions_x))
+
+    positions_x.sort()
+    positions_y.sort()
+    positions_z.sort()
+    n = len(positions_x)
+
+    def percentile(sorted_list, pct):
+        idx = int(len(sorted_list) * pct / 100.0)
+        idx = max(0, min(idx, len(sorted_list) - 1))
+        return sorted_list[idx]
+
+    lo_x, hi_x = percentile(positions_x, 10), percentile(positions_x, 90)
+    lo_y, hi_y = percentile(positions_y, 10), percentile(positions_y, 90)
+    lo_z, hi_z = percentile(positions_z, 5), percentile(positions_z, 95)
+
+    cx = (lo_x + hi_x) / 2.0
+    cy = (lo_y + hi_y) / 2.0
+    cz = (lo_z + hi_z) / 2.0
+    ex = (hi_x - lo_x) / 2.0 + padding
+    ey = (hi_y - lo_y) / 2.0 + padding
+    ez = (hi_z - lo_z) / 2.0 + padding
+
+    zone = {
+        "center_x": cx, "center_y": cy, "center_z": cz,
+        "extent_x": ex, "extent_y": ey, "extent_z": ez,
+    }
+    _log("Village exclusion zone (p10-p90): center=(%.0f, %.0f, %.0f) half_extent=(%.0f, %.0f, %.0f) [+%.0fcm padding]"
+         % (cx, cy, cz, ex, ey, ez, padding))
+    return [zone]
+
+
 def main():
     _log("Starting demo map generation (village + PCG forest)...")
     config = _load_demo_config()
     demo_path = config.get("demo_level_path", "/Game/HomeWorld/Maps/Main")
     template_path = config.get("template_level_path", "/Game/StylizedProvencal/Maps/Main")
-    # #region agent log
-    _debug_log("H4", "create_demo_map.py:main", "config loaded", json.dumps({"demo_path": demo_path}))
-    # #endregion
-
     if not _ensure_demo_level_exists(demo_path, template_path):
-        # #region agent log
-        _debug_log("H4", "create_demo_map.py:main", "demo level missing or duplicate failed", '{"ok":0}')
-        # #endregion
         _log("Stopping. Create or copy the Main level first (see message above).")
         return
-    # #region agent log
-    _debug_log("H4", "create_demo_map.py:main", "demo level exists", '{"ok":1}')
-    # #endregion
 
     if not _ensure_main_is_open(demo_path):
-        # #region agent log
-        _debug_log("H4", "create_demo_map.py:main", "could not open Main", '{"ok":0}')
-        # #endregion
         _log("Stopping. Open Main level and run the script again.")
         return
-    # #region agent log
-    _debug_log("H4", "create_demo_map.py:main", "Main is open", '{"ok":1}')
-    # #endregion
 
-    # Build location and extent from config (Unreal units: cm); override with landscape bounds if present
+    _cleanup_stale_pcg()
+
+    # PCG volume sized to landscape; fall back to config values
     location = unreal.Vector(
         float(config.get("volume_center_x", 0)),
         float(config.get("volume_center_y", 0)),
@@ -215,11 +294,15 @@ def main():
     landscape_bounds = _get_landscape_bounds()
     if landscape_bounds is not None:
         location, extent = landscape_bounds
-        _log("Using PCG volume bounds from landscape: center=%s half_extent=%s" % (location, extent))
+        _log("PCG volume sized to landscape: center=%s half_extent=%s" % (location, extent))
+    else:
+        _log("No landscape found — using config volume bounds: center=%s half_extent=%s" % (location, extent))
 
+    # Exclusion zones: prefer config, then auto-detect from village assets, then 10% center fallback
     exclusion_zones = config.get("exclusion_zones") or []
     if not exclusion_zones:
-        # Default: one exclusion zone in the center, 10% of volume size
+        exclusion_zones = _detect_village_exclusion_zones()
+    if not exclusion_zones:
         ex_x = max(100.0, abs(extent.x) * 0.1)
         ex_y = max(100.0, abs(extent.y) * 0.1)
         ex_z = max(50.0, abs(extent.z) * 0.1)
@@ -227,19 +310,14 @@ def main():
             "center_x": location.x, "center_y": location.y, "center_z": location.z,
             "extent_x": ex_x, "extent_y": ex_y, "extent_z": ex_z,
         }]
-        _log("Added default center exclusion zone (10%% of volume): extent %s %s %s" % (ex_x, ex_y, ex_z))
+        _log("Fallback: 10%% center exclusion zone (no village actors found): extent %.0f %.0f %.0f" % (ex_x, ex_y, ex_z))
+
     graph_asset = pcg_forest.create_pcg_graph(exclusion_zones=exclusion_zones)
-    # #region agent log
-    _debug_log("H4", "create_demo_map.py:main", "PCG graph created", '{"hasGraph":%d}' % (1 if graph_asset else 0))
-    # #endregion
     if graph_asset:
         pcg_forest.place_volume_and_generate(graph_asset, location=location, extent=extent, exclusion_zones=exclusion_zones)
-        # #region agent log
-        _debug_log("H4", "create_demo_map.py:main", "volume placed and generated", '{"ok":1}')
-        # #endregion
     pcg_forest.try_world_partition()
 
-    _log("Done. Demo map ready (medieval village + PCG forest). Trees/rocks from Stylized Provencal; edit pcg_forest_config.json to change.")
+    _log("Done. Demo map ready (village + PCG forest). Trees/rocks from Stylized Provencal surround village with exclusion dead zones.")
 
 
 if __name__ == "__main__":

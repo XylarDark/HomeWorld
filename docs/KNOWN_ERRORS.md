@@ -33,6 +33,12 @@ For each entry use:
 - **Fix:** Rename to `static constexpr int32 MCPRecvBufferSize = 8192`.
 - **Context:** 2026-02, UnrealMCP plugin build, UE 5.7 migration.
 
+### UnrealMCP plugin: FPaths::IsRelativePath removed in UE 5.7
+- **Error:** `error C2039: 'IsRelativePath': is not a member of 'FPaths'` in UnrealMCPEditorCommands.cpp.
+- **Cause:** `FPaths::IsRelativePath` was renamed to `FPaths::IsRelative` in UE 5.7.
+- **Fix:** Replace `FPaths::IsRelativePath(...)` with `FPaths::IsRelative(...)`.
+- **Context:** 2026-02, UnrealMCP plugin build, UE 5.7 migration.
+
 ### MCP set_blueprint_property: full asset path causes Editor crash
 - **Error:** Fatal error: `Attempted to create a package with name containing double slashes. PackageName: /Game/Blueprints//Game/HomeWorld/GameMode/BP_GameMode` — Editor crashes.
 - **Cause:** `FindBlueprintByName` in UnrealMCPCommonUtils.cpp prepends `/Game/Blueprints/` to the blueprint_name argument. Passing a full path like `/Game/HomeWorld/GameMode/BP_GameMode` creates the invalid double-slash path.
@@ -50,6 +56,24 @@ For each entry use:
 - **Cause:** Components created in the C++ constructor (like `CharacterMesh0`) are not visible to the MCP plugin's component lookup on the Blueprint asset.
 - **Fix:** Use Python Editor scripts to access the component via `get_editor_property()` or the SubobjectDataSubsystem. MCP cannot set properties on inherited components.
 - **Context:** 2026-02, MCP runtime, BP_HomeWorldCharacter.
+
+### UE 5.7 Python API: get_actor_bounds() signature changed
+- **Error:** `get_actor_bounds() takes at most 2 arguments (4 given)` when calling `actor.get_actor_bounds(False, origin, extent, False)`.
+- **Cause:** In UE 5.7, `get_actor_bounds(bOnlyCollidingComponents)` returns a `(origin, box_extent)` tuple instead of accepting out-parameters.
+- **Fix:** Replace `actor.get_actor_bounds(False, origin, extent, False)` with `origin, extent = actor.get_actor_bounds(False)`.
+- **Context:** 2026-02, Python Editor scripting, affects landscape bounds and actor bounds queries.
+
+### Unreal Python: module caching prevents picking up script changes
+- **Error:** Changes to Python scripts (e.g. `create_pcg_forest.py`) are not reflected when re-running `create_demo_map.py` or `bootstrap_project.py` because Python caches imported modules in `sys.modules`.
+- **Cause:** The Unreal Editor Python session persists across script executions. `import module` reuses the cached version instead of re-reading from disk.
+- **Fix:** Add `importlib.reload(module)` after each import in orchestrator scripts. Applied to `create_demo_map.py` and `bootstrap_project.py`.
+- **Context:** 2026-02, Python Editor scripting, module caching.
+
+### UE 5.7 Python: AnimBP factory class named differently
+- **Error:** `AnimationBlueprintFactory` not found in `unreal` module when trying to create an Animation Blueprint programmatically.
+- **Cause:** In UE 5.7, the factory class is `AnimBlueprintFactory`, not `AnimationBlueprintFactory`.
+- **Fix:** Try multiple names: `AnimBlueprintFactory`, `AnimationBlueprintFactory`, `AnimBlueprint_Factory`.
+- **Context:** 2026-02, Python Editor scripting, AnimBP creation.
 
 ### MCP set_blueprint_property: cannot find GameMode Blueprints
 - **Error:** `Blueprint not found: BP_GameMode` when calling `set_blueprint_property` with the short name.

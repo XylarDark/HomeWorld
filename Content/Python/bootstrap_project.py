@@ -2,7 +2,7 @@
 # Run from Unreal Editor: Tools -> Execute Python Script.
 # One-click project setup: creates all Enhanced Input assets, character Blueprint,
 # project settings, and level preparation in order.
-# Re-runnable: each sub-script deletes existing assets before recreating.
+# Idempotent: each sub-script checks for existing assets and skips/reuses them.
 #
 # Usage:
 #   1. Open the project in Unreal Editor
@@ -12,6 +12,7 @@
 # Optional: set skeletal mesh and Animation Blueprint paths in
 # Content/Python/character_blueprint_config.json before running.
 
+import importlib
 import os
 import sys
 
@@ -35,33 +36,46 @@ def main(run_pcg=True):
     _log("=== HomeWorld project bootstrap ===")
 
     # Step 1: Enhanced Input assets (IA_Move, IA_Look, IMC_Default)
-    _log("--- Step 1/4: Enhanced Input ---")
+    _log("--- Step 1/5: Enhanced Input ---")
     try:
         import setup_enhanced_input
+        importlib.reload(setup_enhanced_input)
         setup_enhanced_input.main()
     except Exception as e:
         _log("Enhanced Input setup error: " + str(e))
 
-    # Step 2: Character Blueprint (BP_HomeWorldCharacter)
-    _log("--- Step 2/4: Character Blueprint ---")
+    # Step 2: Animation Blueprint (ABP_HomeWorldCharacter)
+    _log("--- Step 2/5: Animation Blueprint ---")
+    try:
+        import setup_animation_blueprint
+        importlib.reload(setup_animation_blueprint)
+        setup_animation_blueprint.main()
+    except Exception as e:
+        _log("Animation Blueprint setup error: " + str(e))
+
+    # Step 3: Character Blueprint (BP_HomeWorldCharacter)
+    _log("--- Step 3/5: Character Blueprint ---")
     try:
         import setup_character_blueprint
+        importlib.reload(setup_character_blueprint)
         setup_character_blueprint.main()
     except Exception as e:
         _log("Character Blueprint setup error: " + str(e))
 
-    # Step 3: Project settings (game mode, default map, pawn class)
-    _log("--- Step 3/4: Project Settings ---")
+    # Step 4: Project settings (game mode, default map, pawn class)
+    _log("--- Step 4/5: Project Settings ---")
     try:
         import setup_project_settings
+        importlib.reload(setup_project_settings)
         setup_project_settings.main()
     except Exception as e:
         _log("Project settings error: " + str(e))
 
-    # Step 4: Level setup (PlayerStart, optional PCG)
-    _log("--- Step 4/4: Level Setup ---")
+    # Step 5: Level setup (PlayerStart, optional PCG)
+    _log("--- Step 5/5: Level Setup ---")
     try:
         import setup_level
+        importlib.reload(setup_level)
         setup_level.main(run_pcg=run_pcg)
     except Exception as e:
         _log("Level setup error: " + str(e))

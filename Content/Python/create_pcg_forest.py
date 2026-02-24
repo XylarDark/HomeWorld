@@ -149,13 +149,11 @@ def create_pcg_graph(exclusion_zones=None):
     _ensure_pcg_folder()
     if exclusion_zones is None:
         exclusion_zones = []
-    # Re-run: delete existing graph so create_asset succeeds (script is re-runnable)
-    try:
-        if unreal.EditorAssetLibrary.does_asset_exist(PCG_GRAPH_PACKAGE):
-            unreal.EditorAssetLibrary.delete_asset(PCG_GRAPH_PACKAGE)
-            _log("Removed existing PCG graph for re-run.")
-    except Exception as e:
-        _log("Could not remove existing graph (re-run may fail): " + str(e))
+    if unreal.EditorAssetLibrary.does_asset_exist(PCG_GRAPH_PACKAGE):
+        existing = unreal.load_asset(PCG_GRAPH_PACKAGE)
+        if existing:
+            _log("PCG graph already exists at " + PCG_GRAPH_PACKAGE + ". Reusing (delete in Content Browser to force recreation).")
+            return existing
     asset_tools = unreal.AssetToolsHelpers.get_asset_tools()
     factory = unreal.PCGGraphFactory()
     graph_asset = asset_tools.create_asset(
@@ -313,14 +311,60 @@ def create_pcg_graph(exclusion_zones=None):
     return graph_asset
 
 
+def _find_existing_pcg_volume(world):
+    """Return the first non-exclusion PCGVolume in the level, or None."""
+    try:
+        volumes = unreal.GameplayStatics.get_all_actors_of_class(world, unreal.PCGVolume)
+        for vol in (volumes or []):
+            try:
+                tags = vol.get_editor_property("tags") if hasattr(vol, "get_editor_property") else getattr(vol, "tags", [])
+                tag_strs = [str(t) for t in tags] if tags else []
+                if "PCG_Exclusion" not in tag_strs:
+                    return vol
+            except Exception:
+                return vol
+    except Exception:
+        pass
+    return None
+
+
+def _find_existing_exclusion_volumes(world):
+    """Return list of PCGVolume actors tagged 'PCG_Exclusion' in the level."""
+    result = []
+    try:
+        volumes = unreal.GameplayStatics.get_all_actors_of_class(world, unreal.PCGVolume)
+        for vol in (volumes or []):
+            try:
+                tags = vol.get_editor_property("tags") if hasattr(vol, "get_editor_property") else getattr(vol, "tags", [])
+                if tags and "PCG_Exclusion" in [str(t) for t in tags]:
+                    result.append(vol)
+            except Exception:
+                pass
+    except Exception:
+        pass
+    return result
+
+
 def _spawn_exclusion_volumes(exclusion_zones):
-    """Spawn one PCGVolume (or box) actor per exclusion zone for Option B. Tag with PCG_Exclusion."""
+    """Spawn one PCGVolume (or box) actor per exclusion zone for Option B. Tag with PCG_Exclusion.
+    Skips spawning if the correct number of exclusion volumes already exist."""
     if not exclusion_zones:
         return
     editor_subsystem = unreal.EditorLevelLibrary
     world = editor_subsystem.get_editor_world()
     if not world:
         return
+    existing = _find_existing_exclusion_volumes(world)
+    if len(existing) >= len(exclusion_zones):
+        _log("Exclusion volumes already exist (%d found, %d needed). Skipping spawn." % (len(existing), len(exclusion_zones)))
+        return
+    if existing:
+        _log("Found %d existing exclusion volume(s) but need %d. Removing stale ones and recreating." % (len(existing), len(exclusion_zones)))
+        for vol in existing:
+            try:
+                vol.destroy_actor()
+            except Exception:
+                pass
     rotation = unreal.Rotator(0.0, 0.0, 0.0)
     for i, zone in enumerate(exclusion_zones):
         try:
@@ -354,7 +398,7 @@ def _spawn_exclusion_volumes(exclusion_zones):
 
 
 def place_volume_and_generate(graph_asset, location=None, extent=None, exclusion_zones=None):
-    """Place a PCG Volume in the current level, assign graph, generate, save level.
+    """Place a PCG Volume in the current level (or reuse existing), assign graph, generate, save level.
     location: unreal.Vector for volume center (default 0,0,0).
     extent: unreal.Vector for half-extents in cm (default 5000,5000,500 => 100x100x10 m).
     exclusion_zones: optional list of dicts (center_*, extent_*); spawns exclusion volume actors when provided (Option B)."""
@@ -374,22 +418,34 @@ def place_volume_and_generate(graph_asset, location=None, extent=None, exclusion
     if exclusion_zones is None:
         exclusion_zones = []
 
-    rotation = unreal.Rotator(0.0, 0.0, 0.0)
-    volume = editor_subsystem.spawn_actor_from_class(unreal.PCGVolume, location, rotation)
-    if not volume:
-        _log("Failed to spawn PCG Volume.")
-        return
-
-    # Set bounds: PCGVolume may use BoxComponent or Brush; set half-extents (cm)
-    root = volume.get_root_component()
-    if root and hasattr(root, "set_box_extent"):
-        root.set_box_extent(extent)
+    volume = _find_existing_pcg_volume(world)
+    if volume:
+        _log("Reusing existing PCG Volume (skipping spawn to avoid duplicates).")
+        volume.set_actor_location(location, False, False)
     else:
-        box_comp = volume.get_component_by_class(unreal.BoxComponent)
-        if box_comp and hasattr(box_comp, "set_box_extent"):
-            box_comp.set_box_extent(extent)
+        rotation = unreal.Rotator(0.0, 0.0, 0.0)
+        volume = editor_subsystem.spawn_actor_from_class(unreal.PCGVolume, location, rotation)
+        if not volume:
+            _log("Failed to spawn PCG Volume.")
+            return
+
+    # Size the volume to match the desired extent.
+    # PCGVolume uses BrushComponent; scale the actor so its world bounds match target extent.
+    # Reset scale first to get the unscaled base extent, then compute the correct scale.
+    try:
+        volume.set_actor_scale3d(unreal.Vector(1.0, 1.0, 1.0))
+        _, base_ext = volume.get_actor_bounds(False)
+        if base_ext.x > 0 and base_ext.y > 0 and base_ext.z > 0:
+            scale_x = abs(extent.x) / base_ext.x
+            scale_y = abs(extent.y) / base_ext.y
+            scale_z = abs(extent.z) / base_ext.z
+            volume.set_actor_scale3d(unreal.Vector(scale_x, scale_y, scale_z))
+            _log("Scaled PCG Volume: %.1fx %.1fy %.1fz (target extent: %.0f, %.0f, %.0f)"
+                 % (scale_x, scale_y, scale_z, extent.x, extent.y, extent.z))
         else:
-            _log("Volume has no BoxComponent; set bounds manually in Details (10000 x 10000 cm).")
+            _log("Default volume extent is zero; set volume bounds manually in Editor.")
+    except Exception as e:
+        _log("Could not scale volume: %s. Set bounds manually in Details." % str(e))
 
     # Spawn exclusion volume actors (Option B) so they exist in the level for graph reference or manual wiring
     _spawn_exclusion_volumes(exclusion_zones)

@@ -2,78 +2,73 @@
 
 **Goal:** The character uses correct animations (idle, walk/run) so it looks right in play.
 
-**Status:** In progress — Blueprint scaffolding done, manual Editor work required.
+**Status:** Mostly done — AnimBP active in PIE (`ABP_HomeWorldCharacter_C`), skeletal mesh rendering (`SK_Man_Full_01`). AnimGraph state machine needs manual setup for idle/walk transitions. C++ `UHomeWorldAnimInstance` parent class needs rebuild.
 
 ---
 
 ## What's already done (programmatic)
 
-- `BP_HomeWorldCharacter` Blueprint created (child of `AHomeWorldCharacter`) via MCP.
-- C++ class handles movement, input binding, camera — no C++ changes needed.
-- Python setup scripts exist: `setup_enhanced_input.py`, `setup_character_blueprint.py`.
-- Config files ready: `character_blueprint_config.json`.
+- `UHomeWorldAnimInstance` C++ class created ([HomeWorldAnimInstance.h](../../Source/HomeWorld/HomeWorldAnimInstance.h), [.cpp](../../Source/HomeWorld/HomeWorldAnimInstance.cpp)) — exposes `Speed`, `bIsInAir`, `bIsMoving` to the AnimGraph via `NativeUpdateAnimation()`.
+- `ABP_HomeWorldCharacter` Animation Blueprint asset created at `/Game/HomeWorld/Characters/` via `setup_animation_blueprint.py`, with skeleton from `SK_Man_Full_01`.
+- `BP_HomeWorldCharacter` Blueprint created (child of `AHomeWorldCharacter`) with skeletal mesh (`SK_Man_Full_01`) and AnimBP assigned.
+- Enhanced Input assets created: `IA_Move`, `IA_Look`, `IMC_Default`.
+- Project settings configured: GameMode, default map, DefaultPawnClass.
+- Animation sequences available in `Content/Man/Demo/Animations/`: `ThirdPersonIdle`, `ThirdPersonWalk`, `ThirdPersonRun`, `ThirdPerson_Jump`.
+- All setup scripts are idempotent — safe to re-run without duplicates.
 
 ## Context
 
-- Movement and input are driven by C++ in [AHomeWorldCharacter](../../Source/HomeWorld/HomeWorldCharacter.h) and [HomeWorldCharacter.cpp](../../Source/HomeWorld/HomeWorldCharacter.cpp), using Enhanced Input. See [CONVENTIONS.md](../CONVENTIONS.md) for input setup.
-- Animation is driven on the **Blueprint side**: the character mesh, skeleton, and Animation Blueprint are assigned on the default pawn (either on the C++ class defaults or on a Blueprint child of `AHomeWorldCharacter`).
+- Movement and input are driven by C++ in [AHomeWorldCharacter](../../Source/HomeWorld/HomeWorldCharacter.h).
+- Animation data (Speed, IsInAir) is computed in C++ by [UHomeWorldAnimInstance](../../Source/HomeWorld/HomeWorldAnimInstance.h) — no EventGraph wiring needed.
+- The AnimBP's AnimGraph must be populated manually (UE5 does not expose AnimGraph node creation to Python or MCP).
 
 ---
 
 ## Remaining manual steps
 
-### Step 1 — Run Enhanced Input setup script
+### Step 0 — Rebuild C++ (required once)
 
-In the Editor: **Tools > Execute Python Script** → `Content/Python/setup_enhanced_input.py`.
+After pulling the new `HomeWorldAnimInstance` files, rebuild the project:
+- Close the Editor, run `Build-HomeWorld.bat`, then reopen the Editor.
+- Or use Live Coding (Ctrl+Alt+F11) if the Editor is open and not in PIE.
 
-This creates `IA_Move`, `IA_Look`, and `IMC_Default` at `/Game/HomeWorld/Input/`.
+After rebuild, re-run the AnimBP setup so the parent class gets set to `UHomeWorldAnimInstance`:
+- **Via MCP:** `execute_python_script("setup_animation_blueprint.py")`
+- Or delete `ABP_HomeWorldCharacter` in Content Browser and re-run the script.
 
-### Step 2 — Configure and run Character Blueprint setup script
+### Step 1 — Populate the AnimBP AnimGraph
 
-1. Edit `Content/Python/character_blueprint_config.json`:
-   - Set `skeletal_mesh` to the asset path of your mesh (e.g. `/Game/Characters/Mannequins/Meshes/SKM_Manny`).
-   - Leave `anim_blueprint` empty for now (you'll create it in Step 3).
-2. In the Editor: **Tools > Execute Python Script** → `Content/Python/setup_character_blueprint.py`.
-   - This assigns the input assets and skeletal mesh to `BP_HomeWorldCharacter`.
+1. Open `ABP_HomeWorldCharacter` in the Editor (Content Browser → `/Game/HomeWorld/Characters/`).
+2. Open the **AnimGraph** tab.
+3. Right-click → **Add New State Machine** → name it `Locomotion`.
+4. Double-click the state machine to open it.
+5. Add two states:
+   - **Idle** — assign `ThirdPersonIdle` animation (from `Content/Man/Demo/Animations/`).
+   - **Walk/Run** — assign `ThirdPersonRun` animation.
+6. Add transitions:
+   - **Idle → Walk/Run:** condition = `Speed > 10` (drag `Speed` from the C++ parent — it's already exposed as BlueprintReadOnly).
+   - **Walk/Run → Idle:** condition = `Speed < 10`.
+7. Set **Idle** as the default state (right-click → Set as Default).
+8. Connect the state machine output to the **Output Pose** node.
+9. Compile and save.
 
-### Step 3 — Create an Animation Blueprint
+### Step 2 — Test in PIE
 
-1. In Content Browser: **Right-click → Animation → Animation Blueprint**.
-2. Select the **same skeleton** as the mesh you assigned in Step 2.
-3. Name it `ABP_HomeWorldCharacter`.
-4. Open the Animation Blueprint and add a **State Machine** with at least:
-   - **Idle** (default state) — plays an idle animation.
-   - **Locomotion** (walk/run) — plays a walk or run animation.
-5. Create a **Speed** variable. In the **Event Graph**, use **Try Get Pawn Owner → Get Velocity → Vector Length** to set it each tick.
-6. In the **State Machine**, add transitions:
-   - Idle → Locomotion: when **Speed > 10**.
-   - Locomotion → Idle: when **Speed < 10**.
+PIE automated check (2026-02-22):
+- `ABP_HomeWorldCharacter_C` AnimInstance is **active and running**.
+- Skeletal mesh `SK_Man_Full_01` is assigned.
+- Character spawns and is possessed by PlayerController.
+- AnimGraph state machine not yet populated — character will T-pose until Step 1 is completed.
 
-### Step 4 — Assign AnimBP to the character
-
-1. Open `BP_HomeWorldCharacter` in the Editor.
-2. Select the **Mesh** component in the Components panel.
-3. In Details, set **Anim Class** to `ABP_HomeWorldCharacter`.
-4. Compile and save the Blueprint.
-
-### Step 5 — Set GameMode DefaultPawnClass
-
-1. Open `BP_GameMode` in the Editor (Content Browser → `/Game/HomeWorld/GameMode/`).
-2. In the **Classes** section, set **Default Pawn Class** to `BP_HomeWorldCharacter`.
-3. Save the Blueprint.
-
-> **Why manual?** MCP cannot find Blueprints stored outside `/Game/Blueprints/` and cannot set inherited C++ properties. See [KNOWN_ERRORS.md](../KNOWN_ERRORS.md).
-
-### Step 6 — Test in PIE
-
-1. Press **Play** (Alt+P) in the Editor.
-2. Move with WASD and confirm: idle animation when still, walk/run when moving.
-3. If the mesh has no visible animation, verify the AnimBP is assigned and the skeleton matches.
+1. After completing Step 1, press **Play** (Alt+P).
+2. Move with WASD — character should play walk/run animation.
+3. Stand still — character should play idle animation.
+4. If no animation plays, verify the AnimBP is assigned on BP_HomeWorldCharacter → Mesh → Anim Class.
 
 ---
 
 ## Reference
 
-- **C++ movement:** `AHomeWorldCharacter::Move()` adds movement input; `CharacterMovementComponent` handles velocity. Animation does not need to be changed in C++ for basic locomotion.
-- **Velocity for AnimBP:** The Animation Blueprint can drive Idle/Locomotion from the pawn owner's **Get Velocity** (e.g. Vector Length on XY) or **Get Movement Component → Velocity**; no extra C++ API is required.
-- **Input:** IA_Move, IA_Look, IMC_Default must exist and be assigned per [CONVENTIONS.md](../CONVENTIONS.md#input-setup-enhanced-input).
+- **C++ locomotion data:** `UHomeWorldAnimInstance` computes `Speed` (horizontal velocity in cm/s), `bIsMoving` (Speed > 5), `bIsInAir` (CharacterMovement->IsFalling()) every tick.
+- **Available animations:** `ThirdPersonIdle`, `ThirdPersonWalk`, `ThirdPersonRun`, `ThirdPerson_Jump` in `/Game/Man/Demo/Animations/`.
+- **Scripts:** `setup_animation_blueprint.py` (creates AnimBP asset), `setup_character_blueprint.py` (assigns mesh + AnimBP), `bootstrap_project.py` (runs all setup).

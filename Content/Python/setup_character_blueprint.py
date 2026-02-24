@@ -3,7 +3,7 @@
 # Creates BP_HomeWorldCharacter (Blueprint child of AHomeWorldCharacter) and assigns:
 #   - MoveAction -> IA_Move, LookAction -> IA_Look, DefaultMappingContext -> IMC_Default
 #   - Optional: skeletal mesh and Animation Blueprint from config
-# Re-runnable: deletes existing Blueprint before creating a new one.
+# Idempotent: reuses existing Blueprint if found, only creates if missing.
 
 import json
 import os
@@ -50,14 +50,13 @@ def _load_config():
         return defaults
 
 
-def _delete_if_exists(asset_path):
-    if unreal.EditorAssetLibrary.does_asset_exist(asset_path):
-        unreal.EditorAssetLibrary.delete_asset(asset_path)
-
-
 def _create_character_blueprint():
-    """Create a Blueprint child of AHomeWorldCharacter."""
-    _delete_if_exists(BP_FULL)
+    """Create a Blueprint child of AHomeWorldCharacter, or return the existing one."""
+    if unreal.EditorAssetLibrary.does_asset_exist(BP_FULL):
+        existing = unreal.load_asset(BP_FULL)
+        if existing:
+            _log("Reusing existing Blueprint: " + BP_FULL)
+            return existing
 
     asset_tools = unreal.AssetToolsHelpers.get_asset_tools()
 

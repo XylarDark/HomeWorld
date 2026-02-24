@@ -53,3 +53,30 @@ priority: 12
 - Use parameterized queries for databases
 - Validate and sanitize all inputs
 - Use secrets management for credentials
+
+## Unreal Editor Python Scripting
+
+### Idempotency (critical)
+
+All Editor scripts in `Content/Python/` must be re-runnable without side effects:
+
+- **Assets:** Check `EditorAssetLibrary.does_asset_exist(path)` before creating. If it exists, load and return it — don't delete-and-recreate.
+- **Actors:** Check `GameplayStatics.get_all_actors_of_class(world, cls)` before spawning. Reuse existing actors where possible.
+- **Settings:** Overwriting project settings is inherently idempotent — acceptable to re-apply.
+- See `00-core-principles.mdc` for the full Idempotency Protocol.
+
+### Module caching
+
+The Unreal Editor Python session is long-lived. Imported modules are cached in `sys.modules` and won't reflect disk changes on re-import.
+
+- **Orchestrator scripts** (`bootstrap_project.py`, `create_demo_map.py`) must call `importlib.reload(module)` after every `import` of a sibling script.
+- Standalone scripts that are executed directly (not imported) don't need this.
+
+### UE 5.7 Python API changes
+
+| Old (UE ≤ 5.6) | New (UE 5.7) |
+|---|---|
+| `actor.get_actor_bounds(False, origin, extent, False)` (out-params) | `origin, extent = actor.get_actor_bounds(False)` (returns tuple) |
+| `FKey("W")` in `map_key()` | API changed; `FKey` struct may require different construction — check Output Log for TypeError |
+
+Always check `docs/KNOWN_ERRORS.md` before using Unreal Python APIs that accept complex types.

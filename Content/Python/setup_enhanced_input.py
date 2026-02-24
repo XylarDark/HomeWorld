@@ -1,7 +1,7 @@
 # setup_enhanced_input.py
 # Run from Unreal Editor: Tools -> Execute Python Script.
 # Creates Enhanced Input assets: IA_Move (Axis2D), IA_Look (Axis2D), IMC_Default (WASD + Mouse).
-# Re-runnable: deletes existing assets before creating new ones.
+# Idempotent: skips creation if assets already exist to preserve manual customizations.
 
 import sys
 
@@ -22,15 +22,16 @@ def _log(msg):
     print("InputSetup: " + str(msg))
 
 
-def _delete_if_exists(asset_path):
-    if unreal.EditorAssetLibrary.does_asset_exist(asset_path):
-        unreal.EditorAssetLibrary.delete_asset(asset_path)
+def _asset_exists(asset_path):
+    return unreal.EditorAssetLibrary.does_asset_exist(asset_path)
 
 
 def _create_input_action(name, value_type_name="Axis2D"):
-    """Create an InputAction asset. value_type_name: 'Boolean', 'Axis1D', 'Axis2D', 'Axis3D'."""
+    """Create an InputAction asset if it doesn't already exist. value_type_name: 'Boolean', 'Axis1D', 'Axis2D', 'Axis3D'."""
     asset_path = INPUT_PATH + "/" + name
-    _delete_if_exists(asset_path)
+    if _asset_exists(asset_path):
+        _log("Skipping " + asset_path + " (already exists)")
+        return unreal.load_asset(asset_path)
 
     asset_tools = unreal.AssetToolsHelpers.get_asset_tools()
 
@@ -74,9 +75,11 @@ def _create_input_action(name, value_type_name="Axis2D"):
 
 
 def _create_mapping_context(name, ia_move, ia_look):
-    """Create IMC_Default with WASD -> IA_Move and Mouse2D -> IA_Look."""
+    """Create IMC_Default with WASD -> IA_Move and Mouse2D -> IA_Look. Skips if already exists."""
     asset_path = INPUT_PATH + "/" + name
-    _delete_if_exists(asset_path)
+    if _asset_exists(asset_path):
+        _log("Skipping " + asset_path + " (already exists)")
+        return unreal.load_asset(asset_path)
 
     asset_tools = unreal.AssetToolsHelpers.get_asset_tools()
 

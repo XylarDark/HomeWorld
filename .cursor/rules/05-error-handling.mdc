@@ -85,6 +85,8 @@ Before writing or reviewing C++ that touches engine APIs, check for deprecated p
 - **Do not use `ANY_PACKAGE`** — it was removed in UE 5.7. Use `nullptr`.
 - **Avoid generic global names** (e.g. `BufferSize`) that collide with engine headers; prefix and use `static constexpr`.
 - When integrating third-party plugins targeting older UE versions, expect API breakage and apply known fixes before building.
+- **Python `get_actor_bounds()`** signature changed: UE 5.7 returns a `(origin, extent)` tuple from `actor.get_actor_bounds(False)`. The old 4-arg form with out-parameters silently fails. See `12-python.mdc` for the full UE 5.7 Python API table.
+- **`FPaths::IsRelativePath`** was renamed to `FPaths::IsRelative` in UE 5.7.
 
 ## MCP Input Validation
 

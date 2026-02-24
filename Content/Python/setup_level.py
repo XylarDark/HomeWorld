@@ -28,9 +28,7 @@ def _get_landscape_center_z():
         landscapes = unreal.GameplayStatics.get_all_actors_of_class(world, unreal.Landscape)
         if not landscapes:
             return None
-        origin = unreal.Vector()
-        extent = unreal.Vector()
-        landscapes[0].get_actor_bounds(False, origin, extent, False)
+        origin, extent = landscapes[0].get_actor_bounds(False)
         return (origin, origin.z + extent.z)
     except Exception:
         return None

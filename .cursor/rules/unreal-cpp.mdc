@@ -24,5 +24,6 @@ These APIs changed or were removed in UE 5.7. Check `docs/KNOWN_ERRORS.md` for t
 | Global names that collide with engine headers (e.g. `BufferSize`) | Prefix with module/context name and use `static constexpr` |
 | `UCollisionProfile::Pawn_ProfileName` (may need extra includes) | `FName("Pawn")` literal |
 | `SCENE_QUERY_STAT` macro (version-dependent includes) | `FCollisionQueryParams(NAME_None, false, OwnerActor)` |
+| `FPaths::IsRelativePath(...)` | `FPaths::IsRelative(...)` (renamed in UE 5.7) |
 
 When writing or reviewing C++ that uses `FindObject`, image compression, or global constants, verify against this table first.
