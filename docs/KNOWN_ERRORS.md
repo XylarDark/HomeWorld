@@ -57,6 +57,12 @@ For each entry use:
 - **Fix:** Use Python Editor scripts to access the component via `get_editor_property()` or the SubobjectDataSubsystem. MCP cannot set properties on inherited components.
 - **Context:** 2026-02, MCP runtime, BP_HomeWorldCharacter.
 
+### GameplayAbilities: GameplayAbilitySpec.h include path
+- **Error:** `fatal error C1083: Cannot open include file: 'Abilities/GameplayAbilitySpec.h': No such file or directory` in HomeWorldCharacter.cpp.
+- **Cause:** The GameplayAbilities plugin exposes the header as `GameplayAbilitySpec.h` (under the module's Public folder), not `Abilities/GameplayAbilitySpec.h`.
+- **Fix:** Use `#include "GameplayAbilitySpec.h"` instead of `#include "Abilities/GameplayAbilitySpec.h"`.
+- **Context:** 2026-02, GAS default ability granting, UE 5.7.
+
 ### UE 5.7 Python API: get_actor_bounds() signature changed
 - **Error:** `get_actor_bounds() takes at most 2 arguments (4 given)` when calling `actor.get_actor_bounds(False, origin, extent, False)`.
 - **Cause:** In UE 5.7, `get_actor_bounds(bOnlyCollidingComponents)` returns a `(origin, box_extent)` tuple instead of accepting out-parameters.
@@ -80,3 +86,9 @@ For each entry use:
 - **Cause:** The MCP plugin searches specific asset paths (likely `/Game/Blueprints/`) and does not find Blueprints stored in other directories (e.g. `/Game/HomeWorld/GameMode/`).
 - **Fix:** Unknown — the MCP plugin's asset search is limited. Use Python Editor scripts or manual Editor steps to configure GameMode properties.
 - **Context:** 2026-02, MCP runtime, BP_GameMode.
+
+### Night swarms: do not use Mass Entity; use Epic's replacement when documented
+- **Error:** N/A (policy).
+- **Cause:** Mass Entity is deprecated in UE 5.5+ and has been removed from this project. Epic will document a replacement for swarms.
+- **Fix:** Do not add Mass Entity or Mass C++ to the project. When implementing night swarms (Weeks 3–4), use whatever Mass-related plugin or API Epic documents as the replacement. See STACK_PLAN Layer 5 (AI and Simulation).
+- **Context:** 2026-02, stack plan, swarms.

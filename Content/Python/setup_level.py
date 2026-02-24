@@ -4,6 +4,7 @@
 #   - Ensures a PlayerStart exists (spawns one above the landscape if missing)
 #   - Optionally triggers the PCG demo map script
 
+import importlib
 import os
 import sys
 
@@ -70,6 +71,7 @@ def _run_pcg_demo(run_pcg=True):
         if script_dir not in sys.path:
             sys.path.insert(0, script_dir)
         import create_demo_map
+        importlib.reload(create_demo_map)
         _log("Running PCG demo map generation...")
         create_demo_map.main()
     except ImportError:

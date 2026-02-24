@@ -139,10 +139,15 @@ def check_skeletal_mesh():
     try:
         mesh = pawn.mesh
         sk = None
-        try:
-            sk = mesh.get_editor_property("skeletal_mesh_asset")
-        except Exception:
-            sk = getattr(mesh, "skeletal_mesh", None)
+        for prop in ("skeletal_mesh_asset", "skeletal_mesh"):
+            try:
+                sk = mesh.get_editor_property(prop)
+                if sk:
+                    break
+            except Exception:
+                pass
+        if not sk:
+            sk = getattr(mesh, "skeletal_mesh", None) or getattr(mesh, "skeletal_mesh_asset", None)
         name = sk.get_name() if sk else "None"
         return {"name": "Skeletal mesh", "passed": sk is not None, "detail": name}
     except Exception as e:
@@ -155,7 +160,11 @@ def check_anim_instance():
         return {"name": "AnimInstance", "passed": False, "detail": "No pawn"}
     try:
         mesh = pawn.mesh
-        anim = mesh.get_anim_instance()
+        anim = None
+        if hasattr(mesh, "get_anim_instance"):
+            anim = mesh.get_anim_instance()
+        if not anim and hasattr(mesh, "anim_instance"):
+            anim = getattr(mesh, "anim_instance", None)
         if anim:
             cls = anim.get_class().get_name()
             return {"name": "AnimInstance", "passed": True, "detail": cls}

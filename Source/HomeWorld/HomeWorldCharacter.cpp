@@ -2,9 +2,12 @@
 
 #include "HomeWorldCharacter.h"
 #include "AbilitySystemComponent.h"
+#include "Abilities/GameplayAbility.h"
+#include "GameplayAbilitySpec.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/PlayerController.h"
+#include "GameFramework/PlayerState.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Math/RotationMatrix.h"
 #include "HomeWorldAttributeSet.h"
@@ -93,7 +96,26 @@ void AHomeWorldCharacter::PossessedBy(AController* NewController)
 	Super::PossessedBy(NewController);
 	if (AbilitySystemComponent)
 	{
-		AbilitySystemComponent->InitAbilityActorInfo(this, this);
+		// Server and owning client: owner = this. Simulated proxy: owner = PlayerState for replication.
+		if (IsLocallyControlled() || HasAuthority())
+		{
+			AbilitySystemComponent->InitAbilityActorInfo(this, this);
+		}
+		else if (APlayerState* PS = GetPlayerState())
+		{
+			AbilitySystemComponent->InitAbilityActorInfo(this, PS);
+		}
+		// Grant default abilities (assigned in Blueprint) so GAS is "in use"; only for authority/local.
+		if (IsLocallyControlled() || HasAuthority())
+		{
+			for (TSubclassOf<UGameplayAbility> AbilityClass : DefaultAbilities)
+			{
+				if (AbilityClass)
+				{
+					AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(AbilityClass, 1, INDEX_NONE, this));
+				}
+			}
+		}
 	}
 }
 

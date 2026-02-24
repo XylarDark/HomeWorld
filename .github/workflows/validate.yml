@@ -36,7 +36,7 @@ jobs:
 
       - name: Check required docs exist and are non-empty
         run: |
-          for doc in docs/TASKLIST.md docs/SETUP.md docs/CONVENTIONS.md docs/KNOWN_ERRORS.md AGENTS.md ROADMAP.md; do
+          for doc in docs/TASKLIST.md docs/SETUP.md docs/CONVENTIONS.md docs/KNOWN_ERRORS.md docs/SESSION_LOG.md AGENTS.md ROADMAP.md; do
             if [ ! -s "$doc" ]; then
               echo "::error::Missing or empty: $doc"
               exit 1

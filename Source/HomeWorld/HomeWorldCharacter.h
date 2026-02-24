@@ -10,6 +10,7 @@
 
 class UAbilitySystemComponent;
 class UAttributeSet;
+class UGameplayAbility;
 class USpringArmComponent;
 class UCameraComponent;
 class UInputAction;
@@ -40,6 +41,10 @@ protected:
 	/** Default attribute set (e.g. Health, Stamina). Subclass or add more in Blueprint. */
 	UPROPERTY(VisibleAnywhere, Category = "Abilities")
 	TObjectPtr<UAttributeSet> AttributeSet;
+
+	/** Ability classes granted at spawn (e.g. 3 survivor skills). Assign in Blueprint defaults; no abilities granted if empty. */
+	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
+	TArray<TSubclassOf<UGameplayAbility>> DefaultAbilities;
 
 	/** Spring arm attached to capsule; camera follows controller rotation. */
 	UPROPERTY(VisibleAnywhere, Category = "Camera")

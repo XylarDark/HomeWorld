@@ -12,7 +12,7 @@ Do these steps once. Everything else for first-phase setup is already in the rep
    - **FAB:** Survival character (or equivalent).
    - **Quixel:** Biomes/vegetation for forest.
    - The team will add specific asset names/links here when chosen.
-5. **World:** Confirm the project uses Open World / World Partition (already set in `Config/DefaultEngine.ini`).
+5. **World:** Primary level(s) **must** use World Partition; **Main** (`/Game/HomeWorld/Maps/Main`) is the canonical map. Confirm in Editor: open Main, **World Settings** → enable **World Partition** if not already. If Main was created without WP, use **World Partition → Convert Level** (or equivalent) once. See [CONTENT_LAYOUT.md](CONTENT_LAYOUT.md) for content paths.
 6. **Roles (optional):** Note Designer / Artist / Programmer / Tester and who leads Week 1.
 
 7. **MCP (Cursor-to-Editor bridge):** Run **`Setup-MCP.bat`** from the project root. This installs the tools that let Cursor's AI agent control the Unreal Editor directly (spawn actors, create Blueprints, set properties). See [MCP_SETUP.md](MCP_SETUP.md) for details and troubleshooting.
@@ -20,6 +20,7 @@ Do these steps once. Everything else for first-phase setup is already in the rep
    - `unreal-cpp.mdc` — C++ conventions and UE 5.7 API pitfalls.
    - `unreal-project.mdc` — project layout, plugins, default pawn.
    - `09-mcp-workflow.mdc` — MCP-first workflow priorities.
+   - `07-ai-agent-behavior.mdc` — session continuity (SESSION_LOG), cleanup, error recording.
    - `05-error-handling.mdc` — error recording policy (`docs/KNOWN_ERRORS.md`).
    - `08-project-context.mdc` — HomeWorld-specific context and conventions.
 
@@ -66,7 +67,8 @@ Use this to confirm first-phase setup is complete before starting tasks.
 
 - [ ] **Plugins:** In `HomeWorld.uproject`, the `Plugins` array includes `PCG`, `GameplayAbilities`, `EnhancedInput`, `SteamSockets`, and `DaySequence` (or `TimeOfDay`), each with `"Enabled":true`.
 - [ ] **Default map:** In `Config/DefaultEngine.ini`, under `[/Script/EngineSettings.GameMapsSettings]`, `GameDefaultMap` is set (e.g. `/Game/HomeWorld/Maps/Main.Main`).
-- [ ] **Docs:** `docs/PROTOTYPE_VISION.md`, `docs/SETUP.md`, `docs/TEAM_APPROVAL_CHECKLIST.md`, `docs/TASKLIST.md`, `ROADMAP.md` exist.
+- [ ] **Docs:** `docs/PROTOTYPE_VISION.md`, `docs/SETUP.md`, `docs/TEAM_APPROVAL_CHECKLIST.md`, `docs/TASKLIST.md`, `docs/SESSION_LOG.md`, `docs/CONTENT_LAYOUT.md`, `ROADMAP.md` exist.
+- [ ] **Main map:** World Partition is enabled (open Main → World Settings → Enable World Partition). See [CONTENT_LAYOUT.md](CONTENT_LAYOUT.md).
 
 **C++ and default pawn:**
 

@@ -50,6 +50,7 @@ flowchart TB
 
 - **Engine:** Unreal Engine 5.7. Open World template, World Partition.
 - **Platform:** PC, Steam Early Access. No console in MVP.
+- **Lock:** Engine 5.7 only; platform PC + Steam Early Access. Do not add engine or platform variants (e.g. console, different engine version) without team decision.
 - **Rationale:** Single codebase; Lumen/Nanite for whimsical look; World Partition for large proc-gen realms.
 
 ---
@@ -67,8 +68,7 @@ flowchart TB
 - **Core:** Gameplay Ability System (GAS) – already enabled. Base ability and attribute classes are in C++; specific abilities and data (e.g. 3 survivor skills) in Blueprint.
 - **Recommended:** Blueprint-first (Ninja GAS Blueprint or similar) for 3 survivor skills in Act 1; extend for needs/buffs in Act 2 (family sim). Optional paid: Advanced ARPG Template (~$50) for PoE-style trees/combos.
 - **Phase:** Week 1 – 3 skills; Week 2 – GAS for relationship/needs if desired.
-
----
+- **Week 2 extension (needs/relationship):** Add needs or relationship attributes to `UHomeWorldAttributeSet`, or introduce a second attribute set (e.g. `UHomeWorldNeedsAttributeSet`) and add it to the same `AbilitySystemComponent`. No mandatory second set; extend existing or add as needed.
 
 ## Layer 4 – Building and Home
 
@@ -79,8 +79,8 @@ flowchart TB
 
 ## Layer 5 – AI and Simulation
 
-- **Family/NPCs:** Behavior Trees or State Trees (UE built-in); needs/morale can use GAS attributes.
-- **Swarms:** Mass Entity is deprecated; when implementing swarms, use whatever Mass-related plugin Epic documents as the replacement. Mass Gameplay / Mass AI (optional) for night swarms scaling with family size.
+- **Family/NPCs:** Behavior Trees or State Trees (UE built-in); needs/morale can use GAS attributes. Use **AHomeWorldAIController** (C++) as the controller base; assign BT/ST in Blueprint.
+- **Swarms:** Mass Entity is deprecated; when implementing swarms, use whatever Mass-related plugin Epic documents as the replacement. Mass Gameplay / Mass AI (optional) for night swarms scaling with family size. **Do not use Mass Entity;** add no Mass C++ until Epic documents the replacement. See [KNOWN_ERRORS.md](KNOWN_ERRORS.md) if needed.
 - **Phase:** Week 2 – family AI; Weeks 3–4 – Mass/replacement swarms.
 
 ---
@@ -88,13 +88,16 @@ flowchart TB
 ## Layer 6 – Day/Night and Systems
 
 - **Recommended:** Day/Night sequencer (plugin or custom); PCG or level logic for night spawns. Tied to “family defends at night” pillar.
+- **Tech choice:** Day/night uses **DaySequence** plugin (no custom sequencer). No implementation required until Week 2+.
 - **Phase:** Weeks 3–4 (Alpha).
+- **TimeOfDay implementation:** Game code reads phase and time via **UHomeWorldTimeOfDaySubsystem** (GetCurrentPhase, GetNormalizedTime). Drive values from DaySequence in level Blueprint (e.g. Event Tick or DaySequence callback), or implement in C++ with DaySequence plugin when ready.
 
 ---
 
 ## Layer 7 – Multiplayer and Co-op
 
 - **Recommended:** Steam Sockets (replaces SteamCore/Steam Sessions) for 2–8p; replication for roles, buffs, and state. Optional: AWS GameLift (free tier) for dedicated servers if needed later.
+- **Tech choice:** Multiplayer uses **SteamSockets** (replaces SteamCore). No implementation required until Week 2+.
 - **Phase:** Week 2 – 2p; Weeks 3–4 – up to 8p clans.
 
 ---
@@ -138,3 +141,21 @@ flowchart TB
 - [../ROADMAP.md](../ROADMAP.md) – phases, pillars, campaign
 - [TASKLIST.md](TASKLIST.md) – Current task list (links to task docs in docs/tasks/)
 - [SETUP.md](SETUP.md) – developer setup checklist
+- [CONTENT_LAYOUT.md](CONTENT_LAYOUT.md) – content paths contract
+
+---
+
+## Implementation status (core tech)
+
+Core technology foundations implemented per bare-bones stack plan (contracts, base classes, stubs). Content (abilities, buildables, AI behaviors, leaderboard data) is out of scope.
+
+| Layer | Status | Notes |
+|-------|--------|--------|
+| 1 – Engine/Platform | Done | Lock in docs; Main map WP; plugins in .uproject. |
+| 2 – World/PCG | Done | PCG enabled; CONTENT_LAYOUT paths. |
+| 3 – GAS | Done | Base classes; DefaultAbilities granting; Week 2 needs extension documented. |
+| 4 – Building | Done | GetPlacementHit + GetPlacementTransform. |
+| 5 – AI | Done | AHomeWorldAIController stub; Mass deprecated, doc in STACK_PLAN + KNOWN_ERRORS. |
+| 6 – Day/Night | Done | UHomeWorldTimeOfDaySubsystem stub; implementation via DaySequence documented. |
+| 7 – Multiplayer | Done | UHomeWorldSessionSubsystem stub. |
+| 8 – Leaderboards | Done | UHomeWorldLeaderboardSubsystem stub. |
