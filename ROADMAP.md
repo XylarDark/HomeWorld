@@ -10,7 +10,7 @@ Single place for the home team to track phases, owners, and approval gates. This
 | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | **Core loop**   | Day: build/nurture/explore → Night: family defends → Realm-hop for loot/heirs. Co-op 2–8p with role synergy (Protector / Healer / Home). |
 | **Campaign**    | Act 1 solo (2–3h) → Act 2 duo (3–4h) → Act 3 full co-op (3–5h+). Teaches combat → bonds → dynasty.                                       |
-| **Tech**        | UE 5.7, PCG biomes, GAS combat, Day/Night, Mass or Epic’s replacement for swarms, Steam sessions + optional GameLift. ~$0–150 (templates).                 |
+| **Tech**        | UE 5.7, PCG biomes, GAS combat, Day/Night, Mass Entity + Mass AI (UE 5.7 recommended) for swarms, Steam sessions + optional GameLift. ~$0–150 (templates).                 |
 | **North stars** | Nurturing bonds, Protector mastery, Whimsical realm-hop, Day–night legacy, Co-op synergy, Prestige leaderboards, Meaningful progression. |
 
 ---
@@ -77,7 +77,7 @@ flowchart LR
 ## Phase 3: Weeks 3–4 – Alpha / Act 3 (Pillars 4, 6 + Act 3)
 
 - **Focus:** Dynasty Rising – expand realms, raise heir, endgame portals; swarms + leaderboards.
-- **Tech:** Day–night sequencer + PCG spawns; Mass or Epic’s replacement for night swarms (scale with family); second biome (e.g. sand/crystal); leaderboards (Steam API or SteamLead).
+- **Tech:** Day–night sequencer + PCG spawns; Mass Entity + Mass AI (UE 5.7 recommended) for night swarms (scale with family); second biome (e.g. sand/crystal); leaderboards (Steam API or SteamLead).
 - **Art/Story:** Heir/home themes; strength → legacy.
 - **Success:** Clan raid (2–8p) + “Best Homes” leaderboard playtest (family size × happiness + clears).
 
@@ -109,5 +109,5 @@ flowchart LR
 
 - **Campaign** drives content: each week maps to an Act and its emotional beat.
 - **Pillars** drive scope: no week adds every pillar; Week 1 = combat/explore/progression, Week 2 = bonds/co-op, Week 3–4 = day–night/competition.
-- **Tech** is staged: PCG + GAS first, then family AI + Steam, then Mass (or Epic’s replacement) + leaderboards.
+- **Tech** is staged: PCG + GAS first, then family AI + Steam, then Mass Entity + Mass AI (UE 5.7 recommended) + leaderboards.
 - **Approval checklist** = gate before Week 1; same checklist can be reused at end of Week 2 and Week 4 for go/no-go to next phase.

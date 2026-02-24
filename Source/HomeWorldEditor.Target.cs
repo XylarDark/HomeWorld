@@ -11,5 +11,6 @@ public class HomeWorldEditorTarget : TargetRules
 		DefaultBuildSettings = BuildSettingsVersion.Latest;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
 		ExtraModuleNames.Add("HomeWorld");
+		ExtraModuleNames.Add("HomeWorldEditor");
 	}
 }

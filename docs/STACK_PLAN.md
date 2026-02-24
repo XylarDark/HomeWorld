@@ -74,14 +74,15 @@ flowchart TB
 
 - **Recommended:** Blueprint-based snap/placement; optional Behavior or State Trees for “home” logic. No mandatory plugin; Week 1 = basic placement or placeholder.
 - **Phase:** Week 1 – minimal build/claim; Week 2 – home as first-class space for duo and night defense.
+- **Agentic building (Week 2+):** Player places build orders (holograms) via placement API; family agents detect (EQS), gather resources, claim Smart Object, complete build. Uses Mass + State Tree BUILD branch + Smart Objects. See [AGENTIC_BUILDING.md](tasks/AGENTIC_BUILDING.md) and C++ bases [AHomeWorldBuildOrder](../Source/HomeWorld/HomeWorldBuildOrder.h), [AHomeWorldResourcePile](../Source/HomeWorld/HomeWorldResourcePile.h).
 
 ---
 
 ## Layer 5 – AI and Simulation
 
-- **Family/NPCs:** Behavior Trees or State Trees (UE built-in); needs/morale can use GAS attributes. Use **AHomeWorldAIController** (C++) as the controller base; assign BT/ST in Blueprint.
-- **Swarms:** Mass Entity is deprecated; when implementing swarms, use whatever Mass-related plugin Epic documents as the replacement. Mass Gameplay / Mass AI (optional) for night swarms scaling with family size. **Do not use Mass Entity;** add no Mass C++ until Epic documents the replacement. See [KNOWN_ERRORS.md](KNOWN_ERRORS.md) if needed.
-- **Phase:** Week 2 – family AI; Weeks 3–4 – Mass/replacement swarms.
+- **Family/NPCs:** Behavior Trees or State Trees (UE built-in); needs/morale can use GAS attributes. Use **AHomeWorldAIController** (C++) as the controller base for actor-based NPCs (e.g. key story characters); assign BT/ST in Blueprint.
+- **Scalable agents/swarms:** Use **UE 5.7 recommended Mass Entity + Mass AI** (MassEntity, MassGameplay, MassAI, StateTree, ZoneGraph, SmartObjects) for 5–100+ family gatherers/defenders and night swarms. This is Epic's current stack; no deprecated tech. See [KNOWN_ERRORS.md](KNOWN_ERRORS.md) for plugin list and [docs/tasks/FAMILY_AGENTS_MASS_STATETREE.md](tasks/FAMILY_AGENTS_MASS_STATETREE.md) for Week 2 setup.
+- **Phase:** Week 2 – first family agents (Mass config + State Tree + spawner); Weeks 3–4 – roles (Protector/Healer trees), needs sim (GAS attributes or Mass processor).
 
 ---
 
@@ -155,7 +156,7 @@ Core technology foundations implemented per bare-bones stack plan (contracts, ba
 | 2 – World/PCG | Done | PCG enabled; CONTENT_LAYOUT paths. |
 | 3 – GAS | Done | Base classes; DefaultAbilities granting; Week 2 needs extension documented. |
 | 4 – Building | Done | GetPlacementHit + GetPlacementTransform. |
-| 5 – AI | Done | AHomeWorldAIController stub; Mass deprecated, doc in STACK_PLAN + KNOWN_ERRORS. |
+| 5 – AI | Done | AHomeWorldAIController stub; Mass Entity + Mass AI (UE 5.7 recommended) for family/swarm agents, see FAMILY_AGENTS_MASS_STATETREE.md. |
 | 6 – Day/Night | Done | UHomeWorldTimeOfDaySubsystem stub; implementation via DaySequence documented. |
 | 7 – Multiplayer | Done | UHomeWorldSessionSubsystem stub. |
 | 8 – Leaderboards | Done | UHomeWorldLeaderboardSubsystem stub. |

@@ -110,3 +110,63 @@ Agent session summaries for cross-session context persistence.
 **Key decisions:** Only stable foundations (contracts, base classes, stubs); no content. Subsystems are stubs; backends in Week 2+.
 
 **Errors encountered:** Build failed with Live Coding active; close Editor and run Build-HomeWorld.bat to compile.
+
+---
+
+## 2026-02-24 — HomeWorld agentic automation (Mass + State Trees) plan
+
+**Tasks completed:** Policy/docs: STACK_PLAN Layer 5 now recommends UE 5.7 Mass Entity + Mass AI (replaced deprecated wording). KNOWN_ERRORS entry updated to use Mass + Mass AI for family/swarm agents. SETUP.md: Week 2 plugins subsection (MassEntity, MassGameplay, MassAI, StateTree, ZoneGraph, SmartObjects); removed Mass deprecated note. AGENTS.md: Stack line updated for Week 2 Mass/State Tree. ROADMAP.md: "Mass or Epic's replacement" → "Mass Entity + Mass AI (UE 5.7 recommended)" in all three places. CONTENT_LAYOUT.md: added /Game/HomeWorld/Mass/, AI/, ZoneGraph/, SmartObjects/. Plugins: added MassEntity, MassGameplay, MassAI, StateTree, ZoneGraph, SmartObjects to HomeWorld.uproject. Task doc: created docs/tasks/FAMILY_AGENTS_MASS_STATETREE.md; added Task 5 to TASKLIST.md. STACK_PLAN implementation status table: Layer 5 note updated to Mass Entity + Mass AI.
+
+**Key decisions:** Use UE 5.7 recommended (non-deprecated) tech; AHomeWorldAIController retained for actor-based NPCs. Manual Editor steps (MEC, State Tree, spawner, ZoneGraph, Smart Objects) remain in task doc for user.
+
+---
+
+## 2026-02-24 — Editor open: animation setup + Week 2 folders
+
+**With Editor open:** Ran via MCP: `setup_animation_blueprint.py` (success — AnimBP created or already exists at /Game/HomeWorld/Characters/ABP_HomeWorldCharacter); `ensure_week2_folders.py` (created /Game/HomeWorld/Mass, AI, ZoneGraph, SmartObjects per CONTENT_LAYOUT). Ran `pie_test_runner.py` (PIE was not running: 1/7 passed, PCG 1161 actors).
+
+**Remaining (manual):** Task 1 — Open ABP_HomeWorldCharacter → AnimGraph → add Locomotion state machine (Idle/Walk on Speed); PIE test with Play. Task 5 — Create MEC_FamilyGatherer, ST_FamilyGatherer, place Mass Spawner, ZoneGraph, Smart Objects per FAMILY_AGENTS_MASS_STATETREE.md.
+
+---
+
+## 2026-02-24 — Agentic building automation (plan implementation)
+
+**Tasks completed:** C++: Added AHomeWorldBuildOrder (BuildDefinitionID, OverlapVolume, tag BuildOrder) and AHomeWorldResourcePile (ResourceType, AmountPerHarvest, tag ResourcePile) in Source/HomeWorld/. CONTENT_LAYOUT.md: added /Game/HomeWorld/Building/. Python: extended ensure_week2_folders.py with /Game/HomeWorld/Building/. Docs: created docs/tasks/AGENTIC_BUILDING.md (steps 1–5, success criteria, references); added Task 6 to TASKLIST.md; added "Next: Agentic building" to FAMILY_AGENTS_MASS_STATETREE.md; added agentic building bullet to STACK_PLAN Layer 4.
+
+**Key decisions:** Build order and resource pile are abstract C++ bases; Blueprint adds mesh and Smart Object. Full build was blocked by Live Coding (Editor open); UHT parsed new headers successfully.
+
+**Remaining (manual, in AGENTIC_BUILDING.md):** Smart Object definitions (SO_WallBuilder, HarvestWood), State Tree BUILD branch, Mass Processor MP_WoodInventory, EQS, "Convert to Construction Mesh," placing BP_BuildOrder_Wall/BP_WoodPile in level.
+
+---
+
+## 2026-02-24 — Editor closed: build verify + collision profile fix
+
+**Tasks completed:** With Editor closed, ran Build-HomeWorld.bat. Build failed: `UCollisionProfile::OverlapAllDynamic_ProfileName` is not a member in UE 5.7. Fixed both HomeWorldBuildOrder.cpp and HomeWorldResourcePile.cpp to use `SetCollisionProfileName(FName("OverlapAllDynamic"))`. Rebuild succeeded (exit code 0). Documented fix in KNOWN_ERRORS.md.
+
+**Key decisions:** Use profile name string for overlap collision in UE 5.7; avoid removed UCollisionProfile constants.
+
+---
+
+## 2026-02-24 — External AI automation (doc + optional script)
+
+**Tasks completed:** Created docs/EXTERNAL_AI_AUTOMATION.md (definitions, primary path Cursor+UnrealMCP, optional external script-generator path, HomeWorld paths, example prompt and script, security). Updated MCP_SETUP.md with "External AI / LLM-generated scripts" subsection linking to that doc. Updated AGENTS.md with one sentence and link to EXTERNAL_AI_AUTOMATION.md. Added Content/Python/llm_build_home_example.py as idempotent reference script (ensure Building path, spawn circle of placeholder actors; HomeWorld paths only).
+
+**Key decisions:** UnrealMCP unchanged; external AI is optional enhancement. All naming HomeWorld; no RealmBond.
+
+---
+
+## 2026-02-24 — Task list: in-depth manual guides
+
+**Tasks completed:** Analyzed TASKLIST and all task docs. Expanded task docs into in-depth step-by-step guides for manual work: (1) CHARACTER_ANIMATION.md — detailed AnimGraph steps (state machine, Idle/WalkRun, transitions with Speed, compile/save, PIE test), checklist, and animation paths. (2) CHARACTER_ORIENTATION.md — PIE test steps and MeshForwardYawOffset fix with exact UI path. (3) CHARACTER_GROUND.md and PCG_FOREST_ON_MAP.md — optional in-depth verification sections. (4) FAMILY_AGENTS_MASS_STATETREE.md — plugins, MEC creation (traits table, mesh), State Tree (Selector, states, blackboard, link to MEC), spawner/ZoneGraph/Smart Objects placement, needs + night, checklist, troubleshooting table. (5) AGENTIC_BUILDING.md — prep assets (Construction Mesh, BP_BuildOrder_Wall from C++), SO_WallBuilder (slots, events), BP_WoodPile, State Tree BUILD branch (EQS, tasks), MP_WoodInventory, spawn and test, checklist, troubleshooting. Updated TASKLIST.md to note that docs include in-depth manual guides.
+
+**Key decisions:** No new automation added (AnimGraph, State Tree, Smart Objects, EQS are Editor-only). All manual steps are now documented with exact UI paths, checklists, and troubleshooting so the team can complete work without guesswork.
+
+---
+
+## 2026-02-24 — MEC commandlet automation (HomeWorldEditor + CreateMEC)
+
+**Tasks completed:** Implemented the CreateMEC commandlet as specified in the alternative-automation plan. (1) Added HomeWorldEditor module: HomeWorld.uproject second module entry (HomeWorldEditor, Editor); Source/HomeWorldEditor/HomeWorldEditor.Build.cs (UnrealEd, AssetTools, AssetRegistry, MassSpawner); HomeWorldEditor.h/.cpp with IMPLEMENT_MODULE; HomeWorldEditor.Target.cs ExtraModuleNames.Add("HomeWorldEditor"). (2) Implemented CreateMEC commandlet: CreateMECCommandlet.h/.cpp — parses Path= (default /Game/HomeWorld/Mass/MEC_FamilyGatherer), creates or loads UMassEntityConfigAsset, adds traits by class path (MassSpawner.MassAgentTrait, MassMovement.MassMovementTrait, etc.), saves via UPackage::Save. Idempotent (reuses existing asset). (3) Updated docs: ALTERNATIVE_AUTOMATION_OPTIONS.md — added build prerequisite (build with Editor closed); KNOWN_ERRORS.md — entry for build failure when Live Coding is active. UHT and module setup succeeded; full compile was blocked by Live Coding (Editor open). Build and commandlet run must be done with Editor closed.
+
+**Key decisions:** Single Editor module dependency for MEC: MassSpawner (UMassEntityConfigAsset, UMassEntityTraitBase). Trait class paths use /Script/Module.Class; unknown traits are skipped with a warning. State Tree and mesh assignment left for Editor or future commandlet extension.
+
+**Errors encountered:** None in code. Build requires Editor closed (documented in KNOWN_ERRORS and ALTERNATIVE_AUTOMATION_OPTIONS).

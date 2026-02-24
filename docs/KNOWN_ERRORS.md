@@ -63,6 +63,12 @@ For each entry use:
 - **Fix:** Use `#include "GameplayAbilitySpec.h"` instead of `#include "Abilities/GameplayAbilitySpec.h"`.
 - **Context:** 2026-02, GAS default ability granting, UE 5.7.
 
+### UCollisionProfile::OverlapAllDynamic_ProfileName not in UE 5.7
+- **Error:** `error C2039: 'OverlapAllDynamic_ProfileName': is not a member of 'UCollisionProfile'` in HomeWorldBuildOrder.cpp and HomeWorldResourcePile.cpp.
+- **Cause:** The constant was removed or renamed in UE 5.7; the engine collision profile list is name-based.
+- **Fix:** Use `SetCollisionProfileName(FName("OverlapAllDynamic"))` instead of `UCollisionProfile::OverlapAllDynamic_ProfileName`.
+- **Context:** 2026-02, agentic building C++ (AHomeWorldBuildOrder, AHomeWorldResourcePile), UE 5.7.
+
 ### UE 5.7 Python API: get_actor_bounds() signature changed
 - **Error:** `get_actor_bounds() takes at most 2 arguments (4 given)` when calling `actor.get_actor_bounds(False, origin, extent, False)`.
 - **Cause:** In UE 5.7, `get_actor_bounds(bOnlyCollidingComponents)` returns a `(origin, box_extent)` tuple instead of accepting out-parameters.
@@ -87,8 +93,20 @@ For each entry use:
 - **Fix:** Unknown — the MCP plugin's asset search is limited. Use Python Editor scripts or manual Editor steps to configure GameMode properties.
 - **Context:** 2026-02, MCP runtime, BP_GameMode.
 
-### Night swarms: do not use Mass Entity; use Epic's replacement when documented
+### Family/swarm agents: use UE 5.7 recommended Mass Entity + Mass AI
 - **Error:** N/A (policy).
-- **Cause:** Mass Entity is deprecated in UE 5.5+ and has been removed from this project. Epic will document a replacement for swarms.
-- **Fix:** Do not add Mass Entity or Mass C++ to the project. When implementing night swarms (Weeks 3–4), use whatever Mass-related plugin or API Epic documents as the replacement. See STACK_PLAN Layer 5 (AI and Simulation).
-- **Context:** 2026-02, stack plan, swarms.
+- **Cause:** Project previously avoided Mass; Epic's current (non-deprecated) stack for crowds and lightweight AI is Mass Entity + Mass AI.
+- **Fix:** Use UE 5.7 recommended Mass Entity + Mass AI for family/swarm agents. Enable: MassEntity, MassGameplay, MassAI, StateTree, ZoneGraph, SmartObjects (and MassNavigation, MassRepresentation as required). See STACK_PLAN Layer 5 and docs/tasks/FAMILY_AGENTS_MASS_STATETREE.md.
+- **Context:** 2026-02, stack plan, Week 2 family agents.
+
+### Build HomeWorldEditor (CreateMEC commandlet) fails: Live Coding active
+- **Error:** `Unable to build while Live Coding is active. Exit the editor and game...`
+- **Cause:** Building the Editor target (HomeWorldEditor module) while the Unreal Editor is running triggers Live Coding checks and blocks the build.
+- **Fix:** Close the Unreal Editor (and any PIE session), then run `Build-HomeWorld.bat`. To run the CreateMEC commandlet, use the engine executable with `-run=HomeWorldEditor.CreateMEC` (Editor must not be running for that too). See docs/ALTERNATIVE_AUTOMATION_OPTIONS.md.
+- **Context:** 2026-02, HomeWorldEditor module, CreateMEC commandlet.
+
+### FAssetRegistryModule::Get() is not static in UE 5.7
+- **Error:** `error C2352: 'FAssetRegistryModule::Get': a call of a non-static member function requires an object`
+- **Cause:** In UE 5.7, `FAssetRegistryModule::Get()` is an instance method, not a static one.
+- **Fix:** Use `FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry").Get()` to obtain the registry, then call `AssetCreated()` etc. Include `Modules/ModuleManager.h`.
+- **Context:** 2026-02, CreateMECCommandlet, asset registration.

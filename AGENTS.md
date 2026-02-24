@@ -6,9 +6,9 @@
 
 **Code:** C++ lives in `Source/HomeWorld/`. Default pawn: `AHomeWorldCharacter`; default game mode: `AHomeWorldGameMode`. Both use Enhanced Input for movement and look.
 
-**Stack (enabled plugins):** Enhanced Input, PCG, Gameplay Abilities, Steam Sockets, Day Sequence. Mass/swarms plugin TBD when swarms are added (Mass Entity is deprecated). Config in `Config/`; project layout and rules in `.cursor/rules/` (Unreal C++, Blueprint, project).
+**Stack (enabled plugins):** Enhanced Input, PCG, Gameplay Abilities, Steam Sockets, Day Sequence. For Week 2 family agents, enable UE 5.7 recommended Mass Entity + Mass AI, StateTree, ZoneGraph, SmartObjects (see [SETUP.md](docs/SETUP.md)). Config in `Config/`; project layout and rules in `.cursor/rules/` (Unreal C++, Blueprint, project).
 
-**MCP-first development:** When the Unreal Editor is running and MCP tools are connected (unrealMCP), prefer live Editor manipulation via MCP over writing scripts or giving manual instructions. See `.cursor/rules/09-mcp-workflow.mdc` and [docs/MCP_SETUP.md](docs/MCP_SETUP.md).
+**MCP-first development:** When the Unreal Editor is running and MCP tools are connected (unrealMCP), prefer live Editor manipulation via MCP over writing scripts or giving manual instructions. See `.cursor/rules/09-mcp-workflow.mdc` and [docs/MCP_SETUP.md](docs/MCP_SETUP.md). For using external LLMs to generate Editor automation scripts, see [docs/EXTERNAL_AI_AUTOMATION.md](docs/EXTERNAL_AI_AUTOMATION.md).
 
 **Current tasks:** [docs/TASKLIST.md](docs/TASKLIST.md) — master task list; each task links to a detailed doc in `docs/tasks/`.
 

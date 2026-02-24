@@ -7,7 +7,7 @@ Do these steps once. Everything else for first-phase setup is already in the rep
 3. **Plugins:** In Editor, **Edit > Plugins** – confirm these are enabled (all are in .uproject):
    - **PCG**, **Gameplay Abilities**, **Enhanced Input**, **Day Night Sequencer**, **Steam Sockets** (replaces SteamCore for co-op).
    **Restart UE5 after enabling any new plugins.**  
-   Note: **Mass Entity** is deprecated (5.5+) and has been removed from this project. When you add swarms (e.g. Weeks 3–4), enable whatever Mass-related plugin Epic documents as the replacement.
+   For **Week 2 family agents**, also enable UE 5.7 recommended Mass + State Tree stack (see [Week 2 plugins](#week-2-plugins-mass--state-trees) below).
 4. **Free assets:**
    - **FAB:** Survival character (or equivalent).
    - **Quixel:** Biomes/vegetation for forest.
@@ -40,7 +40,7 @@ All required plugins are enabled in `HomeWorld.uproject`. No Marketplace install
 | Enhanced Input | `EnhancedInput` | Better controls |
 | Day Night Sequencer (UE5.5+) | `DaySequence` | Day/night cycles |
 
-**Swarms (future):** Mass Entity is deprecated in UE 5.5+ and has been removed from this project. When implementing night swarms, enable and use whatever Mass-related plugin Epic documents as the replacement.
+**Week 2 plugins (Mass + State Trees):** For autonomous family agents (Week 2+), enable UE 5.7 recommended: **MassEntity**, **MassGameplay**, **MassAI**, **MassNavigation**, **MassRepresentation**, **StateTree**, **ZoneGraph**, **SmartObjects**. Restart the Editor after enabling. Validation: Plugins tab shows Mass / StateTree / ZoneGraph / SmartObjects enabled. See [FAMILY_AGENTS_MASS_STATETREE.md](tasks/FAMILY_AGENTS_MASS_STATETREE.md).
 
 **Python/PCG scripts:** For the demo map and PCG forest scripts, **PythonScriptPlugin** and **PCGPythonInterop** must also be enabled. Restart the Editor after first enable.
 

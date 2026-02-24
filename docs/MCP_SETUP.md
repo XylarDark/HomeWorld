@@ -158,6 +158,10 @@ When connected, the AI agent follows `.cursor/rules/09-mcp-workflow.mdc`:
 2. **Python scripts** for batch/repeatable operations (saved in `Content/Python/`)
 3. **Manual instructions** only when MCP and Python cannot accomplish the task
 
+## External AI / LLM-generated scripts
+
+External LLMs can generate Python that is then run via MCP (`execute_python_script`) or via the Editor (Tools → Execute Python Script). Conventions, example prompts, and a sample script are in [EXTERNAL_AI_AUTOMATION.md](EXTERNAL_AI_AUTOMATION.md). Always review generated code before running.
+
 ## Troubleshooting
 
 | Issue | Fix |
