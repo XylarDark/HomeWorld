@@ -4,7 +4,7 @@ rem so building the solution in VS does not fail with "Microsoft.NET.Sdk specifi
 rem Run from the project root (folder containing HomeWorld.uproject).
 
 cd /d "%~dp0"
-call "%~dp0scripts\SetEnv-BundledDotNet.bat"
+call "%~dp0SetEnv-BundledDotNet.bat"
 if errorlevel 1 exit /B 1
 if not exist "HomeWorld.sln" (
     echo HomeWorld.sln not found. Generate project files first - see docs\SETUP.md

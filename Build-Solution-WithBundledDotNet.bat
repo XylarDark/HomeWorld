@@ -4,7 +4,7 @@ rem with the Engine's Build.bat. The C++ project requires VS/Build.bat; dotnet m
 rem build it. Run from the project root.
 
 cd /d "%~dp0"
-call "%~dp0scripts\SetEnv-BundledDotNet.bat"
+call "%~dp0SetEnv-BundledDotNet.bat"
 if errorlevel 1 exit /B 1
 if not exist "HomeWorld.sln" (
     echo HomeWorld.sln not found. Generate project files first - see docs\SETUP.md

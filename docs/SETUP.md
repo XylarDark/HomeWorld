@@ -123,7 +123,7 @@ The project has a C++ game module (`Source/HomeWorld/`). To build from an IDE or
 | Run the demo map script (village + PCG forest) | **Run-DemoMapScript.bat** (set `UE_EDITOR` in the file first) |
 | Set up MCP (Cursor-to-Editor bridge) | **Setup-MCP.bat** (one-time; installs uv, clones unreal-mcp, copies plugin) |
 
-`scripts/SetEnv-BundledDotNet.bat` is used by the two solution-related batch files; edit its UE path if the engine is installed elsewhere.
+`SetEnv-BundledDotNet.bat` (project root) is used by the two solution-related batch files; edit its UE path if the engine is installed elsewhere.
 
 If you add or remove C++ files, regenerate project files so the solution stays in sync.
 
