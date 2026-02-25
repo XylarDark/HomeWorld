@@ -86,6 +86,7 @@ def main(run_pcg=True):
     _log("  - Verify in Editor: Project Settings > Maps & Modes shows HomeWorldGameMode and Main map.")
     _log("  - Play In Editor (PIE) to test movement and camera.")
     _log("  - Animation Blueprint state machine must be built manually in Editor (Python cannot create AnimGraph nodes).")
+    _log("  - For PCG trees/rocks: run with run_pcg=True or run create_demo_map.py; then create a PCG graph, set Get Landscape Data (By Tag + PCG_Landscape), assign graph to volume, click Generate. See docs/PCG_SETUP.md.")
 
 
 if __name__ == "__main__":

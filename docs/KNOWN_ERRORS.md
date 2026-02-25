@@ -122,3 +122,39 @@ For each entry use:
 - **Cause:** In UE 5.7, `FAssetRegistryModule::Get()` is an instance method, not a static one.
 - **Fix:** Use `FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry").Get()` to obtain the registry, then call `AssetCreated()` etc. Include `Modules/ModuleManager.h`.
 - **Context:** 2026-02, CreateMECCommandlet, asset registration.
+
+### PCG create_demo_map: Graph protected, PCGStaticMeshSpawnerEntry missing, pin names
+- **Error:** (1) `PCGComponent: Property 'Graph' for attribute 'graph' on 'PCGComponent' is protected and cannot be set` when assigning graph from Python. (2) `module 'unreal' has no attribute 'PCGStaticMeshSpawnerEntry'` so tree/rock mesh entries are not set. (3) `LogPCG: Error: From node DefaultInputNode does not have the Out label` and `does not have the Output label` (pin names vary by engine version).
+- **Cause:** UE 5.7: PCGComponent graph is read-only from Python; PCGStaticMeshSpawnerEntry struct may not be exposed in Python; default and Difference node pin labels are internal (not fixed "Out"/"In" or "Output"/"Input").
+- **Fix:** (1) Do not set graph via set_editor_property; try set_graph() or graph_instance if available; otherwise log and ask user to assign ForestIsland_PCG in Details and click Generate. (2) If PCGStaticMeshSpawnerEntry is missing, use PCGMeshSelectorSingleMesh and set first tree/rock mesh. (3) Introspect pin labels at runtime: use input_node.output_pins[0] and output_node.input_pins[0] for default nodes, and difference_node.input_pins[0]/[1] for Difference, via _get_pin_label() / _get_default_node_pin_labels() / _get_difference_node_pin_labels(). (4) PCGVolume: use only BoxComponent for exclusion extent (no get_root_component in Python).
+- **Context:** 2026-02, Content/Python/create_pcg_forest.py, create_demo_map.py, PCG forest trees/rocks.
+
+### PCG Surface Sampler: "No surfaces found from which to generate"
+- **Error:** `LogPCG: Warning: [PCGVolume_7 - SurfaceSampler_0/1]: No surfaces found from which to generate` and `Could not initialize per-execution timeslice state data`.
+- **Cause:** The Surface Sampler needs **surface** data (e.g. landscape geometry), not just bounds. Connecting only the graph Input node provides bounds; in UE 5.7 that does not supply the actual surface, so the sampler reports no surfaces.
+- **Fix:** Add a **Get Landscape Data** node (`PCGGetLandscapeSettings`) to the graph, connect its output to the Surface Sampler's **Surface** input pin, and connect the graph Input to the Surface Sampler's **Bounding** input (if present). Introspect pin labels via `_get_node_all_input_pin_labels()` so "Surface" and "Bounding" are wired correctly. If `PCGGetLandscapeSettings` is not available in Python, the script skips the node and logs "Get Landscape Data node skipped"; user must assign the graph and Generate, or add the node manually in the PCG Editor.
+- **Context:** 2026-02, Content/Python/create_pcg_forest.py, PCG forest.
+
+### PCG: "From node GetLandscapeData_0 does not have the Execution Dependency label"
+- **Error:** `LogPCG: Error: From node GetLandscapeData_0 does not have the Execution Dependency label` when the graph includes a Get Landscape Data node connected to the Surface Sampler.
+- **Cause:** PCG nodes have both data pins (e.g. "Surface", "Bounding", "Out") and execution pins ("Execution Dependency"). Connecting a data output (e.g. from Get Landscape Data) to an "Execution Dependency" input fails because the engine expects the source to have an output named "Execution Dependency". Using the first input pin when "Surface" was missing picked "Execution Dependency" for the landscape→Surface Sampler edge.
+- **Fix:** (1) Use only data pins for data edges: introduce `_first_data_input_pin_label()` to choose the first input label that is not "Execution Dependency". Use that for surface_pin when "Surface" is not in the list. (2) Connect execution separately: if the Input node has an "Execution Dependency" output, connect it to the Surface Sampler's and Get Landscape Data's "Execution Dependency" inputs via `_get_output_pin_label_by_name()`. Only add execution edges when the source has that output.
+- **Context:** 2026-02, Content/Python/create_pcg_forest.py, PCG graph wiring.
+
+### PCG nothing generated (trees/rocks) after assigning graph and Generate
+- **Error:** User assigns ForestIsland_PCG to the PCG Volume and clicks Generate but no trees or rocks appear; no useful log output.
+- **Cause:** (1) Using a separate Get Landscape Data node changed execution/data flow so the Surface Sampler did not receive the right input in some engine/context. (2) Both tree and rock branches connected directly to the Output node; some PCG versions only use one input, so one branch overwrote the other or only one stream was used.
+- **Fix:** (1) Use the **canonical SimpleForest flow**: feed the Surface Sampler from the graph **Input** node only (no Get Landscape Data). When the graph is run by a PCG Volume, the Input provides the landscape surface within the volume. (2) Add a **Merge** node: connect both the tree spawner and rock spawner to the Merge node, then Merge → Output, so both branches contribute. (3) Keep Get Landscape Data optional (`use_get_landscape = False`); when enabled, set `b_unbounded` on its settings.
+- **Context:** 2026-02, Content/Python/create_pcg_forest.py, PCG forest generation.
+
+### PCG Generate does nothing: landscape subsections and Get Landscape Data (UE 5.7 By Tag / Component By Class)
+- **Error:** After assigning ForestIsland_PCG and clicking Generate, no trees or rocks appear (Surface Sampler may log "No surfaces found" or nothing at all).
+- **Cause:** (1) **Landscape component subsections:** Use **1x1** (2x2 can cause no output). (2) **Get Landscape Data (UE 5.7):** Actor selector offers **By Tag** only (no By Class); Component selector offers **By Class** and **By Tag**. The node must find the level's Landscape (e.g. Actor By Tag = `PCG_Landscape` with that tag on the Landscape actor, and/or Component By Class = Landscape Component).
+- **Fix:** (1) Landscape → Details → **Component Subsection** = **1x1**. (2) Ensure the level's **Landscape** actor has tag **`PCG_Landscape`** (script adds it via `ensure_landscape_has_pcg_tag()`). (3) In the PCG graph → **Get Landscape Data** → Details: set **Actor** to **By Tag** and tag **`PCG_Landscape`**; set **Component** to **By Class** and **Landscape Component** if needed. (4) Wiring: **Get Landscape Data Out** → **Surface Sampler Surface** only; **Surface Sampler Out** → spawner/filter chain → **Output**.
+- **Context:** 2026-02, Content/Python/create_pcg_forest.py, UE 5.7 PCG. See also **docs/PCG_VARIABLES_NO_ACCESS.md** for all variables with no (or unreliable) access.
+
+### PCG: script does not create graph or assign graph; manual steps required
+- **Error:** N/A (policy). Running create_demo_map.py or setup_level with run_pcg=True does not result in trees/rocks.
+- **Cause:** The Python API does not expose Get Landscape Data's Actor/Component selector (By Tag, tag name, By Class) or the PCG Volume's graph assignment in a way that can be set reliably. The script therefore only tags the Landscape and creates/sizes the PCG Volume.
+- **Fix:** Create (or copy from a reference project) a PCG graph, set Get Landscape Data to **By Tag** + **`PCG_Landscape`**, assign the graph to the PCG Volume in Details, and click **Generate**. See **docs/PCG_SETUP.md** for the full checklist and references.
+- **Context:** 2026-02, PCG Fundamental Redo; script reduced to tag + volume only. See also **docs/PCG_VARIABLES_NO_ACCESS.md** for all variables with no (or unreliable) access.

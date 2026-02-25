@@ -28,6 +28,8 @@ When the Unreal Editor is open and the MCP server is connected to Cursor:
 
 See [MCP_SETUP.md](MCP_SETUP.md) for installation and `.cursor/rules/09-mcp-workflow.mdc` for full priority rules.
 
+**Automation — variables with no access:** When adding automation for Editor/engine features (Python, MCP), follow the "variables no access" procedure: identify required settings from tutorials/docs, verify automation access, document no-access items and manual steps in KNOWN_ERRORS or a feature doc (e.g. [PCG_VARIABLES_NO_ACCESS.md](PCG_VARIABLES_NO_ACCESS.md)). See `.cursor/rules/automation-standards.mdc`.
+
 ---
 
 ## Code-first checklist

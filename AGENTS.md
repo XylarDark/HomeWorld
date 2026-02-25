@@ -48,6 +48,6 @@
 
 ## Setup and validation
 
-[docs/SETUP.md](docs/SETUP.md) (includes validation checklist). Cursor rules ship with the repo in `.cursor/rules/` — they are loaded automatically when the project is opened in Cursor. Key rules: `unreal-cpp.mdc` (C++ conventions + UE 5.7 API pitfalls), `08-project-context.mdc` (HomeWorld overview), `09-mcp-workflow.mdc` (MCP-first priorities). Always check `docs/KNOWN_ERRORS.md` before making changes in areas where errors have been recorded.
+[docs/SETUP.md](docs/SETUP.md) (includes validation checklist). Cursor rules ship with the repo in `.cursor/rules/` — they are loaded automatically when the project is opened in Cursor. Key rules: `unreal-cpp.mdc` (C++ conventions + UE 5.7 API pitfalls), `08-project-context.mdc` (HomeWorld overview), `09-mcp-workflow.mdc` (MCP-first priorities), `automation-standards.mdc` (variables-with-no-access procedure for Editor automation). Always check `docs/KNOWN_ERRORS.md` before making changes in areas where errors have been recorded. When adding automation for Editor/engine features, follow the "variables no access" procedure: identify required settings, verify automation access, document no-access items and manual steps (see `.cursor/rules/automation-standards.mdc` and e.g. `docs/PCG_VARIABLES_NO_ACCESS.md`).
 
 - **Session continuity:** Read `docs/SESSION_LOG.md` at task start to load prior context. Append a summary at task end. See `.cursor/rules/07-ai-agent-behavior.mdc` (Session Continuity, AI Agent Checklist).

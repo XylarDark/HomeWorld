@@ -8,8 +8,10 @@
   "volume_extent_y": 5000,
   "volume_extent_z": 500,
   "exclusion_zones": [],
+  "skip_exclusion_zones": true,
   "_comment_demo": "Target level for demo (village + forest). Script opens this level.",
   "_comment_template": "Source level to duplicate if demo_level_path does not exist (medieval village).",
   "_comment_volume": "PCG volume center and half-extents in cm (5000 = 50 m => 100 m box). Adjust to surround village.",
-  "_comment_exclusion_zones": "Optional dead zones (no trees). Array of objects: center_x, center_y, center_z, extent_x, extent_y, extent_z (cm, half-extents)."
+  "_comment_exclusion_zones": "Optional dead zones (no trees). Array of objects: center_x, center_y, center_z, extent_x, extent_y, extent_z (cm, half-extents).",
+  "_comment_skip_exclusion": "Set to true to build graph without Difference node; use to test if exclusion was preventing generation."
 }

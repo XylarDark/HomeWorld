@@ -1,19 +1,34 @@
 # create_demo_map.py
 # Run from Unreal Editor: Tools -> Execute Python Script.
-# Generates the demo level: medieval village (from StylizedProvencal) + PCG forest.
-# Ensures Main exists (duplicates from template if missing), opens Main, creates PCG graph,
-# places volume with configurable position/size, generates, saves.
-# Config: Content/Python/demo_map_config.json. Reuses create_pcg_forest for graph and volume.
+# Ensures Main exists (duplicates from template if missing), opens Main, tags the Landscape for PCG,
+# and places/sizes one PCG Volume. Does NOT create a PCG graph or assign a graph.
+# You must create the graph in the Editor, set Get Landscape Data (By Tag + PCG_Landscape), assign the graph to the volume, and click Generate.
+# Config: Content/Python/demo_map_config.json. See docs/PCG_SETUP.md for the full checklist.
 
 import json
 import os
 import sys
+import time
 
 try:
     import unreal
 except ImportError:
     print("ERROR: Run this script inside Unreal Editor (Python Editor Script Plugin).")
     sys.exit(1)
+
+# #region agent log
+def _agent_log(location, message, data=None, hypothesis_id=None):
+    try:
+        proj_dir = unreal.SystemLibrary.get_project_directory()
+        log_path = os.path.join(proj_dir, "debug-e934ae.log")
+        payload = {"sessionId": "e934ae", "location": location, "message": message, "data": data or {}, "timestamp": int(time.time() * 1000)}
+        if hypothesis_id:
+            payload["hypothesisId"] = hypothesis_id
+        with open(log_path, "a") as f:
+            f.write(json.dumps(payload) + "\n")
+    except Exception:
+        pass
+# #endregion
 
 # Import PCG forest logic so we don't duplicate it.
 # Force reload to pick up disk changes in a long-lived Editor Python session.
@@ -39,6 +54,7 @@ def _load_demo_config():
         "volume_center_x": 0.0, "volume_center_y": 0.0, "volume_center_z": 0.0,
         "volume_extent_x": 5000.0, "volume_extent_y": 5000.0, "volume_extent_z": 500.0,
         "exclusion_zones": [],
+        "skip_exclusion_zones": False,
     }
     try:
         proj_dir = unreal.SystemLibrary.get_project_directory()
@@ -162,33 +178,6 @@ NATURE_MESH_PREFIXES = ("SM_Tree", "SMF_Forest_Rock", "SM_Rock_Small", "SM_Grass
 SCATTER_MESH_PREFIXES = ("SM_Clouds", "SM_Water", "SM_River", "SM_Sky", "SM_Terrain", "SM_Ground", "SM_Ocean")
 
 
-def _cleanup_stale_pcg():
-    """Remove existing PCG graph asset and PCG Volume actors so the script can rebuild
-    with updated exclusion zones and volume size. Safe to call if nothing exists."""
-    if unreal.EditorAssetLibrary.does_asset_exist(pcg_forest.PCG_GRAPH_PACKAGE):
-        try:
-            unreal.EditorAssetLibrary.delete_asset(pcg_forest.PCG_GRAPH_PACKAGE)
-            _log("Deleted stale PCG graph for rebuild.")
-        except Exception as e:
-            _log("Could not delete PCG graph: " + str(e))
-    world = unreal.EditorLevelLibrary.get_editor_world()
-    if not world:
-        return
-    try:
-        volumes = unreal.GameplayStatics.get_all_actors_of_class(world, unreal.PCGVolume)
-        for vol in (volumes or []):
-            try:
-                unreal.EditorLevelLibrary.destroy_actor(vol)
-            except Exception:
-                try:
-                    vol.destroy_actor()
-                except Exception:
-                    pass
-        if volumes:
-            _log("Removed %d existing PCG Volume(s) from level." % len(volumes))
-    except Exception:
-        pass
-
 
 def _detect_village_exclusion_zones(padding=EXCLUSION_PADDING_CM):
     """Scan the level for StylizedProvencal structure actors (buildings, walls, props, etc.)
@@ -267,6 +256,9 @@ def _detect_village_exclusion_zones(padding=EXCLUSION_PADDING_CM):
 
 def main():
     _log("Starting demo map generation (village + PCG forest)...")
+    # #region agent log
+    _agent_log("create_demo_map.py:main_start", "Demo map script started", {}, "H2")
+    # #endregion
     config = _load_demo_config()
     demo_path = config.get("demo_level_path", "/Game/HomeWorld/Maps/Main")
     template_path = config.get("template_level_path", "/Game/StylizedProvencal/Maps/Main")
@@ -277,10 +269,11 @@ def main():
     if not _ensure_main_is_open(demo_path):
         _log("Stopping. Open Main level and run the script again.")
         return
+    # #region agent log
+    _agent_log("create_demo_map.py:main_open", "Main level open", {"demo_path": demo_path}, "H2")
+    # #endregion
 
-    _cleanup_stale_pcg()
-
-    # PCG volume sized to landscape; fall back to config values
+    # PCG: tag Landscape and place/size one PCG Volume. Script does NOT create a graph or assign a graph.
     location = unreal.Vector(
         float(config.get("volume_center_x", 0)),
         float(config.get("volume_center_y", 0)),
@@ -294,30 +287,15 @@ def main():
     landscape_bounds = _get_landscape_bounds()
     if landscape_bounds is not None:
         location, extent = landscape_bounds
-        _log("PCG volume sized to landscape: center=%s half_extent=%s" % (location, extent))
+        _log("PCG volume will cover the entire landscape: center=%s half_extent=%s." % (location, extent))
     else:
-        _log("No landscape found — using config volume bounds: center=%s half_extent=%s" % (location, extent))
+        _log("No landscape found — using config volume bounds. Add a Landscape or set volume_extent_* in demo_map_config.json for full coverage.")
 
-    # Exclusion zones: prefer config, then auto-detect from village assets, then 10% center fallback
-    exclusion_zones = config.get("exclusion_zones") or []
-    if not exclusion_zones:
-        exclusion_zones = _detect_village_exclusion_zones()
-    if not exclusion_zones:
-        ex_x = max(100.0, abs(extent.x) * 0.1)
-        ex_y = max(100.0, abs(extent.y) * 0.1)
-        ex_z = max(50.0, abs(extent.z) * 0.1)
-        exclusion_zones = [{
-            "center_x": location.x, "center_y": location.y, "center_z": location.z,
-            "extent_x": ex_x, "extent_y": ex_y, "extent_z": ex_z,
-        }]
-        _log("Fallback: 10%% center exclusion zone (no village actors found): extent %.0f %.0f %.0f" % (ex_x, ex_y, ex_z))
-
-    graph_asset = pcg_forest.create_pcg_graph(exclusion_zones=exclusion_zones)
-    if graph_asset:
-        pcg_forest.place_volume_and_generate(graph_asset, location=location, extent=extent, exclusion_zones=exclusion_zones)
+    pcg_forest.ensure_landscape_has_pcg_tag()
+    pcg_forest.place_pcg_volume(location=location, extent=extent)
     pcg_forest.try_world_partition()
 
-    _log("Done. Demo map ready (village + PCG forest). Trees/rocks from Stylized Provencal surround village with exclusion dead zones.")
+    _log("Done. Demo map ready. For PCG: create a PCG graph in the Editor, set Get Landscape Data to By Tag + PCG_Landscape, assign the graph to PCG_Forest volume, and click Generate. See docs/PCG_SETUP.md.")
 
 
 if __name__ == "__main__":
