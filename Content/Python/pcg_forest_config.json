@@ -16,7 +16,12 @@
   ],
   "height_filter_min": null,
   "height_filter_max": null,
+  "points_per_squared_meter": 0.02,
+  "density_lower_bound": 0.2,
+  "density_upper_bound": 0.5,
   "_comment_trees": "Stylized Provencal trees by default. Replace with Megascans paths from Content/Environments/ if desired.",
   "_comment_rocks": "Stylized Provencal forest/small rocks. Leave empty to skip rocks branch.",
-  "_comment_height": "Optional: set height_filter_min and height_filter_max (world Z in cm) to spawn only on terrain. E.g. -5000 to 5000. Leave null to skip."
+  "_comment_height": "Optional: set height_filter_min and height_filter_max (world Z in cm) to spawn only on terrain. E.g. -5000 to 5000. Leave null to skip.",
+  "transform_offset_z": -250,
+  "_comment_offset": "Z offset in cm (negative=down) so center-pivot meshes sit on surface."
 }

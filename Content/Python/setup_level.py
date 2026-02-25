@@ -63,7 +63,7 @@ def _ensure_player_start():
 
 
 def _run_pcg_demo(run_pcg=True):
-    """Optionally run create_demo_map: tags Landscape and places/sizes PCG Volume. Does not create a graph or generate; see docs/PCG_SETUP.md."""
+    """Optionally run create_demo_map: creates PCG graph (if missing), tags Landscape, places/sizes PCG Volume. Does not assign graph or Generate; see docs/PCG_SETUP.md."""
     if not run_pcg:
         return
     try:

@@ -77,6 +77,7 @@ These reusable scripts eliminate the need for one-off diagnostic scripts:
 | `mcp_harness.py` | Structured command-response bridge | Write `Saved/mcp_request.json`, run via MCP, read `Saved/mcp_response.json` |
 | `pie_test_runner.py` | PIE validation checks (ground, character, PCG) | Run via MCP, read `Saved/pie_test_results.json` |
 | `blueprint_inspector.py` | Read Blueprint structure as JSON | Write `Saved/blueprint_inspect_request.json`, run via MCP, read `Saved/blueprint_inspect_result.json` |
+| `layout_blueprint_nodes.py` | Space Blueprint graph nodes in a grid | Optional: write `Saved/layout_blueprint_request.json` with `{"path": "/Game/.../BP_Name"}`, run via MCP, read `Saved/layout_blueprint_result.json` |
 | `capture_viewport.py` | Screenshot capture | Run via MCP, read `Saved/screenshot_result.json` |
 
 **MCP harness commands:** `ping`, `asset_exists`, `get_actors`, `world_info`, `pawn_info`, `blueprint_defaults`, `pie_status`, `start_pie`, `stop_pie`.
