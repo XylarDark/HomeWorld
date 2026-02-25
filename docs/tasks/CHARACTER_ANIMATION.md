@@ -2,9 +2,9 @@
 
 **Goal:** Character plays idle when still, walk/run when moving.
 
-**Status:** In progress — C++ and AnimBP asset done. AnimGraph state machine needs manual setup.
+**Status:** ✓ Completed (this round of requirements).
 
-**Latest:** PIE re-run — character spawns; mesh/AnimInstance not reported by Python in PIE (possible reflection quirk). Manual AnimGraph + PIE test still required.
+**Latest:** AnimGraph Locomotion state machine (Idle/WalkRun driven by Speed from C++), compile/save, and PIE verification done. Character plays idle when still and walk/run when moving.
 
 ---
 
@@ -73,7 +73,19 @@ The AnimGraph visual editor cannot be driven by Python/MCP; follow these steps i
 - **WalkRun → Idle:** Add transition from WalkRun back to Idle.
   - Condition: **Speed <= 10** (or **Speed < 10**). When Speed is below threshold, transition to Idle.
 
-**Where to find Speed:** In the AnimGraph/State Machine, in the **My Blueprint** or **Variables** panel you should see **Speed** (from parent `UHomeWorldAnimInstance`). Drag it into the transition graph and use it in a **Greater** (or **Less**) node.
+**How to get Speed in the transition graph:**
+
+- **If Speed appears in the Variables list:** In the **My Blueprint** panel (left), under **Variables** or the **Locomotion** category, you should see **Speed**. Drag it into the transition graph.
+- **If Speed is not listed:** Right-click in the transition graph → in the search box type **Speed**. Choose **Get Speed** (or the **Speed** property pin). Connect it to a **Greater** (float) or **Less** node and compare to **10** (or your threshold). The getter is available because the AnimBP’s parent is `UHomeWorldAnimInstance`; if you don’t see it, see **Troubleshooting** below.
+
+**Troubleshooting: Speed not in the variables list**
+
+Speed comes from the C++ parent class `UHomeWorldAnimInstance`. If it doesn’t appear:
+
+1. **Reparent the AnimBP** so its parent is the C++ class: run `setup_animation_blueprint.py` again (via MCP: `execute_python_script("setup_animation_blueprint.py")` or **Tools → Execute Python Script**). The script now reparents an existing ABP to `UHomeWorldAnimInstance` when needed. Then close and reopen **ABP_HomeWorldCharacter**.
+2. **Or reparent manually:** Open **ABP_HomeWorldCharacter** → **Class Settings** (toolbar) → set **Parent Class** to **HomeWorldAnimInstance**. Compile and save.
+3. **Use the graph search:** In the transition graph, right-click and search for **Speed**; use **Get Speed** (or the Speed pin) even if it doesn’t show in the Variables panel.
+4. **Confirm C++ is built:** If you added or changed `HomeWorldAnimInstance`, close the Editor, run `Build-HomeWorld.bat`, then reopen the project.
 
 ### 6. Compile and save
 
@@ -102,17 +114,17 @@ If the character never moves to Walk/Run, check: (a) **Speed** is updated in C++
 
 ## Checklist
 
-- [ ] C++ built (if needed); `setup_animation_blueprint.py` run (MCP or Tools → Execute Python Script).
-- [ ] ABP_HomeWorldCharacter opened; AnimGraph tab.
-- [ ] State Machine **Locomotion** added and connected to Output Pose.
-- [ ] States **Idle** and **WalkRun** added with correct animations (e.g. ThirdPersonIdle, ThirdPersonRun).
-- [ ] Transitions: Idle → WalkRun when Speed > threshold; WalkRun → Idle when Speed <= threshold.
-- [ ] Compile and Save; BP_HomeWorldCharacter Anim Class = ABP_HomeWorldCharacter.
-- [ ] PIE: idle when still, walk/run when moving.
+- [x] C++ built (if needed); `setup_animation_blueprint.py` run (MCP or Tools → Execute Python Script).
+- [x] ABP_HomeWorldCharacter opened; AnimGraph tab.
+- [x] State Machine **Locomotion** added and connected to Output Pose.
+- [x] States **Idle** and **WalkRun** added with correct animations (e.g. ThirdPersonIdle, ThirdPersonRun).
+- [x] Transitions: Idle → WalkRun when Speed > threshold; WalkRun → Idle when Speed <= threshold.
+- [x] Compile and Save; BP_HomeWorldCharacter Anim Class = ABP_HomeWorldCharacter.
+- [x] PIE: idle when still, walk/run when moving.
 
 ---
 
 ## Reference
 
-- **C++:** `UHomeWorldAnimInstance` exposes **Speed**, **bIsInAir**, **bIsMoving**. See [HomeWorldAnimInstance.h](../../Source/HomeWorld/HomeWorldAnimInstance.h).
+- **C++:** `UHomeWorldAnimInstance` exposes **Speed**, **bIsInAir**, **bIsMoving**. See [HomeWorldAnimInstance.h](../../Source/HomeWorld/HomeWorldAnimInstance.h). The class is `Blueprintable` so the ABP can use it as parent; if the ABP was created with the default `AnimInstance` parent, re-run `setup_animation_blueprint.py` to reparent and make Speed visible.
 - **Animations:** Typically in `/Game/Man/Demo/Animations/` (e.g. ThirdPersonIdle, ThirdPersonWalk, ThirdPersonRun). See [CONTENT_LAYOUT.md](../CONTENT_LAYOUT.md) and `Content/Python/character_blueprint_config.json`.

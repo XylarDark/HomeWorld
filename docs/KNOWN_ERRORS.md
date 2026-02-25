@@ -57,6 +57,18 @@ For each entry use:
 - **Fix:** Use Python Editor scripts to access the component via `get_editor_property()` or the SubobjectDataSubsystem. MCP cannot set properties on inherited components.
 - **Context:** 2026-02, MCP runtime, BP_HomeWorldCharacter.
 
+### Python InputMappingContext.map_key: Key struct from string
+- **Error:** `TypeError: NativizeProperty: Cannot nativize 'str' as 'ToKey' (StructProperty)` / `Key: Struct has 0 initialization parameters, but the given sequence had 1 elements` when calling `imc.map_key(action, "W")` in setup_enhanced_input.py.
+- **Cause:** UE Python API expects `to_key` to be a `Key` struct. Passing a string fails because `unreal.Key` has no string constructor; it has a single editor property `key_name` (Name).
+- **Fix:** Construct the key with `key_obj = unreal.Key()` then `key_obj.set_editor_property("key_name", unreal.Name(key_name))`. Use that key object in `map_key(action, key_obj)`.
+- **Context:** 2026-02, Content/Python/setup_enhanced_input.py, UE 5.7.
+
+### AnimBlueprint: no get_editor_property("parent_class") in Python
+- **Error:** `Reparent failed: AnimBlueprint: Failed to find property 'parent_class' for attribute 'parent_class' on 'AnimBlueprint'` when running `setup_animation_blueprint.py`.
+- **Cause:** `UAnimBlueprint` does not expose a `parent_class` editor property in the Python API (unlike regular `UBlueprint`). The effective parent is the super class of the Blueprint's generated class.
+- **Fix:** In Python, get the current parent via the generated class: load the ABP, get `abp.generated_class()` (or `BlueprintEditorLibrary.generated_class(abp)`), then get the super class with `gen_class.get_super_class()` or `gen_class.get_editor_property("super_class")`. Use that to decide whether to call `BlueprintEditorLibrary.reparent_blueprint(abp, target_parent_class)`.
+- **Context:** 2026-02, setup_animation_blueprint.py, Animation Blueprint reparenting.
+
 ### GameplayAbilities: GameplayAbilitySpec.h include path
 - **Error:** `fatal error C1083: Cannot open include file: 'Abilities/GameplayAbilitySpec.h': No such file or directory` in HomeWorldCharacter.cpp.
 - **Cause:** The GameplayAbilities plugin exposes the header as `GameplayAbilitySpec.h` (under the module's Public folder), not `Abilities/GameplayAbilitySpec.h`.

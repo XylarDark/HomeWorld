@@ -170,3 +170,50 @@ Agent session summaries for cross-session context persistence.
 **Key decisions:** Single Editor module dependency for MEC: MassSpawner (UMassEntityConfigAsset, UMassEntityTraitBase). Trait class paths use /Script/Module.Class; unknown traits are skipped with a warning. State Tree and mesh assignment left for Editor or future commandlet extension.
 
 **Errors encountered:** None in code. Build requires Editor closed (documented in KNOWN_ERRORS and ALTERNATIVE_AUTOMATION_OPTIONS).
+
+---
+
+## 2026-02-24 — Character animation: Speed variable not in AnimBP variables list
+
+**Issue:** User on CHARACTER_ANIMATION Step 5 could not find "Speed" in the variables list for Idle/WalkRun transition conditions.
+
+**Root cause:** Speed is exposed by the C++ parent `UHomeWorldAnimInstance`. If the ABP was created when C++ was not built (or with default parent), its parent stays `AnimInstance` and inherited C++ variables are not visible.
+
+**Fixes applied:**
+- **C++:** Added `Blueprintable` to `UHomeWorldAnimInstance` (HomeWorldAnimInstance.h).
+- **Script:** `setup_animation_blueprint.py` now reparents an existing ABP to `UHomeWorldAnimInstance` when the asset already exists, so re-running the script fixes parent class and makes Speed/bIsInAir/bIsMoving visible.
+- **Doc:** CHARACTER_ANIMATION.md — Step 5: added "How to get Speed" (Variables panel vs right-click search "Speed"/Get Speed); new "Troubleshooting: Speed not in the variables list" (re-run setup script, reparent manually, or use graph search); Reference note on reparent.
+
+**Next for user:** Re-run `setup_animation_blueprint.py` (MCP or Tools → Execute Python Script), close and reopen ABP_HomeWorldCharacter, then in the transition graph use Speed (Variables or right-click → search "Speed"). Rebuild C++ if the Blueprintable change was just added.
+
+---
+
+## 2026-02-24 — Movement setup best-practices validation
+
+**Tasks completed:** Validated third-person movement implementation against Epic docs, Lyra references, and community patterns (wirepair, UE5 Enhanced Input tutorials). Created `docs/MOVEMENT_INPUT_VALIDATION.md` with comparison table and references.
+
+**Findings:** Current setup aligns with best practices: Triggered + Completed for movement (key release stops input); camera-relative direction via GetControlRotation(); AddMovementInput(world direction, scale) in Tick; bOrientRotationToMovement for third-person; four Boolean input actions (W/S/A/D) used due to Python IMC modifier issues, with Axis2D fallback when four actions are not set. No code changes required for validation.
+
+---
+
+## 2026-02-24 — Orientation complete + Character Ground (plan execution)
+
+**Tasks completed:** Implemented plan "Orientation complete + Character Ground (next task)". (1) **Part 1:** Marked Task 2 (orientation) completed: TASKLIST.md — Task 2 row set to Completed/Done, summary updated; CHARACTER_ORIENTATION.md — Status Completed, Latest and "What is already done" updated with mesh offset -90, checklist marked done. (2) **Part 2:** Completed Task 3 (Character on ground): TASKLIST.md — Task 3 row set to Completed/Done, note that Task 3 was next focus and terrain deferred; CHARACTER_GROUND.md — Status Completed, Latest updated with spawn/ground trace and note that walk-on-surface is deferred.
+
+**Key decisions:** Terrain / walk-on-ground-surface remains a separate, deferred concern; no new task doc or implementation in this pass.
+
+---
+
+## 2026-02-24 — Enhanced Input on Editor load
+
+**Tasks completed:** Added `Content/Python/init_unreal.py` so Enhanced Input setup runs automatically when the Editor loads. Uses Unreal’s standard startup script in `Content/Python/`; calls `setup_enhanced_input.main()` (idempotent). Updated `docs/SETUP.md` validation and PIE troubleshooting to state that Enhanced Input is applied on load and when to run scripts manually if needed.
+
+**Key decisions:** Single startup script runs only Enhanced Input (not full bootstrap) to keep startup fast and avoid prompts; same assets as manual run.
+
+---
+
+## 2026-02-24 — Rules updated from session (avoid “run script for movement”)
+
+**Tasks completed:** Updated Cursor rules and AGENTS.md so the problems from this session are avoided. (1) **00-core-principles.mdc** — Added “Editor startup setup”: run critical setup (e.g. Enhanced Input) at Editor load via `init_unreal.py`; don’t require users to run setup_enhanced_input as normal first step. (2) **09-mcp-workflow.mdc** — Added “Editor startup scripts”: init_unreal.py runs on load; only suggest running setup_enhanced_input when troubleshooting. (3) **08-project-context.mdc** — Added “Critical setup on load” principle. (4) **12-python.mdc** — Added “Editor startup script” subsection: keep init_unreal.py minimal and idempotent. (5) **AGENTS.md** — Noted in Dev environment setup that Enhanced Input is applied on load; manual run only for troubleshooting.
+
+**Key decisions:** Encode “critical setup on load” and “don’t instruct run setup_enhanced_input unless troubleshooting” so future agents and docs don’t reintroduce the “movement only works after running script” workflow.

@@ -70,13 +70,29 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Camera", meta = (ClampMin = "0.0", ClampMax = "89.0"))
 	float MaxPitch = 20.0f;
 
-	/** Move input action (Axis2D: X = strafe, Y = forward/back). Assign in Editor or Blueprint defaults. */
+	/** Move input action (Axis2D fallback). Prefer the four directional actions below when available. */
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> MoveAction;
 
 	/** Look input action (Axis2D: mouse delta). Assign in Editor or Blueprint defaults. */
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> LookAction;
+
+	/** Optional: W key. When set with the other three, used for camera-relative movement (no IMC modifiers). */
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UInputAction> MoveForwardAction;
+
+	/** Optional: S key. */
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UInputAction> MoveBackAction;
+
+	/** Optional: A key. */
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UInputAction> StrafeLeftAction;
+
+	/** Optional: D key. */
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UInputAction> StrafeRightAction;
 
 	/** Default mapping context (WASD + Mouse). Assign in Editor or Blueprint defaults. */
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
@@ -90,9 +106,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Movement", meta = (ClampMin = "1.0", ClampMax = "1440.0"))
 	float RotationRateYaw = 720.0f;
 
-	/** Offset (degrees) applied to the mesh relative rotation so mesh forward matches movement direction. Use e.g. 90 or -90 if the mesh faces the wrong way. */
+	/** Offset (degrees) applied to the mesh relative rotation so mesh forward matches movement direction. Default -90: skeleton forward was 90° right of capsule forward. */
 	UPROPERTY(EditDefaultsOnly, Category = "Mesh", meta = (ClampMin = "-180.0", ClampMax = "180.0"))
-	float MeshForwardYawOffset = 0.0f;
+	float MeshForwardYawOffset = -90.0f;
 
 	/** Capsule radius (cm). Human-sized default; override in Blueprint for different characters. */
 	UPROPERTY(EditDefaultsOnly, Category = "Movement", meta = (ClampMin = "1.0", ClampMax = "200.0"))
@@ -103,7 +119,23 @@ protected:
 	float CapsuleHalfHeight = 88.0f;
 
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
 
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+
+	/** Key down: add to axis. */
+	void OnMoveForwardPressed(const FInputActionValue& Value);
+	void OnMoveBackPressed(const FInputActionValue& Value);
+	void OnStrafeLeftPressed(const FInputActionValue& Value);
+	void OnStrafeRightPressed(const FInputActionValue& Value);
+	/** Key up: subtract from axis so movement stops on release. */
+	void OnMoveForwardReleased(const FInputActionValue& Value);
+	void OnMoveBackReleased(const FInputActionValue& Value);
+	void OnStrafeLeftReleased(const FInputActionValue& Value);
+	void OnStrafeRightReleased(const FInputActionValue& Value);
+
+	/** Net forward/right axis from the four directional keys. Used when using MoveForward/MoveBack/StrafeLeft/StrafeRight. */
+	float MovementForwardAxis = 0.f;
+	float MovementRightAxis = 0.f;
 };

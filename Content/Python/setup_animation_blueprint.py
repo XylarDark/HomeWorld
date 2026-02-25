@@ -110,12 +110,81 @@ def _get_anim_instance_class():
     return None
 
 
+def _get_abp_current_parent_class(abp):
+    """Get the current parent class of an AnimBlueprint via its generated class (AnimBlueprint has no parent_class property)."""
+    gen_class = None
+    try:
+        gen_class = abp.generated_class()
+    except Exception:
+        try:
+            gen_class = abp.get_editor_property("generated_class")
+        except Exception:
+            pass
+    if not gen_class:
+        try:
+            bel = getattr(unreal, "BlueprintEditorLibrary", None)
+            if bel and hasattr(bel, "generated_class"):
+                gen_class = bel.generated_class(abp)
+        except Exception:
+            pass
+    if not gen_class:
+        return None
+    fn = getattr(gen_class, "get_super_class", None)
+    if callable(fn):
+        try:
+            sup = fn()
+            if sup:
+                return sup
+        except Exception:
+            pass
+    for prop in ("super_class", "super_struct"):
+        try:
+            sup = gen_class.get_editor_property(prop)
+            if sup:
+                return sup
+        except Exception:
+            pass
+    return None
+
+
+def _reparent_to_anim_instance_if_needed(abp, target_parent_class):
+    """If the ABP's parent is not target_parent_class, reparent so C++ vars (e.g. Speed) are visible."""
+    if not abp or not target_parent_class:
+        return False
+    try:
+        current = _get_abp_current_parent_class(abp)
+        target_name = target_parent_class.get_name() if target_parent_class else ""
+        if current:
+            current_name = current.get_name()
+            if current_name == target_name:
+                return False
+        reparent = getattr(unreal, "BlueprintEditorLibrary", None)
+        if reparent and hasattr(reparent, "reparent_blueprint"):
+            reparent.reparent_blueprint(abp, target_parent_class)
+            _log("Reparented " + ABP_FULL + " to " + target_name + " (Speed/bIsInAir/bIsMoving now visible).")
+            return True
+    except Exception as e:
+        _log("Reparent failed: " + str(e))
+    return False
+
+
 def main():
     _log("Setting up Animation Blueprint...")
 
     if unreal.EditorAssetLibrary.does_asset_exist(ABP_FULL):
-        _log("Skipping — " + ABP_FULL + " already exists.")
-        return unreal.load_asset(ABP_FULL)
+        abp = unreal.load_asset(ABP_FULL)
+        parent_class = _get_anim_instance_class()
+        if parent_class and _reparent_to_anim_instance_if_needed(abp, parent_class):
+            try:
+                unreal.EditorAssetLibrary.save_loaded_asset(abp)
+            except Exception:
+                try:
+                    unreal.EditorAssetSubsystem().save_asset(ABP_FULL)
+                except Exception:
+                    pass
+        else:
+            _log("Reusing existing " + ABP_FULL + ".")
+        return abp
 
     skeleton = _find_skeleton()
     if not skeleton:

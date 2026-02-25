@@ -2,9 +2,9 @@
 
 **Goal:** Character stands on ground (no floating or sinking).
 
-**Status:** Verified — PIE check passed (MOVE_WALKING, not falling, capsule 42r/88h).
+**Status:** Completed — PIE check passed (MOVE_WALKING, not falling, capsule 42r/88h). Task closed.
 
-**Latest:** PIE re-run with Editor open — on ground, capsule 88/42 confirmed.
+**Latest:** Character on ground verified (capsule 88/42, MOVE_WALKING). Spawn ground trace in BeginPlay places capsule on hit; no floating or sinking. Walk on varied terrain / ground surface is a separate concern, deferred to later.
 
 ---
 

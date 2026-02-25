@@ -61,6 +61,14 @@ All scripts, setup routines, and automated workflows **must be safe to run multi
 - [ ] Re-runs produce the same result as first runs (no duplicates, no data loss)
 - [ ] The script logs whether it created, reused, or skipped each resource
 
+## Editor startup setup
+
+When a Python script is **required for core functionality** (e.g. movement/input working in PIE), run it at Editor startup so that clone-and-open works without a manual step:
+
+- Use **`Content/Python/init_unreal.py`** — Unreal runs this automatically when the Editor loads (standard `Content/Python/` startup location).
+- Keep startup logic **minimal and idempotent**: only call setup that must run every load (e.g. Enhanced Input assets); do not run full bootstrap or prompts.
+- Do not instruct users to "run setup_enhanced_input.py" as a normal first step; that is for **troubleshooting** when movement still fails after load. See `09-mcp-workflow.mdc` (Editor startup scripts).
+
 ## Pre-Flight Checklist
 
 Before making ANY code change, verify:

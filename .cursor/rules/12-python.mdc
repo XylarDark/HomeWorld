@@ -57,6 +57,10 @@ version: 1.0
 
 ## Unreal Editor Python Scripting
 
+### Editor startup script
+
+**`Content/Python/init_unreal.py`** runs when the Editor loads (Unreal's standard startup location). It must stay minimal and only call idempotent setup (e.g. Enhanced Input). Do not add heavy bootstrap or user prompts. Scripts invoked from `init_unreal.py` must be safe to run every session (check-before-create, no duplicates).
+
 ### Idempotency (critical)
 
 All Editor scripts in `Content/Python/` must be re-runnable without side effects:

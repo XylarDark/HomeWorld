@@ -20,6 +20,8 @@
 4. Open Editor, restart Cursor, verify MCP green dot in status bar.
 5. See [docs/SETUP.md](docs/SETUP.md) for the full checklist.
 
+**Enhanced Input** is applied automatically when the Editor loads (`Content/Python/init_unreal.py`). You do not need to run `setup_enhanced_input.py` unless movement still fails (troubleshooting).
+
 ## Testing
 
 - **Automated (Python):** `PythonAutomationTest` plugin is enabled. Tests in `Content/Python/tests/` (named `test_*.py`) are auto-discovered. Run via Editor: Tools > Test Automation.

@@ -13,4 +13,7 @@ class HOMEWORLD_API AHomeWorldGameMode : public AGameModeBase
 
 public:
 	AHomeWorldGameMode();
+
+protected:
+	virtual void BeginPlay() override;
 };

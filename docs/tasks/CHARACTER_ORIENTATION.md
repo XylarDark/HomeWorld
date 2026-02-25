@@ -2,9 +2,9 @@
 
 **Goal:** Character faces movement direction when moving.
 
-**Status:** Verify — C++ done (`bOrientRotationToMovement`, `RotationRate`). Manual PIE test needed.
+**Status:** Completed — C++ done; mesh offset -90 applied and verified in PIE.
 
-**Latest:** PIE re-run — character spawned (HomeWorldCharacter). Manual WASD test still required for orientation.
+**Latest:** Mesh forward yaw offset default set to -90 in C++ ([HomeWorldCharacter.h](../../Source/HomeWorld/HomeWorldCharacter.h)); character and mesh face movement direction (WASD and diagonals) verified.
 
 ---
 
@@ -13,7 +13,8 @@
 - In [HomeWorldCharacter.cpp](../../Source/HomeWorld/HomeWorldCharacter.cpp), the Character Movement Component is configured so the pawn rotates toward movement:
   - **Orient Rotation to Movement** is enabled (or equivalent).
   - **Rotation Rate** is set so the turn feels responsive.
-- No code changes are required unless you want to tune rotation speed or disable orientation in certain states.
+- **Mesh forward yaw offset** default is -90° in C++ ([HomeWorldCharacter.h](../../Source/HomeWorld/HomeWorldCharacter.h)) so the skeletal mesh faces the movement direction (skeleton forward was 90° right of capsule forward).
+- No further code changes required unless you want to tune rotation speed or disable orientation in certain states.
 
 ---
 
@@ -61,9 +62,9 @@ If the capsule rotates correctly but the **skeletal mesh** faces the wrong direc
 
 ## Checklist
 
-- [ ] PIE: Move with WASD in several directions.
-- [ ] Confirmed capsule (and mesh) face movement direction.
-- [ ] If mesh was wrong: BP_HomeWorldCharacter → Mesh component → **Mesh Forward Yaw Offset** set and PIE re-tested.
+- [x] PIE: Move with WASD in several directions.
+- [x] Confirmed capsule (and mesh) face movement direction (mesh offset -90 in C++).
+- [x] Mesh facing corrected via default `MeshForwardYawOffset = -90` in C++; override in BP_HomeWorldCharacter if needed for other characters.
 
 ---
 

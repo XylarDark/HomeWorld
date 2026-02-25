@@ -74,7 +74,7 @@ Use this to confirm first-phase setup is complete before starting tasks.
 
 - [ ] **C++ builds:** After generating Visual Studio project files, **HomeWorld** and **HomeWorldEditor** targets build (see [Building (C++)](#building-c)).
 - [ ] **Default game mode:** **Project Settings → Maps & Modes** → Default GameMode is **HomeWorldGameMode**; Default Pawn Class is **HomeWorldCharacter** (or a Blueprint child). See [CONVENTIONS.md](CONVENTIONS.md#input-setup-enhanced-input).
-- [ ] **PIE:** Character moves with WASD, camera follows mouse (third-person). If not, create and assign **IA_Move**, **IA_Look**, **IMC_Default** per [CONVENTIONS.md](CONVENTIONS.md).
+- [ ] **PIE:** Character moves with WASD, camera follows mouse (third-person). Enhanced Input assets are created automatically when the Editor loads (`Content/Python/init_unreal.py`). If movement still fails, run `setup_enhanced_input.py` once or assign **IA_Move**, **IA_Look**, **IMC_Default** on the pawn per [CONVENTIONS.md](CONVENTIONS.md).
 
 **Developer (Editor):**
 
@@ -87,6 +87,17 @@ When all above are checked, proceed to [TASKLIST.md](TASKLIST.md) and the task d
 **Testing and validation:** The `PythonAutomationTest` plugin is enabled. Test files in `Content/Python/tests/` (`test_*.py`) are auto-discovered by the Editor's Test Automation window. Run from Editor (Tools > Test Automation) or use the PIE test runner (`Content/Python/pie_test_runner.py`). For manual checks, run through the checklist above and play-test where applicable.
 
 When you fix a build, lint, or runtime error, record it in [KNOWN_ERRORS.md](KNOWN_ERRORS.md) so we don't repeat it.
+
+---
+
+## PIE: Character not visible / can't move
+
+If when you press Play the character doesn't appear and you can't move:
+
+1. **PlayerStart in the level** — The pawn spawns at a PlayerStart. If there is none, it may spawn at (0,0,0) and fall or be in the void. With the **Main** level open, run **Tools → Execute Python Script** → `Content/Python/setup_level.py` to add a PlayerStart (above landscape or at 0,0,300). Or place one manually: **Place Actors → Basic → Player Start** and put it on the ground.
+2. **Input assets on the character** — Movement and camera need **IA_Move**, **IA_Look**, and **IMC_Default** assigned on the default pawn. The Editor runs Enhanced Input setup on load (`Content/Python/init_unreal.py`). Run **Tools → Execute Python Script** → `Content/Python/setup_character_blueprint.py` to assign those assets to the character Blueprint. Or in **Content → HomeWorld → Characters**, open **BP_HomeWorldCharacter**, select **Class Defaults**, and set **Move Action** = IA_Move, **Look Action** = IA_Look, **Default Mapping Context** = IMC_Default. Save.
+3. **GameMode default pawn** — **Project Settings → Maps & Modes** (or open **BP_GameMode**): set **Default Pawn Class** to **BP_HomeWorldCharacter**. If it's None or another class, the correct character won't spawn.
+4. **Full bootstrap** — If you're unsure what's missing, with **Main** open run **Tools → Execute Python Script** → `Content/Python/bootstrap_project.py`. It creates input assets, character Blueprint, project settings, and a PlayerStart, then save the level and try PIE again.
 
 ---
 

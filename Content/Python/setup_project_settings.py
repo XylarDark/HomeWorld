@@ -65,7 +65,8 @@ def _set_default_map():
 
 
 def _set_default_pawn_class():
-    """Set DefaultPawnClass on the GameMode to BP_HomeWorldCharacter if it exists."""
+    """Set DefaultPawnClass on the GameMode to BP_HomeWorldCharacter if it exists.
+    Set on BP_GameMode first (used at runtime); fall back to C++ GameMode CDO."""
     bp_asset_path = CHARACTER_BP
     if not unreal.EditorAssetLibrary.does_asset_exist(bp_asset_path):
         _log("BP_HomeWorldCharacter not found at " + bp_asset_path + "; DefaultPawnClass unchanged (C++ default is AHomeWorldCharacter).")
@@ -89,6 +90,20 @@ def _set_default_pawn_class():
         _log("Could not get generated class from " + bp_asset_path + "; set DefaultPawnClass in Editor.")
         return
 
+    gm_bp_path = GAME_MODE_BP.replace("_C", "").rsplit(".", 1)[0]
+    if unreal.EditorAssetLibrary.does_asset_exist(gm_bp_path):
+        gm_bp = unreal.load_asset(gm_bp_path)
+        if gm_bp:
+            try:
+                gm_gen = gm_bp.generated_class() if hasattr(gm_bp, "generated_class") else gm_bp.get_editor_property("generated_class")
+                cdo = unreal.get_default_object(gm_gen)
+                cdo.set_editor_property("default_pawn_class", bp_class)
+                _log("Set DefaultPawnClass on BP_GameMode = " + bp_asset_path)
+                unreal.EditorAssetLibrary.save_loaded_asset(gm_bp)
+                return
+            except Exception as e:
+                _log("BP GameMode CDO set failed: " + str(e))
+
     gm_class = None
     try:
         gm_class = unreal.HomeWorldGameMode.static_class()
@@ -108,20 +123,6 @@ def _set_default_pawn_class():
             return
         except Exception as e:
             _log("CDO set failed: " + str(e))
-
-    gm_bp_path = GAME_MODE_BP.replace("_C", "").rsplit(".", 1)[0]
-    if unreal.EditorAssetLibrary.does_asset_exist(gm_bp_path):
-        gm_bp = unreal.load_asset(gm_bp_path)
-        if gm_bp:
-            try:
-                gm_gen = gm_bp.generated_class() if hasattr(gm_bp, "generated_class") else gm_bp.get_editor_property("generated_class")
-                cdo = unreal.get_default_object(gm_gen)
-                cdo.set_editor_property("default_pawn_class", bp_class)
-                _log("Set DefaultPawnClass on BP_GameMode = " + bp_asset_path)
-                unreal.EditorAssetLibrary.save_loaded_asset(gm_bp)
-                return
-            except Exception as e:
-                _log("BP GameMode CDO set failed: " + str(e))
 
     _log("Could not set DefaultPawnClass programmatically; set in Editor on the GameMode Blueprint.")
 

@@ -30,6 +30,14 @@ If MCP tools are not listed or connection fails (Editor closed, plugin not loade
 - Fall back to Python Editor scripts or manual step-by-step instructions.
 - Do not block on MCP; proceed with the next-best approach.
 
+## Editor startup scripts
+
+**`Content/Python/init_unreal.py`** runs automatically when the Unreal Editor loads. It applies Enhanced Input setup (IA_Move, IA_Look, IMC_Default, etc.) so movement works in PIE without a manual script run.
+
+- **Do not** instruct users or document "run setup_enhanced_input.py" as a normal first step after opening the project. Enhanced Input is already applied on load.
+- **Do** suggest running `setup_enhanced_input.py` only when **troubleshooting** (e.g. movement still broken after opening the Editor, or Python startup was disabled).
+- When adding other critical setup that must exist for core gameplay, consider invoking it from `init_unreal.py` and keep that file minimal and idempotent.
+
 ## MCP connection details
 
 - **Plugin:** UnrealMCP (TCP server on port 55557, auto-starts with Editor)

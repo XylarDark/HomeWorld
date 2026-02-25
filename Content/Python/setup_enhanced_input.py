@@ -14,6 +14,10 @@ except ImportError:
 INPUT_PATH = "/Game/HomeWorld/Input"
 IA_MOVE_NAME = "IA_Move"
 IA_LOOK_NAME = "IA_Look"
+IA_MOVE_FORWARD_NAME = "IA_MoveForward"
+IA_MOVE_BACK_NAME = "IA_MoveBack"
+IA_STRAFE_LEFT_NAME = "IA_StrafeLeft"
+IA_STRAFE_RIGHT_NAME = "IA_StrafeRight"
 IMC_NAME = "IMC_Default"
 
 
@@ -74,12 +78,141 @@ def _create_input_action(name, value_type_name="Axis2D"):
     return ia
 
 
-def _create_mapping_context(name, ia_move, ia_look):
-    """Create IMC_Default with WASD -> IA_Move and Mouse2D -> IA_Look. Skips if already exists."""
+def _get_key(key_name):
+    """Resolve key name to Unreal Key struct (required by InputMappingContext.map_key)."""
+    key_cls = getattr(unreal, "Key", None)
+    name_cls = getattr(unreal, "Name", None)
+    if key_cls and name_cls:
+        try:
+            key_obj = key_cls()
+            key_obj.set_editor_property("key_name", name_cls(key_name))
+            return key_obj
+        except Exception:
+            pass
+    # Fallback: Keys enum (e.g. Keys.W) may work in some UE versions
+    keys_cls = getattr(unreal, "Keys", None)
+    if keys_cls:
+        attr_name = key_name.replace(" ", "_")
+        k = getattr(keys_cls, attr_name, None)
+        if k is not None and not callable(k):
+            return k
+    return None
+
+
+def _add_default_mappings(imc, ia_move, ia_look):
+    """Add WASD -> IA_Move and Mouse2D -> IA_Look to an IMC. Used for new and existing IMCs."""
+    if not imc or not hasattr(imc, "map_key"):
+        return
+
+    def _add_modifier(mapping, modifier_cls, **mod_props):
+        if not mapping or not modifier_cls:
+            return
+        mod = modifier_cls()
+        for prop_name, prop_val in mod_props.items():
+            try:
+                mod.set_editor_property(prop_name, prop_val)
+            except Exception:
+                pass
+        try:
+            existing = list(mapping.get_editor_property("modifiers") or [])
+            existing.append(mod)
+            mapping.set_editor_property("modifiers", existing)
+        except Exception:
+            try:
+                mapping.modifiers.append(mod)
+            except Exception:
+                pass
+
+    swizzle_cls = getattr(unreal, "InputModifierSwizzleAxis", None)
+    negate_cls = getattr(unreal, "InputModifierNegate", None)
+    # YXZ = swap X and Y so 1D key value goes to Y axis (forward/back for Move).
+    for enum_name in ("InputAxisSwizzle", "EInputAxisSwizzle"):
+        swizzle_order_yxz = getattr(getattr(unreal, enum_name, None), "YXZ", None)
+        if swizzle_order_yxz is not None:
+            break
+
+    def _map_key_safe(action, key_name):
+        key_obj = _get_key(key_name)
+        if key_obj is None:
+            _log("Could not resolve key '" + key_name + "'; skipping.")
+            return None
+        try:
+            return imc.map_key(action, key_obj)
+        except Exception as e:
+            _log("map_key failed for " + key_name + ": " + str(e))
+            return None
+
+    if ia_move:
+        # W/S: 1D key defaults to Axis.X in UE -> we use Axis.X for forward/back. No swizzle; Negate for S.
+        mapping_w = _map_key_safe(ia_move, "W")
+        mapping_s = _map_key_safe(ia_move, "S")
+        if negate_cls and mapping_s:
+            _add_modifier(mapping_s, negate_cls)
+        # D/A: 1D key -> Axis.Y (strafe). Swizzle YXZ puts key value on Y.
+        mapping_d = _map_key_safe(ia_move, "D")
+        if swizzle_cls and mapping_d:
+            _add_modifier(mapping_d, swizzle_cls, **({"order": swizzle_order_yxz} if swizzle_order_yxz is not None else {}))
+        mapping_a = _map_key_safe(ia_move, "A")
+        if swizzle_cls and mapping_a:
+            _add_modifier(mapping_a, swizzle_cls, **({"order": swizzle_order_yxz} if swizzle_order_yxz is not None else {}))
+        if negate_cls and mapping_a:
+            _add_modifier(mapping_a, negate_cls)
+
+    if ia_look:
+        for mouse_key_name in ("Mouse2D", "MouseXY", "Mouse_XY_2D_Axis", "Mouse XY 2D-Axis"):
+            if _map_key_safe(ia_look, mouse_key_name) is not None:
+                break
+        else:
+            _log("Could not map Mouse2D to IA_Look; bind mouse in Editor.")
+
+
+def _add_four_directional_mappings(imc, ia_forward, ia_back, ia_left, ia_right):
+    """Map W/S/A/D to the four Boolean actions (no modifiers). C++ uses these for reliable camera-relative movement."""
+    if not imc or not hasattr(imc, "map_key"):
+        return
+
+    def _map_key_safe(action, key_name):
+        key_obj = _get_key(key_name)
+        if key_obj is None:
+            _log("Could not resolve key '" + key_name + "'; skipping.")
+            return None
+        try:
+            return imc.map_key(action, key_obj)
+        except Exception as e:
+            _log("map_key failed for " + key_name + ": " + str(e))
+            return None
+
+    if ia_forward:
+        _map_key_safe(ia_forward, "W")
+    if ia_back:
+        _map_key_safe(ia_back, "S")
+    if ia_left:
+        _map_key_safe(ia_left, "A")
+    if ia_right:
+        _map_key_safe(ia_right, "D")
+
+
+def _create_mapping_context(name, ia_move, ia_look, ia_forward=None, ia_back=None, ia_left=None, ia_right=None):
+    """Create IMC_Default with WASD -> IA_Move and Mouse2D -> IA_Look. If already exists, ensures mappings are present."""
     asset_path = INPUT_PATH + "/" + name
     if _asset_exists(asset_path):
-        _log("Skipping " + asset_path + " (already exists)")
-        return unreal.load_asset(asset_path)
+        _log("IMC already exists; ensuring WASD + Mouse mappings: " + asset_path)
+        imc = unreal.load_asset(asset_path)
+        if imc:
+            # Remove existing Move/Look mappings so we don't duplicate; re-add with correct modifiers.
+            if hasattr(imc, "unmap_all_keys_from_action"):
+                if ia_move:
+                    imc.unmap_all_keys_from_action(ia_move)
+                if ia_look:
+                    imc.unmap_all_keys_from_action(ia_look)
+                for ia in (ia_forward, ia_back, ia_left, ia_right):
+                    if ia:
+                        imc.unmap_all_keys_from_action(ia)
+            _add_default_mappings(imc, ia_move, ia_look)
+            _add_four_directional_mappings(imc, ia_forward, ia_back, ia_left, ia_right)
+            unreal.EditorAssetLibrary.save_loaded_asset(imc)
+            _log("Updated " + asset_path + " with WASD + Mouse bindings")
+        return imc
 
     asset_tools = unreal.AssetToolsHelpers.get_asset_tools()
 
@@ -103,70 +236,8 @@ def _create_mapping_context(name, ia_move, ia_look):
         unreal.EditorAssetLibrary.save_loaded_asset(imc)
         return imc
 
-    def _get_key(name):
-        key_cls = getattr(unreal, "Key", None)
-        if key_cls:
-            try:
-                return key_cls(name)
-            except Exception:
-                pass
-        keys_cls = getattr(unreal, "Keys", None)
-        if keys_cls:
-            k = getattr(keys_cls, name, None)
-            if k:
-                return k
-        return name
-
-    def _add_modifier(mapping, modifier_cls):
-        """Try to append a modifier to an EnhancedActionKeyMapping."""
-        if not mapping:
-            return
-        mod = modifier_cls()
-        try:
-            existing = list(mapping.get_editor_property("modifiers") or [])
-            existing.append(mod)
-            mapping.set_editor_property("modifiers", existing)
-        except Exception:
-            try:
-                mapping.modifiers.append(mod)
-            except Exception:
-                pass
-
-    swizzle_cls = getattr(unreal, "InputModifierSwizzleAxis", None)
-    negate_cls = getattr(unreal, "InputModifierNegate", None)
-
-    if ia_move:
-        # W -> IA_Move: Swizzle (YXZ) so 1D key press maps to Y-axis (forward)
-        mapping_w = imc.map_key(ia_move, _get_key("W"))
-        if swizzle_cls and mapping_w:
-            _add_modifier(mapping_w, swizzle_cls)
-
-        # S -> IA_Move: Swizzle (YXZ) + Negate (backward)
-        mapping_s = imc.map_key(ia_move, _get_key("S"))
-        if swizzle_cls and mapping_s:
-            _add_modifier(mapping_s, swizzle_cls)
-        if negate_cls and mapping_s:
-            _add_modifier(mapping_s, negate_cls)
-
-        # D -> IA_Move: no modifiers (X-axis positive = right)
-        imc.map_key(ia_move, _get_key("D"))
-
-        # A -> IA_Move: Negate (X-axis negative = left)
-        mapping_a = imc.map_key(ia_move, _get_key("A"))
-        if negate_cls and mapping_a:
-            _add_modifier(mapping_a, negate_cls)
-
-    if ia_look:
-        # Mouse 2D -> IA_Look
-        for mouse_key_name in ("Mouse2D", "MouseXY", "Mouse XY 2D-Axis"):
-            try:
-                imc.map_key(ia_look, _get_key(mouse_key_name))
-                break
-            except Exception:
-                continue
-        else:
-            _log("Could not map Mouse2D to IA_Look; bind mouse in Editor.")
-
+    _add_default_mappings(imc, ia_move, ia_look)
+    _add_four_directional_mappings(imc, ia_forward, ia_back, ia_left, ia_right)
     unreal.EditorAssetLibrary.save_loaded_asset(imc)
     _log("Created " + asset_path + " with WASD + Mouse bindings")
     return imc
@@ -176,9 +247,13 @@ def main():
     _log("Creating Enhanced Input assets...")
     ia_move = _create_input_action(IA_MOVE_NAME, "Axis2D")
     ia_look = _create_input_action(IA_LOOK_NAME, "Axis2D")
-    imc = _create_mapping_context(IMC_NAME, ia_move, ia_look)
+    ia_forward = _create_input_action(IA_MOVE_FORWARD_NAME, "Boolean")
+    ia_back = _create_input_action(IA_MOVE_BACK_NAME, "Boolean")
+    ia_left = _create_input_action(IA_STRAFE_LEFT_NAME, "Boolean")
+    ia_right = _create_input_action(IA_STRAFE_RIGHT_NAME, "Boolean")
+    imc = _create_mapping_context(IMC_NAME, ia_move, ia_look, ia_forward, ia_back, ia_left, ia_right)
     if ia_move and ia_look and imc:
-        _log("Done. IA_Move, IA_Look, IMC_Default created at " + INPUT_PATH)
+        _log("Done. IA_Move, IA_Look, IMC_Default + IA_MoveForward/Back/StrafeLeft/Right at " + INPUT_PATH)
     else:
         _log("Some assets could not be created; check log above and finish in Editor.")
     return ia_move, ia_look, imc

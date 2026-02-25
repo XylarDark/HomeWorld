@@ -11,7 +11,7 @@
  * Set this as the parent class of ABP_HomeWorldCharacter so the AnimGraph can
  * read Speed/IsInAir directly without any EventGraph wiring.
  */
-UCLASS()
+UCLASS(Blueprintable)
 class HOMEWORLD_API UHomeWorldAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
