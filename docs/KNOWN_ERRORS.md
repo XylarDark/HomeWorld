@@ -15,6 +15,22 @@ For each entry use:
 
 ## Entries
 
+### Duplicated level: World Partition shows None and is not editable
+- **Error:** After duplicating Main to create the Homestead map (or any level), **World Settings → World Partition** shows **None** and the field cannot be edited (grayed out or read-only).
+- **Cause:** Duplicated levels do not get a World Partition asset assigned; the level is still a non–World Partition level until it is explicitly converted.
+- **Fix:** With the duplicated level (e.g. Homestead) open, use **Tools → Convert Level** from the main menu. This converts the current level to World Partition and assigns the asset. After conversion, World Settings will show the World Partition asset and streaming will be enabled. Save the level.
+- **Context:** 2026-02, Homestead map creation; applies to any level duplicated from another. See [HOMESTEAD_MAP.md](HOMESTEAD_MAP.md), [SETUP.md](SETUP.md).
+
+### World Partition conversion creates a second map (Homestead_WP)
+- **What happens:** After **Tools → Convert Level**, the Editor has two level assets: the original (e.g. **Homestead**) and the converted one (e.g. **Homestead_WP**). The converted one has World Partition and streaming; the original does not.
+- **Which to use:** Use **Homestead_WP** (the one with World Partition). Do all homestead layout, PCG, and placeholders in that map.
+- **To keep only one:** Delete the old **Homestead** in Content Browser, then rename **Homestead_WP** to **Homestead** so config/scripts that reference `/Game/HomeWorld/Maps/Homestead` still work. See [HOMESTEAD_MAP.md](HOMESTEAD_MAP.md) (“Why two maps”).
+
+### Homestead: no ground visible after World Partition conversion
+- **Error:** Placeholders and PCG trees are visible but there is no landscape/ground; everything appears to float.
+- **Cause:** After **Tools → Convert Level**, the Landscape is in a World Partition **streaming cell**. Only cells that are loaded appear in the Editor; if the cell containing the Landscape is not loaded, the ground is not visible.
+- **Fix:** **Window → World Partition** → use **Load All** (or **Load All Streamed Levels** / **Load All Cells**) so all cells load and the Landscape appears. Alternatively, load only the region around the origin (where the homestead is). If no Landscape actor exists in the Outliner at all, add one via **Mode → Landscape → Create New**. See [HOMESTEAD_MAP.md](HOMESTEAD_MAP.md) (“No ground visible”).
+
 ### UnrealMCP plugin: ANY_PACKAGE removed in UE 5.7
 - **Error:** `error C2065: 'ANY_PACKAGE': undeclared identifier` in UnrealMCPBlueprintCommands.cpp and UnrealMCPBlueprintNodeCommands.cpp (9 occurrences).
 - **Cause:** `ANY_PACKAGE` macro was deprecated in UE 5.1 and fully removed in UE 5.7. The unreal-mcp plugin (chongdashu/unreal-mcp) targets UE 5.5.
@@ -158,6 +174,12 @@ For each entry use:
 - **Cause:** In UE 5.7 the **Static Mesh Spawner** node has **no align-to-surface or orient-to-normal option** in Details. Rotation may come from the Surface Sampler (point normals).
 - **Fix:** Rely on **Transform Points** (Absolute Rotation, yaw-only) to overwrite point rotation. If trees still lie down, the Surface Sampler may be setting point rotation before Transform Points; ensure Transform Points is in the chain and Absolute Rotation is enabled. See **docs/PCG_SETUP.md** (trees lying down).
 - **Context:** 2026-02, PCG forest; do not suggest "turn off align on spawner" — the option does not exist.
+
+### PCG: trees tilted or meshes poking out of the bottom of the landscape
+- **Error:** (1) Trees/rocks not all upright (some tilted). (2) Trees/rocks appear to spawn out of the bottom of the landscape.
+- **Cause:** (1) **Tilted:** Transform Points rotation or Absolute Rotation not applied in the graph, or spawner re-applying surface normal rotation. (2) **Out of bottom:** Mesh pivot (base vs center) does not match **transform_offset_z** in config (negative offset with base-pivot pushes mesh into ground; wrong offset for center-pivot causes clipping).
+- **Fix:** (1) **Tilted:** In ForestIsland_PCG, ensure **Transform Points** runs after Surface Sampler with **Absolute Rotation** checked and **Yaw only** (Pitch = 0, Roll = 0). Disable any “Align to Normal” on the Static Mesh Spawner if present. Re-run the script that places the PCG volume so config is re-applied. (2) **Out of bottom:** Check mesh pivot in Static Mesh editor; set **transform_offset_z** in `pcg_forest_config.json`: **0** for base-pivot meshes, **negative** (e.g. -250 for ~5 m height) for center-pivot. Re-run the PCG script so the graph is updated from config. See **docs/PCG_SETUP.md** (Debug: trees tilted or meshes out of the bottom).
+- **Context:** 2026-02, PCG forest/Homestead.
 
 ### PCG: script does not create graph or assign graph; manual steps required
 - **Error:** N/A (policy). Running create_demo_map.py or setup_level with run_pcg=True does not result in trees/rocks.

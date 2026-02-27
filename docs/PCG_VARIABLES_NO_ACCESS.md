@@ -44,6 +44,12 @@ Settings that are **necessary** for PCG to work (per tutorials and docs) but **n
 
 - **Out, Surface, Bounding Shape, Execution Dependency:** Required for correct edges when building the graph. Pin labels can vary by engine version (e.g. "Out" vs "Output"); automation must introspect at runtime. **Source:** docs/KNOWN_ERRORS.md (pin name errors, Execution Dependency label).
 
+### Homestead map
+
+- **Same no-access items** as above apply when running PCG on the Homestead map (`/Game/HomeWorld/Maps/Homestead`). Script `Content/Python/create_homestead_pcg.py` places/sizes the PCG Volume and tags the Landscape; it cannot set Get Landscape Data, graph assignment, or mesh list.
+- **Compound exclusion:** `homestead_map_config.json` defines `exclusion_zones` (compound bounds). To keep trees out of the compound, either duplicate **ForestIsland_PCG** to **Homestead_PCG**, add or configure a **Difference** node with a **Points from Bounds** (or similar) source using those bounds, or set the exclusion box in the graph to match the config. See [docs/HOMESTEAD_MAP.md](HOMESTEAD_MAP.md).
+- **Trees tilted or meshes out of bottom:** Check Transform Points (Absolute Rotation, Yaw only) and **transform_offset_z** in `pcg_forest_config.json` vs mesh pivot. See [docs/KNOWN_ERRORS.md](KNOWN_ERRORS.md) (PCG: trees tilted or meshes poking out of the bottom) and [docs/PCG_SETUP.md](PCG_SETUP.md) (Debug: trees tilted or meshes out of the bottom).
+
 ---
 
 ## References

@@ -1,0 +1,37 @@
+{
+  "homestead_level_path": "/Game/HomeWorld/Maps/Homestead",
+  "source_level_path": "/Game/HomeWorld/Maps/Main",
+  "volume_center_x": 0,
+  "volume_center_y": 0,
+  "volume_center_z": 0,
+  "volume_extent_x": 5000,
+  "volume_extent_y": 5000,
+  "volume_extent_z": 500,
+  "volume_extent_z_padding": 10000,
+  "exclusion_zones": [
+    {
+      "center_x": 0,
+      "center_y": 0,
+      "center_z": 0,
+      "extent_x": 1500,
+      "extent_y": 1500,
+      "extent_z": 500
+    }
+  ],
+  "skip_exclusion_zones": false,
+  "_comment_homestead": "Homestead-focused map for tutorial home, compound, surrounding zones.",
+  "_comment_source": "Duplicate this level to create Homestead if missing (ensure_homestead_map.py).",
+  "_comment_volume": "PCG volume center and half-extents in cm. Compound exclusion so trees do not spawn inside walls. PCG transform_offset_z is in pcg_forest_config.json (shared graph).",
+  "_comment_exclusion_zones": "Compound bounds (center + half-extents in cm). Default 30m x 30m box at origin.",
+  "placeholder_actors": [
+    {"label": "House", "x": 0, "y": 0, "z": 0, "scale": 2},
+    {"label": "StoneMill", "x": 400, "y": 0, "z": 0, "scale": 1},
+    {"label": "LumberMill", "x": -400, "y": 0, "z": 0, "scale": 1},
+    {"label": "WaterMill", "x": 0, "y": 400, "z": 0, "scale": 1},
+    {"label": "Well", "x": 300, "y": 300, "z": 0, "scale": 0.5},
+    {"label": "Loom", "x": -300, "y": 300, "z": 0, "scale": 0.5},
+    {"label": "Forge", "x": 300, "y": -300, "z": 0, "scale": 1},
+    {"label": "GarbagePortal", "x": -300, "y": -300, "z": 0, "scale": 0.8}
+  ],
+  "_comment_placeholder_actors": "Optional. Run place_homestead_placeholders.py with Homestead open to spawn Cube placeholders at these positions (cm). label = actor label; scale = uniform scale."
+}

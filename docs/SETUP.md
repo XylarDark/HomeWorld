@@ -44,6 +44,8 @@ All required plugins are enabled in `HomeWorld.uproject`. No Marketplace install
 
 **Python/PCG scripts:** For the demo map and PCG forest scripts, **PythonScriptPlugin** and **PCGPythonInterop** must also be enabled. Restart the Editor after first enable.
 
+**Milady Character Import pipeline (optional):** For the Milady chibi protagonist pipeline (wallet connect → NFT verification → IPFS PNG → Meshy 2D→3D → VRM import → retarget), install and enable: **VRM4U** (GitHub: ruyo/VRM4U), **Meshy-for-Unreal** (Meshy.ai), and a Web3/Wallet plugin (e.g. Web3.UE or MetaMask Embedded Wallets SDK). Add them to `HomeWorld.uproject` after installation. One-time setup (API keys, plugin order, known issues) is documented in [MILADY_IMPORT_SETUP.md](MILADY_IMPORT_SETUP.md). Content paths: `/Game/HomeWorld/Milady/` per [CONTENT_LAYOUT.md](CONTENT_LAYOUT.md). See [MILADY_IMPORT_ROADMAP.md](tasks/MILADY_IMPORT_ROADMAP.md) for the full task roadmap.
+
 ---
 
 ## Git and LFS

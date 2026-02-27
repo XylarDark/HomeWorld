@@ -2,6 +2,8 @@
 
 Single place for the home team to track phases, owners, and approval gates. This distills the GDD into what happens when, who touches what, and how it ties to the 7 pillars and 8–12 hour campaign.
 
+**Campaign & moral vision:** For the full narrative (homestead → family taken → 7 sin-themed levels → villain → day/night homestead → final boss & succession), death/succession rules, and the Seven Sins vs Virtues system (-1/0/+1), see [docs/CAMPAIGN_VISION.md](docs/CAMPAIGN_VISION.md).
+
 ---
 
 ## GDD Snapshot (Chopped)

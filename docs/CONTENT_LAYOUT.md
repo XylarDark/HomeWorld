@@ -10,7 +10,7 @@ All project-specific assets live under `/Game/HomeWorld/`.
 
 | Path | Purpose |
 |------|--------|
-| `/Game/HomeWorld/Maps/` | Levels (e.g. Main). Primary map is Main. |
+| `/Game/HomeWorld/Maps/` | Levels (e.g. Main, Homestead). **Main** is primary demo/overworld; **Homestead** is the homestead-focused map (tutorial home, compound, surrounding zones). See [HOMESTEAD_MAP.md](HOMESTEAD_MAP.md). |
 | `/Game/HomeWorld/Characters/` | Character Blueprints, Animation Blueprints (e.g. BP_HomeWorldCharacter, ABP_HomeWorldCharacter). |
 | `/Game/HomeWorld/GameMode/` | GameMode Blueprints (e.g. BP_GameMode). |
 | `/Game/HomeWorld/PCG/` | PCG graphs and related assets (e.g. ForestIsland_PCG). |
@@ -19,6 +19,8 @@ All project-specific assets live under `/Game/HomeWorld/`.
 | `/Game/HomeWorld/ZoneGraph/` | ZoneGraph data / lanes for home/forest (optional; may live under Maps). |
 | `/Game/HomeWorld/SmartObjects/` | Smart Object definitions (e.g. Harvestable, Bed). |
 | `/Game/HomeWorld/Building/` | Build order Blueprints (BP_BuildOrder_Wall, etc.), building-related assets. Smart Object definitions for building (e.g. SO_WallBuilder) can live here or under SmartObjects. |
+| `/Game/HomeWorld/Milady/` | Milady character import pipeline: imported VRM/GLB meshes (Meshes, Generated), materials (Materials), retargeted animations (Animations), Blueprints (e.g. BP_MiladyCharacter). See [MILADY_IMPORT_ROADMAP.md](tasks/MILADY_IMPORT_ROADMAP.md). |
+| `/Game/HomeWorld/Homestead/` | Homestead map assets: Structures, Placeholders (central house, outbuildings, walls). See [HOMESTEAD_MAP.md](HOMESTEAD_MAP.md). PCG graphs for Homestead can live here or under `/Game/HomeWorld/PCG/`. |
 
 Other subfolders under `/Game/HomeWorld/` (e.g. Blueprints, UI, Materials) may be added as the project grows. New project content should go under `/Game/HomeWorld/` or a documented subfolder.
 

@@ -233,3 +233,30 @@ Agent session summaries for cross-session context persistence.
 **Tasks completed:** Implemented PCG Variables With No (or Unreliable) Automation Access plan. (1) Created docs/PCG_VARIABLES_NO_ACCESS.md with summary table (Get Landscape Data actor/component selector, PCG Volume graph, Static Mesh Spawner mesh entries, Surface Sampler exposed in 5.7, wiring pin labels), per-node details, and references. (2) Added Content/Python/pcg_settings_introspect.py (Editor-only; writes Saved/pcg_settings_introspect_5.7.txt). (3) Cross-linked: PCG_SETUP.md references PCG_VARIABLES_NO_ACCESS.md; KNOWN_ERRORS PCG entries reference PCG_VARIABLES_NO_ACCESS.md. (4) Encoded "variables no access" as standard procedure: new .cursor/rules/automation-standards.mdc (four-step procedure + PCG example); AGENTS.md Setup and validation updated with automation-standards.mdc and procedure sentence; docs/CONVENTIONS.md MCP-first section updated with procedure and link to PCG_VARIABLES_NO_ACCESS.md.
 
 **Key decisions:** Checking and documenting required-but-inaccessible variables is now standard whenever we add automation for Editor/engine features; re-check on engine/API upgrades.
+
+---
+
+## 2026-02-26 ? Milady Character Import Pipeline roadmap implementation
+
+**Tasks completed:** Implemented Milady Character Import Pipeline roadmap as specified in the plan. (1) Created docs/tasks/MILADY_IMPORT_ROADMAP.md with full 7-phase roadmap (Plugin setup, Wallet/NFT, IPFS PNG, Meshy 2D?3D, VRM4U import/rigging, Animation retargeting, Player integration), task tables (Programmatic/Manual, dependencies, effort, perf notes), milestones, and references. (2) Updated CONTENT_LAYOUT.md with /Game/HomeWorld/Milady/ path and purpose. (3) Updated SETUP.md with Milady pipeline plugins subsection (VRM4U, Meshy-for-Unreal, Web3/Wallet) and link to MILADY_IMPORT_SETUP.md. (4) Created docs/MILADY_IMPORT_SETUP.md with one-time setup: plugin install order, API keys, content paths, ensure_milady_folders.py usage, known issues, Remilia Collective contract reference. (5) Created Content/Python/ensure_milady_folders.py (idempotent; creates Milady/Meshes, Materials, Animations, Blueprints). (6) Added Task 7 to TASKLIST.md: Milady Character Import pipeline linking to MILADY_IMPORT_ROADMAP.md and MILADY_IMPORT_SETUP.md.
+
+**Key decisions:** Roadmap is copy-paste ready for execution; Phase 1 programmatic deliverables (docs + script) done; plugin installs and Phases 2?7 remain for team/next sessions.
+
+---
+
+## 2026-02-26 ? Milady import: programmatic implementation and manual steps list
+
+**Tasks completed:** (1) C++: UHomeWorldWalletSubsystem (connected address), UHomeWorldNFTSubsystem (LoadMiladyConfig, FetchMetadataFromURL, DownloadMiladyPNG, IPFS gateway, VerifyMiladyOwnership stub), UHomeWorldMiladyImportSubsystem (ImportMiladyFromMetadataURL: metadata then PNG; Meshy/VRM4U stubbed), FMiladyTokenMetadata (MiladyTypes.h), UHomeWorldChibiAnimInstance (BouncePhase, BounceScale, BounceOffset). (2) HomeWorld.Build.cs: HTTP, Json, JsonUtilities. (3) Config/DefaultGame.ini: [Milady] RemiliaContractAddress, EthereumRPCURL, IPFSGateway. (4) Python: create_milady_pastel_material.py (M_MiladyPastel). (5) MILADY_IMPORT_ROADMAP.md: added "Programmatic work completed" and "Manual steps required" (checklist for all phases). (6) TASKLIST.md: Task 7 status In progress, note pointing to manual steps.
+
+**Key decisions:** ImportMiladyByTokenId stays stub until Web3 provides tokenURI; use ImportMiladyFromMetadataURL with known metadata URL for testing. Build failed with Live Coding active (Editor open); close Editor and run Build-HomeWorld.bat to compile.
+
+---
+
+## 2026-02-26 PCG debug: spawning below landscape and trees not upright
+
+**Tasks completed:**
+- Implemented PCG debug plan: (1) Set **transform_offset_z** to **0** in `pcg_forest_config.json` (base-pivot default); updated comment to point to PCG_SETUP. (2) Added **update_forest_island_graph_from_config(graph_asset)** in `create_pcg_forest.py` to re-apply offset and yaw-only rotation to all Transform Points nodes from config; called from **place_pcg_volume** when a graph is assigned so re-running Homestead or demo PCG script applies config without recreating the graph. (3) Comment in homestead_map_config: PCG transform_offset_z is in pcg_forest_config (shared graph). (4) Inline comment in create_pcg_forest.py for transform_offset_z (0 = base-pivot; negative = center-pivot). (5) **PCG_SETUP.md:** Reworded “Poking out the bottom” to clarify spawn Z is from transform_offset_z and pivot; added **Debug** subsection (mesh pivot, transform_offset_z 0 vs negative, rotation verification steps, volume_extent_z_padding note). (6) **KNOWN_ERRORS.md:** New entry “PCG: trees tilted or meshes poking out of the bottom of the landscape” with cause and fix. (7) **PCG_VARIABLES_NO_ACCESS.md:** Bullet linking to KNOWN_ERRORS and PCG_SETUP for trees tilted / meshes out of bottom.
+
+**Key decisions:**
+- Default offset 0 favors base-pivot meshes (Stylized Provencal); if trees float, set negative in config and re-run script.
+- Graph is updated from config on every place_pcg_volume with a graph so no need to delete ForestIsland_PCG to pick up config changes.

@@ -77,7 +77,13 @@ If you prefer to build the graph from zero in the Editor, see **[docs/tasks/PCG_
 **Trees at weird angles or poking out of the volume:**
 
 - **Weird angles / trees lying down:** The graph’s **Transform Points** node is set to **Yaw only** (0–359°); pitch and roll are 0 so trees stay upright. In UE 5.7 the **Static Mesh Spawner** has **no align-to-surface option** in Details. If trees still lie down, the rotation may be coming from the **Surface Sampler** (points inherit surface normals). Try in the graph: ensure **Transform Points** runs after the Surface Sampler and that its **Absolute Rotation** is checked so it overwrites point rotation. Tree meshes should have their pivot at the base.
-- **Poking out the bottom:** When the script uses landscape bounds, the script adds **volume_extent_z_padding** (default **10000 cm = 100 m** in `demo_map_config.json`) to the volume’s Z half-extent so the box extends further down and tree/rock meshes don’t spawn out the bottom. If they still do, increase `volume_extent_z_padding` (e.g. 15000 or 20000) or ensure mesh pivots are at the base.
+- **Poking out the bottom:** Spawn Z is controlled by **transform_offset_z** in `pcg_forest_config.json` and mesh pivot, not by volume size. **volume_extent_z_padding** only enlarges the PCG Volume’s Z extent (bounds for sampling); it does not move spawn points. If meshes poke out the bottom, fix pivot and offset (see Debug below).
+
+**Debug: trees tilted or meshes out of the bottom**
+
+- **Mesh pivot:** In the Static Mesh editor, check whether tree/rock pivots are at the **base** or **center**. If pivot is at base, use **transform_offset_z: 0** in `Content/Python/pcg_forest_config.json`. If pivot is at center, use a negative value (e.g. **-250** for ~5 m height, **-400** to **-500** for taller trees). Re-run the PCG script (e.g. `create_homestead_pcg.py` or the script that places the volume) so the graph is updated from config, then Generate again.
+- **Rotation (trees not upright):** Open **ForestIsland_PCG** in the PCG Graph editor. Confirm **Transform Points** is after Surface Sampler and before Static Mesh Spawner. Select each Transform Points node → Details: **Rotation** min/max should be **Yaw only** (e.g. 0–359°), **Pitch = 0**, **Roll = 0**; **Absolute Rotation** = true. In the Static Mesh Spawner, ensure there is no “Align to Normal” (or similar) that would re-apply surface rotation; rely on Transform Points for rotation. Re-running the script that places the volume will re-apply rotation/offset from `pcg_forest_config.json`.
+- **volume_extent_z_padding:** Only affects the volume’s vertical bounds; it does not change spawn height. Keep it (e.g. 10000) so the volume fully contains the landscape.
 
 **If Generate still does nothing (Details → Generate is correct):**
 

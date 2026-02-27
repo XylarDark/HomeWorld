@@ -352,6 +352,7 @@ def create_pcg_graph(exclusion_zones=None):
     transform_settings.set_editor_property("uniform_scale", True)
     transform_settings.set_editor_property("absolute_scale", True)
     transform_settings.set_editor_property("seed", 12345)
+    # 0 = base-pivot meshes; negative = center-pivot (e.g. -250 for ~5 m height). See docs/PCG_SETUP.md.
     offset_z = config.get("transform_offset_z", -250.0)
     # #region agent log
     _debug_log("H5", "Transform offset config", {"offset_z": float(offset_z)})
@@ -603,6 +604,41 @@ def _find_existing_pcg_volume(world):
     return None
 
 
+def update_forest_island_graph_from_config(graph_asset):
+    """Re-apply transform_offset_z and rotation (yaw-only, absolute) to all Transform Points nodes in the graph.
+    Call when graph already exists so config changes in pcg_forest_config.json take effect without recreating the graph."""
+    if not graph_asset:
+        return
+    config = _load_config()
+    offset_z = float(config.get("transform_offset_z", -250.0))
+    rot_min = unreal.Rotator(0.0, 0.0, 0.0)
+    rot_max = unreal.Rotator(359.0, 0.0, 0.0)
+    transform_cls = getattr(unreal, "PCGTransformPointsSettings", None)
+    if not transform_cls:
+        return
+    try:
+        nodes = getattr(graph_asset, "nodes", None) or []
+    except Exception:
+        nodes = []
+    updated = 0
+    for node in nodes:
+        try:
+            settings = node.get_settings() if hasattr(node, "get_settings") else None
+            if settings is None or not isinstance(settings, transform_cls):
+                continue
+            settings.set_editor_property("offset_min", unreal.Vector(0.0, 0.0, offset_z))
+            settings.set_editor_property("offset_max", unreal.Vector(0.0, 0.0, offset_z))
+            settings.set_editor_property("b_absolute_offset", False)
+            settings.set_editor_property("rotation_min", rot_min)
+            settings.set_editor_property("rotation_max", rot_max)
+            settings.set_editor_property("absolute_rotation", True)
+            updated += 1
+        except Exception as e:
+            _log("update_forest_island_graph: skip node: %s" % e)
+    if updated:
+        _log("Updated %d Transform Points node(s) from config (offset_z=%.0f, yaw-only rotation)." % (updated, offset_z))
+
+
 def place_pcg_volume(location=None, extent=None, graph_asset=None):
     """Place a PCG Volume in the current level (or reuse existing), size it to extent, save level.
     If graph_asset is provided, tries to assign it to the volume, set Get Landscape Data tag, and trigger Generate.
@@ -660,6 +696,7 @@ def place_pcg_volume(location=None, extent=None, graph_asset=None):
     editor_subsystem.save_current_level()
     if graph_asset:
         _log("Attempting to assign graph and trigger Generate...")
+        update_forest_island_graph_from_config(graph_asset)
         try_assign_graph_to_volume(graph_asset)
         try_set_get_landscape_selector(graph_asset)
         trigger_pcg_generate()

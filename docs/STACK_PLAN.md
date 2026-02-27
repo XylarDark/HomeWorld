@@ -60,6 +60,7 @@ flowchart TB
 - **Core:** UE PCG (Procedural Content Generation) – already enabled in project.
 - **Recommended:** PCG for biomes (forest first, then sand/crystal); portals or sublevels for “realm-hop.” Optional: PCGEx or Biome Core (free) for more complex graphs.
 - **Phase:** Week 1 – forest biome; Weeks 3–4 – second biome. Load on-demand via World Partition/streaming.
+- **Planetoid generation:** The 7 sin-themed levels are designed as distinct planetoids with per-level biomes and PCG; philosophy (Astroneer-inspired, non-deformable) is in [PLANETOID_DESIGN.md](PLANETOID_DESIGN.md).
 
 ---
 

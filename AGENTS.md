@@ -1,6 +1,6 @@
 # HomeWorld – Agent context
 
-**Project:** HomeWorld — Unreal Engine 5.7 game (Open World / World Partition). Targets UE 5.7 (compatible with 5.7.x, including 5.7.3). Theme: "Love as Epic Quest"; Act 1 focus is lone wanderer (explore → fight → build). See [docs/PROTOTYPE_VISION.md](docs/PROTOTYPE_VISION.md) and [docs/STACK_PLAN.md](docs/STACK_PLAN.md) for vision and stack. **Lock:** Engine 5.7 only; platform PC + Steam Early Access; do not add engine or platform variants without team decision.
+**Project:** HomeWorld — Unreal Engine 5.7 game (Open World / World Partition). Targets UE 5.7 (compatible with 5.7.x, including 5.7.3). Theme: "Love as Epic Quest"; Act 1 focus is lone wanderer (explore → fight → build). See [docs/PROTOTYPE_VISION.md](docs/PROTOTYPE_VISION.md), [docs/CAMPAIGN_VISION.md](docs/CAMPAIGN_VISION.md) (narrative, 7 sins/virtues, succession), and [docs/STACK_PLAN.md](docs/STACK_PLAN.md) for vision and stack. **Lock:** Engine 5.7 only; platform PC + Steam Early Access; do not add engine or platform variants without team decision.
 
 **Programmatic by default:** As much work as possible is done in C++. New gameplay systems, movement, input, and core logic go in C++; Blueprint is for content, level design, and designer overrides. See [docs/CONVENTIONS.md](docs/CONVENTIONS.md) for the code-first checklist and C++ vs Blueprint split.
 
