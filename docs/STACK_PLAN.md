@@ -116,6 +116,20 @@ flowchart TB
 - **Recommended:** FAB for character(s) (e.g. survival char); Quixel for biomes/vegetation; UE Marketplace / Quixel for stylized fantasy where needed. Pipeline: import → Blueprint/PCG; no custom engine.
 - **Phase:** Week 1 – FAB + Quixel for forest; expand in later phases.
 
+### Free assets for prototype
+
+Recommended free packs for the 30-day demonstrable prototype. Document which packs you use (forest / homestead / family) so the team and automation stay aligned.
+
+| Pack | Use | Notes / link |
+|------|-----|--------------|
+| **Epic FAB** | Characters | **Windows > Fab** in Editor; filter "Free." Paragon/Infinity Blade, MetaHumans. New free items every two weeks. [Fab free content](https://www.unrealengine.com/en-US/fabfreecontent) |
+| **Quixel Megascans (Bridge)** | Forest, terrain, vegetation | Edit > Plugins > Bridge. Nanite/Lumen-ready. Confirm UE access in Bridge (free-for-all ended Dec 2024). |
+| **POLYGON Adventure Pack** | Environment + characters | 265 assets (trees, buildings, rocks, ground); 5 characters, Mannequin rig. Low-poly fantasy; UE 5.1–5.4. |
+| **Medieval Village Megapack** | Homestead, village | 550+ medieval assets, modular buildings, props; Nanite/Lumen; UE 5.4. |
+| **Primitive Characters Pack** | Family (Protector, Healer, Child) | 5 rigged family-style (man, woman, child, grandparents), weapons; UE4/5. |
+
+**Suggested use:** Days 1–5 = existing or Quixel for forest; Days 6–10 = one environment pack for homestead compound; Days 11–15 = Primitive or Polygon for family roles. See [workflow/VISION.md](workflow/VISION.md) (Demonstrable prototype) and [workflow/PROTOTYPE_SCOPE.md](workflow/PROTOTYPE_SCOPE.md) when locking the "beautiful corner."
+
 ---
 
 ## Phase–Tech Map
@@ -139,9 +153,9 @@ flowchart TB
 
 ## References
 
-- [PROTOTYPE_VISION.md](PROTOTYPE_VISION.md) – theme, Act 1 focus, Week 1 playtest goal
-- [../ROADMAP.md](../ROADMAP.md) – phases, pillars, campaign
-- [TASKLIST.md](TASKLIST.md) – Current task list (links to task docs in docs/tasks/)
+- [workflow/VISION.md](workflow/VISION.md) – theme, campaign, Act 1 focus, Week 1 playtest goal
+- [workflow/README.md](workflow/README.md) – workflow index, task status, 30-day schedule
+- [workflow/30_DAY_SCHEDULE.md](workflow/30_DAY_SCHEDULE.md) – day-by-day schedule (links to task docs in docs/tasks/)
 - [SETUP.md](SETUP.md) – developer setup checklist
 - [CONTENT_LAYOUT.md](CONTENT_LAYOUT.md) – content paths contract
 

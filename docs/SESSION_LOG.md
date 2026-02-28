@@ -260,3 +260,137 @@ Agent session summaries for cross-session context persistence.
 **Key decisions:**
 - Default offset 0 favors base-pivot meshes (Stylized Provencal); if trees float, set negative in config and re-run script.
 - Graph is updated from config on every place_pcg_volume with a graph so no need to delete ForestIsland_PCG to pick up config changes.
+
+---
+
+## 2026-02-27 Parallel plugin: policy-driven, self-aware tool suggestions
+
+**Tasks completed:**
+- Added `.cursor/rules/11-parallel-plugin.mdc`: policy to recommend user run Parallel commands (don't do the work); tool-awareness table for when to suggest `/parallel-search`, `/parallel-extract`, `/parallel-research`, `/parallel-enrich`; citations and status/result commands.
+- Updated AGENTS.md with one-line Parallel plugin mention (agent recommends commands, user pastes, agent interprets).
+- Updated docs/SETUP.md: optional `/parallel-setup` under Cursor rules list.
+- Updated `.cursor/rules/05-error-handling.mdc`: when investigating errors/API changes needing external info, recommend `/parallel-search` or `/parallel-extract`, then record in KNOWN_ERRORS with source/citation.
+
+**Key decisions:**
+- No PARALLEL_PLUGIN_USAGE.md; rule is single source of truth so environment is self-aware without a doc.
+- Recommend-don't-do is default: agent suggests the command, user runs and pastes, agent interprets and integrates.
+
+---
+
+## 2026-02-27 Compound Engineering Plugin Integration
+
+**Tasks completed:**
+- Implemented Compound Engineering integration plan. (1) Created `.cursor/rules/10-compound-engineering.mdc`: policy rule with `alwaysApply: true`, situation-to-command mapping (brainstorm → `/workflowsbrainstorm`, plan → `/workflowsplan`, review → `/workflowsreview`, execute plan → `/workflowswork`, changelog → `/changelog`, document solution → `/workflowscompound`, deepen plan → `/deepen-plan`, autonomous → `/lfg`/`/slfg`, library docs → context7 MCP, first-time → `/setup`), exception when user asks for work in-chat, self-contained (no doc link). (2) Updated AGENTS.md: added Compound Engineering subsection stating recommending plugin commands is policy, mapping in rule, context7 for docs, optional `/setup`. (3) Updated docs/SETUP.md: optional step to run `/setup` in Cursor once for Compound Engineering, with pointer to rule. (4) Updated docs/CURSOR_DEV.md: one sentence that plugin recommendation is policy and link to rule.
+
+**Key decisions:**
+- Rule is single source of truth; no separate COMPOUND_ENGINEERING.md. Agent suggests plugin commands when use case fits instead of doing that workflow inline.
+
+---
+
+## 2026-02-27 30-Day Schedule and Doc Consolidation
+
+**Tasks completed:**
+- Created `docs/workflow/`: README.md (entry point, Pre–Day 1 checklist, task status table), VISION.md (consolidated prototype + campaign, moral system, tech summary, scope lock), 30_DAY_SCHEDULE.md (Day 1–30 with checkboxes; Act 1 → Homestead → Family → Planetoid → Spirits → Dungeon → buffer).
+- Removed redundant docs: HOMESTEAD_DAILY_ROADMAP.md, TASKLIST.md, ROADMAP.md (root), PROTOTYPE_VISION.md, CAMPAIGN_VISION.md, HOMESTEAD_PLANETOID_ROADMAP.md, TEAM_APPROVAL_CHECKLIST.md. Content merged into workflow/VISION and 30_DAY_SCHEDULE.
+- Updated references: AGENTS.md, README.md, CONTRIBUTING.md, STACK_PLAN.md, PLANETOID_DESIGN.md, HOMESTEAD_MAP.md, SETUP.md, MILADY_IMPORT_ROADMAP.md, .github ISSUE_TEMPLATE and PULL_REQUEST_TEMPLATE to point to docs/workflow/.
+
+**Key decisions:**
+- Single workflow folder is source of truth for vision and daily schedule. Operational docs (SETUP, KNOWN_ERRORS, PCG_SETUP, CONVENTIONS, CONTENT_LAYOUT, MCP_SETUP) and task how-to guides in docs/tasks/ remain; schedule references them by day.
+
+---
+
+## 2026-02-26 PCG debug: volume Z and spawn position
+
+**Tasks completed:**
+- Reduced **volume_extent_z_padding** from 10000 to 1000 cm in `homestead_map_config.json` and in `create_homestead_pcg.py` defaults so the PCG volume fits tighter around the landscape and does not extend far below the map (quick fix for "volume underneath the map").
+- Updated **PCG_SETUP.md**: volume_extent_z_padding default 1000 cm; increase only if sampling fails at terrain edges.
+- Added **HOMESTEAD_MAP.md** checklist for "trees/rocks out of bottom or not upright": re-run `create_homestead_pcg.py`, use transform_offset_z 0 for base-pivot meshes, re-run to resize volume with new padding.
+
+**Remaining (already in place):** transform_offset_z is 0 in pcg_forest_config.json; `place_pcg_volume` calls `update_forest_island_graph_from_config` so re-running the Homestead PCG script re-applies offset and yaw-only rotation. Day 1 manual steps and verification (PCG manual steps, verify trees/rocks on landscape) still required.
+
+---
+
+## 2026-02-26 UE 5.7 tech upgrade (agentic-style pass)
+
+**Tasks completed:**
+- Created **docs/UE57_TECH.md**: single entry point for UE 5.7 tech (when to use, key links, canonical examples, audit result, plugin/5.7 status, upgrade path, plan-first for UE work). Audit: game C++ and Content/Python checked; no deprecated API usage in repo.
+- Updated **AGENTS.md**: UE 5.7 API/plugin work reminder (check unreal-cpp.mdc and KNOWN_ERRORS first); added ue57-api-check to project skills list.
+- Updated **07-ai-agent-behavior.mdc**: added "UE 5.7 check" to AI Agent Checklist (before C++/Blueprint/PCG/plugin changes check pitfalls and KNOWN_ERRORS; after upgrade re-verify automation).
+- Updated **Source/HomeWorld/AGENTS.md** and **Content/Python/AGENTS.md**: UE 5.7 lock and pointer to unreal-cpp, KNOWN_ERRORS, UE57_TECH.
+- Added **.cursor/commands/build-and-validate.md**: build steps, log check, optional PIE, reminder to check KNOWN_ERRORS when touching C++/PCG/plugins.
+- Expanded **canonical examples**: README.md (GAS, PCG automation, link to UE57_TECH); unreal-cpp.mdc (GAS: HomeWorldGameplayAbility, HomeWorldAttributeSet); 12-python.mdc (level_loader, create_pcg_forest).
+- Added **.cursor/skills/ue57-api-check/SKILL.md**: when to use (FindObject, FPaths, collision, get_actor_bounds, AnimBP factory, etc.), steps (pitfalls table, KNOWN_ERRORS, replacements, build/test), references.
+
+**Key decisions:**
+- UE 5.7 tech entry point is docs/UE57_TECH.md; no separate plan file edited. All implementation followed the attached UE 5.7 tech upgrade plan.
+
+---
+
+## 2026-02-26 PCG: Generate fix plan + agentic best practices
+
+**Tasks completed:**
+- **Phase 1:** Added "Generate produces nothing (checklist)" to [docs/PCG_SETUP.md](PCG_SETUP.md): ordered 5-step checklist (Get Landscape Data, mesh list, graph on volume, Landscape tag, Load All if WP), Output Log search (LogPCG / "No surfaces found"), Surface Sampler Debug, optional minimal PCG test; Homestead Load All and StylizedProvencal asset verification. Updated [.cursor/skills/pcg-validate/SKILL.md](.cursor/skills/pcg-validate/SKILL.md) with same checklist and diagnosis steps. Added to [AGENTS.md](AGENTS.md) Commands: "PCG Generate nothing" bullet (pcg-validate skill + PCG_SETUP checklist). Added to [.cursor/rules/07-ai-agent-behavior.mdc](.cursor/rules/07-ai-agent-behavior.mdc) AI Agent Checklist: when user reports PCG Generate produces nothing, follow checklist and pcg-validate skill.
+- **Phase 2:** Created [docs/PCG_BEST_PRACTICES.md](PCG_BEST_PRACTICES.md): minimal working graph, mandatory manual steps, when to use Partitioned/Hierarchical generation, reference projects/tutorials. Created [.cursor/rules/pcg-best-practices.mdc](.cursor/rules/pcg-best-practices.mdc): before changing PCG graph or adding nodes, check PCG_BEST_PRACTICES and PCG_VARIABLES_NO_ACCESS. Updated pcg-validate skill with "Minimal working graph" and "Mandatory manual steps" subsections; added Key Files entry in 08-project-context for PCG_BEST_PRACTICES; added PCG graph reminder in AGENTS.md (UE 5.7 / PCG work).
+- **Phase 3:** Added "From decoration to collectible resources" to PCG_BEST_PRACTICES.md (Static Mesh only vs Actor Spawner vs hybrid) and to pcg-validate skill so the agent can recommend the right option when the user wants resources in set locations for collection.
+
+**Key decisions:**
+- All discoveries written to both human docs and agent-facing artifacts (rules, skills, AGENTS.md) per plan agentic-integration table.
+- No code changes to create_pcg_forest.py or create_homestead_from_scratch.py; plan was documentation and agentic best practices only.
+
+---
+
+## 2026-02-26 PCG debug instrumentation cleanup
+
+**Tasks completed:**
+- Removed all `_agent_log` debug instrumentation (and `#region agent log` blocks) from: `create_homestead_from_scratch.py`, `create_pcg_forest.py`, `level_loader.py`, `check_level_bounds.py`, `Content/Python/tests/test_level_loader.py`, `Content/Python/tests/test_level_pie_flow.py`. Dropped unused `json`/`time` imports where they were only used by instrumentation.
+
+**Context:** User had confirmed PCG success (volume fitted to landscape; assets on ground and upright). Per debug workflow, instrumentation was removed after confirmed success.
+
+---
+
+## 2026-02-26 PCG volume and WP best practices (plan implementation)
+
+**Tasks completed:**
+- **Config-first volume:** Simplified [Content/Python/create_homestead_from_scratch.py](Content/Python/create_homestead_from_scratch.py): volume bounds come from config (`volume_center_*`, `volume_extent_*`); optional **one-shot** landscape override when `use_landscape_bounds` is true (no retries, no Phase 1/2 wait, no WP.LoadAll). Removed `time` import.
+- **PCG_SETUP.md:** Rewrote **PCG volume size** section: defined "location" and "volume" as the single PCG Volume center and half-extents; config as source of truth; optional one-shot landscape; added **Partitioned Generation** steps (Is Partitioned on PCG component, Partition Grid Size on PCG World Actor). Updated Fast iteration, "What the script does," "Volume bounds" in If nothing generates, and Homestead bullet in Generate produces nothing.
+- **PCG_BEST_PRACTICES.md:** Added **World Partition: volume and partition grid** subsection (config/fixed region for volume bounds; Partitioned Generation + grid; Get Landscape Data for surface only).
+- **HOMESTEAD_MAP.md:** Updated Content paths, PCG summary, and Scripts table to document config-first volume bounds and set `volume_center_*`/`volume_extent_*` to match playable region; referenced Is Partitioned and PCG World Actor.
+
+**Key decisions:** Per plan: landscape is the right source for **surface** (Get Landscape Data), not for **volume sizing** in script when using World Partition; script no longer depends on landscape bounds being available.
+
+---
+
+## 2026-02-26 PCG re-approach: manual vs programmatic split, programmatic steps done
+
+**Tasks completed:**
+- Created **docs/PCG_TUTORIAL_ALIGNMENT.md**: split the PCG re-approach into **Manual** (user in Editor) and **Programmatic (completed)** sections; manual plan includes follow Epic tutorial, optional reference-project verification, WP Cleanup then Generate, Load All before Generate, and post-script manual steps.
+- **PCG_BEST_PRACTICES.md:** Added **Canonical flow (from Epic)** subsection: minimal Get Landscape Data → Surface, Input → Bounding, Surface Sampler → Spawner → Output; Landscape 1x1 and tag; note that our graph extends this with Density, Transform, Difference, rocks; links to Epic Foundation and PCG Tutorial Series.
+- **PCG_SETUP.md:** Documented **Cleanup then Generate** for World Partition (in Steps only you do, PCG volume size step 3, Fast iteration step 5); added checklist item 6 (if Partition Grid Size or Is Partitioned changed, run Cleanup then Generate); expanded **Minimal PCG test** to canonical-only graph (Input + Get Landscape Data + Surface Sampler + one Spawner, no Density/Transform/Difference) for troubleshooting.
+- **create_pcg_forest.py:** Updated top-of-file comment to state the script builds the canonical tutorial flow plus Density, Transform, optional Difference, rocks; added pointer to PCG_BEST_PRACTICES.
+
+**Key decisions:** All programmatic work done in docs and one script comment; no new automation. User follows the manual plan in PCG_TUTORIAL_ALIGNMENT.md.
+
+---
+
+## 2026-02-26 Scripts and docs: organization and redundancy
+
+**Tasks completed:**
+- **PCG_MANUAL_SETUP.md:** Corrected description — script (create_pcg_forest) does create the graph; doc is for building from scratch in the Editor without the script. Added top note pointing to PCG_SETUP for script-based flow; fixed "After it works" to link to PCG_SETUP.
+- **PCG_FOREST_ON_MAP.md:** Config line updated to Homestead: homestead_map_config.json (level, volume, exclusion), pcg_forest_config.json (density, transform, meshes).
+- **create_homestead_from_scratch.py:** DRY — now calls ensure_homestead_map.ensure_homestead_map_exists() instead of inline _ensure_homestead_exists(); removed duplicate logic.
+- **CONTENT_LAYOUT.md:** Added "Script index" table under Python and config paths (script name, purpose, entry/called-by, config). Updated configs example to homestead_map_config.json.
+- **HOMESTEAD_MAP.md:** Scripts table updated to state create_homestead_from_scratch ensures map (calls ensure_homestead_map). Added note: ensure_homestead_map.py is for "map only, no PCG"; ensure_homestead_folders run separately when needed.
+
+**Key decisions:** Scripts stay flat in Content/Python; no subdirs. Single canonical PCG runbook remains PCG_SETUP.md.
+
+---
+
+## 2026-02-26 Game Dev Best Practices and 30-Day Prototype (plan implementation)
+
+**Tasks completed:**
+- **VISION.md:** Added subsection **"Demonstrable prototype and vertical slice"**: MVP vs vertical slice definitions, campaign alignment (family taken → lone wanderer → claim home as base for rescue), Week 1 playtest as gate, and "one moment + one beautiful corner" by end of 30 days.
+- **STACK_PLAN.md:** Added **"Free assets for prototype"** table: FAB, Quixel Bridge, POLYGON Adventure Pack, Medieval Village Megapack, Primitive Characters Pack with use (forest / homestead / family) and suggested use by day range; link to Fab free content and references to VISION and PROTOTYPE_SCOPE.
+- **docs/workflow/PROTOTYPE_SCOPE.md:** Created scoping doc with gameplay loop, creative pillars, chosen moment/corner (TBD), and asset list by type (Player, Enemies, Allies, Buildings, Environment, Items/resources, Boss).
+- **30_DAY_SCHEDULE.md:** Added **prototype gate** note at top: Day 5 = sign-off before Day 6; Days 26–30 = pick one moment + one corner and/or record demo; link to VISION.
+
+**Key decisions:** All four doc updates from the plan implemented; no code changes. Campaign-aligned MVP (family taken, lone wanderer, claim base for rescue) is now explicit in workflow docs.

@@ -34,7 +34,7 @@ Settings that are **necessary** for PCG to work (per tutorials and docs) but **n
 
 ### Static Mesh Spawner
 
-- **Mesh selector / mesh entries:** Tutorials say "assign one static mesh in Details." Python: `PCGStaticMeshSpawnerEntry` is missing in UE 5.7; mesh entries may be partially or fully inaccessible from script. **Source:** docs/KNOWN_ERRORS.md (PCG create_demo_map: PCGStaticMeshSpawnerEntry missing).
+- **Mesh selector / mesh entries:** Tutorials say "assign one static mesh in Details." Python: `PCGStaticMeshSpawnerEntry` is missing in UE 5.7; mesh entries may be partially or fully inaccessible from script. **Source:** docs/KNOWN_ERRORS.md (PCG script: PCGStaticMeshSpawnerEntry missing).
 
 ### Surface Sampler (PCGSurfaceSamplerSettings)
 
@@ -46,7 +46,7 @@ Settings that are **necessary** for PCG to work (per tutorials and docs) but **n
 
 ### Homestead map
 
-- **Same no-access items** as above apply when running PCG on the Homestead map (`/Game/HomeWorld/Maps/Homestead`). Script `Content/Python/create_homestead_pcg.py` places/sizes the PCG Volume and tags the Landscape; it cannot set Get Landscape Data, graph assignment, or mesh list.
+- **Same no-access items** as above apply when running PCG on the Homestead map (`/Game/HomeWorld/Maps/Homestead`). Script `Content/Python/create_homestead_from_scratch.py` places/sizes the PCG Volume and tags the Landscape; it cannot set Get Landscape Data, graph assignment, or mesh list.
 - **Compound exclusion:** `homestead_map_config.json` defines `exclusion_zones` (compound bounds). To keep trees out of the compound, either duplicate **ForestIsland_PCG** to **Homestead_PCG**, add or configure a **Difference** node with a **Points from Bounds** (or similar) source using those bounds, or set the exclusion box in the graph to match the config. See [docs/HOMESTEAD_MAP.md](HOMESTEAD_MAP.md).
 - **Trees tilted or meshes out of bottom:** Check Transform Points (Absolute Rotation, Yaw only) and **transform_offset_z** in `pcg_forest_config.json` vs mesh pivot. See [docs/KNOWN_ERRORS.md](KNOWN_ERRORS.md) (PCG: trees tilted or meshes poking out of the bottom) and [docs/PCG_SETUP.md](PCG_SETUP.md) (Debug: trees tilted or meshes out of the bottom).
 

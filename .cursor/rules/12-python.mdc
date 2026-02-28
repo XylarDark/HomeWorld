@@ -61,6 +61,9 @@ version: 1.0
 
 **`Content/Python/init_unreal.py`** runs when the Editor loads (Unreal's standard startup location). It must stay minimal and only call idempotent setup (e.g. Enhanced Input). Do not add heavy bootstrap or user prompts. Scripts invoked from `init_unreal.py` must be safe to run every session (check-before-create, no duplicates).
 
+- **Canonical example (level/landscape):** `Content/Python/level_loader.py` — idempotent helpers, check-before-create, UE 5.7 Python API (e.g. `get_actor_bounds` tuple return).
+- **Canonical example (PCG automation):** `Content/Python/create_pcg_forest.py` — graph creation, pin wiring; see `docs/PCG_VARIABLES_NO_ACCESS.md` for settings automation cannot set.
+
 ### Idempotency (critical)
 
 All Editor scripts in `Content/Python/` must be re-runnable without side effects:
@@ -74,7 +77,7 @@ All Editor scripts in `Content/Python/` must be re-runnable without side effects
 
 The Unreal Editor Python session is long-lived. Imported modules are cached in `sys.modules` and won't reflect disk changes on re-import.
 
-- **Orchestrator scripts** (`bootstrap_project.py`, `create_demo_map.py`) must call `importlib.reload(module)` after every `import` of a sibling script.
+- **Orchestrator scripts** (`bootstrap_project.py`, `create_homestead_from_scratch.py`, `setup_level.py`) must call `importlib.reload(module)` after every `import` of a sibling script.
 - Standalone scripts that are executed directly (not imported) don't need this.
 
 ### UE 5.7 Python API changes

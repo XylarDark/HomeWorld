@@ -16,6 +16,8 @@ HomeWorld is developed **programmatically by default**: as much work as possible
 
 When adding new features, prefer C++ for the core implementation; use Blueprint for data, overrides, and content integration.
 
+**Debug instrumentation:** When implementing new features, add minimal debug instrumentation (entry/exit, key branches, critical values) by default so that when something goes wrong we can get runtime evidence quickly. See `.cursor/rules/16-feature-debug-instrumentation.mdc`.
+
 ---
 
 ## MCP-first when Editor is running

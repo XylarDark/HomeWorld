@@ -1,8 +1,8 @@
 # PCG Manual Setup (Square One) — UE 5.7
 
-Follow these steps **entirely in the Editor** to get trees/rocks generating on the landscape. No script.
+Build the PCG graph **from zero in the Editor without using the script**. For script-based setup (ForestIsland_PCG + volume created by script), see [PCG_SETUP.md](../PCG_SETUP.md).
 
-**Single checklist:** [docs/PCG_SETUP.md](../../PCG_SETUP.md) — what the script does vs what you do, prerequisites, and references. The script only tags the Landscape and creates/sizes the PCG Volume; it does **not** create the graph, set Get Landscape Data, or assign the graph to the volume.
+This doc is for when you want to create the graph entirely by hand (e.g. a minimal test graph or a different layout). The **script** (`create_homestead_from_scratch` → `create_pcg_forest`) **does** create the graph (ForestIsland_PCG), tag the Landscape, and place/size the PCG Volume; you still set Get Landscape Data (By Tag + `PCG_Landscape`), assign the graph to the volume, and click Generate. See [PCG_SETUP.md](../PCG_SETUP.md) for that workflow.
 
 ---
 
@@ -98,4 +98,4 @@ In the PCG Graph Editor you should see the default **Input** and **Output** node
 ## After it works
 
 - You can add more nodes (Density Filter, second branch for rocks, Merge, etc.) using the same pattern: **Get Landscape Data** → **Surface**; **Input** → **Bounding Shape**; sampler → filters/transform → spawner → **Output**.
-- The script no longer creates a graph; it only tags the Landscape and places/sizes the PCG Volume. You create the graph (or copy from a reference), set Get Landscape Data (By Tag **`PCG_Landscape`**), assign the graph to the volume, and click Generate. See [docs/PCG_SETUP.md](../../PCG_SETUP.md).
+- For script-based flow (graph + volume created by script): see [PCG_SETUP.md](../PCG_SETUP.md) for prerequisites, what the script does vs what you do, and the Generate checklist.

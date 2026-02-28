@@ -14,15 +14,16 @@ Single reference for procedural trees/rocks on the landscape: what the script do
 
 ## What the script does
 
-The script (**create_demo_map.py**, or **create_pcg_forest.py** directly) **does**:
+The script **create_homestead_from_scratch.py** **does**:
 
-1. **Creates a PCG graph** at **`/Game/HomeWorld/PCG/ForestIsland_PCG`** if it does not exist: Get Landscape Data, Surface Sampler (bounds + surface), Density Filter, Transform Points (trees **upright**, yaw-only rotation), Static Mesh Spawner (trees); optional rocks branch and Merge; optional **Difference** for exclusion zones so trees spawn **around the village**, not inside it.
-2. **Tree density** is driven by **`Content/Python/pcg_forest_config.json`**: `points_per_squared_meter` (default 0.02 = sparser), `density_lower_bound` / `density_upper_bound` (Density Filter). Lower values = fewer trees.
-3. **Exclusion zones** (when **`skip_exclusion_zones`** is false in **`demo_map_config.json`**): the script auto-detects building-tagged actors and StylizedProvencal structures and builds **two** exclusion zones via simple clustering — one around the **village** (center) and one around the **castle** (top-left) — so trees spawn around them, not inside. You can also set **`exclusion_zones`** manually in config.
-4. **Tags the Landscape** with **`PCG_Landscape`** if missing (`ensure_landscape_has_pcg_tag()`).
-5. **Creates and sizes one PCG Volume** to the landscape bounds (or config), labeled **PCG_Forest** in the Outliner.
-6. Saves the level.
-7. **Attempts automation:** When the graph is created/loaded, the script tries to **assign the graph to the volume** (`try_assign_graph_to_volume`), **set Get Landscape Data to By Tag + PCG_Landscape** (`try_set_get_landscape_selector`), and **trigger Generate** (`trigger_pcg_generate`). In UE 5.7 many of these properties are protected or not exposed in Python, so these attempts often fail; the script logs what worked and what did not.
+1. **Recreates Homestead from scratch:** Ensures Homestead map exists (duplicates from Main if missing), opens Homestead, then sets up PCG.
+2. **Creates or reuses a PCG graph** at **`/Game/HomeWorld/PCG/ForestIsland_PCG`**: when **`recreate_volume_and_graph`** is true (default), the graph is force-recreated; when false, the existing graph is reused and only Transform Points (and exclusion) are updated from config. Graph contains Get Landscape Data, Surface Sampler (bounds + surface), Density Filter, Transform Points (trees **upright**, yaw-only rotation), Static Mesh Spawner (trees); optional rocks branch and Merge; optional **Difference** for exclusion zones from **`homestead_map_config.json`** so trees spawn **around the compound**, not inside.
+3. **Tree density** is driven by **`Content/Python/pcg_forest_config.json`**: `points_per_squared_meter` (default 0.02 = sparser), `density_lower_bound` / `density_upper_bound` (Density Filter). Lower values = fewer trees.
+4. **Exclusion zones** come from **`homestead_map_config.json`** → **`exclusion_zones`** (center + half-extents in cm). Set **`skip_exclusion_zones`** to true to disable.
+5. **Tags the Landscape** with **`PCG_Landscape`** if missing (`ensure_landscape_has_pcg_tag()`).
+6. **PCG Volume:** When **`recreate_volume_and_graph`** is true, destroys any existing PCG Volume and creates a new one; when false, reuses the existing volume. Volume **bounds** (center and half-extents) come from **config** (`volume_center_*`, `volume_extent_*` in `homestead_map_config.json`); if **`use_landscape_bounds`** is true and landscape bounds are available in one shot, they override for that run. See **PCG volume size** below. Volume is labeled **PCG_Forest** in the Outliner. **One volume is enough** for the playable region. For World Partition levels, enable **Is Partitioned** on the PCG component and set **Partition Grid Size** on the **PCG World Actor** (see same section).
+7. Saves the level.
+8. **Attempts automation:** When the graph is created/loaded, the script tries to **assign the graph to the volume** (`try_assign_graph_to_volume`), **set Get Landscape Data to By Tag + PCG_Landscape** (`try_set_get_landscape_selector`), and **trigger Generate** (`trigger_pcg_generate`). In UE 5.7 many of these properties are protected or not exposed in Python, so these attempts often fail; the script logs what worked and what did not.
 
 The script **cannot** (engine/Python limits):
 
@@ -41,9 +42,37 @@ So **after running the script**, if PCG did not generate, do the remaining steps
    - **2a.** Select **Get Landscape Data** and in **Details** set: **Actor** → **By Tag**, tag **`PCG_Landscape`**; **Component** → **By Class** → **Landscape Component** (if available).
    - **2b.** Select the **tree Static Mesh Spawner** node — in Details under **Mesh Selector** set the mesh list (e.g. the paths from `Content/Python/pcg_forest_config.json` → `static_mesh_spawner_meshes`). If there is a **rocks** Static Mesh Spawner, select it and set its mesh list from `static_mesh_spawner_meshes_rocks`. **Without this step, Generate produces no instances.**
 3. **Assign the graph** to the **PCG Volume** (Outliner → select PCG_Forest → Details → **Graph** → ForestIsland_PCG).
-4. **Generate from the level:** Close or minimize the graph editor. In the **level** (e.g. Main), select **PCG_Forest** in the Outliner. In the **Details** panel (right side), scroll to the **PCG** section and click the **Generate** button there. Use this Details-panel button only — not the green Play button or Simulate on the main toolbar, and not a Generate/Run button inside the graph asset editor. **If nothing appears after a normal click, try Ctrl+Click on Generate** to force a full regeneration. After clicking Generate, **Output Log** (Window → Developer Tools → Output Log) should show lines containing `LogPCG`. If there are no LogPCG lines, the correct Generate was not used or the PCG log category may be filtered out.
+4. **Generate from the level:** Close or minimize the graph editor. In the **level** (e.g. Main), select **PCG_Forest** in the Outliner. In the **Details** panel (right side), scroll to the **PCG** section and click the **Generate** button there. Use this Details-panel button only — not the green Play button or Simulate on the main toolbar, and not a Generate/Run button inside the graph asset editor. **If nothing appears after a normal click, try Ctrl+Click on Generate** to force a full regeneration. **For World Partition:** If you enabled **Is Partitioned** or changed **Partition Grid Size**, run **Cleanup** on the volume first, then **Generate** (or Ctrl+Click). After clicking Generate, **Output Log** (Window → Developer Tools → Output Log) should show lines containing `LogPCG`. If there are no LogPCG lines, the correct Generate was not used or the PCG log category may be filtered out.
 
 If the script’s automation could not assign the graph or set Get Landscape Data (common in UE 5.7), you still need to set Get Landscape Data (and Component), **set the mesh list on each Static Mesh Spawner**, assign the graph to the volume if needed, and Generate from the level as above.
+
+---
+
+## Fast iteration (minimize delay)
+
+To run **create_homestead_from_scratch.py** with the least delay when iterating:
+
+1. **Open Homestead** in the Editor.
+2. Run **create_homestead_from_scratch.py** (Tools → Execute Python Script or MCP).
+3. Optional: in **`Content/Python/homestead_map_config.json`** set **`recreate_volume_and_graph`** to **false** for repeated runs so the script reuses the existing volume and graph and only updates location/extent and Transform Points from config.
+4. Set **`use_landscape_bounds`** to **false** to always use config bounds (no one-shot landscape query).
+5. When using **Partitioned Generation:** after enabling Is Partitioned or changing Partition Grid Size, run **Cleanup** then **Generate** on the PCG Volume.
+
+See `_comment_fast_iteration` in `homestead_map_config.json` for a short summary of these keys.
+
+---
+
+## PCG volume size
+
+**What "location" and "volume" mean:** The script places **one PCG Volume** (actor **PCG_Forest**). Its **location** is the volume center in world space; its **volume** (size) is given by **half-extents** in cm. There is no separate "location volume" asset. **Where bounds come from:** **Config** is the source of truth (`volume_center_*`, `volume_extent_*` in `homestead_map_config.json`). If **`use_landscape_bounds`** is true, the script tries **once** to read landscape bounds; if available, it overrides config for that run only. No retries or Load All.
+
+**World Partition - Partitioned Generation (recommended):** For levels using World Partition (e.g. Homestead), use **Partitioned Generation** so PCG streams with the world:
+
+1. Select the **PCG Volume** (PCG_Forest) in the Outliner -> Details -> **PCG** component -> enable **Is Partitioned**.
+2. Find the **PCG World Actor** in the level (Outliner or search) -> set **Partition Grid Size** to match your needs (e.g. **51200**-**102400** cm for Homestead-style regions).
+3. **Cleanup then Generate:** After enabling Is Partitioned or changing Partition Grid Size, run **Cleanup** on the PCG Volume (Details -> PCG section), then **Generate** (or Ctrl+Click for full regenerate). Re-run Cleanup then Generate whenever you change the grid size or toggle Is Partitioned.
+
+The volume only needs to **overlap** the area you want to generate; the **partition grid** defines how work is split and streamed. **Get Landscape Data** remains the source for the **surface** (where to place instances); at Generate time each partition cell samples the landscape within its bounds.
 
 ---
 
@@ -62,6 +91,31 @@ If you prefer to build the graph from zero in the Editor, see **[docs/tasks/PCG_
 
 ---
 
+## Generate produces nothing (checklist)
+
+When clicking **Generate** on the PCG Volume shows **no instances**, work through in order:
+
+1. **Get Landscape Data:** In ForestIsland_PCG, select **Get Landscape Data** → Details: **Actor** → **By Tag**, tag **`PCG_Landscape`**; **Component** → **By Class** → **Landscape Component**. Without this, the Surface Sampler gets no surface and logs "No surfaces found".
+2. **Mesh list on spawners:** Tree (and rocks) **Static Mesh Spawner** nodes must have meshes assigned in Details (Mesh Selector / mesh list). Use paths from `Content/Python/pcg_forest_config.json` or assign in the graph. Without meshes, Generate produces no instances.
+3. **Graph on volume:** In the level, select **PCG_Forest** → Details → **Graph** → **ForestIsland_PCG**. If the script could not assign it, assign manually.
+4. **Landscape:** Landscape must have tag **`PCG_Landscape`** and **Component Subsection = 1x1** (Details).
+5. **World Partition:** If the level uses World Partition (e.g. **Homestead**), the Landscape may be in an unloaded cell. Use **Window → World Partition → Load All** (or load the relevant region) before Generate so Get Landscape Data can find the Landscape.
+6. **Partitioned / grid size:** If you changed **Partition Grid Size** or enabled **Is Partitioned** on the PCG component, run **Cleanup** on the volume then **Generate** (or Ctrl+Click). See the canonical flow in [PCG_BEST_PRACTICES.md](PCG_BEST_PRACTICES.md).
+
+**Output Log:** Open **Window → Developer Tools → Output Log**. Click Generate (or **Ctrl+Click**). Search for **LogPCG** and **"No surfaces found"**; capture that output for diagnosis.
+
+**Surface Sampler Debug:** In the graph, select **Surface Sampler** → Details → **Debug** → enable **Debug**, set **Point Mesh** to a small mesh (e.g. PCG_Cube). Generate again: if debug cubes appear, the problem is **downstream** (spawner/mesh list); if no cubes, the problem is **Get Landscape Data or bounds**.
+
+**Minimal PCG test (troubleshooting):** Build a graph with **only** the canonical flow: **Input** → **Surface Sampler** (Bounding); **Get Landscape Data** → **Surface Sampler** (Surface); **Surface Sampler** → **Static Mesh Spawner** (one mesh) → **Output**. No Density, Transform, or Difference. Set Get Landscape Data to By Tag `PCG_Landscape` and Component By Class Landscape Component; assign one mesh to the spawner. Assign this graph to the volume and Generate. If this produces instances, the issue is in our extensions (Density, Transform, exclusion, rocks). If it also produces nothing, the issue is Get Landscape Data, bounds, or level/plugin. See [PCG_BEST_PRACTICES.md](PCG_BEST_PRACTICES.md) (Canonical flow).
+
+**Homestead:** World Partition is used; volume bounds come from config (and optionally landscape in one shot). **Load All (or load the region) before Generate is required** so the Landscape is present when Get Landscape Data runs. Enable **Is Partitioned** on the PCG component and set **Partition Grid Size** on the PCG World Actor for streaming. See **PCG volume size** above.
+
+**Assets:** `Content/Python/pcg_forest_config.json` references `/Game/StylizedProvencal/Meshes/...`. Verify in the Content Browser that these paths exist; if the pack is missing or paths differ, the mesh list in the graph would be empty or invalid and Generate would produce nothing even if points are generated.
+
+For more detail, see **If nothing generates** below.
+
+---
+
 ## If nothing generates
 
 0. **Force full regeneration:** Try **Ctrl+Click** on the Generate button in the PCG Volume’s Details panel; a normal click may not run a full generate in some cases.
@@ -72,8 +126,7 @@ If you prefer to build the graph from zero in the Editor, see **[docs/tasks/PCG_
 3. **Wiring:** Get Landscape Data **Out** → Surface Sampler **Surface**; Input → Surface Sampler **Bounding Shape**; chain to spawner → Output.
 4. **Output Log:** Generate from the level (select PCG Volume → Details → Generate). Then open **Window → Developer Tools → Output Log** and search for `PCG`. You should see at least some lines starting with `LogPCG`. If there are **no** LogPCG lines, you are not generating from the volume in the level (go back to step 4 in "Steps only you do"). If you see "No surfaces found", Get Landscape Data is not providing surface (fix step 2). Note any red errors.
 5. **Debug points:** In the graph, select the **Surface Sampler** node → Details → **Debug** section → enable **Debug** and set **Point Mesh** to a small mesh (e.g. PCG_Cube). Generate again: if coloured cubes appear on the landscape, points are fine and the issue is downstream (spawner/mesh list); if no cubes, no points are generated (fix Get Landscape Data / bounds).
-6. **Volume bounds:** Ensure the PCG Volume overlaps the landscape (the script sizes it to landscape bounds; if you moved the volume or landscape, resize the volume so it covers the terrain).
-
+6. **Volume bounds:** The script uses **config** (`volume_center_*`, `volume_extent_*` in **`homestead_map_config.json`**) as the source of truth. If **`use_landscape_bounds`** is true, it tries **once** to read landscape bounds and overrides config when available; otherwise the volume uses config. Set the config values to match your playable region. Optional: run **check_level_bounds.py** (Tools -> Execute Python Script) to see if landscape bounds are available.
 **Trees at weird angles or poking out of the volume:**
 
 - **Weird angles / trees lying down:** The graph’s **Transform Points** node is set to **Yaw only** (0–359°); pitch and roll are 0 so trees stay upright. In UE 5.7 the **Static Mesh Spawner** has **no align-to-surface option** in Details. If trees still lie down, the rotation may be coming from the **Surface Sampler** (points inherit surface normals). Try in the graph: ensure **Transform Points** runs after the Surface Sampler and that its **Absolute Rotation** is checked so it overwrites point rotation. Tree meshes should have their pivot at the base.
@@ -81,9 +134,9 @@ If you prefer to build the graph from zero in the Editor, see **[docs/tasks/PCG_
 
 **Debug: trees tilted or meshes out of the bottom**
 
-- **Mesh pivot:** In the Static Mesh editor, check whether tree/rock pivots are at the **base** or **center**. If pivot is at base, use **transform_offset_z: 0** in `Content/Python/pcg_forest_config.json`. If pivot is at center, use a negative value (e.g. **-250** for ~5 m height, **-400** to **-500** for taller trees). Re-run the PCG script (e.g. `create_homestead_pcg.py` or the script that places the volume) so the graph is updated from config, then Generate again.
-- **Rotation (trees not upright):** Open **ForestIsland_PCG** in the PCG Graph editor. Confirm **Transform Points** is after Surface Sampler and before Static Mesh Spawner. Select each Transform Points node → Details: **Rotation** min/max should be **Yaw only** (e.g. 0–359°), **Pitch = 0**, **Roll = 0**; **Absolute Rotation** = true. In the Static Mesh Spawner, ensure there is no “Align to Normal” (or similar) that would re-apply surface rotation; rely on Transform Points for rotation. Re-running the script that places the volume will re-apply rotation/offset from `pcg_forest_config.json`.
-- **volume_extent_z_padding:** Only affects the volume’s vertical bounds; it does not change spawn height. Keep it (e.g. 10000) so the volume fully contains the landscape.
+- **Mesh pivot:** In the Static Mesh editor, check whether tree/rock pivots are at the **base** or **center**. If pivot is at base, use **transform_offset_z: 0**. If pivot is at center, use a **positive** value (e.g. **250** to **400** cm) so world-space Z offset lifts the instance and the base sits on the surface. Re-run **create_homestead_from_scratch.py** so the graph is updated from config, then Generate again.
+- **Rotation (trees not upright):** Open **ForestIsland_PCG** in the PCG Graph editor. Confirm **Transform Points** is after Surface Sampler and before Static Mesh Spawner. Select each Transform Points node → Details: **Rotation** min/max with **Pitch = 0**, **Roll = 0** (script sets roll=0, pitch=0, yaw=0–359° via Rotator(roll, pitch, yaw)). **Absolute Rotation** = true. If still tilted, ensure there is no “Align to Normal” (or similar) that would re-apply surface rotation; rely on Transform Points for rotation. Re-running the script that places the volume will re-apply rotation/offset from `pcg_forest_config.json`.
+- **volume_extent_z_padding:** Only affects the volume’s vertical bounds; it does not change spawn height. Default is 1000 cm so the volume fits around the landscape without extending far below; increase (e.g. 10000) only if sampling fails at terrain edges.
 
 **If Generate still does nothing (Details → Generate is correct):**
 

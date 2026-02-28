@@ -1,0 +1,33 @@
+---
+description: Add debug instrumentation when implementing new features for faster debugging
+alwaysApply: true
+---
+
+# Feature debug instrumentation (policy)
+
+When implementing **new features** (new scripts, new systems, new automation, new APIs), add **minimal debug instrumentation** by default so that when something goes wrong we can fast-track to runtime evidence instead of re-instrumenting later.
+
+## What to add
+
+- **Entry/exit:** Log at the start and end of main flows (e.g. main(), key public functions) with a short message and, if useful, 1–3 key parameters or results.
+- **Branches:** Log which branch was taken at important conditionals (e.g. "using landscape bounds" vs "using config bounds", "level already open" vs "opened level").
+- **Critical values:** Log inputs or outputs that drive behavior (e.g. path, bounds, success/failure) in a structured way (message + data dict).
+
+Keep instrumentation **minimal**: a few well-placed logs per feature, not every line. Prefer one consistent mechanism per codebase (e.g. a small `_debug_log(msg, data)` that writes to a file or `unreal.log` with a prefix).
+
+## Format and hygiene
+
+- Use a **consistent prefix** per script/module (e.g. `"Level loader: "`, `"Homestead from scratch: "`) so logs are grep-able.
+- Prefer **structured data** (e.g. `{"path": path, "has_bounds": True}`) so logs are parseable; avoid logging secrets or PII.
+- **Wrap debug blocks** in a region or comment so they can be found or stripped later (e.g. `# #region agent log` / `# #endregion` or `// DEBUG:`).
+- For **Python Editor scripts** that may be used in debug sessions: writing NDJSON lines to a workspace log file (e.g. `debug-*.log`) allows hypothesis-based analysis; include `location`, `message`, `data`, and optional `hypothesisId`/`runId` when that workflow is in use.
+
+## When to skip
+
+- Trivial one-liners or pure data transforms with no branching.
+- Code paths that already log sufficiently for operational debugging.
+- Do not add instrumentation in hot loops or every frame; prefer entry/exit and key decisions only.
+
+## Outcome
+
+New code ships with lightweight observability. When a bug appears, we already have runtime evidence (which path was taken, what values were used), so we can confirm or reject hypotheses quickly without re-instrumenting from scratch.

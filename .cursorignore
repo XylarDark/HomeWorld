@@ -1,0 +1,32 @@
+﻿# Exclude from Cursor agent indexing (context/search).
+# Reduces noise and avoids sensitive content in chat (Practice 22, agentic-coding).
+# See AGENTS.md and .cursor/rules/02-security.mdc.
+
+# Build and engine artifacts
+Binaries/
+Intermediate/
+Saved/
+DerivedDataCache/
+
+# Version control
+.git/
+
+# External plugins (not project code)
+Plugins/UnrealMCP/
+
+# Python
+__pycache__/
+*.pyc
+
+# Secrets and env (do not index)
+.env
+.env.local
+.env.*.local
+
+# IDE / OS
+.vs/
+.idea/
+.DS_Store
+
+# Logs
+*.log

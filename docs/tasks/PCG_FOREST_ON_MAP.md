@@ -8,4 +8,4 @@
 
 **Step-by-step from scratch:** **[PCG_MANUAL_SETUP.md](PCG_MANUAL_SETUP.md)** — tag Landscape, create graph, wire nodes, add volume, Generate.
 
-**Config:** `Content/Python/demo_map_config.json` (level, volume bounds); `Content/Python/pcg_forest_config.json` (optional, for script volume sizing).
+**Config (Homestead):** `Content/Python/homestead_map_config.json` (level path, volume bounds, exclusion zones); `Content/Python/pcg_forest_config.json` (density, transform, mesh paths).

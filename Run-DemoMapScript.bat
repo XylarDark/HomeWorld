@@ -8,5 +8,5 @@ if "%UE_EDITOR%"=="" (
 )
 REM Point PROJECT to your .uproject: use HomeWorld.uproject if it sits next to this batch, or HomeWorld\HomeWorld.uproject if the project is in a subfolder.
 set PROJECT=%~dp0HomeWorld.uproject
-"%UE_EDITOR%" "%PROJECT%" -ExecutePythonScript="Content/Python/create_demo_map.py" %*
+"%UE_EDITOR%" "%PROJECT%" -ExecutePythonScript="Content/Python/create_homestead_from_scratch.py" %*
 pause

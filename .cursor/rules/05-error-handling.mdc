@@ -77,6 +77,7 @@ try {
 - Document errors and their fixes so the same mistake is not repeated.
 - Prefer a single project-wide place (e.g. `docs/KNOWN_ERRORS.md` or `docs/LESSONS_LEARNED.md`) for recurring or instructive errors.
 - Follow the process in `07-ai-agent-behavior.mdc` (error recurrence prevention) when working in the codebase.
+- **When investigating an error or API change that needs external info:** Recommend the user run `/parallel-search` (or `/parallel-extract` if a URL is known), paste the result, then record the finding in `docs/KNOWN_ERRORS.md` with a brief source/citation. See `.cursor/rules/11-parallel-plugin.mdc`.
 
 ## UE 5.7 Migration Guard
 

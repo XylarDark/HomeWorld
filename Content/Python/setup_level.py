@@ -63,21 +63,21 @@ def _ensure_player_start():
 
 
 def _run_pcg_demo(run_pcg=True):
-    """Optionally run create_demo_map: creates PCG graph (if missing), tags Landscape, places/sizes PCG Volume. Does not assign graph or Generate; see docs/PCG_SETUP.md."""
+    """Optionally run create_homestead_from_scratch: ensures Homestead exists, opens it, sets up PCG volume to landscape size. See docs/PCG_SETUP.md."""
     if not run_pcg:
         return
     try:
         script_dir = os.path.dirname(os.path.abspath(__file__))
         if script_dir not in sys.path:
             sys.path.insert(0, script_dir)
-        import create_demo_map
-        importlib.reload(create_demo_map)
-        _log("Running PCG demo map generation...")
-        create_demo_map.main()
+        import create_homestead_from_scratch
+        importlib.reload(create_homestead_from_scratch)
+        _log("Running Homestead-from-scratch PCG setup...")
+        create_homestead_from_scratch.main()
     except ImportError:
-        _log("create_demo_map.py not found; skip PCG generation. Run it separately if needed.")
+        _log("create_homestead_from_scratch.py not found; skip PCG. Run it separately if needed.")
     except Exception as e:
-        _log("PCG demo map error: " + str(e))
+        _log("PCG Homestead setup error: " + str(e))
 
 
 def main(run_pcg=False):

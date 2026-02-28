@@ -9,6 +9,7 @@ HomeWorld is set up so that AI agents and humans follow the same conventions whe
   - **Unreal project/config** (`**/*.uproject`, `**/Config/*.ini`): project layout, game module, plugins, default pawn and game mode.
   - **DevEnvTemplate rules** (00–20 series): core principles, code quality, security, testing, git workflow, error handling, documentation, AI-agent behavior, and tech-specific (TypeScript, Python, JSON, etc.). These are copied from [DevEnvTemplate](../DevEnvTemplate) and can be re-synced from there. Project context for HomeWorld is in AGENTS.md and docs/.
 - **Building:** Generate Visual Studio project files from the `.uproject`, then build the **HomeWorld** and **HomeWorldEditor** targets. See the **Building (C++)** section in [SETUP.md](SETUP.md). To build from the command line, use MSBuild or the IDE after generating the solution once.
+- **Compound Engineering plugin:** Recommending its commands when the use case fits is policy; the agent suggests plugin workflows (e.g. `/workflowsreview`, `/workflowsplan`) instead of doing that work inline. See [.cursor/rules/10-compound-engineering.mdc](../.cursor/rules/10-compound-engineering.mdc).
 
 When asking Cursor to change C++ or Blueprint behavior, the rules ensure suggestions align with programmatic-by-default and the existing HomeWorld layout.
 

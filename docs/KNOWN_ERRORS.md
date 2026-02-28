@@ -31,6 +31,12 @@ For each entry use:
 - **Cause:** After **Tools → Convert Level**, the Landscape is in a World Partition **streaming cell**. Only cells that are loaded appear in the Editor; if the cell containing the Landscape is not loaded, the ground is not visible.
 - **Fix:** **Window → World Partition** → use **Load All** (or **Load All Streamed Levels** / **Load All Cells**) so all cells load and the Landscape appears. Alternatively, load only the region around the origin (where the homestead is). If no Landscape actor exists in the Outliner at all, add one via **Mode → Landscape → Create New**. See [HOMESTEAD_MAP.md](HOMESTEAD_MAP.md) (“No ground visible”).
 
+### World Partition bounds from Python (UE 5.7): World has no get_world_partition; Blueprint library takes no args
+- **Error:** Script needs landscape or World Partition bounds for PCG volume sizing. `world.get_world_partition()` does not exist; `WorldPartitionBlueprintLibrary.get_runtime_world_bounds(world)` fails with `takes no arguments (1 given)`.
+- **Cause:** UE 5.7 Python does not expose `get_world_partition` on `unreal.World`. The Blueprint library’s `get_runtime_world_bounds` / `get_editor_world_bounds` are exposed as **no-argument** methods (they use the current/context world internally).
+- **Fix:** In `level_loader._get_world_partition_bounds`: call `lib.get_runtime_world_bounds()` and `lib.get_editor_world_bounds()` with **no arguments**. Do not pass `world`. If the current editor level is the one with World Partition, the library returns that world’s bounds. See [level_loader.py](Content/Python/level_loader.py).
+- **Context:** 2026-02, Homestead from scratch / PCG volume sizing; landscape has 0 components until Load All, so we fall back to WP bounds when available.
+
 ### UnrealMCP plugin: ANY_PACKAGE removed in UE 5.7
 - **Error:** `error C2065: 'ANY_PACKAGE': undeclared identifier` in UnrealMCPBlueprintCommands.cpp and UnrealMCPBlueprintNodeCommands.cpp (9 occurrences).
 - **Cause:** `ANY_PACKAGE` macro was deprecated in UE 5.1 and fully removed in UE 5.7. The unreal-mcp plugin (chongdashu/unreal-mcp) targets UE 5.5.
@@ -104,9 +110,9 @@ For each entry use:
 - **Context:** 2026-02, Python Editor scripting, affects landscape bounds and actor bounds queries.
 
 ### Unreal Python: module caching prevents picking up script changes
-- **Error:** Changes to Python scripts (e.g. `create_pcg_forest.py`) are not reflected when re-running `create_demo_map.py` or `bootstrap_project.py` because Python caches imported modules in `sys.modules`.
+- **Error:** Changes to Python scripts (e.g. `create_pcg_forest.py`) are not reflected when re-running `create_homestead_from_scratch.py` or `bootstrap_project.py` because Python caches imported modules in `sys.modules`.
 - **Cause:** The Unreal Editor Python session persists across script executions. `import module` reuses the cached version instead of re-reading from disk.
-- **Fix:** Add `importlib.reload(module)` after each import in orchestrator scripts. Applied to `create_demo_map.py` and `bootstrap_project.py`.
+- **Fix:** Add `importlib.reload(module)` after each import in orchestrator scripts. Applied to `create_homestead_from_scratch.py`, `setup_level.py`, and `bootstrap_project.py`.
 - **Context:** 2026-02, Python Editor scripting, module caching.
 
 ### UE 5.7 Python: AnimBP factory class named differently
@@ -139,11 +145,11 @@ For each entry use:
 - **Fix:** Use `FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry").Get()` to obtain the registry, then call `AssetCreated()` etc. Include `Modules/ModuleManager.h`.
 - **Context:** 2026-02, CreateMECCommandlet, asset registration.
 
-### PCG create_demo_map: Graph protected, PCGStaticMeshSpawnerEntry missing, pin names
+### PCG script (create_homestead_from_scratch): Graph protected, PCGStaticMeshSpawnerEntry missing, pin names
 - **Error:** (1) `PCGComponent: Property 'Graph' for attribute 'graph' on 'PCGComponent' is protected and cannot be set` when using set_editor_property("graph", ...); (2) same property `cannot be read` when calling get_editor_property("graph") in trigger_pcg_generate. (3) `module 'unreal' has no attribute 'PCGStaticMeshSpawnerEntry'` so tree/rock mesh entries are not set. (4) `LogPCG: Error: From node DefaultInputNode does not have the Out label` (pin names vary by engine version).
 - **Cause:** UE 5.7: PCGComponent graph is protected for both set (via set_editor_property) and get; **set_graph(graph_asset) does work** for assignment. PCGStaticMeshSpawnerEntry/PCGMeshSelectorSingleMesh not in Python API; default/Difference node pin labels are internal.
 - **Fix:** (1) Assign graph via comp.set_graph(graph_asset), not set_editor_property. (2) In trigger_pcg_generate do not read the graph property; wrap any read in try/except and call comp.generate(True) — UE 5.7 requires the force argument. (3) Meshes: user sets mesh list in graph Details (PCG_SETUP.md step 2b). (4) Introspect pin labels at runtime. (5) PCGVolume: use only BoxComponent for exclusion extent.
-- **Context:** 2026-02, Content/Python/create_pcg_forest.py, create_demo_map.py, PCG forest trees/rocks.
+- **Context:** 2026-02, Content/Python/create_pcg_forest.py, create_homestead_from_scratch.py, PCG forest trees/rocks.
 
 ### PCG Surface Sampler: "No surfaces found from which to generate"
 - **Error:** `LogPCG: Warning: [PCGVolume_7 - SurfaceSampler_0/1]: No surfaces found from which to generate` and `Could not initialize per-execution timeslice state data`.
@@ -182,7 +188,7 @@ For each entry use:
 - **Context:** 2026-02, PCG forest/Homestead.
 
 ### PCG: script does not create graph or assign graph; manual steps required
-- **Error:** N/A (policy). Running create_demo_map.py or setup_level with run_pcg=True does not result in trees/rocks.
+- **Error:** N/A (policy). Running create_homestead_from_scratch.py or setup_level with run_pcg=True does not result in trees/rocks (manual mesh list and Generate required).
 - **Cause:** The Python API does not expose Get Landscape Data's Actor/Component selector (By Tag, tag name, By Class) or the PCG Volume's graph assignment in a way that can be set reliably. The script therefore only tags the Landscape and creates/sizes the PCG Volume.
 - **Fix:** Create (or copy from a reference project) a PCG graph, set Get Landscape Data to **By Tag** + **`PCG_Landscape`**, assign the graph to the PCG Volume in Details, and click **Generate**. See **docs/PCG_SETUP.md** for the full checklist and references.
 - **Context:** 2026-02, PCG Fundamental Redo; script reduced to tag + volume only. See also **docs/PCG_VARIABLES_NO_ACCESS.md** for all variables with no (or unreliable) access.

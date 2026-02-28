@@ -15,6 +15,8 @@ version: 1.0
 - **Module boundaries:** Game code lives in the `HomeWorld` module. Do not depend on engine private headers or other game modules without explicit approval.
 - **Include order:** Own header first, then engine/public includes, then project includes. Keep includes minimal.
 - **Source layout:** C++ lives under `Source/HomeWorld/`. Core pawn is `AHomeWorldCharacter`; default game mode is `AHomeWorldGameMode`.
+- **Canonical example (pawn):** `Source/HomeWorld/HomeWorldCharacter.h` and `HomeWorldCharacter.cpp` — includes, naming, UPROPERTY/UFUNCTION.
+- **Canonical example (GAS):** `HomeWorldGameplayAbility.h/.cpp` and `HomeWorldAttributeSet.h/.cpp` — base ability and attribute set for UE 5.7.
 
 ## UE 5.7 API pitfalls
 

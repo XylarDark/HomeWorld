@@ -1,0 +1,1 @@
+C++ game module; **UE 5.7 only**. See `.cursor/rules/unreal-cpp.mdc` and `docs/CONVENTIONS.md`. Include own header first; follow Unreal prefixes (A, U, F, E, I). For API or plugin work, check `unreal-cpp.mdc` pitfalls table and `docs/KNOWN_ERRORS.md`; see `docs/UE57_TECH.md` for the full UE 5.7 tech entry point.

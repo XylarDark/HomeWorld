@@ -1,0 +1,1 @@
+Editor scripts: idempotent, check-before-create. **UE 5.7** Python API (e.g. `get_actor_bounds` returns tuple). See `.cursor/rules/12-python.mdc` and `.cursor/rules/09-mcp-workflow.mdc`. For API or plugin work, check `docs/KNOWN_ERRORS.md` and `docs/UE57_TECH.md`.

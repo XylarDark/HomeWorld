@@ -1,0 +1,17 @@
+---
+name: "PCG Best Practices"
+description: "Before changing PCG graphs or adding nodes, check best practices and no-access docs"
+alwaysApply: false
+priority: 5
+version: 1.0
+---
+
+# PCG Best Practices
+
+When working on PCG (Procedural Content Generation) graphs, volumes, or spawners:
+
+1. **Before changing the PCG graph or adding nodes:** Read [docs/PCG_BEST_PRACTICES.md](docs/PCG_BEST_PRACTICES.md) and [docs/PCG_VARIABLES_NO_ACCESS.md](docs/PCG_VARIABLES_NO_ACCESS.md). The former describes the minimal working graph, mandatory manual steps, and when to use Partitioned/Hierarchical generation; the latter lists settings that automation cannot set and must be done in the Editor.
+
+2. **When the user reports "Generate produces nothing":** Follow [docs/PCG_SETUP.md](docs/PCG_SETUP.md) section "Generate produces nothing (checklist)" and use the **pcg-validate** skill (ordered checklist, Output Log, Surface Sampler Debug). Do not suggest graph changes before verifying Get Landscape Data, mesh list, graph assignment, Landscape tag, and World Partition Load All.
+
+3. **When suggesting new PCG nodes or graph structure:** Ensure the proposal aligns with the minimal working graph (Get Landscape Data → Surface Sampler → Static Mesh Spawner) and document which steps remain manual per PCG_VARIABLES_NO_ACCESS.

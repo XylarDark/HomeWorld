@@ -1,12 +1,12 @@
 # Homestead Map
 
-Homestead-focused level for the tutorial home, compound (house, outbuildings, walls), and surrounding zones. Used for Day 1 layout and Phase 1 of the [Homestead & Planetoid roadmap](tasks/HOMESTEAD_PLANETOID_ROADMAP.md).
+Homestead-focused level for the tutorial home, compound (house, outbuildings, walls), and surrounding zones. Used for Day 6 layout and Homestead Phase 1 of the [30-day schedule](workflow/30_DAY_SCHEDULE.md).
 
 ---
 
 ## Purpose
 
-- **Tutorial and campaign:** Player starts at the homestead with family; after the attack they spend 7 levels getting the family back; later they return to a ruined homestead for the day/night loop ([CAMPAIGN_VISION.md](CAMPAIGN_VISION.md)).
+- **Tutorial and campaign:** Player starts at the homestead with family; after the attack they spend 7 levels getting the family back; later they return to a ruined homestead for the day/night loop ([workflow/VISION.md](workflow/VISION.md)).
 - **Single map for “home”:** Keeps Main as demo/overworld; Homestead is where we develop resource collection, home building, family, and defenses.
 - **Travel later:** Portal or sublevel from Homestead to sin-themed planetoids fits the campaign.
 
@@ -42,11 +42,11 @@ If you created Homestead by duplicating Main, **World Settings → World Partiti
 
 **Conversion time:** Converting can take **several minutes to 30+ minutes** because Homestead was duplicated from Main (landscape, many actors, possibly PCG instances). This is normal. Let it finish; check Task Manager for UnrealEditor CPU/disk activity if it seems stuck.
 
-**After conversion finishes:** (1) Save the level (Ctrl+S). (2) Run `Content/Python/ensure_homestead_folders.py` if you haven’t yet. (3) Run `Content/Python/place_homestead_placeholders.py` to spawn house/outbuilding placeholders, or place them manually. (4) Run `Content/Python/create_homestead_pcg.py` (with Homestead open) to add the PCG volume and tag the Landscape; then complete the manual PCG steps in [PCG_SETUP.md](PCG_SETUP.md). (5) If you see no ground (placeholders/PCG floating): the Landscape may be in an unloaded cell — see **No ground visible** below.
+**After conversion finishes:** (1) Save the level (Ctrl+S). (2) Run `Content/Python/ensure_homestead_folders.py` if you haven’t yet. (3) Run `Content/Python/place_homestead_placeholders.py` to spawn house/outbuilding placeholders, or place them manually. (4) Run **`Content/Python/create_homestead_from_scratch.py`** — it ensures Homestead exists, opens it, then creates/sizes the PCG volume from config (and optionally landscape in one shot); complete the manual PCG steps in [PCG_SETUP.md](PCG_SETUP.md). (5) If you see no ground (placeholders/PCG floating): the Landscape may be in an unloaded cell — see **No ground visible** below.
 
 ### No ground visible (placeholders / trees floating)
 
-After World Partition conversion, the **Landscape** can end up in a **streaming cell** that isn’t loaded in the Editor, so you see no ground. **Fix:** (1) **Window → World Partition** to open the World Partition window. (2) Use **Load All** (or **Load All Streamed Levels** / **Load All Cells** depending on UE version) so every cell loads, including the one containing the Landscape. The ground should appear. (3) If you prefer to keep cells unloaded for performance, use **Streaming** or **Loading** options to load only the region around the origin (e.g. 0,0,0) where your placeholders are. (4) If there is still no Landscape in the Outliner, the conversion may have omitted it: add a new one via **Landscape** mode (**Mode** panel → **Landscape**) → **Create New** and create a new landscape in the level. See [KNOWN_ERRORS.md](KNOWN_ERRORS.md) (Homestead: no ground visible).
+After World Partition conversion, the **Landscape** can end up in a **streaming cell** that isn’t loaded in the Editor, so you see no ground. **Fix:** (1) **Window → World Partition** to open the World Partition window. (2) Use **Load All** (or **Load All Streamed Levels** / **Load All Cells** depending on UE version) so every cell loads, including the one containing the Landscape. The ground should appear. (3) If you prefer to keep cells unloaded for performance, use **Streaming** or **Loading** options to load only the region around the origin (e.g. 0,0,0) where your placeholders are. (4) If there is still no Landscape in the Outliner, the conversion may have omitted it: add a new one via **Landscape** mode (**Mode** panel → **Landscape**) → **Create New** and create a new landscape in the level. See [KNOWN_ERRORS.md](KNOWN_ERRORS.md) (Homestead: no ground visible). For reliable Homestead setup when using `create_homestead_from_scratch.py`, run the script after opening Homestead. **Volume bounds** come from **config** (`volume_center_*`, `volume_extent_*` in `homestead_map_config.json`); set these to match your Homestead playable region (e.g. from the World Partition window). Optional: set `recreate_volume_and_graph: false` for re-runs. For World Partition, enable **Is Partitioned** on the PCG component and set **Partition Grid Size** on the PCG World Actor. See [PCG_SETUP.md](PCG_SETUP.md) (PCG volume size, Fast iteration).
 - **Homestead assets:** `/Game/HomeWorld/Homestead/` with subfolders **Structures**, **Placeholders** (ensure via `Content/Python/ensure_homestead_folders.py`).
 - **PCG:** Reuse `/Game/HomeWorld/PCG/ForestIsland_PCG` or add a dedicated graph (e.g. Homestead_PCG) under `/Game/HomeWorld/PCG/` or `/Game/HomeWorld/Homestead/`. Config: `Content/Python/homestead_map_config.json` (volume bounds, exclusion_zones for compound).
 
@@ -57,8 +57,10 @@ See [CONTENT_LAYOUT.md](CONTENT_LAYOUT.md) for the full path table.
 ## PCG summary
 
 - **Forest (and optionally quarry/garden/field):** Use the same approach as Main ([PCG_SETUP.md](PCG_SETUP.md)): Landscape tagged **PCG_Landscape**, Component Subsection **1x1**, one PCG Volume covering the level with **exclusion zone(s)** for the compound so trees do not spawn inside the walls.
-- **Config:** `homestead_map_config.json` defines `volume_extent_*` and `exclusion_zones` (compound center + half-extents in cm). Script `create_homestead_pcg.py` (or equivalent) can create/size the PCG Volume and feed exclusion zones when the Homestead level is open.
+- **Config:** `homestead_map_config.json` defines **`volume_center_x/y/z`** and **`volume_extent_x/y/z`** (source of truth for PCG volume bounds). Set them to match your Homestead playable region (e.g. from the World Partition window or a known region). **create_homestead_from_scratch.py** uses config; if **`use_landscape_bounds`** is true, it tries **once** to read landscape bounds and overrides config when available. No retries or Load All in script. See [PCG_SETUP.md](PCG_SETUP.md) **PCG volume size**.
 - **Manual steps:** After running the script, set Get Landscape Data (By Tag `PCG_Landscape`), mesh list on Static Mesh Spawner(s), assign graph to volume, and click **Generate** from the volume’s Details panel. See [PCG_SETUP.md](PCG_SETUP.md) and [PCG_VARIABLES_NO_ACCESS.md](PCG_VARIABLES_NO_ACCESS.md).
+
+**Trees/rocks spawning out of the bottom or not upright:** (1) Re-run **create_homestead_from_scratch.py** so the graph gets **transform_offset_z** and **Transform Points** (yaw-only, absolute rotation) from `pcg_forest_config.json`. (2) Use **transform_offset_z: 0** in `pcg_forest_config.json` for base-pivot meshes. (3) If the volume was extending far below the map, `volume_extent_z_padding` is now 1000 cm by default; re-run the script to resize. See [PCG_SETUP.md](PCG_SETUP.md) (Debug: trees tilted or meshes out of the bottom).
 
 ---
 
@@ -79,8 +81,8 @@ See [CONTENT_LAYOUT.md](CONTENT_LAYOUT.md) for the full path table.
 
 ## Task linkage
 
-- **Day 1 (1.1):** Homestead layout — the Homestead map and this doc implement the “authored map + placeholders + PCG” option. See [HOMESTEAD_DAILY_ROADMAP.md](tasks/HOMESTEAD_DAILY_ROADMAP.md).
-- **Phase 1:** Homestead generation, resources, home placement. See [HOMESTEAD_PLANETOID_ROADMAP.md](tasks/HOMESTEAD_PLANETOID_ROADMAP.md).
+- **Day 6 (1.1):** Homestead layout — the Homestead map and this doc implement the “authored map + placeholders + PCG” option. See [workflow/30_DAY_SCHEDULE.md](workflow/30_DAY_SCHEDULE.md).
+- **Homestead Phase 1:** Homestead generation, resources, home placement. See [workflow/30_DAY_SCHEDULE.md](workflow/30_DAY_SCHEDULE.md) Days 6–10.
 
 ---
 
@@ -91,5 +93,7 @@ See [CONTENT_LAYOUT.md](CONTENT_LAYOUT.md) for the full path table.
 | `Content/Python/homestead_map_config.json` | `homestead_level_path`, `source_level_path`, PCG `volume_extent_*`, `exclusion_zones`. |
 | `Content/Python/ensure_homestead_map.py` | Idempotent: duplicate Main to Homestead if Homestead does not exist. |
 | `Content/Python/ensure_homestead_folders.py` | Idempotent: create `/Game/HomeWorld/Homestead/`, Structures, Placeholders. |
-| `Content/Python/create_homestead_pcg.py` | (Optional) Create/size PCG Volume in Homestead, apply exclusion from config; manual steps still required for graph assignment and Generate. |
+| `Content/Python/create_homestead_from_scratch.py` | **Single entry point:** Ensures Homestead exists (calls ensure_homestead_map), opens Homestead, destroys/places PCG volume using config bounds (optional one-shot landscape override), applies exclusion from config; manual steps still required for graph assignment and Generate. Set `volume_center_*` and `volume_extent_*` in config to match your playable region. |
 | `Content/Python/place_homestead_placeholders.py` | (Optional) Spawn Cube placeholders for house and outbuildings from `homestead_map_config.json` → `placeholder_actors`. Idempotent: re-run replaces placeholders. |
+
+**Note:** `create_homestead_from_scratch.py` ensures the Homestead map exists (it calls `ensure_homestead_map`). Run `ensure_homestead_map.py` alone only when you need the map created without running the full PCG setup (e.g. "map only, no PCG"). Run `ensure_homestead_folders.py` separately when needed (e.g. before placing placeholders).

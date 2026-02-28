@@ -1,12 +1,13 @@
 # create_pcg_forest.py
 # Run from Unreal Editor: Tools -> Execute Python Script.
 #
-# Creates a PCG graph: Get Landscape Data + Surface Sampler -> Density Filter -> Transform Points
-# -> Static Mesh Spawner (trees). Optional rocks branch with Merge. Script also tags the Landscape
-# with PCG_Landscape and places/sizes one PCG Volume. It does NOT assign the graph to the volume
-# or call Generate (engine limitation). You must: set Get Landscape Data to By Tag + PCG_Landscape,
-# assign the graph to the volume in Details, and click Generate.
-# Config: Content/Python/pcg_forest_config.json. See docs/PCG_SETUP.md.
+# Builds the canonical tutorial flow (Get Landscape Data -> Surface Sampler; Input -> Bounding;
+# Surface Sampler -> Static Mesh Spawner -> Output) plus: Density Filter, Transform Points,
+# optional Difference (exclusion zones), and optional rocks branch + Merge. Script tags the
+# Landscape with PCG_Landscape and places/sizes one PCG Volume. It does NOT assign the graph
+# to the volume or call Generate (engine limitation). You must: set Get Landscape Data to
+# By Tag + PCG_Landscape, assign the graph to the volume in Details, and click Generate.
+# Config: Content/Python/pcg_forest_config.json. See docs/PCG_SETUP.md and docs/PCG_BEST_PRACTICES.md.
 
 import json
 import os
@@ -32,20 +33,6 @@ EXECUTION_DEPENDENCY = "Execution Dependency"
 
 def _log(msg):
     unreal.log("PCG Forest: " + str(msg))
-    print("PCG Forest: " + str(msg))
-
-
-# #region agent log
-def _debug_log(hypothesis_id, message, data, run_id="run1"):
-    try:
-        proj = unreal.SystemLibrary.get_project_directory()
-        log_path = os.path.join(proj, "debug-e934ae.log")
-        payload = {"sessionId": "e934ae", "runId": run_id, "hypothesisId": hypothesis_id, "location": "create_pcg_forest", "message": message, "data": data, "timestamp": int(time.time() * 1000)}
-        with open(log_path, "a", encoding="utf-8") as f:
-            f.write(json.dumps(payload, ensure_ascii=False) + "\n")
-    except Exception:
-        pass
-# #endregion
 
 
 def ensure_landscape_has_pcg_tag():
@@ -280,18 +267,26 @@ def _connect_exclusion_points_to_difference(graph_asset, difference_node, exclus
         _log("Exclusion zones defined but exclusion point source could not be connected. Wire exclusion to Difference in Editor if needed.")
 
 
-def create_pcg_graph(exclusion_zones=None):
+def create_pcg_graph(exclusion_zones=None, force_recreate=False):
     """Create PCG graph with Get Landscape Data, Surface Sampler -> Density -> [Difference] -> Transform -> Spawner.
     Optional rocks branch with Merge. Does NOT set Get Landscape Data actor/tag (user sets By Tag + PCG_Landscape).
-    Does NOT assign graph to volume or call Generate. Returns graph asset or None."""
+    Does NOT assign graph to volume or call Generate. Returns graph asset or None.
+    If force_recreate is True and the graph asset exists, it is deleted and recreated."""
     _ensure_pcg_folder()
     if exclusion_zones is None:
         exclusion_zones = []
     if unreal.EditorAssetLibrary.does_asset_exist(PCG_GRAPH_PACKAGE):
-        existing = unreal.load_asset(PCG_GRAPH_PACKAGE)
-        if existing:
-            _log("PCG graph already exists at %s. Reusing (delete in Content Browser to force recreation)." % PCG_GRAPH_PACKAGE)
-            return existing
+        if force_recreate:
+            try:
+                unreal.EditorAssetLibrary.delete_asset(PCG_GRAPH_PACKAGE)
+                _log("Deleted existing PCG graph for recreation.")
+            except Exception as e:
+                _log("Could not delete existing graph: %s" % e)
+        else:
+            existing = unreal.load_asset(PCG_GRAPH_PACKAGE)
+            if existing:
+                _log("PCG graph already exists at %s. Reusing (delete in Content Browser or set force_recreate=True to force recreation)." % PCG_GRAPH_PACKAGE)
+                return existing
     asset_tools = unreal.AssetToolsHelpers.get_asset_tools()
     factory = unreal.PCGGraphFactory()
     graph_asset = asset_tools.create_asset(PCG_GRAPH_NAME, "/Game/HomeWorld/PCG", unreal.PCGGraph, factory)
@@ -341,9 +336,9 @@ def create_pcg_graph(exclusion_zones=None):
     surface_settings.set_editor_property("apply_density_to_points", True)
     density_settings.set_editor_property("lower_bound", density_lo)
     density_settings.set_editor_property("upper_bound", density_hi)
-    # UE Python Rotator is (Yaw, Pitch, Roll): only vary Yaw so trees stay upright (log showed 0,359,0 set Pitch=359).
-    rot_min = unreal.Rotator(0.0, 0.0, 0.0)    # Yaw=0, Pitch=0, Roll=0
-    rot_max = unreal.Rotator(359.0, 0.0, 0.0)  # Yaw=359, Pitch=0, Roll=0
+    # UE Python Rotator(roll, pitch, yaw): only vary Yaw so trees stay upright (0 pitch, 0 roll).
+    rot_min = unreal.Rotator(0.0, 0.0, 0.0)    # roll=0, pitch=0, yaw=0
+    rot_max = unreal.Rotator(0.0, 0.0, 359.0)   # roll=0, pitch=0, yaw=359
     transform_settings.set_editor_property("rotation_min", rot_min)
     transform_settings.set_editor_property("rotation_max", rot_max)
     transform_settings.set_editor_property("absolute_rotation", True)
@@ -352,37 +347,14 @@ def create_pcg_graph(exclusion_zones=None):
     transform_settings.set_editor_property("uniform_scale", True)
     transform_settings.set_editor_property("absolute_scale", True)
     transform_settings.set_editor_property("seed", 12345)
-    # 0 = base-pivot meshes; negative = center-pivot (e.g. -250 for ~5 m height). See docs/PCG_SETUP.md.
-    offset_z = config.get("transform_offset_z", -250.0)
-    # #region agent log
-    _debug_log("H5", "Transform offset config", {"offset_z": float(offset_z)})
-    # #endregion
+    # transform_offset_z: 0 = base-pivot; for center-pivot meshes use positive (e.g. 250) to lift so base sits on surface. See docs/PCG_SETUP.md.
+    offset_z = config.get("transform_offset_z", 0.0)
+    transform_settings.set_editor_property("offset_min", unreal.Vector(0.0, 0.0, float(offset_z)))
+    transform_settings.set_editor_property("offset_max", unreal.Vector(0.0, 0.0, float(offset_z)))
     try:
-        transform_settings.set_editor_property("offset_min", unreal.Vector(0.0, 0.0, float(offset_z)))
-        transform_settings.set_editor_property("offset_max", unreal.Vector(0.0, 0.0, float(offset_z)))
-        transform_settings.set_editor_property("b_absolute_offset", False)
-        # #region agent log
-        try:
-            omin = transform_settings.get_editor_property("offset_min")
-            omax = transform_settings.get_editor_property("offset_max")
-            _debug_log("H5", "Tree transform offset read-back", {"offset_min_z": getattr(omin, "z", None), "offset_max_z": getattr(omax, "z", None)})
-        except Exception as e2:
-            _debug_log("H5", "Tree offset read-back failed", {"error": str(e2)})
-        # #endregion
-    except Exception as e:
-        # #region agent log
-        _debug_log("H5", "Tree transform offset set failed", {"error": str(e)})
-        # #endregion
+        transform_settings.set_editor_property("absolute_offset", True)  # world-space Z so positive = up
+    except Exception:
         pass
-    # #region agent log
-    try:
-        rmin = transform_settings.get_editor_property("rotation_min")
-        rmax = transform_settings.get_editor_property("rotation_max")
-        abs_rot = transform_settings.get_editor_property("absolute_rotation")
-        _debug_log("H4", "Transform rotation set and read-back", {"rotation_min_pitch": getattr(rmin, "pitch", None), "rotation_min_yaw": getattr(rmin, "yaw", None), "rotation_min_roll": getattr(rmin, "roll", None), "rotation_max_pitch": getattr(rmax, "pitch", None), "rotation_max_yaw": getattr(rmax, "yaw", None), "rotation_max_roll": getattr(rmax, "roll", None), "absolute_rotation": abs_rot})
-    except Exception as e:
-        _debug_log("H4", "Transform rotation read-back failed", {"error": str(e)})
-    # #endregion
 
     # Rotation is yaw-only above (rotation_min/max) so instances stay upright. UE 5.7 Static Mesh Spawner has no align-to-surface option.
 
@@ -499,7 +471,7 @@ def create_pcg_graph(exclusion_zones=None):
             density_rock_settings.set_editor_property("lower_bound", 0.3)
             density_rock_settings.set_editor_property("upper_bound", 1.0)
             transform_rock_settings.set_editor_property("rotation_min", unreal.Rotator(0.0, 0.0, 0.0))
-            transform_rock_settings.set_editor_property("rotation_max", unreal.Rotator(359.0, 0.0, 0.0))  # (Yaw, Pitch, Roll)
+            transform_rock_settings.set_editor_property("rotation_max", unreal.Rotator(0.0, 0.0, 359.0))  # roll=0, pitch=0, yaw=359
             transform_rock_settings.set_editor_property("absolute_rotation", True)
             transform_rock_settings.set_editor_property("scale_min", unreal.Vector(0.8, 0.8, 0.8))
             transform_rock_settings.set_editor_property("scale_max", unreal.Vector(1.2, 1.2, 1.2))
@@ -509,19 +481,11 @@ def create_pcg_graph(exclusion_zones=None):
             try:
                 transform_rock_settings.set_editor_property("offset_min", unreal.Vector(0.0, 0.0, float(offset_z)))
                 transform_rock_settings.set_editor_property("offset_max", unreal.Vector(0.0, 0.0, float(offset_z)))
-                transform_rock_settings.set_editor_property("b_absolute_offset", False)
-                # #region agent log
                 try:
-                    ro_min = transform_rock_settings.get_editor_property("offset_min")
-                    ro_max = transform_rock_settings.get_editor_property("offset_max")
-                    _debug_log("H5", "Rocks transform offset read-back", {"offset_min_z": getattr(ro_min, "z", None), "offset_max_z": getattr(ro_max, "z", None)})
-                except Exception as e2r:
-                    _debug_log("H5", "Rocks offset read-back failed", {"error": str(e2r)})
-                # #endregion
-            except Exception as e_rock:
-                # #region agent log
-                _debug_log("H5", "Rocks transform offset set failed", {"error": str(e_rock)})
-                # #endregion
+                    transform_rock_settings.set_editor_property("absolute_offset", True)
+                except Exception:
+                    pass
+            except Exception:
                 pass
             rock_entries_set = False
             rock_entry_count = 0
@@ -604,15 +568,34 @@ def _find_existing_pcg_volume(world):
     return None
 
 
+def destroy_pcg_volume(world=None):
+    """Destroy the level's main PCG Volume (PCG_Forest) so a fresh one can be placed with correct dimensions.
+    Returns True if a volume was destroyed, False otherwise."""
+    if world is None:
+        world = unreal.EditorLevelLibrary.get_editor_world()
+    if not world:
+        return False
+    volume = _find_existing_pcg_volume(world)
+    if not volume:
+        return False
+    try:
+        unreal.EditorLevelLibrary.destroy_actor(volume)
+        _log("Destroyed existing PCG Volume.")
+        return True
+    except Exception as e:
+        _log("Could not destroy PCG Volume: %s" % e)
+        return False
+
+
 def update_forest_island_graph_from_config(graph_asset):
     """Re-apply transform_offset_z and rotation (yaw-only, absolute) to all Transform Points nodes in the graph.
     Call when graph already exists so config changes in pcg_forest_config.json take effect without recreating the graph."""
     if not graph_asset:
         return
     config = _load_config()
-    offset_z = float(config.get("transform_offset_z", -250.0))
-    rot_min = unreal.Rotator(0.0, 0.0, 0.0)
-    rot_max = unreal.Rotator(359.0, 0.0, 0.0)
+    offset_z = float(config.get("transform_offset_z", 0.0))
+    rot_min = unreal.Rotator(0.0, 0.0, 0.0)   # roll=0, pitch=0, yaw=0
+    rot_max = unreal.Rotator(0.0, 0.0, 359.0) # roll=0, pitch=0, yaw=359
     transform_cls = getattr(unreal, "PCGTransformPointsSettings", None)
     if not transform_cls:
         return
@@ -621,6 +604,7 @@ def update_forest_island_graph_from_config(graph_asset):
     except Exception:
         nodes = []
     updated = 0
+    first_readback = None
     for node in nodes:
         try:
             settings = node.get_settings() if hasattr(node, "get_settings") else None
@@ -628,11 +612,23 @@ def update_forest_island_graph_from_config(graph_asset):
                 continue
             settings.set_editor_property("offset_min", unreal.Vector(0.0, 0.0, offset_z))
             settings.set_editor_property("offset_max", unreal.Vector(0.0, 0.0, offset_z))
-            settings.set_editor_property("b_absolute_offset", False)
+            try:
+                settings.set_editor_property("absolute_offset", True)
+            except Exception:
+                pass
             settings.set_editor_property("rotation_min", rot_min)
             settings.set_editor_property("rotation_max", rot_max)
             settings.set_editor_property("absolute_rotation", True)
             updated += 1
+            if first_readback is None:
+                try:
+                    rmin = settings.get_editor_property("rotation_min")
+                    omin = settings.get_editor_property("offset_min")
+                    abs_rot = settings.get_editor_property("absolute_rotation")
+                    abs_off = settings.get_editor_property("absolute_offset") if hasattr(settings, "get_editor_property") else None
+                    first_readback = {"rotation_min_pitch": getattr(rmin, "pitch", None), "rotation_min_yaw": getattr(rmin, "yaw", None), "rotation_min_roll": getattr(rmin, "roll", None), "offset_min_z": getattr(omin, "z", None), "absolute_rotation": abs_rot, "absolute_offset": abs_off}
+                except Exception as e:
+                    first_readback = {"readback_error": str(e)}
         except Exception as e:
             _log("update_forest_island_graph: skip node: %s" % e)
     if updated:
@@ -676,17 +672,11 @@ def place_pcg_volume(location=None, extent=None, graph_asset=None):
     try:
         volume.set_actor_scale3d(unreal.Vector(1.0, 1.0, 1.0))
         _, base_ext = volume.get_actor_bounds(False)
-        # #region agent log
-        _debug_log("H2", "Volume scale inputs", {"extent_x": float(extent.x), "extent_y": float(extent.y), "extent_z": float(extent.z), "base_ext_x": float(base_ext.x), "base_ext_y": float(base_ext.y), "base_ext_z": float(base_ext.z)})
-        # #endregion
         if base_ext.x > 0 and base_ext.y > 0 and base_ext.z > 0:
             scale_x = abs(extent.x) / base_ext.x
             scale_y = abs(extent.y) / base_ext.y
             scale_z = abs(extent.z) / base_ext.z
             volume.set_actor_scale3d(unreal.Vector(scale_x, scale_y, scale_z))
-            # #region agent log
-            _debug_log("H3", "Volume scale applied", {"scale_x": scale_x, "scale_y": scale_y, "scale_z": scale_z})
-            # #endregion
             _log("Scaled PCG Volume to extent (%.0f, %.0f, %.0f) cm." % (extent.x, extent.y, extent.z))
         else:
             _log("Default volume extent is zero; set volume bounds manually in Editor.")

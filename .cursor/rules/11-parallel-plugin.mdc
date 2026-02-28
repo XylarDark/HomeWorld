@@ -1,0 +1,34 @@
+---
+name: "Parallel Plugin: Recommend, Don't Do"
+description: "When a task fits a Parallel plugin feature, recommend the user run that command and paste results; then interpret and integrate. Environment is self-aware of added tools."
+alwaysApply: true
+priority: 11
+version: 1.0
+---
+
+# Parallel Plugin: Policy-Driven Tool Suggestions
+
+## Core policy
+
+When you identify a task that is a good fit for a **Parallel plugin** feature, **recommend** the user run the corresponding command and paste the result. Do not perform the lookup, research, extract, or enrichment yourself. After the user pastes output, interpret it and integrate (summarize, add to `docs/KNOWN_ERRORS.md`, apply to code, update task docs, etc.).
+
+**Generalization:** When a good use case for an added tool (e.g. Parallel) arises, recommend running that tool and pasting results; then help interpret and integrate. This applies to other plugins the environment may add later.
+
+## Tool awareness (when to suggest what)
+
+| Trigger | Recommend | Example suggestion |
+|---------|------------|--------------------|
+| Need **current or external info** (UE/Epic API, docs, plugin compatibility, error cause) | `/parallel-search <query>` | "Run `/parallel-search UE 5.7 PCG Get Landscape Data` and paste the result; I'll summarize and we can update the doc." |
+| User or context has a **specific URL** (Epic doc, tutorial, release notes) | `/parallel-extract <url>` | "Run `/parallel-extract https://docs.unrealengine.com/...` and paste the content; I'll interpret and apply." |
+| User explicitly asks for **deep / exhaustive / comprehensive** research | `/parallel-research <topic>` | "Run `/parallel-research UE 5.7 PCG migration` and paste the report when done; I'll integrate the findings." |
+| Need to **enrich a list** (plugins, companies, assets) with web-sourced fields | `/parallel-enrich <file or entities> with <fields>` | "Run `/parallel-enrich plugins.csv with docs maintainer` and share the output; I'll help integrate." |
+
+## Citations
+
+When you help interpret or summarize pasted Parallel output, attribute sources and link where applicable (per the plugin's citation standards).
+
+## Status and long-running tasks
+
+- **`/parallel-status <run_id>`** — User can check status of a running research task.
+- **`/parallel-result <run_id>`** — User can fetch the result when complete and paste it for you to integrate.
+- For long-running `/parallel-research`, recommend the user run it, then use `/parallel-status` or wait and use `/parallel-result`, and paste the result into chat.

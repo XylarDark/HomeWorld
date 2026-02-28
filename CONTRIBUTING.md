@@ -12,8 +12,8 @@
 
 ## Scope and context
 
-- **Roadmap:** [ROADMAP.md](ROADMAP.md) – phases, pillars, campaign.
-- **Current tasks:** [docs/TASKLIST.md](docs/TASKLIST.md) – what to build first in the Editor; each task links to a detailed doc in docs/tasks/.
+- **Vision and schedule:** [docs/workflow/README.md](docs/workflow/README.md) – vision, 30-day schedule, task status.
+- **Current tasks:** [docs/workflow/30_DAY_SCHEDULE.md](docs/workflow/30_DAY_SCHEDULE.md) – day-by-day tasks; each links to a detailed doc in docs/tasks/.
 - **Stack:** [docs/STACK_PLAN.md](docs/STACK_PLAN.md) – recommended tech per layer.
 
 ## Before opening a PR

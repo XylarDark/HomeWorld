@@ -1,0 +1,37 @@
+---
+name: "Plan first"
+description: "For complex or multi-file work, propose a short implementation plan and get approval before editing; save plans to .cursor/plans/ when useful"
+alwaysApply: true
+priority: 7
+---
+
+# Plan-first and spec discipline
+
+For **complex or multi-file work**, do not jump straight into code. Propose a short implementation plan (or reference an existing plan in `.cursor/plans/` or the conversation) and get implicit or explicit approval before editing.
+
+## When to plan first
+
+- Multi-file refactors or new features spanning several modules.
+- Tasks that affect architecture, public APIs, or shared config/schema.
+- When the user asks for a plan or uses Plan Mode (Shift+Tab in Cursor).
+- When the task is ambiguous or has multiple valid approaches.
+
+## What the plan should include
+
+- **Goal:** What we are building or changing (1–2 sentences).
+- **Research/tutorials (for new features):** For new features, the plan should be informed by prior research: Epic/UE docs, best practices, and tutorials (follow tutorials first, then expand; see 07-ai-agent-behavior.mdc).
+- **Files/steps:** Key files to create or modify and the order of steps.
+- **Constraints:** Any boundaries from AGENTS.md or KNOWN_ERRORS (e.g. MCP safety, idempotency).
+- **Success:** How we will verify (tests, manual check, or “document why deferred”).
+
+Keep the plan short (bullets, not essays). Reference existing docs (e.g. `docs/tasks/`, `docs/CONVENTIONS.md`) instead of duplicating them.
+
+## Saving plans
+
+When the user requests it or the task is large and would benefit from resume/future reference, save the plan under `.cursor/plans/` (e.g. `feature-name.md`). Mention in the doc that plans can live there (see [docs/SPEC_AND_PLAN.md](docs/SPEC_AND_PLAN.md)).
+
+## When to skip
+
+- Single-file, obvious fixes (typo, one function change).
+- User explicitly says “just do it” or “no plan needed.”
+- Trivial edits (comment, rename in one place).

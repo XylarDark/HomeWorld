@@ -46,6 +46,7 @@ HomeWorld is a co-op ARPG survival game with family sim elements, built in Unrea
 - `docs/SETUP.md` - Developer onboarding (Engine, plugins, MCP, rules, Git)
 - `docs/KNOWN_ERRORS.md` - Recorded errors and fixes
 - `docs/MCP_SETUP.md` - MCP bridge installation and troubleshooting
+- `docs/PCG_BEST_PRACTICES.md` - PCG minimal graph, manual steps, Partitioned/Hierarchical; check before changing PCG graphs (see also `pcg-best-practices.mdc`)
 
 ## Conventions
 

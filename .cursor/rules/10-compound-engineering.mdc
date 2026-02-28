@@ -1,0 +1,36 @@
+---
+name: "Compound Engineering Plugin Policy"
+description: "When a task matches a Compound Engineering workflow, recommend the plugin command instead of doing the work inline. The rule holds the full situation-to-command mapping; no doc lookup required."
+alwaysApply: true
+priority: 8
+version: 1.0
+---
+
+# Compound Engineering Plugin Policy
+
+## Policy
+
+When you run into a situation that is a good use case for a **Compound Engineering** plugin feature, **do not do that work yourself**—recommend the user run the appropriate command. The environment is self-aware of these tools; suggest them when the use case fits.
+
+**Exception:** If the user explicitly asks you to do the work in-chat (e.g. "review this yourself" or "write the plan here"), do it. The policy is to suggest the plugin when the use case fits, not to refuse inline work when the user prefers it.
+
+## Situation → Command (use this mapping)
+
+| Situation | Recommend |
+|-----------|-----------|
+| User wants to **explore approaches or brainstorm** before building | `/workflowsbrainstorm` |
+| User wants a **formal feature plan** or task breakdown | `/workflowsplan` (optionally after brainstorm) |
+| User wants **exhaustive code/PR review** (security, performance, architecture, data, etc.) | `/workflowsreview` |
+| User wants to **execute a written plan** | `/workflowswork` |
+| User wants a **changelog** for recent merges to main | `/changelog` |
+| User has **solved a problem** worth capturing for the team | `/workflowscompound` |
+| User has a plan that needs **deeper research** (best practices, docs) | `/deepen-plan` |
+| User wants **full autonomous workflow** (plan + execute) | `/lfg` or `/slfg` (swarm) |
+| User or task needs **up-to-date library/framework docs** (Unreal, C++, Python, Blueprint, etc.) | Use **context7 MCP**: `resolve-library-id` then `query-docs`; do not rely only on training data |
+| **First-time setup** (review agents for this stack) | Recommend `/setup` once; the plugin generates `compound-engineering.local.md` |
+
+## Summary
+
+- The rule above is self-contained. No "see doc for when to use."
+- Do not create `compound-engineering.local.md` by hand; `/setup` generates it.
+- When the situation matches a row above, recommend the command (or use context7 for docs) instead of performing that workflow inline—unless the user explicitly asked for the work in-chat.

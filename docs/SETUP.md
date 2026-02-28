@@ -23,8 +23,10 @@ Do these steps once. Everything else for first-phase setup is already in the rep
    - `07-ai-agent-behavior.mdc` — session continuity (SESSION_LOG), cleanup, error recording.
    - `05-error-handling.mdc` — error recording policy (`docs/KNOWN_ERRORS.md`).
    - `08-project-context.mdc` — HomeWorld-specific context and conventions.
+   - **Optional:** Run `/parallel-setup` once for the Parallel plugin (research/enrich). The agent will suggest when to use its commands.
+   - **Optional:** Run `/setup` in Cursor once to configure Compound Engineering review agents for this project. The agent recommends plugin commands (e.g. `/workflowsreview`, `/workflowsplan`) when the use case fits; see `.cursor/rules/10-compound-engineering.mdc`.
 
-After this, follow [TASKLIST.md](TASKLIST.md) for current tasks.
+After this, follow [workflow/README.md](workflow/README.md) and [workflow/30_DAY_SCHEDULE.md](workflow/30_DAY_SCHEDULE.md) for current tasks.
 
 ---
 
@@ -69,7 +71,7 @@ Use this to confirm first-phase setup is complete before starting tasks.
 
 - [ ] **Plugins:** In `HomeWorld.uproject`, the `Plugins` array includes `PCG`, `GameplayAbilities`, `EnhancedInput`, `SteamSockets`, and `DaySequence` (or `TimeOfDay`), each with `"Enabled":true`.
 - [ ] **Default map:** In `Config/DefaultEngine.ini`, under `[/Script/EngineSettings.GameMapsSettings]`, `GameDefaultMap` is set (e.g. `/Game/HomeWorld/Maps/Main.Main`).
-- [ ] **Docs:** `docs/PROTOTYPE_VISION.md`, `docs/SETUP.md`, `docs/TEAM_APPROVAL_CHECKLIST.md`, `docs/TASKLIST.md`, `docs/SESSION_LOG.md`, `docs/CONTENT_LAYOUT.md`, `ROADMAP.md` exist.
+- [ ] **Docs:** `docs/workflow/README.md`, `docs/workflow/VISION.md`, `docs/workflow/30_DAY_SCHEDULE.md`, `docs/SETUP.md`, `docs/SESSION_LOG.md`, `docs/CONTENT_LAYOUT.md` exist.
 - [ ] **Main map:** World Partition is enabled (open Main → World Settings → Enable World Partition). See [CONTENT_LAYOUT.md](CONTENT_LAYOUT.md).
 
 **C++ and default pawn:**
@@ -82,11 +84,11 @@ Use this to confirm first-phase setup is complete before starting tasks.
 
 - [ ] UE 5.4+ (or 5.7) installed; project opens without plugin errors. **Edit > Plugins** shows PCG, Gameplay Abilities, Enhanced Input, Steam Sockets, Day Night Sequencer enabled.
 - [ ] FAB/Quixel assets (or equivalents) acquired if needed.
-- [ ] Team has run through [TEAM_APPROVAL_CHECKLIST.md](TEAM_APPROVAL_CHECKLIST.md) if applicable.
+- [ ] Team has run through the [workflow Pre–Day 1 checklist](workflow/README.md) if applicable.
 
-When all above are checked, proceed to [TASKLIST.md](TASKLIST.md) and the task docs in `docs/tasks/`.
+When all above are checked, proceed to [workflow/30_DAY_SCHEDULE.md](workflow/30_DAY_SCHEDULE.md) and the task docs in `docs/tasks/`.
 
-**Testing and validation:** The `PythonAutomationTest` plugin is enabled. Test files in `Content/Python/tests/` (`test_*.py`) are auto-discovered by the Editor's Test Automation window. Run from Editor (Tools > Test Automation) or use the PIE test runner (`Content/Python/pie_test_runner.py`). For manual checks, run through the checklist above and play-test where applicable.
+**Testing and validation:** The `PythonAutomationTest` plugin is enabled. Test files in `Content/Python/tests/` (`test_*.py`) are auto-discovered by the Editor's Test Automation window. Run from Editor (Tools > Test Automation) or use the PIE test runner (`Content/Python/pie_test_runner.py`). Level tests that load a map use the latent level loader (see [LEVEL_TESTING_PLAN.md](LEVEL_TESTING_PLAN.md)). An optional PIE full-flow test (`test_level_pie_flow.py`) loads Homestead, starts PIE, runs checks, and stops PIE (~30–60 s); run from Tools > Test Automation when needed. For manual checks, run through the checklist above and play-test where applicable.
 
 When you fix a build, lint, or runtime error, record it in [KNOWN_ERRORS.md](KNOWN_ERRORS.md) so we don't repeat it.
 
