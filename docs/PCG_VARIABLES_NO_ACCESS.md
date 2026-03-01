@@ -15,6 +15,7 @@ Settings that are **necessary** for PCG to work (per tutorials and docs) but **n
 | **Get Landscape Data** | bUnbounded (optional) | Control landscape cache bounds vs grid bounds | Unknown — may or may not be exposed as `b_unbounded` | If needed: check Details for Unbounded and set |
 | **PCG Volume (PCGComponent)** | Graph (asset reference) | Which graph runs when user clicks Generate | **No** — `graph` is protected; `set_graph()` unreliable across builds | Outliner → select PCG Volume → Details → **Graph** → assign your graph |
 | **Static Mesh Spawner** | Mesh selector / mesh entries | Which static meshes to spawn (trees, rocks) | **No / partial** — `PCGStaticMeshSpawnerEntry` missing in Python 5.7; mesh list not settable like in Editor | In graph: Static Mesh Spawner → Details → assign static mesh(s) |
+| **Actor Spawner (PCGSpawnActorSettings)** | Template Actor / Actor Class | Which Blueprint to spawn (e.g. BP_HarvestableTree) | **Tried** — script tries `template_actor`, `actor_class`, `template`; if not exposed in 5.7 Python, set manually | In graph: Actor Spawner node → Details → **Template Actor** (or **Actor Class**) → BP_HarvestableTree |
 | **Surface Sampler** | Points Per Squared Meter, Unbounded, Point Extents, etc. | Density and sampling behavior | **Yes** — exposed in 5.7: `points_per_squared_meter`, `unbounded`, `point_extents`, `point_steepness`, `looseness`, etc. | Not required manually if script sets them |
 | **Wiring (all nodes)** | Pin labels (Out, Surface, Bounding Shape, Execution Dependency) | Correct graph connections | **Version-dependent** — pin names vary by engine (e.g. "Out" vs "Output"); must introspect at runtime if building graph from code | When building graph manually: connect Get Landscape Data **Out** → Surface Sampler **Surface**; **Input** → Surface Sampler **Bounding Shape** |
 
@@ -25,6 +26,7 @@ Settings that are **necessary** for PCG to work (per tutorials and docs) but **n
 ### Get Landscape Data (UPCGGetLandscapeSettings)
 
 - **Actor Filter (By Tag + tag name):** Tutorials and Epic Node Reference state the node must target the level's Landscape; in UE 5.7 the actor selector is **By Tag** only. The script tags the Landscape with `PCG_Landscape` but cannot set the node's Actor selector or tag name from Python — property names are not exposed or differ. **Source:** Epic PCG Node Reference (Get Actor Data / Get Landscape Data), Tech Artist's Guide to PCG, Epic Forums (PCG with multiple Landscape actors), docs/tasks/PCG_MANUAL_SETUP.md.
+- **World Partition (Empty Open World):** The root Landscape actor can have **0 components**; components live on **LandscapeStreamingProxy** actors. Get Landscape Data (By Tag) finds all actors with the tag; if only one proxy is tagged, instances spawn only in that cell. Scripts tag **all** loaded LandscapeStreamingProxy actors with `PCG_Landscape` so By Tag returns the full surface. **Manual:** Load the World Partition region(s) containing the landscape (select all cells or the full grid → Load region from selection), then run the script (or diagnostic) so all proxies are tagged; then Generate.
 - **Component selector (By Class, Landscape Component):** Same; not reliably settable from Python.
 - **bUnbounded / SamplingProperties:** Documented in Epic API summary; Python exposure unknown. Re-check with introspection script if needed.
 
@@ -35,6 +37,10 @@ Settings that are **necessary** for PCG to work (per tutorials and docs) but **n
 ### Static Mesh Spawner
 
 - **Mesh selector / mesh entries:** Tutorials say "assign one static mesh in Details." Python: `PCGStaticMeshSpawnerEntry` is missing in UE 5.7; mesh entries may be partially or fully inaccessible from script. **Source:** docs/KNOWN_ERRORS.md (PCG script: PCGStaticMeshSpawnerEntry missing).
+
+### Actor Spawner (PCGSpawnActorSettings)
+
+- **Template Actor / Actor Class:** When `spawn_harvestable_trees` is true in pcg_forest_config.json, the script creates an Actor Spawner for the tree branch and tries to set the template (properties `template_actor`, `actor_class`, or `template`). If none are exposed or settable in UE 5.7 Python, the script logs that you must set **Template Actor** to BP_HarvestableTree in the graph Details. **Manual:** Open ForestIsland_PCG → select the Actor Spawner node → Details → **Template Actor** (or **Actor Class**) → assign `/Game/HomeWorld/Building/BP_HarvestableTree`.
 
 ### Surface Sampler (PCGSurfaceSamplerSettings)
 
@@ -68,4 +74,4 @@ Settings that are **necessary** for PCG to work (per tutorials and docs) but **n
 
 ## Introspection (optional)
 
-To see what Python actually exposes for Get Landscape Data on your engine build, run the Editor script `Content/Python/pcg_settings_introspect.py` (if present). Output is written to `Saved/pcg_settings_introspect_5.7.txt` (or similar). Re-run after engine upgrades and update this doc if new properties become available.
+To see what Python actually exposes for Get Landscape Data, Static Mesh Spawner, and **actual graph node settings**, run the Editor script `Content/Python/pcg_settings_introspect.py`. Output is written to `Saved/pcg_settings_introspect_5.7.txt`. The script also loads `ForestIsland_PCG` (if it exists) and dumps properties from each node’s settings so you can add any writable tag/selector/mesh_entries names to `try_set_get_landscape_selector()` or mesh list code. Re-run after engine upgrades. See [PCG_ELEGANT_SOLUTIONS.md](PCG_ELEGANT_SOLUTIONS.md) for the one-time “golden” graph approach and introspection-driven automation.

@@ -16,12 +16,15 @@
   ],
   "height_filter_min": null,
   "height_filter_max": null,
-  "points_per_squared_meter": 0.02,
-  "density_lower_bound": 0.2,
-  "density_upper_bound": 0.5,
+  "points_per_squared_meter": 0.01,
+  "density_lower_bound": 0.1,
+  "density_upper_bound": 0.25,
+  "spawn_harvestable_trees": true,
+  "harvestable_tree_blueprint_path": "/Game/HomeWorld/Building/BP_HarvestableTree",
   "_comment_trees": "Stylized Provencal trees by default. Replace with Megascans paths from Content/Environments/ if desired.",
   "_comment_rocks": "Stylized Provencal forest/small rocks. Leave empty to skip rocks branch.",
   "_comment_height": "Optional: set height_filter_min and height_filter_max (world Z in cm) to spawn only on terrain. E.g. -5000 to 5000. Leave null to skip.",
   "transform_offset_z": 0,
-  "_comment_offset": "Z offset in cm (world space). 0 = base-pivot; for center-pivot use positive (e.g. 250-400) to lift so base sits on surface. See docs/PCG_SETUP.md."
+  "_comment_offset": "Z offset in cm (world space). 0 = base-pivot; for center-pivot use positive (e.g. 250-400) to lift so base sits on surface. See docs/PCG_SETUP.md.",
+  "_comment_harvestable": "When spawn_harvestable_trees is true, script uses Actor Spawner (BP_HarvestableTree). Delete ForestIsland_PCG and re-run script to apply; or replace tree spawner manually per docs/tasks/DAY7_RESOURCE_NODES.md."
 }

@@ -35,8 +35,38 @@ def _log(msg):
     unreal.log("PCG Forest: " + str(msg))
 
 
+def _tag_actor_pcg_landscape(actor, add=True):
+    """Add or remove PCG_LANDSCAPE_TAG on an actor. Returns True if changed."""
+    try:
+        tags = actor.get_editor_property("tags") if hasattr(actor, "get_editor_property") else getattr(actor, "tags", None)
+        if tags is None:
+            return False
+        tag_strs = [str(t) for t in tags]
+        has_tag = PCG_LANDSCAPE_TAG in tag_strs
+        if add and has_tag:
+            return False
+        if not add and not has_tag:
+            return False
+        if add:
+            if hasattr(actor, "add_tag"):
+                actor.add_tag(PCG_LANDSCAPE_TAG)
+            else:
+                tags.append(unreal.Name(PCG_LANDSCAPE_TAG))
+                if hasattr(actor, "set_editor_property"):
+                    actor.set_editor_property("tags", tags)
+        else:
+            tags[:] = [t for t in tags if str(t) != PCG_LANDSCAPE_TAG]
+            if hasattr(actor, "set_editor_property"):
+                actor.set_editor_property("tags", tags)
+        return True
+    except Exception:
+        return False
+
+
 def ensure_landscape_has_pcg_tag():
-    """Ensure the level's first Landscape actor has PCG_LANDSCAPE_TAG so Get Landscape Data (Actor By Tag) can find it. Idempotent."""
+    """Ensure the level's first Landscape actor has PCG_LANDSCAPE_TAG so Get Landscape Data (Actor By Tag) can find it. Idempotent.
+    In World Partition, the root Landscape may have 0 components (they live in LandscapeStreamingProxy). If so, we tag the first
+    proxy that has components and remove the tag from the root so Get Landscape Data finds an actor with surfaces."""
     try:
         world = unreal.EditorLevelLibrary.get_editor_world()
         if not world:
@@ -45,21 +75,37 @@ def ensure_landscape_has_pcg_tag():
         if not landscapes:
             return
         land = landscapes[0]
-        tags = land.get_editor_property("tags") if hasattr(land, "get_editor_property") else getattr(land, "tags", None)
-        if tags is not None:
-            tag_strs = [str(t) for t in tags]
-            if PCG_LANDSCAPE_TAG in tag_strs:
-                return
-            try:
-                if hasattr(land, "add_tag"):
-                    land.add_tag(PCG_LANDSCAPE_TAG)
-                else:
-                    tags.append(unreal.Name(PCG_LANDSCAPE_TAG))
-                    if hasattr(land, "set_editor_property"):
-                        land.set_editor_property("tags", tags)
+        comp_class = getattr(unreal, "LandscapeComponent", None)
+        root_comp_count = 0
+        if comp_class and hasattr(land, "get_components_by_class"):
+            root_comp_count = len(land.get_components_by_class(comp_class))
+
+        if root_comp_count > 0:
+            # Normal case: root has components, tag it
+            if _tag_actor_pcg_landscape(land, add=True):
                 _log("Tagged Landscape with '%s' for Get Landscape Data (By Tag)." % PCG_LANDSCAPE_TAG)
-            except Exception as e:
-                _log("Could not add tag to Landscape: %s" % e)
+            return
+
+        # World Partition: root has 0 components; tag all proxies that have components so Get Landscape Data finds full surface
+        proxy_class = getattr(unreal, "LandscapeStreamingProxy", None)
+        if not proxy_class:
+            _tag_actor_pcg_landscape(land, add=True)
+            return
+        proxies = unreal.GameplayStatics.get_all_actors_of_class(world, proxy_class)
+        if not proxies:
+            _tag_actor_pcg_landscape(land, add=True)
+            return
+        tagged_count = 0
+        _tag_actor_pcg_landscape(land, add=False)
+        for proxy in proxies:
+            if comp_class and hasattr(proxy, "get_components_by_class"):
+                n = len(proxy.get_components_by_class(comp_class))
+                if n > 0 and _tag_actor_pcg_landscape(proxy, add=True):
+                    tagged_count += 1
+        if tagged_count > 0:
+            _log("World Partition: root has 0 components; tagged %d LandscapeStreamingProxy actor(s) with '%s' so Get Landscape Data finds full landscape. Generate again." % (tagged_count, PCG_LANDSCAPE_TAG))
+        else:
+            _tag_actor_pcg_landscape(land, add=True)
     except Exception:
         pass
 
@@ -72,7 +118,7 @@ def _load_config():
         if not os.path.exists(config_path):
             return {"trees": [], "rocks": [], "height_filter_min": None, "height_filter_max": None,
                     "points_per_squared_meter": 0.05, "density_lower_bound": 0.3, "density_upper_bound": 1.0,
-                    "transform_offset_z": -250.0}
+                    "transform_offset_z": -250.0, "spawn_harvestable_trees": False, "harvestable_tree_blueprint_path": "/Game/HomeWorld/Building/BP_HarvestableTree"}
         with open(config_path, "r", encoding="utf-8") as f:
             data = json.load(f)
         trees = [p for p in (data.get("static_mesh_spawner_meshes") or []) if p]
@@ -87,13 +133,16 @@ def _load_config():
         density_lo = float(data.get("density_lower_bound", 0.3))
         density_hi = float(data.get("density_upper_bound", 1.0))
         offset_z = float(data.get("transform_offset_z", -250.0))
+        spawn_harvestable = bool(data.get("spawn_harvestable_trees", False))
+        bp_path = str(data.get("harvestable_tree_blueprint_path") or "/Game/HomeWorld/Building/BP_HarvestableTree").strip()
         return {"trees": trees, "rocks": rocks, "height_filter_min": h_min, "height_filter_max": h_max,
                 "points_per_squared_meter": points_per_m2, "density_lower_bound": density_lo, "density_upper_bound": density_hi,
-                "transform_offset_z": offset_z}
+                "transform_offset_z": offset_z, "spawn_harvestable_trees": spawn_harvestable, "harvestable_tree_blueprint_path": bp_path}
     except Exception as e:
         _log("Config load warning: " + str(e))
         return {"trees": [], "rocks": [], "height_filter_min": None, "height_filter_max": None,
-                "points_per_squared_meter": 0.05, "density_lower_bound": 0.3, "density_upper_bound": 1.0}
+                "points_per_squared_meter": 0.05, "density_lower_bound": 0.3, "density_upper_bound": 1.0,
+                "transform_offset_z": -250.0, "spawn_harvestable_trees": False, "harvestable_tree_blueprint_path": "/Game/HomeWorld/Building/BP_HarvestableTree"}
 
 
 def _get_mesh_paths():
@@ -271,7 +320,7 @@ def create_pcg_graph(exclusion_zones=None, force_recreate=False):
     """Create PCG graph with Get Landscape Data, Surface Sampler -> Density -> [Difference] -> Transform -> Spawner.
     Optional rocks branch with Merge. Does NOT set Get Landscape Data actor/tag (user sets By Tag + PCG_Landscape).
     Does NOT assign graph to volume or call Generate. Returns graph asset or None.
-    If force_recreate is True and the graph asset exists, it is deleted and recreated."""
+    Default force_recreate=False: existing graph is reused; create only when asset is missing. If True, existing graph is deleted and recreated (opt-in escape hatch)."""
     _ensure_pcg_folder()
     if exclusion_zones is None:
         exclusion_zones = []
@@ -315,6 +364,11 @@ def create_pcg_graph(exclusion_zones=None, force_recreate=False):
         _log("Get Landscape Data node skipped (PCGGetLandscapeSettings not found). Add it manually and set By Tag + PCG_Landscape.")
     landscape_out = _first_data_output_label(get_landscape_node) if get_landscape_node else None
 
+    config = _load_config()
+    use_harvestable_trees = config.get("spawn_harvestable_trees", False)
+    harvestable_bp_path = config.get("harvestable_tree_blueprint_path") or "/Game/HomeWorld/Building/BP_HarvestableTree"
+    actor_spawner_cls = getattr(unreal, "PCGSpawnActorSettings", None)
+
     # Main chain: Surface Sampler, Density, Transform, Spawner (spaced for graph editor)
     surface_node, surface_settings = graph_asset.add_node_of_type(unreal.PCGSurfaceSamplerSettings)
     _set_graph_node_position(surface_node, 400, 300)
@@ -322,13 +376,17 @@ def create_pcg_graph(exclusion_zones=None, force_recreate=False):
     _set_graph_node_position(density_node, 800, 300)
     transform_node, transform_settings = graph_asset.add_node_of_type(unreal.PCGTransformPointsSettings)
     _set_graph_node_position(transform_node, 1200, 300)
-    spawner_node, spawner_settings = graph_asset.add_node_of_type(unreal.PCGStaticMeshSpawnerSettings)
+    if use_harvestable_trees and actor_spawner_cls:
+        spawner_node, spawner_settings = graph_asset.add_node_of_type(actor_spawner_cls)
+        tree_spawner_is_actor = True
+    else:
+        spawner_node, spawner_settings = graph_asset.add_node_of_type(unreal.PCGStaticMeshSpawnerSettings)
+        tree_spawner_is_actor = False
     _set_graph_node_position(spawner_node, 1600, 300)
     if not all([surface_node, density_node, transform_node, spawner_node]):
         _log("Failed to add one or more nodes.")
         return None
 
-    config = _load_config()
     points_per_m2 = config.get("points_per_squared_meter", 0.05)
     density_lo = config.get("density_lower_bound", 0.3)
     density_hi = config.get("density_upper_bound", 1.0)
@@ -358,29 +416,48 @@ def create_pcg_graph(exclusion_zones=None, force_recreate=False):
 
     # Rotation is yaw-only above (rotation_min/max) so instances stay upright. UE 5.7 Static Mesh Spawner has no align-to-surface option.
 
-    mesh_paths = _get_mesh_paths()
-    tree_entries_set = False
-    tree_entry_count = 0
-    entry_cls = getattr(unreal, "PCGStaticMeshSpawnerEntry", None)
-    try:
-        if entry_cls:
-            spawner_settings.set_mesh_selector_type(unreal.PCGMeshSelectorWeighted)
-            selector = spawner_settings.get_editor_property("mesh_selector_parameters")
-            if selector and mesh_paths:
-                entries = []
-                for path in mesh_paths:
-                    mesh_asset = unreal.load_asset(path)
-                    if mesh_asset:
-                        entries.append(entry_cls(weight=100, mesh=mesh_asset))
-                tree_entry_count = len(entries)
-                if entries and hasattr(selector, "set_editor_property"):
-                    selector.set_editor_property("mesh_entries", entries)
-                    tree_entries_set = True
-        else:
-            # UE 5.7 Python: PCGStaticMeshSpawnerEntry and PCGMeshSelectorSingleMesh are not exposed; meshes must be set in Editor.
-            _log("Tree meshes: set in Editor — open ForestIsland_PCG, select the tree Static Mesh Spawner node, in Details set the mesh list (e.g. from pcg_forest_config.json).")
-    except Exception as e:
-        _log("Mesh selector setup warning: %s" % e)
+    if tree_spawner_is_actor:
+        template_set = False
+        try:
+            bp_asset = unreal.load_asset(harvestable_bp_path) if unreal.EditorAssetLibrary.does_asset_exist(harvestable_bp_path) else None
+            if bp_asset and hasattr(spawner_settings, "set_editor_property"):
+                for prop in ("template_actor", "actor_class", "template"):
+                    try:
+                        spawner_settings.set_editor_property(prop, bp_asset)
+                        template_set = True
+                        _log("Tree branch: Actor Spawner template set to %s (property %s)." % (harvestable_bp_path, prop))
+                        break
+                    except Exception:
+                        continue
+            if not template_set:
+                _log("Tree branch: Actor Spawner added. Set Template Actor to BP_HarvestableTree in ForestIsland_PCG Details (%s)." % harvestable_bp_path)
+        except Exception as e:
+            _log("Actor Spawner template warning: %s. Set Template Actor to BP_HarvestableTree in ForestIsland_PCG Details." % e)
+        tree_entries_set = False
+        tree_entry_count = 0
+    else:
+        mesh_paths = _get_mesh_paths()
+        tree_entries_set = False
+        tree_entry_count = 0
+        entry_cls = getattr(unreal, "PCGStaticMeshSpawnerEntry", None)
+        try:
+            if entry_cls:
+                spawner_settings.set_mesh_selector_type(unreal.PCGMeshSelectorWeighted)
+                selector = spawner_settings.get_editor_property("mesh_selector_parameters")
+                if selector and mesh_paths:
+                    entries = []
+                    for path in mesh_paths:
+                        mesh_asset = unreal.load_asset(path)
+                        if mesh_asset:
+                            entries.append(entry_cls(weight=100, mesh=mesh_asset))
+                    tree_entry_count = len(entries)
+                    if entries and hasattr(selector, "set_editor_property"):
+                        selector.set_editor_property("mesh_entries", entries)
+                        tree_entries_set = True
+            else:
+                _log("Tree meshes: set in Editor — open ForestIsland_PCG, select the tree Static Mesh Spawner node, in Details set the mesh list (e.g. from pcg_forest_config.json).")
+        except Exception as e:
+            _log("Mesh selector setup warning: %s" % e)
 
     # Optional height filter
     height_filter_node = None
@@ -547,7 +624,10 @@ def create_pcg_graph(exclusion_zones=None, force_recreate=False):
         unreal.EditorAssetLibrary.save_loaded_asset(graph_asset)
     except Exception:
         pass
-    _log("Created and saved PCG graph: %s. Set Get Landscape Data to By Tag + PCG_Landscape, assign graph to volume, then Generate." % PCG_GRAPH_PACKAGE)
+    if tree_spawner_is_actor:
+        _log("Created and saved PCG graph: %s (tree branch = Actor Spawner / harvestable). Set Get Landscape Data to By Tag + PCG_Landscape, assign graph to volume, then Generate." % PCG_GRAPH_PACKAGE)
+    else:
+        _log("Created and saved PCG graph: %s. Set Get Landscape Data to By Tag + PCG_Landscape, assign graph to volume, then Generate." % PCG_GRAPH_PACKAGE)
     return graph_asset
 
 
@@ -588,15 +668,21 @@ def destroy_pcg_volume(world=None):
 
 
 def update_forest_island_graph_from_config(graph_asset):
-    """Re-apply transform_offset_z and rotation (yaw-only, absolute) to all Transform Points nodes in the graph.
-    Call when graph already exists so config changes in pcg_forest_config.json take effect without recreating the graph."""
+    """Re-apply density, transform_offset_z and rotation from pcg_forest_config.json to existing graph nodes.
+    Updates Surface Sampler (points_per_squared_meter), Density Filter (bounds), and Transform Points (offset, rotation).
+    Call when graph already exists so config changes take effect without recreating the graph."""
     if not graph_asset:
         return
     config = _load_config()
     offset_z = float(config.get("transform_offset_z", 0.0))
+    points_per_m2 = float(config.get("points_per_squared_meter", 0.05))
+    density_lo = float(config.get("density_lower_bound", 0.3))
+    density_hi = float(config.get("density_upper_bound", 1.0))
     rot_min = unreal.Rotator(0.0, 0.0, 0.0)   # roll=0, pitch=0, yaw=0
     rot_max = unreal.Rotator(0.0, 0.0, 359.0) # roll=0, pitch=0, yaw=359
     transform_cls = getattr(unreal, "PCGTransformPointsSettings", None)
+    surface_cls = getattr(unreal, "PCGSurfaceSamplerSettings", None)
+    density_cls = getattr(unreal, "PCGDensityFilterSettings", None)
     if not transform_cls:
         return
     try:
@@ -605,6 +691,21 @@ def update_forest_island_graph_from_config(graph_asset):
         nodes = []
     updated = 0
     first_readback = None
+    for node in nodes:
+        try:
+            settings = node.get_settings() if hasattr(node, "get_settings") else None
+            if settings and surface_cls and isinstance(settings, surface_cls):
+                settings.set_editor_property("points_per_squared_meter", points_per_m2)
+                settings.set_editor_property("apply_density_to_points", True)
+                updated += 1
+                continue
+            if settings and density_cls and isinstance(settings, density_cls):
+                settings.set_editor_property("lower_bound", density_lo)
+                settings.set_editor_property("upper_bound", density_hi)
+                updated += 1
+                continue
+        except Exception:
+            pass
     for node in nodes:
         try:
             settings = node.get_settings() if hasattr(node, "get_settings") else None
@@ -632,7 +733,7 @@ def update_forest_island_graph_from_config(graph_asset):
         except Exception as e:
             _log("update_forest_island_graph: skip node: %s" % e)
     if updated:
-        _log("Updated %d Transform Points node(s) from config (offset_z=%.0f, yaw-only rotation)." % (updated, offset_z))
+        _log("Updated graph from config: Surface/Density/Transform (points_per_m2=%.3f, density=%.2f-%.2f, offset_z=%.0f)." % (points_per_m2, density_lo, density_hi, offset_z))
 
 
 def place_pcg_volume(location=None, extent=None, graph_asset=None):
@@ -685,11 +786,17 @@ def place_pcg_volume(location=None, extent=None, graph_asset=None):
 
     editor_subsystem.save_current_level()
     if graph_asset:
-        _log("Attempting to assign graph and trigger Generate...")
+        _log("Attempting to assign graph, set Get Landscape Data + mesh lists, and trigger Generate (demo-ready)...")
         update_forest_island_graph_from_config(graph_asset)
-        try_assign_graph_to_volume(graph_asset)
         try_set_get_landscape_selector(graph_asset)
+        try_set_spawner_mesh_lists(graph_asset)
+        try_assign_graph_to_volume(graph_asset)
         trigger_pcg_generate()
+        try:
+            editor_subsystem.save_current_level()
+            _log("Level saved after Generate; PCG instances persisted.")
+        except Exception as e:
+            _log("Save after Generate failed: %s" % e)
     else:
         _log("PCG Volume placed and level saved. Assign your PCG graph to the volume in Details and click Generate.")
 
@@ -778,8 +885,107 @@ def try_set_get_landscape_selector(graph_asset):
                     continue
         except Exception as e:
             _log("try_set_get_landscape_selector: Node check failed: %s" % e)
+    # Try with unreal.Name for tag (some APIs expect Name not str)
+    tag_name = getattr(unreal, "Name", None)
+    if tag_name is not None:
+        try:
+            name_val = tag_name(PCG_LANDSCAPE_TAG)
+        except Exception:
+            name_val = None
+        if name_val is not None:
+            for node in nodes:
+                try:
+                    settings = node.get_settings() if hasattr(node, "get_settings") else None
+                    if settings is None or not isinstance(settings, get_landscape_cls):
+                        continue
+                    for prop in ("tag", "selected_tag", "actor_tag", "filter_tag", "landscape_tag", "tag_name"):
+                        try:
+                            if hasattr(settings, "set_editor_property"):
+                                settings.set_editor_property(prop, name_val)
+                                _log("try_set_get_landscape_selector: Set %s = %s (Name)." % (prop, PCG_LANDSCAPE_TAG))
+                                return True
+                        except Exception:
+                            continue
+                    for prop in ("actor_selector", "actor_filter", "selector_settings"):
+                        try:
+                            sub = settings.get_editor_property(prop) if hasattr(settings, "get_editor_property") else getattr(settings, prop, None)
+                            if sub is not None and hasattr(sub, "set_editor_property"):
+                                for subprop in ("tag", "selected_tag", "tag_name", "filter_tag", "actor_filter_tag"):
+                                    try:
+                                        sub.set_editor_property(subprop, name_val)
+                                        _log("try_set_get_landscape_selector: Set %s.%s = %s (Name)." % (prop, subprop, PCG_LANDSCAPE_TAG))
+                                        return True
+                                    except Exception:
+                                        continue
+                        except Exception:
+                            continue
+                except Exception:
+                    continue
     _log("try_set_get_landscape_selector: Could not set tag from script. Set Get Landscape Data to By Tag + PCG_Landscape in the graph Details.")
     return False
+
+
+def try_set_spawner_mesh_lists(graph_asset):
+    """Apply mesh lists from pcg_forest_config.json to all Static Mesh Spawner nodes in the graph.
+    First spawner = trees (static_mesh_spawner_meshes), second = rocks (static_mesh_spawner_meshes_rocks).
+    Logs what was set. If PCGStaticMeshSpawnerEntry is not in unreal, logs that user must set meshes in Editor."""
+    if not graph_asset:
+        return 0
+    config = _load_config()
+    tree_paths = config.get("trees") or []
+    rock_paths = config.get("rocks") or []
+    if not tree_paths and not rock_paths:
+        _log("try_set_spawner_mesh_lists: No tree or rock paths in config.")
+        return 0
+    try:
+        nodes = getattr(graph_asset, "nodes", None) or []
+    except Exception:
+        nodes = []
+    spawner_cls = getattr(unreal, "PCGStaticMeshSpawnerSettings", None)
+    entry_cls = getattr(unreal, "PCGStaticMeshSpawnerEntry", None)
+    if not spawner_cls:
+        _log("try_set_spawner_mesh_lists: PCGStaticMeshSpawnerSettings not found.")
+        return 0
+    if not entry_cls:
+        _log("try_set_spawner_mesh_lists: PCGStaticMeshSpawnerEntry not in unreal; set mesh lists in Editor (Details on each Static Mesh Spawner node).")
+        return 0
+    spawner_settings_list = []
+    for node in nodes:
+        try:
+            settings = node.get_settings() if hasattr(node, "get_settings") else None
+            if settings is not None and isinstance(settings, spawner_cls):
+                spawner_settings_list.append(settings)
+        except Exception:
+            continue
+    updated = 0
+    use_harvestable_trees = config.get("spawn_harvestable_trees", False)
+    for i, spawner_settings in enumerate(spawner_settings_list):
+        # When spawn_harvestable_trees is true, tree branch is Actor Spawner; only Static Mesh Spawners here are rocks (or none).
+        if use_harvestable_trees:
+            paths = rock_paths
+        else:
+            paths = tree_paths if i == 0 else rock_paths
+        if not paths:
+            continue
+        try:
+            spawner_settings.set_mesh_selector_type(unreal.PCGMeshSelectorWeighted)
+            selector = spawner_settings.get_editor_property("mesh_selector_parameters")
+            if not selector:
+                continue
+            entries = []
+            for path in paths:
+                mesh_asset = unreal.load_asset(path)
+                if mesh_asset:
+                    entries.append(entry_cls(weight=100, mesh=mesh_asset))
+            if entries and hasattr(selector, "set_editor_property"):
+                selector.set_editor_property("mesh_entries", entries)
+                updated += 1
+                _log("try_set_spawner_mesh_lists: Set %d mesh(es) on spawner %d (%s)." % (len(entries), i + 1, "trees" if i == 0 else "rocks"))
+        except Exception as e:
+            _log("try_set_spawner_mesh_lists: spawner %d failed: %s" % (i + 1, e))
+    if updated == 0 and spawner_settings_list:
+        _log("try_set_spawner_mesh_lists: Could not set mesh_entries on any spawner; set mesh list in Editor on each Static Mesh Spawner node.")
+    return updated
 
 
 def trigger_pcg_generate():
