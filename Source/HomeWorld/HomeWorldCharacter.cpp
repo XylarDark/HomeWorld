@@ -221,6 +221,18 @@ void AHomeWorldCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	{
 		StrafeRightAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/HomeWorld/Input/IA_StrafeRight.IA_StrafeRight"));
 	}
+	if (!PrimaryAttackAction)
+	{
+		PrimaryAttackAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/HomeWorld/Input/IA_PrimaryAttack.IA_PrimaryAttack"));
+	}
+	if (!DodgeAction)
+	{
+		DodgeAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/HomeWorld/Input/IA_Dodge.IA_Dodge"));
+	}
+	if (!InteractAction)
+	{
+		InteractAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/HomeWorld/Input/IA_Interact.IA_Interact"));
+	}
 	// #region agent log
 	{
 		const FString DataJson2 = FString::Printf(TEXT("{\"afterFallback_hasMove\":%s,\"afterFallback_hasLook\":%s,\"afterFallback_hasIMC\":%s,\"willStillReturnEarly\":%s}"),
@@ -281,6 +293,19 @@ void AHomeWorldCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 
 	EnhancedInput->BindAction(LookAction, ETriggerEvent::Triggered, this, &AHomeWorldCharacter::Look);
 
+	if (PrimaryAttackAction && PrimaryAttackAbilityClass)
+	{
+		EnhancedInput->BindAction(PrimaryAttackAction, ETriggerEvent::Triggered, this, &AHomeWorldCharacter::OnPrimaryAttackTriggered);
+	}
+	if (DodgeAction && DodgeAbilityClass)
+	{
+		EnhancedInput->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &AHomeWorldCharacter::OnDodgeTriggered);
+	}
+	if (InteractAction && InteractAbilityClass)
+	{
+		EnhancedInput->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AHomeWorldCharacter::OnInteractTriggered);
+	}
+
 	// Ensure game viewport receives input after bindings are set (fixes PIE when keyboard/mouse don't move or look).
 	if (APlayerController* PC = Cast<APlayerController>(GetController()))
 	{
@@ -331,6 +356,57 @@ void AHomeWorldCharacter::OnStrafeRightPressed(const FInputActionValue& Value)
 void AHomeWorldCharacter::OnStrafeRightReleased(const FInputActionValue& Value)
 {
 	MovementRightAxis = FMath::Clamp(MovementRightAxis - 1.0f, -1.0f, 1.0f);
+}
+
+void AHomeWorldCharacter::OnPrimaryAttackTriggered(const FInputActionValue& Value)
+{
+	UE_LOG(LogTemp, Log, TEXT("HomeWorld: PrimaryAttack input triggered"));
+	if (!AbilitySystemComponent)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HomeWorld: PrimaryAttack skipped - no AbilitySystemComponent"));
+		return;
+	}
+	if (!PrimaryAttackAbilityClass)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HomeWorld: PrimaryAttack skipped - PrimaryAttackAbilityClass not set on Blueprint"));
+		return;
+	}
+	const bool bActivated = AbilitySystemComponent->TryActivateAbilityByClass(PrimaryAttackAbilityClass);
+	UE_LOG(LogTemp, Log, TEXT("HomeWorld: PrimaryAttack ability %s"), bActivated ? TEXT("activated") : TEXT("failed to activate"));
+}
+
+void AHomeWorldCharacter::OnDodgeTriggered(const FInputActionValue& Value)
+{
+	UE_LOG(LogTemp, Log, TEXT("HomeWorld: Dodge input triggered"));
+	if (!AbilitySystemComponent)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HomeWorld: Dodge skipped - no AbilitySystemComponent"));
+		return;
+	}
+	if (!DodgeAbilityClass)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HomeWorld: Dodge skipped - DodgeAbilityClass not set on Blueprint"));
+		return;
+	}
+	const bool bActivated = AbilitySystemComponent->TryActivateAbilityByClass(DodgeAbilityClass);
+	UE_LOG(LogTemp, Log, TEXT("HomeWorld: Dodge ability %s"), bActivated ? TEXT("activated") : TEXT("failed to activate"));
+}
+
+void AHomeWorldCharacter::OnInteractTriggered(const FInputActionValue& Value)
+{
+	UE_LOG(LogTemp, Log, TEXT("HomeWorld: Interact input triggered"));
+	if (!AbilitySystemComponent)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HomeWorld: Interact skipped - no AbilitySystemComponent"));
+		return;
+	}
+	if (!InteractAbilityClass)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HomeWorld: Interact skipped - InteractAbilityClass not set on Blueprint"));
+		return;
+	}
+	const bool bActivated = AbilitySystemComponent->TryActivateAbilityByClass(InteractAbilityClass);
+	UE_LOG(LogTemp, Log, TEXT("HomeWorld: Interact ability %s"), bActivated ? TEXT("activated") : TEXT("failed to activate"));
 }
 
 void AHomeWorldCharacter::Move(const FInputActionValue& Value)

@@ -38,15 +38,17 @@ Exact invocations the agent should use (see [docs/SETUP.md](docs/SETUP.md) and [
 - **Python script in Editor:** From project root, `py "Content/Python/<script>.py"`; or via MCP: `execute_python_script("<script>.py")` (paths relative to `Content/Python/`).
 - **Python tests:** Editor: Tools > Test Automation (discovers `Content/Python/tests/test_*.py`).
 - **PIE validation:** MCP `execute_python_script("pie_test_runner.py")`, then read `Saved/pie_test_results.json`.
+- **Demo map setup:** Primary demo map is **DemoMap** (`/Game/HomeWorld/Maps/DemoMap`). Run `create_demo_from_scratch.py` (Editor or MCP). Create map first via File → New Level → Empty Open World → Save As; see [docs/DEMO_MAP.md](docs/DEMO_MAP.md).
 - **Project commands:** Reusable workflows in `.cursor/commands/` are available via `/` in chat (e.g. `/run-tests-and-fix`, `/create-pr`, `/review-changes`).
-- **Project skills:** Domain skills in `.cursor/skills/` (e.g. homestead-setup, pcg-validate, ue57-api-check) are available via `/` in chat for Homestead map + PCG setup, PCG validation, and UE 5.7 API/plugin checks.
-- **PCG Generate nothing:** Use the **pcg-validate** skill and [docs/PCG_SETUP.md](docs/PCG_SETUP.md) section "Generate produces nothing (checklist)"; check Output Log for **LogPCG** and **No surfaces found**.
+- **Project skills:** Domain skills in `.cursor/skills/` (e.g. demo-map-setup, homestead-setup, pcg-validate, ue57-api-check) are available via `/` in chat. **Primary demo map:** DemoMap and **create_demo_from_scratch.py**; see [docs/DEMO_MAP.md](docs/DEMO_MAP.md). Use **demo-map-setup** for DemoMap + PCG; **homestead-setup** for legacy Homestead.
+- **PCG Generate nothing:** Use the **pcg-validate** skill and [docs/PCG_SETUP.md](docs/PCG_SETUP.md) section "Generate produces nothing (checklist)"; check Output Log for **LogPCG** and **No surfaces found**. For a short, tutorial-aligned flow and volume sizing (DemoMap or Homestead), see [docs/PCG_QUICK_SETUP.md](docs/PCG_QUICK_SETUP.md).
 - **UE 5.7 API/plugin work:** Before changing C++, Blueprint, PCG, or plugin code, check [.cursor/rules/unreal-cpp.mdc](.cursor/rules/unreal-cpp.mdc) (pitfalls table) and [docs/KNOWN_ERRORS.md](docs/KNOWN_ERRORS.md). For **PCG graph or node changes**, also check [docs/PCG_BEST_PRACTICES.md](docs/PCG_BEST_PRACTICES.md) and [docs/PCG_VARIABLES_NO_ACCESS.md](docs/PCG_VARIABLES_NO_ACCESS.md). See [docs/UE57_TECH.md](docs/UE57_TECH.md) for the full UE 5.7 tech entry point.
 
 ## Boundaries
 
 - **Never:** Commit secrets, API keys, or `.env`; edit `Plugins/UnrealMCP/` or `Saved/` (they are not project code); change engine version (UE 5.7 only) or target platform (PC + Steam Early Access) without a team decision.
 - **Ask first:** CI/schema changes (`.github/workflows/`, JSON schema files), adding or upgrading dependencies, or broad refactors that touch many modules.
+- **Game content:** Automation preserves existing content; create-if-missing, update-in-place. See [.cursor/rules/18-game-development-principles.mdc](.cursor/rules/18-game-development-principles.mdc).
 
 ## Testing
 
@@ -60,7 +62,7 @@ Exact invocations the agent should use (see [docs/SETUP.md](docs/SETUP.md) and [
 - **C++:** PascalCase types, camelCase locals; Unreal prefixes (`A`, `U`, `F`, `E`, `I`). Include own header first. See `.cursor/rules/unreal-cpp.mdc`.
 - **Python:** PEP 8, type hints, 4-space indent. UE scripts must be idempotent (check-before-create). See `.cursor/rules/12-python.mdc`.
 - **Commits:** Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`). See `.cursor/rules/04-git-workflow.mdc`.
-- **Feature debug instrumentation:** When implementing new features, add minimal debug logs (entry/exit, key branches, critical values) so debugging can fast-track to runtime evidence. See `.cursor/rules/16-feature-debug-instrumentation.mdc`.
+- **Feature debug instrumentation and log-driven validation:** When implementing features, include a **robust, log-driven way to validate** that they work (entry/exit, user-triggered actions, success/fail in logs). The user must not have to prompt for logging to confirm implementation. See `.cursor/rules/16-feature-debug-instrumentation.mdc`.
 
 ## PR and commit guidelines
 

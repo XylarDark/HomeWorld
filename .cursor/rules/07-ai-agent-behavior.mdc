@@ -162,6 +162,7 @@ Before any MCP call:
 - [ ] **Session log read** — read `docs/SESSION_LOG.md` at task start to load prior context (see Session Continuity)
 - [ ] **Daily state read** — read `docs/workflow/DAILY_STATE.md` at task start so "yesterday" and "today" are available when the user asks
 - [ ] **New feature: research and tutorials first** — when developing a new feature: research Epic/UE docs and best practices for that feature; follow tutorials first, then expand where the project needs differ (see Feature development: research and tutorials first above)
+- [ ] **Log-driven validation** — when implementing a feature, include a robust log-driven way to validate it (entry/exit, user-triggered actions, success/fail). The user must not have to prompt for logging to confirm the feature works. See `.cursor/rules/16-feature-debug-instrumentation.mdc`.
 - [ ] **UE 5.7 check** — before C++/Blueprint/PCG or plugin changes: check `unreal-cpp.mdc` pitfalls table and `docs/KNOWN_ERRORS.md`; after engine/plugin upgrade: re-verify automation access (see `automation-standards.mdc` and `docs/UE57_TECH.md`)
 - [ ] **PCG Generate produces nothing** — when the user reports that PCG Generate shows no instances: follow [docs/PCG_SETUP.md](docs/PCG_SETUP.md) "Generate produces nothing (checklist)" and the **pcg-validate** skill (ordered checklist, Output Log, Surface Sampler Debug).
 - [ ] Context gathered before changes

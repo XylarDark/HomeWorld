@@ -16,7 +16,7 @@ HomeWorld is developed **programmatically by default**: as much work as possible
 
 When adding new features, prefer C++ for the core implementation; use Blueprint for data, overrides, and content integration.
 
-**Debug instrumentation:** When implementing new features, add minimal debug instrumentation (entry/exit, key branches, critical values) by default so that when something goes wrong we can get runtime evidence quickly. See `.cursor/rules/16-feature-debug-instrumentation.mdc`.
+**Debug instrumentation and log-driven validation:** When implementing new features, add minimal debug instrumentation (entry/exit, key branches, critical values, and for user-triggered actions: trigger + outcome) by default. Every feature must be **validatable from logs** (Output Log, log files, or test output) so you can confirm it works without prompting for logging. See `.cursor/rules/16-feature-debug-instrumentation.mdc`.
 
 ---
 
