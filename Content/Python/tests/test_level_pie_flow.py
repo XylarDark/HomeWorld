@@ -1,7 +1,7 @@
 # test_level_pie_flow.py
-# PythonAutomationTest: full flow — load Homestead, wait ready, start PIE, run PIE checks, stop PIE.
+# PythonAutomationTest: full flow — load DemoMap, wait ready, start PIE, run PIE checks, stop PIE.
 # Optional; takes ~30–60 s. Run via Editor: Tools > Test Automation.
-# Requires Homestead map and default game mode/pawn.
+# Requires DemoMap and default game mode/pawn.
 
 import json
 import os
@@ -20,14 +20,14 @@ import importlib
 importlib.reload(level_loader)
 importlib.reload(pie_test_runner)
 
-HOMESTEAD_PATH = "/Game/HomeWorld/Maps/Homestead"
+DEMO_MAP_PATH = "/Game/HomeWorld/Maps/DemoMap"
 LEVEL_WAIT_SEC = 30
 PIE_YIELDS = 12
 LATENT_TIMEOUT_SEC = 90
 
 
-def test_homestead_pie_full_flow():
-    """Load Homestead, wait for ready, start PIE, run pie_test_runner checks, stop PIE."""
+def test_demo_map_pie_full_flow():
+    """Load DemoMap, wait for ready, start PIE, run pie_test_runner checks, stop PIE."""
     try:
         lib = getattr(unreal, "PyAutomationTestLibrary", None)
         if lib and hasattr(lib, "set_latent_command_timeout"):
@@ -36,7 +36,7 @@ def test_homestead_pie_full_flow():
         pass
     # 1) Load level and wait for ready
     gen = level_loader.latent_load_level_and_wait(
-        HOMESTEAD_PATH, level_loader.landscape_has_bounds, LEVEL_WAIT_SEC
+        DEMO_MAP_PATH, level_loader.landscape_has_bounds, LEVEL_WAIT_SEC
     )
     for _ in gen:
         yield

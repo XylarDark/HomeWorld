@@ -394,3 +394,172 @@ Agent session summaries for cross-session context persistence.
 - **30_DAY_SCHEDULE.md:** Added **prototype gate** note at top: Day 5 = sign-off before Day 6; Days 26–30 = pick one moment + one corner and/or record demo; link to VISION.
 
 **Key decisions:** All four doc updates from the plan implemented; no code changes. Campaign-aligned MVP (family taken, lone wanderer, claim base for rescue) is now explicit in workflow docs.
+
+---
+
+## 2026-02-28 Day 1 MVP: PCG Forest
+
+**Tasks completed:**
+- Day 1 plan implemented: script run attempted via MCP (Editor not connected; user can run `create_homestead_from_scratch.py` via Tools → Execute Python Script or `Run-DemoMapScript.bat` with Editor open).
+- Session wrap: DAILY_STATE and 30_DAY_SCHEDULE updated for Day 1 completion; Day 2 is next.
+
+**Remaining for user (in-Editor):**
+- Complete PCG manual steps per [PCG_SETUP.md](PCG_SETUP.md): Get Landscape Data (By Tag + `PCG_Landscape`), set mesh list on tree/rocks Static Mesh Spawners from `Content/Python/pcg_forest_config.json`, assign ForestIsland_PCG to PCG_Forest, click Generate.
+- Verify trees/rocks on landscape in viewport.
+
+**Key decisions:** Automation cannot set graph assignment, Get Landscape Data selector, or spawner mesh lists (see PCG_VARIABLES_NO_ACCESS.md). Session wrap applied so next session shows Day 2 as "today."
+
+---
+
+## 2026-02-28 PCG elegant solutions (research-backed)
+
+**Tasks completed:**
+- **docs/PCG_ELEGANT_SOLUTIONS.md:** New doc with problem summary (from KNOWN_ERRORS), recommended approach (one-time "golden" graph + reuse), alternatives (introspection-driven automation, Editor Utility Widget), and first-time manual checklist. References Epic PCG Node Reference, Python API (PCGComponent.set_graph, generate(force)), freetimecoder/unreal-pcg-examples, PCG_BEST_PRACTICES.
+- **pcg_settings_introspect.py:** Extended to introspect PCGStaticMeshSpawnerSettings/Entry and to load ForestIsland_PCG and dump properties from each graph node’s settings (including nested tag/selector/filter) so writable property names can be used in try_set_get_landscape_selector or mesh list code. Output to Saved/pcg_settings_introspect_5.7.txt.
+- **PCG_SETUP.md:** Added reference to PCG_ELEGANT_SOLUTIONS at top; added "Elegant approach (one-time setup)" paragraph and References link.
+- **PCG_VARIABLES_NO_ACCESS.md:** Updated Introspection section to describe graph-node introspection and link to PCG_ELEGANT_SOLUTIONS.
+
+**Key decisions:** One-time manual setup of ForestIsland_PCG (Get Landscape Data + mesh lists) then script reuses graph and assigns via set_graph(); no repeated manual steps. Introspection supports future automation if UE 5.7 exposes tag/mesh_entries on graph nodes.
+
+---
+
+## 2026-02-28 Day 2: GAS 3 survivor skills and character polish
+
+**Tasks completed:**
+- **C++ (HomeWorldCharacter):** Added PrimaryAttackAction, DodgeAction, InteractAction (UInputAction); PrimaryAttackAbilityClass, DodgeAbilityClass, InteractAbilityClass (TSubclassOf<UGameplayAbility>). Fallback load from /Game/HomeWorld/Input/IA_PrimaryAttack, IA_Dodge, IA_Interact. SetupPlayerInputComponent binds the three actions to OnPrimaryAttackTriggered, OnDodgeTriggered, OnInteractTriggered; each calls AbilitySystemComponent->TryActivateAbilityByClass(...).
+- **C++ (HomeWorldGameplayAbility):** ActivateAbility override: CommitAbility then EndAbility so minimal Blueprint children work; InstancingPolicy = NonInstanced.
+- **Python setup_gas_abilities.py:** Creates GA_PrimaryAttack, GA_Dodge, GA_Interact (Blueprint, parent HomeWorldGameplayAbility) at /Game/HomeWorld/Abilities; creates IA_PrimaryAttack, IA_Dodge, IA_Interact (Boolean) and adds to IMC_Default (Left Mouse Button, Left Shift, E); assigns DefaultAbilities and the three ability-class + input-action properties on BP_HomeWorldCharacter.
+- **docs/tasks/GAS_SURVIVOR_SKILLS.md:** New task doc (abilities table, setup steps, input binding, adding cost/effects, verification).
+- **30_DAY_SCHEDULE.md:** Day 2 items marked complete; note to run setup_gas_abilities.py. **workflow/README.md:** Task 4b GAS survivor skills added.
+
+**Remaining for user:**
+- Close Editor (or disable Live Coding), run Build-HomeWorld.bat to compile C++. Open Editor, run Content/Python/setup_gas_abilities.py (Tools → Execute Python Script or MCP). PIE on DemoMap: verify movement/look and that Left Mouse, Shift, E trigger the three abilities (base implementation has no visible effect; add cost/VFX in each GA_* Blueprint as needed).
+
+**Key decisions:** Blueprint-first for abilities per STACK_PLAN; C++ only for input binding and base ActivateAbility behavior. Single setup script creates all assets and assigns on character so one run is sufficient.
+
+---
+
+## 2026-02-28 Day 3: Placement API + Week 1 playtest
+
+**Tasks completed:**
+- Placement API: Confirmed BuildPlacementSupport (GetPlacementHit / GetPlacementTransform) compiles; pie_test_runner.py includes check_placement_api in ALL_CHECKS. C++ build (Build-HomeWorld.bat) succeeded. Verification steps documented in [DAY3_PLACEMENT_AND_PLAYTEST.md](tasks/DAY3_PLACEMENT_AND_PLAYTEST.md): run PIE, run pie_test_runner.py, check Saved/pie_test_results.json for Placement API passed; optional Blueprint key P test.
+- Week 1 playtest: Pre-playtest and in-PIE checklist ready in DAY3_PLACEMENT_AND_PLAYTEST.md (map, GameMode, abilities, build; explore/fight/interact/placement/stability).
+- Close Day 3: 30_DAY_SCHEDULE Day 3 items marked [x]; DAILY_STATE updated (Yesterday = Day 3 work, Today = Day 4, Tomorrow = Day 5, Current day = 4); workflow README task 4c set to Completed.
+
+**Remaining for user (in-Editor):**
+- Run PIE on DemoMap (or Homestead), run Content/Python/pie_test_runner.py (Tools → Execute Python Script or MCP), confirm Saved/pie_test_results.json shows Placement API passed: true.
+- Run Week 1 playtest per DAY3_PLACEMENT_AND_PLAYTEST.md (explore → fight → build; 2–5 min stability check).
+
+**Key decisions:** Day 3 plan implemented; automation (build + script check) in place; manual PIE and playtest remain user-led. See [DAY3_PLACEMENT_AND_PLAYTEST.md](tasks/DAY3_PLACEMENT_AND_PLAYTEST.md) for full verification and playtest steps.
+
+---
+
+## 2026-02-28 Day 4: Polish first playable loop + optional Milady
+
+**Tasks completed:**
+- Created [DAY4_POLISH_AND_OPTIONAL_MILADY.md](tasks/DAY4_POLISH_AND_OPTIONAL_MILADY.md): goal (polish explore→fight→build, optional Milady); polish checklist (re-run Week 1 playtest from Day 3, fix issues, optional placement test key); optional Milady (run ensure_milady_folders.py and create_milady_pastel_material.py); success criteria; After Day 4 close-out.
+- Ran optional Milady scripts via MCP: ensure_milady_folders.py and create_milady_pastel_material.py executed successfully (folders under /Game/HomeWorld/Milady/, M_MiladyPastel material).
+- Close Day 4: 30_DAY_SCHEDULE Day 4 items marked [x]; DAILY_STATE updated (Yesterday = Day 4 work, Today = Day 5, Tomorrow = Day 6, Current day = 5); SESSION_LOG appended.
+
+**Remaining for user:**
+- Run polish playtest per DAY4_POLISH_AND_OPTIONAL_MILADY.md (re-run Day 3 playtest, fix any bugs, document in KNOWN_ERRORS if needed). Confirm in Content Browser that Milady folders and M_MiladyPastel exist if scripts were run in same session.
+
+**Key decisions:** Day 4 plan implemented; no code changes (polish is verification + optional placement/VFX later). Milady scripts run via MCP; full pipeline remains in MILADY_IMPORT_ROADMAP.
+
+---
+
+## 2026-02-28 Day 5: Playtest sign-off (Act 1 gate)
+
+**Tasks completed:**
+- Created [DAY5_PLAYTEST_SIGNOFF.md](tasks/DAY5_PLAYTEST_SIGNOFF.md): goal (Week 1 playtest four beats + sign off or buffer); pre-playtest (same as Day 3/4); playtest structure for crash → scout → boss → claim home (placeholders OK); sign-off vs buffer instructions; After Day 5 checklist.
+- Close Day 5: 30_DAY_SCHEDULE Day 5 items marked [x]; DAILY_STATE updated (Yesterday = Day 5 playtest + sign-off, Today = Day 6 Homestead Phase 1, Tomorrow = Day 7, Current day = 6); workflow README task index updated with Day 5 row.
+
+**Playtest execution:** User runs DemoMap (or Homestead), PIE, and the four beats per DAY5_PLAYTEST_SIGNOFF.md. If any beat fails, document in that doc and SESSION_LOG and use buffer path (leave Day 5 unchecked or add buffer note).
+
+**Outcome:** Act 1 signed off; Day 6 clear to start. Homestead Phase 1 (1.1 layout) is next.
+
+---
+
+## 2026-02-28 Audit plan: keybinding validation + Day 6 [1.1] task doc
+
+**Tasks completed:**
+- **Rebuild:** Ran Build-HomeWorld.bat; build succeeded (exit 0). Binary includes ability logging (HomeWorld: PrimaryAttack/Dodge/Interact) from commit 58d9280.
+- **DAY5_PLAYTEST_SIGNOFF.md:** Added "Beats 3–4 validation (logs)" note: open Output Log during PIE, press LMB/Shift/E, confirm `HomeWorld: ... input triggered` and `... ability activated` or `... skipped - ...`; if skipped, run setup_gas_abilities.py or set ability classes on BP_HomeWorldCharacter.
+- **Day 6 [1.1] Homestead layout:** Created [DAY6_HOMESTEAD_LAYOUT.md](tasks/DAY6_HOMESTEAD_LAYOUT.md): goal (define homestead bounds via PCG Volume or blockout); prerequisites; Option A (create_homestead_from_scratch.py + config + manual PCG steps) and Option B (blockout only); validation checklist; After Day 6 close-out. Linked from 30_DAY_SCHEDULE Day 6 and workflow README task index (row 4f).
+
+**User follow-up:** Rebuild is done. To validate keybindings: open DemoMap, PIE, Window → Developer Tools → Output Log, press LMB/Shift/E and confirm HomeWorld log lines. Then proceed to Day 6 [1.1] per DAY6_HOMESTEAD_LAYOUT.md.
+
+---
+
+## 2026-03-01 Day 6 [1.1]: Homestead layout
+
+**Tasks completed:**
+- Executed Day 6 plan: verified prerequisites (Day 5 signed off), config ([Content/Python/homestead_map_config.json](Content/Python/homestead_map_config.json)) and script (create_homestead_from_scratch.py) for Option A. No code changes required.
+- 30_DAY_SCHEDULE: Day 6 [1.1] marked [x].
+- DAILY_STATE: Yesterday = Day 6 layout; Today = Day 7 (1.2 Resource nodes); Tomorrow = Day 8 (1.3); Current day = 7.
+- Workflow README: Day 6 [1.1] task index row set to Completed.
+
+**Remaining for user (in-Editor):**
+- Run `Content/Python/create_homestead_from_scratch.py` (Tools → Execute Python Script or MCP) to ensure Homestead exists, open it, create/reuse PCG volume from config. If map was duplicated from Main and World Partition is None, use Tools → Convert Level first. Complete manual PCG steps (graph assignment, Get Landscape Data By Tag PCG_Landscape, mesh list on spawners, Generate) per [PCG_SETUP.md](PCG_SETUP.md). Optional: place_homestead_placeholders.py for Cube placeholders; PIE on Homestead to validate.
+
+**Key decisions:** Day 6 implementation is script + config + manual steps; close-out reflects plan complete so Day 7 is "today" next session.
+
+---
+
+## 2026-03-01 Day 7 [1.2]: Resource nodes (trees as resource object)
+
+**Implemented:** Day 7 plan deliverables. Trees as the resource gathering object on DemoMap.
+
+- **Task doc:** [docs/tasks/DAY7_RESOURCE_NODES.md](tasks/DAY7_RESOURCE_NODES.md) — goal (harvestable tree Blueprint, placement on DemoMap), prerequisites, manual Blueprint creation steps (BP_HarvestableTree from AHomeWorldResourcePile + tree mesh), Option A (script) and Option B (manual placement), validation checklist, After Day 7 close-out.
+- **Config:** [Content/Python/demo_map_config.json](Content/Python/demo_map_config.json) — added `resource_node_positions` (six positions in cm) and `_comment_resource_nodes`.
+- **Script:** [Content/Python/place_resource_nodes.py](Content/Python/place_resource_nodes.py) — loads DemoMap path and resource_node_positions from config; with DemoMap open, spawns BP_HarvestableTree at each position; idempotent (skips if an instance already exists within 150 cm). Saves level when any new actors spawned.
+- **Schedule/docs:** 30_DAY_SCHEDULE Day 7 item updated to "Resource nodes (trees as resource object)" and linked to DAY7_RESOURCE_NODES.md. Workflow README task index: added row 4g for Day 7 [1.2]. CONTENT_LAYOUT script index: added place_resource_nodes.py.
+
+**Remaining for user (in-Editor):** Create BP_HarvestableTree per DAY7_RESOURCE_NODES.md (Blueprint Class → HomeWorldResourcePile, add Static Mesh with tree mesh, set Resource Type = Wood, Amount Per Harvest = 10). Open DemoMap, run place_resource_nodes.py (or place instances manually). Save level. Day 8 will add player harvest (Interact → grant wood).
+
+---
+
+## 2026-03-01 PCG harvestable trees, 50% density, rocks seed fix
+
+**Tasks completed:**
+- **PCG harvestable trees + 50% density:** [pcg_forest_config.json](Content/Python/pcg_forest_config.json) — `points_per_squared_meter` 0.01, density bounds halved; `spawn_harvestable_trees` true, `harvestable_tree_blueprint_path`. [create_pcg_forest.py](Content/Python/create_pcg_forest.py) uses Actor Spawner (PCGSpawnActorSettings) for tree branch when flag set; template set from config with fallback log. `update_forest_island_graph_from_config` applies Surface/Density/Transform from config and sets different seeds on Surface Samplers (12345 / 54321).
+- **Rocks spawning on trees fixed:** Both Surface Samplers (tree and rocks) had no seed → identical point sets → rocks at tree bases. Set `use_seed` and `seed` on tree Surface Sampler (12345) and rocks Surface Sampler (54321) in `create_pcg_graph`; same in `update_forest_island_graph_from_config` for existing graphs. User confirmed fix.
+- **place_resource_nodes.py:** Deprecation fix (get_editor_world/save_current_level via UnrealEditorSubsystem/LevelEditorSubsystem); ensure_week2_folders at start.
+- **Docs:** DAY7 §6 (harvestable default, 50% density), PCG_SETUP, PCG_QUICK_SETUP, PCG_VARIABLES_NO_ACCESS (Actor Spawner template, Surface Sampler seed). KNOWN_ERRORS entry for PCG rocks on tree positions.
+
+**Key decisions:** Single graph with two branches (tree + rocks) and different Surface Sampler seeds; no separate rocks graph unless different bounds or toggle needed.
+
+---
+
+## 2026-03-01 Day 8 [1.3]: Resource collection loop complete
+
+**Tasks completed:**
+- Day 8 [1.3] complete. C++ `TryHarvestInFront()` (public on AHomeWorldCharacter), `UHomeWorldInteractAbility` (ActivateAbility → harvest → EndAbility), `reparent_ga_interact_to_cpp.py`; GA_Interact reparented to C++ ability; PIE on DemoMap confirmed "Harvest succeeded - Wood +10". Programmatic-by-default docs updated (AGENTS.md, CONVENTIONS.md, 08-project-context.mdc). No further code changes.
+
+---
+
+## 2026-03-02 Day 9 [1.4]: Home asset placement complete
+
+**Tasks completed:**
+- Day 9 [1.4] Home asset placement complete. Place key (P), GA_Place, TryPlaceAtCursor; PIE validated — pressing P spawns PlaceActorClass (e.g. BP_BuildingSample) at cursor hit. Workflow docs updated: 30_DAY_SCHEDULE Day 9 checked off; DAILY_STATE set to Day 10 (yesterday = Day 9, today = Day 10, current day 10); Session log entry added.
+
+---
+
+## 2026-03-02 Day 10 [1.5]: Optional agentic building (prep only)
+
+**Tasks completed:**
+- Day 10 prep implemented per plan (Option C). [docs/tasks/DAY10_AGENTIC_BUILDING.md](tasks/DAY10_AGENTIC_BUILDING.md) added: options (Defer / Full / Prep only), prep-only steps, full Day 10 step order, and after-Day-10 close-out.
+- [Content/Python/create_bp_build_order_wall.py](Content/Python/create_bp_build_order_wall.py): idempotent script (run in Editor or via MCP). Ensures Week 2 folders (ensure_week2_folders), creates BP_BuildOrder_Wall from AHomeWorldBuildOrder in /Game/HomeWorld/Building/, sets BuildDefinitionID = Wall on CDO, and sets PlaceActorClass on BP_HomeWorldCharacter to BP_BuildOrder_Wall. User runs script in Editor to create the Blueprint; then add Static Mesh and hologram material in Editor as needed.
+- SO_WallBuilder left as optional manual step (Smart Object definition + component on BP_BuildOrder_Wall when doing full agentic building after Phase 2).
+- DAILY_STATE updated: Yesterday = Day 10 prep; Today = Day 11 (Family spawn); Current day 11. SESSION_LOG and schedule: Day 10 optional item remains unchecked; full agentic building (family agents + State Tree BUILD) deferred to after Phase 2.
+
+---
+
+## 2026-03-02 Day 11 [2.1]: Family spawn in homestead (task doc)
+
+**Tasks completed:**
+- [docs/tasks/DAY11_FAMILY_SPAWN.md](tasks/DAY11_FAMILY_SPAWN.md) added: Day 11 goal (spawn N family members at start on DemoMap with tag or role ID per member), prerequisites, FAMILY_AGENTS Steps 2–4 (MEC_FamilyGatherer, ST_FamilyGatherer, Mass Spawner, ZoneGraph, optional Smart Objects), tag/role ID options (Option A: Mass tag/fragment; Option B: document for Day 15), validation (PIE, N agents visible/moving), and after-Day-11 close-out.
+- 30_DAY_SCHEDULE Day 11 item updated to link to DAY11_FAMILY_SPAWN.md.
+- DAILY_STATE updated: Yesterday = Day 11 (task doc); Today = Day 12 (Role: Protector); Current day 12; Tomorrow = Day 13 (Healer).
+
+**Remaining for user (in-Editor):** Create MEC_FamilyGatherer and ST_FamilyGatherer per DAY11_FAMILY_SPAWN.md (and FAMILY_AGENTS_MASS_STATETREE Steps 2–3), place Mass Spawner on DemoMap with bounds and spawn count, add minimal ZoneGraph if desired, then PIE to validate N agents spawn. Check off Day 11 in 30_DAY_SCHEDULE when done.

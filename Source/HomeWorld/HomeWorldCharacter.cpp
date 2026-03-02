@@ -1,6 +1,7 @@
 // Copyright HomeWorld. All Rights Reserved.
 
 #include "HomeWorldCharacter.h"
+#include "BuildPlacementSupport.h"
 #include "AbilitySystemComponent.h"
 #include "Abilities/GameplayAbility.h"
 #include "GameplayAbilitySpec.h"
@@ -11,6 +12,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Math/RotationMatrix.h"
 #include "HomeWorldAttributeSet.h"
+#include "HomeWorldResourcePile.h"
+#include "HomeWorldInventorySubsystem.h"
 #include "InputActionValue.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
@@ -20,25 +23,7 @@
 #include "Engine/HitResult.h"
 #include "CollisionQueryParams.h"
 #include "Components/CapsuleComponent.h"
-#include "HAL/FileManager.h"
-#include "Misc/Paths.h"
-
-// #region agent log
-static void DebugLogLine(const FString& Location, const FString& Message, const FString& DataJson, const FString& HypothesisId)
-{
-	const FString Path = FPaths::ProjectSavedDir() + TEXT("debug-e79282.log");
-	const int64 Timestamp = FDateTime::UtcNow().ToUnixTimestamp() * 1000;
-	const FString Line = FString::Printf(TEXT("{\"sessionId\":\"e79282\",\"timestamp\":%lld,\"location\":\"%s\",\"message\":\"%s\",\"data\":%s,\"hypothesisId\":\"%s\"}\n"),
-		Timestamp, *Location, *Message.Replace(TEXT("\""), TEXT("\\\"")), *DataJson, *HypothesisId);
-	if (FArchive* Ar = IFileManager::Get().CreateFileWriter(*Path, 0x08)) // FILEWRITE_Append
-	{
-		FTCHARToUTF8 Utf8(*Line);
-		Ar->Serialize(const_cast<char*>(Utf8.Get()), Utf8.Length());
-		Ar->Close();
-		delete Ar;
-	}
-}
-// #endregion
+#include "Engine/GameInstance.h"
 
 AHomeWorldCharacter::AHomeWorldCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -81,17 +66,6 @@ UAbilitySystemComponent* AHomeWorldCharacter::GetAbilitySystemComponent() const
 void AHomeWorldCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	// #region agent log
-	{
-		const FVector Loc = GetActorLocation();
-		const FString DataJson = FString::Printf(TEXT("{\"locX\":%.1f,\"locY\":%.1f,\"locZ\":%.1f,\"hasController\":%s,\"hasCameraBoom\":%s,\"hasFollowCamera\":%s}"),
-			Loc.X, Loc.Y, Loc.Z,
-			GetController() ? TEXT("true") : TEXT("false"),
-			CameraBoom ? TEXT("true") : TEXT("false"),
-			FollowCamera ? TEXT("true") : TEXT("false"));
-		DebugLogLine(TEXT("HomeWorldCharacter.cpp:BeginPlay"), TEXT("Character BeginPlay"), DataJson, TEXT("H2,H4,H5"));
-	}
-	// #endregion
 	// Apply Blueprint/class defaults for rotation rate (constructor only sees base default).
 	if (UCharacterMovementComponent* Movement = GetCharacterMovement())
 	{
@@ -145,12 +119,6 @@ void AHomeWorldCharacter::Tick(float DeltaTime)
 void AHomeWorldCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
-	// #region agent log
-	{
-		const FString DataJson = FString::Printf(TEXT("{\"hasController\":true,\"controllerName\":\"%s\"}"), NewController ? *NewController->GetName() : TEXT("null"));
-		DebugLogLine(TEXT("HomeWorldCharacter.cpp:PossessedBy"), TEXT("Pawn possessed"), DataJson, TEXT("H2"));
-	}
-	// #endregion
 	if (AbilitySystemComponent)
 	{
 		// Server and owning client: owner = this. Simulated proxy: owner = PlayerState for replication.
@@ -179,19 +147,7 @@ void AHomeWorldCharacter::PossessedBy(AController* NewController)
 void AHomeWorldCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 	UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent);
-	// #region agent log
-	{
-		const FString DataJson = FString::Printf(TEXT("{\"hasEnhancedInput\":%s,\"hasDefaultMappingContext\":%s,\"hasMoveAction\":%s,\"hasLookAction\":%s,\"willReturnEarly\":%s}"),
-			EnhancedInput ? TEXT("true") : TEXT("false"),
-			DefaultMappingContext ? TEXT("true") : TEXT("false"),
-			MoveAction ? TEXT("true") : TEXT("false"),
-			LookAction ? TEXT("true") : TEXT("false"),
-			(!EnhancedInput || !DefaultMappingContext || !MoveAction || !LookAction) ? TEXT("true") : TEXT("false"));
-		DebugLogLine(TEXT("HomeWorldCharacter.cpp:SetupPlayerInputComponent"), TEXT("Input setup"), DataJson, TEXT("H3"));
-	}
-	// #endregion
 	// Fallback: load input assets from project if not set (e.g. when Default Pawn Class is C++ instead of BP_HomeWorldCharacter).
 	if (!MoveAction)
 	{
@@ -233,16 +189,10 @@ void AHomeWorldCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	{
 		InteractAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/HomeWorld/Input/IA_Interact.IA_Interact"));
 	}
-	// #region agent log
+	if (!PlaceAction)
 	{
-		const FString DataJson2 = FString::Printf(TEXT("{\"afterFallback_hasMove\":%s,\"afterFallback_hasLook\":%s,\"afterFallback_hasIMC\":%s,\"willStillReturnEarly\":%s}"),
-			MoveAction ? TEXT("true") : TEXT("false"),
-			LookAction ? TEXT("true") : TEXT("false"),
-			DefaultMappingContext ? TEXT("true") : TEXT("false"),
-			(!EnhancedInput || !DefaultMappingContext || !MoveAction || !LookAction) ? TEXT("true") : TEXT("false"));
-		DebugLogLine(TEXT("HomeWorldCharacter.cpp:SetupPlayerInputComponent:afterFallback"), TEXT("Input after fallback"), DataJson2, TEXT("H3"));
+		PlaceAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/HomeWorld/Input/IA_Place.IA_Place"));
 	}
-	// #endregion
 	if (!EnhancedInput || !DefaultMappingContext || !MoveAction || !LookAction)
 	{
 		return;
@@ -260,20 +210,6 @@ void AHomeWorldCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 			}
 		}
 	}
-	// #region agent log
-	{
-		APlayerController* PC = Cast<APlayerController>(GetController());
-		ULocalPlayer* LP = PC ? PC->GetLocalPlayer() : nullptr;
-		UEnhancedInputLocalPlayerSubsystem* Subsystem = LP ? LP->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>() : nullptr;
-		const FString DataJson3 = FString::Printf(TEXT("{\"hasPC\":%s,\"hasLP\":%s,\"hasSubsystem\":%s,\"mappingContextAdded\":%s}"),
-			PC ? TEXT("true") : TEXT("false"),
-			LP ? TEXT("true") : TEXT("false"),
-			Subsystem ? TEXT("true") : TEXT("false"),
-			bMappingContextAdded ? TEXT("true") : TEXT("false"));
-		DebugLogLine(TEXT("HomeWorldCharacter.cpp:SetupPlayerInputComponent:mapping"), TEXT("Mapping context"), DataJson3, TEXT("H3"));
-	}
-	// #endregion
-
 	// Prefer four directional actions; explicit pressed/released so movement stops on key up.
 	if (MoveForwardAction && MoveBackAction && StrafeLeftAction && StrafeRightAction)
 	{
@@ -304,6 +240,10 @@ void AHomeWorldCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	if (InteractAction && InteractAbilityClass)
 	{
 		EnhancedInput->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AHomeWorldCharacter::OnInteractTriggered);
+	}
+	if (PlaceAction && PlaceAbilityClass)
+	{
+		EnhancedInput->BindAction(PlaceAction, ETriggerEvent::Triggered, this, &AHomeWorldCharacter::OnPlaceTriggered);
 	}
 
 	// Ensure game viewport receives input after bindings are set (fixes PIE when keyboard/mouse don't move or look).
@@ -409,16 +349,95 @@ void AHomeWorldCharacter::OnInteractTriggered(const FInputActionValue& Value)
 	UE_LOG(LogTemp, Log, TEXT("HomeWorld: Interact ability %s"), bActivated ? TEXT("activated") : TEXT("failed to activate"));
 }
 
+void AHomeWorldCharacter::OnPlaceTriggered(const FInputActionValue& Value)
+{
+	UE_LOG(LogTemp, Log, TEXT("HomeWorld: Place input triggered"));
+	if (!AbilitySystemComponent)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HomeWorld: Place skipped - no AbilitySystemComponent"));
+		return;
+	}
+	if (!PlaceAbilityClass)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HomeWorld: Place skipped - PlaceAbilityClass not set on Blueprint"));
+		return;
+	}
+	const bool bActivated = AbilitySystemComponent->TryActivateAbilityByClass(PlaceAbilityClass);
+	UE_LOG(LogTemp, Log, TEXT("HomeWorld: Place ability %s"), bActivated ? TEXT("activated") : TEXT("failed to activate"));
+}
+
+bool AHomeWorldCharacter::TryPlaceAtCursor()
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HomeWorld: Place failed - no World"));
+		return false;
+	}
+	if (!PlaceActorClass)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HomeWorld: Place failed - PlaceActorClass not set (assign BP_BuildOrder_Wall or placeholder in Blueprint)"));
+		return false;
+	}
+	const float MaxDistance = 10000.0f;
+	FHitResult OutHit;
+	FTransform OutTransform;
+	if (!UBuildPlacementSupport::GetPlacementTransform(World, MaxDistance, OutHit, OutTransform))
+	{
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: Place failed - no hit (aim at ground or surface)"));
+		return false;
+	}
+	AActor* Spawned = World->SpawnActor<AActor>(PlaceActorClass, OutTransform);
+	if (!Spawned)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HomeWorld: Place failed - spawn failed at %s"), *OutTransform.GetLocation().ToString());
+		return false;
+	}
+	UE_LOG(LogTemp, Log, TEXT("HomeWorld: Place succeeded at %s (spawned %s)"), *OutTransform.GetLocation().ToString(), *GetNameSafe(Spawned));
+	return true;
+}
+
+bool AHomeWorldCharacter::TryHarvestInFront()
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+	const FVector Start = GetActorLocation() + FVector(0.0f, 0.0f, GetCapsuleComponent() ? GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight() * 0.5f : 50.0f);
+	const FVector Forward = GetControlRotation().Vector();
+	const float TraceLength = 280.0f;
+	const FVector End = Start + Forward * TraceLength;
+	FHitResult Hit;
+	FCollisionQueryParams Params(NAME_None, false, this);
+	if (!World->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params))
+	{
+		return false;
+	}
+	AHomeWorldResourcePile* Pile = Cast<AHomeWorldResourcePile>(Hit.GetActor());
+	if (!Pile)
+	{
+		return false;
+	}
+	UGameInstance* GI = World->GetGameInstance();
+	if (!GI)
+	{
+		return false;
+	}
+	UHomeWorldInventorySubsystem* Inv = GI->GetSubsystem<UHomeWorldInventorySubsystem>();
+	if (!Inv)
+	{
+		return false;
+	}
+	const FName ResourceType = Pile->ResourceType;
+	const int32 Amount = Pile->AmountPerHarvest;
+	Inv->AddResource(ResourceType, Amount);
+	UE_LOG(LogTemp, Log, TEXT("HomeWorld: Harvest succeeded - %s +%d"), *ResourceType.ToString(), Amount);
+	return true;
+}
+
 void AHomeWorldCharacter::Move(const FInputActionValue& Value)
 {
-	// #region agent log
-	static bool bFirstMove = true;
-	if (bFirstMove)
-	{
-		bFirstMove = false;
-		DebugLogLine(TEXT("HomeWorldCharacter.cpp:Move"), TEXT("Move action triggered"), TEXT("{}"), TEXT("H3"));
-	}
-	// #endregion
 	const FVector2D Axis = Value.Get<FVector2D>();
 	const FRotator ControlRot = GetControlRotation();
 	FVector Forward = FRotationMatrix(FRotator(0.0f, ControlRot.Yaw, 0.0f)).GetUnitAxis(EAxis::X);
@@ -434,14 +453,6 @@ void AHomeWorldCharacter::Move(const FInputActionValue& Value)
 
 void AHomeWorldCharacter::Look(const FInputActionValue& Value)
 {
-	// #region agent log
-	static bool bFirstLook = true;
-	if (bFirstLook)
-	{
-		bFirstLook = false;
-		DebugLogLine(TEXT("HomeWorldCharacter.cpp:Look"), TEXT("Look action triggered"), TEXT("{}"), TEXT("H3"));
-	}
-	// #endregion
 	const FVector2D Axis = Value.Get<FVector2D>();
 	APlayerController* PC = Cast<APlayerController>(GetController());
 	if (!PC)

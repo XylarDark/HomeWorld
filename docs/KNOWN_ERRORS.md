@@ -37,6 +37,12 @@ For each entry use:
 - **Fix:** In `level_loader._get_world_partition_bounds`: call `lib.get_runtime_world_bounds()` and `lib.get_editor_world_bounds()` with **no arguments**. Do not pass `world`. If the current editor level is the one with World Partition, the library returns that world’s bounds. See [level_loader.py](Content/Python/level_loader.py).
 - **Context:** 2026-02, Homestead from scratch / PCG volume sizing; landscape has 0 components until Load All, so we fall back to WP bounds when available.
 
+### PCG diagnostic: landscape_components=0 even when region is loaded
+- **Error:** `pcg_generate_nothing_diagnostic.py` reports `landscape_components=0` and `extent=(0,0,0)` even after the World Partition loaded region includes the landscape and the viewport shows the ground.
+- **Cause:** In World Partition, the **root** Landscape actor (e.g. Landscape1) has **Component Count: 0** in Details; the actual components (143 total) live on **LandscapeStreamingProxy** child actors. Python’s `land.get_components_by_class(LandscapeComponent)` on the root therefore returns 0. This matches the Editor UI (Details → Information → Component Count: 0, Total Component Count: 143).
+- **Fix:** Do not rely on the diagnostic’s component count. Ensure **Landscape1** (the root) has tag **PCG_Landscape**; Get Landscape Data finds by tag and should use loaded proxies. Click **Generate** on the PCG Volume and check **Output Log** (LogPCG, “No surfaces found”). If instances appear, PCG is working. See [PCG_SETUP.md](PCG_SETUP.md) “Generate produces nothing”.
+- **Context:** 2026-02, PCG debug; Homestead uses LandscapeStreamingProxy; root Landscape shows 0 components, proxies hold the geometry.
+
 ### UnrealMCP plugin: ANY_PACKAGE removed in UE 5.7
 - **Error:** `error C2065: 'ANY_PACKAGE': undeclared identifier` in UnrealMCPBlueprintCommands.cpp and UnrealMCPBlueprintNodeCommands.cpp (9 occurrences).
 - **Cause:** `ANY_PACKAGE` macro was deprecated in UE 5.1 and fully removed in UE 5.7. The unreal-mcp plugin (chongdashu/unreal-mcp) targets UE 5.5.
@@ -73,6 +79,12 @@ For each entry use:
 - **Fix:** Use Python Editor scripts (`setup_character_blueprint.py`) to set inherited properties via `set_editor_property()` on the Blueprint's default object. MCP cannot be used for this.
 - **Context:** 2026-02, MCP runtime, BP_HomeWorldCharacter.
 
+### PCG: rocks spawn on top of trees (same positions)
+- **Error:** In ForestIsland_PCG with both tree and rocks branches, rocks appear only at the base of each tree; no rocks elsewhere on the ground.
+- **Cause:** Both Surface Sampler nodes (tree and rocks) had no seed set, so they used the same default and generated identical point sets. Rocks and trees therefore shared the same XY positions.
+- **Fix:** Set different seeds on each Surface Sampler: tree branch 12345, rocks branch 54321. In [create_pcg_forest.py](Content/Python/create_pcg_forest.py), set `use_seed` and `seed` on both Surface Samplers in `create_pcg_graph`, and in `update_forest_island_graph_from_config` set seed on each Surface Sampler when updating an existing graph (first = 12345, second = 54321). Run the demo script then Generate so the graph uses the new seeds.
+- **Context:** 2026-03, PCG ForestIsland_PCG; two branches + Merge. See [PCG_VARIABLES_NO_ACCESS.md](PCG_VARIABLES_NO_ACCESS.md) (Surface Sampler seed).
+
 ### MCP set_component_property: cannot find inherited C++ components
 - **Error:** `Component not found: CharacterMesh0` and `Component not found: Mesh` when calling `set_component_property` on a Blueprint child of ACharacter.
 - **Cause:** Components created in the C++ constructor (like `CharacterMesh0`) are not visible to the MCP plugin's component lookup on the Blueprint asset.
@@ -96,6 +108,24 @@ For each entry use:
 - **Cause:** The GameplayAbilities plugin exposes the header as `GameplayAbilitySpec.h` (under the module's Public folder), not `Abilities/GameplayAbilitySpec.h`.
 - **Fix:** Use `#include "GameplayAbilitySpec.h"` instead of `#include "Abilities/GameplayAbilitySpec.h"`.
 - **Context:** 2026-02, GAS default ability granting, UE 5.7.
+
+### GAS: NonInstanced ability instancing policy deprecated
+- **Error:** Asset validation log: "Gameplay Ability Instancing Policy is NonInstanced which is deprecated. Use InstancedPerActor."
+- **Cause:** UE has deprecated `NonInstanced` in favor of `InstancedPerActor` for ability instances.
+- **Fix:** In `UHomeWorldGameplayAbility` constructor (HomeWorldGameplayAbility.cpp), set `InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor`. Rebuild; Blueprint abilities inheriting from this class will use the new default.
+- **Context:** 2026-02, GA_PrimaryAttack, GA_Dodge, GA_Interact validation.
+
+### PIE: AttachTo "cannot be attached to itself" (BP_RiverSpline, BP_Walls)
+- **Error:** `AttachTo: '...DefaultSceneRoot' cannot be attached to itself. Aborting.` spams the log when playing in Homestead (PIE).
+- **Cause:** In StylizedProvencal Blueprints (e.g. BP_RiverSpline, BP_Walls), the root component’s **Attach Parent** is set to itself, or Blueprint/construction logic calls AttachToComponent on the root with itself.
+- **Fix:** Open each Blueprint (Content → StylizedProvencal/Blueprints): in the Components tree, select the root (DefaultSceneRoot). In Details, set **Attach Parent** to None (or the intended parent). If attachment is done in Event Graph/Construction Script, ensure the target is not the same component. Save the Blueprint.
+- **Context:** 2026-02, Homestead map PIE; assets from StylizedProvencal pack.
+
+### DaySequence M_24HrSky depends on Landmass plugin (not mounted)
+- **Error:** `While trying to load package /DaySequence/M_24HrSky, a dependent package /Landmass/Landscape/OldPrototype_BP/... was not available`; "plugin Landmass is not mounted."
+- **Cause:** Day Sequence or a level uses M_24HrSky material that references Landmass plugin content; Landmass is not enabled in the project.
+- **Fix:** Either enable the **Landmass** plugin (Edit → Plugins → search Landmass) and restart, or remove/replace the M_24HrSky (or dependent) usage so the project does not reference Landmass content.
+- **Context:** 2026-02, Editor startup / Day Sequence.
 
 ### UCollisionProfile::OverlapAllDynamic_ProfileName not in UE 5.7
 - **Error:** `error C2039: 'OverlapAllDynamic_ProfileName': is not a member of 'UCollisionProfile'` in HomeWorldBuildOrder.cpp and HomeWorldResourcePile.cpp.

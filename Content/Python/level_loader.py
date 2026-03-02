@@ -287,6 +287,18 @@ def get_landscape_bounds():
         return None
 
 
+def get_world_partition_bounds():
+    """Return (origin Vector, box_extent Vector) from the current world's World Partition, or None.
+    Use when the level uses World Partition and landscape bounds are not yet available (cells not loaded).
+    Sizing the PCG volume to WP bounds is a reasonable fallback so the volume covers the level without requiring Load All."""
+    if not unreal:
+        return None
+    world = get_editor_world()
+    if not world:
+        return None
+    return _get_world_partition_bounds(world)
+
+
 def landscape_has_bounds():
     """True if get_landscape_bounds() returns non-None (used as ready condition)."""
     return get_landscape_bounds() is not None

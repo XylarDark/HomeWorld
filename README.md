@@ -21,7 +21,7 @@
 |-----|-------------|
 | [docs/workflow/README.md](docs/workflow/README.md) | **Workflow** — vision, 30-day schedule, task status, Pre–Day 1 checklist |
 | [docs/workflow/VISION.md](docs/workflow/VISION.md) | Theme, campaign, moral system, scope lock |
-| [docs/workflow/30_DAY_SCHEDULE.md](docs/workflow/30_DAY_SCHEDULE.md) | Day-by-day schedule (Act 1 → Homestead → Family → Planetoid → Spirits → Dungeon) |
+| [docs/workflow/30_DAY_SCHEDULE.md](docs/workflow/30_DAY_SCHEDULE.md) | Day-by-day schedule (Act 1 → DemoMap / Homestead Phase 1 → Family → Planetoid → Spirits → Dungeon) |
 | [docs/STACK_PLAN.md](docs/STACK_PLAN.md) | Tech stack and recommended plugins |
 | [docs/SETUP.md](docs/SETUP.md) | Developer setup (Engine, Plugins, MCP, Git/LFS, Building, Validation) |
 | [docs/MCP_SETUP.md](docs/MCP_SETUP.md) | MCP bridge setup (Cursor-to-Unreal Editor AI control) |

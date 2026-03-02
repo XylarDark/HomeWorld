@@ -8,6 +8,7 @@
 #include "InputActionValue.h"
 #include "HomeWorldCharacter.generated.h"
 
+class AActor;
 class UAbilitySystemComponent;
 class UAttributeSet;
 class UGameplayAbility;
@@ -30,6 +31,14 @@ public:
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	/** Trace forward and harvest the first resource pile hit; adds ResourceType/AmountPerHarvest to inventory. Called from GA_Interact / UHomeWorldInteractAbility. */
+	UFUNCTION(BlueprintCallable, Category = "Interaction", meta = (DisplayName = "Try Harvest In Front"))
+	bool TryHarvestInFront();
+
+	/** Trace from camera via GetPlacementTransform and spawn PlaceActorClass at hit. Called from GA_Place / UHomeWorldPlaceAbility. */
+	UFUNCTION(BlueprintCallable, Category = "Build|Placement", meta = (DisplayName = "Try Place At Cursor"))
+	bool TryPlaceAtCursor();
 
 protected:
 	virtual void PossessedBy(AController* NewController) override;
@@ -98,6 +107,42 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;
 
+	/** Primary attack (e.g. Left Mouse). Triggers PrimaryAttackAbilityClass if set. */
+	UPROPERTY(EditDefaultsOnly, Category = "Input|Abilities")
+	TObjectPtr<UInputAction> PrimaryAttackAction;
+
+	/** Dodge/Sprint (e.g. Shift). Triggers DodgeAbilityClass if set. */
+	UPROPERTY(EditDefaultsOnly, Category = "Input|Abilities")
+	TObjectPtr<UInputAction> DodgeAction;
+
+	/** Interact/Use (e.g. E). Triggers InteractAbilityClass if set. */
+	UPROPERTY(EditDefaultsOnly, Category = "Input|Abilities")
+	TObjectPtr<UInputAction> InteractAction;
+
+	/** Place/Build (e.g. P). Triggers PlaceAbilityClass if set. */
+	UPROPERTY(EditDefaultsOnly, Category = "Input|Abilities")
+	TObjectPtr<UInputAction> PlaceAction;
+
+	/** Ability class to activate when PrimaryAttackAction fires. Assign in Blueprint; should match one of DefaultAbilities. */
+	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
+	TSubclassOf<UGameplayAbility> PrimaryAttackAbilityClass;
+
+	/** Ability class to activate when DodgeAction fires. Assign in Blueprint; should match one of DefaultAbilities. */
+	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
+	TSubclassOf<UGameplayAbility> DodgeAbilityClass;
+
+	/** Ability class to activate when InteractAction fires. Assign in Blueprint; should match one of DefaultAbilities. */
+	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
+	TSubclassOf<UGameplayAbility> InteractAbilityClass;
+
+	/** Ability class to activate when PlaceAction fires. Assign in Blueprint; should match one of DefaultAbilities. */
+	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
+	TSubclassOf<UGameplayAbility> PlaceAbilityClass;
+
+	/** Actor class to spawn when placing (e.g. BP_BuildOrder_Wall). Assign in Blueprint; if null, placement logs and returns false. */
+	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
+	TSubclassOf<AActor> PlaceActorClass;
+
 	/** Scale applied to look input (mouse sensitivity). */
 	UPROPERTY(EditDefaultsOnly, Category = "Input", meta = (ClampMin = "0.01", ClampMax = "10.0"))
 	float LookSensitivity = 1.0f;
@@ -134,6 +179,12 @@ protected:
 	void OnMoveBackReleased(const FInputActionValue& Value);
 	void OnStrafeLeftReleased(const FInputActionValue& Value);
 	void OnStrafeRightReleased(const FInputActionValue& Value);
+
+	/** Activate ability by input (used for Primary Attack, Dodge, Interact, Place). */
+	void OnPrimaryAttackTriggered(const FInputActionValue& Value);
+	void OnDodgeTriggered(const FInputActionValue& Value);
+	void OnInteractTriggered(const FInputActionValue& Value);
+	void OnPlaceTriggered(const FInputActionValue& Value);
 
 	/** Net forward/right axis from the four directional keys. Used when using MoveForward/MoveBack/StrafeLeft/StrafeRight. */
 	float MovementForwardAxis = 0.f;

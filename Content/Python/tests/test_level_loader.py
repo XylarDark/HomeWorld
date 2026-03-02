@@ -1,6 +1,6 @@
 # test_level_loader.py
-# PythonAutomationTest: validates smart level loader (latent load Homestead and ready condition).
-# Requires Homestead map to exist. Run via Editor: Tools > Test Automation.
+# PythonAutomationTest: validates smart level loader (latent load demo map and ready condition).
+# Requires DemoMap to exist. Run via Editor: Tools > Test Automation.
 
 import os
 import sys
@@ -16,13 +16,13 @@ import level_loader
 import importlib
 importlib.reload(level_loader)
 
-HOMESTEAD_PATH = "/Game/HomeWorld/Maps/Homestead"
+DEMO_MAP_PATH = "/Game/HomeWorld/Maps/DemoMap"
 MAX_WAIT_SEC = 30
 LATENT_TIMEOUT_SEC = 45
 
 
-def test_homestead_loads_and_ready():
-    """Load Homestead via latent level loader and assert level is ready (landscape or WP bounds)."""
+def test_demo_map_loads_and_ready():
+    """Load DemoMap via latent level loader and assert level is ready (landscape or WP bounds)."""
     try:
         lib = getattr(unreal, "PyAutomationTestLibrary", None)
         if lib and hasattr(lib, "set_latent_command_timeout"):
@@ -30,15 +30,15 @@ def test_homestead_loads_and_ready():
     except Exception:
         pass
     gen = level_loader.latent_load_level_and_wait(
-        HOMESTEAD_PATH, level_loader.landscape_has_bounds, MAX_WAIT_SEC
+        DEMO_MAP_PATH, level_loader.landscape_has_bounds, MAX_WAIT_SEC
     )
     for _ in gen:
         yield
-    is_loaded = level_loader.is_level_loaded(HOMESTEAD_PATH)
+    is_loaded = level_loader.is_level_loaded(DEMO_MAP_PATH)
     has_bounds = level_loader.landscape_has_bounds()
     current_path = level_loader.get_current_level_path()
     assert is_loaded, (
-        "Homestead level not loaded: current=%s" % current_path
+        "Demo map level not loaded: current=%s" % current_path
     )
     assert has_bounds, (
         "Landscape or World Partition bounds not available after load"

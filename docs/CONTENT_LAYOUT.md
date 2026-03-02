@@ -10,7 +10,7 @@ All project-specific assets live under `/Game/HomeWorld/`.
 
 | Path | Purpose |
 |------|--------|
-| `/Game/HomeWorld/Maps/` | Levels (e.g. Main, Homestead). **Main** is primary demo/overworld; **Homestead** is the homestead-focused map (tutorial home, compound, surrounding zones). See [HOMESTEAD_MAP.md](HOMESTEAD_MAP.md). |
+| `/Game/HomeWorld/Maps/` | Levels. **DemoMap** is the primary demo/playable map for MVP (Empty Open World, no duplicate). **Main** and **Homestead** are legacy/narrative. See [DEMO_MAP.md](DEMO_MAP.md), [HOMESTEAD_MAP.md](HOMESTEAD_MAP.md). |
 | `/Game/HomeWorld/Characters/` | Character Blueprints, Animation Blueprints (e.g. BP_HomeWorldCharacter, ABP_HomeWorldCharacter). |
 | `/Game/HomeWorld/GameMode/` | GameMode Blueprints (e.g. BP_GameMode). |
 | `/Game/HomeWorld/PCG/` | PCG graphs and related assets (e.g. ForestIsland_PCG). |
@@ -47,8 +47,8 @@ Top-level content folders not under `/Game/HomeWorld/` or `/Game/Man/` are third
 
 ## Python and config paths
 
-- **Python scripts:** `Content/Python/` (e.g. `bootstrap_project.py`, `create_homestead_from_scratch.py`).
-- **Configs:** `Content/Python/*.json` (e.g. `homestead_map_config.json`, `pcg_forest_config.json`, `character_blueprint_config.json`).
+- **Python scripts:** `Content/Python/` (e.g. `bootstrap_project.py`, `create_demo_from_scratch.py`, `create_homestead_from_scratch.py`).
+- **Configs:** `Content/Python/*.json` (e.g. `demo_map_config.json` for DemoMap development, `pcg_forest_config.json`, `character_blueprint_config.json`; `homestead_map_config.json` for legacy Homestead map).
 
 Paths in config files use `/Game/...` asset paths; file paths are relative to project root or `Content/Python/`.
 
@@ -57,15 +57,18 @@ Paths in config files use `/Game/...` asset paths; file paths are relative to pr
 | Script | Purpose | Entry / called-by | Config |
 |--------|---------|-------------------|--------|
 | `bootstrap_project.py` | One-click project setup: Enhanced Input, AnimBP, character BP, project settings, level (optional PCG). | Entry | — |
-| `create_homestead_from_scratch.py` | Ensures Homestead exists, opens it, creates/sizes PCG volume and graph (ForestIsland_PCG). | Entry | homestead_map_config.json |
-| `create_pcg_forest.py` | Creates PCG graph (Get Landscape Data, Surface Sampler, Density, Transform, Spawner), tags Landscape, places PCG volume. | Called by create_homestead_from_scratch | pcg_forest_config.json |
-| `level_loader.py` | Level open/load, landscape bounds, WP streaming helpers. | Library (used by create_homestead, check_level_bounds, tests) | — |
+| `create_demo_from_scratch.py` | Ensures DemoMap exists (manual create), opens it, creates/sizes PCG volume and graph (ForestIsland_PCG). Primary demo flow. | Entry | demo_map_config.json |
+| `ensure_demo_map.py` | Idempotent: check DemoMap exists; if not, log manual steps (File -> New Level -> Empty Open World -> Save As). | Standalone (also used by create_demo_from_scratch) | demo_map_config.json |
+| `create_homestead_from_scratch.py` | Ensures Homestead exists (duplicate from Main if missing), opens it, creates/sizes PCG volume and graph. Legacy/campaign. | Entry | homestead_map_config.json |
+| `create_pcg_forest.py` | Creates PCG graph (Get Landscape Data, Surface Sampler, Density, Transform, Spawner), tags Landscape, places PCG volume. | Called by create_demo_from_scratch, create_homestead_from_scratch | pcg_forest_config.json |
+| `level_loader.py` | Level open/load, landscape bounds, WP streaming helpers. | Library (used by create_demo, create_homestead, check_level_bounds, tests) | — |
 | `ensure_homestead_map.py` | Idempotent: duplicate Main to Homestead if Homestead does not exist. | Standalone (also used by create_homestead_from_scratch) | homestead_map_config.json |
 | `ensure_homestead_folders.py` | Idempotent: create `/Game/HomeWorld/Homestead/`, Structures, Placeholders. | Standalone | — |
 | `ensure_milady_folders.py` | Idempotent: create Milady content folders (Meshes, Materials, Animations, Blueprints). | Standalone | — |
 | `ensure_week2_folders.py` | Idempotent: create Mass, AI, ZoneGraph, SmartObjects, Building. | Standalone | — |
 | `place_homestead_placeholders.py` | Spawn placeholders from config (house, outbuildings). | Standalone | homestead_map_config.json |
-| `setup_level.py` | PlayerStart, optional run of create_homestead_from_scratch. | Called by bootstrap_project | — |
+| `place_resource_nodes.py` | Spawn BP_HarvestableTree at resource_node_positions on DemoMap (Day 7). Idempotent. | Standalone | demo_map_config.json |
+| `setup_level.py` | PlayerStart, optional run of create_demo_from_scratch. | Called by bootstrap_project | — |
 | `setup_enhanced_input.py` | IA_Move, IA_Look, IMC_Default. | Called by bootstrap; also init_unreal.py on Editor load | — |
 | `setup_animation_blueprint.py` | ABP_HomeWorldCharacter. | Called by bootstrap_project | character_blueprint_config.json |
 | `setup_character_blueprint.py` | BP_HomeWorldCharacter. | Called by bootstrap_project | character_blueprint_config.json |

@@ -61,6 +61,8 @@ All scripts, setup routines, and automated workflows **must be safe to run multi
 - [ ] Re-runs produce the same result as first runs (no duplicates, no data loss)
 - [ ] The script logs whether it created, reused, or skipped each resource
 
+For game content and levels, see also **game-development-principles** (create-if-missing, never delete by default): `.cursor/rules/18-game-development-principles.mdc`.
+
 ## Editor startup setup
 
 When a Python script is **required for core functionality** (e.g. movement/input working in PIE), run it at Editor startup so that clone-and-open works without a manual step:

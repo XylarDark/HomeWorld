@@ -20,7 +20,7 @@ Keep instrumentation **minimal**: a few well-placed logs per feature, not every 
 
 ## Format and hygiene
 
-- Use a **consistent prefix** per script/module (e.g. `"Level loader: "`, `"Homestead from scratch: "`, `"HomeWorld: "`) so logs are grep-able.
+- Use a **consistent prefix** per script/module (e.g. `"Level loader: "`, `"Demo from scratch: "`, `"HomeWorld: "`) so logs are grep-able.
 - Prefer **structured data** (e.g. `{"path": path, "has_bounds": True}`) so logs are parseable; avoid logging secrets or PII.
 - **Wrap debug blocks** in a region or comment so they can be found or stripped later (e.g. `# #region agent log` / `# #endregion` or `// DEBUG:`).
 - For **Python Editor scripts** that may be used in debug sessions: writing NDJSON lines to a workspace log file (e.g. `debug-*.log`) allows hypothesis-based analysis; include `location`, `message`, `data`, and optional `hypothesisId`/`runId` when that workflow is in use.

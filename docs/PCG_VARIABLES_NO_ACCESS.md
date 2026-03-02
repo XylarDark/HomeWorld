@@ -45,6 +45,7 @@ Settings that are **necessary** for PCG to work (per tutorials and docs) but **n
 ### Surface Sampler (PCGSurfaceSamplerSettings)
 
 - **Points Per Squared Meter, Unbounded, Point Extents, etc.:** Required for density/sampling. **Python 5.7:** Exposed as `points_per_squared_meter`, `unbounded`, `point_extents`, `point_steepness`, `looseness`, `apply_density_to_points`, `keep_zero_density_points`, `use_legacy_grid_creation_method`. No need for manual steps for these if automation sets them. **Source:** Epic Python API (PCGSurfaceSamplerSettings, UE 5.7).
+- **Seed / use_seed:** When the graph has two Surface Samplers (trees + rocks), both must use **different seeds** or they generate the same point set and rocks spawn on top of trees. The script sets seed 12345 on the first (tree) and 54321 on the second (rocks); `update_forest_island_graph_from_config` applies the same when updating an existing graph.
 
 ### Wiring (pin labels)
 

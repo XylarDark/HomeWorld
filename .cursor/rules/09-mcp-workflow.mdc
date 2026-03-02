@@ -56,13 +56,13 @@ If MCP tools are not listed or connection fails (Editor closed, plugin not loade
 Use `execute_python_script` to run any Python Editor script directly from Cursor:
 
 - **Relative paths** are resolved against `Content/Python/` (e.g. `setup_enhanced_input.py`).
-- **Absolute paths** work as-is (e.g. `C:/dev/HomeWorld/Content/Python/create_homestead_from_scratch.py`).
+- **Absolute paths** work as-is (e.g. `C:/dev/HomeWorld/Content/Python/create_demo_from_scratch.py`).
 - Script output goes to the Editor's **Output Log**, not the MCP response.
 - The script runs with full access to the `unreal` Python module.
 
 This replaces the manual "Tools > Execute Python Script" step for all automated scripts.
 
-**Module caching caveat:** The Editor Python session caches imported modules. If you edit a script that is imported by another (e.g. `create_pcg_forest.py` imported by `create_homestead_from_scratch.py`), the changes won't take effect until the importing script calls `importlib.reload()`. All orchestrator scripts in this project already do this.
+**Module caching caveat:** The Editor Python session caches imported modules. If you edit a script that is imported by another (e.g. `create_pcg_forest.py` imported by `create_demo_from_scratch.py`), the changes won't take effect until the importing script calls `importlib.reload()`. All orchestrator scripts in this project already do this.
 
 **Idempotency requirement:** Scripts executed via MCP must be safe to re-run. Check for existing assets/actors before creating. See `00-core-principles.mdc` (Idempotency Protocol).
 

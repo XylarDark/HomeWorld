@@ -22,7 +22,7 @@ HomeWorld is a co-op ARPG survival game with family sim elements, built in Unrea
 
 ## Key Principles
 
-- **Programmatic by default**: Gameplay systems, movement, input, camera, combat in C++; Blueprint for content and designer overrides
+- **Programmatic by default**: Maximize C++ and Python; minimize Blueprint logic. Gameplay systems, movement, input, camera, combat, and **abilities** in C++; Blueprint for content and asset assignment only. For abilities: implement in C++ ability classes and reparent GA_* Blueprints to them (no Blueprint graph wiring by default)
 - **MCP-first**: When the Editor is running and MCP is connected, prefer live Editor manipulation via MCP tools
 - **Error recording**: Document errors in `docs/KNOWN_ERRORS.md` so they are not repeated; check it before similar work
 - **Code-first, then Editor**: Automate as much as possible (Python scripts, MCP); manual Editor steps documented in task guides

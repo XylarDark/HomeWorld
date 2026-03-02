@@ -392,6 +392,14 @@ def create_pcg_graph(exclusion_zones=None, force_recreate=False):
     density_hi = config.get("density_upper_bound", 1.0)
     surface_settings.set_editor_property("points_per_squared_meter", points_per_m2)
     surface_settings.set_editor_property("apply_density_to_points", True)
+    try:
+        surface_settings.set_editor_property("use_seed", True)
+    except Exception:
+        pass
+    try:
+        surface_settings.set_editor_property("seed", 12345)
+    except Exception:
+        pass
     density_settings.set_editor_property("lower_bound", density_lo)
     density_settings.set_editor_property("upper_bound", density_hi)
     # UE Python Rotator(roll, pitch, yaw): only vary Yaw so trees stay upright (0 pitch, 0 roll).
@@ -545,6 +553,14 @@ def create_pcg_graph(exclusion_zones=None, force_recreate=False):
         if all([surface_rock, density_rock, transform_rock, spawner_rock]):
             surface_rock_settings.set_editor_property("points_per_squared_meter", 0.01)
             surface_rock_settings.set_editor_property("apply_density_to_points", True)
+            try:
+                surface_rock_settings.set_editor_property("use_seed", True)
+            except Exception:
+                pass
+            try:
+                surface_rock_settings.set_editor_property("seed", 54321)
+            except Exception:
+                pass
             density_rock_settings.set_editor_property("lower_bound", 0.3)
             density_rock_settings.set_editor_property("upper_bound", 1.0)
             transform_rock_settings.set_editor_property("rotation_min", unreal.Rotator(0.0, 0.0, 0.0))
@@ -691,12 +707,22 @@ def update_forest_island_graph_from_config(graph_asset):
         nodes = []
     updated = 0
     first_readback = None
+    surface_sampler_index = 0
     for node in nodes:
         try:
             settings = node.get_settings() if hasattr(node, "get_settings") else None
             if settings and surface_cls and isinstance(settings, surface_cls):
                 settings.set_editor_property("points_per_squared_meter", points_per_m2)
                 settings.set_editor_property("apply_density_to_points", True)
+                try:
+                    settings.set_editor_property("use_seed", True)
+                except Exception:
+                    pass
+                try:
+                    settings.set_editor_property("seed", 12345 if surface_sampler_index == 0 else 54321)
+                except Exception:
+                    pass
+                surface_sampler_index += 1
                 updated += 1
                 continue
             if settings and density_cls and isinstance(settings, density_cls):
@@ -733,7 +759,7 @@ def update_forest_island_graph_from_config(graph_asset):
         except Exception as e:
             _log("update_forest_island_graph: skip node: %s" % e)
     if updated:
-        _log("Updated graph from config: Surface/Density/Transform (points_per_m2=%.3f, density=%.2f-%.2f, offset_z=%.0f)." % (points_per_m2, density_lo, density_hi, offset_z))
+        _log("Updated graph from config: Surface/Density/Transform (points_per_m2=%.3f, density=%.2f-%.2f, offset_z=%.0f). Surface Samplers use seeds 12345 (tree) and 54321 (rocks) so rocks do not spawn on tree positions." % (points_per_m2, density_lo, density_hi, offset_z))
 
 
 def place_pcg_volume(location=None, extent=None, graph_asset=None):

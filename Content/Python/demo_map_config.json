@@ -1,18 +1,21 @@
 {
-  "demo_level_path": "/Game/HomeWorld/Maps/Main",
-  "template_level_path": "/Game/StylizedProvencal/Maps/Main",
+  "demo_level_path": "/Game/HomeWorld/Maps/DemoMap",
   "volume_center_x": 0,
   "volume_center_y": 0,
   "volume_center_z": 0,
   "volume_extent_x": 5000,
   "volume_extent_y": 5000,
   "volume_extent_z": 500,
-  "volume_extent_z_padding": 10000,
-  "exclusion_zones": [],
+  "volume_extent_z_padding": 1000,
+  "exclusion_zones": [
+    {"center_x": 0, "center_y": 0, "center_z": 0, "extent_x": 500, "extent_y": 500, "extent_z": 300}
+  ],
   "skip_exclusion_zones": false,
-  "_comment_demo": "Target level for demo (village + forest). Script opens this level.",
-  "_comment_template": "Source level to duplicate if demo_level_path does not exist (medieval village).",
-  "_comment_volume": "PCG volume center and half-extents in cm (5000 = 50 m => 100 m box). Adjust to surround village.",
-  "_comment_exclusion_zones": "Optional dead zones (no trees). Array of objects: center_x, center_y, center_z, extent_x, extent_y, extent_z (cm, half-extents).",
-  "_comment_skip_exclusion": "false = auto-detect village/buildings and exclude so trees spawn around village; true = no exclusion."
+  "recreate_volume_and_graph": false,
+  "use_landscape_bounds": true,
+  "_comment_demo": "Primary demo/playable map for MVP. Create once: File -> New Level -> Empty Open World -> Save As /Game/HomeWorld/Maps/DemoMap. No duplicate from another level.",
+  "_comment_volume": "PCG volume center and half-extents in cm. Set use_landscape_bounds false and volume_center_* / volume_extent_* to match your landscape; see docs/PCG_QUICK_SETUP.md.",
+  "_comment_exclusion_zones": "Compound bounds (center + half-extents in cm). Trees will not spawn inside these zones.",
+  "resource_node_positions": [{"x": 500, "y": 0, "z": 0}, {"x": -400, "y": 300, "z": 0}, {"x": -200, "y": -450, "z": 0}, {"x": 600, "y": 400, "z": 0}, {"x": 0, "y": 500, "z": 0}, {"x": -500, "y": -200, "z": 0}],
+  "_comment_resource_nodes": "Day 7: positions in cm for place_resource_nodes.py. Spawns BP_HarvestableTree at each."
 }

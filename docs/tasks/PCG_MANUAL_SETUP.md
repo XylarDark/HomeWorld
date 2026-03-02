@@ -2,7 +2,7 @@
 
 Build the PCG graph **from zero in the Editor without using the script**. For script-based setup (ForestIsland_PCG + volume created by script), see [PCG_SETUP.md](../PCG_SETUP.md).
 
-This doc is for when you want to create the graph entirely by hand (e.g. a minimal test graph or a different layout). The **script** (`create_homestead_from_scratch` → `create_pcg_forest`) **does** create the graph (ForestIsland_PCG), tag the Landscape, and place/size the PCG Volume; you still set Get Landscape Data (By Tag + `PCG_Landscape`), assign the graph to the volume, and click Generate. See [PCG_SETUP.md](../PCG_SETUP.md) for that workflow.
+This doc is for when you want to create the graph entirely by hand (e.g. a minimal test graph or a different layout). The **script** (`create_demo_from_scratch` → `create_pcg_forest`) **does** create the graph (ForestIsland_PCG), tag the Landscape, and place/size the PCG Volume; you still set Get Landscape Data (By Tag + `PCG_Landscape`), assign the graph to the volume, and click Generate. See [PCG_SETUP.md](../PCG_SETUP.md) for that workflow.
 
 ---
 

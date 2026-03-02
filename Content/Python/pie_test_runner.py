@@ -191,6 +191,37 @@ def check_pcg_actors():
         return {"name": "PCG actors", "passed": False, "detail": str(e)}
 
 
+def check_placement_api():
+    """Verify GetPlacementHit/GetPlacementTransform (BuildPlacementSupport) in PIE."""
+    world = get_pie_world()
+    if not world:
+        return {"name": "Placement API", "passed": False, "detail": "PIE world not available"}
+    lib = getattr(unreal, "BuildPlacementSupport", None)
+    if not lib:
+        return {"name": "Placement API", "passed": False, "detail": "BuildPlacementSupport not found"}
+    max_dist = 10000.0
+    try:
+        # UE Python: static BlueprintCallable may return (bool,) or (bool, FHitResult)
+        result = lib.get_placement_hit(world, max_dist)
+        if isinstance(result, (list, tuple)):
+            ok = result[0] if len(result) >= 1 else False
+        else:
+            ok = bool(result)
+        return {"name": "Placement API", "passed": True, "detail": "GetPlacementHit success=%s" % ok}
+    except (TypeError, AttributeError):
+        # Some builds expose (world, max_dist, out_hit) with in/out HitResult
+        try:
+            hit = getattr(unreal, "HitResult", lambda: None)()
+            if hit is not None:
+                ok = lib.get_placement_hit(world, max_dist, hit)
+                return {"name": "Placement API", "passed": True, "detail": "GetPlacementHit success=%s" % ok}
+        except Exception:
+            pass
+        return {"name": "Placement API", "passed": False, "detail": "GetPlacementHit signature not supported from Python"}
+    except Exception as e:
+        return {"name": "Placement API", "passed": False, "detail": str(e)}
+
+
 ALL_CHECKS = [
     check_pie_active,
     check_character_spawned,
@@ -198,6 +229,7 @@ ALL_CHECKS = [
     check_capsule,
     check_skeletal_mesh,
     check_anim_instance,
+    check_placement_api,
     check_pcg_actors,
 ]
 

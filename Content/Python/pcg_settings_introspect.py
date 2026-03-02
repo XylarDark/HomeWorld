@@ -1,8 +1,10 @@
 # pcg_settings_introspect.py
 # Run from Unreal Editor: Tools -> Execute Python Script (or via MCP execute_python_script).
 #
-# Introspects PCG node settings (Get Landscape Data, Surface Sampler) to see which
-# properties Python can read/write. Does not create or save any assets.
+# Introspects PCG node settings (Get Landscape Data, Surface Sampler, Static Mesh Spawner)
+# and, if the project graph exists, settings from actual graph nodes. Use output to find
+# property names for try_set_get_landscape_selector and mesh list automation (see docs/PCG_ELEGANT_SOLUTIONS.md).
+# Does not create or save any assets.
 # Output: Saved/pcg_settings_introspect_5.7.txt (or similar).
 # See docs/PCG_VARIABLES_NO_ACCESS.md.
 
@@ -66,6 +68,47 @@ def _introspect_settings(settings, label):
             results.append((name, type_str, True, value_str))
         except Exception as e:
             results.append((name, "?", False, str(e)[:150]))
+    return results
+
+
+def _introspect_nested(settings, prefix="", depth=0, max_depth=2):
+    """Recursively introspect nested structs (e.g. actor_selector) to find tag/selector props. Returns list of (path, type_str, readable, value_str)."""
+    results = []
+    if settings is None or depth > max_depth:
+        return results
+    names = set()
+    for name in dir(settings):
+        if name.startswith("_"):
+            continue
+        names.add(name)
+    for extra in ("actor_selector", "actor_filter", "selector_settings", "tag", "selected_tag", "tag_name", "filter_tag", "landscape_tag", "mesh_selector_parameters", "mesh_entries"):
+        names.add(extra)
+    for name in sorted(names):
+        path = "%s.%s" % (prefix, name) if prefix else name
+        try:
+            if hasattr(settings, "get_editor_property"):
+                val = settings.get_editor_property(name)
+            else:
+                val = getattr(settings, name, None)
+            if callable(val):
+                continue
+            type_str = type(val).__name__
+            try:
+                value_str = str(val)[:120]
+            except Exception:
+                value_str = "<cannot repr>"
+            results.append((path, type_str, True, value_str))
+            # One level of nesting for structs that might hold tag/selector
+            if depth < 1 and type_str not in ("str", "int", "float", "bool", "NoneType"):
+                if "tag" in name.lower() or "selector" in name.lower() or "filter" in name.lower():
+                    try:
+                        if val is not None and not isinstance(val, (str, int, float, bool)):
+                            sub = _introspect_nested(val, path, depth + 1, max_depth)
+                            results.extend(sub)
+                    except Exception:
+                        pass
+        except Exception as e:
+            results.append((path, "?", False, str(e)[:100]))
     return results
 
 
@@ -143,6 +186,60 @@ def main():
             lines.append("")
     except Exception as e:
         lines.append("=== PCGComponent error: %s ===" % e)
+        lines.append("")
+
+    # PCGStaticMeshSpawnerSettings and PCGStaticMeshSpawnerEntry (for mesh list automation)
+    try:
+        spawner_cls = getattr(unreal, "PCGStaticMeshSpawnerSettings", None)
+        entry_cls = getattr(unreal, "PCGStaticMeshSpawnerEntry", None)
+        lines.append("=== PCGStaticMeshSpawner (mesh list) ===")
+        lines.append("  PCGStaticMeshSpawnerSettings: %s" % ("found" if spawner_cls else "NOT in unreal"))
+        lines.append("  PCGStaticMeshSpawnerEntry: %s" % ("found" if entry_cls else "NOT in unreal"))
+        if spawner_cls is not None:
+            try:
+                settings = spawner_cls()
+            except Exception:
+                settings = None
+            if settings is not None:
+                for name, type_str, readable, value_str in _introspect_settings(settings, "Spawner"):
+                    if "mesh" in name.lower() or "selector" in name.lower() or "entry" in name.lower():
+                        lines.append("  %s: type=%s readable=%s value=%s" % (name, type_str, readable, value_str))
+        lines.append("")
+    except Exception as e:
+        lines.append("=== PCGStaticMeshSpawner error: %s ===" % e)
+        lines.append("")
+
+    # Load ForestIsland_PCG and introspect actual node settings (real property names)
+    graph_path = "/Game/HomeWorld/PCG/ForestIsland_PCG"
+    try:
+        if unreal.EditorAssetLibrary.does_asset_exist(graph_path):
+            graph_asset = unreal.load_asset(graph_path)
+            if graph_asset is not None:
+                lines.append("=== Graph nodes from %s ===" % graph_path)
+                nodes = getattr(graph_asset, "nodes", None) or []
+                get_landscape_cls = getattr(unreal, "PCGGetLandscapeSettings", None)
+                spawner_cls = getattr(unreal, "PCGStaticMeshSpawnerSettings", None)
+                for node in nodes:
+                    try:
+                        settings = node.get_settings() if hasattr(node, "get_settings") else None
+                        if settings is None:
+                            continue
+                        cls_name = type(settings).__name__
+                        lines.append("  --- Node settings: %s ---" % cls_name)
+                        for path, type_str, readable, value_str in _introspect_nested(settings, cls_name):
+                            lines.append("    %s: type=%s readable=%s value=%s" % (path, type_str, readable, value_str))
+                        if get_landscape_cls and isinstance(settings, get_landscape_cls):
+                            lines.append("  (Use above to add tag/selector props to try_set_get_landscape_selector)")
+                        if spawner_cls and isinstance(settings, spawner_cls):
+                            lines.append("  (Use above for mesh_entries / mesh_selector_parameters)")
+                    except Exception as e:
+                        lines.append("  Node error: %s" % (str(e)[:100]))
+                lines.append("")
+        else:
+            lines.append("=== Graph %s not found (run create_demo_from_scratch once to create it) ===" % graph_path)
+            lines.append("")
+    except Exception as e:
+        lines.append("=== Graph introspection error: %s ===" % e)
         lines.append("")
 
     out_dir = _project_saved_dir()

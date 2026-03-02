@@ -2,19 +2,22 @@
 
 ## Programmatic by default
 
-HomeWorld is developed **programmatically by default**: as much work as possible is done in C++ so that behavior is in code, versionable, and reviewable.
+HomeWorld is developed **programmatically by default**: maximize C++ (and Python automation); minimize Blueprint logic so behavior is in code, versionable, and reviewable.
 
 - **C++** is used for:
   - Gameplay systems (movement, input, camera, combat, building logic)
+  - **Abilities and GAS logic** — implement in C++ ability subclasses (e.g. `UHomeWorldInteractAbility`); reparent GA_* Blueprints to these classes so no Blueprint graph wiring is needed (use `reparent_ga_*_to_cpp.py`-style scripts where applicable)
   - Core logic and reusable behavior
   - Anything that should be consistent across maps and Blueprint children
 
 - **Blueprint** is used for:
   - Content (meshes, materials, level placement)
-  - Designer-facing overrides and one-off behavior
-  - Subclassing C++ classes to assign assets (e.g. character mesh, input assets)
+  - Designer-facing overrides and one-off data (e.g. asset references on C++ class defaults)
+  - Subclassing C++ classes **only to assign assets** (e.g. character mesh, input assets); avoid adding logic in the Blueprint graph when a C++ subclass can do it
 
-When adding new features, prefer C++ for the core implementation; use Blueprint for data, overrides, and content integration.
+**Default for new abilities:** Implement the ability in C++ (subclass of `UHomeWorldGameplayAbility` or a dedicated C++ ability class). Create or reparent the corresponding GA_* Blueprint to that C++ class so the Blueprint remains data-only (no Event Graph logic). Use Blueprint graph wiring only when C++ or reparenting is not feasible.
+
+When adding new features, prefer C++ for the core implementation; use Blueprint for data and content integration, not for control flow or gameplay logic.
 
 **Debug instrumentation and log-driven validation:** When implementing new features, add minimal debug instrumentation (entry/exit, key branches, critical values, and for user-triggered actions: trigger + outcome) by default. Every feature must be **validatable from logs** (Output Log, log files, or test output) so you can confirm it works without prompting for logging. See `.cursor/rules/16-feature-debug-instrumentation.mdc`.
 
@@ -37,8 +40,9 @@ See [MCP_SETUP.md](MCP_SETUP.md) for installation and `.cursor/rules/09-mcp-work
 ## Code-first checklist
 
 - **New systems:** Implement in C++; expose designer-facing APIs with `UFUNCTION(BlueprintCallable)` or `BlueprintNativeEvent` where designers need to drive or extend behavior from Blueprint.
-- **C++ systems (current):** Movement, input, camera, game mode, default pawn. GAS: `AHomeWorldCharacter` owns `UAbilitySystemComponent` and `UHomeWorldAttributeSet`; base ability class `UHomeWorldGameplayAbility`. New attributes go in `UHomeWorldAttributeSet` (or a second attribute set if needed).
-- **Blueprint:** Content (meshes, materials, input assets), level layout, one-off logic, and Blueprint children of C++ classes for asset assignment (e.g. character mesh, IA_Move/IA_Look/IMC_Default).
+- **New abilities:** Implement in a C++ ability class (e.g. `UHomeWorldInteractAbility`); reparent the GA_* Blueprint to that class so the Blueprint has no graph logic. Do not default to "wire it in the Blueprint graph."
+- **C++ systems (current):** Movement, input, camera, game mode, default pawn. GAS: `AHomeWorldCharacter` owns `UAbilitySystemComponent` and `UHomeWorldAttributeSet`; base `UHomeWorldGameplayAbility`; dedicated C++ abilities (e.g. `UHomeWorldInteractAbility`) for Interact. New attributes go in `UHomeWorldAttributeSet` (or a second attribute set if needed).
+- **Blueprint:** Content (meshes, materials, input assets), level layout, and Blueprint children of C++ classes for **asset assignment only** (e.g. character mesh, IA_Move/IA_Look/IMC_Default). Avoid adding gameplay logic in Blueprint when it can live in C++.
 
 ---
 

@@ -83,10 +83,10 @@ def main(run_pcg=True):
     _log("=== Bootstrap complete ===")
     _log("Next steps:")
     _log("  - If skeletal mesh/AnimBP are not set: add paths to Content/Python/character_blueprint_config.json and re-run, or assign in Editor on BP_HomeWorldCharacter.")
-    _log("  - Verify in Editor: Project Settings > Maps & Modes shows HomeWorldGameMode and Main map.")
+    _log("  - Verify in Editor: Project Settings > Maps & Modes shows HomeWorldGameMode. Primary demo map is DemoMap; see docs/DEMO_MAP.md.")
     _log("  - Play In Editor (PIE) to test movement and camera.")
     _log("  - Animation Blueprint state machine must be built manually in Editor (Python cannot create AnimGraph nodes).")
-    _log("  - For PCG trees/rocks: run create_homestead_from_scratch.py (recreates Homestead and sets PCG to landscape size) or run setup_level with run_pcg=True; then set Get Landscape Data (By Tag + PCG_Landscape), mesh lists on spawners, click Generate. See docs/PCG_SETUP.md.")
+    _log("  - For PCG trees/rocks: run create_demo_from_scratch.py (ensures DemoMap and PCG; open DemoMap or let script open it) or run setup_level with run_pcg=True; then set Get Landscape Data (By Tag + PCG_Landscape), mesh lists on spawners, click Generate. See docs/DEMO_MAP.md and docs/PCG_SETUP.md.")
 
 
 if __name__ == "__main__":

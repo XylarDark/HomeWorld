@@ -2,7 +2,7 @@
 
 **Project:** HomeWorld — Unreal Engine 5.7 game (Open World / World Partition). Targets UE 5.7 (compatible with 5.7.x, including 5.7.3). Theme: "Love as Epic Quest"; Act 1 focus is lone wanderer (explore → fight → build). See [docs/workflow/VISION.md](docs/workflow/VISION.md) (theme, campaign, 7 sins/virtues, succession) and [docs/STACK_PLAN.md](docs/STACK_PLAN.md) for stack. **Lock:** Engine 5.7 only; platform PC + Steam Early Access; do not add engine or platform variants without team decision.
 
-**Programmatic by default:** As much work as possible is done in C++. New gameplay systems, movement, input, and core logic go in C++; Blueprint is for content, level design, and designer overrides. See [docs/CONVENTIONS.md](docs/CONVENTIONS.md) for the code-first checklist and C++ vs Blueprint split.
+**Programmatic by default:** Prefer C++ (and Python automation) over Blueprints. New gameplay systems, movement, input, abilities, and core logic are implemented in C++; Blueprint is for content, level design, and designer overrides only. For abilities: implement logic in a C++ ability subclass (e.g. `UHomeWorldInteractAbility`) and reparent the GA_* Blueprint to that class so no Blueprint graph wiring is required. See [docs/CONVENTIONS.md](docs/CONVENTIONS.md) for the code-first checklist and C++ vs Blueprint split.
 
 **Code:** C++ lives in `Source/HomeWorld/`. Default pawn: `AHomeWorldCharacter`; default game mode: `AHomeWorldGameMode`. Both use Enhanced Input for movement and look.
 
@@ -40,8 +40,8 @@ Exact invocations the agent should use (see [docs/SETUP.md](docs/SETUP.md) and [
 - **PIE validation:** MCP `execute_python_script("pie_test_runner.py")`, then read `Saved/pie_test_results.json`.
 - **Demo map setup:** Primary demo map is **DemoMap** (`/Game/HomeWorld/Maps/DemoMap`). Run `create_demo_from_scratch.py` (Editor or MCP). Create map first via File → New Level → Empty Open World → Save As; see [docs/DEMO_MAP.md](docs/DEMO_MAP.md).
 - **Project commands:** Reusable workflows in `.cursor/commands/` are available via `/` in chat (e.g. `/run-tests-and-fix`, `/create-pr`, `/review-changes`).
-- **Project skills:** Domain skills in `.cursor/skills/` (e.g. demo-map-setup, homestead-setup, pcg-validate, ue57-api-check) are available via `/` in chat. **Primary demo map:** DemoMap and **create_demo_from_scratch.py**; see [docs/DEMO_MAP.md](docs/DEMO_MAP.md). Use **demo-map-setup** for DemoMap + PCG; **homestead-setup** for legacy Homestead.
-- **PCG Generate nothing:** Use the **pcg-validate** skill and [docs/PCG_SETUP.md](docs/PCG_SETUP.md) section "Generate produces nothing (checklist)"; check Output Log for **LogPCG** and **No surfaces found**. For a short, tutorial-aligned flow and volume sizing (DemoMap or Homestead), see [docs/PCG_QUICK_SETUP.md](docs/PCG_QUICK_SETUP.md).
+- **Project skills:** Domain skills in `.cursor/skills/` (e.g. demo-map-setup, homestead-setup, pcg-validate, ue57-api-check) are available via `/` in chat. **Primary demo map:** DemoMap and **create_demo_from_scratch.py**; see [docs/DEMO_MAP.md](docs/DEMO_MAP.md). Use **demo-map-setup** for DemoMap + PCG.
+- **PCG Generate nothing:** Use the **pcg-validate** skill and [docs/PCG_SETUP.md](docs/PCG_SETUP.md) section "Generate produces nothing (checklist)"; check Output Log for **LogPCG** and **No surfaces found**. For a short, tutorial-aligned flow and volume sizing (DemoMap), see [docs/PCG_QUICK_SETUP.md](docs/PCG_QUICK_SETUP.md).
 - **UE 5.7 API/plugin work:** Before changing C++, Blueprint, PCG, or plugin code, check [.cursor/rules/unreal-cpp.mdc](.cursor/rules/unreal-cpp.mdc) (pitfalls table) and [docs/KNOWN_ERRORS.md](docs/KNOWN_ERRORS.md). For **PCG graph or node changes**, also check [docs/PCG_BEST_PRACTICES.md](docs/PCG_BEST_PRACTICES.md) and [docs/PCG_VARIABLES_NO_ACCESS.md](docs/PCG_VARIABLES_NO_ACCESS.md). See [docs/UE57_TECH.md](docs/UE57_TECH.md) for the full UE 5.7 tech entry point.
 
 ## Boundaries

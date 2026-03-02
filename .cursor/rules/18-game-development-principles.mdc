@@ -1,0 +1,96 @@
+---
+name: "Game development principles"
+description: "Principles of video game development: preserve content, create-if-missing, designer-author workflows, and senior game-dev standards. Align automation and agents with how games are built."
+alwaysApply: true
+priority: 2
+version: 1.0
+---
+
+# Game development principles
+
+These principles align agents and automation with how video games are built: iterative, non-destructive content pipelines; designer and author work preserved; automation that enhances rather than replaces human judgment. Apply whenever making or reviewing changes that touch levels, assets, Blueprints, or content.
+
+---
+
+## 1. Preserve designer and author work
+
+**Content and levels are authored by designers and level authors.** Automation must not delete, overwrite, or recreate that work by default.
+
+- **Never assume delete-and-recreate is acceptable** for normal runs. Designers iterate in the Editor; scripts should add or update in place, not wipe their work.
+- **Version-controlled assets** (e.g. .uasset, .umap in Git LFS) represent committed work. Automation that destroys or replaces them without explicit user intent risks losing team work and breaking pipelines.
+- **Manual one-time setup** (e.g. Get Landscape Data, mesh lists, graph assignment) is done once and saved; automation reuses that content and applies only config-driven updates. Do not assume "recreate from scratch" is the right default.
+
+**Senior mindset:** Treat content as the source of truth. Code and automation serve the content pipeline; they do not own it.
+
+---
+
+## 2. Create-if-missing, update-in-place
+
+**For assets (PCG graphs, Blueprints, configs) and level actors (PCG Volume, placeholders):**
+
+- **If the resource exists:** Reuse it. Update only what is driven by config or script (e.g. volume bounds, transform offset, density, exclusion zones). Do not delete or recreate.
+- **If the resource is absent:** Create it once, then fall into the "exists" path on all future runs.
+- **Re-runs must be safe:** Multiple runs of the same script must not create duplicates, destroy existing instances, or overwrite designer edits. See also Idempotency Protocol in [00-core-principles.mdc](00-core-principles.mdc).
+
+**Senior mindset:** Prefer stability and predictability. "Run again" should mean "ensure correct state," not "start over."
+
+---
+
+## 3. No "nuke and recreate" in normal pipelines
+
+**Delete-and-recreate (or destroy-and-respawn) is an escape hatch**, not the default.
+
+- **Opt-in only:** Any destructive path (e.g. "recreate volume and graph") must be gated by an explicit config flag or user choice (e.g. `recreate_volume_and_graph: true`). Default must be non-destructive.
+- **Document escape hatches:** When such an option exists, document it clearly: what it does, when to use it (e.g. "start over" or repair), and that normal iteration does not require it.
+- **Pipeline alignment:** Real game pipelines rely on incremental updates, version control, and collaboration. Nuking content breaks iteration and blocks others who may have the asset checked out or merged.
+
+**Senior mindset:** Destructive operations are for exceptional cases. Normal workflow is additive and in-place.
+
+---
+
+## 4. Automation enhances designer workflow
+
+**Automation should handle technical grunt work while preserving designer agency over creative decisions.**
+
+- **Expose only what designers need:** Automation and tooling should not require designers to understand implementation details. Expose controls that matter for iteration (e.g. density, bounds, exclusion); hide or document the rest.
+- **Respect "no-touch" zones:** Some settings are designer-owned (e.g. graph wiring, mesh list, tag assignment). Document which steps automation cannot perform (see [automation-standards.mdc](automation-standards.mdc) and feature docs like PCG_VARIABLES_NO_ACCESS). Do not overwrite or assume defaults for those.
+- **Config over code where appropriate:** Use config (e.g. JSON) for values designers may want to tune (bounds, density, exclusion zones). Code applies config; it does not hardcode content decisions. See project conventions in [docs/CONVENTIONS.md](../../docs/CONVENTIONS.md).
+
+**Senior mindset:** Automation that replaces designer judgment is brittle. Automation that handles repetition and applies config lets designers iterate faster.
+
+---
+
+## 5. Content pipeline and iteration
+
+**Game development is iterative.** Levels and assets are built over many sessions; multiple people may touch the same resources.
+
+- **Idempotent scripts:** Setup and automation scripts must be safe to run multiple times: check before create, reuse over recreate, log what was skipped or updated. See [00-core-principles.mdc](00-core-principles.mdc) Idempotency Protocol.
+- **One-time setup then automate:** Identify which steps are one-time (e.g. assign graph, set Get Landscape Data, add mesh list) and which are repeatable (e.g. update bounds from config, trigger Generate). Scripts should not force redoing one-time steps every run.
+- **Document manual steps:** When the engine or API does not allow automation to set a required value, document it and the exact manual step. Do not leave automation that silently fails or assumes a manual step was done. See [automation-standards.mdc](automation-standards.mdc).
+
+**Senior mindset:** Pipelines that assume "run once from clean" do not scale. Pipelines that support "run again after designer edits" do.
+
+---
+
+## 6. Senior game-developer standards
+
+**Agents and automation should reason like a senior game developer:**
+
+- **Stability over cleverness:** Prefer predictable, documented behavior over one-off fixes or "it works on my run" logic.
+- **Explicit over implicit:** Destructive or high-impact actions require an explicit opt-in (config flag, confirmation, or documented escape hatch). Defaults should be safe and non-destructive.
+- **Document escape hatches:** When a "start over" or "force recreate" path exists, document when and why to use it so future agents and humans do not misuse it.
+- **Think in content terms:** Levels, Blueprints, and assets are the product. Code and scripts are there to support creating and iterating on that content—not to own or replace it.
+
+---
+
+## Checklist for automation and scripts
+
+When adding or changing automation that touches content or levels:
+
+- [ ] Default behavior is **create-if-missing, update-in-place**; no delete/recreate unless explicitly opted in.
+- [ ] Re-runs do not create duplicates or destroy existing content.
+- [ ] One-time manual steps are documented; script does not assume they were done or overwrite them.
+- [ ] Config-driven values (bounds, density, etc.) are applied from config; designer-owned settings are left alone or documented as manual.
+- [ ] Any destructive option is opt-in, documented, and clearly named (e.g. `recreate_volume_and_graph`).
+
+See also: [00-core-principles.mdc](00-core-principles.mdc) (Idempotency), [automation-standards.mdc](automation-standards.mdc) (variables with no access), [07-ai-agent-behavior.mdc](07-ai-agent-behavior.mdc) (session cleanup, error recording).

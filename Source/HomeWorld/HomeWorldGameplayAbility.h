@@ -17,4 +17,8 @@ class HOMEWORLD_API UHomeWorldGameplayAbility : public UGameplayAbility
 
 public:
 	UHomeWorldGameplayAbility();
+
+	/** Override so minimal Blueprint children can work without implementing: commits and ends. Override in Blueprint to add cost/effects. */
+	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 };

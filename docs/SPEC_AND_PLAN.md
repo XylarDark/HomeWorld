@@ -8,8 +8,9 @@ For **complex or multi-file work**, the agent should propose a short implementat
 
 ## Where plans live
 
-- **Saved plans:** Plans can be saved under `.cursor/plans/` (e.g. `feature-name.md`) for resume and for future agents. Use when the user asks or when the task is large enough to benefit from a persistent reference.
-- **Plan Mode:** In Cursor, use Plan Mode (Shift+Tab in the agent input) to get a reviewable plan before any code is written. You can save the result to `.cursor/plans/` via "Save to workspace."
+- **"Make a plan" / "Create a plan":** When the user asks for a plan, use the **Cursor plan feature** (present the plan in-app for confirmation). Do not create a file in `.cursor/plans/` unless the user explicitly asks to save the plan to a file or to the workspace.
+- **Saved plans:** Plans can be saved under `.cursor/plans/` (e.g. `feature-name.md`) for resume and for future agents only when the user explicitly asks to save the plan or when you suggest it after the user has confirmed a plan and the task is large enough to benefit from a persistent reference.
+- **Plan Mode:** In Cursor, use Plan Mode (Shift+Tab in the agent input) to get a reviewable plan before any code is written. You can save the result to `.cursor/plans/` via "Save to workspace" if the user requests it.
 
 ## Spec-first (optional)
 

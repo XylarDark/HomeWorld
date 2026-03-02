@@ -1,6 +1,8 @@
 # Homestead Map
 
-Homestead-focused level for the tutorial home, compound (house, outbuildings, walls), and surrounding zones. Used for Day 6 layout and Homestead Phase 1 of the [30-day schedule](workflow/30_DAY_SCHEDULE.md).
+**For current development use DemoMap;** see [DEMO_MAP.md](DEMO_MAP.md). This doc describes the Homestead map for campaign/later use.
+
+Homestead-focused level for the tutorial home, compound (house, outbuildings, walls), and surrounding zones. Used for Homestead Phase 1 of the [30-day schedule](workflow/30_DAY_SCHEDULE.md) when building on the Homestead map; Day 6 layout development uses **DemoMap** and [create_demo_from_scratch.py](../Content/Python/create_demo_from_scratch.py).
 
 ---
 
@@ -93,7 +95,7 @@ See [CONTENT_LAYOUT.md](CONTENT_LAYOUT.md) for the full path table.
 | `Content/Python/homestead_map_config.json` | `homestead_level_path`, `source_level_path`, PCG `volume_extent_*`, `exclusion_zones`. |
 | `Content/Python/ensure_homestead_map.py` | Idempotent: duplicate Main to Homestead if Homestead does not exist. |
 | `Content/Python/ensure_homestead_folders.py` | Idempotent: create `/Game/HomeWorld/Homestead/`, Structures, Placeholders. |
-| `Content/Python/create_homestead_from_scratch.py` | **Single entry point:** Ensures Homestead exists (calls ensure_homestead_map), opens Homestead, destroys/places PCG volume using config bounds (optional one-shot landscape override), applies exclusion from config; manual steps still required for graph assignment and Generate. Set `volume_center_*` and `volume_extent_*` in config to match your playable region. |
+| `Content/Python/create_homestead_from_scratch.py` | **Single entry point:** Ensures Homestead exists (calls ensure_homestead_map), opens Homestead, creates or reuses PCG volume (create-if-missing; default is reuse). Volume bounds from config (optional landscape/World Partition override). Set `recreate_volume_and_graph: true` in config only to force recreation. Manual steps still required for graph assignment and Generate. Set `volume_center_*` and `volume_extent_*` in config to match your playable region. |
 | `Content/Python/place_homestead_placeholders.py` | (Optional) Spawn Cube placeholders for house and outbuildings from `homestead_map_config.json` → `placeholder_actors`. Idempotent: re-run replaces placeholders. |
 
 **Note:** `create_homestead_from_scratch.py` ensures the Homestead map exists (it calls `ensure_homestead_map`). Run `ensure_homestead_map.py` alone only when you need the map created without running the full PCG setup (e.g. "map only, no PCG"). Run `ensure_homestead_folders.py` separately when needed (e.g. before placing placeholders).

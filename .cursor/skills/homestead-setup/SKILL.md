@@ -1,11 +1,11 @@
 ---
 name: homestead-setup
-description: Set up or refresh the Homestead map and PCG (volume, graph, exclusion). Use when the user wants to create/regenerate Homestead, fix "no ground" or "volume not sized to landscape," or run the one-shot Homestead + PCG script.
+description: Set up or refresh the Homestead map and PCG (legacy/campaign). For the primary demo map use demo-map-setup instead. Use when the user explicitly wants Homestead, fix "no ground" or "volume not sized to landscape," or run the Homestead + PCG script.
 ---
 
 # Homestead setup
 
-Run the Homestead-from-scratch workflow so the map and PCG volume are ready for play or iteration.
+Run the Homestead-from-scratch workflow so the Homestead map and PCG volume are ready. **For the primary demo/playable map (MVP build-out), use the demo-map-setup skill and DemoMap instead.** Homestead is legacy/campaign.
 
 ## When to use
 
@@ -19,11 +19,11 @@ Run the Homestead-from-scratch workflow so the map and PCG volume are ready for 
 
 2. **Fast path (recommended):** Tell the user to open Homestead in the Editor, then **Window → World Partition → Load All** so landscape bounds are available. Then run the script so the volume is sized to the landscape in one pass.
 
-3. **Run the script:** Execute `Content/Python/create_homestead_from_scratch.py` via Editor (Tools → Execute Python Script or `py "Content/Python/create_homestead_from_scratch.py"`) or MCP `execute_python_script("create_homestead_from_scratch.py")`. The script will open Homestead if needed, wait for landscape bounds (or use config after timeout), destroy/recreate or reuse PCG volume and graph per config, size the volume, and attempt to assign the graph and Generate.
+3. **Run the script:** Execute `Content/Python/create_homestead_from_scratch.py` via Editor (Tools → Execute Python Script or `py "Content/Python/create_homestead_from_scratch.py"`) or MCP `execute_python_script("create_homestead_from_scratch.py")`. The script opens Homestead if needed, waits for landscape bounds (or uses config after timeout), and **create-if-missing or reuses** PCG volume and graph (default is non-destructive). Set `recreate_volume_and_graph: true` in config only to force recreation. It sizes the volume and attempts to assign the graph and Generate.
 
 4. **After the script:** Remind the user of manual steps from [docs/PCG_SETUP.md](../../docs/PCG_SETUP.md): set Get Landscape Data to By Tag + PCG_Landscape, set mesh lists on Static Mesh Spawner nodes, assign the graph to the volume if the script could not, and click Generate from the level (select PCG_Forest → Details → Generate).
 
-5. **Fast iteration:** For repeated runs without full recreation, suggest setting in `Content/Python/homestead_map_config.json`: `recreate_volume_and_graph: false`, and optionally `landscape_wait_attempts: 3`, `landscape_wait_delay_sec: 0.5`. See [docs/PCG_SETUP.md](../../docs/PCG_SETUP.md) (Fast iteration).
+5. **Fast iteration:** Default is non-destructive (reuse). Set `recreate_volume_and_graph: true` in config only to force full recreation. For faster runs, optionally reduce `landscape_wait_attempts` or `landscape_wait_delay_sec` in config. See [docs/PCG_SETUP.md](../../docs/PCG_SETUP.md) (Fast iteration).
 
 ## References
 

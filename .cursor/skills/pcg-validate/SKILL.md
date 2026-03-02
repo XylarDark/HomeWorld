@@ -7,11 +7,13 @@ description: Validate or troubleshoot PCG setup (ForestIsland_PCG, volume, lands
 
 Check that the PCG graph, volume, and landscape are correctly configured so Generate produces instances.
 
+**Short path:** For a one-page, tutorial-aligned setup (manual-only or script + 3 steps) and **volume sizing for DemoMap**, use [docs/PCG_QUICK_SETUP.md](../../docs/PCG_QUICK_SETUP.md).
+
 ## When to use
 
 - User says trees/rocks don't spawn, PCG "does nothing," or assets spawn wrong (below ground, tilted).
 - User asks what to set in the graph or volume (Get Landscape Data, mesh list, etc.).
-- Debugging "volume not sized to landscape" or "no ground" after running create_homestead_from_scratch.
+- Debugging "volume not sized to landscape" or "no ground" after running create_demo_from_scratch.
 
 ## Generate produces nothing — ordered checklist
 
@@ -21,7 +23,7 @@ When the user reports that **Generate produces no instances**, follow this order
 2. **Mesh list on spawners:** Tree (and rocks) **Static Mesh Spawner** nodes must have meshes in Details (Mesh Selector / mesh list). Use paths from `Content/Python/pcg_forest_config.json` or assign in the graph. Without meshes, Generate produces no instances.
 3. **Graph on volume:** Select **PCG_Forest** in the level → Details → **Graph** → ForestIsland_PCG. Assign manually if the script could not.
 4. **Landscape:** Tag **PCG_Landscape**; **Component Subsection = 1x1**.
-5. **World Partition:** If the level uses WP (e.g. Homestead), use **Window → World Partition → Load All** (or load the region) before Generate so Get Landscape Data can find the Landscape.
+5. **World Partition:** If the level uses WP (e.g. DemoMap), use **Window → World Partition → Load All** (or load the region) before Generate so Get Landscape Data can find the Landscape.
 
 **Output Log:** Instruct the user to open **Window → Developer Tools → Output Log**, click Generate (or **Ctrl+Click**), then search for **LogPCG** and **"No surfaces found"** and capture that for diagnosis.
 
@@ -29,7 +31,7 @@ When the user reports that **Generate produces no instances**, follow this order
 
 **Minimal test (optional):** Create a second, minimal graph (Input → Point from Mesh or one Static Mesh Spawner with one mesh), assign to the same volume, Generate. If minimal produces output, the issue is ForestIsland_PCG; if not, the issue may be volume/level or PCG plugin.
 
-**Homestead:** Load All (or load region) before Generate is required. **Assets:** Verify `/Game/StylizedProvencal/Meshes/...` paths exist in Content Browser; see `pcg_forest_config.json`.
+**DemoMap:** Load All (or load region) before Generate is required. **Assets:** Verify `/Game/StylizedProvencal/Meshes/...` paths exist in Content Browser; see `pcg_forest_config.json`.
 
 ## Minimal working graph
 
@@ -41,7 +43,7 @@ Before changing the graph or adding nodes, ensure these are documented and (wher
 
 ## General validation (when to use)
 
-1. **Landscape tag:** The Landscape in the level must have the tag **PCG_Landscape**. The script `create_homestead_from_scratch.py` calls `ensure_landscape_has_pcg_tag()`. If unsure, select the Landscape in the Outliner → Details → Actor → Tags → add PCG_Landscape. Landscape Component Subsection should be **1x1** (Details) for PCG in UE 5.x.
+1. **Landscape tag:** The Landscape in the level must have the tag **PCG_Landscape**. The script `create_demo_from_scratch.py` calls `ensure_landscape_has_pcg_tag()`. If unsure, select the Landscape in the Outliner → Details → Actor → Tags → add PCG_Landscape. Landscape Component Subsection should be **1x1** (Details) for PCG in UE 5.x.
 
 2. **Get Landscape Data (in graph):** Open ForestIsland_PCG → select **Get Landscape Data** node → Details: **Actor** → **By Tag**, tag **PCG_Landscape**; **Component** → **By Class** → **Landscape Component** if available. Script cannot set this in UE 5.7; it must be done in the Editor. See [docs/PCG_SETUP.md](../../docs/PCG_SETUP.md) and [docs/PCG_VARIABLES_NO_ACCESS.md](../../docs/PCG_VARIABLES_NO_ACCESS.md).
 

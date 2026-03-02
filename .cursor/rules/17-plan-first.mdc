@@ -1,6 +1,6 @@
 ---
 name: "Plan first"
-description: "For complex or multi-file work, propose a short implementation plan and get approval before editing; save plans to .cursor/plans/ when useful"
+description: "For complex work, use the Cursor plan feature when user says 'make a plan'; save to .cursor/plans/ only when user explicitly asks"
 alwaysApply: true
 priority: 7
 ---
@@ -8,6 +8,10 @@ priority: 7
 # Plan-first and spec discipline
 
 For **complex or multi-file work**, do not jump straight into code. Propose a short implementation plan (or reference an existing plan in `.cursor/plans/` or the conversation) and get implicit or explicit approval before editing.
+
+## When the user asks for a plan
+
+When the user says **"make a plan," "create a plan," or "develop a plan,"** use the **Cursor plan feature** (present the plan in-app for confirmation, e.g. in Plan mode). **Do not** create or update a file under `.cursor/plans/` unless the user explicitly asks to **"save the plan to a file"** or **"save to workspace."**
 
 ## When to plan first
 
@@ -28,7 +32,7 @@ Keep the plan short (bullets, not essays). Reference existing docs (e.g. `docs/t
 
 ## Saving plans
 
-When the user requests it or the task is large and would benefit from resume/future reference, save the plan under `.cursor/plans/` (e.g. `feature-name.md`). Mention in the doc that plans can live there (see [docs/SPEC_AND_PLAN.md](docs/SPEC_AND_PLAN.md)).
+Save a plan under `.cursor/plans/` **only when the user explicitly asks** to save the plan to a file or to the workspace (e.g. "save this plan," "save to workspace"). When the task is large and would benefit from a persistent reference, you may suggest saving after the user has confirmed the plan. Do not create `.cursor/plans/*.md` by default when the user says "make a plan." See [docs/SPEC_AND_PLAN.md](docs/SPEC_AND_PLAN.md).
 
 ## When to skip
 

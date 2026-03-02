@@ -88,7 +88,7 @@ Use this to confirm first-phase setup is complete before starting tasks.
 
 When all above are checked, proceed to [workflow/30_DAY_SCHEDULE.md](workflow/30_DAY_SCHEDULE.md) and the task docs in `docs/tasks/`.
 
-**Testing and validation:** The `PythonAutomationTest` plugin is enabled. Test files in `Content/Python/tests/` (`test_*.py`) are auto-discovered by the Editor's Test Automation window. Run from Editor (Tools > Test Automation) or use the PIE test runner (`Content/Python/pie_test_runner.py`). Level tests that load a map use the latent level loader (see [LEVEL_TESTING_PLAN.md](LEVEL_TESTING_PLAN.md)). An optional PIE full-flow test (`test_level_pie_flow.py`) loads Homestead, starts PIE, runs checks, and stops PIE (~30–60 s); run from Tools > Test Automation when needed. For manual checks, run through the checklist above and play-test where applicable.
+**Testing and validation:** The `PythonAutomationTest` plugin is enabled. Test files in `Content/Python/tests/` (`test_*.py`) are auto-discovered by the Editor's Test Automation window. Run from Editor (Tools > Test Automation) or use the PIE test runner (`Content/Python/pie_test_runner.py`). Level tests that load a map use the latent level loader (see [LEVEL_TESTING_PLAN.md](LEVEL_TESTING_PLAN.md)). An optional PIE full-flow test (`test_level_pie_flow.py`) loads DemoMap, starts PIE, runs checks, and stops PIE (~30–60 s); run from Tools > Test Automation when needed. For manual checks, run through the checklist above and play-test where applicable.
 
 When you fix a build, lint, or runtime error, record it in [KNOWN_ERRORS.md](KNOWN_ERRORS.md) so we don't repeat it.
 

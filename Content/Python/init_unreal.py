@@ -21,3 +21,9 @@ try:
     setup_enhanced_input.main()
 except Exception as e:
     unreal.log_warning("InitUnreal: Enhanced Input setup failed: " + str(e))
+
+try:
+    import setup_gas_abilities
+    setup_gas_abilities.main()
+except Exception as e:
+    unreal.log_warning("InitUnreal: GAS abilities setup failed: " + str(e))

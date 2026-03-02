@@ -3,7 +3,7 @@
 # Run from Editor: Tools -> Execute Python Script, or via MCP execute_python_script("check_level_bounds.py").
 # If the level uses World Partition and the Landscape has zero bounds (cells not loaded), logs a warning
 # suggesting Window -> World Partition -> Load All. Use this to remind designers before running
-# scripts that depend on landscape size (e.g. create_homestead_from_scratch).
+# scripts that depend on landscape size (e.g. create_demo_from_scratch).
 
 import os
 import sys

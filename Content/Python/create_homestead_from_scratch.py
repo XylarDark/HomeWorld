@@ -1,11 +1,10 @@
 # create_homestead_from_scratch.py
-# Single script: recreate Homestead map from scratch and set up PCG.
-# Run from Unreal Editor: Tools -> Execute Python Script or via MCP.
-# 1) Ensures Homestead exists (duplicates from source_level_path if missing).
+# Ensures Homestead map and PCG are set up (create-if-missing, update-in-place). Run from Unreal Editor: Tools -> Execute Python Script or via MCP.
+# 1) Ensures Homestead exists (duplicates from source_level_path only if missing).
 # 2) Opens Homestead level.
-# 3) Destroys existing PCG volume (if recreate_volume_and_graph), recreates graph, places one PCG volume, assigns graph and triggers Generate.
-# Volume bounds: Config (volume_center_*, volume_extent_*) is the source of truth. If use_landscape_bounds is true and landscape bounds are available in one shot, they override for this run only (no retries or Load All).
-# Config: Content/Python/homestead_map_config.json. See docs/HOMESTEAD_MAP.md and docs/PCG_SETUP.md.
+# 3) Creates PCG volume and graph only if missing; reuses and updates bounds/config by default. Set recreate_volume_and_graph=true in config only when you explicitly want to destroy and recreate (escape hatch).
+# 4) Attempts demo setup: set Get Landscape Data (By Tag + PCG_Landscape), mesh lists on spawners, assign graph, trigger Generate, save level. If any step fails (engine API limits), see Output Log and docs/PCG_SETUP.md "Demo setup".
+# Volume bounds: Config (volume_center_*, volume_extent_*) is the source of truth; use_landscape_bounds then World Partition bounds fallback when available. Config: Content/Python/homestead_map_config.json. See docs/HOMESTEAD_MAP.md and docs/PCG_SETUP.md.
 
 import json
 import os
@@ -43,7 +42,7 @@ def _load_config():
         "volume_extent_z_padding": 1000.0,
         "exclusion_zones": [],
         "skip_exclusion_zones": False,
-        "recreate_volume_and_graph": True,
+        "recreate_volume_and_graph": False,
         "use_landscape_bounds": True,
         "landscape_wait_attempts": 20,
         "landscape_wait_delay_sec": 2.0,
@@ -101,7 +100,7 @@ def _ensure_homestead_exists(homestead_path, source_path):
 
 
 def main():
-    _log("Starting: recreate Homestead from scratch and set up PCG to landscape size.")
+    _log("Starting: ensure Homestead and PCG (create-if-missing, update bounds and config).")
     config = _load_config()
     homestead_path = config.get("homestead_level_path", "/Game/HomeWorld/Maps/Homestead")
     source_path = config.get("source_level_path", "/Game/HomeWorld/Maps/Main")
@@ -118,7 +117,7 @@ def main():
         return
 
     pcg_forest.ensure_landscape_has_pcg_tag()
-    recreate_volume_and_graph = config.get("recreate_volume_and_graph", True)
+    recreate_volume_and_graph = config.get("recreate_volume_and_graph", False)
     if recreate_volume_and_graph:
         pcg_forest.destroy_pcg_volume()
     else:
@@ -145,7 +144,16 @@ def main():
                 extent.z = extent.z + z_pad
             _log("PCG volume fitted to landscape: center=(%.0f, %.0f, %.0f) half_extent=(%.0f, %.0f, %.0f) cm." % (location.x, location.y, location.z, extent.x, extent.y, extent.z))
         else:
-            _log("Using config volume bounds (landscape not available in one shot).")
+            wp_bounds = level_loader.get_world_partition_bounds()
+            if wp_bounds is not None:
+                location, extent = wp_bounds
+                z_pad = float(config.get("volume_extent_z_padding", 1000))
+                if z_pad > 0:
+                    extent.z = extent.z + z_pad
+                _log("PCG volume fitted to World Partition bounds (landscape not loaded): center=(%.0f, %.0f, %.0f) half_extent=(%.0f, %.0f, %.0f) cm." % (location.x, location.y, location.z, extent.x, extent.y, extent.z))
+                _log("For a smaller playable area, set use_landscape_bounds=false and volume_center_* and volume_extent_* in homestead_map_config.json; see docs/PCG_QUICK_SETUP.md.")
+            else:
+                _log("Using config volume bounds (landscape and World Partition bounds not available).")
     else:
         _log("Using config volume bounds (use_landscape_bounds=false).")
 
@@ -161,7 +169,7 @@ def main():
         _log("No PCG graph created; assign ForestIsland_PCG to the volume in Details.")
     pcg_forest.try_world_partition()
 
-    _log("Done. Homestead recreated and PCG volume placed. Set Get Landscape Data to By Tag + PCG_Landscape and mesh lists on spawners if needed, then Generate. For World Partition, enable Is Partitioned on the PCG component and set Partition Grid Size on the PCG World Actor. See docs/PCG_SETUP.md.")
+    _log("Done. If Output Log shows any 'Could not set' or 'set in Editor', do those steps manually once (see docs/PCG_SETUP.md 'Demo setup'). Then save the level. For World Partition, enable Is Partitioned on the PCG component and set Partition Grid Size on the PCG World Actor if needed.")
 
 
 if __name__ == "__main__":
