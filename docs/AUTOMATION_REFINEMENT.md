@@ -24,6 +24,9 @@
    - `suggested_strategy`: one-line suggestion for process or docs (e.g. AGENTS.md, workflow docs).  
    The watcher/guardian scripts merge this into the run history and then delete the file.
 
+5. **Editor Output Log (on failure)**  
+   When the main loop fails, the Watcher captures the Editor log: **Saved/Logs/editor_output_full.txt** (unfiltered) and **Saved/Logs/editor_output_filtered.txt** (development-relevant only). Fixer and Guardian use these to diagnose Editor-related failures. **Safety rule:** when previous fix round(s) did not resolve the issue, the agent is instructed to read the **unfiltered** log so the filter cannot hide the real error. See [AUTOMATION_EDITOR_LOG.md](AUTOMATION_EDITOR_LOG.md).
+
 ---
 
 ## How to use the feed for refinement
@@ -59,11 +62,23 @@
 | Saved/Logs/automation_errors.log | Error lines from the main loop |
 | Saved/Logs/automation_loop_breaker_report.md | Loop-breaker report when it cannot resolve the loop |
 | Saved/Logs/agent_feedback_this_run.json | Ephemeral; written by fix/loop-breaker, merged into history then removed |
+| Saved/Logs/editor_output_full.txt | Unfiltered Editor log (last N lines); captured on failure. When unfixable, use this. |
+| Saved/Logs/editor_output_filtered.txt | Filtered Editor log (development-relevant only). See [AUTOMATION_EDITOR_LOG.md](AUTOMATION_EDITOR_LOG.md). |
 | docs/KNOWN_ERRORS.md | Recorded errors and fixes (update from run history) |
 | .cursor/rules/*.mdc | Project rules (update when patterns justify) |
 | AGENTS.md | Top-level agent context and workflow (update for strategy) |
 
 ---
+
+## Eighth list cycle (2026-03-05)
+
+The eighth 10-task list (T1–T8) completed; T9 (this pass) updated **AUTOMATION_GAPS.md** with a cycle summary so the next list generator has the current gap list. Refinement sources (agent_run_history.ndjson, automation_errors.log, SESSION_LOG) are ready for the next refinement pass or Refiner run.
+
+---
+
+## Refinement when Saved/Logs is not readable
+
+When `Saved/Logs` is not available (e.g. in chat, or path filtered), use **SESSION_LOG.md** and **CURRENT_TASK_LIST.md** outcomes to infer patterns: repeated "PIE not running", "blocked on T1", "deferred", etc. Add or extend **KNOWN_ERRORS.md** entries and doc notes so the same interpretations are documented. Run the Refiner script (Run-RefinerAgent.ps1) when the automation host has access to agent_run_history.ndjson and automation_errors.log for full refinement.
 
 ## Checklist for a refinement pass
 

@@ -1,15 +1,11 @@
 # Next session prompt
 
-**Use this to start the next session (or run Start-AllAgents.ps1).** N1 Done; next-window tasks N2–N4 in CYCLE_TASKLIST.
+**Eighth task list is active (MVP-focused).** Work on the first **pending** task (T1) from [CURRENT_TASK_LIST.md](CURRENT_TASK_LIST.md).
 
 ---
 
-Continue the automatic development cycle. Read docs/workflow/DAILY_STATE.md, docs/workflow/CYCLE_TASKLIST.md (N2–N4), and docs/SESSION_LOG.md.
+**At session start:** Read [DAILY_STATE.md](DAILY_STATE.md), [CURRENT_TASK_LIST.md](CURRENT_TASK_LIST.md), and [SESSION_LOG.md](../SESSION_LOG.md). Work only on **T1-T10**; do not add T11 or new task sections—document new work in SESSION_LOG or [AUTOMATION_GAPS.md](../AUTOMATION_GAPS.md). Work on the first **pending** task (T1: PIE pre-demo checklist). Complete one task per round. **When you complete a task, you MUST update CURRENT_TASK_LIST.md:** set only that task's **status** to `completed`; do not change any other task's status. Then update SESSION_LOG and DAILY_STATE at session end.
 
-**Task source:** [CYCLE_TASKLIST.md](CYCLE_TASKLIST.md). **Today:** N2 (Deferred features). N3–N4 pending.
+**Canonical workflow:** Fetch task → implement → decide build/Editor → validate in Editor (MCP, PIE, pie_test_runner) when applicable → debug until success → finish → **update CURRENT_TASK_LIST.md status** → fetch next. When C++ or Build.cs change, the loop runs Safe-Build after the round. Exit non-zero on validation failure so Fixer runs.
 
-**This session:**
-1. **N2:** Implement one or more deferred items from T10: full agentic building, SaveGame/role persistence, death→spirit hook, boss GAS + reward. Success: at least one of those flows or subsystems done. See [DAY10_AGENTIC_BUILDING.md](docs/tasks/DAY10_AGENTIC_BUILDING.md), [DAY15_ROLE_PERSISTENCE.md](docs/tasks/DAY15_ROLE_PERSISTENCE.md), [DAYS_16_TO_30.md](docs/tasks/DAYS_16_TO_30.md) Day 21/25.
-2. **Or:** N3 (Act 2 prep: TimeOfDay → Defend, family at homestead) or N4 (Steam EA prep) per priority.
-
-Update SESSION_LOG and DAILY_STATE at session end.
+**When all T1-T10 are complete:** Generate the next 10-task list per [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md). When generating the list, read [TASK_LIST_REPEATS_LOG.md](TASK_LIST_REPEATS_LOG.md) and ACCOMPLISHMENTS_OVERVIEW §4 to avoid duplicating completed work. Then run `.\Tools\Start-AllAgents-InNewWindow.ps1` for the next cycle.

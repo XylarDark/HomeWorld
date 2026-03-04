@@ -16,9 +16,9 @@
 
 | Role | Invoked by | Responsibility | Accountable for | Handoff |
 |------|------------|----------------|-----------------|---------|
-| **Developer** | RunAutomationLoop (main loop) | Do the current day's work from 30_DAY_IMPLEMENTATION_STATUS; update state, SESSION_LOG, DAILY_STATE; write next prompt. | Completing or clearly deferring the task; updating implementation status and session log. | On success: next round or exit 0. On failure: **Fixer** is invoked by the Watcher. |
+| **Developer** | RunAutomationLoop (main loop) | Do the current task from docs/workflow/CURRENT_TASK_LIST.md (first pending/in_progress); update state, SESSION_LOG, DAILY_STATE; write next prompt. | Completing or clearly deferring the task; updating task status in CURRENT_TASK_LIST and session log. | On success: next round or exit 0. On failure: **Fixer** is invoked by the Watcher. |
 | **Fixer** | Watcher (when Developer exits non-zero) | Diagnose from automation_errors.log and loop log; apply fix (code, config, KNOWN_ERRORS, docs); document what was done. | Applying a concrete fix; appending to SESSION_LOG; **when the fix is generalizable** (e.g. you added a KNOWN_ERRORS entry or a rule would prevent recurrence), write agent_feedback_this_run.json with suggested_rule_update or suggested_strategy so Refiner can update rules from run history. | On success: Watcher re-runs Developer. If same failure recurs: **Guardian** is invoked. If MaxFixRounds reached: **Guardian** then exit. |
-| **Guardian** | Watcher (when same failure recurs or MaxFixRounds reached) | Break the loop: try a *different* fix (e.g. skip day, block with reason, AUTOMATION_GAPS) or, if unresolved, write a full report for the user. | Either resolving the loop or writing **Saved/Logs/automation_loop_breaker_report.md** (summary, what was tried, recommended steps). The script ensures the report exists if the Guardian doesn't write it. | Report exists → user (or Refiner) continues. Re-run Watch-AutomationAndFix to resume. |
+| **Guardian** | Watcher (when same failure recurs or MaxFixRounds reached) | Break the loop: try a *different* fix (e.g. set current task to blocked in CURRENT_TASK_LIST.md, block with reason, AUTOMATION_GAPS) or, if unresolved, write a full report for the user. | Either resolving the loop or writing **Saved/Logs/automation_loop_breaker_report.md** (summary, what was tried, recommended steps). The script ensures the report exists if the Guardian doesn't write it. | Report exists → user (or Refiner) continues. Re-run Watch-AutomationAndFix to resume. |
 | **Refiner** | On-demand or after Guardian report | Read agent_run_history.ndjson, automation_errors.log, and (if present) automation_loop_breaker_report.md; update .cursor/rules, KNOWN_ERRORS.md, AGENTS.md, or workflow docs so the same failures don't recur. | Turning run history and suggestions into concrete rule/strategy updates; optionally checking that Fixer and Guardian left the expected artifacts (SESSION_LOG, report). | Updated rules and docs; next run benefits. See [AUTOMATION_REFINEMENT.md](AUTOMATION_REFINEMENT.md). |
 | **Gap-Solver** | On-demand or after a gap is logged / after Guardian report | Read [AUTOMATION_GAPS.md](../AUTOMATION_GAPS.md) and [GAP_SOLUTIONS_RESEARCH.md](../GAP_SOLUTIONS_RESEARCH.md); for each gap without a solution implemented, implement programmatic solution first, then GUI automation stub or docs; update AUTOMATION_GAPS and GAP_SOLUTIONS_RESEARCH. | Implementing or documenting a solution for every logged gap; updating the Research log and closing or annotating gaps. | Updated AUTOMATION_GAPS / GAP_SOLUTIONS_RESEARCH; optionally SESSION_LOG. Run via `.\Tools\Run-GapSolverAgent.ps1` or **run-gap-solver** command. |
 
@@ -43,6 +43,28 @@ Development only "pauses" at a **documented** handoff: either all days done (exi
 - **Guardian → Refiner / Gap-Solver / user:** Guardian's report and agent_feedback_this_run (merged into run history) are the input for Refiner or a human. Refiner is accountable for turning that into rule/strategy changes. When the report (or AUTOMATION_GAPS) mentions an automation gap, **Gap-Solver** is accountable for implementing a solution and updating AUTOMATION_GAPS/GAP_SOLUTIONS_RESEARCH.
 - **Developer / Guardian → Gap-Solver:** When a step is logged to AUTOMATION_GAPS.md, the Gap-Solver is the role responsible for implementing solutions. Run `.\Tools\Run-GapSolverAgent.ps1` on-demand or after a Guardian report that references gaps.
 - **Run history:** Every run (Developer, Fixer, Guardian) is recorded in **Saved/Logs/agent_run_history.ndjson**. Refiner (or a human) can audit that each role did its part (e.g. Fixer rounds have suggested_rule_update when appropriate; Guardian wrote report when unresolved).
+
+---
+
+## Structured handoff (Fixer / Guardian)
+
+When the **Developer** exits non-zero, the Watcher writes **Saved/Logs/agent_handoff.json** so the Fixer (and, when invoked, the Guardian) get a consistent handoff bundle and lose less context. Fixer and Guardian prompts instruct them to **read agent_handoff.json first**, then the log files.
+
+**Handoff schema (agent_handoff.json):**
+
+| Field | Description |
+|-------|-------------|
+| `ts` | ISO timestamp when the handoff was written |
+| `exit_code` | Exit code of the role that failed |
+| `round` | Loop round number (from last activity) |
+| `role_that_failed` | `"Developer"` or `"Fixer"` |
+| `last_prompt_preview` | Truncated prompt from the failed run (from RunAutomationLoop) |
+| `last_error_summary` | Last lines of automation_errors.log |
+| `editor_log_captured` | Whether Editor log was captured (editor_output_full.txt exists) |
+| `suggested_next_reader` | What the next role should read (e.g. "Fixer: read … first, then …") |
+| `agent_facing_summary` | Optional 3–5 sentence summary for the receiving agent |
+
+The **Developer** (RunAutomationLoop) writes **Saved/Logs/automation_last_prompt_preview.txt** on non-zero exit so the Watcher can include it in the handoff. The **Watcher** writes **agent_handoff.json** after capturing the Editor log and before starting the Fixer or invoking the Guardian.
 
 ---
 

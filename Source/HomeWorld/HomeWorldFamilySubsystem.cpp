@@ -1,6 +1,7 @@
 // Copyright HomeWorld. All Rights Reserved.
 
 #include "HomeWorldFamilySubsystem.h"
+#include "HomeWorldSaveGame.h"
 
 void UHomeWorldFamilySubsystem::SetRoleForIndex(int32 SpawnIndex, EHomeWorldFamilyRole Role)
 {
@@ -24,4 +25,24 @@ EHomeWorldFamilyRole UHomeWorldFamilySubsystem::GetRoleForIndex(int32 SpawnIndex
 int32 UHomeWorldFamilySubsystem::GetMemberCount() const
 {
 	return RoleBySpawnIndex.Num();
+}
+
+void UHomeWorldFamilySubsystem::SerializeToSaveGame(UHomeWorldSaveGame* Out) const
+{
+	if (!Out) return;
+	Out->SavedRoleBySpawnIndex.Reset();
+	for (EHomeWorldFamilyRole R : RoleBySpawnIndex)
+	{
+		Out->SavedRoleBySpawnIndex.Add(static_cast<uint8>(R));
+	}
+}
+
+void UHomeWorldFamilySubsystem::DeserializeFromSaveGame(const UHomeWorldSaveGame* In)
+{
+	if (!In) return;
+	RoleBySpawnIndex.Reset();
+	for (uint8 B : In->SavedRoleBySpawnIndex)
+	{
+		RoleBySpawnIndex.Add(static_cast<EHomeWorldFamilyRole>(B));
+	}
 }

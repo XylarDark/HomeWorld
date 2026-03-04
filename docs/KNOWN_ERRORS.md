@@ -2,6 +2,8 @@
 
 Record errors and their fixes here so they are not repeated. See `.cursor/rules/07-ai-agent-behavior.mdc` (Error recurrence prevention) and `05-error-handling.mdc` (Learning from errors).
 
+**Eighth list (2026-03-05):** No new errors logged during T1–T7 (PIE pre-demo, Save/Load, portal, Defend, SaveGame, packaging, slice sign-off). For pre-demo validation steps see [VERTICAL_SLICE_CHECKLIST](workflow/VERTICAL_SLICE_CHECKLIST.md) §3.
+
 ## Entry format
 
 For each entry use:
@@ -14,6 +16,12 @@ For each entry use:
 ---
 
 ## Entries
+
+### PowerShell: Test-Path -LiteralPath $env:UE_EDITOR when UE_EDITOR is unset
+- **Error:** `ParameterBindingValidationException` or "Cannot bind argument to parameter 'LiteralPath' because it is null" when a script runs `Test-Path -LiteralPath $env:UE_EDITOR` and `$env:UE_EDITOR` is not set.
+- **Cause:** Passing null or empty to `-LiteralPath` throws in PowerShell.
+- **Fix:** Never call `Test-Path -LiteralPath $env:UE_EDITOR` without first ensuring UE_EDITOR is set. Use the project helper **Test-UE_EDITORSet** from `Tools/Common-Automation.ps1` (dot-source it), or guard with `if (-not $env:UE_EDITOR) { ... }` before any path check.
+- **Context:** Automation scripts (RunAutomationLoop, Check-AutomationPrereqs, Safe-Build). See docs/AUTOMATION_LOOP_UNTIL_DONE.md, docs/AUTOMATION_READINESS.md.
 
 ### Duplicated level: World Partition shows None and is not editable
 - **Error:** After duplicating Main to create the Homestead map (or any level), **World Settings → World Partition** shows **None** and the field cannot be edited (grayed out or read-only).
@@ -67,6 +75,12 @@ For each entry use:
 - **Fix:** Use `#include "Kismet/GameplayStatics.h"`.
 - **Context:** 2026-03-03, T5 Dungeon entrance (OpenLevel).
 
+### UHT: default parameter FString() not parsed in Blueprint-callable header
+- **Error:** `Error: C++ Default parameter not parsed: SlotName 'FString()'` in HomeWorldSaveGameSubsystem.h (UHT/Win64).
+- **Cause:** Unreal Header Tool does not accept `FString()` as a default argument in UFUNCTION declarations.
+- **Fix:** Remove default for the FString parameter in the header; use no default (caller passes empty string for default). In the .cpp implementation, treat empty SlotName as default: `const FString Slot = SlotName.IsEmpty() ? DefaultSlotName : SlotName`.
+- **Context:** 2026-03-03, N2 SaveGame subsystem.
+
 ### UnrealMCP plugin: BufferSize name collision in UE 5.7
 - **Error:** `error C4459: declaration of 'BufferSize' hides global declaration` in MCPServerRunnable.cpp (treated as error in UE 5.7).
 - **Cause:** Global `const int32 BufferSize = 8192` in plugin code shadows a local in UE's `StringConv.h` header.
@@ -84,6 +98,18 @@ For each entry use:
 - **Cause:** Get-PromptText in RunAutomationLoop.ps1 expected content *between* two "---" fences. When NEXT_SESSION_PROMPT.md has only one "---", `-split "---", 3` yields two parts, so the "middle block" branch was skipped. The fallback then took the first line that doesn't start with `#` or `**`, which is the line "---" itself, so the agent received the prompt "---" and exited immediately.
 - **Fix:** In Get-PromptText: (1) Use content after the first "---" (parts[1]) when parts.Count -ge 2 and parts[1] is non-empty and not literally "---". (2) In the fallback, exclude the line "---" so it is never returned as the prompt.
 - **Context:** 2026-03-03, Watch-AutomationAndFix; Fixer round. Tools/RunAutomationLoop.ps1.
+
+### RunAutomationLoop.ps1: task list "0 remaining" when tasks are pending (regex)
+- **Error:** Loop exits immediately with "no pending or in_progress tasks (0 remaining)" even though CURRENT_TASK_LIST.md has tasks with `- **status:** pending`.
+- **Cause:** The file uses markdown bold: `- **status:** pending`. The regex `status:\s*(pending|in_progress)` expects optional whitespace after the colon, but the file has `**` there, so the pattern never matched.
+- **Fix:** Use a regex that allows optional asterisks: `status:\s*\**\s*(pending|in_progress)` (in both Test-HasPendingTasks and Get-PendingTaskCount). See RunAutomationLoop.ps1.
+- **Context:** 2026-03-04; debug log showed matchCount 0 while statusLinesSnippet contained "**status:** pending".
+
+### RunAutomationLoop.ps1: parse errors (Unexpected token, Missing closing ')')
+- **Error:** PowerShell reports parse errors when loading RunAutomationLoop.ps1: e.g. "Unexpected token 'automation_tasks_complete.md"", "Missing closing ')' in expression", "Unexpected token '}'", at lines 200, 337, 390, 396, 398, 277.
+- **Cause:** Smart (Unicode) double quotes (U+201C/U+201D) or em dash (U+2014) in string literals; or variable expansion inside double-quoted strings that contain `)` or spaces (e.g. `"($n remaining)"`) can confuse the parser when the opening quote is non-ASCII.
+- **Fix:** Use only ASCII double quote (U+0022) and single quote (U+0027) in .ps1 files. For strings with variables and punctuation, use the `-f` format operator, e.g. `('message {0} remaining' -f $n)` instead of `"message ($n remaining)"`. Use single-quoted strings for paths and literal text. Replace em dash in code with `'-'`. Avoid mixing concatenation of `"`n`n"` with long single-quoted strings; use one double-quoted string or build with `-f`.
+- **Context:** 2026-03-04, Tools/RunAutomationLoop.ps1; automation_terminal_capture.log showed parse errors on agent start.
 
 ### MCP set_blueprint_property: full asset path causes Editor crash
 - **Error:** Fatal error: `Attempted to create a package with name containing double slashes. PackageName: /Game/Blueprints//Game/HomeWorld/GameMode/BP_GameMode` — Editor crashes.
@@ -252,3 +278,9 @@ For each entry use:
 - **Cause:** The representation trait lives in the **MassRepresentation** module (part of MassGameplay). The HomeWorldEditor module did not depend on MassRepresentation, so `StaticLoadClass` for `MassRepresentationFragmentTrait` failed and the commandlet could not add the trait. The Editor MEC trait picker may also not list it if the module was not loaded.
 - **Fix:** Add **MassRepresentation** to `PrivateDependencyModuleNames` in [Source/HomeWorldEditor/HomeWorldEditor.Build.cs](Source/HomeWorldEditor/HomeWorldEditor.Build.cs). Rebuild with `Build-HomeWorld.bat` (Editor closed). Run the CreateMEC commandlet: `UnrealEditor.exe HomeWorld.uproject -run=HomeWorldEditor.CreateMEC [Path=/Game/HomeWorld/Mass/MEC_FamilyGatherer]`. Open **MEC_FamilyGatherer** in the Editor; the representation trait should now be present. Set **Static Mesh** and **Scale** (1.0) in Details. For finding a cube/placeholder mesh in UE 5.7, use **only** Epic 5.7–sourced steps: see [UE57_EDITOR_UI.md](UE57_EDITOR_UI.md) (Show Engine Content, then browse or search). Save. See [DAY11_FAMILY_SPAWN.md](tasks/DAY11_FAMILY_SPAWN.md) Step 2.
 - **Context:** 2026-03, MEC_FamilyGatherer, family agent visualization.
+
+### pie_test_runner.py: Save/Load and Phase 2 checks require PIE running
+- **Error:** When running `pie_test_runner.py` (via MCP or Tools → Execute Python Script), checks such as **check_save_load_persistence** and **check_time_of_day_phase2** report "PIE not running" and are not executed; summary may show e.g. 3/15 passed with many "PIE not running".
+- **Cause:** Those checks query the PIE world and game state; they only run when a Play-in-Editor session is active. Running the script with the Editor open but no PIE session yields "PIE not running" for all PIE-dependent checks.
+- **Fix:** For full validation of Save/Load and TimeOfDay Phase 2: start PIE (Play), then run `execute_python_script("pie_test_runner.py")` (MCP) or run the script from the Editor; review `Saved/pie_test_results.json`. When documenting outcomes (e.g. in CURRENT_TASK_LIST or task docs), state whether PIE was running so readers can interpret pass/fail/not run correctly.
+- **Context:** 2026-03-05, T5 (fifth list) PIE validation; DAY15_ROLE_PERSISTENCE §4, DAY12_ROLE_PROTECTOR §4.

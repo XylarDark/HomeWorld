@@ -1,4 +1,4 @@
-# Check-AutomationPrereqs.ps1 - Verify prerequisites for the 30-day automation loop.
+# Check-AutomationPrereqs.ps1 - Verify prerequisites for the automation loop.
 # Run from project root: .\Tools\Check-AutomationPrereqs.ps1
 # See docs/AUTOMATION_READINESS.md "Before you start" for how to fix any missing item.
 
@@ -6,8 +6,9 @@ param(
     [string]$ProjectRoot = ""
 )
 
-if (-not $ProjectRoot) { $ProjectRoot = $env:HOMEWORLD_PROJECT }
-if (-not $ProjectRoot) { $ProjectRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path }
+$commonScript = Join-Path $PSScriptRoot "Common-Automation.ps1"
+if (Test-Path -LiteralPath $commonScript) { . $commonScript }
+if (-not $ProjectRoot) { $ProjectRoot = Resolve-ProjectRoot }
 $ProjectRoot = $ProjectRoot.TrimEnd("\", "/")
 
 $allOk = $true
@@ -22,24 +23,36 @@ if (-not $agentCmd) {
 }
 
 # 2. UE_EDITOR
-if (-not $env:UE_EDITOR -or [string]::IsNullOrWhiteSpace($env:UE_EDITOR)) {
-    Write-Host "FAIL: UE_EDITOR environment variable is not set. Set it to your UnrealEditor.exe path (see docs/AUTOMATION_READINESS.md)"
-    $allOk = $false
-} elseif (-not (Test-Path -LiteralPath $env:UE_EDITOR)) {
-    Write-Host "FAIL: UE_EDITOR is set to '$env:UE_EDITOR' but that path does not exist."
+if (-not (Test-UE_EDITORSet)) {
+    if (-not $env:UE_EDITOR -or [string]::IsNullOrWhiteSpace($env:UE_EDITOR)) {
+        Write-Host "FAIL: UE_EDITOR environment variable is not set. Set it to your UnrealEditor.exe path (see docs/AUTOMATION_READINESS.md)"
+    } else {
+        Write-Host "FAIL: UE_EDITOR is set to '$env:UE_EDITOR' but that path does not exist."
+    }
     $allOk = $false
 } else {
     Write-Host "OK: UE_EDITOR is set and file exists: $env:UE_EDITOR"
 }
 
-# 3. Required state files
-$statusPath = Join-Path $ProjectRoot "docs\workflow\30_DAY_IMPLEMENTATION_STATUS.md"
+# 3. Required state files (current task list drives the loop)
+$taskListPath = Join-Path $ProjectRoot "docs\workflow\CURRENT_TASK_LIST.md"
 $promptPath = Join-Path $ProjectRoot "docs\workflow\NEXT_SESSION_PROMPT.md"
-if (-not (Test-Path $statusPath)) {
-    Write-Host "FAIL: 30_DAY_IMPLEMENTATION_STATUS.md not found at docs/workflow/"
+if (-not (Test-Path -LiteralPath $taskListPath)) {
+    Write-Host "FAIL: CURRENT_TASK_LIST.md not found at docs/workflow/. Create from CURRENT_TASK_LIST_TEMPLATE.md or see HOW_TO_GENERATE_TASK_LIST.md"
     $allOk = $false
 } else {
-    Write-Host "OK: 30_DAY_IMPLEMENTATION_STATUS.md exists"
+    Write-Host "OK: CURRENT_TASK_LIST.md exists"
+    $validateScript = Join-Path $ProjectRoot "Content\Python\validate_task_list.py"
+    if (Test-Path -LiteralPath $validateScript) {
+        $validateResult = & python $validateScript 2>&1
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "FAIL: CURRENT_TASK_LIST.md validation failed. Run: python Content/Python/validate_task_list.py"
+            Write-Host $validateResult
+            $allOk = $false
+        } else {
+            Write-Host "OK: CURRENT_TASK_LIST.md passes validate_task_list.py"
+        }
+    }
 }
 if (-not (Test-Path $promptPath)) {
     Write-Host "FAIL: NEXT_SESSION_PROMPT.md not found at docs/workflow/"

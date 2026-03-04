@@ -11,8 +11,14 @@ version: 1.0
 ## Session Continuity (progress-file pattern)
 
 At the **start** of every task:
-1. Read `docs/SESSION_LOG.md` to load context from prior sessions (completed work, blockers, errors, key decisions).
-2. Read `docs/workflow/DAILY_STATE.md` to know **yesterday** (what was done last session) and **today** (what to do this session). When the user asks "what did we do yesterday and what do we need to do today?", use DAILY_STATE (and optionally SESSION_LOG) to answer.
+1. **Tasks complete alert (automatic):** If `Saved/Logs/automation_tasks_complete.md` exists, **prepend a prominent note** to your first response: "All tasks complete. Generate a new task list (see docs/workflow/HOW_TO_GENERATE_TASK_LIST.md) and run .\Tools\Start-AllAgents-InNewWindow.ps1 (or double-click Start-AllAgents.bat) when ready." The user must be informed so they can create the next task list without having to ask.
+2. **Automation exit alert (automatic):** If `Saved/Logs/automation_exit_alert.md` exists, read it and **prepend a short automation exit summary** to your first response (exit reason, exit code, round, pending tasks, last message). Also read **Saved/Logs/automation_terminal_capture.log** (last 50 lines) and include any relevant error lines from the terminal in the summary so errors that only appeared in the external terminal are reported in chat. The user must be informed without having to ask. Then proceed with the user's request. Do not repeat the same alert in the same conversation unless the user asks again.
+3. **Latest completion (automatic):** If neither automation_tasks_complete.md nor automation_exit_alert.md exists, but `Saved/Logs/automation_last_completion.json` exists, read it and **prepend a short line** to your first response: "Latest automation: Round N completed at [timestamp]. CURRENT_TASK_LIST may have been updated. Run .\Tools\Get-AutomationStatus.ps1 to see if the loop is still running." This informs the user when something (a round) has completed even while the run may still be in progress.
+4. **Automation progress in chat:** When the user asks "automation status", "what's the agent doing", "show me agent progress", "what has happened", or similar, read **Saved/Logs/automation_heartbeat.log** (tail, last 25–30 lines), **Saved/Logs/automation_status_latest.txt** if present, and **Saved/Logs/automation_terminal_capture.log** (tail, last 40–50 lines) so any errors that appeared only in the terminal are included. Summarize: current round, elapsed time, last log lines, and any errors from the terminal capture so the user sees progress and errors in chat.
+5. Read `docs/SESSION_LOG.md` to load context from prior sessions (completed work, blockers, errors, key decisions).
+6. Read `docs/workflow/DAILY_STATE.md` to know **yesterday** (what was done last session) and **today** (what to do this session). When the user asks "what did we do yesterday and what do we need to do today?", use DAILY_STATE (and optionally SESSION_LOG) to answer.
+
+**When working on docs/workflow/CURRENT_TASK_LIST.md (automation loop):** Complete **exactly one task** per round. Set **only that task's** status to **completed**; do not change any other task's status. The loop will invoke the agent again for the next pending task until all are done. Marking multiple tasks completed or all tasks completed in one round will cause the loop to exit early.
 
 At the **end** of every task:
 1. Append a summary entry to `docs/SESSION_LOG.md` (date, tasks completed/remaining, errors encountered, key decisions).
@@ -36,6 +42,15 @@ Manage context proactively to stay effective on long-horizon tasks:
 - **Search strategy:** Use `Grep` for exact symbol/string lookup; use `SemanticSearch` for exploratory "how/where" questions; use `Glob` for finding files by name pattern.
 - **Subtask decomposition:** Break large tasks into smaller subtasks. Complete and report on each subtask before starting the next. Use the `Task` tool to delegate independent sub-problems in parallel when possible.
 - **Avoid context pollution:** Don't read files you don't need. Don't re-read files whose content you already have in context.
+
+## Automation: always separate terminal window, with capture by default
+
+**Never run the automation loop in the chat or integrated terminal.** When the user says **"start agents"**, **"run automation"**, **"start the loop"**, or similar, you must **always** start with capture by default:
+
+- **Run:** **`.\Tools\Start-AllAgents-InNewWindow.ps1`** (optionally with the same parameters as Start-AllAgents.ps1). This launches **Run-AutomationWithCapture.ps1** in a new window, so terminal output is captured to **Saved/Logs/automation_terminal_capture.log** and the window stays open until the user closes it. Do not run `.\Tools\Start-AllAgents.ps1` or `Start-AutomationSession.ps1` in the current terminal.
+- **Or tell the user:** "Double-click **Start-AllAgents.bat** in the project root" (the .bat also uses capture and keeps the window open).
+
+Capture is the default: the new-window launcher always uses Run-AutomationWithCapture.ps1 so errors and output are available in chat and to the Fixer. Do not use `run_terminal_cmd` with `is_background: true` to run Start-AllAgents.ps1—use only the new-window launcher or the .bat.
 
 ## Tool Usage
 
@@ -159,6 +174,11 @@ Before any MCP call:
 
 ## AI Agent Checklist
 
+- [ ] **Automation in separate window with capture** — when the user says "start agents" (or similar), run `.\Tools\Start-AllAgents-InNewWindow.ps1` so the run uses capture by default; never run Start-AllAgents.ps1 in the chat/integrated terminal (see Automation: always separate terminal window, with capture by default)
+- [ ] **Tasks complete alert** — if `Saved/Logs/automation_tasks_complete.md` exists, prepend a prominent "All tasks complete; generate a new task list" note (see Session Continuity)
+- [ ] **Automation exit alert** — if `Saved/Logs/automation_exit_alert.md` exists, read it and prepend a short summary so the user is informed automatically (see Session Continuity)
+- [ ] **CURRENT_TASK_LIST (loop):** When completing a task from CURRENT_TASK_LIST, set only that task to **completed**; leave all other tasks' status unchanged so the loop continues to the next pending task
+- [ ] **Latest completion** — if neither of the above exists but `Saved/Logs/automation_last_completion.json` exists, prepend "Latest automation: Round N completed at [time]; run Get-AutomationStatus to see if still running" so the user is informed when a round has completed
 - [ ] **Session log read** — read `docs/SESSION_LOG.md` at task start to load prior context (see Session Continuity)
 - [ ] **Daily state read** — read `docs/workflow/DAILY_STATE.md` at task start so "yesterday" and "today" are available when the user asks
 - [ ] **New feature: research and tutorials first** — when developing a new feature: use **UE 5.7–specific sources only** (Epic 5.7 docs, project docs); see `ue57-sources.mdc` and Feature development above.

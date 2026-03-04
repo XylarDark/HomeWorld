@@ -11,6 +11,8 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+$commonScript = Join-Path $PSScriptRoot "Common-Automation.ps1"
+if (Test-Path -LiteralPath $commonScript) { . $commonScript }
 $ProjectRoot = $null
 if ($env:HOMEWORLD_PROJECT -and (Test-Path -LiteralPath $env:HOMEWORLD_PROJECT)) {
     $ProjectRoot = $env:HOMEWORLD_PROJECT.TrimEnd("\", "/")
@@ -97,7 +99,7 @@ try {
         if ($LaunchEditorAfter -and $editorWasRunning) {
             Write-SafeLog "Launching Editor and waiting for MCP (port 55557)..."
             $cycleScript = Join-Path $ProjectRoot "Content\Python\run_automation_cycle.py"
-            if ((Test-Path -LiteralPath $cycleScript) -and $env:UE_EDITOR) {
+            if ((Test-Path -LiteralPath $cycleScript) -and (Test-UE_EDITORSet)) {
                 & python $cycleScript --no-build --launch-and-wait
                 if ($LASTEXITCODE -ne 0) { Write-SafeLog "Editor launch/wait failed (non-fatal)." }
             } else {

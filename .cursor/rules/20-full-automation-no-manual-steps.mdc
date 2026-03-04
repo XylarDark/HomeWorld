@@ -36,7 +36,7 @@ The project is set up for **fully autonomous** automation. The agent does not as
 - **Why current automation didn't cover it** (e.g. "No MCP/Python API for adding Mass Spawner to level", "Selector in UI not scriptable")
 - **Suggested approach for future automation** (e.g. "GUI automation: capture ref image for Modes panel, then PyAutoGUI to click Mass Spawner and set config", "Research UE 5.7 Mass Spawner Python API")
 
-Append new entries; do not remove or mark resolved in this file (the user's follow-up sessions will implement fixes and can note resolution elsewhere if desired).
+Append new entries; do not remove original gap entries. **When a gap is addressed** (automation solution implemented and verified), **note it in docs/AUTOMATION_GAPS.md** (e.g. Research log or Addressed subsection: date, gap id, how addressed, link). Adding the resolution keeps the file as the single record of both open and closed gaps.
 
 ## References
 

@@ -129,6 +129,7 @@ The project has a C++ game module (`Source/HomeWorld/`). To build from an IDE or
 | Run the PCG forest script (Editor opens and runs script) | **Run-PCGForestScript.bat** (set `UE_EDITOR` in the file first) |
 | Run the demo map script (village + PCG forest) | **Run-DemoMapScript.bat** (set `UE_EDITOR` in the file first) |
 | Set up MCP (Cursor-to-Editor bridge) | **Setup-MCP.bat** (one-time; installs uv, clones unreal-mcp, copies plugin) |
+| Package for Windows (Shipping) | **Package-HomeWorld.bat** (RunUAT BuildCookRun; close Editor first) |
 
 `SetEnv-BundledDotNet.bat` (project root) is used by the two solution-related batch files; edit its UE path if the engine is installed elsewhere.
 
@@ -137,3 +138,27 @@ If you add or remove C++ files, regenerate project files so the solution stays i
 **Visual Studio Installer:** The project’s `.vsconfig` requests **.NET 8.0 Runtime (LTS)** and **.NET SDK**, not .NET 6.0. If the Installer prompts for “.NET 6.0 Runtime (Out of support)”, cancel and ensure **.NET 8.0 Runtime** and **.NET SDK** are installed instead (Individual components in the Installer). The C# parts of the solution target .NET 8.0.
 
 **Rebuild All in Visual Studio:** The **VisualStudioTools** plugin is disabled in `.uproject` so that “Rebuild All” works without build-order issues (UBT would otherwise require UE5Rules to be built before the game when that plugin is enabled). To use the plugin: enable it in **Edit > Plugins**, then when building the full solution build **UE5Rules** first, then **HomeWorld**. For game-only builds, use **`Build-HomeWorld.bat`**.
+
+---
+
+## Packaging (shipping build)
+
+For Steam Early Access or distribution you need a **packaged** (cooked + staged) build. Use either the Editor or command line. **Source:** [Sharing and Releasing Projects (UE 5.7)](https://dev.epicgames.com/documentation/en-us/unreal-engine/sharing-and-releasing-projects-for-unreal-engine); [Packaging Projects for Windows](https://dev.epicgames.com/documentation/en-us/unreal-engine/packaging-unreal-engine-projects-for-windows) (verify menu paths in Epic 5.7 docs if your Editor differs).
+
+**Prerequisites:** Close the Editor before command-line packaging. Ensure the project builds (run **`Build-HomeWorld.bat`** or **`.\Tools\Safe-Build.ps1`**).
+
+### From the Editor
+
+1. Open the project in Unreal Editor (UE 5.7).
+2. **File → Package Project → Windows (64-bit)** (or the target platform).
+3. Choose an output directory (e.g. `Saved/StagedBuilds` or a custom path). Packaging will cook content and produce an executable and content in that folder.
+4. Run the packaged executable from the chosen output to verify.
+
+### From the command line (RunUAT)
+
+Use the Engine's **RunUAT** (Unreal Automation Tool) to cook and package without the Editor:
+
+- **RunUAT location:** `C:\Program Files\Epic Games\UE_5.7\Engine\Build\BatchFiles\RunUAT.bat` (adjust if UE 5.7 is installed elsewhere).
+- **Example (Windows 64-bit Shipping):** From project root, run **`Package-HomeWorld.bat`** (see project root), or invoke RunUAT manually with BuildCookRun; output under `Saved\StagedBuilds`.
+
+**Validation:** After packaging, launch the game from the staged directory and confirm: level loads, character moves, no missing content. For a Steam store checklist, see [workflow/STEAM_EA_STORE_CHECKLIST.md](workflow/STEAM_EA_STORE_CHECKLIST.md).

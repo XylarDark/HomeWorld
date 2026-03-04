@@ -39,6 +39,37 @@ Note any blockers or missing pieces; record below or in [KNOWN_ERRORS.md](../KNO
 
 ---
 
+## T1 verification (CURRENT_TASK_LIST — Week 1 playtest loop)
+
+**Purpose:** T1 asks to verify the four beats on DemoMap in PIE and document pass/fail. Use this section when running that verification (automation or manual).
+
+**Automated checks (run with PIE already running):**
+
+1. Open **DemoMap**; start **PIE** (Play).
+2. Run **`Content/Python/pie_test_runner.py`** via MCP (`execute_python_script("pie_test_runner.py")`) or **Tools → Execute Python Script**.
+3. Read **`Saved/pie_test_results.json`**. Map to beats:
+   - **Crash:** `PIE active` and `Character spawned` passed ⇒ spawn OK, no crash.
+   - **Scout:** `On ground`, `Capsule dimensions`, `PCG actors` passed ⇒ move/look and environment.
+   - **Claim home (placement):** `Placement API` passed ⇒ P (place) can use placement trace.
+
+**Manual checks (in PIE, with Output Log open):**
+
+- **Boss (combat):** Press **LMB**, **Shift**. Confirm log: `HomeWorld: PrimaryAttack input triggered`, `HomeWorld: Dodge input triggered`, and `... ability activated` or `... failed to activate`.
+- **Claim home (Interact / Place):** Press **E**, then **P**. Confirm: `HomeWorld: Interact input triggered`, `HomeWorld: Place input triggered`, and corresponding ability lines.
+
+**T1 result (fill when run):**
+
+| Beat        | Pass/Fail | Note |
+|------------|-----------|------|
+| Crash      |           |      |
+| Scout      |           |      |
+| Boss       |           |      |
+| Claim home |           |      |
+
+If any beat fails, fix or log in [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) / [SESSION_LOG.md](../SESSION_LOG.md) and set T1 to **blocked** in [CURRENT_TASK_LIST.md](../workflow/CURRENT_TASK_LIST.md) until resolved.
+
+---
+
 ## 3. Sign-off or buffer
 
 **If gate passed (all four beats testable with placeholders):**
@@ -60,6 +91,23 @@ Note any blockers or missing pieces; record below or in [KNOWN_ERRORS.md](../KNO
 - [ ] 30_DAY_SCHEDULE: Day 5 items marked [x] (or buffer note).
 - [ ] DAILY_STATE: Yesterday = Day 5; Today = Day 6; Current day = 6 (or in progress).
 - [ ] SESSION_LOG: Day 5 summary + sign-off or buffer items.
+
+---
+
+## 5. T1 (CURRENT_TASK_LIST) — Week 1 playtest loop verification
+
+**Purpose:** [CURRENT_TASK_LIST.md](../workflow/CURRENT_TASK_LIST.md) T1 requires verifying the four beats (crash, scout, boss, claim home) on DemoMap in PIE. This section records that verification.
+
+**Programmatic verification (2026-03-03):**
+
+- **Crash (spawn):** GameMode uses BP_HomeWorldCharacter; PlayerStart in level. C++ and Blueprint chain in place. `pie_test_runner.py` checks PIE active, character spawned, on ground, capsule when PIE is running.
+- **Scout (move/look):** Enhanced Input (WASD + look) and GAS granted in C++; `init_unreal.py` applies Enhanced Input on Editor load. Movement and look are bound in `HomeWorldCharacter`.
+- **Boss (LMB/Shift):** `PrimaryAttackAction`/`DodgeAction` bound to `PrimaryAttackAbilityClass`/`DodgeAbilityClass`. Logs: `HomeWorld: PrimaryAttack input triggered`, `HomeWorld: Dodge input triggered`, and ability activated/skipped. `setup_gas_abilities.py` creates IA_PrimaryAttack (LMB), IA_Dodge (Shift), GA_PrimaryAttack, GA_Dodge and assigns on BP_HomeWorldCharacter.
+- **Claim home (E or P):** `InteractAction`/`PlaceAction` bound to `InteractAbilityClass`/`PlaceAbilityClass`. E = Interact (harvest/use); P = Place (TryPlaceAtCursor). `setup_gas_abilities.py` creates IA_Interact (E), IA_Place (P), GA_Interact, GA_Place. C++ logs: `HomeWorld: Interact input triggered`, `HomeWorld: Place input triggered`.
+
+**Automated check:** With Editor connected, `pie_test_runner.py` was executed via MCP. Results are written to `Saved/pie_test_results.json` (PIE active, character spawned, on ground, placement API, PCG actors). Run with **DemoMap** open and **PIE running** for full relevance.
+
+**In-Editor sign-off:** Open **DemoMap** → start **PIE** → run the four beats per §2 above. In **Window → Developer Tools → Output Log**, press **LMB**, **Shift**, **E**, **P** and confirm the corresponding `HomeWorld: ... input triggered` and ability activated/skipped lines. No blockers logged; T1 marked completed in CURRENT_TASK_LIST.
 
 ---
 

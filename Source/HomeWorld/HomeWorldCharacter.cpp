@@ -14,6 +14,7 @@
 #include "HomeWorldAttributeSet.h"
 #include "HomeWorldResourcePile.h"
 #include "HomeWorldInventorySubsystem.h"
+#include "HomeWorldSpiritRosterSubsystem.h"
 #include "InputActionValue.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
@@ -395,6 +396,24 @@ bool AHomeWorldCharacter::TryPlaceAtCursor()
 	}
 	UE_LOG(LogTemp, Log, TEXT("HomeWorld: Place succeeded at %s (spawned %s)"), *OutTransform.GetLocation().ToString(), *GetNameSafe(Spawned));
 	return true;
+}
+
+FName AHomeWorldCharacter::GetSpiritIdForDeath() const
+{
+	return FName(*FString::Printf(TEXT("%s_%u"), *GetName(), GetUniqueID()));
+}
+
+void AHomeWorldCharacter::ReportDeathAndAddSpirit()
+{
+	UWorld* World = GetWorld();
+	if (!World) return;
+	UGameInstance* GI = World->GetGameInstance();
+	if (!GI) return;
+	UHomeWorldSpiritRosterSubsystem* Spirits = GI->GetSubsystem<UHomeWorldSpiritRosterSubsystem>();
+	if (!Spirits) return;
+	FName SpiritId = GetSpiritIdForDeath();
+	Spirits->AddSpirit(SpiritId);
+	UE_LOG(LogTemp, Log, TEXT("HomeWorld: Character '%s' reported death and added as spirit: %s"), *GetName(), *SpiritId.ToString());
 }
 
 bool AHomeWorldCharacter::TryHarvestInFront()

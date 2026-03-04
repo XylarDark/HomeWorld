@@ -73,9 +73,9 @@ def _save_current_level():
 
 
 def _find_existing_portal(world):
-    """Return True if an actor with tag Portal_To_Planetoid exists in the level."""
+    """Return (True, actor) if an actor with tag Portal_To_Planetoid exists, else (False, None)."""
     if not world:
-        return False
+        return False, None
     try:
         for actor in unreal.EditorLevelLibrary.get_all_level_actors():
             if not actor:
@@ -86,9 +86,52 @@ def _find_existing_portal(world):
             tag_strs = [str(t) for t in tags]
             if PORTAL_TAG in tag_strs:
                 _log("Portal placeholder already present (actor with tag " + PORTAL_TAG + ").")
-                return True
+                return True, actor
     except Exception as e:
         _log("Could not enumerate actors: " + str(e))
+    return False, None
+
+
+def _set_level_to_open(actor, level_to_open):
+    """Set LevelToOpen on actor (AHomeWorldDungeonEntrance). Tries set_editor_property, setattr, and multiple names. Returns True if set."""
+    if not actor or not level_to_open:
+        return False
+    name_val = unreal.Name(level_to_open)
+    # 1) set_editor_property with common UE Python name variants (C++ PascalCase, Blueprint snake_case, DisplayName)
+    for val in (name_val, level_to_open):
+        for prop_name in ("LevelToOpen", "level_to_open", "Level To Open"):
+            try:
+                actor.set_editor_property(prop_name, val)
+                if _verify_level_to_open(actor, level_to_open):
+                    _log("Set LevelToOpen via set_editor_property(%s) to %s" % (prop_name, level_to_open))
+                    return True
+            except Exception:
+                continue
+    # 2) setattr in case the property is exposed as an attribute
+    for attr in ("LevelToOpen", "level_to_open"):
+        try:
+            setattr(actor, attr, name_val)
+            if _verify_level_to_open(actor, level_to_open):
+                _log("Set LevelToOpen via setattr(%s) to %s" % (attr, level_to_open))
+                return True
+        except Exception:
+            continue
+    _log("LevelToOpen could not be set from Python (tried set_editor_property and setattr). Set in Editor Details or use gui_automation/set_portal_level_to_open.py.")
+    return False
+
+
+def _verify_level_to_open(actor, expected):
+    """Return True if actor's LevelToOpen reads back as expected."""
+    for prop in ("LevelToOpen", "level_to_open"):
+        try:
+            v = actor.get_editor_property(prop)
+            if v is None:
+                continue
+            s = str(v) if not hasattr(v, "to_string") else v.to_string()
+            if expected in s or s == expected:
+                return True
+        except Exception:
+            continue
     return False
 
 
@@ -103,10 +146,13 @@ def main():
     location = unreal.Vector(pos[0], pos[1], pos[2])
     rotation = unreal.Rotator(0, 0, 0)
 
-    if _find_existing_portal(world):
+    level_to_open = config.get("portal_level_to_open", "Planetoid_Pride")
+    found, existing_actor = _find_existing_portal(world)
+    if found and existing_actor:
+        if _set_level_to_open(existing_actor, level_to_open):
+            _save_current_level()
         return
 
-    level_to_open = config.get("portal_level_to_open", "Planetoid_Pride")
     actor = None
 
     # Prefer AHomeWorldDungeonEntrance (trigger + Open Level) so portal works without manual Blueprint.
@@ -114,9 +160,8 @@ def main():
         entrance_class = unreal.load_class(None, "/Script/HomeWorld.HomeWorldDungeonEntrance")
         if entrance_class:
             actor = unreal.EditorLevelLibrary.spawn_actor_from_class(entrance_class, location, rotation)
-            if actor and hasattr(actor, "set_editor_property"):
-                actor.set_editor_property("level_to_open", unreal.Name(level_to_open))
-                _log("Set level_to_open to " + str(level_to_open))
+            if actor:
+                _set_level_to_open(actor, level_to_open)
     except Exception as e:
         _log("Could not spawn HomeWorldDungeonEntrance: " + str(e))
 

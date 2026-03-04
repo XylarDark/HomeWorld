@@ -1,12 +1,24 @@
-# Reference images for State Tree GUI automation
+# Reference images for State Tree GUI automation (Gap 2)
+
+**Ref images not in repo.** The files below must be produced **host-side**: run [capture_state_tree_refs.py](../capture_state_tree_refs.py) with the Editor open and ST_FamilyGatherer open in the State Tree editor (see "Host-side requirement" and "Capture script" below).
 
 The script `state_tree_apply_defend_branch.py` uses image-based location (PyAutoGUI `locateOnScreen`) to drive the State Tree editor when Python/MCP cannot edit the graph. Capture small, distinctive regions of the State Tree editor UI and save them here as PNGs. Use a consistent resolution and DPI (e.g. 100% scale) so location works across runs.
 
-## One-time: capture refs
+## Capture script (recommended)
 
-With the Editor open and **ST_FamilyGatherer** (or target State Tree) open in the State Tree editor, capture the following regions (e.g. with a capture script or screenshot tool) and save as the filenames below. Optionally crop each image to the relevant UI element for better matching.
+From project root, with **Unreal Editor** open and **ST_FamilyGatherer** open in the State Tree editor:
 
-## Suggested images (optional; add any subset)
+- **Interactive (all 5 refs):**  
+  `py Content/Python/gui_automation/capture_state_tree_refs.py`  
+  For each ref, position the Editor so the described region is visible, then press Enter. Images are saved to this folder.
+
+- **Auto (one ref):**  
+  `py Content/Python/gui_automation/capture_state_tree_refs.py --auto`  
+  Captures a full-screen screenshot as `state_tree_editor.png`. The other four refs require the interactive run above.
+
+Requires: `pip install pyautogui`. Optionally crop each saved image to the relevant UI element for better PyAutoGUI matching.
+
+## Ref images (used by state_tree_apply_defend_branch.py)
 
 | Filename | Description | When to capture |
 |----------|-------------|-----------------|
@@ -17,3 +29,14 @@ With the Editor open and **ST_FamilyGatherer** (or target State Tree) open in th
 | `blackboard_is_night.png` | Blackboard panel showing IsNight key. | With State Tree Blackboard tab visible. |
 
 If a ref is missing, the script skips that step and logs it. See [docs/AUTOMATION_GAPS.md](../../../../docs/AUTOMATION_GAPS.md) (Gap 2) and [docs/tasks/DAY12_ROLE_PROTECTOR.md](../../../../docs/tasks/DAY12_ROLE_PROTECTOR.md) for the manual steps this automation aims to replicate.
+
+### Host-side requirement
+
+Ref capture **must be run on the host** where the Unreal Editor is visible with ST_FamilyGatherer open in the State Tree editor. The automation loop does not have PyAutoGUI or Editor focus. To produce the refs:
+
+1. Install PyAutoGUI on the host: `pip install pyautogui`
+2. Open the Editor and open **ST_FamilyGatherer** in the State Tree editor (`/Game/HomeWorld/AI/ST_FamilyGatherer`).
+3. From project root run: `py Content/Python/gui_automation/capture_state_tree_refs.py --auto` for a single full-screen ref (`state_tree_editor.png`), or `py Content/Python/gui_automation/capture_state_tree_refs.py` (no `--auto`) for interactive capture of all five refs.
+4. Optionally crop each saved image to the relevant UI element for best PyAutoGUI matching.
+
+Once refs exist, `state_tree_apply_defend_branch.py` can run host-side; otherwise use the one-time manual steps in [AUTOMATION_GAPS.md](../../../../docs/AUTOMATION_GAPS.md) § Gap 2.

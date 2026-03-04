@@ -16,7 +16,7 @@ One-command build, test, and cycle orchestration. Use with Cursor and (optionall
 - [ ] `UE_EDITOR` set (for host scripts and orchestrator).
 - [ ] Cursor Agent CLI installed and authenticated (`agent login` or `CURSOR_API_KEY`) for RunAutomationLoop.
 - [ ] For loop with Editor tasks: set `UE_EDITOR` to UnrealEditor.exe so the loop can auto-launch the Editor before the first round; or start the Editor yourself. Use `-NoLaunchEditor` to run without the Editor.
-- [ ] Required docs and state files exist: `docs/workflow/30_DAY_IMPLEMENTATION_STATUS.md`, `docs/workflow/NEXT_SESSION_PROMPT.md` (created/updated by the agent).
+- [ ] Required docs and state files exist: `docs/workflow/CURRENT_TASK_LIST.md`, `docs/workflow/30_DAY_IMPLEMENTATION_STATUS.md`, `docs/workflow/NEXT_SESSION_PROMPT.md` (created/updated by the agent). Run `.\Tools\Check-AutomationPrereqs.ps1` to verify; it also runs `validate_task_list.py` to ensure the task list schema is valid.
 
 ## Commands (run from project root)
 
@@ -60,7 +60,22 @@ One-command build, test, and cycle orchestration. Use with Cursor and (optionall
 - **LFS / large .uasset:** Use `git lfs install` and ensure .uasset/.umap are tracked (see .gitattributes). Pull with LFS before build.
 - **RunAutomationLoop: agent exited with -1073740791 / "usage limit for Opus" / "Assertion failed":** The Cursor Agent hit an API usage limit (e.g. Opus) or the CLI crashed. **Fix:** In Cursor settings, switch the default model to a different one (e.g. not Opus), or set a Spend Limit so the agent can continue. Your usage resets on your billing cycle. Then re-run `.\Tools\RunAutomationLoop.ps1`.
 - **Terminal crashed but is the agent still running?** Check **Saved/automation_last_activity.json** (recent timestamp = likely still in a round) and **Saved/Logs/automation_loop.log** for progress. In Task Manager, look for **agent** or **node**. To report failures: paste **Saved/Logs/automation_errors.log** into chat so the agent can fix them (or fix them yourself).
+- **Single-instance guard (avoid two loops):** Only one automation loop can run at a time. The loop uses a **lock file**: **Saved/Logs/automation_loop.lock** (contains the PID of the running process). If you run **Start-AllAgents-InNewWindow.ps1** or **Start-AllAgents.bat** while a loop is already running, the script prints a yellow message and **exits without starting a second window**. To avoid two CLIs fighting over the task list: do not start a second run until the first has finished or you have closed its window. If you already have two windows: close the one that started **later** (the duplicate); keep the one that started first (or the one with the higher round number). After the loop exits (or you close its window), the lock is removed so you can start a new run. See [docs/AUTOMATION_LOOP_UNTIL_DONE.md](docs/AUTOMATION_LOOP_UNTIL_DONE.md) § Single-instance guard.
 - **Refine rules and strategy from runs:** All runs (main, fix, loop-breaker) are recorded in **Saved/Logs/agent_run_history.ndjson**. Use it with automation_errors.log and automation_loop_breaker_report.md to update .cursor/rules, KNOWN_ERRORS.md, and development strategy. See [docs/AUTOMATION_REFINEMENT.md](docs/AUTOMATION_REFINEMENT.md).
+
+### High-level event log
+
+**Saved/Logs/automation_events.log** is a one-line-per-event stream of high-level automation actions. It is written to the terminal (with color) and to this file whenever:
+
+- **round_completed** — A Developer round finished successfully (RunAutomationLoop).
+- **build_validated** / **build_failed** — Safe-Build succeeded or failed (before first round or after a round that changed C++).
+- **fixer_invoked** — The Watcher started the Fixer after the main loop failed (Watch-AutomationAndFix).
+- **guardian_invoked** — The Watcher started the Guardian when the same failure recurred (Watch-AutomationAndFix).
+- **loop_exited_ok** — The loop exited with no pending tasks or stop requested.
+- **loop_exited_fail** — The loop exited with an error (agent non-zero, timeout, or build failure); Fixer will run.
+- **PIE validation** — When **pie_test_runner.py** runs (e.g. via MCP), it appends a line: passed (e.g. 8/8) or failed with a pointer to Saved/pie_test_results.json.
+
+Run **`.\Tools\Get-AutomationStatus.ps1`** (without `-Short`) to see the last 10 high-level events. The same events appear in the terminal when the loop or Watcher runs.
 
 ## Example Cursor prompts
 
@@ -75,7 +90,7 @@ To run the 30-day automation loop without manually pasting "Continue" each sessi
 
 1. **Install Cursor Agent CLI** — Follow [Cursor CLI docs](https://cursor.com/docs/cli/overview). On Windows, install per Cursor’s instructions (e.g. from Cursor settings or the install script referenced in the docs).
 2. **Authenticate** — Run `agent login` once in a terminal, or set the `CURSOR_API_KEY` environment variable for headless/scripted use. Get an API key from the [Cursor Dashboard](https://cursor.com/settings).
-3. **Run the loop** — From project root: `.\Tools\RunAutomationLoop.ps1`. The script reads the prompt from `docs/workflow/NEXT_SESSION_PROMPT.md`, runs the agent with `-p -f --approve-mcps --workspace`, then checks `docs/workflow/30_DAY_IMPLEMENTATION_STATUS.md`; if any day is still `pending`, it runs the agent again. **The Editor is auto-launched** before the first round when `UE_EDITOR` is set; use `-NoLaunchEditor` to skip. See [docs/AUTOMATION_LOOP_UNTIL_DONE.md](docs/AUTOMATION_LOOP_UNTIL_DONE.md).
+3. **Run the loop** — From project root: `.\Tools\RunAutomationLoop.ps1`. The script reads the prompt from `docs/workflow/NEXT_SESSION_PROMPT.md`, runs the agent with `-p -f --approve-mcps --workspace`, then checks `docs/workflow/30_DAY_IMPLEMENTATION_STATUS.md`; if any day is still `pending`, it runs the agent again. **The Editor is auto-launched** before the first round when `UE_EDITOR` is set; use `-NoLaunchEditor` to skip. When Source/ or *.Build.cs are modified after a round, the loop runs Safe-Build and exits so the Fixer runs if the build fails; the Developer should validate in Editor when the task requires it and exit non-zero on validation failure. See [docs/AUTOMATION_LOOP_UNTIL_DONE.md](docs/AUTOMATION_LOOP_UNTIL_DONE.md).
 
 ## First-time / next manual steps
 

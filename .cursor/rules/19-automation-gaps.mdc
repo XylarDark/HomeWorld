@@ -32,3 +32,5 @@ When a task corresponds to a **logged automation gap**:
 ## 4. After implementing or attempting
 
 Update [docs/AUTOMATION_GAPS.md](../../docs/AUTOMATION_GAPS.md) (e.g. add "Solution: …" or "Research: …" and date in the Research log) and/or [docs/GAP_SOLUTIONS_RESEARCH.md](../../docs/GAP_SOLUTIONS_RESEARCH.md).
+
+**If a gap is fully or partially addressed:** Add a dated entry to AUTOMATION_GAPS.md (Research log or Addressed subsection) stating which gap was addressed, how (programmatic / GUI automation / commandlet), and a link to the script or doc. This is project policy so the gaps file tracks both open and closed gaps.

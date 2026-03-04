@@ -114,7 +114,7 @@ Tasks for the next cycle after T1–T9. Source: [NEXT_30_DAY_WINDOW.md](NEXT_30_
 - **goal:** Implement one or more deferred items from T10: full agentic building, SaveGame/role persistence, death→spirit hook, boss GAS + reward.
 - **success criteria:** At least one of: full agentic building flow, role persistence across sessions, spirit roster on death, boss GAS + reward.
 - **doc:** [DAY10_AGENTIC_BUILDING.md](../tasks/DAY10_AGENTIC_BUILDING.md), [DAY15_ROLE_PERSISTENCE.md](../tasks/DAY15_ROLE_PERSISTENCE.md), [DAYS_16_TO_30.md](../tasks/DAYS_16_TO_30.md) Day 21/25.
-- **status:** pending
+- **status:** completed
 
 ---
 

@@ -39,6 +39,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Family", meta = (DisplayName = "Get Member Count"))
 	int32 GetMemberCount() const;
 
+	/** Write current role-by-index into SaveGame for persistence. */
+	void SerializeToSaveGame(class UHomeWorldSaveGame* Out) const;
+
+	/** Restore role-by-index from SaveGame (replaces current in-memory state). */
+	void DeserializeFromSaveGame(const class UHomeWorldSaveGame* In);
+
 private:
 	UPROPERTY()
 	TArray<EHomeWorldFamilyRole> RoleBySpawnIndex;

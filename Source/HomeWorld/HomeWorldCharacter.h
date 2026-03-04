@@ -40,6 +40,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Build|Placement", meta = (DisplayName = "Try Place At Cursor"))
 	bool TryPlaceAtCursor();
 
+	/** Report death and add this character to the spirit roster (Day 21). Call from Blueprint or game code when Health reaches 0 (e.g. GAS effect or damage handler). */
+	UFUNCTION(BlueprintCallable, Category = "Spirit", meta = (DisplayName = "Report Death And Add Spirit"))
+	void ReportDeathAndAddSpirit();
+
+	/** Unique ID used when adding this character as a spirit (actor name + unique ID). */
+	UFUNCTION(BlueprintCallable, Category = "Spirit", meta = (DisplayName = "Get Spirit Id For Death"))
+	FName GetSpiritIdForDeath() const;
+
 protected:
 	virtual void PossessedBy(AController* NewController) override;
 

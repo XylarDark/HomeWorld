@@ -1,9 +1,10 @@
 # place_dungeon_entrance.py
 # Run from Unreal Editor with target level open (DemoMap or planetoid): Tools -> Execute Python Script or via MCP.
-# Idempotent: places a single dungeon entrance placeholder actor at the position in dungeon_map_config.json.
-# If an actor with tag Dungeon_POI already exists, skips. Add Level Streaming or Open Level (dungeon sublevel) in Blueprint.
-# Config: Content/Python/dungeon_map_config.json (dungeon_entrance_position).
-# See docs/tasks/DAYS_16_TO_30.md (Day 24).
+# Idempotent: places a dungeon entrance at the position in dungeon_map_config.json.
+# Prefers AHomeWorldDungeonEntrance (trigger + Open Level); falls back to StaticMeshActor cube if C++ class unavailable.
+# If an actor with tag Dungeon_POI already exists, skips.
+# Config: Content/Python/dungeon_map_config.json (dungeon_entrance_position, dungeon_level_name).
+# See docs/tasks/DAYS_16_TO_30.md (Day 24); T3 verification: walk into entrance in PIE -> dungeon level loads.
 
 import json
 import os
@@ -26,7 +27,10 @@ def _log(msg):
 
 def _load_config():
     """Load Content/Python/dungeon_map_config.json."""
-    defaults = {"dungeon_entrance_position": [-800, 0, 100]}
+    defaults = {
+        "dungeon_entrance_position": [-800, 0, 100],
+        "dungeon_level_name": "Dungeon_Interior",
+    }
     try:
         proj_dir = unreal.SystemLibrary.get_project_directory()
         config_path = os.path.join(proj_dir, "Content", "Python", "dungeon_map_config.json")
@@ -37,6 +41,8 @@ def _load_config():
         pos = data.get("dungeon_entrance_position")
         if isinstance(pos, list) and len(pos) >= 3:
             defaults["dungeon_entrance_position"] = [float(pos[0]), float(pos[1]), float(pos[2])]
+        if isinstance(data.get("dungeon_level_name"), str) and data["dungeon_level_name"]:
+            defaults["dungeon_level_name"] = data["dungeon_level_name"]
         return defaults
     except Exception as e:
         _log("Config load warning: " + str(e))
@@ -97,15 +103,50 @@ def main():
     if _find_existing_dungeon_entrance(world):
         return
 
+    level_to_open = config.get("dungeon_level_name", "Dungeon_Interior")
+    actor = None
+
+    # Prefer AHomeWorldDungeonEntrance (trigger + Open Level) so dungeon entrance works without manual Blueprint.
     try:
-        actor_class = unreal.StaticMeshActor
-        mesh = unreal.load_asset(CUBE_MESH_PATH)
-        if not mesh:
-            _log("Fallback: spawning StaticMeshActor without mesh (cube not found at " + CUBE_MESH_PATH + ").")
-        actor = unreal.EditorLevelLibrary.spawn_actor_from_class(actor_class, location, rotation)
-        if not actor:
-            _log("Failed to spawn dungeon entrance placeholder actor.")
+        entrance_class = unreal.load_class(None, "/Script/HomeWorld.HomeWorldDungeonEntrance")
+        if entrance_class:
+            actor = unreal.EditorLevelLibrary.spawn_actor_from_class(entrance_class, location, rotation)
+            if actor and hasattr(actor, "set_editor_property"):
+                name_val = unreal.Name(level_to_open)
+                for prop_name in ("LevelToOpen", "level_to_open"):
+                    try:
+                        actor.set_editor_property(prop_name, name_val)
+                        _log("Set " + prop_name + " to " + str(level_to_open))
+                        break
+                    except Exception:
+                        continue
+    except Exception as e:
+        _log("Could not spawn HomeWorldDungeonEntrance: " + str(e))
+
+    # Fallback: spawn cube placeholder (designer adds Open Level in Blueprint).
+    if not actor:
+        try:
+            actor_class = unreal.StaticMeshActor
+            mesh = unreal.load_asset(CUBE_MESH_PATH)
+            if not mesh:
+                _log("Fallback: spawning StaticMeshActor without mesh (cube not found at " + CUBE_MESH_PATH + ").")
+            actor = unreal.EditorLevelLibrary.spawn_actor_from_class(actor_class, location, rotation)
+            if actor and mesh and hasattr(actor, "get_component_by_class"):
+                smc = actor.get_component_by_class(unreal.StaticMeshComponent)
+                if smc and hasattr(smc, "set_editor_property"):
+                    smc.set_editor_property("static_mesh", mesh)
+                elif smc and hasattr(smc, "set_static_mesh"):
+                    smc.set_static_mesh(mesh)
+            _log("Placed cube placeholder; add Open Level (" + str(level_to_open) + ") in Blueprint.")
+        except Exception as e:
+            _log("Failed to place dungeon entrance: " + str(e))
             return
+
+    if not actor:
+        _log("Failed to spawn dungeon entrance actor.")
+        return
+
+    try:
         tags = actor.get_editor_property("tags") if hasattr(actor, "get_editor_property") else getattr(actor, "tags", [])
         if tags is None:
             tags = []
@@ -114,16 +155,10 @@ def main():
             tags.append(unreal.Name(DUNGEON_TAG))
             if hasattr(actor, "set_editor_property"):
                 actor.set_editor_property("tags", tags)
-        if mesh and hasattr(actor, "get_component_by_class"):
-            smc = actor.get_component_by_class(unreal.StaticMeshComponent)
-            if smc and hasattr(smc, "set_editor_property"):
-                smc.set_editor_property("static_mesh", mesh)
-            elif smc and hasattr(smc, "set_static_mesh"):
-                smc.set_static_mesh(mesh)
-        _log("Placed dungeon entrance placeholder at " + str(pos) + ". Add Level Streaming or Open Level (dungeon sublevel) in Blueprint.")
+        _log("Placed dungeon entrance at " + str(pos) + " (LevelToOpen=" + str(level_to_open) + ").")
         _save_current_level()
     except Exception as e:
-        _log("Failed to place dungeon entrance: " + str(e))
+        _log("Failed to set tags or save: " + str(e))
 
 
 if __name__ == "__main__":

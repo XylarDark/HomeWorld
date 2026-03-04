@@ -29,9 +29,9 @@ When the Unreal Editor is open and the MCP server is connected to Cursor:
 
 1. **Use MCP tools first** for Editor tasks (spawning actors, setting properties, creating assets, configuring Blueprints).
 2. **Save repeatable workflows** as Python scripts in `Content/Python/` alongside MCP usage, so operations can be re-run without MCP.
-3. **Fall back to manual instructions** only when MCP and Python cannot accomplish the task (e.g. AnimGraph state machine editing).
+3. When MCP and Python cannot accomplish a step, **log it to [AUTOMATION_GAPS.md](AUTOMATION_GAPS.md)** with a suggested approach for future automation; do not document manual steps for the user (project is fully autonomous). See `.cursor/rules/20-full-automation-no-manual-steps.mdc`.
 
-See [MCP_SETUP.md](MCP_SETUP.md) for installation and `.cursor/rules/09-mcp-workflow.mdc` for full priority rules.
+See [MCP_SETUP.md](MCP_SETUP.md) for installation and `.cursor/rules/09-mcp-workflow.mdc` for full priority rules. For PIE pre-demo validation and vertical slice checks, see [VERTICAL_SLICE_CHECKLIST](workflow/VERTICAL_SLICE_CHECKLIST.md) §3.
 
 **Automation — variables with no access:** When adding automation for Editor/engine features (Python, MCP), follow the "variables no access" procedure: identify required settings from tutorials/docs, verify automation access, document no-access items and manual steps in KNOWN_ERRORS or a feature doc (e.g. [PCG_VARIABLES_NO_ACCESS.md](PCG_VARIABLES_NO_ACCESS.md)). See `.cursor/rules/automation-standards.mdc`.
 

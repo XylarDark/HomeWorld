@@ -18,8 +18,9 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-if (-not $ProjectRoot) { $ProjectRoot = $env:HOMEWORLD_PROJECT }
-if (-not $ProjectRoot) { $ProjectRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path }
+$commonScript = Join-Path $PSScriptRoot "Common-Automation.ps1"
+if (Test-Path -LiteralPath $commonScript) { . $commonScript }
+if (-not $ProjectRoot) { $ProjectRoot = Resolve-ProjectRoot }
 $ProjectRoot = $ProjectRoot.TrimEnd("\", "/")
 $SavedDir = Join-Path $ProjectRoot "Saved"
 $LogsDir = Join-Path $SavedDir "Logs"
@@ -35,26 +36,6 @@ function Write-GuardianLog {
     $line = "[$ts] Guard-AutomationLoop: $Message"
     Write-Host $line
     try { Add-Content -Path $GuardianLogPath -Value $line -Encoding UTF8 -ErrorAction SilentlyContinue } catch {}
-}
-
-function Get-AgentExe {
-    if ($AgentPath -and (Test-Path -LiteralPath $AgentPath)) { return $AgentPath }
-    $cmd = Get-Command agent -ErrorAction SilentlyContinue
-    if ($cmd) { return $cmd.Source }
-    $searchDirs = @(
-        (Join-Path $env:LOCALAPPDATA "cursor-cli"),
-        (Join-Path (Join-Path $env:LOCALAPPDATA "Cursor") "agent"),
-        (Join-Path (Join-Path $env:USERPROFILE ".cursor") "bin"),
-        (Join-Path (Join-Path $env:LOCALAPPDATA "Programs") "cursor-cli")
-    )
-    foreach ($dir in $searchDirs) {
-        if (-not $dir -or -not (Test-Path $dir)) { continue }
-        $exe = Join-Path $dir "agent.exe"
-        if (Test-Path -LiteralPath $exe) { return $exe }
-        $c = Join-Path $dir "agent.cmd"
-        if (Test-Path -LiteralPath $c) { return $c }
-    }
-    return $null
 }
 
 # Read last N lines from a log file
@@ -118,7 +99,7 @@ if ($CheckOnly) {
 }
 
 Write-GuardianLog "Running loop-breaker agent..."
-$agentExe = Get-AgentExe
+$agentExe = Get-AgentExe -AgentPath $AgentPath
 if (-not $agentExe) {
     Write-GuardianLog "ERROR: agent not found. Writing minimal report and exiting."
     $report = @"
@@ -144,9 +125,11 @@ $errorsTail = (Get-LogTail -Path $ErrorsLogPath -Lines 35) -join "`n"
 $loopBreakerPrompt = @"
 You are the **Guardian** in the agent company (see docs/AGENT_COMPANY.md). The **Developer** and **Fixer** are in a **repeating failure loop** (same error or same exit code). You are accountable for either breaking the loop with a different fix or writing a full report so the user (or the **Refiner**) can continue. Development must not stop without a clear handoff.
 
+**Handoff:** Read **Saved/Logs/agent_handoff.json** first for context (exit code, round, role that failed, last error summary, whether Editor log was captured). Then read the log excerpts below.
+
 **Your responsibilities:**
-1. **Analyze** why the same failure keeps recurring (read the log excerpts below).
-2. **Try a different fix** than the Fixer already tried: e.g. skip the failing day in docs/workflow/30_DAY_IMPLEMENTATION_STATUS.md (set to blocked with reason), add a guard in code, change strategy, or log the gap in docs/AUTOMATION_GAPS.md.
+1. Read **Saved/Logs/agent_handoff.json** first, then **analyze** why the same failure keeps recurring (read the log excerpts below). Read **Saved/Logs/editor_output_full.txt** (unfiltered Editor log) for full context if it exists. See docs/AUTOMATION_EDITOR_LOG.md.
+2. **Try a different fix** than the Fixer already tried: e.g. set the current task to blocked in docs/workflow/CURRENT_TASK_LIST.md (with reason), add a guard in code, change strategy, or log the gap in docs/AUTOMATION_GAPS.md.
 3. **If you cannot resolve the loop**, you MUST write a full report to **Saved/Logs/automation_loop_breaker_report.md** with:
    - Summary of the loop (what keeps failing)
    - What the Fixer already tried (from watcher log)
@@ -176,7 +159,7 @@ Write-GuardianLog "Loop-breaker agent finished with exit code $breakerExit"
 $appendScript = Join-Path $PSScriptRoot "Append-AgentRunRecord.ps1"
 if (Test-Path -LiteralPath $appendScript) {
     $errSummary = (Get-LogTail -Path $ErrorsLogPath -Lines 15) -join " "
-    & $appendScript -ProjectRoot $ProjectRoot -Role loop_breaker -Round 1 -ExitCode $breakerExit -ErrorSummary $errSummary
+    & $appendScript -ProjectRoot $ProjectRoot -Role loop_breaker -Round 1 -ExitCode $breakerExit -ErrorSummary $errSummary -Model $Model
 }
 
 if (-not (Test-Path -LiteralPath $ReportPath)) {
@@ -189,7 +172,7 @@ if (-not (Test-Path -LiteralPath $ReportPath)) {
 
 **Recommended steps:**
 1. Read Saved/Logs/automation_errors.log and Saved/Logs/watcher.log for the repeating failure.
-2. Fix the root cause (e.g. API limit, build failure, skip the failing day, or add to AUTOMATION_GAPS.md). If the loop is due to an automation gap, run **Gap-Solver**: `.\Tools\Run-GapSolverAgent.ps1` (or run-gap-solver command).
+2. Fix the root cause (e.g. API limit, build failure, set current task to blocked in CURRENT_TASK_LIST.md, or add to AUTOMATION_GAPS.md). If the loop is due to an automation gap, run **Gap-Solver**: `.\Tools\Run-GapSolverAgent.ps1` (or run-gap-solver command).
 3. Optionally run Refiner: `.\Tools\Run-RefinerAgent.ps1` to update rules from run history.
 4. Re-run `.\Tools\Watch-AutomationAndFix.ps1` or `.\Tools\Start-AutomationSession.ps1` to continue.
 

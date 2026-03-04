@@ -6,6 +6,7 @@
 # Usage: From project root, .\Tools\Start-AllAgents.ps1 [same params as Watch-AutomationAndFix.ps1]
 #   -MaxFixRounds: Max fix-agent rounds before invoking Guardian and exiting (default 3).
 #   -NoRetryAfterFix: After a fix round, exit instead of re-running the loop.
+#   -NoPauseOnComplete: Do not pause at success (default is to pause and show status so you can confirm the loop finished normally).
 #   -NoLaunchEditor: Do not auto-launch the Editor (default is to launch when UE_EDITOR set).
 #   -SkipInstall: Do not install the CLI if missing; fail instead.
 #   -Verbose: Pass through for prompt preview and elapsed time.
@@ -15,6 +16,7 @@
 param(
     [int]$MaxFixRounds = 3,
     [switch]$NoRetryAfterFix,
+    [switch]$NoPauseOnComplete,
     [string]$ProjectRoot = "",
     [string]$PromptFile = "",
     [switch]$NoLaunchEditor,
@@ -25,13 +27,13 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-
-# Resolve project root
-if (-not $ProjectRoot) { $ProjectRoot = $env:HOMEWORLD_PROJECT }
-if (-not $ProjectRoot) { $ProjectRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path }
+$commonScript = Join-Path $PSScriptRoot "Common-Automation.ps1"
+if (Test-Path -LiteralPath $commonScript) { . $commonScript }
+if (-not $ProjectRoot) { $ProjectRoot = Resolve-ProjectRoot }
 $ProjectRoot = $ProjectRoot.TrimEnd("\", "/")
 if (-not (Test-Path $ProjectRoot)) {
     Write-Error "Project root not found: $ProjectRoot"
+    if (-not $NoPauseOnComplete) { Read-Host "Press Enter to close this window" }
     exit 1
 }
 
@@ -42,33 +44,9 @@ function Refresh-EnvPath {
     if ($machinePath) { $env:Path = $machinePath + ";" + $env:Path }
 }
 
-function Find-AgentExe {
-    $cmd = Get-Command agent -ErrorAction SilentlyContinue
-    if ($cmd) { return $cmd.Source }
-    $searchDirs = @(
-        (Join-Path $env:LOCALAPPDATA "cursor-cli"),
-        (Join-Path (Join-Path $env:LOCALAPPDATA "Cursor") "agent"),
-        (Join-Path (Join-Path $env:USERPROFILE ".cursor") "bin"),
-        (Join-Path $env:APPDATA "cursor-cli"),
-        (Join-Path (Join-Path $env:LOCALAPPDATA "Programs") "cursor-cli")
-    )
-    foreach ($dir in $searchDirs) {
-        if (-not $dir -or -not (Test-Path $dir)) { continue }
-        $exe = Join-Path $dir "agent.exe"
-        if (Test-Path -LiteralPath $exe) { return $exe }
-        $cmd = Join-Path $dir "agent.cmd"
-        if (Test-Path -LiteralPath $cmd) { return $cmd }
-    }
-    return $null
-}
-
 # Ensure CLI is available (install if missing and not -SkipInstall)
-$agentExe = $null
-if ($AgentPath -and (Test-Path -LiteralPath $AgentPath)) {
-    $agentExe = $AgentPath
-}
-if (-not $agentExe) { $agentExe = Find-AgentExe }
-if (-not $agentExe) { Refresh-EnvPath; $agentExe = Find-AgentExe }
+$agentExe = Get-AgentExe -AgentPath $AgentPath
+if (-not $agentExe) { Refresh-EnvPath; $agentExe = Get-AgentExe -AgentPath $AgentPath }
 
 if (-not $agentExe -and -not $SkipInstall) {
     Write-Host "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')] Start-AllAgents: Cursor Agent CLI not found. Installing..."
@@ -76,6 +54,7 @@ if (-not $agentExe -and -not $SkipInstall) {
         irm 'https://cursor.com/install?win32=true' | iex
     } catch {
         Write-Error "Install failed: $_"
+        if (-not $NoPauseOnComplete) { Read-Host "Press Enter to close this window" }
         exit 1
     }
     Refresh-EnvPath
@@ -84,6 +63,7 @@ if (-not $agentExe -and -not $SkipInstall) {
 
 if (-not $agentExe) {
     Write-Error "Cursor Agent CLI (agent) not found. Install manually or run without -SkipInstall."
+    if (-not $NoPauseOnComplete) { Read-Host "Press Enter to close this window" }
     exit 1
 }
 
@@ -95,6 +75,7 @@ $watcherArgs = @{
     MaxFixRounds   = $MaxFixRounds
 }
 if ($NoRetryAfterFix) { $watcherArgs["NoRetryAfterFix"] = $true }
+if ($NoPauseOnComplete) { $watcherArgs["NoPauseOnComplete"] = $true }
 if ($PromptFile) { $watcherArgs["PromptFile"] = $PromptFile }
 if ($NoLaunchEditor) { $watcherArgs["NoLaunchEditor"] = $true }
 if ($Model) { $watcherArgs["Model"] = $Model }
@@ -102,4 +83,11 @@ if ($SkipInstall) { $watcherArgs["SkipInstall"] = $true }
 if ($Verbose) { $watcherArgs["Verbose"] = $true }
 
 & $watcherScript @watcherArgs
-exit $LASTEXITCODE
+$exitCode = $LASTEXITCODE
+
+# Keep terminal open so you can see output and confirm how the run ended (success, failure, or stop)
+if (-not $NoPauseOnComplete) {
+    Write-Host ""
+    Read-Host "Press Enter to close this window"
+}
+exit $exitCode

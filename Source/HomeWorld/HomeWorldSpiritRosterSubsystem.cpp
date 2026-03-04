@@ -1,6 +1,7 @@
 // Copyright HomeWorld. All Rights Reserved.
 
 #include "HomeWorldSpiritRosterSubsystem.h"
+#include "HomeWorldSaveGame.h"
 
 void UHomeWorldSpiritRosterSubsystem::AddSpirit(FName SpiritId)
 {
@@ -29,4 +30,16 @@ bool UHomeWorldSpiritRosterSubsystem::RemoveSpirit(FName SpiritId)
 int32 UHomeWorldSpiritRosterSubsystem::GetSpiritCount() const
 {
 	return SpiritIds.Num();
+}
+
+void UHomeWorldSpiritRosterSubsystem::SerializeToSaveGame(UHomeWorldSaveGame* Out) const
+{
+	if (!Out) return;
+	Out->SavedSpiritIds = SpiritIds;
+}
+
+void UHomeWorldSpiritRosterSubsystem::DeserializeFromSaveGame(const UHomeWorldSaveGame* In)
+{
+	if (!In) return;
+	SpiritIds = In->SavedSpiritIds;
 }

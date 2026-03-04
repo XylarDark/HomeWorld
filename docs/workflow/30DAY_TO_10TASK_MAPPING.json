@@ -1,0 +1,15 @@
+{
+  "description": "Maps 30-day schedule buckets to 10-task list (T1-T10). Each task lists day numbers (1-30) that belong to that bucket.",
+  "buckets": {
+    "T1": { "days": [1, 2, 3, 4, 5], "label": "Week 1 playtest (Act 1)" },
+    "T2": { "days": [6, 7, 8, 9, 10], "label": "Homestead Phase 1" },
+    "T3": { "days": [11, 12, 13, 14, 15], "label": "Family Phase 2" },
+    "T4": { "days": [16, 17, 18, 19, 20], "label": "Planetoid Phase 3" },
+    "T5": { "days": [21, 22, 23, 24, 25], "label": "Spirits / Dungeon Phase 4-5" },
+    "T6": { "days": [26, 27, 28, 29, 30], "label": "Buffer (30-day)" },
+    "T7": { "days": [], "label": "Buffer / reserved" },
+    "T8": { "days": [], "label": "Buffer / reserved" },
+    "T9": { "days": [], "label": "Buffer / reserved" },
+    "T10": { "days": [], "label": "Buffer / reserved" }
+  }
+}

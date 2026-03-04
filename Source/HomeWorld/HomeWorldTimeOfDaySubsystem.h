@@ -16,6 +16,9 @@ enum class EHomeWorldTimeOfDayPhase : uint8
 	Dawn
 };
 
+/** Broadcast when phase transitions to Night (optional night encounter hook). Not yet invoked; poll GetIsNight() for now. */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnNightStarted);
+
 /**
  * World subsystem for day/night. Game code queries phase/time through this API; implement with DaySequence in Week 2+.
  * Stub only; returns default phase and time.
@@ -37,4 +40,8 @@ public:
 	/** True when current phase is Night. Use for State Tree IsNight / Defend branch. */
 	UFUNCTION(BlueprintCallable, Category = "TimeOfDay", meta = (DisplayName = "Get Is Night"))
 	virtual bool GetIsNight() const;
+
+	/** Optional night encounter: broadcast when phase transitions to Night. Currently not invoked; poll GetIsNight() for spawn logic. See docs/tasks/NIGHT_ENCOUNTER.md. */
+	UPROPERTY(BlueprintAssignable, Category = "TimeOfDay")
+	FOnNightStarted OnNightStarted;
 };

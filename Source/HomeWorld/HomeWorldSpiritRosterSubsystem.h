@@ -33,6 +33,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Spirit", meta = (DisplayName = "Get Spirit Count"))
 	int32 GetSpiritCount() const;
 
+	/** Write current spirit IDs into SaveGame for persistence. */
+	void SerializeToSaveGame(class UHomeWorldSaveGame* Out) const;
+
+	/** Restore spirit roster from SaveGame (replaces current in-memory state). */
+	void DeserializeFromSaveGame(const class UHomeWorldSaveGame* In);
+
 private:
 	UPROPERTY()
 	TArray<FName> SpiritIds;

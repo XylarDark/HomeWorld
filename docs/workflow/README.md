@@ -20,6 +20,7 @@ This folder is the **single place for project ideas and daily workflow**: consol
 |----------|---------|
 | [DAILY_STATE.md](DAILY_STATE.md) | **Yesterday** (last session), **Today** (this day's tasks), **Tomorrow** (preview). Read at session start; updated at session end. |
 | [VISION.md](VISION.md) | Theme, campaign summary, moral system (Seven Sins/Virtues), death/succession, tech summary, scope lock. |
+| [ACCOMPLISHMENTS_OVERVIEW.md](ACCOMPLISHMENTS_OVERVIEW.md) | **Master high-level record** of all work accomplished. Use with task list and vision to inform what work to do next and when generating the next task list. |
 | [30_DAY_SCHEDULE.md](30_DAY_SCHEDULE.md) | Day-by-day schedule (Act 1 → Homestead → Family → Planetoid → Spirits → Dungeon → buffer). Check off items as you complete them. |
 | [30_DAY_IMPLEMENTATION_STATUS.md](30_DAY_IMPLEMENTATION_STATUS.md) | Which days are implementation-complete (done) vs pending/blocked. Used by the automation loop. |
 | [PROJECT_STATE_AND_TASK_LIST.md](PROJECT_STATE_AND_TASK_LIST.md) | **Project overview and task list** — summary of work done, work not yet completed (T1–T10), and quick reference. Use this for "what to work on next." |

@@ -15,8 +15,9 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-if (-not $ProjectRoot) { $ProjectRoot = $env:HOMEWORLD_PROJECT }
-if (-not $ProjectRoot) { $ProjectRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path }
+$commonScript = Join-Path $PSScriptRoot "Common-Automation.ps1"
+if (Test-Path -LiteralPath $commonScript) { . $commonScript }
+if (-not $ProjectRoot) { $ProjectRoot = Resolve-ProjectRoot }
 $ProjectRoot = $ProjectRoot.TrimEnd("\", "/")
 $SavedDir = Join-Path $ProjectRoot "Saved"
 $LogsDir = Join-Path $SavedDir "Logs"
@@ -32,34 +33,11 @@ function Write-GapSolverLog {
     try { Add-Content -Path $GapSolverLogPath -Value $line -Encoding UTF8 -ErrorAction SilentlyContinue } catch {}
 }
 
-function Get-AgentExe {
-    if ($AgentPath -and (Test-Path -LiteralPath $AgentPath)) { return $AgentPath }
-    $cmd = Get-Command agent -ErrorAction SilentlyContinue
-    if ($cmd) { return $cmd.Source }
-    $searchDirs = @(
-        (Join-Path $env:LOCALAPPDATA "cursor-agent"),
-        (Join-Path $env:LOCALAPPDATA "cursor-cli"),
-        (Join-Path (Join-Path $env:LOCALAPPDATA "Cursor") "agent"),
-        (Join-Path (Join-Path $env:USERPROFILE ".cursor") "bin"),
-        (Join-Path (Join-Path $env:LOCALAPPDATA "Programs") "cursor-cli")
-    )
-    foreach ($dir in $searchDirs) {
-        if (-not $dir -or -not (Test-Path $dir)) { continue }
-        $exe = Join-Path $dir "agent.exe"
-        if (Test-Path -LiteralPath $exe) { return $exe }
-        $c = Join-Path $dir "agent.cmd"
-        if (Test-Path -LiteralPath $c) { return $c }
-        $p = Join-Path $dir "agent.ps1"
-        if (Test-Path -LiteralPath $p) { return $p }
-    }
-    return $null
-}
-
 if (-not (Test-Path $LogsDir)) { New-Item -ItemType Directory -Path $LogsDir -Force | Out-Null }
 
 Write-GapSolverLog "Starting Gap-Solver agent (company role: Gap-Solver)."
 
-$agentExe = Get-AgentExe
+$agentExe = Get-AgentExe -AgentPath $AgentPath
 if (-not $agentExe) {
     Write-GapSolverLog "ERROR: Cursor Agent CLI not found. Run .\Tools\Start-AutomationSession.ps1 once or set PATH."
     exit 1

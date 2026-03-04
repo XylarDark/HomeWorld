@@ -25,6 +25,23 @@
 
 **Validation:** PIE, press P while aiming at ground; BP_BuildOrder_Wall spawns at cursor. No family agents required.
 
+### T5 (CURRENT_TASK_LIST) verification — agentic building flow
+
+- **Automated:** Run `create_bp_build_order_wall.py` (Editor or MCP) to ensure BP_BuildOrder_Wall exists and **Place Actor Class** is set on BP_HomeWorldCharacter. Run `pie_test_runner.py`; the **PlaceActorClass set** check verifies the character is configured for placement.
+- **In PIE:** Press **P** while aiming at ground; BP_BuildOrder_Wall (or assigned placeholder) spawns at cursor. Full agentic flow (family agents building) is deferred per NEXT_30_DAY_WINDOW N2.
+
+**T5 verification (2026-03-05):** Ran `create_bp_build_order_wall.py` and `pie_test_runner.py` via MCP; both executed successfully. **What works:** Script creates/reuses BP_BuildOrder_Wall, sets BuildDefinitionID and PlaceActorClass on BP_HomeWorldCharacter; pie_test_runner includes `check_place_actor_class_set`. In PIE, key **P** spawns the place actor at cursor. **What remains manual/deferred:** Full agentic flow (family agents fulfilling build orders via SO_WallBuilder, State Tree BUILD branch, MP_WoodInventory) remains deferred per NEXT_30_DAY_WINDOW N2; no console command to place wall from outside PIE — placement is in-PIE only via GA_Place (key P).
+
+### T3 (CURRENT_TASK_LIST) verification — place wall via agent/console
+
+- **Goal:** Place wall (or BP_BuildOrder_Wall) via agent/console so automation or testing can place structures.
+- **What works (2026-03-05):**
+  - **In-PIE:** Key **P** (GA_Place) spawns PlaceActorClass (e.g. BP_BuildOrder_Wall) at cursor. Run `create_bp_build_order_wall.py` first so PlaceActorClass is set on BP_HomeWorldCharacter.
+  - **Console:** **hw.PlaceWall** — in PIE, open console (~) and run `hw.PlaceWall` to place one instance at current cursor/aim (same as key P). Requires PIE; uses character's PlaceActorClass and TryPlaceAtCursor().
+  - **Automation:** Run `create_bp_build_order_wall.py` (Editor or MCP) to ensure BP_BuildOrder_Wall exists and PlaceActorClass is set; `pie_test_runner.py` has `check_place_actor_class_set`.
+- **What remains manual/deferred:** Full agentic flow (family agents fulfilling build orders via SO_WallBuilder, State Tree BUILD branch) is deferred. Placing from **outside** PIE (e.g. Editor-only automation) would require GUI automation to simulate P or hw.PlaceWall inside a PIE session; no Editor-time spawn of build orders is implemented.
+- **Success:** Place wall executable via console (hw.PlaceWall) and in-PIE flow (key P); verification and gaps documented here and in AUTOMATION_GAPS only if a new gap is identified.
+
 ---
 
 ## 3. Full Day 10 (Option B) — step order
