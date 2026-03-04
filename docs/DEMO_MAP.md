@@ -12,8 +12,11 @@ DemoMap is the **primary demo and playable map** for HomeWorld. It is created as
 
 ---
 
-## Creating the map (one-time manual)
+## Creating the map
 
+**Automatic (when template is configured):** Set **`template_level_path`** in [demo_map_config.json](../Content/Python/demo_map_config.json) to a project-owned Empty Open World level (e.g. create once: File → New Level → Empty Open World → Save As `/Game/HomeWorld/Maps/Templates/EmptyOpenWorld`). Then run **ensure_demo_map.py** or **create_demo_from_scratch.py**; when DemoMap is missing, the script creates it from that template via `NewLevelFromTemplate`. No manual "File → New Level" step.
+
+**One-time manual (when no template):** If `template_level_path` is not set:
 1. In the Editor: **File → New Level** → choose **Empty Open World** → **Create**.
 2. **File → Save As** → save to **Content/HomeWorld/Maps/** as **DemoMap** (path `/Game/HomeWorld/Maps/DemoMap`).
 3. Confirm **World Settings → World Partition** is enabled (it is, for Empty Open World).
@@ -31,9 +34,9 @@ DemoMap is the **primary demo and playable map** for HomeWorld. It is created as
 
 ## Config and scripts
 
-- **Config:** [Content/Python/demo_map_config.json](../Content/Python/demo_map_config.json) — `demo_level_path`, `volume_center_*`, `volume_extent_*`, `exclusion_zones`, `recreate_volume_and_graph`, `use_landscape_bounds`. No `source_level_path`; this map is never duplicated.
+- **Config:** [Content/Python/demo_map_config.json](../Content/Python/demo_map_config.json) — `demo_level_path`, `template_level_path` (optional; when set, DemoMap is created from this template when missing), `volume_center_*`, `volume_extent_*`, `exclusion_zones`, `recreate_volume_and_graph`, `use_landscape_bounds`. No `source_level_path`; this map is never duplicated.
 - **Scripts:**
-  - **ensure_demo_map.py** — Checks that DemoMap exists; if not, logs the manual steps above. Run from Editor or MCP.
+  - **ensure_demo_map.py** — Checks that DemoMap exists; if not, creates it from `template_level_path` when set (via `NewLevelFromTemplate`), else logs manual steps. Run from Editor or MCP.
   - **create_demo_from_scratch.py** — Calls ensure_demo_map, opens DemoMap, tags landscape, creates/reuses PCG volume and ForestIsland_PCG graph, tries to assign graph and trigger Generate. Run with DemoMap open or let it open the level.
   - **setup_level.py** — Run with DemoMap open to add a **PlayerStart** (so the character spawns in PIE) and **Directional Light + Sky Light** (so the level is not black). Run after creating the map and landscape; then save and press Play.
 

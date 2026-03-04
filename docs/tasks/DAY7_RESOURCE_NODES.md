@@ -14,7 +14,11 @@
 
 ---
 
-## 2. Create the harvestable tree Blueprint (manual)
+## 2. Create the harvestable tree Blueprint
+
+**Option A — Script (recommended):** Run **`Content/Python/create_bp_harvestable_tree.py`** (Tools → Execute Python Script or MCP). This creates **BP_HarvestableTree** in `/Game/HomeWorld/Building/` with ResourceType=Wood and AmountPerHarvest=10. Add a Static Mesh component with a tree mesh in the Editor if desired (see Option B step 4).
+
+**Option B — Manual:**
 
 1. **Content Browser:** Navigate to **Content → HomeWorld → Building**. If the **Building** folder is missing, run **`Content/Python/ensure_week2_folders.py`** (Tools → Execute Python Script or MCP) once to create it; then refresh the Content Browser or navigate again.
 2. **Right-click** → **Blueprint Class**. Search for **HomeWorldResourcePile** ([AHomeWorldResourcePile](../../Source/HomeWorld/HomeWorldResourcePile.h)). Create a child Blueprint.

@@ -20,10 +20,11 @@ Follow [FAMILY_AGENTS_MASS_STATETREE.md](FAMILY_AGENTS_MASS_STATETREE.md) in ord
 
 ### Step 2 — MEC_FamilyGatherer
 
-1. **Content Browser** → **Content → HomeWorld → Mass**. Right-click → **Miscellaneous → Mass Entity Config** (or **Mass → Mass Entity Config**).
-2. Name **MEC_FamilyGatherer**. Open it.
-3. **Details → Traits:** Add MassAgent, MassMovement, MassZoneGraphLaneNavigation (or MassNavigation in UE 5.7), MassRepresentationPoint, MassStateTree, optional MassCrowdFX.
-4. **MassRepresentationPoint:** Assign a **Static Mesh** (e.g. capsule or project mesh). Scale 1.0. Save.
+1. **Content Browser** → **Content → HomeWorld → Mass**. Right-click → **Miscellaneous → Mass Entity Config** (or **Mass → Mass Entity Config**). Name **MEC_FamilyGatherer** (or create it via the commandlet below).
+2. **Add representation trait via commandlet (recommended):** The Editor module links **MassRepresentation** so the CreateMEC commandlet can add the representation trait. With the Editor **closed**, run: `UnrealEditor.exe HomeWorld.uproject -run=HomeWorldEditor.CreateMEC [Path=/Game/HomeWorld/Mass/MEC_FamilyGatherer]`. This adds **MassRepresentationFragmentTrait** (and other traits) to the MEC. Rebuild with `Build-HomeWorld.bat` first if you changed the Editor module.
+3. **Details → Traits → Add** (for any traits not added by the commandlet): **StateTree**, **Movement**, **ZoneGraph Navigation** (or **NavMesh Navigation**). Optional: **Avoidance**, **Agent Capsule Collision Sync**, etc.
+4. **StateTree trait:** Set **State Tree** = **ST_FamilyGatherer** (create in Step 3 first if needed).
+5. **Representation trait (mesh):** If the commandlet added the representation trait, open **MEC_FamilyGatherer** and in Details find the **Mass Representation Fragment** (or representation) section. Set **Static Mesh** to a placeholder (e.g. cube). To get a cube or other engine mesh: follow [UE57_EDITOR_UI.md](../UE57_EDITOR_UI.md) (Show Engine Content, then browse or search for Cube/Shape). Set **Scale** = **1.0**. If no representation trait is present, add MassRepresentation to the Editor module (see [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) MEC mesh entry), rebuild, and run the commandlet again. Save.
 
 ### Step 3 — ST_FamilyGatherer
 
@@ -31,13 +32,16 @@ Follow [FAMILY_AGENTS_MASS_STATETREE.md](FAMILY_AGENTS_MASS_STATETREE.md) in ord
 2. Name **ST_FamilyGatherer**, save under `/Game/HomeWorld/AI/`. Open it.
 3. Root: **Selector**. Add at least one branch for Day 11 (e.g. **Idle** → **Wander** with MoveTo random point, or a single “Stand” state) so agents spawn and are visible; full gather/sleep can come later.
 4. **Blackboard:** HomePos (Vector); optionally Hunger, IsNight for later.
-5. **MEC_FamilyGatherer** → MassStateTree trait → set **State Tree** = ST_FamilyGatherer. **Compile** State Tree.
+5. **MEC_FamilyGatherer** → **StateTree** trait → set **State Tree** = **ST_FamilyGatherer**. **Compile** State Tree.
 
 ### Step 4 — Spawn in level
 
-1. Open **DemoMap**.
-2. **Modes** → search **Mass Spawner** → drag into level.
-3. Select Mass Spawner. **Details:** **Config** = MEC_FamilyGatherer, **Spawn count** = N (e.g. 5–10), **Bounds** around homestead/play area so agents spawn in view.
+**Option A (script):** With DemoMap open, run `Content/Python/place_mass_spawner_demomap.py` (Tools → Execute Python Script or MCP). Config from `demo_map_config.json` (mass_spawner_position, mass_spawner_spawn_count). If Config/Spawn count did not apply via script, set in Details (see Option B).
+
+**Option B (manual):** Open **DemoMap**. **Modes** → search **Mass Spawner** → drag into level. Select Mass Spawner. **Details:** **Config** = MEC_FamilyGatherer, **Spawn count** = N (e.g. 5–10), **Bounds** around homestead/play area so agents spawn in view.
+
+**Representation mesh:** Run `Content/Python/set_mec_representation_mesh.py` to set Cube on MEC representation trait; or open MEC_FamilyGatherer and set Static Mesh in Details (see Step 2.5).
+
 4. **ZoneGraph:** Add minimal navigation (lanes or nav) so agents can move; if not set up yet, a minimal State Tree without movement is enough for “spawn and visible.”
 5. **Smart Objects** (gather/sleep): Optional for Day 11; add in Day 12+ if needed.
 
@@ -55,7 +59,7 @@ Day 15 (role assignment and persistence) needs a way to identify each family mem
 ## 4. Validation
 
 - **PIE** on DemoMap: press Play, confirm **N family agents** appear in the spawn bounds.
-- Agents **visible** (MassRepresentationPoint mesh); if State Tree + ZoneGraph are set up, agents **move** or idle.
+- Agents **visible** (representation-trait mesh); if State Tree + ZoneGraph are set up, agents **move** or idle.
 - **Success:** N agents spawn at start without player input.
 
 ---

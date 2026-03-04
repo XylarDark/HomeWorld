@@ -18,7 +18,7 @@ These principles align agents and automation with how video games are built: ite
 
 - **Never assume delete-and-recreate is acceptable** for normal runs. Designers iterate in the Editor; scripts should add or update in place, not wipe their work.
 - **Version-controlled assets** (e.g. .uasset, .umap in Git LFS) represent committed work. Automation that destroys or replaces them without explicit user intent risks losing team work and breaking pipelines.
-- **Manual one-time setup** (e.g. Get Landscape Data, mesh lists, graph assignment) is done once and saved; automation reuses that content and applies only config-driven updates. Do not assume "recreate from scratch" is the right default.
+- **Create-if-missing then automate:** Where the engine or API does not expose a setting, use **GUI automation** (PyAutoGUI, ref images, Editor-driven scripts) to set it; automation reuses that content and applies config-driven updates. Do not assume "recreate from scratch" or "user does one-time setup" — automate or log the gap to `docs/AUTOMATION_GAPS.md`. See **20-full-automation-no-manual-steps.mdc**.
 
 **Senior mindset:** Treat content as the source of truth. Code and automation serve the content pipeline; they do not own it.
 
@@ -65,8 +65,7 @@ These principles align agents and automation with how video games are built: ite
 **Game development is iterative.** Levels and assets are built over many sessions; multiple people may touch the same resources.
 
 - **Idempotent scripts:** Setup and automation scripts must be safe to run multiple times: check before create, reuse over recreate, log what was skipped or updated. See [00-core-principles.mdc](00-core-principles.mdc) Idempotency Protocol.
-- **One-time setup then automate:** Identify which steps are one-time (e.g. assign graph, set Get Landscape Data, add mesh list) and which are repeatable (e.g. update bounds from config, trigger Generate). Scripts should not force redoing one-time steps every run.
-- **Document manual steps:** When the engine or API does not allow automation to set a required value, document it and the exact manual step. Do not leave automation that silently fails or assumes a manual step was done. See [automation-standards.mdc](automation-standards.mdc).
+- **Automate all setup:** Use MCP, Python, or GUI automation for one-time and repeatable steps (e.g. assign graph, set Get Landscape Data, add mesh list, trigger Generate). If a step cannot be automated, log it to `docs/AUTOMATION_GAPS.md` and do not assume the user will perform it. See [20-full-automation-no-manual-steps.mdc](20-full-automation-no-manual-steps.mdc).
 
 **Senior mindset:** Pipelines that assume "run once from clean" do not scale. Pipelines that support "run again after designer edits" do.
 
@@ -89,8 +88,8 @@ When adding or changing automation that touches content or levels:
 
 - [ ] Default behavior is **create-if-missing, update-in-place**; no delete/recreate unless explicitly opted in.
 - [ ] Re-runs do not create duplicates or destroy existing content.
-- [ ] One-time manual steps are documented; script does not assume they were done or overwrite them.
-- [ ] Config-driven values (bounds, density, etc.) are applied from config; designer-owned settings are left alone or documented as manual.
+- [ ] No step is left as "manual for the user"; automate (MCP, Python, GUI automation) or log to `docs/AUTOMATION_GAPS.md`.
+- [ ] Config-driven values (bounds, density, etc.) are applied from config; any setting that cannot be automated is logged to AUTOMATION_GAPS with a suggested approach.
 - [ ] Any destructive option is opt-in, documented, and clearly named (e.g. `recreate_volume_and_graph`).
 
 See also: [00-core-principles.mdc](00-core-principles.mdc) (Idempotency), [automation-standards.mdc](automation-standards.mdc) (variables with no access), [07-ai-agent-behavior.mdc](07-ai-agent-behavior.mdc) (session cleanup, error recording).

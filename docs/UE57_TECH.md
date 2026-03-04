@@ -4,10 +4,11 @@ Single entry point for Unreal Engine 5.7 development in HomeWorld: when to plan 
 
 ## When to use this doc
 
+- **Policy:** For any Unreal Engine API, UI, plugin, or documentation, use **only UE 5.7–specific sources** (Epic 5.7 docs, this doc, docs/UE57_EDITOR_UI.md, KNOWN_ERRORS). Do not rely on training data or other engine versions. See [.cursor/rules/ue57-sources.mdc](../.cursor/rules/ue57-sources.mdc).
 - Starting **UE 5.7 API, plugin, or engine-related work** (C++, Blueprint, PCG, Python Editor scripts).
 - Before adding or changing code that touches **FindObject**, **FPaths**, image utils, collision profiles, PCG graph, or Python Unreal APIs (e.g. `get_actor_bounds`, AnimBP factory).
 - After an **engine or plugin upgrade** (e.g. 5.7 → 5.8) to know what to re-verify.
-- Planning **multi-system UE work** (e.g. Mass migration, PCG graph v2) — save plans under [.cursor/plans/](../.cursor/plans/) (see [SPEC_AND_PLAN.md](SPEC_AND_PLAN.md)).
+- Planning **multi-system UE work** (e.g. Mass migration, PCG graph v2) — propose the plan in the agent chat (see [SPEC_AND_PLAN.md](SPEC_AND_PLAN.md)).
 
 ## Key links
 
@@ -20,6 +21,8 @@ Single entry point for Unreal Engine 5.7 development in HomeWorld: when to plan 
 | Plugins, layers, stack | [STACK_PLAN.md](STACK_PLAN.md) |
 | Plan before code (complex work) | [SPEC_AND_PLAN.md](SPEC_AND_PLAN.md), [.cursor/rules/17-plan-first.mdc](../.cursor/rules/17-plan-first.mdc) |
 | Automation “no access” procedure | [.cursor/rules/automation-standards.mdc](../.cursor/rules/automation-standards.mdc) |
+| Editor UI (menus, panels, options) | [UE57_EDITOR_UI.md](UE57_EDITOR_UI.md), [.cursor/rules/ue57-editor-ui.mdc](../.cursor/rules/ue57-editor-ui.mdc) — use Epic 5.7 docs only; cite URLs |
+| Full automation stack (programmatic + GUI, orchestration) | [FULL_AUTOMATION_RESEARCH.md](FULL_AUTOMATION_RESEARCH.md) |
 
 ## Canonical examples
 
@@ -52,4 +55,4 @@ Single entry point for Unreal Engine 5.7 development in HomeWorld: when to plan 
 
 ## Plan first for UE work
 
-For **multi-file or multi-system** UE work (e.g. new GAS abilities, Mass setup, PCG graph changes), follow [17-plan-first.mdc](../.cursor/rules/17-plan-first.mdc): propose a short plan and get approval before editing. Save plans under `.cursor/plans/` when the task is large enough to benefit from resume or future reference.
+For **multi-file or multi-system** UE work (e.g. new GAS abilities, Mass setup, PCG graph changes), follow [17-plan-first.mdc](../.cursor/rules/17-plan-first.mdc): propose a short plan in the agent chat and get approval before editing. Keep plans in chat unless the user asks to save to a file.

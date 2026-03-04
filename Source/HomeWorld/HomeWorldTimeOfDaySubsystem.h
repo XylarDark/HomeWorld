@@ -33,4 +33,8 @@ public:
 	/** Normalized time in [0,1] over the full cycle. Stub: returns 0.25 (day). */
 	UFUNCTION(BlueprintCallable, Category = "TimeOfDay", meta = (DisplayName = "Get Normalized Time"))
 	virtual float GetNormalizedTime() const;
+
+	/** True when current phase is Night. Use for State Tree IsNight / Defend branch. */
+	UFUNCTION(BlueprintCallable, Category = "TimeOfDay", meta = (DisplayName = "Get Is Night"))
+	virtual bool GetIsNight() const;
 };

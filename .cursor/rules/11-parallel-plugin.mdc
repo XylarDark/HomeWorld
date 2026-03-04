@@ -18,9 +18,9 @@ When you identify a task that is a good fit for a **Parallel plugin** feature, *
 
 | Trigger | Recommend | Example suggestion |
 |---------|------------|--------------------|
-| Need **current or external info** (UE/Epic API, docs, plugin compatibility, error cause) | `/parallel-search <query>` | "Run `/parallel-search UE 5.7 PCG Get Landscape Data` and paste the result; I'll summarize and we can update the doc." |
-| User or context has a **specific URL** (Epic doc, tutorial, release notes) | `/parallel-extract <url>` | "Run `/parallel-extract https://docs.unrealengine.com/...` and paste the content; I'll interpret and apply." |
-| User explicitly asks for **deep / exhaustive / comprehensive** research | `/parallel-research <topic>` | "Run `/parallel-research UE 5.7 PCG migration` and paste the report when done; I'll integrate the findings." |
+| Need **current or external info** (UE/Epic API, docs, plugin compatibility, error cause) | `/parallel-search <query>` | For **Unreal** topics always include **"UE 5.7"** or **"Unreal Engine 5.7"** in the query (see ue57-sources.mdc). Example: "Run `/parallel-search UE 5.7 PCG Get Landscape Data` and paste the result; I'll summarize and we can update the doc." |
+| User or context has a **specific URL** (Epic doc, tutorial, release notes) | `/parallel-extract <url>` | Prefer Epic 5.7 docs: `https://dev.epicgames.com/documentation/en-us/unreal-engine/...`. "Run `/parallel-extract <url>` and paste the content; I'll interpret and apply." |
+| User explicitly asks for **deep / exhaustive / comprehensive** research | `/parallel-research <topic>` | For **Unreal** topics include **"UE 5.7"** in the topic (see ue57-sources.mdc). Example: "Run `/parallel-research UE 5.7 PCG migration` and paste the report when done; I'll integrate the findings." |
 | Need to **enrich a list** (plugins, companies, assets) with web-sourced fields | `/parallel-enrich <file or entities> with <fields>` | "Run `/parallel-enrich plugins.csv with docs maintainer` and share the output; I'll help integrate." |
 
 ## Citations

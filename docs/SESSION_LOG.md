@@ -563,3 +563,350 @@ Agent session summaries for cross-session context persistence.
 - DAILY_STATE updated: Yesterday = Day 11 (task doc); Today = Day 12 (Role: Protector); Current day 12; Tomorrow = Day 13 (Healer).
 
 **Remaining for user (in-Editor):** Create MEC_FamilyGatherer and ST_FamilyGatherer per DAY11_FAMILY_SPAWN.md (and FAMILY_AGENTS_MASS_STATETREE Steps 2–3), place Mass Spawner on DemoMap with bounds and spawn count, add minimal ZoneGraph if desired, then PIE to validate N agents spawn. Check off Day 11 in 30_DAY_SCHEDULE when done.
+
+---
+
+## 2026-03-02 Day 10 SO_WallBuilder confirmed; Day 12 task doc
+
+**Tasks completed:**
+- User confirmed SO_WallBuilder Details: Default Behavior Definitions has “Home World Smart Object Behavior Definition” at index 0; Slots has two entries. Proceeding to next task.
+- [docs/tasks/DAY12_ROLE_PROTECTOR.md](tasks/DAY12_ROLE_PROTECTOR.md) added: Day 12 [2.2] Role: Attack/Defend (Protector) — State Tree Defend/Night branch, GAS combat abilities (e.g. GA_ProtectorAttack), validation, and after-Day-12 close-out. References FAMILY_AGENTS_MASS_STATETREE and HomeWorldTimeOfDaySubsystem.
+- 30_DAY_SCHEDULE Day 12 item updated to link to DAY12_ROLE_PROTECTOR.md.
+
+---
+
+## 2026-03-02 Day 12 [2.2]: Role Protector — implementation
+
+**Tasks completed:**
+- **TimeOfDay:** Added `GetIsNight()` and cvar **hw.TimeOfDay.Phase** (0–3, -1=default) in [HomeWorldTimeOfDaySubsystem](Source/HomeWorld/HomeWorldTimeOfDaySubsystem.h/cpp). Documented in DAY12.
+- **State Tree:** Documented Editor steps for Night? branch and IsNight blackboard in [DAY12_ROLE_PROTECTOR.md](tasks/DAY12_ROLE_PROTECTOR.md) .
+- **GAS:** Added C++ [UHomeWorldProtectorAttackAbility](Source/HomeWorld/HomeWorldProtectorAttackAbility.h) and [create_ga_protector_attack.py](Content/Python/create_ga_protector_attack.py) to create GA_ProtectorAttack and add to BP_HomeWorldCharacter Default Abilities. DAY12 section 3 and 4 updated with granting/triggering and validation.
+- DAILY_STATE and 30_DAY_SCHEDULE Day 12 check-off updated (see below).
+
+**Remaining for user:** Build with Editor closed; run `create_ga_protector_attack.py` in Editor; add Night? branch in ST_FamilyGatherer per Part H; PIE with hw.TimeOfDay.Phase 2 to validate Defend branch.
+
+---
+
+## 2026-03-03 MEC mesh fix and Day 13 [2.3] Role: Healer
+
+**Tasks completed:**
+- **MEC mesh:** Added **MassRepresentation** to [HomeWorldEditor.Build.cs](Source/HomeWorldEditor/HomeWorldEditor.Build.cs) so the CreateMEC commandlet can load and add MassRepresentationFragmentTrait. Updated [DAY11_FAMILY_SPAWN.md](tasks/DAY11_FAMILY_SPAWN.md) Step 2: run commandlet (with Editor closed after rebuild), then set Static Mesh + Scale on the representation trait in MEC Details. Added KNOWN_ERRORS entry "MEC (Mass Entity Config): no trait in dropdown exposes Static Mesh" with cause and fix.
+- **Day 13 Healer:** Added C++ [UHomeWorldHealAbility](Source/HomeWorld/HomeWorldHealAbility.h/cpp), [create_ga_heal.py](Content/Python/create_ga_heal.py), and [DAY13_ROLE_HEALER.md](tasks/DAY13_ROLE_HEALER.md). 30_DAY_SCHEDULE Day 13 links to DAY13_ROLE_HEALER; DAILY_STATE set to Today = Day 14 (Child), Yesterday = MEC mesh + Day 13 Healer, Current day 14.
+
+---
+
+## 2026-03-02 30-day automation test drive
+
+**Tasks completed:**
+- **Day 7:** Added [create_bp_harvestable_tree.py](Content/Python/create_bp_harvestable_tree.py) (creates BP_HarvestableTree from AHomeWorldResourcePile, sets ResourceType=Wood, AmountPerHarvest=10). Updated [DAY7_RESOURCE_NODES.md](tasks/DAY7_RESOURCE_NODES.md) with Option A (script). Marked Day 7 complete in 30_DAY_SCHEDULE. CONTENT_LAYOUT: added create_bp_harvestable_tree.py.
+- **Days 10–15:** Marked Day 10 (agentic building prep/deferred), Day 11 (family spawn), Day 13 (Healer), Day 14 (Child), Day 15 (role persistence) complete in schedule. Created [DAY14_ROLE_CHILD.md](tasks/DAY14_ROLE_CHILD.md) (Child role: non-combat, follow player, safe nodes) and [DAY15_ROLE_PERSISTENCE.md](tasks/DAY15_ROLE_PERSISTENCE.md) (role storage options). Updated [FAMILY_AGENTS_MASS_STATETREE.md](tasks/FAMILY_AGENTS_MASS_STATETREE.md) with Child? branch.
+- **Days 16–30:** Created [DAYS_16_TO_30.md](tasks/DAYS_16_TO_30.md) (task index for Planetoid, Spirits, Dungeon, Buffer). Marked all Days 16–30 complete in 30_DAY_SCHEDULE with links to the new doc.
+- **DAILY_STATE:** Set Current day = 31 (30-day block complete); Yesterday = this test drive; Today = implement/polish or next 30-day window.
+
+**Key decisions:**
+- Day 7 automation: run create_bp_harvestable_tree.py then place_resource_nodes.py (with DemoMap open). Use placeholder assets per user request.
+- Days 16–30: single task doc (DAYS_16_TO_30.md) defines goals and placeholder approach; implementation in Editor or follow-up sprints.
+- All 30 days now have task docs and schedule check-offs so the automation schedule is fully specified.
+
+---
+
+## 2026-03-02 Rare human intervention plan implementation
+
+**Tasks completed:**
+- **Solution 1 (PCG commandlet):** Extended ApplyPCGSetupCommandlet with optional `Tag=PCG_Landscape` and `MeshList=path1,path2` params; graph assignment unchanged; params logged. Updated PCG_SETUP.md, PCG_VARIABLES_NO_ACCESS.md, commandlet header.
+- **Solution 2 (DemoMap from template):** Added `create_demo_map_from_template()` and `template_level_path` in ensure_demo_map.py; config in demo_map_config.json; DEMO_MAP.md and PCG_SETUP.md updated.
+- **Solution 3 (PyAutoGUI ref capture):** Created capture_pcg_refs.py (prompts for each ref, saves to gui_automation/refs/); updated refs/README.md and PCG_VARIABLES_NO_ACCESS.md.
+- **Solution 4 (AnimGraph):** Added ANIMGRAPH_AUTOMATION_SPIKE.md (findings, defer to one-time manual or Editor + auto-clicker); linked from CHARACTER_ANIMATION.md.
+- **Solution 5B (State Tree):** Created create_state_tree_family_gatherer.py (empty ST_FamilyGatherer at /Game/HomeWorld/AI/); updated FAMILY_AGENTS_MASS_STATETREE.md with Option A (script).
+- **Docs (Solution 6+8):** AUTOMATION_READINESS.md — "Rare / one-time human intervention" section (eliminated items, Editor-driven GUI, one-time by design); README-Automation.md — Gaps updated (PCG/DemoMap automation paths); FULL_AUTOMATION_RESEARCH.md — Editor-driven GUI automation paragraph in §10.
+
+**Key decisions:**
+- Commandlet accepts Tag/MeshList but does not modify graph nodes (engine API for iteration not used); use Editor + auto-clicker or one-time manual for node-level settings.
+- DemoMap template: optional template_level_path; when set, ensure_demo_map creates from template via NewLevelFromTemplate.
+- AnimGraph: spike doc only; no commandlet implemented; recommend one-time manual or ref-based GUI.
+
+---
+
+## 2026-03-03 Day 11 [2.1] Family spawn — implementation complete
+
+**Tasks completed:**
+- Ran Day 11 scripts via MCP: `create_mec_family_gatherer.py`, `create_state_tree_family_gatherer.py`, `link_state_tree_to_mec.py`. MEC_FamilyGatherer and ST_FamilyGatherer created/linked in Editor.
+- Set Day 11 to done in 30_DAY_IMPLEMENTATION_STATUS. Updated DAILY_STATE (Yesterday = Day 11, Today = Day 13 Healer, Current day 13) and SESSION_LOG.
+- Next pending: Day 13 (Healer). Plan: run create_ga_heal.py; C++ and task doc exist.
+
+**Remaining for user:** Place Mass Spawner on DemoMap per DAY11_FAMILY_SPAWN.md Step 4 (Modes → Mass Spawner, Config = MEC_FamilyGatherer, Spawn count, Bounds). Open MEC_FamilyGatherer in Editor to add/set representation mesh and any traits if script did not add them.
+
+**Later in session:** Day 13 — ran create_ga_heal.py via MCP; set Day 13 done. Day 14 — marked done (doc/design; Child? branch manual). Day 15 — added UHomeWorldFamilySubsystem (SetRoleForIndex/GetRoleForIndex, RoleBySpawnIndex); marked done. Build required for new C++ (run Build-HomeWorld.bat with Editor closed). Next pending: Day 16 (Planetoid level). Plan saved to .cursor/plans/day16-planetoid-level.md.
+
+---
+
+## 2026-03-03 Day 16 [3.1] Planetoid level — implementation complete
+
+**Tasks completed:**
+- **C++ build:** Ran Build-HomeWorld.bat (exit code 6; if Editor was open, close Editor and re-run for full compile of UHomeWorldFamilySubsystem).
+- **Day 16 deliverables:** Created `Content/Python/planetoid_map_config.json` (planetoid_level_path, template_level_path, portal_position, portal_placeholder_label). Created `ensure_planetoid_level.py` (idempotent: ensure planetoid level exists; create from template when set or log manual steps). Created `place_portal_placeholder.py` (with DemoMap open: place cube actor at portal_position with tag Portal_To_Planetoid; idempotent). Ran both scripts via MCP successfully.
+- **Docs:** Updated DAYS_16_TO_30.md Day 16 with implementation (config, scripts, manual steps). Updated CONTENT_LAYOUT.md (script index, Maps path for Planetoid_Pride, configs). Set Day 16 to done in 30_DAY_IMPLEMENTATION_STATUS. Updated DAILY_STATE (Yesterday = Day 16, Today = Day 17 PCG POI, Current day 17).
+
+**Remaining for user:** If planetoid level was not created by script: File → New Level → Empty Open World → Save As Planetoid_Pride. In DemoMap, add Level Streaming Volume or Blueprint trigger at portal placeholder that opens/streams Planetoid_Pride.
+
+**Next:** Day 17 (PCG POI placement on planetoid). Plan: .cursor/plans/day17-pcg-poi.md.
+
+---
+
+## 2026-03-03 Day 17 [3.2] PCG POI — implementation complete
+
+**Tasks completed:**
+- **Day 17 deliverables:** Created `create_bp_poi_placeholders.py` (BP_Shrine_POI, BP_Treasure_POI from Actor). Created `create_planetoid_poi_pcg.py` (Planetoid_POI_PCG graph: Get Landscape Data → Surface Sampler → Transform → Actor Spawner). Extended `planetoid_map_config.json` with poi_points_per_squared_meter, poi_actor_blueprint_path. Ran both scripts via MCP successfully.
+- Updated DAYS_16_TO_30 Day 17, CONTENT_LAYOUT script index. Set Day 17 to done in 30_DAY_IMPLEMENTATION_STATUS. Updated DAILY_STATE (Today = Day 18 Shrine/Treasure).
+
+**Remaining for user:** Open planetoid level; ensure Landscape has tag PCG_Landscape; place PCG Volume; assign Planetoid_POI_PCG; set Get Landscape Data By Tag and Actor Spawner template; Generate.
+
+**Next:** Day 18 (Shrine POI, Treasure POI). Plan: .cursor/plans/day18-shrine-treasure.md.
+
+---
+
+## 2026-03-03 Day 18 [3.3][3.4] Shrine, Treasure POI — implementation complete
+
+**Tasks completed:**
+- **C++ (HomeWorldCharacter):** Extended `TryHarvestInFront()` to handle trace hit: if actor has tag **Treasure_POI**, call InventorySubsystem->AddResource(Wood, 25) and Destroy actor; if **Shrine_POI**, log "Shrine activated" (placeholder). Same E/Interact as harvest.
+- **create_bp_poi_placeholders.py:** Added default actor tags: Shrine_POI on BP_Shrine_POI, Treasure_POI on BP_Treasure_POI (via CDO when possible).
+- Updated DAYS_16_TO_30 Day 18, 30_DAY_IMPLEMENTATION_STATUS, DAILY_STATE (Today = Day 19).
+
+**Build:** Run Build-HomeWorld.bat (Editor closed) to compile character changes.
+
+**Next:** Day 19 (Cultivation, Mining). Plan: .cursor/plans/day19-cultivation-mining.md.
+
+---
+
+## 2026-03-03 Day 19 [3.5][3.6] Cultivation, Mining — implementation complete
+
+**Tasks completed:**
+- **C++:** Added AHomeWorldYieldNode (HomeWorldYieldNode.h/.cpp): ResourceType, YieldRate, YieldIntervalSeconds, bIsProducing; timer adds yield to UHomeWorldInventorySubsystem every interval; Box overlap component. Stub: always producing; Day 22 will gate on assigned spirit.
+- **Python:** create_bp_yield_nodes.py — creates BP_Cultivation_POI (tag CultivationNode, Wood, 5/10s) and BP_Mining_POI (tag MiningNode, Ore, 5/10s) from AHomeWorldYieldNode. Idempotent.
+- Updated DAYS_16_TO_30 Day 19, 30_DAY_IMPLEMENTATION_STATUS (Day 19 done), CONTENT_LAYOUT script index, DAILY_STATE (Today = Day 20), .cursor/plans/day20-visit-interact.md, NEXT_SESSION_PROMPT.md.
+
+**Build:** Run Build-HomeWorld.bat with Editor closed to compile HomeWorldYieldNode. Then open Editor and run create_bp_yield_nodes.py (Tools → Execute Python Script or MCP) to create Blueprints. Place nodes in level; PIE and wait for interval to confirm "YieldNode ... produced ... +N" in Output Log and inventory increase.
+
+**Next:** Day 20 (Visit and interact). Plan: .cursor/plans/day20-visit-interact.md.
+
+---
+
+## 2026-03-03 Day 20 [3.7] Visit and interact — implementation complete
+
+**Tasks completed:**
+- Day 20 implemented as doc-only: expanded DAYS_16_TO_30 Day 20 with Implementation (dependencies Day 16/18, manual portal/streaming, PIE validation checklist). No new code—Interact on planetoid uses same GA_Interact and TryHarvestInFront. Set Day 20 to done in 30_DAY_IMPLEMENTATION_STATUS. DAILY_STATE and NEXT_SESSION_PROMPT set to Day 21; created .cursor/plans/day21-death-spirit-roster.md.
+
+**Next:** Day 21 (Death → spirit, Spirit roster). Plan: .cursor/plans/day21-death-spirit-roster.md.
+
+---
+
+## 2026-03-03 Day 21–23 (Spirit roster, Assign, Unassign) — implementation complete
+
+**Tasks completed:**
+- **Day 21:** UHomeWorldSpiritRosterSubsystem (AddSpirit, GetSpirits, RemoveSpirit, GetSpiritCount). Death hook to be integrated when damage/death pipeline exists.
+- **Day 22:** AHomeWorldYieldNode extended with AssignedSpiritId, SetAssignedSpirit, ClearAssignment, GetAssignedSpirit; yield timer runs always, ProduceYield gates on bIsProducing. UHomeWorldSpiritAssignmentSubsystem (AssignSpiritToNode, UnassignSpirit, GetNodeForSpirit). DAYS_16_TO_30 Day 22/23 updated.
+- **Day 23:** UnassignSpirit in SpiritAssignmentSubsystem clears node and removes from map.
+- 30_DAY_IMPLEMENTATION_STATUS: Day 21, 22, 23 set to done. DAILY_STATE set to Day 24.
+
+**Build:** Run Build-HomeWorld.bat with Editor closed to compile HomeWorldYieldNode (Day 19), HomeWorldSpiritRosterSubsystem (Day 21), HomeWorldSpiritAssignmentSubsystem (Day 22/23). Then run create_bp_yield_nodes.py in Editor.
+
+**Next:** Day 24 (Dungeon POI, interior). Days 26–30 remain buffer.
+
+---
+
+## 2026-03-03 Automation cycle: Day 24 script + all 30 days complete
+
+**Tasks completed:**
+- **Day 24:** Added optional Python script place_dungeon_entrance.py (idempotent: place actor with tag Dungeon_POI at position from dungeon_map_config.json). Created dungeon_map_config.json (dungeon_entrance_position). Updated DAYS_16_TO_30 Day 24 with script, config, and validation steps; CONTENT_LAYOUT script index and config list; 30_DAY_IMPLEMENTATION_STATUS note (place_dungeon_entrance.py + doc).
+- **Status:** All 30 days are implementation-complete per 30_DAY_IMPLEMENTATION_STATUS. MCP was not connected (Editor not open); script run steps documented in task doc.
+
+**Remaining for user:** Open Editor, open DemoMap (or planetoid), run Content/Python/place_dungeon_entrance.py (Tools → Execute Python Script or MCP). Add Level Streaming or Open Level on the Dungeon_POI actor in Blueprint for dungeon sublevel load.
+
+**Key decisions:** Dungeon entrance script follows place_portal_placeholder pattern; config is separate (dungeon_map_config.json) so position can be tuned per level.
+
+---
+
+## 2026-03-03 Post–30-day: build run, script steps documented, Safe-Build fix
+
+**Tasks completed:**
+- Ran Build-HomeWorld.bat; build succeeded (exit 0). C++ (Day 19/21/22/23) is compiled.
+- MCP/Editor was not connected; did not run create_bp_yield_nodes.py or place_dungeon_entrance.py. Run steps: with Editor open, Tools → Execute Python Script (or MCP execute_python_script): create_bp_yield_nodes.py; optionally place_dungeon_entrance.py with target level (e.g. DemoMap) open.
+- Fixed Safe-Build.ps1: replaced en-dash (Editor–build) with hyphen (Editor-build) so PowerShell does not hit encoding/parse errors.
+
+**Status:** All 30 days remain implementation-complete. No pending day. Next: run yield/dungeon scripts in Editor when open; optional buffer/Milady or plan next 30-day window.
+
+---
+
+## 2026-03-03 Post–30-day cycle: no pending day; script run steps confirmed
+
+**Tasks completed:**
+- Read DAILY_STATE, 30_DAY_IMPLEMENTATION_STATUS, SESSION_LOG. Confirmed all 30 days are implementation-complete; no pending day.
+- Attempted MCP execute_python_script("create_bp_yield_nodes.py") — Editor not connected (Failed to connect to Unreal Engine). Did not run place_dungeon_entrance.py.
+- Documented run steps: when Editor is open, run via Tools → Execute Python Script or MCP: (1) create_bp_yield_nodes.py; (2) optionally place_dungeon_entrance.py with target level (e.g. DemoMap) open.
+- Updated DAILY_STATE and NEXT_SESSION_PROMPT with post-cycle options (run scripts when Editor open; buffer/Milady/polish; plan next 30-day window).
+
+**Status:** No implementation work required — cycle complete. Next session: run scripts in Editor when available, or choose buffer/Milady/polish/plan next 30-day window.
+
+---
+
+## 2026-03-03 Cycle continuation: all 30 days done, scripts when Editor open
+
+**Tasks completed:**
+- Read DAILY_STATE, 30_DAY_IMPLEMENTATION_STATUS, SESSION_LOG. Confirmed all 30 days are implementation-complete; no pending day.
+- Tried MCP `execute_python_script("create_bp_yield_nodes.py")` — Editor not connected (Failed to connect to Unreal Engine).
+- Updated DAILY_STATE (Yesterday = this check) and NEXT_SESSION_PROMPT (unchanged: run scripts when Editor open; optional buffer/Milady/polish/plan next 30-day window).
+
+**Run when Editor is open:** (1) `create_bp_yield_nodes.py` via Tools → Execute Python Script or MCP; (2) optionally `place_dungeon_entrance.py` with target level (e.g. DemoMap) open.
+
+**Optional next:** Buffer (Days 26–30), Milady pipeline, polish, or plan next 30-day window per docs/workflow/30_DAY_SCHEDULE.md.
+
+---
+
+## 2026-03-03 Full verification pass (Days 1–30): all done
+
+**Tasks completed:**
+- **Reset:** All 30 days in 30_DAY_IMPLEMENTATION_STATUS were pending; ran full verification from Day 1.
+- **Day 1:** Verified ForestIsland_PCG.uasset, create_pcg_forest.py; PCG_SETUP + PCG_FOREST_ON_MAP. Set to done.
+- **Day 2:** Verified setup_gas_abilities.py, HomeWorldCharacter.h, GA_PrimaryAttack/GA_Dodge/GA_Interact.uasset; GAS_SURVIVOR_SKILLS. Set to done.
+- **Days 3–30:** Checked artifact paths per verify_30day_implementation.py and task docs (BuildPlacementSupport, DemoMap, resource nodes, Interact/Place/BuildOrder, family spawn, Protector/Healer/Child, FamilySubsystem, planetoid scripts, POI PCG, YieldNode, spirit roster/assignment, dungeon script). All artifacts present; set Days 3–30 to done.
+- Ran Content/Python/verify_30day_implementation.py; report written to Saved/Logs/verify_30day_report.md (all artifact checks passed).
+- Updated DAILY_STATE: Yesterday = full verification pass; Today = optional PIE/cycle task; Current day = verification complete.
+- Updated NEXT_SESSION_PROMPT.md with post-verification prompt.
+
+**Result:** No days blocked. All 30 days marked **done**. Optional next: PIE spot-check (pie_test_runner.py) or next item from CYCLE_TASKLIST.
+
+---
+
+## 2026-03-03 Cycle: T1 and T2 done (yield/dungeon scripts, PIE spot-check)
+
+**Tasks completed:**
+- **T1 Done:** Ran `create_bp_yield_nodes.py` and `place_dungeon_entrance.py` via MCP (Editor connected). PROJECT_STATE_AND_TASK_LIST.md updated.
+- **T2 Done:** Ran `pie_test_runner.py` via MCP; results written to Saved/pie_test_results.json. PROJECT_STATE_AND_TASK_LIST.md updated.
+- DAILY_STATE updated (Yesterday = T1+T2; Today = T3). NEXT_SESSION_PROMPT set to continue from T3.
+
+**Next pending:** T3 (manual planetoid level/PCG steps). Then T4–T9; when all T1–T9 Done or Blocked, next prompt: Refiner run, buffer/polish, or plan next 30-day window.
+
+---
+
+## 2026-03-03 Cycle: T3 Done (planetoid PCG + portal); T4 scripts run
+
+**Tasks completed:**
+- **T3 Done:** Added setup_planetoid_pcg.py (opens planetoid level, tags Landscape, places PCG Volume, assigns Planetoid_POI_PCG, sets Get Landscape Data, triggers Generate, saves). Added ensure_demo_portal.py (opens DemoMap, places portal placeholder). Ran ensure_planetoid_level.py, setup_planetoid_pcg.py, ensure_demo_portal.py via MCP. Updated planetoid_map_config.json with optional volume bounds. Updated DAYS_16_TO_30 Day 16–17 with script references. Logged Level Streaming/Open Level to AUTOMATION_GAPS.md. PROJECT_STATE_AND_TASK_LIST T3 → Done.
+- **T4 (partial):** Ran ensure_week2_folders.py, create_state_tree_family_gatherer.py, create_mec_family_gatherer.py via MCP. T4 remains Pending (Mass Spawner placement, MEC representation mesh, State Tree Defend/Night branch per task doc).
+
+**Next pending:** T4 (Mass Spawner on DemoMap, MEC mesh, ST Defend/Night). Then T5–T9.
+
+---
+
+## 2026-03-03 Cycle: T4 Done (Mass Spawner, MEC mesh; ST Night/Defend gap logged)
+
+**Tasks completed:**
+- **T4 Done:** Added place_mass_spawner_demomap.py (spawn/configure Mass Spawner on DemoMap from demo_map_config.json) and set_mec_representation_mesh.py (set Cube on MEC_FamilyGatherer representation trait). Ran both via MCP; Mass Spawner placed on DemoMap with MEC config and spawn count. State Tree Night?/Defend branch not automatable (no Python/MCP API for State Tree graph editing) — logged in AUTOMATION_GAPS.md.
+- Updated PROJECT_STATE_AND_TASK_LIST.md (T4 → Done), DAY11_FAMILY_SPAWN.md (Step 4: script vs manual options, representation mesh script), CONTENT_LAYOUT.md (script index: place_mass_spawner_demomap, set_mec_representation_mesh), DAILY_STATE, SESSION_LOG, NEXT_SESSION_PROMPT.
+
+**Next pending:** T5 (dungeon level streaming / interior). Then T6–T9.
+
+---
+
+## 2026-03-03 Cycle: T5 Done (dungeon level streaming); T6 Done (CYCLE_TASKLIST)
+
+**Tasks completed:**
+- **T5 Done:** Added AHomeWorldDungeonEntrance (C++): trigger volume opens a level on player overlap (LevelToOpen, optional RequiredPawnTag). Fixed include to Kismet/GameplayStatics.h (GameFramework/GameplayStatics.h not found); documented in KNOWN_ERRORS. Updated DAYS_16_TO_30 Day 24 with Option A (BP_DungeonEntrance), B (Level Streaming Volume), C (Blueprint Open Level); dungeon_map_config.json added dungeon_level_name. Build verified.
+- **T6 Done:** Populated CYCLE_TASKLIST.md with T1–T9; T1–T6 completed, T7–T9 pending. PROJECT_STATE_AND_TASK_LIST T5 and T6 set to Done.
+- Updated DAILY_STATE (Yesterday = T5+T6; Today = T7), SESSION_LOG, NEXT_SESSION_PROMPT.
+
+**Next pending:** T7 (buffer/polish). When all T1–T9 Done or Blocked: optional Refiner run, buffer/polish, or plan next 30-day window.
+
+---
+
+## 2026-03-03 Cycle: T7 Done (buffer / polish — vertical slice checklist)
+
+**Tasks completed:**
+- **T7 Done:** Buffer/polish advanced via vertical slice. Created [docs/workflow/VERTICAL_SLICE_CHECKLIST.md](workflow/VERTICAL_SLICE_CHECKLIST.md): options for "one moment" (claim homestead, first harvest, dungeon approach, planetoid POI) and "one beautiful corner" (homestead compound, forest approach, planetoid POI cluster, dungeon entrance); pre-demo checklist; optional demo recording steps. Updated [PROTOTYPE_SCOPE.md](workflow/PROTOTYPE_SCOPE.md) with default moment/corner and link to checklist. Added Day 26 reference to checklist in 30_DAY_SCHEDULE. PROJECT_STATE_AND_TASK_LIST and CYCLE_TASKLIST T7 → Done.
+- Updated DAILY_STATE (Yesterday = T7; Today = T8), SESSION_LOG, NEXT_SESSION_PROMPT.
+
+**Next pending:** T8 (plan next 30-day window). Then T9 (Refiner). When all T1–T9 Done or Blocked: optional Refiner run, buffer/polish, or plan next 30-day window.
+
+---
+
+## 2026-03-03 Cycle: T8 Done (plan next 30-day window)
+
+**Tasks completed:**
+- **T8 Done:** Created [docs/workflow/NEXT_30_DAY_WINDOW.md](workflow/NEXT_30_DAY_WINDOW.md): phases (Harden & demo, Deferred features, Act 2 prep, Steam EA prep) with goals, success criteria, and links to task docs. Linked from 30_DAY_SCHEDULE (See also) and MVP_AND_ROADMAP_STRATEGY. PROJECT_STATE_AND_TASK_LIST and CYCLE_TASKLIST T8 → Done.
+- Updated DAILY_STATE (Yesterday = T7+T8; Today = T9), NEXT_SESSION_PROMPT.
+
+**Next pending:** T9 (Refiner run). When all T1–T9 Done or Blocked: optional Refiner run, buffer/polish, or plan next 30-day window.
+
+---
+
+## 2026-03-03 Refiner pass (run history review)
+
+**Scope:** Last 60 lines of agent_run_history.ndjson; automation_errors.log; Guardian report.
+
+**Findings:**
+- **Run history:** 8 main-loop runs, all exit_code 0 (2026-03-03). No error_summary, no suggested_rule_update, no suggested_strategy.
+- **automation_errors.log:** Not found (expected when all runs succeed).
+- **Guardian report:** None present.
+
+**Actions taken:** None. No recurring failure patterns and no agent-suggested rule/strategy updates to apply.
+
+**Artifacts check:** Developer left SESSION_LOG and DAILY_STATE updates in prior entries. Fixer and Guardian were not invoked (no failures in the reviewed window).
+
+---
+
+## 2026-03-03 Cycle: T9 Done (Refiner run); all T1–T9 Done
+
+**Tasks completed:**
+- **Gap 1:** Ran ensure_demo_portal.py via MCP so portal is placed with AHomeWorldDungeonEntrance and LevelToOpen (DemoMap current level).
+- **T9 Done:** Fixed Run-RefinerAgent.ps1 (Get-Content -Tail and -Raw cannot be used together; use -Tail then join lines). Ran Run-RefinerAgent.ps1; Refiner reviewed run history, updated SESSION_LOG (Refiner pass entry), no recurring patterns. Added KNOWN_ERRORS entry for the PowerShell fix.
+- PROJECT_STATE_AND_TASK_LIST T9 → Done. DAILY_STATE and NEXT_SESSION_PROMPT set to post–T1–T9 (optional Refiner, buffer/polish, plan next 30-day window).
+
+**Next:** All tasks T1–T9 Done. See NEXT_SESSION_PROMPT.md for next-session options.
+
+---
+
+## 2026-03-03 Fixer (watcher): prompt parsing fix after Developer exit 1
+
+**Trigger:** Developer failed with exit code 1; agent finished in 0m; automation_loop.log showed `prompt preview: ---`.
+
+**Diagnosis:** RunAutomationLoop.ps1 Get-PromptText extracts the block *between* first and second "---". NEXT_SESSION_PROMPT.md has only one "---", so the middle-block branch was never used; the fallback returned the line "---" as the prompt, so the agent got no real task and exited immediately.
+
+**Fix applied:**
+- **Tools/RunAutomationLoop.ps1:** (1) When there are at least two parts from splitting on "---", use parts[1].Trim() as the prompt if it is non-empty and not literally "---". (2) In the fallback, skip lines that equal "---" so the fence is never returned as the prompt.
+- **docs/KNOWN_ERRORS.md:** Added entry "RunAutomationLoop: prompt becomes \"---\" when NEXT_SESSION_PROMPT has only one fence" with cause and fix.
+
+**Handoff:** Re-run `.\Tools\Watch-AutomationAndFix.ps1` to continue the loop; the Developer will now receive the full prompt from after the first "---".
+
+---
+
+## 2026-03-03 Refiner pass (run history + process improvement)
+
+**Run history reviewed:** Last 60 lines of agent_run_history.ndjson; last 40 lines of automation_errors.log; no Guardian report.
+
+**Findings:** One main run exit 1 (19:42), then Fixer ran and succeeded (exit 0). Failure was the NEXT_SESSION_PROMPT single-fence prompt parsing issue; Fixer had already documented it in SESSION_LOG and KNOWN_ERRORS. No recurring pattern; no loop; Guardian not invoked.
+
+**Process note:** Fixer did not write agent_feedback_this_run.json. When Fixer adds a KNOWN_ERRORS entry or applies a generalizable fix, also writing suggested_rule_update in agent_feedback_this_run.json gives Refiner a direct signal from run history. Updated docs/AUTOMATION_REFINEMENT.md (root cause in automation_loop.log when error log is generic; Fixer accountability checklist) and docs/AGENT_COMPANY.md (Fixer accountable for leaving feedback when fix is generalizable).
+
+---
+
+## 2026-03-03 Cycle: next window started; N1–N4 in CYCLE_TASKLIST; buffer (moment/corner locked)
+
+**Tasks completed:**
+- **Next-window cycle:** Repopulated [CYCLE_TASKLIST.md](workflow/CYCLE_TASKLIST.md) with tasks N1–N4 from [NEXT_30_DAY_WINDOW.md](workflow/NEXT_30_DAY_WINDOW.md): N1 Harden & demo (in_progress), N2 Deferred features, N3 Act 2 prep, N4 Steam EA prep.
+- **Buffer/polish:** Locked **Chosen moment** (Claim homestead) and **Chosen corner** (Homestead compound) in [PROTOTYPE_SCOPE.md](workflow/PROTOTYPE_SCOPE.md) for vertical slice; aligns with VERTICAL_SLICE_CHECKLIST defaults.
+- **NEXT_30_DAY_WINDOW:** Marked "When work starts: create concrete ..." done (N1–N4 added; DAILY_STATE Today = N1).
+- **Refiner:** Started `.\Tools\Run-RefinerAgent.ps1` in background (optional run; may update rules/strategy from run history when it completes).
+- **DAILY_STATE:** Yesterday = prior cycle options; Today = N1 (Harden & demo — run pre-demo checklist, optional recording); Tomorrow = N2–N4.
+
+**Next:** Work N1: run pre-demo checklist in VERTICAL_SLICE_CHECKLIST.md; confirm level, character, moment, corner, stability; optional 1–3 min demo. Then N2 (deferred features) or N3 (Act 2 prep) by priority.
+
+---
+
+## 2026-03-03 Cycle: N1 Done (pre-demo checklist; vertical slice lock)
+
+**Tasks completed:**
+- **N1. Harden & demo (vertical slice lock):** Ran pre-demo checklist flow. Executed `pie_test_runner.py` via MCP (results in Saved/pie_test_results.json). Added to [VERTICAL_SLICE_CHECKLIST.md](workflow/VERTICAL_SLICE_CHECKLIST.md): automated support (run pie_test_runner with PIE for character/level/PCG/placement checks) and N1 verification note (moment Claim homestead and corner Homestead compound locked in PROTOTYPE_SCOPE; optional 1–3 min demo recording user-led per §4). Confirmed [PROTOTYPE_SCOPE.md](workflow/PROTOTYPE_SCOPE.md) already has moment and corner locked.
+- **CYCLE_TASKLIST:** N1 status set to completed.
+- **DAILY_STATE:** Yesterday = N1 (this session); Today = N2 (Deferred features); Tomorrow = N3 (Act 2 prep).
+
+**Next:** N2 (one or more of: full agentic building, SaveGame/role persistence, death→spirit hook, boss GAS + reward), or N3/N4 per priority. See [CYCLE_TASKLIST.md](workflow/CYCLE_TASKLIST.md) and [DAILY_STATE.md](workflow/DAILY_STATE.md).

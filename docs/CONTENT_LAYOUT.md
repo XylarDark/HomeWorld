@@ -10,7 +10,7 @@ All project-specific assets live under `/Game/HomeWorld/`.
 
 | Path | Purpose |
 |------|--------|
-| `/Game/HomeWorld/Maps/` | Levels. **DemoMap** is the primary demo/playable map for MVP (Empty Open World, no duplicate). **Main** and **Homestead** are legacy/narrative. See [DEMO_MAP.md](DEMO_MAP.md), [HOMESTEAD_MAP.md](HOMESTEAD_MAP.md). |
+| `/Game/HomeWorld/Maps/` | Levels. **DemoMap** is the primary demo/playable map for MVP (Empty Open World, no duplicate). **Planetoid_Pride** (Day 16+) is the first planetoid level; travel from DemoMap via portal. **Dungeon_Interior** (Day 24) optional dungeon sublevel; use **BP_DungeonEntrance** (C++ AHomeWorldDungeonEntrance) at entrance to open. **Main** and **Homestead** are legacy/narrative. See [DEMO_MAP.md](DEMO_MAP.md), [HOMESTEAD_MAP.md](HOMESTEAD_MAP.md), [tasks/DAYS_16_TO_30.md](tasks/DAYS_16_TO_30.md). |
 | `/Game/HomeWorld/Characters/` | Character Blueprints, Animation Blueprints (e.g. BP_HomeWorldCharacter, ABP_HomeWorldCharacter). |
 | `/Game/HomeWorld/GameMode/` | GameMode Blueprints (e.g. BP_GameMode). |
 | `/Game/HomeWorld/PCG/` | PCG graphs and related assets (e.g. ForestIsland_PCG). |
@@ -48,7 +48,7 @@ Top-level content folders not under `/Game/HomeWorld/` or `/Game/Man/` are third
 ## Python and config paths
 
 - **Python scripts:** `Content/Python/` (e.g. `bootstrap_project.py`, `create_demo_from_scratch.py`, `create_homestead_from_scratch.py`).
-- **Configs:** `Content/Python/*.json` (e.g. `demo_map_config.json` for DemoMap development, `pcg_forest_config.json`, `character_blueprint_config.json`; `homestead_map_config.json` for legacy Homestead map).
+- **Configs:** `Content/Python/*.json` (e.g. `demo_map_config.json`, `planetoid_map_config.json` for Day 16 planetoid/portal, `dungeon_map_config.json` for Day 24 dungeon entrance, `pcg_forest_config.json`, `character_blueprint_config.json`; `homestead_map_config.json` for legacy Homestead map).
 
 Paths in config files use `/Game/...` asset paths; file paths are relative to project root or `Content/Python/`.
 
@@ -67,6 +67,7 @@ Paths in config files use `/Game/...` asset paths; file paths are relative to pr
 | `ensure_milady_folders.py` | Idempotent: create Milady content folders (Meshes, Materials, Animations, Blueprints). | Standalone | — |
 | `ensure_week2_folders.py` | Idempotent: create Mass, AI, ZoneGraph, SmartObjects, Building. | Standalone | — |
 | `place_homestead_placeholders.py` | Spawn placeholders from config (house, outbuildings). | Standalone | homestead_map_config.json |
+| `create_bp_harvestable_tree.py` | Creates BP_HarvestableTree (AHomeWorldResourcePile) with ResourceType=Wood, AmountPerHarvest=10. Idempotent. Run before place_resource_nodes. | Standalone | — |
 | `place_resource_nodes.py` | Spawn BP_HarvestableTree at resource_node_positions on DemoMap (Day 7). Idempotent. | Standalone | demo_map_config.json |
 | `setup_level.py` | PlayerStart, optional run of create_demo_from_scratch. | Called by bootstrap_project | — |
 | `setup_enhanced_input.py` | IA_Move, IA_Look, IMC_Default. | Called by bootstrap; also init_unreal.py on Editor load | — |
@@ -82,6 +83,14 @@ Paths in config files use `/Game/...` asset paths; file paths are relative to pr
 | `layout_blueprint_nodes.py` | Space Blueprint graph nodes in a grid. | Agent tool | — |
 | `create_milady_pastel_material.py` | Creates M_MiladyPastel material. | Standalone | — |
 | `run_pie_verify.py` | Run PIE and run pie_test_runner. | Standalone | — |
+| `ensure_planetoid_level.py` | Idempotent: ensure planetoid level exists (Day 16); create from template when set or log manual steps. | Standalone | planetoid_map_config.json |
+| `place_portal_placeholder.py` | With DemoMap open: place portal placeholder actor at config position; tag Portal_To_Planetoid (Day 16). | Standalone | planetoid_map_config.json |
+| `create_bp_poi_placeholders.py` | Creates BP_Shrine_POI, BP_Treasure_POI (Actor) for Day 17 PCG POI. | Standalone | — |
+| `create_planetoid_poi_pcg.py` | Creates Planetoid_POI_PCG graph (Actor Spawner) for planetoid level (Day 17). | Standalone | planetoid_map_config.json |
+| `create_bp_yield_nodes.py` | Creates BP_Cultivation_POI, BP_Mining_POI (AHomeWorldYieldNode) with tags and yield defaults (Day 19). | Standalone | — |
+| `place_dungeon_entrance.py` | With level open: place dungeon entrance placeholder at config position; tag Dungeon_POI (Day 24). | Standalone | dungeon_map_config.json |
+| `place_mass_spawner_demomap.py` | Idempotent: ensure Mass Spawner on DemoMap with MEC_FamilyGatherer config and spawn count (Day 11). | Standalone | demo_map_config.json |
+| `set_mec_representation_mesh.py` | Set Static Mesh (Cube) on MEC_FamilyGatherer representation trait. | Standalone | — |
 
 Tests live in `Content/Python/tests/` (e.g. `test_level_loader.py`, `test_pcg_forest.py`). Run via Editor: Tools > Test Automation.
 

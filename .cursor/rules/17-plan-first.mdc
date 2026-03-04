@@ -23,7 +23,7 @@ When the user says **"make a plan," "create a plan," or "develop a plan,"** use 
 ## What the plan should include
 
 - **Goal:** What we are building or changing (1–2 sentences).
-- **Research/tutorials (for new features):** For new features, the plan should be informed by prior research: Epic/UE docs, best practices, and tutorials (follow tutorials first, then expand; see 07-ai-agent-behavior.mdc).
+- **Research/tutorials (for new features):** For new features, the plan should be informed by prior research using **UE 5.7–specific sources only**: Epic Unreal Engine 5.7 docs and 5.7-targeted tutorials (follow tutorials first, then expand). See 07-ai-agent-behavior.mdc and **ue57-sources.mdc**.
 - **Files/steps:** Key files to create or modify and the order of steps.
 - **Constraints:** Any boundaries from AGENTS.md or KNOWN_ERRORS (e.g. MCP safety, idempotency).
 - **Success:** How we will verify (tests, manual check, or “document why deferred”).

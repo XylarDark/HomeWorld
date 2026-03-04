@@ -98,9 +98,9 @@ def _introspect_nested(settings, prefix="", depth=0, max_depth=2):
             except Exception:
                 value_str = "<cannot repr>"
             results.append((path, type_str, True, value_str))
-            # One level of nesting for structs that might hold tag/selector
-            if depth < 1 and type_str not in ("str", "int", "float", "bool", "NoneType"):
-                if "tag" in name.lower() or "selector" in name.lower() or "filter" in name.lower():
+            # Recurse into structs that might hold tag/selector/mesh (for Get Landscape Data and Spawner)
+            if depth < max_depth and type_str not in ("str", "int", "float", "bool", "NoneType"):
+                if any(x in name.lower() for x in ("tag", "selector", "filter", "mesh", "actor", "component", "entry", "parameter")):
                     try:
                         if val is not None and not isinstance(val, (str, int, float, bool)):
                             sub = _introspect_nested(val, path, depth + 1, max_depth)
@@ -118,7 +118,7 @@ def main():
     lines.append("Run from Unreal Editor. No assets created or saved.")
     lines.append("")
 
-    # Get Landscape Data
+    # Get Landscape Data — full dump for actor selector / tag (no-API automation)
     try:
         cls = getattr(unreal, "PCGGetLandscapeSettings", None)
         if cls is not None:
@@ -127,9 +127,12 @@ def main():
             except Exception:
                 settings = None
             if settings is not None:
-                lines.append("=== PCGGetLandscapeSettings ===")
+                lines.append("=== PCGGetLandscapeSettings (all properties) ===")
                 for name, type_str, readable, value_str in _introspect_settings(settings, "GetLandscape"):
                     lines.append("  %s: type=%s readable=%s value=%s" % (name, type_str, readable, value_str))
+                lines.append("  --- nested (actor/selector/tag) ---")
+                for path, type_str, readable, value_str in _introspect_nested(settings, "GetLandscape", 0, max_depth=3):
+                    lines.append("  %s: type=%s readable=%s value=%s" % (path, type_str, readable, value_str))
                 lines.append("")
             else:
                 lines.append("=== PCGGetLandscapeSettings: could not instantiate ===")
@@ -188,11 +191,11 @@ def main():
         lines.append("=== PCGComponent error: %s ===" % e)
         lines.append("")
 
-    # PCGStaticMeshSpawnerSettings and PCGStaticMeshSpawnerEntry (for mesh list automation)
+    # PCGStaticMeshSpawnerSettings and PCGStaticMeshSpawnerEntry (for mesh list automation) — full dump
     try:
         spawner_cls = getattr(unreal, "PCGStaticMeshSpawnerSettings", None)
         entry_cls = getattr(unreal, "PCGStaticMeshSpawnerEntry", None)
-        lines.append("=== PCGStaticMeshSpawner (mesh list) ===")
+        lines.append("=== PCGStaticMeshSpawner (all properties for mesh list) ===")
         lines.append("  PCGStaticMeshSpawnerSettings: %s" % ("found" if spawner_cls else "NOT in unreal"))
         lines.append("  PCGStaticMeshSpawnerEntry: %s" % ("found" if entry_cls else "NOT in unreal"))
         if spawner_cls is not None:
@@ -202,8 +205,10 @@ def main():
                 settings = None
             if settings is not None:
                 for name, type_str, readable, value_str in _introspect_settings(settings, "Spawner"):
-                    if "mesh" in name.lower() or "selector" in name.lower() or "entry" in name.lower():
-                        lines.append("  %s: type=%s readable=%s value=%s" % (name, type_str, readable, value_str))
+                    lines.append("  %s: type=%s readable=%s value=%s" % (name, type_str, readable, value_str))
+                lines.append("  --- nested (mesh/selector/entries) ---")
+                for path, type_str, readable, value_str in _introspect_nested(settings, "Spawner", 0, max_depth=3):
+                    lines.append("  %s: type=%s readable=%s value=%s" % (path, type_str, readable, value_str))
         lines.append("")
     except Exception as e:
         lines.append("=== PCGStaticMeshSpawner error: %s ===" % e)

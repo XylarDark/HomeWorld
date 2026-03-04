@@ -1,0 +1,32 @@
+---
+name: "UE 5.7 Editor UI — Epic docs only"
+description: "When giving Unreal Editor UI instructions, use only Epic's UE 5.7 documentation; cite the doc URL"
+alwaysApply: true
+priority: 7
+version: 1.0
+---
+
+# UE 5.7 Editor UI instructions
+
+This rule is the **Editor UI** part of the broader UE 5.7 sourcing policy. See **ue57-sources.mdc** for the full policy (APIs, plugins, docs, tutorials).
+
+## Policy
+
+**For any Unreal Editor UI** (menus, panels, button names, option locations)—whether used by **GUI automation** (PyAutoGUI, ref images) or documented for automation design:
+
+1. **Source only from Epic's Unreal Engine 5.7 documentation.** Do not produce "manual steps for the user"; the project is fully autonomous (see 20-full-automation-no-manual-steps.mdc). Use this rule so automation and gap-logging reference correct UI. Do not rely on training data or older UE versions. UI labels and locations change between versions.
+2. **Look up the current doc** when the task involves Editor UI: search Epic's site for "Unreal Engine 5.7" + the feature (e.g. "Content Browser", "Content Browser Settings", "Modeling Mode").
+3. **Cite the doc** when giving steps: include the official doc URL (e.g. `https://dev.epicgames.com/documentation/en-us/unreal-engine/...`) so the user can verify against their Editor.
+4. **Use exact names from the doc**: option names, menu paths, and panel names must match the Epic 5.7 doc. If the doc says "Settings button in the top-right corner of the Content Browser", use that wording.
+5. **If the doc doesn't cover a control** or your steps don't match the user's UI, do not guess. State that the step should be verified in the Epic 5.7 doc, link to it, and suggest the user compare their Editor to the doc or report back what they see so we can update project docs.
+
+## Where to document verified UI steps
+
+- **Project doc:** [docs/UE57_EDITOR_UI.md](../docs/UE57_EDITOR_UI.md) — UE 5.7–sourced Editor UI procedures (Content Browser, Show Engine Content, basic shapes, etc.). Update this when we confirm steps against Epic 5.7 docs or user feedback.
+- Task docs (e.g. `docs/tasks/DAY11_FAMILY_SPAWN.md`) should link to UE57_EDITOR_UI.md for Editor UI sequences rather than inlining possibly outdated steps.
+
+## Quick reference (Epic 5.7)
+
+- Content Browser: https://dev.epicgames.com/documentation/en-us/unreal-engine/content-browser-in-unreal-engine
+- Content Browser Settings (View type, Content toggles, Show Engine Content): https://dev.epicgames.com/documentation/en-us/unreal-engine/content-browser-settings-in-unreal-engine
+- Predefined shapes (Modeling Mode — Box, Sphere, etc.): https://dev.epicgames.com/documentation/en-us/unreal-engine/predefined-shapes-in-unreal-engine

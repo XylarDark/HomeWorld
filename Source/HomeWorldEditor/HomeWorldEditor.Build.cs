@@ -21,6 +21,8 @@ public class HomeWorldEditor : ModuleRules
 			"AssetTools",
 			"AssetRegistry",
 			"MassSpawner",
+			"MassRepresentation",
+			"PCG",
 		});
 	}
 }

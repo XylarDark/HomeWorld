@@ -1,0 +1,34 @@
+---
+name: "Automation gap handling"
+description: "When a task hits a logged automation gap, try programmatic solution first, then GUI automation; update AUTOMATION_GAPS with outcomes."
+alwaysApply: false
+priority: 5
+version: 1.0
+---
+
+# Automation gap handling
+
+When a task corresponds to a **logged automation gap** (see [docs/AUTOMATION_GAPS.md](../../docs/AUTOMATION_GAPS.md)), or when you have just **logged a new gap** in AUTOMATION_GAPS.md: the **Gap-Solver** role is responsible for implementing solutions. Run `.\Tools\Run-GapSolverAgent.ps1` (or the **run-gap-solver** command) on-demand to have the Gap-Solver implement programmatic or GUI-automation solutions and update the docs. See [docs/AGENT_COMPANY.md](../../docs/AGENT_COMPANY.md).
+
+When a task corresponds to a **logged automation gap**:
+
+## 1. Read context
+
+- Read [docs/AUTOMATION_GAPS.md](../../docs/AUTOMATION_GAPS.md) and the "Solution approaches" section.
+- If applicable, read [docs/FULL_AUTOMATION_RESEARCH.md](../../docs/FULL_AUTOMATION_RESEARCH.md) and [docs/PCG_VARIABLES_NO_ACCESS.md](../../docs/PCG_VARIABLES_NO_ACCESS.md).
+
+## 2. Prefer programmatic, then GUI, then document
+
+1. **Programmatic first:** Existing C++/Blueprint reuse, Python API, or commandlet. Try before falling back.
+2. **GUI automation:** Ref-based script in `Content/Python/gui_automation/` (see [pcg_apply_manual_steps.py](../../Content/Python/gui_automation/pcg_apply_manual_steps.py), [state_tree_apply_defend_branch.py](../../Content/Python/gui_automation/state_tree_apply_defend_branch.py)).
+3. **Document only** if neither is viable; do not output "manual steps" for the user — log to AUTOMATION_GAPS with suggested approach.
+
+## 3. Gap-specific guidance
+
+- **Portal / Level Streaming (Gap 1):** Spawn [AHomeWorldDungeonEntrance](../../Source/HomeWorld/HomeWorldDungeonEntrance.h) (or BP) at portal position and set `LevelToOpen` from [planetoid_map_config.json](../../Content/Python/planetoid_map_config.json). Implemented in [place_portal_placeholder.py](../../Content/Python/place_portal_placeholder.py). If Python cannot set the property, document and/or add GUI automation.
+- **PCG no-access steps:** Run or instruct running [pcg_apply_manual_steps.py](../../Content/Python/gui_automation/pcg_apply_manual_steps.py) with Editor focused and refs present; if refs missing, run [capture_pcg_refs.py](../../Content/Python/gui_automation/capture_pcg_refs.py) per [refs/README.md](../../Content/Python/gui_automation/refs/README.md).
+- **State Tree (Gap 2):** No high-level Python API for graph editing. Use [state_tree_apply_defend_branch.py](../../Content/Python/gui_automation/state_tree_apply_defend_branch.py) with refs in [refs/state_tree/](../../Content/Python/gui_automation/refs/state_tree/), or one-time manual per [DAY12_ROLE_PROTECTOR.md](../../docs/tasks/DAY12_ROLE_PROTECTOR.md).
+
+## 4. After implementing or attempting
+
+Update [docs/AUTOMATION_GAPS.md](../../docs/AUTOMATION_GAPS.md) (e.g. add "Solution: …" or "Research: …" and date in the Research log) and/or [docs/GAP_SOLUTIONS_RESEARCH.md](../../docs/GAP_SOLUTIONS_RESEARCH.md).

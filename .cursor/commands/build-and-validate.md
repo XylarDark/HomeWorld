@@ -4,11 +4,9 @@ Compile the project and optionally run PIE validation. Use when verifying C++, p
 
 ## Steps
 
-1. **Close Editor / disable Live Coding**
-   - Building while the Editor is running can fail with "Unable to build while Live Coding is active." Close the Editor or turn off Live Coding before building.
-
-2. **Run the build**
-   - From project root: `Build-HomeWorld.bat`
+1. **Run the build (Editor–build protocol is automatic)**
+   - From project root: **`.\Tools\Safe-Build.ps1`**
+   - Safe-Build closes the Editor if running, runs the build, and retries once if the failure was Editor-related (Live Coding / Exit code 6). No manual close required. See [docs/EDITOR_BUILD_PROTOCOL.md](../docs/EDITOR_BUILD_PROTOCOL.md).
    - Check `Build-HomeWorld.log` for completion (look for "Exit code:" at the end). Non-zero exit = fix compile errors before continuing.
 
 3. **Optional: PIE validation**

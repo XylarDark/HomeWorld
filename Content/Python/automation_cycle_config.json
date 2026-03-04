@@ -1,0 +1,6 @@
+{
+  "tasks": {
+    "1": ["create_demo_from_scratch.py"],
+    "2": "mcp"
+  }
+}

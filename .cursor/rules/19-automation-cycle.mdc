@@ -1,0 +1,68 @@
+---
+name: "Automation cycle"
+description: "When running the automatic development cycle, follow these steps and loop guards so the agent implements, tests, debugs, and finalizes tasks without infinite loops."
+alwaysApply: false
+priority: 8
+version: 1.0
+---
+
+# Automation cycle
+
+When the user has started the **automatic development cycle** (via the start-automation-cycle command or by asking to "Continue" the cycle), follow the steps below. Read [docs/workflow/CYCLE_TASKLIST.md](docs/workflow/CYCLE_TASKLIST.md) and [docs/workflow/CYCLE_STATE.md](docs/workflow/CYCLE_STATE.md) at the start of each iteration; update both as you go.
+
+**30-day "loop until done":** If the user wants the process to run until all 30-day tasks are **implementation-complete**, also read [docs/workflow/30_DAY_IMPLEMENTATION_STATUS.md](docs/workflow/30_DAY_IMPLEMENTATION_STATUS.md). Work on the first day with status `pending` (or `blocked` if resuming with a fix). When you complete or block a day, set its status to `done` or `blocked` in that file. At **session end**, write [docs/workflow/NEXT_SESSION_PROMPT.md](docs/workflow/NEXT_SESSION_PROMPT.md) with the exact prompt to start the next session (so the user or external tooling can paste it and continue). See [docs/AUTOMATION_LOOP_UNTIL_DONE.md](docs/AUTOMATION_LOOP_UNTIL_DONE.md).
+
+---
+
+## Cycle steps (one task per iteration)
+
+For the **current task** (from CYCLE_STATE.current_task_index and CYCLE_TASKLIST):
+
+1. **Implement programmatic work** — Code (C++, Python), scripts. Use MCP when Editor is open; otherwise document what runs when (e.g. run_ue_automation.py after build). **C++ build:** Run **.\Tools\Safe-Build.ps1** (not Build-HomeWorld.bat) so the Editor is closed automatically if running and build is retried on Editor-related failure; see [docs/EDITOR_BUILD_PROTOCOL.md](docs/EDITOR_BUILD_PROTOCOL.md). Follow research-first: read docs/KNOWN_ERRORS.md, DAILY_STATE, SESSION_LOG; for new features use UE 5.7 sources and project docs (see 07-ai-agent-behavior.mdc).
+
+2. **Implement editor work** — MCP execute_python_script, Blueprint/asset steps via MCP; then Python Editor scripts; then **GUI automation** (PyAutoGUI, ref images, Content/Python/gui_automation). Do not produce an "editor checklist for the user." If a step cannot be automated, log to docs/AUTOMATION_GAPS.md (date, feature, what is needed, why not covered, suggested approach), set blocked_reason, and continue. See 20-full-automation-no-manual-steps.mdc.
+
+3. **Perform test** — Run the appropriate test: pie_test_runner.py (MCP) + Saved/pie_test_results.json, or run_ue_automation.py (host), or the **orchestrator** with `--task N` (build → scripts from config → run_ue_automation; see docs/FULL_AUTOMATION_RESEARCH.md §9). One clear pass/fail outcome. Do not rely on a "manual checklist" for the user.
+
+4. **Perform debug** — If test failed: from **first principles** — what exactly failed? (log, assertion, screenshot.) Form a hypothesis; check KNOWN_ERRORS and relevant docs; apply minimal fix and re-test. Record last_error_summary in CYCLE_STATE so the same-failure guard can trigger.
+
+5. **Finalize task** — If test passed: mark task **completed** in CYCLE_TASKLIST; update DAILY_STATE (yesterday/today); append SESSION_LOG; advance current_task_index in CYCLE_STATE; reset retry_count. If using 30-day implementation status, set the completed day to `done` in docs/workflow/30_DAY_IMPLEMENTATION_STATUS.md. Then proceed to next task or report cycle done.
+
+6. **Update rules** — On any failure that is instructive: add or update an entry in docs/KNOWN_ERRORS.md (and optional feature doc). No new rule file unless a recurring pattern justifies it.
+
+---
+
+## Loop guards (avoid infinite loops)
+
+- **Max retries per task:** 3. After 3 failures for the same task, mark the task **blocked** in CYCLE_TASKLIST, set blocked_reason in CYCLE_STATE, and move to the next task (or stop and report).
+
+- **Same-failure guard:** If last_error_summary in CYCLE_STATE is **unchanged** after a retry, count as "no progress." After **2 no-progress** attempts, you must try a **different** approach (research, different strategy, or mark blocked) instead of repeating the same fix.
+
+- **Progress requirement:** Before every retry, state what changed (new hypothesis, new doc, new fix). Do not retry the same change if it already failed.
+
+---
+
+## First-principles and accuracy
+
+- **Before implementing:** Read DAILY_STATE, SESSION_LOG, KNOWN_ERRORS; for new features, research first (UE 5.7, project docs). Use 17-plan-first.mdc for non-trivial work.
+
+- **Before retry:** State what failed, what the hypothesis is, and what minimal change will test it.
+
+- **After failure:** Update CYCLE_STATE (last_error_summary, retry_count); if blocked, set blocked_reason. Do not suggest "manual step X." If the block is due to a step that cannot be automated, log to docs/AUTOMATION_GAPS.md and set blocked_reason to e.g. "automation gap: [brief description]; logged in AUTOMATION_GAPS.md."
+
+---
+
+## Orchestrator (headless vs MCP)
+
+- **When to call:** For automated build + script + test runs without an open Editor session, run `py Content/Python/run_automation_cycle.py --task N` (with UE_EDITOR set). The orchestrator runs build, headless scripts from automation_cycle_config.json (if any), then run_ue_automation.py, and updates CYCLE_STATE.
+- **Headless mode:** Scripts run via `-ExecutePythonScript` (Editor starts and exits per script). Use when the task only needs batch Editor Python (e.g. create_demo_from_scratch.py).
+- **MCP mode:** Use `--launch-and-wait` to start the Editor and wait for port 55557, then the agent uses MCP for Editor work; when done, run with `--close-editor` before the next build (automate; do not assume user closes Editor).
+
+---
+
+## Session end (loop until done)
+
+When the user has asked for the process to **never end until all 30-day tasks are done** (or equivalent):
+
+- At the **end of every session** (before you stop), write **docs/workflow/NEXT_SESSION_PROMPT.md** with the exact prompt the user (or external script) should paste in a **new chat** to continue. The prompt should instruct the next agent to read 30_DAY_IMPLEMENTATION_STATUS, DAILY_STATE, SESSION_LOG; work on the next pending day; update status and state; and write NEXT_SESSION_PROMPT again. So each session hands off to the next via that file.
+- The agent **cannot** start a new Cursor session by itself; something external (user or tooling) must open a new chat and paste the prompt. See docs/AUTOMATION_LOOP_UNTIL_DONE.md for options and external tooling.

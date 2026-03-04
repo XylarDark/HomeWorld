@@ -886,8 +886,8 @@ def try_set_get_landscape_selector(graph_asset):
             settings = node.get_settings() if hasattr(node, "get_settings") else None
             if settings is None or not isinstance(settings, get_landscape_cls):
                 continue
-            # Try common selector/tag property names (engine-specific).
-            for prop in ("tag", "selected_tag", "actor_tag", "filter_tag", "landscape_tag"):
+            # Try common selector/tag property names (engine-specific). Add names from pcg_settings_introspect output if found.
+            for prop in ("tag", "selected_tag", "actor_tag", "filter_tag", "landscape_tag", "actor_filter_tag", "filter_tag_name", "landscape_actor_tag"):
                 try:
                     if hasattr(settings, "set_editor_property"):
                         settings.set_editor_property(prop, PCG_LANDSCAPE_TAG)
@@ -900,7 +900,7 @@ def try_set_get_landscape_selector(graph_asset):
                 try:
                     sub = settings.get_editor_property(prop) if hasattr(settings, "get_editor_property") else getattr(settings, prop, None)
                     if sub is not None and hasattr(sub, "set_editor_property"):
-                        for subprop in ("tag", "selected_tag", "tag_name"):
+                        for subprop in ("tag", "selected_tag", "tag_name", "actor_filter_tag", "filter_tag_name"):
                             try:
                                 sub.set_editor_property(subprop, PCG_LANDSCAPE_TAG)
                                 _log("try_set_get_landscape_selector: Set %s.%s = %s." % (prop, subprop, PCG_LANDSCAPE_TAG))
@@ -924,7 +924,7 @@ def try_set_get_landscape_selector(graph_asset):
                     settings = node.get_settings() if hasattr(node, "get_settings") else None
                     if settings is None or not isinstance(settings, get_landscape_cls):
                         continue
-                    for prop in ("tag", "selected_tag", "actor_tag", "filter_tag", "landscape_tag", "tag_name"):
+                    for prop in ("tag", "selected_tag", "actor_tag", "filter_tag", "landscape_tag", "tag_name", "actor_filter_tag", "filter_tag_name"):
                         try:
                             if hasattr(settings, "set_editor_property"):
                                 settings.set_editor_property(prop, name_val)

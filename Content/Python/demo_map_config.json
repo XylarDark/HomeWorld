@@ -1,5 +1,6 @@
 {
   "demo_level_path": "/Game/HomeWorld/Maps/DemoMap",
+  "template_level_path": null,
   "volume_center_x": 0,
   "volume_center_y": 0,
   "volume_center_z": 0,
@@ -13,9 +14,16 @@
   "skip_exclusion_zones": false,
   "recreate_volume_and_graph": false,
   "use_landscape_bounds": true,
-  "_comment_demo": "Primary demo/playable map for MVP. Create once: File -> New Level -> Empty Open World -> Save As /Game/HomeWorld/Maps/DemoMap. No duplicate from another level.",
+  "_comment_demo": "Primary demo/playable map for MVP. If template_level_path is set (e.g. project-owned Empty Open World at /Game/HomeWorld/Maps/Templates/EmptyOpenWorld), ensure_demo_map creates DemoMap from it when missing; else create once: File -> New Level -> Empty Open World -> Save As.",
+  "_comment_template": "Optional. Set to a level asset path to create DemoMap from template when missing (e.g. save Empty Open World once as /Game/HomeWorld/Maps/Templates/EmptyOpenWorld). Leave null to log manual steps.",
   "_comment_volume": "PCG volume center and half-extents in cm. Set use_landscape_bounds false and volume_center_* / volume_extent_* to match your landscape; see docs/PCG_QUICK_SETUP.md.",
   "_comment_exclusion_zones": "Compound bounds (center + half-extents in cm). Trees will not spawn inside these zones.",
   "resource_node_positions": [{"x": 500, "y": 0, "z": 0}, {"x": -400, "y": 300, "z": 0}, {"x": -200, "y": -450, "z": 0}, {"x": 600, "y": 400, "z": 0}, {"x": 0, "y": 500, "z": 0}, {"x": -500, "y": -200, "z": 0}],
-  "_comment_resource_nodes": "Day 7: positions in cm for place_resource_nodes.py. Spawns BP_HarvestableTree at each."
+  "_comment_resource_nodes": "Day 7: positions in cm for place_resource_nodes.py. Spawns BP_HarvestableTree at each.",
+  "mass_spawner_position": [0, 0, 100],
+  "mass_spawner_spawn_count": 5,
+  "mass_spawner_extent_x": 1000,
+  "mass_spawner_extent_y": 1000,
+  "mass_spawner_extent_z": 200,
+  "_comment_mass_spawner": "T4 / Day 11: place_mass_spawner_demomap.py uses these for Mass Spawner placement and count."
 }

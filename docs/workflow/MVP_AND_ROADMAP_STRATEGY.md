@@ -56,3 +56,4 @@ See [VISION.md](VISION.md) (Demonstrable prototype and vertical slice) and [30_D
 - **Scope:** Don't add features before the Day 5 gate. After gate, add Homestead/Family/Planetoid in schedule order.
 - **Tech decisions:** When in doubt, choose the option that works for **both** MVP and release (e.g. WP bounds for volume, GAS for skills, Mass for family agents). Avoid "MVP-only" hacks that would block or complicate release.
 - **Documentation:** Keep PCG_SETUP, STACK_PLAN, KNOWN_ERRORS, and workflow docs (VISION, 30_DAY_SCHEDULE, DAILY_STATE) updated so the next session or contributor can continue toward MVP and then toward release without re-deciding strategy.
+- **After first 30 days:** Plan the next block using [NEXT_30_DAY_WINDOW.md](NEXT_30_DAY_WINDOW.md) (harden vertical slice, deferred features, Act 2 prep, Steam EA prep).

@@ -22,6 +22,7 @@ public class HomeWorld : ModuleRules
 			"GameplayAbilities",
 			"GameplayTags",
 			"GameplayTasks",
+			"SmartObjectsModule",
 		});
 	}
 }

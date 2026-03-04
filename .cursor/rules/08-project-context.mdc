@@ -25,7 +25,7 @@ HomeWorld is a co-op ARPG survival game with family sim elements, built in Unrea
 - **Programmatic by default**: Maximize C++ and Python; minimize Blueprint logic. Gameplay systems, movement, input, camera, combat, and **abilities** in C++; Blueprint for content and asset assignment only. For abilities: implement in C++ ability classes and reparent GA_* Blueprints to them (no Blueprint graph wiring by default)
 - **MCP-first**: When the Editor is running and MCP is connected, prefer live Editor manipulation via MCP tools
 - **Error recording**: Document errors in `docs/KNOWN_ERRORS.md` so they are not repeated; check it before similar work
-- **Code-first, then Editor**: Automate as much as possible (Python scripts, MCP); manual Editor steps documented in task guides
+- **Full automation**: Automate all Editor/engine steps (Python scripts, MCP, GUI automation). If a step cannot be automated, log to docs/AUTOMATION_GAPS.md for a future session; do not document manual steps for the user. See 20-full-automation-no-manual-steps.mdc.
 - **Idempotent scripts**: All Python setup/automation scripts must check for existing assets/actors before creating new ones; re-runs must be safe and produce the same result (see `00-core-principles.mdc` Idempotency Protocol)
 - **Critical setup on load**: Enhanced Input is applied automatically when the Editor opens via `Content/Python/init_unreal.py`. Do not require users to run `setup_enhanced_input.py` for normal setup—only for troubleshooting if movement fails after load.
 
@@ -46,12 +46,13 @@ HomeWorld is a co-op ARPG survival game with family sim elements, built in Unrea
 - `docs/SETUP.md` - Developer onboarding (Engine, plugins, MCP, rules, Git)
 - `docs/KNOWN_ERRORS.md` - Recorded errors and fixes
 - `docs/MCP_SETUP.md` - MCP bridge installation and troubleshooting
-- `docs/PCG_BEST_PRACTICES.md` - PCG minimal graph, manual steps, Partitioned/Hierarchical; check before changing PCG graphs (see also `pcg-best-practices.mdc`)
+- `docs/PCG_BEST_PRACTICES.md` - PCG minimal graph, automation and GUI automation; check before changing PCG graphs (see also `pcg-best-practices.mdc`). `docs/AUTOMATION_GAPS.md` - logged steps that need an automatic solution (no manual steps).
 
 ## Conventions
 
 - C++ naming: PascalCase types, camelCase locals; Unreal prefixes (A, U, F, E, I)
 - UE 5.7 target: check `unreal-cpp.mdc` API pitfalls table before using deprecated APIs
+- **Unreal-related information:** Use **only UE 5.7–specific sources** (Epic 5.7 docs, docs/UE57_TECH.md, docs/UE57_EDITOR_UI.md, docs/KNOWN_ERRORS.md). Do not rely on training data or other engine versions. See **ue57-sources.mdc**.
 - PowerShell shell: use `;` not `&&` for command chaining
 - Batch files in project root for common operations (build, open VS, run scripts, MCP setup)
 - Debug logs go to `Saved/Logs/` (gitignored)

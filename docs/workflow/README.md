@@ -21,6 +21,8 @@ This folder is the **single place for project ideas and daily workflow**: consol
 | [DAILY_STATE.md](DAILY_STATE.md) | **Yesterday** (last session), **Today** (this day's tasks), **Tomorrow** (preview). Read at session start; updated at session end. |
 | [VISION.md](VISION.md) | Theme, campaign summary, moral system (Seven Sins/Virtues), death/succession, tech summary, scope lock. |
 | [30_DAY_SCHEDULE.md](30_DAY_SCHEDULE.md) | Day-by-day schedule (Act 1 → Homestead → Family → Planetoid → Spirits → Dungeon → buffer). Check off items as you complete them. |
+| [30_DAY_IMPLEMENTATION_STATUS.md](30_DAY_IMPLEMENTATION_STATUS.md) | Which days are implementation-complete (done) vs pending/blocked. Used by the automation loop. |
+| [PROJECT_STATE_AND_TASK_LIST.md](PROJECT_STATE_AND_TASK_LIST.md) | **Project overview and task list** — summary of work done, work not yet completed (T1–T10), and quick reference. Use this for "what to work on next." |
 | [MVP_AND_ROADMAP_STRATEGY.md](MVP_AND_ROADMAP_STRATEGY.md) | How we balance MVP execution (validate loop fast) with long-term readiness (ship on same stack); what to implement for MVP; MVP-first vs release alignment. |
 
 **Current day:** In [DAILY_STATE.md](DAILY_STATE.md) see **Current day** and **Today**. Or open [30_DAY_SCHEDULE.md](30_DAY_SCHEDULE.md) and find the first **Day N** that still has unchecked items.

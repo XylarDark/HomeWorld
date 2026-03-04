@@ -1,0 +1,17 @@
+{
+  "description": "Example Horde job templates for HomeWorld. Import or adapt in Horde Server dashboard.",
+  "templates": [
+    {
+      "name": "HomeWorld-EditorAutomationTests",
+      "description": "Build Win64 and run Editor automation tests (Smoke group)",
+      "steps": [
+        "Checkout project (and LFS)",
+        "RunUAT BuildGraph -Script=Tools/BuildGraph.xml -Project=HomeWorld.uproject -Platform=Win64",
+        "RunUAT with -ExecCmds=\"Automation RunTest Group:Smoke;Quit\" -ReportExportPath=<path>",
+        "Publish test report and build artifacts"
+      ],
+      "agentRequirements": ["Windows", "UE_5.7"],
+      "notes": "Configure in Horde dashboard with actual BuildGraph and project paths; agent needs UE_EDITOR and project root."
+    }
+  ]
+}

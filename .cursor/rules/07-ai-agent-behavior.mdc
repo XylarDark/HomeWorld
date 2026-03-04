@@ -136,7 +136,7 @@ Temporary files created during a session **must be deleted** before the task is 
 
 ## Feature development: research and tutorials first
 
-When developing a **new feature** (new system, new UE subsystem, new plugin use, or significant new capability): (1) **Research first** — look up official docs and Unreal Engine best practices (Epic docs, UE 5.7 reference, docs/KNOWN_ERRORS.md, project docs e.g. PCG_BEST_PRACTICES.md, UE57_TECH.md). (2) **Tutorials first** — follow relevant tutorials (Epic, community, version-specific) before customizing. (3) **Then expand** — extend or adapt only where the project explicitly needs something different. This is policy: research then tutorials then implement then expand. For deep research, recommend /parallel-research or /parallel-extract (see 11-parallel-plugin.mdc) and integrate the result.
+When developing a **new feature** (new system, new UE subsystem, new plugin use, or significant new capability): (1) **Research first** — use **only UE 5.7–specific sources**: Epic Unreal Engine 5.7 docs, docs/KNOWN_ERRORS.md, docs/UE57_TECH.md, docs/UE57_EDITOR_UI.md, and project feature docs (e.g. PCG_BEST_PRACTICES.md). Do not rely on training data or other engine versions. See **ue57-sources.mdc**. (2) **Tutorials first** — follow tutorials that target UE 5.7 (or explicitly match 5.7) before customizing. (3) **Then expand** — extend or adapt only where the project explicitly needs something different. This is policy: research then tutorials then implement then expand. For deep research, recommend /parallel-research or /parallel-extract with "UE 5.7" in the query (see 11-parallel-plugin.mdc) and integrate the result.
 
 ## Debug Mode
 
@@ -155,15 +155,15 @@ For **hard-to-reproduce or subtle bugs** (regressions, race conditions, performa
 Before any MCP call:
 - [ ] `blueprint_name` is a short name, not a full `/Game/` path (crashes Editor otherwise)
 - [ ] `docs/KNOWN_ERRORS.md` checked for the tool + property combination being used
-- [ ] Fallback plan ready (Python script or manual steps) in case MCP cannot resolve the target
+- [ ] Fallback plan ready (Python script or GUI automation, or log to docs/AUTOMATION_GAPS.md) in case MCP cannot resolve the target; do not assume manual steps for the user (see 20-full-automation-no-manual-steps.mdc)
 
 ## AI Agent Checklist
 
 - [ ] **Session log read** — read `docs/SESSION_LOG.md` at task start to load prior context (see Session Continuity)
 - [ ] **Daily state read** — read `docs/workflow/DAILY_STATE.md` at task start so "yesterday" and "today" are available when the user asks
-- [ ] **New feature: research and tutorials first** — when developing a new feature: research Epic/UE docs and best practices for that feature; follow tutorials first, then expand where the project needs differ (see Feature development: research and tutorials first above)
+- [ ] **New feature: research and tutorials first** — when developing a new feature: use **UE 5.7–specific sources only** (Epic 5.7 docs, project docs); see `ue57-sources.mdc` and Feature development above.
 - [ ] **Log-driven validation** — when implementing a feature, include a robust log-driven way to validate it (entry/exit, user-triggered actions, success/fail). The user must not have to prompt for logging to confirm the feature works. See `.cursor/rules/16-feature-debug-instrumentation.mdc`.
-- [ ] **UE 5.7 check** — before C++/Blueprint/PCG or plugin changes: check `unreal-cpp.mdc` pitfalls table and `docs/KNOWN_ERRORS.md`; after engine/plugin upgrade: re-verify automation access (see `automation-standards.mdc` and `docs/UE57_TECH.md`)
+- [ ] **UE 5.7 check** — before C++/Blueprint/PCG or plugin changes: check `unreal-cpp.mdc` pitfalls table and `docs/KNOWN_ERRORS.md`; use UE 5.7 docs for API/UI; after engine/plugin upgrade, re-verify automation access (see `automation-standards.mdc` and `docs/UE57_TECH.md`). For any Unreal-related lookups, use only 5.7 sources per `ue57-sources.mdc`.
 - [ ] **PCG Generate produces nothing** — when the user reports that PCG Generate shows no instances: follow [docs/PCG_SETUP.md](docs/PCG_SETUP.md) "Generate produces nothing (checklist)" and the **pcg-validate** skill (ordered checklist, Output Log, Surface Sampler Debug).
 - [ ] Context gathered before changes
 - [ ] Changes are complete

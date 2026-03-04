@@ -60,7 +60,7 @@ When you run **create_demo_from_scratch.py** with the Editor open and DemoMap lo
 
 | Step | Done by script? | If it fails |
 |------|------------------|-------------|
-| Ensure DemoMap exists | Logs manual steps if missing | File → New Level → Empty Open World → Save As DemoMap |
+| Ensure DemoMap exists | Yes when `template_level_path` in demo_map_config.json is set (creates from template); else logs manual steps | File → New Level → Empty Open World → Save As DemoMap, or set template_level_path and run ensure_demo_map |
 | Open DemoMap level | Yes | Open the level in Editor |
 | Tag Landscape with `PCG_Landscape` | Yes (`ensure_landscape_has_pcg_tag`) | Add tag in Details on Landscape actor |
 | Create/reuse PCG graph (ForestIsland_PCG) | Yes | Create graph per [PCG_MANUAL_SETUP.md](tasks/PCG_MANUAL_SETUP.md) |
@@ -68,7 +68,7 @@ When you run **create_demo_from_scratch.py** with the Editor open and DemoMap lo
 | Apply density (Surface Sampler, Density Filter) and transform/rotation from config | Yes (`update_forest_island_graph_from_config`) | Edit graph nodes in Details |
 | Set Get Landscape Data to By Tag + `PCG_Landscape` | **Tried** (`try_set_get_landscape_selector`: multiple property names + `unreal.Name`) | Set in graph: Get Landscape Data → Details → Actor By Tag, tag `PCG_Landscape`; Component By Class → Landscape Component |
 | Set mesh list on tree/rocks Static Mesh Spawner nodes | **Tried** (`try_set_spawner_mesh_lists`: uses `PCGStaticMeshSpawnerEntry` if present in Python) | Set in graph: each Static Mesh Spawner → Details → Mesh Selector → mesh list from `pcg_forest_config.json` |
-| Assign graph to PCG Volume | **Tried** (`try_assign_graph_to_volume`: `set_graph()` on PCGComponent) | In level: select PCG_Forest → Details → Graph → ForestIsland_PCG |
+| Assign graph to PCG Volume | **Tried** (`try_assign_graph_to_volume`: `set_graph()` on PCGComponent). **Or** run C++ commandlet: `UnrealEditor.exe HomeWorld.uproject <MapPath> -run=HomeWorldEditor.ApplyPCGSetup [GraphPath=/Game/HomeWorld/PCG/ForestIsland_PCG] [Tag=PCG_Landscape] [MeshList=/Game/Path1,...]` (level must be loaded). The commandlet assigns the graph; Tag and MeshList are accepted and logged—setting them on graph nodes requires one-time manual setup or Editor + auto-clicker (see [PCG_VARIABLES_NO_ACCESS.md](PCG_VARIABLES_NO_ACCESS.md)). | In level: select PCG_Forest → Details → Graph → ForestIsland_PCG |
 | Trigger Generate | Yes (`trigger_pcg_generate`) | In level: select PCG_Forest → Details → Generate (or Ctrl+Click) |
 | Save level after Generate | Yes | Save level (Ctrl+S) so instances persist |
 

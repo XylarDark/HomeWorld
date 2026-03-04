@@ -1,0 +1,45 @@
+---
+name: "Full automation — no manual steps"
+description: "Automation runs fully autonomously; do not create or rely on manual steps. Log automation gaps to a file for future solution sessions."
+alwaysApply: true
+priority: 1
+version: 1.0
+---
+
+# Full automation — no manual steps
+
+The project is set up for **fully autonomous** automation. The agent does not assume the user can or will perform manual work during or between sessions. There is no ability to "go in the middle of a session and perform manual work"; the agent must automate or log gaps.
+
+## Policy
+
+1. **Do not create or document "manual steps" for the user.** Do not output "Your step:", "Manual: do X", or task-guide instructions that require the user to perform Editor or CLI actions. The automation loop runs without human intervention.
+
+2. **Automation order.** For any Editor or engine task, use in order:
+   - **MCP** (when Editor is running and connected)
+   - **Python Editor scripts** (Content/Python, run via MCP or commandlet)
+   - **GUI automation** (Editor-driven: PyAutoGUI, screenshots, reference images, click/key sequences) — see `Content/Python/gui_automation/`, `docs/FULL_AUTOMATION_RESEARCH.md` §10
+   - **C++ commandlets** where they can set the required state
+   If none of these can accomplish the task, do **not** fall back to "document the manual step." Instead, log the gap (see below).
+
+3. **When something cannot be automated:** Log it to **`docs/AUTOMATION_GAPS.md`** with enough context for a **future chat session** to design and implement an automatic solution. The user will start dedicated sessions to address entries in that file. Do not leave the resolution as "the user must do X."
+
+4. **Session output.** Do not end a task or session with instructions for the user to perform manual work. If a step could not be automated, append an entry to `docs/AUTOMATION_GAPS.md`, set the task/day to **blocked** (or skip with reason), and in session summary state that the gap was logged for a future automation pass.
+
+## Logging automation gaps
+
+**File:** `docs/AUTOMATION_GAPS.md`
+
+**Per entry, include:**
+- **Date** (YYYY-MM-DD)
+- **Feature / task** (e.g. "Day 11 – Place Mass Spawner on DemoMap", "PCG – assign graph in Details")
+- **What is needed** (one sentence: what would need to happen for the feature to be complete)
+- **Why current automation didn't cover it** (e.g. "No MCP/Python API for adding Mass Spawner to level", "Selector in UI not scriptable")
+- **Suggested approach for future automation** (e.g. "GUI automation: capture ref image for Modes panel, then PyAutoGUI to click Mass Spawner and set config", "Research UE 5.7 Mass Spawner Python API")
+
+Append new entries; do not remove or mark resolved in this file (the user's follow-up sessions will implement fixes and can note resolution elsewhere if desired).
+
+## References
+
+- GUI automation: `Content/Python/gui_automation/`, `docs/FULL_AUTOMATION_RESEARCH.md` (Editor-driven GUI automation)
+- Variables with no API access: `automation-standards.mdc` (now: attempt GUI automation; if still not possible, log to AUTOMATION_GAPS.md)
+- Cycle/blocked: `19-automation-cycle.mdc` (blocked_reason; do not suggest "manual step X")

@@ -66,9 +66,9 @@ If a trait name differs in your UE 5.7 build (e.g. **MassNavigation** instead of
 
 ### 3.1 Create the State Tree asset
 
-1. **Content Browser:** Navigate to **Content → HomeWorld → AI**.
-2. **Right-click** → **AI → State Tree** (or **Artificial Intelligence → State Tree**).
-3. Name it **ST_FamilyGatherer**, save under `/Game/HomeWorld/AI/`. Double-click to open.
+**Option A (script):** Run `Content/Python/create_state_tree_family_gatherer.py` in the Editor (Tools → Execute Python Script or MCP). This creates **ST_FamilyGatherer** in `/Game/HomeWorld/AI/` if missing. Then open it in the Editor and add Selector and states per steps below.
+
+**Option B (manual):** Content Browser → **Content → HomeWorld → AI** → **Right-click** → **AI → State Tree** (or **Artificial Intelligence → State Tree**). Name it **ST_FamilyGatherer**, save under `/Game/HomeWorld/AI/`. Double-click to open.
 
 ### 3.2 Build the decision flow
 
@@ -76,6 +76,7 @@ If a trait name differs in your UE 5.7 build (e.g. **MassNavigation** instead of
 2. Add the following **states** (or **branches**) as children of the Selector, in this order (top = highest priority):
 
    - **Night?** → State that runs **Defend** behavior (e.g. MoveTo enemy). Condition: **IsNight** (from blackboard or EQS).
+   - **Child?** → (Day 14) For **Child** role: **Follow** player or **Idle at safe node**; no combat. Condition: **IsChild** or tag Role_Child. See [DAY14_ROLE_CHILD.md](DAY14_ROLE_CHILD.md).
    - **Hungry?** → State that runs **Gather** (e.g. MoveTo Smart Object farm, play gather anim). Condition: **Hunger > threshold** (e.g. 50).
    - **Idle** → State that runs **Wander** (e.g. MoveTo random point in home bounds).
    - **Sleep** → State that runs **Sleep** at a Smart Object (e.g. bed). Condition can be time or blackboard.

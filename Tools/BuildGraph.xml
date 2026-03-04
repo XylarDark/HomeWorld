@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Minimal BuildGraph for HomeWorld. Includes Engine BuildProject; run with RunUAT BuildGraph -Script=Tools/BuildGraph.xml -Project=HomeWorld.uproject -->
+<Graph xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Include Script="$(EngineDir)/Build/Graph/BuildProject.xml"/>
+</Graph>

@@ -1,0 +1,48 @@
+# CI: build (and optional test/package) for Win64. Requires a self-hosted Windows runner with UE 5.7 installed.
+# Keep validate.yml for fast lint/doc checks on every push; this workflow runs the full build when a runner is available.
+name: CI
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  build-win64:
+    runs-on: [self-hosted, windows, ue57]
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Build (Win64 Development)
+        shell: pwsh
+        run: |
+          $env:UE_ENGINE = $env:UE_ENGINE ?? "C:\Program Files\Epic Games\UE_5.7"
+          if (Test-Path ".\Tools\RunFullBuild.ps1") {
+            .\Tools\RunFullBuild.ps1 -Platform Win64
+          } else {
+            .\Build-HomeWorld.bat
+          }
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Run automation tests (optional)
+        shell: pwsh
+        env:
+          UE_EDITOR: ${{ env.UE_EDITOR }}
+        run: |
+          if ($env:UE_EDITOR -and (Test-Path ".\Tools\RunTests.ps1")) {
+            .\Tools\RunTests.ps1 -Group Smoke
+          } else {
+            Write-Host "Skipping tests (UE_EDITOR not set or RunTests.ps1 missing)"
+          }
+
+      - name: Archive build log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: Build-HomeWorld.log

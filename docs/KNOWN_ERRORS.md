@@ -55,6 +55,18 @@ For each entry use:
 - **Fix:** Replace `CompressImageArray` with `PNGCompressImageArray` and change `TArray<uint8>` to `TArray64<uint8>`.
 - **Context:** 2026-02, UnrealMCP plugin build, UE 5.7 migration.
 
+### PowerShell: Get-Content -Tail and -Raw cannot be used together
+- **Error:** `The 'Raw' and 'Tail' parameters cannot be specified in the same command` when running Run-RefinerAgent.ps1.
+- **Cause:** Get-Content does not allow -Raw (return whole file as one string) and -Tail (return last N lines) in the same call.
+- **Fix:** Use Get-Content -Tail N only, then join lines: `$lines = Get-Content -Path $Path -Tail 60; $text = $lines -join "`n"`.
+- **Context:** 2026-03-03, Tools/Run-RefinerAgent.ps1.
+
+### C++: GameplayStatics include path (UE 5.7)
+- **Error:** `fatal error C1083: Cannot open include file: 'GameFramework/GameplayStatics.h': No such file or directory` when building HomeWorldDungeonEntrance.cpp.
+- **Cause:** UGameplayStatics lives in the Kismet module; the correct include is Kismet/GameplayStatics.h, not GameFramework/GameplayStatics.h.
+- **Fix:** Use `#include "Kismet/GameplayStatics.h"`.
+- **Context:** 2026-03-03, T5 Dungeon entrance (OpenLevel).
+
 ### UnrealMCP plugin: BufferSize name collision in UE 5.7
 - **Error:** `error C4459: declaration of 'BufferSize' hides global declaration` in MCPServerRunnable.cpp (treated as error in UE 5.7).
 - **Cause:** Global `const int32 BufferSize = 8192` in plugin code shadows a local in UE's `StringConv.h` header.
@@ -67,6 +79,12 @@ For each entry use:
 - **Fix:** Replace `FPaths::IsRelativePath(...)` with `FPaths::IsRelative(...)`.
 - **Context:** 2026-02, UnrealMCP plugin build, UE 5.7 migration.
 
+### RunAutomationLoop: prompt becomes "---" when NEXT_SESSION_PROMPT has only one fence
+- **Error:** Developer agent exits in 0m with exit code 1; automation_loop.log shows `prompt preview: ---`.
+- **Cause:** Get-PromptText in RunAutomationLoop.ps1 expected content *between* two "---" fences. When NEXT_SESSION_PROMPT.md has only one "---", `-split "---", 3` yields two parts, so the "middle block" branch was skipped. The fallback then took the first line that doesn't start with `#` or `**`, which is the line "---" itself, so the agent received the prompt "---" and exited immediately.
+- **Fix:** In Get-PromptText: (1) Use content after the first "---" (parts[1]) when parts.Count -ge 2 and parts[1] is non-empty and not literally "---". (2) In the fallback, exclude the line "---" so it is never returned as the prompt.
+- **Context:** 2026-03-03, Watch-AutomationAndFix; Fixer round. Tools/RunAutomationLoop.ps1.
+
 ### MCP set_blueprint_property: full asset path causes Editor crash
 - **Error:** Fatal error: `Attempted to create a package with name containing double slashes. PackageName: /Game/Blueprints//Game/HomeWorld/GameMode/BP_GameMode` — Editor crashes.
 - **Cause:** `FindBlueprintByName` in UnrealMCPCommonUtils.cpp prepends `/Game/Blueprints/` to the blueprint_name argument. Passing a full path like `/Game/HomeWorld/GameMode/BP_GameMode` creates the invalid double-slash path.
@@ -78,6 +96,12 @@ For each entry use:
 - **Cause:** The MCP plugin's property lookup does not resolve C++ `UPROPERTY` names inherited from the parent class. It likely only finds properties defined directly in the Blueprint.
 - **Fix:** Use Python Editor scripts (`setup_character_blueprint.py`) to set inherited properties via `set_editor_property()` on the Blueprint's default object. MCP cannot be used for this.
 - **Context:** 2026-02, MCP runtime, BP_HomeWorldCharacter.
+
+### SO_WallBuilder: Slot at index N needs to provide a behavior definition
+- **Error:** Content validation reports: `/Game/HomeWorld/Building/SO_WallBuilder Slot at index 0 needs to provide a behavior definition since there is no default one in the SmartObject definition` (and index 1).
+- **Cause:** The Smart Object definition has slots but no **Default Behavior Definitions**. Each slot must have a behavior (either from the slot or from the definition’s default).
+- **Fix (non-experimental, no Gameplay Behavior Smart Objects plugin):** Run `Content/Python/create_so_wall_builder.py` in the Editor (Tools → Execute Python Script or MCP). The script creates **DA_SO_WallBuilder_Behavior** and assigns it to SO_WallBuilder’s **Default Behavior Definitions**, so validation passes. You do not need to create the behavior asset manually: **USmartObjectBehaviorDefinition** inherits from **UObject** (not UDataAsset), so the class does not appear in the Editor’s “Data Asset” creation menu; the script creates it via the asset tools API. If the script reports “HomeWorldSmartObjectBehaviorDefinition not found”, build the project and restart the Editor. For full build behavior later, extend the C++ class or add logic that uses the Smart Object.
+- **Context:** Day 10 SO_WallBuilder. We avoid the experimental “Gameplay Behavior Smart Objects” plugin by using a minimal C++ subclass of `USmartObjectBehaviorDefinition` in the HomeWorld module.
 
 ### PCG: rocks spawn on top of trees (same positions)
 - **Error:** In ForestIsland_PCG with both tree and rocks branches, rocks appear only at the base of each tree; no rocks elsewhere on the ground.
@@ -164,9 +188,9 @@ For each entry use:
 - **Context:** 2026-02, stack plan, Week 2 family agents.
 
 ### Build HomeWorldEditor (CreateMEC commandlet) fails: Live Coding active
-- **Error:** `Unable to build while Live Coding is active. Exit the editor and game...`
+- **Error:** `Unable to build while Live Coding is active. Exit the editor and game...` (or Exit code: 6 in Build-HomeWorld.log)
 - **Cause:** Building the Editor target (HomeWorldEditor module) while the Unreal Editor is running triggers Live Coding checks and blocks the build.
-- **Fix:** Close the Unreal Editor (and any PIE session), then run `Build-HomeWorld.bat`. To run the CreateMEC commandlet, use the engine executable with `-run=HomeWorldEditor.CreateMEC` (Editor must not be running for that too). See docs/ALTERNATIVE_AUTOMATION_OPTIONS.md.
+- **Fix (automatic):** Use **`.\Tools\Safe-Build.ps1`** instead of `Build-HomeWorld.bat`; it closes the Editor if running and retries once on Editor-related failure. Or run `py Content/Python/run_automation_cycle.py` (without `--no-build`), which applies the same protocol. See docs/EDITOR_BUILD_PROTOCOL.md.
 - **Context:** 2026-02, HomeWorldEditor module, CreateMEC commandlet.
 
 ### FAssetRegistryModule::Get() is not static in UE 5.7
@@ -222,3 +246,9 @@ For each entry use:
 - **Cause:** The Python API does not expose Get Landscape Data's Actor/Component selector (By Tag, tag name, By Class) or the PCG Volume's graph assignment in a way that can be set reliably. The script therefore only tags the Landscape and creates/sizes the PCG Volume.
 - **Fix:** Create (or copy from a reference project) a PCG graph, set Get Landscape Data to **By Tag** + **`PCG_Landscape`**, assign the graph to the PCG Volume in Details, and click **Generate**. See **docs/PCG_SETUP.md** for the full checklist and references.
 - **Context:** 2026-02, PCG Fundamental Redo; script reduced to tag + volume only. See also **docs/PCG_VARIABLES_NO_ACCESS.md** for all variables with no (or unreliable) access.
+
+### MEC (Mass Entity Config): no trait in dropdown exposes Static Mesh
+- **Error:** The MEC Traits **Add** dropdown does not show a trait that has **Static Mesh** or **Mesh**; family agents spawn with no visible mesh.
+- **Cause:** The representation trait lives in the **MassRepresentation** module (part of MassGameplay). The HomeWorldEditor module did not depend on MassRepresentation, so `StaticLoadClass` for `MassRepresentationFragmentTrait` failed and the commandlet could not add the trait. The Editor MEC trait picker may also not list it if the module was not loaded.
+- **Fix:** Add **MassRepresentation** to `PrivateDependencyModuleNames` in [Source/HomeWorldEditor/HomeWorldEditor.Build.cs](Source/HomeWorldEditor/HomeWorldEditor.Build.cs). Rebuild with `Build-HomeWorld.bat` (Editor closed). Run the CreateMEC commandlet: `UnrealEditor.exe HomeWorld.uproject -run=HomeWorldEditor.CreateMEC [Path=/Game/HomeWorld/Mass/MEC_FamilyGatherer]`. Open **MEC_FamilyGatherer** in the Editor; the representation trait should now be present. Set **Static Mesh** and **Scale** (1.0) in Details. For finding a cube/placeholder mesh in UE 5.7, use **only** Epic 5.7–sourced steps: see [UE57_EDITOR_UI.md](UE57_EDITOR_UI.md) (Show Engine Content, then browse or search). Save. See [DAY11_FAMILY_SPAWN.md](tasks/DAY11_FAMILY_SPAWN.md) Step 2.
+- **Context:** 2026-03, MEC_FamilyGatherer, family agent visualization.

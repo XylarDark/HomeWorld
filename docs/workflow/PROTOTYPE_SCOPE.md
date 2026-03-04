@@ -8,8 +8,8 @@ Scoping document for the 30-day demonstrable prototype. Update when you lock the
 
 - **Gameplay loop:** Explore → fight → build (solo, 2–3h). Context: family taken; lone wanderer secures a base for the rescue.
 - **Creative pillars:** Love as Epic Quest; combat + bonds; roles (casual vs hardcore).
-- **Chosen moment:** *(TBD – e.g. "Claiming the homestead after the first boss" or "First family member returns / rescued" at home.)*
-- **Chosen corner:** *(TBD – e.g. Homestead compound with placed assets + resource nodes, or one Planetoid POI.)*
+- **Chosen moment:** **Locked: Claim homestead** — player places first home asset (P) after exploring/harvesting. (Alternatives for future: First harvest, Dungeon approach, Planetoid POI. See [VERTICAL_SLICE_CHECKLIST.md](VERTICAL_SLICE_CHECKLIST.md).)
+- **Chosen corner:** **Locked: Homestead compound** — DemoMap/Homestead with placed buildings + resource nodes + PCG. (Alternatives: Forest approach, Planetoid POI cluster, Dungeon entrance. See [VERTICAL_SLICE_CHECKLIST.md](VERTICAL_SLICE_CHECKLIST.md).)
 
 ---
 

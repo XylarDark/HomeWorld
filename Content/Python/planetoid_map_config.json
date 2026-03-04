@@ -1,0 +1,15 @@
+{
+  "planetoid_level_path": "/Game/HomeWorld/Maps/Planetoid_Pride",
+  "template_level_path": null,
+  "portal_position": [800, 0, 100],
+  "portal_placeholder_label": "Portal_To_Planetoid",
+  "portal_level_to_open": "Planetoid_Pride",
+  "_comment_planetoid": "Day 16: planetoid level path. If template_level_path is set, ensure_planetoid_level.py creates Planetoid_Pride from it when missing.",
+  "_comment_portal": "Position [x,y,z] in cm on DemoMap for portal placeholder; place_portal_placeholder.py uses this.",
+  "poi_points_per_squared_meter": 0.002,
+  "poi_actor_blueprint_path": "/Game/HomeWorld/BP_Shrine_POI",
+  "_comment_poi": "Day 17: POI density for create_planetoid_poi_pcg.py; optional poi_actor_blueprint_path for Actor Spawner template.",
+  "volume_center_x": 0, "volume_center_y": 0, "volume_center_z": 0,
+  "volume_extent_x": 5000, "volume_extent_y": 5000, "volume_extent_z": 500,
+  "_comment_volume": "Optional: PCG volume center and half-extents (cm) for setup_planetoid_pcg.py when use_landscape_bounds is false."
+}

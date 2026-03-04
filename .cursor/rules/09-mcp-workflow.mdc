@@ -1,6 +1,6 @@
 ---
 name: "MCP-First Workflow"
-description: "Use MCP tools first when the Unreal Editor is running to automate Editor tasks and avoid manual steps"
+description: "Use MCP first, then Python/GUI automation; never document manual steps for the user. Log automation gaps to docs/AUTOMATION_GAPS.md."
 alwaysApply: true
 priority: 10
 version: 1.0
@@ -22,13 +22,14 @@ When the Unreal Editor is running and MCP tools (unrealMCP) are connected:
 |----------|--------|-------------|
 | 1 | MCP tools (live Editor) | Any Editor manipulation when connected |
 | 2 | Python Editor scripts | Batch/repeatable operations; offline-capable workflows |
-| 3 | Manual Editor instructions | Only when MCP and Python cannot accomplish the task (e.g. AnimGraph editing) |
+| 3 | GUI automation (PyAutoGUI, ref images, screenshots) | Editor-driven automation when MCP/Python have no API (see Content/Python/gui_automation, docs/FULL_AUTOMATION_RESEARCH.md §10) |
+| 4 | Log to docs/AUTOMATION_GAPS.md | When no automation (MCP, Python, GUI) can accomplish the task; do not output "manual steps" for the user (see 20-full-automation-no-manual-steps.mdc) |
 
 ## When MCP is unavailable
 
 If MCP tools are not listed or connection fails (Editor closed, plugin not loaded):
-- Fall back to Python Editor scripts or manual step-by-step instructions.
-- Do not block on MCP; proceed with the next-best approach.
+- Fall back to Python Editor scripts or GUI automation (if Editor can be driven another way). Do not produce "manual step-by-step instructions" for the user.
+- If a step cannot be automated, log it to docs/AUTOMATION_GAPS.md and set task/day to blocked. See 20-full-automation-no-manual-steps.mdc.
 
 ## Editor startup scripts
 

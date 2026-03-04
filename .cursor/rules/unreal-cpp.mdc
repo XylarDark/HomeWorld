@@ -20,6 +20,8 @@ version: 1.0
 
 ## UE 5.7 API pitfalls
 
+For all Unreal-related lookups (APIs, UI, plugins), use **only UE 5.7–specific sources**; see **ue57-sources.mdc**.
+
 These APIs changed or were removed in UE 5.7. Check `docs/KNOWN_ERRORS.md` for the full list.
 
 | Removed / Deprecated | Replacement |

@@ -415,25 +415,50 @@ bool AHomeWorldCharacter::TryHarvestInFront()
 		return false;
 	}
 	AHomeWorldResourcePile* Pile = Cast<AHomeWorldResourcePile>(Hit.GetActor());
-	if (!Pile)
+	if (Pile)
 	{
-		return false;
+		UGameInstance* GI = World->GetGameInstance();
+		if (!GI)
+		{
+			return false;
+		}
+		UHomeWorldInventorySubsystem* Inv = GI->GetSubsystem<UHomeWorldInventorySubsystem>();
+		if (!Inv)
+		{
+			return false;
+		}
+		const FName ResourceType = Pile->ResourceType;
+		const int32 Amount = Pile->AmountPerHarvest;
+		Inv->AddResource(ResourceType, Amount);
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: Harvest succeeded - %s +%d"), *ResourceType.ToString(), Amount);
+		return true;
 	}
-	UGameInstance* GI = World->GetGameInstance();
-	if (!GI)
+
+	// Day 18: Treasure POI (tag Treasure_POI) — grant resources and remove actor
+	AActor* HitActor = Hit.GetActor();
+	if (HitActor && HitActor->ActorHasTag(FName("Treasure_POI")))
 	{
-		return false;
+		UGameInstance* GI = World->GetGameInstance();
+		if (GI)
+		{
+			if (UHomeWorldInventorySubsystem* Inv = GI->GetSubsystem<UHomeWorldInventorySubsystem>())
+			{
+				Inv->AddResource(FName("Wood"), 25);
+				UE_LOG(LogTemp, Log, TEXT("HomeWorld: Treasure opened - Wood +25"));
+			}
+		}
+		HitActor->Destroy();
+		return true;
 	}
-	UHomeWorldInventorySubsystem* Inv = GI->GetSubsystem<UHomeWorldInventorySubsystem>();
-	if (!Inv)
+
+	// Day 18: Shrine POI (tag Shrine_POI) — placeholder (future: GAS buff)
+	if (HitActor && HitActor->ActorHasTag(FName("Shrine_POI")))
 	{
-		return false;
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: Shrine activated (placeholder)"));
+		return true;
 	}
-	const FName ResourceType = Pile->ResourceType;
-	const int32 Amount = Pile->AmountPerHarvest;
-	Inv->AddResource(ResourceType, Amount);
-	UE_LOG(LogTemp, Log, TEXT("HomeWorld: Harvest succeeded - %s +%d"), *ResourceType.ToString(), Amount);
-	return true;
+
+	return false;
 }
 
 void AHomeWorldCharacter::Move(const FInputActionValue& Value)

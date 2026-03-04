@@ -1,0 +1,36 @@
+---
+name: "UE 5.7 — Always use 5.7-specific sources"
+description: "For any Unreal Engine API, UI, plugin, or documentation: use only UE 5.7–specific sources; do not rely on training data or other engine versions"
+alwaysApply: true
+priority: 6
+version: 1.0
+---
+
+# UE 5.7 sourcing policy
+
+## Rule
+
+**Whenever you need or give information about Unreal Engine** (APIs, Editor UI, plugins, Blueprint, Python Editor API, behavior, or setup):
+
+1. **Use only UE 5.7–specific sources.** Do not rely on training data or documentation for other engine versions. APIs, UI labels, menu paths, and plugin behavior change between versions.
+2. **Prefer in order:**
+   - **Epic Unreal Engine 5.7 documentation:** https://dev.epicgames.com/documentation/en-us/unreal-engine/ (filter or search for "Unreal Engine 5.7").
+   - **Project docs:** `docs/UE57_TECH.md`, `docs/UE57_EDITOR_UI.md`, `docs/KNOWN_ERRORS.md`, and feature docs (e.g. `docs/PCG_SETUP.md`, `docs/PCG_VARIABLES_NO_ACCESS.md`).
+   - **Project rules:** `unreal-cpp.mdc` (pitfalls table), `ue57-editor-ui.mdc` (Editor UI), `12-python.mdc` (Python API table).
+3. **When looking something up:** Use web search or `/parallel-search` with **"Unreal Engine 5.7"** (or "UE 5.7") in the query so results are version-relevant. For a specific Epic page, use `/parallel-extract` with the doc URL.
+4. **When giving instructions:** Cite the Epic 5.7 doc URL when the steps come from it (e.g. Editor UI, menu names). Use exact option/menu/API names from the 5.7 doc. If the doc does not cover something or the user's Editor differs, do not guess—link to the doc and ask the user to compare or report what they see.
+5. **Tutorials and third-party content:** Prefer tutorials and guides that explicitly target **UE 5.7** (or 5.6/5.5 if 5.7 is scarce); treat older versions as possibly outdated and cross-check with Epic 5.7 docs.
+
+## Applies to
+
+- **C++ and Blueprint APIs** — use Epic 5.7 API reference and `unreal-cpp.mdc` / `docs/KNOWN_ERRORS.md`.
+- **Editor UI** (menus, panels, buttons, Content Browser, Settings) — use Epic 5.7 docs and `docs/UE57_EDITOR_UI.md`; see `ue57-editor-ui.mdc`.
+- **Python Editor API** — use 5.7 Python API and `12-python.mdc` (UE 5.7 table); see `docs/KNOWN_ERRORS.md` for signature changes.
+- **Plugins** (PCG, GAS, Mass, State Tree, etc.) — use Epic 5.7 plugin docs and project docs (e.g. `PCG_SETUP.md`, `PCG_VARIABLES_NO_ACCESS.md`).
+- **Automation and “no access”** — when identifying required settings or variables, use Epic 5.7 docs (or version-explicit sources); see `automation-standards.mdc`.
+
+## Quick reference
+
+- **Epic UE 5.7 docs root:** https://dev.epicgames.com/documentation/en-us/unreal-engine/
+- **Project UE 5.7 entry:** `docs/UE57_TECH.md`
+- **Editor UI procedures:** `docs/UE57_EDITOR_UI.md`, `.cursor/rules/ue57-editor-ui.mdc`

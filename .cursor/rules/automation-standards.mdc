@@ -10,19 +10,19 @@ version: 1.0
 
 ## Variables with no access (automation)
 
-When programming automation that drives or configures **Editor or engine features** (Python Editor scripts, MCP-driven workflows, commandlets, etc.), follow this procedure so required-but-inaccessible variables are documented and manual steps are explicit.
+When programming automation that drives or configures **Editor or engine features** (Python Editor scripts, MCP-driven workflows, commandlets, GUI automation), follow this procedure. The project is **fully autonomous**; do not document "manual steps" for the user. See **20-full-automation-no-manual-steps.mdc**.
 
 1. **Identify required variables/settings**  
-   From official docs, tutorials, and reference projects: list every setting or variable that is **necessary** for the feature to work (e.g. "set in Details," "configure in the node," "assign in the panel"). Use multiple sources (Epic docs, community tutorials, version-specific guides).
+   Use **Epic Unreal Engine 5.7 documentation** (or version-explicit sources that match 5.7) to list every setting or variable necessary for the feature (e.g. "set in Details," "configure in the node," "assign in the panel"). Do not rely on training data or other engine versions. See **ue57-sources.mdc**.
 
 2. **Check access from our automation**  
-   For each required variable/setting, verify whether it can be **set (or read) reliably** from our automation (Python API, MCP tools, Blueprint/C++). Use API docs, introspection (e.g. property listing, one-off tests). "Reliably" includes correct property names, no protected/read-only members, and stable behavior across relevant minor engine versions.
+   For each required variable/setting, verify whether it can be **set (or read) reliably** from: MCP, Python Editor API, **GUI automation** (PyAutoGUI, screenshots, reference images — see `Content/Python/gui_automation/`, `docs/FULL_AUTOMATION_RESEARCH.md` §10), or C++ commandlets. Use API docs, introspection, and existing GUI automation patterns. "Reliably" includes correct property names, no protected/read-only members, and stable behavior across relevant minor engine versions.
 
-3. **Document "no access" and manual steps**  
-   - **No (or unreliable) access:** Record in a feature-specific doc (e.g. `docs/PCG_VARIABLES_NO_ACCESS.md`) or in `docs/KNOWN_ERRORS.md`: variable/setting name, why it is necessary, that automation cannot set it (and why, if known), and the **manual step** the user must perform. Link from setup/runbooks to this record.  
-   - **Manual steps:** In any "how to run" or "setup" doc, explicitly list which steps **only the user** can do because of no access (e.g. "Assign the graph in Details; script cannot set it").
+3. **When automation cannot set a required value**  
+   - **Try GUI automation** (Editor-driven: capture refs, PyAutoGUI, click/type) before concluding "no access."  
+   - **If still no access:** Do **not** document a manual step for the user. Instead, **log an entry to `docs/AUTOMATION_GAPS.md`** (date, feature/task, what is needed, why automation didn't cover it, suggested approach for future automation). Optionally record the variable/setting in a feature-specific doc (e.g. `docs/PCG_VARIABLES_NO_ACCESS.md`) for technical reference, but the resolution path is automation or log-gap, not "user must do X."
 
 4. **Re-check on engine/API upgrades**  
-   When upgrading the engine or a plugin (e.g. UE 5.7 → 5.8, or UnrealMCP update), re-run the access check for affected features and update the "no access" doc and KNOWN_ERRORS so we do not assume old limitations remain or that previously working properties still exist.
+   When upgrading the engine or a plugin (e.g. UE 5.7 → 5.8, or UnrealMCP update), re-run the access check for affected features and update AUTOMATION_GAPS and KNOWN_ERRORS so we do not assume old limitations remain or that previously working properties still exist.
 
-**Worked example:** PCG — see `docs/PCG_VARIABLES_NO_ACCESS.md` for the list of required settings that automation cannot set (Get Landscape Data actor/component selector, PCG Volume graph assignment, Static Mesh Spawner mesh entries, etc.) and `docs/PCG_SETUP.md` for the manual steps.
+**Worked example:** PCG — use Python/MCP where possible; use GUI automation (e.g. `pcg_apply_manual_steps.py`, reference images) where the API does not expose a setting. If a step still cannot be automated, append to `docs/AUTOMATION_GAPS.md` with a suggested approach (e.g. new ref image, different UI flow) for a future session to implement.

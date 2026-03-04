@@ -1,0 +1,5 @@
+{
+  "dungeon_entrance_position": [-800, 0, 100],
+  "dungeon_level_name": "Dungeon_Interior",
+  "_comment": "Day 24: position for place_dungeon_entrance.py; dungeon_level_name used by BP_DungeonEntrance Level To Open (map asset name, e.g. for /Game/HomeWorld/Maps/Dungeon_Interior)."
+}

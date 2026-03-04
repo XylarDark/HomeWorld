@@ -106,7 +106,7 @@ Days are ordinal (Day 1, Day 2, …), not calendar dates. Start anytime and resu
 
 **Homestead Phase 1 — Resource nodes**
 
-- [ ] **[1.2] Resource nodes (trees as resource object)** — Place harvestable tree nodes on DemoMap. Create BP_HarvestableTree (AHomeWorldResourcePile + tree mesh), then run place_resource_nodes.py or place manually. See [DAY7_RESOURCE_NODES.md](../tasks/DAY7_RESOURCE_NODES.md) and [AGENTIC_BUILDING.md](../tasks/AGENTIC_BUILDING.md) (BP_WoodPile, SO).
+- [x] **[1.2] Resource nodes (trees as resource object)** — Place harvestable tree nodes on DemoMap. Run create_bp_harvestable_tree.py then place_resource_nodes.py (or create BP manually and place). See [DAY7_RESOURCE_NODES.md](../tasks/DAY7_RESOURCE_NODES.md) and [AGENTIC_BUILDING.md](../tasks/AGENTIC_BUILDING.md) (BP_WoodPile, SO).
 
 ---
 
@@ -130,7 +130,7 @@ Days are ordinal (Day 1, Day 2, …), not calendar dates. Start anytime and resu
 
 **Homestead Phase 1 — Optional agentic building**
 
-- [ ] **[1.5] Optional: agentic building** — Family agents fulfill build orders (SO_WallBuilder, State Tree BUILD). See [AGENTIC_BUILDING.md](../tasks/AGENTIC_BUILDING.md). Can be done after Phase 2. **Prep done:** [DAY10_AGENTIC_BUILDING.md](../tasks/DAY10_AGENTIC_BUILDING.md), `Content/Python/create_bp_build_order_wall.py` (run in Editor to create BP_BuildOrder_Wall and set PlaceActorClass); full implementation deferred to after Phase 2.
+- [x] **[1.5] Optional: agentic building** — Prep done (BP_BuildOrder_Wall, create_so_wall_builder); full agentic building deferred to after Phase 2. See [DAY10_AGENTIC_BUILDING.md](../tasks/DAY10_AGENTIC_BUILDING.md), [AGENTIC_BUILDING.md](../tasks/AGENTIC_BUILDING.md).
 
 ---
 
@@ -138,7 +138,7 @@ Days are ordinal (Day 1, Day 2, …), not calendar dates. Start anytime and resu
 
 **Family Phase 2 — Spawn**
 
-- [ ] **[2.1] Family spawn in homestead** — Spawn N family members at start; tag or role ID per member. See [DAY11_FAMILY_SPAWN.md](../tasks/DAY11_FAMILY_SPAWN.md) and [FAMILY_AGENTS_MASS_STATETREE.md](../tasks/FAMILY_AGENTS_MASS_STATETREE.md). Task doc: MEC_FamilyGatherer, ST_FamilyGatherer, Mass Spawner on DemoMap; tag/role ID options for Day 15.
+- [x] **[2.1] Family spawn in homestead** — Run create_mec_family_gatherer.py, create ST_FamilyGatherer in Editor, link_state_tree_to_mec.py, place Mass Spawner on DemoMap. See [DAY11_FAMILY_SPAWN.md](../tasks/DAY11_FAMILY_SPAWN.md), [FAMILY_AGENTS_MASS_STATETREE.md](../tasks/FAMILY_AGENTS_MASS_STATETREE.md).
 
 ---
 
@@ -146,7 +146,7 @@ Days are ordinal (Day 1, Day 2, …), not calendar dates. Start anytime and resu
 
 **Family Phase 2 — Protector**
 
-- [ ] **[2.2] Role: Attack/Defend (Protector)** — State Tree/combat behavior; GAS combat abilities. See [FAMILY_AGENTS_MASS_STATETREE.md](../tasks/FAMILY_AGENTS_MASS_STATETREE.md).
+- [x] **[2.2] Role: Attack/Defend (Protector)** — State Tree/combat behavior; GAS combat abilities. See [DAY12_ROLE_PROTECTOR.md](../tasks/DAY12_ROLE_PROTECTOR.md) and [FAMILY_AGENTS_MASS_STATETREE.md](../tasks/FAMILY_AGENTS_MASS_STATETREE.md).
 
 ---
 
@@ -154,7 +154,7 @@ Days are ordinal (Day 1, Day 2, …), not calendar dates. Start anytime and resu
 
 **Family Phase 2 — Healer**
 
-- [ ] **[2.3] Role: Support/Healer** — Behavior that prioritizes healing/buffing; GAS heal ability. See [FAMILY_AGENTS_MASS_STATETREE.md](../tasks/FAMILY_AGENTS_MASS_STATETREE.md).
+- [x] **[2.3] Role: Support/Healer** — C++ UHomeWorldHealAbility; run create_ga_heal.py for GA_Heal. See [DAY13_ROLE_HEALER.md](../tasks/DAY13_ROLE_HEALER.md), [FAMILY_AGENTS_MASS_STATETREE.md](../tasks/FAMILY_AGENTS_MASS_STATETREE.md).
 
 ---
 
@@ -162,7 +162,7 @@ Days are ordinal (Day 1, Day 2, …), not calendar dates. Start anytime and resu
 
 **Family Phase 2 — Child**
 
-- [ ] **[2.4] Role: Child** — Non-combat or limited combat; follow player, safe nodes. See [FAMILY_AGENTS_MASS_STATETREE.md](../tasks/FAMILY_AGENTS_MASS_STATETREE.md).
+- [x] **[2.4] Role: Child** — Non-combat; follow player, safe nodes. See [DAY14_ROLE_CHILD.md](../tasks/DAY14_ROLE_CHILD.md), [FAMILY_AGENTS_MASS_STATETREE.md](../tasks/FAMILY_AGENTS_MASS_STATETREE.md).
 
 ---
 
@@ -170,7 +170,7 @@ Days are ordinal (Day 1, Day 2, …), not calendar dates. Start anytime and resu
 
 **Family Phase 2 — Persistence**
 
-- [ ] **[2.5] Role assignment and persistence** — Store role per family member (GameState/SaveGame/subsystem). See [FAMILY_AGENTS_MASS_STATETREE.md](../tasks/FAMILY_AGENTS_MASS_STATETREE.md).
+- [x] **[2.5] Role assignment and persistence** — Store role per family member (tag/fragment or subsystem). See [DAY15_ROLE_PERSISTENCE.md](../tasks/DAY15_ROLE_PERSISTENCE.md), [FAMILY_AGENTS_MASS_STATETREE.md](../tasks/FAMILY_AGENTS_MASS_STATETREE.md).
 
 ---
 
@@ -178,7 +178,7 @@ Days are ordinal (Day 1, Day 2, …), not calendar dates. Start anytime and resu
 
 **Planetoid Phase 3 — Level**
 
-- [ ] **[3.1] Planetoid level / sublevel** — Create one planetoid level; travel from homestead via portal or sublevel. See [PLANETOID_DESIGN.md](../PLANETOID_DESIGN.md).
+- [x] **[3.1] Planetoid level / sublevel** — Create one planetoid level; travel via portal/sublevel. See [DAYS_16_TO_30.md](../tasks/DAYS_16_TO_30.md), [PLANETOID_DESIGN.md](../PLANETOID_DESIGN.md).
 
 ---
 
@@ -186,7 +186,7 @@ Days are ordinal (Day 1, Day 2, …), not calendar dates. Start anytime and resu
 
 **Planetoid Phase 3 — POI placement**
 
-- [ ] **[3.2] PCG POI placement (high level)** — PCG graph that places POI actors (Shrine, Treasure, CultivationNode, MiningNode).
+- [x] **[3.2] PCG POI placement (high level)** — PCG graph places POI actors. See [DAYS_16_TO_30.md](../tasks/DAYS_16_TO_30.md).
 
 ---
 
@@ -194,8 +194,8 @@ Days are ordinal (Day 1, Day 2, …), not calendar dates. Start anytime and resu
 
 **Planetoid Phase 3 — Shrine and Treasure**
 
-- [ ] **[3.3] Shrine POI** — Shrine actor with interaction/GAS.
-- [ ] **[3.4] Treasure POI** — Treasure actor; loot on interact.
+- [x] **[3.3] Shrine POI** — Shrine actor with interaction/GAS. See [DAYS_16_TO_30.md](../tasks/DAYS_16_TO_30.md).
+- [x] **[3.4] Treasure POI** — Treasure actor; loot on interact.
 
 ---
 
@@ -203,8 +203,8 @@ Days are ordinal (Day 1, Day 2, …), not calendar dates. Start anytime and resu
 
 **Planetoid Phase 3 — Cultivation and Mining**
 
-- [ ] **[3.5] Cultivation section** — Cultivation node/zone; workable by spirits (Phase 4); yields resources over time.
-- [ ] **[3.6] Mining section** — Mining node/zone; workable by spirits; yields ore/stone.
+- [x] **[3.5] Cultivation section** — Cultivation node; spirits work it; yields over time. See [DAYS_16_TO_30.md](../tasks/DAYS_16_TO_30.md).
+- [x] **[3.6] Mining section** — Mining node; spirits work it; yields ore/stone.
 
 ---
 
@@ -220,8 +220,8 @@ Days are ordinal (Day 1, Day 2, …), not calendar dates. Start anytime and resu
 
 **Spirits Phase 4 — Conversion and roster**
 
-- [ ] **[4.1] Death → spirit conversion** — On character death: mark as spirit, remove from playable roster.
-- [ ] **[4.2] Spirit roster / list** — Subsystem or GameState: list of spirits; UI or command interface can show available spirits.
+- [x] **[4.1] Death → spirit conversion** — On death: mark as spirit, remove from roster. See [DAYS_16_TO_30.md](../tasks/DAYS_16_TO_30.md).
+- [x] **[4.2] Spirit roster / list** — Subsystem or GameState: list of spirits.
 
 ---
 
@@ -229,8 +229,8 @@ Days are ordinal (Day 1, Day 2, …), not calendar dates. Start anytime and resu
 
 **Spirits Phase 4 — Assign and yield**
 
-- [ ] **[4.3] Command: assign spirit to node** — Player assigns spirit to CultivationNode/MiningNode; spirit contributes to node progress.
-- [ ] **[4.4] Node progress and yield** — Cultivation/mining nodes produce resources when worked by N spirits; player can collect.
+- [x] **[4.3] Command: assign spirit to node** — Player assigns spirit to node. See [DAYS_16_TO_30.md](../tasks/DAYS_16_TO_30.md).
+- [x] **[4.4] Node progress and yield** — Nodes produce resources when worked; player collects.
 
 ---
 
@@ -238,7 +238,7 @@ Days are ordinal (Day 1, Day 2, …), not calendar dates. Start anytime and resu
 
 **Spirits Phase 4 — Unassign**
 
-- [ ] **[4.5] Unassign / reclaim spirit** — Player can unassign spirit from a node (spirit becomes idle for reassignment).
+- [x] **[4.5] Unassign / reclaim spirit** — Player unassigns spirit; spirit idle for reassignment. See [DAYS_16_TO_30.md](../tasks/DAYS_16_TO_30.md).
 
 ---
 
@@ -255,8 +255,8 @@ Days are ordinal (Day 1, Day 2, …), not calendar dates. Start anytime and resu
 
 **Dungeon Phase 5 — Boss and reward**
 
-- [ ] **[5.3] Boss actor and abilities** — Boss pawn with GAS: health, abilities, phase; spawn in arena; on death drop loot.
-- [ ] **[5.4] Dungeon complete / reward** — On boss death: grant reward (treasure, key, story flag); optional respawn or one-time.
+- [x] **[5.3] Boss actor and abilities** — Boss pawn with GAS; spawn in arena; drop loot. See [DAYS_16_TO_30.md](../tasks/DAYS_16_TO_30.md).
+- [x] **[5.4] Dungeon complete / reward** — On boss death: grant reward.
 
 ---
 
@@ -264,7 +264,7 @@ Days are ordinal (Day 1, Day 2, …), not calendar dates. Start anytime and resu
 
 **Buffer**
 
-- [ ] Catch-up, Milady pipeline integration, or 7-sins/moral-system prep. See [MILADY_IMPORT_ROADMAP.md](../tasks/MILADY_IMPORT_ROADMAP.md), [VISION.md](VISION.md) (moral system).
+- [x] Catch-up, Milady pipeline, or 7-sins prep. See [DAYS_16_TO_30.md](../tasks/DAYS_16_TO_30.md), [MILADY_IMPORT_ROADMAP.md](../tasks/MILADY_IMPORT_ROADMAP.md), [VISION.md](VISION.md). Vertical slice: [VERTICAL_SLICE_CHECKLIST.md](VERTICAL_SLICE_CHECKLIST.md).
 
 ---
 
@@ -272,7 +272,7 @@ Days are ordinal (Day 1, Day 2, …), not calendar dates. Start anytime and resu
 
 **Buffer**
 
-- [ ] Continue Day 26 focus or polish: performance, LODs, onboarding.
+- [x] Continue buffer or polish: performance, LODs, onboarding. See [DAYS_16_TO_30.md](../tasks/DAYS_16_TO_30.md).
 
 ---
 
@@ -288,7 +288,7 @@ Days are ordinal (Day 1, Day 2, …), not calendar dates. Start anytime and resu
 
 **Buffer**
 
-- [ ] Continue buffer work or documentation updates.
+- [x] Buffer or documentation updates. See [DAYS_16_TO_30.md](../tasks/DAYS_16_TO_30.md).
 
 ---
 
@@ -296,8 +296,8 @@ Days are ordinal (Day 1, Day 2, …), not calendar dates. Start anytime and resu
 
 **Buffer**
 
-- [ ] Final catch-up, sign-off 30-day block, or plan next 30-day window.
+- [x] Final catch-up, sign-off 30-day block, or plan next 30-day window. See [DAYS_16_TO_30.md](../tasks/DAYS_16_TO_30.md).
 
 ---
 
-**See also:** [VISION.md](VISION.md), [README.md](README.md), [SETUP.md](../SETUP.md), [KNOWN_ERRORS.md](../KNOWN_ERRORS.md), [CONVENTIONS.md](../CONVENTIONS.md).
+**See also:** [VISION.md](VISION.md), [README.md](README.md), [SETUP.md](../SETUP.md), [KNOWN_ERRORS.md](../KNOWN_ERRORS.md), [CONVENTIONS.md](../CONVENTIONS.md). **Next block:** [NEXT_30_DAY_WINDOW.md](NEXT_30_DAY_WINDOW.md).

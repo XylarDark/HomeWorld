@@ -16,7 +16,8 @@ Do these steps once. Everything else for first-phase setup is already in the rep
 6. **Roles (optional):** Note Designer / Artist / Programmer / Tester and who leads Week 1.
 
 7. **MCP (Cursor-to-Editor bridge):** Run **`Setup-MCP.bat`** from the project root. This installs the tools that let Cursor's AI agent control the Unreal Editor directly (spawn actors, create Blueprints, set properties). See [MCP_SETUP.md](MCP_SETUP.md) for details and troubleshooting.
-8. **Cursor rules:** The repo ships a full `.cursor/rules/` directory that guides Cursor's AI agent. Open the project in Cursor and the rules are picked up automatically — no extra setup. Skim `.cursor/rules/` for an overview; key rules:
+8. **Cursor Agent CLI (optional, for fully automatic loop):** To run the 30-day automation loop without manually starting each session, install the Cursor Agent CLI (see [Cursor CLI docs](https://cursor.com/docs/cli/overview)), run `agent login` (or set `CURSOR_API_KEY`), then run `.\Tools\RunAutomationLoop.ps1` from project root. See [README-Automation.md](../README-Automation.md) and [AUTOMATION_LOOP_UNTIL_DONE.md](AUTOMATION_LOOP_UNTIL_DONE.md). For a one-page "is everything ready?" checklist, see [AUTOMATION_READINESS.md](AUTOMATION_READINESS.md).
+9. **Cursor rules:** The repo ships a full `.cursor/rules/` directory that guides Cursor's AI agent. Open the project in Cursor and the rules are picked up automatically — no extra setup. Skim `.cursor/rules/` for an overview; key rules:
    - `unreal-cpp.mdc` — C++ conventions and UE 5.7 API pitfalls.
    - `unreal-project.mdc` — project layout, plugins, default pawn.
    - `09-mcp-workflow.mdc` — MCP-first workflow priorities.
@@ -27,6 +28,8 @@ Do these steps once. Everything else for first-phase setup is already in the rep
    - **Optional:** Run `/setup` in Cursor once to configure Compound Engineering review agents for this project. The agent recommends plugin commands (e.g. `/workflowsreview`, `/workflowsplan`) when the use case fits; see `.cursor/rules/10-compound-engineering.mdc`.
 
 After this, follow [workflow/README.md](workflow/README.md) and [workflow/30_DAY_SCHEDULE.md](workflow/30_DAY_SCHEDULE.md) for current tasks.
+
+**CI (optional):** For full build and automation tests in GitHub Actions, a self-hosted Windows runner with UE 5.7 is required. See [CI_SETUP.md](CI_SETUP.md) for setup steps, labels, and `UE_EDITOR`. [validate.yml](../.github/workflows/validate.yml) runs on every push without UE (lint, docs, C++ pairing).
 
 ---
 

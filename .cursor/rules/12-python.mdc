@@ -82,6 +82,8 @@ The Unreal Editor Python session is long-lived. Imported modules are cached in `
 
 ### UE 5.7 Python API changes
 
+For Unreal API and Editor behavior, use **only UE 5.7–specific sources**; see **ue57-sources.mdc**.
+
 | Old (UE ≤ 5.6) | New (UE 5.7) |
 |---|---|
 | `actor.get_actor_bounds(False, origin, extent, False)` (out-params) | `origin, extent = actor.get_actor_bounds(False)` (returns tuple) |

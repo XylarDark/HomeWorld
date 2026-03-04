@@ -10,8 +10,8 @@ version: 1.0
 
 When working on PCG (Procedural Content Generation) graphs, volumes, or spawners:
 
-1. **Before changing the PCG graph or adding nodes:** Read [docs/PCG_BEST_PRACTICES.md](docs/PCG_BEST_PRACTICES.md) and [docs/PCG_VARIABLES_NO_ACCESS.md](docs/PCG_VARIABLES_NO_ACCESS.md). The former describes the minimal working graph, mandatory manual steps, and when to use Partitioned/Hierarchical generation; the latter lists settings that automation cannot set and must be done in the Editor.
+1. **Before changing the PCG graph or adding nodes:** Read [docs/PCG_BEST_PRACTICES.md](docs/PCG_BEST_PRACTICES.md) and [docs/PCG_VARIABLES_NO_ACCESS.md](docs/PCG_VARIABLES_NO_ACCESS.md). Use MCP, Python, or GUI automation (e.g. Content/Python/gui_automation, pcg_apply_manual_steps.py) for any required steps. If a step cannot be automated, log to [docs/AUTOMATION_GAPS.md](docs/AUTOMATION_GAPS.md); do not document "manual steps" for the user. See 20-full-automation-no-manual-steps.mdc.
 
 2. **When the user reports "Generate produces nothing":** Follow [docs/PCG_SETUP.md](docs/PCG_SETUP.md) section "Generate produces nothing (checklist)" and use the **pcg-validate** skill (ordered checklist, Output Log, Surface Sampler Debug). Do not suggest graph changes before verifying Get Landscape Data, mesh list, graph assignment, Landscape tag, and World Partition Load All.
 
-3. **When suggesting new PCG nodes or graph structure:** Ensure the proposal aligns with the minimal working graph (Get Landscape Data → Surface Sampler → Static Mesh Spawner) and document which steps remain manual per PCG_VARIABLES_NO_ACCESS.
+3. **When suggesting new PCG nodes or graph structure:** Ensure the proposal aligns with the minimal working graph (Get Landscape Data → Surface Sampler → Static Mesh Spawner). Automate all steps (MCP, Python, GUI automation); if any step cannot be automated, log it to docs/AUTOMATION_GAPS.md with a suggested approach for a future session.
