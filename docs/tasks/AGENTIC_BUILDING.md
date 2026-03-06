@@ -46,7 +46,7 @@
    - **OnActivated:** When an agent claims and “activates” the SO, trigger: play build anim (e.g. montage) and **spawn the final wall mesh** at the hologram location (replace or hide the hologram).
    - **OnDeactivated:** When the interaction ends, **destroy the hologram** (or hide it) so the built wall remains.
 
-Implementation of OnActivated/OnDeactivated depends on your project: use Blueprint logic on the SO definition or on the BP_BuildOrder_Wall that holds the SO component. The goal is: agent claims SO → build anim plays → final mesh appears → hologram removed.
+Implementation of OnActivated/OnDeactivated: use Blueprint logic on the SO definition or on the BP_BuildOrder_Wall that holds the SO component; from C++ call **AHomeWorldBuildOrder::CompleteBuildOrder()** when the build finishes (sets `bBuildCompleted`, logs). Blueprint can bind to `bBuildCompleted` to hide hologram and show final mesh. Console **hw.CompleteBuildOrder** (PIE) completes the nearest incomplete build order for testing. Goal: agent claims SO → build anim plays → CompleteBuildOrder() → final mesh appears, hologram removed.
 
 ### 2.2 Link SO_WallBuilder to the hologram
 

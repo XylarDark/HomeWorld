@@ -142,7 +142,7 @@ Write-LoopLog "RunAutomationLoop: logging to $LoopLogPath; last activity to $Las
 if (-not $PromptFile) { $PromptFile = Join-Path $ProjectRoot "docs\workflow\NEXT_SESSION_PROMPT.md" }
 else { $PromptFile = Join-Path $ProjectRoot $PromptFile }
 
-$DefaultPrompt = "Continue the automatic development cycle. Read docs/workflow/DAILY_STATE.md, docs/workflow/CURRENT_TASK_LIST.md, and docs/SESSION_LOG.md. Work only on tasks T1-T10 in CURRENT_TASK_LIST.md. Work on the first task that is pending or in_progress. Do not add new task sections (T11, T12, etc); if you discover work that deserves a new task, document it in SESSION_LOG or docs/AUTOMATION_GAPS.md for the next task-list generation. Complete exactly one task per round. When you finish a task you MUST update docs/workflow/CURRENT_TASK_LIST.md: change ONLY that task's line '- **status:** pending' or '- **status:** in_progress' to '- **status:** completed'; do not change any other task's status. Saving this file is required so the loop does not re-run the same tasks. Also update DAILY_STATE and SESSION_LOG and write the next recommended prompt into docs/workflow/NEXT_SESSION_PROMPT.md. The loop will invoke you again for the next pending task until T1-T10 are done. If you change C++ or Build.cs, the loop will run a build after this round. When the task requires in-Editor validation, run it (e.g. execute_python_script('pie_test_runner.py')) and exit non-zero if it fails so the Fixer runs."
+$DefaultPrompt = "Continue the automatic development cycle. Read docs/workflow/DAILY_STATE.md, docs/workflow/CURRENT_TASK_LIST.md, and docs/SESSION_LOG.md. Work only on tasks T1-T10 in CURRENT_TASK_LIST.md. Work on the first task that is pending or in_progress. Do not add new task sections (T11, T12, etc); if you discover work that deserves a new task, document it in SESSION_LOG or docs/AUTOMATION_GAPS.md for the next task-list generation. Complete exactly one task per round. When you finish a task you MUST update docs/workflow/CURRENT_TASK_LIST.md: change ONLY that task's line '- **status:** pending' or '- **status:** in_progress' to '- **status:** completed'; do not change any other task's status. Saving this file is required so the loop does not re-run the same tasks. If the task is about a deferred feature (e.g. verify or document agentic building, death-to-spirit, SaveGame): also update docs/workflow/PROJECT_STATE_AND_TASK_LIST.md section 2 Deferred features table (Last list/date or status) so the next list generator does not re-add the same verify task. If your task is T10 (buffer): update only ACCOMPLISHMENTS_OVERVIEW §4 and PROJECT_STATE_AND_TASK_LIST §4 and set T10 status to completed in CURRENT_TASK_LIST; do NOT replace or regenerate CURRENT_TASK_LIST.md (the user generates the next list after the loop exits). Also update DAILY_STATE and SESSION_LOG and write the next recommended prompt into docs/workflow/NEXT_SESSION_PROMPT.md. The loop will invoke you again for the next pending task until T1-T10 are done. If you change C++ or Build.cs, the loop will run a build after this round. When the task requires in-Editor validation, run it (e.g. execute_python_script('pie_test_runner.py')) and exit non-zero if it fails so the Fixer runs."
 
 function Get-PromptText {
     if (-not (Test-Path $PromptFile)) { return $DefaultPrompt }
@@ -678,6 +678,17 @@ do {
     $taskStateAfter = Get-TaskListState
     $stillPending = ($taskStateAfter.PendingCount -gt 0)
     $pendingCount = $taskStateAfter.PendingCount
+    # Consistency check: detect overwrite or regression (pending count should not increase after a successful round)
+    if ($pendingCount -gt $pendingCountAtStart) {
+        $overwriteMsg = "RunAutomationLoop: WARNING - Task list pending count INCREASED after round $round (was $pendingCountAtStart, now $pendingCount). Possible agent overwrote CURRENT_TASK_LIST.md (e.g. T10 generated new list). See TASK_LIST_REPEATS_LOG and docs/workflow/AUTOMATION_DEBUG_TASK_LIST.md."
+        Write-LoopLog $overwriteMsg -IsError
+        Write-AutomationEvent -EventType loop_exited_fail -Message "Task list overwrite detected (pending $pendingCountAtStart -> $pendingCount)."
+        if ($ErrorsLogPath) {
+            try { Add-Content -Path $ErrorsLogPath -Value $overwriteMsg -Encoding UTF8 -ErrorAction SilentlyContinue } catch {}
+        }
+        Invoke-ExitStatusAlert -ExitReason "Task list overwrite detected (pending count increased after round $round)" -ExitCode 1
+        exit 1
+    }
     if ($stillPending) {
         $nextMsg = if ($taskStateAfter.FirstPendingId) {
             "next pending: " + $taskStateAfter.FirstPendingId + " - " + $taskStateAfter.FirstPendingGoal

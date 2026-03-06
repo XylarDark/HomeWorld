@@ -2,9 +2,22 @@
 
 The automation loop is driven by **one task list**: `docs/workflow/CURRENT_TASK_LIST.md`. It must contain exactly **10 tasks** (T1–T10) with a consistent schema. The loop counts only T1–T10; do not add T11 or new task sections—document new work in SESSION_LOG or AUTOMATION_GAPS.md for the next list. This doc describes how to create or replace that list so agents have the best chance of one-shot success.
 
+## Task list composition: dynamic by development phase (policy)
+
+**Goal:** Maximize both **quality** and **quantity** of development depending on the current needs of the cycle. Avoid spending too many tokens on verification when we are in rapid prototyping; avoid skipping verification when we are hardening for demo or release.
+
+**How to choose the split:** Read **PROJECT_STATE_AND_TASK_LIST.md §0 "Current development phase"**. It defines two phases and how many of the 10 tasks should be implementation vs verification. The task list generator **must** use that section to decide the split for the next list.
+
+- **Rapid prototyping:** More **implementation** slots (e.g. 7–8 of 10). Testable feature/code work: implement a system, add an ability, wire a flow, fix a bug with a test. Success criteria must be testable (PIE, test pass, build, script run). Fewer verification slots (2–3): e.g. one PIE or build check, T10 buffer; optional docs/gaps. Use when adding features, exploring systems, building out MVP.
+- **Prototype hardening:** Balanced or verification-heavy (e.g. 4–5 implementation, 5–6 verification). Verification = run PIE pre-demo checklist, run packaged build and smoke-test, document in VERTICAL_SLICE_CHECKLIST, update AUTOMATION_GAPS, polish KNOWN_ERRORS/CONVENTIONS, refinement from run history, buffer (ACCOMPLISHMENTS + PROJECT_STATE §4). T10 remains the buffer task (do not replace the task list). Use when preparing for demo, playtest, or release; or when stabilizing after a big push.
+
+**When generating a new list:** (1) Read PROJECT_STATE_AND_TASK_LIST §0 and note **Current phase**. (2) Assign that many slots to **testable implementation** (fill first slots T1, T2, …). (3) Assign the remaining slots to **verification and support**. This keeps the list dynamic to our needs. **When to change phase:** Update PROJECT_STATE_AND_TASK_LIST §0 "Current phase" when the team shifts (e.g. "We're two weeks from a demo" → set to **Prototype hardening**; "We're adding the next feature set" → **Rapid prototyping**).
+
 ## Avoiding repeated tasks
 
 If the same or similar tasks keep appearing across sessions, see **[TASK_LIST_REPEATS_LOG.md](TASK_LIST_REPEATS_LOG.md)** for causes (status not persisted, re-verification by design, overlap when generating new lists, gaps reappearing) and how we address them. When generating a new list: read **ACCOMPLISHMENTS_OVERVIEW §4** so you don't duplicate completed work unless you intend re-verification; prefer continuing or carrying over pending tasks instead of re-adding the same goals.
+
+**Deferred features:** Read **PROJECT_STATE_AND_TASK_LIST.md §2 "Deferred features"**. Do **not** add another task that only "verify or document" a deferred feature (e.g. agentic building, death-to-spirit, SaveGame) if that feature was already verified or documented in the last 1–2 lists. Add a "deferred" task only if the goal is to **implement** the feature (e.g. full agentic building per DAY10 Option B) or to re-verify after major code changes. This prevents re-doing the same verification cycle.
 
 ---
 
@@ -16,7 +29,7 @@ Gather detail from:
 - **ACCOMPLISHMENTS_OVERVIEW.md** — high-level record of all work accomplished; use with task list and vision to avoid duplicating and to inform next tasks. **Check §4** before adding a task that might already be completed in a prior cycle (see TASK_LIST_REPEATS_LOG).
 - **AUTOMATION_GAPS.md** — known gaps, manual steps, and workarounds.
 - **NEXT_30_DAY_WINDOW.md** — near-term priorities (N1–N4, etc.).
-- **PROJECT_STATE_AND_TASK_LIST.md** — overall state and task context.
+- **PROJECT_STATE_AND_TASK_LIST.md** — overall state and task context; **§0 "Current development phase"** is the single source of truth for how many tasks are implementation vs verification (read it first when building the list).
 - **Existing task docs** in `docs/tasks/` (e.g. DAY5_PLAYTEST_SIGNOFF, DAY12_ROLE_PROTECTOR, DAY10_AGENTIC_BUILDING).
 - **Epic/UE docs** and project docs (CONVENTIONS.md, KNOWN_ERRORS.md, PCG_SETUP.md, etc.) for APIs and pitfalls.
 
@@ -33,7 +46,7 @@ Each of the 10 tasks should be filled with **research-backed detail**:
 ## Process
 
 1. **Copy the template:** Copy `CURRENT_TASK_LIST_TEMPLATE.md` to `CURRENT_TASK_LIST.md` (or overwrite the existing `CURRENT_TASK_LIST.md`).
-2. **Fill each slot T1–T10:** For each task, paste or write goal, success_criteria, research_notes, and steps_or_doc from the sources above. Set **status** to `pending` for work to do, `completed` for already-done items, or `blocked` if blocked with a reason.
+2. **Fill each slot T1–T10:** Read **PROJECT_STATE_AND_TASK_LIST.md §0** for the current development phase. Respect **Task list composition** above: assign that many slots to **testable implementation** (build/code/feature with testable success criteria), and the rest to **verification and support** (PIE checklist, packaged build, docs, AUTOMATION_GAPS, refinement, buffer). T10 is always the buffer task. For each task, paste or write goal, success_criteria, research_notes, and steps_or_doc from the sources above. Set **status** to `pending` for work to do, `completed` for already-done items, or `blocked` if blocked with a reason.
 3. **Run the loop:** The automation loop reads `CURRENT_TASK_LIST.md`, fetches the first pending/in_progress task, and runs until the list has no pending/in_progress tasks (or until a stop sentinel or Guardian report).
 
 No automated “research and fill” script is required; you (or a future generator) can fill the template manually or via script. The loop only needs the file to exist and to use the 10-task schema with **status** lines.

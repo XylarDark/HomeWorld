@@ -8,6 +8,7 @@
 #include "InputActionValue.h"
 #include "HomeWorldCharacter.generated.h"
 
+struct FOnAttributeChangeData;
 class AActor;
 class UAbilitySystemComponent;
 class UAttributeSet;
@@ -39,6 +40,14 @@ public:
 	/** Trace from camera via GetPlacementTransform and spawn PlaceActorClass at hit. Called from GA_Place / UHomeWorldPlaceAbility. */
 	UFUNCTION(BlueprintCallable, Category = "Build|Placement", meta = (DisplayName = "Try Place At Cursor"))
 	bool TryPlaceAtCursor();
+
+	/** Request astral death: advance to dawn and respawn at start (same as hw.AstralDeath). Call from in-game astral-defeat logic or bind to IA_AstralDeath for testing. See ASTRAL_DEATH_AND_DAY_SAFETY.md. */
+	UFUNCTION(BlueprintCallable, Category = "HomeWorld|Astral", meta = (DisplayName = "Request Astral Death"))
+	void RequestAstralDeath();
+
+	/** Day restoration: consume a meal (day only). Restores Health and sets day buff for next night. No effect at night. See DAY_RESTORATION_LOOP.md. */
+	UFUNCTION(BlueprintCallable, Category = "Day Restoration", meta = (DisplayName = "Consume Meal Restore"))
+	bool ConsumeMealRestore();
 
 	/** Report death and add this character to the spirit roster (Day 21). Call from Blueprint or game code when Health reaches 0 (e.g. GAS effect or damage handler). */
 	UFUNCTION(BlueprintCallable, Category = "Spirit", meta = (DisplayName = "Report Death And Add Spirit"))
@@ -131,6 +140,17 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Input|Abilities")
 	TObjectPtr<UInputAction> PlaceAction;
 
+	/** Optional: trigger astral death (dawn + respawn) for testing. Assign IA_AstralDeath or leave null. */
+	UPROPERTY(EditDefaultsOnly, Category = "Input|Abilities")
+	TObjectPtr<UInputAction> AstralDeathAction;
+
+	/** Second spirit ability (e.g. R). Triggers SpiritShieldAbilityClass if set; night-only. */
+	UPROPERTY(EditDefaultsOnly, Category = "Input|Abilities")
+	TObjectPtr<UInputAction> SpiritShieldAction;
+
+	/** Called when Health attribute changes (GAS). When Health <= 0 at night, invokes RequestAstralDeath so lethal astral damage triggers dawn + respawn. */
+	void OnHealthChanged(const struct FOnAttributeChangeData& Data);
+
 	/** Ability class to activate when PrimaryAttackAction fires. Assign in Blueprint; should match one of DefaultAbilities. */
 	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
 	TSubclassOf<UGameplayAbility> PrimaryAttackAbilityClass;
@@ -146,6 +166,10 @@ protected:
 	/** Ability class to activate when PlaceAction fires. Assign in Blueprint; should match one of DefaultAbilities. */
 	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
 	TSubclassOf<UGameplayAbility> PlaceAbilityClass;
+
+	/** Ability class to activate when SpiritShieldAction fires (e.g. GA_SpiritShield). Night-only; assign in Blueprint. */
+	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
+	TSubclassOf<UGameplayAbility> SpiritShieldAbilityClass;
 
 	/** Actor class to spawn when placing (e.g. BP_BuildOrder_Wall). Assign in Blueprint; if null, placement logs and returns false. */
 	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
@@ -193,6 +217,8 @@ protected:
 	void OnDodgeTriggered(const FInputActionValue& Value);
 	void OnInteractTriggered(const FInputActionValue& Value);
 	void OnPlaceTriggered(const FInputActionValue& Value);
+	void OnAstralDeathTriggered(const FInputActionValue& Value);
+	void OnSpiritShieldTriggered(const FInputActionValue& Value);
 
 	/** Net forward/right axis from the four directional keys. Used when using MoveForward/MoveBack/StrafeLeft/StrafeRight. */
 	float MovementForwardAxis = 0.f;

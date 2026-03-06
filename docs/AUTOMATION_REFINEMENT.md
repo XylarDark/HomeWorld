@@ -76,6 +76,30 @@ The eighth 10-task list (T1–T8) completed; T9 (this pass) updated **AUTOMATION
 
 ---
 
+## Ninth list cycle (2026-03-05)
+
+The ninth 10-task list (T1–T8) completed; T9 updated **AUTOMATION_GAPS.md** Research log with ninth-cycle outcome (no new gaps; Gap 1 and Gap 2 unchanged). **AUTOMATION_REFINEMENT.md** updated with this cycle note. Next list generator: use AUTOMATION_GAPS per [HOW_TO_GENERATE_TASK_LIST.md](workflow/HOW_TO_GENERATE_TASK_LIST.md).
+
+---
+
+## Eleventh list cycle (2026-03-05)
+
+The eleventh 10-task list (PIE-full validation, deferred features, Act 2 prep, Steam EA, docs, AUTOMATION_GAPS, buffer). T1–T7 completed; T8 (this pass) refinement: **AUTOMATION_REFINEMENT.md** updated with this cycle note; refinement pass used SESSION_LOG and CURRENT_TASK_LIST (Saved/Logs not in workspace). No recurring error patterns from this cycle; Run-RefinerAgent.ps1 may be run when automation host has access to agent_run_history.ndjson and automation_errors.log for full refinement. Next: T9 (AUTOMATION_GAPS update), T10 (buffer), then generate new list per [HOW_TO_GENERATE_TASK_LIST.md](workflow/HOW_TO_GENERATE_TASK_LIST.md).
+
+---
+
+## Refiner pass 2026-03-04 (stall pattern from automation_errors.log)
+
+**Inputs:** Last 60 lines of agent_run_history.ndjson (all exit_code 0, main role; no suggested_rule_update/suggested_strategy), last 40 lines of automation_errors.log (repeated Watch-HeartbeatStall: STALL DETECTED), no Guardian report.
+
+**Findings:** Run history showed no recurring *failure* codes. automation_errors.log showed a **recurring pattern**: Watch-HeartbeatStall repeatedly logging that heartbeat/last_activity was not updated for 15+ minutes (up to 301 min in one run, 71.9 min in another), and killing agent process(es). This is the stall watcher doing its job when the main loop stops writing heartbeats (loop hung/crashed) or when runs legitimately exceed the 15 min threshold.
+
+**Updates applied:** (1) **KNOWN_ERRORS.md** — Added entry "Watch-HeartbeatStall: STALL DETECTED repeatedly in automation_errors.log" with cause, fix (e.g. -StallThresholdMinutes, -NoStallProtection), and context. (2) **AUTOMATION_REFINEMENT.md** — Checklist item for Refiner: when automation_errors.log shows many Watch-HeartbeatStall lines, use KNOWN_ERRORS entry and document mitigation.
+
+**Artifacts:** No Guardian report present; Developer runs in history all exit 0. No automation gap mentioned in excerpts; Gap-Solver not triggered.
+
+---
+
 ## Refinement when Saved/Logs is not readable
 
 When `Saved/Logs` is not available (e.g. in chat, or path filtered), use **SESSION_LOG.md** and **CURRENT_TASK_LIST.md** outcomes to infer patterns: repeated "PIE not running", "blocked on T1", "deferred", etc. Add or extend **KNOWN_ERRORS.md** entries and doc notes so the same interpretations are documented. Run the Refiner script (Run-RefinerAgent.ps1) when the automation host has access to agent_run_history.ndjson and automation_errors.log for full refinement.
@@ -88,3 +112,10 @@ When `Saved/Logs` is not available (e.g. in chat, or path filtered), use **SESSI
 - [ ] If `automation_loop_breaker_report.md` exists, use it to add KNOWN_ERRORS entries and rule or strategy changes.
 - [ ] Update **.cursor/rules** or **AGENTS.md** only when the same pattern appears multiple times or the loop-breaker explicitly recommends it.
 - [ ] **Fixer accountability:** When run history shows a fix round with no `suggested_rule_update`/`suggested_strategy`, consider adding a rule or doc note that Fixer should write `agent_feedback_this_run.json` when the fix is generalizable (e.g. added a KNOWN_ERRORS entry), so future Refiner passes have a direct signal from history.
+- [ ] **automation_errors.log — Watch-HeartbeatStall:** When the log shows many repeated "Watch-HeartbeatStall: STALL DETECTED" lines (heartbeat/last_activity not updated for X min), treat as the known stall pattern: see **KNOWN_ERRORS.md** "Watch-HeartbeatStall: STALL DETECTED repeatedly". No Guardian report is required for this pattern; document mitigation (-StallThresholdMinutes, -NoStallProtection) in KNOWN_ERRORS and optionally in workflow docs.
+
+---
+
+## Twelfth list cycle (2026-03-05)
+
+T7 refinement completed. **Inputs:** SESSION_LOG.md and CURRENT_TASK_LIST.md (Saved/Logs not in workspace). **Outcome:** No new recurring failure patterns from this cycle; twelfth list T1–T6 completed (PIE re-run, agentic building deferred, packaged build, demo sign-off, Act 2 stub, docs polish). **Updates applied:** (1) This cycle note in AUTOMATION_REFINEMENT.md; (2) KNOWN_ERRORS.md "Next priority" refreshed for post–T7: T8 (AUTOMATION_GAPS), T9 (KNOWN_ERRORS/CONVENTIONS polish), T10 (buffer), then generate new list per [HOW_TO_GENERATE_TASK_LIST.md](workflow/HOW_TO_GENERATE_TASK_LIST.md). Run Run-RefinerAgent.ps1 when automation host has access to agent_run_history.ndjson and automation_errors.log for full refinement.

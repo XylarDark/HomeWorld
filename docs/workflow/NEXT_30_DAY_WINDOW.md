@@ -9,6 +9,8 @@
 - **Starts after:** First 30-day block is implementation-complete; vertical slice checklist exists (one moment + one beautiful corner); T1–T9 cycle tasks Done or Blocked.
 - **Goals:** Harden vertical slice, implement deferred features where needed, and/or prepare Act 2 (day/night defend, family back) or Steam EA scope.
 
+**Post-MVP / progression unlocks (not in current scope):** The ability to **enter the astral during the day** is a **late-game progression unlock** per [VISION.md](VISION.md) (Day and night) and [PROTOTYPE_SCOPE.md](PROTOTYPE_SCOPE.md) § Day/night and astral. Do not treat astral-by-day as MVP; it is post–vertical slice / progression content.
+
 ---
 
 ## Suggested phases (next N days)

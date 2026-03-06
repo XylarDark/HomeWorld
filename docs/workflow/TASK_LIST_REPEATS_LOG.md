@@ -44,7 +44,9 @@
 
 **Observed:** Portal (Gap 1) and State Tree (Gap 2) appear in multiple lists as "verify or document"; each cycle may add scripts or docs but the gap stays open until manual steps or new API is used.
 
-**References:** AUTOMATION_GAPS.md; LAST_SESSION_AUDIT_AND_MVP_REMAINING §3.
+**Mitigation:** **PROJECT_STATE_AND_TASK_LIST §2 "Deferred features"** records each deferred feature and "last list/date" so the next list generator does not add the same "verify or document deferred X" task again unless the goal is to *implement* X or to re-verify after major changes. When an agent completes a deferred-feature task, they must update that table (or the task doc) so the next generator can skip re-adding it. See HOW_TO_GENERATE_TASK_LIST "Deferred features" paragraph.
+
+**References:** AUTOMATION_GAPS.md; LAST_SESSION_AUDIT_AND_MVP_REMAINING §3; PROJECT_STATE_AND_TASK_LIST §2 Deferred features.
 
 ---
 
@@ -66,7 +68,8 @@ To reduce unnecessary repeats when creating the next CURRENT_TASK_LIST:
 1. **Read ACCOMPLISHMENTS_OVERVIEW §4** — Which cycle just finished? Which tasks were completed? Don’t add the same task again unless the goal is explicit **re-verification** (e.g. "Re-run vertical slice checklist after code changes").
 2. **Read CURRENT_TASK_LIST.md** (before replacing) — If the file still has pending tasks, prefer **continuing** that list (or copying pending items into the new list) instead of discarding and re-adding similar goals.
 3. **Re-verification vs new work** — If a task is "re-run X" or "re-verify Y," name it clearly (e.g. "Re-run vertical slice pre-demo checklist") so it’s obvious it’s intentional. For net-new work, prefer tasks that don’t duplicate §4 completed items.
-4. **Gaps** — For AUTOMATION_GAPS items, "verify or document" is a valid repeat until the gap is closed; optionally add a note in the task (e.g. "Gap 1 still open; verify or document current status") so it’s clear why it’s there again.
+4. **Gaps** — For AUTOMATION_GAPS items, "verify or document" is a valid repeat until the gap is closed; optionally add a note in the task (e.g. "Gap 1 still open; verify or document current status") so it's clear why it's there again.
+5. **Deferred features** — Check PROJECT_STATE_AND_TASK_LIST §2 "Deferred features"; do not add another "verify or document deferred X" if X was verified in the last 1-2 lists unless the goal is to implement X or re-verify after major changes. verify or document current status") so it’s clear why it’s there again.
 
 ---
 
@@ -79,12 +82,15 @@ To reduce unnecessary repeats when creating the next CURRENT_TASK_LIST:
 | 2026-03-05 | Max 10 rounds cap in RunAutomationLoop. | If (A) still happens, loop exits after 10 rounds instead of restarting from T1. |
 | 2026-03-05 | Task list parser: `$` → `\z` in section regex. | Correct pending count so loop doesn’t exit early or mis-identify next task. |
 | 2026-03-05 | TASK_LIST_REPEATS_LOG.md (this file) created. | Single place to log causes and mitigations; reference from HOW_TO_GENERATE_TASK_LIST. |
+| 2026-03-04 | Tenth-list run: after round 10, CURRENT_TASK_LIST had all T1–T10 pending again (agent overwrote file). Max-rounds cap exited loop; T1–T10 marked **completed** post-run; ACCOMPLISHMENTS §4 and DAILY_STATE updated. | Cause (A): status not persisted (round 10 wrote file with all pending). Mitigation: max rounds prevented infinite re-run; manual fix applied. |
+| 2026-03-05 | RunAutomationLoop default prompt and NEXT_SESSION_PROMPT: when completing a deferred-feature task, agent must also update PROJECT_STATE_AND_TASK_LIST §2 Deferred features table (Last list/date). T2 success_criteria and steps_or_doc in CURRENT_TASK_LIST updated to require §2 update when outcome is still deferred. | Reduces (D): deferred features are marked so next list generator does not re-add the same verify task. |
 
 ---
 
 ## 4. References
 
 - **Task list generation:** [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md) (sources; use ACCOMPLISHMENTS_OVERVIEW to avoid duplicating completed work).
+- **Debugging task list / overwrites:** [AUTOMATION_DEBUG_TASK_LIST.md](AUTOMATION_DEBUG_TASK_LIST.md) (evidence from logs, overwrite vs parser bug, consistency check, T10 prompt).
 - **Audit and MVP remaining:** [LAST_SESSION_AUDIT_AND_MVP_REMAINING.md](LAST_SESSION_AUDIT_AND_MVP_REMAINING.md).
 - **Cycle outcomes:** [ACCOMPLISHMENTS_OVERVIEW.md](ACCOMPLISHMENTS_OVERVIEW.md) §4.
 - **Gaps:** [AUTOMATION_GAPS.md](../AUTOMATION_GAPS.md).

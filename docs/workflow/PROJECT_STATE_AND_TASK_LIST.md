@@ -2,7 +2,20 @@
 
 **Purpose:** Single overview of the state of the project and **work not yet completed**, codified as a task list to work from. Update this file when major milestones or the task list change.
 
-**Last updated:** 2026-03-05 (sixth 10-task list: vertical slice, PIE validation, agentic building, SaveGame, Act 2 Defend, demo, packaging, single-instance guard, buffer).
+**Last updated:** 2026-03-06 (twenty-ninth 10-task list, rapid prototyping: 8 implementation + 2 verification).
+
+---
+
+## 0. Current development phase (for task list composition)
+
+**Single source of truth for the task list generator.** When generating a new 10-task list, read this to choose how many slots are implementation vs verification. Update this when the team shifts phase (e.g. before a demo, after adding major features).
+
+| Phase | When to use | Implementation slots (testable build/code/feature) | Verification/support slots (PIE checklist, packaged build, docs, gaps, refinement, buffer) |
+|-------|-------------|-------------------------------------------------------------------|--------------------------------------------------------------------------------------------|
+| **Rapid prototyping** | Adding features, exploring systems, building out MVP. Maximize quantity of shippable work; keep verification minimal so tokens go to implementation. | **7–8** of 10 | **2–3** (e.g. one PIE or build check, T10 buffer; optional docs/gaps) |
+| **Prototype hardening** | Preparing for demo, release, or playtest; stabilizing after a big push; regression and quality focus. Maximize quality and confidence; more verification and docs. | **4–5** of 10 | **5–6** (PIE pre-demo, packaged build, VERTICAL_SLICE_CHECKLIST, AUTOMATION_GAPS, KNOWN_ERRORS/CONVENTIONS, refinement, buffer) |
+
+**Current phase:** **Rapid prototyping** (default while MVP and vertical slice are still being built out). Change to **Prototype hardening** when preparing for a concrete demo date, playtest, or release.
 
 ---
 
@@ -46,6 +59,21 @@
 - **Tests:** PythonAutomationTest (Content/Python/tests/test_*.py); pie_test_runner.py → Saved/pie_test_results.json; level loader and PIE flow tests.
 - **CI:** validate.yml (lint, JSON, C++, doc freshness).
 
+### Deferred features (track so we don't re-do "verify/document" every list)
+
+When a task is **"verify or document deferred X"** and the agent completes it (by implementing X or by documenting that X remains deferred), that completion must be recorded so the **next list generator** does not add the same "verify deferred X" task again unless the goal is to **implement** X or to re-verify after major changes.
+
+| Feature | Status | Last list/date | Rule for next list |
+|--------|--------|-----------------|--------------------|
+| **Full agentic building** (family agents fulfilling build orders) | Deferred; SO activation observable | Sixteenth list (2026-03-05): hw.SimulateBuildOrderActivation simulates SO_WallBuilder activation (log + CompleteBuildOrder); testable in PIE. Full agent flow (BUILD branch, family agents claiming) still requires State Tree/Blueprint (no API). | Do **not** add another "verify or document agentic building" task unless the goal is to **implement** full flow (DAY10 Option B) or to re-verify after code changes. |
+| **Death-to-spirit** (ReportDeathAndAddSpirit, hw.ReportDeath) | Implemented; verifiable in PIE | Eleventh list (2026-03-05); console `hw.ReportDeath`; pie_test_runner check_report_death. | Do **not** add "verify death-to-spirit" again unless re-verifying after changes. Prefer "implement" or other deferred items. |
+| **SaveGame persistence** (hw.Save / hw.Load across PIE restart) | Implemented; verification in lists | DAY15 §4; verified in several lists. | Add "verify SaveGame across restart" only if re-verification is needed (e.g. after SaveGame code changes). |
+| **Boss reward** (hw.GrantBossReward) | Implemented; verifiable | Documented; verified in second list. | Same as above; don't re-add verify unless implementing new behavior or re-verifying. |
+| **Astral return on death** (night combat: return to body, wake at dawn) | Designed; implementation deferred | Thirteenth list (2026-03-05); [ASTRAL_DEATH_AND_DAY_SAFETY.md](../tasks/ASTRAL_DEATH_AND_DAY_SAFETY.md). | Do **not** add "verify or document astral return" again unless the goal is to **implement** (OnAstralDeath → advance to dawn, respawn in bed). |
+| **Astral-by-day** (enter the astral during the day) | Late-game progression unlock; not in MVP | Thirteenth list (2026-03-05); [NEXT_30_DAY_WINDOW.md](NEXT_30_DAY_WINDOW.md), [PROTOTYPE_SCOPE.md](PROTOTYPE_SCOPE.md) § Day/night and astral, [VISION.md](VISION.md). | Do **not** treat as MVP. Add only if implementing the progression unlock (post–vertical slice). |
+
+**When an agent completes a "deferred" task:** (1) Set that task's **status** to `completed` in CURRENT_TASK_LIST. (2) Update the task doc (e.g. DAY10_AGENTIC_BUILDING, DAY15_ROLE_PERSISTENCE) or SESSION_LOG with the outcome (implemented vs still deferred). (3) If the outcome is "still deferred," add or update the row above (or the **Last list/date** cell) so the next list generator knows this verification was just done. **When generating the next list:** Read this table and ACCOMPLISHMENTS_OVERVIEW §4; do not add a task that only "verify or document" the same deferred feature again unless the intent is to implement or to re-verify after major changes.
+
 ---
 
 ## 3. Work not yet completed (task list)
@@ -58,23 +86,24 @@ Use this list as the source of "what to do next." Each item has a **goal**, **su
 
 | Id | One-line summary | See CURRENT_TASK_LIST for status and order |
 |----|-------------------|-------------------------------------------|
-| T1 | PIE pre-demo checklist (Editor + PIE, pie_test_runner) | completed |
-| T2 | Save/Load and Phase 2 in PIE: document or verify | completed |
-| T3 | Portal LevelToOpen: verify or document (DemoMap to planetoid) | completed |
-| T4 | State Tree Defend/Night: verify or document | completed |
-| T5 | SaveGame persistence across PIE restart | completed |
-| T6 | Packaged build run or Steam EA checklist update | completed |
-| T7 | Vertical slice sign-off or 1-3 min demo | completed |
-| T8 | Docs polish (KNOWN_ERRORS, CONVENTIONS, or checklist) | completed |
-| T9 | AUTOMATION_GAPS or refinement doc update | completed |
-| T10 | Buffer: next list generation prep (ACCOMPLISHMENTS + PROJECT_STATE §4) | completed |
+| T1 | Pre-demo verification entry point: link §3 and CONSOLE_COMMANDS from one doc | pending |
+| T2 | pie_test_runner results: add interpretation doc or in-script summary | pending |
+| T3 | Combat stub testability: document how to read DefendCombatMode/PlanetoidCombatStyle in PIE | pending |
+| T4 | MVP polish readiness: add "What to do in Editor for polish" section | pending |
+| T5 | Vertical slice sign-off: add "as of" date or run progress note | pending |
+| T6 | Vertical slice checklist: update §4 with twenty-ninth-list deliverables | pending |
+| T7 | Packaged build: optional retry or document outcome | pending |
+| T8 | KNOWN_ERRORS or AUTOMATION_GAPS: update with findings from this cycle | pending |
+| T9 | Verification: Run PIE pre-demo checklist and document results | pending |
+| T10 | Buffer: next list generation prep (ACCOMPLISHMENTS + PROJECT_STATE §4) | pending |
 
 ---
 
-## 4. Current list (eighth 10-task list)
+## 4. Current list (twenty-ninth 10-task list, rapid prototyping)
 
-- The **eighth 10-task list** (2026-03-05) is **complete**: all T1–T10 **completed** (PIE pre-demo, Save/Load and Phase 2, portal, State Tree Defend, SaveGame, packaging, slice sign-off, docs polish, AUTOMATION_GAPS/refinement, buffer).
-- **Next step:** Generate the next 10-task list per [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md) (read [TASK_LIST_REPEATS_LOG.md](TASK_LIST_REPEATS_LOG.md) and ACCOMPLISHMENTS_OVERVIEW §4 to avoid duplicating completed work). Then run `.\Tools\Start-AllAgents-InNewWindow.ps1` (or Start-AllAgents.bat) for the next cycle. See [LAST_SESSION_AUDIT_AND_MVP_REMAINING.md](LAST_SESSION_AUDIT_AND_MVP_REMAINING.md) for audit and MVP basics.
+- The **twenty-ninth 10-task list** is **complete** (all T1–T10 completed; run 3 of 4 toward polished MVP per [MVP_GAP_ANALYSIS.md](MVP_GAP_ANALYSIS.md)). Phase: **Rapid prototyping** (§0).
+- **Next step:** Generate the next (thirtieth) list per [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md), then run `.\Tools\Start-AllAgents-InNewWindow.ps1` for run 4 of 4.
+- **Cycle doc freshness and next priority:** See [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) (top) and [ACCOMPLISHMENTS_OVERVIEW.md](ACCOMPLISHMENTS_OVERVIEW.md) §4.
 
 ---
 

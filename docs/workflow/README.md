@@ -4,6 +4,12 @@ This folder is the **single place for project ideas and daily workflow**: consol
 
 ---
 
+## Automation loop (current)
+
+**Active driver:** [CURRENT_TASK_LIST.md](CURRENT_TASK_LIST.md) (10 tasks T1–T10). Run `.\Tools\Start-AllAgents-InNewWindow.ps1` to start the loop. Generate new lists per [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md). **Legacy (reference only):** [CYCLE_TASKLIST.md](CYCLE_TASKLIST.md), [CYCLE_STATE.md](CYCLE_STATE.md) — superseded by CURRENT_TASK_LIST and RunAutomationLoop.
+
+---
+
 ## Daily flow (yesterday / today / tomorrow)
 
 **Start a day:** Prompt the chat with e.g. "What did we do yesterday and what do we need to do today?" The agent reads [DAILY_STATE.md](DAILY_STATE.md) (and [SESSION_LOG.md](../SESSION_LOG.md)) and answers from **Yesterday** and **Today**.
@@ -25,6 +31,7 @@ This folder is the **single place for project ideas and daily workflow**: consol
 | [30_DAY_IMPLEMENTATION_STATUS.md](30_DAY_IMPLEMENTATION_STATUS.md) | Which days are implementation-complete (done) vs pending/blocked. Used by the automation loop. |
 | [PROJECT_STATE_AND_TASK_LIST.md](PROJECT_STATE_AND_TASK_LIST.md) | **Project overview and task list** — summary of work done, work not yet completed (T1–T10), and quick reference. Use this for "what to work on next." |
 | [MVP_AND_ROADMAP_STRATEGY.md](MVP_AND_ROADMAP_STRATEGY.md) | How we balance MVP execution (validate loop fast) with long-term readiness (ship on same stack); what to implement for MVP; MVP-first vs release alignment. |
+| [EDITOR_POLISH_TUTORIAL.md](../EDITOR_POLISH_TUTORIAL.md) | **Editor polish** — Step-by-step tutorial to get the slice to a polished MVP state: pre-demo verification, one-time manual steps (portal, State Tree Defend), and lighting/LOD/placement/animation/UX. Use when automation runs are complete and you are ready for in-Editor work. |
 
 **Current day:** In [DAILY_STATE.md](DAILY_STATE.md) see **Current day** and **Today**. Or open [30_DAY_SCHEDULE.md](30_DAY_SCHEDULE.md) and find the first **Day N** that still has unchecked items.
 

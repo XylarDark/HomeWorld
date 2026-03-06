@@ -41,7 +41,31 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "TimeOfDay", meta = (DisplayName = "Get Is Night"))
 	virtual bool GetIsNight() const;
 
+	/** True when Defend-at-home phase is active (Phase 2 / Night). Same as GetIsNight(); use for Act 2 Defend stub and State Tree. */
+	UFUNCTION(BlueprintCallable, Category = "TimeOfDay", meta = (DisplayName = "Get Is Defend Phase Active"))
+	virtual bool GetIsDefendPhaseActive() const;
+
+	/** Set current phase (Day=0, Dusk=1, Night=2, Dawn=3). Stub: sets hw.TimeOfDay.Phase for testing. Callable from C++/Blueprint. */
+	UFUNCTION(BlueprintCallable, Category = "TimeOfDay", meta = (DisplayName = "Set Phase"))
+	virtual void SetPhase(EHomeWorldTimeOfDayPhase Phase);
+
+	/** Advance time-of-day to Dawn (e.g. after astral death). Calls SetPhase(Dawn). See docs/tasks/ASTRAL_DEATH_AND_DAY_SAFETY.md. */
+	UFUNCTION(BlueprintCallable, Category = "TimeOfDay", meta = (DisplayName = "Advance To Dawn"))
+	virtual void AdvanceToDawn();
+
+	/**
+	 * Seconds until dawn when current phase is Night (stub countdown).
+	 * When phase is set to Night, a fixed-duration countdown starts (see hw.TimeOfDay.NightDurationSeconds, default 120).
+	 * Returns -1 when not night. Used by HUD for "time until dawn" display. See docs/tasks (T4 night countdown).
+	 */
+	UFUNCTION(BlueprintCallable, Category = "TimeOfDay", meta = (DisplayName = "Get Seconds Until Dawn"))
+	virtual float GetSecondsUntilDawn() const;
+
 	/** Optional night encounter: broadcast when phase transitions to Night. Currently not invoked; poll GetIsNight() for spawn logic. See docs/tasks/NIGHT_ENCOUNTER.md. */
 	UPROPERTY(BlueprintAssignable, Category = "TimeOfDay")
 	FOnNightStarted OnNightStarted;
+
+private:
+	/** World time at which night phase ends (set when SetPhase(Night) is called). Stub countdown for HUD. */
+	float NightPhaseEndTime = 0.f;
 };

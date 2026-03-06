@@ -1,10 +1,11 @@
 # place_dungeon_entrance.py
 # Run from Unreal Editor with target level open (DemoMap or planetoid): Tools -> Execute Python Script or via MCP.
 # Idempotent: places a dungeon entrance at the position in dungeon_map_config.json.
-# Prefers AHomeWorldDungeonEntrance (trigger + Open Level); falls back to StaticMeshActor cube if C++ class unavailable.
+# Prefers BP_DungeonEntrance (default LevelToOpen from config), then AHomeWorldDungeonEntrance; falls back to cube.
+# Run ensure_dungeon_entrance_blueprint.py first so BP_DungeonEntrance exists with correct default.
 # If an actor with tag Dungeon_POI already exists, skips.
 # Config: Content/Python/dungeon_map_config.json (dungeon_entrance_position, dungeon_level_name).
-# See docs/tasks/DAYS_16_TO_30.md (Day 24); T3 verification: walk into entrance in PIE -> dungeon level loads.
+# See docs/tasks/DAYS_16_TO_30.md (Day 24); T7: walk into entrance in PIE -> dungeon level loads.
 
 import json
 import os
@@ -105,23 +106,48 @@ def main():
 
     level_to_open = config.get("dungeon_level_name", "Dungeon_Interior")
     actor = None
+    bp_dungeon_path = "/Game/HomeWorld/BP_DungeonEntrance"
 
-    # Prefer AHomeWorldDungeonEntrance (trigger + Open Level) so dungeon entrance works without manual Blueprint.
-    try:
-        entrance_class = unreal.load_class(None, "/Script/HomeWorld.HomeWorldDungeonEntrance")
-        if entrance_class:
-            actor = unreal.EditorLevelLibrary.spawn_actor_from_class(entrance_class, location, rotation)
-            if actor and hasattr(actor, "set_editor_property"):
-                name_val = unreal.Name(level_to_open)
-                for prop_name in ("LevelToOpen", "level_to_open"):
+    # Prefer BP_DungeonEntrance (default LevelToOpen from ensure_dungeon_entrance_blueprint) so dungeon opens without Editor set.
+    if unreal.EditorAssetLibrary.does_asset_exist(bp_dungeon_path):
+        try:
+            bp_asset = unreal.load_asset(bp_dungeon_path)
+            if bp_asset:
+                gen_class = None
+                if hasattr(bp_asset, "generated_class"):
                     try:
-                        actor.set_editor_property(prop_name, name_val)
-                        _log("Set " + prop_name + " to " + str(level_to_open))
-                        break
+                        gen_class = bp_asset.generated_class()
                     except Exception:
-                        continue
-    except Exception as e:
-        _log("Could not spawn HomeWorldDungeonEntrance: " + str(e))
+                        pass
+                if not gen_class and hasattr(bp_asset, "get_editor_property"):
+                    try:
+                        gen_class = bp_asset.get_editor_property("generated_class")
+                    except Exception:
+                        pass
+                if gen_class:
+                    actor = unreal.EditorLevelLibrary.spawn_actor_from_class(gen_class, location, rotation)
+                    if actor:
+                        _log("Placed BP_DungeonEntrance (LevelToOpen from Blueprint default).")
+        except Exception as e:
+            _log("Could not spawn BP_DungeonEntrance: " + str(e))
+
+    # Fallback: AHomeWorldDungeonEntrance (attempt to set LevelToOpen from Python).
+    if not actor:
+        try:
+            entrance_class = unreal.load_class(None, "/Script/HomeWorld.HomeWorldDungeonEntrance")
+            if entrance_class:
+                actor = unreal.EditorLevelLibrary.spawn_actor_from_class(entrance_class, location, rotation)
+                if actor and hasattr(actor, "set_editor_property"):
+                    name_val = unreal.Name(level_to_open)
+                    for prop_name in ("LevelToOpen", "level_to_open"):
+                        try:
+                            actor.set_editor_property(prop_name, name_val)
+                            _log("Set " + prop_name + " to " + str(level_to_open))
+                            break
+                        except Exception:
+                            continue
+        except Exception as e:
+            _log("Could not spawn HomeWorldDungeonEntrance: " + str(e))
 
     # Fallback: spawn cube placeholder (designer adds Open Level in Blueprint).
     if not actor:

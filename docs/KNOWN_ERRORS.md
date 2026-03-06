@@ -2,7 +2,29 @@
 
 Record errors and their fixes here so they are not repeated. See `.cursor/rules/07-ai-agent-behavior.mdc` (Error recurrence prevention) and `05-error-handling.mdc` (Learning from errors).
 
+**Twenty-ninth list (2026-03-06):** T1–T7 completed (pre-demo verification entry point, pie_test_results interpretation, combat stub testability, MVP polish section, vertical slice date/run note, §4 update, packaged build skip documented). T8 = this update. No new errors this cycle. **Next:** T9 (PIE pre-demo verification), T10 (buffer); then generate new 10-task list per [HOW_TO_GENERATE_TASK_LIST](workflow/HOW_TO_GENERATE_TASK_LIST.md) and run `.\Tools\Start-AllAgents-InNewWindow.ps1`.
+
+**Twenty-eighth list (2026-03-05):** T1–T8 completed (console commands reference, night spawn at Phase 2, HUD metrics reference, pie_test_runner planetoid/HomesteadLandedOnPlanetoid check, demo-readiness checklist, vertical slice §4, packaged build skip documented, KNOWN_ERRORS/AUTOMATION_GAPS update). No new errors this cycle. **Next:** T9 (PIE pre-demo verification), T10 (buffer); then generate new 10-task list per [HOW_TO_GENERATE_TASK_LIST](workflow/HOW_TO_GENERATE_TASK_LIST.md) and run `.\Tools\Start-AllAgents-InNewWindow.ps1`.
+
+**Twenty-seventh list (2026-03-05):** T1–T8 completed (LoveLevel/day-buff feedback, defeat path, homestead-on-planetoid, pie_test_runner SaveGame, pre-demo §3, vertical slice §4, packaged build skip documented, KNOWN_ERRORS/AUTOMATION_GAPS update). No new errors this cycle. **Next:** T9 (PIE pre-demo verification), T10 (buffer); then generate new 10-task list per [HOW_TO_GENERATE_TASK_LIST](workflow/HOW_TO_GENERATE_TASK_LIST.md) and run `.\Tools\Start-AllAgents-InNewWindow.ps1`.
+
+**C4458 / UHT Role shadowing (2026-03-05):** In code that uses GameMode or Controller, avoid naming a local variable or **function parameter** `Role` — it shadows a class member (e.g. AActor::Role) and causes MSVC C4458 or UHT "shadowing is not allowed". Use e.g. `AssignedRole`, `StubRole`, or `InRole` for converted-foe role. Context: T2 converted foe role stub; T3 GetConvertedFoeRoleDisplayName(EConvertedFoeRole InRole) in HomeWorldGameMode.
+
+**T4 SpiritBurst HUD (2026-03-05):** Do not name a custom static cooldown helper `GetCooldownTimeRemaining` on a UGameplayAbility subclass — the engine’s UGameplayAbility already has a UFUNCTION of that name; UHT fails with "Override of UFUNCTION ... cannot have a UFUNCTION() declaration". Use a distinct name (e.g. `GetSpiritBurstCooldownRemaining`).
+
 **Eighth list (2026-03-05):** No new errors logged during T1–T7 (PIE pre-demo, Save/Load, portal, Defend, SaveGame, packaging, slice sign-off). For pre-demo validation steps see [VERTICAL_SLICE_CHECKLIST](workflow/VERTICAL_SLICE_CHECKLIST.md) §3.
+
+**Ninth list (2026-03-05):** T8 docs polish. No new errors during T1–T8. Pre-demo and PIE validation: [VERTICAL_SLICE_CHECKLIST](workflow/VERTICAL_SLICE_CHECKLIST.md) §3; next list: complete T9 (AUTOMATION_GAPS/refinement), T10 (buffer), then generate next 10-task list per [HOW_TO_GENERATE_TASK_LIST](workflow/HOW_TO_GENERATE_TASK_LIST.md).
+
+**Eleventh list (2026-03-05):** T1–T7 completed (PIE-full validation, deferred features, Act 2 prep, SaveGame, Steam EA/packaging, store draft, docs polish). T8 refinement completed (AUTOMATION_REFINEMENT updated; no new errors this cycle). Pre-demo checklist: [VERTICAL_SLICE_CHECKLIST](workflow/VERTICAL_SLICE_CHECKLIST.md) §3; PIE + `pie_test_runner.py` → `Saved/pie_test_results.json`. **Next priority:** T9 (AUTOMATION_GAPS update), T10 (buffer); then generate new 10-task list per [HOW_TO_GENERATE_TASK_LIST](workflow/HOW_TO_GENERATE_TASK_LIST.md).
+
+**Twelfth list (2026-03-05):** T1–T8 completed (PIE pre-demo, agentic building, packaged build, demo sign-off, Act 2 night encounter, docs polish, refinement, AUTOMATION_GAPS). T3 packaging: cook succeeded; stage failed with Error_MissingExecutable (103)—build HomeWorld Win64 Shipping first, then re-run Package-HomeWorld.bat. See entry "Package-HomeWorld: Stage fails with MissingExecutable (103)" below. **Next priority:** T9 (KNOWN_ERRORS/CONVENTIONS polish) and T10 (buffer) complete; then generate new 10-task list per [HOW_TO_GENERATE_TASK_LIST](workflow/HOW_TO_GENERATE_TASK_LIST.md) and run `.\Tools\Start-AllAgents-InNewWindow.ps1`.
+
+**Thirteenth list (2026-03-05):** T1–T8 completed (MVP scope day/night and astral, astral-return-on-death doc, no-day-death rule, PIE pre-demo T3, packaged build T6: not run this round—see [STEAM_EA_STORE_CHECKLIST](workflow/STEAM_EA_STORE_CHECKLIST.md), docs polish T7, AUTOMATION_GAPS update T8). T9: KNOWN_ERRORS polish (this update). **Next priority:** T10 (buffer: update ACCOMPLISHMENTS_OVERVIEW §4 and PROJECT_STATE §4); then generate new 10-task list per [HOW_TO_GENERATE_TASK_LIST](workflow/HOW_TO_GENERATE_TASK_LIST.md) and run `.\Tools\Start-AllAgents-InNewWindow.ps1`. Pre-demo checklist: [VERTICAL_SLICE_CHECKLIST](workflow/VERTICAL_SLICE_CHECKLIST.md) §3.
+
+**T7 refinement (2026-03-05):** Refinement pass used SESSION_LOG and CURRENT_TASK_LIST (Saved/Logs not in workspace). **Next priority (after T7):** T8 (AUTOMATION_GAPS update), T9 (KNOWN_ERRORS or CONVENTIONS polish), T10 (buffer); then generate new 10-task list per [HOW_TO_GENERATE_TASK_LIST.md](workflow/HOW_TO_GENERATE_TASK_LIST.md). See [CURRENT_TASK_LIST.md](workflow/CURRENT_TASK_LIST.md).
+
+**T6 docs polish (2026-03-05):** KNOWN_ERRORS used for this cycle's polish; packaging (T3) and agentic building deferred status are documented in this file and [PROJECT_STATE_AND_TASK_LIST.md](workflow/PROJECT_STATE_AND_TASK_LIST.md) §2. **Next priority (after T6):** T7 refinement, T8 AUTOMATION_GAPS, T9 KNOWN_ERRORS/CONVENTIONS polish, T10 buffer. See [CURRENT_TASK_LIST.md](workflow/CURRENT_TASK_LIST.md).
 
 ## Entry format
 
@@ -16,6 +38,36 @@ For each entry use:
 ---
 
 ## Entries
+
+### C4456: declaration hides previous local (MSVC)
+- **Error:** `error C4456: declaration of 'X' hides previous local declaration` when compiling C++ (e.g. HomeWorldGameMode.cpp).
+- **Cause:** A variable with the same name is declared in an outer scope (e.g. `HeightOffset` at function or block start) and again in an inner block (e.g. inside a nested `if`), which MSVC treats as shadowing.
+- **Fix:** Rename the inner variable (e.g. `PackHeightOffset` instead of a second `HeightOffset`) or reuse the outer variable instead of redeclaring.
+- **Context:** 2026-03-05, T5 planetoid pack count; HomeWorldGameMode::TryTriggerNightEncounter() had inner `HeightOffset` inside planetoid-pack block; outer scope already had `HeightOffset` for wave spawn.
+
+### APlayerController: HUDClass and AHUD::GetOwningPlayer (UE 5.7)
+- **Error:** `HUDClass = AMyHUD::StaticClass()` in player controller constructor fails with C2065: 'HUDClass': undeclared identifier. In AHUD, `GetOwningPlayer()` fails with C3861: identifier not found.
+- **Cause:** In UE 5.7, APlayerController does not expose HUDClass in C++ (or it was renamed/removed). AHUD has no GetOwningPlayer() method.
+- **Fix:** Override `SpawnDefaultHUD()` in your player controller; spawn your HUD with `FActorSpawnParameters::Owner = this`, then set `MyHUD = HUD`. In the HUD, get the owning player with `Cast<APlayerController>(GetOwner())`.
+- **Context:** 2026-03-05, T5 Physical/Spiritual HUD; AHomeWorldPlayerController and AHomeWorldHUD.
+
+### AController::GetPlayerState() is templated in UE 5.7
+- **Error:** `Cast<AHomeWorldPlayerState>(PC->GetPlayerState())` fails with C2672: no matching overloaded function found; could not deduce template argument for 'T'.
+- **Cause:** In UE 5.7, `AController::GetPlayerState()` is a template that returns `T*`; it has no parameterless overload that returns `APlayerState*`.
+- **Fix:** Call `PC->GetPlayerState<AHomeWorldPlayerState>()` instead of `Cast<AHomeWorldPlayerState>(PC->GetPlayerState())`.
+- **Context:** 2026-03-05, HomeWorldSaveGameSubsystem when reading/restoring SpiritualPowerCollected from PlayerState.
+
+### AGameModeBase::GetGameState() is templated in UE 5.7
+- **Error:** `GetGameState()` fails with C2672: no matching overloaded function found; could not deduce template argument for 'T'.
+- **Cause:** In UE 5.7, `AGameModeBase::GetGameState()` is a template; it has no parameterless overload that returns `AGameStateBase*`.
+- **Fix:** Call `GetGameState<AGameStateBase>()` when iterating PlayerArray for regen or other per-player logic.
+- **Context:** 2026-03-05, HomeWorldGameMode::TrySpiritualPowerRegenAtNight (T4 twenty-second list).
+
+### TAutoConsoleVariable: cannot assign int32 (UE 5.7)
+- **Error:** `CVar = static_cast<int32>(value)` fails: no conversion from int32 to TAutoConsoleVariable.
+- **Cause:** TAutoConsoleVariable has no operator=(int32); assignment is for move/copy of the variable object, not setting its value.
+- **Fix:** Use `IConsoleManager::Get().FindConsoleVariable(TEXT("VarName"))->Set(TEXT("3"))` (or the appropriate Set overload) to set the value from code.
+- **Context:** 2026-03-05, AdvanceToDawn() in HomeWorldTimeOfDaySubsystem; setting hw.TimeOfDay.Phase from C++.
 
 ### PowerShell: Test-Path -LiteralPath $env:UE_EDITOR when UE_EDITOR is unset
 - **Error:** `ParameterBindingValidationException` or "Cannot bind argument to parameter 'LiteralPath' because it is null" when a script runs `Test-Path -LiteralPath $env:UE_EDITOR` and `$env:UE_EDITOR` is not set.
@@ -93,6 +145,25 @@ For each entry use:
 - **Fix:** Replace `FPaths::IsRelativePath(...)` with `FPaths::IsRelative(...)`.
 - **Context:** 2026-02, UnrealMCP plugin build, UE 5.7 migration.
 
+### Package-HomeWorld: Stage fails with MissingExecutable (exit code 103)
+- **Error:** RunUAT BuildCookRun completes **Cook** successfully but **Stage** fails: `Stage Failed. Missing receipt '...\HomeWorld-Win64-Shipping.target'. Check that this target has been built.` AutomationTool exits with ExitCode=103 (Error_MissingExecutable).
+- **Cause:** RunUAT BuildCookRun (as used in Package-HomeWorld.bat) does not build the game target; it expects the **HomeWorld Win64 Shipping** executable (and .target receipt) to already exist. Build-HomeWorld.bat builds **HomeWorldEditor Win64 Development**, not the Shipping game.
+- **Fix:** Before running `Package-HomeWorld.bat`, build the game in Shipping config: e.g. `"C:\Program Files\Epic Games\UE_5.7\Engine\Build\BatchFiles\Build.bat" HomeWorld Win64 Shipping -Project="<path-to>\HomeWorld.uproject"`. Then run Package-HomeWorld.bat. See [STEAM_EA_STORE_CHECKLIST.md](workflow/STEAM_EA_STORE_CHECKLIST.md) § Current status (T3 twelfth list) and § How to run packaged build.
+- **Context:** 2026-03-05, T3 twelfth list; packaging for Steam EA.
+
+### Package-HomeWorld: Stage fails with SafeCopyFile (xaudio2_9redist / onnxruntime in use)
+- **Error:** During RunUAT BuildCookRun **Stage**, SafeCopyFile fails: `xaudio2_9redist.dll` "doesn't exist" (skip copy); `onnxruntime.dll` "The process cannot access the file ... because it is being used by another process." Staged build is incomplete; packaged exe may be missing.
+- **Cause:** Editor or another process (e.g. previous Unreal process, antivirus) has Engine/plugin DLLs open. RunUAT stages from Engine binaries; if those files are locked, copy fails.
+- **Fix:** Close Unreal Editor and any Unreal processes before running `Package-HomeWorld.bat`. Ensure no other process is using `C:\Program Files\Epic Games\UE_5.7\Engine\...` or project `Saved\StagedBuilds`. Then re-run: (1) Build HomeWorld Win64 Shipping; (2) Package-HomeWorld.bat. See [STEAM_EA_STORE_CHECKLIST.md](workflow/STEAM_EA_STORE_CHECKLIST.md) § How to run packaged build.
+- **Context:** 2026-03-05, T5 sixteenth list; packaging after Shipping build succeeded.
+
+### Package-HomeWorld: Stage SafeCopyFile — files in use (HomeWorld.exe, engine DLLs)
+- **Error:** During RunUAT BuildCookRun **Stage**, SafeCopyFile fails repeatedly: "The process cannot access the file ... because it is being used by another process" for e.g. `HomeWorld.exe`, manifest files, `libogg_64.dll`, `steam_api64.dll`, `libvorbisfile_64.dll`. `GFSDK_Aftermath_Lib.x64.dll` may be skipped (source doesn't exist). Cook succeeds; Stage does not complete; packaged exe not produced.
+- **Cause:** A process (Unreal Editor, Cursor, previous RunUAT, antivirus, or other) has open handles to files under `Saved\StagedBuilds` or Engine binaries. RunUAT copies into StagedBuilds; if the destination (or source) is locked, copy fails after retries.
+- **Fix:** Close Unreal Editor and any process using the project or Engine directory. Optionally delete or rename `Saved\StagedBuilds` so Stage writes to a clean folder. Re-run: (1) Build HomeWorld Win64 Shipping; (2) `Package-HomeWorld.bat`. Run packaging from a clean context (e.g. dedicated build agent or fresh terminal with no Editor).
+- **Retry (recommended):** From project root, run **`.\Tools\Package-AfterClose.ps1 -CleanStagedBuilds`** *after* closing Unreal Editor and any running HomeWorld game. The script (1) checks for lock-holding processes (UnrealEditor.exe, HomeWorld.exe, HomeWorld-Win64-Shipping.exe) and exits with instructions if any are running; (2) with `-CleanStagedBuilds`, removes `Saved\StagedBuilds` for a clean stage; (3) builds HomeWorld Win64 Shipping; (4) runs `Package-HomeWorld.bat`. Do not run the script while Editor is open. See [STEAM_EA_STORE_CHECKLIST.md](workflow/STEAM_EA_STORE_CHECKLIST.md) § Packaged build retry when Stage failed (files in use).
+- **Context:** 2026-03-05, T8 twentieth list; Cook succeeded, Stage failed; Shipping build had succeeded earlier in same session.
+
 ### RunAutomationLoop: prompt becomes "---" when NEXT_SESSION_PROMPT has only one fence
 - **Error:** Developer agent exits in 0m with exit code 1; automation_loop.log shows `prompt preview: ---`.
 - **Cause:** Get-PromptText in RunAutomationLoop.ps1 expected content *between* two "---" fences. When NEXT_SESSION_PROMPT.md has only one "---", `-split "---", 3` yields two parts, so the "middle block" branch was skipped. The fallback then took the first line that doesn't start with `#` or `**`, which is the line "---" itself, so the agent received the prompt "---" and exited immediately.
@@ -110,6 +181,12 @@ For each entry use:
 - **Cause:** Smart (Unicode) double quotes (U+201C/U+201D) or em dash (U+2014) in string literals; or variable expansion inside double-quoted strings that contain `)` or spaces (e.g. `"($n remaining)"`) can confuse the parser when the opening quote is non-ASCII.
 - **Fix:** Use only ASCII double quote (U+0022) and single quote (U+0027) in .ps1 files. For strings with variables and punctuation, use the `-f` format operator, e.g. `('message {0} remaining' -f $n)` instead of `"message ($n remaining)"`. Use single-quoted strings for paths and literal text. Replace em dash in code with `'-'`. Avoid mixing concatenation of `"`n`n"` with long single-quoted strings; use one double-quoted string or build with `-f`.
 - **Context:** 2026-03-04, Tools/RunAutomationLoop.ps1; automation_terminal_capture.log showed parse errors on agent start.
+
+### Watch-HeartbeatStall: STALL DETECTED repeatedly in automation_errors.log
+- **Error:** `automation_errors.log` fills with repeated lines: `Watch-HeartbeatStall: STALL DETECTED. Heartbeat/last_activity not updated for X min (threshold 15 min). Killing agent process(es).` with X increasing (e.g. 188, 191, … 301 min, or ~72 min in another run).
+- **Cause:** The stall watcher (Watch-HeartbeatStall.ps1) runs every 3 minutes and checks whether `Saved/Logs/automation_heartbeat.log` or `Saved/automation_last_activity.json` was updated. Those files are written by **RunAutomationLoop.ps1** every 1 minute while the agent job is running. If they are not updated for ≥ `StallThresholdMinutes` (default 15) and an agent process is still running, the watcher treats the run as stalled and kills the agent. Repeated log lines with increasing "not updated for X min" mean either (1) the main loop stopped writing heartbeats (loop hung or crashed) so the watcher keeps seeing stale files and keeps logging, or (2) the agent was legitimately busy >15 min and the loop’s heartbeat loop did not run (e.g. script blocked elsewhere).
+- **Fix:** (1) If agent rounds routinely take >15 minutes (e.g. long builds, Editor operations), run the loop with a higher threshold: `-StallThresholdMinutes 30` (or 45), or use `-NoStallProtection` for that run (e.g. debugging). (2) If the loop is hanging and not writing heartbeats, the stall watcher is working as intended (killing the agent so the round can end); investigate why the loop blocked (e.g. job wait, I/O). (3) Refiner: when automation_errors.log shows many Watch-HeartbeatStall lines, add or update this entry and consider documenting `-StallThresholdMinutes` in workflow docs for long-task runs.
+- **Context:** 2026-03-04, Refiner pass; automation_errors.log showed 40+ stall lines (188–301 min, then 71.9 min). See Tools/RunAutomationLoop.ps1 (heartbeat every 1 min), Tools/Watch-HeartbeatStall.ps1, docs/AUTOMATION_LOOP_UNTIL_DONE.md (Stall protection).
 
 ### MCP set_blueprint_property: full asset path causes Editor crash
 - **Error:** Fatal error: `Attempted to create a package with name containing double slashes. PackageName: /Game/Blueprints//Game/HomeWorld/GameMode/BP_GameMode` — Editor crashes.

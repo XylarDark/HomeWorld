@@ -1,5 +1,9 @@
 # Cycle state
 
+**Superseded:** The active loop uses **[CURRENT_TASK_LIST.md](CURRENT_TASK_LIST.md)** and **RunAutomationLoop.ps1** (status in CURRENT_TASK_LIST only). This file is kept for reference only.
+
+---
+
 Used by the automatic development cycle to avoid infinite loops. The agent reads this at the start of each iteration and updates it after implement/test/debug/finalize.
 
 **Fields:**

@@ -17,14 +17,17 @@ if _script_dir not in sys.path:
     sys.path.insert(0, _script_dir)
 import level_loader
 import place_portal_placeholder
+import ensure_portal_blueprint
 import importlib
 importlib.reload(level_loader)
 importlib.reload(place_portal_placeholder)
+importlib.reload(ensure_portal_blueprint)
 
 DEMO_MAP_PATH = "/Game/HomeWorld/Maps/DemoMap"
 
 
 def main():
+    ensure_portal_blueprint.main()
     if not level_loader.is_level_loaded(DEMO_MAP_PATH):
         if not level_loader.open_level(DEMO_MAP_PATH):
             unreal.log("Ensure demo portal: Could not open DemoMap. Open it in the Editor and run again.")

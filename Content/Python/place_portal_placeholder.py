@@ -1,9 +1,9 @@
 # place_portal_placeholder.py
 # Run from Unreal Editor with DemoMap open (Tools -> Execute Python Script or via MCP).
 # Idempotent: places a portal actor on the current level (intended: DemoMap) at the position in
-# planetoid_map_config.json. Prefers AHomeWorldDungeonEntrance (trigger + Open Level); falls back
-# to StaticMeshActor cube if the C++ class is unavailable. If an actor with tag Portal_To_Planetoid
-# already exists, skips. See docs/AUTOMATION_GAPS.md and docs/GAP_SOLUTIONS_RESEARCH.md.
+# planetoid_map_config.json. Prefers BP_PortalToPlanetoid (default LevelToOpen=Planetoid_Pride),
+# then AHomeWorldDungeonEntrance; falls back to StaticMeshActor cube if neither is available.
+# Run ensure_portal_blueprint.py first so BP_PortalToPlanetoid exists with correct default.
 # Config: Content/Python/planetoid_map_config.json (portal_position, portal_level_to_open).
 
 import json
@@ -154,16 +154,41 @@ def main():
         return
 
     actor = None
+    bp_portal_path = "/Game/HomeWorld/BP_PortalToPlanetoid"
 
-    # Prefer AHomeWorldDungeonEntrance (trigger + Open Level) so portal works without manual Blueprint.
-    try:
-        entrance_class = unreal.load_class(None, "/Script/HomeWorld.HomeWorldDungeonEntrance")
-        if entrance_class:
-            actor = unreal.EditorLevelLibrary.spawn_actor_from_class(entrance_class, location, rotation)
-            if actor:
-                _set_level_to_open(actor, level_to_open)
-    except Exception as e:
-        _log("Could not spawn HomeWorldDungeonEntrance: " + str(e))
+    # Prefer BP_PortalToPlanetoid (default LevelToOpen=Planetoid_Pride) so portal opens planetoid without Editor set.
+    if unreal.EditorAssetLibrary.does_asset_exist(bp_portal_path):
+        try:
+            bp_asset = unreal.load_asset(bp_portal_path)
+            if bp_asset:
+                gen_class = None
+                if hasattr(bp_asset, "generated_class"):
+                    try:
+                        gen_class = bp_asset.generated_class()
+                    except Exception:
+                        pass
+                if not gen_class and hasattr(bp_asset, "get_editor_property"):
+                    try:
+                        gen_class = bp_asset.get_editor_property("generated_class")
+                    except Exception:
+                        pass
+                if gen_class:
+                    actor = unreal.EditorLevelLibrary.spawn_actor_from_class(gen_class, location, rotation)
+                    if actor:
+                        _log("Placed BP_PortalToPlanetoid (LevelToOpen from Blueprint default).")
+        except Exception as e:
+            _log("Could not spawn BP_PortalToPlanetoid: " + str(e))
+
+    # Fallback: AHomeWorldDungeonEntrance (attempt to set LevelToOpen from Python).
+    if not actor:
+        try:
+            entrance_class = unreal.load_class(None, "/Script/HomeWorld.HomeWorldDungeonEntrance")
+            if entrance_class:
+                actor = unreal.EditorLevelLibrary.spawn_actor_from_class(entrance_class, location, rotation)
+                if actor:
+                    _set_level_to_open(actor, level_to_open)
+        except Exception as e:
+            _log("Could not spawn HomeWorldDungeonEntrance: " + str(e))
 
     # Fallback: spawn cube placeholder (designer adds Open Level in Blueprint).
     if not actor:

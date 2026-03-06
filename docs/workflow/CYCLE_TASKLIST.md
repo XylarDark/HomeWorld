@@ -1,5 +1,9 @@
 # Cycle task list
 
+**Superseded:** The active automation loop now uses **[CURRENT_TASK_LIST.md](CURRENT_TASK_LIST.md)** and **RunAutomationLoop.ps1**. Use CURRENT_TASK_LIST for the 10-task list and Start-AllAgents-InNewWindow.ps1 to run the loop. This file is kept for reference only.
+
+---
+
 Generated when the automatic development cycle starts. The agent reads and updates this file each iteration.
 
 **Source:** [PROJECT_STATE_AND_TASK_LIST.md](PROJECT_STATE_AND_TASK_LIST.md) section 3 (T1–T10). Skip T10 (deferred). Status here is synced with that file.

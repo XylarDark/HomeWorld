@@ -25,6 +25,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Inventory", meta = (DisplayName = "Get Resource"))
 	int32 GetResource(FName ResourceType) const;
 
+	/** Total count of all physical goods (sum of all resource amounts). Used for physical vs spiritual goods (T7); log via hw.Goods. */
+	UFUNCTION(BlueprintCallable, Category = "Inventory", meta = (DisplayName = "Get Total Physical Goods"))
+	int32 GetTotalPhysicalGoods() const;
+
 	/** Spend amount if player has enough; returns true if spent, false if insufficient. */
 	UFUNCTION(BlueprintCallable, Category = "Inventory", meta = (DisplayName = "Spend Resource"))
 	bool SpendResource(FName ResourceType, int32 Amount);

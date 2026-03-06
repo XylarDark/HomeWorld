@@ -13,6 +13,21 @@ Scoping document for the 30-day demonstrable prototype. Update when you lock the
 
 ---
 
+## Day/night and astral (MVP scope)
+
+Aligned with [VISION.md](VISION.md) **Day and night: physical and spiritual worlds**:
+
+- **Day (physical):** **Daytime mechanics (vision):** (1) **Support/healer/caretaker** — cooking and having meals; (2) **Explorer/builder** — collecting resources, building, exploring the planetoid; (3) **Later game** — child NPC to take care of and keep an eye on. **Goal:** Build up **love** (meals, care, building, child care) → **bonuses used during the night**. Building, cooking, resources, socializing; horses and tools; physical goods. **No death mechanics during the day** — the day is safe. **Restoration:** Health and other losses from astral combat are **not** restored at dawn; they are restored **during the day** through food, care, and wholesome living. Day activities grant **buffs and love-based bonuses** for the next night. See [VISION.md](VISION.md) § Day and night.
+- **Night (spiritual/astral):** Astral bodies defend the land; spirit abilities, flight, combat vs spirits/monsters; spiritual artefacts and power. **Astral death:** if we die in astral form we return to our body and wake up in the morning — no permanent death from night combat. How you spent the day (food, care, bonds) affects restoration and buffs available for the night.
+- **Combat:** **Placeholder only** until a full vision board pass on combat mechanics. Placeholder abilities, UI, and spawn stubs are fine; avoid deep combat system work until the vision board.
+- **Planetoid and homestead (vision):** When on a planetoid, the **homestead lands and appears** on it; you **venture out** from there. When you **complete a planetoid** you move on to another (homestead travels to the next). See [VISION.md](VISION.md) § Campaign summary.
+- **Vanquishing (vision):** Combat **does not kill** — it **strips foes of their sin** and **converts them to their "loved" version**. Converted monsters can become **vendors**, **helpers**, **quest givers**, or **join the homestead as pets or workers**. See [VISION.md](VISION.md) § Day and night.
+- **Night encounters (vision):** Two parts — (1) **waves at home** (defend and convert), (2) **packs across the planetoid** (explore to convert) plus **bigger monsters and bosses** at key points. Goal: limited time per night; balance defend vs explore; progress until you can clear a full planetoid in one night (all foes converted). See [VISION.md](VISION.md) § Day and night.
+- **Combat variety (vision):** **Defend (waves at home):** Defenses around homestead; **ranged attacks** from defenses or **ground AOE** attacks. **Planetoid (away from home):** **Combos** and **single-target damage**. Variety lets you progress without building both at once; **end-game** = use AOE or single-target in either situation. See [VISION.md](VISION.md) § Combat variety.
+- **Late-game (post-MVP):** Ability to **enter the astral during the day** is a progression unlock; not in MVP scope.
+
+---
+
 ## Asset list by type (to-do for the slice)
 
 | Type | Needed for prototype | Notes |

@@ -12,9 +12,12 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Math/RotationMatrix.h"
 #include "HomeWorldAttributeSet.h"
+#include "HomeWorldGameMode.h"
+#include "HomeWorldPlayerState.h"
 #include "HomeWorldResourcePile.h"
 #include "HomeWorldInventorySubsystem.h"
 #include "HomeWorldSpiritRosterSubsystem.h"
+#include "HomeWorldTimeOfDaySubsystem.h"
 #include "InputActionValue.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
@@ -25,6 +28,7 @@
 #include "CollisionQueryParams.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/GameInstance.h"
+#include "Kismet/GameplayStatics.h"
 
 AHomeWorldCharacter::AHomeWorldCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -141,6 +145,8 @@ void AHomeWorldCharacter::PossessedBy(AController* NewController)
 					AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(AbilityClass, 1, INDEX_NONE, this));
 				}
 			}
+			// T1: Lethal astral damage → RequestAstralDeath. When Health goes to 0 at night, advance to dawn + respawn.
+			AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UHomeWorldAttributeSet::GetHealthAttribute()).AddUObject(this, &AHomeWorldCharacter::OnHealthChanged);
 		}
 	}
 }
@@ -194,6 +200,14 @@ void AHomeWorldCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	{
 		PlaceAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/HomeWorld/Input/IA_Place.IA_Place"));
 	}
+	if (!AstralDeathAction)
+	{
+		AstralDeathAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/HomeWorld/Input/IA_AstralDeath.IA_AstralDeath"));
+	}
+	if (!SpiritShieldAction)
+	{
+		SpiritShieldAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/HomeWorld/Input/IA_SpiritShield.IA_SpiritShield"));
+	}
 	if (!EnhancedInput || !DefaultMappingContext || !MoveAction || !LookAction)
 	{
 		return;
@@ -245,6 +259,14 @@ void AHomeWorldCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	if (PlaceAction && PlaceAbilityClass)
 	{
 		EnhancedInput->BindAction(PlaceAction, ETriggerEvent::Triggered, this, &AHomeWorldCharacter::OnPlaceTriggered);
+	}
+	if (AstralDeathAction)
+	{
+		EnhancedInput->BindAction(AstralDeathAction, ETriggerEvent::Triggered, this, &AHomeWorldCharacter::OnAstralDeathTriggered);
+	}
+	if (SpiritShieldAction && SpiritShieldAbilityClass)
+	{
+		EnhancedInput->BindAction(SpiritShieldAction, ETriggerEvent::Triggered, this, &AHomeWorldCharacter::OnSpiritShieldTriggered);
 	}
 
 	// Ensure game viewport receives input after bindings are set (fixes PIE when keyboard/mouse don't move or look).
@@ -367,6 +389,29 @@ void AHomeWorldCharacter::OnPlaceTriggered(const FInputActionValue& Value)
 	UE_LOG(LogTemp, Log, TEXT("HomeWorld: Place ability %s"), bActivated ? TEXT("activated") : TEXT("failed to activate"));
 }
 
+void AHomeWorldCharacter::OnAstralDeathTriggered(const FInputActionValue& Value)
+{
+	UE_LOG(LogTemp, Log, TEXT("HomeWorld: AstralDeath input triggered (dawn + respawn)"));
+	RequestAstralDeath();
+}
+
+void AHomeWorldCharacter::OnSpiritShieldTriggered(const FInputActionValue& Value)
+{
+	UE_LOG(LogTemp, Log, TEXT("HomeWorld: SpiritShield input triggered"));
+	if (!AbilitySystemComponent)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HomeWorld: SpiritShield skipped - no AbilitySystemComponent"));
+		return;
+	}
+	if (!SpiritShieldAbilityClass)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HomeWorld: SpiritShield skipped - SpiritShieldAbilityClass not set on Blueprint"));
+		return;
+	}
+	const bool bActivated = AbilitySystemComponent->TryActivateAbilityByClass(SpiritShieldAbilityClass);
+	UE_LOG(LogTemp, Log, TEXT("HomeWorld: SpiritShield ability %s"), bActivated ? TEXT("activated") : TEXT("failed to activate"));
+}
+
 bool AHomeWorldCharacter::TryPlaceAtCursor()
 {
 	UWorld* World = GetWorld();
@@ -403,6 +448,24 @@ FName AHomeWorldCharacter::GetSpiritIdForDeath() const
 	return FName(*FString::Printf(TEXT("%s_%u"), *GetName(), GetUniqueID()));
 }
 
+void AHomeWorldCharacter::OnHealthChanged(const FOnAttributeChangeData& Data)
+{
+	if (Data.NewValue > 0.f) return;
+	// Only player character: astral death is "player's astral form defeated at night".
+	if (!Cast<APlayerController>(GetController())) return;
+	UWorld* World = GetWorld();
+	if (!World) return;
+	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
+	if (!TimeOfDay || !TimeOfDay->GetIsNight()) return;
+	UE_LOG(LogTemp, Log, TEXT("HomeWorld: Lethal astral damage (Health 0 at night) -> RequestAstralDeath"));
+	RequestAstralDeath();
+}
+
+void AHomeWorldCharacter::RequestAstralDeath()
+{
+	AHomeWorldGameMode::RequestAstralDeath(this);
+}
+
 void AHomeWorldCharacter::ReportDeathAndAddSpirit()
 {
 	UWorld* World = GetWorld();
@@ -416,11 +479,61 @@ void AHomeWorldCharacter::ReportDeathAndAddSpirit()
 	UE_LOG(LogTemp, Log, TEXT("HomeWorld: Character '%s' reported death and added as spirit: %s"), *GetName(), *SpiritId.ToString());
 }
 
+bool AHomeWorldCharacter::ConsumeMealRestore()
+{
+	UWorld* World = GetWorld();
+	if (!World) return false;
+	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
+	if (TimeOfDay && TimeOfDay->GetIsNight())
+	{
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: ConsumeMealRestore only available by day (current phase is night)."));
+		return false;
+	}
+	UHomeWorldAttributeSet* AttrSet = Cast<UHomeWorldAttributeSet>(AttributeSet);
+	if (!AttrSet)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HomeWorld: ConsumeMealRestore failed - no AttributeSet."));
+		return false;
+	}
+	const float Current = AttrSet->GetHealth();
+	const float Max = AttrSet->GetMaxHealth();
+	const float RestoreAmount = 25.f;
+	const float NewHealth = FMath::Min(Current + RestoreAmount, Max);
+	AttrSet->SetHealth(NewHealth);
+
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	AHomeWorldPlayerState* PS = PC ? Cast<AHomeWorldPlayerState>(PC->PlayerState) : nullptr;
+	if (PS)
+	{
+		PS->SetDayRestorationBuff(true);
+		PS->IncrementMealsConsumedToday();
+		PS->AddLovePoints(1);  // T1: meal contributes to love (HUD "Love: N" and night bonuses).
+		// T2 caretaker stub: if Family-tagged actors exist in level, count as "meal with family".
+		static const FName FamilyTag(TEXT("Family"));
+		TArray<AActor*> FamilyActors;
+		UGameplayStatics::GetAllActorsWithTag(World, FamilyTag, FamilyActors);
+		if (FamilyActors.Num() > 0)
+		{
+			PS->IncrementMealsWithFamilyToday();
+			UE_LOG(LogTemp, Log, TEXT("HomeWorld: ConsumeMealRestore — meal with family (Family actors=%d); meals with family today=%d (caretaker stub)."), FamilyActors.Num(), PS->GetMealsWithFamilyToday());
+		}
+	}
+	UE_LOG(LogTemp, Log, TEXT("HomeWorld: ConsumeMealRestore — Health %.0f -> %.0f, day buff set, meals today=%d (visible at night / HUD)."), Current, NewHealth, PS ? PS->GetMealsConsumedToday() : 0);
+	return true;
+}
+
 bool AHomeWorldCharacter::TryHarvestInFront()
 {
 	UWorld* World = GetWorld();
 	if (!World)
 	{
+		return false;
+	}
+	// T5: Physical = day harvest only; night collect = Spiritual (handled by spiritual collectibles).
+	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
+	if (TimeOfDay && TimeOfDay->GetIsNight())
+	{
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: Harvest only available by day (Physical). Current phase is night."));
 		return false;
 	}
 	const FVector Start = GetActorLocation() + FVector(0.0f, 0.0f, GetCapsuleComponent() ? GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight() * 0.5f : 50.0f);
@@ -449,7 +562,8 @@ bool AHomeWorldCharacter::TryHarvestInFront()
 		const FName ResourceType = Pile->ResourceType;
 		const int32 Amount = Pile->AmountPerHarvest;
 		Inv->AddResource(ResourceType, Amount);
-		UE_LOG(LogTemp, Log, TEXT("HomeWorld: Harvest succeeded - %s +%d"), *ResourceType.ToString(), Amount);
+		const int32 PhysicalTotal = Inv->GetTotalPhysicalGoods();
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: Harvest succeeded (Physical) - %s +%d (total Physical: %d)"), *ResourceType.ToString(), Amount, PhysicalTotal);
 		return true;
 	}
 
@@ -463,7 +577,8 @@ bool AHomeWorldCharacter::TryHarvestInFront()
 			if (UHomeWorldInventorySubsystem* Inv = GI->GetSubsystem<UHomeWorldInventorySubsystem>())
 			{
 				Inv->AddResource(FName("Wood"), 25);
-				UE_LOG(LogTemp, Log, TEXT("HomeWorld: Treasure opened - Wood +25"));
+				const int32 PhysicalTotal = Inv->GetTotalPhysicalGoods();
+				UE_LOG(LogTemp, Log, TEXT("HomeWorld: Treasure opened (Physical) - Wood +25 (total Physical: %d)"), PhysicalTotal);
 			}
 		}
 		HitActor->Destroy();

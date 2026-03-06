@@ -2,6 +2,8 @@
 
 **Purpose:** Copy this file to `CURRENT_TASK_LIST.md` and fill each task with research-backed detail so agents can one-shot. Each task must have **status:** one of `pending` | `in_progress` | `completed` | `blocked`. The loop runs until no task has status `pending` or `in_progress`.
 
+**Policy (dynamic by phase):** The split of implementation vs verification is **dynamic**. Read [PROJECT_STATE_AND_TASK_LIST.md](PROJECT_STATE_AND_TASK_LIST.md) §0 **Current development phase**: **Rapid prototyping** → more implementation slots (e.g. 7–8), fewer verification (2–3); **Prototype hardening** → balanced (e.g. 4–5 implementation, 5–6 verification). T10 is always buffer. See [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md) § Task list composition.
+
 See [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md) for sources and process.
 
 ---

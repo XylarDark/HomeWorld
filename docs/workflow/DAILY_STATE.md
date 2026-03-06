@@ -2,7 +2,7 @@
 
 **Purpose:** This file is read at session start and updated at session end so you can ask "what did we do yesterday and what do we need to do today?" and get a clear answer. The agent updates it automatically when a session ends.
 
-**Current focus:** Eighth task list complete (all T1–T10 done). Next = generate new 10-task list.
+**Current focus:** Twenty-ninth task list **complete** (T1–T10 all done; run 3 of 4 toward polished MVP). Generate thirtieth list for run 4 of 4, or use [docs/EDITOR_POLISH_TUTORIAL.md](../EDITOR_POLISH_TUTORIAL.md) to implement outstanding work in Editor for a polished state.
 
 ---
 
@@ -10,7 +10,7 @@
 
 What was completed or in progress in the previous session.
 
-- **T10 (eighth list) completed.** ACCOMPLISHMENTS_OVERVIEW §4: eighth-cycle row updated (all T1–T10 completed; Next = generate new list + run Start-AllAgents-InNewWindow.ps1). PROJECT_STATE_AND_TASK_LIST §4: list complete; next step = generate list per HOW_TO_GENERATE_TASK_LIST then run Start-AllAgents. T10 status set to completed in CURRENT_TASK_LIST.
+- **T10 completed (twenty-ninth list):** Buffer — ACCOMPLISHMENTS_OVERVIEW §4 and PROJECT_STATE_AND_TASK_LIST §4 updated with twenty-ninth-cycle outcome and next step (generate new list, then Start-AllAgents-InNewWindow.ps1); T10 status set to completed in CURRENT_TASK_LIST. All T1–T10 completed.
 
 ---
 
@@ -18,7 +18,7 @@ What was completed or in progress in the previous session.
 
 What we need to do today. Work from [CURRENT_TASK_LIST.md](CURRENT_TASK_LIST.md) and [ACCOMPLISHMENTS_OVERVIEW.md](ACCOMPLISHMENTS_OVERVIEW.md).
 
-- **Generate new 10-task list** — All T1–T10 complete. Generate the next list per [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md) (read [TASK_LIST_REPEATS_LOG.md](TASK_LIST_REPEATS_LOG.md) and ACCOMPLISHMENTS_OVERVIEW §4 to avoid duplicating completed work). Then run `.\Tools\Start-AllAgents-InNewWindow.ps1` for the next cycle.
+- **All T1–T10 complete.** Either: (1) Generate the next (thirtieth) task list per [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md), then run `.\Tools\Start-AllAgents-InNewWindow.ps1` for run 4 of 4; or (2) Follow [EDITOR_POLISH_TUTORIAL.md](../EDITOR_POLISH_TUTORIAL.md) to implement outstanding work in Editor and reach a polished MVP state.
 
 ---
 
@@ -26,7 +26,7 @@ What we need to do today. Work from [CURRENT_TASK_LIST.md](CURRENT_TASK_LIST.md)
 
 Preview of next focus.
 
-- **Run next automation cycle** — After the new list is generated, run Start-AllAgents-InNewWindow.ps1; agent will pick first pending task from the new list.
+- Thirtieth list (run 4 of 4 toward polished MVP) or follow-up from next list generation.
 
 ---
 

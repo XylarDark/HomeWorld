@@ -28,6 +28,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Build Order")
 	FName GetBuildDefinitionID() const { return BuildDefinitionID; }
 
+	/**
+	 * Complete this build order (e.g. when SO_WallBuilder OnActivated or agent BUILD branch finishes).
+	 * Callable from Blueprint or C++; logs and sets bBuildCompleted for hologram swap/hide in Blueprint.
+	 * Console: hw.CompleteBuildOrder targets nearest build order to player (PIE).
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Build Order")
+	void CompleteBuildOrder();
+
+	/** True after CompleteBuildOrder(); Blueprint can bind to hide hologram / show final mesh. */
+	UPROPERTY(BlueprintReadOnly, Category = "Build Order")
+	bool bBuildCompleted = false;
+
 protected:
 	/** Overlap volume so agents/EQS can detect this build order. */
 	UPROPERTY(VisibleAnywhere, Category = "Build Order")

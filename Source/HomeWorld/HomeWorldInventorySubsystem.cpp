@@ -14,6 +14,16 @@ int32 UHomeWorldInventorySubsystem::GetResource(FName ResourceType) const
 	return Ptr ? *Ptr : 0;
 }
 
+int32 UHomeWorldInventorySubsystem::GetTotalPhysicalGoods() const
+{
+	int32 Total = 0;
+	for (const auto& Pair : ResourceCounts)
+	{
+		Total += Pair.Value;
+	}
+	return Total;
+}
+
 bool UHomeWorldInventorySubsystem::SpendResource(FName ResourceType, int32 Amount)
 {
 	if (Amount <= 0) return true;

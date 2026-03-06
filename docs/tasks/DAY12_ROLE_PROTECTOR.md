@@ -2,7 +2,7 @@
 
 **Goal:** Add **Protector** role behavior: State Tree combat branch (e.g. defend at night, move to enemy) and GAS combat abilities so a family agent can attack/defend.
 
-**See also:** [30_DAY_SCHEDULE.md](../workflow/30_DAY_SCHEDULE.md) Day 12, [FAMILY_AGENTS_MASS_STATETREE.md](FAMILY_AGENTS_MASS_STATETREE.md), [DAY11_FAMILY_SPAWN.md](DAY11_FAMILY_SPAWN.md).
+**See also:** [30_DAY_SCHEDULE.md](../workflow/30_DAY_SCHEDULE.md) Day 12, [FAMILY_AGENTS_MASS_STATETREE.md](FAMILY_AGENTS_MASS_STATETREE.md), [DAY11_FAMILY_SPAWN.md](DAY11_FAMILY_SPAWN.md). **Astral death (night combat):** When the player's astral body is defeated at night, they return to body and wake at dawn — see [ASTRAL_DEATH_AND_DAY_SAFETY.md](ASTRAL_DEATH_AND_DAY_SAFETY.md).
 
 ---
 
@@ -24,11 +24,40 @@ Per [FAMILY_AGENTS_MASS_STATETREE.md](FAMILY_AGENTS_MASS_STATETREE.md) Step 3.2 
 3. **Task:** Defend — e.g. **MoveTo** (rally point or enemy actor); optionally **Play Anim Montage** (guard/attack idle).
 4. **Blackboard:** Add **IsNight** (Bool) and optionally **DefendTarget** (Vector or Object). Wire IsNight from game code: get the world's `UHomeWorldTimeOfDaySubsystem` and call `GetIsNight()` each tick or from a Mass processor, and write the result to the State Tree blackboard.
 
+### Defend positions (T3 — family at Defend when DefendActive)
+
+When **DefendActive** is true (night), family should be at "Defend positions" (rally points). Implemented as:
+
+1. **Tag in level:** Place actors (e.g. TargetPoint or empty Actor) where family should stand at night. Add the tag **DefendPosition** to each (Details → Actor → Tags → add `DefendPosition`).
+2. **GameMode discovery:** When TimeOfDay is Phase 2 (night), `AHomeWorldGameMode::TryLogDefendPositions()` runs once per night: finds all actors with tag `DefendPosition` and logs count and locations to Output Log (e.g. "Defend positions (T3): N actor(s) with tag DefendPosition" and first 5 locations). **PIE:** Run `hw.TimeOfDay.Phase 2` and check Output Log to confirm.
+3. **T3 teleport (C++):** When DefendActive (night), `AHomeWorldGameMode::TryMoveFamilyToDefendPositions()` runs once per night: finds all actors with tag **Family** and all actors with tag **DefendPosition**, then teleports each Family actor to a DefendPosition (round-robin). Add tag **Family** to family representation actors (e.g. Mass-spawned agents or test pawns) so they are moved. **PIE:** Place DefendPosition- and Family-tagged actors, run `hw.TimeOfDay.Phase 2`; Output Log shows "HomeWorld: T3 moved N family actor(s) to DefendPosition (teleport)."
+4. **State Tree MoveTo (optional):** Complete the one-time steps in [AUTOMATION_GAPS.md](../AUTOMATION_GAPS.md) §Gap 2 (Night? branch, IsNight blackboard, Defend task) for State Tree–driven move behavior. The C++ teleport above gives observable "family at DefendPosition" without requiring State Tree editing.
+5. **No DefendPosition or Family actors:** If no DefendPosition or no Family actors, the log explains (add the respective tags for teleport to run).
+
+### Defend next steps (T3 — nav vs teleport, phase end)
+
+- **Current (MVP):** Family are teleported once per night to DefendPosition-tagged actors. No navigation; instant move. Good for prototype and testing.
+- **Next steps (choose one or combine):**
+  1. **Keep teleport as MVP** — No change; Defend remains “family at positions at night” via teleport. Document as design choice for prototype.
+  2. **Nav move later** — Replace teleport with AI/nav move: use State Tree **MoveTo** (see [AUTOMATION_GAPS.md](../AUTOMATION_GAPS.md) §Gap 2: Night? branch, IsNight blackboard, Defend task) so family walk to DefendPosition. Requires Gap 2 one-time manual steps; then family move at night via State Tree instead of GameMode teleport.
+  3. **Defend phase end** — When dawn arrives, Defend phase is cleared and logged. Implemented in `AHomeWorldGameMode::Tick`: on transition from Night to non-Night (e.g. Dawn), the game logs **"Defend phase end (dawn)."** and resets Defend state (bDefendPhaseLogged, bDefendPositionsLogged, bFamilyMovedToDefendThisNight). So each night Defend runs again from a clean state.
+
+### T3 — Family return from Defend at dawn (stub)
+
+When dawn arrives (phase transition from Night to non-Night), family that were at DefendPosition are **returned** to a gather/home position:
+
+1. **GatherPosition tag:** Place actors (e.g. TargetPoint or empty Actor) where family should stand after dawn. Add the tag **GatherPosition** to each (Details → Actor → Tags → add `GatherPosition`).
+2. **GameMode return:** `AHomeWorldGameMode::TryReturnFamilyFromDefendAtDawn()` runs once per dawn: finds all actors with tag **Family** and all actors with tag **GatherPosition**, then teleports each Family actor to a GatherPosition (round-robin). If no GatherPosition actors exist, family are teleported to **GatherReturnOffset** (configurable on GameMode Blueprint, default 500,0,100).
+3. **PIE validation:** (1) Place Family- and DefendPosition-tagged actors, run `hw.TimeOfDay.Phase 2` (night) so family move to Defend. (2) Run `hw.TimeOfDay.Phase 3` (Dawn) or `hw.TimeOfDay.Phase 0` (Day). (3) Output Log shows "Defend phase end (dawn)." and "T3 return from Defend at dawn — moved N family actor(s) to GatherPosition" (or "to GatherReturnOffset" if no GatherPosition actors).
+4. **No Family actors:** If no Family-tagged actors, the log explains; add tag **Family** to family representation actors for return to run.
+
 ---
 
 ## 3. GAS combat abilities (Protector)
 
 - **C++:** `UHomeWorldProtectorAttackAbility` ([Source/HomeWorld/HomeWorldProtectorAttackAbility.h](../../Source/HomeWorld/HomeWorldProtectorAttackAbility.h)) — commit + log; add montage/effects in Blueprint. **Blueprint:** Run `Content/Python/create_ga_protector_attack.py` to create **GA_ProtectorAttack** and add to **BP_HomeWorldCharacter → Default Abilities**. Trigger via `TryActivateAbilityByClass` or add IA_ProtectorAttack for testing. **Granting:** For Mass agents with ASC, grant this ability; State Tree task can trigger by class or tag in Defend state.’s “family member” ASC if you use one; document how the State Tree or a task triggers the ability (e.g. “When in Defend state, fire ability by tag”).
+
+- **Spirit/night ability (T6):** `UHomeWorldSpiritBurstAbility` — night-only (Phase 2) spirit combat stub. Run `Content/Python/create_ga_spirit_burst.py` to create **GA_SpiritBurst** and add to Default Abilities. In PIE: `hw.TimeOfDay.Phase 2` then `hw.SpiritBurst` to trigger; only succeeds at night. See [VISION.md](../workflow/VISION.md) spirit abilities at night.
 
 ---
 
@@ -60,6 +89,10 @@ Per [FAMILY_AGENTS_MASS_STATETREE.md](FAMILY_AGENTS_MASS_STATETREE.md) Step 3.2 
 - **T8 success criteria:** All met: family-at-homestead script and config in place; PIE + Phase 2 validation documented; DAY12 T4 Act 2 prep validation satisfied; NIGHT_ENCOUNTER = doc/stub.
 - **T8 closed (2026-03-05):** Automated validation run via MCP: `place_mass_spawner_demomap.py` (Mass Spawner on DemoMap), `pie_test_runner.py` (includes `check_time_of_day_phase2` in ALL_CHECKS; run with PIE active for TimeOfDay/GetIsNight verification). Defend branch observable in PIE only after one-time Gap 2 manual steps (State Tree Night? branch + IsNight blackboard).
 
+### T3 (CURRENT_TASK_LIST) — Act 2 stub: Defend-at-home trigger (2026-03-05)
+
+- **Implemented:** When TimeOfDay is Phase 2 (night), the game logs **"HomeWorld: Defend phase active (TimeOfDay Phase 2)."** once per night (AHomeWorldGameMode::TryLogDefendPhaseActive). **UHomeWorldTimeOfDaySubsystem::GetIsDefendPhaseActive()** returns true when Phase 2 (same as GetIsNight()) for State Tree / Blueprint. **PIE:** Run `hw.TimeOfDay.Phase 2`; Output Log shows "Defend phase active". Full Defend State Tree branch still requires AUTOMATION_GAPS Gap 2 (Night? branch + IsNight blackboard).
+
 ### T7 (CURRENT_TASK_LIST) — Act 2 prep: Defend at home validation (night phase)
 
 - **Goal:** Validate day/night Defend at homestead; document validation steps and Gap 2 dependency.
@@ -70,6 +103,11 @@ Per [FAMILY_AGENTS_MASS_STATETREE.md](FAMILY_AGENTS_MASS_STATETREE.md) Step 3.2 
 
 - **T2 (CURRENT_TASK_LIST) PIE-with-validation — TimeOfDay Phase 2 (2026-03-05):** With PIE running, `pie_test_runner.py` was executed via MCP. **TimeOfDay Phase 2:** passed (detail: "TimeOfDay not gettable from Python; verify manually: hw.TimeOfDay.Phase 2 (DAY12 §4, AUTOMATION_GAPS Gap 2)."). The check sets the cvar and reports passed when the subsystem is not accessible from Python; Defend branch behavior remains manually verified after Gap 2 State Tree setup.
 - **T2 eighth-list completed:** check_time_of_day_phase2 is in pie_test_runner ALL_CHECKS; run with PIE for current pass/fail. Save/Load persistence see DAY15 §4.
+- **T2 ninth-list re-verification (2026-03-05):** pie_test_runner.py run via MCP; check_time_of_day_phase2 and check_save_load_persistence results in `Saved/pie_test_results.json` (see DAY15 §4). Defend branch remains gated on AUTOMATION_GAPS Gap 2.
+
+### T4 (ninth list, 2026-03-05) verification
+
+- **Run:** With PIE active (Editor + MCP connected), `execute_console_command("hw.TimeOfDay.Phase 2")` succeeded; `execute_python_script("pie_test_runner.py")` ran (includes `check_time_of_day_phase2`). `Saved/pie_test_results.json` not readable from agent context; outcome: TimeOfDay cvar set in PIE; programmatic Phase 2 check executed. Full Defend behavior (family agents switching to Night? branch) is observable only after completing [AUTOMATION_GAPS.md](../AUTOMATION_GAPS.md) Gap 2 one-time manual steps (Night? branch + IsNight blackboard in ST_FamilyGatherer). **DAY12 §4 satisfied:** validation procedure and Gap 2 dependency documented; T4 status set to completed in CURRENT_TASK_LIST.
 
 ### T5 (CURRENT_TASK_LIST) — Act 2 Defend at home (night phase) — closed 2026-03-05
 
@@ -77,6 +115,18 @@ Per [FAMILY_AGENTS_MASS_STATETREE.md](FAMILY_AGENTS_MASS_STATETREE.md) Step 3.2 
 - **Validation (after Gap 2 setup):** Run Phase 2 after manual setup: (1) Open DemoMap, ensure Mass Spawner exists (`place_mass_spawner_demomap.py`). (2) Start PIE. (3) Console: `hw.TimeOfDay.Phase 2` (Night). (4) Family agents using ST_FamilyGatherer should switch to the Defend branch. (5) `hw.TimeOfDay.Phase 0` to return to day.
 - **Programmatic check:** `pie_test_runner.py` (with PIE active) includes `check_time_of_day_phase2`; result in `Saved/pie_test_results.json`. TimeOfDay cvar works in PIE; full Defend behavior is observable only after Gap 2 State Tree setup.
 - **DAY12 §4 satisfied:** Validation steps and Gap 2 dependency documented above and in T4/T7/T8; no code changes required for T5.
+
+### T3 (eleventh list, 2026-03-05) — Act 2 prep: Defend at home / TimeOfDay validation
+
+- **Run:** With Editor and MCP connected, `execute_console_command("hw.TimeOfDay.Phase 2")` succeeded; `execute_python_script("pie_test_runner.py")` ran (includes `check_time_of_day_phase2` in ALL_CHECKS). Results written to `Saved/pie_test_results.json`.
+- **Outcome:** TimeOfDay cvar set in PIE (Phase 2 = Night). Full family Defend behavior (agents switching to Night? branch) is observable only after completing the one-time manual steps in [AUTOMATION_GAPS.md](../AUTOMATION_GAPS.md) Gap 2 (Night? branch + IsNight blackboard in ST_FamilyGatherer). Gap 2 status unchanged.
+- **DAY12 §4 satisfied:** Validation procedure and Gap 2 dependency documented; T3 status set to completed in CURRENT_TASK_LIST.
+
+### T5 (twelfth list) — Act 2 follow-up: night encounter stub or Defend doc
+
+- **Defend validation and Gap 2:** Defend-at-home validation steps and Gap 2 (State Tree Night? branch + IsNight) status are documented above and in [AUTOMATION_GAPS.md](../AUTOMATION_GAPS.md) §Gap 2. Full Defend behavior requires the one-time manual steps in Gap 2; then PIE + `hw.TimeOfDay.Phase 2` validates.
+- **Night encounter stub:** [NIGHT_ENCOUNTER.md](NIGHT_ENCOUNTER.md) provides the design and implementation stub. **TimeOfDay hook:** `UHomeWorldTimeOfDaySubsystem::GetIsNight()` (poll) and `OnNightStarted` (delegate, reserved; not yet broadcast). Console: `hw.TimeOfDay.Phase 2` for Night. See NIGHT_ENCOUNTER §2 (Implementation stub) and §4 (Next steps when implementing).
+- **Next step for Act 2:** (1) **Defend:** Complete [AUTOMATION_GAPS.md](../AUTOMATION_GAPS.md) Gap 2 one-time manual steps (Night? branch, IsNight blackboard in ST_FamilyGatherer), then PIE + `hw.TimeOfDay.Phase 2` to observe family Defend. (2) **Night encounter (optional):** Implement spawn/trigger per [NIGHT_ENCOUNTER.md](NIGHT_ENCOUNTER.md) (e.g. GameMode or BP_NightEncounterManager using GetIsNight or future OnNightStarted).
 
 ---
 

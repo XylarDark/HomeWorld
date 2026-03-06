@@ -18,6 +18,7 @@ IA_MOVE_FORWARD_NAME = "IA_MoveForward"
 IA_MOVE_BACK_NAME = "IA_MoveBack"
 IA_STRAFE_LEFT_NAME = "IA_StrafeLeft"
 IA_STRAFE_RIGHT_NAME = "IA_StrafeRight"
+IA_ASTRAL_DEATH_NAME = "IA_AstralDeath"
 IMC_NAME = "IMC_Default"
 
 
@@ -243,6 +244,27 @@ def _create_mapping_context(name, ia_move, ia_look, ia_forward=None, ia_back=Non
     return imc
 
 
+def _add_astral_death_to_imc(imc, ia_astral):
+    """Add F8 -> IA_AstralDeath to IMC_Default for in-game astral death trigger (T1). Idempotent."""
+    if not imc or not ia_astral or not hasattr(imc, "map_key"):
+        return
+    try:
+        if hasattr(imc, "unmap_all_keys_from_action") and ia_astral:
+            imc.unmap_all_keys_from_action(ia_astral)
+    except Exception:
+        pass
+    key = _get_key("F8")
+    if key is None:
+        _log("Could not resolve F8 for IA_AstralDeath; bind in Editor.")
+        return
+    try:
+        imc.map_key(ia_astral, key)
+        unreal.EditorAssetLibrary.save_loaded_asset(imc)
+        _log("Added IA_AstralDeath (F8) to IMC_Default for astral death trigger.")
+    except Exception as e:
+        _log("map_key IA_AstralDeath failed: " + str(e))
+
+
 def main():
     _log("Creating Enhanced Input assets...")
     ia_move = _create_input_action(IA_MOVE_NAME, "Axis2D")
@@ -252,8 +274,11 @@ def main():
     ia_left = _create_input_action(IA_STRAFE_LEFT_NAME, "Boolean")
     ia_right = _create_input_action(IA_STRAFE_RIGHT_NAME, "Boolean")
     imc = _create_mapping_context(IMC_NAME, ia_move, ia_look, ia_forward, ia_back, ia_left, ia_right)
+    ia_astral = _create_input_action(IA_ASTRAL_DEATH_NAME, "Boolean")
+    if ia_astral and imc:
+        _add_astral_death_to_imc(imc, ia_astral)
     if ia_move and ia_look and imc:
-        _log("Done. IA_Move, IA_Look, IMC_Default + IA_MoveForward/Back/StrafeLeft/Right at " + INPUT_PATH)
+        _log("Done. IA_Move, IA_Look, IMC_Default + IA_MoveForward/Back/StrafeLeft/Right + IA_AstralDeath (F8) at " + INPUT_PATH)
     else:
         _log("Some assets could not be created; check log above and finish in Editor.")
     return ia_move, ia_look, imc

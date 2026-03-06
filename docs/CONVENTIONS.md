@@ -31,7 +31,7 @@ When the Unreal Editor is open and the MCP server is connected to Cursor:
 2. **Save repeatable workflows** as Python scripts in `Content/Python/` alongside MCP usage, so operations can be re-run without MCP.
 3. When MCP and Python cannot accomplish a step, **log it to [AUTOMATION_GAPS.md](AUTOMATION_GAPS.md)** with a suggested approach for future automation; do not document manual steps for the user (project is fully autonomous). See `.cursor/rules/20-full-automation-no-manual-steps.mdc`.
 
-See [MCP_SETUP.md](MCP_SETUP.md) for installation and `.cursor/rules/09-mcp-workflow.mdc` for full priority rules. For PIE pre-demo validation and vertical slice checks, see [VERTICAL_SLICE_CHECKLIST](workflow/VERTICAL_SLICE_CHECKLIST.md) §3.
+See [MCP_SETUP.md](MCP_SETUP.md) for installation and `.cursor/rules/09-mcp-workflow.mdc` for full priority rules. For PIE pre-demo validation and vertical slice checks, see [VERTICAL_SLICE_CHECKLIST](workflow/VERTICAL_SLICE_CHECKLIST.md) §3. Current cycle status: [CURRENT_TASK_LIST](workflow/CURRENT_TASK_LIST.md) and [KNOWN_ERRORS.md](KNOWN_ERRORS.md) (next priority / freshness).
 
 **Automation — variables with no access:** When adding automation for Editor/engine features (Python, MCP), follow the "variables no access" procedure: identify required settings from tutorials/docs, verify automation access, document no-access items and manual steps in KNOWN_ERRORS or a feature doc (e.g. [PCG_VARIABLES_NO_ACCESS.md](PCG_VARIABLES_NO_ACCESS.md)). See `.cursor/rules/automation-standards.mdc`.
 
@@ -70,3 +70,17 @@ The default pawn uses a **third-person** setup:
 - **Camera:** A spring arm and follow camera are attached to the character capsule. The camera orbits with the mouse (Look) and stays behind the character. Pitch is clamped so the camera does not flip.
 - **Movement:** Movement is **camera-relative** — W moves toward where the camera looks, and the character orients to movement direction.
 - **Input:** IA_Move, IA_Look, and IMC_Default are created by `bootstrap_project.py` and assigned to the default pawn. If running manually, see the Input setup section above. Camera settings (arm length, FOV, pitch limits, sensitivity) are exposed on the character for tuning.
+
+---
+
+## Design rules (day/night, death)
+
+- **No death during the day:** There are no mechanics to die during the day; the day phase is safe in that sense. Death mechanics apply to night (astral) combat and to succession (permanent death when no heirs). See [PROTOTYPE_SCOPE](workflow/PROTOTYPE_SCOPE.md) § Day/night and astral (MVP scope) and [VISION](workflow/VISION.md) § Day and night: physical and spiritual worlds.
+
+### Physical vs spiritual goods (T7)
+
+Per [VISION](workflow/VISION.md) **Day and night: physical and spiritual worlds**:
+
+- **Physical goods:** Materials, food, and supplies collected **by day** (harvest, resource piles, yield nodes). Stored in `UHomeWorldInventorySubsystem` (resource types and counts). Day harvest → physical; use `hw.Goods` or harvest in PIE to see physical total.
+- **Spiritual (artefacts/power):** Collected **at night** (Phase 2) via overlap on spiritual collectibles or night-only interactions. Stored in `AHomeWorldPlayerState::SpiritualPowerCollected`. Night collect → spiritual; use `hw.Goods` or `hw.SpiritualPower` to see spiritual total.
+- **Rule:** One counter per realm: physical = inventory total (sum of all resource amounts); spiritual = `GetSpiritualPowerCollected()`. Both observable in PIE via console command `hw.Goods`.
