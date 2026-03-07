@@ -2,6 +2,8 @@
 
 Scoping document for the 30-day demonstrable prototype. Update when you lock the "beautiful corner" (e.g. after Day 10) and when you choose the one moment for the vertical slice. See [VISION.md](VISION.md) (Demonstrable prototype and vertical slice) and [30_DAY_SCHEDULE.md](30_DAY_SCHEDULE.md).
 
+**As of 2026-03-02 (run 4 of 4 toward polished MVP):** Chosen **moment** = Claim homestead; chosen **corner** = Homestead compound (see High-level below).
+
 ---
 
 ## High-level
@@ -10,6 +12,22 @@ Scoping document for the 30-day demonstrable prototype. Update when you lock the
 - **Creative pillars:** Love as Epic Quest; combat + bonds; roles (casual vs hardcore).
 - **Chosen moment:** **Locked: Claim homestead** — player places first home asset (P) after exploring/harvesting. (Alternatives for future: First harvest, Dungeon approach, Planetoid POI. See [VERTICAL_SLICE_CHECKLIST.md](VERTICAL_SLICE_CHECKLIST.md).)
 - **Chosen corner:** **Locked: Homestead compound** — DemoMap/Homestead with placed buildings + resource nodes + PCG. (Alternatives: Forest approach, Planetoid POI cluster, Dungeon entrance. See [VERTICAL_SLICE_CHECKLIST.md](VERTICAL_SLICE_CHECKLIST.md).)
+- **As of:** 2026-03-02 (run 4 of 4 toward polished MVP). Moment and corner locked as above.
+
+---
+
+## Week 1 playtest (vision gate)
+
+Per [VISION.md](VISION.md): **Week 1 playtest goal — Survive 3 missions: crash → scout → boss → claim home.**
+
+| Beat | How to verify |
+|------|----------------|
+| **(1) Crash** | Start from crash/landing state: open DemoMap or Homestead; PIE starts with character spawned. Sign-off: character present, level loaded. |
+| **(2) Scout** | Explore the map: move, harvest (E on BP_HarvestableTree), optional portal to planetoid. Sign-off: harvest works; explore loop playable. |
+| **(3) Boss** | Reach or trigger a boss encounter (e.g. dungeon entrance, key-point boss at night with `hw.TimeOfDay.Phase 2` and KeyPoint-tagged actor or `KeyPointBossSpawnDistance` > 0). Sign-off: boss placeholder or encounter triggerable. |
+| **(4) Claim home** | Place first home asset (P) after exploring/harvesting; building spawns. Sign-off: GA_Place / TryPlaceAtCursor works; "claim homestead" moment complete. |
+
+See [VERTICAL_SLICE_CHECKLIST.md](VERTICAL_SLICE_CHECKLIST.md) §3 for pre-demo run sequence and [DAY5_PLAYTEST_SIGNOFF.md](../tasks/DAY5_PLAYTEST_SIGNOFF.md) for playtest sign-off.
 
 ---
 

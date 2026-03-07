@@ -194,8 +194,18 @@ public:
 	/** T3 Homestead-on-planetoid stub: true when the current level is considered a planetoid (homestead has "landed"). Set once in BeginPlay from level name. See docs/tasks/PLANETOID_HOMESTEAD.md. */
 	bool bHomesteadLandedOnPlanetoid = false;
 
+	/** Set by hw.Planetoid.Complete; true when current planetoid is marked complete (for "complete → travel to next" flow). See docs/tasks/PLANETOID_HOMESTEAD.md §5. */
+	bool bPlanetoidComplete = false;
+
 public:
 	/** T3: True when homestead has landed on the current planetoid (set in BeginPlay from level name). For downstream systems (venture-out, completion). */
 	UFUNCTION(BlueprintCallable, Category = "HomeWorld|Planetoid")
 	bool GetHomesteadLandedOnPlanetoid() const { return bHomesteadLandedOnPlanetoid; }
+
+	/** True when current planetoid has been marked complete (e.g. via hw.Planetoid.Complete). For PIE testing and downstream transition-to-next flow. */
+	UFUNCTION(BlueprintCallable, Category = "HomeWorld|Planetoid")
+	bool GetPlanetoidComplete() const { return bPlanetoidComplete; }
+
+	/** Set planetoid complete flag (e.g. from console command). Logs and sets bPlanetoidComplete so pie_test_runner or transition logic can verify. */
+	void SetPlanetoidComplete(bool bComplete) { bPlanetoidComplete = bComplete; }
 };

@@ -2,7 +2,7 @@
 
 **Purpose:** This file is read at session start and updated at session end so you can ask "what did we do yesterday and what do we need to do today?" and get a clear answer. The agent updates it automatically when a session ends.
 
-**Current focus:** Twenty-ninth task list **complete** (T1–T10 all done; run 3 of 4 toward polished MVP). Generate thirtieth list for run 4 of 4, or use [docs/EDITOR_POLISH_TUTORIAL.md](../EDITOR_POLISH_TUTORIAL.md) to implement outstanding work in Editor for a polished state.
+**Current focus:** Thirty-second task list **complete** (all T1–T10 in-loop). Next: generate thirty-third list when ready.
 
 ---
 
@@ -10,7 +10,7 @@
 
 What was completed or in progress in the previous session.
 
-- **T10 completed (twenty-ninth list):** Buffer — ACCOMPLISHMENTS_OVERVIEW §4 and PROJECT_STATE_AND_TASK_LIST §4 updated with twenty-ninth-cycle outcome and next step (generate new list, then Start-AllAgents-InNewWindow.ps1); T10 status set to completed in CURRENT_TASK_LIST. All T1–T10 completed.
+- **Thirty-second run completed:** 10 rounds (16:53–19:58); T1–T10 all completed by agents. Max-rounds 11 (T1) allowed T10 buffer to run in-loop. Loop exited OK; ACCOMPLISHMENTS §4 and PROJECT_STATE §4 updated by T10 agent. Session closed per user ("session completed").
 
 ---
 
@@ -18,7 +18,7 @@ What was completed or in progress in the previous session.
 
 What we need to do today. Work from [CURRENT_TASK_LIST.md](CURRENT_TASK_LIST.md) and [ACCOMPLISHMENTS_OVERVIEW.md](ACCOMPLISHMENTS_OVERVIEW.md).
 
-- **All T1–T10 complete.** Either: (1) Generate the next (thirtieth) task list per [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md), then run `.\Tools\Start-AllAgents-InNewWindow.ps1` for run 4 of 4; or (2) Follow [EDITOR_POLISH_TUTORIAL.md](../EDITOR_POLISH_TUTORIAL.md) to implement outstanding work in Editor and reach a polished MVP state.
+- **All T1–T10 complete.** Generate a new task list per [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md), then run `.\Tools\Start-AllAgents-InNewWindow.ps1` for the next cycle.
 
 ---
 
@@ -26,7 +26,7 @@ What we need to do today. Work from [CURRENT_TASK_LIST.md](CURRENT_TASK_LIST.md)
 
 Preview of next focus.
 
-- Thirtieth list (run 4 of 4 toward polished MVP) or follow-up from next list generation.
+- Next 10-task list (thirty-third) and automation run after user generates list.
 
 ---
 

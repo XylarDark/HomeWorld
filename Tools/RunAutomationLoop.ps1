@@ -469,11 +469,11 @@ do {
     }
     $round++
     $script:CurrentRound = $round
-    # Cap at 10 rounds per run so we never loop forever if the task list is reset or agent keeps repopulating pending.
-    if ($round -gt 10) {
-        Write-LoopLog "RunAutomationLoop: max rounds (10) reached; exiting. Fix CURRENT_TASK_LIST.md if tasks were not marked completed, then restart."
-        Write-AutomationEvent -EventType loop_exited_ok -Message "Max rounds (10) reached; exiting."
-        Invoke-ExitStatusAlert -ExitReason "Max rounds (10) reached" -ExitCode 0
+    # Cap at 11 rounds per run (one round per task T1-T10 so the buffer task T10 runs in the same run).
+    if ($round -gt 11) {
+        Write-LoopLog "RunAutomationLoop: max rounds (11) reached; exiting. Fix CURRENT_TASK_LIST.md if tasks were not marked completed, then restart."
+        Write-AutomationEvent -EventType loop_exited_ok -Message "Max rounds (11) reached; exiting."
+        Invoke-ExitStatusAlert -ExitReason "Max rounds (11) reached" -ExitCode 0
         exit 0
     }
     # Before running the agent: if there are no pending/in_progress tasks, exit 0 (task list already complete; do not run agent).

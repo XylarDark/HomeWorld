@@ -23,6 +23,9 @@ public class HomeWorld : ModuleRules
 			"GameplayTags",
 			"GameplayTasks",
 			"SmartObjectsModule",
+			"UMG",
+			"Slate",
+			"SlateCore",
 		});
 	}
 }

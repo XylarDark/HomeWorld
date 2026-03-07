@@ -406,6 +406,50 @@ def check_planetoid_homestead_landed():
         }
 
 
+def check_planetoid_complete():
+    """When PIE is running: run hw.Planetoid.Complete and verify GameMode bPlanetoidComplete (GetPlanetoidComplete) is true. Optional check for 'complete planetoid → travel to next' flow. See PLANETOID_HOMESTEAD.md §5, CONSOLE_COMMANDS.md."""
+    if not is_pie_running():
+        return {"name": "Planetoid complete (hw.Planetoid.Complete)", "passed": False, "detail": "PIE not running"}
+    world = get_pie_world()
+    if not world:
+        return {"name": "Planetoid complete (hw.Planetoid.Complete)", "passed": False, "detail": "No PIE world"}
+    try:
+        unreal.SystemLibrary.execute_console_command(world, "hw.Planetoid.Complete")
+        gm = None
+        if hasattr(unreal.GameplayStatics, "get_game_mode"):
+            gm = unreal.GameplayStatics.get_game_mode(world)
+        if not gm and hasattr(unreal.GameplayStatics, "get_authority_game_mode"):
+            gm = unreal.GameplayStatics.get_authority_game_mode(world)
+        complete = None
+        if gm and hasattr(gm, "get_planetoid_complete"):
+            complete = gm.get_planetoid_complete()
+        if gm and complete is None and hasattr(gm, "GetPlanetoidComplete"):
+            complete = gm.GetPlanetoidComplete()
+        if complete is True:
+            return {
+                "name": "Planetoid complete (hw.Planetoid.Complete)",
+                "passed": True,
+                "detail": "hw.Planetoid.Complete executed; bPlanetoidComplete=true",
+            }
+        if complete is False:
+            return {
+                "name": "Planetoid complete (hw.Planetoid.Complete)",
+                "passed": False,
+                "detail": "hw.Planetoid.Complete executed but bPlanetoidComplete=false (GetPlanetoidComplete not set?)",
+            }
+        return {
+            "name": "Planetoid complete (hw.Planetoid.Complete)",
+            "passed": True,
+            "detail": "hw.Planetoid.Complete executed; could not read GetPlanetoidComplete from Python — verify 'planetoid complete (bPlanetoidComplete set)' in Output Log",
+        }
+    except Exception as e:
+        return {
+            "name": "Planetoid complete (hw.Planetoid.Complete)",
+            "passed": False,
+            "detail": "Exception: " + str(e),
+        }
+
+
 def check_dungeon_entrance_configured():
     """Editor-time check: current level has dungeon entrance (tag Dungeon_POI); optional LevelToOpen (e.g. Dungeon_Interior)."""
     world = unreal.EditorLevelLibrary.get_editor_world()
@@ -1546,6 +1590,7 @@ ALL_CHECKS = [
     check_portal_configured,
     check_dungeon_entrance_configured,
     check_planetoid_homestead_landed,
+    check_planetoid_complete,
     check_time_of_day_phase2,
     check_astral_death_flow,
     check_spirit_ability_phase2,

@@ -2,7 +2,7 @@
 
 **Purpose:** Single overview of the state of the project and **work not yet completed**, codified as a task list to work from. Update this file when major milestones or the task list change.
 
-**Last updated:** 2026-03-06 (twenty-ninth 10-task list, rapid prototyping: 8 implementation + 2 verification).
+**Last updated:** 2026-03-06 (thirty-second 10-task list, rapid prototyping: 7 implementation + 2 verification + 1 buffer).
 
 ---
 
@@ -86,23 +86,23 @@ Use this list as the source of "what to do next." Each item has a **goal**, **su
 
 | Id | One-line summary | See CURRENT_TASK_LIST for status and order |
 |----|-------------------|-------------------------------------------|
-| T1 | Pre-demo verification entry point: link §3 and CONSOLE_COMMANDS from one doc | pending |
-| T2 | pie_test_runner results: add interpretation doc or in-script summary | pending |
-| T3 | Combat stub testability: document how to read DefendCombatMode/PlanetoidCombatStyle in PIE | pending |
-| T4 | MVP polish readiness: add "What to do in Editor for polish" section | pending |
-| T5 | Vertical slice sign-off: add "as of" date or run progress note | pending |
-| T6 | Vertical slice checklist: update §4 with twenty-ninth-list deliverables | pending |
-| T7 | Packaged build: optional retry or document outcome | pending |
-| T8 | KNOWN_ERRORS or AUTOMATION_GAPS: update with findings from this cycle | pending |
-| T9 | Verification: Run PIE pre-demo checklist and document results | pending |
-| T10 | Buffer: next list generation prep (ACCOMPLISHMENTS + PROJECT_STATE §4) | pending |
+| T1 | Increase max rounds to 11 in RunAutomationLoop.ps1 | completed |
+| T2 | Vertical slice §4: thirty-second-list deliverables subsection | completed |
+| T3 | CONSOLE_COMMANDS: pie_test_results.json check names (planetoid_complete) | completed |
+| T4 | Console command hw.SinVirtue.Greed (stub, optional) | completed |
+| T5 | Packaged build: retry or document outcome | completed |
+| T6 | KNOWN_ERRORS or AUTOMATION_GAPS: cycle note or findings | completed |
+| T7 | VERTICAL_SLICE_CHECKLIST §4: thirty-second outcomes row | completed |
+| T8 | Verification: Run PIE pre-demo checklist and document results | completed |
+| T9 | Verification: Confirm task list and loop state | completed |
+| T10 | Buffer: next list generation prep (ACCOMPLISHMENTS + PROJECT_STATE §4) | completed |
 
 ---
 
-## 4. Current list (twenty-ninth 10-task list, rapid prototyping)
+## 4. Current list (thirty-second 10-task list, complete)
 
-- The **twenty-ninth 10-task list** is **complete** (all T1–T10 completed; run 3 of 4 toward polished MVP per [MVP_GAP_ANALYSIS.md](MVP_GAP_ANALYSIS.md)). Phase: **Rapid prototyping** (§0).
-- **Next step:** Generate the next (thirtieth) list per [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md), then run `.\Tools\Start-AllAgents-InNewWindow.ps1` for run 4 of 4.
+- The **thirty-second 10-task list** is **complete** (all T1–T10 completed). Delivered: max rounds 11, vertical slice §4 thirty-second deliverables, CONSOLE_COMMANDS planetoid_complete, hw.SinVirtue.Greed stub, packaged build or doc, KNOWN_ERRORS/AUTOMATION_GAPS note, PIE verification, task list/loop state verification, buffer.
+- **Next step:** Generate a new 10-task list per [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md), then run `.\Tools\Start-AllAgents-InNewWindow.ps1` for the next cycle.
 - **Cycle doc freshness and next priority:** See [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) (top) and [ACCOMPLISHMENTS_OVERVIEW.md](ACCOMPLISHMENTS_OVERVIEW.md) §4.
 
 ---

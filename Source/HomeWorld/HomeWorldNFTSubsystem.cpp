@@ -102,6 +102,36 @@ void UHomeWorldNFTSubsystem::OnPNGResponse(FHttpRequestPtr Request, FHttpRespons
 	OnPNGDownloaded.Broadcast(true, LocalPath);
 }
 
+void UHomeWorldNFTSubsystem::DownloadImageForCharacter(const FString& ImageURL)
+{
+	const FString ResolvedURL = ResolveIPFSUrl(ImageURL);
+	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
+	Request->SetURL(ResolvedURL);
+	Request->SetVerb(TEXT("GET"));
+	Request->OnProcessRequestComplete().BindUObject(this, &UHomeWorldNFTSubsystem::OnCharacterImageResponse);
+	Request->ProcessRequest();
+}
+
+void UHomeWorldNFTSubsystem::OnCharacterImageResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bSuccess)
+{
+	FString LocalPath;
+	if (!bSuccess || !Response.IsValid() || Response->GetResponseCode() != 200)
+	{
+		OnCharacterImageDownloaded.Broadcast(false, LocalPath);
+		return;
+	}
+	const FString CacheDir = FPaths::ProjectSavedDir() / TEXT("CharacterCache");
+	IFileManager::Get().MakeDirectory(*CacheDir, true);
+	LocalPath = FPaths::Combine(CacheDir, TEXT("character.png"));
+	const TArray<uint8>& Payload = Response->GetContent();
+	if (!FFileHelper::SaveArrayToFile(Payload, *LocalPath))
+	{
+		OnCharacterImageDownloaded.Broadcast(false, FString());
+		return;
+	}
+	OnCharacterImageDownloaded.Broadcast(true, LocalPath);
+}
+
 FString UHomeWorldNFTSubsystem::GetCachedPNGPath(int32 TokenId) const
 {
 	return FPaths::Combine(FPaths::ProjectSavedDir(), TEXT("MiladyCache"), FString::Printf(TEXT("%d.png"), TokenId));

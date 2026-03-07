@@ -37,6 +37,24 @@ This folder is the **single place for project ideas and daily workflow**: consol
 
 ---
 
+## Vision → task docs (cross-reference)
+
+Map from [VISION.md](VISION.md) sections to the task docs that implement or scope them. Use this to trace "where do I work for X?"
+
+| VISION section | Task / scope doc |
+|----------------|-------------------|
+| **Theme and prototype** (Love as Epic Quest, Act 1 focus) | [PROTOTYPE_SCOPE.md](PROTOTYPE_SCOPE.md) |
+| **Campaign summary** (7 levels, planetoid, homestead travels) | [PROTOTYPE_SCOPE.md](PROTOTYPE_SCOPE.md), [PLANETOID_HOMESTEAD.md](../tasks/PLANETOID_HOMESTEAD.md), [PLANETOID_DESIGN.md](../PLANETOID_DESIGN.md) |
+| **Day and night** (physical vs spiritual, love → night bonuses) | [PROTOTYPE_SCOPE.md](PROTOTYPE_SCOPE.md) § Day/night, [DAY_RESTORATION_LOOP.md](../tasks/DAY_RESTORATION_LOOP.md), [DAY_LOVE_OR_BOND.md](../tasks/DAY_LOVE_OR_BOND.md), [NIGHT_ENCOUNTER.md](../tasks/NIGHT_ENCOUNTER.md) |
+| **Conversion not kill** (strip sin → loved; vendors/helpers/quest/pets) | [CONVERSION_NOT_KILL.md](../tasks/CONVERSION_NOT_KILL.md) |
+| **Combat variety** (defend = ranged/AOE; planetoid = combos/single-target) | [DEFEND_COMBAT.md](../tasks/DEFEND_COMBAT.md), [PLANETOID_COMBAT.md](../tasks/PLANETOID_COMBAT.md) |
+| **Moral system (Seven Sins & Virtues)** | [SIN_VIRTUE_SPECTRUM.md](../tasks/SIN_VIRTUE_SPECTRUM.md), [PLANETOID_DESIGN.md](../PLANETOID_DESIGN.md) |
+| **Planetoid complete → next** (homestead lifts, travel to next) | [PLANETOID_HOMESTEAD.md](../tasks/PLANETOID_HOMESTEAD.md) |
+| **Week 1 playtest gate** (crash → scout → boss → claim home) | [PROTOTYPE_SCOPE.md](PROTOTYPE_SCOPE.md) § Week 1 playtest, [VERTICAL_SLICE_CHECKLIST.md](VERTICAL_SLICE_CHECKLIST.md) |
+| **Vertical slice** (one moment, one beautiful corner) | [VERTICAL_SLICE_CHECKLIST.md](VERTICAL_SLICE_CHECKLIST.md), [PROTOTYPE_SCOPE.md](PROTOTYPE_SCOPE.md) |
+
+---
+
 ## Pre–Day 1 checklist (Phase 0 gate)
 
 Complete before committing to Day 1 (or before Week 1 if using phase language):

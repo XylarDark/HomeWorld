@@ -37,6 +37,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Milady|Import", meta = (DisplayName = "Import Milady From Metadata URL"))
 	void ImportMiladyFromMetadataURL(const FString& MetadataURL, int32 TokenId);
 
+	/** Start character generation from any image URL or local file path. If URL (http/https/ipfs), downloads to CharacterCache then runs Meshy/VRM4U stubs; if local path, runs stubs. Sets LastGeneratedCharacterMeshPath when done (stub: empty until VRM4U integrated). */
+	UFUNCTION(BlueprintCallable, Category = "Character|Generation", meta = (DisplayName = "Start Character From Image"))
+	void StartCharacterFromImage(const FString& ImageURLOrPath);
+
+	/** Asset path of last generated character skeletal mesh (e.g. /Game/HomeWorld/Milady/Generated/Char_SK). Empty until VRM4U/Meshy pipeline produces an asset. */
+	UPROPERTY(BlueprintReadOnly, Category = "Character|Generation")
+	FString LastGeneratedCharacterMeshPath;
+
 	/** Get last imported token metadata (if any). */
 	UPROPERTY(BlueprintReadOnly, Category = "Milady|Import")
 	FMiladyTokenMetadata LastImportedMetadata;
@@ -50,6 +58,10 @@ private:
 	void OnNFTMetadataReceived(bool bSuccess, FMiladyTokenMetadata Meta);
 	UFUNCTION()
 	void OnNFTPNGDownloaded(bool bSuccess, FString LocalPath);
+	UFUNCTION()
+	void OnCharacterImageDownloaded(bool bSuccess, FString LocalPath);
 
 	int32 PendingTokenId = 0;
+	bool bStartCharacterFromImagePending = false;
+	FString PendingCharacterImagePath;
 };

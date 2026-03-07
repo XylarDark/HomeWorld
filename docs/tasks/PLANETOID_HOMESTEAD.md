@@ -59,3 +59,15 @@ When the player **completes** a planetoid, the homestead **lifts** and **travels
 **Order of levels:** The 7 levels are sin-themed (Pride, Greed, Wrath, Envy, Gluttony, Lust, Sloth). Progression is typically linear (Level 1 → 2 → … → 7), but design may allow optional order or backtracking; completion state per planetoid should support that.
 
 **Outcome:** After transition, the player is on the next planetoid with the homestead landed and the venture-out loop available again. SaveGame should record current planetoid index (or level name) and per-planetoid completion so save/load and re-entry behave correctly.
+
+---
+
+## 5. Testing planetoid complete (manual verification)
+
+To test the "planetoid complete → travel to next" flow before a console command exists:
+
+1. **Complete condition (stub):** In PIE, treat "boss converted" or "key points cleared" as the trigger. Optionally use an existing console (e.g. `hw.Conversion.Test` multiple times, or defeat key-point boss placeholder by overlap) to simulate clearing the planetoid.
+2. **Transition:** When the complete condition is met (per level design), the game would load the next planetoid level (see §4). Manual verification: use **Portal** or **Open Level** (e.g. from DemoMap to Planetoid level, or level-to-level) to simulate "travel to next."
+3. **Sign-off:** Confirm (a) completion state is observable (e.g. log, HUD, or SaveGame flag when implemented), and (b) level transition (portal or `OpenLevel`) works so "homestead travels to next" can be wired to it.
+
+When a console command (e.g. `hw.Planetoid.Complete` or `hw.CompletePlanetoid`) is added, it will set a completion flag or log "planetoid complete" for automated PIE testing; see [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md). **pie_test_runner** includes an optional check **Planetoid complete (hw.Planetoid.Complete)** that runs the command in PIE and verifies GameMode `bPlanetoidComplete` is true; results appear in `Saved/pie_test_results.json`. To add or extend this check, see `Content/Python/pie_test_runner.py` (`check_planetoid_complete`) and CONSOLE_COMMANDS.md (Check names table).

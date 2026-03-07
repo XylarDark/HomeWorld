@@ -10,7 +10,7 @@ All project-specific assets live under `/Game/HomeWorld/`.
 
 | Path | Purpose |
 |------|--------|
-| `/Game/HomeWorld/Maps/` | Levels. **DemoMap** is the primary demo/playable map for MVP (Empty Open World, no duplicate). **Planetoid_Pride** (Day 16+) is the first planetoid level; travel from DemoMap via portal. **Dungeon_Interior** (Day 24) optional dungeon sublevel; use **BP_DungeonEntrance** (C++ AHomeWorldDungeonEntrance) at entrance to open. **Main** and **Homestead** are legacy/narrative. See [DEMO_MAP.md](DEMO_MAP.md), [HOMESTEAD_MAP.md](HOMESTEAD_MAP.md), [tasks/DAYS_16_TO_30.md](tasks/DAYS_16_TO_30.md). |
+| `/Game/HomeWorld/Maps/` | Levels. **MainMenu** is the main menu map (create via ensure_main_menu_map.py; set GameDefaultMap to start here). **DemoMap** is the primary demo/playable map for MVP (Empty Open World, no duplicate). **Planetoid_Pride** (Day 16+) is the first planetoid level; travel from DemoMap via portal. **Dungeon_Interior** (Day 24) optional dungeon sublevel; use **BP_DungeonEntrance** (C++ AHomeWorldDungeonEntrance) at entrance to open. **Main** and **Homestead** are legacy/narrative. See [DEMO_MAP.md](DEMO_MAP.md), [HOMESTEAD_MAP.md](HOMESTEAD_MAP.md), [CHARACTER_GENERATION_AND_CUSTOMIZATION.md](CHARACTER_GENERATION_AND_CUSTOMIZATION.md), [tasks/DAYS_16_TO_30.md](tasks/DAYS_16_TO_30.md). |
 | `/Game/HomeWorld/Characters/` | Character Blueprints, Animation Blueprints (e.g. BP_HomeWorldCharacter, ABP_HomeWorldCharacter). |
 | `/Game/HomeWorld/GameMode/` | GameMode Blueprints (e.g. BP_GameMode). |
 | `/Game/HomeWorld/PCG/` | PCG graphs and related assets (e.g. ForestIsland_PCG). |
@@ -22,7 +22,9 @@ All project-specific assets live under `/Game/HomeWorld/`.
 | `/Game/HomeWorld/Milady/` | Milady character import pipeline: imported VRM/GLB meshes (Meshes, Generated), materials (Materials), retargeted animations (Animations), Blueprints (e.g. BP_MiladyCharacter). See [MILADY_IMPORT_ROADMAP.md](tasks/MILADY_IMPORT_ROADMAP.md). |
 | `/Game/HomeWorld/Homestead/` | Homestead map assets: Structures, Placeholders (central house, outbuildings, walls). See [HOMESTEAD_MAP.md](HOMESTEAD_MAP.md). PCG graphs for Homestead can live here or under `/Game/HomeWorld/PCG/`. |
 
-Other subfolders under `/Game/HomeWorld/` (e.g. Blueprints, UI, Materials) may be added as the project grows. New project content should go under `/Game/HomeWorld/` or a documented subfolder.
+| `/Game/HomeWorld/UI/` | Main menu and character UI: **WBP_MainMenu** (parent HomeWorldMainMenuWidget), **WBP_CharacterCreate** / **WBP_CharacterCustomize**. Create folder via ensure_ui_folders.py. See [CHARACTER_GENERATION_AND_CUSTOMIZATION.md](CHARACTER_GENERATION_AND_CUSTOMIZATION.md). |
+
+Other subfolders under `/Game/HomeWorld/` (e.g. Blueprints, Materials) may be added as the project grows. New project content should go under `/Game/HomeWorld/` or a documented subfolder.
 
 ---
 

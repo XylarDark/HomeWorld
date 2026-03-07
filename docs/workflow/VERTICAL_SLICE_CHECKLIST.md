@@ -32,6 +32,8 @@
 
 ## 3. Pre-demo checklist (before recording or showing)
 
+**Entry point:** For the single doc that links this step-by-step sequence (§3) and the command reference, see [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) (Pre-demo verification). This section (§3) is the ordered run sequence; for all `hw.*` commands used during the run (e.g. `hw.TimeOfDay.Phase`, `hw.Planetoid.Complete`), use CONSOLE_COMMANDS.
+
 - [x] **Level:** DemoMap (or Homestead) open; PCG generated; no "no surfaces" or empty volume.
 - [ ] **Character:** BP_HomeWorldCharacter; Enhanced Input applied (movement + look); GAS abilities (LMB, Shift, E, P) granted.
 - [ ] **Moment:** Chosen moment (1.A–D) playable in PIE; key action (place / harvest / trigger / interact) works.
@@ -48,6 +50,12 @@
 6. **Run pie_test_runner** — Via MCP: `execute_python_script("pie_test_runner.py")`. Or in Editor: Tools → Execute Python Script → `Content/Python/pie_test_runner.py`. Results are written to `Saved/pie_test_results.json`.
 7. **Inspect results** — On the host, open `Saved/pie_test_results.json`. Confirm: **Level** (level name, PCG actors), **Character** (spawned, on ground, capsule), **Moment** (placement API, Place/Harvest if applicable), **Corner** (PCG count). For SaveGame round-trip: phase, LoveLevel, spiritual power restored after hw.Save / hw.Load if that check is present. When PIE is on a planetoid map (level name contains "Planetoid" or is DemoMap), the **Planetoid / HomesteadLandedOnPlanetoid** check reports whether GameMode set the flag (see pie_test_runner; manual fallback: check Output Log for "Homestead landed on planetoid").
 8. **Optional: stability** — Run PIE for 2–5 minutes; confirm no crash or repeated log errors. Spot-check **Corner** (homestead compound) in viewport.
+
+**Note (thirtieth list T9):** PIE pre-demo was not run this session (Editor/MCP not required for doc-only close-out). When Editor is available, run the step-by-step sequence above and document outcome (e.g. pass/fail summary from `Saved/pie_test_results.json`) in SESSION_LOG or here.
+
+**T9 (thirty-first list, 2026-03-06) verification outcome:** Pre-demo checklist §3 run attempted with Editor/MCP **not connected** (MCP returned "Failed to connect to Unreal Engine"). `pie_test_runner.py` was not executed; `Saved/pie_test_results.json` was not produced. **Level**, **PCG generated**, **Character**, **Moment**, **Corner**, **Stability** = not verified this run. Outcome documented here and in SESSION_LOG. **Single entry point for pre-demo:** This section (§3) is the step-by-step run sequence; for all `hw.*` commands used during the run, see [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) (Pre-demo verification and Commands). When Editor is available: open DemoMap (or Homestead), ensure PCG generated, start PIE, run `pie_test_runner.py` via MCP or Tools → Execute Python Script, inspect `Saved/pie_test_results.json` for pass/fail; optionally spot-check corner and 2–5 min stability.
+
+**T8 (thirty-second list, 2026-03-06) verification outcome:** Pre-demo checklist §3 run attempted with Editor/MCP **not connected** (MCP returned "Failed to connect to Unreal Engine"). `pie_test_runner.py` was not executed; `Saved/pie_test_results.json` was not produced. **Level**, **PCG generated**, **Character**, **Moment**, **Corner**, **Stability** = not verified this run. **Doc change:** Single entry point for pre-demo is now explicit: [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) (Pre-demo verification) links §3 (run sequence) and this document (command reference). Outcome documented here and in SESSION_LOG. When Editor is available: open DemoMap (or Homestead), ensure PCG generated, start PIE, run `pie_test_runner.py` via MCP or Tools → Execute Python Script, inspect `Saved/pie_test_results.json` for pass/fail; optionally spot-check corner and 2–5 min stability.
 
 **3.1 HUD metrics reference (AHomeWorldHUD)** — Which on-screen line shows which metric (top-to-bottom draw order). Source: `Source/HomeWorld/HomeWorldHUD.cpp`. Use for testers and automation when verifying values.
 
@@ -324,6 +332,50 @@ When (1)–(3) are done, the slice is **ready to show**; (4) is optional for a r
 | **Combat stub testability** | CONSOLE_COMMANDS.md or DEFEND_COMBAT.md / PLANETOID_COMBAT.md documents how to read DefendCombatMode (Ranged \| GroundAOE) and PlanetoidCombatStyle / ComboHitCount in PIE (console command or HUD line or log). Verify: doc explains how to confirm combat stubs in PIE; run command or check HUD/log per doc. |
 | **MVP polish readiness ("What to do in Editor for polish")** | MVP_GAP_ANALYSIS.md (or linked doc) has section "What to do in Editor for polish" listing main categories (lighting pass, LOD check, asset placement tweaks, animation polish, UX/HUD polish, 2–5 min stability run). Verify: section exists; when switching to Editor polish, checklist is available. |
 | **Vertical slice sign-off date/run note** | VERTICAL_SLICE_SIGNOFF.md or VERTICAL_SLICE_CHECKLIST has "As of: YYYY-MM-DD" or "Run N of 4 toward polished MVP" so slice state is timestamped. Verify: sign-off or checklist shows date or run note; next list (run 4) can update it. |
+
+### Thirtieth-list deliverables (testable for vertical slice)
+
+**Context:** Thirtieth list (vision-aligned). T1–T8 delivered: vision–task cross-ref, sin/virtue spectrum doc, Week 1 playtest checklist, planetoid complete testing doc, converted role mapping, day love→night paragraph, vertical slice single source (as-of date), night three-part checklist. T9 PIE pre-demo documented deferred in §3; T10 buffer. See [ACCOMPLISHMENTS_OVERVIEW.md](ACCOMPLISHMENTS_OVERVIEW.md) §4.
+
+| Deliverable | Verification (PIE or script) |
+|-------------|------------------------------|
+| **Vision–task cross-ref** | Vision doc ([VISION.md](VISION.md)) and task list / schedule aligned; tasks reference vision sections (day/night, combat, planetoid). Verify: doc cross-refs exist; grep or read confirms. |
+| **Sin/virtue spectrum doc** | [SIN_VIRTUE_SPECTRUM.md](../tasks/SIN_VIRTUE_SPECTRUM.md) defines sin/virtue axes (e.g. Pride) and stub usage. Verify: doc exists; §2 describes stub or console command for one axis. |
+| **Week 1 playtest checklist** | Week 1 playtest checklist doc or section exists (e.g. in task doc or VERTICAL_SLICE_CHECKLIST); items testable in PIE. Verify: checklist present; run or doc confirms. |
+| **Planetoid complete testing doc** | [PLANETOID_HOMESTEAD.md](../tasks/PLANETOID_HOMESTEAD.md) §5 (or equivalent) describes "complete planetoid" testing (flag, console command, or flow). Verify: doc describes test path; hw.Planetoid.Complete when implemented. |
+| **Converted role mapping** | Converted foe role mapping (Vendor, Helper, QuestGiver, Pet, Worker) documented and/or implemented; GetConvertedFoeRole or log shows role. Verify: [CONVERSION_NOT_KILL.md](../tasks/CONVERSION_NOT_KILL.md) or NIGHT_ENCOUNTER; PIE hw.Conversion.Test or defeat flow. |
+| **Day love→night paragraph** | Design or doc has day love / bond → night bonus paragraph (e.g. [DAY_LOVE_OR_BOND.md](../tasks/DAY_LOVE_OR_BOND.md)); vertical slice single source updated. Verify: paragraph exists; vertical slice as-of date or run note in checklist/sign-off. |
+| **Vertical slice single source (as-of date)** | VERTICAL_SLICE_CHECKLIST or VERTICAL_SLICE_SIGNOFF has as-of date or run note for thirtieth-list state. Verify: date or run note present in §3/§4 or sign-off. |
+| **Night three-part checklist** | Night encounter design has three-part structure (waves at home, packs on planetoid, key-point bosses) or checklist in [NIGHT_ENCOUNTER.md](../tasks/NIGHT_ENCOUNTER.md). Verify: doc has three-part breakdown; cross-ref VISION. |
+| **PIE pre-demo (T9 deferred)** | PIE pre-demo run documented deferred in §3 when Editor/MCP not required for doc-only close-out. Verify: §3 note present; when Editor available, run step-by-step sequence per §3. |
+
+### Thirty-first-list deliverables (testable for vertical slice)
+
+**Context:** Thirty-first list (rapid prototyping). T1–T2 delivered: console command `hw.Planetoid.Complete` (sets GameMode `bPlanetoidComplete`), console command `hw.SinVirtue.Pride` (stub logs Pride axis). T3 added Thirtieth-list deliverables to §4. T4 adds this subsection. T5–T8: CONSOLE_COMMANDS update, packaged build doc, KNOWN_ERRORS/AUTOMATION_GAPS cycle note, pie_test_runner planetoid-complete check (doc or implement). T9 PIE pre-demo; T10 buffer. See [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md), [PLANETOID_HOMESTEAD.md](../tasks/PLANETOID_HOMESTEAD.md) §5, [SIN_VIRTUE_SPECTRUM.md](../tasks/SIN_VIRTUE_SPECTRUM.md) §2.
+
+| Deliverable | Verification (PIE or script) |
+|-------------|------------------------------|
+| **hw.Planetoid.Complete** | PIE: run `hw.Planetoid.Complete` (or `hw.CompletePlanetoid`); GameMode `bPlanetoidComplete` set or log "planetoid complete". Enables testing "complete planetoid → travel to next" per [PLANETOID_HOMESTEAD.md](../tasks/PLANETOID_HOMESTEAD.md) §5. Verify: command in [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md); in PIE run command, check flag or Output Log. |
+| **hw.SinVirtue.Pride** | PIE: run `hw.SinVirtue.Pride`; logs current Pride axis stub value (e.g. "Pride: 0"). Design-only stub per [SIN_VIRTUE_SPECTRUM.md](../tasks/SIN_VIRTUE_SPECTRUM.md). Verify: command in CONSOLE_COMMANDS.md and SIN_VIRTUE_SPECTRUM.md §2; in PIE run command, check Output Log. |
+| **CONSOLE_COMMANDS update** | [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) lists both commands with description and PIE verification. Verify: doc includes hw.Planetoid.Complete and hw.SinVirtue.Pride; Key PIE-test usage updated if applicable. |
+| **Vertical slice §4 thirty-first deliverables** | This subsection in §4 with verification refs. Verify: "Thirty-first-list deliverables" present; table matches T1–T8 outcomes. |
+| **pie_test_runner planetoid-complete (T8)** | Optional check in pie_test_runner: run command, verify flag or log; or doc "how to add" in CONSOLE_COMMANDS / PLANETOID_HOMESTEAD. Verify: check implemented and documented, or doc-only "how to add" present. |
+
+### Thirty-second-list deliverables (testable for vertical slice)
+
+**Context:** Thirty-second list (rapid prototyping). T1–T6 delivered: max-rounds 11 (RunAutomationLoop.ps1), Vertical slice §4 thirty-second subsection (this), CONSOLE_COMMANDS planetoid_complete in pie_test_results interpretation, hw.SinVirtue.Greed stub (CONSOLE_COMMANDS + SIN_VIRTUE_SPECTRUM §2), packaged build skip documented (e.g. "Thirty-second list: package not run"), KNOWN_ERRORS/AUTOMATION_GAPS cycle note (T1–T6 completed; no new errors). T8 PIE pre-demo: pending (run §3 step-by-step when Editor/MCP available; document outcome in §3 or SESSION_LOG). T9–T10: task list/loop state verification and buffer. See [CURRENT_TASK_LIST.md](CURRENT_TASK_LIST.md), [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md).
+
+**Outcomes (thirty-second run):** Max rounds 11 ✓; §4 thirty-second subsection ✓; CONSOLE_COMMANDS planetoid_complete key ✓; hw.SinVirtue.Greed ✓; packaged build doc (skip) ✓; KNOWN_ERRORS cycle note ✓; PIE outcome = T8 pending (pre-demo when Editor available).
+
+| Deliverable | Verification (PIE or script) |
+|-------------|------------------------------|
+| **Max rounds 11** | RunAutomationLoop.ps1 allows 11 rounds; log says "max rounds (11)". Verify: script check and message updated; T1 completed. |
+| **Vertical slice §4 thirty-second deliverables** | This subsection in §4 with verification refs. Verify: "Thirty-second-list deliverables" present; outcomes row filled (above). |
+| **CONSOLE_COMMANDS pie_test_results (planetoid_complete)** | CONSOLE_COMMANDS.md documents planetoid_complete in pie_test_results interpretation. Verify: doc includes planetoid_complete; testers know what to look for in Saved/pie_test_results.json. |
+| **hw.SinVirtue.Greed (optional)** | Command implemented and documented in CONSOLE_COMMANDS + SIN_VIRTUE_SPECTRUM §2. Verify: run `hw.SinVirtue.Greed` in PIE; doc refs present; T4 completed. |
+| **Packaged build or doc** | Skip documented (e.g. "Thirty-second list: package not run; use Package-AfterClose.ps1 when ready"). Verify: STEAM_EA_STORE_CHECKLIST or KNOWN_ERRORS note; T5 completed. |
+| **KNOWN_ERRORS / AUTOMATION_GAPS cycle note** | Cycle note added (e.g. "Thirty-second list: T1–T6 completed; no new errors"). Verify: KNOWN_ERRORS or AUTOMATION_GAPS updated; T6 completed. |
+| **PIE pre-demo outcome (T8)** | PIE pre-demo run attempted when Editor/MCP available; outcome in §3 or SESSION_LOG. If not run: document and run §3 step-by-step when Editor is available. Verify: §3 or SESSION_LOG documents outcome; T8 status set when done. |
 
 ---
 

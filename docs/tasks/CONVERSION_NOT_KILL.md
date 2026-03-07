@@ -35,6 +35,17 @@ After a foe is converted:
 
 1. **Loved form:** The foe is replaced or transformed into their "loved" version (no death state). Placeholder: the encounter actor may be destroyed or replaced by a neutral/friendly placeholder; full implementation is later.
 2. **Role assignment (stub):** Converted foes can later be assigned a **role**: vendor, helper, quest giver, or homestead pet/worker. **Implemented (T2):** When `ReportFoeConverted` is called, the game assigns a stub role round-robin (`EConvertedFoeRole`: Vendor, Helper, QuestGiver, Pet, Worker) and stores it in `ConvertedFoeRolesThisNight`. Role is readable via `GetConvertedFoeRole(int32 Index)` (0-based index for conversions this night). List is cleared when phase leaves Night. No persistence or full behavior yet.
+   - **Vision outcome mapping (per [VISION.md](../workflow/VISION.md)):** Converted foes become vendors, helpers, quest givers, or join the homestead as pets or workers.
+
+   | EConvertedFoeRole (stub) | Vision outcome |
+   |--------------------------|----------------|
+   | Vendor | Vendor (shop, trade) |
+   | Helper | Helper (allies, support) |
+   | QuestGiver | Quest giver (objectives, rewards) |
+   | Pet | Homestead pet (companion, optional combat) |
+   | Worker | Homestead worker (gather, build, etc.) |
+
+   **How to read in PIE:** Run `hw.Conversion.Test` one or more times; Output Log shows `role: Vendor` (or Helper, QuestGiver, Pet, Worker) per conversion. Role for the *i*-th conversion this night: `GameMode->GetConvertedFoeRole(i)` (C++) or inspect log line for that conversion.
    - When expanding: use the role for spawning vendors, helpers, quest givers, or homestead NPCs.
 
 **Current scope:** Design doc + conversion hook + role stub. Full loved-form spawn and role-driven behavior are future work.

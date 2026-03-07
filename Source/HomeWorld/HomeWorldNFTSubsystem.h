@@ -11,6 +11,8 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnMiladyMetadataReceived, bool, bSuccess, FMiladyTokenMetadata, Metadata);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnMiladyPNGDownloaded, bool, bSuccess, FString, LocalPath);
+/** Broadcast when DownloadImageForCharacter completes (generic image for character generation, not NFT-specific). */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnCharacterImageDownloaded, bool, bSuccess, FString, LocalPath);
 
 /**
  * Game instance subsystem for Milady NFT (Remilia Collective) and metadata.
@@ -32,6 +34,10 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Milady|NFT")
 	FOnMiladyPNGDownloaded OnPNGDownloaded;
 
+	/** Broadcast when DownloadImageForCharacter completes (for generic art/NFT character generation). */
+	UPROPERTY(BlueprintAssignable, Category = "Character|Image")
+	FOnCharacterImageDownloaded OnCharacterImageDownloaded;
+
 	/** Verify that the given wallet owns at least one Milady. Requires Web3 plugin eth_call balanceOf; stub returns false until integrated. */
 	UFUNCTION(BlueprintCallable, Category = "Milady|NFT", meta = (DisplayName = "Verify Milady Ownership"))
 	bool VerifyMiladyOwnership(const FString& WalletAddress);
@@ -43,6 +49,10 @@ public:
 	/** Download PNG from ImageURI (IPFS gateway or HTTPS) and save to Saved/MiladyCache/TokenId.png. Broadcasts OnPNGDownloaded when done. */
 	UFUNCTION(BlueprintCallable, Category = "Milady|NFT", meta = (DisplayName = "Download Milady PNG"))
 	void DownloadMiladyPNG(const FString& ImageURI, int32 TokenId);
+
+	/** Download image from URL (HTTP/HTTPS or IPFS) and save to Saved/CharacterCache/character.png. For generic character-from-art flow. Broadcasts OnCharacterImageDownloaded when done. */
+	UFUNCTION(BlueprintCallable, Category = "Character|Image", meta = (DisplayName = "Download Image For Character"))
+	void DownloadImageForCharacter(const FString& ImageURL);
 
 	/** Get path where downloaded PNG is saved (Saved/MiladyCache/TokenId.png). */
 	UFUNCTION(BlueprintPure, Category = "Milady|NFT", meta = (DisplayName = "Get Cached PNG Path"))
@@ -67,6 +77,7 @@ public:
 protected:
 	void OnMetadataResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bSuccess);
 	void OnPNGResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bSuccess);
+	void OnCharacterImageResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bSuccess);
 	FString ResolveIPFSUrl(const FString& Uri) const;
 
 	int32 PendingMetadataTokenId = 0;

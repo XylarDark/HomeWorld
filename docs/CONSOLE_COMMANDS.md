@@ -6,6 +6,8 @@ Short reference for all `hw.*` and related console commands used in PIE testing 
 
 ## Pre-demo verification (entry point)
 
+**Single entry point for pre-demo:** Run sequence → [VERTICAL_SLICE_CHECKLIST §3](workflow/VERTICAL_SLICE_CHECKLIST.md); command reference → this document (Commands and Key PIE-test usage below).
+
 **How to run the pre-demo checklist:** Use a single sequence before recording or showing the slice.
 
 1. **Step-by-step run sequence** — Follow [Vertical Slice Checklist §3](workflow/VERTICAL_SLICE_CHECKLIST.md) (Pre-demo checklist). §3 gives the ordered steps: open DemoMap, ensure PCG generated, start PIE, run `pie_test_runner.py`, inspect `Saved/pie_test_results.json`, and optional stability check.
@@ -36,6 +38,9 @@ Opening this doc gives you both: the link to §3 for the run sequence and the co
 | **hw.TestGrantSpiritualCollect** | Test-only: grant one spiritual collect using same formula as SpiritualCollectible (base + day buff + love). **Night only.** For pie_test_runner day-buff-bonus and love-bonus checks. |
 | **hw.Conversion.Test** | Trigger conversion hook (ReportFoeConverted) for testing. Logs conversion and increments ConvertedFoesThisNight (CONVERSION_NOT_KILL.md). |
 | **hw.CombatStubs** | Log DefendCombatMode (Ranged \| GroundAOE), PlanetoidCombatStyle (Combo \| SingleTarget), and ComboHitCount to Output Log. Use in PIE to verify combat stubs. See [DEFEND_COMBAT.md](tasks/DEFEND_COMBAT.md), [PLANETOID_COMBAT.md](tasks/PLANETOID_COMBAT.md). |
+| **hw.Planetoid.Complete** | Set planetoid-complete flag on GameMode (bPlanetoidComplete). Use in PIE to test "complete planetoid → travel to next" flow. Logs "planetoid complete"; pie_test_runner can verify flag. See [PLANETOID_HOMESTEAD.md](tasks/PLANETOID_HOMESTEAD.md) §5. |
+| **hw.SinVirtue.Pride** | Log current Pride axis stub value (e.g. 0). Design only; no gameplay implementation. Use in PIE to read one sin/virtue axis. See [SIN_VIRTUE_SPECTRUM.md](tasks/SIN_VIRTUE_SPECTRUM.md) §2. |
+| **hw.SinVirtue.Greed** | Log current Greed axis stub value (e.g. 0). Design only; no gameplay implementation. Use in PIE to read one sin/virtue axis. See [SIN_VIRTUE_SPECTRUM.md](tasks/SIN_VIRTUE_SPECTRUM.md) §2. |
 
 ---
 
@@ -59,6 +64,8 @@ Opening this doc gives you both: the link to §3 for the run sequence and the co
 - **Spirit abilities:** Set `hw.TimeOfDay.Phase 2`, then `hw.SpiritBurst` or `hw.SpiritShield` (abilities must be granted to character).
 - **Night encounter (one spawn at Phase 2):** Set `hw.TimeOfDay.Phase 2` in PIE; Wave 1 spawns one placeholder (Cube) in front of the player. Output Log: `HomeWorld: Night encounter Wave 1 — spawned placeholder at ...`. HUD shows "Wave 1" and "Phase: Night". See [NIGHT_ENCOUNTER.md](tasks/NIGHT_ENCOUNTER.md) §2.1.
 - **Combat stubs (DefendCombatMode, PlanetoidCombatStyle, ComboHitCount):** In PIE, run **`hw.CombatStubs`** to print current values to the Output Log (e.g. `DefendCombatMode=Ranged`, `PlanetoidCombatStyle=SingleTarget`, `ComboHitCount=0`). To change DefendCombatMode or PlanetoidCombatStyle, select the player's **PlayerState** in the World Outliner, then in the Details panel use **HomeWorld|Defend** and **HomeWorld|Planetoid**; run `hw.CombatStubs` again to confirm. See [DEFEND_COMBAT.md](tasks/DEFEND_COMBAT.md) and [PLANETOID_COMBAT.md](tasks/PLANETOID_COMBAT.md) "Testing in PIE".
+- **Planetoid complete:** In PIE, run **`hw.Planetoid.Complete`** to set the GameMode's planetoid-complete flag. Output Log shows "planetoid complete (bPlanetoidComplete set)". Use to test the "complete → travel to next" flow; optional pie_test_runner check can verify the flag. See [PLANETOID_HOMESTEAD.md](tasks/PLANETOID_HOMESTEAD.md) §5.
+- **Sin/virtue (stub):** In PIE, run **`hw.SinVirtue.Pride`** or **`hw.SinVirtue.Greed`** to log the current axis stub value (e.g. `Pride: 0`, `Greed: 0`) to the Output Log. Design only; see [SIN_VIRTUE_SPECTRUM.md](tasks/SIN_VIRTUE_SPECTRUM.md) §2.
 
 **Running checks:** With Editor open and PIE running, execute `pie_test_runner.py` via MCP (`execute_python_script("pie_test_runner.py")`) or Tools → Execute Python Script; read `Saved/pie_test_results.json` for pass/fail and detail. See [VERTICAL_SLICE_CHECKLIST](workflow/VERTICAL_SLICE_CHECKLIST.md) §3 for pre-demo checklist.
 
@@ -104,6 +111,7 @@ After running `pie_test_runner.py`, results are written to **`Saved/pie_test_res
 | Portal configured | Level has an actor tagged Portal_To_Planetoid with LevelToOpen set. |
 | Dungeon entrance configured | Level has an actor tagged Dungeon_POI. |
 | Planetoid / HomesteadLandedOnPlanetoid | On planetoid/DemoMap, GameMode set HomesteadLandedOnPlanetoid. |
+| Planetoid complete (hw.Planetoid.Complete) | After hw.Planetoid.Complete, GameMode bPlanetoidComplete is true (optional; see PLANETOID_HOMESTEAD.md §5). |
 | TimeOfDay Phase 2 | After hw.TimeOfDay.Phase 2, GetIsNight() is true. |
 | Astral death flow | hw.AstralDeath advances to Dawn and respawn. |
 | Spirit ability (Phase 2) | hw.SpiritBurst at night runs without error. |
@@ -121,5 +129,7 @@ After running `pie_test_runner.py`, results are written to **`Saved/pie_test_res
 | Day buff persistence (save/load) | Day buff still set after save/load. |
 | Day buff bonus at night (collect) | At night, day buff gives +1 spiritual power per collect. |
 | Love bonus at night (collect) | At night, LoveLevel adds bonus to spiritual collect. |
+
+When PIE is running, the `checks` array in the JSON includes a result for **Planetoid complete (hw.Planetoid.Complete)** (optional flow; see [PLANETOID_HOMESTEAD.md](tasks/PLANETOID_HOMESTEAD.md) §5). Use the **name** field to match table rows above.
 
 **One-line summary in Output Log:** When you run `pie_test_runner.py` from the Editor (MCP or Tools → Execute Python Script), the script also prints a one-line summary to the **Output Log** (e.g. "PIE validation: 25/35 passed" or "PIE validation failed: 25/35 (see Saved/pie_test_results.json)"). Use that for a quick pass/fail; use the JSON file for which checks failed and why.

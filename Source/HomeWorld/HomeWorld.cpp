@@ -388,6 +388,38 @@ namespace
 		UE_LOG(LogTemp, Log, TEXT("HomeWorld: Combat stubs — DefendCombatMode=%s, PlanetoidCombatStyle=%s, ComboHitCount=%d"),
 			DefendStr, PlanetoidStr, PS->GetComboHitCount());
 	}
+
+	void CmdPlanetoidComplete(const TArray<FString>& Args)
+	{
+		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		if (!World)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Planetoid.Complete requires a play world (PIE or game)."));
+			return;
+		}
+		AHomeWorldGameMode* HWGM = Cast<AHomeWorldGameMode>(World->GetAuthGameMode());
+		if (!HWGM)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: GameMode is not AHomeWorldGameMode."));
+			return;
+		}
+		HWGM->SetPlanetoidComplete(true);
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: planetoid complete (bPlanetoidComplete set). Use for PIE testing of complete → travel-to-next flow. See PLANETOID_HOMESTEAD.md §5."));
+	}
+
+	void CmdSinVirtuePride(const TArray<FString>& Args)
+	{
+		// Stub: design only per SIN_VIRTUE_SPECTRUM.md; no gameplay implementation yet.
+		constexpr float StubPride = 0.0f;
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: Pride: %g (stub; sin/virtue axis -1..0..+1). See SIN_VIRTUE_SPECTRUM.md, CONSOLE_COMMANDS.md."), StubPride);
+	}
+
+	void CmdSinVirtueGreed(const TArray<FString>& Args)
+	{
+		// Stub: design only per SIN_VIRTUE_SPECTRUM.md; no gameplay implementation yet.
+		constexpr float StubGreed = 0.0f;
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: Greed: %g (stub; sin/virtue axis -1..0..+1). See SIN_VIRTUE_SPECTRUM.md, CONSOLE_COMMANDS.md."), StubGreed);
+	}
 }
 
 void FHomeWorldModule::StartupModule()
@@ -476,6 +508,21 @@ void FHomeWorldModule::StartupModule()
 		TEXT("hw.CombatStubs"),
 		TEXT("Log DefendCombatMode (Ranged|GroundAOE), PlanetoidCombatStyle (Combo|SingleTarget), ComboHitCount. Use in PIE to verify combat stubs. See DEFEND_COMBAT.md, PLANETOID_COMBAT.md."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdCombatStubs),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Planetoid.Complete"),
+		TEXT("Set planetoid-complete flag on GameMode for PIE testing of complete → travel-to-next flow. See PLANETOID_HOMESTEAD.md §5, CONSOLE_COMMANDS.md."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdPlanetoidComplete),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.SinVirtue.Pride"),
+		TEXT("Log current Pride axis stub value (e.g. 0). Design only; see SIN_VIRTUE_SPECTRUM.md §2, CONSOLE_COMMANDS.md."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdSinVirtuePride),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.SinVirtue.Greed"),
+		TEXT("Log current Greed axis stub value (e.g. 0). Design only; see SIN_VIRTUE_SPECTRUM.md §2, CONSOLE_COMMANDS.md."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdSinVirtueGreed),
 		ECVF_Cheat);
 }
 

@@ -3,6 +3,8 @@
 #include "HomeWorldMiladyImportSubsystem.h"
 #include "HomeWorldWalletSubsystem.h"
 #include "HomeWorldNFTSubsystem.h"
+#include "Misc/Paths.h"
+#include "HAL/FileManager.h"
 
 namespace
 {
@@ -78,6 +80,65 @@ void UHomeWorldMiladyImportSubsystem::OnNFTPNGDownloaded(bool bSuccess, FString 
 	LastDownloadedPNGPath = LocalPath;
 	OnImportProgress.Broadcast(TEXT("Meshy 2D->3D (stub)"), 3, MILADY_IMPORT_TOTAL_STEPS);
 	OnImportProgress.Broadcast(TEXT("VRM4U import (stub)"), 4, MILADY_IMPORT_TOTAL_STEPS);
+	OnImportProgress.Broadcast(TEXT("Done"), MILADY_IMPORT_TOTAL_STEPS, MILADY_IMPORT_TOTAL_STEPS);
+	OnImportComplete.Broadcast(true);
+}
+
+void UHomeWorldMiladyImportSubsystem::StartCharacterFromImage(const FString& ImageURLOrPath)
+{
+	UWorld* World = GetWorld();
+	UGameInstance* GI = World ? World->GetGameInstance() : nullptr;
+	UHomeWorldNFTSubsystem* NFT = GI ? GI->GetSubsystem<UHomeWorldNFTSubsystem>() : nullptr;
+
+	const bool bIsURL = ImageURLOrPath.StartsWith(TEXT("http://")) || ImageURLOrPath.StartsWith(TEXT("https://")) || ImageURLOrPath.StartsWith(TEXT("ipfs://"));
+	if (bIsURL && NFT)
+	{
+		bStartCharacterFromImagePending = true;
+		NFT->OnCharacterImageDownloaded.AddDynamic(this, &UHomeWorldMiladyImportSubsystem::OnCharacterImageDownloaded);
+		OnImportProgress.Broadcast(TEXT("Download image"), 1, MILADY_IMPORT_TOTAL_STEPS);
+		NFT->DownloadImageForCharacter(ImageURLOrPath);
+		return;
+	}
+
+	// Local path: use directly if file exists
+	if (!bIsURL && FPaths::FileExists(ImageURLOrPath))
+	{
+		PendingCharacterImagePath = ImageURLOrPath;
+		LastDownloadedPNGPath = ImageURLOrPath;
+	}
+	else if (!bIsURL)
+	{
+		OnImportComplete.Broadcast(false);
+		return;
+	}
+
+	// Run Meshy/VRM4U stub (same as PNG path)
+	OnImportProgress.Broadcast(TEXT("Meshy 2D->3D (stub)"), 3, MILADY_IMPORT_TOTAL_STEPS);
+	OnImportProgress.Broadcast(TEXT("VRM4U import (stub)"), 4, MILADY_IMPORT_TOTAL_STEPS);
+	LastGeneratedCharacterMeshPath = TEXT("");
+	OnImportProgress.Broadcast(TEXT("Done"), MILADY_IMPORT_TOTAL_STEPS, MILADY_IMPORT_TOTAL_STEPS);
+	OnImportComplete.Broadcast(true);
+}
+
+void UHomeWorldMiladyImportSubsystem::OnCharacterImageDownloaded(bool bSuccess, FString LocalPath)
+{
+	UGameInstance* GI = GetWorld() ? GetWorld()->GetGameInstance() : nullptr;
+	UHomeWorldNFTSubsystem* NFT = GI ? GI->GetSubsystem<UHomeWorldNFTSubsystem>() : nullptr;
+	if (NFT)
+	{
+		NFT->OnCharacterImageDownloaded.RemoveAll(this);
+	}
+	bStartCharacterFromImagePending = false;
+	if (!bSuccess)
+	{
+		OnImportComplete.Broadcast(false);
+		return;
+	}
+	LastDownloadedPNGPath = LocalPath;
+	PendingCharacterImagePath = LocalPath;
+	OnImportProgress.Broadcast(TEXT("Meshy 2D->3D (stub)"), 3, MILADY_IMPORT_TOTAL_STEPS);
+	OnImportProgress.Broadcast(TEXT("VRM4U import (stub)"), 4, MILADY_IMPORT_TOTAL_STEPS);
+	LastGeneratedCharacterMeshPath = TEXT("");
 	OnImportProgress.Broadcast(TEXT("Done"), MILADY_IMPORT_TOTAL_STEPS, MILADY_IMPORT_TOTAL_STEPS);
 	OnImportComplete.Broadcast(true);
 }

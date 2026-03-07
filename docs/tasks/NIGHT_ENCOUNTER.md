@@ -10,6 +10,18 @@
 
 ---
 
+## Vision alignment checklist (three-part structure)
+
+Per [VISION.md](../workflow/VISION.md) § Night encounters: (1) waves at home, (2) packs on planetoid, (3) key-point bosses. Implementation status:
+
+| Part | Vision | Stub/config | How to verify |
+|------|--------|-------------|---------------|
+| **(1) Waves at home** | Waves spawn against your home; you and family defend and convert. | **Implemented.** Wave 1/2/3 with configurable delay and spawn count (Cube, Sphere, Cylinder); HUD "Wave N". | PIE: `hw.TimeOfDay.Phase 2`; see §2.1. Log: "Night encounter Wave 1 — spawned placeholder at ..."; HUD shows "Wave 1". |
+| **(2) Packs on planetoid** | Monsters spawn across the planetoid; explore to find and convert packs. | **Implemented.** Planetoid pack placeholders spawn at `PlanetoidPackSpawnDistance` (default 2000), count `PlanetoidPackCount` (Cone mesh). | PIE: `hw.TimeOfDay.Phase 2` with `PlanetoidPackSpawnDistance` > 0. Log: "Planetoid pack 1/N (away from home) spawned at ...". See §1.1. |
+| **(3) Key-point bosses** | Bigger monsters and bosses at key points; convert them. | **Implemented.** One boss placeholder at KeyPoint-tagged actor or at `KeyPointBossSpawnDistance` (scaled mesh). | PIE: place actor with tag `KeyPoint` or set `KeyPointBossSpawnDistance` > 0; set Phase 2. Log: "Key-point boss placeholder spawned at ...". See §1.2. |
+
+---
+
 ## 0. Vision: two-part structure and goal
 
 Per [VISION.md](../workflow/VISION.md) **Vanquishing foes** and **Night encounters (two-part structure and goal)**:

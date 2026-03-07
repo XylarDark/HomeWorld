@@ -29,6 +29,8 @@
 
 ## 3. How love scales night bonuses
 
+**How day love translates to night bonus (summary):** Meals, care, and building during the day increase **LoveLevel** (or bond); the day restoration buff (one meal) is one path. At night, that value is read when applying bonuses: stronger astral combat, more spiritual power per collectible, better restoration, or other benefits. Cause → effect: **day activities (meals, care, building) → LoveLevel / day buff → stronger at night.** See [VISION.md](../workflow/VISION.md) § Day and night (goal of the day = build up love → bonuses at night). **Automated check:** `pie_test_runner.py` includes day-buff and love-bonus checks (e.g. `hw.RestoreMeal` then `hw.TimeOfDay.Phase 2` and `hw.TestGrantSpiritualCollect` to verify bonus).
+
 - **Night bonuses** are benefits during the astral phase: e.g. extra spiritual power per collectible, damage reduction, cooldown reduction, or regen. The existing **day restoration buff** gives a fixed bonus (e.g. +1 spiritual power per collectible); the **love** metric can scale that further.
 - **Scaling (design):**
   - **Tier-based:** LoveLevel 0 = no bonus, 1 = small bonus, 2 = medium, 3+ = full bonus (e.g. multiplier on spiritual power gained, or extra effect duration).
