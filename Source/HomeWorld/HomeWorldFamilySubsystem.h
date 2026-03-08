@@ -6,14 +6,16 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "HomeWorldFamilySubsystem.generated.h"
 
-/** Role names for family members (Protector, Healer, Child, Gatherer). */
+/** Role names for family members (Protector, Healer, Child, Gatherer, Partner). */
 UENUM(BlueprintType)
 enum class EHomeWorldFamilyRole : uint8
 {
 	Gatherer,
 	Protector,
 	Healer,
-	Child
+	Child,
+	/** MVP tutorial step 3: romantic partner for "complete one love task with partner". Identify by role (e.g. spawn index 0) or tag "Partner". */
+	Partner
 };
 
 /**

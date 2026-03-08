@@ -45,6 +45,18 @@ void AHomeWorldPlayerState::ResetComboHitCount()
 	}
 }
 
+void AHomeWorldPlayerState::SetTutorialComplete(bool bComplete)
+{
+	if (bTutorialComplete != bComplete)
+	{
+		bTutorialComplete = bComplete;
+		if (bTutorialComplete)
+		{
+			UE_LOG(LogHomeWorldPlayerState, Log, TEXT("Tutorial complete (family taken — inciting incident)."));
+		}
+	}
+}
+
 void AHomeWorldPlayerState::SetSpiritBurstBlockMessage(const FString& Message, float WorldTime)
 {
 	LastSpiritBurstBlockMessage = Message;
@@ -117,6 +129,11 @@ void AHomeWorldPlayerState::IncrementMealsWithFamilyToday()
 	}
 }
 
+void AHomeWorldPlayerState::SetLastMealTriggered(EMealType Type)
+{
+	LastMealTriggered = Type;
+}
+
 void AHomeWorldPlayerState::SetLoveLevel(int32 Level)
 {
 	const int32 NewLevel = FMath::Max(0, Level);
@@ -134,4 +151,34 @@ void AHomeWorldPlayerState::AddLovePoints(int32 Points)
 		LoveLevel += Points;
 		UE_LOG(LogHomeWorldPlayerState, Log, TEXT("Love: %d (+%d) (HUD updates; scales night bonuses)."), LoveLevel, Points);
 	}
+}
+
+void AHomeWorldPlayerState::IncrementLoveTasksCompletedToday()
+{
+	if (LoveTasksCompletedToday < INT32_MAX)
+	{
+		LoveTasksCompletedToday++;
+		UE_LOG(LogHomeWorldPlayerState, Log, TEXT("Love tasks today: %d (one love task done; MVP tutorial List 4 step 3)."), LoveTasksCompletedToday);
+	}
+}
+
+void AHomeWorldPlayerState::CompleteOneLoveTask()
+{
+	AddLovePoints(1);
+	IncrementLoveTasksCompletedToday();
+}
+
+void AHomeWorldPlayerState::IncrementGamesWithChildToday()
+{
+	if (GamesWithChildToday < INT32_MAX)
+	{
+		GamesWithChildToday++;
+		UE_LOG(LogHomeWorldPlayerState, Log, TEXT("Games with child today: %d (one game with child done; MVP tutorial List 5 step 4)."), GamesWithChildToday);
+	}
+}
+
+void AHomeWorldPlayerState::CompleteOneGameWithChild()
+{
+	AddLovePoints(1);
+	IncrementGamesWithChildToday();
 }

@@ -31,7 +31,7 @@ void UHomeWorldMainMenuWidget::OnCharacterClicked()
 
 void UHomeWorldMainMenuWidget::OnOptionsClicked()
 {
-	// Override in Blueprint to show options panel.
+	UE_LOG(LogTemp, Log, TEXT("HomeWorld: Main menu Options clicked (stub; override in Blueprint for options panel)."));
 }
 
 void UHomeWorldMainMenuWidget::OnQuitClicked()

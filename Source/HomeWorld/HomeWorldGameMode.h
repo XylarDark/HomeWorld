@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "HomeWorldPlanetoidTypes.h"
 #include "HomeWorldGameMode.generated.h"
 
 class AActor;
@@ -40,6 +41,25 @@ public:
 	/** Request astral death for the local player (advance to dawn + respawn). Call from character, ability, or damage path. No-op if World or GameMode invalid. */
 	UFUNCTION(BlueprintCallable, Category = "HomeWorld|Astral", meta = (WorldContext = "WorldContextObject"))
 	static void RequestAstralDeath(UObject* WorldContextObject);
+
+	/** List 61: Can the player enter astral during the day? MVP = always true (no gate). Future: tutorial complete, love level threshold, or config. See ASTRAL_DEATH_AND_DAY_SAFETY.md §3 (progression gate). */
+	UFUNCTION(BlueprintCallable, Category = "HomeWorld|Astral")
+	bool CanEnterAstralByDay(APlayerController* PlayerController = nullptr) const;
+
+	/** List 61: Enter astral during the day (stub). When phase is Day or Dusk, sets phase to Night and bAstralByDay so return restores Day. Respects CanEnterAstralByDay(). Call from hw.EnterAstral or in-world trigger. See ASTRAL_DEATH_AND_DAY_SAFETY.md, MVP_FULL_SCOPE_10_LISTS List 61. */
+	UFUNCTION(BlueprintCallable, Category = "HomeWorld|Astral")
+	void EnterAstralByDay();
+
+	/** True when player entered astral via EnterAstralByDay (return from astral restores Day instead of Dawn). Cleared when returning. */
+	bool bAstralByDay = false;
+
+	/** True when current astral session was entered during day (return restores Day). For PIE and Blueprint. */
+	UFUNCTION(BlueprintCallable, Category = "HomeWorld|Astral")
+	bool GetAstralByDay() const { return bAstralByDay; }
+
+	/** Act 2 prep: Log Defend phase status (phase, DefendPosition count, Family count, family-moved-this-night). Use from hw.Defend.Status in PIE. See DAY12_ROLE_PROTECTOR.md. */
+	UFUNCTION(BlueprintCallable, Category = "HomeWorld|Defend")
+	void LogDefendStatus() const;
 
 protected:
 	virtual void BeginPlay() override;
@@ -208,4 +228,26 @@ public:
 
 	/** Set planetoid complete flag (e.g. from console command). Logs and sets bPlanetoidComplete so pie_test_runner or transition logic can verify. */
 	void SetPlanetoidComplete(bool bComplete) { bPlanetoidComplete = bComplete; }
+
+	/** T4 (list 37): Current zone alignment (fight / harvest / empower). Read at runtime for branching; set via hw.Planetoid.ZoneAlignment or config. Per PLANETOID_BIOMES.md §3. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HomeWorld|Planetoid")
+	EPlanetoidAlignment CurrentZoneAlignment = EPlanetoidAlignment::Neutral;
+
+	/** T4 (list 37): Current zone biome for this planetoid. Read at runtime with CurrentZoneAlignment for fight/harvest/empower behaviour. Per PLANETOID_BIOMES.md §1–2. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HomeWorld|Planetoid")
+	EBiomeType CurrentZoneBiome = EBiomeType::Forest;
+
+	/** T4: Current zone alignment (Corrupted = fight, Neutral = harvest, Positive = empower). Use in PIE or Blueprint to branch behaviour. */
+	UFUNCTION(BlueprintCallable, Category = "HomeWorld|Planetoid")
+	EPlanetoidAlignment GetCurrentZoneAlignment() const { return CurrentZoneAlignment; }
+
+	/** T4: Current zone biome (Desert, Forest, Marsh, Canyon). Use with GetCurrentZoneAlignment for per-biome alignment behaviour. */
+	UFUNCTION(BlueprintCallable, Category = "HomeWorld|Planetoid")
+	EBiomeType GetCurrentZoneBiome() const { return CurrentZoneBiome; }
+
+	/** T4: Set current zone alignment (e.g. from console hw.Planetoid.ZoneAlignment). Logs and updates CurrentZoneAlignment. */
+	void SetCurrentZoneAlignment(EPlanetoidAlignment InAlignment) { CurrentZoneAlignment = InAlignment; }
+
+	/** T4: Set current zone biome (e.g. from console or level config). */
+	void SetCurrentZoneBiome(EBiomeType InBiome) { CurrentZoneBiome = InBiome; }
 };

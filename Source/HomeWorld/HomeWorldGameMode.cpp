@@ -38,18 +38,34 @@ void AHomeWorldGameMode::OnAstralDeath(APlayerController* PlayerController)
 	if (!PlayerController) return;
 
 	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
-	if (TimeOfDay)
+	const bool bReturningFromDayAstral = bAstralByDay;
+	if (bReturningFromDayAstral)
 	{
-		TimeOfDay->AdvanceToDawn();
+		bAstralByDay = false;
+		if (TimeOfDay)
+		{
+			TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Day);
+		}
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: Return from astral-by-day — phase restored to Day."));
+		// Do not clear day restoration (same day continues); only respawn.
 	}
-	// Day restoration: clear day buff, meals count, meals-with-family, and love level at dawn so they must be earned again (DAY_RESTORATION_LOOP.md, DAY_LOVE_OR_BOND.md, T2 caretaker).
-	AHomeWorldPlayerState* PS = Cast<AHomeWorldPlayerState>(PlayerController->PlayerState);
-	if (PS)
+	else
 	{
-		PS->ClearDayRestorationBuff();
-		PS->ResetMealsConsumedToday();
-		PS->ResetMealsWithFamilyToday();
-		PS->ClearLoveLevel();
+		if (TimeOfDay)
+		{
+			TimeOfDay->AdvanceToDawn();
+		}
+		// Day restoration: clear day buff, meals count, meals-with-family, and love level at dawn so they must be earned again (DAY_RESTORATION_LOOP.md, DAY_LOVE_OR_BOND.md, T2 caretaker).
+		AHomeWorldPlayerState* PS = Cast<AHomeWorldPlayerState>(PlayerController->PlayerState);
+		if (PS)
+		{
+			PS->ClearDayRestorationBuff();
+			PS->ResetMealsConsumedToday();
+			PS->ResetMealsWithFamilyToday();
+			PS->ClearLoveLevel();
+			PS->ResetLoveTasksCompletedToday();
+			PS->ResetGamesWithChildToday();
+		}
 	}
 	RestartPlayer(PlayerController);
 }
@@ -73,6 +89,36 @@ void AHomeWorldGameMode::RequestAstralDeath(UObject* WorldContextObject)
 	}
 	HWGM->OnAstralDeath(PC);
 	UE_LOG(LogTemp, Log, TEXT("HomeWorld: RequestAstralDeath executed (dawn + respawn at start)."));
+}
+
+bool AHomeWorldGameMode::CanEnterAstralByDay(APlayerController* PlayerController) const
+{
+	// MVP (List 61): No gate — always allowed. Future: check PlayerState GetTutorialComplete(), GetLoveLevel() >= threshold, or config flag.
+	(void)PlayerController;
+	return true;
+}
+
+void AHomeWorldGameMode::EnterAstralByDay()
+{
+	UWorld* World = GetWorld();
+	if (!World) return;
+	APlayerController* PC = World->GetFirstPlayerController();
+	if (!CanEnterAstralByDay(PC))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HomeWorld: EnterAstralByDay — progression gate not met (astral-by-day not unlocked)."));
+		return;
+	}
+	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
+	if (!TimeOfDay) return;
+	const EHomeWorldTimeOfDayPhase Current = TimeOfDay->GetCurrentPhase();
+	if (Current != EHomeWorldTimeOfDayPhase::Day && Current != EHomeWorldTimeOfDayPhase::Dusk)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HomeWorld: EnterAstralByDay — only from Day or Dusk (current phase %d). Use hw.GoToBed or hw.TimeOfDay.Phase 2 for night."), static_cast<int32>(Current));
+		return;
+	}
+	bAstralByDay = true;
+	TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Night);
+	UE_LOG(LogTemp, Log, TEXT("HomeWorld: Enter astral during day — phase set to Night. Return with hw.AstralDeath or F8 to restore Day."));
 }
 
 void AHomeWorldGameMode::Tick(float DeltaTime)
@@ -549,6 +595,7 @@ void AHomeWorldGameMode::TryLogDefendPhaseActive()
 	if (bDefendPhaseLogged) return;
 	bDefendPhaseLogged = true;
 	UE_LOG(LogTemp, Log, TEXT("HomeWorld: Defend phase active (TimeOfDay Phase 2)."));
+	UE_LOG(LogTemp, Log, TEXT("HomeWorld: Defend active — convert attackers (VISION: convert, not kill). Call ReportFoeConverted when a foe is stripped of sin."));
 }
 
 void AHomeWorldGameMode::TryLogDefendPositions()
@@ -688,6 +735,27 @@ void AHomeWorldGameMode::TryReturnFamilyFromDefendAtDawn()
 	}
 }
 
+void AHomeWorldGameMode::LogDefendStatus() const
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HomeWorld: Defend status — no world."));
+		return;
+	}
+	const UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
+	const int32 Phase = TimeOfDay ? static_cast<int32>(TimeOfDay->GetCurrentPhase()) : -1;
+	const bool bDefendActive = TimeOfDay && TimeOfDay->GetIsDefendPhaseActive();
+	static const FName DefendPositionTag(TEXT("DefendPosition"));
+	static const FName FamilyTag(TEXT("Family"));
+	TArray<AActor*> DefendPositions;
+	UGameplayStatics::GetAllActorsWithTag(World, DefendPositionTag, DefendPositions);
+	TArray<AActor*> FamilyActors;
+	UGameplayStatics::GetAllActorsWithTag(World, FamilyTag, FamilyActors);
+	UE_LOG(LogTemp, Log, TEXT("HomeWorld: Defend status — Phase=%d (0=Day,1=Dusk,2=Night,3=Dawn), DefendActive=%s, DefendPosition actors=%d, Family actors=%d, family moved this night=%s. Use hw.TimeOfDay.Phase 2 for night; add DefendPosition/Family tags for T3 teleport. See DAY12_ROLE_PROTECTOR.md."),
+		Phase, bDefendActive ? TEXT("true") : TEXT("false"), DefendPositions.Num(), FamilyActors.Num(), bFamilyMovedToDefendThisNight ? TEXT("true") : TEXT("false"));
+}
+
 // #region agent log
 void AHomeWorldGameMode::BeginPlay()
 {
@@ -708,6 +776,19 @@ void AHomeWorldGameMode::BeginPlay()
 		else
 		{
 			UE_LOG(LogTemp, Log, TEXT("HomeWorld: Homestead not on planetoid; Level=%s"), *LevelName);
+		}
+
+		// T1 (List 2): Tutorial start = morning. When loading DemoMap or a level named like tutorial/homestead, set time-of-day to Day (0 = morning). See MVP_TUTORIAL_PLAN List 2, CONSOLE_COMMANDS hw.TimeOfDay.Phase.
+		const bool bIsTutorialMap = LevelName.Equals(TEXT("DemoMap"), ESearchCase::IgnoreCase)
+			|| LevelName.Contains(TEXT("Demo"), ESearchCase::IgnoreCase)
+			|| LevelName.Contains(TEXT("Homestead"), ESearchCase::IgnoreCase);
+		if (bIsTutorialMap)
+		{
+			if (UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>())
+			{
+				TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Day);
+				UE_LOG(LogTemp, Log, TEXT("HomeWorld: Tutorial start — time-of-day set to morning (Phase Day); Level=%s"), *LevelName);
+			}
 		}
 	}
 

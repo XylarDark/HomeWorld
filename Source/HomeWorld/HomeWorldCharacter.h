@@ -6,6 +6,7 @@
 #include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "HomeWorldMealTypes.h"
 #include "HomeWorldCharacter.generated.h"
 
 struct FOnAttributeChangeData;
@@ -45,9 +46,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "HomeWorld|Astral", meta = (DisplayName = "Request Astral Death"))
 	void RequestAstralDeath();
 
-	/** Day restoration: consume a meal (day only). Restores Health and sets day buff for next night. No effect at night. See DAY_RESTORATION_LOOP.md. */
+	/** Day restoration: consume a meal (day only). Restores Health and sets day buff for next night; sets LastMealTriggered on PlayerState. No effect at night. List 57: use MealType for in-world breakfast/lunch/dinner triggers. */
 	UFUNCTION(BlueprintCallable, Category = "Day Restoration", meta = (DisplayName = "Consume Meal Restore"))
-	bool ConsumeMealRestore();
+	bool ConsumeMealRestore(EMealType MealType = EMealType::Breakfast);
 
 	/** Report death and add this character to the spirit roster (Day 21). Call from Blueprint or game code when Health reaches 0 (e.g. GAS effect or damage handler). */
 	UFUNCTION(BlueprintCallable, Category = "Spirit", meta = (DisplayName = "Report Death And Add Spirit"))

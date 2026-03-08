@@ -479,7 +479,7 @@ void AHomeWorldCharacter::ReportDeathAndAddSpirit()
 	UE_LOG(LogTemp, Log, TEXT("HomeWorld: Character '%s' reported death and added as spirit: %s"), *GetName(), *SpiritId.ToString());
 }
 
-bool AHomeWorldCharacter::ConsumeMealRestore()
+bool AHomeWorldCharacter::ConsumeMealRestore(EMealType MealType)
 {
 	UWorld* World = GetWorld();
 	if (!World) return false;
@@ -507,6 +507,7 @@ bool AHomeWorldCharacter::ConsumeMealRestore()
 	{
 		PS->SetDayRestorationBuff(true);
 		PS->IncrementMealsConsumedToday();
+		PS->SetLastMealTriggered(MealType);
 		PS->AddLovePoints(1);  // T1: meal contributes to love (HUD "Love: N" and night bonuses).
 		// T2 caretaker stub: if Family-tagged actors exist in level, count as "meal with family".
 		static const FName FamilyTag(TEXT("Family"));
@@ -518,7 +519,8 @@ bool AHomeWorldCharacter::ConsumeMealRestore()
 			UE_LOG(LogTemp, Log, TEXT("HomeWorld: ConsumeMealRestore — meal with family (Family actors=%d); meals with family today=%d (caretaker stub)."), FamilyActors.Num(), PS->GetMealsWithFamilyToday());
 		}
 	}
-	UE_LOG(LogTemp, Log, TEXT("HomeWorld: ConsumeMealRestore — Health %.0f -> %.0f, day buff set, meals today=%d (visible at night / HUD)."), Current, NewHealth, PS ? PS->GetMealsConsumedToday() : 0);
+	const TCHAR* MealName = MealType == EMealType::Breakfast ? TEXT("Breakfast") : (MealType == EMealType::Lunch ? TEXT("Lunch") : TEXT("Dinner"));
+	UE_LOG(LogTemp, Log, TEXT("HomeWorld: ConsumeMealRestore %s — Health %.0f -> %.0f, day buff set, meals today=%d (visible at night / HUD)."), MealName, Current, NewHealth, PS ? PS->GetMealsConsumedToday() : 0);
 	return true;
 }
 
@@ -590,6 +592,73 @@ bool AHomeWorldCharacter::TryHarvestInFront()
 	{
 		UE_LOG(LogTemp, Log, TEXT("HomeWorld: Shrine activated (placeholder)"));
 		return true;
+	}
+
+	// List 57 T2: Breakfast (tag Breakfast) — in-world meal trigger. Interact (E) triggers ConsumeMealRestore(Breakfast).
+	if (HitActor && HitActor->ActorHasTag(FName("Breakfast")))
+	{
+		const bool bOk = ConsumeMealRestore(EMealType::Breakfast);
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: Breakfast (interact) — %s. MVP List 57 T2."), bOk ? TEXT("consumed") : TEXT("skipped (e.g. night)"));
+		return bOk;
+	}
+
+	// List 57 T3: Lunch (tag Lunch) — in-world meal trigger. Interact (E) or overlap triggers lunch.
+	if (HitActor && HitActor->ActorHasTag(FName("Lunch")))
+	{
+		const bool bOk = ConsumeMealRestore(EMealType::Lunch);
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: Lunch (interact) — %s. MVP List 57 T3."), bOk ? TEXT("consumed") : TEXT("skipped (e.g. night)"));
+		return bOk;
+	}
+
+	// List 57 T4: Dinner (tag Dinner) — in-world meal trigger. Interact (E) or overlap triggers dinner.
+	if (HitActor && HitActor->ActorHasTag(FName("Dinner")))
+	{
+		const bool bOk = ConsumeMealRestore(EMealType::Dinner);
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: Dinner (interact) — %s. MVP List 57 T4."), bOk ? TEXT("consumed") : TEXT("skipped (e.g. night)"));
+		return bOk;
+	}
+
+	// List 56 / T2 + T3: Bed (tag Bed) — go to bed (day) or wake (night). Interact: if night → AdvanceToDawn; else → SetPhase(Night).
+	if (HitActor && HitActor->ActorHasTag(FName("Bed")))
+	{
+		if (UHomeWorldTimeOfDaySubsystem* Tod = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>())
+		{
+			if (Tod->GetIsNight())
+			{
+				Tod->AdvanceToDawn();
+				UE_LOG(LogTemp, Log, TEXT("HomeWorld: Wake (interact at bed) — phase set to Dawn. MVP List 56 T3."));
+			}
+			else
+			{
+				Tod->SetPhase(EHomeWorldTimeOfDayPhase::Night);
+				UE_LOG(LogTemp, Log, TEXT("HomeWorld: Go to bed (interact) — phase set to Night. MVP List 8 / List 56."));
+			}
+			return true;
+		}
+	}
+
+	// List 58 T3: Partner (tag Partner) — in-world love task. Interact (E) completes one love task (AddLovePoints + LoveTasksCompletedToday).
+	if (HitActor && HitActor->ActorHasTag(FName("Partner")))
+	{
+		AHomeWorldPlayerState* PS = GetPlayerState<AHomeWorldPlayerState>();
+		if (PS)
+		{
+			PS->CompleteOneLoveTask();
+			UE_LOG(LogTemp, Log, TEXT("HomeWorld: Love task (interact with partner) — one love task done. MVP List 58 T3."));
+			return true;
+		}
+	}
+
+	// List 59 T1/T3: Child (tag Child) — in-world game-with-child. Interact (E) completes one game with child (AddLovePoints + GamesWithChildToday).
+	if (HitActor && HitActor->ActorHasTag(FName("Child")))
+	{
+		AHomeWorldPlayerState* PS = GetPlayerState<AHomeWorldPlayerState>();
+		if (PS)
+		{
+			PS->CompleteOneGameWithChild();
+			UE_LOG(LogTemp, Log, TEXT("HomeWorld: Game with child (interact with child) — one game with child done. MVP List 59."));
+			return true;
+		}
 	}
 
 	return false;

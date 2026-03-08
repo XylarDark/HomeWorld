@@ -87,6 +87,48 @@ void AHomeWorldHUD::DrawHUD()
 	Canvas->DrawText(Font, LoveLine, X, Y, TextScale, TextScale);
 	Y += LineSpacing;
 
+	// T3 (vision-aligned UI): Sin/virtue spectrum stub — four axes (Pride, Greed, Wrath, Envy) -1..0..+1. Design only; values from stubs. See SIN_VIRTUE_SPECTRUM.md, CONSOLE_COMMANDS hw.SinVirtue.Pride / .Greed / .Wrath / .Envy.
+	constexpr float SinVirtuePrideStub = 0.0f;
+	constexpr float SinVirtueGreedStub = 0.0f;
+	constexpr float SinVirtueWrathStub = 0.0f;
+	constexpr float SinVirtueEnvyStub = 0.0f;
+	const FString PrideLine = FString::Printf(TEXT("Pride: %g (sin/virtue stub)"), SinVirtuePrideStub);
+	Canvas->DrawText(Font, PrideLine, X, Y, TextScale, TextScale);
+	Y += LineSpacing;
+	const FString GreedLine = FString::Printf(TEXT("Greed: %g (sin/virtue stub)"), SinVirtueGreedStub);
+	Canvas->DrawText(Font, GreedLine, X, Y, TextScale, TextScale);
+	Y += LineSpacing;
+	const FString WrathLine = FString::Printf(TEXT("Wrath: %g (sin/virtue stub)"), SinVirtueWrathStub);
+	Canvas->DrawText(Font, WrathLine, X, Y, TextScale, TextScale);
+	Y += LineSpacing;
+	const FString EnvyLine = FString::Printf(TEXT("Envy: %g (sin/virtue stub)"), SinVirtueEnvyStub);
+	Canvas->DrawText(Font, EnvyLine, X, Y, TextScale, TextScale);
+	Y += LineSpacing;
+	static bool bLoggedPrideOnce = false;
+	if (!bLoggedPrideOnce)
+	{
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld HUD: Pride: %g (sin/virtue stub; axis -1..0..+1). See SIN_VIRTUE_SPECTRUM.md, hw.SinVirtue.Pride in CONSOLE_COMMANDS."), SinVirtuePrideStub);
+		bLoggedPrideOnce = true;
+	}
+	static bool bLoggedGreedOnce = false;
+	if (!bLoggedGreedOnce)
+	{
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld HUD: Greed: %g (sin/virtue stub; axis -1..0..+1). See SIN_VIRTUE_SPECTRUM.md, hw.SinVirtue.Greed in CONSOLE_COMMANDS."), SinVirtueGreedStub);
+		bLoggedGreedOnce = true;
+	}
+	static bool bLoggedWrathOnce = false;
+	if (!bLoggedWrathOnce)
+	{
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld HUD: Wrath: %g (sin/virtue stub; axis -1..0..+1). See SIN_VIRTUE_SPECTRUM.md, hw.SinVirtue.Wrath in CONSOLE_COMMANDS."), SinVirtueWrathStub);
+		bLoggedWrathOnce = true;
+	}
+	static bool bLoggedEnvyOnce = false;
+	if (!bLoggedEnvyOnce)
+	{
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld HUD: Envy: %g (sin/virtue stub; axis -1..0..+1). See SIN_VIRTUE_SPECTRUM.md, hw.SinVirtue.Envy in CONSOLE_COMMANDS."), SinVirtueEnvyStub);
+		bLoggedEnvyOnce = true;
+	}
+
 	// T4: One-time log so "Love: N on HUD" is validatable from Output Log (PlayerState AddLovePoints/SetLoveLevel or save/load).
 	static bool bLoggedLoveOnce = false;
 	if (!bLoggedLoveOnce)
@@ -114,9 +156,13 @@ void AHomeWorldHUD::DrawHUD()
 					const FString MealsWithFamilyLine = FString::Printf(TEXT("Meals with family: %d"), MealsWithFamily);
 					Canvas->DrawText(Font, MealsWithFamilyLine, X, Y, TextScale, TextScale);
 					Y += LineSpacing;
+					const int32 GamesWithChild = PSForMeals->GetGamesWithChildToday();
+					const FString GamesWithChildLine = FString::Printf(TEXT("Games with child: %d"), GamesWithChild);
+					Canvas->DrawText(Font, GamesWithChildLine, X, Y, TextScale, TextScale);
+					Y += LineSpacing;
 					if (!bLoggedRestoredTodayOnce)
 					{
-						UE_LOG(LogTemp, Log, TEXT("HomeWorld HUD: Restored today count shown during day (use hw.RestoreMeal to increment)."));
+						UE_LOG(LogTemp, Log, TEXT("HomeWorld HUD: Restored today count shown during day (use hw.RestoreMeal to increment). Games with child count shown (use hw.GameWithChild.Complete to increment; MVP tutorial List 5)."));
 						bLoggedRestoredTodayOnce = true;
 					}
 				}

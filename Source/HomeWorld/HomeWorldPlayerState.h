@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
+#include "HomeWorldMealTypes.h"
 #include "HomeWorldPlayerState.generated.h"
 
 class UWorld;
@@ -90,6 +91,13 @@ public:
 	/** Reset at dawn (call alongside ResetMealsConsumedToday). */
 	void ResetMealsWithFamilyToday() { MealsWithFamilyToday = 0; }
 
+	/** Last meal type triggered (ConsumeMealRestore or in-world trigger). Used for tutorial/MVP checklist and in-world meal triggers. List 57. */
+	UFUNCTION(BlueprintCallable, Category = "Day Restoration", meta = (DisplayName = "Get Last Meal Triggered"))
+	EMealType GetLastMealTriggered() const { return LastMealTriggered; }
+
+	/** Set when a meal is consumed (breakfast/lunch/dinner). Called from ConsumeMealRestore. */
+	void SetLastMealTriggered(EMealType Type);
+
 	/** Love/bond metric: 0–N, earned during the day (meals, care, building, child); scales night bonuses. Cleared at dawn. See DAY_LOVE_OR_BOND.md. */
 	UFUNCTION(BlueprintCallable, Category = "Love/Bond", meta = (DisplayName = "Get Love Level"))
 	int32 GetLoveLevel() const { return LoveLevel; }
@@ -104,6 +112,34 @@ public:
 
 	/** Clear at dawn (call alongside ClearDayRestorationBuff). */
 	void ClearLoveLevel() { SetLoveLevel(0); }
+
+	/** Love tasks completed this day (e.g. interact with partner, give gift). Reset at dawn. MVP tutorial List 4: "one love task done". */
+	UFUNCTION(BlueprintCallable, Category = "Love/Bond", meta = (DisplayName = "Get Love Tasks Completed Today"))
+	int32 GetLoveTasksCompletedToday() const { return LoveTasksCompletedToday; }
+
+	/** Increment when player completes a love task (e.g. hw.LoveTask.Complete or interact with partner). */
+	void IncrementLoveTasksCompletedToday();
+
+	/** Complete one love task: AddLovePoints(1) + IncrementLoveTasksCompletedToday(). Callable from console (hw.LoveTask.Complete) or in-world trigger (e.g. interact with partner). MVP tutorial List 4; List 58. */
+	UFUNCTION(BlueprintCallable, Category = "Love/Bond", meta = (DisplayName = "Complete One Love Task"))
+	void CompleteOneLoveTask();
+
+	/** Reset at dawn (call alongside ClearLoveLevel). */
+	void ResetLoveTasksCompletedToday() { LoveTasksCompletedToday = 0; }
+
+	/** Games played with child this day (MVP tutorial List 5 step 4). Reset at dawn. */
+	UFUNCTION(BlueprintCallable, Category = "Love/Bond", meta = (DisplayName = "Get Games With Child Today"))
+	int32 GetGamesWithChildToday() const { return GamesWithChildToday; }
+
+	/** Increment when player completes "play game with child" (e.g. hw.GameWithChild.Complete or interact with child). */
+	void IncrementGamesWithChildToday();
+
+	/** Complete one game with child: AddLovePoints(1) + IncrementGamesWithChildToday(). Callable from console (hw.GameWithChild.Complete) or in-world trigger (e.g. interact with child). MVP tutorial List 5; List 59. */
+	UFUNCTION(BlueprintCallable, Category = "Love/Bond", meta = (DisplayName = "Complete One Game With Child"))
+	void CompleteOneGameWithChild();
+
+	/** Reset at dawn (call alongside ResetLoveTasksCompletedToday). */
+	void ResetGamesWithChildToday() { GamesWithChildToday = 0; }
 
 	/** Set a short-lived HUD message when SpiritBurst is blocked (e.g. insufficient spiritual power). WorldTime = GetWorld()->GetTimeSeconds() when blocked. HUD shows it for a few seconds. */
 	void SetSpiritBurstBlockMessage(const FString& Message, float WorldTime);
@@ -138,6 +174,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "HomeWorld|Planetoid")
 	void ResetComboHitCount();
 
+	/** T2 List 10: True when "family taken" / tutorial end has occurred. Set by hw.TutorialEnd or hw.FamilyTaken; narrative trigger later. Inciting incident for Act 1. */
+	UFUNCTION(BlueprintCallable, Category = "HomeWorld|Tutorial", meta = (DisplayName = "Get Tutorial Complete"))
+	bool GetTutorialComplete() const { return bTutorialComplete; }
+
+	/** Set tutorial complete (e.g. hw.TutorialEnd or narrative "family taken" moment). Logs and sets bTutorialComplete for PIE verification and Act 1 handoff. */
+	void SetTutorialComplete(bool bComplete);
+
 private:
 	UPROPERTY()
 	int32 SpiritualPowerCollected = 0;
@@ -157,9 +200,21 @@ private:
 	UPROPERTY()
 	int32 MealsWithFamilyToday = 0;
 
+	/** Last meal type triggered this session (breakfast/lunch/dinner). Set by ConsumeMealRestore(EMealType). List 57. */
+	UPROPERTY()
+	EMealType LastMealTriggered = EMealType::Breakfast;
+
 	/** Love/bond level (0–N) earned this day; scales night bonuses. Cleared at dawn. See DAY_LOVE_OR_BOND.md. */
 	UPROPERTY()
 	int32 LoveLevel = 0;
+
+	/** Love tasks completed this day (e.g. interact with partner). Reset at dawn. MVP tutorial List 4. */
+	UPROPERTY()
+	int32 LoveTasksCompletedToday = 0;
+
+	/** Games played with child this day. Reset at dawn. MVP tutorial List 5 step 4. */
+	UPROPERTY()
+	int32 GamesWithChildToday = 0;
 
 	/** Last SpiritBurst block reason (e.g. "Not enough spiritual power"); cleared after display duration. */
 	UPROPERTY()
@@ -180,4 +235,8 @@ private:
 	/** Combo hit count for combo-style planetoid combat; reset on timeout or miss. Stub only. */
 	UPROPERTY()
 	int32 ComboHitCount = 0;
+
+	/** T2 List 10: True when "family taken" / tutorial end has occurred. Set by hw.TutorialEnd or narrative. */
+	UPROPERTY()
+	bool bTutorialComplete = false;
 };
