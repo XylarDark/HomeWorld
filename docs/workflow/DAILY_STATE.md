@@ -2,7 +2,7 @@
 
 **Purpose:** This file is read at session start and updated at session end so you can ask "what did we do yesterday and what do we need to do today?" and get a clear answer. The agent updates it automatically when a session ends.
 
-**Current focus:** Sixty-third task list (List 63 — Integration). All T1–T10 **completed**.
+**Current focus:** Sixty-fourth task list (List 64 — packaged build, demo sign-off). Run agents on [CURRENT_TASK_LIST.md](CURRENT_TASK_LIST.md); T1 first pending.
 
 ---
 
@@ -10,7 +10,7 @@
 
 What was completed or in progress in the previous session.
 
-- **Session completed:** List 63 T10 completed (Buffer). ACCOMPLISHMENTS_OVERVIEW §4 updated with sixty-third-cycle row; PROJECT_STATE_AND_TASK_LIST §4 updated (list complete, next = List 64); T10 status set to completed in CURRENT_TASK_LIST. SESSION_LOG and DAILY_STATE updated.
+- **Session completed:** Commits pushed (vision, C++, content, tools, docs); List 64 generated (packaged build smoke-test; demo sign-off; MVP full-scope verification); CURRENT_TASK_LIST replaced; PROJECT_STATE §3–§4 and DAILY_STATE updated; agents started.
 
 ---
 
@@ -18,7 +18,7 @@ What was completed or in progress in the previous session.
 
 What we need to do today. Work from [CURRENT_TASK_LIST.md](CURRENT_TASK_LIST.md) and [ACCOMPLISHMENTS_OVERVIEW.md](ACCOMPLISHMENTS_OVERVIEW.md).
 
-- **Sixty-third list:** All T1–T10 completed. **Next:** Generate List 64 (packaged build smoke-test; demo sign-off) per [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md) and [MVP_FULL_SCOPE_10_LISTS.md](MVP_FULL_SCOPE_10_LISTS.md); then run `.\Tools\Start-AllAgents-InNewWindow.ps1` on the new list.
+- **T1–T10 (sixty-fourth list):** T1 Packaged build run or smoke-test first; then T2–T10 per order. Run agents via `.\Tools\Start-AllAgents-InNewWindow.ps1` (Editor open + MCP connected).
 
 ---
 
@@ -26,7 +26,7 @@ What we need to do today. Work from [CURRENT_TASK_LIST.md](CURRENT_TASK_LIST.md)
 
 Preview of next focus.
 
-- **After List 64 generated:** Run agents on new CURRENT_TASK_LIST via `.\Tools\Start-AllAgents-InNewWindow.ps1` (Editor open + MCP connected).
+- **After List 64:** MVP full scope (10 lists) complete; next lists per VISION and [NEXT_30_DAY_WINDOW.md](NEXT_30_DAY_WINDOW.md).
 
 ---
 

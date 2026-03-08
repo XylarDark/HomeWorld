@@ -89,23 +89,23 @@ Use this list as the source of "what to do next." Each item has a **goal**, **su
 
 | Id | One-line summary | See CURRENT_TASK_LIST for status and order |
 |----|-------------------|-------------------------------------------|
-| T1 | Tutorial loop single-session run (MVP tutorial 13 steps) | pending |
-| T2 | Week 1 playtest single-session run (crash → scout → boss → claim home) | pending |
-| T3 | Vertical slice pre-demo checklist run | pending |
-| T4 | Integration doc — single entry point and run mapping | pending |
-| T5 | CONSOLE_COMMANDS and MVP_TUTORIAL_PLAN — integration verification | pending |
-| T6 | MVP full scope List 63 — vertical slice §4 sixty-third deliverables | pending |
-| T7 | AUTOMATION_GAPS or KNOWN_ERRORS — List 63 findings | pending |
+| T1 | Packaged build run or smoke-test | pending |
+| T2 | Demo sign-off (vertical slice) | pending |
+| T3 | MVP full-scope verification | pending |
+| T4 | CONSOLE_COMMANDS and checklist refresh (List 64) | pending |
+| T5 | MVP full scope List 64 — vertical slice §4 sixty-fourth deliverables | pending |
+| T6 | AUTOMATION_GAPS or KNOWN_ERRORS — List 64 findings | pending |
+| T7 | Buffer prep (post–List 64) | pending |
 | T8 | Docs and cycle (combined) | pending |
 | T9 | Verification (combined) | pending |
 | T10 | Buffer: next list prep (ACCOMPLISHMENTS + PROJECT_STATE §4) | pending |
 
 ---
 
-## 4. Current list (sixty-third 10-task list — MVP full scope List 63)
+## 4. Current list (sixty-fourth 10-task list — MVP full scope List 64)
 
-- The **sixty-third 10-task list** is **complete**. All T1–T10 **completed** (List 63: Integration — tutorial + Week 1 playtest single-session run; vertical slice pre-demo). See [CURRENT_TASK_LIST.md](CURRENT_TASK_LIST.md).
-- **Next step:** Generate **List 64** (packaged build smoke-test; demo sign-off; MVP full-scope verification and buffer) per [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md) and [MVP_FULL_SCOPE_10_LISTS.md](MVP_FULL_SCOPE_10_LISTS.md); then run `.\Tools\Start-AllAgents-InNewWindow.ps1`.
+- The **sixty-fourth 10-task list** is **in progress**. **Focus:** List 64 per [MVP_FULL_SCOPE_10_LISTS.md](MVP_FULL_SCOPE_10_LISTS.md): Packaged build smoke-test; demo sign-off; MVP full-scope verification and buffer. See [CURRENT_TASK_LIST.md](CURRENT_TASK_LIST.md).
+- **Next step:** Run agents on CURRENT_TASK_LIST (T1 first pending). After List 64, MVP full scope (10 lists) complete; next lists per VISION and [NEXT_30_DAY_WINDOW.md](NEXT_30_DAY_WINDOW.md).
 - **Cycle doc freshness and next priority:** See [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) (top) and [ACCOMPLISHMENTS_OVERVIEW.md](ACCOMPLISHMENTS_OVERVIEW.md) §4.
 
 ---
