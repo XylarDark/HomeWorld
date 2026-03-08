@@ -48,6 +48,8 @@
 
 **Note:** If no save exists yet, `hw.Load` logs "Load failed - no save in slot" and returns; run `hw.Save` first.
 
+**hw.Roles (role persistence observability):** In PIE, run **`hw.Roles`** to log current family roles (index → role) from `UHomeWorldFamilySubsystem`. After **hw.Save** then **hw.Load**, run **hw.Roles** again to confirm the same roles were restored. See [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) Commands table.
+
 **Automated check:** `pie_test_runner.py` includes `check_save_load_persistence`: when PIE is running, it calls SaveGameSubsystem.SaveGameToSlot then LoadGameFromSlot and passes if both succeed. Run via MCP `execute_python_script("pie_test_runner.py")`; see `Saved/pie_test_results.json` for the "Save/Load persistence" result. If PIE is not running, the check reports "PIE not running".
 
 **T5 run (2026-03-05):** pie_test_runner.py executed via MCP; PIE was not running. Result: "Save/Load persistence" = failed, detail "PIE not running". For full validation: start PIE in Editor, then run `execute_python_script("pie_test_runner.py")` and read `Saved/pie_test_results.json` — "Save/Load persistence" will be passed if SaveGameToSlot and LoadGameFromSlot succeed.

@@ -28,6 +28,9 @@
 - **T7 (twenty-ninth list, 2026-03-06) completed:** Package not run this list. Use **`.\Tools\Package-AfterClose.ps1`** when ready (close Unreal Editor and any HomeWorld game first). See § Packaged build retry when Stage failed (files in use) and [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) for Stage SafeCopyFile workaround.
 - **T6 (thirty-first list, 2026-03-06) completed:** Package not run this list. Use **`.\Tools\Package-AfterClose.ps1`** when ready (close Unreal Editor and any HomeWorld game first). See § Packaged build retry when Stage failed (files in use) and [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) for Stage SafeCopyFile workaround.
 - **T5 (thirty-second list, 2026-03-06) completed:** Package not run this list. Use **`.\Tools\Package-AfterClose.ps1`** when ready (close Unreal Editor and any HomeWorld game first). See § Packaged build retry when Stage failed (files in use) and [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) for Stage SafeCopyFile workaround.
+- **T6 (thirty-fourth list, 2026-03-06) completed:** Package not run this list. Use **`.\Tools\Package-AfterClose.ps1`** when ready (close Unreal Editor and any HomeWorld game first). See § Packaged build retry when Stage failed (files in use) and [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) for Stage SafeCopyFile workaround.
+- **T6 (thirty-fifth list, 2026-03-06) completed:** Thirty-fifth list: package not run; use **`.\Tools\Package-AfterClose.ps1`** when ready (close Unreal Editor and any HomeWorld game first). See § Packaged build retry when Stage failed (files in use) and [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) for Stage SafeCopyFile workaround.
+- **T1 (fifty-fourth list, 2026-03-08) completed:** Packaged build not run this list. Use **`.\Tools\Package-AfterClose.ps1`** when ready (close Unreal Editor and any HomeWorld game first). See § Packaged build retry when Stage failed (files in use) and [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) for Stage SafeCopyFile workaround.
 
 ---
 

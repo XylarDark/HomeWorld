@@ -32,6 +32,11 @@
 
 **T5 verification (2026-03-05):** Ran `create_bp_build_order_wall.py` and `pie_test_runner.py` via MCP; both executed successfully. **What works:** Script creates/reuses BP_BuildOrder_Wall, sets BuildDefinitionID and PlaceActorClass on BP_HomeWorldCharacter; pie_test_runner includes `check_place_actor_class_set`. In PIE, key **P** spawns the place actor at cursor. **What remains manual/deferred:** Full agentic flow (family agents fulfilling build orders via SO_WallBuilder, State Tree BUILD branch, MP_WoodInventory) remains deferred per NEXT_30_DAY_WINDOW N2; no console command to place wall from outside PIE — placement is in-PIE only via GA_Place (key P).
 
+### T3 (List 60 / CURRENT_TASK_LIST) — State Tree BUILD branch and verification
+
+- **BUILD branch (State Tree):** Implement by following [AGENTIC_BUILDING.md](AGENTIC_BUILDING.md) **Step 3** manually in the Editor (no automation API; see [AUTOMATION_GAPS.md](../AUTOMATION_GAPS.md) Gap 2). Verification after manual setup: PIE with family agents (Mass spawner + ST_FamilyGatherer BUILD branch) or use **Path 1** below (console commands, no agents).
+- **Single entry point for run sequence and commands:** [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) links §3 (run sequence) and the command reference; open CONSOLE_COMMANDS for both [VERTICAL_SLICE_CHECKLIST §3](../workflow/VERTICAL_SLICE_CHECKLIST.md#3-pre-demo-checklist-before-recording-or-showing) and **hw.PlaceWall**, **hw.CompleteBuildOrder**, **hw.SimulateBuildOrderActivation**.
+
 ### T3 (CURRENT_TASK_LIST) verification — place wall via agent/console
 
 - **Goal:** Place wall (or BP_BuildOrder_Wall) via agent/console so automation or testing can place structures.
@@ -49,6 +54,12 @@
 **T3 (CURRENT_TASK_LIST, fifteenth list 2026-03-05):** One concrete step implemented. (1) **AHomeWorldBuildOrder::CompleteBuildOrder()** — BlueprintCallable; sets `bBuildCompleted` and logs; SO_WallBuilder OnActivated (or agent BUILD branch) can call this when build finishes. (2) **Console command hw.CompleteBuildOrder** — In PIE, completes the nearest incomplete build order to the player (e.g. after placing with hw.PlaceWall or key P). **PIE test:** Place wall (P or hw.PlaceWall), then run `hw.CompleteBuildOrder`; log shows "Build order completed" and actor's `bBuildCompleted` is true (Blueprint can hide hologram / show final mesh). Full BUILD branch and SO behavior wiring still deferred.
 
 **T3 (CURRENT_TASK_LIST, sixteenth list 2026-03-05):** SO_WallBuilder activation made **triggerable and observable** in PIE. **hw.SimulateBuildOrderActivation** — In PIE, simulates SO activation on the nearest incomplete build order: logs "SO_WallBuilder activation (simulated). Completing build order on &lt;actor&gt;" and calls CompleteBuildOrder(). **PIE test:** Place wall (P or hw.PlaceWall), then run `hw.SimulateBuildOrderActivation`; Output Log shows the SO activation message and "Build order completed"; `bBuildCompleted` is true. Full agent flow (family agents claiming and completing via State Tree BUILD branch) remains deferred (no API for State Tree graph editing); this command satisfies "SO activation is triggered and observable" for testing.
+
+### T4 (List 60 / CURRENT_TASK_LIST) — Build orders and family agents in DemoMap
+
+- **Goal:** DemoMap has (1) at least one incomplete build order and (2) family agents (Mass spawner) that can use the BUILD flow.
+- **Scripts (run with DemoMap open):** **create_bp_build_order_wall.py** → **place_build_order_wall.py** → **place_mass_spawner_demomap.py**. Config: `demo_map_config.json` **build_order_wall_position**, **mass_spawner_***.
+- **Placement + completion path:** See [DEMO_MAP.md](../DEMO_MAP.md) § Config and scripts ("Build orders and family agents"). In PIE: "agent completes one build order" is observable when the State Tree BUILD branch is set up (manual per [AUTOMATION_GAPS.md](../AUTOMATION_GAPS.md)); or use **Path 1** (hw.PlaceWall, hw.CompleteBuildOrder / hw.SimulateBuildOrderActivation) for verification without agents.
 
 ---
 

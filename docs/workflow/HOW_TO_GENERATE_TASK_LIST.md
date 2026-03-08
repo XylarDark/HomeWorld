@@ -13,6 +13,18 @@ The automation loop is driven by **one task list**: `docs/workflow/CURRENT_TASK_
 
 **When generating a new list:** (1) Read PROJECT_STATE_AND_TASK_LIST §0 and note **Current phase**. (2) Assign that many slots to **testable implementation** (fill first slots T1, T2, …). (3) Assign the remaining slots to **verification and support**. This keeps the list dynamic to our needs. **When to change phase:** Update PROJECT_STATE_AND_TASK_LIST §0 "Current phase" when the team shifts (e.g. "We're two weeks from a demo" → set to **Prototype hardening**; "We're adding the next feature set" → **Rapid prototyping**).
 
+### Consolidate overhead so more slots are substantive (policy)
+
+**Problem:** Many lists have used 4–5 tasks for small, recurring overhead (vertical slice §4 N-th deliverables, CONSOLE_COMMANDS refresh, KNOWN_ERRORS/AUTOMATION_GAPS cycle note, build verification, doc review, task list validation). That leaves only 3–4 slots for real implementation.
+
+**Policy:** Consolidate so that **more of the 10 tasks are substantive work**:
+
+- **One "Docs and cycle" task** (e.g. T8): Combine vertical slice §4 N-th-list deliverables, CONSOLE_COMMANDS or workflow doc update, and KNOWN_ERRORS/AUTOMATION_GAPS cycle note into a **single task**. Success = all three done (or explicitly deferred) in one go.
+- **One "Verification" task** (e.g. T9): Combine build run (if C++/config changed), doc review (VERTICAL_SLICE_CHECKLIST §3–§4, CONSOLE_COMMANDS), and task list validation (validate_task_list.py, DAILY_STATE) into a **single task**. Success = build green, docs reviewed, list validated.
+- **T10** remains the buffer task (ACCOMPLISHMENTS + PROJECT_STATE §4; do not replace CURRENT_TASK_LIST).
+
+**Resulting shape (rapid prototyping):** T1–T7 = **implementation** (build/code/feature/test; each task should be a meaningful chunk of work). T8 = **Docs and cycle** (combined). T9 = **Verification** (combined). T10 = **Buffer**. That gives **7 implementation slots** instead of 3–4, so more work gets done per list. Use bigger, multi-step implementation tasks where it makes sense (e.g. "Implement X and add a test" or "Add feature A and wire it in B").
+
 ## Avoiding repeated tasks
 
 If the same or similar tasks keep appearing across sessions, see **[TASK_LIST_REPEATS_LOG.md](TASK_LIST_REPEATS_LOG.md)** for causes (status not persisted, re-verification by design, overlap when generating new lists, gaps reappearing) and how we address them. When generating a new list: read **ACCOMPLISHMENTS_OVERVIEW §4** so you don't duplicate completed work unless you intend re-verification; prefer continuing or carrying over pending tasks instead of re-adding the same goals.

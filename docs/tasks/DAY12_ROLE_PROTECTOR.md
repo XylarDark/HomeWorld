@@ -24,11 +24,13 @@ Per [FAMILY_AGENTS_MASS_STATETREE.md](FAMILY_AGENTS_MASS_STATETREE.md) Step 3.2 
 3. **Task:** Defend — e.g. **MoveTo** (rally point or enemy actor); optionally **Play Anim Montage** (guard/attack idle).
 4. **Blackboard:** Add **IsNight** (Bool) and optionally **DefendTarget** (Vector or Object). Wire IsNight from game code: get the world's `UHomeWorldTimeOfDaySubsystem` and call `GetIsNight()` each tick or from a Mass processor, and write the result to the State Tree blackboard.
 
+**List 62 / task list T2 (State Tree Night? branch):** There is no automation API for State Tree graph editing. Use the **one-time manual steps** in [AUTOMATION_GAPS.md](../AUTOMATION_GAPS.md) §Gap 2 (open ST_FamilyGatherer, add Night? as first child, condition IsNight, Defend task, Blackboard IsNight). Then validate with PIE + **hw.TimeOfDay.Phase 2** (see [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) § Defend-at-night (List 62) verification). The C++ teleport path (T1/T3) gives observable "family at DefendPosition" without requiring the State Tree branch.
+
 ### Defend positions (T3 — family at Defend when DefendActive)
 
 When **DefendActive** is true (night), family should be at "Defend positions" (rally points). Implemented as:
 
-1. **Tag in level:** Place actors (e.g. TargetPoint or empty Actor) where family should stand at night. Add the tag **DefendPosition** to each (Details → Actor → Tags → add `DefendPosition`).
+1. **Tag in level:** **create_demo_from_scratch.py** runs **place_defend_gather_positions.py** and **place_partner.py** so DemoMap gets one DefendPosition- and one GatherPosition-tagged actor and one Family-tagged actor (partner). Alternatively run those scripts with DemoMap open (Tools → Execute Python Script or MCP). Or place actors manually and add the tag **DefendPosition** (Details → Actor → Tags → add `DefendPosition`).
 2. **GameMode discovery:** When TimeOfDay is Phase 2 (night), `AHomeWorldGameMode::TryLogDefendPositions()` runs once per night: finds all actors with tag `DefendPosition` and logs count and locations to Output Log (e.g. "Defend positions (T3): N actor(s) with tag DefendPosition" and first 5 locations). **PIE:** Run `hw.TimeOfDay.Phase 2` and check Output Log to confirm.
 3. **T3 teleport (C++):** When DefendActive (night), `AHomeWorldGameMode::TryMoveFamilyToDefendPositions()` runs once per night: finds all actors with tag **Family** and all actors with tag **DefendPosition**, then teleports each Family actor to a DefendPosition (round-robin). Add tag **Family** to family representation actors (e.g. Mass-spawned agents or test pawns) so they are moved. **PIE:** Place DefendPosition- and Family-tagged actors, run `hw.TimeOfDay.Phase 2`; Output Log shows "HomeWorld: T3 moved N family actor(s) to DefendPosition (teleport)."
 4. **State Tree MoveTo (optional):** Complete the one-time steps in [AUTOMATION_GAPS.md](../AUTOMATION_GAPS.md) §Gap 2 (Night? branch, IsNight blackboard, Defend task) for State Tree–driven move behavior. The C++ teleport above gives observable "family at DefendPosition" without requiring State Tree editing.
@@ -41,6 +43,10 @@ When **DefendActive** is true (night), family should be at "Defend positions" (r
   1. **Keep teleport as MVP** — No change; Defend remains “family at positions at night” via teleport. Document as design choice for prototype.
   2. **Nav move later** — Replace teleport with AI/nav move: use State Tree **MoveTo** (see [AUTOMATION_GAPS.md](../AUTOMATION_GAPS.md) §Gap 2: Night? branch, IsNight blackboard, Defend task) so family walk to DefendPosition. Requires Gap 2 one-time manual steps; then family move at night via State Tree instead of GameMode teleport.
   3. **Defend phase end** — When dawn arrives, Defend phase is cleared and logged. Implemented in `AHomeWorldGameMode::Tick`: on transition from Night to non-Night (e.g. Dawn), the game logs **"Defend phase end (dawn)."** and resets Defend state (bDefendPhaseLogged, bDefendPositionsLogged, bFamilyMovedToDefendThisNight). So each night Defend runs again from a clean state.
+
+### Conversion and Defend (List 62 — VISION: convert, not kill)
+
+Defend-at-night aligns with [VISION.md](../workflow/VISION.md) § Vanquishing foes: we **convert** attackers (strip sin → loved form), not kill them. When Defend phase is active (night), the game logs **"Defend active — convert attackers (VISION: convert, not kill)."** (once per night in `TryLogDefendPhaseActive`). When a foe is defeated during Defend, call **`AHomeWorldGameMode::ReportFoeConverted(Foe)`** so the game records the conversion (increments `ConvertedFoesThisNight`, optional role assignment). See GameMode `ReportFoeConverted`, `GetConvertedFoesThisNight`, and `EConvertedFoeRole`; full conversion gameplay (strip sin, spawn loved form) is implemented in later lists.
 
 ### T3 — Family return from Defend at dawn (stub)
 
@@ -70,6 +76,7 @@ When dawn arrives (phase transition from Night to non-Night), family that were a
 
 - **Family at homestead:** For the prototype, "family at homestead" is satisfied by family agents (Mass) spawning on the playable map. Use **DemoMap** as the homestead map: Mass Spawner is placed via `Content/Python/place_mass_spawner_demomap.py` (config: `demo_map_config.json` — `mass_spawner_position`, `mass_spawner_spawn_count`, etc.). Ensure MEC_FamilyGatherer and ST_FamilyGatherer are set up per [DAY11_FAMILY_SPAWN.md](DAY11_FAMILY_SPAWN.md).
 - **PIE validation (hw.TimeOfDay.Phase 2):** (1) Open DemoMap, start PIE. (2) Open **Console** (or Output Log). (3) Run `hw.TimeOfDay.Phase 2` to force **Night**. (4) If ST_FamilyGatherer has the **Night?** branch and **IsNight** blackboard wired from `UHomeWorldTimeOfDaySubsystem::GetIsNight()` (see [AUTOMATION_GAPS.md](../AUTOMATION_GAPS.md) Gap 2 for one-time manual steps), family agents should switch to the Defend branch (e.g. MoveTo rally or guard behavior). (5) Run `hw.TimeOfDay.Phase 0` to return to day. If the State Tree Night? branch is not yet added, complete the manual steps in AUTOMATION_GAPS Gap 2 first.
+- **hw.Defend.Status:** In PIE, run **`hw.Defend.Status`** to log Defend phase status (phase 0–3, DefendActive, DefendPosition actor count, Family actor count, family-moved-this-night). Use after `hw.TimeOfDay.Phase 2` to verify Defend at home without relying on State Tree. See [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) Commands table.
 
 ### T4 (CURRENT_TASK_LIST) close-out
 

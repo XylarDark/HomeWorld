@@ -45,7 +45,7 @@
 | System | Use |
 |--------|-----|
 | **HasDayRestorationBuff** | One meal (or one qualifying day activity) sets the flag; already used for +1 spiritual power per collectible at night. Love is broader: multiple activities can increase LoveLevel, which can scale that same bonus or others. |
-| **AHomeWorldPlayerState** | Holds `LoveLevel` (or `BondPoints`) stub: `GetLoveLevel()`, `SetLoveLevel(int32)`, optional `AddLovePoints(int32)`. Cleared or decayed at dawn (same as day buff) so each day the player must earn it again. |
+| **AHomeWorldPlayerState** | Holds `LoveLevel` (or `BondPoints`) stub: `GetLoveLevel()`, `SetLoveLevel(int32)`, `AddLovePoints(int32)`, `CompleteOneLoveTask()` (AddLovePoints(1) + IncrementLoveTasksCompletedToday). Cleared or decayed at dawn (same as day buff) so each day the player must earn it again. Call `CompleteOneLoveTask()` from console (`hw.LoveTask.Complete`) or in-world trigger (e.g. interact with partner). |
 | **Dawn** | When advancing to dawn, clear or reset LoveLevel (e.g. set to 0) so the next day the player builds it again. |
 | **Persistence (future)** | If we want to carry over a "bond" across days (e.g. long-term relationship meter), we can add `SavedLoveLevel` or `SavedBondPoints` to `UHomeWorldSaveGame` and restore on load. Stub does not require persistence. |
 
@@ -55,4 +55,5 @@
 
 - This design doc exists and defines: how love is earned (meals, care, building, child), how it aggregates (LoveLevel or BondPoints), and how it scales night bonuses (tier or formula).
 - PlayerState has a **stub value** (e.g. `GetLoveLevel()` / `SetLoveLevel(int32)`) that can be read when applying night bonuses; no full implementation required.
+- **Complete one love task:** A single entry point `CompleteOneLoveTask()` (AddLovePoints(1) + IncrementLoveTasksCompletedToday) is callable from console (`hw.LoveTask.Complete`) and from in-world trigger (e.g. interact with partner); MVP tutorial List 4 and List 58.
 - Night bonus code (existing or future) can call the stub so the hook is code-ready; actual scaling formula can be placeholder (e.g. +0 for now, or +LoveLevel to spiritual power for testing).

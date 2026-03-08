@@ -1,113 +1,113 @@
 # Current task list (10-task)
 
-**Last updated:** 2026-03-06 (thirty-second list, **rapid prototyping**: 7 implementation + 2 verification + 1 buffer per PROJECT_STATE §0). **Context:** Follow-on from thirty-first (console commands, vertical slice §4, pie_test_runner planetoid check done): max-rounds fix, vertical slice §4 thirty-second, CONSOLE_COMMANDS pie_test_results keys, optional second sin/virtue stub, packaged build, KNOWN_ERRORS, PIE verification, buffer.
+**Last updated:** 2026-03-09 (sixty-third list, **ninth of MVP full scope 10 lists**). **Rapid prototyping (consolidated):** T1–T7 = implementation, T8 = docs and cycle, T9 = verification, T10 = buffer. **Context:** MVP full scope (Vision-aligned) — List 63: Integration — tutorial + Week 1 playtest single-session run; vertical slice pre-demo. See [VISION.md](VISION.md) § MVP full scope; [MVP_FULL_SCOPE_10_LISTS.md](MVP_FULL_SCOPE_10_LISTS.md).
 
 **Purpose:** Single ordered list that drives the automation loop. Agents fetch the first **pending** or **in_progress** task; update status when done. Loop exits when no task has status pending or in_progress.
 
 **Convention:** `pending` | `in_progress` | `completed` | `blocked`
 
-**Order:** T1–T7 = implementation; T8–T9 = verification; T10 = buffer.
+**Order:** T1–T7 implementation; T8 docs and cycle; T9 verification; T10 buffer.
 
 ---
 
-## T1. Increase max rounds to 11 in RunAutomationLoop.ps1
+## T1. Tutorial loop single-session run (MVP tutorial 13 steps)
 
-- **goal:** Change the loop cap from 10 to 11 rounds in RunAutomationLoop.ps1 so that when all 10 tasks are pending, the buffer task (T10) runs in the same run instead of being left for manual completion. Update the check from `if ($round -gt 10)` to `if ($round -gt 11)` and update the log message to "max rounds (11) reached". Optionally add a one-line comment in the script explaining why 11 (one round per task T1–T10).
-- **success criteria:** RunAutomationLoop.ps1 allows 11 rounds; log message says "max rounds (11)"; T1 status set to completed.
-- **research_notes:** Tools/RunAutomationLoop.ps1 lines 472–477; thirty-first run hit round 10 and exited before T10 (buffer). See SESSION_LOG 2026-03-06.
-- **steps_or_doc:** Tools/RunAutomationLoop.ps1.
+- **goal:** Run the **MVP tutorial loop** in a **single PIE session**: wake → breakfast → love task → game with child → gather (wood/ore/flowers) → lunch → dinner → bed → spectral combat → encampment → boss → night ends → wake to family taken. Use [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) § Pre-demo verification and [MVP_TUTORIAL_PLAN.md](MVP_TUTORIAL_PLAN.md) checklist; console commands (hw.Meal.*, hw.LoveTask.Complete, hw.GameWithChild.Complete, hw.GoToBed, hw.TimeOfDay.Phase, etc.) as needed. Document outcome: which steps completed, which deferred or failed, and any fixes. Per [MVP_FULL_SCOPE_10_LISTS.md](MVP_FULL_SCOPE_10_LISTS.md) List 63.
+- **success criteria:** Tutorial loop run (or documented partial run) in one session; outcome in SESSION_LOG or VERTICAL_SLICE_CHECKLIST §3; T1 status set to completed.
+- **research_notes:** [MVP_TUTORIAL_PLAN.md](MVP_TUTORIAL_PLAN.md); [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) § Pre-demo verification; [VERTICAL_SLICE_CHECKLIST.md](VERTICAL_SLICE_CHECKLIST.md) §3; VISION § MVP tutorial loop.
+- **steps_or_doc:** docs/CONSOLE_COMMANDS.md; docs/workflow/MVP_TUTORIAL_PLAN.md; docs/workflow/VERTICAL_SLICE_CHECKLIST.md.
 - **status:** completed
 
 ---
 
-## T2. Vertical slice §4: thirty-second-list deliverables subsection
+## T2. Week 1 playtest single-session run (crash → scout → boss → claim home)
 
-- **goal:** Add a subsection "Thirty-second-list deliverables" to VERTICAL_SLICE_CHECKLIST.md §4 with a short table or list of what this list will deliver (to be filled after run: max-rounds fix, CONSOLE_COMMANDS pie_test_results keys, optional hw.SinVirtue.Greed, packaged build or doc, KNOWN_ERRORS note, PIE outcome). Same pattern as "Thirty-first-list deliverables". No new implementation; doc only.
-- **success criteria:** VERTICAL_SLICE_CHECKLIST §4 contains "Thirty-second-list deliverables" with verification refs or placeholder rows; T2 status set to completed.
-- **research_notes:** [VERTICAL_SLICE_CHECKLIST.md](VERTICAL_SLICE_CHECKLIST.md) §4 (Thirty-first-list deliverables pattern); thirty-second list T1–T8 scope.
+- **goal:** Run the **Week 1 playtest** in a **single PIE session**: crash → scout → boss → claim home (per VISION § Demonstrable prototype gate). Use [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) § Pre-demo verification and Week 1 playtest checklist; [DAY5_PLAYTEST_SIGNOFF.md](../tasks/DAY5_PLAYTEST_SIGNOFF.md) T1 verification if applicable. Document outcome: pass/fail per beat, stability (2–5 min), any fixes. Per List 63.
+- **success criteria:** Week 1 playtest run (or documented partial run) in one session; outcome in SESSION_LOG or task doc; T2 status set to completed.
+- **research_notes:** [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md); [DAY5_PLAYTEST_SIGNOFF.md](../tasks/DAY5_PLAYTEST_SIGNOFF.md); [VERTICAL_SLICE_CHECKLIST.md](VERTICAL_SLICE_CHECKLIST.md) §3; VISION § Week 1 playtest goal.
+- **steps_or_doc:** docs/CONSOLE_COMMANDS.md; docs/tasks/DAY5_PLAYTEST_SIGNOFF.md; docs/workflow/VERTICAL_SLICE_CHECKLIST.md.
+- **status:** completed
+
+---
+
+## T3. Vertical slice pre-demo checklist run
+
+- **goal:** Execute the **vertical slice pre-demo checklist** ([VERTICAL_SLICE_CHECKLIST.md](VERTICAL_SLICE_CHECKLIST.md) §3): level open, character/Enhanced Input/GAS, chosen moment playable, chosen corner visible, stability 2–5 min. Run pie_test_runner.py if PIE is active; document pass/fail and any gaps. Optional: 1–3 min demo recording (user-led). Per List 63.
+- **success criteria:** Pre-demo checklist run and outcome documented (VERTICAL_SLICE_CHECKLIST §3 or SESSION_LOG); T3 status set to completed.
+- **research_notes:** [VERTICAL_SLICE_CHECKLIST.md](VERTICAL_SLICE_CHECKLIST.md) §3; [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) § Pre-demo verification; pie_test_runner.py; [PROTOTYPE_SCOPE.md](PROTOTYPE_SCOPE.md) moment/corner.
+- **steps_or_doc:** docs/workflow/VERTICAL_SLICE_CHECKLIST.md; docs/CONSOLE_COMMANDS.md; Content/Python/pie_test_runner.py.
+- **status:** completed
+
+---
+
+## T4. Integration doc — single entry point and run mapping
+
+- **goal:** Ensure **one clear entry point** for integration runs: [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) § Pre-demo verification links §3 (run sequence), tutorial checklist (MVP_TUTORIAL_PLAN), and Week 1 playtest checklist. Add or update a **List 63 integration** subsection: order of runs (tutorial loop → Week 1 playtest → pre-demo checklist), expected outcomes, and where to document results. Per List 63.
+- **success criteria:** CONSOLE_COMMANDS (or linked doc) has List 63 integration run order and outcome locations; T4 status set to completed.
+- **research_notes:** [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md); [MVP_TUTORIAL_PLAN.md](MVP_TUTORIAL_PLAN.md); [VERTICAL_SLICE_CHECKLIST.md](VERTICAL_SLICE_CHECKLIST.md) §3.
+- **steps_or_doc:** docs/CONSOLE_COMMANDS.md; docs/workflow/MVP_TUTORIAL_PLAN.md; docs/workflow/VERTICAL_SLICE_CHECKLIST.md.
+- **status:** completed
+
+---
+
+## T5. CONSOLE_COMMANDS and MVP_TUTORIAL_PLAN — integration verification
+
+- **goal:** Update [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) and [MVP_TUTORIAL_PLAN.md](MVP_TUTORIAL_PLAN.md) with **List 63 integration verification** steps: how to run tutorial + Week 1 playtest + pre-demo in one or two sessions; which commands and checklists to use; where to record pass/fail. Per List 63.
+- **success criteria:** CONSOLE_COMMANDS and MVP_TUTORIAL_PLAN include integration (List 63) verification; T5 status set to completed.
+- **research_notes:** [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md); [MVP_TUTORIAL_PLAN.md](MVP_TUTORIAL_PLAN.md); [VERTICAL_SLICE_CHECKLIST.md](VERTICAL_SLICE_CHECKLIST.md) §3.
+- **steps_or_doc:** docs/CONSOLE_COMMANDS.md; docs/workflow/MVP_TUTORIAL_PLAN.md.
+- **status:** completed
+
+---
+
+## T6. MVP full scope List 63 — vertical slice §4 sixty-third deliverables
+
+- **goal:** Add **Sixty-third-list deliverables** (and MVP full scope List 63 note) to VERTICAL_SLICE_CHECKLIST.md §4: tutorial loop single-session run, Week 1 playtest single-session run, vertical slice pre-demo checklist run, integration doc/entry point, verification doc. Note that this is list 9 of 10 for MVP full scope (Vision-aligned). Per List 63.
+- **success criteria:** VERTICAL_SLICE_CHECKLIST §4 contains sixty-third-list deliverables and List 63 scope note; T6 status set to completed.
+- **research_notes:** [VERTICAL_SLICE_CHECKLIST.md](VERTICAL_SLICE_CHECKLIST.md) §4; [MVP_FULL_SCOPE_10_LISTS.md](MVP_FULL_SCOPE_10_LISTS.md) List 63.
 - **steps_or_doc:** docs/workflow/VERTICAL_SLICE_CHECKLIST.md.
 - **status:** completed
 
 ---
 
-## T3. CONSOLE_COMMANDS: pie_test_results.json check names (planetoid_complete)
+## T7. AUTOMATION_GAPS or KNOWN_ERRORS — List 63 findings
 
-- **goal:** In CONSOLE_COMMANDS.md section "Reading Saved/pie_test_results.json", ensure the check names table (or equivalent) includes the planetoid_complete check added in thirty-first list (T8). If the table lists individual checks, add a row for planetoid_complete; if it references "checks array", add a brief note that planetoid_complete is one of the checks when PIE is running. So testers know what to look for.
-- **success criteria:** CONSOLE_COMMANDS.md documents planetoid_complete in the pie_test_results interpretation; T3 status set to completed.
-- **research_notes:** [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) "Reading Saved/pie_test_results.json"; [pie_test_runner.py](../../Content/Python/pie_test_runner.py) ALL_CHECKS (planetoid complete).
-- **steps_or_doc:** docs/CONSOLE_COMMANDS.md.
+- **goal:** If integration runs revealed gaps (missing commands, flaky steps, manual-only steps), add or update AUTOMATION_GAPS (and optionally KNOWN_ERRORS) with List 63 findings: what was run, what failed or was deferred, and suggested next step for List 64. Per List 63.
+- **success criteria:** AUTOMATION_GAPS or KNOWN_ERRORS updated with List 63 cycle note or findings; T7 status set to completed.
+- **research_notes:** [AUTOMATION_GAPS.md](../AUTOMATION_GAPS.md); [KNOWN_ERRORS.md](../KNOWN_ERRORS.md); [MVP_FULL_SCOPE_10_LISTS.md](MVP_FULL_SCOPE_10_LISTS.md).
+- **steps_or_doc:** docs/AUTOMATION_GAPS.md; docs/KNOWN_ERRORS.md.
 - **status:** completed
 
 ---
 
-## T4. Console command hw.SinVirtue.Greed (stub, optional)
+## T8. Docs and cycle (combined)
 
-- **goal:** Add a second sin/virtue console command `hw.SinVirtue.Greed` that logs the stub value (e.g. 0), same pattern as hw.SinVirtue.Pride. Document in CONSOLE_COMMANDS.md and SIN_VIRTUE_SPECTRUM.md §2. Optional: if time-boxed, document "hw.SinVirtue.Greed to be added" and mark T4 completed with doc-only.
-- **success criteria:** Command implemented and documented, or doc-only "to be added" in CONSOLE_COMMANDS + SIN_VIRTUE_SPECTRUM; T4 status set to completed.
-- **research_notes:** [HomeWorld.cpp](../../Source/HomeWorld/HomeWorld.cpp) CmdSinVirtuePride pattern; [SIN_VIRTUE_SPECTRUM.md](../tasks/SIN_VIRTUE_SPECTRUM.md); [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md).
-- **steps_or_doc:** Source/HomeWorld/HomeWorld.cpp; docs/CONSOLE_COMMANDS.md; docs/tasks/SIN_VIRTUE_SPECTRUM.md.
+- **goal:** In **one task**, do all of: (1) Ensure VERTICAL_SLICE_CHECKLIST §4 has sixty-third-list deliverables (if not done in T6). (2) Update CONSOLE_COMMANDS.md or MVP_TUTORIAL_PLAN (integration) so they reflect current state. (3) Update KNOWN_ERRORS or AUTOMATION_GAPS with cycle note (e.g. "List 63 (MVP full scope): Integration; T1–T7 completed."). Success = all three done (or explicitly deferred).
+- **success criteria:** Vertical slice §4 sixty-third updated; CONSOLE_COMMANDS/MVP_TUTORIAL_PLAN updated; KNOWN_ERRORS or AUTOMATION_GAPS cycle note; T8 status set to completed.
+- **research_notes:** [VERTICAL_SLICE_CHECKLIST.md](VERTICAL_SLICE_CHECKLIST.md) §4; [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md); [MVP_TUTORIAL_PLAN.md](MVP_TUTORIAL_PLAN.md); [KNOWN_ERRORS.md](../KNOWN_ERRORS.md); [AUTOMATION_GAPS.md](../AUTOMATION_GAPS.md).
+- **steps_or_doc:** docs/workflow/VERTICAL_SLICE_CHECKLIST.md; docs/CONSOLE_COMMANDS.md; docs/workflow/MVP_TUTORIAL_PLAN.md; docs/KNOWN_ERRORS.md; docs/AUTOMATION_GAPS.md.
 - **status:** completed
 
 ---
 
-## T5. Packaged build: retry or document outcome
+## T9. Verification (combined)
 
-- **goal:** Optionally run Package-AfterClose.ps1 (or project packaging script) with Editor and game processes closed; document outcome in STEAM_EA_STORE_CHECKLIST or KNOWN_ERRORS. If not running package this list, add a brief note (e.g. "Thirty-second list: package not run; use Package-AfterClose.ps1 when ready") so the next list has context.
-- **success criteria:** Package retry attempted and outcome documented, or skip documented; T5 status set to completed.
-- **research_notes:** [STEAM_EA_STORE_CHECKLIST.md](STEAM_EA_STORE_CHECKLIST.md); [KNOWN_ERRORS.md](../KNOWN_ERRORS.md); Tools/Package-AfterClose.ps1.
-- **steps_or_doc:** docs/KNOWN_ERRORS.md, docs/workflow/STEAM_EA_STORE_CHECKLIST.md.
+- **goal:** In **one task**, do all of: (1) If T1–T7 changed C++ or Build.cs, run Build-HomeWorld.bat and confirm build passes. (2) Review VERTICAL_SLICE_CHECKLIST §3–§4 and CONSOLE_COMMANDS for consistency; document outcome in SESSION_LOG or VERTICAL_SLICE_CHECKLIST §3. (3) Run validate_task_list.py and fix any schema issues; update DAILY_STATE "Today" if needed. Success = build green (if applicable), doc review done, list validated.
+- **success criteria:** Build run and result logged; doc review done and noted; validate_task_list.py passed; DAILY_STATE updated if needed; T9 status set to completed.
+- **research_notes:** Build-HomeWorld.bat; [VERTICAL_SLICE_CHECKLIST.md](VERTICAL_SLICE_CHECKLIST.md) §3; [SESSION_LOG.md](../SESSION_LOG.md); Content/Python/validate_task_list.py; [DAILY_STATE.md](DAILY_STATE.md).
+- **steps_or_doc:** Build-HomeWorld.bat; docs/workflow/VERTICAL_SLICE_CHECKLIST.md; python Content/Python/validate_task_list.py; docs/workflow/DAILY_STATE.md.
 - **status:** completed
 
 ---
 
-## T6. KNOWN_ERRORS or AUTOMATION_GAPS: cycle note or findings
+## T10. Buffer: next list prep (ACCOMPLISHMENTS + PROJECT_STATE §4)
 
-- **goal:** After T1–T5, update KNOWN_ERRORS.md or AUTOMATION_GAPS.md with any new findings from this cycle. If no new errors, add a brief cycle note (e.g. "Thirty-second list: T1–T6 completed; no new errors") so the next list generator has context.
-- **success criteria:** KNOWN_ERRORS or AUTOMATION_GAPS updated with cycle findings or cycle note; T6 status set to completed.
-- **research_notes:** [KNOWN_ERRORS.md](../KNOWN_ERRORS.md); [AUTOMATION_GAPS.md](../AUTOMATION_GAPS.md); 07-ai-agent-behavior (error recurrence prevention).
-- **steps_or_doc:** docs/KNOWN_ERRORS.md, docs/AUTOMATION_GAPS.md.
-- **status:** completed
-
----
-
-## T7. VERTICAL_SLICE_CHECKLIST §4: thirty-second outcomes row
-
-- **goal:** After T1–T6 (and optionally T8–T9), add or complete the "Thirty-second-list deliverables" content in VERTICAL_SLICE_CHECKLIST §4: list what was delivered (max-rounds 11, vertical slice §4 subsection, CONSOLE_COMMANDS planetoid_complete key, hw.SinVirtue.Greed or doc, packaged build or doc, KNOWN_ERRORS note, PIE outcome). Same pattern as thirty-first-list deliverables table.
-- **success criteria:** VERTICAL_SLICE_CHECKLIST §4 thirty-second subsection has outcomes and verification refs; T7 status set to completed.
-- **research_notes:** [VERTICAL_SLICE_CHECKLIST.md](VERTICAL_SLICE_CHECKLIST.md) §4; thirty-first-list deliverables pattern.
-- **steps_or_doc:** docs/workflow/VERTICAL_SLICE_CHECKLIST.md.
-- **status:** completed
-
----
-
-## T8. Verification: Run PIE pre-demo checklist and document results
-
-- **goal:** Run the pre-demo verification gate: with Editor open and DemoMap (or Homestead) loaded, start PIE, run pie_test_runner.py via MCP or Tools > Execute Python Script, document outcome in VERTICAL_SLICE_CHECKLIST §3 or SESSION_LOG (e.g. Saved/pie_test_results.json present, pass/fail summary). If Editor/MCP is not connected, document that and the steps to run §3 when Editor is available.
-- **success criteria:** PIE pre-demo run attempted; outcome documented in §3 or SESSION_LOG; T8 status set to completed.
-- **research_notes:** [VERTICAL_SLICE_CHECKLIST.md](VERTICAL_SLICE_CHECKLIST.md) §3; pie_test_runner.py; [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) Pre-demo verification.
-- **steps_or_doc:** docs/workflow/VERTICAL_SLICE_CHECKLIST.md §3; docs/SESSION_LOG.md.
-- **status:** completed
-
----
-
-## T9. Verification: Confirm task list and loop state
-
-- **goal:** Confirm CURRENT_TASK_LIST.md has no duplicate or stray sections; confirm DAILY_STATE "Today" aligns with first pending task. Optionally run validate_task_list.py and fix any schema issues. If all tasks T1–T8 are completed and only T10 remains, this task can be "verify loop will run T10 this run (max rounds 11)" and document outcome.
-- **success criteria:** Task list validated (or state confirmed); T9 status set to completed.
-- **research_notes:** [CURRENT_TASK_LIST.md](CURRENT_TASK_LIST.md); [DAILY_STATE.md](DAILY_STATE.md); Content/Python/validate_task_list.py.
-- **steps_or_doc:** docs/workflow/CURRENT_TASK_LIST.md; python Content/Python/validate_task_list.py.
-- **status:** completed
-
----
-
-## T10. Buffer: next list generation prep (ACCOMPLISHMENTS + PROJECT_STATE §4)
-
-- **goal:** Update ACCOMPLISHMENTS_OVERVIEW §4 with thirty-second-cycle outcome and PROJECT_STATE_AND_TASK_LIST §4 so the next list can be generated; set T1–T10 status to completed where done. Do NOT replace or regenerate CURRENT_TASK_LIST.md (user does that after the loop exits).
-- **success criteria:** ACCOMPLISHMENTS_OVERVIEW §4 has thirty-second-cycle row (outcome + Next = generate new list); PROJECT_STATE §4 says current list complete and points to HOW_TO_GENERATE_TASK_LIST and Start-AllAgents-InNewWindow.ps1; T10 status set to completed in CURRENT_TASK_LIST only.
-- **research_notes:** [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md); [ACCOMPLISHMENTS_OVERVIEW.md](ACCOMPLISHMENTS_OVERVIEW.md); [PROJECT_STATE_AND_TASK_LIST.md](PROJECT_STATE_AND_TASK_LIST.md); TASK_LIST_REPEATS_LOG.
+- **goal:** Update ACCOMPLISHMENTS_OVERVIEW §4 with sixty-third-cycle outcome and PROJECT_STATE_AND_TASK_LIST §4. Do NOT replace CURRENT_TASK_LIST.md (user does that after the loop). Set T1–T10 status to completed where done. **Next list:** List 64 per [MVP_FULL_SCOPE_10_LISTS.md](MVP_FULL_SCOPE_10_LISTS.md) (Packaged build smoke-test; demo sign-off; MVP full-scope verification and buffer). Generate next list per HOW_TO_GENERATE_TASK_LIST when ready.
+- **success criteria:** ACCOMPLISHMENTS_OVERVIEW §4 has sixty-third-cycle row; PROJECT_STATE §4 says current list complete and points to List 64 (packaged build smoke-test; demo sign-off); T10 status set to completed in CURRENT_TASK_LIST only.
+- **research_notes:** [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md); [ACCOMPLISHMENTS_OVERVIEW.md](ACCOMPLISHMENTS_OVERVIEW.md); [PROJECT_STATE_AND_TASK_LIST.md](PROJECT_STATE_AND_TASK_LIST.md); [MVP_FULL_SCOPE_10_LISTS.md](MVP_FULL_SCOPE_10_LISTS.md).
 - **steps_or_doc:** [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md), [ACCOMPLISHMENTS_OVERVIEW.md](ACCOMPLISHMENTS_OVERVIEW.md), [PROJECT_STATE_AND_TASK_LIST.md](PROJECT_STATE_AND_TASK_LIST.md).
 - **status:** completed
 
 ---
 
-**Order:** T1–T7 implementation, T8–T9 verification, T10 buffer. See [PROJECT_STATE_AND_TASK_LIST.md](PROJECT_STATE_AND_TASK_LIST.md) §0 (phase) and §4 (current list).
+**Order:** T1–T7 implementation (tutorial loop single-session, Week 1 playtest single-session, vertical slice pre-demo run, integration doc, CONSOLE_COMMANDS/MVP_TUTORIAL_PLAN integration verification, vertical slice §4 sixty-third, AUTOMATION_GAPS/KNOWN_ERRORS). T8 = Docs and cycle. T9 = Verification. T10 = Buffer. **After list 63:** Generate List 64 per [MVP_FULL_SCOPE_10_LISTS.md](MVP_FULL_SCOPE_10_LISTS.md) (packaged build smoke-test; demo sign-off); run `.\Tools\Start-AllAgents-InNewWindow.ps1` when ready.

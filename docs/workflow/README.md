@@ -32,6 +32,9 @@ This folder is the **single place for project ideas and daily workflow**: consol
 | [PROJECT_STATE_AND_TASK_LIST.md](PROJECT_STATE_AND_TASK_LIST.md) | **Project overview and task list** — summary of work done, work not yet completed (T1–T10), and quick reference. Use this for "what to work on next." |
 | [MVP_AND_ROADMAP_STRATEGY.md](MVP_AND_ROADMAP_STRATEGY.md) | How we balance MVP execution (validate loop fast) with long-term readiness (ship on same stack); what to implement for MVP; MVP-first vs release alignment. |
 | [EDITOR_POLISH_TUTORIAL.md](../EDITOR_POLISH_TUTORIAL.md) | **Editor polish** — Step-by-step tutorial to get the slice to a polished MVP state: pre-demo verification, one-time manual steps (portal, State Tree Defend), and lighting/LOD/placement/animation/UX. Use when automation runs are complete and you are ready for in-Editor work. |
+| [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) | **Pre-demo verification entry point (one doc):** links §3 (run sequence in [VERTICAL_SLICE_CHECKLIST](VERTICAL_SLICE_CHECKLIST.md)) and `hw.*` command reference. Open CONSOLE_COMMANDS for both. |
+
+**4-list planetoid block complete:** Lists 36–39 delivered biomes, alignments, configs, and placement wiring. See [PLANETOID_BIOMES.md](../PLANETOID_BIOMES.md) §5.1 for handoff and suggested next steps (PIE on planetoid map, spawn by alignment, content authoring).
 
 **Current day:** In [DAILY_STATE.md](DAILY_STATE.md) see **Current day** and **Today**. Or open [30_DAY_SCHEDULE.md](30_DAY_SCHEDULE.md) and find the first **Day N** that still has unchecked items.
 
@@ -45,12 +48,14 @@ Map from [VISION.md](VISION.md) sections to the task docs that implement or scop
 |----------------|-------------------|
 | **Theme and prototype** (Love as Epic Quest, Act 1 focus) | [PROTOTYPE_SCOPE.md](PROTOTYPE_SCOPE.md) |
 | **Campaign summary** (7 levels, planetoid, homestead travels) | [PROTOTYPE_SCOPE.md](PROTOTYPE_SCOPE.md), [PLANETOID_HOMESTEAD.md](../tasks/PLANETOID_HOMESTEAD.md), [PLANETOID_DESIGN.md](../PLANETOID_DESIGN.md) |
+| **Planetoid biomes and resources** (4 biomes, 3 alignments, harvestable/monster/dungeon per biome) | [PLANETOID_BIOMES.md](../PLANETOID_BIOMES.md), [PLANETOID_DESIGN.md](../PLANETOID_DESIGN.md) |
 | **Day and night** (physical vs spiritual, love → night bonuses) | [PROTOTYPE_SCOPE.md](PROTOTYPE_SCOPE.md) § Day/night, [DAY_RESTORATION_LOOP.md](../tasks/DAY_RESTORATION_LOOP.md), [DAY_LOVE_OR_BOND.md](../tasks/DAY_LOVE_OR_BOND.md), [NIGHT_ENCOUNTER.md](../tasks/NIGHT_ENCOUNTER.md) |
 | **Conversion not kill** (strip sin → loved; vendors/helpers/quest/pets) | [CONVERSION_NOT_KILL.md](../tasks/CONVERSION_NOT_KILL.md) |
 | **Combat variety** (defend = ranged/AOE; planetoid = combos/single-target) | [DEFEND_COMBAT.md](../tasks/DEFEND_COMBAT.md), [PLANETOID_COMBAT.md](../tasks/PLANETOID_COMBAT.md) |
 | **Moral system (Seven Sins & Virtues)** | [SIN_VIRTUE_SPECTRUM.md](../tasks/SIN_VIRTUE_SPECTRUM.md), [PLANETOID_DESIGN.md](../PLANETOID_DESIGN.md) |
 | **Planetoid complete → next** (homestead lifts, travel to next) | [PLANETOID_HOMESTEAD.md](../tasks/PLANETOID_HOMESTEAD.md) |
 | **Week 1 playtest gate** (crash → scout → boss → claim home) | [PROTOTYPE_SCOPE.md](PROTOTYPE_SCOPE.md) § Week 1 playtest, [VERTICAL_SLICE_CHECKLIST.md](VERTICAL_SLICE_CHECKLIST.md) |
+| **MVP tutorial loop** (one day: wake → meals → love task → child game → gather → bed → spectral → boss → family taken) | [MVP_TUTORIAL_PLAN.md](MVP_TUTORIAL_PLAN.md) (13-step checklist), [VISION.md](VISION.md) § Campaign summary |
 | **Vertical slice** (one moment, one beautiful corner) | [VERTICAL_SLICE_CHECKLIST.md](VERTICAL_SLICE_CHECKLIST.md), [PROTOTYPE_SCOPE.md](PROTOTYPE_SCOPE.md) |
 
 ---

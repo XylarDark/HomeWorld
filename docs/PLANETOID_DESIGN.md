@@ -38,5 +38,6 @@ Planetoid and procedural-generation philosophy for the 7 sin-themed levels. **In
 ## References
 
 - **Campaign:** The 7 levels and their sin themes are defined in [workflow/VISION.md](workflow/VISION.md).
+- **Biomes and resources:** Four biomes, resource node types, and corrupted/neutral/positive alignment are in [PLANETOID_BIOMES.md](PLANETOID_BIOMES.md).
 - **Tech:** PCG and World Partition are in [STACK_PLAN.md](STACK_PLAN.md) (Layer 2 – World and Procedural Content).
 - **Astroneer modding (Procedural Generation):** [astroneermodding.readthedocs.io](https://astroneermodding.readthedocs.io/en/latest/guides/proceduralGeneration.html) (Procedural Placement, Procedural Modifier, biome/layer metadata, per-planet models).

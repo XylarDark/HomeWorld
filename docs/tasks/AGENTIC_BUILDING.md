@@ -10,6 +10,36 @@
 
 ---
 
+## Build-order claim and completion path (T1 / List 60)
+
+A **path** exists for "family agent claims and completes one build order" in two forms; both are documented here so the flow is playable or observable in PIE.
+
+| Path | Description | Verification |
+|------|-------------|--------------|
+| **Path 1 (simulated, PIE-observable)** | Place a build order (key **P** or **hw.PlaceWall**), then simulate agent completion: **hw.SimulateBuildOrderActivation** or **hw.CompleteBuildOrder**. No family agents required; SO activation and completion are triggerable and observable in Output Log. | [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) — hw.PlaceWall, hw.CompleteBuildOrder, hw.SimulateBuildOrderActivation; [DAY10_AGENTIC_BUILDING.md](DAY10_AGENTIC_BUILDING.md) § T3 verification. |
+| **Path 2 (full agent)** | State Tree **BUILD branch** per [Step 3](#step-3-state-tree-build-branch--in-depth-guide) below: EQS BuildOrder nearby → MoveTo SO → Claim SO_WallBuilder → play build → CompleteBuildOrder(). Requires manual State Tree graph setup (no Python API; see [AUTOMATION_GAPS.md](../AUTOMATION_GAPS.md) Gap 2). Alternatively a Blueprint-only build-order flow per [DAY10_AGENTIC_BUILDING.md](DAY10_AGENTIC_BUILDING.md). | PIE with family agents (Mass spawner + ST_FamilyGatherer BUILD branch); or follow Step 3 in Editor. |
+
+**Pre-demo / run sequence:** For step-by-step run sequence and all commands (including agentic building), use the single entry point: [VERTICAL_SLICE_CHECKLIST §3](../workflow/VERTICAL_SLICE_CHECKLIST.md#3-pre-demo-checklist-before-recording-or-showing) (run sequence) and [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) (command reference). Open CONSOLE_COMMANDS for both §3 and the hw.* commands.
+
+---
+
+## Build-order targeting (family agents — T2 / List 60)
+
+Mechanism for **family agents to find and select** incomplete build orders so the BUILD branch (or Blueprint equivalent) can pick one. Use one or more of the following; the BUILD branch in [Step 3](#step-3-state-tree-build-branch--in-depth-guide) uses EQS + tag.
+
+| Mechanism | Description | Use in BUILD |
+|-----------|-------------|--------------|
+| **Tag BuildOrder** | All [AHomeWorldBuildOrder](../../Source/HomeWorld/HomeWorldBuildOrder.h) actors get tag **BuildOrder** in C++ constructor. Blueprint children (e.g. BP_BuildOrder_Wall) inherit it; you can add **Wall** (or other) in Details for EQS filtering by type. | EQS query filters by **Tag = BuildOrder**. |
+| **Incomplete only** | Build orders are **incomplete** when **`bBuildCompleted == false`**. After [CompleteBuildOrder()](../../Source/HomeWorld/HomeWorldBuildOrder.cpp) the order is complete and should be excluded from targeting. | In EQS or State Tree: use a query that returns actors; in a Mass processor or Blueprint, filter with `!bBuildCompleted`. EQS does not filter by C++ property; use a custom test or post-filter in State Tree (e.g. condition that checks result is incomplete). |
+| **EQS (recommended)** | Create an EQS query: find actors overlapping a sphere/capsule (e.g. 500–1000 u), filtered by **Tag = BuildOrder**. Returns candidate locations/actors; the BUILD branch condition requires at least one result (or nearest distance valid). | [Step 3](#step-3-state-tree-build-branch--in-depth-guide): BUILD condition references this EQS; tasks use **nearest** result as target. |
+| **Selection rule** | **Nearest:** pick the build order closest to the agent (EQS “nearest” or sort results by distance). **By BuildDefinitionID:** filter by [GetBuildDefinitionID()](../../Source/HomeWorld/HomeWorldBuildOrder.h) (e.g. `Wall`) if the agent should only target certain types. | State Tree: use EQS “nearest” generator or first result; optional blackboard key **TargetBuildOrder** (object or vector) set from EQS result for MoveTo. |
+| **Blackboard (optional)** | In [ST_FamilyGatherer](FAMILY_AGENTS_MASS_STATETREE.md) or BUILD branch: **TargetBuildOrder** (Object or Vector), **CurrentJob** (Gather/Build/Defend). Set when entering BUILD so MoveTo and SO claim use the chosen order. | Step 3 blackboard: set **CurrentJob = Build** and optionally **TargetBuildOrder** from EQS. |
+| **Subsystem / service (optional)** | A future **subsystem or service** could list incomplete build orders in the level (e.g. `GetIncompleteBuildOrders(World, Origin, Radius)`). Not required for List 60; EQS + tag is sufficient. | If added: BUILD condition or processor could call it and set blackboard; same selection rule (nearest or by BuildDefinitionID). |
+
+**Console parity:** The commands **hw.CompleteBuildOrder** and **hw.SimulateBuildOrderActivation** ([CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md)) use the same idea: find all `AHomeWorldBuildOrder`, filter `!bBuildCompleted`, pick **nearest to player**, then complete. Agents use the same “nearest incomplete” rule from the agent’s position via EQS.
+
+---
+
 ## Step 1: Prep building assets — In-depth guide
 
 ### 1.1 Modular building pieces
@@ -65,6 +95,10 @@ Implementation of OnActivated/OnDeactivated: use Blueprint logic on the SO defin
 ---
 
 ## Step 3: State Tree BUILD branch — In-depth guide
+
+**T3 / List 60 (CURRENT_TASK_LIST):** This step is the **BUILD branch** implementation. There is no automation API for State Tree graph editing (see [AUTOMATION_GAPS.md](../AUTOMATION_GAPS.md) Gap 2); follow the steps below manually in the Editor. **Verification:** Run sequence → [VERTICAL_SLICE_CHECKLIST §3](../workflow/VERTICAL_SLICE_CHECKLIST.md#3-pre-demo-checklist-before-recording-or-showing); commands → [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) (**hw.PlaceWall**, **hw.CompleteBuildOrder**, **hw.SimulateBuildOrderActivation**). Path 1 (simulated) needs no BUILD branch; Path 2 (full agent) requires completing this step then PIE with family agents.
+
+**Targeting:** How agents find and select build orders is defined in [Build-order targeting (family agents)](#build-order-targeting-family-agents--t2--list-60) above (EQS + tag **BuildOrder**, nearest incomplete, optional blackboard). The BUILD branch uses that mechanism to pick an incomplete [AHomeWorldBuildOrder](../../Source/HomeWorld/HomeWorldBuildOrder.h) (e.g. nearest or by BuildDefinitionID).
 
 1. Open **ST_FamilyGatherer** (Content → HomeWorld → AI).
 2. Add a **new top-priority branch** (highest in the Selector): **BuildOrder nearby?** → **BUILD**.

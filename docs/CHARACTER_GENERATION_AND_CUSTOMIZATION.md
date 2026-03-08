@@ -26,7 +26,11 @@ Run in Editor: **Tools â†’ Execute Python Script** â†’ `Content/Python
 
 Run: `Content/Python/ensure_ui_folders.py` (creates `/Game/HomeWorld/UI`).
 
-Then in the Editor:
+Both scripts are idempotent: they check before create and log "already exists" or skip when the map/folder is present.
+
+**Create-if-missing: WBP_MainMenu** — Run **Tools → Execute Python Script** → `Content/Python/ensure_wbp_main_menu.py` (or via MCP `execute_python_script("ensure_wbp_main_menu.py")`). The script is idempotent: it creates the widget in `/Game/HomeWorld/UI` with parent **HomeWorldMainMenuWidget** if the Editor provides a Widget Blueprint factory; otherwise it logs and you create manually. If the widget was created, open it and add a **Canvas Panel**, **Vertical Box**, and four **Buttons** (Play, Character, Options, Quit); bind each **On Clicked** to **OnPlayClicked**, **OnCharacterClicked**, **OnOptionsClicked**, **OnQuitClicked**. If the script did not create the asset: in **Content Browser** go to `/Game/HomeWorld/UI` → right‑click → **User Interface → Widget Blueprint**, name it `WBP_MainMenu`, then **Class Settings** → Parent Class: **HomeWorldMainMenuWidget**, and add the four buttons and bindings as above. Set `MainMenuWidgetClassPath` in DefaultGame.ini (step 2 below). MCP create_umg_widget_blueprint and add_button_to_widget currently fail (parameter naming); see [AUTOMATION_GAPS.md](AUTOMATION_GAPS.md).
+
+Then in the Editor (full steps):
 
 1. **WBP_MainMenu**  
    - **Content Browser** â†’ Rightâ€‘click in `/Game/HomeWorld/UI` â†’ **User Interface â†’ Widget Blueprint**.  
@@ -49,6 +53,30 @@ Then in the Editor:
 
 After this, launching the game opens the MainMenu map and the main menu widget (Play, Character, Options, Quit). **Play** loads the game map (default: DemoMap).
 
+**First-launch flow (List 55 — how to verify):** (1) **Ensure MainMenu map exists** — Run `Content/Python/ensure_main_menu_map.py` in Editor (Tools → Execute Python Script or MCP `execute_python_script("ensure_main_menu_map.py")`). The script is idempotent; it creates `/Game/HomeWorld/Maps/MainMenu` from the template in `Content/Python/main_menu_config.json` (default template: Homestead) if the map is missing. If the map is missing and you launch the game, the engine may fail to open. (2) **Config** — `Config/DefaultEngine.ini` under `[/Script/EngineSettings.GameMapsSettings]` has `GameDefaultMap=/Game/HomeWorld/Maps/MainMenu.MainMenu` and `EditorStartupMap` set to MainMenu so the game (and Editor) start on the main menu. (3) **Verify:** Launch the game (packaged exe or PIE). You should see the main menu widget (Play, Character, Options, Quit). Click **Play**; the playable level (DemoMap) should load. Success = MainMenu → Play → DemoMap.
+
+**Play → game map (code path):** WBP_MainMenu Play button **On Clicked** → `UHomeWorldMainMenuWidget::OnPlayClicked()` → `GetHomeWorldGameInstance()` → `UHomeWorldGameInstance::OpenGameMap()`. The map loaded is `GameMapPath` (default in C++: `/Game/HomeWorld/Maps/DemoMap.DemoMap` if not set); overridable in Blueprint (BP_GameInstance) or config. Success: launching from MainMenu and clicking Play opens the playable level (DemoMap or the configured map).
+
+**Character → character screen (code path):** WBP_MainMenu Character button **On Clicked** → `UHomeWorldMainMenuWidget::OnCharacterClicked()` → `GetHomeWorldGameInstance()` → `UHomeWorldGameInstance::OpenCharacterScreen()`. The game instance creates the widget from `CharacterScreenWidgetClassPath` (default in `Config/DefaultGame.ini`: `/Game/HomeWorld/UI/WBP_CharacterCreate.WBP_CharacterCreate_C`) and adds it to the viewport. For the screen to appear, **WBP_CharacterCreate** must exist in `/Game/HomeWorld/UI` with Parent Class **HomeWorldCharacterCustomizeWidget** (see §3 below). Success: clicking Character on the main menu opens the character customization screen.
+
+**Options and Quit (code path):** **Options** — `UHomeWorldMainMenuWidget::OnOptionsClicked()` is a stub (logs to Output Log; override in Blueprint to show an options panel). **Quit** — `OnQuitClicked()` runs the engine console command `quit`, which requests application exit. WBP_MainMenu Options and Quit buttons should be bound to **OnOptionsClicked** and **OnQuitClicked** respectively.
+
+**Pre-demo verification entry point (one doc):** [CONSOLE_COMMANDS.md](CONSOLE_COMMANDS.md) § Pre-demo verification is the single doc that links (1) the step-by-step run sequence [VERTICAL_SLICE_CHECKLIST §3](workflow/VERTICAL_SLICE_CHECKLIST.md) and (2) the `hw.*` command reference (same doc). Open CONSOLE_COMMANDS for both.
+
+### Main menu flow checklist
+
+Use this checklist to verify the main menu flow (List 55 / MVP full scope) without re-reading the full doc:
+
+1. **Game starts on MainMenu** — Launch the game (or PIE with MainMenu as start map). Confirm the main menu widget appears (Play, Character, Options, Quit).
+2. **Play loads game map** — Click **Play**. The playable level (default: DemoMap) should load.
+3. **Character opens character screen** — From the main menu, click **Character**. The character customization screen (WBP_CharacterCreate) should open.
+4. **Confirm (character screen)** — On the character screen, click **Confirm**. Profile is saved (e.g. to Saved/CharacterCustomization.json) and the character screen closes; main menu remains.
+5. **Back from character screen** — On the character screen, click **Back**. The character screen closes and the main menu is shown again.
+6. **Options** — Click **Options**. Stub: log in Output Log; no panel yet (override in Blueprint for options screen).
+7. **Quit** — Click **Quit**. The game (or PIE) should exit.
+
+**Optional PIE verification:** Run from Editor: **Play** (PIE). If the game is configured to start on MainMenu (GameDefaultMap in DefaultEngine.ini), the same steps apply. For the full pre-demo run and console commands, see [VERTICAL_SLICE_CHECKLIST §3](workflow/VERTICAL_SLICE_CHECKLIST.md) and [CONSOLE_COMMANDS.md](CONSOLE_COMMANDS.md).
+
 ### 3. Character creation/customization screen (WBP_CharacterCreate)
 
 Create a second Widget Blueprint `WBP_CharacterCreate` in `/Game/HomeWorld/UI` (Parent Class: **HomeWorldCharacterCustomizeWidget**):
@@ -56,8 +84,13 @@ Create a second Widget Blueprint `WBP_CharacterCreate` in `/Game/HomeWorld/UI` (
 - Placeholder **Upload / Scan** button (and optional URL field).
 - Placeholder **Face sliders** (or â€œFace customizationâ€ area).
 - **Confirm** button.
+- **Back** button.
 
-Open this widget from the main menu **Character** button (in WBP_MainMenu, in **OnCharacterClicked** create and add WBP_CharacterCreate to viewport, or call a subsystem that does so). Backend for â€œimage â†’ characterâ€ and face params is Phase C/E.
+**Confirm button (stub):** In WBP_CharacterCreate, bind the Confirm button **On Clicked** to **OnConfirmClicked**. The C++ implementation logs to Output Log (`HomeWorld: Character Confirm clicked; saving profile and closing.`), calls `UHomeWorldCharacterCustomizationSubsystem::SaveCustomizationToProfile()` if the subsystem is present (writes to `Saved/CharacterCustomization.json`), then removes the widget. The flow is testable without the full Phase C/E generation pipeline: Main menu → Character → Confirm closes the screen and optionally persists current morph values; full "image → character" and face-param backend is deferred.
+
+**Back button:** Bind the Back button **On Clicked** to **OnBackClicked**. The C++ implementation removes the character screen widget (no save); the main menu remains visible underneath.
+
+The main menu **Character** button is wired in C++: **OnCharacterClicked** calls `GetHomeWorldGameInstance()->OpenCharacterScreen()`, which creates the widget from `CharacterScreenWidgetClassPath` (see DefaultGame.ini) and adds it to the viewport. Ensure WBP_MainMenu Character button **On Clicked** is bound to **OnCharacterClicked** (no Blueprint graph needed if using the C++ base class). If WBP_CharacterCreate does not exist yet: in Content Browser under `/Game/HomeWorld/UI`, create **User Interface → Widget Blueprint**, name it `WBP_CharacterCreate`, then set **Class Settings → Parent Class** to **HomeWorldCharacterCustomizeWidget**. Backend for â€œimage â†’ characterâ€ and face params is Phase C/E.
 
 ---
 
@@ -105,8 +138,8 @@ See [MILADY_IMPORT_ROADMAP.md](tasks/MILADY_IMPORT_ROADMAP.md) Phases 3â€“5
 | `Source/HomeWorld/HomeWorldCharacterCustomizationSubsystem` | SetCustomizationTarget, GetMorphTargetNames, SetMorphTargetValue, Save/LoadCustomizationFromProfile, ApplyMorphValues. |
 | `Source/HomeWorld/HomeWorldPlayerController` | Shows main menu widget when on MainMenu map; SetInputMode UI. |
 | `Config/DefaultGame.ini` | `[/Script/HomeWorld.HomeWorldGameInstance]` MainMenuWidgetClassPath. |
-| `Content/Python/ensure_main_menu_map.py` | Idempotent create MainMenu map. |
-| `Content/Python/ensure_ui_folders.py` | Idempotent create /Game/HomeWorld/UI. |
+| `Content/Python/ensure_main_menu_map.py` | Idempotent: check before create; log skip if exists. |
+| `Content/Python/ensure_ui_folders.py` | Idempotent: check before create; log skip if exists. |
 
 **In-game customization (Phase F):** From pause menu or hub, call `GetGameInstance<UHomeWorldGameInstance>()->OpenCharacterScreen()` to show the same WBP_CharacterCreate. Set input mode to UI when the widget is shown; when the widget closes (OnBackClicked or OnConfirmClicked), restore game input (e.g. SetInputModeGameOnly in the widget or in the pause menu). Optionally set the customization target to the current pawn's mesh when opening from in-game (e.g. in the widget's NativeConstruct, get the local pawn and call the customization subsystem's SetCustomizationTarget(Pawn->GetMesh())).
 

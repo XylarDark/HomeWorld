@@ -73,7 +73,7 @@ Use this to confirm first-phase setup is complete before starting tasks.
 **In-repo (no Editor):**
 
 - [ ] **Plugins:** In `HomeWorld.uproject`, the `Plugins` array includes `PCG`, `GameplayAbilities`, `EnhancedInput`, `SteamSockets`, and `DaySequence` (or `TimeOfDay`), each with `"Enabled":true`.
-- [ ] **Default map:** In `Config/DefaultEngine.ini`, under `[/Script/EngineSettings.GameMapsSettings]`, `GameDefaultMap` is set (e.g. `/Game/HomeWorld/Maps/Main.Main`).
+- [ ] **Default map:** In `Config/DefaultEngine.ini`, under `[/Script/EngineSettings.GameMapsSettings]`, `GameDefaultMap` and `EditorStartupMap` are set. **First launch:** Editor opens on DemoMap. **After first load:** init_unreal creates MainMenu (if missing) and sets EditorStartupMap to MainMenu so the next launch opens on the main menu. See [Default map and Editor startup map](#default-map-and-editor-startup-map-list-55) below.
 - [ ] **Docs:** `docs/workflow/README.md`, `docs/workflow/VISION.md`, `docs/workflow/30_DAY_SCHEDULE.md`, `docs/SETUP.md`, `docs/SESSION_LOG.md`, `docs/CONTENT_LAYOUT.md` exist.
 - [ ] **Main map:** World Partition is enabled (open Main → World Settings → Enable World Partition). See [CONTENT_LAYOUT.md](CONTENT_LAYOUT.md).
 
@@ -94,6 +94,20 @@ When all above are checked, proceed to [workflow/30_DAY_SCHEDULE.md](workflow/30
 **Testing and validation:** The `PythonAutomationTest` plugin is enabled. Test files in `Content/Python/tests/` (`test_*.py`) are auto-discovered by the Editor's Test Automation window. Run from Editor (Tools > Test Automation) or use the PIE test runner (`Content/Python/pie_test_runner.py`). Level tests that load a map use the latent level loader (see [LEVEL_TESTING_PLAN.md](LEVEL_TESTING_PLAN.md)). An optional PIE full-flow test (`test_level_pie_flow.py`) loads DemoMap, starts PIE, runs checks, and stops PIE (~30–60 s); run from Tools > Test Automation when needed. For manual checks, run through the checklist above and play-test where applicable.
 
 When you fix a build, lint, or runtime error, record it in [KNOWN_ERRORS.md](KNOWN_ERRORS.md) so we don't repeat it.
+
+### Default map and Editor startup map (List 55)
+
+**Config file:** `Config/DefaultEngine.ini`, section `[/Script/EngineSettings.GameMapsSettings]`.
+
+| Key | Effect | Current default |
+|-----|--------|-----------------|
+| **GameDefaultMap** | Map used when the game starts (packaged exe or PIE). | `/Game/HomeWorld/Maps/MainMenu.MainMenu` — game starts on main menu; **Play** loads DemoMap via Game Instance. MainMenu is created automatically on first Editor load (init_unreal + ensure_main_menu_map). |
+| **EditorStartupMap** | Level the Editor opens when you launch the project. | First launch: **DemoMap** (so Editor always opens). After first load, init_unreal sets this to **MainMenu** so the next launch opens on the main menu. |
+
+**How to change:**
+
+- **Editor always opens on DemoMap:** Set `EditorStartupMap=/Game/HomeWorld/Maps/DemoMap.DemoMap` in DefaultEngine.ini and leave it; init_unreal will not overwrite it if it is already set to MainMenu (it only switches DemoMap → MainMenu when MainMenu exists).
+- **Packaged game skips main menu (start in DemoMap):** Set `GameDefaultMap=/Game/HomeWorld/Maps/DemoMap.DemoMap`. Use this for testing or a kiosk-style launch.
 
 ---
 

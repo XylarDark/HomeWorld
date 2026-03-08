@@ -2,7 +2,7 @@
 
 **Purpose:** This file is read at session start and updated at session end so you can ask "what did we do yesterday and what do we need to do today?" and get a clear answer. The agent updates it automatically when a session ends.
 
-**Current focus:** Thirty-second task list **complete** (all T1–T10 in-loop). Next: generate thirty-third list when ready.
+**Current focus:** Sixty-third task list (List 63 — Integration). All T1–T10 **completed**.
 
 ---
 
@@ -10,7 +10,7 @@
 
 What was completed or in progress in the previous session.
 
-- **Thirty-second run completed:** 10 rounds (16:53–19:58); T1–T10 all completed by agents. Max-rounds 11 (T1) allowed T10 buffer to run in-loop. Loop exited OK; ACCOMPLISHMENTS §4 and PROJECT_STATE §4 updated by T10 agent. Session closed per user ("session completed").
+- **Session completed:** List 63 T10 completed (Buffer). ACCOMPLISHMENTS_OVERVIEW §4 updated with sixty-third-cycle row; PROJECT_STATE_AND_TASK_LIST §4 updated (list complete, next = List 64); T10 status set to completed in CURRENT_TASK_LIST. SESSION_LOG and DAILY_STATE updated.
 
 ---
 
@@ -18,7 +18,7 @@ What was completed or in progress in the previous session.
 
 What we need to do today. Work from [CURRENT_TASK_LIST.md](CURRENT_TASK_LIST.md) and [ACCOMPLISHMENTS_OVERVIEW.md](ACCOMPLISHMENTS_OVERVIEW.md).
 
-- **All T1–T10 complete.** Generate a new task list per [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md), then run `.\Tools\Start-AllAgents-InNewWindow.ps1` for the next cycle.
+- **Sixty-third list:** All T1–T10 completed. **Next:** Generate List 64 (packaged build smoke-test; demo sign-off) per [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md) and [MVP_FULL_SCOPE_10_LISTS.md](MVP_FULL_SCOPE_10_LISTS.md); then run `.\Tools\Start-AllAgents-InNewWindow.ps1` on the new list.
 
 ---
 
@@ -26,7 +26,7 @@ What we need to do today. Work from [CURRENT_TASK_LIST.md](CURRENT_TASK_LIST.md)
 
 Preview of next focus.
 
-- Next 10-task list (thirty-third) and automation run after user generates list.
+- **After List 64 generated:** Run agents on new CURRENT_TASK_LIST via `.\Tools\Start-AllAgents-InNewWindow.ps1` (Editor open + MCP connected).
 
 ---
 
