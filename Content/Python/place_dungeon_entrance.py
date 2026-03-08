@@ -4,7 +4,8 @@
 # Prefers BP_DungeonEntrance (default LevelToOpen from config), then AHomeWorldDungeonEntrance; falls back to cube.
 # Run ensure_dungeon_entrance_blueprint.py first so BP_DungeonEntrance exists with correct default.
 # If an actor with tag Dungeon_POI already exists, skips.
-# Config: Content/Python/dungeon_map_config.json (dungeon_entrance_position, dungeon_level_name).
+# Config: Content/Python/dungeon_map_config.json (dungeon_entrance_position, dungeon_level_name; optional biome for planetoid_dungeons lookup).
+# Dungeon types per biome: Content/Python/planetoid_dungeons.json (see docs/PLANETOID_BIOMES.md §2.2).
 # See docs/tasks/DAYS_16_TO_30.md (Day 24); T7: walk into entrance in PIE -> dungeon level loads.
 
 import json
@@ -44,10 +45,27 @@ def _load_config():
             defaults["dungeon_entrance_position"] = [float(pos[0]), float(pos[1]), float(pos[2])]
         if isinstance(data.get("dungeon_level_name"), str) and data["dungeon_level_name"]:
             defaults["dungeon_level_name"] = data["dungeon_level_name"]
+        if isinstance(data.get("biome"), str) and data["biome"]:
+            defaults["biome"] = data["biome"]
         return defaults
     except Exception as e:
         _log("Config load warning: " + str(e))
         return defaults
+
+
+def _load_planetoid_dungeons():
+    """Load Content/Python/planetoid_dungeons.json for biome-based dungeon type lookup. Returns dict biome -> list of dungeon entries."""
+    try:
+        proj_dir = unreal.SystemLibrary.get_project_directory()
+        path = os.path.join(proj_dir, "Content", "Python", "planetoid_dungeons.json")
+        if not os.path.exists(path):
+            return {}
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return {k: v for k, v in data.items() if k != "_comment" and isinstance(v, list)}
+    except Exception as e:
+        _log("planetoid_dungeons load warning: " + str(e))
+        return {}
 
 
 def _get_editor_world():
@@ -97,6 +115,16 @@ def main():
         return
 
     config = _load_config()
+    dungeons_by_biome = _load_planetoid_dungeons()
+    if dungeons_by_biome:
+        biome = config.get("biome")
+        if biome and biome in dungeons_by_biome:
+            entries = dungeons_by_biome[biome]
+            if entries:
+                first_ = entries[0]
+                _log("planetoid_dungeons: biome=" + str(biome) + " -> " + str(first_.get("dungeon_type_id", "")) + " (" + str(first_.get("display_name", "")) + ").")
+        else:
+            _log("planetoid_dungeons.json loaded; biomes: " + ", ".join(sorted(dungeons_by_biome.keys())))
     pos = config["dungeon_entrance_position"]
     location = unreal.Vector(pos[0], pos[1], pos[2])
     rotation = unreal.Rotator(0, 0, 0)

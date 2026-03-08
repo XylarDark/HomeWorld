@@ -2,10 +2,12 @@
 # Run from Unreal Editor: Tools -> Execute Python Script.
 # Level preparation for the demo:
 #   - Ensures a PlayerStart exists (spawns one above the landscape if missing)
+#   - On DemoMap, places PlayerStart at homestead compound (first exclusion zone center) when config present
 #   - Ensures basic lighting (Directional Light + Sky Light) so PIE is not black
 #   - Optionally triggers the PCG demo map script
 
 import importlib
+import json
 import os
 import sys
 
@@ -19,6 +21,47 @@ except ImportError:
 def _log(msg):
     unreal.log("LevelSetup: " + str(msg))
     print("LevelSetup: " + str(msg))
+
+
+def _load_demo_map_config():
+    """Load Content/Python/demo_map_config.json. Return dict or None."""
+    try:
+        proj_dir = unreal.SystemLibrary.get_project_directory()
+        config_path = os.path.join(proj_dir, "Content", "Python", "demo_map_config.json")
+        if not os.path.isfile(config_path):
+            return None
+        with open(config_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return None
+
+
+def _is_demo_map_current():
+    """Return True if the current level is DemoMap (or path contains DemoMap)."""
+    try:
+        world = unreal.EditorLevelLibrary.get_editor_world()
+        if not world:
+            return False
+        path = unreal.EditorLevelLibrary.get_editor_world().get_path_name()
+        return path is not None and "DemoMap" in path
+    except Exception:
+        return False
+
+
+def _homestead_spawn_position_from_config():
+    """If demo_map_config has exclusion_zones, return (x, y, z) for first zone center (Unreal cm). Else None."""
+    config = _load_demo_map_config()
+    if not config:
+        return None
+    zones = config.get("exclusion_zones") or []
+    if not zones:
+        return None
+    z0 = zones[0]
+    cx = float(z0.get("center_x", 0))
+    cy = float(z0.get("center_y", 0))
+    cz = float(z0.get("center_z", 0))
+    # Use center; Z will be overridden by landscape top + offset when available
+    return (cx, cy, cz)
 
 
 def _get_landscape_center_z():
@@ -37,7 +80,9 @@ def _get_landscape_center_z():
 
 
 def _ensure_player_start():
-    """Spawn a PlayerStart actor if one doesn't already exist in the level."""
+    """Spawn a PlayerStart actor if one doesn't already exist in the level.
+    On DemoMap, uses homestead compound (first exclusion zone center from demo_map_config) for XY so
+    the player spawns in or at the homestead (MVP tutorial List 2)."""
     world = unreal.EditorLevelLibrary.get_editor_world()
     if not world:
         _log("No editor world open. Open a level first.")
@@ -49,12 +94,23 @@ def _ensure_player_start():
         _log("PlayerStart already exists at (%.0f, %.0f, %.0f)" % (loc.x, loc.y, loc.z))
         return
 
-    spawn_location = unreal.Vector(0.0, 0.0, 300.0)
+    spawn_x, spawn_y = 0.0, 0.0
+    spawn_z = 300.0
+
+    homestead = _homestead_spawn_position_from_config() if _is_demo_map_current() else None
+    if homestead is not None:
+        spawn_x, spawn_y, zone_cz = homestead
+        spawn_z = zone_cz + 300.0
+        _log("Using homestead spawn (first exclusion zone center): (%.0f, %.0f)" % (spawn_x, spawn_y))
+
     landscape_info = _get_landscape_center_z()
     if landscape_info:
         center, top_z = landscape_info
-        spawn_location = unreal.Vector(center.x, center.y, top_z + 200.0)
+        if homestead is None:
+            spawn_x, spawn_y = center.x, center.y
+        spawn_z = top_z + 200.0
 
+    spawn_location = unreal.Vector(float(spawn_x), float(spawn_y), float(spawn_z))
     rotation = unreal.Rotator(0.0, 0.0, 0.0)
     ps = unreal.EditorLevelLibrary.spawn_actor_from_class(unreal.PlayerStart, spawn_location, rotation)
     if ps:

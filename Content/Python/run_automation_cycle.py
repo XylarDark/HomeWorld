@@ -126,18 +126,34 @@ def wait_for_port(port: int = MCP_PORT, timeout: float = PORT_WAIT_TIMEOUT) -> b
     return False
 
 
-def launch_editor(ue_editor: str, uproject: str, project_root: str, unattended: bool = True) -> Optional[subprocess.Popen]:
-    """Launch UnrealEditor with uproject. Returns Popen instance or None on failure."""
+def launch_editor(
+    ue_editor: str,
+    uproject: str,
+    project_root: str,
+    unattended: bool = True,
+    capture_log_path: Optional[str] = None,
+) -> Optional[subprocess.Popen]:
+    """Launch UnrealEditor with uproject. Returns Popen instance or None on failure.
+    If capture_log_path is set, Editor stdout/stderr are written there for diagnostics."""
     cmd = [ue_editor, uproject]
     if unattended:
         cmd.append("-UNATTENDED")
-    _log("launching Editor", {"cmd": cmd})
+    _log("launching Editor", {"cmd": cmd, "capture_log": capture_log_path})
+    stdout_dest = subprocess.DEVNULL
+    stderr_dest = subprocess.DEVNULL
+    if capture_log_path:
+        try:
+            log_file = open(capture_log_path, "w", encoding="utf-8", errors="replace")
+            stdout_dest = log_file
+            stderr_dest = subprocess.STDOUT
+        except OSError as e:
+            _log("could not open capture log", {"path": capture_log_path, "error": str(e)})
     try:
         p = subprocess.Popen(
             cmd,
             cwd=project_root,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
+            stdout=stdout_dest,
+            stderr=stderr_dest,
         )
         return p
     except OSError as e:
@@ -341,6 +357,7 @@ def main() -> int:
     )
     parser.add_argument("--close-editor", action="store_true", help="If Editor is running, send graceful close (taskkill)")
     parser.add_argument("--launch-and-wait", action="store_true", help="Launch Editor and wait for port 55557 then exit (writes Saved/cycle_editor_ready.json)")
+    parser.add_argument("--capture-editor-log", action="store_true", help="When launching Editor, write stdout/stderr to Saved/Logs/editor_launch_<timestamp>.log for diagnostics (e.g. missing map 'Exiting')")
     parser.add_argument("--scripts", nargs="*", default=None, help="Run these Content/Python scripts headless (-ExecutePythonScript each); Editor starts and exits per script")
     args = parser.parse_args()
 
@@ -426,7 +443,15 @@ def main() -> int:
         if is_editor_running():
             _log("Editor already running; waiting for port")
         else:
-            p = launch_editor(ue_editor, uproject, project_root)
+            capture_path = None
+            if getattr(args, "capture_editor_log", False):
+                from datetime import datetime, timezone
+                logs_dir = os.path.join(saved_dir, "Logs")
+                os.makedirs(logs_dir, exist_ok=True)
+                ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+                capture_path = os.path.join(logs_dir, f"editor_launch_{ts}.log")
+                _log("Editor output will be captured", {"path": capture_path})
+            p = launch_editor(ue_editor, uproject, project_root, capture_log_path=capture_path)
             if p is None:
                 return 1
         if not wait_for_port(MCP_PORT, PORT_WAIT_TIMEOUT):

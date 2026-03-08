@@ -1,0 +1,15 @@
+{
+  "_comment": "Dungeon types per biome for level/POI naming and placement. Keys match EBiomeType (HomeWorldPlanetoidTypes.h). Per docs/PLANETOID_BIOMES.md §2 and §4. Expand with additional dungeon variants per biome in later lists.",
+  "Desert": [
+    { "dungeon_type_id": "Desert_Tomb_01", "display_name": "Tomb / crypt", "notes": "Desert tomb or crypt; level/POI naming" }
+  ],
+  "Forest": [
+    { "dungeon_type_id": "Forest_Grove_01", "display_name": "Ancient grove / dark wood", "notes": "Grove or dark wood dungeon; level/POI naming" }
+  ],
+  "Marsh": [
+    { "dungeon_type_id": "Marsh_Shrine_01", "display_name": "Swamp dungeon / bog shrine", "notes": "Swamp or bog shrine; level/POI naming" }
+  ],
+  "Canyon": [
+    { "dungeon_type_id": "Canyon_Mine_01", "display_name": "Mine / cavern", "notes": "Mine or cavern; level/POI naming" }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "_comment": "Alignment-based behavior for fight/harvest/empower. Keys match EPlanetoidAlignment (HomeWorldPlanetoidTypes.h). Per docs/PLANETOID_BIOMES.md §3 and §3.1. Code branches on GameMode GetCurrentZoneAlignment().",
+  "Corrupted": {
+    "activity_focus": "fight",
+    "spawn_rule": "spawn corrupted monsters; combat; dangerous",
+    "harvest_rule": "disabled_or_minimal",
+    "empower_rule": "conversion: strip sin, convert foes to loved version (vendors, helpers, quest givers)"
+  },
+  "Neutral": {
+    "activity_focus": "harvest",
+    "spawn_rule": "no_combat_focus; safe",
+    "harvest_rule": "full (trees, herbs, rocks, water per biome)",
+    "empower_rule": "none"
+  },
+  "Positive": {
+    "activity_focus": "empower",
+    "spawn_rule": "no_hostile_spawns; safe",
+    "harvest_rule": "optional_safe",
+    "empower_rule": "buffs, spirit nodes, restoration"
+  }
+}

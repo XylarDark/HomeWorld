@@ -1,6 +1,8 @@
 # place_resource_nodes.py
 # Run from Unreal Editor with DemoMap open (Tools -> Execute Python Script or via MCP).
 # Reads demo_map_config.json "resource_node_positions" and spawns BP_HarvestableTree at each position (cm).
+# Uses resource_nodes_per_biome.json to decide which resource node types apply for the current biome
+# (see docs/PLANETOID_BIOMES.md §1.1–§1.2). Placement uses the config for node type/variant selection.
 # Idempotent: ensures Building folder exists (via ensure_week2_folders), then skips spawning if an actor
 # of the same Blueprint class already exists within RADIUS_CM of that position.
 # See docs/tasks/DAY7_RESOURCE_NODES.md.
@@ -21,6 +23,8 @@ if _script_dir not in sys.path:
 
 DEMO_LEVEL_SUBPATH = "DemoMap"
 BP_HARVESTABLE_TREE_PATH = "/Game/HomeWorld/Building/BP_HarvestableTree"
+BP_HARVESTABLE_ORE_PATH = "/Game/HomeWorld/Building/BP_HarvestableOre"
+BP_HARVESTABLE_FLOWER_PATH = "/Game/HomeWorld/Building/BP_HarvestableFlower"
 RADIUS_CM = 150.0  # consider "already placed" if an instance exists within this distance
 
 
@@ -33,6 +37,8 @@ def _load_config():
     defaults = {
         "demo_level_path": "/Game/HomeWorld/Maps/DemoMap",
         "resource_node_positions": [],
+        "biome": "Forest",
+        "alignment": "Neutral",
     }
     try:
         proj_dir = unreal.SystemLibrary.get_project_directory()
@@ -48,11 +54,57 @@ def _load_config():
                 if isinstance(p, dict) and "x" in p and "y" in p and "z" in p:
                     out.append({"x": float(p["x"]), "y": float(p["y"]), "z": float(p["z"])})
             defaults["resource_node_positions"] = out
+        ore_positions = data.get("resource_node_ore_positions")
+        if isinstance(ore_positions, list):
+            ore_out = []
+            for p in ore_positions:
+                if isinstance(p, dict) and "x" in p and "y" in p and "z" in p:
+                    ore_out.append({"x": float(p["x"]), "y": float(p["y"]), "z": float(p["z"])})
+            defaults["resource_node_ore_positions"] = ore_out
+        flower_positions = data.get("resource_node_flower_positions")
+        if isinstance(flower_positions, list):
+            flower_out = []
+            for p in flower_positions:
+                if isinstance(p, dict) and "x" in p and "y" in p and "z" in p:
+                    flower_out.append({"x": float(p["x"]), "y": float(p["y"]), "z": float(p["z"])})
+            defaults["resource_node_flower_positions"] = flower_out
         defaults["demo_level_path"] = data.get("demo_level_path", defaults["demo_level_path"])
+        defaults["biome"] = data.get("biome", defaults["biome"])
+        defaults["alignment"] = data.get("alignment", defaults["alignment"])
         return defaults
     except Exception as e:
         _log("Config load warning: " + str(e))
         return defaults
+
+
+def _load_resource_nodes_per_biome():
+    """Load Content/Python/resource_nodes_per_biome.json for per-biome node types/variants (PLANETOID_BIOMES §1.1–§1.2)."""
+    try:
+        proj_dir = unreal.SystemLibrary.get_project_directory()
+        config_path = os.path.join(proj_dir, "Content", "Python", "resource_nodes_per_biome.json")
+        if not os.path.exists(config_path):
+            return {}
+        with open(config_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return data if isinstance(data, dict) else {}
+    except Exception as e:
+        _log("resource_nodes_per_biome load warning: " + str(e))
+        return {}
+
+
+def _load_planetoid_alignments():
+    """Load Content/Python/planetoid_alignments.json for alignment-based branching (PLANETOID_BIOMES §3, §3.1)."""
+    try:
+        proj_dir = unreal.SystemLibrary.get_project_directory()
+        config_path = os.path.join(proj_dir, "Content", "Python", "planetoid_alignments.json")
+        if not os.path.exists(config_path):
+            return {}
+        with open(config_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return data if isinstance(data, dict) else {}
+    except Exception as e:
+        _log("planetoid_alignments load warning: " + str(e))
+        return {}
 
 
 def _get_editor_world():
@@ -122,6 +174,30 @@ def main():
     config = _load_config()
     demo_path = config.get("demo_level_path", "/Game/HomeWorld/Maps/DemoMap")
     positions = config.get("resource_node_positions", [])
+    biome = config.get("biome", "Forest")
+    alignment = config.get("alignment", "Neutral")
+
+    # Branch on alignment using planetoid_alignments.json (PLANETOID_BIOMES §3, §3.1)
+    alignments_cfg = _load_planetoid_alignments()
+    align_entry = alignments_cfg.get(alignment) if isinstance(alignments_cfg, dict) else None
+    harvest_rule = align_entry.get("harvest_rule", "full") if isinstance(align_entry, dict) else "full"
+    if alignment == "Corrupted" and harvest_rule in ("disabled_or_minimal", "disabled", "minimal"):
+        _log("Alignment is Corrupted with harvest_rule=%s; skipping resource node placement (fight zone)." % harvest_rule)
+        return
+    if align_entry:
+        _log("Using planetoid_alignments for alignment: %s (activity_focus=%s, harvest_rule=%s)" % (
+            alignment,
+            align_entry.get("activity_focus", "—"),
+            harvest_rule,
+        ))
+
+    # Load per-biome node types so placement uses config (PLANETOID_BIOMES §1.1–§1.2)
+    nodes_per_biome = _load_resource_nodes_per_biome()
+    biome_entries = nodes_per_biome.get(biome, []) if isinstance(nodes_per_biome, dict) else []
+    if biome_entries:
+        _log("Using resource_nodes_per_biome for biome: %s (%d node types)" % (biome, len(biome_entries)))
+    else:
+        _log("No resource_nodes_per_biome entry for biome '%s'; placing with default type." % biome)
 
     current = _get_current_level_path()
     if not current or DEMO_LEVEL_SUBPATH not in (current or ""):
@@ -162,10 +238,19 @@ def main():
             existing_locs.append(loc)
 
     spawned = 0
-    for pos in positions:
+    for i, pos in enumerate(positions):
         target = (pos["x"], pos["y"], pos["z"])
         if any(_distance_cm(target, ex) <= RADIUS_CM for ex in existing_locs):
             continue
+        # Use config to pick logical node type/variant for this position (when we have multiple BPs we can spawn by type)
+        node_type_name = "Trees"
+        variant_id = None
+        if biome_entries:
+            entry = biome_entries[i % len(biome_entries)]
+            if isinstance(entry, dict):
+                node_type_name = entry.get("node_type", node_type_name)
+                variants = entry.get("variants", [])
+                variant_id = variants[0] if variants else None
         location = unreal.Vector(target[0], target[1], target[2])
         rotation = unreal.Rotator(0, 0, 0)
         try:
@@ -173,12 +258,77 @@ def main():
             if actor:
                 existing_locs.append(target)
                 spawned += 1
-                _log("Spawned at (%.0f, %.0f, %.0f)" % (target[0], target[1], target[2]))
+                _log("Spawned at (%.0f, %.0f, %.0f) type=%s variant=%s" % (target[0], target[1], target[2], node_type_name, variant_id or "—"))
         except Exception as e:
             _log("Failed to spawn at (%.0f, %.0f, %.0f): %s" % (target[0], target[1], target[2], e))
 
     _log("Done. Spawned %d new resource node(s); %d position(s) already had an instance." % (spawned, len(positions) - spawned))
-    if spawned > 0:
+
+    # Ore nodes (MVP tutorial List 6: mine some ore)
+    ore_positions = config.get("resource_node_ore_positions", [])
+    ore_spawned = 0
+    if ore_positions and unreal.EditorAssetLibrary.does_asset_exist(BP_HARVESTABLE_ORE_PATH):
+        ore_bp = unreal.load_asset(BP_HARVESTABLE_ORE_PATH)
+        if ore_bp:
+            try:
+                ore_class = ore_bp.generated_class() if callable(getattr(ore_bp, "generated_class", None)) else getattr(ore_bp, "generated_class", None) or ore_bp.get_editor_property("generated_class")
+            except Exception:
+                ore_class = None
+            if ore_class:
+                ore_existing = unreal.GameplayStatics.get_all_actors_of_class(world, ore_class) or []
+                ore_locs = [_actor_location_cm(a) for a in ore_existing]
+                ore_locs = [loc for loc in ore_locs if loc]
+                for pos in ore_positions:
+                    target = (pos["x"], pos["y"], pos["z"])
+                    if any(_distance_cm(target, ex) <= RADIUS_CM for ex in ore_locs):
+                        continue
+                    loc = unreal.Vector(target[0], target[1], target[2])
+                    try:
+                        actor = unreal.EditorLevelLibrary.spawn_actor_from_class(ore_class, loc, unreal.Rotator(0, 0, 0))
+                        if actor:
+                            ore_locs.append(target)
+                            ore_spawned += 1
+                            _log("Spawned ore at (%.0f, %.0f, %.0f)" % target)
+                    except Exception as e:
+                        _log("Failed to spawn ore at (%.0f, %.0f, %.0f): %s" % (target[0], target[1], target[2], e))
+        else:
+            _log("Ore positions configured but BP_HarvestableOre not loaded. Run create_bp_harvestable_ore.py first.")
+    elif ore_positions:
+        _log("resource_node_ore_positions set but BP_HarvestableOre missing. Run create_bp_harvestable_ore.py first.")
+
+    # Flower nodes (MVP tutorial List 6: pick some flowers)
+    flower_positions = config.get("resource_node_flower_positions", [])
+    flower_spawned = 0
+    if flower_positions and unreal.EditorAssetLibrary.does_asset_exist(BP_HARVESTABLE_FLOWER_PATH):
+        flower_bp = unreal.load_asset(BP_HARVESTABLE_FLOWER_PATH)
+        if flower_bp:
+            try:
+                flower_class = flower_bp.generated_class() if callable(getattr(flower_bp, "generated_class", None)) else getattr(flower_bp, "generated_class", None) or flower_bp.get_editor_property("generated_class")
+            except Exception:
+                flower_class = None
+            if flower_class:
+                flower_existing = unreal.GameplayStatics.get_all_actors_of_class(world, flower_class) or []
+                flower_locs = [_actor_location_cm(a) for a in flower_existing]
+                flower_locs = [loc for loc in flower_locs if loc]
+                for pos in flower_positions:
+                    target = (pos["x"], pos["y"], pos["z"])
+                    if any(_distance_cm(target, ex) <= RADIUS_CM for ex in flower_locs):
+                        continue
+                    loc = unreal.Vector(target[0], target[1], target[2])
+                    try:
+                        actor = unreal.EditorLevelLibrary.spawn_actor_from_class(flower_class, loc, unreal.Rotator(0, 0, 0))
+                        if actor:
+                            flower_locs.append(target)
+                            flower_spawned += 1
+                            _log("Spawned flower at (%.0f, %.0f, %.0f)" % target)
+                    except Exception as e:
+                        _log("Failed to spawn flower at (%.0f, %.0f, %.0f): %s" % (target[0], target[1], target[2], e))
+        else:
+            _log("Flower positions configured but BP_HarvestableFlower not loaded. Run create_bp_harvestable_flower.py first.")
+    elif flower_positions:
+        _log("resource_node_flower_positions set but BP_HarvestableFlower missing. Run create_bp_harvestable_flower.py first.")
+
+    if spawned > 0 or ore_spawned > 0 or flower_spawned > 0:
         _save_current_level()
         _log("Level saved.")
 

@@ -1,0 +1,15 @@
+{
+  "_comment": "Monster types (corrupted theme) per biome for spawn or AI. Keys match EBiomeType (HomeWorldPlanetoidTypes.h). Per docs/PLANETOID_BIOMES.md §2 and §4. Alignment: corrupted (fight/conversion). Type names are placeholders for future Blueprint or spawn IDs.",
+  "Desert": [
+    { "monster_type_id": "Desert_Corrupted_01", "display_name": "Desert corrupted", "notes": "Tomb/crypt theme" }
+  ],
+  "Forest": [
+    { "monster_type_id": "Forest_Corrupted_01", "display_name": "Forest corrupted", "notes": "Grove/dark wood theme" }
+  ],
+  "Marsh": [
+    { "monster_type_id": "Marsh_Corrupted_01", "display_name": "Marsh corrupted", "notes": "Swamp/bog shrine theme" }
+  ],
+  "Canyon": [
+    { "monster_type_id": "Canyon_Corrupted_01", "display_name": "Canyon corrupted", "notes": "Mine/cavern theme" }
+  ]
+}

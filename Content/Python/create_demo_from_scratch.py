@@ -139,7 +139,19 @@ def main():
         _log("No PCG graph created; assign ForestIsland_PCG to the volume in Details.")
     pcg_forest.try_world_partition()
 
-    _log("Done. If Output Log shows any 'Could not set' or 'set in Editor', do those steps manually once (see docs/PCG_SETUP.md 'Demo setup'). Then save the level. For World Partition, enable Is Partitioned on the PCG component and set Partition Grid Size on the PCG World Actor if needed.")
+    # List 62 T3: DefendPosition, GatherPosition, and one Family-tagged actor for Defend-at-night flow.
+    _log("Placing DefendPosition, GatherPosition, and partner (Family tag) for List 62 T3...")
+    try:
+        import place_defend_gather_positions
+        import place_partner
+        importlib.reload(place_defend_gather_positions)
+        importlib.reload(place_partner)
+        place_defend_gather_positions.main()
+        place_partner.main()
+    except Exception as e:
+        _log("Defend/Gather or partner placement warning: " + str(e))
+
+    _log("Done. If Output Log shows any 'Could not set' or 'set in Editor', do those steps manually once (see docs/PCG_SETUP.md 'Demo setup'). Then save the level. For World Partition, enable Is Partitioned on the PCG component and set Partition Grid Size on the PCG World Actor if needed. For Defend-at-night: PIE, hw.TimeOfDay.Phase 2 (night) -> family at Defend; Phase 0 or 3 -> return. See CONSOLE_COMMANDS.md § Defend-at-night.")
 
 
 if __name__ == "__main__":

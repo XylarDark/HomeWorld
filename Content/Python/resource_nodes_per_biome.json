@@ -1,0 +1,26 @@
+{
+  "_comment": "Resource node types per biome for PCG or placement scripts. Keys match EBiomeType (HomeWorldPlanetoidTypes.h). Per docs/PLANETOID_BIOMES.md §1.1 and §1.2. Role: primary, sparse, some, optional, oasis. variants: concrete type names/IDs per PLANETOID_BIOMES §1.2.",
+  "Desert": [
+    { "node_type": "Rocks", "role": "primary", "variants": ["sandstone_rock", "iron_ore", "desert_boulder"] },
+    { "node_type": "FlowersHerbs", "role": "sparse", "variants": ["sparse_sage", "desert_herb"] },
+    { "node_type": "Water", "role": "oasis", "variants": ["oasis_well", "desert_spring"] }
+  ],
+  "Forest": [
+    { "node_type": "Trees", "role": "primary", "variants": ["oak_tree", "pine_tree", "birch_tree"] },
+    { "node_type": "FlowersHerbs", "role": "primary", "variants": ["wildflower", "forest_herb", "berry_bush"] },
+    { "node_type": "Rocks", "role": "some", "variants": ["forest_stone", "moss_rock"] },
+    { "node_type": "Water", "role": "some", "variants": ["river_water", "forest_pond", "stream"] },
+    { "node_type": "Spirits", "role": "optional", "variants": ["forest_spirit_node"] }
+  ],
+  "Marsh": [
+    { "node_type": "Trees", "role": "optional", "variants": ["marsh_tree"] },
+    { "node_type": "FlowersHerbs", "role": "primary", "variants": ["fen_herb", "marsh_flower", "bog_plant"] },
+    { "node_type": "Rocks", "role": "some", "variants": ["marsh_stone"] },
+    { "node_type": "Water", "role": "primary", "variants": ["fen_pool", "bog_water", "marsh_spring"] },
+    { "node_type": "Spirits", "role": "primary", "variants": ["fen_spirit_node", "bog_spirit"] }
+  ],
+  "Canyon": [
+    { "node_type": "FlowersHerbs", "role": "sparse", "variants": ["canyon_herb", "sparse_flower"] },
+    { "node_type": "Rocks", "role": "primary", "variants": ["canyon_rock", "crystal_node", "ore_vein"] }
+  ]
+}
