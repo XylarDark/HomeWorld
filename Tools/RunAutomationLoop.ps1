@@ -373,10 +373,10 @@ function Start-EditorAndWaitForMCP {
     Write-LoopLog "RunAutomationLoop: launching Editor and waiting for MCP port 55557..."
     Push-Location $ProjectRoot
     try {
-        & python $cycleScript --no-build --launch-and-wait
+        & python $cycleScript --no-build --launch-and-wait --capture-editor-log
         $exit = $LASTEXITCODE
         if ($exit -ne 0) {
-            Write-Error "Editor launch/wait failed (exit $exit). Check UE_EDITOR and run_automation_cycle.py."
+            Write-Error "Editor launch/wait failed (exit $exit). Check UE_EDITOR and run_automation_cycle.py. See Saved/Logs/editor_launch_*.log and docs/EDITOR_LAUNCH_DEEP_DIVE.md."
             exit $exit
         }
         $readyPath = Join-Path $ProjectRoot "Saved\cycle_editor_ready.json"

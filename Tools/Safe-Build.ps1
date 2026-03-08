@@ -82,9 +82,28 @@ try {
         }
     }
 
-    Write-SafeLog "Running build..."
-    & $BuildBat
-    $exitCode = $LASTEXITCODE
+    $exitCode = -1
+    $buildError = $null
+    try {
+        Write-SafeLog "Running build..."
+        & $BuildBat
+        $exitCode = $LASTEXITCODE
+    } catch {
+        $buildError = $_
+        $exitCode = 1
+        if ($_.Exception.Message -match "being used by another process") {
+            Write-SafeLog "Build failed with 'file in use'; waiting 10s and retrying once..."
+            Start-Sleep -Seconds 10
+            try {
+                & $BuildBat
+                $exitCode = $LASTEXITCODE
+            } catch {
+                $buildError = $_
+                $exitCode = 1
+                Write-SafeLog "Retry also failed. See KNOWN_ERRORS.md 'Safe-Build / Build-HomeWorld.bat: file in use'."
+            }
+        }
+    }
 
     if ($exitCode -ne 0 -and (Test-BuildFailureEditorRelated)) {
         Write-SafeLog "Build failed; log suggests Editor was in use. Force-closing and retrying once."
