@@ -33,6 +33,8 @@
 
 ## 4. Validation
 
+**Verification entry point:** [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) § SaveGame and role persistence (T2 / Day 15) — commands and in-session vs cross–PIE-restart steps.
+
 - **PIE:** Spawn N family members; each has a consistent role (tag or subsystem entry). After (optional) save/load, roles are restored.
 - **Success:** Role assignment is deterministic and (if implemented) persists across save/load.
 

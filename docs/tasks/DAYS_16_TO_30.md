@@ -142,7 +142,7 @@ Task index for Phase 3 (Planetoid), Phase 4 (Spirits), Phase 5 (Dungeon), and bu
 
 **Implementation:** Boss: Pawn or Character Blueprint with GAS (reuse or extend existing attribute set/abilities); spawn in dungeon arena; placeholder mesh. Reward: on death (or kill event) call `UHomeWorldInventorySubsystem::AddResource` or custom reward struct; optional story flag. Manual/Blueprint setup; no new C++ required unless custom boss behavior needed.
 
-**T5 verification (boss reward):** In PIE, open console (~) and run `hw.GrantBossReward` (or `hw.GrantBossReward 150` for amount). Grants Wood to player inventory; confirm log "HomeWorld: hw.GrantBossReward granted Wood +N". A real boss Blueprint would call the same InventorySubsystem AddResource on death.
+**T5 verification (boss reward):** In PIE, open console (~) and run `hw.GrantBossReward` (or `hw.GrantBossReward 150` for amount). Grants Wood to player inventory; **HUD shows "Boss reward: +N Wood"** (yellow toast for 4s); confirm log "HomeWorld: hw.GrantBossReward granted Wood +N". A real boss Blueprint would call the same InventorySubsystem AddResource on death.
 
 **T8 (CURRENT_TASK_LIST) verification:** Automated: run `pie_test_runner.py` with PIE active; the **GrantBossReward** check executes `hw.GrantBossReward 50` in the PIE world and, if InventorySubsystem is accessible from Python, asserts Wood increased; otherwise reports "executed; confirm in Output Log". Manual: same as T5 above.
 

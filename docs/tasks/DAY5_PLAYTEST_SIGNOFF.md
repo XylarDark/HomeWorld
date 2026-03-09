@@ -109,6 +109,8 @@ If any beat fails, fix or log in [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) / [SESSIO
 
 **In-Editor sign-off:** Open **DemoMap** → start **PIE** → run the four beats per §2 above. In **Window → Developer Tools → Output Log**, press **LMB**, **Shift**, **E**, **P** and confirm the corresponding `HomeWorld: ... input triggered` and ability activated/skipped lines. No blockers logged; T1 marked completed in CURRENT_TASK_LIST.
 
+**List 66 T3 (Phase 1.3 — Week 1 playtest single-session) deferred (2026-03-08):** Editor/MCP was not connected this session. When Editor is available: (1) Open [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) § Pre-demo verification → Week 1 playtest checklist (crash → scout → boss → claim home). (2) Open DemoMap, start PIE, run `pie_test_runner.py` via MCP or Tools → Execute Python Script; read `Saved/pie_test_results.json`. (3) In PIE: LMB, Shift, E, P; confirm Output Log lines per § T1 verification above. (4) Document pass/fail per beat in this section (T1 result table) or [SESSION_LOG.md](../SESSION_LOG.md). (5) Stability: 2–5 min PIE run if desired.
+
 ---
 
 ## References
