@@ -16,6 +16,7 @@
 #include "HomeWorldFamilySubsystem.h"
 #include "HomeWorldSaveGameSubsystem.h"
 #include "HomeWorldSpiritBurstAbility.h"
+#include "HomeWorldSpiritRosterSubsystem.h"
 #include "HomeWorldSpiritShieldAbility.h"
 #include "HomeWorldTimeOfDaySubsystem.h"
 #include "AbilitySystemComponent.h"
@@ -114,6 +115,31 @@ namespace
 		Char->ReportDeathAndAddSpirit();
 	}
 
+	void CmdSpirits(const TArray<FString>& Args)
+	{
+		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		if (!World)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Spirits requires a play world (PIE or game)."));
+			return;
+		}
+		UGameInstance* GI = World->GetGameInstance();
+		if (!GI) return;
+		UHomeWorldSpiritRosterSubsystem* Spirits = GI->GetSubsystem<UHomeWorldSpiritRosterSubsystem>();
+		if (!Spirits)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: SpiritRosterSubsystem not found."));
+			return;
+		}
+		const int32 Count = Spirits->GetSpiritCount();
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Spirits — roster has %d spirit(s). Use hw.ReportDeath then hw.Spirits to verify (T5 / Day 21)."), Count);
+		const TArray<FName> Ids = Spirits->GetSpirits();
+		for (int32 i = 0; i < Ids.Num(); ++i)
+		{
+			UE_LOG(LogTemp, Log, TEXT("HomeWorld:   [%d] %s"), i, *Ids[i].ToString());
+		}
+	}
+
 	void CmdGrantBossReward(const TArray<FString>& Args)
 	{
 		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
@@ -128,6 +154,7 @@ namespace
 		if (!Inv) { UE_LOG(LogTemp, Warning, TEXT("HomeWorld: InventorySubsystem not found.")); return; }
 		const int32 Amount = Args.Num() > 0 ? FCString::Atoi(*Args[0]) : 100;
 		Inv->AddResource(FName("Wood"), Amount);
+		Inv->SetLastBossRewardDisplay(Amount, World->GetTimeSeconds() + 4.0f);
 		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.GrantBossReward granted Wood +%d (boss reward placeholder)."), Amount);
 	}
 
@@ -798,6 +825,11 @@ void FHomeWorldModule::StartupModule()
 		TEXT("hw.ReportDeath"),
 		TEXT("Report player death and add to spirit roster (T5 / Day 21 verification)."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdReportDeath),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Spirits"),
+		TEXT("List spirit roster: count and spirit IDs. Run hw.ReportDeath then hw.Spirits to verify death-to-spirit (T5 / Day 21)."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdSpirits),
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.GrantBossReward"),

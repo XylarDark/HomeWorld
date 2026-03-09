@@ -33,7 +33,16 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Inventory", meta = (DisplayName = "Spend Resource"))
 	bool SpendResource(FName ResourceType, int32 Amount);
 
+	/** Set last boss reward for HUD toast (called by hw.GrantBossReward). DisplayUntilTime = World->TimeSeconds() + duration. */
+	void SetLastBossRewardDisplay(int32 Amount, float DisplayUntilTime);
+
+	/** Get last boss reward for HUD; returns true if HUD should show toast (current time < DisplayUntil). */
+	bool GetLastBossRewardForHUD(int32& OutAmount, float& OutDisplayUntil) const;
+
 private:
 	UPROPERTY()
 	TMap<FName, int32> ResourceCounts;
+
+	int32 LastBossRewardAmount = 0;
+	float LastBossRewardDisplayUntil = 0.f;
 };

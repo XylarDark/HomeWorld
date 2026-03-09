@@ -87,6 +87,28 @@ void AHomeWorldHUD::DrawHUD()
 	Canvas->DrawText(Font, LoveLine, X, Y, TextScale, TextScale);
 	Y += LineSpacing;
 
+	// Boss reward toast: show "Boss reward: +N Wood" for a few seconds after hw.GrantBossReward (T3 observable feedback).
+	static bool bLoggedBossRewardToastOnce = false;
+	UHomeWorldInventorySubsystem* Inv = PC->GetGameInstance() ? PC->GetGameInstance()->GetSubsystem<UHomeWorldInventorySubsystem>() : nullptr;
+	if (World && Inv)
+	{
+		int32 RewardAmount = 0;
+		float DisplayUntil = 0.f;
+		if (Inv->GetLastBossRewardForHUD(RewardAmount, DisplayUntil) && World->GetTimeSeconds() < DisplayUntil)
+		{
+			const FString BossRewardLine = FString::Printf(TEXT("Boss reward: +%d Wood"), RewardAmount);
+			Canvas->SetDrawColor(FColor::Yellow);
+			Canvas->DrawText(Font, BossRewardLine, X, Y, TextScale, TextScale);
+			Canvas->SetDrawColor(FColor::White);
+			Y += LineSpacing;
+			if (!bLoggedBossRewardToastOnce)
+			{
+				UE_LOG(LogTemp, Log, TEXT("HomeWorld HUD: Boss reward toast shown (+N Wood) for 4s after hw.GrantBossReward (T3 observable effect)."));
+				bLoggedBossRewardToastOnce = true;
+			}
+		}
+	}
+
 	// T3 (vision-aligned UI): Sin/virtue spectrum stub — four axes (Pride, Greed, Wrath, Envy) -1..0..+1. Design only; values from stubs. See SIN_VIRTUE_SPECTRUM.md, CONSOLE_COMMANDS hw.SinVirtue.Pride / .Greed / .Wrath / .Envy.
 	constexpr float SinVirtuePrideStub = 0.0f;
 	constexpr float SinVirtueGreedStub = 0.0f;

@@ -32,3 +32,16 @@ bool UHomeWorldInventorySubsystem::SpendResource(FName ResourceType, int32 Amoun
 	*Ptr -= Amount;
 	return true;
 }
+
+void UHomeWorldInventorySubsystem::SetLastBossRewardDisplay(int32 Amount, float DisplayUntilTime)
+{
+	LastBossRewardAmount = Amount;
+	LastBossRewardDisplayUntil = DisplayUntilTime;
+}
+
+bool UHomeWorldInventorySubsystem::GetLastBossRewardForHUD(int32& OutAmount, float& OutDisplayUntil) const
+{
+	OutAmount = LastBossRewardAmount;
+	OutDisplayUntil = LastBossRewardDisplayUntil;
+	return LastBossRewardAmount > 0 && LastBossRewardDisplayUntil > 0.f;
+}
