@@ -2,7 +2,7 @@
 
 Scoping document for the 30-day demonstrable prototype. Update when you lock the "beautiful corner" (e.g. after Day 10) and when you choose the one moment for the vertical slice. See [VISION.md](VISION.md) (Demonstrable prototype and vertical slice) and [30_DAY_SCHEDULE.md](30_DAY_SCHEDULE.md).
 
-**As of 2026-03-02 (run 4 of 4 toward polished MVP):** Chosen **moment** = Claim homestead; chosen **corner** = Homestead compound (see High-level below).
+**As of 2026-03-02 (run 4 of 4 toward polished MVP):** Chosen **moment** = Claim homestead; chosen **corner** = Homestead compound (see High-level below). **List 65 (Harden & demo):** Lock confirmed; pre-demo entry point and run sequence in [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) § Pre-demo verification and [VERTICAL_SLICE_CHECKLIST.md](VERTICAL_SLICE_CHECKLIST.md) §3.
 
 ---
 

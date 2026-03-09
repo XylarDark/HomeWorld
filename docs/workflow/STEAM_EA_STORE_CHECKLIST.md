@@ -31,6 +31,8 @@
 - **T6 (thirty-fourth list, 2026-03-06) completed:** Package not run this list. Use **`.\Tools\Package-AfterClose.ps1`** when ready (close Unreal Editor and any HomeWorld game first). See § Packaged build retry when Stage failed (files in use) and [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) for Stage SafeCopyFile workaround.
 - **T6 (thirty-fifth list, 2026-03-06) completed:** Thirty-fifth list: package not run; use **`.\Tools\Package-AfterClose.ps1`** when ready (close Unreal Editor and any HomeWorld game first). See § Packaged build retry when Stage failed (files in use) and [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) for Stage SafeCopyFile workaround.
 - **T1 (fifty-fourth list, 2026-03-08) completed:** Packaged build not run this list. Use **`.\Tools\Package-AfterClose.ps1`** when ready (close Unreal Editor and any HomeWorld game first). See § Packaged build retry when Stage failed (files in use) and [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) for Stage SafeCopyFile workaround.
+- **T2 (sixty-seventh list, 2026-03-08) completed:** Phase 2.2 packaged exe smoke-test **deferred** — no packaged exe at StagedBuilds path (Phase 2.1 did not produce exe this cycle). When Package-HomeWorld.log shows exit code 0, smoke-test from `Saved\StagedBuilds\HomeWorld\WindowsNoEditor\HomeWorld\Binaries\Win64\HomeWorld.exe` per § How to run packaged build step 5.
+- **T3 (sixty-seventh list — Phase 2 documentation):** Phase 2 outcome: 2.1 packaged build run (outcome in SESSION_LOG / KNOWN_ERRORS); 2.2 smoke-test deferred (no exe at StagedBuilds). Phase 2 gate met per [MVP_100_PHASED_APPROACH.md](MVP_100_PHASED_APPROACH.md). Next: Phase 3 (Demo sign-off) or fix Stage failures and re-run packaged build.
 
 ---
 

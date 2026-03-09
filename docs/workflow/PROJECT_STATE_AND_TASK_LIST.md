@@ -2,7 +2,7 @@
 
 **Purpose:** Single overview of the state of the project and **work not yet completed**, codified as a task list to work from. Update this file when major milestones or the task list change.
 
-**Last updated:** 2026-03-09 (sixty-third 10-task list complete; MVP full scope List 63: Integration).
+**Last updated:** 2026-03-02 (seventieth list — Deferred features).
 
 ---
 
@@ -15,7 +15,7 @@
 | **Rapid prototyping** | Adding features, exploring systems, building out MVP. Maximize quantity of shippable work; keep verification minimal so tokens go to implementation. | **7** of 10 (T1–T7) | **3** (T8 = combined docs/cycle, T9 = combined verification, T10 = buffer). See HOW_TO_GENERATE_TASK_LIST § "Consolidate overhead." |
 | **Prototype hardening** | Preparing for demo, release, or playtest; stabilizing after a big push; regression and quality focus. Maximize quality and confidence; more verification and docs. | **4–5** of 10 | **5–6** (PIE pre-demo, packaged build, VERTICAL_SLICE_CHECKLIST, AUTOMATION_GAPS, KNOWN_ERRORS/CONVENTIONS, refinement, buffer) |
 
-**Current phase:** **Rapid prototyping** (default while MVP and vertical slice are still being built out). Change to **Prototype hardening** when preparing for a concrete demo date, playtest, or release.
+**Current phase:** **Rapid prototyping** (seventieth list — Deferred features: agentic Path 2, SaveGame polish, boss reward, bed actor, spirit roster). Change to Prototype hardening when preparing for demo or release.
 
 **Consolidation (rapid prototyping):** Use **one** "Docs and cycle" task (T8) and **one** "Verification" task (T9) instead of 4–5 separate doc/cycle/verify tasks. That leaves T1–T7 for substantive implementation; each of T1–T7 should be a meaningful chunk (e.g. multi-step feature, or feature + test). See [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md) § Consolidate overhead.
 
@@ -23,6 +23,8 @@
 
 ## 1. Executive summary
 
+- **MVP 100%; asset-ready.** Next step: add assets. Per [MVP_100_PHASED_APPROACH.md](MVP_100_PHASED_APPROACH.md) Phase 4.
+- **Pre-demo verification entry point (one doc):** The one doc is [CONSOLE_COMMANDS](../CONSOLE_COMMANDS.md): it links §3 (run sequence → [VERTICAL_SLICE_CHECKLIST §3](VERTICAL_SLICE_CHECKLIST.md#3-pre-demo-checklist-before-recording-or-showing)) and the command reference (same doc, § Pre-demo verification and Commands). Open CONSOLE_COMMANDS for both §3 and the command reference.
 - **30-day block:** All days 1–30 are **implementation-complete** per artifact checks and verification pass (see [30_DAY_IMPLEMENTATION_STATUS.md](30_DAY_IMPLEMENTATION_STATUS.md)). Scripts, C++ types, configs, and task docs exist; many steps have been run in Editor via MCP or documented for one-time manual runs.
 - **Automation:** The **agent company** (Developer, Fixer, Guardian, Refiner) is in place. One script **Start-AllAgents.ps1** starts the full company; the Editor auto-launches when `UE_EDITOR` is set. Run history and refinement (rules/strategy from runs) are recorded and documented.
 - **Remaining work** is mostly: (1) running a few scripts in Editor when open, (2) one-time or rare manual steps in level/PCG/State Tree, (3) deferred: full agentic building only (SaveGame, death→spirit, boss reward are implemented and verifiable via console commands `hw.Save`, `hw.Load`, `hw.ReportDeath`, `hw.GrantBossReward` in PIE), (4) buffer/polish and next 30-day planning.
@@ -63,17 +65,19 @@
 
 ### Deferred features (track so we don't re-do "verify/document" every list)
 
+**Full agentic Path 2 (State Tree BUILD) is post–100% MVP; add when ready.** Path 2 is not required for asset-ready.
+
 When a task is **"verify or document deferred X"** and the agent completes it (by implementing X or by documenting that X remains deferred), that completion must be recorded so the **next list generator** does not add the same "verify deferred X" task again unless the goal is to **implement** X or to re-verify after major changes.
 
 | Feature | Status | Last list/date | Rule for next list |
 |--------|--------|-----------------|--------------------|
-| **Full agentic building** (family agents fulfilling build orders) | Deferred; SO activation observable | Sixtieth list (2026-03-09): List 60 T1–T7 completed — Path 1 (hw.PlaceWall, hw.CompleteBuildOrder, hw.SimulateBuildOrderActivation) works; Path 2 (full agent) requires State Tree BUILD branch per AGENTIC_BUILDING Step 3 (manual; no Python/MCP API — same as Gap 2). AUTOMATION_GAPS List 60 T7 cycle note. | Do **not** add another "verify or document agentic building" task unless the goal is to **implement** full flow (DAY10 Option B) or to re-verify after code changes. |
-| **Death-to-spirit** (ReportDeathAndAddSpirit, hw.ReportDeath) | Implemented; verifiable in PIE | Eleventh list (2026-03-05); console `hw.ReportDeath`; pie_test_runner check_report_death. | Do **not** add "verify death-to-spirit" again unless re-verifying after changes. Prefer "implement" or other deferred items. |
+| **Full agentic building** (family agents fulfilling build orders) | Deferred; SO activation observable | Sixtieth list (2026-03-09): Path 1 works; Path 2 requires State Tree BUILD (manual; no Python/MCP API). **List 69 T3 (2026-03-08):** Post–100% MVP one-liner added in §2 — Path 2 not required for asset-ready. | Do **not** add another "verify or document agentic building" task unless the goal is to **implement** full flow (DAY10 Option B) or to re-verify after code changes. |
+| **Death-to-spirit** (ReportDeathAndAddSpirit, hw.ReportDeath) | Implemented; verifiable in PIE | Seventieth list (2026-03-09) T5: added **hw.Spirits** (list roster count and IDs); console `hw.ReportDeath` then `hw.Spirits`; pie_test_runner check_report_death. | Do **not** add "verify death-to-spirit" again unless re-verifying after changes. Prefer "implement" or other deferred items. |
 | **SaveGame persistence** (hw.Save / hw.Load across PIE restart) | Implemented; verification in lists | DAY15 §4; verified in several lists. | Add "verify SaveGame across restart" only if re-verification is needed (e.g. after SaveGame code changes). |
 | **Boss reward** (hw.GrantBossReward) | Implemented; verifiable | Documented; verified in second list. | Same as above; don't re-add verify unless implementing new behavior or re-verifying. |
 | **Astral return on death** (night combat: return to body, wake at dawn) | Designed; implementation deferred | Thirteenth list (2026-03-05); [ASTRAL_DEATH_AND_DAY_SAFETY.md](../tasks/ASTRAL_DEATH_AND_DAY_SAFETY.md). | Do **not** add "verify or document astral return" again unless the goal is to **implement** (OnAstralDeath → advance to dawn, respawn in bed). |
 | **Astral-by-day** (enter the astral during the day) | Late-game progression unlock; not in MVP | Thirteenth list (2026-03-05); [NEXT_30_DAY_WINDOW.md](NEXT_30_DAY_WINDOW.md), [PROTOTYPE_SCOPE.md](PROTOTYPE_SCOPE.md) § Day/night and astral, [VISION.md](VISION.md). | Do **not** treat as MVP. Add only if implementing the progression unlock (post–vertical slice). |
-| **Bed or wake-up trigger** (MVP tutorial List 2; go-to-bed List 8) | Deferred; optional for List 2 and List 8 | Forty-first list (List 2); forty-seventh list (2026-03-07): List 8 scope documents bed actor optional — **hw.GoToBed** or **hw.TimeOfDay.Phase 2** sufficient for step 8 verification; bed can be added later (e.g. reuse List 2 placeholder). | Do **not** add "verify or add bed placeholder" again unless implementing; List 3 (breakfast) and List 8 (go to bed) verification use console. |
+| **Bed or wake-up trigger** (MVP tutorial List 2; go-to-bed List 8) | **Implemented** (List 70) | Seventieth list (2026-03-09): In-world bed **BP_Bed** (create_bp_bed.py, place_bed.py); interact (E) or overlap (HomeWorldGoToBedTriggerComponent) triggers go-to-bed (Phase → Night) or wake (Night → Dawn). CONSOLE_COMMANDS § Tutorial (List 8)/(List 10) and VERTICAL_SLICE_CHECKLIST §3. | Do **not** add "verify or add bed" again unless re-verifying; use **place_bed.py** with DemoMap open to place bed. |
 
 **When an agent completes a "deferred" task:** (1) Set that task's **status** to `completed` in CURRENT_TASK_LIST. (2) Update the task doc (e.g. DAY10_AGENTIC_BUILDING, DAY15_ROLE_PERSISTENCE) or SESSION_LOG with the outcome (implemented vs still deferred). (3) If the outcome is "still deferred," add or update the row above (or the **Last list/date** cell) so the next list generator knows this verification was just done. **When generating the next list:** Read this table and ACCOMPLISHMENTS_OVERVIEW §4; do not add a task that only "verify or document" the same deferred feature again unless the intent is to implement or to re-verify after major changes.
 
@@ -89,23 +93,23 @@ Use this list as the source of "what to do next." Each item has a **goal**, **su
 
 | Id | One-line summary | See CURRENT_TASK_LIST for status and order |
 |----|-------------------|-------------------------------------------|
-| T1 | Packaged build run or smoke-test | pending |
-| T2 | Demo sign-off (vertical slice) | pending |
-| T3 | MVP full-scope verification | pending |
-| T4 | CONSOLE_COMMANDS and checklist refresh (List 64) | pending |
-| T5 | MVP full scope List 64 — vertical slice §4 sixty-fourth deliverables | pending |
-| T6 | AUTOMATION_GAPS or KNOWN_ERRORS — List 64 findings | pending |
-| T7 | Buffer prep (post–List 64) | pending |
+| T1 | Vertical slice lock (moment + corner) | pending |
+| T2 | Pre-demo checklist run (all items) | pending |
+| T3 | Demo sign-off or recording (optional 1–3 min) | pending |
+| T4 | CONSOLE_COMMANDS and checklist refresh (post–List 64) | pending |
+| T5 | Vertical slice §4 sixty-fifth deliverables | pending |
+| T6 | AUTOMATION_GAPS or KNOWN_ERRORS — sixty-fifth list findings | pending |
+| T7 | Buffer prep (next list: Preparing assets, Steam Demo, or Deferred) | pending |
 | T8 | Docs and cycle (combined) | pending |
 | T9 | Verification (combined) | pending |
 | T10 | Buffer: next list prep (ACCOMPLISHMENTS + PROJECT_STATE §4) | pending |
 
 ---
 
-## 4. Current list (sixty-fourth 10-task list — MVP full scope List 64)
+## 4. Current list (seventieth 10-task list — Deferred features)
 
-- The **sixty-fourth 10-task list** is **in progress**. **Focus:** List 64 per [MVP_FULL_SCOPE_10_LISTS.md](MVP_FULL_SCOPE_10_LISTS.md): Packaged build smoke-test; demo sign-off; MVP full-scope verification and buffer. See [CURRENT_TASK_LIST.md](CURRENT_TASK_LIST.md).
-- **Next step:** Run agents on CURRENT_TASK_LIST (T1 first pending). After List 64, MVP full scope (10 lists) complete; next lists per VISION and [NEXT_30_DAY_WINDOW.md](NEXT_30_DAY_WINDOW.md).
+- The **seventieth 10-task list** is **complete**. All T1–T10 completed (pre-demo verification entry point §3/CONSOLE_COMMANDS; SaveGame polish, boss reward, bed actor, spirit roster visibility; vertical slice §4 seventieth, deferred-phase doc, docs and cycle, verification, buffer). See [CURRENT_TASK_LIST.md](CURRENT_TASK_LIST.md).
+- **Next (after list 70):** Generate next list per [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md) (**Preparing assets**, **Steam Demo prep**, or add assets per [NEXT_30_DAY_WINDOW.md](NEXT_30_DAY_WINDOW.md)); run `.\Tools\Start-AllAgents-InNewWindow.ps1` when ready. Act 2 prep is not in current scope.
 - **Cycle doc freshness and next priority:** See [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) (top) and [ACCOMPLISHMENTS_OVERVIEW.md](ACCOMPLISHMENTS_OVERVIEW.md) §4.
 
 ---
