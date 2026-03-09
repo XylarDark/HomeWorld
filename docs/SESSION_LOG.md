@@ -8594,3 +8594,12 @@ Agent session summaries for cross-session context persistence.
 - T6 (seventy-first list): (1) Added **Phased execution** line to [NEXT_30_DAY_WINDOW.md](workflow/NEXT_30_DAY_WINDOW.md) pointing to [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](workflow/ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md) for the step-by-step plan (Phase 1: workflow, Phase 2: image-to-3D deferred, Phase 3+: packaged build, store draft). (2) Confirmed [ASSET_WORKFLOW_AND_STEAM_DEMO.md](../ASSET_WORKFLOW_AND_STEAM_DEMO.md) already references the phased approach in its intro. (3) Added **Phase 1 gate outcome (List 71)** to Phase 1 in [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](workflow/ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md): "Phase 1 gate met: workflow §1 complete and paths aligned; automation vs manual documented; ensure_* pattern referenced. (T1–T3 complete.)" Set T6 **status** to **completed** in CURRENT_TASK_LIST.md only.
 
 **Success criteria met:** NEXT_30_DAY_WINDOW and ASSET_WORKFLOW_AND_STEAM_DEMO reference the phased approach; Phase 1 section has gate-outcome note. First pending task is now T7 (Phase 1 gate — document completion).
+
+---
+
+## 2026-03-09 T7: Phase 1 gate — document completion — seventy-first list
+
+**Tasks completed:**
+- T7 (seventy-first list): Confirmed Phase 1 steps 1.1 and 1.2 complete (workflow §1 current, automation vs manual listed). Updated [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](workflow/ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md) Phase 1 section with one-line **Phase 1 gate — List 71** outcome: workflow §1 complete and paths aligned; automation vs manual documented; ensure_* pattern referenced; CONTENT_LAYOUT and CONVENTIONS aligned; entry point and phased doc link in place; T1–T6 complete; no steps deferred. Set T7 status to **completed** in CURRENT_TASK_LIST.md.
+
+**Success criteria met:** Phase 1 gate outcome recorded in phased approach doc and SESSION_LOG. First pending task is now T8 (Docs and cycle).

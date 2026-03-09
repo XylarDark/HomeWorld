@@ -20,7 +20,7 @@
 
 **Phase 1 gate:** Steps 1.1 and 1.2 done; workflow doc is the single entry point for "how we add assets." Optional 1.3 if it unblocks future work.
 
-**Phase 1 gate outcome (List 71):** Phase 1 gate met: workflow §1 complete and paths aligned; automation vs manual documented; ensure_* pattern referenced. (T1–T3 complete.)
+**Phase 1 gate — List 71:** Phase 1 gate met: workflow §1 complete and paths aligned; automation vs manual documented; ensure_* pattern referenced; CONTENT_LAYOUT and CONVENTIONS aligned; entry point and phased doc link in place. List 71 T1–T6 complete; no steps deferred.
 
 ---
 

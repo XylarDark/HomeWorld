@@ -76,7 +76,7 @@
 - **success criteria:** Phase 1 gate outcome recorded in phased approach doc (and optionally SESSION_LOG); T7 status set to completed.
 - **research_notes:** [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md) Phase 1 gate; [SESSION_LOG.md](../SESSION_LOG.md).
 - **steps_or_doc:** docs/workflow/ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md; docs/SESSION_LOG.md.
-- **status:** pending
+- **status:** completed
 
 ---
 
