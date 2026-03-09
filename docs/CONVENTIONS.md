@@ -84,3 +84,9 @@ Per [VISION](workflow/VISION.md) **Day and night: physical and spiritual worlds*
 - **Physical goods:** Materials, food, and supplies collected **by day** (harvest, resource piles, yield nodes). Stored in `UHomeWorldInventorySubsystem` (resource types and counts). Day harvest → physical; use `hw.Goods` or harvest in PIE to see physical total.
 - **Spiritual (artefacts/power):** Collected **at night** (Phase 2) via overlap on spiritual collectibles or night-only interactions. Stored in `AHomeWorldPlayerState::SpiritualPowerCollected`. Night collect → spiritual; use `hw.Goods` or `hw.SpiritualPower` to see spiritual total.
 - **Rule:** One counter per realm: physical = inventory total (sum of all resource amounts); spiritual = `GetSpiritualPowerCollected()`. Both observable in PIE via console command `hw.Goods`.
+
+---
+
+## Asset paths and import convention
+
+All new project content lives under **`/Game/HomeWorld/`** or a documented subfolder (Maps, Characters, GameMode, PCG, Mass, AI, Building, Milady, Homestead, UI, etc.). Do not create ad-hoc top-level Content folders without updating the path list. **Version control:** Track `.uasset` and `.umap` with **Git LFS**. The single source of truth for all project content paths and the script index is **[CONTENT_LAYOUT.md](CONTENT_LAYOUT.md)**; use it when choosing where to place or import assets and when writing automation that references Content paths.
