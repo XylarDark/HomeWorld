@@ -4,6 +4,8 @@
 
 **Source:** Vision update (2026-03-06). See [workflow/VISION.md](workflow/VISION.md) for campaign and sin/virtue context; [PLANETOID_DESIGN.md](PLANETOID_DESIGN.md) for proc-gen philosophy.
 
+**Pride (first MVP planetoid):** Pride’s **biome focus** is **canyons, valleys, mountains, and large spires** (vertical, dramatic terrain). The **Canyon** biome in this doc (rocks, crystals, mine/cavern) is the primary harvestable/dungeon fit; Pride’s surface character is canyon–valley–mountain–spire overall. See [PLANETOID_PRIDE_MVP.md](PLANETOID_PRIDE_MVP.md) for vision and implementation research.
+
 ---
 
 ## 1. Resource node types

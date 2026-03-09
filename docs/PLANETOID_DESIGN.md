@@ -13,6 +13,7 @@ Planetoid and procedural-generation philosophy for the 7 sin-themed levels. **In
 
 **2. Surface + optional layers**
 
+- **Pride (first MVP planetoid):** Biome focus = **canyons, valleys, mountains, large spires**. Surface area TBD; use Astroneer-like (medium) scale as reference. See [PLANETOID_PRIDE_MVP.md](PLANETOID_PRIDE_MVP.md) for vision and implementation research.
 - **Surface:** Primary play area (PCG-on-Landscape or equivalent). Define at least one named surface biome per planetoid (e.g. Pride_Highlands, Greed_Mines).
 - **Layers:** Optional subsurface/cave or “second layer” regions with different placement rules and density (e.g. Pride_Depths, Greed_Caverns). Can be separate PCG graphs or sublevels that stream in.
 
@@ -35,9 +36,23 @@ Planetoid and procedural-generation philosophy for the 7 sin-themed levels. **In
 
 ---
 
+## Post-MVP: Chunk/biome loading and progression (vision)
+
+**Not MVP.** Per [workflow/VISION.md](workflow/VISION.md) § Campaign summary (Planetoid structure and progression):
+
+- **Chunk shape and biomes:** A shape/method will be used to create **chunks that load as biomes**, so different sections of a planetoid can host different content (desert, forest, marsh, canyon, etc.) and stream or load independently.
+- **Destroyable vs persistent:** **Only harvestables** (trees, rocks, flowers/herbs, etc.) are destroyable; all other world content is persistent.
+- **Below ground = dungeon:** Anything **below ground** (subsurface) is a **portal to a dungeon map** — entering leads to a separate dungeon level.
+- **Progression:** Conquering the planetoid and each biome **unlocks items**. Those items are used **at the spaceship (back home)** to **choose which biomes appear on the next planetoid**. This loop runs throughout the game.
+
+Implementation of chunking, biome loading, and spaceship biome-selection is post-MVP.
+
+---
+
 ## References
 
 - **Campaign:** The 7 levels and their sin themes are defined in [workflow/VISION.md](workflow/VISION.md).
+- **Pride (first MVP):** [PLANETOID_PRIDE_MVP.md](PLANETOID_PRIDE_MVP.md) — canyons, valleys, mountains, large spires; Astroneer-like scale; UE5 implementation approach.
 - **Biomes and resources:** Four biomes, resource node types, and corrupted/neutral/positive alignment are in [PLANETOID_BIOMES.md](PLANETOID_BIOMES.md).
 - **Tech:** PCG and World Partition are in [STACK_PLAN.md](STACK_PLAN.md) (Layer 2 – World and Procedural Content).
 - **Astroneer modding (Procedural Generation):** [astroneermodding.readthedocs.io](https://astroneermodding.readthedocs.io/en/latest/guides/proceduralGeneration.html) (Procedural Placement, Procedural Modifier, biome/layer metadata, per-planet models).
