@@ -45,6 +45,8 @@
 
 ## Phase 4: 2D PNG to 3D Model Conversion (Meshy.ai)
 
+**Image-to-3D research and deferred pass:** See [ASSET_WORKFLOW_AND_STEAM_DEMO.md](../ASSET_WORKFLOW_AND_STEAM_DEMO.md) §2 for tools (Meshy, Tripo/TripoSR, Luma) and when to defer full pipeline; manual upload → GLB → VRM4U is a valid short-term path.
+
 | # | Task | Type | Dependencies | Effort | Description | Perf |
 |---|------|------|--------------|--------|-------------|------|
 | 4.1 | Meshy API key and plugin config | **Manual** | 1.2 | Low (1–2h) | In Editor (or plugin settings): set Meshy API key. Prefer env var or encrypted config; document in MILADY_IMPORT_SETUP. Confirm plugin can call "image to 3D" (GLB/VRM output). | — |
