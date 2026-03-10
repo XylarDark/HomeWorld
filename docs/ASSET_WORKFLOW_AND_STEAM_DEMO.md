@@ -2,11 +2,11 @@
 
 **Purpose:** Define a good workflow and tools for asset generation; research **image-to-3D** (e.g. scan a Milady image → 3D copy) with a deferred pass if not realistic short-term; and align next work with the **MVP deliverable**: **marketing-ready** slice with **assets and visuals mandatory** for good-looking marketing material. **Launching on Steam is not required for MVP** — Steam store and packaged build for distribution are post-MVP when we choose to ship.
 
-**Assets and visuals are mandatory for MVP** so we can produce screenshots, capsule art, and trailer material. Current focus: preparing assets and visual quality — **Act 2 prep is not in scope** (see [workflow/NEXT_30_DAY_WINDOW.md](workflow/NEXT_30_DAY_WINDOW.md)).
+**Assets and visuals are mandatory for MVP** so we can produce screenshots, capsule art, and trailer material. Current focus: preparing assets and visual quality — **Act 2 prep is not in scope** (see [VisionBoard/NEXT_30_DAY_WINDOW.md](../VisionBoard/NEXT_30_DAY_WINDOW.md)).
 
-**Phased execution:** For a step-by-step plan, see **[workflow/ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](workflow/ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md)** (Phase 1: workflow, Phase 2: image-to-3D deferred; Phase 3–4 packaged build/store draft are optional for MVP).
+**Phased execution:** For a step-by-step plan, see **[VisionBoard/ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](../VisionBoard/ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md)** (Phase 1: workflow, Phase 2: image-to-3D deferred; Phase 3–4 packaged build/store draft are optional for MVP).
 
-**See also:** [tasks/MILADY_IMPORT_ROADMAP.md](tasks/MILADY_IMPORT_ROADMAP.md) (full Milady pipeline), [workflow/STEAM_EA_STORE_CHECKLIST.md](workflow/STEAM_EA_STORE_CHECKLIST.md) (for when we launch on Steam — not required for MVP).
+**See also:** [TaskLists/TaskSpecs/MILADY_IMPORT_ROADMAP.md](../TaskLists/TaskSpecs/MILADY_IMPORT_ROADMAP.md) (full Milady pipeline), [workflow/STEAM_EA_STORE_CHECKLIST.md](workflow/STEAM_EA_STORE_CHECKLIST.md) (for when we launch on Steam — not required for MVP).
 
 ---
 
@@ -82,9 +82,9 @@ Per [automation-standards](.cursor/rules/automation-standards.mdc): steps we can
 
 ## 2. Image-to-3D (Milady): vision and research
 
-**Phased context:** This section aligns with **Phase 2** of [workflow/ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](workflow/ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md) (image-to-3D deferred pass). **Phase 2 gate — List 72:** Met: image-to-3D deferred; resume path documented.
+**Phased context:** This section aligns with **Phase 2** of [VisionBoard/ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](../VisionBoard/ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md) (image-to-3D deferred pass). **Phase 2 gate — List 72:** Met: image-to-3D deferred; resume path documented.
 
-**Cross-links:** Full Milady pipeline and Phase 4 (2D PNG → 3D): [tasks/MILADY_IMPORT_ROADMAP.md](tasks/MILADY_IMPORT_ROADMAP.md) Phase 4.
+**Cross-links:** Full Milady pipeline and Phase 4 (2D PNG → 3D): [TaskLists/TaskSpecs/MILADY_IMPORT_ROADMAP.md](../TaskLists/TaskSpecs/MILADY_IMPORT_ROADMAP.md) Phase 4.
 
 ### Vision
 
@@ -92,7 +92,7 @@ Per [automation-standards](.cursor/rules/automation-standards.mdc): steps we can
 
 ### Current project state
 
-- **[MILADY_IMPORT_ROADMAP.md](tasks/MILADY_IMPORT_ROADMAP.md)** Phase 4: **Meshy** is the intended path (PNG → Meshy image-to-3D → GLB/VRM → VRM4U import). Phase 4.2 is “Call Meshy image-to-3D from UE” (high effort, 1+ day).
+- **[MILADY_IMPORT_ROADMAP.md](../TaskLists/TaskSpecs/MILADY_IMPORT_ROADMAP.md)** Phase 4: **Meshy** is the intended path (PNG → Meshy image-to-3D → GLB/VRM → VRM4U import). Phase 4.2 is “Call Meshy image-to-3D from UE” (high effort, 1+ day).
 - **Meshy-for-Unreal** plugin (if installed) and Meshy API key are one-time setup; see [MILADY_IMPORT_SETUP.md](MILADY_IMPORT_SETUP.md).
 
 ### Research: image-to-3D tools (single image → 3D)
@@ -112,7 +112,7 @@ Per [automation-standards](.cursor/rules/automation-standards.mdc): steps we can
 
 If we **defer** full “scan Milady image → 3D in-game” this cycle:
 
-1. **Document** in this file and in [MILADY_IMPORT_ROADMAP.md](tasks/MILADY_IMPORT_ROADMAP.md): “Image-to-3D (Milady) — feasible via Meshy or Tripo; deferred to post–Steam Demo (or next asset sprint).”
+1. **Document** in this file and in [MILADY_IMPORT_ROADMAP.md](../TaskLists/TaskSpecs/MILADY_IMPORT_ROADMAP.md): “Image-to-3D (Milady) — feasible via Meshy or Tripo; deferred to post–Steam Demo (or next asset sprint).”
 2. **Short-term option:** Manual path: export one Milady PNG → upload to Meshy (or Tripo) → download GLB → import in UE with VRM4U; use as placeholder or reference. No automation required for demo.
 3. **When resuming:** See [When resuming the image-to-3D pipeline](#when-resuming-the-image-to-3d-pipeline-phase-2-step-23) below.
 
@@ -122,7 +122,7 @@ If we **defer** full “scan Milady image → 3D in-game” this cycle:
 
 **What to implement:**
 
-- **Option A — Meshy from UE:** Follow [MILADY_IMPORT_ROADMAP.md](tasks/MILADY_IMPORT_ROADMAP.md) Phase 4: 4.1 (API key and plugin config), 4.2 (Call Meshy image-to-3D from UE — upload PNG, poll/callback, download GLB/VRM), 4.3 (save output to project path). Wire `UHomeWorldMiladyImportSubsystem` (or equivalent) so that after PNG is fetched, the Meshy plugin is invoked; on completion, save to e.g. `Content/HomeWorld/Milady/Generated/<tokenId>.glb` and trigger VRM4U import.
+- **Option A — Meshy from UE:** Follow [MILADY_IMPORT_ROADMAP.md](../TaskLists/TaskSpecs/MILADY_IMPORT_ROADMAP.md) Phase 4: 4.1 (API key and plugin config), 4.2 (Call Meshy image-to-3D from UE — upload PNG, poll/callback, download GLB/VRM), 4.3 (save output to project path). Wire `UHomeWorldMiladyImportSubsystem` (or equivalent) so that after PNG is fetched, the Meshy plugin is invoked; on completion, save to e.g. `Content/HomeWorld/Milady/Generated/<tokenId>.glb` and trigger VRM4U import.
 - **Option B — Tripo / TripoSR path:** Add Tripo or TripoSR integration (plugins exist for Unreal/Blender/ComfyUI): same flow — pass PNG → request 3D → poll or callback → download GLB → VRM4U import. Document chosen plugin and any API keys in [MILADY_IMPORT_SETUP.md](MILADY_IMPORT_SETUP.md).
 
 **Where to document "variables with no access":**
@@ -131,7 +131,7 @@ If we **defer** full “scan Milady image → 3D in-game” this cycle:
 - **Alternatively or in addition:** [MILADY_IMPORT_SETUP.md](MILADY_IMPORT_SETUP.md) (Known issues and plugin order) or [KNOWN_ERRORS.md](KNOWN_ERRORS.md) for one-off or engine-specific items.
 - **New gaps:** Log to [AUTOMATION_GAPS.md](AUTOMATION_GAPS.md) with date, feature, what is needed, why automation didn't cover it, and suggested approach.
 
-**References:** [workflow/ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](workflow/ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md) Phase 2 step 2.3; [MILADY_IMPORT_ROADMAP.md](tasks/MILADY_IMPORT_ROADMAP.md) Phase 4.
+**References:** [VisionBoard/ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](../VisionBoard/ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md) Phase 2 step 2.3; [MILADY_IMPORT_ROADMAP.md](../TaskLists/TaskSpecs/MILADY_IMPORT_ROADMAP.md) Phase 4.
 
 ### Phase 2 step 2.2 — optional manual run (List 72)
 
@@ -159,7 +159,7 @@ If we **defer** full “scan Milady image → 3D in-game” this cycle:
 
 ### Task list linkage
 
-When generating the next 10-task list, **MVP priority = assets and visuals** (marketing-ready). Packaged build and Steam store tasks are optional for MVP; add them when we are preparing to ship. See [workflow/NEXT_30_DAY_WINDOW.md](workflow/NEXT_30_DAY_WINDOW.md).
+When generating the next 10-task list, **MVP priority = assets and visuals** (marketing-ready). Packaged build and Steam store tasks are optional for MVP; add them when we are preparing to ship. See [VisionBoard/NEXT_30_DAY_WINDOW.md](../VisionBoard/NEXT_30_DAY_WINDOW.md).
 
 ---
 
