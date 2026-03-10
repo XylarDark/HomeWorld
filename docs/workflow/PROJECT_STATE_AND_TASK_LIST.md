@@ -2,7 +2,7 @@
 
 **Purpose:** Single overview of the state of the project and **work not yet completed**, codified as a task list to work from. Update this file when major milestones or the task list change.
 
-**Last updated:** 2026-03-02 (seventieth list — Deferred features).
+**Last updated:** 2026-03-09 (seventy-third list complete — Phase 3 Steam Demo packaged build + smoke test).
 
 ---
 
@@ -106,10 +106,10 @@ Use this list as the source of "what to do next." Each item has a **goal**, **su
 
 ---
 
-## 4. Current list (seventieth 10-task list — Deferred features)
+## 4. Current list (seventy-third 10-task list — Phase 3 Steam Demo packaged build + smoke test)
 
-- The **seventieth 10-task list** is **complete**. All T1–T10 completed (pre-demo verification entry point §3/CONSOLE_COMMANDS; SaveGame polish, boss reward, bed actor, spirit roster visibility; vertical slice §4 seventieth, deferred-phase doc, docs and cycle, verification, buffer). See [CURRENT_TASK_LIST.md](CURRENT_TASK_LIST.md).
-- **Next (after list 70):** Generate next list per [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md) (**Preparing assets**, **Steam Demo prep**, or add assets per [NEXT_30_DAY_WINDOW.md](NEXT_30_DAY_WINDOW.md)); run `.\Tools\Start-AllAgents-InNewWindow.ps1` when ready. Act 2 prep is not in current scope.
+- The **seventy-third 10-task list** is **complete**. Phase 3 (Steam Demo packaged build + smoke test): T1–T10 in [CURRENT_TASK_LIST.md](CURRENT_TASK_LIST.md) all completed (packaged build run, smoke test or deferred, Phase 3 gate, vertical slice §4, docs and cycle, verification, buffer).
+- **Next (after list 73):** Phase 4 (Steam Demo store draft) per [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md). Generate next list per [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md); run `.\Tools\Start-AllAgents-InNewWindow.ps1` when ready.
 - **Cycle doc freshness and next priority:** See [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) (top) and [ACCOMPLISHMENTS_OVERVIEW.md](ACCOMPLISHMENTS_OVERVIEW.md) §4.
 
 ---

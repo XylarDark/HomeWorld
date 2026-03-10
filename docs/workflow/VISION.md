@@ -29,9 +29,12 @@ Single source for project theme, campaign narrative, moral system, and scope. In
 
 **By end of 30 days:** Choose **one moment** (e.g. claiming the homestead after the first boss, or first family member rescued) and **one beautiful corner** (e.g. homestead compound) to polish for a showable vertical slice and/or short demo video.
 
-**MVP full scope (Vision-aligned):** Everything in this Vision that applies to the prototype and MVP is to be developed for the MVP. In addition to the MVP tutorial loop, Week 1 playtest gate, and vertical slice (one moment + one corner), the **MVP includes**:
+**MVP deliverable (what “done” means):** The MVP is **done** when we have a **marketing-ready** slice: one playable loop, one moment, one beautiful corner, and **good-looking marketing material** (screenshots, key art, capsule, short video). **Launching on Steam is not required for the MVP deliverable** — Steam store and distribution are post-MVP when we choose to ship. **Assets and visuals are mandatory** for the MVP so we can produce that marketing material; the asset pipeline and visual quality are required, not optional.
 
-- **Packaged build** — Ship-ready packaged build (run or smoke-test) for demo/distribution.
+**MVP full scope (Vision-aligned):** Everything in this Vision that applies to the prototype and MVP is to be developed for the MVP. In addition to the MVP tutorial loop, Week 1 playtest gate, vertical slice (one moment + one corner), and **assets/visuals for marketing**, the **MVP includes**:
+
+- **Assets and visuals (mandatory)** — Quality assets and visuals sufficient for good-looking marketing material (screenshots, capsule, trailer). Asset workflow and visual polish are part of MVP scope.
+- **Packaged build (optional for MVP deliverable)** — Useful for recording and distribution; not required to “complete” MVP. Steam launch is post-MVP.
 - **Main menu (WBP_MainMenu)** — Main menu with Play, Character, Options, Quit; first-launch flow into game.
 - **Full agentic building** — Family agents fulfilling build orders (State Tree/Blueprint flow; not console-only).
 - **Astral-by-day** — Ability to enter the astral during the day (progression unlock or stub) as part of MVP scope.
@@ -61,7 +64,11 @@ All other systems and content described in this Vision that touch the opening, t
 
 **The 7 levels:** Each level is a themed planetoid aligned with one of the Seven Deadly Sins (Pride, Greed, Wrath, Envy, Gluttony, Lust, Sloth). Levels, factions, and encounters are shaped by that sin and its virtue counterpart. Planetoid generation is distinct per level, surface + layers, per-level PCG; Astroneer-inspired, non-deformable. **Pride** is the **first MVP planetoid**, with a **biome focus on canyons, valleys, mountains, and large spires**; surface area is Astroneer-like (medium) as starting reference. See [PLANETOID_DESIGN.md](../PLANETOID_DESIGN.md) and [PLANETOID_PRIDE_MVP.md](../PLANETOID_PRIDE_MVP.md) for details.
 
-**Planetoid and homestead:** When you arrive on a planetoid, **your homestead lands and appears on the planetoid**; that becomes your base there. You **venture out** from the homestead to explore, defend, and convert. **When you complete a planetoid** (clear its challenges, convert its foes, meet the goal for that level), you **move on to another planetoid** — the homestead lifts and travels to the next.
+**MVP scope (planetoid):** The **entire MVP** is the user **completing day/night cycles while they explore the planetoid**. Core loop: day/night cycles, exploration of the spherical planetoid segmented into biomes, harvest places, monster camps, dungeon camp, and side quest givers; homestead on a plateau at the top of a mountain with the ability to glide down to the ground.
+
+**Planetoid shape and biomes:** The **map shape is a sphere**. The **entire area of the planetoid** is **segmented into biomes** (desert, forest, marsh, canyon). Each biome has: a **place to harvest**, a **couple of monster camps**, **one camp outside a dungeon**, and a **side quest giver**. See [PLANETOID_DESIGN.md](../PLANETOID_DESIGN.md) and [PLANETOID_BIOMES.md](../PLANETOID_BIOMES.md).
+
+**Homestead and glide:** The **homestead starts on a plateau at the top of a mountain**. From there the player can **glide down** to the ground to explore the planetoid. When you arrive on a planetoid, the homestead is that plateau base; you venture out (including gliding down) to explore, harvest, defend, and convert. **When you complete a planetoid** (clear its challenges, convert its foes, meet the goal for that level), you **move on to another planetoid** — the homestead lifts and travels to the next.
 
 **Planetoid biomes and resources:** Planetoids use **four biomes** at the start: **desert, forest, marsh, canyon**. Each biome has its own **harvestable** (trees, flowers/herbs, rocks, water, spirits), **monster type**, and **dungeon type**. Each biome can appear in three **alignments**: **corrupted** (where you fight), **neutral** (where you harvest), and **positive** (where you empower yourself). Resource nodes include trees, flowers/herbs, rocks, water, and spirits. See [PLANETOID_BIOMES.md](../PLANETOID_BIOMES.md) for the full design.
 

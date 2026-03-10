@@ -4,6 +4,28 @@ Planetoid and procedural-generation philosophy for the 7 sin-themed levels. **In
 
 ---
 
+## Map shape and biome segmentation
+
+- **Shape:** The planetoid **map shape is a sphere**. The playable surface is the sphere’s exterior; orientation and streaming follow the spherical layout (e.g. “align to planet up” for gravity and placement).
+- **Biome segmentation:** The **entire area of the planetoid** is **divided into biomes**. We have the biomes we want (desert, forest, marsh, canyon; see [PLANETOID_BIOMES.md](PLANETOID_BIOMES.md)); each region of the sphere’s surface is assigned to one of these biomes so the player explores distinct harvest, combat, and dungeon content per biome.
+
+---
+
+## Per-biome structure (content per biome)
+
+Each biome on the planetoid contains a **consistent set of content** so exploration and day/night loops have clear goals:
+
+| Content | Description |
+|--------|-------------|
+| **Harvest place** | A dedicated area (or areas) in the biome where the player can gather that biome’s harvestables (trees, herbs, rocks, water, spirits per [PLANETOID_BIOMES.md](PLANETOID_BIOMES.md)). |
+| **Monster camps** | A **couple of camps of monsters** (corrupted, per-biome type) for combat and conversion. |
+| **Dungeon camp** | **One camp outside a dungeon** — a monster camp positioned at or near the dungeon entrance for that biome. |
+| **Side quest giver** | A **side quest giver** in the biome so the player can pick up and complete side quests while exploring. |
+
+Placement (PCG, scripts, or hand-authored) should ensure every biome has these four elements. Implementation is task-list driven.
+
+---
+
 ## Principles
 
 **1. One identity per planetoid**
@@ -20,7 +42,7 @@ Planetoid and procedural-generation philosophy for the 7 sin-themed levels. **In
 **3. Placement philosophy**
 
 - **Radius / density:** Control how close or far props, foliage, and points of interest spawn (similar to Astroneer’s Radius and Max Projection Distance).
-- **Orientation:** If planetoids remain flat (current World Partition + Landscape), “surface up” is world Z; if spherical planetoids are added later, adopt “align to planet up” so objects and PCG align to the local surface normal.
+- **Orientation:** The map shape is a **sphere**; adopt “align to planet up” so objects and PCG align to the local surface normal. (If a flat World Partition + Landscape is used for a first implementation, treat it as a stand-in for the spherical layout.)
 - **Per-planetoid graphs:** Each sin-themed level has its own PCG graph(s) or graph parameters (like Astroneer’s per-planet modifiers), rather than one global graph for all levels.
 
 **4. Thematic consistency**
@@ -49,10 +71,17 @@ Implementation of chunking, biome loading, and spaceship biome-selection is post
 
 ---
 
+## World builder and planetoid-to-reality
+
+For a single checklist of what it takes to make the planetoid map real, how much is in-Editor vs automated, and a **single script** that assembles level/portal/PCG so you can then craft in-world, see [PLANETOID_TO_REALITY_AND_WORLD_BUILDER.md](PLANETOID_TO_REALITY_AND_WORLD_BUILDER.md). For the **world-builder** plan and **planetoid modifier** config schema (player customization of next planetoid via biomes), see [WORLD_BUILDER_AND_MODIFIERS.md](WORLD_BUILDER_AND_MODIFIERS.md).
+
+---
+
 ## References
 
 - **Campaign:** The 7 levels and their sin themes are defined in [workflow/VISION.md](workflow/VISION.md).
 - **Pride (first MVP):** [PLANETOID_PRIDE_MVP.md](PLANETOID_PRIDE_MVP.md) — canyons, valleys, mountains, large spires; Astroneer-like scale; UE5 implementation approach.
 - **Biomes and resources:** Four biomes, resource node types, and corrupted/neutral/positive alignment are in [PLANETOID_BIOMES.md](PLANETOID_BIOMES.md).
 - **Tech:** PCG and World Partition are in [STACK_PLAN.md](STACK_PLAN.md) (Layer 2 – World and Procedural Content).
+- **Planetoid to reality and world builder:** [PLANETOID_TO_REALITY_AND_WORLD_BUILDER.md](PLANETOID_TO_REALITY_AND_WORLD_BUILDER.md) — checklist, in-editor work, orchestrator script, world-builder and modifier tools. [WORLD_BUILDER_AND_MODIFIERS.md](WORLD_BUILDER_AND_MODIFIERS.md) — config schema for world-builder and player biome modifiers.
 - **Astroneer modding (Procedural Generation):** [astroneermodding.readthedocs.io](https://astroneermodding.readthedocs.io/en/latest/guides/proceduralGeneration.html) (Procedural Placement, Procedural Modifier, biome/layer metadata, per-planet models).

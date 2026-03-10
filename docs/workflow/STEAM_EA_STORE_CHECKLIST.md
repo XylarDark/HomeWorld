@@ -1,10 +1,12 @@
 # Steam Early Access — Store Page Checklist
 
+**Not required for MVP deliverable.** The MVP deliverable is **marketing-ready** (assets + visuals mandatory for good-looking screenshots, capsule, trailer). **Launching on Steam is not required to complete the MVP** — this checklist is for when we choose to ship or draft the store presence.
+
 **Purpose:** Checklist for preparing a Steam store page and depots for HomeWorld (PC, Steam Early Access). Use when ready to ship or draft the store presence. See [SETUP.md](../SETUP.md) for packaging; [VISION.md](VISION.md) and AGENTS.md for scope.
 
 ---
 
-## Current status (2026-03-05)
+## Current status (2026-03-09)
 
 - **Packaging script:** `Package-HomeWorld.bat` in project root; uses RunUAT BuildCookRun (Win64 Shipping); output `Saved\StagedBuilds`; log `Package-HomeWorld.log`. See [SETUP.md § Packaging](../SETUP.md#packaging-shipping-build).
 - **Packaged build run:** Not yet run this cycle. To run: close Unreal Editor, then from project root run `Package-HomeWorld.bat`; monitor `Package-HomeWorld.log` for completion (exit code 0 = success). RunUAT can take 30+ minutes.
@@ -33,6 +35,10 @@
 - **T1 (fifty-fourth list, 2026-03-08) completed:** Packaged build not run this list. Use **`.\Tools\Package-AfterClose.ps1`** when ready (close Unreal Editor and any HomeWorld game first). See § Packaged build retry when Stage failed (files in use) and [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) for Stage SafeCopyFile workaround.
 - **T2 (sixty-seventh list, 2026-03-08) completed:** Phase 2.2 packaged exe smoke-test **deferred** — no packaged exe at StagedBuilds path (Phase 2.1 did not produce exe this cycle). When Package-HomeWorld.log shows exit code 0, smoke-test from `Saved\StagedBuilds\HomeWorld\WindowsNoEditor\HomeWorld\Binaries\Win64\HomeWorld.exe` per § How to run packaged build step 5.
 - **T3 (sixty-seventh list — Phase 2 documentation):** Phase 2 outcome: 2.1 packaged build run (outcome in SESSION_LOG / KNOWN_ERRORS); 2.2 smoke-test deferred (no exe at StagedBuilds). Phase 2 gate met per [MVP_100_PHASED_APPROACH.md](MVP_100_PHASED_APPROACH.md). Next: Phase 3 (Demo sign-off) or fix Stage failures and re-run packaged build.
+- **T1 (seventy-third list — Phase 3 step 3.1, 2026-03-09) completed:** **Package-AfterClose.ps1 run.** No lock-holding processes; **Shipping build succeeded** (~49s). **Package-HomeWorld.bat** ran; **packaging failed with exit code 25** (see `Package-HomeWorld.log` in project root for details; if Stage failed with SafeCopyFile/files in use, see [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) and § Packaged build retry when Stage failed below). Packaged exe not produced; smoke test deferred. **Next steps:** Inspect `Package-HomeWorld.log` for exit 25 cause; if Stage/SafeCopyFile, close all processes and run `.\Tools\Package-AfterClose.ps1 -CleanStagedBuilds`; when log shows exit code 0, smoke-test from `Saved\StagedBuilds\HomeWorld\WindowsNoEditor\HomeWorld\Binaries\Win64\HomeWorld.exe`.
+- **T2 (seventy-third list — Phase 3 step 3.2, 2026-03-09) completed:** **Smoke test deferred** — no packaged exe at StagedBuilds path (T1 packaging failed exit 25). When `Package-HomeWorld.log` shows exit code 0, launch and verify from `Saved\StagedBuilds\HomeWorld\WindowsNoEditor\HomeWorld\Binaries\Win64\HomeWorld.exe` per § Packaged build (level loads, character moves, no critical errors).
+- **Seventy-third list (Phase 3) outcome:** T1: packaged build run via `Package-AfterClose.ps1`; **packaging failed (exit code 25)**; no exe produced. T2: **smoke test deferred** (no exe). **Next steps:** Inspect `Package-HomeWorld.log` for exit 25 cause; if Stage failed with SafeCopyFile/files in use, close all processes and run `.\Tools\Package-AfterClose.ps1 -CleanStagedBuilds` (see [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) and § Packaged build retry when Stage failed). When log shows exit code 0, smoke-test from `Saved\StagedBuilds\HomeWorld\WindowsNoEditor\HomeWorld\Binaries\Win64\HomeWorld.exe` and check off § Packaged build items below.
+- **T6 (seventy-third list, 2026-03-09) completed:** T1 packaging failed (exit 25). STEAM_EA_STORE_CHECKLIST § Current status and § Packaged build retry when Stage failed already reference [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) and the retry procedure. If exit 25 was Stage/SafeCopyFile (files in use), follow § Packaged build retry when Stage failed and KNOWN_ERRORS "Package-HomeWorld: Stage SafeCopyFile — files in use". No additional doc changes required.
 
 ---
 

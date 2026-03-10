@@ -1,0 +1,6 @@
+{
+  "_comment": "Optional: plateau spawn position for planetoid (Player Start). Used by place_homestead_spawn.py. Omit to use planetoid_map_config volume_center or defaults.",
+  "location_x": 0,
+  "location_y": 0,
+  "location_z": 500
+}

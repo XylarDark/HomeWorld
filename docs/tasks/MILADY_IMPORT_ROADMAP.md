@@ -45,7 +45,9 @@
 
 ## Phase 4: 2D PNG to 3D Model Conversion (Meshy.ai)
 
-**Image-to-3D research and deferred pass:** See [ASSET_WORKFLOW_AND_STEAM_DEMO.md](../ASSET_WORKFLOW_AND_STEAM_DEMO.md) §2 for tools (Meshy, Tripo/TripoSR, Luma) and when to defer full pipeline; manual upload → GLB → VRM4U is a valid short-term path.
+**Image-to-3D (Milady) — feasible via Meshy or Tripo; full pipeline deferred to post–Steam Demo (or next asset sprint). Manual path: PNG → Meshy/Tripo → GLB → VRM4U import.** See [ASSET_WORKFLOW_AND_STEAM_DEMO.md](../ASSET_WORKFLOW_AND_STEAM_DEMO.md) §2 for tools (Meshy, Tripo/TripoSR, Luma) and when to defer full pipeline; manual upload → GLB → VRM4U is a valid short-term path.
+
+**When resuming (Phase 2 step 2.3):** For a clear "when resuming" checklist (what to implement, where to document no-access), see [ASSET_WORKFLOW_AND_STEAM_DEMO.md](../ASSET_WORKFLOW_AND_STEAM_DEMO.md) §2 *When resuming the image-to-3D pipeline*. Implement Phase 4 (Meshy from UE) or add a Tripo/TripoSR path; document any variables or options automation cannot set in `docs/MILADY_VARIABLES_NO_ACCESS.md` (create when needed), [MILADY_IMPORT_SETUP.md](../MILADY_IMPORT_SETUP.md), or [KNOWN_ERRORS.md](../KNOWN_ERRORS.md).
 
 | # | Task | Type | Dependencies | Effort | Description | Perf |
 |---|------|------|--------------|--------|-------------|------|

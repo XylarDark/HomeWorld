@@ -120,6 +120,18 @@ For the **Week 1 playtest goal** (crash → scout → boss → claim home), see 
 
 **T8 (sixty-ninth list — docs and cycle):** Vertical slice §4 sixty-ninth deliverables confirmed (T6); [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) and this §3 reflect current state (List 69 MVP 100 Phase 4: 100% MVP asset-ready gate; MVP 100%; asset-ready; Path 2 deferred note). Entry point unchanged: CONSOLE_COMMANDS links §3 (run sequence) and the command reference. Cycle note in [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) and [AUTOMATION_GAPS.md](../AUTOMATION_GAPS.md). T8 status set to completed.
 
+**T8 (seventy-first list — docs and cycle):** Vertical slice §4 seventy-first deliverables added (Phase 1 Asset workflow: workflow §1, automation vs manual, CONTENT_LAYOUT/CONVENTIONS alignment); [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) and this §3 reflect current state (List 71 Phase 1 Asset workflow and tooling; no new verification steps). Entry point unchanged: CONSOLE_COMMANDS links §3 (run sequence) and the command reference. Cycle note in [KNOWN_ERRORS.md](../KNOWN_ERRORS.md). T8 status set to completed.
+
+**T8 (seventy-second list — docs and cycle):** Vertical slice §4 seventy-second deliverables confirmed (T5); [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) and this §3 reflect current state (List 72 Phase 2 Image-to-3D deferred: deferred pass, resume path, Phase 2 gate; no new verification steps). Entry point unchanged: CONSOLE_COMMANDS links §3 (run sequence) and the command reference. Cycle note in [KNOWN_ERRORS.md](../KNOWN_ERRORS.md). T8 status set to completed.
+
+**T8 (seventy-third list — docs and cycle):** Vertical slice §4 seventy-third deliverables confirmed (T5); [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) and this §3 reflect current state (List 73 Phase 3 Steam Demo: packaged build run, smoke test or deferred; Phase 3 gate). Entry point unchanged: CONSOLE_COMMANDS links §3 (run sequence) and the command reference. Cycle note in [KNOWN_ERRORS.md](../KNOWN_ERRORS.md). T8 status set to completed.
+
+**T9 (seventy-third list — verification):** Build not applicable (no C++ or Build.cs changes in T1–T8 this list). Doc review: §3 (T1–T8 seventy-third, CONSOLE_COMMANDS entry point) and §4 (Seventy-third-list deliverables: Phase 3 Steam Demo — packaged build run, smoke test or deferred; Phase 3 gate) are consistent with [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) (pre-demo entry point) and [STEAM_EA_STORE_CHECKLIST.md](STEAM_EA_STORE_CHECKLIST.md) (T1/T2/T3/T6 seventy-third: packaging exit 25, smoke test deferred, Phase 3 outcome, KNOWN_ERRORS ref). Pre-demo entry point unchanged: CONSOLE_COMMANDS links §3 (run sequence) and the command reference. `validate_task_list.py` passed. Outcome documented here and in SESSION_LOG. T9 status set to completed.
+
+**T9 (seventy-second list — verification):** Build not applicable (no C++ or Build.cs changes in T1–T8 this list). Doc review: §3 (T1–T8 seventy-second, CONSOLE_COMMANDS entry point) and §4 (Seventy-second-list deliverables: Phase 2 Image-to-3D deferred, deferred pass, resume path, Phase 2 gate) are consistent with [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) (pre-demo entry point) and [ASSET_WORKFLOW_AND_STEAM_DEMO.md](../ASSET_WORKFLOW_AND_STEAM_DEMO.md) §2 (Phase 2 gate, cross-links). Pre-demo entry point unchanged: CONSOLE_COMMANDS links §3 (run sequence) and the command reference. `validate_task_list.py` passed. Outcome documented here and in SESSION_LOG. T9 status set to completed.
+
+**T9 (seventy-first list — verification):** Build not applicable (no C++ or Build.cs changes in T1–T8 this list). Doc review: §3 (T1–T8 seventy-first, CONSOLE_COMMANDS entry point) and §4 (Seventy-first-list deliverables: Phase 1 Asset workflow — workflow §1, automation vs manual, CONTENT_LAYOUT/CONVENTIONS alignment) are consistent with [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) (pre-demo entry point) and [ASSET_WORKFLOW_AND_STEAM_DEMO.md](../ASSET_WORKFLOW_AND_STEAM_DEMO.md) §1. Pre-demo entry point unchanged: CONSOLE_COMMANDS links §3 (run sequence) and the command reference. `validate_task_list.py` passed. Outcome documented here and in SESSION_LOG. T9 status set to completed.
+
 **T9 (sixty-ninth list — verification):** Build not applicable (no C++ or Build.cs changes in T1–T8 this list). Doc review: §3 (T1–T8 sixty-ninth, CONSOLE_COMMANDS entry point) and §4 (Sixty-ninth-list deliverables: Phase 4.1–4.3, gate note, asset-ready) are consistent with [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) (pre-demo entry point). `validate_task_list.py` passed. Outcome documented here and in SESSION_LOG. T9 status set to completed.
 
 **T9 (seventieth list — verification):** Build ran (Safe-Build) and passed. Doc review: §3 (T1–T8 seventieth, CONSOLE_COMMANDS entry point, seventieth-list Deferred features note) and §4 (Seventieth-list deliverables: T1–T5 outcomes, Path 2 deferred, SaveGame/boss/bed/spirits) are consistent with [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) (pre-demo entry point, List 70 T7 Deferred-phase outcomes). `validate_task_list.py` passed. Outcome documented here and in SESSION_LOG. T9 status set to completed.
@@ -1014,6 +1026,38 @@ The **MVP tutorial loop** is the target for the **tutorial gate** (one day: wake
 | **T4 — Bed actor** | In-world bed (BP_Bed); interact (E) or overlap triggers go-to-bed/wake; CONSOLE_COMMANDS § Tutorial (List 8)/(List 10). |
 | **T5 — Spirit roster on death** | ReportDeathAndAddSpirit (hw.ReportDeath) adds spirit to roster; hw.Spirits lists roster count/IDs; visibility/verification in CONSOLE_COMMANDS and PROJECT_STATE §2. |
 | **Vertical slice §4 seventieth deliverables** | This subsection; Deferred features list (T1–T5 outcomes). Pre-demo entry point: [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) links §3 (run sequence) and the command reference. |
+
+### Seventy-first-list deliverables (Phase 1 Asset workflow and tooling)
+
+**Context:** Seventy-first list is **Assets + Steam Demo Phase 1** per [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md): lock asset workflow doc, document automation vs manual, optional script; gate = workflow §1 current and automation vs manual listed. Entry point: [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) § Pre-demo verification links §3 (run sequence) and the command reference.
+
+| Deliverable | Outcome (seventy-first list) |
+|-------------|------------------------------|
+| **Phase 1 — Asset workflow §1** | [ASSET_WORKFLOW_AND_STEAM_DEMO.md](../ASSET_WORKFLOW_AND_STEAM_DEMO.md) §1 current: tools table, recommended workflow (source → import → paths → placement); paths from [CONTENT_LAYOUT.md](../CONTENT_LAYOUT.md). T1 completed. |
+| **Phase 1 — Automation vs manual** | Automation vs manual list in workflow §1 or linked doc; "no access" items and manual step per automation-standards. T2 completed. |
+| **Phase 1 — CONTENT_LAYOUT / CONVENTIONS alignment** | CONTENT_LAYOUT and workflow §1 paths aligned; asset path convention in CONVENTIONS or workflow §1. T4–T5 completed. |
+| **Phase 1 gate** | Phase 1 gate — List 71: workflow §1 complete, automation vs manual documented; gate met. T6–T7 completed. |
+| **Vertical slice §4 seventy-first deliverables** | This subsection; Phase 1 Asset workflow and tooling. Pre-demo entry point: [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) links §3 (run sequence) and the command reference. |
+
+### Seventy-second-list deliverables (Phase 2 Image-to-3D deferred)
+
+**Context:** Seventy-second list is **Assets + Steam Demo Phase 2** per [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md): image-to-3D (Milady) full pipeline deferred to post–Steam Demo; deferred pass and resume path documented. Entry point: [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) § Pre-demo verification links §3 (run sequence) and the command reference.
+
+| Deliverable | Outcome (seventy-second list) |
+|-------------|------------------------------|
+| **Phase 2 — T1–T4 outcomes** | Deferred pass doc (ASSET_WORKFLOW_AND_STEAM_DEMO §2, MILADY_IMPORT_ROADMAP Phase 4); optional manual run (T2); resume path doc (T3); Phase 2 gate documented in ASSETS_AND_STEAM_DEMO_PHASED_APPROACH. Image-to-3D deferred; resume path documented. |
+| **Vertical slice §4 seventy-second deliverables** | This subsection; Phase 2 Image-to-3D deferred. Pre-demo entry point: [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) links §3 (run sequence) and the command reference. |
+
+### Seventy-third-list deliverables (Phase 3 Steam Demo)
+
+**Context:** Seventy-third list is **Assets + Steam Demo Phase 3** per [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md): packaged build run, smoke test (or deferred); Phase 3 gate. Entry point: [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) § Pre-demo verification links §3 (run sequence) and the command reference.
+
+| Deliverable | Outcome (seventy-third list) |
+|-------------|------------------------------|
+| **Phase 3 — Packaged build run** | T1: Package-AfterClose.ps1 run; outcome (success or documented failure) in SESSION_LOG and STEAM_EA_STORE_CHECKLIST § Current status. |
+| **Phase 3 — Smoke test** | T2: If exe exists, launch and verify level/character; else "smoke test deferred until packaged build succeeds"; result in SESSION_LOG and STEAM_EA_STORE_CHECKLIST. |
+| **Phase 3 gate** | T4: Phase 3 gate documented in ASSETS_AND_STEAM_DEMO_PHASED_APPROACH Phase 3 section (gate met: packaged build run, outcome recorded; smoke test pass/deferred). |
+| **Vertical slice §4 seventy-third deliverables** | This subsection; Phase 3 Steam Demo (packaged build run, smoke test or deferred; Phase 3 gate). Pre-demo entry point: [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) links §3 (run sequence) and the command reference. |
 
 ---
 

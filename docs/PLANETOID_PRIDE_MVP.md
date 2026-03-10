@@ -19,6 +19,10 @@ This gives Pride a **distinct identity**: vertical, dramatic terrain (canyons, v
 
 **Surface area:** Not fixed yet. Use **Astroneer-like scale** as a starting reference (see §2). When locking size, consider play time to cross, density of POIs, and World Partition cell count.
 
+**Map shape and biomes:** The planetoid **map shape is a sphere**; the **entire area** is **segmented into biomes** (desert, forest, marsh, canyon). Each biome has a harvest place, a couple of monster camps, one camp outside a dungeon, and a side quest giver. See [PLANETOID_DESIGN.md](PLANETOID_DESIGN.md) and [PLANETOID_BIOMES.md](PLANETOID_BIOMES.md).
+
+**Homestead and glide:** The **homestead starts on a plateau at the top of a mountain**. The player can **glide down** from the plateau to the ground to explore the planetoid. This supports the MVP loop: complete day/night cycles while exploring the sphere, with a clear “home base” (plateau) and a fast way down (glide). Implementation: plateau as starting spawn/homestead location; glide ability (e.g. GAS or movement mode) to descend; return to plateau by travel/climb or fast travel as needed.
+
 ---
 
 ## 2. Astroneer: what they do (reference for scale and approach)

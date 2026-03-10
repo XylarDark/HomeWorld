@@ -1,113 +1,113 @@
 # Current task list (10-task)
 
-**Last updated:** 2026-03-02 (seventy-first list — **Assets + Steam Demo Phase 1: Asset workflow and tooling**). **Context:** [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md) Phase 1 — lock asset workflow doc, document automation vs manual, optional script; gate = workflow §1 current and automation vs manual listed.
+**Last updated:** 2026-03-02 (seventy-third list — **Assets + Steam Demo Phase 3: Packaged build and smoke test**). **Context:** [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md) Phase 3 — run packaged build, document outcome; smoke test if exe exists.
 
 **Purpose:** Single ordered list that drives the automation loop. Agents fetch the first **pending** or **in_progress** task; update status when done. Loop exits when no task has status pending or in_progress.
 
 **Convention:** `pending` | `in_progress` | `completed` | `blocked`
 
-**Order:** T1–T7 = Phase 1 implementation (workflow, automation vs manual, optional script, follow-ups); T8 = Docs and cycle; T9 = Verification; T10 = Buffer.
+**Order:** T1–T7 = Phase 3 implementation (packaged build, smoke test, checklist update, gate, follow-ups); T8 = Docs and cycle; T9 = Verification; T10 = Buffer.
 
 ---
 
-## T1. Workflow §1 review and paths (Phase 1 step 1.1)
+## T1. Run packaged build (Phase 3 step 3.1)
 
-- **goal:** Ensure [ASSET_WORKFLOW_AND_STEAM_DEMO.md](../ASSET_WORKFLOW_AND_STEAM_DEMO.md) §1 (asset workflow) is current: tools table, recommended workflow (source → import → paths → placement → document manual). Add or align project-specific paths (e.g. `/Game/HomeWorld/Milady/`, Building, Maps) from [CONTENT_LAYOUT.md](../CONTENT_LAYOUT.md) so workflow §1 references the single source of truth for content paths.
-- **success criteria:** ASSET_WORKFLOW_AND_STEAM_DEMO §1 complete; paths in §1 match or reference CONTENT_LAYOUT; workflow is the entry point for "how we add assets."
-- **research_notes:** [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md) Phase 1 step 1.1; [CONTENT_LAYOUT.md](../CONTENT_LAYOUT.md) (Milady, Building, Maps, Characters, PCG, etc.); [ASSET_WORKFLOW_AND_STEAM_DEMO.md](../ASSET_WORKFLOW_AND_STEAM_DEMO.md) §1.
-- **steps_or_doc:** docs/ASSET_WORKFLOW_AND_STEAM_DEMO.md §1; docs/CONTENT_LAYOUT.md.
+- **goal:** Close Editor and any processes using project/Engine binaries. Run `.\Tools\Package-AfterClose.ps1` (or `-CleanStagedBuilds` if Stage failed before). Monitor `Package-HomeWorld.log` for exit code 0. Document outcome (success or failure and reason) in SESSION_LOG and [STEAM_EA_STORE_CHECKLIST.md](STEAM_EA_STORE_CHECKLIST.md) § Current status. If Stage fails with SafeCopyFile (files in use), document and reference [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) Package-HomeWorld workaround.
+- **success criteria:** Packaged build was run; outcome (success or documented failure) recorded in SESSION_LOG and STEAM_EA_STORE_CHECKLIST § Current status; Phase 3 step 3.1 gate satisfied; T1 status set to completed.
+- **research_notes:** [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md) Phase 3 step 3.1; [STEAM_EA_STORE_CHECKLIST.md](STEAM_EA_STORE_CHECKLIST.md) § Packaged build retry, § Current status; [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) Package-HomeWorld; Tools/Package-AfterClose.ps1.
+- **steps_or_doc:** Tools/Package-AfterClose.ps1; Package-HomeWorld.log; docs/workflow/STEAM_EA_STORE_CHECKLIST.md; docs/SESSION_LOG.md.
 - **status:** completed
 
 ---
 
-## T2. Automation vs manual list (Phase 1 step 1.2)
+## T2. Smoke test (Phase 3 step 3.2)
 
-- **goal:** Document which asset steps are **automatable** (Python batch import, MCP placement, PCG config, EditorAssetLibrary) and which require **one-time or manual** steps (VRM4U import options, Meshy API key, DCC export presets, State Tree editing). Per [automation-standards](.cursor/rules/automation-standards.mdc): list "no access" items and the manual step for each. Place in ASSET_WORKFLOW_AND_STEAM_DEMO §1, or in MILADY_VARIABLES_NO_ACCESS / [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) with a cross-reference from §1.
-- **success criteria:** Clear automation vs manual list in workflow doc or linked doc; each "no access" item has manual step documented; Phase 1 gate 1.2 satisfied.
-- **research_notes:** [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md) Phase 1 step 1.2; .cursor/rules/automation-standards.mdc; [AUTOMATION_GAPS.md](../AUTOMATION_GAPS.md); [docs/PCG_VARIABLES_NO_ACCESS.md](../PCG_VARIABLES_NO_ACCESS.md) (pattern for no-access docs).
-- **steps_or_doc:** docs/ASSET_WORKFLOW_AND_STEAM_DEMO.md §1; docs/AUTOMATION_GAPS.md; docs/KNOWN_ERRORS.md.
+- **goal:** If packaged exe exists at `Saved\StagedBuilds\HomeWorld\WindowsNoEditor\HomeWorld\Binaries\Win64\HomeWorld.exe`, launch it; confirm level loads, character moves, no critical errors. Document result in SESSION_LOG and STEAM_EA_STORE_CHECKLIST § Packaged build. If no exe (build did not produce one), document "smoke test deferred until packaged build succeeds" with reason.
+- **success criteria:** Smoke test run and result documented (pass or deferred with reason); T2 status set to completed.
+- **research_notes:** [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md) Phase 3 step 3.2; [STEAM_EA_STORE_CHECKLIST.md](STEAM_EA_STORE_CHECKLIST.md) § Packaged build.
+- **steps_or_doc:** Saved/StagedBuilds/.../HomeWorld.exe; docs/workflow/STEAM_EA_STORE_CHECKLIST.md; docs/SESSION_LOG.md.
 - **status:** completed
 
 ---
 
-## T3. Optional — one repeatable asset step (Phase 1 step 1.3)
+## T3. Update STEAM_EA_STORE_CHECKLIST § Current status
 
-- **goal:** If useful, add or document **one idempotent script** (e.g. ensure content folders, or a minimal batch-import/placement pattern) in `Content/Python/` and reference it from the workflow doc. **Skip** if current scripts (e.g. ensure_milady_folders.py) already cover the pattern; then document in ASSET_WORKFLOW_AND_STEAM_DEMO §1 that "ensure_* folders" pattern is the reference and list existing scripts. Gate does not require new code.
-- **success criteria:** Either (a) one new or updated script referenced from workflow §1, or (b) workflow §1 explicitly references existing ensure_* (or equivalent) scripts as the repeatable-asset-step pattern; T3 status set to completed.
-- **research_notes:** [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md) Phase 1 step 1.3; Content/Python/ensure_milady_folders.py; Content/Python/ensure_ui_folders.py; idempotency per 00-core-principles.mdc.
-- **steps_or_doc:** docs/ASSET_WORKFLOW_AND_STEAM_DEMO.md §1; Content/Python/.
+- **goal:** Add a **seventy-third list (Phase 3)** entry to [STEAM_EA_STORE_CHECKLIST.md](STEAM_EA_STORE_CHECKLIST.md) § Current status: packaged build run outcome (T1), smoke test outcome (T2). Include next steps (e.g. if Stage failed: close processes, use -CleanStagedBuilds, re-run; if exe exists: smoke-test path and checklist checkboxes).
+- **success criteria:** STEAM_EA_STORE_CHECKLIST § Current status has list 73 / Phase 3 outcome; T3 status set to completed.
+- **research_notes:** [STEAM_EA_STORE_CHECKLIST.md](STEAM_EA_STORE_CHECKLIST.md) § Current status; [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md) Phase 3.
+- **steps_or_doc:** docs/workflow/STEAM_EA_STORE_CHECKLIST.md.
 - **status:** completed
 
 ---
 
-## T4. CONTENT_LAYOUT alignment with workflow paths
+## T4. Phase 3 gate — document completion
 
-- **goal:** Ensure [CONTENT_LAYOUT.md](../CONTENT_LAYOUT.md) is consistent with the workflow §1 paths: all asset types (Milady, Building, Maps, Characters, PCG, etc.) used in the workflow doc are present in CONTENT_LAYOUT. If CONTENT_LAYOUT has paths not yet mentioned in ASSET_WORKFLOW_AND_STEAM_DEMO §1, add a short "Content paths" sentence or table row in §1 that points to CONTENT_LAYOUT as the single source of truth.
-- **success criteria:** CONTENT_LAYOUT and workflow §1 paths aligned; workflow §1 points to CONTENT_LAYOUT for full path list; T4 status set to completed.
-- **research_notes:** [CONTENT_LAYOUT.md](../CONTENT_LAYOUT.md); [ASSET_WORKFLOW_AND_STEAM_DEMO.md](../ASSET_WORKFLOW_AND_STEAM_DEMO.md) §1.
-- **steps_or_doc:** docs/CONTENT_LAYOUT.md; docs/ASSET_WORKFLOW_AND_STEAM_DEMO.md §1.
-- **status:** completed
-
----
-
-## T5. CONVENTIONS or doc note for asset paths
-
-- **goal:** If [CONVENTIONS.md](../CONVENTIONS.md) (or equivalent) exists, add or update a short note on **asset path / import convention** (e.g. new project content under `/Game/HomeWorld/` or a documented subfolder; LFS for .uasset/.umap). If CONVENTIONS does not exist or has no asset section, add a one-paragraph "Asset paths" subsection to ASSET_WORKFLOW_AND_STEAM_DEMO §1 that states the convention and links to CONTENT_LAYOUT.
-- **success criteria:** Asset path convention is stated in CONVENTIONS or in workflow §1 with link to CONTENT_LAYOUT; T5 status set to completed.
-- **research_notes:** [CONVENTIONS.md](../CONVENTIONS.md); [CONTENT_LAYOUT.md](../CONTENT_LAYOUT.md); [ASSET_WORKFLOW_AND_STEAM_DEMO.md](../ASSET_WORKFLOW_AND_STEAM_DEMO.md) §1.
-- **steps_or_doc:** docs/CONVENTIONS.md; docs/ASSET_WORKFLOW_AND_STEAM_DEMO.md §1; docs/CONTENT_LAYOUT.md.
-- **status:** completed
-
----
-
-## T6. Phase 1 entry point and phased doc link
-
-- **goal:** Ensure [NEXT_30_DAY_WINDOW.md](NEXT_30_DAY_WINDOW.md) and [ASSET_WORKFLOW_AND_STEAM_DEMO.md](../ASSET_WORKFLOW_AND_STEAM_DEMO.md) both point to [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md) for phased execution. Add a "Phase 1 gate" outcome line to ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md § Phase 1 when T1–T2 (and optionally T3) are done (e.g. "Phase 1 gate — List 71: workflow §1 current, automation vs manual listed; gate met."). Do this as a placeholder or fill after T1–T2 complete; T6 can be updated in T8 or T9 if preferred.
-- **success criteria:** NEXT_30_DAY_WINDOW and ASSET_WORKFLOW_AND_STEAM_DEMO reference the phased approach; Phase 1 section in phased doc has a gate-outcome note (can be "pending List 71" until T1–T2 done); T6 status set to completed.
-- **research_notes:** [NEXT_30_DAY_WINDOW.md](NEXT_30_DAY_WINDOW.md); [ASSET_WORKFLOW_AND_STEAM_DEMO.md](../ASSET_WORKFLOW_AND_STEAM_DEMO.md); [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md) Phase 1.
-- **steps_or_doc:** docs/workflow/NEXT_30_DAY_WINDOW.md; docs/ASSET_WORKFLOW_AND_STEAM_DEMO.md; docs/workflow/ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md.
-- **status:** completed
-
----
-
-## T7. Phase 1 gate — document completion
-
-- **goal:** Confirm Phase 1 steps 1.1 and 1.2 are complete (workflow §1 current, automation vs manual listed). Document in [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md) Phase 1 section a one-line **Phase 1 gate — List 71** outcome (e.g. "Phase 1 gate met: workflow §1 complete and paths aligned; automation vs manual documented."). If either step was deferred, note it. Optionally add a short SESSION_LOG-style summary.
-- **success criteria:** Phase 1 gate outcome recorded in phased approach doc (and optionally SESSION_LOG); T7 status set to completed.
-- **research_notes:** [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md) Phase 1 gate; [SESSION_LOG.md](../SESSION_LOG.md).
+- **goal:** Confirm Phase 3 steps 3.1 and 3.2 are complete (build run and outcome documented; smoke test or deferred). Add a one-line **Phase 3 gate — List 73** outcome to [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md) Phase 3 section (e.g. "Phase 3 gate met: packaged build run, outcome recorded; smoke test pass/deferred."). Optionally append short summary to SESSION_LOG.
+- **success criteria:** Phase 3 gate outcome in phased approach doc; T4 status set to completed.
+- **research_notes:** [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md) Phase 3 gate; [SESSION_LOG.md](../SESSION_LOG.md).
 - **steps_or_doc:** docs/workflow/ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md; docs/SESSION_LOG.md.
+- **status:** completed
+
+---
+
+## T5. Vertical slice §4 seventy-third-list deliverables
+
+- **goal:** Add a row or entry to [VERTICAL_SLICE_CHECKLIST.md](VERTICAL_SLICE_CHECKLIST.md) §4 for "Seventy-third list (Phase 3 Steam Demo): packaged build run, smoke test (or deferred); Phase 3 gate."
+- **success criteria:** VERTICAL_SLICE_CHECKLIST §4 has seventy-third-list row; T5 status set to completed.
+- **research_notes:** [VERTICAL_SLICE_CHECKLIST.md](VERTICAL_SLICE_CHECKLIST.md) §4; [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md) Phase 3.
+- **steps_or_doc:** docs/workflow/VERTICAL_SLICE_CHECKLIST.md §4.
+- **status:** completed
+
+---
+
+## T6. KNOWN_ERRORS / checklist ref if Stage failed
+
+- **goal:** If T1 resulted in Stage failure (e.g. SafeCopyFile files in use), ensure STEAM_EA_STORE_CHECKLIST § Current status and/or SESSION_LOG reference [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) and the retry procedure (§ Packaged build retry when Stage failed). If build succeeded, no change required; document "no Stage failure" or skip.
+- **success criteria:** If Stage failed, KNOWN_ERRORS and retry procedure are referenced in checklist or SESSION_LOG; if build succeeded, T6 marked completed with note; T6 status set to completed.
+- **research_notes:** [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) Package-HomeWorld; [STEAM_EA_STORE_CHECKLIST.md](STEAM_EA_STORE_CHECKLIST.md) § Packaged build retry.
+- **steps_or_doc:** docs/KNOWN_ERRORS.md; docs/workflow/STEAM_EA_STORE_CHECKLIST.md; docs/SESSION_LOG.md.
+- **status:** completed
+
+---
+
+## T7. Phase 4 prep note
+
+- **goal:** In PROJECT_STATE_AND_TASK_LIST §4 or ACCOMPLISHMENTS_OVERVIEW §4, ensure "Next" after list 73 mentions Phase 4 (Steam Demo store draft) per ASSETS_AND_STEAM_DEMO_PHASED_APPROACH. No requirement to run Phase 4 in this list.
+- **success criteria:** PROJECT_STATE or ACCOMPLISHMENTS notes "after list 73 → Phase 4 (store draft)" or equivalent; T7 status set to completed.
+- **research_notes:** [PROJECT_STATE_AND_TASK_LIST.md](PROJECT_STATE_AND_TASK_LIST.md) §4; [ACCOMPLISHMENTS_OVERVIEW.md](ACCOMPLISHMENTS_OVERVIEW.md) §4; [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md) Phase 4.
+- **steps_or_doc:** docs/workflow/PROJECT_STATE_AND_TASK_LIST.md; docs/workflow/ACCOMPLISHMENTS_OVERVIEW.md.
 - **status:** completed
 
 ---
 
 ## T8. Docs and cycle (combined)
 
-- **goal:** In **one task**, do all of: (1) Ensure VERTICAL_SLICE_CHECKLIST §4 has a seventy-first-list deliverables row (Phase 1: asset workflow locked, automation vs manual, CONTENT_LAYOUT/CONVENTIONS alignment). (2) CONSOLE_COMMANDS or workflow doc updated if any new verification steps were added. (3) KNOWN_ERRORS or AUTOMATION_GAPS cycle note for list 71 (e.g. "Seventy-first list (Phase 1 Asset workflow): T1–T7 outcomes; workflow §1, automation vs manual, Phase 1 gate."). Success = all three done (or explicitly deferred).
-- **success criteria:** Vertical slice §4 has seventy-first-list row; CONSOLE_COMMANDS/workflow current if needed; KNOWN_ERRORS or AUTOMATION_GAPS cycle note; T8 status set to completed.
+- **goal:** In **one task**, do all of: (1) Ensure VERTICAL_SLICE_CHECKLIST §4 has seventy-third-list row (if not in T5). (2) CONSOLE_COMMANDS or workflow doc updated if any new verification steps. (3) KNOWN_ERRORS or AUTOMATION_GAPS cycle note for list 73 (e.g. "Seventy-third list (Phase 3 Steam Demo): packaged build run, smoke test; Phase 3 gate."). Success = all three done (or explicitly deferred).
+- **success criteria:** Vertical slice §4 seventy-third updated; CONSOLE_COMMANDS/workflow current if needed; KNOWN_ERRORS or AUTOMATION_GAPS cycle note; T8 status set to completed.
 - **research_notes:** [VERTICAL_SLICE_CHECKLIST.md](VERTICAL_SLICE_CHECKLIST.md) §4; [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md); [KNOWN_ERRORS.md](../KNOWN_ERRORS.md); [AUTOMATION_GAPS.md](../AUTOMATION_GAPS.md).
 - **steps_or_doc:** docs/workflow/VERTICAL_SLICE_CHECKLIST.md; docs/CONSOLE_COMMANDS.md; docs/KNOWN_ERRORS.md; docs/AUTOMATION_GAPS.md.
-- **status:** pending
+- **status:** completed
 
 ---
 
 ## T9. Verification (combined)
 
-- **goal:** In **one task**, do all of: (1) If T1–T7 changed C++ or Build.cs, run Build-HomeWorld.bat and confirm build passes. (2) Review VERTICAL_SLICE_CHECKLIST §3–§4 and ASSET_WORKFLOW_AND_STEAM_DEMO for consistency; document outcome in SESSION_LOG or checklist. (3) Run validate_task_list.py and fix any schema issues; update DAILY_STATE "Today" if needed. Success = build green (if applicable), doc review done, list validated.
+- **goal:** In **one task**, do all of: (1) If T1–T7 changed C++ or Build.cs, run Build-HomeWorld.bat and confirm build passes. (2) Review VERTICAL_SLICE_CHECKLIST §3–§4 and STEAM_EA_STORE_CHECKLIST for consistency; document outcome in SESSION_LOG or checklist. (3) Run validate_task_list.py and fix any schema issues; update DAILY_STATE "Today" if needed. Success = build green (if applicable), doc review done, list validated.
 - **success criteria:** Build run and result logged if applicable; doc review done and noted; validate_task_list.py passed; DAILY_STATE updated if needed; T9 status set to completed.
-- **research_notes:** Build-HomeWorld.bat; [VERTICAL_SLICE_CHECKLIST.md](VERTICAL_SLICE_CHECKLIST.md) §3–§4; [ASSET_WORKFLOW_AND_STEAM_DEMO.md](../ASSET_WORKFLOW_AND_STEAM_DEMO.md); [SESSION_LOG.md](../SESSION_LOG.md); Content/Python/validate_task_list.py; [DAILY_STATE.md](DAILY_STATE.md).
-- **steps_or_doc:** Build-HomeWorld.bat; docs/workflow/VERTICAL_SLICE_CHECKLIST.md; docs/ASSET_WORKFLOW_AND_STEAM_DEMO.md; python Content/Python/validate_task_list.py; docs/workflow/DAILY_STATE.md.
-- **status:** pending
+- **research_notes:** Build-HomeWorld.bat; [VERTICAL_SLICE_CHECKLIST.md](VERTICAL_SLICE_CHECKLIST.md) §3–§4; [STEAM_EA_STORE_CHECKLIST.md](STEAM_EA_STORE_CHECKLIST.md); [SESSION_LOG.md](../SESSION_LOG.md); Content/Python/validate_task_list.py; [DAILY_STATE.md](DAILY_STATE.md).
+- **steps_or_doc:** Build-HomeWorld.bat; docs/workflow/VERTICAL_SLICE_CHECKLIST.md; docs/workflow/STEAM_EA_STORE_CHECKLIST.md; python Content/Python/validate_task_list.py; docs/workflow/DAILY_STATE.md.
+- **status:** completed
 
 ---
 
 ## T10. Buffer: next list prep (ACCOMPLISHMENTS + PROJECT_STATE §4)
 
-- **goal:** Update ACCOMPLISHMENTS_OVERVIEW §4 with seventy-first-list (Phase 1 Asset workflow) outcome and PROJECT_STATE_AND_TASK_LIST §4. Do NOT replace CURRENT_TASK_LIST (user does that after the loop). Set T1–T10 status to completed where done. **Next:** Per [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md) — Phase 2 (Image-to-3D deferred pass), or Phase 3 (Steam Demo packaged build); generate next list per HOW_TO_GENERATE_TASK_LIST when ready.
-- **success criteria:** ACCOMPLISHMENTS_OVERVIEW §4 has seventy-first-cycle row; PROJECT_STATE §4 says list 71 complete and points to Phase 2 or Phase 3; T10 status set to completed in CURRENT_TASK_LIST only.
+- **goal:** Update ACCOMPLISHMENTS_OVERVIEW §4 with seventy-third-list (Phase 3 Steam Demo) outcome and PROJECT_STATE_AND_TASK_LIST §4. Do NOT replace CURRENT_TASK_LIST (user does that after the loop). Set T1–T10 status to completed where done. **Next:** Per [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md) — Phase 4 (Steam Demo store draft); generate next list per HOW_TO_GENERATE_TASK_LIST when ready.
+- **success criteria:** ACCOMPLISHMENTS_OVERVIEW §4 has seventy-third-cycle row; PROJECT_STATE §4 says list 73 complete and points to Phase 4; T10 status set to completed in CURRENT_TASK_LIST only.
 - **research_notes:** [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md); [ACCOMPLISHMENTS_OVERVIEW.md](ACCOMPLISHMENTS_OVERVIEW.md); [PROJECT_STATE_AND_TASK_LIST.md](PROJECT_STATE_AND_TASK_LIST.md); [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md).
 - **steps_or_doc:** HOW_TO_GENERATE_TASK_LIST.md; ACCOMPLISHMENTS_OVERVIEW.md; PROJECT_STATE_AND_TASK_LIST.md; ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md.
-- **status:** pending
+- **status:** completed
 
 ---
 
-**Order:** T1–T7 = Phase 1 (workflow §1, automation vs manual, optional script, CONTENT_LAYOUT/CONVENTIONS, entry point, Phase 1 gate). T8 = Docs and cycle. T9 = Verification. T10 = Buffer. **After list 71:** Phase 2 (image-to-3D deferred) or Phase 3 (packaged build + smoke test) per [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md); run `.\Tools\Start-AllAgents-InNewWindow.ps1` when ready for next list.
+**Order:** T1–T7 = Phase 3 (packaged build, smoke test, checklist update, gate, vertical slice §4, KNOWN_ERRORS ref if needed, Phase 4 prep). T8 = Docs and cycle. T9 = Verification. T10 = Buffer. **After list 73:** Phase 4 (store draft) per [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md); run `.\Tools\Start-AllAgents-InNewWindow.ps1` when ready for next list.

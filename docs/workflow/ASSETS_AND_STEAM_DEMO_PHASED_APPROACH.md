@@ -1,6 +1,8 @@
-# Phased approach: Assets workflow, image-to-3D, and Steam Demo
+# Phased approach: Assets workflow, image-to-3D, and MVP deliverable (marketing-ready)
 
-**Purpose:** Accomplish all the work we can on the **next steps** after list 70: **asset workflow and tooling**, **image-to-3D (Milady) research and deferred pass**, and **Steam Demo prep**. Each phase has a gate; after Phase 5 you have a locked workflow, a clear deferred decision for image-to-3D, and a Steam Demo path (packaged build + smoke test + store draft).
+**Purpose:** Accomplish the work needed for the **MVP deliverable**: **marketing-ready** slice with **assets and visuals mandatory** for good-looking marketing material (screenshots, capsule, trailer). Phases 1–2 lock asset workflow and image-to-3D; Phase 3–4 (packaged build, store draft) are **optional for MVP** — we do **not** require launching on Steam to call the MVP done. When we choose to ship, use the Steam checklist then.
+
+**MVP deliverable = marketing-ready.** Assets and visuals are mandatory. Steam launch is not.
 
 **Scope:** [ASSET_WORKFLOW_AND_STEAM_DEMO.md](../ASSET_WORKFLOW_AND_STEAM_DEMO.md), [NEXT_30_DAY_WINDOW.md](NEXT_30_DAY_WINDOW.md). **Act 2 prep is not in scope** (deferred).
 
@@ -8,9 +10,9 @@
 
 ---
 
-## Phase 1: Asset workflow and tooling
+## Phase 1: Asset workflow and tooling (mandatory for MVP)
 
-**Goal:** Lock the **asset generation workflow** and document what we can automate vs what stays manual. No requirement to implement new scripts — document patterns, content paths, and manual steps so future asset work is consistent.
+**Goal:** Lock the **asset generation workflow** and document what we can automate vs what stays manual. **Assets and visuals are mandatory for the MVP deliverable** (marketing material); this phase ensures we can add and iterate on assets consistently. No requirement to implement new scripts — document patterns, content paths, and manual steps so future asset work is consistent.
 
 | Step | What to do | Where to document | Gate |
 |------|------------|-------------------|------|
@@ -36,11 +38,13 @@
 
 **Phase 2 gate:** 2.1 and 2.3 done. Optional 2.2 (manual run) improves confidence but is not required for the gate.
 
+**Phase 2 gate — List 72:** Phase 2 gate met: image-to-3D deferred; resume path documented.
+
 ---
 
-## Phase 3: Steam Demo — packaged build and smoke test
+## Phase 3: Packaged build and smoke test (optional for MVP)
 
-**Goal:** Run the **packaged build** and **smoke test** so we have a distributable build (or a documented failure and workaround). This is the highest-impact step for "Steam Demo prep."
+**Goal:** Run the **packaged build** and **smoke test** so we have a distributable build (or a documented failure and workaround). **Not required for MVP deliverable** — MVP is marketing-ready (assets + visuals); this phase is for when we want a runnable exe for recording or future Steam distribution.
 
 | Step | What to do | Where to document | Gate |
 |------|------------|-------------------|------|
@@ -49,29 +53,31 @@
 
 **Phase 3 gate:** 3.1 done (build run and outcome documented). 3.2 done when exe exists; otherwise document "smoke test deferred until packaged build succeeds."
 
+**Phase 3 gate — List 73:** Phase 3 gate met: packaged build run, outcome recorded; smoke test deferred (no exe).
+
 ---
 
-## Phase 4: Steam Demo — store draft
+## Phase 4: Store draft (optional for MVP — for when we ship on Steam)
 
-**Goal:** Have a **store page draft** (title, short description, about, key features, capsule/screenshots plan) so Steam Demo store presence can be filled quickly when ready. No Steamworks account or app creation required for this phase.
+**Goal:** Have a **store page draft** (title, short description, about, key features, capsule/screenshots plan) so when we **do** launch on Steam, store presence can be filled quickly. **Not required for MVP deliverable** — MVP = marketing-ready (assets + visuals); Steam launch is post-MVP. No Steamworks account or app creation required for this phase.
 
 | Step | What to do | Where to document | Gate |
 |------|------------|-------------------|------|
 | 4.1 | **Store draft content:** Ensure [STEAM_EA_STORE_CHECKLIST.md](STEAM_EA_STORE_CHECKLIST.md) § Store page content (draft) has or is updated with: store title, short description, about/long description, key features, system requirements (draft). Use [VERTICAL_SLICE_CHECKLIST.md](VERTICAL_SLICE_CHECKLIST.md) and [VISION.md](VISION.md) for tone and scope. | STEAM_EA_STORE_CHECKLIST § Store page content | Draft copy in checklist |
 | 4.2 | **Capsule and screenshots plan:** Add a brief plan for capsule art (e.g. 616x353, 460x215) and in-game screenshots (e.g. vertical slice moment, Homestead corner). Can be a bullet list; actual assets can be created later. | STEAM_EA_STORE_CHECKLIST § Store page content or linked doc | Plan documented |
 
-**Phase 4 gate:** Store draft (4.1) and capsule/screenshots plan (4.2) are in the checklist or linked; no blocker for Steam Demo prep.
+**Phase 4 gate:** Store draft (4.1) and capsule/screenshots plan (4.2) are in the checklist or linked; no blocker for future Steam launch. (MVP deliverable does not require Steam.)
 
 ---
 
 ## Phase 5: Consolidation and next-list prep
 
-**Goal:** Record this phased block's outcomes and leave the project ready for the **next** task list (e.g. more assets, polish, or Steamworks setup).
+**Goal:** Record this phased block's outcomes and leave the project ready for the **next** task list (e.g. more assets, polish, or Steamworks setup when we choose to ship).
 
 | Step | What to do | Where to document | Gate |
 |------|------------|-------------------|------|
-| 5.1 | **Vertical slice §4:** Add a row or subsection to [VERTICAL_SLICE_CHECKLIST.md](VERTICAL_SLICE_CHECKLIST.md) §4 for "Assets + Steam Demo phased block": Phase 1–4 outcomes (workflow locked, image-to-3D deferred, packaged build/smoke test status, store draft). | VERTICAL_SLICE_CHECKLIST §4 | §4 updated |
-| 5.2 | **ACCOMPLISHMENTS_OVERVIEW and PROJECT_STATE:** Update [ACCOMPLISHMENTS_OVERVIEW.md](ACCOMPLISHMENTS_OVERVIEW.md) §4 with this block (e.g. "Assets + Steam Demo phased approach: Phase 1–4 complete; gates met or deferred as documented"). Update [PROJECT_STATE_AND_TASK_LIST.md](PROJECT_STATE_AND_TASK_LIST.md) §4 so "Next" points to next list per [NEXT_30_DAY_WINDOW.md](NEXT_30_DAY_WINDOW.md) (further assets, Steamworks, or user-defined). | Both docs | Accomplishments and next step clear |
+| 5.1 | **Vertical slice §4:** Add a row or subsection to [VERTICAL_SLICE_CHECKLIST.md](VERTICAL_SLICE_CHECKLIST.md) §4 for "Assets + MVP deliverable (marketing-ready) phased block": Phase 1–4 outcomes (workflow locked, image-to-3D deferred, packaged build/smoke test status if run, store draft if done). | VERTICAL_SLICE_CHECKLIST §4 | §4 updated |
+| 5.2 | **ACCOMPLISHMENTS_OVERVIEW and PROJECT_STATE:** Update [ACCOMPLISHMENTS_OVERVIEW.md](ACCOMPLISHMENTS_OVERVIEW.md) §4 with this block (e.g. "Assets + MVP deliverable phased approach: Phase 1–2 (workflow, assets/visuals) complete; Phase 3–4 optional for MVP"). Update [PROJECT_STATE_AND_TASK_LIST.md](PROJECT_STATE_AND_TASK_LIST.md) §4 so "Next" points to next list per [NEXT_30_DAY_WINDOW.md](NEXT_30_DAY_WINDOW.md) (further assets, polish, or Steam when we ship). | Both docs | Accomplishments and next step clear |
 | 5.3 | **DAILY_STATE and SESSION_LOG:** Set [DAILY_STATE.md](DAILY_STATE.md) Yesterday/Today to reflect completion of this block; Tomorrow = next list focus. Append [SESSION_LOG.md](../SESSION_LOG.md) with a short summary (phases completed, any deferrals). | DAILY_STATE; SESSION_LOG | Session continuity updated |
 
 **Phase 5 gate:** 5.1–5.3 done; next 10-task list can be generated per [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md).

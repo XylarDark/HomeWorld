@@ -2,6 +2,10 @@
 
 When the agent cannot automate a step (MCP, Python, GUI automation, commandlets), it **logs an entry here** instead of documenting "manual steps" for the user. The user runs separate chat sessions to design and implement automatic solutions for these gaps.
 
+**Tutorial for all manual work:** For a single step-by-step guide to everything you must do in the Editor by hand (PCG, portal, main menu, State Tree, planetoid terrain, etc.), see [MANUAL_EDITOR_TUTORIAL.md](MANUAL_EDITOR_TUTORIAL.md).
+
+**Policy — Editor UI automation as default:** When we have the ability to interact with the Editor UI automatically (GUI scripts in `Content/Python/gui_automation/`), that is the **default method**. Use the clicker script first; manual is fallback when GUI is unavailable or fails. See [GUI_AUTOMATION_WHY_AND_WHEN.md](GUI_AUTOMATION_WHY_AND_WHEN.md) and [.cursor/rules/automation-standards.mdc](.cursor/rules/automation-standards.mdc). To add ref images to the repo so clickers work for everyone without per-machine capture, see [REF_IMAGES_SETUP_TUTORIAL.md](REF_IMAGES_SETUP_TUTORIAL.md).
+
 **Format per entry:** Date | Feature/task | What is needed | Why automation didn't cover it | Suggested approach for future automation
 
 **Policy — when a gap is addressed:** When a gap is addressed (automation solution implemented and verified), add an entry to the **Research log** below (or to the **Addressed** subsection) with: date, gap id, brief description of how it was addressed, and link to script/doc. Do not remove the original gap entry; add the resolution note so this file is the single record of open and closed gaps.

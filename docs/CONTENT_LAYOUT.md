@@ -21,7 +21,9 @@ All project-specific assets live under `/Game/HomeWorld/`.
 | `/Game/HomeWorld/Building/` | Build order Blueprints (BP_BuildOrder_Wall, etc.), building-related assets. Smart Object definitions for building (e.g. SO_WallBuilder) can live here or under SmartObjects. |
 | `/Game/HomeWorld/Milady/` | Milady character import pipeline: imported VRM/GLB meshes (Meshes, Generated), materials (Materials), retargeted animations (Animations), Blueprints (e.g. BP_MiladyCharacter). See [MILADY_IMPORT_ROADMAP.md](tasks/MILADY_IMPORT_ROADMAP.md). |
 | `/Game/HomeWorld/Homestead/` | Homestead map assets: Structures, Placeholders (central house, outbuildings, walls). See [HOMESTEAD_MAP.md](HOMESTEAD_MAP.md). PCG graphs for Homestead can live here or under `/Game/HomeWorld/PCG/`. |
-
+| `/Game/HomeWorld/Harvestables/` | Static meshes for harvestables (trees, rocks, flowers). Assigned to BP_HarvestableTree etc.; filled by batch import from `AssetCreation/Exports/Harvestables/`. See [AssetCreation/README.md](../AssetCreation/README.md). |
+| `/Game/HomeWorld/Dungeon/` | Dungeon kit pieces (walls, pillars, doors, props). Filled by batch import from `AssetCreation/Exports/Dungeon/`. See [AssetCreation/README.md](../AssetCreation/README.md). |
+| `/Game/HomeWorld/Biomes/` | Biome props (trees, rocks, plants for PCG or placement). Filled by batch import from `AssetCreation/Exports/Biomes/`. See [AssetCreation/README.md](../AssetCreation/README.md). |
 | `/Game/HomeWorld/UI/` | Main menu and character UI: **WBP_MainMenu** (parent HomeWorldMainMenuWidget), **WBP_CharacterCreate** / **WBP_CharacterCustomize**. Create folder via ensure_ui_folders.py. See [CHARACTER_GENERATION_AND_CUSTOMIZATION.md](CHARACTER_GENERATION_AND_CUSTOMIZATION.md). |
 
 Other subfolders under `/Game/HomeWorld/` (e.g. Blueprints, Materials) may be added as the project grows. New project content should go under `/Game/HomeWorld/` or a documented subfolder.
@@ -50,6 +52,7 @@ Top-level content folders not under `/Game/HomeWorld/` or `/Game/Man/` are third
 ## Python and config paths
 
 - **Python scripts:** `Content/Python/` (e.g. `bootstrap_project.py`, `create_demo_from_scratch.py`, `create_homestead_from_scratch.py`).
+- **Source assets:** `AssetCreation/` at project root — Blender exports (FBX/GLB) go in `AssetCreation/Exports/<Category>/`; batch import script reads from there and imports into `/Game/HomeWorld/...`. See [AssetCreation/README.md](../AssetCreation/README.md) and [ASSET_WORKFLOW_AND_STEAM_DEMO.md](ASSET_WORKFLOW_AND_STEAM_DEMO.md) §1.
 - **Configs:** `Content/Python/*.json` (e.g. `demo_map_config.json`, `planetoid_map_config.json` for Day 16 planetoid/portal, `dungeon_map_config.json` for Day 24 dungeon entrance, `pcg_forest_config.json`, `character_blueprint_config.json`; `homestead_map_config.json` for legacy Homestead map).
 
 Paths in config files use `/Game/...` asset paths; file paths are relative to project root or `Content/Python/`.
@@ -93,6 +96,7 @@ Paths in config files use `/Game/...` asset paths; file paths are relative to pr
 | `place_dungeon_entrance.py` | With level open: place dungeon entrance placeholder at config position; tag Dungeon_POI (Day 24). | Standalone | dungeon_map_config.json |
 | `place_mass_spawner_demomap.py` | Idempotent: ensure Mass Spawner on DemoMap with MEC_FamilyGatherer config and spawn count (Day 11). | Standalone | demo_map_config.json |
 | `set_mec_representation_mesh.py` | Set Static Mesh (Cube) on MEC_FamilyGatherer representation trait. | Standalone | — |
+| `batch_import_asset_creation.py` | Batch import FBX/GLB from `AssetCreation/Exports/` into `/Game/HomeWorld/` by category (Characters, Harvestables, Homestead, Dungeon, Biomes). Idempotent; run from Editor or MCP. | Standalone | — |
 
 Tests live in `Content/Python/tests/` (e.g. `test_level_loader.py`, `test_pcg_forest.py`). Run via Editor: Tools > Test Automation.
 

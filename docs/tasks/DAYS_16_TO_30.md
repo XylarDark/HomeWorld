@@ -13,7 +13,8 @@ Task index for Phase 3 (Planetoid), Phase 4 (Spirits), Phase 5 (Dungeon), and bu
 **Implementation (scripts + manual):**
 
 - **Config:** [Content/Python/planetoid_map_config.json](../../Content/Python/planetoid_map_config.json) — `planetoid_level_path` (e.g. `/Game/HomeWorld/Maps/Planetoid_Pride`), optional `template_level_path`, `portal_position` (x,y,z on DemoMap), `portal_placeholder_label`.
-- **Scripts:** Run in Editor (Tools → Execute Python Script or MCP `execute_python_script`):
+- **Single entry point:** Run **assemble_planetoid_from_config.py** in Editor. It runs: ensure_demo_portal (DemoMap + portal) → setup_planetoid_pcg (planetoid level + PCG). Then do manual steps in [PLANETOID_TO_REALITY_AND_WORLD_BUILDER.md](../PLANETOID_TO_REALITY_AND_WORLD_BUILDER.md) §6.3 (Get Landscape Data By Tag, Actor Spawner Template, terrain, plateau).
+- **Scripts (individual):** Run in Editor (Tools → Execute Python Script or MCP `execute_python_script`):
   1. **ensure_planetoid_level.py** — Idempotent: ensures planetoid level exists; if missing, creates from template when `template_level_path` is set, else logs manual steps (File → New Level → Empty Open World → Save As Planetoid_Pride).
   2. **ensure_demo_portal.py** — Opens DemoMap and runs **place_portal_placeholder.py**: places **AHomeWorldDungeonEntrance** at `portal_position` with `LevelToOpen` from config (`portal_level_to_open`, e.g. Planetoid_Pride) and tag `Portal_To_Planetoid`; idempotent. Falls back to cube if C++ class unavailable. Alternatively run **place_portal_placeholder.py** with DemoMap already open.
   3. **setup_planetoid_pcg.py** — One-shot: ensures planetoid level, POI BPs, Planetoid_POI_PCG graph; opens planetoid level, tags Landscape, places PCG Volume, assigns graph, sets Get Landscape Data, triggers Generate, saves. See [PCG_SETUP.md](../PCG_SETUP.md).

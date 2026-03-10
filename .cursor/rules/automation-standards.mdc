@@ -8,6 +8,10 @@ version: 1.0
 
 # Automation Standards
 
+## Editor UI automation as default
+
+**Policy:** When we have the ability to interact with the Unreal Editor UI automatically (e.g. PyAutoGUI-based scripts in `Content/Python/gui_automation/`, ref-image clickers, capture-and-run flows), that is the **default method**. Prefer running or instructing the GUI automation script for the step; treat manual Editor steps only as **fallback** when GUI automation is unavailable (e.g. ref images not captured, script not runnable in the current environment) or has failed. Document and maintain ref images and scripts so GUI automation can be used by default where it exists. See [docs/GUI_AUTOMATION_WHY_AND_WHEN.md](../../docs/GUI_AUTOMATION_WHY_AND_WHEN.md) and [docs/MANUAL_EDITOR_TUTORIAL.md](../../docs/MANUAL_EDITOR_TUTORIAL.md).
+
 ## Variables with no access (automation)
 
 When programming automation that drives or configures **Editor or engine features** (Python Editor scripts, MCP-driven workflows, commandlets, GUI automation), follow this procedure. The project is **fully autonomous**; do not document "manual steps" for the user. See **20-full-automation-no-manual-steps.mdc**.

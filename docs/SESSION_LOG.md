@@ -6,6 +6,21 @@ Agent session summaries for cross-session context persistence.
 
 ---
 
+## 2026-03-02 Asset creation: tools, workflow, automation, directory
+
+**Tasks completed:**
+- Implemented full Asset Creation plan: AssetCreation/ directory with README.md, STYLE_GUIDE.md, subfolders (Exports/{Characters,Harvestables,Homestead,Dungeon,Biomes}, AI_Sources, RefImages).
+- Documented Blender export preset in STYLE_GUIDE (Forward X, Up Z, FBX Unit Scale, Apply Modifiers, Face smoothing, FBX 2020.2).
+- Implemented Content/Python/batch_import_asset_creation.py: scans AssetCreation/Exports/, maps categories to /Game/HomeWorld/..., imports FBX/GLB via AssetImportTask; idempotent.
+- Updated docs/ASSET_WORKFLOW_AND_STEAM_DEMO.md with subsection "Asset creation directory and batch import" (purpose, export preset, script, STYLE_GUIDE link).
+- Updated docs/CONTENT_LAYOUT.md: new paths Harvestables, Dungeon, Biomes; Source assets note (AssetCreation/ at project root); script index entry for batch_import_asset_creation.py.
+
+**Tasks remaining:** None for this plan. Optional: run batch import in Editor to validate; add Blender add-ons per plan.
+
+**Key decisions:** Source assets live in AssetCreation/ at project root; Exports/ is single source for batch import; script replace_existing for idempotent re-runs.
+
+---
+
 ## 2026-02-22 ? PIE verification, character consolidation, cleanup rules
 
 **Tasks completed:**
@@ -8603,3 +8618,210 @@ Agent session summaries for cross-session context persistence.
 - T7 (seventy-first list): Confirmed Phase 1 steps 1.1 and 1.2 complete (workflow §1 current, automation vs manual listed). Updated [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](workflow/ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md) Phase 1 section with one-line **Phase 1 gate — List 71** outcome: workflow §1 complete and paths aligned; automation vs manual documented; ensure_* pattern referenced; CONTENT_LAYOUT and CONVENTIONS aligned; entry point and phased doc link in place; T1–T6 complete; no steps deferred. Set T7 status to **completed** in CURRENT_TASK_LIST.md.
 
 **Success criteria met:** Phase 1 gate outcome recorded in phased approach doc and SESSION_LOG. First pending task is now T8 (Docs and cycle).
+
+---
+
+## 2026-03-09 T8: Docs and cycle — seventy-first list
+
+**Tasks completed:**
+- T8 (seventy-first list): (1) Added **Seventy-first-list deliverables** subsection to [VERTICAL_SLICE_CHECKLIST.md](workflow/VERTICAL_SLICE_CHECKLIST.md) §4: Phase 1 asset workflow §1, automation vs manual, CONTENT_LAYOUT/CONVENTIONS alignment, Phase 1 gate; added T8 §3 note for List 71. (2) Updated [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) with seventy-first list (T8) note: entry point unchanged; no new verification steps this list; cycle note in KNOWN_ERRORS. (3) Added cycle note to [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) for seventy-first list T8 (vertical slice §4 seventy-first deliverables; CONSOLE_COMMANDS and §3 current; next T9, T10; after List 71: Phase 2 or Phase 3 per ASSETS_AND_STEAM_DEMO_PHASED_APPROACH). Set T8 status to **completed** in CURRENT_TASK_LIST.md only.
+
+**Success criteria met:** Vertical slice §4 has seventy-first-list row; CONSOLE_COMMANDS/workflow current (no new verification steps); KNOWN_ERRORS cycle note. First pending task is now T9 (Verification).
+
+---
+
+## 2026-03-09 T9: Verification — seventy-first list
+
+**Tasks completed:**
+- T9 (seventy-first list): (1) Build not applicable (no C++ or Build.cs changes in T1–T8 this list). (2) Doc review: VERTICAL_SLICE_CHECKLIST §3 (T8 seventy-first note, CONSOLE_COMMANDS entry point) and §4 (seventy-first-list deliverables: Phase 1 Asset workflow, workflow §1, automation vs manual, CONTENT_LAYOUT/CONVENTIONS alignment) are consistent with CONSOLE_COMMANDS (pre-demo entry point) and ASSET_WORKFLOW_AND_STEAM_DEMO §1. (3) Ran `validate_task_list.py` — passed. Added T9 (seventy-first list) verification outcome to VERTICAL_SLICE_CHECKLIST §3. Set T9 status to **completed** in CURRENT_TASK_LIST.md only.
+
+**Success criteria met:** Build N/A logged; doc review done and noted in §3; validate_task_list.py passed; T9 status set to completed. First pending task is now T10 (Buffer).
+
+---
+
+## 2026-03-09 T10: Buffer — seventy-first list (Phase 1 Asset workflow complete)
+
+**Tasks completed:**
+- T10 (seventy-first list): (1) Added **Seventy-first 10-task list** row to [ACCOMPLISHMENTS_OVERVIEW.md](workflow/ACCOMPLISHMENTS_OVERVIEW.md) §4: Phase 1 Asset workflow (T1–T7 workflow §1, automation vs manual, CONTENT_LAYOUT/CONVENTIONS, Phase 1 gate; T8–T10 docs and cycle, verification, buffer); outcome = all T1–T10 completed; next = Phase 2 or Phase 3 per ASSETS_AND_STEAM_DEMO_PHASED_APPROACH. (2) Updated **Last updated** in ACCOMPLISHMENTS_OVERVIEW header to List 71 complete. (3) Updated [PROJECT_STATE_AND_TASK_LIST.md](workflow/PROJECT_STATE_AND_TASK_LIST.md) §4: current list = seventy-first (Phase 1 Asset workflow complete); next = Phase 2 (Image-to-3D) or Phase 3 (Steam Demo packaged build); last updated 2026-03-09. (4) Set T10 status to **completed** in CURRENT_TASK_LIST.md only (no replacement of CURRENT_TASK_LIST).
+
+**Success criteria met:** ACCOMPLISHMENTS_OVERVIEW §4 has seventy-first-cycle row; PROJECT_STATE §4 says list 71 complete and points to Phase 2 or Phase 3; T10 status set to completed. **All T1–T10 (seventy-first list) complete.** Next: user generates next list per [HOW_TO_GENERATE_TASK_LIST.md](workflow/HOW_TO_GENERATE_TASK_LIST.md); run `.\Tools\Start-AllAgents-InNewWindow.ps1` when ready.
+
+---
+
+## 2026-03-09 T1: Deferred pass doc (seventy-second list — Phase 2 step 2.1)
+
+**Tasks completed:**
+- T1 (seventy-second list): Added explicit deferred-decision note to [ASSET_WORKFLOW_AND_STEAM_DEMO.md](ASSET_WORKFLOW_AND_STEAM_DEMO.md) §2 and [MILADY_IMPORT_ROADMAP.md](tasks/MILADY_IMPORT_ROADMAP.md) Phase 4: "Image-to-3D (Milady) — feasible via Meshy or Tripo; **full pipeline deferred** to post–Steam Demo (or next asset sprint). Manual path: PNG → Meshy/Tripo → GLB → VRM4U import." ASSET_WORKFLOW §2 now has a "Decision (Phase 2 / List 72)" callout; MILADY_IMPORT_ROADMAP Phase 4 leads with the same note. Set T1 status to **completed** in CURRENT_TASK_LIST.md.
+
+**Success criteria met:** Both docs contain the deferred-decision note; Phase 2 step 2.1 gate satisfied; T1 status set to completed. First pending task is now T2 (optional manual run).
+
+---
+
+## 2026-03-09 T2: Optional manual run (seventy-second list — Phase 2 step 2.2)
+
+**Tasks completed:**
+- T2 (seventy-second list): Manual run skipped; tools not available for autonomous session (gate does not require this step). Added **Phase 2 step 2.2 — optional manual run (List 72)** subsection to [ASSET_WORKFLOW_AND_STEAM_DEMO.md](ASSET_WORKFLOW_AND_STEAM_DEMO.md) §2 with outcome note and optional path for future manual run. Set T2 status to **completed** in CURRENT_TASK_LIST.md only.
+
+**Success criteria met:** Skipped with one-line note; outcome documented in §2; T2 status set to completed. First pending task is now T3 (Resume path doc).
+
+---
+
+## 2026-03-09 T3: Resume path doc (seventy-second list — Phase 2 step 2.3)
+
+**Tasks completed:**
+- T3 (seventy-second list): Documented "when resuming" the full image-to-3D pipeline in [ASSET_WORKFLOW_AND_STEAM_DEMO.md](ASSET_WORKFLOW_AND_STEAM_DEMO.md) §2: added subsection **When resuming the image-to-3D pipeline (Phase 2 step 2.3)** with (1) what to implement — Option A (Meshy from UE: Phase 4 tasks 4.1–4.3, wire Milady import subsystem) or Option B (Tripo/TripoSR path); (2) where to document "variables with no access" — create `docs/MILADY_VARIABLES_NO_ACCESS.md` when needed, or MILADY_IMPORT_SETUP / KNOWN_ERRORS; new gaps to [AUTOMATION_GAPS.md](AUTOMATION_GAPS.md). Updated [MILADY_IMPORT_ROADMAP.md](tasks/MILADY_IMPORT_ROADMAP.md) Phase 4 with a **When resuming (Phase 2 step 2.3)** pointer to ASSET_WORKFLOW §2. Set T3 status to **completed** in CURRENT_TASK_LIST.md only.
+
+**Success criteria met:** Resume steps are clear (what to implement, where to document no-access); Phase 2 gate 2.3 satisfied; T3 status set to completed. First pending task is now T4 (Phase 2 gate — document completion).
+
+---
+
+## 2026-03-09 T4: Phase 2 gate — document completion (seventy-second list)
+
+**Tasks completed:**
+- T4 (seventy-second list): Confirmed Phase 2 steps 2.1 and 2.3 complete (T1 and T3 completed). Added **Phase 2 gate — List 72** outcome to [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](workflow/ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md) Phase 2 section: "Phase 2 gate met: image-to-3D deferred; resume path documented." Set T4 status to **completed** in CURRENT_TASK_LIST.md only.
+
+**Success criteria met:** Phase 2 gate outcome in phased approach doc; T4 status set to completed. First pending task is now T5 (Vertical slice §4 seventy-second-list placeholder).
+
+---
+
+## 2026-03-09 T5: Vertical slice §4 seventy-second-list placeholder (seventy-second list)
+
+**Tasks completed:**
+- T5 (seventy-second list): Added **Seventy-second-list deliverables (Phase 2 Image-to-3D deferred)** subsection to [VERTICAL_SLICE_CHECKLIST.md](workflow/VERTICAL_SLICE_CHECKLIST.md) §4: context (Phase 2 per ASSETS_AND_STEAM_DEMO_PHASED_APPROACH, deferred pass and resume path documented), table with Phase 2 T1–T4 outcomes and vertical slice §4 seventy-second row. Set T5 status to **completed** in CURRENT_TASK_LIST.md only.
+
+**Success criteria met:** VERTICAL_SLICE_CHECKLIST §4 has seventy-second-list deliverables row; T5 status set to completed. First pending task is now T6 (ASSET_WORKFLOW_AND_STEAM_DEMO §2 cross-links).
+
+---
+
+## 2026-03-09 T6: ASSET_WORKFLOW_AND_STEAM_DEMO §2 cross-links (seventy-second list)
+
+**Tasks completed:**
+- T6 (seventy-second list): In [ASSET_WORKFLOW_AND_STEAM_DEMO.md](ASSET_WORKFLOW_AND_STEAM_DEMO.md) §2, added **Phased context** line linking to [workflow/ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](workflow/ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md) Phase 2 and **Phase 2 gate — List 72** note ("Met: image-to-3D deferred; resume path documented"). Added **Cross-links** line linking to [tasks/MILADY_IMPORT_ROADMAP.md](tasks/MILADY_IMPORT_ROADMAP.md) Phase 4. Set T6 status to **completed** in CURRENT_TASK_LIST.md only.
+
+**Success criteria met:** §2 has cross-links to roadmap and phased approach; Phase 2 gate note added. First pending task is now T7 (Buffer / Phase 3 prep note).
+
+---
+
+## 2026-03-09 T7: Buffer / Phase 3 prep note (seventy-second list)
+
+**Tasks completed:**
+- T7 (seventy-second list): Confirmed [PROJECT_STATE_AND_TASK_LIST.md](workflow/PROJECT_STATE_AND_TASK_LIST.md) §4 already states "Next (after list 72): Phase 3 (Steam Demo packaged build + smoke test)" per ASSETS_AND_STEAM_DEMO_PHASED_APPROACH. In [ACCOMPLISHMENTS_OVERVIEW.md](workflow/ACCOMPLISHMENTS_OVERVIEW.md) header, added explicit **After list 72:** Phase 3 (Steam Demo packaged build + smoke test). Set T7 status to **completed** in CURRENT_TASK_LIST.md only.
+
+**Success criteria met:** PROJECT_STATE §4 and ACCOMPLISHMENTS note "after list 72 → Phase 3 (packaged build)"; T7 status set to completed. First pending task is now T8 (Docs and cycle).
+
+---
+
+## 2026-03-09 T8: Docs and cycle (seventy-second list)
+
+**Tasks completed:**
+- T8 (seventy-second list): (1) Vertical slice §4 seventy-second deliverables already present from T5; added **T8 (seventy-second list — docs and cycle)** note to VERTICAL_SLICE_CHECKLIST §3. (2) CONSOLE_COMMANDS.md: added **Seventy-second list (T8 — docs and cycle)** paragraph (List 72 Phase 2 Image-to-3D deferred; no new verification steps; entry point unchanged). (3) KNOWN_ERRORS.md: prepended **Seventy-second list T8 (docs and cycle)** cycle note. Set T8 status to **completed** in CURRENT_TASK_LIST.md only.
+
+**Success criteria met:** Vertical slice §4 seventy-second confirmed; CONSOLE_COMMANDS and workflow current; KNOWN_ERRORS cycle note for list 72. First pending task is now T9 (Verification).
+
+---
+
+## 2026-03-09 T9: Verification (seventy-second list)
+
+**Tasks completed:**
+- T9 (seventy-second list): (1) Build not applicable — no C++ or Build.cs changes in T1–T8 this list (all doc-only: deferred pass, resume path, Phase 2 gate, vertical slice §4, cross-links, docs and cycle). (2) Doc review: VERTICAL_SLICE_CHECKLIST §3–§4 and ASSET_WORKFLOW_AND_STEAM_DEMO §2 are consistent (Phase 2 gate, CONSOLE_COMMANDS entry point, seventy-second deliverables). Added **T9 (seventy-second list — verification)** outcome to VERTICAL_SLICE_CHECKLIST §3. (3) `validate_task_list.py` passed. Set T9 status to **completed** in CURRENT_TASK_LIST.md.
+
+**Success criteria met:** Build N/A; doc review done and noted in §3; validate_task_list.py passed. First pending task is now T10 (Buffer: next list prep).
+
+---
+
+## 2026-03-09 T10: Buffer — next list prep (seventy-second list)
+
+**Tasks completed:**
+- T10 (seventy-second list): (1) [ACCOMPLISHMENTS_OVERVIEW.md](workflow/ACCOMPLISHMENTS_OVERVIEW.md) §4: added **Seventy-second 10-task list** row (Phase 2 Image-to-3D deferred pass; T1–T4 deferred pass/resume path/gate; T5–T7 vertical slice §4, cross-links, Phase 3 prep; T8–T10 docs, verification, buffer). Updated header **Last updated** to List 72 complete. (2) [PROJECT_STATE_AND_TASK_LIST.md](workflow/PROJECT_STATE_AND_TASK_LIST.md) §4: set seventy-second list to **complete** (T1–T10 completed); **Next** = Phase 3 (Steam Demo packaged build + smoke test). Updated **Last updated** to seventy-second list complete. (3) Set T10 status to **completed** in CURRENT_TASK_LIST.md only (no other task statuses changed).
+
+**Success criteria met:** ACCOMPLISHMENTS_OVERVIEW §4 has seventy-second-cycle row; PROJECT_STATE §4 says list 72 complete and points to Phase 3; T10 status set to completed. **All T1–T10 (seventy-second list) complete.** User generates next list per [HOW_TO_GENERATE_TASK_LIST.md](workflow/HOW_TO_GENERATE_TASK_LIST.md); run `.\Tools\Start-AllAgents-InNewWindow.ps1` when ready.
+
+---
+
+## 2026-03-09 T1: Run packaged build — Phase 3 step 3.1 (seventy-third list)
+
+**Tasks completed:**
+- T1 (seventy-third list): Ran `.\Tools\Package-AfterClose.ps1` from project root. No lock-holding processes; **Shipping build succeeded** (~49s). **Package-HomeWorld.bat** executed; **packaging failed with exit code 25** (see `Package-HomeWorld.log` for details). Packaged exe not produced; smoke test deferred to T2. Documented outcome in [STEAM_EA_STORE_CHECKLIST.md](workflow/STEAM_EA_STORE_CHECKLIST.md) § Current status and this SESSION_LOG. Set T1 status to **completed** in CURRENT_TASK_LIST.md only.
+
+**Outcome:** Phase 3 step 3.1 gate = packaged build *run* (outcome recorded); packaging did not complete (exit 25). If exit 25 is Stage/SafeCopyFile, use [KNOWN_ERRORS.md](KNOWN_ERRORS.md) and STEAM_EA_STORE_CHECKLIST § Packaged build retry when Stage failed. **Next:** T2 (smoke test if exe exists; else document deferred).
+
+---
+
+## 2026-03-09 T2: Smoke test — Phase 3 step 3.2 (seventy-third list)
+
+**Tasks completed:**
+- T2 (seventy-third list): Checked for packaged exe at `Saved\StagedBuilds\HomeWorld\WindowsNoEditor\HomeWorld\Binaries\Win64\HomeWorld.exe` — **not present** (T1 packaging failed exit 25; exe not produced). **Smoke test deferred** until packaged build succeeds. Documented in this SESSION_LOG and [STEAM_EA_STORE_CHECKLIST.md](workflow/STEAM_EA_STORE_CHECKLIST.md) § Current status. Set T2 status to **completed** in CURRENT_TASK_LIST.md only.
+
+**Outcome:** Smoke test deferred with reason: no packaged exe (packaging failed exit 25 in T1). When Package-HomeWorld.log shows exit code 0, run smoke test from the StagedBuilds path per STEAM_EA_STORE_CHECKLIST § Packaged build. **Next:** T3 (update STEAM_EA_STORE_CHECKLIST § Current status with T1+T2 outcomes).
+
+---
+
+## 2026-03-09 T3: Update STEAM_EA_STORE_CHECKLIST § Current status (seventy-third list)
+
+**Tasks completed:**
+- T3 (seventy-third list): Added a **Seventy-third list (Phase 3) outcome** entry to [STEAM_EA_STORE_CHECKLIST.md](workflow/STEAM_EA_STORE_CHECKLIST.md) § Current status summarizing T1 (packaged build run, failed exit 25, no exe) and T2 (smoke test deferred). Included next steps: inspect Package-HomeWorld.log for exit 25; if Stage/SafeCopyFile use Package-AfterClose.ps1 -CleanStagedBuilds; when exit 0, smoke-test from StagedBuilds path and check off § Packaged build. Set T3 status to **completed** in CURRENT_TASK_LIST.md only.
+
+**Success criteria met:** STEAM_EA_STORE_CHECKLIST § Current status has list 73 / Phase 3 consolidated outcome and next steps. **Next:** T4 (Phase 3 gate — document completion).
+
+---
+
+## 2026-03-09 T4: Phase 3 gate — document completion (seventy-third list)
+
+**Tasks completed:**
+- T4 (seventy-third list): Confirmed Phase 3 steps 3.1 and 3.2 complete (T1 build run and outcome documented; T2 smoke test deferred). Added one-line **Phase 3 gate — List 73** outcome to [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](workflow/ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md) Phase 3 section: "Phase 3 gate met: packaged build run, outcome recorded; smoke test deferred (no exe)." Set T4 status to **completed** in CURRENT_TASK_LIST.md only.
+
+**Success criteria met:** Phase 3 gate outcome recorded in phased approach doc. **Next:** T5 (Vertical slice §4 seventy-third-list deliverables).
+
+---
+
+## 2026-03-09 T5: Vertical slice §4 seventy-third-list deliverables (seventy-third list)
+
+**Tasks completed:**
+- T5 (seventy-third list): Added §4 subsection **Seventy-third-list deliverables (Phase 3 Steam Demo)** to [VERTICAL_SLICE_CHECKLIST.md](workflow/VERTICAL_SLICE_CHECKLIST.md): context (Phase 3 per ASSETS_AND_STEAM_DEMO_PHASED_APPROACH), table rows for packaged build run (T1), smoke test (T2), Phase 3 gate (T4), and vertical slice §4 seventy-third deliverables; CONSOLE_COMMANDS entry point unchanged. Set T5 status to **completed** in CURRENT_TASK_LIST.md only.
+
+**Success criteria met:** VERTICAL_SLICE_CHECKLIST §4 has seventy-third-list row/entry. **Next:** T6 (KNOWN_ERRORS / checklist ref if Stage failed, or skip).
+
+---
+
+## 2026-03-09 T6: KNOWN_ERRORS / checklist ref if Stage failed (seventy-third list)
+
+**Tasks completed:**
+- T6 (seventy-third list): T1 packaging failed (exit 25). Verified STEAM_EA_STORE_CHECKLIST § Current status and § Packaged build retry when Stage failed already reference [KNOWN_ERRORS.md](KNOWN_ERRORS.md) and the retry procedure. Added **T6 (seventy-third list, 2026-03-09) completed** entry to § Current status: if exit 25 was Stage/SafeCopyFile (files in use), follow § Packaged build retry and KNOWN_ERRORS "Package-HomeWorld: Stage SafeCopyFile — files in use". Set T6 status to **completed** in CURRENT_TASK_LIST.md only.
+
+**Success criteria met:** KNOWN_ERRORS and retry procedure are referenced in checklist; T6 marked completed. **Next:** T7 (Phase 4 prep note).
+
+---
+
+## 2026-03-09 T7: Phase 4 prep note (seventy-third list)
+
+**Tasks completed:**
+- T7 (seventy-third list): Confirmed PROJECT_STATE_AND_TASK_LIST §4 already notes "Next (after list 73): Phase 4 (Steam Demo store draft)" per ASSETS_AND_STEAM_DEMO_PHASED_APPROACH. Updated ACCOMPLISHMENTS_OVERVIEW "Last updated" line to state **After list 73 (Phase 3): Phase 4 (Steam Demo store draft)** with link to phased approach and next-list instructions. Set T7 status to **completed** in CURRENT_TASK_LIST.md only.
+
+**Success criteria met:** PROJECT_STATE and ACCOMPLISHMENTS both note after list 73 → Phase 4 (store draft). **Next:** T8 (Docs and cycle).
+
+---
+
+## 2026-03-09 T8: Docs and cycle (seventy-third list)
+
+**Tasks completed:**
+- T8 (seventy-third list): (1) Confirmed VERTICAL_SLICE_CHECKLIST §4 already has seventy-third-list deliverables (T5). (2) Added T8 (seventy-third list) note to [VERTICAL_SLICE_CHECKLIST.md](workflow/VERTICAL_SLICE_CHECKLIST.md) §3 and to [CONSOLE_COMMANDS.md](CONSOLE_COMMANDS.md); entry point unchanged (CONSOLE_COMMANDS links §3 and command reference). (3) Added seventy-third list T8 cycle note to [KNOWN_ERRORS.md](KNOWN_ERRORS.md). Set T8 status to **completed** in CURRENT_TASK_LIST.md only.
+
+**Success criteria met:** Vertical slice §4 seventy-third updated; CONSOLE_COMMANDS/workflow current; KNOWN_ERRORS cycle note. **Next:** T9 (Verification).
+
+---
+
+## 2026-03-09 T9: Verification (seventy-third list)
+
+**Tasks completed:**
+- T9 (seventy-third list): (1) Build not applicable — no C++ or Build.cs changes in T1–T8 this list (packaged build run, smoke test deferred, checklist/gate/vertical slice §4, KNOWN_ERRORS ref, Phase 4 prep). (2) Doc review: VERTICAL_SLICE_CHECKLIST §3 (T1–T8 seventy-third, CONSOLE_COMMANDS entry point) and §4 (Seventy-third-list deliverables: Phase 3 Steam Demo) are consistent with CONSOLE_COMMANDS and STEAM_EA_STORE_CHECKLIST (T1 packaging exit 25, T2 smoke test deferred, T3/T6 Phase 3 outcome, KNOWN_ERRORS ref). (3) `validate_task_list.py` passed. Added T9 (seventy-third list) verification outcome to VERTICAL_SLICE_CHECKLIST §3. Set T9 status to **completed** in CURRENT_TASK_LIST.md only.
+
+**Success criteria met:** Doc review done and noted; validate_task_list.py passed; T9 status set to completed. **Next:** T10 (Buffer: ACCOMPLISHMENTS §4 + PROJECT_STATE §4).
+
+---
+
+## 2026-03-09 T10: Buffer (seventy-third list complete)
+
+**Tasks completed:**
+- T10 (seventy-third list): (1) Added seventy-third 10-task list row to ACCOMPLISHMENTS_OVERVIEW §4 (Phase 3: packaged build run, smoke test or deferred, Phase 3 gate, vertical slice §4, docs and cycle, verification, buffer; next = Phase 4 Steam Demo store draft). (2) Updated ACCOMPLISHMENTS_OVERVIEW "Last updated" to list 73 complete. (3) Updated PROJECT_STATE_AND_TASK_LIST §4: seventy-third list marked **complete**; next = Phase 4 (Steam Demo store draft) per ASSETS_AND_STEAM_DEMO_PHASED_APPROACH. (4) Set T10 status to **completed** in CURRENT_TASK_LIST.md only. Did not replace CURRENT_TASK_LIST (user does that after the loop).
+
+**Success criteria met:** ACCOMPLISHMENTS_OVERVIEW §4 has seventy-third-cycle row; PROJECT_STATE §4 says list 73 complete and points to Phase 4; T10 status set to completed. **All T1–T10 (seventy-third list) complete.** Next: user generates new list per [HOW_TO_GENERATE_TASK_LIST.md](workflow/HOW_TO_GENERATE_TASK_LIST.md), then runs `.\Tools\Start-AllAgents-InNewWindow.ps1` when ready for Phase 4.

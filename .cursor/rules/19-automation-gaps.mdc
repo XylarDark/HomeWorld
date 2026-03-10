@@ -17,10 +17,10 @@ When a task corresponds to a **logged automation gap**:
 - Read [docs/AUTOMATION_GAPS.md](../../docs/AUTOMATION_GAPS.md) and the "Solution approaches" section.
 - If applicable, read [docs/FULL_AUTOMATION_RESEARCH.md](../../docs/FULL_AUTOMATION_RESEARCH.md) and [docs/PCG_VARIABLES_NO_ACCESS.md](../../docs/PCG_VARIABLES_NO_ACCESS.md).
 
-## 2. Prefer programmatic, then GUI, then document
+## 2. Prefer programmatic, then GUI (default for Editor UI), then document
 
 1. **Programmatic first:** Existing C++/Blueprint reuse, Python API, or commandlet. Try before falling back.
-2. **GUI automation:** Ref-based script in `Content/Python/gui_automation/` (see [pcg_apply_manual_steps.py](../../Content/Python/gui_automation/pcg_apply_manual_steps.py), [state_tree_apply_defend_branch.py](../../Content/Python/gui_automation/state_tree_apply_defend_branch.py)).
+2. **GUI automation (default for Editor UI):** When a step requires Editor UI interaction and a GUI automation script exists (e.g. in `Content/Python/gui_automation/`), **use it as the default method**. Run or instruct running the script (with ref images captured if needed); treat manual steps only as fallback when GUI is unavailable or fails. See [automation-standards.mdc](automation-standards.mdc) (Editor UI automation as default) and [docs/GUI_AUTOMATION_WHY_AND_WHEN.md](../../docs/GUI_AUTOMATION_WHY_AND_WHEN.md).
 3. **Document only** if neither is viable; do not output "manual steps" for the user — log to AUTOMATION_GAPS with suggested approach.
 
 ## 3. Gap-specific guidance

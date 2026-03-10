@@ -76,6 +76,19 @@ At the start we have **four biomes**. Each has a distinct **harvestable focus**,
 
 Per-biome harvestable, monster, and dungeon lists can be expanded in later task lists (e.g. specific tree or rock variants per biome).
 
+### 2.0 Per-biome content (structure)
+
+Each biome on the planetoid has the same **content structure** so the player always has clear things to do. Per [PLANETOID_DESIGN.md](PLANETOID_DESIGN.md) § Per-biome structure:
+
+| Element | Per biome |
+|---------|-----------|
+| **Harvest place** | At least one area where the player can harvest that biome’s resources (trees, herbs, rocks, water, spirits as per the table above). |
+| **Monster camps** | A **couple of camps** of corrupted monsters (per-biome type from §2.1). |
+| **Dungeon camp** | **One camp outside a dungeon** — a monster camp at or near the dungeon entrance for that biome (dungeon type from §2.2). |
+| **Side quest giver** | One **side quest giver** in the biome. |
+
+Placement (PCG, scripts, or hand-authored) ensures every biome has these four; implementation is task-list driven.
+
 ### 2.1 Monster types per biome (config)
 
 Per-biome **corrupted** monster types (for spawn or AI) are defined in config so that placement scripts or spawn logic can look up which monster type IDs to use in each biome:
