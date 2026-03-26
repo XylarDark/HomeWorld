@@ -1,8 +1,24 @@
-# MCP Server Setup: Cursor-to-Unreal Editor Bridge
+# MCP Setup – Cursor to Unreal Editor
 
-Connect Cursor IDE to the running Unreal Editor so the AI agent can create assets, spawn actors, configure Blueprints, and manipulate the Editor in real time.
+This guide gets the **MCP (Model Context Protocol) bridge** working so Cursor can talk to the Unreal Editor. When it’s set up, the AI agent can create assets, spawn actors, configure Blueprints, and run Python scripts in the Editor from Cursor.
 
-## Installed configuration
+**You will:** Run one batch file (recommended) or follow the manual steps. Then build the project, open the Editor, and restart Cursor so the connection appears.
+
+---
+
+## Quick start (recommended)
+
+From the project root, run:
+
+```
+Setup-MCP.bat
+```
+
+This installs `uv`, clones the MCP server, installs Python dependencies, copies the UE plugin, and creates `.cursor/mcp.json`. When it finishes: run **Build-HomeWorld.bat**, open the Editor, and **restart Cursor**. You should see the MCP connection (green dot) when the Editor is running.
+
+---
+
+## Installed configuration (reference)
 
 | Component | Location |
 |-----------|----------|
@@ -12,18 +28,6 @@ Connect Cursor IDE to the running Unreal Editor so the AI agent can create asset
 | Cursor rule | `.cursor\rules\09-mcp-workflow.mdc` |
 
 The plugin auto-starts a TCP listener on **port 55557** when the Editor opens. Cursor launches the Python MCP server via the `uv run` command defined in `.cursor/mcp.json`.
-
----
-
-## Quick start (one command)
-
-From the project root, run:
-
-```
-Setup-MCP.bat
-```
-
-This handles everything: installs `uv`, clones the MCP server, installs Python dependencies, copies the UE plugin, and creates `.cursor/mcp.json`. After it finishes, build the project (`Build-HomeWorld.bat`), open the Editor, and restart Cursor.
 
 ---
 

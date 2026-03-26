@@ -8,6 +8,6 @@ Run the **Gap-Solver** role: implement solutions for logged automation gaps so t
 .\Tools\Run-GapSolverAgent.ps1
 ```
 
-Optionally with `-Model <name>`. The Gap-Solver reads docs/AUTOMATION_GAPS.md and docs/GAP_SOLUTIONS_RESEARCH.md, then for each gap without a solution implemented: implements programmatic solution first (e.g. portal via AHomeWorldDungeonEntrance), then GUI automation stub or docs, and updates AUTOMATION_GAPS and GAP_SOLUTIONS_RESEARCH.
+Optionally with `-Model <name>`. The Gap-Solver reads docs/Automation/AUTOMATION_GAPS.md and docs/Automation/GAP_SOLUTIONS_RESEARCH.md, then for each gap without a solution implemented: implements programmatic solution first (e.g. portal via AHomeWorldDungeonEntrance), then GUI automation stub or docs, and updates AUTOMATION_GAPS and GAP_SOLUTIONS_RESEARCH.
 
-See docs/AGENT_COMPANY.md (Gap-Solver role) and .cursor/skills/automation-gap-solutions/SKILL.md. Logs to Saved/Logs/gap_solver.log.
+See docs/Automation/AGENT_COMPANY.md (Gap-Solver role) and .cursor/skills/automation-gap-solutions/SKILL.md. Logs to Saved/Logs/gap_solver.log.

@@ -1,6 +1,10 @@
-# Editor–build protocol (automatic)
+# Editor–build protocol
 
-Builds must not stall because the Unreal Editor is open. This protocol is applied automatically by the tools below; the agent does not assume the user will close the Editor.
+When to close the Editor before a C++ build and which scripts to use so builds don’t stall. The tools below apply this automatically.
+
+**When to use this:** You’re about to run a C++ build (e.g. `Build-HomeWorld.bat`) and the Editor might be open, or a build failed with "Live Coding" / "module locked." Use **Safe-Build.ps1** or **run_automation_cycle.py** so the Editor is closed and the build retried when needed.
+
+---
 
 ## Why this exists
 

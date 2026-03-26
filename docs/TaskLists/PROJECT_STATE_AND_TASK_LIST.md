@@ -109,7 +109,7 @@ Use this list as the source of "what to do next." Each item has a **goal**, **su
 ## 4. Current list (seventy-third 10-task list — Phase 3 Steam Demo packaged build + smoke test)
 
 - The **seventy-third 10-task list** is **complete**. Phase 3 (Steam Demo packaged build + smoke test): T1–T10 in [CURRENT_TASK_LIST.md](CURRENT_TASK_LIST.md) all completed (packaged build run, smoke test or deferred, Phase 3 gate, vertical slice §4, docs and cycle, verification, buffer).
-- **Next (after list 73):** Phase 4 (Steam Demo store draft) per [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md). Generate next list per [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md); run `.\Tools\Start-AllAgents-InNewWindow.ps1` when ready.
+- **Next (after list 73):** Phase 4 (Steam Demo store draft) **skipped**. Generate next list per [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md); next focus per [NEXT_30_DAY_WINDOW.md](NEXT_30_DAY_WINDOW.md) (assets, polish, deferred, etc.). Run `.\Tools\Start-AllAgents-InNewWindow.ps1` when ready.
 - **Cycle doc freshness and next priority:** See [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) (top) and [ACCOMPLISHMENTS_OVERVIEW.md](ACCOMPLISHMENTS_OVERVIEW.md) §4.
 
 ---

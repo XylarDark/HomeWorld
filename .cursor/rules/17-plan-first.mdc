@@ -28,7 +28,7 @@ When the user says **"make a plan," "create a plan," or "develop a plan,"** use 
 - **Constraints:** Any boundaries from AGENTS.md or KNOWN_ERRORS (e.g. MCP safety, idempotency).
 - **Success:** How we will verify (tests, manual check, or “document why deferred”).
 
-Keep the plan short (bullets, not essays). Reference existing docs (e.g. `docs/tasks/`, `docs/CONVENTIONS.md`) instead of duplicating them.
+Keep the plan short (bullets, not essays). Reference existing docs (e.g. `docs/TaskLists/TaskSpecs/`, `docs/CONVENTIONS.md`) instead of duplicating them.
 
 ## Saving plans
 

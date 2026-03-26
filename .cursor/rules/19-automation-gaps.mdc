@@ -27,7 +27,7 @@ When a task corresponds to a **logged automation gap**:
 
 - **Portal / Level Streaming (Gap 1):** Spawn [AHomeWorldDungeonEntrance](../../Source/HomeWorld/HomeWorldDungeonEntrance.h) (or BP) at portal position and set `LevelToOpen` from [planetoid_map_config.json](../../Content/Python/planetoid_map_config.json). Implemented in [place_portal_placeholder.py](../../Content/Python/place_portal_placeholder.py). If Python cannot set the property, document and/or add GUI automation.
 - **PCG no-access steps:** Run or instruct running [pcg_apply_manual_steps.py](../../Content/Python/gui_automation/pcg_apply_manual_steps.py) with Editor focused and refs present; if refs missing, run [capture_pcg_refs.py](../../Content/Python/gui_automation/capture_pcg_refs.py) per [refs/README.md](../../Content/Python/gui_automation/refs/README.md).
-- **State Tree (Gap 2):** No high-level Python API for graph editing. Use [state_tree_apply_defend_branch.py](../../Content/Python/gui_automation/state_tree_apply_defend_branch.py) with refs in [refs/state_tree/](../../Content/Python/gui_automation/refs/state_tree/), or one-time manual per [DAY12_ROLE_PROTECTOR.md](../../docs/tasks/DAY12_ROLE_PROTECTOR.md).
+- **State Tree (Gap 2):** No high-level Python API for graph editing. Use [state_tree_apply_defend_branch.py](../../Content/Python/gui_automation/state_tree_apply_defend_branch.py) with refs in [refs/state_tree/](../../Content/Python/gui_automation/refs/state_tree/), or one-time manual per [DAY12_ROLE_PROTECTOR.md](../../docs/TaskLists/TaskSpecs/DAY12_ROLE_PROTECTOR.md).
 
 ## 4. After implementing or attempting
 

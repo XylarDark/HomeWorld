@@ -7,7 +7,7 @@ description: Validate or troubleshoot PCG setup (ForestIsland_PCG, volume, lands
 
 Check that the PCG graph, volume, and landscape are correctly configured so Generate produces instances.
 
-**Short path:** For a one-page, tutorial-aligned setup (manual-only or script + 3 steps) and **volume sizing for DemoMap**, use [docs/PCG_QUICK_SETUP.md](../../docs/PCG_QUICK_SETUP.md).
+**Short path:** For a one-page, tutorial-aligned setup (manual-only or script + 3 steps) and **volume sizing for DemoMap**, use [docs/PCG_QUICK_SETUP.md](../../docs/PCG/PCG_QUICK_SETUP.md).
 
 ## When to use
 
@@ -35,17 +35,17 @@ When the user reports that **Generate produces no instances**, follow this order
 
 ## Minimal working graph
 
-Input → **Get Landscape Data** → **Surface Sampler** (Surface + Bounding) → [optional Transform Points] → **Static Mesh Spawner** → Output. Get Landscape Data **Out** → Surface Sampler **Surface**; graph **Input** → Surface Sampler **Bounding Shape**. Mesh list and Get Landscape Data (By Tag + Component) are **mandatory manual steps** in UE 5.7; see [docs/PCG_BEST_PRACTICES.md](../../docs/PCG_BEST_PRACTICES.md) and [docs/PCG_VARIABLES_NO_ACCESS.md](../../docs/PCG_VARIABLES_NO_ACCESS.md).
+Input → **Get Landscape Data** → **Surface Sampler** (Surface + Bounding) → [optional Transform Points] → **Static Mesh Spawner** → Output. Get Landscape Data **Out** → Surface Sampler **Surface**; graph **Input** → Surface Sampler **Bounding Shape**. Mesh list and Get Landscape Data (By Tag + Component) are **mandatory manual steps** in UE 5.7; see [docs/PCG/PCG_BEST_PRACTICES.md](../../docs/PCG/PCG_BEST_PRACTICES.md) and [docs/PCG/PCG_VARIABLES_NO_ACCESS.md](../../docs/PCG/PCG_VARIABLES_NO_ACCESS.md).
 
 ## Mandatory manual steps
 
-Before changing the graph or adding nodes, ensure these are documented and (where applicable) done in the Editor: (1) Get Landscape Data: By Tag `PCG_Landscape`, Component By Class → Landscape Component; (2) Mesh list on each Static Mesh Spawner; (3) Graph assigned to volume; (4) Landscape tag and Component Subsection 1x1; (5) World Partition Load All before Generate if the level uses WP. See [docs/PCG_BEST_PRACTICES.md](../../docs/PCG_BEST_PRACTICES.md).
+Before changing the graph or adding nodes, ensure these are documented and (where applicable) done in the Editor: (1) Get Landscape Data: By Tag `PCG_Landscape`, Component By Class → Landscape Component; (2) Mesh list on each Static Mesh Spawner; (3) Graph assigned to volume; (4) Landscape tag and Component Subsection 1x1; (5) World Partition Load All before Generate if the level uses WP. See [docs/PCG/PCG_BEST_PRACTICES.md](../../docs/PCG/PCG_BEST_PRACTICES.md).
 
 ## General validation (when to use)
 
 1. **Landscape tag:** The Landscape in the level must have the tag **PCG_Landscape**. The script `create_demo_from_scratch.py` calls `ensure_landscape_has_pcg_tag()`. If unsure, select the Landscape in the Outliner → Details → Actor → Tags → add PCG_Landscape. Landscape Component Subsection should be **1x1** (Details) for PCG in UE 5.x.
 
-2. **Get Landscape Data (in graph):** Open ForestIsland_PCG → select **Get Landscape Data** node → Details: **Actor** → **By Tag**, tag **PCG_Landscape**; **Component** → **By Class** → **Landscape Component** if available. Script cannot set this in UE 5.7; it must be done in the Editor. See [docs/PCG_SETUP.md](../../docs/PCG_SETUP.md) and [docs/PCG_VARIABLES_NO_ACCESS.md](../../docs/PCG_VARIABLES_NO_ACCESS.md).
+2. **Get Landscape Data (in graph):** Open ForestIsland_PCG → select **Get Landscape Data** node → Details: **Actor** → **By Tag**, tag **PCG_Landscape**; **Component** → **By Class** → **Landscape Component** if available. Script cannot set this in UE 5.7; it must be done in the Editor. See [docs/PCG/PCG_SETUP.md](../../docs/PCG/PCG_SETUP.md) and [docs/PCG/PCG_VARIABLES_NO_ACCESS.md](../../docs/PCG/PCG_VARIABLES_NO_ACCESS.md).
 
 3. **Mesh lists on spawners:** Tree and rocks Static Mesh Spawner nodes need meshes assigned in Details (Mesh Selector / mesh list). Script cannot set these. Use paths from `Content/Python/pcg_forest_config.json` (static_mesh_spawner_meshes, static_mesh_spawner_meshes_rocks) or assign in the graph. Without meshes, Generate produces no instances.
 
@@ -53,7 +53,7 @@ Before changing the graph or adding nodes, ensure these are documented and (wher
 
 5. **Generate from level:** Generate must be triggered from the **level**: select PCG_Forest in Outliner → Details → PCG section → **Generate**. Not from inside the graph editor. If nothing appears, try Ctrl+Click on Generate.
 
-6. **Placement (below ground / tilted):** Check [docs/PCG_SETUP.md](../../docs/PCG_SETUP.md) "Trees at weird angles" and "Poking out the bottom": mesh pivot (base vs center), `transform_offset_z` in pcg_forest_config.json (0 for base-pivot; negative for center-pivot). Transform Points node should have **Absolute Rotation** and **Yaw-only** rotation so trees stay upright; script sets these when creating/updating the graph.
+6. **Placement (below ground / tilted):** Check [docs/PCG/PCG_SETUP.md](../../docs/PCG/PCG_SETUP.md) "Trees at weird angles" and "Poking out the bottom": mesh pivot (base vs center), `transform_offset_z` in pcg_forest_config.json (0 for base-pivot; negative for center-pivot). Transform Points node should have **Absolute Rotation** and **Yaw-only** rotation so trees stay upright; script sets these when creating/updating the graph.
 
 ## From decoration to collectible resources
 
@@ -63,11 +63,11 @@ When the user wants **resources in set locations for the player to collect**, re
 - **Actor Spawner:** Use **Actor Spawner** in the graph to spawn Blueprint actors (e.g. BP_Resource_Tree) with collision and interaction; PCG defines where, Blueprint defines how they are collected. Heavier; document class assignment and partition/streaming.
 - **Hybrid:** PCG generates points; a runtime system reads them and spawns/registers collectible actors. Option for large-scale or when collectibles are a separate layer.
 
-See [docs/PCG_BEST_PRACTICES.md](../../docs/PCG_BEST_PRACTICES.md) section "From decoration to collectible resources" for details.
+See [docs/PCG/PCG_BEST_PRACTICES.md](../../docs/PCG/PCG_BEST_PRACTICES.md) section "From decoration to collectible resources" for details.
 
 ## References
 
-- [docs/PCG_SETUP.md](../../docs/PCG_SETUP.md) — full steps, what script can/cannot do
-- [docs/PCG_BEST_PRACTICES.md](../../docs/PCG_BEST_PRACTICES.md) — minimal graph, manual steps, Partitioned/Hierarchical, decoration vs collectibles
-- [docs/PCG_VARIABLES_NO_ACCESS.md](../../docs/PCG_VARIABLES_NO_ACCESS.md) — settings that require manual Editor steps
+- [docs/PCG/PCG_SETUP.md](../../docs/PCG/PCG_SETUP.md) — full steps, what script can/cannot do
+- [docs/PCG/PCG_BEST_PRACTICES.md](../../docs/PCG/PCG_BEST_PRACTICES.md) — minimal graph, manual steps, Partitioned/Hierarchical, decoration vs collectibles
+- [docs/PCG/PCG_VARIABLES_NO_ACCESS.md](../../docs/PCG/PCG_VARIABLES_NO_ACCESS.md) — settings that require manual Editor steps
 - [docs/KNOWN_ERRORS.md](../../docs/KNOWN_ERRORS.md) — PCG and MCP pitfalls

@@ -1,39 +1,64 @@
-# HomeWorld – Developer Setup Checklist
+# HomeWorld – Developer Setup Guide
 
-Do these steps once. Everything else for first-phase setup is already in the repo.
-
-1. **Engine:** Install Unreal Engine 5.7 (recommended); 5.4+ may work. The project targets UE 5.7 and is compatible with 5.7.x (including 5.7.3). Project is developed code-first; see [CONVENTIONS.md](CONVENTIONS.md).
-2. **Project:** Open `HomeWorld.uproject`; allow first-time load/compile.
-3. **Plugins:** In Editor, **Edit > Plugins** – confirm these are enabled (all are in .uproject):
-   - **PCG**, **Gameplay Abilities**, **Enhanced Input**, **Day Night Sequencer**, **Steam Sockets** (replaces SteamCore for co-op).
-   **Restart UE5 after enabling any new plugins.**  
-   For **Week 2 family agents**, also enable UE 5.7 recommended Mass + State Tree stack (see [Week 2 plugins](#week-2-plugins-mass--state-trees) below).
-4. **Free assets:**
-   - **FAB:** Survival character (or equivalent).
-   - **Quixel:** Biomes/vegetation for forest.
-   - The team will add specific asset names/links here when chosen.
-5. **World:** Primary level(s) **must** use World Partition; **Main** (`/Game/HomeWorld/Maps/Main`) is the canonical map. Confirm in Editor: open Main, **World Settings** → enable **World Partition** if not already. If Main was created without WP, use **World Partition → Convert Level** (or equivalent) once. See [CONTENT_LAYOUT.md](CONTENT_LAYOUT.md) for content paths.
-6. **Roles (optional):** Note Designer / Artist / Programmer / Tester and who leads Week 1.
-
-7. **MCP (Cursor-to-Editor bridge):** Run **`Setup-MCP.bat`** from the project root. This installs the tools that let Cursor's AI agent control the Unreal Editor directly (spawn actors, create Blueprints, set properties). See [MCP_SETUP.md](MCP_SETUP.md) for details and troubleshooting.
-8. **Cursor Agent CLI (optional, for fully automatic loop):** To run the 30-day automation loop without manually starting each session, install the Cursor Agent CLI (see [Cursor CLI docs](https://cursor.com/docs/cli/overview)), run `agent login` (or set `CURSOR_API_KEY`), then run `.\Tools\RunAutomationLoop.ps1` from project root. See [README-Automation.md](../README-Automation.md) and [AUTOMATION_LOOP_UNTIL_DONE.md](AUTOMATION_LOOP_UNTIL_DONE.md). For a one-page "is everything ready?" checklist, see [AUTOMATION_READINESS.md](AUTOMATION_READINESS.md).
-9. **Cursor rules:** The repo ships a full `.cursor/rules/` directory that guides Cursor's AI agent. Open the project in Cursor and the rules are picked up automatically — no extra setup. Skim `.cursor/rules/` for an overview; key rules:
-   - `unreal-cpp.mdc` — C++ conventions and UE 5.7 API pitfalls.
-   - `unreal-project.mdc` — project layout, plugins, default pawn.
-   - `09-mcp-workflow.mdc` — MCP-first workflow priorities.
-   - `07-ai-agent-behavior.mdc` — session continuity (SESSION_LOG), cleanup, error recording.
-   - `05-error-handling.mdc` — error recording policy (`docs/KNOWN_ERRORS.md`).
-   - `08-project-context.mdc` — HomeWorld-specific context and conventions.
-   - **Optional:** Run `/parallel-setup` once for the Parallel plugin (research/enrich). The agent will suggest when to use its commands.
-   - **Optional:** Run `/setup` in Cursor once to configure Compound Engineering review agents for this project. The agent recommends plugin commands (e.g. `/workflowsreview`, `/workflowsplan`) when the use case fits; see `.cursor/rules/10-compound-engineering.mdc`.
-
-After this, follow [workflow/README.md](workflow/README.md) and [workflow/30_DAY_SCHEDULE.md](workflow/30_DAY_SCHEDULE.md) for current tasks.
-
-**CI (optional):** For full build and automation tests in GitHub Actions, a self-hosted Windows runner with UE 5.7 is required. See [CI_SETUP.md](CI_SETUP.md) for setup steps, labels, and `UE_EDITOR`. [validate.yml](../.github/workflows/validate.yml) runs on every push without UE (lint, docs, C++ pairing).
+This guide walks you through setting up the project so you can open the Editor, run scripts, and play in-editor. Do each step once; later sections cover validation, building, and troubleshooting.
 
 ---
 
-## Plugins
+## What you need before starting
+
+- **Windows** (project is developed on Windows).
+- **Unreal Engine 5.7** (or 5.4+; 5.7 recommended). Install from Epic Games Launcher.
+- **HomeWorld repo** cloned locally (e.g. `git clone` and open the folder).
+
+---
+
+## Setup steps (do in order)
+
+### Step 1: Install the engine and open the project
+
+1. Install **Unreal Engine 5.7** from the Epic Games Launcher. The project targets UE 5.7 and is compatible with 5.7.x (including 5.7.3). The project is developed code-first; see [CONVENTIONS.md](CONVENTIONS.md) for conventions.
+2. Open **`HomeWorld.uproject`** (double-click or from the Launcher). Allow first-time load and compile.
+
+### Step 2: Confirm plugins are enabled
+
+In the Editor, go to **Edit → Plugins** and confirm these are enabled (they are listed in the .uproject):
+   - **PCG**, **Gameplay Abilities**, **Enhanced Input**, **Day Night Sequencer**, **Steam Sockets** (replaces SteamCore for co-op).
+   **Restart the Editor** after enabling any new plugins.  
+   For **Week 2 family agents**, also enable the UE 5.7 Mass + State Tree stack (see [Week 2 plugins](#week-2-plugins-mass--state-trees) below).
+
+### Step 3: (Optional) Add free assets
+
+- **FAB:** Survival character (or equivalent).
+- **Quixel:** Biomes/vegetation for forest.  
+  The team will add specific asset names/links here when chosen.
+
+### Step 4: Confirm World Partition on your main level
+
+Primary levels **must** use World Partition. Open **Main** (`/Game/HomeWorld/Maps/Main`) in the Editor → **World Settings** → enable **World Partition** if not already. If Main was created without it, use **World Partition → Convert Level** once. Content paths: [CONTENT_LAYOUT.md](CONTENT_LAYOUT.md).
+
+### Step 5: Set up the MCP bridge (Cursor ↔ Editor)
+
+Run **`Setup-MCP.bat`** from the project root. This installs the tools that let Cursor’s AI agent control the Unreal Editor (spawn actors, create Blueprints, set properties). See [Setup/MCP_SETUP.md](Setup/MCP_SETUP.md) for details and troubleshooting.
+
+### Step 6: (Optional) Cursor Agent CLI and automation
+
+To run the 30-day automation loop without starting each session manually: install the [Cursor Agent CLI](https://cursor.com/docs/cli/overview), run `agent login` (or set `CURSOR_API_KEY`), then run `.\Tools\RunAutomationLoop.ps1` from the project root. See [Automation/AUTOMATION_LOOP_UNTIL_DONE.md](Automation/AUTOMATION_LOOP_UNTIL_DONE.md). For a short “is everything ready?” checklist, see [Automation/AUTOMATION_READINESS.md](Automation/AUTOMATION_READINESS.md).
+
+### Step 7: (Optional) Cursor rules and plugins
+
+The repo ships a `.cursor/rules/` directory; open the project in Cursor and the rules load automatically. Key rules: `unreal-cpp.mdc`, `unreal-project.mdc`, `09-mcp-workflow.mdc`, `07-ai-agent-behavior.mdc`, `08-project-context.mdc`. Optional: run `/parallel-setup` once for the Parallel plugin; run `/setup` in Cursor once for Compound Engineering review agents (see `.cursor/rules/10-compound-engineering.mdc`).
+
+---
+
+## What to do next
+
+After setup, follow [workflow/README.md](workflow/README.md) and [workflow/30_DAY_SCHEDULE.md](workflow/30_DAY_SCHEDULE.md) for current tasks.
+
+**CI (optional):** For full build and automation tests in GitHub Actions, use a self-hosted Windows runner with UE 5.7. See [Setup/CI_SETUP.md](Setup/CI_SETUP.md). The [validate.yml](../.github/workflows/validate.yml) workflow runs on every push (lint, docs, C++ pairing) without needing the Editor.
+
+---
+
+## Plugins (reference)
 
 All required plugins are enabled in `HomeWorld.uproject`. No Marketplace install is needed for co-op: **Steam Sockets** (in .uproject) replaces SteamCore/Steam Sessions.
 
@@ -49,7 +74,7 @@ All required plugins are enabled in `HomeWorld.uproject`. No Marketplace install
 
 **Python/PCG scripts:** For the demo map and PCG forest scripts, **PythonScriptPlugin** and **PCGPythonInterop** must also be enabled. Restart the Editor after first enable.
 
-**Milady Character Import pipeline (optional):** For the Milady chibi protagonist pipeline (wallet connect → NFT verification → IPFS PNG → Meshy 2D→3D → VRM import → retarget), install and enable: **VRM4U** (GitHub: ruyo/VRM4U), **Meshy-for-Unreal** (Meshy.ai), and a Web3/Wallet plugin (e.g. Web3.UE or MetaMask Embedded Wallets SDK). Add them to `HomeWorld.uproject` after installation. One-time setup (API keys, plugin order, known issues) is documented in [MILADY_IMPORT_SETUP.md](MILADY_IMPORT_SETUP.md). Content paths: `/Game/HomeWorld/Milady/` per [CONTENT_LAYOUT.md](CONTENT_LAYOUT.md). See [MILADY_IMPORT_ROADMAP.md](tasks/MILADY_IMPORT_ROADMAP.md) for the full task roadmap.
+**Milady Character Import pipeline (optional):** For the Milady chibi protagonist pipeline, install **VRM4U**, **Meshy-for-Unreal**, and a Web3/Wallet plugin; add them to `HomeWorld.uproject`. One-time setup is in [Assets/MILADY_IMPORT_SETUP.md](Assets/MILADY_IMPORT_SETUP.md). Content paths: [CONTENT_LAYOUT.md](CONTENT_LAYOUT.md).
 
 ---
 
@@ -66,15 +91,15 @@ Use this checklist to confirm Git and GitHub setup.
 
 ---
 
-## Validation
+## How to confirm setup is complete
 
-Use this to confirm first-phase setup is complete before starting tasks.
+Use this checklist to confirm first-phase setup before starting tasks. Work through each section in order.
 
 **In-repo (no Editor):**
 
 - [ ] **Plugins:** In `HomeWorld.uproject`, the `Plugins` array includes `PCG`, `GameplayAbilities`, `EnhancedInput`, `SteamSockets`, and `DaySequence` (or `TimeOfDay`), each with `"Enabled":true`.
 - [ ] **Default map:** In `Config/DefaultEngine.ini`, under `[/Script/EngineSettings.GameMapsSettings]`, `GameDefaultMap` and `EditorStartupMap` are set. **First launch:** Editor opens on DemoMap. **After first load:** init_unreal creates MainMenu (if missing) and sets EditorStartupMap to MainMenu so the next launch opens on the main menu. See [Default map and Editor startup map](#default-map-and-editor-startup-map-list-55) below.
-- [ ] **Docs:** `docs/workflow/README.md`, `docs/workflow/VISION.md`, `docs/workflow/30_DAY_SCHEDULE.md`, `docs/SETUP.md`, `docs/SESSION_LOG.md`, `docs/CONTENT_LAYOUT.md` exist.
+- [ ] **Docs:** `docs/workflow/README.md`, `docs/workflow/30_DAY_SCHEDULE.md`, `docs/SETUP.md`, `docs/SESSION_LOG.md`, `docs/CONTENT_LAYOUT.md` exist.
 - [ ] **Main map:** World Partition is enabled (open Main → World Settings → Enable World Partition). See [CONTENT_LAYOUT.md](CONTENT_LAYOUT.md).
 
 **C++ and default pawn:**
@@ -89,11 +114,11 @@ Use this to confirm first-phase setup is complete before starting tasks.
 - [ ] FAB/Quixel assets (or equivalents) acquired if needed.
 - [ ] Team has run through the [workflow Pre–Day 1 checklist](workflow/README.md) if applicable.
 
-When all above are checked, proceed to [workflow/30_DAY_SCHEDULE.md](workflow/30_DAY_SCHEDULE.md) and the task docs in `docs/tasks/`.
+When all above are checked, proceed to [workflow/30_DAY_SCHEDULE.md](workflow/30_DAY_SCHEDULE.md) and the task specs in [TaskLists/TaskSpecs/](TaskLists/TaskSpecs/).
 
-**Testing and validation:** The `PythonAutomationTest` plugin is enabled. Test files in `Content/Python/tests/` (`test_*.py`) are auto-discovered by the Editor's Test Automation window. Run from Editor (Tools > Test Automation) or use the PIE test runner (`Content/Python/pie_test_runner.py`). Level tests that load a map use the latent level loader (see [LEVEL_TESTING_PLAN.md](LEVEL_TESTING_PLAN.md)). An optional PIE full-flow test (`test_level_pie_flow.py`) loads DemoMap, starts PIE, runs checks, and stops PIE (~30–60 s); run from Tools > Test Automation when needed. For manual checks, run through the checklist above and play-test where applicable.
+**Testing:** The `PythonAutomationTest` plugin is enabled. Tests in `Content/Python/tests/` (`test_*.py`) appear in **Tools → Test Automation**. You can also run the PIE test runner: `Content/Python/pie_test_runner.py`. Level tests use the latent level loader; see [Testing/LEVEL_TESTING_PLAN.md](Testing/LEVEL_TESTING_PLAN.md). For a full PIE flow (~30–60 s), run `test_level_pie_flow.py` from Test Automation. For manual checks, run through this checklist and play-test.
 
-When you fix a build, lint, or runtime error, record it in [KNOWN_ERRORS.md](KNOWN_ERRORS.md) so we don't repeat it.
+**Recording errors:** When you fix a build, lint, or runtime error, add it to [KNOWN_ERRORS.md](KNOWN_ERRORS.md) so the team doesn’t repeat it.
 
 ### Default map and Editor startup map (List 55)
 

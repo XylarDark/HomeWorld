@@ -23,7 +23,7 @@ This rule is the **Editor UI** part of the broader UE 5.7 sourcing policy. See *
 ## Where to document verified UI steps
 
 - **Project doc:** [docs/UE57_EDITOR_UI.md](../docs/UE57_EDITOR_UI.md) — UE 5.7–sourced Editor UI procedures (Content Browser, Show Engine Content, basic shapes, etc.). Update this when we confirm steps against Epic 5.7 docs or user feedback.
-- Task docs (e.g. `docs/tasks/DAY11_FAMILY_SPAWN.md`) should link to UE57_EDITOR_UI.md for Editor UI sequences rather than inlining possibly outdated steps.
+- Task docs (e.g. `docs/TaskLists/TaskSpecs/DAY11_FAMILY_SPAWN.md`) should link to UE57_EDITOR_UI.md for Editor UI sequences rather than inlining possibly outdated steps.
 
 ## Quick reference (Epic 5.7)
 

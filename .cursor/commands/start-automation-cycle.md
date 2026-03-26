@@ -42,7 +42,7 @@ If the user wants the process to **never end until all 30-day tasks are implemen
 1. Read [docs/workflow/30_DAY_IMPLEMENTATION_STATUS.md](../docs/workflow/30_DAY_IMPLEMENTATION_STATUS.md) and work on the first day with status `pending` (or execute the plan in `.cursor/plans/` if the prompt references one).
 2. When you finish or block a day, update that file (set day to `done` or `blocked`), update DAILY_STATE and SESSION_LOG.
 3. Create a short implementation plan for the **next** pending day (goal, key steps, task doc link, success criteria) and save it to `.cursor/plans/dayN-<slug>.md` (e.g. `day7-resource-nodes.md`), or embed the plan steps in NEXT_SESSION_PROMPT. The next session should execute that plan.
-4. At **session end**, write [docs/workflow/NEXT_SESSION_PROMPT.md](../docs/workflow/NEXT_SESSION_PROMPT.md) with the exact prompt to paste in a **new chat** to continue (e.g. reference the plan file or include the steps). The agent cannot start a new session by itself; the user (or external tooling) starts the next session and pastes that prompt. See [docs/AUTOMATION_LOOP_UNTIL_DONE.md](../docs/AUTOMATION_LOOP_UNTIL_DONE.md).
+4. At **session end**, write [docs/workflow/NEXT_SESSION_PROMPT.md](../docs/workflow/NEXT_SESSION_PROMPT.md) with the exact prompt to paste in a **new chat** to continue (e.g. reference the plan file or include the steps). The agent cannot start a new session by itself; the user (or external tooling) starts the next session and pastes that prompt. See [docs/Automation/AUTOMATION_LOOP_UNTIL_DONE.md](../docs/Automation/AUTOMATION_LOOP_UNTIL_DONE.md).
 
 ## Success
 

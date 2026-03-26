@@ -10,7 +10,7 @@ version: 1.0
 
 When the user has started the **automatic development cycle** (via the start-automation-cycle command or by asking to "Continue" the cycle), follow the steps below. Read [docs/workflow/CYCLE_TASKLIST.md](docs/workflow/CYCLE_TASKLIST.md) and [docs/workflow/CYCLE_STATE.md](docs/workflow/CYCLE_STATE.md) at the start of each iteration; update both as you go.
 
-**30-day "loop until done":** If the user wants the process to run until all 30-day tasks are **implementation-complete**, also read [docs/workflow/30_DAY_IMPLEMENTATION_STATUS.md](docs/workflow/30_DAY_IMPLEMENTATION_STATUS.md). Work on the first day with status `pending` (or `blocked` if resuming with a fix). When you complete or block a day, set its status to `done` or `blocked` in that file. At **session end**, write [docs/workflow/NEXT_SESSION_PROMPT.md](docs/workflow/NEXT_SESSION_PROMPT.md) with the exact prompt to start the next session (so the user or external tooling can paste it and continue). See [docs/AUTOMATION_LOOP_UNTIL_DONE.md](docs/AUTOMATION_LOOP_UNTIL_DONE.md).
+**30-day "loop until done":** If the user wants the process to run until all 30-day tasks are **implementation-complete**, also read [docs/TaskLists/30_DAY_IMPLEMENTATION_STATUS.md](docs/TaskLists/30_DAY_IMPLEMENTATION_STATUS.md). Work on the first day with status `pending` (or `blocked` if resuming with a fix). When you complete or block a day, set its status to `done` or `blocked` in that file. At **session end**, write [docs/TaskLists/NEXT_SESSION_PROMPT.md](docs/TaskLists/NEXT_SESSION_PROMPT.md) with the exact prompt to start the next session (so the user or external tooling can paste it and continue). See [docs/AUTOMATION_LOOP_UNTIL_DONE.md](docs/AUTOMATION_LOOP_UNTIL_DONE.md).
 
 ---
 
@@ -26,7 +26,7 @@ For the **current task** (from CYCLE_STATE.current_task_index and CYCLE_TASKLIST
 
 4. **Perform debug** — If test failed: from **first principles** — what exactly failed? (log, assertion, screenshot.) Form a hypothesis; check KNOWN_ERRORS and relevant docs; apply minimal fix and re-test. Record last_error_summary in CYCLE_STATE so the same-failure guard can trigger.
 
-5. **Finalize task** — If test passed: mark task **completed** in CYCLE_TASKLIST; update DAILY_STATE (yesterday/today); append SESSION_LOG; advance current_task_index in CYCLE_STATE; reset retry_count. If using 30-day implementation status, set the completed day to `done` in docs/workflow/30_DAY_IMPLEMENTATION_STATUS.md. Then proceed to next task or report cycle done.
+5. **Finalize task** — If test passed: mark task **completed** in CYCLE_TASKLIST; update DAILY_STATE (yesterday/today); append SESSION_LOG; advance current_task_index in CYCLE_STATE; reset retry_count. If using 30-day implementation status, set the completed day to `done` in docs/TaskLists/30_DAY_IMPLEMENTATION_STATUS.md. Then proceed to next task or report cycle done.
 
 6. **Update rules** — On any failure that is instructive: add or update an entry in docs/KNOWN_ERRORS.md (and optional feature doc). No new rule file unless a recurring pattern justifies it.
 
@@ -64,5 +64,5 @@ For the **current task** (from CYCLE_STATE.current_task_index and CYCLE_TASKLIST
 
 When the user has asked for the process to **never end until all 30-day tasks are done** (or equivalent):
 
-- At the **end of every session** (before you stop), write **docs/workflow/NEXT_SESSION_PROMPT.md** with the exact prompt the user (or external script) should paste in a **new chat** to continue. The prompt should instruct the next agent to read 30_DAY_IMPLEMENTATION_STATUS, DAILY_STATE, SESSION_LOG; work on the next pending day; update status and state; and write NEXT_SESSION_PROMPT again. So each session hands off to the next via that file.
+- At the **end of every session** (before you stop), write **docs/TaskLists/NEXT_SESSION_PROMPT.md** with the exact prompt the user (or external script) should paste in a **new chat** to continue. The prompt should instruct the next agent to read 30_DAY_IMPLEMENTATION_STATUS, DAILY_STATE, SESSION_LOG; work on the next pending day; update status and state; and write NEXT_SESSION_PROMPT again. So each session hands off to the next via that file.
 - The agent **cannot** start a new Cursor session by itself; something external (user or tooling) must open a new chat and paste the prompt. See docs/AUTOMATION_LOOP_UNTIL_DONE.md for options and external tooling.

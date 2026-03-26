@@ -1,6 +1,18 @@
 # Automation readiness
 
-**Short answer:** The development environment is set up for programming and testing both inside and outside the Editor. The fully automated 30-day loop is ready to run once the prerequisites below are met. A few gaps (CI doc paths, readiness checklist) were closed so CI passes and "ready to go" is clearly defined.
+This page tells you **what’s ready to run** and **what you must do first** before using the 30-day automation loop (Cursor agents + Editor + scripts).
+
+---
+
+## Quick start: run the loop
+
+1. **Install and log in to Cursor Agent CLI** — See [Prerequisites](#prerequisites-to-run-the-loop) step 1 and 2.
+2. **Set `UE_EDITOR`** — Point it to your `UnrealEditor.exe` (step 3).
+3. **Open the Unreal Editor** — Open the HomeWorld project so it’s running.
+4. **Start the agents** — From the project root run: `.\Tools\Start-AllAgents-InNewWindow.ps1`.  
+   Optionally use **`-LaunchEditor`** so the script launches the Editor (requires `UE_EDITOR` set).
+
+After that, the loop uses the task list and runs sessions until the 30-day window is done (or you stop it). To confirm your machine is ready, run `.\Tools\Check-AutomationPrereqs.ps1`.
 
 ---
 
@@ -33,7 +45,7 @@ Complete these in order before running the automation loop:
 
 After all four are done, **open the Editor first**, then run `.\Tools\Start-AllAgents-InNewWindow.ps1` from the project root. Use `-LaunchEditor` only if you want the script to launch the Editor (can hit timeout or map issues; see KNOWN_ERRORS).
 
-**If you used -LaunchEditor and see "Editor launch/wait failed (exit 1)":** Open the Editor yourself, then run `.\Tools\Start-AllAgents-InNewWindow.ps1` (no flag). Check `Saved/Logs/editor_launch_<timestamp>.log` and [EDITOR_LAUNCH_DEEP_DIVE.md](EDITOR_LAUNCH_DEEP_DIVE.md) if you need to debug launch.
+**If you used -LaunchEditor and see "Editor launch/wait failed (exit 1)":** Open the Editor yourself, then run `.\Tools\Start-AllAgents-InNewWindow.ps1` (no flag). Check `Saved/Logs/editor_launch_<timestamp>.log` and [../Editor/EDITOR_LAUNCH_DEEP_DIVE.md](../Editor/EDITOR_LAUNCH_DEEP_DIVE.md) if you need to debug launch.
 
 ---
 
@@ -56,6 +68,6 @@ After all four are done, **open the Editor first**, then run `.\Tools\Start-AllA
 
 - The loop auto-launches the Unreal Editor before the first round when `UE_EDITOR` is set and the Editor is not running. Set `UE_EDITOR` to your UnrealEditor.exe path. Use `-NoLaunchEditor` to run without the Editor.
 - Full build and UE automation in CI require a self-hosted Windows runner with UE 5.7 (ci.yml).
-- Some Editor actions have no Python/MCP API; use the C++ commandlet (e.g. ApplyPCGSetup for graph assignment), Editor + auto-clicker with refs, or one-time manual setup. See docs/PCG_VARIABLES_NO_ACCESS.md and task docs.
+- Some Editor actions have no Python/MCP API; use the C++ commandlet (e.g. ApplyPCGSetup for graph assignment), Editor + auto-clicker with refs, or one-time manual setup. See [PCG/PCG_VARIABLES_NO_ACCESS.md](../PCG/PCG_VARIABLES_NO_ACCESS.md) and task docs.
 
-See [README-Automation.md](../README-Automation.md) for commands and [docs/AUTOMATION_LOOP_UNTIL_DONE.md](AUTOMATION_LOOP_UNTIL_DONE.md) for loop behavior.
+See [README-Automation.md](../../README-Automation.md) for commands and [AUTOMATION_LOOP_UNTIL_DONE.md](AUTOMATION_LOOP_UNTIL_DONE.md) for loop behavior.

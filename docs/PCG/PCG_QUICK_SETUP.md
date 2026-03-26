@@ -1,6 +1,8 @@
-# PCG Quick Setup — Tutorial-aligned (UE 5.7)
+# PCG Quick Setup – Tutorial (UE 5.7)
 
-One-page flow so PCG works without a tedious process. Based on Epic’s PCG workflow: **graph (Get Landscape Data → Surface Sampler → Spawner) → volume (sized to landscape) → Generate**.
+This guide gets PCG (trees, rocks, etc.) working on a landscape in one sitting. Choose **Option A** if you want to build the graph by hand; choose **Option B** if you prefer running a script and then doing a short manual pass.
+
+**You will need:** A level open in the Editor with a **Landscape** that has **Component Subsection = 1×1** and the tag **`PCG_Landscape`**. For DemoMap, start with [Maps/DEMO_MAP.md](../Maps/DEMO_MAP.md).
 
 ---
 

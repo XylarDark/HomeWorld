@@ -1,8 +1,8 @@
 # PCG Setup — HomeWorld (UE 5.7)
 
-Single reference for procedural trees/rocks on the landscape: what the script does, what you must do in the Editor, and where to look for help.
+This doc is the **full reference** for PCG (procedural trees/rocks): what the script does, what you must do in the Editor, and how to fix "Generate produces nothing."
 
-**Quick path:** [**PCG_QUICK_SETUP.md**](PCG_QUICK_SETUP.md) — one-page, tutorial-aligned flow (manual-only or script + 3 steps) and volume sizing (config when landscape bounds unavailable). **Primary demo map:** DemoMap and **create_demo_from_scratch.py**; see [DEMO_MAP.md](DEMO_MAP.md).
+**Want a short, step-by-step path?** Use [**PCG_QUICK_SETUP.md**](PCG_QUICK_SETUP.md) first — one-page flow (manual-only or script + 3 manual steps) and volume sizing. **Primary demo map:** DemoMap and **create_demo_from_scratch.py**; see [../Maps/DEMO_MAP.md](../Maps/DEMO_MAP.md).
 
 For **elegant, research-backed approaches** (one-time "golden" graph so you don’t repeat manual steps), see **[PCG_ELEGANT_SOLUTIONS.md](PCG_ELEGANT_SOLUTIONS.md)**.
 

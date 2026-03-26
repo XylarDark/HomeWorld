@@ -17,6 +17,7 @@ This directory contains Cursor rules for the HomeWorld project. It includes tech
 - **08-project-context.mdc** - DevEnvTemplate context (generic); for HomeWorld see [AGENTS.md](../../AGENTS.md) and `docs/`
 - **16-feature-debug-instrumentation.mdc** - Debug instrumentation policy for new features
 - **17-plan-first.mdc** - Plan before code for complex/multi-file work; see [docs/SPEC_AND_PLAN.md](../../docs/SPEC_AND_PLAN.md)
+- **19-docs-directory-structure.mdc** - Place new docs in correct docs/ subdir per [docs/DOCS_LAYOUT.md](../../docs/DOCS_LAYOUT.md); keep docs organized.
 
 ### Stack-Specific Rules (Conditional, from DevEnvTemplate)
 
@@ -34,11 +35,11 @@ This directory contains Cursor rules for the HomeWorld project. It includes tech
 Rules should point to **canonical examples** in the repo (e.g. `Source/HomeWorld/` or `Content/Python/`) instead of inlining long code.
 
 - **C++:** `unreal-cpp.mdc` — pawn: `HomeWorldCharacter.h/.cpp`; GAS: `HomeWorldGameplayAbility.h`, `HomeWorldAttributeSet.h`.
-- **Python:** `12-python.mdc` — level/landscape: `level_loader.py`; PCG automation: `create_pcg_forest.py` (see `docs/PCG_VARIABLES_NO_ACCESS.md` for limits).
+- **Python:** `12-python.mdc` — level/landscape: `level_loader.py`; PCG automation: `create_pcg_forest.py` (see `docs/PCG/PCG_VARIABLES_NO_ACCESS.md` for limits).
 
-Full list and links: [docs/UE57_TECH.md](../../docs/UE57_TECH.md).
+Full list and links: [docs/UE/UE57_TECH.md](../../docs/UE/UE57_TECH.md).
 
 ## Maintenance
 
 - To refresh rules from DevEnvTemplate: copy `DevEnvTemplate/.cursor/rules/*.mdc` to `.cursor/rules/` (preserve `unreal-*.mdc`).
-- See [docs/CURSOR_DEV.md](../CURSOR_DEV.md) and [DevEnvTemplate/BOOTSTRAP.md](../DevEnvTemplate/BOOTSTRAP.md) for setup and usage.
+- See [docs/Setup/CURSOR_DEV.md](../../docs/Setup/CURSOR_DEV.md) and [DevEnvTemplate/BOOTSTRAP.md](../DevEnvTemplate/BOOTSTRAP.md) for setup and usage.

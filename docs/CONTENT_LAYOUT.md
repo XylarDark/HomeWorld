@@ -1,6 +1,8 @@
 # HomeWorld – Content layout
 
-Single source of truth for Content paths. Scripts, configs, and MCP assume these paths. Do not rename or move top-level folders without updating this doc and all references.
+Single source of truth for **where content and scripts live**. Use this when you need a path (e.g. `/Game/HomeWorld/Maps/`, `Content/Python/`) or when you want to see what a script does and which config it uses.
+
+**Running a script:** In the Editor: **Tools → Execute Python Script**, then choose the script under `Content/Python/`. Via MCP: `execute_python_script("script_name.py")` (paths are relative to `Content/Python/`). Do not rename or move the top-level folders below without updating this doc and all references.
 
 ---
 
@@ -10,7 +12,7 @@ All project-specific assets live under `/Game/HomeWorld/`.
 
 | Path | Purpose |
 |------|--------|
-| `/Game/HomeWorld/Maps/` | Levels. **MainMenu** is the main menu map (create via ensure_main_menu_map.py; set GameDefaultMap to start here). **DemoMap** is the primary demo/playable map for MVP (Empty Open World, no duplicate). **Planetoid_Pride** (Day 16+) is the first planetoid level; travel from DemoMap via portal. **Dungeon_Interior** (Day 24) optional dungeon sublevel; use **BP_DungeonEntrance** (C++ AHomeWorldDungeonEntrance) at entrance to open. **Main** and **Homestead** are legacy/narrative. See [DEMO_MAP.md](DEMO_MAP.md), [HOMESTEAD_MAP.md](HOMESTEAD_MAP.md), [VisionBoard/Character/CHARACTER_GENERATION_AND_CUSTOMIZATION.md](../VisionBoard/Character/CHARACTER_GENERATION_AND_CUSTOMIZATION.md), [TaskLists/TaskSpecs/DAYS_16_TO_30.md](TaskLists/TaskSpecs/DAYS_16_TO_30.md). |
+| `/Game/HomeWorld/Maps/` | Levels. **MainMenu** is the main menu map (create via ensure_main_menu_map.py; set GameDefaultMap to start here). **DemoMap** is the primary demo/playable map for MVP (Empty Open World, no duplicate). **Planetoid_Pride** (Day 16+) is the first planetoid level; travel from DemoMap via portal. **Dungeon_Interior** (Day 24) optional dungeon sublevel; use **BP_DungeonEntrance** (C++ AHomeWorldDungeonEntrance) at entrance to open. **Main** and **Homestead** are legacy/narrative. See [Maps/DEMO_MAP.md](Maps/DEMO_MAP.md), [Maps/HOMESTEAD_MAP.md](Maps/HOMESTEAD_MAP.md), [VisionBoard/Character/CHARACTER_GENERATION_AND_CUSTOMIZATION.md](../VisionBoard/Character/CHARACTER_GENERATION_AND_CUSTOMIZATION.md), [TaskLists/TaskSpecs/DAYS_16_TO_30.md](TaskLists/TaskSpecs/DAYS_16_TO_30.md). |
 | `/Game/HomeWorld/Characters/` | Character Blueprints, Animation Blueprints (e.g. BP_HomeWorldCharacter, ABP_HomeWorldCharacter). |
 | `/Game/HomeWorld/GameMode/` | GameMode Blueprints (e.g. BP_GameMode). |
 | `/Game/HomeWorld/PCG/` | PCG graphs and related assets (e.g. ForestIsland_PCG). |
@@ -20,7 +22,7 @@ All project-specific assets live under `/Game/HomeWorld/`.
 | `/Game/HomeWorld/SmartObjects/` | Smart Object definitions (e.g. Harvestable, Bed). |
 | `/Game/HomeWorld/Building/` | Build order Blueprints (BP_BuildOrder_Wall, etc.), building-related assets. Smart Object definitions for building (e.g. SO_WallBuilder) can live here or under SmartObjects. |
 | `/Game/HomeWorld/Milady/` | Milady character import pipeline: imported VRM/GLB meshes (Meshes, Generated), materials (Materials), retargeted animations (Animations), Blueprints (e.g. BP_MiladyCharacter). See [MILADY_IMPORT_ROADMAP.md](TaskLists/TaskSpecs/MILADY_IMPORT_ROADMAP.md). |
-| `/Game/HomeWorld/Homestead/` | Homestead map assets: Structures, Placeholders (central house, outbuildings, walls). See [HOMESTEAD_MAP.md](HOMESTEAD_MAP.md). PCG graphs for Homestead can live here or under `/Game/HomeWorld/PCG/`. |
+| `/Game/HomeWorld/Homestead/` | Homestead map assets: Structures, Placeholders (central house, outbuildings, walls). See [Maps/HOMESTEAD_MAP.md](Maps/HOMESTEAD_MAP.md). PCG graphs for Homestead can live here or under `/Game/HomeWorld/PCG/`. |
 | `/Game/HomeWorld/Harvestables/` | Static meshes for harvestables (trees, rocks, flowers). Assigned to BP_HarvestableTree etc.; filled by batch import from `AssetCreation/Exports/Harvestables/`. See [AssetCreation/README.md](../AssetCreation/README.md). |
 | `/Game/HomeWorld/Dungeon/` | Dungeon kit pieces (walls, pillars, doors, props). Filled by batch import from `AssetCreation/Exports/Dungeon/`. See [AssetCreation/README.md](../AssetCreation/README.md). |
 | `/Game/HomeWorld/Biomes/` | Biome props (trees, rocks, plants for PCG or placement). Filled by batch import from `AssetCreation/Exports/Biomes/`. See [AssetCreation/README.md](../AssetCreation/README.md). |
@@ -52,7 +54,7 @@ Top-level content folders not under `/Game/HomeWorld/` or `/Game/Man/` are third
 ## Python and config paths
 
 - **Python scripts:** `Content/Python/` (e.g. `bootstrap_project.py`, `create_demo_from_scratch.py`, `create_homestead_from_scratch.py`).
-- **Source assets:** `AssetCreation/` at project root — Blender exports (FBX/GLB) go in `AssetCreation/Exports/<Category>/`; batch import script reads from there and imports into `/Game/HomeWorld/...`. See [AssetCreation/README.md](../AssetCreation/README.md) and [ASSET_WORKFLOW_AND_STEAM_DEMO.md](ASSET_WORKFLOW_AND_STEAM_DEMO.md) §1.
+- **Source assets:** `AssetCreation/` at project root — Blender exports (FBX/GLB) go in `AssetCreation/Exports/<Category>/`; batch import script reads from there and imports into `/Game/HomeWorld/...`. See [AssetCreation/README.md](../AssetCreation/README.md) and [Assets/ASSET_WORKFLOW_AND_STEAM_DEMO.md](Assets/ASSET_WORKFLOW_AND_STEAM_DEMO.md) §1.
 - **Configs:** `Content/Python/*.json` (e.g. `demo_map_config.json`, `planetoid_map_config.json` for Day 16 planetoid/portal, `dungeon_map_config.json` for Day 24 dungeon entrance, `pcg_forest_config.json`, `character_blueprint_config.json`; `homestead_map_config.json` for legacy Homestead map).
 
 Paths in config files use `/Game/...` asset paths; file paths are relative to project root or `Content/Python/`.

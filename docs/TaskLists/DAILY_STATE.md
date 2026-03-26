@@ -18,7 +18,7 @@ What was completed or in progress in the previous session.
 
 What we need to do today. Work from [CURRENT_TASK_LIST.md](CURRENT_TASK_LIST.md) and [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md).
 
-- **All T1–T10 complete.** No first pending task. Generate a new task list per [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md); then run `.\Tools\Start-AllAgents-InNewWindow.ps1` when ready. Phase 4 = Steam Demo store draft per [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md).
+- **All T1–T10 complete.** No first pending task. Generate a new task list per [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md); then run `.\Tools\Start-AllAgents-InNewWindow.ps1` when ready. Phase 4 (Steam Demo store draft) skipped; next focus = assets, polish, or [NEXT_30_DAY_WINDOW.md](NEXT_30_DAY_WINDOW.md).
 
 ---
 
@@ -26,7 +26,7 @@ What we need to do today. Work from [CURRENT_TASK_LIST.md](CURRENT_TASK_LIST.md)
 
 Preview of next focus.
 
-- **After list 73:** Generate next list per [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md); then run `.\Tools\Start-AllAgents-InNewWindow.ps1`. Phase 4 = Steam Demo store draft per [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md).
+- **After list 73:** Generate next list per [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md); then run `.\Tools\Start-AllAgents-InNewWindow.ps1`. Phase 4 skipped; next focus per [NEXT_30_DAY_WINDOW.md](NEXT_30_DAY_WINDOW.md) (assets, polish, deferred, etc.).
 
 ---
 

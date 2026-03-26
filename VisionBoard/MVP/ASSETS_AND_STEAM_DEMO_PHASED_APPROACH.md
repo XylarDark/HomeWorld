@@ -1,6 +1,6 @@
 # Phased approach: Assets workflow, image-to-3D, and MVP deliverable (marketing-ready)
 
-**Purpose:** Accomplish the work needed for the **MVP deliverable**: **marketing-ready** slice with **assets and visuals mandatory** for good-looking marketing material (screenshots, capsule, trailer). Phases 1–2 lock asset workflow and image-to-3D; Phase 3–4 (packaged build, store draft) are **optional for MVP** — we do **not** require launching on Steam to call the MVP done. When we choose to ship, use the Steam checklist then.
+**Purpose:** Accomplish the work needed for the **MVP deliverable**: **marketing-ready** slice with **assets and visuals mandatory** for good-looking marketing material (screenshots, capsule, trailer). Phases 1–2 lock asset workflow and image-to-3D; Phase 3 (packaged build) is **optional for MVP**. **Phase 4 (store draft) is skipped** — when we ship on Steam, use [STEAM_EA_STORE_CHECKLIST](STEAM_EA_STORE_CHECKLIST.md) directly. — we do **not** require launching on Steam to call the MVP done. When we choose to ship, use the Steam checklist then.
 
 **MVP deliverable = marketing-ready.** Assets and visuals are mandatory. Steam launch is not.
 
@@ -57,9 +57,11 @@
 
 ---
 
-## Phase 4: Store draft (optional for MVP — for when we ship on Steam)
+## Phase 4: Store draft — **SKIPPED**
 
-**Goal:** Have a **store page draft** (title, short description, about, key features, capsule/screenshots plan) so when we **do** launch on Steam, store presence can be filled quickly. **Not required for MVP deliverable** — MVP = marketing-ready (assets + visuals); Steam launch is post-MVP. No Steamworks account or app creation required for this phase.
+**Status:** This phase has been removed from the plan. When we ship on Steam, use [STEAM_EA_STORE_CHECKLIST](../../docs/TaskLists/STEAM_EA_STORE_CHECKLIST.md) directly to draft store content and capsule/screenshots.
+
+**Original goal (for reference):** Have a **store page draft** (title, short description, about, key features, capsule/screenshots plan) so when we **do** launch on Steam, store presence can be filled quickly. **Not required for MVP deliverable** — MVP = marketing-ready (assets + visuals); Steam launch is post-MVP. No Steamworks account or app creation required for this phase.
 
 | Step | What to do | Where to document | Gate |
 |------|------------|-------------------|------|
@@ -76,8 +78,8 @@
 
 | Step | What to do | Where to document | Gate |
 |------|------------|-------------------|------|
-| 5.1 | **Vertical slice §4:** Add a row or subsection to [VERTICAL_SLICE_CHECKLIST.md](VERTICAL_SLICE_CHECKLIST.md) §4 for "Assets + MVP deliverable (marketing-ready) phased block": Phase 1–4 outcomes (workflow locked, image-to-3D deferred, packaged build/smoke test status if run, store draft if done). | VERTICAL_SLICE_CHECKLIST §4 | §4 updated |
-| 5.2 | **ACCOMPLISHMENTS_OVERVIEW and PROJECT_STATE:** Update [ACCOMPLISHMENTS_OVERVIEW.md](ACCOMPLISHMENTS_OVERVIEW.md) §4 with this block (e.g. "Assets + MVP deliverable phased approach: Phase 1–2 (workflow, assets/visuals) complete; Phase 3–4 optional for MVP"). Update [PROJECT_STATE_AND_TASK_LIST.md](PROJECT_STATE_AND_TASK_LIST.md) §4 so "Next" points to next list per [NEXT_30_DAY_WINDOW.md](NEXT_30_DAY_WINDOW.md) (further assets, polish, or Steam when we ship). | Both docs | Accomplishments and next step clear |
+| 5.1 | **Vertical slice §4:** Add a row or subsection to [VERTICAL_SLICE_CHECKLIST.md](VERTICAL_SLICE_CHECKLIST.md) §4 for "Assets + MVP deliverable (marketing-ready) phased block": Phase 1–3 outcomes (workflow locked, image-to-3D deferred, packaged build/smoke test status if run). Phase 4 (store draft) skipped.. | VERTICAL_SLICE_CHECKLIST §4 | §4 updated |
+| 5.2 | **ACCOMPLISHMENTS_OVERVIEW and PROJECT_STATE:** Update [ACCOMPLISHMENTS_OVERVIEW.md](ACCOMPLISHMENTS_OVERVIEW.md) §4 with this block (e.g. "Assets + MVP deliverable phased approach: Phase 1–2 (workflow, assets/visuals) complete; Phase 3 optional for MVP; Phase 4 (store draft) skipped"). Update [PROJECT_STATE_AND_TASK_LIST.md](PROJECT_STATE_AND_TASK_LIST.md) §4 so "Next" points to next list per [NEXT_30_DAY_WINDOW.md](NEXT_30_DAY_WINDOW.md) (further assets, polish, or Steam when we ship). | Both docs | Accomplishments and next step clear |
 | 5.3 | **DAILY_STATE and SESSION_LOG:** Set [DAILY_STATE.md](DAILY_STATE.md) Yesterday/Today to reflect completion of this block; Tomorrow = next list focus. Append [SESSION_LOG.md](../SESSION_LOG.md) with a short summary (phases completed, any deferrals). | DAILY_STATE; SESSION_LOG | Session continuity updated |
 
 **Phase 5 gate:** 5.1–5.3 done; next 10-task list can be generated per [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md).
@@ -108,10 +110,10 @@ Use this to turn phases into 10-task lists. Each phase can be **one list** or co
 | **1** | T1 Workflow §1 review and paths (1.1). T2 Automation vs manual list (1.2). T3 Optional script or doc (1.3). T4–T7 Buffer or small follow-ups (e.g. CONTENT_LAYOUT, CONVENTIONS). | Docs and cycle | Verification | Buffer |
 | **2** | T1 Deferred pass in ASSET_WORKFLOW_AND_STEAM_DEMO + MILADY_IMPORT_ROADMAP (2.1). T2 Optional manual run and outcome (2.2). T3 Resume path doc (2.3). T4–T7 Buffer or Phase 1 follow-ups. | Docs and cycle | Verification | Buffer |
 | **3** | T1 Run Package-AfterClose.ps1; document outcome (3.1). T2 Smoke test if exe exists (3.2). T3 Update STEAM_EA_STORE_CHECKLIST § Current status. T4–T7 Buffer or store draft start. | Docs and cycle | Verification | Buffer |
-| **4** | T1 Store draft content in checklist (4.1). T2 Capsule/screenshots plan (4.2). T3–T7 Buffer or Phase 3 retry (e.g. re-run package). | Docs and cycle | Verification | Buffer |
+| **4 (skipped)** | — Phase 4 removed from plan. Use STEAM_EA_STORE_CHECKLIST when shipping. | — | — | — |
 | **5** | T1 VERTICAL_SLICE_CHECKLIST §4 (5.1). T2 ACCOMPLISHMENTS_OVERVIEW + PROJECT_STATE §4 (5.2). T3 DAILY_STATE + SESSION_LOG (5.3). T4–T7 Buffer. | Docs and cycle | Verification | Buffer |
 
-**Order:** Execute phases 1 → 2 → 3 → 4 → 5. You can merge phases into fewer lists (e.g. List A = Phase 1+2, List B = Phase 3+4, List C = Phase 5) to reduce overhead.
+**Order:** Execute phases 1 → 2 → 3 → 5 (Phase 4 skipped). You can merge phases into fewer lists (e.g. List A = Phase 1+2, List B = Phase 3+4, List C = Phase 5) to reduce overhead.
 
 ---
 
@@ -120,7 +122,7 @@ Use this to turn phases into 10-task lists. Each phase can be **one list** or co
 - [ ] Phase 1 gate: Asset workflow doc current; automation vs manual documented.
 - [ ] Phase 2 gate: Image-to-3D deferred pass and resume path documented.
 - [ ] Phase 3 gate: Packaged build run and outcome documented; smoke test if exe exists.
-- [ ] Phase 4 gate: Store draft and capsule/screenshots plan in checklist.
+- [x] Phase 4: **Skipped** (removed from plan).
 - [ ] Phase 5 gate: VERTICAL_SLICE §4, ACCOMPLISHMENTS, PROJECT_STATE, DAILY_STATE, SESSION_LOG updated; next list can be generated.
 
 **See also:** [ASSET_WORKFLOW_AND_STEAM_DEMO.md](../ASSET_WORKFLOW_AND_STEAM_DEMO.md), [NEXT_30_DAY_WINDOW.md](NEXT_30_DAY_WINDOW.md), [STEAM_EA_STORE_CHECKLIST.md](STEAM_EA_STORE_CHECKLIST.md), [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md).

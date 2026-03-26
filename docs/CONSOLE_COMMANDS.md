@@ -1,8 +1,11 @@
 # HomeWorld – Console commands reference
 
-Short reference for all `hw.*` and related console commands used in PIE testing and automation. All commands require a **play world** (PIE or packaged game); they are registered as cheat commands (`ECVF_Cheat`). Source: `Source/HomeWorld/HomeWorld.cpp`, `Source/HomeWorld/HomeWorldTimeOfDaySubsystem.cpp`.
+Reference for all `hw.*` console commands used in PIE testing and automation. Commands need a **play world** (PIE or packaged game) and are cheat commands (`ECVF_Cheat`).
 
-**Pre-demo verification (one doc):** Run sequence → [VERTICAL_SLICE_CHECKLIST §3](../VisionBoard/MVP/VERTICAL_SLICE_CHECKLIST.md#3-pre-demo-checklist-before-recording-or-showing); commands → this doc ([§ Pre-demo verification](#pre-demo-verification-entry-point) and [Commands](#commands-hw)). **List 63 integration** (run order and where to document): [§ List 63 integration](#list-63-integration). Open this document for both §3 and the command reference. **First-launch flow and main menu flow (List 55):** See [CHARACTER_GENERATION_AND_CUSTOMIZATION §2](../VisionBoard/Character/CHARACTER_GENERATION_AND_CUSTOMIZATION.md#2-main-menu-and-character-screen-setup) (First-launch flow) and the [main menu flow checklist](../VisionBoard/Character/CHARACTER_GENERATION_AND_CUSTOMIZATION.md#main-menu-flow-checklist) (MainMenu → Play, Character, Options, Quit) for how to verify game start and main menu buttons.
+**How to use this doc:**  
+- **Follow the pre-demo run sequence** → Use [VERTICAL_SLICE_CHECKLIST §3](../VisionBoard/MVP/VERTICAL_SLICE_CHECKLIST.md#3-pre-demo-checklist-before-recording-or-showing) (open level, start PIE, run `pie_test_runner.py`, check results).  
+- **Look up a command** → Use [Pre-demo verification](#pre-demo-verification-entry-point) and [Commands](#commands-hw) below.  
+- **First-launch and main menu** → See [CHARACTER_GENERATION_AND_CUSTOMIZATION §2](../VisionBoard/Character/CHARACTER_GENERATION_AND_CUSTOMIZATION.md#2-main-menu-and-character-screen-setup) and the [main menu flow checklist](../VisionBoard/Character/CHARACTER_GENERATION_AND_CUSTOMIZATION.md#main-menu-flow-checklist).
 
 **Fifty-first list refresh (2026-03-07):** This doc and [VERTICAL_SLICE_CHECKLIST §3](../VisionBoard/MVP/VERTICAL_SLICE_CHECKLIST.md#3-pre-demo-checklist-before-recording-or-showing) were refreshed for the current PIE flow (MVP tutorial + post-tutorial + Week 1 playtest); pre-demo and tutorial verification steps are up to date.
 

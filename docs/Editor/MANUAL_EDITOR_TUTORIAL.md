@@ -1,12 +1,12 @@
-# Manual Editor tutorial — Work that tools cannot do
+# Manual Editor tutorial – Tasks that tools cannot do
 
-**Purpose:** One place for **every task you must do in the Unreal Editor by hand**, because scripts, MCP, and Python cannot do them (or cannot do them reliably). Run your automation first, then follow this tutorial to complete setup. Each section is ordered so you can do them in sequence or jump to what you need.
+This guide lists **every task you must do by hand in the Unreal Editor** when scripts or MCP can’t do them (or can’t do them reliably). Run your scripts first, then use the matching section below to finish setup.
 
-**When to use:** After running scripts such as `create_demo_from_scratch.py`, `assemble_planetoid_from_config.py`, `ensure_wbp_main_menu.py`, or `ensure_demo_portal.py`. If something still does not work (e.g. PCG generates nothing, portal does not load the planetoid, main menu has no buttons), use the matching section below.
+**When to use:** After running scripts such as `create_demo_from_scratch.py`, `assemble_planetoid_from_config.py`, `ensure_wbp_main_menu.py`, or `ensure_demo_portal.py`. If something still doesn’t work (e.g. PCG generates nothing, portal doesn’t load, main menu has no buttons), open the section that matches your issue.
 
-**Policy — GUI automation is default when available:** When we have the ability to interact with the Editor UI automatically (e.g. GUI scripts in `Content/Python/gui_automation/`), that is the **default method**. Use the clicker script first; use this manual tutorial only as **fallback** when GUI automation is unavailable (refs not captured, script not runnable) or has failed. For steps with no clicker (e.g. WBP_MainMenu, BUILD branch, terrain), manual is the only path. See [GUI_AUTOMATION_WHY_AND_WHEN.md](GUI_AUTOMATION_WHY_AND_WHEN.md) and [.cursor/rules/automation-standards.mdc](.cursor/rules/automation-standards.mdc).
+**Default: use GUI automation when available.** If we have a clicker script (e.g. in `Content/Python/gui_automation/`), run it first. Use this manual tutorial only when GUI automation isn’t available or has failed. See [Automation/GUI_AUTOMATION_WHY_AND_WHEN.md](../Automation/GUI_AUTOMATION_WHY_AND_WHEN.md) and `.cursor/rules/automation-standards.mdc`.
 
-**References:** [PCG_VARIABLES_NO_ACCESS.md](PCG_VARIABLES_NO_ACCESS.md), [AUTOMATION_GAPS.md](AUTOMATION_GAPS.md), [PLANETOID_TO_REALITY_AND_WORLD_BUILDER.md](PLANETOID_TO_REALITY_AND_WORLD_BUILDER.md).
+**More detail:** [PCG/PCG_VARIABLES_NO_ACCESS.md](../PCG/PCG_VARIABLES_NO_ACCESS.md), [Automation/AUTOMATION_GAPS.md](../Automation/AUTOMATION_GAPS.md).
 
 ---
 
@@ -53,7 +53,7 @@
    - With **PCG_Forest** still selected, in **Details** find the **PCG** section and click **Generate** (or **Ctrl+Click** for full regeneration).  
    - Check **Output Log** for `LogPCG`; if none, the correct Generate was not used.
 
-**Save the level** (Ctrl+S) so instances persist. See [PCG_SETUP.md](PCG_SETUP.md) and [PCG_VARIABLES_NO_ACCESS.md](PCG_VARIABLES_NO_ACCESS.md) for more.
+**Save the level** (Ctrl+S) so instances persist. See [PCG/PCG_SETUP.md](../PCG/PCG_SETUP.md) and [PCG/PCG_VARIABLES_NO_ACCESS.md](../PCG/PCG_VARIABLES_NO_ACCESS.md) for more.
 
 ---
 
@@ -87,7 +87,7 @@
    - With the volume selected, **Details** → **Generate** (or Ctrl+Click).  
    - Save the level.
 
-See [PLANETOID_TO_REALITY_AND_WORLD_BUILDER.md](PLANETOID_TO_REALITY_AND_WORLD_BUILDER.md) §6.3.
+See TaskLists/TaskSpecs for planetoid checklist and manual follow-up.
 
 ---
 
@@ -104,7 +104,7 @@ See [PLANETOID_TO_REALITY_AND_WORLD_BUILDER.md](PLANETOID_TO_REALITY_AND_WORLD_B
 3. Set **Level To Open** to **Planetoid_Pride** (the level name, no path).
 4. **Save** the level.
 
-**Alternative:** Run `ensure_portal_blueprint.py` then `ensure_demo_portal.py` so the portal is **BP_PortalToPlanetoid**; its class default already has LevelToOpen = Planetoid_Pride. See [AUTOMATION_GAPS.md](AUTOMATION_GAPS.md) Gap 1.
+**Alternative:** Run `ensure_portal_blueprint.py` then `ensure_demo_portal.py` so the portal is **BP_PortalToPlanetoid**; its class default already has LevelToOpen = Planetoid_Pride. See [Automation/AUTOMATION_GAPS.md](../Automation/AUTOMATION_GAPS.md) Gap 1.
 
 ---
 
@@ -139,7 +139,7 @@ See [PLANETOID_TO_REALITY_AND_WORLD_BUILDER.md](PLANETOID_TO_REALITY_AND_WORLD_B
      `GameDefaultMap=/Game/HomeWorld/Maps/MainMenu.MainMenu`  
    - Ensure **GameInstanceClass** is **HomeWorldGameInstance**.
 
-See [CHARACTER_GENERATION_AND_CUSTOMIZATION.md](CHARACTER_GENERATION_AND_CUSTOMIZATION.md) §2.
+See [VisionBoard/Character/CHARACTER_GENERATION_AND_CUSTOMIZATION.md](../../VisionBoard/Character/CHARACTER_GENERATION_AND_CUSTOMIZATION.md) §2.
 
 ---
 
@@ -170,7 +170,7 @@ See [CHARACTER_GENERATION_AND_CUSTOMIZATION.md](CHARACTER_GENERATION_AND_CUSTOMI
 
 6. **Compile and save** the State Tree.
 
-**Validate:** PIE → console `hw.TimeOfDay.Phase 2` → agents using ST_FamilyGatherer should switch to the Defend branch. See [AUTOMATION_GAPS.md](AUTOMATION_GAPS.md) § Gap 2 and [DAY12_ROLE_PROTECTOR.md](tasks/DAY12_ROLE_PROTECTOR.md).
+**Validate:** PIE → console `hw.TimeOfDay.Phase 2` → agents using ST_FamilyGatherer should switch to the Defend branch. See [Automation/AUTOMATION_GAPS.md](../Automation/AUTOMATION_GAPS.md) § Gap 2 and [TaskLists/TaskSpecs/DAY12_ROLE_PROTECTOR.md](../TaskLists/TaskSpecs/DAY12_ROLE_PROTECTOR.md).
 
 ---
 
@@ -189,7 +189,7 @@ See [CHARACTER_GENERATION_AND_CUSTOMIZATION.md](CHARACTER_GENERATION_AND_CUSTOMI
 5. **Blackboard:** Optional keys **TargetBuildOrder**, **CurrentJob** (Build) for the BUILD branch.
 6. **Compile and save.**
 
-See [AGENTIC_BUILDING.md](tasks/AGENTIC_BUILDING.md) Step 3 and [AUTOMATION_GAPS.md](AUTOMATION_GAPS.md).
+See [TaskLists/TaskSpecs/AGENTIC_BUILDING.md](../TaskLists/TaskSpecs/AGENTIC_BUILDING.md) Step 3 and [Automation/AUTOMATION_GAPS.md](../Automation/AUTOMATION_GAPS.md).
 
 ---
 
@@ -205,7 +205,7 @@ See [AGENTIC_BUILDING.md](tasks/AGENTIC_BUILDING.md) Step 3 and [AUTOMATION_GAPS
 2. **File → Save As** → save under **Content/HomeWorld/Maps/** as **Planetoid_Pride** (path `/Game/HomeWorld/Maps/Planetoid_Pride`).
 3. Run **assemble_planetoid_from_config.py** or **setup_planetoid_pcg.py** again; they will use this level.
 
-See [DAYS_16_TO_30.md](tasks/DAYS_16_TO_30.md) Day 16.
+See [TaskLists/TaskSpecs/DAYS_16_TO_30.md](../TaskLists/TaskSpecs/DAYS_16_TO_30.md) Day 16.
 
 ---
 
@@ -227,7 +227,7 @@ See [DAYS_16_TO_30.md](tasks/DAYS_16_TO_30.md) Day 16.
    - Paint or use height/slope-based materials so slopes and valleys read correctly (e.g. rock on steep, grass/dirt in valleys).
 4. **Save** the level.
 
-See [PLANETOID_PRIDE_MVP.md](PLANETOID_PRIDE_MVP.md) §3 and [PLANETOID_TO_REALITY_AND_WORLD_BUILDER.md](PLANETOID_TO_REALITY_AND_WORLD_BUILDER.md).
+See TaskLists/TaskSpecs for Planetoid_Pride MVP and planetoid checklist.
 
 ---
 
@@ -244,7 +244,7 @@ See [PLANETOID_PRIDE_MVP.md](PLANETOID_PRIDE_MVP.md) §3 and [PLANETOID_TO_REALI
    - Place the player start (or a “homestead” actor/volume) on the plateau.  
    - Set **GameMode** default spawn or the level’s **Player Start** to this location.
 3. **Glide**  
-   - Implement later as a GAS ability or movement mode; design is in [VISION.md](workflow/VISION.md) and [PLANETOID_PRIDE_MVP.md](PLANETOID_PRIDE_MVP.md).
+   - Implement later as a GAS ability or movement mode; design is in [workflow/VISION.md](../workflow/VISION.md) and TaskLists/TaskSpecs.
 
 ---
 
@@ -259,7 +259,7 @@ See [PLANETOID_PRIDE_MVP.md](PLANETOID_PRIDE_MVP.md) §3 and [PLANETOID_TO_REALI
 3. Set **Meal Type** on each (Breakfast, Lunch, Dinner).
 4. Save each Blueprint.
 
-Interact (E) on the tagged actor already works via GA_Interact; this adds overlap-based triggering. See [AUTOMATION_GAPS.md](AUTOMATION_GAPS.md) research log (List 57).
+Interact (E) on the tagged actor already works via GA_Interact; this adds overlap-based triggering. See [Automation/AUTOMATION_GAPS.md](../Automation/AUTOMATION_GAPS.md) research log (List 57).
 
 ---
 
@@ -276,7 +276,7 @@ Interact (E) on the tagged actor already works via GA_Interact; this adds overla
 3. Run the script that tags the Landscape (`setup_planetoid_pcg.py` or `ensure_landscape_has_pcg_tag`) so **all loaded** proxies get tag **PCG_Landscape**.
 4. Then in the PCG graph set **Get Landscape Data** → **By Tag** = **PCG_Landscape** (§1 or §2) and **Generate**.
 
-See [PCG_VARIABLES_NO_ACCESS.md](PCG_VARIABLES_NO_ACCESS.md) (World Partition, Empty Open World).
+See [PCG/PCG_VARIABLES_NO_ACCESS.md](../PCG/PCG_VARIABLES_NO_ACCESS.md) (World Partition, Empty Open World).
 
 ---
 
@@ -300,10 +300,8 @@ See [PCG_VARIABLES_NO_ACCESS.md](PCG_VARIABLES_NO_ACCESS.md) (World Partition, E
 
 ## See also
 
-- [PCG_SETUP.md](PCG_SETUP.md) — Full PCG checklist and troubleshooting.  
-- [PCG_VARIABLES_NO_ACCESS.md](PCG_VARIABLES_NO_ACCESS.md) — Why each PCG setting is manual.  
-- [AUTOMATION_GAPS.md](AUTOMATION_GAPS.md) — All gaps and workarounds (portal, State Tree, WBP_MainMenu).  
-- [PLANETOID_TO_REALITY_AND_WORLD_BUILDER.md](PLANETOID_TO_REALITY_AND_WORLD_BUILDER.md) — Planetoid checklist and manual follow-up.  
-- [CHARACTER_GENERATION_AND_CUSTOMIZATION.md](CHARACTER_GENERATION_AND_CUSTOMIZATION.md) — Main menu and character screen.  
-- [AGENTIC_BUILDING.md](tasks/AGENTIC_BUILDING.md) — BUILD branch and build orders.  
-- [DAY12_ROLE_PROTECTOR.md](tasks/DAY12_ROLE_PROTECTOR.md) — Defend-at-night and State Tree.
+- [PCG/PCG_SETUP.md](../PCG/PCG_SETUP.md) — Full PCG checklist and troubleshooting.
+- [PCG/PCG_VARIABLES_NO_ACCESS.md](../PCG/PCG_VARIABLES_NO_ACCESS.md) — Why each PCG setting is manual.
+- [Automation/AUTOMATION_GAPS.md](../Automation/AUTOMATION_GAPS.md) — All gaps and workarounds (portal, State Tree, WBP_MainMenu).
+- [TaskLists/TaskSpecs/AGENTIC_BUILDING.md](../TaskLists/TaskSpecs/AGENTIC_BUILDING.md) — BUILD branch and build orders.
+- [TaskLists/TaskSpecs/DAY12_ROLE_PROTECTOR.md](../TaskLists/TaskSpecs/DAY12_ROLE_PROTECTOR.md) — Defend-at-night and State Tree.

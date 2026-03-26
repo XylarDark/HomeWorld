@@ -102,12 +102,12 @@
 
 ## T10. Buffer: next list prep (ACCOMPLISHMENTS + PROJECT_STATE §4)
 
-- **goal:** Update ACCOMPLISHMENTS_OVERVIEW §4 with seventy-third-list (Phase 3 Steam Demo) outcome and PROJECT_STATE_AND_TASK_LIST §4. Do NOT replace CURRENT_TASK_LIST (user does that after the loop). Set T1–T10 status to completed where done. **Next:** Per [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md) — Phase 4 (Steam Demo store draft); generate next list per HOW_TO_GENERATE_TASK_LIST when ready.
-- **success criteria:** ACCOMPLISHMENTS_OVERVIEW §4 has seventy-third-cycle row; PROJECT_STATE §4 says list 73 complete and points to Phase 4; T10 status set to completed in CURRENT_TASK_LIST only.
+- **goal:** Update ACCOMPLISHMENTS_OVERVIEW §4 with seventy-third-list (Phase 3 Steam Demo) outcome and PROJECT_STATE_AND_TASK_LIST §4. Do NOT replace CURRENT_TASK_LIST (user does that after the loop). Set T1–T10 status to completed where done. **Next:** Phase 4 (store draft) skipped; generate next list per HOW_TO_GENERATE_TASK_LIST when ready (focus per NEXT_30_DAY_WINDOW).
+- **success criteria:** ACCOMPLISHMENTS_OVERVIEW §4 has seventy-third-cycle row; PROJECT_STATE §4 says list 73 complete and next = generate list (Phase 4 skipped); T10 status set to completed in CURRENT_TASK_LIST only.
 - **research_notes:** [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md); [ACCOMPLISHMENTS_OVERVIEW.md](ACCOMPLISHMENTS_OVERVIEW.md); [PROJECT_STATE_AND_TASK_LIST.md](PROJECT_STATE_AND_TASK_LIST.md); [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md).
 - **steps_or_doc:** HOW_TO_GENERATE_TASK_LIST.md; ACCOMPLISHMENTS_OVERVIEW.md; PROJECT_STATE_AND_TASK_LIST.md; ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md.
 - **status:** completed
 
 ---
 
-**Order:** T1–T7 = Phase 3 (packaged build, smoke test, checklist update, gate, vertical slice §4, KNOWN_ERRORS ref if needed, Phase 4 prep). T8 = Docs and cycle. T9 = Verification. T10 = Buffer. **After list 73:** Phase 4 (store draft) per [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md); run `.\Tools\Start-AllAgents-InNewWindow.ps1` when ready for next list.
+**Order:** T1–T7 = Phase 3 (packaged build, smoke test, checklist update, gate, vertical slice §4, KNOWN_ERRORS ref if needed, Phase 4 prep). T8 = Docs and cycle. T9 = Verification. T10 = Buffer. **After list 73:** Phase 4 skipped; generate next list per [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md); run `.\Tools\Start-AllAgents-InNewWindow.ps1` when ready.

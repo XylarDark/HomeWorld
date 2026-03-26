@@ -1,0 +1,42 @@
+---
+name: "Docs directory structure"
+description: "When generating or adding documentation, place it in the correct docs/ subdirectory per DOCS_LAYOUT; keep everything organized."
+alwaysApply: true
+priority: 19
+version: 1.0
+---
+
+# Documentation directory structure
+
+## Policy
+
+When generating or adding **any documentation** (or other structured content under `docs/`):
+
+1. **Follow the canonical layout** in [docs/DOCS_LAYOUT.md](docs/DOCS_LAYOUT.md). Place new docs in the **appropriate subdirectory**, not at `docs/` root.
+2. **Do not add new top-level files** under `docs/` unless the layout is updated first: add the new file to DOCS_LAYOUT and (if needed) a new subdirectory.
+3. **Use existing subdirectories** for the topic:
+   - **Setup/** — MCP, CI, Horde, ref images, Cursor dev
+   - **PCG/** — Procedural Content Generation
+   - **Maps/** — DemoMap, Homestead, level guides
+   - **Automation/** — Agent company, gaps, loop, refinement, research
+   - **Editor/** — Build protocol, launch, polish, manual tutorial
+   - **UE/** — UE 5.7 tech, Editor UI
+   - **Assets/** — Asset workflow, Milady
+   - **Testing/** — Level testing, validation
+   - **MVP/** — Gap analysis, feasibility
+   - **IndustryStandards/** — Industry-standard approaches
+   - **TaskLists/** — Task lists and TaskSpecs (existing)
+   - **workflow/** — Workflow index (existing)
+4. **Root (docs/) is for entry points only:** README, DOCS_LAYOUT, CONVENTIONS, CONTENT_LAYOUT, CONSOLE_COMMANDS, KNOWN_ERRORS, SETUP, SPEC_AND_PLAN, SESSION_LOG. New operational or topic-specific docs go in subdirs.
+5. **Links:** When linking to another doc, use the path from repo root (e.g. `docs/PCG/PCG_SETUP.md`) or the relative path from the current file (e.g. from `docs/Setup/MCP_SETUP.md` to `../CONSOLE_COMMANDS.md`).
+
+## When in doubt
+
+- Check [docs/DOCS_LAYOUT.md](docs/DOCS_LAYOUT.md) for the full table and single-source-of-truth rules.
+- If the topic does not fit an existing subdir, add a new subdirectory, update DOCS_LAYOUT and docs/README.md, then add the file there.
+
+## Applies to
+
+- New markdown docs under `docs/`
+- Generated runbooks, guides, or reference docs that belong in the project
+- Cursor rules or skills that create or reference docs (use the paths from DOCS_LAYOUT)
