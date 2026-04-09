@@ -35,6 +35,24 @@ For the **Run automation tests** step in ci.yml to run (Smoke group), the runner
 
 If `UE_EDITOR` is not set, the workflow still runs the build; the "Run automation tests" step will skip and log that tests were skipped.
 
+**`UE_EDITOR` inside GitHub Actions:** [.github/workflows/ci.yml](../../.github/workflows/ci.yml) passes `UE_EDITOR: ${{ env.UE_EDITOR }}` into the test step. That value is only non-empty if you define **`env`** at the **workflow** or **job** level in `ci.yml`, or if your runner exposes it in a way Actions injects into `env` (varies by runner setup). If tests always skip, either set **`UE_EDITOR`** as a persistent **user or system** environment variable on the runner (restart the runner service after changes) or add a job-level default, for example:
+
+```yaml
+jobs:
+  build-win64:
+    runs-on: [self-hosted, windows, ue57]
+    env:
+      UE_EDITOR: 'C:\Program Files\Epic Games\UE_5.7\Engine\Binaries\Win64\UnrealEditor.exe'
+```
+
+Use your real engine path, or a repository variable / secret if paths differ per machine.
+
+### Runner maintenance
+
+- **Disk:** Periodically clear **Derived Data Cache** and old **Intermediate** folders if the runner disk fills or builds slow down. Typical locations: `%LOCALAPPDATA%\UnrealEngine\Common\DerivedDataCache`, and the repo’s `Intermediate/` / `Saved/` (safe to delete on the runner between runs if you accept longer next build).
+- **Labels:** The job requires `runs-on: [self-hosted, windows, ue57]` — ensure the runner is registered with labels **windows** and **ue57** (plus self-hosted).
+- **Engine path:** [ci.yml](../../.github/workflows/ci.yml) defaults **`UE_ENGINE`** to `C:\Program Files\Epic Games\UE_5.7` for the build step if unset; align installs or override `UE_ENGINE` on the runner.
+
 ### 4. What ci.yml does when a runner is available
 
 1. Checkout with LFS.

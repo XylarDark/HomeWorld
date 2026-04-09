@@ -13,6 +13,8 @@ HomeWorld is set up so that AI agents and humans follow the same conventions whe
 
 When asking Cursor to change C++ or Blueprint behavior, the rules ensure suggestions align with programmatic-by-default and the existing HomeWorld layout.
 
+**Pinned environment (toolchain, MCP, Cursor plugins):** [DEV_ENV_MATRIX.md](DEV_ENV_MATRIX.md). Optional recommended VS Code/Cursor extensions: repo [`.vscode/extensions.json`](../../.vscode/extensions.json).
+
 ## DevEnvTemplate (environment doctor)
 
 The project includes [DevEnvTemplate](../DevEnvTemplate) as a subfolder. It provides a **health check** for the development environment (diagnose, prescribe, auto-fix). To use it:

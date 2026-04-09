@@ -31,6 +31,7 @@ Setup and environment: MCP, CI, local tools, ref images, Cursor dev.
 | File | Purpose |
 |------|--------|
 | [Setup/MCP_SETUP.md](Setup/MCP_SETUP.md) | MCP bridge install and troubleshooting. |
+| [Setup/DEV_ENV_MATRIX.md](Setup/DEV_ENV_MATRIX.md) | Pinned toolchain, env vars, C++/Python/Cursor/MCP checklist. |
 | [Setup/CI_SETUP.md](Setup/CI_SETUP.md) | CI (GitHub Actions) configuration. |
 | [Setup/HORDE_LOCAL_SETUP.md](Setup/HORDE_LOCAL_SETUP.md) | Horde local setup (if used). |
 | [Setup/REF_IMAGES_SETUP_TUTORIAL.md](Setup/REF_IMAGES_SETUP_TUTORIAL.md) | Reference images for GUI automation. |

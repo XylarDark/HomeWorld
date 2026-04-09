@@ -10,7 +10,7 @@
 
 What was completed or in progress in the previous session.
 
-- Asset creation plan implemented: AssetCreation/ directory (README, STYLE_GUIDE, Exports/AI_Sources/RefImages subfolders), batch_import_asset_creation.py, ASSET_WORKFLOW and CONTENT_LAYOUT updated with new paths and script index.
+- Development environment upgrade: [docs/Setup/DEV_ENV_MATRIX.md](../Setup/DEV_ENV_MATRIX.md), `.vscode/extensions.json`, MCP_SETUP configuration audit, CI_SETUP runner/UE_EDITOR notes, KNOWN_ERRORS for Check-AutomationPrereqs; Safe-Build verified on this machine.
 
 ---
 

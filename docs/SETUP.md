@@ -10,6 +10,8 @@ This guide walks you through setting up the project so you can open the Editor, 
 - **Unreal Engine 5.7** (or 5.4+; 5.7 recommended). Install from Epic Games Launcher.
 - **HomeWorld repo** cloned locally (e.g. `git clone` and open the folder).
 
+For a **pinned toolchain matrix** (Visual Studio workloads, Git LFS, Python, `UE_EDITOR`, C++ IntelliSense options, and Cursor plugin decisions), see [Setup/DEV_ENV_MATRIX.md](Setup/DEV_ENV_MATRIX.md).
+
 ---
 
 ## Setup steps (do in order)

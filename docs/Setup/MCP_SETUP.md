@@ -31,6 +31,19 @@ The plugin auto-starts a TCP listener on **port 55557** when the Editor opens. C
 
 ---
 
+## Configuration audit (HomeWorld)
+
+Use this when onboarding a machine or after changing install paths. Full matrix: [DEV_ENV_MATRIX.md](DEV_ENV_MATRIX.md).
+
+| Check | Expected |
+|--------|----------|
+| **`.cursor/mcp.json`** | One server, **`unrealMCP`**: `command` = `uv`; `args` include `--directory` → folder containing `unreal_mcp_server.py` (repo default in §4 below: `C:\tools\unreal-mcp\Python`). Adjust the path if you installed the server elsewhere. |
+| **Editor** | HomeWorld opens with **UnrealMCP** enabled; Output Log shows the plugin listening on **55557**. |
+| **Cursor** | After edits to `mcp.json`, restart Cursor; **Settings → Tools & MCP** shows a healthy connection when the Editor is running. |
+| **Cursor Agent CLI** (automation loop) | `agent --version` works; `agent login` or **`CURSOR_API_KEY`** set. See [AUTOMATION_READINESS.md](../Automation/AUTOMATION_READINESS.md). |
+
+---
+
 ## Manual setup from scratch
 
 Follow these steps if the batch script fails or you need to customize the installation.

@@ -8825,3 +8825,19 @@ Agent session summaries for cross-session context persistence.
 - T10 (seventy-third list): (1) Added seventy-third 10-task list row to ACCOMPLISHMENTS_OVERVIEW §4 (Phase 3: packaged build run, smoke test or deferred, Phase 3 gate, vertical slice §4, docs and cycle, verification, buffer; next = Phase 4 Steam Demo store draft). (2) Updated ACCOMPLISHMENTS_OVERVIEW "Last updated" to list 73 complete. (3) Updated PROJECT_STATE_AND_TASK_LIST §4: seventy-third list marked **complete**; next = Phase 4 (Steam Demo store draft) per ASSETS_AND_STEAM_DEMO_PHASED_APPROACH. (4) Set T10 status to **completed** in CURRENT_TASK_LIST.md only. Did not replace CURRENT_TASK_LIST (user does that after the loop).
 
 **Success criteria met:** ACCOMPLISHMENTS_OVERVIEW §4 has seventy-third-cycle row; PROJECT_STATE §4 says list 73 complete and points to Phase 4; T10 status set to completed. **All T1–T10 (seventy-third list) complete.** Next: user generates new list per [HOW_TO_GENERATE_TASK_LIST.md](workflow/HOW_TO_GENERATE_TASK_LIST.md), then runs `.\Tools\Start-AllAgents-InNewWindow.ps1` when ready for Phase 4.
+
+---
+
+## 2026-04-08 Development environment upgrade plan
+
+**Tasks completed:**
+- Added [docs/Setup/DEV_ENV_MATRIX.md](Setup/DEV_ENV_MATRIX.md): pinned Windows/VS/UE 5.7/Git/Python/uv, env vars (`UE_EDITOR`, `CURSOR_API_KEY`, `UE_ENGINE`), C++ language service guidance (MSVC + C/C++ extension primary; Unreal Clangd optional; VSIX/Open VSX note), Python/CI Ruff alignment, Cursor Marketplace adopt/skip table (Parallel + Compound Engineering adopted; others optional), MCP + Agent CLI audit checklist.
+- Linked matrix from [docs/SETUP.md](SETUP.md), [docs/README.md](README.md), [docs/DOCS_LAYOUT.md](DOCS_LAYOUT.md), [docs/Setup/CURSOR_DEV.md](Setup/CURSOR_DEV.md).
+- Ran `.\Tools\Safe-Build.ps1` (succeeded). Ran `.\Tools\Check-AutomationPrereqs.ps1` (failed on missing `docs/workflow/CURRENT_TASK_LIST.md` / `NEXT_SESSION_PROMPT.md` when loop files absent).
+- Added KNOWN_ERRORS entry for Check-AutomationPrereqs failure when task-list files are missing.
+- Added [`.vscode/extensions.json`](.vscode/extensions.json) recommendations: `ms-vscode.cpptools`, `ms-python.python`, `charliermarsh.ruff`.
+- [docs/Setup/MCP_SETUP.md](Setup/MCP_SETUP.md): new **Configuration audit** section aligned with repo `.cursor/mcp.json` and AUTOMATION_READINESS.
+- [docs/Setup/CI_SETUP.md](Setup/CI_SETUP.md): **`UE_EDITOR` in GitHub Actions** explanation + **Runner maintenance** (disk, labels, `UE_ENGINE`).
+
+**Key decisions:** Standard C++ path remains MSVC + Microsoft C/C++ extension; clangd documented as optional trial only.
+

@@ -38,7 +38,7 @@ Setup, conventions, content layout, automation, and operational guides live here
 - **Workflow and daily state:** [workflow/README.md](workflow/README.md)
 - **Vision and scope:** [VisionBoard/Core/VISION.md](../VisionBoard/Core/VISION.md), [VisionBoard/Core/STACK_PLAN.md](../VisionBoard/Core/STACK_PLAN.md)
 - **Current tasks:** [TaskLists/PROJECT_STATE_AND_TASK_LIST.md](TaskLists/PROJECT_STATE_AND_TASK_LIST.md), [TaskLists/CURRENT_TASK_LIST.md](TaskLists/CURRENT_TASK_LIST.md)
-- **Setup:** [SETUP.md](SETUP.md)
+- **Setup:** [SETUP.md](SETUP.md), [Setup/DEV_ENV_MATRIX.md](Setup/DEV_ENV_MATRIX.md) (pinned toolchain and env checklist)
 - **Content paths:** [CONTENT_LAYOUT.md](CONTENT_LAYOUT.md)
 - **Pre-demo verification:** [CONSOLE_COMMANDS.md](CONSOLE_COMMANDS.md) §3
 - **PCG:** [PCG/PCG_SETUP.md](PCG/PCG_SETUP.md), [PCG/PCG_QUICK_SETUP.md](PCG/PCG_QUICK_SETUP.md)
