@@ -7,6 +7,8 @@
 #include "HomeWorldPlanetoidTypes.h"
 #include "HomeWorldGameMode.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogHomeWorld, Log, All);
+
 class AActor;
 class APlayerController;
 
@@ -64,6 +66,10 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+
+	/** Called when TimeOfDaySubsystem broadcasts OnNightStarted. Sets up night-specific timers and state. */
+	UFUNCTION()
+	void OnNightStarted();
 
 	/** When TimeOfDay is night (Phase 2), trigger once per night: spawn placeholder and log. Reset when phase leaves night. See docs/tasks/NIGHT_ENCOUNTER.md. */
 	void TryTriggerNightEncounter();
@@ -205,11 +211,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "HomeWorld|Spiritual", meta = (ClampMin = "0", ClampMax = "10"))
 	int32 SpiritualPowerRegenAmount = 1;
 
-	/** Accumulator for next regen tick; reset when leaving night. */
-	float NightSpiritualPowerRegenAccumulator = 0.f;
+	/** Timer handle for repeating spiritual power regen during night. Cleared when leaving night. */
+	FTimerHandle SpiritualPowerRegenTimerHandle;
 
 	/** T4: When at night and interval > 0, add SpiritualPowerRegenAmount to each player every SpiritualPowerRegenIntervalSeconds. Observable on HUD and in log. */
-	void TrySpiritualPowerRegenAtNight(float DeltaTime);
+	UFUNCTION()
+	void PerformSpiritualPowerRegen();
 
 	/** T3 Homestead-on-planetoid stub: true when the current level is considered a planetoid (homestead has "landed"). Set once in BeginPlay from level name. See docs/tasks/PLANETOID_HOMESTEAD.md. */
 	bool bHomesteadLandedOnPlanetoid = false;

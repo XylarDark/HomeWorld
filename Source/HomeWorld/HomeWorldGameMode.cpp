@@ -19,6 +19,8 @@
 #include "HAL/FileManager.h"
 #include "Misc/Paths.h"
 
+DEFINE_LOG_CATEGORY(LogHomeWorld);
+
 AHomeWorldGameMode::AHomeWorldGameMode()
 {
 	DefaultPawnClass = AHomeWorldCharacter::StaticClass();
@@ -46,7 +48,7 @@ void AHomeWorldGameMode::OnAstralDeath(APlayerController* PlayerController)
 		{
 			TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Day);
 		}
-		UE_LOG(LogTemp, Log, TEXT("HomeWorld: Return from astral-by-day — phase restored to Day."));
+		UE_LOG(LogHomeWorld, Log, TEXT("HomeWorld: Return from astral-by-day — phase restored to Day."));
 		// Do not clear day restoration (same day continues); only respawn.
 	}
 	else
@@ -105,7 +107,7 @@ void AHomeWorldGameMode::EnterAstralByDay()
 	APlayerController* PC = World->GetFirstPlayerController();
 	if (!CanEnterAstralByDay(PC))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("HomeWorld: EnterAstralByDay — progression gate not met (astral-by-day not unlocked)."));
+		UE_LOG(LogHomeWorld, Warning, TEXT("HomeWorld: EnterAstralByDay — progression gate not met (astral-by-day not unlocked)."));
 		return;
 	}
 	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
@@ -143,13 +145,12 @@ void AHomeWorldGameMode::Tick(float DeltaTime)
 	}
 
 	TryTriggerNightEncounter();
-	TrySpiritualPowerRegenAtNight(DeltaTime);
 	TryLogDefendPhaseActive();
 	TryLogDefendPositions();
 	TryMoveFamilyToDefendPositions();
 }
 
-void AHomeWorldGameMode::TrySpiritualPowerRegenAtNight(float DeltaTime)
+void AHomeWorldGameMode::PerformSpiritualPowerRegen()
 {
 	UWorld* World = GetWorld();
 	if (!World) return;
@@ -157,13 +158,12 @@ void AHomeWorldGameMode::TrySpiritualPowerRegenAtNight(float DeltaTime)
 	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
 	if (!TimeOfDay || !TimeOfDay->GetIsNight())
 	{
-		NightSpiritualPowerRegenAccumulator = 0.f;
+		if (SpiritualPowerRegenTimerHandle.IsValid())
+		{
+			World->GetTimerManager().ClearTimer(SpiritualPowerRegenTimerHandle);
+		}
 		return;
 	}
-	if (SpiritualPowerRegenIntervalSeconds <= 0.f || SpiritualPowerRegenAmount <= 0) return;
-
-	NightSpiritualPowerRegenAccumulator += DeltaTime;
-	if (NightSpiritualPowerRegenAccumulator < SpiritualPowerRegenIntervalSeconds) return;
 
 	int32 PlayerCount = 0;
 	if (AGameStateBase* GS = GetGameState<AGameStateBase>())
@@ -177,8 +177,8 @@ void AHomeWorldGameMode::TrySpiritualPowerRegenAtNight(float DeltaTime)
 			}
 		}
 	}
-	UE_LOG(LogTemp, Log, TEXT("HomeWorld: Spiritual power regen at night +%d (players: %d); observable on HUD as Spiritual power: N."), SpiritualPowerRegenAmount, PlayerCount);
-	NightSpiritualPowerRegenAccumulator = FMath::Max(0.f, NightSpiritualPowerRegenAccumulator - SpiritualPowerRegenIntervalSeconds);
+
+	UE_LOG(LogHomeWorld, Log, TEXT("HomeWorld: Spiritual power regen at night +%d (players: %d)"), SpiritualPowerRegenAmount, PlayerCount);
 }
 
 void AHomeWorldGameMode::TryTriggerNightEncounter()
@@ -192,13 +192,19 @@ void AHomeWorldGameMode::TryTriggerNightEncounter()
 	const bool bIsNight = TimeOfDay->GetIsNight();
 	if (!bIsNight)
 	{
+		// Reset all night state when leaving night phase
 		bNightEncounterTriggered = false;
 		bPlanetoidPackSpawnedThisNight = false;
 		bKeyPointBossSpawnedThisNight = false;
 		bDefensePositionsSpawnedThisNight = false;
+		bFamilyMovedToDefendThisNight = false;
+		bFamilyReturnedThisDawn = false;
+		bDefendPhaseLogged = false;
+		bDefendPositionsLogged = false;
 		CurrentNightEncounterWave = 0;
 		ConvertedFoesThisNight = 0;
 		ConvertedFoeRolesThisNight.Empty();
+
 		if (NightEncounterWave2TimerHandle.IsValid())
 		{
 			World->GetTimerManager().ClearTimer(NightEncounterWave2TimerHandle);
@@ -207,12 +213,34 @@ void AHomeWorldGameMode::TryTriggerNightEncounter()
 		{
 			World->GetTimerManager().ClearTimer(NightEncounterWave3TimerHandle);
 		}
+		if (SpiritualPowerRegenTimerHandle.IsValid())
+		{
+			World->GetTimerManager().ClearTimer(SpiritualPowerRegenTimerHandle);
+		}
 		return;
 	}
 
 	if (bNightEncounterTriggered) return;
 	bNightEncounterTriggered = true;
 	CurrentNightEncounterWave = 1;
+
+	// Bind to night started event (if not already) and start repeating regen timer
+	if (!TimeOfDay->OnNightStarted.IsBoundToObject(this))
+	{
+		TimeOfDay->OnNightStarted.AddDynamic(this, &AHomeWorldGameMode::OnNightStarted);
+	}
+
+	// Start repeating spiritual power regen during night
+	if (SpiritualPowerRegenIntervalSeconds > 0.f && SpiritualPowerRegenAmount > 0 && !SpiritualPowerRegenTimerHandle.IsValid())
+	{
+		World->GetTimerManager().SetTimer(
+			SpiritualPowerRegenTimerHandle,
+			this,
+			&AHomeWorldGameMode::PerformSpiritualPowerRegen,
+			SpiritualPowerRegenIntervalSeconds,
+			true);
+		UE_LOG(LogHomeWorld, Log, TEXT("HomeWorld: Started repeating spiritual power regen every %.1fs during night."), SpiritualPowerRegenIntervalSeconds);
+	}
 
 	const float SpawnDist = NightEncounterSpawnDistance;
 	const float HeightOffset = NightEncounterSpawnHeightOffset;
@@ -756,7 +784,12 @@ void AHomeWorldGameMode::LogDefendStatus() const
 		Phase, bDefendActive ? TEXT("true") : TEXT("false"), DefendPositions.Num(), FamilyActors.Num(), bFamilyMovedToDefendThisNight ? TEXT("true") : TEXT("false"));
 }
 
-// #region agent log
+void AHomeWorldGameMode::OnNightStarted()
+{
+	UE_LOG(LogHomeWorld, Log, TEXT("HomeWorld: Night started event received — setting up night systems (encounters, regen timer)."));
+	// Additional night setup can be added here in the future (e.g. State Tree triggers, music, etc.)
+}
+
 void AHomeWorldGameMode::BeginPlay()
 {
 	Super::BeginPlay();
