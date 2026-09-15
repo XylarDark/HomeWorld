@@ -29,7 +29,7 @@ HomeWorld vendors [DevEnvTemplate/](DevEnvTemplate/) as a **gitlink** (pinned SH
 | Layer | Status |
 | ----- | ------ |
 | **Agent context** | `.agents/skills/` (core), `.agents/skills-extras/` (opt-in catalog), stack rules `21-unreal-engine.mdc` / `22-unreal-editor-ui.mdc` |
-| **Operational memory** | `docs/KNOWN_ERRORS.md`, `docs/Automation/AUTOMATION_GAPS.md` (canonical), `docs/operational/automation-gaps.md` (pointer), `docs/DOCS_LAYOUT.md`, `docs/human-use/` |
+| **Operational memory** | `docs/KNOWN_ERRORS.md`, `docs/Automation/AUTOMATION_GAPS.md` (canonical), `docs/operational/automation-gaps.md` (pointer), `docs/DOCS_LAYOUT.md`, `docs/human-use/` (steer / taste / test; [cursor-cannot](docs/human-use/cursor-cannot/README.md)) |
 | **Doctor** | Nested under `DevEnvTemplate/` (not `.devenv/`); `npm run doctor` / `doctor:build` / `sync` from repo root |
 
 **Accepted declines (do not re-litigate every session):**
@@ -39,6 +39,10 @@ HomeWorld vendors [DevEnvTemplate/](DevEnvTemplate/) as a **gitlink** (pinned SH
 - Do **not** vendor a second checkout under `.devenv/`; `DevEnvTemplate/` is the doctor root.
 - Do **not** add ESLint / TypeScript unit-test gates for the game host; doctor “Node stack” criticals for missing TS/ESLint/JS tests are **accepted declines** (this repo is UE 5.7 + Python automation).
 - Automation gaps for game systems stay in [docs/Automation/AUTOMATION_GAPS.md](docs/Automation/AUTOMATION_GAPS.md), not the template stub.
+
+The human **steers**, **makes taste**, and **tests**; the agent executes. See
+[docs/human-use/OWNERSHIP.md](docs/human-use/OWNERSHIP.md). Do not invent a human
+decision or a product listed under [cursor-cannot](docs/human-use/cursor-cannot/README.md).
 
 Refresh layers: `npm run sync` (dry-run) then `npm run sync:apply`. Details: [docs/Setup/CURSOR_DEV.md](docs/Setup/CURSOR_DEV.md).
 

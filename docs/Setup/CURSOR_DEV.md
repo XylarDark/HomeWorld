@@ -19,7 +19,9 @@ When asking Cursor to change C++ or Blueprint behavior, the rules ensure suggest
 
 ## DevEnvTemplate (doctor + layer sync)
 
-Pinned checkout: [DevEnvTemplate/](../../DevEnvTemplate/) gitlink at **`2997a3d`** (layer-aware sync, agent skills, MCP hygiene). Full template docs: [DevEnvTemplate/docs/SYNC.md](../../DevEnvTemplate/docs/SYNC.md), [BOOTSTRAP.md](../../DevEnvTemplate/BOOTSTRAP.md).
+Pinned checkout: [DevEnvTemplate/](../../DevEnvTemplate/) gitlink (refresh from the
+template working tree when adopting Human Use steer/taste/test). Full template docs:
+[DevEnvTemplate/docs/SYNC.md](../../DevEnvTemplate/docs/SYNC.md), [BOOTSTRAP.md](../../DevEnvTemplate/BOOTSTRAP.md).
 
 ### Doctor
 
@@ -49,6 +51,8 @@ node DevEnvTemplate/dist/scripts/sync/cli.js --layer agent-context,operational-m
 
 **Canonical automation gaps for HomeWorld:** [docs/Automation/AUTOMATION_GAPS.md](../Automation/AUTOMATION_GAPS.md). The template entry shape at `docs/operational/automation-gaps.md` is a pointer only.
 
-**Human ownership:** [docs/human-use/OWNERSHIP.md](../human-use/OWNERSHIP.md) — agents execute agent-owned work and stop for human decisions.
+**Human ownership:** [docs/human-use/OWNERSHIP.md](../human-use/OWNERSHIP.md) — you
+steer, make taste, and test; the agent executes and stops when a job you own is
+missing. Practices Cursor does not enforce: [cursor-cannot](../human-use/cursor-cannot/README.md).
 
 **Opt-in extras:** Copy individual skills from [`.agents/skills-extras/`](../../.agents/skills-extras/) into `.agents/skills/` when needed (see [`.agents/README.md`](../../.agents/README.md)).

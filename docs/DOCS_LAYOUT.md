@@ -37,6 +37,15 @@ Setup and environment: MCP, CI, local tools, ref images, Cursor dev.
 | [Setup/REF_IMAGES_SETUP_TUTORIAL.md](Setup/REF_IMAGES_SETUP_TUTORIAL.md) | Reference images for GUI automation. |
 | [Setup/CURSOR_DEV.md](Setup/CURSOR_DEV.md) | Cursor and dev environment. |
 
+### guides/
+
+Template MCP hygiene and plan-integration (layer sync). HomeWorld MCP install stays in Setup/.
+
+| File | Purpose |
+|------|--------|
+| [guides/mcp-hygiene.md](guides/mcp-hygiene.md) | Treat `.cursor/mcp.json` as a production change. |
+| [guides/cursor-plan-integration.md](guides/cursor-plan-integration.md) | Plan mode with Human Use ownership. |
+
 ### operational/
 
 Template operational-memory entry shapes (layer sync). HomeWorld canonical automation gaps stay under Automation/.
@@ -47,13 +56,16 @@ Template operational-memory entry shapes (layer sync). HomeWorld canonical autom
 
 ### human-use/
 
-Human vs agent ownership (DevEnvTemplate operational layer). Agents name the owner and stop when a human decision is missing.
+Human jobs: steer, taste, test (DevEnvTemplate operational layer). Agents name the
+job and stop when a decision you own is missing. Applies anywhere in the tree.
 
 | File | Purpose |
 |------|--------|
 | [human-use/README.md](human-use/README.md) | Index for ownership docs. |
-| [human-use/OWNERSHIP.md](human-use/OWNERSHIP.md) | Who owns the next step. |
-| [human-use/CYCLE.md](human-use/CYCLE.md) | Decision cycle. |
+| [human-use/OWNERSHIP.md](human-use/OWNERSHIP.md) | Who owns the next step; alert shape. |
+| [human-use/CYCLE.md](human-use/CYCLE.md) | When a decision is due for this task. |
+| [human-use/outcome.md](human-use/outcome.md) | Gradeable rubric; verifier scores, not the implementer. |
+| [human-use/cursor-cannot/](human-use/cursor-cannot/README.md) | Week 1 PDF slices Cursor does not enforce. |
 
 ---
 
