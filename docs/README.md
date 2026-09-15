@@ -25,8 +25,8 @@ Setup, conventions, content layout, automation, and operational guides live here
 | **[Automation/](Automation/)** | Agent company, automation gaps, loop, refinement, research. |
 | **[Editor/](Editor/)** | Build protocol, launch deep dive, polish, manual tutorial. |
 | **[UE/](UE/)** | UE 5.7 tech, Editor UI. |
-| **[Assets/](Assets/)** | Asset workflow, Milady import. |
-| **[Testing/](Testing/)** | Level testing, movement validation. |
+| **[Assets/](Assets/)** | Asset workflow, external asset manifest (sources + licenses), Milady import. |
+| **[Testing/](Testing/)** | Level testing, MVP PIE + tutorial verification, movement validation. |
 | **[MVP/](MVP/)** | MVP gap analysis, mobile feasibility. |
 | **[IndustryStandards/](IndustryStandards/)** | Industry-standard approaches for MVP (world, character, monsters). |
 

@@ -1,4 +1,5 @@
 {
+  "_comment_mvp_cast": "Player skeletal mesh for vertical slice; partner/child use BP_*_Placeholder + tags (see demo_map_config _comment_mvp_cast). STYLE_GUIDE: docs/AssetCreation/STYLE_GUIDE.md.",
   "skeletal_mesh": "/Game/Man/Mesh/Full/SK_Man_Full_01",
   "anim_blueprint": "/Game/HomeWorld/Characters/ABP_HomeWorldCharacter",
   "mesh_forward_yaw_offset": 0.0,

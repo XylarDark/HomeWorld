@@ -6,7 +6,7 @@
 
 **Phased execution:** For a step-by-step plan, see **[VisionBoard/ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](../VisionBoard/ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md)** (Phase 1: workflow, Phase 2: image-to-3D deferred; Phase 3–4 packaged build/store draft are optional for MVP).
 
-**See also:** [TaskLists/TaskSpecs/MILADY_IMPORT_ROADMAP.md](../TaskLists/TaskSpecs/MILADY_IMPORT_ROADMAP.md) (full Milady pipeline), [workflow/STEAM_EA_STORE_CHECKLIST.md](workflow/STEAM_EA_STORE_CHECKLIST.md) (for when we launch on Steam — not required for MVP).
+**See also:** [Assets/EXTERNAL_ASSET_MANIFEST.md](EXTERNAL_ASSET_MANIFEST.md) (free-tier sources, bundle inventory, MVP vs automation tracks), [TaskLists/TaskSpecs/MILADY_IMPORT_ROADMAP.md](../TaskLists/TaskSpecs/MILADY_IMPORT_ROADMAP.md) (full Milady pipeline), [workflow/STEAM_EA_STORE_CHECKLIST.md](workflow/STEAM_EA_STORE_CHECKLIST.md) (for when we launch on Steam — not required for MVP).
 
 ---
 

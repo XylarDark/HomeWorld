@@ -54,6 +54,16 @@ Do this once with DemoMap open:
 
 **Build orders and family agents (optional):** To add one build order and family agents for agentic-building tests, run **create_bp_build_order_wall.py**, then **place_build_order_wall.py**, then **place_mass_spawner_demomap.py**. See task docs for DAY10 / AGENTIC_BUILDING if needed.
 
+### Hero corner checklist (MVP marketing)
+
+Use the first **exclusion zone** in [demo_map_config.json](../../Content/Python/demo_map_config.json) as the homestead compound framing target ([VERTICAL_SLICE_CHECKLIST.md](../../VisionBoard/MVP/VERTICAL_SLICE_CHECKLIST.md)):
+
+1. **Ground:** No holes under PlayerStart; landscape or floor meshes read clearly at screenshot FOV.
+2. **PCG ring:** Trees and rocks stop at the exclusion boundary (no clutter inside the compound).
+3. **Lighting:** Directional + sky from `setup_level.py`; tune for one strong hero shot (golden hour or clear midday).
+4. **Cast props:** Partner and child placeholders visible near `partner_position` / `child_position` if you need tutorial screenshots (run `place_partner.py`, `place_child.py` with DemoMap open).
+5. **External assets:** Log Megascans/Kenney/pack rows in [Assets/EXTERNAL_ASSET_MANIFEST.md](../Assets/EXTERNAL_ASSET_MANIFEST.md).
+
 ---
 
 ## Tutorial 4: Finish PCG in the Editor (one-time)

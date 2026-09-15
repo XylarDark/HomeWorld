@@ -39,14 +39,14 @@ Vision: *“Assets and visuals are mandatory for the MVP deliverable.”* Market
 
 | Gap | Current state | Needed for MVP |
 |-----|----------------|----------------|
-| **No exported assets in pipeline** | `AssetCreation/Exports/` has only `.gitkeep` in Harvestables, Homestead, Dungeon, Biomes, Characters. No FBX/GLB in Exports. | Populate Exports (or use marketplace/FAB/Quixel): harvestables (trees, rocks, flowers), homestead buildings/props, dungeon kit, biome props. Run batch_import_asset_creation.py to get meshes into `/Game/HomeWorld/`. |
-| **PCG / environment look** | ForestIsland_PCG exists; mesh list and landscape tag often manual. Trees/rocks may be placeholder or from a pack. | Lock PCG setup (Get Landscape Data By Tag, Static Mesh Spawner mesh list) so “beautiful corner” (homestead compound + forest) looks intentional. Use Quixel or POLYGON/Medieval Village per STACK_PLAN. |
+| **No exported assets in pipeline** | `AssetCreation/Exports/` now includes CC-BY pipeline probe GLBs (Khronos Box copies) plus `ATTRIBUTION.md`; run `batch_import_asset_creation.py` in Editor to import into `/Game/HomeWorld/`. Full source ladder: [Assets/EXTERNAL_ASSET_MANIFEST.md](../Assets/EXTERNAL_ASSET_MANIFEST.md). | Replace probes with CC0 Kenney / Megascans / pack meshes for harvestables (trees, rocks, flowers), homestead buildings/props, dungeon kit, biome props. Run batch_import after each drop. |
+| **PCG / environment look** | ForestIsland_PCG exists; mesh list and landscape tag often manual. Trees/rocks may be placeholder or from a pack. | Lock PCG setup (Get Landscape Data By Tag, Static Mesh Spawner mesh list) so “beautiful corner” (homestead compound + forest) looks intentional. `pcg_forest_config.json` documents locked Stylized Provencal paths; use Quixel or POLYGON/Medieval Village per STACK_PLAN when upgrading look. |
 | **Character / family look** | BP_HomeWorldCharacter; FAB or Man ref in CONTENT_LAYOUT. Family (partner, child) may be placeholder. | One recognizable player character; partner and child with clear read (Primitive Characters or POLYGON per PROTOTYPE_SCOPE asset list). |
 | **Homestead “beautiful corner”** | place_homestead_placeholders, Homestead map; DemoMap compound. | Placed buildings, resource nodes, and PCG so one framed shot is screenshot-ready (lighting, no holes, no floating meshes). |
 | **Capsule / key art** | Not in scope for Phase 4 (skipped). | Before calling MVP “done”: at least one capsule (616×353) and 2–5 key screenshots for store or pitch. |
 | **Enemies / boss** | Night encounter placeholder; key-point boss spawn stub. | One or more enemy types for “scout/boss” beat; one boss for “claim home” moment (placeholder art OK if readable). |
 
-**Action:** Prioritize (1) getting real meshes into Exports and importing (harvestables + homestead or environment pack), (2) one polished “beautiful corner” shot, (3) capsule/screenshots plan.
+**Action:** Prioritize (1) getting real meshes into Exports and importing (harvestables + homestead or environment pack), (2) one polished “beautiful corner” shot, (3) capsule/screenshots plan. **Verification after changes:** [Testing/MVP_PIE_AND_TUTORIAL_VERIFICATION.md](../Testing/MVP_PIE_AND_TUTORIAL_VERIFICATION.md).
 
 ---
 

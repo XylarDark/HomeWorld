@@ -1,4 +1,5 @@
 {
+  "_comment_mvp_cast": "MVP cast placement: partner_position + child_position feed place_partner.py / place_child.py (tags Partner, Child). Player uses character_blueprint_config.json. See docs/Assets/EXTERNAL_ASSET_MANIFEST.md (Cast minimum section).",
   "demo_level_path": "/Game/HomeWorld/Maps/DemoMap",
   "template_level_path": null,
   "volume_center_x": 0,
