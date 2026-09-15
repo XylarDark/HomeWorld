@@ -22,6 +22,26 @@
 
 **Compound Engineering plugin:** The plugin is installed; **recommending its commands when appropriate is policy**. When a task is a good use case for a plugin workflow (plan, review, changelog, docs lookup, etc.), recommend the corresponding slash command instead of doing that workflow yourself. The situation-to-command mapping is in [.cursor/rules/10-compound-engineering.mdc](.cursor/rules/10-compound-engineering.mdc). Use **context7** MCP for up-to-date library/framework docs when relevant. Optional one-time: run `/setup` in Cursor to configure review agents for this project.
 
+## DevEnvTemplate (adopted layers)
+
+HomeWorld vendors [DevEnvTemplate/](DevEnvTemplate/) as a **gitlink** (pinned SHA) and adopts these layers:
+
+| Layer | Status |
+| ----- | ------ |
+| **Agent context** | `.agents/skills/` (core), `.agents/skills-extras/` (opt-in catalog), stack rules `21-unreal-engine.mdc` / `22-unreal-editor-ui.mdc` |
+| **Operational memory** | `docs/KNOWN_ERRORS.md`, `docs/Automation/AUTOMATION_GAPS.md` (canonical), `docs/operational/automation-gaps.md` (pointer), `docs/DOCS_LAYOUT.md`, `docs/human-use/` |
+| **Doctor** | Nested under `DevEnvTemplate/` (not `.devenv/`); `npm run doctor` / `doctor:build` / `sync` from repo root |
+
+**Accepted declines (do not re-litigate every session):**
+
+- Keep HomeWorld **always-applied** Cursor rules (`00–20`, `ue57-*`, etc.) until a dedicated migration to AGENTS.md + skills; template retires those for *new* adoptions only.
+- Do **not** require Node 24+ on the host for day-to-day UE work; doctor may warn `EBADENGINE` under Node 22 — accepted for now.
+- Do **not** vendor a second checkout under `.devenv/`; `DevEnvTemplate/` is the doctor root.
+- Do **not** add ESLint / TypeScript unit-test gates for the game host; doctor “Node stack” criticals for missing TS/ESLint/JS tests are **accepted declines** (this repo is UE 5.7 + Python automation).
+- Automation gaps for game systems stay in [docs/Automation/AUTOMATION_GAPS.md](docs/Automation/AUTOMATION_GAPS.md), not the template stub.
+
+Refresh layers: `npm run sync` (dry-run) then `npm run sync:apply`. Details: [docs/Setup/CURSOR_DEV.md](docs/Setup/CURSOR_DEV.md).
+
 ## Dev environment setup
 
 1. Install UE 5.7, clone this repo, open `HomeWorld.uproject`.

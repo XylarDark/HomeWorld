@@ -57,6 +57,8 @@ Use this preset for every FBX/GLB export so the batch import script and UE behav
 
 **Export destination:** `AssetCreation/Exports/<Category>/` where `<Category>` is one of: Characters, Harvestables, Homestead, Dungeon, Biomes.
 
+**Scripted export (preferred):** Run [Blender/export_to_asset_creation.py](Blender/export_to_asset_creation.py) inside Blender (or via blender-mcp). It applies the table above and writes under `Exports/<Category>/`. Then import with unrealMCP: `execute_python_script("batch_import_asset_creation.py")`.
+
 Reference: [Blender–UE5 workflow](https://srogers4.github.io/blender-ue5-workflow/blender/export_settings/).
 
 ---

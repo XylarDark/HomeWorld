@@ -6,6 +6,31 @@ Agent session summaries for cross-session context persistence.
 
 ---
 
+## 2026-09-15 DevEnvTemplate full adoption
+
+**Tasks completed:**
+- Pinned DevEnvTemplate gitlink to `2997a3d`; added `.gitmodules`.
+- Completed agent-context + operational-memory: core skills (localized), skills-extras catalog, Unreal stack rules, `docs/human-use/`, operational gaps pointer.
+- Host wiring: `npm run sync` / `doctor:*`, AGENTS.md adopted-layers + accepted declines, CURSOR_DEV / DOCS_LAYOUT updates.
+- Blender Lab MCP docs/example remain part of the same environment pass.
+
+**Key decisions:** Keep always-applied HomeWorld Cursor rules until a dedicated migration; doctor stays under `DevEnvTemplate/` (not `.devenv/`); Node 22 EBADENGINE accepted.
+
+---
+
+## 2026-09-15 DevEnvTemplate sync + Blender MCP
+
+**Tasks completed:**
+- Fast-forwarded nested DevEnvTemplate gitlink `6331de6` → `2997a3d`; rebuilt doctor (`npm run doctor:build`).
+- Applied layer sync: agent-context (`.agents/skills/*`, `21-unreal-engine.mdc`, `22-unreal-editor-ui.mdc`, `11-javascript.mdc`) + operational-memory pointer at `docs/operational/automation-gaps.md`.
+- Added root `npm run sync` / `sync:apply` wrappers; updated `docs/Setup/CURSOR_DEV.md`.
+- Wired Blender MCP alongside unrealMCP; mcp.json.example + gitignore live mcp.json; AssetCreation Blender export helper + docs.
+- **Fix (Connecting hang):** Cursor was using PyPI `uvx blender-mcp` (ahujasid) against the official Lab addon (`lab_blender_org/mcp`). Switched to Lab `blender-mcp.exe` from `uv tool install git+…/blender_mcp.git#subdirectory=mcp`.
+
+**Key decisions:** Keep HomeWorld always-applied Cursor rules (00–20 / ue57-*) until a dedicated migration; sync is add-missing only. Canonical automation gaps remain `docs/Automation/AUTOMATION_GAPS.md`. Use **Blender Lab MCP** (5.1+), not community PyPI blender-mcp, with this project's Steam Blender 5.2.
+
+---
+
 ## 2026-03-02 Asset creation: tools, workflow, automation, directory
 
 **Tasks completed:**
@@ -8840,4 +8865,28 @@ Agent session summaries for cross-session context persistence.
 - [docs/Setup/CI_SETUP.md](Setup/CI_SETUP.md): **`UE_EDITOR` in GitHub Actions** explanation + **Runner maintenance** (disk, labels, `UE_ENGINE`).
 
 **Key decisions:** Standard C++ path remains MSVC + Microsoft C/C++ extension; clangd documented as optional trial only.
+
+---
+
+## 2026-05-13 Test assets and MVP-quality environment (plan implementation)
+
+**Tasks completed:**
+- Added [docs/Assets/EXTERNAL_ASSET_MANIFEST.md](Assets/EXTERNAL_ASSET_MANIFEST.md): two-track (automation vs MVP), free-tier source ladder, bundle inventory table, cast minimum checklist, script/config references.
+- Added [AssetCreation/Exports/ATTRIBUTION.md](../AssetCreation/Exports/ATTRIBUTION.md) for Khronos glTF Box (CC-BY 4.0); populated `AssetCreation/Exports/` with `khronos_box_sample.glb` and category copies for batch-import pipeline verification.
+- Added [docs/Testing/MVP_PIE_AND_TUTORIAL_VERIFICATION.md](Testing/MVP_PIE_AND_TUTORIAL_VERIFICATION.md): batch import, PCG lock, `pie_test_runner`, tutorial console flow.
+- Updated [docs/DOCS_LAYOUT.md](DOCS_LAYOUT.md), [docs/README.md](README.md), [docs/CONTENT_LAYOUT.md](CONTENT_LAYOUT.md), [docs/Assets/ASSET_WORKFLOW_AND_STEAM_DEMO.md](Assets/ASSET_WORKFLOW_AND_STEAM_DEMO.md), [AssetCreation/README.md](../../AssetCreation/README.md), [docs/Maps/DEMO_MAP.md](Maps/DEMO_MAP.md), [docs/MVP/MVP_GAP_ANALYSIS_VISION.md](MVP/MVP_GAP_ANALYSIS_VISION.md).
+- Config comments: [Content/Python/pcg_forest_config.json](../Content/Python/pcg_forest_config.json) (MVP PCG lock note), [demo_map_config.json](../Content/Python/demo_map_config.json), [character_blueprint_config.json](../Content/Python/character_blueprint_config.json).
+
+**Editor / MCP:** `batch_import_asset_creation.py` was not executed here (MCP: Failed to connect to Unreal Engine). Next session with Editor open: run batch import once, then confirm meshes under `/Game/HomeWorld/<Category>/` and re-run `pie_test_runner.py` per MVP verification doc.
+
+**Key decisions:** CC-BY probe meshes are documented for attribution; production art should prefer CC0 Kenney or Megascans per manifest ladder.
+
+
+## 2026-09-05 — Workspace audit + GDD draft for Google Docs
+
+- Audited working game vs vision for collaborator GDD/art kickoff.
+- Drafted full GDD (14 sections) onto system clipboard + `%TEMP%\HomeWorld_GDD_Draft.txt`.
+- Google Doc opened (HomeWorld GDD); Cursor browser blocked paste (Docs clipboard permission). User can Ctrl+V in Chrome/Edge.
+- Canvas: `canvases/homeworld-game-audit.canvas.tsx`.
+- Verdict: systems-complete prototype; art/visuals are main gap for marketing-ready slice.
 

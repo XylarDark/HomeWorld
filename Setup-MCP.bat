@@ -75,28 +75,38 @@ if exist "%PLUGIN_DST%\UnrealMCP.uplugin" (
     echo [OK] Plugin copied to Plugins\UnrealMCP
 )
 
-rem --- Step 6: Create .cursor/mcp.json if missing ---
+rem --- Step 6: Create .cursor/mcp.json if missing (from example; live file is gitignored) ---
 if exist "%MCP_JSON%" (
     echo [OK] .cursor/mcp.json already exists
 ) else (
     echo Creating .cursor/mcp.json...
     if not exist "%~dp0.cursor" mkdir "%~dp0.cursor"
-    (
-        echo {
-        echo   "mcpServers": {
-        echo     "unrealMCP": {
-        echo       "command": "uv",
-        echo       "args": [
-        echo         "--directory",
-        echo         "C:\\tools\\unreal-mcp\\Python",
-        echo         "run",
-        echo         "unreal_mcp_server.py"
-        echo       ]
-        echo     }
-        echo   }
-        echo }
-    ) > "%MCP_JSON%"
-    echo [OK] Created .cursor/mcp.json
+    if exist "%~dp0.cursor\mcp.json.example" (
+        copy /Y "%~dp0.cursor\mcp.json.example" "%MCP_JSON%" >nul
+        echo [OK] Copied .cursor\mcp.json.example -^> .cursor\mcp.json
+        echo      Edit unrealMCP --directory if your unreal-mcp path differs from C:\tools\unreal-mcp\Python
+    ) else (
+        (
+            echo {
+            echo   "mcpServers": {
+            echo     "unrealMCP": {
+            echo       "command": "uv",
+            echo       "args": [
+            echo         "--directory",
+            echo         "C:\\tools\\unreal-mcp\\Python",
+            echo         "run",
+            echo         "unreal_mcp_server.py"
+            echo       ]
+            echo     },
+            echo     "blender": {
+            echo       "command": "cmd",
+            echo       "args": ["/c", "uvx", "blender-mcp"]
+            echo     }
+            echo   }
+            echo }
+        ) > "%MCP_JSON%"
+        echo [OK] Created .cursor/mcp.json (unrealMCP + blender)
+    )
 )
 
 echo.

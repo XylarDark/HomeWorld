@@ -1,0 +1,24 @@
+{
+  "//": "Copy to .cursor/mcp.json and edit. That path is gitignored (live config may hold machine paths).",
+  "//1": "Never write a secret literally in this file. Prefer ${env:NAME} for credentials.",
+  "//2": "After changing mcp.json, fully quit and relaunch Cursor (or toggle the server in Settings → Tools & MCP).",
+  "//3": "Blender: use the OFFICIAL Blender Lab MCP package + Lab addon (Blender 5.1+). Do NOT use `uvx blender-mcp` from PyPI (ahujasid) — it talks a different protocol and Cursor will stick on Connecting.",
+  "//4": "Install Lab MCP once: uv tool install \"git+https://projects.blender.org/lab/blender_mcp.git#subdirectory=mcp\"",
+  "//5": "In Blender: Extensions → MCP (lab_blender_org) enabled; Preferences → Add-ons → MCP → Start MCP Bridge Server (port 9876).",
+
+  "mcpServers": {
+    "unrealMCP": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "C:\\tools\\unreal-mcp\\Python",
+        "run",
+        "unreal_mcp_server.py"
+      ]
+    },
+    "blender": {
+      "command": "C:\\Users\\User\\.local\\bin\\blender-mcp.exe",
+      "args": []
+    }
+  }
+}

@@ -1,0 +1,3 @@
+[submodule "DevEnvTemplate"]
+	path = DevEnvTemplate
+	url = https://github.com/XylarDark/DevEnvTemplate.git

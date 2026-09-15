@@ -37,6 +37,24 @@ Setup and environment: MCP, CI, local tools, ref images, Cursor dev.
 | [Setup/REF_IMAGES_SETUP_TUTORIAL.md](Setup/REF_IMAGES_SETUP_TUTORIAL.md) | Reference images for GUI automation. |
 | [Setup/CURSOR_DEV.md](Setup/CURSOR_DEV.md) | Cursor and dev environment. |
 
+### operational/
+
+Template operational-memory entry shapes (layer sync). HomeWorld canonical automation gaps stay under Automation/.
+
+| File | Purpose |
+|------|--------|
+| [operational/automation-gaps.md](operational/automation-gaps.md) | Pointer to [Automation/AUTOMATION_GAPS.md](Automation/AUTOMATION_GAPS.md). |
+
+### human-use/
+
+Human vs agent ownership (DevEnvTemplate operational layer). Agents name the owner and stop when a human decision is missing.
+
+| File | Purpose |
+|------|--------|
+| [human-use/README.md](human-use/README.md) | Index for ownership docs. |
+| [human-use/OWNERSHIP.md](human-use/OWNERSHIP.md) | Who owns the next step. |
+| [human-use/CYCLE.md](human-use/CYCLE.md) | Decision cycle. |
+
 ---
 
 ## PCG/
@@ -119,6 +137,7 @@ Asset pipeline, image-to-3D, Milady.
 | File | Purpose |
 |------|--------|
 | [Assets/ASSET_WORKFLOW_AND_STEAM_DEMO.md](Assets/ASSET_WORKFLOW_AND_STEAM_DEMO.md) | Asset workflow; image-to-3D; Steam demo. |
+| [Assets/EXTERNAL_ASSET_MANIFEST.md](Assets/EXTERNAL_ASSET_MANIFEST.md) | Free-tier source ladder, bundle inventory, MVP vs automation tracks, cast checklist. |
 | [Assets/MILADY_IMPORT_SETUP.md](Assets/MILADY_IMPORT_SETUP.md) | Milady import pipeline setup. |
 
 ---
@@ -130,6 +149,7 @@ Testing plans and validation.
 | File | Purpose |
 |------|--------|
 | [Testing/LEVEL_TESTING_PLAN.md](Testing/LEVEL_TESTING_PLAN.md) | Level loading and test strategy. |
+| [Testing/MVP_PIE_AND_TUTORIAL_VERIFICATION.md](Testing/MVP_PIE_AND_TUTORIAL_VERIFICATION.md) | After asset/PCG changes: batch import, PCG lock, pie_test_runner, tutorial console checklist. |
 | [Testing/MOVEMENT_INPUT_VALIDATION.md](Testing/MOVEMENT_INPUT_VALIDATION.md) | Movement input validation. |
 
 ---

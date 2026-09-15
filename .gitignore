@@ -40,3 +40,10 @@ __pycache__/
 .env
 .env.local
 .env.*.local
+
+# Cursor MCP live config (may hold machine paths / credentials).
+# Start from .cursor/mcp.json.example — see docs/Setup/MCP_SETUP.md
+.cursor/mcp.json
+.mcp.json
+# .devenv workspace (auto-added)
+.devenv/
