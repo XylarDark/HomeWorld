@@ -8,6 +8,23 @@
 
 ---
 
+## Repo roots outside `docs/` (MVP swarm vs UE)
+
+These paths are **intentionally outside** lowercase `docs/`. Do not merge `Docs/` into `docs/` or move swarm kit files into UE subdirs without updating this table.
+
+| Path | Purpose |
+|------|---------|
+| **`Docs/`** (capital D) | MVP swarm canon — GDD slices, art bible, material sheet, WAVE handoffs (`Docs/handoffs/`), QA placeholders. See [Docs/README.md](../Docs/README.md). |
+| **`swarm/`** | Conductor runtime — [SWARM_OPS.md](../swarm/SWARM_OPS.md), [PHASE_BOARD.md](../swarm/PHASE_BOARD.md), wave packets, role cards (source for `.cursor/agents/`). |
+| **`Lib/`** | Kit specs and master-material JSON for Blender-first pipeline (homestead, gatherables, night layer, transit). |
+| **`Maps/`** (repo root) | Preview map READMEs for swarm lookdev (`Preview_Homestead_Night`, etc.) — not UE `/Game/` maps under `Content/`. |
+| **`START_HERE.md`** | Human Lead entry for MVP lookdev swarm; gates and on-demand specialist spawn. |
+| **`HOMEWORLD_MVP_SWARM_BRIEF.md`** | Game canon brief for the swarm (Human Lead owns changes after P0). |
+
+**UE project docs** stay in **`docs/`** (this tree). **MVP swarm docs** stay in **`Docs/`**. On case-insensitive filesystems, Git may only expose one casing locally — see [Docs/README.md](../Docs/README.md).
+
+---
+
 ## Root (docs/) — entry points and single-source-of-truth only
 
 | File | Purpose |

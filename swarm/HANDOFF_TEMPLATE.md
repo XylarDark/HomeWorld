@@ -36,7 +36,7 @@
 
 ## Blockers
 
--
+- (If blocked by a real failure or automation gap, link [docs/KNOWN_ERRORS.md](../docs/KNOWN_ERRORS.md) or [docs/Automation/AUTOMATION_GAPS.md](../docs/Automation/AUTOMATION_GAPS.md) entry)
 
 ## Risks for the next owner
 
@@ -44,4 +44,8 @@
 
 ## Evidence
 
-- Screenshot / frame / list / test notes:
+Gate claims without evidence are invalid. List checkable artifacts:
+
+- Repo-relative paths (files, handoffs, preview READMEs):
+- Screenshot / frame / render / checklist output:
+- Test or verify notes (command run + outcome):

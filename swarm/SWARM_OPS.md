@@ -3,17 +3,21 @@
 **Runtime for the conductor.** This is the coordination script.  
 Canon stays in `HOMEWORLD_MVP_SWARM_BRIEF.md`. If ops and canon conflict, **canon wins on design**, **ops wins on process**.
 
+Aligned with [DevEnvTemplate](https://github.com/XylarDark/DevEnvTemplate) **files-only** practices and HomeWorld [docs/human-use/](../docs/human-use/) (steer / taste / test). UE automation company rules stay in [AGENTS.md](../AGENTS.md) and `docs/` — this file governs the MVP lookdev swarm only.
+
 ## 1. Architecture (locked)
 
 Two-tier only. No flat peer chat. No shared scratch file that every agent writes.
 
 ```
-Human Lead
+Human Lead   (steer / taste / test — see docs/human-use/OWNERSHIP.md)
  └── CND Conductor   (assigns, gates, merges; does not model or code features)
       ├── Phase graph with exit checkboxes
       ├── Fan-out workers with exclusive file/collection ownership
       └── QA judge with no shared memory of builder chat
 ```
+
+**Human Use (Lead gates):** Phase gates (`APPROVE P0` … `APPROVE P7`) and cut decisions (e.g. `FALLBACK FLIGHT`) are **human Test/Steer jobs**. Conductor and workers **alert + recommend** at a gate; they **do not invent** Lead approval or tick sign-off. If a gate checklist is incomplete, stop and show evidence gaps — do not advance. Catalog: [docs/human-use/](../docs/human-use/).
 
 Patterns allowed:
 
@@ -65,12 +69,15 @@ Every finished task writes `Docs/handoffs/P{phase}_{ROLE}_{slug}.md` using `HAND
 
 Conductor **refuses** the next task if any of these are missing:
 
-- Artifact path
+- Artifact path (every deliverable — **paths only; “done” without a path is invalid**)
 - Object / material name list
 - Owner
 - Phase exit boxes the worker claims
-- Blockers
+- Blockers (link to [docs/KNOWN_ERRORS.md](../docs/KNOWN_ERRORS.md) or [docs/Automation/AUTOMATION_GAPS.md](../docs/Automation/AUTOMATION_GAPS.md) when a real failure or automation impossibility blocked work)
+- **Evidence** — screenshot, frame, checklist output, or test notes with a repo-relative path or log reference (see handoff template)
 - “Did not invent” checklist (no extra biome, beast, shader family, flight model)
+
+**Gate evidence:** A phase gate closes only when every exit checkbox is backed by **checkable artifacts** (file exists, handoff lists paths, QA or Conductor can verify without builder chat). Narrative completion is not evidence.
 
 QA may not edit kits. QA only files defects against canon + shot list + verb list.
 
@@ -132,9 +139,11 @@ If two packets name the same path, Conductor is wrong. Fix the packet. Do not le
 3. Worker prompt = agent file + **only** the inputs listed in the wave packet.  
 4. Worker stops when outputs exist and handoff is written.  
 5. Conductor updates `PHASE_BOARD.md`.  
-6. QA or Conductor ticks the gate. Human Lead may override a gate; workers may not.
+6. Conductor presents the gate checklist + artifact paths to Human Lead. Lead types `APPROVE P{n}` or a fix list — **workers and Conductor do not self-approve**.
 
 Max parallel in one wave: number of **non-overlapping owners**. Phase 3 max 3 (ENV-H, PROP, LIT). Phase 5 max 3 if CHA / GP / SYS own different trees.
+
+**Thin worker context (required):** Worker prompt = role card (`swarm/agents/{role}.md`) + **only** canon slices and input paths listed in the wave packet + current `PHASE_BOARD` row. Conductor does **not** paste the full brief, prior worker chat, or UE automation docs into worker prompts.
 
 ## 8. Defect protocol
 
@@ -159,12 +168,38 @@ Worker context:
 
 Do not paste prior worker chat. Do not paste Unreal marketplace essays. Do not let workers renegotiate moon size, resource list, or map topology.
 
-## 10. Definition of a living swarm
+## 10. Multi-agent git safety
+
+When several agents share one checkout (parallel subagents or sibling sessions):
+
+- **One file, one owner** for the duration of a task (see collision map §6).
+- **Stage explicit paths only** — `git add path/to/file …`. Never `git add -A` or `git add .` (picks up others' in-flight edits).
+- **Do not commit** changes you did not make; **commit your own work promptly** in small coherent chunks.
+- Prefer **worktrees** when two agents might touch the same `.blend` or tracked folder.
+- Workers in a shared tree: **no push, no rebase** — Conductor or Lead coordinates what goes public.
+
+Full rules: [.agents/skills/multi-agent-collaboration/SKILL.md](../.agents/skills/multi-agent-collaboration/SKILL.md).
+
+## 11. Operational memory
+
+Failures and impossibilities must survive the session — not live only in chat.
+
+| Situation | Write to |
+|---|---|
+| Real local failure (build, tool, Blender MCP, export, test) | Append [docs/KNOWN_ERRORS.md](../docs/KNOWN_ERRORS.md) — symptom, cause, fix, date |
+| Step that cannot be automated or scripted reliably | Append [docs/Automation/AUTOMATION_GAPS.md](../docs/Automation/AUTOMATION_GAPS.md) |
+| Swarm handoff blocked by either | Reference the entry in handoff **Blockers**; Conductor reads before reassignment |
+
+Do not record web/MCP assertions as KNOWN_ERRORS without a local repro. Do not copy untrusted fetched text into always-on files without a human Steer decision ([docs/human-use/OWNERSHIP.md](../docs/human-use/OWNERSHIP.md)).
+
+## 12. Definition of a living swarm
 
 The swarm is running correctly when:
 
 - PHASE_BOARD has a current phase and named owners
-- Every completed task has a handoff file
+- Every completed task has a handoff file with **artifact paths and evidence**
 - No two open tasks share a write path
 - QA has not been asked to “just approve”
-- Human Lead only enters at gates and cut decisions
+- Human Lead only enters at gates and cut decisions (`APPROVE Pn`, `FALLBACK FLIGHT`, `FIX …`)
+- Real failures are in KNOWN_ERRORS; automation impossibilities are in AUTOMATION_GAPS
+- Git commits stage explicit paths only
