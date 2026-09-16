@@ -1,0 +1,70 @@
+{
+  "id": "M_Nurtured",
+  "display_name": "Nurtured",
+  "status": "DEFINITION_LOCKED",
+  "date": "2026-09-16",
+  "phase": "P2",
+  "owner": "TA",
+  "blender_node_group": "NG_M_Nurtured",
+  "ue_material": "M_Nurtured",
+  "shading_model": "DefaultLit",
+  "tone": "Nurture on/off for crop + stored material; hopeful soft glow when on — not sci-fi.",
+  "parameters": {
+    "BaseColor": {
+      "type": "Color",
+      "default": [0.45, 0.62, 0.30, 1.0],
+      "notes": "Healthy crop / tended plant. Off state leans duller via instance or NightMix pairing."
+    },
+    "Roughness": {
+      "type": "Float",
+      "default": 0.70,
+      "range": [0.40, 0.95],
+      "notes": "Living plant / soft stored material."
+    },
+    "Variation": {
+      "type": "Float",
+      "default": 0.30,
+      "range": [0.0, 1.0],
+      "notes": "Growth breakup; on/off should stay readable at garden distance."
+    },
+    "NightMix": {
+      "type": "Float",
+      "default": 0.0,
+      "range": [0.0, 1.0],
+      "notes": "Night overlay + optional soft life glow. Spirit seed → night crop uses this master, not a new one."
+    },
+    "Emissive": {
+      "type": "Color",
+      "default": [0.15, 0.35, 0.18, 1.0],
+      "optional": true,
+      "notes": "On when nurtured; near-black when off. Warm-green, low intensity — hopeful, not neon."
+    }
+  },
+  "night_overlay": {
+    "mode": "parameter_overlay",
+    "tint": [0.12, 0.22, 0.18, 1.0],
+    "desaturate": 0.10,
+    "value_mul": 0.70,
+    "emissive_mul_at_night": 1.25,
+    "second_map_set": false
+  },
+  "allowed_instance_tweaks": [
+    "BaseColor crop ↔ stored material tint",
+    "Roughness",
+    "Variation",
+    "NightMix",
+    "Emissive on/off (nurtured state)"
+  ],
+  "forbidden": [
+    "Third nurture target materials",
+    "Crafting-tree shaders",
+    "Sci-fi growth FX masters",
+    "Second night map set"
+  ],
+  "cite_on_meshes": [
+    "SM_Planter_Crop (homestead nurture target 1)",
+    "stored material nurture target (RES_SEED / tended store)",
+    "RES_SEED faint day plant → night crop instance",
+    "garden crop proxies (×2 nurture verbs only)"
+  ]
+}

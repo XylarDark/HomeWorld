@@ -1,0 +1,67 @@
+{
+  "id": "M_PathStone",
+  "display_name": "Path Stone",
+  "status": "DEFINITION_LOCKED",
+  "date": "2026-09-16",
+  "phase": "P2",
+  "owner": "TA",
+  "blender_node_group": "NG_M_PathStone",
+  "ue_material": "M_PathStone",
+  "shading_model": "DefaultLit",
+  "tone": "Readable path cobble / flag; warm, worn, handmade.",
+  "parameters": {
+    "BaseColor": {
+      "type": "Color",
+      "default": [0.48, 0.44, 0.38, 1.0],
+      "notes": "Pale warm path stone, lighter than cliff for walkability read."
+    },
+    "Roughness": {
+      "type": "Float",
+      "default": 0.82,
+      "range": [0.60, 0.95],
+      "notes": "Worn tread slightly smoother via Variation, not a second set."
+    },
+    "Variation": {
+      "type": "Float",
+      "default": 0.40,
+      "range": [0.0, 1.0],
+      "notes": "Stone-to-stone color + edge wear. Supports 3-pack path kit."
+    },
+    "NightMix": {
+      "type": "Float",
+      "default": 0.0,
+      "range": [0.0, 1.0],
+      "notes": "Moonlit cool wash; keep path readable at night."
+    },
+    "Emissive": {
+      "type": "Color",
+      "default": [0.0, 0.0, 0.0, 1.0],
+      "optional": true,
+      "notes": "Off. Landing ritual glow uses M_SpiritUnlit accents or LIT, not path albedo glow."
+    }
+  },
+  "night_overlay": {
+    "mode": "parameter_overlay",
+    "tint": [0.16, 0.22, 0.34, 1.0],
+    "desaturate": 0.12,
+    "value_mul": 0.58,
+    "second_map_set": false
+  },
+  "allowed_instance_tweaks": [
+    "BaseColor within path palette",
+    "Roughness",
+    "Variation (pack A/B/C)",
+    "NightMix"
+  ],
+  "forbidden": [
+    "Photoreal cobble scans",
+    "Unique landing-circle shader",
+    "Night map swaps"
+  ],
+  "cite_on_meshes": [
+    "SM_PathStone_A/B/C (3-pack)",
+    "SM_LandingCircle (stone ring)",
+    "homestead / forest path stones",
+    "RES_STONE stored path-stone proxies"
+  ]
+}

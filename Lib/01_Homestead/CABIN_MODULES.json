@@ -1,0 +1,37 @@
+{
+  "id": "CABIN_MODULES",
+  "type": "SM_ modular set",
+  "status": "SPEC_READY",
+  "date": "2026-09-16",
+  "phase": "P3",
+  "owner": "ENV-H",
+  "graybox_map": ["SM_Cabin"],
+  "overall_size_m": [5.5, 4.5, 5.5],
+  "overall_height_lock_m": [5.0, 6.0],
+  "world_origin": [-6.0, 1.0, 0.0],
+  "units": "meters",
+  "apply_scale": true,
+  "materials": {
+    "wood": "M_WoodCabin",
+    "chimney_foundation_stone": "M_CliffRock",
+    "window_pane": "M_WoodCabin"
+  },
+  "emissive_owner": "LIT",
+  "window_rule": "warm_slots_never_dark",
+  "modules": [
+    "SM_Cabin_Wall_Front",
+    "SM_Cabin_Wall_Back",
+    "SM_Cabin_Wall_Side_L",
+    "SM_Cabin_Wall_Side_R",
+    "SM_Cabin_Foundation",
+    "SM_Cabin_Roof_A",
+    "SM_Cabin_Roof_B",
+    "SM_Cabin_Chimney",
+    "SM_Cabin_Door",
+    "SM_Cabin_Window_Frame",
+    "SM_Cabin_Window_Pane",
+    "SM_Cabin_Porch_Deck",
+    "SM_Cabin_Porch_Post",
+    "SM_Cabin_Porch_Rail"
+  ]
+}

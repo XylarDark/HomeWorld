@@ -1,0 +1,68 @@
+{
+  "id": "M_GatherHerb",
+  "display_name": "Gather Herb",
+  "status": "DEFINITION_LOCKED",
+  "date": "2026-09-16",
+  "phase": "P2",
+  "owner": "TA",
+  "blender_node_group": "NG_M_GatherHerb",
+  "ue_material": "M_GatherHerb",
+  "shading_model": "DefaultLit",
+  "tone": "Soft gatherable plant read (herb, berry leaf, fiber plant); hopeful, not neon loot.",
+  "parameters": {
+    "BaseColor": {
+      "type": "Color",
+      "default": [0.40, 0.58, 0.28, 1.0],
+      "notes": "Herb green default. Berry fruit / flower accents via instance BaseColor only."
+    },
+    "Roughness": {
+      "type": "Float",
+      "default": 0.75,
+      "range": [0.45, 0.95],
+      "notes": "Leaves matte; berry skin slightly glossier."
+    },
+    "Variation": {
+      "type": "Float",
+      "default": 0.30,
+      "range": [0.0, 1.0],
+      "notes": "Cluster breakup so gather nodes read without UI scream."
+    },
+    "NightMix": {
+      "type": "Float",
+      "default": 0.0,
+      "range": [0.0, 1.0],
+      "notes": "Cool plant wash. Spirit-seed night crop → switch to M_Nurtured instance, not a second herb set."
+    },
+    "Emissive": {
+      "type": "Color",
+      "default": [0.0, 0.0, 0.0, 1.0],
+      "optional": true,
+      "notes": "Usually off. Soft interact hint only if AD approves; prefer gameplay FX over material glow."
+    }
+  },
+  "night_overlay": {
+    "mode": "parameter_overlay",
+    "tint": [0.10, 0.16, 0.26, 1.0],
+    "desaturate": 0.22,
+    "value_mul": 0.50,
+    "second_map_set": false
+  },
+  "allowed_instance_tweaks": [
+    "BaseColor for RES_HERB / RES_BERRY / RES_FIBER leaf accents",
+    "Roughness",
+    "Variation",
+    "NightMix",
+    "Optional weak Emissive interact hint"
+  ],
+  "forbidden": [
+    "Loot-beam shaders",
+    "Extra resource materials beyond six canon resources",
+    "Night texture sets"
+  ],
+  "cite_on_meshes": [
+    "SM_HerbCluster (RES_HERB)",
+    "SM_BerryBush leaf/fruit (RES_BERRY)",
+    "fern / vine / flax gather proxies (RES_FIBER)",
+    "poultice / bowl stored plant parts (tint only)"
+  ]
+}

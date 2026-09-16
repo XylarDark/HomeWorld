@@ -1,0 +1,68 @@
+{
+  "id": "M_BeastStylized",
+  "display_name": "Beast Stylized",
+  "status": "DEFINITION_LOCKED",
+  "date": "2026-09-16",
+  "phase": "P2",
+  "owner": "TA",
+  "blender_node_group": "NG_M_BeastStylized",
+  "ue_material": "M_BeastStylized",
+  "shading_model": "DefaultLit",
+  "tone": "One MVP beast: soft stylized fur/skin; readable silhouette; tame-mark friendly.",
+  "parameters": {
+    "BaseColor": {
+      "type": "Color",
+      "default": [0.62, 0.48, 0.36, 1.0],
+      "notes": "Warm coat default. State tints (wild/curious/tame/bonded) stay on this master."
+    },
+    "Roughness": {
+      "type": "Float",
+      "default": 0.70,
+      "range": [0.40, 0.90],
+      "notes": "Soft fur read; nose/hoof accents rougher via Variation."
+    },
+    "Variation": {
+      "type": "Float",
+      "default": 0.35,
+      "range": [0.0, 1.0],
+      "notes": "Coat breakup + tame-mark slot contrast. Not a new mesh family."
+    },
+    "NightMix": {
+      "type": "Float",
+      "default": 0.0,
+      "range": [0.0, 1.0],
+      "notes": "Cool moonlight on coat; no night beast maps."
+    },
+    "Emissive": {
+      "type": "Color",
+      "default": [0.0, 0.0, 0.0, 1.0],
+      "optional": true,
+      "notes": "Optional soft eye or tame-mark glow (very low). No combat VFX materials."
+    }
+  },
+  "night_overlay": {
+    "mode": "parameter_overlay",
+    "tint": [0.14, 0.16, 0.28, 1.0],
+    "desaturate": 0.15,
+    "value_mul": 0.55,
+    "second_map_set": false
+  },
+  "allowed_instance_tweaks": [
+    "BaseColor per beast state tint",
+    "Roughness",
+    "Variation (tame-mark read)",
+    "NightMix",
+    "Optional low Emissive eyes/mark"
+  ],
+  "forbidden": [
+    "Extra beast materials / species",
+    "Combat damage shaders",
+    "Photoreal fur scans",
+    "Second night coat set"
+  ],
+  "cite_on_meshes": [
+    "SK_Beast_MVP (single beast)",
+    "beast pad proxy if painted",
+    "tame-mark decal slot (instance, not new master)"
+  ]
+}

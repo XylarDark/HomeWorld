@@ -1,0 +1,68 @@
+{
+  "id": "M_FoliageCard",
+  "display_name": "Foliage Card",
+  "status": "DEFINITION_LOCKED",
+  "date": "2026-09-16",
+  "phase": "P2",
+  "owner": "TA",
+  "blender_node_group": "NG_M_FoliageCard",
+  "ue_material": "M_FoliageCard",
+  "shading_model": "DefaultLit_Masked",
+  "opacity": "alpha_clip_or_dither",
+  "tone": "Stylized card foliage (pine needles, fern fronds); handmade silhouette.",
+  "parameters": {
+    "BaseColor": {
+      "type": "Color",
+      "default": [0.22, 0.42, 0.20, 1.0],
+      "notes": "Deep pine green. Fern/vine instances may shift toward M_GatherHerb palette but stay on this master for cards."
+    },
+    "Roughness": {
+      "type": "Float",
+      "default": 0.80,
+      "range": [0.55, 0.95],
+      "notes": "Soft leaf response; avoid plastic shine."
+    },
+    "Variation": {
+      "type": "Float",
+      "default": 0.35,
+      "range": [0.0, 1.0],
+      "notes": "Per-card value/hue noise; wind-friendly."
+    },
+    "NightMix": {
+      "type": "Float",
+      "default": 0.0,
+      "range": [0.0, 1.0],
+      "notes": "Desat + cool overlay; alpha stays day maps."
+    },
+    "Emissive": {
+      "type": "Color",
+      "default": [0.0, 0.0, 0.0, 1.0],
+      "optional": true,
+      "notes": "Off for normal pines. Spirit-seed glow → M_Nurtured or M_SpiritUnlit."
+    }
+  },
+  "night_overlay": {
+    "mode": "parameter_overlay",
+    "tint": [0.08, 0.14, 0.24, 1.0],
+    "desaturate": 0.30,
+    "value_mul": 0.40,
+    "second_map_set": false
+  },
+  "allowed_instance_tweaks": [
+    "BaseColor within foliage palette",
+    "Roughness",
+    "Variation",
+    "NightMix",
+    "Alpha threshold (clip hardness)"
+  ],
+  "forbidden": [
+    "Photoreal leaf scans",
+    "Extra tree species cards",
+    "Second night opacity sets"
+  ],
+  "cite_on_meshes": [
+    "SM_Pine_NeedleCard / canopy cards",
+    "fern / vine / flax card proxies (non-gather highlight)",
+    "distant pine instances (5–8 homestead, forest)"
+  ]
+}

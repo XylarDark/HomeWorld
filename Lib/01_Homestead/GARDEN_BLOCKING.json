@@ -1,0 +1,26 @@
+{
+  "id": "GARDEN_BLOCKING",
+  "type": "SM_ blocking",
+  "status": "SPEC_READY",
+  "date": "2026-09-16",
+  "phase": "P3",
+  "owner": "ENV-H",
+  "graybox_map": ["SM_Garden_Beds"],
+  "zone_size_m": [4.0, 2.5, 0.6],
+  "world_origin": [-3.5, 0.5, 0.0],
+  "units": "meters",
+  "apply_scale": true,
+  "materials": {
+    "planter_wood": "M_WoodCabin",
+    "soil_blocking": "M_StylizedGrass"
+  },
+  "plant_dress_owner": "PROP",
+  "plant_masters_for_prop": ["M_GatherHerb", "M_Nurtured"],
+  "meshes": [
+    "SM_GardenBed_A",
+    "SM_GardenBed_B",
+    "SM_GardenBed_C",
+    "SM_GardenBed_Soil"
+  ],
+  "note": "Beds/planters blocking only; PROP dresses planters"
+}

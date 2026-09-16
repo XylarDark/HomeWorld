@@ -1,0 +1,71 @@
+{
+  "id": "M_SpiritUnlit",
+  "display_name": "Spirit Unlit",
+  "status": "DEFINITION_LOCKED",
+  "date": "2026-09-16",
+  "phase": "P2",
+  "owner": "TA",
+  "blender_node_group": "NG_M_SpiritUnlit",
+  "ue_material": "M_SpiritUnlit",
+  "shading_model": "Unlit",
+  "tone": "Spirit layer: soft unlit glow; hurt vs healed is a material state, not a new mesh family.",
+  "parameters": {
+    "BaseColor": {
+      "type": "Color",
+      "default": [0.55, 0.72, 0.95, 1.0],
+      "notes": "Healed cool-warm spirit. Hurt instance: cooler, thinner, lower value."
+    },
+    "Roughness": {
+      "type": "Float",
+      "default": 1.0,
+      "range": [0.0, 1.0],
+      "notes": "Exposed for API parity with lit masters; Unlit path ignores specular. Keep at 1.0."
+    },
+    "Variation": {
+      "type": "Float",
+      "default": 0.25,
+      "range": [0.0, 1.0],
+      "notes": "Soft noise / fringe so spirits read handmade, not flat UI blobs."
+    },
+    "NightMix": {
+      "type": "Float",
+      "default": 1.0,
+      "range": [0.0, 1.0],
+      "notes": "Spirits peak at night. Day may dim via NightMix→0 + layer visibility; still one map set."
+    },
+    "Emissive": {
+      "type": "Color",
+      "default": [0.45, 0.70, 1.0, 1.0],
+      "optional": true,
+      "notes": "PRIMARY look for this master. Hurt: lower intensity / cooler. Healed: warmer bloom. Portal sockets may share."
+    }
+  },
+  "night_overlay": {
+    "mode": "parameter_overlay",
+    "tint": [0.20, 0.35, 0.70, 1.0],
+    "desaturate": 0.0,
+    "value_mul": 1.15,
+    "emissive_mul_at_night": 1.0,
+    "second_map_set": false,
+    "notes": "NightMix brightens emissive and soft fringe; does not swap textures."
+  },
+  "allowed_instance_tweaks": [
+    "BaseColor hurt ↔ healed",
+    "Emissive intensity/color (hurt/healed)",
+    "Variation",
+    "NightMix (and Lib/07 layer visibility)",
+    "Roughness kept for parity (unused in Unlit)"
+  ],
+  "forbidden": [
+    "New spirit mesh families for hurt/healed",
+    "Photoreal / sci-fi hologram kits",
+    "Combat VFX materials",
+    "Second night map set"
+  ],
+  "cite_on_meshes": [
+    "SK_/SM_Spirit (×3 heal targets)",
+    "spirit-wound site accents",
+    "SM_Shrine portal socket glow",
+    "Lib/07_Night_SpiritLayer props"
+  ]
+}
