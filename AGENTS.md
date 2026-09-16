@@ -46,6 +46,10 @@ decision or a product listed under [cursor-cannot](docs/human-use/cursor-cannot/
 
 Refresh layers: `npm run sync` (dry-run) then `npm run sync:apply`. Details: [docs/Setup/CURSOR_DEV.md](docs/Setup/CURSOR_DEV.md).
 
+## MVP lookdev swarm (on demand)
+
+Blender-first MVP production kit: canon in **`Docs/`**, kits in **`Lib/`**, coordination in **`swarm/`**. **Start:** [START_HERE.md](START_HERE.md) → Conductor chat → phase gates (`APPROVE P0` … `APPROVE P7`). **Process:** [swarm/SWARM_OPS.md](swarm/SWARM_OPS.md) (Human Use, evidence gates, explicit-path git staging, KNOWN_ERRORS / AUTOMATION_GAPS). Specialists in [`.cursor/agents/`](.cursor/agents/) load **on demand** when Conductor spawns a role — not always-on; separate from the UE automation company unless explicitly invoked.
+
 ## Dev environment setup
 
 1. Install UE 5.7, clone this repo, open `HomeWorld.uproject`.
