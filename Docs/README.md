@@ -1,0 +1,20 @@
+# Docs/ — MVP swarm canon
+
+This directory is **Blender-first MVP swarm canon**: GDD slices, art bible, material sheet, WAVE handoffs, and QA placeholders for the multi-agent production kit.
+
+## Do not merge with `docs/`
+
+| Path | Purpose |
+|------|---------|
+| **`Docs/`** (this tree) | MVP swarm operating system — canon, handoffs, shot list, kit-facing specs linked from `Lib/` |
+| **`docs/`** (lowercase) | Unreal Engine 5.7 project documentation — setup, automation, PCG, task lists, known errors |
+
+These are **intentionally separate**. On case-insensitive filesystems (macOS/Windows defaults), Git may only check out one of the two names locally — clone on Linux CI or use a case-sensitive volume if you need both trees simultaneously.
+
+## Entry points
+
+- **Start swarm:** [../START_HERE.md](../START_HERE.md)
+- **Master prompt:** [../HOMEWORLD_MASTER_PROMPT.md](../HOMEWORLD_MASTER_PROMPT.md)
+- **Game canon brief:** [../HOMEWORLD_MVP_SWARM_BRIEF.md](../HOMEWORLD_MVP_SWARM_BRIEF.md)
+- **Swarm ops:** [../swarm/SWARM_OPS.md](../swarm/SWARM_OPS.md)
+- **UE project context:** [../AGENTS.md](../AGENTS.md) and [../docs/README.md](../docs/README.md)

@@ -1,0 +1,27 @@
+{
+  "id": "PINES_HOMESTEAD",
+  "type": "SM_ foliage set",
+  "status": "SPEC_READY",
+  "date": "2026-09-16",
+  "phase": "P3",
+  "owner": "ENV-H",
+  "species": "stylized_pine_only",
+  "height_m": [6.0, 12.0],
+  "units": "meters",
+  "apply_scale": true,
+  "materials": {
+    "trunk": "M_WoodWild",
+    "foliage": "M_FoliageCard"
+  },
+  "variants": [
+    { "name": "SM_Pine_Homestead_S", "height_m": 6.0 },
+    { "name": "SM_Pine_Homestead_M", "height_m": 8.5 },
+    { "name": "SM_Pine_Homestead_L", "height_m": 11.0 }
+  ],
+  "graybox_sockets": [
+    { "name": "SOCKET_Pine_A", "origin": [-8.0, -2.0, 0.0] },
+    { "name": "SOCKET_Pine_B", "origin": [3.0, 3.0, 0.0] },
+    { "name": "SOCKET_Pine_C", "origin": [5.5, 1.5, 0.0] }
+  ],
+  "rejects": ["extra_species", "outside_6_12m", "photoreal_scans"]
+}

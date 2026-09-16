@@ -1,0 +1,34 @@
+{
+  "id": "SM_IslandTop",
+  "type": "SM_",
+  "status": "SPEC_READY",
+  "date": "2026-09-16",
+  "phase": "P3",
+  "owner": "ENV-H",
+  "graybox_map": ["SM_Island_Hero"],
+  "units": "meters",
+  "apply_scale": true,
+  "origin": "ground_contact",
+  "size_m": { "x": 21.0, "y": 14.0, "z_crust": 0.5 },
+  "world_top_z": 0.0,
+  "materials": [
+    { "slot": "ground", "master": "M_StylizedGrass" },
+    { "slot": "path", "master": "M_PathStone" }
+  ],
+  "separate_from": "SM_Cliff",
+  "sockets": [
+    { "name": "SOCKET_Cabin", "origin": [-6.0, 1.0, 0.0] },
+    { "name": "SOCKET_Garden_Beds", "origin": [-3.5, 0.5, 0.0] },
+    { "name": "SOCKET_Path_Homestead", "origin": [0.0, 0.0, 0.0] },
+    { "name": "SOCKET_Lookout_Pad", "origin": [7.0, -3.5, 0.0] },
+    { "name": "SOCKET_Glider_Perch", "origin": [7.5, -4.5, 0.0] },
+    { "name": "SOCKET_Shrine_Homestead", "origin": [-2.0, 3.5, 0.0] },
+    { "name": "SOCKET_Pine_A", "origin": [-8.0, -2.0, 0.0] },
+    { "name": "SOCKET_Pine_B", "origin": [3.0, 3.0, 0.0] },
+    { "name": "SOCKET_Pine_C", "origin": [5.5, 1.5, 0.0] },
+    { "name": "SOCKET_CliffAttach_Lookout", "origin": [7.5, -5.5, 0.0] },
+    { "name": "SOCKET_CliffAttach_Cabin", "origin": [-7.0, -4.5, 0.0] },
+    { "name": "SOCKET_CliffAttach_Rear", "origin": [0.0, 5.0, 0.0] }
+  ],
+  "rejects": ["pancake_with_cliff", "cylinder", "unique_grass_shader"]
+}

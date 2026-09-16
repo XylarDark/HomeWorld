@@ -1,0 +1,67 @@
+{
+  "id": "M_WoodWild",
+  "display_name": "Wood Wild",
+  "status": "DEFINITION_LOCKED",
+  "date": "2026-09-16",
+  "phase": "P2",
+  "owner": "TA",
+  "blender_node_group": "NG_M_WoodWild",
+  "ue_material": "M_WoodWild",
+  "shading_model": "DefaultLit",
+  "tone": "Living pine bark and branch wood; stylized, readable trunks.",
+  "parameters": {
+    "BaseColor": {
+      "type": "Color",
+      "default": [0.28, 0.20, 0.14, 1.0],
+      "notes": "Dark warm bark. Cut faces / planks may lighten slightly via instance."
+    },
+    "Roughness": {
+      "type": "Float",
+      "default": 0.88,
+      "range": [0.65, 1.0],
+      "notes": "Bark is matte; fresh cut slightly lower."
+    },
+    "Variation": {
+      "type": "Float",
+      "default": 0.40,
+      "range": [0.0, 1.0],
+      "notes": "Bark breakup + lichen flecks (non-emissive)."
+    },
+    "NightMix": {
+      "type": "Float",
+      "default": 0.0,
+      "range": [0.0, 1.0],
+      "notes": "Cool bark rim; no second bark set."
+    },
+    "Emissive": {
+      "type": "Color",
+      "default": [0.0, 0.0, 0.0, 1.0],
+      "optional": true,
+      "notes": "Off. Spirit-touched wood uses M_SpiritUnlit or M_Nurtured."
+    }
+  },
+  "night_overlay": {
+    "mode": "parameter_overlay",
+    "tint": [0.10, 0.14, 0.22, 1.0],
+    "desaturate": 0.20,
+    "value_mul": 0.45,
+    "second_map_set": false
+  },
+  "allowed_instance_tweaks": [
+    "BaseColor bark ↔ cut-face lighten",
+    "Roughness within range",
+    "Variation",
+    "NightMix"
+  ],
+  "forbidden": [
+    "New tree species materials",
+    "Photoreal bark scans",
+    "Night texture swaps"
+  ],
+  "cite_on_meshes": [
+    "SM_Pine_Trunk / branch kits",
+    "RES_WOOD world (choppable pine / branch)",
+    "firewood / plank stored proxies (raw)",
+    "lookout post wild timber"
+  ]
+}

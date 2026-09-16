@@ -1,0 +1,29 @@
+{
+  "id": "SM_Cliff",
+  "type": "SM_ module family",
+  "status": "SPEC_READY",
+  "date": "2026-09-16",
+  "phase": "P3",
+  "owner": "ENV-H",
+  "shape": "layered_torn_earth",
+  "not": ["pancake", "cylinder"],
+  "graybox_map": [
+    "SM_Cliff_LookoutFace",
+    "SM_Cliff_CabinFace",
+    "SM_Cliff_Rear"
+  ],
+  "units": "meters",
+  "apply_scale": true,
+  "material": "M_CliffRock",
+  "modules": [
+    { "name": "SM_Cliff_Slab_A", "size_m": [3.0, 1.2, 1.5], "role": "stratum_slab" },
+    { "name": "SM_Cliff_Slab_B", "size_m": [2.5, 1.0, 1.2], "role": "stratum_slab" },
+    { "name": "SM_Cliff_Slab_C", "size_m": [2.0, 0.9, 1.0], "role": "lip_shelf" },
+    { "name": "SM_Cliff_Chunk_Torn", "size_m": [2.5, 2.0, 3.0], "role": "vertical_torn" },
+    { "name": "SM_Cliff_LookoutFace", "size_m": [6.0, 2.5, 8.0], "origin": [7.5, -5.5, -4.0] },
+    { "name": "SM_Cliff_CabinFace", "size_m": [5.0, 2.0, 6.0], "origin": [-7.0, -4.5, -3.0] },
+    { "name": "SM_Cliff_Rear", "size_m": [12.0, 2.0, 5.0], "origin": [0.0, 5.0, -2.5] }
+  ],
+  "assembly": "stack_3_to_5_slabs_with_stagger_plus_torn_chunks",
+  "separate_from": "SM_IslandTop"
+}

@@ -1,0 +1,68 @@
+{
+  "id": "M_WoodCabin",
+  "display_name": "Wood Cabin",
+  "status": "DEFINITION_LOCKED",
+  "date": "2026-09-16",
+  "phase": "P2",
+  "owner": "TA",
+  "blender_node_group": "NG_M_WoodCabin",
+  "ue_material": "M_WoodCabin",
+  "shading_model": "DefaultLit",
+  "tone": "Handmade cabin timber; painted or raw, warm and hopeful — not grimdark.",
+  "parameters": {
+    "BaseColor": {
+      "type": "Color",
+      "default": [0.55, 0.38, 0.24, 1.0],
+      "notes": "Warm plank. Painted instances shift hue; keep soft, not neon."
+    },
+    "Roughness": {
+      "type": "Float",
+      "default": 0.72,
+      "range": [0.45, 0.90],
+      "notes": "Painted boards lower roughness; raw boards higher."
+    },
+    "Variation": {
+      "type": "Float",
+      "default": 0.30,
+      "range": [0.0, 1.0],
+      "notes": "Grain + plank seams. UV-friendly for modular walls."
+    },
+    "NightMix": {
+      "type": "Float",
+      "default": 0.0,
+      "range": [0.0, 1.0],
+      "notes": "Slight cool wash; windows stay warm via separate emissive props/lights — never dark windows."
+    },
+    "Emissive": {
+      "type": "Color",
+      "default": [0.0, 0.0, 0.0, 1.0],
+      "optional": true,
+      "notes": "Cabin body off. Window panes / lantern glass use warm emissive instance or LIT, not dark glass."
+    }
+  },
+  "night_overlay": {
+    "mode": "parameter_overlay",
+    "tint": [0.18, 0.16, 0.28, 1.0],
+    "desaturate": 0.10,
+    "value_mul": 0.60,
+    "second_map_set": false
+  },
+  "allowed_instance_tweaks": [
+    "BaseColor painted ↔ raw within palette",
+    "Roughness (paint vs raw)",
+    "Variation",
+    "NightMix",
+    "Emissive on window/lantern glass instances only (warm)"
+  ],
+  "forbidden": [
+    "Dark cabin windows",
+    "Photoreal timber scans",
+    "Unique per-prop wood shaders"
+  ],
+  "cite_on_meshes": [
+    "SM_Cabin_Wall / Roof / Chimney / Door / Window / PorchRail",
+    "workbench frame (painted)",
+    "drying rack posts (cabin timber language)",
+    "glider perch cabin wood parts"
+  ]
+}

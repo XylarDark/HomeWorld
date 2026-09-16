@@ -1,0 +1,67 @@
+{
+  "id": "M_CliffRock",
+  "display_name": "Cliff Rock",
+  "status": "DEFINITION_LOCKED",
+  "date": "2026-09-16",
+  "phase": "P2",
+  "owner": "TA",
+  "blender_node_group": "NG_M_CliffRock",
+  "ue_material": "M_CliffRock",
+  "shading_model": "DefaultLit",
+  "tone": "Layered warm stone cliff; handmade strata, not scan rock.",
+  "parameters": {
+    "BaseColor": {
+      "type": "Color",
+      "default": [0.42, 0.36, 0.30, 1.0],
+      "notes": "Warm taupe cliff. Keep readable silhouette layers."
+    },
+    "Roughness": {
+      "type": "Float",
+      "default": 0.78,
+      "range": [0.55, 0.95],
+      "notes": "Dry stone; slight polish only on wet/worn accents via Variation."
+    },
+    "Variation": {
+      "type": "Float",
+      "default": 0.45,
+      "range": [0.0, 1.0],
+      "notes": "Strata bands + soft speckles. Prefer procedural/painted masks."
+    },
+    "NightMix": {
+      "type": "Float",
+      "default": 0.0,
+      "range": [0.0, 1.0],
+      "notes": "Cool moon-rim overlay; no night albedo swap."
+    },
+    "Emissive": {
+      "type": "Color",
+      "default": [0.0, 0.0, 0.0, 1.0],
+      "optional": true,
+      "notes": "Usually off. Tiny moss flecks never glow unless spirit-wound context (use M_SpiritUnlit)."
+    }
+  },
+  "night_overlay": {
+    "mode": "parameter_overlay",
+    "tint": [0.15, 0.20, 0.32, 1.0],
+    "desaturate": 0.15,
+    "value_mul": 0.50,
+    "second_map_set": false
+  },
+  "allowed_instance_tweaks": [
+    "BaseColor warm/cool within cliff palette",
+    "Roughness within range",
+    "Variation (strata contrast)",
+    "NightMix"
+  ],
+  "forbidden": [
+    "Photoreal rock scans",
+    "Pancake/cylinder cliff shading tricks as unique shaders",
+    "Second night map set"
+  ],
+  "cite_on_meshes": [
+    "SM_Cliff",
+    "SM_LooseRock / RES_STONE world proxies",
+    "cliff ledge trim",
+    "lookout rock shelves"
+  ]
+}

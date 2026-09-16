@@ -1,0 +1,68 @@
+{
+  "id": "M_StylizedGrass",
+  "display_name": "Stylized Grass",
+  "status": "DEFINITION_LOCKED",
+  "date": "2026-09-16",
+  "phase": "P2",
+  "owner": "TA",
+  "blender_node_group": "NG_M_StylizedGrass",
+  "ue_material": "M_StylizedGrass",
+  "shading_model": "DefaultLit",
+  "tone": "Warm handmade meadow; readable clumps, not photoreal blades.",
+  "parameters": {
+    "BaseColor": {
+      "type": "Color",
+      "default": [0.35, 0.55, 0.22, 1.0],
+      "notes": "Mid spring green. Instance may lean dry/lush only."
+    },
+    "Roughness": {
+      "type": "Float",
+      "default": 0.85,
+      "range": [0.6, 1.0],
+      "notes": "Matte vegetation; avoid shiny grass."
+    },
+    "Variation": {
+      "type": "Float",
+      "default": 0.35,
+      "range": [0.0, 1.0],
+      "notes": "Hue/value breakup + soft clump noise. Scale follows world meters."
+    },
+    "NightMix": {
+      "type": "Float",
+      "default": 0.0,
+      "range": [0.0, 1.0],
+      "notes": "Parameter + cool/desat overlay only. NOT a second map set. Driven by GameState time float."
+    },
+    "Emissive": {
+      "type": "Color",
+      "default": [0.0, 0.0, 0.0, 1.0],
+      "optional": true,
+      "notes": "Off for ground grass. Do not glow meadows."
+    }
+  },
+  "night_overlay": {
+    "mode": "parameter_overlay",
+    "tint": [0.12, 0.18, 0.28, 1.0],
+    "desaturate": 0.25,
+    "value_mul": 0.55,
+    "second_map_set": false
+  },
+  "allowed_instance_tweaks": [
+    "BaseColor (dry amber ↔ lush green within palette)",
+    "Roughness within range",
+    "Variation amount",
+    "NightMix (runtime / LIT preset only)"
+  ],
+  "forbidden": [
+    "Photoreal grass scans",
+    "Second day/night texture sets",
+    "Unique shaders outside this master"
+  ],
+  "cite_on_meshes": [
+    "SM_IslandTop (ground)",
+    "SM_Garden_Dirt (edge grass)",
+    "PCG_Grass_Homestead",
+    "PCG_Grass_Forest",
+    "forest path floor cards / clumps"
+  ]
+}
