@@ -1,5 +1,10 @@
 # Session summary (rolling)
 
+## 2026-09-17 ET — PL-B DESKTOP prep (Lead away)
+
+Lead not at PC. Conductor prepped PL-B: Manny BP verified, map load attempted, one-shot Alt+P checklist in [PL_B_PIE.md](../Docs/handoffs/PL_B_PIE.md). Cannot close greps without human PIE or Lead **WAIVE**.
+
+
 ## 2026-09-17 ET — APPROVE PL-A / PL-B unlocked
 
 Lead **`APPROVE PL-A`** (Luke Thompson). Manny substitute + preflight evidence **CLOSED**. **PL-B OPEN** — human Alt+P verb greps on `L_VS_MVP_Markers` (Docs/12c–12e prefixes). Keep [VP_A_PIE.md](../Docs/handoffs/VP_A_PIE.md) WAIVE record intact.
