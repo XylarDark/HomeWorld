@@ -37,7 +37,8 @@ These paths are **intentionally outside** lowercase `docs/`. Do not merge `Docs/
 | [KNOWN_ERRORS.md](KNOWN_ERRORS.md) | Recorded errors and fixes; check before similar work. |
 | [SETUP.md](SETUP.md) | Developer onboarding; install, build, MCP, first run. |
 | [SPEC_AND_PLAN.md](SPEC_AND_PLAN.md) | Plan-first discipline; when to save plans to `.cursor/plans/`. |
-| [SESSION_LOG.md](SESSION_LOG.md) | Session summaries; read at start, append at end. |
+| [SESSION_LOG.md](SESSION_LOG.md) | Full session history (large); append at end for legacy UE track. |
+| [SESSION_SUMMARY.md](SESSION_SUMMARY.md) | Rolling last-30-days summary; **default read at start** for swarm/Conductor. |
 
 ---
 

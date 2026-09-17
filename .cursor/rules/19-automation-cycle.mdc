@@ -8,7 +8,9 @@ version: 1.0
 
 # Automation cycle
 
-When the user has started the **automatic development cycle** (via the start-automation-cycle command or by asking to "Continue" the cycle), follow the steps below. Read [docs/workflow/CYCLE_TASKLIST.md](docs/workflow/CYCLE_TASKLIST.md) and [docs/workflow/CYCLE_STATE.md](docs/workflow/CYCLE_STATE.md) at the start of each iteration; update both as you go.
+> **QUARANTINE — removed WAVE F.** Pre-swarm agent-company loop (`Start-AllAgents*`, `run_automation_cycle.py`) is **deleted**. Do not run or resurrect. **Active driver:** [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md) + Conductor — [START_HERE.md](../../START_HERE.md). History: [docs/Automation/AGENT_COMPANY.md](../../docs/Automation/AGENT_COMPANY.md).
+
+When the user has started the **automatic development cycle** (legacy — only if explicitly reviving quarantine docs) (via the start-automation-cycle command or by asking to "Continue" the cycle), follow the steps below. Read [docs/workflow/CYCLE_TASKLIST.md](docs/workflow/CYCLE_TASKLIST.md) and [docs/workflow/CYCLE_STATE.md](docs/workflow/CYCLE_STATE.md) at the start of each iteration; update both as you go.
 
 **30-day "loop until done":** If the user wants the process to run until all 30-day tasks are **implementation-complete**, also read [docs/TaskLists/30_DAY_IMPLEMENTATION_STATUS.md](docs/TaskLists/30_DAY_IMPLEMENTATION_STATUS.md). Work on the first day with status `pending` (or `blocked` if resuming with a fix). When you complete or block a day, set its status to `done` or `blocked` in that file. At **session end**, write [docs/TaskLists/NEXT_SESSION_PROMPT.md](docs/TaskLists/NEXT_SESSION_PROMPT.md) with the exact prompt to start the next session (so the user or external tooling can paste it and continue). See [docs/AUTOMATION_LOOP_UNTIL_DONE.md](docs/AUTOMATION_LOOP_UNTIL_DONE.md).
 

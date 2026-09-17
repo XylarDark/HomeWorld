@@ -8,7 +8,7 @@ version: 1.0
 
 # Automation gap handling
 
-When a task corresponds to a **logged automation gap** (see [docs/AUTOMATION_GAPS.md](../../docs/AUTOMATION_GAPS.md)), or when you have just **logged a new gap** in AUTOMATION_GAPS.md: the **Gap-Solver** role is responsible for implementing solutions. Run `.\Tools\Run-GapSolverAgent.ps1` (or the **run-gap-solver** command) on-demand to have the Gap-Solver implement programmatic or GUI-automation solutions and update the docs. See [docs/AGENT_COMPANY.md](../../docs/AGENT_COMPANY.md).
+When a task corresponds to a **logged automation gap** (see [docs/Automation/AUTOMATION_GAPS.md](../../docs/Automation/AUTOMATION_GAPS.md)), or when you have just **logged a new gap** in AUTOMATION_GAPS.md: implement programmatic or GUI-automation solutions on **Windows Editor** when APIs exist; log outcomes in AUTOMATION_GAPS. Pre-swarm Gap-Solver / `Run-GapSolverAgent.ps1` **removed WAVE F** — history: [docs/Automation/AGENT_COMPANY.md](../../docs/Automation/AGENT_COMPANY.md). Post-audit coordination: [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md) + Conductor.
 
 When a task corresponds to a **logged automation gap**:
 
