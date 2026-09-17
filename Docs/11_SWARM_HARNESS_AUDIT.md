@@ -24,6 +24,18 @@
 
 Lead redirected: **refine swarm + harness before product next-phase.** This audit is evidence-based from repo artifacts, not session vibes.
 
+### After HR-A…D (re-grade 2026-09-17)
+
+| Track | Before | After HR-A…D | Δ | Evidence |
+|-------|--------|--------------|---|----------|
+| **Swarm** | B (3.6) | **B+ (4.0)** | +0.4 | HR-C board/templates; SESSION_SUMMARY; HR-D dry-run handoff |
+| **Harness** | C+ (3.1) | **B- (3.8)** | +0.7 | HR-B validate/bridge/rules; HR-A measures; HR-D cloud loop proved |
+| **Combined NP readiness** | C (2.8) | **B- (3.9)** | +1.1 | Meets unlock threshold ≥ B- (3.4) — pending Lead **`APPROVE HR-D`** |
+
+**Unlock rule:** Combined **3.9 ≥ 3.4** — product NP planning may proceed after Lead **`APPROVE HR-D`**, or Lead may override with documented residual risks (see [11d_HR_D_HANDOFF.md](11d_HR_D_HANDOFF.md)).
+
+**Not invented green:** Windows `npm run doctor` still exits non-zero on accepted-decline criticals; DevEnvTemplate pin still behind template `main`; C++ validation still Windows-only.
+
 ---
 
 ## Period audited
@@ -51,6 +63,21 @@ Lead redirected: **refine swarm + harness before product next-phase.** This audi
 
 **Swarm average (weighted): 3.6 / 5 → B**
 
+### Swarm — After HR-A…D
+
+| Dimension | Before | After | Δ | HR evidence |
+|-----------|--------|-------|---|-------------|
+| Role clarity | B+ (4) | B+ (4) | — | HR-C trimmed dual-OS entrypoints in workflow/rules |
+| Lead gates | A (5) | A (5) | — | HR-A…D each Lead-gated per Docs/11 |
+| Handoffs | B+ (4) | A- (4) | — | CLOUD_AGENT_PACKET + HANDOFF_TEMPLATE cloud section (HR-C); HR_D_DRY_RUN (HR-D) |
+| PHASE_BOARD freshness | C (3) | B+ (4) | +1 | POST-AUDIT section + HR track rows (HR-C); HR-D status updated |
+| Conductor vs fan-out | A- (4) | A- (4) | — | HR-D followed Conductor packet discipline |
+| Packet discipline | B (3) | B+ (4) | +1 | HR-D dry-run used CLOUD_AGENT_PACKET end-to-end |
+| Dual OS (swarm vs agent company) | C+ (3) | B (3.5) | +0.5 | HR-C killed stale loop refs; SESSION_SUMMARY replaces full SESSION read |
+| Durable memory / docs | B- (3) | B (3.5) | +0.5 | Rolling SESSION_SUMMARY policy (HR-C) |
+
+**Swarm average after HR-A…D: 4.0 / 5 → B+**
+
 ---
 
 ## Harness scorecard
@@ -69,6 +96,25 @@ Lead redirected: **refine swarm + harness before product next-phase.** This audi
 | **Merge-conflict hotspots** | C | 3 | Frequent touches: `Docs/README.md`, `docs/SESSION_LOG.md`, `Content/Python/place_vs_mvp_*.py` | Parallel PRs **#18/#19** (transit stack) needed rebase; SESSION_LOG conflicts on every doc PR |
 
 **Harness average (weighted): 3.1 / 5 → C+**
+
+### Harness — After HR-A…D
+
+| Dimension | Before | After | Δ | HR evidence |
+|-----------|--------|-------|---|-------------|
+| Safe-Build protocol | B+ (4) | B+ (4) | — | HR-B single path in AGENTS.md — unchanged |
+| DevEnvTemplate submodule | D+ (2) | C (3) | +1 | HR-A measured; HR-B init runbook in CURSOR_DEV.md — pin still behind `main` |
+| MCP (UE + Blender) | B- (3) | B- (3) | — | No MCP work in HR track; cloud gap documented |
+| Cursor rules token cost | C (3) | B- (3.5) | +0.5 | HR-B: 20→15 always-on rules (glob-scoped) |
+| CI: validate vs build-win64 | B- (3) | B+ (4) | +1 | HR-B validate paths aligned to DOCS_LAYOUT; CI_POLICY.md |
+| Cloud agents | B (3) | A- (4) | +1 | HR-D dry-run: docs PR → validate green → handoff without MCP |
+| Windows self-hosted link | C+ (3) | B+ (4) | +1 | HR-B WINDOWS_BRIDGE.md runbook |
+| Python Editor scripts | B+ (4) | B+ (4) | — | Not in HR-D scope |
+| Content binary policy | A (5) | A (5) | — | HR-D: no `.uasset` commits — verified |
+| Merge-conflict hotspots | C (3) | C+ (3.5) | +0.5 | SESSION_SUMMARY reduces SESSION_LOG touch frequency |
+
+**Harness average after HR-A…D: 3.8 / 5 → B-**
+
+**Residual (not bumped):** Windows doctor criticals (SH-05 class); submodule pin lag; cloud C++ validation gap until Windows/ci.yml pass.
 
 ---
 
@@ -120,9 +166,12 @@ Lead redirected: **refine swarm + harness before product next-phase.** This audi
 
 ```
 Docs/11 audit status: APPROVED — Lead Luke Thompson, 2026-09-17 ET
-Notes: Lead approved Docs/11 (HR strategy).
-HR-A deliverable: Docs/11a_HR_MEASURES.md — COMPLETE, awaiting Lead APPROVE HR-A.
-Product next-phase (NP-A…E) remains DEFERRED until HR-D re-grade passes or Lead parks refine.
+HR-A: APPROVED — Docs/11a_HR_MEASURES.md
+HR-B: APPROVED — Docs/11b_HR_B_HANDOFF.md
+HR-C: APPROVED — Docs/11c_HR_C_HANDOFF.md
+HR-D: COMPLETE — Docs/11d_HR_D_HANDOFF.md + Docs/handoffs/HR_D_DRY_RUN.md (awaiting APPROVE HR-D)
+Re-grade: Swarm B+ (4.0), Harness B- (3.8), Combined B- (3.9) — meets ≥3.4 unlock threshold
+Product next-phase (NP-A…E): unlock after Lead APPROVE HR-D or Lead override with residual risks
 ```
 
-*Prepared from repo evidence; re-grade after HR-D dry-run.*
+*Prepared from repo evidence; re-graded after HR-D dry-run 2026-09-17.*

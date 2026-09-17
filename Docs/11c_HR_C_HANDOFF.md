@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **COMPLETE — awaiting Lead `APPROVE HR-C`** |
+| **Status** | **APPROVED** — Lead Luke Thompson, **`APPROVE HR-C`**, 2026-09-17 ET (morning of 2026-09-17) |
 | **Date** | 2026-09-17 |
 | **Author** | Cloud Agent (HR-C) |
 | **Baseline** | [11b_HR_B_HANDOFF.md](11b_HR_B_HANDOFF.md) (HR-B APPROVED) |
@@ -12,7 +12,7 @@
 
 ## Gate
 
-Lead: type **`APPROVE HR-C`** to unlock **HR-D** (dry-run loop).
+**APPROVED** — Lead Luke Thompson, **`APPROVE HR-C`**, 2026-09-17 ET (morning). Unlocked **HR-D** — see [11d_HR_D_HANDOFF.md](11d_HR_D_HANDOFF.md).
 
 ---
 
@@ -37,27 +37,27 @@ Lead: type **`APPROVE HR-C`** to unlock **HR-D** (dry-run loop).
 | Docs/05–10 | CLOSED |
 | HR-A | APPROVED |
 | HR-B | APPROVED (Lead Luke Thompson, 2026-09-17 ET) |
-| HR-C | COMPLETE — awaiting APPROVE HR-C |
-| HR-D | LOCKED until APPROVE HR-C |
+| HR-C | **APPROVED** (Lead Luke Thompson, 2026-09-17 ET) |
+| HR-D | COMPLETE — awaiting APPROVE HR-D |
 | Product NP-A…E | PARKED / DEFERRED |
 
-**Current phase:** HR-C · **Active owners:** CND (Conductor)
+**Current phase:** HR-D · **Active owners:** Cloud Agent (dry-run) / CND (Conductor)
 
 ---
 
 ## Verification
 
-- [ ] `validate` job green on PR
-- [ ] `python-lint` job green on PR
-- [ ] Lead reviews cloud packet + SESSION_SUMMARY policy
-- [ ] Lead types **`APPROVE HR-C`**
+- [x] `validate` job green on HR-C PR (#26)
+- [x] `python-lint` job green on HR-C PR (#26)
+- [x] Lead reviews cloud packet + SESSION_SUMMARY policy
+- [x] Lead typed **`APPROVE HR-C`**
 
 ---
 
 ## Next (after APPROVE HR-C)
 
-**HR-D** — Conductor assigns one docs-only cloud-agent task → PR → evidence handoff → re-grade [11_SWARM_HARNESS_AUDIT.md](11_SWARM_HARNESS_AUDIT.md) per [11_SWARM_HARNESS_REFINE.md](11_SWARM_HARNESS_REFINE.md) § HR-D.
+**HR-D** — Conductor assigned docs-only cloud-agent task → PR → evidence handoff → re-grade [11_SWARM_HARNESS_AUDIT.md](11_SWARM_HARNESS_AUDIT.md). Delivered: [11d_HR_D_HANDOFF.md](11d_HR_D_HANDOFF.md), [handoffs/HR_D_DRY_RUN.md](handoffs/HR_D_DRY_RUN.md).
 
 ---
 
-*HR-C complete 2026-09-17 — awaiting Lead APPROVE HR-C.*
+*HR-C APPROVED 2026-09-17 — HR-D dry-run executed same day.*
