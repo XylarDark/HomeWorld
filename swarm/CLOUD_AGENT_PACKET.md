@@ -77,9 +77,44 @@ Cloud agents run on **Linux without Unreal Engine**. Do **not** attempt:
 
 **Do on cloud:** docs, markdown, validate.yml-safe JSON, C++ source edits, Python scripts (untested in Editor until Windows handoff).
 
-**Windows handoff:** After merge, **Conductor parent** (not Task executor) follows [WINDOWS_BRIDGE.md](../docs/Setup/WINDOWS_BRIDGE.md) and [HR3_A_WINDOWS_EXEC.md](../Docs/handoffs/HR3_A_WINDOWS_EXEC.md) for DESKTOP Shell, build, dress, PIE, MCP validation. Cloud agent **returns after merge** — does not claim Windows Shell.
+**Windows handoff:** After merge, **Conductor parent only** (not Task executor) follows [WINDOWS_BRIDGE.md](../docs/Setup/WINDOWS_BRIDGE.md) and [HR3_A_WINDOWS_EXEC.md](../Docs/handoffs/HR3_A_WINDOWS_EXEC.md) for DESKTOP Shell, build, dress, PIE, MCP validation. Cloud agent **returns after merge** — does not claim Windows Shell. Task workers **FAIL** DESKTOP routing (HS-B / HR3-A).
 
 **HR3 gate refs:** Lead **`APPROVE HR3-A`** per [Docs/15_HR3_A_PLUS.md](../Docs/15_HR3_A_PLUS.md) before DESKTOP exec implementation PRs. Task executors **cannot** route Shell to DESKTOP — see HR3-A handoff failure modes.
+
+---
+
+## ResourceExhausted — sanctioned Contents API fallback (HS-B)
+
+If clone / cloud workspace hits **ResourceExhausted** (or equivalent checkout failure):
+
+1. **Do not** invent a second full clone strategy or claim DESKTOP Shell from the cloud VM.
+2. Complete **docs-only** work via GitHub **Contents API** — e.g. `gh api repos/<owner>/<repo>/contents/<path>` (get / put / create branch / open PR). **No local clone required.**
+3. Still honor hard rules: Docs/07 CLOSED · FALLBACK armed · no combat · no `.uasset`/`.umap` · exclusive write paths.
+4. Record in handoff **Blockers** or Evidence: `ResourceExhausted → gh Contents API` (path is **sanctioned**, not a waiver theater).
+
+This is the same path used for Docs/17a inventory and Docs/17b ops filings.
+
+---
+
+## No DESKTOP for executors / Task workers (HS-B)
+
+| Actor | DESKTOP Shell / MCP / PIE |
+|-------|---------------------------|
+| **Conductor parent** | **YES** — only happy path ([WINDOWS_BRIDGE.md](../docs/Setup/WINDOWS_BRIDGE.md)) |
+| **Task executor / worker subagent** | **NO** — tools missing; prior Linux-`cursor` claims unreliable |
+| **This cloud packet target** | **NO** — return after merge; Conductor parent runs Windows follow-up |
+
+Do **not** assign DESKTOP evidence to Task executors. See [HR3_A_WINDOWS_EXEC.md](../Docs/handoffs/HR3_A_WINDOWS_EXEC.md).
+
+---
+
+## Batch digest preference (HS-B)
+
+Prefer **phase-end digests** for Lead-facing updates:
+
+- One short digest at phase gate: status · PR URL(s) · merge SHA(s) · next gate string
+- **Avoid** per-CI / per-push spam in Lead chat
+- Stamp-only PRs for Lead `APPROVE *` remain valid; Conductor batches the narrative
 
 ---
 
@@ -87,4 +122,4 @@ Cloud agents run on **Linux without Unreal Engine**. Do **not** attempt:
 
 On completion, Conductor files `Docs/handoffs/<packet_id>.md` using [HANDOFF_TEMPLATE.md](HANDOFF_TEMPLATE.md) § Cloud agent PR section.
 
-**Gate:** Lead **`APPROVE HR3-*`** per [Docs/15_HR3_A_PLUS.md](../Docs/15_HR3_A_PLUS.md) (active HR3 track), **`APPROVE HR2-*`** per [Docs/13_HR2_HARNESS_REFINE.md](../Docs/13_HR2_HARNESS_REFINE.md) (HR2 **CLOSED**), or legacy **`APPROVE HR-*`** per [Docs/11_SWARM_HARNESS_REFINE.md](../Docs/11_SWARM_HARNESS_REFINE.md).
+**Gate:** Active track **Docs/17 HS** — Lead **`APPROVE HS-*`** per [Docs/17_HS_AUDIT_STRATEGY.md](../Docs/17_HS_AUDIT_STRATEGY.md). Closed refs: **`APPROVE HR3-*`** ([Docs/15](../Docs/15_HR3_A_PLUS.md)), **`APPROVE HR2-*`** ([Docs/13](../Docs/13_HR2_HARNESS_REFINE.md)), legacy **`APPROVE HR-*`** ([Docs/11](../Docs/11_SWARM_HARNESS_REFINE.md)).

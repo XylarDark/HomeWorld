@@ -86,6 +86,8 @@ Single path for agents: [AGENTS.md](../../AGENTS.md) § Build → Editor → MCP
 
 ## Canonical Windows agent lane (Conductor parent only)
 
+**Happy path (HS-B):** DESKTOP Shell is **Conductor parent only** — see [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md) §16. Task executors and cloud agents must not claim this lane.
+
 **HR3-A (2026-09-17):** DESKTOP Shell routing is **proven for Conductor parent agents only**. See [Docs/handoffs/HR3_A_WINDOWS_EXEC.md](../../Docs/handoffs/HR3_A_WINDOWS_EXEC.md).
 
 | Actor | DESKTOP Shell (`machineId`) | Notes |
@@ -109,7 +111,8 @@ Cursor **Task** executor subagents do **not** expose the tools needed for Window
 ## Related
 
 - [Docs/handoffs/HR3_A_WINDOWS_EXEC.md](../../Docs/handoffs/HR3_A_WINDOWS_EXEC.md) — HR3-A runbook, proof excerpts, failure modes
-- [swarm/CLOUD_AGENT_PACKET.md](../../swarm/CLOUD_AGENT_PACKET.md) — DESKTOP owner = Conductor parent
+- [swarm/CLOUD_AGENT_PACKET.md](../../swarm/CLOUD_AGENT_PACKET.md) — DESKTOP owner = Conductor parent; Contents API fallback; batch digests
+- [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md) — Conductor / evidence gates · §16 DESKTOP parent-only · §13 session resume
+- [Docs/17b_HS_SWARM_OPS.md](../../Docs/17b_HS_SWARM_OPS.md) — HS-B ops tighten (PENDING APPROVE HS-B)
 - [CURSOR_DEV.md](CURSOR_DEV.md) — DevEnvTemplate init on any host
 - [Docs/11b_HR_B_HANDOFF.md](../../Docs/11b_HR_B_HANDOFF.md) — HR-B checklist
-- [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md) — Conductor / evidence gates

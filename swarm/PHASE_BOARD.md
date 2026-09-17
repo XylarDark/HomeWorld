@@ -29,16 +29,16 @@ Every **active** post-audit / HR / VP row must name **who runs evidence**:
 | Tag | Meaning |
 |-----|---------|
 | **CLOUD** | Cursor cloud agent (Linux VM) — docs, C++ source, CI; no MCP/PIE |
-| **DESKTOP** | **DESKTOP-21CT3H0** — Conductor **parent** only ([HR3_A_WINDOWS_EXEC.md](../Docs/handoffs/HR3_A_WINDOWS_EXEC.md)) |
+| **DESKTOP** | **DESKTOP-21CT3H0** — Conductor **parent** only ([HR3_A_WINDOWS_EXEC.md](../Docs/handoffs/HR3_A_WINDOWS_EXEC.md)); Task executors **FAIL** |
 | **Lead** | Human — GitHub Settings, **`APPROVE *`** gates |
 
-Task executors are **not** DESKTOP owners. Re-verify rule: [HR3_D_EVIDENCE_LANE.md](../Docs/handoffs/HR3_D_EVIDENCE_LANE.md) · [SWARM_OPS.md](SWARM_OPS.md) §4.
+**DESKTOP Shell law (HS-B):** Conductor **parent** session only — never assign DESKTOP Shell / MCP / PIE to Cursor **Task** executors or cloud Linux VMs. Happy path: [WINDOWS_BRIDGE.md](../docs/Setup/WINDOWS_BRIDGE.md) · [SWARM_OPS.md](SWARM_OPS.md) §16. Re-verify rule: [HR3_D_EVIDENCE_LANE.md](../Docs/handoffs/HR3_D_EVIDENCE_LANE.md).
 
 ---
 
 ## POST-AUDIT (Docs/05–10 + HR track)
 
-MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** **Product next-phase (NP-A…E) is CLOSED / COMPLETE.** **HR2 track CLOSED / COMPLETE.** **HR3 track CLOSED / COMPLETE** — Lead **`APPROVE HR3-D`**, 2026-09-17 ET (HR3-C **DEFERRED**). **VP strategy APPROVED.** **VP-B APPROVED / CLOSED** — Lead **`APPROVE VP-B`**, 2026-09-17 ET (PR #67 @ `e00c542`). **VP-C APPROVED / CLOSED** — Lead **`APPROVE VP-C`**, 2026-09-17 ET (PR #69 @ `f88ece5`). **VP-A re-verify WAIVED** — Lead **`WAIVE VP-A re-verify`**, 2026-09-17 ET. Active: **VP-D IN PROGRESS**.
+MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** **Product next-phase (NP-A…E) is CLOSED / COMPLETE.** **HR2 track CLOSED / COMPLETE.** **HR3 track CLOSED / COMPLETE** — Lead **`APPROVE HR3-D`**, 2026-09-17 ET (HR3-C **DEFERRED**). **VP track CLOSED / COMPLETE** (VP-A re-verify **WAIVED**). **Docs/16 Playable Loop CLOSED / COMPLETE** — Lead **`APPROVE PL-D`**, 2026-09-17 ET. **Docs/17 HS Audit ACTIVE** — Lead **`APPROVE HS STRATEGY`** + **`APPROVE HS-A`**; **HS-B IN PROGRESS**.
 
 | Track | Doc / phase | Host | Status | Gate / handoff |
 |---|---|---|---|---|
@@ -66,8 +66,12 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **HR3 track** | Harness Refine 3 (A+) | — | **CLOSED / COMPLETE** | [15_HR3_A_PLUS.md](../Docs/15_HR3_A_PLUS.md) — HR3-C **DEFERRED**; harness **~A**, swarm **~A+** |
 | **VP-C** | Playability polish | CLOUD+DESKTOP | **APPROVED / CLOSED** | [handoffs/VP_C_POLISH.md](../Docs/handoffs/VP_C_POLISH.md) — Lead **`APPROVE VP-C`**, 2026-09-17 ET |
 | **VP-D** | Bootstrap dry-run | CLOUD+DESKTOP | **APPROVED / CLOSED** | [handoffs/VP_D_BOOTSTRAP_CI.md](../Docs/handoffs/VP_D_BOOTSTRAP_CI.md) — Lead **`APPROVE VP-D`**, 2026-09-17 ET; branch protection **DEFERRED** |
+| **Docs/16 PL** | Playable Loop | CLOUD+DESKTOP+Lead | **CLOSED / COMPLETE** | [16_PLAYABLE_LOOP.md](../Docs/16_PLAYABLE_LOOP.md) — Lead **`APPROVE PL-D`**, 2026-09-17 ET; PL-B **WAIVED** |
+| **Docs/17 HS** | Harness & Swarm Audit | CLOUD | **APPROVED / ACTIVE** | [17_HS_AUDIT_STRATEGY.md](../Docs/17_HS_AUDIT_STRATEGY.md) — Lead **`APPROVE HS STRATEGY`**, 2026-09-17 ET |
+| **HS-A** | Inventory & debt ledger | CLOUD | **APPROVED / CLOSED** | [17a_HS_INVENTORY.md](../Docs/17a_HS_INVENTORY.md) — Lead **`APPROVE HS-A`**, 2026-09-17 ET (PR #88) |
+| **HS-B** | Swarm ops tighten | CLOUD | **IN PROGRESS** | [17b_HS_SWARM_OPS.md](../Docs/17b_HS_SWARM_OPS.md) — **PENDING** Lead **`APPROVE HS-B`**; DESKTOP = Conductor **parent** only |
 
-**Current track:** **Docs/17 HS APPROVED** — HS-A **CLOSED**; **HS-B IN PROGRESS**.
+**Current track:** **Docs/17 HS APPROVED** — HS-A **CLOSED**; **HS-B IN PROGRESS** (ops PR — not APPROVED).
 
 ---
 
@@ -75,6 +79,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 
 | ID | Phase | Host | Owner | Write path | Due artifact |
 |---|---|---|---|---|---|
+| HS-B-swarm-ops | HS-B | CLOUD | CND | Docs/ + swarm/ | [17b_HS_SWARM_OPS.md](../Docs/17b_HS_SWARM_OPS.md) — **PENDING** Lead **`APPROVE HS-B`** (do not claim APPROVE) |
 | HS-A-inventory | HS-A | CLOUD | CND | Docs/ | [17a_HS_INVENTORY.md](../Docs/17a_HS_INVENTORY.md) — **APPROVED / CLOSED** Lead **`APPROVE HS-A`**, 2026-09-17 ET |
 | PL-A-character | PL-A | DESKTOP+CLOUD | CND | Docs/handoffs/ | [PL_A_CHARACTER.md](../Docs/handoffs/PL_A_CHARACTER.md) — **APPROVED / CLOSED** — Lead **`APPROVE PL-A`**, 2026-09-17 ET |
 | PL-B-pie | PL-B | Lead | Lead | Docs/handoffs/ | [PL_B_PIE.md](../Docs/handoffs/PL_B_PIE.md) — **WAIVED / CLOSED** — Lead **`WAIVE PL-B`**, 2026-09-17 ET |
