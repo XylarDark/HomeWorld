@@ -1,9 +1,9 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **PL-A** (character realization) — **OPEN / IN PROGRESS** — Docs/16 Playable Loop **APPROVED** (Lead **`APPROVE PL STRATEGY`**, 2026-09-17 ET)
+**Current phase:** **PL-A** (character realization) — **OPEN / IN PROGRESS** — Lead **Manny substitute APPROVED** 2026-09-17 ET (`SKM_Manny_Simple` + `ABP_Unarmed`)
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
-**Active owners:** **CLOUD** (VP-D docs) + **DESKTOP** (PA-05 bootstrap evidence) + **Lead** (gates / GitHub Settings)  
-**Blocked by:** none for PL-A start — next gate Lead **`APPROVE PL-A`**. Branch protection remains **DEFERRED** (HR3-C).
+**Active owners:** **DESKTOP** (Manny copy / MCP apply / preflight) + **CLOUD** (config/docs) + **Lead** (`APPROVE PL-A`)  
+**Blocked by:** DESKTOP apply + preflight evidence before Lead **`APPROVE PL-A`**. Branch protection remains **DEFERRED** (HR3-C).
 
 | Phase | Name | Owners | Status | Gate file | Handoffs |
 |---|---|---|---|---|---|
@@ -65,7 +65,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **VP-C** | Playability polish | CLOUD+DESKTOP | **APPROVED / CLOSED** | [handoffs/VP_C_POLISH.md](../Docs/handoffs/VP_C_POLISH.md) — Lead **`APPROVE VP-C`**, 2026-09-17 ET |
 | **VP-D** | Bootstrap dry-run | CLOUD+DESKTOP | **APPROVED / CLOSED** | [handoffs/VP_D_BOOTSTRAP_CI.md](../Docs/handoffs/VP_D_BOOTSTRAP_CI.md) — Lead **`APPROVE VP-D`**, 2026-09-17 ET; branch protection **DEFERRED** |
 
-**Current track:** **Docs/16 Playable Loop APPROVED** — **PL-A OPEN**. VP **CLOSED**. Next gate **`APPROVE PL-A`**.
+**Current track:** **Docs/16 Playable Loop APPROVED** — **PL-A IN PROGRESS** (Manny substitute). VP **CLOSED**. Next gate **`APPROVE PL-A`**.
 
 ---
 
@@ -73,9 +73,9 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 
 | ID | Phase | Host | Owner | Write path | Due artifact |
 |---|---|---|---|---|---|
-| VP-A-reverify | VP-A | Lead | Lead | Docs/handoffs/ | **WAIVED** — Lead **`WAIVE VP-A re-verify`**, 2026-09-17 ET; honest STILL FAIL record in [VP_A_PIE.md](../Docs/handoffs/VP_A_PIE.md) § Re-verify |
-| VP-D-bootstrap | VP-D | DESKTOP | CND | Docs/handoffs/ | [VP_D_BOOTSTRAP_CI.md](../Docs/handoffs/VP_D_BOOTSTRAP_CI.md) — PA-05 cold-clone → submodule → `doctor:ue` → Editor → `bootstrap_project.py` → idempotent re-run; DESKTOP evidence **TBD** |
-| VP-D-branch-protection | VP-D | Lead | Lead | docs/Setup/ | [CI_SETUP.md](../docs/Setup/CI_SETUP.md) + [HR3_C_BRANCH_PROTECTION.md](../Docs/handoffs/HR3_C_BRANCH_PROTECTION.md) — checklist documented; **DEFERRED** unless Lead confirms apply in GitHub UI |
+| PL-A-character | PL-A | DESKTOP+CLOUD | CND | Docs/handoffs/ | [PL_A_CHARACTER.md](../Docs/handoffs/PL_A_CHARACTER.md) — Manny substitute APPROVED; config → `SKM_Manny_Simple` + `ABP_Unarmed`; DESKTOP apply + preflight; Lead **`APPROVE PL-A`** |
+| VP-A-reverify | VP-A | Lead | Lead | Docs/handoffs/ | **WAIVED** — Lead **`WAIVE VP-A re-verify`**, 2026-09-17 ET; debt closes under **PL-B** |
+| HR3-C-branch-protection | HR3-C | Lead | Lead | docs/Setup/ | **DEFERRED** — [HR3_C_BRANCH_PROTECTION.md](../Docs/handoffs/HR3_C_BRANCH_PROTECTION.md) |
 
 ## Deferred accept (VP-B — not open defects)
 
