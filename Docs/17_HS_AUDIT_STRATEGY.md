@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **DRAFT** — awaiting Lead **`APPROVE HS STRATEGY`** |
+| **Status** | **APPROVED / ACTIVE** — Lead Luke Thompson, **`APPROVE HS STRATEGY`**, 2026-09-17 ET |
 | **Date** | 2026-09-17 |
 | **Author** | Conductor (HomeWorld) |
 | **Baseline main** | `d59a0b2` — Docs/16 PL **CLOSED**; session handoff filed |
@@ -162,7 +162,7 @@ Each WAVE: deliverable doc + PR(s) → Lead **`APPROVE HS-*`** before next WAVE 
 
 ## Immediate unlock (after strategy gate)
 
-1. Lead **`APPROVE HS STRATEGY`**
+1. Lead **`APPROVE HS STRATEGY`** — **DONE** (2026-09-17 ET)
 2. Conductor unlocks **HS-A** only (inventory) — no implementation WAVEs until **`APPROVE HS-A`**
 
 ---
@@ -177,6 +177,8 @@ Each WAVE: deliverable doc + PR(s) → Lead **`APPROVE HS-*`** before next WAVE 
 
 ## Gate
 
-Lead type **`APPROVE HS STRATEGY`** to unlock HS-A.
+Lead **`APPROVE HS STRATEGY`** — **APPROVED** (Luke Thompson, 2026-09-17 ET).
 
-*DRAFT — Docs/17 Harness & Swarm Audit. Not active until Lead APPROVE HS STRATEGY.*
+**HS-A UNLOCKED / IN PROGRESS** — inventory & debt ledger.
+
+*APPROVED — Docs/17 Harness & Swarm Audit. Lead **`APPROVE HS STRATEGY`**, 2026-09-17 ET.*
