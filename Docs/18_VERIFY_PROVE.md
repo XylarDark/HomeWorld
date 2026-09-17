@@ -41,8 +41,8 @@ Prove the signed playable loop on **DESKTOP-21CT3H0** with **real** editor-log g
 | Docs/16 PL | **CLOSED** |
 | Docs/17 HS | **CLOSED / COMPLETE** |
 | **Docs/18 / VP2 strategy** | **APPROVED** — Lead **`APPROVE VP2 STRATEGY`**, 2026-09-17 ET |
-| **VP2-A** | **UNLOCKED / IN PROGRESS** |
-| **VP2-B** | LOCKED |
+| **VP2-A** | **PENDING `APPROVE VP2-A`** — DESKTOP retry **9/9 PASS** ([VP2_A_EVIDENCE.md](handoffs/VP2_A_EVIDENCE.md)) |
+| **VP2-B** | LOCKED (backlog documented in VP2-A handoff if Lead wants success-path greps) |
 | **VP2-C** | LOCKED (optional; Lead picks flavor after VP2-A/B) |
 
 ---
@@ -66,9 +66,10 @@ Naming: **VP2-A … VP2-C** (Verify & Prove 2). Do **not** reuse Docs/14 `VP-A�
 
 **Done criteria:**
 
-- [ ] Preflight PASS on DESKTOP
-- [ ] Evidence table filed with honest PASS/MISSING counts
-- [ ] MISSING rows listed with likely cause (not papered over)
+- [x] Preflight PASS on DESKTOP
+- [x] Evidence table filed with honest PASS/MISSING counts — **RETRY 9/9 PASS, 0 MISSING** (2026-09-17 ET)
+- [x] First-run 0/9 contrast + caveats documented (soft-reject vs success; VP2-B backlog)
+- [ ] Lead **`APPROVE VP2-A`**
 
 ### VP2-B — Close MISSING blockers (only if needed)
 
@@ -116,8 +117,8 @@ If VP2-A is **all PASS** (or Lead **`WAIVE VP2-B`** with written MISSING accept)
 
 ## Immediate unlock
 
-1. Lead **`APPROVE VP2 STRATEGY`** — **DONE** (2026-09-17 ET)
-2. Conductor unlocks **VP2-A** only — **IN PROGRESS**
+1. Lead **`APPROVE VP2 STRATEGY`** — **DONE** (2026-09-17 ET; PR #101)
+2. Conductor **VP2-A DESKTOP prove** — **FILED** (retry 9/9 PASS) — **PENDING `APPROVE VP2-A`**
 
 ---
 
@@ -125,6 +126,6 @@ If VP2-A is **all PASS** (or Lead **`WAIVE VP2-B`** with written MISSING accept)
 
 Lead **`APPROVE VP2 STRATEGY`** — **APPROVED** (Luke Thompson, 2026-09-17 ET).
 
-**VP2-A UNLOCKED / IN PROGRESS** — DESKTOP prove.
+**VP2-A PENDING `APPROVE VP2-A`** — DESKTOP retry evidence **9/9 PASS** filed in [VP2_A_EVIDENCE.md](handoffs/VP2_A_EVIDENCE.md).
 
-*APPROVED — Docs/18 Verify & Prove. Lead **`APPROVE VP2 STRATEGY`**, 2026-09-17 ET.*
+*APPROVED strategy — Docs/18 Verify & Prove. Lead **`APPROVE VP2 STRATEGY`**, 2026-09-17 ET. VP2-A gate open.*
