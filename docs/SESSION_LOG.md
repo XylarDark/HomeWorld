@@ -9008,3 +9008,15 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 **Next:** Lead next-phase audit (no new WAVE id in Docs/10). Run `create_master_materials.py` on Windows Editor to materialize `.uasset` graphs locally.
 
+---
+
+## 2026-09-17 — Docs/11 next-phase strategy (DRAFT)
+
+**Tasks completed:**
+- `Docs/11_NEXT_PHASE_STRATEGY.md` — NP-A…E Lead-gated phases (inventory, lookdev, form/V1, SYS V3–V4, SYS V6–V8); hard rules; explicit DEFER list; approval gate.
+- Updated `Docs/README.md` — link Docs/11 as NEXT (awaiting Lead `APPROVE Docs/11`).
+
+**Hard rules honored:** Docs/07 CLOSED not reopened; FALLBACK armed; no NP implementation in this PR (docs only).
+
+**Gate:** Await Lead **`APPROVE Docs/11`** before NP-A inventory work.
+
