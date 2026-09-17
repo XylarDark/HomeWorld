@@ -3,8 +3,8 @@
 | Field | Value |
 |-------|-------|
 | **Phase** | PL-A |
-| **Status** | **EVIDENCE COMPLETE — PENDING LEAD `APPROVE PL-A`** |
-| **Lead gate** | **`APPROVE PL-A`** before PL-B |
+| **Status** | **APPROVED / CLOSED** — Lead Luke Thompson, **`APPROVE PL-A`**, 2026-09-17 ET |
+| **Lead gate** | **`APPROVE PL-A`** — **APPROVED**; unlocks PL-B |
 | **Spec** | [16_PLAYABLE_LOOP.md](../16_PLAYABLE_LOOP.md) § PL-A |
 | **Baseline** | Main @ `93a47e7` (PR #75) + preflight follow-up — DESKTOP **DESKTOP-21CT3H0** |
 
@@ -62,3 +62,11 @@ Replace VP-B mesh-only interim with Lead-accepted Epic UE 5.7 Mannequin substitu
 ---
 
 *PL-A evidence filed — stop for Lead **`APPROVE PL-A`** before PL-B.*
+
+## Lead APPROVE PL-A
+
+Lead **`APPROVE PL-A`** (Luke Thompson, 2026-09-17 ET) — PL-A **APPROVED / CLOSED**. **PL-B UNLOCKED** (human Alt+P verb greps). Keep VP-A WAIVE record intact; PL-B closes that debt with real greps.
+
+---
+
+*PL-A **APPROVED / CLOSED** — Lead **`APPROVE PL-A`**, 2026-09-17 ET.*
