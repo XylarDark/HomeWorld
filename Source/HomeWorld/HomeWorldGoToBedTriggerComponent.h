@@ -16,8 +16,9 @@ class HOMEWORLD_API UHomeWorldGoToBedTriggerComponent : public UBoxComponent
 	GENERATED_BODY()
 
 public:
-	UHomeWorldGoToBedTriggerComponent();
+	UHomeWorldGoToBedTriggerComponent(const FObjectInitializer& ObjectInitializer);
 
+	virtual void PostInitProperties() override;
 	virtual void BeginPlay() override;
 
 protected:

@@ -8911,3 +8911,7 @@ Agent session summaries for cross-session context persistence.
 
 **Key decisions:** No UE maps/dress invented; no Docs/07 edits. Next: run batch import on UE 5.7 machine per Docs/05.
 
+## 2026-09-17 — Fix GoToBed/Meal trigger editor crash (UE 5.7.4)
+
+**Fix:** Deferred `SetCollisionProfileName` from UBoxComponent subclass constructors to `PostInitProperties` (assert: NewObject with empty name during CDO construction); PR to main.
+
