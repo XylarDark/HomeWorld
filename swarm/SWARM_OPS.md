@@ -242,3 +242,44 @@ The swarm is running correctly when:
 - Human Lead only enters at gates and cut decisions (`APPROVE Pn`, `FALLBACK FLIGHT`, `FIX …`)
 - Real failures are in KNOWN_ERRORS; automation impossibilities are in AUTOMATION_GAPS
 - Git commits stage explicit paths only
+
+## 13. Session resume (HS-B — debt #8)
+
+Chat transcripts lag and refresh. **Durable continuity is files**, not chat.
+
+**On every Conductor / swarm session start (required):**
+
+1. Latest durable handoff: `Docs/handoffs/SESSION_HANDOFF_*.md` (pick newest by date in filename)
+2. Rolling summary: [docs/SESSION_SUMMARY.md](../docs/SESSION_SUMMARY.md) — **append only**; do **not** rewrite all history
+3. Live board: [PHASE_BOARD.md](PHASE_BOARD.md)
+
+Resume from the handoff **resume_focus** / unfinished list. Do not reconstruct the day from chat alone.
+
+Pointer also in [AGENTS.md](../AGENTS.md) § Session continuity.
+
+## 14. Cloud Contents API fallback (HS-B — debt #4)
+
+When cloud clone / workspace returns **ResourceExhausted** (or equivalent):
+
+- **Sanctioned path:** GitHub **Contents API** via `gh api repos/<owner>/<repo>/contents/...` (read/write file, create branch, open PR) — **no local clone required**
+- Encode use in handoff Evidence/Blockers as `ResourceExhausted → gh Contents API`
+- Still: no `.uasset`/`.umap`; no DESKTOP Shell from cloud; exclusive ownership
+
+Packet: [CLOUD_AGENT_PACKET.md](CLOUD_AGENT_PACKET.md).
+
+## 15. Lead digests (HS-B — debt #6)
+
+Prefer **phase-end digests** (one message: gate status + PR URL(s) + merge SHA(s) + next `APPROVE *` string) over per-CI / per-push spam. Stamp PRs for Lead gates remain valid; Conductor batches the Lead-facing narrative.
+
+## 16. DESKTOP parent-only happy path (HS-B — debt #2)
+
+Cross-link: [docs/Setup/WINDOWS_BRIDGE.md](../docs/Setup/WINDOWS_BRIDGE.md) § Canonical Windows agent lane.
+
+| Actor | DESKTOP Shell |
+|-------|---------------|
+| Conductor **parent** | **YES** |
+| Task executor / worker | **NO** (FAIL) |
+| Cloud Linux VM | **NO** |
+
+Proof / failure modes: [Docs/handoffs/HR3_A_WINDOWS_EXEC.md](../Docs/handoffs/HR3_A_WINDOWS_EXEC.md).
+

@@ -70,7 +70,7 @@ Use when a **Cursor cloud agent** ships a PR (no UE/MCP on the VM). Full packet:
 - [ ] Editor Python / GUI automation on cloud VM
 - [ ] `.uasset` / `.umap` commits
 
-**Windows follow-up:** [docs/Setup/WINDOWS_BRIDGE.md](../docs/Setup/WINDOWS_BRIDGE.md) — DESKTOP Editor + MCP for dress, PIE, and script validation after merge.
+**Windows follow-up:** [docs/Setup/WINDOWS_BRIDGE.md](../docs/Setup/WINDOWS_BRIDGE.md) — **Conductor parent only** on DESKTOP-21CT3H0 (Task executors **FAIL**). Cloud agents do not claim DESKTOP Shell.
 
 ### Evidence paths (repo-relative)
 
@@ -87,3 +87,15 @@ Use when a **Cursor cloud agent** ships a PR (no UE/MCP on the VM). Full packet:
 | **Preflight** | `npm run preflight:ue` exit code |
 
 Re-verify after blocker-fix: append **§ Re-verify** to prior handoff — [HR3_D_EVIDENCE_LANE.md](../Docs/handoffs/HR3_D_EVIDENCE_LANE.md).
+
+
+### ResourceExhausted / Contents API fallback (HS-B)
+
+- [ ] Hit ResourceExhausted (or clone fail)? → used sanctioned **`gh` Contents API** (no invented second clone)
+- [ ] Did **not** claim DESKTOP Shell / MCP / PIE from cloud VM or Task executor
+- Notes:
+
+### Lead-facing digest (prefer phase-end)
+
+- [ ] Phase-end digest prepared (status + PR links + SHAs) — not per-CI spam
+- Digest / PR URLs:
