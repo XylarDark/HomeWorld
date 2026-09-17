@@ -1,6 +1,8 @@
 // Copyright HomeWorld. All Rights Reserved.
 
 #include "HomeWorldCharacter.h"
+#include "HomeWorldFallbackGlideComponent.h"
+#include "HomeWorldShrinePortalComponent.h"
 #include "BuildPlacementSupport.h"
 #include "AbilitySystemComponent.h"
 #include "Abilities/GameplayAbility.h"
@@ -29,6 +31,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Engine/GameInstance.h"
 #include "Kismet/GameplayStatics.h"
+#include "EngineUtils.h"
 
 AHomeWorldCharacter::AHomeWorldCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -61,6 +64,8 @@ AHomeWorldCharacter::AHomeWorldCharacter(const FObjectInitializer& ObjectInitial
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom);
 	FollowCamera->SetFieldOfView(CameraFOV);
+
+	FallbackGlideComponent = CreateDefaultSubobject<UHomeWorldFallbackGlideComponent>(TEXT("FallbackGlideComponent"));
 }
 
 UAbilitySystemComponent* AHomeWorldCharacter::GetAbilitySystemComponent() const
@@ -103,6 +108,10 @@ void AHomeWorldCharacter::BeginPlay()
 void AHomeWorldCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (IsFallbackGliding())
+	{
+		return;
+	}
 	// Apply accumulated movement from the four directional keys (W/S/A/D).
 	float Forward = FMath::Clamp(MovementForwardAxis, -1.0f, 1.0f);
 	float Right = FMath::Clamp(MovementRightAxis, -1.0f, 1.0f);
@@ -522,6 +531,138 @@ bool AHomeWorldCharacter::ConsumeMealRestore(EMealType MealType)
 	const TCHAR* MealName = MealType == EMealType::Breakfast ? TEXT("Breakfast") : (MealType == EMealType::Lunch ? TEXT("Lunch") : TEXT("Dinner"));
 	UE_LOG(LogTemp, Log, TEXT("HomeWorld: ConsumeMealRestore %s — Health %.0f -> %.0f, day buff set, meals today=%d (visible at night / HUD)."), MealName, Current, NewHealth, PS ? PS->GetMealsConsumedToday() : 0);
 	return true;
+}
+
+bool AHomeWorldCharacter::IsFallbackGliding() const
+{
+	return FallbackGlideComponent && FallbackGlideComponent->IsGliding();
+}
+
+void AHomeWorldCharacter::CancelFallbackGlide()
+{
+	if (FallbackGlideComponent)
+	{
+		FallbackGlideComponent->CancelGlide();
+	}
+}
+
+static AActor* FindGlideStartMarker(UWorld* World)
+{
+	if (!World)
+	{
+		return nullptr;
+	}
+	static const FName GlideStartNames[] = {
+		FName(TEXT("GP_GlideStart")),
+		FName(TEXT("CRUMB_Depart_Lookout")),
+		FName(TEXT("VS_MARKER_LeaveIsland_FALLBACK")),
+	};
+	for (const FName& Label : GlideStartNames)
+	{
+		for (TActorIterator<AActor> It(World); It; ++It)
+		{
+			AActor* Actor = *It;
+			if (!Actor)
+			{
+				continue;
+			}
+#if WITH_EDITOR
+			if (Actor->GetActorLabel().Equals(Label.ToString(), ESearchCase::CaseSensitive))
+			{
+				return Actor;
+			}
+#endif
+			if (Actor->GetName().Equals(Label.ToString(), ESearchCase::CaseSensitive))
+			{
+				return Actor;
+			}
+		}
+	}
+	TArray<AActor*> Tagged;
+	UGameplayStatics::GetAllActorsWithTag(World, FName(TEXT("GlideStart")), Tagged);
+	return Tagged.Num() > 0 ? Tagged[0] : nullptr;
+}
+
+bool AHomeWorldCharacter::TryStartFallbackGlide()
+{
+	if (!FallbackGlideComponent || FallbackGlideComponent->IsGliding())
+	{
+		return false;
+	}
+
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+
+	AActor* GlideStart = FindGlideStartMarker(World);
+	if (!GlideStart)
+	{
+		UE_LOG(LogTemp, Log, TEXT("FALLBACK: TryStartFallbackGlide — no GP_GlideStart / CRUMB_Depart_Lookout in level"));
+		return false;
+	}
+
+	const float DistSq = FVector::DistSquared(GetActorLocation(), GlideStart->GetActorLocation());
+	if (DistSq > FMath::Square(GlideStartProximityCm))
+	{
+		UE_LOG(LogTemp, Log, TEXT("FALLBACK: TryStartFallbackGlide — too far from glide start (%.0f cm max)"), GlideStartProximityCm);
+		return false;
+	}
+
+	const bool bStarted = FallbackGlideComponent->StartGlide();
+	UE_LOG(LogTemp, Log, TEXT("FALLBACK: TryStartFallbackGlide %s near %s"), bStarted ? TEXT("started") : TEXT("failed"), *GlideStart->GetName());
+	return bStarted;
+}
+
+bool AHomeWorldCharacter::TryShrinePortalInteract()
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+
+	const FVector Start = GetActorLocation() + FVector(0.0f, 0.0f, GetCapsuleComponent() ? GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight() * 0.5f : 50.0f);
+	const FVector Forward = GetControlRotation().Vector();
+	const float TraceLength = 320.0f;
+	const FVector End = Start + Forward * TraceLength;
+	FHitResult Hit;
+	FCollisionQueryParams Params(NAME_None, false, this);
+	if (!World->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params))
+	{
+		return false;
+	}
+
+	AActor* HitActor = Hit.GetActor();
+	if (!HitActor)
+	{
+		return false;
+	}
+
+	UHomeWorldShrinePortalComponent* Portal = HitActor->FindComponentByClass<UHomeWorldShrinePortalComponent>();
+	if (!Portal && HitActor->GetAttachParentActor())
+	{
+		Portal = HitActor->GetAttachParentActor()->FindComponentByClass<UHomeWorldShrinePortalComponent>();
+	}
+	if (!Portal)
+	{
+		static const FName PortalTags[] = { FName(TEXT("ShrinePortal")), FName(TEXT("Portal_POI")) };
+		for (const FName& Tag : PortalTags)
+		{
+			if (HitActor->ActorHasTag(Tag))
+			{
+				Portal = HitActor->FindComponentByClass<UHomeWorldShrinePortalComponent>();
+				break;
+			}
+		}
+	}
+
+	if (Portal)
+	{
+		return Portal->TryPortalTransit(this);
+	}
+	return false;
 }
 
 bool AHomeWorldCharacter::TryHarvestInFront()

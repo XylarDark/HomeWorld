@@ -18,6 +18,7 @@ class USpringArmComponent;
 class UCameraComponent;
 class UInputAction;
 class UInputMappingContext;
+class UHomeWorldFallbackGlideComponent;
 
 UCLASS(Blueprintable)
 /**
@@ -37,6 +38,20 @@ public:
 	/** Trace forward and harvest the first resource pile hit; adds ResourceType/AmountPerHarvest to inventory. Called from GA_Interact / UHomeWorldInteractAbility. */
 	UFUNCTION(BlueprintCallable, Category = "Interaction", meta = (DisplayName = "Try Harvest In Front"))
 	bool TryHarvestInFront();
+
+	/** FALLBACK V2: start scripted CRUMB glide when near GP_GlideStart / glider perch. Day/body only. */
+	UFUNCTION(BlueprintCallable, Category = "Transit|FALLBACK", meta = (DisplayName = "Try Start Fallback Glide"))
+	bool TryStartFallbackGlide();
+
+	UFUNCTION(BlueprintCallable, Category = "Transit|FALLBACK", meta = (DisplayName = "Cancel Fallback Glide"))
+	void CancelFallbackGlide();
+
+	UFUNCTION(BlueprintCallable, Category = "Transit|FALLBACK", meta = (DisplayName = "Is Fallback Gliding"))
+	bool IsFallbackGliding() const;
+
+	/** Try shrine portal transit on hit actor (V5 both ways). */
+	UFUNCTION(BlueprintCallable, Category = "Portal|FALLBACK", meta = (DisplayName = "Try Shrine Portal Interact"))
+	bool TryShrinePortalInteract();
 
 	/** Trace from camera via GetPlacementTransform and spawn PlaceActorClass at hit. Called from GA_Place / UHomeWorldPlaceAbility. */
 	UFUNCTION(BlueprintCallable, Category = "Build|Placement", meta = (DisplayName = "Try Place At Cursor"))
@@ -60,6 +75,10 @@ public:
 
 protected:
 	virtual void PossessedBy(AController* NewController) override;
+
+	/** FALLBACK scripted glide along CRUMB_* (no free-flight). */
+	UPROPERTY(VisibleAnywhere, Category = "Transit|FALLBACK")
+	TObjectPtr<UHomeWorldFallbackGlideComponent> FallbackGlideComponent;
 
 	/** Ability system; used for GAS combat and attributes. */
 	UPROPERTY(VisibleAnywhere, Category = "Abilities")
@@ -195,6 +214,10 @@ protected:
 	/** Capsule half-height (cm). Human-sized default; override in Blueprint for different characters. */
 	UPROPERTY(EditDefaultsOnly, Category = "Movement", meta = (ClampMin = "1.0", ClampMax = "500.0"))
 	float CapsuleHalfHeight = 88.0f;
+
+	/** Max distance (cm) to GP_GlideStart / CRUMB_Depart_Lookout / GlideStart tag to allow interact glide. */
+	UPROPERTY(EditDefaultsOnly, Category = "Transit|FALLBACK", meta = (ClampMin = "50.0", ClampMax = "2000.0"))
+	float GlideStartProximityCm = 450.0f;
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;

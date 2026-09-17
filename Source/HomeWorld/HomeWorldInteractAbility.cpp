@@ -31,6 +31,14 @@ void UHomeWorldInteractAbility::ActivateAbility(const FGameplayAbilitySpecHandle
 		return;
 	}
 
-	const bool bHarvested = Character->TryHarvestInFront();
-	EndAbility(Handle, ActorInfo, ActivationInfo, false, !bHarvested);
+	bool bHandled = Character->TryStartFallbackGlide();
+	if (!bHandled)
+	{
+		bHandled = Character->TryShrinePortalInteract();
+	}
+	if (!bHandled)
+	{
+		bHandled = Character->TryHarvestInFront();
+	}
+	EndAbility(Handle, ActorInfo, ActivationInfo, false, !bHandled);
 }
