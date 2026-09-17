@@ -3,8 +3,8 @@
 | Field | Value |
 |-------|-------|
 | **Phase** | HR2-C |
-| **Status** | COMPLETE — await **`APPROVE HR2-C`** |
-| **Lead gate** | **`APPROVE HR2-C`** closes HR2 track |
+| **Status** | **APPROVED** — Lead Luke Thompson, **`APPROVE HR2-C`**, 2026-09-17 ET |
+| **Lead gate** | **`APPROVE HR2-C`** — HR2 track **CLOSED / COMPLETE** |
 | **Spec** | [13c_HR2_C_CI_GATE.md](../13c_HR2_C_CI_GATE.md) |
 
 ## Summary
@@ -21,6 +21,6 @@ C++ PRs now **require** green `build-win64` (self-hosted Windows) unless Lead do
 
 Lead **`APPROVE HR2-B`** (Luke Thompson, 2026-09-17 ET) — HR2-B **APPROVED**; HR2-C unlocked.
 
-## Next
+## Stamp
 
-Lead **`APPROVE HR2-C`** → HR2 track **CLOSED**. No HR2-D.
+Lead **`APPROVE HR2-C`** (Luke Thompson, 2026-09-17 ET) — HR2-C **APPROVED**; HR2 track **CLOSED / COMPLETE**. No HR2-D.

@@ -20,6 +20,12 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 ## Rolling log (newest first)
 
+### 2026-09-17 — HR2 track CLOSED (APPROVE HR2-C)
+
+- Lead **`APPROVE HR2-C`** (Luke Thompson, 2026-09-17 ET) — HR2-C **APPROVED**; HR2 track **CLOSED / COMPLETE** (HR2-A/B/C all approved).
+- Docs stamped: [13_HR2_HARNESS_REFINE.md](../Docs/13_HR2_HARNESS_REFINE.md), [13c_HR2_C_CI_GATE.md](../Docs/13c_HR2_C_CI_GATE.md), [PHASE_BOARD.md](../swarm/PHASE_BOARD.md).
+- **No HR2-D.** No new product phases without Lead direction.
+
 ### 2026-09-17 — HR2-C C++ CI gate (build-win64 required)
 
 - Lead **`APPROVE HR2-B`** (Luke Thompson, 2026-09-17 ET) — HR2-B **APPROVED**; HR2-C unlocked.
