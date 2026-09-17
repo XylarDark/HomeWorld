@@ -1,3 +1,8 @@
+## 2026-09-17 ET — APPROVE HS-B / HS-C unlocked
+
+Lead **`APPROVE HS-B`**. Swarm ops closed ([Docs/17b](../Docs/17b_HS_SWARM_OPS.md)). **HS-C** CI as law **IN PROGRESS** — apply branch protection or **`ACCEPT HS-C DEFER`**.
+
+
 ## 2026-09-17 ET — APPROVE HS-A / HS-B unlocked
 
 Lead **`APPROVE HS-A`**. Inventory closed ([Docs/17a](../Docs/17a_HS_INVENTORY.md)). **HS-B** swarm ops tighten **IN PROGRESS**.
