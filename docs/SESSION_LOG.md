@@ -8931,7 +8931,17 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 **Submodule:** Documented pin `213673f`; template main `2efd756` (behind). Init: `git submodule update --init DevEnvTemplate`.
 
-**PR #10:** Not merged — validate CI failed (missing `docs/workflow/30_DAY_SCHEDULE.md`).
-
 **Gate:** Await Lead `APPROVE WAVE B` before WAVE C.
+
+---
+
+## 2026-09-17 — Docs/05 first-pass artifacts (Windows → repo)
+
+**Tasks completed:**
+- Added `Content/Python/place_vs_mvp_markers.py` (markers level + NightMix MPC from `MVP_CRUMB_SPLINE.json`).
+- Added `Docs/handoffs/UE_IMPORT_FIRST_PASS_DONE.md` (DESKTOP-21CT3H0 completion note).
+- Updated `Docs/05_UE_IMPORT_FIRST_PASS.md`: steps 1–4 marked done; verify checklist.
+- Opened PR #10 — scripts/docs only; no `.uasset`/`.umap` committed.
+
+**Key decisions:** Content binaries remain local on Windows; repo carries idempotent script + handoff for re-run.
 

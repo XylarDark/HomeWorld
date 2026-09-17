@@ -10,18 +10,22 @@
 
 - Unpacked signed MVP vertical slice (P3–P7) from box archive; opened PR #3 (`cursor/mvp-vertical-slice-p3-p7-070e`).
 - Deliverables: Blender lib, preview stills 1–5, VS_MVP reel, FALLBACK FLIGHT, P6 QA re-judge PASS, P7 Lead SIGN OFF.
+- Fixed GoToBed/Meal trigger editor crash (PostInitProperties deferral); merged PRs #5, #8, #9.
+- Added Docs/05 first-pass artifacts from DESKTOP-21CT3H0: `place_vs_mvp_markers.py`, `UE_IMPORT_FIRST_PASS_DONE.md`, updated `05_UE_IMPORT_FIRST_PASS.md`.
+- Opened PR #10 (scripts + handoff; Content binaries stay local on Windows).
 
 ---
 
 ## Today
 
-- Review and merge PR #3 to `main`.
-- Optional: begin UE import per `Docs/04_UE_HANDOFF_NOTES.md` (out of scope for PR).
+- Review and merge PR #10 to `main`.
+- Verify marker placement / NightMix in UE viewport on Windows if needed.
 
 ---
 
 ## Tomorrow
 
+- Continue UE dress / gameplay wiring per Docs/05 §5–6 non-goals boundary; PIE validation as needed.
 - Generate next task list when MVP slice merge is complete; Editor batch import + PIE verification as needed.
 
 ---
