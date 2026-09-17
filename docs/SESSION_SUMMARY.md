@@ -384,6 +384,13 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 - Docs/10 CLOSED (master graphs + NightMix); WAVE F archive; VS_MVP primary slice — [Docs/08_AUDIT_SIGN_OFF.md](../Docs/08_AUDIT_SIGN_OFF.md).
 
+### 2026-09-17 — VP2-A DESKTOP prove retry (9/9 PASS)
+
+- Conductor parent DESKTOP retry: `evidence:grep` → **9/9 PASS, 0 MISSING** (soft-reject paths documented).
+- Filed [Docs/handoffs/VP2_A_EVIDENCE.md](../Docs/handoffs/VP2_A_EVIDENCE.md); [Docs/18_VERIFY_PROVE.md](../Docs/18_VERIFY_PROVE.md) board → **PENDING `APPROVE VP2-A`**.
+- First-run contrast: **0/9** (MCP crash + LogTemp filter). VP2-B backlog captured (LogTemp, piles, MCP console play-world).
+- PR #103 (docs-only; no `.uasset`/`.umap`).
+
 ---
 
 *Maintained by Conductor; HR-C established this rolling policy.*
