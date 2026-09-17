@@ -15,9 +15,9 @@
 
 Lead **`APPROVE VP STRATEGY`** — **APPROVED** (Luke Thompson, 2026-09-17 ET).
 
-**Next gate (VP):** Lead **`APPROVE VP-B`** after DESKTOP smoke + ABP evidence — **VP-B UNLOCKED / IN PROGRESS** ([15_HR3_A_PLUS.md](15_HR3_A_PLUS.md) HR3 **CLOSED / COMPLETE**).
+**Next gate (VP):** Lead **`APPROVE VP-B`** after DESKTOP mesh-only preflight + NightMix smoke evidence — **VP-B IN PROGRESS** ([handoffs/VP_B_SMOKE_CHARACTER.md](handoffs/VP_B_SMOKE_CHARACTER.md); HR3 **CLOSED / COMPLETE**).
 
-**VP-A APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET (hard-fail accepted; re-verify after VP-B). **VP-B UNLOCKED / IN PROGRESS** (do not mark VP track complete). VP-C/D remain **LOCKED** until VP-A re-verify after VP-B.
+**VP-A APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET (hard-fail accepted; re-verify after VP-B). **VP-B IN PROGRESS** — mesh-only interim (Engine DefaultSkeletalMesh, empty anim_blueprint; preflight aligned). VP-C/D remain **LOCKED** until VP-A re-verify after VP-B.
 
 ### Re-verify (HR3-D)
 
@@ -53,7 +53,7 @@ Product NP (NP-A…E) and Harness Refine 2 (HR2-A…C) are **CLOSED**. Senior po
 | **Harness HR2 (Docs/13)** | **CLOSED** |
 | **Docs/14 / VP strategy** | **APPROVED** — Lead **`APPROVE VP STRATEGY`**, 2026-09-17 ET |
 | **VP-A** | **APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET (verb PIE hard-fail accepted; PA-03 → VP-B) |
-| **VP-B** | **UNLOCKED / IN PROGRESS** — resume after HR3 close (do not mark VP track complete) |
+| **VP-B** | **IN PROGRESS** — mesh-only interim (Engine DefaultSkeletalMesh, empty anim_blueprint); preflight aligned; HR3 **CLOSED** |
 | **VP-C** | **LOCKED** |
 | **VP-D** | **LOCKED** |
 
@@ -206,7 +206,7 @@ Phases run **sequentially** (recommended: A → B → C → D) unless Lead direc
 ```
 Docs/14 / VP STRATEGY: APPROVED — Lead Luke Thompson, APPROVE VP STRATEGY, 2026-09-17 ET
 VP-A: APPROVED — Lead APPROVE VP-A, 2026-09-17 ET (hard-fail accepted; re-verify after VP-B)
-VP-B: UNLOCKED / IN PROGRESS — VP-C: LOCKED — VP-D: LOCKED
+VP-B: IN PROGRESS (mesh-only repo fixes) — VP-C: LOCKED — VP-D: LOCKED
 Product NP: CLOSED — HR2: CLOSED
 ```
 

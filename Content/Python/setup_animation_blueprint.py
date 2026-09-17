@@ -171,6 +171,11 @@ def _reparent_to_anim_instance_if_needed(abp, target_parent_class):
 def main():
     _log("Setting up Animation Blueprint...")
 
+    config = _load_config()
+    if not (config.get("anim_blueprint") or "").strip():
+        _log("Skipping ABP setup — anim_blueprint empty in " + CONFIG_FILE + " (VP-B mesh-only interim).")
+        return None
+
     if unreal.EditorAssetLibrary.does_asset_exist(ABP_FULL):
         abp = unreal.load_asset(ABP_FULL)
         parent_class = _get_anim_instance_class()

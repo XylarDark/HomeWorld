@@ -14,7 +14,8 @@
       "Content/Python/character_blueprint_config.json"
     ],
     "characterConfigPath": "Content/Python/character_blueprint_config.json",
-    "requiredCharacterConfigKeys": ["skeletal_mesh", "anim_blueprint"]
+    "requiredCharacterConfigKeys": ["skeletal_mesh"],
+    "optionalCharacterConfigKeys": ["anim_blueprint"]
   },
   "content": {
     "vsMvpMap": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers",
@@ -29,7 +30,7 @@
   "blockerCodes": {
     "MCP_UNREACHABLE": "UnrealMCP port 55557 not reachable — open Editor and verify MCP green dot",
     "CONFIG_MISSING": "Required repo file or JSON config missing",
-    "CONFIG_EMPTY_PATH": "Character config path is empty — assign skeletal_mesh / anim_blueprint",
+    "CONFIG_EMPTY_PATH": "Character config path is empty — assign skeletal_mesh (anim_blueprint may be empty for VP-B mesh-only interim)",
     "REPO_SCRIPT_MISSING": "Bootstrap or placement script missing from repo",
     "ASSET_MISSING_ON_DISK": "Required .uasset/.umap not found under Content/ (LFS or local import)",
     "EDITOR_RESULTS_MISSING": "Editor deep-check results missing — run preflight_ue_editor.py via MCP on DESKTOP",
