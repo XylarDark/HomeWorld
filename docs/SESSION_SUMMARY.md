@@ -1,3 +1,8 @@
+## 2026-09-17 ET — ACCEPT HS-C DEFER / HS-D unlocked
+
+Lead **`ACCEPT HS-C DEFER`**. Branch protection permanently deferred for HS (risk accepted). **HS-D** evidence & re-verify automation **IN PROGRESS**.
+
+
 ## 2026-09-17 ET — APPROVE HS-B / HS-C unlocked
 
 Lead **`APPROVE HS-B`**. Swarm ops closed ([Docs/17b](../Docs/17b_HS_SWARM_OPS.md)). **HS-C** CI as law **IN PROGRESS** — apply branch protection or **`ACCEPT HS-C DEFER`**.
