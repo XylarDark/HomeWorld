@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **APPROVED** — Lead Luke Thompson, **`APPROVE HR2 STRATEGY`**, 2026-09-17 ET |
+| **Status** | **CLOSED / COMPLETE** — HR2 track closed; Lead Luke Thompson, **`APPROVE HR2-C`**, 2026-09-17 ET |
 | **Date** | 2026-09-17 |
 | **Strategy merge** | `d10e7b575e25d87c8aea55ee6bf314b8288e38d2` (PR #47) |
 | **Baseline** | Main @ `54193ac` — post-NP audit + senior harness review |
@@ -36,7 +36,8 @@ HR-A…D + HR-B2 delivered a **B- harness** and unlocked product NP. Senior harn
 | **Docs/13 / HR2 strategy** | **APPROVED** — Lead **`APPROVE HR2 STRATEGY`**, 2026-09-17 ET |
 | **HR2-A** | **APPROVED** — [13a_HR2_A_HANDOFF.md](13a_HR2_A_HANDOFF.md); Lead **`APPROVE HR2-A`**, 2026-09-17 ET |
 | **HR2-B** | **APPROVED** — [13b_HR2_B_COLD_CLONE.md](13b_HR2_B_COLD_CLONE.md); Lead **`APPROVE HR2-B`**, 2026-09-17 ET |
-| **HR2-C** | **COMPLETE — awaiting Lead `APPROVE HR2-C`** — [13c_HR2_C_CI_GATE.md](13c_HR2_C_CI_GATE.md) |
+| **HR2-C** | **APPROVED** — [13c_HR2_C_CI_GATE.md](13c_HR2_C_CI_GATE.md); Lead **`APPROVE HR2-C`**, 2026-09-17 ET |
+| **HR2 track** | **CLOSED / COMPLETE** — HR2-A/B/C all **APPROVED**; no HR2-D |
 
 ---
 
@@ -166,7 +167,8 @@ Phases may run **sequentially** (recommended: A → B → C) or **parallel** aft
 Docs/13 / HR2 STRATEGY: APPROVED — Lead Luke Thompson, APPROVE HR2 STRATEGY, 2026-09-17 ET
 HR2-A: APPROVED — Lead Luke Thompson, APPROVE HR2-A, 2026-09-17 ET
 HR2-B: APPROVED — Lead Luke Thompson, APPROVE HR2-B, 2026-09-17 ET
-HR2-C: COMPLETE — build-win64 required on C++ paths; await APPROVE HR2-C
+HR2-C: APPROVED — Lead Luke Thompson, APPROVE HR2-C, 2026-09-17 ET
+HR2 track: CLOSED / COMPLETE — no HR2-D
 ```
 
 ---
@@ -185,4 +187,4 @@ HR2-C: COMPLETE — build-win64 required on C++ paths; await APPROVE HR2-C
 
 ---
 
-*Conductor prepared this file; HR2 strategy **APPROVED** 2026-09-17 ET. HR2-A **APPROVED** 2026-09-17 ET. HR2-B **APPROVED** 2026-09-17 ET. HR2-C complete — **stop for Lead `APPROVE HR2-C`** (closes HR2 track).*
+*Conductor prepared this file; HR2 strategy **APPROVED** 2026-09-17 ET. HR2-A **APPROVED** 2026-09-17 ET. HR2-B **APPROVED** 2026-09-17 ET. HR2-C **APPROVED** 2026-09-17 ET — **HR2 track CLOSED / COMPLETE**. No HR2-D.*

@@ -1,9 +1,9 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **HR2-C** (C++ CI gate) — **COMPLETE awaiting APPROVE HR2-C**  
+**Current phase:** **HR2 TRACK CLOSED** — HR2-A/B/C all **APPROVED** (Lead **`APPROVE HR2-C`**, 2026-09-17 ET)  
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
-**Active owners:** **CND** (Conductor) + cloud agent (HR2-C PR)  
-**Blocked by:** Lead **`APPROVE HR2-C`** — [Docs/13c_HR2_C_CI_GATE.md](../Docs/13c_HR2_C_CI_GATE.md)
+**Active owners:** **CND** (Conductor) — no open HR2 gates  
+**Blocked by:** — (HR2 track complete; no HR2-D)
 
 | Phase | Name | Owners | Status | Gate file | Handoffs |
 |---|---|---|---|---|---|
@@ -22,7 +22,7 @@ Status values: `LOCKED` `OPEN` `IN PROGRESS` `GATE FAILED` `CLOSED` `GATE READY`
 
 ## POST-AUDIT (Docs/05–10 + HR track)
 
-MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** **Product next-phase (NP-A…E) is CLOSED / COMPLETE.** **HR2 strategy APPROVED** — Lead **`APPROVE HR2 STRATEGY`**, 2026-09-17 ET. Active: **HR2-C COMPLETE — await APPROVE HR2-C** (closes HR2 track).
+MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** **Product next-phase (NP-A…E) is CLOSED / COMPLETE.** **HR2 track CLOSED / COMPLETE** — HR2-A/B/C all **APPROVED**; Lead **`APPROVE HR2-C`**, 2026-09-17 ET. No HR2-D.
 
 | Track | Doc / phase | Status | Gate / handoff |
 |---|---|---|---|
@@ -37,9 +37,10 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **Docs/13** | Harness Refine 2 strategy | **APPROVED** | [13_HR2_HARNESS_REFINE.md](../Docs/13_HR2_HARNESS_REFINE.md) — Lead **`APPROVE HR2 STRATEGY`**, 2026-09-17 ET |
 | **HR2-A** | Doctor signal (UE host) | **APPROVED** | [13a_HR2_A_HANDOFF.md](../Docs/13a_HR2_A_HANDOFF.md) — Lead **`APPROVE HR2-A`**, 2026-09-17 ET |
 | **HR2-B** | Cold-clone submodule | **APPROVED** | [13b_HR2_B_COLD_CLONE.md](../Docs/13b_HR2_B_COLD_CLONE.md) — Lead **`APPROVE HR2-B`**, 2026-09-17 ET |
-| **HR2-C** | C++ CI gate (build-win64) | **COMPLETE — awaiting APPROVE HR2-C** | [13c_HR2_C_CI_GATE.md](../Docs/13c_HR2_C_CI_GATE.md), [handoffs/HR2_C_CI_GATE.md](../Docs/handoffs/HR2_C_CI_GATE.md) |
+| **HR2-C** | C++ CI gate (build-win64) | **APPROVED** | [13c_HR2_C_CI_GATE.md](../Docs/13c_HR2_C_CI_GATE.md), [handoffs/HR2_C_CI_GATE.md](../Docs/handoffs/HR2_C_CI_GATE.md) — Lead **`APPROVE HR2-C`**, 2026-09-17 ET |
+| **HR2 track** | Harness Refine 2 | **CLOSED / COMPLETE** | [13_HR2_HARNESS_REFINE.md](../Docs/13_HR2_HARNESS_REFINE.md) — no HR2-D |
 
-**Current track:** HR2-C **COMPLETE** — `build-win64` required on C++ paths; Conductor stops for Lead **`APPROVE HR2-C`** (closes HR2 track). Product NP **CLOSED**.
+**Current track:** **HR2 TRACK CLOSED** — HR2-A/B/C all **APPROVED**. Product NP **CLOSED**. No new product phases without Lead direction.
 
 ---
 
@@ -47,7 +48,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 
 | ID | Phase | Owner | Write path | Due artifact |
 |---|---|---|---|---|
-| HR2-C-gate | HR2-C | Lead | Docs/ | **`APPROVE HR2-C`** → HR2 track **CLOSED** |
+| — | — | — | — | — |
 
 ## Open defects
 

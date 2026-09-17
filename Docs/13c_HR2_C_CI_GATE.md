@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **COMPLETE — awaiting Lead `APPROVE HR2-C`** |
+| **Status** | **APPROVED** — Lead Luke Thompson, **`APPROVE HR2-C`**, 2026-09-17 ET |
 | **Date** | 2026-09-17 |
 | **Author** | Cloud Agent (HR2-C) |
 | **Strategy** | [13_HR2_HARNESS_REFINE.md](13_HR2_HARNESS_REFINE.md) — Lead **`APPROVE HR2 STRATEGY`**, 2026-09-17 ET |
@@ -12,7 +12,7 @@
 
 ## Gate
 
-**Awaiting** Lead **`APPROVE HR2-C`** — closes HR2 track when approved. **Do not invent HR2-D.**
+**APPROVED** — Lead Luke Thompson, **`APPROVE HR2-C`**, 2026-09-17 ET. HR2 track **CLOSED / COMPLETE**. **No HR2-D.**
 
 ---
 
@@ -95,8 +95,8 @@ This PR is **docs + ci.yml only** — no C++ gameplay changes. CI validate runs 
 - [x] CI_POLICY and ci.yml agree on path list
 - [x] Cloud agent packet updated
 - [x] Branch protection documented in CI_SETUP / CI_POLICY
-- [ ] Lead **`APPROVE HR2-C`** → HR2 track **CLOSED**
+- [x] Lead **`APPROVE HR2-C`** → HR2 track **CLOSED**
 
 ---
 
-*HR2-C complete — Conductor stops for Lead **`APPROVE HR2-C`**.*
+*HR2-C **APPROVED** 2026-09-17 ET — HR2 track **CLOSED / COMPLETE**. No HR2-D.*
