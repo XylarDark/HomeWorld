@@ -8,8 +8,8 @@
 #   1. Open the project in Unreal Editor
 #   2. Tools -> Execute Python Script -> Content/Python/bootstrap_project.py
 #
-# Legacy DemoMap/PCG builders (create_demo_from_scratch.py, setup_level.py) remain
-# in repo as QUARANTINE — not invoked by default. See Docs/08d_CONTENT_CANON.md §7–8.
+# WAVE F removed DemoMap/Homestead map builders and gui_automation. VS_MVP slice only.
+# See Docs/08_AUDIT_SIGN_OFF.md and Docs/08d_CONTENT_CANON.md §8.
 #
 # Optional: set skeletal mesh and Animation Blueprint paths in
 # Content/Python/character_blueprint_config.json before running.
@@ -53,18 +53,7 @@ def _run_slice_setup():
         _log("place_vs_mvp_markers error: " + str(e))
 
 
-def _run_legacy_level_pcg():
-    """QUARANTINE: DemoMap/Homestead PCG via setup_level — opt-in only."""
-    _log("--- Legacy (quarantine): setup_level + PCG ---")
-    try:
-        import setup_level
-        importlib.reload(setup_level)
-        setup_level.main(run_pcg=True)
-    except Exception as e:
-        _log("Legacy level/PCG setup error: " + str(e))
-
-
-def main(run_pcg=False, run_slice=True):
+def main(run_slice=True):
     _log("=== HomeWorld project bootstrap (VS_MVP slice primary) ===")
 
     # Step 1: Enhanced Input assets (IA_Move, IA_Look, IMC_Default)
@@ -103,11 +92,9 @@ def main(run_pcg=False, run_slice=True):
     except Exception as e:
         _log("Project settings error: " + str(e))
 
-    # Step 5: VS_MVP slice (primary) or legacy DemoMap PCG (quarantine, opt-in)
+    # Step 5: VS_MVP slice (primary)
     if run_slice:
         _run_slice_setup()
-    if run_pcg:
-        _run_legacy_level_pcg()
 
     _log("=== Bootstrap complete ===")
     _log("Next steps:")
@@ -115,9 +102,8 @@ def main(run_pcg=False, run_slice=True):
     _log("  - If skeletal mesh/AnimBP are not set: add paths to Content/Python/character_blueprint_config.json and re-run, or assign in Editor on BP_HomeWorldCharacter.")
     _log("  - Verify in Editor: Project Settings > Maps & Modes shows HomeWorldGameMode.")
     _log("  - Play In Editor (PIE) on VS_MVP markers level to test movement; NightMix driven via TimeOfDaySubsystem when MPC exists.")
-    _log("  - Legacy DemoMap/PCG: run create_demo_from_scratch.py only for quarantined harness tests — see Docs/08d_CONTENT_CANON.md §8.")
     _log("  - Animation Blueprint state machine must be built manually in Editor (Python cannot create AnimGraph nodes).")
 
 
 if __name__ == "__main__":
-    main(run_pcg=False, run_slice=True)
+    main(run_slice=True)
