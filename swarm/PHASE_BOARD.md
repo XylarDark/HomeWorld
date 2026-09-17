@@ -1,9 +1,10 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **Docs/18 VP2 STRATEGY DRAFT** — awaiting Lead **`APPROVE VP2 STRATEGY`**
+**Current phase:** **VP2-A** — DESKTOP prove / evidence:grep (**IN PROGRESS**)
+
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
-**Active owners:** **Conductor** (VP2 draft) / **Lead** (strategy gate)  
-**Blocked by:** Lead **`APPROVE VP2 STRATEGY`**. Docs/17 HS **CLOSED**. Branch protection **DEFERRED**.
+**Active owners:** **Conductor** (parent DESKTOP) / **DESKTOP-21CT3H0**
+**Blocked by:** none for VP2-A start. Next gate Lead **`APPROVE VP2-A`**. Branch protection **DEFERRED**.
 **Sign-off doc:** [Docs/17_HS_AUDIT_SIGN_OFF.md](../Docs/17_HS_AUDIT_SIGN_OFF.md) — **SIGNED OFF** Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET.
 
 
@@ -85,7 +86,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **HS-E** | Character / bootstrap canon | CLOUD+Lead+DESKTOP | **APPROVED / CLOSED** | [17e_HS_CONTENT_BOOTSTRAP.md](../Docs/17e_HS_CONTENT_BOOTSTRAP.md) — Lead **`APPROVE HS-E`**, 2026-09-17 ET (PR #97); policy **KEEP-LOCAL**; handoff [HS_E_CONTENT_BOOTSTRAP.md](../Docs/handoffs/HS_E_CONTENT_BOOTSTRAP.md) |
 | **HS-F** | Sign-off & re-grade | CLOUD+Lead | **IN PROGRESS** | [17_HS_AUDIT_SIGN_OFF.md](../Docs/17_HS_AUDIT_SIGN_OFF.md) — PENDING Lead **`SIGN OFF HS AUDIT`**; proposed harness **~A** / swarm **~A** |
 
-**Current track:** **Docs/18 Verify & Prove DRAFT** — await **`APPROVE VP2 STRATEGY`**. Docs/17 HS CLOSED.
+**Current track:** **Docs/18 VP2 APPROVED** — Lead **`APPROVE VP2 STRATEGY`**; **VP2-A IN PROGRESS**.
 
 ---
 
