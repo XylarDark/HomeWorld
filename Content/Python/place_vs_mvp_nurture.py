@@ -84,22 +84,91 @@ def _homestead_cabin_base():
     return blender_to_ue_cm((-6.0, 1.0, 0.0))
 
 
+def _member_name_variants(enum_name: str):
+    """Candidate UE Python enum member names for EHomeWorldNurtureTargetId."""
+    variants = [enum_name]
+    if enum_name.upper().startswith("N1"):
+        variants.extend(
+            [
+                "N1_Crop",
+                "N1_CROP",
+                "N1_crop",
+                "NEWENUMERATOR0",
+                "NEW_ENUMERATOR0",
+            ]
+        )
+    elif enum_name.upper().startswith("N2"):
+        variants.extend(
+            [
+                "N2_Stored",
+                "N2_STORED",
+                "N2_stored",
+                "NEWENUMERATOR1",
+                "NEW_ENUMERATOR1",
+            ]
+        )
+    seen = set()
+    ordered = []
+    for name in variants:
+        if name not in seen:
+            seen.add(name)
+            ordered.append(name)
+    return ordered
+
+
+def _find_nurture_target_enum_type():
+    """Resolve enum type: EHomeWorldNurtureTargetId, scan dir(unreal), or component CDO."""
+    for type_name in ("EHomeWorldNurtureTargetId", "HomeWorldNurtureTargetId"):
+        enum_type = getattr(unreal, type_name, None)
+        if enum_type is not None:
+            return type_name, enum_type
+
+    for name in sorted(dir(unreal)):
+        if "NurtureTarget" in name and "Id" in name and not name.startswith("_"):
+            enum_type = getattr(unreal, name, None)
+            if enum_type is not None:
+                return name, enum_type
+
+    comp_class = unreal.load_class(None, NURTURE_COMPONENT_CLASS)
+    if comp_class:
+        try:
+            cdo = unreal.get_default_object(comp_class)
+            if cdo and hasattr(cdo, "get_editor_property"):
+                sample = cdo.get_editor_property("target_id")
+                if sample is not None:
+                    enum_type = type(sample)
+                    return getattr(enum_type, "__name__", "target_id_enum"), enum_type
+        except Exception:
+            pass
+
+    return None, None
+
+
 def _resolve_nurture_target_id(enum_name: str):
-    enum_type = getattr(unreal, "HomeWorldNurtureTargetId", None)
+    type_name, enum_type = _find_nurture_target_enum_type()
     if enum_type is None:
-        _log("HomeWorldNurtureTargetId enum missing — run Safe-Build first")
+        _log("Nurture target enum missing — run Safe-Build first")
         return None
-    # UE Python exposes EHomeWorldNurtureTargetId members as N1_Crop / N2_Stored (not raw int).
-    aliases = {
-        "N1_CROP": "N1_Crop",
-        "N2_STORED": "N2_Stored",
-    }
-    target_id = getattr(enum_type, enum_name, None)
-    if target_id is None and enum_name in aliases:
-        target_id = getattr(enum_type, aliases[enum_name], None)
-    if target_id is None:
-        _log("HomeWorldNurtureTargetId.%s not found" % enum_name)
-    return target_id
+
+    for member in _member_name_variants(enum_name):
+        target_id = getattr(enum_type, member, None)
+        if target_id is not None:
+            if member != enum_name:
+                _log("Resolved %s via %s.%s" % (enum_name, type_name, member))
+            return target_id
+
+    # Last resort: match dir(enum_type) for N1/N2 substring (handles odd exporter names).
+    needle = "N1" if enum_name.upper().startswith("N1") else "N2"
+    for member in dir(enum_type):
+        if member.startswith("_") or needle not in member:
+            continue
+        target_id = getattr(enum_type, member, None)
+        if target_id is not None:
+            _log("Resolved %s via %s.%s (dir scan)" % (enum_name, type_name, member))
+            return target_id
+
+    _log("%s.%s not found (tried %s)" % (type_name, enum_name, ", ".join(_member_name_variants(enum_name))))
+    return None
 
 
 def _configure_target(actor, target_id, res_id: str) -> None:
@@ -107,8 +176,31 @@ def _configure_target(actor, target_id, res_id: str) -> None:
     if not comp_class or not hasattr(actor, "get_component_by_class"):
         return
     comp = actor.get_component_by_class(comp_class)
-    if comp and hasattr(comp, "configure_target") and target_id is not None:
-        comp.configure_target(target_id, unreal.Name(res_id))
+    if not comp or target_id is None:
+        return
+
+    res_name = unreal.Name(res_id)
+
+    if hasattr(comp, "configure_target"):
+        try:
+            comp.configure_target(target_id, res_name)
+            return
+        except TypeError as exc:
+            _log("configure_target failed (%s); trying set_editor_property" % exc)
+
+    for target_prop, res_prop in (
+        ("target_id", "required_resource_id"),
+        ("TargetId", "RequiredResourceId"),
+    ):
+        try:
+            comp.set_editor_property(target_prop, target_id)
+            comp.set_editor_property(res_prop, res_name)
+            _log("Configured via set_editor_property(%s)" % target_prop)
+            return
+        except Exception:
+            continue
+
+    _log("Could not configure nurture target on %s" % actor.get_name())
 
 
 def _ensure_target(label: str, enum_name: str, res_id: str, offset: unreal.Vector):
