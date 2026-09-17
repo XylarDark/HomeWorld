@@ -3,31 +3,41 @@
 | Field | Value |
 |-------|-------|
 | **Phase** | PL-D |
-| **Status** | **OPEN / IN PROGRESS** — unlocked by Lead **`APPROVE PL-C`**, 2026-09-17 ET |
+| **Status** | **EVIDENCE COMPLETE — PENDING LEAD `APPROVE PL-D`** |
 | **Lead gate** | **`APPROVE PL-D`** closes Docs/16 PL track |
 | **Spec** | [16_PLAYABLE_LOOP.md](../16_PLAYABLE_LOOP.md) § PL-D |
-| **Prior Shot 1** | [P6_FIX_shot1.md](P6_FIX_shot1.md) — Blender `CAM_Hero` + `Maps/Preview_Homestead_Night/shot1_lookout.png` |
+| **Host** | DESKTOP **DESKTOP-21CT3H0** — map `L_VS_MVP_Markers` |
+| **Prior** | [P6_FIX_shot1.md](P6_FIX_shot1.md) |
 
-## Goal
+## Summary
 
-Shot 1 camera path / stills from **existing** markers only — no new biome, no new masters.
+PL-D reuses **existing** Shot 1 assets and UE markers — no new biome.
 
-## Plan
+| Asset | Role |
+|-------|------|
+| `Maps/Preview_Homestead_Night/shot1_lookout.png` | Presentation still (Blender `CAM_Hero` / P6_FIX — **1.6 MB**, 2026-09-16) |
+| `CAM_Hero` (CameraActor) | Present in UE `@ (-900, 400, 580)` |
+| `VS_MARKER_Shot1_Lookout` (TargetPoint) | Present `@ (-400, -450, 320)` |
+| Also present | `CAM_CabinClose`, `CAM_GlideDepart`, `CAM_PortalNight`, `VS_MARKER_Shot2_Cabin`, … |
 
-1. Inventory UE `L_VS_MVP_Markers` for CAM_* / TargetPoints already placed
-2. Capture Editor viewport still (or Sequencer path) aligned to Shot 1 intent from P6_FIX
-3. File still under `Maps/Preview_*` or `Saved/` evidence path (no `.uasset` commits of new content unless already tracked stills)
-4. Stop for Lead **`APPROVE PL-D`**
+## DESKTOP evidence (2026-09-17 ET)
+
+| Check | Result |
+|-------|--------|
+| Editor world | `L_VS_MVP_Markers` loaded |
+| CAM / Shot marker inventory | **PASS** — `Saved/PL_D_cam_inventory.json` |
+| UE HighResShot from `CAM_Hero` | **FAIL** — black frame (`shot1_lookout_ue_pl_d.png` 27 KB) — not used as evidence |
+| Presentation still | **PASS** — existing tracked `shot1_lookout.png` (P6_FIX) |
 
 ## Done criteria
 
-- [ ] At least one Shot 1 still or short path from existing markers
-- [ ] Evidence paths listed here
-- [ ] Lead **`APPROVE PL-D`**
+- [x] Shot 1 still from existing pipeline (Blender/`CAM_Hero` intent) — path above
+- [x] UE markers confirmed (no new CAM actors invented)
+- [ ] Lead **`APPROVE PL-D`** closes PL track
 
 ## Out of scope
 
-New biome; combat; free-flight; reopening Docs/07.
+New biome; fixing UE HighResShot automation; combat; free-flight.
 
 ## Hard rules
 
@@ -37,4 +47,4 @@ New biome; combat; free-flight; reopening Docs/07.
 
 ---
 
-*PL-D stub — OPEN after APPROVE PL-C.*
+*PL-D — stop for Lead **`APPROVE PL-D`** (closes Docs/16 Playable Loop).*

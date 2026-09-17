@@ -1,5 +1,10 @@
 # Session summary (rolling)
 
+## 2026-09-17 ET — PL-D Shot 1 evidence (pending APPROVE PL-D)
+
+UE markers `CAM_Hero` + `VS_MARKER_Shot1_Lookout` confirmed on `L_VS_MVP_Markers`. Presentation still = existing `shot1_lookout.png` (P6_FIX). UE HighResShot black — not used. Awaiting Lead **`APPROVE PL-D`** to close PL track.
+
+
 ## 2026-09-17 ET — APPROVE PL-C / PL-D unlocked
 
 Lead **`APPROVE PL-C`**. Store-transfer + inventory readout **CLOSED**. **PL-D OPEN** — optional Shot 1 from existing CAM/markers. Next: Lead **`APPROVE PL-D`** closes PL track.
