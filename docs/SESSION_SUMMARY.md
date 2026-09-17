@@ -20,6 +20,13 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 ## Rolling log (newest first)
 
+### 2026-09-17 — VP-C APPROVED (APPROVE VP-C stamp)
+
+- Lead **`APPROVE VP-C`** (Luke Thompson, 2026-09-17 ET) — VP-C **APPROVED / CLOSED**; **VP-D IN PROGRESS** (unlocked).
+- Polish PR #69 @ `f88ece5` (PA-04 M_Nurtured visual, PA-06 interact prompts; PA-07 deferred). HR3-C branch protection **DEFERRED** unless Lead applies.
+- Docs stamped: [VP_C_POLISH.md](../Docs/handoffs/VP_C_POLISH.md), [VP_D_BOOTSTRAP_CI.md](../Docs/handoffs/VP_D_BOOTSTRAP_CI.md), [14_VP_VERIFY_POLISH.md](../Docs/14_VP_VERIFY_POLISH.md), [PHASE_BOARD.md](../swarm/PHASE_BOARD.md).
+- **Next:** Conductor DESKTOP PA-05 bootstrap dry-run; Lead branch-protection checklist; Lead **`APPROVE VP-D`** when VP-D complete.
+
 ### 2026-09-17 — Lead WAIVE VP-A re-verify (start VP-C)
 
 - Lead **`WAIVE VP-A re-verify`** (Luke Thompson, 2026-09-17 ET) — all required verb prefixes **WAIVED** for VP-C unlock per HR3-D.

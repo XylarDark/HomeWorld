@@ -3,14 +3,14 @@
 | Field | Value |
 |-------|-------|
 | **Phase** | VP-C |
-| **Status** | **IN PROGRESS / PENDING APPROVE VP-C** — impl landed in repo; **not COMPLETE** |
-| **Lead gate** | **`APPROVE VP-C`** before VP-C implementation PR merge / COMPLETE |
+| **Status** | **APPROVED / CLOSED** — Lead Luke Thompson, **`APPROVE VP-C`**, 2026-09-17 ET |
+| **Lead gate** | **`APPROVE VP-C`** — **APPROVED**; unlocks VP-D |
 | **Spec** | [14_VP_VERIFY_POLISH.md](../14_VP_VERIFY_POLISH.md) § VP-C |
 | **Baseline** | Main @ `f88ece5` (PR #69) + VP-A re-verify **WAIVED** |
 
 ## Summary
 
-Thin playability polish for the signed VS_MVP slice — no new systems, no combat, no free-flight. VP-A re-verify gate **WAIVED** — Lead **`WAIVE VP-A re-verify`** (Luke Thompson, 2026-09-17 ET) per [HR3_D_EVIDENCE_LANE.md](HR3_D_EVIDENCE_LANE.md). Honest automation **STILL FAIL** record in [VP_A_PIE.md](VP_A_PIE.md) § Re-verify. **VP-C may proceed to COMPLETE** when polish ships; still requires Lead **`APPROVE VP-C`**.
+Thin playability polish for the signed VS_MVP slice — no new systems, no combat, no free-flight. VP-A re-verify gate **WAIVED** — Lead **`WAIVE VP-A re-verify`** (Luke Thompson, 2026-09-17 ET) per [HR3_D_EVIDENCE_LANE.md](HR3_D_EVIDENCE_LANE.md). Honest automation **STILL FAIL** record in [VP_A_PIE.md](VP_A_PIE.md) § Re-verify. **VP-C APPROVED / CLOSED** — Lead **`APPROVE VP-C`**, 2026-09-17 ET; polish PR #69 @ `f88ece5`.
 
 ## Shipped (this PR)
 
@@ -55,4 +55,4 @@ Thin playability polish for the signed VS_MVP slice — no new systems, no comba
 
 ---
 
-*VP-C handoff — **IN PROGRESS / PENDING APPROVE VP-C**. Re-verify **WAIVED**; **COMPLETE** when polish ships + Lead **`APPROVE VP-C`**.*
+*VP-C **APPROVED / CLOSED** — Lead **`APPROVE VP-C`**, 2026-09-17 ET (polish PR #69 @ `f88ece5`). **VP-D IN PROGRESS** — see [VP_D_BOOTSTRAP_CI.md](VP_D_BOOTSTRAP_CI.md).*
