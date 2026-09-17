@@ -15,7 +15,7 @@
 | **Target** | Cursor cloud agent |
 | **Branch** | `cursor/<descriptive-kebab-name>-b3a5` |
 | **Base branch** | `main` (fetch before branch) |
-| **Hard rules** | Docs/07 CLOSED · FALLBACK armed · no `.uasset`/`.umap` · docs/swarm only unless packet says otherwise |
+| **Hard rules** | Docs/07 CLOSED · FALLBACK armed · default KEEP-LOCAL Content; allowlist per [Docs/20](../Docs/20_UASSET_AI_POLICY.md) · docs/swarm only unless packet says otherwise |
 
 ---
 
@@ -73,7 +73,7 @@ Cloud agents run on **Linux without Unreal Engine**. Do **not** attempt:
 - [ ] **`.\Tools\Safe-Build.ps1`** or any C++ build on the cloud VM
 - [ ] **`execute_python_script`** / Editor Python (no Editor)
 - [ ] **GUI automation** (`Content/Python/gui_automation/`) — Windows Editor only
-- [ ] Commit **`.uasset`** / **`.umap`** — binary work stays on Windows
+- [ ] Commit **`.uasset`** / **`.umap`** outside [Docs/20 allowlist](../Docs/20_UASSET_AI_POLICY.md) — default KEEP-LOCAL; binary work on DESKTOP
 
 **Do on cloud:** docs, markdown, validate.yml-safe JSON, C++ source edits, Python scripts (untested in Editor until Windows handoff).
 
@@ -89,7 +89,7 @@ If clone / cloud workspace hits **ResourceExhausted** (or equivalent checkout fa
 
 1. **Do not** invent a second full clone strategy or claim DESKTOP Shell from the cloud VM.
 2. Complete **docs-only** work via GitHub **Contents API** — e.g. `gh api repos/<owner>/<repo>/contents/<path>` (get / put / create branch / open PR). **No local clone required.**
-3. Still honor hard rules: Docs/07 CLOSED · FALLBACK armed · no combat · no `.uasset`/`.umap` · exclusive write paths.
+3. Still honor hard rules: Docs/07 CLOSED · FALLBACK armed · no combat · KEEP-LOCAL Content (allowlist per Docs/20) · exclusive write paths.
 4. Record in handoff **Blockers** or Evidence: `ResourceExhausted → gh Contents API` (path is **sanctioned**, not a waiver theater).
 
 This is the same path used for Docs/17a inventory and Docs/17b ops filings.

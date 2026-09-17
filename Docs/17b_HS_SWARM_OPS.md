@@ -9,7 +9,7 @@
 | **Prior gate** | [17a_HS_INVENTORY.md](17a_HS_INVENTORY.md) — Lead **`APPROVE HS-A`**, 2026-09-17 ET (stamp PR **#88**) |
 | **Baseline main** | tip at authoring (post-#88); strategy baseline `d59a0b2` (PL CLOSED) |
 | **Scope** | Encode post-PL swarm contracts for debt **#2, #4, #6, #8** — DESKTOP parent-only, Contents API fallback, batch digests, resume-from-handoff |
-| **Hard rules honored** | Docs/07 CLOSED; FALLBACK glide only; no combat; no `.uasset`/`.umap` commits; exactly 10 masters; no invented product phases |
+| **Hard rules honored** | Docs/07 CLOSED; FALLBACK glide only; no combat; Content KEEP-LOCAL (allowlist [20_UASSET_AI_POLICY.md](20_UASSET_AI_POLICY.md)); exactly 10 masters; no invented product phases |
 
 **Gate:** Lead **`APPROVE HS-B`** — **APPROVED** (Luke Thompson, 2026-09-17 ET). **HS-C UNLOCKED**.
 
@@ -58,7 +58,7 @@ After Docs/16 PL **CLOSED**, Conductor still carried ops rules as tribal knowled
 
 ### ResourceExhausted → sanctioned `gh` Contents API
 
-When a cloud/clone path returns **ResourceExhausted** (or equivalent clone/checkout failure), workers **may** complete docs-only work via GitHub **Contents API** (`gh api repos/.../contents/...`) — **no local clone required**. Prefer Contents API over inventing a second checkout strategy. Still no `.uasset`/`.umap`; still no DESKTOP claims from cloud.
+When a cloud/clone path returns **ResourceExhausted** (or equivalent clone/checkout failure), workers **may** complete docs-only work via GitHub **Contents API** (`gh api repos/.../contents/...`) — **no local clone required**. Prefer Contents API over inventing a second checkout strategy. Still KEEP-LOCAL Content (allowlist per Docs/20); still no DESKTOP claims from cloud.
 
 ### Batch digest preference
 

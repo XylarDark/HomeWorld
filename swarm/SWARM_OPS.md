@@ -264,7 +264,7 @@ When cloud clone / workspace returns **ResourceExhausted** (or equivalent):
 
 - **Sanctioned path:** GitHub **Contents API** via `gh api repos/<owner>/<repo>/contents/...` (read/write file, create branch, open PR) — **no local clone required**
 - Encode use in handoff Evidence/Blockers as `ResourceExhausted → gh Contents API`
-- Still: no `.uasset`/`.umap`; no DESKTOP Shell from cloud; exclusive ownership
+- Still: default **KEEP-LOCAL** for Content binaries; allowlist commits only per [Docs/20_UASSET_AI_POLICY.md](../Docs/20_UASSET_AI_POLICY.md); no DESKTOP Shell from cloud; exclusive ownership
 
 Packet: [CLOUD_AGENT_PACKET.md](CLOUD_AGENT_PACKET.md).
 

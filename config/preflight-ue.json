@@ -41,7 +41,7 @@
     "CONFIG_EMPTY_PATH": "Character config path is empty — assign skeletal_mesh (anim_blueprint may be empty only for legacy VP-B mesh-only interim)",
     "REPO_SCRIPT_MISSING": "Bootstrap or placement script missing from repo",
     "ASSET_MISSING_ON_DISK": "Required .uasset/.umap not found under Content/ (LFS or local import)",
-    "MANNEQUINS_DIR_MISSING": "Content/Characters/Mannequins missing — HS-E KEEP-LOCAL: copy Epic UE 5.7 TemplateResources High Characters Mannequins locally (see Docs/17e); never commit .uasset/.umap",
+    "MANNEQUINS_DIR_MISSING": "Content/Characters/Mannequins missing — HS-E KEEP-LOCAL: copy Epic UE 5.7 TemplateResources High Characters Mannequins locally (see Docs/17e); not on Docs/20 allowlist",
     "EDITOR_RESULTS_MISSING": "Editor deep-check results missing — run preflight_ue_editor.py via MCP on DESKTOP",
     "EDITOR_ABP_SKELETON": "ABP skeleton missing or AnimBP failed to compile (checks config anim_blueprint / characterAnimBlueprint)",
     "EDITOR_BP_MESH_EMPTY": "BP_HomeWorldCharacter skeletal mesh or anim_class unset/broken",

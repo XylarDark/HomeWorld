@@ -100,9 +100,13 @@ Lead policy **`HS-E POLICY KEEP-LOCAL`** (2026-09-17 ET): character mesh/ABP sta
 
 **Setup runbook:** [Docs/17e_HS_CONTENT_BOOTSTRAP.md](../../Docs/17e_HS_CONTENT_BOOTSTRAP.md) · DESKTOP checklist: [Docs/handoffs/HS_E_CONTENT_BOOTSTRAP.md](../../Docs/handoffs/HS_E_CONTENT_BOOTSTRAP.md).
 
-**Never** `git add` Mannequins `.uasset`/`.umap`. Do not claim DESKTOP path proof from cloud agents.
+**Never** `git add` Mannequins `.uasset`/`.umap` (excluded from [Docs/20 allowlist](../../Docs/20_UASSET_AI_POLICY.md)). Do not claim DESKTOP path proof from cloud agents.
 
 Config key: `content.requiredLocalDirs` in [config/preflight-ue.json](../../config/preflight-ue.json).
+
+### Docs/20 allowlisted assets (warn-only)
+
+`npm run check:uasset-allowlist` — warns when required allowlisted VS_MVP / character assets are missing on disk. Use `--strict` to fail. See [Docs/20_UASSET_AI_POLICY.md](../../Docs/20_UASSET_AI_POLICY.md).
 
 ---
 

@@ -2,6 +2,27 @@
 * text=auto eol=lf
 *.bat text eol=crlf
 
-# Unreal binary assets (LFS)
-*.uasset filter=lfs diff=lfs merge=lfs -text
-*.umap filter=lfs diff=lfs merge=lfs -text
+# --- Docs/20 UASSET allowlist — Git LFS for permitted Content binaries ---
+# One-time: git lfs install
+# Policy: Docs/20_UASSET_AI_POLICY.md
+
+# VS_MVP slice (maps, markers, in-map shot cameras)
+Content/HomeWorld/Maps/VS_MVP/** filter=lfs diff=lfs merge=lfs -text
+
+# Gameplay-critical character BPs
+Content/HomeWorld/Characters/BP_*.uasset filter=lfs diff=lfs merge=lfs -text
+Content/HomeWorld/Characters/ABP_HomeWorldCharacter.uasset filter=lfs diff=lfs merge=lfs -text
+
+# Gather / place-spawn abilities
+Content/HomeWorld/Abilities/GA_Place.uasset filter=lfs diff=lfs merge=lfs -text
+Content/HomeWorld/Abilities/GA_Interact.uasset filter=lfs diff=lfs merge=lfs -text
+
+# AI draft refs (PNG/WebP + sidecars — not UE Content)
+Docs/refs/ai/** filter=lfs diff=lfs merge=lfs -text
+art/wip/** filter=lfs diff=lfs merge=lfs -text
+
+# --- Grandfather: pre-Docs/20 tracked binaries (LFS retained; do not expand) ---
+# New commits outside Docs/20 allowlist require Lead APPROVE UASSET ALLOWLIST <id>
+Content/HomeWorld/** filter=lfs diff=lfs merge=lfs -text
+Content/__ExternalActors__/** filter=lfs diff=lfs merge=lfs -text
+Content/__ExternalObjects__/** filter=lfs diff=lfs merge=lfs -text

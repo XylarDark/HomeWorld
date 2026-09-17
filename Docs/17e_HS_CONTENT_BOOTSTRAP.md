@@ -10,7 +10,7 @@
 | **Policy** | Lead **`HS-E POLICY KEEP-LOCAL`**, 2026-09-17 ET — Option A |
 | **Debt** | Docs/17a ledger **#5** — Character assets local-only (`Content/Characters/Mannequins`) |
 | **Baseline** | PL-A Manny + `ABP_Unarmed` ([PL_A_CHARACTER.md](handoffs/PL_A_CHARACTER.md), PRs #75–#77) · HR3-B preflight |
-| **Hard rules honored** | Docs/07 CLOSED; FALLBACK glide only; no combat; **no `.uasset`/`.umap` commits** in this PR; exactly 10 masters; no invented product phases |
+| **Hard rules honored** | Docs/07 CLOSED; FALLBACK glide only; no combat; Mannequins **KEEP-LOCAL** (superseded for other paths by [20_UASSET_AI_POLICY.md](20_UASSET_AI_POLICY.md)); exactly 10 masters; no invented product phases |
 
 **Gate:** Lead typed **`HS-E POLICY KEEP-LOCAL`**. Next: Lead types **`APPROVE HS-E`**. This filing does **not** claim **`APPROVE HS-E`**.
 
@@ -37,7 +37,7 @@ One honest policy for Mannequins / Manny provenance + bootstrap / preflight expe
 | **Lead string** | **`HS-E POLICY KEEP-LOCAL`** |
 | **Meaning** | Keep current PL-A paths (`/Game/Characters/Mannequins/...`). Mannequins stay **local-only** on each DESKTOP. Document copy + preflight. |
 | **Config change** | **None** — `character_blueprint_config.json` already matches DESKTOP. |
-| **Git** | Still **no** `.uasset`/`.umap` commits. |
+| **Git** | Mannequins **never** committed. Other Content: default KEEP-LOCAL; allowlist per [20_UASSET_AI_POLICY.md](20_UASSET_AI_POLICY.md) (PENDING **`APPROVE UASSET POLICY`**). |
 | **Cold clone** | **Will fail loud** until § Complete DESKTOP setup runbook is followed. |
 | **Options B/C** | Not chosen — Engine-only and binary strategy remain documented history only; do not implement without a new Lead policy string. |
 

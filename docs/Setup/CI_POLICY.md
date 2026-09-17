@@ -55,7 +55,7 @@ When a PR changes **any** of these paths, **`build-win64` is required** (green o
 | Docs / markdown only | **Required** | **Not required** (workflow skipped) |
 | Python Editor scripts (`Content/Python/`) | **Required** | Optional (run PIE/tests on Windows) |
 | C++ (`Source/`, `*.Build.cs`, `*.uproject`, plugin Source) | **Required** | **Required** — must be green before merge |
-| `.uasset` / `.umap` | N/A (never commit) | Windows Editor only |
+| `.uasset` / `.umap` | Allowlist only ([Docs/20_UASSET_AI_POLICY.md](../../Docs/20_UASSET_AI_POLICY.md)); default KEEP-LOCAL | Windows Editor + Git LFS for allowlisted paths |
 
 If the self-hosted runner is offline, **do not merge** C++ PRs until `build-win64` is green or Lead documents a **waiver** (below).
 

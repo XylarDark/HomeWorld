@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "policyDoc": "Docs/20_UASSET_AI_POLICY.md",
+  "gateString": "APPROVE UASSET POLICY",
+  "gitLfsInstallHint": "git lfs install && git lfs pull",
+  "allowlist": {
+    "repoPaths": [
+      "Content/HomeWorld/Maps/VS_MVP",
+      "Content/HomeWorld/Characters/BP_",
+      "Content/HomeWorld/Characters/ABP_HomeWorldCharacter.uasset",
+      "Content/HomeWorld/Abilities/GA_Place.uasset",
+      "Content/HomeWorld/Abilities/GA_Interact.uasset"
+    ],
+    "excludeRepoPaths": [
+      "Content/Characters/Mannequins",
+      "Content/__ExternalActors__",
+      "Content/__ExternalObjects__"
+    ]
+  },
+  "requiredOnDisk": [
+    {
+      "gamePath": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers",
+      "label": "VS_MVP markers map"
+    },
+    {
+      "gamePath": "/Game/HomeWorld/Characters/BP_HomeWorldCharacter",
+      "label": "HomeWorld character BP"
+    }
+  ],
+  "aiDraftPaths": [
+    "Docs/refs/ai",
+    "art/wip"
+  ]
+}
