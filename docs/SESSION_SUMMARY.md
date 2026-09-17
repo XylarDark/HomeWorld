@@ -1,5 +1,10 @@
 # Session summary (rolling)
 
+## 2026-09-17 ET — PL-A Manny substitute APPROVED
+
+Lead approved **UE 5.7 template Mannequin** (`SKM_Manny_Simple` + `ABP_Unarmed`) as PL-A substitute for missing `SK_Man_Full_01`. Config paths updated; DESKTOP copies Mannequins locally (**no `.uasset` commits**). Next: MCP apply + `preflight:ue --require-editor`, then Lead **`APPROVE PL-A`**.
+
+
 ## 2026-09-17 ET — APPROVE PL STRATEGY / Docs/16
 
 Lead **`APPROVE PL STRATEGY`**. Playable Loop track **ACTIVE**: PL-A character realization OPEN; PL-B/C/D LOCKED. Prior VP track CLOSED.
