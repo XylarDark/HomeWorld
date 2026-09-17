@@ -8963,3 +8963,19 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 **Gate:** Await Lead `APPROVE WAVE D` before WAVE E.
 
+---
+
+## 2026-09-17 — WAVE E slice upgrade pass
+
+**Tasks completed:**
+- `Docs/08e_UPGRADE_PASS.md` — §7 target table (DONE/PARTIAL/DEFERRED), evidence, gate to WAVE F.
+- `bootstrap_project.py` — default orchestration → `batch_import_asset_creation` + `place_vs_mvp_markers`; legacy PCG opt-in only.
+- `pie_test_runner.py` — soft VS_MVP / MPC / marker checks.
+- `TimeOfDaySubsystem` — NightMix scalar on `MPC_HomeWorld_Time` when `SetPhase` runs; GameMode recognizes VS_MVP slice levels.
+- Helpers: `wire_nightmix_mpc_note.py`, `create_master_materials_stub.py`.
+- Quarantine banners on `docs/Maps/*` and `docs/PCG/*`; pointer updates in `Docs/README.md` and `08_AUDIT_UPGRADE_STRATEGY.md`.
+
+**Verification:** Safe-Build not run on cloud VM — required on DESKTOP-21CT3H0 for C++ compile.
+
+**Gate:** Await Lead `APPROVE WAVE E` before WAVE F deletes.
+
