@@ -3,6 +3,26 @@
 #include "HomeWorldTimeOfDaySubsystem.h"
 #include "HAL/IConsoleManager.h"
 #include "Engine/World.h"
+#include "Kismet/KismetMaterialLibrary.h"
+#include "Materials/MaterialParameterCollection.h"
+
+namespace HomeWorldNightMix
+{
+	static const TCHAR* MPCAssetPath = TEXT("/Game/HomeWorld/Materials/MPC_HomeWorld_Time.MPC_HomeWorld_Time");
+	static const FName NightMixParamName(TEXT("NightMix"));
+
+	float NightMixForPhase(EHomeWorldTimeOfDayPhase Phase)
+	{
+		switch (Phase)
+		{
+		case EHomeWorldTimeOfDayPhase::Day:   return 0.f;
+		case EHomeWorldTimeOfDayPhase::Dusk:  return 0.35f;
+		case EHomeWorldTimeOfDayPhase::Night: return 0.85f; // homestead night target (place_vs_mvp_markers default)
+		case EHomeWorldTimeOfDayPhase::Dawn:  return 0.15f;
+		default:                              return 0.f;
+		}
+	}
+}
 
 namespace
 {
@@ -44,6 +64,28 @@ bool UHomeWorldTimeOfDaySubsystem::GetIsDefendPhaseActive() const
 	return GetIsNight();
 }
 
+void UHomeWorldTimeOfDaySubsystem::SetNightMixScalar(float NightMix)
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+	UMaterialParameterCollection* MPC = LoadObject<UMaterialParameterCollection>(nullptr, HomeWorldNightMix::MPCAssetPath);
+	if (!MPC)
+	{
+		UE_LOG(LogTemp, Verbose, TEXT("HomeWorld: NightMix MPC not found (%s) — skip (run place_vs_mvp_markers.py on Windows host)."), HomeWorldNightMix::MPCAssetPath);
+		return;
+	}
+	UKismetMaterialLibrary::SetScalarParameterValue(World, MPC, HomeWorldNightMix::NightMixParamName, NightMix);
+	UE_LOG(LogTemp, Log, TEXT("HomeWorld: NightMix=%.2f on MPC_HomeWorld_Time"), NightMix);
+}
+
+void UHomeWorldTimeOfDaySubsystem::ApplyNightMixForPhase(EHomeWorldTimeOfDayPhase Phase)
+{
+	SetNightMixScalar(HomeWorldNightMix::NightMixForPhase(Phase));
+}
+
 void UHomeWorldTimeOfDaySubsystem::SetPhase(EHomeWorldTimeOfDayPhase Phase)
 {
 	IConsoleVariable* CVar = IConsoleManager::Get().FindConsoleVariable(TEXT("hw.TimeOfDay.Phase"));
@@ -57,6 +99,7 @@ void UHomeWorldTimeOfDaySubsystem::SetPhase(EHomeWorldTimeOfDayPhase Phase)
 		const float Duration = CVarNightDurationSeconds.GetValueOnGameThread();
 		NightPhaseEndTime = GetWorld()->GetTimeSeconds() + Duration;
 	}
+	ApplyNightMixForPhase(Phase);
 }
 
 void UHomeWorldTimeOfDaySubsystem::AdvanceToDawn()

@@ -1,8 +1,10 @@
 # PCG Setup — HomeWorld (UE 5.7)
 
+> **Historical / quarantine (WAVE D–E):** ForestIsland PCG on DemoMap/Homestead is **legacy harness** content. The signed MVP slice uses kit meshes + VS_MVP markers ([Docs/08d_CONTENT_CANON.md](../../Docs/08d_CONTENT_CANON.md)); PCG graphs are WAVE F delete candidates. Keep this doc for quarantined map work only.
+
 This doc is the **full reference** for PCG (procedural trees/rocks): what the script does, what you must do in the Editor, and how to fix "Generate produces nothing."
 
-**Want a short, step-by-step path?** Use [**PCG_QUICK_SETUP.md**](PCG_QUICK_SETUP.md) first — one-page flow (manual-only or script + 3 manual steps) and volume sizing. **Primary demo map:** DemoMap and **create_demo_from_scratch.py**; see [../Maps/DEMO_MAP.md](../Maps/DEMO_MAP.md).
+**Want a short, step-by-step path?** Use [**PCG_QUICK_SETUP.md**](PCG_QUICK_SETUP.md) first. **Legacy demo map:** DemoMap and **create_demo_from_scratch.py** (quarantine); MVP slice primary is **VS_MVP** — see [Maps/VS_MVP/README.md](../../Maps/VS_MVP/README.md).
 
 For **elegant, research-backed approaches** (one-time "golden" graph so you don’t repeat manual steps), see **[PCG_ELEGANT_SOLUTIONS.md](PCG_ELEGANT_SOLUTIONS.md)**.
 

@@ -57,6 +57,7 @@ Decide what old Homestead/PCG/Mass/abilities stays vs yields to `Docs/04` import
 
 Upgrade C++/BP/Python that touch the signed vertical slice first; defer off-slice polish systems.
 
+- **Deliverable:** [08e_UPGRADE_PASS.md](08e_UPGRADE_PASS.md)
 - **Gate:** Lead **APPROVE WAVE E**
 
 ### WAVE F — Archive / delete

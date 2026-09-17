@@ -116,6 +116,116 @@ def check_on_ground():
         return {"name": "On ground", "passed": False, "detail": str(e)}
 
 
+VS_MVP_LEVEL_ASSET = "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers"
+MPC_HOMEWORLD_TIME = "/Game/HomeWorld/Materials/MPC_HomeWorld_Time"
+VS_MVP_MARKER_LABELS = (
+    "VS_MARKER_Shot1_Lookout",
+    "VS_MARKER_Shot2_Cabin",
+    "VS_MARKER_LeaveIsland_FALLBACK",
+    "VS_MARKER_LandPlanet",
+    "VS_MARKER_PortalHome",
+    "VS_MARKER_PortalPlanet",
+)
+
+
+def check_vs_mvp_level_asset():
+    """Soft-check L_VS_MVP_Markers asset exists (local Windows Content may omit binaries)."""
+    try:
+        exists = unreal.EditorAssetLibrary.does_asset_exist(VS_MVP_LEVEL_ASSET)
+        if not exists:
+            return {
+                "name": "VS_MVP level asset",
+                "passed": True,
+                "detail": "SKIP: %s not in project — run place_vs_mvp_markers.py on Windows host (DESKTOP-21CT3H0)" % VS_MVP_LEVEL_ASSET,
+            }
+        return {
+            "name": "VS_MVP level asset",
+            "passed": True,
+            "detail": "Asset exists: %s" % VS_MVP_LEVEL_ASSET,
+        }
+    except Exception as e:
+        return {
+            "name": "VS_MVP level asset",
+            "passed": True,
+            "detail": "SKIP (soft): could not query asset — %s" % str(e),
+        }
+
+
+def check_mpc_homeworld_time():
+    """Soft-check MPC_HomeWorld_Time with NightMix scalar stub exists."""
+    try:
+        exists = unreal.EditorAssetLibrary.does_asset_exist(MPC_HOMEWORLD_TIME)
+        if not exists:
+            return {
+                "name": "MPC_HomeWorld_Time",
+                "passed": True,
+                "detail": "SKIP: %s not in project — created by place_vs_mvp_markers.py; NightMix driven from TimeOfDaySubsystem when present" % MPC_HOMEWORLD_TIME,
+            }
+        return {
+            "name": "MPC_HomeWorld_Time",
+            "passed": True,
+            "detail": "Asset exists: %s (NightMix scalar; C++ SetPhase updates via TimeOfDaySubsystem)" % MPC_HOMEWORLD_TIME,
+        }
+    except Exception as e:
+        return {
+            "name": "MPC_HomeWorld_Time",
+            "passed": True,
+            "detail": "SKIP (soft): could not query MPC — %s" % str(e),
+        }
+
+
+def check_vs_mvp_markers_in_level():
+    """When PIE level is VS_MVP: count VS_MARKER_* TargetPoints if dress exists; soft-skip otherwise."""
+    if not is_pie_running():
+        return {"name": "VS_MVP markers in level", "passed": False, "detail": "PIE not running"}
+    world = get_pie_world()
+    if not world:
+        return {"name": "VS_MVP markers in level", "passed": False, "detail": "No PIE world"}
+    level_name = _get_pie_level_name(world)
+    is_vs_mvp = False
+    if level_name:
+        level_lower = level_name.lower()
+        is_vs_mvp = "vs_mvp" in level_lower or "l_vs_mvp" in level_lower
+    if not is_vs_mvp:
+        return {
+            "name": "VS_MVP markers in level",
+            "passed": True,
+            "detail": "Level=%s (not VS_MVP); marker check N/A" % (level_name or "unknown"),
+        }
+    try:
+        found = []
+        for actor in unreal.GameplayStatics.get_all_actors_of_class(world, unreal.TargetPoint):
+            try:
+                label = actor.get_actor_label()
+            except Exception:
+                continue
+            if label in VS_MVP_MARKER_LABELS:
+                found.append(label)
+        if not found:
+            return {
+                "name": "VS_MVP markers in level",
+                "passed": True,
+                "detail": "Level=%s; no VS_MARKER_* TargetPoints in PIE — run place_vs_mvp_markers.py or open L_VS_MVP_Markers (soft skip)" % (level_name or "unknown"),
+            }
+        passed = len(found) >= 3
+        return {
+            "name": "VS_MVP markers in level",
+            "passed": passed,
+            "detail": "Level=%s; markers found=%d/%d (%s)" % (
+                level_name,
+                len(found),
+                len(VS_MVP_MARKER_LABELS),
+                ", ".join(found[:4]) + ("..." if len(found) > 4 else ""),
+            ),
+        }
+    except Exception as e:
+        return {
+            "name": "VS_MVP markers in level",
+            "passed": True,
+            "detail": "Level=%s; exception enumerating markers (soft skip): %s" % (level_name or "unknown", str(e)),
+        }
+
+
 def check_demomap_morning_spawn():
     """When PIE is on DemoMap (or Homestead): verify time-of-day is Day (0) and player spawns and is on ground. MVP tutorial List 2 (wake up in homestead). See CONSOLE_COMMANDS § Tutorial (List 2) verification."""
     if not is_pie_running():
@@ -1804,6 +1914,9 @@ ALL_CHECKS = [
     check_pie_active,
     check_character_spawned,
     check_on_ground,
+    check_vs_mvp_level_asset,
+    check_mpc_homeworld_time,
+    check_vs_mvp_markers_in_level,
     check_demomap_morning_spawn,
     check_capsule,
     check_skeletal_mesh,

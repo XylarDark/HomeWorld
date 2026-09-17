@@ -1,6 +1,8 @@
 # Homestead Map
 
-**For current development use DemoMap;** see [DEMO_MAP.md](DEMO_MAP.md). This doc describes the Homestead map for campaign/later use.
+> **Historical / quarantine (WAVE D–E):** MVP slice canon is **`Maps/VS_MVP`** + Docs/04 import path — not Homestead campaign maps. See [Docs/08d_CONTENT_CANON.md](../../Docs/08d_CONTENT_CANON.md). Homestead docs remain until WAVE F archive.
+
+**Legacy campaign map** (quarantined). For MVP slice use [Maps/VS_MVP/README.md](../../Maps/VS_MVP/README.md) and `place_vs_mvp_markers.py`.
 
 **When to use this:** You need the Homestead level for narrative/campaign content (tutorial home, compound, outbuildings). For the primary demo and MVP build-out, use **DemoMap** and `create_demo_from_scratch.py` instead.
 

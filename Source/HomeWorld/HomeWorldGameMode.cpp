@@ -809,8 +809,11 @@ void AHomeWorldGameMode::BeginPlay()
 			UE_LOG(LogTemp, Log, TEXT("HomeWorld: Homestead not on planetoid; Level=%s"), *LevelName);
 		}
 
-		// T1 (List 2): Tutorial start = morning. When loading DemoMap or a level named like tutorial/homestead, set time-of-day to Day (0 = morning). See MVP_TUTORIAL_PLAN List 2, CONSOLE_COMMANDS hw.TimeOfDay.Phase.
-		const bool bIsTutorialMap = LevelName.Equals(TEXT("DemoMap"), ESearchCase::IgnoreCase)
+		// T1 (List 2) + WAVE E: Tutorial/slice start = morning on VS_MVP markers level or legacy DemoMap/Homestead.
+		const bool bIsVsMvpSlice = LevelName.Contains(TEXT("VS_MVP"), ESearchCase::IgnoreCase)
+			|| LevelName.Contains(TEXT("L_VS_MVP"), ESearchCase::IgnoreCase);
+		const bool bIsTutorialMap = bIsVsMvpSlice
+			|| LevelName.Equals(TEXT("DemoMap"), ESearchCase::IgnoreCase)
 			|| LevelName.Contains(TEXT("Demo"), ESearchCase::IgnoreCase)
 			|| LevelName.Contains(TEXT("Homestead"), ESearchCase::IgnoreCase);
 		if (bIsTutorialMap)
@@ -818,7 +821,7 @@ void AHomeWorldGameMode::BeginPlay()
 			if (UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>())
 			{
 				TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Day);
-				UE_LOG(LogTemp, Log, TEXT("HomeWorld: Tutorial start — time-of-day set to morning (Phase Day); Level=%s"), *LevelName);
+				UE_LOG(LogTemp, Log, TEXT("HomeWorld: Slice/tutorial start — time-of-day set to morning (Phase Day, NightMix=0); Level=%s"), *LevelName);
 			}
 		}
 	}

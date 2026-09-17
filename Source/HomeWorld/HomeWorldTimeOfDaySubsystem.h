@@ -54,6 +54,18 @@ public:
 	virtual void AdvanceToDawn();
 
 	/**
+	 * Push NightMix scalar to MPC_HomeWorld_Time when the asset exists (WAVE E slice look).
+	 * Masters read NightMix per Docs/02_MATERIAL_SHEET.md; created by place_vs_mvp_markers.py.
+	 * No-op if MPC missing (Content may be local-only on Windows host).
+	 */
+	UFUNCTION(BlueprintCallable, Category = "TimeOfDay", meta = (DisplayName = "Apply Night Mix For Phase"))
+	virtual void ApplyNightMixForPhase(EHomeWorldTimeOfDayPhase Phase);
+
+	/** Set NightMix on MPC_HomeWorld_Time directly (0=day, 1=full night overlay). Logs result. */
+	UFUNCTION(BlueprintCallable, Category = "TimeOfDay", meta = (DisplayName = "Set Night Mix Scalar"))
+	virtual void SetNightMixScalar(float NightMix);
+
+	/**
 	 * Seconds until dawn when current phase is Night (stub countdown).
 	 * When phase is set to Night, a fixed-duration countdown starts (see hw.TimeOfDay.NightDurationSeconds, default 120).
 	 * Returns -1 when not night. Used by HUD for "time until dawn" display. See docs/tasks (T4 night countdown).

@@ -4,6 +4,11 @@
 # without manually running setup_enhanced_input.py. Idempotent: safe to run every load.
 # Also ensures MainMenu map exists (create from template if missing) and switches EditorStartupMap
 # to MainMenu so the next Editor launch opens on the main menu.
+#
+# WAVE E slice canon: VS_MVP + Docs/04 import is primary (bootstrap_project.py /
+# place_vs_mvp_markers.py). Do NOT run batch import or marker placement here — too heavy for
+# every Editor load. NightMix MPC is created by place_vs_mvp_markers; C++ TimeOfDaySubsystem
+# drives NightMix on SetPhase when MPC exists.
 
 import sys
 import os
