@@ -3,8 +3,8 @@
 | Field | Value |
 |-------|-------|
 | **Phase** | HR3-C |
-| **Status** | **PENDING LEAD APPLY** — GitHub branch protection not confirmed by agent |
-| **Lead gate** | Apply settings → stamp **APPLIED** (or **DEFERRED** + ticket) → **`APPROVE HR3-C`** |
+| **Status** | **DEFERRED** — Lead skip 2026-09-17 ET; GitHub apply not verified |
+| **Lead gate** | **`APPROVE HR3-C deferred`** — checklist delivered (PR #62); apply later via [CI_SETUP.md](../../docs/Setup/CI_SETUP.md) |
 | **Spec** | [15c_HR3_C_BRANCH_PROTECTION.md](../15c_HR3_C_BRANCH_PROTECTION.md) |
 | **Checklist** | [docs/Setup/CI_SETUP.md](../../docs/Setup/CI_SETUP.md) § Branch protection |
 
@@ -66,6 +66,6 @@ Set status **DEFERRED**, add ticket/issue link and reason (e.g. waiting for firs
 
 | When | Who | Action |
 |------|-----|--------|
-| 2026-09-17 | Cloud Agent | Checklist + handoff filed; API **403** — **PENDING LEAD APPLY** |
-| _pending_ | Lead | GitHub settings applied → **APPLIED** |
-| _pending_ | Lead | **`APPROVE HR3-C`** |
+| 2026-09-17 | Cloud Agent | Checklist + handoff filed; API **403** — **PENDING LEAD APPLY** (PR #62) |
+| 2026-09-17 | Lead (Luke Thompson) | Typed **skip** on UI/API verify → **DEFERRED**; **`APPROVE HR3-C deferred`** — checklist in CI_SETUP for later apply |
+| _pending_ | Lead | GitHub settings applied → **APPLIED** (when ready) |
