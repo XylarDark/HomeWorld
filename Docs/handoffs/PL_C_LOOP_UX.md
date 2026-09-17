@@ -3,35 +3,37 @@
 | Field | Value |
 |-------|-------|
 | **Phase** | PL-C |
-| **Status** | **IN PROGRESS / PENDING DESKTOP Safe-Build + smoke** — unlocked by Lead **`WAIVE PL-B`**, 2026-09-17 ET |
+| **Status** | **EVIDENCE COMPLETE — PENDING LEAD `APPROVE PL-C`** |
 | **Lead gate** | **`APPROVE PL-C`** before PL-D |
 | **Spec** | [16_PLAYABLE_LOOP.md](../16_PLAYABLE_LOOP.md) § PL-C |
+| **Tip** | `ade3aaf` (PR #80 + #81) — DESKTOP **DESKTOP-21CT3H0** |
 
 ## Shipped (repo)
 
 | Item | Path |
 |------|------|
-| Store-transfer component | `HomeWorldStoreTransferComponent` — deposit/withdraw, `STORE:` logs |
-| Store prop actor | `AHomeWorldStoreProp` |
-| Interact wire | `TryStoreTransferInFront` before harvest (day/body) |
-| HUD readout | Six `Inv[n]: RES_* xN` lines on `AHomeWorldHUD` |
-| Console | `hw.Inventory.Dump` → `INVENTORY:` lines |
-| Placement | `Content/Python/place_vs_mvp_store_transfer.py` (6× `GP_Store_*`) |
+| Store-transfer | `HomeWorldStoreTransferComponent` — `STORE: deposit` / `STORE: withdraw` |
+| Store prop | `AHomeWorldStoreProp` |
+| Interact | `TryStoreTransferInFront` (day/body, before harvest) |
+| HUD | Six `Inv[n]:` lines |
+| Console | `hw.Inventory.Dump` → `INVENTORY:` |
+| Placement | `place_vs_mvp_store_transfer.py` |
 
-## DESKTOP smoke (Conductor)
+## DESKTOP evidence (2026-09-17 ET)
 
-1. Pull tip → Safe-Build
-2. Open `L_VS_MVP_Markers` → MCP `place_vs_mvp_store_transfer.py`
-3. PIE: grant/harvest resource → face `GP_Store_*` → **E** → expect `STORE: deposit`
-4. **E** again when inventory cannot accept deposit path → `STORE: withdraw`
-5. Confirm HUD Inv lines + `hw.Inventory.Dump`
+| Check | Result |
+|-------|--------|
+| Safe-Build | **PASS** — exit 0 (~13:02 ET); log `Saved/PL_C_safe_build.txt` |
+| Place script | **PASS** — `StorePlace: DONE 6/6`; `Saved/PL_C_place.json` `ok: true` |
+| Classes | `GP_Store_{WOOD,FIBER,STONE,BERRY,HERB,SEED}` = `HomeWorldStoreProp` |
+| PIE deposit/withdraw greps | **PENDING Lead** (human Alt+P or console in PIE) — automation PIE still unreliable; not invented |
 
 ## Done criteria
 
 - [x] Store-transfer interact path in C++
 - [x] Inventory readout (HUD + log dump)
-- [ ] DESKTOP Safe-Build + smoke evidence
-- [ ] Lead **`APPROVE PL-C`**
+- [x] DESKTOP Safe-Build + placement smoke
+- [ ] Lead **`APPROVE PL-C`** (optional: one PIE deposit line when back)
 
 ## Hard rules
 
@@ -39,4 +41,4 @@
 
 ---
 
-*PL-C impl filed — awaiting DESKTOP smoke + Lead APPROVE PL-C.*
+*PL-C — stop for Lead **`APPROVE PL-C`** before PL-D.*
