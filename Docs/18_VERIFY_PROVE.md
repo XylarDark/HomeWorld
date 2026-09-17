@@ -44,7 +44,7 @@ Prove the signed playable loop on **DESKTOP-21CT3H0** with **real** editor-log g
 | Docs/17 HS | **CLOSED / COMPLETE** |
 | **Docs/18 / VP2 strategy** | **APPROVED** — Lead **`APPROVE VP2 STRATEGY`**, 2026-09-17 ET |
 | **VP2-A** | **PENDING `APPROVE VP2-A`** — DESKTOP retry **9/9 PASS** soft-reject caveats ([VP2_A_EVIDENCE.md](handoffs/VP2_A_EVIDENCE.md)) |
-| **VP2-B** | **IN PROGRESS** — Lead early unlock (2026-09-17 ET); success-path fixes in [VP2_B_FIX.md](handoffs/VP2_B_FIX.md); awaiting DESKTOP re-prove |
+| **VP2-B** | **APPROVED / COMPLETE** — Lead **`APPROVE VP2-B`**, 2026-09-17 ET (DESKTOP 9/9 success-path; [VP2_B_FIX.md](handoffs/VP2_B_FIX.md)) |
 | **VP2-C** | LOCKED (optional; Lead picks flavor after VP2-A/B) |
 
 ---
@@ -86,7 +86,13 @@ Naming: **VP2-A … VP2-C** (Verify & Prove 2). Do **not** reuse Docs/14 `VP-A�
 | **Deliverable** | [Docs/handoffs/VP2_B_FIX.md](handoffs/VP2_B_FIX.md) + DESKTOP `Saved/vp2_b_evidence.json` |
 | **Gate** | Lead **`APPROVE VP2-B`** (VP2-A remains **PENDING** until separate Lead action) |
 
-**Status:** **IN PROGRESS** — CLOUD fixes merged; DESKTOP Safe-Build + PIE re-prove pending Conductor parent.
+**Status:** **APPROVED / COMPLETE** — Lead **`APPROVE VP2-B`**, 2026-09-17 ET. DESKTOP re-prove **9/9 PASS** success-path ([VP2_B_FIX.md](handoffs/VP2_B_FIX.md)). VP2-A remains **PENDING `APPROVE VP2-A`**.
+
+**Done criteria:**
+
+- [x] CLOUD success-path fixes merged
+- [x] DESKTOP Safe-Build + PIE re-prove **9/9 PASS**
+- [x] Lead **`APPROVE VP2-B`**
 
 ### VP2-C — Optional follow-on (Lead picks one)
 
@@ -121,7 +127,7 @@ Naming: **VP2-A … VP2-C** (Verify & Prove 2). Do **not** reuse Docs/14 `VP-A�
 
 1. Lead **`APPROVE VP2 STRATEGY`** — **DONE** (2026-09-17 ET; PR #101)
 2. Conductor **VP2-A DESKTOP prove** — **FILED** (retry 9/9 PASS) — **PENDING `APPROVE VP2-A`**
-3. Conductor **VP2-B DESKTOP re-prove** — **IN PROGRESS** ([VP2_B_FIX.md](handoffs/VP2_B_FIX.md))
+3. Conductor **VP2-B DESKTOP re-prove** — **APPROVED** — Lead **`APPROVE VP2-B`**, 2026-09-17 ET ([VP2_B_FIX.md](handoffs/VP2_B_FIX.md))
 
 ---
 
