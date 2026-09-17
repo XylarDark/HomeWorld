@@ -2,22 +2,40 @@
 
 **When to use this:** Opening a PR or choosing whether a change needs a Windows UE build.
 
+**HR2-C (2026-09-17):** `build-win64` is **Required** when a PR touches C++ paths (see path list below). Docs-only PRs remain **validate-only**.
+
 ---
 
 ## Two workflows
 
 | Workflow | Runner | UE required | When it runs |
 |----------|--------|-------------|--------------|
-| **[validate.yml](../../.github/workflows/validate.yml)** | GitHub-hosted Ubuntu | No | Every push/PR to `main` / `master` |
-| **[ci.yml](../../.github/workflows/ci.yml)** | Self-hosted `[self-hosted, windows, ue57]` | Yes (UE 5.7 + VS) | Push/PR when workflow triggers; needs **DESKTOP-21CT3H0** (or equivalent) online |
+| **[validate.yml](../../.github/workflows/validate.yml)** | GitHub-hosted Ubuntu | No | **Every** push/PR to `main` / `master` |
+| **[ci.yml](../../.github/workflows/ci.yml)** | Self-hosted `[self-hosted, windows, ue57]` | Yes (UE 5.7 + VS) | Push/PR that touches **C++ path filters** (below); needs **DESKTOP-21CT3H0** (or equivalent) online |
 
-Full runner setup: [CI_SETUP.md](CI_SETUP.md). Cloud → Windows handoff: [WINDOWS_BRIDGE.md](WINDOWS_BRIDGE.md).
+Full runner setup: [CI_SETUP.md](CI_SETUP.md). Cloud → Windows handoff: [WINDOWS_BRIDGE.md](WINDOWS_BRIDGE.md). HR2-C deliverable: [Docs/13c_HR2_C_CI_GATE.md](../../Docs/13c_HR2_C_CI_GATE.md).
+
+---
+
+## C++ path filters (ci.yml ↔ CI_POLICY — must stay in sync)
+
+When a PR changes **any** of these paths, **`build-win64` is required** (green on self-hosted Windows runner):
+
+| Path pattern | Examples |
+|--------------|----------|
+| `Source/**` | `Source/HomeWorld/*.cpp`, `Source/HomeWorld/*.h` |
+| `**/*.Build.cs` | `Source/HomeWorld/HomeWorld.Build.cs` |
+| `*.uproject` | `HomeWorld.uproject` |
+| `Plugins/**/Source/**` | Tracked plugin C++ (if any) |
+| `.github/workflows/ci.yml` | CI workflow changes (re-validates build gate) |
+
+**Not in C++ filters:** `docs/**`, `Docs/**`, `Content/Python/**`, `Config/*.ini` (unless paired with C++ paths), `.cursor/**`, `swarm/**`.
 
 ---
 
 ## What validate checks (DOCS_LAYOUT truth)
 
-`validate.yml` verifies:
+`validate.yml` verifies (runs on **all** PRs):
 
 - `HomeWorld.uproject` valid JSON
 - `Content/Python/*.json` valid
@@ -26,7 +44,7 @@ Full runner setup: [CI_SETUP.md](CI_SETUP.md). Cloud → Windows handoff: [WINDO
 - **DevEnvTemplate pin + submodule** — gitlink matches [config/devenv-template-pin.json](../../config/devenv-template-pin.json); empty submodule dir is inited in CI ([scripts/verify-devenv-submodule.sh](../../scripts/verify-devenv-submodule.sh); HR2-B)
 - Git hygiene (no `__pycache__`, temp JSON in root)
 
-**Docs-only PRs:** `validate` + `python-lint` jobs are sufficient. No `ci.yml` / Win64 build required.
+**Docs-only PRs:** `validate` + `python-lint` jobs are **sufficient**. `ci.yml` does **not** run (no C++ path changes). No Win64 build required.
 
 ---
 
@@ -34,12 +52,40 @@ Full runner setup: [CI_SETUP.md](CI_SETUP.md). Cloud → Windows handoff: [WINDO
 
 | Change type | validate | ci.yml build-win64 |
 |-------------|----------|-------------------|
-| Docs / markdown only | Required | Not required |
-| Python Editor scripts (`Content/Python/`) | Required | Optional (run PIE/tests on Windows) |
-| C++ (`Source/`, `*.Build.cs`) | Required | **Recommended** — cloud agents cannot Safe-Build locally |
+| Docs / markdown only | **Required** | **Not required** (workflow skipped) |
+| Python Editor scripts (`Content/Python/`) | **Required** | Optional (run PIE/tests on Windows) |
+| C++ (`Source/`, `*.Build.cs`, `*.uproject`, plugin Source) | **Required** | **Required** — must be green before merge |
 | `.uasset` / `.umap` | N/A (never commit) | Windows Editor only |
 
-If the self-hosted runner is offline, merge may proceed for docs-only work; C++ PRs should wait for green build or explicit Lead verification on **DESKTOP-21CT3H0**.
+If the self-hosted runner is offline, **do not merge** C++ PRs until `build-win64` is green or Lead documents a **waiver** (below).
+
+---
+
+## Lead waiver (build-win64 escape hatch)
+
+When the Windows runner is unavailable or Lead accepts merge risk without a CI build:
+
+1. Add to the **PR description** (exact phrase): `Lead waiver: build-win64`
+2. **Or** apply GitHub label: `lead-waiver-build-win64`
+3. Lead explicitly approves merge in review (Conductor / Human Lead)
+
+The workflow skips `build-win64` when the waiver is present and posts a notice job. **Validate must still be green.** Waiver is for **build-win64 only** — not for skipping `validate` or committing `.uasset`.
+
+---
+
+## Branch protection (GitHub settings — Lead action)
+
+Repo settings are outside this tree. Lead should configure **Settings → Branches → Branch protection** for `main`:
+
+| Check | Required on `main` | Notes |
+|-------|-------------------|-------|
+| `validate` | **Yes** | Every PR |
+| `python-lint` | **Yes** | Every PR |
+| `build-win64` | **Yes** | Only runs when C++ paths change; skipped PRs show no check (docs-only merges OK) |
+
+If GitHub blocks docs-only PRs because `build-win64` never ran, use **“Do not require status checks to pass before merging”** for checks that did not run (GitHub default for skipped workflows), or enforce C++ gate via Lead review + this policy until rulesets support path-scoped required checks.
+
+Details: [CI_SETUP.md](CI_SETUP.md) § Branch protection.
 
 ---
 
@@ -65,3 +111,4 @@ Prefer normal commits so `validate` stays green on every merge.
 - [BUILD_POLICY.md](BUILD_POLICY.md) — Safe-Build for agents
 - [MCP_SETUP.md](MCP_SETUP.md) — Editor MCP after build
 - [Docs/11a_HR_MEASURES.md](../../Docs/11a_HR_MEASURES.md) — SH-01 CI flake baseline
+- [Docs/13c_HR2_C_CI_GATE.md](../../Docs/13c_HR2_C_CI_GATE.md) — HR2-C evidence and done criteria

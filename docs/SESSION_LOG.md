@@ -9096,3 +9096,15 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 **Gate:** NP-E **COMPLETE** — await Lead **`APPROVE NP-E`** (final product NP phase). STOP for Lead stamp.
 
+---
+
+## 2026-09-17 — HR2-B stamp + HR2-C C++ CI gate (cloud agent)
+
+**Lead:** **`APPROVE HR2-B`** (Luke Thompson, 2026-09-17 ET).
+
+**Delivered:** HR2-B stamped APPROVED in Docs/13, 13b, handoffs/HR2_B_COLD_CLONE; HR2-C unlocked. `ci.yml` path filters (`Source/**`, `**/*.Build.cs`, `*.uproject`, `Plugins/**/Source/**`); `build-win64` promoted from recommended to **Required** in CI_POLICY; Lead waiver (`Lead waiver: build-win64` / label `lead-waiver-build-win64`); branch protection notes in CI_SETUP; CLOUD_AGENT_PACKET updated; Docs/13c_HR2_C_CI_GATE.md + handoffs/HR2_C_CI_GATE.md; PHASE_BOARD HR2-C COMPLETE.
+
+**Out of scope:** UE on Ubuntu; build-win64 for docs/Python-only; gameplay C++.
+
+**Gate:** HR2-C **COMPLETE** — await Lead **`APPROVE HR2-C`** (closes HR2 track). STOP — do not invent HR2-D.
+

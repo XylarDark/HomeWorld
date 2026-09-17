@@ -20,6 +20,13 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 ## Rolling log (newest first)
 
+### 2026-09-17 — HR2-C C++ CI gate (build-win64 required)
+
+- Lead **`APPROVE HR2-B`** (Luke Thompson, 2026-09-17 ET) — HR2-B **APPROVED**; HR2-C unlocked.
+- HR2-C: `ci.yml` path filters for C++ paths; `build-win64` **Required** (was recommended); Lead waiver documented; branch protection note in CI_SETUP.
+- Deliverables: [Docs/13c_HR2_C_CI_GATE.md](../Docs/13c_HR2_C_CI_GATE.md), [Docs/handoffs/HR2_C_CI_GATE.md](../Docs/handoffs/HR2_C_CI_GATE.md).
+- **Next:** Lead **`APPROVE HR2-C`** → HR2 track **CLOSED**. **Do not invent HR2-D.**
+
 ### 2026-09-17 — HR2-B cold-clone submodule onboarding
 
 - Lead **`APPROVE HR2-A`** (Luke Thompson, 2026-09-17 ET) — HR2-A **APPROVED**; HR2-B unlocked.

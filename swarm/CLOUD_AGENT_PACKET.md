@@ -38,8 +38,8 @@ cursor/<descriptive-name>-b3a5
 |----------|--------|
 | **PR URL** | GitHub PR link in handoff + PHASE_BOARD note |
 | **Merge SHA** | Squash-merge commit on `main` after Lead/Conductor merge |
-| **CI status** | `validate` + `python-lint` green (required for docs PRs) |
-| **Optional `ci.yml`** | When `Source/` or `*.Build.cs` changed — self-hosted `windows`/`ue57` runner |
+| **CI status** | `validate` + `python-lint` green (required for **all** PRs) |
+| **`ci.yml` / `build-win64`** | **Required** when PR touches C++ paths: `Source/**`, `**/*.Build.cs`, `*.uproject`, `Plugins/**/Source/**` — self-hosted `windows`/`ue57` runner on **DESKTOP-21CT3H0**. **Lead waiver:** PR body `Lead waiver: build-win64` or label `lead-waiver-build-win64` — see [CI_POLICY.md](../docs/Setup/CI_POLICY.md) (HR2-C) |
 | **Windows validation** | DESKTOP-21CT3H0: Safe-Build → Editor → MCP — not on cloud VM |
 
 List repo-relative paths for every deliverable (files created/changed). Gate claims without paths are invalid per SWARM_OPS.
@@ -66,4 +66,4 @@ Cloud agents run on **Linux without Unreal Engine**. Do **not** attempt:
 
 On completion, Conductor files `Docs/handoffs/<packet_id>.md` using [HANDOFF_TEMPLATE.md](HANDOFF_TEMPLATE.md) § Cloud agent PR section.
 
-**Gate:** Lead **`APPROVE HR-*`** per [Docs/11_SWARM_HARNESS_REFINE.md](../Docs/11_SWARM_HARNESS_REFINE.md).
+**Gate:** Lead **`APPROVE HR2-*`** per [Docs/13_HR2_HARNESS_REFINE.md](../Docs/13_HR2_HARNESS_REFINE.md) (HR2 track) or legacy **`APPROVE HR-*`** per [Docs/11_SWARM_HARNESS_REFINE.md](../Docs/11_SWARM_HARNESS_REFINE.md).

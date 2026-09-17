@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **COMPLETE — awaiting Lead `APPROVE HR2-B`** |
+| **Status** | **APPROVED** — Lead Luke Thompson, **`APPROVE HR2-B`**, 2026-09-17 ET |
 | **Date** | 2026-09-17 |
 | **Author** | Cloud Agent (HR2-B) |
 | **Strategy** | [13_HR2_HARNESS_REFINE.md](13_HR2_HARNESS_REFINE.md) — Lead **`APPROVE HR2 STRATEGY`**, 2026-09-17 ET |
@@ -12,7 +12,7 @@
 
 ## Gate
 
-**Awaiting** Lead **`APPROVE HR2-B`** — do **not** start HR2-C until approved.
+**APPROVED** — Lead Luke Thompson typed **`APPROVE HR2-B`** on 2026-09-17 ET. HR2-C unlocked.
 
 ---
 
@@ -134,8 +134,8 @@ doctor:ue exit: 0 (only accepted declines remain)
 - [x] CI inits empty submodule (cold-clone path in validate)
 - [x] Runbook copy-paste complete in CURSOR_DEV + AGENTS.md
 - [x] No manual "ask in chat" steps
-- [ ] Lead **`APPROVE HR2-B`** → unlock HR2-C
+- [x] Lead **`APPROVE HR2-B`** → unlock HR2-C
 
 ---
 
-*HR2-B complete — Conductor stops for Lead **`APPROVE HR2-B`**.*
+*HR2-B **APPROVED** 2026-09-17 ET — HR2-C unlocked.*
