@@ -1,3 +1,8 @@
+## 2026-09-17 ET — Docs/20 UASSET/AI policy DRAFT
+
+Lead requested UASSET allowlist + AI provenance policy. [Docs/20_UASSET_AI_POLICY.md](../Docs/20_UASSET_AI_POLICY.md) + [AI_ASSET_LOG.md](../Docs/AI_ASSET_LOG.md) filed; scoped `.gitattributes` LFS; `npm run check:uasset-allowlist`; swarm/setup pointers updated. PHASE_BOARD **IN PROGRESS** — PENDING **`APPROVE UASSET POLICY`**. No Content binaries in PR.
+
+
 ## 2026-09-17 ET — APPROVE HS-G
 
 Lead Luke Thompson **`APPROVE HS-G`**, 2026-09-17 ET. [Docs/17g_HS_G_OPS_DIET.md](../Docs/17g_HS_G_OPS_DIET.md) stamped **APPROVED / COMPLETE**; PHASE_BOARD HS-G closed; Docs/17/18/17d pointers synced. PR #105 merged. VP2-A/B gate strings unchanged.
