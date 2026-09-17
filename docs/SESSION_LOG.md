@@ -9031,3 +9031,12 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 **Gate:** HR-A **COMPLETE** — await Lead **`APPROVE HR-A`**. Do not start HR-B.
 
+---
+
+## 2026-09-17 — HR-A Windows backfill (Docs/11a)
+
+**Tasks completed:**
+- Filled Windows DESKTOP-21CT3H0 rows in `Docs/11a_HR_MEASURES.md` from live run (~23:13 ET, HEAD `675388a`): Node v22.17.1, submodule init PASS, doctor non-zero (5 criticals), rules 34/2255/122342 chars, PHASE_BOARD stale confirmed, entrypoint dual-OS grep clean.
+
+**Gate:** HR-A **COMPLETE** — await Lead **`APPROVE HR-A`**.
+
