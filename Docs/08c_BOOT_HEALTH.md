@@ -88,7 +88,7 @@ After Safe-Build green and Editor open, the **Docs/05 UE import first pass** suc
 | FALLBACK transit | UNCHANGED | Scripted glide + portal both ways (armed) |
 
 **Runbook:** [Docs/05_UE_IMPORT_FIRST_PASS.md](05_UE_IMPORT_FIRST_PASS.md)  
-**Handoff note:** [Docs/handoffs/UE_IMPORT_FIRST_PASS_DONE.md](handoffs/UE_IMPORT_FIRST_PASS_DONE.md) (on PR #10 branch / pending merge)  
+**Handoff note:** [Docs/handoffs/UE_IMPORT_FIRST_PASS_DONE.md](handoffs/UE_IMPORT_FIRST_PASS_DONE.md) (PR #10 merged)  
 **Automation:** `Content/Python/place_vs_mvp_markers.py`, `Content/Python/batch_import_asset_creation.py`
 
 ### Content binaries — local on Windows
