@@ -3,7 +3,7 @@
 **Current phase:** **PL-B** (human PIE verb pass) — **OPEN / IN PROGRESS** — PL-A **APPROVED / CLOSED** (Lead **`APPROVE PL-A`**, 2026-09-17 ET)
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **DESKTOP** + **Lead** (Alt+P Output Log greps)  
-**Blocked by:** human Alt+P evidence before Lead **`APPROVE PL-B`**. Branch protection remains **DEFERRED** (HR3-C).
+**Blocked by:** Lead presence for Alt+P (DESKTOP prepped — Manny + one-shot checklist). Branch protection remains **DEFERRED** (HR3-C).
 
 | Phase | Name | Owners | Status | Gate file | Handoffs |
 |---|---|---|---|---|---|
@@ -74,7 +74,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | ID | Phase | Host | Owner | Write path | Due artifact |
 |---|---|---|---|---|---|
 | PL-A-character | PL-A | DESKTOP+CLOUD | CND | Docs/handoffs/ | [PL_A_CHARACTER.md](../Docs/handoffs/PL_A_CHARACTER.md) — **APPROVED / CLOSED** — Lead **`APPROVE PL-A`**, 2026-09-17 ET |
-| PL-B-pie | PL-B | DESKTOP+Lead | CND+Lead | Docs/handoffs/ | [PL_B_PIE.md](../Docs/handoffs/PL_B_PIE.md) — human Alt+P greps FORM/FALLBACK/HEAL/NURTURE/DAWN/TAME + GATHER; Lead **`APPROVE PL-B`** |
+| PL-B-pie | PL-B | DESKTOP+Lead | CND+Lead | Docs/handoffs/ | [PL_B_PIE.md](../Docs/handoffs/PL_B_PIE.md) — **READY FOR Alt+P** (Manny verified; one-shot checklist filed); Lead away — greps **PENDING** |
 | VP-A-reverify | VP-A | Lead | Lead | Docs/handoffs/ | **WAIVED** — Lead **`WAIVE VP-A re-verify`**, 2026-09-17 ET; debt closes under **PL-B** |
 | HR3-C-branch-protection | HR3-C | Lead | Lead | docs/Setup/ | **DEFERRED** — [HR3_C_BRANCH_PROTECTION.md](../Docs/handoffs/HR3_C_BRANCH_PROTECTION.md) |
 
