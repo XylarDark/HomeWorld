@@ -9072,3 +9072,15 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 **Gate:** NP-C **COMPLETE** — await Lead **`APPROVE NP-C`**.
 
+---
+
+## 2026-09-17 — NP-D SYS V3–V4 + APPROVE NP-C stamp (cloud agent)
+
+**Lead:** **`APPROVE NP-C`** (Luke Thompson, 2026-09-17 ET).
+
+**Delivered:** Docs/11 conflict resolution; NP-C handoff/gate stamped APPROVED; Docs/12d_NP_D_SYS_V3_V4.md + handoffs/NP_D_SYS_V3_V4.md; C++ six-slot RES_* inventory (`HomeWorldInventoryTypes`, upgraded `HomeWorldInventorySubsystem`), `AHomeWorldResourcePile::TryHarvest`, `UHomeWorldBeastTameComponent`, `TryTameBeastInFront`; `place_vs_mvp_beast_tame.py`; PHASE_BOARD NP-D COMPLETE.
+
+**Windows follow-up:** Safe-Build after merge; `place_vs_mvp_beast_tame.py`; PIE gather + tame runbook (Docs/12d).
+
+**Gate:** NP-D **COMPLETE** — await Lead **`APPROVE NP-D`**. Do not start NP-E.
+

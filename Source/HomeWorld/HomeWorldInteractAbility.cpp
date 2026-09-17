@@ -38,6 +38,10 @@ void UHomeWorldInteractAbility::ActivateAbility(const FGameplayAbilitySpecHandle
 	}
 	if (!bHandled)
 	{
+		bHandled = Character->TryTameBeastInFront();
+	}
+	if (!bHandled)
+	{
 		bHandled = Character->TryHarvestInFront();
 	}
 	EndAbility(Handle, ActorInfo, ActivationInfo, false, !bHandled);

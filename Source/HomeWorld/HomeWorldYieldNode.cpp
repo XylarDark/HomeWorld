@@ -75,6 +75,8 @@ void AHomeWorldYieldNode::ProduceYield()
 	UHomeWorldInventorySubsystem* Inv = GI->GetSubsystem<UHomeWorldInventorySubsystem>();
 	if (!Inv) return;
 
-	Inv->AddResource(ResourceType, YieldRate);
-	UE_LOG(LogTemp, Log, TEXT("HomeWorld: YieldNode '%s' produced %s +%d"), *GetName(), *ResourceType.ToString(), YieldRate);
+	if (Inv->TryAddResource(ResourceType, YieldRate))
+	{
+		UE_LOG(LogTemp, Log, TEXT("GATHER: YieldNode '%s' produced %s +%d"), *GetName(), *ResourceType.ToString(), YieldRate);
+	}
 }

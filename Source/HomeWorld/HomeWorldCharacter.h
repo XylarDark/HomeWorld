@@ -37,7 +37,11 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	/** Trace forward and harvest the first resource pile hit; adds ResourceType/AmountPerHarvest to inventory. Called from GA_Interact / UHomeWorldInteractAbility. */
+	/** Trace forward and offer tame food on beast pad (V4). Day/body only. Called from GA_Interact before harvest. */
+	UFUNCTION(BlueprintCallable, Category = "Interaction", meta = (DisplayName = "Try Tame Beast In Front"))
+	bool TryTameBeastInFront();
+
+	/** Trace forward and harvest the first resource pile hit; adds RES_* +1 to six-slot inventory. Called from GA_Interact / UHomeWorldInteractAbility. */
 	UFUNCTION(BlueprintCallable, Category = "Interaction", meta = (DisplayName = "Try Harvest In Front"))
 	bool TryHarvestInFront();
 

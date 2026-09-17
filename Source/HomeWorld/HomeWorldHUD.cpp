@@ -96,7 +96,7 @@ void AHomeWorldHUD::DrawHUD()
 		float DisplayUntil = 0.f;
 		if (Inv->GetLastBossRewardForHUD(RewardAmount, DisplayUntil) && World->GetTimeSeconds() < DisplayUntil)
 		{
-			const FString BossRewardLine = FString::Printf(TEXT("Boss reward: +%d Wood"), RewardAmount);
+			const FString BossRewardLine = FString::Printf(TEXT("Boss reward: +%d RES_WOOD"), RewardAmount);
 			Canvas->SetDrawColor(FColor::Yellow);
 			Canvas->DrawText(Font, BossRewardLine, X, Y, TextScale, TextScale);
 			Canvas->SetDrawColor(FColor::White);

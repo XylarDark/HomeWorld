@@ -20,24 +20,25 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 ## Rolling log (newest first)
 
-<<<<<<< HEAD
-### 2026-09-17 — NP-B lookdev apply (Windows evidence)
+### 2026-09-17 — NP-D SYS V3–V4 + APPROVE NP-C stamp
 
-- Lead **`APPROVE NP-A`** — NP-B unlocked (2026-09-17 ET).
-- Windows DESKTOP-21CT3H0 @ HEAD `82c7eb2`: `assign_vs_mvp_materials` **Done** — 78 actors, 78 slots assigned, 0 missing/unmapped; 8 masters used (`M_BeastStylized` + `M_Nurtured` unused — expected).
-- NightMix smoke **FAILED** (`KismetMaterialLibrary` — non-blocking; C++ PIE NightMix OK). Level saved locally; not committed.
-- [Docs/12b_NP_B_LOOKDEV.md](../Docs/12b_NP_B_LOOKDEV.md) + [Docs/handoffs/NP_B_LOOKDEV.md](../Docs/handoffs/NP_B_LOOKDEV.md) stamped **COMPLETE**.
-- **Next:** Lead **`APPROVE NP-B`** → unlock NP-C.
-=======
+- Lead **`APPROVE NP-C`** (Luke Thompson, 2026-09-17 ET) — NP-C **APPROVED**; NP-D unlocked.
+- Resolved Docs/11 + SESSION_SUMMARY conflict markers; NP-A/B/C **APPROVED**; next gate **`APPROVE NP-D`**.
+- NP-D: RES_* six-slot inventory, gather path, beast tame SM — [12d_NP_D_SYS_V3_V4.md](../Docs/12d_NP_D_SYS_V3_V4.md).
+- **Next:** Lead **`APPROVE NP-D`** after PR merge + Windows Safe-Build → unlock NP-E.
+
 ### 2026-09-17 — NP-C form + V1 polish
 
 - Lead **`APPROVE NP-B`** — lookdev apply signed off (Luke Thompson, 2026-09-17 ET).
 - NP-C delivered: [12c_NP_C_FORM_V1.md](../Docs/12c_NP_C_FORM_V1.md) — GP_PlayerStart, form swap (FORM: logs), soft walk bounds, V2/V5 PIE runbook, NightMix smoke script.
 - C++: `HomeWorldSoftBoundsComponent`, character form sync via `TimeOfDaySubsystem::OnPhaseChanged`.
 - Python: `place_vs_mvp_gp.py`, `smoke_nightmix_phase.py`, `vs_mvp_walk_bounds.json`; bootstrap chain extended.
-- **Windows:** Safe-Build required after merge; then run placement scripts + PIE runbook.
-- **Next:** Lead **`APPROVE NP-C`** → unlock NP-D.
->>>>>>> 860bdf2 (feat(np-c): form swap, GP_PlayerStart, soft walk bounds)
+
+### 2026-09-17 — NP-B lookdev apply (Windows evidence)
+
+- Lead **`APPROVE NP-A`** — NP-B unlocked (2026-09-17 ET).
+- Windows DESKTOP-21CT3H0 @ HEAD `82c7eb2`: `assign_vs_mvp_materials` **Done** — 78 actors, 78 slots assigned, 0 missing/unmapped; 8 masters used (`M_BeastStylized` + `M_Nurtured` unused — expected).
+- NightMix smoke residual (non-blocking). [Docs/12b_NP_B_LOOKDEV.md](../Docs/12b_NP_B_LOOKDEV.md) **APPROVED**.
 
 ### 2026-09-17 — NP-A inventory / gap map
 

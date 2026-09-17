@@ -19,6 +19,8 @@
 #include "HomeWorldPlayerState.h"
 #include "HomeWorldResourcePile.h"
 #include "HomeWorldInventorySubsystem.h"
+#include "HomeWorldInventoryTypes.h"
+#include "HomeWorldBeastTameComponent.h"
 #include "HomeWorldSpiritRosterSubsystem.h"
 #include "HomeWorldTimeOfDaySubsystem.h"
 #include "InputActionValue.h"
@@ -682,6 +684,39 @@ bool AHomeWorldCharacter::TryShrinePortalInteract()
 	return false;
 }
 
+bool AHomeWorldCharacter::TryTameBeastInFront()
+{
+	UWorld* World = GetWorld();
+	if (!World || GetIsSpiritForm())
+	{
+		return false;
+	}
+	const FVector Start = GetActorLocation() + FVector(0.0f, 0.0f, GetCapsuleComponent() ? GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight() * 0.5f : 50.0f);
+	const FVector Forward = GetControlRotation().Vector();
+	const float TraceLength = 280.0f;
+	const FVector End = Start + Forward * TraceLength;
+	FHitResult Hit;
+	FCollisionQueryParams Params(NAME_None, false, this);
+	if (!World->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params))
+	{
+		return false;
+	}
+	AActor* HitActor = Hit.GetActor();
+	if (!HitActor)
+	{
+		return false;
+	}
+	if (UHomeWorldBeastTameComponent* Tame = HitActor->FindComponentByClass<UHomeWorldBeastTameComponent>())
+	{
+		if (Tame->GetTameState() == EHomeWorldBeastTameState::Tamed)
+		{
+			return Tame->TryPromoteToHelper(this);
+		}
+		return Tame->TryOfferFood(this);
+	}
+	return false;
+}
+
 bool AHomeWorldCharacter::TryHarvestInFront()
 {
 	UWorld* World = GetWorld();
@@ -689,11 +724,11 @@ bool AHomeWorldCharacter::TryHarvestInFront()
 	{
 		return false;
 	}
-	// T5: Physical = day harvest only; night collect = Spiritual (handled by spiritual collectibles).
+	// SYS V3: gather day/body only.
 	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
-	if (TimeOfDay && TimeOfDay->GetIsNight())
+	if (GetIsSpiritForm() || (TimeOfDay && TimeOfDay->GetIsNight()))
 	{
-		UE_LOG(LogTemp, Log, TEXT("HomeWorld: Harvest only available by day (Physical). Current phase is night."));
+		UE_LOG(LogTemp, Log, TEXT("GATHER: blocked — night or spirit form"));
 		return false;
 	}
 	const FVector Start = GetActorLocation() + FVector(0.0f, 0.0f, GetCapsuleComponent() ? GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight() * 0.5f : 50.0f);
@@ -719,12 +754,12 @@ bool AHomeWorldCharacter::TryHarvestInFront()
 		{
 			return false;
 		}
-		const FName ResourceType = Pile->ResourceType;
-		const int32 Amount = Pile->AmountPerHarvest;
-		Inv->AddResource(ResourceType, Amount);
-		const int32 PhysicalTotal = Inv->GetTotalPhysicalGoods();
-		UE_LOG(LogTemp, Log, TEXT("HomeWorld: Harvest succeeded (Physical) - %s +%d (total Physical: %d)"), *ResourceType.ToString(), Amount, PhysicalTotal);
-		return true;
+		if (Pile->TryHarvest(Inv))
+		{
+			UE_LOG(LogTemp, Log, TEXT("GATHER: harvest ok (total Physical: %d)"), Inv->GetTotalPhysicalGoods());
+			return true;
+		}
+		return false;
 	}
 
 	// Day 18: Treasure POI (tag Treasure_POI) — grant resources and remove actor
@@ -736,9 +771,9 @@ bool AHomeWorldCharacter::TryHarvestInFront()
 		{
 			if (UHomeWorldInventorySubsystem* Inv = GI->GetSubsystem<UHomeWorldInventorySubsystem>())
 			{
-				Inv->AddResource(FName("Wood"), 25);
+				Inv->TryAddResource(HomeWorldInventory::RES_WOOD, 3);
 				const int32 PhysicalTotal = Inv->GetTotalPhysicalGoods();
-				UE_LOG(LogTemp, Log, TEXT("HomeWorld: Treasure opened (Physical) - Wood +25 (total Physical: %d)"), PhysicalTotal);
+				UE_LOG(LogTemp, Log, TEXT("GATHER: treasure RES_WOOD +3 (total Physical: %d)"), PhysicalTotal);
 			}
 		}
 		HitActor->Destroy();
