@@ -20,6 +20,13 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 ## Rolling log (newest first)
 
+### 2026-09-17 — VP strategy APPROVED (APPROVE VP STRATEGY stamp)
+
+- Lead **`APPROVE VP STRATEGY`** (Luke Thompson, 2026-09-17 ET) — Docs/14 **APPROVED / ACTIVE**; VP-A **UNLOCKED / IN PROGRESS**.
+- Docs stamped: [14_VP_VERIFY_POLISH.md](../Docs/14_VP_VERIFY_POLISH.md), [PHASE_BOARD.md](../swarm/PHASE_BOARD.md); stub [handoffs/VP_A_PIE.md](../Docs/handoffs/VP_A_PIE.md) pending DESKTOP evidence.
+- Product NP **CLOSED**. HR2 **CLOSED**. VP-B/C/D **LOCKED** until their gates.
+- **Next:** DESKTOP PIE evidence → Lead **`APPROVE VP-A`**. **Do not mark VP-A complete without evidence.**
+
 ### 2026-09-17 — VP Verify & Polish strategy (docs-only)
 
 - Delivered [Docs/14_VP_VERIFY_POLISH.md](../Docs/14_VP_VERIFY_POLISH.md) — **DRAFT**; phases VP-A (PIE evidence), VP-B (smoke/ABP), VP-C (thin polish), VP-D (bootstrap + branch protection).

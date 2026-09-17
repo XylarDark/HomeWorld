@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **DRAFT — awaiting Lead `APPROVE VP STRATEGY`** |
+| **Status** | **APPROVED / ACTIVE** — Lead Luke Thompson, **`APPROVE VP STRATEGY`**, 2026-09-17 ET |
 | **Date** | 2026-09-17 |
 | **Baseline** | Main post-NP + HR2 — product NP-A…E **CLOSED**, HR2-A…C **CLOSED** |
 | **Author** | Conductor (HomeWorld) |
@@ -13,11 +13,11 @@
 
 ## Gate
 
-Lead **`APPROVE VP STRATEGY`** — **PENDING**.
+Lead **`APPROVE VP STRATEGY`** — **APPROVED** (Luke Thompson, 2026-09-17 ET).
 
-**Next gate after approval:** **`APPROVE VP-A`** (unlocks VP-A PIE evidence work on Windows DESKTOP).
+**Next gate:** **`APPROVE VP-A`** after DESKTOP PIE evidence is filed in [handoffs/VP_A_PIE.md](handoffs/VP_A_PIE.md).
 
-**Conductor stops here.** No VP-A…D implementation until Lead approves this strategy.
+**VP-A unlocked / IN PROGRESS** — Windows DESKTOP PIE evidence work may begin. VP-B/C/D remain **LOCKED** until their gates.
 
 ---
 
@@ -47,8 +47,8 @@ Product NP (NP-A…E) and Harness Refine 2 (HR2-A…C) are **CLOSED**. Senior po
 |-------|--------|
 | **Product NP (Docs/11)** | **CLOSED** |
 | **Harness HR2 (Docs/13)** | **CLOSED** |
-| **Docs/14 / VP strategy** | **DRAFT — await `APPROVE VP STRATEGY`** |
-| **VP-A** | **LOCKED** |
+| **Docs/14 / VP strategy** | **APPROVED** — Lead **`APPROVE VP STRATEGY`**, 2026-09-17 ET |
+| **VP-A** | **UNLOCKED / IN PROGRESS** |
 | **VP-B** | **LOCKED** |
 | **VP-C** | **LOCKED** |
 | **VP-D** | **LOCKED** |
@@ -200,8 +200,8 @@ Naming: **VP-A … VP-D** (Verify & Polish). Do **not** reuse NP-* or HR2-* phas
 Phases run **sequentially** (recommended: A → B → C → D) unless Lead directs parallel work after strategy approval — each phase still requires its own APPROVE before implementation.
 
 ```
-Docs/14 / VP STRATEGY: DRAFT — await APPROVE VP STRATEGY
-VP-A: LOCKED — VP-B: LOCKED — VP-C: LOCKED — VP-D: LOCKED
+Docs/14 / VP STRATEGY: APPROVED — Lead Luke Thompson, APPROVE VP STRATEGY, 2026-09-17 ET
+VP-A: UNLOCKED / IN PROGRESS — VP-B: LOCKED — VP-C: LOCKED — VP-D: LOCKED
 Product NP: CLOSED — HR2: CLOSED
 ```
 
@@ -223,4 +223,4 @@ Product NP: CLOSED — HR2: CLOSED
 
 ---
 
-*Conductor prepared this file; **stop for Lead `APPROVE VP STRATEGY`**. No VP-A…D implementation in the strategy PR.*
+*Conductor prepared this file; Lead **`APPROVE VP STRATEGY`** locked 2026-09-17 ET. VP-A PIE evidence in progress on DESKTOP; VP-B/C/D implementation PRs await their gates.*
