@@ -9,7 +9,6 @@ AHomeWorldNurtureTarget::AHomeWorldNurtureTarget()
 	SetRootComponent(Root);
 
 	NurtureComponent = CreateDefaultSubobject<UHomeWorldNurtureComponent>(TEXT("Nurture"));
-	NurtureComponent->SetupAttachment(Root);
 
 	Tags.AddUnique(FName(TEXT("NurtureTarget")));
 }

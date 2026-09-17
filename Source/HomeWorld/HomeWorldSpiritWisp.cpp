@@ -10,7 +10,6 @@ AHomeWorldSpiritWisp::AHomeWorldSpiritWisp()
 	SetRootComponent(Root);
 
 	HealComponent = CreateDefaultSubobject<UHomeWorldSpiritHealComponent>(TEXT("SpiritHeal"));
-	HealComponent->SetupAttachment(Root);
 
 	Tags.AddUnique(FName(TEXT("SpiritWound")));
 	Tags.AddUnique(FName(TEXT("SM_SpiritWound_01")));
