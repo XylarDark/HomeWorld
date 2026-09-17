@@ -1,11 +1,11 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **HS-F** — Sign-off & re-grade (**IN PROGRESS**)
+**Current phase:** — (no active HS phase) — **Docs/17 Harness & Swarm Audit CLOSED / COMPLETE** (Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET)
 
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
-**Active owners:** **Conductor** (HS-F) / **Lead** (`SIGN OFF HS AUDIT`)
-**Blocked by:** none for HS-F drafting. Final gate Lead **`SIGN OFF HS AUDIT`**. Branch protection **DEFERRED**.
-**Sign-off doc:** [Docs/17_HS_AUDIT_SIGN_OFF.md](../Docs/17_HS_AUDIT_SIGN_OFF.md) — PENDING **`SIGN OFF HS AUDIT`** (do not claim).
+**Active owners:** **Lead** (next product/harness track TBD)
+**Blocked by:** none for HS. Branch protection remains **DEFERRED** (ACCEPT HS-C DEFER). Next track **TBD by Lead** — do not invent phases.
+**Sign-off doc:** [Docs/17_HS_AUDIT_SIGN_OFF.md](../Docs/17_HS_AUDIT_SIGN_OFF.md) — **SIGNED OFF** Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET.
 
 
 | Phase | Name | Owners | Status | Gate file | Handoffs |
@@ -49,7 +49,7 @@ Canonical history: **VP-A → VP-B → VP-A re-verify → VP-C**. Spec: [17d_HS_
 
 ## POST-AUDIT (Docs/05–10 + HR track)
 
-MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** **Product next-phase (NP-A…E) is CLOSED / COMPLETE.** **HR2 track CLOSED / COMPLETE.** **HR3 track CLOSED / COMPLETE** — Lead **`APPROVE HR3-D`**, 2026-09-17 ET (HR3-C **DEFERRED**). **VP track CLOSED / COMPLETE** (VP-A re-verify **WAIVED**). **Docs/16 Playable Loop CLOSED / COMPLETE** — Lead **`APPROVE PL-D`**, 2026-09-17 ET. **Docs/17 HS Audit ACTIVE** — HS-A/B/D/E **CLOSED**; HS-C **DEFERRED**; **HS-F IN PROGRESS**.
+MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** **Product next-phase (NP-A…E) is CLOSED / COMPLETE.** **HR2 track CLOSED / COMPLETE.** **HR3 track CLOSED / COMPLETE** — Lead **`APPROVE HR3-D`**, 2026-09-17 ET (HR3-C **DEFERRED**). **VP track CLOSED / COMPLETE** (VP-A re-verify **WAIVED**). **Docs/16 Playable Loop CLOSED / COMPLETE** — Lead **`APPROVE PL-D`**, 2026-09-17 ET. **Docs/17 HS Audit CLOSED / COMPLETE** — Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET. Next track TBD.
 
 | Track | Doc / phase | Host | Status | Gate / handoff |
 |---|---|---|---|---|
@@ -86,7 +86,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **HS-E** | Character / bootstrap canon | CLOUD+Lead+DESKTOP | **APPROVED / CLOSED** | [17e_HS_CONTENT_BOOTSTRAP.md](../Docs/17e_HS_CONTENT_BOOTSTRAP.md) — Lead **`APPROVE HS-E`**, 2026-09-17 ET (PR #97); policy **KEEP-LOCAL**; handoff [HS_E_CONTENT_BOOTSTRAP.md](../Docs/handoffs/HS_E_CONTENT_BOOTSTRAP.md) |
 | **HS-F** | Sign-off & re-grade | CLOUD+Lead | **IN PROGRESS** | [17_HS_AUDIT_SIGN_OFF.md](../Docs/17_HS_AUDIT_SIGN_OFF.md) — PENDING Lead **`SIGN OFF HS AUDIT`**; proposed harness **~A** / swarm **~A** |
 
-**Current track:** **Docs/17 HS** — HS-A/B/D/E **CLOSED**; HS-C **DEFERRED**; **HS-F IN PROGRESS**.
+**Current track:** **Docs/17 HS CLOSED / COMPLETE** — harness **~A**, swarm **~A**. Next product **TBD by Lead**.
 
 ---
 

@@ -49,3 +49,7 @@ Presentation still `Maps/Preview_Homestead_Night/shot1_lookout.png`. HighResShot
 ## Auth pointers
 
 `Docs/16_PLAYABLE_LOOP.md` · `Docs/handoffs/PL_*.md` · `AGENTS.md` · `swarm/PHASE_BOARD.md`
+
+## Update — SIGN OFF HS AUDIT (2026-09-17 ET)
+
+Docs/17 HS Audit **CLOSED / COMPLETE**. Grades: harness **~A**, swarm **~A**. Resume: await Lead next track name; do not invent phases.

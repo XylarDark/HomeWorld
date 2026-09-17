@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **PENDING** Lead **`SIGN OFF HS AUDIT`** |
+| **Status** | **SIGNED OFF / CLOSED** — Lead Luke Thompson, **`SIGN OFF HS AUDIT`**, 2026-09-17 ET |
 | **Date** | 2026-09-17 (ET) |
 | **Author** | Conductor executor (HomeWorld) — `gh` Contents API only |
 | **Parent plan** | [17_HS_AUDIT_STRATEGY.md](17_HS_AUDIT_STRATEGY.md) — Lead **`APPROVE HS STRATEGY`**, 2026-09-17 ET |
@@ -10,7 +10,7 @@
 | **Baseline** | Docs/08 **SIGNED OFF** ([08_AUDIT_SIGN_OFF.md](08_AUDIT_SIGN_OFF.md)); HR3 **CLOSED** (HR3-C **DEFERRED**); PL **CLOSED** |
 | **Hard rules honored** | Docs/07 CLOSED; FALLBACK glide only; no combat; no `.uasset`/`.umap` commits; exactly 10 masters; no invented product phases |
 
-**This filing does NOT claim `SIGN OFF HS AUDIT`.** Until Lead types that string, HS track stays open at HS-F and no next product track is named.
+**Gate:** Lead **`SIGN OFF HS AUDIT`** — **SIGNED OFF** (Luke Thompson, 2026-09-17 ET). Docs/17 HS track **CLOSED / COMPLETE**. Next product track **TBD by Lead only**.
 
 ---
 
@@ -23,18 +23,18 @@
 | **HS-C** | [17c_HS_CI_LAW.md](17c_HS_CI_LAW.md) | **ACCEPT DEFER / CLOSED** | Lead **`ACCEPT HS-C DEFER`**, 2026-09-17 ET — branch protection permanently deferred for HS (written risk) |
 | **HS-D** | [17d_HS_EVIDENCE.md](17d_HS_EVIDENCE.md) | **APPROVED / CLOSED** | Lead **`APPROVE HS-D`**, 2026-09-17 ET (PR #94) — `evidence:grep` + re-verify rule |
 | **HS-E** | [17e_HS_CONTENT_BOOTSTRAP.md](17e_HS_CONTENT_BOOTSTRAP.md) | **APPROVED / CLOSED** | Lead **`APPROVE HS-E`**, 2026-09-17 ET (PR #97) — policy **KEEP-LOCAL**; no `.uasset` commits |
-| **HS-F** | **This document** | **IN PROGRESS** | Pending Lead **`SIGN OFF HS AUDIT`** |
+| **HS-F** | **This document** | **SIGNED OFF / CLOSED** | Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET |
 
 ---
 
-## 2. Proposed grades (honest — not claimed as final until Lead sign-off)
+## 2. Final grades (Lead sign-off)
 
 ### Harness
 
 | When | Grade | Why |
 |------|-------|-----|
 | **Before HS** (PL close / strategy start) | **~A** | HR3 closed loops (preflight, DESKTOP lane, evidence lane); HR3-C / CI-as-law still soft |
-| **After HS-A…E** (proposed at HS-F) | **~A** | Same ceiling: CI-as-law **ACCEPT DEFER** (HS-C). Gains: `evidence:grep`, KEEP-LOCAL fail-loud, swarm ops encoded — not enough to claim pure **A+** while required checks are advisory |
+| **After HS (signed)** | **~A** | Same ceiling: CI-as-law **ACCEPT DEFER** (HS-C). Gains: `evidence:grep`, KEEP-LOCAL fail-loud, swarm ops encoded — not enough to claim pure **A+** while required checks are advisory |
 
 **Evidence for ~A (not A+):** `npm run evidence:grep` · KEEP-LOCAL Mannequins fail-loud (`MANNEQUINS_DIR_MISSING`) · HS-B swarm contracts · HS-C permanent defer keeps “CI as law” off the board.
 
@@ -43,7 +43,7 @@
 | When | Grade | Why |
 |------|-------|-----|
 | **Before HS** (PL close / strategy start) | **~A−** | DESKTOP still Conductor-parent-only (tribal); WAIVE culture; cloud Contents API flake undocumented |
-| **After HS-A…E** (proposed at HS-F) | **~A** | DESKTOP **parent-only law encoded** (PHASE_BOARD / SWARM_OPS / packet / WINDOWS_BRIDGE); Contents API fallback **sanctioned**; digests + resume-from-handoff; re-verify refuse-polish rule |
+| **After HS (signed)** | **~A** | DESKTOP **parent-only law encoded** (PHASE_BOARD / SWARM_OPS / packet / WINDOWS_BRIDGE); Contents API fallback **sanctioned**; digests + resume-from-handoff; re-verify refuse-polish rule |
 
 **Not ~A+:** DESKTOP remains parent-only ceiling (Task executors still FAIL) — documented ACCEPT, not fixed.
 
@@ -117,3 +117,18 @@ Type: SIGN OFF HS AUDIT
 ---
 
 *PENDING — Docs/17 HS-F sign-off. Does **not** claim Lead **`SIGN OFF HS AUDIT`.***
+
+## Lead SIGN OFF HS AUDIT
+
+Lead **`SIGN OFF HS AUDIT`** (Luke Thompson, 2026-09-17 ET) — Docs/17 Harness & Swarm Audit **CLOSED / COMPLETE**.
+
+| Area | Final grade |
+|------|-------------|
+| **Harness** | **~A** |
+| **Swarm** | **~A** |
+
+Next product/harness track: **TBD by Lead only** — agents must not invent phases.
+
+---
+
+*Docs/17 HS Audit **SIGNED OFF / CLOSED** — Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET.*

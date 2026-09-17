@@ -45,7 +45,7 @@ These are **intentionally separate**. On case-insensitive filesystems (macOS/Win
 - **Verify & Polish strategy (APPROVED — VP-B PARKED):** [14_VP_VERIFY_POLISH.md](14_VP_VERIFY_POLISH.md) — Lead **`APPROVE VP STRATEGY`**, 2026-09-17 ET; VP-A **APPROVED**; VP-B **PARKED** pending HR3
 - **Harness Refine 3 — A+ strategy (APPROVED):** [15_HR3_A_PLUS.md](15_HR3_A_PLUS.md) — Lead **`APPROVE HR3 STRATEGY`**, 2026-09-17 ET
 | [16_PLAYABLE_LOOP.md](16_PLAYABLE_LOOP.md) | Playable Loop (PL) — character + PIE + thin UX | **CLOSED / COMPLETE** |
-| [17_HS_AUDIT_STRATEGY.md](17_HS_AUDIT_STRATEGY.md) | Harness & Swarm Audit (HS) — post–Docs/08 | **APPROVED** |
+| [17_HS_AUDIT_STRATEGY.md](17_HS_AUDIT_STRATEGY.md) | Harness & Swarm Audit (HS) — post–Docs/08 | **CLOSED / COMPLETE** |
 | [17a_HS_INVENTORY.md](17a_HS_INVENTORY.md) | HS-A inventory & debt ledger | **CLOSED** |
 | [17b_HS_SWARM_OPS.md](17b_HS_SWARM_OPS.md) | HS-B swarm ops tighten | **CLOSED** |
 | [17c_HS_CI_LAW.md](17c_HS_CI_LAW.md) | HS-C CI as law | **DEFERRED / CLOSED** |
