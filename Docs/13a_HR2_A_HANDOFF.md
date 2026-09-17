@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **COMPLETE — awaiting Lead `APPROVE HR2-A`** |
+| **Status** | **APPROVED** — Lead Luke Thompson, **`APPROVE HR2-A`**, 2026-09-17 ET |
 | **Date** | 2026-09-17 |
 | **Author** | Cloud Agent (HR2-A) |
 | **Strategy** | [13_HR2_HARNESS_REFINE.md](13_HR2_HARNESS_REFINE.md) — Lead **`APPROVE HR2 STRATEGY`**, 2026-09-17 ET |
@@ -12,7 +12,7 @@
 
 ## Gate
 
-**Awaiting** Lead **`APPROVE HR2-A`** — do **not** start HR2-B until approved.
+**APPROVED** — Lead Luke Thompson typed **`APPROVE HR2-A`** on 2026-09-17 ET. HR2-B unlocked.
 
 ---
 
@@ -91,8 +91,8 @@ Adding a new accepted decline: update **both** `config/doctor-ue-declines.json` 
 - [x] Exit **1** path preserved for non-declined criticals (wrapper logic)
 - [x] DOCTOR_POLICY + CURSOR_DEV document `doctor` vs `doctor:ue`
 - [x] Decline registry is machine-readable single source for wrapper
-- [ ] Lead **`APPROVE HR2-A`** → unlock HR2-B
+- [x] Lead **`APPROVE HR2-A`** → unlock HR2-B (2026-09-17 ET)
 
 ---
 
-*HR2-A complete — Conductor stops for Lead **`APPROVE HR2-A`**.*
+*HR2-A **APPROVED** — Lead Luke Thompson, **`APPROVE HR2-A`**, 2026-09-17 ET.*

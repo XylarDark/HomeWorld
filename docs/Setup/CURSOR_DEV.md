@@ -25,16 +25,18 @@ Pinned checkout: [DevEnvTemplate/](../../DevEnvTemplate/) **gitlink** — bumped
 | Field | Value |
 |-------|-------|
 | **Pinned SHA** | `2efd7569a698e73a04279feaebaae1eb55c4e1c0` |
+| **Canonical registry** | [config/devenv-template-pin.json](../../config/devenv-template-pin.json) — CI reads this; update with CURSOR_DEV when bumping pin |
 | **Remote** | `https://github.com/XylarDark/DevEnvTemplate.git` |
 | **Template branch** | `master` (not `main`) |
 | **HR-B2 delta** | Multi-agent swarm guide + extras skill (+2 commits from `213673f`) |
 | **Doctor policy** | [DOCTOR_POLICY.md](DOCTOR_POLICY.md) — accepted declines for UE game host |
+| **HR2-B handoff** | [Docs/13b_HR2_B_COLD_CLONE.md](../../Docs/13b_HR2_B_COLD_CLONE.md) — cold-clone runbook + CI guard |
 
 Full template docs: [DevEnvTemplate/docs/SYNC.md](../../DevEnvTemplate/docs/SYNC.md), [BOOTSTRAP.md](../../DevEnvTemplate/BOOTSTRAP.md).
 
 ### Init runbook (fresh clone — idempotent)
 
-From repo root after clone:
+From repo root after clone (idempotent — safe on re-run):
 
 ```bash
 git submodule update --init --recursive DevEnvTemplate
@@ -42,9 +44,11 @@ npm run doctor:build   # once: install + build under DevEnvTemplate/
 npm run doctor:ue      # UE host: exit 0 when only DOCTOR_POLICY declines remain
 ```
 
+Verify pin matches registry: `git ls-tree HEAD DevEnvTemplate` should equal `config/devenv-template-pin.json` → `sha`.
+
 **Node 22 `EBADENGINE`:** Template prefers Node **24+**; HomeWorld host allows Node 20+. Warnings on Node 22 are an **accepted decline** — doctor still runs.
 
-**Empty `DevEnvTemplate/`:** Run submodule init before any `npm run doctor*` command.
+**Empty `DevEnvTemplate/`:** Normal on fresh clone — run submodule init before any `npm run doctor*` command. CI runs the same init via [scripts/verify-devenv-submodule.sh](../../scripts/verify-devenv-submodule.sh).
 
 ### Doctor (ongoing)
 
