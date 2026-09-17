@@ -1,9 +1,10 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **HS-A** — Inventory & debt ledger (**IN PROGRESS** — evidence [Docs/17a_HS_INVENTORY.md](../Docs/17a_HS_INVENTORY.md) on branch `cursor/docs-17a-hs-inventory`; **PENDING** Lead **`APPROVE HS-A`**)
+**Current phase:** **HS-B** — Swarm ops tighten (**IN PROGRESS**)
+
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
-**Active owners:** **Conductor** (HS-A)  
-**Blocked by:** none for HS-A. Next gate Lead **`APPROVE HS-A`** (do not unlock HS-B until stamped). Branch protection remains **DEFERRED** (HR3-C → HS-C).
+**Active owners:** **Conductor** (HS-B)
+**Blocked by:** none for HS-B. Next gate Lead **`APPROVE HS-B`**. Branch protection remains **DEFERRED** (HR3-C → HS-C).
 
 
 | Phase | Name | Owners | Status | Gate file | Handoffs |
@@ -66,7 +67,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **VP-C** | Playability polish | CLOUD+DESKTOP | **APPROVED / CLOSED** | [handoffs/VP_C_POLISH.md](../Docs/handoffs/VP_C_POLISH.md) — Lead **`APPROVE VP-C`**, 2026-09-17 ET |
 | **VP-D** | Bootstrap dry-run | CLOUD+DESKTOP | **APPROVED / CLOSED** | [handoffs/VP_D_BOOTSTRAP_CI.md](../Docs/handoffs/VP_D_BOOTSTRAP_CI.md) — Lead **`APPROVE VP-D`**, 2026-09-17 ET; branch protection **DEFERRED** |
 
-**Current track:** **Docs/17 Harness & Swarm Audit APPROVED** — Lead **`APPROVE HS STRATEGY`**, 2026-09-17 ET; **HS-A IN PROGRESS**.
+**Current track:** **Docs/17 HS APPROVED** — HS-A **CLOSED**; **HS-B IN PROGRESS**.
 
 ---
 
