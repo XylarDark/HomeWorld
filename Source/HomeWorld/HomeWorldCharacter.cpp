@@ -469,7 +469,7 @@ bool AHomeWorldCharacter::TryPlaceAtCursor()
 	return true;
 }
 
-FName AHomeWorldCharacter::GetSpiritIdForDeath() const
+FName AHomeWorldCharacter::GetSpiritIdForDeath()
 {
 	return FName(*FString::Printf(TEXT("%s_%u"), *GetName(), GetUniqueID()));
 }
