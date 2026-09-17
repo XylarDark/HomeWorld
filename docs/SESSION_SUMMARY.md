@@ -1,5 +1,10 @@
 # Session summary (rolling)
 
+## 2026-09-17 ET — APPROVE PL STRATEGY / Docs/16
+
+Lead **`APPROVE PL STRATEGY`**. Playable Loop track **ACTIVE**: PL-A character realization OPEN; PL-B/C/D LOCKED. Prior VP track CLOSED.
+
+
 ## 2026-09-17 ET — APPROVE VP-D / VP track CLOSED
 
 Lead **`APPROVE VP-D`** (Luke Thompson). Docs/14 Verify & Polish **CLOSED / COMPLETE** (VP-A…D). Bootstrap evidence PR #72; stamp follow-up. Branch protection remains **DEFERRED** (HR3-C). Next track TBD.
