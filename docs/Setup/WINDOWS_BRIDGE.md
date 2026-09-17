@@ -81,8 +81,32 @@ Single path for agents: [AGENTS.md](../../AGENTS.md) § Build → Editor → MCP
 
 ---
 
+## Canonical Windows agent lane (Conductor parent only)
+
+**HR3-A (2026-09-17):** DESKTOP Shell routing is **proven for Conductor parent agents only**. See [Docs/handoffs/HR3_A_WINDOWS_EXEC.md](../../Docs/handoffs/HR3_A_WINDOWS_EXEC.md).
+
+| Actor | DESKTOP Shell (`machineId`) | Notes |
+|-------|----------------------------|-------|
+| **Conductor parent** | **YES** — canonical lane | `ListMachines` → `machineId=929b6d1e-df75-4a84-b73c-a171c6eb877c` → Shell → hostname **DESKTOP-21CT3H0** |
+| **Task executor subagent** | **NO** — do not assign | No `CallDynamicTool` / `Shell` / `ListMachines` / `CopyToBox`; prior claims of Linux `cursor` host are **unreliable** |
+| **Cloud agent (Linux VM)** | **NO** — never claim | No UE/MCP; ship PR → merge → Conductor parent on DESKTOP |
+
+### DO NOT assign DESKTOP Shell to Task executors
+
+Cursor **Task** executor subagents do **not** expose the tools needed for Windows routing. Conductor must run DESKTOP evidence (PIE, MCP, Safe-Build follow-up) in the **parent** session — not via spawned executors.
+
+### Local-exec root and staging path
+
+- **CopyFromBox** to `C:\dev\HomeWorld\**` is **refused** (outside local-exec root on the worker).
+- **Staging path:** `C:\Users\User\HomeWorldStaging\` — stage scripts/helpers here, then Shell on machine; or write via machine Shell directly into repo paths.
+- **MCP staging helper:** `C:\Users\User\HomeWorldStaging\hw_unreal_mcp_client.py`
+
+---
+
 ## Related
 
+- [Docs/handoffs/HR3_A_WINDOWS_EXEC.md](../../Docs/handoffs/HR3_A_WINDOWS_EXEC.md) — HR3-A runbook, proof excerpts, failure modes
+- [swarm/CLOUD_AGENT_PACKET.md](../../swarm/CLOUD_AGENT_PACKET.md) — DESKTOP owner = Conductor parent
 - [CURSOR_DEV.md](CURSOR_DEV.md) — DevEnvTemplate init on any host
 - [Docs/11b_HR_B_HANDOFF.md](../../Docs/11b_HR_B_HANDOFF.md) — HR-B checklist
 - [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md) — Conductor / evidence gates

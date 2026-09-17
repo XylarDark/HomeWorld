@@ -1,9 +1,9 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **HR3-A** (Windows agent exec reliability) — **UNLOCKED / IN PROGRESS**  
+**Current phase:** **HR3-A** (Windows agent exec reliability) — **EVIDENCE FILED / AWAITING APPROVE HR3-A**  
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
-**Active owners:** **CND** (Conductor) + cloud/Windows agent (HR3-A planning)  
-**Blocked by:** Lead **`APPROVE HR3-A`** before HR3-A implementation PR — [Docs/15_HR3_A_PLUS.md](../Docs/15_HR3_A_PLUS.md) § HR3-A. VP-A **APPROVED** (hard-fail ABP). **VP-B PARKED** pending HR3.
+**Active owners:** **CND** (Conductor parent — DESKTOP lane) + Lead gate  
+**Blocked by:** Lead **`APPROVE HR3-A`** — [handoffs/HR3_A_WINDOWS_EXEC.md](../Docs/handoffs/HR3_A_WINDOWS_EXEC.md) filed; not COMPLETE until Lead stamp. VP-A **APPROVED** (hard-fail ABP). **VP-B PARKED** pending HR3.
 
 | Phase | Name | Owners | Status | Gate file | Handoffs |
 |---|---|---|---|---|---|
@@ -43,14 +43,14 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **VP-A** | PIE evidence | **APPROVED** | [handoffs/VP_A_PIE.md](../Docs/handoffs/VP_A_PIE.md) — Lead **`APPROVE VP-A`**, 2026-09-17 ET; hard-fail accepted |
 | **VP-B** | Smoke & character risk | **PARKED** | Pending HR3 — resume after HR3 track (+ HR3-B preflight recommended) |
 | **Docs/15** | Harness Refine 3 (A+) | **APPROVED** | [15_HR3_A_PLUS.md](../Docs/15_HR3_A_PLUS.md) — Lead **`APPROVE HR3 STRATEGY`**, 2026-09-17 ET |
-| **HR3-A** | Windows exec reliability | **UNLOCKED / IN PROGRESS** | handoffs/HR3_A_WINDOWS_EXEC.md (pending) — Lead **`APPROVE HR3-A`** before implementation PR |
+| **HR3-A** | Windows exec reliability | **EVIDENCE FILED — AWAITING APPROVE HR3-A** | [handoffs/HR3_A_WINDOWS_EXEC.md](../Docs/handoffs/HR3_A_WINDOWS_EXEC.md) — parent→DESKTOP proven; executors FAIL; Lead **`APPROVE HR3-A`** before implementation PR |
 | **HR3-B** | UE preflight fails loud | **LOCKED** | handoffs/HR3_B_UE_PREFLIGHT.md (pending) |
 | **HR3-C** | Branch protection real | **LOCKED** | handoffs/HR3_C_BRANCH_PROTECTION.md (pending) |
 | **HR3-D** | DESKTOP evidence + re-verify | **LOCKED** | handoffs/HR3_D_EVIDENCE_LANE.md (pending) |
 | **VP-C** | Playability polish | **LOCKED** | handoffs/VP_C_POLISH.md (pending) |
 | **VP-D** | Bootstrap & branch protection | **LOCKED** | handoffs/VP_D_BOOTSTRAP_CI.md (pending) |
 
-**Current track:** **HR3 strategy APPROVED** — **HR3-A UNLOCKED / IN PROGRESS** (await Lead **`APPROVE HR3-A`** before implementation PR). VP-A **APPROVED**; **VP-B PARKED**; VP-C/D **LOCKED**. Product NP **CLOSED**. HR2 **CLOSED / COMPLETE**.
+**Current track:** **HR3 strategy APPROVED** — **HR3-A EVIDENCE FILED** (await Lead **`APPROVE HR3-A`** — not COMPLETE until stamp). VP-A **APPROVED**; **VP-B PARKED**; VP-C/D **LOCKED**. Product NP **CLOSED**. HR2 **CLOSED / COMPLETE**.
 
 ---
 
@@ -58,7 +58,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 
 | ID | Phase | Owner | Write path | Due artifact |
 |---|---|---|---|---|
-| HR3-A-plan | HR3-A | CND / cloud | Docs/handoffs/ | Windows exec runbook — Lead **`APPROVE HR3-A`** before implementation PR |
+| HR3-A-gate | HR3-A | Lead | Docs/handoffs/ | [HR3_A_WINDOWS_EXEC.md](../Docs/handoffs/HR3_A_WINDOWS_EXEC.md) filed — Lead **`APPROVE HR3-A`** → unlock HR3-B |
 | VP-B-resume | VP-B | DESKTOP | Docs/handoffs/ | **PARKED** — resume after HR3 (ABP skeleton + NightMix smoke) |
 
 ## Open defects

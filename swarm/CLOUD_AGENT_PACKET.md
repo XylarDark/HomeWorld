@@ -2,7 +2,7 @@
 
 **When to use:** Conductor assigns a **docs-only** or **C++-touching** task to a Cursor cloud agent (Linux VM, no UE/MCP). Fill this packet and attach paths from [HANDOFF_TEMPLATE.md](HANDOFF_TEMPLATE.md).
 
-**Process authority:** [SWARM_OPS.md](SWARM_OPS.md) · **Windows follow-up:** [docs/Setup/WINDOWS_BRIDGE.md](../docs/Setup/WINDOWS_BRIDGE.md)
+**Process authority:** [SWARM_OPS.md](SWARM_OPS.md) · **Windows follow-up:** [docs/Setup/WINDOWS_BRIDGE.md](../docs/Setup/WINDOWS_BRIDGE.md) · **HR3-A lane:** [Docs/handoffs/HR3_A_WINDOWS_EXEC.md](../Docs/handoffs/HR3_A_WINDOWS_EXEC.md)
 
 ---
 
@@ -40,7 +40,7 @@ cursor/<descriptive-name>-b3a5
 | **Merge SHA** | Squash-merge commit on `main` after Lead/Conductor merge |
 | **CI status** | `validate` + `python-lint` green (required for **all** PRs) |
 | **`ci.yml` / `build-win64`** | **Required** when PR touches C++ paths: `Source/**`, `**/*.Build.cs`, `*.uproject`, `Plugins/**/Source/**` — self-hosted `windows`/`ue57` runner on **DESKTOP-21CT3H0**. **Lead waiver:** PR body `Lead waiver: build-win64` or label `lead-waiver-build-win64` — see [CI_POLICY.md](../docs/Setup/CI_POLICY.md) (HR2-C) |
-| **Windows validation** | DESKTOP-21CT3H0: Safe-Build → Editor → MCP — not on cloud VM |
+| **Windows validation** | **DESKTOP owner = Conductor parent only** — not cloud VM, not Task executors. Safe-Build → Editor → MCP on DESKTOP-21CT3H0 after merge |
 
 List repo-relative paths for every deliverable (files created/changed). Gate claims without paths are invalid per SWARM_OPS.
 
@@ -58,7 +58,9 @@ Cloud agents run on **Linux without Unreal Engine**. Do **not** attempt:
 
 **Do on cloud:** docs, markdown, validate.yml-safe JSON, C++ source edits, Python scripts (untested in Editor until Windows handoff).
 
-**Windows handoff:** After merge, Lead or Windows session follows [WINDOWS_BRIDGE.md](../docs/Setup/WINDOWS_BRIDGE.md) for build, dress, PIE, MCP validation.
+**Windows handoff:** After merge, **Conductor parent** (not Task executor) follows [WINDOWS_BRIDGE.md](../docs/Setup/WINDOWS_BRIDGE.md) and [HR3_A_WINDOWS_EXEC.md](../Docs/handoffs/HR3_A_WINDOWS_EXEC.md) for DESKTOP Shell, build, dress, PIE, MCP validation. Cloud agent **returns after merge** — does not claim Windows Shell.
+
+**HR3 gate refs:** Lead **`APPROVE HR3-A`** per [Docs/15_HR3_A_PLUS.md](../Docs/15_HR3_A_PLUS.md) before DESKTOP exec implementation PRs. Task executors **cannot** route Shell to DESKTOP — see HR3-A handoff failure modes.
 
 ---
 
@@ -66,4 +68,4 @@ Cloud agents run on **Linux without Unreal Engine**. Do **not** attempt:
 
 On completion, Conductor files `Docs/handoffs/<packet_id>.md` using [HANDOFF_TEMPLATE.md](HANDOFF_TEMPLATE.md) § Cloud agent PR section.
 
-**Gate:** Lead **`APPROVE HR2-*`** per [Docs/13_HR2_HARNESS_REFINE.md](../Docs/13_HR2_HARNESS_REFINE.md) (HR2 track) or legacy **`APPROVE HR-*`** per [Docs/11_SWARM_HARNESS_REFINE.md](../Docs/11_SWARM_HARNESS_REFINE.md).
+**Gate:** Lead **`APPROVE HR3-*`** per [Docs/15_HR3_A_PLUS.md](../Docs/15_HR3_A_PLUS.md) (active HR3 track), **`APPROVE HR2-*`** per [Docs/13_HR2_HARNESS_REFINE.md](../Docs/13_HR2_HARNESS_REFINE.md) (HR2 **CLOSED**), or legacy **`APPROVE HR-*`** per [Docs/11_SWARM_HARNESS_REFINE.md](../Docs/11_SWARM_HARNESS_REFINE.md).
