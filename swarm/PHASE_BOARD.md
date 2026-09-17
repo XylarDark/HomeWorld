@@ -1,9 +1,9 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **NP** (Product next-phase)  
+**Current phase:** **NP-A** (Product next-phase — inventory / gap map)  
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **CND** (Conductor)  
-**Blocked by:** — (await Lead **`APPROVE NP STRATEGY`** or **`APPROVE Docs/11 NP`** before NP-A)
+**Blocked by:** — (await Lead **`APPROVE NP-A`** after PR merge)
 
 | Phase | Name | Owners | Status | Gate file | Handoffs |
 |---|---|---|---|---|---|
@@ -30,15 +30,17 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | Docs/06 | VS_MVP dress | **CLOSED** | [06_VS_MVP_DRESS.md](../Docs/06_VS_MVP_DRESS.md) |
 | Docs/07 | Vertical slice sign-off | **CLOSED** | [07_VERTICAL_SLICE_SIGN OFF.md](../Docs/07_VERTICAL_SLICE_SIGN%20OFF.md) |
 | Docs/08–10 | Audit WAVEs + post-audit wrap | **CLOSED** | [08_AUDIT_SIGN_OFF.md](../Docs/08_AUDIT_SIGN_OFF.md), [10_POST_AUDIT_WRAP.md](../Docs/10_POST_AUDIT_WRAP.md) |
-| Docs/11 | Swarm & harness refine strategy | **CLOSED** | [11_SWARM_HARNESS_REFINE.md](../Docs/11_SWARM_HARNESS_REFINE.md) |
+| Docs/11 | Product next-phase strategy | **APPROVED** | [11_NEXT_PHASE_STRATEGY.md](../Docs/11_NEXT_PHASE_STRATEGY.md) — Lead **`APPROVE NP STRATEGY`**, 2026-09-17 ET |
+| Docs/11 | Swarm & harness refine | **CLOSED** | [11_SWARM_HARNESS_REFINE.md](../Docs/11_SWARM_HARNESS_REFINE.md) |
 | **HR-A** | Measure & inventory | **APPROVED** | [11a_HR_MEASURES.md](../Docs/11a_HR_MEASURES.md) |
 | **HR-B** | Harness tighten | **APPROVED** | [11b_HR_B_HANDOFF.md](../Docs/11b_HR_B_HANDOFF.md) |
 | **HR-C** | Swarm ops refine | **APPROVED** | [11c_HR_C_HANDOFF.md](../Docs/11c_HR_C_HANDOFF.md) |
 | **HR-D** | Prove (dry-run loop) | **APPROVED** | [11d_HR_D_HANDOFF.md](../Docs/11d_HR_D_HANDOFF.md) |
 | **HR-B2** | Residual harness risks | **APPROVED** | [11e_HR_B2_HANDOFF.md](../Docs/11e_HR_B2_HANDOFF.md) |
-| **Product NP-A…E** | Next-phase gameplay / lookdev apply | **DRAFT — awaiting APPROVE NP STRATEGY** | [11_NEXT_PHASE_STRATEGY.md](../Docs/11_NEXT_PHASE_STRATEGY.md) |
+| **NP-A** | Inventory / gap map | **COMPLETE — awaiting APPROVE NP-A** | [12a_NP_A_INVENTORY.md](../Docs/12a_NP_A_INVENTORY.md) |
+| **NP-B…E** | Lookdev + verbs apply | **LOCKED** | Blocked until Lead **`APPROVE NP-A`** |
 
-**Current track:** Harness refine **CLOSED** (Lead **`APPROVE HR-B2`** then **`APPROVE HR-D`**, 2026-09-17 ET). Product NP **ACTIVE DRAFT** — await Lead **`APPROVE NP STRATEGY`** before NP-A.
+**Current track:** NP strategy **APPROVED** (Lead **`APPROVE NP STRATEGY`**, 2026-09-17 ET). **NP-A COMPLETE** — await Lead **`APPROVE NP-A`**.
 
 ---
 
@@ -46,7 +48,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 
 | ID | Phase | Owner | Write path | Due artifact |
 |---|---|---|---|---|
-| NP-strategy | NP | Lead | Docs/ | **`APPROVE NP STRATEGY`** → unlock NP-A |
+| NP-A-gate | NP-A | Lead | Docs/ | **`APPROVE NP-A`** → unlock NP-B |
 
 ## Open defects
 

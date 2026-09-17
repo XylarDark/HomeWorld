@@ -20,6 +20,12 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 ## Rolling log (newest first)
 
+### 2026-09-17 — NP-A inventory / gap map
+
+- Lead **`APPROVE NP STRATEGY`** — product NP strategy **APPROVED** (Luke Thompson, 2026-09-17 ET).
+- NP-A delivered: [Docs/12a_NP_A_INVENTORY.md](../Docs/12a_NP_A_INVENTORY.md) — KEEP/PRESENT/MISSING/DEFER vs Docs/03 + Docs/02; Windows mesh counts; content binary volatility call-out for NP-B.
+- **Next:** Lead **`APPROVE NP-A`** → unlock NP-B (no lookdev implementation until approved).
+
 ### 2026-09-17 — HR track CLOSED; product NP unlocked
 
 - Lead **`APPROVE HR-B2`** then **`APPROVE HR-D`** — harness refine track **CLOSED** (Luke Thompson, 2026-09-17 ET).
