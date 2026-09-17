@@ -1,9 +1,9 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **VP strategy** — **DRAFT awaiting `APPROVE VP STRATEGY`**  
+**Current phase:** **VP-A** (PIE evidence) — **UNLOCKED / IN PROGRESS**  
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
-**Active owners:** **CND** (Conductor)  
-**Blocked by:** Lead **`APPROVE VP STRATEGY`** — [Docs/14_VP_VERIFY_POLISH.md](../Docs/14_VP_VERIFY_POLISH.md)
+**Active owners:** **CND** (Conductor) + Windows DESKTOP (VP-A evidence)  
+**Blocked by:** DESKTOP PIE evidence → Lead **`APPROVE VP-A`** — [Docs/14_VP_VERIFY_POLISH.md](../Docs/14_VP_VERIFY_POLISH.md), [handoffs/VP_A_PIE.md](../Docs/handoffs/VP_A_PIE.md)
 
 | Phase | Name | Owners | Status | Gate file | Handoffs |
 |---|---|---|---|---|---|
@@ -22,7 +22,7 @@ Status values: `LOCKED` `OPEN` `IN PROGRESS` `GATE FAILED` `CLOSED` `GATE READY`
 
 ## POST-AUDIT (Docs/05–10 + HR track)
 
-MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** **Product next-phase (NP-A…E) is CLOSED / COMPLETE.** **HR2 track CLOSED / COMPLETE** — HR2-A/B/C all **APPROVED**; Lead **`APPROVE HR2-C`**, 2026-09-17 ET. Active: **VP strategy DRAFT — await `APPROVE VP STRATEGY`**.
+MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** **Product next-phase (NP-A…E) is CLOSED / COMPLETE.** **HR2 track CLOSED / COMPLETE** — HR2-A/B/C all **APPROVED**; Lead **`APPROVE HR2-C`**, 2026-09-17 ET. **VP strategy APPROVED** — Lead **`APPROVE VP STRATEGY`**, 2026-09-17 ET. Active: **VP-A UNLOCKED / IN PROGRESS** (DESKTOP PIE evidence).
 
 | Track | Doc / phase | Status | Gate / handoff |
 |---|---|---|---|
@@ -39,13 +39,13 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **HR2-B** | Cold-clone submodule | **APPROVED** | [13b_HR2_B_COLD_CLONE.md](../Docs/13b_HR2_B_COLD_CLONE.md) — Lead **`APPROVE HR2-B`**, 2026-09-17 ET |
 | **HR2-C** | C++ CI gate (build-win64) | **APPROVED** | [13c_HR2_C_CI_GATE.md](../Docs/13c_HR2_C_CI_GATE.md), [handoffs/HR2_C_CI_GATE.md](../Docs/handoffs/HR2_C_CI_GATE.md) — Lead **`APPROVE HR2-C`**, 2026-09-17 ET |
 | **HR2 track** | Harness Refine 2 | **CLOSED / COMPLETE** | [13_HR2_HARNESS_REFINE.md](../Docs/13_HR2_HARNESS_REFINE.md) — no HR2-D |
-| **Docs/14** | Verify & Polish strategy | **DRAFT — awaiting APPROVE VP STRATEGY** | [14_VP_VERIFY_POLISH.md](../Docs/14_VP_VERIFY_POLISH.md) |
-| **VP-A** | PIE evidence | **LOCKED** | [handoffs/VP_A_PIE.md](../Docs/handoffs/VP_A_PIE.md) (pending) |
+| **Docs/14** | Verify & Polish strategy | **APPROVED** | [14_VP_VERIFY_POLISH.md](../Docs/14_VP_VERIFY_POLISH.md) — Lead **`APPROVE VP STRATEGY`**, 2026-09-17 ET |
+| **VP-A** | PIE evidence | **UNLOCKED / IN PROGRESS** | [handoffs/VP_A_PIE.md](../Docs/handoffs/VP_A_PIE.md) (pending DESKTOP evidence) |
 | **VP-B** | Smoke & character risk | **LOCKED** | handoffs/VP_B_SMOKE_CHARACTER.md (pending) |
 | **VP-C** | Playability polish | **LOCKED** | handoffs/VP_C_POLISH.md (pending) |
 | **VP-D** | Bootstrap & branch protection | **LOCKED** | handoffs/VP_D_BOOTSTRAP_CI.md (pending) |
 
-**Current track:** VP strategy **DRAFT** — Conductor stops for Lead **`APPROVE VP STRATEGY`**. Product NP **CLOSED**. HR2 **CLOSED / COMPLETE**.
+**Current track:** VP strategy **APPROVED** — **VP-A IN PROGRESS** (DESKTOP PIE evidence). VP-B/C/D **LOCKED** until their gates. Product NP **CLOSED**. HR2 **CLOSED / COMPLETE**.
 
 ---
 
@@ -53,7 +53,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 
 | ID | Phase | Owner | Write path | Due artifact |
 |---|---|---|---|---|
-| VP-strategy-gate | Docs/14 | Lead | Docs/ | **`APPROVE VP STRATEGY`** → unlock VP-A |
+| VP-A-evidence | VP-A | CND / DESKTOP | Docs/handoffs/ | [VP_A_PIE.md](../Docs/handoffs/VP_A_PIE.md) — DESKTOP PIE log evidence → Lead **`APPROVE VP-A`** |
 
 ## Open defects
 
