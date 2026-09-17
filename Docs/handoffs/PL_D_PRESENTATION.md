@@ -3,8 +3,8 @@
 | Field | Value |
 |-------|-------|
 | **Phase** | PL-D |
-| **Status** | **EVIDENCE COMPLETE — PENDING LEAD `APPROVE PL-D`** |
-| **Lead gate** | **`APPROVE PL-D`** closes Docs/16 PL track |
+| **Status** | **APPROVED / CLOSED** — Lead Luke Thompson, **`APPROVE PL-D`**, 2026-09-17 ET |
+| **Lead gate** | **`APPROVE PL-D`** — **APPROVED**; Docs/16 PL track **CLOSED / COMPLETE** |
 | **Spec** | [16_PLAYABLE_LOOP.md](../16_PLAYABLE_LOOP.md) § PL-D |
 | **Host** | DESKTOP **DESKTOP-21CT3H0** — map `L_VS_MVP_Markers` |
 | **Prior** | [P6_FIX_shot1.md](P6_FIX_shot1.md) |
@@ -33,7 +33,7 @@ PL-D reuses **existing** Shot 1 assets and UE markers — no new biome.
 
 - [x] Shot 1 still from existing pipeline (Blender/`CAM_Hero` intent) — path above
 - [x] UE markers confirmed (no new CAM actors invented)
-- [ ] Lead **`APPROVE PL-D`** closes PL track
+- [x] Lead **`APPROVE PL-D`** closes PL track
 
 ## Out of scope
 
@@ -48,3 +48,11 @@ New biome; fixing UE HighResShot automation; combat; free-flight.
 ---
 
 *PL-D — stop for Lead **`APPROVE PL-D`** (closes Docs/16 Playable Loop).*
+
+## Lead APPROVE PL-D
+
+Lead **`APPROVE PL-D`** (Luke Thompson, 2026-09-17 ET) — PL-D **APPROVED / CLOSED**. **Docs/16 Playable Loop track CLOSED / COMPLETE** (PL-A APPROVED, PL-B WAIVED, PL-C APPROVED, PL-D APPROVED).
+
+---
+
+*PL-D **APPROVED / CLOSED** — Lead **`APPROVE PL-D`**, 2026-09-17 ET. PL track complete.*

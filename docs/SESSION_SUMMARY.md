@@ -1,5 +1,10 @@
 # Session summary (rolling)
 
+## 2026-09-17 ET — APPROVE PL-D / Docs/16 PL track CLOSED
+
+Lead **`APPROVE PL-D`**. Playable Loop **CLOSED / COMPLETE** (A APPROVED, B WAIVED, C APPROVED, D APPROVED). Shot 1 still + UE markers filed. Next product/harness track **TBD**.
+
+
 ## 2026-09-17 ET — PL-D Shot 1 evidence (pending APPROVE PL-D)
 
 UE markers `CAM_Hero` + `VS_MARKER_Shot1_Lookout` confirmed on `L_VS_MVP_Markers`. Presentation still = existing `shot1_lookout.png` (P6_FIX). UE HighResShot black — not used. Awaiting Lead **`APPROVE PL-D`** to close PL track.
