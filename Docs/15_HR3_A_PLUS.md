@@ -26,7 +26,7 @@ Lead **`APPROVE HR3-B`** — **APPROVED** (Luke Thompson, 2026-09-17 ET). Eviden
 
 **Next gate:** **`APPROVE HR3-D`** — DESKTOP evidence lane + re-verify.
 
-**HR3-A APPROVED / COMPLETE**. **HR3-B APPROVED / COMPLETE**. **HR3-C DEFERRED / COMPLETE for track** — Lead **`APPROVE HR3-C deferred`**, 2026-09-17 ET (checklist PR #62; GitHub apply deferred). **HR3-D UNLOCKED / IN PROGRESS**. **VP-B PARKED** pending HR3 (do not mark VP complete).
+**HR3-A APPROVED / COMPLETE**. **HR3-B APPROVED / COMPLETE**. **HR3-C DEFERRED / COMPLETE for track** — Lead **`APPROVE HR3-C deferred`**, 2026-09-17 ET (checklist PR #62; GitHub apply deferred). **HR3-D EVIDENCE FILED / AWAITING APPROVE HR3-D**. **VP-B PARKED** pending HR3 close (do not mark VP complete).
 
 ---
 
@@ -72,7 +72,7 @@ Conductor blunt grade at VP-A close: **swarm B+ / harness B**. **A+** means **cl
 | **HR3-A** | **APPROVED / COMPLETE** — [handoffs/HR3_A_WINDOWS_EXEC.md](handoffs/HR3_A_WINDOWS_EXEC.md) |
 | **HR3-B** | **APPROVED / COMPLETE** — [handoffs/HR3_B_UE_PREFLIGHT.md](handoffs/HR3_B_UE_PREFLIGHT.md) |
 | **HR3-C** | **DEFERRED / COMPLETE for track** — [15c_HR3_C_BRANCH_PROTECTION.md](15c_HR3_C_BRANCH_PROTECTION.md), [handoffs/HR3_C_BRANCH_PROTECTION.md](handoffs/HR3_C_BRANCH_PROTECTION.md) — Lead skip 2026-09-17 ET; checklist PR #62 |
-| **HR3-D** | **UNLOCKED / IN PROGRESS** |
+| **HR3-D** | **EVIDENCE FILED** — [handoffs/HR3_D_EVIDENCE_LANE.md](handoffs/HR3_D_EVIDENCE_LANE.md) |
 
 ---
 
@@ -167,10 +167,10 @@ Naming: **HR3-A … HR3-D** (Harness Refine 3 — A+ pass). Do **not** reuse HR2
 
 **Done criteria:**
 
-- [ ] PHASE_BOARD shows cloud vs DESKTOP owner for HR3 and VP phases
-- [ ] SWARM_OPS handoff contract documented (host, greps, evidence path)
-- [ ] Re-verify rule: VP-B complete → VP-A greps re-prove before VP-C
-- [ ] Handoff doc includes example VP-A re-verify checklist
+- [x] PHASE_BOARD shows cloud vs DESKTOP owner for HR3 and VP phases — [swarm/PHASE_BOARD.md](../swarm/PHASE_BOARD.md) Host column
+- [x] SWARM_OPS handoff contract documented (host, greps, evidence path) — [swarm/SWARM_OPS.md](../swarm/SWARM_OPS.md) §4a–4c
+- [x] Re-verify rule: VP-B complete → VP-A greps re-prove before VP-C — [14_VP_VERIFY_POLISH.md](14_VP_VERIFY_POLISH.md) § Re-verify
+- [x] Handoff doc includes example VP-A re-verify checklist — [handoffs/HR3_D_EVIDENCE_LANE.md](handoffs/HR3_D_EVIDENCE_LANE.md)
 
 ---
 
@@ -221,8 +221,8 @@ Docs/15 / HR3 STRATEGY: APPROVED — Lead Luke Thompson, APPROVE HR3 STRATEGY, 2
 HR3-A: APPROVED / COMPLETE — Lead APPROVE HR3-A, 2026-09-17 ET (evidence PR #58)
 HR3-B: APPROVED / COMPLETE — Lead APPROVE HR3-B, 2026-09-17 ET (evidence PR #60)
 HR3-C: DEFERRED / COMPLETE for track — Lead APPROVE HR3-C deferred, 2026-09-17 ET (PR #62)
-HR3-D: UNLOCKED / IN PROGRESS
-VP-B: PARKED pending HR3
+HR3-D: EVIDENCE FILED — await APPROVE HR3-D
+VP-B: PARKED pending HR3 close
 ```
 
 ---
@@ -242,4 +242,4 @@ VP-B: PARKED pending HR3
 
 ---
 
-*Conductor prepared this file; HR3 strategy **APPROVED** 2026-09-17 ET — Lead **`APPROVE HR3 STRATEGY`**. HR3-A **APPROVED / COMPLETE**. HR3-B **APPROVED / COMPLETE**. HR3-C **DEFERRED / COMPLETE for track** — Lead **`APPROVE HR3-C deferred`**, 2026-09-17 ET (checklist PR #62; GitHub apply deferred). HR3-D **UNLOCKED / IN PROGRESS**. VP-B **PARKED** until HR3 lands.*
+*Conductor prepared this file; HR3 strategy **APPROVED** 2026-09-17 ET — Lead **`APPROVE HR3 STRATEGY`**. HR3-A **APPROVED / COMPLETE**. HR3-B **APPROVED / COMPLETE**. HR3-C **DEFERRED / COMPLETE for track** — Lead **`APPROVE HR3-C deferred`**, 2026-09-17 ET (checklist PR #62; GitHub apply deferred). HR3-D **EVIDENCE FILED** — [handoffs/HR3_D_EVIDENCE_LANE.md](handoffs/HR3_D_EVIDENCE_LANE.md). VP-B **PARKED** until HR3-D close.*

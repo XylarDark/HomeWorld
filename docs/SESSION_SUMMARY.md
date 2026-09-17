@@ -20,12 +20,17 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 ## Rolling log (newest first)
 
+### 2026-09-17 — HR3-D DESKTOP evidence lane + re-verify (docs-only)
+
+- Cloud agent HR3-D: [PHASE_BOARD.md](../swarm/PHASE_BOARD.md) **Host** column (**CLOUD** | **DESKTOP** | **Lead**); handoff PR contract in [SWARM_OPS.md](../swarm/SWARM_OPS.md) §4a–4c and [CLOUD_AGENT_PACKET.md](../swarm/CLOUD_AGENT_PACKET.md).
+- Re-verify rule: **VP-B → VP-A greps re-prove → VP-C unlock** — [14_VP_VERIFY_POLISH.md](../Docs/14_VP_VERIFY_POLISH.md) § Re-verify; example checklist in [HR3_D_EVIDENCE_LANE.md](../Docs/handoffs/HR3_D_EVIDENCE_LANE.md).
+- HR3-C **DEFERRED / COMPLETE for track** (Lead skip). **Next:** Lead **`APPROVE HR3-D`** closes HR3 track; then resume VP-B + VP-A re-verify.
+
 ### 2026-09-17 — HR3-C DEFERRED (APPROVE HR3-C deferred stamp)
 
 - Lead Luke Thompson typed **skip** on HR3-C branch-protection UI/API verify (2026-09-17 ET) — treat as **`APPROVE HR3-C deferred`**: checklist delivered (PR #62); GitHub apply not verified; do not block HR3-D.
 - Docs stamped: [HR3_C_BRANCH_PROTECTION.md](../Docs/handoffs/HR3_C_BRANCH_PROTECTION.md), [15_HR3_A_PLUS.md](../Docs/15_HR3_A_PLUS.md), [15c_HR3_C_BRANCH_PROTECTION.md](../Docs/15c_HR3_C_BRANCH_PROTECTION.md), [PHASE_BOARD.md](../swarm/PHASE_BOARD.md).
-- **HR3-C DEFERRED / COMPLETE for track**. **HR3-D UNLOCKED / IN PROGRESS**. **VP-B still PARKED** pending HR3.
-- **Next:** HR3-D planning (DESKTOP evidence lane + re-verify) — Lead **`APPROVE HR3-D`** before implementation PR. Branch protection apply remains in [CI_SETUP.md](Setup/CI_SETUP.md) for later.
+- Branch protection apply remains in [CI_SETUP.md](Setup/CI_SETUP.md) for later.
 
 ### 2026-09-17 — HR3-C branch protection checklist (docs-only)
 

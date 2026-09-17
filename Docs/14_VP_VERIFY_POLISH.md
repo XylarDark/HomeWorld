@@ -17,7 +17,11 @@ Lead **`APPROVE VP STRATEGY`** — **APPROVED** (Luke Thompson, 2026-09-17 ET).
 
 **Next gate (VP):** Resume **VP-B** after HR3 track progress — HR3 strategy **APPROVED** ([15_HR3_A_PLUS.md](15_HR3_A_PLUS.md)); **VP-B PARKED**.
 
-**VP-A APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET (hard-fail accepted; re-verify after VP-B). **VP-B PARKED** pending HR3 (do not mark VP complete). VP-C/D remain **LOCKED**.
+**VP-A APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET (hard-fail accepted; re-verify after VP-B). **VP-B PARKED** pending HR3 close (do not mark VP complete). VP-C/D remain **LOCKED**.
+
+### Re-verify (HR3-D)
+
+After **VP-B** (or any blocker-fix phase), **VP-A verb greps must re-run** on DESKTOP before **VP-C** unlocks. Do not treat the original VP-A hard-fail record as permanent — append a **§ Re-verify** section to [handoffs/VP_A_PIE.md](handoffs/VP_A_PIE.md) with updated pass/fail table. Checklist: [handoffs/HR3_D_EVIDENCE_LANE.md](handoffs/HR3_D_EVIDENCE_LANE.md). Conductor refuses VP-C until re-verify is filed or Lead **WAIVED** per prefix.
 
 ---
 
@@ -127,7 +131,7 @@ Naming: **VP-A … VP-D** (Verify & Polish). Do **not** reuse NP-* or HR2-* phas
 
 **Done criteria:**
 
-- [ ] VP-A failures addressed or explicitly waived by Lead
+- [ ] VP-A re-verify greps **PASS** (or Lead **WAIVED** per prefix) after VP-B — [HR3_D_EVIDENCE_LANE.md](handoffs/HR3_D_EVIDENCE_LANE.md)
 - [ ] Nurture success visibly distinct (M_Nurtured or documented MI path)
 - [ ] Interact/gather gaps from VP-A closed or logged with reason
 
