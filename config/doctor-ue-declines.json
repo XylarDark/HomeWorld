@@ -1,0 +1,11 @@
+{
+  "host": "homeworld-ue57",
+  "policyDoc": "docs/Setup/DOCTOR_POLICY.md",
+  "acceptedCriticalMessages": [
+    "TypeScript Not Configured",
+    "ESLint Not Configured",
+    "No JS Unit Tests Detected",
+    "Secrets Handling Not Detected",
+    "Always-Applied Rule Budget Exceeded"
+  ]
+}

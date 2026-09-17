@@ -2,8 +2,9 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **DRAFT** — awaiting Lead **`APPROVE HR2 STRATEGY`** |
+| **Status** | **APPROVED** — Lead Luke Thompson, **`APPROVE HR2 STRATEGY`**, 2026-09-17 ET |
 | **Date** | 2026-09-17 |
+| **Strategy merge** | `d10e7b575e25d87c8aea55ee6bf314b8288e38d2` (PR #47) |
 | **Baseline** | Main @ `54193ac` — post-NP audit + senior harness review |
 | **Harness grade** | **B- (~3.8/5)** — past blocking threshold (HR-A…D + HR-B2 complete) |
 | **Author** | Conductor (HomeWorld) |
@@ -32,10 +33,10 @@ HR-A…D + HR-B2 delivered a **B- harness** and unlocked product NP. Senior harn
 |-------|--------|
 | **Docs/11 HR-A…D + HR-B2** | **CLOSED** |
 | **Product NP (Docs/11_NEXT_PHASE_STRATEGY)** | **CLOSED** — NP work complete at audit baseline |
-| **Docs/13 / HR2 strategy** | **DRAFT** — awaiting Lead **`APPROVE HR2 STRATEGY`** |
-| **HR2-A** | **LOCKED** — no implementation until strategy approved |
-| **HR2-B** | **LOCKED** |
-| **HR2-C** | **LOCKED** |
+| **Docs/13 / HR2 strategy** | **APPROVED** — Lead **`APPROVE HR2 STRATEGY`**, 2026-09-17 ET |
+| **HR2-A** | **IN PROGRESS** — [13a_HR2_A_HANDOFF.md](13a_HR2_A_HANDOFF.md); await Lead **`APPROVE HR2-A`** |
+| **HR2-B** | **LOCKED** — blocked until **`APPROVE HR2-A`** |
+| **HR2-C** | **LOCKED** — blocked until **`APPROVE HR2-B`** |
 
 ---
 
@@ -162,8 +163,8 @@ Naming: **HR2-A … HR2-C** (Harness Refine 2). Do **not** reuse HR-A…D or NP 
 Phases may run **sequentially** (recommended: A → B → C) or **parallel** after strategy approval if Lead directs — each phase still requires its own APPROVE before implementation.
 
 ```
-Docs/13 / HR2 STRATEGY: DRAFT — awaiting Lead APPROVE HR2 STRATEGY
-HR2-A: LOCKED
+Docs/13 / HR2 STRATEGY: APPROVED — Lead Luke Thompson, APPROVE HR2 STRATEGY, 2026-09-17 ET
+HR2-A: IN PROGRESS — doctor:ue wrapper; await APPROVE HR2-A
 HR2-B: LOCKED
 HR2-C: LOCKED
 ```
@@ -184,4 +185,4 @@ HR2-C: LOCKED
 
 ---
 
-*Conductor prepared this file; **stop for Lead `APPROVE HR2 STRATEGY`** — no HR2-A/B/C implementation until approved.*
+*Conductor prepared this file; HR2 strategy **APPROVED** 2026-09-17 ET. HR2-A implementation in progress — **stop for Lead `APPROVE HR2-A`** before HR2-B.*

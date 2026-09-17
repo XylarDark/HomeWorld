@@ -2,9 +2,11 @@
 
 HomeWorld is a **Unreal Engine 5.7 game host** (C++, Python Editor automation, minimal root `package.json` for DevEnvTemplate doctor/sync only). The DevEnvTemplate doctor scores against a **Node/TS app** profile by default. Several **critical** findings are **accepted declines** — not bugs to fix by inventing a fake Node application.
 
-**Canonical doctor commands:** [CURSOR_DEV.md](CURSOR_DEV.md) — `npm run doctor:build` (after pin bump or fresh clone), `npm run doctor`.
+**Canonical doctor commands:** [CURSOR_DEV.md](CURSOR_DEV.md) — `npm run doctor:build` (after pin bump or fresh clone), **`npm run doctor:ue`** (UE host — trust exit code), `npm run doctor` (raw template output).
 
-**HR-B2 evidence:** [Docs/11e_HR_B2_HANDOFF.md](../../Docs/11e_HR_B2_HANDOFF.md).
+**Decline registry (machine-readable):** [config/doctor-ue-declines.json](../../config/doctor-ue-declines.json) — keep in sync with the table below.
+
+**HR-B2 evidence:** [Docs/11e_HR_B2_HANDOFF.md](../../Docs/11e_HR_B2_HANDOFF.md). **HR2-A:** [Docs/13a_HR2_A_HANDOFF.md](../../Docs/13a_HR2_A_HANDOFF.md).
 
 ---
 
@@ -22,12 +24,13 @@ HomeWorld is a **Unreal Engine 5.7 game host** (C++, Python Editor automation, m
 
 ## Expected doctor outcome
 
-| Host | Expected exit | Score (HR-B2 cloud run) |
-|------|---------------|-------------------------|
-| **Cloud VM** (after submodule init + `doctor:build`) | **Non-zero** (5 criticals above) | **77/100** |
-| **Windows DESKTOP** | Same critical class | Same class |
+| Command | Host | Expected exit | Notes |
+|---------|------|---------------|-------|
+| **`npm run doctor:ue`** | Cloud VM / Windows (after submodule init + `doctor:build`) | **0** when only accepted declines remain | **Preferred** for agents and CI hygiene checks on UE host |
+| `npm run doctor` | Same | **1** (5 policy criticals) | Raw DevEnvTemplate signal — read this doc before interpreting |
+| Either | Score | **77/100** (HR-B2 / HR2-A cloud baseline) | Warnings may remain; only **non-declined** criticals fail `doctor:ue` |
 
-**Green doctor** on this host would require either (a) adopting a full Node/TS app stack (declined), or (b) reducing always-applied rules below 200 lines **and** template support for host-specific doctor ignore lists (not available at pin `2efd756`).
+**Green raw doctor** on this host would require either (a) adopting a full Node/TS app stack (declined), or (b) reducing always-applied rules below 200 lines **and** template support for host-specific doctor ignore lists (not available at pin `2efd756`). Use **`doctor:ue`** instead.
 
 ---
 
@@ -45,4 +48,4 @@ Template prefers Node **24+**; HomeWorld allows Node **20+**. `EBADENGINE` on No
 
 ---
 
-*HR-B2 — honest mitigation; no silent doctor fail.*
+*HR-B2 — honest mitigation; HR2-A adds `doctor:ue` exit-code truth (no TS/ESLint/Jest cosplay).*

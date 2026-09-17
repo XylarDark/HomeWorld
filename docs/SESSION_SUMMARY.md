@@ -20,6 +20,12 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 ## Rolling log (newest first)
 
+### 2026-09-17 — HR2-A doctor signal (`doctor:ue`)
+
+- Lead **`APPROVE HR2 STRATEGY`** (Luke Thompson, 2026-09-17 ET) — strategy merge `d10e7b5` (PR #47).
+- HR2-A: `scripts/doctor-ue.js`, `config/doctor-ue-declines.json`, `npm run doctor:ue` — cloud before exit **1**, after exit **0** (77/100, 5 accepted declines).
+- Handoff: [Docs/13a_HR2_A_HANDOFF.md](../Docs/13a_HR2_A_HANDOFF.md). **Next:** Lead **`APPROVE HR2-A`** → unlock HR2-B.
+
 ### 2026-09-17 — HR2 harness refine strategy (docs-only)
 
 - Delivered [Docs/13_HR2_HARNESS_REFINE.md](../Docs/13_HR2_HARNESS_REFINE.md) — **DRAFT**; phases HR2-A (doctor signal), HR2-B (cold-clone submodule), HR2-C (C++ CI gate).
