@@ -20,6 +20,13 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 ## Rolling log (newest first)
 
+### 2026-09-17 — HR-D dry-run loop (cloud agent proof)
+
+- Lead **`APPROVE HR-C`** — swarm ops refine signed off; HR-D unlocked.
+- Cloud agent dry-run: docs-only PR on `cursor/hr-d-dry-run-a82d` — no MCP, no Safe-Build, no `.uasset`.
+- Deliverables: [Docs/handoffs/HR_D_DRY_RUN.md](../Docs/handoffs/HR_D_DRY_RUN.md), [Docs/11d_HR_D_HANDOFF.md](../Docs/11d_HR_D_HANDOFF.md); audit re-grade (combined **B- 3.9** vs baseline **C 2.8**).
+- **Next:** Lead **`APPROVE HR-D`** → unlock product NP planning or schedule HR-B2 for residual risks.
+
 ### 2026-09-17 — HR-C swarm ops refine
 
 - Lead **`APPROVE HR-B`** — harness tighten signed off (PR #25).

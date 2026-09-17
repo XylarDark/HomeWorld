@@ -2,12 +2,13 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **ACTIVE** — Docs/11 **APPROVED**; HR-A **APPROVED**; HR-B **APPROVED**; HR-C **COMPLETE awaiting APPROVE HR-C** |
-| **Approval notes** | Lead Luke Thompson, 2026-09-17 ET — Docs/11 / HR strategy; **APPROVE HR-A**; **APPROVE HR-B**; HR-C delivered in HR-C PR |
+| **Status** | **ACTIVE** — Docs/11 **APPROVED**; HR-A **APPROVED**; HR-B **APPROVED**; HR-C **APPROVED**; HR-D **COMPLETE awaiting APPROVE HR-D** |
+| **Approval notes** | Lead Luke Thompson, 2026-09-17 ET — Docs/11 / HR strategy; **APPROVE HR-A**; **APPROVE HR-B**; **APPROVE HR-C**; HR-D dry-run delivered in HR-D PR |
 | **Date** | 2026-09-17 |
 | **HR-A stamp** | Lead Luke Thompson, **APPROVE HR-A**, 2026-09-17 ET |
 | **HR-B stamp** | Lead Luke Thompson, **APPROVE HR-B**, 2026-09-17 ET — [11b_HR_B_HANDOFF.md](11b_HR_B_HANDOFF.md) |
-| **HR-C stamp** | **COMPLETE awaiting APPROVE HR-C**, 2026-09-17 — [11c_HR_C_HANDOFF.md](11c_HR_C_HANDOFF.md) |
+| **HR-C stamp** | Lead Luke Thompson, **APPROVE HR-C**, 2026-09-17 ET (morning) — [11c_HR_C_HANDOFF.md](11c_HR_C_HANDOFF.md) |
+| **HR-D stamp** | **COMPLETE awaiting APPROVE HR-D**, 2026-09-17 — [11d_HR_D_HANDOFF.md](11d_HR_D_HANDOFF.md) |
 | **Author** | Conductor (HomeWorld) |
 | **Audit input** | [11_SWARM_HARNESS_AUDIT.md](11_SWARM_HARNESS_AUDIT.md) |
 | **Product next-phase** | **PARKED** — [11_NEXT_PHASE_STRATEGY.md](11_NEXT_PHASE_STRATEGY.md) (NP-A…E DEFERRED) |
@@ -29,8 +30,8 @@ Lead directive: **refine swarm + harness technologies before any product gamepla
 | **Docs/11 audit + refine** | **APPROVED** — Lead Luke Thompson, 2026-09-17 ET |
 | **HR-A** | **APPROVED** — [11a_HR_MEASURES.md](11a_HR_MEASURES.md) |
 | **HR-B** | **APPROVED** — [11b_HR_B_HANDOFF.md](11b_HR_B_HANDOFF.md) |
-| **HR-C** | **COMPLETE awaiting APPROVE HR-C** — [11c_HR_C_HANDOFF.md](11c_HR_C_HANDOFF.md) |
-| **HR-D** | **NOT STARTED** — blocked until Lead **`APPROVE HR-C`** |
+| **HR-C** | **APPROVED** — [11c_HR_C_HANDOFF.md](11c_HR_C_HANDOFF.md) |
+| **HR-D** | **COMPLETE awaiting APPROVE HR-D** — [11d_HR_D_HANDOFF.md](11d_HR_D_HANDOFF.md), [handoffs/HR_D_DRY_RUN.md](handoffs/HR_D_DRY_RUN.md) |
 | **Product NP-A…E** | **DEFERRED** — blocked until HR-D re-grade **or** Lead explicitly parks HR and unblocks NP |
 
 ---
@@ -135,8 +136,8 @@ Demonstrate the refined harness end-to-end before unlocking product NP.
 Docs/11 / HR STRATEGY: APPROVED — Lead Luke Thompson, 2026-09-17 ET
 HR-A: APPROVED — Lead Luke Thompson, 2026-09-17 ET
 HR-B: APPROVED — Lead Luke Thompson, 2026-09-17 ET (see 11b_HR_B_HANDOFF.md)
-HR-C: COMPLETE — awaiting Lead APPROVE HR-C (see 11c_HR_C_HANDOFF.md)
-HR-D: blocked until APPROVE HR-C
+HR-C: APPROVED — Lead Luke Thompson, APPROVE HR-C, 2026-09-17 ET (see 11c_HR_C_HANDOFF.md)
+HR-D: COMPLETE — awaiting Lead APPROVE HR-D (see 11d_HR_D_HANDOFF.md)
 ```
 
 ---
@@ -152,4 +153,4 @@ HR-D: blocked until APPROVE HR-C
 
 ---
 
-*Conductor prepared this file; HR-C complete — awaiting Lead APPROVE HR-C.*
+*Conductor prepared this file; HR-D dry-run complete — awaiting Lead APPROVE HR-D.*

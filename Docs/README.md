@@ -28,7 +28,8 @@ These are **intentionally separate**. On case-insensitive filesystems (macOS/Win
 - **Swarm & harness refine (APPROVED):** [11_SWARM_HARNESS_REFINE.md](11_SWARM_HARNESS_REFINE.md) — HR-A…D Lead gates (before product next-phase)
 - **HR-A measures (APPROVED):** [11a_HR_MEASURES.md](11a_HR_MEASURES.md) — baseline tables
 - **HR-B harness tighten (APPROVED):** [11b_HR_B_HANDOFF.md](11b_HR_B_HANDOFF.md)
-- **HR-C swarm ops refine (COMPLETE):** [11c_HR_C_HANDOFF.md](11c_HR_C_HANDOFF.md) — await Lead **`APPROVE HR-C`**
+- **HR-C swarm ops refine (APPROVED):** [11c_HR_C_HANDOFF.md](11c_HR_C_HANDOFF.md) — Lead Luke Thompson, 2026-09-17 ET
+- **HR-D prove dry-run (COMPLETE):** [11d_HR_D_HANDOFF.md](11d_HR_D_HANDOFF.md) — await Lead **`APPROVE HR-D`**; evidence [handoffs/HR_D_DRY_RUN.md](handoffs/HR_D_DRY_RUN.md)
 - **Product next-phase (DEFERRED):** [11_NEXT_PHASE_STRATEGY.md](11_NEXT_PHASE_STRATEGY.md) — NP-A…E parked until HR refine signed off
 - **Start swarm:** [../START_HERE.md](../START_HERE.md)
 - **Master prompt:** [../HOMEWORLD_MASTER_PROMPT.md](../HOMEWORLD_MASTER_PROMPT.md)

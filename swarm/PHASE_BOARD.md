@@ -1,9 +1,9 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **HR-C** (Harness Refine — swarm ops)  
+**Current phase:** **HR-D** (Harness Refine — prove dry-run loop)  
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **CND** (Conductor)  
-**Blocked by:** — (await Lead **`APPROVE HR-C`** after PR merge)
+**Blocked by:** — (await Lead **`APPROVE HR-D`** after PR merge)
 
 | Phase | Name | Owners | Status | Gate file | Handoffs |
 |---|---|---|---|---|---|
@@ -33,11 +33,11 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. Active work is **
 | Docs/11 | Swarm & harness refine strategy | **APPROVED** | [11_SWARM_HARNESS_REFINE.md](../Docs/11_SWARM_HARNESS_REFINE.md) |
 | **HR-A** | Measure & inventory | **APPROVED** | [11a_HR_MEASURES.md](../Docs/11a_HR_MEASURES.md) |
 | **HR-B** | Harness tighten | **APPROVED** | [11b_HR_B_HANDOFF.md](../Docs/11b_HR_B_HANDOFF.md) |
-| **HR-C** | Swarm ops refine | **COMPLETE — awaiting APPROVE HR-C** | [11c_HR_C_HANDOFF.md](../Docs/11c_HR_C_HANDOFF.md) |
-| **HR-D** | Prove (dry-run loop) | **LOCKED** | Blocked until Lead **`APPROVE HR-C`** |
+| **HR-C** | Swarm ops refine | **APPROVED** | [11c_HR_C_HANDOFF.md](../Docs/11c_HR_C_HANDOFF.md) |
+| **HR-D** | Prove (dry-run loop) | **COMPLETE — awaiting APPROVE HR-D** | [11d_HR_D_HANDOFF.md](../Docs/11d_HR_D_HANDOFF.md), [HR_D_DRY_RUN.md](../Docs/handoffs/HR_D_DRY_RUN.md) |
 | **Product NP-A…E** | Next-phase gameplay / lookdev apply | **PARKED / DEFERRED** | [11_NEXT_PHASE_STRATEGY.md](../Docs/11_NEXT_PHASE_STRATEGY.md) |
 
-**Current track:** HR-A **APPROVED**, HR-B **APPROVED**, HR-C **COMPLETE** (awaiting Lead **`APPROVE HR-C`**).
+**Current track:** HR-A **APPROVED**, HR-B **APPROVED**, HR-C **APPROVED**, HR-D **COMPLETE** (awaiting Lead **`APPROVE HR-D`**).
 
 ---
 
@@ -45,7 +45,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. Active work is **
 
 | ID | Phase | Owner | Write path | Due artifact |
 |---|---|---|---|---|
-| HR-D | POST-AUDIT | CND | Docs/handoffs/ | Dry-run handoff after APPROVE HR-C |
+| NP-plan | POST-AUDIT | CND | Docs/ | Rewrite/unblock 11_NEXT_PHASE after APPROVE HR-D |
 
 ## Open defects
 
