@@ -1,3 +1,8 @@
+## 2026-09-17 ET — Docs/18 VP2 Verify & Prove DRAFT
+
+Lead asked for next-track draft after HS sign-off. Docs/18 VP2 (prove loop with evidence:grep before features) filed DRAFT — await **`APPROVE VP2 STRATEGY`**.
+
+
 ## 2026-09-17 ET — SIGN OFF HS AUDIT / Docs/17 CLOSED
 
 Lead **`SIGN OFF HS AUDIT`**. Harness **~A**, swarm **~A**. HS-A/B/D/E APPROVED; HS-C ACCEPT DEFER; HS-E KEEP-LOCAL. Next product track **TBD by Lead only**.
