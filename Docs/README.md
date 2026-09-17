@@ -58,3 +58,4 @@ These are **intentionally separate**. On case-insensitive filesystems (macOS/Win
 - **Game canon brief:** [../HOMEWORLD_MVP_SWARM_BRIEF.md](../HOMEWORLD_MVP_SWARM_BRIEF.md)
 - **Swarm ops:** [../swarm/SWARM_OPS.md](../swarm/SWARM_OPS.md)
 - **UE project context:** [../AGENTS.md](../AGENTS.md) and [../docs/README.md](../docs/README.md)
+| [18_VERIFY_PROVE.md](18_VERIFY_PROVE.md) | Verify & Prove (VP2) | **DRAFT** |
