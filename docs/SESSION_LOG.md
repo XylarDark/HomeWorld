@@ -9020,3 +9020,14 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 **Gate:** Await Lead **`APPROVE Docs/11`** before NP-A inventory work.
 
+---
+
+## 2026-09-17 — Docs/11 APPROVED + HR-A deliverable
+
+**Tasks completed:**
+- Lead approval stamped on `Docs/11_SWARM_HARNESS_AUDIT.md` and `Docs/11_SWARM_HARNESS_REFINE.md` (Luke Thompson, 2026-09-17 ET; HR strategy).
+- Created `Docs/11a_HR_MEASURES.md` — HR-A baseline tables (submodule, rules budget, CI paths, PHASE_BOARD gap, dual-OS residue); cloud measurements filled; Windows DESKTOP-21CT3H0 rows PENDING.
+- Updated `Docs/README.md` — link 11a.
+
+**Gate:** HR-A **COMPLETE** — await Lead **`APPROVE HR-A`**. Do not start HR-B.
+

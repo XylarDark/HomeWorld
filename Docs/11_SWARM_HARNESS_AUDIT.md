@@ -2,7 +2,8 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **DRAFT** — awaiting Lead **`APPROVE Docs/11`** / **`APPROVE HR STRATEGY`** |
+| **Status** | **APPROVED** — Lead Luke Thompson, 2026-09-17 ET |
+| **Approval notes** | Lead approved Docs/11 (HR strategy); equivalent: "go with your suggestion" |
 | **Date** | 2026-09-17 |
 | **Author** | Conductor (HomeWorld) |
 | **Scope** | How **swarm ops** and **engineering harness** performed from P0–P7 through WAVE A–F and post-audit wrap (Docs/05–10) |
@@ -118,8 +119,9 @@ Lead redirected: **refine swarm + harness before product next-phase.** This audi
 ## Gate
 
 ```
-Docs/11 audit status: DRAFT — awaiting Lead APPROVE Docs/11 / APPROVE HR STRATEGY
-Do NOT start HR-A until Lead approves.
+Docs/11 audit status: APPROVED — Lead Luke Thompson, 2026-09-17 ET
+Notes: Lead approved Docs/11 (HR strategy).
+HR-A deliverable: Docs/11a_HR_MEASURES.md — COMPLETE, awaiting Lead APPROVE HR-A.
 Product next-phase (NP-A…E) remains DEFERRED until HR-D re-grade passes or Lead parks refine.
 ```
 
