@@ -33,8 +33,10 @@
 #include "EnhancedInputSubsystems.h"
 #include "Engine/World.h"
 #include "Engine/HitResult.h"
+#include "Engine/ActorInstanceHandle.h"
 #include "CollisionQueryParams.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/PrimitiveComponent.h"
 #include "Engine/GameInstance.h"
 #include "Engine/Engine.h"
 #include "Kismet/GameplayStatics.h"
@@ -1137,7 +1139,23 @@ bool AHomeWorldCharacter::FindInteractTargetInCone(FHitResult& OutHit) const
 	OutHit.Distance = FVector::Dist(Start, ImpactPoint);
 	OutHit.ImpactNormal = -Forward.GetSafeNormal();
 	OutHit.Normal = OutHit.ImpactNormal;
-	OutHit.SetActor(BestActor);
+
+	UPrimitiveComponent* PrimComp = Cast<UPrimitiveComponent>(BestActor->GetRootComponent());
+	if (!PrimComp)
+	{
+		PrimComp = BestActor->FindComponentByClass<UPrimitiveComponent>();
+	}
+	if (PrimComp)
+	{
+		OutHit.Component = PrimComp;
+		OutHit.HitObjectHandle = FActorInstanceHandle(PrimComp);
+	}
+	else
+	{
+		OutHit.HitObjectHandle = FActorInstanceHandle(BestActor);
+	}
+	// Resolve handle so GetActor() works for downstream interact (UE 5.7 lazy handle).
+	OutHit.GetActor();
 	return true;
 }
 
@@ -1164,7 +1182,15 @@ bool AHomeWorldCharacter::TraceInteractHit(FHitResult& OutHit) const
 
 AActor* AHomeWorldCharacter::GetInteractTargetActor(const FHitResult& Hit) const
 {
-	return Hit.GetActor();
+	if (AActor* Actor = Hit.GetActor())
+	{
+		return Actor;
+	}
+	if (UPrimitiveComponent* Comp = Hit.GetComponent())
+	{
+		return Comp->GetOwner();
+	}
+	return nullptr;
 }
 
 FString AHomeWorldCharacter::BuildInteractRangeHint(AActor* Target) const
