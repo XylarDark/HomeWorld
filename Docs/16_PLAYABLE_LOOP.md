@@ -77,6 +77,9 @@ Naming: **PL-A … PL-D** (Playable Loop). Do **not** reuse NP-* / HR-* / VP-* i
 - [ ] `npm run preflight:ue -- --require-editor` exit **0** on DESKTOP without relying on mesh-only skip as the primary path
 - [ ] Safe-Build green if C++ touched
 
+
+**Lead substitute (2026-09-17 ET):** UE 5.7 TemplateResources **High Characters Mannequins** → DESKTOP `Content/Characters/Mannequins` (local). Config: `/Game/Characters/Mannequins/Meshes/SKM_Manny_Simple` + `/Game/Characters/Mannequins/Anims/Unarmed/ABP_Unarmed`. Legacy `/Game/Man/...` deferred.
+
 **Out of scope:** Full AnimGraph automation spike; Milady; combat idle sets.
 
 ---
