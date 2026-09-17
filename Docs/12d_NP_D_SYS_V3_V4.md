@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **COMPLETE — awaiting Lead `APPROVE NP-D`** |
+| **Status** | **APPROVED** — Lead **`APPROVE NP-D`**, 2026-09-17 ET |
 | **Date** | 2026-09-17 (ET) |
 | **Author** | Conductor (HomeWorld) |
 | **Parent** | [11_NEXT_PHASE_STRATEGY.md](11_NEXT_PHASE_STRATEGY.md) |
@@ -19,7 +19,7 @@
 | Legacy gather evolve | `TryHarvestInFront`, `AHomeWorldResourcePile::TryHarvest` | **PRESENT** — Wood/Ore/Flowers → RES_* |
 | Beast tame SM | `Source/HomeWorld/HomeWorldBeastTameComponent.*` | **PRESENT** — wild→cautious→tamed→helper |
 | Interact wiring | `HomeWorldInteractAbility`, `TryTameBeastInFront` | **PRESENT** — E key after portal, before gather |
-| Beast pad script | `Content/Python/place_vs_mvp_beast_tame.py` | **PRESENT** — idempotent tame component on pad |
+| Beast pad actor + script | `HomeWorldBeastPad.*`, `place_vs_mvp_beast_tame.py` | **PRESENT** — C++ ctor tame component; idempotent spawn |
 | Handoff | [handoffs/NP_D_SYS_V3_V4.md](handoffs/NP_D_SYS_V3_V4.md) | **PRESENT** |
 
 ---
@@ -101,7 +101,7 @@ Local `.umap` changes from placement are **not committed**.
 
 | Step | Action | Expected log |
 |------|--------|--------------|
-| 1 | Run `place_vs_mvp_beast_tame.py` | Beast pad actor gets tame component |
+| 1 | Run `place_vs_mvp_beast_tame.py` | Spawns `AHomeWorldBeastPad` (tame component in C++ ctor) |
 | 2 | `hw.Gather.Flowers 1` (or berry gather) | RES_HERB or RES_BERRY in inventory |
 | 3 | Walk to beast pad; Interact (E) | `TAME: offer accepted` |
 | 4 | Stay in radius ~4s | `TAME: bond complete -> tamed` |
@@ -116,8 +116,8 @@ Local `.umap` changes from placement are **not committed**.
 
 ## Gate
 
-Lead **`APPROVE NP-D`** → unlock **NP-E** (SYS V6–V8 heal + nurture + dawn persist).
+Lead **`APPROVE NP-D`** — **GRANTED** (Luke Thompson, 2026-09-17 ET) → unlocked **NP-E**.
 
 ---
 
-*NP-D delivered 2026-09-17 ET under Lead APPROVE NP-C.*
+*NP-D APPROVED 2026-09-17 ET. Beast pad residual fixed via AHomeWorldBeastPad in NP-E branch.*

@@ -9084,3 +9084,15 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 **Gate:** NP-D **COMPLETE** — await Lead **`APPROVE NP-D`**. Do not start NP-E.
 
+---
+
+## 2026-09-17 — NP-E SYS V6–V8 + APPROVE NP-D stamp (cloud agent)
+
+**Lead:** **`APPROVE NP-D`** (Luke Thompson, 2026-09-17 ET).
+
+**Delivered:** NP-D stamped APPROVED; Docs/12e_NP_E_SYS_V6_V8.md + handoffs/NP_E_SYS_V6_V8.md; V6 `UHomeWorldSpiritHealComponent` + `AHomeWorldSpiritWisp` + evolved `UHomeWorldHealAbility`; V7 `UHomeWorldNurtureComponent` + `AHomeWorldNurtureTarget`; V8 SaveGame dawn persist + `PersistDawnSnapshot` on `SetPhase(Dawn)`; `AHomeWorldBeastPad` residual fix; placement scripts `place_vs_mvp_spirit_heal.py`, `place_vs_mvp_nurture.py`; bootstrap chain extended; PHASE_BOARD NP-E COMPLETE.
+
+**Windows follow-up:** Safe-Build after merge; run beast/heal/nurture placement scripts; PIE runbook Docs/12e (grep HEAL:/NURTURE:/DAWN:/FORM:).
+
+**Gate:** NP-E **COMPLETE** — await Lead **`APPROVE NP-E`** (final product NP phase). STOP for Lead stamp.
+

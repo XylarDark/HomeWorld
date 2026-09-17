@@ -47,6 +47,20 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Inventory", meta = (DisplayName = "Spend Tame Food"))
 	FName SpendTameFood();
 
+	/** V6 heal — RES_HERB or RES_SEED available. */
+	UFUNCTION(BlueprintCallable, Category = "Inventory", meta = (DisplayName = "Has Heal Resource"))
+	bool HasHealResource(int32 Amount = 1) const;
+
+	/** Spend 1× RES_HERB (prefer) or RES_SEED for heal. */
+	UFUNCTION(BlueprintCallable, Category = "Inventory", meta = (DisplayName = "Spend Heal Resource"))
+	FName SpendHealResource();
+
+	/** V8 — copy slot array for SaveGame. */
+	void CopySlotsTo(TArray<FHomeWorldInventorySlot>& OutSlots) const;
+
+	/** V8 — restore slots from SaveGame (replaces current). */
+	void RestoreSlotsFrom(const TArray<FHomeWorldInventorySlot>& InSlots);
+
 	/** Read-only slot view (0–5). */
 	UFUNCTION(BlueprintCallable, Category = "Inventory", meta = (DisplayName = "Get Slot"))
 	FHomeWorldInventorySlot GetSlot(int32 SlotIndex) const;

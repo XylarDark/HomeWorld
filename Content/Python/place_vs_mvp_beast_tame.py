@@ -1,9 +1,7 @@
 # place_vs_mvp_beast_tame.py
-# NP-D: idempotent GP_BeastPad TargetPoint + UHomeWorldBeastTameComponent on L_VS_MVP_Markers.
-# Spawns GP_BeastPad near CRUMB_Landing when no beast pad exists (planet slice V4).
+# NP-D/NP-E: idempotent AHomeWorldBeastPad near CRUMB_Landing on L_VS_MVP_Markers.
+# C++ constructor creates UHomeWorldBeastTameComponent (no Editor add_component_by_class).
 # Run via MCP execute_python_script or Tools > Execute Python Script.
-#
-# Prerequisite: place_vs_mvp_markers.py (CRUMB_Landing TargetPoint).
 
 from __future__ import annotations
 
@@ -22,10 +20,8 @@ LEVEL_PATH = "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers"
 JSON_REL = os.path.join("AssetCreation", "Exports", "MVP_CRUMB_SPLINE.json")
 GP_BEAST_PAD_LABEL = "GP_BeastPad"
 LANDING_CRUMB_LABEL = "CRUMB_Landing"
-BEAST_PAD_TAGS = ("BeastPad", "SM_BeastPad_01")
-TAME_COMPONENT_CLASS = "/Script/HomeWorld.HomeWorldBeastTameComponent"
+BEAST_PAD_CLASS = "/Script/HomeWorld.HomeWorldBeastPad"
 FOLDER = "VS_MVP/Markers"
-# Offset from landing circle toward planet path (cm) — readable beast pad on slice
 SPAWN_OFFSET = unreal.Vector(200.0, 150.0, 0.0)
 
 
@@ -68,44 +64,29 @@ def _load_level() -> bool:
     return False
 
 
-def _actor_tag_names(actor) -> set:
-    try:
-        return {str(t) for t in list(actor.tags)}
-    except Exception:
-        return set()
-
-
-def _apply_beast_pad_tags(actor) -> None:
-    for tag in BEAST_PAD_TAGS:
-        name = unreal.Name(tag)
-        if hasattr(actor, "add_tag"):
-            actor.add_tag(name)
-        else:
-            tags = list(actor.tags) if hasattr(actor, "tags") else []
-            if tag not in {str(t) for t in tags}:
-                tags.append(name)
-                actor.tags = tags
-
-
 def _find_beast_pad_actor():
     gp = find_actor_by_label(GP_BEAST_PAD_LABEL)
     if gp:
         return gp
-
+    beast_class = unreal.load_class(None, BEAST_PAD_CLASS)
+    if beast_class:
+        for actor in unreal.EditorLevelLibrary.get_all_level_actors():
+            try:
+                if actor.get_class() == beast_class:
+                    return actor
+            except Exception:
+                continue
     for actor in unreal.EditorLevelLibrary.get_all_level_actors():
         try:
             label = actor.get_actor_label()
         except Exception:
             label = ""
-        tag_names = _actor_tag_names(actor)
-        if tag_names.intersection(set(BEAST_PAD_TAGS)):
-            return actor
         if "BeastPad" in label or "Beast_Pad" in label or "SM_BeastPad" in label:
             return actor
     return None
 
 
-def _landing_location_from_json():
+def _anchor_from_json(key: str):
     root = _project_root()
     json_path = os.path.join(root, JSON_REL)
     if not os.path.isfile(json_path):
@@ -115,11 +96,10 @@ def _landing_location_from_json():
             data = json.load(f)
     except Exception:
         return None
-    for crumb in data.get("crumbs") or []:
-        if isinstance(crumb, dict) and crumb.get("name") == LANDING_CRUMB_LABEL:
-            loc = crumb.get("location")
-            if loc:
-                return blender_to_ue_cm(loc)
+    anchors = data.get("anchors") or {}
+    entry = anchors.get(key)
+    if isinstance(entry, dict) and entry.get("location"):
+        return blender_to_ue_cm(entry["location"])
     return None
 
 
@@ -128,23 +108,26 @@ def _resolve_landing_location():
     if landing:
         _log("Using existing %s @ %s" % (LANDING_CRUMB_LABEL, landing.get_actor_location()))
         return landing.get_actor_location()
-    json_loc = _landing_location_from_json()
+    json_loc = _anchor_from_json("SM_LandingCircle")
     if json_loc:
-        _log("Using %s from MVP_CRUMB_SPLINE.json" % LANDING_CRUMB_LABEL)
+        _log("Using SM_LandingCircle from MVP_CRUMB_SPLINE.json")
         return json_loc
     return None
 
 
-def _spawn_beast_pad_target_point(location: unreal.Vector):
+def _spawn_beast_pad(location: unreal.Vector):
+    beast_class = unreal.load_class(None, BEAST_PAD_CLASS)
+    if not beast_class:
+        _log("HomeWorldBeastPad not found — run Safe-Build first")
+        return None
     rot = unreal.Rotator(0, 0, 0)
-    actor = unreal.EditorLevelLibrary.spawn_actor_from_class(unreal.TargetPoint, location, rot)
+    actor = unreal.EditorLevelLibrary.spawn_actor_from_class(beast_class, location, rot)
     if not actor:
-        _log("Failed to spawn TargetPoint %s" % GP_BEAST_PAD_LABEL)
+        _log("Failed to spawn HomeWorldBeastPad")
         return None
     actor.set_actor_label(GP_BEAST_PAD_LABEL)
     actor.set_folder_path(FOLDER)
-    _apply_beast_pad_tags(actor)
-    _log("Spawned TargetPoint %s @ %s (tags: %s)" % (GP_BEAST_PAD_LABEL, location, ", ".join(BEAST_PAD_TAGS)))
+    _log("Spawned HomeWorldBeastPad %s @ %s (tame component in C++ ctor)" % (GP_BEAST_PAD_LABEL, location))
     return actor
 
 
@@ -152,47 +135,17 @@ def _ensure_beast_pad_actor():
     existing = _find_beast_pad_actor()
     if existing:
         _log("Reused beast pad '" + existing.get_name() + "'")
-        _apply_beast_pad_tags(existing)
+        if existing.get_actor_label() != GP_BEAST_PAD_LABEL:
+            existing.set_actor_label(GP_BEAST_PAD_LABEL)
         return existing
 
     landing_loc = _resolve_landing_location()
     if not landing_loc:
-        _log("No %s — run place_vs_mvp_markers.py first" % LANDING_CRUMB_LABEL)
+        _log("No landing anchor — run place_vs_mvp_markers.py first")
         return None
 
     spawn_loc = landing_loc + SPAWN_OFFSET
-    return _spawn_beast_pad_target_point(spawn_loc)
-
-
-def _has_tame_component(actor) -> bool:
-    tame_class = unreal.load_class(None, TAME_COMPONENT_CLASS)
-    if not tame_class:
-        return False
-    if hasattr(actor, "get_component_by_class"):
-        return actor.get_component_by_class(tame_class) is not None
-    return False
-
-
-def _attach_tame_component(pad) -> bool:
-    if _has_tame_component(pad):
-        _log("Reused existing tame component on '" + pad.get_name() + "'")
-        return True
-
-    tame_class = unreal.load_class(None, TAME_COMPONENT_CLASS)
-    if not tame_class:
-        _log("HomeWorldBeastTameComponent not found — run Safe-Build first")
-        return False
-
-    try:
-        comp = pad.add_component_by_class(tame_class, False, unreal.Transform(), False)
-        if comp:
-            pad.modify()
-            _log("TAME: placed component on '" + pad.get_name() + "'")
-            return True
-        _log("add_component_by_class returned None")
-    except Exception as exc:
-        _log("Failed to add component: " + str(exc))
-    return False
+    return _spawn_beast_pad(spawn_loc)
 
 
 def main() -> int:
@@ -201,9 +154,6 @@ def main() -> int:
 
     pad = _ensure_beast_pad_actor()
     if not pad:
-        return 1
-
-    if not _attach_tame_component(pad):
         return 1
 
     try:

@@ -11,6 +11,9 @@
  * Persists family roles and spirit roster via UHomeWorldSaveGame to a slot.
  */
 UCLASS(BlueprintType)
+class UHomeWorldSaveGame;
+class UWorld;
+
 class HOMEWORLD_API UHomeWorldSaveGameSubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
@@ -30,4 +33,14 @@ public:
 	/** Returns true if a save exists in the given slot. Pass empty SlotName for default. */
 	UFUNCTION(BlueprintCallable, Category = "Save", meta = (DisplayName = "Does Save Game Exist"))
 	bool DoesSaveGameExist(const FString& SlotName, int32 UserIndex) const;
+
+	/** NP-E V8 — capture inventory + SYS verbs from play world into SaveGame object. */
+	void CaptureNPSessionState(UHomeWorldSaveGame* SaveGame, UWorld* World);
+
+	/** NP-E V8 — apply NP session fields to live subsystems/actors. */
+	void ApplyNPSessionState(const UHomeWorldSaveGame* SaveGame, UWorld* World);
+
+	/** NP-E V8 — dawn hook: snapshot + write default slot; logs DAWN:. */
+	UFUNCTION(BlueprintCallable, Category = "Save", meta = (DisplayName = "Persist Dawn Snapshot"))
+	bool PersistDawnSnapshot();
 };

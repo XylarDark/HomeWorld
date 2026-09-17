@@ -1,16 +1,137 @@
 // Copyright HomeWorld. All Rights Reserved.
 
 #include "HomeWorldSaveGameSubsystem.h"
+#include "HomeWorldBeastTameComponent.h"
 #include "HomeWorldFamilySubsystem.h"
+#include "HomeWorldInventorySubsystem.h"
+#include "HomeWorldNurtureComponent.h"
 #include "HomeWorldSaveGame.h"
 #include "HomeWorldPlayerState.h"
+#include "HomeWorldSpiritHealComponent.h"
 #include "HomeWorldSpiritRosterSubsystem.h"
 #include "HomeWorldTimeOfDaySubsystem.h"
+#include "EngineUtils.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
 
 const TCHAR* UHomeWorldSaveGameSubsystem::DefaultSlotName = TEXT("HomeWorldSave");
+
+void UHomeWorldSaveGameSubsystem::CaptureNPSessionState(UHomeWorldSaveGame* SaveGame, UWorld* World)
+{
+	if (!SaveGame || !World)
+	{
+		return;
+	}
+
+	UGameInstance* GI = World->GetGameInstance();
+	if (UHomeWorldInventorySubsystem* Inv = GI ? GI->GetSubsystem<UHomeWorldInventorySubsystem>() : nullptr)
+	{
+		Inv->CopySlotsTo(SaveGame->SavedInventorySlots);
+	}
+
+	SaveGame->SavedBeastTameState = 0;
+	SaveGame->SavedSpiritHealIds.Reset();
+	SaveGame->SavedSpiritHealStates.Reset();
+	SaveGame->bSavedN1Nurtured = false;
+	SaveGame->bSavedN2Nurtured = false;
+
+	for (TActorIterator<AActor> It(World); It; ++It)
+	{
+		AActor* Actor = *It;
+		if (!Actor)
+		{
+			continue;
+		}
+		if (UHomeWorldBeastTameComponent* Tame = Actor->FindComponentByClass<UHomeWorldBeastTameComponent>())
+		{
+			SaveGame->SavedBeastTameState = static_cast<uint8>(Tame->GetTameState());
+		}
+		if (UHomeWorldSpiritHealComponent* Heal = Actor->FindComponentByClass<UHomeWorldSpiritHealComponent>())
+		{
+			SaveGame->SavedSpiritHealIds.Add(Heal->GetSpiritId());
+			SaveGame->SavedSpiritHealStates.Add(static_cast<uint8>(Heal->GetHealState()));
+		}
+		if (UHomeWorldNurtureComponent* Nurture = Actor->FindComponentByClass<UHomeWorldNurtureComponent>())
+		{
+			if (Nurture->GetTargetId() == EHomeWorldNurtureTargetId::N1_Crop)
+			{
+				SaveGame->bSavedN1Nurtured = Nurture->GetIsNurtured();
+			}
+			else if (Nurture->GetTargetId() == EHomeWorldNurtureTargetId::N2_Stored)
+			{
+				SaveGame->bSavedN2Nurtured = Nurture->GetIsNurtured();
+			}
+		}
+	}
+}
+
+void UHomeWorldSaveGameSubsystem::ApplyNPSessionState(const UHomeWorldSaveGame* SaveGame, UWorld* World)
+{
+	if (!SaveGame || !World)
+	{
+		return;
+	}
+
+	UGameInstance* GI = World->GetGameInstance();
+	if (UHomeWorldInventorySubsystem* Inv = GI ? GI->GetSubsystem<UHomeWorldInventorySubsystem>() : nullptr)
+	{
+		if (SaveGame->SavedInventorySlots.Num() == HomeWorldInventory::SlotCount)
+		{
+			Inv->RestoreSlotsFrom(SaveGame->SavedInventorySlots);
+		}
+	}
+
+	for (TActorIterator<AActor> It(World); It; ++It)
+	{
+		AActor* Actor = *It;
+		if (!Actor)
+		{
+			continue;
+		}
+		if (UHomeWorldBeastTameComponent* Tame = Actor->FindComponentByClass<UHomeWorldBeastTameComponent>())
+		{
+			Tame->ApplyPersistedState(static_cast<EHomeWorldBeastTameState>(SaveGame->SavedBeastTameState));
+		}
+		if (UHomeWorldSpiritHealComponent* Heal = Actor->FindComponentByClass<UHomeWorldSpiritHealComponent>())
+		{
+			const FName Id = Heal->GetSpiritId();
+			const int32 Idx = SaveGame->SavedSpiritHealIds.IndexOfByKey(Id);
+			if (SaveGame->SavedSpiritHealStates.IsValidIndex(Idx))
+			{
+				Heal->ApplyPersistedState(static_cast<EHomeWorldSpiritHealState>(SaveGame->SavedSpiritHealStates[Idx]));
+			}
+		}
+		if (UHomeWorldNurtureComponent* Nurture = Actor->FindComponentByClass<UHomeWorldNurtureComponent>())
+		{
+			if (Nurture->GetTargetId() == EHomeWorldNurtureTargetId::N1_Crop)
+			{
+				Nurture->ApplyPersistedNurtured(SaveGame->bSavedN1Nurtured);
+			}
+			else if (Nurture->GetTargetId() == EHomeWorldNurtureTargetId::N2_Stored)
+			{
+				Nurture->ApplyPersistedNurtured(SaveGame->bSavedN2Nurtured);
+			}
+		}
+	}
+}
+
+bool UHomeWorldSaveGameSubsystem::PersistDawnSnapshot()
+{
+	UWorld* World = GetGameInstance() ? GetGameInstance()->GetWorld() : nullptr;
+	if (!World)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("DAWN: persist skipped — no world"));
+		return false;
+	}
+
+	const bool bOk = SaveGameToSlot(FString(), 0);
+	const UHomeWorldInventorySubsystem* Inv = GetGameInstance()->GetSubsystem<UHomeWorldInventorySubsystem>();
+	const int32 Physical = Inv ? Inv->GetTotalPhysicalGoods() : 0;
+	UE_LOG(LogTemp, Log, TEXT("DAWN: persisted inventory=%d tame+heal+nurture in slot '%s' (%s)"),
+		Physical, DefaultSlotName, bOk ? TEXT("ok") : TEXT("failed"));
+	return bOk;
+}
 
 bool UHomeWorldSaveGameSubsystem::SaveGameToSlot(const FString& SlotName, int32 UserIndex)
 {
@@ -54,6 +175,7 @@ bool UHomeWorldSaveGameSubsystem::SaveGameToSlot(const FString& SlotName, int32 
 				SaveGame->SavedLoveLevel = PS->GetLoveLevel();
 			}
 		}
+		CaptureNPSessionState(SaveGame, World);
 	}
 
 	bool bSaved = UGameplayStatics::SaveGameToSlot(SaveGame, Slot, UserIndex);
@@ -119,6 +241,7 @@ bool UHomeWorldSaveGameSubsystem::LoadGameFromSlot(const FString& SlotName, int3
 				UE_LOG(LogTemp, Log, TEXT("HomeWorld: Spiritual power=%d, day buff=%d, loveLevel=%d restored"), SaveGame->SavedSpiritualPowerCollected, SaveGame->bSavedHasDayRestorationBuff ? 1 : 0, SaveGame->SavedLoveLevel);
 			}
 		}
+		ApplyNPSessionState(SaveGame, World);
 	}
 
 	UE_LOG(LogTemp, Log, TEXT("HomeWorld: Load completed from slot '%s' (roles=%d, spirits=%d, phase=%d, spiritualPower=%d, dayBuff=%d, loveLevel=%d)"),

@@ -1,7 +1,12 @@
 // Copyright HomeWorld. All Rights Reserved.
 
 #include "HomeWorldHealAbility.h"
+#include "HomeWorldCharacter.h"
+#include "HomeWorldSpiritHealComponent.h"
 #include "AbilitySystemComponent.h"
+#include "Engine/World.h"
+#include "GameFramework/Character.h"
+#include "Components/CapsuleComponent.h"
 
 UHomeWorldHealAbility::UHomeWorldHealAbility()
 {
@@ -11,16 +16,27 @@ UHomeWorldHealAbility::UHomeWorldHealAbility()
 void UHomeWorldHealAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	UE_LOG(LogTemp, Log, TEXT("HomeWorld: Heal ability activated [%s]"), *GetName());
-
-	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
+	if (!ActorInfo || !ActorInfo->AvatarActor.IsValid())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("HomeWorld: Heal [%s] failed CommitAbility"), *GetName());
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
 		return;
 	}
 
-	// Minimal: commit succeeded. Add healing GE or attribute change in Blueprint or extend in C++ later.
-	UE_LOG(LogTemp, Log, TEXT("HomeWorld: Heal [%s] committed successfully"), *GetName());
-	EndAbility(Handle, ActorInfo, ActivationInfo, false, false);
+	AHomeWorldCharacter* Character = Cast<AHomeWorldCharacter>(ActorInfo->AvatarActor.Get());
+	if (!Character)
+	{
+		EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
+		return;
+	}
+
+	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HEAL: ability commit failed"));
+		EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
+		return;
+	}
+
+	const bool bHealed = Character->TryHealSpiritInFront();
+	UE_LOG(LogTemp, Log, TEXT("HEAL: ability %s"), bHealed ? TEXT("handled target") : TEXT("no target or soft fail"));
+	EndAbility(Handle, ActorInfo, ActivationInfo, false, !bHealed);
 }

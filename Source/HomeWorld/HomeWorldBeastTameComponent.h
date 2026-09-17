@@ -42,6 +42,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Tame")
 	bool TryPromoteToHelper(AHomeWorldCharacter* Character);
 
+	/** V8 dawn persist — restore tame state without transition log spam. */
+	void ApplyPersistedState(EHomeWorldBeastTameState NewState);
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

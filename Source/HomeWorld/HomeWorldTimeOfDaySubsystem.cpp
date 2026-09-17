@@ -1,7 +1,9 @@
 // Copyright HomeWorld. All Rights Reserved.
 
 #include "HomeWorldTimeOfDaySubsystem.h"
+#include "HomeWorldSaveGameSubsystem.h"
 #include "HAL/IConsoleManager.h"
+#include "Engine/GameInstance.h"
 #include "Engine/World.h"
 #include "Kismet/KismetMaterialLibrary.h"
 #include "Materials/MaterialParameterCollection.h"
@@ -108,6 +110,17 @@ void UHomeWorldTimeOfDaySubsystem::SetPhase(EHomeWorldTimeOfDayPhase Phase)
 		NightPhaseEndTime = GetWorld()->GetTimeSeconds() + Duration;
 	}
 	ApplyNightMixForPhase(Phase);
+
+	if (Phase == EHomeWorldTimeOfDayPhase::Dawn && GetWorld())
+	{
+		if (UGameInstance* GI = GetWorld()->GetGameInstance())
+		{
+			if (UHomeWorldSaveGameSubsystem* Save = GI->GetSubsystem<UHomeWorldSaveGameSubsystem>())
+			{
+				Save->PersistDawnSnapshot();
+			}
+		}
+	}
 
 	if (Phase != Previous)
 	{

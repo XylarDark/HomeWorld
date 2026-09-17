@@ -66,6 +66,19 @@ def _run_slice_setup():
     except Exception as e:
         _log("place_fallback_glide_markers error: " + str(e))
 
+    _log("--- Step 5d/5: NP-D/E SYS markers (beast, heal, nurture) ---")
+    for mod_name in (
+        "place_vs_mvp_beast_tame",
+        "place_vs_mvp_spirit_heal",
+        "place_vs_mvp_nurture",
+    ):
+        try:
+            mod = __import__(mod_name)
+            importlib.reload(mod)
+            mod.main()
+        except Exception as e:
+            _log("%s error: %s" % (mod_name, str(e)))
+
 
 def main(run_slice=True):
     _log("=== HomeWorld project bootstrap (VS_MVP slice primary) ===")

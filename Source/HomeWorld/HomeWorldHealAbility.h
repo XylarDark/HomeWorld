@@ -7,8 +7,8 @@
 #include "HomeWorldHealAbility.generated.h"
 
 /**
- * Support/Healer role ability. GA_Heal Blueprint should use this as parent.
- * Minimal: commit + log; add healing GE or attribute change in Blueprint or extend in C++.
+ * SYS V6 heal ability. GA_Heal Blueprint parent — traces spirit wisps and spends RES_HERB/RES_SEED.
+ * Interact (E) also routes through AHomeWorldCharacter::TryHealSpiritInFront (same component path).
  */
 UCLASS(Blueprintable)
 class HOMEWORLD_API UHomeWorldHealAbility : public UHomeWorldGameplayAbility
