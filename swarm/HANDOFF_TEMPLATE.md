@@ -75,3 +75,15 @@ Use when a **Cursor cloud agent** ships a PR (no UE/MCP on the VM). Full packet:
 ### Evidence paths (repo-relative)
 
 -
+
+### DESKTOP evidence (HR3-D — when host = DESKTOP-21CT3H0)
+
+| Field | Value |
+|-------|-------|
+| **Host** | DESKTOP-21CT3H0 |
+| **Grep prefixes** | (phase-specific — e.g. VP-A: `FORM:`, `FALLBACK:`, …) |
+| **Log source** | `Saved/Logs/HomeWorld.log` |
+| **Pass/fail table** | One row per prefix — PASS / FAIL / WAIVED + excerpt |
+| **Preflight** | `npm run preflight:ue` exit code |
+
+Re-verify after blocker-fix: append **§ Re-verify** to prior handoff — [HR3_D_EVIDENCE_LANE.md](../Docs/handoffs/HR3_D_EVIDENCE_LANE.md).
