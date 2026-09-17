@@ -1,7 +1,8 @@
 ---
 name: "Testing Standards"
 description: "Follow test pyramid and AAA patterns when writing or updating tests to ensure coverage and reliability"
-alwaysApply: true
+alwaysApply: false
+globs: "**/tests/**, **/test_*.py, **/*.{test,spec}.{js,ts,py}, Content/Python/tests/**"
 priority: 4
 version: 1.0
 ---

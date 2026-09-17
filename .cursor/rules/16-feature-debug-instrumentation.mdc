@@ -1,6 +1,7 @@
 ---
 description: Add debug instrumentation when implementing new features for faster debugging
-alwaysApply: true
+alwaysApply: false
+globs: "**/Source/**, **/Content/Python/**, **/Tools/**, **/.github/workflows/**"
 ---
 
 # Feature debug instrumentation (policy)

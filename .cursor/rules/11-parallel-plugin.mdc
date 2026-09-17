@@ -1,7 +1,8 @@
 ---
 name: "Parallel Plugin: Recommend, Don't Do"
 description: "When a task fits a Parallel plugin feature, recommend the user run that command and paste results; then interpret and integrate. Environment is self-aware of added tools."
-alwaysApply: true
+alwaysApply: false
+globs: "**/*.{cpp,h,py,md,mdc}, docs/**, Docs/**, Source/**"
 priority: 11
 version: 1.0
 ---

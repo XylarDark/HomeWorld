@@ -1,7 +1,8 @@
 ---
 name: "Code Quality Standards"
 description: "Enforce naming, structure, and design patterns when writing or reviewing code to maintain consistency"
-alwaysApply: true
+alwaysApply: false
+globs: "**/*.{cpp,h,py,js,ts,md,json,yml,yaml,mdc}"
 priority: 2
 version: 1.0
 ---

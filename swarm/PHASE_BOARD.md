@@ -1,9 +1,9 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **HR-D** (Harness Refine — prove dry-run loop)  
+**Current phase:** **HR-B2** (Harness Refine — residual risks)  
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **CND** (Conductor)  
-**Blocked by:** — (await Lead **`APPROVE HR-D`** after PR merge)
+**Blocked by:** — (await Lead **`APPROVE HR-B2`** after PR merge; then **`APPROVE HR-D`**)
 
 | Phase | Name | Owners | Status | Gate file | Handoffs |
 |---|---|---|---|---|---|
@@ -22,7 +22,7 @@ Status values: `LOCKED` `OPEN` `IN PROGRESS` `GATE FAILED` `CLOSED` `GATE READY`
 
 ## POST-AUDIT (Docs/05–10 + HR track)
 
-MVP vertical slice and post-audit product wrap are **CLOSED**. Active work is **Harness Refine (HR-A…D)** until Lead approves HR-D or explicitly unblocks product next-phase.
+MVP vertical slice and post-audit product wrap are **CLOSED**. Active work is **Harness Refine (HR-A…D + HR-B2)** until Lead approves HR-D or explicitly unblocks product next-phase.
 
 | Track | Doc / phase | Status | Gate / handoff |
 |---|---|---|---|
@@ -34,10 +34,11 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. Active work is **
 | **HR-A** | Measure & inventory | **APPROVED** | [11a_HR_MEASURES.md](../Docs/11a_HR_MEASURES.md) |
 | **HR-B** | Harness tighten | **APPROVED** | [11b_HR_B_HANDOFF.md](../Docs/11b_HR_B_HANDOFF.md) |
 | **HR-C** | Swarm ops refine | **APPROVED** | [11c_HR_C_HANDOFF.md](../Docs/11c_HR_C_HANDOFF.md) |
-| **HR-D** | Prove (dry-run loop) | **COMPLETE — awaiting APPROVE HR-D** | [11d_HR_D_HANDOFF.md](../Docs/11d_HR_D_HANDOFF.md), [HR_D_DRY_RUN.md](../Docs/handoffs/HR_D_DRY_RUN.md) |
-| **Product NP-A…E** | Next-phase gameplay / lookdev apply | **PARKED / DEFERRED** | [11_NEXT_PHASE_STRATEGY.md](../Docs/11_NEXT_PHASE_STRATEGY.md) |
+| **HR-D** | Prove (dry-run loop) | **COMPLETE — awaiting APPROVE HR-D** (Lead deferred → HR-B2 first) | [11d_HR_D_HANDOFF.md](../Docs/11d_HR_D_HANDOFF.md), [11d_HR_D_DEFER.md](../Docs/11d_HR_D_DEFER.md) |
+| **HR-B2** | Residual harness risks | **COMPLETE — awaiting APPROVE HR-B2** | [11e_HR_B2_HANDOFF.md](../Docs/11e_HR_B2_HANDOFF.md) |
+| **Product NP-A…E** | Next-phase gameplay / lookdev apply | **PARKED** | [11_NEXT_PHASE_STRATEGY.md](../Docs/11_NEXT_PHASE_STRATEGY.md) |
 
-**Current track:** HR-A **APPROVED**, HR-B **APPROVED**, HR-C **APPROVED**, HR-D **COMPLETE** (awaiting Lead **`APPROVE HR-D`**).
+**Current track:** **HR-B2** **COMPLETE** (awaiting Lead **`APPROVE HR-B2`**). HR-D dry-run **COMPLETE**; **`APPROVE HR-D` deferred**. Product NP **PARKED**.
 
 ---
 
@@ -45,7 +46,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. Active work is **
 
 | ID | Phase | Owner | Write path | Due artifact |
 |---|---|---|---|---|
-| NP-plan | POST-AUDIT | CND | Docs/ | Rewrite/unblock 11_NEXT_PHASE after APPROVE HR-D |
+| HR-D-approve | POST-AUDIT | Lead | Docs/ | **`APPROVE HR-D`** after **`APPROVE HR-B2`** |
 
 ## Open defects
 

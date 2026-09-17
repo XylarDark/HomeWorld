@@ -11,7 +11,7 @@ HomeWorld is set up so that AI agents and humans follow the same conventions whe
   - **UE stack (glob-scoped from template):** `21-unreal-engine.mdc`, `22-unreal-editor-ui.mdc` — general Unreal practices; HomeWorld keeps version-specific policy in `ue57-sources.mdc` / `ue57-editor-ui.mdc` and [UE57_TECH.md](../UE/UE57_TECH.md).
   - **HomeWorld / DevEnvTemplate always-applied rules** (00–20 series and project-specific): still in use. Newer DevEnvTemplate **retires** those always-on files for *new* adoptions (migrate into `AGENTS.md` + skills). HomeWorld **keeps** them until a dedicated migration; do not delete them during routine sync.
 - **Build → Editor → MCP (agents):** **`.\Tools\Safe-Build.ps1`** → open Editor → verify MCP (port 55557). See [BUILD_POLICY.md](BUILD_POLICY.md), [MCP_SETUP.md](MCP_SETUP.md), [WINDOWS_BRIDGE.md](WINDOWS_BRIDGE.md). Humans with Editor already closed may still use `Build-HomeWorld.bat` directly.
-- **Rules token budget:** HR-B target — reduce `alwaysApply: true` count by glob-scoping UE-only rules; baseline **20** always-on (34 total `.mdc` files). After HR-B: see [Docs/11b_HR_B_HANDOFF.md](../../Docs/11b_HR_B_HANDOFF.md).
+- **Rules token budget:** HR-B2 reduced `alwaysApply: true` from **15 → 3** (session-wide: `07`, `08`, `20`). See [Docs/11e_HR_B2_HANDOFF.md](../../Docs/11e_HR_B2_HANDOFF.md). Doctor rule-budget critical: **accepted decline** — [DOCTOR_POLICY.md](DOCTOR_POLICY.md).
 - **Compound Engineering plugin:** Recommending its commands when the use case fits is policy; the agent suggests plugin workflows (e.g. `/workflowsreview`, `/workflowsplan`) instead of doing that work inline. See [.cursor/rules/10-compound-engineering.mdc](../../.cursor/rules/10-compound-engineering.mdc).
 
 When asking Cursor to change C++ or Blueprint behavior, the rules ensure suggestions align with programmatic-by-default and the existing HomeWorld layout.
@@ -20,13 +20,15 @@ When asking Cursor to change C++ or Blueprint behavior, the rules ensure suggest
 
 ## DevEnvTemplate (doctor + layer sync)
 
-Pinned checkout: [DevEnvTemplate/](../../DevEnvTemplate/) **gitlink** — accepted pin; bump deferred unless Lead requests.
+Pinned checkout: [DevEnvTemplate/](../../DevEnvTemplate/) **gitlink** — bumped HR-B2 to template `master`.
 
 | Field | Value |
 |-------|-------|
-| **Pinned SHA** | `213673ff181743a703ab390af0d43097f889a0f9` |
+| **Pinned SHA** | `2efd7569a698e73a04279feaebaae1eb55c4e1c0` |
 | **Remote** | `https://github.com/XylarDark/DevEnvTemplate.git` |
-| **Template `main`** | Ahead of pin — **do not force-push** template; bump only when doctor passes on cloud + Windows |
+| **Template branch** | `master` (not `main`) |
+| **HR-B2 delta** | Multi-agent swarm guide + extras skill (+2 commits from `213673f`) |
+| **Doctor policy** | [DOCTOR_POLICY.md](DOCTOR_POLICY.md) — accepted declines for UE game host |
 
 Full template docs: [DevEnvTemplate/docs/SYNC.md](../../DevEnvTemplate/docs/SYNC.md), [BOOTSTRAP.md](../../DevEnvTemplate/BOOTSTRAP.md).
 

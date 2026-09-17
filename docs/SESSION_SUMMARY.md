@@ -20,12 +20,18 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 ## Rolling log (newest first)
 
+### 2026-09-17 — HR-B2 residual harness risks
+
+- Lead deferred **`APPROVE HR-D`** → **HR-B2 first** — [Docs/11d_HR_D_DEFER.md](../Docs/11d_HR_D_DEFER.md).
+- DevEnvTemplate pin `213673f` → **`2efd756`**; rules **15 → 3** always-on; [DOCTOR_POLICY.md](Setup/DOCTOR_POLICY.md) for accepted declines.
+- Handoff: [Docs/11e_HR_B2_HANDOFF.md](../Docs/11e_HR_B2_HANDOFF.md). Product NP **PARKED**.
+- **Next:** Lead **`APPROVE HR-B2`** → then **`APPROVE HR-D`**.
+
 ### 2026-09-17 — HR-D dry-run loop (cloud agent proof)
 
-- Lead **`APPROVE HR-C`** — swarm ops refine signed off; HR-D unlocked.
-- Cloud agent dry-run: docs-only PR on `cursor/hr-d-dry-run-a82d` — no MCP, no Safe-Build, no `.uasset`.
+- Lead **`APPROVE HR-C`** — swarm ops refine signed off; HR-D dry-run unlocked.
+- Cloud agent dry-run: docs-only PR #27 — no MCP, no Safe-Build, no `.uasset`.
 - Deliverables: [Docs/handoffs/HR_D_DRY_RUN.md](../Docs/handoffs/HR_D_DRY_RUN.md), [Docs/11d_HR_D_HANDOFF.md](../Docs/11d_HR_D_HANDOFF.md); audit re-grade (combined **B- 3.9** vs baseline **C 2.8**).
-- **Next:** Lead **`APPROVE HR-D`** → unlock product NP planning or schedule HR-B2 for residual risks.
 
 ### 2026-09-17 — HR-C swarm ops refine
 
