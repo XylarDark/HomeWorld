@@ -2,11 +2,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **APPROVED** — Lead `APPROVE VP2-B` 2026-09-17 ET (DESKTOP 9/9 success-path). VP2-A still **PENDING `APPROVE VP2-A`**. |
+| **Status** | **APPROVED** — Lead `APPROVE VP2-B` 2026-09-17 ET (DESKTOP 9/9 success-path). VP2-A **APPROVED** — Lead `APPROVE VP2-A` 2026-09-17 ET. |
 | **Date** | 2026-09-17 (ET) |
 | **Lead direction** | VP2-B unlocked **before** VP2-A approve — success-path greps (not soft-reject-only) |
 | **Parent plan** | [Docs/18_VERIFY_PROVE.md](../18_VERIFY_PROVE.md) |
-| **VP2-A context** | [VP2_A_EVIDENCE.md](VP2_A_EVIDENCE.md) — retry **9/9 PASS** soft-reject caveats; **PENDING `APPROVE VP2-A`** (do not stamp in this PR) |
+| **VP2-A context** | [VP2_A_EVIDENCE.md](VP2_A_EVIDENCE.md) — **APPROVED** — Lead `APPROVE VP2-A` 2026-09-17 ET (retry **9/9 PASS**; soft-reject caveats historical) |
 | **Branch** | `cursor/vp2-b-success-path-fixes-1899` |
 
 ---
@@ -86,7 +86,7 @@ Target: **9/9 PASS** with success-path rows above (not ObjectIterator / `unreal.
 
 ### 5. Gate
 
-Lead **`APPROVE VP2-B`** after DESKTOP re-prove. VP2-A remains **PENDING `APPROVE VP2-A`** until Lead acts separately.
+Lead **`APPROVE VP2-B`** after DESKTOP re-prove. Lead **`APPROVE VP2-A`** locked 2026-09-17 ET.
 
 ---
 
@@ -109,7 +109,7 @@ Lead **`APPROVE VP2-B`** after DESKTOP re-prove. VP2-A remains **PENDING `APPROV
 | **Host** | DESKTOP-21CT3H0 |
 | **Tip** | `73e7a9e` (`cursor/vp2-b-success-path-fixes-1899`) |
 | **evidence:grep** | **9/9 PASS** (`Saved/vp2_b_evidence.json` local) |
-| **Status** | Success-path re-prove **COMPLETE** — Lead **`APPROVE VP2-B`** 2026-09-17 ET. VP2-A still **PENDING `APPROVE VP2-A`**. |
+| **Status** | Success-path re-prove **COMPLETE** — Lead **`APPROVE VP2-B`** 2026-09-17 ET. Lead **`APPROVE VP2-A`** locked 2026-09-17 ET. |
 
 ### Success-path excerpts (continuous HomeWorld.log)
 
@@ -132,4 +132,4 @@ Lead **`APPROVE VP2-B`** after DESKTOP re-prove. VP2-A remains **PENDING `APPROV
 3. **MCP hang:** multi-verb mega-scripts can reset MCP / crash editor; prefer short batch with control-aim.
 4. Do **not** treat `HEAL: component ready` / `NURTURE: component ready` alone as Lead PASS — require success lines above (HS-G).
 
-Lead **APPROVE VP2-B** locked 2026-09-17 ET.
+Lead **APPROVE VP2-B** locked 2026-09-17 ET. Lead **APPROVE VP2-A** locked 2026-09-17 ET.

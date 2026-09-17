@@ -1,10 +1,10 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **VP2-B** — success-path fixes (**APPROVED** — Lead **`APPROVE VP2-B`**, 2026-09-17 ET); **VP2-A** PENDING **`APPROVE VP2-A`**
+**Current phase:** **VP2** — prove track **COMPLETE** (A+B **APPROVED** — Lead **`APPROVE VP2-A`** + **`APPROVE VP2-B`**, 2026-09-17 ET); VP2-C optional (LOCKED)
 
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **Conductor** (parent DESKTOP) / **DESKTOP-21CT3H0**
-**Blocked by:** none. VP2-B **APPROVED** — Lead **`APPROVE VP2-B`**, 2026-09-17 ET. VP2-A **PENDING `APPROVE VP2-A`**. Branch protection **DEFERRED**.
+**Blocked by:** none. VP2-A/B **APPROVED** — Lead **`APPROVE VP2-A`** + **`APPROVE VP2-B`**, 2026-09-17 ET. VP2-C optional (LOCKED). Branch protection **DEFERRED**.
 **Sign-off doc:** [Docs/17_HS_AUDIT_SIGN_OFF.md](../Docs/17_HS_AUDIT_SIGN_OFF.md) — **SIGNED OFF** Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET.
 
 
@@ -87,7 +87,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **HS-F** | Sign-off & re-grade | CLOUD+Lead | **SIGNED OFF / CLOSED** | [17_HS_AUDIT_SIGN_OFF.md](../Docs/17_HS_AUDIT_SIGN_OFF.md) — Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET |
 | **HS-G** | Conductor/DESKTOP ops diet | CLOUD+DESKTOP+Lead | **APPROVED / COMPLETE** | [17g_HS_G_OPS_DIET.md](../Docs/17g_HS_G_OPS_DIET.md) — Lead **`APPROVE HS-G`**, 2026-09-17 ET (evidence PASS, hang budget, compile hygiene) |
 
-**Current track:** **Docs/18 VP2 ACTIVE** — Lead **`APPROVE VP2 STRATEGY`** (PR #101); **VP2-A PENDING `APPROVE VP2-A`** (retry 9/9 PASS); **VP2-B APPROVED** — Lead **`APPROVE VP2-B`**, 2026-09-17 ET ([VP2_B_FIX.md](../Docs/handoffs/VP2_B_FIX.md)). **HS-G APPROVED / COMPLETE**.
+**Current track:** **Docs/18 VP2 prove COMPLETE** — Lead **`APPROVE VP2 STRATEGY`** (PR #101); **VP2-A APPROVED** — Lead **`APPROVE VP2-A`**, 2026-09-17 ET ([VP2_A_EVIDENCE.md](../Docs/handoffs/VP2_A_EVIDENCE.md)); **VP2-B APPROVED** — Lead **`APPROVE VP2-B`**, 2026-09-17 ET ([VP2_B_FIX.md](../Docs/handoffs/VP2_B_FIX.md)). VP2-C optional (LOCKED). **HS-G APPROVED / COMPLETE**.
 
 ---
 
@@ -119,5 +119,5 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 |---|---|---|---|---|
 | — | — | — | — | — |
 
-| VP2-A-evidence | VP2-A | DESKTOP | CND | Docs/handoffs | [VP2_A_EVIDENCE.md](../Docs/handoffs/VP2_A_EVIDENCE.md) — retry **9/9 PASS** — **PENDING** Lead **`APPROVE VP2-A`** |
+| VP2-A-evidence | VP2-A | DESKTOP | CND | Docs/handoffs | [VP2_A_EVIDENCE.md](../Docs/handoffs/VP2_A_EVIDENCE.md) — **APPROVED / CLOSED** — Lead **`APPROVE VP2-A`**, 2026-09-17 ET (retry **9/9 PASS**; soft-reject caveats historical) |
 | VP2-B-fix | VP2-B | CLOUD+DESKTOP | CND | Docs/handoffs + Source/ | [VP2_B_FIX.md](../Docs/handoffs/VP2_B_FIX.md) — **APPROVED / CLOSED** — Lead **`APPROVE VP2-B`**, 2026-09-17 ET (DESKTOP 9/9 success-path) |

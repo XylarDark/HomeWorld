@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **EVIDENCE FILED — PENDING Lead `APPROVE VP2-A`** |
+| **Status** | **APPROVED** — Lead `APPROVE VP2-A` 2026-09-17 ET |
 | **Date** | 2026-09-17 (ET) |
 | **Host** | DESKTOP-21CT3H0 · Conductor **parent** |
 | **Parent plan** | [Docs/18_VERIFY_PROVE.md](../18_VERIFY_PROVE.md) — Lead **`APPROVE VP2 STRATEGY`**, 2026-09-17 ET (PR #101) |
@@ -99,6 +99,6 @@ Document for follow-up; **not implemented in this filing PR**.
 
 ## Gate
 
-Stop for Lead **`APPROVE VP2-A`** (or **`WAIVE VP2-B`** path per Docs/18 if Lead accepts soft-reject proofs). **Do not invent greps.**
+Lead **`APPROVE VP2-A`** — **APPROVED** (2026-09-17 ET).
 
-*VP2-A evidence filed — RETRY 9/9 PASS — not APPROVED.*
+Original retry **9/9 PASS** soft-reject caveats (HEAL/NURTURE/TAME/GATHER/STORE/INVENTORY/DAWN paths above) remain **historical** filing context. Success-path re-prove followed under **VP2-B** ([VP2_B_FIX.md](VP2_B_FIX.md) — Lead **`APPROVE VP2-B`**, 2026-09-17 ET).

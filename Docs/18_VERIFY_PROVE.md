@@ -43,9 +43,10 @@ Prove the signed playable loop on **DESKTOP-21CT3H0** with **real** editor-log g
 | Docs/16 PL | **CLOSED** |
 | Docs/17 HS | **CLOSED / COMPLETE** |
 | **Docs/18 / VP2 strategy** | **APPROVED** — Lead **`APPROVE VP2 STRATEGY`**, 2026-09-17 ET |
-| **VP2-A** | **PENDING `APPROVE VP2-A`** — DESKTOP retry **9/9 PASS** soft-reject caveats ([VP2_A_EVIDENCE.md](handoffs/VP2_A_EVIDENCE.md)) |
+| **VP2-A** | **APPROVED / COMPLETE** — Lead **`APPROVE VP2-A`**, 2026-09-17 ET (retry **9/9 PASS**; soft-reject caveats historical — [VP2_A_EVIDENCE.md](handoffs/VP2_A_EVIDENCE.md)) |
 | **VP2-B** | **APPROVED / COMPLETE** — Lead **`APPROVE VP2-B`**, 2026-09-17 ET (DESKTOP 9/9 success-path; [VP2_B_FIX.md](handoffs/VP2_B_FIX.md)) |
-| **VP2-C** | LOCKED (optional; Lead picks flavor after VP2-A/B) |
+| **VP2 prove (A+B)** | **COMPLETE** — Lead **`APPROVE VP2-A`** + **`APPROVE VP2-B`**, 2026-09-17 ET |
+| **VP2-C** | LOCKED (optional; Lead picks flavor or **`APPROVE VP2-C STOP`** / **`CLOSE VP2`**) |
 
 ---
 
@@ -71,7 +72,7 @@ Naming: **VP2-A … VP2-C** (Verify & Prove 2). Do **not** reuse Docs/14 `VP-A�
 - [x] Preflight PASS on DESKTOP
 - [x] Evidence table filed with honest PASS/MISSING counts — **RETRY 9/9 PASS, 0 MISSING** (2026-09-17 ET)
 - [x] First-run 0/9 contrast + caveats documented (soft-reject vs success; VP2-B backlog)
-- [ ] Lead **`APPROVE VP2-A`**
+- [x] Lead **`APPROVE VP2-A`**
 
 ### VP2-B — Success-path fixes (Lead early unlock)
 
@@ -84,9 +85,9 @@ Naming: **VP2-A … VP2-C** (Verify & Prove 2). Do **not** reuse Docs/14 `VP-A�
 | **Out** | New verbs, combat, free-flight, art campaigns, AnimGraph spikes, `.uasset`/`.umap` commits |
 | **Re-prove** | Re-run VP2-A checklist with success-path rows; **`log LogTemp Log`** before greps |
 | **Deliverable** | [Docs/handoffs/VP2_B_FIX.md](handoffs/VP2_B_FIX.md) + DESKTOP `Saved/vp2_b_evidence.json` |
-| **Gate** | Lead **`APPROVE VP2-B`** (VP2-A remains **PENDING** until separate Lead action) |
+| **Gate** | Lead **`APPROVE VP2-B`** |
 
-**Status:** **APPROVED / COMPLETE** — Lead **`APPROVE VP2-B`**, 2026-09-17 ET. DESKTOP re-prove **9/9 PASS** success-path ([VP2_B_FIX.md](handoffs/VP2_B_FIX.md)). VP2-A remains **PENDING `APPROVE VP2-A`**.
+**Status:** **APPROVED / COMPLETE** — Lead **`APPROVE VP2-B`**, 2026-09-17 ET. DESKTOP re-prove **9/9 PASS** success-path ([VP2_B_FIX.md](handoffs/VP2_B_FIX.md)).
 
 **Done criteria:**
 
@@ -126,7 +127,7 @@ Naming: **VP2-A … VP2-C** (Verify & Prove 2). Do **not** reuse Docs/14 `VP-A�
 ## Immediate unlock
 
 1. Lead **`APPROVE VP2 STRATEGY`** — **DONE** (2026-09-17 ET; PR #101)
-2. Conductor **VP2-A DESKTOP prove** — **FILED** (retry 9/9 PASS) — **PENDING `APPROVE VP2-A`**
+2. Conductor **VP2-A DESKTOP prove** — **APPROVED** — Lead **`APPROVE VP2-A`**, 2026-09-17 ET ([VP2_A_EVIDENCE.md](handoffs/VP2_A_EVIDENCE.md))
 3. Conductor **VP2-B DESKTOP re-prove** — **APPROVED** — Lead **`APPROVE VP2-B`**, 2026-09-17 ET ([VP2_B_FIX.md](handoffs/VP2_B_FIX.md))
 
 ---
@@ -135,6 +136,6 @@ Naming: **VP2-A … VP2-C** (Verify & Prove 2). Do **not** reuse Docs/14 `VP-A�
 
 Lead **`APPROVE VP2 STRATEGY`** — **APPROVED** (Luke Thompson, 2026-09-17 ET).
 
-**VP2-A PENDING `APPROVE VP2-A`** — DESKTOP retry evidence **9/9 PASS** filed in [VP2_A_EVIDENCE.md](handoffs/VP2_A_EVIDENCE.md).
+**VP2-A APPROVED** — Lead **`APPROVE VP2-A`**, 2026-09-17 ET ([VP2_A_EVIDENCE.md](handoffs/VP2_A_EVIDENCE.md)). **VP2-B APPROVED** — Lead **`APPROVE VP2-B`**, 2026-09-17 ET. Required prove track (A+B) **COMPLETE**; VP2-C optional (LOCKED).
 
-*APPROVED strategy — Docs/18 Verify & Prove. Lead **`APPROVE VP2 STRATEGY`**, 2026-09-17 ET. VP2-A gate open.*
+*APPROVED strategy — Docs/18 Verify & Prove. Lead **`APPROVE VP2 STRATEGY`**, 2026-09-17 ET. VP2-A/B gates closed.*
