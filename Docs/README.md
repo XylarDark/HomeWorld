@@ -23,6 +23,7 @@ These are **intentionally separate**. On case-insensitive filesystems (macOS/Win
 - **WAVE E upgrade pass:** [08e_UPGRADE_PASS.md](08e_UPGRADE_PASS.md) — COMPLETE (PR #15 merged)
 - **WAVE F audit sign-off:** [08_AUDIT_SIGN_OFF.md](08_AUDIT_SIGN_OFF.md) — **SIGNED OFF** (PR #16 merged; Lead Luke Thompson, 2026-09-16 ET)
 - **FALLBACK glide + portal runbook:** [09_FALLBACK_GLIDE.md](09_FALLBACK_GLIDE.md) — CRUMB scripted glide V2 + dual shrine portal
+- **Post-audit wrap (CLOSED):** [10_POST_AUDIT_WRAP.md](10_POST_AUDIT_WRAP.md) — master graphs + NightMix; Lead next-phase audit
 - **Start swarm:** [../START_HERE.md](../START_HERE.md)
 - **Master prompt:** [../HOMEWORLD_MASTER_PROMPT.md](../HOMEWORLD_MASTER_PROMPT.md)
 - **Game canon brief:** [../HOMEWORLD_MVP_SWARM_BRIEF.md](../HOMEWORLD_MVP_SWARM_BRIEF.md)

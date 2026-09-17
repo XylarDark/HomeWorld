@@ -39,7 +39,10 @@ def main():
     _log("C++ driver: TimeOfDaySubsystem SetPhase → ApplyNightMixForPhase → SetNightMixScalar")
     for phase, value in PHASE_NIGHTMIX:
         _log("  Phase %s → NightMix=%.2f" % (phase, value))
-    _log("Masters M_* under /Game/HomeWorld/Materials/Masters/ — use create_master_materials_stub.py for empty shells")
+    _log(
+        "Masters M_* under /Game/HomeWorld/Materials/Masters/ — run create_master_materials.py "
+        "(NightMix CollectionParameter on MPC scalar NightMix)"
+    )
     _log("FALLBACK FLIGHT: CRUMB_* markers from place_vs_mvp_markers; glide/portal BP wiring DEFERRED (Editor dress)")
 
     try:
