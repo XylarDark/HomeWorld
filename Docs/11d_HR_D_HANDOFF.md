@@ -45,9 +45,9 @@ Lead: type **`APPROVE HR-D`** to unlock **product next-phase** planning ([11_NEX
 |------|-------|
 | **Packet** | Conductor → cloud agent; docs-only per CLOUD_AGENT_PACKET |
 | **Branch** | `cursor/hr-d-dry-run-a82d` |
-| **PR URL** | *(filled after merge — see HR_D_DRY_RUN.md)* |
-| **Merge SHA** | *(filled after merge)* |
-| **CI** | `validate` + `python-lint` green (required) |
+| **PR URL** | https://github.com/XylarDark/HomeWorld/pull/27 |
+| **Merge SHA** | `09284b287730985c0c4671852425e820f41abf45` |
+| **CI** | `validate` + `python-lint` — **pass** |
 
 ### Cloud VM checklist
 

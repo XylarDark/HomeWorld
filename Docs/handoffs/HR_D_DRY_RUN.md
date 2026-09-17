@@ -70,9 +70,9 @@
 Gate claims without evidence are invalid.
 
 - Repo-relative paths: see **Artifacts written** table above
-- PR URL: *(filled after PR open — see Cloud agent PR section)*
-- Merge SHA: *(filled after squash-merge)*
-- CI: `validate` + `python-lint` — *(filled after CI run)*
+- PR URL: https://github.com/XylarDark/HomeWorld/pull/27
+- Merge SHA: `09284b287730985c0c4671852425e820f41abf45`
+- CI: `validate` + `python-lint` — **pass** (2026-09-17)
 
 ---
 
