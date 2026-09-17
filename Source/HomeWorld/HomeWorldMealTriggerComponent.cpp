@@ -12,15 +12,9 @@ UHomeWorldMealTriggerComponent::UHomeWorldMealTriggerComponent(const FObjectInit
 void UHomeWorldMealTriggerComponent::PostInitProperties()
 {
 	Super::PostInitProperties();
-
 	SetBoxExtent(FVector(80.0f, 80.0f, 50.0f));
-	SetGenerateOverlapEvents(true);
-}
-
-void UHomeWorldMealTriggerComponent::PostInitProperties()
-{
-	Super::PostInitProperties();
 	SetCollisionProfileName(FName("OverlapAllDynamic"));
+	SetGenerateOverlapEvents(true);
 }
 
 void UHomeWorldMealTriggerComponent::BeginPlay()
