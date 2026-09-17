@@ -15,9 +15,9 @@
 
 Lead **`APPROVE VP STRATEGY`** — **APPROVED** (Luke Thompson, 2026-09-17 ET).
 
-**Next gate (VP):** Resume **VP-B** after HR3 track progress — HR3 strategy **APPROVED** ([15_HR3_A_PLUS.md](15_HR3_A_PLUS.md)); **VP-B PARKED**.
+**Next gate (VP):** Lead **`APPROVE VP-B`** after DESKTOP smoke + ABP evidence — **VP-B UNLOCKED / IN PROGRESS** ([15_HR3_A_PLUS.md](15_HR3_A_PLUS.md) HR3 **CLOSED / COMPLETE**).
 
-**VP-A APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET (hard-fail accepted; re-verify after VP-B). **VP-B PARKED** pending HR3 close (do not mark VP complete). VP-C/D remain **LOCKED**.
+**VP-A APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET (hard-fail accepted; re-verify after VP-B). **VP-B UNLOCKED / IN PROGRESS** (do not mark VP track complete). VP-C/D remain **LOCKED** until VP-A re-verify after VP-B.
 
 ### Re-verify (HR3-D)
 
@@ -53,7 +53,7 @@ Product NP (NP-A…E) and Harness Refine 2 (HR2-A…C) are **CLOSED**. Senior po
 | **Harness HR2 (Docs/13)** | **CLOSED** |
 | **Docs/14 / VP strategy** | **APPROVED** — Lead **`APPROVE VP STRATEGY`**, 2026-09-17 ET |
 | **VP-A** | **APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET (verb PIE hard-fail accepted; PA-03 → VP-B) |
-| **VP-B** | **PARKED** — pending HR3 (do not mark VP complete); was unlocked mid-fix |
+| **VP-B** | **UNLOCKED / IN PROGRESS** — resume after HR3 close (do not mark VP track complete) |
 | **VP-C** | **LOCKED** |
 | **VP-D** | **LOCKED** |
 
@@ -228,4 +228,4 @@ Product NP: CLOSED — HR2: CLOSED
 
 ---
 
-*Conductor prepared this file; Lead **`APPROVE VP STRATEGY`** locked 2026-09-17 ET. VP-A **APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET ([handoffs/VP_A_PIE.md](handoffs/VP_A_PIE.md)) — hard-fail accepted; **VP-B UNLOCKED**; re-verify verb PIE after VP-B.*
+*Conductor prepared this file; Lead **`APPROVE VP STRATEGY`** locked 2026-09-17 ET. VP-A **APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET ([handoffs/VP_A_PIE.md](handoffs/VP_A_PIE.md)) — hard-fail accepted; **VP-B UNLOCKED / IN PROGRESS** (HR3 **CLOSED / COMPLETE**); re-verify verb PIE after VP-B before VP-C.*
