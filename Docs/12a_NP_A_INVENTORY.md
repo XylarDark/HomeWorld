@@ -7,7 +7,7 @@
 | **Author** | Conductor (HomeWorld) |
 | **Parent** | [11_NEXT_PHASE_STRATEGY.md](11_NEXT_PHASE_STRATEGY.md) |
 | **Scope** | UE realization vs [03_GAMEPLAY_MVP.md](03_GAMEPLAY_MVP.md) + [03_SYSTEMS_MVP.md](03_SYSTEMS_MVP.md) + [02_MATERIAL_SHEET.md](02_MATERIAL_SHEET.md) |
-| **Evidence base** | Repo scripts/C++ at `ae7f649`; Windows DESKTOP-21CT3H0 live counts (Conductor ~2026-09-17 03:01 ET) |
+| **Evidence base** | Repo scripts/C++ at `ae7f649`; Windows DESKTOP-21CT3H0 confirmed via `cmd dir` (Lead update ~2026-09-17 ET) |
 
 **Gate:** stop for Lead **`APPROVE NP-A`** before NP-B lookdev apply.
 
@@ -26,30 +26,71 @@
 
 ## Windows DESKTOP-21CT3H0 live notes
 
-Conductor measured on Windows host **DESKTOP-21CT3H0** at repo **HEAD `ae7f649`**, ~**2026-09-17 03:01 ET**. Cloud/Linux clone carries **scripts + JSON only** — no VS_MVP binaries in git.
+Confirmed on Windows host **DESKTOP-21CT3H0** at repo **HEAD `ae7f649`** via **`cmd dir`** (~2026-09-17 ET). Cloud/Linux clone carries **scripts + JSON only** — VS_MVP binaries are local-only in git.
 
-| Asset area | Windows count | Repo (git) | Gap / note |
-|------------|---------------|------------|------------|
-| `/Game/HomeWorld/Meshes/Homestead/` | **≈49** `.uasset` | **0** (folder absent) | **PRESENT** on host; local-only |
-| `/Game/HomeWorld/Meshes/Forest/` | **≈20** | **0** | **PRESENT** on host |
-| `/Game/HomeWorld/Meshes/Gatherables/` | **≈41** | **0** | **PRESENT** on host |
-| `/Game/HomeWorld/Meshes/Transit/` | **≈11** | **0** | **PRESENT** on host |
-| `/Game/HomeWorld/Materials/Masters/` | **file count may be 0** after pulls | **0** | **PENDING** — masters are local-only; `create_master_materials.py` can recreate |
-| `/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers` | **PRESENT** (Editor) | **0** `.umap` in git | **PRESENT** on host; volatile across clones |
-| `/Game/HomeWorld/Materials/MPC_HomeWorld_Time` | **PRESENT** (Editor) | **0** in git | Created by `place_vs_mvp_markers.py`; same volatility |
-| Dress mesh material assignment | **Not done** | N/A | Scripts spawn meshes; **no MI assignment** — **NP-B** |
+### Meshes (PRESENT)
 
-### Content binary volatility (NP-B blocker call-out)
+| UE path | Windows count | Repo (git) | Disposition |
+|---------|---------------|------------|-------------|
+| `/Game/HomeWorld/Meshes/Homestead/` | **≈49** `.uasset` | **0** (folder absent) | **PRESENT** |
+| `/Game/HomeWorld/Meshes/Forest/` | **≈20** | **0** | **PRESENT** |
+| `/Game/HomeWorld/Meshes/Gatherables/` | **≈41** | **0** | **PRESENT** |
+| `/Game/HomeWorld/Meshes/Transit/` | **≈11** | **0** | **PRESENT** |
 
-Per project policy, **no `.uasset`/`.umap` commits**. Windows Editor holds the authoritative VS_MVP state. After `git pull`, masters, MPC, and `L_VS_MVP_Markers` may be **missing or stale** until automation re-runs:
+### Materials (PRESENT — assign gap → NP-B)
+
+| Asset | Windows | Repo (git) | Disposition |
+|-------|---------|------------|-------------|
+| `MPC_HomeWorld_Time.uasset` | **PRESENT** | **0** | **PRESENT** (local-only) |
+| `Materials/Masters/M_BeastStylized` | **PRESENT** | **0** | **PRESENT** |
+| `Materials/Masters/M_CliffRock` | **PRESENT** | **0** | **PRESENT** |
+| `Materials/Masters/M_FoliageCard` | **PRESENT** | **0** | **PRESENT** |
+| `Materials/Masters/M_GatherHerb` | **PRESENT** | **0** | **PRESENT** |
+| `Materials/Masters/M_Nurtured` | **PRESENT** | **0** | **PRESENT** |
+| `Materials/Masters/M_PathStone` | **PRESENT** | **0** | **PRESENT** |
+| `Materials/Masters/M_SpiritUnlit` | **PRESENT** | **0** | **PRESENT** |
+| `Materials/Masters/M_StylizedGrass` | **PRESENT** | **0** | **PRESENT** |
+| `Materials/Masters/M_WoodCabin` | **PRESENT** | **0** | **PRESENT** |
+| `Materials/Masters/M_WoodWild` | **PRESENT** | **0** | **PRESENT** |
+| MI assignment on `DRESS_*` meshes | **MISSING** | N/A | **MISSING** → **NP-B** |
+
+All ten Docs/02 masters confirmed on host. `place_vs_mvp_dress.py` spawns kit actors but **does not assign** master instances — NP-B scope.
+
+### Maps (PRESENT)
+
+| Asset / folder | Windows | Repo (git) | Disposition |
+|----------------|---------|------------|-------------|
+| `Maps/VS_MVP/L_VS_MVP_Markers.umap` | **PRESENT** | **0** `.umap` in git | **PRESENT** (local-only) |
+| `Maps/MainMenu.umap` | **PRESENT** | **PRESENT** (tracked) | **PRESENT** |
+| `Maps/VS_MVP/Cameras/` | **PRESENT** | **0** | **PRESENT** (local-only) |
+| `Maps/VS_MVP/Markers/` | **PRESENT** | **0** | **PRESENT** (local-only) |
+| `Maps/VS_MVP/Transit/` | **PRESENT** | **0** | **PRESENT** (local-only) |
+
+### Characters (PRESENT — skeleton risk)
+
+| Asset | Windows | Repo (git) | Disposition / risk |
+|-------|---------|------------|-------------------|
+| `Characters/BP_HomeWorldCharacter.uasset` | **PRESENT** | **PRESENT** (tracked) | **PRESENT** |
+| `Characters/ABP_HomeWorldCharacter.uasset` | **PRESENT** | **PRESENT** (tracked) | **PRESENT** — **risk:** may still warn missing skeleton on compile/open |
+
+### C++ / Python (PRESENT — repo + host)
+
+| Layer | Landed on host | Disposition |
+|-------|----------------|-------------|
+| C++ | FallbackGlide, ShrinePortal (+Trigger), Character, TimeOfDaySubsystem | **PRESENT** |
+| Python | `place_vs_mvp_markers`, `place_vs_mvp_dress`, `place_fallback_glide_markers`, `create_master_materials*`, `wire_nightmix*` | **PRESENT** (scripts in repo; run on Windows Editor) |
+
+### Content binary volatility (NP-B call-out)
+
+Per project policy, **no `.uasset`/`.umap` commits**. Windows Editor at `ae7f649` currently holds full VS_MVP state (meshes, ten masters, MPC, markers map). After **`git pull` on a fresh clone**, local-only assets may be **absent** until automation re-runs:
 
 1. `batch_import_asset_creation.py` → Meshes categories  
 2. `place_vs_mvp_markers.py` → markers + MPC  
 3. `place_vs_mvp_dress.py` → DRESS_* kit  
-4. `create_master_materials.py` → ten masters  
+4. `create_master_materials.py` → ten masters (confirmed present on current host)  
 5. `place_fallback_glide_markers.py` → GP_GlideStart + portal triggers  
 
-**NP-B** must treat **recreate + assign** as first-class work, not assume binaries survive pulls.
+**NP-B** primary gap is **MI assignment onto DRESS_* meshes**, not master recreation on the current host. New clones still need the full script chain above.
 
 ---
 
@@ -89,18 +130,19 @@ Per project policy, **no `.uasset`/`.umap` commits**. Windows Editor holds the a
 
 | Master | Docs/02 | Script def | Windows `.uasset` | Assigned on dress meshes |
 |--------|---------|------------|-------------------|--------------------------|
-| M_StylizedGrass | **KEEP** | **PRESENT** | **PENDING** (may be 0) | **MISSING** |
-| M_CliffRock | **KEEP** | **PRESENT** | **PENDING** | **MISSING** |
-| M_WoodCabin | **KEEP** | **PRESENT** | **PENDING** | **MISSING** |
-| M_WoodWild | **KEEP** | **PRESENT** | **PENDING** | **MISSING** |
-| M_FoliageCard | **KEEP** | **PRESENT** | **PENDING** | **MISSING** |
-| M_PathStone | **KEEP** | **PRESENT** | **PENDING** | **MISSING** |
-| M_GatherHerb | **KEEP** | **PRESENT** | **PENDING** | **MISSING** |
-| M_BeastStylized | **KEEP** | **PRESENT** | **PENDING** | **MISSING** |
-| M_SpiritUnlit | **KEEP** | **PRESENT** | **PENDING** | **MISSING** |
-| M_Nurtured | **KEEP** | **PRESENT** | **PENDING** | **MISSING** |
+| M_StylizedGrass | **KEEP** | **PRESENT** | **PRESENT** | **MISSING** → NP-B |
+| M_CliffRock | **KEEP** | **PRESENT** | **PRESENT** | **MISSING** → NP-B |
+| M_WoodCabin | **KEEP** | **PRESENT** | **PRESENT** | **MISSING** → NP-B |
+| M_WoodWild | **KEEP** | **PRESENT** | **PRESENT** | **MISSING** → NP-B |
+| M_FoliageCard | **KEEP** | **PRESENT** | **PRESENT** | **MISSING** → NP-B |
+| M_PathStone | **KEEP** | **PRESENT** | **PRESENT** | **MISSING** → NP-B |
+| M_GatherHerb | **KEEP** | **PRESENT** | **PRESENT** | **MISSING** → NP-B |
+| M_BeastStylized | **KEEP** | **PRESENT** | **PRESENT** | **MISSING** → NP-B |
+| M_SpiritUnlit | **KEEP** | **PRESENT** | **PRESENT** | **MISSING** → NP-B |
+| M_Nurtured | **KEEP** | **PRESENT** | **PRESENT** | **MISSING** → NP-B |
+| MPC_HomeWorld_Time | **KEEP** | **PRESENT** (script) | **PRESENT** | N/A (runtime driver) |
 
-**Summary:** Script + JSON = **PRESENT**. Runtime masters and mesh MI assignment = **MISSING** until NP-B on Windows.
+**Summary:** Script + JSON + all ten master `.uasset` + MPC = **PRESENT** on Windows at `ae7f649`. **MI assignment on DRESS_* meshes = MISSING** → **NP-B**.
 
 ---
 
@@ -116,7 +158,7 @@ Per project policy, **no `.uasset`/`.umap` commits**. Windows Editor holds the a
 | **V6 Heal** | SYS ([03_SYSTEMS_MVP](03_SYSTEMS_MVP.md) §6) | Not in UE — stub GA only | ×3 spirits, herb/seed spend | **NP-E** |
 | **V7 Nurture** | SYS ([03_SYSTEMS_MVP](03_SYSTEMS_MVP.md) §7) | Not in UE | N1/N2 + `M_Nurtured` flag | **NP-E** |
 | **V8 Dawn/form** | Spec ([03_GAMEPLAY_MVP](03_GAMEPLAY_MVP.md) §4, §7) | Partial — TimeOfDay + NightMix stub | Body↔spirit swap, persist | **NP-C/E** |
-| **Materials ×10** | Script+JSON ([02_MATERIAL_SHEET](02_MATERIAL_SHEET.md)) | Masters may need recreate + assign | Content volatility + no MI on dress | **NP-B** |
+| **Materials ×10** | Script+JSON ([02_MATERIAL_SHEET](02_MATERIAL_SHEET.md)) | Ten masters + MPC **PRESENT** on host; MI on DRESS_* **MISSING** | Assign masters to dress meshes | **NP-B** |
 
 ---
 
@@ -151,9 +193,9 @@ Per project policy, **no `.uasset`/`.umap` commits**. Windows Editor holds the a
 | Item | Disposition | Evidence | Owner phase |
 |------|-------------|----------|-------------|
 | Ten master definitions | **KEEP** | Docs/02 + `Lib/06_Materials_Master/` | — |
-| UE master material graphs | **PRESENT** script / **PENDING** binary | `create_master_materials.py`; Windows count may be 0 | NP-B |
-| NightMix MPC wiring | **PRESENT** script / **PENDING** binary | C++ `ApplyNightMixForPhase`; MPC local-only | NP-B |
-| MI instances on kit meshes | **MISSING** | Dress script skips `M_*`; no assign pass | NP-B |
+| UE master material graphs | **PRESENT** | All 10 `.uasset` confirmed on Windows; `create_master_materials.py` | — |
+| NightMix MPC wiring | **PRESENT** | `MPC_HomeWorld_Time.uasset` on host; C++ `ApplyNightMixForPhase` | NP-B smoke |
+| MI instances on kit meshes | **MISSING** | Dress script skips `M_*`; no assign pass | **NP-B** |
 | Lumen / Nanite | **DEFER** | Docs/04 | — |
 
 ### Content / integration
@@ -162,7 +204,8 @@ Per project policy, **no `.uasset`/`.umap` commits**. Windows Editor holds the a
 |------|-------------|----------|-------------|
 | VS_MVP mesh import | **PRESENT** (Windows) | ≈121 meshes across 4 categories | — |
 | VS_MVP dress actors | **PRESENT** (Windows) | `place_vs_mvp_dress.py` | NP-B materials |
-| L_VS_MVP_Markers | **PRESENT** (Windows) | Not in git | Volatility → NP-B |
+| L_VS_MVP_Markers + VS_MVP subfolders | **PRESENT** (Windows) | Markers map; Cameras/Markers/Transit folders | Volatility on fresh clone |
+| BP + ABP HomeWorldCharacter | **PRESENT** | Tracked in git; ABP skeleton warning **risk** | NP-C if anim blocks PIE |
 | Legacy DemoMap/Homestead UE assets | **KEEP** quarantine | `Content/__ExternalActors__` — not VS_MVP slice | WAVE F |
 | Crafting tree | **DEFER** | Not in MVP SYS | — |
 | Docs/07 reopen | **DEFER** | CLOSED per audit | — |
@@ -188,7 +231,7 @@ Per project policy, **no `.uasset`/`.umap` commits**. Windows Editor holds the a
 | Phase | Closes |
 |-------|--------|
 | **NP-A** (this doc) | Evidence map — **COMPLETE** |
-| **NP-B** | Recreate masters if needed; assign 10 masters on DRESS_*; NightMix smoke |
+| **NP-B** | Assign 10 masters (MI) on DRESS_* meshes; NightMix smoke | Masters + MPC already **PRESENT** on host |
 | **NP-C** | V1 walk bounds; V2/V5 PIE verify; form swap + GP_PlayerStart |
 | **NP-D** | V3 gather + V4 tame — full SYS inventory-lite |
 | **NP-E** | V6 heal + V7 nurture + V8 dawn persist |
@@ -200,6 +243,10 @@ Per project policy, **no `.uasset`/`.umap` commits**. Windows Editor holds the a
 - [x] Verb table vs Docs/03_GAMEPLAY + Docs/03_SYSTEMS
 - [x] Materials ×10 vs Docs/02 + script inventory
 - [x] Windows live mesh counts recorded
+- [x] Windows materials (10 masters + MPC) confirmed **PRESENT** via `cmd dir`
+- [x] Windows maps (L_VS_MVP_Markers + VS_MVP folders) confirmed **PRESENT**
+- [x] MI assignment on DRESS_* recorded **MISSING** → NP-B
+- [x] ABP skeleton warning noted as risk
 - [x] Content binary volatility documented for NP-B
 - [x] C++ / Python landed list matches repo at `ae7f649`
 - [ ] PIE verify V2/V5 — **PENDING** Windows host (not NP-A scope)

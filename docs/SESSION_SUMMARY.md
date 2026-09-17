@@ -24,6 +24,7 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 - Lead **`APPROVE NP STRATEGY`** — product NP strategy **APPROVED** (Luke Thompson, 2026-09-17 ET).
 - NP-A delivered: [Docs/12a_NP_A_INVENTORY.md](../Docs/12a_NP_A_INVENTORY.md) — KEEP/PRESENT/MISSING/DEFER vs Docs/03 + Docs/02; Windows mesh counts; content binary volatility call-out for NP-B.
+- Windows inventory confirmed (`cmd dir`, HEAD ae7f649): ten masters + MPC + L_VS_MVP_Markers **PRESENT**; MI on DRESS_* **MISSING** → NP-B; ABP skeleton warning risk noted.
 - **Next:** Lead **`APPROVE NP-A`** → unlock NP-B (no lookdev implementation until approved).
 
 ### 2026-09-17 — HR track CLOSED; product NP unlocked
