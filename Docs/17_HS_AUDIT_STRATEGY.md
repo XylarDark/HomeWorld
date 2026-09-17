@@ -179,6 +179,6 @@ Each WAVE: deliverable doc + PR(s) → Lead **`APPROVE HS-*`** before next WAVE 
 
 Lead **`APPROVE HS STRATEGY`** — **APPROVED** (Luke Thompson, 2026-09-17 ET).
 
-**HS-A UNLOCKED / IN PROGRESS** — inventory & debt ledger.
+**HS-A APPROVED / CLOSED** — Lead **`APPROVE HS-A`**, 2026-09-17 ET. **HS-B UNLOCKED / IN PROGRESS**.
 
 *APPROVED — Docs/17 Harness & Swarm Audit. Lead **`APPROVE HS STRATEGY`**, 2026-09-17 ET.*
