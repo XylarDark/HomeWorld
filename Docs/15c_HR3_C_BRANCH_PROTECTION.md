@@ -5,7 +5,8 @@
 | **Status** | **EVIDENCE FILED — PENDING LEAD APPLY** |
 | **Date** | 2026-09-17 |
 | **Author** | Cloud Agent (HR3-C) |
-| **Prior gate** | HR2-C **APPROVED** — [13c_HR2_C_CI_GATE.md](13c_HR2_C_CI_GATE.md); VP strategy **APPROVED** — [14_VP_VERIFY_POLISH.md](14_VP_VERIFY_POLISH.md) (VP-D branch-protection item) |
+| **Strategy** | [15_HR3_A_PLUS.md](15_HR3_A_PLUS.md) — Lead **`APPROVE HR3 STRATEGY`**, 2026-09-17 ET |
+| **Prior gate** | HR2-C **APPROVED** — [13c_HR2_C_CI_GATE.md](13c_HR2_C_CI_GATE.md); HR3-B evidence filed — [handoffs/HR3_B_UE_PREFLIGHT.md](handoffs/HR3_B_UE_PREFLIGHT.md) |
 | **Related** | [docs/Setup/CI_SETUP.md](../docs/Setup/CI_SETUP.md) § Branch protection · [docs/Setup/CI_POLICY.md](../docs/Setup/CI_POLICY.md) |
 
 ---
