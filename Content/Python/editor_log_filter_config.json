@@ -1,16 +1,52 @@
 {
   "allow_categories": [
-    "LogPCG", "LogScript", "LogHomeWorld", "LogOutputLog", "LogPython", "LogAutomation",
-    "LogTemp", "LogLoad", "LoadErrors", "LogWindows", "LogInit", "LogExit", "LogActor",
-    "LogGameMode", "LogWorld", "LogEngine", "LogUnrealMCP"
+    "LogPCG",
+    "LogScript",
+    "LogHomeWorld",
+    "LogOutputLog",
+    "LogPython",
+    "LogAutomation",
+    "LogTemp",
+    "LogLoad",
+    "LoadErrors",
+    "LogWindows",
+    "LogInit",
+    "LogExit",
+    "LogActor",
+    "LogGameMode",
+    "LogWorld",
+    "LogEngine",
+    "LogUnrealMCP"
   ],
   "signal_keywords": [
-    "error", "failed", "failure", "exception", "assert", "not found", "cannot",
-    "unable", "missing", "invalid", "crash", "fatal", "traceback",
-    "no surfaces found"
+    "error",
+    "failed",
+    "failure",
+    "exception",
+    "assert",
+    "not found",
+    "cannot",
+    "unable",
+    "missing",
+    "invalid",
+    "crash",
+    "fatal",
+    "traceback",
+    "no surfaces found",
+    "FORM:",
+    "FALLBACK:",
+    "HEAL:",
+    "NURTURE:",
+    "DAWN:",
+    "TAME:",
+    "GATHER:",
+    "STORE:",
+    "INVENTORY:"
   ],
   "noise_categories_unless_signal": [
-    "LogAssetRegistry", "LogContentStreaming", "LogAssetManager"
+    "LogAssetRegistry",
+    "LogContentStreaming",
+    "LogAssetManager"
   ],
   "severity_pattern": "\\b(Error|Warning|Fatal|Assert|Exception)\\b"
 }

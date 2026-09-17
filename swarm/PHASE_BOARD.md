@@ -34,6 +34,16 @@ Every **active** post-audit / HR / VP row must name **who runs evidence**:
 
 **DESKTOP Shell law (HS-B):** Conductor **parent** session only — never assign DESKTOP Shell / MCP / PIE to Cursor **Task** executors or cloud Linux VMs. Happy path: [WINDOWS_BRIDGE.md](../docs/Setup/WINDOWS_BRIDGE.md) · [SWARM_OPS.md](SWARM_OPS.md) §16. Re-verify rule: [HR3_D_EVIDENCE_LANE.md](../Docs/handoffs/HR3_D_EVIDENCE_LANE.md).
 
+### Re-verify before polish (HS-D)
+
+Prior **hard-fail** verb greps must be **re-proved** (or Lead **WAIVED** per prefix) before any downstream **polish / presentation** unlock:
+
+1. Blocker-fix phase files evidence → Lead **`APPROVE`**.
+2. DESKTOP owner (Conductor **parent**) re-runs the prior phase prefix checklist on current `main`; append **§ Re-verify** (keep original FAIL/WAIVE). Prefer `npm run evidence:grep -- --log Saved/Logs/HomeWorld.log`.
+3. Conductor **refuses** polish unlock until all required prefixes **PASS** or Lead **WAIVED**.
+
+Canonical history: **VP-A → VP-B → VP-A re-verify → VP-C**. Spec: [17d_HS_EVIDENCE.md](../Docs/17d_HS_EVIDENCE.md) · handoff [HS_D_EVIDENCE.md](../Docs/handoffs/HS_D_EVIDENCE.md) · ops [SWARM_OPS.md](SWARM_OPS.md) §4c. Silent skip forbidden.
+
 ---
 
 ## POST-AUDIT (Docs/05–10 + HR track)
@@ -71,7 +81,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **HS-A** | Inventory & debt ledger | CLOUD | **APPROVED / CLOSED** | [17a_HS_INVENTORY.md](../Docs/17a_HS_INVENTORY.md) — Lead **`APPROVE HS-A`**, 2026-09-17 ET (PR #88) |
 | **HS-B** | Swarm ops tighten | CLOUD | **APPROVED / CLOSED** | [17b_HS_SWARM_OPS.md](../Docs/17b_HS_SWARM_OPS.md) — Lead **`APPROVE HS-B`**, 2026-09-17 ET |
 | **HS-C** | CI as law | CLOUD+Lead | **DEFERRED / CLOSED** | Lead **`ACCEPT HS-C DEFER`**, 2026-09-17 ET — [17c](../Docs/17c_HS_CI_LAW.md) |
-| **HS-D** | Evidence automation | CLOUD+DESKTOP | **IN PROGRESS** | preflight + scripted verb evidence; re-verify rule |
+| **HS-D** | Evidence automation | CLOUD+DESKTOP | **IN PROGRESS** | [17d_HS_EVIDENCE.md](../Docs/17d_HS_EVIDENCE.md) · [HS_D_EVIDENCE.md](../Docs/handoffs/HS_D_EVIDENCE.md) — PENDING Lead **`APPROVE HS-D`** |
 
 **Current track:** **Docs/17 HS** — HS-A/B **CLOSED**; HS-C **DEFERRED**; **HS-D IN PROGRESS**.
 
@@ -81,6 +91,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 
 | ID | Phase | Host | Owner | Write path | Due artifact |
 |---|---|---|---|---|---|
+| HS-D-evidence | HS-D | CLOUD+DESKTOP | CND | Docs/ + scripts/ | [17d_HS_EVIDENCE.md](../Docs/17d_HS_EVIDENCE.md) · [HS_D_EVIDENCE.md](../Docs/handoffs/HS_D_EVIDENCE.md) — **IN PROGRESS** PENDING Lead **`APPROVE HS-D`** |
 | HS-B-swarm-ops | HS-B | CLOUD | CND | Docs/ + swarm/ | [17b_HS_SWARM_OPS.md](../Docs/17b_HS_SWARM_OPS.md) — **APPROVED / CLOSED** Lead **`APPROVE HS-B`**, 2026-09-17 ET |
 | HS-A-inventory | HS-A | CLOUD | CND | Docs/ | [17a_HS_INVENTORY.md](../Docs/17a_HS_INVENTORY.md) — **APPROVED / CLOSED** Lead **`APPROVE HS-A`**, 2026-09-17 ET |
 | PL-A-character | PL-A | DESKTOP+CLOUD | CND | Docs/handoffs/ | [PL_A_CHARACTER.md](../Docs/handoffs/PL_A_CHARACTER.md) — **APPROVED / CLOSED** — Lead **`APPROVE PL-A`**, 2026-09-17 ET |
