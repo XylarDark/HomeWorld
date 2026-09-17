@@ -2,27 +2,27 @@
 
 **Purpose:** This file is read at session start and updated at session end so you can ask "what did we do yesterday and what do we need to do today?" and get a clear answer. The agent updates it automatically when a session ends.
 
-**Current focus:** DevEnvTemplate fully adopted locally (gitlink `2997a3d`, skills, human-use, sync/doctor scripts). Next: commit/push adoption if not already; generate next task list when ready.
+**Current focus:** MVP vertical slice P3–P7 signed and in PR #3; merge when ready. Next: UE handoff or new task list per [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md).
 
 ---
 
 ## Yesterday (last session)
 
-- Full DevEnvTemplate adoption: gitlink `2997a3d`, `.gitmodules`, core skills localized, skills-extras + `docs/human-use/`, AGENTS.md layer table + accepted declines, doctor/sync verified.
-- Blender Lab MCP connected (official `blender-mcp.exe`, not PyPI).
+- Unpacked signed MVP vertical slice (P3–P7) from box archive; opened PR #3 (`cursor/mvp-vertical-slice-p3-p7-070e`).
+- Deliverables: Blender lib, preview stills 1–5, VS_MVP reel, FALLBACK FLIGHT, P6 QA re-judge PASS, P7 Lead SIGN OFF.
 
 ---
 
 ## Today
 
-- Confirm adoption commit is on `main` if desired.
-- Optional: Editor batch import + PIE verification; generate next task list per [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md).
+- Review and merge PR #3 to `main`.
+- Optional: begin UE import per `Docs/04_UE_HANDOFF_NOTES.md` (out of scope for PR).
 
 ---
 
 ## Tomorrow
 
-- Assets / polish / next task list; optional later migration of retired always-on Cursor rules into AGENTS.md + skills.
+- Generate next task list when MVP slice merge is complete; Editor batch import + PIE verification as needed.
 
 ---
 
