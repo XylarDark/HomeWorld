@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | WAVE F COMPLETE — awaiting Lead **`SIGN OFF AUDIT`** |
+| **Status** | **COMPLETE** — Lead Luke Thompson signed off (2026-09-16 ET / 2026-09-17 UTC) |
 | **Date** | 2026-09-17 |
 | **Author** | Conductor (HomeWorld) |
 

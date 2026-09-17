@@ -2,14 +2,16 @@
 
 | Field | Value |
 |-------|-------|
-| **Board status** | WAVE F — ARCHIVE COMPLETE (awaiting Lead gate) |
-| **Date** | 2026-09-17 |
+| **Status** | **SIGNED OFF** — Lead Luke Thompson |
+| **Board status** | Audit **COMPLETE** — WAVE F archive merged (PR #16) |
+| **Date (ET)** | 2026-09-16 |
+| **Date (UTC)** | 2026-09-17 |
 | **Author** | Audit executor (HomeWorld) |
 | **Parent plan** | [08_AUDIT_UPGRADE_STRATEGY.md](08_AUDIT_UPGRADE_STRATEGY.md) |
 | **Delete authority** | [08d_CONTENT_CANON.md](08d_CONTENT_CANON.md) §8 |
 | **Prior gate** | Lead **APPROVE WAVE E** (PR #15 merged) |
 
-**Gate:** stop for Lead **`SIGN OFF AUDIT`** — audit is **not closed** until Lead types this phrase on the WAVE F PR.
+**Gate:** **CLOSED** — Lead Luke Thompson typed **`SIGN OFF AUDIT`** (2026-09-16 ET / 2026-09-17 UTC). Audit is **COMPLETE**.
 
 ---
 
@@ -22,7 +24,7 @@
 | **C** | [08c_BOOT_HEALTH.md](08c_BOOT_HEALTH.md) | #13 | **COMPLETE** |
 | **D** | [08d_CONTENT_CANON.md](08d_CONTENT_CANON.md) | #14 | **COMPLETE** |
 | **E** | [08e_UPGRADE_PASS.md](08e_UPGRADE_PASS.md) | #15 | **COMPLETE** |
-| **F** | **This document** + repo deletes | *(this PR)* | **COMPLETE** — awaiting **`SIGN OFF AUDIT`** |
+| **F** | **This document** + repo deletes | #16 | **COMPLETE** |
 
 ---
 
@@ -123,7 +125,14 @@ Lead should verify on the **Windows dev machine** after pulling this PR. These a
 | **`.cursor/worktrees/`** stale checkouts | Local copies only |
 | **Orphaned Guardian/capture scripts** (`Tools/Guard-AutomationLoop.ps1`, `Run-AutomationWithCapture.ps1`, etc.) | **Kept in repo** for now; Lead may retire separately if unused |
 
-**Post-merge Windows checks:**
+**Verification status (DESKTOP-21CT3H0):**
+
+| Check | When | Result |
+|-------|------|--------|
+| **Safe-Build** | Before WAVE F merge (WAVE E tip `9180850`) | **GREEN** |
+| **WAVE F post-merge checks** (§3 list below) | After Windows pull of PR #16 | **PENDING** |
+
+**Post-merge Windows checks** (pending pull):
 
 1. `.\Tools\Safe-Build.ps1` — green compile
 2. Open Editor — boots to **MainMenu** (no DemoMap missing-map prompt)
@@ -143,26 +152,24 @@ Lead should verify on the **Windows dev machine** after pulling this PR. These a
 
 ---
 
-## 5. Gate — SIGN OFF AUDIT
+## 5. Gate — SIGN OFF AUDIT (CLOSED)
 
 | | |
 |---|---|
-| **Gate** | Lead types **`SIGN OFF AUDIT`** on the WAVE F PR |
-| **Unlocks** | Audit **CLOSED** — post-audit feature work per Lead roadmap |
-| **Do not claim** | Audit closed until Lead gate granted |
-
-```
-STOP — Lead approval required
-Type: SIGN OFF AUDIT
-```
+| **Gate** | Lead **`SIGN OFF AUDIT`** — **GRANTED** |
+| **Signed by** | Lead Luke Thompson |
+| **Signed (ET)** | 2026-09-16 |
+| **Signed (UTC)** | 2026-09-17 |
+| **WAVE F PR** | #16 merged to `main` |
+| **Audit status** | **COMPLETE** — post-audit feature work per Lead roadmap |
 
 ---
 
-## Board / Actions / Gate / Next (for Lead)
+## Board / Actions / Gate / Next
 
 | | |
 |---|---|
-| **Board** | WAVE F deliverable ready — 492 quarantine paths removed; stubs for dual-canon docs; VS_MVP primary |
-| **Actions** | Review PR; run Safe-Build + Editor boot on DESKTOP-21CT3H0; optional local cleanup §3; comment **`SIGN OFF AUDIT`** |
-| **Gate** | `SIGN OFF AUDIT` — audit not closed until granted |
-| **Next (after gate)** | Post-audit: VS_MVP dress in Editor, FALLBACK glide BP wiring, master material graphs — per Lead priority |
+| **Board** | Audit **COMPLETE** — Waves A–F done (PR #11–#16); 492 quarantine paths removed; VS_MVP primary |
+| **Verification** | Safe-Build green at WAVE E (`9180850`) on DESKTOP-21CT3H0; WAVE F post-merge checks pending Windows pull |
+| **Gate** | **CLOSED** — Lead signed off |
+| **Next** | Post-audit: VS_MVP dress in Editor, FALLBACK glide BP wiring, master material graphs — per Lead priority |

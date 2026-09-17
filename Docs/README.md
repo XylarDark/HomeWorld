@@ -13,13 +13,13 @@ These are **intentionally separate**. On case-insensitive filesystems (macOS/Win
 
 ## Entry points
 
-- **Audit & upgrade strategy (Lead-gated):** [08_AUDIT_UPGRADE_STRATEGY.md](08_AUDIT_UPGRADE_STRATEGY.md)
+- **Audit & upgrade strategy:** [08_AUDIT_UPGRADE_STRATEGY.md](08_AUDIT_UPGRADE_STRATEGY.md) — **COMPLETE** (Lead signed off)
 - **WAVE A inventory:** [08a_INVENTORY.md](08a_INVENTORY.md)
 - **WAVE B harness gap:** [08b_HARNESS_GAP.md](08b_HARNESS_GAP.md) — COMPLETE (PR #12)
 - **WAVE C boot health:** [08c_BOOT_HEALTH.md](08c_BOOT_HEALTH.md) — COMPLETE (PR #13)
 - **WAVE D content canon:** [08d_CONTENT_CANON.md](08d_CONTENT_CANON.md) — COMPLETE (PR #14 merged)
 - **WAVE E upgrade pass:** [08e_UPGRADE_PASS.md](08e_UPGRADE_PASS.md) — COMPLETE (PR #15 merged)
-- **WAVE F audit sign-off:** [08_AUDIT_SIGN_OFF.md](08_AUDIT_SIGN_OFF.md) — **Gate: `SIGN OFF AUDIT`**
+- **WAVE F audit sign-off:** [08_AUDIT_SIGN_OFF.md](08_AUDIT_SIGN_OFF.md) — **SIGNED OFF** (PR #16 merged; Lead Luke Thompson, 2026-09-16 ET)
 - **Start swarm:** [../START_HERE.md](../START_HERE.md)
 - **Master prompt:** [../HOMEWORLD_MASTER_PROMPT.md](../HOMEWORLD_MASTER_PROMPT.md)
 - **Game canon brief:** [../HOMEWORLD_MVP_SWARM_BRIEF.md](../HOMEWORLD_MVP_SWARM_BRIEF.md)
