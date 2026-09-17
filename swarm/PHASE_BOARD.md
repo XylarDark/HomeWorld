@@ -1,9 +1,10 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **PL-B** (human PIE verb pass) — **OPEN / IN PROGRESS** — PL-A **APPROVED / CLOSED** (Lead **`APPROVE PL-A`**, 2026-09-17 ET)
+**Current phase:** **PL-C** (thin loop UX / PA-07) — **OPEN / IN PROGRESS** — PL-B **WAIVED** (Lead **`WAIVE PL-B`**, 2026-09-17 ET)
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
-**Active owners:** **DESKTOP** + **Lead** (Alt+P Output Log greps)  
+**Active owners:** **CLOUD** (store-transfer + inventory readout) + **DESKTOP** (smoke) + **Lead** (`APPROVE PL-C`)  
 **Blocked by:** none for PL-C start. Branch protection remains **DEFERRED** (HR3-C).
+
 
 | Phase | Name | Owners | Status | Gate file | Handoffs |
 |---|---|---|---|---|---|
