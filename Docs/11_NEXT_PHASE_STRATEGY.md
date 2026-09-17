@@ -14,7 +14,7 @@
 
 Lead **`APPROVE NP STRATEGY`** — **GRANTED** (Luke Thompson, 2026-09-17 ET).
 
-**Next gate:** Lead **`APPROVE NP-A`** → unlock NP-B lookdev apply.
+**Next gate:** Lead **`APPROVE NP-B`** → unlock NP-C form + V1 polish (after Windows lookdev evidence).
 
 ---
 
@@ -22,8 +22,8 @@ Lead **`APPROVE NP STRATEGY`** — **GRANTED** (Luke Thompson, 2026-09-17 ET).
 
 | Phase | Focus | Deliverable | Status |
 |-------|--------|-------------|--------|
-| **NP-A** | Inventory / gap map | [12a_NP_A_INVENTORY.md](12a_NP_A_INVENTORY.md) | **COMPLETE — awaiting APPROVE NP-A** |
-| **NP-B** | Lookdev apply | Assign 10 masters onto dressed VS_MVP meshes; NightMix smoke | **LOCKED** — await APPROVE NP-A |
+| **NP-A** | Inventory / gap map | [12a_NP_A_INVENTORY.md](12a_NP_A_INVENTORY.md) | **APPROVED** — Lead **`APPROVE NP-A`**, 2026-09-17 ET |
+| **NP-B** | Lookdev apply | [12b_NP_B_LOOKDEV.md](12b_NP_B_LOOKDEV.md) — `assign_vs_mvp_materials.py` | **COMPLETE — awaiting APPROVE NP-B** (Windows evidence pending) |
 | **NP-C** | Form + V1 polish | Body↔spirit; GP_PlayerStart; soft walk bounds | **LOCKED** |
 | **NP-D** | SYS V3–V4 | 6-slot inventory + gather + tame | **LOCKED** |
 | **NP-E** | SYS V6–V8 | Heal ×3, nurture ×2, dawn persist | **LOCKED** |
@@ -49,8 +49,8 @@ Lead **`APPROVE NP STRATEGY`** — **GRANTED** (Luke Thompson, 2026-09-17 ET).
 | Step | Lead action | Unlocks |
 |------|-------------|---------|
 | 0 | **`APPROVE NP STRATEGY`** | NP-A inventory / gap map — **DONE** |
-| 1 | **`APPROVE NP-A`** | NP-B lookdev apply |
-| 2 | **`APPROVE NP-B`** | NP-C form + V1 polish |
+| 1 | **`APPROVE NP-A`** | NP-B lookdev apply — **DONE** |
+| 2 | **`APPROVE NP-B`** | NP-C form + V1 polish — **NEXT** |
 | 3 | **`APPROVE NP-C`** | NP-D SYS V3–V4 |
 | 4 | **`APPROVE NP-D`** | NP-E SYS V6–V8 |
 | 5 | **`APPROVE NP-E`** | Product next-phase complete |
@@ -58,7 +58,8 @@ Lead **`APPROVE NP STRATEGY`** — **GRANTED** (Luke Thompson, 2026-09-17 ET).
 ```
 Harness refine: CLOSED — Lead Luke Thompson, APPROVE HR-B2 + APPROVE HR-D, 2026-09-17 ET
 Product NP strategy: APPROVED — Lead Luke Thompson, APPROVE NP STRATEGY, 2026-09-17 ET
-NP-A: COMPLETE — awaiting APPROVE NP-A
+NP-A: APPROVED — Lead APPROVE NP-A, 2026-09-17 ET
+NP-B: COMPLETE (script + docs) — awaiting APPROVE NP-B after Windows run
 ```
 
 ---
@@ -70,11 +71,12 @@ NP-A: COMPLETE — awaiting APPROVE NP-A
 | [11_SWARM_HARNESS_REFINE.md](11_SWARM_HARNESS_REFINE.md) | **CLOSED** — HR track complete; unlocked this doc |
 | [11d_HR_D_HANDOFF.md](11d_HR_D_HANDOFF.md) | HR-D dry-run evidence + re-grade |
 | [11e_HR_B2_HANDOFF.md](11e_HR_B2_HANDOFF.md) | HR-B2 residual harness closure |
-| [12a_NP_A_INVENTORY.md](12a_NP_A_INVENTORY.md) | NP-A deliverable — gap map |
+| [12a_NP_A_INVENTORY.md](12a_NP_A_INVENTORY.md) | NP-A deliverable — gap map (APPROVED) |
+| [12b_NP_B_LOOKDEV.md](12b_NP_B_LOOKDEV.md) | NP-B deliverable — lookdev apply runbook |
 | [03_GAMEPLAY_MVP.md](03_GAMEPLAY_MVP.md) | Verb spec baseline |
 | [03_SYSTEMS_MVP.md](03_SYSTEMS_MVP.md) | SYS tables baseline |
 | [06_VS_MVP_DRESS.md](06_VS_MVP_DRESS.md) | NP-B lookdev apply target |
 
 ---
 
-*Strategy approved and NP-A delivered 2026-09-17 ET. Awaiting APPROVE NP-A.*
+*NP-A approved and NP-B script delivered 2026-09-17 ET. Awaiting Windows evidence + APPROVE NP-B.*

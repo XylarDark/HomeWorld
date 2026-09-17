@@ -1,9 +1,9 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **NP-A** (Product next-phase — inventory / gap map)  
+**Current phase:** **NP-B** (Product next-phase — lookdev apply)  
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **CND** (Conductor)  
-**Blocked by:** — (await Lead **`APPROVE NP-A`** after PR merge)
+**Blocked by:** — (await Lead **`APPROVE NP-B`** after Windows run evidence)
 
 | Phase | Name | Owners | Status | Gate file | Handoffs |
 |---|---|---|---|---|---|
@@ -37,10 +37,11 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **HR-C** | Swarm ops refine | **APPROVED** | [11c_HR_C_HANDOFF.md](../Docs/11c_HR_C_HANDOFF.md) |
 | **HR-D** | Prove (dry-run loop) | **APPROVED** | [11d_HR_D_HANDOFF.md](../Docs/11d_HR_D_HANDOFF.md) |
 | **HR-B2** | Residual harness risks | **APPROVED** | [11e_HR_B2_HANDOFF.md](../Docs/11e_HR_B2_HANDOFF.md) |
-| **NP-A** | Inventory / gap map | **COMPLETE — awaiting APPROVE NP-A** | [12a_NP_A_INVENTORY.md](../Docs/12a_NP_A_INVENTORY.md) |
-| **NP-B…E** | Lookdev + verbs apply | **LOCKED** | Blocked until Lead **`APPROVE NP-A`** |
+| **NP-A** | Inventory / gap map | **APPROVED** | [12a_NP_A_INVENTORY.md](../Docs/12a_NP_A_INVENTORY.md) — Lead **`APPROVE NP-A`**, 2026-09-17 ET |
+| **NP-B** | Lookdev apply | **COMPLETE — awaiting APPROVE NP-B** | [12b_NP_B_LOOKDEV.md](../Docs/12b_NP_B_LOOKDEV.md), [handoffs/NP_B_LOOKDEV.md](../Docs/handoffs/NP_B_LOOKDEV.md) |
+| **NP-C…E** | Form + SYS verbs | **LOCKED** | Blocked until Lead **`APPROVE NP-B`** |
 
-**Current track:** NP strategy **APPROVED** (Lead **`APPROVE NP STRATEGY`**, 2026-09-17 ET). **NP-A COMPLETE** — await Lead **`APPROVE NP-A`**.
+**Current track:** NP-A **APPROVED** (Lead **`APPROVE NP-A`**, 2026-09-17 ET). **NP-B COMPLETE** (script + docs) — await Windows evidence + Lead **`APPROVE NP-B`**.
 
 ---
 
@@ -48,7 +49,8 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 
 | ID | Phase | Owner | Write path | Due artifact |
 |---|---|---|---|---|
-| NP-A-gate | NP-A | Lead | Docs/ | **`APPROVE NP-A`** → unlock NP-B |
+| NP-B-run | NP-B | CND | Docs/handoffs/ | Run `assign_vs_mvp_materials.py` on DESKTOP; fill NP_B_LOOKDEV evidence |
+| NP-B-gate | NP-B | Lead | Docs/ | **`APPROVE NP-B`** → unlock NP-C |
 
 ## Open defects
 

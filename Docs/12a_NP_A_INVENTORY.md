@@ -2,14 +2,14 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **COMPLETE — awaiting Lead `APPROVE NP-A`** |
+| **Status** | **APPROVED** — Lead **`APPROVE NP-A`**, 2026-09-17 ET |
 | **Date** | 2026-09-17 (ET) |
 | **Author** | Conductor (HomeWorld) |
 | **Parent** | [11_NEXT_PHASE_STRATEGY.md](11_NEXT_PHASE_STRATEGY.md) |
 | **Scope** | UE realization vs [03_GAMEPLAY_MVP.md](03_GAMEPLAY_MVP.md) + [03_SYSTEMS_MVP.md](03_SYSTEMS_MVP.md) + [02_MATERIAL_SHEET.md](02_MATERIAL_SHEET.md) |
 | **Evidence base** | Repo scripts/C++ at `ae7f649`; Windows DESKTOP-21CT3H0 confirmed via `cmd dir` (Lead update ~2026-09-17 ET) |
 
-**Gate:** stop for Lead **`APPROVE NP-A`** before NP-B lookdev apply.
+**Gate:** Lead **`APPROVE NP-A`** — **GRANTED** (2026-09-17 ET). NP-B unlocked — see [12b_NP_B_LOOKDEV.md](12b_NP_B_LOOKDEV.md).
 
 ---
 
@@ -253,4 +253,4 @@ Per project policy, **no `.uasset`/`.umap` commits**. Windows Editor at `ae7f649
 
 ---
 
-*Delivered under Lead **`APPROVE NP STRATEGY`** (Luke Thompson, 2026-09-17 ET). Awaiting Lead **`APPROVE NP-A`** to unlock NP-B.*
+*Delivered under Lead **`APPROVE NP STRATEGY`** (Luke Thompson, 2026-09-17 ET). NP-A approved — NP-B in progress via [12b_NP_B_LOOKDEV.md](12b_NP_B_LOOKDEV.md).*
