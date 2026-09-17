@@ -14,7 +14,11 @@
 
 Lead **`APPROVE NP STRATEGY`** — **GRANTED** (Luke Thompson, 2026-09-17 ET).
 
+<<<<<<< HEAD
 **Next gate:** Lead **`APPROVE NP-B`** → unlock NP-C form + V1 polish (after Windows lookdev evidence).
+=======
+**Next gate:** Lead **`APPROVE NP-C`** → unlock NP-D SYS V3–V4.
+>>>>>>> 860bdf2 (feat(np-c): form swap, GP_PlayerStart, soft walk bounds)
 
 ---
 
@@ -22,9 +26,15 @@ Lead **`APPROVE NP STRATEGY`** — **GRANTED** (Luke Thompson, 2026-09-17 ET).
 
 | Phase | Focus | Deliverable | Status |
 |-------|--------|-------------|--------|
+<<<<<<< HEAD
 | **NP-A** | Inventory / gap map | [12a_NP_A_INVENTORY.md](12a_NP_A_INVENTORY.md) | **APPROVED** — Lead **`APPROVE NP-A`**, 2026-09-17 ET |
 | **NP-B** | Lookdev apply | [12b_NP_B_LOOKDEV.md](12b_NP_B_LOOKDEV.md) — `assign_vs_mvp_materials.py` | **COMPLETE — awaiting APPROVE NP-B** (78/78 assign, DESKTOP-21CT3H0 @ `82c7eb2`) |
 | **NP-C** | Form + V1 polish | Body↔spirit; GP_PlayerStart; soft walk bounds | **LOCKED** |
+=======
+| **NP-A** | Inventory / gap map | [12a_NP_A_INVENTORY.md](12a_NP_A_INVENTORY.md) | **APPROVED** |
+| **NP-B** | Lookdev apply | Assign 10 masters onto dressed VS_MVP meshes; NightMix smoke | **APPROVED** |
+| **NP-C** | Form + V1 polish | [12c_NP_C_FORM_V1.md](12c_NP_C_FORM_V1.md) | **COMPLETE — awaiting APPROVE NP-C** |
+>>>>>>> 860bdf2 (feat(np-c): form swap, GP_PlayerStart, soft walk bounds)
 | **NP-D** | SYS V3–V4 | 6-slot inventory + gather + tame | **LOCKED** |
 | **NP-E** | SYS V6–V8 | Heal ×3, nurture ×2, dawn persist | **LOCKED** |
 
@@ -58,8 +68,12 @@ Lead **`APPROVE NP STRATEGY`** — **GRANTED** (Luke Thompson, 2026-09-17 ET).
 ```
 Harness refine: CLOSED — Lead Luke Thompson, APPROVE HR-B2 + APPROVE HR-D, 2026-09-17 ET
 Product NP strategy: APPROVED — Lead Luke Thompson, APPROVE NP STRATEGY, 2026-09-17 ET
+<<<<<<< HEAD
 NP-A: APPROVED — Lead APPROVE NP-A, 2026-09-17 ET
 NP-B: COMPLETE — Windows evidence filed (78/78 assign); awaiting APPROVE NP-B
+=======
+NP-A: APPROVED — NP-B: APPROVED — NP-C: COMPLETE awaiting APPROVE NP-C
+>>>>>>> 860bdf2 (feat(np-c): form swap, GP_PlayerStart, soft walk bounds)
 ```
 
 ---

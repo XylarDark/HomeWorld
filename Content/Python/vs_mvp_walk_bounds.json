@@ -1,0 +1,11 @@
+{
+  "_comment": "V1 soft walk bounds for VS_MVP hero island (Lib/00_Core/GRAYBOX_LAYOUT.md). C++ HomeWorldSoftBoundsComponent defaults match these values.",
+  "center_x_cm": -400,
+  "center_y_cm": -50,
+  "center_z_cm": 100,
+  "radius_xy_cm": 1050,
+  "min_z_cm": -400,
+  "max_z_cm": 600,
+  "pushback_strength": 1.2,
+  "source": "21m island footprint; cabin hub near SM_Cabin anchor"
+}

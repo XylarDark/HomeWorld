@@ -9060,3 +9060,15 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 **Gate:** HR-B2 **COMPLETE** — await Lead **`APPROVE HR-B2`**. Product NP **PARKED**.
 
+---
+
+## 2026-09-17 — NP-C form + V1 polish (cloud agent)
+
+**Lead:** **`APPROVE NP-B`** (Luke Thompson, 2026-09-17 ET).
+
+**Delivered:** Docs/12c_NP_C_FORM_V1.md + handoffs/NP_C_FORM_V1.md; C++ form swap (FORM: logs) + SoftBoundsComponent; place_vs_mvp_gp.py, smoke_nightmix_phase.py, vs_mvp_walk_bounds.json; bootstrap + check_level_bounds updates; PHASE_BOARD current = NP-C COMPLETE.
+
+**Windows follow-up:** Safe-Build after merge; run place_vs_mvp_gp.py + PIE runbook (V2/V5).
+
+**Gate:** NP-C **COMPLETE** — await Lead **`APPROVE NP-C`**.
+

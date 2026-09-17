@@ -1,10 +1,12 @@
 # check_level_bounds.py
 # Optional Phase 4 (LEVEL_TESTING_PLAN): check current editor level for Landscape bounds.
+# NP-C: also logs VS_MVP soft walk bounds config (vs_mvp_walk_bounds.json) when level is L_VS_MVP_Markers.
 # Run from Editor: Tools -> Execute Python Script, or via MCP execute_python_script("check_level_bounds.py").
 # If the level uses World Partition and the Landscape has zero bounds (cells not loaded), logs a warning
 # suggesting Window -> World Partition -> Load All. Use this to remind designers before running
 # scripts that depend on landscape size (e.g. create_demo_from_scratch).
 
+import json
 import os
 import sys
 
@@ -21,6 +23,32 @@ import importlib
 importlib.reload(level_loader)
 
 
+def _log_vs_mvp_walk_bounds():
+    config_path = os.path.join(_script_dir, "vs_mvp_walk_bounds.json")
+    if not os.path.isfile(config_path):
+        return
+    try:
+        with open(config_path, "r", encoding="utf-8") as f:
+            cfg = json.load(f)
+    except Exception:
+        return
+    unreal.log(
+        "Check level bounds: VS_MVP soft walk bounds (C++ SoftBoundsComponent) — "
+        "center=(%.0f,%.0f,%.0f) radius=%.0f cm min_z=%.0f max_z=%.0f"
+        % (
+            float(cfg.get("center_x_cm", -400)),
+            float(cfg.get("center_y_cm", -50)),
+            float(cfg.get("center_z_cm", 100)),
+            float(cfg.get("radius_xy_cm", 1050)),
+            float(cfg.get("min_z_cm", -400)),
+            float(cfg.get("max_z_cm", 600)),
+        )
+    )
+    unreal.log(
+        "Check level bounds: Navmesh deferred — soft pushback only per Docs/12c NP-C runbook."
+    )
+
+
 def main():
     if not unreal:
         return
@@ -28,6 +56,8 @@ def main():
     if not path:
         unreal.log("Check level bounds: No editor level open.")
         return
+    if path and "L_VS_MVP_Markers" in path:
+        _log_vs_mvp_walk_bounds()
     has_bounds = level_loader.landscape_has_bounds()
     if not has_bounds:
         if level_loader.level_has_actor_of_class(unreal.Landscape):
