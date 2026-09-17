@@ -20,6 +20,13 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 ## Rolling log (newest first)
 
+### 2026-09-17 — VP-A APPROVED (APPROVE VP-A stamp)
+
+- Lead **`APPROVE VP-A`** (Luke Thompson, 2026-09-17 ET) — VP-A **APPROVED**; **VP-B UNLOCKED / IN PROGRESS**.
+- Evidence PR #54: verb PIE **hard-fail accepted** (PA-03 `ABP_HomeWorldCharacter` skeleton); re-verify greps after VP-B.
+- Docs stamped: [handoffs/VP_A_PIE.md](../Docs/handoffs/VP_A_PIE.md), [14_VP_VERIFY_POLISH.md](../Docs/14_VP_VERIFY_POLISH.md), [PHASE_BOARD.md](../swarm/PHASE_BOARD.md).
+- **Next:** VP-B implementation (ABP skeleton + NightMix smoke) — Lead **`APPROVE VP-B`** before implementation PR. VP-C/D **LOCKED**.
+
 ### 2026-09-17 — VP-A PIE evidence filed (DESKTOP hard-fail)
 
 - DESKTOP PIE run on **DESKTOP-21CT3H0** (2026-09-17 ~08:26–08:28 ET) via UnrealMCP @ repo `cb592fa`.

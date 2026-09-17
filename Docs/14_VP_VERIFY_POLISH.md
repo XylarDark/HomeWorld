@@ -15,9 +15,9 @@
 
 Lead **`APPROVE VP STRATEGY`** — **APPROVED** (Luke Thompson, 2026-09-17 ET).
 
-**Next gate:** **`APPROVE VP-A`** — DESKTOP PIE evidence **filed** in [handoffs/VP_A_PIE.md](handoffs/VP_A_PIE.md) (2026-09-17 ET; verb PIE **hard-fail**, ABP skeleton blocker → VP-B).
+**Next gate:** **`APPROVE VP-B`** — VP-B smoke + ABP skeleton implementation (after VP-A stamp).
 
-**VP-A EVIDENCE FILED** — await Lead **`APPROVE VP-A`**. VP-B/C/D remain **LOCKED** until their gates.
+**VP-A APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET (hard-fail accepted; re-verify after VP-B). **VP-B UNLOCKED**. VP-C/D remain **LOCKED**.
 
 ---
 
@@ -48,8 +48,8 @@ Product NP (NP-A…E) and Harness Refine 2 (HR2-A…C) are **CLOSED**. Senior po
 | **Product NP (Docs/11)** | **CLOSED** |
 | **Harness HR2 (Docs/13)** | **CLOSED** |
 | **Docs/14 / VP strategy** | **APPROVED** — Lead **`APPROVE VP STRATEGY`**, 2026-09-17 ET |
-| **VP-A** | **EVIDENCE FILED — AWAITING APPROVE VP-A** (verb PIE hard-fail; PA-03 ABP skeleton → VP-B) |
-| **VP-B** | **LOCKED** |
+| **VP-A** | **APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET (verb PIE hard-fail accepted; PA-03 → VP-B) |
+| **VP-B** | **UNLOCKED / IN PROGRESS** |
 | **VP-C** | **LOCKED** |
 | **VP-D** | **LOCKED** |
 
@@ -201,7 +201,8 @@ Phases run **sequentially** (recommended: A → B → C → D) unless Lead direc
 
 ```
 Docs/14 / VP STRATEGY: APPROVED — Lead Luke Thompson, APPROVE VP STRATEGY, 2026-09-17 ET
-VP-A: EVIDENCE FILED (verb PIE hard-fail; await APPROVE VP-A) — VP-B: LOCKED — VP-C: LOCKED — VP-D: LOCKED
+VP-A: APPROVED — Lead APPROVE VP-A, 2026-09-17 ET (hard-fail accepted; re-verify after VP-B)
+VP-B: UNLOCKED / IN PROGRESS — VP-C: LOCKED — VP-D: LOCKED
 Product NP: CLOSED — HR2: CLOSED
 ```
 
@@ -223,4 +224,4 @@ Product NP: CLOSED — HR2: CLOSED
 
 ---
 
-*Conductor prepared this file; Lead **`APPROVE VP STRATEGY`** locked 2026-09-17 ET. VP-A PIE evidence **filed** 2026-09-17 ET ([handoffs/VP_A_PIE.md](handoffs/VP_A_PIE.md)) — verb PIE hard-fail; await Lead **`APPROVE VP-A`**; VP-B recommended next.*
+*Conductor prepared this file; Lead **`APPROVE VP STRATEGY`** locked 2026-09-17 ET. VP-A **APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET ([handoffs/VP_A_PIE.md](handoffs/VP_A_PIE.md)) — hard-fail accepted; **VP-B UNLOCKED**; re-verify verb PIE after VP-B.*

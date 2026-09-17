@@ -3,8 +3,8 @@
 | Field | Value |
 |-------|-------|
 | **Phase** | VP-A |
-| **Status** | **EVIDENCE FILED — HARD FAIL on verb PIE** (await Lead **`APPROVE VP-A`**) |
-| **Lead gate** | **`APPROVE VP-A`** — after evidence review |
+| **Status** | **APPROVED** — Lead Luke Thompson, **`APPROVE VP-A`**, 2026-09-17 ET (hard-fail accepted; re-verify after VP-B) |
+| **Lead gate** | **`APPROVE VP-A`** — **APPROVED**; unlocks **VP-B** |
 | **Spec** | [14_VP_VERIFY_POLISH.md](../14_VP_VERIFY_POLISH.md) § VP-A |
 
 ## Summary
@@ -128,4 +128,4 @@ Lead **`APPROVE VP STRATEGY`** (Luke Thompson, 2026-09-17 ET) — VP strategy **
 
 ## Stamp
 
-_(Awaiting Lead **`APPROVE VP-A`** — evidence filed 2026-09-17 ET; verb PIE **hard-fail**; VP-B recommended next.)_
+Lead **`APPROVE VP-A`** (Luke Thompson, 2026-09-17 ET) — VP-A **APPROVED** (evidence filed; verb PIE **hard-fail accepted** — PA-03 ABP skeleton). **VP-B UNLOCKED** — fix ABP skeleton + NightMix smoke; re-run verb PIE greps after VP-B before VP-C.
