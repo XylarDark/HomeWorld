@@ -83,19 +83,111 @@ These are optional; the primary path for HomeWorld is a self-hosted Windows runn
 
 ## Branch protection (Lead — GitHub repo settings)
 
-HR2-C makes **`build-win64` required** for PRs that touch C++ paths. Branch protection is configured in GitHub, not in this repo. Lead should set **Settings → Branches → Branch protection rules** for `main`:
+**HR3-C (Docs/15c):** Branch protection is configured in **GitHub Settings**, not in this repo. Cloud agents **cannot** flip the branch-protection UI — Lead must apply the checklist below and confirm in [Docs/handoffs/HR3_C_BRANCH_PROTECTION.md](../../Docs/handoffs/HR3_C_BRANCH_PROTECTION.md).
 
-| Status check | Require? | When it applies |
-|--------------|----------|-----------------|
-| **validate** | Yes | Every PR |
-| **python-lint** | Yes | Every PR |
-| **build-win64** | Yes | When [ci.yml](../../.github/workflows/ci.yml) runs (C++ path filters — see [CI_POLICY.md](CI_POLICY.md)) |
+**Policy:** [CI_POLICY.md](CI_POLICY.md) · **HR2-C path filters:** [Docs/13c_HR2_C_CI_GATE.md](../../Docs/13c_HR2_C_CI_GATE.md) · **HR3-C gate:** [Docs/15c_HR3_C_BRANCH_PROTECTION.md](../../Docs/15c_HR3_C_BRANCH_PROTECTION.md)
 
-**Docs-only PRs:** `ci.yml` does not run (path filters). GitHub should allow merge when only `validate` + `python-lint` ran. If a globally required `build-win64` blocks docs PRs, disable “require status checks to pass” for checks that did not run, or rely on Lead merge policy until path-scoped rulesets are available.
+### Required status checks on `main`
 
-**Lead waiver:** When the Windows runner is offline, Lead may merge with `Lead waiver: build-win64` in the PR body or label `lead-waiver-build-win64` — see [CI_POLICY.md](CI_POLICY.md) § Lead waiver.
+| Status check (exact job name) | Workflow | Require? | When it applies |
+|-------------------------------|----------|----------|-----------------|
+| **`validate`** | [validate.yml](../../.github/workflows/validate.yml) | **Yes** | Every PR to `main` |
+| **`python-lint`** | [validate.yml](../../.github/workflows/validate.yml) | **Yes** | Every PR to `main` |
+| **`build-win64`** | [ci.yml](../../.github/workflows/ci.yml) | **Yes** | When PR touches **C++ path filters** (below); skipped on docs-only PRs |
 
-**C++ path list (keep in sync with ci.yml):** `Source/**`, `**/*.Build.cs`, `*.uproject`, `Plugins/**/Source/**`, `.github/workflows/ci.yml`.
+**C++ path filters** (must stay in sync with `ci.yml` and [CI_POLICY.md](CI_POLICY.md)):
+
+| Path pattern | Examples |
+|--------------|----------|
+| `Source/**` | `Source/HomeWorld/*.cpp`, `Source/HomeWorld/*.h` |
+| `**/*.Build.cs` | `Source/HomeWorld/HomeWorld.Build.cs` |
+| `*.uproject` | `HomeWorld.uproject` |
+| `Plugins/**/Source/**` | Tracked plugin C++ (if any) |
+| `.github/workflows/ci.yml` | CI workflow changes |
+
+**Not in C++ filters:** `docs/**`, `Docs/**`, `Content/Python/**`, `Config/*.ini` (unless paired with C++ paths), `.cursor/**`, `swarm/**`.
+
+### Lead checklist — enable branch protection for `main`
+
+Complete these steps in the GitHub UI (**repo admin** required). Do **not** mark HR3-C done until Lead confirms each box.
+
+#### 0. Prerequisites
+
+- [ ] At least **one recent PR** has run Actions so check names appear in the picker (merge this HR3-C docs PR or any open PR first if the list is empty).
+- [ ] Self-hosted runner **DESKTOP-21CT3H0** is online with labels `windows`, `ue57` when testing C++ PRs ([§ Self-hosted Windows runner](#self-hosted-windows-runner-primary) above).
+
+#### 1. Open branch protection
+
+1. Go to **https://github.com/XylarDark/HomeWorld/settings/branches**
+2. Under **Branch protection rules**, click **Add rule** (or **Edit** an existing rule for `main`).
+3. **Branch name pattern:** `main`
+
+#### 2. Pull request requirements (recommended)
+
+- [ ] **Require a pull request before merging** — enabled
+- [ ] **Require approvals** — optional (team preference); minimum **1** if enabled
+- [ ] **Dismiss stale pull request approvals when new commits are pushed** — optional
+- [ ] **Require conversation resolution before merging** — optional
+
+#### 3. Status checks (required)
+
+- [ ] **Require status checks to pass before merging** — enabled
+- [ ] **Require branches to be up to date before merging** — enabled (recommended)
+- [ ] Search the status-check picker and add these **exact job names**:
+  - [ ] **`validate`**
+  - [ ] **`python-lint`**
+  - [ ] **`build-win64`**
+
+GitHub may show workflow context in the UI (e.g. `Validate / validate`). Select the entries whose **job name** matches the table above.
+
+**Skipped checks (docs-only PRs):** [ci.yml](../../.github/workflows/ci.yml) uses path filters — docs-only PRs do **not** run `build-win64`. Enable **“Do not require status checks to pass for checks that were skipped”** (GitHub wording may vary: *allow merge when optional/skipped checks did not run*). Without this, docs PRs can be blocked waiting for a check that never runs.
+
+If that option is unavailable on your plan, use **Lead merge policy** for docs-only PRs until path-scoped rulesets exist — see [CI_POLICY.md](CI_POLICY.md).
+
+#### 4. Additional protections (recommended)
+
+- [ ] **Do not allow bypassing the above settings** — enabled (admins included), or document who may bypass
+- [ ] **Restrict who can push to matching branches** — optional; blocks direct pushes to `main`
+- [ ] **Allow force pushes** — **disabled**
+- [ ] **Allow deletions** — **disabled**
+
+#### 5. Save and verify
+
+1. Click **Create** or **Save changes**.
+2. Open a **docs-only test PR** — expect **`validate`** + **`python-lint`** green; **`build-win64`** absent/skipped; merge allowed.
+3. Open (or use) a **C++-touching PR** — expect all three checks; **`build-win64`** must be green on self-hosted Windows unless [Lead waiver](#lead-waiver-build-win64) applies.
+
+#### 6. Lead confirmation (HR3-C evidence)
+
+After applying settings, Lead updates [Docs/handoffs/HR3_C_BRANCH_PROTECTION.md](../../Docs/handoffs/HR3_C_BRANCH_PROTECTION.md):
+
+- Status → **APPLIED** (or **DEFERRED** with ticket/note)
+- Screenshot or API excerpt listing required checks on `main`
+- Date and Lead stamp
+
+**API verify (Lead / admin PAT only):** Cloud agent token returns **403** — Lead must run:
+
+```bash
+gh api repos/XylarDark/HomeWorld/branches/main/protection \
+  --jq '{required_checks: .required_status_checks.contexts, strict: .required_status_checks.strict, enforce_admins: .enforce_admins.enabled}'
+```
+
+Expected `required_checks` includes `validate`, `python-lint`, and `build-win64` when HR3-C is **APPLIED**. Empty response or 404 means protection is **not** configured — do not claim enabled in PHASE_BOARD.
+
+### Docs-only PR behavior
+
+When a PR changes only paths **outside** the C++ filters, **`ci.yml` does not run**. With skipped-check handling enabled, merge requires only **`validate`** + **`python-lint`**. See [CI_POLICY.md](CI_POLICY.md) § Two workflows.
+
+### Lead waiver (build-win64)
+
+When the Windows runner is offline or Lead accepts merge risk without a CI build:
+
+1. PR description contains exact text: **`Lead waiver: build-win64`**
+2. **Or** GitHub label: **`lead-waiver-build-win64`**
+3. **`validate`** + **`python-lint`** must still be green
+4. Lead approves merge in review
+
+`ci.yml` skips `build-win64` and runs `build-win64-waiver-notice`. Branch protection may still show `build-win64` as pending — Lead uses admin merge or temporary bypass per team policy. Full policy: [CI_POLICY.md](CI_POLICY.md) § Lead waiver.
 
 ---
 

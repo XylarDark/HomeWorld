@@ -71,7 +71,7 @@ Conductor blunt grade at VP-A close: **swarm B+ / harness B**. **A+** means **cl
 | **Docs/15 / HR3 strategy** | **APPROVED** — Lead **`APPROVE HR3 STRATEGY`**, 2026-09-17 ET |
 | **HR3-A** | **APPROVED / COMPLETE** — [handoffs/HR3_A_WINDOWS_EXEC.md](handoffs/HR3_A_WINDOWS_EXEC.md) |
 | **HR3-B** | **APPROVED / COMPLETE** — [handoffs/HR3_B_UE_PREFLIGHT.md](handoffs/HR3_B_UE_PREFLIGHT.md) |
-| **HR3-C** | **UNLOCKED / IN PROGRESS** — branch protection real |
+| **HR3-C** | **EVIDENCE FILED — PENDING LEAD APPLY** — [15c_HR3_C_BRANCH_PROTECTION.md](15c_HR3_C_BRANCH_PROTECTION.md), [handoffs/HR3_C_BRANCH_PROTECTION.md](handoffs/HR3_C_BRANCH_PROTECTION.md) |
 | **HR3-D** | **LOCKED** until per-phase gate |
 
 ---
@@ -134,7 +134,7 @@ Naming: **HR3-A … HR3-D** (Harness Refine 3 — A+ pass). Do **not** reuse HR2
 |------|------|
 | **Problem** | HR2-C made `build-win64` required in workflow/path filters; GitHub branch protection may still be advisory if Lead has not applied rules on `main`. |
 | **Required checks** | `validate`, `python-lint`, `build-win64` (on C++ path changes per [13c_HR2_C_CI_GATE.md](13c_HR2_C_CI_GATE.md)) |
-| **Deliverable** | [handoffs/HR3_C_BRANCH_PROTECTION.md](handoffs/HR3_C_BRANCH_PROTECTION.md) + CI_SETUP updates |
+| **Deliverable** | [15c_HR3_C_BRANCH_PROTECTION.md](15c_HR3_C_BRANCH_PROTECTION.md), [handoffs/HR3_C_BRANCH_PROTECTION.md](handoffs/HR3_C_BRANCH_PROTECTION.md) + [CI_SETUP.md](../docs/Setup/CI_SETUP.md) updates |
 | **Lead action** | Apply branch protection **OR** defer with dated ticket note in handoff (bot cannot configure GitHub UI) |
 | **Gate** | Lead **`APPROVE HR3-C`** before implementation PR |
 
@@ -142,10 +142,10 @@ Naming: **HR3-A … HR3-D** (Harness Refine 3 — A+ pass). Do **not** reuse HR2
 
 **Done criteria:**
 
-- [ ] CI_SETUP Lead checklist complete (step-by-step for required checks)
-- [ ] Handoff shows evidence of applied settings **OR** explicit defer + ticket id
-- [ ] CI_POLICY and ci.yml remain aligned with HR2-C path list
-- [ ] Docs-only PRs still merge on validate alone
+- [x] CI_SETUP Lead checklist complete (step-by-step for required checks)
+- [ ] Handoff shows evidence of applied settings **OR** explicit defer + ticket id — **PENDING LEAD APPLY** (agent API **403**)
+- [x] CI_POLICY and ci.yml remain aligned with HR2-C path list
+- [x] Docs-only PRs still merge on validate alone (documented skipped-check behavior)
 
 ---
 
@@ -220,7 +220,7 @@ Phases may run **sequentially** (recommended: A → B → C → D) or **parallel
 Docs/15 / HR3 STRATEGY: APPROVED — Lead Luke Thompson, APPROVE HR3 STRATEGY, 2026-09-17 ET
 HR3-A: APPROVED / COMPLETE — Lead APPROVE HR3-A, 2026-09-17 ET (evidence PR #58)
 HR3-B: APPROVED / COMPLETE — Lead APPROVE HR3-B, 2026-09-17 ET (evidence PR #60)
-HR3-C: UNLOCKED / IN PROGRESS — await Lead APPROVE HR3-C before implementation PR
+HR3-C: EVIDENCE FILED — PENDING LEAD APPLY (GitHub Settings)
 HR3-D: LOCKED
 VP-B: PARKED pending HR3
 ```
@@ -242,4 +242,4 @@ VP-B: PARKED pending HR3
 
 ---
 
-*Conductor prepared this file; HR3 strategy **APPROVED** 2026-09-17 ET — Lead **`APPROVE HR3 STRATEGY`**. HR3-A **APPROVED / COMPLETE** — Lead **`APPROVE HR3-A`**, 2026-09-17 ET. HR3-B **APPROVED / COMPLETE** — Lead **`APPROVE HR3-B`**, 2026-09-17 ET. **HR3-C UNLOCKED / IN PROGRESS**; HR3-D **LOCKED**. VP-B **PARKED** until HR3 lands.*
+*Conductor prepared this file; HR3 strategy **APPROVED** 2026-09-17 ET — Lead **`APPROVE HR3 STRATEGY`**. HR3-A **APPROVED / COMPLETE**. HR3-B **APPROVED / COMPLETE**. HR3-C **EVIDENCE FILED — PENDING LEAD APPLY** (checklist in CI_SETUP; Lead must confirm GitHub branch protection). HR3-D **LOCKED**. VP-B **PARKED** until HR3 lands.*

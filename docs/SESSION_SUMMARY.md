@@ -20,6 +20,13 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 ## Rolling log (newest first)
 
+### 2026-09-17 — HR3-C branch protection checklist (docs-only)
+
+- Cloud agent HR3-C: expanded [docs/Setup/CI_SETUP.md](Setup/CI_SETUP.md) § Branch protection — step-by-step Lead checklist for **`validate`**, **`python-lint`**, **`build-win64`** on `main`; aligned with [CI_POLICY.md](Setup/CI_POLICY.md) and HR2-C path filters.
+- Spec + handoff: [Docs/15c_HR3_C_BRANCH_PROTECTION.md](../Docs/15c_HR3_C_BRANCH_PROTECTION.md), [Docs/handoffs/HR3_C_BRANCH_PROTECTION.md](../Docs/handoffs/HR3_C_BRANCH_PROTECTION.md) — status **PENDING LEAD APPLY** (API `gh …/protection` → **403**; Lead must confirm in GitHub UI).
+- [PHASE_BOARD.md](../swarm/PHASE_BOARD.md): HR3-C **EVIDENCE FILED — PENDING LEAD APPLY**.
+- **Next:** Lead apply branch protection → stamp handoff **APPLIED** → **`APPROVE HR3-C`**. Do not claim protection enabled without GitHub confirmation.
+
 ### 2026-09-17 — HR3-B APPROVED (APPROVE HR3-B stamp)
 
 - Lead **`APPROVE HR3-B`** (Luke Thompson, 2026-09-17 ET) — HR3-B **APPROVED / COMPLETE**; **HR3-C UNLOCKED / IN PROGRESS**.
