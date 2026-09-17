@@ -6,13 +6,15 @@
 | **Gate** | **`APPROVE HR3 STRATEGY`** — **APPROVED** (Luke Thompson, 2026-09-17 ET) |
 | **HR3-A evidence merge** | `27a1af4` (PR #58) |
 | **HR3-B evidence merge** | `9d7ffaf` (PR #60) |
+| **HR3-D evidence merge** | `e19c0ac` (PR #64) |
 | **Date** | 2026-09-17 |
-| **Baseline** | Main post-HR2 + VP-A evidence — HR2 **CLOSED**, VP strategy **APPROVED**, VP-A **APPROVED** (hard-fail ABP), VP-B **PARKED** for HR3 |
-| **Harness grade (now)** | **~B** — doctor:ue truth, cold-clone CI, build-win64 path filters; no loud UE preflight, Windows exec tribal, branch protection advisory |
-| **Swarm grade (now)** | **~B+** — gates, handoffs, DESKTOP evidence filed; re-verify and worker lane not closed-loop |
+| **Baseline** | Main post-HR2 + VP-A evidence — HR2 **CLOSED**, VP strategy **APPROVED**, VP-A **APPROVED** (hard-fail ABP), VP-B **UNLOCKED** after HR3 close |
+| **Harness grade (now)** | **~A** — preflight + Windows lane + build-win64 path filters; HR3-C **DEFERRED** (not pure A+ on CI-as-law until branch protection applied) |
+| **Swarm grade (now)** | **~A+** — DESKTOP lane, handoff contract, re-verify rule on PHASE_BOARD |
+| **HR3 track** | **CLOSED / COMPLETE** — Lead **`APPROVE HR3-D`**, 2026-09-17 ET (HR3-C **DEFERRED**) |
 | **Author** | Conductor (HomeWorld) |
 | **Prior HR track** | [13_HR2_HARNESS_REFINE.md](13_HR2_HARNESS_REFINE.md) — **CLOSED** |
-| **Parallel product track** | [14_VP_VERIFY_POLISH.md](14_VP_VERIFY_POLISH.md) — **APPROVED**; VP-B **PARKED** pending HR3 |
+| **Parallel product track** | [14_VP_VERIFY_POLISH.md](14_VP_VERIFY_POLISH.md) — **APPROVED**; VP-B **UNLOCKED / IN PROGRESS** |
 
 ---
 
@@ -24,9 +26,9 @@ Lead **`APPROVE HR3-A`** — **APPROVED** (Luke Thompson, 2026-09-17 ET). Eviden
 
 Lead **`APPROVE HR3-B`** — **APPROVED** (Luke Thompson, 2026-09-17 ET). Evidence merge `9d7ffaf` (PR #60).
 
-**Next gate:** **`APPROVE HR3-D`** — DESKTOP evidence lane + re-verify.
+Lead **`APPROVE HR3-D`** — **APPROVED** (Luke Thompson, 2026-09-17 ET). Evidence merge `e19c0ac` (PR #64).
 
-**HR3-A APPROVED / COMPLETE**. **HR3-B APPROVED / COMPLETE**. **HR3-C DEFERRED / COMPLETE for track** — Lead **`APPROVE HR3-C deferred`**, 2026-09-17 ET (checklist PR #62; GitHub apply deferred). **HR3-D EVIDENCE FILED / AWAITING APPROVE HR3-D**. **VP-B PARKED** pending HR3 close (do not mark VP complete).
+**HR3-A APPROVED / COMPLETE**. **HR3-B APPROVED / COMPLETE**. **HR3-C DEFERRED / COMPLETE for track** — Lead **`APPROVE HR3-C deferred`**, 2026-09-17 ET (checklist PR #62; GitHub apply deferred). **HR3-D APPROVED / COMPLETE**. **HR3 track CLOSED / COMPLETE**. **VP-B UNLOCKED / IN PROGRESS** (do not mark VP track complete).
 
 ---
 
@@ -67,12 +69,13 @@ Conductor blunt grade at VP-A close: **swarm B+ / harness B**. **A+** means **cl
 | **Docs/13 / HR2** | **CLOSED / COMPLETE** |
 | **Docs/14 / VP strategy** | **APPROVED** |
 | **VP-A** | **APPROVED** — hard-fail ABP evidence filed |
-| **VP-B** | **PARKED** — pending HR3 (was unlocked mid-fix) |
+| **VP-B** | **UNLOCKED / IN PROGRESS** — resume after HR3 close |
 | **Docs/15 / HR3 strategy** | **APPROVED** — Lead **`APPROVE HR3 STRATEGY`**, 2026-09-17 ET |
 | **HR3-A** | **APPROVED / COMPLETE** — [handoffs/HR3_A_WINDOWS_EXEC.md](handoffs/HR3_A_WINDOWS_EXEC.md) |
 | **HR3-B** | **APPROVED / COMPLETE** — [handoffs/HR3_B_UE_PREFLIGHT.md](handoffs/HR3_B_UE_PREFLIGHT.md) |
 | **HR3-C** | **DEFERRED / COMPLETE for track** — [15c_HR3_C_BRANCH_PROTECTION.md](15c_HR3_C_BRANCH_PROTECTION.md), [handoffs/HR3_C_BRANCH_PROTECTION.md](handoffs/HR3_C_BRANCH_PROTECTION.md) — Lead skip 2026-09-17 ET; checklist PR #62 |
-| **HR3-D** | **EVIDENCE FILED** — [handoffs/HR3_D_EVIDENCE_LANE.md](handoffs/HR3_D_EVIDENCE_LANE.md) |
+| **HR3-D** | **APPROVED / COMPLETE** — [handoffs/HR3_D_EVIDENCE_LANE.md](handoffs/HR3_D_EVIDENCE_LANE.md) — Lead **`APPROVE HR3-D`**, 2026-09-17 ET; PR #64 |
+| **HR3 track** | **CLOSED / COMPLETE** — HR3-C **DEFERRED**; harness **~A**, swarm **~A+** |
 
 ---
 
@@ -161,7 +164,7 @@ Naming: **HR3-A … HR3-D** (Harness Refine 3 — A+ pass). Do **not** reuse HR2
 | **Re-verify rule** | After VP-B (or any blocker-fix phase), **VP-A greps re-run** required before VP-C unlock |
 | **Optional** | Thin routine/prompt for CI-fail wake — document only if routine cannot be created from repo |
 | **Deliverable** | PHASE_BOARD template + [SWARM_OPS.md](../swarm/SWARM_OPS.md) / [CLOUD_AGENT_PACKET.md](../swarm/CLOUD_AGENT_PACKET.md) updates; [handoffs/HR3_D_EVIDENCE_LANE.md](handoffs/HR3_D_EVIDENCE_LANE.md) |
-| **Gate** | Lead **`APPROVE HR3-D`** before implementation PR |
+| **Gate** | Lead **`APPROVE HR3-D`** — **APPROVED** (Luke Thompson, 2026-09-17 ET) |
 
 **Why A+:** Documented fail isn't forever; swarm re-closes the loop.
 
@@ -182,7 +185,7 @@ Naming: **HR3-A … HR3-D** (Harness Refine 3 — A+ pass). Do **not** reuse HR2
 | **FALLBACK FLIGHT armed** | No free-flight / flight HUD |
 | **No `.uasset` / `.umap` commits** | Local Windows only |
 | **Exactly 10 masters** | Docs/02 |
-| **VP-B PARKED** | Resume VP-B after HR3 strategy (+ recommended HR3-B preflight) — do not mark VP track complete |
+| **VP-B resume** | VP-B **UNLOCKED / IN PROGRESS** after HR3 close — do not mark VP track complete until VP-D |
 | **Lead APPROVE each HR3-* before implementation PR** | This doc |
 | **Docs-only default for strategy + handoffs** | HR3-A/B/C/D implementation PRs may touch scripts, CI docs, swarm ops — no gameplay C++ unless explicitly scoped |
 | **Stop for Lead APPROVE HR3 STRATEGY before HR3-A** | This PR is strategy only |
@@ -221,8 +224,11 @@ Docs/15 / HR3 STRATEGY: APPROVED — Lead Luke Thompson, APPROVE HR3 STRATEGY, 2
 HR3-A: APPROVED / COMPLETE — Lead APPROVE HR3-A, 2026-09-17 ET (evidence PR #58)
 HR3-B: APPROVED / COMPLETE — Lead APPROVE HR3-B, 2026-09-17 ET (evidence PR #60)
 HR3-C: DEFERRED / COMPLETE for track — Lead APPROVE HR3-C deferred, 2026-09-17 ET (PR #62)
-HR3-D: EVIDENCE FILED — await APPROVE HR3-D
-VP-B: PARKED pending HR3 close
+HR3-D: APPROVED / COMPLETE — Lead APPROVE HR3-D, 2026-09-17 ET (evidence PR #64)
+HR3 track: CLOSED / COMPLETE (HR3-C DEFERRED)
+VP-B: UNLOCKED / IN PROGRESS
+Harness grade: ~A (HR3-C deferred = not pure A+ on CI-as-law)
+Swarm grade: ~A+
 ```
 
 ---
@@ -232,7 +238,7 @@ VP-B: PARKED pending HR3 close
 | Doc | Relationship |
 |-----|--------------|
 | [13_HR2_HARNESS_REFINE.md](13_HR2_HARNESS_REFINE.md) | HR2 **CLOSED** — HR3 is A+ pass on residual B/B+ friction |
-| [14_VP_VERIFY_POLISH.md](14_VP_VERIFY_POLISH.md) | VP **APPROVED**; VP-A hard-fail drove HR3-B; VP-B **PARKED** |
+| [14_VP_VERIFY_POLISH.md](14_VP_VERIFY_POLISH.md) | VP **APPROVED**; VP-A hard-fail drove HR3-B; VP-B **UNLOCKED / IN PROGRESS** |
 | [11_SWARM_HARNESS_AUDIT.md](11_SWARM_HARNESS_AUDIT.md) | Baseline grades; HR3 targets A+ closed loops |
 | [WINDOWS_BRIDGE.md](../docs/Setup/WINDOWS_BRIDGE.md) | DESKTOP-21CT3H0 — HR3-A canonical lane |
 | [CI_SETUP.md](../docs/Setup/CI_SETUP.md) | HR3-C branch protection checklist |
@@ -242,4 +248,4 @@ VP-B: PARKED pending HR3 close
 
 ---
 
-*Conductor prepared this file; HR3 strategy **APPROVED** 2026-09-17 ET — Lead **`APPROVE HR3 STRATEGY`**. HR3-A **APPROVED / COMPLETE**. HR3-B **APPROVED / COMPLETE**. HR3-C **DEFERRED / COMPLETE for track** — Lead **`APPROVE HR3-C deferred`**, 2026-09-17 ET (checklist PR #62; GitHub apply deferred). HR3-D **EVIDENCE FILED** — [handoffs/HR3_D_EVIDENCE_LANE.md](handoffs/HR3_D_EVIDENCE_LANE.md). VP-B **PARKED** until HR3-D close.*
+*Conductor prepared this file; HR3 strategy **APPROVED** 2026-09-17 ET — Lead **`APPROVE HR3 STRATEGY`**. HR3-A **APPROVED / COMPLETE**. HR3-B **APPROVED / COMPLETE**. HR3-C **DEFERRED / COMPLETE for track** — Lead **`APPROVE HR3-C deferred`**, 2026-09-17 ET (checklist PR #62; GitHub apply deferred). HR3-D **APPROVED / COMPLETE** — Lead **`APPROVE HR3-D`**, 2026-09-17 ET (PR #64). **HR3 track CLOSED / COMPLETE** — harness **~A** (HR3-C deferred), swarm **~A+**. VP-B **UNLOCKED / IN PROGRESS**.*

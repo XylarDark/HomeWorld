@@ -1,9 +1,9 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **HR3-D** (DESKTOP evidence lane + re-verify) — **EVIDENCE FILED / AWAITING APPROVE HR3-D**  
+**Current phase:** **VP-B** (smoke & character risk) — **UNLOCKED / IN PROGRESS** (resume)  
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
-**Active owners:** **CND** (Conductor) + **CLOUD** agent (docs PR)  
-**Blocked by:** Lead **`APPROVE HR3-D`**. HR3-C **DEFERRED / COMPLETE for track** (Lead skip 2026-09-17 ET; checklist PR #62). HR3-A/B **APPROVED**. VP-A **APPROVED** (hard-fail ABP; re-verify after VP-B). **VP-B PARKED** pending HR3 close.
+**Active owners:** **CND** (Conductor parent on **DESKTOP**)  
+**Blocked by:** None for VP-B start. **HR3 track CLOSED / COMPLETE** — Lead **`APPROVE HR3-D`**, 2026-09-17 ET (HR3-C **DEFERRED**). VP-A **APPROVED** (hard-fail ABP; **re-verify after VP-B** before VP-C). VP-C/D **LOCKED**.
 
 | Phase | Name | Owners | Status | Gate file | Handoffs |
 |---|---|---|---|---|---|
@@ -36,7 +36,7 @@ Task executors are **not** DESKTOP owners. Re-verify rule: [HR3_D_EVIDENCE_LANE.
 
 ## POST-AUDIT (Docs/05–10 + HR track)
 
-MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** **Product next-phase (NP-A…E) is CLOSED / COMPLETE.** **HR2 track CLOSED / COMPLETE.** **VP strategy APPROVED.** **HR3 strategy APPROVED.** **HR3-A/B APPROVED**. **HR3-C DEFERRED / COMPLETE for track** — Lead **`APPROVE HR3-C deferred`**, 2026-09-17 ET. Active: **HR3-D EVIDENCE FILED** (await **`APPROVE HR3-D`**). **VP-B PARKED**.
+MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** **Product next-phase (NP-A…E) is CLOSED / COMPLETE.** **HR2 track CLOSED / COMPLETE.** **HR3 track CLOSED / COMPLETE** — Lead **`APPROVE HR3-D`**, 2026-09-17 ET (HR3-C **DEFERRED**). **VP strategy APPROVED.** Active: **VP-B UNLOCKED / IN PROGRESS** (resume). VP-A re-verify required after VP-B before VP-C.
 
 | Track | Doc / phase | Host | Status | Gate / handoff |
 |---|---|---|---|---|
@@ -55,16 +55,17 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **HR2 track** | Harness Refine 2 | — | **CLOSED / COMPLETE** | [13_HR2_HARNESS_REFINE.md](../Docs/13_HR2_HARNESS_REFINE.md) |
 | **Docs/14** | Verify & Polish strategy | CLOUD | **APPROVED** | [14_VP_VERIFY_POLISH.md](../Docs/14_VP_VERIFY_POLISH.md) |
 | **VP-A** | PIE evidence | DESKTOP | **APPROVED** | [handoffs/VP_A_PIE.md](../Docs/handoffs/VP_A_PIE.md) — hard-fail; **re-verify after VP-B** |
-| **VP-B** | Smoke & character risk | DESKTOP | **PARKED** | Pending HR3 close — ABP skeleton + NightMix smoke |
+| **VP-B** | Smoke & character risk | DESKTOP | **UNLOCKED / IN PROGRESS** | ABP skeleton + NightMix smoke — resume after HR3 close |
 | **Docs/15** | Harness Refine 3 (A+) | CLOUD | **APPROVED** | [15_HR3_A_PLUS.md](../Docs/15_HR3_A_PLUS.md) |
 | **HR3-A** | Windows exec reliability | DESKTOP | **APPROVED** | [handoffs/HR3_A_WINDOWS_EXEC.md](../Docs/handoffs/HR3_A_WINDOWS_EXEC.md) |
 | **HR3-B** | UE preflight fails loud | CLOUD+DESKTOP | **APPROVED** | [handoffs/HR3_B_UE_PREFLIGHT.md](../Docs/handoffs/HR3_B_UE_PREFLIGHT.md) — PR #60 |
 | **HR3-C** | Branch protection | Lead | **DEFERRED / COMPLETE for track** | Lead skip 2026-09-17 ET — [handoffs/HR3_C_BRANCH_PROTECTION.md](../Docs/handoffs/HR3_C_BRANCH_PROTECTION.md) checklist PR #62; GitHub apply deferred |
-| **HR3-D** | DESKTOP evidence + re-verify | CLOUD | **EVIDENCE FILED** | [handoffs/HR3_D_EVIDENCE_LANE.md](../Docs/handoffs/HR3_D_EVIDENCE_LANE.md) — await **`APPROVE HR3-D`** |
+| **HR3-D** | DESKTOP evidence + re-verify | CLOUD | **APPROVED** | [handoffs/HR3_D_EVIDENCE_LANE.md](../Docs/handoffs/HR3_D_EVIDENCE_LANE.md) — Lead **`APPROVE HR3-D`**, 2026-09-17 ET; PR #64 |
+| **HR3 track** | Harness Refine 3 (A+) | — | **CLOSED / COMPLETE** | [15_HR3_A_PLUS.md](../Docs/15_HR3_A_PLUS.md) — HR3-C **DEFERRED**; harness **~A**, swarm **~A+** |
 | **VP-C** | Playability polish | CLOUD+DESKTOP | **LOCKED** | Requires VP-A re-verify after VP-B — [14_VP_VERIFY_POLISH.md](../Docs/14_VP_VERIFY_POLISH.md) |
 | **VP-D** | Bootstrap dry-run | CLOUD+DESKTOP | **LOCKED** | handoffs/VP_D_BOOTSTRAP_CI.md (pending) |
 
-**Current track:** **HR3-D EVIDENCE FILED** — Lead **`APPROVE HR3-D`** closes HR3 (HR3-C deferred). VP-A **APPROVED** (re-verify pending VP-B); **VP-B PARKED**; VP-C/D **LOCKED**.
+**Current track:** **HR3 CLOSED / COMPLETE** — Lead **`APPROVE HR3-D`**, 2026-09-17 ET. **VP-B UNLOCKED / IN PROGRESS** (resume). VP-A **APPROVED** — **re-verify after VP-B** before VP-C. VP-C/D **LOCKED**.
 
 ---
 
@@ -72,9 +73,8 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 
 | ID | Phase | Host | Owner | Write path | Due artifact |
 |---|---|---|---|---|---|
-| HR3-D-gate | HR3-D | CLOUD | CND | Docs/handoffs/ | [HR3_D_EVIDENCE_LANE.md](../Docs/handoffs/HR3_D_EVIDENCE_LANE.md) filed — Lead **`APPROVE HR3-D`** |
-| VP-B-resume | VP-B | DESKTOP | CND parent | Docs/handoffs/ | **PARKED** — resume after HR3-D; then VP-A re-verify before VP-C |
-| VP-A-reverify | VP-A | DESKTOP | CND parent | Docs/handoffs/ | Re-run verb greps after VP-B — checklist in HR3_D handoff |
+| VP-B-smoke | VP-B | DESKTOP | CND parent | Docs/handoffs/ | **IN PROGRESS** — NightMix smoke + ABP skeleton fix; file `VP_B_SMOKE_CHARACTER.md` |
+| VP-A-reverify | VP-A | DESKTOP | CND parent | Docs/handoffs/ | **LOCKED until VP-B** — re-run verb greps after VP-B; checklist in HR3_D handoff |
 
 ## Open defects
 

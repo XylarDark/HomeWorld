@@ -3,8 +3,9 @@
 | Field | Value |
 |-------|-------|
 | **Phase** | HR3-D |
-| **Status** | **EVIDENCE FILED** — await Lead **`APPROVE HR3-D`** |
-| **Lead gate** | **`APPROVE HR3-D`** — closes HR3 track (HR3-C **DEFERRED** by Lead skip) |
+| **Status** | **APPROVED** — Lead Luke Thompson, **`APPROVE HR3-D`**, 2026-09-17 ET |
+| **Lead gate** | **`APPROVE HR3-D`** — **APPROVED**; HR3 track **CLOSED / COMPLETE** (HR3-C **DEFERRED**) |
+| **Evidence merge** | `e19c0ac` (PR #64) |
 | **Spec** | [15_HR3_A_PLUS.md](../15_HR3_A_PLUS.md) § HR3-D |
 | **Date** | 2026-09-17 ET |
 
@@ -133,4 +134,10 @@ Run on **DESKTOP-21CT3H0** after VP-B merge. Conductor parent only.
 
 ## Gate
 
-Lead **`APPROVE HR3-D`** closes the HR3 track for swarm A+ (with HR3-C explicitly deferred). Resume **VP-B** after HR3-D approval; then run VP-A re-verify before **VP-C**.
+Lead **`APPROVE HR3-D`** — **APPROVED** (Luke Thompson, 2026-09-17 ET). HR3-D **COMPLETE**. **HR3 track CLOSED / COMPLETE** (HR3-C **DEFERRED** — checklist PR #62; GitHub apply deferred). Evidence merge `e19c0ac` (PR #64).
+
+**Next:** **VP-B UNLOCKED / IN PROGRESS** — DESKTOP smoke + ABP fix; then **VP-A re-verify** before **VP-C**.
+
+## Prior stamp
+
+Lead **`APPROVE HR3-C deferred`** (Luke Thompson, 2026-09-17 ET) — HR3-C **DEFERRED / COMPLETE for track**; HR3-D **EVIDENCE FILED**. Evidence merge `e19c0ac` (PR #64).
