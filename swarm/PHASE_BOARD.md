@@ -5,6 +5,7 @@
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **Conductor** (HS-F) / **Lead** (`SIGN OFF HS AUDIT`)
 **Blocked by:** none for HS-F drafting. Final gate Lead **`SIGN OFF HS AUDIT`**. Branch protection **DEFERRED**.
+**Sign-off doc:** [Docs/17_HS_AUDIT_SIGN_OFF.md](../Docs/17_HS_AUDIT_SIGN_OFF.md) — PENDING **`SIGN OFF HS AUDIT`** (do not claim).
 
 
 | Phase | Name | Owners | Status | Gate file | Handoffs |
@@ -82,7 +83,8 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **HS-B** | Swarm ops tighten | CLOUD | **APPROVED / CLOSED** | [17b_HS_SWARM_OPS.md](../Docs/17b_HS_SWARM_OPS.md) — Lead **`APPROVE HS-B`**, 2026-09-17 ET |
 | **HS-C** | CI as law | CLOUD+Lead | **DEFERRED / CLOSED** | Lead **`ACCEPT HS-C DEFER`**, 2026-09-17 ET — [17c](../Docs/17c_HS_CI_LAW.md) |
 | **HS-D** | Evidence automation | CLOUD+DESKTOP | **APPROVED / CLOSED** | [17d_HS_EVIDENCE.md](../Docs/17d_HS_EVIDENCE.md) · [HS_D_EVIDENCE.md](../Docs/handoffs/HS_D_EVIDENCE.md) — Lead **`APPROVE HS-D`**, 2026-09-17 ET (PR #94) |
-| **HS-E** | Character / bootstrap canon | CLOUD+Lead+DESKTOP | **IN PROGRESS** | [17e_HS_CONTENT_BOOTSTRAP.md](../Docs/17e_HS_CONTENT_BOOTSTRAP.md) — policy **KEEP-LOCAL** (Lead 2026-09-17 ET); PENDING **`APPROVE HS-E`**; handoff [HS_E_CONTENT_BOOTSTRAP.md](../Docs/handoffs/HS_E_CONTENT_BOOTSTRAP.md) |
+| **HS-E** | Character / bootstrap canon | CLOUD+Lead+DESKTOP | **APPROVED / CLOSED** | [17e_HS_CONTENT_BOOTSTRAP.md](../Docs/17e_HS_CONTENT_BOOTSTRAP.md) — Lead **`APPROVE HS-E`**, 2026-09-17 ET (PR #97); policy **KEEP-LOCAL**; handoff [HS_E_CONTENT_BOOTSTRAP.md](../Docs/handoffs/HS_E_CONTENT_BOOTSTRAP.md) |
+| **HS-F** | Sign-off & re-grade | CLOUD+Lead | **IN PROGRESS** | [17_HS_AUDIT_SIGN_OFF.md](../Docs/17_HS_AUDIT_SIGN_OFF.md) — PENDING Lead **`SIGN OFF HS AUDIT`**; proposed harness **~A** / swarm **~A** |
 
 **Current track:** **Docs/17 HS** — HS-A/B/D/E **CLOSED**; HS-C **DEFERRED**; **HS-F IN PROGRESS**.
 
@@ -92,7 +94,8 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 
 | ID | Phase | Host | Owner | Write path | Due artifact |
 |---|---|---|---|---|---|
-| HS-E-bootstrap | HS-E | CLOUD+Lead+DESKTOP | CND+Lead | Docs/ | [17e_HS_CONTENT_BOOTSTRAP.md](../Docs/17e_HS_CONTENT_BOOTSTRAP.md) · [HS_E_CONTENT_BOOTSTRAP.md](../Docs/handoffs/HS_E_CONTENT_BOOTSTRAP.md) — **IN PROGRESS** policy **KEEP-LOCAL**; PENDING **`APPROVE HS-E`** |
+| HS-F-sign-off | HS-F | CLOUD+Lead | CND+Lead | Docs/ | [17_HS_AUDIT_SIGN_OFF.md](../Docs/17_HS_AUDIT_SIGN_OFF.md) — **IN PROGRESS**; PENDING Lead **`SIGN OFF HS AUDIT`**; do not invent next product track |
+| HS-E-bootstrap | HS-E | CLOUD+Lead+DESKTOP | CND+Lead | Docs/ | [17e_HS_CONTENT_BOOTSTRAP.md](../Docs/17e_HS_CONTENT_BOOTSTRAP.md) · [HS_E_CONTENT_BOOTSTRAP.md](../Docs/handoffs/HS_E_CONTENT_BOOTSTRAP.md) — **APPROVED / CLOSED** Lead **`APPROVE HS-E`**, 2026-09-17 ET (KEEP-LOCAL) |
 | HS-D-evidence | HS-D | CLOUD+DESKTOP | CND | Docs/ + scripts/ | [17d_HS_EVIDENCE.md](../Docs/17d_HS_EVIDENCE.md) · [HS_D_EVIDENCE.md](../Docs/handoffs/HS_D_EVIDENCE.md) — **APPROVED / CLOSED** Lead **`APPROVE HS-D`**, 2026-09-17 ET |
 | HS-B-swarm-ops | HS-B | CLOUD | CND | Docs/ + swarm/ | [17b_HS_SWARM_OPS.md](../Docs/17b_HS_SWARM_OPS.md) — **APPROVED / CLOSED** Lead **`APPROVE HS-B`**, 2026-09-17 ET |
 | HS-A-inventory | HS-A | CLOUD | CND | Docs/ | [17a_HS_INVENTORY.md](../Docs/17a_HS_INVENTORY.md) — **APPROVED / CLOSED** Lead **`APPROVE HS-A`**, 2026-09-17 ET |
