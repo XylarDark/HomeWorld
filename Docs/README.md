@@ -45,6 +45,7 @@ These are **intentionally separate**. On case-insensitive filesystems (macOS/Win
 - **Verify & Polish strategy (APPROVED — VP-B PARKED):** [14_VP_VERIFY_POLISH.md](14_VP_VERIFY_POLISH.md) — Lead **`APPROVE VP STRATEGY`**, 2026-09-17 ET; VP-A **APPROVED**; VP-B **PARKED** pending HR3
 - **Harness Refine 3 — A+ strategy (APPROVED):** [15_HR3_A_PLUS.md](15_HR3_A_PLUS.md) — Lead **`APPROVE HR3 STRATEGY`**, 2026-09-17 ET
 | [16_PLAYABLE_LOOP.md](16_PLAYABLE_LOOP.md) | Playable Loop (PL) — character + PIE + thin UX | **CLOSED / COMPLETE** |
+| [17_HS_AUDIT_STRATEGY.md](17_HS_AUDIT_STRATEGY.md) | Harness & Swarm Audit (HS) — post–Docs/08 | **DRAFT** |
 - **HR3-C branch protection (PENDING LEAD APPLY):** [15c_HR3_C_BRANCH_PROTECTION.md](15c_HR3_C_BRANCH_PROTECTION.md) — Lead checklist in [docs/Setup/CI_SETUP.md](../docs/Setup/CI_SETUP.md); handoff [handoffs/HR3_C_BRANCH_PROTECTION.md](handoffs/HR3_C_BRANCH_PROTECTION.md)
 - **Start swarm:** [../START_HERE.md](../START_HERE.md)
 - **Master prompt:** [../HOMEWORLD_MASTER_PROMPT.md](../HOMEWORLD_MASTER_PROMPT.md)
