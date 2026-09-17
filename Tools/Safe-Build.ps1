@@ -65,6 +65,27 @@ function Test-BuildFailureEditorRelated {
     return $false
 }
 
+function Assert-HomeWorldEditorDll {
+    param([string]$Root)
+    $dllPath = Join-Path $Root "Binaries\Win64\UnrealEditor-HomeWorld.dll"
+    $minBytes = 100 * 1024
+    if (-not (Test-Path -LiteralPath $dllPath)) {
+        Write-SafeLog "FATAL: Missing editor module DLL: $dllPath"
+        Write-SafeLog "Build reported success but UnrealEditor-HomeWorld.dll was not produced."
+        Write-SafeLog "If Editor shows Windows Bad Image, kill CrashReportClientEditor.exe, close Unreal Editor, then rerun .\Tools\Safe-Build.ps1."
+        exit 1
+    }
+    $length = (Get-Item -LiteralPath $dllPath).Length
+    if ($length -le $minBytes) {
+        Write-SafeLog "FATAL: UnrealEditor-HomeWorld.dll is $length bytes (expected > $minBytes)."
+        Write-SafeLog "Likely cause: linker wrote a zero/tiny DLL while CrashReportClientEditor held the file — Editor launch shows Bad Image and appears hung."
+        Write-SafeLog "Fix: taskkill /f /im CrashReportClientEditor.exe; close Unreal Editor; rerun .\Tools\Safe-Build.ps1 until DLL is healthy (~1.5 MB)."
+        exit 1
+    }
+    $mb = [math]::Round($length / 1MB, 2)
+    Write-SafeLog "Editor module DLL OK ($mb MB): $dllPath"
+}
+
 # Ensure we're in project root
 Push-Location $ProjectRoot
 try {
@@ -114,6 +135,7 @@ try {
     }
 
     if ($exitCode -eq 0) {
+        Assert-HomeWorldEditorDll -Root $ProjectRoot
         Write-SafeLog "Build succeeded."
         if ($LaunchEditorAfter -and $editorWasRunning) {
             Write-SafeLog "Launching Editor and waiting for MCP (port 55557)..."

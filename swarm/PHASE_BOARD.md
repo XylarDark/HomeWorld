@@ -1,10 +1,10 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **VP2** — prove track **COMPLETE** (A+B **APPROVED** — Lead **`APPROVE VP2-A`** + **`APPROVE VP2-B`**, 2026-09-17 ET); VP2-C optional (LOCKED)
+**Current phase:** **VP2 CLOSED** — Lead **`APPROVE VP2-C STOP`** / Conductor **`CLOSE VP2`**, 2026-09-17 ET (main `2ef961f`)
 
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **Conductor** (parent DESKTOP) / **DESKTOP-21CT3H0**
-**Blocked by:** none. VP2-A/B **APPROVED** — Lead **`APPROVE VP2-A`** + **`APPROVE VP2-B`**, 2026-09-17 ET. VP2-C optional (LOCKED). Branch protection **DEFERRED**.
+**Blocked by:** none. **No active product phase** — do not invent NP/product tracks without Lead gate. Branch protection **DEFERRED**.
 **Sign-off doc:** [Docs/17_HS_AUDIT_SIGN_OFF.md](../Docs/17_HS_AUDIT_SIGN_OFF.md) — **SIGNED OFF** Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET.
 
 
@@ -49,7 +49,7 @@ Canonical history: **VP-A → VP-B → VP-A re-verify → VP-C**. Spec: [17d_HS_
 
 ## POST-AUDIT (Docs/05–10 + HR track)
 
-MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** **Product next-phase (NP-A…E) is CLOSED / COMPLETE.** **HR2 track CLOSED / COMPLETE.** **HR3 track CLOSED / COMPLETE** — Lead **`APPROVE HR3-D`**, 2026-09-17 ET (HR3-C **DEFERRED**). **VP track CLOSED / COMPLETE** (VP-A re-verify **WAIVED**). **Docs/16 Playable Loop CLOSED / COMPLETE** — Lead **`APPROVE PL-D`**, 2026-09-17 ET. **Docs/17 HS Audit CLOSED / COMPLETE** — Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET. Next track TBD.
+MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** **Product next-phase (NP-A…E) is CLOSED / COMPLETE.** **HR2 track CLOSED / COMPLETE.** **HR3 track CLOSED / COMPLETE** — Lead **`APPROVE HR3-D`**, 2026-09-17 ET (HR3-C **DEFERRED**). **VP track CLOSED / COMPLETE** (VP-A re-verify **WAIVED**). **Docs/16 Playable Loop CLOSED / COMPLETE** — Lead **`APPROVE PL-D`**, 2026-09-17 ET. **Docs/17 HS Audit CLOSED / COMPLETE** — Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET. **Docs/18 VP2 CLOSED / COMPLETE** — Lead **`APPROVE VP2-C STOP`**, 2026-09-17 ET. Next product track TBD (Lead gate).
 
 | Track | Doc / phase | Host | Status | Gate / handoff |
 |---|---|---|---|---|
@@ -86,8 +86,12 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **HS-E** | Character / bootstrap canon | CLOUD+Lead+DESKTOP | **APPROVED / CLOSED** | [17e_HS_CONTENT_BOOTSTRAP.md](../Docs/17e_HS_CONTENT_BOOTSTRAP.md) — Lead **`APPROVE HS-E`**, 2026-09-17 ET (PR #97); policy **KEEP-LOCAL**; handoff [HS_E_CONTENT_BOOTSTRAP.md](../Docs/handoffs/HS_E_CONTENT_BOOTSTRAP.md) |
 | **HS-F** | Sign-off & re-grade | CLOUD+Lead | **SIGNED OFF / CLOSED** | [17_HS_AUDIT_SIGN_OFF.md](../Docs/17_HS_AUDIT_SIGN_OFF.md) — Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET |
 | **HS-G** | Conductor/DESKTOP ops diet | CLOUD+DESKTOP+Lead | **APPROVED / COMPLETE** | [17g_HS_G_OPS_DIET.md](../Docs/17g_HS_G_OPS_DIET.md) — Lead **`APPROVE HS-G`**, 2026-09-17 ET (evidence PASS, hang budget, compile hygiene) |
+| **Docs/18** | Verify & Prove 2 (VP2) | CLOUD+DESKTOP+Lead | **CLOSED / COMPLETE** | [18_VERIFY_PROVE.md](../Docs/18_VERIFY_PROVE.md) — Lead **`APPROVE VP2-C STOP`**, 2026-09-17 ET; main `2ef961f` |
+| **VP2-A** | DESKTOP prove | DESKTOP | **APPROVED / CLOSED** | [VP2_A_EVIDENCE.md](../Docs/handoffs/VP2_A_EVIDENCE.md) — **9/9 PASS** |
+| **VP2-B** | Success-path fixes | CLOUD+DESKTOP | **APPROVED / CLOSED** | [VP2_B_FIX.md](../Docs/handoffs/VP2_B_FIX.md) — DESKTOP **9/9 PASS** |
+| **VP2-C** | Optional follow-on | — | **STOP / CLOSED** | **C0 Stop** — no C1/C2 |
 
-**Current track:** **Docs/18 VP2 prove COMPLETE** — Lead **`APPROVE VP2 STRATEGY`** (PR #101); **VP2-A APPROVED** — Lead **`APPROVE VP2-A`**, 2026-09-17 ET ([VP2_A_EVIDENCE.md](../Docs/handoffs/VP2_A_EVIDENCE.md)); **VP2-B APPROVED** — Lead **`APPROVE VP2-B`**, 2026-09-17 ET ([VP2_B_FIX.md](../Docs/handoffs/VP2_B_FIX.md)). VP2-C optional (LOCKED). **HS-G APPROVED / COMPLETE**.
+**Current track:** **Docs/18 VP2 CLOSED / COMPLETE** — Lead **`APPROVE VP2-C STOP`** / Conductor **`CLOSE VP2`**, 2026-09-17 ET (main `2ef961f`). **No active product phase.** **HS-G APPROVED / COMPLETE**.
 
 ---
 
