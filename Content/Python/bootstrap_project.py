@@ -52,6 +52,20 @@ def _run_slice_setup():
     except Exception as e:
         _log("place_vs_mvp_markers error: " + str(e))
 
+    _log("--- Step 5c/5: GP_PlayerStart + portal/glide markers (NP-C) ---")
+    try:
+        import place_vs_mvp_gp
+        importlib.reload(place_vs_mvp_gp)
+        place_vs_mvp_gp.main()
+    except Exception as e:
+        _log("place_vs_mvp_gp error: " + str(e))
+    try:
+        import place_fallback_glide_markers
+        importlib.reload(place_fallback_glide_markers)
+        place_fallback_glide_markers.main()
+    except Exception as e:
+        _log("place_fallback_glide_markers error: " + str(e))
+
 
 def main(run_slice=True):
     _log("=== HomeWorld project bootstrap (VS_MVP slice primary) ===")

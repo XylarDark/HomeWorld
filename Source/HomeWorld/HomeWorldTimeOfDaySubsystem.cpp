@@ -64,6 +64,12 @@ bool UHomeWorldTimeOfDaySubsystem::GetIsDefendPhaseActive() const
 	return GetIsNight();
 }
 
+bool UHomeWorldTimeOfDaySubsystem::GetIsSpiritPhase() const
+{
+	const EHomeWorldTimeOfDayPhase Phase = GetCurrentPhase();
+	return Phase == EHomeWorldTimeOfDayPhase::Night || Phase == EHomeWorldTimeOfDayPhase::Dusk;
+}
+
 void UHomeWorldTimeOfDaySubsystem::SetNightMixScalar(float NightMix)
 {
 	UWorld* World = GetWorld();
@@ -88,6 +94,8 @@ void UHomeWorldTimeOfDaySubsystem::ApplyNightMixForPhase(EHomeWorldTimeOfDayPhas
 
 void UHomeWorldTimeOfDaySubsystem::SetPhase(EHomeWorldTimeOfDayPhase Phase)
 {
+	const EHomeWorldTimeOfDayPhase Previous = GetCurrentPhase();
+
 	IConsoleVariable* CVar = IConsoleManager::Get().FindConsoleVariable(TEXT("hw.TimeOfDay.Phase"));
 	if (CVar)
 	{
@@ -100,6 +108,16 @@ void UHomeWorldTimeOfDaySubsystem::SetPhase(EHomeWorldTimeOfDayPhase Phase)
 		NightPhaseEndTime = GetWorld()->GetTimeSeconds() + Duration;
 	}
 	ApplyNightMixForPhase(Phase);
+
+	if (Phase != Previous)
+	{
+		LastBroadcastPhase = Phase;
+		OnPhaseChanged.Broadcast(Phase);
+		if (Phase == EHomeWorldTimeOfDayPhase::Night)
+		{
+			OnNightStarted.Broadcast();
+		}
+	}
 }
 
 void UHomeWorldTimeOfDaySubsystem::AdvanceToDawn()

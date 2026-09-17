@@ -2,6 +2,7 @@
 
 #include "HomeWorldCharacter.h"
 #include "HomeWorldFallbackGlideComponent.h"
+#include "HomeWorldSoftBoundsComponent.h"
 #include "HomeWorldShrinePortalComponent.h"
 #include "BuildPlacementSupport.h"
 #include "AbilitySystemComponent.h"
@@ -66,6 +67,7 @@ AHomeWorldCharacter::AHomeWorldCharacter(const FObjectInitializer& ObjectInitial
 	FollowCamera->SetFieldOfView(CameraFOV);
 
 	FallbackGlideComponent = CreateDefaultSubobject<UHomeWorldFallbackGlideComponent>(TEXT("FallbackGlideComponent"));
+	SoftBoundsComponent = CreateDefaultSubobject<UHomeWorldSoftBoundsComponent>(TEXT("SoftBoundsComponent"));
 }
 
 UAbilitySystemComponent* AHomeWorldCharacter::GetAbilitySystemComponent() const
@@ -103,11 +105,26 @@ void AHomeWorldCharacter::BeginPlay()
 	{
 		MeshComp->SetRelativeRotation(FRotator(0.0f, MeshForwardYawOffset, 0.0f));
 	}
+
+	if (UWorld* World = GetWorld())
+	{
+		if (UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>())
+		{
+			TimeOfDay->OnPhaseChanged.AddDynamic(this, &AHomeWorldCharacter::OnTimeOfDayPhaseChanged);
+			SyncFormWithTimeOfDay();
+		}
+	}
 }
 
 void AHomeWorldCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (SoftBoundsComponent)
+	{
+		SoftBoundsComponent->bBoundsEnabled = !IsFallbackGliding();
+	}
+
 	if (IsFallbackGliding())
 	{
 		return;
@@ -818,6 +835,47 @@ void AHomeWorldCharacter::Move(const FInputActionValue& Value)
 		Direction.Normalize();
 		AddMovementInput(Direction, 1.0f);
 	}
+}
+
+void AHomeWorldCharacter::SyncFormWithTimeOfDay()
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
+	if (!TimeOfDay)
+	{
+		return;
+	}
+	ApplyFormForPhase(TimeOfDay->GetCurrentPhase());
+}
+
+void AHomeWorldCharacter::OnTimeOfDayPhaseChanged(EHomeWorldTimeOfDayPhase NewPhase)
+{
+	ApplyFormForPhase(NewPhase);
+}
+
+void AHomeWorldCharacter::ApplyFormForPhase(EHomeWorldTimeOfDayPhase Phase)
+{
+	if (Phase == LastAppliedFormPhase && (Phase == EHomeWorldTimeOfDayPhase::Night) == bIsSpiritForm)
+	{
+		return;
+	}
+	LastAppliedFormPhase = Phase;
+
+	const bool bSpirit = (Phase == EHomeWorldTimeOfDayPhase::Night || Phase == EHomeWorldTimeOfDayPhase::Dusk);
+	if (bIsSpiritForm == bSpirit)
+	{
+		return;
+	}
+	bIsSpiritForm = bSpirit;
+
+	static const TCHAR* PhaseNames[] = { TEXT("Day"), TEXT("Dusk"), TEXT("Night"), TEXT("Dawn") };
+	const int32 PhaseIdx = FMath::Clamp(static_cast<int32>(Phase), 0, 3);
+	const TCHAR* FormLabel = bSpirit ? TEXT("spirit") : TEXT("body");
+	UE_LOG(LogTemp, Log, TEXT("FORM: %s form (phase=%s; NightMix driven by TimeOfDaySubsystem)"), FormLabel, PhaseNames[PhaseIdx]);
 }
 
 void AHomeWorldCharacter::Look(const FInputActionValue& Value)

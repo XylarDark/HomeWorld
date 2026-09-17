@@ -19,6 +19,8 @@ class UCameraComponent;
 class UInputAction;
 class UInputMappingContext;
 class UHomeWorldFallbackGlideComponent;
+class UHomeWorldSoftBoundsComponent;
+#include "HomeWorldTimeOfDaySubsystem.h"
 
 UCLASS(Blueprintable)
 /**
@@ -71,7 +73,15 @@ public:
 
 	/** Unique ID used when adding this character as a spirit (actor name + unique ID). */
 	UFUNCTION(BlueprintCallable, Category = "Spirit", meta = (DisplayName = "Get Spirit Id For Death"))
-	FName GetSpiritIdForDeath() const;
+	FName GetSpiritIdForDeath();
+
+	/** NP-C: true when TimeOfDay phase is Night or Dusk (spirit form; no free-flight). */
+	UFUNCTION(BlueprintCallable, Category = "Form", meta = (DisplayName = "Is Spirit Form"))
+	bool GetIsSpiritForm() const { return bIsSpiritForm; }
+
+	/** Apply body/spirit form from current TimeOfDay phase. Callable from Blueprint for tests. */
+	UFUNCTION(BlueprintCallable, Category = "Form", meta = (DisplayName = "Sync Form With Time Of Day"))
+	void SyncFormWithTimeOfDay();
 
 protected:
 	virtual void PossessedBy(AController* NewController) override;
@@ -79,6 +89,14 @@ protected:
 	/** FALLBACK scripted glide along CRUMB_* (no free-flight). */
 	UPROPERTY(VisibleAnywhere, Category = "Transit|FALLBACK")
 	TObjectPtr<UHomeWorldFallbackGlideComponent> FallbackGlideComponent;
+
+	/** V1 soft pushback when leaving hero island bounds (no navmesh). */
+	UPROPERTY(VisibleAnywhere, Category = "Walk|Bounds")
+	TObjectPtr<UHomeWorldSoftBoundsComponent> SoftBoundsComponent;
+
+	/** NP-C: spirit form flag — Night/Dusk true, Day/Dawn false. SYS reads via GetIsSpiritForm(). */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Form")
+	bool bIsSpiritForm = false;
 
 	/** Ability system; used for GAS combat and attributes. */
 	UPROPERTY(VisibleAnywhere, Category = "Abilities")
@@ -244,7 +262,13 @@ protected:
 	void OnAstralDeathTriggered(const FInputActionValue& Value);
 	void OnSpiritShieldTriggered(const FInputActionValue& Value);
 
+	void ApplyFormForPhase(EHomeWorldTimeOfDayPhase Phase);
+	UFUNCTION()
+	void OnTimeOfDayPhaseChanged(EHomeWorldTimeOfDayPhase NewPhase);
+
 	/** Net forward/right axis from the four directional keys. Used when using MoveForward/MoveBack/StrafeLeft/StrafeRight. */
 	float MovementForwardAxis = 0.f;
 	float MovementRightAxis = 0.f;
+
+	EHomeWorldTimeOfDayPhase LastAppliedFormPhase = EHomeWorldTimeOfDayPhase::Day;
 };

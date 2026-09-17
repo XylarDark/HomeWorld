@@ -19,6 +19,9 @@ enum class EHomeWorldTimeOfDayPhase : uint8
 /** Broadcast when phase transitions to Night (optional night encounter hook). Not yet invoked; poll GetIsNight() for now. */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnNightStarted);
 
+/** Broadcast whenever SetPhase changes the active phase (form swap, NightMix, HUD). */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTimeOfDayPhaseChanged, EHomeWorldTimeOfDayPhase, NewPhase);
+
 /**
  * World subsystem for day/night. Game code queries phase/time through this API; implement with DaySequence in Week 2+.
  * Stub only; returns default phase and time.
@@ -77,7 +80,18 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "TimeOfDay")
 	FOnNightStarted OnNightStarted;
 
+	/** Fired from SetPhase when the phase value changes (after NightMix apply). */
+	UPROPERTY(BlueprintAssignable, Category = "TimeOfDay")
+	FOnTimeOfDayPhaseChanged OnPhaseChanged;
+
+	/** True when phase is Night or Dusk (spirit-capable per Docs/03_GAMEPLAY_MVP §4). */
+	UFUNCTION(BlueprintCallable, Category = "TimeOfDay", meta = (DisplayName = "Get Is Spirit Phase"))
+	virtual bool GetIsSpiritPhase() const;
+
 private:
 	/** World time at which night phase ends (set when SetPhase(Night) is called). Stub countdown for HUD. */
 	float NightPhaseEndTime = 0.f;
+
+	/** Last phase broadcast from SetPhase (avoids duplicate OnPhaseChanged). */
+	EHomeWorldTimeOfDayPhase LastBroadcastPhase = EHomeWorldTimeOfDayPhase::Day;
 };
