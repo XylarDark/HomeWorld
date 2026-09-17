@@ -1,40 +1,77 @@
-# Docs/11 — Product Next-Phase Strategy (DEFERRED)
+# Docs/11 — Product Next-Phase Strategy
 
 | Field | Value |
 |-------|-------|
-| **Status** | **DEFERRED** — blocked on [11_SWARM_HARNESS_REFINE.md](11_SWARM_HARNESS_REFINE.md) (HR-A…D) |
-| **Date** | 2026-09-17 (draft superseded same day) |
+| **Status** | **ACTIVE DRAFT — awaiting Lead `APPROVE NP STRATEGY`** (or **`APPROVE Docs/11 NP`**) |
+| **Date** | 2026-09-17 |
 | **Author** | Conductor (HomeWorld) |
+| **Unlocked by** | Lead Luke Thompson — **`APPROVE HR-B2`** then **`APPROVE HR-D`**, 2026-09-17 ET |
+| **Harness refine** | **CLOSED** — [11_SWARM_HARNESS_REFINE.md](11_SWARM_HARNESS_REFINE.md) (HR-A…D + HR-B2) |
 
 ---
 
-## Lead redirect
+## Gate
 
-Lead redirected execution **before** product gameplay phases. The NP-A…E board below is **not** the active Docs/11 deliverable.
+Lead: type **`APPROVE NP STRATEGY`** (or **`APPROVE Docs/11 NP`**) to unlock **NP-A** implementation work.
 
-**Active Docs/11 track:**
-
-1. [11_SWARM_HARNESS_AUDIT.md](11_SWARM_HARNESS_AUDIT.md) — performance scorecard  
-2. [11_SWARM_HARNESS_REFINE.md](11_SWARM_HARNESS_REFINE.md) — HR-A…D refine plan  
-
-**Gate:** Lead **`APPROVE Docs/11`** / **`APPROVE HR STRATEGY`** — **GRANTED** (Luke Thompson, 2026-09-17 ET). HR-A complete — await **`APPROVE HR-A`**.
-
-Product NP-A…E may be rewritten after **`APPROVE HR-D`** or when Lead explicitly unblocks product work.
+**Do not start NP-A until Lead approves this strategy.**
 
 ---
 
-## Archived NP board (do not execute)
+## NP board
 
-| Phase | Focus | Deliverable |
-|-------|--------|-------------|
-| **NP-A** | Inventory / gap map | Docs/11a: UE vs Docs/03 verbs + materials |
-| **NP-B** | Lookdev apply | Ten masters on VS_MVP meshes |
-| **NP-C** | Form + V1 polish | Body↔spirit, GP_PlayerStart, walk bounds |
-| **NP-D** | SYS verbs V3–V4 | 6-slot inventory + gather + tame |
-| **NP-E** | SYS verbs V6–V8 | Heal, nurture, dawn persist |
-
-Hard rules for any future NP work: Docs/07 CLOSED; FALLBACK armed; no free-flight; no combat; no Lumen/Nanite gates; no `.uasset`/`.umap` commits; exactly 10 masters; Lead APPROVE each NP-*.
+| Phase | Focus | Deliverable | Status |
+|-------|--------|-------------|--------|
+| **NP-A** | Inventory / gap map | Docs/12a: UE vs Docs/03 verbs + materials assigned vs not | **DRAFT — awaiting APPROVE NP STRATEGY** |
+| **NP-B** | Lookdev apply | Assign 10 masters onto dressed VS_MVP meshes; NightMix smoke | **DRAFT — awaiting APPROVE NP STRATEGY** |
+| **NP-C** | Form + V1 polish | Body↔spirit; GP_PlayerStart; soft walk bounds | **DRAFT — awaiting APPROVE NP STRATEGY** |
+| **NP-D** | SYS V3–V4 | 6-slot inventory + gather + tame | **DRAFT — awaiting APPROVE NP STRATEGY** |
+| **NP-E** | SYS V6–V8 | Heal ×3, nurture ×2, dawn persist | **DRAFT — awaiting APPROVE NP STRATEGY** |
 
 ---
 
-*Parked per Lead redirect 2026-09-17. See swarm/harness audit for current gate.*
+## Hard rules (every NP phase)
+
+| Rule | Source |
+|------|--------|
+| Docs/07 CLOSED | Do not reopen vertical-slice sign-off |
+| FALLBACK FLIGHT armed | No free-flight / flight HUD |
+| No combat | Placeholder only per AGENTS.md boundaries |
+| No Lumen/Nanite gates | Docs/04 deferred |
+| No `.uasset`/`.umap` commits | Local Windows only |
+| Exactly 10 masters | Docs/02 |
+| Lead APPROVE each NP-* before build | This doc |
+
+---
+
+## Approval gate
+
+| Step | Lead action | Unlocks |
+|------|-------------|---------|
+| 0 | **`APPROVE NP STRATEGY`** or **`APPROVE Docs/11 NP`** | NP-A inventory / gap map |
+| 1 | **`APPROVE NP-A`** | NP-B lookdev apply |
+| 2 | **`APPROVE NP-B`** | NP-C form + V1 polish |
+| 3 | **`APPROVE NP-C`** | NP-D SYS V3–V4 |
+| 4 | **`APPROVE NP-D`** | NP-E SYS V6–V8 |
+| 5 | **`APPROVE NP-E`** | Product next-phase complete |
+
+```
+Harness refine: CLOSED — Lead Luke Thompson, APPROVE HR-B2 + APPROVE HR-D, 2026-09-17 ET
+Product NP: ACTIVE DRAFT — awaiting Lead APPROVE NP STRATEGY
+```
+
+---
+
+## Relationship to prior docs
+
+| Doc | Relationship |
+|-----|--------------|
+| [11_SWARM_HARNESS_REFINE.md](11_SWARM_HARNESS_REFINE.md) | **CLOSED** — HR track complete; unlocked this doc |
+| [11d_HR_D_HANDOFF.md](11d_HR_D_HANDOFF.md) | HR-D dry-run evidence + re-grade |
+| [11e_HR_B2_HANDOFF.md](11e_HR_B2_HANDOFF.md) | HR-B2 residual harness closure |
+| [03_VERBS_AND_SYSTEMS.md](03_VERBS_AND_SYSTEMS.md) | NP-A inventory baseline |
+| [06_VS_MVP_DRESS.md](06_VS_MVP_DRESS.md) | NP-B lookdev apply target |
+
+---
+
+*Conductor activated this board after Lead APPROVE HR-B2 + APPROVE HR-D, 2026-09-17 ET. Awaiting APPROVE NP STRATEGY.*

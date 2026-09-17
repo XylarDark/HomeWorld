@@ -25,14 +25,14 @@ These are **intentionally separate**. On case-insensitive filesystems (macOS/Win
 - **FALLBACK glide + portal runbook:** [09_FALLBACK_GLIDE.md](09_FALLBACK_GLIDE.md) — CRUMB scripted glide V2 + dual shrine portal
 - **Post-audit wrap (CLOSED):** [10_POST_AUDIT_WRAP.md](10_POST_AUDIT_WRAP.md) — master graphs + NightMix
 - **Swarm & harness audit (APPROVED):** [11_SWARM_HARNESS_AUDIT.md](11_SWARM_HARNESS_AUDIT.md) — Lead Luke Thompson, 2026-09-17 ET
-- **Swarm & harness refine (APPROVED):** [11_SWARM_HARNESS_REFINE.md](11_SWARM_HARNESS_REFINE.md) — HR-A…D Lead gates (before product next-phase)
+- **Swarm & harness refine (CLOSED):** [11_SWARM_HARNESS_REFINE.md](11_SWARM_HARNESS_REFINE.md) — HR-A…D + HR-B2 approved (Lead Luke Thompson, 2026-09-17 ET)
 - **HR-A measures (APPROVED):** [11a_HR_MEASURES.md](11a_HR_MEASURES.md) — baseline tables
 - **HR-B harness tighten (APPROVED):** [11b_HR_B_HANDOFF.md](11b_HR_B_HANDOFF.md)
 - **HR-C swarm ops refine (APPROVED):** [11c_HR_C_HANDOFF.md](11c_HR_C_HANDOFF.md) — Lead Luke Thompson, 2026-09-17 ET
-- **HR-D prove dry-run (COMPLETE):** [11d_HR_D_HANDOFF.md](11d_HR_D_HANDOFF.md) — evidence [handoffs/HR_D_DRY_RUN.md](handoffs/HR_D_DRY_RUN.md)
-- **HR-D defer stamp:** [11d_HR_D_DEFER.md](11d_HR_D_DEFER.md) — Lead deferred **`APPROVE HR-D`** → HR-B2 first (2026-09-17 ET)
-- **HR-B2 residual harness (COMPLETE):** [11e_HR_B2_HANDOFF.md](11e_HR_B2_HANDOFF.md) — await Lead **`APPROVE HR-B2`**
-- **Product next-phase (PARKED):** [11_NEXT_PHASE_STRATEGY.md](11_NEXT_PHASE_STRATEGY.md) — NP-A…E parked until HR refine signed off
+- **HR-D prove dry-run (APPROVED):** [11d_HR_D_HANDOFF.md](11d_HR_D_HANDOFF.md) — Lead **`APPROVE HR-D`**, 2026-09-17 ET
+- **HR-D defer stamp (CLOSED):** [11d_HR_D_DEFER.md](11d_HR_D_DEFER.md) — HR-B2 first, then HR-D approved
+- **HR-B2 residual harness (APPROVED):** [11e_HR_B2_HANDOFF.md](11e_HR_B2_HANDOFF.md) — Lead **`APPROVE HR-B2`**, 2026-09-17 ET
+- **Product next-phase (NEXT):** [11_NEXT_PHASE_STRATEGY.md](11_NEXT_PHASE_STRATEGY.md) — **ACTIVE DRAFT**; await Lead **`APPROVE NP STRATEGY`**
 - **Start swarm:** [../START_HERE.md](../START_HERE.md)
 - **Master prompt:** [../HOMEWORLD_MASTER_PROMPT.md](../HOMEWORLD_MASTER_PROMPT.md)
 - **Game canon brief:** [../HOMEWORLD_MVP_SWARM_BRIEF.md](../HOMEWORLD_MVP_SWARM_BRIEF.md)
