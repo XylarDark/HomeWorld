@@ -32,7 +32,8 @@ These are **intentionally separate**. On case-insensitive filesystems (macOS/Win
 - **HR-D prove dry-run (APPROVED):** [11d_HR_D_HANDOFF.md](11d_HR_D_HANDOFF.md) — Lead **`APPROVE HR-D`**, 2026-09-17 ET
 - **HR-D defer stamp (CLOSED):** [11d_HR_D_DEFER.md](11d_HR_D_DEFER.md) — HR-B2 first, then HR-D approved
 - **HR-B2 residual harness (APPROVED):** [11e_HR_B2_HANDOFF.md](11e_HR_B2_HANDOFF.md) — Lead **`APPROVE HR-B2`**, 2026-09-17 ET
-- **Product next-phase (NEXT):** [11_NEXT_PHASE_STRATEGY.md](11_NEXT_PHASE_STRATEGY.md) — **ACTIVE DRAFT**; await Lead **`APPROVE NP STRATEGY`**
+- **Product next-phase (APPROVED):** [11_NEXT_PHASE_STRATEGY.md](11_NEXT_PHASE_STRATEGY.md) — Lead **`APPROVE NP STRATEGY`**, 2026-09-17 ET
+- **NP-A inventory / gap map (COMPLETE):** [12a_NP_A_INVENTORY.md](12a_NP_A_INVENTORY.md) — await Lead **`APPROVE NP-A`**
 - **Start swarm:** [../START_HERE.md](../START_HERE.md)
 - **Master prompt:** [../HOMEWORLD_MASTER_PROMPT.md](../HOMEWORLD_MASTER_PROMPT.md)
 - **Game canon brief:** [../HOMEWORLD_MVP_SWARM_BRIEF.md](../HOMEWORLD_MVP_SWARM_BRIEF.md)
