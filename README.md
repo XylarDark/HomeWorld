@@ -4,29 +4,39 @@
 
 ---
 
-## Getting started
+## Start here (MVP canon)
 
-- **Project layout:** The repository root is the project root. After cloning, open `HomeWorld.uproject` from the clone root (the folder that contains `HomeWorld.uproject`, `Source/`, `Config/`, and `Content/`).
-- **Engine:** Unreal Engine 5.7 (recommended); 5.4+ may work.
+| Path | Role |
+|------|------|
+| **[START_HERE.md](START_HERE.md)** | Boot the MVP lookdev swarm (Conductor, phase gates) |
+| **[Docs/](Docs/README.md)** | **Signed MVP product canon** — GDD, art bible, export/UE handoff, audit WAVEs |
+| **[swarm/SWARM_OPS.md](swarm/SWARM_OPS.md)** | Swarm process — Human Use, evidence gates |
+| **[AGENTS.md](AGENTS.md)** | Agent / Cursor context (UE 5.7, MCP, build policy) |
+| **[docs/](docs/README.md)** | UE engineering docs — setup, PCG, automation, known errors |
+
+**Quarantine (history only):** [VisionBoard/MVP/](VisionBoard/MVP/README.md) · [docs/Automation/AGENT_COMPANY.md](docs/Automation/AGENT_COMPANY.md)
+
+---
+
+## Getting started (UE 5.7)
+
+- **Project layout:** Repository root contains `HomeWorld.uproject`, `Source/`, `Config/`, and `Content/`.
+- **Engine:** Unreal Engine 5.7 (recommended).
 - **Clone** this repo, then open `HomeWorld.uproject` in the Editor (first load may compile).
-- **MCP setup:** Run `Setup-MCP.bat` to enable Cursor's AI to control the Editor directly. Then build (`Build-HomeWorld.bat`), open the Editor, and restart Cursor. See [docs/MCP_SETUP.md](docs/MCP_SETUP.md).
-- **Current tasks:** See [docs/workflow/README.md](docs/workflow/README.md) and [docs/workflow/30_DAY_SCHEDULE.md](docs/workflow/30_DAY_SCHEDULE.md). Each task links to a detailed doc in `docs/tasks/`.
+- **MCP setup:** Run `Setup-MCP.bat` to enable Cursor control of the Editor. Then **`.\Tools\Safe-Build.ps1`**, open the Editor, restart Cursor. See [docs/Setup/MCP_SETUP.md](docs/Setup/MCP_SETUP.md).
+- **Build policy:** Agents use [Safe-Build](docs/Setup/BUILD_POLICY.md) (wraps `Build-HomeWorld.bat`).
 - Full setup: [docs/SETUP.md](docs/SETUP.md).
 
 ---
 
-## Docs
+## Docs split
 
-| Doc | Description |
-|-----|-------------|
-| [docs/workflow/README.md](docs/workflow/README.md) | **Workflow** — vision, 30-day schedule, task status, Pre–Day 1 checklist |
-| [docs/workflow/VISION.md](docs/workflow/VISION.md) | Theme, campaign, moral system, scope lock |
-| [docs/workflow/30_DAY_SCHEDULE.md](docs/workflow/30_DAY_SCHEDULE.md) | Day-by-day schedule (Act 1 → DemoMap / Homestead Phase 1 → Family → Planetoid → Spirits → Dungeon) |
-| [docs/STACK_PLAN.md](docs/STACK_PLAN.md) | Tech stack and recommended plugins |
-| [docs/SETUP.md](docs/SETUP.md) | Developer setup (Engine, Plugins, MCP, Git/LFS, Building, Validation) |
-| [docs/MCP_SETUP.md](docs/MCP_SETUP.md) | MCP bridge setup (Cursor-to-Unreal Editor AI control) |
+| Tree | Purpose |
+|------|---------|
+| **`Docs/`** (capital) | MVP swarm canon — do not merge with lowercase tree |
+| **`docs/`** (lowercase) | Unreal project documentation — session ops, PCG, setup |
 
-**Task detail docs** (see [workflow README](docs/workflow/README.md)): [Character animation](docs/tasks/CHARACTER_ANIMATION.md), [Character orientation](docs/tasks/CHARACTER_ORIENTATION.md), [Character ground](docs/tasks/CHARACTER_GROUND.md), [PCG forest on map](docs/tasks/PCG_FOREST_ON_MAP.md).
+Session task boards live under `docs/TaskLists/` and `docs/workflow/` — they are **not** the signed MVP GDD (see **`Docs/`**).
 
 ---
 

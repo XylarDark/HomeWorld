@@ -1,6 +1,18 @@
 # HomeWorld – Agent context
 
-**Project:** HomeWorld — Unreal Engine 5.7 game (Open World / World Partition). Targets UE 5.7 (compatible with 5.7.x, including 5.7.3). Theme: "Love as Epic Quest"; Act 1 focus is lone wanderer (explore → fight → build). See [VisionBoard/Core/VISION.md](VisionBoard/Core/VISION.md) (theme, campaign, 7 sins/virtues, succession) and [VisionBoard/Core/STACK_PLAN.md](VisionBoard/Core/STACK_PLAN.md) for stack. **Lock:** Engine 5.7 only; platform PC + Steam Early Access; do not add engine or platform variants without team decision.
+## MVP canon (read first)
+
+| Path | Role |
+|------|------|
+| **[START_HERE.md](START_HERE.md)** | Swarm entry — Human Lead gates, Conductor boot |
+| **`Docs/`** (capital D) | **Signed MVP product canon** — GDD, art bible, export table, audit WAVEs ([Docs/README.md](Docs/README.md)) |
+| **`docs/`** (lowercase) | UE 5.7 engineering — setup, PCG, automation, known errors ([docs/README.md](docs/README.md)) |
+
+**Do not treat** [VisionBoard/MVP/](VisionBoard/MVP/README.md) or [docs/Automation/AGENT_COMPANY.md](docs/Automation/AGENT_COMPANY.md) as MVP product canon — see quarantine pointers there. Long-horizon theme/stack: [VisionBoard/Core/VISION.md](VisionBoard/Core/VISION.md).
+
+---
+
+**Project:** HomeWorld — Unreal Engine 5.7 game (Open World / World Partition). Targets UE 5.7 (compatible with 5.7.x, including 5.7.3). Theme: "Love as Epic Quest"; Act 1 focus is lone wanderer (explore → fight → build). **Lock:** Engine 5.7 only; platform PC + Steam Early Access; do not add engine or platform variants without team decision.
 
 **Programmatic by default:** Prefer C++ (and Python automation) over Blueprints. New gameplay systems, movement, input, abilities, and core logic are implemented in C++; Blueprint is for content, level design, and designer overrides only. For abilities: implement logic in a C++ ability subclass (e.g. `UHomeWorldInteractAbility`) and reparent the GA_* Blueprint to that class so no Blueprint graph wiring is required. See [docs/CONVENTIONS.md](docs/CONVENTIONS.md) for the code-first checklist and C++ vs Blueprint split.
 
@@ -14,9 +26,9 @@
 
 **Industry standards (MVP):** [docs/IndustryStandards/INDUSTRY_STANDARDS_FOR_MVP_WORLD_AND_CHARACTERS.md](docs/IndustryStandards/INDUSTRY_STANDARDS_FOR_MVP_WORLD_AND_CHARACTERS.md) — industry-standard approaches for game world, 2D→character, and characters/monsters with MVP commit decisions.
 
-**Current tasks:** [docs/workflow/README.md](docs/workflow/README.md) — workflow index; [docs/TaskLists/PROJECT_STATE_AND_TASK_LIST.md](docs/TaskLists/PROJECT_STATE_AND_TASK_LIST.md) — **project overview and task list** (work done + work not yet completed T1–T10); [docs/TaskLists/30_DAY_SCHEDULE.md](docs/TaskLists/30_DAY_SCHEDULE.md) — 30-day schedule; each task links to a detailed doc in `docs/TaskLists/TaskSpecs/`. **MVP deliverable:** Marketing-ready (assets and visuals mandatory for good-looking marketing material); launching on Steam is not required to complete the MVP. **Task list policy:** When generating a new 10-task list, the split of implementation vs verification is **dynamic by development phase**. Read [docs/TaskLists/PROJECT_STATE_AND_TASK_LIST.md](docs/TaskLists/PROJECT_STATE_AND_TASK_LIST.md) §0 **Current development phase**: **Rapid prototyping** → more implementation (e.g. 7–8), fewer verification; **Prototype hardening** → balanced (e.g. 4–5 implementation, 5–6 verification). Maximize quality and quantity according to phase. See [docs/TaskLists/HOW_TO_GENERATE_TASK_LIST.md](docs/TaskLists/HOW_TO_GENERATE_TASK_LIST.md) § Task list composition.
+**Session ops (not MVP GDD):** [docs/TaskLists/DAILY_STATE.md](docs/TaskLists/DAILY_STATE.md), [docs/SESSION_LOG.md](docs/SESSION_LOG.md), [docs/workflow/README.md](docs/workflow/README.md), [docs/TaskLists/PROJECT_STATE_AND_TASK_LIST.md](docs/TaskLists/PROJECT_STATE_AND_TASK_LIST.md) — task boards and session history. **Product canon** for the signed slice is **`Docs/`** (see [Docs/08_AUDIT_UPGRADE_STRATEGY.md](Docs/08_AUDIT_UPGRADE_STRATEGY.md)). Pre-swarm 30-day lists and VisionBoard/MVP gap docs are **quarantine** — do not treat as GDD.
 
-**Daily workflow:** At session start the agent reads [docs/TaskLists/DAILY_STATE.md](docs/TaskLists/DAILY_STATE.md) (yesterday / today). You can prompt e.g. "What did we do yesterday and what do we need to do today?" At session end the agent updates DAILY_STATE (what was done → yesterday; next day's tasks → today; tomorrow preview) and appends [docs/SESSION_LOG.md](docs/SESSION_LOG.md).
+**Daily workflow:** At session start read DAILY_STATE (yesterday / today). At session end update DAILY_STATE and append SESSION_LOG.
 
 **Feature development (policy):** When developing a **new feature**, research Epic/UE docs and best practices first; **follow tutorials first**, then expand. See .cursor/rules/07-ai-agent-behavior.mdc (Feature development: research and tutorials first).
 
@@ -64,13 +76,13 @@ Blender-first MVP production kit: canon in **`Docs/`**, kits in **`Lib/`**, coor
 
 Exact invocations the agent should use (see [docs/SETUP.md](docs/SETUP.md) and [docs/PCG/PCG_SETUP.md](docs/PCG/PCG_SETUP.md) for more):
 
-- **C++ build:** Use **`.\Tools\Safe-Build.ps1`** from project root so the Editor is closed automatically if running and build is retried once on Editor-related failure. Do not assume the user will close the Editor. See [docs/Editor/EDITOR_BUILD_PROTOCOL.md](docs/Editor/EDITOR_BUILD_PROTOCOL.md). Alternatively `py Content/Python/run_automation_cycle.py` (without `--no-build`) applies the same protocol.
+- **C++ build:** Use **`.\Tools\Safe-Build.ps1`** from project root (it **calls** `Build-HomeWorld.bat` after closing the Editor if needed). Do not run `Build-HomeWorld.bat` directly in agent/automation flows. See [docs/Setup/BUILD_POLICY.md](docs/Setup/BUILD_POLICY.md) and [docs/Editor/EDITOR_BUILD_PROTOCOL.md](docs/Editor/EDITOR_BUILD_PROTOCOL.md). Alternatively `py Content/Python/run_automation_cycle.py` (without `--no-build`) applies the same protocol.
 - **Python script in Editor:** From project root, `py "Content/Python/<script>.py"`; or via MCP: `execute_python_script("<script>.py")` (paths relative to `Content/Python/`).
 - **Python tests:** Editor: Tools > Test Automation (discovers `Content/Python/tests/test_*.py`).
 - **PIE validation:** MCP `execute_python_script("pie_test_runner.py")`, then read `Saved/pie_test_results.json`.
 - **Host automation:** Set `UE_EDITOR` to UnrealEditor.exe, then from project root run `py Content/Python/run_ue_automation.py`; optional `capture_editor_screenshot.py` for screenshots (requires PyAutoGUI). See [docs/Automation/FULL_AUTOMATION_RESEARCH.md](docs/Automation/FULL_AUTOMATION_RESEARCH.md) (Implementation Phase 2).
 - **Demo map setup:** Primary demo map is **DemoMap** (`/Game/HomeWorld/Maps/DemoMap`). Run `create_demo_from_scratch.py` (Editor or MCP). Create map first via File → New Level → Empty Open World → Save As; see [docs/Maps/DEMO_MAP.md](docs/Maps/DEMO_MAP.md).
-- **Agent company (roles and continuity):** Developer (main loop), Fixer (on failure), Guardian (loop-breaker), Refiner (rules/strategy from run history), **Gap-Solver** (implements solutions for logged automation gaps). They keep each other accountable so development continues through errors. See [docs/AGENT_COMPANY.md](docs/AGENT_COMPANY.md).
+- **Agent company (historical / quarantine):** Developer/Fixer/Guardian loop in [docs/Automation/AGENT_COMPANY.md](docs/Automation/AGENT_COMPANY.md) — **parallel harness**, not MVP swarm canon. Prefer [swarm/SWARM_OPS.md](swarm/SWARM_OPS.md) + Conductor for product-direction work unless explicitly invoking the UE automation company.
 - **Start all agents ("start agents" in chat):** When the user says "start agents", "run automation", or "start the loop", run **`.\Tools\Start-AllAgents-InNewWindow.ps1`** (capture by default). This opens a new window that uses **Run-AutomationWithCapture.ps1**: all terminal output goes to **Saved/Logs/automation_terminal_capture.log** and the window stays open until the user closes it. Or tell them to double-click **Start-AllAgents.bat** in project root. Never run Start-AllAgents.ps1 in the chat/integrated terminal.
 - **Automation exit update:** When the user asks for an **automation update**, **check automation exit**, **what happened with the agents**, or **give me the automation update**, read **Saved/Logs/automation_exit_alert.md** (or automation_exit_alert.json). If the file exists, summarize it for the user (exit reason, exit code, round, pending tasks, last message). If the file is missing or unreadable, run `.\Tools\Get-AutomationStatus.ps1` or read Saved/automation_last_activity.json and Saved/Logs/automation_loop.log tail and give a short status. The loop writes this alert file automatically whenever it exits (success, stop, or error).
 - **Watcher (fix-on-failure):** Run **`.\Tools\Watch-AutomationAndFix.ps1`** to run the automation loop and, when it fails, start the **Fixer**; after **3 fix rounds** (default) the watcher invokes the **Guardian** and reports (Saved/Logs/automation_loop_breaker_report.md). See docs/AUTOMATION_LOOP_UNTIL_DONE.md (including **Thresholds before we report to you**).

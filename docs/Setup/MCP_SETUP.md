@@ -14,7 +14,7 @@ From the project root, run:
 Setup-MCP.bat
 ```
 
-This installs `uv`, clones the MCP server, installs Python dependencies, copies the UE plugin, and creates `.cursor/mcp.json`. When it finishes: run **Build-HomeWorld.bat**, open the Editor, and **restart Cursor**. You should see the MCP connection (green dot) when the Editor is running.
+This installs `uv`, clones the MCP server, installs Python dependencies, copies the UE plugin, and creates `.cursor/mcp.json`. When it finishes: run **`.\Tools\Safe-Build.ps1`** (preferred; see [BUILD_POLICY.md](BUILD_POLICY.md)), open the Editor, and **restart Cursor**. You should see the MCP connection (green dot) when the Editor is running.
 
 ---
 
