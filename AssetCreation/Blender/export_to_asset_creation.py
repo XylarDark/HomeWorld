@@ -11,10 +11,13 @@ Or call the API from MCP / another script:
     from export_to_asset_creation import export_fbx
     export_fbx(category="Harvestables", filename="tree_01.fbx", selected_only=True)
 
-Categories: Characters, Harvestables, Homestead, Dungeon, Biomes.
+Categories (Docs/04 mesh roots + legacy):
+  Homestead, Forest, Gatherables, Transit, Beasts, Spirits,
+  Characters, Harvestables, Dungeon, Biomes.
 
-Preset (UE5): Forward X, Up Z, FBX Unit Scale, Apply Modifiers, Face smoothing, FBX 2020.2.
-See AssetCreation/STYLE_GUIDE.md.
+Preset (UE5 / STYLE_GUIDE): Forward X, Up Z, FBX Unit Scale, Apply Modifiers,
+Face smoothing, FBX 2020.2. See AssetCreation/STYLE_GUIDE.md.
+Docs/04 axis note (-Y Forward) is deferred to UE import preset; helper keeps STYLE_GUIDE.
 """
 
 from __future__ import annotations
@@ -36,18 +39,38 @@ def _debug_log(message: str, data: Optional[dict] = None) -> None:
 
 # #endregion
 
+# Docs/04 content roots (mesh) + legacy AssetCreation folders
 VALID_CATEGORIES = (
+    "Homestead",
+    "Forest",
+    "Gatherables",
+    "Transit",
+    "Beasts",
+    "Spirits",
     "Characters",
     "Harvestables",
-    "Homestead",
     "Dungeon",
     "Biomes",
+)
+
+# Categories that land under /Game/HomeWorld/Meshes/<Category>/ (Docs/04)
+MESH_CATEGORIES = (
+    "Homestead",
+    "Forest",
+    "Gatherables",
+    "Transit",
+    "Beasts",
+    "Spirits",
 )
 
 
 def _repo_root() -> Path:
     """AssetCreation/Blender/ -> AssetCreation/ -> repo root."""
-    return Path(__file__).resolve().parents[2]
+    try:
+        return Path(__file__).resolve().parents[2]
+    except NameError:
+        # exec()'d without __file__ (MCP / paste) — fall back to known repo layout
+        return Path("/workspace/repos/HomeWorld")
 
 
 def exports_dir(category: str) -> Path:
@@ -104,6 +127,7 @@ def export_fbx(
     abs_path = str(dest.resolve())
 
     # UE5-oriented FBX (Blender 3.x / 4.x bpy.ops.export_scene.fbx)
+    # STYLE_GUIDE: Forward X, Up Z (keep helper preset; Docs/04 -Y deferred to UE)
     bpy.ops.export_scene.fbx(
         filepath=abs_path,
         use_selection=selected_only,

@@ -2,7 +2,7 @@
 # Imports FBX/GLB from AssetCreation/Exports/ into /Game/HomeWorld/ by category.
 # Run from Unreal Editor: Tools -> Execute Python Script, or via MCP execute_python_script("batch_import_asset_creation.py").
 # Idempotent: set replace_existing=True to re-import and overwrite; False to skip files that already exist in Content.
-# See AssetCreation/README.md and docs/ASSET_WORKFLOW_AND_STEAM_DEMO.md.
+# See AssetCreation/README.md, Docs/04_EXPORT_TABLE.md, Docs/05_UE_IMPORT_FIRST_PASS.md.
 
 import os
 import sys
@@ -14,7 +14,26 @@ except ImportError:
     sys.exit(1)
 
 PREFIX = "batch_import_asset_creation:"
-EXPORTS_SUBFOLDERS = ("Characters", "Harvestables", "Homestead", "Dungeon", "Biomes")
+
+# Docs/04 mesh roots + legacy AssetCreation folders
+EXPORTS_SUBFOLDERS = (
+    "Homestead",
+    "Forest",
+    "Gatherables",
+    "Transit",
+    "Beasts",
+    "Spirits",
+    "Characters",
+    "Harvestables",
+    "Dungeon",
+    "Biomes",
+)
+
+# Docs/04: Homestead/Forest/Gatherables/Transit/Beasts/Spirits -> /Game/HomeWorld/Meshes/<Category>/
+MESH_CATEGORIES = frozenset(
+    ("Homestead", "Forest", "Gatherables", "Transit", "Beasts", "Spirits")
+)
+
 CONTENT_PREFIX = "/Game/HomeWorld"
 EXTENSIONS = (".fbx", ".FBX", ".glb", ".GLB")
 
@@ -35,6 +54,13 @@ def _project_root():
 
 def _exports_dir(project_root):
     return os.path.join(project_root, "AssetCreation", "Exports")
+
+
+def _destination_path(category):
+    """Docs/04 mesh categories under Meshes/; legacy categories keep /Game/HomeWorld/<Category>."""
+    if category in MESH_CATEGORIES:
+        return "%s/Meshes/%s" % (CONTENT_PREFIX, category)
+    return "%s/%s" % (CONTENT_PREFIX, category)
 
 
 def _collect_files(exports_dir):
@@ -69,7 +95,7 @@ def main():
     tasks = []
     for category, filepath in files:
         name_no_ext = os.path.splitext(os.path.basename(filepath))[0]
-        dest_path = "%s/%s" % (CONTENT_PREFIX, category)
+        dest_path = _destination_path(category)
         task = unreal.AssetImportTask()
         task.filename = filepath
         task.destination_path = dest_path
@@ -78,8 +104,9 @@ def main():
         task.save = True
         task.replace_existing = True
         tasks.append(task)
+        _log("Queued %s -> %s/%s" % (filepath, dest_path, name_no_ext))
 
-    _log("Importing %d file(s) into %s/..." % (len(tasks), CONTENT_PREFIX))
+    _log("Importing %d file(s)..." % len(tasks))
     result = asset_tools.import_asset_tasks(tasks)
     if result:
         _log("Import completed. Check Output Log for any errors.")
