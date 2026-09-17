@@ -43,7 +43,7 @@ Diff HomeWorld vs current DevEnvTemplate (AGENTS, Safe-Build, MCP, session log, 
 
 Editor must open on UE 5.7.x without assert. Includes GoToBed/Meal constructor fix class of bugs; Safe-Build green.
 
-- **Deliverable:** green editor open evidence + known crash list closed
+- **Deliverable:** [08c_BOOT_HEALTH.md](08c_BOOT_HEALTH.md) — green editor open evidence + known crash list closed
 - **Gate:** Lead **APPROVE WAVE C**
 
 ### WAVE D — MVP slice vs legacy Content
