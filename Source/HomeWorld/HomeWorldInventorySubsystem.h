@@ -4,45 +4,67 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "HomeWorldInventoryTypes.h"
 #include "HomeWorldInventorySubsystem.generated.h"
 
 /**
- * Game instance subsystem for player resource inventory (Phase 1 resource collection).
- * Used when the player harvests resource piles: harvest interaction calls AddResource;
- * building/placement can call SpendResource. Stub for Day 3 (resource collection loop).
+ * Game instance subsystem — SYS V3 six-slot inventory-lite (Docs/03_SYSTEMS_MVP §2–3).
+ * Exactly six slots; one stack per RES_*; stack max 9. Gather calls TryAddResource; tame/heal spend via SpendResource.
  */
 UCLASS(BlueprintType)
 class HOMEWORLD_API UHomeWorldInventorySubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 
+	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+
 public:
-	/** Add amount of a resource (e.g. from harvesting a pile). ResourceType matches AHomeWorldResourcePile::ResourceType. */
+	/** Try to add Amount of ResourceType (+1 gather). Returns false when inventory cannot accept (full stack / no empty slot). */
+	UFUNCTION(BlueprintCallable, Category = "Inventory", meta = (DisplayName = "Try Add Resource"))
+	bool TryAddResource(FName ResourceType, int32 Amount);
+
+	/** Legacy alias — calls TryAddResource; logs GATHER: fail when inventory full. */
 	UFUNCTION(BlueprintCallable, Category = "Inventory", meta = (DisplayName = "Add Resource"))
 	void AddResource(FName ResourceType, int32 Amount);
 
-	/** Current amount of the given resource type (0 if never added). */
+	/** Current count for normalized RES_* (legacy names mapped). */
 	UFUNCTION(BlueprintCallable, Category = "Inventory", meta = (DisplayName = "Get Resource"))
 	int32 GetResource(FName ResourceType) const;
 
-	/** Total count of all physical goods (sum of all resource amounts). Used for physical vs spiritual goods (T7); log via hw.Goods. */
+	/** Sum of all six slot counts (physical goods). */
 	UFUNCTION(BlueprintCallable, Category = "Inventory", meta = (DisplayName = "Get Total Physical Goods"))
 	int32 GetTotalPhysicalGoods() const;
 
-	/** Spend amount if player has enough; returns true if spent, false if insufficient. */
+	/** Spend Amount if stack has enough; clears slot at 0. */
 	UFUNCTION(BlueprintCallable, Category = "Inventory", meta = (DisplayName = "Spend Resource"))
 	bool SpendResource(FName ResourceType, int32 Amount);
 
-	/** Set last boss reward for HUD toast (called by hw.GrantBossReward). DisplayUntilTime = World->TimeSeconds() + duration. */
-	void SetLastBossRewardDisplay(int32 Amount, float DisplayUntilTime);
+	/** True if at least Amount of berry or herb is available (V4 tame offer). Prefers berry. */
+	UFUNCTION(BlueprintCallable, Category = "Inventory", meta = (DisplayName = "Has Tame Food"))
+	bool HasTameFood(int32 Amount = 1) const;
 
-	/** Get last boss reward for HUD; returns true if HUD should show toast (current time < DisplayUntil). */
+	/** Spend 1× RES_BERRY or RES_HERB for tame offer. Returns spent id or NAME_None. */
+	UFUNCTION(BlueprintCallable, Category = "Inventory", meta = (DisplayName = "Spend Tame Food"))
+	FName SpendTameFood();
+
+	/** Read-only slot view (0–5). */
+	UFUNCTION(BlueprintCallable, Category = "Inventory", meta = (DisplayName = "Get Slot"))
+	FHomeWorldInventorySlot GetSlot(int32 SlotIndex) const;
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory", meta = (DisplayName = "Get Slot Count"))
+	int32 GetSlotCount() const { return HomeWorldInventory::SlotCount; }
+
+	void SetLastBossRewardDisplay(int32 Amount, float DisplayUntilTime);
 	bool GetLastBossRewardForHUD(int32& OutAmount, float& OutDisplayUntil) const;
 
 private:
 	UPROPERTY()
-	TMap<FName, int32> ResourceCounts;
+	TArray<FHomeWorldInventorySlot> Slots;
 
 	int32 LastBossRewardAmount = 0;
 	float LastBossRewardDisplayUntil = 0.f;
+
+	void EnsureSlotArray();
+	int32 FindSlotIndexForResource(FName NormalizedId) const;
+	int32 FindEmptySlotIndex() const;
 };

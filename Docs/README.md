@@ -34,7 +34,9 @@ These are **intentionally separate**. On case-insensitive filesystems (macOS/Win
 - **HR-B2 residual harness (APPROVED):** [11e_HR_B2_HANDOFF.md](11e_HR_B2_HANDOFF.md) — Lead **`APPROVE HR-B2`**, 2026-09-17 ET
 - **Product next-phase (APPROVED):** [11_NEXT_PHASE_STRATEGY.md](11_NEXT_PHASE_STRATEGY.md) — Lead **`APPROVE NP STRATEGY`**, 2026-09-17 ET
 - **NP-A inventory / gap map (APPROVED):** [12a_NP_A_INVENTORY.md](12a_NP_A_INVENTORY.md) — Lead **`APPROVE NP-A`**, 2026-09-17 ET
-- **NP-B lookdev apply (COMPLETE — await Windows + APPROVE NP-B):** [12b_NP_B_LOOKDEV.md](12b_NP_B_LOOKDEV.md)
+- **NP-B lookdev apply (APPROVED):** [12b_NP_B_LOOKDEV.md](12b_NP_B_LOOKDEV.md) — Lead **`APPROVE NP-B`**, 2026-09-17 ET
+- **NP-C form + V1 polish (APPROVED):** [12c_NP_C_FORM_V1.md](12c_NP_C_FORM_V1.md) — Lead **`APPROVE NP-C`**, 2026-09-17 ET
+- **NP-D SYS V3–V4 gather + tame (COMPLETE — await APPROVE NP-D):** [12d_NP_D_SYS_V3_V4.md](12d_NP_D_SYS_V3_V4.md)
 - **Start swarm:** [../START_HERE.md](../START_HERE.md)
 - **Master prompt:** [../HOMEWORLD_MASTER_PROMPT.md](../HOMEWORLD_MASTER_PROMPT.md)
 - **Game canon brief:** [../HOMEWORLD_MVP_SWARM_BRIEF.md](../HOMEWORLD_MVP_SWARM_BRIEF.md)

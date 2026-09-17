@@ -1,9 +1,9 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **NP-C** (Form + V1 polish) — **COMPLETE awaiting APPROVE NP-C** (Windows place done)  
+**Current phase:** **NP-D** (SYS V3–V4 gather + tame) — **IN PROGRESS → COMPLETE awaiting APPROVE NP-D**  
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **CND** (Conductor)  
-**Blocked by:** — (await Lead **`APPROVE NP-C`**)
+**Blocked by:** — (await Lead **`APPROVE NP-D`** after PR merge + Windows Safe-Build)
 
 | Phase | Name | Owners | Status | Gate file | Handoffs |
 |---|---|---|---|---|---|
@@ -37,12 +37,13 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **HR-C** | Swarm ops refine | **APPROVED** | [11c_HR_C_HANDOFF.md](../Docs/11c_HR_C_HANDOFF.md) |
 | **HR-D** | Prove (dry-run loop) | **APPROVED** | [11d_HR_D_HANDOFF.md](../Docs/11d_HR_D_HANDOFF.md) |
 | **HR-B2** | Residual harness risks | **APPROVED** | [11e_HR_B2_HANDOFF.md](../Docs/11e_HR_B2_HANDOFF.md) |
-| **NP-A** | Inventory / gap map | **APPROVED** | [12a_NP_A_INVENTORY.md](../Docs/12a_NP_A_INVENTORY.md) — Lead **`APPROVE NP-A`**, 2026-09-17 ET |
-| **NP-B** | Lookdev apply | **APPROVED** | [12b_NP_B_LOOKDEV.md](../Docs/12b_NP_B_LOOKDEV.md), [handoffs/NP_B_LOOKDEV.md](../Docs/handoffs/NP_B_LOOKDEV.md) |
-| **NP-C** | Form + V1 polish | **COMPLETE — awaiting APPROVE NP-C** | [12c_NP_C_FORM_V1.md](../Docs/12c_NP_C_FORM_V1.md), [handoffs/NP_C_FORM_V1.md](../Docs/handoffs/NP_C_FORM_V1.md) — Windows place @ `16f7afe` |
-| **NP-D…E** | SYS verbs apply | **LOCKED** | Blocked until Lead **`APPROVE NP-C`** |
+| **NP-A** | Inventory / gap map | **APPROVED** | [12a_NP_A_INVENTORY.md](../Docs/12a_NP_A_INVENTORY.md) |
+| **NP-B** | Lookdev apply | **APPROVED** | [12b_NP_B_LOOKDEV.md](../Docs/12b_NP_B_LOOKDEV.md) |
+| **NP-C** | Form + V1 polish | **APPROVED** | [12c_NP_C_FORM_V1.md](../Docs/12c_NP_C_FORM_V1.md) — Lead **`APPROVE NP-C`**, 2026-09-17 ET |
+| **NP-D** | SYS V3–V4 gather + tame | **COMPLETE — awaiting APPROVE NP-D** | [12d_NP_D_SYS_V3_V4.md](../Docs/12d_NP_D_SYS_V3_V4.md), [handoffs/NP_D_SYS_V3_V4.md](../Docs/handoffs/NP_D_SYS_V3_V4.md) |
+| **NP-E** | Heal + nurture + persist | **LOCKED** | Blocked until Lead **`APPROVE NP-D`** |
 
-**Current track:** NP-C **COMPLETE** — Windows evidence filed (DESKTOP-21CT3H0, HEAD `16f7afe`). Await Lead **`APPROVE NP-C`** → unlock NP-D.
+**Current track:** NP-D **COMPLETE** — cloud C++ + docs delivered. Await Lead **`APPROVE NP-D`** → unlock NP-E. Windows: **Safe-Build required** after merge.
 
 ---
 
@@ -50,7 +51,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 
 | ID | Phase | Owner | Write path | Due artifact |
 |---|---|---|---|---|
-| NP-C-gate | NP-C | Lead | Docs/ | **`APPROVE NP-C`** → unlock NP-D |
+| NP-D-gate | NP-D | Lead | Docs/ | **`APPROVE NP-D`** → unlock NP-E |
 
 ## Open defects
 

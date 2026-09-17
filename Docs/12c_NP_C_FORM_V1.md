@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **COMPLETE — awaiting Lead `APPROVE NP-C`** |
+| **Status** | **APPROVED** — Lead **`APPROVE NP-C`**, 2026-09-17 ET |
 | **Date** | 2026-09-17 (ET) |
 | **Author** | Conductor (HomeWorld) |
 | **Parent** | [11_NEXT_PHASE_STRATEGY.md](11_NEXT_PHASE_STRATEGY.md) |
@@ -111,8 +111,8 @@ Expect four `OK phase=… NightMix=…` lines in Output Log.
 
 ## Gate
 
-Lead **`APPROVE NP-C`** → unlock **NP-D** (SYS V3–V4 inventory + gather + tame).
+Lead **`APPROVE NP-C`** — **GRANTED** (Luke Thompson, 2026-09-17 ET) → **NP-D** unlocked.
 
 ---
 
-*NP-C delivered 2026-09-17 ET under Lead APPROVE NP-B.*
+*NP-C APPROVED 2026-09-17 ET. NP-D delivered same day.*

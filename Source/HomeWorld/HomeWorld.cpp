@@ -11,6 +11,7 @@
 #include "HomeWorldCharacter.h"
 #include "HomeWorldGameMode.h"
 #include "HomeWorldInventorySubsystem.h"
+#include "HomeWorldInventoryTypes.h"
 #include "HomeWorldPlanetoidTypes.h"
 #include "HomeWorldPlayerState.h"
 #include "HomeWorldFamilySubsystem.h"
@@ -153,9 +154,9 @@ namespace
 		UHomeWorldInventorySubsystem* Inv = GI->GetSubsystem<UHomeWorldInventorySubsystem>();
 		if (!Inv) { UE_LOG(LogTemp, Warning, TEXT("HomeWorld: InventorySubsystem not found.")); return; }
 		const int32 Amount = Args.Num() > 0 ? FCString::Atoi(*Args[0]) : 100;
-		Inv->AddResource(FName("Wood"), Amount);
+		Inv->TryAddResource(HomeWorldInventory::RES_WOOD, Amount);
 		Inv->SetLastBossRewardDisplay(Amount, World->GetTimeSeconds() + 4.0f);
-		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.GrantBossReward granted Wood +%d (boss reward placeholder)."), Amount);
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.GrantBossReward granted RES_WOOD +%d (boss reward placeholder)."), Amount);
 	}
 
 	void CmdGatherOre(const TArray<FString>& Args)
@@ -172,8 +173,10 @@ namespace
 		if (!Inv) { UE_LOG(LogTemp, Warning, TEXT("HomeWorld: InventorySubsystem not found.")); return; }
 		const int32 Amount = Args.Num() > 0 ? FCString::Atoi(*Args[0]) : 10;
 		if (Amount <= 0) { UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Gather.Ore amount must be positive.")); return; }
-		Inv->AddResource(FName("Ore"), Amount);
-		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Gather.Ore granted Ore +%d (stub for MVP tutorial List 6 step 5)."), Amount);
+		if (Inv->TryAddResource(HomeWorldInventory::RES_STONE, Amount))
+		{
+			UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Gather.Ore granted RES_STONE +%d (legacy Ore alias)."), Amount);
+		}
 	}
 
 	void CmdGatherFlowers(const TArray<FString>& Args)
@@ -190,8 +193,10 @@ namespace
 		if (!Inv) { UE_LOG(LogTemp, Warning, TEXT("HomeWorld: InventorySubsystem not found.")); return; }
 		const int32 Amount = Args.Num() > 0 ? FCString::Atoi(*Args[0]) : 5;
 		if (Amount <= 0) { UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Gather.Flowers amount must be positive.")); return; }
-		Inv->AddResource(FName("Flowers"), Amount);
-		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Gather.Flowers granted Flowers +%d (stub for MVP tutorial List 6 step 5)."), Amount);
+		if (Inv->TryAddResource(HomeWorldInventory::RES_HERB, Amount))
+		{
+			UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Gather.Flowers granted RES_HERB +%d (legacy Flowers alias)."), Amount);
+		}
 	}
 
 	void CmdPlaceWall(const TArray<FString>& Args)
@@ -390,17 +395,15 @@ namespace
 		const int32 SpiritualArtefacts = PS ? PS->GetSpiritualArtefactsCollected() : 0;
 		UE_LOG(LogTemp, Log, TEXT("HomeWorld: Goods — Physical (day): %d, Spiritual power (night): %d, Spiritual artefacts (night): %d"),
 			Physical, SpiritualPower, SpiritualArtefacts);
-		// List 6 verification: log Wood, Ore, Flowers so "collected all three" is verifiable via hw.Goods.
 		if (Inv)
 		{
-			const int32 Wood = Inv->GetResource(FName(TEXT("Wood")));
-			const int32 Ore = Inv->GetResource(FName(TEXT("Ore")));
-			const int32 Flowers = Inv->GetResource(FName(TEXT("Flowers")));
-			if (Wood > 0 || Ore > 0 || Flowers > 0)
-			{
-				UE_LOG(LogTemp, Log, TEXT("HomeWorld: Goods — Wood: %d, Ore: %d, Flowers: %d (MVP tutorial List 6 gather verification)."),
-					Wood, Ore, Flowers);
-			}
+			UE_LOG(LogTemp, Log, TEXT("HomeWorld: RES slots — WOOD:%d FIBER:%d STONE:%d BERRY:%d HERB:%d SEED:%d"),
+				Inv->GetResource(HomeWorldInventory::RES_WOOD),
+				Inv->GetResource(HomeWorldInventory::RES_FIBER),
+				Inv->GetResource(HomeWorldInventory::RES_STONE),
+				Inv->GetResource(HomeWorldInventory::RES_BERRY),
+				Inv->GetResource(HomeWorldInventory::RES_HERB),
+				Inv->GetResource(HomeWorldInventory::RES_SEED));
 		}
 	}
 

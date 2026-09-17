@@ -3,8 +3,8 @@
 | Field | Value |
 |-------|-------|
 | **Phase** | NP-C |
-| **Status** | **COMPLETE — awaiting `APPROVE NP-C`** (Windows place done) |
-| **Lead stamp** | NP-B **APPROVED** (Luke Thompson, 2026-09-17 ET) |
+| **Status** | **APPROVED** — Lead **`APPROVE NP-C`** (Luke Thompson, 2026-09-17 ET) |
+| **Lead stamp** | **`APPROVE NP-C`** — Luke Thompson, 2026-09-17 ET |
 | **Deliverable** | [12c_NP_C_FORM_V1.md](../12c_NP_C_FORM_V1.md) |
 
 ---
@@ -40,6 +40,6 @@ Local `.umap` changes from placement scripts are **not committed** (project poli
 
 ---
 
-## Next gate
+## Gate
 
-Lead **`APPROVE NP-C`** → unlock NP-D.
+Lead **`APPROVE NP-C`** — **GRANTED** (Luke Thompson, 2026-09-17 ET) → NP-D unlocked.
