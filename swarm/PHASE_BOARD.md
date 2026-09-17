@@ -1,9 +1,9 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **VP-A** (PIE evidence) — **EVIDENCE FILED / AWAITING APPROVE VP-A**  
+**Current phase:** **VP-B** (Smoke & character risk) — **UNLOCKED / IN PROGRESS**  
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
-**Active owners:** **CND** (Conductor) + Lead gate  
-**Blocked by:** Lead **`APPROVE VP-A`** — [Docs/14_VP_VERIFY_POLISH.md](../Docs/14_VP_VERIFY_POLISH.md), [handoffs/VP_A_PIE.md](../Docs/handoffs/VP_A_PIE.md) (verb PIE **hard-fail**; VP-B recommended next)
+**Active owners:** **CND** (Conductor) + cloud/Windows agent (VP-B implementation)  
+**Blocked by:** Lead **`APPROVE VP-B`** before VP-B implementation PR — [Docs/14_VP_VERIFY_POLISH.md](../Docs/14_VP_VERIFY_POLISH.md) § VP-B (PA-02 NightMix smoke, PA-03 ABP skeleton)
 
 | Phase | Name | Owners | Status | Gate file | Handoffs |
 |---|---|---|---|---|---|
@@ -22,7 +22,7 @@ Status values: `LOCKED` `OPEN` `IN PROGRESS` `GATE FAILED` `CLOSED` `GATE READY`
 
 ## POST-AUDIT (Docs/05–10 + HR track)
 
-MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** **Product next-phase (NP-A…E) is CLOSED / COMPLETE.** **HR2 track CLOSED / COMPLETE** — HR2-A/B/C all **APPROVED**; Lead **`APPROVE HR2-C`**, 2026-09-17 ET. **VP strategy APPROVED** — Lead **`APPROVE VP STRATEGY`**, 2026-09-17 ET. Active: **VP-A EVIDENCE FILED** — await Lead **`APPROVE VP-A`** (verb PIE hard-fail; VP-B next).
+MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** **Product next-phase (NP-A…E) is CLOSED / COMPLETE.** **HR2 track CLOSED / COMPLETE** — HR2-A/B/C all **APPROVED**; Lead **`APPROVE HR2-C`**, 2026-09-17 ET. **VP strategy APPROVED** — Lead **`APPROVE VP STRATEGY`**, 2026-09-17 ET. **VP-A APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET (hard-fail accepted). Active: **VP-B UNLOCKED / IN PROGRESS** (ABP skeleton + NightMix smoke).
 
 | Track | Doc / phase | Status | Gate / handoff |
 |---|---|---|---|
@@ -40,12 +40,12 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **HR2-C** | C++ CI gate (build-win64) | **APPROVED** | [13c_HR2_C_CI_GATE.md](../Docs/13c_HR2_C_CI_GATE.md), [handoffs/HR2_C_CI_GATE.md](../Docs/handoffs/HR2_C_CI_GATE.md) — Lead **`APPROVE HR2-C`**, 2026-09-17 ET |
 | **HR2 track** | Harness Refine 2 | **CLOSED / COMPLETE** | [13_HR2_HARNESS_REFINE.md](../Docs/13_HR2_HARNESS_REFINE.md) — no HR2-D |
 | **Docs/14** | Verify & Polish strategy | **APPROVED** | [14_VP_VERIFY_POLISH.md](../Docs/14_VP_VERIFY_POLISH.md) — Lead **`APPROVE VP STRATEGY`**, 2026-09-17 ET |
-| **VP-A** | PIE evidence | **EVIDENCE FILED — AWAITING APPROVE VP-A** | [handoffs/VP_A_PIE.md](../Docs/handoffs/VP_A_PIE.md) — DESKTOP 2026-09-17; verb PIE **hard-fail** (ABP skeleton) |
-| **VP-B** | Smoke & character risk | **LOCKED** | handoffs/VP_B_SMOKE_CHARACTER.md (pending) |
+| **VP-A** | PIE evidence | **APPROVED** | [handoffs/VP_A_PIE.md](../Docs/handoffs/VP_A_PIE.md) — Lead **`APPROVE VP-A`**, 2026-09-17 ET; hard-fail accepted |
+| **VP-B** | Smoke & character risk | **UNLOCKED / IN PROGRESS** | handoffs/VP_B_SMOKE_CHARACTER.md (pending) — PA-02 NightMix, PA-03 ABP skeleton |
 | **VP-C** | Playability polish | **LOCKED** | handoffs/VP_C_POLISH.md (pending) |
 | **VP-D** | Bootstrap & branch protection | **LOCKED** | handoffs/VP_D_BOOTSTRAP_CI.md (pending) |
 
-**Current track:** VP strategy **APPROVED** — **VP-A EVIDENCE FILED** (await Lead **`APPROVE VP-A`**). VP-B/C/D **LOCKED** until their gates (VP-B recommended after VP-A stamp). Product NP **CLOSED**. HR2 **CLOSED / COMPLETE**.
+**Current track:** VP-A **APPROVED** — **VP-B UNLOCKED / IN PROGRESS** (await Lead **`APPROVE VP-B`** before implementation PR). VP-C/D **LOCKED**. Product NP **CLOSED**. HR2 **CLOSED / COMPLETE**.
 
 ---
 
@@ -53,7 +53,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 
 | ID | Phase | Owner | Write path | Due artifact |
 |---|---|---|---|---|
-| VP-A-gate | VP-A | Lead | Docs/handoffs/ | [VP_A_PIE.md](../Docs/handoffs/VP_A_PIE.md) filed — Lead **`APPROVE VP-A`** → unlock VP-B |
+| VP-B-impl | VP-B | CND / GP | Docs/handoffs/ | ABP skeleton (PA-03) + NightMix smoke (PA-02) — Lead **`APPROVE VP-B`** before implementation PR |
 
 ## Open defects
 
