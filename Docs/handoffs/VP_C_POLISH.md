@@ -6,11 +6,11 @@
 | **Status** | **IN PROGRESS / PENDING APPROVE VP-C** — impl landed in repo; **not COMPLETE** |
 | **Lead gate** | **`APPROVE VP-C`** before VP-C implementation PR merge / COMPLETE |
 | **Spec** | [14_VP_VERIFY_POLISH.md](../14_VP_VERIFY_POLISH.md) § VP-C |
-| **Baseline** | Main post–VP-B stamp + VP-A re-verify STILL FAIL @ `0e4bca1` |
+| **Baseline** | Main @ `f88ece5` (PR #69) + VP-A re-verify **WAIVED** |
 
 ## Summary
 
-Thin playability polish for the signed VS_MVP slice — no new systems, no combat, no free-flight. **Do not mark VP-C COMPLETE** until Conductor files **VP-A re-verify PASS** on DESKTOP (or Lead **WAIVE** per prefix) per [HR3_D_EVIDENCE_LANE.md](HR3_D_EVIDENCE_LANE.md). Re-verify filed **STILL FAIL** — see [VP_A_PIE.md](VP_A_PIE.md) § Re-verify (2026-09-17 post–VP-B).
+Thin playability polish for the signed VS_MVP slice — no new systems, no combat, no free-flight. VP-A re-verify gate **WAIVED** — Lead **`WAIVE VP-A re-verify`** (Luke Thompson, 2026-09-17 ET) per [HR3_D_EVIDENCE_LANE.md](HR3_D_EVIDENCE_LANE.md). Honest automation **STILL FAIL** record in [VP_A_PIE.md](VP_A_PIE.md) § Re-verify. **VP-C may proceed to COMPLETE** when polish ships; still requires Lead **`APPROVE VP-C`**.
 
 ## Shipped (this PR)
 
@@ -31,11 +31,11 @@ Thin playability polish for the signed VS_MVP slice — no new systems, no comba
 | Prerequisite | Owner | Status |
 |--------------|-------|--------|
 | VP-B **APPROVED / CLOSED** | Lead | **DONE** — **`APPROVE VP-B`**, 2026-09-17 ET |
-| VP-A **re-verify** on DESKTOP | CND parent | **STILL FAIL** — [VP_A_PIE.md](VP_A_PIE.md) § Re-verify; MCP PIE world / PlayerController blocker |
+| VP-A **re-verify** on DESKTOP | Lead | **WAIVED** — Lead **`WAIVE VP-A re-verify`**, 2026-09-17 ET ([VP_A_PIE.md](VP_A_PIE.md) § Re-verify) |
 
 ## Done criteria (Docs/14)
 
-- [ ] VP-A re-verify greps **PASS** (or Lead **WAIVED** per prefix) after VP-B — **STILL FAIL**
+- [x] VP-A re-verify greps **PASS** (or Lead **WAIVED** per prefix) after VP-B — **WAIVED** (automation greps remain STILL FAIL)
 - [x] Nurture success visibly distinct (M_Nurtured dynamic MI path in C++)
 - [x] Interact/gather gaps from VP-A closed or logged with reason — gather markers present; prompts added
 
@@ -43,7 +43,7 @@ Thin playability polish for the signed VS_MVP slice — no new systems, no comba
 
 | Evidence | Status |
 |----------|--------|
-| VP-A re-verify verb greps | **STILL FAIL** — Conductor DESKTOP run; see [VP_A_PIE.md](VP_A_PIE.md) |
+| VP-A re-verify verb greps | **WAIVED** — automation STILL FAIL on record; Lead waiver 2026-09-17 ET |
 | Nurture visual + interact prompts in PIE | **PENDING** — requires human Alt+P PIE or post–automation-fix MCP path |
 
 ## Hard rules
@@ -55,4 +55,4 @@ Thin playability polish for the signed VS_MVP slice — no new systems, no comba
 
 ---
 
-*VP-C handoff — **IN PROGRESS / PENDING APPROVE VP-C**. Implementation may proceed; **COMPLETE** blocked until VP-A re-verify PASS or Lead WAIVE per HR3-D.*
+*VP-C handoff — **IN PROGRESS / PENDING APPROVE VP-C**. Re-verify **WAIVED**; **COMPLETE** when polish ships + Lead **`APPROVE VP-C`**.*
