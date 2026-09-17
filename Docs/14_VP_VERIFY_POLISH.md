@@ -15,7 +15,7 @@
 
 Lead **`APPROVE VP STRATEGY`** — **APPROVED** (Luke Thompson, 2026-09-17 ET).
 
-**Next gate (VP):** Lead **`APPROVE VP-C`** — VP-C planning/impl **IN PROGRESS** ([handoffs/VP_C_POLISH.md](handoffs/VP_C_POLISH.md)).
+**Next gate (VP):** Lead **`APPROVE VP-C`** — VP-C impl **IN PROGRESS / PENDING APPROVE VP-C** ([handoffs/VP_C_POLISH.md](handoffs/VP_C_POLISH.md)); VP-A re-verify **STILL FAIL** gates COMPLETE.
 
 **VP-A APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET (hard-fail accepted). **VP-B APPROVED / CLOSED** — Lead **`APPROVE VP-B`**, 2026-09-17 ET ([handoffs/VP_B_SMOKE_CHARACTER.md](handoffs/VP_B_SMOKE_CHARACTER.md); PR #67 @ `e00c542`). **VP-C IN PROGRESS** (unlocked). **VP-D LOCKED**.
 
@@ -54,7 +54,7 @@ Product NP (NP-A…E) and Harness Refine 2 (HR2-A…C) are **CLOSED**. Senior po
 | **Docs/14 / VP strategy** | **APPROVED** — Lead **`APPROVE VP STRATEGY`**, 2026-09-17 ET |
 | **VP-A** | **APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET (verb PIE hard-fail accepted; PA-03 → VP-B) |
 | **VP-B** | **APPROVED / CLOSED** — Lead **`APPROVE VP-B`**, 2026-09-17 ET; PA-03 deferred accept (mesh-only interim) |
-| **VP-C** | **IN PROGRESS** — planning/impl unlocked; done criteria require VP-A re-verify (HR3-D) |
+| **VP-C** | **IN PROGRESS / PENDING APPROVE VP-C** — PA-04/06 impl landed; done criteria require VP-A re-verify PASS or WAIVE (HR3-D) |
 | **VP-D** | **LOCKED** |
 
 ---
@@ -131,9 +131,9 @@ Naming: **VP-A … VP-D** (Verify & Polish). Do **not** reuse NP-* or HR2-* phas
 
 **Done criteria:**
 
-- [ ] VP-A re-verify greps **PASS** (or Lead **WAIVED** per prefix) after VP-B — [HR3_D_EVIDENCE_LANE.md](handoffs/HR3_D_EVIDENCE_LANE.md)
-- [ ] Nurture success visibly distinct (M_Nurtured or documented MI path)
-- [ ] Interact/gather gaps from VP-A closed or logged with reason
+- [ ] VP-A re-verify greps **PASS** (or Lead **WAIVED** per prefix) after VP-B — **STILL FAIL** ([VP_A_PIE.md](handoffs/VP_A_PIE.md) § Re-verify)
+- [x] Nurture success visibly distinct (M_Nurtured dynamic MI path in C++ — pending DESKTOP PIE visual confirm)
+- [x] Interact/gather gaps from VP-A closed or logged with reason — markers present; interact prompts added; PA-07 deferred
 
 ---
 
@@ -205,9 +205,9 @@ Phases run **sequentially** (recommended: A → B → C → D) unless Lead direc
 
 ```
 Docs/14 / VP STRATEGY: APPROVED — Lead Luke Thompson, APPROVE VP STRATEGY, 2026-09-17 ET
-VP-A: APPROVED — re-verify IN PROGRESS (HR3-D) before VP-C COMPLETE
+VP-A: APPROVED — re-verify STILL FAIL (HR3-D) before VP-C COMPLETE
 VP-B: APPROVED / CLOSED — Lead APPROVE VP-B, 2026-09-17 ET
-VP-C: IN PROGRESS — VP-D: LOCKED
+VP-C: IN PROGRESS / PENDING APPROVE VP-C — VP-D: LOCKED
 Product NP: CLOSED — HR2: CLOSED — HR3: CLOSED / COMPLETE
 ```
 

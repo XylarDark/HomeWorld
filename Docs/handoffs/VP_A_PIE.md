@@ -129,3 +129,58 @@ Lead **`APPROVE VP STRATEGY`** (Luke Thompson, 2026-09-17 ET) — VP strategy **
 ## Stamp
 
 Lead **`APPROVE VP-A`** (Luke Thompson, 2026-09-17 ET) — VP-A **APPROVED** (evidence filed; verb PIE **hard-fail accepted** — PA-03 ABP skeleton). **VP-B UNLOCKED** — fix ABP skeleton + NightMix smoke; re-run verb PIE greps after VP-B before VP-C.
+
+---
+
+## Re-verify (2026-09-17 post–VP-B)
+
+Post–VP-B re-run on **DESKTOP-21CT3H0** after mesh-only character interim (PR #67 @ `e00c542`) and repo stamp **`0e4bca1`** (includes PR #68). Original fail record above **unchanged**; this section adds updated evidence only.
+
+| Field | Value |
+|-------|-------|
+| **Host** | DESKTOP-21CT3H0 |
+| **UE version** | 5.7.4-51494982+++UE5+Release-5.7 |
+| **Timestamp** | 2026-09-17 (post–VP-B re-verify attempt) |
+| **Repo tip** | `0e4bca1` (VP-B mesh-only `e00c542` / PR #67, then stamp incl. PR #68) |
+| **Character BP** | Engine `DefaultSkeletalMesh`; `anim_class` **None**; `BlueprintEditorLibrary.compile_blueprint` **OK** |
+| **Preflight** | `preflight:ue --require-editor` exit **0** (warning only `EDITOR_ABP_SKELETON`) |
+| **Map** | `/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers` |
+
+### MCP PIE / automation
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| `LevelEditorSubsystem.is_in_play_in_editor()` | **True** | After `editor_request_begin_play` |
+| `EditorLevelLibrary.get_pie_worlds(True\|False)` count | **0** | No PIE worlds visible to automation |
+| Editor-world PlayerController | **None** | No controllable pawn in automation path |
+| `pie_test_runner` | **3/40** | **Character spawned FAIL** — No controlled pawn / No PIE world |
+
+### Verb log greps (re-verify)
+
+Gameplay prefixes only (not placement-script prose):
+
+| Prefix | Result | Notes |
+|--------|--------|-------|
+| `FORM:` | **FAIL** | 0 gameplay lines — automation cannot drive PIE pawn |
+| `FALLBACK:` | **FAIL** | 0 gameplay lines |
+| `HEAL:` | **FAIL** | 0 gameplay lines |
+| `NURTURE:` | **FAIL** | 0 gameplay lines |
+| `DAWN:` | **FAIL** | 0 gameplay lines |
+| `TAME:` | **FAIL** | 0 gameplay lines |
+| `GATHER:` | **FAIL** | 0 gameplay lines |
+
+**Verdict:** Re-verify **STILL FAIL** — all seven prefixes absent in automation PIE path. Mesh-only VP-B did **not** restore MCP/automation PIE world visibility or PlayerController.
+
+### Root-cause update (post–VP-B)
+
+| Item | Status |
+|------|--------|
+| **PA-03 ABP** | **Deferred accept** — ABP no longer assigned to BP (`anim_class` None); `EDITOR_ABP_SKELETON` warning only; not blocking preflight |
+| **Remaining blocker** | **MCP/automation PIE world visibility / no PlayerController** — not fixed by mesh-only interim |
+| **Human path** | Lead **Alt+P** PIE on DESKTOP or Lead **WAIVE** per prefix still required for green greps |
+
+### Recommendation (re-verify)
+
+1. Treat re-verify as **STILL FAIL** — do **not** invent PASS greps or mark VP-C **COMPLETE** on verb evidence alone.
+2. **VP-C impl may proceed** in parallel; **APPROVE VP-C** / **COMPLETE** remain gated by re-verify **PASS** or Lead **WAIVE** per [HR3_D_EVIDENCE_LANE.md](HR3_D_EVIDENCE_LANE.md).
+3. Next DESKTOP attempt: human Alt+P PIE walk-through per runbooks, **or** automation gap session for MCP `get_pie_worlds` / PlayerController visibility.

@@ -20,6 +20,13 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 ## Rolling log (newest first)
 
+### 2026-09-17 — VP-A re-verify STILL FAIL + VP-C polish impl (pending APPROVE VP-C)
+
+- **VP-A re-verify** on DESKTOP @ `0e4bca1`: verb greps **STILL FAIL** (0 gameplay lines all prefixes); MCP PIE `get_pie_worlds` count **0**, no PlayerController; `pie_test_runner` **3/40**. § Re-verify appended to [VP_A_PIE.md](../Docs/handoffs/VP_A_PIE.md).
+- **VP-C impl (repo):** PA-04 `ApplyNurturedVisual` on nurture success/restore; PA-06 interact on-screen prompts + range hints; gather dress **no gap** (GP_N1/GP_N2 present); PA-07 store-transfer **deferred**. Handoff [VP_C_POLISH.md](../Docs/handoffs/VP_C_POLISH.md) — **IN PROGRESS / PENDING APPROVE VP-C** (not COMPLETE).
+- [PHASE_BOARD.md](../swarm/PHASE_BOARD.md): VP-A-reverify → **STILL FAIL**; VP-C → **PENDING APPROVE VP-C**.
+- **Next:** Lead **`APPROVE VP-C`**; human Alt+P PIE for verb greps or Lead **WAIVE** per prefix.
+
 ### 2026-09-17 — VP-B APPROVED (APPROVE VP-B stamp)
 
 - Lead **`APPROVE VP-B`** (Luke Thompson, 2026-09-17 ET) — VP-B **APPROVED / CLOSED**; **VP-C IN PROGRESS** (planning/impl unlocked).
