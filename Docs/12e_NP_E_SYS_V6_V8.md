@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **COMPLETE — awaiting Lead `APPROVE NP-E`** |
+| **Status** | **APPROVED** — Lead **`APPROVE NP-E`** (Luke Thompson, 2026-09-17 ET) |
 | **Date** | 2026-09-17 (ET) |
 | **Author** | Conductor (HomeWorld) |
 | **Parent** | [11_NEXT_PHASE_STRATEGY.md](11_NEXT_PHASE_STRATEGY.md) |
@@ -131,8 +131,8 @@ Local `.umap` changes are **not committed**.
 
 ## Gate
 
-Lead **`APPROVE NP-E`** → **product NP track complete** (final NP phase).
+Lead **`APPROVE NP-E`** — **GRANTED** (Luke Thompson, 2026-09-17 ET) → **product NP track CLOSED / COMPLETE** (final NP phase).
 
 ---
 
-*NP-E delivered 2026-09-17 ET under Lead APPROVE NP-D.*
+*NP-E APPROVED 2026-09-17 ET — Lead APPROVE NP-E. Product NP track complete; no NP-F.*

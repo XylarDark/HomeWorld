@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **APPROVED** — Lead Luke Thompson, 2026-09-17 ET |
+| **Status** | **CLOSED / COMPLETE** — Lead Luke Thompson, **`APPROVE NP-E`**, 2026-09-17 ET |
 | **Date** | 2026-09-17 |
 | **Author** | Conductor (HomeWorld) |
 | **Unlocked by** | Lead **`APPROVE NP STRATEGY`**, 2026-09-17 ET |
@@ -14,7 +14,7 @@
 
 Lead **`APPROVE NP STRATEGY`** — **GRANTED** (Luke Thompson, 2026-09-17 ET).
 
-**Next gate:** Lead **`APPROVE NP-E`** → product NP track complete.
+**Next gate:** **None** — product NP track (NP-A…E) **CLOSED / COMPLETE**.
 
 ---
 
@@ -26,7 +26,7 @@ Lead **`APPROVE NP STRATEGY`** — **GRANTED** (Luke Thompson, 2026-09-17 ET).
 | **NP-B** | Lookdev apply | [12b_NP_B_LOOKDEV.md](12b_NP_B_LOOKDEV.md) | **APPROVED** — Lead **`APPROVE NP-B`**, 2026-09-17 ET |
 | **NP-C** | Form + V1 polish | [12c_NP_C_FORM_V1.md](12c_NP_C_FORM_V1.md) | **APPROVED** — Lead **`APPROVE NP-C`**, 2026-09-17 ET |
 | **NP-D** | SYS V3–V4 | [12d_NP_D_SYS_V3_V4.md](12d_NP_D_SYS_V3_V4.md) | **APPROVED** — Lead **`APPROVE NP-D`**, 2026-09-17 ET |
-| **NP-E** | SYS V6–V8 | [12e_NP_E_SYS_V6_V8.md](12e_NP_E_SYS_V6_V8.md) | **COMPLETE — awaiting APPROVE NP-E** |
+| **NP-E** | SYS V6–V8 | [12e_NP_E_SYS_V6_V8.md](12e_NP_E_SYS_V6_V8.md) | **APPROVED** — Lead **`APPROVE NP-E`**, 2026-09-17 ET |
 
 ---
 
@@ -53,13 +53,13 @@ Lead **`APPROVE NP STRATEGY`** — **GRANTED** (Luke Thompson, 2026-09-17 ET).
 | 2 | **`APPROVE NP-B`** | NP-C form + V1 polish — **DONE** |
 | 3 | **`APPROVE NP-C`** | NP-D SYS V3–V4 — **DONE** |
 | 4 | **`APPROVE NP-D`** | NP-E SYS V6–V8 — **DONE** |
-| 5 | **`APPROVE NP-E`** | Product next-phase complete — **NEXT** |
+| 5 | **`APPROVE NP-E`** | Product next-phase complete — **DONE** |
 
 ```
 Harness refine: CLOSED — Lead Luke Thompson, APPROVE HR-B2 + APPROVE HR-D, 2026-09-17 ET
 Product NP strategy: APPROVED — Lead Luke Thompson, APPROVE NP STRATEGY, 2026-09-17 ET
-NP-A: APPROVED — NP-B: APPROVED — NP-C: APPROVED — NP-D: APPROVED (2026-09-17 ET)
-NP-E: COMPLETE awaiting APPROVE NP-E
+NP-A: APPROVED — NP-B: APPROVED — NP-C: APPROVED — NP-D: APPROVED — NP-E: APPROVED (2026-09-17 ET)
+Product NP track: CLOSED / COMPLETE — Lead APPROVE NP-E, 2026-09-17 ET
 ```
 
 ---
@@ -79,4 +79,4 @@ NP-E: COMPLETE awaiting APPROVE NP-E
 
 ---
 
-*NP-E SYS V6–V8 complete 2026-09-17 ET. Awaiting Lead APPROVE NP-E (final NP gate).*
+*Product NP track CLOSED 2026-09-17 ET — Lead Luke Thompson, APPROVE NP-E. No NP-F; no further product NP gates.*
