@@ -60,6 +60,8 @@
 
 These are **not** open HS defects. Lead may reopen any later under a **Lead-named** track only.
 
+**Optional residual:** [17g_HS_G_OPS_DIET.md](17g_HS_G_OPS_DIET.md) — HS-G Conductor/DESKTOP ops diet **APPROVED / COMPLETE** (Lead **`APPROVE HS-G`**, 2026-09-17 ET). Does not reopen Docs/17 status.
+
 ---
 
 ## 4. What improved vs Docs/08 / HR3 close

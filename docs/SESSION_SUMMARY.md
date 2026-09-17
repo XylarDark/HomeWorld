@@ -1,3 +1,13 @@
+## 2026-09-17 ET — APPROVE HS-G
+
+Lead Luke Thompson **`APPROVE HS-G`**, 2026-09-17 ET. [Docs/17g_HS_G_OPS_DIET.md](../Docs/17g_HS_G_OPS_DIET.md) stamped **APPROVED / COMPLETE**; PHASE_BOARD HS-G closed; Docs/17/18/17d pointers synced. PR #105 merged. VP2-A/B gate strings unchanged.
+
+
+## 2026-09-17 ET — HS-G ops diet DRAFT
+
+Lead requested optional residual mini-track. [Docs/17g_HS_G_OPS_DIET.md](../Docs/17g_HS_G_OPS_DIET.md) filed **DRAFT** — three Conductor/DESKTOP ops rules (evidence PASS, hang budget, compile hygiene). PHASE_BOARD + Docs/17/18/17d pointers. PENDING **`APPROVE HS-G`** — do not stamp in PR.
+
+
 ## 2026-09-17 ET — VP2-A evidence filed (0/9 MISSING)
 
 DESKTOP: preflight PASS; PIE+Manny+ABP_Unarmed PASS; MCP interact automation crashed; evidence:grep 0/9 MISSING. Handoff VP2_A_EVIDENCE.md — PENDING **`APPROVE VP2-A`**.

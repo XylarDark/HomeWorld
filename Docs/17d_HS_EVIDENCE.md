@@ -11,7 +11,9 @@
 | **Baseline** | HR3-B preflight ([HR3_B_UE_PREFLIGHT.md](handoffs/HR3_B_UE_PREFLIGHT.md)) · HR3-D evidence lane ([HR3_D_EVIDENCE_LANE.md](handoffs/HR3_D_EVIDENCE_LANE.md)) |
 | **Hard rules honored** | Docs/07 CLOSED; FALLBACK glide only; no combat; no `.uasset`/`.umap` commits; exactly 10 masters; no invented product phases |
 
-**Gate:** Lead **`APPROVE HS-D`** — **not claimed here**. Until stamped: HS-E stays locked.
+**Gate:** Lead **`APPROVE HS-D`** — **APPROVED** (Luke Thompson, 2026-09-17 ET).
+
+**Lead-gate PASS (VP2+):** Soft-reject greps are diagnostic only — canonical [17g_HS_G_OPS_DIET.md](17g_HS_G_OPS_DIET.md) (**APPROVED / COMPLETE**, Lead **`APPROVE HS-G`**, 2026-09-17 ET).
 
 ---
 
