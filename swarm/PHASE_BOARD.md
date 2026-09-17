@@ -1,9 +1,9 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **VP-C** (playability polish) — **IN PROGRESS / PENDING APPROVE VP-C** (impl landed; re-verify **WAIVED**)  
+**Current phase:** **VP-D** (bootstrap dry-run + branch protection) — **IN PROGRESS**  
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
-**Active owners:** **CLOUD** (VP-C impl) + **Lead** (gates)  
-**Blocked by:** Lead **`APPROVE VP-C`** only — VP-A re-verify **WAIVED** (Lead **`WAIVE VP-A re-verify`**, 2026-09-17 ET). VP-B **APPROVED / CLOSED**. **VP-D LOCKED**.
+**Active owners:** **CLOUD** (VP-D docs) + **DESKTOP** (PA-05 bootstrap evidence) + **Lead** (gates / GitHub Settings)  
+**Blocked by:** Lead **`APPROVE VP-D`** only — VP-C **APPROVED / CLOSED** (Lead **`APPROVE VP-C`**, 2026-09-17 ET; polish PR #69 @ `f88ece5`). VP-A re-verify **WAIVED**. HR3-C branch protection **DEFERRED** unless Lead applies.
 
 | Phase | Name | Owners | Status | Gate file | Handoffs |
 |---|---|---|---|---|---|
@@ -36,7 +36,7 @@ Task executors are **not** DESKTOP owners. Re-verify rule: [HR3_D_EVIDENCE_LANE.
 
 ## POST-AUDIT (Docs/05–10 + HR track)
 
-MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** **Product next-phase (NP-A…E) is CLOSED / COMPLETE.** **HR2 track CLOSED / COMPLETE.** **HR3 track CLOSED / COMPLETE** — Lead **`APPROVE HR3-D`**, 2026-09-17 ET (HR3-C **DEFERRED**). **VP strategy APPROVED.** **VP-B APPROVED / CLOSED** — Lead **`APPROVE VP-B`**, 2026-09-17 ET (PR #67 @ `e00c542`). **VP-A re-verify WAIVED** — Lead **`WAIVE VP-A re-verify`**, 2026-09-17 ET. Active: **VP-C IN PROGRESS / PENDING APPROVE VP-C**.
+MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** **Product next-phase (NP-A…E) is CLOSED / COMPLETE.** **HR2 track CLOSED / COMPLETE.** **HR3 track CLOSED / COMPLETE** — Lead **`APPROVE HR3-D`**, 2026-09-17 ET (HR3-C **DEFERRED**). **VP strategy APPROVED.** **VP-B APPROVED / CLOSED** — Lead **`APPROVE VP-B`**, 2026-09-17 ET (PR #67 @ `e00c542`). **VP-C APPROVED / CLOSED** — Lead **`APPROVE VP-C`**, 2026-09-17 ET (PR #69 @ `f88ece5`). **VP-A re-verify WAIVED** — Lead **`WAIVE VP-A re-verify`**, 2026-09-17 ET. Active: **VP-D IN PROGRESS**.
 
 | Track | Doc / phase | Host | Status | Gate / handoff |
 |---|---|---|---|---|
@@ -62,10 +62,10 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **HR3-C** | Branch protection | Lead | **DEFERRED / COMPLETE for track** | Lead skip 2026-09-17 ET — [handoffs/HR3_C_BRANCH_PROTECTION.md](../Docs/handoffs/HR3_C_BRANCH_PROTECTION.md) checklist PR #62; GitHub apply deferred |
 | **HR3-D** | DESKTOP evidence + re-verify | CLOUD | **APPROVED** | [handoffs/HR3_D_EVIDENCE_LANE.md](../Docs/handoffs/HR3_D_EVIDENCE_LANE.md) — Lead **`APPROVE HR3-D`**, 2026-09-17 ET; PR #65 |
 | **HR3 track** | Harness Refine 3 (A+) | — | **CLOSED / COMPLETE** | [15_HR3_A_PLUS.md](../Docs/15_HR3_A_PLUS.md) — HR3-C **DEFERRED**; harness **~A**, swarm **~A+** |
-| **VP-C** | Playability polish | CLOUD+DESKTOP | **IN PROGRESS / PENDING APPROVE VP-C** | [handoffs/VP_C_POLISH.md](../Docs/handoffs/VP_C_POLISH.md) — PA-04/06 shipped; PA-07 deferred; re-verify **WAIVED** |
-| **VP-D** | Bootstrap dry-run | CLOUD+DESKTOP | **LOCKED** | handoffs/VP_D_BOOTSTRAP_CI.md (pending) |
+| **VP-C** | Playability polish | CLOUD+DESKTOP | **APPROVED / CLOSED** | [handoffs/VP_C_POLISH.md](../Docs/handoffs/VP_C_POLISH.md) — Lead **`APPROVE VP-C`**, 2026-09-17 ET; polish PR #69 @ `f88ece5`; PA-07 deferred |
+| **VP-D** | Bootstrap dry-run | CLOUD+DESKTOP | **IN PROGRESS** | [handoffs/VP_D_BOOTSTRAP_CI.md](../Docs/handoffs/VP_D_BOOTSTRAP_CI.md) — PA-05 DESKTOP evidence TBD; branch protection checklist (HR3-C **DEFERRED** unless Lead applies) |
 
-**Current track:** **VP-B APPROVED / CLOSED**. **VP-C IN PROGRESS / PENDING APPROVE VP-C** (impl landed). **VP-A re-verify WAIVED** — Lead **`WAIVE VP-A re-verify`**, 2026-09-17 ET. **VP-D LOCKED**.
+**Current track:** **VP-C APPROVED / CLOSED** — Lead **`APPROVE VP-C`**, 2026-09-17 ET (PR #69 @ `f88ece5`). **VP-D IN PROGRESS** (unlocked). **VP-A re-verify WAIVED**. HR3-C branch protection **DEFERRED** unless Lead applies GitHub settings.
 
 ---
 
@@ -74,7 +74,8 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | ID | Phase | Host | Owner | Write path | Due artifact |
 |---|---|---|---|---|---|
 | VP-A-reverify | VP-A | Lead | Lead | Docs/handoffs/ | **WAIVED** — Lead **`WAIVE VP-A re-verify`**, 2026-09-17 ET; honest STILL FAIL record in [VP_A_PIE.md](../Docs/handoffs/VP_A_PIE.md) § Re-verify |
-| VP-C-impl | VP-C | CLOUD+DESKTOP | CND / GP | Docs/handoffs/ | [VP_C_POLISH.md](../Docs/handoffs/VP_C_POLISH.md) — **IN PROGRESS / PENDING APPROVE VP-C**; PA-04/06 shipped; PA-07 deferred |
+| VP-D-bootstrap | VP-D | DESKTOP | CND | Docs/handoffs/ | [VP_D_BOOTSTRAP_CI.md](../Docs/handoffs/VP_D_BOOTSTRAP_CI.md) — PA-05 cold-clone → submodule → `doctor:ue` → Editor → `bootstrap_project.py` → idempotent re-run; DESKTOP evidence **TBD** |
+| VP-D-branch-protection | VP-D | Lead | Lead | docs/Setup/ | [CI_SETUP.md](../docs/Setup/CI_SETUP.md) + [HR3_C_BRANCH_PROTECTION.md](../Docs/handoffs/HR3_C_BRANCH_PROTECTION.md) — checklist documented; **DEFERRED** unless Lead confirms apply in GitHub UI |
 
 ## Deferred accept (VP-B — not open defects)
 
