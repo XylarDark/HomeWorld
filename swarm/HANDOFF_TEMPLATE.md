@@ -49,3 +49,29 @@ Gate claims without evidence are invalid. List checkable artifacts:
 - Repo-relative paths (files, handoffs, preview READMEs):
 - Screenshot / frame / render / checklist output:
 - Test or verify notes (command run + outcome):
+
+---
+
+## Cloud agent PR (HR / post-audit)
+
+Use when a **Cursor cloud agent** ships a PR (no UE/MCP on the VM). Full packet: [CLOUD_AGENT_PACKET.md](CLOUD_AGENT_PACKET.md).
+
+### Branch & PR
+
+- **Branch:** `cursor/<descriptive-name>-b3a5` (lowercase kebab; suffix required)
+- **PR URL:**
+- **Merge SHA:** (after squash-merge to `main`)
+- **CI:** `validate` + `python-lint` — pass/fail + link
+
+### Cloud VM — do NOT
+
+- [ ] MCP / UnrealMCP on cloud VM
+- [ ] `.\Tools\Safe-Build.ps1` or C++ build on cloud VM
+- [ ] Editor Python / GUI automation on cloud VM
+- [ ] `.uasset` / `.umap` commits
+
+**Windows follow-up:** [docs/Setup/WINDOWS_BRIDGE.md](../docs/Setup/WINDOWS_BRIDGE.md) — DESKTOP Editor + MCP for dress, PIE, and script validation after merge.
+
+### Evidence paths (repo-relative)
+
+-

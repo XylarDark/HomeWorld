@@ -26,6 +26,14 @@ You own **steer**, **taste**, and **test** for the swarm. Agents execute and **a
 
 Swarm role cards live in [`.cursor/agents/`](.cursor/agents/) (copied from [swarm/agents/](swarm/agents/)). Conductor spawns **one specialist per task** with thin context (role card + wave packet inputs only). They are **not** the UE automation company (Developer / Fixer / Guardian in [docs/Automation/AGENT_COMPANY.md](docs/Automation/AGENT_COMPANY.md) unless you explicitly invoke that loop.
 
+## Session continuity (swarm)
+
+At **session start:** read [docs/SESSION_SUMMARY.md](docs/SESSION_SUMMARY.md) and [swarm/PHASE_BOARD.md](swarm/PHASE_BOARD.md) — not the full [docs/SESSION_LOG.md](docs/SESSION_LOG.md) unless debugging a past incident.
+
+At **session end:** Conductor appends SESSION_SUMMARY and updates PHASE_BOARD when status changes.
+
+**Cloud agents:** [swarm/CLOUD_AGENT_PACKET.md](swarm/CLOUD_AGENT_PACKET.md) — no MCP / no Safe-Build on cloud VM; Windows handoff via [docs/Setup/WINDOWS_BRIDGE.md](docs/Setup/WINDOWS_BRIDGE.md).
+
 ## Key paths
 
 | Path | Role |
@@ -34,5 +42,6 @@ Swarm role cards live in [`.cursor/agents/`](.cursor/agents/) (copied from [swar
 | [HOMEWORLD_MVP_SWARM_BRIEF.md](HOMEWORLD_MVP_SWARM_BRIEF.md) | Game canon |
 | [swarm/SWARM_OPS.md](swarm/SWARM_OPS.md) | Process — Human Use, evidence gates, git safety, KNOWN_ERRORS |
 | [swarm/PHASE_BOARD.md](swarm/PHASE_BOARD.md) | Live status (Conductor writes) |
+| [docs/SESSION_SUMMARY.md](docs/SESSION_SUMMARY.md) | Rolling last-30-days swarm memory |
 | [docs/KNOWN_ERRORS.md](docs/KNOWN_ERRORS.md) | Record real failures |
 | [docs/Automation/AUTOMATION_GAPS.md](docs/Automation/AUTOMATION_GAPS.md) | Log automation impossibilities |

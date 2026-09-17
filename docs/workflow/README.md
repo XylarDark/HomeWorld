@@ -9,28 +9,29 @@ This folder is the **entry point** for project workflow. Vision, MVP, and task-l
 | Location | Contents |
 |----------|----------|
 | **[VisionBoard/](../../VisionBoard/)** | **MVP and vision:** Theme, campaign, moral system, scope. VISION.md, PROTOTYPE_SCOPE, MVP_* and tutorial plan, vertical slice, planetoid design/biomes, STACK_PLAN, CHARACTER_GENERATION_AND_CUSTOMIZATION, assets/Steam phased approach, Steam checklist. Plus vision-board prompt files (Aesthetics, Gameplay Mechanics, World Lore, etc.). See [VisionBoard/README.md](../../VisionBoard/README.md). |
-| **[docs/TaskLists/](../TaskLists/)** | **Task generation and lists:** Current task list (T1–T10), how to generate lists, 30-day schedule, daily state, accomplishments, project state, cycle/agent task list. **TaskSpecs/** holds the per-task specs (DAY3_, DAY7_, CONVERSION_NOT_KILL, AGENTIC_BUILDING, etc.). See [TaskLists/README.md](../TaskLists/README.md). |
+| **[docs/TaskLists/](../TaskLists/)** | **Task generation and lists (quarantine / history):** 30-day schedule, daily state, accomplishments, project state. Pre-swarm agent loop **removed WAVE F**. See [TaskLists/README.md](../TaskLists/README.md). |
 | **docs/** | Setup, conventions, content layout, PCG, automation, known errors, console commands, and other operational docs. |
+
+---
+
+## Active driver (post-audit)
+
+**MVP lookdev swarm:** [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md) + **Conductor** — [START_HERE.md](../../START_HERE.md). Live status: [swarm/PHASE_BOARD.md](../../swarm/PHASE_BOARD.md). Harness refine track: [Docs/11_SWARM_HARNESS_REFINE.md](../../Docs/11_SWARM_HARNESS_REFINE.md).
+
+**Quarantine (do not start):** Pre-swarm agent-company loop — [docs/Automation/AGENT_COMPANY.md](../Automation/AGENT_COMPANY.md). Deleted WAVE F: `Start-AllAgents*`, `run_automation_cycle.py`, agent-loop Tools.
 
 ---
 
 ## Daily flow (yesterday / today / tomorrow)
 
-**Start a day:** Ask e.g. "What did we do yesterday and what do we need to do today?" The agent reads [TaskLists/DAILY_STATE.md](../TaskLists/DAILY_STATE.md) (and [SESSION_LOG.md](../SESSION_LOG.md)) and answers from **Yesterday** and **Today**.
+**Swarm / Conductor sessions:** Read [docs/SESSION_SUMMARY.md](../SESSION_SUMMARY.md) and [swarm/PHASE_BOARD.md](../../swarm/PHASE_BOARD.md) at start; append SESSION_SUMMARY at end. Full [SESSION_LOG.md](../SESSION_LOG.md) only when investigating a specific past incident.
 
-**End a session:** The agent updates [TaskLists/DAILY_STATE.md](../TaskLists/DAILY_STATE.md) and appends [SESSION_LOG.md](../SESSION_LOG.md). See `.cursor/rules/07-ai-agent-behavior.mdc`.
-
----
-
-## Automation loop
-
-**Active driver:** [TaskLists/CURRENT_TASK_LIST.md](../TaskLists/CURRENT_TASK_LIST.md) (10 tasks T1–T10). Run `.\Tools\Start-AllAgents-InNewWindow.ps1` to start the loop. Generate new lists per [TaskLists/HOW_TO_GENERATE_TASK_LIST.md](../TaskLists/HOW_TO_GENERATE_TASK_LIST.md).
+**Legacy task-list sessions:** Ask e.g. "What did we do yesterday and what do we need to do today?" — agent reads [TaskLists/DAILY_STATE.md](../TaskLists/DAILY_STATE.md) (quarantine/history). End of session: append SESSION_LOG if still using that track.
 
 ---
 
 ## Key links
 
 - **Vision and scope:** [VisionBoard/Core/VISION.md](../../VisionBoard/Core/VISION.md), [VisionBoard/Core/STACK_PLAN.md](../../VisionBoard/Core/STACK_PLAN.md)
-- **Project state and task list:** [TaskLists/PROJECT_STATE_AND_TASK_LIST.md](../TaskLists/PROJECT_STATE_AND_TASK_LIST.md)
-- **Pre-demo verification:** [CONSOLE_COMMANDS.md](../CONSOLE_COMMANDS.md) §3 and [VisionBoard/VERTICAL_SLICE_CHECKLIST.md](../../VisionBoard/VERTICAL_SLICE_CHECKLIST.md)
+- **Swarm ops:** [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md), [START_HERE.md](../../START_HERE.md)
 - **Setup and conventions:** [SETUP.md](../SETUP.md), [CONVENTIONS.md](../CONVENTIONS.md), [CONTENT_LAYOUT.md](../CONTENT_LAYOUT.md), [KNOWN_ERRORS.md](../KNOWN_ERRORS.md)

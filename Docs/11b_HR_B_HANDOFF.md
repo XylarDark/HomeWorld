@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **COMPLETE — awaiting Lead `APPROVE HR-B`** |
+| **Status** | **APPROVED** — Lead Luke Thompson, **`APPROVE HR-B`**, 2026-09-17 ET |
 | **Date** | 2026-09-17 |
 | **Author** | Cloud Agent (HR-B) |
 | **Baseline** | [11a_HR_MEASURES.md](11a_HR_MEASURES.md) |
@@ -12,7 +12,7 @@
 
 ## Gate
 
-Lead: type **`APPROVE HR-B`** to unlock HR-C (swarm ops refine).
+**APPROVED** — Lead Luke Thompson, **`APPROVE HR-B`**, 2026-09-17 ET. Unlocked HR-C — see [11c_HR_C_HANDOFF.md](11c_HR_C_HANDOFF.md).
 
 ---
 
@@ -80,10 +80,10 @@ Lead: type **`APPROVE HR-B`** to unlock HR-C (swarm ops refine).
 
 ---
 
-## Next (after APPROVE HR-B)
+## Next
 
-**HR-C** — PHASE_BOARD post-audit section, handoff templates for cloud PRs, SESSION_LOG hygiene, dual-OS trim per [11_SWARM_HARNESS_REFINE.md](11_SWARM_HARNESS_REFINE.md).
+**HR-C** — delivered; see [11c_HR_C_HANDOFF.md](11c_HR_C_HANDOFF.md). Await Lead **`APPROVE HR-C`** for HR-D.
 
 ---
 
-*HR-B complete 2026-09-17 — awaiting Lead APPROVE HR-B.*
+*HR-B APPROVED 2026-09-17 — Lead Luke Thompson.*

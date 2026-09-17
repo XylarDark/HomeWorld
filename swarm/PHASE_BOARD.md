@@ -1,9 +1,9 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** — (MVP vertical slice CLOSED)  
+**Current phase:** **HR-C** (Harness Refine — swarm ops)  
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
-**Active owners:** —  
-**Blocked by:** —
+**Active owners:** **CND** (Conductor)  
+**Blocked by:** — (await Lead **`APPROVE HR-C`** after PR merge)
 
 | Phase | Name | Owners | Status | Gate file | Handoffs |
 |---|---|---|---|---|---|
@@ -18,11 +18,34 @@
 
 Status values: `LOCKED` `OPEN` `IN PROGRESS` `GATE FAILED` `CLOSED` `GATE READY`
 
+---
+
+## POST-AUDIT (Docs/05–10 + HR track)
+
+MVP vertical slice and post-audit product wrap are **CLOSED**. Active work is **Harness Refine (HR-A…D)** until Lead approves HR-D or explicitly unblocks product next-phase.
+
+| Track | Doc / phase | Status | Gate / handoff |
+|---|---|---|---|
+| Docs/05 | UE import first pass | **CLOSED** | [05_UE_IMPORT_FIRST_PASS.md](../Docs/05_UE_IMPORT_FIRST_PASS.md) |
+| Docs/06 | VS_MVP dress | **CLOSED** | [06_VS_MVP_DRESS.md](../Docs/06_VS_MVP_DRESS.md) |
+| Docs/07 | Vertical slice sign-off | **CLOSED** | [07_VERTICAL_SLICE_SIGN OFF.md](../Docs/07_VERTICAL_SLICE_SIGN%20OFF.md) |
+| Docs/08–10 | Audit WAVEs + post-audit wrap | **CLOSED** | [08_AUDIT_SIGN_OFF.md](../Docs/08_AUDIT_SIGN_OFF.md), [10_POST_AUDIT_WRAP.md](../Docs/10_POST_AUDIT_WRAP.md) |
+| Docs/11 | Swarm & harness refine strategy | **APPROVED** | [11_SWARM_HARNESS_REFINE.md](../Docs/11_SWARM_HARNESS_REFINE.md) |
+| **HR-A** | Measure & inventory | **APPROVED** | [11a_HR_MEASURES.md](../Docs/11a_HR_MEASURES.md) |
+| **HR-B** | Harness tighten | **APPROVED** | [11b_HR_B_HANDOFF.md](../Docs/11b_HR_B_HANDOFF.md) |
+| **HR-C** | Swarm ops refine | **COMPLETE — awaiting APPROVE HR-C** | [11c_HR_C_HANDOFF.md](../Docs/11c_HR_C_HANDOFF.md) |
+| **HR-D** | Prove (dry-run loop) | **LOCKED** | Blocked until Lead **`APPROVE HR-C`** |
+| **Product NP-A…E** | Next-phase gameplay / lookdev apply | **PARKED / DEFERRED** | [11_NEXT_PHASE_STRATEGY.md](../Docs/11_NEXT_PHASE_STRATEGY.md) |
+
+**Current track:** HR-A **APPROVED**, HR-B **APPROVED**, HR-C **COMPLETE** (awaiting Lead **`APPROVE HR-C`**).
+
+---
+
 ## Open tasks
 
 | ID | Phase | Owner | Write path | Due artifact |
 |---|---|---|---|---|
-| — | — | — | — | — |
+| HR-D | POST-AUDIT | CND | Docs/handoffs/ | Dry-run handoff after APPROVE HR-C |
 
 ## Open defects
 

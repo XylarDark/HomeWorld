@@ -9040,3 +9040,13 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 **Gate:** HR-A **COMPLETE** — await Lead **`APPROVE HR-A`**.
 
+---
+
+## 2026-09-17 — HR-C swarm ops refine (cloud agent)
+
+**Lead:** APPROVE HR-B (Luke Thompson, 2026-09-17 ET).
+
+**Delivered:** POST-AUDIT section in `swarm/PHASE_BOARD.md`; `swarm/CLOUD_AGENT_PACKET.md` + HANDOFF_TEMPLATE cloud section; `docs/SESSION_SUMMARY.md` rolling policy; dual-OS trim in workflow/README + `.cursor/rules/07`, `19-automation-cycle`, `19-automation-gaps`, quarantine banners on automation commands; stamps in Docs/11 + 11b; `Docs/11c_HR_C_HANDOFF.md`; AGENTS.md + START_HERE session continuity.
+
+**Gate:** HR-C **COMPLETE** — await Lead **`APPROVE HR-C`** (unlocks HR-D dry-run).
+

@@ -1,6 +1,8 @@
 # Start automatic development cycle
 
-Run the automatic development cycle: turn **desires** (feature goals) into a task list, then execute one cycle iteration (implement programmatic → editor → test → debug → finalize → update rules) for the current task. Follow [.cursor/rules/19-automation-cycle.mdc](.cursor/rules/19-automation-cycle.mdc) for steps and loop guards.
+> **QUARANTINE — removed WAVE F.** `Start-AllAgents*`, `run_automation_cycle.py`, and agent-loop Tools are **deleted**. Do not run this command for new work. **Active driver:** [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md) + Conductor — [START_HERE.md](../../START_HERE.md). History: [docs/Automation/AGENT_COMPANY.md](../../docs/Automation/AGENT_COMPANY.md).
+
+Run the automatic development cycle (legacy reference only): turn **desires** (feature goals) into a task list, then execute one cycle iteration (implement programmatic → editor → test → debug → finalize → update rules) for the current task. Follow [.cursor/rules/19-automation-cycle.mdc](.cursor/rules/19-automation-cycle.mdc) for steps and loop guards.
 
 ## First run (start cycle)
 

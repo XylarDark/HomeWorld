@@ -2,7 +2,7 @@
 
 **Purpose:** This file is read at session start and updated at session end so you can ask "what did we do yesterday and what do we need to do today?" and get a clear answer. The agent updates it automatically when a session ends.
 
-**Current focus:** WAVE F complete — await Lead **`SIGN OFF AUDIT`** to close audit.
+**Current focus:** **Quarantine / history.** Post-audit active driver: [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md) + Conductor — [swarm/PHASE_BOARD.md](../../swarm/PHASE_BOARD.md). HR track: [Docs/11_SWARM_HARNESS_REFINE.md](../../Docs/11_SWARM_HARNESS_REFINE.md).
 
 ---
 
