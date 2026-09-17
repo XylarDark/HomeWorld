@@ -2,16 +2,16 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **PENDING** Lead **`APPROVE HS-B`** |
+| **Status** | **APPROVED / CLOSED** — Lead Luke Thompson, **`APPROVE HS-B`**, 2026-09-17 ET |
 | **Date** | 2026-09-17 (ET) |
 | **Author** | Conductor executor (HomeWorld) — `gh` Contents API only |
 | **Parent plan** | [17_HS_AUDIT_STRATEGY.md](17_HS_AUDIT_STRATEGY.md) — Lead **`APPROVE HS STRATEGY`**, 2026-09-17 ET |
 | **Prior gate** | [17a_HS_INVENTORY.md](17a_HS_INVENTORY.md) — Lead **`APPROVE HS-A`**, 2026-09-17 ET (stamp PR **#88**) |
 | **Baseline main** | tip at authoring (post-#88); strategy baseline `d59a0b2` (PL CLOSED) |
 | **Scope** | Encode post-PL swarm contracts for debt **#2, #4, #6, #8** — DESKTOP parent-only, Contents API fallback, batch digests, resume-from-handoff |
-| **Hard rules honored** | Docs/07 CLOSED; FALLBACK glide only; no combat; no `.uasset`/`.umap` commits; exactly 10 masters; no invented product phases; no merge; **do not claim `APPROVE HS-B`** |
+| **Hard rules honored** | Docs/07 CLOSED; FALLBACK glide only; no combat; no `.uasset`/`.umap` commits; exactly 10 masters; no invented product phases |
 
-**Gate:** stop for Lead **`APPROVE HS-B`** before HS-C unlocks.
+**Gate:** Lead **`APPROVE HS-B`** — **APPROVED** (Luke Thompson, 2026-09-17 ET). **HS-C UNLOCKED**.
 
 ---
 
@@ -86,3 +86,11 @@ On chat refresh or new Conductor session: read latest `Docs/handoffs/SESSION_HAN
 ---
 
 *PENDING — Docs/17b HS-B Swarm Ops. Awaiting Lead **`APPROVE HS-B`**. Do not unlock HS-C until stamped.*
+
+## Lead APPROVE HS-B
+
+Lead **`APPROVE HS-B`** (Luke Thompson, 2026-09-17 ET) — swarm ops tighten **APPROVED / CLOSED**. **HS-C** (CI as law) **UNLOCKED**.
+
+---
+
+*HS-B **APPROVED / CLOSED** — Lead **`APPROVE HS-B`**, 2026-09-17 ET.*
