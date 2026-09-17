@@ -4,8 +4,15 @@
 #include "HomeWorldCharacter.h"
 #include "GameFramework/Pawn.h"
 
-UHomeWorldMealTriggerComponent::UHomeWorldMealTriggerComponent()
+UHomeWorldMealTriggerComponent::UHomeWorldMealTriggerComponent(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
 {
+}
+
+void UHomeWorldMealTriggerComponent::PostInitProperties()
+{
+	Super::PostInitProperties();
+
 	SetBoxExtent(FVector(80.0f, 80.0f, 50.0f));
 	SetCollisionProfileName(FName("OverlapAllDynamic"));
 	SetGenerateOverlapEvents(true);

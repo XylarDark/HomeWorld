@@ -5,8 +5,15 @@
 #include "GameFramework/Pawn.h"
 #include "Engine/World.h"
 
-UHomeWorldGoToBedTriggerComponent::UHomeWorldGoToBedTriggerComponent()
+UHomeWorldGoToBedTriggerComponent::UHomeWorldGoToBedTriggerComponent(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
 {
+}
+
+void UHomeWorldGoToBedTriggerComponent::PostInitProperties()
+{
+	Super::PostInitProperties();
+
 	SetBoxExtent(FVector(80.0f, 80.0f, 50.0f));
 	SetCollisionProfileName(FName("OverlapAllDynamic"));
 	SetGenerateOverlapEvents(true);

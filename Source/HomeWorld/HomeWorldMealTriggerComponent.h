@@ -19,7 +19,9 @@ class HOMEWORLD_API UHomeWorldMealTriggerComponent : public UBoxComponent
 	GENERATED_BODY()
 
 public:
-	UHomeWorldMealTriggerComponent();
+	UHomeWorldMealTriggerComponent(const FObjectInitializer& ObjectInitializer);
+
+	virtual void PostInitProperties() override;
 
 	/** Which meal this trigger fires (Breakfast, Lunch, Dinner). Set per Blueprint instance. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Meal")
