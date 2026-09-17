@@ -2,7 +2,8 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **DRAFT** — awaiting Lead **`APPROVE Docs/11`** / **`APPROVE HR STRATEGY`** |
+| **Status** | **APPROVED** — Lead Luke Thompson, 2026-09-17 ET |
+| **Approval notes** | Lead approved Docs/11 (HR strategy); equivalent: "go with your suggestion" |
 | **Date** | 2026-09-17 |
 | **Author** | Conductor (HomeWorld) |
 | **Audit input** | [11_SWARM_HARNESS_AUDIT.md](11_SWARM_HARNESS_AUDIT.md) |
@@ -22,8 +23,9 @@ Lead directive: **refine swarm + harness technologies before any product gamepla
 
 | Track | Status |
 |-------|--------|
-| **Docs/11 audit** | DRAFT — this refine plan's input |
-| **HR-A … HR-D** | **NOT STARTED** — blocked until Lead **`APPROVE Docs/11`** |
+| **Docs/11 audit + refine** | **APPROVED** — Lead Luke Thompson, 2026-09-17 ET |
+| **HR-A** | **COMPLETE** — [11a_HR_MEASURES.md](11a_HR_MEASURES.md); awaiting Lead **`APPROVE HR-A`** |
+| **HR-B … HR-D** | **NOT STARTED** — blocked until Lead **`APPROVE HR-A`** |
 | **Product NP-A…E** | **DEFERRED** — blocked until HR-D re-grade **or** Lead explicitly parks HR and unblocks NP |
 
 ---
@@ -125,8 +127,9 @@ Demonstrate the refined harness end-to-end before unlocking product NP.
 | 4 | **`APPROVE HR-D`** | Product next-phase rewrite (replace DEFERRED NP board) **or** Lead override |
 
 ```
-HR STRATEGY status: DRAFT — awaiting Lead APPROVE Docs/11
-Do NOT start HR-A until Lead types approval.
+HR STRATEGY status: APPROVED — Lead Luke Thompson, 2026-09-17 ET
+HR-A status: COMPLETE — awaiting Lead APPROVE HR-A (Docs/11a_HR_MEASURES.md)
+Do NOT start HR-B until Lead approves HR-A.
 ```
 
 ---

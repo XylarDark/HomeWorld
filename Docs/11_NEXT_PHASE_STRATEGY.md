@@ -17,7 +17,7 @@ Lead redirected execution **before** product gameplay phases. The NP-A…E board
 1. [11_SWARM_HARNESS_AUDIT.md](11_SWARM_HARNESS_AUDIT.md) — performance scorecard  
 2. [11_SWARM_HARNESS_REFINE.md](11_SWARM_HARNESS_REFINE.md) — HR-A…D refine plan  
 
-**Gate:** Lead **`APPROVE Docs/11`** / **`APPROVE HR STRATEGY`** applies to the swarm/harness docs above.
+**Gate:** Lead **`APPROVE Docs/11`** / **`APPROVE HR STRATEGY`** — **GRANTED** (Luke Thompson, 2026-09-17 ET). HR-A complete — await **`APPROVE HR-A`**.
 
 Product NP-A…E may be rewritten after **`APPROVE HR-D`** or when Lead explicitly unblocks product work.
 
