@@ -1,9 +1,9 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **HS-A** — Inventory & debt ledger (**IN PROGRESS**)
+**Current phase:** **HS-A** — Inventory & debt ledger (**IN PROGRESS** — evidence [Docs/17a_HS_INVENTORY.md](../Docs/17a_HS_INVENTORY.md) on branch `cursor/docs-17a-hs-inventory`; **PENDING** Lead **`APPROVE HS-A`**)
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **Conductor** (HS-A)  
-**Blocked by:** none for HS-A. Next gate Lead **`APPROVE HS-A`**. Branch protection remains **DEFERRED** (HR3-C → HS-C).
+**Blocked by:** none for HS-A. Next gate Lead **`APPROVE HS-A`** (do not unlock HS-B until stamped). Branch protection remains **DEFERRED** (HR3-C → HS-C).
 
 
 | Phase | Name | Owners | Status | Gate file | Handoffs |
@@ -74,6 +74,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 
 | ID | Phase | Host | Owner | Write path | Due artifact |
 |---|---|---|---|---|---|
+| HS-A-inventory | HS-A | CLOUD | CND | Docs/ | [17a_HS_INVENTORY.md](../Docs/17a_HS_INVENTORY.md) — **PENDING** Lead **`APPROVE HS-A`** (evidence PR — not APPROVED) |
 | PL-A-character | PL-A | DESKTOP+CLOUD | CND | Docs/handoffs/ | [PL_A_CHARACTER.md](../Docs/handoffs/PL_A_CHARACTER.md) — **APPROVED / CLOSED** — Lead **`APPROVE PL-A`**, 2026-09-17 ET |
 | PL-B-pie | PL-B | Lead | Lead | Docs/handoffs/ | [PL_B_PIE.md](../Docs/handoffs/PL_B_PIE.md) — **WAIVED / CLOSED** — Lead **`WAIVE PL-B`**, 2026-09-17 ET |
 | PL-D-presentation | PL-D | DESKTOP+Lead | CND+Lead | Docs/handoffs/ | [PL_D_PRESENTATION.md](../Docs/handoffs/PL_D_PRESENTATION.md) — **APPROVED / CLOSED** — Lead **`APPROVE PL-D`**, 2026-09-17 ET; PL track complete |
