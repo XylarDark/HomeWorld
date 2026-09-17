@@ -3,8 +3,8 @@
 | Field | Value |
 |-------|-------|
 | **Phase** | HR3-A |
-| **Status** | **EVIDENCE FILED — AWAITING APPROVE HR3-A** (not COMPLETE until Lead stamp) |
-| **Lead gate** | **`APPROVE HR3-A`** — after evidence review |
+| **Status** | **APPROVED** — Lead Luke Thompson, **`APPROVE HR3-A`**, 2026-09-17 ET |
+| **Lead gate** | **`APPROVE HR3-A`** — **APPROVED**; unlocks **HR3-B** |
 | **Spec** | [15_HR3_A_PLUS.md](../15_HR3_A_PLUS.md) § HR3-A |
 | **Date** | 2026-09-17 ET |
 
@@ -175,6 +175,12 @@ Use this checklist before filing DESKTOP evidence or running PIE/MCP scripts. **
 
 ## Gate
 
-Lead **`APPROVE HR3-A`** — unlocks HR3-A implementation PR(s) and HR3-B planning. HR3-A handoff is **evidence complete**; status is **not COMPLETE** until Lead stamp.
+Lead **`APPROVE HR3-A`** — **APPROVED** (Luke Thompson, 2026-09-17 ET). HR3-A **COMPLETE**. **HR3-B UNLOCKED / IN PROGRESS** — UE preflight fails loud ([15_HR3_A_PLUS.md](../15_HR3_A_PLUS.md) § HR3-B). **VP-B remains PARKED** pending HR3.
 
-**Next after stamp:** HR3-B (UE preflight fails loud) — [15_HR3_A_PLUS.md](../15_HR3_A_PLUS.md) § HR3-B. **VP-B remains PARKED** pending HR3.
+## Prior stamp
+
+Lead **`APPROVE HR3 STRATEGY`** (Luke Thompson, 2026-09-17 ET) — HR3 strategy **APPROVED**; HR3-A **UNLOCKED**. Evidence merge `27a1af4` (PR #58).
+
+## Stamp
+
+Lead **`APPROVE HR3-A`** (Luke Thompson, 2026-09-17 ET) — HR3-A **APPROVED / COMPLETE** (Conductor parent→DESKTOP lane proven; Task executors FAIL). **HR3-B UNLOCKED / IN PROGRESS** — Lead **`APPROVE HR3-B`** before implementation PR. **VP-B still PARKED**.
