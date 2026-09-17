@@ -13,6 +13,7 @@
 class UHomeWorldSaveGame;
 class UWorld;
 
+UCLASS(BlueprintType)
 class HOMEWORLD_API UHomeWorldSaveGameSubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()

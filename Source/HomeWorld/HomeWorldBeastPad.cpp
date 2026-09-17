@@ -10,7 +10,6 @@ AHomeWorldBeastPad::AHomeWorldBeastPad()
 	SetRootComponent(Root);
 
 	TameComponent = CreateDefaultSubobject<UHomeWorldBeastTameComponent>(TEXT("BeastTame"));
-	TameComponent->SetupAttachment(Root);
 
 	Tags.AddUnique(FName(TEXT("BeastPad")));
 	Tags.AddUnique(FName(TEXT("SM_BeastPad_01")));
