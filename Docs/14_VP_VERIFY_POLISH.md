@@ -15,9 +15,9 @@
 
 Lead **`APPROVE VP STRATEGY`** — **APPROVED** (Luke Thompson, 2026-09-17 ET).
 
-**Next gate:** **`APPROVE VP-B`** — VP-B smoke + ABP skeleton implementation (after VP-A stamp).
+**Next gate:** **`APPROVE HR3 STRATEGY`** — HR3 lands before VP-B resume ([15_HR3_A_PLUS.md](15_HR3_A_PLUS.md)).
 
-**VP-A APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET (hard-fail accepted; re-verify after VP-B). **VP-B UNLOCKED**. VP-C/D remain **LOCKED**.
+**VP-A APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET (hard-fail accepted; re-verify after VP-B). **VP-B PARKED** pending HR3 (do not mark VP complete). VP-C/D remain **LOCKED**.
 
 ---
 
@@ -49,7 +49,7 @@ Product NP (NP-A…E) and Harness Refine 2 (HR2-A…C) are **CLOSED**. Senior po
 | **Harness HR2 (Docs/13)** | **CLOSED** |
 | **Docs/14 / VP strategy** | **APPROVED** — Lead **`APPROVE VP STRATEGY`**, 2026-09-17 ET |
 | **VP-A** | **APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET (verb PIE hard-fail accepted; PA-03 → VP-B) |
-| **VP-B** | **UNLOCKED / IN PROGRESS** |
+| **VP-B** | **PARKED** — pending HR3 (do not mark VP complete); was unlocked mid-fix |
 | **VP-C** | **LOCKED** |
 | **VP-D** | **LOCKED** |
 
