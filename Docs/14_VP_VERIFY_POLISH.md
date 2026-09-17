@@ -15,7 +15,7 @@
 
 Lead **`APPROVE VP STRATEGY`** — **APPROVED** (Luke Thompson, 2026-09-17 ET).
 
-**Next gate:** **`APPROVE HR3 STRATEGY`** — HR3 lands before VP-B resume ([15_HR3_A_PLUS.md](15_HR3_A_PLUS.md)).
+**Next gate (VP):** Resume **VP-B** after HR3 track progress — HR3 strategy **APPROVED** ([15_HR3_A_PLUS.md](15_HR3_A_PLUS.md)); **VP-B PARKED**.
 
 **VP-A APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET (hard-fail accepted; re-verify after VP-B). **VP-B PARKED** pending HR3 (do not mark VP complete). VP-C/D remain **LOCKED**.
 
