@@ -413,6 +413,14 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 - D19-B: `hw.Gather.Seed` console cheat → `RES_SEED` (mirrors Ore/Flowers).
 - D19-C: `evidence-grep.js --success-path` + tests green (`npm run evidence:grep:test`).
 
+### 2026-09-17 — Docs/19 CLOSED (Lead APPROVE D19)
+
+- Lead **`APPROVE D19`** 2026-09-17 ET — D19-A/B/C after DESKTOP prove (PR #107).
+- D19-A: `GP_Gather_*` spawn; `GATHER: RES_WOOD +1` / `harvest ok`; `HomeWorldResourcePile` non-Abstract.
+- D19-B: `hw.Gather.Seed` → `GATHER: RES_SEED +N`.
+- D19-C: `evidence-grep --success-path` PASS; Safe-Build ASCII/single-quote fixes on branch.
+- Docs: [19_THIN_PLAYABILITY.md](../Docs/19_THIN_PLAYABILITY.md) **CLOSED / COMPLETE**; [PHASE_BOARD.md](../swarm/PHASE_BOARD.md) → no active product phase.
+
 ---
 
 *Maintained by Conductor; HR-C established this rolling policy.*
