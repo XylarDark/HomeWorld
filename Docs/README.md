@@ -23,8 +23,10 @@ These are **intentionally separate**. On case-insensitive filesystems (macOS/Win
 - **WAVE E upgrade pass:** [08e_UPGRADE_PASS.md](08e_UPGRADE_PASS.md) — COMPLETE (PR #15 merged)
 - **WAVE F audit sign-off:** [08_AUDIT_SIGN_OFF.md](08_AUDIT_SIGN_OFF.md) — **SIGNED OFF** (PR #16 merged; Lead Luke Thompson, 2026-09-16 ET)
 - **FALLBACK glide + portal runbook:** [09_FALLBACK_GLIDE.md](09_FALLBACK_GLIDE.md) — CRUMB scripted glide V2 + dual shrine portal
-- **Post-audit wrap (CLOSED):** [10_POST_AUDIT_WRAP.md](10_POST_AUDIT_WRAP.md) — master graphs + NightMix; Lead next-phase audit
-- **Next-phase strategy (DRAFT):** [11_NEXT_PHASE_STRATEGY.md](11_NEXT_PHASE_STRATEGY.md) — **NEXT** — NP-A…E Lead gates; await **`APPROVE Docs/11`**
+- **Post-audit wrap (CLOSED):** [10_POST_AUDIT_WRAP.md](10_POST_AUDIT_WRAP.md) — master graphs + NightMix
+- **Swarm & harness audit (DRAFT):** [11_SWARM_HARNESS_AUDIT.md](11_SWARM_HARNESS_AUDIT.md) — **NEXT** — P0–P7 + WAVE A–F + Docs/05–10 scorecard; await **`APPROVE Docs/11`**
+- **Swarm & harness refine (DRAFT):** [11_SWARM_HARNESS_REFINE.md](11_SWARM_HARNESS_REFINE.md) — HR-A…D Lead gates (before product next-phase)
+- **Product next-phase (DEFERRED):** [11_NEXT_PHASE_STRATEGY.md](11_NEXT_PHASE_STRATEGY.md) — NP-A…E parked until HR refine signed off
 - **Start swarm:** [../START_HERE.md](../START_HERE.md)
 - **Master prompt:** [../HOMEWORLD_MASTER_PROMPT.md](../HOMEWORLD_MASTER_PROMPT.md)
 - **Game canon brief:** [../HOMEWORLD_MVP_SWARM_BRIEF.md](../HOMEWORLD_MVP_SWARM_BRIEF.md)
