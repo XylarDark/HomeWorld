@@ -14,9 +14,9 @@
 
 Lead **`APPROVE PL STRATEGY`** — **APPROVED** (Luke Thompson, 2026-09-17 ET).
 
-**Next gate:** Lead **`APPROVE PL-A`** before PL-B.
+**Next gate:** Lead **`APPROVE PL-B`** before PL-C.
 
-**PL-A OPEN** — character realization. PL-B/C/D **LOCKED**.
+**PL-A CLOSED** — Lead **`APPROVE PL-A`**, 2026-09-17 ET. **PL-B OPEN**. PL-C/D **LOCKED**.
 
 ---
 
@@ -47,8 +47,8 @@ NP shipped SYS/GP verbs; VP polished runbooks and thin UX around an **Engine `De
 | HR2 / HR3 | **CLOSED** (HR3-C **DEFERRED**) |
 | Docs/14 / VP | **CLOSED / COMPLETE** |
 | **Docs/16 / PL strategy** | **APPROVED** — Lead **`APPROVE PL STRATEGY`**, 2026-09-17 ET |
-| **PL-A** | **OPEN / IN PROGRESS** |
-| **PL-B** | **LOCKED** |
+| **PL-A** | **APPROVED / CLOSED** — Lead **`APPROVE PL-A`**, 2026-09-17 ET |
+| **PL-B** | **OPEN / IN PROGRESS** |
 | **PL-C** | **LOCKED** |
 | **PL-D** | **LOCKED** |
 
@@ -79,6 +79,8 @@ Naming: **PL-A … PL-D** (Playable Loop). Do **not** reuse NP-* / HR-* / VP-* i
 
 
 **Lead substitute (2026-09-17 ET):** UE 5.7 TemplateResources **High Characters Mannequins** → DESKTOP `Content/Characters/Mannequins` (local). Config: `/Game/Characters/Mannequins/Meshes/SKM_Manny_Simple` + `/Game/Characters/Mannequins/Anims/Unarmed/ABP_Unarmed`. Legacy `/Game/Man/...` deferred.
+
+**Status:** **APPROVED / CLOSED** — Lead **`APPROVE PL-A`**, 2026-09-17 ET.
 
 **Out of scope:** Full AnimGraph automation spike; Milady; combat idle sets.
 
