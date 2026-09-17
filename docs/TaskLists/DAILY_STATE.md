@@ -2,27 +2,27 @@
 
 **Purpose:** This file is read at session start and updated at session end so you can ask "what did we do yesterday and what do we need to do today?" and get a clear answer. The agent updates it automatically when a session ends.
 
-**Current focus:** Audit WAVE E complete — await Lead `APPROVE WAVE E`; then WAVE F archive/delete per 08d §8.
+**Current focus:** WAVE F complete — await Lead **`SIGN OFF AUDIT`** to close audit.
 
 ---
 
 ## Yesterday (last session)
 
-- WAVE E upgrade pass: `Docs/08e_UPGRADE_PASS.md`; bootstrap → VS_MVP + Docs/04 import; pie_test_runner soft checks; NightMix C++ hook; legacy map/PCG quarantine banners.
-- Helpers: `wire_nightmix_mpc_note.py`, `create_master_materials_stub.py`.
+- WAVE F archive: removed 492 quarantined paths (DemoMap/Homestead, PCG/Mass, sample packs, agent-loop scripts/Tools).
+- Added `Docs/08_AUDIT_SIGN_OFF.md`; stubs for dual-canon docs; MainMenu startup map; bootstrap VS_MVP-only.
 
 ---
 
 ## Today
 
-- Lead review WAVE E PR; comment **`APPROVE WAVE E`** to unlock WAVE F.
-- Run `.\Tools\Safe-Build.ps1` on DESKTOP-21CT3H0 to verify C++ NightMix changes.
+- Lead review WAVE F PR; run Safe-Build + Editor boot on DESKTOP-21CT3H0.
+- Lead comment **`SIGN OFF AUDIT`** to close audit.
 
 ---
 
 ## Tomorrow
 
-- WAVE F (after gate): archive/delete quarantined DemoMap/PCG/Mass/scripts per 08d §8; `Docs/08_AUDIT_SIGN_OFF.md`.
+- Post-audit work per Lead priority: VS_MVP dress, FALLBACK glide BP, master material graphs.
 
 ---
 

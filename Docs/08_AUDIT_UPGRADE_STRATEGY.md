@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | PROPOSED (Lead-gated) |
+| **Status** | WAVE F COMPLETE — awaiting Lead **`SIGN OFF AUDIT`** |
 | **Date** | 2026-09-17 |
 | **Author** | Conductor (HomeWorld) |
 
@@ -64,6 +64,7 @@ Upgrade C++/BP/Python that touch the signed vertical slice first; defer off-slic
 
 Kill dead bat loops, stale agent runners, docs that fight `Docs/`.
 
+- **Deliverable:** [08_AUDIT_SIGN_OFF.md](08_AUDIT_SIGN_OFF.md) — 492 tracked paths removed; stubs for dual-canon docs
 - **Gate:** Lead **SIGN OFF AUDIT** (`Docs/08_AUDIT_SIGN_OFF.md`)
 
 ## Hard rules

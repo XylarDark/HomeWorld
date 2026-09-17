@@ -2,14 +2,14 @@
 
 | Field | Value |
 |-------|-------|
-| **Board status** | WAVE E — UPGRADE PASS COMPLETE (awaiting Lead gate) |
+| **Board status** | WAVE E — UPGRADE PASS COMPLETE (PR #15 merged — APPROVED) |
 | **Date** | 2026-09-17 |
 | **Author** | Audit executor (HomeWorld) |
 | **Parent plan** | [08_AUDIT_UPGRADE_STRATEGY.md](08_AUDIT_UPGRADE_STRATEGY.md) |
 | **Prior waves** | [08d_CONTENT_CANON.md](08d_CONTENT_CANON.md) (PR #14 merged — WAVE D APPROVED) |
 | **Hard rules honored** | Docs/07 CLOSED not reopened; FALLBACK FLIGHT armed; no WAVE F deletes; no new off-slice features |
 
-**Gate:** stop for Lead **`APPROVE WAVE E`**
+**Gate:** Lead **`APPROVE WAVE E`** — **GRANTED** (PR #15 merged). WAVE F executed per [08_AUDIT_SIGN_OFF.md](08_AUDIT_SIGN_OFF.md).
 
 ---
 
