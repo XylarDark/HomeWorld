@@ -1,3 +1,8 @@
+## 2026-09-17 ET — Docs/17 HS Audit strategy DRAFT
+
+Lead asked for post–Docs/08 harness/swarm audit (same shape as Docs/08 WAVEs). Drafted Docs/17 HS-A…F; awaiting **`APPROVE HS STRATEGY`**.
+
+
 # Session summary (rolling)
 
 ## 2026-09-17 ET — APPROVE PL-D / Docs/16 PL track CLOSED
