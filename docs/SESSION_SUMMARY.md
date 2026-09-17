@@ -1,3 +1,8 @@
+## 2026-09-17 ET — APPROVE HS-D / HS-E unlocked
+
+Lead **`APPROVE HS-D`**. Evidence automation closed ([Docs/17d](../Docs/17d_HS_EVIDENCE.md)). **HS-E** character/bootstrap canon **IN PROGRESS**.
+
+
 ## 2026-09-17 ET — ACCEPT HS-C DEFER / HS-D unlocked
 
 Lead **`ACCEPT HS-C DEFER`**. Branch protection permanently deferred for HS (risk accepted). **HS-D** evidence & re-verify automation **IN PROGRESS**.
