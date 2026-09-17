@@ -49,6 +49,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Interaction", meta = (DisplayName = "Try Nurture In Front"))
 	bool TryNurtureInFront();
 
+	/** PL-C: Trace forward Stored prop — deposit inventory→stored or withdraw. Day/body. */
+	UFUNCTION(BlueprintCallable, Category = "Interaction", meta = (DisplayName = "Try Store Transfer In Front"))
+	bool TryStoreTransferInFront();
+
 	/** Trace forward and harvest the first resource pile hit; adds RES_* +1 to six-slot inventory. Called from GA_Interact / UHomeWorldInteractAbility. */
 	UFUNCTION(BlueprintCallable, Category = "Interaction", meta = (DisplayName = "Try Harvest In Front"))
 	bool TryHarvestInFront();
