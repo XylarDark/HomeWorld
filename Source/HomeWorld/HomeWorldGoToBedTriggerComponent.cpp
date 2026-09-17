@@ -8,6 +8,12 @@
 UHomeWorldGoToBedTriggerComponent::UHomeWorldGoToBedTriggerComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+}
+
+void UHomeWorldGoToBedTriggerComponent::PostInitProperties()
+{
+	Super::PostInitProperties();
+
 	SetBoxExtent(FVector(80.0f, 80.0f, 50.0f));
 	SetGenerateOverlapEvents(true);
 }
