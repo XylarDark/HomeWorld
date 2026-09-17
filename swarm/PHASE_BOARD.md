@@ -1,9 +1,9 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **VP-B** (Smoke & character risk) — **UNLOCKED / IN PROGRESS**  
+**Current phase:** **HR3** (Harness Refine 3 — A+ strategy) — **DRAFT / AWAIT APPROVE HR3 STRATEGY**  
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
-**Active owners:** **CND** (Conductor) + cloud/Windows agent (VP-B implementation)  
-**Blocked by:** Lead **`APPROVE VP-B`** before VP-B implementation PR — [Docs/14_VP_VERIFY_POLISH.md](../Docs/14_VP_VERIFY_POLISH.md) § VP-B (PA-02 NightMix smoke, PA-03 ABP skeleton)
+**Active owners:** **CND** (Conductor) + Lead gate  
+**Blocked by:** Lead **`APPROVE HR3 STRATEGY`** — [Docs/15_HR3_A_PLUS.md](../Docs/15_HR3_A_PLUS.md). VP-A **APPROVED** (hard-fail ABP). **VP-B PARKED** pending HR3 (was unlocked mid-fix).
 
 | Phase | Name | Owners | Status | Gate file | Handoffs |
 |---|---|---|---|---|---|
@@ -22,7 +22,7 @@ Status values: `LOCKED` `OPEN` `IN PROGRESS` `GATE FAILED` `CLOSED` `GATE READY`
 
 ## POST-AUDIT (Docs/05–10 + HR track)
 
-MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** **Product next-phase (NP-A…E) is CLOSED / COMPLETE.** **HR2 track CLOSED / COMPLETE** — HR2-A/B/C all **APPROVED**; Lead **`APPROVE HR2-C`**, 2026-09-17 ET. **VP strategy APPROVED** — Lead **`APPROVE VP STRATEGY`**, 2026-09-17 ET. **VP-A APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET (hard-fail accepted). Active: **VP-B UNLOCKED / IN PROGRESS** (ABP skeleton + NightMix smoke).
+MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** **Product next-phase (NP-A…E) is CLOSED / COMPLETE.** **HR2 track CLOSED / COMPLETE** — HR2-A/B/C all **APPROVED**; Lead **`APPROVE HR2-C`**, 2026-09-17 ET. **VP strategy APPROVED** — Lead **`APPROVE VP STRATEGY`**, 2026-09-17 ET. **VP-A APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET (hard-fail accepted). **VP-B PARKED** pending HR3. Active: **HR3 strategy DRAFT** — await Lead **`APPROVE HR3 STRATEGY`** ([Docs/15](../Docs/15_HR3_A_PLUS.md)).
 
 | Track | Doc / phase | Status | Gate / handoff |
 |---|---|---|---|
@@ -41,11 +41,16 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **HR2 track** | Harness Refine 2 | **CLOSED / COMPLETE** | [13_HR2_HARNESS_REFINE.md](../Docs/13_HR2_HARNESS_REFINE.md) — no HR2-D |
 | **Docs/14** | Verify & Polish strategy | **APPROVED** | [14_VP_VERIFY_POLISH.md](../Docs/14_VP_VERIFY_POLISH.md) — Lead **`APPROVE VP STRATEGY`**, 2026-09-17 ET |
 | **VP-A** | PIE evidence | **APPROVED** | [handoffs/VP_A_PIE.md](../Docs/handoffs/VP_A_PIE.md) — Lead **`APPROVE VP-A`**, 2026-09-17 ET; hard-fail accepted |
-| **VP-B** | Smoke & character risk | **UNLOCKED / IN PROGRESS** | handoffs/VP_B_SMOKE_CHARACTER.md (pending) — PA-02 NightMix, PA-03 ABP skeleton |
+| **VP-B** | Smoke & character risk | **PARKED** | Pending HR3 — was unlocked mid-fix; resume after HR3 strategy (+ HR3-B preflight recommended) |
+| **Docs/15** | Harness Refine 3 (A+) | **DRAFT** | [15_HR3_A_PLUS.md](../Docs/15_HR3_A_PLUS.md) — await Lead **`APPROVE HR3 STRATEGY`** |
+| **HR3-A** | Windows exec reliability | **LOCKED** | handoffs/HR3_A_WINDOWS_EXEC.md (pending) |
+| **HR3-B** | UE preflight fails loud | **LOCKED** | handoffs/HR3_B_UE_PREFLIGHT.md (pending) |
+| **HR3-C** | Branch protection real | **LOCKED** | handoffs/HR3_C_BRANCH_PROTECTION.md (pending) |
+| **HR3-D** | DESKTOP evidence + re-verify | **LOCKED** | handoffs/HR3_D_EVIDENCE_LANE.md (pending) |
 | **VP-C** | Playability polish | **LOCKED** | handoffs/VP_C_POLISH.md (pending) |
 | **VP-D** | Bootstrap & branch protection | **LOCKED** | handoffs/VP_D_BOOTSTRAP_CI.md (pending) |
 
-**Current track:** VP-A **APPROVED** — **VP-B UNLOCKED / IN PROGRESS** (await Lead **`APPROVE VP-B`** before implementation PR). VP-C/D **LOCKED**. Product NP **CLOSED**. HR2 **CLOSED / COMPLETE**.
+**Current track:** **HR3 strategy DRAFT** (await Lead **`APPROVE HR3 STRATEGY`**). VP-A **APPROVED**; **VP-B PARKED** pending HR3; VP-C/D **LOCKED**. Product NP **CLOSED**. HR2 **CLOSED / COMPLETE**.
 
 ---
 
@@ -53,7 +58,8 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 
 | ID | Phase | Owner | Write path | Due artifact |
 |---|---|---|---|---|
-| VP-B-impl | VP-B | CND / GP | Docs/handoffs/ | ABP skeleton (PA-03) + NightMix smoke (PA-02) — Lead **`APPROVE VP-B`** before implementation PR |
+| HR3-strategy | HR3 | Lead | Docs/15_HR3_A_PLUS.md | Lead **`APPROVE HR3 STRATEGY`** → unlock HR3-A |
+| VP-B-resume | VP-B | DESKTOP | Docs/handoffs/ | **PARKED** — resume after HR3 (ABP skeleton + NightMix smoke) |
 
 ## Open defects
 

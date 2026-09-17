@@ -42,7 +42,8 @@ These are **intentionally separate**. On case-insensitive filesystems (macOS/Win
 - **HR2-A doctor signal (APPROVED):** [13a_HR2_A_HANDOFF.md](13a_HR2_A_HANDOFF.md) — Lead **`APPROVE HR2-A`**, 2026-09-17 ET
 - **HR2-B cold-clone submodule (APPROVED):** [13b_HR2_B_COLD_CLONE.md](13b_HR2_B_COLD_CLONE.md) — Lead **`APPROVE HR2-B`**, 2026-09-17 ET
 - **HR2-C C++ CI gate (APPROVED — HR2 track CLOSED):** [13c_HR2_C_CI_GATE.md](13c_HR2_C_CI_GATE.md) — Lead **`APPROVE HR2-C`**, 2026-09-17 ET
-- **Verify & Polish strategy (APPROVED — VP-A IN PROGRESS):** [14_VP_VERIFY_POLISH.md](14_VP_VERIFY_POLISH.md) — Lead **`APPROVE VP STRATEGY`**, 2026-09-17 ET
+- **Verify & Polish strategy (APPROVED — VP-B PARKED):** [14_VP_VERIFY_POLISH.md](14_VP_VERIFY_POLISH.md) — Lead **`APPROVE VP STRATEGY`**, 2026-09-17 ET; VP-A **APPROVED**; VP-B **PARKED** pending HR3
+- **Harness Refine 3 — A+ strategy (DRAFT):** [15_HR3_A_PLUS.md](15_HR3_A_PLUS.md) — await Lead **`APPROVE HR3 STRATEGY`**, 2026-09-17 ET
 - **Start swarm:** [../START_HERE.md](../START_HERE.md)
 - **Master prompt:** [../HOMEWORLD_MASTER_PROMPT.md](../HOMEWORLD_MASTER_PROMPT.md)
 - **Game canon brief:** [../HOMEWORLD_MVP_SWARM_BRIEF.md](../HOMEWORLD_MVP_SWARM_BRIEF.md)

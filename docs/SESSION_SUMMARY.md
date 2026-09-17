@@ -20,12 +20,18 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 ## Rolling log (newest first)
 
+### 2026-09-17 — HR3 A+ strategy (docs-only DRAFT)
+
+- Delivered [Docs/15_HR3_A_PLUS.md](../Docs/15_HR3_A_PLUS.md) — **DRAFT**; phases HR3-A (Windows exec), HR3-B (UE preflight), HR3-C (branch protection), HR3-D (DESKTOP evidence + re-verify).
+- [PHASE_BOARD.md](../swarm/PHASE_BOARD.md): current track **HR3 draft**; **VP-B PARKED** pending HR3; VP-A **APPROVED** (hard-fail ABP).
+- Harness target **~B → A+**; swarm **~B+ → A+**. **No HR3-A…D implementation** in strategy PR.
+- **Next:** Lead **`APPROVE HR3 STRATEGY`** → unlock HR3-A. Resume VP-B after HR3 (+ HR3-B preflight recommended).
+
 ### 2026-09-17 — VP-A APPROVED (APPROVE VP-A stamp)
 
-- Lead **`APPROVE VP-A`** (Luke Thompson, 2026-09-17 ET) — VP-A **APPROVED**; **VP-B UNLOCKED / IN PROGRESS**.
+- Lead **`APPROVE VP-A`** (Luke Thompson, 2026-09-17 ET) — VP-A **APPROVED**; VP-B was unlocked then **PARKED** for HR3.
 - Evidence PR #54: verb PIE **hard-fail accepted** (PA-03 `ABP_HomeWorldCharacter` skeleton); re-verify greps after VP-B.
 - Docs stamped: [handoffs/VP_A_PIE.md](../Docs/handoffs/VP_A_PIE.md), [14_VP_VERIFY_POLISH.md](../Docs/14_VP_VERIFY_POLISH.md), [PHASE_BOARD.md](../swarm/PHASE_BOARD.md).
-- **Next:** VP-B implementation (ABP skeleton + NightMix smoke) — Lead **`APPROVE VP-B`** before implementation PR. VP-C/D **LOCKED**.
 
 ### 2026-09-17 — VP-A PIE evidence filed (DESKTOP hard-fail)
 
