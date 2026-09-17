@@ -41,6 +41,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Interaction", meta = (DisplayName = "Try Tame Beast In Front"))
 	bool TryTameBeastInFront();
 
+	/** Trace forward and heal spirit wisp (V6). Night/spirit only. Used by GA_Heal and GA_Interact. */
+	UFUNCTION(BlueprintCallable, Category = "Interaction", meta = (DisplayName = "Try Heal Spirit In Front"))
+	bool TryHealSpiritInFront();
+
+	/** Trace forward and nurture homestead target (V7). Night/spirit only. */
+	UFUNCTION(BlueprintCallable, Category = "Interaction", meta = (DisplayName = "Try Nurture In Front"))
+	bool TryNurtureInFront();
+
 	/** Trace forward and harvest the first resource pile hit; adds RES_* +1 to six-slot inventory. Called from GA_Interact / UHomeWorldInteractAbility. */
 	UFUNCTION(BlueprintCallable, Category = "Interaction", meta = (DisplayName = "Try Harvest In Front"))
 	bool TryHarvestInFront();

@@ -20,6 +20,13 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 ## Rolling log (newest first)
 
+### 2026-09-17 — NP-E SYS V6–V8 + APPROVE NP-D stamp
+
+- Lead **`APPROVE NP-D`** (Luke Thompson, 2026-09-17 ET) — NP-D **APPROVED**; NP-E unlocked and **COMPLETE**.
+- NP-E: heal ×3 (`HEAL:`), nurture ×2 (`NURTURE:`), dawn persist (`DAWN:`) — [12e_NP_E_SYS_V6_V8.md](../Docs/12e_NP_E_SYS_V6_V8.md).
+- Residual: `AHomeWorldBeastPad` C++ actor replaces unreliable Editor `add_component_by_class`.
+- **Next:** Lead **`APPROVE NP-E`** → product NP track complete. Windows **Safe-Build** required after merge.
+
 ### 2026-09-17 — NP-D SYS V3–V4 + APPROVE NP-C stamp
 
 - Lead **`APPROVE NP-C`** (Luke Thompson, 2026-09-17 ET) — NP-C **APPROVED**; NP-D unlocked.

@@ -206,6 +206,15 @@ bool UHomeWorldBeastTameComponent::TryOfferFood(AHomeWorldCharacter* Character)
 	return true;
 }
 
+void UHomeWorldBeastTameComponent::ApplyPersistedState(EHomeWorldBeastTameState NewState)
+{
+	ResetBondProgress();
+	if (TameState != NewState)
+	{
+		SetTameState(NewState);
+	}
+}
+
 bool UHomeWorldBeastTameComponent::TryPromoteToHelper(AHomeWorldCharacter* Character)
 {
 	if (!Character || TameState != EHomeWorldBeastTameState::Tamed)

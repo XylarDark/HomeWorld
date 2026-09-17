@@ -134,6 +134,45 @@ bool UHomeWorldInventorySubsystem::HasTameFood(int32 Amount) const
 		|| GetResource(HomeWorldInventory::RES_HERB) >= Amount;
 }
 
+bool UHomeWorldInventorySubsystem::HasHealResource(int32 Amount) const
+{
+	return GetResource(HomeWorldInventory::RES_HERB) >= Amount
+		|| GetResource(HomeWorldInventory::RES_SEED) >= Amount;
+}
+
+FName UHomeWorldInventorySubsystem::SpendHealResource()
+{
+	if (GetResource(HomeWorldInventory::RES_HERB) >= 1)
+	{
+		if (SpendResource(HomeWorldInventory::RES_HERB, 1))
+		{
+			return HomeWorldInventory::RES_HERB;
+		}
+	}
+	if (GetResource(HomeWorldInventory::RES_SEED) >= 1)
+	{
+		if (SpendResource(HomeWorldInventory::RES_SEED, 1))
+		{
+			return HomeWorldInventory::RES_SEED;
+		}
+	}
+	return NAME_None;
+}
+
+void UHomeWorldInventorySubsystem::CopySlotsTo(TArray<FHomeWorldInventorySlot>& OutSlots) const
+{
+	OutSlots = Slots;
+}
+
+void UHomeWorldInventorySubsystem::RestoreSlotsFrom(const TArray<FHomeWorldInventorySlot>& InSlots)
+{
+	EnsureSlotArray();
+	if (InSlots.Num() == HomeWorldInventory::SlotCount)
+	{
+		Slots = InSlots;
+	}
+}
+
 FName UHomeWorldInventorySubsystem::SpendTameFood()
 {
 	if (GetResource(HomeWorldInventory::RES_BERRY) >= 1)

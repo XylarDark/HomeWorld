@@ -42,6 +42,14 @@ void UHomeWorldInteractAbility::ActivateAbility(const FGameplayAbilitySpecHandle
 	}
 	if (!bHandled)
 	{
+		bHandled = Character->TryHealSpiritInFront();
+	}
+	if (!bHandled)
+	{
+		bHandled = Character->TryNurtureInFront();
+	}
+	if (!bHandled)
+	{
 		bHandled = Character->TryHarvestInFront();
 	}
 	EndAbility(Handle, ActorInfo, ActivationInfo, false, !bHandled);

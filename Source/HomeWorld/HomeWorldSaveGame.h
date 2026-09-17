@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/SaveGame.h"
+#include "HomeWorldInventoryTypes.h"
 #include "HomeWorldSaveGame.generated.h"
 
 /**
@@ -39,4 +40,25 @@ public:
 	/** Love/bond level (0–N) earned this day; scales night bonuses. Restored to PlayerState on hw.Load. See DAY_LOVE_OR_BOND.md. */
 	UPROPERTY(VisibleAnywhere, Category = "Save")
 	int32 SavedLoveLevel = 0;
+
+	/** NP-E V8 — six-slot inventory snapshot at dawn. */
+	UPROPERTY(VisibleAnywhere, Category = "Save|NP-E")
+	TArray<FHomeWorldInventorySlot> SavedInventorySlots;
+
+	/** NP-E V8 — beast tame state (EHomeWorldBeastTameState as uint8). */
+	UPROPERTY(VisibleAnywhere, Category = "Save|NP-E")
+	uint8 SavedBeastTameState = 0;
+
+	/** NP-E V8 — spirit heal ids (Spirit_A/B/C) parallel to SavedSpiritHealStates. */
+	UPROPERTY(VisibleAnywhere, Category = "Save|NP-E")
+	TArray<FName> SavedSpiritHealIds;
+
+	UPROPERTY(VisibleAnywhere, Category = "Save|NP-E")
+	TArray<uint8> SavedSpiritHealStates;
+
+	UPROPERTY(VisibleAnywhere, Category = "Save|NP-E")
+	bool bSavedN1Nurtured = false;
+
+	UPROPERTY(VisibleAnywhere, Category = "Save|NP-E")
+	bool bSavedN2Nurtured = false;
 };

@@ -36,7 +36,8 @@ These are **intentionally separate**. On case-insensitive filesystems (macOS/Win
 - **NP-A inventory / gap map (APPROVED):** [12a_NP_A_INVENTORY.md](12a_NP_A_INVENTORY.md) — Lead **`APPROVE NP-A`**, 2026-09-17 ET
 - **NP-B lookdev apply (APPROVED):** [12b_NP_B_LOOKDEV.md](12b_NP_B_LOOKDEV.md) — Lead **`APPROVE NP-B`**, 2026-09-17 ET
 - **NP-C form + V1 polish (APPROVED):** [12c_NP_C_FORM_V1.md](12c_NP_C_FORM_V1.md) — Lead **`APPROVE NP-C`**, 2026-09-17 ET
-- **NP-D SYS V3–V4 gather + tame (COMPLETE — await APPROVE NP-D):** [12d_NP_D_SYS_V3_V4.md](12d_NP_D_SYS_V3_V4.md)
+- **NP-D SYS V3–V4 gather + tame (APPROVED):** [12d_NP_D_SYS_V3_V4.md](12d_NP_D_SYS_V3_V4.md) — Lead **`APPROVE NP-D`**, 2026-09-17 ET
+- **NP-E heal + nurture + dawn persist (COMPLETE — await APPROVE NP-E):** [12e_NP_E_SYS_V6_V8.md](12e_NP_E_SYS_V6_V8.md)
 - **Start swarm:** [../START_HERE.md](../START_HERE.md)
 - **Master prompt:** [../HOMEWORLD_MASTER_PROMPT.md](../HOMEWORLD_MASTER_PROMPT.md)
 - **Game canon brief:** [../HOMEWORLD_MVP_SWARM_BRIEF.md](../HOMEWORLD_MVP_SWARM_BRIEF.md)

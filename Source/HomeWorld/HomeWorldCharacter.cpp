@@ -21,6 +21,8 @@
 #include "HomeWorldInventorySubsystem.h"
 #include "HomeWorldInventoryTypes.h"
 #include "HomeWorldBeastTameComponent.h"
+#include "HomeWorldNurtureComponent.h"
+#include "HomeWorldSpiritHealComponent.h"
 #include "HomeWorldSpiritRosterSubsystem.h"
 #include "HomeWorldTimeOfDaySubsystem.h"
 #include "InputActionValue.h"
@@ -713,6 +715,64 @@ bool AHomeWorldCharacter::TryTameBeastInFront()
 			return Tame->TryPromoteToHelper(this);
 		}
 		return Tame->TryOfferFood(this);
+	}
+	return false;
+}
+
+bool AHomeWorldCharacter::TryHealSpiritInFront()
+{
+	UWorld* World = GetWorld();
+	if (!World || !GetIsSpiritForm())
+	{
+		return false;
+	}
+	const FVector Start = GetActorLocation() + FVector(0.0f, 0.0f, GetCapsuleComponent() ? GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight() * 0.5f : 50.0f);
+	const FVector Forward = GetControlRotation().Vector();
+	const float TraceLength = 280.0f;
+	const FVector End = Start + Forward * TraceLength;
+	FHitResult Hit;
+	FCollisionQueryParams Params(NAME_None, false, this);
+	if (!World->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params))
+	{
+		return false;
+	}
+	AActor* HitActor = Hit.GetActor();
+	if (!HitActor)
+	{
+		return false;
+	}
+	if (UHomeWorldSpiritHealComponent* Heal = HitActor->FindComponentByClass<UHomeWorldSpiritHealComponent>())
+	{
+		return Heal->TryHeal(this);
+	}
+	return false;
+}
+
+bool AHomeWorldCharacter::TryNurtureInFront()
+{
+	UWorld* World = GetWorld();
+	if (!World || !GetIsSpiritForm())
+	{
+		return false;
+	}
+	const FVector Start = GetActorLocation() + FVector(0.0f, 0.0f, GetCapsuleComponent() ? GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight() * 0.5f : 50.0f);
+	const FVector Forward = GetControlRotation().Vector();
+	const float TraceLength = 280.0f;
+	const FVector End = Start + Forward * TraceLength;
+	FHitResult Hit;
+	FCollisionQueryParams Params(NAME_None, false, this);
+	if (!World->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params))
+	{
+		return false;
+	}
+	AActor* HitActor = Hit.GetActor();
+	if (!HitActor)
+	{
+		return false;
+	}
+	if (UHomeWorldNurtureComponent* Nurture = HitActor->FindComponentByClass<UHomeWorldNurtureComponent>())
+	{
+		return Nurture->TryNurture(this);
 	}
 	return false;
 }
