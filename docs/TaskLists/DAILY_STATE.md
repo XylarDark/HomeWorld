@@ -2,27 +2,27 @@
 
 **Purpose:** This file is read at session start and updated at session end so you can ask "what did we do yesterday and what do we need to do today?" and get a clear answer. The agent updates it automatically when a session ends.
 
-**Current focus:** MVP vertical slice P3–P7 signed and in PR #3; merge when ready. Next: UE handoff or new task list per [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md).
+**Current focus:** Audit WAVE E complete — await Lead `APPROVE WAVE E`; then WAVE F archive/delete per 08d §8.
 
 ---
 
 ## Yesterday (last session)
 
-- WAVE C boot health complete (PR #13 merged); Lead APPROVE WAVE C.
-- WAVE D deliverable: `Docs/08d_CONTENT_CANON.md` — MVP slice vs legacy Content canon; transit/look single canon; no dual DemoMap/Homestead vs VS_MVP.
-- Updated `Docs/README.md` and `Docs/08_AUDIT_UPGRADE_STRATEGY.md` WAVE D pointers.
+- WAVE E upgrade pass: `Docs/08e_UPGRADE_PASS.md`; bootstrap → VS_MVP + Docs/04 import; pie_test_runner soft checks; NightMix C++ hook; legacy map/PCG quarantine banners.
+- Helpers: `wire_nightmix_mpc_note.py`, `create_master_materials_stub.py`.
 
 ---
 
 ## Today
 
-- Lead review WAVE D PR; comment **`APPROVE WAVE D`** to unlock WAVE E upgrade pass.
+- Lead review WAVE E PR; comment **`APPROVE WAVE E`** to unlock WAVE F.
+- Run `.\Tools\Safe-Build.ps1` on DESKTOP-21CT3H0 to verify C++ NightMix changes.
 
 ---
 
 ## Tomorrow
 
-- WAVE E (after gate): upgrade slice-touching C++/BP/Python — VS_MVP dress, NightMix, FALLBACK glide, portal shrines (see 08d §7).
+- WAVE F (after gate): archive/delete quarantined DemoMap/PCG/Mass/scripts per 08d §8; `Docs/08_AUDIT_SIGN_OFF.md`.
 
 ---
 

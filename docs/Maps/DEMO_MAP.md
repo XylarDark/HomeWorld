@@ -1,6 +1,8 @@
 # Demo Map – Setup Guide
 
-DemoMap is the **primary demo and playable map** for HomeWorld. This guide shows how to create it, add a landscape, run the setup scripts, and finish PCG in the Editor.
+> **Historical / quarantine (WAVE D–E):** The signed MVP vertical slice uses **`Maps/VS_MVP`** and **`/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers`** as the primary playable canon. DemoMap builders remain for legacy harness tests until WAVE F. See [Docs/08d_CONTENT_CANON.md](../../Docs/08d_CONTENT_CANON.md) and [Maps/VS_MVP/README.md](../../Maps/VS_MVP/README.md).
+
+DemoMap is a **legacy demo map** (quarantined; not the MVP slice primary). This guide shows how to create it, add a landscape, run the setup scripts, and finish PCG in the Editor.
 
 **You will:** Create an Empty Open World map (or use a template), add a small landscape, run `create_demo_from_scratch.py`, then do a few one-time steps in the Editor so trees and rocks appear.
 

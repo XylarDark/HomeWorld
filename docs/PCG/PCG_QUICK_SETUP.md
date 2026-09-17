@@ -1,5 +1,7 @@
 # PCG Quick Setup – Tutorial (UE 5.7)
 
+> **Quarantine:** PCG on DemoMap is legacy. MVP slice primary: [Maps/VS_MVP/README.md](../../Maps/VS_MVP/README.md) + [Docs/08d_CONTENT_CANON.md](../../Docs/08d_CONTENT_CANON.md).
+
 This guide gets PCG (trees, rocks, etc.) working on a landscape in one sitting. Choose **Option A** if you want to build the graph by hand; choose **Option B** if you prefer running a script and then doing a short manual pass.
 
 **You will need:** A level open in the Editor with a **Landscape** that has **Component Subsection = 1×1** and the tag **`PCG_Landscape`**. For DemoMap, start with [Maps/DEMO_MAP.md](../Maps/DEMO_MAP.md).
