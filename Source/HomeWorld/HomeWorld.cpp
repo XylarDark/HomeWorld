@@ -20,6 +20,7 @@
 #include "HomeWorldSpiritRosterSubsystem.h"
 #include "HomeWorldSpiritShieldAbility.h"
 #include "HomeWorldTimeOfDaySubsystem.h"
+#include "HomeWorldPlayWorld.h"
 #include "AbilitySystemComponent.h"
 
 #define LOCTEXT_NAMESPACE "FHomeWorldModule"
@@ -28,7 +29,7 @@ namespace
 {
 	void CmdSave(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Save requires a play world (PIE or game)."));
@@ -44,7 +45,7 @@ namespace
 
 	void CmdLoad(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Load requires a play world (PIE or game)."));
@@ -60,7 +61,7 @@ namespace
 
 	void CmdRoles(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Roles requires a play world (PIE or game)."));
@@ -102,7 +103,7 @@ namespace
 
 	void CmdReportDeath(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.ReportDeath requires a play world (PIE or game)."));
@@ -118,7 +119,7 @@ namespace
 
 	void CmdSpirits(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Spirits requires a play world (PIE or game)."));
@@ -143,7 +144,7 @@ namespace
 
 	void CmdGrantBossReward(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.GrantBossReward requires a play world (PIE or game)."));
@@ -161,7 +162,7 @@ namespace
 
 	void CmdGatherOre(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Gather.Ore requires a play world (PIE or game)."));
@@ -181,7 +182,7 @@ namespace
 
 	void CmdGatherFlowers(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Gather.Flowers requires a play world (PIE or game)."));
@@ -202,7 +203,7 @@ namespace
 
 	void CmdInventoryDump(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Inventory.Dump requires a play world (PIE or game)."));
@@ -230,7 +231,7 @@ namespace
 
 	void CmdPlaceWall(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.PlaceWall requires a play world (PIE or game)."));
@@ -247,7 +248,7 @@ namespace
 
 	void CmdAstralDeath(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.AstralDeath requires a play world (PIE or game)."));
@@ -268,7 +269,7 @@ namespace
 
 	void CmdEnterAstral(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.EnterAstral requires a play world (PIE or game)."));
@@ -285,7 +286,7 @@ namespace
 
 	void CmdCompleteBuildOrder(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.CompleteBuildOrder requires a play world (PIE or game)."));
@@ -324,7 +325,7 @@ namespace
 
 	void CmdSimulateBuildOrderActivation(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.SimulateBuildOrderActivation requires a play world (PIE or game)."));
@@ -363,7 +364,7 @@ namespace
 
 	void CmdSpiritualPower(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.SpiritualPower requires a play world (PIE or game)."));
@@ -379,7 +380,7 @@ namespace
 
 	void CmdSpendSpiritualPower(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.SpendSpiritualPower requires a play world (PIE or game)."));
@@ -407,7 +408,7 @@ namespace
 
 	void CmdGoods(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Goods requires a play world (PIE or game)."));
@@ -438,7 +439,7 @@ namespace
 
 	void CmdSpiritBurst(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.SpiritBurst requires a play world (PIE or game)."));
@@ -457,7 +458,7 @@ namespace
 
 	void CmdSpiritShield(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.SpiritShield requires a play world (PIE or game)."));
@@ -476,7 +477,7 @@ namespace
 
 	void CmdRestoreMeal(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.RestoreMeal requires a play world (PIE or game)."));
@@ -493,7 +494,7 @@ namespace
 
 	void CmdMealBreakfast(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Meal.Breakfast requires a play world (PIE or game)."));
@@ -510,7 +511,7 @@ namespace
 
 	void CmdMealLunch(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Meal.Lunch requires a play world (PIE or game)."));
@@ -527,7 +528,7 @@ namespace
 
 	void CmdMealDinner(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Meal.Dinner requires a play world (PIE or game)."));
@@ -544,7 +545,7 @@ namespace
 
 	void CmdLoveTaskComplete(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.LoveTask.Complete requires a play world (PIE or game)."));
@@ -560,7 +561,7 @@ namespace
 
 	void CmdGameWithChildComplete(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.GameWithChild.Complete requires a play world (PIE or game)."));
@@ -576,7 +577,7 @@ namespace
 
 	void CmdTutorialEnd(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.TutorialEnd requires a play world (PIE or game)."));
@@ -593,7 +594,7 @@ namespace
 	// Same formula as AHomeWorldSpiritualCollectible: BasePower + day buff bonus + love bonus. For PIE regression (pie_test_runner day buff bonus at night).
 	void CmdTestGrantSpiritualCollect(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.TestGrantSpiritualCollect requires a play world (PIE or game)."));
@@ -620,7 +621,7 @@ namespace
 
 	void CmdConversionTest(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Conversion.Test requires a play world (PIE or game)."));
@@ -640,7 +641,7 @@ namespace
 
 	void CmdCombatStubs(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.CombatStubs requires a play world (PIE or game)."));
@@ -658,7 +659,7 @@ namespace
 
 	void CmdPlanetoidComplete(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Planetoid.Complete requires a play world (PIE or game)."));
@@ -676,7 +677,7 @@ namespace
 
 	void CmdDefendStatus(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Defend.Status requires a play world (PIE or game)."));
@@ -716,7 +717,7 @@ namespace
 
 	void CmdPlanetoidZoneAlignment(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Planetoid.ZoneAlignment requires a play world (PIE or game)."));
@@ -750,7 +751,7 @@ namespace
 
 	void CmdPlanetoidZoneInfo(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Planetoid.ZoneInfo requires a play world (PIE or game)."));
@@ -796,7 +797,7 @@ namespace
 
 	void CmdGoToBed(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.GoToBed requires a play world (PIE or game)."));
@@ -814,7 +815,7 @@ namespace
 
 	void CmdWake(const TArray<FString>& Args)
 	{
-		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Wake requires a play world (PIE or game)."));
@@ -833,6 +834,35 @@ namespace
 		}
 		TimeOfDay->AdvanceToDawn();
 		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Wake — phase set to Dawn (Phase 3). List 56 T3. For morning (Day/0) run hw.TimeOfDay.Phase 0."));
+	}
+
+	void CmdTimeOfDaySetPhase(const TArray<FString>& Args)
+	{
+		if (Args.Num() < 1)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.TimeOfDay.SetPhase N — N=0 Day, 1 Dusk, 2 Night, 3 Dawn (calls SetPhase / DAWN snapshot)."));
+			return;
+		}
+		const int32 PhaseInt = FCString::Atoi(*Args[0]);
+		if (PhaseInt < 0 || PhaseInt > 3)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.TimeOfDay.SetPhase — phase must be 0-3."));
+			return;
+		}
+		UWorld* World = HomeWorldPlayWorld::Resolve();
+		if (!World)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.TimeOfDay.SetPhase requires a play world (PIE or game)."));
+			return;
+		}
+		UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
+		if (!TimeOfDay)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: TimeOfDaySubsystem not found."));
+			return;
+		}
+		TimeOfDay->SetPhase(static_cast<EHomeWorldTimeOfDayPhase>(PhaseInt));
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.TimeOfDay.SetPhase %d (SetPhase side effects applied)."), PhaseInt);
 	}
 }
 
@@ -1042,6 +1072,11 @@ void FHomeWorldModule::StartupModule()
 		TEXT("hw.Wake"),
 		TEXT("Wake: advance time-of-day to Dawn (Phase 3). Only has effect when current phase is Night. Use in PIE for List 56 T3 verification. In-world: interact or overlap bed at night."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdWake),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.TimeOfDay.SetPhase"),
+		TEXT("Set time-of-day via SetPhase (0=Day, 1=Dusk, 2=Night, 3=Dawn). Runs PersistDawnSnapshot on Dawn. Prefer over raw hw.TimeOfDay.Phase for evidence greps."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdTimeOfDaySetPhase),
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.Defend.Status"),

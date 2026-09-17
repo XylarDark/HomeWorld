@@ -225,6 +225,8 @@ Reference for all `hw.*` console commands used in PIE testing and automation. Co
 | **hw.GoToBed** | Go to bed: set time-of-day to Night (Phase 2). Player "wakes" in astral / night phase. Use for MVP tutorial List 8 step 8 verification. Alternative: `hw.TimeOfDay.Phase 2`. |
 | **hw.Sleep** | Alias for hw.GoToBed: set time-of-day to Night (Phase 2). MVP tutorial List 8 step 8. |
 | **hw.Wake** | Wake: advance time-of-day to Dawn (Phase 3). Only has effect when current phase is Night. Use in PIE for List 56 T3 verification. In-world: interact (E) or overlap bed at night for same effect. |
+| **hw.TimeOfDay.SetPhase** *N* | Set phase via `SetPhase` (0=Day … 3=Dawn). Runs `PersistDawnSnapshot` on Dawn. Prefer for VP2 evidence over raw CVar-only changes. |
+| **hw.Inventory.Dump** | Log six inventory slots as **`INVENTORY:`** lines (PL-C). Works in PIE via MCP console after VP2-B play-world fallback. |
 
 ---
 
@@ -232,13 +234,14 @@ Reference for all `hw.*` console commands used in PIE testing and automation. Co
 
 | Cvar | Default | Description |
 |------|---------|-------------|
-| **hw.TimeOfDay.Phase** | 0 | Override time-of-day phase: **0** = Day, **1** = Dusk, **2** = Night, **3** = Dawn. **-1** = use default (Day). Set in PIE with e.g. `hw.TimeOfDay.Phase 2` for night; used by Defend branch, spirit abilities, spiritual collectibles. |
+| **hw.TimeOfDay.Phase** | 0 | Override time-of-day phase: **0** = Day, **1** = Dusk, **2** = Night, **3** = Dawn. **-1** = use default (Day). External changes invoke **`SetPhase`** side effects (NightMix, **`DAWN:`** snapshot on Dawn). Prefer **`hw.TimeOfDay.SetPhase N`** when MCP path needs explicit SetPhase. |
 | **hw.TimeOfDay.NightDurationSeconds** | 120 | Night phase duration in seconds for stub countdown ("Dawn in Ns"). Used when phase is set to Night. |
 
 ---
 
 ## Key PIE-test usage
 
+- **VP2 evidence greps (HS-D / Docs/18):** Before `npm run evidence:grep -- --log Saved/Logs/HomeWorld.log`, run **`log LogTemp Log`** in PIE so `Log`-level lines (`GATHER:`, `STORE:`, `HEAL:`, etc.) appear. Python C++ bindings use **snake_case** (`try_harvest_in_front`, `try_store_transfer_in_front`). Runbook: [Docs/handoffs/VP2_B_FIX.md](../Docs/handoffs/VP2_B_FIX.md).
 - **TimeOfDay:** Use `hw.TimeOfDay.Phase 0` for day, `hw.TimeOfDay.Phase 2` for night (or **`hw.GoToBed`** / **`hw.Sleep`** for "go to bed" → Night). Many checks (Defend, spirit abilities, spiritual collectibles, day buff at night) require Phase 2. **pie_test_runner** includes a **Current TimeOfDay phase** check that reads and reports the current phase (0=Day, 1=Dusk, 2=Night, 3=Dawn) in `Saved/pie_test_results.json` for §3 verification without running `hw.TimeOfDay.Phase` (no arg) in the console.
 - **Save/Load:** In PIE run `hw.Save` then `hw.Load`; run `hw.Roles` to verify role persistence. See § [SaveGame and role persistence (T2 / Day 15)](#savegame-and-role-persistence-t2--day-15). `pie_test_runner` includes `check_save_load_persistence` and related checks.
 - **Death and boss reward:** `hw.ReportDeath` (spirit roster); **`hw.Spirits`** (list roster count and IDs after ReportDeath); `hw.GrantBossReward` or `hw.GrantBossReward 50`. Validated by `check_report_death` and `check_grant_boss_reward` in pie_test_runner.

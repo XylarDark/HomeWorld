@@ -43,9 +43,10 @@ Prove the signed playable loop on **DESKTOP-21CT3H0** with **real** editor-log g
 | Docs/16 PL | **CLOSED** |
 | Docs/17 HS | **CLOSED / COMPLETE** |
 | **Docs/18 / VP2 strategy** | **APPROVED** — Lead **`APPROVE VP2 STRATEGY`**, 2026-09-17 ET |
-| **VP2-A** | **UNLOCKED / IN PROGRESS** |
-| **VP2-B** | LOCKED |
-| **VP2-C** | LOCKED (optional; Lead picks flavor after VP2-A/B) |
+| **VP2-A** | **APPROVED / COMPLETE** — Lead **`APPROVE VP2-A`**, 2026-09-17 ET (retry **9/9 PASS**; soft-reject caveats historical — [VP2_A_EVIDENCE.md](handoffs/VP2_A_EVIDENCE.md)) |
+| **VP2-B** | **APPROVED / COMPLETE** — Lead **`APPROVE VP2-B`**, 2026-09-17 ET (DESKTOP 9/9 success-path; [VP2_B_FIX.md](handoffs/VP2_B_FIX.md)) |
+| **VP2 prove (A+B)** | **COMPLETE** — Lead **`APPROVE VP2-A`** + **`APPROVE VP2-B`**, 2026-09-17 ET |
+| **VP2-C** | LOCKED (optional; Lead picks flavor or **`APPROVE VP2-C STOP`** / **`CLOSE VP2`**) |
 
 ---
 
@@ -68,24 +69,31 @@ Naming: **VP2-A … VP2-C** (Verify & Prove 2). Do **not** reuse Docs/14 `VP-A�
 
 **Done criteria:**
 
-- [ ] Preflight PASS on DESKTOP
-- [ ] Evidence table filed with honest PASS/MISSING counts
-- [ ] MISSING rows listed with likely cause (not papered over)
+- [x] Preflight PASS on DESKTOP
+- [x] Evidence table filed with honest PASS/MISSING counts — **RETRY 9/9 PASS, 0 MISSING** (2026-09-17 ET)
+- [x] First-run 0/9 contrast + caveats documented (soft-reject vs success; VP2-B backlog)
+- [x] Lead **`APPROVE VP2-A`**
 
-### VP2-B — Close MISSING blockers (only if needed)
+### VP2-B — Success-path fixes (Lead early unlock)
 
-**Goal:** Fix **script/config/spawn** blockers that caused VP2-A MISSING — not new features.
+**Goal:** DESKTOP **success-path** greps for GATHER / STORE / HEAL / NURTURE / TAME / INVENTORY / DAWN via normal console + PIE interact — not soft-reject-only or ObjectIterator hacks.
 
 | Item | Spec |
 |------|------|
-| **Trigger** | VP2-A has any **MISSING** Lead wants closed |
-| **In** | Preflight/config, apply scripts, interact/log prefixes, store-transfer registration, KEEP-LOCAL path fixes |
-| **Out** | New verbs, combat, free-flight, art campaigns, AnimGraph spikes |
-| **Re-prove** | Re-run VP2-A checklist; board **re-verify before polish** (HS-D rule) |
-| **Deliverable** | [Docs/handoffs/VP2_B_FIX.md](handoffs/VP2_B_FIX.md) + evidence re-run |
+| **Trigger** | Lead direction 2026-09-17 ET — unlock VP2-B **before** VP2-A approve |
+| **In** | Play-world console fallback, CVar→SetPhase/Dawn snapshot, interact trace fallback, `place_vs_mvp_resource_piles.py`, evidence runbook |
+| **Out** | New verbs, combat, free-flight, art campaigns, AnimGraph spikes, `.uasset`/`.umap` commits |
+| **Re-prove** | Re-run VP2-A checklist with success-path rows; **`log LogTemp Log`** before greps |
+| **Deliverable** | [Docs/handoffs/VP2_B_FIX.md](handoffs/VP2_B_FIX.md) + DESKTOP `Saved/vp2_b_evidence.json` |
 | **Gate** | Lead **`APPROVE VP2-B`** |
 
-If VP2-A is **all PASS** (or Lead **`WAIVE VP2-B`** with written MISSING accept), skip to VP2-C menu / close.
+**Status:** **APPROVED / COMPLETE** — Lead **`APPROVE VP2-B`**, 2026-09-17 ET. DESKTOP re-prove **9/9 PASS** success-path ([VP2_B_FIX.md](handoffs/VP2_B_FIX.md)).
+
+**Done criteria:**
+
+- [x] CLOUD success-path fixes merged
+- [x] DESKTOP Safe-Build + PIE re-prove **9/9 PASS**
+- [x] Lead **`APPROVE VP2-B`**
 
 ### VP2-C — Optional follow-on (Lead picks one)
 
@@ -118,8 +126,9 @@ If VP2-A is **all PASS** (or Lead **`WAIVE VP2-B`** with written MISSING accept)
 
 ## Immediate unlock
 
-1. Lead **`APPROVE VP2 STRATEGY`** — **DONE** (2026-09-17 ET)
-2. Conductor unlocks **VP2-A** only — **IN PROGRESS**
+1. Lead **`APPROVE VP2 STRATEGY`** — **DONE** (2026-09-17 ET; PR #101)
+2. Conductor **VP2-A DESKTOP prove** — **APPROVED** — Lead **`APPROVE VP2-A`**, 2026-09-17 ET ([VP2_A_EVIDENCE.md](handoffs/VP2_A_EVIDENCE.md))
+3. Conductor **VP2-B DESKTOP re-prove** — **APPROVED** — Lead **`APPROVE VP2-B`**, 2026-09-17 ET ([VP2_B_FIX.md](handoffs/VP2_B_FIX.md))
 
 ---
 
@@ -127,6 +136,6 @@ If VP2-A is **all PASS** (or Lead **`WAIVE VP2-B`** with written MISSING accept)
 
 Lead **`APPROVE VP2 STRATEGY`** — **APPROVED** (Luke Thompson, 2026-09-17 ET).
 
-**VP2-A UNLOCKED / IN PROGRESS** — DESKTOP prove.
+**VP2-A APPROVED** — Lead **`APPROVE VP2-A`**, 2026-09-17 ET ([VP2_A_EVIDENCE.md](handoffs/VP2_A_EVIDENCE.md)). **VP2-B APPROVED** — Lead **`APPROVE VP2-B`**, 2026-09-17 ET. Required prove track (A+B) **COMPLETE**; VP2-C optional (LOCKED).
 
-*APPROVED — Docs/18 Verify & Prove. Lead **`APPROVE VP2 STRATEGY`**, 2026-09-17 ET.*
+*APPROVED strategy — Docs/18 Verify & Prove. Lead **`APPROVE VP2 STRATEGY`**, 2026-09-17 ET. VP2-A/B gates closed.*
