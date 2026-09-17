@@ -10,10 +10,10 @@ class UBoxComponent;
 class UHomeWorldInventorySubsystem;
 
 /**
- * Gather node actor (world harvest). Blueprint BP_WoodPile etc. may subclass for art/Smart Objects.
- * VS_MVP/D19-A: non-Abstract so Editor Python can spawn piles without a committed .uasset.
+ * Base actor for gather nodes (world harvest). Blueprint BP_WoodPile etc. inherit.
  * NP-D: +1 gather via TryHarvest; optional cooldown or deplete-until-dawn.
  */
+// D19-A: non-Abstract so Editor Python can spawn VS_MVP gather markers (BP subclasses still optional for art).
 UCLASS(Blueprintable)
 class HOMEWORLD_API AHomeWorldResourcePile : public AActor
 {
