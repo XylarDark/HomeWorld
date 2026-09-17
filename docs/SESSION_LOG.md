@@ -8993,3 +8993,18 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 **Gate:** Audit **not closed** — await Lead **`SIGN OFF AUDIT`** on WAVE F PR.
 
+---
+
+## 2026-09-17 — Post-audit wrap: master materials + NightMix (Docs/10)
+
+**Tasks completed:**
+- `create_master_materials.py` + `homeworld_material_graph.py` — ten Docs/02 masters with MPC NightMix CollectionParameter, day→night overlay from JSON.
+- `create_master_materials_stub.py` delegates to full builder; `wire_nightmix_mpc_note.py` / `place_vs_mvp_markers.py` comments updated.
+- `Docs/10_POST_AUDIT_WRAP.md` — post-audit track CLOSED; OUT list (V3–V8 SYS, Docs/07, Lumen, free-flight).
+- Handoff: `Docs/handoffs/POST_AUDIT_MASTER_MATERIALS.md`; `Docs/README.md` entry.
+- Tests: `test_homeworld_master_material_defs.py` (JSON contract, no Editor).
+
+**PR:** #21 merged — `98ba9f5`. CI: validate + python-lint green.
+
+**Next:** Lead next-phase audit (no new WAVE id in Docs/10). Run `create_master_materials.py` on Windows Editor to materialize `.uasset` graphs locally.
+
