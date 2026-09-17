@@ -1,9 +1,10 @@
 ---
 name: "Automation standards"
 description: "Standards for automation that drives or configures Editor/engine features (Python, MCP, commandlets)"
-alwaysApply: true
+alwaysApply: false
+globs: "**/Content/Python/**, **/Tools/**, **/.github/workflows/**"
 priority: 9
-version: 1.0
+version: 1.1
 ---
 
 # Automation Standards

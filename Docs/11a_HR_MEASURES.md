@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **COMPLETE** — awaiting Lead **`APPROVE HR-A`** |
+| **Status** | **APPROVED** — Lead **`APPROVE HR-A`** (Luke Thompson, 2026-09-17 ET) |
 | **Date** | 2026-09-17 |
 | **Author** | Conductor (HomeWorld) |
 | **Parent gate** | Lead **`APPROVE Docs/11`** — **GRANTED** (Luke Thompson, 2026-09-17 ET; equivalent: "go with your suggestion") |
@@ -10,7 +10,7 @@
 | **Refine plan** | [11_SWARM_HARNESS_REFINE.md](11_SWARM_HARNESS_REFINE.md) (HR-A deliverable) |
 | **Hard rules** | Docs/07 CLOSED; FALLBACK armed; no V3–V8 gameplay; docs/config measure only |
 
-**Gate:** Lead **`APPROVE HR-A`** unlocks HR-B harness tighten. Do **not** start HR-B until granted.
+**Gate:** Lead **`APPROVE HR-A`** — **GRANTED** 2026-09-17 ET. HR-B delivered — see [11b_HR_B_HANDOFF.md](11b_HR_B_HANDOFF.md).
 
 ---
 
@@ -181,9 +181,21 @@ Pattern: `Start-AllAgents|AGENT_COMPANY|gui_automation|run_automation_cycle`
 
 ```
 Docs/11 status: APPROVED — Lead Luke Thompson, 2026-09-17 ET
-HR-A status: COMPLETE — awaiting Lead APPROVE HR-A
-Do NOT start HR-B until Lead approves.
+HR-A status: APPROVED — Lead Luke Thompson, 2026-09-17 ET
+HR-B status: COMPLETE — awaiting Lead APPROVE HR-B
 Measured: cloud VM 2026-09-17 UTC; Windows DESKTOP-21CT3H0 2026-09-17 ~23:13 ET (HEAD 675388a).
 ```
 
-*HR-A measurement pass complete on both hosts.*
+---
+
+## 10. HR-B post-measures (rules + CI)
+
+| Metric | HR-A baseline | After HR-B |
+|--------|---------------|------------|
+| `alwaysApply: true` count | **20** | **15** |
+| Glob-scoped rules | 12 | **17** |
+| validate.yml SH-01 | Stub paths required | Canonical DOCS_LAYOUT paths — [CI_POLICY.md](../docs/Setup/CI_POLICY.md) |
+
+Details: [11b_HR_B_HANDOFF.md](11b_HR_B_HANDOFF.md).
+
+*HR-A measurement pass complete on both hosts; HR-B harness tighten delivered.*

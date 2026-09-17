@@ -2,9 +2,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **APPROVED** — Lead Luke Thompson, 2026-09-17 ET |
-| **Approval notes** | Lead approved Docs/11 (HR strategy); equivalent: "go with your suggestion" |
+| **Status** | **ACTIVE** — Docs/11 **APPROVED**; HR-A **APPROVED**; HR-B **COMPLETE awaiting APPROVE HR-B** |
+| **Approval notes** | Lead Luke Thompson, 2026-09-17 ET — Docs/11 / HR strategy; **APPROVE HR-A**; HR-B delivered in PR #25 |
 | **Date** | 2026-09-17 |
+| **HR-A stamp** | Lead Luke Thompson, **APPROVE HR-A**, 2026-09-17 ET |
+| **HR-B stamp** | **COMPLETE awaiting APPROVE HR-B**, 2026-09-17 — [11b_HR_B_HANDOFF.md](11b_HR_B_HANDOFF.md) |
 | **Author** | Conductor (HomeWorld) |
 | **Audit input** | [11_SWARM_HARNESS_AUDIT.md](11_SWARM_HARNESS_AUDIT.md) |
 | **Product next-phase** | **PARKED** — [11_NEXT_PHASE_STRATEGY.md](11_NEXT_PHASE_STRATEGY.md) (NP-A…E DEFERRED) |
@@ -24,8 +26,9 @@ Lead directive: **refine swarm + harness technologies before any product gamepla
 | Track | Status |
 |-------|--------|
 | **Docs/11 audit + refine** | **APPROVED** — Lead Luke Thompson, 2026-09-17 ET |
-| **HR-A** | **COMPLETE** — [11a_HR_MEASURES.md](11a_HR_MEASURES.md); awaiting Lead **`APPROVE HR-A`** |
-| **HR-B … HR-D** | **NOT STARTED** — blocked until Lead **`APPROVE HR-A`** |
+| **HR-A** | **APPROVED** — [11a_HR_MEASURES.md](11a_HR_MEASURES.md) |
+| **HR-B** | **COMPLETE awaiting APPROVE HR-B** — [11b_HR_B_HANDOFF.md](11b_HR_B_HANDOFF.md) |
+| **HR-C … HR-D** | **NOT STARTED** — blocked until Lead **`APPROVE HR-B`** |
 | **Product NP-A…E** | **DEFERRED** — blocked until HR-D re-grade **or** Lead explicitly parks HR and unblocks NP |
 
 ---
@@ -127,9 +130,10 @@ Demonstrate the refined harness end-to-end before unlocking product NP.
 | 4 | **`APPROVE HR-D`** | Product next-phase rewrite (replace DEFERRED NP board) **or** Lead override |
 
 ```
-HR STRATEGY status: APPROVED — Lead Luke Thompson, 2026-09-17 ET
-HR-A status: COMPLETE — awaiting Lead APPROVE HR-A (Docs/11a_HR_MEASURES.md)
-Do NOT start HR-B until Lead approves HR-A.
+Docs/11 / HR STRATEGY: APPROVED — Lead Luke Thompson, 2026-09-17 ET
+HR-A: APPROVED — Lead Luke Thompson, 2026-09-17 ET
+HR-B: COMPLETE — awaiting Lead APPROVE HR-B (see 11b_HR_B_HANDOFF.md)
+HR-C: blocked until APPROVE HR-B
 ```
 
 ---
@@ -145,4 +149,4 @@ Do NOT start HR-B until Lead approves HR-A.
 
 ---
 
-*Conductor prepared this file; Lead approval required before HR-A execution.*
+*Conductor prepared this file; HR-B complete — awaiting Lead APPROVE HR-B.*

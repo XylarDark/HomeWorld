@@ -64,11 +64,11 @@ Blender-first MVP production kit: canon in **`Docs/`**, kits in **`Lib/`**, coor
 
 ## Dev environment setup
 
-1. Install UE 5.7, clone this repo, open `HomeWorld.uproject`.
+1. Install UE 5.7, clone this repo, init DevEnvTemplate: `git submodule update --init --recursive DevEnvTemplate` (then `npm run doctor:build` once, `npm run doctor` — see [docs/Setup/CURSOR_DEV.md](docs/Setup/CURSOR_DEV.md)).
 2. Run `Setup-MCP.bat` (one-time MCP bridge install).
-3. Run `.\Tools\Safe-Build.ps1` to compile C++ (closes Editor automatically if needed; see docs/EDITOR_BUILD_PROTOCOL.md).
-4. Open Editor, restart Cursor, verify MCP green dot in status bar.
-5. See [docs/SETUP.md](docs/SETUP.md) for the full checklist.
+3. **Build → Editor → MCP chain:** Run `.\Tools\Safe-Build.ps1` (closes Editor if needed, then builds — see [docs/Setup/BUILD_POLICY.md](docs/Setup/BUILD_POLICY.md)).
+4. Open Unreal Editor (`HomeWorld.uproject`), restart Cursor, verify MCP green dot (port 55557 — [docs/Setup/MCP_SETUP.md](docs/Setup/MCP_SETUP.md)).
+5. See [docs/SETUP.md](docs/SETUP.md) for the full checklist. **Cloud agents:** no UE/MCP on Linux VM — see [docs/Setup/WINDOWS_BRIDGE.md](docs/Setup/WINDOWS_BRIDGE.md).
 
 **Enhanced Input** is applied automatically when the Editor loads (`Content/Python/init_unreal.py`). You do not need to run `setup_enhanced_input.py` unless movement still fails (troubleshooting).
 
@@ -76,7 +76,18 @@ Blender-first MVP production kit: canon in **`Docs/`**, kits in **`Lib/`**, coor
 
 Exact invocations the agent should use (see [docs/SETUP.md](docs/SETUP.md) and [docs/PCG/PCG_SETUP.md](docs/PCG/PCG_SETUP.md) for more):
 
-- **C++ build:** Use **`.\Tools\Safe-Build.ps1`** from project root (it **calls** `Build-HomeWorld.bat` after closing the Editor if needed). Do not run `Build-HomeWorld.bat` directly in agent/automation flows. See [docs/Setup/BUILD_POLICY.md](docs/Setup/BUILD_POLICY.md) and [docs/Editor/EDITOR_BUILD_PROTOCOL.md](docs/Editor/EDITOR_BUILD_PROTOCOL.md).
+### Build → Editor → MCP (canonical agent chain)
+
+| Step | Action | Doc |
+|------|--------|-----|
+| 1 | **`.\Tools\Safe-Build.ps1`** from repo root (closes Editor if running, then builds) | [BUILD_POLICY.md](docs/Setup/BUILD_POLICY.md), [EDITOR_BUILD_PROTOCOL.md](docs/Editor/EDITOR_BUILD_PROTOCOL.md) |
+| 2 | Open **Unreal Editor** (`HomeWorld.uproject`) | [SETUP.md](docs/SETUP.md) |
+| 3 | Restart Cursor; confirm **MCP green dot** (UnrealMCP port 55557) | [MCP_SETUP.md](docs/Setup/MCP_SETUP.md) |
+| 4 | Use MCP tools or `execute_python_script` for Editor work | [09-mcp-workflow.mdc](.cursor/rules/09-mcp-workflow.mdc) |
+
+**Agents and automation:** Always use **Safe-Build**, never `Build-HomeWorld.bat` directly. **Humans** with Editor already closed may use `Build-HomeWorld.bat` (Safe-Build wraps it). **Cloud agents** (no UE): open PR → optional self-hosted `ci.yml` for C++ → Windows **DESKTOP-21CT3H0** for Editor/MCP — [WINDOWS_BRIDGE.md](docs/Setup/WINDOWS_BRIDGE.md).
+
+- **C++ build (agents):** **`.\Tools\Safe-Build.ps1`** only — see chain above.
 - **Python script in Editor:** From project root, `py "Content/Python/<script>.py"`; or via MCP: `execute_python_script("<script>.py")` (paths relative to `Content/Python/`).
 - **Python tests:** Editor: Tools > Test Automation (discovers `Content/Python/tests/test_*.py`).
 - **PIE validation:** MCP `execute_python_script("pie_test_runner.py")`, then read `Saved/pie_test_results.json`.

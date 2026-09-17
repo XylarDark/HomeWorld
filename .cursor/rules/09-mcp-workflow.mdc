@@ -1,9 +1,10 @@
 ---
 name: "MCP-First Workflow"
 description: "Use MCP first, then Python/GUI automation; never document manual steps for the user. Log automation gaps to docs/AUTOMATION_GAPS.md."
-alwaysApply: true
+alwaysApply: false
+globs: "**/Content/Python/**, **/Source/**, **/*.uproject, **/Tools/**"
 priority: 10
-version: 1.0
+version: 1.1
 ---
 
 # MCP-First Workflow
@@ -101,7 +102,7 @@ On failure, `ok` is `false` and `error` contains a human-readable message. New u
 
 ## C++ build from agent
 
-The agent can trigger C++ builds via Shell: `Build-HomeWorld.bat`. Monitor `Build-HomeWorld.log` for completion (look for "Exit code:" at the end). The build must be run when PIE is not active.
+The agent can trigger C++ builds via Shell: **`.\Tools\Safe-Build.ps1`** (not `Build-HomeWorld.bat` directly). Monitor `Build-HomeWorld.log` for completion (look for "Exit code:" at the end). The build must be run when PIE is not active. See [docs/Setup/BUILD_POLICY.md](../../docs/Setup/BUILD_POLICY.md).
 
 ## Automated tests
 

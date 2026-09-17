@@ -61,6 +61,6 @@ HomeWorld is a co-op ARPG survival game with family sim elements, built in Unrea
 
 1. Clone repo, open `HomeWorld.uproject`
 2. Run `Setup-MCP.bat` (one-time MCP bridge install)
-3. Run `Build-HomeWorld.bat` (compile C++ module + plugins)
-4. Open Editor, restart Cursor, verify MCP green dot
+3. Run `.\Tools\Safe-Build.ps1` (compile C++ module + plugins; closes Editor if needed)
+4. Open Editor, restart Cursor, verify MCP green dot (port 55557)
 5. Follow `docs/TASKLIST.md` for current work
