@@ -1,9 +1,9 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **VP-D** (bootstrap dry-run + branch protection) — **IN PROGRESS**  
+**Current phase:** none — **Docs/14 Verify & Polish CLOSED / COMPLETE** (Lead **`APPROVE VP-D`**, 2026-09-17 ET)
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **CLOUD** (VP-D docs) + **DESKTOP** (PA-05 bootstrap evidence) + **Lead** (gates / GitHub Settings)  
-**Blocked by:** Lead **`APPROVE VP-D`** only — VP-C **APPROVED / CLOSED** (Lead **`APPROVE VP-C`**, 2026-09-17 ET; polish PR #69 @ `f88ece5`). VP-A re-verify **WAIVED**. HR3-C branch protection **DEFERRED** unless Lead applies.
+**Blocked by:** none — VP track closed. Branch protection remains **DEFERRED** (HR3-C). Next product/harness track TBD by Lead.
 
 | Phase | Name | Owners | Status | Gate file | Handoffs |
 |---|---|---|---|---|---|
@@ -62,10 +62,10 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **HR3-C** | Branch protection | Lead | **DEFERRED / COMPLETE for track** | Lead skip 2026-09-17 ET — [handoffs/HR3_C_BRANCH_PROTECTION.md](../Docs/handoffs/HR3_C_BRANCH_PROTECTION.md) checklist PR #62; GitHub apply deferred |
 | **HR3-D** | DESKTOP evidence + re-verify | CLOUD | **APPROVED** | [handoffs/HR3_D_EVIDENCE_LANE.md](../Docs/handoffs/HR3_D_EVIDENCE_LANE.md) — Lead **`APPROVE HR3-D`**, 2026-09-17 ET; PR #65 |
 | **HR3 track** | Harness Refine 3 (A+) | — | **CLOSED / COMPLETE** | [15_HR3_A_PLUS.md](../Docs/15_HR3_A_PLUS.md) — HR3-C **DEFERRED**; harness **~A**, swarm **~A+** |
-| **VP-C** | Playability polish | CLOUD+DESKTOP | **APPROVED / CLOSED** | [handoffs/VP_C_POLISH.md](../Docs/handoffs/VP_C_POLISH.md) — Lead **`APPROVE VP-C`**, 2026-09-17 ET; polish PR #69 @ `f88ece5`; PA-07 deferred |
-| **VP-D** | Bootstrap dry-run | CLOUD+DESKTOP | **IN PROGRESS** | [handoffs/VP_D_BOOTSTRAP_CI.md](../Docs/handoffs/VP_D_BOOTSTRAP_CI.md) — PA-05 DESKTOP evidence TBD; branch protection checklist (HR3-C **DEFERRED** unless Lead applies) |
+| **VP-C** | Playability polish | CLOUD+DESKTOP | **APPROVED / CLOSED** | [handoffs/VP_C_POLISH.md](../Docs/handoffs/VP_C_POLISH.md) — Lead **`APPROVE VP-C`**, 2026-09-17 ET |
+| **VP-D** | Bootstrap dry-run | CLOUD+DESKTOP | **APPROVED / CLOSED** | [handoffs/VP_D_BOOTSTRAP_CI.md](../Docs/handoffs/VP_D_BOOTSTRAP_CI.md) — Lead **`APPROVE VP-D`**, 2026-09-17 ET; branch protection **DEFERRED** |
 
-**Current track:** **VP-C APPROVED / CLOSED** — Lead **`APPROVE VP-C`**, 2026-09-17 ET (PR #69 @ `f88ece5`). **VP-D IN PROGRESS** (unlocked). **VP-A re-verify WAIVED**. HR3-C branch protection **DEFERRED** unless Lead applies GitHub settings.
+**Current track:** **Docs/14 / VP CLOSED / COMPLETE** — Lead **`APPROVE VP-D`**, 2026-09-17 ET. Next track TBD.
 
 ---
 

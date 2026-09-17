@@ -3,8 +3,8 @@
 | Field | Value |
 |-------|-------|
 | **Phase** | VP-D |
-| **Status** | **EVIDENCE FILED / PENDING APPROVE VP-D** |
-| **Lead gate** | **`APPROVE VP-D`** before marking VP track CLOSED |
+| **Status** | **APPROVED / CLOSED** — Lead **`APPROVE VP-D`**, Luke Thompson, 2026-09-17 ET |
+| **Lead gate** | **`APPROVE VP-D`** — **APPROVED**; VP track **CLOSED / COMPLETE** |
 | **Spec** | [14_VP_VERIFY_POLISH.md](../14_VP_VERIFY_POLISH.md) § VP-D |
 | **Baseline** | Main @ `998d3dd` (APPROVE VP-C stamp PR #71); DESKTOP evidence taken @ `ade5c03` |
 
@@ -39,7 +39,7 @@ PA-05 bootstrap chain exercised on **DESKTOP-21CT3H0**. Branch protection remain
 
 - [x] Fresh-clone / clean-tree bootstrap chain evidence on DESKTOP (submodule + doctor:ue + Safe-Build + bootstrap Steps 1–5; 2nd pass partial)
 - [x] CI_SETUP lists required status checks and Lead steps
-- [ ] Lead confirms branch protection configured — **DEFERRED** (same as HR3-C)
+- [x] Lead confirms branch protection configured — **DEFERRED accepted** for track close (same as HR3-C; checklist remains in CI_SETUP)
 
 ## Hard rules
 
@@ -49,4 +49,8 @@ PA-05 bootstrap chain exercised on **DESKTOP-21CT3H0**. Branch protection remain
 
 ---
 
-*VP-D handoff — evidence filed; pending Lead **`APPROVE VP-D`** to close VP track.*
+*VP-D **APPROVED / CLOSED** — Lead **`APPROVE VP-D`**, 2026-09-17 ET. VP track **CLOSED / COMPLETE**.*
+
+## Stamp
+
+Lead **`APPROVE VP-D`** (Luke Thompson, 2026-09-17 ET) — VP-D **CLOSED**. Docs/14 Verify & Polish track **CLOSED / COMPLETE**. Branch protection remains **DEFERRED** (HR3-C).

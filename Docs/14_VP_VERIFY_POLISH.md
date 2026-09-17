@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **APPROVED / ACTIVE** — Lead Luke Thompson, **`APPROVE VP STRATEGY`**, 2026-09-17 ET |
+| **Status** | **CLOSED / COMPLETE** — Lead **`APPROVE VP-D`**, Luke Thompson, 2026-09-17 ET
 | **Date** | 2026-09-17 |
 | **Baseline** | Main post-NP + HR2 — product NP-A…E **CLOSED**, HR2-A…C **CLOSED** |
 | **Author** | Conductor (HomeWorld) |
@@ -15,7 +15,7 @@
 
 Lead **`APPROVE VP STRATEGY`** — **APPROVED** (Luke Thompson, 2026-09-17 ET).
 
-**Next gate (VP):** Lead **`APPROVE VP-D`** — VP-D bootstrap + branch protection **IN PROGRESS** ([handoffs/VP_D_BOOTSTRAP_CI.md](handoffs/VP_D_BOOTSTRAP_CI.md)).
+**Next gate (VP):** none — track **CLOSED / COMPLETE**. Lead **`APPROVE VP-D`**, 2026-09-17 ET.
 
 **VP-A APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET (hard-fail accepted). **VP-B APPROVED / CLOSED** — Lead **`APPROVE VP-B`**, 2026-09-17 ET ([handoffs/VP_B_SMOKE_CHARACTER.md](handoffs/VP_B_SMOKE_CHARACTER.md); PR #67 @ `e00c542`). **VP-C APPROVED / CLOSED** — Lead **`APPROVE VP-C`**, 2026-09-17 ET ([handoffs/VP_C_POLISH.md](handoffs/VP_C_POLISH.md); PR #69 @ `f88ece5`). **VP-D IN PROGRESS** (unlocked). VP-A re-verify **WAIVED** (Lead **`WAIVE VP-A re-verify`**, 2026-09-17 ET).
 
@@ -54,8 +54,8 @@ Product NP (NP-A…E) and Harness Refine 2 (HR2-A…C) are **CLOSED**. Senior po
 | **Docs/14 / VP strategy** | **APPROVED** — Lead **`APPROVE VP STRATEGY`**, 2026-09-17 ET |
 | **VP-A** | **APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET (verb PIE hard-fail accepted; PA-03 → VP-B) |
 | **VP-B** | **APPROVED / CLOSED** — Lead **`APPROVE VP-B`**, 2026-09-17 ET; PA-03 deferred accept (mesh-only interim) |
-| **VP-C** | **APPROVED / CLOSED** — Lead **`APPROVE VP-C`**, 2026-09-17 ET; polish PR #69 @ `f88ece5`; PA-07 deferred |
-| **VP-D** | **IN PROGRESS** — bootstrap dry-run (PA-05) + branch protection checklist (HR3-C **DEFERRED** unless Lead applies) |
+| **VP-C** | **APPROVED / CLOSED** — Lead **`APPROVE VP-C`**, 2026-09-17 ET |
+| **VP-D** | **APPROVED / CLOSED** — Lead **`APPROVE VP-D`**, 2026-09-17 ET; Docs/14 track **CLOSED / COMPLETE** |
 
 ---
 
@@ -207,7 +207,7 @@ Phases run **sequentially** (recommended: A → B → C → D) unless Lead direc
 Docs/14 / VP STRATEGY: APPROVED — Lead Luke Thompson, APPROVE VP STRATEGY, 2026-09-17 ET
 VP-A: APPROVED — re-verify WAIVED (HR3-D) — Lead WAIVE VP-A re-verify, 2026-09-17 ET
 VP-B: APPROVED / CLOSED — Lead APPROVE VP-B, 2026-09-17 ET
-VP-C: APPROVED / CLOSED — Lead APPROVE VP-C, 2026-09-17 ET — VP-D: IN PROGRESS
+VP-A…D: all APPROVED/CLOSED — Lead APPROVE VP-D, 2026-09-17 ET — Docs/14 VP track CLOSED / COMPLETE
 Product NP: CLOSED — HR2: CLOSED — HR3: CLOSED / COMPLETE
 ```
 

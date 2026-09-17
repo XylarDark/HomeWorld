@@ -1,5 +1,10 @@
 # Session summary (rolling)
 
+## 2026-09-17 ET — APPROVE VP-D / VP track CLOSED
+
+Lead **`APPROVE VP-D`** (Luke Thompson). Docs/14 Verify & Polish **CLOSED / COMPLETE** (VP-A…D). Bootstrap evidence PR #72; stamp follow-up. Branch protection remains **DEFERRED** (HR3-C). Next track TBD.
+
+
 **Purpose:** Short operational memory for **swarm / Conductor** sessions. Read this and [swarm/PHASE_BOARD.md](../swarm/PHASE_BOARD.md) at session start — **not** the full [SESSION_LOG.md](SESSION_LOG.md) unless you need a specific past incident.
 
 **Policy:** Conductor (or the closing agent) maintains a **rolling last-30-days** summary here. When an entry is older than 30 days, move detail to SESSION_LOG only (do not delete SESSION_LOG history).
