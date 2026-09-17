@@ -52,6 +52,7 @@ Naming: **D19-A … D19-C**. Do **not** reuse VP2 or PL gate strings.
 | Item | Spec |
 |------|------|
 | **Script** | `Content/Python/place_vs_mvp_resource_piles.py` |
+| **Spawn class** | Prefer local BP under `/Game/HomeWorld/Building/` (`BP_VS_MVP_ResourcePile`, `BP_WoodPile`, `BP_Harvestable*`) if present; else **C++ `AHomeWorldResourcePile`** (non-Abstract) |
 | **Labels** | `GP_Gather_WOOD`, `GP_Gather_HERB`, `GP_Gather_BERRY` |
 | **Tags** | Same FName tags on actor for PIE lookup fallback |
 | **Level** | `L_VS_MVP_Markers` — **KEEP-LOCAL** save after run (not in git) |

@@ -15,8 +15,17 @@ except ImportError:
 
 PREFIX = "ResourcePile:"
 LEVEL_PATH = "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers"
-PILE_CLASS = "/Script/HomeWorld.HomeWorldResourcePile"
+PILE_BASE_CLASS = "/Script/HomeWorld.HomeWorldResourcePile"
 FOLDER = "VS_MVP/Markers"
+
+# Concrete Blueprint subclasses (KEEP-LOCAL .uasset) — tried before C++ spawn.
+BP_CANDIDATES = (
+    "/Game/HomeWorld/Building/BP_VS_MVP_ResourcePile",
+    "/Game/HomeWorld/Building/BP_WoodPile",
+    "/Game/HomeWorld/Building/BP_HarvestableTree",
+    "/Game/HomeWorld/Building/BP_HarvestableOre",
+    "/Game/HomeWorld/Building/BP_HarvestableFlower",
+)
 
 # Near homestead cabin — stable labels + tags for MCP/PIE gather success-path
 PILE_SPECS = (
@@ -41,16 +50,57 @@ def find_actor_by_label(label: str):
     return None
 
 
-def _is_resource_pile(actor, pile_cls) -> bool:
-    if not actor or not pile_cls:
-        return False
+def _generated_class_from_bp(asset_path: str):
+    if not unreal.EditorAssetLibrary.does_asset_exist(asset_path):
+        return None
+    bp = unreal.load_asset(asset_path)
+    if not bp:
+        return None
     try:
-        return actor.get_class() == pile_cls
+        return bp.generated_class()
     except Exception:
         try:
-            return actor.get_class().get_name() == "HomeWorldResourcePile"
+            return bp.get_editor_property("generated_class")
         except Exception:
-            return False
+            return None
+
+
+def _load_base_pile_class():
+    return unreal.load_class(None, PILE_BASE_CLASS)
+
+
+def _resolve_pile_spawn_class():
+    """Prefer concrete BP subclass if present locally; else C++ HomeWorldResourcePile."""
+    base_cls = _load_base_pile_class()
+    if not base_cls:
+        return None, None
+
+    for asset_path in BP_CANDIDATES:
+        gen_cls = _generated_class_from_bp(asset_path)
+        if gen_cls:
+            _log("spawn class from BP " + asset_path)
+            return gen_cls, base_cls
+
+    _log("spawn class from C++ HomeWorldResourcePile (non-Abstract)")
+    return base_cls, base_cls
+
+
+def _is_resource_pile(actor, pile_base_cls) -> bool:
+    if not actor or not pile_base_cls:
+        return False
+    try:
+        cls = actor.get_class()
+        while cls:
+            if cls == pile_base_cls:
+                return True
+            get_super = getattr(cls, "get_super_class", None)
+            cls = get_super() if get_super else None
+    except Exception:
+        pass
+    try:
+        return "ResourcePile" in actor.get_class().get_name()
+    except Exception:
+        return False
 
 
 def _read_resource_type(actor) -> str:
@@ -132,12 +182,12 @@ def _configure_pile(actor, resource_id: str) -> None:
         _log("configure warn: " + str(exc))
 
 
-def _find_pile_by_tag_or_resource(pile_cls, label: str, resource_id: str):
+def _find_pile_by_tag_or_resource(pile_base_cls, label: str, resource_id: str):
     tag_name = unreal.Name(label)
     res_name = unreal.Name(resource_id)
     fallback = None
     for actor in unreal.EditorLevelLibrary.get_all_level_actors():
-        if not _is_resource_pile(actor, pile_cls):
+        if not _is_resource_pile(actor, pile_base_cls):
             continue
         try:
             if tag_name in actor.tags:
@@ -152,11 +202,11 @@ def _find_pile_by_tag_or_resource(pile_cls, label: str, resource_id: str):
     return fallback
 
 
-def _dedupe_extra_piles(pile_cls, label: str, resource_id: str, keep_actor) -> None:
+def _dedupe_extra_piles(pile_base_cls, label: str, resource_id: str, keep_actor) -> None:
     tag_name = unreal.Name(label)
     res_name = unreal.Name(resource_id)
     for actor in unreal.EditorLevelLibrary.get_all_level_actors():
-        if actor == keep_actor or not _is_resource_pile(actor, pile_cls):
+        if actor == keep_actor or not _is_resource_pile(actor, pile_base_cls):
             continue
         matches = False
         try:
@@ -181,14 +231,21 @@ def _dedupe_extra_piles(pile_cls, label: str, resource_id: str, keep_actor) -> N
             _destroy_actor(actor)
 
 
-def _ensure_pile(label: str, resource_id: str, offset: unreal.Vector, base: unreal.Vector, pile_cls) -> bool:
+def _ensure_pile(
+    label: str,
+    resource_id: str,
+    offset: unreal.Vector,
+    base: unreal.Vector,
+    spawn_cls,
+    pile_base_cls,
+) -> bool:
     loc = base + offset
     actor = find_actor_by_label(label)
     if not actor:
-        actor = _find_pile_by_tag_or_resource(pile_cls, label, resource_id)
+        actor = _find_pile_by_tag_or_resource(pile_base_cls, label, resource_id)
 
     if actor:
-        if not _is_resource_pile(actor, pile_cls):
+        if not _is_resource_pile(actor, pile_base_cls):
             _log("replace legacy " + label + " (" + actor.get_class().get_name() + ")")
             _destroy_actor(actor)
             actor = None
@@ -202,13 +259,13 @@ def _ensure_pile(label: str, resource_id: str, offset: unreal.Vector, base: unre
             pass
         _add_tag(actor, label)
         _configure_pile(actor, resource_id)
-        _dedupe_extra_piles(pile_cls, label, resource_id, actor)
+        _dedupe_extra_piles(pile_base_cls, label, resource_id, actor)
         _log("reuse " + label + " res=" + resource_id)
         return True
 
-    actor = unreal.EditorLevelLibrary.spawn_actor_from_class(pile_cls, loc)
+    actor = unreal.EditorLevelLibrary.spawn_actor_from_class(spawn_cls, loc)
     if not actor:
-        _log("FAIL spawn " + label)
+        _log("FAIL spawn " + label + " (class=" + str(spawn_cls) + ")")
         return False
 
     _apply_label(actor, label)
@@ -218,16 +275,16 @@ def _ensure_pile(label: str, resource_id: str, offset: unreal.Vector, base: unre
         pass
     _add_tag(actor, label)
     _configure_pile(actor, resource_id)
-    _dedupe_extra_piles(pile_cls, label, resource_id, actor)
+    _dedupe_extra_piles(pile_base_cls, label, resource_id, actor)
     _log("spawn " + label + " res=" + resource_id)
     return True
 
 
-def _verify_piles(pile_cls) -> None:
+def _verify_piles(pile_base_cls) -> None:
     for label, resource_id, _offset in PILE_SPECS:
         actor = find_actor_by_label(label)
         if not actor:
-            actor = _find_pile_by_tag_or_resource(pile_cls, label, resource_id)
+            actor = _find_pile_by_tag_or_resource(pile_base_cls, label, resource_id)
         if not actor:
             _log("verify FAIL missing " + label)
             continue
@@ -254,18 +311,18 @@ def main() -> int:
     if not _load_level():
         return 1
 
-    pile_cls = unreal.load_class(None, PILE_CLASS)
-    if not pile_cls:
-        _log("FAIL load class " + PILE_CLASS + " — Safe-Build first")
+    spawn_cls, pile_base_cls = _resolve_pile_spawn_class()
+    if not spawn_cls or not pile_base_cls:
+        _log("FAIL load spawn class — Safe-Build first")
         return 1
 
     base = _homestead_base()
     ok = True
     for label, res_id, offset in PILE_SPECS:
-        if not _ensure_pile(label, res_id, offset, base, pile_cls):
+        if not _ensure_pile(label, res_id, offset, base, spawn_cls, pile_base_cls):
             ok = False
 
-    _verify_piles(pile_cls)
+    _verify_piles(pile_base_cls)
 
     _log(
         "Done. PIE day/body: face GP_Gather_* within 280cm, Interact (E) or "
