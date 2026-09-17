@@ -50,7 +50,7 @@ Editor must open on UE 5.7.x without assert. Includes GoToBed/Meal constructor f
 
 Decide what old Homestead/PCG/Mass/abilities stays vs yields to `Docs/04` import path (`/Game/HomeWorld/Meshes/...`, FALLBACK glide, portal both ways). No dual canons for transit/look.
 
-- **Deliverable:** `Docs/08d_CONTENT_CANON.md`
+- **Deliverable:** [08d_CONTENT_CANON.md](08d_CONTENT_CANON.md)
 - **Gate:** Lead **APPROVE WAVE D**
 
 ### WAVE E — Upgrade pass
