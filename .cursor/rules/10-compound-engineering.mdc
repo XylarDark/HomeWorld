@@ -1,7 +1,8 @@
 ---
 name: "Compound Engineering Plugin Policy"
 description: "When a task matches a Compound Engineering workflow, recommend the plugin command instead of doing the work inline. The rule holds the full situation-to-command mapping; no doc lookup required."
-alwaysApply: true
+alwaysApply: false
+globs: "**/*.{cpp,h,py,md,mdc}, docs/**, Docs/**, .cursor/**"
 priority: 8
 version: 1.0
 ---

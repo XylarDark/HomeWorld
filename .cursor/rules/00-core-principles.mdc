@@ -1,7 +1,8 @@
 ---
 name: "Core Principles"
 description: "Apply core engineering principles when writing or reviewing any code to ensure quality, safety, and idempotency"
-alwaysApply: true
+alwaysApply: false
+globs: "**/*.{cpp,h,py,md,mdc,json,yml,yaml}, **/Content/**, **/Source/**, **/Tools/**"
 priority: 1
 version: 1.0
 ---

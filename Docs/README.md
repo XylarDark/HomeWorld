@@ -29,8 +29,10 @@ These are **intentionally separate**. On case-insensitive filesystems (macOS/Win
 - **HR-A measures (APPROVED):** [11a_HR_MEASURES.md](11a_HR_MEASURES.md) — baseline tables
 - **HR-B harness tighten (APPROVED):** [11b_HR_B_HANDOFF.md](11b_HR_B_HANDOFF.md)
 - **HR-C swarm ops refine (APPROVED):** [11c_HR_C_HANDOFF.md](11c_HR_C_HANDOFF.md) — Lead Luke Thompson, 2026-09-17 ET
-- **HR-D prove dry-run (COMPLETE):** [11d_HR_D_HANDOFF.md](11d_HR_D_HANDOFF.md) — await Lead **`APPROVE HR-D`**; evidence [handoffs/HR_D_DRY_RUN.md](handoffs/HR_D_DRY_RUN.md)
-- **Product next-phase (DEFERRED):** [11_NEXT_PHASE_STRATEGY.md](11_NEXT_PHASE_STRATEGY.md) — NP-A…E parked until HR refine signed off
+- **HR-D prove dry-run (COMPLETE):** [11d_HR_D_HANDOFF.md](11d_HR_D_HANDOFF.md) — evidence [handoffs/HR_D_DRY_RUN.md](handoffs/HR_D_DRY_RUN.md)
+- **HR-D defer stamp:** [11d_HR_D_DEFER.md](11d_HR_D_DEFER.md) — Lead deferred **`APPROVE HR-D`** → HR-B2 first (2026-09-17 ET)
+- **HR-B2 residual harness (COMPLETE):** [11e_HR_B2_HANDOFF.md](11e_HR_B2_HANDOFF.md) — await Lead **`APPROVE HR-B2`**
+- **Product next-phase (PARKED):** [11_NEXT_PHASE_STRATEGY.md](11_NEXT_PHASE_STRATEGY.md) — NP-A…E parked until HR refine signed off
 - **Start swarm:** [../START_HERE.md](../START_HERE.md)
 - **Master prompt:** [../HOMEWORLD_MASTER_PROMPT.md](../HOMEWORLD_MASTER_PROMPT.md)
 - **Game canon brief:** [../HOMEWORLD_MVP_SWARM_BRIEF.md](../HOMEWORLD_MVP_SWARM_BRIEF.md)

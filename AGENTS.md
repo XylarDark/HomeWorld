@@ -49,7 +49,7 @@ HomeWorld vendors [DevEnvTemplate/](DevEnvTemplate/) as a **gitlink** (pinned SH
 - Keep HomeWorld **always-applied** Cursor rules (`00–20`, `ue57-*`, etc.) until a dedicated migration to AGENTS.md + skills; template retires those for *new* adoptions only.
 - Do **not** require Node 24+ on the host for day-to-day UE work; doctor may warn `EBADENGINE` under Node 22 — accepted for now.
 - Do **not** vendor a second checkout under `.devenv/`; `DevEnvTemplate/` is the doctor root.
-- Do **not** add ESLint / TypeScript unit-test gates for the game host; doctor “Node stack” criticals for missing TS/ESLint/JS tests are **accepted declines** (this repo is UE 5.7 + Python automation).
+- Do **not** add ESLint / TypeScript unit-test gates for the game host; doctor “Node stack” criticals for missing TS/ESLint/JS tests are **accepted declines** (this repo is UE 5.7 + Python automation). Full matrix: [docs/Setup/DOCTOR_POLICY.md](docs/Setup/DOCTOR_POLICY.md).
 - Automation gaps for game systems stay in [docs/Automation/AUTOMATION_GAPS.md](docs/Automation/AUTOMATION_GAPS.md), not the template stub.
 
 The human **steers**, **makes taste**, and **tests**; the agent executes. See

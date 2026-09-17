@@ -9050,3 +9050,13 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 **Gate:** HR-C **COMPLETE** — await Lead **`APPROVE HR-C`** (unlocks HR-D dry-run).
 
+---
+
+## 2026-09-17 — HR-B2 residual harness risks (cloud agent)
+
+**Lead:** deferred **`APPROVE HR-D`** → HR-B2 first (2026-09-17 ET).
+
+**Delivered:** DevEnvTemplate pin `213673f` → `2efd756`; rules always-on **15 → 3**; `docs/Setup/DOCTOR_POLICY.md`; `Docs/11d_HR_D_DEFER.md`, `Docs/11e_HR_B2_HANDOFF.md`; PHASE_BOARD current = HR-B2; doctor cloud 77/100 exit 1 (5 accepted-decline criticals).
+
+**Gate:** HR-B2 **COMPLETE** — await Lead **`APPROVE HR-B2`**. Product NP **PARKED**.
+

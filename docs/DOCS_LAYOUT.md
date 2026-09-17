@@ -54,6 +54,7 @@ Setup and environment: MCP, CI, local tools, ref images, Cursor dev.
 | [Setup/HORDE_LOCAL_SETUP.md](Setup/HORDE_LOCAL_SETUP.md) | Horde local setup (if used). |
 | [Setup/REF_IMAGES_SETUP_TUTORIAL.md](Setup/REF_IMAGES_SETUP_TUTORIAL.md) | Reference images for GUI automation. |
 | [Setup/CURSOR_DEV.md](Setup/CURSOR_DEV.md) | Cursor and dev environment; DevEnvTemplate init runbook. |
+| [Setup/DOCTOR_POLICY.md](Setup/DOCTOR_POLICY.md) | DevEnvTemplate doctor accepted declines for UE game host (HR-B2). |
 | [Setup/CI_POLICY.md](Setup/CI_POLICY.md) | When validate.yml vs ci.yml; docs-only PRs; `[skip ci]`. |
 | [Setup/WINDOWS_BRIDGE.md](Setup/WINDOWS_BRIDGE.md) | Cloud agent → self-hosted CI → DESKTOP Editor/MCP. |
 | [Setup/BUILD_POLICY.md](Setup/BUILD_POLICY.md) | Safe-Build vs Build-HomeWorld.bat for agents vs humans. |

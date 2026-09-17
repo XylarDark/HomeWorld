@@ -1,7 +1,8 @@
 ---
 name: "Security Standards"
 description: "Apply OWASP-minded security rules when handling input, secrets, or external data to prevent vulnerabilities"
-alwaysApply: true
+alwaysApply: false
+globs: "**/*.{cpp,h,py,js,ts,json,yml,yaml,md,mdc,env*}, **/.github/workflows/**"
 priority: 3
 version: 1.0
 ---

@@ -1,7 +1,8 @@
 ---
 name: "Error Handling Standards"
 description: "Apply defensive programming and error recording when handling failures to prevent regressions and data loss"
-alwaysApply: true
+alwaysApply: false
+globs: "**/*.{cpp,h,py,js,ts,md,json,yml,yaml,mdc}, **/.github/workflows/**"
 priority: 6
 version: 1.0
 ---
