@@ -1,6 +1,6 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **VP2-A** — DESKTOP prove / evidence:grep (**IN PROGRESS**)
+**Current phase:** **VP2-A** — DESKTOP prove (**EVIDENCE FILED** — 0/9 MISSING; MCP crash; PENDING **`APPROVE VP2-A`**)
 
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **Conductor** (parent DESKTOP) / **DESKTOP-21CT3H0**
@@ -117,3 +117,5 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | ID | Phase | Owner | Blocker | File |
 |---|---|---|---|---|
 | — | — | — | — | — |
+
+| VP2-A-evidence | VP2-A | DESKTOP | CND | Docs/handoffs | [VP2_A_EVIDENCE.md](../Docs/handoffs/VP2_A_EVIDENCE.md) — **PENDING** Lead **`APPROVE VP2-A`** |
