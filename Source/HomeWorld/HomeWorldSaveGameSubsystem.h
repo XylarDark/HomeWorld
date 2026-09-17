@@ -10,7 +10,6 @@
  * Game instance subsystem for saving/loading game state (Day 15 role persistence, Day 21 spirit roster).
  * Persists family roles and spirit roster via UHomeWorldSaveGame to a slot.
  */
-UCLASS(BlueprintType)
 class UHomeWorldSaveGame;
 class UWorld;
 
