@@ -1,10 +1,10 @@
 {
   "_comment_mvp_cast": "Player skeletal mesh for vertical slice; partner/child use BP_*_Placeholder + tags (see demo_map_config _comment_mvp_cast). STYLE_GUIDE: docs/AssetCreation/STYLE_GUIDE.md.",
-  "_comment_vp_b_interim": "VP-B interim: Engine DefaultSkeletalMesh + mesh-only spawn. ABP/Mannequin deferred until real mannequin returns — spawn > AnimGraph.",
-  "skeletal_mesh": "/Engine/EditorMeshes/SkeletalMesh/DefaultSkeletalMesh",
-  "anim_blueprint": "",
+  "_comment_pl_a": "PL-A (2026-09-17 ET): Lead-accepted substitute — UE 5.7 TemplateResources High Characters Mannequins copied DESKTOP-local to Content/Characters/Mannequins (no .uasset commits). Retires VP-B Engine DefaultSkeletalMesh mesh-only interim. Legacy /Game/Man/... and ABP_HomeWorldCharacter deferred.",
+  "skeletal_mesh": "/Game/Characters/Mannequins/Meshes/SKM_Manny_Simple",
+  "anim_blueprint": "/Game/Characters/Mannequins/Anims/Unarmed/ABP_Unarmed",
   "mesh_forward_yaw_offset": 0.0,
-  "_comment_skeletal_mesh": "Content or Engine path to skeletal mesh. Engine paths (e.g. /Engine/EditorMeshes/...) skip disk preflight.",
-  "_comment_anim_blueprint": "Animation Blueprint path. Leave empty for mesh-only / single-node interim (VP-B); preflight treats empty as OK.",
+  "_comment_skeletal_mesh": "Project path (not /Engine/...). DESKTOP must have Content/Characters/Mannequins from Epic TP High Characters pack.",
+  "_comment_anim_blueprint": "Epic ABP_Unarmed — compiling idle/walk minimal anim. HomeWorld ABP_HomeWorldCharacter stays unassigned until rewired on Manny skeleton.",
   "_comment_yaw_offset": "Degrees to rotate the mesh so its forward matches movement direction. Use 90 or -90 if the mesh faces sideways."
 }
