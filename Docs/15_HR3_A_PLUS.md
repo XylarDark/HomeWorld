@@ -89,10 +89,10 @@ Naming: **HR3-A … HR3-D** (Harness Refine 3 — A+ pass). Do **not** reuse HR2
 
 **Done criteria:**
 
-- [ ] Runbook proves worker → `machineId` → hostname **DESKTOP-21CT3H0**
-- [ ] Known failure modes documented; fix or workaround is the documented happy path
-- [ ] CLOUD_AGENT_PACKET / WINDOWS_BRIDGE cross-links updated
-- [ ] Handoff includes command output excerpts (hostname, exit code)
+- [x] Runbook proves **parent** → `machineId` → hostname **DESKTOP-21CT3H0** — [handoffs/HR3_A_WINDOWS_EXEC.md](handoffs/HR3_A_WINDOWS_EXEC.md)
+- [x] Known failure modes documented; happy path = **Conductor parent** (Task executors FAIL — do not assign DESKTOP Shell)
+- [x] CLOUD_AGENT_PACKET / WINDOWS_BRIDGE cross-links updated
+- [x] Handoff includes command output excerpts (hostname, machineId, tool availability)
 
 ---
 

@@ -20,6 +20,13 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 ## Rolling log (newest first)
 
+### 2026-09-17 — HR3-A Windows exec evidence filed (docs-only)
+
+- [handoffs/HR3_A_WINDOWS_EXEC.md](../Docs/handoffs/HR3_A_WINDOWS_EXEC.md): **parent → machineId → DESKTOP-21CT3H0** proven; Task executors **FAIL** (no Shell/ListMachines/CallDynamicTool).
+- Updated [WINDOWS_BRIDGE.md](Setup/WINDOWS_BRIDGE.md) § Canonical Windows agent lane; [CLOUD_AGENT_PACKET.md](../swarm/CLOUD_AGENT_PACKET.md) DESKTOP owner = Conductor parent.
+- [PHASE_BOARD.md](../swarm/PHASE_BOARD.md): HR3-A **EVIDENCE FILED / AWAITING APPROVE HR3-A** (not COMPLETE until Lead stamp). **VP-B PARKED**.
+- **Next:** Lead **`APPROVE HR3-A`** → unlock HR3-B (UE preflight). Do not assign DESKTOP Shell to Task executors.
+
 ### 2026-09-17 — HR3 strategy APPROVED (APPROVE HR3 STRATEGY stamp)
 
 - Lead **`APPROVE HR3 STRATEGY`** (Luke Thompson, 2026-09-17 ET) — Docs/15 **APPROVED / ACTIVE**; **HR3-A UNLOCKED / IN PROGRESS**.
