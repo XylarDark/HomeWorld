@@ -78,8 +78,26 @@ function gamePathToDiskCandidates(gamePath) {
   return [base + ext, base + '.uasset', base + '.umap'];
 }
 
+/** Engine content lives in the engine install, not under project Content/. */
+function isEngineGamePath(gamePath) {
+  return Boolean(gamePath && (gamePath.startsWith('/Engine/') || gamePath.startsWith('/Engine')));
+}
+
 function assetExistsOnDisk(gamePath) {
+  if (isEngineGamePath(gamePath)) return true;
   return gamePathToDiskCandidates(gamePath).some((p) => fs.existsSync(p));
+}
+
+function loadCharacterConfig(config) {
+  const charCfgRel = config.repo?.characterConfigPath;
+  if (!charCfgRel) return null;
+  const charCfgAbs = path.join(projectRoot, charCfgRel);
+  if (!fs.existsSync(charCfgAbs)) return null;
+  try {
+    return JSON.parse(fs.readFileSync(charCfgAbs, 'utf8'));
+  } catch (_) {
+    return null;
+  }
 }
 
 /**
@@ -129,27 +147,25 @@ function checkRepo(config) {
 
   const charCfgRel = repo.characterConfigPath;
   if (charCfgRel) {
-    const charCfgAbs = path.join(projectRoot, charCfgRel);
-    if (fs.existsSync(charCfgAbs)) {
-      try {
-        const charCfg = JSON.parse(fs.readFileSync(charCfgAbs, 'utf8'));
-        for (const key of repo.requiredCharacterConfigKeys || []) {
-          const val = (charCfg[key] || '').trim();
-          if (!val) {
-            blockers.push({
-              code: 'CONFIG_EMPTY_PATH',
-              message: config.blockerCodes?.CONFIG_EMPTY_PATH || 'Character config path empty',
-              detail: `${charCfgRel} → ${key}`,
-            });
-          }
+    const charCfg = loadCharacterConfig(config);
+    if (charCfg === null && fs.existsSync(path.join(projectRoot, charCfgRel))) {
+      blockers.push({
+        code: 'CONFIG_MISSING',
+        message: 'Invalid character_blueprint_config.json',
+        detail: charCfgRel,
+      });
+    } else if (charCfg) {
+      for (const key of repo.requiredCharacterConfigKeys || []) {
+        const val = (charCfg[key] || '').trim();
+        if (!val) {
+          blockers.push({
+            code: 'CONFIG_EMPTY_PATH',
+            message: config.blockerCodes?.CONFIG_EMPTY_PATH || 'Character config path empty',
+            detail: `${charCfgRel} → ${key}`,
+          });
         }
-      } catch (err) {
-        blockers.push({
-          code: 'CONFIG_MISSING',
-          message: 'Invalid character_blueprint_config.json',
-          detail: err.message,
-        });
       }
+      // anim_blueprint empty is OK for VP-B mesh-only interim (optionalCharacterConfigKeys)
     }
   }
 
@@ -161,25 +177,21 @@ function checkDiskAssets(config) {
   /** @type {Blocker[]} */
   const blockers = [];
   const content = config.content || {};
-  const paths = [
-    content.vsMvpMap,
-    content.characterBlueprint,
-    content.characterAnimBlueprint,
-  ].filter(Boolean);
+  const charCfg = loadCharacterConfig(config);
+  const meshOnly = charCfg && !(charCfg.anim_blueprint || '').trim();
 
-  if (content.skeletalMeshFromCharacterConfig) {
-    const charCfgAbs = path.join(projectRoot, config.repo?.characterConfigPath || '');
-    if (fs.existsSync(charCfgAbs)) {
-      try {
-        const charCfg = JSON.parse(fs.readFileSync(charCfgAbs, 'utf8'));
-        if (charCfg.skeletal_mesh) paths.push(charCfg.skeletal_mesh);
-      } catch (_) {
-        /* covered by repo check */
-      }
-    }
+  const paths = [content.vsMvpMap, content.characterBlueprint].filter(Boolean);
+
+  if (!meshOnly && content.characterAnimBlueprint) {
+    paths.push(content.characterAnimBlueprint);
+  }
+
+  if (content.skeletalMeshFromCharacterConfig && charCfg?.skeletal_mesh) {
+    paths.push(charCfg.skeletal_mesh);
   }
 
   for (const gamePath of paths) {
+    if (isEngineGamePath(gamePath)) continue;
     if (!assetExistsOnDisk(gamePath)) {
       blockers.push({
         code: 'ASSET_MISSING_ON_DISK',
@@ -209,6 +221,11 @@ function mergeEditorResults(config) {
     if (Array.isArray(data.blockers)) {
       for (const b of data.blockers) {
         if (b && b.code) blockers.push(b);
+      }
+    }
+    if (Array.isArray(data.warnings)) {
+      for (const w of data.warnings) {
+        if (w && w.message) warnings.push(`[${w.code || 'EDITOR_WARN'}] ${w.message}`);
       }
     }
     if (data.ok === false && blockers.length === 0 && data.message) {

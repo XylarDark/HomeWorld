@@ -204,6 +204,13 @@ def _assign_mesh_and_anim(bp, config):
                 _log("Could not set anim_class: " + str(e) + ". Assign AnimBP in Editor.")
         else:
             _log("Animation Blueprint not found: " + anim_path)
+    elif mesh_comp and sk_path and not anim_path:
+        # VP-B mesh-only interim: clear anim_class so broken unused ABP does not block spawn
+        try:
+            mesh_comp.set_editor_property("anim_class", None)
+            _log("Cleared anim_class (mesh-only interim — anim_blueprint empty in config)")
+        except Exception as e:
+            _log("Could not clear anim_class: " + str(e))
 
     if not mesh_comp:
         _log("Could not access SkeletalMeshComponent on " + BP_NAME + "; assign mesh/anim in Editor.")

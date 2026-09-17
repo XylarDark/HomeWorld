@@ -20,18 +20,23 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 ## Rolling log (newest first)
 
+### 2026-09-17 — VP-B mesh-only character + preflight (repo lane)
+
+- Cloud agent VP-B: interim **mesh-only** spawn — `character_blueprint_config.json` → Engine `DefaultSkeletalMesh`, empty `anim_blueprint`; preflight + bootstrap scripts aligned (spawn > AnimGraph).
+- Handoff: [Docs/handoffs/VP_B_SMOKE_CHARACTER.md](../Docs/handoffs/VP_B_SMOKE_CHARACTER.md); [PHASE_BOARD.md](../swarm/PHASE_BOARD.md) + [Docs/14](../Docs/14_VP_VERIFY_POLISH.md) → VP-B **IN PROGRESS** (HR3 **CLOSED**).
+- **Next (DESKTOP):** `setup_character_blueprint.py` → `preflight_ue_editor.py` → `npm run preflight:ue -- --require-editor`; then NightMix smoke + VP-A re-grep.
+
 ### 2026-09-17 — HR3-D APPROVED (APPROVE HR3-D stamp)
 
 - Lead **`APPROVE HR3-D`** (Luke Thompson, 2026-09-17 ET) — HR3-D **APPROVED / COMPLETE**; **HR3 track CLOSED / COMPLETE** (HR3-C **DEFERRED**).
-- Evidence merge `e19c0ac` (PR #64). Grades: harness **~A** (C deferred = not pure A+ on CI-as-law), swarm **~A+**.
+- Evidence merge `9fe48d6` (PR #65). Grades: harness **~A** (C deferred = not pure A+ on CI-as-law), swarm **~A+**.
 - Docs stamped: [HR3_D_EVIDENCE_LANE.md](../Docs/handoffs/HR3_D_EVIDENCE_LANE.md), [15_HR3_A_PLUS.md](../Docs/15_HR3_A_PLUS.md), [PHASE_BOARD.md](../swarm/PHASE_BOARD.md), [14_VP_VERIFY_POLISH.md](../Docs/14_VP_VERIFY_POLISH.md).
-- **Next:** **VP-B UNLOCKED / IN PROGRESS** (DESKTOP smoke + ABP); **VP-A re-verify** after VP-B before VP-C.
 
 ### 2026-09-17 — HR3-D DESKTOP evidence lane + re-verify (docs-only)
 
 - Cloud agent HR3-D: [PHASE_BOARD.md](../swarm/PHASE_BOARD.md) **Host** column (**CLOUD** | **DESKTOP** | **Lead**); handoff PR contract in [SWARM_OPS.md](../swarm/SWARM_OPS.md) §4a–4c and [CLOUD_AGENT_PACKET.md](../swarm/CLOUD_AGENT_PACKET.md).
 - Re-verify rule: **VP-B → VP-A greps re-prove → VP-C unlock** — [14_VP_VERIFY_POLISH.md](../Docs/14_VP_VERIFY_POLISH.md) § Re-verify; example checklist in [HR3_D_EVIDENCE_LANE.md](../Docs/handoffs/HR3_D_EVIDENCE_LANE.md).
-- HR3-C **DEFERRED / COMPLETE for track** (Lead skip). **Next:** Lead **`APPROVE HR3-D`** closes HR3 track; then resume VP-B + VP-A re-verify.
+- HR3-C **DEFERRED / COMPLETE for track** (Lead skip).
 
 ### 2026-09-17 — HR3-C DEFERRED (APPROVE HR3-C deferred stamp)
 

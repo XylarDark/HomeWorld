@@ -1,9 +1,10 @@
 {
   "_comment_mvp_cast": "Player skeletal mesh for vertical slice; partner/child use BP_*_Placeholder + tags (see demo_map_config _comment_mvp_cast). STYLE_GUIDE: docs/AssetCreation/STYLE_GUIDE.md.",
-  "skeletal_mesh": "/Game/Man/Mesh/Full/SK_Man_Full_01",
-  "anim_blueprint": "/Game/HomeWorld/Characters/ABP_HomeWorldCharacter",
+  "_comment_vp_b_interim": "VP-B interim: Engine DefaultSkeletalMesh + mesh-only spawn. ABP/Mannequin deferred until real mannequin returns — spawn > AnimGraph.",
+  "skeletal_mesh": "/Engine/EditorMeshes/SkeletalMesh/DefaultSkeletalMesh",
+  "anim_blueprint": "",
   "mesh_forward_yaw_offset": 0.0,
-  "_comment_skeletal_mesh": "Content path to the skeletal mesh asset (e.g. /Game/Characters/Meshes/SK_Mannequin). Leave empty to skip.",
-  "_comment_anim_blueprint": "Content path to the Animation Blueprint asset (e.g. /Game/Characters/Animations/ABP_Character). Leave empty to skip.",
+  "_comment_skeletal_mesh": "Content or Engine path to skeletal mesh. Engine paths (e.g. /Engine/EditorMeshes/...) skip disk preflight.",
+  "_comment_anim_blueprint": "Animation Blueprint path. Leave empty for mesh-only / single-node interim (VP-B); preflight treats empty as OK.",
   "_comment_yaw_offset": "Degrees to rotate the mesh so its forward matches movement direction. Use 90 or -90 if the mesh faces sideways."
 }

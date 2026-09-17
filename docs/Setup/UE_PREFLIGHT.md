@@ -64,11 +64,11 @@ CI runs the same in [validate.yml](../../.github/workflows/validate.yml). Full a
 |------|---------|
 | `MCP_UNREACHABLE` | Port 55557 closed — Editor not running or UnrealMCP not loaded |
 | `CONFIG_MISSING` | Required repo file or invalid JSON |
-| `CONFIG_EMPTY_PATH` | `character_blueprint_config.json` missing `skeletal_mesh` / `anim_blueprint` |
-| `ASSET_MISSING_ON_DISK` | Expected `.uasset`/`.umap` absent under `Content/` |
+| `CONFIG_EMPTY_PATH` | `character_blueprint_config.json` missing `skeletal_mesh` (`anim_blueprint` may be empty for VP-B mesh-only) |
+| `ASSET_MISSING_ON_DISK` | Expected `.uasset`/`.umap` absent under `Content/` (`/Engine/...` paths skipped) |
 | `EDITOR_RESULTS_MISSING` | No `Saved/preflight_ue_editor.json` when `--require-editor` |
 | `EDITOR_ABP_SKELETON` | ABP skeleton missing or AnimBP compile error (**VP-A root cause**) |
-| `EDITOR_BP_MESH_EMPTY` | BP skeletal mesh or `anim_class` unset |
+| `EDITOR_BP_MESH_EMPTY` | BP skeletal mesh unset (mesh-only: empty `anim_class` OK when config `anim_blueprint` empty) |
 | `EDITOR_MAP_MISSING` | VS_MVP map missing or unloadable |
 
 Dry-run a fail class (tests / docs):
