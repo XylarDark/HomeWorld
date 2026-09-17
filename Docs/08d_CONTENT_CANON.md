@@ -340,7 +340,7 @@ After Lead **SIGN OFF AUDIT** (`Docs/08_AUDIT_SIGN_OFF.md`), candidates for arch
 - `VisionBoard/MVP/VERTICAL_SLICE_SIGNOFF.md` (superseded by Docs/07)
 - `docs/Automation/AGENT_COMPANY.md` (after swarm pointer sufficient)
 
-*No deletes until WAVE F and Lead SIGN OFF AUDIT.*
+*Deletes executed WAVE F — see [08_AUDIT_SIGN_OFF.md](08_AUDIT_SIGN_OFF.md). Audit not closed until Lead **`SIGN OFF AUDIT`**.*
 
 ---
 

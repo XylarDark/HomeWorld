@@ -8979,3 +8979,17 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 **Gate:** Await Lead `APPROVE WAVE E` before WAVE F deletes.
 
+---
+
+## 2026-09-17 — WAVE F archive / audit sign-off
+
+**Tasks completed:**
+- Removed **492 tracked paths** per `Docs/08d_CONTENT_CANON.md` §8: DemoMap/Homestead maps, PCG/Mass/combat/building assets, StylizedProvencal + Man + Milady sample packs, Python map-builders + `gui_automation/`, agent-loop Tools/bats.
+- Added `Docs/08_AUDIT_SIGN_OFF.md` (Waves A–E PR #11–#15; Windows-local cleanup §3; gate **`SIGN OFF AUDIT`**).
+- Stubs: `VisionBoard/MVP/VERTICAL_SLICE_SIGNOFF.md`, `docs/Automation/AGENT_COMPANY.md`.
+- Repointed `EditorStartupMap` → MainMenu; `bootstrap_project.py` VS_MVP-only; `AGENTS.md` removed deleted loop entrypoints.
+
+**Hard rules honored:** Docs/07 CLOSED not reopened; FALLBACK armed; no new features; Source C++ untouched.
+
+**Gate:** Audit **not closed** — await Lead **`SIGN OFF AUDIT`** on WAVE F PR.
+
