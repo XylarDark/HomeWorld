@@ -20,6 +20,14 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 ## Rolling log (newest first)
 
+### 2026-09-17 — VP-B APPROVED (APPROVE VP-B stamp)
+
+- Lead **`APPROVE VP-B`** (Luke Thompson, 2026-09-17 ET) — VP-B **APPROVED / CLOSED**; **VP-C IN PROGRESS** (planning/impl unlocked).
+- PA-03 **deferred accept** under VP-B (mesh-only interim; not an open defect). **VP-D LOCKED**.
+- **VP-A re-verify** on DESKTOP (CND parent) — **IN PROGRESS** / required before VP-C **COMPLETE** per [HR3_D_EVIDENCE_LANE.md](../Docs/handoffs/HR3_D_EVIDENCE_LANE.md). Do **not** mark VP-C **COMPLETE** until re-verify filed or Lead **WAIVED**.
+- Docs stamped: [VP_B_SMOKE_CHARACTER.md](../Docs/handoffs/VP_B_SMOKE_CHARACTER.md), [14_VP_VERIFY_POLISH.md](../Docs/14_VP_VERIFY_POLISH.md), [PHASE_BOARD.md](../swarm/PHASE_BOARD.md); stub [VP_C_POLISH.md](../Docs/handoffs/VP_C_POLISH.md).
+- **Next:** Conductor files VP-A re-verify on DESKTOP; VP-C implementation — Lead **`APPROVE VP-C`** before implementation PR merge.
+
 ### 2026-09-17 — VP-B DESKTOP evidence + NightMix MaterialLibrary fix
 
 - **DESKTOP-21CT3H0** @ `5d09cf8`: preflight exit **0** (`mesh_only: true`); NightMix smoke **4/4** via `unreal.MaterialLibrary` (PA-02 fixed).
