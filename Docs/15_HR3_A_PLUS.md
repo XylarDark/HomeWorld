@@ -5,6 +5,7 @@
 | **Status** | **APPROVED / ACTIVE** — Lead Luke Thompson, **`APPROVE HR3 STRATEGY`**, 2026-09-17 ET |
 | **Gate** | **`APPROVE HR3 STRATEGY`** — **APPROVED** (Luke Thompson, 2026-09-17 ET) |
 | **HR3-A evidence merge** | `27a1af4` (PR #58) |
+| **HR3-B evidence merge** | `9d7ffaf` (PR #60) |
 | **Date** | 2026-09-17 |
 | **Baseline** | Main post-HR2 + VP-A evidence — HR2 **CLOSED**, VP strategy **APPROVED**, VP-A **APPROVED** (hard-fail ABP), VP-B **PARKED** for HR3 |
 | **Harness grade (now)** | **~B** — doctor:ue truth, cold-clone CI, build-win64 path filters; no loud UE preflight, Windows exec tribal, branch protection advisory |
@@ -21,9 +22,11 @@ Lead **`APPROVE HR3 STRATEGY`** — **APPROVED** (Luke Thompson, 2026-09-17 ET).
 
 Lead **`APPROVE HR3-A`** — **APPROVED** (Luke Thompson, 2026-09-17 ET). Evidence merge `27a1af4` (PR #58).
 
-**Next gate:** **`APPROVE HR3-B`** — UE preflight fails loud.
+Lead **`APPROVE HR3-B`** — **APPROVED** (Luke Thompson, 2026-09-17 ET). Evidence merge `9d7ffaf` (PR #60).
 
-**HR3-A APPROVED / COMPLETE**. **HR3-B UNLOCKED / IN PROGRESS**. HR3-C/D **LOCKED**. **VP-B PARKED** pending HR3 (do not mark VP complete).
+**Next gate:** **`APPROVE HR3-C`** — branch protection real.
+
+**HR3-A APPROVED / COMPLETE**. **HR3-B APPROVED / COMPLETE**. **HR3-C UNLOCKED / IN PROGRESS**. HR3-D **LOCKED**. **VP-B PARKED** pending HR3 (do not mark VP complete).
 
 ---
 
@@ -67,8 +70,9 @@ Conductor blunt grade at VP-A close: **swarm B+ / harness B**. **A+** means **cl
 | **VP-B** | **PARKED** — pending HR3 (was unlocked mid-fix) |
 | **Docs/15 / HR3 strategy** | **APPROVED** — Lead **`APPROVE HR3 STRATEGY`**, 2026-09-17 ET |
 | **HR3-A** | **APPROVED / COMPLETE** — [handoffs/HR3_A_WINDOWS_EXEC.md](handoffs/HR3_A_WINDOWS_EXEC.md) |
-| **HR3-B** | **EVIDENCE FILED — AWAITING APPROVE HR3-B** — [handoffs/HR3_B_UE_PREFLIGHT.md](handoffs/HR3_B_UE_PREFLIGHT.md) |
-| **HR3-C … HR3-D** | **LOCKED** until per-phase gates |
+| **HR3-B** | **APPROVED / COMPLETE** — [handoffs/HR3_B_UE_PREFLIGHT.md](handoffs/HR3_B_UE_PREFLIGHT.md) |
+| **HR3-C** | **UNLOCKED / IN PROGRESS** — branch protection real |
+| **HR3-D** | **LOCKED** until per-phase gate |
 
 ---
 
@@ -109,14 +113,14 @@ Naming: **HR3-A … HR3-D** (Harness Refine 3 — A+ pass). Do **not** reuse HR2
 | **Checks (minimum)** | MCP port **55557** reachable; VS_MVP map path exists; character BP + ABP skeleton deps resolvable; bootstrap-critical assets present (script-defined list). |
 | **Policy** | Document when to run: before VP PIE, before DESKTOP handoff PR, in CI where applicable (dry-run / skip-MCP mode on cloud). |
 | **Evidence** | [handoffs/HR3_B_UE_PREFLIGHT.md](handoffs/HR3_B_UE_PREFLIGHT.md) — script + policy; DESKTOP dry-run exit codes (pass + deliberate fail cases) |
-| **Gate** | Lead **`APPROVE HR3-B`** before implementation PR |
+| **Gate** | Lead **`APPROVE HR3-B`** — **APPROVED** (Luke Thompson, 2026-09-17 ET) |
 
 **Why A+:** Harness screams before Lead wastes a phase on empty FORM: greps.
 
 **Done criteria:**
 
 - [x] `npm run preflight:ue` (or documented equivalent) exits **non-zero** on each blocker class above — [handoffs/HR3_B_UE_PREFLIGHT.md](handoffs/HR3_B_UE_PREFLIGHT.md)
-- [ ] DESKTOP dry-run logs show pass + fail exit codes with clear messages (Lead/Conductor on DESKTOP-21CT3H0)
+- [x] DESKTOP dry-run logs show pass + fail exit codes with clear messages — [handoffs/HR3_B_UE_PREFLIGHT.md](handoffs/HR3_B_UE_PREFLIGHT.md) § DESKTOP evidence
 - [x] Policy doc: when required, who runs it (cloud vs DESKTOP owner) — [docs/Setup/UE_PREFLIGHT.md](../docs/Setup/UE_PREFLIGHT.md)
 - [x] VP-A class failure (ABP skeleton) would have been caught by preflight — `EDITOR_ABP_SKELETON` + `--simulate-fail`
 
@@ -215,8 +219,9 @@ Phases may run **sequentially** (recommended: A → B → C → D) or **parallel
 ```
 Docs/15 / HR3 STRATEGY: APPROVED — Lead Luke Thompson, APPROVE HR3 STRATEGY, 2026-09-17 ET
 HR3-A: APPROVED / COMPLETE — Lead APPROVE HR3-A, 2026-09-17 ET (evidence PR #58)
-HR3-B: UNLOCKED / IN PROGRESS — await Lead APPROVE HR3-B before implementation PR
-HR3-C … HR3-D: LOCKED
+HR3-B: APPROVED / COMPLETE — Lead APPROVE HR3-B, 2026-09-17 ET (evidence PR #60)
+HR3-C: UNLOCKED / IN PROGRESS — await Lead APPROVE HR3-C before implementation PR
+HR3-D: LOCKED
 VP-B: PARKED pending HR3
 ```
 
@@ -237,4 +242,4 @@ VP-B: PARKED pending HR3
 
 ---
 
-*Conductor prepared this file; HR3 strategy **APPROVED** 2026-09-17 ET — Lead **`APPROVE HR3 STRATEGY`**. HR3-A **APPROVED / COMPLETE** — Lead **`APPROVE HR3-A`**, 2026-09-17 ET. **HR3-B UNLOCKED / IN PROGRESS**; HR3-C/D **LOCKED**. VP-B **PARKED** until HR3 lands. No HR3-B implementation scripts in stamp PR — unlock only.*
+*Conductor prepared this file; HR3 strategy **APPROVED** 2026-09-17 ET — Lead **`APPROVE HR3 STRATEGY`**. HR3-A **APPROVED / COMPLETE** — Lead **`APPROVE HR3-A`**, 2026-09-17 ET. HR3-B **APPROVED / COMPLETE** — Lead **`APPROVE HR3-B`**, 2026-09-17 ET. **HR3-C UNLOCKED / IN PROGRESS**; HR3-D **LOCKED**. VP-B **PARKED** until HR3 lands.*

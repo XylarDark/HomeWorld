@@ -20,6 +20,14 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 ## Rolling log (newest first)
 
+### 2026-09-17 — HR3-B APPROVED (APPROVE HR3-B stamp)
+
+- Lead **`APPROVE HR3-B`** (Luke Thompson, 2026-09-17 ET) — HR3-B **APPROVED / COMPLETE**; **HR3-C UNLOCKED / IN PROGRESS**.
+- DESKTOP dry-run on **DESKTOP-21CT3H0** @ `9d7ffaf` (PR #60): `--skip-mcp --assets-only` exit **0**; `--simulate-fail=EDITOR_ABP_SKELETON` exit **1**; editor + `--require-editor` exit **1** (`EDITOR_ABP_SKELETON`, `EDITOR_BP_MESH_EMPTY`).
+- Docs stamped: [HR3_B_UE_PREFLIGHT.md](../Docs/handoffs/HR3_B_UE_PREFLIGHT.md), [15_HR3_A_PLUS.md](../Docs/15_HR3_A_PLUS.md), [PHASE_BOARD.md](../swarm/PHASE_BOARD.md).
+- **VP-B still PARKED** pending HR3. HR3-D **LOCKED**. No HR3-C implementation in stamp PR.
+- **Next:** HR3-C planning (branch protection real) — Lead **`APPROVE HR3-C`** before implementation PR.
+
 ### 2026-09-17 — HR3-B UE preflight (cloud PR)
 
 - Added `npm run preflight:ue` — [scripts/preflight-ue.js](../scripts/preflight-ue.js), [config/preflight-ue.json](../config/preflight-ue.json), [Content/Python/preflight_ue_editor.py](../Content/Python/preflight_ue_editor.py).
