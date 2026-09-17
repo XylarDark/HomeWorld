@@ -4,7 +4,7 @@
 |-------|-------|
 | **Status** | **APPROVED / ACTIVE** — Lead Luke Thompson, **`APPROVE HR3 STRATEGY`**, 2026-09-17 ET |
 | **Gate** | **`APPROVE HR3 STRATEGY`** — **APPROVED** (Luke Thompson, 2026-09-17 ET) |
-| **Strategy merge** | Pending stamp PR merge |
+| **HR3-A evidence merge** | `27a1af4` (PR #58) |
 | **Date** | 2026-09-17 |
 | **Baseline** | Main post-HR2 + VP-A evidence — HR2 **CLOSED**, VP strategy **APPROVED**, VP-A **APPROVED** (hard-fail ABP), VP-B **PARKED** for HR3 |
 | **Harness grade (now)** | **~B** — doctor:ue truth, cold-clone CI, build-win64 path filters; no loud UE preflight, Windows exec tribal, branch protection advisory |
@@ -19,9 +19,11 @@
 
 Lead **`APPROVE HR3 STRATEGY`** — **APPROVED** (Luke Thompson, 2026-09-17 ET).
 
-**Next gate:** **`APPROVE HR3-A`** — Windows agent exec reliability ([handoffs/HR3_A_WINDOWS_EXEC.md](handoffs/HR3_A_WINDOWS_EXEC.md)).
+Lead **`APPROVE HR3-A`** — **APPROVED** (Luke Thompson, 2026-09-17 ET). Evidence merge `27a1af4` (PR #58).
 
-**HR3-A UNLOCKED / IN PROGRESS**. HR3-B/C/D **LOCKED**. **VP-B PARKED** pending HR3 (do not mark VP complete).
+**Next gate:** **`APPROVE HR3-B`** — UE preflight fails loud.
+
+**HR3-A APPROVED / COMPLETE**. **HR3-B UNLOCKED / IN PROGRESS**. HR3-C/D **LOCKED**. **VP-B PARKED** pending HR3 (do not mark VP complete).
 
 ---
 
@@ -64,8 +66,9 @@ Conductor blunt grade at VP-A close: **swarm B+ / harness B**. **A+** means **cl
 | **VP-A** | **APPROVED** — hard-fail ABP evidence filed |
 | **VP-B** | **PARKED** — pending HR3 (was unlocked mid-fix) |
 | **Docs/15 / HR3 strategy** | **APPROVED** — Lead **`APPROVE HR3 STRATEGY`**, 2026-09-17 ET |
-| **HR3-A** | **UNLOCKED / IN PROGRESS** |
-| **HR3-B … HR3-D** | **LOCKED** until per-phase gates |
+| **HR3-A** | **APPROVED / COMPLETE** — [handoffs/HR3_A_WINDOWS_EXEC.md](handoffs/HR3_A_WINDOWS_EXEC.md) |
+| **HR3-B** | **UNLOCKED / IN PROGRESS** |
+| **HR3-C … HR3-D** | **LOCKED** until per-phase gates |
 
 ---
 
@@ -83,7 +86,7 @@ Naming: **HR3-A … HR3-D** (Harness Refine 3 — A+ pass). Do **not** reuse HR2
 | **Host** | Self-hosted worker **DESKTOP-21CT3H0** — see [WINDOWS_BRIDGE.md](../docs/Setup/WINDOWS_BRIDGE.md), [CLOUD_AGENT_PACKET.md](../swarm/CLOUD_AGENT_PACKET.md) |
 | **Approach** | (a) Document canonical `machineId` / worker targeting for Cursor cloud agents and Conductor spawns; (b) prove worker → `machineId` → hostname **DESKTOP** with command output; (c) catalog known failure modes + fix or documented workaround that becomes the **happy path**. |
 | **Evidence** | [handoffs/HR3_A_WINDOWS_EXEC.md](handoffs/HR3_A_WINDOWS_EXEC.md) — runbook, failure modes, proof excerpts |
-| **Gate** | Lead **`APPROVE HR3-A`** before implementation PR |
+| **Gate** | Lead **`APPROVE HR3-A`** — **APPROVED** (Luke Thompson, 2026-09-17 ET) |
 
 **Why A+:** Without this, DESKTOP work is tribal Conductor-only — swarm can't own PIE/MCP.
 
@@ -211,8 +214,9 @@ Phases may run **sequentially** (recommended: A → B → C → D) or **parallel
 
 ```
 Docs/15 / HR3 STRATEGY: APPROVED — Lead Luke Thompson, APPROVE HR3 STRATEGY, 2026-09-17 ET
-HR3-A: UNLOCKED / IN PROGRESS — await Lead APPROVE HR3-A before implementation PR
-HR3-B … HR3-D: LOCKED
+HR3-A: APPROVED / COMPLETE — Lead APPROVE HR3-A, 2026-09-17 ET (evidence PR #58)
+HR3-B: UNLOCKED / IN PROGRESS — await Lead APPROVE HR3-B before implementation PR
+HR3-C … HR3-D: LOCKED
 VP-B: PARKED pending HR3
 ```
 
@@ -233,4 +237,4 @@ VP-B: PARKED pending HR3
 
 ---
 
-*Conductor prepared this file; HR3 strategy **APPROVED** 2026-09-17 ET — Lead **`APPROVE HR3 STRATEGY`**. HR3-A **UNLOCKED / IN PROGRESS**; HR3-B/C/D **LOCKED**. VP-B **PARKED** until HR3 lands. No HR3-A implementation scripts in stamp PR — unlock only.*
+*Conductor prepared this file; HR3 strategy **APPROVED** 2026-09-17 ET — Lead **`APPROVE HR3 STRATEGY`**. HR3-A **APPROVED / COMPLETE** — Lead **`APPROVE HR3-A`**, 2026-09-17 ET. **HR3-B UNLOCKED / IN PROGRESS**; HR3-C/D **LOCKED**. VP-B **PARKED** until HR3 lands. No HR3-B implementation scripts in stamp PR — unlock only.*

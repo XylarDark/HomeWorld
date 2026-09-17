@@ -20,6 +20,13 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 ## Rolling log (newest first)
 
+### 2026-09-17 — HR3-A APPROVED (APPROVE HR3-A stamp)
+
+- Lead **`APPROVE HR3-A`** (Luke Thompson, 2026-09-17 ET) — HR3-A **APPROVED / COMPLETE**; **HR3-B UNLOCKED / IN PROGRESS**.
+- Docs stamped: [handoffs/HR3_A_WINDOWS_EXEC.md](../Docs/handoffs/HR3_A_WINDOWS_EXEC.md), [15_HR3_A_PLUS.md](../Docs/15_HR3_A_PLUS.md), [PHASE_BOARD.md](../swarm/PHASE_BOARD.md). Evidence merge `27a1af4` (PR #58).
+- **VP-B still PARKED** pending HR3. HR3-C/D **LOCKED**. No HR3-B implementation in stamp PR.
+- **Next:** HR3-B planning (UE preflight fails loud) — Lead **`APPROVE HR3-B`** before implementation PR.
+
 ### 2026-09-17 — HR3-A Windows exec evidence filed (docs-only)
 
 - [handoffs/HR3_A_WINDOWS_EXEC.md](../Docs/handoffs/HR3_A_WINDOWS_EXEC.md): **parent → machineId → DESKTOP-21CT3H0** proven; Task executors **FAIL** (no Shell/ListMachines/CallDynamicTool).
