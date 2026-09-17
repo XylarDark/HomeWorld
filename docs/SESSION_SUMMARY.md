@@ -20,6 +20,13 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 ## Rolling log (newest first)
 
+### 2026-09-17 — HR2-B cold-clone submodule onboarding
+
+- Lead **`APPROVE HR2-A`** (Luke Thompson, 2026-09-17 ET) — HR2-A **APPROVED**; HR2-B unlocked.
+- HR2-B: pin registry `config/devenv-template-pin.json`, CI guard `scripts/verify-devenv-submodule.sh` in validate.yml, runbook in CURSOR_DEV + AGENTS.md.
+- Cloud evidence: empty `DevEnvTemplate/` → submodule init → `doctor:build` exit 0 → `doctor:ue` exit 0.
+- Handoff: [Docs/13b_HR2_B_COLD_CLONE.md](../Docs/13b_HR2_B_COLD_CLONE.md). **Next:** Lead **`APPROVE HR2-B`** → unlock HR2-C. **Do not start HR2-C.**
+
 ### 2026-09-17 — HR2-A doctor signal (`doctor:ue`)
 
 - Lead **`APPROVE HR2 STRATEGY`** (Luke Thompson, 2026-09-17 ET) — strategy merge `d10e7b5` (PR #47).

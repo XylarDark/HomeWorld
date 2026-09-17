@@ -23,6 +23,7 @@ Full runner setup: [CI_SETUP.md](CI_SETUP.md). Cloud → Windows handoff: [WINDO
 - `Content/Python/*.json` valid
 - **Required docs** at canonical paths (see [DOCS_LAYOUT.md](../DOCS_LAYOUT.md)) — not quarantine stubs under `docs/workflow/` or `docs/tasks/`
 - C++ header/source pairing (warnings)
+- **DevEnvTemplate pin + submodule** — gitlink matches [config/devenv-template-pin.json](../../config/devenv-template-pin.json); empty submodule dir is inited in CI ([scripts/verify-devenv-submodule.sh](../../scripts/verify-devenv-submodule.sh); HR2-B)
 - Git hygiene (no `__pycache__`, temp JSON in root)
 
 **Docs-only PRs:** `validate` + `python-lint` jobs are sufficient. No `ci.yml` / Win64 build required.

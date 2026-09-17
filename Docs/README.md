@@ -39,7 +39,8 @@ These are **intentionally separate**. On case-insensitive filesystems (macOS/Win
 - **NP-D SYS V3–V4 gather + tame (APPROVED):** [12d_NP_D_SYS_V3_V4.md](12d_NP_D_SYS_V3_V4.md) — Lead **`APPROVE NP-D`**, 2026-09-17 ET
 - **NP-E heal + nurture + dawn persist (APPROVED):** [12e_NP_E_SYS_V6_V8.md](12e_NP_E_SYS_V6_V8.md) — Lead **`APPROVE NP-E`**, 2026-09-17 ET
 - **Harness Refine 2 strategy (APPROVED):** [13_HR2_HARNESS_REFINE.md](13_HR2_HARNESS_REFINE.md) — Lead **`APPROVE HR2 STRATEGY`**, 2026-09-17 ET
-- **HR2-A doctor signal (COMPLETE — await APPROVE HR2-A):** [13a_HR2_A_HANDOFF.md](13a_HR2_A_HANDOFF.md) — `npm run doctor:ue`
+- **HR2-A doctor signal (APPROVED):** [13a_HR2_A_HANDOFF.md](13a_HR2_A_HANDOFF.md) — Lead **`APPROVE HR2-A`**, 2026-09-17 ET
+- **HR2-B cold-clone submodule (COMPLETE — await APPROVE HR2-B):** [13b_HR2_B_COLD_CLONE.md](13b_HR2_B_COLD_CLONE.md)
 - **Start swarm:** [../START_HERE.md](../START_HERE.md)
 - **Master prompt:** [../HOMEWORLD_MASTER_PROMPT.md](../HOMEWORLD_MASTER_PROMPT.md)
 - **Game canon brief:** [../HOMEWORLD_MVP_SWARM_BRIEF.md](../HOMEWORLD_MVP_SWARM_BRIEF.md)

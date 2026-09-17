@@ -83,6 +83,9 @@ jobs:
             fi
           done
 
+      - name: DevEnvTemplate pin + submodule (HR2-B)
+        run: bash scripts/verify-devenv-submodule.sh
+
       - name: Git hygiene checks
         run: |
           ERRORS=0

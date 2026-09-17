@@ -36,7 +36,7 @@
 
 ## DevEnvTemplate (adopted layers)
 
-HomeWorld vendors [DevEnvTemplate/](DevEnvTemplate/) as a **gitlink** (pinned SHA) and adopts these layers:
+HomeWorld vendors [DevEnvTemplate/](DevEnvTemplate/) as a **gitlink** (pinned SHA — registry: [config/devenv-template-pin.json](config/devenv-template-pin.json)) and adopts these layers:
 
 | Layer | Status |
 | ----- | ------ |
@@ -64,7 +64,7 @@ Blender-first MVP production kit: canon in **`Docs/`**, kits in **`Lib/`**, coor
 
 ## Dev environment setup
 
-1. Install UE 5.7, clone this repo, init DevEnvTemplate: `git submodule update --init --recursive DevEnvTemplate` (then `npm run doctor:build` once, `npm run doctor` — see [docs/Setup/CURSOR_DEV.md](docs/Setup/CURSOR_DEV.md)).
+1. Install UE 5.7, clone this repo, init DevEnvTemplate: `git submodule update --init --recursive DevEnvTemplate` → `npm run doctor:build` once → `npm run doctor:ue` (UE host exit code; see [docs/Setup/CURSOR_DEV.md](docs/Setup/CURSOR_DEV.md), [Docs/13b_HR2_B_COLD_CLONE.md](Docs/13b_HR2_B_COLD_CLONE.md)).
 2. Run `Setup-MCP.bat` (one-time MCP bridge install).
 3. **Build → Editor → MCP chain:** Run `.\Tools\Safe-Build.ps1` (closes Editor if needed, then builds — see [docs/Setup/BUILD_POLICY.md](docs/Setup/BUILD_POLICY.md)).
 4. Open Unreal Editor (`HomeWorld.uproject`), restart Cursor, verify MCP green dot (port 55557 — [docs/Setup/MCP_SETUP.md](docs/Setup/MCP_SETUP.md)).

@@ -1,0 +1,13 @@
+{
+  "path": "DevEnvTemplate",
+  "remote": "https://github.com/XylarDark/DevEnvTemplate.git",
+  "branch": "master",
+  "sha": "2efd7569a698e73a04279feaebaae1eb55c4e1c0",
+  "shortSha": "2efd756",
+  "docPaths": [
+    "docs/Setup/CURSOR_DEV.md",
+    "Docs/13b_HR2_B_COLD_CLONE.md"
+  ],
+  "hr2Phase": "HR2-B",
+  "updated": "2026-09-17"
+}
