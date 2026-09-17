@@ -1,10 +1,10 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **HS-B** — Swarm ops tighten (**IN PROGRESS**)
+**Current phase:** **HS-C** — CI as law (**IN PROGRESS** — apply branch protection or Lead **`ACCEPT HS-C DEFER`**)
 
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
-**Active owners:** **Conductor** (HS-B)
-**Blocked by:** none for HS-B. Next gate Lead **`APPROVE HS-B`**. Branch protection remains **DEFERRED** (HR3-C → HS-C).
+**Active owners:** **Lead** (GitHub settings) / **Conductor** (verify + docs)
+**Blocked by:** Lead must **apply** branch protection on `main` **or** type **`ACCEPT HS-C DEFER`**. Next gate **`APPROVE HS-C`** (applied) or accept-defer stamp.
 
 
 | Phase | Name | Owners | Status | Gate file | Handoffs |
@@ -71,7 +71,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **HS-A** | Inventory & debt ledger | CLOUD | **APPROVED / CLOSED** | [17a_HS_INVENTORY.md](../Docs/17a_HS_INVENTORY.md) — Lead **`APPROVE HS-A`**, 2026-09-17 ET (PR #88) |
 | **HS-B** | Swarm ops tighten | CLOUD | **IN PROGRESS** | [17b_HS_SWARM_OPS.md](../Docs/17b_HS_SWARM_OPS.md) — **PENDING** Lead **`APPROVE HS-B`**; DESKTOP = Conductor **parent** only |
 
-**Current track:** **Docs/17 HS APPROVED** — HS-A **CLOSED**; **HS-B IN PROGRESS** (ops PR — not APPROVED).
+**Current track:** **Docs/17 HS** — HS-A/B **CLOSED**; **HS-C IN PROGRESS**.
 
 ---
 
