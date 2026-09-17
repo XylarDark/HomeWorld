@@ -5,6 +5,7 @@
   "description": "HomeWorld Unreal project - root scripts for DevEnvTemplate doctor and layer sync",
   "scripts": {
     "doctor": "node DevEnvTemplate/dist/scripts/doctor/cli.js --project-root .",
+    "doctor:ue": "node scripts/doctor-ue.js",
     "doctor:fix": "node DevEnvTemplate/dist/scripts/doctor/cli.js --project-root . --fix",
     "doctor:fast": "node DevEnvTemplate/dist/scripts/doctor/cli.js --project-root . --fast",
     "doctor:build": "cd DevEnvTemplate && npm install && npm run build",

@@ -39,7 +39,7 @@ From repo root after clone:
 ```bash
 git submodule update --init --recursive DevEnvTemplate
 npm run doctor:build   # once: install + build under DevEnvTemplate/
-npm run doctor
+npm run doctor:ue      # UE host: exit 0 when only DOCTOR_POLICY declines remain
 ```
 
 **Node 22 `EBADENGINE`:** Template prefers Node **24+**; HomeWorld host allows Node 20+. Warnings on Node 22 are an **accepted decline** — doctor still runs.
@@ -48,9 +48,12 @@ npm run doctor
 
 ### Doctor (ongoing)
 
-1. **Health check:** `npm run doctor` (after init runbook).
-2. **Apply auto-fixes:** `npm run doctor:fix`.
-3. **Rebuild doctor CLI:** `npm run doctor:build` (after template pin bump).
+1. **Health check (UE host):** `npm run doctor:ue` — runs doctor, treats [DOCTOR_POLICY.md](DOCTOR_POLICY.md) accepted declines as non-fatal; **trust this exit code** on cloud and Windows.
+2. **Raw template output:** `npm run doctor` — always exits non-zero while policy criticals remain; use for full report / score inspection.
+3. **Apply auto-fixes:** `npm run doctor:fix`.
+4. **Rebuild doctor CLI:** `npm run doctor:build` (after template pin bump).
+
+Decline list: [config/doctor-ue-declines.json](../../config/doctor-ue-declines.json). HR2-A handoff: [Docs/13a_HR2_A_HANDOFF.md](../../Docs/13a_HR2_A_HANDOFF.md).
 
 Reports are partial for Unreal (C++/Blueprint) but useful for repo hygiene, secrets, and docs.
 
