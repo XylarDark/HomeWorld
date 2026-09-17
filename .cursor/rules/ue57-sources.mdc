@@ -1,9 +1,10 @@
 ---
 name: "UE 5.7 — Always use 5.7-specific sources"
 description: "For any Unreal Engine API, UI, plugin, or documentation: use only UE 5.7–specific sources; do not rely on training data or other engine versions"
-alwaysApply: true
+alwaysApply: false
+globs: "**/*.uproject, **/Source/**, **/Content/**, **/Config/**, **/Plugins/**"
 priority: 6
-version: 1.0
+version: 1.1
 ---
 
 # UE 5.7 sourcing policy

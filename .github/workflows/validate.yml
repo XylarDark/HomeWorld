@@ -34,9 +34,21 @@ jobs:
             fi
           done
 
-      - name: Check required docs exist and are non-empty
+      - name: Check required docs exist and are non-empty (DOCS_LAYOUT canonical paths)
         run: |
-          for doc in docs/SETUP.md docs/CONVENTIONS.md docs/KNOWN_ERRORS.md docs/SESSION_LOG.md docs/workflow/README.md docs/workflow/30_DAY_SCHEDULE.md docs/workflow/MVP_AND_ROADMAP_STRATEGY.md AGENTS.md; do
+          for doc in \
+            AGENTS.md \
+            docs/DOCS_LAYOUT.md \
+            docs/SETUP.md \
+            docs/CONVENTIONS.md \
+            docs/KNOWN_ERRORS.md \
+            docs/SESSION_LOG.md \
+            docs/workflow/README.md \
+            docs/TaskLists/README.md \
+            docs/TaskLists/30_DAY_SCHEDULE.md \
+            docs/TaskLists/DAILY_STATE.md \
+            docs/Setup/CI_POLICY.md \
+            docs/Setup/WINDOWS_BRIDGE.md; do
             if [ ! -s "$doc" ]; then
               echo "::error::Missing or empty: $doc"
               exit 1
@@ -44,14 +56,14 @@ jobs:
             echo "  OK: $doc"
           done
 
-      - name: Check task docs exist
+      - name: Check quarantine pointer stubs still exist (compat only)
         run: |
-          for task in docs/tasks/CHARACTER_ANIMATION.md docs/tasks/CHARACTER_ORIENTATION.md docs/tasks/CHARACTER_GROUND.md docs/tasks/PCG_FOREST_ON_MAP.md; do
-            if [ ! -s "$task" ]; then
-              echo "::error::Missing or empty: $task"
-              exit 1
+          for stub in docs/workflow/30_DAY_SCHEDULE.md docs/workflow/MVP_AND_ROADMAP_STRATEGY.md; do
+            if [ ! -s "$stub" ]; then
+              echo "::warning::Quarantine stub missing (non-blocking): $stub"
+            else
+              echo "  OK (stub): $stub"
             fi
-            echo "  OK: $task"
           done
 
       - name: C++ header/source pairing check

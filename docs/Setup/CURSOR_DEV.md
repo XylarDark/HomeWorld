@@ -10,7 +10,8 @@ HomeWorld is set up so that AI agents and humans follow the same conventions whe
   - **Unreal project/config** (`**/*.uproject`, `**/Config/*.ini`): project layout, game module, plugins, default pawn and game mode.
   - **UE stack (glob-scoped from template):** `21-unreal-engine.mdc`, `22-unreal-editor-ui.mdc` — general Unreal practices; HomeWorld keeps version-specific policy in `ue57-sources.mdc` / `ue57-editor-ui.mdc` and [UE57_TECH.md](../UE/UE57_TECH.md).
   - **HomeWorld / DevEnvTemplate always-applied rules** (00–20 series and project-specific): still in use. Newer DevEnvTemplate **retires** those always-on files for *new* adoptions (migrate into `AGENTS.md` + skills). HomeWorld **keeps** them until a dedicated migration; do not delete them during routine sync.
-- **Building:** Agents use **`.\Tools\Safe-Build.ps1`** (calls `Build-HomeWorld.bat`; closes Editor first). See [BUILD_POLICY.md](BUILD_POLICY.md) and [EDITOR_BUILD_PROTOCOL.md](../Editor/EDITOR_BUILD_PROTOCOL.md). IDE/MSBuild after generating the solution: [SETUP.md](../SETUP.md).
+- **Build → Editor → MCP (agents):** **`.\Tools\Safe-Build.ps1`** → open Editor → verify MCP (port 55557). See [BUILD_POLICY.md](BUILD_POLICY.md), [MCP_SETUP.md](MCP_SETUP.md), [WINDOWS_BRIDGE.md](WINDOWS_BRIDGE.md). Humans with Editor already closed may still use `Build-HomeWorld.bat` directly.
+- **Rules token budget:** HR-B target — reduce `alwaysApply: true` count by glob-scoping UE-only rules; baseline **20** always-on (34 total `.mdc` files). After HR-B: see [Docs/11b_HR_B_HANDOFF.md](../../Docs/11b_HR_B_HANDOFF.md).
 - **Compound Engineering plugin:** Recommending its commands when the use case fits is policy; the agent suggests plugin workflows (e.g. `/workflowsreview`, `/workflowsplan`) instead of doing that work inline. See [.cursor/rules/10-compound-engineering.mdc](../../.cursor/rules/10-compound-engineering.mdc).
 
 When asking Cursor to change C++ or Blueprint behavior, the rules ensure suggestions align with programmatic-by-default and the existing HomeWorld layout.
@@ -19,15 +20,35 @@ When asking Cursor to change C++ or Blueprint behavior, the rules ensure suggest
 
 ## DevEnvTemplate (doctor + layer sync)
 
-Pinned checkout: [DevEnvTemplate/](../../DevEnvTemplate/) gitlink (refresh from the
-template working tree when adopting Human Use steer/taste/test). Full template docs:
-[DevEnvTemplate/docs/SYNC.md](../../DevEnvTemplate/docs/SYNC.md), [BOOTSTRAP.md](../../DevEnvTemplate/BOOTSTRAP.md).
+Pinned checkout: [DevEnvTemplate/](../../DevEnvTemplate/) **gitlink** — accepted pin; bump deferred unless Lead requests.
 
-### Doctor
+| Field | Value |
+|-------|-------|
+| **Pinned SHA** | `213673ff181743a703ab390af0d43097f889a0f9` |
+| **Remote** | `https://github.com/XylarDark/DevEnvTemplate.git` |
+| **Template `main`** | Ahead of pin — **do not force-push** template; bump only when doctor passes on cloud + Windows |
 
-1. **One-time setup:** From the repo root, run `npm run doctor:build` (install + build under `DevEnvTemplate/`). Template package prefers Node.js **24+**; host `package.json` still allows 20+ for older local installs.
-2. **Run health check:** `npm run doctor`.
-3. **Apply auto-fixes:** `npm run doctor:fix`.
+Full template docs: [DevEnvTemplate/docs/SYNC.md](../../DevEnvTemplate/docs/SYNC.md), [BOOTSTRAP.md](../../DevEnvTemplate/BOOTSTRAP.md).
+
+### Init runbook (fresh clone — idempotent)
+
+From repo root after clone:
+
+```bash
+git submodule update --init --recursive DevEnvTemplate
+npm run doctor:build   # once: install + build under DevEnvTemplate/
+npm run doctor
+```
+
+**Node 22 `EBADENGINE`:** Template prefers Node **24+**; HomeWorld host allows Node 20+. Warnings on Node 22 are an **accepted decline** — doctor still runs.
+
+**Empty `DevEnvTemplate/`:** Run submodule init before any `npm run doctor*` command.
+
+### Doctor (ongoing)
+
+1. **Health check:** `npm run doctor` (after init runbook).
+2. **Apply auto-fixes:** `npm run doctor:fix`.
+3. **Rebuild doctor CLI:** `npm run doctor:build` (after template pin bump).
 
 Reports are partial for Unreal (C++/Blueprint) but useful for repo hygiene, secrets, and docs.
 

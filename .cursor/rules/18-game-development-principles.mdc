@@ -1,9 +1,10 @@
 ---
 name: "Game development principles"
 description: "Principles of video game development: preserve content, create-if-missing, designer-author workflows, and senior game-dev standards. Align automation and agents with how games are built."
-alwaysApply: true
+alwaysApply: false
+globs: "**/Content/**, **/Maps/**, **/Lib/**, **/*.uasset, **/*.umap"
 priority: 2
-version: 1.0
+version: 1.1
 ---
 
 # Game development principles

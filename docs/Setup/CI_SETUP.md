@@ -1,5 +1,7 @@
 # CI setup (self-hosted runner and alternatives)
 
+**Policy summary:** When `validate.yml` vs `ci.yml` matters, docs-only PRs, and `[skip ci]` — see [CI_POLICY.md](CI_POLICY.md). **Cloud → Windows handoff:** [WINDOWS_BRIDGE.md](WINDOWS_BRIDGE.md).
+
 This doc explains how to get **full Unreal Engine build and automation tests** running in CI. The repo has two workflows:
 
 - **validate.yml** — Runs on every push on GitHub-hosted runners (Ubuntu). No UE required: lint, JSON checks, required docs, C++ header/source pairing. Always runs.
