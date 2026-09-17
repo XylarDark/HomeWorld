@@ -2,8 +2,9 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **DRAFT** — await Lead **`APPROVE HR3 STRATEGY`** |
-| **Gate** | **PENDING** — Lead Luke Thompson |
+| **Status** | **APPROVED / ACTIVE** — Lead Luke Thompson, **`APPROVE HR3 STRATEGY`**, 2026-09-17 ET |
+| **Gate** | **`APPROVE HR3 STRATEGY`** — **APPROVED** (Luke Thompson, 2026-09-17 ET) |
+| **Strategy merge** | Pending stamp PR merge |
 | **Date** | 2026-09-17 |
 | **Baseline** | Main post-HR2 + VP-A evidence — HR2 **CLOSED**, VP strategy **APPROVED**, VP-A **APPROVED** (hard-fail ABP), VP-B **PARKED** for HR3 |
 | **Harness grade (now)** | **~B** — doctor:ue truth, cold-clone CI, build-win64 path filters; no loud UE preflight, Windows exec tribal, branch protection advisory |
@@ -11,6 +12,16 @@
 | **Author** | Conductor (HomeWorld) |
 | **Prior HR track** | [13_HR2_HARNESS_REFINE.md](13_HR2_HARNESS_REFINE.md) — **CLOSED** |
 | **Parallel product track** | [14_VP_VERIFY_POLISH.md](14_VP_VERIFY_POLISH.md) — **APPROVED**; VP-B **PARKED** pending HR3 |
+
+---
+
+## Gate
+
+Lead **`APPROVE HR3 STRATEGY`** — **APPROVED** (Luke Thompson, 2026-09-17 ET).
+
+**Next gate:** **`APPROVE HR3-A`** — Windows agent exec reliability ([handoffs/HR3_A_WINDOWS_EXEC.md](handoffs/HR3_A_WINDOWS_EXEC.md)).
+
+**HR3-A UNLOCKED / IN PROGRESS**. HR3-B/C/D **LOCKED**. **VP-B PARKED** pending HR3 (do not mark VP complete).
 
 ---
 
@@ -52,8 +63,9 @@ Conductor blunt grade at VP-A close: **swarm B+ / harness B**. **A+** means **cl
 | **Docs/14 / VP strategy** | **APPROVED** |
 | **VP-A** | **APPROVED** — hard-fail ABP evidence filed |
 | **VP-B** | **PARKED** — pending HR3 (was unlocked mid-fix) |
-| **Docs/15 / HR3 strategy** | **DRAFT** — await Lead **`APPROVE HR3 STRATEGY`** |
-| **HR3-A … HR3-D** | **LOCKED** until strategy + per-phase gates |
+| **Docs/15 / HR3 strategy** | **APPROVED** — Lead **`APPROVE HR3 STRATEGY`**, 2026-09-17 ET |
+| **HR3-A** | **UNLOCKED / IN PROGRESS** |
+| **HR3-B … HR3-D** | **LOCKED** until per-phase gates |
 
 ---
 
@@ -198,8 +210,9 @@ Naming: **HR3-A … HR3-D** (Harness Refine 3 — A+ pass). Do **not** reuse HR2
 Phases may run **sequentially** (recommended: A → B → C → D) or **parallel** after strategy approval if Lead directs — each phase still requires its own APPROVE before implementation.
 
 ```
-Docs/15 / HR3 STRATEGY: DRAFT — await Lead APPROVE HR3 STRATEGY
-HR3-A … HR3-D: LOCKED
+Docs/15 / HR3 STRATEGY: APPROVED — Lead Luke Thompson, APPROVE HR3 STRATEGY, 2026-09-17 ET
+HR3-A: UNLOCKED / IN PROGRESS — await Lead APPROVE HR3-A before implementation PR
+HR3-B … HR3-D: LOCKED
 VP-B: PARKED pending HR3
 ```
 
@@ -220,4 +233,4 @@ VP-B: PARKED pending HR3
 
 ---
 
-*Conductor prepared this file; HR3 strategy **DRAFT** 2026-09-17 ET — await Lead **`APPROVE HR3 STRATEGY`**. No HR3-A…D implementation in this PR. VP-B **PARKED** until HR3 lands.*
+*Conductor prepared this file; HR3 strategy **APPROVED** 2026-09-17 ET — Lead **`APPROVE HR3 STRATEGY`**. HR3-A **UNLOCKED / IN PROGRESS**; HR3-B/C/D **LOCKED**. VP-B **PARKED** until HR3 lands. No HR3-A implementation scripts in stamp PR — unlock only.*

@@ -20,6 +20,12 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 ## Rolling log (newest first)
 
+### 2026-09-17 — HR3 strategy APPROVED (APPROVE HR3 STRATEGY stamp)
+
+- Lead **`APPROVE HR3 STRATEGY`** (Luke Thompson, 2026-09-17 ET) — Docs/15 **APPROVED / ACTIVE**; **HR3-A UNLOCKED / IN PROGRESS**.
+- Docs stamped: [15_HR3_A_PLUS.md](../Docs/15_HR3_A_PLUS.md), [PHASE_BOARD.md](../swarm/PHASE_BOARD.md). **VP-B PARKED** pending HR3. HR3-B/C/D **LOCKED**.
+- **Next:** HR3-A planning (Windows exec runbook) — Lead **`APPROVE HR3-A`** before implementation PR. No HR3-A scripts in stamp PR.
+
 ### 2026-09-17 — HR3 A+ strategy (docs-only DRAFT)
 
 - Delivered [Docs/15_HR3_A_PLUS.md](../Docs/15_HR3_A_PLUS.md) — **DRAFT**; phases HR3-A (Windows exec), HR3-B (UE preflight), HR3-C (branch protection), HR3-D (DESKTOP evidence + re-verify).
