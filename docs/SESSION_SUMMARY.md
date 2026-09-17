@@ -1,5 +1,10 @@
 # Session summary (rolling)
 
+## 2026-09-17 ET — WAIVE PL-B / PL-C unlocked
+
+Lead **`WAIVE PL-B`** (Luke Thompson, away). Verb Alt+P greps **WAIVED** (no invented lines). **PL-C OPEN** — PA-07 store-transfer + thin inventory readout. Next: Lead **`APPROVE PL-C`**.
+
+
 ## 2026-09-17 ET — APPROVE PL-A / PL-B unlocked
 
 Lead **`APPROVE PL-A`** (Luke Thompson). Manny substitute + preflight evidence **CLOSED**. **PL-B OPEN** — human Alt+P verb greps on `L_VS_MVP_Markers` (Docs/12c–12e prefixes). Keep [VP_A_PIE.md](../Docs/handoffs/VP_A_PIE.md) WAIVE record intact.

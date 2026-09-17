@@ -1,9 +1,10 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **PL-B** (human PIE verb pass) — **OPEN / IN PROGRESS** — PL-A **APPROVED / CLOSED** (Lead **`APPROVE PL-A`**, 2026-09-17 ET)
+**Current phase:** **PL-C** (thin loop UX / PA-07) — **OPEN / IN PROGRESS** — PL-B **WAIVED** (Lead **`WAIVE PL-B`**, 2026-09-17 ET)
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
-**Active owners:** **DESKTOP** + **Lead** (Alt+P Output Log greps)  
-**Blocked by:** human Alt+P evidence before Lead **`APPROVE PL-B`**. Branch protection remains **DEFERRED** (HR3-C).
+**Active owners:** **CLOUD** (store-transfer + inventory readout) + **DESKTOP** (smoke) + **Lead** (`APPROVE PL-C`)  
+**Blocked by:** none for PL-C start. Branch protection remains **DEFERRED** (HR3-C).
+
 
 | Phase | Name | Owners | Status | Gate file | Handoffs |
 |---|---|---|---|---|---|
@@ -65,7 +66,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **VP-C** | Playability polish | CLOUD+DESKTOP | **APPROVED / CLOSED** | [handoffs/VP_C_POLISH.md](../Docs/handoffs/VP_C_POLISH.md) — Lead **`APPROVE VP-C`**, 2026-09-17 ET |
 | **VP-D** | Bootstrap dry-run | CLOUD+DESKTOP | **APPROVED / CLOSED** | [handoffs/VP_D_BOOTSTRAP_CI.md](../Docs/handoffs/VP_D_BOOTSTRAP_CI.md) — Lead **`APPROVE VP-D`**, 2026-09-17 ET; branch protection **DEFERRED** |
 
-**Current track:** **Docs/16 Playable Loop APPROVED** — **PL-A CLOSED**; **PL-B OPEN**. VP **CLOSED**. Next gate **`APPROVE PL-B`**.
+**Current track:** **Docs/16 Playable Loop APPROVED** — **PL-A CLOSED**; **PL-B WAIVED**; **PL-C OPEN**. VP **CLOSED**. Next gate **`APPROVE PL-C`**.
 
 ---
 
@@ -74,7 +75,8 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | ID | Phase | Host | Owner | Write path | Due artifact |
 |---|---|---|---|---|---|
 | PL-A-character | PL-A | DESKTOP+CLOUD | CND | Docs/handoffs/ | [PL_A_CHARACTER.md](../Docs/handoffs/PL_A_CHARACTER.md) — **APPROVED / CLOSED** — Lead **`APPROVE PL-A`**, 2026-09-17 ET |
-| PL-B-pie | PL-B | DESKTOP+Lead | CND+Lead | Docs/handoffs/ | [PL_B_PIE.md](../Docs/handoffs/PL_B_PIE.md) — human Alt+P greps FORM/FALLBACK/HEAL/NURTURE/DAWN/TAME + GATHER; Lead **`APPROVE PL-B`** |
+| PL-B-pie | PL-B | Lead | Lead | Docs/handoffs/ | [PL_B_PIE.md](../Docs/handoffs/PL_B_PIE.md) — **WAIVED / CLOSED** — Lead **`WAIVE PL-B`**, 2026-09-17 ET |
+| PL-C-loop | PL-C | CLOUD+DESKTOP | CND | Docs/handoffs/ | [PL_C_LOOP_UX.md](../Docs/handoffs/PL_C_LOOP_UX.md) — PA-07 store-transfer + thin inventory readout; Lead **`APPROVE PL-C`** |
 | VP-A-reverify | VP-A | Lead | Lead | Docs/handoffs/ | **WAIVED** — Lead **`WAIVE VP-A re-verify`**, 2026-09-17 ET; debt closes under **PL-B** |
 | HR3-C-branch-protection | HR3-C | Lead | Lead | docs/Setup/ | **DEFERRED** — [HR3_C_BRANCH_PROTECTION.md](../Docs/handoffs/HR3_C_BRANCH_PROTECTION.md) |
 

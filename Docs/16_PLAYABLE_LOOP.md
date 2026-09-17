@@ -14,9 +14,9 @@
 
 Lead **`APPROVE PL STRATEGY`** — **APPROVED** (Luke Thompson, 2026-09-17 ET).
 
-**Next gate:** Lead **`APPROVE PL-B`** before PL-C.
+**Next gate:** Lead **`APPROVE PL-C`** before PL-D.
 
-**PL-A CLOSED** — Lead **`APPROVE PL-A`**, 2026-09-17 ET. **PL-B OPEN**. PL-C/D **LOCKED**.
+**PL-A CLOSED**. **PL-B WAIVED** — Lead **`WAIVE PL-B`**, 2026-09-17 ET. **PL-C OPEN**. PL-D **LOCKED**.
 
 ---
 
@@ -48,8 +48,8 @@ NP shipped SYS/GP verbs; VP polished runbooks and thin UX around an **Engine `De
 | Docs/14 / VP | **CLOSED / COMPLETE** |
 | **Docs/16 / PL strategy** | **APPROVED** — Lead **`APPROVE PL STRATEGY`**, 2026-09-17 ET |
 | **PL-A** | **APPROVED / CLOSED** — Lead **`APPROVE PL-A`**, 2026-09-17 ET |
-| **PL-B** | **OPEN / IN PROGRESS** |
-| **PL-C** | **LOCKED** |
+| **PL-B** | **WAIVED / CLOSED** — Lead **`WAIVE PL-B`**, 2026-09-17 ET |
+| **PL-C** | **OPEN / IN PROGRESS** |
 | **PL-D** | **LOCKED** |
 
 ---
@@ -102,6 +102,8 @@ Naming: **PL-A … PL-D** (Playable Loop). Do **not** reuse NP-* / HR-* / VP-* i
 
 - [ ] All six primary prefixes + supporting `GATHER:` have PASS or documented fail with log excerpt
 - [ ] Character spawn confirmed in PIE (controlled pawn)
+
+**Status:** **WAIVED / CLOSED** — Lead **`WAIVE PL-B`**, 2026-09-17 ET (no invented greps; optional Alt+P later).
 
 ---
 
