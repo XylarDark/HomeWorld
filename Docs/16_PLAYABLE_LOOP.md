@@ -14,9 +14,9 @@
 
 Lead **`APPROVE PL STRATEGY`** — **APPROVED** (Luke Thompson, 2026-09-17 ET).
 
-**Next gate:** Lead **`APPROVE PL-C`** before PL-D.
+**Next gate:** Lead **`APPROVE PL-D`** closes PL track.
 
-**PL-A CLOSED**. **PL-B WAIVED** — Lead **`WAIVE PL-B`**, 2026-09-17 ET. **PL-C OPEN**. PL-D **LOCKED**.
+**PL-A CLOSED**. **PL-B WAIVED**. **PL-C CLOSED** — Lead **`APPROVE PL-C`**, 2026-09-17 ET. **PL-D OPEN**.
 
 ---
 
@@ -49,8 +49,8 @@ NP shipped SYS/GP verbs; VP polished runbooks and thin UX around an **Engine `De
 | **Docs/16 / PL strategy** | **APPROVED** — Lead **`APPROVE PL STRATEGY`**, 2026-09-17 ET |
 | **PL-A** | **APPROVED / CLOSED** — Lead **`APPROVE PL-A`**, 2026-09-17 ET |
 | **PL-B** | **WAIVED / CLOSED** — Lead **`WAIVE PL-B`**, 2026-09-17 ET |
-| **PL-C** | **OPEN / IN PROGRESS** |
-| **PL-D** | **LOCKED** |
+| **PL-C** | **APPROVED / CLOSED** — Lead **`APPROVE PL-C`**, 2026-09-17 ET |
+| **PL-D** | **OPEN / IN PROGRESS** |
 
 ---
 
