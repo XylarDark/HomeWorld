@@ -50,6 +50,10 @@ void UHomeWorldInteractAbility::ActivateAbility(const FGameplayAbilitySpecHandle
 	}
 	if (!bHandled)
 	{
+		bHandled = Character->TryStoreTransferInFront();
+	}
+	if (!bHandled)
+	{
 		bHandled = Character->TryHarvestInFront();
 	}
 	EndAbility(Handle, ActorInfo, ActivationInfo, false, !bHandled);

@@ -22,6 +22,7 @@
 #include "HomeWorldInventoryTypes.h"
 #include "HomeWorldBeastTameComponent.h"
 #include "HomeWorldNurtureComponent.h"
+#include "HomeWorldStoreTransferComponent.h"
 #include "HomeWorldSpiritHealComponent.h"
 #include "HomeWorldSpiritRosterSubsystem.h"
 #include "HomeWorldTimeOfDaySubsystem.h"
@@ -785,6 +786,43 @@ bool AHomeWorldCharacter::TryNurtureInFront()
 	return false;
 }
 
+
+bool AHomeWorldCharacter::TryStoreTransferInFront()
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
+	if (GetIsSpiritForm() || (TimeOfDay && TimeOfDay->GetIsNight()))
+	{
+		UE_LOG(LogTemp, Log, TEXT("STORE: blocked — night or spirit form"));
+		ShowInteractFeedback(TEXT("STORE: day/body form only"), FColor::Yellow);
+		return false;
+	}
+
+	FHitResult Hit;
+	if (!TraceInteractHit(Hit))
+	{
+		return false;
+	}
+	AActor* HitActor = GetInteractTargetActor(Hit);
+	if (!HitActor)
+	{
+		return false;
+	}
+	if (UHomeWorldStoreTransferComponent* Store = HitActor->FindComponentByClass<UHomeWorldStoreTransferComponent>())
+	{
+		const bool bResult = Store->TryTransfer(this);
+		ShowInteractFeedback(
+			bResult ? TEXT("STORE: transfer ok") : TEXT("STORE: nothing to deposit/withdraw"),
+			bResult ? FColor::Green : FColor::Yellow);
+		return bResult;
+	}
+	return false;
+}
+
 bool AHomeWorldCharacter::TryHarvestInFront()
 {
 	UWorld* World = GetWorld();
@@ -1043,6 +1081,10 @@ FString AHomeWorldCharacter::BuildInteractRangeHint(AActor* Target) const
 	if (Target->FindComponentByClass<UHomeWorldNurtureComponent>())
 	{
 		return TEXT("[E] Nurture crop/store");
+	}
+	if (Target->FindComponentByClass<UHomeWorldStoreTransferComponent>())
+	{
+		return TEXT("[E] Store transfer");
 	}
 	if (Cast<AHomeWorldResourcePile>(Target))
 	{

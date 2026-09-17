@@ -3,34 +3,40 @@
 | Field | Value |
 |-------|-------|
 | **Phase** | PL-C |
-| **Status** | **OPEN / IN PROGRESS** — unlocked by Lead **`WAIVE PL-B`**, 2026-09-17 ET |
+| **Status** | **IN PROGRESS / PENDING DESKTOP Safe-Build + smoke** — unlocked by Lead **`WAIVE PL-B`**, 2026-09-17 ET |
 | **Lead gate** | **`APPROVE PL-C`** before PL-D |
 | **Spec** | [16_PLAYABLE_LOOP.md](../16_PLAYABLE_LOOP.md) § PL-C |
-| **Canon** | [GATHERABLES_WORLD_STORED.md](../../Lib/03_Gatherables/GATHERABLES_WORLD_STORED.md) |
-| **Prior** | PA-07 deferred in [VP_C_POLISH.md](VP_C_POLISH.md) |
 
-## Goal
+## Shipped (repo)
 
-1. **PA-07 store-transfer** — inventory unit ↔ Stored gatherable count (homestead Stored props).
-2. **Thin inventory readout** — on-screen or log-backed 6-slot display — **no new masters**.
+| Item | Path |
+|------|------|
+| Store-transfer component | `HomeWorldStoreTransferComponent` — deposit/withdraw, `STORE:` logs |
+| Store prop actor | `AHomeWorldStoreProp` |
+| Interact wire | `TryStoreTransferInFront` before harvest (day/body) |
+| HUD readout | Six `Inv[n]: RES_* xN` lines on `AHomeWorldHUD` |
+| Console | `hw.Inventory.Dump` → `INVENTORY:` lines |
+| Placement | `Content/Python/place_vs_mvp_store_transfer.py` (6× `GP_Store_*`) |
+
+## DESKTOP smoke (Conductor)
+
+1. Pull tip → Safe-Build
+2. Open `L_VS_MVP_Markers` → MCP `place_vs_mvp_store_transfer.py`
+3. PIE: grant/harvest resource → face `GP_Store_*` → **E** → expect `STORE: deposit`
+4. **E** again when inventory cannot accept deposit path → `STORE: withdraw`
+5. Confirm HUD Inv lines + `hw.Inventory.Dump`
 
 ## Done criteria
 
-- [ ] Store-transfer interact path works (Spend from inventory → Stored++; or reverse if specced)
-- [ ] Inventory readout shows 6 RES_* slots (HUD widget or `INVENTORY:` log dump on key)
-- [ ] DESKTOP smoke evidence in this handoff
-- [ ] Safe-Build green if C++ touched
-
-## Out of scope
-
-New masters (stay at **10**); full RPG UI; combat; reopening PL-B greps.
+- [x] Store-transfer interact path in C++
+- [x] Inventory readout (HUD + log dump)
+- [ ] DESKTOP Safe-Build + smoke evidence
+- [ ] Lead **`APPROVE PL-C`**
 
 ## Hard rules
 
-- Docs/07 CLOSED
-- No free-flight
-- No `.uasset` / `.umap` commits
+- Docs/07 CLOSED; no free-flight; no new masters; no `.uasset` commits
 
 ---
 
-*PL-C stub — OPEN after WAIVE PL-B.*
+*PL-C impl filed — awaiting DESKTOP smoke + Lead APPROVE PL-C.*
