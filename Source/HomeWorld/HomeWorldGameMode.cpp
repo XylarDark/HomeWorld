@@ -224,11 +224,9 @@ void AHomeWorldGameMode::TryTriggerNightEncounter()
 	bNightEncounterTriggered = true;
 	CurrentNightEncounterWave = 1;
 
-	// Bind to night started event (if not already) and start repeating regen timer
-	if (!TimeOfDay->OnNightStarted.IsBoundToObject(this))
-	{
-		TimeOfDay->OnNightStarted.AddDynamic(this, &AHomeWorldGameMode::OnNightStarted);
-	}
+	// Dynamic multicast delegates have no IsBoundToObject; RemoveDynamic + AddDynamic is idempotent.
+	TimeOfDay->OnNightStarted.RemoveDynamic(this, &AHomeWorldGameMode::OnNightStarted);
+	TimeOfDay->OnNightStarted.AddDynamic(this, &AHomeWorldGameMode::OnNightStarted);
 
 	// Start repeating spiritual power regen during night
 	if (SpiritualPowerRegenIntervalSeconds > 0.f && SpiritualPowerRegenAmount > 0 && !SpiritualPowerRegenTimerHandle.IsValid())

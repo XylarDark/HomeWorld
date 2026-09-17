@@ -8,7 +8,7 @@ UHomeWorldMealTriggerComponent::UHomeWorldMealTriggerComponent(const FObjectInit
 	: Super(ObjectInitializer)
 {
 	SetBoxExtent(FVector(80.0f, 80.0f, 50.0f));
-	bGenerateOverlapEvents = true;
+	SetGenerateOverlapEvents(true);
 }
 
 void UHomeWorldMealTriggerComponent::PostInitProperties()
