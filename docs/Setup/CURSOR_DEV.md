@@ -59,6 +59,10 @@ Verify pin matches registry: `git ls-tree HEAD DevEnvTemplate` should equal `con
 
 Decline list: [config/doctor-ue-declines.json](../../config/doctor-ue-declines.json). HR2-A handoff: [Docs/13a_HR2_A_HANDOFF.md](../../Docs/13a_HR2_A_HANDOFF.md).
 
+### UE preflight (HR3-B)
+
+Before DESKTOP PIE or verb greps: **`npm run preflight:ue`** — see [UE_PREFLIGHT.md](UE_PREFLIGHT.md). Cloud CI uses `--skip-mcp --assets-only`. Not a substitute for `doctor:ue`.
+
 Reports are partial for Unreal (C++/Blueprint) but useful for repo hygiene, secrets, and docs.
 
 ### Layer sync (refresh skills / entry shapes)

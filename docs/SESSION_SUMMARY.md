@@ -20,6 +20,13 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 ## Rolling log (newest first)
 
+### 2026-09-17 — HR3-B UE preflight (cloud PR)
+
+- Added `npm run preflight:ue` — [scripts/preflight-ue.js](../scripts/preflight-ue.js), [config/preflight-ue.json](../config/preflight-ue.json), [Content/Python/preflight_ue_editor.py](../Content/Python/preflight_ue_editor.py).
+- Policy: [docs/Setup/UE_PREFLIGHT.md](Setup/UE_PREFLIGHT.md); handoff: [Docs/handoffs/HR3_B_UE_PREFLIGHT.md](../Docs/handoffs/HR3_B_UE_PREFLIGHT.md).
+- CI: validate job runs `--skip-mcp --assets-only` + `preflight:ue:test`. Cross-links: DOCTOR_POLICY, WINDOWS_BRIDGE, CURSOR_DEV.
+- **Next:** Lead **`APPROVE HR3-B`** after DESKTOP dry-run; then unlock HR3-C.
+
 ### 2026-09-17 — HR3-A APPROVED (APPROVE HR3-A stamp)
 
 - Lead **`APPROVE HR3-A`** (Luke Thompson, 2026-09-17 ET) — HR3-A **APPROVED / COMPLETE**; **HR3-B UNLOCKED / IN PROGRESS**.
