@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **APPROVED / ACTIVE** — Lead Luke Thompson, **`APPROVE HS STRATEGY`**, 2026-09-17 ET |
+| **Status** | **CLOSED / COMPLETE** — Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET (strategy **`APPROVE HS STRATEGY`** same day) |
 | **Date** | 2026-09-17 |
 | **Author** | Conductor (HomeWorld) |
 | **Baseline main** | `d59a0b2` — Docs/16 PL **CLOSED**; session handoff filed |
