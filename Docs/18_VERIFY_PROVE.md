@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **DRAFT** — awaiting Lead **`APPROVE VP2 STRATEGY`** |
+| **Status** | **APPROVED / ACTIVE** — Lead Luke Thompson, **`APPROVE VP2 STRATEGY`**, 2026-09-17 ET |
 | **Date** | 2026-09-17 |
 | **Author** | Conductor (HomeWorld) |
 | **Baseline main** | `cab7e9c` — Docs/17 HS **SIGNED OFF**; Docs/16 PL **CLOSED** |
@@ -40,8 +40,8 @@ Prove the signed playable loop on **DESKTOP-21CT3H0** with **real** editor-log g
 |-------|--------|
 | Docs/16 PL | **CLOSED** |
 | Docs/17 HS | **CLOSED / COMPLETE** |
-| **Docs/18 / VP2 strategy** | **DRAFT** — await **`APPROVE VP2 STRATEGY`** |
-| **VP2-A** | LOCKED |
+| **Docs/18 / VP2 strategy** | **APPROVED** — Lead **`APPROVE VP2 STRATEGY`**, 2026-09-17 ET |
+| **VP2-A** | **UNLOCKED / IN PROGRESS** |
 | **VP2-B** | LOCKED |
 | **VP2-C** | LOCKED (optional; Lead picks flavor after VP2-A/B) |
 
@@ -116,13 +116,15 @@ If VP2-A is **all PASS** (or Lead **`WAIVE VP2-B`** with written MISSING accept)
 
 ## Immediate unlock
 
-1. Lead **`APPROVE VP2 STRATEGY`**
-2. Conductor unlocks **VP2-A** only
+1. Lead **`APPROVE VP2 STRATEGY`** — **DONE** (2026-09-17 ET)
+2. Conductor unlocks **VP2-A** only — **IN PROGRESS**
 
 ---
 
 ## Gate
 
-Lead type **`APPROVE VP2 STRATEGY`** to unlock VP2-A.
+Lead **`APPROVE VP2 STRATEGY`** — **APPROVED** (Luke Thompson, 2026-09-17 ET).
 
-*DRAFT — Docs/18 Verify & Prove. Not active until Lead APPROVE VP2 STRATEGY.*
+**VP2-A UNLOCKED / IN PROGRESS** — DESKTOP prove.
+
+*APPROVED — Docs/18 Verify & Prove. Lead **`APPROVE VP2 STRATEGY`**, 2026-09-17 ET.*
