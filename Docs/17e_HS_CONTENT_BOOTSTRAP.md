@@ -257,3 +257,11 @@ Until stamped: do not claim APPROVE HS-E; do not dump `.uasset`s; do not invent 
 ---
 
 *PENDING APPROVE HS-E — Docs/17e. Policy **KEEP-LOCAL** recorded 2026-09-17 ET. Do not claim APPROVE in this PR.*
+
+## Lead APPROVE HS-E
+
+Lead **`APPROVE HS-E`** (Luke Thompson, 2026-09-17 ET) — character/bootstrap canon **APPROVED / CLOSED** (policy **KEEP-LOCAL**). **HS-F** (sign-off & re-grade) **UNLOCKED**.
+
+---
+
+*HS-E **APPROVED / CLOSED** — Lead **`APPROVE HS-E`**, 2026-09-17 ET.*

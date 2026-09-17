@@ -1,3 +1,8 @@
+## 2026-09-17 ET — APPROVE HS-E / HS-F unlocked
+
+Lead **`APPROVE HS-E`** (policy **KEEP-LOCAL**). Character/bootstrap closed ([Docs/17e](../Docs/17e_HS_CONTENT_BOOTSTRAP.md)). **HS-F** sign-off & re-grade **IN PROGRESS**.
+
+
 ## 2026-09-17 ET — HS-E POLICY KEEP-LOCAL (PENDING APPROVE HS-E)
 
 Lead **`HS-E POLICY KEEP-LOCAL`**. Docs/17e + DESKTOP handoff + preflight Mannequins fail-loud. Status still **PENDING** **`APPROVE HS-E`**. Do not claim APPROVE. No `.uasset` commits.

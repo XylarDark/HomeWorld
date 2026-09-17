@@ -179,6 +179,6 @@ Each WAVE: deliverable doc + PR(s) → Lead **`APPROVE HS-*`** before next WAVE 
 
 Lead **`APPROVE HS STRATEGY`** — **APPROVED** (Luke Thompson, 2026-09-17 ET).
 
-**HS-A/B APPROVED / CLOSED**. **HS-C DEFERRED / CLOSED**. **HS-D APPROVED / CLOSED** — Lead **`APPROVE HS-D`**, 2026-09-17 ET. **HS-E UNLOCKED / IN PROGRESS**.
+**HS-A/B/D/E APPROVED / CLOSED**. **HS-C DEFERRED / CLOSED**. **HS-E** policy **KEEP-LOCAL**. **HS-F UNLOCKED / IN PROGRESS**.
 
 *APPROVED — Docs/17 Harness & Swarm Audit. Lead **`APPROVE HS STRATEGY`**, 2026-09-17 ET.*
