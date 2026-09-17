@@ -1,5 +1,7 @@
 # Company of agents: roles, accountability, continuity
 
+> **Quarantine / historical harness.** This describes the pre-swarm **UE automation company** (Developer / Fixer / Guardian loop). For MVP product-direction work, use **[swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md)** + Conductor and **[START_HERE.md](../../START_HERE.md)**. MVP canon: **`Docs/`** ([Docs/README.md](../../Docs/README.md)). Do not extend this loop as game canon during audit WAVEs — see [Docs/08a_INVENTORY.md](../../Docs/08a_INVENTORY.md).
+
 **Goal:** A small "company" of agents with **named roles** that **keep each other accountable** and ensure **development continues through all errors**—no silent drop, no dead end without a clear handoff.
 
 ---

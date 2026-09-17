@@ -14,6 +14,8 @@ These are **intentionally separate**. On case-insensitive filesystems (macOS/Win
 ## Entry points
 
 - **Audit & upgrade strategy (Lead-gated):** [08_AUDIT_UPGRADE_STRATEGY.md](08_AUDIT_UPGRADE_STRATEGY.md)
+- **WAVE A inventory:** [08a_INVENTORY.md](08a_INVENTORY.md)
+- **WAVE B harness gap:** [08b_HARNESS_GAP.md](08b_HARNESS_GAP.md) — **Gate: `APPROVE WAVE B`**
 - **Start swarm:** [../START_HERE.md](../START_HERE.md)
 - **Master prompt:** [../HOMEWORLD_MASTER_PROMPT.md](../HOMEWORLD_MASTER_PROMPT.md)
 - **Game canon brief:** [../HOMEWORLD_MVP_SWARM_BRIEF.md](../HOMEWORLD_MVP_SWARM_BRIEF.md)

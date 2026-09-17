@@ -8923,3 +8923,15 @@ Agent session summaries for cross-session context persistence.
 
 Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs/README.md`; no Docs/07 or PHASE_BOARD edits.
 
+---
+
+## 2026-09-17 — WAVE B harness gap + pointer align
+
+**Tasks completed:** `Docs/08b_HARNESS_GAP.md` (HomeWorld vs DevEnvTemplate gap table, build policy, submodule init/SHA, PR #10 parallel status). Pointer PR: AGENTS.md + README lead with START_HERE/Docs/; quarantine banners on AGENT_COMPANY + VisionBoard/MVP/README; `docs/Setup/BUILD_POLICY.md`; MCP_SETUP → Safe-Build.
+
+**Submodule:** Documented pin `213673f`; template main `2efd756` (behind). Init: `git submodule update --init DevEnvTemplate`.
+
+**PR #10:** Not merged — validate CI failed (missing `docs/workflow/30_DAY_SCHEDULE.md`).
+
+**Gate:** Await Lead `APPROVE WAVE B` before WAVE C.
+
