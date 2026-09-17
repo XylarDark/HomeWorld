@@ -77,13 +77,13 @@ function Assert-HomeWorldEditorDll {
     }
     $length = (Get-Item -LiteralPath $dllPath).Length
     if ($length -le $minBytes) {
-        Write-SafeLog ("FATAL: UnrealEditor-HomeWorld.dll is {0} bytes (expected > {1})." -f $length, $minBytes)
+        Write-SafeLog ('FATAL: UnrealEditor-HomeWorld.dll is {0} bytes (expected > {1}).' -f $length, $minBytes)
         Write-SafeLog "Likely cause: linker wrote a zero/tiny DLL while CrashReportClientEditor held the file — Editor launch shows Bad Image and appears hung."
         Write-SafeLog "Fix: taskkill /f /im CrashReportClientEditor.exe; close Unreal Editor; rerun .\Tools\Safe-Build.ps1 until DLL is healthy (~1.5 MB)."
         exit 1
     }
     $mb = [math]::Round($length / 1MB, 2)
-    Write-SafeLog ("Editor module DLL OK ({0} MB): {1}" -f $mb, $dllPath)
+    Write-SafeLog ('Editor module DLL OK ({0} MB): {1}' -f $mb, $dllPath)
 }
 
 # Ensure we're in project root
