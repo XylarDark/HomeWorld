@@ -112,3 +112,16 @@ If filing evidence after a blocker-fix that superseded a prior hard-fail (e.g. h
 ---
 
 *HS-D handoff — DESKTOP proof steps for Conductor parent. Executor filing is docs/scripts only.*
+
+## DESKTOP Conductor-parent smoke (2026-09-17 ET)
+
+Host: **DESKTOP-21CT3H0** · main tip `2bc2ce4` (PR #92 merged) · MCP ping **OK**.
+
+| Check | Result |
+|-------|--------|
+| `npm run evidence:grep:test` | **6/6 PASS** |
+| `node scripts/evidence-grep.js --log Saved/Logs/HomeWorld.log` | Tool runs; current log **0/9** verb prefixes (**MISSING** — no fresh PIE this session) |
+| Full PIE verb table | **NOT RUN** this session — checklist remains for optional Lead/Conductor PIE before or after **`APPROVE HS-D`** |
+
+Honest: HS-D deliverable = host-side tooling + re-verify policy. Fresh Alt+P greps are **not** claimed.
+
