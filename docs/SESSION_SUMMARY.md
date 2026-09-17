@@ -1,3 +1,8 @@
+## 2026-09-17 ET — APPROVE HS-A / HS-B unlocked
+
+Lead **`APPROVE HS-A`**. Inventory closed ([Docs/17a](../Docs/17a_HS_INVENTORY.md)). **HS-B** swarm ops tighten **IN PROGRESS**.
+
+
 ## 2026-09-17 ET — APPROVE HS STRATEGY / HS-A unlocked
 
 Lead **`APPROVE HS STRATEGY`**. Docs/17 active; **HS-A** inventory & debt ledger **IN PROGRESS**.

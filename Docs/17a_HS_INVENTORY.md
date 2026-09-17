@@ -2,15 +2,15 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **PENDING** Lead **`APPROVE HS-A`** |
+| **Status** | **APPROVED / CLOSED** — Lead Luke Thompson, **`APPROVE HS-A`**, 2026-09-17 ET |
 | **Date** | 2026-09-17 (ET) |
 | **Author** | Conductor executor (HomeWorld) — gh Contents API only |
 | **Parent plan** | [17_HS_AUDIT_STRATEGY.md](17_HS_AUDIT_STRATEGY.md) — Lead **`APPROVE HS STRATEGY`**, 2026-09-17 ET |
 | **Baseline** | Docs/08 **SIGNED OFF** ([08_AUDIT_SIGN_OFF.md](08_AUDIT_SIGN_OFF.md), PR **#16** / **#17**); strategy baseline main `d59a0b2` (PL CLOSED); inventory filed against main tip at authoring |
 | **Scope** | Authoritative map of work since Docs/08 SIGN OFF (PRs ~**#17–#85** + strategy **#86**) — tracks, keepers, open debt with owners + HS WAVE |
-| **Hard rules honored** | Docs/07 CLOSED; FALLBACK glide only; no combat; no `.uasset`/`.umap` commits; exactly 10 masters; no invented product phases; no merge; **do not claim `APPROVE HS-A`** |
+| **Hard rules honored** | Docs/07 CLOSED; FALLBACK glide only; no combat; no `.uasset`/`.umap` commits; exactly 10 masters; no invented product phases |
 
-**Gate:** stop for Lead **`APPROVE HS-A`** before HS-B unlocks.
+**Gate:** Lead **`APPROVE HS-A`** — **APPROVED** (Luke Thompson, 2026-09-17 ET). **HS-B UNLOCKED**.
 
 ---
 
@@ -201,3 +201,11 @@ Type: APPROVE HS-A
 On approval, Conductor opens HS-B (`Docs/17b_HS_SWARM_OPS.md` + ops PR). Until then: no HS implementation WAVEs, no merge claims of APPROVE HS-A, Docs/07 remains CLOSED, FALLBACK FLIGHT remains armed.
 
 *HS-A deliverable — Docs/17a. Does **not** claim Lead APPROVE HS-A.*
+
+## Lead APPROVE HS-A
+
+Lead **`APPROVE HS-A`** (Luke Thompson, 2026-09-17 ET) — inventory & debt ledger **APPROVED / CLOSED**. **HS-B** (swarm ops tighten) **UNLOCKED**.
+
+---
+
+*HS-A **APPROVED / CLOSED** — Lead **`APPROVE HS-A`**, 2026-09-17 ET.*
