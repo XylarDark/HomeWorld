@@ -1,5 +1,10 @@
 # Session summary (rolling)
 
+## 2026-09-17 ET — APPROVE PL-A / PL-B unlocked
+
+Lead **`APPROVE PL-A`** (Luke Thompson). Manny substitute + preflight evidence **CLOSED**. **PL-B OPEN** — human Alt+P verb greps on `L_VS_MVP_Markers` (Docs/12c–12e prefixes). Keep [VP_A_PIE.md](../Docs/handoffs/VP_A_PIE.md) WAIVE record intact.
+
+
 ## 2026-09-17 ET — PL-A Manny substitute APPROVED
 
 Lead approved **UE 5.7 template Mannequin** (`SKM_Manny_Simple` + `ABP_Unarmed`) as PL-A substitute for missing `SK_Man_Full_01`. Config paths updated; DESKTOP copies Mannequins locally (**no `.uasset` commits**). Next: MCP apply + `preflight:ue --require-editor`, then Lead **`APPROVE PL-A`**.
