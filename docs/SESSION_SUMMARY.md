@@ -20,6 +20,14 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 ## Rolling log (newest first)
 
+### 2026-09-17 — VP-A PIE evidence filed (DESKTOP hard-fail)
+
+- DESKTOP PIE run on **DESKTOP-21CT3H0** (2026-09-17 ~08:26–08:28 ET) via UnrealMCP @ repo `cb592fa`.
+- [handoffs/VP_A_PIE.md](../Docs/handoffs/VP_A_PIE.md): scene inventory **PASS**; all verb prefixes **FAIL** (no spawnable character).
+- Root cause: `ABP_HomeWorldCharacter` skeleton missing (`UE4_Mannequin_Skeleton`) — maps **PA-03 / VP-B**.
+- [PHASE_BOARD.md](../swarm/PHASE_BOARD.md): VP-A **EVIDENCE FILED / AWAITING APPROVE VP-A** (not COMPLETE until Lead stamp).
+- **Next:** Lead **`APPROVE VP-A`** → unlock **VP-B** (ABP skeleton + NightMix smoke) before verb PIE re-run.
+
 ### 2026-09-17 — VP strategy APPROVED (APPROVE VP STRATEGY stamp)
 
 - Lead **`APPROVE VP STRATEGY`** (Luke Thompson, 2026-09-17 ET) — Docs/14 **APPROVED / ACTIVE**; VP-A **UNLOCKED / IN PROGRESS**.

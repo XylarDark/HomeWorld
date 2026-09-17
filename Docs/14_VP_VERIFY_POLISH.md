@@ -15,9 +15,9 @@
 
 Lead **`APPROVE VP STRATEGY`** — **APPROVED** (Luke Thompson, 2026-09-17 ET).
 
-**Next gate:** **`APPROVE VP-A`** after DESKTOP PIE evidence is filed in [handoffs/VP_A_PIE.md](handoffs/VP_A_PIE.md).
+**Next gate:** **`APPROVE VP-A`** — DESKTOP PIE evidence **filed** in [handoffs/VP_A_PIE.md](handoffs/VP_A_PIE.md) (2026-09-17 ET; verb PIE **hard-fail**, ABP skeleton blocker → VP-B).
 
-**VP-A unlocked / IN PROGRESS** — Windows DESKTOP PIE evidence work may begin. VP-B/C/D remain **LOCKED** until their gates.
+**VP-A EVIDENCE FILED** — await Lead **`APPROVE VP-A`**. VP-B/C/D remain **LOCKED** until their gates.
 
 ---
 
@@ -48,7 +48,7 @@ Product NP (NP-A…E) and Harness Refine 2 (HR2-A…C) are **CLOSED**. Senior po
 | **Product NP (Docs/11)** | **CLOSED** |
 | **Harness HR2 (Docs/13)** | **CLOSED** |
 | **Docs/14 / VP strategy** | **APPROVED** — Lead **`APPROVE VP STRATEGY`**, 2026-09-17 ET |
-| **VP-A** | **UNLOCKED / IN PROGRESS** |
+| **VP-A** | **EVIDENCE FILED — AWAITING APPROVE VP-A** (verb PIE hard-fail; PA-03 ABP skeleton → VP-B) |
 | **VP-B** | **LOCKED** |
 | **VP-C** | **LOCKED** |
 | **VP-D** | **LOCKED** |
@@ -79,9 +79,9 @@ Naming: **VP-A … VP-D** (Verify & Polish). Do **not** reuse NP-* or HR2-* phas
 
 **Done criteria:**
 
-- [ ] All six primary prefixes (`FORM`, `FALLBACK`, `HEAL`, `NURTURE`, `DAWN`, `TAME`) have **pass or documented fail** with log excerpt
-- [ ] `handoffs/VP_A_PIE.md` filed with DESKTOP evidence
-- [ ] Any hard-fail blocks VP-B/C until root-caused (do not invent workarounds that violate FALLBACK rules)
+- [x] All six primary prefixes (`FORM`, `FALLBACK`, `HEAL`, `NURTURE`, `DAWN`, `TAME`) have **pass or documented fail** with log excerpt — **all FAIL** (filed 2026-09-17)
+- [x] `handoffs/VP_A_PIE.md` filed with DESKTOP evidence
+- [x] Any hard-fail blocks VP-B/C until root-caused — **ABP skeleton hard-fail** blocks verb PIE; fix in **VP-B** (PA-03)
 
 ---
 
@@ -201,7 +201,7 @@ Phases run **sequentially** (recommended: A → B → C → D) unless Lead direc
 
 ```
 Docs/14 / VP STRATEGY: APPROVED — Lead Luke Thompson, APPROVE VP STRATEGY, 2026-09-17 ET
-VP-A: UNLOCKED / IN PROGRESS — VP-B: LOCKED — VP-C: LOCKED — VP-D: LOCKED
+VP-A: EVIDENCE FILED (verb PIE hard-fail; await APPROVE VP-A) — VP-B: LOCKED — VP-C: LOCKED — VP-D: LOCKED
 Product NP: CLOSED — HR2: CLOSED
 ```
 
@@ -223,4 +223,4 @@ Product NP: CLOSED — HR2: CLOSED
 
 ---
 
-*Conductor prepared this file; Lead **`APPROVE VP STRATEGY`** locked 2026-09-17 ET. VP-A PIE evidence in progress on DESKTOP; VP-B/C/D implementation PRs await their gates.*
+*Conductor prepared this file; Lead **`APPROVE VP STRATEGY`** locked 2026-09-17 ET. VP-A PIE evidence **filed** 2026-09-17 ET ([handoffs/VP_A_PIE.md](handoffs/VP_A_PIE.md)) — verb PIE hard-fail; await Lead **`APPROVE VP-A`**; VP-B recommended next.*
