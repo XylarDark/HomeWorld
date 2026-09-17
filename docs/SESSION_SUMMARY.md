@@ -20,6 +20,13 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 ## Rolling log (newest first)
 
+### 2026-09-17 — NP-B lookdev apply (script + docs)
+
+- Lead **`APPROVE NP-A`** — NP-B unlocked (2026-09-17 ET).
+- Delivered `assign_vs_mvp_materials.py` + `homeworld_vs_mvp_material_rules.py` — ten Docs/02 masters on `DRESS_*`; NightMix MPC smoke optional.
+- Runbook [Docs/12b_NP_B_LOOKDEV.md](../Docs/12b_NP_B_LOOKDEV.md); handoff [Docs/handoffs/NP_B_LOOKDEV.md](../Docs/handoffs/NP_B_LOOKDEV.md) — Windows evidence **PENDING**.
+- **Next:** Conductor runs on DESKTOP → Lead **`APPROVE NP-B`**.
+
 ### 2026-09-17 — NP-A inventory / gap map
 
 - Lead **`APPROVE NP STRATEGY`** — product NP strategy **APPROVED** (Luke Thompson, 2026-09-17 ET).
