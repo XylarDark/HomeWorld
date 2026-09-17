@@ -100,7 +100,7 @@ Handoff markdown **and** PR body for DESKTOP or cross-host phases must include:
 | Field | Required content |
 |-------|------------------|
 | **Host** | `DESKTOP-21CT3H0` or `CLOUD` (Linux VM) |
-| **Grep prefixes** | Log tokens to grep (e.g. VP-A: `FORM:`, `FALLBACK:`, `HEAL:`, `NURTURE:`, `DAWN:`, `TAME:`, `GATHER:`) |
+| **Grep prefixes** | Log tokens to grep (HS-D / VP-A class: `FORM:`, `FALLBACK:`, `HEAL:`, `NURTURE:`, `DAWN:`, `TAME:`, `GATHER:`, `STORE:`, `INVENTORY:`) |
 | **Evidence path** | Repo-relative handoff path + log file (e.g. `Saved/Logs/HomeWorld.log`) |
 | **Pass/fail table** | One row per prefix/check — **PASS**, **FAIL**, or **WAIVED** (Lead only) with excerpt or line count |
 | **Preflight** | `npm run preflight:ue` exit code when DESKTOP PIE applies ([UE_PREFLIGHT.md](../docs/Setup/UE_PREFLIGHT.md)) |
@@ -108,17 +108,18 @@ Handoff markdown **and** PR body for DESKTOP or cross-host phases must include:
 
 Example VP-A table: [VP_A_PIE.md](../Docs/handoffs/VP_A_PIE.md). Full lane spec: [HR3_D_EVIDENCE_LANE.md](../Docs/handoffs/HR3_D_EVIDENCE_LANE.md).
 
-### 4c. Re-verify rule (blocker-fix → re-prove)
+### 4c. Re-verify rule (blocker-fix → re-prove) — HS-D
 
 When phase **B** fixes a blocker that caused hard-fail in phase **A**:
 
 1. File **B** evidence; Lead **`APPROVE`** when satisfied.
-2. **Re-run A's grep checklist** on current `main` (DESKTOP owner); append **§ Re-verify** to A's handoff — do not erase the original fail record.
-3. **Unlock downstream polish** (e.g. **VP-C**) only when A re-verify shows **PASS** on all required rows **or** Lead **WAIVED** per row.
+2. **Re-run A's grep checklist** on current `main` (DESKTOP = Conductor **parent**); append **§ Re-verify** to A's handoff — do not erase the original fail / WAIVE record.
+3. Prefer host scoring: `npm run evidence:grep -- --log Saved/Logs/HomeWorld.log` (optional `--json Saved/hs_d_evidence_grep.json`; `--strict` for gate scripts). Paste table into the handoff — **never invent** Output Log lines.
+4. **Unlock downstream polish / presentation** only when A re-verify shows **PASS** on all required prefixes **or** Lead **WAIVED** per prefix (named, not silent).
 
-Canonical VP chain: **VP-B complete → VP-A greps re-prove → VP-C unlock**. See [14_VP_VERIFY_POLISH.md](../Docs/14_VP_VERIFY_POLISH.md) § Re-verify.
+Canonical VP chain: **VP-B complete → VP-A greps re-prove → VP-C unlock**. See [14_VP_VERIFY_POLISH.md](../Docs/14_VP_VERIFY_POLISH.md) § Re-verify · [17d_HS_EVIDENCE.md](../Docs/17d_HS_EVIDENCE.md) · [HR3_D_EVIDENCE_LANE.md](../Docs/handoffs/HR3_D_EVIDENCE_LANE.md).
 
-Conductor **refuses** VP-C (or any polish phase tied to prior hard-fail greps) until re-verify is filed or Lead waives.
+Conductor **refuses** any polish phase tied to prior hard-fail greps until re-verify is filed or Lead waives. Preflight before PIE: [UE_PREFLIGHT.md](../docs/Setup/UE_PREFLIGHT.md) (HR3-B). DESKTOP checklist: [HS_D_EVIDENCE.md](../Docs/handoffs/HS_D_EVIDENCE.md).
 
 ## 5. Phase graph
 
@@ -282,4 +283,3 @@ Cross-link: [docs/Setup/WINDOWS_BRIDGE.md](../docs/Setup/WINDOWS_BRIDGE.md) § C
 | Cloud Linux VM | **NO** |
 
 Proof / failure modes: [Docs/handoffs/HR3_A_WINDOWS_EXEC.md](../Docs/handoffs/HR3_A_WINDOWS_EXEC.md).
-

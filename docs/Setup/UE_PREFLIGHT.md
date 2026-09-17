@@ -79,6 +79,25 @@ npm run preflight:ue -- --assets-only --simulate-fail=EDITOR_ABP_SKELETON
 
 ---
 
+
+
+## Evidence capture (HS-D)
+
+After DESKTOP PIE (or any real `Saved/Logs/*.log`), score canonical verb prefixes **without inventing greps**:
+
+```powershell
+npm run evidence:grep -- --log Saved/Logs/HomeWorld.log
+npm run evidence:grep -- --log Saved/Logs/HomeWorld.log --json Saved/hs_d_evidence_grep.json
+# Gate mode (exit 1 if any required prefix MISSING):
+npm run evidence:grep -- --log Saved/Logs/HomeWorld.log --strict
+```
+
+Prefixes: `FORM:` `FALLBACK:` `HEAL:` `NURTURE:` `DAWN:` `TAME:` `GATHER:` `STORE:` `INVENTORY:` (PL-C dump via `hw.Inventory.Dump`).
+
+Policy: [Docs/17d_HS_EVIDENCE.md](../../Docs/17d_HS_EVIDENCE.md) · DESKTOP checklist: [Docs/handoffs/HS_D_EVIDENCE.md](../../Docs/handoffs/HS_D_EVIDENCE.md) · re-verify: [SWARM_OPS.md](../../swarm/SWARM_OPS.md) §4c.
+
+Cloud/CI may run `npm run evidence:grep:test` (fixture logs only — not a substitute for DESKTOP PIE).
+
 ## vs `doctor:ue`
 
 | Tool | Purpose |

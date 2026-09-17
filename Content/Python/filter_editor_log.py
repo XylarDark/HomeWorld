@@ -30,6 +30,9 @@ _DEFAULT_SIGNAL_KEYWORDS = [
     "error", "failed", "failure", "exception", "assert", "not found", "cannot",
     "unable", "missing", "invalid", "crash", "fatal", "traceback",
     "no surfaces found",
+    # HS-D verb / inventory evidence markers (keep in filtered editor logs)
+    "FORM:", "FALLBACK:", "HEAL:", "NURTURE:", "DAWN:", "TAME:", "GATHER:",
+    "STORE:", "INVENTORY:",
 ]
 _DEFAULT_NOISE_CATEGORIES = frozenset({
     "LogAssetRegistry", "LogContentStreaming", "LogAssetManager",

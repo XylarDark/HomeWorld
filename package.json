@@ -13,7 +13,9 @@
     "doctor:build": "cd DevEnvTemplate && npm install && npm run build",
     "sync": "node DevEnvTemplate/dist/scripts/sync/cli.js --layer agent-context,operational-memory --template ./DevEnvTemplate --project-root .",
     "sync:apply": "node DevEnvTemplate/dist/scripts/sync/cli.js --layer agent-context,operational-memory --template ./DevEnvTemplate --project-root . --apply",
-    "sync:all": "node DevEnvTemplate/dist/scripts/sync/cli.js --layer all --template ./DevEnvTemplate --project-root ."
+    "sync:all": "node DevEnvTemplate/dist/scripts/sync/cli.js --layer all --template ./DevEnvTemplate --project-root .",
+    "evidence:grep": "node scripts/evidence-grep.js",
+    "evidence:grep:test": "node --test scripts/evidence-grep.test.js"
   },
   "engines": {
     "node": ">=20.0.0"
