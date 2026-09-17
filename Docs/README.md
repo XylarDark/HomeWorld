@@ -13,6 +13,8 @@ These are **intentionally separate**. On case-insensitive filesystems (macOS/Win
 
 ## Entry points
 
+- **UE import first pass:** [05_UE_IMPORT_FIRST_PASS.md](05_UE_IMPORT_FIRST_PASS.md)
+- **VS_MVP kit dress (post-audit):** [06_VS_MVP_DRESS.md](06_VS_MVP_DRESS.md)
 - **Audit & upgrade strategy:** [08_AUDIT_UPGRADE_STRATEGY.md](08_AUDIT_UPGRADE_STRATEGY.md) — **COMPLETE** (Lead signed off)
 - **WAVE A inventory:** [08a_INVENTORY.md](08a_INVENTORY.md)
 - **WAVE B harness gap:** [08b_HARNESS_GAP.md](08b_HARNESS_GAP.md) — COMPLETE (PR #12)
