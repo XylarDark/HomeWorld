@@ -41,7 +41,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **NP-B** | Lookdev apply | **COMPLETE — awaiting APPROVE NP-B** | [12b_NP_B_LOOKDEV.md](../Docs/12b_NP_B_LOOKDEV.md), [handoffs/NP_B_LOOKDEV.md](../Docs/handoffs/NP_B_LOOKDEV.md) |
 | **NP-C…E** | Form + SYS verbs | **LOCKED** | Blocked until Lead **`APPROVE NP-B`** |
 
-**Current track:** NP-A **APPROVED** (Lead **`APPROVE NP-A`**, 2026-09-17 ET). **NP-B COMPLETE** (script + docs) — await Windows evidence + Lead **`APPROVE NP-B`**.
+**Current track:** NP-B **COMPLETE** — Windows evidence filed (DESKTOP-21CT3H0, HEAD `82c7eb2`, 78/78 assign). Await Lead **`APPROVE NP-B`** → unlock NP-C.
 
 ---
 
@@ -49,7 +49,6 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 
 | ID | Phase | Owner | Write path | Due artifact |
 |---|---|---|---|---|
-| NP-B-run | NP-B | CND | Docs/handoffs/ | Run `assign_vs_mvp_materials.py` on DESKTOP; fill NP_B_LOOKDEV evidence |
 | NP-B-gate | NP-B | Lead | Docs/ | **`APPROVE NP-B`** → unlock NP-C |
 
 ## Open defects

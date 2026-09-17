@@ -2,15 +2,16 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **IN PROGRESS** — script + runbook delivered; Windows evidence pending |
+| **Status** | **COMPLETE — awaiting Lead `APPROVE NP-B`** |
 | **Date** | 2026-09-17 |
-| **Author** | Cloud Agent (NP-B) |
+| **Author** | Conductor (HomeWorld) |
 | **Parent** | [11_NEXT_PHASE_STRATEGY.md](11_NEXT_PHASE_STRATEGY.md) |
 | **Prerequisite** | Lead **`APPROVE NP-A`** — **GRANTED**; [12a_NP_A_INVENTORY.md](12a_NP_A_INVENTORY.md) |
 | **Script** | `Content/Python/assign_vs_mvp_materials.py` |
 | **Mapping module** | `Content/Python/homeworld_vs_mvp_material_rules.py` |
+| **Evidence base** | Windows DESKTOP-21CT3H0 at repo **HEAD `82c7eb2`** |
 
-**Gate:** Lead **`APPROVE NP-B`** after Conductor runs script on DESKTOP and fills [handoffs/NP_B_LOOKDEV.md](handoffs/NP_B_LOOKDEV.md) evidence.
+**Gate:** Lead **`APPROVE NP-B`** after evidence review in [handoffs/NP_B_LOOKDEV.md](handoffs/NP_B_LOOKDEV.md).
 
 ---
 
@@ -81,16 +82,50 @@ Material resolution order per master: `/Game/HomeWorld/Materials/Instances/MI_<S
 
 ## 3. Verify (Windows)
 
-- [ ] Output Log: `assign_vs_mvp_materials: Done` with `actors` > 0, `missing_master` = 0
-- [ ] `slots_assigned` > 0 on first run; `slots_skipped` dominates on re-run
-- [ ] NightMix smoke lines: `NightMix smoke set` for 0.0 and 0.85 (unless `--no-nightmix-smoke`)
-- [ ] Viewport: island grass tone, cabin wood, path/landing stone, shrine glow accents readable
-- [ ] Level saved on disk under `Content/.../L_VS_MVP_Markers.umap` — **not** committed
-- [ ] FALLBACK reminder logged (CRUMB glide + portal; no free-flight)
+- [x] Output Log: `assign_vs_mvp_materials: Done` with `actors` = **78**, `missing_master` = 0
+- [x] `slots_assigned` = **78** on first run; `slots_skipped` = 0
+- [ ] NightMix smoke lines: **FAILED** — `KismetMaterialLibrary` missing in UE 5.7 Python (non-blocking; C++ PIE path OK)
+- [x] Viewport: island grass, cabin wood, path/landing stone, shrine glow accents (host spot-check)
+- [x] Level saved on disk — `L_VS_MVP_Markers` **local only**, not committed
+- [x] FALLBACK reminder logged (CRUMB glide + portal; no free-flight)
 
 ---
 
-## 4. Explicit non-goals
+## 4. Windows run result (2026-09-17, DESKTOP-21CT3H0)
+
+**HEAD:** `82c7eb2`
+
+```
+assign_vs_mvp_materials: Done {
+  actors: 78,
+  slots_assigned: 78,
+  slots_skipped: 0,
+  missing_master: 0,
+  unmapped: 0,
+  masters_used: [M_CliffRock, M_FoliageCard, M_GatherHerb, M_PathStone, M_SpiritUnlit, M_StylizedGrass, M_WoodCabin, M_WoodWild]
+}
+```
+
+| Master | Applied | Notes |
+|--------|---------|-------|
+| M_CliffRock | yes | |
+| M_FoliageCard | yes | |
+| M_GatherHerb | yes | |
+| M_PathStone | yes | |
+| M_SpiritUnlit | yes | shrine glow accents |
+| M_StylizedGrass | yes | island / ground plate |
+| M_WoodCabin | yes | cabin / shrines |
+| M_WoodWild | yes | |
+| M_BeastStylized | no | **PRESENT** on host; no beast DRESS meshes — expected |
+| M_Nurtured | no | **PRESENT** on host; no nurture/crop DRESS meshes — expected |
+
+**NightMix smoke:** script path failed (`unreal.KismetMaterialLibrary`); assign pass **not affected**. Residual for NP-C or follow-up.
+
+Full handoff: [handoffs/NP_B_LOOKDEV.md](handoffs/NP_B_LOOKDEV.md).
+
+---
+
+## 5. Explicit non-goals
 
 - V3–V8 SYS verbs (NP-D / NP-E)
 - Free-flight / combat / Lumen / Nanite gates
@@ -99,9 +134,13 @@ Material resolution order per master: `/Game/HomeWorld/Materials/Instances/MI_<S
 
 ---
 
-## 5. Related
+## 6. Related
 
 - Inventory: [12a_NP_A_INVENTORY.md](12a_NP_A_INVENTORY.md)
 - Dress runbook: [06_VS_MVP_DRESS.md](06_VS_MVP_DRESS.md)
 - Handoff evidence: [handoffs/NP_B_LOOKDEV.md](handoffs/NP_B_LOOKDEV.md)
 - Strategy gates: [11_NEXT_PHASE_STRATEGY.md](11_NEXT_PHASE_STRATEGY.md)
+
+---
+
+*Windows lookdev apply complete 2026-09-17 ET. Awaiting Lead **`APPROVE NP-B`**.*
