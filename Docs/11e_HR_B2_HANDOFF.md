@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **COMPLETE — awaiting Lead `APPROVE HR-B2`** |
+| **Status** | **APPROVED** — Lead Luke Thompson, **`APPROVE HR-B2`**, 2026-09-17 ET |
 | **Date** | 2026-09-17 |
 | **Author** | Cloud Agent (HR-B2) |
 | **Baseline** | [11b_HR_B_HANDOFF.md](11b_HR_B_HANDOFF.md) deferred list; [11d_HR_D_DEFER.md](11d_HR_D_DEFER.md) Lead stamp |
@@ -12,9 +12,9 @@
 
 ## Gate
 
-Lead: type **`APPROVE HR-B2`** to close residual harness risks and unblock HR-D path (Lead deferred HR-D until HR-B2 — see [11d_HR_D_DEFER.md](11d_HR_D_DEFER.md)).
+**APPROVED** — Lead Luke Thompson, **`APPROVE HR-B2`**, 2026-09-17 ET.
 
-**Product NP stays PARKED.**
+Closed residual harness risks; unblocked **`APPROVE HR-D`** (Lead had deferred HR-D until HR-B2 — see [11d_HR_D_DEFER.md](11d_HR_D_DEFER.md)).
 
 ---
 
@@ -116,8 +116,8 @@ npm run doctor         # exit 1 (expected — accepted declines)
 
 ## Next
 
-After **`APPROVE HR-B2`:** Lead may unlock **HR-D** dry-run per [11_SWARM_HARNESS_REFINE.md](11_SWARM_HARNESS_REFINE.md) § HR-D (Lead deferred HR-D until HR-B2 — [11d_HR_D_DEFER.md](11d_HR_D_DEFER.md)).
+Lead **`APPROVE HR-D`** followed (2026-09-17 ET) — harness refine track closed; product NP planning unlocked — [11_NEXT_PHASE_STRATEGY.md](11_NEXT_PHASE_STRATEGY.md).
 
 ---
 
-*HR-B2 COMPLETE 2026-09-17 — awaiting Lead APPROVE HR-B2.*
+*HR-B2 APPROVED — Lead Luke Thompson, APPROVE HR-B2, 2026-09-17 ET.*

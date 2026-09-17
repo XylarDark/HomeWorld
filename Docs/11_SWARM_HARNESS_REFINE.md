@@ -2,18 +2,18 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **ACTIVE** — HR-B2 **COMPLETE awaiting APPROVE HR-B2**; HR-D dry-run **COMPLETE** but **`APPROVE HR-D` deferred** by Lead |
-| **Approval notes** | Lead Luke Thompson, 2026-09-17 ET — Docs/11 / HR strategy; **APPROVE HR-A**; **APPROVE HR-B**; **APPROVE HR-C**; HR-D dry-run delivered; **HR-B2 before APPROVE HR-D** (2026-09-17 ET) |
+| **Status** | **CLOSED** — HR track complete (HR-A…D + HR-B2); product NP **ACTIVE DRAFT** |
+| **Approval notes** | Lead Luke Thompson, 2026-09-17 ET — Docs/11 / HR strategy; **APPROVE HR-A**; **APPROVE HR-B**; **APPROVE HR-C**; **APPROVE HR-B2** (first); **APPROVE HR-D** |
 | **Date** | 2026-09-17 |
 | **HR-A stamp** | Lead Luke Thompson, **APPROVE HR-A**, 2026-09-17 ET |
 | **HR-B stamp** | Lead Luke Thompson, **APPROVE HR-B**, 2026-09-17 ET — [11b_HR_B_HANDOFF.md](11b_HR_B_HANDOFF.md) |
 | **HR-C stamp** | Lead Luke Thompson, **APPROVE HR-C**, 2026-09-17 ET — [11c_HR_C_HANDOFF.md](11c_HR_C_HANDOFF.md) |
-| **HR-D dry-run** | **COMPLETE** — [11d_HR_D_HANDOFF.md](11d_HR_D_HANDOFF.md), [handoffs/HR_D_DRY_RUN.md](handoffs/HR_D_DRY_RUN.md) |
-| **HR-D defer** | Lead deferred **`APPROVE HR-D`** → **HR-B2 first**, 2026-09-17 ET — [11d_HR_D_DEFER.md](11d_HR_D_DEFER.md) |
-| **HR-B2 stamp** | **COMPLETE awaiting APPROVE HR-B2**, 2026-09-17 — [11e_HR_B2_HANDOFF.md](11e_HR_B2_HANDOFF.md) |
+| **HR-D stamp** | Lead Luke Thompson, **APPROVE HR-D**, 2026-09-17 ET (after HR-B2) — [11d_HR_D_HANDOFF.md](11d_HR_D_HANDOFF.md), [handoffs/HR_D_DRY_RUN.md](handoffs/HR_D_DRY_RUN.md) |
+| **HR-D defer** | **CLOSED** — [11d_HR_D_DEFER.md](11d_HR_D_DEFER.md) (HR-B2 first, then HR-D approved) |
+| **HR-B2 stamp** | Lead Luke Thompson, **APPROVE HR-B2**, 2026-09-17 ET — [11e_HR_B2_HANDOFF.md](11e_HR_B2_HANDOFF.md) |
 | **Author** | Conductor (HomeWorld) |
 | **Audit input** | [11_SWARM_HARNESS_AUDIT.md](11_SWARM_HARNESS_AUDIT.md) |
-| **Product next-phase** | **PARKED** — [11_NEXT_PHASE_STRATEGY.md](11_NEXT_PHASE_STRATEGY.md) (NP-A…E DEFERRED) |
+| **Product next-phase** | **ACTIVE DRAFT** — awaiting Lead **`APPROVE NP STRATEGY`** — [11_NEXT_PHASE_STRATEGY.md](11_NEXT_PHASE_STRATEGY.md) |
 
 ---
 
@@ -33,9 +33,9 @@ Lead directive: **refine swarm + harness technologies before any product gamepla
 | **HR-A** | **APPROVED** — [11a_HR_MEASURES.md](11a_HR_MEASURES.md) |
 | **HR-B** | **APPROVED** — [11b_HR_B_HANDOFF.md](11b_HR_B_HANDOFF.md) |
 | **HR-C** | **APPROVED** — [11c_HR_C_HANDOFF.md](11c_HR_C_HANDOFF.md) |
-| **HR-D** | **COMPLETE — awaiting APPROVE HR-D** (Lead deferred approval → HR-B2 first) — [11d_HR_D_HANDOFF.md](11d_HR_D_HANDOFF.md), [11d_HR_D_DEFER.md](11d_HR_D_DEFER.md) |
-| **HR-B2** | **COMPLETE awaiting APPROVE HR-B2** — [11e_HR_B2_HANDOFF.md](11e_HR_B2_HANDOFF.md) |
-| **Product NP-A…E** | **PARKED** — blocked until **`APPROVE HR-D`** after HR-B2 **or** Lead explicitly unblocks NP |
+| **HR-D** | **APPROVED** — Lead Luke Thompson, 2026-09-17 ET (after HR-B2) — [11d_HR_D_HANDOFF.md](11d_HR_D_HANDOFF.md) |
+| **HR-B2** | **APPROVED** — Lead Luke Thompson, 2026-09-17 ET — [11e_HR_B2_HANDOFF.md](11e_HR_B2_HANDOFF.md) |
+| **Product NP-A…E** | **ACTIVE DRAFT** — awaiting Lead **`APPROVE NP STRATEGY`** — [11_NEXT_PHASE_STRATEGY.md](11_NEXT_PHASE_STRATEGY.md) |
 
 ---
 
@@ -153,8 +153,9 @@ Docs/11 / HR STRATEGY: APPROVED — Lead Luke Thompson, 2026-09-17 ET
 HR-A: APPROVED — Lead Luke Thompson, 2026-09-17 ET
 HR-B: APPROVED — Lead Luke Thompson, 2026-09-17 ET (see 11b_HR_B_HANDOFF.md)
 HR-C: APPROVED — Lead Luke Thompson, APPROVE HR-C, 2026-09-17 ET (see 11c_HR_C_HANDOFF.md)
-HR-D: dry-run COMPLETE — awaiting Lead APPROVE HR-D (see 11d_HR_D_HANDOFF.md); approval deferred → HR-B2 first (see 11d_HR_D_DEFER.md)
-HR-B2: COMPLETE — awaiting Lead APPROVE HR-B2 (see 11e_HR_B2_HANDOFF.md)
+HR-B2: APPROVED — Lead Luke Thompson, APPROVE HR-B2, 2026-09-17 ET (see 11e_HR_B2_HANDOFF.md)
+HR-D: APPROVED — Lead Luke Thompson, APPROVE HR-D, 2026-09-17 ET (after HR-B2; see 11d_HR_D_HANDOFF.md)
+Product NP: ACTIVE DRAFT — awaiting Lead APPROVE NP STRATEGY (see 11_NEXT_PHASE_STRATEGY.md)
 ```
 
 ---
@@ -170,4 +171,4 @@ HR-B2: COMPLETE — awaiting Lead APPROVE HR-B2 (see 11e_HR_B2_HANDOFF.md)
 
 ---
 
-*Conductor prepared this file; HR-B2 complete — awaiting Lead APPROVE HR-B2.*
+*Conductor prepared this file; HR track CLOSED — Lead APPROVE HR-B2 + APPROVE HR-D, 2026-09-17 ET. Product NP awaiting APPROVE NP STRATEGY.*

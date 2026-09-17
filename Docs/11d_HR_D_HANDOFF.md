@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **COMPLETE — awaiting Lead `APPROVE HR-D`** |
+| **Status** | **APPROVED** — Lead Luke Thompson, **`APPROVE HR-D`**, 2026-09-17 ET (after **`APPROVE HR-B2`**) |
 | **Date** | 2026-09-17 |
 | **Author** | Cloud Agent (HR-D dry-run) |
 | **Baseline** | [11c_HR_C_HANDOFF.md](11c_HR_C_HANDOFF.md) (HR-C APPROVED) |
@@ -13,7 +13,9 @@
 
 ## Gate
 
-Lead: type **`APPROVE HR-D`** to unlock **product next-phase** planning ([11_NEXT_PHASE_STRATEGY.md](11_NEXT_PHASE_STRATEGY.md)) **or** schedule **HR-B2** if residual risks are unacceptable.
+**APPROVED** — Lead Luke Thompson, **`APPROVE HR-D`**, 2026-09-17 ET (after **`APPROVE HR-B2`**).
+
+Unlocked **product next-phase** planning — [11_NEXT_PHASE_STRATEGY.md](11_NEXT_PHASE_STRATEGY.md) now **ACTIVE DRAFT** awaiting **`APPROVE NP STRATEGY`**.
 
 ### Unlock rule (from Docs/11)
 
@@ -89,15 +91,15 @@ Lead may **`APPROVE HR-D`** with these documented, or block NP and schedule HR-B
 - [ ] `validate` job green on PR
 - [ ] `python-lint` job green on PR
 - [ ] Lead reviews re-grade + residual risks
-- [ ] Lead types **`APPROVE HR-D`**
+- [x] Lead typed **`APPROVE HR-D`** (2026-09-17 ET, after **`APPROVE HR-B2`**)
 
 ---
 
 ## Next (after APPROVE HR-D)
 
-1. Conductor rewrites or unblocks [11_NEXT_PHASE_STRATEGY.md](11_NEXT_PHASE_STRATEGY.md) (product NP-A…E).
-2. Optional HR-B2 if Lead wants doctor pin bump or further rules budget work before NP gameplay.
+1. [11_NEXT_PHASE_STRATEGY.md](11_NEXT_PHASE_STRATEGY.md) activated — product NP-A…E **DRAFT** awaiting Lead **`APPROVE NP STRATEGY`**.
+2. Do **not** start NP-A implementation until NP strategy approved.
 
 ---
 
-*HR-D complete 2026-09-17 — awaiting Lead APPROVE HR-D.*
+*HR-D APPROVED — Lead Luke Thompson, APPROVE HR-D, 2026-09-17 ET (after APPROVE HR-B2).*

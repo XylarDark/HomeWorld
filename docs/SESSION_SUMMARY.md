@@ -20,6 +20,12 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 ## Rolling log (newest first)
 
+### 2026-09-17 — HR track CLOSED; product NP unlocked
+
+- Lead **`APPROVE HR-B2`** then **`APPROVE HR-D`** — harness refine track **CLOSED** (Luke Thompson, 2026-09-17 ET).
+- [Docs/11_NEXT_PHASE_STRATEGY.md](../Docs/11_NEXT_PHASE_STRATEGY.md) activated — NP-A…E **DRAFT** awaiting Lead **`APPROVE NP STRATEGY`**.
+- **Next:** Lead **`APPROVE NP STRATEGY`** → unlock NP-A (no implementation until approved).
+
 ### 2026-09-17 — HR-B2 residual harness risks
 
 - Lead deferred **`APPROVE HR-D`** → **HR-B2 first** — [Docs/11d_HR_D_DEFER.md](../Docs/11d_HR_D_DEFER.md).
