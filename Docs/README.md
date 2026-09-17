@@ -49,7 +49,8 @@ These are **intentionally separate**. On case-insensitive filesystems (macOS/Win
 | [17a_HS_INVENTORY.md](17a_HS_INVENTORY.md) | HS-A inventory & debt ledger | **CLOSED** |
 | [17b_HS_SWARM_OPS.md](17b_HS_SWARM_OPS.md) | HS-B swarm ops tighten | **CLOSED** |
 | [17c_HS_CI_LAW.md](17c_HS_CI_LAW.md) | HS-C CI as law | **DEFERRED / CLOSED** |
-| [17d_HS_EVIDENCE.md](17d_HS_EVIDENCE.md) | HS-D evidence & re-verify | **IN PROGRESS** |
+| [17d_HS_EVIDENCE.md](17d_HS_EVIDENCE.md) | HS-D evidence & re-verify | **CLOSED** |
+| [17e_HS_CONTENT_BOOTSTRAP.md](17e_HS_CONTENT_BOOTSTRAP.md) | HS-E character / bootstrap canon | **IN PROGRESS** |
 - **HR3-C branch protection (PENDING LEAD APPLY):** [15c_HR3_C_BRANCH_PROTECTION.md](15c_HR3_C_BRANCH_PROTECTION.md) — Lead checklist in [docs/Setup/CI_SETUP.md](../docs/Setup/CI_SETUP.md); handoff [handoffs/HR3_C_BRANCH_PROTECTION.md](handoffs/HR3_C_BRANCH_PROTECTION.md)
 - **Start swarm:** [../START_HERE.md](../START_HERE.md)
 - **Master prompt:** [../HOMEWORLD_MASTER_PROMPT.md](../HOMEWORLD_MASTER_PROMPT.md)
