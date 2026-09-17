@@ -3,8 +3,8 @@
 | Field | Value |
 |-------|-------|
 | **Phase** | NP-E |
-| **Status** | **COMPLETE — awaiting `APPROVE NP-E`** |
-| **Lead stamp** | NP-D **APPROVED** (Luke Thompson, 2026-09-17 ET) |
+| **Status** | **APPROVED** — Lead **`APPROVE NP-E`** (Luke Thompson, 2026-09-17 ET) |
+| **Lead stamp** | NP-E **APPROVED** (Luke Thompson, 2026-09-17 ET) |
 | **Deliverable** | [12e_NP_E_SYS_V6_V8.md](../12e_NP_E_SYS_V6_V8.md) |
 
 ---
@@ -40,6 +40,6 @@ Local `.umap` placement not committed (project policy).
 
 ---
 
-## Next gate
+## Gate (closed)
 
-Lead **`APPROVE NP-E`** → product next-phase (NP-A…E) **complete**.
+Lead **`APPROVE NP-E`** — **GRANTED** (Luke Thompson, 2026-09-17 ET). Product next-phase (NP-A…E) **CLOSED / COMPLETE**. No NP-F.

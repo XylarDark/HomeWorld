@@ -1,9 +1,9 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **NP-E** (Heal + nurture + dawn persist) — **COMPLETE awaiting APPROVE NP-E**  
+**Current phase:** **PRODUCT NP TRACK CLOSED** — Lead **`APPROVE NP-E`** (Luke Thompson, 2026-09-17 ET)  
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
-**Active owners:** **CND** (Conductor)  
-**Blocked by:** — (await Lead **`APPROVE NP-E`** — final product NP gate)
+**Active owners:** **CND** (Conductor) — no open product NP phases  
+**Blocked by:** —
 
 | Phase | Name | Owners | Status | Gate file | Handoffs |
 |---|---|---|---|---|---|
@@ -22,7 +22,7 @@ Status values: `LOCKED` `OPEN` `IN PROGRESS` `GATE FAILED` `CLOSED` `GATE READY`
 
 ## POST-AUDIT (Docs/05–10 + HR track)
 
-MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** Active work is **Product next-phase (NP-A…E)** — **NP-E final gate pending Lead stamp.**
+MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** **Product next-phase (NP-A…E) is CLOSED / COMPLETE** — Lead **`APPROVE NP-E`**, 2026-09-17 ET.
 
 | Track | Doc / phase | Status | Gate / handoff |
 |---|---|---|---|
@@ -37,9 +37,9 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **NP-B** | Lookdev apply | **APPROVED** | [12b_NP_B_LOOKDEV.md](../Docs/12b_NP_B_LOOKDEV.md) |
 | **NP-C** | Form + V1 polish | **APPROVED** | [12c_NP_C_FORM_V1.md](../Docs/12c_NP_C_FORM_V1.md) |
 | **NP-D** | SYS V3–V4 gather + tame | **APPROVED** | [12d_NP_D_SYS_V3_V4.md](../Docs/12d_NP_D_SYS_V3_V4.md) — Lead **`APPROVE NP-D`**, 2026-09-17 ET |
-| **NP-E** | Heal + nurture + persist | **COMPLETE — awaiting APPROVE NP-E** | [12e_NP_E_SYS_V6_V8.md](../Docs/12e_NP_E_SYS_V6_V8.md), [handoffs/NP_E_SYS_V6_V8.md](../Docs/handoffs/NP_E_SYS_V6_V8.md) |
+| **NP-E** | Heal + nurture + persist | **APPROVED** | [12e_NP_E_SYS_V6_V8.md](../Docs/12e_NP_E_SYS_V6_V8.md), [handoffs/NP_E_SYS_V6_V8.md](../Docs/handoffs/NP_E_SYS_V6_V8.md) — Lead **`APPROVE NP-E`**, 2026-09-17 ET |
 
-**Current track:** NP-E **COMPLETE** — cloud C++ + docs + placement scripts. Await Lead **`APPROVE NP-E`** (product NP track complete after stamp). Windows: **Safe-Build required** after merge.
+**Current track:** **PRODUCT NP TRACK CLOSED** — NP-A…E all **APPROVED**. Placement script fixes on main (`870f1d0`). No NP-F; no next product NP gate.
 
 ---
 
@@ -47,7 +47,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 
 | ID | Phase | Owner | Write path | Due artifact |
 |---|---|---|---|---|
-| NP-E-gate | NP-E | Lead | Docs/ | **`APPROVE NP-E`** → product NP complete |
+| — | — | — | — | Product NP track closed — no open NP tasks |
 
 ## Open defects
 
