@@ -8953,3 +8953,13 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 **Gate:** Await Lead `APPROVE WAVE C` before WAVE D (`Docs/08d_CONTENT_CANON.md`).
 
+---
+
+## 2026-09-17 — WAVE D content canon (MVP vs legacy)
+
+**Tasks completed:** `Docs/08d_CONTENT_CANON.md` — disposition table for Content/HomeWorld/*, sample packs, Python importers vs map-builders; transit canon (FALLBACK CRUMB glide + dual shrine portal); look canon (Docs/02 + Preview + Lib masters); resolved 08a dual-canon conflicts; WAVE E upgrade targets and WAVE F delete candidates (names only). Updated `Docs/README.md` and `Docs/08_AUDIT_UPGRADE_STRATEGY.md` WAVE D pointer.
+
+**Hard rules honored:** Documentation only — no Content deletes, no C++ gameplay rewrite, Docs/07 CLOSED, FALLBACK armed.
+
+**Gate:** Await Lead `APPROVE WAVE D` before WAVE E.
+
