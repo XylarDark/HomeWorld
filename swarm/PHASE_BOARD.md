@@ -1,10 +1,10 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **VP2 CLOSED** — Lead **`APPROVE VP2-C STOP`** / Conductor **`CLOSE VP2`**, 2026-09-17 ET (main `2ef961f`)
+**Current phase:** **Docs/19 CLOSED / COMPLETE** — Lead **`APPROVE D19`**, 2026-09-17 ET (PR #107; VP2 **CLOSED**)
 
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **Conductor** (parent DESKTOP) / **DESKTOP-21CT3H0**
-**Blocked by:** none. **No active product phase** — do not invent NP/product tracks without Lead gate. Branch protection **DEFERRED**.
+**Blocked by:** none. **No active product phase** — do not invent next track without Lead gate. Do not reopen VP2. Branch protection **DEFERRED**.
 **Sign-off doc:** [Docs/17_HS_AUDIT_SIGN_OFF.md](../Docs/17_HS_AUDIT_SIGN_OFF.md) — **SIGNED OFF** Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET.
 
 
@@ -49,7 +49,7 @@ Canonical history: **VP-A → VP-B → VP-A re-verify → VP-C**. Spec: [17d_HS_
 
 ## POST-AUDIT (Docs/05–10 + HR track)
 
-MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** **Product next-phase (NP-A…E) is CLOSED / COMPLETE.** **HR2 track CLOSED / COMPLETE.** **HR3 track CLOSED / COMPLETE** — Lead **`APPROVE HR3-D`**, 2026-09-17 ET (HR3-C **DEFERRED**). **VP track CLOSED / COMPLETE** (VP-A re-verify **WAIVED**). **Docs/16 Playable Loop CLOSED / COMPLETE** — Lead **`APPROVE PL-D`**, 2026-09-17 ET. **Docs/17 HS Audit CLOSED / COMPLETE** — Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET. **Docs/18 VP2 CLOSED / COMPLETE** — Lead **`APPROVE VP2-C STOP`**, 2026-09-17 ET. Next product track TBD (Lead gate).
+MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** **Product next-phase (NP-A…E) is CLOSED / COMPLETE.** **HR2 track CLOSED / COMPLETE.** **HR3 track CLOSED / COMPLETE** — Lead **`APPROVE HR3-D`**, 2026-09-17 ET (HR3-C **DEFERRED**). **VP track CLOSED / COMPLETE** (VP-A re-verify **WAIVED**). **Docs/16 Playable Loop CLOSED / COMPLETE** — Lead **`APPROVE PL-D`**, 2026-09-17 ET. **Docs/17 HS Audit CLOSED / COMPLETE** — Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET. **Docs/18 VP2 CLOSED / COMPLETE** — Lead **`APPROVE VP2-C STOP`**, 2026-09-17 ET. **Docs/19 D19 CLOSED / COMPLETE** — Lead **`APPROVE D19`**, 2026-09-17 ET. Next product track TBD (Lead gate).
 
 | Track | Doc / phase | Host | Status | Gate / handoff |
 |---|---|---|---|---|
@@ -90,8 +90,12 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **VP2-A** | DESKTOP prove | DESKTOP | **APPROVED / CLOSED** | [VP2_A_EVIDENCE.md](../Docs/handoffs/VP2_A_EVIDENCE.md) — **9/9 PASS** |
 | **VP2-B** | Success-path fixes | CLOUD+DESKTOP | **APPROVED / CLOSED** | [VP2_B_FIX.md](../Docs/handoffs/VP2_B_FIX.md) — DESKTOP **9/9 PASS** |
 | **VP2-C** | Optional follow-on | — | **STOP / CLOSED** | **C0 Stop** — no C1/C2 |
+| **Docs/19** | Thin playability (D19) | CLOUD+DESKTOP+Lead | **CLOSED / COMPLETE** | [19_THIN_PLAYABILITY.md](../Docs/19_THIN_PLAYABILITY.md) — Lead **`APPROVE D19`**, 2026-09-17 ET (PR #107) |
+| **D19-A** | Gather piles that stick | CLOUD+DESKTOP | **APPROVED / CLOSED** | DESKTOP: `GP_Gather_*`; `GATHER: RES_WOOD +1` / `harvest ok` |
+| **D19-B** | Seed cheat | CLOUD+DESKTOP | **APPROVED / CLOSED** | DESKTOP: `hw.Gather.Seed` → `GATHER: RES_SEED +N` |
+| **D19-C** | Success-path evidence filter | CLOUD | **APPROVED / CLOSED** | `evidence-grep.js --success-path`; tests green |
 
-**Current track:** **Docs/18 VP2 CLOSED / COMPLETE** — Lead **`APPROVE VP2-C STOP`** / Conductor **`CLOSE VP2`**, 2026-09-17 ET (main `2ef961f`). **No active product phase.** **HS-G APPROVED / COMPLETE**.
+**Current track:** **Docs/19 CLOSED / COMPLETE** — Lead **`APPROVE D19`**, 2026-09-17 ET (PR #107). **No active product phase.** **VP2 CLOSED** — do not reopen. **HS-G APPROVED / COMPLETE**.
 
 ---
 

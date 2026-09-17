@@ -200,6 +200,26 @@ namespace
 		}
 	}
 
+	void CmdGatherSeed(const TArray<FString>& Args)
+	{
+		UWorld* World = HomeWorldPlayWorld::Resolve();
+		if (!World)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Gather.Seed requires a play world (PIE or game)."));
+			return;
+		}
+		UGameInstance* GI = World->GetGameInstance();
+		if (!GI) return;
+		UHomeWorldInventorySubsystem* Inv = GI->GetSubsystem<UHomeWorldInventorySubsystem>();
+		if (!Inv) { UE_LOG(LogTemp, Warning, TEXT("HomeWorld: InventorySubsystem not found.")); return; }
+		const int32 Amount = Args.Num() > 0 ? FCString::Atoi(*Args[0]) : 1;
+		if (Amount <= 0) { UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Gather.Seed amount must be positive.")); return; }
+		if (Inv->TryAddResource(HomeWorldInventory::RES_SEED, Amount))
+		{
+			UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Gather.Seed granted RES_SEED +%d (D19-B nurture unblock)."), Amount);
+		}
+	}
+
 
 	void CmdInventoryDump(const TArray<FString>& Args)
 	{
@@ -907,6 +927,11 @@ void FHomeWorldModule::StartupModule()
 		TEXT("hw.Gather.Flowers"),
 		TEXT("Add Flowers to inventory (default 5). Stub for MVP tutorial List 6 step 5. Use in PIE to verify 'pick some flowers' or harvest from BP_HarvestableFlower."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdGatherFlowers),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Gather.Seed"),
+		TEXT("Add Seed to inventory (default 1). D19-B cheat for N1_Crop nurture success-path. Use in PIE: hw.Gather.Seed 1 then night interact at GP_N1_Crop."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdGatherSeed),
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.Inventory.Dump"),

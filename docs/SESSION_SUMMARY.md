@@ -405,6 +405,22 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 - Docs: [18_VERIFY_PROVE.md](../Docs/18_VERIFY_PROVE.md) track **CLOSED**; [PHASE_BOARD.md](../swarm/PHASE_BOARD.md) VP2 rows closed; no C1/C2 follow-on.
 - Harness: `Tools/Safe-Build.ps1` asserts `Binaries/Win64/UnrealEditor-HomeWorld.dll` > 100 KB post-build (HS-G Bad Image / zero-byte DLL residual).
 
+### 2026-09-17 — Docs/19 thin playability (D19-A/B/C impl)
+
+- Lead **`APPROVE D19 STRATEGY`** 2026-09-17 ET — bot-shaped gather + seed + success-path evidence.
+- Docs: [19_THIN_PLAYABILITY.md](../Docs/19_THIN_PLAYABILITY.md) **APPROVED**; [PHASE_BOARD.md](../swarm/PHASE_BOARD.md) → Docs/19 **IN PROGRESS** (VP2 stays CLOSED).
+- D19-A: hardened `place_vs_mvp_resource_piles.py` — label re-apply, actor tags, dedupe, verify log.
+- D19-B: `hw.Gather.Seed` console cheat → `RES_SEED` (mirrors Ore/Flowers).
+- D19-C: `evidence-grep.js --success-path` + tests green (`npm run evidence:grep:test`).
+
+### 2026-09-17 — Docs/19 CLOSED (Lead APPROVE D19)
+
+- Lead **`APPROVE D19`** 2026-09-17 ET — D19-A/B/C after DESKTOP prove (PR #107).
+- D19-A: `GP_Gather_*` spawn; `GATHER: RES_WOOD +1` / `harvest ok`; `HomeWorldResourcePile` non-Abstract.
+- D19-B: `hw.Gather.Seed` → `GATHER: RES_SEED +N`.
+- D19-C: `evidence-grep --success-path` PASS; Safe-Build ASCII/single-quote fixes on branch.
+- Docs: [19_THIN_PLAYABILITY.md](../Docs/19_THIN_PLAYABILITY.md) **CLOSED / COMPLETE**; [PHASE_BOARD.md](../swarm/PHASE_BOARD.md) → no active product phase.
+
 ---
 
 *Maintained by Conductor; HR-C established this rolling policy.*

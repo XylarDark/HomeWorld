@@ -13,7 +13,8 @@ class UHomeWorldInventorySubsystem;
  * Base actor for gather nodes (world harvest). Blueprint BP_WoodPile etc. inherit.
  * NP-D: +1 gather via TryHarvest; optional cooldown or deplete-until-dawn.
  */
-UCLASS(Blueprintable, Abstract)
+// D19-A: non-Abstract so Editor Python can spawn VS_MVP gather markers (BP subclasses still optional for art).
+UCLASS(Blueprintable)
 class HOMEWORLD_API AHomeWorldResourcePile : public AActor
 {
 	GENERATED_BODY()
