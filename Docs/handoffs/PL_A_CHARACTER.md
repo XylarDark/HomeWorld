@@ -3,42 +3,55 @@
 | Field | Value |
 |-------|-------|
 | **Phase** | PL-A |
-| **Status** | **IN PROGRESS** — Lead **Manny substitute APPROVED** 2026-09-17 ET; config paths set; DESKTOP apply / preflight evidence pending |
+| **Status** | **EVIDENCE COMPLETE — PENDING LEAD `APPROVE PL-A`** |
 | **Lead gate** | **`APPROVE PL-A`** before PL-B |
 | **Spec** | [16_PLAYABLE_LOOP.md](../16_PLAYABLE_LOOP.md) § PL-A |
-| **Baseline** | Main post–PL STRATEGY (`03a3e46`) — DESKTOP **DESKTOP-21CT3H0** |
+| **Baseline** | Main @ `93a47e7` (PR #75) + preflight follow-up — DESKTOP **DESKTOP-21CT3H0** |
 
 ## Summary
 
-Replace VP-B mesh-only interim (`/Engine/.../DefaultSkeletalMesh` + empty `anim_blueprint`) with a **Lead-accepted** Epic UE 5.7 Mannequin substitute:
+Replace VP-B mesh-only interim with Lead-accepted Epic UE 5.7 Mannequin substitute:
 
 | Item | Value |
 |------|-------|
+| **Lead** | **Manny substitute APPROVED** 2026-09-17 ET |
 | **Source (host)** | `UE_5.7\Templates\TemplateResources\High\Characters\Content\Mannequins` |
 | **DESKTOP dest** | `Content/Characters/Mannequins/` (**local only** — **no `.uasset` commits**) |
 | **Skeletal mesh** | `/Game/Characters/Mannequins/Meshes/SKM_Manny_Simple` |
-| **Anim BP** | `/Game/Characters/Mannequins/Anims/Unarmed/ABP_Unarmed` (compiling idle/walk minimal) |
-| **Config** | [character_blueprint_config.json](../../Content/Python/character_blueprint_config.json) |
-| **Legacy** | `/Game/Man/...` / `SK_Man_Full_01` / `ABP_HomeWorldCharacter` — **deferred** (missing skeleton; not assigned) |
+| **Anim BP** | `/Game/Characters/Mannequins/Anims/Unarmed/ABP_Unarmed` |
+| **Apply script** | `Content/Python/pl_a_apply_character.py` (do **not** re-run `vp_b_apply_character.py`) |
+| **Legacy** | `/Game/Man/...`, `ABP_HomeWorldCharacter` — **deferred / unassigned** |
 
 ## Done criteria (Docs/16)
 
-- [ ] Character BP uses non-Engine project mesh (Manny substitute path)
-- [ ] ABP compiles (ABP_Unarmed) **or** mesh-only explicitly retired with Lead note
-- [ ] `npm run preflight:ue -- --require-editor` exit **0** without mesh-only as primary path
-- [ ] Safe-Build green if C++ touched (N/A if scripts/config only)
+- [x] Character BP uses non-Engine project mesh (Manny substitute)
+- [x] Compiling ABP (`ABP_Unarmed` compile OK) — mesh-only interim retired
+- [x] `npm run preflight:ue -- --require-editor` exit **0** with `mesh_only: false` (post preflight path fix)
+- [x] Safe-Build — **N/A** (no C++ touched)
 
-## DESKTOP evidence
+## DESKTOP evidence (2026-09-17 ET)
 
 | Check | Result |
 |-------|--------|
-| Copy Mannequins → `Content/Characters/Mannequins` | **PENDING** — Conductor |
-| Key assets on disk (`SKM_Manny_Simple`, `SK_Mannequin`, `ABP_Unarmed`) | **PENDING** |
-| `git pull` config tip | **PENDING** |
-| `setup_character_blueprint.py` (MCP) | **PENDING** |
-| BP mesh / `anim_class` | **PENDING** |
-| `npm run preflight:ue -- --require-editor` | **PENDING** |
-| Safe-Build | **N/A** unless C++ touched |
+| Copy Mannequins → `Content/Characters/Mannequins` | **PASS** — 128 files / ~125 MB |
+| Key assets on disk | **PASS** — `SKM_Manny_Simple`, `SK_Mannequin`, `ABP_Unarmed` |
+| Config tip | **PASS** — PR #75 @ `93a47e7` |
+| `pl_a_apply_character.py` (MCP) | **PASS** — `Saved/PL_A_apply.json` `ok: true`; BP compile OK; ABP compile OK |
+| BP mesh / anim_class | **PASS** — `SKM_Manny_Simple` + `ABP_Unarmed_C` (not `/Engine/...`) |
+| `npm run preflight:ue -- --require-editor` | **PASS** — exit **0** after preflight honors config ABP path |
+| Safe-Build | **N/A** |
+
+### Apply JSON excerpt
+
+```json
+{
+  "mesh_path": "/Game/Characters/Mannequins/Meshes/SKM_Manny_Simple",
+  "anim_path": "/Game/Characters/Mannequins/Anims/Unarmed/ABP_Unarmed",
+  "ok": true,
+  "bp_compile": "ok",
+  "abp_compile": "ok"
+}
+```
 
 ## Hard rules
 
@@ -48,4 +61,4 @@ Replace VP-B mesh-only interim (`/Engine/.../DefaultSkeletalMesh` + empty `anim_
 
 ---
 
-*PL-A — Lead Manny substitute APPROVED; awaiting DESKTOP apply evidence then Lead **`APPROVE PL-A`**.*
+*PL-A evidence filed — stop for Lead **`APPROVE PL-A`** before PL-B.*

@@ -182,8 +182,11 @@ function checkDiskAssets(config) {
 
   const paths = [content.vsMvpMap, content.characterBlueprint].filter(Boolean);
 
-  if (!meshOnly && content.characterAnimBlueprint) {
-    paths.push(content.characterAnimBlueprint);
+  // PL-A: prefer character config anim_blueprint; fall back to content.characterAnimBlueprint
+  const abpFromCfg = (charCfg?.anim_blueprint || '').trim();
+  const abpPath = abpFromCfg || content.characterAnimBlueprint;
+  if (!meshOnly && abpPath) {
+    paths.push(abpPath);
   }
 
   if (content.skeletalMeshFromCharacterConfig && charCfg?.skeletal_mesh) {

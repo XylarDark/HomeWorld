@@ -2,7 +2,7 @@
 # HR3-B: Editor-side deep checks for UE preflight (run via MCP on DESKTOP).
 # Writes Saved/preflight_ue_editor.json for scripts/preflight-ue.js to consume.
 #
-# VP-B: mesh-only mode when character_blueprint_config.json anim_blueprint is empty —
+# VP-B mesh-only when anim_blueprint empty; PL-A sets anim_blueprint → check that ABP path (not legacy ABP_HomeWorldCharacter).
 # skeletal mesh set + anim_class None is OK; broken unused ABP is warning only.
 #
 # MCP: execute_python_script("preflight_ue_editor.py")
@@ -317,7 +317,8 @@ def run_checks():
 
     map_path = content.get("vsMvpMap")
     bp_path = content.get("characterBlueprint")
-    abp_path = content.get("characterAnimBlueprint")
+    # PL-A: prefer character_blueprint_config.json anim_blueprint over hardcoded legacy ABP
+    abp_path = (char_config.get("anim_blueprint") or "").strip() or content.get("characterAnimBlueprint")
 
     for name, path, fn in (
         ("map", map_path, lambda p: _check_asset_exists(p, "EDITOR_MAP_MISSING", "VS_MVP map")),

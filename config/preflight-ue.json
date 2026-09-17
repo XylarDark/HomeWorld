@@ -14,27 +14,32 @@
       "Content/Python/character_blueprint_config.json"
     ],
     "characterConfigPath": "Content/Python/character_blueprint_config.json",
-    "requiredCharacterConfigKeys": ["skeletal_mesh"],
-    "optionalCharacterConfigKeys": ["anim_blueprint"]
+    "requiredCharacterConfigKeys": [
+      "skeletal_mesh"
+    ],
+    "optionalCharacterConfigKeys": [
+      "anim_blueprint"
+    ]
   },
   "content": {
     "vsMvpMap": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers",
     "characterBlueprint": "/Game/HomeWorld/Characters/BP_HomeWorldCharacter",
-    "characterAnimBlueprint": "/Game/HomeWorld/Characters/ABP_HomeWorldCharacter",
-    "skeletalMeshFromCharacterConfig": true
+    "characterAnimBlueprint": "/Game/Characters/Mannequins/Anims/Unarmed/ABP_Unarmed",
+    "skeletalMeshFromCharacterConfig": true,
+    "animBlueprintFromCharacterConfig": true
   },
   "editor": {
     "resultFile": "Saved/preflight_ue_editor.json",
     "script": "Content/Python/preflight_ue_editor.py"
   },
   "blockerCodes": {
-    "MCP_UNREACHABLE": "UnrealMCP port 55557 not reachable — open Editor and verify MCP green dot",
+    "MCP_UNREACHABLE": "UnrealMCP port 55557 not reachable \u2014 open Editor and verify MCP green dot",
     "CONFIG_MISSING": "Required repo file or JSON config missing",
-    "CONFIG_EMPTY_PATH": "Character config path is empty — assign skeletal_mesh (anim_blueprint may be empty for VP-B mesh-only interim)",
+    "CONFIG_EMPTY_PATH": "Character config path is empty \u2014 assign skeletal_mesh (anim_blueprint may be empty only for legacy VP-B mesh-only interim)",
     "REPO_SCRIPT_MISSING": "Bootstrap or placement script missing from repo",
     "ASSET_MISSING_ON_DISK": "Required .uasset/.umap not found under Content/ (LFS or local import)",
-    "EDITOR_RESULTS_MISSING": "Editor deep-check results missing — run preflight_ue_editor.py via MCP on DESKTOP",
-    "EDITOR_ABP_SKELETON": "ABP skeleton missing or AnimBP failed to compile (VP-A class blocker)",
+    "EDITOR_RESULTS_MISSING": "Editor deep-check results missing \u2014 run preflight_ue_editor.py via MCP on DESKTOP",
+    "EDITOR_ABP_SKELETON": "ABP skeleton missing or AnimBP failed to compile (checks config anim_blueprint / characterAnimBlueprint)",
     "EDITOR_BP_MESH_EMPTY": "BP_HomeWorldCharacter skeletal mesh or anim_class unset/broken",
     "EDITOR_MAP_MISSING": "VS_MVP map asset missing or unloadable in Editor"
   }
