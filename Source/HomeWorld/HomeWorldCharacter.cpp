@@ -1128,7 +1128,16 @@ bool AHomeWorldCharacter::FindInteractTargetInCone(FHitResult& OutHit) const
 	}
 
 	const FVector ImpactPoint = BestActor->GetActorLocation();
-	OutHit = FHitResult(BestActor, BestActor->GetRootComponent(), ImpactPoint, Forward);
+	OutHit.Reset();
+	OutHit.bBlockingHit = true;
+	OutHit.Location = ImpactPoint;
+	OutHit.ImpactPoint = ImpactPoint;
+	OutHit.TraceStart = Start;
+	OutHit.TraceEnd = ImpactPoint;
+	OutHit.Distance = FVector::Dist(Start, ImpactPoint);
+	OutHit.ImpactNormal = -Forward.GetSafeNormal();
+	OutHit.Normal = OutHit.ImpactNormal;
+	OutHit.SetActor(BestActor);
 	return true;
 }
 
