@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
 #include "HomeWorldMealTypes.h"
+#include "HomeWorldTimeOfDaySubsystem.h"
 #include "HomeWorldCharacter.generated.h"
 
 struct FOnAttributeChangeData;
@@ -20,7 +21,6 @@ class UInputAction;
 class UInputMappingContext;
 class UHomeWorldFallbackGlideComponent;
 class UHomeWorldSoftBoundsComponent;
-#include "HomeWorldTimeOfDaySubsystem.h"
 
 UCLASS(Blueprintable)
 /**
