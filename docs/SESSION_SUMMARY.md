@@ -1,3 +1,8 @@
+## 2026-09-17 ET — APPROVE VP2 STRATEGY / VP2-A unlocked
+
+Lead **`APPROVE VP2 STRATEGY`**. Docs/18 active; **VP2-A** DESKTOP evidence prove **IN PROGRESS**.
+
+
 ## 2026-09-17 ET — Docs/18 VP2 Verify & Prove DRAFT
 
 Lead asked for next-track draft after HS sign-off. Docs/18 VP2 (prove loop with evidence:grep before features) filed DRAFT — await **`APPROVE VP2 STRATEGY`**.
