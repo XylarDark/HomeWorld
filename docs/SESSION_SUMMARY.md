@@ -1,5 +1,10 @@
 # Session summary (rolling)
 
+## 2026-09-17 ET — APPROVE PL-C / PL-D unlocked
+
+Lead **`APPROVE PL-C`**. Store-transfer + inventory readout **CLOSED**. **PL-D OPEN** — optional Shot 1 from existing CAM/markers. Next: Lead **`APPROVE PL-D`** closes PL track.
+
+
 ## 2026-09-17 ET — WAIVE PL-B / PL-C unlocked
 
 Lead **`WAIVE PL-B`** (Luke Thompson, away). Verb Alt+P greps **WAIVED** (no invented lines). **PL-C OPEN** — PA-07 store-transfer + thin inventory readout. Next: Lead **`APPROVE PL-C`**.
