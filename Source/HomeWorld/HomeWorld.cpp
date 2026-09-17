@@ -199,6 +199,35 @@ namespace
 		}
 	}
 
+
+	void CmdInventoryDump(const TArray<FString>& Args)
+	{
+		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
+		if (!World)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Inventory.Dump requires a play world (PIE or game)."));
+			return;
+		}
+		UGameInstance* GI = World->GetGameInstance();
+		if (!GI) return;
+		UHomeWorldInventorySubsystem* Inv = GI->GetSubsystem<UHomeWorldInventorySubsystem>();
+		if (!Inv) { UE_LOG(LogTemp, Warning, TEXT("HomeWorld: InventorySubsystem not found.")); return; }
+		UE_LOG(LogTemp, Log, TEXT("INVENTORY: dump begin (slots=%d total=%d)"), Inv->GetSlotCount(), Inv->GetTotalPhysicalGoods());
+		for (int32 Si = 0; Si < Inv->GetSlotCount(); ++Si)
+		{
+			const FHomeWorldInventorySlot Slot = Inv->GetSlot(Si);
+			if (Slot.IsEmpty())
+			{
+				UE_LOG(LogTemp, Log, TEXT("INVENTORY: slot[%d]=empty"), Si);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Log, TEXT("INVENTORY: slot[%d]=%s x%d"), Si, *Slot.ResId.ToString(), Slot.Count);
+			}
+		}
+		UE_LOG(LogTemp, Log, TEXT("INVENTORY: dump end"));
+	}
+
 	void CmdPlaceWall(const TArray<FString>& Args)
 	{
 		UWorld* World = GEngine ? GEngine->GetCurrentPlayWorld() : nullptr;
