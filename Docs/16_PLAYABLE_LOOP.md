@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **APPROVED / ACTIVE** — Lead Luke Thompson, **`APPROVE PL STRATEGY`**, 2026-09-17 ET |
+| **Status** | **CLOSED / COMPLETE** — Lead **`APPROVE PL-D`**, 2026-09-17 ET (strategy **`APPROVE PL STRATEGY`** same day) |
 | **Date** | 2026-09-17 |
 | **Baseline** | Main post–VP — Docs/14 Verify & Polish **CLOSED / COMPLETE** (`635bbaa`) |
 | **Author** | Conductor (HomeWorld) |
@@ -14,9 +14,9 @@
 
 Lead **`APPROVE PL STRATEGY`** — **APPROVED** (Luke Thompson, 2026-09-17 ET).
 
-**Next gate:** Lead **`APPROVE PL-D`** closes PL track.
+**Track gate:** Lead **`APPROVE PL-D`** — **APPROVED** (Luke Thompson, 2026-09-17 ET). **No further PL gates.**
 
-**PL-A CLOSED**. **PL-B WAIVED**. **PL-C CLOSED** — Lead **`APPROVE PL-C`**, 2026-09-17 ET. **PL-D OPEN**.
+**PL-A CLOSED**. **PL-B WAIVED**. **PL-C CLOSED**. **PL-D CLOSED**. Track **CLOSED / COMPLETE**.
 
 ---
 
@@ -46,11 +46,11 @@ NP shipped SYS/GP verbs; VP polished runbooks and thin UX around an **Engine `De
 | Product NP (Docs/11) | **CLOSED** |
 | HR2 / HR3 | **CLOSED** (HR3-C **DEFERRED**) |
 | Docs/14 / VP | **CLOSED / COMPLETE** |
-| **Docs/16 / PL strategy** | **APPROVED** — Lead **`APPROVE PL STRATEGY`**, 2026-09-17 ET |
+| **Docs/16 / PL strategy** | **CLOSED / COMPLETE** — Lead **`APPROVE PL-D`**, 2026-09-17 ET |
 | **PL-A** | **APPROVED / CLOSED** — Lead **`APPROVE PL-A`**, 2026-09-17 ET |
 | **PL-B** | **WAIVED / CLOSED** — Lead **`WAIVE PL-B`**, 2026-09-17 ET |
 | **PL-C** | **APPROVED / CLOSED** — Lead **`APPROVE PL-C`**, 2026-09-17 ET |
-| **PL-D** | **OPEN / IN PROGRESS** |
+| **PL-D** | **APPROVED / CLOSED** — Lead **`APPROVE PL-D`**, 2026-09-17 ET |
 
 ---
 
@@ -124,6 +124,8 @@ Naming: **PL-A … PL-D** (Playable Loop). Do **not** reuse NP-* / HR-* / VP-* i
 ---
 
 ### PL-D — Optional presentation
+
+**Status:** **APPROVED / CLOSED** — Lead **`APPROVE PL-D`**, 2026-09-17 ET.
 
 **Goal:** Shot 1 camera path / stills from **existing** markers only.
 
