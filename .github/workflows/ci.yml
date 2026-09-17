@@ -1,17 +1,39 @@
-# CI: build (and optional test/package) for Win64. Requires a self-hosted Windows runner with UE 5.7 installed.
-# Keep validate.yml for fast lint/doc checks on every push; this workflow runs the full build when a runner is available.
+# CI: Win64 build (and optional test/package) for C++-touching changes.
+# Requires a self-hosted Windows runner with UE 5.7 installed.
+# Path filters (HR2-C): only runs when C++ / project descriptor paths change.
+# Docs-only PRs stay on validate.yml — see docs/Setup/CI_POLICY.md.
 name: CI
 
 on:
   push:
     branches: [ master, main ]
+    paths:
+      - 'Source/**'
+      - '**/*.Build.cs'
+      - '*.uproject'
+      - 'Plugins/**/Source/**'
+      - '.github/workflows/ci.yml'
   pull_request:
     branches: [ master, main ]
+    paths:
+      - 'Source/**'
+      - '**/*.Build.cs'
+      - '*.uproject'
+      - 'Plugins/**/Source/**'
+      - '.github/workflows/ci.yml'
 
 jobs:
   build-win64:
     runs-on: [self-hosted, windows, ue57]
-    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    if: |
+      !contains(github.event.head_commit.message, '[skip ci]') &&
+      (
+        github.event_name != 'pull_request' ||
+        (
+          !contains(github.event.pull_request.body, 'Lead waiver: build-win64') &&
+          !contains(toJSON(github.event.pull_request.labels.*.name), 'lead-waiver-build-win64')
+        )
+      )
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -46,3 +68,17 @@ jobs:
         with:
           name: build-log
           path: Build-HomeWorld.log
+
+  build-win64-waiver-notice:
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'pull_request' &&
+      (
+        contains(github.event.pull_request.body, 'Lead waiver: build-win64') ||
+        contains(toJSON(github.event.pull_request.labels.*.name), 'lead-waiver-build-win64')
+      )
+    steps:
+      - name: Lead waiver acknowledged
+        run: |
+          echo "::notice::build-win64 skipped — Lead waiver documented on this PR."
+          echo "Merge requires Lead approval per docs/Setup/CI_POLICY.md (HR2-C)."

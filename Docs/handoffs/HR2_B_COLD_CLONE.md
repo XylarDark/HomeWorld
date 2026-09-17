@@ -3,8 +3,8 @@
 | Field | Value |
 |-------|-------|
 | **Phase** | HR2-B |
-| **Status** | COMPLETE — await **`APPROVE HR2-B`** |
-| **Lead gate** | **`APPROVE HR2-B`** unlocks HR2-C |
+| **Status** | **APPROVED** — Lead **`APPROVE HR2-B`**, 2026-09-17 ET |
+| **Lead gate** | **`APPROVE HR2-B`** — stamped; HR2-C unlocked |
 | **Spec** | [13b_HR2_B_COLD_CLONE.md](../13b_HR2_B_COLD_CLONE.md) |
 
 ## Summary
@@ -21,4 +21,4 @@ Empty `DevEnvTemplate/` → verify script (init) → `doctor:build` exit 0 → `
 
 ## Next
 
-Lead **`APPROVE HR2-B`** → HR2-C (C++ CI gate / build-win64 required).
+HR2-C (C++ CI gate) — Lead **`APPROVE HR2-C`** after HR2-C PR merges.

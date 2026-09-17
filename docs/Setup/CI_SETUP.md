@@ -81,7 +81,25 @@ These are optional; the primary path for HomeWorld is a self-hosted Windows runn
 
 ---
 
+## Branch protection (Lead — GitHub repo settings)
+
+HR2-C makes **`build-win64` required** for PRs that touch C++ paths. Branch protection is configured in GitHub, not in this repo. Lead should set **Settings → Branches → Branch protection rules** for `main`:
+
+| Status check | Require? | When it applies |
+|--------------|----------|-----------------|
+| **validate** | Yes | Every PR |
+| **python-lint** | Yes | Every PR |
+| **build-win64** | Yes | When [ci.yml](../../.github/workflows/ci.yml) runs (C++ path filters — see [CI_POLICY.md](CI_POLICY.md)) |
+
+**Docs-only PRs:** `ci.yml` does not run (path filters). GitHub should allow merge when only `validate` + `python-lint` ran. If a globally required `build-win64` blocks docs PRs, disable “require status checks to pass” for checks that did not run, or rely on Lead merge policy until path-scoped rulesets are available.
+
+**Lead waiver:** When the Windows runner is offline, Lead may merge with `Lead waiver: build-win64` in the PR body or label `lead-waiver-build-win64` — see [CI_POLICY.md](CI_POLICY.md) § Lead waiver.
+
+**C++ path list (keep in sync with ci.yml):** `Source/**`, `**/*.Build.cs`, `*.uproject`, `Plugins/**/Source/**`, `.github/workflows/ci.yml`.
+
+---
+
 ## Summary
 
 - **validate.yml** — No setup; runs on every push on GitHub-hosted runners.
-- **ci.yml** — Requires a self-hosted Windows runner with UE 5.7, Visual Studio, and (for tests) `UE_EDITOR` set. Add labels `windows`, `ue57` to the runner. See steps 1–4 above.
+- **ci.yml** — Requires a self-hosted Windows runner with UE 5.7, Visual Studio, and (for tests) `UE_EDITOR` set. Add labels `windows`, `ue57` to the runner. Runs only when C++ path filters match (HR2-C). See steps 1–4 above and [CI_POLICY.md](CI_POLICY.md).

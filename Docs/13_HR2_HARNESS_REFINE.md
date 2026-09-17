@@ -35,8 +35,8 @@ HR-A…D + HR-B2 delivered a **B- harness** and unlocked product NP. Senior harn
 | **Product NP (Docs/11_NEXT_PHASE_STRATEGY)** | **CLOSED** — NP work complete at audit baseline |
 | **Docs/13 / HR2 strategy** | **APPROVED** — Lead **`APPROVE HR2 STRATEGY`**, 2026-09-17 ET |
 | **HR2-A** | **APPROVED** — [13a_HR2_A_HANDOFF.md](13a_HR2_A_HANDOFF.md); Lead **`APPROVE HR2-A`**, 2026-09-17 ET |
-| **HR2-B** | **IN PROGRESS** — [13b_HR2_B_COLD_CLONE.md](13b_HR2_B_COLD_CLONE.md); await Lead **`APPROVE HR2-B`** |
-| **HR2-C** | **LOCKED** — blocked until **`APPROVE HR2-B`** |
+| **HR2-B** | **APPROVED** — [13b_HR2_B_COLD_CLONE.md](13b_HR2_B_COLD_CLONE.md); Lead **`APPROVE HR2-B`**, 2026-09-17 ET |
+| **HR2-C** | **COMPLETE — awaiting Lead `APPROVE HR2-C`** — [13c_HR2_C_CI_GATE.md](13c_HR2_C_CI_GATE.md) |
 
 ---
 
@@ -165,8 +165,8 @@ Phases may run **sequentially** (recommended: A → B → C) or **parallel** aft
 ```
 Docs/13 / HR2 STRATEGY: APPROVED — Lead Luke Thompson, APPROVE HR2 STRATEGY, 2026-09-17 ET
 HR2-A: APPROVED — Lead Luke Thompson, APPROVE HR2-A, 2026-09-17 ET
-HR2-B: IN PROGRESS — cold-clone runbook + CI guard; await APPROVE HR2-B
-HR2-C: LOCKED
+HR2-B: APPROVED — Lead Luke Thompson, APPROVE HR2-B, 2026-09-17 ET
+HR2-C: COMPLETE — build-win64 required on C++ paths; await APPROVE HR2-C
 ```
 
 ---
@@ -185,4 +185,4 @@ HR2-C: LOCKED
 
 ---
 
-*Conductor prepared this file; HR2 strategy **APPROVED** 2026-09-17 ET. HR2-A **APPROVED** 2026-09-17 ET. HR2-B in progress — **stop for Lead `APPROVE HR2-B`** before HR2-C.*
+*Conductor prepared this file; HR2 strategy **APPROVED** 2026-09-17 ET. HR2-A **APPROVED** 2026-09-17 ET. HR2-B **APPROVED** 2026-09-17 ET. HR2-C complete — **stop for Lead `APPROVE HR2-C`** (closes HR2 track).*
