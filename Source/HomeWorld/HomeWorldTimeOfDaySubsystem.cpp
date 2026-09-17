@@ -1,6 +1,7 @@
 // Copyright HomeWorld. All Rights Reserved.
 
 #include "HomeWorldTimeOfDaySubsystem.h"
+#include "HomeWorldPlayWorld.h"
 #include "HomeWorldSaveGameSubsystem.h"
 #include "HAL/IConsoleManager.h"
 #include "Engine/GameInstance.h"
@@ -28,15 +29,58 @@ namespace HomeWorldNightMix
 
 namespace
 {
+	/** Guard: SetPhase sets the CVar; skip OnChanged re-entry. */
+	bool GHomeWorldApplyingPhaseFromSetPhase = false;
+
 	// Override phase for testing (e.g. Defend branch). 0=Day, 1=Dusk, 2=Night, 3=Dawn. -1 = use default.
 	static TAutoConsoleVariable<int32> CVarTimeOfDayPhase(
 		TEXT("hw.TimeOfDay.Phase"), 0,
-		TEXT("Override time-of-day phase for testing: 0=Day, 1=Dusk, 2=Night, 3=Dawn. -1 = default (Day)."));
+		TEXT("Override time-of-day phase for testing: 0=Day, 1=Dusk, 2=Night, 3=Dawn. -1 = default (Day). Calls SetPhase side effects when changed externally."));
 
 	// Fixed duration of night phase in seconds for "time until dawn" stub countdown (T4 HUD). Default 120.
 	static TAutoConsoleVariable<float> CVarNightDurationSeconds(
 		TEXT("hw.TimeOfDay.NightDurationSeconds"), 120.f,
 		TEXT("Night phase duration in seconds for stub countdown (Dawn in Ns). Used when phase is set to Night."));
+
+	void OnTimeOfDayPhaseCVarChanged(IConsoleVariable* Var)
+	{
+		if (GHomeWorldApplyingPhaseFromSetPhase || !Var)
+		{
+			return;
+		}
+
+		const int32 Value = Var->GetInt();
+		if (Value < 0 || Value > 3)
+		{
+			return;
+		}
+
+		UWorld* World = HomeWorldPlayWorld::Resolve(nullptr);
+		if (!World)
+		{
+			return;
+		}
+
+		if (UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>())
+		{
+			GHomeWorldApplyingPhaseFromSetPhase = true;
+			TimeOfDay->SetPhase(static_cast<EHomeWorldTimeOfDayPhase>(Value));
+			GHomeWorldApplyingPhaseFromSetPhase = false;
+		}
+	}
+
+	struct FHomeWorldTimeOfDayCVarRegistrar
+	{
+		FHomeWorldTimeOfDayCVarRegistrar()
+		{
+			if (IConsoleVariable* CVar = IConsoleManager::Get().FindConsoleVariable(TEXT("hw.TimeOfDay.Phase")))
+			{
+				CVar->SetOnChangedCallback(FConsoleVariableDelegate::CreateStatic(&OnTimeOfDayPhaseCVarChanged));
+			}
+		}
+	};
+
+	static FHomeWorldTimeOfDayCVarRegistrar GHomeWorldTimeOfDayCVarRegistrar;
 }
 
 EHomeWorldTimeOfDayPhase UHomeWorldTimeOfDaySubsystem::GetCurrentPhase() const
@@ -101,7 +145,9 @@ void UHomeWorldTimeOfDaySubsystem::SetPhase(EHomeWorldTimeOfDayPhase Phase)
 	IConsoleVariable* CVar = IConsoleManager::Get().FindConsoleVariable(TEXT("hw.TimeOfDay.Phase"));
 	if (CVar)
 	{
+		GHomeWorldApplyingPhaseFromSetPhase = true;
 		CVar->Set(static_cast<int32>(Phase));
+		GHomeWorldApplyingPhaseFromSetPhase = false;
 	}
 	// Start stub countdown when entering night so GetSecondsUntilDawn() and HUD "Dawn in Ns" work (T4).
 	if (Phase == EHomeWorldTimeOfDayPhase::Night && GetWorld())

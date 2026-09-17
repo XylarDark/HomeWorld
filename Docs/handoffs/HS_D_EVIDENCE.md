@@ -71,6 +71,8 @@ Runbooks: [12c](../12c_NP_C_FORM_V1.md) · [12d](../12d_NP_D_SYS_V3_V4.md) · [1
 
 ### D. Scripted score (after log exists)
 
+**Before greps:** in PIE run **`log LogTemp Log`** so `Log`-level verb lines are captured. VP2 success-path runbook: [VP2_B_FIX.md](VP2_B_FIX.md).
+
 ```powershell
 npm run evidence:grep -- --log Saved/Logs/HomeWorld.log --json Saved/hs_d_evidence_grep.json
 # Optional strict (exit 1 if any required prefix MISSING):

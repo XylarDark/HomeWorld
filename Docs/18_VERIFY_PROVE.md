@@ -43,8 +43,8 @@ Prove the signed playable loop on **DESKTOP-21CT3H0** with **real** editor-log g
 | Docs/16 PL | **CLOSED** |
 | Docs/17 HS | **CLOSED / COMPLETE** |
 | **Docs/18 / VP2 strategy** | **APPROVED** — Lead **`APPROVE VP2 STRATEGY`**, 2026-09-17 ET |
-| **VP2-A** | **PENDING `APPROVE VP2-A`** — DESKTOP retry **9/9 PASS** ([VP2_A_EVIDENCE.md](handoffs/VP2_A_EVIDENCE.md)) |
-| **VP2-B** | LOCKED (backlog documented in VP2-A handoff if Lead wants success-path greps) |
+| **VP2-A** | **PENDING `APPROVE VP2-A`** — DESKTOP retry **9/9 PASS** soft-reject caveats ([VP2_A_EVIDENCE.md](handoffs/VP2_A_EVIDENCE.md)) |
+| **VP2-B** | **IN PROGRESS** — Lead early unlock (2026-09-17 ET); success-path fixes in [VP2_B_FIX.md](handoffs/VP2_B_FIX.md); awaiting DESKTOP re-prove |
 | **VP2-C** | LOCKED (optional; Lead picks flavor after VP2-A/B) |
 
 ---
@@ -73,20 +73,20 @@ Naming: **VP2-A … VP2-C** (Verify & Prove 2). Do **not** reuse Docs/14 `VP-A�
 - [x] First-run 0/9 contrast + caveats documented (soft-reject vs success; VP2-B backlog)
 - [ ] Lead **`APPROVE VP2-A`**
 
-### VP2-B — Close MISSING blockers (only if needed)
+### VP2-B — Success-path fixes (Lead early unlock)
 
-**Goal:** Fix **script/config/spawn** blockers that caused VP2-A MISSING — not new features.
+**Goal:** DESKTOP **success-path** greps for GATHER / STORE / HEAL / NURTURE / TAME / INVENTORY / DAWN via normal console + PIE interact — not soft-reject-only or ObjectIterator hacks.
 
 | Item | Spec |
 |------|------|
-| **Trigger** | VP2-A has any **MISSING** Lead wants closed |
-| **In** | Preflight/config, apply scripts, interact/log prefixes, store-transfer registration, KEEP-LOCAL path fixes |
-| **Out** | New verbs, combat, free-flight, art campaigns, AnimGraph spikes |
-| **Re-prove** | Re-run VP2-A checklist; board **re-verify before polish** (HS-D rule) |
-| **Deliverable** | [Docs/handoffs/VP2_B_FIX.md](handoffs/VP2_B_FIX.md) + evidence re-run |
-| **Gate** | Lead **`APPROVE VP2-B`** |
+| **Trigger** | Lead direction 2026-09-17 ET — unlock VP2-B **before** VP2-A approve |
+| **In** | Play-world console fallback, CVar→SetPhase/Dawn snapshot, interact trace fallback, `place_vs_mvp_resource_piles.py`, evidence runbook |
+| **Out** | New verbs, combat, free-flight, art campaigns, AnimGraph spikes, `.uasset`/`.umap` commits |
+| **Re-prove** | Re-run VP2-A checklist with success-path rows; **`log LogTemp Log`** before greps |
+| **Deliverable** | [Docs/handoffs/VP2_B_FIX.md](handoffs/VP2_B_FIX.md) + DESKTOP `Saved/vp2_b_evidence.json` |
+| **Gate** | Lead **`APPROVE VP2-B`** (VP2-A remains **PENDING** until separate Lead action) |
 
-If VP2-A is **all PASS** (or Lead **`WAIVE VP2-B`** with written MISSING accept), skip to VP2-C menu / close.
+**Status:** **IN PROGRESS** — CLOUD fixes merged; DESKTOP Safe-Build + PIE re-prove pending Conductor parent.
 
 ### VP2-C — Optional follow-on (Lead picks one)
 
@@ -121,6 +121,7 @@ If VP2-A is **all PASS** (or Lead **`WAIVE VP2-B`** with written MISSING accept)
 
 1. Lead **`APPROVE VP2 STRATEGY`** — **DONE** (2026-09-17 ET; PR #101)
 2. Conductor **VP2-A DESKTOP prove** — **FILED** (retry 9/9 PASS) — **PENDING `APPROVE VP2-A`**
+3. Conductor **VP2-B DESKTOP re-prove** — **IN PROGRESS** ([VP2_B_FIX.md](handoffs/VP2_B_FIX.md))
 
 ---
 

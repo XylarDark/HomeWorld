@@ -1045,6 +1045,93 @@ void AHomeWorldCharacter::ShowInteractFeedback(const FString& Message, FColor Co
 	}
 }
 
+bool AHomeWorldCharacter::ActorHasInteractableComponent(const AActor* Actor)
+{
+	if (!Actor)
+	{
+		return false;
+	}
+	if (Cast<AHomeWorldResourcePile>(Actor))
+	{
+		return true;
+	}
+	if (Actor->FindComponentByClass<UHomeWorldBeastTameComponent>()
+		|| Actor->FindComponentByClass<UHomeWorldSpiritHealComponent>()
+		|| Actor->FindComponentByClass<UHomeWorldNurtureComponent>()
+		|| Actor->FindComponentByClass<UHomeWorldStoreTransferComponent>())
+	{
+		return true;
+	}
+	return false;
+}
+
+bool AHomeWorldCharacter::FindInteractTargetInCone(FHitResult& OutHit) const
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+
+	const float HalfHeight = GetCapsuleComponent() ? GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight() * 0.5f : 50.0f;
+	const FVector Start = GetActorLocation() + FVector(0.0f, 0.0f, HalfHeight);
+	const FVector Forward = GetControlRotation().Vector();
+
+	static const FName InteractTags[] = {
+		FName(TEXT("ResourcePile")),
+		FName(TEXT("StoreProp")),
+		FName(TEXT("SpiritHeal")),
+		FName(TEXT("SpiritWound")),
+		FName(TEXT("NurtureTarget")),
+		FName(TEXT("BeastPad")),
+	};
+
+	AActor* BestActor = nullptr;
+	float BestScore = -1.f;
+
+	for (const FName& Tag : InteractTags)
+	{
+		TArray<AActor*> TaggedActors;
+		UGameplayStatics::GetAllActorsWithTag(World, Tag, TaggedActors);
+		for (AActor* Candidate : TaggedActors)
+		{
+			if (!ActorHasInteractableComponent(Candidate))
+			{
+				continue;
+			}
+
+			const FVector ToTarget = Candidate->GetActorLocation() - Start;
+			const float Dist = ToTarget.Size();
+			if (Dist < KINDA_SMALL_NUMBER || Dist > InteractTraceLengthCm)
+			{
+				continue;
+			}
+
+			const float Dot = FVector::DotProduct(Forward, ToTarget / Dist);
+			if (Dot < 0.35f)
+			{
+				continue;
+			}
+
+			const float Score = Dot / Dist;
+			if (Score > BestScore)
+			{
+				BestScore = Score;
+				BestActor = Candidate;
+			}
+		}
+	}
+
+	if (!BestActor)
+	{
+		return false;
+	}
+
+	const FVector ImpactPoint = BestActor->GetActorLocation();
+	OutHit = FHitResult(BestActor, BestActor->GetRootComponent(), ImpactPoint, Forward);
+	return true;
+}
+
 bool AHomeWorldCharacter::TraceInteractHit(FHitResult& OutHit) const
 {
 	UWorld* World = GetWorld();
@@ -1056,7 +1143,14 @@ bool AHomeWorldCharacter::TraceInteractHit(FHitResult& OutHit) const
 	const FVector Start = GetActorLocation() + FVector(0.0f, 0.0f, HalfHeight);
 	const FVector End = Start + GetControlRotation().Vector() * InteractTraceLengthCm;
 	FCollisionQueryParams Params(NAME_None, false, this);
-	return World->LineTraceSingleByChannel(OutHit, Start, End, ECC_Visibility, Params);
+	if (World->LineTraceSingleByChannel(OutHit, Start, End, ECC_Visibility, Params))
+	{
+		if (ActorHasInteractableComponent(GetInteractTargetActor(OutHit)))
+		{
+			return true;
+		}
+	}
+	return FindInteractTargetInCone(OutHit);
 }
 
 AActor* AHomeWorldCharacter::GetInteractTargetActor(const FHitResult& Hit) const

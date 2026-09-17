@@ -391,6 +391,14 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 - First-run contrast: **0/9** (MCP crash + LogTemp filter). VP2-B backlog captured (LogTemp, piles, MCP console play-world).
 - PR #103 (docs-only; no `.uasset`/`.umap`).
 
+### 2026-09-17 — VP2-B success-path fixes (Lead early unlock)
+
+- Lead direction: VP2-B before VP2-A approve; **do not stamp `APPROVE VP2-A`**.
+- C++: `HomeWorldPlayWorld` PIE fallback for MCP console cheats; CVar `hw.TimeOfDay.Phase` → `SetPhase`; `hw.TimeOfDay.SetPhase`; `PersistDawnSnapshot` world resolve; interact cone-proximity fallback.
+- Python: `place_vs_mvp_resource_piles.py` (GP_Gather_* near homestead).
+- Docs: [VP2_B_FIX.md](../Docs/handoffs/VP2_B_FIX.md), [18_VERIFY_PROVE.md](../Docs/18_VERIFY_PROVE.md), [PHASE_BOARD.md](../swarm/PHASE_BOARD.md) → VP2-B **IN PROGRESS**.
+- Awaiting DESKTOP Safe-Build + re-prove; gate **`APPROVE VP2-B`**.
+
 ---
 
 *Maintained by Conductor; HR-C established this rolling policy.*

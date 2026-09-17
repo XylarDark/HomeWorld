@@ -291,6 +291,8 @@ protected:
 	/** VP-C PA-06: on-screen interact feedback (debug overlay). */
 	void ShowInteractFeedback(const FString& Message, FColor Color = FColor::Green) const;
 	bool TraceInteractHit(FHitResult& OutHit) const;
+	bool FindInteractTargetInCone(FHitResult& OutHit) const;
+	static bool ActorHasInteractableComponent(const AActor* Actor);
 	AActor* GetInteractTargetActor(const FHitResult& Hit) const;
 	FString BuildInteractRangeHint(AActor* Target) const;
 	void UpdateInteractRangeHint(float DeltaTime);

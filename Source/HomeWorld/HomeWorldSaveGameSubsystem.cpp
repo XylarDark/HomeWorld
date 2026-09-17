@@ -1,6 +1,7 @@
 // Copyright HomeWorld. All Rights Reserved.
 
 #include "HomeWorldSaveGameSubsystem.h"
+#include "HomeWorldPlayWorld.h"
 #include "HomeWorldBeastTameComponent.h"
 #include "HomeWorldFamilySubsystem.h"
 #include "HomeWorldInventorySubsystem.h"
@@ -118,7 +119,7 @@ void UHomeWorldSaveGameSubsystem::ApplyNPSessionState(const UHomeWorldSaveGame* 
 
 bool UHomeWorldSaveGameSubsystem::PersistDawnSnapshot()
 {
-	UWorld* World = GetGameInstance() ? GetGameInstance()->GetWorld() : nullptr;
+	UWorld* World = HomeWorldPlayWorld::ResolveFromGameInstance(GetGameInstance());
 	if (!World)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("DAWN: persist skipped — no world"));
