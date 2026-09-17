@@ -20,6 +20,13 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 ## Rolling log (newest first)
 
+### 2026-09-17 — VP Verify & Polish strategy (docs-only)
+
+- Delivered [Docs/14_VP_VERIFY_POLISH.md](../Docs/14_VP_VERIFY_POLISH.md) — **DRAFT**; phases VP-A (PIE evidence), VP-B (smoke/ABP), VP-C (thin polish), VP-D (bootstrap + branch protection).
+- [swarm/PHASE_BOARD.md](../swarm/PHASE_BOARD.md): HR2 track **CLOSED**; VP rows **LOCKED**; current track awaits Lead **`APPROVE VP STRATEGY`**.
+- Post-NP audit residuals PA-01…PA-08 mapped to VP phases. **No VP-A…D implementation** in strategy PR.
+- **Next:** Lead **`APPROVE VP STRATEGY`** → unlock VP-A on DESKTOP.
+
 ### 2026-09-17 — HR2 track CLOSED (APPROVE HR2-C)
 
 - Lead **`APPROVE HR2-C`** (Luke Thompson, 2026-09-17 ET) — HR2-C **APPROVED**; HR2 track **CLOSED / COMPLETE** (HR2-A/B/C all approved).
