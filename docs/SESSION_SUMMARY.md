@@ -1,3 +1,8 @@
+## 2026-09-17 ET — VP2-A evidence filed (0/9 MISSING)
+
+DESKTOP: preflight PASS; PIE+Manny+ABP_Unarmed PASS; MCP interact automation crashed; evidence:grep 0/9 MISSING. Handoff VP2_A_EVIDENCE.md — PENDING **`APPROVE VP2-A`**.
+
+
 ## 2026-09-17 ET — APPROVE VP2 STRATEGY / VP2-A unlocked
 
 Lead **`APPROVE VP2 STRATEGY`**. Docs/18 active; **VP2-A** DESKTOP evidence prove **IN PROGRESS**.
