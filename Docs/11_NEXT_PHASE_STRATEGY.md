@@ -23,7 +23,7 @@ Lead **`APPROVE NP STRATEGY`** — **GRANTED** (Luke Thompson, 2026-09-17 ET).
 | Phase | Focus | Deliverable | Status |
 |-------|--------|-------------|--------|
 | **NP-A** | Inventory / gap map | [12a_NP_A_INVENTORY.md](12a_NP_A_INVENTORY.md) | **APPROVED** — Lead **`APPROVE NP-A`**, 2026-09-17 ET |
-| **NP-B** | Lookdev apply | [12b_NP_B_LOOKDEV.md](12b_NP_B_LOOKDEV.md) — `assign_vs_mvp_materials.py` | **COMPLETE — awaiting APPROVE NP-B** (Windows evidence pending) |
+| **NP-B** | Lookdev apply | [12b_NP_B_LOOKDEV.md](12b_NP_B_LOOKDEV.md) — `assign_vs_mvp_materials.py` | **COMPLETE — awaiting APPROVE NP-B** (78/78 assign, DESKTOP-21CT3H0 @ `82c7eb2`) |
 | **NP-C** | Form + V1 polish | Body↔spirit; GP_PlayerStart; soft walk bounds | **LOCKED** |
 | **NP-D** | SYS V3–V4 | 6-slot inventory + gather + tame | **LOCKED** |
 | **NP-E** | SYS V6–V8 | Heal ×3, nurture ×2, dawn persist | **LOCKED** |
@@ -59,7 +59,7 @@ Lead **`APPROVE NP STRATEGY`** — **GRANTED** (Luke Thompson, 2026-09-17 ET).
 Harness refine: CLOSED — Lead Luke Thompson, APPROVE HR-B2 + APPROVE HR-D, 2026-09-17 ET
 Product NP strategy: APPROVED — Lead Luke Thompson, APPROVE NP STRATEGY, 2026-09-17 ET
 NP-A: APPROVED — Lead APPROVE NP-A, 2026-09-17 ET
-NP-B: COMPLETE (script + docs) — awaiting APPROVE NP-B after Windows run
+NP-B: COMPLETE — Windows evidence filed (78/78 assign); awaiting APPROVE NP-B
 ```
 
 ---
@@ -79,4 +79,4 @@ NP-B: COMPLETE (script + docs) — awaiting APPROVE NP-B after Windows run
 
 ---
 
-*NP-A approved and NP-B script delivered 2026-09-17 ET. Awaiting Windows evidence + APPROVE NP-B.*
+*NP-B Windows lookdev apply complete 2026-09-17 ET. Awaiting Lead APPROVE NP-B.*

@@ -20,12 +20,13 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 ## Rolling log (newest first)
 
-### 2026-09-17 — NP-B lookdev apply (script + docs)
+### 2026-09-17 — NP-B lookdev apply (Windows evidence)
 
 - Lead **`APPROVE NP-A`** — NP-B unlocked (2026-09-17 ET).
-- Delivered `assign_vs_mvp_materials.py` + `homeworld_vs_mvp_material_rules.py` — ten Docs/02 masters on `DRESS_*`; NightMix MPC smoke optional.
-- Runbook [Docs/12b_NP_B_LOOKDEV.md](../Docs/12b_NP_B_LOOKDEV.md); handoff [Docs/handoffs/NP_B_LOOKDEV.md](../Docs/handoffs/NP_B_LOOKDEV.md) — Windows evidence **PENDING**.
-- **Next:** Conductor runs on DESKTOP → Lead **`APPROVE NP-B`**.
+- Windows DESKTOP-21CT3H0 @ HEAD `82c7eb2`: `assign_vs_mvp_materials` **Done** — 78 actors, 78 slots assigned, 0 missing/unmapped; 8 masters used (`M_BeastStylized` + `M_Nurtured` unused — expected).
+- NightMix smoke **FAILED** (`KismetMaterialLibrary` — non-blocking; C++ PIE NightMix OK). Level saved locally; not committed.
+- [Docs/12b_NP_B_LOOKDEV.md](../Docs/12b_NP_B_LOOKDEV.md) + [Docs/handoffs/NP_B_LOOKDEV.md](../Docs/handoffs/NP_B_LOOKDEV.md) stamped **COMPLETE**.
+- **Next:** Lead **`APPROVE NP-B`** → unlock NP-C.
 
 ### 2026-09-17 — NP-A inventory / gap map
 
