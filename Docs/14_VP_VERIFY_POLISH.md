@@ -140,7 +140,7 @@ Naming: **VP-A … VP-D** (Verify & Polish). Do **not** reuse NP-* or HR2-* phas
 | Item | Spec |
 |------|------|
 | **PA-05 Bootstrap dry-run** | Cold or clean clone path: submodule init (HR2-B) → `npm run doctor:ue` → Editor open → `bootstrap_project.py` (or documented chain) → idempotent re-run — log excerpts in handoff |
-| **Branch protection** | Extend [docs/Setup/CI_SETUP.md](../docs/Setup/CI_SETUP.md) § Branch protection with **VP-D checklist** for Lead: required checks **`validate`**, **`python-lint`**, **`build-win64`** (C++ paths per HR2-C); docs-only PR behavior |
+| **Branch protection** | **HR3-C** — [docs/Setup/CI_SETUP.md](../docs/Setup/CI_SETUP.md) § Branch protection + [15c_HR3_C_BRANCH_PROTECTION.md](15c_HR3_C_BRANCH_PROTECTION.md); Lead applies GitHub settings ([handoffs/HR3_C_BRANCH_PROTECTION.md](handoffs/HR3_C_BRANCH_PROTECTION.md)) |
 | **Evidence** | `Docs/handoffs/VP_D_BOOTSTRAP_CI.md` |
 | **Gate** | Lead **`APPROVE VP-D`** before VP-D implementation PR; Lead configures GitHub settings separately |
 

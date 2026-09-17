@@ -75,17 +75,19 @@ The workflow skips `build-win64` when the waiver is present and posts a notice j
 
 ## Branch protection (GitHub settings — Lead action)
 
-Repo settings are outside this tree. Lead should configure **Settings → Branches → Branch protection** for `main`:
+**HR3-C (Docs/15c):** Repo settings are outside this tree. Lead applies the step-by-step checklist in [CI_SETUP.md](CI_SETUP.md) § Branch protection. Handoff status: [Docs/handoffs/HR3_C_BRANCH_PROTECTION.md](../../Docs/handoffs/HR3_C_BRANCH_PROTECTION.md) — cloud agents **cannot** confirm protection is enabled (API 403 without admin).
 
 | Check | Required on `main` | Notes |
 |-------|-------------------|-------|
-| `validate` | **Yes** | Every PR |
-| `python-lint` | **Yes** | Every PR |
-| `build-win64` | **Yes** | Only runs when C++ paths change; skipped PRs show no check (docs-only merges OK) |
+| `validate` | **Yes** | Every PR — [validate.yml](../../.github/workflows/validate.yml) job `validate` |
+| `python-lint` | **Yes** | Every PR — [validate.yml](../../.github/workflows/validate.yml) job `python-lint` |
+| `build-win64` | **Yes** | When C++ path filters match — [ci.yml](../../.github/workflows/ci.yml) job `build-win64`; skipped on docs-only PRs |
 
-If GitHub blocks docs-only PRs because `build-win64` never ran, use **“Do not require status checks to pass before merging”** for checks that did not run (GitHub default for skipped workflows), or enforce C++ gate via Lead review + this policy until rulesets support path-scoped required checks.
+**C++ path filters** (must match `ci.yml` and table above in § C++ path filters): `Source/**`, `**/*.Build.cs`, `*.uproject`, `Plugins/**/Source/**`, `.github/workflows/ci.yml`.
 
-Details: [CI_SETUP.md](CI_SETUP.md) § Branch protection.
+If GitHub blocks docs-only PRs because `build-win64` never ran, enable **“Do not require status checks for checks that were skipped”** in the branch rule, or enforce C++ gate via Lead review until path-scoped rulesets are available.
+
+Details: [CI_SETUP.md](CI_SETUP.md) § Branch protection · Gate: [Docs/15c_HR3_C_BRANCH_PROTECTION.md](../../Docs/15c_HR3_C_BRANCH_PROTECTION.md).
 
 ---
 
