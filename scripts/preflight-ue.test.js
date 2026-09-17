@@ -45,3 +45,9 @@ test('full mode without MCP skips editor when unreachable (expected on cloud VM)
   assert.ok(r.status === 0 || r.status === 1, `unexpected exit ${r.status}`);
   assert.match(r.stdout, /preflight:ue/);
 });
+
+test('simulate-fail MANNEQUINS_DIR_MISSING for HS-E KEEP-LOCAL documentation', () => {
+  const r = runPreflight(['--assets-only', '--simulate-fail=MANNEQUINS_DIR_MISSING']);
+  assert.strictEqual(r.status, 1);
+  assert.match(r.stdout, /MANNEQUINS_DIR_MISSING/);
+});

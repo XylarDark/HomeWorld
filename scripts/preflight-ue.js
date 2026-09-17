@@ -180,6 +180,21 @@ function checkDiskAssets(config) {
   const charCfg = loadCharacterConfig(config);
   const meshOnly = charCfg && !(charCfg.anim_blueprint || '').trim();
 
+  // HS-E KEEP-LOCAL: fail loud when Content/Characters/Mannequins (or other required local dirs) missing
+  for (const rel of content.requiredLocalDirs || []) {
+    const abs = path.join(projectRoot, rel);
+    if (!fs.existsSync(abs) || !fs.statSync(abs).isDirectory()) {
+      const isMannequins = rel.replace(/\\/g, '/').includes('Characters/Mannequins');
+      blockers.push({
+        code: isMannequins ? 'MANNEQUINS_DIR_MISSING' : 'ASSET_MISSING_ON_DISK',
+        message:
+          config.blockerCodes?.[isMannequins ? 'MANNEQUINS_DIR_MISSING' : 'ASSET_MISSING_ON_DISK'] ||
+          'Required local content directory missing',
+        detail: rel,
+      });
+    }
+  }
+
   const paths = [content.vsMvpMap, content.characterBlueprint].filter(Boolean);
 
   // PL-A: prefer character config anim_blueprint; fall back to content.characterAnimBlueprint
