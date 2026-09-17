@@ -15,9 +15,9 @@
 
 Lead **`APPROVE VP STRATEGY`** — **APPROVED** (Luke Thompson, 2026-09-17 ET).
 
-**Next gate (VP):** Lead **`APPROVE VP-B`** after DESKTOP mesh-only preflight + NightMix smoke evidence — **VP-B IN PROGRESS** ([handoffs/VP_B_SMOKE_CHARACTER.md](handoffs/VP_B_SMOKE_CHARACTER.md); HR3 **CLOSED / COMPLETE**).
+**Next gate (VP):** Lead **`APPROVE VP-B`** — DESKTOP evidence complete @ `5d09cf8` ([handoffs/VP_B_SMOKE_CHARACTER.md](handoffs/VP_B_SMOKE_CHARACTER.md); HR3 **CLOSED / COMPLETE**).
 
-**VP-A APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET (hard-fail accepted; re-verify after VP-B). **VP-B IN PROGRESS** — mesh-only interim (Engine DefaultSkeletalMesh, empty anim_blueprint; preflight aligned). VP-C/D remain **LOCKED** until VP-A re-verify after VP-B.
+**VP-A APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET (hard-fail accepted; re-verify after VP-B). **VP-B EVIDENCE COMPLETE — PENDING LEAD `APPROVE VP-B`**. VP-C/D remain **LOCKED** until Lead gate + VP-A re-verify.
 
 ### Re-verify (HR3-D)
 
@@ -53,7 +53,7 @@ Product NP (NP-A…E) and Harness Refine 2 (HR2-A…C) are **CLOSED**. Senior po
 | **Harness HR2 (Docs/13)** | **CLOSED** |
 | **Docs/14 / VP strategy** | **APPROVED** — Lead **`APPROVE VP STRATEGY`**, 2026-09-17 ET |
 | **VP-A** | **APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET (verb PIE hard-fail accepted; PA-03 → VP-B) |
-| **VP-B** | **IN PROGRESS** — mesh-only interim (Engine DefaultSkeletalMesh, empty anim_blueprint); preflight aligned; HR3 **CLOSED** |
+| **VP-B** | **EVIDENCE COMPLETE — PENDING LEAD `APPROVE VP-B`** — DESKTOP preflight exit 0 + NightMix 4/4 @ `5d09cf8` |
 | **VP-C** | **LOCKED** |
 | **VP-D** | **LOCKED** |
 
@@ -95,7 +95,7 @@ Naming: **VP-A … VP-D** (Verify & Polish). Do **not** reuse NP-* or HR2-* phas
 
 | Item | Spec |
 |------|------|
-| **PA-02 NightMix smoke** | `Content/Python/smoke_nightmix_phase.py` — ensure `unreal.KismetMaterialLibrary.set_scalar_parameter_value(world, mpc, name, value)` works on DESKTOP UE 5.7; fallback path if module alias differs (see [KNOWN_ERRORS.md](../docs/KNOWN_ERRORS.md), [12-python.mdc](../.cursor/rules/12-python.mdc)) |
+| **PA-02 NightMix smoke** | `Content/Python/smoke_nightmix_phase.py` — prefer `unreal.MaterialLibrary.set_scalar_parameter_value` on UE 5.7; fallback `KismetMaterialLibrary` if present (see [KNOWN_ERRORS.md](../docs/KNOWN_ERRORS.md), [12-python.mdc](../.cursor/rules/12-python.mdc)) — **DESKTOP 4/4 @ `5d09cf8`** |
 | **PA-03 ABP skeleton** | `ABP_HomeWorldCharacter` — if PIE shows skeleton/mesh mismatch warning, fix retarget or default mesh assignment in C++/placement scripts; **defer** if warning is cosmetic only and PIE verbs pass |
 | **Evidence** | `Docs/handoffs/VP_B_SMOKE_CHARACTER.md` — before/after smoke script exit code; ABP warning status |
 | **Gate** | Lead **`APPROVE VP-B`** before VP-B implementation PR |
@@ -106,8 +106,8 @@ Naming: **VP-A … VP-D** (Verify & Polish). Do **not** reuse NP-* or HR2-* phas
 
 **Done criteria:**
 
-- [ ] `smoke_nightmix_phase.py` exits **0** on DESKTOP with four `OK phase=` lines
-- [ ] ABP skeleton: **fixed if blocking**, else **documented accept** in handoff
+- [x] `smoke_nightmix_phase.py` exits **0** on DESKTOP with four `OK phase=` lines — **4/4 @ DESKTOP-21CT3H0**
+- [x] ABP skeleton: **documented accept** (mesh-only interim; `EDITOR_ABP_SKELETON` warning only) — [handoffs/VP_B_SMOKE_CHARACTER.md](handoffs/VP_B_SMOKE_CHARACTER.md)
 - [ ] Safe-Build green if C++ touched
 
 ---
@@ -206,7 +206,7 @@ Phases run **sequentially** (recommended: A → B → C → D) unless Lead direc
 ```
 Docs/14 / VP STRATEGY: APPROVED — Lead Luke Thompson, APPROVE VP STRATEGY, 2026-09-17 ET
 VP-A: APPROVED — Lead APPROVE VP-A, 2026-09-17 ET (hard-fail accepted; re-verify after VP-B)
-VP-B: IN PROGRESS (mesh-only repo fixes) — VP-C: LOCKED — VP-D: LOCKED
+VP-B: EVIDENCE COMPLETE — PENDING LEAD APPROVE VP-B — VP-C: LOCKED — VP-D: LOCKED
 Product NP: CLOSED — HR2: CLOSED
 ```
 
@@ -228,4 +228,4 @@ Product NP: CLOSED — HR2: CLOSED
 
 ---
 
-*Conductor prepared this file; Lead **`APPROVE VP STRATEGY`** locked 2026-09-17 ET. VP-A **APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET ([handoffs/VP_A_PIE.md](handoffs/VP_A_PIE.md)) — hard-fail accepted; **VP-B UNLOCKED / IN PROGRESS** (HR3 **CLOSED / COMPLETE**); re-verify verb PIE after VP-B before VP-C.*
+*Conductor prepared this file; Lead **`APPROVE VP STRATEGY`** locked 2026-09-17 ET. VP-A **APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET ([handoffs/VP_A_PIE.md](handoffs/VP_A_PIE.md)) — hard-fail accepted; **VP-B EVIDENCE COMPLETE — PENDING LEAD `APPROVE VP-B`** ([handoffs/VP_B_SMOKE_CHARACTER.md](handoffs/VP_B_SMOKE_CHARACTER.md)); re-verify verb PIE after gate before VP-C.*

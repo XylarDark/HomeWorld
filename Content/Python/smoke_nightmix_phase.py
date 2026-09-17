@@ -28,6 +28,30 @@ def _log(msg):
     print(PREFIX, msg)
 
 
+def _get_editor_world():
+    """Return the editor world; prefer UnrealEditorSubsystem, fallback to EditorLevelLibrary."""
+    try:
+        subsystem = (
+            unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem)
+            if hasattr(unreal, "get_editor_subsystem")
+            else None
+        )
+        if subsystem and hasattr(subsystem, "get_editor_world"):
+            return subsystem.get_editor_world()
+    except Exception:
+        pass
+    return unreal.EditorLevelLibrary.get_editor_world()
+
+
+def _get_material_library():
+    """UE 5.7 exposes MaterialLibrary; older builds may only have KismetMaterialLibrary."""
+    for name in ("MaterialLibrary", "KismetMaterialLibrary"):
+        lib = getattr(unreal, name, None)
+        if lib is not None:
+            return lib, name
+    return None, None
+
+
 def main():
     _log("NightMix phase smoke (NP-C residual from NP-B)")
 
@@ -43,14 +67,14 @@ def main():
         _log("FAIL: MPC missing at %s — run place_vs_mvp_markers.py" % MPC_PATH)
         return 1
 
-    world = unreal.EditorLevelLibrary.get_editor_world()
+    world = _get_editor_world()
     if not world:
         _log("FAIL: no editor world")
         return 1
 
-    material_lib = unreal.KismetMaterialLibrary
+    material_lib, lib_name = _get_material_library()
     if not material_lib:
-        _log("FAIL: unreal.KismetMaterialLibrary unavailable")
+        _log("FAIL: unreal.MaterialLibrary and unreal.KismetMaterialLibrary unavailable")
         return 1
 
     ok = 0
@@ -62,7 +86,10 @@ def main():
                 unreal.Name("NightMix"),
                 float(expected),
             )
-            _log("OK phase=%s NightMix=%.2f (MaterialLibrary.set_scalar_parameter_value)" % (phase_name, expected))
+            _log(
+                "OK phase=%s NightMix=%.2f (%s.set_scalar_parameter_value)"
+                % (phase_name, expected, lib_name)
+            )
             ok += 1
         except Exception as exc:
             _log("FAIL phase=%s: %s" % (phase_name, exc))
