@@ -1,6 +1,6 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **VP2-A** — DESKTOP prove (**EVIDENCE FILED** — 0/9 MISSING; MCP crash; PENDING **`APPROVE VP2-A`**)
+**Current phase:** **VP2-A** — DESKTOP prove (**EVIDENCE FILED** — retry **9/9 PASS**; PENDING **`APPROVE VP2-A`**)
 
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **Conductor** (parent DESKTOP) / **DESKTOP-21CT3H0**
@@ -86,7 +86,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **HS-E** | Character / bootstrap canon | CLOUD+Lead+DESKTOP | **APPROVED / CLOSED** | [17e_HS_CONTENT_BOOTSTRAP.md](../Docs/17e_HS_CONTENT_BOOTSTRAP.md) — Lead **`APPROVE HS-E`**, 2026-09-17 ET (PR #97); policy **KEEP-LOCAL**; handoff [HS_E_CONTENT_BOOTSTRAP.md](../Docs/handoffs/HS_E_CONTENT_BOOTSTRAP.md) |
 | **HS-F** | Sign-off & re-grade | CLOUD+Lead | **IN PROGRESS** | [17_HS_AUDIT_SIGN_OFF.md](../Docs/17_HS_AUDIT_SIGN_OFF.md) — PENDING Lead **`SIGN OFF HS AUDIT`**; proposed harness **~A** / swarm **~A** |
 
-**Current track:** **Docs/18 VP2 APPROVED** — Lead **`APPROVE VP2 STRATEGY`**; **VP2-A IN PROGRESS**.
+**Current track:** **Docs/18 VP2 APPROVED** — Lead **`APPROVE VP2 STRATEGY`** (PR #101); **VP2-A PENDING `APPROVE VP2-A`** (retry 9/9 PASS).
 
 ---
 
@@ -118,4 +118,4 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 |---|---|---|---|---|
 | — | — | — | — | — |
 
-| VP2-A-evidence | VP2-A | DESKTOP | CND | Docs/handoffs | [VP2_A_EVIDENCE.md](../Docs/handoffs/VP2_A_EVIDENCE.md) — **PENDING** Lead **`APPROVE VP2-A`** |
+| VP2-A-evidence | VP2-A | DESKTOP | CND | Docs/handoffs | [VP2_A_EVIDENCE.md](../Docs/handoffs/VP2_A_EVIDENCE.md) — retry **9/9 PASS** — **PENDING** Lead **`APPROVE VP2-A`** |
