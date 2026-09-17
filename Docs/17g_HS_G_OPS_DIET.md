@@ -6,7 +6,7 @@
 | **Date** | 2026-09-17 |
 | **Author** | Conductor |
 | **Approved** | Lead Luke Thompson — **`APPROVE HS-G`**, 2026-09-17 ET |
-| **Parent** | [17_HS_AUDIT_SIGN_OFF.md](17_HS_AUDIT_SIGN_OFF.md) **CLOSED** · [18_VERIFY_PROVE.md](18_VERIFY_PROVE.md) **ACTIVE** (VP2-A PENDING; VP2-B IN PROGRESS success-path) |
+| **Parent** | [17_HS_AUDIT_SIGN_OFF.md](17_HS_AUDIT_SIGN_OFF.md) **CLOSED** · [18_VERIFY_PROVE.md](18_VERIFY_PROVE.md) **CLOSED** (VP2-C STOP) |
 
 ---
 

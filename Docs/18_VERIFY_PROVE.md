@@ -2,10 +2,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **APPROVED / ACTIVE** — Lead Luke Thompson, **`APPROVE VP2 STRATEGY`**, 2026-09-17 ET |
+| **Status** | **CLOSED / COMPLETE** — Lead **`APPROVE VP2-C STOP`** / Conductor **`CLOSE VP2`**, 2026-09-17 ET |
 | **Date** | 2026-09-17 |
 | **Author** | Conductor (HomeWorld) |
-| **Baseline main** | `cab7e9c` — Docs/17 HS **SIGNED OFF**; Docs/16 PL **CLOSED** |
+| **Baseline main** | `2ef961f` — VP2-A+B prove merged (PR #104); VP2-C **STOP** |
 | **Why now** | PL + HS closed at ~A, but **PL-B** and **VP-A re-verify** were **WAIVED**. HS-D shipped `evidence:grep` — use it before inventing features. |
 | **Prior tracks** | [14_VP_VERIFY_POLISH.md](14_VP_VERIFY_POLISH.md) **CLOSED** · [16_PLAYABLE_LOOP.md](16_PLAYABLE_LOOP.md) **CLOSED** · [17_HS_AUDIT_SIGN_OFF.md](17_HS_AUDIT_SIGN_OFF.md) **SIGNED OFF** |
 
@@ -42,11 +42,11 @@ Prove the signed playable loop on **DESKTOP-21CT3H0** with **real** editor-log g
 |-------|--------|
 | Docs/16 PL | **CLOSED** |
 | Docs/17 HS | **CLOSED / COMPLETE** |
-| **Docs/18 / VP2 strategy** | **APPROVED** — Lead **`APPROVE VP2 STRATEGY`**, 2026-09-17 ET |
-| **VP2-A** | **APPROVED / COMPLETE** — Lead **`APPROVE VP2-A`**, 2026-09-17 ET (retry **9/9 PASS**; soft-reject caveats historical — [VP2_A_EVIDENCE.md](handoffs/VP2_A_EVIDENCE.md)) |
+| **Docs/18 / VP2 track** | **CLOSED / COMPLETE** — Lead **`APPROVE VP2-C STOP`** / Conductor **`CLOSE VP2`**, 2026-09-17 ET |
+| **VP2-A** | **APPROVED / COMPLETE** — Lead **`APPROVE VP2-A`**, 2026-09-17 ET (retry **9/9 PASS**; [VP2_A_EVIDENCE.md](handoffs/VP2_A_EVIDENCE.md)) |
 | **VP2-B** | **APPROVED / COMPLETE** — Lead **`APPROVE VP2-B`**, 2026-09-17 ET (DESKTOP 9/9 success-path; [VP2_B_FIX.md](handoffs/VP2_B_FIX.md)) |
-| **VP2 prove (A+B)** | **COMPLETE** — Lead **`APPROVE VP2-A`** + **`APPROVE VP2-B`**, 2026-09-17 ET |
-| **VP2-C** | LOCKED (optional; Lead picks flavor or **`APPROVE VP2-C STOP`** / **`CLOSE VP2`**) |
+| **VP2 prove (A+B)** | **COMPLETE** — main `2ef961f` (PR #104) |
+| **VP2-C** | **STOP / CLOSED** — **C0 Stop** chosen; no C1/C2 follow-on |
 
 ---
 
@@ -105,7 +105,9 @@ Naming: **VP2-A … VP2-C** (Verify & Prove 2). Do **not** reuse Docs/14 `VP-A�
 | **C1 Thin playability** | Prompts / gather-store feel / nurture readable (extend VP-C polish class) | Lead **`APPROVE VP2-C PLAY`** then implement |
 | **C2 Presentation** | Replace P6 still and/or fix black HighResShot from `CAM_Hero` | Lead **`APPROVE VP2-C SHOT`** then implement |
 
-**Deliverable:** [Docs/18c_VP2_FOLLOWON.md](18c_VP2_FOLLOWON.md) only if C1/C2 chosen.
+**Deliverable:** [Docs/18c_VP2_FOLLOWON.md](18c_VP2_FOLLOWON.md) only if C1/C2 chosen — **not created** (C0 Stop).
+
+**Status:** **STOP / CLOSED** — Lead authorized Conductor judgment **`APPROVE VP2-C STOP`** / **`CLOSE VP2`**, 2026-09-17 ET. Required prove (A+B) complete on main `2ef961f`; optional C1/C2 not pursued.
 
 ---
 
@@ -124,11 +126,15 @@ Naming: **VP2-A … VP2-C** (Verify & Prove 2). Do **not** reuse Docs/14 `VP-A�
 
 ---
 
-## Immediate unlock
+## Close stamp (VP2-C STOP)
 
-1. Lead **`APPROVE VP2 STRATEGY`** — **DONE** (2026-09-17 ET; PR #101)
-2. Conductor **VP2-A DESKTOP prove** — **APPROVED** — Lead **`APPROVE VP2-A`**, 2026-09-17 ET ([VP2_A_EVIDENCE.md](handoffs/VP2_A_EVIDENCE.md))
-3. Conductor **VP2-B DESKTOP re-prove** — **APPROVED** — Lead **`APPROVE VP2-B`**, 2026-09-17 ET ([VP2_B_FIX.md](handoffs/VP2_B_FIX.md))
+| Field | Value |
+|-------|-------|
+| **Gate** | Lead **`APPROVE VP2-C STOP`** / Conductor **`CLOSE VP2`** |
+| **Date** | 2026-09-17 ET |
+| **Baseline** | main `2ef961f` — VP2-A+B (PR #104) |
+| **Decision** | **C0 Stop** — no C1 playability or C2 presentation follow-on |
+| **Next product track** | **None** — do not invent NP/product phases without Lead gate |
 
 ---
 
@@ -136,6 +142,6 @@ Naming: **VP2-A … VP2-C** (Verify & Prove 2). Do **not** reuse Docs/14 `VP-A�
 
 Lead **`APPROVE VP2 STRATEGY`** — **APPROVED** (Luke Thompson, 2026-09-17 ET).
 
-**VP2-A APPROVED** — Lead **`APPROVE VP2-A`**, 2026-09-17 ET ([VP2_A_EVIDENCE.md](handoffs/VP2_A_EVIDENCE.md)). **VP2-B APPROVED** — Lead **`APPROVE VP2-B`**, 2026-09-17 ET. Required prove track (A+B) **COMPLETE**; VP2-C optional (LOCKED).
+**VP2 track CLOSED / COMPLETE** — Lead **`APPROVE VP2-A`**, **`APPROVE VP2-B`**, **`APPROVE VP2-C STOP`** (Conductor **`CLOSE VP2`**), 2026-09-17 ET. Baseline main `2ef961f`.
 
-*APPROVED strategy — Docs/18 Verify & Prove. Lead **`APPROVE VP2 STRATEGY`**, 2026-09-17 ET. VP2-A/B gates closed.*
+*CLOSED — Docs/18 Verify & Prove. Required prove (A+B) complete; VP2-C STOP; no new product phase.*

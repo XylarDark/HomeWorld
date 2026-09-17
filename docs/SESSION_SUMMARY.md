@@ -399,6 +399,12 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 - Docs: [VP2_B_FIX.md](../Docs/handoffs/VP2_B_FIX.md), [18_VERIFY_PROVE.md](../Docs/18_VERIFY_PROVE.md), [PHASE_BOARD.md](../swarm/PHASE_BOARD.md) → VP2-B **IN PROGRESS**.
 - Awaiting DESKTOP Safe-Build + re-prove; gate **`APPROVE VP2-B`**.
 
+### 2026-09-17 — VP2 CLOSED (C0 Stop) + Safe-Build DLL guard
+
+- Lead authorized Conductor **`APPROVE VP2-C STOP`** / **`CLOSE VP2`** after VP2-A+B on main `2ef961f`.
+- Docs: [18_VERIFY_PROVE.md](../Docs/18_VERIFY_PROVE.md) track **CLOSED**; [PHASE_BOARD.md](../swarm/PHASE_BOARD.md) VP2 rows closed; no C1/C2 follow-on.
+- Harness: `Tools/Safe-Build.ps1` asserts `Binaries/Win64/UnrealEditor-HomeWorld.dll` > 100 KB post-build (HS-G Bad Image / zero-byte DLL residual).
+
 ---
 
 *Maintained by Conductor; HR-C established this rolling policy.*
