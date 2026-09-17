@@ -1,10 +1,10 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **HS-D** — Evidence & re-verify automation (**IN PROGRESS**)
+**Current phase:** **HS-E** — Character / bootstrap canon (**IN PROGRESS**)
 
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
-**Active owners:** **Conductor** (HS-D) / **DESKTOP** (Conductor-parent proofs)
-**Blocked by:** none for HS-D start. Next gate Lead **`APPROVE HS-D`**. Branch protection **PERMANENTLY DEFERRED** (HS-C / HR3-C).
+**Active owners:** **Lead** (policy decide) / **Conductor** (docs+config) / **DESKTOP** (setup proof)
+**Blocked by:** Lead must pick Mannequins policy in HS-E (KEEP-local / Engine-only / binary strategy). Next gate **`APPROVE HS-E`**. Branch protection **DEFERRED**.
 
 
 | Phase | Name | Owners | Status | Gate file | Handoffs |
@@ -48,7 +48,7 @@ Canonical history: **VP-A → VP-B → VP-A re-verify → VP-C**. Spec: [17d_HS_
 
 ## POST-AUDIT (Docs/05–10 + HR track)
 
-MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** **Product next-phase (NP-A…E) is CLOSED / COMPLETE.** **HR2 track CLOSED / COMPLETE.** **HR3 track CLOSED / COMPLETE** — Lead **`APPROVE HR3-D`**, 2026-09-17 ET (HR3-C **DEFERRED**). **VP track CLOSED / COMPLETE** (VP-A re-verify **WAIVED**). **Docs/16 Playable Loop CLOSED / COMPLETE** — Lead **`APPROVE PL-D`**, 2026-09-17 ET. **Docs/17 HS Audit ACTIVE** — HS-A/B **CLOSED**; HS-C **DEFERRED**; **HS-D IN PROGRESS**.
+MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** **Product next-phase (NP-A…E) is CLOSED / COMPLETE.** **HR2 track CLOSED / COMPLETE.** **HR3 track CLOSED / COMPLETE** — Lead **`APPROVE HR3-D`**, 2026-09-17 ET (HR3-C **DEFERRED**). **VP track CLOSED / COMPLETE** (VP-A re-verify **WAIVED**). **Docs/16 Playable Loop CLOSED / COMPLETE** — Lead **`APPROVE PL-D`**, 2026-09-17 ET. **Docs/17 HS Audit ACTIVE** — HS-A/B/D **CLOSED**; HS-C **DEFERRED**; **HS-E IN PROGRESS**.
 
 | Track | Doc / phase | Host | Status | Gate / handoff |
 |---|---|---|---|---|
@@ -83,7 +83,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **HS-C** | CI as law | CLOUD+Lead | **DEFERRED / CLOSED** | Lead **`ACCEPT HS-C DEFER`**, 2026-09-17 ET — [17c](../Docs/17c_HS_CI_LAW.md) |
 | **HS-D** | Evidence automation | CLOUD+DESKTOP | **IN PROGRESS** | [17d_HS_EVIDENCE.md](../Docs/17d_HS_EVIDENCE.md) · [HS_D_EVIDENCE.md](../Docs/handoffs/HS_D_EVIDENCE.md) — PENDING Lead **`APPROVE HS-D`** |
 
-**Current track:** **Docs/17 HS** — HS-A/B **CLOSED**; HS-C **DEFERRED**; **HS-D IN PROGRESS**.
+**Current track:** **Docs/17 HS** — HS-A/B/D **CLOSED**; HS-C **DEFERRED**; **HS-E IN PROGRESS**.
 
 ---
 
