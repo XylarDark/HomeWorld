@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "mcp": {
+    "host": "127.0.0.1",
+    "port": 55557,
+    "timeoutMs": 3000
+  },
+  "repo": {
+    "requiredFiles": [
+      "HomeWorld.uproject",
+      "Content/Python/bootstrap_project.py",
+      "Content/Python/setup_animation_blueprint.py",
+      "Content/Python/place_vs_mvp_markers.py",
+      "Content/Python/character_blueprint_config.json"
+    ],
+    "characterConfigPath": "Content/Python/character_blueprint_config.json",
+    "requiredCharacterConfigKeys": ["skeletal_mesh", "anim_blueprint"]
+  },
+  "content": {
+    "vsMvpMap": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers",
+    "characterBlueprint": "/Game/HomeWorld/Characters/BP_HomeWorldCharacter",
+    "characterAnimBlueprint": "/Game/HomeWorld/Characters/ABP_HomeWorldCharacter",
+    "skeletalMeshFromCharacterConfig": true
+  },
+  "editor": {
+    "resultFile": "Saved/preflight_ue_editor.json",
+    "script": "Content/Python/preflight_ue_editor.py"
+  },
+  "blockerCodes": {
+    "MCP_UNREACHABLE": "UnrealMCP port 55557 not reachable — open Editor and verify MCP green dot",
+    "CONFIG_MISSING": "Required repo file or JSON config missing",
+    "CONFIG_EMPTY_PATH": "Character config path is empty — assign skeletal_mesh / anim_blueprint",
+    "REPO_SCRIPT_MISSING": "Bootstrap or placement script missing from repo",
+    "ASSET_MISSING_ON_DISK": "Required .uasset/.umap not found under Content/ (LFS or local import)",
+    "EDITOR_RESULTS_MISSING": "Editor deep-check results missing — run preflight_ue_editor.py via MCP on DESKTOP",
+    "EDITOR_ABP_SKELETON": "ABP skeleton missing or AnimBP failed to compile (VP-A class blocker)",
+    "EDITOR_BP_MESH_EMPTY": "BP_HomeWorldCharacter skeletal mesh or anim_class unset/broken",
+    "EDITOR_MAP_MISSING": "VS_MVP map asset missing or unloadable in Editor"
+  }
+}

@@ -86,6 +86,15 @@ jobs:
       - name: DevEnvTemplate pin + submodule (HR2-B)
         run: bash scripts/verify-devenv-submodule.sh
 
+      - name: Validate preflight-ue config JSON (HR3-B)
+        run: python3 -c "import json; json.load(open('config/preflight-ue.json'))"
+
+      - name: UE preflight repo checks (HR3-B — cloud assets-only)
+        run: npm run preflight:ue -- --skip-mcp --assets-only
+
+      - name: UE preflight unit tests (HR3-B)
+        run: npm run preflight:ue:test
+
       - name: Git hygiene checks
         run: |
           ERRORS=0

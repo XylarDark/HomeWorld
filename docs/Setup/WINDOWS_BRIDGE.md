@@ -65,7 +65,10 @@ Cloud agents **cannot** run this step. On **DESKTOP-21CT3H0** (or Lead machine):
 3. Open **`HomeWorld.uproject`**
 4. Restart Cursor → MCP green dot (port **55557**) — [MCP_SETUP.md](MCP_SETUP.md)
 5. Run Editor scripts via MCP `execute_python_script` or Tools → Execute Python Script
-6. PIE / dress validation; capture logs under `Saved/Logs/` as evidence
+6. **`npm run preflight:ue -- --require-editor`** — HR3-B gate before PIE ([UE_PREFLIGHT.md](UE_PREFLIGHT.md); run `preflight_ue_editor.py` via MCP first)
+7. PIE / dress validation; capture logs under `Saved/Logs/` as evidence
+
+Cloud agents run **`npm run preflight:ue -- --skip-mcp --assets-only`** only (repo checks in CI). Full preflight is DESKTOP-owned.
 
 ---
 

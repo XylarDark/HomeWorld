@@ -67,7 +67,7 @@ Conductor blunt grade at VP-A close: **swarm B+ / harness B**. **A+** means **cl
 | **VP-B** | **PARKED** — pending HR3 (was unlocked mid-fix) |
 | **Docs/15 / HR3 strategy** | **APPROVED** — Lead **`APPROVE HR3 STRATEGY`**, 2026-09-17 ET |
 | **HR3-A** | **APPROVED / COMPLETE** — [handoffs/HR3_A_WINDOWS_EXEC.md](handoffs/HR3_A_WINDOWS_EXEC.md) |
-| **HR3-B** | **UNLOCKED / IN PROGRESS** |
+| **HR3-B** | **EVIDENCE FILED — AWAITING APPROVE HR3-B** — [handoffs/HR3_B_UE_PREFLIGHT.md](handoffs/HR3_B_UE_PREFLIGHT.md) |
 | **HR3-C … HR3-D** | **LOCKED** until per-phase gates |
 
 ---
@@ -115,10 +115,10 @@ Naming: **HR3-A … HR3-D** (Harness Refine 3 — A+ pass). Do **not** reuse HR2
 
 **Done criteria:**
 
-- [ ] `npm run preflight:ue` (or documented equivalent) exits **non-zero** on each blocker class above
-- [ ] DESKTOP dry-run logs show pass + fail exit codes with clear messages
-- [ ] Policy doc: when required, who runs it (cloud vs DESKTOP owner)
-- [ ] VP-A class failure (ABP skeleton) would have been caught by preflight
+- [x] `npm run preflight:ue` (or documented equivalent) exits **non-zero** on each blocker class above — [handoffs/HR3_B_UE_PREFLIGHT.md](handoffs/HR3_B_UE_PREFLIGHT.md)
+- [ ] DESKTOP dry-run logs show pass + fail exit codes with clear messages (Lead/Conductor on DESKTOP-21CT3H0)
+- [x] Policy doc: when required, who runs it (cloud vs DESKTOP owner) — [docs/Setup/UE_PREFLIGHT.md](../docs/Setup/UE_PREFLIGHT.md)
+- [x] VP-A class failure (ABP skeleton) would have been caught by preflight — `EDITOR_ABP_SKELETON` + `--simulate-fail`
 
 ---
 

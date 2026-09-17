@@ -6,6 +6,8 @@
   "scripts": {
     "doctor": "node DevEnvTemplate/dist/scripts/doctor/cli.js --project-root .",
     "doctor:ue": "node scripts/doctor-ue.js",
+    "preflight:ue": "node scripts/preflight-ue.js",
+    "preflight:ue:test": "node --test scripts/preflight-ue.test.js",
     "doctor:fix": "node DevEnvTemplate/dist/scripts/doctor/cli.js --project-root . --fix",
     "doctor:fast": "node DevEnvTemplate/dist/scripts/doctor/cli.js --project-root . --fast",
     "doctor:build": "cd DevEnvTemplate && npm install && npm run build",

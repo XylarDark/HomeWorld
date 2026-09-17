@@ -58,6 +58,7 @@ Setup and environment: MCP, CI, local tools, ref images, Cursor dev.
 | [Setup/CI_POLICY.md](Setup/CI_POLICY.md) | When validate.yml vs ci.yml; docs-only PRs; `[skip ci]`. |
 | [Setup/WINDOWS_BRIDGE.md](Setup/WINDOWS_BRIDGE.md) | Cloud agent → self-hosted CI → DESKTOP Editor/MCP. |
 | [Setup/BUILD_POLICY.md](Setup/BUILD_POLICY.md) | Safe-Build vs Build-HomeWorld.bat for agents vs humans. |
+| [Setup/UE_PREFLIGHT.md](Setup/UE_PREFLIGHT.md) | UE preflight (`preflight:ue`) — fail loud before PIE; cloud vs DESKTOP modes (HR3-B). |
 
 ### guides/
 
