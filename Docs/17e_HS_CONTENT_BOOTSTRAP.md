@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **IN PROGRESS** — policy **KEEP-LOCAL** stamped by Lead; still **PENDING** Lead **`APPROVE HS-E`** |
+| **Status** | **APPROVED / CLOSED** — Lead Luke Thompson, **`APPROVE HS-E`**, 2026-09-17 ET (policy **KEEP-LOCAL**) |
 | **Date** | 2026-09-17 (ET) |
 | **Author** | Conductor executor (HomeWorld) — `gh` Contents API only |
 | **Parent plan** | [17_HS_AUDIT_STRATEGY.md](17_HS_AUDIT_STRATEGY.md) — Lead **`APPROVE HS STRATEGY`**, 2026-09-17 ET |
