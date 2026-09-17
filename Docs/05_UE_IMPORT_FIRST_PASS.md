@@ -5,7 +5,8 @@
 **Date:** 2026-09-16  
 **Status:** RUNBOOK — first UE import staging only  
 **First-pass (Windows):** **DONE** on DESKTOP-21CT3H0 — see `Docs/handoffs/UE_IMPORT_FIRST_PASS_DONE.md`  
-**Do not:** full dress, Nanite/Lumen gates, free-flight, PHASE_BOARD / Docs/07 edits  
+**Do not (this pass):** full dress, Nanite/Lumen gates, free-flight, PHASE_BOARD / Docs/07 edits  
+**Next (post-audit dress):** [06_VS_MVP_DRESS.md](06_VS_MVP_DRESS.md) — `place_vs_mvp_dress.py`  
 
 **Contracts:** `Docs/04_EXPORT_TABLE.md`, `Docs/04_UE_HANDOFF_NOTES.md`  
 **Staging disk:** `AssetCreation/Exports/<Category>/`  
@@ -118,3 +119,9 @@ Evidence / camera reel remains Blender + `Maps/VS_MVP/CAMERA_REEL.md` until a la
 - [x] No full dress claimed
 
 **Note:** `.uasset` / `.umap` from this pass live on the Windows machine only; repo carries scripts + handoff, not Content binaries.
+
+---
+
+## 8. Dress pass (post Lead SIGN OFF)
+
+See **[06_VS_MVP_DRESS.md](06_VS_MVP_DRESS.md)** — run `Content/Python/place_vs_mvp_dress.py` after import + markers. Handoff: [handoffs/VS_MVP_DRESS.md](handoffs/VS_MVP_DRESS.md).
