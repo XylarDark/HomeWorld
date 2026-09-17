@@ -20,6 +20,13 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 ## Rolling log (newest first)
 
+### 2026-09-17 — HR3-C DEFERRED (APPROVE HR3-C deferred stamp)
+
+- Lead Luke Thompson typed **skip** on HR3-C branch-protection UI/API verify (2026-09-17 ET) — treat as **`APPROVE HR3-C deferred`**: checklist delivered (PR #62); GitHub apply not verified; do not block HR3-D.
+- Docs stamped: [HR3_C_BRANCH_PROTECTION.md](../Docs/handoffs/HR3_C_BRANCH_PROTECTION.md), [15_HR3_A_PLUS.md](../Docs/15_HR3_A_PLUS.md), [15c_HR3_C_BRANCH_PROTECTION.md](../Docs/15c_HR3_C_BRANCH_PROTECTION.md), [PHASE_BOARD.md](../swarm/PHASE_BOARD.md).
+- **HR3-C DEFERRED / COMPLETE for track**. **HR3-D UNLOCKED / IN PROGRESS**. **VP-B still PARKED** pending HR3.
+- **Next:** HR3-D planning (DESKTOP evidence lane + re-verify) — Lead **`APPROVE HR3-D`** before implementation PR. Branch protection apply remains in [CI_SETUP.md](Setup/CI_SETUP.md) for later.
+
 ### 2026-09-17 — HR3-C branch protection checklist (docs-only)
 
 - Cloud agent HR3-C: expanded [docs/Setup/CI_SETUP.md](Setup/CI_SETUP.md) § Branch protection — step-by-step Lead checklist for **`validate`**, **`python-lint`**, **`build-win64`** on `main`; aligned with [CI_POLICY.md](Setup/CI_POLICY.md) and HR2-C path filters.

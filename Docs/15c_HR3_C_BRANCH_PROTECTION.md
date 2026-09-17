@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **EVIDENCE FILED — PENDING LEAD APPLY** |
+| **Status** | **DEFERRED / COMPLETE for track** — Lead skip 2026-09-17 ET |
 | **Date** | 2026-09-17 |
 | **Author** | Cloud Agent (HR3-C) |
 | **Strategy** | [15_HR3_A_PLUS.md](15_HR3_A_PLUS.md) — Lead **`APPROVE HR3 STRATEGY`**, 2026-09-17 ET |
@@ -13,11 +13,11 @@
 
 ## Gate
 
-**PENDING** — Lead applies GitHub **Settings → Branches** for `main` and stamps [handoffs/HR3_C_BRANCH_PROTECTION.md](handoffs/HR3_C_BRANCH_PROTECTION.md) **APPLIED** (or **DEFERRED** with ticket).
+**DEFERRED** — Lead Luke Thompson typed **skip** on UI/API verify (2026-09-17 ET). Treat as **`APPROVE HR3-C deferred`**: checklist delivered (PR #62); GitHub apply not verified; checklist remains in [CI_SETUP.md](../docs/Setup/CI_SETUP.md) for later apply.
 
-Cloud agents **cannot** enable branch protection. This PR delivers the **Lead checklist** and honest verification notes only.
+Cloud agents **cannot** enable branch protection. Checklist and verification notes filed; **do not block HR3-D**.
 
-**Next gate:** Lead **`APPROVE HR3-C`** after confirming protection in GitHub UI or API (admin).
+**Next gate:** Lead **`APPROVE HR3-D`** before HR3-D implementation PR. Re-apply branch protection in GitHub when ready → stamp handoff **APPLIED**.
 
 ---
 
@@ -78,9 +78,9 @@ HR2-C wired workflow path filters and policy text; HR3-C makes the **GitHub sett
 - [x] CI_SETUP Lead checklist: Settings → Branches → `main` → required checks
 - [x] Check names and C++ path list aligned with CI_POLICY and HR2-C
 - [x] Handoff filed with **PENDING LEAD APPLY** and API 403 documented
-- [ ] Lead applies branch protection in GitHub UI
-- [ ] Lead confirms in handoff (**APPLIED** or **DEFERRED** + ticket)
-- [ ] Lead **`APPROVE HR3-C`**
+- [x] Lead confirms in handoff — **DEFERRED** (skip 2026-09-17 ET; GitHub apply not verified)
+- [x] Lead **`APPROVE HR3-C deferred`** — complete for track; unlock HR3-D
+- [ ] Lead applies branch protection in GitHub UI (when ready) → stamp **APPLIED**
 
 ---
 
@@ -90,4 +90,4 @@ HR2-C wired workflow path filters and policy text; HR3-C makes the **GitHub sett
 
 ---
 
-*HR3-C docs PR — await Lead apply + **`APPROVE HR3-C`**. Do not claim protection enabled without GitHub confirmation.*
+*HR3-C **DEFERRED / COMPLETE for track** — Lead **`APPROVE HR3-C deferred`**, 2026-09-17 ET. Checklist PR #62; GitHub apply deferred. HR3-D unlocked. Do not claim protection enabled without GitHub confirmation.*
