@@ -8,7 +8,7 @@
 | **Parent plan** | [17_HS_AUDIT_STRATEGY.md](17_HS_AUDIT_STRATEGY.md) — Lead **`APPROVE HS STRATEGY`**, 2026-09-17 ET |
 | **Prior gate** | Lead **`APPROVE HS-E`** (KEEP-LOCAL), 2026-09-17 ET — stamp PR **#97** (may merge / merged) |
 | **Baseline** | Docs/08 **SIGNED OFF** ([08_AUDIT_SIGN_OFF.md](08_AUDIT_SIGN_OFF.md)); HR3 **CLOSED** (HR3-C **DEFERRED**); PL **CLOSED** |
-| **Hard rules honored** | Docs/07 CLOSED; FALLBACK glide only; no combat; no `.uasset`/`.umap` commits; exactly 10 masters; no invented product phases |
+| **Hard rules honored** | Docs/07 CLOSED; FALLBACK glide only; no combat; Content default KEEP-LOCAL (allowlist [20_UASSET_AI_POLICY.md](20_UASSET_AI_POLICY.md)); exactly 10 masters; no invented product phases |
 
 **Gate:** Lead **`SIGN OFF HS AUDIT`** — **SIGNED OFF** (Luke Thompson, 2026-09-17 ET). Docs/17 HS track **CLOSED / COMPLETE**. Next product track **TBD by Lead only**.
 
@@ -87,7 +87,7 @@ These are **not** open HS defects. Lead may reopen any later under a **Lead-name
 | **Who names next** | **Lead only** |
 | **What agents must not do** | Invent NP/VP/PL/HS successors, phase ids, or “obvious next” product tracks |
 | **After `SIGN OFF HS AUDIT`** | Next product track = **TBD by Lead only** — park product until Lead names it |
-| **Hard rules that survive** | Docs/07 CLOSED · FALLBACK armed · no combat · no `.uasset`/`.umap` commits · 10 masters |
+| **Hard rules that survive** | Docs/07 CLOSED · FALLBACK armed · no combat · Content KEEP-LOCAL + Docs/20 allowlist · 10 masters |
 
 ---
 

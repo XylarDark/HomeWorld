@@ -36,7 +36,7 @@ Cloud agent PR (GitHub)
 ### 1. Cloud agent opens PR
 
 - Branch: `cursor/<descriptive-name>-<suffix>` per cloud agent policy
-- No `.uasset` / `.umap` in repo — binary work stays on Windows
+- Default **KEEP-LOCAL** for Content binaries; allowlisted paths per [Docs/20_UASSET_AI_POLICY.md](../../Docs/20_UASSET_AI_POLICY.md) only — binary work on DESKTOP
 - Evidence paths in PR body (scripts, docs, log expectations)
 
 ### 2. GitHub Actions — validate (always)

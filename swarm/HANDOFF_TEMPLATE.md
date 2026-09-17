@@ -68,7 +68,7 @@ Use when a **Cursor cloud agent** ships a PR (no UE/MCP on the VM). Full packet:
 - [ ] MCP / UnrealMCP on cloud VM
 - [ ] `.\Tools\Safe-Build.ps1` or C++ build on cloud VM
 - [ ] Editor Python / GUI automation on cloud VM
-- [ ] `.uasset` / `.umap` commits
+- [ ] `.uasset` / `.umap` commits outside [Docs/20 allowlist](../Docs/20_UASSET_AI_POLICY.md)
 
 **Windows follow-up:** [docs/Setup/WINDOWS_BRIDGE.md](../docs/Setup/WINDOWS_BRIDGE.md) — **Conductor parent only** on DESKTOP-21CT3H0 (Task executors **FAIL**). Cloud agents do not claim DESKTOP Shell.
 
