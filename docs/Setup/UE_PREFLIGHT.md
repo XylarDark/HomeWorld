@@ -66,6 +66,7 @@ CI runs the same in [validate.yml](../../.github/workflows/validate.yml). Full a
 | `CONFIG_MISSING` | Required repo file or invalid JSON |
 | `CONFIG_EMPTY_PATH` | `character_blueprint_config.json` missing `skeletal_mesh` (`anim_blueprint` may be empty for VP-B mesh-only) |
 | `ASSET_MISSING_ON_DISK` | Expected `.uasset`/`.umap` absent under `Content/` (`/Engine/...` paths skipped) |
+| `MANNEQUINS_DIR_MISSING` | `Content/Characters/Mannequins` missing — HS-E KEEP-LOCAL local copy required (see Docs/17e) |
 | `EDITOR_RESULTS_MISSING` | No `Saved/preflight_ue_editor.json` when `--require-editor` |
 | `EDITOR_ABP_SKELETON` | ABP skeleton missing or AnimBP compile error (**VP-A root cause**) |
 | `EDITOR_BP_MESH_EMPTY` | BP skeletal mesh unset (mesh-only: empty `anim_class` OK when config `anim_blueprint` empty) |
@@ -80,6 +81,30 @@ npm run preflight:ue -- --assets-only --simulate-fail=EDITOR_ABP_SKELETON
 ---
 
 
+
+## HS-E KEEP-LOCAL — Mannequins on DESKTOP (fail loud)
+
+Lead policy **`HS-E POLICY KEEP-LOCAL`** (2026-09-17 ET): character mesh/ABP stay at project `/Game/Characters/Mannequins/...`. Those assets are **not in git**.
+
+| Mode | Mannequins disk check? |
+|------|-------------------------|
+| `preflight:ue` / `--skip-mcp` / `--require-editor` (DESKTOP) | **Yes** — requires dir `Content/Characters/Mannequins` + mesh/ABP `.uasset` files |
+| `--assets-only` (cloud CI) | **No** — repo JSON only; may PASS on cold clone (**false confidence**) |
+
+**Fail codes when folder/assets missing (DESKTOP disk modes):**
+
+| Code | Meaning |
+|------|---------|
+| `MANNEQUINS_DIR_MISSING` | `Content/Characters/Mannequins` directory absent — copy from Epic UE 5.7 `Templates\TemplateResources\High\Characters\Content\Mannequins` |
+| `ASSET_MISSING_ON_DISK` | Config mesh/ABP `.uasset` not under `Content/` |
+
+**Setup runbook:** [Docs/17e_HS_CONTENT_BOOTSTRAP.md](../../Docs/17e_HS_CONTENT_BOOTSTRAP.md) · DESKTOP checklist: [Docs/handoffs/HS_E_CONTENT_BOOTSTRAP.md](../../Docs/handoffs/HS_E_CONTENT_BOOTSTRAP.md).
+
+**Never** `git add` Mannequins `.uasset`/`.umap`. Do not claim DESKTOP path proof from cloud agents.
+
+Config key: `content.requiredLocalDirs` in [config/preflight-ue.json](../../config/preflight-ue.json).
+
+---
 
 ## Evidence capture (HS-D)
 

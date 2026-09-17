@@ -1,3 +1,8 @@
+## 2026-09-17 ET — HS-E POLICY KEEP-LOCAL (PENDING APPROVE HS-E)
+
+Lead **`HS-E POLICY KEEP-LOCAL`**. Docs/17e + DESKTOP handoff + preflight Mannequins fail-loud. Status still **PENDING** **`APPROVE HS-E`**. Do not claim APPROVE. No `.uasset` commits.
+
+
 ## 2026-09-17 ET — APPROVE HS-D / HS-E unlocked
 
 Lead **`APPROVE HS-D`**. Evidence automation closed ([Docs/17d](../Docs/17d_HS_EVIDENCE.md)). **HS-E** character/bootstrap canon **IN PROGRESS**.
