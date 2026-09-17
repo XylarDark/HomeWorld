@@ -45,7 +45,7 @@ void UHomeWorldNurtureComponent::BeginPlay()
 	}
 
 	UE_LOG(LogTemp, Log, TEXT("NURTURE: component ready target=%s nurtured=%d requires=%s"),
-		TargetLabel(), bNurtured ? 1 : 0, *RequiredResourceId.ToString());
+		*TargetLabel().ToString(), bNurtured ? 1 : 0, *RequiredResourceId.ToString());
 }
 
 FName UHomeWorldNurtureComponent::TargetLabel() const
@@ -77,7 +77,7 @@ void UHomeWorldNurtureComponent::ApplyPersistedNurtured(bool bInNurtured)
 		return;
 	}
 	bNurtured = bInNurtured;
-	UE_LOG(LogTemp, Log, TEXT("NURTURE: %s M_Nurtured=%d (restored)"), TargetLabel(), bNurtured ? 1 : 0);
+	UE_LOG(LogTemp, Log, TEXT("NURTURE: %s M_Nurtured=%d (restored)"), *TargetLabel().ToString(), bNurtured ? 1 : 0);
 }
 
 bool UHomeWorldNurtureComponent::IsNightSpiritHomesteadAllowed(AHomeWorldCharacter* Character) const
@@ -105,13 +105,13 @@ bool UHomeWorldNurtureComponent::TryNurture(AHomeWorldCharacter* Character)
 
 	if (!IsNightSpiritHomesteadAllowed(Character))
 	{
-		UE_LOG(LogTemp, Log, TEXT("NURTURE: soft fail %s — day or body form"), TargetLabel());
+		UE_LOG(LogTemp, Log, TEXT("NURTURE: soft fail %s — day or body form"), *TargetLabel().ToString());
 		return false;
 	}
 
 	if (bNurtured)
 	{
-		UE_LOG(LogTemp, Log, TEXT("NURTURE: soft success %s — already nurtured (M_Nurtured on)"), TargetLabel());
+		UE_LOG(LogTemp, Log, TEXT("NURTURE: soft success %s — already nurtured (M_Nurtured on)"), *TargetLabel().ToString());
 		return true;
 	}
 
@@ -125,18 +125,18 @@ bool UHomeWorldNurtureComponent::TryNurture(AHomeWorldCharacter* Character)
 	if (Inv->GetResource(RequiredResourceId) < 1)
 	{
 		UE_LOG(LogTemp, Log, TEXT("NURTURE: soft fail %s — no %s in inventory"),
-			TargetLabel(), *RequiredResourceId.ToString());
+			*TargetLabel().ToString(), *RequiredResourceId.ToString());
 		return false;
 	}
 
 	if (!Inv->SpendResource(RequiredResourceId, 1))
 	{
-		UE_LOG(LogTemp, Log, TEXT("NURTURE: soft fail %s — spend failed"), TargetLabel());
+		UE_LOG(LogTemp, Log, TEXT("NURTURE: soft fail %s — spend failed"), *TargetLabel().ToString());
 		return false;
 	}
 
 	bNurtured = true;
 	UE_LOG(LogTemp, Log, TEXT("NURTURE: success %s M_Nurtured=1 consumed 1x %s"),
-		TargetLabel(), *RequiredResourceId.ToString());
+		*TargetLabel().ToString(), *RequiredResourceId.ToString());
 	return true;
 }
