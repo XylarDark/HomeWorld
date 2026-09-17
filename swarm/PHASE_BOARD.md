@@ -1,9 +1,9 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **PL-D** (optional presentation / Shot 1) — **OPEN / IN PROGRESS** — PL-C **APPROVED** (Lead **`APPROVE PL-C`**, 2026-09-17 ET)
+**Current phase:** — (no active PL phase) — **Docs/16 Playable Loop CLOSED / COMPLETE** (Lead **`APPROVE PL-D`**, 2026-09-17 ET)
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
-**Active owners:** **DESKTOP** (viewport still / existing CAM markers) + **Lead** (`APPROVE PL-D`)  
-**Blocked by:** Lead **`APPROVE PL-D`** only (Shot 1 evidence filed). Branch protection remains **DEFERRED** (HR3-C).
+**Active owners:** **Lead** (next product/harness gate)  
+**Blocked by:** none for PL. Branch protection remains **DEFERRED** (HR3-C). Next track TBD by Lead.
 
 
 | Phase | Name | Owners | Status | Gate file | Handoffs |
@@ -66,7 +66,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **VP-C** | Playability polish | CLOUD+DESKTOP | **APPROVED / CLOSED** | [handoffs/VP_C_POLISH.md](../Docs/handoffs/VP_C_POLISH.md) — Lead **`APPROVE VP-C`**, 2026-09-17 ET |
 | **VP-D** | Bootstrap dry-run | CLOUD+DESKTOP | **APPROVED / CLOSED** | [handoffs/VP_D_BOOTSTRAP_CI.md](../Docs/handoffs/VP_D_BOOTSTRAP_CI.md) — Lead **`APPROVE VP-D`**, 2026-09-17 ET; branch protection **DEFERRED** |
 
-**Current track:** **Docs/16 Playable Loop APPROVED** — **PL-A/C CLOSED**; **PL-B WAIVED**; **PL-D OPEN**. Next gate **`APPROVE PL-D`** (closes PL).
+**Current track:** **Docs/16 Playable Loop CLOSED / COMPLETE** — PL-A APPROVED, PL-B WAIVED, PL-C APPROVED, PL-D APPROVED. Next product track **TBD**.
 
 ---
 
@@ -76,7 +76,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 |---|---|---|---|---|---|
 | PL-A-character | PL-A | DESKTOP+CLOUD | CND | Docs/handoffs/ | [PL_A_CHARACTER.md](../Docs/handoffs/PL_A_CHARACTER.md) — **APPROVED / CLOSED** — Lead **`APPROVE PL-A`**, 2026-09-17 ET |
 | PL-B-pie | PL-B | Lead | Lead | Docs/handoffs/ | [PL_B_PIE.md](../Docs/handoffs/PL_B_PIE.md) — **WAIVED / CLOSED** — Lead **`WAIVE PL-B`**, 2026-09-17 ET |
-| PL-D-presentation | PL-D | DESKTOP+Lead | CND+Lead | Docs/handoffs/ | [PL_D_PRESENTATION.md](../Docs/handoffs/PL_D_PRESENTATION.md) — **EVIDENCE COMPLETE** — still `shot1_lookout.png` + UE CAM_Hero/VS_MARKER_Shot1; Lead **`APPROVE PL-D`** |
+| PL-D-presentation | PL-D | DESKTOP+Lead | CND+Lead | Docs/handoffs/ | [PL_D_PRESENTATION.md](../Docs/handoffs/PL_D_PRESENTATION.md) — **APPROVED / CLOSED** — Lead **`APPROVE PL-D`**, 2026-09-17 ET; PL track complete |
 | PL-C-loop | PL-C | CLOUD+DESKTOP | CND | Docs/handoffs/ | [PL_C_LOOP_UX.md](../Docs/handoffs/PL_C_LOOP_UX.md) — **APPROVED / CLOSED** — Lead **`APPROVE PL-C`**, 2026-09-17 ET |
 | VP-A-reverify | VP-A | Lead | Lead | Docs/handoffs/ | **WAIVED** — Lead **`WAIVE VP-A re-verify`**, 2026-09-17 ET; debt closes under **PL-B** |
 | HR3-C-branch-protection | HR3-C | Lead | Lead | docs/Setup/ | **DEFERRED** — [HR3_C_BRANCH_PROTECTION.md](../Docs/handoffs/HR3_C_BRANCH_PROTECTION.md) |
