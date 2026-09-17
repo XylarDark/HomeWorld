@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **IN PROGRESS** — awaiting DESKTOP re-prove + Lead **`APPROVE VP2-B`** |
+| **Status** | **RE-PROVE COMPLETE** — awaiting Lead **`APPROVE VP2-B`** (then **`APPROVE VP2-A`**) |
 | **Date** | 2026-09-17 (ET) |
 | **Lead direction** | VP2-B unlocked **before** VP2-A approve — success-path greps (not soft-reject-only) |
 | **Parent plan** | [Docs/18_VERIFY_PROVE.md](../18_VERIFY_PROVE.md) |
@@ -102,4 +102,34 @@ Lead **`APPROVE VP2-B`** after DESKTOP re-prove. VP2-A remains **PENDING `APPROV
 
 ---
 
-*VP2-B fixes landed — DESKTOP re-prove required — not APPROVED.*
+## DESKTOP re-prove result (2026-09-17 ET)
+
+| Field | Value |
+|-------|-------|
+| **Host** | DESKTOP-21CT3H0 |
+| **Tip** | `73e7a9e` (`cursor/vp2-b-success-path-fixes-1899`) |
+| **evidence:grep** | **9/9 PASS** (`Saved/vp2_b_evidence.json` local) |
+| **Status** | Success-path re-prove **COMPLETE** — awaiting Lead **`APPROVE VP2-B`** (then **`APPROVE VP2-A`**) |
+
+### Success-path excerpts (continuous HomeWorld.log)
+
+| Prefix | Verdict | Evidence line |
+|--------|---------|---------------|
+| `INVENTORY:` | **PASS** | `INVENTORY: dump begin (slots=6 total=17)` |
+| `GATHER:` | **PASS** | `GATHER: RES_WOOD +3` / `RES_STONE` / `RES_HERB` (cheat grants; `GP_Gather_WOOD` label still flaky in PIE) |
+| `STORE:` | **PASS** | `STORE: deposit RES_STONE inventory->stored count=2` |
+| `TAME:` | **PASS** | `TAME: offer accepted (RES_HERB consumed) - bond wait 4.0s` |
+| `HEAL:` | **PASS** | `HEAL: success Spirit_A consumed RES_HERB` |
+| `NURTURE:` | **PASS** | `NURTURE: success N2_Stored M_Nurtured=1 consumed 1x RES_WOOD` |
+| `DAWN:` | **PASS** | `DAWN: persisted inventory=17 tame+heal+nurture in slot 'HomeWorldSave' (ok)` |
+| `FORM:` | **PASS** | `FORM: spirit form (phase=Night…)` / `FORM: body form (phase=Dawn…)` |
+| `FALLBACK:` | **PASS** | `FALLBACK: TryStartFallbackGlide started near TargetPoint_1` |
+
+### Prove notes
+
+1. **Control rotation matters:** `TraceInteractHit` uses `GetControlRotation()`, not actor yaw. MCP teleports must set player-controller control rotation or interact returns false with no `STORE:` log.
+2. **DLL Bad Image:** zero-byte `UnrealEditor-HomeWorld.dll` after link-while-locked — rebuild until ~1.48 MB before editor launch.
+3. **MCP hang:** multi-verb mega-scripts can reset MCP / crash editor; prefer short batch with control-aim.
+4. Do **not** treat `HEAL: component ready` / `NURTURE: component ready` alone as Lead PASS — require success lines above (HS-G).
+
+*Re-prove filed — not stamped. Lead must type `APPROVE VP2-B` / `APPROVE VP2-A`.*
