@@ -8901,3 +8901,13 @@ Agent session summaries for cross-session context persistence.
 - Canvas: `canvases/homeworld-game-audit.canvas.tsx`.
 - Verdict: systems-complete prototype; art/visuals are main gap for marketing-ready slice.
 
+## 2026-09-17 — UE import staging (FBX + runbook)
+
+**Tasks completed:**
+- Unpacked `ue-import-staging.tar.gz`: 13 MVP FBX under `AssetCreation/Exports/{Homestead,Forest,Gatherables,Transit}/`, `MVP_CRUMB_SPLINE.json`, `MVP_EXPORT_MANIFEST.md`, `blender/floating_island_homestead_LIB.blend`.
+- Updated `Content/Python/batch_import_asset_creation.py` and `AssetCreation/Blender/export_to_asset_creation.py` for Docs/04 `/Game/HomeWorld/Meshes/<Category>/` paths.
+- Added `Docs/05_UE_IMPORT_FIRST_PASS.md` runbook and `Docs/handoffs/UE_IMPORT_STAGING.md`.
+- Opened PR #4 to `main` (staging only; UE Editor not run).
+
+**Key decisions:** No UE maps/dress invented; no Docs/07 edits. Next: run batch import on UE 5.7 machine per Docs/05.
+
