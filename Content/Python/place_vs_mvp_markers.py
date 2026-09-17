@@ -6,7 +6,7 @@
 #   - Creates MPC_HomeWorld_Time with scalar NightMix (default 0.85 night target)
 #   - C++ UHomeWorldTimeOfDaySubsystem::SetPhase → ApplyNightMixForPhase → MPC
 #   - Masters M_* consume NightMix per Docs/02_MATERIAL_SHEET.md (see wire_nightmix_mpc_note.py)
-#   - create_master_materials_stub.py creates empty M_* shells under Materials/Masters/
+#   - create_master_materials.py builds/upgrades M_* master graphs under Materials/Masters/
 
 from __future__ import annotations
 
