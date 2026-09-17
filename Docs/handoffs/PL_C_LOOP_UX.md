@@ -3,8 +3,8 @@
 | Field | Value |
 |-------|-------|
 | **Phase** | PL-C |
-| **Status** | **EVIDENCE COMPLETE — PENDING LEAD `APPROVE PL-C`** |
-| **Lead gate** | **`APPROVE PL-C`** before PL-D |
+| **Status** | **APPROVED / CLOSED** — Lead Luke Thompson, **`APPROVE PL-C`**, 2026-09-17 ET |
+| **Lead gate** | **`APPROVE PL-C`** — **APPROVED**; unlocks PL-D |
 | **Spec** | [16_PLAYABLE_LOOP.md](../16_PLAYABLE_LOOP.md) § PL-C |
 | **Tip** | `ade3aaf` (PR #80 + #81) — DESKTOP **DESKTOP-21CT3H0** |
 
@@ -33,7 +33,7 @@
 - [x] Store-transfer interact path in C++
 - [x] Inventory readout (HUD + log dump)
 - [x] DESKTOP Safe-Build + placement smoke
-- [ ] Lead **`APPROVE PL-C`** (optional: one PIE deposit line when back)
+- [x] Lead **`APPROVE PL-C`** (PIE deposit greps optional / not blocking)
 
 ## Hard rules
 
@@ -42,3 +42,11 @@
 ---
 
 *PL-C — stop for Lead **`APPROVE PL-C`** before PL-D.*
+
+## Lead APPROVE PL-C
+
+Lead **`APPROVE PL-C`** (Luke Thompson, 2026-09-17 ET) — PL-C **APPROVED / CLOSED**. **PL-D UNLOCKED** (optional Shot 1 from existing markers).
+
+---
+
+*PL-C **APPROVED / CLOSED** — Lead **`APPROVE PL-C`**, 2026-09-17 ET.*
