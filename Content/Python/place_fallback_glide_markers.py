@@ -117,8 +117,8 @@ def spawn_portal_trigger(label, location, destination_label, folder):
 
     portal_comp = actor.get_component_by_class(unreal.HomeWorldShrinePortalComponent)
     if portal_comp:
-        portal_comp.set_editor_property("destination_label", unreal.Name(destination_label))
-        portal_comp.set_editor_property("b_require_night", False)
+        portal_comp.set_editor_property("DestinationLabel", unreal.Name(destination_label))
+        portal_comp.set_editor_property("bRequireNight", False)
         _log("Portal trigger %s -> %s (bRequireNight=false)" % (label, destination_label))
     else:
         _log("Portal trigger %s spawned without component reference" % label)

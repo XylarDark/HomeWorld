@@ -66,6 +66,8 @@ Content/Python/place_vs_mvp_markers.py
 Content/Python/place_fallback_glide_markers.py
 ```
 
+`place_fallback_glide_markers.py` uses UE reflection names `DestinationLabel` / `bRequireNight` on portal components.
+
 Creates:
 
 - All `CRUMB_*` TargetPoints (from `AssetCreation/Exports/MVP_CRUMB_SPLINE.json`)
