@@ -1145,14 +1145,10 @@ bool AHomeWorldCharacter::FindInteractTargetInCone(FHitResult& OutHit) const
 	{
 		PrimComp = BestActor->FindComponentByClass<UPrimitiveComponent>();
 	}
+	OutHit.HitObjectHandle = FActorInstanceHandle(BestActor);
 	if (PrimComp)
 	{
 		OutHit.Component = PrimComp;
-		OutHit.HitObjectHandle = FActorInstanceHandle(PrimComp);
-	}
-	else
-	{
-		OutHit.HitObjectHandle = FActorInstanceHandle(BestActor);
 	}
 	// Resolve handle so GetActor() works for downstream interact (UE 5.7 lazy handle).
 	OutHit.GetActor();
