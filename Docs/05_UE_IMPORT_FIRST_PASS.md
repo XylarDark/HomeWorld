@@ -4,6 +4,7 @@
 **Role:** INT  
 **Date:** 2026-09-16  
 **Status:** RUNBOOK — first UE import staging only  
+**First-pass (Windows):** **DONE** on DESKTOP-21CT3H0 — see `Docs/handoffs/UE_IMPORT_FIRST_PASS_DONE.md`  
 **Do not:** full dress, Nanite/Lumen gates, free-flight, PHASE_BOARD / Docs/07 edits  
 
 **Contracts:** `Docs/04_EXPORT_TABLE.md`, `Docs/04_UE_HANDOFF_NOTES.md`  
@@ -22,7 +23,7 @@
 
 ---
 
-## 1. Open project
+## 1. Open project — **DONE** (DESKTOP-21CT3H0)
 
 1. Launch **UE 5.7**
 2. Open `HomeWorld.uproject` from the HomeWorld repo root
@@ -30,7 +31,9 @@
 
 ---
 
-## 2. Batch import FBX
+## 2. Batch import FBX — **DONE**
+
+Meshes imported under `/Game/HomeWorld/Meshes/{Homestead,Forest,Gatherables,Transit}/` (UCX warnings once; meshes landed).
 
 1. **Tools → Execute Python Script**
 2. Select `Content/Python/batch_import_asset_creation.py`
@@ -58,7 +61,9 @@ UCX boxes ship **inside** the matching SM_ FBX (`UCX_SM_Cabin`, `UCX_SM_Shrine_*
 
 ---
 
-## 3. Map folder + TargetPoints from JSON
+## 3. Map folder + TargetPoints from JSON — **DONE**
+
+Level **`L_VS_MVP_Markers`** at `/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers` — **28 actors** (CRUMB_*, VS_MARKER_*, ANCHOR_*, CAM_*). Automated via `Content/Python/place_vs_mvp_markers.py` (idempotent re-run).
 
 1. Create (empty) level / folder: `/Game/HomeWorld/Maps/VS_MVP` (and optional `Transit/`, `Cameras/`, `Markers/` subfolders)
 2. Open `AssetCreation/Exports/MVP_CRUMB_SPLINE.json`
@@ -73,7 +78,9 @@ Do **not** fully dress the homestead/forest in this pass — placement markers +
 
 ---
 
-## 4. NightMix stub
+## 4. NightMix stub — **DONE**
+
+MPC **`/Game/HomeWorld/Materials/MPC_HomeWorld_Time`** with scalar **NightMix** default **0.85** (created by `place_vs_mvp_markers.py`).
 
 - One scalar **NightMix** (0–1) on the ten masters (or a Material Parameter Collection stub)
 - Homestead night preview target ≈ **0.85**; day landing / planet ≈ **0**
@@ -104,8 +111,10 @@ Evidence / camera reel remains Blender + `Maps/VS_MVP/CAMERA_REEL.md` until a la
 
 ## 7. Verify
 
-- [ ] FBX under `/Game/HomeWorld/Meshes/{Homestead,Forest,Gatherables,Transit}/`
-- [ ] UCX collision proxies present on cabin / shrines / landing
-- [ ] TargetPoints named from `MVP_CRUMB_SPLINE.json`
-- [ ] NightMix stub exists
-- [ ] No full dress claimed
+- [x] FBX under `/Game/HomeWorld/Meshes/{Homestead,Forest,Gatherables,Transit}/` (Windows first-pass)
+- [ ] UCX collision proxies present on cabin / shrines / landing (verify in viewport)
+- [x] TargetPoints named from `MVP_CRUMB_SPLINE.json` — `L_VS_MVP_Markers`, 28 actors
+- [x] NightMix stub exists — `MPC_HomeWorld_Time`
+- [x] No full dress claimed
+
+**Note:** `.uasset` / `.umap` from this pass live on the Windows machine only; repo carries scripts + handoff, not Content binaries.
