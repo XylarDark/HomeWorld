@@ -20,6 +20,13 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 ## Rolling log (newest first)
 
+### 2026-09-17 — HR2 harness refine strategy (docs-only)
+
+- Delivered [Docs/13_HR2_HARNESS_REFINE.md](../Docs/13_HR2_HARNESS_REFINE.md) — **DRAFT**; phases HR2-A (doctor signal), HR2-B (cold-clone submodule), HR2-C (C++ CI gate).
+- [swarm/PHASE_BOARD.md](../swarm/PHASE_BOARD.md): HR2 rows **LOCKED**; product NP **CLOSED**; current track awaits Lead **`APPROVE HR2 STRATEGY`**.
+- Baseline: harness **B- (~3.8/5)** @ `54193ac`; no HR2 implementation in this PR.
+- **Next:** Lead **`APPROVE HR2 STRATEGY`** → unlock HR2-A.
+
 ### 2026-09-17 — Product NP track CLOSED (APPROVE NP-E)
 
 - Lead **`APPROVE NP-E`** (Luke Thompson, 2026-09-17 ET) — NP-E **APPROVED**; product NP track **CLOSED / COMPLETE** (NP-A…E all approved).

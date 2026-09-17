@@ -1,9 +1,9 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **PRODUCT NP TRACK CLOSED** — Lead **`APPROVE NP-E`** (Luke Thompson, 2026-09-17 ET)  
+**Current phase:** **HR2 strategy** — **DRAFT awaiting Lead `APPROVE HR2 STRATEGY`** (product NP **CLOSED**)  
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
-**Active owners:** **CND** (Conductor) — no open product NP phases  
-**Blocked by:** —
+**Active owners:** **CND** (Conductor)  
+**Blocked by:** Lead **`APPROVE HR2 STRATEGY`** — [Docs/13_HR2_HARNESS_REFINE.md](../Docs/13_HR2_HARNESS_REFINE.md)
 
 | Phase | Name | Owners | Status | Gate file | Handoffs |
 |---|---|---|---|---|---|
@@ -22,7 +22,7 @@ Status values: `LOCKED` `OPEN` `IN PROGRESS` `GATE FAILED` `CLOSED` `GATE READY`
 
 ## POST-AUDIT (Docs/05–10 + HR track)
 
-MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** **Product next-phase (NP-A…E) is CLOSED / COMPLETE** — Lead **`APPROVE NP-E`**, 2026-09-17 ET.
+MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** **Product next-phase (NP-A…E) is CLOSED / COMPLETE** — Lead **`APPROVE NP-E`**, 2026-09-17 ET. Active harness track: **HR2 (Docs/13)** — strategy **DRAFT**, awaiting Lead **`APPROVE HR2 STRATEGY`**.
 
 | Track | Doc / phase | Status | Gate / handoff |
 |---|---|---|---|
@@ -38,8 +38,12 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **NP-C** | Form + V1 polish | **APPROVED** | [12c_NP_C_FORM_V1.md](../Docs/12c_NP_C_FORM_V1.md) |
 | **NP-D** | SYS V3–V4 gather + tame | **APPROVED** | [12d_NP_D_SYS_V3_V4.md](../Docs/12d_NP_D_SYS_V3_V4.md) — Lead **`APPROVE NP-D`**, 2026-09-17 ET |
 | **NP-E** | Heal + nurture + persist | **APPROVED** | [12e_NP_E_SYS_V6_V8.md](../Docs/12e_NP_E_SYS_V6_V8.md), [handoffs/NP_E_SYS_V6_V8.md](../Docs/handoffs/NP_E_SYS_V6_V8.md) — Lead **`APPROVE NP-E`**, 2026-09-17 ET |
+| **Docs/13** | Harness Refine 2 strategy | **DRAFT — LOCKED** | [13_HR2_HARNESS_REFINE.md](../Docs/13_HR2_HARNESS_REFINE.md) — awaiting Lead **`APPROVE HR2 STRATEGY`** |
+| **HR2-A** | Doctor signal (UE host) | **LOCKED** | Blocked until **`APPROVE HR2 STRATEGY`** → then **`APPROVE HR2-A`** |
+| **HR2-B** | Cold-clone submodule | **LOCKED** | Blocked until **`APPROVE HR2 STRATEGY`** → then **`APPROVE HR2-B`** |
+| **HR2-C** | C++ CI gate (build-win64) | **LOCKED** | Blocked until **`APPROVE HR2 STRATEGY`** → then **`APPROVE HR2-C`** |
 
-**Current track:** **PRODUCT NP TRACK CLOSED** — NP-A…E all **APPROVED**. Placement script fixes on main (`870f1d0`). No NP-F; no next product NP gate.
+**Current track:** Product NP **CLOSED** (NP-A…E **APPROVED**). HR2 strategy **DRAFT** — Conductor stops for Lead **`APPROVE HR2 STRATEGY`** before HR2-A/B/C implementation.
 
 ---
 
@@ -47,7 +51,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 
 | ID | Phase | Owner | Write path | Due artifact |
 |---|---|---|---|---|
-| — | — | — | — | Product NP track closed — no open NP tasks |
+| HR2-strategy-gate | HR2 | Lead | Docs/ | **`APPROVE HR2 STRATEGY`** → unlock HR2-A planning |
 
 ## Open defects
 
