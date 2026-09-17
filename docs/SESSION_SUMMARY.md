@@ -20,6 +20,13 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 ## Rolling log (newest first)
 
+### 2026-09-17 — Lead WAIVE VP-A re-verify (start VP-C)
+
+- Lead **`WAIVE VP-A re-verify`** (Luke Thompson, 2026-09-17 ET) — all required verb prefixes **WAIVED** for VP-C unlock per HR3-D.
+- Honest automation **STILL FAIL** record retained in [VP_A_PIE.md](../Docs/handoffs/VP_A_PIE.md) § Re-verify; waiver stamp appended.
+- [PHASE_BOARD.md](../swarm/PHASE_BOARD.md): VP-A-reverify → **WAIVED**; no longer blocks VP-C **COMPLETE** (Lead **`APPROVE VP-C`** still required).
+- **Next:** Lead **`APPROVE VP-C`** when polish sign-off ready.
+
 ### 2026-09-17 — VP-A re-verify STILL FAIL + VP-C polish impl (pending APPROVE VP-C)
 
 - **VP-A re-verify** on DESKTOP @ `0e4bca1`: verb greps **STILL FAIL** (0 gameplay lines all prefixes); MCP PIE `get_pie_worlds` count **0**, no PlayerController; `pie_test_runner` **3/40**. § Re-verify appended to [VP_A_PIE.md](../Docs/handoffs/VP_A_PIE.md).

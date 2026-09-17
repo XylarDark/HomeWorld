@@ -181,6 +181,10 @@ Gameplay prefixes only (not placement-script prose):
 
 ### Recommendation (re-verify)
 
-1. Treat re-verify as **STILL FAIL** — do **not** invent PASS greps or mark VP-C **COMPLETE** on verb evidence alone.
-2. **VP-C impl may proceed** in parallel; **APPROVE VP-C** / **COMPLETE** remain gated by re-verify **PASS** or Lead **WAIVE** per [HR3_D_EVIDENCE_LANE.md](HR3_D_EVIDENCE_LANE.md).
-3. Next DESKTOP attempt: human Alt+P PIE walk-through per runbooks, **or** automation gap session for MCP `get_pie_worlds` / PlayerController visibility.
+1. Treat automation re-verify as **STILL FAIL** — do **not** invent PASS greps; honest fail record stands.
+2. **VP-C impl may proceed**; re-verify gate **WAIVED** by Lead (see stamp below).
+3. Optional follow-up: human Alt+P PIE walk-through per runbooks, **or** automation gap session for MCP `get_pie_worlds` / PlayerController visibility.
+
+### Stamp (re-verify)
+
+Lead **`WAIVE VP-A re-verify`** (Luke Thompson, 2026-09-17 ET) — all required verb prefixes (`FORM`, `FALLBACK`, `HEAL`, `NURTURE`, `DAWN`, `TAME`, `GATHER`) **WAIVED** for VP-C unlock per [HR3_D_EVIDENCE_LANE.md](HR3_D_EVIDENCE_LANE.md). Automation path remains **STILL FAIL**; waiver does not rewrite grep results.
