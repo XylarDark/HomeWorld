@@ -3,8 +3,9 @@
 | Field | Value |
 |-------|-------|
 | **Phase** | HR3-B |
-| **Status** | **EVIDENCE FILED — AWAITING APPROVE HR3-B** |
-| **Lead gate** | **`APPROVE HR3-B`** — after evidence review |
+| **Status** | **APPROVED** — Lead Luke Thompson, **`APPROVE HR3-B`**, 2026-09-17 ET |
+| **Lead gate** | **`APPROVE HR3-B`** — **APPROVED**; unlocks **HR3-C** |
+| **Evidence merge** | `9d7ffaf` (PR #60) |
 | **Spec** | [15_HR3_A_PLUS.md](../15_HR3_A_PLUS.md) § HR3-B |
 | **Policy** | [docs/Setup/UE_PREFLIGHT.md](../../docs/Setup/UE_PREFLIGHT.md) |
 
@@ -69,27 +70,45 @@ CI: `validate` job runs assets-only preflight + unit tests on every PR.
 
 ---
 
-## DESKTOP dry-run (Lead / Conductor)
+## DESKTOP evidence (Lead / Conductor)
 
-After merge, on **DESKTOP-21CT3H0**:
+Host: **DESKTOP-21CT3H0** (2026-09-17 ET), repo @ `9d7ffaf` (PR #60).
+
+### Host preflight (Node)
+
+```powershell
+node scripts/preflight-ue.js --skip-mcp --assets-only
+# exit 0 (PASS)
+
+node scripts/preflight-ue.js --skip-mcp --assets-only --simulate-fail=EDITOR_ABP_SKELETON
+# exit 1 — [EDITOR_ABP_SKELETON] … VP-A class failure
+```
+
+### Editor deep checks (MCP / `--require-editor`)
+
+```powershell
+# Editor open; via MCP:
+execute_python_script("preflight_ue_editor.py")
+
+npm run preflight:ue -- --require-editor
+# exit 1 — EDITOR_ABP_SKELETON + EDITOR_BP_MESH_EMPTY (VP-A class blockers; expected before VP-B fix)
+```
+
+| Step | Command | Exit | Blockers |
+|------|---------|------|----------|
+| Assets-only pass | `node scripts/preflight-ue.js --skip-mcp --assets-only` | **0** | — |
+| Simulated fail | `… --simulate-fail=EDITOR_ABP_SKELETON` | **1** | `EDITOR_ABP_SKELETON` |
+| Editor required | `preflight_ue_editor.py` + `npm run preflight:ue -- --require-editor` | **1** | `EDITOR_ABP_SKELETON`, `EDITOR_BP_MESH_EMPTY` |
+
+**VP-A counterfactual:** Preflight with `--require-editor` before verb greps would have blocked PIE with exit **1** instead of empty `FORM:` / `HEAL:` greps.
 
 ### Pass path (expected after VP-B fixes)
 
 ```powershell
-# Editor open, MCP green
+# Editor open, MCP green, ABP/mesh fixed
 execute_python_script("preflight_ue_editor.py")   # via MCP
 npm run preflight:ue -- --require-editor           # exit 0
 ```
-
-### Fail paths (reproduce VP-A class — before VP-B fix)
-
-| Step | Command | Expected |
-|------|---------|----------|
-| MCP down | Close Editor → `npm run preflight:ue` | exit **1**, `MCP_UNREACHABLE` |
-| ABP skeleton | With broken ABP → run editor script → `npm run preflight:ue -- --skip-mcp --require-editor` | exit **1**, `EDITOR_ABP_SKELETON` |
-| Simulated | `npm run preflight:ue -- --simulate-fail=EDITOR_ABP_SKELETON` | exit **1** (any host) |
-
-**VP-A counterfactual:** If preflight had run with `--require-editor` before verb greps, `EDITOR_ABP_SKELETON` would have blocked PIE with a clear exit **1** instead of empty `FORM:` / `HEAL:` greps.
 
 ---
 
@@ -103,4 +122,12 @@ npm run preflight:ue -- --require-editor           # exit 0
 
 ## Gate
 
-_(Awaiting Lead **`APPROVE HR3-B`** — cloud evidence + DESKTOP dry-run table above.)_
+Lead **`APPROVE HR3-B`** — **APPROVED** (Luke Thompson, 2026-09-17 ET). HR3-B **COMPLETE**. **HR3-C UNLOCKED / IN PROGRESS** — branch protection real ([15_HR3_A_PLUS.md](../15_HR3_A_PLUS.md) § HR3-C). **VP-B remains PARKED** pending HR3.
+
+## Prior stamp
+
+Lead **`APPROVE HR3-A`** (Luke Thompson, 2026-09-17 ET) — HR3-A **APPROVED / COMPLETE**; HR3-B **UNLOCKED**. Evidence merge `9d7ffaf` (PR #60).
+
+## Stamp
+
+Lead **`APPROVE HR3-B`** (Luke Thompson, 2026-09-17 ET) — HR3-B **APPROVED / COMPLETE** (cloud CI + DESKTOP dry-run exit codes above). **HR3-C UNLOCKED / IN PROGRESS** — Lead **`APPROVE HR3-C`** before implementation PR. **VP-B still PARKED**.
