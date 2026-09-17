@@ -3,8 +3,8 @@
 | Field | Value |
 |-------|-------|
 | **Phase** | VP-B |
-| **Status** | **EVIDENCE COMPLETE — PENDING LEAD `APPROVE VP-B`** |
-| **Lead gate** | **`APPROVE VP-B`** before marking complete or unlocking VP-C |
+| **Status** | **APPROVED / CLOSED** — Lead Luke Thompson, **`APPROVE VP-B`**, 2026-09-17 ET |
+| **Lead gate** | **`APPROVE VP-B`** — **APPROVED**; unlocks VP-C planning/impl (VP-A re-verify still required before VP-C **COMPLETE** per HR3-D) |
 | **Spec** | [14_VP_VERIFY_POLISH.md](../14_VP_VERIFY_POLISH.md) § VP-B |
 | **Baseline** | Main @ `5d09cf8` (PR #66 mesh-only) — DESKTOP **DESKTOP-21CT3H0** |
 
@@ -90,4 +90,4 @@ smoke_nightmix_phase: Smoke complete: 4/4 phases written to MPC
 
 ---
 
-*VP-B DESKTOP evidence filed — pending Lead **`APPROVE VP-B`**. VP-C remains **LOCKED** until gate.*
+*VP-B **APPROVED / CLOSED** — Lead **`APPROVE VP-B`**, 2026-09-17 ET. VP-C **IN PROGRESS** (unlocked). Conductor must file VP-A re-verify (or Lead **WAIVE**) per [HR3_D_EVIDENCE_LANE.md](HR3_D_EVIDENCE_LANE.md) before VP-C **COMPLETE**.*

@@ -15,13 +15,13 @@
 
 Lead **`APPROVE VP STRATEGY`** — **APPROVED** (Luke Thompson, 2026-09-17 ET).
 
-**Next gate (VP):** Lead **`APPROVE VP-B`** — DESKTOP evidence complete @ `5d09cf8` ([handoffs/VP_B_SMOKE_CHARACTER.md](handoffs/VP_B_SMOKE_CHARACTER.md); HR3 **CLOSED / COMPLETE**).
+**Next gate (VP):** Lead **`APPROVE VP-C`** — VP-C planning/impl **IN PROGRESS** ([handoffs/VP_C_POLISH.md](handoffs/VP_C_POLISH.md)).
 
-**VP-A APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET (hard-fail accepted; re-verify after VP-B). **VP-B EVIDENCE COMPLETE — PENDING LEAD `APPROVE VP-B`**. VP-C/D remain **LOCKED** until Lead gate + VP-A re-verify.
+**VP-A APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET (hard-fail accepted). **VP-B APPROVED / CLOSED** — Lead **`APPROVE VP-B`**, 2026-09-17 ET ([handoffs/VP_B_SMOKE_CHARACTER.md](handoffs/VP_B_SMOKE_CHARACTER.md); PR #67 @ `e00c542`). **VP-C IN PROGRESS** (unlocked). **VP-D LOCKED**.
 
 ### Re-verify (HR3-D)
 
-After **VP-B** (or any blocker-fix phase), **VP-A verb greps must re-run** on DESKTOP before **VP-C** unlocks. Do not treat the original VP-A hard-fail record as permanent — append a **§ Re-verify** section to [handoffs/VP_A_PIE.md](handoffs/VP_A_PIE.md) with updated pass/fail table. Checklist: [handoffs/HR3_D_EVIDENCE_LANE.md](handoffs/HR3_D_EVIDENCE_LANE.md). Conductor refuses VP-C until re-verify is filed or Lead **WAIVED** per prefix.
+After **VP-B** (or any blocker-fix phase), **VP-A verb greps must re-run** on DESKTOP before **VP-C done criteria** are met. Do not treat the original VP-A hard-fail record as permanent — append a **§ Re-verify** section to [handoffs/VP_A_PIE.md](handoffs/VP_A_PIE.md) with updated pass/fail table. Checklist: [handoffs/HR3_D_EVIDENCE_LANE.md](handoffs/HR3_D_EVIDENCE_LANE.md). Conductor must file re-verify (or Lead **WAIVE** per prefix) before marking VP-C **COMPLETE** — VP-C planning/impl may proceed in parallel.
 
 ---
 
@@ -53,8 +53,8 @@ Product NP (NP-A…E) and Harness Refine 2 (HR2-A…C) are **CLOSED**. Senior po
 | **Harness HR2 (Docs/13)** | **CLOSED** |
 | **Docs/14 / VP strategy** | **APPROVED** — Lead **`APPROVE VP STRATEGY`**, 2026-09-17 ET |
 | **VP-A** | **APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET (verb PIE hard-fail accepted; PA-03 → VP-B) |
-| **VP-B** | **EVIDENCE COMPLETE — PENDING LEAD `APPROVE VP-B`** — DESKTOP preflight exit 0 + NightMix 4/4 @ `5d09cf8` |
-| **VP-C** | **LOCKED** |
+| **VP-B** | **APPROVED / CLOSED** — Lead **`APPROVE VP-B`**, 2026-09-17 ET; PA-03 deferred accept (mesh-only interim) |
+| **VP-C** | **IN PROGRESS** — planning/impl unlocked; done criteria require VP-A re-verify (HR3-D) |
 | **VP-D** | **LOCKED** |
 
 ---
@@ -108,7 +108,7 @@ Naming: **VP-A … VP-D** (Verify & Polish). Do **not** reuse NP-* or HR2-* phas
 
 - [x] `smoke_nightmix_phase.py` exits **0** on DESKTOP with four `OK phase=` lines — **4/4 @ DESKTOP-21CT3H0**
 - [x] ABP skeleton: **documented accept** (mesh-only interim; `EDITOR_ABP_SKELETON` warning only) — [handoffs/VP_B_SMOKE_CHARACTER.md](handoffs/VP_B_SMOKE_CHARACTER.md)
-- [ ] Safe-Build green if C++ touched
+- [x] Safe-Build green if C++ touched — PR #67 @ `e00c542`
 
 ---
 
@@ -205,9 +205,10 @@ Phases run **sequentially** (recommended: A → B → C → D) unless Lead direc
 
 ```
 Docs/14 / VP STRATEGY: APPROVED — Lead Luke Thompson, APPROVE VP STRATEGY, 2026-09-17 ET
-VP-A: APPROVED — Lead APPROVE VP-A, 2026-09-17 ET (hard-fail accepted; re-verify after VP-B)
-VP-B: EVIDENCE COMPLETE — PENDING LEAD APPROVE VP-B — VP-C: LOCKED — VP-D: LOCKED
-Product NP: CLOSED — HR2: CLOSED
+VP-A: APPROVED — re-verify IN PROGRESS (HR3-D) before VP-C COMPLETE
+VP-B: APPROVED / CLOSED — Lead APPROVE VP-B, 2026-09-17 ET
+VP-C: IN PROGRESS — VP-D: LOCKED
+Product NP: CLOSED — HR2: CLOSED — HR3: CLOSED / COMPLETE
 ```
 
 ---
@@ -228,4 +229,4 @@ Product NP: CLOSED — HR2: CLOSED
 
 ---
 
-*Conductor prepared this file; Lead **`APPROVE VP STRATEGY`** locked 2026-09-17 ET. VP-A **APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET ([handoffs/VP_A_PIE.md](handoffs/VP_A_PIE.md)) — hard-fail accepted; **VP-B EVIDENCE COMPLETE — PENDING LEAD `APPROVE VP-B`** ([handoffs/VP_B_SMOKE_CHARACTER.md](handoffs/VP_B_SMOKE_CHARACTER.md)); re-verify verb PIE after gate before VP-C.*
+*Conductor prepared this file; Lead **`APPROVE VP STRATEGY`** locked 2026-09-17 ET. VP-A **APPROVED** — Lead **`APPROVE VP-A`**, 2026-09-17 ET ([handoffs/VP_A_PIE.md](handoffs/VP_A_PIE.md)) — hard-fail accepted. **VP-B APPROVED / CLOSED** — Lead **`APPROVE VP-B`**, 2026-09-17 ET ([handoffs/VP_B_SMOKE_CHARACTER.md](handoffs/VP_B_SMOKE_CHARACTER.md)). **VP-C IN PROGRESS** — Conductor must file VP-A re-verify (or Lead **WAIVE**) per HR3-D before VP-C **COMPLETE**.*
