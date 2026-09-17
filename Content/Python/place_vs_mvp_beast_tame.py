@@ -64,26 +64,26 @@ def _load_level() -> bool:
     return False
 
 
-def _find_beast_pad_actor():
-    gp = find_actor_by_label(GP_BEAST_PAD_LABEL)
-    if gp:
-        return gp
-    beast_class = unreal.load_class(None, BEAST_PAD_CLASS)
-    if beast_class:
-        for actor in unreal.EditorLevelLibrary.get_all_level_actors():
-            try:
-                if actor.get_class() == beast_class:
-                    return actor
-            except Exception:
-                continue
-    for actor in unreal.EditorLevelLibrary.get_all_level_actors():
-        try:
-            label = actor.get_actor_label()
-        except Exception:
-            label = ""
-        if "BeastPad" in label or "Beast_Pad" in label or "SM_BeastPad" in label:
-            return actor
-    return None
+def _load_beast_pad_class():
+    return unreal.load_class(None, BEAST_PAD_CLASS)
+
+
+def _is_beast_pad_actor(actor, beast_class) -> bool:
+    if not actor or not beast_class:
+        return False
+    try:
+        return actor.get_class() == beast_class
+    except Exception:
+        return False
+
+
+def _destroy_actor(actor) -> None:
+    try:
+        name = actor.get_name()
+        unreal.EditorLevelLibrary.destroy_actor(actor)
+        _log("Destroyed legacy actor '%s'" % name)
+    except Exception as exc:
+        _log("Destroy warning: " + str(exc))
 
 
 def _anchor_from_json(key: str):
@@ -115,8 +115,9 @@ def _resolve_landing_location():
     return None
 
 
-def _spawn_beast_pad(location: unreal.Vector):
-    beast_class = unreal.load_class(None, BEAST_PAD_CLASS)
+def _spawn_beast_pad(location: unreal.Vector, beast_class=None):
+    if beast_class is None:
+        beast_class = _load_beast_pad_class()
     if not beast_class:
         _log("HomeWorldBeastPad not found — run Safe-Build first")
         return None
@@ -132,20 +133,44 @@ def _spawn_beast_pad(location: unreal.Vector):
 
 
 def _ensure_beast_pad_actor():
-    existing = _find_beast_pad_actor()
-    if existing:
-        _log("Reused beast pad '" + existing.get_name() + "'")
-        if existing.get_actor_label() != GP_BEAST_PAD_LABEL:
-            existing.set_actor_label(GP_BEAST_PAD_LABEL)
-        return existing
-
-    landing_loc = _resolve_landing_location()
-    if not landing_loc:
-        _log("No landing anchor — run place_vs_mvp_markers.py first")
+    beast_class = _load_beast_pad_class()
+    if not beast_class:
+        _log("HomeWorldBeastPad not found — run Safe-Build first")
         return None
 
-    spawn_loc = landing_loc + SPAWN_OFFSET
-    return _spawn_beast_pad(spawn_loc)
+    labeled = find_actor_by_label(GP_BEAST_PAD_LABEL)
+    if labeled and _is_beast_pad_actor(labeled, beast_class):
+        _log("Reused HomeWorldBeastPad '%s'" % labeled.get_name())
+        return labeled
+
+    spawn_loc = None
+    if labeled and not _is_beast_pad_actor(labeled, beast_class):
+        spawn_loc = labeled.get_actor_location()
+        try:
+            legacy_class = labeled.get_class().get_name()
+        except Exception:
+            legacy_class = "unknown"
+        _log(
+            "Replacing legacy %s (%s) with HomeWorldBeastPad"
+            % (GP_BEAST_PAD_LABEL, legacy_class)
+        )
+        _destroy_actor(labeled)
+
+    if spawn_loc is None:
+        for actor in unreal.EditorLevelLibrary.get_all_level_actors():
+            if _is_beast_pad_actor(actor, beast_class):
+                _log("Reused HomeWorldBeastPad '%s'" % actor.get_name())
+                if actor.get_actor_label() != GP_BEAST_PAD_LABEL:
+                    actor.set_actor_label(GP_BEAST_PAD_LABEL)
+                return actor
+
+        landing_loc = _resolve_landing_location()
+        if not landing_loc:
+            _log("No landing anchor — run place_vs_mvp_markers.py first")
+            return None
+        spawn_loc = landing_loc + SPAWN_OFFSET
+
+    return _spawn_beast_pad(spawn_loc, beast_class)
 
 
 def main() -> int:

@@ -23,8 +23,8 @@ FOLDER = "VS_MVP/Markers"
 
 # Offsets from SM_Cabin anchor (Blender m -> UE cm applied in blender_to_ue)
 NURTURE_SPECS = (
-    ("GP_N1_Crop", 0, "RES_SEED", unreal.Vector(200.0, -200.0, 0.0)),
-    ("GP_N2_Stored", 1, "RES_WOOD", unreal.Vector(-250.0, 300.0, 0.0)),
+    ("GP_N1_Crop", "N1_Crop", "RES_SEED", unreal.Vector(200.0, -200.0, 0.0)),
+    ("GP_N2_Stored", "N2_Stored", "RES_WOOD", unreal.Vector(-250.0, 300.0, 0.0)),
 )
 
 
@@ -84,20 +84,42 @@ def _homestead_cabin_base():
     return blender_to_ue_cm((-6.0, 1.0, 0.0))
 
 
-def _configure_target(actor, target_enum: int, res_id: str) -> None:
+def _resolve_nurture_target_id(enum_name: str):
+    enum_type = getattr(unreal, "HomeWorldNurtureTargetId", None)
+    if enum_type is None:
+        _log("HomeWorldNurtureTargetId enum missing — run Safe-Build first")
+        return None
+    # UE Python exposes EHomeWorldNurtureTargetId members as N1_Crop / N2_Stored (not raw int).
+    aliases = {
+        "N1_CROP": "N1_Crop",
+        "N2_STORED": "N2_Stored",
+    }
+    target_id = getattr(enum_type, enum_name, None)
+    if target_id is None and enum_name in aliases:
+        target_id = getattr(enum_type, aliases[enum_name], None)
+    if target_id is None:
+        _log("HomeWorldNurtureTargetId.%s not found" % enum_name)
+    return target_id
+
+
+def _configure_target(actor, target_id, res_id: str) -> None:
     comp_class = unreal.load_class(None, NURTURE_COMPONENT_CLASS)
     if not comp_class or not hasattr(actor, "get_component_by_class"):
         return
     comp = actor.get_component_by_class(comp_class)
-    if comp and hasattr(comp, "configure_target"):
-        comp.configure_target(target_enum, unreal.Name(res_id))
+    if comp and hasattr(comp, "configure_target") and target_id is not None:
+        comp.configure_target(target_id, unreal.Name(res_id))
 
 
-def _ensure_target(label: str, target_enum: int, res_id: str, offset: unreal.Vector):
+def _ensure_target(label: str, enum_name: str, res_id: str, offset: unreal.Vector):
+    target_id = _resolve_nurture_target_id(enum_name)
+    if target_id is None:
+        return None
+
     existing = find_actor_by_label(label)
     if existing:
         _log("Reused %s" % label)
-        _configure_target(existing, target_enum, res_id)
+        _configure_target(existing, target_id, res_id)
         return existing
 
     target_class = unreal.load_class(None, TARGET_CLASS)
@@ -113,8 +135,8 @@ def _ensure_target(label: str, target_enum: int, res_id: str, offset: unreal.Vec
         return None
     actor.set_actor_label(label)
     actor.set_folder_path(FOLDER)
-    _configure_target(actor, target_enum, res_id)
-    _log("Spawned %s @ %s (target=%d res=%s)" % (label, loc, target_enum, res_id))
+    _configure_target(actor, target_id, res_id)
+    _log("Spawned %s @ %s (target=%s res=%s)" % (label, loc, enum_name, res_id))
     return actor
 
 
@@ -123,8 +145,8 @@ def main() -> int:
         return 1
 
     ok = 0
-    for label, target_enum, res_id, offset in NURTURE_SPECS:
-        if _ensure_target(label, target_enum, res_id, offset):
+    for label, enum_name, res_id, offset in NURTURE_SPECS:
+        if _ensure_target(label, enum_name, res_id, offset):
             ok += 1
 
     if ok < len(NURTURE_SPECS):
