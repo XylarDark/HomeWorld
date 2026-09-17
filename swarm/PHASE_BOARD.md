@@ -1,10 +1,10 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **VP2 CLOSED** — Lead **`APPROVE VP2-C STOP`** / Conductor **`CLOSE VP2`**, 2026-09-17 ET (main `2ef961f`)
+**Current phase:** **Docs/19 IN PROGRESS** — Lead **`APPROVE D19 STRATEGY`**, 2026-09-17 ET (main `aa6472e`; VP2 **CLOSED**)
 
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **Conductor** (parent DESKTOP) / **DESKTOP-21CT3H0**
-**Blocked by:** none. **No active product phase** — do not invent NP/product tracks without Lead gate. Branch protection **DEFERRED**.
+**Blocked by:** none. **Active product phase:** Docs/19 thin playability (D19-A/B/C). Do not reopen VP2. Branch protection **DEFERRED**.
 **Sign-off doc:** [Docs/17_HS_AUDIT_SIGN_OFF.md](../Docs/17_HS_AUDIT_SIGN_OFF.md) — **SIGNED OFF** Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET.
 
 
@@ -90,8 +90,12 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **VP2-A** | DESKTOP prove | DESKTOP | **APPROVED / CLOSED** | [VP2_A_EVIDENCE.md](../Docs/handoffs/VP2_A_EVIDENCE.md) — **9/9 PASS** |
 | **VP2-B** | Success-path fixes | CLOUD+DESKTOP | **APPROVED / CLOSED** | [VP2_B_FIX.md](../Docs/handoffs/VP2_B_FIX.md) — DESKTOP **9/9 PASS** |
 | **VP2-C** | Optional follow-on | — | **STOP / CLOSED** | **C0 Stop** — no C1/C2 |
+| **Docs/19** | Thin playability (D19) | CLOUD+DESKTOP+Lead | **APPROVED / IN PROGRESS** | [19_THIN_PLAYABILITY.md](../Docs/19_THIN_PLAYABILITY.md) — Lead **`APPROVE D19 STRATEGY`**, 2026-09-17 ET |
+| **D19-A** | Gather piles that stick | CLOUD+DESKTOP | **IN PROGRESS** | `place_vs_mvp_resource_piles.py` — gate **`APPROVE D19-A`** |
+| **D19-B** | Seed cheat | CLOUD | **IN PROGRESS** | `hw.Gather.Seed` — gate **`APPROVE D19-B`** |
+| **D19-C** | Success-path evidence filter | CLOUD | **IN PROGRESS** | `evidence-grep.js --success-path` — gate **`APPROVE D19-C`** |
 
-**Current track:** **Docs/18 VP2 CLOSED / COMPLETE** — Lead **`APPROVE VP2-C STOP`** / Conductor **`CLOSE VP2`**, 2026-09-17 ET (main `2ef961f`). **No active product phase.** **HS-G APPROVED / COMPLETE**.
+**Current track:** **Docs/19 IN PROGRESS** — Lead **`APPROVE D19 STRATEGY`**, 2026-09-17 ET (main `aa6472e`). **VP2 CLOSED** — do not reopen. **HS-G APPROVED / COMPLETE**.
 
 ---
 
