@@ -63,4 +63,5 @@ protected:
 private:
 	bool IsNightSpiritHomesteadAllowed(AHomeWorldCharacter* Character) const;
 	FName TargetLabel() const;
+	void ApplyNurturedVisual();
 };

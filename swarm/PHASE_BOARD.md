@@ -1,9 +1,9 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **VP-C** (playability polish) — **IN PROGRESS** (planning/impl unlocked; **VP-A re-verify pending** on DESKTOP before VP-C done criteria)  
+**Current phase:** **VP-C** (playability polish) — **IN PROGRESS / PENDING APPROVE VP-C** (impl landed; **VP-A re-verify STILL FAIL** gates COMPLETE)  
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **CND** (Conductor parent on **DESKTOP** for re-verify) + **CLOUD** (VP-C impl) + **Lead** (gates)  
-**Blocked by:** **VP-A re-verify** on DESKTOP (CND parent) — required before VP-C **COMPLETE** / polish evidence sign-off per [HR3_D_EVIDENCE_LANE.md](../Docs/handoffs/HR3_D_EVIDENCE_LANE.md). VP-B **APPROVED / CLOSED**. **VP-D LOCKED**.
+**Blocked by:** **VP-A re-verify STILL FAIL** on DESKTOP (CND parent) — MCP/automation PIE world / PlayerController; human Alt+P PIE or Lead **WAIVE** required before VP-C **COMPLETE** per [HR3_D_EVIDENCE_LANE.md](../Docs/handoffs/HR3_D_EVIDENCE_LANE.md). VP-B **APPROVED / CLOSED**. **VP-D LOCKED**.
 
 | Phase | Name | Owners | Status | Gate file | Handoffs |
 |---|---|---|---|---|---|
@@ -54,7 +54,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **HR2-C** | C++ CI gate (build-win64) | CLOUD | **APPROVED** | [13c_HR2_C_CI_GATE.md](../Docs/13c_HR2_C_CI_GATE.md), [handoffs/HR2_C_CI_GATE.md](../Docs/handoffs/HR2_C_CI_GATE.md) |
 | **HR2 track** | Harness Refine 2 | — | **CLOSED / COMPLETE** | [13_HR2_HARNESS_REFINE.md](../Docs/13_HR2_HARNESS_REFINE.md) |
 | **Docs/14** | Verify & Polish strategy | CLOUD | **APPROVED** | [14_VP_VERIFY_POLISH.md](../Docs/14_VP_VERIFY_POLISH.md) |
-| **VP-A** | PIE evidence | DESKTOP | **APPROVED** — **re-verify IN PROGRESS** | [handoffs/VP_A_PIE.md](../Docs/handoffs/VP_A_PIE.md) — Conductor must file § Re-verify (or Lead **WAIVE**) per HR3-D |
+| **VP-A** | PIE evidence | DESKTOP | **APPROVED** — **re-verify STILL FAIL** | [handoffs/VP_A_PIE.md](../Docs/handoffs/VP_A_PIE.md) § Re-verify (2026-09-17 post–VP-B); human PIE or Lead **WAIVE** |
 | **VP-B** | Smoke & character risk | DESKTOP | **APPROVED / CLOSED** | [handoffs/VP_B_SMOKE_CHARACTER.md](../Docs/handoffs/VP_B_SMOKE_CHARACTER.md) — Lead **`APPROVE VP-B`**, 2026-09-17 ET; PA-03 **deferred accept** (mesh-only interim) |
 | **Docs/15** | Harness Refine 3 (A+) | CLOUD | **APPROVED** | [15_HR3_A_PLUS.md](../Docs/15_HR3_A_PLUS.md) |
 | **HR3-A** | Windows exec reliability | DESKTOP | **APPROVED** | [handoffs/HR3_A_WINDOWS_EXEC.md](../Docs/handoffs/HR3_A_WINDOWS_EXEC.md) |
@@ -62,10 +62,10 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **HR3-C** | Branch protection | Lead | **DEFERRED / COMPLETE for track** | Lead skip 2026-09-17 ET — [handoffs/HR3_C_BRANCH_PROTECTION.md](../Docs/handoffs/HR3_C_BRANCH_PROTECTION.md) checklist PR #62; GitHub apply deferred |
 | **HR3-D** | DESKTOP evidence + re-verify | CLOUD | **APPROVED** | [handoffs/HR3_D_EVIDENCE_LANE.md](../Docs/handoffs/HR3_D_EVIDENCE_LANE.md) — Lead **`APPROVE HR3-D`**, 2026-09-17 ET; PR #65 |
 | **HR3 track** | Harness Refine 3 (A+) | — | **CLOSED / COMPLETE** | [15_HR3_A_PLUS.md](../Docs/15_HR3_A_PLUS.md) — HR3-C **DEFERRED**; harness **~A**, swarm **~A+** |
-| **VP-C** | Playability polish | CLOUD+DESKTOP | **IN PROGRESS** | [handoffs/VP_C_POLISH.md](../Docs/handoffs/VP_C_POLISH.md) — impl unlocked; done criteria need VP-A re-verify |
+| **VP-C** | Playability polish | CLOUD+DESKTOP | **IN PROGRESS / PENDING APPROVE VP-C** | [handoffs/VP_C_POLISH.md](../Docs/handoffs/VP_C_POLISH.md) — PA-04/06 shipped; PA-07 deferred; COMPLETE gated by VP-A re-verify |
 | **VP-D** | Bootstrap dry-run | CLOUD+DESKTOP | **LOCKED** | handoffs/VP_D_BOOTSTRAP_CI.md (pending) |
 
-**Current track:** **VP-B APPROVED / CLOSED**. **VP-C IN PROGRESS** (planning/impl unlocked). **VP-A re-verify** on DESKTOP (CND parent) — **IN PROGRESS** / required before VP-C **COMPLETE**. **VP-D LOCKED**. Do **not** mark VP-C **COMPLETE** until re-verify filed or Lead **WAIVED**.
+**Current track:** **VP-B APPROVED / CLOSED**. **VP-C IN PROGRESS / PENDING APPROVE VP-C** (impl landed). **VP-A re-verify STILL FAIL** on DESKTOP — human Alt+P PIE or Lead **WAIVE** before VP-C **COMPLETE**. **VP-D LOCKED**.
 
 ---
 
@@ -73,8 +73,8 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 
 | ID | Phase | Host | Owner | Write path | Due artifact |
 |---|---|---|---|---|---|
-| VP-A-reverify | VP-A | DESKTOP | CND parent | Docs/handoffs/ | **IN PROGRESS** — re-run verb greps after VP-B; append § Re-verify to [VP_A_PIE.md](../Docs/handoffs/VP_A_PIE.md); checklist in [HR3_D_EVIDENCE_LANE.md](../Docs/handoffs/HR3_D_EVIDENCE_LANE.md) |
-| VP-C-impl | VP-C | CLOUD+DESKTOP | CND / GP | Docs/handoffs/ | [VP_C_POLISH.md](../Docs/handoffs/VP_C_POLISH.md) — DRAFT IN PROGRESS; Lead **`APPROVE VP-C`** before implementation PR merge |
+| VP-A-reverify | VP-A | DESKTOP | CND parent | Docs/handoffs/ | **STILL FAIL / pending human PIE or Lead WAIVE** — § Re-verify filed in [VP_A_PIE.md](../Docs/handoffs/VP_A_PIE.md); MCP PIE world blocker |
+| VP-C-impl | VP-C | CLOUD+DESKTOP | CND / GP | Docs/handoffs/ | [VP_C_POLISH.md](../Docs/handoffs/VP_C_POLISH.md) — **IN PROGRESS / PENDING APPROVE VP-C**; PA-04/06 shipped; PA-07 deferred |
 
 ## Deferred accept (VP-B — not open defects)
 

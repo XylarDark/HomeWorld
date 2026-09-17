@@ -283,4 +283,19 @@ protected:
 	float MovementRightAxis = 0.f;
 
 	EHomeWorldTimeOfDayPhase LastAppliedFormPhase = EHomeWorldTimeOfDayPhase::Day;
+
+	/** VP-C PA-06: on-screen interact feedback (debug overlay). */
+	void ShowInteractFeedback(const FString& Message, FColor Color = FColor::Green) const;
+	bool TraceInteractHit(FHitResult& OutHit) const;
+	AActor* GetInteractTargetActor(const FHitResult& Hit) const;
+	FString BuildInteractRangeHint(AActor* Target) const;
+	void UpdateInteractRangeHint(float DeltaTime);
+
+	UPROPERTY(EditDefaultsOnly, Category = "Interaction|Feedback", meta = (ClampMin = "50.0", ClampMax = "1000.0"))
+	float InteractTraceLengthCm = 280.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Interaction|Feedback", meta = (ClampMin = "0.1", ClampMax = "2.0"))
+	float InteractHintRefreshSeconds = 0.35f;
+
+	float InteractHintAccumulator = 0.f;
 };

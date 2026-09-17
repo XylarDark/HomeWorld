@@ -35,6 +35,7 @@
 #include "CollisionQueryParams.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/GameInstance.h"
+#include "Engine/Engine.h"
 #include "Kismet/GameplayStatics.h"
 #include "EngineUtils.h"
 
@@ -133,6 +134,9 @@ void AHomeWorldCharacter::Tick(float DeltaTime)
 	{
 		return;
 	}
+
+	UpdateInteractRangeHint(DeltaTime);
+
 	// Apply accumulated movement from the four directional keys (W/S/A/D).
 	float Forward = FMath::Clamp(MovementForwardAxis, -1.0f, 1.0f);
 	float Right = FMath::Clamp(MovementRightAxis, -1.0f, 1.0f);
@@ -688,22 +692,18 @@ bool AHomeWorldCharacter::TryShrinePortalInteract()
 
 bool AHomeWorldCharacter::TryTameBeastInFront()
 {
-	UWorld* World = GetWorld();
-	if (!World || GetIsSpiritForm())
+	if (GetIsSpiritForm())
 	{
+		ShowInteractFeedback(TEXT("TAME: day/body form only"), FColor::Yellow);
 		return false;
 	}
-	const FVector Start = GetActorLocation() + FVector(0.0f, 0.0f, GetCapsuleComponent() ? GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight() * 0.5f : 50.0f);
-	const FVector Forward = GetControlRotation().Vector();
-	const float TraceLength = 280.0f;
-	const FVector End = Start + Forward * TraceLength;
+
 	FHitResult Hit;
-	FCollisionQueryParams Params(NAME_None, false, this);
-	if (!World->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params))
+	if (!TraceInteractHit(Hit))
 	{
 		return false;
 	}
-	AActor* HitActor = Hit.GetActor();
+	AActor* HitActor = GetInteractTargetActor(Hit);
 	if (!HitActor)
 	{
 		return false;
@@ -712,67 +712,75 @@ bool AHomeWorldCharacter::TryTameBeastInFront()
 	{
 		if (Tame->GetTameState() == EHomeWorldBeastTameState::Tamed)
 		{
-			return Tame->TryPromoteToHelper(this);
+			const bool bPromoted = Tame->TryPromoteToHelper(this);
+			ShowInteractFeedback(
+				bPromoted ? TEXT("TAME: promoted to helper") : TEXT("TAME: helper promote failed"),
+				bPromoted ? FColor::Green : FColor::Yellow);
+			return bPromoted;
 		}
-		return Tame->TryOfferFood(this);
+		const bool bOffered = Tame->TryOfferFood(this);
+		ShowInteractFeedback(
+			bOffered ? TEXT("TAME: food offered — stay calm") : TEXT("TAME: need RES_BERRY or RES_HERB"),
+			bOffered ? FColor::Green : FColor::Yellow);
+		return bOffered;
 	}
 	return false;
 }
 
 bool AHomeWorldCharacter::TryHealSpiritInFront()
 {
-	UWorld* World = GetWorld();
-	if (!World || !GetIsSpiritForm())
+	if (!GetIsSpiritForm())
 	{
+		ShowInteractFeedback(TEXT("HEAL: night/spirit form only"), FColor::Yellow);
 		return false;
 	}
-	const FVector Start = GetActorLocation() + FVector(0.0f, 0.0f, GetCapsuleComponent() ? GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight() * 0.5f : 50.0f);
-	const FVector Forward = GetControlRotation().Vector();
-	const float TraceLength = 280.0f;
-	const FVector End = Start + Forward * TraceLength;
+
 	FHitResult Hit;
-	FCollisionQueryParams Params(NAME_None, false, this);
-	if (!World->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params))
+	if (!TraceInteractHit(Hit))
 	{
 		return false;
 	}
-	AActor* HitActor = Hit.GetActor();
+	AActor* HitActor = GetInteractTargetActor(Hit);
 	if (!HitActor)
 	{
 		return false;
 	}
 	if (UHomeWorldSpiritHealComponent* Heal = HitActor->FindComponentByClass<UHomeWorldSpiritHealComponent>())
 	{
-		return Heal->TryHeal(this);
+		const bool bHealed = Heal->TryHeal(this);
+		ShowInteractFeedback(
+			bHealed ? TEXT("HEAL: spirit healed") : TEXT("HEAL: need RES_HERB/RES_SEED or already healed"),
+			bHealed ? FColor::Green : FColor::Yellow);
+		return bHealed;
 	}
 	return false;
 }
 
 bool AHomeWorldCharacter::TryNurtureInFront()
 {
-	UWorld* World = GetWorld();
-	if (!World || !GetIsSpiritForm())
+	if (!GetIsSpiritForm())
 	{
+		ShowInteractFeedback(TEXT("NURTURE: night/spirit form only"), FColor::Yellow);
 		return false;
 	}
-	const FVector Start = GetActorLocation() + FVector(0.0f, 0.0f, GetCapsuleComponent() ? GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight() * 0.5f : 50.0f);
-	const FVector Forward = GetControlRotation().Vector();
-	const float TraceLength = 280.0f;
-	const FVector End = Start + Forward * TraceLength;
+
 	FHitResult Hit;
-	FCollisionQueryParams Params(NAME_None, false, this);
-	if (!World->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params))
+	if (!TraceInteractHit(Hit))
 	{
 		return false;
 	}
-	AActor* HitActor = Hit.GetActor();
+	AActor* HitActor = GetInteractTargetActor(Hit);
 	if (!HitActor)
 	{
 		return false;
 	}
 	if (UHomeWorldNurtureComponent* Nurture = HitActor->FindComponentByClass<UHomeWorldNurtureComponent>())
 	{
-		return Nurture->TryNurture(this);
+		const bool bResult = Nurture->TryNurture(this);
+		ShowInteractFeedback(
+			bResult ? TEXT("NURTURE: success — M_Nurtured on") : TEXT("NURTURE: need required RES in inventory"),
+			bResult ? FColor::Green : FColor::Yellow);
+		return bResult;
 	}
 	return false;
 }
@@ -789,15 +797,12 @@ bool AHomeWorldCharacter::TryHarvestInFront()
 	if (GetIsSpiritForm() || (TimeOfDay && TimeOfDay->GetIsNight()))
 	{
 		UE_LOG(LogTemp, Log, TEXT("GATHER: blocked — night or spirit form"));
+		ShowInteractFeedback(TEXT("GATHER: day/body form only"), FColor::Yellow);
 		return false;
 	}
-	const FVector Start = GetActorLocation() + FVector(0.0f, 0.0f, GetCapsuleComponent() ? GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight() * 0.5f : 50.0f);
-	const FVector Forward = GetControlRotation().Vector();
-	const float TraceLength = 280.0f;
-	const FVector End = Start + Forward * TraceLength;
+
 	FHitResult Hit;
-	FCollisionQueryParams Params(NAME_None, false, this);
-	if (!World->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params))
+	if (!TraceInteractHit(Hit))
 	{
 		return false;
 	}
@@ -817,8 +822,12 @@ bool AHomeWorldCharacter::TryHarvestInFront()
 		if (Pile->TryHarvest(Inv))
 		{
 			UE_LOG(LogTemp, Log, TEXT("GATHER: harvest ok (total Physical: %d)"), Inv->GetTotalPhysicalGoods());
+			ShowInteractFeedback(
+				FString::Printf(TEXT("GATHER: +1 resource (total %d)"), Inv->GetTotalPhysicalGoods()),
+				FColor::Green);
 			return true;
 		}
+		ShowInteractFeedback(TEXT("GATHER: pile empty or blocked"), FColor::Yellow);
 		return false;
 	}
 
@@ -987,4 +996,84 @@ void AHomeWorldCharacter::Look(const FInputActionValue& Value)
 	R.Pitch = FMath::Clamp(R.Pitch + Axis.Y * LookSensitivity, MinPitch, MaxPitch);
 	R.Roll = 0.0f;
 	PC->SetControlRotation(R);
+}
+
+void AHomeWorldCharacter::ShowInteractFeedback(const FString& Message, FColor Color) const
+{
+	UE_LOG(LogTemp, Log, TEXT("INTERACT: %s"), *Message);
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 2.5f, Color, Message);
+	}
+}
+
+bool AHomeWorldCharacter::TraceInteractHit(FHitResult& OutHit) const
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+	const float HalfHeight = GetCapsuleComponent() ? GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight() * 0.5f : 50.0f;
+	const FVector Start = GetActorLocation() + FVector(0.0f, 0.0f, HalfHeight);
+	const FVector End = Start + GetControlRotation().Vector() * InteractTraceLengthCm;
+	FCollisionQueryParams Params(NAME_None, false, this);
+	return World->LineTraceSingleByChannel(OutHit, Start, End, ECC_Visibility, Params);
+}
+
+AActor* AHomeWorldCharacter::GetInteractTargetActor(const FHitResult& Hit) const
+{
+	return Hit.GetActor();
+}
+
+FString AHomeWorldCharacter::BuildInteractRangeHint(AActor* Target) const
+{
+	if (!Target)
+	{
+		return FString();
+	}
+	if (Target->FindComponentByClass<UHomeWorldBeastTameComponent>())
+	{
+		return TEXT("[E] Tame beast");
+	}
+	if (Target->FindComponentByClass<UHomeWorldSpiritHealComponent>())
+	{
+		return TEXT("[E] Heal spirit");
+	}
+	if (Target->FindComponentByClass<UHomeWorldNurtureComponent>())
+	{
+		return TEXT("[E] Nurture crop/store");
+	}
+	if (Cast<AHomeWorldResourcePile>(Target))
+	{
+		return TEXT("[E] Gather resource");
+	}
+	return FString();
+}
+
+void AHomeWorldCharacter::UpdateInteractRangeHint(float DeltaTime)
+{
+	if (!IsPlayerControlled())
+	{
+		return;
+	}
+
+	InteractHintAccumulator += DeltaTime;
+	if (InteractHintAccumulator < InteractHintRefreshSeconds)
+	{
+		return;
+	}
+	InteractHintAccumulator = 0.f;
+
+	FHitResult Hit;
+	if (!TraceInteractHit(Hit))
+	{
+		return;
+	}
+
+	const FString Hint = BuildInteractRangeHint(GetInteractTargetActor(Hit));
+	if (!Hint.IsEmpty())
+	{
+		ShowInteractFeedback(Hint, FColor::Cyan);
+	}
 }

@@ -4,8 +4,21 @@
 #include "HomeWorldCharacter.h"
 #include "HomeWorldInventorySubsystem.h"
 #include "HomeWorldTimeOfDaySubsystem.h"
+#include "Components/MeshComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "Engine/World.h"
 #include "GameFramework/Actor.h"
+#include "Materials/MaterialInstanceDynamic.h"
+#include "Materials/MaterialInterface.h"
+
+namespace HomeWorldNurtureVisual
+{
+	static const TCHAR* MasterMaterialPath = TEXT("/Game/HomeWorld/Materials/Masters/M_Nurtured.M_Nurtured");
+	static const FName NurturedScalarParam(TEXT("Nurtured"));
+	static const FName EmissiveVectorParam(TEXT("Emissive"));
+	static const FLinearColor EmissiveOn(0.15f, 0.35f, 0.18f, 1.f);
+	static const FLinearColor EmissiveOff(0.f, 0.f, 0.f, 1.f);
+}
 
 namespace
 {
@@ -46,6 +59,11 @@ void UHomeWorldNurtureComponent::BeginPlay()
 
 	UE_LOG(LogTemp, Log, TEXT("NURTURE: component ready target=%s nurtured=%d requires=%s"),
 		*TargetLabel().ToString(), bNurtured ? 1 : 0, *RequiredResourceId.ToString());
+
+	if (bNurtured)
+	{
+		ApplyNurturedVisual();
+	}
 }
 
 FName UHomeWorldNurtureComponent::TargetLabel() const
@@ -78,6 +96,7 @@ void UHomeWorldNurtureComponent::ApplyPersistedNurtured(bool bInNurtured)
 	}
 	bNurtured = bInNurtured;
 	UE_LOG(LogTemp, Log, TEXT("NURTURE: %s M_Nurtured=%d (restored)"), *TargetLabel().ToString(), bNurtured ? 1 : 0);
+	ApplyNurturedVisual();
 }
 
 bool UHomeWorldNurtureComponent::IsNightSpiritHomesteadAllowed(AHomeWorldCharacter* Character) const
@@ -138,5 +157,61 @@ bool UHomeWorldNurtureComponent::TryNurture(AHomeWorldCharacter* Character)
 	bNurtured = true;
 	UE_LOG(LogTemp, Log, TEXT("NURTURE: success %s M_Nurtured=1 consumed 1x %s"),
 		*TargetLabel().ToString(), *RequiredResourceId.ToString());
+	ApplyNurturedVisual();
 	return true;
+}
+
+void UHomeWorldNurtureComponent::ApplyNurturedVisual()
+{
+	AActor* Owner = GetOwner();
+	if (!Owner)
+	{
+		return;
+	}
+
+	UMaterialInterface* MasterMaterial = LoadObject<UMaterialInterface>(nullptr, HomeWorldNurtureVisual::MasterMaterialPath);
+	if (!MasterMaterial)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NURTURE: %s visual skipped — M_Nurtured master not loaded"),
+			*TargetLabel().ToString());
+		return;
+	}
+
+	const FLinearColor EmissiveValue = bNurtured ? HomeWorldNurtureVisual::EmissiveOn : HomeWorldNurtureVisual::EmissiveOff;
+	const float NurturedScalar = bNurtured ? 1.f : 0.f;
+	int32 SlotsUpdated = 0;
+
+	TArray<UMeshComponent*> MeshComponents;
+	Owner->GetComponents<UMeshComponent>(MeshComponents);
+	for (UMeshComponent* MeshComp : MeshComponents)
+	{
+		if (!MeshComp)
+		{
+			continue;
+		}
+		const int32 MaterialCount = MeshComp->GetNumMaterials();
+		for (int32 SlotIndex = 0; SlotIndex < MaterialCount; ++SlotIndex)
+		{
+			UMaterialInstanceDynamic* DynamicMaterial = MeshComp->CreateAndSetMaterialInstanceDynamic(SlotIndex);
+			if (!DynamicMaterial)
+			{
+				DynamicMaterial = UMaterialInstanceDynamic::Create(MasterMaterial, Owner);
+				if (DynamicMaterial)
+				{
+					MeshComp->SetMaterial(SlotIndex, DynamicMaterial);
+				}
+			}
+			if (!DynamicMaterial)
+			{
+				continue;
+			}
+			DynamicMaterial->SetVectorParameterValue(HomeWorldNurtureVisual::EmissiveVectorParam, EmissiveValue);
+			DynamicMaterial->SetScalarParameterValue(HomeWorldNurtureVisual::NurturedScalarParam, NurturedScalar);
+			++SlotsUpdated;
+		}
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("NURTURE: %s visual M_Nurtured=%d slots=%d emissive=(%.2f,%.2f,%.2f)"),
+		*TargetLabel().ToString(), bNurtured ? 1 : 0, SlotsUpdated,
+		EmissiveValue.R, EmissiveValue.G, EmissiveValue.B);
 }
