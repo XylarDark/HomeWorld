@@ -81,6 +81,45 @@ Conductor **refuses** the next task if any of these are missing:
 
 QA may not edit kits. QA only files defects against canon + shot list + verb list.
 
+### 4a. Host owner lane (HR3-D)
+
+[PHASE_BOARD.md](PHASE_BOARD.md) names **Host** per active HR/VP row: **CLOUD** | **DESKTOP** | **Lead**.
+
+| Tag | Runs evidence |
+|-----|----------------|
+| **CLOUD** | Cursor cloud agent — docs, C++ source, `validate` / `python-lint` CI |
+| **DESKTOP** | **DESKTOP-21CT3H0** — Conductor **parent** only ([HR3_A_WINDOWS_EXEC.md](../Docs/handoffs/HR3_A_WINDOWS_EXEC.md)); not Task executors |
+| **Lead** | GitHub Settings, **`APPROVE *`** stamps |
+
+Cloud agents **return after merge**; they do not claim DESKTOP Shell, MCP, or PIE. See [CLOUD_AGENT_PACKET.md](CLOUD_AGENT_PACKET.md).
+
+### 4b. DESKTOP / cross-host handoff PR contract
+
+Handoff markdown **and** PR body for DESKTOP or cross-host phases must include:
+
+| Field | Required content |
+|-------|------------------|
+| **Host** | `DESKTOP-21CT3H0` or `CLOUD` (Linux VM) |
+| **Grep prefixes** | Log tokens to grep (e.g. VP-A: `FORM:`, `FALLBACK:`, `HEAL:`, `NURTURE:`, `DAWN:`, `TAME:`, `GATHER:`) |
+| **Evidence path** | Repo-relative handoff path + log file (e.g. `Saved/Logs/HomeWorld.log`) |
+| **Pass/fail table** | One row per prefix/check — **PASS**, **FAIL**, or **WAIVED** (Lead only) with excerpt or line count |
+| **Preflight** | `npm run preflight:ue` exit code when DESKTOP PIE applies ([UE_PREFLIGHT.md](../docs/Setup/UE_PREFLIGHT.md)) |
+| **PR URL + merge SHA** | After squash-merge to `main` |
+
+Example VP-A table: [VP_A_PIE.md](../Docs/handoffs/VP_A_PIE.md). Full lane spec: [HR3_D_EVIDENCE_LANE.md](../Docs/handoffs/HR3_D_EVIDENCE_LANE.md).
+
+### 4c. Re-verify rule (blocker-fix → re-prove)
+
+When phase **B** fixes a blocker that caused hard-fail in phase **A**:
+
+1. File **B** evidence; Lead **`APPROVE`** when satisfied.
+2. **Re-run A's grep checklist** on current `main` (DESKTOP owner); append **§ Re-verify** to A's handoff — do not erase the original fail record.
+3. **Unlock downstream polish** (e.g. **VP-C**) only when A re-verify shows **PASS** on all required rows **or** Lead **WAIVED** per row.
+
+Canonical VP chain: **VP-B complete → VP-A greps re-prove → VP-C unlock**. See [14_VP_VERIFY_POLISH.md](../Docs/14_VP_VERIFY_POLISH.md) § Re-verify.
+
+Conductor **refuses** VP-C (or any polish phase tied to prior hard-fail greps) until re-verify is filed or Lead waives.
+
 ## 5. Phase graph
 
 ```

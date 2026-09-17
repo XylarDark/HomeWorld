@@ -2,7 +2,7 @@
 
 **When to use:** Conductor assigns a **docs-only** or **C++-touching** task to a Cursor cloud agent (Linux VM, no UE/MCP). Fill this packet and attach paths from [HANDOFF_TEMPLATE.md](HANDOFF_TEMPLATE.md).
 
-**Process authority:** [SWARM_OPS.md](SWARM_OPS.md) · **Windows follow-up:** [docs/Setup/WINDOWS_BRIDGE.md](../docs/Setup/WINDOWS_BRIDGE.md) · **HR3-A lane:** [Docs/handoffs/HR3_A_WINDOWS_EXEC.md](../Docs/handoffs/HR3_A_WINDOWS_EXEC.md)
+**Process authority:** [SWARM_OPS.md](SWARM_OPS.md) · **Windows follow-up:** [docs/Setup/WINDOWS_BRIDGE.md](../docs/Setup/WINDOWS_BRIDGE.md) · **HR3-A lane:** [Docs/handoffs/HR3_A_WINDOWS_EXEC.md](../Docs/handoffs/HR3_A_WINDOWS_EXEC.md) · **HR3-D evidence lane:** [Docs/handoffs/HR3_D_EVIDENCE_LANE.md](../Docs/handoffs/HR3_D_EVIDENCE_LANE.md)
 
 ---
 
@@ -43,6 +43,25 @@ cursor/<descriptive-name>-b3a5
 | **Windows validation** | **DESKTOP owner = Conductor parent only** — not cloud VM, not Task executors. Safe-Build → Editor → MCP on DESKTOP-21CT3H0 after merge |
 
 List repo-relative paths for every deliverable (files created/changed). Gate claims without paths are invalid per SWARM_OPS.
+
+---
+
+## Handoff PR contract (HR3-D — required fields)
+
+Every cloud-agent PR that files swarm evidence must include in **PR body** and **`Docs/handoffs/*.md`**:
+
+| Field | CLOUD example | DESKTOP follow-up example |
+|-------|---------------|---------------------------|
+| **Host** | `CLOUD` (Linux VM) | `DESKTOP-21CT3H0` |
+| **Grep prefixes** | N/A for docs-only | `FORM:`, `FALLBACK:`, `HEAL:`, `NURTURE:`, `DAWN:`, `TAME:`, `GATHER:` |
+| **Evidence path** | `Docs/handoffs/HR3_D_EVIDENCE_LANE.md` | `Docs/handoffs/VP_A_PIE.md` + `Saved/Logs/HomeWorld.log` |
+| **Pass/fail table** | Deliverable checklist (DONE/PENDING) | One row per prefix — PASS / FAIL / WAIVED + excerpt |
+
+Full spec: [SWARM_OPS.md](SWARM_OPS.md) §4b · [HR3_D_EVIDENCE_LANE.md](../Docs/handoffs/HR3_D_EVIDENCE_LANE.md).
+
+### Re-verify (cloud agents do not run this)
+
+After a **blocker-fix** DESKTOP phase (e.g. **VP-B**), Conductor parent **re-runs prior hard-fail greps** (VP-A) before unlocking **VP-C**. Cloud agents document the rule only; DESKTOP owner executes re-verify. See [14_VP_VERIFY_POLISH.md](../Docs/14_VP_VERIFY_POLISH.md) § Re-verify.
 
 ---
 
