@@ -8882,6 +8882,17 @@ Agent session summaries for cross-session context persistence.
 **Key decisions:** CC-BY probe meshes are documented for attribution; production art should prefer CC0 Kenney or Megascans per manifest ladder.
 
 
+## 2026-09-17 — MVP vertical slice P3–P7 archive → PR #3
+
+**Tasks completed:**
+- Unpacked signed MVP vertical slice archive (`mvp-vertical-slice-p3-p7.tar.gz`) into repo root (37 files: Docs/, Lib/, Maps/, swarm/, blender/).
+- Branch `cursor/mvp-vertical-slice-p3-p7-070e`; commit `3725635`; PR [#3](https://github.com/XylarDark/HomeWorld/pull/3) to `main`.
+- Verified: PHASE_BOARD P0–P7 CLOSED; Docs/07 SIGNED/APPROVED; blend + 5 preview PNGs; FALLBACK FLIGHT documented.
+
+**Key decisions:** Committed archive as-is per Lead sign-off — no edits to Docs/07 or PHASE_BOARD statuses. UE import out of scope.
+
+---
+
 ## 2026-09-05 — Workspace audit + GDD draft for Google Docs
 
 - Audited working game vs vision for collaborator GDD/art kickoff.
