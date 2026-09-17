@@ -879,6 +879,11 @@ void FHomeWorldModule::StartupModule()
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdGatherFlowers),
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Inventory.Dump"),
+		TEXT("PL-C: Log six inventory slots as INVENTORY: lines. Thin readout companion to HUD Inv[n]."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdInventoryDump),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.PlaceWall"),
 		TEXT("Place PlaceActorClass (e.g. BP_BuildOrder_Wall) at cursor. Requires PIE; run create_bp_build_order_wall.py first."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdPlaceWall),
