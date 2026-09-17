@@ -1,10 +1,10 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **HS-C** — CI as law (**IN PROGRESS** — apply branch protection or Lead **`ACCEPT HS-C DEFER`**)
+**Current phase:** **HS-D** — Evidence & re-verify automation (**IN PROGRESS**)
 
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
-**Active owners:** **Lead** (GitHub settings) / **Conductor** (verify + docs)
-**Blocked by:** Lead must **apply** branch protection on `main` **or** type **`ACCEPT HS-C DEFER`**. Next gate **`APPROVE HS-C`** (applied) or accept-defer stamp.
+**Active owners:** **Conductor** (HS-D) / **DESKTOP** (Conductor-parent proofs)
+**Blocked by:** none for HS-D start. Next gate Lead **`APPROVE HS-D`**. Branch protection **PERMANENTLY DEFERRED** (HS-C / HR3-C).
 
 
 | Phase | Name | Owners | Status | Gate file | Handoffs |
@@ -38,7 +38,7 @@ Every **active** post-audit / HR / VP row must name **who runs evidence**:
 
 ## POST-AUDIT (Docs/05–10 + HR track)
 
-MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** **Product next-phase (NP-A…E) is CLOSED / COMPLETE.** **HR2 track CLOSED / COMPLETE.** **HR3 track CLOSED / COMPLETE** — Lead **`APPROVE HR3-D`**, 2026-09-17 ET (HR3-C **DEFERRED**). **VP track CLOSED / COMPLETE** (VP-A re-verify **WAIVED**). **Docs/16 Playable Loop CLOSED / COMPLETE** — Lead **`APPROVE PL-D`**, 2026-09-17 ET. **Docs/17 HS Audit ACTIVE** — HS-A/B **CLOSED**; **HS-C IN PROGRESS** (apply protection or ACCEPT DEFER).
+MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** **Product next-phase (NP-A…E) is CLOSED / COMPLETE.** **HR2 track CLOSED / COMPLETE.** **HR3 track CLOSED / COMPLETE** — Lead **`APPROVE HR3-D`**, 2026-09-17 ET (HR3-C **DEFERRED**). **VP track CLOSED / COMPLETE** (VP-A re-verify **WAIVED**). **Docs/16 Playable Loop CLOSED / COMPLETE** — Lead **`APPROVE PL-D`**, 2026-09-17 ET. **Docs/17 HS Audit ACTIVE** — HS-A/B **CLOSED**; HS-C **DEFERRED**; **HS-D IN PROGRESS**.
 
 | Track | Doc / phase | Host | Status | Gate / handoff |
 |---|---|---|---|---|
@@ -70,9 +70,10 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **Docs/17 HS** | Harness & Swarm Audit | CLOUD | **APPROVED / ACTIVE** | [17_HS_AUDIT_STRATEGY.md](../Docs/17_HS_AUDIT_STRATEGY.md) — Lead **`APPROVE HS STRATEGY`**, 2026-09-17 ET |
 | **HS-A** | Inventory & debt ledger | CLOUD | **APPROVED / CLOSED** | [17a_HS_INVENTORY.md](../Docs/17a_HS_INVENTORY.md) — Lead **`APPROVE HS-A`**, 2026-09-17 ET (PR #88) |
 | **HS-B** | Swarm ops tighten | CLOUD | **APPROVED / CLOSED** | [17b_HS_SWARM_OPS.md](../Docs/17b_HS_SWARM_OPS.md) — Lead **`APPROVE HS-B`**, 2026-09-17 ET |
-| **HS-C** | CI as law | CLOUD+Lead | **IN PROGRESS** | Apply [15c](../Docs/15c_HR3_C_BRANCH_PROTECTION.md) / CI_SETUP **or** **`ACCEPT HS-C DEFER`** |
+| **HS-C** | CI as law | CLOUD+Lead | **DEFERRED / CLOSED** | Lead **`ACCEPT HS-C DEFER`**, 2026-09-17 ET — [17c](../Docs/17c_HS_CI_LAW.md) |
+| **HS-D** | Evidence automation | CLOUD+DESKTOP | **IN PROGRESS** | preflight + scripted verb evidence; re-verify rule |
 
-**Current track:** **Docs/17 HS** — HS-A/B **CLOSED**; **HS-C IN PROGRESS**.
+**Current track:** **Docs/17 HS** — HS-A/B **CLOSED**; HS-C **DEFERRED**; **HS-D IN PROGRESS**.
 
 ---
 
