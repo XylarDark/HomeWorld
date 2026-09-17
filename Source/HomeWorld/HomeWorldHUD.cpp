@@ -5,6 +5,7 @@
 #include "HomeWorldAttributeSet.h"
 #include "HomeWorldGameMode.h"
 #include "HomeWorldInventorySubsystem.h"
+#include "HomeWorldInventoryTypes.h"
 #include "HomeWorldPlayerState.h"
 #include "HomeWorldSpiritBurstAbility.h"
 #include "HomeWorldSpiritShieldAbility.h"
@@ -82,6 +83,25 @@ void AHomeWorldHUD::DrawHUD()
 
 	Canvas->DrawText(Font, PhysicalLine, X, Y, TextScale, TextScale);
 	Y += LineSpacing;
+
+	// PL-C thin inventory readout — six RES_* slots (no new masters / widgets)
+	if (UGameInstance* GISlots = PC->GetGameInstance())
+	{
+		if (UHomeWorldInventorySubsystem* InvSlots = GISlots->GetSubsystem<UHomeWorldInventorySubsystem>())
+		{
+			const int32 SlotN = InvSlots->GetSlotCount();
+			for (int32 Si = 0; Si < SlotN; ++Si)
+			{
+				const FHomeWorldInventorySlot Slot = InvSlots->GetSlot(Si);
+				const FString SlotLine = Slot.IsEmpty()
+					? FString::Printf(TEXT("Inv[%d]: —"), Si)
+					: FString::Printf(TEXT("Inv[%d]: %s x%d"), Si, *Slot.ResId.ToString(), Slot.Count);
+				Canvas->DrawText(Font, SlotLine, X, Y, TextScale, TextScale);
+				Y += LineSpacing;
+			}
+		}
+	}
+
 	Canvas->DrawText(Font, SpiritualLine, X, Y, TextScale, TextScale);
 	Y += LineSpacing;
 	Canvas->DrawText(Font, LoveLine, X, Y, TextScale, TextScale);
