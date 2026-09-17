@@ -1,16 +1,9 @@
 # PHASE BOARD — Conductor only writes status rows
 
-<<<<<<< HEAD
-**Current phase:** **NP-B** (Product next-phase — lookdev apply)  
+**Current phase:** **NP-C** (Form + V1 polish) — **COMPLETE awaiting APPROVE NP-C** (Windows place done)  
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **CND** (Conductor)  
-**Blocked by:** — (await Lead **`APPROVE NP-B`** after Windows run evidence)
-=======
-**Current phase:** **NP-C** (Form + V1 polish) — **COMPLETE awaiting APPROVE NP-C**  
-**Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
-**Active owners:** **CND** (Conductor)  
-**Blocked by:** — (await Lead **`APPROVE NP-C`** after PR merge)
->>>>>>> 860bdf2 (feat(np-c): form swap, GP_PlayerStart, soft walk bounds)
+**Blocked by:** — (await Lead **`APPROVE NP-C`**)
 
 | Phase | Name | Owners | Status | Gate file | Handoffs |
 |---|---|---|---|---|---|
@@ -44,20 +37,12 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **HR-C** | Swarm ops refine | **APPROVED** | [11c_HR_C_HANDOFF.md](../Docs/11c_HR_C_HANDOFF.md) |
 | **HR-D** | Prove (dry-run loop) | **APPROVED** | [11d_HR_D_HANDOFF.md](../Docs/11d_HR_D_HANDOFF.md) |
 | **HR-B2** | Residual harness risks | **APPROVED** | [11e_HR_B2_HANDOFF.md](../Docs/11e_HR_B2_HANDOFF.md) |
-<<<<<<< HEAD
 | **NP-A** | Inventory / gap map | **APPROVED** | [12a_NP_A_INVENTORY.md](../Docs/12a_NP_A_INVENTORY.md) — Lead **`APPROVE NP-A`**, 2026-09-17 ET |
-| **NP-B** | Lookdev apply | **COMPLETE — awaiting APPROVE NP-B** | [12b_NP_B_LOOKDEV.md](../Docs/12b_NP_B_LOOKDEV.md), [handoffs/NP_B_LOOKDEV.md](../Docs/handoffs/NP_B_LOOKDEV.md) |
-| **NP-C…E** | Form + SYS verbs | **LOCKED** | Blocked until Lead **`APPROVE NP-B`** |
-
-**Current track:** NP-B **COMPLETE** — Windows evidence filed (DESKTOP-21CT3H0, HEAD `82c7eb2`, 78/78 assign). Await Lead **`APPROVE NP-B`** → unlock NP-C.
-=======
-| **NP-A** | Inventory / gap map | **APPROVED** | [12a_NP_A_INVENTORY.md](../Docs/12a_NP_A_INVENTORY.md) |
-| **NP-B** | Lookdev apply | **APPROVED** | Lead stamp 2026-09-17 ET |
-| **NP-C** | Form + V1 polish | **COMPLETE — awaiting APPROVE NP-C** | [12c_NP_C_FORM_V1.md](../Docs/12c_NP_C_FORM_V1.md) |
+| **NP-B** | Lookdev apply | **APPROVED** | [12b_NP_B_LOOKDEV.md](../Docs/12b_NP_B_LOOKDEV.md), [handoffs/NP_B_LOOKDEV.md](../Docs/handoffs/NP_B_LOOKDEV.md) |
+| **NP-C** | Form + V1 polish | **COMPLETE — awaiting APPROVE NP-C** | [12c_NP_C_FORM_V1.md](../Docs/12c_NP_C_FORM_V1.md), [handoffs/NP_C_FORM_V1.md](../Docs/handoffs/NP_C_FORM_V1.md) — Windows place @ `16f7afe` |
 | **NP-D…E** | SYS verbs apply | **LOCKED** | Blocked until Lead **`APPROVE NP-C`** |
 
-**Current track:** NP-B **APPROVED** (Lead Luke Thompson, 2026-09-17 ET). **NP-C COMPLETE** — await Lead **`APPROVE NP-C`**.
->>>>>>> 860bdf2 (feat(np-c): form swap, GP_PlayerStart, soft walk bounds)
+**Current track:** NP-C **COMPLETE** — Windows evidence filed (DESKTOP-21CT3H0, HEAD `16f7afe`). Await Lead **`APPROVE NP-C`** → unlock NP-D.
 
 ---
 
@@ -65,11 +50,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 
 | ID | Phase | Owner | Write path | Due artifact |
 |---|---|---|---|---|
-<<<<<<< HEAD
-| NP-B-gate | NP-B | Lead | Docs/ | **`APPROVE NP-B`** → unlock NP-C |
-=======
 | NP-C-gate | NP-C | Lead | Docs/ | **`APPROVE NP-C`** → unlock NP-D |
->>>>>>> 860bdf2 (feat(np-c): form swap, GP_PlayerStart, soft walk bounds)
 
 ## Open defects
 
