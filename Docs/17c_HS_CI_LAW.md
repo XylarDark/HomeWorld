@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **IN PROGRESS** — awaiting Lead **apply** on GitHub **or** **`ACCEPT HS-C DEFER`** |
+| **Status** | **DEFERRED / CLOSED for track** — Lead **`ACCEPT HS-C DEFER`**, 2026-09-17 ET |
 | **Date** | 2026-09-17 (ET) |
 | **Author** | Conductor (HomeWorld) |
 | **Parent plan** | [17_HS_AUDIT_STRATEGY.md](17_HS_AUDIT_STRATEGY.md) |
@@ -60,7 +60,17 @@ Reply **`ACCEPT HS-C DEFER`**. Conductor stamps permanent accept with risk: C++ 
 
 ## Gate
 
-- Applied path: Lead **`HS-C APPLIED`** → Conductor verify → Lead **`APPROVE HS-C`**
-- Defer path: Lead **`ACCEPT HS-C DEFER`** → stamp close → unlock HS-D
+Lead **`ACCEPT HS-C DEFER`** — **ACCEPTED** (Luke Thompson, 2026-09-17 ET).
 
-*HS-C IN PROGRESS — not APPROVED.*
+**HS-C CLOSED for track** (permanent accept). Checklist remains in [CI_SETUP.md](../docs/Setup/CI_SETUP.md) / [15c](15c_HR3_C_BRANCH_PROTECTION.md) if Lead later applies. **HS-D UNLOCKED**.
+
+### Written risk (accepted)
+
+| Risk | Impact |
+|------|--------|
+| Required checks advisory only | Policy-honor merges; C++ can merge on Ubuntu `validate` alone if humans ignore red |
+| Harness grade ceiling | ~A — not A+ on "CI as law" until GitHub settings applied |
+
+---
+
+*HS-C **DEFERRED / CLOSED** — Lead **`ACCEPT HS-C DEFER`**, 2026-09-17 ET.*
