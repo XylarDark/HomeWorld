@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **PENDING** Lead **`APPROVE HS-D`** |
+| **Status** | **APPROVED / CLOSED** — Lead Luke Thompson, **`APPROVE HS-D`**, 2026-09-17 ET |
 | **Date** | 2026-09-17 (ET) |
 | **Author** | Conductor executor (HomeWorld) — `gh` Contents API only |
 | **Parent plan** | [17_HS_AUDIT_STRATEGY.md](17_HS_AUDIT_STRATEGY.md) — Lead **`APPROVE HS STRATEGY`**, 2026-09-17 ET |
@@ -169,3 +169,11 @@ Until stamped: do not unlock HS-E; do not invent greps; do not claim DESKTOP pro
 ---
 
 *PENDING — Docs/17d HS-D Evidence. Awaiting Lead **`APPROVE HS-D`**. Do not claim APPROVE in this PR.*
+
+## Lead APPROVE HS-D
+
+Lead **`APPROVE HS-D`** (Luke Thompson, 2026-09-17 ET) — evidence & re-verify automation **APPROVED / CLOSED**. **HS-E** (character / bootstrap canon) **UNLOCKED**.
+
+---
+
+*HS-D **APPROVED / CLOSED** — Lead **`APPROVE HS-D`**, 2026-09-17 ET.*
