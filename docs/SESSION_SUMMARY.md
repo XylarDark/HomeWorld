@@ -1,3 +1,8 @@
+## 2026-09-17 ET — APPROVE UASSET POLICY
+
+Lead **`APPROVE UASSET POLICY`**, 2026-09-17 ET. [Docs/20_UASSET_AI_POLICY.md](../Docs/20_UASSET_AI_POLICY.md) stamped **APPROVED / COMPLETE**; allowlist **active** (default KEEP-LOCAL elsewhere). PR #108 merged. No Content binaries. Next product track TBD (Lead gate).
+
+
 ## 2026-09-17 ET — Docs/20 UASSET/AI policy DRAFT
 
 Lead requested UASSET allowlist + AI provenance policy. [Docs/20_UASSET_AI_POLICY.md](../Docs/20_UASSET_AI_POLICY.md) + [AI_ASSET_LOG.md](../Docs/AI_ASSET_LOG.md) filed; scoped `.gitattributes` LFS; `npm run check:uasset-allowlist`; swarm/setup pointers updated. PHASE_BOARD **IN PROGRESS** — PENDING **`APPROVE UASSET POLICY`**. No Content binaries in PR.

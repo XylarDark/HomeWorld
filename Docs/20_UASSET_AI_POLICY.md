@@ -2,13 +2,13 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **PENDING `APPROVE UASSET POLICY`** — Lead must type that exact string to activate |
+| **Status** | **APPROVED / COMPLETE** — Lead **`APPROVE UASSET POLICY`**, 2026-09-17 ET (PR #108) |
 | **Date** | 2026-09-17 (ET) |
 | **Author** | Conductor executor (cloud) |
 | **Supersedes** | Blanket “never commit `.uasset`/`.umap`” hard rule (HS-E era) — see [17e_HS_CONTENT_BOOTSTRAP.md](17e_HS_CONTENT_BOOTSTRAP.md) |
 | **Machine config** | [config/uasset-allowlist.json](../config/uasset-allowlist.json) · [`.gitattributes`](../.gitattributes) |
 
-**Gate:** Policy is **draft** until Lead types **`APPROVE UASSET POLICY`**. Conductor stamps PHASE_BOARD + this doc header after approval. Do not treat allowlist commits as approved before the gate.
+**Gate:** Lead **`APPROVE UASSET POLICY`**, 2026-09-17 ET — **policy live**. Allowlist active per §2; default KEEP-LOCAL elsewhere. Extend only via §7 + **`APPROVE UASSET ALLOWLIST <id>`**.
 
 ---
 
@@ -106,11 +106,11 @@ Missing allowlisted LFS objects → run `git lfs pull`; if still missing, DESKTO
 
 ---
 
-## 8. Gate stamp (empty until Lead approval)
+## 8. Gate stamp
 
 | Field | Value |
 |-------|-------|
-| **Lead string** | *(pending)* **`APPROVE UASSET POLICY`** |
-| **Approved by** | — |
-| **Date (ET)** | — |
-| **PR / SHA** | — |
+| **Lead string** | **`APPROVE UASSET POLICY`** |
+| **Approved by** | Lead (2026-09-17 ET) |
+| **Date (ET)** | 2026-09-17 |
+| **PR / SHA** | PR **#108** (merge SHA on `main` after squash) |

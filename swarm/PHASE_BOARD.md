@@ -1,10 +1,10 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **Docs/20 UASSET/AI policy IN PROGRESS (drafting)** — PENDING Lead **`APPROVE UASSET POLICY`** ([20_UASSET_AI_POLICY.md](../Docs/20_UASSET_AI_POLICY.md))
+**Current phase:** **Docs/20 CLOSED / COMPLETE** — Lead **`APPROVE UASSET POLICY`**, 2026-09-17 ET (PR #108; allowlist **active**)
 
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **Conductor** (parent DESKTOP) / **DESKTOP-21CT3H0**
-**Blocked by:** none. **No active product gameplay phase** — policy track only until **`APPROVE UASSET POLICY`**. Do not reopen VP2/D19. Branch protection **DEFERRED**.
+**Blocked by:** none. **No active product gameplay phase** — next track TBD (Lead gate). Do not reopen VP2/D19. Branch protection **DEFERRED**.
 **Sign-off doc:** [Docs/17_HS_AUDIT_SIGN_OFF.md](../Docs/17_HS_AUDIT_SIGN_OFF.md) — **SIGNED OFF** Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET.
 
 
@@ -94,9 +94,9 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **D19-A** | Gather piles that stick | CLOUD+DESKTOP | **APPROVED / CLOSED** | DESKTOP: `GP_Gather_*`; `GATHER: RES_WOOD +1` / `harvest ok` |
 | **D19-B** | Seed cheat | CLOUD+DESKTOP | **APPROVED / CLOSED** | DESKTOP: `hw.Gather.Seed` → `GATHER: RES_SEED +N` |
 | **D19-C** | Success-path evidence filter | CLOUD | **APPROVED / CLOSED** | `evidence-grep.js --success-path`; tests green |
-| **Docs/20** | UASSET allowlist + AI provenance | CLOUD+Lead | **IN PROGRESS** | [20_UASSET_AI_POLICY.md](../Docs/20_UASSET_AI_POLICY.md) — PENDING **`APPROVE UASSET POLICY`** |
+| **Docs/20** | UASSET allowlist + AI provenance | CLOUD+Lead | **APPROVED / COMPLETE** | [20_UASSET_AI_POLICY.md](../Docs/20_UASSET_AI_POLICY.md) — Lead **`APPROVE UASSET POLICY`**, 2026-09-17 ET (PR #108); allowlist **active** |
 
-**Current track:** **Docs/20 UASSET/AI policy IN PROGRESS** — PENDING **`APPROVE UASSET POLICY`**. Docs/19 + VP2 **CLOSED** — do not reopen. **No active product gameplay phase.**
+**Current track:** **Docs/20 CLOSED / COMPLETE** — allowlist policy **live** on `main`. Docs/19 + VP2 **CLOSED** — do not reopen. **No active product gameplay phase.**
 
 ---
 
@@ -104,7 +104,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 
 | ID | Phase | Host | Owner | Write path | Due artifact |
 |---|---|---|---|---|---|
-| UASSET-policy | Docs/20 | CLOUD+Lead | CND+Lead | Docs/ + config/ + scripts/ | [20_UASSET_AI_POLICY.md](../Docs/20_UASSET_AI_POLICY.md) · [AI_ASSET_LOG.md](../Docs/AI_ASSET_LOG.md) — **IN PROGRESS**; PENDING Lead **`APPROVE UASSET POLICY`** |
+| UASSET-policy | Docs/20 | CLOUD+Lead | CND+Lead | Docs/ + config/ + scripts/ | [20_UASSET_AI_POLICY.md](../Docs/20_UASSET_AI_POLICY.md) · [AI_ASSET_LOG.md](../Docs/AI_ASSET_LOG.md) — **APPROVED / CLOSED** Lead **`APPROVE UASSET POLICY`**, 2026-09-17 ET (PR #108) |
 | HS-F-sign-off | HS-F | CLOUD+Lead | CND+Lead | Docs/ | [17_HS_AUDIT_SIGN_OFF.md](../Docs/17_HS_AUDIT_SIGN_OFF.md) — **CLOSED** Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET |
 | HS-E-bootstrap | HS-E | CLOUD+Lead+DESKTOP | CND+Lead | Docs/ | [17e_HS_CONTENT_BOOTSTRAP.md](../Docs/17e_HS_CONTENT_BOOTSTRAP.md) · [HS_E_CONTENT_BOOTSTRAP.md](../Docs/handoffs/HS_E_CONTENT_BOOTSTRAP.md) — **APPROVED / CLOSED** Lead **`APPROVE HS-E`**, 2026-09-17 ET (KEEP-LOCAL) |
 | HS-D-evidence | HS-D | CLOUD+DESKTOP | CND | Docs/ + scripts/ | [17d_HS_EVIDENCE.md](../Docs/17d_HS_EVIDENCE.md) · [HS_D_EVIDENCE.md](../Docs/handoffs/HS_D_EVIDENCE.md) — **APPROVED / CLOSED** Lead **`APPROVE HS-D`**, 2026-09-17 ET |
