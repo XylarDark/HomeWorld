@@ -19,7 +19,7 @@ Prove the signed playable loop on **DESKTOP-21CT3H0** with **real** editor-log g
 
 `FORM:` · `FALLBACK:` · `HEAL:` · `NURTURE:` · `DAWN:` · `TAME:` · `GATHER:` · `STORE:` · `INVENTORY:`
 
-**Evidence PASS policy (Lead gates):** Soft-reject / diagnostic-only tables are **not** sufficient for **`APPROVE VP2-A`** / **`APPROVE VP2-B`** — require success-path greps or Lead **`ACCEPT SOFT-REJECT`**. When [17g_HS_G_OPS_DIET.md](17g_HS_G_OPS_DIET.md) is **APPROVED**, that doc is canonical; until then this note stands.
+**Evidence PASS policy (Lead gates):** Soft-reject / diagnostic-only tables are **not** sufficient for **`APPROVE VP2-A`** / **`APPROVE VP2-B`** — require success-path greps or Lead **`ACCEPT SOFT-REJECT`**. Canonical: [17g_HS_G_OPS_DIET.md](17g_HS_G_OPS_DIET.md) (**APPROVED / COMPLETE**, Lead **`APPROVE HS-G`**, 2026-09-17 ET).
 
 ---
 

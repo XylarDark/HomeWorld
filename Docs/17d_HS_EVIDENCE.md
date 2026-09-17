@@ -13,7 +13,7 @@
 
 **Gate:** Lead **`APPROVE HS-D`** — **APPROVED** (Luke Thompson, 2026-09-17 ET).
 
-**Lead-gate PASS (VP2+):** Soft-reject greps are diagnostic only — see [17g_HS_G_OPS_DIET.md](17g_HS_G_OPS_DIET.md) when **APPROVED**; until then [18_VERIFY_PROVE.md](18_VERIFY_PROVE.md) prove notes apply.
+**Lead-gate PASS (VP2+):** Soft-reject greps are diagnostic only — canonical [17g_HS_G_OPS_DIET.md](17g_HS_G_OPS_DIET.md) (**APPROVED / COMPLETE**, Lead **`APPROVE HS-G`**, 2026-09-17 ET).
 
 ---
 

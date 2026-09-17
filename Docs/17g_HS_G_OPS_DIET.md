@@ -2,12 +2,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **DRAFT** — await Lead **`APPROVE HS-G`** |
+| **Status** | **APPROVED / COMPLETE** |
 | **Date** | 2026-09-17 |
 | **Author** | Conductor |
+| **Approved** | Lead Luke Thompson — **`APPROVE HS-G`**, 2026-09-17 ET |
 | **Parent** | [17_HS_AUDIT_SIGN_OFF.md](17_HS_AUDIT_SIGN_OFF.md) **CLOSED** · [18_VERIFY_PROVE.md](18_VERIFY_PROVE.md) **ACTIVE** (VP2-A PENDING; VP2-B IN PROGRESS success-path) |
-
-**Gate:** Lead **`APPROVE HS-G`**. Do **not** stamp APPROVE in this PR.
 
 ---
 
@@ -35,15 +34,15 @@ Doctor rewrite · branch protection apply · new gameplay verbs · AnimGraph wor
 
 ---
 
-## Deliverables when APPROVED (not in this PR)
+## Deliverables (complete)
 
-| Item | On approve |
-|------|------------|
-| **Conductor checklist** | Point at Grok Bot skill **HomeWorld desktop prove** (Conductor-owned; not in git) **or** treat **Appendix A** below as canonical |
-| **Cross-links** | One-liner from [17d_HS_EVIDENCE.md](17d_HS_EVIDENCE.md) and [18_VERIFY_PROVE.md](18_VERIFY_PROVE.md) prove notes → this doc |
-| **UE 5.7 gotchas** | Optional 8–12 lines in an existing CONSOLE/HS-B doc if natural; else keep in **Appendix B** here |
+| Item | Status |
+|------|--------|
+| **Conductor checklist** | **Appendix A** below is canonical (Grok Bot skill **HomeWorld desktop prove** optional; Conductor-owned; not in git) |
+| **Cross-links** | [17d_HS_EVIDENCE.md](17d_HS_EVIDENCE.md) and [18_VERIFY_PROVE.md](18_VERIFY_PROVE.md) prove notes → this doc |
+| **UE 5.7 gotchas** | **Appendix B** below (optional future trim to CONSOLE/HS-B if natural) |
 
-**Board:** HS-G **DRAFT** → on Lead **`APPROVE HS-G`**, stamp this doc **APPROVED / COMPLETE** in-place. Implementation = policy doc + checklist/skill — **no multi-PR WAVE**.
+**Board:** HS-G **APPROVED / COMPLETE** — Lead **`APPROVE HS-G`**, 2026-09-17 ET. Implementation = policy doc + checklist — **no multi-PR WAVE**.
 
 ---
 
@@ -69,4 +68,4 @@ Full table: [docs/KNOWN_ERRORS.md](../docs/KNOWN_ERRORS.md) · [unreal-cpp.mdc](
 
 ---
 
-*DRAFT — await Lead **`APPROVE HS-G`**. Does not reopen Docs/17 or change VP2-A/B gate strings.*
+*APPROVED / COMPLETE — Lead **`APPROVE HS-G`**, 2026-09-17 ET. Does not reopen Docs/17 or change VP2-A/B gate strings.*

@@ -85,9 +85,9 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **HS-D** | Evidence automation | CLOUD+DESKTOP | **APPROVED / CLOSED** | [17d_HS_EVIDENCE.md](../Docs/17d_HS_EVIDENCE.md) · [HS_D_EVIDENCE.md](../Docs/handoffs/HS_D_EVIDENCE.md) — Lead **`APPROVE HS-D`**, 2026-09-17 ET (PR #94) |
 | **HS-E** | Character / bootstrap canon | CLOUD+Lead+DESKTOP | **APPROVED / CLOSED** | [17e_HS_CONTENT_BOOTSTRAP.md](../Docs/17e_HS_CONTENT_BOOTSTRAP.md) — Lead **`APPROVE HS-E`**, 2026-09-17 ET (PR #97); policy **KEEP-LOCAL**; handoff [HS_E_CONTENT_BOOTSTRAP.md](../Docs/handoffs/HS_E_CONTENT_BOOTSTRAP.md) |
 | **HS-F** | Sign-off & re-grade | CLOUD+Lead | **SIGNED OFF / CLOSED** | [17_HS_AUDIT_SIGN_OFF.md](../Docs/17_HS_AUDIT_SIGN_OFF.md) — Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET |
-| **HS-G** | Conductor/DESKTOP ops diet | CLOUD+DESKTOP+Lead | **DRAFT** | [17g_HS_G_OPS_DIET.md](../Docs/17g_HS_G_OPS_DIET.md) — PENDING Lead **`APPROVE HS-G`**; optional residual (evidence PASS, hang budget, compile hygiene) |
+| **HS-G** | Conductor/DESKTOP ops diet | CLOUD+DESKTOP+Lead | **APPROVED / COMPLETE** | [17g_HS_G_OPS_DIET.md](../Docs/17g_HS_G_OPS_DIET.md) — Lead **`APPROVE HS-G`**, 2026-09-17 ET (evidence PASS, hang budget, compile hygiene) |
 
-**Current track:** **Docs/18 VP2 ACTIVE** — **VP2-A** PENDING **`APPROVE VP2-A`**; **VP2-B** IN PROGRESS (success-path). **HS-G DRAFT** optional residual — await **`APPROVE HS-G`**.
+**Current track:** **Docs/18 VP2 ACTIVE** — **VP2-A** PENDING **`APPROVE VP2-A`**; **VP2-B** IN PROGRESS (success-path). **HS-G APPROVED / COMPLETE**.
 
 ---
 
