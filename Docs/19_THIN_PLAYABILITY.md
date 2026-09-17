@@ -2,10 +2,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **APPROVED** — Lead **`APPROVE D19 STRATEGY`**, 2026-09-17 ET |
+| **Status** | **CLOSED / COMPLETE** — Lead **`APPROVE D19`**, 2026-09-17 ET (D19-A/B/C) |
 | **Date** | 2026-09-17 |
 | **Author** | Conductor (HomeWorld) |
-| **Baseline main** | `aa6472e` — VP2 CLOSED; HS-G APPROVED |
+| **Baseline main** | `effe3af` — PR #107 merged |
 | **Prior track** | [18_VERIFY_PROVE.md](18_VERIFY_PROVE.md) **CLOSED** — Lead **`APPROVE VP2-C STOP`**, 2026-09-17 ET |
 
 ---
@@ -37,11 +37,11 @@ Naming: **D19-A … D19-C**. Do **not** reuse VP2 or PL gate strings.
 
 | Track | Name | Host | Status | Gate |
 |-------|------|------|--------|------|
-| **D19-A** | Gather piles that stick | CLOUD+DESKTOP | **IN PROGRESS** | Lead **`APPROVE D19-A`** after DESKTOP pile harvest |
-| **D19-B** | Seed cheat (`hw.Gather.Seed`) | CLOUD | **IN PROGRESS** | Lead **`APPROVE D19-B`** after PIE grant log |
-| **D19-C** | Success-path evidence filter | CLOUD | **IN PROGRESS** | Lead **`APPROVE D19-C`** after tests green |
+| **D19-A** | Gather piles that stick | CLOUD+DESKTOP | **APPROVED / COMPLETE** | Lead **`APPROVE D19-A`** — DESKTOP: `GP_Gather_*` spawn; `GATHER: RES_WOOD +1` / `harvest ok` |
+| **D19-B** | Seed cheat (`hw.Gather.Seed`) | CLOUD+DESKTOP | **APPROVED / COMPLETE** | Lead **`APPROVE D19-B`** — DESKTOP: `hw.Gather.Seed` → `GATHER: RES_SEED +N` |
+| **D19-C** | Success-path evidence filter | CLOUD | **APPROVED / COMPLETE** | Lead **`APPROVE D19-C`** — `evidence-grep --success-path` tests green |
 
-**Lead strategy gate:** **`APPROVE D19 STRATEGY`** — **APPROVED** 2026-09-17 ET.
+**Lead gates:** **`APPROVE D19 STRATEGY`** (2026-09-17 ET) · **`APPROVE D19`** (2026-09-17 ET) — covers D19-A/B/C after DESKTOP prove.
 
 ---
 
@@ -69,7 +69,7 @@ place_vs_mvp_resource_piles.py
 
 **Expected gather success-path:** `GATHER: RES_WOOD +N` and/or `GATHER: harvest ok` (face pile ~280 cm, day/body, Interact or `try_harvest_in_front()`).
 
-**Gate:** Lead **`APPROVE D19-A`**
+**Status:** **APPROVED / COMPLETE** — Lead **`APPROVE D19-A`**, 2026-09-17 ET.
 
 ---
 
@@ -84,7 +84,7 @@ place_vs_mvp_resource_piles.py
 | **Mirror** | `CmdGatherOre` / `CmdGatherFlowers` in `HomeWorld.cpp` |
 | **Use** | PIE: `hw.Gather.Seed 1` then night/spirit at `GP_N1_Crop` → `NURTURE: success N1_Crop M_Nurtured=1` |
 
-**Gate:** Lead **`APPROVE D19-B`**
+**Status:** **APPROVED / COMPLETE** — Lead **`APPROVE D19-B`**, 2026-09-17 ET.
 
 ---
 
@@ -111,7 +111,19 @@ npm run evidence:grep -- --log Saved/Logs/HomeWorld.log --success-path --strict
 
 Default (no flag) remains backward-compatible for existing tables.
 
-**Gate:** Lead **`APPROVE D19-C`**
+**Status:** **APPROVED / COMPLETE** — Lead **`APPROVE D19-C`**, 2026-09-17 ET.
+
+---
+
+## DESKTOP evidence (2026-09-17 ET)
+
+| Track | Result |
+|-------|--------|
+| **D19-A** | `place_vs_mvp_resource_piles.py` — `GP_Gather_WOOD`/`HERB`/`BERRY` verify OK; PIE harvest `GATHER: RES_WOOD +1` and/or `GATHER: harvest ok` |
+| **D19-B** | `hw.Gather.Seed 2` → `GATHER: RES_SEED +2` + `HomeWorld: hw.Gather.Seed granted RES_SEED +2` |
+| **D19-C** | `npm run evidence:grep:test` green; `--success-path --strict` PASS on DESKTOP log |
+
+Host: **DESKTOP-21CT3H0** · Safe-Build DLL guard OK (single-quoted `-f`, ASCII log lines).
 
 ---
 
@@ -128,8 +140,8 @@ Default (no flag) remains backward-compatible for existing tables.
 
 ## Board
 
-See [swarm/PHASE_BOARD.md](../swarm/PHASE_BOARD.md) — **Docs/19 IN PROGRESS / APPROVED strategy**. VP2 remains **CLOSED**.
+See [swarm/PHASE_BOARD.md](../swarm/PHASE_BOARD.md) — **Docs/19 CLOSED / COMPLETE**. VP2 remains **CLOSED**. No new product phase without Lead gate.
 
 ---
 
-*APPROVED — Lead **`APPROVE D19 STRATEGY`**, 2026-09-17 ET.*
+*CLOSED / COMPLETE — Lead **`APPROVE D19`**, 2026-09-17 ET (D19-A/B/C).*
