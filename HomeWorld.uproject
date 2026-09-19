@@ -82,6 +82,22 @@
                     {
                         "Name":  "SmartObjects",
                         "Enabled":  true
+                    },
+                    {
+                        "Name":  "PCGBiomeCore",
+                        "Enabled":  true
+                    },
+                    {
+                        "Name":  "PCGPrimitives",
+                        "Enabled":  true
+                    },
+                    {
+                        "Name":  "ProceduralVegetationEditor",
+                        "Enabled":  true
+                    },
+                    {
+                        "Name":  "MeshTerrainMode",
+                        "Enabled":  true
                     }
                 ],
     "TargetPlatforms":  [
