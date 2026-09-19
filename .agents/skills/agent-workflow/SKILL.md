@@ -8,6 +8,14 @@ description: Use when carrying out any coding task in this repo end-to-end - cov
 Baseline behavior for agents working in HomeWorld: how to gather context, run
 commands, generate code, record errors, and finish cleanly.
 
+## Mode before context load
+
+Before gathering a large context pack, classify **SWARM / NON-SWARM / HYBRID**
+([swarm-mode-routing](../swarm-mode-routing/SKILL.md) ·
+[SWARM_MODE_ROUTING.md](../../../docs/human-use/SWARM_MODE_ROUTING.md)). Default
+for coding tasks is **NON-SWARM** — do not load Conductor specialist cards unless
+the detection protocol says SWARM or HYBRID.
+
 ## Project facts
 
 > **Localize on copy.** HomeWorld-specific facts (rewritten from DevEnvTemplate).

@@ -5,6 +5,10 @@ Canon stays in `HOMEWORLD_MVP_SWARM_BRIEF.md`. If ops and canon conflict, **cano
 
 Aligned with [DevEnvTemplate](https://github.com/XylarDark/DevEnvTemplate) **files-only** practices and HomeWorld [docs/human-use/](../docs/human-use/) (steer / taste / test). UE automation company rules stay in [AGENTS.md](../AGENTS.md) and `docs/` — this file governs the MVP lookdev swarm only.
 
+## 0. When to use this file (mode routing)
+
+Not every HomeWorld chat is a swarm session. Before loading role cards or wave packets, classify **SWARM / NON-SWARM / HYBRID** per [docs/human-use/SWARM_MODE_ROUTING.md](../docs/human-use/SWARM_MODE_ROUTING.md) (skill `swarm-mode-routing`). This ops file applies when mode is **SWARM** (or the Conductor half of **HYBRID**). UE engineering tracks stay NON-SWARM even if they update `PHASE_BOARD`.
+
 ## 1. Architecture (locked)
 
 Two-tier only. No flat peer chat. No shared scratch file that every agent writes.
