@@ -486,6 +486,14 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 - U58-E: VS_MVP open + RS placement scripts; `hw.RS.CollectDayBonus` / `CrossBonusStatus` / `CollectNightBonus` LogTemp PASS.
 - U58-F: [UE58_TECH.md](UE/UE58_TECH.md), `ue58-sources.mdc`, `ue58-api-check` skill; track **CLOSED**.
 
+### 2026-09-19 — Docs/23 UE 5.8 Feature Adoption (U58F)
+
+- Branch `feat/ue58-feature-adoption`; [23_UE58_FEATURE_ADOPTION.md](../Docs/23_UE58_FEATURE_ADOPTION.md).
+- Enabled plugins: PCGBiomeCore, PCGPrimitives, ProceduralVegetationEditor, MeshTerrainMode.
+- MegaLights + Fog SSS project CVars; Lumen Lite documented (Medium GI/Reflections).
+- MCP: keep UnrealMCP ([U58F_F_MCP_DECISION.md](../Docs/handoffs/U58F_F_MCP_DECISION.md)).
+- PVE pine + Mesh Terrain Landscape replace remain AD/WLD gated; smoke scripts under `Content/Python/u58f_*.py`.
+
 ---
 
 *Maintained by Conductor; HR-C established this rolling policy.*

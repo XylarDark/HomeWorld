@@ -45,6 +45,33 @@ Single entry point for Unreal Engine **5.8** development in HomeWorld: when to p
 | MassGameplay, MassAI, StateTree, ZoneGraph, SmartObjects | Enabled; MassEntity no longer listed. |
 | ModelingToolsEditorMode | Enabled. |
 
+## Docs/23 — 5.8 capabilities we use / reject
+
+Track: [Docs/23_UE58_FEATURE_ADOPTION.md](../../Docs/23_UE58_FEATURE_ADOPTION.md).
+
+| Capability | HomeWorld decision |
+|------------|-------------------|
+| PCG + `PCGBiomeCore` / `PCGPrimitives` | **Enabled** — nondestructive edit on graph **duplicates** only |
+| Procedural Vegetation Editor | **Enabled** — stylized pine only; AD gate ([U58F_C_PVE_PINE.md](../../Docs/handoffs/U58F_C_PVE_PINE.md)) |
+| MegaLights | **On** — `r.MegaLights.EnableForProject=True` in DefaultEngine.ini |
+| Fog Screen Space Scattering | **On** — `r.Fog.ScreenSpaceScattering=1`; enable on height fog actors |
+| Lumen Lite | **Low path** — Medium GI + Medium Reflections (`sg.GlobalIlluminationQuality 1`, `sg.ReflectionQuality 1`); hero stays High/Epic |
+| UnrealMCP | **Primary** — Epic `ModelContextProtocol` stays **disabled** ([U58F_F_MCP_DECISION.md](../../Docs/handoffs/U58F_F_MCP_DECISION.md)) |
+| Mesh Terrain | **Spike only** — sandbox; do not replace VS_MVP Landscape ([U58F_G_MESH_TERRAIN.md](../../Docs/handoffs/U58F_G_MESH_TERRAIN.md)) |
+| MetaHuman / MH Crowds | **Reject** for hero/family |
+| Mobile tooling | **Reject** (PC + Steam EA lock) |
+| Mover / MassCrowd / Chaos Cloth | **Defer** |
+
+### Lumen Lite (Steam EA min-spec)
+
+```text
+; Runtime / settings UI — Medium GI + Reflections
+sg.GlobalIlluminationQuality 1
+sg.ReflectionQuality 1
+```
+
+Hero lookdev cameras: keep `sg.GlobalIlluminationQuality` at 2 (High) or 3 (Epic). See [Config/DefaultScalability.ini](../../Config/DefaultScalability.ini).
+
 ## U58 cutover checklist (completed / re-run)
 
 1. `EngineAssociation` → `"5.8"` in `HomeWorld.uproject`

@@ -1,10 +1,10 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **Docs/22 UE 5.8 Upgrade CLOSED / COMPLETE** — [22_UE58_UPGRADE.md](../Docs/22_UE58_UPGRADE.md). Branch `chore/ue-5.8-upgrade` → PR to main. Docs/21 **CLOSED**. Next product track TBD (Lead gate).
+**Current phase:** **Docs/23 UE 5.8 Feature Adoption — ACTIVE** — [23_UE58_FEATURE_ADOPTION.md](../Docs/23_UE58_FEATURE_ADOPTION.md). Branch `feat/ue58-feature-adoption`. Docs/22 **CLOSED**.
 
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **Conductor** (parent DESKTOP) / **DESKTOP-21CT3H0**
-**Blocked by:** none. Self-hosted runner must add label **`ue58`** before `ci.yml` goes green on C++ PRs.
+**Blocked by:** U58F-C AD gate for PVE pine commit; U58F-G Landscape replace needs AD+WLD.
 **Sign-off doc:** [Docs/17_HS_AUDIT_SIGN_OFF.md](../Docs/17_HS_AUDIT_SIGN_OFF.md) — **SIGNED OFF** Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET.
 
 
@@ -108,8 +108,16 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **U58-D** | UnrealMCP + automation | DESKTOP | **APPROVED / CLOSED** | MCP 55557 Listen; Python OK |
 | **U58-E** | VS_MVP content / PIE smoke | DESKTOP | **APPROVED / CLOSED** | RS placement + `hw.RS.*` LogTemp PASS |
 | **U58-F** | Docs/rules + close + PR | CLOUD+Lead | **APPROVED / CLOSED** | UE58_TECH · ue58-sources · track CLOSED |
+| **Docs/23** | UE 5.8 Feature Adoption (U58F) | CLOUD+DESKTOP+Lead | **STRATEGY APPROVED / ACTIVE** | [23_UE58_FEATURE_ADOPTION.md](../Docs/23_UE58_FEATURE_ADOPTION.md) |
+| **U58F-A** | Strategy + matrix | CLOUD | **APPROVED** | Docs/23 · UE58_TECH capabilities table |
+| **U58F-B** | PCG 5.8 workflow | CLOUD+DESKTOP | **APPROVED** | PCGBiomeCore/Primitives · `u58f_pcg_smoke.py` |
+| **U58F-C** | PVE stylized pine | DESKTOP+AD | **IN PROGRESS** | Plugin on · AD gate [U58F_C_PVE_PINE.md](../Docs/handoffs/U58F_C_PVE_PINE.md) |
+| **U58F-D** | MegaLights + Fog SSS | DESKTOP | **APPROVED** | DefaultEngine.ini · `u58f_night_look_smoke.py` |
+| **U58F-E** | Lumen Lite path | CLOUD | **APPROVED** | Medium GI/Reflections · DefaultScalability.ini |
+| **U58F-F** | MCP decision | CLOUD | **APPROVED** | Keep UnrealMCP · [U58F_F_MCP_DECISION.md](../Docs/handoffs/U58F_F_MCP_DECISION.md) |
+| **U58F-G** | Mesh Terrain spike | DESKTOP | **SPIKE READY** | Plugin on · sandbox only · [U58F_G_MESH_TERRAIN.md](../Docs/handoffs/U58F_G_MESH_TERRAIN.md) |
 
-**Current track:** **Docs/22 CLOSED / COMPLETE**. Docs/21 **CLOSED**. Do not reopen VP2/D19/RS. Next product track TBD (Lead gate).
+**Current track:** **Docs/23 UE 5.8 Feature Adoption ACTIVE**. Docs/22 **CLOSED**. Do not reopen VP2/D19/RS.
 
 ---
 
@@ -117,6 +125,8 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 
 | ID | Phase | Host | Owner | Write path | Due artifact |
 |---|---|---|---|---|---|
+| U58F-C-pve | U58F-C | DESKTOP+AD | CND+AD | Docs/handoffs + Content/HomeWorld | [U58F_C_PVE_PINE.md](../Docs/handoffs/U58F_C_PVE_PINE.md) — **AD PENDING** |
+| U58F-G-sandbox | U58F-G | DESKTOP | CND | Maps/Sandbox KEEP-LOCAL | [U58F_G_MESH_TERRAIN.md](../Docs/handoffs/U58F_G_MESH_TERRAIN.md) — spike ready |
 | U58-A-pin | U58-A | CLOUD | CND | Docs/22 · HomeWorld.uproject · AGENTS · STACK_PLAN · rules | EngineAssociation 5.8 — **IN PROGRESS** |
 | U58-B-paths | U58-B | CLOUD | CND | Tools/ · .github/ · docs/Setup/ | UE_5.7 → UE_5.8 defaults — **LOCKED** |
 | U58-C-build | U58-C | DESKTOP | CND | Source/ · docs/KNOWN_ERRORS.md | Safe-Build on 5.8 — **LOCKED** |
