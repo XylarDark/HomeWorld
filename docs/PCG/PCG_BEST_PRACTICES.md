@@ -1,6 +1,14 @@
-# PCG Best Practices — HomeWorld (UE 5.7)
+# PCG Best Practices — HomeWorld (UE 5.8)
 
 Summary of PCG setup and graph design aligned with Epic tutorials and reference projects. **Before changing the PCG graph or adding nodes, read this doc and [PCG_VARIABLES_NO_ACCESS.md](PCG_VARIABLES_NO_ACCESS.md).**
+
+**Engine:** UE **5.8** ([Docs/23](../../Docs/23_UE58_FEATURE_ADOPTION.md)). Historical 5.7 notes remain valid for Get Landscape Data / mesh list automation limits — re-verify with `pcg_settings_introspect.py` after upgrades.
+
+### UE 5.8 additions (U58F-B)
+
+- Plugins enabled: **PCGBiomeCore**, **PCGPrimitives** (plus existing PCG + PCGPythonInterop).
+- **Nondestructive PCG edit:** Duplicate production graphs (e.g. `ForestIsland_PCG` → `ForestIsland_PCG_U58F_Edit`) before manual instance edits; do not overwrite signed graphs without Art Director gate.
+- Smoke: `Content/Python/u58f_pcg_smoke.py` → `Saved/u58f_pcg_smoke.json`.
 
 ---
 

@@ -486,13 +486,27 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 - U58-E: VS_MVP open + RS placement scripts; `hw.RS.CollectDayBonus` / `CrossBonusStatus` / `CollectNightBonus` LogTemp PASS.
 - U58-F: [UE58_TECH.md](UE/UE58_TECH.md), `ue58-sources.mdc`, `ue58-api-check` skill; track **CLOSED**.
 
+### 2026-09-19 — Docs/23 UE 5.8 Feature Adoption (U58F)
+
+- Branch `feat/ue58-feature-adoption`; [23_UE58_FEATURE_ADOPTION.md](../Docs/23_UE58_FEATURE_ADOPTION.md).
+- Enabled plugins: PCGBiomeCore, PCGPrimitives, ProceduralVegetationEditor, MeshTerrainMode.
+- MegaLights + Fog SSS project CVars; Lumen Lite documented (Medium GI/Reflections).
+- MCP: keep UnrealMCP ([U58F_F_MCP_DECISION.md](../Docs/handoffs/U58F_F_MCP_DECISION.md)).
+- PVE pine + Mesh Terrain Landscape replace remain AD/WLD gated; smoke scripts under `Content/Python/u58f_*.py`.
+
 ---
 
 *Maintained by Conductor; HR-C established this rolling policy.*
 
+### 2026-09-19 — U58F DESKTOP smoke + PR #111
+
+- Branch `feat/ue58-feature-adoption` merged to main (PR #111).
+- Smokes **ok**: `u58f_pcg_smoke`, `u58f_pve_smoke`, `u58f_night_look_smoke`, `u58f_mesh_terrain_smoke`
+- Remaining gates: Art Director PVE pine Content commit; Mesh Terrain sandbox KEEP-LOCAL (no VS_MVP Landscape replace)
+
 ### 2026-09-19 — Swarm mode routing protocol
 
-- Added [docs/human-use/SWARM_MODE_ROUTING.md](human-use/SWARM_MODE_ROUTING.md) + skill swarm-mode-routing.
+- Added [docs/human-use/SWARM_MODE_ROUTING.md](human-use/SWARM_MODE_ROUTING.md) + skill `swarm-mode-routing`.
 - Wired AGENTS.md, START_HERE, SWARM_OPS §0, agent-workflow, DOCS_LAYOUT.
-- Note: PR #111 uild-win64 may sit queued on self-hosted runner — not a mode-routing blocker.
+- Note: self-hosted `build-win64` queue is merge hygiene, not a mode-routing blocker.
 

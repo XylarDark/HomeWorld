@@ -2,7 +2,7 @@
 
 Settings that are **necessary** for PCG to work (per tutorials and docs) but **not settable** (or not reliably settable) from Python/MCP/scripts. This explains why certain manual steps cannot be removed. See [docs/PCG_SETUP.md](PCG_SETUP.md) for the full setup checklist. To automate the one-time PCG steps without manual clicks, run the optional GUI script `py Content/Python/gui_automation/pcg_apply_manual_steps.py` with the Editor open and focused (requires PyAutoGUI and reference images in `Content/Python/gui_automation/refs/`). **Capture refs once:** Run `py Content/Python/gui_automation/capture_pcg_refs.py` with the Editor in the correct state for each prompt; refs are saved to `gui_automation/refs/`. **When to use:** If introspection and the C++ commandlet (ApplyPCGSetup) are not enough—e.g. you need to set Get Landscape Data By Tag or mesh list and have no C++ tool for it—add reference PNGs per `gui_automation/refs/README.md` (or use capture_pcg_refs.py) and run the script. See [docs/FULL_AUTOMATION_RESEARCH.md](FULL_AUTOMATION_RESEARCH.md) §10.
 
-**Version note:** UE 5.2–5.7. In UE 5.7 the Get Landscape Data **actor selector** offers **By Tag** only (no By Class for actor).
+**Version note:** UE 5.2–5.8. In UE 5.7+ the Get Landscape Data **actor selector** offers **By Tag** only (no By Class for actor). **After Docs/23 / UE 5.8:** re-run `pcg_settings_introspect.py` and update this table if Epic exposes new writable paths (nondestructive edit is Editor-side; mesh list / By Tag often still no-access from Python).
 
 ---
 
