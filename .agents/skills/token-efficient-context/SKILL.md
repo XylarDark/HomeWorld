@@ -33,9 +33,16 @@ implementation work.
 
 Advice to the human and agent, not a hard pin.
 
+**First** classify mode + model class per
+[swarm-mode-routing](../swarm-mode-routing/SKILL.md) /
+[SWARM_MODE_ROUTING.md](../../../docs/human-use/SWARM_MODE_ROUTING.md)
+(`Mode:` then `ModelClass:` lines). Research backing:
+[SWARM_ROUTING_RESEARCH.md](../../../docs/Automation/SWARM_ROUTING_RESEARCH.md).
+
 - Default: Auto / Composer-class for routine edits, tests, boilerplate, Tab.
 - Mid: Sonnet-class for most planning and mid-hard work.
-- Frontier (Opus / GPT-5-class): architecture, subtle bugs, dense multi-file reasoning only. Switch back after that turn.
+- Frontier (Opus / GPT-5-class): architecture, subtle bugs, dense multi-file reasoning, AD taste only. Switch back after that turn.
+- Explore: fast/cheap subagents for parallel search (isolated context).
 - Plan with a stronger model, implement with a cheaper coding model, verify separately. Do not leave a frontier model selected for a rename.
 
 ## Rules and skills budget

@@ -62,7 +62,7 @@ Refresh layers: `npm run sync` (dry-run) then `npm run sync:apply`. Details: [do
 
 Blender-first MVP production kit: canon in **`Docs/`**, kits in **`Lib/`**, coordination in **`swarm/`**. **Start:** [START_HERE.md](START_HERE.md) → Conductor chat → phase gates (`APPROVE P0` … `APPROVE P7`). **Process:** [swarm/SWARM_OPS.md](swarm/SWARM_OPS.md) (Human Use, evidence gates, explicit-path git staging, KNOWN_ERRORS / AUTOMATION_GAPS). Specialists in [`.cursor/agents/`](.cursor/agents/) load **on demand** when Conductor spawns a role — not always-on; separate from the UE automation company unless explicitly invoked.
 
-**Mode detection (token efficiency):** At task start, choose **SWARM / NON-SWARM / HYBRID** per [docs/human-use/SWARM_MODE_ROUTING.md](docs/human-use/SWARM_MODE_ROUTING.md) (skill: `swarm-mode-routing`). Default coding chats are NON-SWARM — do not auto-load Conductor kits.
+**Mode detection (token efficiency):** At task start, choose **SWARM / NON-SWARM / HYBRID** and a **ModelClass** (Auto/Mid/Frontier/Explore) per [docs/human-use/SWARM_MODE_ROUTING.md](docs/human-use/SWARM_MODE_ROUTING.md) (skill: `swarm-mode-routing`; research: [docs/Automation/SWARM_ROUTING_RESEARCH.md](docs/Automation/SWARM_ROUTING_RESEARCH.md)). Default coding chats are NON-SWARM — do not auto-load Conductor kits.
 
 ## Dev environment setup
 

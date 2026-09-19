@@ -17,7 +17,7 @@ uses the same three jobs as a feature cycle.
 Start here: **[OWNERSHIP.md](OWNERSHIP.md)** (jobs, split, alert shape). Then
 [CYCLE.md](CYCLE.md) (when a decision is due *for this task*).
 
-**Swarm vs coding chat:** [SWARM_MODE_ROUTING.md](SWARM_MODE_ROUTING.md) — detect SWARM / NON-SWARM / HYBRID at task start for token efficiency (skill `swarm-mode-routing`).
+**Swarm vs coding chat:** [SWARM_MODE_ROUTING.md](SWARM_MODE_ROUTING.md) — detect SWARM / NON-SWARM / HYBRID + ModelClass at task start (skill `swarm-mode-routing`). Research: [SWARM_ROUTING_RESEARCH.md](../Automation/SWARM_ROUTING_RESEARCH.md).
 
 This is agentic engineering, not vibe coding. The model can leave the syntax. It
 cannot leave modular design, taste, or accountability.

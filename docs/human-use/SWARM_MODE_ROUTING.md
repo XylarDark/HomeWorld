@@ -3,6 +3,7 @@
 **When to use:** At the **start of every task** (and when the ask pivots), choose a mode before loading Conductor kits, specialist role cards, or Blender MCP waves. Goal: **token efficiency** — do not pay swarm context tax for UE engineering, and do not run lookdev as a flat coding chat when specialists + gates are required.
 
 **Canonical skill:** [.agents/skills/swarm-mode-routing/SKILL.md](../../.agents/skills/swarm-mode-routing/SKILL.md)  
+**Research log:** [SWARM_ROUTING_RESEARCH.md](../Automation/SWARM_ROUTING_RESEARCH.md)  
 **Swarm process:** [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md) · **Boot:** [START_HERE.md](../../START_HERE.md)
 
 ---
@@ -60,6 +61,36 @@ Any of (and none of §1):
 
 ---
 
+## Model class routing (after mode)
+
+Pick a **model class** (advice to human + agent — not a hard CI pin). Classes: **Auto** | **Mid** | **Frontier** | **Explore**. Details: [SWARM_ROUTING_RESEARCH.md](../Automation/SWARM_ROUTING_RESEARCH.md).
+
+| Task class | Mode hint | Model class | Context load |
+|------------|-----------|-------------|--------------|
+| Conductor / phase gate synthesis | SWARM | Mid (Frontier only if gate is hard) | Board row + checklist paths |
+| Kit fan-out specialist (ENV/PROP/LIT) | SWARM | Mid / role default | One role card + packet |
+| Art Director taste / shot reject | SWARM | Frontier | AD card only |
+| QA judge (independent) | SWARM | Mid–Frontier | QA card + evidence paths |
+| Engine / C++ / Python / CI / Safe-Build | NON-SWARM | Auto → Mid | Targeted source/docs |
+| Architecture / subtle multi-file bug | NON-SWARM or HYBRID | Frontier one-shot, then drop | Targeted files |
+| Explore / parallel search | any | Explore (fast subagent) | Isolated window |
+| Bulk renames / boilerplate | NON-SWARM | Auto / Composer | Minimal |
+
+Aligns with [token-efficient-context](../../.agents/skills/token-efficient-context/SKILL.md) (plan strong → implement cheap).
+
+---
+
+## Progressive disclosure checklist
+
+Studio-aligned (Cursor / Claude / Codex / Copilot):
+
+- [ ] Always-on = short facts only (`AGENTS.md`) — **no** new `alwaysApply: true` routing rule
+- [ ] Procedures live in skills; skill **description** carries triggers (like Copilot `infer` / Windsurf `model_decision`)
+- [ ] SWARM workers get **one** role card + packet paths — never the full brief
+- [ ] Mode flip → new chat (do not drag Conductor history into a C++ fix)
+
+---
+
 ## Explicit non-triggers (do not enter SWARM for these alone)
 
 - Reading or updating `PHASE_BOARD` / `SESSION_SUMMARY` after a NON-SWARM track.
@@ -78,7 +109,7 @@ Any of (and none of §1):
 | New chat when mode flips | Drag Conductor wave history into a C++ fix |
 | HYBRID = two thin chats | One mega-thread “doing everything” |
 
-Aligns with [token-efficient-context](../../.agents/skills/token-efficient-context/SKILL.md) (~60k smart zone).
+~60k token smart zone for implementation ([token-efficient-context](../../.agents/skills/token-efficient-context/SKILL.md)).
 
 ---
 
@@ -88,9 +119,21 @@ Waiting on **self-hosted** `build-win64` is a **merge hygiene** choice, not a sw
 
 ---
 
+## Output contract
+
+Before heavy tool use, state **two** lines:
+
+```text
+Mode: NON-SWARM|SWARM|HYBRID — <reason>
+ModelClass: Auto|Mid|Frontier|Explore — <reason>
+```
+
+---
+
 ## Checklist (agent)
 
 - [ ] Mode named: `NON-SWARM` | `SWARM` | `HYBRID`
+- [ ] ModelClass named: `Auto` | `Mid` | `Frontier` | `Explore`
 - [ ] First-match rule applied from this doc
 - [ ] SWARM → Conductor/specialist path only; no full-brief dump
 - [ ] NON-SWARM → no specialist role cards loaded
