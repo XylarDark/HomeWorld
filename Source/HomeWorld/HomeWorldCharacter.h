@@ -11,6 +11,8 @@
 #include "HomeWorldCharacter.generated.h"
 
 struct FOnAttributeChangeData;
+class USoundBase;
+class UParticleSystem;
 class AActor;
 class UAbilitySystemComponent;
 class UAttributeSet;
@@ -113,6 +115,17 @@ protected:
 	/** NP-C: spirit form flag — Night/Dusk true, Day/Dawn false. SYS reads via GetIsSpiritForm(). */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Form")
 	bool bIsSpiritForm = false;
+
+	/**
+	 * Docs/27 NF2-A: optional soft handmade sting on body↔spirit form swap.
+	 * Null = log + glow pulse only (no asset required for evidence).
+	 */
+	UPROPERTY(EditDefaultsOnly, Category = "Form|Feel")
+	TObjectPtr<USoundBase> SoftFormSwapSound;
+
+	/** Optional soft particle (Cascade). Null = glow pulse only. */
+	UPROPERTY(EditDefaultsOnly, Category = "Form|Feel")
+	TObjectPtr<UParticleSystem> SoftFormSwapParticles;
 
 	/** Ability system; used for GAS combat and attributes. */
 	UPROPERTY(VisibleAnywhere, Category = "Abilities")
@@ -279,6 +292,8 @@ protected:
 	void OnSpiritShieldTriggered(const FInputActionValue& Value);
 
 	void ApplyFormForPhase(EHomeWorldTimeOfDayPhase Phase);
+	/** Docs/27 NF2-A: soft glow + optional sound/particle when form actually changes. */
+	void PlaySoftFormSwapFeedback(EHomeWorldTimeOfDayPhase Phase, bool bSpirit);
 	UFUNCTION()
 	void OnTimeOfDayPhaseChanged(EHomeWorldTimeOfDayPhase NewPhase);
 

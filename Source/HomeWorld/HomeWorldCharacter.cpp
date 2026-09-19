@@ -40,6 +40,10 @@
 #include "Engine/GameInstance.h"
 #include "Engine/Engine.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/PointLightComponent.h"
+#include "Particles/ParticleSystem.h"
+#include "Sound/SoundBase.h"
+#include "TimerManager.h"
 #include "EngineUtils.h"
 
 AHomeWorldCharacter::AHomeWorldCharacter(const FObjectInitializer& ObjectInitializer)
@@ -1020,6 +1024,70 @@ void AHomeWorldCharacter::ApplyFormForPhase(EHomeWorldTimeOfDayPhase Phase)
 	const int32 PhaseIdx = FMath::Clamp(static_cast<int32>(Phase), 0, 3);
 	const TCHAR* FormLabel = bSpirit ? TEXT("spirit") : TEXT("body");
 	UE_LOG(LogTemp, Log, TEXT("FORM: %s form (phase=%s; NightMix driven by TimeOfDaySubsystem)"), FormLabel, PhaseNames[PhaseIdx]);
+
+	PlaySoftFormSwapFeedback(Phase, bSpirit);
+}
+
+void AHomeWorldCharacter::PlaySoftFormSwapFeedback(EHomeWorldTimeOfDayPhase Phase, bool bSpirit)
+{
+	static const TCHAR* PhaseNames[] = { TEXT("Day"), TEXT("Dusk"), TEXT("Night"), TEXT("Dawn") };
+	const int32 PhaseIdx = FMath::Clamp(static_cast<int32>(Phase), 0, 3);
+	const TCHAR* FormLabel = bSpirit ? TEXT("spirit") : TEXT("body");
+
+	UE_LOG(LogTemp, Log, TEXT("NF2: soft_feedback form=%s phase=%s sound=%s particles=%s"),
+		FormLabel,
+		PhaseNames[PhaseIdx],
+		SoftFormSwapSound ? TEXT("yes") : TEXT("none"),
+		SoftFormSwapParticles ? TEXT("yes") : TEXT("none"));
+
+	const FVector Loc = GetActorLocation();
+
+	if (SoftFormSwapSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, SoftFormSwapSound, Loc);
+	}
+	if (SoftFormSwapParticles)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SoftFormSwapParticles, Loc);
+	}
+
+	// Handmade soft glow pulse — warm amber for body, cool moonlight for spirit (art bible).
+	UPointLightComponent* Glow = NewObject<UPointLightComponent>(this, TEXT("NF2SoftFormGlow"));
+	if (!Glow)
+	{
+		return;
+	}
+	Glow->SetupAttachment(GetRootComponent());
+	Glow->RegisterComponent();
+	Glow->SetMobility(EComponentMobility::Movable);
+	Glow->SetIntensity(bSpirit ? 600.f : 900.f);
+	Glow->SetAttenuationRadius(350.f);
+	Glow->SetCastShadows(false);
+	if (bSpirit)
+	{
+		Glow->SetLightColor(FLinearColor(0.55f, 0.65f, 0.95f));
+	}
+	else
+	{
+		Glow->SetLightColor(FLinearColor(1.0f, 0.72f, 0.35f));
+	}
+
+	TWeakObjectPtr<UPointLightComponent> WeakGlow(Glow);
+	FTimerHandle FadeHandle;
+	if (UWorld* World = GetWorld())
+	{
+		World->GetTimerManager().SetTimer(
+			FadeHandle,
+			FTimerDelegate::CreateLambda([WeakGlow]()
+			{
+				if (UPointLightComponent* Light = WeakGlow.Get())
+				{
+					Light->DestroyComponent();
+				}
+			}),
+			0.55f,
+			false);
+	}
 }
 
 void AHomeWorldCharacter::Look(const FInputActionValue& Value)

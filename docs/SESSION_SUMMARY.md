@@ -1,3 +1,69 @@
+## 2026-09-19 ET — DevHarness Taste Gates sync + HomeWorld pin
+
+DevHarness PR #31 merged (`398ce0b`): extras skill `taste-gate` + `docs/human-use/taste-gates.md`. HomeWorld pin bumped; local `.agents/skills/taste-gate` activated. Docs/26–28 + NF2 ship in same HomeWorld push.
+
+## 2026-09-19 ET — APPROVE TG-E / Docs/28 CLOSED
+
+Lead **`APPROVE TG-E`**, 2026-09-19 ET. Docs/28 Taste Gates **CLOSED / COMPLETE** (TG-A…E). Harness remains: skill `taste-gate` + [taste-gates.md](../docs/human-use/taste-gates.md). PHASE_BOARD: next track TBD — Lead names it or Taste Gate (do not invent).
+
+## 2026-09-19 ET — APPROVE TG-D / TG-E GATE READY
+
+Lead **`APPROVE TG-D`**, 2026-09-19 ET. Dry-run prove accepted ([TG_D_PROVE.md](../Docs/handoffs/TG_D_PROVE.md)); queue entry resolved. Docs/28 still **ACTIVE** — [TG_E_CLOSE.md](../Docs/handoffs/TG_E_CLOSE.md) **GATE READY**. PENDING Lead **`APPROVE TG-E`** to close. Next product track still TBD (no invent).
+
+## 2026-09-19 ET — Docs/28 Taste Gates ACTIVE (TG-A…D)
+
+Lead unlocked Taste Gates research + implement-plan. Filed [28_TASTE_GATES.md](../Docs/28_TASTE_GATES.md) (research digest + strategy). Spike: skill `taste-gate`, [taste-gates.md](../docs/human-use/taste-gates.md), rule pointer in 07-ai-agent-behavior. Dry-run prove [TG_D_PROVE.md](../Docs/handoffs/TG_D_PROVE.md) + `Saved/taste_gates_pending.json`. PHASE_BOARD **ACTIVE**; PENDING Lead **`APPROVE TG-D`** then **`APPROVE TG-E`** to close. Park note superseded — track unparked to ACTIVE.
+
+## 2026-09-19 ET — APPROVE NF2-E / Docs/27 CLOSED
+
+Lead **`APPROVE NF2-E`**, 2026-09-19 ET. Docs/27 Night Feel Build **CLOSED / COMPLETE** (NF2-A…E). Soft form-swap glow + night lookdev shipped; sound assets deferred. PHASE_BOARD: next = **Taste Gates** harness research (parked) or Lead-named track.
+
+
+## 2026-09-19 ET — APPROVE NF2-D
+
+Lead **`APPROVE NF2-D`**, 2026-09-19 ET. Sound/particle assign deferred (glow-only). **NF2-E OPEN** — [NF2_E_CLOSE.md](../Docs/handoffs/NF2_E_CLOSE.md). PENDING Lead **`APPROVE NF2-E`** to close Docs/27 → Taste Gates research.
+
+
+## 2026-09-19 ET — APPROVE NF2-C
+
+Lead **`APPROVE NF2-C`**, 2026-09-19 ET. AD still review **CLOSED**. **NF2-D OPEN** — optional SoftFormSwapSound/particle assign ([NF2_D_SOUND_POLISH.md](../Docs/handoffs/NF2_D_SOUND_POLISH.md)).
+
+
+## 2026-09-19 ET — APPROVE NF2-B
+
+Lead **`APPROVE NF2-B`**, 2026-09-19 ET. Night lookdev **CLOSED** (partial PNG pack accepted). **NF2-C OPEN** — AD still review [NF2_C_AD_STILLS.md](../Docs/handoffs/NF2_C_AD_STILLS.md).
+
+
+## 2026-09-19 ET — NF2-B implement GATE READY
+
+Night lookdev Cmd batch: VS_MVP load, MegaLights/Fog SSS, cameras bound 1/2/5; `shot5_spirit.png` on disk; shot1/2 PNG gap logged. Handoff [NF2_B_NIGHT_LOOKDEV.md](../Docs/handoffs/NF2_B_NIGHT_LOOKDEV.md). PENDING Lead **`APPROVE NF2-B`**.
+
+
+## 2026-09-19 ET — APPROVE NF2-A
+
+Lead **`APPROVE NF2-A`**, 2026-09-19 ET. Soft form-swap feedback **CLOSED**. **NF2-B OPEN** (night lookdev + Shot 1/2/5 evidence). PHASE_BOARD Docs/27 ACTIVE.
+
+
+## 2026-09-19 ET — PARKED: Taste Gates (post-Docs/27 research)
+
+~~Parked~~ → **ACTIVE** 2026-09-19 — see Docs/28 block above. Original vision: harness detects taste limits and queries the human. Ground in [OWNERSHIP.md](../docs/human-use/OWNERSHIP.md).
+
+
+## 2026-09-19 ET — Docs/27 Night Feel Build ACTIVE (NF2-A)
+
+Lead asked to proceed with a new phase track. Filed [27_NIGHT_FEEL_BUILD.md](../Docs/27_NIGHT_FEEL_BUILD.md) (NF2-A…E) from Docs/26 taste canon. NF2-A: soft form-swap glow + `NF2:` logs in `HomeWorldCharacter`; handoff [NF2_A_FORM_SWAP.md](../Docs/handoffs/NF2_A_FORM_SWAP.md). PHASE_BOARD **ACTIVE**. PENDING Safe-Build + DESKTOP PIE greps → Lead **`APPROVE NF2-A`**.
+
+
+## 2026-09-19 ET — APPROVE NF-A / Docs/26 CLOSED
+
+Lead **`APPROVE NF-A`**, 2026-09-19 ET. Docs/26 Night Feel **CLOSED / COMPLETE**. Taste targets remain canon; VNP/WTR night evidence accepted as baseline; soft dusk/dawn VFX+audio sting backlog for explicit implement ask. PHASE_BOARD: next product track TBD.
+
+
+## 2026-09-19 ET — Docs/26 Night Feel taste gate
+
+Taste interview complete: night lookdev + “safe home above a living world” + dusk/dawn NightMix + soft VFX/audio; thin slice **NF-A**. Track **Docs/26 Night Feel** — [26_TASTE_NEXT.md](../Docs/26_TASTE_NEXT.md). PHASE_BOARD **OPEN**. PENDING implement + Lead **`APPROVE NF-A`**.
+
+
 ## 2026-09-19 ET — Docs/25 WTR implement (A–E)
 
 Workspace & Tooling Refine on `feat/ue58-workspace-tooling`: Docs/25 matrix; [U58F_F](../Docs/handoffs/U58F_F_MCP_DECISION.md) Epic vs UnrealMCP capability matrix (**keep UnrealMCP**); pine `.uasset` via Cmd batch; evidence binds `CAM_Hero`/`CAM_CabinClose`/`CAM_PortalNight`; keep_alive pattern; PCG introspect 5.8 refresh; PVE/Mesh CVars notes; [UE58_TECH](../docs/UE/UE58_TECH.md) DESKTOP stability playbook. PHASE_BOARD WTR **CLOSING**.

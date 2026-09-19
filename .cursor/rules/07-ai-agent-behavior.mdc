@@ -172,6 +172,7 @@ Before any MCP call:
 
 ## AI Agent Checklist
 
+- [ ] **Taste Gates** — on a taste limit (vision/map/patterns/next-track invent), load `.cursor/skills/taste-gate/SKILL.md`; emit OWNERSHIP alert; queue; stop — do not invent ([docs/human-use/taste-gates.md](../../docs/human-use/taste-gates.md), Docs/28)
 - [ ] **Swarm driver** — post-audit work uses Conductor + SWARM_OPS; do not run deleted `Start-AllAgents*` / `run_automation_cycle.py` (see Automation driver section)
 - [ ] **Tasks complete alert** — if `Saved/Logs/automation_tasks_complete.md` exists, prepend a prominent "All tasks complete; generate a new task list" note (see Session Continuity)
 - [ ] **Automation exit alert** — if `Saved/Logs/automation_exit_alert.md` exists, read it and prepend a short summary so the user is informed automatically (see Session Continuity)

@@ -141,7 +141,13 @@ Findings from deep research are recorded in [docs/GAP_SOLUTIONS_RESEARCH.md](GAP
 - **2026-03-09 | Seventieth list (Deferred features) T8 docs and cycle:** Seventieth list T1–T8 completed; T8 = this update. Vertical slice §4 seventieth deliverables confirmed (T6); CONSOLE_COMMANDS and VERTICAL_SLICE_CHECKLIST §3 reflect current state (List 70 Deferred features: T1–T5 outcomes — agentic Path 2 deferred, SaveGame/role persistence, boss reward, bed actor, spirit roster visibility; CONSOLE_COMMANDS § T7 Deferred-phase outcomes). Cycle note in [KNOWN_ERRORS.md](KNOWN_ERRORS.md). No new gaps this cycle. Next: T9 (verification), T10 (buffer); after List 70: Act 2 prep, Steam EA prep, or add assets per [HOW_TO_GENERATE_TASK_LIST.md](docs/workflow/HOW_TO_GENERATE_TASK_LIST.md).
 - **2026-03-08 | Sixty-eighth list (MVP 100 Phase 3 — Demo sign-off) T6 cycle note:** Sixty-eighth list (MVP 100 Phase 3: Demo sign-off) T1–T5 completed: T1 Phase 3.1 moment (Claim homestead) and corner (Homestead compound) confirmed in [VERTICAL_SLICE_CHECKLIST §3](workflow/VERTICAL_SLICE_CHECKLIST.md); T2 Phase 3.2 demo sign-off documented (slice ready to show; optional 1–3 min recording deferred); T3 Phase 3 documentation consolidation (outcomes in VERTICAL_SLICE_CHECKLIST §3, gate note in MVP_100_PHASED_APPROACH); T4 buffer prep (Phase 4 = 100% MVP asset-ready gate); T5 VERTICAL_SLICE_CHECKLIST §4 sixty-eighth deliverables. **No new gaps** from this cycle. Gap 1 (LevelToOpen) and Gap 2 (State Tree Defend/Night) status unchanged — see **Addressed** above and §Gap 1 / §Gap 2. **Next:** T7 (CONSOLE_COMMANDS/checklist — Phase 3 alignment); T8–T10. **After List 68:** Phase 4 (100% MVP asset-ready gate) per [MVP_100_PHASED_APPROACH.md](workflow/MVP_100_PHASED_APPROACH.md); run `.\Tools\Start-AllAgents-InNewWindow.ps1` when ready for next list.
 
-### Gap VNP-P3: UE OBJ→StaticMesh import while Editor/MCP down (2026-09-19)
+### Gap NF2-B: UnrealEditor-Cmd HighResShot misses shot1/shot2 PNGs (2026-09-19)
+- **Feature:** NF2-B Shot 1/2/5 stills under `Saved/VNP_Evidence/`
+- **Needed:** All three PNGs after `nf2_b_night_lookdev_evidence.py`
+- **Why blocked:** Cmd batch binds `CAM_Hero`/`CAM_CabinClose`/`CAM_PortalNight` and runs AutomationLibrary+HighResShot; only `shot5_spirit.png` materializes on disk (shots 1–2 missing after wait)
+- **Approach:** Re-run under live Editor+MCP with viewport focus; or GUI capture refs; copy from `Saved/Screenshots` when named; keep_alive longer / ScreenshotComparison Tool
+- **Partial evidence:** cameras_bound=true; MegaLights/Fog SSS/night phase set; `Saved/nf2_b_night_lookdev_evidence.json`
+
 - **Feature:** VNP-P3 allowlisted pine uasset after AD APPROVE
 - **Needed:** Run `vnp_p3_pine_import.py` with Editor+MCP; AssetImportTask for SM_Pine_Stylized_VNP.obj
 - **Why blocked:** UnrealEditor connection closed mid-session (WinError 10054)

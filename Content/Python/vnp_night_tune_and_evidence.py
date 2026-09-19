@@ -206,27 +206,62 @@ def main() -> None:
                 )
             except Exception as e:
                 unreal.log_warning("VNP: set camera failed %s: %s" % (_actor_label(cam), e))
+        # Relative filename under Saved/ — absolute paths often fail under UnrealEditor-Cmd
+        fname_only = fname
+        methods = []
         try:
-            unreal.AutomationLibrary.take_high_res_screenshot(1600, 900, abs_path)
-            entry = {
-                "shot": shot_id,
-                "path": abs_path,
-                "camera": _actor_label(cam) if cam else "viewport",
-                "bound": bool(cam),
-            }
+            if cam:
+                try:
+                    unreal.EditorLevelLibrary.pilot_level_actor(cam)
+                except Exception:
+                    pass
+            unreal.AutomationLibrary.take_high_res_screenshot(1600, 900, fname_only, cam if cam else None)
+            methods.append("AutomationLibrary_rel")
         except Exception as e:
-            entry = {
-                "shot": shot_id,
-                "path": abs_path,
-                "error": str(e),
-                "camera": _actor_label(cam) if cam else "viewport",
-                "bound": bool(cam),
-            }
+            methods.append("AutomationLibrary_fail:%s" % e)
+        try:
+            world = unreal.EditorLevelLibrary.get_editor_world()
+            rel = "Saved/VNP_Evidence/" + fname
+            unreal.SystemLibrary.execute_console_command(
+                world,
+                'HighResShot 1600x900 filename="%s"' % rel.replace("\\", "/"),
+            )
+            methods.append("HighResShot")
+        except Exception as e2:
+            methods.append("HighResShot_fail:%s" % e2)
+        time.sleep(1.5)
+        # Resolve: prefer explicit path; else newest matching under Saved/Screenshots
+        if not os.path.isfile(abs_path):
+            screens_root = unreal.Paths.project_saved_dir() + "Screenshots"
+            candidates = []
+            if os.path.isdir(screens_root):
+                for root, _dirs, files in os.walk(screens_root):
+                    for f in files:
+                        if f.lower().endswith(".png") and (shot_id in f.lower() or f.lower() == fname.lower()):
+                            candidates.append(os.path.join(root, f))
+            if candidates:
+                candidates.sort(key=lambda p: os.path.getmtime(p), reverse=True)
+                try:
+                    import shutil
+
+                    shutil.copy2(candidates[0], abs_path)
+                    methods.append("copied_from_Screenshots")
+                except Exception as ce:
+                    methods.append("copy_fail:%s" % ce)
+        entry = {
+            "shot": shot_id,
+            "path": abs_path,
+            "camera": _actor_label(cam) if cam else "viewport",
+            "bound": bool(cam),
+            "methods": methods,
+            "file_exists": os.path.isfile(abs_path),
+        }
+        if not os.path.isfile(abs_path):
+            entry["note"] = "png missing after AutomationLibrary+HighResShot"
         cmp = _compare_to_golden(shot_id, abs_path)
         if cmp:
             entry["golden_compare"] = cmp
         evidence.append(entry)
-        time.sleep(0.3)
 
     world = unreal.EditorLevelLibrary.get_editor_world()
     level_name = world.get_name() if world else "unknown"
