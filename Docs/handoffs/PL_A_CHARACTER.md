@@ -10,12 +10,12 @@
 
 ## Summary
 
-Replace VP-B mesh-only interim with Lead-accepted Epic UE 5.7 Mannequin substitute:
+Replace VP-B mesh-only interim with Lead-accepted Epic UE 5.8 Mannequin substitute:
 
 | Item | Value |
 |------|-------|
 | **Lead** | **Manny substitute APPROVED** 2026-09-17 ET |
-| **Source (host)** | `UE_5.7\Templates\TemplateResources\High\Characters\Content\Mannequins` |
+| **Source (host)** | `UE_5.8\Templates\TemplateResources\High\Characters\Content\Mannequins` |
 | **DESKTOP dest** | `Content/Characters/Mannequins/` (**local only** — **no `.uasset` commits**) |
 | **Skeletal mesh** | `/Game/Characters/Mannequins/Meshes/SKM_Manny_Simple` |
 | **Anim BP** | `/Game/Characters/Mannequins/Anims/Unarmed/ABP_Unarmed` |

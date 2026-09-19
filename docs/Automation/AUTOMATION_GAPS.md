@@ -12,11 +12,7 @@ When the agent cannot automate a step (MCP, Python, GUI automation, commandlets)
 
 ---
 
-(Entries appended below by the agent when a step cannot be automated.)
-
----
-
-2026-03-03 | Day 16 / T3 — DemoMap level streaming or trigger to planetoid | DemoMap needs Level Streaming Volume referencing planetoid level, or a Blueprint trigger at the portal placeholder that on overlap calls Open Level (Planetoid_Pride) so the player can travel to the planetoid. | No MCP or Python API used in-session for adding Level Streaming Volumes or wiring Blueprint overlap → Open Level. Scripts place the portal placeholder (ensure_demo_portal.py) and set up planetoid PCG (setup_planetoid_pcg.py). | GUI automation: capture ref images for Level Editor (Add Level Streaming Volume, set level reference) or Blueprint (trigger volume + Open Level node); or research UE 5.7 LevelEditorSubsystem / LevelStreaming Python API for adding streaming volumes programmatically.
+2026-09-19 | Docs/22 U58-D — UE 5.8 automation access re-check | Re-verified on DESKTOP-21CT3H0 after first open (shader compile ~9m then MCP Listen on 55557). UnrealMCP DLL rebuilt with Safe-Build; `execute_python_script` + RS placement scripts OK. **Note:** `EditorLevelLibrary.get_all_level_actors` emits DeprecationWarning on 5.8 — migrate scripts to Editor Actor Utilities Subsystem in a follow-up (not blocking). No new PCG no-access regressions observed this session. | First-open shader compile delayed MCP; not a permanent gap. | Research log — addressed for U58 smoke; deprecation migration optional.
 
 2026-03-03 | T4 / Day 11–12 — State Tree Night? branch and Defend behavior | ST_FamilyGatherer needs a first-priority Night? branch (condition: IsNight from blackboard), Defend task (e.g. MoveTo rally/enemy), and IsNight set from TimeOfDaySubsystem. PIE with hw.TimeOfDay.Phase 2 should validate Defend. | No MCP or Python API for editing State Tree graph (add Selector children, conditions, tasks, blackboard). create_state_tree_family_gatherer.py creates an empty asset only; 09-mcp-workflow notes AnimGraph visual graph API not exposed; State Tree is analogous. | Research UE 5.7 State Tree Python/Editor API for adding nodes and blackboard keys; or GUI automation (ref images for State Tree editor: add branch, set condition, add task). See DAY12_ROLE_PROTECTOR.md, FAMILY_AGENTS_MASS_STATETREE.md.
 

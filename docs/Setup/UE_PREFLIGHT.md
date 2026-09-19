@@ -95,7 +95,7 @@ Lead policy **`HS-E POLICY KEEP-LOCAL`** (2026-09-17 ET): character mesh/ABP sta
 
 | Code | Meaning |
 |------|---------|
-| `MANNEQUINS_DIR_MISSING` | `Content/Characters/Mannequins` directory absent — copy from Epic UE 5.7 `Templates\TemplateResources\High\Characters\Content\Mannequins` |
+| `MANNEQUINS_DIR_MISSING` | `Content/Characters/Mannequins` directory absent — copy from Epic UE 5.8 `Templates\TemplateResources\High\Characters\Content\Mannequins` |
 | `ASSET_MISSING_ON_DISK` | Config mesh/ABP `.uasset` not under `Content/` |
 
 **Setup runbook:** [Docs/17e_HS_CONTENT_BOOTSTRAP.md](../../Docs/17e_HS_CONTENT_BOOTSTRAP.md) · DESKTOP checklist: [Docs/handoffs/HS_E_CONTENT_BOOTSTRAP.md](../../Docs/handoffs/HS_E_CONTENT_BOOTSTRAP.md).

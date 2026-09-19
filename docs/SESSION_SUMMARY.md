@@ -1,3 +1,43 @@
+## 2026-09-19 ET — APPROVE RS-E / Docs/21 CLOSED
+
+Lead **`APPROVE RS-E`**, 2026-09-19 ET. Docs/21 Reap & Sow **CLOSED / COMPLETE** (RS-A…E). Special cross-bonus + `hw.RS.*` accepted. PHASE_BOARD: no active product phase — next track TBD (Lead gate). Do not reopen RS/VP2/D19.
+
+
+## 2026-09-19 ET — RS-E implement (GATE READY)
+
+RS-E special cross-bonus filed: [place_vs_mvp_rs_special_site.py](../Content/Python/place_vs_mvp_rs_special_site.py), PlayerState RS flags + `hw.RS.CollectDayBonus` / `CollectNightBonus` / `CrossBonusStatus`, [RS_E_SPECIAL.md](../Docs/handoffs/RS_E_SPECIAL.md). PHASE_BOARD **RS-E GATE READY** — PENDING Lead **`APPROVE RS-E`** (closes Docs/21).
+
+
+## 2026-09-19 ET — APPROVE RS-D
+
+Lead **`APPROVE RS-D`**, 2026-09-19 ET. Filed [place_vs_mvp_rs_humanoid_camp.py](../Content/Python/place_vs_mvp_rs_humanoid_camp.py) + [RS_D_HUMANOID_CAMP.md](../Docs/handoffs/RS_D_HUMANOID_CAMP.md) (`GP_RS_HumanoidCamp` / `_Dream` / `_Collect`). MCP offline — DESKTOP PIE deferred accept. **RS-E OPEN** (special cross-bonus; closes Docs/21 on **`APPROVE RS-E`**).
+
+
+## 2026-09-19 ET — APPROVE RS-C
+
+Lead **`APPROVE RS-C`**, 2026-09-19 ET. Filed [place_vs_mvp_rs_animal_den.py](../Content/Python/place_vs_mvp_rs_animal_den.py) + [RS_C_ANIMAL_DEN.md](../Docs/handoffs/RS_C_ANIMAL_DEN.md) (`GP_RS_AnimalDen` BeastPad + `GP_RS_AnimalDen_Dream` stub). MCP offline — DESKTOP PIE deferred accept. **RS-D OPEN** (humanoid camp).
+
+
+## 2026-09-19 ET — APPROVE RS-B
+
+Lead **`APPROVE RS-B`**, 2026-09-19 ET. Filed [place_vs_mvp_rs_material_sites.py](../Content/Python/place_vs_mvp_rs_material_sites.py) + [RS_B_MATERIALS.md](../Docs/handoffs/RS_B_MATERIALS.md) (`GP_RS_Tree/Rock/Flower` day piles + sow TargetPoints). Editor MCP offline — DESKTOP PIE deferred accept. **RS-C OPEN** (animal den).
+
+
+## 2026-09-19 ET — APPROVE RS-A
+
+Lead **`APPROVE RS-A`**, 2026-09-19 ET. Canon stamp **CLOSED**. **RS-B OPEN** (material triad: trees / rocks / flowers on VS_MVP path). PHASE_BOARD + Docs/21 updated. Next: implement RS-B then **`APPROVE RS-B`**.
+
+
+## 2026-09-19 ET — APPROVE RS STRATEGY + RS-A canon filed
+
+Lead **`APPROVE RS STRATEGY`**, 2026-09-19 ET. [Docs/21_REAP_SOW.md](../Docs/21_REAP_SOW.md) strategy **APPROVED**. **RS-A** canon stamp filed: [Docs/01_GDD_MVP.md](../Docs/01_GDD_MVP.md) fantasy + §3.1 site kit + dream combat; VisionBoard day/night product pointer. PHASE_BOARD **RS-A GATE READY** — PENDING Lead **`APPROVE RS-A`** (unlocks RS-B). No C++/Content.
+
+
+## 2026-09-19 ET — Docs/21 Reap & Sow strategy DRAFT
+
+Filed [Docs/21_REAP_SOW.md](../Docs/21_REAP_SOW.md): day = reap/collect, night = sow/nurture; astral combat = dream battles → heal/recruit; planet sites (trees, rocks, flowers, animal den, humanoid camp, special cross-bonus). Phases **RS-A…E** locked. PHASE_BOARD + Docs/README wired. **PENDING Lead `APPROVE RS STRATEGY`** — do not start RS-A until gate. No C++/Content this session.
+
+
 ## 2026-09-18 ET — Merge outstanding work into main + prune branches
 
 Lead: merge all outstanding work into **main** and remove feature branches. PR #109 merged (VS_MVP markers). Allowlist extended (Docs/20 + `config/uasset-allowlist.json` + `.gitattributes`) for Meshes/Materials/Biomes/Harvestables/Dungeon + GA_Dodge/PrimaryAttack + khronos_box_scale_ref; committed + pushed (`bb8ce21`). **Mannequins** remain KEEP-LOCAL. Local feature branches deleted; **39** remote `cursor/*` / `docs/*` / content branches deleted. Repo branches: **main** only.
@@ -428,13 +468,23 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 - D19-B: `hw.Gather.Seed` console cheat → `RES_SEED` (mirrors Ore/Flowers).
 - D19-C: `evidence-grep.js --success-path` + tests green (`npm run evidence:grep:test`).
 
-### 2026-09-17 — Docs/19 CLOSED (Lead APPROVE D19)
+### 2026-09-19 — Docs/19 CLOSED (Lead APPROVE D19)
 
 - Lead **`APPROVE D19`** 2026-09-17 ET — D19-A/B/C after DESKTOP prove (PR #107).
 - D19-A: `GP_Gather_*` spawn; `GATHER: RES_WOOD +1` / `harvest ok`; `HomeWorldResourcePile` non-Abstract.
 - D19-B: `hw.Gather.Seed` → `GATHER: RES_SEED +N`.
 - D19-C: `evidence-grep --success-path` PASS; Safe-Build ASCII/single-quote fixes on branch.
 - Docs: [19_THIN_PLAYABILITY.md](../Docs/19_THIN_PLAYABILITY.md) **CLOSED / COMPLETE**; [PHASE_BOARD.md](../swarm/PHASE_BOARD.md) → no active product phase.
+
+### 2026-09-19 — Docs/22 UE 5.8 Upgrade CLOSED
+
+- Lead unlocked via upgrade plan implement; branch `chore/ue-5.8-upgrade`.
+- U58-A: `EngineAssociation` **5.8**; AGENTS / STACK_PLAN / rules lock → 5.8.
+- U58-B: Tools/CI/docs defaults `UE_5.7`→`UE_5.8`; runner label **`ue58`**.
+- U58-C: Safe-Build green; removed **MassEntity** from `.uproject` (absent in Launcher 5.8); KNOWN_ERRORS entry.
+- U58-D: UnrealMCP rebuilt; MCP port 55557 after ~9m first-open shader compile.
+- U58-E: VS_MVP open + RS placement scripts; `hw.RS.CollectDayBonus` / `CrossBonusStatus` / `CollectNightBonus` LogTemp PASS.
+- U58-F: [UE58_TECH.md](UE/UE58_TECH.md), `ue58-sources.mdc`, `ue58-api-check` skill; track **CLOSED**.
 
 ---
 

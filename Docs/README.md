@@ -7,7 +7,7 @@ This directory is **Blender-first MVP swarm canon**: GDD slices, art bible, mate
 | Path | Purpose |
 |------|---------|
 | **`Docs/`** (this tree) | MVP swarm operating system — canon, handoffs, shot list, kit-facing specs linked from `Lib/` |
-| **`docs/`** (lowercase) | Unreal Engine 5.7 project documentation — setup, automation, PCG, task lists, known errors |
+| **`docs/`** (lowercase) | Unreal Engine 5.8 project documentation — setup, automation, PCG, task lists, known errors |
 
 These are **intentionally separate**. On case-insensitive filesystems (macOS/Windows defaults), Git may only check out one of the two names locally — clone on Linux CI or use a case-sensitive volume if you need both trees simultaneously.
 
@@ -52,6 +52,8 @@ These are **intentionally separate**. On case-insensitive filesystems (macOS/Win
 | [17d_HS_EVIDENCE.md](17d_HS_EVIDENCE.md) | HS-D evidence & re-verify | **CLOSED** |
 | [17e_HS_CONTENT_BOOTSTRAP.md](17e_HS_CONTENT_BOOTSTRAP.md) | HS-E character / bootstrap canon — policy **KEEP-LOCAL** | **CLOSED** |
 | [20_UASSET_AI_POLICY.md](20_UASSET_AI_POLICY.md) | UASSET allowlist + AI asset provenance | **APPROVED / COMPLETE** — Lead **`APPROVE UASSET POLICY`**, 2026-09-17 ET |
+| [21_REAP_SOW.md](21_REAP_SOW.md) | Reap & Sow (day reap / night sow / dream combat / planet sites) | **CLOSED / COMPLETE** — Lead **`APPROVE RS-E`**, 2026-09-19 ET |
+| [22_UE58_UPGRADE.md](22_UE58_UPGRADE.md) | UE 5.8 Upgrade (U58) — EngineAssociation + tooling cutover | **CLOSED / COMPLETE** — 2026-09-19 ET |
 | [17_HS_AUDIT_SIGN_OFF.md](17_HS_AUDIT_SIGN_OFF.md) | HS-F sign-off & re-grade | **IN PROGRESS** (PENDING **`SIGN OFF HS AUDIT`**) |
 - **HR3-C branch protection (PENDING LEAD APPLY):** [15c_HR3_C_BRANCH_PROTECTION.md](15c_HR3_C_BRANCH_PROTECTION.md) — Lead checklist in [docs/Setup/CI_SETUP.md](../docs/Setup/CI_SETUP.md); handoff [handoffs/HR3_C_BRANCH_PROTECTION.md](handoffs/HR3_C_BRANCH_PROTECTION.md)
 - **Start swarm:** [../START_HERE.md](../START_HERE.md)

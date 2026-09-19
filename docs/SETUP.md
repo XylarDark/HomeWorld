@@ -7,7 +7,7 @@ This guide walks you through setting up the project so you can open the Editor, 
 ## What you need before starting
 
 - **Windows** (project is developed on Windows).
-- **Unreal Engine 5.7** (or 5.4+; 5.7 recommended). Install from Epic Games Launcher.
+- **Unreal Engine 5.8** (or 5.4+; 5.7 recommended). Install from Epic Games Launcher.
 - **HomeWorld repo** cloned locally (e.g. `git clone` and open the folder).
 
 For a **pinned toolchain matrix** (Visual Studio workloads, Git LFS, Python, `UE_EDITOR`, C++ IntelliSense options, and Cursor plugin decisions), see [Setup/DEV_ENV_MATRIX.md](Setup/DEV_ENV_MATRIX.md).
@@ -18,7 +18,7 @@ For a **pinned toolchain matrix** (Visual Studio workloads, Git LFS, Python, `UE
 
 ### Step 1: Install the engine and open the project
 
-1. Install **Unreal Engine 5.7** from the Epic Games Launcher. The project targets UE 5.7 and is compatible with 5.7.x (including 5.7.3). The project is developed code-first; see [CONVENTIONS.md](CONVENTIONS.md) for conventions.
+1. Install **Unreal Engine 5.8** from the Epic Games Launcher. The project targets UE 5.8 and is compatible with 5.7.x (including 5.7.3). The project is developed code-first; see [CONVENTIONS.md](CONVENTIONS.md) for conventions.
 2. Open **`HomeWorld.uproject`** (double-click or from the Launcher). Allow first-time load and compile.
 
 ### Step 2: Confirm plugins are enabled
@@ -26,7 +26,7 @@ For a **pinned toolchain matrix** (Visual Studio workloads, Git LFS, Python, `UE
 In the Editor, go to **Edit → Plugins** and confirm these are enabled (they are listed in the .uproject):
    - **PCG**, **Gameplay Abilities**, **Enhanced Input**, **Day Night Sequencer**, **Steam Sockets** (replaces SteamCore for co-op).
    **Restart the Editor** after enabling any new plugins.  
-   For **Week 2 family agents**, also enable the UE 5.7 Mass + State Tree stack (see [Week 2 plugins](#week-2-plugins-mass--state-trees) below).
+   For **Week 2 family agents**, also enable the UE 5.8 Mass + State Tree stack (see [Week 2 plugins](#week-2-plugins-mass--state-trees) below).
 
 ### Step 3: (Optional) Add free assets
 
@@ -56,7 +56,7 @@ The repo ships a `.cursor/rules/` directory; open the project in Cursor and the 
 
 After setup, follow [workflow/README.md](workflow/README.md) and [workflow/30_DAY_SCHEDULE.md](workflow/30_DAY_SCHEDULE.md) for current tasks.
 
-**CI (optional):** For full build and automation tests in GitHub Actions, use a self-hosted Windows runner with UE 5.7. See [Setup/CI_SETUP.md](Setup/CI_SETUP.md). The [validate.yml](../.github/workflows/validate.yml) workflow runs on every push (lint, docs, C++ pairing) without needing the Editor.
+**CI (optional):** For full build and automation tests in GitHub Actions, use a self-hosted Windows runner with UE 5.8. See [Setup/CI_SETUP.md](Setup/CI_SETUP.md). The [validate.yml](../.github/workflows/validate.yml) workflow runs on every push (lint, docs, C++ pairing) without needing the Editor.
 
 ---
 
@@ -72,7 +72,7 @@ All required plugins are enabled in `HomeWorld.uproject`. No Marketplace install
 | Enhanced Input | `EnhancedInput` | Better controls |
 | Day Night Sequencer (UE5.5+) | `DaySequence` | Day/night cycles |
 
-**Week 2 plugins (Mass + State Trees):** For autonomous family agents (Week 2+), enable UE 5.7 recommended: **MassEntity**, **MassGameplay**, **MassAI**, **MassNavigation**, **MassRepresentation**, **StateTree**, **ZoneGraph**, **SmartObjects**. Restart the Editor after enabling. Validation: Plugins tab shows Mass / StateTree / ZoneGraph / SmartObjects enabled. See [FAMILY_AGENTS_MASS_STATETREE.md](tasks/FAMILY_AGENTS_MASS_STATETREE.md).
+**Week 2 plugins (Mass + State Trees):** For autonomous family agents (Week 2+), enable UE 5.8 recommended: **MassEntity**, **MassGameplay**, **MassAI**, **MassNavigation**, **MassRepresentation**, **StateTree**, **ZoneGraph**, **SmartObjects**. Restart the Editor after enabling. Validation: Plugins tab shows Mass / StateTree / ZoneGraph / SmartObjects enabled. See [FAMILY_AGENTS_MASS_STATETREE.md](tasks/FAMILY_AGENTS_MASS_STATETREE.md).
 
 **Python/PCG scripts:** For the demo map and PCG forest scripts, **PythonScriptPlugin** and **PCGPythonInterop** must also be enabled. Restart the Editor after first enable.
 
@@ -155,7 +155,7 @@ The project has a C++ game module (`Source/HomeWorld/`). To build from an IDE or
 
 1. **Generate project files:** Right-click `HomeWorld.uproject` in Explorer and choose **Generate Visual Studio project files**, or run the Engine’s `Build.bat` with `-projectfiles -project="path/to/HomeWorld.uproject" -game -rocket -progress` (path to `HomeWorld.uproject` in the project root). This produces the `.sln` and project files next to the `.uproject`.
 2. **Build:**
-   - **Game only (simplest):** Run **`Build-HomeWorld.bat`** from the project root. Uses the Engine’s Build.bat and bundled .NET; no SDK install needed. The batch file uses a hardcoded UE path (e.g. `C:\Program Files\Epic Games\UE_5.7\...`); edit it if your engine is installed elsewhere.
+   - **Game only (simplest):** Run **`Build-HomeWorld.bat`** from the project root. Uses the Engine’s Build.bat and bundled .NET; no SDK install needed. The batch file uses a hardcoded UE path (e.g. `C:\Program Files\Epic Games\UE_5.8\...`); edit it if your engine is installed elsewhere.
    - **Full solution from command line:** Run **`Build-Solution-WithBundledDotNet.bat`** to build the whole solution (C++ + C#) using the Engine’s bundled .NET 8 SDK—no system .NET install required.
    - **Full solution in Visual Studio:** Run **`Open-HomeWorld-In-VS.bat`** to open the solution with `DOTNET_ROOT` set to the Engine’s bundled .NET 8 SDK; then build in VS as usual (no system .NET install needed). Optional: to open the .sln without the launcher, install the [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) and add it to PATH so the solution builds cleanly.
 3. **Run:** Launch the editor via the `.uproject` (double-click or from IDE). PIE (Play In Editor) uses the built game module.
@@ -184,13 +184,13 @@ If you add or remove C++ files, regenerate project files so the solution stays i
 
 ## Packaging (shipping build)
 
-For Steam Early Access or distribution you need a **packaged** (cooked + staged) build. Use either the Editor or command line. **Source:** [Sharing and Releasing Projects (UE 5.7)](https://dev.epicgames.com/documentation/en-us/unreal-engine/sharing-and-releasing-projects-for-unreal-engine); [Packaging Projects for Windows](https://dev.epicgames.com/documentation/en-us/unreal-engine/packaging-unreal-engine-projects-for-windows) (verify menu paths in Epic 5.7 docs if your Editor differs).
+For Steam Early Access or distribution you need a **packaged** (cooked + staged) build. Use either the Editor or command line. **Source:** [Sharing and Releasing Projects (UE 5.8)](https://dev.epicgames.com/documentation/en-us/unreal-engine/sharing-and-releasing-projects-for-unreal-engine); [Packaging Projects for Windows](https://dev.epicgames.com/documentation/en-us/unreal-engine/packaging-unreal-engine-projects-for-windows) (verify menu paths in Epic 5.7 docs if your Editor differs).
 
 **Prerequisites:** Close the Editor before command-line packaging. Ensure the project builds (run **`Build-HomeWorld.bat`** or **`.\Tools\Safe-Build.ps1`**).
 
 ### From the Editor
 
-1. Open the project in Unreal Editor (UE 5.7).
+1. Open the project in Unreal Editor (UE 5.8).
 2. **File → Package Project → Windows (64-bit)** (or the target platform).
 3. Choose an output directory (e.g. `Saved/StagedBuilds` or a custom path). Packaging will cook content and produce an executable and content in that folder.
 4. Run the packaged executable from the chosen output to verify.
@@ -199,7 +199,7 @@ For Steam Early Access or distribution you need a **packaged** (cooked + staged)
 
 Use the Engine's **RunUAT** (Unreal Automation Tool) to cook and package without the Editor:
 
-- **RunUAT location:** `C:\Program Files\Epic Games\UE_5.7\Engine\Build\BatchFiles\RunUAT.bat` (adjust if UE 5.7 is installed elsewhere).
+- **RunUAT location:** `C:\Program Files\Epic Games\UE_5.8\Engine\Build\BatchFiles\RunUAT.bat` (adjust if UE 5.8 is installed elsewhere).
 - **Example (Windows 64-bit Shipping):** From project root, run **`Package-HomeWorld.bat`** (see project root), or invoke RunUAT manually with BuildCookRun; output under `Saved\StagedBuilds`.
 
 **Validation:** After packaging, launch the game from the staged directory and confirm: level loads, character moves, no missing content. For a Steam store checklist, see [workflow/STEAM_EA_STORE_CHECKLIST.md](workflow/STEAM_EA_STORE_CHECKLIST.md).

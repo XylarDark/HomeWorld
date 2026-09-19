@@ -11,7 +11,7 @@
 | Component | Expected | Notes |
 |-----------|----------|--------|
 | **OS** | Windows 10/11 x64 | Primary dev platform per AGENTS.md |
-| **Unreal Engine** | **5.7.x** only | Install via Epic Launcher; e.g. `C:\Program Files\Epic Games\UE_5.7`. Stay on a **team-agreed 5.7.x patch** (e.g. 5.7.3); do not move to 5.8+ without a project decision. |
+| **Unreal Engine** | **5.8.x** only | Install via Epic Launcher; e.g. `C:\Program Files\Epic Games\UE_5.8`. Stay on a **team-agreed 5.8.x patch**; do not move off 5.8 without a project decision. See [Docs/22](../../Docs/22_UE58_UPGRADE.md). |
 | **Visual Studio** | 2022 (2019 acceptable) | Workload: **Desktop development with C++**. Include **Windows 10/11 SDK** matching UE’s requirements. Same baseline as [CI_SETUP.md](CI_SETUP.md) self-hosted runner. |
 | **Git** | Current | **Git LFS** installed; run `git lfs install` after clone. |
 | **Python (host)** | 3.10+ | Used by `uv` / Unreal MCP server per [MCP_SETUP.md](MCP_SETUP.md). On Windows, use the same `py` / `python` you use for `Content/Python` scripts and automation. |
@@ -29,9 +29,9 @@
 
 | Variable | Required for | Example / note |
 |----------|----------------|----------------|
-| **`UE_EDITOR`** | Automation loop, `run_automation_cycle.py` launch/wait, optional CI tests | Full path to `UnrealEditor.exe`, e.g. `C:\Program Files\Epic Games\UE_5.7\Engine\Binaries\Win64\UnrealEditor.exe`. See [AUTOMATION_READINESS.md](../Automation/AUTOMATION_READINESS.md). |
+| **`UE_EDITOR`** | Automation loop, `run_automation_cycle.py` launch/wait, optional CI tests | Full path to `UnrealEditor.exe`, e.g. `C:\Program Files\Epic Games\UE_5.8\Engine\Binaries\Win64\UnrealEditor.exe`. See [AUTOMATION_READINESS.md](../Automation/AUTOMATION_READINESS.md). |
 | **`CURSOR_API_KEY`** | Headless Cursor Agent CLI | Alternative to `agent login` for scripted runs. |
-| **`UE_ENGINE`** | CI build script default | [ci.yml](../../.github/workflows/ci.yml) defaults to `C:\Program Files\Epic Games\UE_5.7` if unset on the runner. |
+| **`UE_ENGINE`** | CI build script default | [ci.yml](../../.github/workflows/ci.yml) defaults to `C:\Program Files\Epic Games\UE_5.8` if unset on the runner. |
 
 Never use `Test-Path` on `UE_EDITOR` without a null check; see [KNOWN_ERRORS.md](../KNOWN_ERRORS.md).
 

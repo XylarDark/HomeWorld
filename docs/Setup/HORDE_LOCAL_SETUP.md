@@ -4,7 +4,7 @@ Use [Epic Horde](https://dev.epicgames.com/documentation/en-us/unreal-engine/hor
 
 ## 1. Install Horde Server (optional; for local cluster)
 
-- Run **Engine\\Extras\\Horde\\UnrealHordeServer.msi** from your UE 5.7 engine install (e.g. `C:\Program Files\Epic Games\UE_5.7\Engine\Extras\Horde\`).
+- Run **Engine\\Extras\\Horde\\UnrealHordeServer.msi** from your UE 5.8 engine install (e.g. `C:\Program Files\Epic Games\UE_5.8\Engine\Extras\Horde\`).
 - Server listens on HTTP 13340 and 13342. Use the dashboard (e.g. `http://localhost:13340`) to manage agents and jobs.
 - For production, configure **Server.json** and host MongoDB/Redis separately (see [Horde Server for Unreal Engine](https://dev.epicgames.com/documentation/en-us/unreal-engine/horde-server-for-unreal-engine)).
 
@@ -30,6 +30,6 @@ Use [Epic Horde](https://dev.epicgames.com/documentation/en-us/unreal-engine/hor
 
 ## References
 
-- [Horde Build Automation (UE 5.7)](https://dev.epicgames.com/documentation/en-us/unreal-engine/horde-build-automation-for-unreal-engine)
+- [Horde Build Automation (UE 5.8)](https://dev.epicgames.com/documentation/en-us/unreal-engine/horde-build-automation-for-unreal-engine)
 - [Horde Installation Tutorial](https://dev.epicgames.com/documentation/en-us/unreal-engine/horde-installation-tutorial-for-unreal-engine)
 - [Horde Agents](https://dev.epicgames.com/documentation/en-us/unreal-engine/horde-agents-for-unreal-engine)

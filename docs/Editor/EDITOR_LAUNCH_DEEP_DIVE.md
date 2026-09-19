@@ -45,7 +45,7 @@ To see why the Editor exited, capture its stdout/stderr when launching:
 - **Manual run:** To capture when running the cycle script yourself: `python Content/Python/run_automation_cycle.py --no-build --launch-and-wait --capture-editor-log`. Same log path applies.
 - **Manual test (no script):** From a command prompt, run:
   ```bat
-  "C:\Program Files\Epic Games\UE_5.7\Engine\Binaries\Win64\UnrealEditor.exe" C:\path\to\HomeWorld\HomeWorld.uproject -UNATTENDED
+  "C:\Program Files\Epic Games\UE_5.8\Engine\Binaries\Win64\UnrealEditor.exe" C:\path\to\HomeWorld\HomeWorld.uproject -UNATTENDED
   ```
   (Adjust paths.) Watch the console for the same messages.
 

@@ -1,6 +1,6 @@
 # RunFullBuild.ps1 - Full build via RunUAT BuildGraph or fallback to Build-HomeWorld.bat.
 # Run from project root: .\Tools\RunFullBuild.ps1 [-Clean] [-Platform Win64] [-Test]
-# Requires: UE 5.7 at default path or set $env:UE_ENGINE (e.g. "C:\Program Files\Epic Games\UE_5.7")
+# Requires: UE 5.8 at default path or set $env:UE_ENGINE (e.g. "C:\Program Files\Epic Games\UE_5.8")
 
 param(
     [switch]$Clean,
@@ -12,7 +12,7 @@ $ErrorActionPreference = "Stop"
 $ProjectRoot = $PSScriptRoot + "\.."
 $UProject = Join-Path $ProjectRoot "HomeWorld.uproject"
 $EnginePath = $env:UE_ENGINE
-if (-not $EnginePath) { $EnginePath = "C:\Program Files\Epic Games\UE_5.7" }
+if (-not $EnginePath) { $EnginePath = "C:\Program Files\Epic Games\UE_5.8" }
 $RunUAT = Join-Path $EnginePath "Engine\Build\BatchFiles\RunUAT.bat"
 $BuildGraphScript = Join-Path $ProjectRoot "Tools\BuildGraph.xml"
 

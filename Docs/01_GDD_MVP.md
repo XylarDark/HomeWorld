@@ -1,19 +1,19 @@
 # Docs/01_GDD_MVP.md
 
-## 1. Status: IN PROGRESS (P1)
+## 1. Status: SIGNED slice + Docs/21 Reap & Sow extension
 
-Date: 2026-09-16  
-Owner: DES  
-Inputs (read-only): `Docs/00_CANON.md`, `Docs/00_SHOTLIST.md`  
-Consumers: GP (verbs / transit / day-night), SYS (gather / inventory / tame / heal / nurture)
+Date: 2026-09-16 (slice) · **RS-A canon stamp 2026-09-19**  
+Owner: DES · Conductor (RS-A)  
+Inputs (read-only): `Docs/00_CANON.md`, `Docs/00_SHOTLIST.md`, [21_REAP_SOW.md](21_REAP_SOW.md)  
+Consumers: GP (verbs / transit / day-night), SYS (gather / inventory / tame / heal / nurture / recruit)
 
-This file is the executable design contract for WAVE 1 Track A. GP/SYS implement from tables below; do not open design questions mid-slice.
+This file is the executable design contract for WAVE 1 Track A. GP/SYS implement from tables below; do not open design questions mid-slice. **Product day/night spine** for post-slice work is **Reap & Sow** ([21_REAP_SOW.md](21_REAP_SOW.md)) — day = reap, night = sow, astral = dream combat → heal/recruit.
 
 ---
 
 ## 2. Player fantasy + tone (from canon)
 
-**Fantasy:** You keep a warm floating homestead above a readable pine world. By day (body) you leave the lookout, take a constrained route down, gather six materials, meet one small beast, and come home. By night (spirit) you use shrine portals both ways, heal three wounded spirits, and nurture two homestead targets so home glows with care.
+**Fantasy:** You keep a warm floating homestead above a readable pine world. **By day (body)** you leave the lookout, take a constrained route down, **reap** — gather materials, collect from plants and recruited beings, claim helpers — and come home. **By night (spirit)** you sow and influence: shrine portals both ways, nurture homestead targets, and enter the **dreams** of animals, spirits, and humanoids in **placeholder astral combat** to **heal and recruit** them (convert, do not kill). Items and bonuses from each half make you perform better on the other.
 
 **Tone:** Warm, readable, handmade, hopeful. Not cutesy-infantile. Not grim. Not photoreal. Not sci-fi. (Canon §9.)
 
@@ -23,19 +23,34 @@ This file is the executable design contract for WAVE 1 Track A. GP/SYS implement
 
 | Mode | Form | Where | Core verbs | Transit |
 |---|---|---|---|---|
-| Day | Body | Homestead walk + planet slice | Walk, Glide, Gather, Encounter/Tame, Return/dawn | Constrained glide island → planet (preferred); FALLBACK scripted spline |
-| Night | Spirit | Homestead first, then planet via shrine | Portal both ways, Heal ×3, Nurture ×2, Return/dawn | Shrine portal homestead ↔ planet only. No night flight. |
+| Day | Body | Homestead walk + planet slice | Walk, Glide, **Reap** (Gather / Collect / Claim), Encounter/Tame, Return/dawn | Constrained glide island → planet (preferred); FALLBACK scripted spline |
+| Night | Spirit | Homestead first, then planet via shrine | Portal both ways, **Sow** (Nurture / Influence), **Dream combat** (heal/recruit), Heal ×3, Return/dawn | Shrine portal homestead ↔ planet only. No night flight. |
 
 **Cycle rules (implementable):**
 
-1. **Dawn → Day/Body:** Player is body form on homestead. Spirit layer off / NightMix → 0. Gather nodes and beast pad active.
+1. **Dawn → Day/Body:** Player is body form on homestead. Spirit layer off / NightMix → 0. Gather nodes, material sites, den/camp day interacts, and beast pad active.
 2. **Day departure:** From lookout / glider perch, start Verb 2 (glide or FALLBACK). Land at planet landing circle.
-3. **Day slice:** Walk path 2–4 min; gather; encounter/tame one beast; optional return via Verb 8 (portal if night-armed) or hold until dusk.
-4. **Dusk → Night/Spirit:** At homestead shrine (or on return), form swaps to spirit. NightMix → 1; spirit layer visible; gather/beast interactions idle or blocked.
-5. **Night loop:** Portal homestead ↔ planet (Verb 5); heal three spirits at wound site(s); nurture two homestead targets; return / sleep → dawn (Verb 8).
+3. **Day slice:** Walk path 2–4 min; **reap** at material / living sites; encounter/tame; optional return via Verb 8 (portal if night-armed) or hold until dusk.
+4. **Dusk → Night/Spirit:** At homestead shrine (or on return), form swaps to spirit. NightMix → 1; spirit layer visible; day reap interacts idle or blocked.
+5. **Night loop:** Portal homestead ↔ planet (Verb 5); **sow** (nurture / influence); dream-heal spirits and recruit at den/camp (placeholder); nurture homestead targets; return / sleep → dawn (Verb 8).
 6. **Homestead is hub.** Planet is the same world slice visible from lookout — not a second game.
 
 **Lookout test (WLD gate, design requirement):** From lookout, player can point at landing, portal exit, first harvest, and way home.
+
+### 3.1 Planet site kit (Docs/21 — frozen)
+
+Same dual pattern for materials and living sites. Special site cross-buffs the other half.
+
+| Site | Day (body — reap) | Night (spirit — sow / dream) |
+|------|-------------------|------------------------------|
+| **Trees** | Gather wood / materials | Nurture / spirit-influence for next-day yield |
+| **Rocks** | Mine / collect | Night influence for day reaping |
+| **Flowers** | Gather herbs / fiber / related RES | Nurture / dream-tend for next-day yield or quality |
+| **Animal den** | Collect from / claim helpers after recruitment | Dream-battle → heal → tame / recruit |
+| **Humanoid camp** | Visit / collect from recruited | Dream-battle → heal → recruit |
+| **Special site** | Bonus A (feeds **night**) | Bonus B (feeds **day**) — same landmark |
+
+**Astral / dream combat (product):** Night combat battles the **dreams** of animals, spirits, and humanoids. Win condition = **heal and recruit** (strip sin → loved / allied). **Do not kill.** Deep combat systems remain out of scope until a Lead-gated combat vision pass; RS track uses **placeholder** dream encounters only. Track: [21_REAP_SOW.md](21_REAP_SOW.md).
 
 ---
 

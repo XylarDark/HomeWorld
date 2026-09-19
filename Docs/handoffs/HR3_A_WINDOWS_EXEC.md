@@ -47,7 +47,7 @@ Linux VM — no UE/MCP — unchanged. Never claim Windows Shell.
 |-------|-------|
 | **Hostname** | DESKTOP-21CT3H0 |
 | **machineId** | `929b6d1e-df75-4a84-b73c-a171c6eb877c` |
-| **Self-hosted runner labels** | `self-hosted`, `windows`, `ue57` |
+| **Self-hosted runner labels** | `self-hosted`, `windows`, `ue58` |
 | **MCP port** | TCP **55557** (UnrealMCP) |
 | **Repo path (Windows)** | `C:\dev\HomeWorld\` |
 | **Staging path (CopyFromBox safe)** | `C:\Users\User\HomeWorldStaging\` |

@@ -26,7 +26,7 @@ $BuildLog = Join-Path $ProjectRoot "Build-HomeWorld.log"
 $PackageLog = Join-Path $ProjectRoot "Package-HomeWorld.log"
 
 $UE_ROOT = $env:UE_ROOT
-if (-not $UE_ROOT) { $UE_ROOT = "C:\Program Files\Epic Games\UE_5.7" }
+if (-not $UE_ROOT) { $UE_ROOT = "C:\Program Files\Epic Games\UE_5.8" }
 $BuildBat = Join-Path $UE_ROOT "Engine\Build\BatchFiles\Build.bat"
 if (-not (Test-Path -LiteralPath $BuildBat)) {
     Write-Host "Package-AfterClose: Build.bat not found at $BuildBat. Set UE_ROOT if engine is elsewhere."

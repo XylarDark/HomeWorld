@@ -72,6 +72,22 @@ public:
 	/** Clear day restoration buff (e.g. when advancing to dawn). */
 	void ClearDayRestorationBuff() { SetDayRestorationBuff(false); }
 
+	/** Docs/21 RS-E: day-collected special bonus that buffs the next night. Cleared at dawn. */
+	UFUNCTION(BlueprintCallable, Category = "HomeWorld|RS")
+	bool GetHasRSDayBonusForNight() const { return bHasRSDayBonusForNight; }
+
+	UFUNCTION(BlueprintCallable, Category = "HomeWorld|RS")
+	void SetRSDayBonusForNight(bool bActive);
+
+	/** Docs/21 RS-E: night-collected special bonus that buffs the next day. Cleared at dawn. */
+	UFUNCTION(BlueprintCallable, Category = "HomeWorld|RS")
+	bool GetHasRSNightBonusForDay() const { return bHasRSNightBonusForDay; }
+
+	UFUNCTION(BlueprintCallable, Category = "HomeWorld|RS")
+	void SetRSNightBonusForDay(bool bActive);
+
+	void ClearRSCrossBonuses();
+
 	/** Meals/restoration count this day; shown on HUD as "Restored today: N". Reset at dawn. See DAY_RESTORATION_LOOP.md, T4. */
 	UFUNCTION(BlueprintCallable, Category = "Day Restoration", meta = (DisplayName = "Get Meals Consumed Today"))
 	int32 GetMealsConsumedToday() const { return MealsConsumedToday; }
@@ -191,6 +207,14 @@ private:
 	/** True when player has earned day restoration this day (e.g. consumed meal); cleared at dawn. */
 	UPROPERTY()
 	bool bHasDayRestorationBuff = false;
+
+	/** RS-E: day special-site bonus → feeds night performance. Cleared at dawn. */
+	UPROPERTY()
+	bool bHasRSDayBonusForNight = false;
+
+	/** RS-E: night special-site bonus → feeds day performance. Cleared at dawn. */
+	UPROPERTY()
+	bool bHasRSNightBonusForDay = false;
 
 	/** Number of meals/restorations consumed this day; shown on HUD during day. Reset at dawn. */
 	UPROPERTY()
