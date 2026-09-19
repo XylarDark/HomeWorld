@@ -520,3 +520,11 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 - Added [SWARM_ROUTING_RESEARCH.md](Automation/SWARM_ROUTING_RESEARCH.md); expanded [SWARM_MODE_ROUTING.md](human-use/SWARM_MODE_ROUTING.md) with ModelClass + progressive disclosure.
 - Skill description triggers enriched; AD/QA/Conductor **Preferred model class**; token-efficient-context + SWARM_OPS linked.
 
+### 2026-09-19 — Docs/24 VNP (night / pine / mesh)
+
+- Branch eat/vs-night-pine-mesh; [24_VS_NIGHT_PINE_MESH.md](../Docs/24_VS_NIGHT_PINE_MESH.md).
+- N0–N2: MegaLights/Fog SSS smoke + VS_MVP evidence Saved/VNP_Evidence/.
+- P1–P2: stylized pine OBJ; AD **APPROVE** ([VNP_P2_AD_PINE_VERDICT.md](../Docs/handoffs/VNP_P2_AD_PINE_VERDICT.md)).
+- P3: OBJ staged under Content/HomeWorld/Meshes/Environment/; uasset import pending Editor reconnect.
+- M1–M2: Mesh Terrain sandbox created; no VS_MVP Landscape replace.
+

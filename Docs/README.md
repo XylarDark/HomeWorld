@@ -55,6 +55,7 @@ These are **intentionally separate**. On case-insensitive filesystems (macOS/Win
 | [21_REAP_SOW.md](21_REAP_SOW.md) | Reap & Sow (day reap / night sow / dream combat / planet sites) | **CLOSED / COMPLETE** — Lead **`APPROVE RS-E`**, 2026-09-19 ET |
 | [22_UE58_UPGRADE.md](22_UE58_UPGRADE.md) | UE 5.8 Upgrade (U58) — EngineAssociation + tooling cutover | **CLOSED / COMPLETE** — 2026-09-19 ET |
 | [23_UE58_FEATURE_ADOPTION.md](23_UE58_FEATURE_ADOPTION.md) | UE 5.8 Feature Adoption (U58F) - PCG/PVE/MegaLights/Fog SSS/Lumen Lite | **CLOSED / COMPLETE** - 2026-09-19 ET |
+| [24_VS_NIGHT_PINE_MESH.md](24_VS_NIGHT_PINE_MESH.md) | VS Night / Pine / Mesh (VNP) — MegaLights evidence, PVE pine, Mesh Terrain sandbox | **ACTIVE** — 2026-09-19 ET |
 | [17_HS_AUDIT_SIGN_OFF.md](17_HS_AUDIT_SIGN_OFF.md) | HS-F sign-off & re-grade | **IN PROGRESS** (PENDING **`SIGN OFF HS AUDIT`**) |
 - **HR3-C branch protection (PENDING LEAD APPLY):** [15c_HR3_C_BRANCH_PROTECTION.md](15c_HR3_C_BRANCH_PROTECTION.md) — Lead checklist in [docs/Setup/CI_SETUP.md](../docs/Setup/CI_SETUP.md); handoff [handoffs/HR3_C_BRANCH_PROTECTION.md](handoffs/HR3_C_BRANCH_PROTECTION.md)
 - **Start swarm:** [../START_HERE.md](../START_HERE.md)
