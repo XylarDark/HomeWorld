@@ -60,6 +60,7 @@ These are **intentionally separate**. On case-insensitive filesystems (macOS/Win
 | [26_TASTE_NEXT.md](26_TASTE_NEXT.md) | Night Feel (NF) — taste gate + thin slice dusk/dawn | **CLOSED / COMPLETE** — Lead **`APPROVE NF-A`**, 2026-09-19 ET |
 | [27_NIGHT_FEEL_BUILD.md](27_NIGHT_FEEL_BUILD.md) | Night Feel Build (NF2) — soft dusk/dawn feedback phases | **CLOSED / COMPLETE** — Lead **`APPROVE NF2-E`**, 2026-09-19 ET |
 | [28_TASTE_GATES.md](28_TASTE_GATES.md) | Taste Gates (TG) — detect/queue/resume human taste limits | **CLOSED / COMPLETE** — Lead **`APPROVE TG-E`**, 2026-09-19 ET |
+| [29_TASTE_PROFILER.md](29_TASTE_PROFILER.md) | Taste Profiler (TP) — durable profile + session promote | **CLOSED / COMPLETE** — Lead **`APPROVE TP-E`**, 2026-09-19 ET |
 | [17_HS_AUDIT_SIGN_OFF.md](17_HS_AUDIT_SIGN_OFF.md) | HS-F sign-off & re-grade | **IN PROGRESS** (PENDING **`SIGN OFF HS AUDIT`**) |
 - **HR3-C branch protection (PENDING LEAD APPLY):** [15c_HR3_C_BRANCH_PROTECTION.md](15c_HR3_C_BRANCH_PROTECTION.md) — Lead checklist in [docs/Setup/CI_SETUP.md](../docs/Setup/CI_SETUP.md); handoff [handoffs/HR3_C_BRANCH_PROTECTION.md](handoffs/HR3_C_BRANCH_PROTECTION.md)
 - **Start swarm:** [../START_HERE.md](../START_HERE.md)

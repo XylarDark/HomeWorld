@@ -1,34 +1,27 @@
----
-name: taste-gate
-description: Use when the agent would invent product feel, purpose, architecture vision, shot lists, or the next product track - detect the taste limit, emit an OWNERSHIP alert, queue the ask, and stop until a human answers.
----
-
 # Taste Gate
 
 When the agent hits a **human taste limit**, stop inventing. Detect → alert → queue → stop. After the human answers, scribe and resume agent-owned work.
 
-**Canon:** [taste-gates.md](../../../docs/human-use/taste-gates.md) · [OWNERSHIP.md](../../../docs/human-use/OWNERSHIP.md) · [CYCLE.md](../../../docs/human-use/CYCLE.md)
+**Canon:** [Docs/28_TASTE_GATES.md](../../../Docs/28_TASTE_GATES.md) · [taste-gates.md](../../../docs/human-use/taste-gates.md) · [taste-profile.md](../../../docs/human-use/taste-profile.md) · [OWNERSHIP.md](../../../docs/human-use/OWNERSHIP.md)
 
 ## When to load
 
-Load this skill when **any** checkable heuristic below is true and undecided **for this task**:
+Load this skill when any **taste-limit heuristic** from Docs/28 is true and undecided for this task (vision/GDD/art bible/shot invent; next Docs track feel; architecture `(fill in)`; AD still verdict; reopen CLOSED feel; PHASE_BOARD next TBD but agent would start product work).
 
-1. Would change product vision, art direction, or a locked shot / acceptance list.
-2. Would pick the next product track or surface feel without a human interview or explicit unlock.
-3. Would invent architecture purpose / directory map while [architecture.md](../../../docs/human-use/architecture.md) still says `(fill in)` for this task.
-4. Would assign art-director accept/reject without AD or Lead waive.
-5. Would reopen a closed track’s feel targets.
-6. The phase board (or equivalent) says next track TBD and the agent would start product work anyway.
-
-**Do not load** for: typo/one-line fixes; flesh-out of already-decided taste; work after an explicit human unlock for that phase.
-
-> **Localize on copy.** Hosts may keep a product track doc (e.g. HomeWorld `Docs/28_TASTE_GATES.md`) that lists the same heuristics with project paths. Prefer that doc when present; otherwise use this skill.
+**Do not load** for typo/one-line, flesh-out of locked taste, or work after an explicit Lead `APPROVE *` unlock for that phase.
 
 ## Procedure
 
+### 0. Read profile
+
+Open [taste-profile.md](../../../docs/human-use/taste-profile.md).
+
+- If the fork is **already covered** (locked decision, do-not, or clear process pref) and this task is flesh-out only → do **not** invent; follow the profile and continue agent work (or stop if profile says park).
+- If the fork **conflicts** with the profile or is an **open gap** / missing pref → continue with Detect → Alert → Queue; also **stage** a candidate stub via [taste-profiler](../taste-profiler/SKILL.md) (`Saved/taste_profile_session.json`).
+
 ### 1. Detect
 
-Name the heuristic id (1–6) and the fork in one sentence.
+Name the heuristic id (1–6 from Docs/28) and the fork in one sentence.
 
 ### 2. Alert (OWNERSHIP shape)
 
@@ -45,41 +38,40 @@ Need from you: <numbered options; recommended first; skip last>
 After you pick: <what I do next; next human fork if any>
 ```
 
-**Question budget:** max **2** questions per turn. Prefer A/B choices over open essays.
+**Question budget:** max **2** questions per turn (Docs/26-style). Prefer A/B choices over open essays.
 
 ### 3. Queue
 
-1. Write or update a durable handoff under the host’s handoff folder (e.g. `Docs/handoffs/TASTE_GATE_<SHORT_ID>.md` or `docs/handoffs/…`) — gate id, heuristic, alert paste, status `PENDING`.
-2. Write a machine queue (usually gitignored), e.g. `Saved/taste_gates_pending.json`:
+1. Write or update durable handoff: `Docs/handoffs/TASTE_GATE_<SHORT_ID>.md` (gate id, heuristic, alert paste, status `PENDING`).
+2. Write machine queue (gitignored): `Saved/taste_gates_pending.json` — array of objects:
 
 ```json
 {
-  "id": "TG-EXAMPLE",
+  "id": "TG-DRY-NEXT-TRACK",
   "created": "YYYY-MM-DD",
   "heuristic": 6,
   "status": "pending",
-  "handoff": "Docs/handoffs/TASTE_GATE_EXAMPLE.md",
+  "handoff": "Docs/handoffs/TASTE_GATE_DRY_NEXT_TRACK.md",
   "summary": "one-line fork"
 }
 ```
 
 Idempotent: same `id` updates in place; do not duplicate.
 
-> **Localize on copy.** Path names (`Saved/`, `Docs/handoffs/`) follow the host layout.
-
 ### 4. Stop
 
-Do **not** invent taste, open a new product track, or keep coding past the fork. End the turn after the alert + queue.
+Do **not** invent taste, open a new product Docs track, or keep coding past the fork. End the turn after the alert + queue.
 
 ### 5. Scribe and resume (after human answer)
 
-When the human answers (chat pick, approve phrase, or dictate):
+When Lead/AD answers (chat pick, `APPROVE *`, or dictate):
 
-1. Scribe confirmed taste into the file named in the alert (or the product track doc).
-2. Set queue entry `status` to `resolved`; note resolution in the handoff.
-3. Resume only **agent-owned** work named in `After you pick`.
+1. Scribe confirmed taste into the gate file named in the alert (or Docs track).
+2. Set queue entry `status` to `resolved`; note resolution in handoff.
+3. **Promote or reject** the staged profile candidate ([taste-profiler](../taste-profiler/SKILL.md)) — do not leave durable profile stale.
+4. Resume only **agent-owned** work named in `After you pick`.
 
-## Gate template
+## Gate template (Docs/26-style)
 
 Round N (max 2 Q):
 
@@ -93,6 +85,6 @@ Do not start Round N+1 until Round N is answered or skipped.
 ## Non-goals
 
 - Auto-approve or invent product feel
-- Replacing host Lead/AD approve gates
-- Preference-model / RL training from chat
-- Building products listed under [cursor-cannot/](../../../docs/human-use/cursor-cannot/README.md)
+- Resurrect `Start-AllAgents*` / agent-company loop (WAVE F)
+- Preference-model training from Lead chat
+- Building cursor-cannot products

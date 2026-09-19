@@ -1,3 +1,19 @@
+## 2026-09-19 ET — DevHarness Taste Profiler sync + HomeWorld pin
+
+DevHarness PR #32 merged (`0eafcfb`): extras `taste-profiler` + profile templates; taste-gate read-first. HomeWorld pin bumped; Docs/29 CLOSED work committed with profile/skills.
+
+## 2026-09-19 ET — APPROVE TP-E / Docs/29 CLOSED
+
+Lead **`APPROVE TP-E`**, 2026-09-19 ET. Docs/29 Taste Profiler **CLOSED / COMPLETE** (TP-A…E). Profile + skills stay live. PHASE_BOARD: next track TBD — Lead names it or Taste Gate (do not invent). DevHarness sync = separate chore.
+
+## 2026-09-19 ET — APPROVE TP-D / TP-E GATE READY
+
+Lead **`APPROVE TP-D`**, 2026-09-19 ET. Dry-run prove accepted; session candidate promoted (Skip invent / product still TBD). Docs/29 **ACTIVE** — [TP_E_CLOSE.md](../Docs/handoffs/TP_E_CLOSE.md) **GATE READY**. PENDING Lead **`APPROVE TP-E`**.
+
+## 2026-09-19 ET — Docs/29 Taste Profiler ACTIVE (TP-A…D)
+
+Lead implement-plan unlocked Taste Profiler. Filed [29_TASTE_PROFILER.md](../Docs/29_TASTE_PROFILER.md); seeded [taste-profile.md](../docs/human-use/taste-profile.md); skills `taste-profiler` + taste-gate read-first; prove [TP_D_PROVE.md](../Docs/handoffs/TP_D_PROVE.md). PHASE_BOARD **ACTIVE**; PENDING Lead **`APPROVE TP-D`** then **`APPROVE TP-E`**.
+
 ## 2026-09-19 ET — DevHarness Taste Gates sync + HomeWorld pin
 
 DevHarness PR #31 merged (`398ce0b`): extras skill `taste-gate` + `docs/human-use/taste-gates.md`. HomeWorld pin bumped; local `.agents/skills/taste-gate` activated. Docs/26–28 + NF2 ship in same HomeWorld push.

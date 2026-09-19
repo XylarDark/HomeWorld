@@ -19,6 +19,8 @@ Start here: **[OWNERSHIP.md](OWNERSHIP.md)** (jobs, split, alert shape). Then
 
 **Taste Gates** (detect → queue → ask → scribe → resume): [taste-gates.md](taste-gates.md) · skill `taste-gate` · [Docs/28](../../Docs/28_TASTE_GATES.md).
 
+**Taste Profiler** (durable prefs; read before inventing): [taste-profiler.md](taste-profiler.md) · [taste-profile.md](taste-profile.md) · skill `taste-profiler` · [Docs/29](../../Docs/29_TASTE_PROFILER.md).
+
 **Swarm vs coding chat:** [SWARM_MODE_ROUTING.md](SWARM_MODE_ROUTING.md) — detect SWARM / NON-SWARM / HYBRID + ModelClass at task start (skill `swarm-mode-routing`). Research: [SWARM_ROUTING_RESEARCH.md](../Automation/SWARM_ROUTING_RESEARCH.md).
 
 This is agentic engineering, not vibe coding. The model can leave the syntax. It

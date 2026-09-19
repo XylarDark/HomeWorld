@@ -2,8 +2,8 @@
   "path": "DevEnvTemplate",
   "remote": "https://github.com/XylarDark/DevEnvTemplate.git",
   "branch": "master",
-  "sha": "398ce0b586d441773bd1ceba4989bffe76fcef07",
-  "shortSha": "398ce0b",
+  "sha": "0eafcfba2dbb431493078d9d47fcc1ed5ad45d7a",
+  "shortSha": "0eafcfb",
   "docPaths": [
     "docs/Setup/CURSOR_DEV.md",
     "Docs/13b_HR2_B_COLD_CLONE.md"
@@ -11,5 +11,5 @@
   "hr2Phase": "HR2-B",
   "updated": "2026-09-19",
   "productName": "DevHarness",
-  "note": "Product rebranded DevHarness; vendored path remains DevEnvTemplate/. Taste Gates extras skill landed PR #31."
+  "note": "Product rebranded DevHarness; vendored path remains DevEnvTemplate/. Taste Gates PR #31; Taste Profiler PR #32."
 }

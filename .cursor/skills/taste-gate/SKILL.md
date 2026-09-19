@@ -2,7 +2,7 @@
 
 When the agent hits a **human taste limit**, stop inventing. Detect → alert → queue → stop. After the human answers, scribe and resume agent-owned work.
 
-**Canon:** [Docs/28_TASTE_GATES.md](../../../Docs/28_TASTE_GATES.md) · [taste-gates.md](../../../docs/human-use/taste-gates.md) · [OWNERSHIP.md](../../../docs/human-use/OWNERSHIP.md)
+**Canon:** [Docs/28_TASTE_GATES.md](../../../Docs/28_TASTE_GATES.md) · [taste-gates.md](../../../docs/human-use/taste-gates.md) · [taste-profile.md](../../../docs/human-use/taste-profile.md) · [OWNERSHIP.md](../../../docs/human-use/OWNERSHIP.md)
 
 ## When to load
 
@@ -11,6 +11,13 @@ Load this skill when any **taste-limit heuristic** from Docs/28 is true and unde
 **Do not load** for typo/one-line, flesh-out of locked taste, or work after an explicit Lead `APPROVE *` unlock for that phase.
 
 ## Procedure
+
+### 0. Read profile
+
+Open [taste-profile.md](../../../docs/human-use/taste-profile.md).
+
+- If the fork is **already covered** (locked decision, do-not, or clear process pref) and this task is flesh-out only → do **not** invent; follow the profile and continue agent work (or stop if profile says park).
+- If the fork **conflicts** with the profile or is an **open gap** / missing pref → continue with Detect → Alert → Queue; also **stage** a candidate stub via [taste-profiler](../taste-profiler/SKILL.md) (`Saved/taste_profile_session.json`).
 
 ### 1. Detect
 
@@ -61,7 +68,8 @@ When Lead/AD answers (chat pick, `APPROVE *`, or dictate):
 
 1. Scribe confirmed taste into the gate file named in the alert (or Docs track).
 2. Set queue entry `status` to `resolved`; note resolution in handoff.
-3. Resume only **agent-owned** work named in `After you pick`.
+3. **Promote or reject** the staged profile candidate ([taste-profiler](../taste-profiler/SKILL.md)) — do not leave durable profile stale.
+4. Resume only **agent-owned** work named in `After you pick`.
 
 ## Gate template (Docs/26-style)
 

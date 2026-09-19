@@ -1,6 +1,6 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **Docs/28 Taste Gates (TG) — CLOSED / COMPLETE** — Lead **`APPROVE TG-E`**, 2026-09-19 ET — [28_TASTE_GATES.md](../Docs/28_TASTE_GATES.md). Next: Lead-named track or Taste Gate (do not invent).
+**Current phase:** **Docs/29 Taste Profiler (TP) — CLOSED / COMPLETE** — Lead **`APPROVE TP-E`**, 2026-09-19 ET — [29_TASTE_PROFILER.md](../Docs/29_TASTE_PROFILER.md). Next: Lead-named track or Taste Gate (do not invent).
 
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **Conductor** (parent DESKTOP) / **DESKTOP-21CT3H0**
@@ -49,7 +49,7 @@ Canonical history: **VP-A → VP-B → VP-A re-verify → VP-C**. Spec: [17d_HS_
 
 ## POST-AUDIT (Docs/05–10 + HR track)
 
-MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** **Product next-phase (NP-A…E) is CLOSED / COMPLETE.** **HR2 track CLOSED / COMPLETE.** **HR3 track CLOSED / COMPLETE** — Lead **`APPROVE HR3-D`**, 2026-09-17 ET (HR3-C **DEFERRED**). **VP track CLOSED / COMPLETE** (VP-A re-verify **WAIVED**). **Docs/16 Playable Loop CLOSED / COMPLETE** — Lead **`APPROVE PL-D`**, 2026-09-17 ET. **Docs/17 HS Audit CLOSED / COMPLETE** — Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET. **Docs/18 VP2 CLOSED / COMPLETE** — Lead **`APPROVE VP2-C STOP`**, 2026-09-17 ET. **Docs/19 D19 CLOSED / COMPLETE** — Lead **`APPROVE D19`**, 2026-09-17 ET. **Docs/20 UASSET CLOSED / COMPLETE**. **Docs/21 Reap & Sow CLOSED / COMPLETE** — Lead **`APPROVE RS-E`**, 2026-09-19 ET. **Docs/26 Night Feel CLOSED / COMPLETE** — Lead **`APPROVE NF-A`**, 2026-09-19 ET. **Docs/27 Night Feel Build CLOSED / COMPLETE** — Lead **`APPROVE NF2-E`**, 2026-09-19 ET. **Docs/28 Taste Gates CLOSED / COMPLETE** — Lead **`APPROVE TG-E`**, 2026-09-19 ET. Next: Lead-named track or Taste Gate (do not invent).
+MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** **Product next-phase (NP-A…E) is CLOSED / COMPLETE.** **HR2 track CLOSED / COMPLETE.** **HR3 track CLOSED / COMPLETE** — Lead **`APPROVE HR3-D`**, 2026-09-17 ET (HR3-C **DEFERRED**). **VP track CLOSED / COMPLETE** (VP-A re-verify **WAIVED**). **Docs/16 Playable Loop CLOSED / COMPLETE** — Lead **`APPROVE PL-D`**, 2026-09-17 ET. **Docs/17 HS Audit CLOSED / COMPLETE** — Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET. **Docs/18 VP2 CLOSED / COMPLETE** — Lead **`APPROVE VP2-C STOP`**, 2026-09-17 ET. **Docs/19 D19 CLOSED / COMPLETE** — Lead **`APPROVE D19`**, 2026-09-17 ET. **Docs/20 UASSET CLOSED / COMPLETE**. **Docs/21 Reap & Sow CLOSED / COMPLETE** — Lead **`APPROVE RS-E`**, 2026-09-19 ET. **Docs/26 Night Feel CLOSED / COMPLETE** — Lead **`APPROVE NF-A`**, 2026-09-19 ET. **Docs/27 Night Feel Build CLOSED / COMPLETE** — Lead **`APPROVE NF2-E`**, 2026-09-19 ET. **Docs/28 Taste Gates CLOSED / COMPLETE** — Lead **`APPROVE TG-E`**, 2026-09-19 ET. **Docs/29 Taste Profiler CLOSED / COMPLETE** — Lead **`APPROVE TP-E`**, 2026-09-19 ET. Next: Lead-named track or Taste Gate (do not invent).
 
 | Track | Doc / phase | Host | Status | Gate / handoff |
 |---|---|---|---|---|
@@ -140,7 +140,17 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **U58F-F** | MCP decision | CLOUD | **APPROVED** | Keep UnrealMCP · [U58F_F_MCP_DECISION.md](../Docs/handoffs/U58F_F_MCP_DECISION.md) |
 | **U58F-G** | Mesh Terrain spike | DESKTOP | **SPIKE READY** | Plugin on · sandbox only · [U58F_G_MESH_TERRAIN.md](../Docs/handoffs/U58F_G_MESH_TERRAIN.md) |
 
-**Current track:** none active — Docs/28 **CLOSED** (Lead **`APPROVE TG-E`**). Next: Lead-named track or Taste Gate.
+**Current track:** none active — Docs/29 **CLOSED** (Lead **`APPROVE TP-E`**). Next: Lead-named track or Taste Gate.
+
+### Docs/29 Taste Profiler (TP)
+
+| Phase | Focus | Host | Status | Evidence |
+|-------|--------|------|--------|----------|
+| **TP-A** | Research digest | CLOUD | **DONE** | [29_TASTE_PROFILER.md](../Docs/29_TASTE_PROFILER.md) |
+| **TP-B** | Strategy matrix | CLOUD | **DONE** | Implement-plan unlock ≈ **`APPROVE TP STRATEGY`** |
+| **TP-C** | Profile + skills | CLOUD | **DONE** | [taste-profile.md](../docs/human-use/taste-profile.md) · skills taste-profiler / taste-gate |
+| **TP-D** | Dry-run prove | CLOUD | **DONE** | [TP_D_PROVE.md](../Docs/handoffs/TP_D_PROVE.md) — Lead **`APPROVE TP-D`**, 2026-09-19 ET |
+| **TP-E** | Close Docs/29 | Lead | **DONE** | [TP_E_CLOSE.md](../Docs/handoffs/TP_E_CLOSE.md) — Lead **`APPROVE TP-E`**, 2026-09-19 ET |
 
 ### Docs/28 Taste Gates (TG)
 
@@ -158,6 +168,8 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 
 | ID | Phase | Host | Owner | Write path | Due artifact |
 |---|---|---|---|---|---|
+| TP-E-close | TP-E | Lead | Lead | Docs/29 · PHASE_BOARD | [TP_E_CLOSE.md](../Docs/handoffs/TP_E_CLOSE.md) — **APPROVED / CLOSED** Lead **`APPROVE TP-E`**, 2026-09-19 ET |
+| TP-D-prove | TP-D | CLOUD+Lead | CND+Lead | Docs/handoffs + Saved/ | [TP_D_PROVE.md](../Docs/handoffs/TP_D_PROVE.md) — **APPROVED / CLOSED** Lead **`APPROVE TP-D`**, 2026-09-19 ET |
 | TG-E-close | TG-E | Lead | Lead | Docs/28 · PHASE_BOARD | [TG_E_CLOSE.md](../Docs/handoffs/TG_E_CLOSE.md) — **APPROVED / CLOSED** Lead **`APPROVE TG-E`**, 2026-09-19 ET |
 | TG-D-prove | TG-D | CLOUD+Lead | CND+Lead | Docs/handoffs + Saved/ | [TG_D_PROVE.md](../Docs/handoffs/TG_D_PROVE.md) — **APPROVED / CLOSED** Lead **`APPROVE TG-D`**, 2026-09-19 ET |
 | VNP-N0 | VNP-N0 | DESKTOP | CND | Saved/ · Docs/24 | Night smoke JSON |
