@@ -1,10 +1,10 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **Docs/20 CLOSED / COMPLETE** — Lead **`APPROVE UASSET POLICY`**, 2026-09-17 ET (PR #108); **allowlist extended 2026-09-18** (VS_MVP dress meshes + combat GAs on main `bb8ce21`; Mannequins KEEP-LOCAL)
+**Current phase:** **Docs/22 UE 5.8 Upgrade CLOSED / COMPLETE** — [22_UE58_UPGRADE.md](../Docs/22_UE58_UPGRADE.md). Branch `chore/ue-5.8-upgrade` → PR to main. Docs/21 **CLOSED**. Next product track TBD (Lead gate).
 
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **Conductor** (parent DESKTOP) / **DESKTOP-21CT3H0**
-**Blocked by:** none. **No active product gameplay phase** — next track TBD (Lead gate). Do not reopen VP2/D19. Branch protection **DEFERRED**.
+**Blocked by:** none. Self-hosted runner must add label **`ue58`** before `ci.yml` goes green on C++ PRs.
 **Sign-off doc:** [Docs/17_HS_AUDIT_SIGN_OFF.md](../Docs/17_HS_AUDIT_SIGN_OFF.md) — **SIGNED OFF** Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET.
 
 
@@ -49,7 +49,7 @@ Canonical history: **VP-A → VP-B → VP-A re-verify → VP-C**. Spec: [17d_HS_
 
 ## POST-AUDIT (Docs/05–10 + HR track)
 
-MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** **Product next-phase (NP-A…E) is CLOSED / COMPLETE.** **HR2 track CLOSED / COMPLETE.** **HR3 track CLOSED / COMPLETE** — Lead **`APPROVE HR3-D`**, 2026-09-17 ET (HR3-C **DEFERRED**). **VP track CLOSED / COMPLETE** (VP-A re-verify **WAIVED**). **Docs/16 Playable Loop CLOSED / COMPLETE** — Lead **`APPROVE PL-D`**, 2026-09-17 ET. **Docs/17 HS Audit CLOSED / COMPLETE** — Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET. **Docs/18 VP2 CLOSED / COMPLETE** — Lead **`APPROVE VP2-C STOP`**, 2026-09-17 ET. **Docs/19 D19 CLOSED / COMPLETE** — Lead **`APPROVE D19`**, 2026-09-17 ET. Next product track TBD (Lead gate).
+MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** **Product next-phase (NP-A…E) is CLOSED / COMPLETE.** **HR2 track CLOSED / COMPLETE.** **HR3 track CLOSED / COMPLETE** — Lead **`APPROVE HR3-D`**, 2026-09-17 ET (HR3-C **DEFERRED**). **VP track CLOSED / COMPLETE** (VP-A re-verify **WAIVED**). **Docs/16 Playable Loop CLOSED / COMPLETE** — Lead **`APPROVE PL-D`**, 2026-09-17 ET. **Docs/17 HS Audit CLOSED / COMPLETE** — Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET. **Docs/18 VP2 CLOSED / COMPLETE** — Lead **`APPROVE VP2-C STOP`**, 2026-09-17 ET. **Docs/19 D19 CLOSED / COMPLETE** — Lead **`APPROVE D19`**, 2026-09-17 ET. **Docs/20 UASSET CLOSED / COMPLETE**. **Docs/21 Reap & Sow CLOSED / COMPLETE** — Lead **`APPROVE RS-E`**, 2026-09-19 ET. Next product track TBD (Lead gate).
 
 | Track | Doc / phase | Host | Status | Gate / handoff |
 |---|---|---|---|---|
@@ -95,8 +95,21 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **D19-B** | Seed cheat | CLOUD+DESKTOP | **APPROVED / CLOSED** | DESKTOP: `hw.Gather.Seed` → `GATHER: RES_SEED +N` |
 | **D19-C** | Success-path evidence filter | CLOUD | **APPROVED / CLOSED** | `evidence-grep.js --success-path`; tests green |
 | **Docs/20** | UASSET allowlist + AI provenance | CLOUD+Lead | **APPROVED / COMPLETE** | [20_UASSET_AI_POLICY.md](../Docs/20_UASSET_AI_POLICY.md) — Lead **`APPROVE UASSET POLICY`**, 2026-09-17 ET (PR #108); allowlist **active** |
+| **Docs/21** | Reap & Sow (RS) | CLOUD+DESKTOP+Lead | **CLOSED / COMPLETE** | [21_REAP_SOW.md](../Docs/21_REAP_SOW.md) — Lead **`APPROVE RS-E`**, 2026-09-19 ET |
+| **RS-A** | Canon stamp | CLOUD | **APPROVED / CLOSED** | Lead **`APPROVE RS-A`**, 2026-09-19 ET |
+| **RS-B** | Material triad | CLOUD+DESKTOP | **APPROVED / CLOSED** | Lead **`APPROVE RS-B`**, 2026-09-19 ET — [RS_B_MATERIALS.md](../Docs/handoffs/RS_B_MATERIALS.md) |
+| **RS-C** | Animal den | CLOUD+DESKTOP | **APPROVED / CLOSED** | Lead **`APPROVE RS-C`**, 2026-09-19 ET — [RS_C_ANIMAL_DEN.md](../Docs/handoffs/RS_C_ANIMAL_DEN.md) |
+| **RS-D** | Humanoid camp | CLOUD+DESKTOP | **APPROVED / CLOSED** | Lead **`APPROVE RS-D`**, 2026-09-19 ET — [RS_D_HUMANOID_CAMP.md](../Docs/handoffs/RS_D_HUMANOID_CAMP.md) |
+| **RS-E** | Special cross-bonus | CLOUD+DESKTOP | **APPROVED / CLOSED** | Lead **`APPROVE RS-E`**, 2026-09-19 ET — [RS_E_SPECIAL.md](../Docs/handoffs/RS_E_SPECIAL.md) |
+| **Docs/22** | UE 5.8 Upgrade (U58) | CLOUD+DESKTOP+Lead | **STRATEGY APPROVED / ACTIVE** | [22_UE58_UPGRADE.md](../Docs/22_UE58_UPGRADE.md) — Lead unlocked via upgrade plan implement, 2026-09-19 ET |
+| **U58-A** | Strategy + engine pin | CLOUD | **APPROVED / CLOSED** | EngineAssociation 5.8 · AGENTS/STACK_PLAN/rules lock docs |
+| **U58-B** | Tooling / CI / env paths | CLOUD | **APPROVED / CLOSED** | UE_5.7 → UE_5.8 defaults · runner label `ue58` |
+| **U58-C** | First open + Safe-Build | DESKTOP | **APPROVED / CLOSED** | MassEntity removed; Safe-Build green |
+| **U58-D** | UnrealMCP + automation | DESKTOP | **APPROVED / CLOSED** | MCP 55557 Listen; Python OK |
+| **U58-E** | VS_MVP content / PIE smoke | DESKTOP | **APPROVED / CLOSED** | RS placement + `hw.RS.*` LogTemp PASS |
+| **U58-F** | Docs/rules + close + PR | CLOUD+Lead | **APPROVED / CLOSED** | UE58_TECH · ue58-sources · track CLOSED |
 
-**Current track:** **Docs/20 CLOSED / COMPLETE** — allowlist policy **live** on `main`. Docs/19 + VP2 **CLOSED** — do not reopen. **No active product gameplay phase.**
+**Current track:** **Docs/22 CLOSED / COMPLETE**. Docs/21 **CLOSED**. Do not reopen VP2/D19/RS. Next product track TBD (Lead gate).
 
 ---
 
@@ -104,6 +117,18 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 
 | ID | Phase | Host | Owner | Write path | Due artifact |
 |---|---|---|---|---|---|
+| U58-A-pin | U58-A | CLOUD | CND | Docs/22 · HomeWorld.uproject · AGENTS · STACK_PLAN · rules | EngineAssociation 5.8 — **IN PROGRESS** |
+| U58-B-paths | U58-B | CLOUD | CND | Tools/ · .github/ · docs/Setup/ | UE_5.7 → UE_5.8 defaults — **LOCKED** |
+| U58-C-build | U58-C | DESKTOP | CND | Source/ · docs/KNOWN_ERRORS.md | Safe-Build on 5.8 — **LOCKED** |
+| U58-D-mcp | U58-D | DESKTOP | CND | Plugins/UnrealMCP · AUTOMATION_GAPS | MCP green + pie — **LOCKED** |
+| U58-E-smoke | U58-E | DESKTOP | CND | Maps/VS_MVP · Content/Python | VS_MVP PIE smoke — **LOCKED** |
+| U58-F-docs | U58-F | CLOUD+Lead | CND+Lead | docs/UE/UE58_TECH · ue58-sources · PR | Close track — **LOCKED** |
+| RS-E-special | RS-E | CLOUD+DESKTOP+Lead | CND+Lead | Source/ + Content/Python + Docs/handoffs/ | [RS_E_SPECIAL.md](../Docs/handoffs/RS_E_SPECIAL.md) · `hw.RS.*` · `place_vs_mvp_rs_special_site.py` — **APPROVED / CLOSED** Lead **`APPROVE RS-E`**, 2026-09-19 ET |
+| RS-D-camp | RS-D | CLOUD+DESKTOP | CND | Content/Python + Docs/handoffs/ | [RS_D_HUMANOID_CAMP.md](../Docs/handoffs/RS_D_HUMANOID_CAMP.md) · `place_vs_mvp_rs_humanoid_camp.py` — **APPROVED / CLOSED** Lead **`APPROVE RS-D`**, 2026-09-19 ET |
+| RS-C-den | RS-C | CLOUD+DESKTOP | CND | Content/Python + Docs/handoffs/ | [RS_C_ANIMAL_DEN.md](../Docs/handoffs/RS_C_ANIMAL_DEN.md) · `place_vs_mvp_rs_animal_den.py` — **APPROVED / CLOSED** Lead **`APPROVE RS-C`**, 2026-09-19 ET |
+| RS-B-materials | RS-B | CLOUD+DESKTOP | CND | Content/Python + Docs/handoffs/ | [RS_B_MATERIALS.md](../Docs/handoffs/RS_B_MATERIALS.md) · `place_vs_mvp_rs_material_sites.py` — **APPROVED / CLOSED** Lead **`APPROVE RS-B`**, 2026-09-19 ET |
+| RS-A-canon | RS-A | CLOUD+Lead | CND+Lead | Docs/ + VisionBoard/ | [01_GDD_MVP.md](../Docs/01_GDD_MVP.md) §3.1 · Vision pointer · [21_REAP_SOW.md](../Docs/21_REAP_SOW.md) — **APPROVED / CLOSED** Lead **`APPROVE RS-A`**, 2026-09-19 ET |
+| RS-strategy | Docs/21 | CLOUD+Lead | CND+Lead | Docs/ | [21_REAP_SOW.md](../Docs/21_REAP_SOW.md) — **APPROVED** Lead **`APPROVE RS STRATEGY`**, 2026-09-19 ET |
 | UASSET-policy | Docs/20 | CLOUD+Lead | CND+Lead | Docs/ + config/ + scripts/ | [20_UASSET_AI_POLICY.md](../Docs/20_UASSET_AI_POLICY.md) · [AI_ASSET_LOG.md](../Docs/AI_ASSET_LOG.md) — **APPROVED / CLOSED** Lead **`APPROVE UASSET POLICY`**, 2026-09-17 ET (PR #108) |
 | HS-F-sign-off | HS-F | CLOUD+Lead | CND+Lead | Docs/ | [17_HS_AUDIT_SIGN_OFF.md](../Docs/17_HS_AUDIT_SIGN_OFF.md) — **CLOSED** Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET |
 | HS-E-bootstrap | HS-E | CLOUD+Lead+DESKTOP | CND+Lead | Docs/ | [17e_HS_CONTENT_BOOTSTRAP.md](../Docs/17e_HS_CONTENT_BOOTSTRAP.md) · [HS_E_CONTENT_BOOTSTRAP.md](../Docs/handoffs/HS_E_CONTENT_BOOTSTRAP.md) — **APPROVED / CLOSED** Lead **`APPROVE HS-E`**, 2026-09-17 ET (KEEP-LOCAL) |

@@ -4,7 +4,7 @@ rem Run from the project root (folder containing HomeWorld.uproject).
 rem Build output is logged to Build-HomeWorld.log in the project directory.
 
 set UPROJECT=%~dp0HomeWorld.uproject
-set ENGINE_BAT="C:\Program Files\Epic Games\UE_5.7\Engine\Build\BatchFiles\Build.bat"
+set ENGINE_BAT="C:\Program Files\Epic Games\UE_5.8\Engine\Build\BatchFiles\Build.bat"
 set "LOGFILE=%~dp0Build-HomeWorld.log"
 
 if not exist %UPROJECT% (
@@ -14,7 +14,7 @@ if not exist %UPROJECT% (
 
 if not exist %ENGINE_BAT% (
     echo ERROR: Engine Build.bat not found at %ENGINE_BAT%
-    echo Adjust the path in this script if UE 5.7 is installed elsewhere.
+    echo Adjust the path in this script if UE 5.8 is installed elsewhere.
     exit /B 1
 )
 

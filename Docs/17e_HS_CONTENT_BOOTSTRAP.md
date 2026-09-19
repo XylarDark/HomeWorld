@@ -92,7 +92,7 @@ One honest policy for Mannequins / Manny provenance + bootstrap / preflight expe
 | `Content/Characters/Mannequins/` | **No** | Contents API: `Content/Characters` **does not exist** on `main` |
 | `Content/Python/character_blueprint_config.json` | **Yes** | Paths assume local Mannequins |
 | `Content/Python/pl_a_apply_character.py` | **Yes** | Apply via MCP on DESKTOP |
-| Epic host source (PL-A handoff) | N/A (Engine install) | `UE_5.7\Templates\TemplateResources\High\Characters\Content\Mannequins` |
+| Epic host source (PL-A handoff) | N/A (Engine install) | `UE_5.8\Templates\TemplateResources\High\Characters\Content\Mannequins` |
 
 ### PL-A evidence (already APPROVED — do not re-prove here)
 
@@ -132,10 +132,10 @@ Host: **DESKTOP-21CT3H0**. Executor / cloud agents / Cursor Task **do not** run 
 **Source (Epic install — PL-A citation):**
 
 ```text
-%UE_5.7%\Templates\TemplateResources\High\Characters\Content\Mannequins
+%UE_5.8%\Templates\TemplateResources\High\Characters\Content\Mannequins
 ```
 
-(Adjust drive/root to the machine’s UE 5.7 install. Example: `C:\Program Files\Epic Games\UE_5.7\Templates\TemplateResources\High\Characters\Content\Mannequins`.)
+(Adjust drive/root to the machine’s UE 5.8 install. Example: `C:\Program Files\Epic Games\UE_5.8\Templates\TemplateResources\High\Characters\Content\Mannequins`.)
 
 **Destination (project):**
 

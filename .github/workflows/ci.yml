@@ -1,5 +1,5 @@
 # CI: Win64 build (and optional test/package) for C++-touching changes.
-# Requires a self-hosted Windows runner with UE 5.7 installed.
+# Requires a self-hosted Windows runner with UE 5.8 installed.
 # Path filters (HR2-C): only runs when C++ / project descriptor paths change.
 # Docs-only PRs stay on validate.yml — see docs/Setup/CI_POLICY.md.
 name: CI
@@ -24,7 +24,7 @@ on:
 
 jobs:
   build-win64:
-    runs-on: [self-hosted, windows, ue57]
+    runs-on: [self-hosted, windows, ue58]
     if: |
       !contains(github.event.head_commit.message, '[skip ci]') &&
       (
@@ -43,7 +43,7 @@ jobs:
       - name: Build (Win64 Development)
         shell: pwsh
         run: |
-          $env:UE_ENGINE = $env:UE_ENGINE ?? "C:\Program Files\Epic Games\UE_5.7"
+          $env:UE_ENGINE = $env:UE_ENGINE ?? "C:\Program Files\Epic Games\UE_5.8"
           if (Test-Path ".\Tools\RunFullBuild.ps1") {
             .\Tools\RunFullBuild.ps1 -Platform Win64
           } else {

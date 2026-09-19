@@ -12,7 +12,7 @@ flowchart TB
     Steam[Steam EA]
   end
   subgraph client [Game Client]
-    UE[Unreal Engine 5.7]
+    UE[Unreal Engine 5.8]
   end
   subgraph world [World and Content]
     PCG[PCG Biomes]
@@ -48,9 +48,9 @@ flowchart TB
 
 ## Layer 1 – Engine and Platform
 
-- **Engine:** Unreal Engine 5.7. Open World template, World Partition.
+- **Engine:** Unreal Engine 5.8. Open World template, World Partition.
 - **Platform:** PC, Steam Early Access. No console in MVP.
-- **Lock:** Engine 5.7 only; platform PC + Steam Early Access. Do not add engine or platform variants (e.g. console, different engine version) without team decision.
+- **Lock:** Engine 5.8 only; platform PC + Steam Early Access. Do not add engine or platform variants (e.g. console, different engine version) without team decision. See [Docs/22_UE58_UPGRADE.md](../../Docs/22_UE58_UPGRADE.md).
 - **Rationale:** Single codebase; Lumen/Nanite for whimsical look; World Partition for large proc-gen realms.
 
 ---
@@ -82,7 +82,7 @@ flowchart TB
 ## Layer 5 – AI and Simulation
 
 - **Family/NPCs:** Behavior Trees or State Trees (UE built-in); needs/morale can use GAS attributes. Use **AHomeWorldAIController** (C++) as the controller base for actor-based NPCs (e.g. key story characters); assign BT/ST in Blueprint.
-- **Scalable agents/swarms:** Use **UE 5.7 recommended Mass Entity + Mass AI** (MassEntity, MassGameplay, MassAI, StateTree, ZoneGraph, SmartObjects) for 5–100+ family gatherers/defenders and night swarms. This is Epic's current stack; no deprecated tech. See [KNOWN_ERRORS.md](KNOWN_ERRORS.md) for plugin list and [docs/tasks/FAMILY_AGENTS_MASS_STATETREE.md](tasks/FAMILY_AGENTS_MASS_STATETREE.md) for Week 2 setup.
+- **Scalable agents/swarms:** Use **UE 5.8 recommended Mass Entity + Mass AI** (MassEntity, MassGameplay, MassAI, StateTree, ZoneGraph, SmartObjects) for 5–100+ family gatherers/defenders and night swarms. This is Epic's current stack; no deprecated tech. See [KNOWN_ERRORS.md](KNOWN_ERRORS.md) for plugin list and [docs/tasks/FAMILY_AGENTS_MASS_STATETREE.md](tasks/FAMILY_AGENTS_MASS_STATETREE.md) for Week 2 setup.
 - **Phase:** Week 2 – first family agents (Mass config + State Tree + spawner); Weeks 3–4 – roles (Protector/Healer trees), needs sim (GAS attributes or Mass processor).
 
 ---
@@ -171,7 +171,7 @@ Core technology foundations implemented per bare-bones stack plan (contracts, ba
 | 2 – World/PCG | Done | PCG enabled; CONTENT_LAYOUT paths. |
 | 3 – GAS | Done | Base classes; DefaultAbilities granting; Week 2 needs extension documented. |
 | 4 – Building | Done | GetPlacementHit + GetPlacementTransform. |
-| 5 – AI | Done | AHomeWorldAIController stub; Mass Entity + Mass AI (UE 5.7 recommended) for family/swarm agents, see FAMILY_AGENTS_MASS_STATETREE.md. |
+| 5 – AI | Done | AHomeWorldAIController stub; Mass Entity + Mass AI (UE 5.8 recommended) for family/swarm agents, see FAMILY_AGENTS_MASS_STATETREE.md. |
 | 6 – Day/Night | Done | UHomeWorldTimeOfDaySubsystem stub; implementation via DaySequence documented. |
 | 7 – Multiplayer | Done | UHomeWorldSessionSubsystem stub. |
 | 8 – Leaderboards | Done | UHomeWorldLeaderboardSubsystem stub. |

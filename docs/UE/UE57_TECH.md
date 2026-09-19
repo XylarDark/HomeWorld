@@ -1,6 +1,8 @@
 # UE 5.7 tech stack and checklist
 
-Single entry point for Unreal Engine 5.7 development in HomeWorld: when to plan first, where decisions live, and what to check before or after engine/plugin work.
+> **Superseded for active development:** HomeWorld targets **UE 5.8**. Use [UE58_TECH.md](UE58_TECH.md) and [.cursor/rules/ue58-sources.mdc](../../.cursor/rules/ue58-sources.mdc). This file is retained as **5.7 historical** context.
+
+Single entry point for Unreal Engine 5.7 development in HomeWorld (historical): when to plan first, where decisions live, and what to check before or after engine/plugin work.
 
 ## When to use this doc
 

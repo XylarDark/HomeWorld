@@ -67,6 +67,7 @@ void AHomeWorldGameMode::OnAstralDeath(APlayerController* PlayerController)
 			PS->ClearLoveLevel();
 			PS->ResetLoveTasksCompletedToday();
 			PS->ResetGamesWithChildToday();
+			PS->ClearRSCrossBonuses();
 		}
 	}
 	RestartPlayer(PlayerController);

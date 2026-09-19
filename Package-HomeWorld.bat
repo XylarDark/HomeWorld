@@ -5,7 +5,7 @@ rem Output: Saved\StagedBuilds (or see log). Log: Package-HomeWorld.log
 
 set "PROJECT_ROOT=%~dp0"
 set "UPROJECT=%PROJECT_ROOT%HomeWorld.uproject"
-set "RUNUAT=C:\Program Files\Epic Games\UE_5.7\Engine\Build\BatchFiles\RunUAT.bat"
+set "RUNUAT=C:\Program Files\Epic Games\UE_5.8\Engine\Build\BatchFiles\RunUAT.bat"
 set "LOGFILE=%PROJECT_ROOT%Package-HomeWorld.log"
 
 if not exist "%UPROJECT%" (
@@ -13,8 +13,8 @@ if not exist "%UPROJECT%" (
     exit /B 1
 )
 
-if not exist "C:\Program Files\Epic Games\UE_5.7\Engine\Build\BatchFiles\RunUAT.bat" (
-    echo ERROR: RunUAT.bat not found. Adjust UE_5.7 path in this script if the engine is installed elsewhere.
+if not exist "C:\Program Files\Epic Games\UE_5.8\Engine\Build\BatchFiles\RunUAT.bat" (
+    echo ERROR: RunUAT.bat not found. Adjust UE_5.8 path in this script if the engine is installed elsewhere.
     exit /B 1
 )
 

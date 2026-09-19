@@ -659,6 +659,57 @@ namespace
 		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Conversion.Test executed (conversion hook triggered; ConvertedFoesThisNight=%d; Role=%d)."), Count, static_cast<int32>(AssignedRole));
 	}
 
+	/** Docs/21 RS-E: collect day special-site bonus → buffs night. Prefer day phase. */
+	void CmdRSCollectDayBonus(const TArray<FString>& Args)
+	{
+		UWorld* World = HomeWorldPlayWorld::Resolve();
+		if (!World)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.RS.CollectDayBonus requires a play world (PIE or game)."));
+			return;
+		}
+		APlayerController* PC = UGameplayStatics::GetPlayerController(World, 0);
+		if (!PC) { UE_LOG(LogTemp, Warning, TEXT("HomeWorld: No player controller.")); return; }
+		AHomeWorldPlayerState* PS = Cast<AHomeWorldPlayerState>(PC->PlayerState);
+		if (!PS) { UE_LOG(LogTemp, Warning, TEXT("HomeWorld: Player state is not AHomeWorldPlayerState.")); return; }
+		PS->SetRSDayBonusForNight(true);
+		UE_LOG(LogTemp, Log, TEXT("RS: day→night cross_buff active (hw.RS.CollectDayBonus @ GP_RS_SpecialSite)"));
+	}
+
+	/** Docs/21 RS-E: collect night special-site bonus → buffs day. Prefer night phase. */
+	void CmdRSCollectNightBonus(const TArray<FString>& Args)
+	{
+		UWorld* World = HomeWorldPlayWorld::Resolve();
+		if (!World)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.RS.CollectNightBonus requires a play world (PIE or game)."));
+			return;
+		}
+		APlayerController* PC = UGameplayStatics::GetPlayerController(World, 0);
+		if (!PC) { UE_LOG(LogTemp, Warning, TEXT("HomeWorld: No player controller.")); return; }
+		AHomeWorldPlayerState* PS = Cast<AHomeWorldPlayerState>(PC->PlayerState);
+		if (!PS) { UE_LOG(LogTemp, Warning, TEXT("HomeWorld: Player state is not AHomeWorldPlayerState.")); return; }
+		PS->SetRSNightBonusForDay(true);
+		UE_LOG(LogTemp, Log, TEXT("RS: night→day cross_buff active (hw.RS.CollectNightBonus @ GP_RS_SpecialSite)"));
+	}
+
+	void CmdRSCrossBonusStatus(const TArray<FString>& Args)
+	{
+		UWorld* World = HomeWorldPlayWorld::Resolve();
+		if (!World)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.RS.CrossBonusStatus requires a play world (PIE or game)."));
+			return;
+		}
+		APlayerController* PC = UGameplayStatics::GetPlayerController(World, 0);
+		if (!PC) { UE_LOG(LogTemp, Warning, TEXT("HomeWorld: No player controller.")); return; }
+		AHomeWorldPlayerState* PS = Cast<AHomeWorldPlayerState>(PC->PlayerState);
+		if (!PS) { UE_LOG(LogTemp, Warning, TEXT("HomeWorld: Player state is not AHomeWorldPlayerState.")); return; }
+		UE_LOG(LogTemp, Log, TEXT("RS: status day_bonus_for_night=%d night_bonus_for_day=%d"),
+			PS->GetHasRSDayBonusForNight() ? 1 : 0,
+			PS->GetHasRSNightBonusForDay() ? 1 : 0);
+	}
+
 	void CmdCombatStubs(const TArray<FString>& Args)
 	{
 		UWorld* World = HomeWorldPlayWorld::Resolve();
@@ -1042,6 +1093,21 @@ void FHomeWorldModule::StartupModule()
 		TEXT("hw.Conversion.Test"),
 		TEXT("Trigger conversion hook (ReportFoeConverted) for testing. Logs 'Foe converted (strip sin → loved)' and increments ConvertedFoesThisNight. See CONVERSION_NOT_KILL.md."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdConversionTest),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.RS.CollectDayBonus"),
+		TEXT("Docs/21 RS-E: collect day special-site bonus that buffs night. Logs RS: day_bonus. Use at GP_RS_SpecialSite."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdRSCollectDayBonus),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.RS.CollectNightBonus"),
+		TEXT("Docs/21 RS-E: collect night special-site bonus that buffs day. Logs RS: night_bonus. Use at GP_RS_SpecialSite."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdRSCollectNightBonus),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.RS.CrossBonusStatus"),
+		TEXT("Docs/21 RS-E: log day_bonus_for_night and night_bonus_for_day flags."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdRSCrossBonusStatus),
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.CombatStubs"),

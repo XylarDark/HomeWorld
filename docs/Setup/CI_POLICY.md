@@ -11,7 +11,7 @@
 | Workflow | Runner | UE required | When it runs |
 |----------|--------|-------------|--------------|
 | **[validate.yml](../../.github/workflows/validate.yml)** | GitHub-hosted Ubuntu | No | **Every** push/PR to `main` / `master` |
-| **[ci.yml](../../.github/workflows/ci.yml)** | Self-hosted `[self-hosted, windows, ue57]` | Yes (UE 5.7 + VS) | Push/PR that touches **C++ path filters** (below); needs **DESKTOP-21CT3H0** (or equivalent) online |
+| **[ci.yml](../../.github/workflows/ci.yml)** | Self-hosted `[self-hosted, windows, ue58]` | Yes (UE 5.8 + VS) | Push/PR that touches **C++ path filters** (below); needs **DESKTOP-21CT3H0** (or equivalent) online |
 
 Full runner setup: [CI_SETUP.md](CI_SETUP.md). Cloud → Windows handoff: [WINDOWS_BRIDGE.md](WINDOWS_BRIDGE.md). HR2-C deliverable: [Docs/13c_HR2_C_CI_GATE.md](../../Docs/13c_HR2_C_CI_GATE.md).
 

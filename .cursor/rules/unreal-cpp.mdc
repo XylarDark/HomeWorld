@@ -16,13 +16,13 @@ version: 1.0
 - **Include order:** Own header first, then engine/public includes, then project includes. Keep includes minimal.
 - **Source layout:** C++ lives under `Source/HomeWorld/`. Core pawn is `AHomeWorldCharacter`; default game mode is `AHomeWorldGameMode`.
 - **Canonical example (pawn):** `Source/HomeWorld/HomeWorldCharacter.h` and `HomeWorldCharacter.cpp` — includes, naming, UPROPERTY/UFUNCTION.
-- **Canonical example (GAS):** `HomeWorldGameplayAbility.h/.cpp` and `HomeWorldAttributeSet.h/.cpp` — base ability and attribute set for UE 5.7.
+- **Canonical example (GAS):** `HomeWorldGameplayAbility.h/.cpp` and `HomeWorldAttributeSet.h/.cpp` — base ability and attribute set for UE 5.8.
 
-## UE 5.7 API pitfalls
+## UE 5.7 / 5.8 API pitfalls
 
-For all Unreal-related lookups (APIs, UI, plugins), use **only UE 5.7–specific sources**; see **ue57-sources.mdc**.
+For Unreal lookups use **only UE 5.8–specific sources**; see **ue58-sources.mdc** (5.7 history: ue57-sources.mdc).
 
-These APIs changed or were removed in UE 5.7. Check `docs/KNOWN_ERRORS.md` for the full list.
+These APIs changed or were removed in UE 5.7 and remain relevant on **5.8**. Check `docs/KNOWN_ERRORS.md` for the full list (including **UE 5.8** entries).
 
 | Removed / Deprecated | Replacement |
 |---|---|
@@ -32,5 +32,6 @@ These APIs changed or were removed in UE 5.7. Check `docs/KNOWN_ERRORS.md` for t
 | `UCollisionProfile::Pawn_ProfileName` (may need extra includes) | `FName("Pawn")` literal |
 | `SCENE_QUERY_STAT` macro (version-dependent includes) | `FCollisionQueryParams(NAME_None, false, OwnerActor)` |
 | `FPaths::IsRelativePath(...)` | `FPaths::IsRelative(...)` (renamed in UE 5.7) |
+| **`MassEntity` plugin** (UE **5.8**) | Removed from Launcher installs; enable **MassGameplay** / **MassAI** only — do not list MassEntity in `.uproject` |
 
 When writing or reviewing C++ that uses `FindObject`, image compression, or global constants, verify against this table first.

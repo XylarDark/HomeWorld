@@ -34,10 +34,10 @@ Machine: **DESKTOP-21CT3H0** · `machineId` per [WINDOWS_BRIDGE.md](../../docs/S
 
 ### A. Verify / copy Mannequins (local only)
 
-**Source (Epic UE 5.7):**
+**Source (Epic UE 5.8):**
 
 ```text
-%UE_5.7%\Templates\TemplateResources\High\Characters\Content\Mannequins
+%UE_5.8%\Templates\TemplateResources\High\Characters\Content\Mannequins
 ```
 
 **Destination:**

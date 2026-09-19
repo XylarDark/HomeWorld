@@ -111,6 +111,28 @@ void AHomeWorldPlayerState::SetDayRestorationBuff(bool bActive)
 	}
 }
 
+void AHomeWorldPlayerState::SetRSDayBonusForNight(bool bActive)
+{
+	bHasRSDayBonusForNight = bActive;
+	UE_LOG(LogTemp, Log, TEXT("RS: day_bonus %s; night_buff=%d"), bActive ? TEXT("collected") : TEXT("cleared"), bActive ? 1 : 0);
+}
+
+void AHomeWorldPlayerState::SetRSNightBonusForDay(bool bActive)
+{
+	bHasRSNightBonusForDay = bActive;
+	UE_LOG(LogTemp, Log, TEXT("RS: night_bonus %s; day_buff=%d"), bActive ? TEXT("collected") : TEXT("cleared"), bActive ? 1 : 0);
+}
+
+void AHomeWorldPlayerState::ClearRSCrossBonuses()
+{
+	if (bHasRSDayBonusForNight || bHasRSNightBonusForDay)
+	{
+		bHasRSDayBonusForNight = false;
+		bHasRSNightBonusForDay = false;
+		UE_LOG(LogTemp, Log, TEXT("RS: cross_bonuses cleared at dawn"));
+	}
+}
+
 void AHomeWorldPlayerState::IncrementMealsConsumedToday()
 {
 	if (MealsConsumedToday < INT32_MAX)

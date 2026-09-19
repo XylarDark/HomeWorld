@@ -1,0 +1,40 @@
+---
+name: "UE 5.8 — Always use 5.8-specific sources"
+description: "For any Unreal Engine API, UI, plugin, or documentation: use only UE 5.8–specific sources; do not rely on training data or other engine versions"
+alwaysApply: false
+globs: "**/*.uproject, **/Source/**, **/Content/**, **/Config/**, **/Plugins/**"
+priority: 6
+version: 1.0
+---
+
+# UE 5.8 sourcing policy
+
+Supersedes **ue57-sources.mdc** for active development. Keep ue57-* as historical pointers only.
+
+## Rule
+
+**Whenever you need or give information about Unreal Engine** (APIs, Editor UI, plugins, Blueprint, Python Editor API, behavior, or setup):
+
+1. **Use only UE 5.8–specific sources.** Do not rely on training data or documentation for other engine versions.
+2. **Prefer in order:**
+   - **Epic Unreal Engine 5.8 documentation:** https://dev.epicgames.com/documentation/en-us/unreal-engine/ (filter or search for "Unreal Engine 5.8").
+   - **Project docs:** `docs/UE/UE58_TECH.md`, `docs/UE/UE58_EDITOR_UI.md`, `docs/KNOWN_ERRORS.md`, and feature docs (e.g. `docs/PCG/PCG_SETUP.md`, `docs/PCG/PCG_VARIABLES_NO_ACCESS.md`).
+   - **Project rules:** `unreal-cpp.mdc` (pitfalls table), `ue58-editor-ui.mdc` (Editor UI), `12-python.mdc` (Python API table).
+3. **When looking something up:** Use web search or `/parallel-search` with **"Unreal Engine 5.8"** (or "UE 5.8") in the query.
+4. **When giving instructions:** Cite the Epic 5.8 doc URL when steps come from it. Use exact option/menu/API names from the 5.8 doc.
+5. **Tutorials:** Prefer guides that explicitly target **UE 5.8** (or 5.7 if 5.8 is scarce); cross-check with Epic 5.8 docs.
+
+## Applies to
+
+- **C++ and Blueprint APIs** — Epic 5.8 API reference and `unreal-cpp.mdc` / `docs/KNOWN_ERRORS.md`.
+- **Editor UI** — Epic 5.8 docs and `docs/UE/UE58_EDITOR_UI.md`; see `ue58-editor-ui.mdc`.
+- **Python Editor API** — 5.8 Python API and `12-python.mdc`; see KNOWN_ERRORS for signature changes.
+- **Plugins** (PCG, GAS, Mass, State Tree, etc.) — Epic 5.8 plugin docs. **MassEntity** is not a separate plugin in 5.8 — use MassGameplay / MassAI only.
+- **Automation and “no access”** — Epic 5.8 docs; see `automation-standards.mdc`.
+
+## Quick reference
+
+- **Epic UE docs root:** https://dev.epicgames.com/documentation/en-us/unreal-engine/
+- **Project UE 5.8 entry:** `docs/UE/UE58_TECH.md`
+- **Upgrade track:** `Docs/22_UE58_UPGRADE.md`
+- **Editor UI procedures:** `docs/UE/UE58_EDITOR_UI.md`, `.cursor/rules/ue58-editor-ui.mdc`

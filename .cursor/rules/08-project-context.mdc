@@ -10,11 +10,11 @@ version: 1.0
 
 ## Project Purpose
 
-HomeWorld is a co-op ARPG survival game with family sim elements, built in Unreal Engine 5.7. Players explore, fight, build, and nurture bonds. Target: 8-12h campaign + endgame; PC, Steam Early Access.
+HomeWorld is a co-op ARPG survival game with family sim elements, built in Unreal Engine 5.8. Players explore, fight, build, and nurture bonds. Target: 8-12h campaign + endgame; PC, Steam Early Access.
 
 ## Tech Stack
 
-- Unreal Engine 5.7 (C++ game module + Blueprint for content)
+- Unreal Engine 5.8 (C++ game module + Blueprint for content)
 - Enhanced Input, PCG, Gameplay Abilities, Steam Sockets, Day Sequence
 - Python Editor scripting for automation (`Content/Python/`)
 - MCP bridge for Cursor-to-Editor live control (UnrealMCP plugin)
@@ -51,8 +51,8 @@ HomeWorld is a co-op ARPG survival game with family sim elements, built in Unrea
 ## Conventions
 
 - C++ naming: PascalCase types, camelCase locals; Unreal prefixes (A, U, F, E, I)
-- UE 5.7 target: check `unreal-cpp.mdc` API pitfalls table before using deprecated APIs
-- **Unreal-related information:** Use **only UE 5.7–specific sources** (Epic 5.7 docs, docs/UE57_TECH.md, docs/UE57_EDITOR_UI.md, docs/KNOWN_ERRORS.md). Do not rely on training data or other engine versions. See **ue57-sources.mdc**.
+- UE 5.8 target: check `unreal-cpp.mdc` API pitfalls table before using deprecated APIs
+- **Unreal-related information:** Use **only UE 5.8–specific sources** (Epic 5.8 docs, docs/UE/UE58_TECH.md, docs/UE/UE58_EDITOR_UI.md when present, docs/KNOWN_ERRORS.md). Do not rely on training data or other engine versions. See **ue58-sources.mdc**.
 - PowerShell shell: use `;` not `&&` for command chaining
 - Batch files in project root for common operations (build, open VS, run scripts, MCP setup)
 - Debug logs go to `Saved/Logs/` (gitignored)

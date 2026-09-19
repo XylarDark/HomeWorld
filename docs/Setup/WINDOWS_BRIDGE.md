@@ -6,7 +6,7 @@
 
 ## Host roles
 
-| Host | OS | UE 5.7 | MCP | Typical work |
+| Host | OS | UE 5.8 | MCP | Typical work |
 |------|-----|--------|-----|--------------|
 | **Cursor cloud agent** | Linux | No | No | Docs, C++ edits, Python scripts, PRs |
 | **GitHub self-hosted runner** | Windows (`DESKTOP-21CT3H0`) | Yes | Optional | `ci.yml` Win64 build, automation tests |
@@ -21,7 +21,7 @@ Cloud agent PR (GitHub)
     │
     ├─ docs-only ──► validate.yml (Ubuntu) ──► merge when green
     │
-    └─ C++ / needs PIE ──► validate.yml ──► ci.yml (self-hosted ue57)
+    └─ C++ / needs PIE ──► validate.yml ──► ci.yml (self-hosted ue58)
                                     │
                                     └─► DESKTOP-21CT3H0: build + optional tests
                                               │
@@ -48,7 +48,7 @@ Runs on Ubuntu — no UE install:
 
 ### 3. GitHub Actions — ci.yml (when C++ touched)
 
-Requires runner labels: `self-hosted`, `windows`, `ue57`.
+Requires runner labels: `self-hosted`, `windows`, `ue58`.
 
 - Checkout + LFS
 - `RunFullBuild.ps1` / `Build-HomeWorld.bat`

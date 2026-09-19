@@ -39,7 +39,7 @@ cursor/<descriptive-name>-b3a5
 | **PR URL** | GitHub PR link in handoff + PHASE_BOARD note |
 | **Merge SHA** | Squash-merge commit on `main` after Lead/Conductor merge |
 | **CI status** | `validate` + `python-lint` green (required for **all** PRs) |
-| **`ci.yml` / `build-win64`** | **Required** when PR touches C++ paths: `Source/**`, `**/*.Build.cs`, `*.uproject`, `Plugins/**/Source/**` — self-hosted `windows`/`ue57` runner on **DESKTOP-21CT3H0**. **Lead waiver:** PR body `Lead waiver: build-win64` or label `lead-waiver-build-win64` — see [CI_POLICY.md](../docs/Setup/CI_POLICY.md) (HR2-C) |
+| **`ci.yml` / `build-win64`** | **Required** when PR touches C++ paths: `Source/**`, `**/*.Build.cs`, `*.uproject`, `Plugins/**/Source/**` — self-hosted `windows`/`ue58` runner on **DESKTOP-21CT3H0**. **Lead waiver:** PR body `Lead waiver: build-win64` or label `lead-waiver-build-win64` — see [CI_POLICY.md](../docs/Setup/CI_POLICY.md) (HR2-C) |
 | **Windows validation** | **DESKTOP owner = Conductor parent only** — not cloud VM, not Task executors. Safe-Build → Editor → MCP on DESKTOP-21CT3H0 after merge |
 
 List repo-relative paths for every deliverable (files created/changed). Gate claims without paths are invalid per SWARM_OPS.
