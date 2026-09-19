@@ -187,7 +187,7 @@ If two packets name the same path, Conductor is wrong. Fix the packet. Do not le
 
 Max parallel in one wave: number of **non-overlapping owners**. Phase 3 max 3 (ENV-H, PROP, LIT). Phase 5 max 3 if CHA / GP / SYS own different trees.
 
-**Thin worker context (required):** Worker prompt = role card (`swarm/agents/{role}.md`) + **only** canon slices and input paths listed in the wave packet + current `PHASE_BOARD` row. Conductor does **not** paste the full brief, prior worker chat, or UE automation docs into worker prompts.
+**Thin worker context (required):** Worker prompt = role card (`swarm/agents/{role}.md`) + **only** canon slices and input paths listed in the wave packet + current `PHASE_BOARD` row. Conductor does **not** paste the full brief, prior worker chat, or UE automation docs into worker prompts. **Model class:** Conductor parent defaults to **Mid** (Frontier only for hard gate synthesis); workers default **Mid** / **Auto** unless the role card states **Preferred model class: Frontier** (AD taste, QA judge). See [SWARM_MODE_ROUTING.md](../docs/human-use/SWARM_MODE_ROUTING.md).
 
 ## 8. Defect protocol
 

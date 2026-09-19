@@ -135,6 +135,7 @@ Agent company, automation loop, gaps, refinement, logs, research.
 | [Automation/AUTOMATION_READINESS.md](Automation/AUTOMATION_READINESS.md) | Prerequisites; what's ready to run. |
 | [Automation/AUTOMATION_CAPABILITIES_VERIFICATION.md](Automation/AUTOMATION_CAPABILITIES_VERIFICATION.md) | Verification of automation capabilities. |
 | [Automation/FULL_AUTOMATION_RESEARCH.md](Automation/FULL_AUTOMATION_RESEARCH.md) | Full automation stack; tool catalog. |
+| [Automation/SWARM_ROUTING_RESEARCH.md](Automation/SWARM_ROUTING_RESEARCH.md) | Studio + model research for SWARM/NON-SWARM mode and ModelClass routing. |
 | [Automation/GUI_AUTOMATION_WHY_AND_WHEN.md](Automation/GUI_AUTOMATION_WHY_AND_WHEN.md) | When to use GUI automation vs manual. |
 | [Automation/ALTERNATIVE_AUTOMATION_OPTIONS.md](Automation/ALTERNATIVE_AUTOMATION_OPTIONS.md) | Alternative automation approaches. |
 | [Automation/GAP_SOLUTIONS_RESEARCH.md](Automation/GAP_SOLUTIONS_RESEARCH.md) | Research for closing automation gaps. |

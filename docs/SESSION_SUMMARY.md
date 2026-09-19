@@ -515,3 +515,8 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 - Merged PR #111 (U58F) and PR #112 (swarm mode routing); feature remotes deleted.
 - Docs/23 stamped **CLOSED**; PHASE_BOARD idle (post-U58F).
 
+### 2026-09-19 — Swarm routing optimize (model class + research)
+
+- Added [SWARM_ROUTING_RESEARCH.md](Automation/SWARM_ROUTING_RESEARCH.md); expanded [SWARM_MODE_ROUTING.md](human-use/SWARM_MODE_ROUTING.md) with ModelClass + progressive disclosure.
+- Skill description triggers enriched; AD/QA/Conductor **Preferred model class**; token-efficient-context + SWARM_OPS linked.
+
