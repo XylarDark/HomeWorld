@@ -510,3 +510,8 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 - Wired AGENTS.md, START_HERE, SWARM_OPS §0, agent-workflow, DOCS_LAYOUT.
 - Note: self-hosted `build-win64` queue is merge hygiene, not a mode-routing blocker.
 
+### 2026-09-19 — Merge outstanding to main
+
+- Merged PR #111 (U58F) and PR #112 (swarm mode routing); feature remotes deleted.
+- Docs/23 stamped **CLOSED**; PHASE_BOARD idle (post-U58F).
+

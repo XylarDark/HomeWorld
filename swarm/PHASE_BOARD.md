@@ -1,10 +1,10 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **Docs/23 UE 5.8 Feature Adoption — ACTIVE** — [23_UE58_FEATURE_ADOPTION.md](../Docs/23_UE58_FEATURE_ADOPTION.md). Branch `feat/ue58-feature-adoption`. Docs/22 **CLOSED**.
+**Current phase:** **Idle (post-U58F)** — Docs/23 **CLOSED** ([23_UE58_FEATURE_ADOPTION.md](../Docs/23_UE58_FEATURE_ADOPTION.md)). Swarm mode routing on main ([SWARM_MODE_ROUTING.md](../docs/human-use/SWARM_MODE_ROUTING.md)). Docs/22 **CLOSED**.
 
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **Conductor** (parent DESKTOP) / **DESKTOP-21CT3H0**
-**Blocked by:** U58F-C AD gate for PVE pine commit; U58F-G Landscape replace needs AD+WLD.
+**Blocked by:** Optional follow-ons only — U58F-C AD PVE pine Content commit; U58F-G Landscape replace (AD+WLD+`APPROVE U58F-G`).
 **Sign-off doc:** [Docs/17_HS_AUDIT_SIGN_OFF.md](../Docs/17_HS_AUDIT_SIGN_OFF.md) — **SIGNED OFF** Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET.
 
 
@@ -108,16 +108,16 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **U58-D** | UnrealMCP + automation | DESKTOP | **APPROVED / CLOSED** | MCP 55557 Listen; Python OK |
 | **U58-E** | VS_MVP content / PIE smoke | DESKTOP | **APPROVED / CLOSED** | RS placement + `hw.RS.*` LogTemp PASS |
 | **U58-F** | Docs/rules + close + PR | CLOUD+Lead | **APPROVED / CLOSED** | UE58_TECH · ue58-sources · track CLOSED |
-| **Docs/23** | UE 5.8 Feature Adoption (U58F) | CLOUD+DESKTOP+Lead | **STRATEGY APPROVED / ACTIVE** | [23_UE58_FEATURE_ADOPTION.md](../Docs/23_UE58_FEATURE_ADOPTION.md) |
+| **Docs/23** | UE 5.8 Feature Adoption (U58F) | CLOUD+DESKTOP+Lead | **CLOSED** (PR #111) | [23_UE58_FEATURE_ADOPTION.md](../Docs/23_UE58_FEATURE_ADOPTION.md) |
 | **U58F-A** | Strategy + matrix | CLOUD | **APPROVED** | Docs/23 · UE58_TECH capabilities table |
 | **U58F-B** | PCG 5.8 workflow | CLOUD+DESKTOP | **APPROVED** | PCGBiomeCore/Primitives · `u58f_pcg_smoke.py` |
-| **U58F-C** | PVE stylized pine | DESKTOP+AD | **IN PROGRESS** | Plugin on · AD gate [U58F_C_PVE_PINE.md](../Docs/handoffs/U58F_C_PVE_PINE.md) |
+| **U58F-C** | PVE stylized pine | DESKTOP+AD | **PLUGIN ON / AD PENDING** | Plugin on · AD gate [U58F_C_PVE_PINE.md](../Docs/handoffs/U58F_C_PVE_PINE.md) |
 | **U58F-D** | MegaLights + Fog SSS | DESKTOP | **APPROVED** | DefaultEngine.ini · `u58f_night_look_smoke.py` |
 | **U58F-E** | Lumen Lite path | CLOUD | **APPROVED** | Medium GI/Reflections · DefaultScalability.ini |
 | **U58F-F** | MCP decision | CLOUD | **APPROVED** | Keep UnrealMCP · [U58F_F_MCP_DECISION.md](../Docs/handoffs/U58F_F_MCP_DECISION.md) |
 | **U58F-G** | Mesh Terrain spike | DESKTOP | **SPIKE READY** | Plugin on · sandbox only · [U58F_G_MESH_TERRAIN.md](../Docs/handoffs/U58F_G_MESH_TERRAIN.md) |
 
-**Current track:** **Docs/23 UE 5.8 Feature Adoption ACTIVE**. Docs/22 **CLOSED**. Do not reopen VP2/D19/RS.
+**Current track:** **Idle** — Docs/23 **CLOSED**; swarm routing on main. Docs/22 **CLOSED**. Do not reopen VP2/D19/RS.
 
 ---
 

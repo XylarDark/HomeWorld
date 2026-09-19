@@ -2,14 +2,14 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **U58F-A…G IMPLEMENTED** (C AD gate pending for pine commit; G sandbox-only) — Lead implement-plan 2026-09-19 ET |
+| **Status** | **CLOSED / COMPLETE** — merged PR #111; AD pine Content commit + Mesh Terrain Landscape replace remain optional follow-ons — 2026-09-19 ET |
 | **Date** | 2026-09-19 |
 | **Author** | Conductor (HomeWorld) |
 | **Prior** | Docs/22 UE 5.8 Upgrade **CLOSED** — [22_UE58_UPGRADE.md](22_UE58_UPGRADE.md) |
 | **Prefix** | **U58F** |
 | **Engine** | Launcher UE **5.8.2** (features from 5.8.0; 5.8.2 hotfix install) |
-| **Branch** | `feat/ue58-feature-adoption` |
-| **PR** | [#111](https://github.com/XylarDark/HomeWorld/pull/111) |
+| **Branch** | `main` (was `feat/ue58-feature-adoption`) |
+| **PR** | [#111](https://github.com/XylarDark/HomeWorld/pull/111) **MERGED** |
 
 ---
 
