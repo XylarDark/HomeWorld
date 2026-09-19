@@ -2,12 +2,14 @@
   "path": "DevEnvTemplate",
   "remote": "https://github.com/XylarDark/DevEnvTemplate.git",
   "branch": "master",
-  "sha": "2efd7569a698e73a04279feaebaae1eb55c4e1c0",
-  "shortSha": "2efd756",
+  "sha": "9ac243b6f1af74b160a7c8986a993fbc12645483",
+  "shortSha": "9ac243b",
   "docPaths": [
     "docs/Setup/CURSOR_DEV.md",
     "Docs/13b_HR2_B_COLD_CLONE.md"
   ],
   "hr2Phase": "HR2-B",
-  "updated": "2026-09-17"
+  "updated": "2026-09-19",
+  "productName": "DevHarness",
+  "note": "Product rebranded DevHarness; vendored path remains DevEnvTemplate/"
 }

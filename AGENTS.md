@@ -34,9 +34,9 @@
 
 **Compound Engineering plugin:** The plugin is installed; **recommending its commands when appropriate is policy**. When a task is a good use case for a plugin workflow (plan, review, changelog, docs lookup, etc.), recommend the corresponding slash command instead of doing that workflow yourself. The situation-to-command mapping is in [.cursor/rules/10-compound-engineering.mdc](.cursor/rules/10-compound-engineering.mdc). Use **context7** MCP for up-to-date library/framework docs when relevant. Optional one-time: run `/setup` in Cursor to configure review agents for this project.
 
-## DevEnvTemplate (adopted layers)
+## DevHarness (adopted layers)
 
-HomeWorld vendors [DevEnvTemplate/](DevEnvTemplate/) as a **gitlink** (pinned SHA — registry: [config/devenv-template-pin.json](config/devenv-template-pin.json)) and adopts these layers:
+HomeWorld vendors [DevEnvTemplate/](DevEnvTemplate/) as a **gitlink** to **DevHarness** (product rename 2026-09-19 — pinned SHA; registry: [config/devenv-template-pin.json](config/devenv-template-pin.json)) and adopts these layers:
 
 | Layer | Status |
 | ----- | ------ |
