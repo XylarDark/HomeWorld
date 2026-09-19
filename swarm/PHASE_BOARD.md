@@ -1,6 +1,6 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **Docs/20 CLOSED / COMPLETE** — Lead **`APPROVE UASSET POLICY`**, 2026-09-17 ET (PR #108; allowlist **active**)
+**Current phase:** **Docs/20 CLOSED / COMPLETE** — Lead **`APPROVE UASSET POLICY`**, 2026-09-17 ET (PR #108); **allowlist extended 2026-09-18** (VS_MVP dress meshes + combat GAs on main `bb8ce21`; Mannequins KEEP-LOCAL)
 
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **Conductor** (parent DESKTOP) / **DESKTOP-21CT3H0**

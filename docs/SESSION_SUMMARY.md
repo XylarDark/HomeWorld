@@ -1,3 +1,8 @@
+## 2026-09-18 ET — Merge outstanding work into main + prune branches
+
+Lead: merge all outstanding work into **main** and remove feature branches. PR #109 merged (VS_MVP markers). Allowlist extended (Docs/20 + `config/uasset-allowlist.json` + `.gitattributes`) for Meshes/Materials/Biomes/Harvestables/Dungeon + GA_Dodge/PrimaryAttack + khronos_box_scale_ref; committed + pushed (`bb8ce21`). **Mannequins** remain KEEP-LOCAL. Local feature branches deleted; **39** remote `cursor/*` / `docs/*` / content branches deleted. Repo branches: **main** only.
+
+
 ## 2026-09-17 ET — APPROVE UASSET POLICY
 
 Lead **`APPROVE UASSET POLICY`**, 2026-09-17 ET. [Docs/20_UASSET_AI_POLICY.md](../Docs/20_UASSET_AI_POLICY.md) stamped **APPROVED / COMPLETE**; allowlist **active** (default KEEP-LOCAL elsewhere). PR #108 merged. No Content binaries. Next product track TBD (Lead gate).
