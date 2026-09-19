@@ -26,6 +26,8 @@ You own **steer**, **taste**, and **test** for the swarm. Agents execute and **a
 
 Swarm role cards live in [`.cursor/agents/`](.cursor/agents/) (copied from [swarm/agents/](swarm/agents/)). Conductor spawns **one specialist per task** with thin context (role card + wave packet inputs only). They are **not** the UE automation company (Developer / Fixer / Guardian in [docs/Automation/AGENT_COMPANY.md](docs/Automation/AGENT_COMPANY.md) unless you explicitly invoke that loop.
 
+**When is swarm the right chat?** Agents classify **SWARM vs NON-SWARM vs HYBRID** at task start — [docs/human-use/SWARM_MODE_ROUTING.md](docs/human-use/SWARM_MODE_ROUTING.md). Engine/CI/C++/Python automation stays NON-SWARM; lookdev + Lead gates use this Conductor path.
+
 ## Session continuity (swarm)
 
 At **session start:** read [docs/SESSION_SUMMARY.md](docs/SESSION_SUMMARY.md) and [swarm/PHASE_BOARD.md](swarm/PHASE_BOARD.md) — not the full [docs/SESSION_LOG.md](docs/SESSION_LOG.md) unless debugging a past incident.

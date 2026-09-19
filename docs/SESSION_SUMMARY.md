@@ -489,3 +489,10 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 ---
 
 *Maintained by Conductor; HR-C established this rolling policy.*
+
+### 2026-09-19 — Swarm mode routing protocol
+
+- Added [docs/human-use/SWARM_MODE_ROUTING.md](human-use/SWARM_MODE_ROUTING.md) + skill swarm-mode-routing.
+- Wired AGENTS.md, START_HERE, SWARM_OPS §0, agent-workflow, DOCS_LAYOUT.
+- Note: PR #111 uild-win64 may sit queued on self-hosted runner — not a mode-routing blocker.
+

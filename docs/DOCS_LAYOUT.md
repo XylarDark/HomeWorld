@@ -86,6 +86,7 @@ job and stop when a decision you own is missing. Applies anywhere in the tree.
 |------|--------|
 | [human-use/README.md](human-use/README.md) | Index for ownership docs. |
 | [human-use/OWNERSHIP.md](human-use/OWNERSHIP.md) | Who owns the next step; alert shape. |
+| [human-use/SWARM_MODE_ROUTING.md](human-use/SWARM_MODE_ROUTING.md) | Detect SWARM / NON-SWARM / HYBRID at task start (token efficiency). |
 | [human-use/CYCLE.md](human-use/CYCLE.md) | When a decision is due for this task. |
 | [human-use/outcome.md](human-use/outcome.md) | Gradeable rubric; verifier scores, not the implementer. |
 | [human-use/cursor-cannot/](human-use/cursor-cannot/README.md) | Week 1 PDF slices Cursor does not enforce. |
