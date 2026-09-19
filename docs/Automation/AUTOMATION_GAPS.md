@@ -146,3 +146,4 @@ Findings from deep research are recorded in [docs/GAP_SOLUTIONS_RESEARCH.md](GAP
 - **Needed:** Run `vnp_p3_pine_import.py` with Editor+MCP; AssetImportTask for SM_Pine_Stylized_VNP.obj
 - **Why blocked:** UnrealEditor connection closed mid-session (WinError 10054)
 - **Approach:** Re-open Editor, MCP green, execute_python_script vnp_p3_pine_import.py; commit allowlisted .uasset via LFS
+- **Addressed (2026-09-19 WTR-C):** UnrealEditor-Cmd `wtr_c_batch_run.py` → `Saved/vnp_p3_pine_import.json` `ok=true`; asset `Content/HomeWorld/Meshes/Environment/SM_Pine_Stylized_VNP.uasset` created. Commit via Docs/20 allowlist when Lead stages LFS.

@@ -1,3 +1,8 @@
+## 2026-09-19 ET — Docs/25 WTR implement (A–E)
+
+Workspace & Tooling Refine on `feat/ue58-workspace-tooling`: Docs/25 matrix; [U58F_F](../Docs/handoffs/U58F_F_MCP_DECISION.md) Epic vs UnrealMCP capability matrix (**keep UnrealMCP**); pine `.uasset` via Cmd batch; evidence binds `CAM_Hero`/`CAM_CabinClose`/`CAM_PortalNight`; keep_alive pattern; PCG introspect 5.8 refresh; PVE/Mesh CVars notes; [UE58_TECH](../docs/UE/UE58_TECH.md) DESKTOP stability playbook. PHASE_BOARD WTR **CLOSING**.
+
+
 ## 2026-09-19 ET — APPROVE RS-E / Docs/21 CLOSED
 
 Lead **`APPROVE RS-E`**, 2026-09-19 ET. Docs/21 Reap & Sow **CLOSED / COMPLETE** (RS-A…E). Special cross-bonus + `hw.RS.*` accepted. PHASE_BOARD: no active product phase — next track TBD (Lead gate). Do not reopen RS/VP2/D19.

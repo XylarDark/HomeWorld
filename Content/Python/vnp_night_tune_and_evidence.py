@@ -2,7 +2,11 @@
 
 Loads current editor level, reinforces MegaLights/Fog SSS, warms Point/Spot
 lights toward amber, cools directional if present, high-res screenshots for
-shots 1/2/5 camera actors when named, else viewport captures.
+shots 1/2/5 bound to named cameras on L_VS_MVP_Markers (CAM_Hero,
+CAM_CabinClose, CAM_PortalNight). Uses AutomationLibrary.take_high_res_screenshot
+and optional compare_image_against_reference when a golden exists under
+Saved/VNP_Evidence/Goldens/.
+
 Writes Saved/vnp_night_evidence.json.
 """
 from __future__ import annotations
@@ -15,6 +19,23 @@ import unreal
 
 OUT = unreal.Paths.project_saved_dir() + "vnp_night_evidence.json"
 SHOT_DIR = unreal.Paths.project_saved_dir() + "VNP_Evidence/"
+GOLDEN_DIR = SHOT_DIR + "Goldens/"
+
+# Canon shot → preferred actor labels (Maps/VS_MVP README + place_vs_mvp_markers CAM)
+SHOT_CAMERA_BINDINGS = [
+    (
+        "shot1_lookout",
+        ("CAM_Hero", "Shot1", "Lookout", "Hero", "CAM_Shot1"),
+    ),
+    (
+        "shot2_cabin",
+        ("CAM_CabinClose", "Shot2", "Cabin", "Garden", "CAM_Shot2"),
+    ),
+    (
+        "shot5_spirit",
+        ("CAM_PortalNight", "Shot5", "Spirit", "Portal", "Shrine", "CAM_Shot5"),
+    ),
+]
 
 
 def _try_set(obj, name: str, value) -> bool:
@@ -36,8 +57,65 @@ def _ensure_dir(path: str) -> None:
         os.makedirs(path, exist_ok=True)
 
 
+def _actor_label(a) -> str:
+    try:
+        return a.get_actor_label() or a.get_name()
+    except Exception:
+        return a.get_name() if a else ""
+
+
+def _find_camera(actors, needles: tuple[str, ...]):
+    """Prefer exact label match, then substring on label/name."""
+    cams = []
+    for a in actors:
+        if not a:
+            continue
+        cls = a.get_class().get_name() if a.get_class() else ""
+        if "Camera" not in cls:
+            continue
+        cams.append(a)
+
+    needle_l = [n.lower() for n in needles]
+    for needle in needle_l:
+        for a in cams:
+            label = _actor_label(a).lower()
+            name = a.get_name().lower()
+            if label == needle or name == needle:
+                return a
+    for a in cams:
+        label = _actor_label(a).lower()
+        name = a.get_name().lower()
+        if any(n in label or n in name for n in needle_l):
+            return a
+    return None
+
+
+def _compare_to_golden(shot_id: str, abs_path: str) -> dict | None:
+    golden = GOLDEN_DIR + shot_id + ".png"
+    if not os.path.isfile(golden):
+        return None
+    if not os.path.isfile(abs_path):
+        return {"golden": golden, "compared": False, "reason": "screenshot missing"}
+    try:
+        # UE 5.8 AutomationLibrary — tolerance soft for lighting variance
+        ok = unreal.AutomationLibrary.compare_image_against_reference(
+            abs_path,
+            golden,
+            0.15,
+        )
+        return {"golden": golden, "compared": True, "match": bool(ok)}
+    except TypeError:
+        # Signature variants across 5.8 builds
+        try:
+            ok = unreal.AutomationLibrary.compare_image_against_reference(abs_path, golden)
+            return {"golden": golden, "compared": True, "match": bool(ok)}
+        except Exception as e:
+            return {"golden": golden, "compared": False, "error": str(e)}
+    except Exception as e:
+        return {"golden": golden, "compared": False, "error": str(e)}
+
+
 def _stat_fps() -> str:
-    # Best-effort: console does not return FPS to Python; note request time.
     try:
         unreal.SystemLibrary.execute_console_command(None, "stat fps")
     except Exception:
@@ -64,7 +142,7 @@ def main() -> None:
     for a in actors:
         if not a:
             continue
-        name = a.get_name()
+        name = _actor_label(a)
         cls = a.get_class().get_name() if a.get_class() else ""
 
         if "CameraActor" in cls or "CineCamera" in cls:
@@ -83,7 +161,6 @@ def main() -> None:
                 ):
                     if _try_set(comp, prop, True):
                         applied.append(prop)
-                # Soft density bump toward readable atmosphere (not grim)
                 for prop, val in (
                     ("fog_density", 0.02),
                     ("fog_height_falloff", 0.2),
@@ -116,27 +193,11 @@ def main() -> None:
             if lc and _try_set(lc, "light_color", cool):
                 lights_tuned.append({"actor": name, "class": cls, "applied": ["light_color=cool_moon"]})
 
-    # Prefer named cameras matching shot intents; else viewport
-    shot_specs = [
-        ("shot1_lookout", ("Shot1", "Lookout", "Hero", "CAM_Shot1", "CameraActor")),
-        ("shot2_cabin", ("Shot2", "Cabin", "Garden", "CAM_Shot2")),
-        ("shot5_spirit", ("Shot5", "Spirit", "Portal", "Shrine", "CAM_Shot5")),
-    ]
     evidence = []
-    for shot_id, needles in shot_specs:
+    for shot_id, needles in SHOT_CAMERA_BINDINGS:
         fname = shot_id + ".png"
         abs_path = SHOT_DIR + fname
-        cam = None
-        for a in actors:
-            if not a:
-                continue
-            n = a.get_name()
-            cls = a.get_class().get_name() if a.get_class() else ""
-            if "Camera" not in cls:
-                continue
-            if any(x.lower() in n.lower() for x in needles):
-                cam = a
-                break
+        cam = _find_camera(actors, needles)
         if cam:
             try:
                 unreal.EditorLevelLibrary.set_level_viewport_camera_info(
@@ -144,14 +205,27 @@ def main() -> None:
                     cam.get_actor_rotation(),
                 )
             except Exception as e:
-                unreal.log_warning("VNP: set camera failed %s: %s" % (cam.get_name(), e))
+                unreal.log_warning("VNP: set camera failed %s: %s" % (_actor_label(cam), e))
         try:
             unreal.AutomationLibrary.take_high_res_screenshot(1600, 900, abs_path)
-            evidence.append({"shot": shot_id, "path": abs_path, "camera": cam.get_name() if cam else "viewport"})
+            entry = {
+                "shot": shot_id,
+                "path": abs_path,
+                "camera": _actor_label(cam) if cam else "viewport",
+                "bound": bool(cam),
+            }
         except Exception as e:
-            # Fallback: mark path expected
-            evidence.append({"shot": shot_id, "path": abs_path, "error": str(e), "camera": cam.get_name() if cam else "viewport"})
-
+            entry = {
+                "shot": shot_id,
+                "path": abs_path,
+                "error": str(e),
+                "camera": _actor_label(cam) if cam else "viewport",
+                "bound": bool(cam),
+            }
+        cmp = _compare_to_golden(shot_id, abs_path)
+        if cmp:
+            entry["golden_compare"] = cmp
+        evidence.append(entry)
         time.sleep(0.3)
 
     world = unreal.EditorLevelLibrary.get_editor_world()
@@ -159,12 +233,17 @@ def main() -> None:
 
     result = {
         "ok": True,
-        "phase": "VNP-N0/N1/N2",
+        "phase": "VNP-N0/N1/N2 + WTR-C",
         "level": level_name,
         "fog_tuned": fog_tuned,
         "lights_tuned_count": len(lights_tuned),
         "lights_tuned_sample": lights_tuned[:12],
         "cameras_found": cameras[:40],
+        "camera_bindings": {
+            "shot1_lookout": "CAM_Hero",
+            "shot2_cabin": "CAM_CabinClose",
+            "shot5_spirit": "CAM_PortalNight",
+        },
         "evidence": evidence,
         "fps_note": _stat_fps(),
         "project_cvars": {
@@ -174,7 +253,8 @@ def main() -> None:
         "ad_status": "pending_AD",
         "notes": [
             "Warm windows vs cool moon per Docs/02_ART_BIBLE; not grimdark.",
-            "Shots 1/2/5 only — no sixth framing.",
+            "Shots 1/2/5 bound to CAM_Hero / CAM_CabinClose / CAM_PortalNight.",
+            "Optional goldens: Saved/VNP_Evidence/Goldens/<shot_id>.png",
             "Content map changes KEEP-LOCAL until Lead allowlist commit.",
         ],
     }

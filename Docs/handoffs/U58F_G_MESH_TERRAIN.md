@@ -19,6 +19,26 @@
 
 `Content/Python/u58f_mesh_terrain_smoke.py` → `Saved/u58f_mesh_terrain_smoke.json`
 
-## 5.8.2 note
+## 5.8.2 tessellation / memory (WTR-D)
 
-If OOM during sculpt, apply Mesh Terrain memory budget CVars from the [5.8.2 hotfix notes](https://forums.unrealengine.com/t/5-8-2-hotfix-released/2746335).
+Source: [5.8.2 Hotfix](https://forums.unrealengine.com/t/5-8-2-hotfix-released/2746335) — Mesh Terrain crash on extreme tessellation.
+
+| Guard | Behavior |
+|-------|----------|
+| Soft budget | Console variable caps **newly created elements per tessellation (Remesh) modifier** — **default 100,000,000** |
+| Hard cap | Attempts exceeding **MAX_int32** elements are always blocked |
+| On hit | Tessellation / Remesh modifier **does nothing** (no crash) |
+
+**Discover exact CVar name on DESKTOP** (name not published in forum prose; may ship under MeshPartition / Remesh):
+
+```text
+DumpConsoleVariables MeshPartition
+DumpConsoleVariables Remesh
+DumpConsoleVariables Tessellat
+```
+
+Or Epic MCP EditorAppToolset `SearchCVars` in a throwaway sandbox (never dual-server with UnrealMCP on Conductor).
+
+**Sandbox policy:** KEEP-LOCAL sculpt only on `/Game/HomeWorld/Maps/Sandbox/L_U58F_MeshTerrain`. Do **not** bake memory CVars into `DefaultEngine.ini` unless Lead gate + KNOWN_ERRORS entry.
+
+**Optional cliff sculpt:** small Remesh/tessellate pass on sandbox only; if Editor OOM, stop — see UE58_TECH DESKTOP stability (D3D12 residency).

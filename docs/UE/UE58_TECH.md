@@ -84,3 +84,55 @@ Hero lookdev cameras: keep `sg.GlobalIlluminationQuality` at 2 (High) or 3 (Epic
 ## Plan first for UE work
 
 For **multi-file or multi-system** UE work, follow [17-plan-first.mdc](../../.cursor/rules/17-plan-first.mdc).
+
+---
+
+## DESKTOP workspace stability playbook (Docs/25 WTR-E)
+
+Host: **DESKTOP-21CT3H0** · Engine: Launcher **UE 5.8.2**.
+
+### First open / shader compile
+
+1. First open after engine upgrade or DDC wipe: expect long **shader compile** / Derived Data Cache warm — do not treat as hang until GPU fans settle and Output Log stops streaming compile lines.
+2. Prefer waiting for “Shader compile complete” / idle Output Log before MCP evidence or PIE.
+3. If load stalls on Landscape “Waiting for texture resources…”, see D3D12 note below — do not force VS_MVP Landscape → Mesh Terrain replace.
+
+### Build → Editor → MCP (one page)
+
+Canonical chain: [EDITOR_BUILD_PROTOCOL.md](../Editor/EDITOR_BUILD_PROTOCOL.md) · [BUILD_POLICY.md](../Setup/BUILD_POLICY.md) · [MCP_SETUP.md](../Setup/MCP_SETUP.md).
+
+1. `.\Tools\Safe-Build.ps1` (closes Editor if needed)
+2. Open `HomeWorld.uproject`
+3. Restart Cursor; MCP green on **55557** (UnrealMCP only — **no** Epic `ModelContextProtocol`)
+4. MCP / `execute_python_script` for Editor work
+
+### When to use Unreal Insights
+
+| Use Insights | Skip Insights |
+|--------------|---------------|
+| Sustained hitch / GPU spike on VS_MVP night lookdev | First-open shader compile (expected) |
+| Mesh Terrain sandbox Remesh stalls | One-off Python script failures (use Output Log + Saved JSON) |
+| Comparing Lumen Lite Medium vs hero High | MCP reconnect — fix port/plugin first |
+
+Start: Editor **Trace** / Unreal Insights attach, or `-trace=cpu,gpu,frame` on a short PIE session. Keep captures under `Saved/` (gitignored).
+
+### Mesh Terrain limits (sandbox only)
+
+- Soft tessellation budget ~**100M new elements** per Remesh/tessellate modifier (5.8.2); hard **MAX_int32** block — [U58F_G_MESH_TERRAIN.md](../../Docs/handoffs/U58F_G_MESH_TERRAIN.md).
+- Sandbox map only; never replace `L_VS_MVP_Markers` Landscape without Lead **`APPROVE U58F-G`**.
+
+### D3D12 OOM (optional DESKTOP workaround)
+
+Forum reports (5.8.2 large Landscape): VRAM OOM on load. **Do not** bake into `DefaultEngine.ini` unless Lead gate.
+
+If OOM **reproduces** on DESKTOP:
+
+```text
+rhi.UseSubmissionThread=0
+```
+
+Then add a dated entry to [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) with host + repro. Prefer lowering scalability / unloading WP cells first.
+
+### MCP posture
+
+Primary: UnrealMCP. Capability matrix: [U58F_F_MCP_DECISION.md](../../Docs/handoffs/U58F_F_MCP_DECISION.md). Workspace track: [Docs/25_WORKSPACE_TOOLING_REFINE.md](../../Docs/25_WORKSPACE_TOOLING_REFINE.md).

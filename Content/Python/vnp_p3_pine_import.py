@@ -12,7 +12,10 @@ import os
 import unreal
 
 OUT = unreal.Paths.project_saved_dir() + "vnp_p3_pine_import.json"
-SRC = unreal.Paths.project_saved_dir() + "VNP_PVE_Pine/SM_Pine_Stylized_VNP.obj"
+SRC_CANDIDATES = (
+    unreal.Paths.project_saved_dir() + "VNP_PVE_Pine/SM_Pine_Stylized_VNP.obj",
+    unreal.Paths.project_content_dir() + "HomeWorld/Meshes/Environment/SM_Pine_Stylized_VNP.obj",
+)
 DEST_DIR = "/Game/HomeWorld/Meshes/Environment"
 DEST = DEST_DIR + "/SM_Pine_Stylized_VNP"
 
@@ -20,9 +23,11 @@ DEST = DEST_DIR + "/SM_Pine_Stylized_VNP"
 def main() -> None:
     notes = []
     ok = False
-    if not os.path.isfile(SRC):
-        notes.append("Missing source OBJ: %s" % SRC)
+    SRC = next((p for p in SRC_CANDIDATES if os.path.isfile(p)), None)
+    if not SRC:
+        notes.append("Missing source OBJ; tried: %s" % list(SRC_CANDIDATES))
     else:
+        notes.append("Using source OBJ: %s" % SRC)
         if not unreal.EditorAssetLibrary.does_directory_exist(DEST_DIR):
             unreal.EditorAssetLibrary.make_directory(DEST_DIR)
             notes.append("Created %s" % DEST_DIR)

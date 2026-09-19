@@ -185,6 +185,25 @@ For steps that have no Python/MCP API (see [PCG_VARIABLES_NO_ACCESS.md](PCG_VARI
 
 ---
 
+## 10b. UnrealEditor-Cmd keep_python_script_alive (UE 5.8)
+
+When running Python via **UnrealEditor-Cmd** `-ExecutePythonScript=...`, the Cmd process exits when the entry script returns — **before** latent `AutomationLibrary.take_high_res_screenshot` / map-load work finishes.
+
+**Pattern (Docs/25 WTR-C):**
+
+```python
+import unreal
+unreal.EditorPythonScripting.set_keep_python_script_alive(True)
+# ... schedule screenshots / load_map / latent work ...
+# optional: set_keep_python_script_alive(False) when done for clean exit
+```
+
+Helper: `Content/Python/vnp_editor_keep_alive.py` (`arm()` / `disarm()`). Batch entry: `wtr_c_batch_run.py`. Prefer MCP `execute_python_script` on a live Editor when possible; use Cmd + keep-alive for headless DESKTOP evidence.
+
+Epic: [Python API](https://dev.epicgames.com/documentation/en-us/unreal-engine/python-api/introduction) · EditorPythonScripting.
+
+---
+
 ## 11. References
 
 | Topic | URL |

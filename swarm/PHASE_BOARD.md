@@ -1,10 +1,10 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **Docs/24 VNP — IMPLEMENTED** — [24_VS_NIGHT_PINE_MESH.md](../Docs/24_VS_NIGHT_PINE_MESH.md). Branch `feat/vs-night-pine-mesh`. Docs/23 **CLOSED**.
+**Current phase:** **Docs/25 Workspace & Tooling Refine (WTR) — CLOSED** — [25_WORKSPACE_TOOLING_REFINE.md](../Docs/25_WORKSPACE_TOOLING_REFINE.md). Branch `feat/ue58-workspace-tooling`. Docs/23–24 closed/implemented.
 
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **Conductor** (parent DESKTOP) / **DESKTOP-21CT3H0**
-**Blocked by:** VNP-P2 AD pine gate; VNP-M2 Landscape replace needs AD+WLD+`APPROVE U58F-G` (sandbox OK without).
+**Blocked by:** none
 **Sign-off doc:** [Docs/17_HS_AUDIT_SIGN_OFF.md](../Docs/17_HS_AUDIT_SIGN_OFF.md) — **SIGNED OFF** Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET.
 
 
@@ -110,6 +110,12 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **U58-F** | Docs/rules + close + PR | CLOUD+Lead | **APPROVED / CLOSED** | UE58_TECH · ue58-sources · track CLOSED |
 | **Docs/23** | UE 5.8 Feature Adoption (U58F) | CLOUD+DESKTOP+Lead | **CLOSED** (PR #111) | [23_UE58_FEATURE_ADOPTION.md](../Docs/23_UE58_FEATURE_ADOPTION.md) |
 | **Docs/24** | VS Night / Pine / Mesh (VNP) | CLOUD+DESKTOP+AD | **IMPLEMENTED** | [24_VS_NIGHT_PINE_MESH.md](../Docs/24_VS_NIGHT_PINE_MESH.md) |
+| **Docs/25** | Workspace & Tooling Refine (WTR) | CLOUD+DESKTOP | **CLOSED** | [25_WORKSPACE_TOOLING_REFINE.md](../Docs/25_WORKSPACE_TOOLING_REFINE.md) |
+| **WTR-A** | Strategy matrix | CLOUD | **DONE** | Docs/25 matrix |
+| **WTR-B** | MCP capability matrix | CLOUD+DESKTOP | **DONE** | [U58F_F](../Docs/handoffs/U58F_F_MCP_DECISION.md) — UnrealMCP primary |
+| **WTR-C** | Python / evidence harden | DESKTOP | **DONE** | pine import · CAM bind · keep_alive · PCG introspect |
+| **WTR-D** | Lookdev tool refine | DESKTOP | **DONE** | PVE notes · PCG dup spike · Mesh CVars |
+| **WTR-E** | Stability / Insights | DESKTOP | **DONE** | UE58_TECH playbook |
 | **VNP-N0** | Night plumbing smoke | DESKTOP | **DONE** | `u58f_night_look_smoke.py` |
 | **VNP-N1** | VS_MVP night tune | DESKTOP+LIT | **DONE** | Fog / warm lights |
 | **VNP-N2** | Shots 1/2/5 evidence | DESKTOP | **DONE** | Saved/VNP_Evidence |
@@ -126,7 +132,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **U58F-F** | MCP decision | CLOUD | **APPROVED** | Keep UnrealMCP · [U58F_F_MCP_DECISION.md](../Docs/handoffs/U58F_F_MCP_DECISION.md) |
 | **U58F-G** | Mesh Terrain spike | DESKTOP | **SPIKE READY** | Plugin on · sandbox only · [U58F_G_MESH_TERRAIN.md](../Docs/handoffs/U58F_G_MESH_TERRAIN.md) |
 
-**Current track:** **Docs/24 VNP IMPLEMENTED** (P3 uasset pending Editor). Docs/23 **CLOSED**. Do not reopen VP2/D19/RS.
+**Current track:** **Docs/25 WTR ACTIVE**. Docs/24 IMPLEMENTED; Docs/23 **CLOSED**. Do not reopen VP2/D19/RS.
 
 ---
 
