@@ -47,3 +47,7 @@ __pycache__/
 .mcp.json
 # .devenv workspace (auto-added)
 .devenv/
+
+# KEEP-LOCAL Mannequins (Docs/17e HS-E) — Epic TP High Characters copy per DESKTOP;
+# never commit. Cold clone: copy from UE_5.8 TemplateResources (see Docs/17e).
+Content/Characters/
