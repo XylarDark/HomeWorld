@@ -497,3 +497,10 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 ---
 
 *Maintained by Conductor; HR-C established this rolling policy.*
+
+### 2026-09-19 — U58F DESKTOP smoke + PR #111
+
+- Branch eat/ue58-feature-adoption pushed; PR https://github.com/XylarDark/HomeWorld/pull/111
+- Smokes **ok**: u58f_pcg_smoke, u58f_pve_smoke, u58f_night_look_smoke, u58f_mesh_terrain_smoke
+- Remaining gates: Art Director PVE pine Content commit; Mesh Terrain sandbox KEEP-LOCAL (no VS_MVP Landscape replace)
+
