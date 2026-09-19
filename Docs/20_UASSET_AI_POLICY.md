@@ -23,7 +23,7 @@ Authoritative paths for automation: [docs/CONTENT_LAYOUT.md](../docs/CONTENT_LAY
 
 ---
 
-## 2. Allowlist (initial — narrow)
+## 2. Allowlist (Lead-extended 2026-09-18)
 
 **Default:** **KEEP-LOCAL** for all Content not listed here. No silent mass adds.
 
@@ -34,6 +34,14 @@ Authoritative paths for automation: [docs/CONTENT_LAYOUT.md](../docs/CONTENT_LAY
 | `Content/HomeWorld/Characters/ABP_HomeWorldCharacter.uasset` | Character AnimBP (gameplay-critical) |
 | `Content/HomeWorld/Abilities/GA_Place.uasset` | Place / build verb |
 | `Content/HomeWorld/Abilities/GA_Interact.uasset` | Interact / gather-store handoff |
+| `Content/HomeWorld/Abilities/GA_Dodge.uasset` | Dodge verb (placeholder GA) |
+| `Content/HomeWorld/Abilities/GA_PrimaryAttack.uasset` | Primary attack verb (placeholder GA) |
+| `Content/HomeWorld/Meshes/**` | VS_MVP dress meshes (homestead / gatherables / forest / transit) |
+| `Content/HomeWorld/Materials/**` | Master materials + MPC for VS_MVP |
+| `Content/HomeWorld/Biomes/**` | Biome probe / import targets |
+| `Content/HomeWorld/Harvestables/**` | Harvestable import targets |
+| `Content/HomeWorld/Dungeon/**` | Dungeon volume markers / import targets |
+| `Content/HomeWorld/Characters/khronos_box_scale_ref/**` | Scale reference mesh |
 
 **Explicitly excluded** (never commit without a new Lead gate + allowlist extension):
 
@@ -41,7 +49,6 @@ Authoritative paths for automation: [docs/CONTENT_LAYOUT.md](../docs/CONTENT_LAY
 - `Content/Characters/Mannequins/**` — **KEEP-LOCAL** per [17e_HS_CONTENT_BOOTSTRAP.md](17e_HS_CONTENT_BOOTSTRAP.md)
 - AI WIP dumps under Content
 - `Content/__ExternalActors__/**` legacy DemoMap shards (grandfathered in history only — do not expand)
-- Dress meshes, master materials, MPC, NP lookdev bulk — regenerate on DESKTOP until explicitly allowlisted
 
 **Grandfathered (already in git):** Pre-Docs/20 tracked paths (Input, MainMenu, legacy POI BPs, etc.) remain in history; **new** commits to those paths require allowlist extension (§7).
 

@@ -8,8 +8,16 @@
       "Content/HomeWorld/Maps/VS_MVP",
       "Content/HomeWorld/Characters/BP_",
       "Content/HomeWorld/Characters/ABP_HomeWorldCharacter.uasset",
+      "Content/HomeWorld/Characters/khronos_box_scale_ref",
       "Content/HomeWorld/Abilities/GA_Place.uasset",
-      "Content/HomeWorld/Abilities/GA_Interact.uasset"
+      "Content/HomeWorld/Abilities/GA_Interact.uasset",
+      "Content/HomeWorld/Abilities/GA_Dodge.uasset",
+      "Content/HomeWorld/Abilities/GA_PrimaryAttack.uasset",
+      "Content/HomeWorld/Meshes",
+      "Content/HomeWorld/Materials",
+      "Content/HomeWorld/Biomes",
+      "Content/HomeWorld/Harvestables",
+      "Content/HomeWorld/Dungeon"
     ],
     "excludeRepoPaths": [
       "Content/Characters/Mannequins",
