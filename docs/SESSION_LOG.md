@@ -9118,3 +9118,23 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 **Errors:** none.
 
+---
+
+## 2026-09-20 — CAMERA_BIBLE locked (cloud agent)
+
+**Task:** Lead paste camera bible into product canon; pointer rows only.
+
+**Delivered:** `Docs/CAMERA_BIBLE.md` (verbatim); `Docs/canon/DECISIONS.md` append; `Docs/canon/README.md` Related link; `Docs/canon/FEEL.md` camera TODO pointer. No gameplay code.
+
+**Errors:** none.
+
+---
+
+## 2026-09-20 — CAMERA_BIBLE locked (cloud agent)
+
+**Task:** Lead paste camera bible into product canon; pointer rows only.
+
+**Delivered:** `Docs/CAMERA_BIBLE.md` (verbatim); `Docs/canon/DECISIONS.md` append; `Docs/canon/README.md` Related link; `Docs/canon/FEEL.md` camera TODO pointer. No gameplay code.
+
+**Errors:** none.
+
