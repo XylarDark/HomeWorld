@@ -1,3 +1,7 @@
+## 2026-09-20 ET — CAMERA_BIBLE locked (canon pointer)
+
+Lead paste: added `Docs/CAMERA_BIBLE.md` (Galaxy identity / WoW orbit control / iso systems / FP intimacy). `Docs/canon/DECISIONS.md` row; `Docs/canon/README.md` + `FEEL.md` pointers. No gameplay code.
+
 ## 2026-09-19 ET — DevHarness Taste Profiler sync + HomeWorld pin
 
 DevHarness PR #32 merged (`0eafcfb`): extras `taste-profiler` + profile templates; taste-gate read-first. HomeWorld pin bumped; Docs/29 CLOSED work committed with profile/skills.

@@ -30,6 +30,11 @@ Warm, readable, handmade, hopeful. Routes feel like paths, not sims. Channels sh
 | Glide lateral influence | 0 if FALLBACK cinematic; else ≤15% corridor width | Canon: FALLBACK = no free steer |
 | Camera arm length (3P) | 350–500 UU | Readable character + path |
 | Camera pitch bias | −8° to −15° | Slight down for path/landing |
+
+See Docs/CAMERA_BIBLE.md (LOCKED) for identity/systems/intimacy roles.
+
+| Tunable | Proposed range | Rationale |
+|---|---|---|
 | Night length (full night phase) | 90–180 s real-time before rest prompt | Enough for portal+heal+nurture once |
 | Gather node cooldown | Until dawn **or** 60–120 s | Match SYS “deplete until dawn” preference |
 
