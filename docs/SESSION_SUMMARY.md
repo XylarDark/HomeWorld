@@ -624,3 +624,8 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 - Added `Docs/canon/` (12 files: `PILLARS`…`DECISIONS`, `README`) — Game Dev Partner canon pass; long canon unchanged.
 - PR #115: combat framing A in `DECISIONS.md`; PLAYTEST next 2-min gather + `hw.Gather.Seed` test.
 
+### 2026-09-20 — Camera bible FP amendment (cloud)
+
+- Replaced `Docs/CAMERA_BIBLE.md` with Lead amendment: no dedicated FP; near framing = WoW orbit boom zoom; two presets (Orbit TP + Iso).
+- Added `Docs/CAMERA_IMPL_PROMPT.md`; appended `DECISIONS.md`; aligned `Docs/canon/FEEL.md` + `README.md` pointers.
+
