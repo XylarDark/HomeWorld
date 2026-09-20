@@ -615,3 +615,8 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 - P3: OBJ staged under Content/HomeWorld/Meshes/Environment/; uasset import pending Editor reconnect.
 - M1–M2: Mesh Terrain sandbox created; no VS_MVP Landscape replace.
 
+### 2026-09-20 — Docs/canon short pointer pack (cloud)
+
+- Added `Docs/canon/` (12 files: `PILLARS`…`DECISIONS`, `README`) — Game Dev Partner canon pass; long canon unchanged.
+- PR #115: combat framing A in `DECISIONS.md`; PLAYTEST next 2-min gather + `hw.Gather.Seed` test.
+
