@@ -9108,3 +9108,13 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 **Gate:** HR2-C **COMPLETE** — await Lead **`APPROVE HR2-C`** (closes HR2 track). STOP — do not invent HR2-D.
 
+---
+
+## 2026-09-20 — Docs/canon pointer pack (cloud agent)
+
+**Task:** Add short Game Dev Partner canon pointers under `Docs/canon/` (verbatim from Lead uploads).
+
+**Delivered:** 12 markdown files (`PILLARS`, `FANTASY`, `MVP`, `LOOPS`, `VERBS`, `SCHEMA`, `FEEL`, `CONSTRAINTS`, `DO_NOT`, `PLAYTEST`, `DECISIONS`, `README`); branch `cursor/docs-canon-pointer-pack-371f`; PR #115. No C++/Blueprint; no edits to `Docs/00`, `01`, `03`, `21`. Skipped README index bullet (no simple doc-folder list in `Docs/README.md` / `docs/README.md`).
+
+**Errors:** none.
+
