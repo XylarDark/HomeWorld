@@ -31,7 +31,7 @@ Warm, readable, handmade, hopeful. Routes feel like paths, not sims. Channels sh
 | Camera arm length (3P) | 350–500 UU | Readable character + path |
 | Camera pitch bias | −8° to −15° | Slight down for path/landing |
 
-See Docs/CAMERA_BIBLE.md (LOCKED) for identity/systems/intimacy roles.
+See Docs/CAMERA_BIBLE.md (LOCKED) for identity/systems roles; close framing = orbit near-zoom only (no dedicated FP).
 
 | Tunable | Proposed range | Rationale |
 |---|---|---|

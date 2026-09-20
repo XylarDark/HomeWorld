@@ -9130,11 +9130,11 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 ---
 
-## 2026-09-20 — CAMERA_BIBLE locked (cloud agent)
+## 2026-09-20 — Camera FP amendment (cloud agent)
 
-**Task:** Lead paste camera bible into product canon; pointer rows only.
+**Task:** Lead removed dedicated first-person / intimacy camera from locked bible.
 
-**Delivered:** `Docs/CAMERA_BIBLE.md` (verbatim); `Docs/canon/DECISIONS.md` append; `Docs/canon/README.md` Related link; `Docs/canon/FEEL.md` camera TODO pointer. No gameplay code.
+**Delivered:** `Docs/CAMERA_BIBLE.md` (FP amendment verbatim); new `Docs/CAMERA_IMPL_PROMPT.md`; `DECISIONS.md` append (drop FP row); `FEEL.md` + `canon/README.md` one-line alignment. No gameplay C++. PR #118.
 
 **Errors:** none.
 
