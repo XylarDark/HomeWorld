@@ -23,7 +23,8 @@ namespace HomeWorldInventory
 		{
 			return RES_WOOD;
 		}
-		if (S.Equals(TEXT("Ore"), ESearchCase::IgnoreCase) || S.Equals(TEXT("Stone"), ESearchCase::IgnoreCase))
+		if (S.Equals(TEXT("Ore"), ESearchCase::IgnoreCase) || S.Equals(TEXT("Stone"), ESearchCase::IgnoreCase)
+			|| S.Equals(TEXT("Flint"), ESearchCase::IgnoreCase))
 		{
 			return RES_STONE;
 		}
@@ -32,7 +33,7 @@ namespace HomeWorldInventory
 		{
 			return RES_HERB;
 		}
-		if (S.Equals(TEXT("Fiber"), ESearchCase::IgnoreCase))
+		if (S.Equals(TEXT("Fiber"), ESearchCase::IgnoreCase) || S.Equals(TEXT("Grass"), ESearchCase::IgnoreCase))
 		{
 			return RES_FIBER;
 		}

@@ -654,3 +654,8 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 - Added `Docs/COMBAT_DREAM_BIBLE.md` + `Docs/COMBAT_DREAM_IMPL_PROMPT.md` (Lead A1/B/C/D locks).
 - Amended combat framing A in `Docs/canon/DECISIONS.md`; updated `DO_NOT.md`, `VERBS.md`, `canon/README.md`. Docs-only; boss volume placement deferred to DESKTOP/Content track.
 
+### 2026-09-21 — GC-A site→RES map (cloud)
+
+- Lead **`APPROVE GC STRATEGY`** → `Docs/22_GATHER_CRAFT_IMPL.md`, handoff `Docs/handoffs/GC_A_SITE_RES.md`, `DECISIONS.md` strategy row.
+- C++: `EHomeWorldGatherSiteKind`, pile `GatherSiteKind`, flint/grass flavor logs; Python `homeworld_gc_site_setup.py` + VS_MVP placement scripts. GC-B/C not in PR.
+

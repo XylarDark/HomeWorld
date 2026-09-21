@@ -177,6 +177,7 @@ namespace
 		if (Inv->TryAddResource(HomeWorldInventory::RES_STONE, Amount))
 		{
 			UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Gather.Ore granted RES_STONE +%d (legacy Ore alias)."), Amount);
+			UE_LOG(LogTemp, Log, TEXT("GATHER: RES_STONE (flint)"));
 		}
 	}
 

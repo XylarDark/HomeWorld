@@ -14,6 +14,8 @@ except ImportError:
     print("ERROR: Run inside Unreal Editor.")
     sys.exit(1)
 
+import homeworld_gc_site_setup as gc_site
+
 PREFIX = "RSMaterial:"
 LEVEL_PATH = "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers"
 PILE_BASE_CLASS = "/Script/HomeWorld.HomeWorldResourcePile"
@@ -28,10 +30,11 @@ BP_CANDIDATES = (
 )
 
 # Planet-path offsets from landing / return shrine base (cm)
+# GC-A: site kind drives RES (flowers → RES_FIBER grass, alternates RES_HERB)
 DAY_SPECS = (
-    ("GP_RS_Tree", "RES_WOOD", unreal.Vector(400.0, 200.0, 0.0)),
-    ("GP_RS_Rock", "RES_STONE", unreal.Vector(550.0, 80.0, 0.0)),
-    ("GP_RS_Flower", "RES_HERB", unreal.Vector(480.0, -120.0, 0.0)),
+    ("GP_RS_Tree", "trees", "RES_WOOD", unreal.Vector(400.0, 200.0, 0.0)),
+    ("GP_RS_Rock", "rocks", "RES_STONE", unreal.Vector(550.0, 80.0, 0.0)),
+    ("GP_RS_Flower", "flowers", "RES_FIBER", unreal.Vector(480.0, -120.0, 0.0)),
 )
 
 # Night sow landmark TargetPoints (same sites; nurture C++ enum extension deferred)
@@ -127,13 +130,14 @@ def _apply_label(actor, label: str) -> None:
             _log("label warn " + label + ": " + str(exc))
 
 
-def _configure_pile(actor, resource_id: str) -> None:
+def _configure_pile(actor, site_kind: str, resource_id: str) -> None:
     try:
         actor.set_editor_property("resource_type", unreal.Name(resource_id))
         actor.set_editor_property("amount_per_harvest", 1)
         actor.set_editor_property("b_deplete_until_dawn", False)
     except Exception as exc:
         _log("configure warn: " + str(exc))
+    gc_site.apply_gc_site(actor, site_kind, resource_id)
 
 
 def _planet_base() -> unreal.Vector:
@@ -161,13 +165,20 @@ def _load_level() -> bool:
     return bool(unreal.EditorLoadingAndSavingUtils.load_map(LEVEL_PATH))
 
 
-def _ensure_pile(spawn_cls, pile_base_cls, label: str, resource_id: str, location: unreal.Vector):
+def _ensure_pile(
+    spawn_cls,
+    pile_base_cls,
+    label: str,
+    site_kind: str,
+    resource_id: str,
+    location: unreal.Vector,
+):
     existing = find_actor_by_label(label)
     if existing and _is_resource_pile(existing, pile_base_cls):
         existing.set_actor_location(location, False, True)
-        _configure_pile(existing, resource_id)
+        _configure_pile(existing, site_kind, resource_id)
         _add_tag(existing, label)
-        _log("updated " + label + " " + resource_id)
+        _log("updated " + label + " " + site_kind + " " + resource_id)
         return existing
     if existing:
         try:
@@ -179,13 +190,13 @@ def _ensure_pile(spawn_cls, pile_base_cls, label: str, resource_id: str, locatio
         _log("FAIL spawn " + label)
         return None
     _apply_label(actor, label)
-    _configure_pile(actor, resource_id)
+    _configure_pile(actor, site_kind, resource_id)
     _add_tag(actor, label)
     try:
         actor.set_folder_path(FOLDER)
     except Exception:
         pass
-    _log("spawned " + label + " " + resource_id + " @ " + str(location))
+    _log("spawned " + label + " " + site_kind + " " + resource_id + " @ " + str(location))
     return actor
 
 
@@ -225,18 +236,19 @@ def main() -> None:
         return
     base = _planet_base()
     ok = 0
-    for label, res_id, offset in DAY_SPECS:
+    for label, site_kind, res_id, offset in DAY_SPECS:
         loc = unreal.Vector(base.x + offset.x, base.y + offset.y, base.z + offset.z)
-        if _ensure_pile(spawn_cls, pile_base, label, res_id, loc):
+        if _ensure_pile(spawn_cls, pile_base, label, site_kind, res_id, loc):
             ok += 1
-            unreal.log("HomeWorld: RSMaterial day site " + label + " " + res_id)
+            unreal.log("HomeWorld: RSMaterial day site " + label + " " + site_kind + " " + res_id)
     night_ok = 0
     for label, offset in NIGHT_SPECS:
         loc = unreal.Vector(base.x + offset.x, base.y + offset.y, base.z + offset.z)
         if _ensure_sow_marker(label, loc):
             night_ok += 1
     _log(
-        "Done day=%d/3 night_markers=%d/3. PIE day: face GP_RS_* Interact → GATHER:. "
+        "Done day=%d/3 night_markers=%d/3. PIE day: face GP_RS_* Interact → "
+        "GATHER: RES_WOOD / RES_STONE / RES_FIBER (+ flint/grass flavor lines). "
         "Night sow nurture enum TBD — markers only. Save level KEEP-LOCAL."
         % (ok, night_ok)
     )

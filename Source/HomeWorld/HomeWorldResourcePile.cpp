@@ -1,6 +1,7 @@
 // Copyright HomeWorld. All Rights Reserved.
 
 #include "HomeWorldResourcePile.h"
+#include "HomeWorldGatherSiteTypes.h"
 #include "HomeWorldInventorySubsystem.h"
 #include "HomeWorldInventoryTypes.h"
 #include "HomeWorldTimeOfDaySubsystem.h"
@@ -67,7 +68,38 @@ bool AHomeWorldResourcePile::IsHarvestAvailable() const
 	{
 		return false;
 	}
-	return !ResourceType.IsNone();
+	if (GatherSiteKind != EHomeWorldGatherSiteKind::None)
+	{
+		return true;
+	}
+	if (!ResourceType.IsNone())
+	{
+		return true;
+	}
+	return HomeWorldGatherSite::InferSiteKindFromActor(this) != EHomeWorldGatherSiteKind::None;
+}
+
+FName AHomeWorldResourcePile::ResolveHarvestResourceId()
+{
+	EHomeWorldGatherSiteKind Site = GatherSiteKind;
+	if (Site == EHomeWorldGatherSiteKind::None)
+	{
+		Site = HomeWorldGatherSite::InferSiteKindFromActor(this);
+	}
+	if (Site != EHomeWorldGatherSiteKind::None)
+	{
+		bool bHerbNext = bFlowerNextHarvestIsHerb;
+		const FName FromSite = HomeWorldGatherSite::ResolveResourceForSite(Site, bHerbNext);
+		if (Site == EHomeWorldGatherSiteKind::Flowers)
+		{
+			bFlowerNextHarvestIsHerb = bHerbNext;
+		}
+		if (!FromSite.IsNone())
+		{
+			return FromSite;
+		}
+	}
+	return HomeWorldInventory::NormalizeResourceId(ResourceType);
 }
 
 bool AHomeWorldResourcePile::TryHarvest(UHomeWorldInventorySubsystem* Inventory)
@@ -81,10 +113,21 @@ bool AHomeWorldResourcePile::TryHarvest(UHomeWorldInventorySubsystem* Inventory)
 		return false;
 	}
 
-	const FName Normalized = HomeWorldInventory::NormalizeResourceId(ResourceType);
+	const FName Normalized = ResolveHarvestResourceId();
+	if (Normalized.IsNone() || !HomeWorldInventory::IsValidResourceId(Normalized))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("GATHER: node '%s' has no valid site→RES mapping"), *GetName());
+		return false;
+	}
 	if (!Inventory->TryAddResource(Normalized, AmountPerHarvest))
 	{
 		return false;
+	}
+
+	const TCHAR* Flavor = HomeWorldGatherSite::GetGatherFlavorForResource(Normalized);
+	if (Flavor && Flavor[0] != 0)
+	{
+		UE_LOG(LogTemp, Log, TEXT("GATHER: %s (%s)"), *Normalized.ToString(), Flavor);
 	}
 
 	if (bDepleteUntilDawn)
