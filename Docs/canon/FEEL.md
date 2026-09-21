@@ -35,7 +35,7 @@ See Docs/CAMERA_BIBLE.md (LOCKED) for identity/systems roles; close framing = or
 
 | Tunable | Proposed range | Rationale |
 |---|---|---|
-| Night length (full night phase) | 90–180 s real-time before rest prompt | Enough for portal+heal+nurture once |
+| Night length (full night phase) | 90–180 s real-time before rest prompt | Enough for portal+heal+nurture once. Phase clock lengths TODO playtest — see [DAYNIGHT_BIBLE.md](../DAYNIGHT_BIBLE.md). |
 | Gather node cooldown | Until dawn **or** 60–120 s | Match SYS “deplete until dawn” preference |
 
 Stamp chosen values into `DECISIONS.md` when implemented.

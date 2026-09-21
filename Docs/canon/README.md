@@ -16,4 +16,6 @@ Short normative pointer files for coding sessions. **Long sources of truth stay*
 | [PLAYTEST.md](PLAYTEST.md) | Last prove + next 2-min test |
 | [DECISIONS.md](DECISIONS.md) | Append-only decision log |
 
-**Related:** [CAMERA_BIBLE.md](../CAMERA_BIBLE.md) — LOCKED Orbit TP + Iso (near-zoom on orbit; no dedicated FP) (Lead paste 2026-09-20).
+**Related:** [CAMERA_BIBLE.md](../CAMERA_BIBLE.md) — LOCKED Orbit TP + Iso (near-zoom on orbit; no dedicated FP) (Lead paste 2026-09-20).  
+[DAYNIGHT_BIBLE.md](../DAYNIGHT_BIBLE.md) — LOCKED sleep→spirit, dusk buffer, moonlight portals (Lead interview 2026-09-20).  
+[DAYNIGHT_IMPL_PROMPT.md](../DAYNIGHT_IMPL_PROMPT.md) — agent implementation prompt for day/night (source: DAYNIGHT_BIBLE).

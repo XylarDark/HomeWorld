@@ -4,6 +4,7 @@ Append only. Date · decision · why.
 
 | Date (ET) | Decision | Why |
 |---|---|---|
+| 2026-09-20 | DAYNIGHT bible LOCKED: sleep→spirit (bed/campsite); dusk=day buffer no glide start; glide down-only; portals moonlight body+spirit + up to island; no-torch darkness = soft shrine kidnap home; spirit-out-at-dawn = sickness TODO; phase lengths TODO playtest. Amends older auto-dusk-spirit / portal-night-only where they conflict. | Lead bible interview. |
 | 2026-09-20 | Camera: drop dedicated FP / intimacy camera. Near framing = WoW orbit boom zoom only; do not optimize for true FP. Two presets: Orbit TP + Iso. | Lead chat amendment after CAMERA_BIBLE lock. |
 | 2026-09-20 | Camera bible LOCKED: Galaxy-framed WoW orbit TP = identity; PoE-style isometric = systems; FP = intimacy opt-in. One camera manager, three presets. | Lead paste into camera bible (chat). |
 | 2026-09-20 | Canon PLAYTEST locked test PASS on DESKTOP UE 5.8 (`GATHER: RES_WOOD` + `hw.Gather.Seed`). Launch editor with EngineAssociation (5.8), not 5.7. | Lead `proceed till done`; BuildId skip when 5.7 opened against 5.8-built DLL. |
