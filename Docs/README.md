@@ -67,5 +67,6 @@ These are **intentionally separate**. On case-insensitive filesystems (macOS/Win
 - **Master prompt:** [../HOMEWORLD_MASTER_PROMPT.md](../HOMEWORLD_MASTER_PROMPT.md)
 - **Game canon brief:** [../HOMEWORLD_MVP_SWARM_BRIEF.md](../HOMEWORLD_MVP_SWARM_BRIEF.md)
 - **Swarm ops:** [../swarm/SWARM_OPS.md](../swarm/SWARM_OPS.md)
+- **Gather & craft bible (LOCKED):** [GATHER_CRAFT_BIBLE.md](GATHER_CRAFT_BIBLE.md) — impl [GATHER_CRAFT_IMPL_PROMPT.md](GATHER_CRAFT_IMPL_PROMPT.md)
 - **UE project context:** [../AGENTS.md](../AGENTS.md) and [../docs/README.md](../docs/README.md)
 | [18_VERIFY_PROVE.md](18_VERIFY_PROVE.md) | Verify & Prove (VP2) | **DRAFT** |

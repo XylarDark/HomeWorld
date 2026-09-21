@@ -1,7 +1,7 @@
 # Docs/HOMESTEAD_BIBLE.md
 
 **Status:** LOCKED (Lead interview 2026-09-20 ET)  
-**Pointers:** `Docs/DAYNIGHT_BIBLE.md`, `Docs/CAMERA_BIBLE.md`, `Docs/canon/VERBS.md`, `Docs/canon/DO_NOT.md`, `Docs/00_CANON.md`  
+**Pointers:** `Docs/DAYNIGHT_BIBLE.md`, `Docs/CAMERA_BIBLE.md`, `Docs/GATHER_CRAFT_BIBLE.md`, `Docs/canon/VERBS.md`, `Docs/canon/DO_NOT.md`, `Docs/00_CANON.md`  
 **Amends:** “No crafting trees” → **limited named homestead recipes only** (not a generic skill/crafting web). Co-op on hub deferred — **NPC family** instead.
 
 ---
@@ -53,7 +53,7 @@ Homestead crafting may create **only** these MVP outputs unless Lead appends `DE
 
 **Forbidden:** Generic crafting web, weapon/armor smithing, infinite recipe pages, combat gear on hub.
 
-Recipe costs / station props = **TODO** in `SCHEMA.md` before coding (schema before data rows).
+Recipe costs in `Docs/canon/SCHEMA.md` + demo spine (**campfire first**, then cottage kitchen) in `Docs/GATHER_CRAFT_BIBLE.md`.
 
 ## Placeables
 

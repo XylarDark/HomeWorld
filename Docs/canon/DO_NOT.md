@@ -2,7 +2,7 @@
 
 Sacred systems and forbidden tropes. Prefer this over improvising mid-code.
 
-**Sources:** `Docs/00_CANON.md` §7; `Docs/01_GDD_MVP.md` §12; `Docs/21_REAP_SOW.md`; Lead 2026-09-20 combat framing A (amended 2026-09-21 — [COMBAT_DREAM_BIBLE.md](../COMBAT_DREAM_BIBLE.md)); [HOMESTEAD_BIBLE.md](../HOMESTEAD_BIBLE.md)
+**Sources:** `Docs/00_CANON.md` §7; `Docs/01_GDD_MVP.md` §12; `Docs/21_REAP_SOW.md`; Lead 2026-09-20 combat framing A (amended 2026-09-21 — [COMBAT_DREAM_BIBLE.md](../COMBAT_DREAM_BIBLE.md)); [HOMESTEAD_BIBLE.md](../HOMESTEAD_BIBLE.md); [GATHER_CRAFT_BIBLE.md](../GATHER_CRAFT_BIBLE.md) (Lead 2026-09-21)
 
 ## Sacred (do not break / replace silently)
 
@@ -25,7 +25,7 @@ Sacred systems and forbidden tropes. Prefer this over improvising mid-code.
 | Generic skill trees | Pillars beat systems |
 | Free-flight sim / flight energy HUD | Canon + FALLBACK armed |
 | Second CharacterMovement / parallel PlayerController | Harness |
-| Crafting recipe webs | Gather → store → spend only (homestead: **named recipes only** per HOMESTEAD_BIBLE) |
+| Crafting recipe webs | Gather → store → spend; homestead **named recipes only** at **campfire then cottage** — costs in `SCHEMA.md` / [GATHER_CRAFT_BIBLE.md](../GATHER_CRAFT_BIBLE.md) (demo: campfire/tent→cottage) |
 | Invisible walls as primary bounds | HOMESTEAD_BIBLE — edge glide commit; rare immersive mid-map blockers only |
 | Co-op drop-in on hub (MVP) | HOMESTEAD_BIBLE — NPC family instead |
 | Extra biome / second beast / 7th resource | MVP lock |
