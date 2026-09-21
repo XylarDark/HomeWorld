@@ -2,7 +2,7 @@
 
 Sacred systems and forbidden tropes. Prefer this over improvising mid-code.
 
-**Sources:** `Docs/00_CANON.md` §7; `Docs/01_GDD_MVP.md` §12; `Docs/21_REAP_SOW.md`; Lead 2026-09-20 combat framing A
+**Sources:** `Docs/00_CANON.md` §7; `Docs/01_GDD_MVP.md` §12; `Docs/21_REAP_SOW.md`; Lead 2026-09-20 combat framing A; [HOMESTEAD_BIBLE.md](../HOMESTEAD_BIBLE.md)
 
 ## Sacred (do not break / replace silently)
 
@@ -24,7 +24,9 @@ Sacred systems and forbidden tropes. Prefer this over improvising mid-code.
 | Generic skill trees | Pillars beat systems |
 | Free-flight sim / flight energy HUD | Canon + FALLBACK armed |
 | Second CharacterMovement / parallel PlayerController | Harness |
-| Crafting recipe webs | Gather → store → spend only |
+| Crafting recipe webs | Gather → store → spend only (homestead: **named recipes only** per HOMESTEAD_BIBLE) |
+| Invisible walls as primary bounds | HOMESTEAD_BIBLE — edge glide commit; rare immersive mid-map blockers only |
+| Co-op drop-in on hub (MVP) | HOMESTEAD_BIBLE — NPC family instead |
 | Extra biome / second beast / 7th resource | MVP lock |
 | Night flight | Canon |
 | Photoreal / grimdark / sci-fi kits | Tone |
