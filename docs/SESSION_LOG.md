@@ -9204,6 +9204,16 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 ---
 
+## 2026-09-21 — CD-A track CLOSED (docs stamp, cloud agent)
+
+**Task:** Lead **`APPROVE CD-A`** — stamp Docs/23 Combat & Dream **CLOSED / COMPLETE** (CD-A code already on main PR #128).
+
+**Delivered:** `Docs/23_COMBAT_DREAM_IMPL.md`, `Docs/handoffs/CD_A_STUBS.md`, `Docs/canon/DECISIONS.md`, `Docs/README.md` index row. Docs-only.
+
+**Remaining:** **MV-A** separate track TBD.
+
+---
+
 ## 2026-09-21 — CD-A combat/dream stubs (cloud)
 
 **Task:** Lead **`APPROVE CD STRATEGY`** — CD-A minigame + boss placeholder stubs; do not stamp CD-A approved.

@@ -1,3 +1,7 @@
+## 2026-09-21 ET — CD-A track CLOSED (docs stamp, cloud)
+
+- Lead **`APPROVE CD-A`** → `Docs/23_COMBAT_DREAM_IMPL.md` **CLOSED / COMPLETE**; `Docs/handoffs/CD_A_STUBS.md` **APPROVED / CLOSED**; `Docs/canon/DECISIONS.md` row. CD-A on main `50faeab` (PR #128). Next: **MV-A** TBD — not in this PR.
+
 ## 2026-09-21 ET — GC-C track CLOSED (docs stamp, cloud)
 
 - Lead **`APPROVE GC-C`** → `Docs/22_GATHER_CRAFT_IMPL.md` **CLOSED / COMPLETE**; `Docs/handoffs/GC_C_PLACEHOLDERS.md` **APPROVED / CLOSED**; `Docs/canon/DECISIONS.md` row. GC on main `7061e18` (PR #126). Next: CD-A / MV-A TBD — not in this PR.
@@ -676,5 +680,5 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 ## 2026-09-21 — CD-A stubs (cloud)
 
 - Lead **`APPROVE CD STRATEGY`** → [Docs/23_COMBAT_DREAM_IMPL.md](../Docs/23_COMBAT_DREAM_IMPL.md), handoff [Docs/handoffs/CD_A_STUBS.md](../Docs/handoffs/CD_A_STUBS.md), `DECISIONS.md` CD strategy row (Docs/22 GC **CLOSED** on main via #127).
-- C++: minigame stubs (`MINIGAME:*`), boss placeholder volume (`BOSS:PHASE_*`, `BOSS:SEAL`), `place_vs_mvp_cd_stubs.py`, cheats `hw.Minigame.*` / `hw.Boss.Status`. **CD-A APPROVED not stamped** — pending Lead + DESKTOP greps.
+- C++: minigame stubs (`MINIGAME:*`), boss placeholder volume (`BOSS:PHASE_*`, `BOSS:SEAL`), `place_vs_mvp_cd_stubs.py`, cheats `hw.Minigame.*` / `hw.Boss.Status`. **CD-A APPROVED** stamped in follow-on docs PR (Lead **`APPROVE CD-A`**, 2026-09-21 ET).
 
