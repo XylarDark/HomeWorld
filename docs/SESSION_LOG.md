@@ -9168,3 +9168,15 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 **Errors:** none.
 
+---
+
+## 2026-09-21 — GC-A site→RES map (cloud agent)
+
+**Task:** Lead **`APPROVE GC STRATEGY`** — implement GC-A only (site→RES + flint/grass flavor); docs track + handoff.
+
+**Delivered:** `Docs/22_GATHER_CRAFT_IMPL.md`, `Docs/handoffs/GC_A_SITE_RES.md`, `DECISIONS.md` strategy row; C++ gather site types + pile harvest; Python GC site tags on VS_MVP placement scripts.
+
+**Remaining:** Lead **`APPROVE GC-A`** after DESKTOP greps; GC-B/C locked.
+
+**Errors:** none.
+
