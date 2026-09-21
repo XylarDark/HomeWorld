@@ -2,7 +2,7 @@
 
 Sacred systems and forbidden tropes. Prefer this over improvising mid-code.
 
-**Sources:** `Docs/00_CANON.md` §7; `Docs/01_GDD_MVP.md` §12; `Docs/21_REAP_SOW.md`; Lead 2026-09-20 combat framing A; [HOMESTEAD_BIBLE.md](../HOMESTEAD_BIBLE.md)
+**Sources:** `Docs/00_CANON.md` §7; `Docs/01_GDD_MVP.md` §12; `Docs/21_REAP_SOW.md`; Lead 2026-09-20 combat framing A (amended 2026-09-21 — [COMBAT_DREAM_BIBLE.md](../COMBAT_DREAM_BIBLE.md)); [HOMESTEAD_BIBLE.md](../HOMESTEAD_BIBLE.md)
 
 ## Sacred (do not break / replace silently)
 
@@ -20,7 +20,8 @@ Sacred systems and forbidden tropes. Prefer this over improvising mid-code.
 | Forbidden | Why |
 |---|---|
 | Homestead combat | Pillar 1 |
-| Kill/HP/weapons/aggro combat | Canon hard reject; win = convert only |
+| Kill/HP/weapons/aggro combat (general encounters) | Forbidden for **non-boss** planet content — minigames only (heal/nurture/grow/possess). No trash packs, no weapon-first UX |
+| Kill win-condition (including bosses) | Boss win = **seal / banish / end evil** only — no murder fantasy payoff |
 | Generic skill trees | Pillars beat systems |
 | Free-flight sim / flight energy HUD | Canon + FALLBACK armed |
 | Second CharacterMovement / parallel PlayerController | Harness |
@@ -36,4 +37,6 @@ Sacred systems and forbidden tropes. Prefer this over improvising mid-code.
 
 ## Allowed exception (do not confuse with kill combat)
 
-Night **placeholder dream-convert** at den/camp (Docs/21): heal/recruit; convert, not kill. **Never on homestead.**
+- Night **placeholder dream-convert** at den/camp (Docs/21): heal/recruit; convert, not kill. **Never on homestead.**
+- **Rare boss** vs great/terrible evil (tutorial planet / VS path): **day + night** phase model per [COMBAT_DREAM_BIBLE.md](../COMBAT_DREAM_BIBLE.md) — traversal/interacts by day, spirit blink/possess/heal-strip by night; win = **seal/banish**, not kill. NOW = placeholder volume + phase logs only.
+- **Non-boss** planet encounters: four minigame stub families (`MinigameHeal` / `Nurture` / `Grow` / `Possess`) extending the Docs/21 convert path — not DPS combat.
