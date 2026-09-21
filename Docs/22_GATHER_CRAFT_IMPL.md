@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **GC STRATEGY APPROVED**; **GC-A APPROVED / CLOSED**; **GC-B IN PROGRESS** (this PR); GC-C locked |
+| **Status** | **GC STRATEGY APPROVED**; **GC-A APPROVED / CLOSED**; **GC-B APPROVED / CLOSED**; **GC-C IN PROGRESS** (this PR) — track nearly complete pending Lead **`APPROVE GC-C`** |
 | **Date** | 2026-09-21 |
 | **Author** | Conductor (HomeWorld) |
 | **Bible** | [GATHER_CRAFT_BIBLE.md](GATHER_CRAFT_BIBLE.md) · [GATHER_CRAFT_IMPL_PROMPT.md](GATHER_CRAFT_IMPL_PROMPT.md) |
@@ -17,7 +17,9 @@ Lead **`APPROVE GC STRATEGY`**, 2026-09-21 ET — **GRANTED** (chat: “approve 
 
 **GC-A:** Lead **`APPROVE GC-A`**, 2026-09-21 ET — **GRANTED** (DESKTOP greps deferred/accepted). **CLOSED** on main. Unlocks **GC-B**.
 
-**GC-B:** Lead **`APPROVE GC-B`** — unlocks **GC-C** (placeholder shop/room volumes).
+**GC-B:** Lead **`APPROVE GC-B`**, 2026-09-21 ET — **GRANTED** (chat). **CLOSED** on main. Unlocks **GC-C**.
+
+**GC-C:** Lead **`APPROVE GC-C`** — closes GC track (placeholder volumes). **Not stamped in PR.**
 
 **Do not stamp phase APPROVED in a PR** — Lead types the gate string in chat.
 
@@ -34,11 +36,11 @@ flowchart LR
     RES[Six_RES_map]
     Flavor[Flint_grass_logs]
   end
-  subgraph gcb [GC-B_locked]
+  subgraph gcb [GC-B_CLOSED]
     Craft[Campfire_tent_recipes]
     Prog[PROGRESS_COTTAGE_UNLOCK]
   end
-  subgraph gcc [GC-C_locked]
+  subgraph gcc [GC-C_NOW]
     Place[Shop_room_placeholders]
   end
   Sites --> RES --> Flavor
@@ -55,8 +57,8 @@ flowchart LR
 |-------|------|------|--------|------|
 | **GC STRATEGY** | Bible + impl unlock | Lead | **APPROVED** | Lead **`APPROVE GC STRATEGY`**, 2026-09-21 ET |
 | **GC-A** | Site→RES + flint/grass flavor | CLOUD+DESKTOP | **APPROVED / CLOSED** | Lead **`APPROVE GC-A`**, 2026-09-21 ET |
-| **GC-B** | Campfire + tent + cottage unlock | CLOUD+DESKTOP | **IN PROGRESS** (this PR) | Lead **`APPROVE GC-B`** |
-| **GC-C** | Placeholder shop/room volumes | CLOUD+DESKTOP | **LOCKED** | Lead **`APPROVE GC-C`** |
+| **GC-B** | Campfire + tent + cottage unlock | CLOUD+DESKTOP | **APPROVED / CLOSED** | Lead **`APPROVE GC-B`**, 2026-09-21 ET |
+| **GC-C** | Placeholder shop/room volumes | CLOUD+DESKTOP | **IN PROGRESS** (this PR) | Lead **`APPROVE GC-C`** |
 
 ---
 
@@ -88,22 +90,29 @@ flowchart LR
 
 ---
 
-### GC-B — Campfire + tent + cottage unlock (this PR)
+### GC-B — Campfire + tent + cottage unlock
 
 **Goal:** Named recipe costs at campfire / hub bootstrap; `PROGRESS:COTTAGE_UNLOCK` log/flag after demo loop. Handoff: [handoffs/GC_B_CRAFT_SPINE.md](handoffs/GC_B_CRAFT_SPINE.md).
 
 **Done criteria (GC-B):**
 
-- [ ] `CRAFT: CAMPFIRE` after 1 WOOD + 1 STONE + 1 FIBER (Stored-first)
-- [ ] `CRAFT: TENT` after 3 WOOD + 2 FIBER
-- [ ] `PROGRESS:COTTAGE_UNLOCK` once
-- [ ] Lead **`APPROVE GC-B`** (chat) to unlock GC-C — **not stamped in PR**
+- [x] `CRAFT: CAMPFIRE` after 1 WOOD + 1 STONE + 1 FIBER (Stored-first)
+- [x] `CRAFT: TENT` after 3 WOOD + 2 FIBER
+- [x] `PROGRESS:COTTAGE_UNLOCK` once
+- [x] Lead **`APPROVE GC-B`**, 2026-09-21 ET — GC-C unlocked
 
 ---
 
-### GC-C — Placeholder shops/rooms (locked)
+### GC-C — Placeholder shops/rooms (this PR)
 
-**Goal:** Enter volumes → `PLACEHOLDER:*` logs only; no functional shop craft. **Out of scope for GC-A PR.**
+**Goal:** Enter volumes → `PLACEHOLDER:*` logs only; no functional shop craft. Handoff: [handoffs/GC_C_PLACEHOLDERS.md](handoffs/GC_C_PLACEHOLDERS.md).
+
+**Done criteria (GC-C):**
+
+- [ ] `PLACEHOLDER:WOODSHOP enter` / `TEXTILE` / `RESEARCH` from shop volumes
+- [ ] `PLACEHOLDER:COTTAGE_KITCHEN` / `COTTAGE_BEDROOM` / `CAULDRON` after cottage unlock
+- [ ] GC-B craft greps still pass; homestead non-combat
+- [ ] Lead **`APPROVE GC-C`** (chat) closes GC track — **not stamped in PR**
 
 ---
 

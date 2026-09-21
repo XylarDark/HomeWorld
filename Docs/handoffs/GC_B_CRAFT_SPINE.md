@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **IN PROGRESS** (this PR) — Lead **`APPROVE GC-B`** unlocks GC-C |
+| **Status** | **APPROVED / CLOSED** — Lead **`APPROVE GC-B`** 2026-09-21 ET; GC-C unlocked |
 | **Host** | CLOUD + DESKTOP |
 | **Track** | [Docs/22_GATHER_CRAFT_IMPL.md](../22_GATHER_CRAFT_IMPL.md) |
 | **Prior** | GC-A **APPROVED / CLOSED** — Lead **`APPROVE GC-A`** 2026-09-21 ET |

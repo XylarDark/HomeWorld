@@ -1,3 +1,8 @@
+## 2026-09-21 ET — GC-C placeholder volumes (cloud)
+
+- GC-C: `AHomeWorldGcPlaceholderVolume` + `EHomeWorldGcPlaceholderKind`; overlap logs `PLACEHOLDER:*`; cottage rooms gated on `IsCottageUnlocked()`; `place_vs_mvp_gc_placeholders.py` (`GP_PH_*`).
+- Docs: GC-B **CLOSED** in `Docs/22` + `DECISIONS.md` (Lead **`APPROVE GC-B`** 2026-09-21 ET); GC-C **IN PROGRESS**; handoff `Docs/handoffs/GC_C_PLACEHOLDERS.md`. GC-C not stamped APPROVED — pending Lead **`APPROVE GC-C`**.
+
 ## 2026-09-21 ET — GC-B craft spine (cloud)
 
 - GC-B: `UHomeWorldCraftSubsystem`, `AHomeWorldCraftStation`, interact + Stored-first spend; `place_vs_mvp_gc_craft.py` (`GP_Craft_Hub`); `hw.Craft.*` cheats.

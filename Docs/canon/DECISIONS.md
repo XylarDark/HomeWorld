@@ -4,6 +4,7 @@ Append only. Date · decision · why.
 
 | Date (ET) | Decision | Why |
 |---|---|---|
+| 2026-09-21 | **GC-B APPROVED / CLOSED** — Lead **`APPROVE GC-B`** (chat, 2026-09-21 ET). Unlocks **GC-C** (placeholder shop + cottage room volumes). | GC-B merged main (`45353cf` / PR #125); GC-C PR in flight. |
 | 2026-09-21 | **GC-A APPROVED / CLOSED** — Lead **`APPROVE GC-A`** (chat, 2026-09-21 ET; DESKTOP greps deferred/accepted). Unlocks **GC-B** (campfire + tent + `PROGRESS:COTTAGE_UNLOCK`). | GC-A merged main (`0182dd3` / PR #124); craft spine GC-B PR in flight. |
 | 2026-09-21 | **GC STRATEGY APPROVED** — Lead **`APPROVE GC STRATEGY`** (chat). Unlocks **GC-A** implementation track [Docs/22_GATHER_CRAFT_IMPL.md](../22_GATHER_CRAFT_IMPL.md); GC-B/C remain gated on **`APPROVE GC-A`** / **`APPROVE GC-B`**. | Lead gate 2026-09-21 ET; site→RES + flint/grass flavor before craft/placeholders. |
 | 2026-09-21 | GATHER_CRAFT bible LOCKED. **A1:** flint/grass = display flavor for `RES_STONE`/`RES_FIBER` (six RES unchanged). **B1:** Campfire = 1 WOOD + 1 STONE + 1 FIBER; Tent = 3 WOOD + 2 FIBER. **C1:** Woodshop/textile/research + cottage rooms = placeholders (props + enter volumes + logs); only campfire→cottage demo spends RES; shops not functional craft NOW. **D1:** Craft at campfire early, cottage kitchen/stations when unlocked. Named HOMESTEAD recipes + site→RES day gather stamped; spend Stored-first (Lead-swappable). Upgrade tracks = hub places LATER — not a crafting skill-tree web. | Lead locks 2026-09-21 ET; `GATHER_CRAFT_BIBLE.md` + canon pointer updates only. |
