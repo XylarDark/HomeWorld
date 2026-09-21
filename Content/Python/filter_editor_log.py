@@ -31,7 +31,7 @@ _DEFAULT_SIGNAL_KEYWORDS = [
     "unable", "missing", "invalid", "crash", "fatal", "traceback",
     "no surfaces found",
     # HS-D verb / inventory evidence markers (keep in filtered editor logs)
-    "FORM:", "FALLBACK:", "HEAL:", "NURTURE:", "DAWN:", "TAME:", "GATHER:",
+    "FORM:", "FALLBACK:", "HEAL:", "NURTURE:", "DAWN:", "TAME:", "GATHER:", "MINIGAME:", "BOSS:",
     "STORE:", "INVENTORY:",
 ]
 _DEFAULT_NOISE_CATEGORIES = frozenset({
