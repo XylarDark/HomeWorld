@@ -19,4 +19,5 @@ Short normative pointer files for coding sessions. **Long sources of truth stay*
 **Related:** [CAMERA_BIBLE.md](../CAMERA_BIBLE.md) — LOCKED Orbit TP + Iso (near-zoom on orbit; no dedicated FP) (Lead paste 2026-09-20).  
 [DAYNIGHT_BIBLE.md](../DAYNIGHT_BIBLE.md) — LOCKED sleep→spirit, dusk buffer, moonlight portals (Lead interview 2026-09-20).  
 [DAYNIGHT_IMPL_PROMPT.md](../DAYNIGHT_IMPL_PROMPT.md) — agent implementation prompt for day/night (source: DAYNIGHT_BIBLE).  
-[HOMESTEAD_BIBLE.md](../HOMESTEAD_BIBLE.md) — LOCKED safe hearth, edge glide, limited craft (Lead interview 2026-09-20); impl prompt: [HOMESTEAD_IMPL_PROMPT.md](../HOMESTEAD_IMPL_PROMPT.md).
+[HOMESTEAD_BIBLE.md](../HOMESTEAD_BIBLE.md) — LOCKED safe hearth, edge glide, limited craft (Lead interview 2026-09-20); impl prompt: [HOMESTEAD_IMPL_PROMPT.md](../HOMESTEAD_IMPL_PROMPT.md).  
+[MOVEMENT_BIBLE.md](../MOVEMENT_BIBLE.md) — LOCKED traversal-as-action, one CMC, NOW/LATER parkour/mount/spirit (Lead vision + Conductor scope 2026-09-20); impl prompt: [MOVEMENT_IMPL_PROMPT.md](../MOVEMENT_IMPL_PROMPT.md).
