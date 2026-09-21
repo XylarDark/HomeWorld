@@ -22,6 +22,9 @@
 #include "HomeWorldInventoryTypes.h"
 #include "HomeWorldCraftSubsystem.h"
 #include "HomeWorldCraftStation.h"
+#include "HomeWorldMinigameInteractComponent.h"
+#include "HomeWorldBossSealComponent.h"
+#include "HomeWorldCombatDreamTypes.h"
 #include "HomeWorldBeastTameComponent.h"
 #include "HomeWorldNurtureComponent.h"
 #include "HomeWorldStoreTransferComponent.h"
@@ -795,6 +798,61 @@ bool AHomeWorldCharacter::TryNurtureInFront()
 }
 
 
+bool AHomeWorldCharacter::TryMinigameInFront()
+{
+	FHitResult Hit;
+	if (!TraceInteractHit(Hit))
+	{
+		return false;
+	}
+	AActor* HitActor = GetInteractTargetActor(Hit);
+	if (!HitActor)
+	{
+		return false;
+	}
+	if (UHomeWorldMinigameInteractComponent* Minigame = HitActor->FindComponentByClass<UHomeWorldMinigameInteractComponent>())
+	{
+		const bool bOk = Minigame->TryMinigameInteract(this);
+		if (bOk && HomeWorldCombatDream::IsPolishFirstMinigame(Minigame->GetMinigameKind()))
+		{
+			ShowInteractFeedback(TEXT("MINIGAME:POSSESS — spirit anchors the dream (stub)"), FColor::Cyan);
+		}
+		return bOk;
+	}
+	return false;
+}
+
+bool AHomeWorldCharacter::TryBossSealInFront()
+{
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	AHomeWorldPlayerState* PS = PC ? PC->GetPlayerState<AHomeWorldPlayerState>() : nullptr;
+	if (!PS || (!PS->GetDayBossActive() && !PS->GetNightBossActive()))
+	{
+		return false;
+	}
+
+	FHitResult Hit;
+	if (!TraceInteractHit(Hit))
+	{
+		return false;
+	}
+	AActor* HitActor = GetInteractTargetActor(Hit);
+	if (!HitActor)
+	{
+		return false;
+	}
+	if (UHomeWorldBossSealComponent* Seal = HitActor->FindComponentByClass<UHomeWorldBossSealComponent>())
+	{
+		const bool bOk = Seal->TrySealStub(this);
+		if (bOk)
+		{
+			ShowInteractFeedback(TEXT("BOSS:SEAL — banish stub (no kill)"), FColor::Green);
+		}
+		return bOk;
+	}
+	return false;
+}
+
 bool AHomeWorldCharacter::TryCraftInFront()
 {
 	UWorld* World = GetWorld();
@@ -1185,7 +1243,9 @@ bool AHomeWorldCharacter::ActorHasInteractableComponent(const AActor* Actor)
 	if (Actor->FindComponentByClass<UHomeWorldBeastTameComponent>()
 		|| Actor->FindComponentByClass<UHomeWorldSpiritHealComponent>()
 		|| Actor->FindComponentByClass<UHomeWorldNurtureComponent>()
-		|| Actor->FindComponentByClass<UHomeWorldStoreTransferComponent>())
+		|| Actor->FindComponentByClass<UHomeWorldStoreTransferComponent>()
+		|| Actor->FindComponentByClass<UHomeWorldMinigameInteractComponent>()
+		|| Actor->FindComponentByClass<UHomeWorldBossSealComponent>())
 	{
 		return true;
 	}
@@ -1216,6 +1276,8 @@ bool AHomeWorldCharacter::FindInteractTargetInCone(FHitResult& OutHit) const
 		FName(TEXT("NurtureTarget")),
 		FName(TEXT("BeastPad")),
 		FName(TEXT("CraftStation")),
+		FName(TEXT("MinigameStub")),
+		FName(TEXT("BossSealStub")),
 	};
 
 	AActor* BestActor = nullptr;

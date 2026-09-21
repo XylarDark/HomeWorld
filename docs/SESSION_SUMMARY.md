@@ -673,3 +673,8 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 - Lead **`APPROVE GC STRATEGY`** → `Docs/22_GATHER_CRAFT_IMPL.md`, handoff `Docs/handoffs/GC_A_SITE_RES.md`, `DECISIONS.md` strategy row.
 - C++: `EHomeWorldGatherSiteKind`, pile `GatherSiteKind`, flint/grass flavor logs; Python `homeworld_gc_site_setup.py` + VS_MVP placement scripts. GC-B/C not in PR.
 
+## 2026-09-21 — CD-A stubs (cloud)
+
+- Lead **`APPROVE CD STRATEGY`** → [Docs/23_COMBAT_DREAM_IMPL.md](../Docs/23_COMBAT_DREAM_IMPL.md), handoff [Docs/handoffs/CD_A_STUBS.md](../Docs/handoffs/CD_A_STUBS.md), `DECISIONS.md` CD strategy row (Docs/22 GC **CLOSED** on main via #127).
+- C++: minigame stubs (`MINIGAME:*`), boss placeholder volume (`BOSS:PHASE_*`, `BOSS:SEAL`), `place_vs_mvp_cd_stubs.py`, cheats `hw.Minigame.*` / `hw.Boss.Status`. **CD-A APPROVED not stamped** — pending Lead + DESKTOP greps.
+

@@ -197,6 +197,17 @@ public:
 	/** Set tutorial complete (e.g. hw.TutorialEnd or narrative "family taken" moment). Logs and sets bTutorialComplete for PIE verification and Act 1 handoff. */
 	void SetTutorialComplete(bool bComplete);
 
+	/** CD-A: true while player overlaps boss placeholder volume during day phase. */
+	UFUNCTION(BlueprintCallable, Category = "HomeWorld|CD|Boss")
+	bool GetDayBossActive() const { return bDayBossActive; }
+
+	/** CD-A: true while player overlaps boss placeholder volume during night phase. */
+	UFUNCTION(BlueprintCallable, Category = "HomeWorld|CD|Boss")
+	bool GetNightBossActive() const { return bNightBossActive; }
+
+	void SetBossPhaseFlags(bool bDayBoss, bool bNightBoss);
+	void ClearBossPhaseFlags();
+
 private:
 	UPROPERTY()
 	int32 SpiritualPowerCollected = 0;
@@ -263,4 +274,11 @@ private:
 	/** T2 List 10: True when "family taken" / tutorial end has occurred. Set by hw.TutorialEnd or narrative. */
 	UPROPERTY()
 	bool bTutorialComplete = false;
+
+	/** CD-A boss placeholder overlap flags (cleared on volume exit). */
+	UPROPERTY()
+	bool bDayBossActive = false;
+
+	UPROPERTY()
+	bool bNightBossActive = false;
 };

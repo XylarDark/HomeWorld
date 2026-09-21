@@ -204,3 +204,15 @@ void AHomeWorldPlayerState::CompleteOneGameWithChild()
 	AddLovePoints(1);
 	IncrementGamesWithChildToday();
 }
+
+void AHomeWorldPlayerState::SetBossPhaseFlags(bool bDayBoss, bool bNightBoss)
+{
+	bDayBossActive = bDayBoss;
+	bNightBossActive = bNightBoss;
+}
+
+void AHomeWorldPlayerState::ClearBossPhaseFlags()
+{
+	bDayBossActive = false;
+	bNightBossActive = false;
+}

@@ -59,6 +59,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Interaction", meta = (DisplayName = "Try Craft In Front"))
 	bool TryCraftInFront();
 
+	/** CD-A: Trace forward minigame stub or boss seal (planet only). */
+	UFUNCTION(BlueprintCallable, Category = "Interaction", meta = (DisplayName = "Try Minigame In Front"))
+	bool TryMinigameInFront();
+
+	/** CD-A: Trace forward boss seal stub when inside placeholder volume. */
+	UFUNCTION(BlueprintCallable, Category = "Interaction", meta = (DisplayName = "Try Boss Seal In Front"))
+	bool TryBossSealInFront();
+
 	/** Trace forward and harvest the first resource pile hit; adds RES_* +1 to six-slot inventory. Called from GA_Interact / UHomeWorldInteractAbility. */
 	UFUNCTION(BlueprintCallable, Category = "Interaction", meta = (DisplayName = "Try Harvest In Front"))
 	bool TryHarvestInFront();

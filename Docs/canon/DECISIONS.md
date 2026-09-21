@@ -4,6 +4,7 @@ Append only. Date · decision · why.
 
 | Date (ET) | Decision | Why |
 |---|---|---|
+| 2026-09-21 | **CD STRATEGY APPROVED** — Lead **`APPROVE CD STRATEGY`** (chat, 2026-09-21 ET). Unlocks **CD-A** ([Docs/23_COMBAT_DREAM_IMPL.md](../23_COMBAT_DREAM_IMPL.md): minigame stubs + boss phase volume). **Docs/22 GC track CLOSED** on main (`APPROVE GC-C`); CD-A is separate from GC placeholders. | Lead gate; seal/banish boss model + four planet minigame families per `COMBAT_DREAM_BIBLE.md`. |
 | 2026-09-21 | **Docs/22 Gather & Craft CLOSED / COMPLETE** — Lead **`APPROVE GC-C`** (chat, 2026-09-21 ET). GC-A…C impl track done; next gates **CD-A** / **MV-A** separate TBD. | GC-C merged main (`7061e18` / PR #126); docs stamp closes GC track like RS-E on Docs/21. |
 | 2026-09-21 | **GC-B APPROVED / CLOSED** — Lead **`APPROVE GC-B`** (chat, 2026-09-21 ET). Unlocks **GC-C** (placeholder shop + cottage room volumes). | GC-B merged main (`45353cf` / PR #125); GC-C PR in flight. |
 | 2026-09-21 | **GC-A APPROVED / CLOSED** — Lead **`APPROVE GC-A`** (chat, 2026-09-21 ET; DESKTOP greps deferred/accepted). Unlocks **GC-B** (campfire + tent + `PROGRESS:COTTAGE_UNLOCK`). | GC-A merged main (`0182dd3` / PR #124); craft spine GC-B PR in flight. |
@@ -20,4 +21,4 @@ Append only. Date · decision · why.
 | 2026-09-20 | Add short pointer canon under `Docs/canon/` (`PILLARS`…`DECISIONS`). Do not rewrite `Docs/00`–`03` / `21`. | Agents need named short files; equivalents already exist as long docs — fill gaps only. |
 | 2026-09-19 | Docs/21 Reap & Sow CLOSED (`APPROVE RS-E`). Day=reap, night=sow, dream-convert. | Lead product spine. |
 | 2026-09-17 | Docs/20 UASSET + AI policy APPROVED. Allowlist + LFS + `AI_ASSET_LOG`. | Replace blanket never-commit-.uasset with controlled path. |
-| 2026-09-16 | FALLBACK FLIGHT armed. Scripted glide only; portal both ways at night. | Lead `FALLBACK FLIGHT`. |
+| 2026-09-16 | FALLBACK FLIGHT armed. Scripted glide only; portal both ways at night. Lead `FALLBACK FLIGHT`. |

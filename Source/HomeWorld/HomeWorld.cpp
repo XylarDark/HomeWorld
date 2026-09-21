@@ -23,6 +23,7 @@
 #include "HomeWorldPlayWorld.h"
 #include "HomeWorldCraftSubsystem.h"
 #include "HomeWorldCraftTypes.h"
+#include "HomeWorldCombatDreamTypes.h"
 #include "AbilitySystemComponent.h"
 
 #define LOCTEXT_NAMESPACE "FHomeWorldModule"
@@ -279,6 +280,39 @@ namespace
 		Inv->TryAddResource(HomeWorldInventory::RES_FIBER, 5);
 		Inv->TryAddResource(HomeWorldInventory::RES_STONE, 3);
 		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Craft.GrantDemo — granted WOOD/FIBER/STONE for GC-B demo craft."));
+	}
+
+	void CmdMinigameStub(EHomeWorldMinigameKind Kind)
+	{
+		UE_LOG(LogHomeWorld, Log, TEXT("%s"), HomeWorldCombatDream::GetMinigameLogTag(Kind));
+		if (HomeWorldCombatDream::IsPolishFirstMinigame(Kind))
+		{
+			UE_LOG(LogHomeWorld, Log, TEXT("MOVEMENT:POSSESS stub — dream-object hook (Docs/21 bridge)"));
+		}
+	}
+
+	void CmdMinigameHeal(const TArray<FString>& Args) { CmdMinigameStub(EHomeWorldMinigameKind::Heal); }
+	void CmdMinigameNurture(const TArray<FString>& Args) { CmdMinigameStub(EHomeWorldMinigameKind::Nurture); }
+	void CmdMinigameGrow(const TArray<FString>& Args) { CmdMinigameStub(EHomeWorldMinigameKind::Grow); }
+	void CmdMinigamePossess(const TArray<FString>& Args) { CmdMinigameStub(EHomeWorldMinigameKind::Possess); }
+
+	void CmdBossStatus(const TArray<FString>& Args)
+	{
+		UWorld* World = HomeWorldPlayWorld::Resolve();
+		if (!World)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Boss.Status requires a play world (PIE or game)."));
+			return;
+		}
+		APlayerController* PC = World->GetFirstPlayerController();
+		AHomeWorldPlayerState* PS = PC ? PC->GetPlayerState<AHomeWorldPlayerState>() : nullptr;
+		if (!PS)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Boss.Status — no PlayerState."));
+			return;
+		}
+		UE_LOG(LogHomeWorld, Log, TEXT("BOSS:STATUS DayBoss=%d NightBoss=%d"),
+			PS->GetDayBossActive() ? 1 : 0, PS->GetNightBossActive() ? 1 : 0);
 	}
 
 	void CmdGatherSeed(const TArray<FString>& Args)
@@ -1289,6 +1323,31 @@ void FHomeWorldModule::StartupModule()
 		TEXT("hw.Craft.FishGear"),
 		TEXT("GC-B stub: RECIPE_FISH_GEAR spend + log."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdCraftFishGear),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Minigame.Heal"),
+		TEXT("CD-A: emit MINIGAME:HEAL log (DESKTOP prove)."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdMinigameHeal),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Minigame.Nurture"),
+		TEXT("CD-A: emit MINIGAME:NURTURE log."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdMinigameNurture),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Minigame.Grow"),
+		TEXT("CD-A: emit MINIGAME:GROW log."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdMinigameGrow),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Minigame.Possess"),
+		TEXT("CD-A: emit MINIGAME:POSSESS + MOVEMENT possess stub log."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdMinigamePossess),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Boss.Status"),
+		TEXT("CD-A: log BOSS:STATUS DayBoss/NightBoss flags (after boss volume overlap)."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdBossStatus),
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.Defend.Status"),

@@ -54,6 +54,14 @@ void UHomeWorldInteractAbility::ActivateAbility(const FGameplayAbilitySpecHandle
 	}
 	if (!bHandled)
 	{
+		bHandled = Character->TryMinigameInFront();
+	}
+	if (!bHandled)
+	{
+		bHandled = Character->TryBossSealInFront();
+	}
+	if (!bHandled)
+	{
 		bHandled = Character->TryCraftInFront();
 	}
 	if (!bHandled)
