@@ -9192,3 +9192,15 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 **Errors:** none.
 
+---
+
+## 2026-09-21 — CD-A combat/dream stubs (cloud)
+
+**Task:** Lead **`APPROVE CD STRATEGY`** — CD-A minigame + boss placeholder stubs; do not stamp CD-A approved.
+
+**Delivered:** C++ minigame/boss actors + interact chain; `place_vs_mvp_cd_stubs.py`; `hw.Minigame.*` / `hw.Boss.Status`; `Docs/23_COMBAT_DREAM_IMPL.md`, `Docs/handoffs/CD_A_STUBS.md`, DECISIONS CD row. PR #128.
+
+**Remaining:** DESKTOP Safe-Build + PIE greps `MINIGAME:*`, `BOSS:PHASE_*`; Lead **`APPROVE CD-A`**. GC-C parallel on main (not closed here).
+
+**Errors:** none.
+
