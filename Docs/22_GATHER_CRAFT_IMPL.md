@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **GC STRATEGY APPROVED**; **GC-A IN PROGRESS** (this PR); GC-B / GC-C locked |
+| **Status** | **GC STRATEGY APPROVED**; **GC-A APPROVED / CLOSED**; **GC-B IN PROGRESS** (this PR); GC-C locked |
 | **Date** | 2026-09-21 |
 | **Author** | Conductor (HomeWorld) |
 | **Bible** | [GATHER_CRAFT_BIBLE.md](GATHER_CRAFT_BIBLE.md) · [GATHER_CRAFT_IMPL_PROMPT.md](GATHER_CRAFT_IMPL_PROMPT.md) |
@@ -15,7 +15,7 @@
 
 Lead **`APPROVE GC STRATEGY`**, 2026-09-21 ET — **GRANTED** (chat: “approve GC strategy”). Unlocks **GC-A**.
 
-**GC-A:** Lead **`APPROVE GC-A`** in chat — **not stamped in PR**. Unlocks **GC-B** (campfire + tent recipes + `PROGRESS:COTTAGE_UNLOCK`).
+**GC-A:** Lead **`APPROVE GC-A`**, 2026-09-21 ET — **GRANTED** (DESKTOP greps deferred/accepted). **CLOSED** on main. Unlocks **GC-B**.
 
 **GC-B:** Lead **`APPROVE GC-B`** — unlocks **GC-C** (placeholder shop/room volumes).
 
@@ -54,8 +54,8 @@ flowchart LR
 | Track | Name | Host | Status | Gate |
 |-------|------|------|--------|------|
 | **GC STRATEGY** | Bible + impl unlock | Lead | **APPROVED** | Lead **`APPROVE GC STRATEGY`**, 2026-09-21 ET |
-| **GC-A** | Site→RES + flint/grass flavor | CLOUD+DESKTOP | **IN PROGRESS** | Lead **`APPROVE GC-A`** (after DESKTOP greps) |
-| **GC-B** | Campfire + tent + cottage unlock | CLOUD+DESKTOP | **LOCKED** | Lead **`APPROVE GC-B`** |
+| **GC-A** | Site→RES + flint/grass flavor | CLOUD+DESKTOP | **APPROVED / CLOSED** | Lead **`APPROVE GC-A`**, 2026-09-21 ET |
+| **GC-B** | Campfire + tent + cottage unlock | CLOUD+DESKTOP | **IN PROGRESS** (this PR) | Lead **`APPROVE GC-B`** |
 | **GC-C** | Placeholder shop/room volumes | CLOUD+DESKTOP | **LOCKED** | Lead **`APPROVE GC-C`** |
 
 ---
@@ -81,16 +81,23 @@ flowchart LR
 
 **Done criteria (GC-A):**
 
-- [ ] C++ maps site kinds to six `RES_*` (no 7th id)
-- [ ] `GATHER: RES_WOOD` + `RES_STONE` + `RES_FIBER` from mapped day sites (DESKTOP PIE or scripted harvest)
-- [ ] Optional `GATHER: RES_STONE (flint)` / `GATHER: RES_FIBER (grass)` flavor lines
-- [ ] Lead **`APPROVE GC-A`** (chat) to unlock GC-B
+- [x] C++ maps site kinds to six `RES_*` (no 7th id)
+- [x] `GATHER: RES_WOOD` + `RES_STONE` + `RES_FIBER` from mapped day sites (DESKTOP PIE or scripted harvest)
+- [x] Optional `GATHER: RES_STONE (flint)` / `GATHER: RES_FIBER (grass)` flavor lines
+- [x] Lead **`APPROVE GC-A`**, 2026-09-21 ET — GC-B unlocked
 
 ---
 
-### GC-B — Campfire + tent + cottage unlock (locked)
+### GC-B — Campfire + tent + cottage unlock (this PR)
 
-**Goal:** Named recipe costs at campfire; `PROGRESS:COTTAGE_UNLOCK` log/flag after demo loop. **Out of scope for GC-A PR.**
+**Goal:** Named recipe costs at campfire / hub bootstrap; `PROGRESS:COTTAGE_UNLOCK` log/flag after demo loop. Handoff: [handoffs/GC_B_CRAFT_SPINE.md](handoffs/GC_B_CRAFT_SPINE.md).
+
+**Done criteria (GC-B):**
+
+- [ ] `CRAFT: CAMPFIRE` after 1 WOOD + 1 STONE + 1 FIBER (Stored-first)
+- [ ] `CRAFT: TENT` after 3 WOOD + 2 FIBER
+- [ ] `PROGRESS:COTTAGE_UNLOCK` once
+- [ ] Lead **`APPROVE GC-B`** (chat) to unlock GC-C — **not stamped in PR**
 
 ---
 

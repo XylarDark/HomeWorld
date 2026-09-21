@@ -20,6 +20,8 @@
 #include "HomeWorldResourcePile.h"
 #include "HomeWorldInventorySubsystem.h"
 #include "HomeWorldInventoryTypes.h"
+#include "HomeWorldCraftSubsystem.h"
+#include "HomeWorldCraftStation.h"
 #include "HomeWorldBeastTameComponent.h"
 #include "HomeWorldNurtureComponent.h"
 #include "HomeWorldStoreTransferComponent.h"
@@ -793,6 +795,61 @@ bool AHomeWorldCharacter::TryNurtureInFront()
 }
 
 
+bool AHomeWorldCharacter::TryCraftInFront()
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
+	if (GetIsSpiritForm() || (TimeOfDay && TimeOfDay->GetIsNight()))
+	{
+		UE_LOG(LogTemp, Log, TEXT("CRAFT: blocked — night or spirit form"));
+		ShowInteractFeedback(TEXT("CRAFT: day/body form only"), FColor::Yellow);
+		return false;
+	}
+
+	FHitResult Hit;
+	if (!TraceInteractHit(Hit))
+	{
+		return false;
+	}
+	AActor* HitActor = GetInteractTargetActor(Hit);
+	AHomeWorldCraftStation* Station = Cast<AHomeWorldCraftStation>(HitActor);
+	if (!Station)
+	{
+		return false;
+	}
+
+	UGameInstance* GI = World->GetGameInstance();
+	UHomeWorldCraftSubsystem* Craft = GI ? GI->GetSubsystem<UHomeWorldCraftSubsystem>() : nullptr;
+	if (!Craft)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("CRAFT: fail — CraftSubsystem missing"));
+		return false;
+	}
+
+	const bool bBeforeUnlock = Craft->IsCottageUnlocked();
+	const bool bOk = Craft->TryInteractAtStation(this, Station);
+	if (bOk)
+	{
+		if (Craft->IsCottageUnlocked() && !bBeforeUnlock)
+		{
+			ShowInteractFeedback(TEXT("PROGRESS:COTTAGE_UNLOCK"), FColor::Cyan);
+		}
+		else
+		{
+			ShowInteractFeedback(TEXT("CRAFT: ok — see Output Log"), FColor::Green);
+		}
+	}
+	else
+	{
+		ShowInteractFeedback(TEXT("CRAFT: need resources or wrong step"), FColor::Yellow);
+	}
+	return bOk;
+}
+
 bool AHomeWorldCharacter::TryStoreTransferInFront()
 {
 	UWorld* World = GetWorld();
@@ -1132,6 +1189,10 @@ bool AHomeWorldCharacter::ActorHasInteractableComponent(const AActor* Actor)
 	{
 		return true;
 	}
+	if (Cast<AHomeWorldCraftStation>(Actor))
+	{
+		return true;
+	}
 	return false;
 }
 
@@ -1154,6 +1215,7 @@ bool AHomeWorldCharacter::FindInteractTargetInCone(FHitResult& OutHit) const
 		FName(TEXT("SpiritWound")),
 		FName(TEXT("NurtureTarget")),
 		FName(TEXT("BeastPad")),
+		FName(TEXT("CraftStation")),
 	};
 
 	AActor* BestActor = nullptr;

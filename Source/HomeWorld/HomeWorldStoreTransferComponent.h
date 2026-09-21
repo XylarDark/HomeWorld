@@ -33,6 +33,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Store")
 	void ConfigureResource(FName InResourceId);
 
+	/** GC-B: craft spend decrements stored without withdrawing to inventory first. */
+	void SetStoredCountForCraft(int32 NewCount);
+
 	/** Deposit or withdraw one unit. Returns true on success. */
 	UFUNCTION(BlueprintCallable, Category = "Store")
 	bool TryTransfer(AHomeWorldCharacter* Character);

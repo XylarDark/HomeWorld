@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **IN PROGRESS** — awaiting Lead **`APPROVE GC-A`** after evidence |
+| **Status** | **APPROVED / CLOSED** — Lead **`APPROVE GC-A`**, 2026-09-21 ET |
 | **Host** | CLOUD + DESKTOP |
 | **Track** | [Docs/22_GATHER_CRAFT_IMPL.md](../22_GATHER_CRAFT_IMPL.md) |
 

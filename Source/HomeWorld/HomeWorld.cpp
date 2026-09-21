@@ -21,6 +21,8 @@
 #include "HomeWorldSpiritShieldAbility.h"
 #include "HomeWorldTimeOfDaySubsystem.h"
 #include "HomeWorldPlayWorld.h"
+#include "HomeWorldCraftSubsystem.h"
+#include "HomeWorldCraftTypes.h"
 #include "AbilitySystemComponent.h"
 
 #define LOCTEXT_NAMESPACE "FHomeWorldModule"
@@ -199,6 +201,84 @@ namespace
 		{
 			UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Gather.Flowers granted RES_HERB +%d (legacy Flowers alias)."), Amount);
 		}
+	}
+
+	AHomeWorldCharacter* ResolveHomeWorldCharacter(UWorld* World)
+	{
+		if (!World)
+		{
+			return nullptr;
+		}
+		APlayerController* PC = UGameplayStatics::GetPlayerController(World, 0);
+		return PC ? Cast<AHomeWorldCharacter>(PC->GetPawn()) : nullptr;
+	}
+
+	void CmdCraftStatus(const TArray<FString>& Args)
+	{
+		UWorld* World = HomeWorldPlayWorld::Resolve();
+		if (!World)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Craft.Status requires a play world (PIE or game)."));
+			return;
+		}
+		UGameInstance* GI = World->GetGameInstance();
+		UHomeWorldCraftSubsystem* Craft = GI ? GI->GetSubsystem<UHomeWorldCraftSubsystem>() : nullptr;
+		if (!Craft)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: CraftSubsystem not found."));
+			return;
+		}
+		UE_LOG(LogTemp, Log, TEXT("CRAFT: status campfire=%d tent=%d cottage_unlock=%d"),
+			Craft->HasCampfirePlaced() ? 1 : 0,
+			Craft->HasTentPlaced() ? 1 : 0,
+			Craft->IsCottageUnlocked() ? 1 : 0);
+	}
+
+	void CmdCraftRun(EHomeWorldCraftRecipeId Recipe)
+	{
+		UWorld* World = HomeWorldPlayWorld::Resolve();
+		if (!World)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Craft.* requires a play world (PIE or game)."));
+			return;
+		}
+		UGameInstance* GI = World->GetGameInstance();
+		UHomeWorldCraftSubsystem* Craft = GI ? GI->GetSubsystem<UHomeWorldCraftSubsystem>() : nullptr;
+		AHomeWorldCharacter* Char = ResolveHomeWorldCharacter(World);
+		if (!Craft || !Char)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Craft — need CraftSubsystem + AHomeWorldCharacter pawn."));
+			return;
+		}
+		const bool bOk = Craft->TryCraftRecipe(Char, Recipe, nullptr);
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Craft %s %s"), HomeWorldCraft::GetCraftLogLabel(Recipe), bOk ? TEXT("ok") : TEXT("failed"));
+	}
+
+	void CmdCraftCampfire(const TArray<FString>& Args) { CmdCraftRun(EHomeWorldCraftRecipeId::Campfire); }
+	void CmdCraftTent(const TArray<FString>& Args) { CmdCraftRun(EHomeWorldCraftRecipeId::Tent); }
+	void CmdCraftTorch(const TArray<FString>& Args) { CmdCraftRun(EHomeWorldCraftRecipeId::Torch); }
+	void CmdCraftTameBait(const TArray<FString>& Args) { CmdCraftRun(EHomeWorldCraftRecipeId::TameBait); }
+	void CmdCraftHealSalve(const TArray<FString>& Args) { CmdCraftRun(EHomeWorldCraftRecipeId::HealSalve); }
+	void CmdCraftFishGear(const TArray<FString>& Args) { CmdCraftRun(EHomeWorldCraftRecipeId::FishGear); }
+
+	void CmdCraftGrantDemo(const TArray<FString>& Args)
+	{
+		UWorld* World = HomeWorldPlayWorld::Resolve();
+		if (!World)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Craft.GrantDemo requires a play world (PIE or game)."));
+			return;
+		}
+		UGameInstance* GI = World->GetGameInstance();
+		UHomeWorldInventorySubsystem* Inv = GI ? GI->GetSubsystem<UHomeWorldInventorySubsystem>() : nullptr;
+		if (!Inv)
+		{
+			return;
+		}
+		Inv->TryAddResource(HomeWorldInventory::RES_WOOD, 5);
+		Inv->TryAddResource(HomeWorldInventory::RES_FIBER, 5);
+		Inv->TryAddResource(HomeWorldInventory::RES_STONE, 3);
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Craft.GrantDemo — granted WOOD/FIBER/STONE for GC-B demo craft."));
 	}
 
 	void CmdGatherSeed(const TArray<FString>& Args)
@@ -1169,6 +1249,46 @@ void FHomeWorldModule::StartupModule()
 		TEXT("hw.TimeOfDay.SetPhase"),
 		TEXT("Set time-of-day via SetPhase (0=Day, 1=Dusk, 2=Night, 3=Dawn). Runs PersistDawnSnapshot on Dawn. Prefer over raw hw.TimeOfDay.Phase for evidence greps."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdTimeOfDaySetPhase),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Craft.Status"),
+		TEXT("GC-B: log campfire/tent/cottage_unlock progression flags."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdCraftStatus),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Craft.GrantDemo"),
+		TEXT("GC-B: grant demo RES for campfire+tent craft (inventory)."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdCraftGrantDemo),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Craft.Campfire"),
+		TEXT("GC-B: run RECIPE_CAMPFIRE spend + spawn (Stored-first)."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdCraftCampfire),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Craft.Tent"),
+		TEXT("GC-B: run RECIPE_TENT spend + tent stub."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdCraftTent),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Craft.Torch"),
+		TEXT("GC-B stub: RECIPE_TORCH spend + log."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdCraftTorch),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Craft.TameBait"),
+		TEXT("GC-B stub: RECIPE_TAME_BAIT spend + log."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdCraftTameBait),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Craft.HealSalve"),
+		TEXT("GC-B stub: RECIPE_HEAL_SALVE spend + log."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdCraftHealSalve),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Craft.FishGear"),
+		TEXT("GC-B stub: RECIPE_FISH_GEAR spend + log."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdCraftFishGear),
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.Defend.Status"),

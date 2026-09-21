@@ -9180,3 +9180,15 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 **Errors:** none.
 
+---
+
+## 2026-09-21 — GC-B campfire+tent craft (cloud agent)
+
+**Task:** Lead **`APPROVE GC-A`** granted — implement GC-B only (campfire + tent + `PROGRESS:COTTAGE_UNLOCK`); stamp GC-A closed; do not stamp GC-B approved.
+
+**Delivered:** `HomeWorldCraftSubsystem`, `HomeWorldCraftStation`, character interact + store stored-first spend; `place_vs_mvp_gc_craft.py`; `hw.Craft.*` cheats; `Docs/handoffs/GC_B_CRAFT_SPINE.md`; `Docs/22` + `DECISIONS.md` updates.
+
+**Remaining:** DESKTOP PIE greps for craft logs; Lead **`APPROVE GC-B`** unlocks GC-C.
+
+**Errors:** none.
+
