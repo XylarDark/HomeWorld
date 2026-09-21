@@ -2,10 +2,11 @@
 
 | Field | Value |
 |-------|-------|
+| **Status** | **APPROVED / CLOSED** — Lead **`APPROVE CD-A`**, 2026-09-21 ET |
 | **Track** | CD-A |
 | **Gate** | Lead **`APPROVE CD STRATEGY`** — **GRANTED** 2026-09-21 ET |
-| **Close gate** | Lead **`APPROVE CD-A`** — **not stamped in PR** |
-| **Impl doc** | [23_COMBAT_DREAM_IMPL.md](../23_COMBAT_DREAM_IMPL.md) |
+| **Close gate** | Lead **`APPROVE CD-A`** — **GRANTED** 2026-09-21 ET |
+| **Impl doc** | [23_COMBAT_DREAM_IMPL.md](../23_COMBAT_DREAM_IMPL.md) — **CLOSED / COMPLETE** |
 | **Bible** | [COMBAT_DREAM_BIBLE.md](../COMBAT_DREAM_BIBLE.md) |
 
 ---
@@ -55,6 +56,21 @@ execute_python_script("place_vs_mvp_cd_stubs.py")
 | C++ | `HomeWorldCombatDreamTypes`, `HomeWorldMinigame*`, `HomeWorldBoss*`, `HomeWorldCharacter`, `HomeWorldInteractAbility`, `HomeWorldPlayerState`, `HomeWorld.cpp` |
 | Python | `place_vs_mvp_cd_stubs.py` |
 | Docs | `23_COMBAT_DREAM_IMPL.md`, `canon/DECISIONS.md` |
+
+---
+
+## Done criteria
+
+- [x] Four minigame families log `MINIGAME:*`; possess shows polish line + `MOVEMENT:POSSESS stub`
+- [x] Boss volume logs `BOSS:PHASE_DAY` / `BOSS:PHASE_NIGHT`; optional `BOSS:SEAL`
+- [x] Homestead combat unchanged; no CD placement on homestead map
+- [x] Lead **`APPROVE CD-A`**, 2026-09-21 ET — [Docs/23](../23_COMBAT_DREAM_IMPL.md) **CLOSED / COMPLETE**
+
+---
+
+## Gate
+
+Lead **`APPROVE CD-A`**, 2026-09-21 ET — **GRANTED**. **CD** implementation track **CLOSED / COMPLETE** (merged main `50faeab` / PR #128). **Do not stamp phase gates in PR** — chat only.
 
 ---
 
