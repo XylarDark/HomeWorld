@@ -1,3 +1,8 @@
+## 2026-09-21 ET — GATHER_CRAFT bible locked (cloud)
+
+- Added `Docs/GATHER_CRAFT_BIBLE.md` + `Docs/GATHER_CRAFT_IMPL_PROMPT.md` (Lead A1/B1/C1/D1 locks).
+- Appended `Docs/canon/DECISIONS.md`; recipe rows + flint/grass aliases in `SCHEMA.md`; thin updates to `DO_NOT.md`, `VERBS.md`, `HOMESTEAD_BIBLE.md`, `canon/README.md`, `Docs/README.md`. Docs-only.
+
 ## 2026-09-20 ET — CAMERA_BIBLE locked (canon pointer)
 
 Lead paste: added `Docs/CAMERA_BIBLE.md` (Galaxy identity / WoW orbit control / iso systems / FP intimacy). `Docs/canon/DECISIONS.md` row; `Docs/canon/README.md` + `FEEL.md` pointers. No gameplay code.

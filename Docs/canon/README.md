@@ -21,4 +21,5 @@ Short normative pointer files for coding sessions. **Long sources of truth stay*
 [DAYNIGHT_IMPL_PROMPT.md](../DAYNIGHT_IMPL_PROMPT.md) — agent implementation prompt for day/night (source: DAYNIGHT_BIBLE).  
 [HOMESTEAD_BIBLE.md](../HOMESTEAD_BIBLE.md) — LOCKED safe hearth, edge glide, limited craft (Lead interview 2026-09-20); impl prompt: [HOMESTEAD_IMPL_PROMPT.md](../HOMESTEAD_IMPL_PROMPT.md).  
 [MOVEMENT_BIBLE.md](../MOVEMENT_BIBLE.md) — LOCKED traversal-as-action, one CMC, NOW/LATER parkour/mount/spirit (Lead vision + Conductor scope 2026-09-20); impl prompt: [MOVEMENT_IMPL_PROMPT.md](../MOVEMENT_IMPL_PROMPT.md).  
-[COMBAT_DREAM_BIBLE.md](../COMBAT_DREAM_BIBLE.md) — LOCKED rare boss seal/banish + minigame stubs (Lead locks 2026-09-21 ET); impl prompt: [COMBAT_DREAM_IMPL_PROMPT.md](../COMBAT_DREAM_IMPL_PROMPT.md).
+[COMBAT_DREAM_BIBLE.md](../COMBAT_DREAM_BIBLE.md) — LOCKED rare boss seal/banish + minigame stubs (Lead locks 2026-09-21 ET); impl prompt: [COMBAT_DREAM_IMPL_PROMPT.md](../COMBAT_DREAM_IMPL_PROMPT.md).  
+[GATHER_CRAFT_BIBLE.md](../GATHER_CRAFT_BIBLE.md) — LOCKED six-RES gather, named campfire/cottage craft, demo campfire/tent→cottage (Lead locks 2026-09-21 ET); impl prompt: [GATHER_CRAFT_IMPL_PROMPT.md](../GATHER_CRAFT_IMPL_PROMPT.md).

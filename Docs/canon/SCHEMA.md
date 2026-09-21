@@ -14,6 +14,28 @@
 
 No 7th resource. No equipment/weapons/currency slots.
 
+### Display aliases (gather copy only — IDs unchanged)
+
+| `res_id` | Early flavor display (A1) |
+|---|---|
+| `RES_STONE` | Flint (maps to stone) |
+| `RES_FIBER` | Grass (maps to fiber) |
+
+## Named craft recipes (homestead demo — `GATHER_CRAFT_BIBLE`)
+
+Schema before code. Spend: **Stored first**, then inventory (Lead-swappable — see bible NOTE).
+
+| Recipe ID | Output | Cost |
+|---|---|---|
+| `RECIPE_CAMPFIRE` | Campfire placeable | 1× `RES_WOOD` + 1× `RES_STONE` + 1× `RES_FIBER` |
+| `RECIPE_TENT` | Tent placeable | 3× `RES_WOOD` + 2× `RES_FIBER` |
+| `RECIPE_TORCH` | Torch | 1× `RES_WOOD` + 1× `RES_FIBER` |
+| `RECIPE_TAME_BAIT` | Taming consumable | 1× `RES_BERRY` **or** 1× `RES_HERB` |
+| `RECIPE_HEAL_SALVE` | Healing consumable | 1× `RES_HERB` **or** 1× `RES_SEED` |
+| `RECIPE_FISH_GEAR` | Fish bait/gear | 1× `RES_FIBER` + 1× `RES_BERRY` |
+
+Demo progression flag (no separate shop RES spend in NOW): `PROGRESS:COTTAGE_UNLOCK` at campfire after tent placed — see `GATHER_CRAFT_BIBLE.md`.
+
 ## Creature tame states
 
 | Field | Legal values |

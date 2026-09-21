@@ -3,7 +3,7 @@
 **Status:** LOCKED allowlist  
 **Rule:** If a verb is not listed here (or in the Docs/21 site actions below), **do not implement it**.
 
-**Sources:** `Docs/00_CANON.md` §3; `Docs/01_GDD_MVP.md` §4; `Docs/21_REAP_SOW.md`; [COMBAT_DREAM_BIBLE.md](../COMBAT_DREAM_BIBLE.md) (Lead 2026-09-21)
+**Sources:** `Docs/00_CANON.md` §3; `Docs/01_GDD_MVP.md` §4; `Docs/21_REAP_SOW.md`; [COMBAT_DREAM_BIBLE.md](../COMBAT_DREAM_BIBLE.md) (Lead 2026-09-21); [GATHER_CRAFT_BIBLE.md](../GATHER_CRAFT_BIBLE.md) (Lead 2026-09-21)
 
 ## Day / body only
 
@@ -13,6 +13,7 @@
 | V2 | Glide island → planet | FALLBACK scripted `CRUMB_*` → landing; ~12–40 s |
 | V3 | Gather | Day Use on World node → +1 `RES_*`; ~1.5–3 s |
 | V3b | Store transfer | Homestead: inventory → Stored count (1 unit) |
+| V3c | Craft (named) | Campfire → cottage kitchen: spend per `SCHEMA.md` recipe rows; log `CRAFT:` / `PROGRESS:COTTAGE_UNLOCK` |
 | V4 | Encounter / tame | Beast pad: offer food → `wild`→`cautious`→`tamed`(→`helper`) |
 | RS-Reap | Collect / claim at sites | Trees/rocks/flowers/den/camp/special day bonuses (Docs/21) |
 
@@ -56,7 +57,7 @@ Boss volume enter (implementation): log `BOSS:PHASE_DAY` or `BOSS:PHASE_NIGHT` f
 
 - Homestead combat / attack / aggro (any phase)
 - Free-flight / night glide
-- Crafting tree / recipe craft
+- Crafting tree / unlisted recipe craft (named recipes only — [GATHER_CRAFT_BIBLE.md](../GATHER_CRAFT_BIBLE.md))
 - Kill win-condition combat (including bosses)
 - Aggro trash packs / weapon-primary encounter loops
 - Full GAS combat kit without Lead append
