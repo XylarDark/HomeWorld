@@ -1,3 +1,8 @@
+## 2026-09-21 ET — GC-B craft spine (cloud)
+
+- GC-B: `UHomeWorldCraftSubsystem`, `AHomeWorldCraftStation`, interact + Stored-first spend; `place_vs_mvp_gc_craft.py` (`GP_Craft_Hub`); `hw.Craft.*` cheats.
+- Docs: GC-A **CLOSED** in `Docs/22_GATHER_CRAFT_IMPL.md`; handoff `Docs/handoffs/GC_B_CRAFT_SPINE.md`; `DECISIONS.md` GC-A row. GC-B not stamped APPROVED.
+
 ## 2026-09-21 ET — GATHER_CRAFT bible locked (cloud)
 
 - Added `Docs/GATHER_CRAFT_BIBLE.md` + `Docs/GATHER_CRAFT_IMPL_PROMPT.md` (Lead A1/B1/C1/D1 locks).

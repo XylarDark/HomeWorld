@@ -16,6 +16,11 @@ void UHomeWorldStoreTransferComponent::ConfigureResource(FName InResourceId)
 	ResourceId = HomeWorldInventory::NormalizeResourceId(InResourceId);
 }
 
+void UHomeWorldStoreTransferComponent::SetStoredCountForCraft(const int32 NewCount)
+{
+	StoredCount = FMath::Clamp(NewCount, 0, MaxStored);
+}
+
 UHomeWorldInventorySubsystem* UHomeWorldStoreTransferComponent::GetInventory(AHomeWorldCharacter* Character) const
 {
 	if (!Character)

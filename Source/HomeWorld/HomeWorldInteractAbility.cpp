@@ -54,6 +54,10 @@ void UHomeWorldInteractAbility::ActivateAbility(const FGameplayAbilitySpecHandle
 	}
 	if (!bHandled)
 	{
+		bHandled = Character->TryCraftInFront();
+	}
+	if (!bHandled)
+	{
 		bHandled = Character->TryHarvestInFront();
 	}
 	EndAbility(Handle, ActorInfo, ActivationInfo, false, !bHandled);

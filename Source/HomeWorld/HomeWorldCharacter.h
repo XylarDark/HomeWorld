@@ -55,6 +55,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Interaction", meta = (DisplayName = "Try Store Transfer In Front"))
 	bool TryStoreTransferInFront();
 
+	/** GC-B: Trace forward craft station (hub / campfire / kitchen). Day/body. */
+	UFUNCTION(BlueprintCallable, Category = "Interaction", meta = (DisplayName = "Try Craft In Front"))
+	bool TryCraftInFront();
+
 	/** Trace forward and harvest the first resource pile hit; adds RES_* +1 to six-slot inventory. Called from GA_Interact / UHomeWorldInteractAbility. */
 	UFUNCTION(BlueprintCallable, Category = "Interaction", meta = (DisplayName = "Try Harvest In Front"))
 	bool TryHarvestInFront();
