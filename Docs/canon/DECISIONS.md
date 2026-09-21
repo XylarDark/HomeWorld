@@ -4,6 +4,7 @@ Append only. Date · decision · why.
 
 | Date (ET) | Decision | Why |
 |---|---|---|
+| 2026-09-21 | **Docs/22 Gather & Craft CLOSED / COMPLETE** — Lead **`APPROVE GC-C`** (chat, 2026-09-21 ET). GC-A…C impl track done; next gates **CD-A** / **MV-A** separate TBD. | GC-C merged main (`7061e18` / PR #126); docs stamp closes GC track like RS-E on Docs/21. |
 | 2026-09-21 | **GC-B APPROVED / CLOSED** — Lead **`APPROVE GC-B`** (chat, 2026-09-21 ET). Unlocks **GC-C** (placeholder shop + cottage room volumes). | GC-B merged main (`45353cf` / PR #125); GC-C PR in flight. |
 | 2026-09-21 | **GC-A APPROVED / CLOSED** — Lead **`APPROVE GC-A`** (chat, 2026-09-21 ET; DESKTOP greps deferred/accepted). Unlocks **GC-B** (campfire + tent + `PROGRESS:COTTAGE_UNLOCK`). | GC-A merged main (`0182dd3` / PR #124); craft spine GC-B PR in flight. |
 | 2026-09-21 | **GC STRATEGY APPROVED** — Lead **`APPROVE GC STRATEGY`** (chat). Unlocks **GC-A** implementation track [Docs/22_GATHER_CRAFT_IMPL.md](../22_GATHER_CRAFT_IMPL.md); GC-B/C remain gated on **`APPROVE GC-A`** / **`APPROVE GC-B`**. | Lead gate 2026-09-21 ET; site→RES + flint/grass flavor before craft/placeholders. |

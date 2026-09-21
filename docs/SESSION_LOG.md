@@ -9192,3 +9192,15 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 **Errors:** none.
 
+---
+
+## 2026-09-21 — GC-C track CLOSED (docs stamp, cloud agent)
+
+**Task:** Lead **`APPROVE GC-C`** — stamp Docs/22 Gather & Craft **CLOSED / COMPLETE** (GC-C code already on main PR #126).
+
+**Delivered:** `Docs/22_GATHER_CRAFT_IMPL.md`, `Docs/handoffs/GC_C_PLACEHOLDERS.md`, `Docs/canon/DECISIONS.md`, `Docs/README.md` index row. Docs-only.
+
+**Remaining:** CD-A / MV-A separate tracks TBD.
+
+**Errors:** none.
+
