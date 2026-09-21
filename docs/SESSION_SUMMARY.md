@@ -1,3 +1,7 @@
+## 2026-09-21 ET — GC-C track CLOSED (docs stamp, cloud)
+
+- Lead **`APPROVE GC-C`** → `Docs/22_GATHER_CRAFT_IMPL.md` **CLOSED / COMPLETE**; `Docs/handoffs/GC_C_PLACEHOLDERS.md` **APPROVED / CLOSED**; `Docs/canon/DECISIONS.md` row. GC on main `7061e18` (PR #126). Next: CD-A / MV-A TBD — not in this PR.
+
 ## 2026-09-21 ET — GC-C placeholder volumes (cloud)
 
 - GC-C: `AHomeWorldGcPlaceholderVolume` + `EHomeWorldGcPlaceholderKind`; overlap logs `PLACEHOLDER:*`; cottage rooms gated on `IsCottageUnlocked()`; `place_vs_mvp_gc_placeholders.py` (`GP_PH_*`).

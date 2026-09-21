@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **GC STRATEGY APPROVED**; **GC-A APPROVED / CLOSED**; **GC-B APPROVED / CLOSED**; **GC-C IN PROGRESS** (this PR) — track nearly complete pending Lead **`APPROVE GC-C`** |
+| **Status** | **CLOSED / COMPLETE** — Lead **`APPROVE GC-C`**, 2026-09-21 ET (GC STRATEGY + GC-A…C all approved) |
 | **Date** | 2026-09-21 |
 | **Author** | Conductor (HomeWorld) |
 | **Bible** | [GATHER_CRAFT_BIBLE.md](GATHER_CRAFT_BIBLE.md) · [GATHER_CRAFT_IMPL_PROMPT.md](GATHER_CRAFT_IMPL_PROMPT.md) |
@@ -19,7 +19,9 @@ Lead **`APPROVE GC STRATEGY`**, 2026-09-21 ET — **GRANTED** (chat: “approve 
 
 **GC-B:** Lead **`APPROVE GC-B`**, 2026-09-21 ET — **GRANTED** (chat). **CLOSED** on main. Unlocks **GC-C**.
 
-**GC-C:** Lead **`APPROVE GC-C`** — closes GC track (placeholder volumes). **Not stamped in PR.**
+**GC-C:** Lead **`APPROVE GC-C`**, 2026-09-21 ET — **GRANTED** (chat). Docs/22 Gather & Craft track **CLOSED / COMPLETE**. Implementation on main (`7061e18` / PR #126).
+
+**Next gate:** None on GC — **CD-A** / **MV-A** are separate tracks TBD (Lead gate).
 
 **Do not stamp phase APPROVED in a PR** — Lead types the gate string in chat.
 
@@ -31,7 +33,7 @@ Ship the **Gather & Craft** demo spine from the locked bible: six `RES_*` only; 
 
 ```mermaid
 flowchart LR
-  subgraph gca [GC-A_NOW]
+  subgraph gca [GC-A_CLOSED]
     Sites[Planet_site_kinds]
     RES[Six_RES_map]
     Flavor[Flint_grass_logs]
@@ -40,7 +42,7 @@ flowchart LR
     Craft[Campfire_tent_recipes]
     Prog[PROGRESS_COTTAGE_UNLOCK]
   end
-  subgraph gcc [GC-C_NOW]
+  subgraph gcc [GC-C_CLOSED]
     Place[Shop_room_placeholders]
   end
   Sites --> RES --> Flavor
@@ -58,7 +60,7 @@ flowchart LR
 | **GC STRATEGY** | Bible + impl unlock | Lead | **APPROVED** | Lead **`APPROVE GC STRATEGY`**, 2026-09-21 ET |
 | **GC-A** | Site→RES + flint/grass flavor | CLOUD+DESKTOP | **APPROVED / CLOSED** | Lead **`APPROVE GC-A`**, 2026-09-21 ET |
 | **GC-B** | Campfire + tent + cottage unlock | CLOUD+DESKTOP | **APPROVED / CLOSED** | Lead **`APPROVE GC-B`**, 2026-09-21 ET |
-| **GC-C** | Placeholder shop/room volumes | CLOUD+DESKTOP | **IN PROGRESS** (this PR) | Lead **`APPROVE GC-C`** |
+| **GC-C** | Placeholder shop/room volumes | CLOUD+DESKTOP | **APPROVED / CLOSED** | Lead **`APPROVE GC-C`**, 2026-09-21 ET — [GC_C_PLACEHOLDERS.md](handoffs/GC_C_PLACEHOLDERS.md) |
 
 ---
 
@@ -103,16 +105,34 @@ flowchart LR
 
 ---
 
-### GC-C — Placeholder shops/rooms (this PR)
+### GC-C — Placeholder shops/rooms
 
 **Goal:** Enter volumes → `PLACEHOLDER:*` logs only; no functional shop craft. Handoff: [handoffs/GC_C_PLACEHOLDERS.md](handoffs/GC_C_PLACEHOLDERS.md).
 
 **Done criteria (GC-C):**
 
-- [ ] `PLACEHOLDER:WOODSHOP enter` / `TEXTILE` / `RESEARCH` from shop volumes
-- [ ] `PLACEHOLDER:COTTAGE_KITCHEN` / `COTTAGE_BEDROOM` / `CAULDRON` after cottage unlock
-- [ ] GC-B craft greps still pass; homestead non-combat
-- [ ] Lead **`APPROVE GC-C`** (chat) closes GC track — **not stamped in PR**
+- [x] `PLACEHOLDER:WOODSHOP enter` / `TEXTILE` / `RESEARCH` from shop volumes
+- [x] `PLACEHOLDER:COTTAGE_KITCHEN` / `COTTAGE_BEDROOM` / `CAULDRON` after cottage unlock
+- [x] GC-B craft greps still pass; homestead non-combat
+- [x] Lead **`APPROVE GC-C`**, 2026-09-21 ET → track **CLOSED / COMPLETE**
+
+---
+
+## Approval ladder
+
+| Step | Lead action | Unlocks |
+|------|-------------|---------|
+| 0 | **`APPROVE GC STRATEGY`** | GC-A site→RES — **DONE** 2026-09-21 ET |
+| 1 | **`APPROVE GC-A`** | GC-B craft spine — **DONE** 2026-09-21 ET |
+| 2 | **`APPROVE GC-B`** | GC-C placeholder volumes — **DONE** 2026-09-21 ET |
+| 3 | **`APPROVE GC-C`** | Docs/22 track complete — **DONE** 2026-09-21 ET |
+
+```
+Docs/21 Reap & Sow: CLOSED / COMPLETE — Lead APPROVE RS-E 2026-09-19 ET
+Docs/22 Gather & Craft: CLOSED / COMPLETE — Lead APPROVE GC-C 2026-09-21 ET
+```
+
+**Next product tracks (separate):** CD-A (Combat/Dream impl) · MV-A (Movement impl) — TBD Lead gate.
 
 ---
 
