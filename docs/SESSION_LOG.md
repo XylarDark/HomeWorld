@@ -9158,3 +9158,13 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 **Errors:** none.
 
+---
+
+## 2026-09-21 — COMBAT_DREAM bible locked (cloud agent)
+
+**Task:** Lead locks A1/B/C/D — boss seal/banish + minigame stubs; amend combat framing A in canon pointers.
+
+**Delivered:** `Docs/COMBAT_DREAM_BIBLE.md`; `Docs/COMBAT_DREAM_IMPL_PROMPT.md`; `DECISIONS.md` append + framing A amend note; `DO_NOT.md`, `VERBS.md`, `canon/README.md`. No gameplay C++.
+
+**Errors:** none.
+

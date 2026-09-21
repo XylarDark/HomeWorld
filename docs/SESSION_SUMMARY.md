@@ -644,3 +644,8 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 - Added `Docs/HOMESTEAD_BIBLE.md` + `Docs/HOMESTEAD_IMPL_PROMPT.md` (Lead interview verbatim).
 - Appended `Docs/canon/DECISIONS.md`; `Docs/canon/README.md` + `DO_NOT.md` pointers (edge glide, no invisible-wall bounds, NPC family not co-op MVP, named homestead recipes).
 
+### 2026-09-21 — COMBAT_DREAM bible locked (cloud)
+
+- Added `Docs/COMBAT_DREAM_BIBLE.md` + `Docs/COMBAT_DREAM_IMPL_PROMPT.md` (Lead A1/B/C/D locks).
+- Amended combat framing A in `Docs/canon/DECISIONS.md`; updated `DO_NOT.md`, `VERBS.md`, `canon/README.md`. Docs-only; boss volume placement deferred to DESKTOP/Content track.
+
