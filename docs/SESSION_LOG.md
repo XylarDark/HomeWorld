@@ -9148,3 +9148,13 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 **Errors:** none.
 
+---
+
+## 2026-09-21 — MOVEMENT bible locked (cloud agent)
+
+**Task:** Lead vision + Conductor NOW/LATER movement canon — docs only.
+
+**Delivered:** `Docs/MOVEMENT_BIBLE.md`; `Docs/MOVEMENT_IMPL_PROMPT.md`; `DECISIONS.md` append; `canon/README.md` related links. `DO_NOT.md` unchanged.
+
+**Errors:** none.
+
