@@ -629,8 +629,15 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 - Replaced `Docs/CAMERA_BIBLE.md` with Lead amendment: no dedicated FP; near framing = WoW orbit boom zoom; two presets (Orbit TP + Iso).
 - Added `Docs/CAMERA_IMPL_PROMPT.md`; appended `DECISIONS.md`; aligned `Docs/canon/FEEL.md` + `README.md` pointers.
 
+<<<<<<< HEAD
 ### 2026-09-21 — DAYNIGHT bible locked (cloud)
 
 - Added `Docs/DAYNIGHT_BIBLE.md` + `Docs/DAYNIGHT_IMPL_PROMPT.md` (Lead interview verbatim).
 - Appended `Docs/canon/DECISIONS.md`; Related links in `Docs/canon/README.md`; `FEEL.md` night-length pointer. No gameplay C++.
+=======
+### 2026-09-20 — Homestead bible LOCK (cloud)
+
+- Added `Docs/HOMESTEAD_BIBLE.md` + `Docs/HOMESTEAD_IMPL_PROMPT.md` (Lead interview verbatim).
+- Appended `Docs/canon/DECISIONS.md`; `Docs/canon/README.md` + `DO_NOT.md` pointers (edge glide, no invisible-wall bounds, NPC family not co-op MVP, named homestead recipes).
+>>>>>>> d9ee312 (docs: append SESSION_SUMMARY for homestead bible lock)
 
