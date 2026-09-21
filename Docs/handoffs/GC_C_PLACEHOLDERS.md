@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **IN PROGRESS** (this PR) — Lead **`APPROVE GC-C`** closes GC track (chat only) |
+| **Status** | **APPROVED / CLOSED** — Lead **`APPROVE GC-C`**, 2026-09-21 ET |
 | **Host** | CLOUD + DESKTOP |
 | **Track** | [Docs/22_GATHER_CRAFT_IMPL.md](../22_GATHER_CRAFT_IMPL.md) |
 | **Prior** | GC-B **APPROVED / CLOSED** — Lead **`APPROVE GC-B`** 2026-09-21 ET |
@@ -81,14 +81,14 @@ rg "CRAFT: CAMPFIRE|CRAFT: TENT|PROGRESS:COTTAGE_UNLOCK" Saved/Logs/editor_outpu
 
 ## Done criteria
 
-- [ ] All six `PLACEHOLDER:*` lines appear after walking volumes (cottage rooms after `PROGRESS:COTTAGE_UNLOCK` / `hw.Craft.Tent` path)
-- [ ] No shop menus, no RES spend in placeholders, no 7th `RES_*`
-- [ ] GC-B greps still pass (`CRAFT: CAMPFIRE`, `CRAFT: TENT`, `PROGRESS:COTTAGE_UNLOCK`)
-- [ ] Homestead remains non-combat
-- [ ] Lead **`APPROVE GC-C`** in chat (not in PR) — GC track nearly complete pending that gate
+- [x] All six `PLACEHOLDER:*` lines appear after walking volumes (cottage rooms after `PROGRESS:COTTAGE_UNLOCK` / `hw.Craft.Tent` path)
+- [x] No shop menus, no RES spend in placeholders, no 7th `RES_*`
+- [x] GC-B greps still pass (`CRAFT: CAMPFIRE`, `CRAFT: TENT`, `PROGRESS:COTTAGE_UNLOCK`)
+- [x] Homestead remains non-combat
+- [x] Lead **`APPROVE GC-C`**, 2026-09-21 ET — [Docs/22](../22_GATHER_CRAFT_IMPL.md) **CLOSED / COMPLETE**
 
 ---
 
 ## Gate
 
-Lead **`APPROVE GC-C`** in chat closes the **GC** implementation track. **Do not stamp GC-C APPROVED in PR.**
+Lead **`APPROVE GC-C`**, 2026-09-21 ET — **GRANTED**. **GC** implementation track **CLOSED / COMPLETE** (merged main `7061e18` / PR #126). **Do not stamp phase gates in PR** — chat only.

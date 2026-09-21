@@ -6,7 +6,7 @@
 | **Date** | 2026-09-21 |
 | **Author** | Conductor (HomeWorld) |
 | **Bible** | [COMBAT_DREAM_BIBLE.md](COMBAT_DREAM_BIBLE.md) · [COMBAT_DREAM_IMPL_PROMPT.md](COMBAT_DREAM_IMPL_PROMPT.md) |
-| **Parallel track** | [22_GATHER_CRAFT_IMPL.md](22_GATHER_CRAFT_IMPL.md) — **GC-C IN PROGRESS** on main (Lead **`APPROVE GC-C`** closes GC); no conflict with CD-A planet stubs |
+| **Parallel track** | [22_GATHER_CRAFT_IMPL.md](22_GATHER_CRAFT_IMPL.md) — **CLOSED / COMPLETE** on main (Lead **`APPROVE GC-C`**, PR #126); CD-A planet stubs are independent |
 | **Prefix** | **CD** — do not reuse GC / RS gate strings |
 
 ---
