@@ -13,6 +13,8 @@ except ImportError:
     print("ERROR: Run inside Unreal Editor.")
     sys.exit(1)
 
+import homeworld_gc_site_setup as gc_site
+
 PREFIX = "ResourcePile:"
 LEVEL_PATH = "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers"
 PILE_BASE_CLASS = "/Script/HomeWorld.HomeWorldResourcePile"
@@ -29,9 +31,11 @@ BP_CANDIDATES = (
 
 # Near homestead cabin — stable labels + tags for MCP/PIE gather success-path
 PILE_SPECS = (
-    ("GP_Gather_WOOD", "RES_WOOD", unreal.Vector(150.0, -120.0, 0.0)),
-    ("GP_Gather_HERB", "RES_HERB", unreal.Vector(220.0, -80.0, 0.0)),
-    ("GP_Gather_BERRY", "RES_BERRY", unreal.Vector(180.0, -180.0, 0.0)),
+    ("GP_Gather_WOOD", "trees", "RES_WOOD", unreal.Vector(150.0, -120.0, 0.0)),
+    ("GP_Gather_STONE", "rocks", "RES_STONE", unreal.Vector(120.0, -200.0, 0.0)),
+    ("GP_Gather_FIBER", "flowers", "RES_FIBER", unreal.Vector(220.0, -80.0, 0.0)),
+    ("GP_Gather_BERRY", "berry", "RES_BERRY", unreal.Vector(180.0, -180.0, 0.0)),
+    ("GP_Gather_SEED", "seed", "RES_SEED", unreal.Vector(260.0, -160.0, 0.0)),
 )
 
 
@@ -173,13 +177,14 @@ def _load_level() -> bool:
     return bool(unreal.EditorLoadingAndSavingUtils.load_map(LEVEL_PATH))
 
 
-def _configure_pile(actor, resource_id: str) -> None:
+def _configure_pile(actor, site_kind: str, resource_id: str) -> None:
     try:
         actor.set_editor_property("resource_type", unreal.Name(resource_id))
         actor.set_editor_property("amount_per_harvest", 1)
         actor.set_editor_property("b_deplete_until_dawn", False)
     except Exception as exc:
         _log("configure warn: " + str(exc))
+    gc_site.apply_gc_site(actor, site_kind, resource_id)
 
 
 def _find_pile_by_tag_or_resource(pile_base_cls, label: str, resource_id: str):
@@ -233,6 +238,7 @@ def _dedupe_extra_piles(pile_base_cls, label: str, resource_id: str, keep_actor)
 
 def _ensure_pile(
     label: str,
+    site_kind: str,
     resource_id: str,
     offset: unreal.Vector,
     base: unreal.Vector,
@@ -258,9 +264,9 @@ def _ensure_pile(
         except Exception:
             pass
         _add_tag(actor, label)
-        _configure_pile(actor, resource_id)
+        _configure_pile(actor, site_kind, resource_id)
         _dedupe_extra_piles(pile_base_cls, label, resource_id, actor)
-        _log("reuse " + label + " res=" + resource_id)
+        _log("reuse " + label + " site=" + site_kind + " res=" + resource_id)
         return True
 
     actor = unreal.EditorLevelLibrary.spawn_actor_from_class(spawn_cls, loc)
@@ -274,14 +280,14 @@ def _ensure_pile(
     except Exception:
         pass
     _add_tag(actor, label)
-    _configure_pile(actor, resource_id)
+    _configure_pile(actor, site_kind, resource_id)
     _dedupe_extra_piles(pile_base_cls, label, resource_id, actor)
-    _log("spawn " + label + " res=" + resource_id)
+    _log("spawn " + label + " site=" + site_kind + " res=" + resource_id)
     return True
 
 
 def _verify_piles(pile_base_cls) -> None:
-    for label, resource_id, _offset in PILE_SPECS:
+    for label, _site_kind, resource_id, _offset in PILE_SPECS:
         actor = find_actor_by_label(label)
         if not actor:
             actor = _find_pile_by_tag_or_resource(pile_base_cls, label, resource_id)
@@ -318,15 +324,16 @@ def main() -> int:
 
     base = _homestead_base()
     ok = True
-    for label, res_id, offset in PILE_SPECS:
-        if not _ensure_pile(label, res_id, offset, base, spawn_cls, pile_base_cls):
+    for label, site_kind, res_id, offset in PILE_SPECS:
+        if not _ensure_pile(label, site_kind, res_id, offset, base, spawn_cls, pile_base_cls):
             ok = False
 
     _verify_piles(pile_base_cls)
 
     _log(
         "Done. PIE day/body: face GP_Gather_* within 280cm, Interact (E) or "
-        "try_harvest_in_front() for GATHER: RES_* logs. Save level locally (KEEP-LOCAL)."
+        "try_harvest_in_front() for GATHER: RES_WOOD / RES_STONE / RES_FIBER (+ flint/grass). "
+        "Save level locally (KEEP-LOCAL)."
     )
     return 0 if ok else 1
 

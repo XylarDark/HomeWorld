@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "HomeWorldGatherSiteTypes.h"
 #include "HomeWorldResourcePile.generated.h"
 
 class UBoxComponent;
@@ -22,9 +23,13 @@ class HOMEWORLD_API AHomeWorldResourcePile : public AActor
 public:
 	AHomeWorldResourcePile();
 
-	/** Resource type — legacy ("Wood") or RES_*; normalized on harvest. */
+	/** Resource type — legacy ("Wood") or RES_*; normalized on harvest when GatherSiteKind is None. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Resource")
 	FName ResourceType;
+
+	/** GC-A: Docs/GATHER_CRAFT site→RES map; overrides ResourceType when not None (den/camp/special stay Docs/21). */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Resource")
+	EHomeWorldGatherSiteKind GatherSiteKind = EHomeWorldGatherSiteKind::None;
 
 	/** Amount granted per harvest (SYS default +1). */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Resource", meta = (ClampMin = "1"))
@@ -52,6 +57,10 @@ protected:
 private:
 	bool bDepletedUntilDawn = false;
 	float CooldownRemaining = 0.f;
+	/** Flowers site: next harvest yields RES_HERB when true (alternate with RES_FIBER / grass). */
+	bool bFlowerNextHarvestIsHerb = false;
+
+	FName ResolveHarvestResourceId();
 
 	void TickCooldown(float DeltaTime);
 	virtual void Tick(float DeltaSeconds) override;
