@@ -4,6 +4,7 @@ Append only. Date · decision · why.
 
 | Date (ET) | Decision | Why |
 |---|---|---|
+| 2026-09-20 | MOVEMENT bible LOCKED: traversal-as-action; NOW = authored tutorial planet, parkour lite (mantle/vault), early mount on one CMC, FALLBACK glide down, spirit blink (no fly yet); LATER = PoE gen, spirit flight, full parkour. Keep day reap/night sow. | Lead vision + “bit of everything” scope. |
 | 2026-09-20 | DAYNIGHT bible LOCKED: sleep→spirit (bed/campsite); dusk=day buffer no glide start; glide down-only; portals moonlight body+spirit + up to island; no-torch darkness = soft shrine kidnap home; spirit-out-at-dawn = sickness TODO; phase lengths TODO playtest. Amends older auto-dusk-spirit / portal-night-only where they conflict. | Lead bible interview. |
 | 2026-09-20 | HOMESTEAD bible LOCKED: safe hub + NPC family (no co-op MVP); limited recipes (tent/torch/tame/heal/fish consumables); edge paths = glide down (must hit planet map); no invisible walls (rare immersive exceptions only); leave via glide or moonlight portals. Amends “no crafting trees” to named recipes only. | Lead bible interview. |
 | 2026-09-20 | Camera: drop dedicated FP / intimacy camera. Near framing = WoW orbit boom zoom only; do not optimize for true FP. Two presets: Orbit TP + Iso. | Lead chat amendment after CAMERA_BIBLE lock. |
