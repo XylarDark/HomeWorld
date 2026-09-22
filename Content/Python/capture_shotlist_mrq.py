@@ -265,50 +265,64 @@ class _MrqOrchestrator:
             {"success": self._executor_success, "rendering": self._is_subsystem_rendering()},
         )
 
+    def _centroid_for_pie_night_stack(self) -> Optional[list[float]]:
+        pose = self._sequence_meta.get("pose") or {}
+        reapply = pose.get("mrq_pie_night_reapply") or {}
+        stack = reapply.get("mrq_pie_night_stack") or {}
+        cent = stack.get("homestead_centroid") or {}
+        if cent.get("used"):
+            return cent["used"]
+        rc = stack.get("mrq_fixture_reconfigure") or {}
+        if rc.get("homestead_centroid_used"):
+            return rc["homestead_centroid_used"]
+        return None
+
     def _try_apply_mrq_pie_world_night_stack(self) -> None:
-        """Editor TMP/atmo do not transfer — seed sky stack in the PIE world MRQ renders."""
-        if self._job_meta.get("mrq_pie_world_stack_done"):
+        """Re-apply PIE sky/fog/atmo during MRQ warm-up — one pre-tick apply is often too late."""
+        if self._job_meta.get("executor_finished"):
             return
         import vnp_night_tune_and_evidence as vnp
 
         world, wl = vnp.resolve_mrq_pie_render_world()
-        if world and wl in ("pie", "game_world"):
-            centroid: Optional[list[float]] = None
-            pose = self._sequence_meta.get("pose") or {}
-            reapply = pose.get("mrq_pie_night_reapply") or {}
-            stack = reapply.get("mrq_pie_night_stack") or {}
-            cent = stack.get("homestead_centroid") or {}
-            if cent.get("used"):
-                centroid = cent["used"]
-            else:
-                rc = stack.get("mrq_fixture_reconfigure") or {}
-                if rc.get("homestead_centroid_used"):
-                    centroid = rc["homestead_centroid_used"]
-            meta = vnp.apply_mrq_pie_homestead_night_stack_in_render_world(centroid)
+        if not (world and wl in ("pie", "game_world")):
             self._pie_night_stack_attempts += 1
-            self._job_meta["mrq_pie_world_night_stack"] = meta
-            self._job_meta["mrq_pie_world_stack_attempts"] = self._pie_night_stack_attempts
-            self._job_meta["mrq_pie_world_context"] = wl
-            if meta.get("stack_ok") or self._pie_night_stack_attempts >= 4:
-                self._job_meta["mrq_pie_world_stack_done"] = True
-            _log(
-                "mrq pie world night stack",
-                {
-                    "attempt": self._pie_night_stack_attempts,
-                    "stack_ok": meta.get("stack_ok"),
-                    "world": wl,
-                    "atmo": (meta.get("sky_atmosphere") or {}).get("present"),
-                },
-            )
+            if self._pie_night_stack_attempts >= 120:
+                self._job_meta["mrq_pie_world_night_stack"] = {
+                    "ok": False,
+                    "error": "pie_world_never_available",
+                    "attempts": self._pie_night_stack_attempts,
+                }
             return
+
         self._pie_night_stack_attempts += 1
-        if self._pie_night_stack_attempts >= 90:
-            self._job_meta["mrq_pie_world_stack_done"] = True
-            self._job_meta["mrq_pie_world_night_stack"] = {
-                "ok": False,
-                "error": "pie_world_never_available",
-                "attempts": self._pie_night_stack_attempts,
-            }
+        att = self._pie_night_stack_attempts
+        centroid = self._centroid_for_pie_night_stack()
+        recapture_log = self._job_meta.setdefault("mrq_pie_skylight_recapture_ticks", [])
+
+        if att == 1 or att % 8 == 0:
+            meta = vnp.apply_mrq_pie_homestead_night_stack(
+                centroid, world=world, world_label=wl
+            )
+            meta["render_world_resolved"] = True
+            meta["apply_pass"] = "full_stack"
+            meta["tick_attempt"] = att
+            self._job_meta["mrq_pie_world_night_stack"] = meta
+            self._job_meta["mrq_pie_world_context"] = wl
+        elif att % 2 == 0:
+            recap = vnp.refresh_mrq_pie_skylight_recapture(world)
+            recap["tick_attempt"] = att
+            recapture_log.append(recap)
+            self._job_meta["mrq_pie_skylight_recapture_last"] = recap
+
+        self._job_meta["mrq_pie_world_stack_attempts"] = att
+        _log(
+            "mrq pie world night stack tick",
+            {
+                "attempt": att,
+                "world": wl,
+                "full_stack": att == 1 or att % 8 == 0,
+            },
+        )
 
     def _poll_render_wait(self) -> None:
         self._try_apply_mrq_pie_world_night_stack()

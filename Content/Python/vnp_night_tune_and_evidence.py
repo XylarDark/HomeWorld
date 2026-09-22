@@ -233,9 +233,14 @@ TMP_MOON_LABEL = "lit_moon"
 TMP_SKY_LABEL = "TMP_PA_E_SkyLight"
 TMP_CABIN_WARM_LABEL = "lit_cabinwarm"
 TMP_SKY_ATMO_LABEL = "TMP_PA_E_SkyAtmosphere"
+TMP_HEIGHT_FOG_LABEL = "TMP_PA_E_HeightFog"
 
 # PRESET world.sky_color #0B1630 — readable open-sky ambient when capture sees void black.
 _PRESET_SKY_AMBIENT_LINEAR = unreal.LinearColor(0.043, 0.086, 0.188, 1.0)
+# PRESET horizon_glow #7EC8E8 — fog inscattering for readable night horizon in MRQ void.
+_PRESET_HORIZON_FOG_LINEAR = unreal.LinearColor(0.494, 0.784, 0.910, 1.0)
+# Global atmosphere anchor (not dress centroid — wrong planet origin → black sky in MRQ).
+_SKY_ATMO_WORLD_ORIGIN = unreal.Vector(0.0, 0.0, 0.0)
 
 MRQ_PIE_NIGHT_EXPOSURE_CVARS: tuple[str, ...] = (
     "r.DefaultFeature.AutoExposure 1",
@@ -249,6 +254,10 @@ MRQ_PIE_ATMOSPHERE_SUN_INDEX = 0
 
 MRQ_PIE_RENDER_CVARS: tuple[str, ...] = (
     "r.SupportSkyAtmosphere 1",
+    "r.SkyAtmosphere 1",
+    "r.Fog 1",
+    "r.VolumetricFog 1",
+    "r.Fog.ScreenSpaceScattering 1",
 ) + MRQ_PIE_NIGHT_EXPOSURE_CVARS
 
 _DEFAULT_HOMESTEAD_CENTROID = (-600.0, -100.0, 150.0)
@@ -411,7 +420,10 @@ def _configure_directional_moon(
     intensity: float = 3.5,
     *,
     atmosphere_sun_index: int = MRQ_PIE_ATMOSPHERE_SUN_INDEX,
+    mrq_key_boost: bool = False,
 ) -> list[str]:
+    if mrq_key_boost:
+        intensity = max(intensity, 8.0)
     applied: list[str] = []
     lc = _light_component(actor)
     warm = unreal.LinearColor(1.0, 0.88, 0.55, 1.0)
@@ -435,18 +447,31 @@ def _configure_directional_moon(
     return applied
 
 
-def _configure_skylight(actor, *, intensity: float = 1.35) -> list[str]:
+def _configure_skylight(
+    actor,
+    *,
+    intensity: float = 1.35,
+    recapture: bool = True,
+    mrq_ambient_fill: bool = False,
+) -> list[str]:
     applied: list[str] = []
     comp = _light_component(actor)
     if comp:
+        if mrq_ambient_fill:
+            intensity = max(intensity, 2.8)
+            for prop in ("real_time_capture", "b_real_time_capture", "RealTimeCapture"):
+                if _try_set(comp, prop, False):
+                    applied.append("real_time_capture_off_mrq_fill")
+                    break
+        else:
+            for prop in ("real_time_capture", "b_real_time_capture", "RealTimeCapture"):
+                if _try_set(comp, prop, True):
+                    applied.append("real_time_capture")
+                    break
         if _try_set(comp, "intensity", intensity):
             applied.append("intensity")
         if _try_set(comp, "mobility", unreal.ComponentMobility.MOVABLE):
             applied.append("movable")
-        for prop in ("real_time_capture", "b_real_time_capture", "RealTimeCapture"):
-            if _try_set(comp, prop, True):
-                applied.append("real_time_capture")
-                break
         for prop in ("lower_hemisphere_is_black", "b_lower_hemisphere_is_black"):
             if _try_set(comp, prop, False):
                 applied.append("lower_hemisphere_not_black")
@@ -455,8 +480,13 @@ def _configure_skylight(actor, *, intensity: float = 1.35) -> list[str]:
             if _try_set(comp, prop, _PRESET_SKY_AMBIENT_LINEAR):
                 applied.append("lower_hemisphere_color=preset_sky")
                 break
-        if _invoke_recapture_skylight(comp):
-            applied.append("recapture_sky")
+        if _try_set(comp, "affects_world", True):
+            applied.append("affects_world")
+        if recapture and not mrq_ambient_fill:
+            if _invoke_recapture_skylight(comp):
+                applied.append("recapture_sky")
+        elif mrq_ambient_fill:
+            applied.append("recapture_skipped_mrq_hemisphere_fill")
     return applied
 
 
@@ -515,33 +545,51 @@ def _apply_tod_phase_in_world(world, phase: int = 2) -> dict[str, Any]:
     return meta
 
 
+def _configure_sky_atmosphere_actor(actor) -> list[str]:
+    """Enable atmosphere component; anchor at world origin for planet sampling."""
+    applied: list[str] = []
+    try:
+        actor.set_actor_location(_SKY_ATMO_WORLD_ORIGIN, False, False)
+        applied.append("location=world_origin")
+    except Exception:
+        pass
+    comp = actor.root_component
+    if comp:
+        for prop in ("enabled", "b_enabled"):
+            if _try_set(comp, prop, True):
+                applied.append("enabled")
+                break
+    return applied
+
+
 def _ensure_sky_atmosphere(
     homestead_centroid: list[float] | None,
     *,
     world=None,
 ) -> dict:
     """Sky Atmosphere required for directional Atmosphere Sun Light + MRQ sky (community/Epic)."""
-    cx, cy, cz = _homestead_centroid_xyz(homestead_centroid)
     actors = _actors_for_world(world)
     for a in actors:
         if not a:
             continue
         cls = a.get_class().get_name() if a.get_class() else ""
         if "SkyAtmosphere" in cls:
+            cfg = _configure_sky_atmosphere_actor(a)
             return {
                 "present": True,
                 "spawned": False,
                 "label": _actor_label(a),
+                "configured": cfg,
                 "world_context": _world_path_label(world),
             }
     atmo_cls = getattr(unreal, "SkyAtmosphere", None)
     if atmo_cls is None:
         return {"present": False, "spawned": False, "error": "SkyAtmosphere class missing"}
-    loc = unreal.Vector(cx, cy, cz + 200.0)
     actor = _spawn_actor_in_world(
-        world, atmo_cls, loc, unreal.Rotator(0.0, 0.0, 0.0)
+        world, atmo_cls, _SKY_ATMO_WORLD_ORIGIN, unreal.Rotator(0.0, 0.0, 0.0)
     )
     if actor:
+        cfg = _configure_sky_atmosphere_actor(actor)
         try:
             actor.set_actor_label(TMP_SKY_ATMO_LABEL)
             if _is_editor_world(world):
@@ -552,6 +600,101 @@ def _ensure_sky_atmosphere(
             "present": True,
             "spawned": True,
             "label": TMP_SKY_ATMO_LABEL,
+            "configured": cfg,
+            "world_context": _world_path_label(world),
+        }
+    return {"present": False, "spawned": False, "error": "spawn_failed"}
+
+
+def _fog_component(actor):
+    comp = actor.root_component if actor else None
+    if comp:
+        return comp
+    try:
+        fog_cls = getattr(unreal, "ExponentialHeightFogComponent", None)
+        if fog_cls is not None and actor:
+            return actor.get_component_by_class(fog_cls)
+    except Exception:
+        pass
+    return None
+
+
+def _configure_height_fog(actor, *, mrq_visible_sky: bool = False) -> list[str]:
+    applied: list[str] = []
+    comp = _fog_component(actor)
+    if not comp:
+        return applied
+    density = 0.045 if mrq_visible_sky else 0.02
+    for prop in ("enable_volumetric_fog", "b_enable_volumetric_fog"):
+        if _try_set(comp, prop, True):
+            applied.append("volumetric_fog")
+            break
+    for prop in (
+        "enable_fog_screen_space_scattering",
+        "b_enable_fog_screen_space_scattering",
+    ):
+        if _try_set(comp, prop, True):
+            applied.append("fog_sss")
+            break
+    if _try_set(comp, "fog_density", density):
+        applied.append("fog_density=%s" % density)
+    if _try_set(comp, "fog_height_falloff", 0.15):
+        applied.append("fog_height_falloff")
+    for prop in ("fog_inscattering_color", "FogInscatteringColor"):
+        if _try_set(comp, prop, _PRESET_HORIZON_FOG_LINEAR):
+            applied.append("fog_inscattering=preset_horizon")
+            break
+    for prop in ("directional_inscattering_color", "DirectionalInscatteringColor"):
+        if _try_set(comp, prop, _PRESET_SKY_AMBIENT_LINEAR):
+            applied.append("directional_inscattering=preset_sky")
+            break
+    if _try_set(comp, "volumetric_fog_scattering_distribution", 0.5):
+        applied.append("volumetric_scattering_distribution")
+    if _try_set(comp, "start_distance", 0.0):
+        applied.append("start_distance=0")
+    return applied
+
+
+def _ensure_exponential_height_fog(
+    homestead_centroid: list[float] | None,
+    *,
+    world=None,
+    mrq_visible_sky: bool = False,
+) -> dict:
+    """Height fog gives readable horizon/sky tint when MRQ deferred shows void black."""
+    cx, cy, cz = _homestead_centroid_xyz(homestead_centroid)
+    actors = _actors_for_world(world)
+    for a in actors:
+        if not a:
+            continue
+        cls = a.get_class().get_name() if a.get_class() else ""
+        if "ExponentialHeightFog" in cls or "HeightFog" in cls:
+            cfg = _configure_height_fog(a, mrq_visible_sky=mrq_visible_sky)
+            return {
+                "present": True,
+                "spawned": False,
+                "label": _actor_label(a),
+                "configured": cfg,
+                "world_context": _world_path_label(world),
+            }
+    fog_cls = getattr(unreal, "ExponentialHeightFog", None)
+    if fog_cls is None:
+        return {"present": False, "spawned": False, "error": "ExponentialHeightFog class missing"}
+    loc = unreal.Vector(cx, cy, cz)
+    actor = _spawn_actor_in_world(world, fog_cls, loc, unreal.Rotator(0.0, 0.0, 0.0))
+    if actor:
+        cfg = _configure_height_fog(actor, mrq_visible_sky=mrq_visible_sky)
+        try:
+            actor.set_actor_label(TMP_HEIGHT_FOG_LABEL)
+            if _is_editor_world(world):
+                actor.set_folder_path(TMP_PA_E_ARRANGE_FOLDER)
+        except Exception:
+            pass
+        return {
+            "present": True,
+            "spawned": True,
+            "label": TMP_HEIGHT_FOG_LABEL,
+            "configured": cfg,
             "world_context": _world_path_label(world),
         }
     return {"present": False, "spawned": False, "error": "spawn_failed"}
@@ -565,23 +708,38 @@ def _recapture_skylights_in_actors(actors: list) -> int:
         cls = a.get_class().get_name() if a.get_class() else ""
         if "SkyLight" not in cls:
             continue
-        cfg = _configure_skylight(a)
-        if "recapture_sky" in cfg:
+        comp = _light_component(a)
+        if comp and _invoke_recapture_skylight(comp):
             count += 1
     return count
+
+
+def refresh_mrq_pie_skylight_recapture(world=None) -> dict[str, Any]:
+    """Late RecaptureSky after atmo/fog/moon — call from MRQ wait ticks during warm-up."""
+    w = world
+    if w is None:
+        w, _label = resolve_mrq_pie_render_world()
+    actors = _actors_for_world(w)
+    count = _recapture_skylights_in_actors(actors)
+    return {
+        "skylight_recaptures": count,
+        "world_context": _world_path_label(w),
+    }
 
 
 def reconfigure_pa_e_mrq_night_fixtures(
     homestead_centroid: list[float] | None = None,
     *,
     world=None,
+    mrq_pie_fill: bool = False,
 ) -> dict:
-    """Moon AtmosphereSunLightIndex 0 + SkyLight fill + RecaptureSky in target world."""
+    """Moon AtmosphereSunLightIndex 0 + SkyLight fill in target world."""
     actors = _actors_for_world(world)
     tuned: list[dict] = []
     recaptures = 0
     cx, cy, cz = _homestead_centroid_xyz(homestead_centroid)
     target = unreal.Vector(cx, cy, cz)
+    mrq_fill = mrq_pie_fill or _world_path_label(world) in ("pie", "runtime")
 
     for a in actors:
         if not a:
@@ -599,12 +757,20 @@ def reconfigure_pa_e_mrq_night_fixtures(
                 a.set_actor_rotation(moon_rot, False)
             except Exception:
                 pass
-            cfg = _configure_directional_moon(a, atmosphere_sun_index=MRQ_PIE_ATMOSPHERE_SUN_INDEX)
+            cfg = _configure_directional_moon(
+                a,
+                atmosphere_sun_index=MRQ_PIE_ATMOSPHERE_SUN_INDEX,
+                mrq_key_boost=mrq_fill,
+            )
             tuned.append({"label": label, "class": cls, "configured": cfg})
             continue
 
         if "SkyLight" in cls:
-            cfg = _configure_skylight(a)
+            cfg = _configure_skylight(
+                a,
+                recapture=not mrq_fill,
+                mrq_ambient_fill=mrq_fill,
+            )
             if "recapture_sky" in cfg:
                 recaptures += 1
             tuned.append({"label": label, "class": cls, "configured": cfg})
@@ -620,14 +786,15 @@ def reconfigure_pa_e_mrq_night_fixtures(
                     }
                 )
 
-    extra_recaptures = _recapture_skylights_in_actors(actors)
-    recaptures += extra_recaptures
+    if not mrq_fill:
+        recaptures += _recapture_skylights_in_actors(actors)
     return {
         "lights_reconfigured": tuned,
         "skylight_recaptures": recaptures,
         "homestead_centroid_used": [cx, cy, cz],
         "world_context": _world_path_label(world),
         "atmosphere_sun_index": MRQ_PIE_ATMOSPHERE_SUN_INDEX,
+        "mrq_skylight_hemisphere_fill": mrq_fill,
     }
 
 
@@ -641,16 +808,32 @@ def apply_mrq_pie_homestead_night_stack(
     centroid_meta = _sanitize_homestead_centroid(homestead_centroid)
     used_centroid = centroid_meta["used"]
     wlabel = world_label or _world_path_label(world)
+    mrq_pie = wlabel in ("pie", "game_world", "runtime")
     exposure = apply_mrq_pie_night_exposure_cvars(world)
     tod = _apply_tod_phase_in_world(world, phase=2)
     reseed = reseed_pa_e_tmp_night_fixtures(
         used_centroid, force_mrq_pie=True, world=world
     )
     atmosphere = _ensure_sky_atmosphere(used_centroid, world=world)
-    reconfigure = reconfigure_pa_e_mrq_night_fixtures(used_centroid, world=world)
+    height_fog = _ensure_exponential_height_fog(
+        used_centroid, world=world, mrq_visible_sky=mrq_pie
+    )
+    reconfigure = reconfigure_pa_e_mrq_night_fixtures(
+        used_centroid, world=world, mrq_pie_fill=mrq_pie
+    )
     actors = _actors_for_world(world)
     tune = apply_homestead_night_tune(actors)
+    late_recapture = (
+        refresh_mrq_pie_skylight_recapture(world)
+        if mrq_pie and not reconfigure.get("mrq_skylight_hemisphere_fill")
+        else {"skylight_recaptures": 0, "skipped": "hemisphere_fill"}
+    )
     verify = verify_homestead_night_lighting_stack(actors)
+    visible_sky_ok = bool(
+        verify.get("stack_ok")
+        and (atmosphere.get("present"))
+        and (height_fog.get("present"))
+    )
     return {
         "ok": bool(exposure.get("ok") and tune.get("ok") and verify.get("stack_ok")),
         "world_context": wlabel,
@@ -659,14 +842,17 @@ def apply_mrq_pie_homestead_night_stack(
         "time_of_day": tod,
         "tmp_fixture_reseed": reseed,
         "sky_atmosphere": atmosphere,
+        "height_fog": height_fog,
         "mrq_fixture_reconfigure": reconfigure,
+        "late_skylight_recapture": late_recapture,
         "night_tune": tune,
         "lighting_stack_verify": verify,
         "stack_ok": bool(verify.get("stack_ok")),
+        "visible_sky_stack_ok": visible_sky_ok,
         "atmosphere_sun_index": MRQ_PIE_ATMOSPHERE_SUN_INDEX,
         "note": (
-            "MoviePipelinePIEExecutor renders a PIE copy — TMP/atmo spawned only in Editor do not "
-            "transfer; re-apply stack in PIE world + RecaptureSky + AtmosphereSunLightIndex 0."
+            "PIE MRQ: height fog + atmo @ world origin + hemisphere skylight fill; "
+            "re-apply during warm-up ticks before one-frame still."
         ),
     }
 
@@ -728,8 +914,13 @@ def reseed_pa_e_tmp_night_fixtures(
         moon_rot,
         world=world,
     )
+    mrq_fill = force_mrq_pie and _world_path_label(world) in ("pie", "runtime")
     if moon:
-        cfg = _configure_directional_moon(moon, atmosphere_sun_index=MRQ_PIE_ATMOSPHERE_SUN_INDEX)
+        cfg = _configure_directional_moon(
+            moon,
+            atmosphere_sun_index=MRQ_PIE_ATMOSPHERE_SUN_INDEX,
+            mrq_key_boost=mrq_fill,
+        )
         if moon_new:
             spawned.append({"label": TMP_MOON_LABEL, "class": "DirectionalLight", "configured": cfg})
         elif force_mrq_pie:

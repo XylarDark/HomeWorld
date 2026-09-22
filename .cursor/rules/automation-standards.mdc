@@ -31,7 +31,7 @@ Before trusting **any** automation pass/fail output, verify setup in order: **(1
 
 **PA-E capture (enforced in code):** Call **`arrange_pa_e_shotlist()`** / **`assert_environment_ready()`** after `load_level` — writes `Saved/pa_e_arrange_gate.json`; **do not** start MRQ/AL when `ready: false` (`prove_loop_status: blocked`, `closed_fail: false`). See CAPTURE_REDUNDANCY.md § P0 Arrange gate and [HARNESS_ARRANGE_TASKLIST.md](../../docs/Automation/HARNESS_ARRANGE_TASKLIST.md).
 
-**PA-E MRQ void sky:** Editor `stack_ok` does not prove PIE sky — MRQ wait must run **`apply_mrq_pie_homestead_night_stack_in_render_world`** (AtmosphereSunLightIndex **0**, RecaptureSky). Cause→Avoid: [KNOWN_ERRORS.md](../../docs/KNOWN_ERRORS.md) (PA-E MRQ PIE void black sky).
+**PA-E MRQ void sky:** `stack_ok` ≠ visible sky — need PIE **height fog** + atmo @ origin + warm-up ticks (`visible_sky_stack_ok`). Cause→Avoid: [KNOWN_ERRORS.md](../../docs/KNOWN_ERRORS.md) (PA-E MRQ PIE void black sky).
 
 ### Docs-first
 
