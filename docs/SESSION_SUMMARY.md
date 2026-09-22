@@ -864,6 +864,7 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 ## 2026-09-22 — PA-E shot1/2 camera pose (cloud, post-#172)
 
 - **Fix:** `pa_e_shotlist_common.py` — shot1/2 use CAM_Hero / CAM_CabinClose **doc meters** + look_at **aim_bounds** dress centroid (extent offsets grazed AABB, fence on frame); **`distance_band_ok`** on **`aim_ok`**.
-- **KNOWN_ERRORS:** relocate + ray hit ≠ visual framing PASS.
-- **PR:** `cursor/pa-e-camera-pose-framing-0534` (DESKTOP re-prove MRQ after merge).
+- **Fix:** `capture_shotlist_mrq.py` — MRQ via spawned **PA_E_MRQ_*** at Arrange loc/rot; purge stale possessable + Transform tracks; **add_possessable** only (no `find_binding_by_name` on CAM_*).
+- **KNOWN_ERRORS:** relocate + ray hit ≠ visual PASS; possessable CAM_* + stale sequence Transform ≠ Arrange pose.
+- **PR:** #174 `cursor/pa-e-camera-pose-framing-0534` (DESKTOP re-prove MRQ after merge).
 

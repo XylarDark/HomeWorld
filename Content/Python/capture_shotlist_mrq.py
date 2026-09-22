@@ -7,8 +7,10 @@ playback range, PNG deferred pass, async PIE executor + Slate pre-tick wait.
 
 Near-black AutomationLibrary stills are an **OPEN viewport capture bug** (wrong pose /
 game-view / pilot / empty buffer) — scene content is visible to Lead in Editor;
-MRQ must frame the same in-level **CAM_Hero** / **CAM_CabinClose** with deferred
-lit pass + warm-up. PASS requires **lit homestead** stills, not file-exists-only.
+Arrange relocates in-level **CAM_Hero** / **CAM_CabinClose**; MRQ renders via spawned
+**PA_E_MRQ_{shot_id}** cine cameras at the same resolved loc/rot (stale sequence
+possessable Transform tracks do not override Arrange). Deferred lit pass + warm-up.
+PASS requires **lit homestead** stills, not file-exists-only.
 
 Policy: [docs/Automation/CAPTURE_REDUNDANCY.md](docs/Automation/CAPTURE_REDUNDANCY.md)
 Primary entry: capture_shotlist.py or this script via MCP
@@ -206,7 +208,7 @@ class _MrqOrchestrator:
         else:
             pose_meta["in_level_camera"] = None
             pose_meta["warning"] = "no CAM_* actor — using fallback transform; verify vs Lead-visible framing"
-        sequence, seq_meta = _ensure_shot_level_sequence(shot, cam, loc, rot)
+        sequence, seq_meta = _ensure_shot_level_sequence(shot, loc, rot, in_level_cam=cam)
         self._sequence_meta = {**seq_meta, "pose": pose_meta, "purge_before_capture": purge}
         if sequence is None:
             self._finish_shot_failure("sequence_create_failed", pose_meta, purge)
@@ -535,7 +537,13 @@ def _ensure_spawned_cine_camera(shot_id: str, loc, rot):
     return spawned, {"spawned_camera": True, "label": label}
 
 
-def _ensure_shot_level_sequence(shot: dict, cam, loc, rot) -> tuple[Any, dict[str, Any]]:
+def _ensure_shot_level_sequence(
+    shot: dict,
+    loc,
+    rot,
+    *,
+    in_level_cam=None,
+) -> tuple[Any, dict[str, Any]]:
     meta: dict[str, Any] = {"asset_path": common.sequence_asset_path(shot["sequence_name"])}
     common.ensure_cinematics_folder()
     asset_path = meta["asset_path"]
@@ -559,11 +567,13 @@ def _ensure_shot_level_sequence(shot: dict, cam, loc, rot) -> tuple[Any, dict[st
         meta["error"] = "level_sequence_null"
         return None, meta
 
-    camera_actor = cam
-    cam_meta: dict[str, Any] = {}
-    if camera_actor is None:
-        camera_actor, cam_meta = _ensure_spawned_cine_camera(shot["id"], loc, rot)
+    # MRQ must follow Arrange loc/rot — reused sequences bound to CAM_Hero/CAM_CabinClose keep stale
+    # Transform tracks; live actor relocate does not change the MRQ frame (post-#172 DESKTOP scrap).
+    camera_actor, cam_meta = _ensure_spawned_cine_camera(shot["id"], loc, rot)
     meta.update(cam_meta)
+    meta["mrq_camera_source"] = "spawned_pa_e_mrq_cine"
+    if in_level_cam is not None:
+        meta["in_level_cam_reference"] = common.actor_label(in_level_cam)
     if camera_actor is None:
         meta["error"] = "no_camera_actor"
         return None, meta
@@ -588,10 +598,68 @@ def _ensure_shot_level_sequence(shot: dict, cam, loc, rot) -> tuple[Any, dict[st
     return sequence, meta
 
 
+def _strip_transform_tracks_from_binding(binding) -> int:
+    removed = 0
+    ext_binding = getattr(unreal, "MovieSceneBindingExtensions", None)
+    ext_track = getattr(unreal, "MovieSceneTrackExtensions", None)
+    transform_cls = getattr(unreal, "MovieScene3DTransformTrack", None)
+    if ext_binding is None or transform_cls is None:
+        return 0
+    find_tracks = getattr(ext_binding, "find_tracks_by_exact_type", None)
+    if not callable(find_tracks):
+        find_tracks = getattr(ext_binding, "find_tracks_by_type", None)
+    remove_track = getattr(ext_binding, "remove_track", None)
+    if not callable(find_tracks):
+        return 0
+    try:
+        tracks = list(find_tracks(binding, transform_cls))
+    except Exception:
+        return 0
+    for tr in tracks:
+        if ext_track is not None:
+            try:
+                for sec in ext_track.get_sections(tr):
+                    ext_track.remove_section(tr, sec)
+            except Exception:
+                pass
+        if callable(remove_track):
+            try:
+                remove_track(binding, tr)
+                removed += 1
+            except Exception:
+                pass
+    return removed
+
+
+def _purge_stale_sequence_bindings(ext_seq, sequence, meta: dict[str, Any]) -> None:
+    """Drop named CAM_* possessables and transform tracks so MRQ uses fresh spawned camera pose."""
+    try:
+        bindings = list(ext_seq.get_bindings(sequence))
+    except Exception as e:
+        meta["get_bindings_error"] = str(e)
+        return
+    meta["bindings_before_purge"] = len(bindings)
+    stripped = 0
+    removed = 0
+    remove_binding = getattr(ext_seq, "remove_binding", None)
+    for binding in bindings:
+        stripped += _strip_transform_tracks_from_binding(binding)
+        if callable(remove_binding):
+            try:
+                remove_binding(sequence, binding)
+                removed += 1
+            except Exception as e:
+                meta.setdefault("remove_binding_errors", []).append(str(e))
+    meta["transform_tracks_stripped"] = stripped
+    meta["bindings_removed"] = removed
+
+
 def _rebuild_camera_cut(sequence, camera_actor, meta: dict[str, Any]) -> None:
     ext_seq = unreal.MovieSceneSequenceExtensions
     ext_track = unreal.MovieSceneTrackExtensions
     ext_section = unreal.MovieSceneSectionExtensions
+
+    _purge_stale_sequence_bindings(ext_seq, sequence, meta)
 
     existing = ext_seq.find_tracks_by_exact_type(sequence, unreal.MovieSceneCameraCutTrack)
     for tr in existing:
@@ -618,22 +686,10 @@ def _rebuild_camera_cut(sequence, camera_actor, meta: dict[str, Any]) -> None:
 
 
 def _resolve_possessable_binding(ext_seq, sequence, camera_actor, meta: dict[str, Any]):
-    label = common.actor_label(camera_actor)
-    find_by_name = getattr(ext_seq, "find_binding_by_name", None)
-    if callable(find_by_name):
-        try:
-            found = find_by_name(sequence, label)
-            if found is not None:
-                meta["binding_match"] = "find_binding_by_name"
-                return found
-        except Exception as e:
-            meta["find_binding_by_name_error"] = str(e)
-    bindings = ext_seq.get_bindings(sequence)
-    if len(bindings) == 1:
-        meta["binding_match"] = "single_existing_binding"
-        return bindings[0]
+    """Always possess the spawned PA_E_MRQ_* camera — never reuse stale CAM_Hero bindings."""
     binding = ext_seq.add_possessable(sequence, camera_actor)
-    meta["binding_match"] = "add_possessable"
+    meta["binding_match"] = "add_possessable_spawned_mrq_camera"
+    meta["possessable_actor_label"] = common.actor_label(camera_actor)
     return binding
 
 
