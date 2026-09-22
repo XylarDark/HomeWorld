@@ -9244,3 +9244,13 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 **Remaining:** Next product track Lead-named TBD — **SS-B** not opened.
 
+---
+
+## 2026-09-22 — DS-A visible demo spine (cloud)
+
+**Task:** Lead **`APPROVE DEMO-SPINE`** — DS-A visible campfire → tent → cottage on VS_MVP.
+
+**Delivered:** `Docs/30_DEMO_SPINE.md`, `Docs/handoffs/DS_A_VISIBLE_HEARTH.md`, `DECISIONS.md` row; C++ craft/placeholder visuals + `RevealDemoCottageShell`; Python `vs_mvp_ds_visual_helpers.py` + GC placement script updates. PR #136.
+
+**Remaining:** DESKTOP Safe-Build + PIE walk prove; Lead **`APPROVE DS-A`** when satisfied.
+
