@@ -1,3 +1,7 @@
+## 2026-09-22 — SWARM_OPS §11 operational memory backfill (cloud)
+
+- Docs-only: [docs/KNOWN_ERRORS.md](KNOWN_ERRORS.md) + [docs/Automation/AUTOMATION_GAPS.md](Automation/AUTOMATION_GAPS.md) entries for GC→PA DESKTOP failures (2026-09-20–22); [Docs/qa/DEFECT_PA_E_shot_capture_automation.md](../Docs/qa/DEFECT_PA_E_shot_capture_automation.md); [PA_D_IMPORT_PLACE.md](../Docs/handoffs/PA_D_IMPORT_PLACE.md) Blockers pointer. **No APPROVE PA-E**; Lead still manual Shot 1/2.
+
 ## 2026-09-22 — PA-D APPROVED + place script (cloud)
 
 - Lead **`APPROVE PA-D`**, 2026-09-22 ET → [Docs/32_PROTOTYPE_ASSETS.md](../Docs/32_PROTOTYPE_ASSETS.md) **PA-D IN PROGRESS**; [Docs/handoffs/PA_D_IMPORT_PLACE.md](../Docs/handoffs/PA_D_IMPORT_PLACE.md) **APPROVED** (awaiting DESKTOP evidence). `DECISIONS.md` + `PHASE_BOARD` + `Docs/README` minimal update. **No `.uasset`**. PA track **not CLOSED** (PA-E locked).
