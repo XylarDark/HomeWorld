@@ -1,3 +1,8 @@
+## 2026-09-22 — SS-A spirit stealth stubs (cloud, IN PROGRESS)
+
+- Lead **`SS-A`** → **`APPROVE SS STRATEGY`**; [Docs/25_SPIRIT_STEALTH_IMPL.md](../Docs/25_SPIRIT_STEALTH_IMPL.md) + [Docs/handoffs/SS_A_STEALTH_STUBS.md](../Docs/handoffs/SS_A_STEALTH_STUBS.md); `DECISIONS.md` SS strategy row. SS-A **not** stamped APPROVED.
+- C++: `HomeWorldSpiritLitVolume`, `HomeWorldSpiritStealthComponent`, `place_vs_mvp_ss_stealth.py`, cheats `hw.Stealth.Status` / `hw.Stealth.ForceLit`. DESKTOP greps `STEALTH:*` pending.
+
 ## 2026-09-21 ET — MV-A track CLOSED (docs stamp, cloud)
 
 - Lead **`APPROVE MV-A`** → `Docs/24_MOVEMENT_IMPL.md` **CLOSED / COMPLETE**; `Docs/handoffs/MV_A_TRAVERSAL.md` **APPROVED / CLOSED**; `Docs/canon/DECISIONS.md` row. MV-A on main `349d3e4` (PR #130). **SS-A** (spirit stealth) separate — not part of MV close. Next track TBD — not in this PR.

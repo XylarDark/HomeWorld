@@ -4,6 +4,7 @@
 #include "HomeWorldFallbackGlideComponent.h"
 #include "HomeWorldSoftBoundsComponent.h"
 #include "HomeWorldTraversalComponent.h"
+#include "HomeWorldSpiritStealthComponent.h"
 #include "HomeWorldShrinePortalComponent.h"
 #include "BuildPlacementSupport.h"
 #include "AbilitySystemComponent.h"
@@ -87,6 +88,7 @@ AHomeWorldCharacter::AHomeWorldCharacter(const FObjectInitializer& ObjectInitial
 	FallbackGlideComponent = CreateDefaultSubobject<UHomeWorldFallbackGlideComponent>(TEXT("FallbackGlideComponent"));
 	SoftBoundsComponent = CreateDefaultSubobject<UHomeWorldSoftBoundsComponent>(TEXT("SoftBoundsComponent"));
 	TraversalComponent = CreateDefaultSubobject<UHomeWorldTraversalComponent>(TEXT("TraversalComponent"));
+	SpiritStealthComponent = CreateDefaultSubobject<UHomeWorldSpiritStealthComponent>(TEXT("SpiritStealthComponent"));
 }
 
 UAbilitySystemComponent* AHomeWorldCharacter::GetAbilitySystemComponent() const
@@ -810,6 +812,10 @@ bool AHomeWorldCharacter::TryHealSpiritInFront()
 	if (UHomeWorldSpiritHealComponent* Heal = HitActor->FindComponentByClass<UHomeWorldSpiritHealComponent>())
 	{
 		const bool bHealed = Heal->TryHeal(this);
+		if (bHealed && SpiritStealthComponent)
+		{
+			SpiritStealthComponent->NotifyInteractWhileLit();
+		}
 		ShowInteractFeedback(
 			bHealed ? TEXT("HEAL: spirit healed") : TEXT("HEAL: need RES_HERB/RES_SEED or already healed"),
 			bHealed ? FColor::Green : FColor::Yellow);
@@ -863,6 +869,10 @@ bool AHomeWorldCharacter::TryMinigameInFront()
 	if (UHomeWorldMinigameInteractComponent* Minigame = HitActor->FindComponentByClass<UHomeWorldMinigameInteractComponent>())
 	{
 		const bool bOk = Minigame->TryMinigameInteract(this);
+		if (bOk && SpiritStealthComponent)
+		{
+			SpiritStealthComponent->NotifyInteractWhileLit();
+		}
 		if (bOk && HomeWorldCombatDream::IsPolishFirstMinigame(Minigame->GetMinigameKind()))
 		{
 			ShowInteractFeedback(TEXT("MINIGAME:POSSESS — spirit anchors the dream (stub)"), FColor::Cyan);

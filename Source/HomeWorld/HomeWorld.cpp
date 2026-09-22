@@ -24,6 +24,7 @@
 #include "HomeWorldCraftSubsystem.h"
 #include "HomeWorldCraftTypes.h"
 #include "HomeWorldCombatDreamTypes.h"
+#include "HomeWorldSpiritStealthComponent.h"
 #include "AbilitySystemComponent.h"
 
 #define LOCTEXT_NAMESPACE "FHomeWorldModule"
@@ -295,6 +296,50 @@ namespace
 	void CmdMinigameNurture(const TArray<FString>& Args) { CmdMinigameStub(EHomeWorldMinigameKind::Nurture); }
 	void CmdMinigameGrow(const TArray<FString>& Args) { CmdMinigameStub(EHomeWorldMinigameKind::Grow); }
 	void CmdMinigamePossess(const TArray<FString>& Args) { CmdMinigameStub(EHomeWorldMinigameKind::Possess); }
+
+	void CmdStealthStatus(const TArray<FString>& Args)
+	{
+		UWorld* World = HomeWorldPlayWorld::Resolve();
+		if (!World)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Stealth.Status requires a play world (PIE or game)."));
+			return;
+		}
+		APlayerController* PC = World->GetFirstPlayerController();
+		APawn* Pawn = PC ? PC->GetPawn() : nullptr;
+		AHomeWorldCharacter* Char = Cast<AHomeWorldCharacter>(Pawn);
+		UHomeWorldSpiritStealthComponent* Stealth =
+			Char ? Char->FindComponentByClass<UHomeWorldSpiritStealthComponent>() : nullptr;
+		if (!Stealth)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Stealth.Status — no character stealth component."));
+			return;
+		}
+		Stealth->LogStatus();
+	}
+
+	void CmdStealthForceLit(const TArray<FString>& Args)
+	{
+		UWorld* World = HomeWorldPlayWorld::Resolve();
+		if (!World)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Stealth.ForceLit requires a play world (PIE or game)."));
+			return;
+		}
+		APlayerController* PC = World->GetFirstPlayerController();
+		APawn* Pawn = PC ? PC->GetPawn() : nullptr;
+		AHomeWorldCharacter* Char = Cast<AHomeWorldCharacter>(Pawn);
+		UHomeWorldSpiritStealthComponent* Stealth =
+			Char ? Char->FindComponentByClass<UHomeWorldSpiritStealthComponent>() : nullptr;
+		if (!Stealth)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Stealth.ForceLit — no character stealth component."));
+			return;
+		}
+		const bool bOn = Args.Num() == 0 || FCString::Atoi(*Args[0]) != 0;
+		Stealth->SetForceLitCheat(bOn);
+		UE_LOG(LogHomeWorld, Log, TEXT("STEALTH: ForceLit %d"), bOn ? 1 : 0);
+	}
 
 	void CmdBossStatus(const TArray<FString>& Args)
 	{
@@ -1396,6 +1441,16 @@ void FHomeWorldModule::StartupModule()
 		TEXT("hw.Boss.Status"),
 		TEXT("CD-A: log BOSS:STATUS DayBoss/NightBoss flags (after boss volume overlap)."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdBossStatus),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Stealth.Status"),
+		TEXT("SS-A: log STEALTH:STATUS lit/alert (spirit form + lit volumes)."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdStealthStatus),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Stealth.ForceLit"),
+		TEXT("SS-A: force spirit lit stub (0=off, 1=on). Grep STEALTH: LIT enter / ALERT / CLEAR."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdStealthForceLit),
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.Defend.Status"),
