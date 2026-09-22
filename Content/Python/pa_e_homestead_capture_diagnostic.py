@@ -24,15 +24,19 @@ PREFIX = "pa_e_homestead_capture_diagnostic:"
 def main() -> None:
     common.log(PREFIX, "started")
     level_ok = common.load_level(PREFIX)
-    night_env = common.apply_pa_e_homestead_night_environment(PREFIX)
-    payload = common.write_homestead_capture_diagnostic(PREFIX)
-    payload["level_loaded"] = level_ok
-    payload["homestead_night_environment"] = night_env
+    gate = common.arrange_pa_e_shotlist(PREFIX, level_loaded=level_ok, require_mrq=False)
+    payload = common.write_homestead_capture_diagnostic(
+        PREFIX,
+        level_loaded=level_ok,
+        homestead_night_environment=gate.get("lighting"),
+        arrange_gate=gate,
+    )
     common.log(
         PREFIX,
         "done",
         {
             "path": payload.get("written_path") or common.homestead_diagnostic_path(),
+            "arrange_ready": gate.get("ready"),
             "shot1_inventory_ok": (
                 payload.get("shots", [{}])[0].get("inventory", {}).get("inventory_ok")
                 if payload.get("shots")

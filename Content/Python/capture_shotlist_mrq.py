@@ -403,35 +403,7 @@ def _newest_png_since(directory: str, since_mtime: float) -> Optional[str]:
 
 
 def _probe_mrq() -> dict[str, Any]:
-    probe: dict[str, Any] = {"available": False}
-    required = (
-        "MoviePipelineQueueSubsystem",
-        "MoviePipelineExecutorJob",
-        "MoviePipelinePIEExecutor",
-        "MoviePipelineOutputSetting",
-        "MoviePipelineImageSequenceOutput_PNG",
-    )
-    missing = [n for n in required if not hasattr(unreal, n)]
-    probe["missing_types"] = missing
-    if missing:
-        probe["error"] = "missing_unreal_types: " + ", ".join(missing)
-        probe["plugin_hint"] = [
-            "MovieRenderPipeline",
-            "MovieRenderPipelineEditor",
-            "SequencerScripting",
-        ]
-        return probe
-    try:
-        subsys = unreal.get_editor_subsystem(unreal.MoviePipelineQueueSubsystem)
-        probe["subsystem"] = subsys is not None
-        if subsys is None:
-            probe["error"] = "MoviePipelineQueueSubsystem get_editor_subsystem returned None"
-            return probe
-    except Exception as e:
-        probe["error"] = str(e)
-        return probe
-    probe["available"] = True
-    return probe
+    return common.probe_mrq_tool_readiness()
 
 
 def _resolve_class(*names: str):
@@ -689,12 +661,6 @@ def _start_pie_executor(subsystem, on_finished: Callable) -> tuple[bool, Any]:
         return False, executor
 
 
-def _apply_mrq_scene_prep(viewport_prep: dict[str, Any]) -> None:
-    viewport_prep["finish_loading"] = common.finish_loading_before_capture()
-    viewport_prep.update(common.apply_lit_game_view_for_capture())
-    viewport_prep["homestead_night_environment"] = common.apply_pa_e_homestead_night_environment(PREFIX)
-
-
 def main() -> None:
     _log("started")
     keep_ok = False
@@ -709,32 +675,35 @@ def main() -> None:
     mrq_ok = bool(mrq_probe.get("available"))
 
     level_ok = common.load_level(PREFIX)
-    homestead_diag = common.write_homestead_capture_diagnostic(PREFIX)
-    viewport_prep: dict[str, Any] = {"homestead_diagnostic": homestead_diag}
-    _apply_mrq_scene_prep(viewport_prep)
+    arrange_gate = common.arrange_pa_e_shotlist(
+        PREFIX,
+        level_loaded=level_ok,
+        require_mrq=True,
+        mrq_probe=mrq_probe,
+    )
+    homestead_diag = common.write_homestead_capture_diagnostic(
+        PREFIX,
+        level_loaded=level_ok,
+        homestead_night_environment=arrange_gate.get("lighting"),
+        arrange_gate=arrange_gate,
+    )
+    viewport_prep: dict[str, Any] = {
+        "homestead_diagnostic": homestead_diag,
+        "arrange_gate": arrange_gate,
+        "finish_loading": arrange_gate.get("finish_loading"),
+        "homestead_night_environment": arrange_gate.get("lighting"),
+    }
+    viewport_prep.update(arrange_gate.get("view") or {})
 
-    if not mrq_ok:
-        report = {
-            "ok": False,
-            "capture_pass": False,
-            "closed_fail": True,
-            "prove_loop_status": "blocked",
-            "lead_prove_loop": list(common.LEAD_PROVE_LOOP),
-            "universal_testing_preconditions": list(common.UNIVERSAL_TESTING_PRECONDITIONS),
-            "homestead_diagnostic_path": common.homestead_diagnostic_path(),
-            "prefix": PREFIX.strip(":"),
-            "primary_path": PRIMARY_PATH,
-            "mrq_available": False,
-            "mrq_probe": mrq_probe,
-            "level_loaded": level_ok,
-            "keep_python_script_alive": keep_ok,
-            "prove_criteria": common.PROVE_CRITERIA,
-            "desktop_conductor_checklist": common.desktop_conductor_checklist(),
-            "shots": [],
-            "policy": "Enable MovieRenderPipeline + MovieRenderPipelineEditor in HomeWorld.uproject then Safe-Build",
-        }
-        with open(common.report_path(), "w", encoding="utf-8") as f:
-            json.dump(report, f, indent=2)
+    if not arrange_gate.get("ready"):
+        common.write_blocked_capture_report(
+            prefix=PREFIX,
+            primary_path=PRIMARY_PATH,
+            arrange_gate=arrange_gate,
+            level_loaded=level_ok,
+            keep_python_script_alive=keep_ok,
+            mrq_probe=mrq_probe,
+        )
         if keep_ok:
             try:
                 import vnp_editor_keep_alive as keep

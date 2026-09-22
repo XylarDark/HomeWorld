@@ -1126,9 +1126,39 @@ def main() -> None:
         _log("keep_alive import/arm skipped", {"error": str(e)})
 
     level_ok = _load_level()
-    viewport_prep = _set_lit_and_game_view()
+    arrange_gate = common.arrange_pa_e_shotlist(
+        PREFIX,
+        level_loaded=level_ok,
+        require_mrq=False,
+    )
+    viewport_prep: dict[str, Any] = {
+        "arrange_gate": arrange_gate,
+        "finish_loading": arrange_gate.get("finish_loading"),
+        "homestead_night_environment": arrange_gate.get("lighting"),
+    }
+    viewport_prep.update(arrange_gate.get("view") or common.apply_lit_game_view_for_capture())
     _settle_viewport_before_first_capture()
-    viewport_prep["homestead_night_environment"] = common.apply_pa_e_homestead_night_environment(PREFIX)
+
+    if not arrange_gate.get("ready"):
+        common.write_blocked_capture_report(
+            prefix=PREFIX,
+            primary_path=PRIMARY_PATH,
+            arrange_gate=arrange_gate,
+            level_loaded=level_ok,
+            keep_python_script_alive=keep_ok,
+            extra={
+                "wait_mechanism": SLATE_WAIT_MECHANISM,
+                "driver_error": "arrange_gate_not_ready",
+            },
+        )
+        if keep_ok:
+            try:
+                import vnp_editor_keep_alive as keep
+
+                keep.disarm()
+            except Exception:
+                pass
+        return
 
     orch = _ShotlistOrchestrator(
         keep_ok=keep_ok,

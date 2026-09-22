@@ -25,6 +25,20 @@ Before trusting **any** pass/fail output (CI, Editor Python, MCP harness, MRQ, s
 
 PA-E capture maps step 1–2 to [pa_e_homestead_capture_diagnostic.py](../../Content/Python/pa_e_homestead_capture_diagnostic.py) and `LEAD_PROVE_LOOP` in [pa_e_shotlist_common.py](../../Content/Python/pa_e_shotlist_common.py). Shotlist stills: **thematic readable night** for Shot 1–2 per [00_SHOTLIST.md](../Docs/00_SHOTLIST.md) — **`homestead_night_environment`** in `Saved/pa_e_capture_report.json` (Phase 2 + PRESET tune + stack verify); **not** day phase and **not** Phase 2 without tune.
 
+### P0 Arrange gate (blocks capture — 2026-09-22)
+
+**API:** `arrange_pa_e_shotlist()` / alias `assert_environment_ready()` in [pa_e_shotlist_common.py](../../Content/Python/pa_e_shotlist_common.py). **Artifact:** `Saved/pa_e_arrange_gate.json` (`ready`, `blocked_reasons`, `inventory`, `aim`, `lighting`, `tool_readiness`).
+
+After `load_level`, capture scripts (**must not** start MRQ/AL until `ready: true`):
+
+1. Inventory homestead dress in the **loaded** level (`inventory_ok`).
+2. Re-aim `CAM_*` at framing/homestead bounds via `MathLibrary.find_look_at_rotation` (keyword `Rotator` only — see KNOWN_ERRORS).
+3. Phase 2 + PRESET tune + verify moon/skylight/cabin stack; **re-seed** session TMP fixtures under `VS_MVP/TMP_PA_E_Arrange` when stack missing after load (no .umap commit required).
+4. Lit + game view + `finish_loading_before_screenshot` when exposed.
+5. MRQ path: `probe_mrq_tool_readiness()` — missing types → `mrq_unavailable`; plugins enabled but subsystem null → `editor_restart_required`.
+
+When `ready: false`, scripts write `Saved/pa_e_capture_report.json` with **`prove_loop_status: "blocked"`**, **`closed_fail: false`** — **not** a closed FAIL. Task list: [HARNESS_ARRANGE_TASKLIST.md](HARNESS_ARRANGE_TASKLIST.md).
+
 | # | Practice | Summary |
 |---|----------|---------|
 | 1 | **Docs-first** | Official vendor docs for any tool surface before inventing/hardening (unless already in repo policy / agent memory). Parameter order, required context, save paths. |
