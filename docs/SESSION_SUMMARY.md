@@ -1,3 +1,7 @@
+## 2026-09-22 — PA-E MRQ PIE sky in render world (post-#177)
+
+- Post-#177 DESKTOP: **`mrq_pie_night_stack.ok`** but sky still void black; geometry lit. **Fix:** world-aware `apply_mrq_pie_homestead_night_stack` + **`apply_mrq_pie_homestead_night_stack_in_render_world`** during MRQ wait; PIE deferred spawn; **AtmosphereSunLightIndex 0**; centroid sanitize; `r.SupportSkyAtmosphere 1` on job. Gap **OPEN** — DESKTOP re-prove sky band RGB.
+
 ## 2026-09-22 — PA-E MRQ PIE readable night sky (P0.1)
 
 - Post-#175 DESKTOP: MRQ stills — cabin lit, **void black sky**. **Fix:** `apply_mrq_pie_homestead_night_stack` + per-shot `reapply_night_environment_for_mrq_shot` (`mrq_pie_shot=True`); MRQ exposure ConsoleVariableSetting. KNOWN_ERRORS + CAPTURE_REDUNDANCY. Gap **OPEN** — DESKTOP re-prove.
