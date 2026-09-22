@@ -1,3 +1,7 @@
+## 2026-09-22 — PA-E MRQ executor delegate arity + re-entry lock (cloud)
+
+- Post-#168 DESKTOP: Arrange `ready: true` but MRQ failed `OnMoviePipelineExecutorFinished: expected 2, got 3`; duplicate shot1 / doubled LogPython from nested pre-tick. [capture_shotlist_mrq.py](../Content/Python/capture_shotlist_mrq.py): 2-arg finished handler per Epic 5.8 API, `PREPARING` lock, `_ACTIVE_DRIVER` guard, report `executor_start_error`. KNOWN_ERRORS. Gap **OPEN** — DESKTOP `execute_python_script("capture_shotlist.py")` after gate ready.
+
 ## 2026-09-22 — P0 PA-E Harness Arrange gate (cloud)
 
 - **Problem:** Capture Act/Assert ran without Arrange (Phase 2 without light stack; CAM label ≠ aim; `load_level` dropped TMP lights; diagnostic JSON wrote before `homestead_night_environment`).

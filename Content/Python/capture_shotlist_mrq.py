@@ -46,11 +46,19 @@ CUSTOM_END = common.ONE_FRAME_END
 class _Phase(str, Enum):
     IDLE = "idle"
     RENDER_SHOT = "render_shot"
+    PREPARING = "preparing"
     WAIT_RENDER = "wait_render"
     FINALIZE_SHOT = "finalize_shot"
     WRITE_REPORT = "write_report"
     DISARM = "disarm"
     DONE = "done"
+
+
+# One orchestrator per Editor Python session — prevents nested MCP re-entry from
+# double-arming Slate pre-tick / keep_alive (post-#168 DESKTOP duplicate LogPython).
+_ACTIVE_DRIVER: Optional["_MrqOrchestrator"] = None
+# Epic MRQ Python pattern: keep finished callback reachable (avoid GC before delegate fires).
+_EXECUTOR_FINISHED_HANDLER: Optional[Callable[[Any, bool], None]] = None
 
 
 class _MrqOrchestrator:
@@ -85,6 +93,7 @@ class _MrqOrchestrator:
         self._sequence_meta: dict[str, Any] = {}
         self._job_meta: dict[str, Any] = {}
         self._driver_error: Optional[str] = None
+        self._executor_finished_handler_ref: Optional[Callable[[Any, bool], None]] = None
 
     def start(self) -> bool:
         if not self.mrq_ok:
@@ -127,6 +136,8 @@ class _MrqOrchestrator:
     def _tick(self) -> None:
         if self.phase == _Phase.RENDER_SHOT:
             self._begin_shot_render()
+        elif self.phase == _Phase.PREPARING:
+            pass
         elif self.phase == _Phase.WAIT_RENDER:
             self._poll_render_wait()
         elif self.phase == _Phase.FINALIZE_SHOT:
@@ -137,6 +148,11 @@ class _MrqOrchestrator:
             self._disarm_only()
 
     def _begin_shot_render(self) -> None:
+        if self.phase != _Phase.RENDER_SHOT:
+            return
+        # Lock before queue/executor — nested pre_tick during render_queue_with_executor_instance
+        # re-entered prepare and duplicated shot1 (post-#168 DESKTOP).
+        self.phase = _Phase.PREPARING
         if self.shot_index >= len(common.SHOTS):
             self.phase = _Phase.WRITE_REPORT
             return
@@ -181,15 +197,32 @@ class _MrqOrchestrator:
             return
         self._render_since = time.time()
         self._wait_deadline = time.time() + WAIT_RENDER_SEC
-        exec_ok, self._executor = _start_pie_executor(self._subsystem, self._on_executor_finished)
+        exec_ok, self._executor, exec_err = _start_pie_executor(
+            self._subsystem,
+            self._bind_executor_finished_handler(),
+        )
         job_meta["executor_started"] = exec_ok
+        if exec_err:
+            job_meta["executor_start_error"] = exec_err
         if not exec_ok:
-            self._finish_shot_failure("executor_start_failed", pose_meta, purge)
+            fail_msg = exec_err or "executor_start_failed"
+            self._finish_shot_failure(fail_msg, pose_meta, purge)
             return
         self.phase = _Phase.WAIT_RENDER
         _log("MRQ render started", {"shot": shot["id"], "staging": self._staging_dir})
 
-    def _on_executor_finished(self, _executor: Any, _success: bool, _info: Any) -> None:
+    def _bind_executor_finished_handler(self) -> Callable[[Any, bool], None]:
+        """OnMoviePipelineExecutorFinished: (pipeline_executor, success) — UE 5.8 Python."""
+
+        def _on_finished(pipeline_executor: Any, success: bool) -> None:
+            self._on_executor_finished(pipeline_executor, success)
+
+        self._executor_finished_handler_ref = _on_finished
+        global _EXECUTOR_FINISHED_HANDLER
+        _EXECUTOR_FINISHED_HANDLER = _on_finished
+        return _on_finished
+
+    def _on_executor_finished(self, _executor: Any, _success: bool) -> None:
         _log("executor finished delegate", {"success": bool(_success)})
 
     def _poll_render_wait(self) -> None:
@@ -296,11 +329,18 @@ class _MrqOrchestrator:
             return
         status = common.summarize_capture_report(self.results)
         all_pass = status["capture_pass"]
+        executor_start_error = self._driver_error
+        for shot_entry in self.results:
+            err = (shot_entry.get("mrq_job") or {}).get("executor_start_error")
+            if err:
+                executor_start_error = executor_start_error or err
+                break
         report = {
             **status,
             "prefix": PREFIX.strip(":"),
             "primary_path": PRIMARY_PATH,
             "wait_mechanism": WAIT_MECHANISM,
+            "executor_start_error": executor_start_error,
             "project_dir_abs": common.project_dir(),
             "pil_available": common.pil_available(),
             "level_path": common.LEVEL_PATH,
@@ -339,9 +379,10 @@ class _MrqOrchestrator:
                 "homestead_centroid_script": "pa_e_homestead_capture_diagnostic.py",
             },
             "epic_refs": [
-                "https://dev.epicgames.com/documentation/en-us/unreal-engine/python-api/class/MoviePipelineQueueSubsystem?application_version=5.7",
-                "https://dev.epicgames.com/documentation/en-us/unreal-engine/python-api/class/MoviePipelineOutputSetting?application_version=5.7",
-                "https://forums.unrealengine.com/t/unable-to-render-movie-render-queue-pie-executor-from-commandline-python-script/2556294",
+                "https://dev.epicgames.com/documentation/en-us/unreal-engine/python-api/class/OnMoviePipelineExecutorFinished?application_version=5.8",
+                "https://dev.epicgames.com/documentation/en-us/unreal-engine/python-api/class/MoviePipelineQueueSubsystem?application_version=5.8",
+                "https://dev.epicgames.com/documentation/en-us/unreal-engine/python-api/class/MoviePipelineOutputSetting?application_version=5.8",
+                "https://forums.unrealengine.com/t/unable-to-execute-moviepipelinequeue-from-python/467250",
             ],
             "ladder_doc": "docs/Automation/CAPTURE_REDUNDANCY.md",
             "ladder_rung": "1_built_in_and_in_repo",
@@ -354,6 +395,9 @@ class _MrqOrchestrator:
         self.phase = _Phase.DISARM
         self._disarm_only()
         self.phase = _Phase.DONE
+        global _ACTIVE_DRIVER
+        if _ACTIVE_DRIVER is self:
+            _ACTIVE_DRIVER = None
 
     def _disarm_only(self) -> None:
         if not self.keep_ok:
@@ -644,24 +688,45 @@ def _queue_one_frame_job(
     return True, meta
 
 
-def _start_pie_executor(subsystem, on_finished: Callable) -> tuple[bool, Any]:
+def _start_pie_executor(
+    subsystem,
+    on_finished: Callable[[Any, bool], None],
+) -> tuple[bool, Any, Optional[str]]:
+    """Bind OnMoviePipelineExecutorFinished (2 args) then start PIE executor."""
     executor = None
+    err: Optional[str] = None
     try:
         executor_cls = unreal.MoviePipelinePIEExecutor
         if hasattr(subsystem, "render_queue_with_executor_instance"):
             executor = executor_cls(subsystem)
             if hasattr(executor, "on_executor_finished_delegate"):
-                executor.on_executor_finished_delegate.add_callable(on_finished)
+                delegate = executor.on_executor_finished_delegate
+                bind = getattr(delegate, "add_callable_unique", None)
+                if callable(bind):
+                    bind(on_finished)
+                else:
+                    delegate.add_callable(on_finished)
             subsystem.render_queue_with_executor_instance(executor)
-            return True, executor
+            return True, executor, None
         subsystem.render_queue_with_executor(executor_cls)
-        return True, executor
+        return True, executor, None
     except Exception as e:
-        _log("executor start failed", {"error": str(e)})
-        return False, executor
+        err = str(e)
+        _log("executor start failed", {"error": err})
+        return False, executor, err
 
 
 def main() -> None:
+    global _ACTIVE_DRIVER
+    if _ACTIVE_DRIVER is not None and _ACTIVE_DRIVER.phase not in (
+        _Phase.DONE,
+        _Phase.IDLE,
+    ):
+        _log(
+            "main skipped — orchestrator already active",
+            {"phase": _ACTIVE_DRIVER.phase.value},
+        )
+        return
     _log("started")
     keep_ok = False
     try:
@@ -726,6 +791,7 @@ def main() -> None:
             "prefix": PREFIX.strip(":"),
             "primary_path": PRIMARY_PATH,
             "driver_error": orch._driver_error,
+            "executor_start_error": orch._driver_error,
             "mrq_probe": mrq_probe,
             "level_loaded": level_ok,
             "shots": [],
@@ -739,6 +805,8 @@ def main() -> None:
                 keep.disarm()
             except Exception:
                 pass
+        return
+    _ACTIVE_DRIVER = orch
 
 
 if __name__ == "__main__":
