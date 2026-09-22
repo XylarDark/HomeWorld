@@ -1,6 +1,6 @@
 ## 2026-09-22 — Capture redundancy ladder + shotlist viewport script (cloud)
 
-- Lead policy: [docs/Automation/CAPTURE_REDUNDANCY.md](Automation/CAPTURE_REDUNDANCY.md) (UE built-ins → free tools → project Python; ban host ImageGrab for shotlist PASS).
+- Lead policy: [docs/Automation/CAPTURE_REDUNDANCY.md](Automation/CAPTURE_REDUNDANCY.md) — **gated global ladder** (rung 1 built-in/repo; rung 2 **`APPROVE TOOL SCOUT`**; rung 3 **`APPROVE TOOL BUILD`**; no auto-install / no unprompted stacks); shotlist PA-E uses rung-1 script; ban host ImageGrab for shotlist PASS.
 - [Content/Python/capture_shotlist_viewport.py](../Content/Python/capture_shotlist_viewport.py) — PA-E Shot 1/2 on `L_VS_MVP_Markers`, `Saved/pa_e_capture_report.json`, CopyToBox desktop copy.
 - [DEFECT_PA_E](../Docs/qa/DEFECT_PA_E_shot_capture_automation.md) + AUTOMATION_GAPS PA-E row → ladder + script; gap **OPEN** until DESKTOP prove. **No shotlist PASS claim.**
 

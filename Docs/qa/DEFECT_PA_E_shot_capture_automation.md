@@ -30,11 +30,11 @@ Host Windows **ImageGrab** of the Unreal window during a remote PA-E Shot 1/2 at
 
 ## Automation path (2026-09-22 — capture tooling track)
 
-Follow the **capture redundancy ladder** — [docs/Automation/CAPTURE_REDUNDANCY.md](../../docs/Automation/CAPTURE_REDUNDANCY.md):
+Follow [docs/Automation/CAPTURE_REDUNDANCY.md](../../docs/Automation/CAPTURE_REDUNDANCY.md) (**Lead-gated global ladder** + shotlist instance):
 
-1. **UE built-ins:** [Content/Python/capture_shotlist_viewport.py](../../Content/Python/capture_shotlist_viewport.py) — `L_VS_MVP_Markers`, Shot 1/2 poses (keyword `Rotator`, P6 / graybox fallbacks), lit + game view, `take_high_res_screenshot(..., force_game_view=True)`, keep_alive, `Saved/pa_e_capture_report.json`.
-2. **Free tools:** Document in ladder if built-ins fail on DESKTOP.
-3. **Project Python / GUI:** Harden scripts or ref-image automation — not host ImageGrab for PASS.
+1. **Rung 1 (no gate):** [Content/Python/capture_shotlist_viewport.py](../../Content/Python/capture_shotlist_viewport.py) — UE built-ins only (`take_high_res_screenshot`, keep_alive, etc.) → `Saved/pa_e_capture_report.json`.
+2. **Rung 2:** Free-tool **SCOUT backlog** (names only) — requires Lead **`APPROVE TOOL SCOUT <name>`**; **no auto-install**.
+3. **Rung 3:** Net-new custom stacks — requires Lead **`APPROVE TOOL BUILD <name>`**; not host ImageGrab for PASS.
 
 **Done when (automation gap):** DESKTOP run → report `ok: true` + PNGs under `Saved/Screenshots/PA_E/` and copied to `HomeWorld_PA_E` — Conductor verifies; cloud agents do **not** claim DESKTOP PASS.
 

@@ -135,7 +135,7 @@ Agent company, automation loop, gaps, refinement, logs, research.
 | [Automation/AUTOMATION_READINESS.md](Automation/AUTOMATION_READINESS.md) | Prerequisites; what's ready to run. |
 | [Automation/AUTOMATION_CAPABILITIES_VERIFICATION.md](Automation/AUTOMATION_CAPABILITIES_VERIFICATION.md) | Verification of automation capabilities. |
 | [Automation/FULL_AUTOMATION_RESEARCH.md](Automation/FULL_AUTOMATION_RESEARCH.md) | Full automation stack; tool catalog. |
-| [Automation/CAPTURE_REDUNDANCY.md](Automation/CAPTURE_REDUNDANCY.md) | Shotlist/evidence capture ladder (UE built-ins → free tools → project Python; ImageGrab ban). |
+| [Automation/CAPTURE_REDUNDANCY.md](Automation/CAPTURE_REDUNDANCY.md) | Lead-gated tooling ladder (all gaps): built-in/repo → APPROVE TOOL SCOUT → APPROVE TOOL BUILD; shotlist/PA-E instance; ImageGrab ban. |
 | [Automation/SWARM_ROUTING_RESEARCH.md](Automation/SWARM_ROUTING_RESEARCH.md) | Studio + model research for SWARM/NON-SWARM mode and ModelClass routing. |
 | [Automation/GUI_AUTOMATION_WHY_AND_WHEN.md](Automation/GUI_AUTOMATION_WHY_AND_WHEN.md) | When to use GUI automation vs manual. |
 | [Automation/ALTERNATIVE_AUTOMATION_OPTIONS.md](Automation/ALTERNATIVE_AUTOMATION_OPTIONS.md) | Alternative automation approaches. |

@@ -12,7 +12,6 @@ Does NOT claim shotlist PASS — DESKTOP must verify report + stills.
 from __future__ import annotations
 
 import json
-import math
 import os
 import shutil
 import time
@@ -82,14 +81,6 @@ def _meters_to_ue(loc_m: tuple[float, float, float]) -> unreal.Vector:
 
 
 def _euler_deg_to_rotator(pitch: float, yaw: float, roll: float) -> unreal.Rotator:
-    return unreal.Rotator(pitch=pitch, yaw=yaw, roll=roll)
-
-
-def _blender_euler_rad_to_rotator(eulers: tuple[float, float, float]) -> unreal.Rotator:
-    rx, ry, rz = eulers
-    pitch = math.degrees(rx)
-    yaw = math.degrees(-rz)
-    roll = math.degrees(ry)
     return unreal.Rotator(pitch=pitch, yaw=yaw, roll=roll)
 
 
@@ -406,6 +397,9 @@ def main() -> None:
         "shots": results,
         "policy": "Does not claim shotlist PASS — verify on DESKTOP; no host ImageGrab",
         "ladder_doc": "docs/Automation/CAPTURE_REDUNDANCY.md",
+        "ladder_rung": "1_built_in_and_in_repo",
+        "scout_requires": "APPROVE TOOL SCOUT <name>",
+        "build_requires": "APPROVE TOOL BUILD <name>",
     }
     with open(_report_path(), "w", encoding="utf-8") as f:
         json.dump(report, f, indent=2)
