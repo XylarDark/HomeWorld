@@ -64,23 +64,67 @@ def _log(msg: str, data: Optional[dict] = None) -> None:
     print(line)
 
 
+def _abs_path(path: str) -> str:
+    """unreal.Paths.project_dir() may be relative to engine CWD — always normalize."""
+    return os.path.abspath(os.path.normpath(path))
+
+
 def _project_dir() -> str:
-    return unreal.Paths.project_dir()
+    raw = unreal.Paths.project_dir()
+    if raw:
+        return _abs_path(raw)
+    return _abs_path(os.getcwd())
 
 
 def _saved_pa_e_dir() -> str:
-    path = os.path.join(_project_dir(), "Saved", "Screenshots", "PA_E")
+    path = _abs_path(os.path.join(_project_dir(), "Saved", "Screenshots", "PA_E"))
     os.makedirs(path, exist_ok=True)
     return path
 
 
 def _shot_dest_abs(filename: str) -> str:
-    return os.path.normpath(os.path.join(_saved_pa_e_dir(), filename))
+    return _abs_path(os.path.join(_saved_pa_e_dir(), filename))
 
 
 def _path_for_ue(abs_path: str) -> str:
     """AutomationLibrary / HighResShot: absolute path, forward slashes."""
-    return os.path.normpath(abs_path).replace("\\", "/")
+    return _abs_path(abs_path).replace("\\", "/")
+
+
+def _pil_available() -> bool:
+    try:
+        from PIL import Image  # noqa: F401
+        return True
+    except ImportError:
+        return False
+
+
+def _mtime_at_least(path: str, since: float) -> bool:
+    try:
+        return os.path.getmtime(path) >= since - 0.05
+    except OSError:
+        return False
+
+
+def _purge_stale_shot_pngs(dest_abs: str) -> dict[str, Any]:
+    """Remove prior PNGs so wait/validation cannot latch stale frames."""
+    basename = os.path.basename(dest_abs)
+    candidates: set[str] = {_abs_path(dest_abs)}
+    candidates.add(_abs_path(os.path.join(DESKTOP_PA_E, basename)))
+    for root in _engine_search_roots():
+        candidates.add(_abs_path(os.path.join(root, basename)))
+        candidates.add(_abs_path(os.path.join(root, "PA_E", basename)))
+    removed: list[str] = []
+    errors: list[dict[str, str]] = []
+    for p in sorted(candidates):
+        if not os.path.isfile(p):
+            continue
+        try:
+            os.remove(p)
+            removed.append(p)
+        except OSError as e:
+            errors.append({"path": p, "error": str(e)})
+    return {"basename": basename, "removed": removed, "remove_errors": errors}
 
 
 def _engine_search_roots() -> list[str]:
@@ -89,7 +133,7 @@ def _engine_search_roots() -> list[str]:
     seen: set[str] = set()
 
     def add(p: str) -> None:
-        p = os.path.normpath(p)
+        p = _abs_path(p)
         if p not in seen and os.path.isdir(p):
             seen.add(p)
             roots.append(p)
@@ -120,7 +164,7 @@ def _engine_search_roots() -> list[str]:
 
 
 def _report_path() -> str:
-    return os.path.join(_project_dir(), "Saved", "pa_e_capture_report.json")
+    return _abs_path(os.path.join(_project_dir(), "Saved", "pa_e_capture_report.json"))
 
 
 def _meters_to_ue(loc_m: tuple[float, float, float]) -> unreal.Vector:
@@ -189,15 +233,54 @@ def _set_lit_and_game_view() -> dict:
         applied["viewmode"] = "lit"
     except Exception as e:
         applied["viewmode_error"] = str(e)
+
+    attempts: list[dict[str, Any]] = []
     game_view = False
+    game_view_method: Optional[str] = None
+
+    def try_gv(label: str, fn) -> None:
+        nonlocal game_view, game_view_method
+        if game_view:
+            return
+        try:
+            fn()
+            attempts.append({"method": label, "ok": True})
+            game_view = True
+            game_view_method = label
+        except Exception as e:
+            attempts.append({"method": label, "ok": False, "error": str(e)})
+
     try:
         ues = unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem)
-        if ues and hasattr(ues, "editor_set_game_view"):
-            ues.editor_set_game_view(True)
-            game_view = True
+        if ues:
+            if hasattr(ues, "editor_set_game_view"):
+                try_gv("UnrealEditorSubsystem.editor_set_game_view", lambda: ues.editor_set_game_view(True))
+            if hasattr(ues, "set_game_view"):
+                try_gv("UnrealEditorSubsystem.set_game_view", lambda: ues.set_game_view(True))
     except Exception as e:
-        applied["game_view_error"] = str(e)
+        attempts.append({"method": "UnrealEditorSubsystem", "ok": False, "error": str(e)})
+
+    try:
+        les = unreal.get_editor_subsystem(unreal.LevelEditorSubsystem)
+        if les:
+            for attr in ("set_game_view", "editor_set_game_view"):
+                if hasattr(les, attr):
+                    try_gv(
+                        "LevelEditorSubsystem.%s" % attr,
+                        lambda a=attr: getattr(les, a)(True),
+                    )
+    except Exception as e:
+        attempts.append({"method": "LevelEditorSubsystem", "ok": False, "error": str(e)})
+
+    if not game_view:
+        try_gv(
+            "console_gameview",
+            lambda: unreal.SystemLibrary.execute_console_command(None, "gameview"),
+        )
+
     applied["game_view"] = game_view
+    applied["game_view_method"] = game_view_method
+    applied["game_view_attempts"] = attempts
     return applied
 
 
@@ -228,12 +311,23 @@ def _pose_viewport(
         rot = _euler_deg_to_rotator(*fallback_rot_deg)
         meta["fallback_location_m"] = list(fallback_loc_m)
         meta["fallback_rotation_deg"] = list(fallback_rot_deg)
+    viewport_set = False
     try:
-        unreal.EditorLevelLibrary.set_level_viewport_camera_info(loc, rot)
-        meta["viewport_set"] = True
+        ues = unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem)
+        if ues and hasattr(ues, "set_level_viewport_camera_info"):
+            ues.set_level_viewport_camera_info(loc, rot)
+            viewport_set = True
+            meta["viewport_api"] = "UnrealEditorSubsystem.set_level_viewport_camera_info"
     except Exception as e:
-        meta["viewport_set"] = False
-        meta["viewport_error"] = str(e)
+        meta["viewport_ues_error"] = str(e)
+    if not viewport_set:
+        try:
+            unreal.EditorLevelLibrary.set_level_viewport_camera_info(loc, rot)
+            viewport_set = True
+            meta["viewport_api"] = "EditorLevelLibrary.set_level_viewport_camera_info"
+        except Exception as e:
+            meta["viewport_error"] = str(e)
+    meta["viewport_set"] = viewport_set
     if cam:
         try:
             unreal.EditorLevelLibrary.pilot_level_actor(cam)
@@ -244,11 +338,41 @@ def _pose_viewport(
     return meta
 
 
+def _poll_automation_editor_task(task: Any, timeout_sec: float = 60.0) -> dict[str, Any]:
+    """If take_high_res_screenshot returns AutomationEditorTask, wait for is_task_done."""
+    meta: dict[str, Any] = {
+        "had_task": task is not None,
+        "task_type": type(task).__name__ if task is not None else None,
+        "task_done": None,
+    }
+    if task is None:
+        return meta
+    done_fn = getattr(task, "is_task_done", None)
+    if not callable(done_fn):
+        meta["poll_skipped"] = "no is_task_done"
+        return meta
+    deadline = time.time() + timeout_sec
+    t0 = time.time()
+    while time.time() < deadline:
+        try:
+            if done_fn():
+                meta["task_done"] = True
+                meta["poll_elapsed_sec"] = round(time.time() - t0, 2)
+                return meta
+        except Exception as e:
+            meta["poll_error"] = str(e)
+            break
+        _settle_viewport(frames=1)
+    meta["task_done"] = False
+    meta["poll_elapsed_sec"] = round(time.time() - t0, 2)
+    return meta
+
+
 def _take_high_res_screenshot(
     dest_abs: str,
     camera,
-) -> tuple[str, Optional[str], str]:
-    """Single capture; returns (method, error, path_passed_to_ue)."""
+) -> tuple[str, Optional[str], str, Any, dict[str, Any]]:
+    """Single capture; returns (method, error, path_passed_to_ue, task, task_poll)."""
     ue_path = _path_for_ue(dest_abs)
     last_err: Optional[str] = None
     attempts = (
@@ -264,8 +388,9 @@ def _take_high_res_screenshot(
     )
     for name, fn in attempts:
         try:
-            fn()
-            return name, None, ue_path
+            task = fn()
+            poll = _poll_automation_editor_task(task)
+            return name, None, ue_path, task, poll
         except TypeError:
             continue
         except Exception as e:
@@ -275,9 +400,9 @@ def _take_high_res_screenshot(
             None,
             'HighResShot %dx%d filename="%s"' % (RES_X, RES_Y, ue_path),
         )
-        return "HighResShot_console_abs", None, ue_path
+        return "HighResShot_console_abs", None, ue_path, None, {"had_task": False}
     except Exception as e2:
-        return "failed", last_err or str(e2), ue_path
+        return "failed", last_err or str(e2), ue_path, None, {"had_task": False}
 
 
 def _find_named_png(
@@ -361,32 +486,38 @@ def _wait_for_capture(dest_abs: str, since_mtime: float, timeout_sec: float) -> 
     t0 = time.time()
     while time.time() < deadline:
         _settle_viewport(frames=2)
-        if os.path.isfile(dest_abs) and _file_size_stable(dest_abs):
+        if (
+            os.path.isfile(dest_abs)
+            and _mtime_at_least(dest_abs, since_mtime)
+            and _file_size_stable(dest_abs)
+        ):
             meta["stable"] = True
             meta["discovered_from"] = dest_abs
             meta["wait_elapsed_sec"] = round(time.time() - t0, 2)
             return dest_abs, meta
         found = _find_named_png(basename, since_mtime)
-        if found and os.path.getsize(found) >= MIN_BYTES:
-            if _copy_into_dest(found, dest_abs) and _file_size_stable(dest_abs):
+        if found and os.path.getsize(found) >= MIN_BYTES and _mtime_at_least(found, since_mtime):
+            if _copy_into_dest(found, dest_abs) and _mtime_at_least(dest_abs, since_mtime) and _file_size_stable(dest_abs):
                 meta["stable"] = True
                 meta["discovered_from"] = found
                 meta["wait_elapsed_sec"] = round(time.time() - t0, 2)
                 return dest_abs, meta
-            if os.path.isfile(found) and _file_size_stable(found):
+            if os.path.isfile(found) and _file_size_stable(found) and _mtime_at_least(found, since_mtime):
                 meta["discovered_from"] = found
                 meta["wait_elapsed_sec"] = round(time.time() - t0, 2)
                 return found, meta
         time.sleep(STABLE_POLL_INTERVAL)
     meta["wait_elapsed_sec"] = round(time.time() - t0, 2)
-    if os.path.isfile(dest_abs):
+    if os.path.isfile(dest_abs) and _mtime_at_least(dest_abs, since_mtime):
         meta["discovered_from"] = dest_abs
+        meta["stable"] = _file_size_stable(dest_abs)
         return dest_abs, meta
     found = _find_named_png(basename, since_mtime)
-    if found:
+    if found and _mtime_at_least(found, since_mtime):
         _copy_into_dest(found, dest_abs)
         meta["discovered_from"] = found
-        return dest_abs if os.path.isfile(dest_abs) else found, meta
+        dest_ok = os.path.isfile(dest_abs) and _mtime_at_least(dest_abs, since_mtime)
+        return (dest_abs if dest_ok else found), meta
     return None, meta
 
 
@@ -418,7 +549,15 @@ def _validate_png(path: Optional[str]) -> dict:
         return out
     lum = _mean_luminance(path)
     out["mean_luminance"] = lum
-    if lum is not None and lum < MIN_MEAN_LUMINANCE:
+    out["pil_available"] = _pil_available()
+    if lum is None:
+        if not _pil_available():
+            out["error"] = "pil_unavailable"
+            out["install_note"] = "Install Pillow into the Unreal Editor Python used by -ExecutePythonScript"
+        else:
+            out["error"] = "luminance_read_failed"
+        return out
+    if lum < MIN_MEAN_LUMINANCE:
         out["error"] = "near_black"
         return out
     out["pass"] = True
@@ -447,9 +586,15 @@ def _capture_shot(shot: dict) -> dict:
     pose_meta["fallback_source"] = shot.get("fallback_source")
     _settle_viewport()
     dest = _shot_dest_abs(shot["filename"])
+    purge = _purge_stale_shot_pngs(dest)
     since = time.time()
-    method, cap_err, ue_path = _take_high_res_screenshot(dest, cam if cam else None)
-    _log("capture invoked", {"id": shot["id"], "method": method, "ue_path": ue_path})
+    method, cap_err, ue_path, cap_task, task_poll = _take_high_res_screenshot(
+        dest, cam if cam else None
+    )
+    _log(
+        "capture invoked",
+        {"id": shot["id"], "method": method, "ue_path": ue_path, "dest_abs": dest},
+    )
     _settle_viewport(frames=8)
     resolved, wait_meta = _wait_for_capture(dest, since, WAIT_FILE_SEC)
     validation = _validate_png(resolved)
@@ -457,9 +602,12 @@ def _capture_shot(shot: dict) -> dict:
     entry = {
         "id": shot["id"],
         "filename": shot["filename"],
+        "dest_abs": dest,
+        "purge_before_capture": purge,
         "capture_method": method,
         "capture_error": cap_err,
         "ue_path": ue_path,
+        "automation_task_poll": task_poll,
         "saved_path": resolved,
         "wait": wait_meta,
         "engine_search_roots": _engine_search_roots(),
@@ -540,6 +688,8 @@ def main() -> None:
     report = {
         "ok": all_pass,
         "prefix": PREFIX.strip(":"),
+        "project_dir_abs": _project_dir(),
+        "pil_available": _pil_available(),
         "level_path": LEVEL_PATH,
         "level_loaded": level_ok,
         "viewport_prep": viewport_prep,
