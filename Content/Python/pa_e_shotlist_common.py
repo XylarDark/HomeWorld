@@ -1213,8 +1213,8 @@ def _wide_cabin_anchor_pose(
     meta["lookat_z_offset_uu"] = SHOT2_LOOKAT_Z_OFFSET_UU
     clamp_b = _synthetic_anchor_bounds(anchor)
     loc = _clamp_camera_pose_loc(loc, clamp_b, meta)
-    rot = look_at_rotation(loc, target)
     loc = _clamp_camera_pose_loc(loc, clamp_b, meta)
+    rot = look_at_rotation(loc, target)
     meta["target_centroid"] = [target.x, target.y, target.z]
     meta["camera_location"] = [loc.x, loc.y, loc.z]
     return loc, rot, target, clamp_b
