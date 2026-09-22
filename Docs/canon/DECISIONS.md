@@ -4,6 +4,7 @@ Append only. Date · decision · why.
 
 | Date (ET) | Decision | Why |
 |---|---|---|
+| 2026-09-21 | **DS STRATEGY APPROVED** — Lead typed **`APPROVE DEMO-SPINE`** (chat, 2026-09-21 ET). Unlocks **DS-A** ([Docs/30_DEMO_SPINE.md](../30_DEMO_SPINE.md): visible campfire → tent → cottage on VS_MVP). **Do not** stamp DS-A APPROVED until Lead **`APPROVE DS-A`**. | GC-B/C logs exist; DS-A makes path walkable without cheats-only UX. KEEP-LOCAL level save OK. |
 | 2026-09-21 | **Docs/25 Spirit Stealth CLOSED / COMPLETE** — Lead **`APPROVE SS-A`** (chat, 2026-09-21 ET). SS-A impl track done; **SS-B** not opened (locked bible LATER scope only). | SS-A merged main (`7bc577f` / PR #133); docs stamp closes SS track like CD-A on Docs/23. |
 | 2026-09-21 | **SS STRATEGY APPROVED** — Lead typed **`SS-A`** (chat, 2026-09-21 ET) → treat as **`APPROVE SS STRATEGY`**; unlocks **SS-A** ([Docs/25_SPIRIT_STEALTH_IMPL.md](../25_SPIRIT_STEALTH_IMPL.md): lit volumes + A2 alert stubs). **Do not** stamp SS-A APPROVED until Lead **`APPROVE SS-A`**. | `SPIRIT_STEALTH_BIBLE.md`; orthogonal to closed MV-A (#132) and CD-A. |
 | 2026-09-21 | **Docs/24 Movement CLOSED / COMPLETE** — Lead **`APPROVE MV-A`** (chat, 2026-09-21 ET). MV-A impl track done; **SS-A** (spirit stealth) separate — bible locked, not part of MV close. Next gate TBD (Lead). | MV-A merged main (`349d3e4` / PR #130); docs stamp closes MV track like CD-A on Docs/23. |

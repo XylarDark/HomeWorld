@@ -9,6 +9,8 @@
 
 class UBoxComponent;
 class USceneComponent;
+class UStaticMeshComponent;
+class UTextRenderComponent;
 
 /**
  * GC-B craft interact target — hub bootstrap, placed campfire, or cottage kitchen stub.
@@ -27,10 +29,21 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Craft")
 	EHomeWorldCraftStationKind GetStationKind() const { return StationKind; }
 
+	/** DS-A: engine primitive + floating label for demo spine readability in PIE. */
+	void RefreshDemoSpineVisuals();
+
 protected:
+	virtual void BeginPlay() override;
+
 	UPROPERTY(VisibleAnywhere, Category = "Craft")
 	TObjectPtr<USceneComponent> Root;
 
 	UPROPERTY(VisibleAnywhere, Category = "Craft")
 	TObjectPtr<UBoxComponent> InteractVolume;
+
+	UPROPERTY(VisibleAnywhere, Category = "Craft|DS")
+	TObjectPtr<UStaticMeshComponent> VisualMesh;
+
+	UPROPERTY(VisibleAnywhere, Category = "Craft|DS")
+	TObjectPtr<UTextRenderComponent> LabelText;
 };
