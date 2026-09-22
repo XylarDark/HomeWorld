@@ -7,6 +7,9 @@ from __future__ import annotations
 import json
 import os
 import shutil
+import struct
+import subprocess
+import zlib
 from typing import Any, Optional
 
 try:
@@ -183,7 +186,9 @@ def log(prefix: str, msg: str, data: Optional[dict] = None) -> None:
     if data:
         line += " " + json.dumps(data, default=str)
     if unreal is not None:
+        # Editor mirrors stdout into LogPython — print() duplicates unreal.log (post-#169).
         unreal.log(line)
+        return
     print(line)
 
 
@@ -308,7 +313,7 @@ def purge_stale_shot_pngs(dest_abs: str) -> dict[str, Any]:
     return {"basename": basename, "removed": removed, "remove_errors": errors}
 
 
-def mean_luminance(path: str) -> Optional[float]:
+def _mean_luminance_pil(path: str) -> Optional[float]:
     try:
         from PIL import Image
     except ImportError:
@@ -324,6 +329,166 @@ def mean_luminance(path: str) -> Optional[float]:
         return None
 
 
+def _paeth(a: int, b: int, c: int) -> int:
+    p = a + b - c
+    pa = abs(p - a)
+    pb = abs(p - b)
+    pc = abs(p - c)
+    if pa <= pb and pa <= pc:
+        return a
+    if pb <= pc:
+        return b
+    return c
+
+
+def _png_unfilter_scanlines(
+    raw: bytes, width: int, height: int, bpp: int
+) -> Optional[bytes]:
+    stride = width * bpp
+    if stride <= 0 or height <= 0:
+        return None
+    out = bytearray(height * stride)
+    prev = bytearray(stride)
+    pos = 0
+    for _row in range(height):
+        if pos >= len(raw):
+            return None
+        filt = raw[pos]
+        pos += 1
+        row = raw[pos : pos + stride]
+        pos += stride
+        if len(row) != stride:
+            return None
+        cur = bytearray(stride)
+        for i in range(stride):
+            x = row[i]
+            a = cur[i - bpp] if i >= bpp else 0
+            b = prev[i]
+            c = prev[i - bpp] if i >= bpp else 0
+            if filt == 0:
+                v = x
+            elif filt == 1:
+                v = (x + a) & 0xFF
+            elif filt == 2:
+                v = (x + b) & 0xFF
+            elif filt == 3:
+                v = (x + ((a + b) // 2)) & 0xFF
+            elif filt == 4:
+                v = (x + _paeth(a, b, c)) & 0xFF
+            else:
+                return None
+            cur[i] = v
+        out[_row * stride : (_row + 1) * stride] = cur
+        prev = cur
+    return bytes(out)
+
+
+def _mean_luminance_stdlib_png(path: str) -> Optional[float]:
+    """8-bit RGB/RGBA PNG mean luminance without Pillow (MRQ deferred PNG)."""
+    try:
+        with open(path, "rb") as f:
+            sig = f.read(8)
+        if sig != b"\x89PNG\r\n\x1a\n":
+            return None
+        width = height = 0
+        bit_depth = color_type = 0
+        idat = bytearray()
+        with open(path, "rb") as f:
+            f.read(8)
+            while True:
+                hdr = f.read(8)
+                if len(hdr) < 8:
+                    break
+                length, ctype = struct.unpack(">I4s", hdr)
+                data = f.read(length)
+                f.read(4)
+                if ctype == b"IHDR" and len(data) >= 13:
+                    width, height, bit_depth, color_type = struct.unpack(">IIBB", data[:10])
+                elif ctype == b"IDAT":
+                    idat.extend(data)
+                elif ctype == b"IEND":
+                    break
+        if bit_depth != 8 or color_type not in (2, 6):
+            return None
+        bpp = 3 if color_type == 2 else 4
+        try:
+            raw = zlib.decompress(bytes(idat))
+        except zlib.error:
+            return None
+        pixels = _png_unfilter_scanlines(raw, width, height, bpp)
+        if not pixels:
+            return None
+        total_pixels = width * height
+        step = max(1, total_pixels // 250_000)
+        total = 0.0
+        count = 0
+        for idx_px in range(0, total_pixels, step):
+            o = idx_px * bpp
+            if o + 2 >= len(pixels):
+                break
+            r, g, b = pixels[o], pixels[o + 1], pixels[o + 2]
+            total += 0.2126 * r + 0.7152 * g + 0.0722 * b
+            count += 1
+        return float(total / count) if count else None
+    except OSError:
+        return None
+
+
+def _mean_luminance_host_python(path: str) -> Optional[float]:
+    """Fallback: host ``py``/``python`` with Pillow when Editor Python has no PIL."""
+    abs_png = os.path.abspath(path)
+    code = (
+        "import sys\n"
+        "from PIL import Image\n"
+        "im = Image.open(sys.argv[1]).convert('L')\n"
+        "h = im.histogram()\n"
+        "t = sum(h) or 1\n"
+        "print(sum(i * h[i] for i in range(256)) / t)\n"
+    )
+    candidates: list[list[str]] = []
+    env_py = os.environ.get("HOMEWORLD_HOST_PYTHON")
+    if env_py:
+        candidates.append([env_py, "-c", code, abs_png])
+    candidates.append(["py", "-3", "-c", code, abs_png])
+    for name in ("python3", "python"):
+        candidates.append([name, "-c", code, abs_png])
+    for cmd in candidates:
+        exe = cmd[0]
+        if os.path.sep not in exe and shutil.which(exe) is None:
+            continue
+        try:
+            proc = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=45,
+                check=False,
+            )
+        except (OSError, subprocess.TimeoutExpired):
+            continue
+        if proc.returncode != 0 or not proc.stdout.strip():
+            continue
+        try:
+            return float(proc.stdout.strip().splitlines()[-1])
+        except ValueError:
+            continue
+    return None
+
+
+def mean_luminance(path: str) -> tuple[Optional[float], str]:
+    """Return (mean 0–255, source tag). Order: Editor PIL → stdlib PNG → host Python PIL."""
+    lum = _mean_luminance_pil(path)
+    if lum is not None:
+        return lum, "pil"
+    lum = _mean_luminance_stdlib_png(path)
+    if lum is not None:
+        return lum, "stdlib_png"
+    lum = _mean_luminance_host_python(path)
+    if lum is not None:
+        return lum, "host_python_pil"
+    return None, "none"
+
+
 def validate_png(path: Optional[str]) -> dict:
     out: dict[str, Any] = {"path": path, "pass": False}
     if not path or not os.path.isfile(path):
@@ -334,15 +499,16 @@ def validate_png(path: Optional[str]) -> dict:
     if size < MIN_BYTES:
         out["error"] = "file_too_small"
         return out
-    lum = mean_luminance(path)
+    lum, lum_source = mean_luminance(path)
     out["mean_luminance"] = lum
+    out["luminance_source"] = lum_source
     out["pil_available"] = pil_available()
     if lum is None:
-        if not pil_available():
-            out["error"] = "pil_unavailable"
-            out["install_note"] = "Install Pillow into the Unreal Editor Python used by -ExecutePythonScript"
-        else:
-            out["error"] = "luminance_read_failed"
+        out["error"] = "luminance_unavailable"
+        out["install_note"] = (
+            "Editor Pillow missing; stdlib PNG decode failed. "
+            "Optional: HOMEWORLD_HOST_PYTHON or install Pillow in Editor Python."
+        )
         return out
     if lum < MIN_MEAN_LUMINANCE:
         out["error"] = "near_black"
