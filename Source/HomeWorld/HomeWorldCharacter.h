@@ -24,6 +24,7 @@ class UInputMappingContext;
 class UHomeWorldFallbackGlideComponent;
 class UHomeWorldSoftBoundsComponent;
 class UHomeWorldTraversalComponent;
+class UHomeWorldSpiritStealthComponent;
 
 UCLASS(Blueprintable)
 /**
@@ -138,6 +139,10 @@ protected:
 	/** MV-A: sprint / mantle / blink / mount boost on single CMC. */
 	UPROPERTY(VisibleAnywhere, Category = "Movement|MV-A")
 	TObjectPtr<UHomeWorldTraversalComponent> TraversalComponent;
+
+	/** SS-A: spirit lit / alert stub (spirit form only). */
+	UPROPERTY(VisibleAnywhere, Category = "Stealth|SS-A")
+	TObjectPtr<UHomeWorldSpiritStealthComponent> SpiritStealthComponent;
 
 	/** NP-C: spirit form flag — Night/Dusk true, Day/Dawn false. SYS reads via GetIsSpiritForm(). */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Form")

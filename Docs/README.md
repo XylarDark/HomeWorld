@@ -56,6 +56,7 @@ These are **intentionally separate**. On case-insensitive filesystems (macOS/Win
 | [22_GATHER_CRAFT_IMPL.md](22_GATHER_CRAFT_IMPL.md) | Gather & Craft impl (site→RES, hearth recipes) | **CLOSED / COMPLETE** — Lead **`APPROVE GC-C`**, 2026-09-21 ET |
 | [23_COMBAT_DREAM_IMPL.md](23_COMBAT_DREAM_IMPL.md) | Combat & Dream impl (minigame stubs, boss phase volume) | **CLOSED / COMPLETE** — Lead **`APPROVE CD-A`**, 2026-09-21 ET |
 | [24_MOVEMENT_IMPL.md](24_MOVEMENT_IMPL.md) | Movement impl (traversal stubs, spirit blink, mount boost) | **CLOSED / COMPLETE** — Lead **`APPROVE MV-A`**, 2026-09-21 ET |
+| [25_SPIRIT_STEALTH_IMPL.md](25_SPIRIT_STEALTH_IMPL.md) | Spirit Stealth impl (lit volumes, A2 alert stubs) | **SS STRATEGY APPROVED** — **SS-A IN PROGRESS** |
 | [22_UE58_UPGRADE.md](22_UE58_UPGRADE.md) | UE 5.8 Upgrade (U58) — EngineAssociation + tooling cutover | **CLOSED / COMPLETE** — 2026-09-19 ET |
 | [23_UE58_FEATURE_ADOPTION.md](23_UE58_FEATURE_ADOPTION.md) | UE 5.8 Feature Adoption (U58F) - PCG/PVE/MegaLights/Fog SSS/Lumen Lite | **CLOSED / COMPLETE** - 2026-09-19 ET |
 | [24_VS_NIGHT_PINE_MESH.md](24_VS_NIGHT_PINE_MESH.md) | VS Night / Pine / Mesh (VNP) — MegaLights evidence, PVE pine, Mesh Terrain sandbox | **IMPLEMENTED** — 2026-09-19 ET |
