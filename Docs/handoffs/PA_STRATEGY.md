@@ -2,12 +2,12 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **READY FOR Lead APPROVE PA STRATEGY** |
-| **Track** | PA-0 → PA-A…E |
+| **Status** | **APPROVED / CLOSED** — Lead **`APPROVE PA STRATEGY`**, 2026-09-22 ET |
+| **Track** | PA-0 **CLOSED** → **PA-A OPEN** (PA-B…E locked) |
 | **Host** | CLOUD (stamp) · DESKTOP (Blender/import evidence) |
-| **Impl doc** | [32_PROTOTYPE_ASSETS.md](../32_PROTOTYPE_ASSETS.md) — **OPEN** |
-| **Scope** | **Homestead-only** (Lead defaulted after skipping scope widget) |
-| **Close gate** | Lead **`APPROVE PA STRATEGY`** — **not granted** |
+| **Impl doc** | [32_PROTOTYPE_ASSETS.md](../32_PROTOTYPE_ASSETS.md) — **PA STRATEGY APPROVED** · **PA-A OPEN** |
+| **Scope locked** | **Homestead kit only** — Lead **`APPROVE PA STRATEGY — homestead kit only`**, 2026-09-22 ET (planetside out) |
+| **Close gate** | Lead **`APPROVE PA STRATEGY`** — **GRANTED** 2026-09-22 ET (chat) |
 
 ---
 
@@ -19,27 +19,27 @@
 | Kit plate (AssetCreation) | [AssetCreation/RefImages/homestead_kit_plate_labeled.jpg](../../AssetCreation/RefImages/homestead_kit_plate_labeled.jpg) |
 | Kit plate (AI ref) | [Docs/refs/ai/homestead_kit_plate_labeled.jpg](../refs/ai/homestead_kit_plate_labeled.jpg) |
 | Sidecar | [Docs/refs/ai/homestead_kit_plate_labeled.sidecar.json](../refs/ai/homestead_kit_plate_labeled.sidecar.json) |
-| DECISIONS note | [canon/DECISIONS.md](../canon/DECISIONS.md) — drafted, **not approved** |
+| DECISIONS note | [canon/DECISIONS.md](../canon/DECISIONS.md) — **PA STRATEGY APPROVED** |
 
 **Not in this handoff:** Content `.uasset`, Blender `.blend`, gameplay code.
 
 ---
 
-## Lead gate string
+## Lead gate (record)
 
-Type in chat:
+Lead typed in chat (2026-09-22 ET):
 
 ```text
-APPROVE PA STRATEGY
+APPROVE PA STRATEGY — homestead kit only
 ```
 
 Unlocks **PA-A** (gap audit: plate vs [MVP_EXPORT_MANIFEST.md](../../AssetCreation/Exports/MVP_EXPORT_MANIFEST.md) vs VS_MVP dress actors).
 
-**Do not** conflate with **`APPROVE PA-0`** — PA-0 is the docs stamp only; strategy gate is **`APPROVE PA STRATEGY`**.
+**PA track is not CLOSED** — only the strategy stamp closes here.
 
 ---
 
-## Scope summary (for approve)
+## Scope summary (locked)
 
 **IN:** Upgrade `SM_Cabin`, `SM_IslandTop`, `SM_Pine_Homestead`, `SM_Lookout_Pad`, `SM_Glider_Perch`; polish `SM_Shrine_Homestead`; **create** cliff modules, 3 planters, fence segs, path dress; optional islet crumbs.
 
@@ -53,7 +53,13 @@ Unlocks **PA-A** (gap audit: plate vs [MVP_EXPORT_MANIFEST.md](../../AssetCreati
 
 ---
 
-## DESKTOP chain (after PA STRATEGY — PA-C/D)
+## Next (PA-A)
+
+Gap audit only — **not started** in this PR. No Blender/mesh work until PA-A filed.
+
+---
+
+## DESKTOP chain (PA-C/D — after gap audit)
 
 ```text
 # Blender MCP + STYLE_GUIDE export
@@ -73,10 +79,10 @@ Cloud agents: propose paths only — [WINDOWS_BRIDGE.md](../../docs/Setup/WINDOW
 
 - [x] Kit plate copied to `AssetCreation/RefImages/` and `Docs/refs/ai/`
 - [x] Sidecar JSON per Docs/20
-- [x] Docs/32 strategy **OPEN**
-- [ ] Lead **`APPROVE PA STRATEGY`**
-- [ ] PA-A gap audit scheduled
+- [x] Docs/32 strategy stamped
+- [x] Lead **`APPROVE PA STRATEGY`**, 2026-09-22 ET
+- [ ] **PA-A** gap audit (unlocked — pending)
 
 ---
 
-*PA STRATEGY handoff — **READY FOR Lead APPROVE PA STRATEGY** — 2026-09-22.*
+*PA STRATEGY handoff — **APPROVED / CLOSED** — Lead **`APPROVE PA STRATEGY`**, 2026-09-22 ET. Next: **PA-A**.*

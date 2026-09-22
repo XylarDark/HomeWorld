@@ -3,10 +3,10 @@
 | Field | Value |
 |-------|-------|
 | **Track ID** | **PA** — Prototype Assets (Homestead dress) |
-| **Status** | **OPEN** — awaiting Lead **`APPROVE PA STRATEGY`** |
+| **Status** | **PA STRATEGY APPROVED** · **PA-A OPEN** (track **not CLOSED**) |
 | **Date** | 2026-09-22 |
 | **Author** | Cloud agent (HomeWorld) |
-| **Scope default** | **Homestead-only** (Lead skipped scope widget → homestead dress locked for strategy) |
+| **Scope locked** | **Homestead kit only** — Lead **`APPROVE PA STRATEGY — homestead kit only`**, 2026-09-22 ET (planetside out) |
 | **Prior tracks** | [30_DEMO_SPINE.md](30_DEMO_SPINE.md) **CLOSED** · [31_SPIRIT_STEALTH_FEEL.md](31_SPIRIT_STEALTH_FEEL.md) **IN PROGRESS** (orthogonal) |
 | **Prefix** | **PA** — do **not** reuse DS / SS / GC gate strings |
 
@@ -14,11 +14,11 @@
 
 ## Gate
 
-Lead **`APPROVE PA STRATEGY`** — **not granted** (strategy drafted PA-0 only).
+Lead **`APPROVE PA STRATEGY`** — **GRANTED** (chat, 2026-09-22 ET; Lead typed **`APPROVE PA STRATEGY — homestead kit only`**).
 
-**Do not stamp PA STRATEGY APPROVED in a PR** — Lead types the gate string in chat.
+Unlocks **PA-A** gap audit. **Do not** stamp PA-A/C/D/E done in docs until evidence exists.
 
-**Handoff:** [handoffs/PA_STRATEGY.md](handoffs/PA_STRATEGY.md) — **READY FOR Lead APPROVE PA STRATEGY**.
+**Handoff:** [handoffs/PA_STRATEGY.md](handoffs/PA_STRATEGY.md) — **APPROVED / CLOSED** (strategy stamp only).
 
 **Kit plate (refs):** [refs/ai/homestead_kit_plate_labeled.jpg](refs/ai/homestead_kit_plate_labeled.jpg) · [../AssetCreation/RefImages/homestead_kit_plate_labeled.jpg](../AssetCreation/RefImages/homestead_kit_plate_labeled.jpg) · sidecar [refs/ai/homestead_kit_plate_labeled.sidecar.json](refs/ai/homestead_kit_plate_labeled.sidecar.json)
 
@@ -121,9 +121,9 @@ Workflow index: [AssetCreation/README.md](../AssetCreation/README.md).
 
 | Phase | Name | Host | Status | Gate |
 |-------|------|------|--------|------|
-| **PA-0** | Strategy + kit plate stamp | CLOUD | **DONE** (this PR) | Awaiting **`APPROVE PA STRATEGY`** |
-| **PA-A** | Gap audit (mesh vs plate vs VS_MVP placement) | CLOUD+DESKTOP | **LOCKED** | After PA STRATEGY |
-| **PA-B** | Optional orthos / AI_Sources drafts | CLOUD+Lead | **LOCKED** | Optional |
+| **PA-0** | Strategy + kit plate stamp | CLOUD | **APPROVED / CLOSED** | Lead **`APPROVE PA STRATEGY`**, 2026-09-22 ET |
+| **PA-A** | Gap audit (mesh vs plate vs VS_MVP placement) | CLOUD+DESKTOP | **OPEN** | Unlocked by PA STRATEGY |
+| **PA-B** | Optional orthos / AI_Sources drafts | CLOUD+Lead | **LOCKED** | After PA-A |
 | **PA-C** | Blender rebuild / upgrade | DESKTOP+Blender MCP | **LOCKED** | Per-asset evidence |
 | **PA-D** | Import + place + master material bind | DESKTOP | **LOCKED** | `batch_import` + dress scripts |
 | **PA-E** | Shot 1 + Shot 2 evidence + close | DESKTOP+Lead | **LOCKED** | Lead **`APPROVE PA-E`** (TBD string) |
@@ -156,9 +156,9 @@ Workflow index: [AssetCreation/README.md](../AssetCreation/README.md).
 
 | Step | Lead action | Unlocks |
 |------|-------------|---------|
-| 0 | **`APPROVE PA STRATEGY`** | PA-A gap audit — **pending** |
-| 1 | *(PA sub-gates TBD at approve)* | PA-B…E |
+| 0 | **`APPROVE PA STRATEGY`** | PA-A gap audit — **DONE** 2026-09-22 ET |
+| 1 | **PA-A** (gap audit evidence) | PA-B…E — **pending** |
 
 ---
 
-*Docs/32 Prototype Assets — **OPEN** — awaiting Lead **`APPROVE PA STRATEGY`** (PA-0 stamp 2026-09-22).*
+*Docs/32 Prototype Assets — **PA STRATEGY APPROVED** — homestead kit only — **PA-A OPEN** (2026-09-22 ET).*
