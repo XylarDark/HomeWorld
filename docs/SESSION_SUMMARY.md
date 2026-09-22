@@ -1,3 +1,7 @@
+## 2026-09-22 — Universal tooling practice suite (Lead lock-in, docs only)
+
+- Lead lock-in for **any** automation gap: (1) Docs-first, (2) Proven-results first, (3) Research on dead-ends before SCOUT/BUILD/Lead ping, (4) Gated ladder — [CAPTURE_REDUNDANCY.md](Automation/CAPTURE_REDUNDANCY.md) (canonical universal doc; shotlist instance only); [AUTOMATION_GAPS.md](Automation/AUTOMATION_GAPS.md); [automation-standards.mdc](../.cursor/rules/automation-standards.mdc) v1.4. Capture arc cited only under Examples (non-exhaustive).
+
 ## 2026-09-22 — PA-E DESKTOP prove FAIL post-#159 (docs only)
 
 - **`C:\dev\HomeWorld`**, ~12:51–13:01 ET after **#159**: console **HighResShot** logged for Shot 1/2 + viewport focus OK → **no PNG** (~120s each); AutomationLibrary fallback **`task_done: false`**, **`file_produced_by: null`**; MCP **600s timeout** during `final_drain`; **no** new **`pa_e_capture_report.json`**; **no** new **`Shot*.png`** under **`Saved/Screenshots/PA_E/`**. KNOWN_ERRORS + AUTOMATION_GAPS + [DEFECT_PA_E](../Docs/qa/DEFECT_PA_E_shot_capture_automation.md). Gap **OPEN**; pre-#161 rung-1 variants exhausted on that prove — **#161** adds doc-ordered ladder + **330s** wait; DESKTOP re-prove still required. **No PASS claim.**
