@@ -836,20 +836,22 @@ def _release_main_entry() -> None:
     _MAIN_ENTRY_ACTIVE = False
 
 
+def reset_mrq_session_guards() -> None:
+    """Clear stale orchestrator flags so MCP re-prove does not no-op (DESKTOP prove PASS)."""
+    global _ACTIVE_DRIVER, _MAIN_ENTRY_ACTIVE
+    driver = _ACTIVE_DRIVER
+    if driver is not None:
+        try:
+            driver._unregister_tick()
+        except Exception:
+            pass
+    _ACTIVE_DRIVER = None
+    _MAIN_ENTRY_ACTIVE = False
+
+
 def main() -> None:
     global _ACTIVE_DRIVER, _MAIN_ENTRY_ACTIVE
-    if _MAIN_ENTRY_ACTIVE:
-        _log("main skipped — entry already active", {})
-        return
-    if _ACTIVE_DRIVER is not None and _ACTIVE_DRIVER.phase not in (
-        _Phase.DONE,
-        _Phase.IDLE,
-    ):
-        _log(
-            "main skipped — orchestrator already active",
-            {"phase": _ACTIVE_DRIVER.phase.value},
-        )
-        return
+    reset_mrq_session_guards()
     _MAIN_ENTRY_ACTIVE = True
     _log("started")
     keep_ok = False

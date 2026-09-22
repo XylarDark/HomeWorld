@@ -195,6 +195,21 @@ SHOT_FRAMING_EXCLUDE: dict[str, tuple[str, ...]] = {
 SHOT2_CABIN_AIM_NEEDLES: tuple[str, ...] = SHOT_AIM_PRIMARY_NEEDLES["shot2"]
 SHOT_CAMERA_Z_MARGIN_UU = 120.0
 
+# DESKTOP prove PASS (2026-09-22): VS_MVP CAM_Hero in UU (P6_FIX meters (−9, −4, 5.8) — not +4 on Y).
+SHOT1_DOC_LOCATION_UU = (-900.0, -400.0, 580.0)
+SHOT1_LOOKAT_NEEDLES: tuple[str, ...] = (
+    "DRESS_SM_Island",
+    "SM_Island",
+    "DRESS_SM_Lookout",
+    "SM_Lookout",
+    "Lookout",
+    "DRESS_SM_Cabin",
+    "SM_Cabin",
+)
+# Cabin dress anchor + offset UU (look-at cabin centroid).
+SHOT2_CABIN_OFFSET_UU = (250.0, -550.0, 280.0)
+SHOT_POSE_MAX_ABS_XY_UU = 3000.0
+
 # Expected camera–dress-centroid distance (UU) for aim_ok when ray hits AABB (grazing edge hits ≠ hero framing).
 SHOT_AIM_DISTANCE_UU: dict[str, tuple[float, float]] = {
     "shot1": (350.0, 3200.0),  # CAM_Hero doc meters ≈ 1.1k UU to dress mass
@@ -877,6 +892,30 @@ def _clamp_camera_z_above_dress(
     return loc
 
 
+def _clamp_camera_pose_loc(
+    loc: "unreal.Vector",
+    bounds: dict[str, Any],
+    meta: dict[str, Any],
+    *,
+    margin_uu: float = SHOT_CAMERA_Z_MARGIN_UU,
+    max_abs_xy: float = SHOT_POSE_MAX_ABS_XY_UU,
+) -> "unreal.Vector":
+    """Clamp Z above dress and |X|/|Y| — raw extent math produced Z≪0 and |Y|>3000 on DESKTOP."""
+    loc = _clamp_camera_z_above_dress(loc, bounds, meta, margin_uu=margin_uu)
+    x, y, z = loc.x, loc.y, loc.z
+    clamped = False
+    if abs(x) > max_abs_xy:
+        x = max(-max_abs_xy, min(max_abs_xy, x))
+        clamped = True
+    if abs(y) > max_abs_xy:
+        y = max(-max_abs_xy, min(max_abs_xy, y))
+        clamped = True
+    if clamped:
+        meta["camera_xy_clamped"] = {"max_abs_xy_uu": max_abs_xy, "to": [x, y]}
+        loc = unreal.Vector(x, y, z)
+    return loc
+
+
 def combined_bounds_from_actors(actors: list) -> Optional[dict[str, Any]]:
     if not actors:
         return None
@@ -1030,52 +1069,55 @@ def _camera_pose_from_bounds(
     bounds: dict[str, Any],
     shot: Optional[dict[str, Any]] = None,
 ) -> tuple[Any, Any, dict[str, Any]]:
-    """Relocate CAM to a shot-specific pose, then look_at dress centroid (aim_bounds primary needles).
-
-    Post-#172 DESKTOP: extent-scaled offsets could pass forward_ray_hits_dress_aabb while the dress
-    mass sat off-frame (fence/rock scrap on the right). Shot1 uses CAM_Hero doc meters + look_at.
-    Shot2 uses cabin-only centroid + doc XY; Z clamped above dress min (Garden/Path pulled Z void).
-    """
+    """Production PA-E poses (DESKTOP prove PASS): hard doc hero / cabin anchor — not raw extent math."""
     meta: dict[str, Any] = {"pose_source": "homestead_bounds_relocate"}
     shot = shot or _shot_def(shot_id)
-    pose_bounds = bounds
+
+    if shot_id == "shot1":
+        look_bounds = bounds_for_needles(SHOT1_LOOKAT_NEEDLES, "shot1") or bounds
+        target = _vector_from_list(look_bounds["centroid"])
+        loc = unreal.Vector(*SHOT1_DOC_LOCATION_UU)
+        meta["pose_source"] = "hard_doc_hero"
+        meta["pose_method"] = "hard_doc_cam_hero_uu_look_at_island_lookout_cabin_midpoint"
+        meta["doc_location_uu"] = list(SHOT1_DOC_LOCATION_UU)
+        if shot:
+            meta["doc_location_m"] = list(shot.get("fallback_location_m") or (-9.0, -4.0, 5.8))
+        loc = _clamp_camera_pose_loc(loc, look_bounds, meta)
+        rot = look_at_rotation(loc, target)
+        meta["target_centroid"] = look_bounds["centroid"]
+        meta["look_at_needles"] = "island_lookout_cabin"
+        meta["camera_location"] = [loc.x, loc.y, loc.z]
+        meta["camera_rotation"] = [rot.pitch, rot.yaw, rot.roll]
+        return loc, rot, meta
+
     if shot_id == "shot2":
-        cabin_b = bounds_for_needles(SHOT2_CABIN_AIM_NEEDLES, "shot2")
-        if cabin_b:
-            pose_bounds = cabin_b
-            meta["aim_centroid_source"] = "cabin_only"
-        else:
-            meta["aim_centroid_source"] = "aim_bounds_fallback"
-    c = pose_bounds["centroid"]
-    ext = pose_bounds["extent"]
-    target = _vector_from_list(c)
-    if shot_id == "shot1" and shot and shot.get("fallback_location_m"):
-        # P6_FIX / CAM_Hero: (-9, -4, 5.8) m — proven hero vista; rotate to live dress centroid only.
-        loc = meters_to_ue(tuple(shot["fallback_location_m"]))
-        meta["pose_method"] = "shot1_cam_hero_doc_meters_look_at_dress_centroid"
-        meta["doc_location_m"] = list(shot["fallback_location_m"])
-        loc = _clamp_camera_z_above_dress(loc, pose_bounds, meta)
-    elif shot_id == "shot2" and shot and shot.get("fallback_location_m"):
-        doc = meters_to_ue(tuple(shot["fallback_location_m"]))
-        # Doc XY for cabin-close framing; Z never below cabin dress floor + margin.
-        loc = _clamp_camera_z_above_dress(
-            unreal.Vector(doc.x, doc.y, doc.z),
-            pose_bounds,
-            meta,
-        )
-        meta["pose_method"] = "shot2_cabin_centroid_doc_xy_z_clamped"
-        meta["doc_location_m"] = list(shot["fallback_location_m"])
-    else:
-        loc = unreal.Vector(
-            target.x - ext[0] * 1.2,
-            target.y - ext[1] * 0.9,
-            target.z + ext[2] + 250.0,
-        )
-        meta["pose_method"] = "generic_extent_offset_fallback"
-        loc = _clamp_camera_z_above_dress(loc, pose_bounds, meta)
+        cabin_bounds = bounds_for_needles(SHOT2_CABIN_AIM_NEEDLES, "shot2") or bounds
+        c = cabin_bounds["centroid"]
+        target = _vector_from_list(c)
+        ox, oy, oz = SHOT2_CABIN_OFFSET_UU
+        loc = unreal.Vector(c[0] + ox, c[1] + oy, c[2] + oz)
+        meta["pose_source"] = "hard_cabin_close"
+        meta["pose_method"] = "hard_cabin_anchor_offset_look_at_cabin_centroid"
+        meta["cabin_offset_uu"] = list(SHOT2_CABIN_OFFSET_UU)
+        meta["aim_centroid_source"] = "cabin_only"
+        loc = _clamp_camera_pose_loc(loc, cabin_bounds, meta)
+        rot = look_at_rotation(loc, target)
+        meta["target_centroid"] = c
+        meta["camera_location"] = [loc.x, loc.y, loc.z]
+        meta["camera_rotation"] = [rot.pitch, rot.yaw, rot.roll]
+        return loc, rot, meta
+
+    ext = bounds["extent"]
+    target = _vector_from_list(bounds["centroid"])
+    loc = unreal.Vector(
+        target.x - ext[0] * 1.2,
+        target.y - ext[1] * 0.9,
+        target.z + ext[2] + 250.0,
+    )
+    meta["pose_method"] = "generic_extent_offset_fallback"
+    loc = _clamp_camera_pose_loc(loc, bounds, meta)
     rot = look_at_rotation(loc, target)
-    meta["target_centroid"] = c
-    meta["pose_bounds_min_z"] = (pose_bounds.get("min") or [None, None, None])[2]
+    meta["target_centroid"] = bounds["centroid"]
     meta["camera_location"] = [loc.x, loc.y, loc.z]
     meta["camera_rotation"] = [rot.pitch, rot.yaw, rot.roll]
     return loc, rot, meta
@@ -1125,7 +1167,9 @@ def resolve_camera_transform(shot: dict, cam) -> tuple[Any, Any, dict[str, Any]]
             align = camera_forward_alignment(loc, rot, target, dress_bounds=bounds, shot_id=shot_id)
             meta["aim_after_bounds_relocate"] = align
             meta["pose_source"] = bounds_pose_meta.get("pose_source", "homestead_bounds_relocate")
-            if bounds_pose_meta.get("doc_location_m"):
+            if bounds_pose_meta.get("pose_source") in ("hard_doc_hero", "hard_cabin_close"):
+                meta["pose_source"] = bounds_pose_meta["pose_source"]
+            elif bounds_pose_meta.get("doc_location_m"):
                 meta["pose_source"] = "shotlist_doc_fallback_relocate"
             if not align.get("aim_ok"):
                 clamp_b = bounds
@@ -1133,11 +1177,26 @@ def resolve_camera_transform(shot: dict, cam) -> tuple[Any, Any, dict[str, Any]]
                     cabin_b = bounds_for_needles(SHOT2_CABIN_AIM_NEEDLES, "shot2")
                     if cabin_b:
                         clamp_b = cabin_b
-                loc_doc = _clamp_camera_z_above_dress(
-                    meters_to_ue(tuple(shot["fallback_location_m"])),
-                    clamp_b,
-                    meta,
-                )
+                if shot_id == "shot1":
+                    loc_doc = _clamp_camera_pose_loc(
+                        unreal.Vector(*SHOT1_DOC_LOCATION_UU),
+                        clamp_b,
+                        meta,
+                    )
+                elif shot_id == "shot2":
+                    cc = clamp_b.get("centroid") or [0, 0, 0]
+                    ox, oy, oz = SHOT2_CABIN_OFFSET_UU
+                    loc_doc = _clamp_camera_pose_loc(
+                        unreal.Vector(cc[0] + ox, cc[1] + oy, cc[2] + oz),
+                        clamp_b,
+                        meta,
+                    )
+                else:
+                    loc_doc = _clamp_camera_pose_loc(
+                        meters_to_ue(tuple(shot["fallback_location_m"])),
+                        clamp_b,
+                        meta,
+                    )
                 rot_doc = look_at_rotation(loc_doc, target)
                 err_doc = _apply_camera_transform(cam, loc_doc, rot_doc)
                 if err_doc:
