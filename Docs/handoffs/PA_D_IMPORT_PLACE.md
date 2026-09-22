@@ -92,6 +92,12 @@ Dress script: [place_vs_mvp_dress.py](../../Content/Python/place_vs_mvp_dress.py
 
 ---
 
+## Blockers
+
+- PA-E Shot 1/2 automation unreliable (Cmd HighResShot / host grab) — **Lead manual viewport capture**; see [DEFECT_PA_E_shot_capture_automation.md](../qa/DEFECT_PA_E_shot_capture_automation.md), [docs/KNOWN_ERRORS.md](../../docs/KNOWN_ERRORS.md) and [docs/Automation/AUTOMATION_GAPS.md](../../docs/Automation/AUTOMATION_GAPS.md) (2026-09-22 backfill). **Not CLOSED** on this pointer alone.
+
+---
+
 ## Gate
 
 Lead **`APPROVE PA-D`** grants DESKTOP import/place work only. **PA-D CLOSED** requires DESKTOP evidence + Conductor stamp (or Lead **`APPROVE PA-E`** prep complete). **PA track** closes on **PA-E**, not PA-D.
