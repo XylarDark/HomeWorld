@@ -364,6 +364,10 @@ class _ShotlistOrchestrator:
         else:
             _log("capture missing after slate wait", {"dest": self._dest_abs})
         validation = _validate_png(resolved)
+        validation = common.finalize_shot_validation(
+            validation, shot["id"], cap.get("pose") if isinstance(cap.get("pose"), dict) else None
+        )
+        harness_pass = bool(validation.get("harness_pass"))
         desktop = _copy_to_desktop(resolved, shot["filename"]) if resolved else {"copied": False}
         entry = {
             "id": shot["id"],
@@ -386,7 +390,8 @@ class _ShotlistOrchestrator:
             "pose": cap.get("pose"),
             "validation": validation,
             "desktop_copy": desktop,
-            "pass": bool(validation.get("pass")),
+            "harness_pass": harness_pass,
+            "pass": harness_pass,
         }
         self.results.append(entry)
         _log("shot done", {"id": shot["id"], "pass": entry["pass"], "bytes": validation.get("bytes")})
@@ -415,10 +420,13 @@ class _ShotlistOrchestrator:
             entry["wait_final"] = wait_meta
             if resolved:
                 validation = _validate_png(resolved)
+                pose = entry.get("pose") if isinstance(entry.get("pose"), dict) else None
+                validation = common.finalize_shot_validation(validation, entry["id"], pose)
                 entry["validation"] = validation
                 entry["saved_path"] = resolved
                 entry["desktop_copy"] = _copy_to_desktop(resolved, entry["filename"])
-                entry["pass"] = bool(validation.get("pass"))
+                entry["harness_pass"] = bool(validation.get("harness_pass"))
+                entry["pass"] = entry["harness_pass"]
         if now >= self._final_drain_deadline:
             for entry in self.results:
                 if entry.get("pass"):
@@ -428,10 +436,13 @@ class _ShotlistOrchestrator:
                 resolved = _find_fresh_capture_path(dest, since)
                 if resolved:
                     validation = _validate_png(resolved)
+                    pose = entry.get("pose") if isinstance(entry.get("pose"), dict) else None
+                    validation = common.finalize_shot_validation(validation, entry["id"], pose)
                     entry["validation"] = validation
                     entry["saved_path"] = resolved
                     entry["desktop_copy"] = _copy_to_desktop(resolved, entry["filename"])
-                    entry["pass"] = bool(validation.get("pass"))
+                    entry["harness_pass"] = bool(validation.get("harness_pass"))
+                    entry["pass"] = entry["harness_pass"]
                     entry["wait_final"] = entry.get("wait_final") or {}
                     entry["wait_final"]["final_authoritative"] = True
             _log("final_drain done")

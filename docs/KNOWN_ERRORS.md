@@ -12,6 +12,8 @@ One-line **Cause→Avoid** rows; narratives → [DEFECT_PA_E](../Docs/qa/DEFECT_
 - **Unreal off game thread:** `capture_shotlist_mrq.main()` on `threading.Thread` → MCP `execute_python_script` on game thread only.
 - **MCP disconnect ≠ Editor dead:** long MRQ run dropped MCP TCP → verify Editor process, port 55557, report/PNG mtimes before relaunch.
 - **Aim ok ≠ visual:** `homestead_bounds_relocate` + ray hit but ~90% black / scrap framing → `ready`/`aim_ok` ≠ PASS; center-crop assert; fix pose toward cabin/island center.
+- **Luminance ≠ framing:** center-crop/mean PASS without wide anchor + `aim_ok` → **`capture_outcome: soft_fail`**; **`capture_pass`** is harness-only — Lead eyeball for visual (`lead_visual_framing_approved`).
+- **Binary capture_pass false PASS:** treat **`capture_outcome`** + **`visual_framing_pass`**; near-black ⇒ **`soft_fail`**, not closed FAIL unless **`void_still_after_visible_sky_stack`**.
 - **Stale Sequencer vs live Arrange:** MRQ Level Sequence possessable Transform on `CAM_*` stale after live relocate → spawn/update `PA_E_MRQ_{shot}` at resolved pose or rebuild possessable and clear tracks.
 - **Dirty prove patch:** uncommitted `pa_e_shotlist_common.py` during prove → `git checkout <sha> -- Content/Python/pa_e_shotlist_common.py` after merge.
 

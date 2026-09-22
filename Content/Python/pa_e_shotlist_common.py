@@ -19,6 +19,12 @@ except ImportError:
     unreal = None  # type: ignore
 
 LEVEL_PATH = "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers"
+MARKERS_WORLD_TOKEN = "L_VS_MVP_Markers"
+
+# Three-state capture outcome (P1 harness) — see derive_capture_outcome().
+CAPTURE_OUTCOME_PASS = "pass"
+CAPTURE_OUTCOME_SOFT_FAIL = "soft_fail"
+CAPTURE_OUTCOME_CLOSED_FAIL = "closed_fail"
 CINEMATICS_PA_E_DIR = "/Game/HomeWorld/Cinematics/PA_E"
 RES_X, RES_Y = 1920, 1080
 MIN_BYTES = 50 * 1024
@@ -128,6 +134,9 @@ PROVE_CRITERIA = {
     "max_fraction_pure_black_l0": MIN_FRACTION_PURE_BLACK_L0,
     "shot_pair_max_mse_at_compare_size": SHOT_PAIR_MAX_MSE,
     "file_exists_alone_is_not_pass": True,
+    "luminance_pass_is_not_framing_pass": True,
+    "lead_eyeball_required_for_visual_framing": True,
+    "capture_pass_is_harness_only_not_visual_pass": True,
     "black_stills_not_closed_fail": True,
     "night_readable_requires_preset_tune": True,
     "preset_canon": "Lib/07_Night_SpiritLayer/PRESET_Homestead_Night.md",
@@ -355,6 +364,103 @@ def find_camera(needles: tuple[str, ...]):
         if any(n in label or n in name for n in needle_l):
             return a
     return None
+
+
+def reload_pa_e_capture_python_modules() -> dict[str, Any]:
+    """Reload stale Editor Python modules before MRQ prove (VNP AttributeError on apply_mrq_pie_*)."""
+    import importlib
+    import sys
+
+    out: dict[str, Any] = {"reloaded": [], "errors": {}}
+    for mod_name in ("vnp_night_tune_and_evidence", "pa_e_shotlist_common"):
+        if mod_name not in sys.modules:
+            continue
+        try:
+            importlib.reload(sys.modules[mod_name])
+            out["reloaded"].append(mod_name)
+        except Exception as e:
+            out["errors"][mod_name] = str(e)
+    out["vnp_has_mrq_pie_stack"] = hasattr(
+        sys.modules.get("vnp_night_tune_and_evidence", object()),
+        "apply_mrq_pie_homestead_night_stack",
+    )
+    return out
+
+
+def editor_world_markers_status() -> dict[str, Any]:
+    """Current editor world path must contain L_VS_MVP_Markers for PA-E capture."""
+    import level_loader
+
+    path = level_loader.get_current_level_path()
+    label = ""
+    try:
+        world = level_loader.get_editor_world()
+        if world and hasattr(world, "get_name"):
+            label = str(world.get_name())
+    except Exception as e:
+        return {"ok": False, "error": str(e), "level_path": path}
+    combined = f"{path or ''} {label}"
+    ok = MARKERS_WORLD_TOKEN in combined
+    return {
+        "ok": ok,
+        "level_path": path,
+        "world_name": label,
+        "expected_token": MARKERS_WORLD_TOKEN,
+        "level_path_expected": LEVEL_PATH,
+    }
+
+
+def ensure_markers_editor_world(log_prefix: str = "") -> dict[str, Any]:
+    """Reload Markers map when editor world name/path does not contain L_VS_MVP_Markers."""
+    status = editor_world_markers_status()
+    if status.get("ok"):
+        status["reloaded"] = False
+        return status
+    status["reloaded"] = False
+    status["reload_attempted"] = True
+    loaded = load_level(log_prefix)
+    status["reload_ok"] = loaded
+    after = editor_world_markers_status()
+    status["after_reload"] = after
+    status["ok"] = bool(loaded and after.get("ok"))
+    if not status["ok"] and log_prefix:
+        log(log_prefix, "markers world gate failed", status)
+    return status
+
+
+def conductor_mrq_capture_preflight(log_prefix: str = "") -> dict[str, Any]:
+    """Blocking in-editor gates before MRQ main() Act — token-lean; see CAPTURE_REDUNDANCY.md."""
+    import vnp_night_tune_and_evidence as vnp
+
+    module_reload = reload_pa_e_capture_python_modules()
+    world_gate = ensure_markers_editor_world(log_prefix)
+    night_path_ok = all(
+        hasattr(vnp, name)
+        for name in (
+            "apply_homestead_night_tune",
+            "verify_homestead_night_lighting_stack",
+            "apply_mrq_pie_homestead_night_stack",
+            "reseed_pa_e_tmp_night_fixtures",
+        )
+    )
+    blocked: list[str] = []
+    if not world_gate.get("ok"):
+        blocked.append("wrong_editor_world")
+    if not night_path_ok:
+        blocked.append("vnp_night_stack_api_missing")
+    if module_reload.get("errors"):
+        blocked.append("module_reload_errors")
+    preflight = {
+        "ready": len(blocked) == 0,
+        "blocked_reasons": blocked,
+        "module_reload": module_reload,
+        "world_gate": world_gate,
+        "night_stack_api_ok": night_path_ok,
+        "doc": "docs/Automation/CAPTURE_REDUNDANCY.md",
+    }
+    if log_prefix:
+        log(log_prefix, "conductor_mrq_preflight", {"ready": preflight["ready"], "blocked": blocked})
+    return preflight
 
 
 def load_level(log_prefix: str) -> bool:
@@ -732,8 +838,151 @@ def _mark_prove_loop_in_progress(out: dict[str, Any], error: str) -> None:
     out["prove_loop"] = list(LEAD_PROVE_LOOP)
 
 
+def evaluate_framing_intent(
+    shot_id: str,
+    pose_meta: Optional[dict[str, Any]] = None,
+) -> dict[str, Any]:
+    """Framing-intent gate — luminance PASS is not framing PASS; Lead eyeball required for visual."""
+    meta = pose_meta or {}
+    inv = meta.get("prove_loop_step1_inventory") or inventory_homestead_in_level(shot_id)
+    pose_source = str(meta.get("pose_source") or "")
+    aim_meta = (
+        meta.get("aim_after")
+        or meta.get("aim_after_bounds_relocate")
+        or meta.get("aim_after_doc_fallback")
+        or meta.get("aim_before")
+        or {}
+    )
+    aim_ok = bool(aim_meta.get("aim_ok"))
+    ray_hits = aim_meta.get("forward_ray_hits_dress_aabb")
+    wide_anchor = pose_source in _WIDE_ANCHOR_POSE_SOURCES
+    acceptable_pose = wide_anchor or pose_source in (
+        "homestead_bounds_relocate",
+        "in_level_camera_aim_at_bounds",
+        "wide_hero_anchor",
+        "wide_cabin_anchor",
+    )
+    framing_intent_ok = bool(
+        inv.get("inventory_ok")
+        and inv.get("aim_bounds_ok")
+        and inv.get("framing_ok")
+        and aim_ok
+        and acceptable_pose
+        and ray_hits is not False
+    )
+    lead_approved = bool(meta.get("lead_visual_framing_approved"))
+    return {
+        "shot_id": shot_id,
+        "pose_source": pose_source,
+        "wide_anchor_pose": wide_anchor,
+        "aim_ok": aim_ok,
+        "forward_ray_hits_dress_aabb": ray_hits,
+        "framing_intent_ok": framing_intent_ok,
+        "lead_eyeball_required": True,
+        "lead_visual_framing_approved": lead_approved,
+        "visual_framing_pass": bool(lead_approved and framing_intent_ok),
+        "luminance_is_not_framing_pass": True,
+        "stamp": "Lead eyeball required for visual framing PASS — automation may not claim visual PASS alone.",
+    }
+
+
+def finalize_shot_validation(
+    validation: dict[str, Any],
+    shot_id: str,
+    pose_meta: Optional[dict[str, Any]] = None,
+) -> dict[str, Any]:
+    """Merge luminance assert + framing intent; set harness_pass and closed_fail evidence."""
+    framing = evaluate_framing_intent(shot_id, pose_meta)
+    validation["framing_intent"] = framing
+    validation["lead_eyeball_required"] = framing["lead_eyeball_required"]
+    validation["visual_framing_pass"] = framing["visual_framing_pass"]
+    lum_pass = bool(validation.get("luminance_pass"))
+    if not lum_pass and validation.get("error") is None and validation.get("mean_luminance") is not None:
+        lum_pass = True
+        validation["luminance_pass"] = True
+    harness_pass = lum_pass and framing["framing_intent_ok"]
+    validation["harness_pass"] = harness_pass
+    validation["pass"] = harness_pass
+    validation["capture_pass_semantics"] = (
+        "harness_luminance_plus_framing_intent_not_visual_framing"
+    )
+
+    night_block = (pose_meta or {}).get("mrq_pie_night_reapply") or (pose_meta or {}).get(
+        "editor_prep", {}
+    )
+    stack = night_block if isinstance(night_block, dict) else {}
+    if isinstance(stack.get("mrq_pie_night_stack"), dict):
+        stack = stack["mrq_pie_night_stack"]
+    err = validation.get("error")
+    if err in ("near_black", "center_crop_near_black", "mostly_pure_black"):
+        if stack.get("visible_sky_stack_ok") and stack.get("stack_ok"):
+            validation["closed_fail"] = True
+            validation["error"] = "void_still_after_visible_sky_stack"
+            validation["prove_loop_status"] = "blocked"
+            validation["pass"] = False
+            validation["harness_pass"] = False
+        else:
+            validation.setdefault("closed_fail", False)
+            validation.setdefault("prove_loop_status", "in_progress")
+    if lum_pass and not framing["framing_intent_ok"]:
+        if framing.get("forward_ray_hits_dress_aabb") is False or not framing.get("aim_ok"):
+            validation["closed_fail"] = True
+            validation["error"] = validation.get("error") or "framing_aim_proven_miss"
+            validation["prove_loop_status"] = "blocked"
+            validation["pass"] = False
+            validation["harness_pass"] = False
+    return validation
+
+
+def derive_capture_outcome(
+    *,
+    harness_pass: bool,
+    visual_framing_pass: bool,
+    closed_fail: bool,
+    prove_loop_status: str,
+) -> str:
+    if closed_fail:
+        return CAPTURE_OUTCOME_CLOSED_FAIL
+    if harness_pass and visual_framing_pass:
+        return CAPTURE_OUTCOME_PASS
+    if prove_loop_status == "blocked" and not closed_fail:
+        return CAPTURE_OUTCOME_SOFT_FAIL
+    return CAPTURE_OUTCOME_SOFT_FAIL
+
+
+def capture_outcome_report_fields(
+    *,
+    harness_pass: bool,
+    visual_framing_pass: bool,
+    closed_fail: bool,
+    prove_loop_status: str,
+) -> dict[str, Any]:
+    outcome = derive_capture_outcome(
+        harness_pass=harness_pass,
+        visual_framing_pass=visual_framing_pass,
+        closed_fail=closed_fail,
+        prove_loop_status=prove_loop_status,
+    )
+    ok = outcome == CAPTURE_OUTCOME_PASS
+    return {
+        "capture_outcome": outcome,
+        "capture_outcome_open": outcome == CAPTURE_OUTCOME_SOFT_FAIL,
+        "ok": ok,
+        "capture_pass": harness_pass,
+        "capture_pass_is_harness_not_visual": True,
+        "visual_framing_pass": visual_framing_pass,
+        "closed_fail": closed_fail,
+        "prove_loop_status": prove_loop_status,
+        "capture_outcome_semantics": {
+            "pass": "Harness + Lead-approved visual framing (lead_visual_framing_approved)",
+            "soft_fail": "Inconclusive / harness-only / missing preconditions — capture_pass ≠ visual PASS",
+            "closed_fail": "Proved wrong (wrong world, void after visible sky stack, aim miss)",
+        },
+    }
+
+
 def validate_png(path: Optional[str]) -> dict:
-    out: dict[str, Any] = {"path": path, "pass": False}
+    out: dict[str, Any] = {"path": path, "pass": False, "luminance_pass": False}
     if not path or not os.path.isfile(path):
         out["error"] = "file_missing"
         return out
@@ -774,8 +1023,10 @@ def validate_png(path: Optional[str]) -> dict:
     if frac_black is not None and frac_black > MIN_FRACTION_PURE_BLACK_L0:
         _mark_prove_loop_in_progress(out, "mostly_pure_black")
         return out
-    out["pass"] = True
-    out["prove_loop_status"] = "complete"
+    out["luminance_pass"] = True
+    out["pass"] = False
+    out["prove_loop_status"] = "in_progress"
+    out["note"] = "Luminance gates cleared — call finalize_shot_validation() for framing + harness_pass."
     return out
 
 
@@ -1457,8 +1708,14 @@ def write_homestead_capture_diagnostic(
 
 
 def summarize_capture_report(shots: list[dict[str, Any]]) -> dict[str, Any]:
-    """Report-level status: ok = capture PASS; near-black / speckle is not closed_fail."""
-    capture_pass = bool(shots) and all(r.get("pass") for r in shots)
+    """Report-level status: three-state capture_outcome; capture_pass = harness only (not visual)."""
+    harness_pass = bool(shots) and all(
+        r.get("harness_pass") if "harness_pass" in r else r.get("pass") for r in shots
+    )
+    visual_framing_pass = bool(shots) and all(
+        (r.get("validation") or {}).get("visual_framing_pass") for r in shots
+    )
+    capture_pass = harness_pass
     closed_fail = False
     setup_quality_errors = (
         "near_black",
@@ -1469,6 +1726,12 @@ def summarize_capture_report(shots: list[dict[str, Any]]) -> dict[str, Any]:
         "global_mean_false_pass_speckle",
         "shots_identical_hash",
         "shots_near_identical",
+        "framing_intent_failed",
+    )
+    closed_fail_errors = (
+        "void_still_after_visible_sky_stack",
+        "framing_aim_proven_miss",
+        "wrong_editor_world",
     )
     setup_only = True
     for r in shots:
@@ -1478,9 +1741,13 @@ def summarize_capture_report(shots: list[dict[str, Any]]) -> dict[str, Any]:
             setup_only = False
             break
         err = validation.get("error") or r.get("error")
+        if err in closed_fail_errors:
+            closed_fail = True
+            setup_only = False
+            continue
         if err in setup_quality_errors:
             continue
-        if not r.get("pass"):
+        if not r.get("pass") and not r.get("harness_pass", r.get("pass")):
             setup_only = False
             if err not in (None, *setup_quality_errors):
                 closed_fail = True
@@ -1489,8 +1756,10 @@ def summarize_capture_report(shots: list[dict[str, Any]]) -> dict[str, Any]:
     shot_pair = validate_shot_pair_diversity(pair_paths)
     if not shot_pair.get("pass"):
         capture_pass = False
+        harness_pass = False
         for r in shots:
             r["pass"] = False
+            r["harness_pass"] = False
             validation = r.setdefault("validation", {})
             if validation.get("pass"):
                 validation["pass"] = False
@@ -1500,25 +1769,29 @@ def summarize_capture_report(shots: list[dict[str, Any]]) -> dict[str, Any]:
                 validation["closed_fail"] = False
         setup_only = setup_only and shot_pair.get("error") in setup_quality_errors
 
-    if capture_pass:
+    if harness_pass and visual_framing_pass and not closed_fail:
         prove_loop_status = "complete"
-    elif setup_only and not closed_fail:
-        prove_loop_status = "in_progress"
     elif closed_fail:
         prove_loop_status = "blocked"
+    elif setup_only and not closed_fail:
+        prove_loop_status = "in_progress"
     else:
         prove_loop_status = "in_progress"
+
+    outcome_fields = capture_outcome_report_fields(
+        harness_pass=harness_pass,
+        visual_framing_pass=visual_framing_pass,
+        closed_fail=closed_fail,
+        prove_loop_status=prove_loop_status,
+    )
     return {
-        "ok": capture_pass,
-        "capture_pass": capture_pass,
-        "closed_fail": closed_fail,
-        "prove_loop_status": prove_loop_status,
+        **outcome_fields,
         "shot_pair_validation": shot_pair,
-        "black_stills_not_closed_fail": True,
+        "black_stills_not_closed_fail": not closed_fail,
         "lead_rule": (
             "Do not treat near-black / speckle / identical wrong stills as closed FAIL — "
             "complete LEAD_PROVE_LOOP (inventory → aim → lighting → capture/inspect → bug-fix) "
-            "before claiming success."
+            "before claiming success. Luminance PASS ≠ framing PASS; Lead eyeball for visual."
         ),
     }
 
@@ -1563,8 +1836,9 @@ def desktop_conductor_checklist() -> list[str]:
         "Lead prove loop: (1) inventory homestead in level, (2) aim cameras at bounds centroids, "
         "(3) capture+inspect luminance, (4) bug-fix until lit — near-black is NOT closed FAIL.",
         "Run execute_python_script('pa_e_homestead_capture_diagnostic.py') → Saved/pa_e_homestead_capture_diagnostic.json",
-        "Confirm report homestead_night_environment: Phase 2 + night tune + lighting_stack_verify.stack_ok "
-        "(PRESET_Homestead_Night.md; Phase 2 alone insufficient — do not switch to day for black stills)",
+        "Confirm report homestead_night_environment: Phase 2 + night tune + visible_sky_stack_ok "
+        "(height fog + atmo; stack_ok alone insufficient — PRESET_Homestead_Night.md)",
+        "Run conductor_mrq_capture_preflight gates (world L_VS_MVP_Markers, VNP module reload) before MRQ main().",
         "Safe-Build after MovieRenderPipeline plugins; confirm MRQ Python types import.",
         "If inventory_ok false: run place_vs_mvp_dress.py + batch_import on DESKTOP.",
         "Run execute_python_script('capture_shotlist.py'); read Saved/pa_e_capture_report.json prove_loop fields.",
@@ -1668,10 +1942,15 @@ def apply_pa_e_homestead_night_environment(
                 verify = vnp.verify_homestead_night_lighting_stack()
     block["night_tune"] = tune
     block["lighting_stack_verify"] = verify
+    visible_sky_ok: Optional[bool] = None
+    if mrq_pie_shot and isinstance(block.get("mrq_pie_night_stack"), dict):
+        visible_sky_ok = block["mrq_pie_night_stack"].get("visible_sky_stack_ok")
+        block["visible_sky_stack_ok"] = visible_sky_ok
+    stack_gate = verify.get("stack_ok")
+    if visible_sky_ok is not None:
+        stack_gate = bool(visible_sky_ok)
     block["environment_preconditions_ok"] = bool(
-        block["time_of_day"].get("applied")
-        and tune.get("ok")
-        and verify.get("stack_ok")
+        block["time_of_day"].get("applied") and tune.get("ok") and stack_gate
     )
     if not verify.get("stack_ok"):
         block["warning"] = (
@@ -1919,6 +2198,8 @@ def arrange_pa_e_shotlist(
 
     if not lighting.get("environment_preconditions_ok"):
         blocked_reasons.append("night_lighting_stack_incomplete")
+    if lighting.get("visible_sky_stack_ok") is False:
+        blocked_reasons.append("visible_sky_stack_incomplete")
 
     ready = len(blocked_reasons) == 0
     gate: dict[str, Any] = {
@@ -1963,11 +2244,14 @@ def write_blocked_capture_report(
     extra: Optional[dict[str, Any]] = None,
 ) -> str:
     """No capture attempted — prove-loop blocked, not closed FAIL."""
+    blocked_fields = capture_outcome_report_fields(
+        harness_pass=False,
+        visual_framing_pass=False,
+        closed_fail=False,
+        prove_loop_status="blocked",
+    )
     report: dict[str, Any] = {
-        "ok": False,
-        "capture_pass": False,
-        "closed_fail": False,
-        "prove_loop_status": "blocked",
+        **blocked_fields,
         "arrange_gate": arrange_gate,
         "arrange_gate_path": arrange_gate.get("written_path") or arrange_gate_path(),
         "blocked_reasons": arrange_gate.get("blocked_reasons") or [],

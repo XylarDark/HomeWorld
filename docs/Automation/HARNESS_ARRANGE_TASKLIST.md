@@ -15,7 +15,7 @@
 | P0-7 | Arrange: per-shot `aim_bounds` centroids, ray vs dress AABB, MRQ per-shot night reapply note | Done (follow-up PR) |
 | P0-8 | Arrange: bounds **relocate** CAM (not reaim-only); exclude Cliff from aim needles; ray required for `aim_ok` | PR (cloud) |
 
-**P1 (follow-up):** Three-state reports everywhere (`blocked` / `in_progress` / `pass`) with consistent `closed_fail` semantics across PIE harnesses and NF2-B evidence scripts.
+**P1 (follow-up):** Three-state **`capture_outcome`** (`pass` / `soft_fail` / `closed_fail`) + framing-intent gate + MRQ conductor preflight — **Done (PR)** in [pa_e_shotlist_common.py](../../Content/Python/pa_e_shotlist_common.py) + [capture_shotlist_mrq.py](../../Content/Python/capture_shotlist_mrq.py). Remaining: NF2-B evidence scripts parity.
 
 **P2 (follow-up):** Golden-image compare pipeline after a trusted capture path produces lit PNGs (Epic Screenshot Comparison Tool — scout only until Lead gate).
 
