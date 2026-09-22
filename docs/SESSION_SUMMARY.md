@@ -1,3 +1,7 @@
+## 2026-09-22 — PA-E MRQ visible sky iteration (post-#178 FAIL)
+
+- DESKTOP #178: PIE `stack_ok` but sky still void; **height_fog absent**. **Fix:** spawn/tune **ExponentialHeightFog** in PIE; atmo @ **world origin**; MRQ skylight **hemisphere fill** (skip early black recapture); warm-up **56/16**; full stack + recapture on Slate ticks during MRQ wait. Report **`visible_sky_stack_ok`**. Gap **OPEN** — DESKTOP re-prove top-band RGB.
+
 ## 2026-09-22 — PA-E MRQ PIE sky in render world (post-#177)
 
 - Post-#177 DESKTOP: **`mrq_pie_night_stack.ok`** but sky still void black; geometry lit. **Fix:** world-aware `apply_mrq_pie_homestead_night_stack` + **`apply_mrq_pie_homestead_night_stack_in_render_world`** during MRQ wait; PIE deferred spawn; **AtmosphereSunLightIndex 0**; centroid sanitize; `r.SupportSkyAtmosphere 1` on job. Gap **OPEN** — DESKTOP re-prove sky band RGB.

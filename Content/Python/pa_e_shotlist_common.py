@@ -34,8 +34,9 @@ DESKTOP_PA_E = r"C:\Users\User\Desktop\HomeWorld_PA_E"
 ONE_FRAME_START = 0
 ONE_FRAME_END = 1
 # MRQ warm-up (Epic MoviePipelineAntiAliasingSetting — engine + GPU discard frames)
-MRQ_ENGINE_WARMUP_COUNT = 32
-MRQ_RENDER_WARMUP_COUNT = 8
+# Extra warm-up so Slate pre-tick can apply PIE sky/fog stack before the one-frame still.
+MRQ_ENGINE_WARMUP_COUNT = 56
+MRQ_RENDER_WARMUP_COUNT = 16
 MRQ_CAMERA_CUT_PREROLL_FRAME = -32
 
 _PHASE_2_ALONE_INSUFFICIENT = (
@@ -232,11 +233,10 @@ def _look_target_for_pose_meta(
 
 
 MRQ_PIE_LIGHTING_NOTE = (
-    "MoviePipelinePIEExecutor renders a PIE world — Editor session TMP/atmo do not transfer. "
-    "Pre-job: reapply_night_environment_for_mrq_shot (Editor). During MRQ wait: "
-    "apply_mrq_pie_homestead_night_stack_in_render_world (PIE spawn + AtmosphereSunLightIndex 0 + "
-    "RecaptureSky + SkyAtmosphere + exposure/SupportSkyAtmosphere cvars). Void sky + lit geo = stack "
-    "never applied in PIE — not a day-phase fix."
+    "MoviePipelinePIEExecutor renders PIE — Editor TMP does not transfer. Pre-job: Editor reapply. "
+    "During MRQ wait (warm-up 56/16): repeat PIE stack ticks — ExponentialHeightFog + SkyAtmosphere "
+    "@ world origin + hemisphere skylight fill + AtmosphereSunLightIndex 0. Judge visible_sky_stack_ok "
+    "and top-band RGB, not stack_ok alone — not day phase."
 )
 
 SHOTS = (
