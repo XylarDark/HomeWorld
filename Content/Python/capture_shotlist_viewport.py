@@ -463,6 +463,7 @@ class _ShotlistOrchestrator:
             "driver_error": self._driver_error,
             "state_machine_phases": [p.value for p in _Phase],
             "lead_prove_loop": list(common.LEAD_PROVE_LOOP),
+            "universal_testing_preconditions": list(common.UNIVERSAL_TESTING_PRECONDITIONS),
             "homestead_diagnostic_script": "pa_e_homestead_capture_diagnostic.py",
             "policy": (
                 "AutomationLibrary + slate pre-tick wait (post-#163: blocking sleep freezes ticks); "
@@ -1127,12 +1128,7 @@ def main() -> None:
     level_ok = _load_level()
     viewport_prep = _set_lit_and_game_view()
     _settle_viewport_before_first_capture()
-
-    try:
-        unreal.SystemLibrary.execute_console_command(None, "hw.TimeOfDay.Phase 2")
-        viewport_prep["night_phase"] = 2
-    except Exception:
-        viewport_prep["night_phase"] = "skipped"
+    viewport_prep["time_of_day"] = common.apply_pa_e_shotlist_time_of_day(PREFIX)
 
     orch = _ShotlistOrchestrator(
         keep_ok=keep_ok,

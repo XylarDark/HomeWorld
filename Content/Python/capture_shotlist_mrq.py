@@ -322,6 +322,7 @@ class _MrqOrchestrator:
                 "AL near-black = OPEN viewport capture bug (wrong buffer/pose/game-view)"
             ),
             "lead_prove_loop": list(common.LEAD_PROVE_LOOP),
+            "universal_testing_preconditions": list(common.UNIVERSAL_TESTING_PRECONDITIONS),
             "homestead_diagnostic_path": common.homestead_diagnostic_path(),
             "homestead_diagnostic_script": "pa_e_homestead_capture_diagnostic.py",
             "prove_criteria": common.PROVE_CRITERIA,
@@ -688,17 +689,10 @@ def _start_pie_executor(subsystem, on_finished: Callable) -> tuple[bool, Any]:
         return False, executor
 
 
-def _set_night_phase(viewport_prep: dict[str, Any]) -> None:
-    try:
-        unreal.SystemLibrary.execute_console_command(None, "hw.TimeOfDay.Phase 2")
-        viewport_prep["night_phase"] = 2
-    except Exception:
-        viewport_prep["night_phase"] = "skipped"
-
-
 def _apply_mrq_scene_prep(viewport_prep: dict[str, Any]) -> None:
     viewport_prep["finish_loading"] = common.finish_loading_before_capture()
     viewport_prep.update(common.apply_lit_game_view_for_capture())
+    viewport_prep["time_of_day"] = common.apply_pa_e_shotlist_time_of_day(PREFIX)
 
 
 def main() -> None:
@@ -717,7 +711,6 @@ def main() -> None:
     level_ok = common.load_level(PREFIX)
     homestead_diag = common.write_homestead_capture_diagnostic(PREFIX)
     viewport_prep: dict[str, Any] = {"homestead_diagnostic": homestead_diag}
-    _set_night_phase(viewport_prep)
     _apply_mrq_scene_prep(viewport_prep)
 
     if not mrq_ok:

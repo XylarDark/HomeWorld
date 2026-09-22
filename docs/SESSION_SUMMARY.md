@@ -1,3 +1,7 @@
+## 2026-09-22 — Universal testing preconditions + explicit PA-E TOD (cloud, PR #167)
+
+- Lead lock-in: verify content in level, camera aim, lighting/TOD/view mode, then capture/inspect — stamped in CAPTURE_REDUNDANCY + `automation-standards.mdc` v1.5. PA-E capture: explicit **Night phase 2** per `Docs/00_SHOTLIST.md` Shot 1–2 via `apply_pa_e_shotlist_time_of_day`; report `viewport_prep.time_of_day` (replaces undocumented bare `night_phase`).
+
 ## 2026-09-22 — PA-E Lead prove loop + centroid diagnostic (cloud, PR #167)
 
 - **Hard rule:** near-black stills ⇒ **`closed_fail: false`**, **`prove_loop_status: in_progress`** — inventory → aim at homestead bounds → capture/inspect → bug-fix; not a closed FAIL while Lead sees lit geometry in viewport. [pa_e_shotlist_common.py](../Content/Python/pa_e_shotlist_common.py): `LEAD_PROVE_LOOP`, bounds-aim `resolve_camera_transform`, `summarize_capture_report`, `write_homestead_capture_diagnostic`. New [pa_e_homestead_capture_diagnostic.py](../Content/Python/pa_e_homestead_capture_diagnostic.py) for DESKTOP. MRQ report: `lead_prove_loop`, `homestead_diagnostic_path`. Docs: CAPTURE_REDUNDANCY 4-step bar, AUTOMATION_GAPS, KNOWN_ERRORS, DEFECT. Gap **OPEN** — DESKTOP lit stills + `ok: true`; no cloud PASS.

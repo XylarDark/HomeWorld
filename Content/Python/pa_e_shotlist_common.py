@@ -63,6 +63,43 @@ LEAD_PROVE_LOOP = (
     },
 )
 
+# Universal testing preconditions (Lead lock-in) — verify before trusting pass/fail.
+UNIVERSAL_TESTING_PRECONDITIONS = (
+    {
+        "step": 1,
+        "id": "content_in_level",
+        "action": "Required content/actors exist in the loaded level (not assumed from asset path alone).",
+    },
+    {
+        "step": 2,
+        "id": "camera_aim",
+        "action": "Cameras/viewport aimed at that content (bounds centroids), not void or wrong pilot.",
+    },
+    {
+        "step": 3,
+        "id": "lighting_tod_view",
+        "action": "Lighting, time-of-day phase, and view mode match shot/test intent; record phase/commands in report.",
+    },
+    {
+        "step": 4,
+        "id": "capture_inspect",
+        "action": "Capture or run harness, then inspect output (luminance, logs, artifacts) before PASS/FAIL claims.",
+    },
+)
+
+# PA-E Shot 1–2: homestead **night** per Docs/00_SHOTLIST.md (not day unless shotlist changes).
+PA_E_SHOTLIST_TIME_OF_DAY = {
+    "phase": 2,
+    "phase_name": "Night",
+    "console_command": "hw.TimeOfDay.Phase 2",
+    "shotlist_doc": "Docs/00_SHOTLIST.md",
+    "shotlist_intent": "Shot 1 homestead night lookout; Shot 2 cabin+garden close at night (warm windows vs moonlight).",
+    "note": (
+        "Use explicit phase in code/report — do not silently set night without documenting intent. "
+        "Day phase (0) only when shotlist or test doc requires day (e.g. Shot 4 planet day)."
+    ),
+}
+
 # Actors that must be present for step 1 (any match counts toward inventory).
 HOMESTEAD_INVENTORY_NEEDLES = (
     "DRESS_",
@@ -518,6 +555,7 @@ def write_homestead_capture_diagnostic(log_prefix: str = "pa_e_homestead_capture
     """Steps 1–2 snapshot: inventory + camera vs homestead centroids → Saved JSON."""
     payload: dict[str, Any] = {
         "lead_prove_loop": list(LEAD_PROVE_LOOP),
+        "universal_testing_preconditions": list(UNIVERSAL_TESTING_PRECONDITIONS),
         "prove_criteria": dict(PROVE_CRITERIA),
         "level_path": LEVEL_PATH,
         "shots": [build_shot_diagnostic(shot) for shot in SHOTS],
@@ -612,6 +650,7 @@ def desktop_conductor_checklist() -> list[str]:
         "Lead prove loop: (1) inventory homestead in level, (2) aim cameras at bounds centroids, "
         "(3) capture+inspect luminance, (4) bug-fix until lit — near-black is NOT closed FAIL.",
         "Run execute_python_script('pa_e_homestead_capture_diagnostic.py') → Saved/pa_e_homestead_capture_diagnostic.json",
+        "Confirm report time_of_day matches shotlist intent (PA-E shots 1–2: Night phase 2 per Docs/00_SHOTLIST.md)",
         "Safe-Build after MovieRenderPipeline plugins; confirm MRQ Python types import.",
         "If inventory_ok false: run place_vs_mvp_dress.py + batch_import on DESKTOP.",
         "Run execute_python_script('capture_shotlist.py'); read Saved/pa_e_capture_report.json prove_loop fields.",
@@ -629,6 +668,37 @@ def finish_loading_before_capture() -> dict[str, Any]:
     except Exception as e:
         meta["error"] = str(e)
     return meta
+
+
+def apply_time_of_day_phase(phase: int, log_prefix: str = "") -> dict[str, Any]:
+    """Apply hw.TimeOfDay.Phase N; return metadata for reports (testing precondition step 3)."""
+    cmd = f"hw.TimeOfDay.Phase {int(phase)}"
+    names = {0: "Day", 1: "Dusk", 2: "Night", 3: "Dawn"}
+    meta: dict[str, Any] = {
+        "phase": int(phase),
+        "phase_name": names.get(int(phase), "Unknown"),
+        "console_command": cmd,
+        "applied": False,
+    }
+    try:
+        unreal.SystemLibrary.execute_console_command(None, cmd)
+        meta["applied"] = True
+        if log_prefix:
+            log(log_prefix, "time_of_day applied", {"phase": meta["phase"], "name": meta["phase_name"]})
+    except Exception as e:
+        meta["error"] = str(e)
+        if log_prefix:
+            log(log_prefix, "time_of_day failed", {"error": str(e)})
+    return meta
+
+
+def apply_pa_e_shotlist_time_of_day(log_prefix: str = "") -> dict[str, Any]:
+    """Shotlist-aligned TOD for PA-E stills (night for shots 1–2). Always log in capture report."""
+    block = dict(PA_E_SHOTLIST_TIME_OF_DAY)
+    applied = apply_time_of_day_phase(block["phase"], log_prefix)
+    block["apply_result"] = applied
+    block["applied"] = applied.get("applied", False)
+    return block
 
 
 def apply_lit_game_view_for_capture() -> dict[str, Any]:

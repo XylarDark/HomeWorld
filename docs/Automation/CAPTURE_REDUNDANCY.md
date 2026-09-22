@@ -12,6 +12,19 @@
 
 Apply in order **before** escalating rungs or asking Lead open-ended “does anyone else hit this?”
 
+### Testing preconditions (Lead lock-in — **all** automation, not capture-only)
+
+Before trusting **any** pass/fail output (CI, Editor Python, MCP harness, MRQ, screenshots, PIE tests, commandlets):
+
+| Step | Verify |
+|------|--------|
+| 1 | **Content in level** — required actors/assets are present in the **loaded** level/world, not assumed from paths alone. |
+| 2 | **Camera aim** — viewport/shot cameras point at that content (e.g. bounds centroids), not void or stale hardcoded poses. |
+| 3 | **Lighting / TOD / view mode** — time-of-day phase, lighting, and editor view mode match **test or shotlist intent**; **record** phase/commands used in the report (implicit `hw.TimeOfDay.Phase 2` without doc alignment is a precondition smell). |
+| 4 | **Capture / inspect** — run the tool, then inspect artifacts and logs before claiming PASS or closed FAIL. |
+
+PA-E capture maps step 1–2 to [pa_e_homestead_capture_diagnostic.py](../../Content/Python/pa_e_homestead_capture_diagnostic.py) and `LEAD_PROVE_LOOP` in [pa_e_shotlist_common.py](../../Content/Python/pa_e_shotlist_common.py). Shotlist stills: **night** for Shot 1–2 per [00_SHOTLIST.md](../Docs/00_SHOTLIST.md) — scripts use **explicit** Phase 2 with `time_of_day` in `Saved/pa_e_capture_report.json`; use Phase 0 (day) only when the shotlist or test doc requires day.
+
 | # | Practice | Summary |
 |---|----------|---------|
 | 1 | **Docs-first** | Official vendor docs for any tool surface before inventing/hardening (unless already in repo policy / agent memory). Parameter order, required context, save paths. |
@@ -211,8 +224,9 @@ Examples **not** in current PR scope:
 
 1. **Inventory** — confirm homestead dress/mesh actors are **in** the loaded level (`DRESS_*`, cabin/island kit).
 2. **Aim** — point viewport/shot cameras at **confirmed actor bounds centroids** (MRQ uses in-level `CAM_Hero` / `CAM_CabinClose` with re-aim at framing bounds; avoid hardcoded poses into void).
-3. **Capture + inspect** — run [capture_shotlist.py](../../Content/Python/capture_shotlist.py) (MRQ primary); read mean luminance; near-black ⇒ loop continues.
-4. **Bug-fix** — pose / lighting / game-view / pilot / buffer until stills show intended homestead.
+3. **Lighting / TOD / view mode** — phase and lit game view match **shotlist intent**; report **`time_of_day`** (PA-E shots 1–2: **Night** phase 2 per [00_SHOTLIST.md](../Docs/00_SHOTLIST.md), not undocumented implicit console).
+4. **Capture + inspect** — run [capture_shotlist.py](../../Content/Python/capture_shotlist.py) (MRQ primary); read mean luminance; near-black ⇒ loop continues.
+5. **Bug-fix** — pose / lighting / game-view / pilot / buffer until stills show intended homestead.
 
 **Diagnostic (steps 1–2 only):** MCP `execute_python_script("pa_e_homestead_capture_diagnostic.py")` → `Saved/pa_e_homestead_capture_diagnostic.json` (camera vs homestead centroids).
 
