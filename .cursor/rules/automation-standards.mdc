@@ -4,7 +4,7 @@ description: "Standards for automation that drives or configures Editor/engine f
 alwaysApply: false
 globs: "**/Content/Python/**, **/Tools/**, **/.github/workflows/**"
 priority: 9
-version: 1.7
+version: 1.8
 ---
 
 # Automation Standards
@@ -20,6 +20,8 @@ Applies to **every** automation / tooling gap (any tool surface). Canonical deta
 ### Lead-correction → harness (habit, token-efficient)
 
 When Lead corrects a **proven** miss (DESKTOP evidence, false PASS/FAIL), fold it into the repo **immediately**: blocking gate, assert threshold, or one row in `PROVE_CRITERIA` — **not** a long runbook or rediscovering the same rule in chat. Prefer **compact hard rules** over verbose prose.
+
+**Log reasons along the way:** When a prove miss is understood, append a **token-lean** **Cause → Symptom → Avoid** row to **`docs/KNOWN_ERRORS.md`** (and a one-line harness rule if needed) **in that session** — not only at phase-end.
 
 ### Testing preconditions (universal — before PASS/FAIL claims)
 

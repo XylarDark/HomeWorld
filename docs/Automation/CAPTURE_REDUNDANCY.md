@@ -12,6 +12,8 @@
 
 Apply in order **before** escalating rungs or asking Lead open-ended “does anyone else hit this?”
 
+**Along the way:** Log each understood prove miss (**Cause → Symptom → Avoid**) to [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) when discovered — not only at phase-end ([automation-standards.mdc](../../.cursor/rules/automation-standards.mdc) v1.8).
+
 ### Testing preconditions (Lead lock-in — **all** automation, not capture-only)
 
 Before trusting **any** pass/fail output (CI, Editor Python, MCP harness, MRQ, screenshots, PIE tests, commandlets):
