@@ -13,6 +13,7 @@
 | P0-5 | Docs: CAPTURE_REDUNDANCY, KNOWN_ERRORS, AUTOMATION_GAPS, automation-standards | Done (PR) |
 | P0-6 | Assert harden: center-crop + bright-pixel fraction + shot-pair diversity (block global-mean speckle PASS) | Done (follow-up PR) |
 | P0-7 | Arrange: per-shot `aim_bounds` centroids, ray vs dress AABB, MRQ per-shot night reapply note | Done (follow-up PR) |
+| P0-8 | Arrange: bounds **relocate** CAM (not reaim-only); exclude Cliff from aim needles; ray required for `aim_ok` | PR (cloud) |
 
 **P1 (follow-up):** Three-state reports everywhere (`blocked` / `in_progress` / `pass`) with consistent `closed_fail` semantics across PIE harnesses and NF2-B evidence scripts.
 

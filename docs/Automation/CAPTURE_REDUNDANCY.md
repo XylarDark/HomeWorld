@@ -32,7 +32,7 @@ PA-E capture maps step 1–2 to [pa_e_homestead_capture_diagnostic.py](../../Con
 After `load_level`, capture scripts (**must not** start MRQ/AL until `ready: true`):
 
 1. Inventory homestead dress in the **loaded** level (`inventory_ok`).
-2. Re-aim `CAM_*` at framing/homestead bounds via `MathLibrary.find_look_at_rotation` (keyword `Rotator` only — see KNOWN_ERRORS).
+2. **Relocate** `CAM_*` from per-shot **`aim_bounds`** (`homestead_bounds_relocate` / shotlist doc meters), then **look_at** centroid; **`forward_ray_hits_dress_aabb`** required for `aim_ok`. In-level rotate-only is fallback. Exclude **Cliff** (and Fence/Rock) from aim needles — see KNOWN_ERRORS.
 3. Phase 2 + PRESET tune + verify moon/skylight/cabin stack; **re-seed** session TMP fixtures under `VS_MVP/TMP_PA_E_Arrange` when stack missing after load (no .umap commit required).
 4. Lit + game view + `finish_loading_before_screenshot` when exposed.
 5. MRQ path: `probe_mrq_tool_readiness()` — missing types → `mrq_unavailable`; plugins enabled but subsystem null → `editor_restart_required`.
