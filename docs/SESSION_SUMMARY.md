@@ -1,3 +1,7 @@
+## 2026-09-22 — PA-E MRQ shot sequencing + luminance without Editor PIL (cloud)
+
+- Post-#169 DESKTOP: shot1 rendered; shot2 **`Render already in progress`** (finalize on PNG too early); **`pil_unavailable`** false FAIL on lit PNG; LogPython still doubled (`print`+`unreal.log`). Fixes: executor-finished + `!is_rendering()` gate, `INTER_SHOT_DRAIN`, `_in_tick`/`_MAIN_ENTRY_ACTIVE`, stdlib PNG luminance + host Python fallback, `{shot_id}_{frame_number}` output names. KNOWN_ERRORS.
+
 ## 2026-09-22 — PA-E MRQ executor delegate arity + re-entry lock (cloud)
 
 - Post-#168 DESKTOP: Arrange `ready: true` but MRQ failed `OnMoviePipelineExecutorFinished: expected 2, got 3`; duplicate shot1 / doubled LogPython from nested pre-tick. [capture_shotlist_mrq.py](../Content/Python/capture_shotlist_mrq.py): 2-arg finished handler per Epic 5.8 API, `PREPARING` lock, `_ACTIVE_DRIVER` guard, report `executor_start_error`. KNOWN_ERRORS. Gap **OPEN** — DESKTOP `execute_python_script("capture_shotlist.py")` after gate ready.

@@ -49,6 +49,7 @@ class _Phase(str, Enum):
     PREPARING = "preparing"
     WAIT_RENDER = "wait_render"
     FINALIZE_SHOT = "finalize_shot"
+    INTER_SHOT_DRAIN = "inter_shot_drain"
     WRITE_REPORT = "write_report"
     DISARM = "disarm"
     DONE = "done"
@@ -57,6 +58,7 @@ class _Phase(str, Enum):
 # One orchestrator per Editor Python session — prevents nested MCP re-entry from
 # double-arming Slate pre-tick / keep_alive (post-#168 DESKTOP duplicate LogPython).
 _ACTIVE_DRIVER: Optional["_MrqOrchestrator"] = None
+_MAIN_ENTRY_ACTIVE = False
 # Epic MRQ Python pattern: keep finished callback reachable (avoid GC before delegate fires).
 _EXECUTOR_FINISHED_HANDLER: Optional[Callable[[Any, bool], None]] = None
 
@@ -94,8 +96,15 @@ class _MrqOrchestrator:
         self._job_meta: dict[str, Any] = {}
         self._driver_error: Optional[str] = None
         self._executor_finished_handler_ref: Optional[Callable[[Any, bool], None]] = None
+        self._executor_finished = False
+        self._executor_success = False
+        self._in_tick = False
+        self._inter_shot_drain_deadline = 0.0
 
     def start(self) -> bool:
+        if self._tick_handle is not None:
+            _log("start skipped — tick callback already registered", {})
+            return True
         if not self.mrq_ok:
             self._driver_error = self.mrq_probe.get("error") or "MRQ subsystem unavailable"
             return False
@@ -126,12 +135,25 @@ class _MrqOrchestrator:
         self._tick_handle = None
 
     def _on_slate_pre_tick(self, _delta: float) -> None:
+        if self._in_tick:
+            return
+        self._in_tick = True
         try:
             self._tick()
         except Exception as e:
             _log("orchestrator tick error", {"error": str(e), "phase": self.phase.value})
             self.phase = _Phase.WRITE_REPORT
             self._driver_error = self._driver_error or str(e)
+        finally:
+            self._in_tick = False
+
+    def _is_subsystem_rendering(self) -> bool:
+        try:
+            if self._subsystem and hasattr(self._subsystem, "is_rendering"):
+                return bool(self._subsystem.is_rendering())
+        except Exception:
+            pass
+        return False
 
     def _tick(self) -> None:
         if self.phase == _Phase.RENDER_SHOT:
@@ -142,6 +164,8 @@ class _MrqOrchestrator:
             self._poll_render_wait()
         elif self.phase == _Phase.FINALIZE_SHOT:
             self._finalize_shot()
+        elif self.phase == _Phase.INTER_SHOT_DRAIN:
+            self._poll_inter_shot_drain()
         elif self.phase == _Phase.WRITE_REPORT:
             self._write_report_and_finish()
         elif self.phase == _Phase.DISARM:
@@ -195,6 +219,8 @@ class _MrqOrchestrator:
         if not job_ok:
             self._finish_shot_failure(job_meta.get("error") or "job_setup_failed", pose_meta, purge)
             return
+        self._executor_finished = False
+        self._executor_success = False
         self._render_since = time.time()
         self._wait_deadline = time.time() + WAIT_RENDER_SEC
         exec_ok, self._executor, exec_err = _start_pie_executor(
@@ -223,35 +249,44 @@ class _MrqOrchestrator:
         return _on_finished
 
     def _on_executor_finished(self, _executor: Any, _success: bool) -> None:
-        _log("executor finished delegate", {"success": bool(_success)})
+        self._executor_finished = True
+        self._executor_success = bool(_success)
+        self._job_meta["executor_finished_delegate"] = True
+        self._job_meta["executor_success"] = self._executor_success
+        _log(
+            "executor finished delegate",
+            {"success": self._executor_success, "rendering": self._is_subsystem_rendering()},
+        )
 
     def _poll_render_wait(self) -> None:
         now = time.time()
-        rendering = False
-        try:
-            if self._subsystem and hasattr(self._subsystem, "is_rendering"):
-                rendering = bool(self._subsystem.is_rendering())
-        except Exception:
-            rendering = False
+        rendering = self._is_subsystem_rendering()
         found = _newest_png_since(self._staging_dir, self._render_since)
-        if found and not rendering:
-            self._job_meta["mrq_output_path"] = found
+        if found:
+            self._job_meta["mrq_output_path_candidate"] = found
+        # Do not finalize on PNG alone — wait for OnMoviePipelineExecutorFinished + !is_rendering().
+        if self._executor_finished and not rendering:
+            if found:
+                self._job_meta["mrq_output_path"] = found
             self._job_meta["wait_elapsed_sec"] = round(now - self._render_since, 2)
-            self.phase = _Phase.FINALIZE_SHOT
-            return
-        if found and (now - self._render_since) > 5.0:
-            self._job_meta["mrq_output_path"] = found
-            self._job_meta["wait_elapsed_sec"] = round(now - self._render_since, 2)
-            self._job_meta["note"] = "png_found_while_is_rendering_true"
+            self._job_meta["wait_gate"] = "executor_finished_and_not_rendering"
             self.phase = _Phase.FINALIZE_SHOT
             return
         if now >= self._wait_deadline:
             self._job_meta["timeout"] = True
             self._job_meta["wait_elapsed_sec"] = round(now - self._render_since, 2)
             self._job_meta["rendering_at_timeout"] = rendering
-            if found:
-                self._job_meta["mrq_output_path"] = found
-            self.phase = _Phase.FINALIZE_SHOT
+            self._job_meta["executor_finished_at_timeout"] = self._executor_finished
+            if self._executor_finished and not rendering:
+                if found:
+                    self._job_meta["mrq_output_path"] = found
+                self.phase = _Phase.FINALIZE_SHOT
+            else:
+                self._finish_shot_failure(
+                    "render_wait_timeout_before_executor_finished",
+                    (self._sequence_meta.get("pose") or {}),
+                    self._sequence_meta.get("purge_before_capture") or {},
+                )
 
     def _finalize_shot(self) -> None:
         shot = self._current_shot
@@ -291,6 +326,20 @@ class _MrqOrchestrator:
         _log("shot done", {"id": shot["id"], "pass": entry["pass"], "bytes": validation.get("bytes")})
         self._executor = None
         self.shot_index += 1
+        if self.shot_index >= len(common.SHOTS):
+            self.phase = _Phase.WRITE_REPORT
+        else:
+            self._inter_shot_drain_deadline = time.time() + 120.0
+            self.phase = _Phase.INTER_SHOT_DRAIN
+            _log("inter_shot_drain start", {"next_shot": common.SHOTS[self.shot_index]["id"]})
+
+    def _poll_inter_shot_drain(self) -> None:
+        now = time.time()
+        rendering = self._is_subsystem_rendering()
+        if rendering:
+            return
+        if now >= self._inter_shot_drain_deadline:
+            _log("inter_shot_drain timeout — proceeding", {"rendering": rendering})
         self.phase = _Phase.RENDER_SHOT
 
     def _finish_shot_failure(
@@ -322,7 +371,11 @@ class _MrqOrchestrator:
         _log("shot failed", {"id": shot["id"], "error": error})
         self._executor = None
         self.shot_index += 1
-        self.phase = _Phase.RENDER_SHOT
+        if self.shot_index >= len(common.SHOTS):
+            self.phase = _Phase.WRITE_REPORT
+        else:
+            self._inter_shot_drain_deadline = time.time() + 120.0
+            self.phase = _Phase.INTER_SHOT_DRAIN
 
     def _write_report_and_finish(self) -> None:
         if self.phase == _Phase.DONE:
@@ -395,9 +448,10 @@ class _MrqOrchestrator:
         self.phase = _Phase.DISARM
         self._disarm_only()
         self.phase = _Phase.DONE
-        global _ACTIVE_DRIVER
+        global _ACTIVE_DRIVER, _MAIN_ENTRY_ACTIVE
         if _ACTIVE_DRIVER is self:
             _ACTIVE_DRIVER = None
+        _MAIN_ENTRY_ACTIVE = False
 
     def _disarm_only(self) -> None:
         if not self.keep_ok:
@@ -658,7 +712,9 @@ def _queue_one_frame_job(
     output.custom_start_frame = CUSTOM_START
     output.custom_end_frame = CUSTOM_END
     output.output_resolution = unreal.IntPoint(common.RES_X, common.RES_Y)
-    output.file_name_format = "{shot_name}.{frame_number}"
+    # Level-sequence jobs without MRQ shot tracks leave {shot_name} empty → ".0" / "shot.0" files.
+    output.file_name_format = f"{shot_id}_{{frame_number}}"
+    meta["file_name_format"] = output.file_name_format
     output.override_existing_output = True
     output.zero_pad_frame_numbers = 0
     output.output_directory = unreal.DirectoryPath(output_dir_abs.replace("\\", "/"))
@@ -716,8 +772,16 @@ def _start_pie_executor(
         return False, executor, err
 
 
+def _release_main_entry() -> None:
+    global _MAIN_ENTRY_ACTIVE
+    _MAIN_ENTRY_ACTIVE = False
+
+
 def main() -> None:
-    global _ACTIVE_DRIVER
+    global _ACTIVE_DRIVER, _MAIN_ENTRY_ACTIVE
+    if _MAIN_ENTRY_ACTIVE:
+        _log("main skipped — entry already active", {})
+        return
     if _ACTIVE_DRIVER is not None and _ACTIVE_DRIVER.phase not in (
         _Phase.DONE,
         _Phase.IDLE,
@@ -727,6 +791,7 @@ def main() -> None:
             {"phase": _ACTIVE_DRIVER.phase.value},
         )
         return
+    _MAIN_ENTRY_ACTIVE = True
     _log("started")
     keep_ok = False
     try:
@@ -776,6 +841,7 @@ def main() -> None:
                 keep.disarm()
             except Exception:
                 pass
+        _release_main_entry()
         return
 
     orch = _MrqOrchestrator(
@@ -805,6 +871,7 @@ def main() -> None:
                 keep.disarm()
             except Exception:
                 pass
+        _release_main_entry()
         return
     _ACTIVE_DRIVER = orch
 
