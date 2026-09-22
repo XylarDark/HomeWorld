@@ -3,8 +3,8 @@
 | Field | Value |
 |-------|-------|
 | **Date** | 2026-09-22 (ET) |
-| **Track** | PA-E (formal Shot 1 + Shot 2 per [00_SHOTLIST.md](../00_SHOTLIST.md)) |
-| **Status** | **OPEN** — automation **not** shotlist PASS; Lead capturing manually |
+| **Track** | PA-E formal Shot 1 + Shot 2 per [00_SHOTLIST.md](../00_SHOTLIST.md) |
+| **Status** | **OPEN** — automation **not** shotlist PASS until DESKTOP proves capture script |
 
 ## Symptom
 
@@ -25,12 +25,24 @@ Host Windows **ImageGrab** of the Unreal window during a remote PA-E Shot 1/2 at
 
 - **Do not** invent still paths or mark Shot 1/2 **PASS** from automated captures alone.
 - **Do not** call host ImageGrab shotlist **PASS** while another UI owns focus.
-- **Track close (2026-09-22 ET):** Lead **`APPROVE PA-E`** closed Docs/32 with formal Shot 1/2 stills **deferred/accepted** — this defect and AUTOMATION_GAPS row stay **OPEN** for future automation (no shotlist PASS from ImageGrab files above).
+- **Track close (2026-09-22 ET):** Lead **`APPROVE PA-E`** closed Docs/32 with formal Shot 1/2 stills **deferred/accepted** — this defect and AUTOMATION_GAPS row stay **OPEN** until DESKTOP proves the capture ladder (no shotlist PASS from ImageGrab files above).
 - **Stop grinding remote ImageGrab for PA-E** — focus is not reliable unattended.
-- **Future path:** Viewport-only capture API / GUI automation — see [docs/Automation/AUTOMATION_GAPS.md](../../docs/Automation/AUTOMATION_GAPS.md).
+
+## Automation path (2026-09-22 — capture tooling track)
+
+Follow [docs/Automation/CAPTURE_REDUNDANCY.md](../../docs/Automation/CAPTURE_REDUNDANCY.md) (**Lead-gated global ladder** + shotlist instance):
+
+1. **Rung 1 (no gate):** [Content/Python/capture_shotlist_viewport.py](../../Content/Python/capture_shotlist_viewport.py) — UE built-ins only (`take_high_res_screenshot`, keep_alive, etc.) → `Saved/pa_e_capture_report.json`.
+2. **Rung 2:** Free-tool **SCOUT backlog** (names only) — requires Lead **`APPROVE TOOL SCOUT <name>`**; **no auto-install**.
+3. **Rung 3:** Net-new custom stacks — requires Lead **`APPROVE TOOL BUILD <name>`**; not host ImageGrab for PASS.
+
+**Done when (automation gap):** DESKTOP run → report `ok: true` + PNGs under `Saved/Screenshots/PA_E/` and copied to `HomeWorld_PA_E` — Conductor verifies; cloud agents do **not** claim DESKTOP PASS.
 
 ## References
 
+- [docs/Automation/CAPTURE_REDUNDANCY.md](../../docs/Automation/CAPTURE_REDUNDANCY.md) — Lead policy ladder
 - [docs/KNOWN_ERRORS.md](../../docs/KNOWN_ERRORS.md) — PA-E HighResShot / ImageGrab focus entries (2026-09-22)
 - [docs/Automation/AUTOMATION_GAPS.md](../../docs/Automation/AUTOMATION_GAPS.md) — PA-E Shot 1/2 gap (2026-09-22)
-- [Docs/handoffs/PA_D_IMPORT_PLACE.md](../handoffs/PA_D_IMPORT_PLACE.md) — PA-E owns formal shots; PA-D not CLOSED on shots alone
+- [Docs/handoffs/PA_E_SHOTS.md](../handoffs/PA_E_SHOTS.md) — track closed; automation gap open
+- [Docs/handoffs/P6_FIX_shot1.md](../handoffs/P6_FIX_shot1.md) — Shot 1 camera pose
+- [Content/Python/capture_viewport.py](../../Content/Python/capture_viewport.py) — generic viewport capture helper

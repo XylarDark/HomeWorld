@@ -9258,6 +9258,14 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 ---
 
+## 2026-09-22 — Capture redundancy ladder + shotlist viewport script (cloud)
+
+**Task:** Lock Lead capture policy; add `capture_shotlist_viewport.py`, `CAPTURE_REDUNDANCY.md`; update PA-E defect/gap pointers.
+
+**Delivered:** Python + docs only. Gap **OPEN** until DESKTOP proves `Saved/pa_e_capture_report.json`. No shotlist PASS claim.
+
+---
+
 ## 2026-09-22 — PA track CLOSED (docs stamp, cloud agent)
 
 **Task:** Lead **`APPROVE PA-E`**, 2026-09-22 ET — stamp Docs/32 Prototype Assets **CLOSED / COMPLETE** (PA-A/C/D/E).
