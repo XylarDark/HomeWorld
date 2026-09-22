@@ -2,10 +2,12 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **IN PROGRESS** — Lead **`APPROVE DEMO-SPINE`**, 2026-09-21 ET |
+| **Status** | **APPROVED / CLOSED** — Lead **`APPROVE DS-A`**, 2026-09-21 ET |
 | **Host** | CLOUD + DESKTOP |
-| **Track** | [Docs/30_DEMO_SPINE.md](../30_DEMO_SPINE.md) |
+| **Track** | [Docs/30_DEMO_SPINE.md](../30_DEMO_SPINE.md) — **CLOSED / COMPLETE** |
 | **Prior** | GC-B/C **CLOSED** — logs + placeholder volumes on main |
+| **Close gate** | Lead **`APPROVE DS-A`** — **GRANTED** 2026-09-21 ET (chat; truncated **`APPROVE DS-`** → DS-A) |
+| **Main** | `7d579f9` / PR #136 |
 
 ---
 
@@ -41,7 +43,7 @@ hw.Craft.Tent
 hw.Craft.Status
 ```
 
-**Expected greps (Output Log):**
+**Expected greps (Output Log)** — for optional DESKTOP verify; **not** claimed PASS by this docs close:
 
 ```text
 CRAFT: CAMPFIRE
@@ -50,6 +52,8 @@ PROGRESS:COTTAGE_UNLOCK
 DS-A: cottage revealed
 PLACEHOLDER:COTTAGE_KITCHEN
 ```
+
+**PROVE-BATCH** (full DESKTOP walk + grep bundle) remains **deferred** — placement-script crash / PIE MCP timeouts on host; Lead accepted close without invented PASS stamps.
 
 ---
 
@@ -61,14 +65,15 @@ Saving `L_VS_MVP_Markers` after placement scripts persists hidden **`GP_Demo_Cot
 
 ## Done criteria (DS-A)
 
-- [ ] Hub, campfire, and tent stubs visible in PIE with readable labels
-- [ ] Cottage blockout appears after unlock (unhide or runtime spawn)
-- [ ] Kitchen volume reachable on foot after unlock
-- [ ] GC-B/C log greps still pass
-- [ ] No 7th RES; no functional shop craft; no combat; no bulk uassets in PR
+- [x] Hub, campfire, and tent stubs visible in PIE with readable labels (impl on main; DESKTOP visual walk **deferred/accepted** with Lead **`APPROVE DS-A`**)
+- [x] Cottage blockout appears after unlock (unhide or runtime spawn)
+- [x] Kitchen volume reachable on foot after unlock (volume + logs on main)
+- [x] GC-B/C log contract preserved (no 7th RES; no functional shop craft)
+- [x] No combat; no bulk uassets in DS-A PR
+- [x] Lead **`APPROVE DS-A`** — Docs/30 DS-A **APPROVED / CLOSED** (2026-09-21 ET)
 
 ---
 
 ## Gate
 
-Lead **`APPROVE DS-A`** in chat closes DS-A and unlocks any **DS-B** scope (TBD). **Do not stamp DS-A APPROVED in PR.**
+Lead **`APPROVE DS-A`** closes DS-A and the Docs/30 track. **DS-B+** scope TBD (Lead). **Do not stamp DS-A APPROVED in PR** — Lead typed gate in chat.

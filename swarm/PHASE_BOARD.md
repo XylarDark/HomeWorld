@@ -1,6 +1,6 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **Docs/29 Taste Profiler (TP) — CLOSED / COMPLETE** — Lead **`APPROVE TP-E`**, 2026-09-19 ET — [29_TASTE_PROFILER.md](../Docs/29_TASTE_PROFILER.md). Next: Lead-named track or Taste Gate (do not invent).
+**Current phase:** **Docs/30 Demo Spine (DS) — CLOSED / COMPLETE** — Lead **`APPROVE DS-A`**, 2026-09-21 ET — [30_DEMO_SPINE.md](../Docs/30_DEMO_SPINE.md). Next: Lead-named track TBD (do not invent).
 
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **Conductor** (parent DESKTOP) / **DESKTOP-21CT3H0**
@@ -49,7 +49,7 @@ Canonical history: **VP-A → VP-B → VP-A re-verify → VP-C**. Spec: [17d_HS_
 
 ## POST-AUDIT (Docs/05–10 + HR track)
 
-MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** **Product next-phase (NP-A…E) is CLOSED / COMPLETE.** **HR2 track CLOSED / COMPLETE.** **HR3 track CLOSED / COMPLETE** — Lead **`APPROVE HR3-D`**, 2026-09-17 ET (HR3-C **DEFERRED**). **VP track CLOSED / COMPLETE** (VP-A re-verify **WAIVED**). **Docs/16 Playable Loop CLOSED / COMPLETE** — Lead **`APPROVE PL-D`**, 2026-09-17 ET. **Docs/17 HS Audit CLOSED / COMPLETE** — Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET. **Docs/18 VP2 CLOSED / COMPLETE** — Lead **`APPROVE VP2-C STOP`**, 2026-09-17 ET. **Docs/19 D19 CLOSED / COMPLETE** — Lead **`APPROVE D19`**, 2026-09-17 ET. **Docs/20 UASSET CLOSED / COMPLETE**. **Docs/21 Reap & Sow CLOSED / COMPLETE** — Lead **`APPROVE RS-E`**, 2026-09-19 ET. **Docs/22 Gather & Craft CLOSED / COMPLETE** — Lead **`APPROVE GC-C`**, 2026-09-21 ET. **Docs/23 Combat & Dream CLOSED / COMPLETE** — Lead **`APPROVE CD-A`**, 2026-09-21 ET. **Docs/24 Movement CLOSED / COMPLETE** — Lead **`APPROVE MV-A`**, 2026-09-21 ET. **Docs/25 Spirit Stealth CLOSED / COMPLETE** — Lead **`APPROVE SS-A`**, 2026-09-21 ET. **Docs/26 Night Feel CLOSED / COMPLETE** — Lead **`APPROVE NF-A`**, 2026-09-19 ET. **Docs/27 Night Feel Build CLOSED / COMPLETE** — Lead **`APPROVE NF2-E`**, 2026-09-19 ET. **Docs/28 Taste Gates CLOSED / COMPLETE** — Lead **`APPROVE TG-E`**, 2026-09-19 ET. **Docs/29 Taste Profiler CLOSED / COMPLETE** — Lead **`APPROVE TP-E`**, 2026-09-19 ET. Next: Lead-named product track TBD (do not invent).
+MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine (HR-A…D + HR-B2) is CLOSED.** **Product next-phase (NP-A…E) is CLOSED / COMPLETE.** **HR2 track CLOSED / COMPLETE.** **HR3 track CLOSED / COMPLETE** — Lead **`APPROVE HR3-D`**, 2026-09-17 ET (HR3-C **DEFERRED**). **VP track CLOSED / COMPLETE** (VP-A re-verify **WAIVED**). **Docs/16 Playable Loop CLOSED / COMPLETE** — Lead **`APPROVE PL-D`**, 2026-09-17 ET. **Docs/17 HS Audit CLOSED / COMPLETE** — Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET. **Docs/18 VP2 CLOSED / COMPLETE** — Lead **`APPROVE VP2-C STOP`**, 2026-09-17 ET. **Docs/19 D19 CLOSED / COMPLETE** — Lead **`APPROVE D19`**, 2026-09-17 ET. **Docs/20 UASSET CLOSED / COMPLETE**. **Docs/21 Reap & Sow CLOSED / COMPLETE** — Lead **`APPROVE RS-E`**, 2026-09-19 ET. **Docs/22 Gather & Craft CLOSED / COMPLETE** — Lead **`APPROVE GC-C`**, 2026-09-21 ET. **Docs/23 Combat & Dream CLOSED / COMPLETE** — Lead **`APPROVE CD-A`**, 2026-09-21 ET. **Docs/24 Movement CLOSED / COMPLETE** — Lead **`APPROVE MV-A`**, 2026-09-21 ET. **Docs/25 Spirit Stealth CLOSED / COMPLETE** — Lead **`APPROVE SS-A`**, 2026-09-21 ET. **Docs/26 Night Feel CLOSED / COMPLETE** — Lead **`APPROVE NF-A`**, 2026-09-19 ET. **Docs/27 Night Feel Build CLOSED / COMPLETE** — Lead **`APPROVE NF2-E`**, 2026-09-19 ET. **Docs/28 Taste Gates CLOSED / COMPLETE** — Lead **`APPROVE TG-E`**, 2026-09-19 ET. **Docs/29 Taste Profiler CLOSED / COMPLETE** — Lead **`APPROVE TP-E`**, 2026-09-19 ET. **Docs/30 Demo Spine CLOSED / COMPLETE** — Lead **`APPROVE DS-A`**, 2026-09-21 ET. Next: Lead-named product track TBD (do not invent).
 
 | Track | Doc / phase | Host | Status | Gate / handoff |
 |---|---|---|---|---|
@@ -140,7 +140,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **U58F-F** | MCP decision | CLOUD | **APPROVED** | Keep UnrealMCP · [U58F_F_MCP_DECISION.md](../Docs/handoffs/U58F_F_MCP_DECISION.md) |
 | **U58F-G** | Mesh Terrain spike | DESKTOP | **SPIKE READY** | Plugin on · sandbox only · [U58F_G_MESH_TERRAIN.md](../Docs/handoffs/U58F_G_MESH_TERRAIN.md) |
 
-**Current track:** none active — Docs/29 **CLOSED** (Lead **`APPROVE TP-E`**). Next: Lead-named track or Taste Gate.
+**Current track:** none active — Docs/30 **CLOSED** (Lead **`APPROVE DS-A`**). Next: Lead-named track TBD.
 
 ### Docs/29 Taste Profiler (TP)
 
@@ -193,6 +193,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | CD-A-stubs | CD-A | CLOUD+DESKTOP | **CLOSED** | Source/ + Content/Python + Docs/handoffs/ | [CD_A_STUBS.md](../Docs/handoffs/CD_A_STUBS.md) · Lead **`APPROVE CD-A`**, 2026-09-21 ET — Docs/23 **CLOSED / COMPLETE** (`50faeab` / PR #128) |
 | MV-A-traversal | MV-A | CLOUD+DESKTOP | **CLOSED** | Source/ + Docs/handoffs/ | [MV_A_TRAVERSAL.md](../Docs/handoffs/MV_A_TRAVERSAL.md) · Lead **`APPROVE MV-A`**, 2026-09-21 ET — Docs/24 **CLOSED / COMPLETE** (`349d3e4` / PR #130) |
 | SS-A-stealth | SS-A | CLOUD+DESKTOP | **CLOSED** | Source/ + Content/Python + Docs/handoffs/ | [SS_A_STEALTH_STUBS.md](../Docs/handoffs/SS_A_STEALTH_STUBS.md) · Lead **`APPROVE SS-A`**, 2026-09-21 ET — Docs/25 **CLOSED / COMPLETE** (`7bc577f` / PR #133) |
+| DS-A-hearth | DS-A | CLOUD+DESKTOP | **CLOSED** | Source/ + Content/Python + Docs/handoffs/ | [DS_A_VISIBLE_HEARTH.md](../Docs/handoffs/DS_A_VISIBLE_HEARTH.md) · Lead **`APPROVE DS-A`**, 2026-09-21 ET — Docs/30 **CLOSED / COMPLETE** (`7d579f9` / PR #136); PROVE-BATCH **deferred** |
 | UASSET-policy | Docs/20 | CLOUD+Lead | CND+Lead | Docs/ + config/ + scripts/ | [20_UASSET_AI_POLICY.md](../Docs/20_UASSET_AI_POLICY.md) · [AI_ASSET_LOG.md](../Docs/AI_ASSET_LOG.md) — **APPROVED / CLOSED** Lead **`APPROVE UASSET POLICY`**, 2026-09-17 ET (PR #108) |
 | HS-F-sign-off | HS-F | CLOUD+Lead | CND+Lead | Docs/ | [17_HS_AUDIT_SIGN_OFF.md](../Docs/17_HS_AUDIT_SIGN_OFF.md) — **CLOSED** Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET |
 | HS-E-bootstrap | HS-E | CLOUD+Lead+DESKTOP | CND+Lead | Docs/ | [17e_HS_CONTENT_BOOTSTRAP.md](../Docs/17e_HS_CONTENT_BOOTSTRAP.md) · [HS_E_CONTENT_BOOTSTRAP.md](../Docs/handoffs/HS_E_CONTENT_BOOTSTRAP.md) — **APPROVED / CLOSED** Lead **`APPROVE HS-E`**, 2026-09-17 ET (KEEP-LOCAL) |
