@@ -1,4 +1,5 @@
-﻿import unreal, time, os, json
+﻿"""Harness P3 exempt: PL-D one-off CAM_Hero spike — not canonical shotlist prove."""
+import unreal, time, os, json
 cam = None
 for a in unreal.EditorLevelLibrary.get_all_level_actors():
     try:

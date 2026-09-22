@@ -12,6 +12,7 @@ Expect LogTemp lines:
 
 Writes Saved/nf2_a_form_swap_evidence.json (instructions + expected greps).
 Idempotent: safe to re-run outside Editor (writes JSON only).
+Harness P3 exempt: PIE log-grep instructions only — no Editor capture / Arrange.
 """
 from __future__ import annotations
 

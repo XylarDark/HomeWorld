@@ -24,6 +24,9 @@ Forum refs:
 Policy: [docs/Automation/CAPTURE_REDUNDANCY.md](docs/Automation/CAPTURE_REDUNDANCY.md) § Shotlist.
 Multi-form console HighResShot ladders are **not** used.
 
+Harness P3: ``reload_pa_e_capture_python_modules`` + ``arrange_pa_e_shotlist`` before capture;
+**exempt** ``conductor_mrq_capture_preflight`` (non-MRQ AL diagnostic).
+
 Run: MCP execute_python_script("capture_shotlist_viewport.py") — diagnostic only.
 Primary: execute_python_script("capture_shotlist.py"). UnrealEditor-Cmd
 -ExecutePythonScript=... (uses vnp_editor_keep_alive).
@@ -1101,6 +1104,7 @@ def _copy_to_desktop(local_path: str, filename: str) -> dict:
 
 def main() -> None:
     _log("started")
+    common.reload_pa_e_capture_python_modules()
     keep_ok = False
     try:
         import vnp_editor_keep_alive as keep

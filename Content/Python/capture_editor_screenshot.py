@@ -1,4 +1,5 @@
 # capture_editor_screenshot.py
+# Harness P3 exempt: host PyAutoGUI diagnostic only — not Editor prove / shotlist Arrange.
 # Host-side script: captures a screenshot of the screen (or foreground window) using PyAutoGUI.
 # Run from project root: py Content/Python/capture_editor_screenshot.py
 # Optional: pip install pyautogui (and Pillow). Outputs: Saved/screenshots/capture_<timestamp>.png,

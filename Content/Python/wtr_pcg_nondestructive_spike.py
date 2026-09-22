@@ -5,6 +5,8 @@ first available forest graph), adds/updates a graph comment box via Python when
 exposed, writes Saved/wtr_pcg_nondestructive_spike.json + optional screenshot path.
 
 Idempotent: re-run skips recreate if dup exists; still stamps evidence.
+
+Harness P3 exempt: PCG WTR spike optional PNG — not shotlist / PA-E Arrange.
 """
 from __future__ import annotations
 

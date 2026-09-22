@@ -47,6 +47,8 @@ When `ready: false`, scripts write `Saved/pa_e_capture_report.json` with **`prov
 
 **P2 industry harness (PA-E / MRQ):** Session fixtures under `VS_MVP/TMP_PA_E_Arrange` + editor **`PA_E_MRQ_*`** — **`inventory_pa_e_session_fixtures`**, **`reseed_pa_e_tmp_fixtures_for_capture`**, optional **`teardown_pa_e_session_fixtures`** (editor only; does not delete saved dress). Reports stamp **`artifact_stamps`** (PNG/report/gate mtimes). Full shot PNG purge only when **`PA_E_FRESH_PROVE=1`** at prove start. Task list: [HARNESS_ARRANGE_TASKLIST.md](HARNESS_ARRANGE_TASKLIST.md) P2.
 
+**P3 harness audit (prove scripts):** Full script → gate matrix in [HARNESS_ARRANGE_TASKLIST.md](HARNESS_ARRANGE_TASKLIST.md) P3 table. **Exempt** scripts document one-line **Harness P3 exempt** in module docstring (generic utility, host-only, PIE-instruction JSON, HR preflight, legacy spikes) — not shotlist Arrange.
+
 **MRQ PIE lighting (docs-first):** `MoviePipelinePIEExecutor` renders a **PIE** world. `load_map` / MRQ can **respawn** the level so Editor TMP lights under `VS_MVP/TMP_PA_E_Arrange` do not carry sky/atmo into the render — **cabin warm can read while sky is void black**. Before each job: `reapply_night_environment_for_mrq_shot` → `apply_mrq_pie_homestead_night_stack` (Phase 2 + moon **AtmosphereSunLightIndex 1** + SkyLight fill + **RecaptureSky** + SkyAtmosphere + exposure Min/Max cvars; MRQ job also adds `MoviePipelineConsoleVariableSetting` when available). Epic/community: enable **Atmosphere Sun Light** on the moon directional; Sky Atmosphere present; RecaptureSky after TOD/atmo changes — **do not switch to day**. See `mrq_pie_lighting_note` in arrange gate / capture report.
 
 | # | Practice | Summary |

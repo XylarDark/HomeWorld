@@ -1,3 +1,7 @@
+## 2026-09-22 — Harness P3 audit + universal tooling checklist (cloud)
+
+- **P3:** [HARNESS_ARRANGE_TASKLIST.md](Automation/HARNESS_ARRANGE_TASKLIST.md) prove-script matrix; wired **`conductor_night_evidence_preflight`** + **`summarize_evidence_png_harness`** for NF2-B/VNP; NF2-B **`capture_outcome`** parity; viewport **`reload_pa_e_capture_python_modules`**. Exempt docstrings for host/utility/spikes. **automation-standards.mdc** v1.11 universal gap checklist; CAPTURE_REDUNDANCY P3 pointer. **DESKTOP re-prove** NF2-B / PA-E after merge.
+
 ## 2026-09-22 — PA-E harness P1: three-state + framing gate + conductor preflight (cloud)
 
 - **P1 Lead-approved:** [pa_e_shotlist_common.py](../Content/Python/pa_e_shotlist_common.py) — **`capture_outcome`** (`pass`/`soft_fail`/`closed_fail`), **`finalize_shot_validation`** (luminance vs framing intent, Lead eyeball stamp), **`conductor_mrq_capture_preflight`** (Markers world reload, VNP module reload). MRQ [capture_shotlist_mrq.py](../Content/Python/capture_shotlist_mrq.py) wires preflight + guards; night gate prefers **`visible_sky_stack_ok`**. Docs: CAPTURE_REDUNDANCY, KNOWN_ERRORS, HARNESS P1. **DESKTOP re-prove required** after merge (cloud has no UE).

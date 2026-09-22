@@ -28,6 +28,24 @@
 
 **P2-gated (Lead `APPROVE TOOL SCOUT` only):** Epic Screenshot Comparison / golden-image pipeline after trusted lit capture path — docs scout only until gate; **not** part of industry P2 PR.
 
-**P3 (follow-up):** Full harness audit — every Editor Python “prove” script calls Arrange or documents why not (non-shotlist tests).
+**P3 (follow-up):** Full harness audit — every Editor Python “prove” script calls Arrange or documents why not (non-shotlist tests). **Done (PR).**
+
+| Script | Gate | Notes |
+|--------|------|--------|
+| [capture_shotlist.py](../../Content/Python/capture_shotlist.py) | MRQ entry → `conductor_mrq_capture_preflight` + `arrange_pa_e_shotlist` + `reset_mrq_session_guards` | Canonical PA-E prove |
+| [capture_shotlist_mrq.py](../../Content/Python/capture_shotlist_mrq.py) | Same (implements) | P2 fixtures / latent contract / artifact stamps |
+| [capture_shotlist_viewport.py](../../Content/Python/capture_shotlist_viewport.py) | `reload_pa_e_capture_python_modules` + `arrange_pa_e_shotlist` (`require_mrq=False`) | AL diagnostic; **exempt** MRQ conductor preflight |
+| [pa_e_homestead_capture_diagnostic.py](../../Content/Python/pa_e_homestead_capture_diagnostic.py) | `arrange_pa_e_shotlist` | Arrange-only steps 1–2; no capture |
+| [nf2_b_night_lookdev_evidence.py](../../Content/Python/nf2_b_night_lookdev_evidence.py) | `conductor_night_evidence_preflight` + `arrange_pa_e_shotlist` + P1 `capture_outcome` | NF2-B parity (#180 note) |
+| [vnp_night_tune_and_evidence.py](../../Content/Python/vnp_night_tune_and_evidence.py) | Same when Markers world | Shots 1/2/5; harness luminance only |
+| [vnp_load_vs_mvp_and_evidence.py](../../Content/Python/vnp_load_vs_mvp_and_evidence.py) | load + preflight + arrange → VNP `main()` | Orchestrator |
+| [capture_viewport.py](../../Content/Python/capture_viewport.py) | **Exempt** | Generic utility still; docstring |
+| [capture_editor_screenshot.py](../../Content/Python/capture_editor_screenshot.py) | **Exempt** | Host PyAutoGUI; not Editor prove |
+| [nf2_a_form_swap_evidence.py](../../Content/Python/nf2_a_form_swap_evidence.py) | **Exempt** | PIE log instructions JSON only |
+| [preflight_ue_editor.py](../../Content/Python/preflight_ue_editor.py) | **Exempt** | HR3-B npm preflight |
+| [_pl_d_capture2.py](../../Content/Python/_pl_d_capture2.py), [_pl_d_capture_shot1.py](../../Content/Python/_pl_d_capture_shot1.py) | **Exempt** | PL-D spikes |
+| [wtr_pcg_nondestructive_spike.py](../../Content/Python/wtr_pcg_nondestructive_spike.py) | **Exempt** | WTR PCG spike optional PNG |
+
+Shared API: `conductor_mrq_capture_preflight` (MRQ) · `conductor_night_evidence_preflight` (VNP/NF2) · `arrange_pa_e_shotlist` · `summarize_evidence_png_harness` in [pa_e_shotlist_common.py](../../Content/Python/pa_e_shotlist_common.py).
 
 **References:** [CAPTURE_REDUNDANCY.md](CAPTURE_REDUNDANCY.md) § P0 Arrange gate · [pa_e_shotlist_common.py](../../Content/Python/pa_e_shotlist_common.py) · [Docs/00_SHOTLIST.md](../../Docs/00_SHOTLIST.md)

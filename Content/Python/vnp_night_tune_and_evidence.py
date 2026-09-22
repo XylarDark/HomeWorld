@@ -17,6 +17,9 @@ Public API (no screenshots):
 - apply_mrq_pie_homestead_night_stack_in_render_world() — call after PIE executor starts
 
 Writes Saved/vnp_night_evidence.json (full main() only).
+
+When the editor world is L_VS_MVP_Markers, main() runs conductor night preflight +
+arrange_pa_e_shotlist before capture (shared PA-E gates; shots 1/2/5 not PA-E MRQ).
 """
 from __future__ import annotations
 
@@ -1035,6 +1038,41 @@ def _stat_fps() -> str:
 
 def main() -> None:
     _ensure_dir(SHOT_DIR)
+    arrange_gate: dict[str, Any] | None = None
+    conductor_preflight: dict[str, Any] | None = None
+    try:
+        import importlib
+
+        import pa_e_shotlist_common as common
+
+        importlib.reload(common)
+        if common.editor_world_markers_status().get("ok"):
+            conductor_preflight = common.conductor_night_evidence_preflight("VNP:")
+            arrange_gate = common.arrange_pa_e_shotlist(
+                "VNP:",
+                level_loaded=True,
+                require_mrq=False,
+            )
+            if not conductor_preflight.get("ready") or not arrange_gate.get("ready"):
+                blocked = list(conductor_preflight.get("blocked_reasons") or [])
+                blocked.extend(arrange_gate.get("blocked_reasons") or [])
+                harness = common.summarize_evidence_png_harness([], arrange_gate=arrange_gate)
+                blocked_result = {
+                    "ok": False,
+                    **harness,
+                    "phase": "VNP-N0/N1/N2 + WTR-C",
+                    "blocked_reasons": blocked,
+                    "conductor_preflight": conductor_preflight,
+                    "arrange_gate": arrange_gate,
+                    "policy": "Arrange gate — no AL capture until ready (not closed FAIL).",
+                }
+                with open(OUT, "w", encoding="utf-8") as f:
+                    json.dump(blocked_result, f, indent=2, default=str)
+                unreal.log("VNP night evidence blocked by arrange gate")
+                return
+    except Exception as e:
+        unreal.log_warning("VNP arrange gate skip: %s" % e)
+
     tune = apply_homestead_night_tune()
     verify = verify_homestead_night_lighting_stack()
     actors = unreal.EditorLevelLibrary.get_all_level_actors()
@@ -1122,10 +1160,21 @@ def main() -> None:
     world = unreal.EditorLevelLibrary.get_editor_world()
     level_name = world.get_name() if world else "unknown"
 
+    png_paths = [e.get("path") for e in evidence if e.get("path")]
+    try:
+        import pa_e_shotlist_common as common
+
+        harness = common.summarize_evidence_png_harness(png_paths, arrange_gate=arrange_gate)
+    except Exception:
+        harness = {"capture_outcome": "soft_fail", "harness_pass": False}
+
     result = {
-        "ok": True,
+        "ok": harness.get("capture_outcome") == "pass",
+        **harness,
         "phase": "VNP-N0/N1/N2 + WTR-C",
         "level": level_name,
+        "conductor_preflight": conductor_preflight,
+        "arrange_gate": arrange_gate,
         "preset_doc": PRESET_HOMESTEAD_NIGHT_DOC,
         "night_tune": tune,
         "lighting_stack_verify": verify,

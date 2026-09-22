@@ -1,4 +1,5 @@
 # preflight_ue_editor.py
+# Harness P3 exempt: HR3-B Editor preflight for npm preflight:ue — not capture prove / Arrange.
 # HR3-B: Editor-side deep checks for UE preflight (run via MCP on DESKTOP).
 # Writes Saved/preflight_ue_editor.json for scripts/preflight-ue.js to consume.
 #
