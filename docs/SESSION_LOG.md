@@ -9308,3 +9308,11 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 **Pending:** PA-C tranche 2+ (cabin, path, planters, fence, glider, optional rim); PA-D import on DESKTOP.
 
 **Errors:** None.
+
+## 2026-09-22 — PA-C tranche-2 cabin path planters fence glider (cloud land)
+
+**Completed:** Unpacked tranche-2 tarball; replaced `SM_Cabin.fbx`, `SM_Glider_Perch.fbx`; added path stones ×3, planters ×3, `SM_Garden_Fence_Seg.fbx` under `AssetCreation/Exports/Homestead/`. Stamped Docs/32 (tranche-2 DONE, PA-D OPEN), PA_C_BLENDER, PA_C_TRANCHE2, MVP_EXPORT_MANIFEST, DECISIONS, PHASE_BOARD, Docs/README, SESSION_SUMMARY. No `.uasset`.
+
+**Pending:** Optional island rim; PA-D batch import + place on DESKTOP (Lead **`APPROVE PA-D`** not granted).
+
+**Errors:** None.

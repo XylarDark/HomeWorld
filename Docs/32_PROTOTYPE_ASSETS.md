@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Track ID** | **PA** — Prototype Assets (Homestead dress) |
-| **Status** | **PA STRATEGY APPROVED** · **PA-A CLOSED / COMPLETE** · **PA-C IN PROGRESS** (tranche-1 cliffs+pines **DONE**; track **not CLOSED**) |
+| **Status** | **PA STRATEGY APPROVED** · **PA-A CLOSED / COMPLETE** · **PA-C IN PROGRESS** (tranche-2 **DONE**; optional island rim only) · **PA-D OPEN** (batch import + place — Lead has **not** **`APPROVE PA-D`**) · track **not CLOSED** |
 | **Date** | 2026-09-22 |
 | **Author** | Cloud agent (HomeWorld) |
 | **Scope locked** | **Homestead kit only** — Lead **`APPROVE PA STRATEGY — homestead kit only`**, 2026-09-22 ET (planetside out) |
@@ -18,9 +18,9 @@ Lead **`APPROVE PA STRATEGY`** — **GRANTED** (chat, 2026-09-22 ET; Lead typed 
 
 Lead **`APPROVE PA-A`** — **GRANTED** (chat, 2026-09-22 ET). Gap audit **accepted**; **PA-A CLOSED / COMPLETE**.
 
-Lead **`APPROVE PA-C`** — **GRANTED** (chat, 2026-09-22 ET). **PA-C IN PROGRESS** — tranche-1 cliffs + pine foliage upgrade **DONE** (FBX on `AssetCreation/Exports/Homestead/`). **Do not** stamp PA-D/E done or **whole PA track CLOSED** until PA-E evidence.
+Lead **`APPROVE PA-C`** — **GRANTED** (chat, 2026-09-22 ET). **PA-C IN PROGRESS** — tranche-1 cliffs + pine **DONE**; tranche-2 cabin, path stones, planters, fence, glider perch **DONE** (FBX on `AssetCreation/Exports/Homestead/`). **PA-D** (batch import + place) **OPEN** when DESKTOP ready — **do not** stamp **`APPROVE PA-D`** or PA-E done or **whole PA track CLOSED** until Lead PA-E gate.
 
-**Handoffs:** [handoffs/PA_STRATEGY.md](handoffs/PA_STRATEGY.md) — **APPROVED / CLOSED** (PA-0) · [handoffs/PA_A_GAP_AUDIT.md](handoffs/PA_A_GAP_AUDIT.md) — **APPROVED / CLOSED** (PA-A) · [handoffs/PA_C_BLENDER.md](handoffs/PA_C_BLENDER.md) · [handoffs/PA_C_TRANCHE1.md](handoffs/PA_C_TRANCHE1.md).
+**Handoffs:** [handoffs/PA_STRATEGY.md](handoffs/PA_STRATEGY.md) — **APPROVED / CLOSED** (PA-0) · [handoffs/PA_A_GAP_AUDIT.md](handoffs/PA_A_GAP_AUDIT.md) — **APPROVED / CLOSED** (PA-A) · [handoffs/PA_C_BLENDER.md](handoffs/PA_C_BLENDER.md) · [handoffs/PA_C_TRANCHE1.md](handoffs/PA_C_TRANCHE1.md) · [handoffs/PA_C_TRANCHE2.md](handoffs/PA_C_TRANCHE2.md).
 
 **Kit plate (refs):** [refs/ai/homestead_kit_plate_labeled.jpg](refs/ai/homestead_kit_plate_labeled.jpg) · [../AssetCreation/RefImages/homestead_kit_plate_labeled.jpg](../AssetCreation/RefImages/homestead_kit_plate_labeled.jpg) · sidecar [refs/ai/homestead_kit_plate_labeled.sidecar.json](refs/ai/homestead_kit_plate_labeled.sidecar.json)
 
@@ -126,8 +126,8 @@ Workflow index: [AssetCreation/README.md](../AssetCreation/README.md).
 | **PA-0** | Strategy + kit plate stamp | CLOUD | **APPROVED / CLOSED** | Lead **`APPROVE PA STRATEGY`**, 2026-09-22 ET |
 | **PA-A** | Gap audit (mesh vs plate vs VS_MVP placement) | CLOUD+DESKTOP | **CLOSED / COMPLETE** | Lead **`APPROVE PA-A`**, 2026-09-22 ET |
 | **PA-B** | Optional orthos / AI_Sources drafts | CLOUD+Lead | **OPTIONAL** | Parallel to PA-C if Lead requests |
-| **PA-C** | Blender rebuild / upgrade | DESKTOP+Blender MCP | **IN PROGRESS** — tranche-1 **DONE** | Lead **`APPROVE PA-C`**, 2026-09-22 ET; remaining queue below |
-| **PA-D** | Import + place + master material bind | DESKTOP | **LOCKED** | After PA-C meshes complete |
+| **PA-C** | Blender rebuild / upgrade | DESKTOP+Blender MCP | **IN PROGRESS** — tranche-2 **DONE**; optional island rim only | Lead **`APPROVE PA-C`**, 2026-09-22 ET |
+| **PA-D** | Import + place + master material bind | DESKTOP | **OPEN** | Batch import + VS_MVP place when ready — Lead **`APPROVE PA-D`** **not** granted |
 | **PA-E** | Shot 1 + Shot 2 evidence + close | DESKTOP+Lead | **LOCKED** | Lead **`APPROVE PA-E`** (TBD string) |
 
 ---
@@ -154,7 +154,12 @@ Lead **`APPROVE PA-A`** — verdicts **accepted** (chat, 2026-09-22 ET). Full ha
 
 1. ~~Cliffs~~ **DONE** (tranche 1 — Lookout 864, Cabin 648, Rear 540 tris)
 2. ~~Pines~~ **DONE** (tranche 1 — foliage Z-stack; 472 tris)
-3. Cabin → 4. Path → 5. Planters → 6. Fence → 7. Glider perch → 8. Optional island rim
+3. ~~Cabin~~ **DONE** (tranche 2 — 1680 tris; UCX 5.5×4.5×5.5)
+4. ~~Path stones~~ **DONE** (tranche 2 — A/B/C 24/20/28 tris)
+5. ~~Planters~~ **DONE** (tranche 2 — A/B/C 240/336/240 tris)
+6. ~~Fence~~ **DONE** (tranche 2 — 100 tris)
+7. ~~Glider perch~~ **DONE** (tranche 2 — 132 tris)
+8. Optional island rim — **PENDING** (optional)
 
 **UE cliff place (PA-D):** Lookout `(7.5, -5.5, -4)`, CabinFace `(-7, -4.5, -3)`, Rear `(0, 5, -2.5)` — portable origins at export `(0,0,0)`.
 
@@ -190,9 +195,10 @@ Lead **`APPROVE PA-A`** — verdicts **accepted** (chat, 2026-09-22 ET). Full ha
 |------|-------------|---------|
 | 0 | **`APPROVE PA STRATEGY`** | PA-A gap audit — **DONE** 2026-09-22 ET |
 | 1 | **`APPROVE PA-A`** (gap audit accepted) | PA-C Blender queue — **DONE** 2026-09-22 ET |
-| 2 | **`APPROVE PA-C`** (2026-09-22 ET) + tranche-1 meshes | PA-C **IN PROGRESS**; PA-D after full queue |
-| 3 | **PA-E** + Lead close gate | Whole PA track — **not CLOSED** |
+| 2 | **`APPROVE PA-C`** (2026-09-22 ET) + tranche-1/2 meshes | PA-C **IN PROGRESS** (rim optional); **PA-D OPEN** |
+| 3 | **`APPROVE PA-D`** (not granted) + DESKTOP import/place | PA-E prep |
+| 4 | **PA-E** + Lead close gate | Whole PA track — **not CLOSED** |
 
 ---
 
-*Docs/32 Prototype Assets — **PA-C IN PROGRESS** (tranche-1 cliffs+pines **DONE**) — homestead kit only — track **not CLOSED** (2026-09-22 ET).*
+*Docs/32 Prototype Assets — **PA-C IN PROGRESS** (tranche-2 **DONE**; optional rim) · **PA-D OPEN** — homestead kit only — track **not CLOSED** (2026-09-22 ET).*
