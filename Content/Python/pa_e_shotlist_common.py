@@ -195,6 +195,12 @@ SHOT_FRAMING_EXCLUDE: dict[str, tuple[str, ...]] = {
     "shot2": ("Fence", "Rock", "Lookout", "SM_Lookout", "Cliff", "SM_Cliff", "PA_D_SM_Cliff"),
 }
 
+# Expected camera–dress-centroid distance (UU) for aim_ok when ray hits AABB (grazing edge hits ≠ hero framing).
+SHOT_AIM_DISTANCE_UU: dict[str, tuple[float, float]] = {
+    "shot1": (350.0, 3200.0),  # CAM_Hero doc meters ≈ 1.1k UU to dress mass
+    "shot2": (120.0, 1400.0),  # CAM_CabinClose — tighter cabin/garden
+}
+
 DRESS_LABEL_PREFIX = "DRESS_"
 
 MRQ_PIE_LIGHTING_NOTE = (
@@ -929,6 +935,7 @@ def camera_forward_alignment(
     target: "unreal.Vector",
     *,
     dress_bounds: Optional[dict[str, Any]] = None,
+    shot_id: Optional[str] = None,
 ) -> dict[str, Any]:
     """Diagnostic: forward dot to target + optional ray hit on dress AABB."""
     fwd = unreal.MathLibrary.get_forward_vector(rot)
@@ -948,16 +955,28 @@ def camera_forward_alignment(
             bmin,
             bmax,
         )
+    distance_band_ok: Optional[bool] = None
     if dress_bounds and dress_bounds.get("min") and dress_bounds.get("max"):
         aim_ok = dot > 0.3 and ray_hits is True
     else:
         aim_ok = dot > 0.3
-    return {
+    if shot_id and aim_ok:
+        band = SHOT_AIM_DISTANCE_UU.get(shot_id)
+        if band:
+            lo, hi = band
+            distance_band_ok = lo <= dist <= hi
+            if not distance_band_ok:
+                aim_ok = False
+    out: dict[str, Any] = {
         "distance_uu": round(dist, 2),
         "forward_dot_to_target": round(dot, 4),
         "forward_ray_hits_dress_aabb": ray_hits,
         "aim_ok": aim_ok,
     }
+    if distance_band_ok is not None:
+        out["distance_band_ok"] = distance_band_ok
+        out["distance_band_uu"] = list(SHOT_AIM_DISTANCE_UU.get(shot_id, (0, 0)))
+    return out
 
 
 def _apply_camera_transform(cam, loc, rot) -> Optional[str]:
@@ -970,23 +989,45 @@ def _apply_camera_transform(cam, loc, rot) -> Optional[str]:
         return str(e)
 
 
-def _camera_pose_from_bounds(shot_id: str, bounds: dict[str, Any]) -> tuple[Any, Any, dict[str, Any]]:
+def _shot_def(shot_id: str) -> Optional[dict[str, Any]]:
+    for shot in SHOTS:
+        if shot.get("id") == shot_id:
+            return shot
+    return None
+
+
+def _camera_pose_from_bounds(
+    shot_id: str,
+    bounds: dict[str, Any],
+    shot: Optional[dict[str, Any]] = None,
+) -> tuple[Any, Any, dict[str, Any]]:
+    """Relocate CAM to a shot-specific pose, then look_at dress centroid (aim_bounds primary needles).
+
+    Post-#172 DESKTOP: extent-scaled offsets could pass forward_ray_hits_dress_aabb while the dress
+    mass sat off-frame (fence/rock scrap on the right). Shot1 uses CAM_Hero doc meters + look_at;
+    shot2 uses tighter cabin/garden offsets (not full homestead extent pull).
+    """
     meta: dict[str, Any] = {"pose_source": "homestead_bounds_relocate"}
+    shot = shot or _shot_def(shot_id)
     c = bounds["centroid"]
     ext = bounds["extent"]
     target = _vector_from_list(c)
-    if shot_id == "shot1":
+    if shot_id == "shot1" and shot and shot.get("fallback_location_m"):
+        # P6_FIX / CAM_Hero: (-9, -4, 5.8) m — proven hero vista; rotate to live dress centroid only.
+        loc = meters_to_ue(tuple(shot["fallback_location_m"]))
+        meta["pose_method"] = "shot1_cam_hero_doc_meters_look_at_dress_centroid"
+        meta["doc_location_m"] = list(shot["fallback_location_m"])
+    elif shot_id == "shot2" and shot and shot.get("fallback_location_m"):
+        loc = meters_to_ue(tuple(shot["fallback_location_m"]))
+        meta["pose_method"] = "shot2_cam_cabin_close_doc_meters_look_at_dress_centroid"
+        meta["doc_location_m"] = list(shot["fallback_location_m"])
+    else:
         loc = unreal.Vector(
             target.x - ext[0] * 1.2,
             target.y - ext[1] * 0.9,
             target.z + ext[2] + 250.0,
         )
-    else:
-        loc = unreal.Vector(
-            target.x + ext[0] * 0.45,
-            target.y - ext[1] * 1.0,
-            target.z + ext[2] * 0.35 + 120.0,
-        )
+        meta["pose_method"] = "generic_extent_offset_fallback"
     rot = look_at_rotation(loc, target)
     meta["target_centroid"] = c
     meta["camera_location"] = [loc.x, loc.y, loc.z]
@@ -1024,8 +1065,10 @@ def resolve_camera_transform(shot: dict, cam) -> tuple[Any, Any, dict[str, Any]]
         loc = cam.get_actor_location()
         rot = cam.get_actor_rotation()
         if target is not None and bounds:
-            meta["aim_before"] = camera_forward_alignment(loc, rot, target, dress_bounds=bounds)
-            loc_b, rot_b, bounds_pose_meta = _camera_pose_from_bounds(shot_id, bounds)
+            meta["aim_before"] = camera_forward_alignment(
+                loc, rot, target, dress_bounds=bounds, shot_id=shot_id
+            )
+            loc_b, rot_b, bounds_pose_meta = _camera_pose_from_bounds(shot_id, bounds, shot)
             err = _apply_camera_transform(cam, loc_b, rot_b)
             if err:
                 meta["bounds_relocate_error"] = err
@@ -1033,9 +1076,11 @@ def resolve_camera_transform(shot: dict, cam) -> tuple[Any, Any, dict[str, Any]]
                 loc, rot = loc_b, rot_b
                 meta["camera_relocated_from_bounds"] = True
                 meta["bounds_pose"] = bounds_pose_meta
-            align = camera_forward_alignment(loc, rot, target, dress_bounds=bounds)
+            align = camera_forward_alignment(loc, rot, target, dress_bounds=bounds, shot_id=shot_id)
             meta["aim_after_bounds_relocate"] = align
-            meta["pose_source"] = "homestead_bounds_relocate"
+            meta["pose_source"] = bounds_pose_meta.get("pose_source", "homestead_bounds_relocate")
+            if bounds_pose_meta.get("pose_method", "").endswith("_look_at_dress_centroid"):
+                meta["pose_source"] = "shotlist_doc_fallback_relocate"
             if not align.get("aim_ok"):
                 loc_doc = meters_to_ue(tuple(shot["fallback_location_m"]))
                 rot_doc = look_at_rotation(loc_doc, target)
@@ -1047,7 +1092,9 @@ def resolve_camera_transform(shot: dict, cam) -> tuple[Any, Any, dict[str, Any]]
                     meta["camera_relocated_from_shotlist_doc"] = True
                     meta["fallback_location_m"] = list(shot["fallback_location_m"])
                     meta["pose_source"] = "shotlist_doc_fallback_relocate"
-                align_doc = camera_forward_alignment(loc, rot, target, dress_bounds=bounds)
+                align_doc = camera_forward_alignment(
+                    loc, rot, target, dress_bounds=bounds, shot_id=shot_id
+                )
                 meta["aim_after_doc_fallback"] = align_doc
                 if not align_doc.get("aim_ok"):
                     loc_stay = cam.get_actor_location()
@@ -1058,21 +1105,27 @@ def resolve_camera_transform(shot: dict, cam) -> tuple[Any, Any, dict[str, Any]]
                     else:
                         loc, rot = loc_stay, rot_reaim
                         meta["camera_reaimed_at_homestead"] = True
-                    meta["aim_after"] = camera_forward_alignment(loc, rot, target, dress_bounds=bounds)
+                    meta["aim_after"] = camera_forward_alignment(
+                        loc, rot, target, dress_bounds=bounds, shot_id=shot_id
+                    )
                     meta["pose_source"] = "in_level_camera_aim_at_bounds"
                 else:
                     meta["aim_after"] = align_doc
             else:
                 meta["aim_after"] = align
         elif target is not None:
-            align_before = camera_forward_alignment(loc, rot, target, dress_bounds=bounds)
+            align_before = camera_forward_alignment(
+                loc, rot, target, dress_bounds=bounds, shot_id=shot_id
+            )
             meta["aim_before"] = align_before
             if not align_before.get("aim_ok"):
                 rot = look_at_rotation(loc, target)
                 err_re = _apply_camera_transform(cam, loc, rot)
                 if err_re:
                     meta["camera_reaim_error"] = err_re
-                meta["aim_after"] = camera_forward_alignment(loc, rot, target, dress_bounds=bounds)
+                meta["aim_after"] = camera_forward_alignment(
+                    loc, rot, target, dress_bounds=bounds, shot_id=shot_id
+                )
             meta["pose_source"] = "in_level_camera_aim_at_bounds"
         else:
             meta["pose_source"] = "in_level_camera_no_bounds"
@@ -1082,7 +1135,7 @@ def resolve_camera_transform(shot: dict, cam) -> tuple[Any, Any, dict[str, Any]]
         return loc, rot, meta
 
     if bounds:
-        loc, rot, pose_meta = _camera_pose_from_bounds(shot_id, bounds)
+        loc, rot, pose_meta = _camera_pose_from_bounds(shot_id, bounds, shot)
         meta.update(pose_meta)
         return loc, rot, meta
 
@@ -1225,7 +1278,9 @@ def build_shot_diagnostic(shot: dict) -> dict[str, Any]:
             "aim_bounds_min": bounds.get("min"),
             "aim_bounds_max": bounds.get("max"),
         }
-        entry["alignment"] = camera_forward_alignment(loc, rot, target, dress_bounds=bounds)
+        entry["alignment"] = camera_forward_alignment(
+            loc, rot, target, dress_bounds=bounds, shot_id=shot_id
+        )
     return entry
 
 
@@ -1473,7 +1528,9 @@ def aim_shot_cameras_for_capture(log_prefix: str = "") -> dict[str, Any]:
         aim_ok = False
         if bounds and bounds.get("centroid"):
             target = _vector_from_list(bounds["centroid"])
-            aim_meta = camera_forward_alignment(loc, rot, target, dress_bounds=bounds)
+            aim_meta = camera_forward_alignment(
+                loc, rot, target, dress_bounds=bounds, shot_id=shot["id"]
+            )
             aim_ok = bool(aim_meta.get("aim_ok"))
         elif aim_meta is not None:
             aim_ok = bool(aim_meta.get("aim_ok"))
