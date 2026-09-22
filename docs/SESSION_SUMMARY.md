@@ -22,6 +22,10 @@
 
 - PA-0 docs-only: kit plate + sidecar in `AssetCreation/RefImages/` and `Docs/refs/ai/` (superseded by approve stamp above).
 
+## 2026-09-22 — SS-B HUD UE 5.8 compile fix (cloud)
+
+- PR [#147](https://github.com/XylarDark/HomeWorld/pull/147): `HomeWorldHUD.cpp` — protected `Canvas` (lambda in `DrawHUD`), `DrawTile` + `BLEND_Translucent` + `SetDrawColor`, `bSpiritHiddenCue` rename. Rebased on main (PA-D #146). DESKTOP Safe-Build verify pending.
+
 ## 2026-09-22 — SS-B spirit stealth feel (cloud, IN PROGRESS)
 
 - Lead **`APPROVE SS-B STRATEGY`** (2026-09-21 ET) → [Docs/31_SPIRIT_STEALTH_FEEL.md](../Docs/31_SPIRIT_STEALTH_FEEL.md) **SS-B STRATEGY APPROVED / SS-B IN PROGRESS**; [Docs/handoffs/SS_B_STEALTH_FEEL.md](../Docs/handoffs/SS_B_STEALTH_FEEL.md); `DECISIONS.md` SS-B strategy row. **SS-B not stamped APPROVED.**
