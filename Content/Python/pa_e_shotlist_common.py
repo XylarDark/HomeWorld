@@ -10,6 +10,7 @@ import os
 import shutil
 import struct
 import subprocess
+import time
 import zlib
 from typing import Any, Optional
 
@@ -44,6 +45,45 @@ ONE_FRAME_END = 1
 MRQ_ENGINE_WARMUP_COUNT = 56
 MRQ_RENDER_WARMUP_COUNT = 16
 MRQ_CAMERA_CUT_PREROLL_FRAME = -32
+# Latent wait budgets (Slate pre-tick — no blocking sleep on Editor main thread; see KNOWN_ERRORS).
+MRQ_WAIT_RENDER_BUDGET_SEC = 300.0
+MRQ_INTER_SHOT_DRAIN_SEC = 120.0
+MRQ_PIE_WORLD_WAIT_MAX_ATTEMPTS = 120
+MRQ_PIE_FULL_STACK_EVERY_N_TICKS = 8
+MRQ_PIE_SKYLIGHT_RECAPTURE_EVERY_N_TICKS = 2
+MRQ_WAIT_MECHANISM = "register_slate_pre_tick_callback_and_executor_delegate"
+
+MRQ_LATENT_WAIT_CONTRACT: dict[str, Any] = {
+    "mechanism": MRQ_WAIT_MECHANISM,
+    "no_blocking_sleep_on_editor_thread": True,
+    "anti_aliasing_warmup": {
+        "engine_warm_up_count": MRQ_ENGINE_WARMUP_COUNT,
+        "render_warm_up_count": MRQ_RENDER_WARMUP_COUNT,
+        "render_warm_up_frames": True,
+        "use_camera_cut_for_warm_up": True,
+        "camera_cut_preroll_frame": MRQ_CAMERA_CUT_PREROLL_FRAME,
+        "doc": "Epic MoviePipelineAntiAliasingSetting — stack/recapture during warm-up ticks",
+    },
+    "render_wait_budget_sec": MRQ_WAIT_RENDER_BUDGET_SEC,
+    "inter_shot_drain_sec": MRQ_INTER_SHOT_DRAIN_SEC,
+    "finalize_gate": "executor_finished_and_not_rendering",
+    "pie_world_night_stack_ticks": {
+        "max_attempts_before_pie_world_miss": MRQ_PIE_WORLD_WAIT_MAX_ATTEMPTS,
+        "full_stack_every_n_ticks": MRQ_PIE_FULL_STACK_EVERY_N_TICKS,
+        "skylight_recapture_every_n_ticks": MRQ_PIE_SKYLIGHT_RECAPTURE_EVERY_N_TICKS,
+    },
+}
+
+# Session TMP night fixtures (folder VS_MVP/TMP_PA_E_Arrange) — reseed after load_level; not .umap canon.
+PA_E_TMP_FIXTURE_LABELS: tuple[str, ...] = (
+    "lit_moon",
+    "TMP_PA_E_SkyLight",
+    "lit_cabinwarm",
+    "TMP_PA_E_SkyAtmosphere",
+    "TMP_PA_E_HeightFog",
+)
+PA_E_TMP_ARRANGE_FOLDER = "VS_MVP/TMP_PA_E_Arrange"
+PA_E_MRQ_CAMERA_LABEL_PREFIX = "PA_E_MRQ_"
 
 _PHASE_2_ALONE_INSUFFICIENT = (
     "hw.TimeOfDay.Phase 2 sets gameplay night phase only. Readable thematic night requires "
@@ -300,6 +340,57 @@ def saved_pa_e_dir() -> str:
     return path
 
 
+def stamp_file_artifact(path: Optional[str]) -> dict[str, Any]:
+    """Path + mtime/size for prove reports (DESKTOP can grep mtimes vs capture_since)."""
+    if not path:
+        return {"path": None, "exists": False}
+    p = abs_path(path)
+    out: dict[str, Any] = {"path": p, "exists": os.path.isfile(p)}
+    if not out["exists"]:
+        return out
+    try:
+        st = os.stat(p)
+        out["bytes"] = st.st_size
+        out["mtime"] = st.st_mtime
+        out["mtime_iso"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(st.st_mtime))
+    except OSError as e:
+        out["stat_error"] = str(e)
+    return out
+
+
+def build_pa_e_artifact_stamps(
+    shots: list[dict[str, Any]],
+    *,
+    extra_paths: Optional[list[str]] = None,
+) -> dict[str, Any]:
+    """Stable PA-E output dirs + per-shot PNG/desktop copies for DESKTOP prove."""
+    shot_files: list[dict[str, Any]] = []
+    for row in shots:
+        validation = row.get("validation") or {}
+        desktop = row.get("desktop_copy") or {}
+        shot_files.append(
+            {
+                "shot_id": row.get("id"),
+                "filename": row.get("filename"),
+                "dest_abs": stamp_file_artifact(row.get("dest_abs")),
+                "saved_path": stamp_file_artifact(row.get("saved_path") or validation.get("path")),
+                "desktop_path": stamp_file_artifact(desktop.get("desktop_path")),
+                "mrq_staging": stamp_file_artifact(
+                    (row.get("mrq_job") or {}).get("mrq_output_path")
+                ),
+            }
+        )
+    extras = [stamp_file_artifact(p) for p in (extra_paths or [])]
+    return {
+        "screenshots_dir": stamp_file_artifact(saved_pa_e_dir()),
+        "capture_report": stamp_file_artifact(report_path()),
+        "arrange_gate": stamp_file_artifact(arrange_gate_path()),
+        "homestead_diagnostic": stamp_file_artifact(homestead_diagnostic_path()),
+        "shot_artifacts": shot_files,
+        "extra_paths": extras,
+    }
+
+
 def shot_dest_abs(filename: str) -> str:
     return abs_path(os.path.join(saved_pa_e_dir(), filename))
 
@@ -434,6 +525,7 @@ def conductor_mrq_capture_preflight(log_prefix: str = "") -> dict[str, Any]:
 
     module_reload = reload_pa_e_capture_python_modules()
     world_gate = ensure_markers_editor_world(log_prefix)
+    mrq_probe = probe_mrq_tool_readiness()
     night_path_ok = all(
         hasattr(vnp, name)
         for name in (
@@ -450,12 +542,17 @@ def conductor_mrq_capture_preflight(log_prefix: str = "") -> dict[str, Any]:
         blocked.append("vnp_night_stack_api_missing")
     if module_reload.get("errors"):
         blocked.append("module_reload_errors")
+    if not mrq_probe.get("available"):
+        blocked.append(mrq_probe.get("blocked_reason") or "mrq_unavailable")
     preflight = {
         "ready": len(blocked) == 0,
         "blocked_reasons": blocked,
         "module_reload": module_reload,
         "world_gate": world_gate,
         "night_stack_api_ok": night_path_ok,
+        "mrq_probe": mrq_probe,
+        "mrq_available": bool(mrq_probe.get("available")),
+        "latent_wait_contract": MRQ_LATENT_WAIT_CONTRACT,
         "doc": "docs/Automation/CAPTURE_REDUNDANCY.md",
     }
     if log_prefix:
@@ -497,6 +594,167 @@ def purge_stale_shot_pngs(dest_abs: str) -> dict[str, Any]:
         except OSError as e:
             errors.append({"path": p, "error": str(e)})
     return {"basename": basename, "removed": removed, "remove_errors": errors}
+
+
+def purge_all_pa_e_shot_pngs_if_fresh_prove() -> dict[str, Any]:
+    """Optional full shot purge — only when PA_E_FRESH_PROVE=1 (do not wipe mid-run evidence)."""
+    flag = (os.environ.get("PA_E_FRESH_PROVE") or "").strip().lower()
+    enabled = flag in ("1", "true", "yes")
+    out: dict[str, Any] = {"fresh_prove_purge": enabled, "env": "PA_E_FRESH_PROVE", "per_shot": []}
+    if not enabled:
+        out["skipped"] = True
+        return out
+    for shot in SHOTS:
+        dest = shot_dest_abs(shot["filename"])
+        out["per_shot"].append(purge_stale_shot_pngs(dest))
+    out["skipped"] = False
+    return out
+
+
+def inventory_pa_e_session_fixtures(*, world=None) -> dict[str, Any]:
+    """List TMP arrange + MRQ session actors in editor or PIE world (labels + folder)."""
+    import vnp_night_tune_and_evidence as vnp
+
+    actors = vnp.actors_for_pa_e_world(world)
+    wctx = vnp.pa_e_world_context_label(world)
+    tmp: list[dict[str, str]] = []
+    mrq: list[dict[str, str]] = []
+    for a in actors:
+        if not a:
+            continue
+        label = actor_label(a)
+        folder = _actor_folder(a).replace("\\", "/")
+        if label in PA_E_TMP_FIXTURE_LABELS or PA_E_TMP_ARRANGE_FOLDER in folder:
+            tmp.append({"label": label, "folder": folder, "class": a.get_class().get_name() if a.get_class() else ""})
+        if label.startswith(PA_E_MRQ_CAMERA_LABEL_PREFIX):
+            mrq.append({"label": label, "folder": folder, "class": a.get_class().get_name() if a.get_class() else ""})
+    return {
+        "world_context": wctx,
+        "tmp_fixtures": tmp,
+        "mrq_cameras": mrq,
+        "tmp_labels_expected": list(PA_E_TMP_FIXTURE_LABELS),
+        "arrange_folder": PA_E_TMP_ARRANGE_FOLDER,
+    }
+
+
+def reseed_pa_e_tmp_fixtures_for_capture(
+    homestead_centroid: list[float] | None = None,
+    *,
+    world=None,
+    force_mrq_pie: bool = False,
+    log_prefix: str = "",
+) -> dict[str, Any]:
+    """Thin wrapper — spawn/reseed TMP night stack in target world; stamps lifecycle for reports."""
+    import vnp_night_tune_and_evidence as vnp
+
+    before = inventory_pa_e_session_fixtures(world=world)
+    reseed = vnp.reseed_pa_e_tmp_night_fixtures(
+        homestead_centroid, force_mrq_pie=force_mrq_pie, world=world
+    )
+    after = inventory_pa_e_session_fixtures(world=world)
+    block = {
+        "world_context": reseed.get("world_context") or before.get("world_context"),
+        "before": before,
+        "reseed": reseed,
+        "after": after,
+        "cleaned": False,
+        "note": "Session fixtures only — does not modify saved .umap unless Lead saves level.",
+    }
+    if log_prefix:
+        log(log_prefix, "fixture_reseed", {"world": block["world_context"], "spawned": reseed.get("spawned")})
+    return block
+
+
+def teardown_pa_e_session_fixtures(
+    *,
+    tmp_lights: bool = True,
+    mrq_cameras: bool = False,
+    world=None,
+    log_prefix: str = "",
+) -> dict[str, Any]:
+    """Remove session-only TMP/MRQ actors from editor world — never DRESS_* / SM_Cabin saved content."""
+    import vnp_night_tune_and_evidence as vnp
+
+    if world is not None and vnp.pa_e_world_context_label(world) != "editor":
+        return {
+            "skipped": True,
+            "reason": "teardown_editor_world_only",
+            "world_context": vnp.pa_e_world_context_label(world),
+            "destroyed": [],
+        }
+    destroyed: list[str] = []
+    errors: list[dict[str, str]] = []
+    for a in list(unreal.EditorLevelLibrary.get_all_level_actors()):
+        if not a:
+            continue
+        label = actor_label(a)
+        folder = _actor_folder(a).replace("\\", "/")
+        remove = False
+        if tmp_lights and (
+            label in PA_E_TMP_FIXTURE_LABELS or PA_E_TMP_ARRANGE_FOLDER in folder
+        ):
+            remove = True
+        if mrq_cameras and label.startswith(PA_E_MRQ_CAMERA_LABEL_PREFIX):
+            remove = True
+        if not remove:
+            continue
+        try:
+            unreal.EditorLevelLibrary.destroy_actor(a)
+            destroyed.append(label)
+        except Exception as e:
+            errors.append({"label": label, "error": str(e)})
+    out = {
+        "skipped": False,
+        "tmp_lights": tmp_lights,
+        "mrq_cameras": mrq_cameras,
+        "world_context": "editor",
+        "destroyed": destroyed,
+        "destroy_errors": errors,
+        "left_for_next_shot": not (tmp_lights or mrq_cameras),
+    }
+    if log_prefix:
+        log(log_prefix, "fixture_teardown", {"destroyed_count": len(destroyed)})
+    return out
+
+
+def classify_mrq_wait_outcome(
+    *,
+    error: Optional[str],
+    executor_finished: bool,
+    rendering: bool,
+    png_path: Optional[str],
+    timed_out: bool = False,
+) -> dict[str, Any]:
+    """Map MRQ wait failures to soft_fail vs closed_fail (P1/P2 harness semantics)."""
+    has_png = bool(png_path and os.path.isfile(png_path))
+    closed_fail = False
+    prove_loop_status = "in_progress"
+    wait_outcome = "ok"
+    if error == "render_wait_timeout_before_executor_finished":
+        wait_outcome = "timeout_before_executor_idle"
+        closed_fail = True
+        prove_loop_status = "blocked"
+    elif timed_out and executor_finished and not rendering and not has_png:
+        wait_outcome = "timeout_executor_idle_no_png"
+        closed_fail = False
+        prove_loop_status = "in_progress"
+    elif executor_finished and not rendering and not has_png:
+        wait_outcome = "executor_idle_no_png"
+        closed_fail = False
+        prove_loop_status = "in_progress"
+    elif error in ("executor_start_failed", "job_setup_failed", "sequence_create_failed"):
+        wait_outcome = "setup_failed"
+        closed_fail = True
+        prove_loop_status = "blocked"
+    return {
+        "wait_outcome": wait_outcome,
+        "closed_fail": closed_fail,
+        "prove_loop_status": prove_loop_status,
+        "executor_finished": executor_finished,
+        "rendering": rendering,
+        "has_png": has_png,
+        "latent_wait_contract": MRQ_LATENT_WAIT_CONTRACT,
+    }
 
 
 def _mean_luminance_pil(path: str) -> Optional[float]:
@@ -1036,7 +1294,9 @@ def copy_to_desktop(local_path: str, filename: str) -> dict:
     try:
         os.makedirs(dest_dir, exist_ok=True)
         shutil.copy2(local_path, dest)
-        return {"copied": True, "desktop_path": dest}
+        out = {"copied": True, "desktop_path": dest}
+        out.update(stamp_file_artifact(dest))
+        return out
     except Exception as e:
         return {"copied": False, "desktop_path": dest, "error": str(e)}
 
@@ -1732,6 +1992,10 @@ def summarize_capture_report(shots: list[dict[str, Any]]) -> dict[str, Any]:
         "void_still_after_visible_sky_stack",
         "framing_aim_proven_miss",
         "wrong_editor_world",
+        "render_wait_timeout_before_executor_finished",
+        "executor_start_failed",
+        "job_setup_failed",
+        "sequence_create_failed",
     )
     setup_only = True
     for r in shots:
@@ -1935,7 +2199,11 @@ def apply_pa_e_homestead_night_environment(
                 bounds = inv.get("homestead_bounds") or inv.get("framing_bounds")
                 if bounds and bounds.get("centroid"):
                     homestead_centroid = bounds["centroid"]
-            reseed_meta = vnp.reseed_pa_e_tmp_night_fixtures(homestead_centroid)
+            lifecycle = reseed_pa_e_tmp_fixtures_for_capture(
+                homestead_centroid, log_prefix=log_prefix
+            )
+            block["fixture_lifecycle"] = lifecycle
+            reseed_meta = lifecycle.get("reseed")
             block["tmp_fixture_reseed"] = reseed_meta
             if reseed_meta.get("stack_ok_after_reseed"):
                 tune = vnp.apply_homestead_night_tune()

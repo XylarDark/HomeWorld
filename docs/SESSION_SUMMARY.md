@@ -886,6 +886,12 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 - **Fix:** `place_vs_mvp_pa_d.py` saves level after PA-D spawn and before `run_dress_refresh()` so `load_level` in dress does not wipe unsaved cliffs/planters/fence/path stones.
 - **PR:** #149 (`cursor/pa-d-save-before-dress-1f4a`).
 
+## 2026-09-22 — PA-E P2 industry harness (cloud)
+
+- **P2:** Fixture lifecycle (`inventory` / `reseed` / optional editor `teardown`), centralized **`MRQ_LATENT_WAIT_CONTRACT`**, **`probe_mrq_tool_readiness`** in **`conductor_mrq_capture_preflight`**, **`artifact_stamps`** + **`PA_E_FRESH_PROVE`** purge gate in MRQ report.
+- **Docs:** [HARNESS_ARRANGE_TASKLIST.md](Automation/HARNESS_ARRANGE_TASKLIST.md) P2 realigned (golden-image → gated SCOUT); CAPTURE_REDUNDANCY + KNOWN_ERRORS one-liners.
+- **DESKTOP:** Re-prove `execute_python_script("capture_shotlist_mrq.py")` → `Saved/pa_e_capture_report.json` + Shot1/Shot2 under `Saved/Screenshots/PA_E/` (cloud cannot run UE).
+
 ## 2026-09-22 — PA-E shot1/2 camera pose (cloud, post-#172)
 
 - **Fix:** `pa_e_shotlist_common.py` — shot1/2 use CAM_Hero / CAM_CabinClose **doc meters** + look_at **aim_bounds** dress centroid (extent offsets grazed AABB, fence on frame); **`distance_band_ok`** on **`aim_ok`**.
