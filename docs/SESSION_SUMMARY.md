@@ -1,3 +1,8 @@
+## 2026-09-22 — P0 PA-E Harness Arrange gate (cloud)
+
+- **Problem:** Capture Act/Assert ran without Arrange (Phase 2 without light stack; CAM label ≠ aim; `load_level` dropped TMP lights; diagnostic JSON wrote before `homestead_night_environment`).
+- **Fix:** `arrange_pa_e_shotlist()` / `assert_environment_ready()` in [pa_e_shotlist_common.py](../Content/Python/pa_e_shotlist_common.py) → `Saved/pa_e_arrange_gate.json`; blocks [capture_shotlist_mrq.py](../Content/Python/capture_shotlist_mrq.py), [capture_shotlist_viewport.py](../Content/Python/capture_shotlist_viewport.py); TMP re-seed in [vnp_night_tune_and_evidence.py](../Content/Python/vnp_night_tune_and_evidence.py). Docs: CAPTURE_REDUNDANCY § P0 Arrange, [HARNESS_ARRANGE_TASKLIST.md](Automation/HARNESS_ARRANGE_TASKLIST.md), KNOWN_ERRORS, AUTOMATION_GAPS. Formal shotlist gap **OPEN** until DESKTOP lit stills.
+
 ## 2026-09-22 — Universal testing preconditions + explicit PA-E TOD (cloud, PR #167)
 
 - Lead lock-in: verify content in level, camera aim, lighting/TOD/view mode, then capture/inspect — stamped in CAPTURE_REDUNDANCY + `automation-standards.mdc` v1.5. PA-E capture: explicit **Night phase 2** per `Docs/00_SHOTLIST.md` Shot 1–2 via `apply_pa_e_shotlist_time_of_day`; report `viewport_prep.time_of_day` (replaces undocumented bare `night_phase`).

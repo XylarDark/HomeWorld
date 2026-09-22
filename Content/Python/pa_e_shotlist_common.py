@@ -574,8 +574,14 @@ def resolve_camera_transform(shot: dict, cam) -> tuple[Any, Any, dict[str, Any]]
     return loc, rot, meta
 
 
-def write_homestead_capture_diagnostic(log_prefix: str = "pa_e_homestead_capture_diagnostic:") -> dict[str, Any]:
-    """Steps 1–2 snapshot: inventory + camera vs homestead centroids → Saved JSON."""
+def write_homestead_capture_diagnostic(
+    log_prefix: str = "pa_e_homestead_capture_diagnostic:",
+    *,
+    level_loaded: Optional[bool] = None,
+    homestead_night_environment: Optional[dict[str, Any]] = None,
+    arrange_gate: Optional[dict[str, Any]] = None,
+) -> dict[str, Any]:
+    """Steps 1–2 snapshot: inventory + camera vs homestead centroids → Saved JSON (single write)."""
     payload: dict[str, Any] = {
         "lead_prove_loop": list(LEAD_PROVE_LOOP),
         "universal_testing_preconditions": list(UNIVERSAL_TESTING_PRECONDITIONS),
@@ -588,6 +594,13 @@ def write_homestead_capture_diagnostic(log_prefix: str = "pa_e_homestead_capture
             "Use framing_bounds centroids to aim CAM_* before MRQ/AL capture."
         ),
     }
+    if level_loaded is not None:
+        payload["level_loaded"] = level_loaded
+    if homestead_night_environment is not None:
+        payload["homestead_night_environment"] = homestead_night_environment
+    if arrange_gate is not None:
+        payload["arrange_gate"] = arrange_gate
+        payload["arrange_gate_path"] = arrange_gate.get("written_path") or arrange_gate_path()
     path = homestead_diagnostic_path()
     try:
         os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -725,7 +738,12 @@ def apply_pa_e_shotlist_time_of_day(log_prefix: str = "") -> dict[str, Any]:
     return block
 
 
-def apply_pa_e_homestead_night_environment(log_prefix: str = "") -> dict[str, Any]:
+def apply_pa_e_homestead_night_environment(
+    log_prefix: str = "",
+    *,
+    reseed_tmp_fixtures: bool = True,
+    homestead_centroid: Optional[list[float]] = None,
+) -> dict[str, Any]:
     """Phase 2 + PRESET tune + lighting stack verify before PA-E/MRQ capture."""
     import vnp_night_tune_and_evidence as vnp
 
@@ -738,6 +756,18 @@ def apply_pa_e_homestead_night_environment(log_prefix: str = "") -> dict[str, An
     block["time_of_day"] = apply_pa_e_shotlist_time_of_day(log_prefix)
     tune = vnp.apply_homestead_night_tune()
     verify = vnp.verify_homestead_night_lighting_stack()
+    reseed_meta: Optional[dict[str, Any]] = None
+    if reseed_tmp_fixtures and not verify.get("stack_ok"):
+        if homestead_centroid is None:
+            inv = inventory_homestead_in_level()
+            bounds = inv.get("homestead_bounds") or inv.get("framing_bounds")
+            if bounds and bounds.get("centroid"):
+                homestead_centroid = bounds["centroid"]
+        reseed_meta = vnp.reseed_pa_e_tmp_night_fixtures(homestead_centroid)
+        block["tmp_fixture_reseed"] = reseed_meta
+        if reseed_meta.get("stack_ok_after_reseed"):
+            tune = vnp.apply_homestead_night_tune()
+            verify = vnp.verify_homestead_night_lighting_stack()
     block["night_tune"] = tune
     block["lighting_stack_verify"] = verify
     block["environment_preconditions_ok"] = bool(
@@ -825,3 +855,212 @@ def sync_editor_viewport_to_camera(cam, loc, rot) -> dict[str, Any]:
     meta["location"] = [loc.x, loc.y, loc.z]
     meta["rotation"] = [rot.pitch, rot.yaw, rot.roll]
     return meta
+
+
+def arrange_gate_path() -> str:
+    return abs_path(os.path.join(project_dir(), "Saved", "pa_e_arrange_gate.json"))
+
+
+def probe_mrq_tool_readiness() -> dict[str, Any]:
+    """MRQ Python types + queue subsystem — blocked with editor_restart_required if plugins stale."""
+    if unreal is None:
+        return {"available": False, "error": "not_in_editor"}
+    probe: dict[str, Any] = {"available": False}
+    required = (
+        "MoviePipelineQueueSubsystem",
+        "MoviePipelineExecutorJob",
+        "MoviePipelinePIEExecutor",
+        "MoviePipelineOutputSetting",
+        "MoviePipelineImageSequenceOutput_PNG",
+    )
+    missing = [n for n in required if not hasattr(unreal, n)]
+    probe["missing_types"] = missing
+    if missing:
+        probe["error"] = "missing_unreal_types: " + ", ".join(missing)
+        probe["blocked_reason"] = "mrq_unavailable"
+        probe["plugin_hint"] = [
+            "MovieRenderPipeline",
+            "MovieRenderPipelineEditor",
+            "SequencerScripting",
+        ]
+        probe["remediation"] = "Enable plugins in HomeWorld.uproject, Safe-Build, restart Editor"
+        return probe
+    try:
+        subsys = unreal.get_editor_subsystem(unreal.MoviePipelineQueueSubsystem)
+        probe["subsystem"] = subsys is not None
+        if subsys is None:
+            probe["error"] = "MoviePipelineQueueSubsystem get_editor_subsystem returned None"
+            probe["blocked_reason"] = "editor_restart_required"
+            probe["remediation"] = (
+                "Plugins may be enabled on disk but Python session stale — restart Editor after Safe-Build"
+            )
+            return probe
+    except Exception as e:
+        probe["error"] = str(e)
+        probe["blocked_reason"] = "mrq_unavailable"
+        return probe
+    probe["available"] = True
+    return probe
+
+
+def aim_shot_cameras_for_capture(log_prefix: str = "") -> dict[str, Any]:
+    """Step 2: re-aim CAM_* at framing/homestead bounds centroids (find_look_at_rotation)."""
+    shots_aim: list[dict[str, Any]] = []
+    all_aim_ok = True
+    for shot in SHOTS:
+        cam = find_camera(shot["camera_labels"])
+        loc, rot, pose_meta = resolve_camera_transform(shot, cam)
+        inv = pose_meta.get("prove_loop_step1_inventory") or inventory_homestead_in_level(shot["id"])
+        bounds = inv.get("framing_bounds") or inv.get("homestead_bounds")
+        aim_meta = pose_meta.get("aim_after") or pose_meta.get("aim_before")
+        aim_ok = False
+        if bounds and bounds.get("centroid"):
+            target = _vector_from_list(bounds["centroid"])
+            aim_meta = camera_forward_alignment(loc, rot, target)
+            aim_ok = bool(aim_meta.get("aim_ok"))
+        elif aim_meta is not None:
+            aim_ok = bool(aim_meta.get("aim_ok"))
+        elif pose_meta.get("warning"):
+            aim_ok = False
+        else:
+            aim_ok = pose_meta.get("pose_source") != "hardcoded_fallback_last_resort"
+        if not aim_ok:
+            all_aim_ok = False
+        shots_aim.append(
+            {
+                "shot_id": shot["id"],
+                "camera_labels": shot["camera_labels"],
+                "camera_label": pose_meta.get("camera_label"),
+                "pose_source": pose_meta.get("pose_source"),
+                "aim_ok": aim_ok,
+                "aim": aim_meta,
+                "inventory_ok": inv.get("inventory_ok"),
+            }
+        )
+    out = {"shots": shots_aim, "aim_ok": all_aim_ok}
+    if log_prefix:
+        log(log_prefix, "aim_shot_cameras", {"aim_ok": all_aim_ok})
+    return out
+
+
+def arrange_pa_e_shotlist(
+    log_prefix: str = "",
+    *,
+    level_loaded: bool = True,
+    require_mrq: bool = False,
+    mrq_probe: Optional[dict[str, Any]] = None,
+) -> dict[str, Any]:
+    """P0 Arrange gate — inventory, aim, night stack, lit/game view. Blocks capture when not ready."""
+    blocked_reasons: list[str] = []
+    if not level_loaded:
+        blocked_reasons.append("level_load_failed")
+
+    inventory = inventory_homestead_in_level()
+    if not inventory.get("inventory_ok"):
+        blocked_reasons.append("inventory_empty")
+
+    centroid = None
+    bounds = inventory.get("homestead_bounds") or inventory.get("framing_bounds")
+    if bounds and bounds.get("centroid"):
+        centroid = bounds["centroid"]
+
+    aim = aim_shot_cameras_for_capture(log_prefix)
+    if not aim.get("aim_ok"):
+        blocked_reasons.append("camera_aim_not_at_homestead")
+
+    finish_loading = finish_loading_before_capture()
+    lighting = apply_pa_e_homestead_night_environment(
+        log_prefix, reseed_tmp_fixtures=True, homestead_centroid=centroid
+    )
+    view = apply_lit_game_view_for_capture()
+
+    tool_readiness: dict[str, Any] = {"mrq": None}
+    if require_mrq:
+        tool_readiness["mrq"] = mrq_probe if mrq_probe is not None else probe_mrq_tool_readiness()
+        mrq = tool_readiness["mrq"] or {}
+        if not mrq.get("available"):
+            reason = mrq.get("blocked_reason") or "mrq_unavailable"
+            blocked_reasons.append(reason)
+
+    if not lighting.get("environment_preconditions_ok"):
+        blocked_reasons.append("night_lighting_stack_incomplete")
+
+    ready = len(blocked_reasons) == 0
+    gate: dict[str, Any] = {
+        "ready": ready,
+        "blocked_reasons": blocked_reasons,
+        "level_loaded": level_loaded,
+        "inventory": inventory,
+        "aim": aim,
+        "lighting": lighting,
+        "view": view,
+        "finish_loading": finish_loading,
+        "tool_readiness": tool_readiness,
+        "lead_prove_loop": list(LEAD_PROVE_LOOP),
+        "universal_testing_preconditions": list(UNIVERSAL_TESTING_PRECONDITIONS),
+        "level_path": LEVEL_PATH,
+    }
+    path = arrange_gate_path()
+    try:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(gate, f, indent=2, default=str)
+        gate["written_path"] = path
+        if log_prefix:
+            log(log_prefix, "arrange_gate written", {"ready": ready, "path": path, "blocked": blocked_reasons})
+    except OSError as e:
+        gate["write_error"] = str(e)
+        if log_prefix:
+            log(log_prefix, "arrange_gate write failed", {"error": str(e)})
+    return gate
+
+
+def write_blocked_capture_report(
+    *,
+    prefix: str,
+    primary_path: str,
+    arrange_gate: dict[str, Any],
+    level_loaded: bool,
+    keep_python_script_alive: bool = False,
+    mrq_probe: Optional[dict[str, Any]] = None,
+    extra: Optional[dict[str, Any]] = None,
+) -> str:
+    """No capture attempted — prove-loop blocked, not closed FAIL."""
+    report: dict[str, Any] = {
+        "ok": False,
+        "capture_pass": False,
+        "closed_fail": False,
+        "prove_loop_status": "blocked",
+        "arrange_gate": arrange_gate,
+        "arrange_gate_path": arrange_gate.get("written_path") or arrange_gate_path(),
+        "blocked_reasons": arrange_gate.get("blocked_reasons") or [],
+        "lead_prove_loop": list(LEAD_PROVE_LOOP),
+        "universal_testing_preconditions": list(UNIVERSAL_TESTING_PRECONDITIONS),
+        "homestead_diagnostic_path": homestead_diagnostic_path(),
+        "prefix": prefix.strip(":"),
+        "primary_path": primary_path,
+        "level_path": LEVEL_PATH,
+        "level_loaded": level_loaded,
+        "keep_python_script_alive": keep_python_script_alive,
+        "prove_criteria": PROVE_CRITERIA,
+        "desktop_conductor_checklist": desktop_conductor_checklist(),
+        "shots": [],
+        "policy": (
+            "P0 Arrange gate — no MRQ/AL job until ready. "
+            "Blocked is not closed FAIL; complete LEAD_PROVE_LOOP (inventory→aim→lighting→capture)."
+        ),
+    }
+    if mrq_probe is not None:
+        report["mrq_probe"] = mrq_probe
+        report["mrq_available"] = bool(mrq_probe.get("available"))
+    if extra:
+        report.update(extra)
+    out_path = report_path()
+    with open(out_path, "w", encoding="utf-8") as f:
+        json.dump(report, f, indent=2, default=str)
+    log(prefix, "capture blocked by arrange gate", {"reasons": report["blocked_reasons"], "path": out_path})
+    return out_path
+
+
+# Lead-facing alias (Arrange before Act/Assert).
+assert_environment_ready = arrange_pa_e_shotlist

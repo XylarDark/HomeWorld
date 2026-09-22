@@ -17,6 +17,8 @@ Writes Saved/vnp_night_evidence.json (full main() only).
 """
 from __future__ import annotations
 
+from typing import Any
+
 import json
 import os
 import time
@@ -219,6 +221,144 @@ def apply_homestead_night_tune(actors: list | None = None) -> dict:
         "lights_tuned_count": len(lights_tuned),
         "lights_tuned_sample": lights_tuned[:12],
         "note": "Phase 2 alone does not apply this tune — call before PA-E/MRQ capture.",
+    }
+
+
+# Session-only fixtures (re-spawned after load_level; not saved to .umap by default).
+TMP_PA_E_ARRANGE_FOLDER = "VS_MVP/TMP_PA_E_Arrange"
+TMP_MOON_LABEL = "lit_moon"
+TMP_SKY_LABEL = "TMP_PA_E_SkyLight"
+TMP_CABIN_WARM_LABEL = "lit_cabinwarm"
+
+
+def _spawn_light_if_missing(
+    actors: list,
+    label: str,
+    unreal_class,
+    location: "unreal.Vector",
+    rotation: "unreal.Rotator | None" = None,
+) -> tuple[Any, bool]:
+    for a in actors:
+        if _actor_label(a) == label:
+            return a, False
+    rot = rotation if rotation is not None else unreal.Rotator(roll=0.0, pitch=0.0, yaw=0.0)
+    actor = unreal.EditorLevelLibrary.spawn_actor_from_class(unreal_class, location, rot)
+    if actor:
+        try:
+            actor.set_actor_label(label)
+            actor.set_folder_path(TMP_PA_E_ARRANGE_FOLDER)
+        except Exception:
+            pass
+    return actor, True
+
+
+def _configure_directional_moon(actor, intensity: float = 3.5) -> list[str]:
+    applied: list[str] = []
+    try:
+        lc = actor.light_component if hasattr(actor, "light_component") else actor.root_component
+    except Exception:
+        lc = actor.root_component
+    warm = unreal.LinearColor(1.0, 0.88, 0.55, 1.0)
+    if lc:
+        if _try_set(lc, "light_color", warm):
+            applied.append("light_color=moon_warm")
+        if _try_set(lc, "intensity", intensity):
+            applied.append("intensity")
+        if _try_set(lc, "mobility", unreal.ComponentMobility.MOVABLE):
+            applied.append("movable")
+    return applied
+
+
+def _configure_skylight(actor) -> list[str]:
+    applied: list[str] = []
+    try:
+        comp = actor.light_component if hasattr(actor, "light_component") else actor.root_component
+    except Exception:
+        comp = actor.root_component
+    if comp and _try_set(comp, "intensity", 1.2):
+        applied.append("intensity")
+    return applied
+
+
+def _configure_cabin_warm_point(actor, intensity: float = 1200.0) -> list[str]:
+    applied: list[str] = []
+    try:
+        lc = actor.light_component if hasattr(actor, "light_component") else actor.root_component
+    except Exception:
+        lc = actor.root_component
+    warm = unreal.LinearColor(1.0, 0.72, 0.35, 1.0)
+    if lc:
+        if _try_set(lc, "light_color", warm):
+            applied.append("light_color=warm_amber")
+        if _try_set(lc, "intensity", intensity):
+            applied.append("intensity")
+        if _try_set(lc, "mobility", unreal.ComponentMobility.MOVABLE):
+            applied.append("movable")
+    return applied
+
+
+def reseed_pa_e_tmp_night_fixtures(homestead_centroid: list[float] | None = None) -> dict:
+    """Idempotent TMP moon + skylight + cabin warm after load_level (prove without saving .umap)."""
+    actors = unreal.EditorLevelLibrary.get_all_level_actors()
+    verify_before = verify_homestead_night_lighting_stack(actors)
+    if verify_before.get("stack_ok"):
+        return {
+            "skipped": True,
+            "reason": "stack_already_ok",
+            "verify_before": verify_before,
+            "verify_after": verify_before,
+            "spawned": [],
+        }
+
+    if homestead_centroid and len(homestead_centroid) >= 3:
+        cx, cy, cz = homestead_centroid[0], homestead_centroid[1], homestead_centroid[2]
+    else:
+        # PRESET graybox cabin warm origin (meters) → UE cm
+        cx, cy, cz = -600.0, -100.0, 150.0
+
+    target = unreal.Vector(cx, cy, cz)
+    moon_loc = unreal.Vector(cx - 8000.0, cy - 6000.0, cz + 12000.0)
+    sky_loc = unreal.Vector(cx, cy, cz + 400.0)
+    cabin_loc = unreal.Vector(cx + 200.0, cy + 150.0, cz + 80.0)
+
+    spawned: list[dict] = []
+    try:
+        moon_rot = unreal.MathLibrary.find_look_at_rotation(moon_loc, target)
+    except Exception:
+        moon_rot = unreal.Rotator(roll=0.0, pitch=-45.0, yaw=0.0)
+
+    moon, moon_new = _spawn_light_if_missing(
+        actors, TMP_MOON_LABEL, unreal.DirectionalLight, moon_loc, moon_rot
+    )
+    if moon and moon_new:
+        spawned.append({"label": TMP_MOON_LABEL, "class": "DirectionalLight", "configured": _configure_directional_moon(moon)})
+
+    sky, sky_new = _spawn_light_if_missing(actors, TMP_SKY_LABEL, unreal.SkyLight, sky_loc)
+    if sky and sky_new:
+        spawned.append({"label": TMP_SKY_LABEL, "class": "SkyLight", "configured": _configure_skylight(sky)})
+
+    cabin, cabin_new = _spawn_light_if_missing(
+        actors, TMP_CABIN_WARM_LABEL, unreal.PointLight, cabin_loc
+    )
+    if cabin and cabin_new:
+        spawned.append(
+            {
+                "label": TMP_CABIN_WARM_LABEL,
+                "class": "PointLight",
+                "configured": _configure_cabin_warm_point(cabin),
+            }
+        )
+
+    actors_after = unreal.EditorLevelLibrary.get_all_level_actors()
+    verify_after = verify_homestead_night_lighting_stack(actors_after)
+    return {
+        "skipped": False,
+        "homestead_centroid_used": [cx, cy, cz],
+        "spawned": spawned,
+        "verify_before": verify_before,
+        "verify_after": verify_after,
+        "stack_ok_after_reseed": bool(verify_after.get("stack_ok")),
+        "note": "TMP actors under VS_MVP/TMP_PA_E_Arrange — re-run after load_level; optional KEEP-LOCAL save.",
     }
 
 

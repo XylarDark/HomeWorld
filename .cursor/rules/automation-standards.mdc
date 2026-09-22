@@ -21,6 +21,8 @@ Applies to **every** automation / tooling gap (any tool surface). Canonical deta
 
 Before trusting **any** automation pass/fail output, verify setup in order: **(1)** content in loaded level, **(2)** camera aimed at that content, **(3)** lighting / time-of-day / **preset tune** match intent (PA-E night: Phase 2 + `PRESET_Homestead_Night` — Phase 2 alone insufficient; do not switch to day for black stills) — **record** in reports, **(4)** capture or run harness then inspect output. Do not treat missing preconditions as a closed FAIL without this loop. Full table: CAPTURE_REDUNDANCY.md § Testing preconditions.
 
+**PA-E capture (enforced in code):** Call **`arrange_pa_e_shotlist()`** / **`assert_environment_ready()`** after `load_level` — writes `Saved/pa_e_arrange_gate.json`; **do not** start MRQ/AL when `ready: false` (`prove_loop_status: blocked`, `closed_fail: false`). See CAPTURE_REDUNDANCY.md § P0 Arrange gate and [HARNESS_ARRANGE_TASKLIST.md](../../docs/Automation/HARNESS_ARRANGE_TASKLIST.md).
+
 ### Docs-first
 
 - Read **official Epic (or vendor) docs** before inventing or hardening console commands, Editor Python APIs, MCP usage, commandlets, or similar — unless usage is already in repo policy or agent memory.
