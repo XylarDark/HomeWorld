@@ -9254,3 +9254,15 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 **Remaining:** DESKTOP Safe-Build + PIE walk prove; Lead **`APPROVE DS-A`** when satisfied.
 
+---
+
+## 2026-09-22 — DS-A track CLOSED (docs stamp, cloud)
+
+**Task:** Lead **`APPROVE DS-A`**, 2026-09-21 ET — close Docs/30 Demo Spine.
+
+**Delivered:** `Docs/30_DEMO_SPINE.md` **CLOSED / COMPLETE**; `Docs/handoffs/DS_A_VISIBLE_HEARTH.md` **APPROVED / CLOSED**; `Docs/canon/DECISIONS.md` append; thin `Docs/README.md`, `SESSION_SUMMARY.md`, `swarm/PHASE_BOARD.md` updates. DS-A impl already on main `7d579f9` (PR #136).
+
+**Deferred:** **PROVE-BATCH** DESKTOP grep/walk bundle — placement crash / PIE MCP timeouts; no invented PASS evidence.
+
+**Remaining:** Next product track Lead-named TBD — **DS-B+** not opened.
+

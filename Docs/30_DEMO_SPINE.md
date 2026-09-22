@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **DEMO-SPINE STRATEGY APPROVED** — Lead **`APPROVE DEMO-SPINE`**, 2026-09-21 ET; **DS-A IN PROGRESS** (this PR) |
+| **Status** | **CLOSED / COMPLETE** — Lead **`APPROVE DS-A`**, 2026-09-21 ET (DS STRATEGY + DS-A approved) |
 | **Date** | 2026-09-22 |
 | **Author** | Conductor (HomeWorld) |
 | **Prior tracks** | [22_GATHER_CRAFT_IMPL.md](22_GATHER_CRAFT_IMPL.md) **CLOSED** (GC-B/C logs + placeholders) |
@@ -13,6 +13,10 @@
 ## Gate
 
 Lead **`APPROVE DEMO-SPINE`**, 2026-09-21 ET — **GRANTED** (chat). Unlocks **DS-A** (visible hearth path).
+
+**DS-A:** Lead **`APPROVE DS-A`**, 2026-09-21 ET — **GRANTED** (chat; Lead typed **`APPROVE DS-`** truncated — treat as **`APPROVE DS-A`**). Docs/30 Demo Spine track **CLOSED / COMPLETE**. Implementation on main (`7d579f9` / PR #136).
+
+**Next gate:** None on DS — **DS-B+** remains Lead TBD (art-dressed cottage, optional prove bundle). **PROVE-BATCH** on DESKTOP remains **deferred** (placement-script crash / PIE MCP timeouts on host — not stamped PASS; no invented grep evidence).
 
 **Do not stamp phase APPROVED in a PR** — Lead types the gate string in chat.
 
@@ -31,7 +35,7 @@ Make **campfire → tent → cottage** **seeable in-world** on VS_MVP so a human
 | Track | Name | Host | Status | Gate |
 |-------|------|------|--------|------|
 | **DS STRATEGY** | Visible demo spine policy | Lead | **APPROVED** | Lead **`APPROVE DEMO-SPINE`**, 2026-09-21 ET |
-| **DS-A** | Visible hearth + cottage blockout | CLOUD+DESKTOP | **IN PROGRESS** | Handoff [DS_A_VISIBLE_HEARTH.md](handoffs/DS_A_VISIBLE_HEARTH.md) |
+| **DS-A** | Visible hearth + cottage blockout | CLOUD+DESKTOP | **APPROVED / CLOSED** | Lead **`APPROVE DS-A`**, 2026-09-21 ET — [handoffs/DS_A_VISIBLE_HEARTH.md](handoffs/DS_A_VISIBLE_HEARTH.md) |
 
 **Out of scope (DS-A):** Full P0 Conductor prove on DESKTOP; functional kitchen cooking (P2 UT); spirit stealth polish; 7th RES; functional shop craft; combat; bulk `.uasset` import.
 
@@ -64,3 +68,7 @@ Make **campfire → tent → cottage** **seeable in-world** on VS_MVP so a human
 ## Next gates
 
 **DS-B+** TBD (Lead) — e.g. art-dressed cottage prop rebind, P0 prove bundle. Do not open without Lead gate string prefixed **`DS`**.
+
+---
+
+*Docs/30 Demo Spine **CLOSED / COMPLETE** — Lead **`APPROVE DS-A`**, 2026-09-21 ET.*

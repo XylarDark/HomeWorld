@@ -1,3 +1,7 @@
+## 2026-09-22 — DS-A track CLOSED (docs stamp, cloud)
+
+- Lead **`APPROVE DS-A`** (2026-09-21 ET; chat truncated **`APPROVE DS-`**) → `Docs/30_DEMO_SPINE.md` **CLOSED / COMPLETE**; `Docs/handoffs/DS_A_VISIBLE_HEARTH.md` **APPROVED / CLOSED**; `Docs/canon/DECISIONS.md` row. DS-A on main `7d579f9` (PR #136). **PROVE-BATCH** DESKTOP walk/greps **deferred** — not stamped PASS. Next track Lead TBD.
+
 ## 2026-09-22 — SS-A spirit stealth stubs (cloud, IN PROGRESS)
 
 - Lead **`SS-A`** → **`APPROVE SS STRATEGY`**; [Docs/25_SPIRIT_STEALTH_IMPL.md](../Docs/25_SPIRIT_STEALTH_IMPL.md) + [Docs/handoffs/SS_A_STEALTH_STUBS.md](../Docs/handoffs/SS_A_STEALTH_STUBS.md); `DECISIONS.md` SS strategy row. SS-A **not** stamped APPROVED.
