@@ -9246,6 +9246,16 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 ---
 
+## 2026-09-22 — SS-B spirit stealth feel (cloud)
+
+**Task:** Lead **`APPROVE SS-B STRATEGY`** — SS-B feel polish (hidden/revealed cues, alert HUD, NPC torch carriers).
+
+**Delivered:** `Docs/31_SPIRIT_STEALTH_FEEL.md`, `Docs/handoffs/SS_B_STEALTH_FEEL.md`, `DECISIONS.md` SS-B strategy row; C++ `HomeWorldSpiritStealthComponent` feel + `HomeWorldSpiritNpcTorchCarrier` + HUD alert bar; `place_vs_mvp_ss_b_feel.py`. SS-A `STEALTH: LIT/ALERT/CLEAR` logs preserved.
+
+**Remaining:** DESKTOP Safe-Build + placement + PIE greps; Lead **`APPROVE SS-B`**.
+
+---
+
 ## 2026-09-22 — DS-A visible demo spine (cloud)
 
 **Task:** Lead **`APPROVE DEMO-SPINE`** — DS-A visible campfire → tent → cottage on VS_MVP.

@@ -1,3 +1,8 @@
+## 2026-09-22 — SS-B spirit stealth feel (cloud, IN PROGRESS)
+
+- Lead **`APPROVE SS-B STRATEGY`** (2026-09-21 ET) → [Docs/31_SPIRIT_STEALTH_FEEL.md](../Docs/31_SPIRIT_STEALTH_FEEL.md) **SS-B STRATEGY APPROVED / SS-B IN PROGRESS**; [Docs/handoffs/SS_B_STEALTH_FEEL.md](../Docs/handoffs/SS_B_STEALTH_FEEL.md); `DECISIONS.md` SS-B strategy row. **SS-B not stamped APPROVED.**
+- C++: stealth feel cues on `HomeWorldSpiritStealthComponent`, HUD alert bar, `HomeWorldSpiritNpcTorchCarrier`, `place_vs_mvp_ss_b_feel.py`. DESKTOP greps `STEALTH:*` + PIE feel pending.
+
 ## 2026-09-22 — DS-A track CLOSED (docs stamp, cloud)
 
 - Lead **`APPROVE DS-A`** (2026-09-21 ET; chat truncated **`APPROVE DS-`**) → `Docs/30_DEMO_SPINE.md` **CLOSED / COMPLETE**; `Docs/handoffs/DS_A_VISIBLE_HEARTH.md` **APPROVED / CLOSED**; `Docs/canon/DECISIONS.md` row. DS-A on main `7d579f9` (PR #136). **PROVE-BATCH** DESKTOP walk/greps **deferred** — not stamped PASS. Next track Lead TBD.

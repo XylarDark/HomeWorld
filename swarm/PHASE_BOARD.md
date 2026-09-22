@@ -1,6 +1,6 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **Docs/30 Demo Spine (DS) — CLOSED / COMPLETE** — Lead **`APPROVE DS-A`**, 2026-09-21 ET — [30_DEMO_SPINE.md](../Docs/30_DEMO_SPINE.md). Next: Lead-named track TBD (do not invent).
+**Current phase:** **Docs/31 Spirit Stealth feel (SS-B) — IN PROGRESS** — Lead **`APPROVE SS-B STRATEGY`**, 2026-09-21 ET — [31_SPIRIT_STEALTH_FEEL.md](../Docs/31_SPIRIT_STEALTH_FEEL.md). Close: Lead **`APPROVE SS-B`**. DS track **CLOSED** on Docs/30.
 
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **Conductor** (parent DESKTOP) / **DESKTOP-21CT3H0**

@@ -9,12 +9,34 @@
 #include "HomeWorldPlayerState.h"
 #include "HomeWorldSpiritBurstAbility.h"
 #include "HomeWorldSpiritShieldAbility.h"
+#include "HomeWorldSpiritStealthComponent.h"
+#include "HomeWorldCharacter.h"
 #include "HomeWorldTimeOfDaySubsystem.h"
 #include "AbilitySystemInterface.h"
 #include "Engine/Canvas.h"
 #include "Engine/Engine.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/Pawn.h"
+
+namespace HomeWorldStealthHud
+{
+	static void DrawScreenEdgePulse(AHUD* HUD, float Alert01, bool bRevealed)
+	{
+		if (!HUD || !HUD->Canvas || !bRevealed)
+		{
+			return;
+		}
+		const int32 W = HUD->Canvas->ClipX;
+		const int32 H = HUD->Canvas->ClipY;
+		const int32 Thickness = FMath::Clamp(static_cast<int32>(6.f + Alert01 * 18.f), 4, 24);
+		const uint8 Alpha = static_cast<uint8>(FMath::Clamp(40.f + Alert01 * 160.f, 30.f, 220.f));
+		const FColor EdgeColor(255, 120, 40, Alpha);
+		HUD->Canvas->DrawTile(HUD->Canvas->DefaultTexture, 0.f, 0.f, static_cast<float>(W), static_cast<float>(Thickness), 0.f, 0.f, 1.f, 1.f, EdgeColor);
+		HUD->Canvas->DrawTile(HUD->Canvas->DefaultTexture, 0.f, static_cast<float>(H - Thickness), static_cast<float>(W), static_cast<float>(Thickness), 0.f, 0.f, 1.f, 1.f, EdgeColor);
+		HUD->Canvas->DrawTile(HUD->Canvas->DefaultTexture, 0.f, 0.f, static_cast<float>(Thickness), static_cast<float>(H), 0.f, 0.f, 1.f, 1.f, EdgeColor);
+		HUD->Canvas->DrawTile(HUD->Canvas->DefaultTexture, static_cast<float>(W - Thickness), 0.f, static_cast<float>(Thickness), static_cast<float>(H), 0.f, 0.f, 1.f, 1.f, EdgeColor);
+	}
+}
 
 void AHomeWorldHUD::DrawHUD()
 {
@@ -404,6 +426,51 @@ void AHomeWorldHUD::DrawHUD()
 			{
 				bLoggedAstralOnce = false;
 				bLoggedSpiritBurstOnce = false;
+			}
+		}
+	}
+
+	// SS-B: spirit stealth alert tick + hidden/revealed HUD (planet spirit form only).
+	if (APawn* StealthPawn = PC->GetPawn())
+	{
+		const AHomeWorldCharacter* HWChar = Cast<AHomeWorldCharacter>(StealthPawn);
+		if (HWChar && HWChar->GetIsSpiritForm())
+		{
+			if (const UHomeWorldSpiritStealthComponent* Stealth =
+					HWChar->FindComponentByClass<UHomeWorldSpiritStealthComponent>())
+			{
+				const float Alert01 = Stealth->GetAlertLevel();
+				const bool bLit = Stealth->IsSpiritLit();
+				const bool bRevealed = Stealth->IsSpiritRevealedCueActive();
+				const bool bHidden = Stealth->IsSpiritHiddenCueActive();
+
+				const float BarW = 180.f;
+				const float BarH = 10.f;
+				const float BarX = Canvas->ClipX - BarW - 28.f;
+				const float BarY = 28.f;
+				Canvas->DrawTile(Canvas->DefaultTexture, BarX, BarY, BarW, BarH, 0.f, 0.f, 1.f, 1.f, FColor(30, 30, 40, 200));
+				if (Alert01 > 0.01f || bLit)
+				{
+					const FColor Fill(255, 140, 50, 230);
+					Canvas->DrawTile(Canvas->DefaultTexture, BarX, BarY, BarW * Alert01, BarH, 0.f, 0.f, 1.f, 1.f, Fill);
+				}
+
+				const FString StealthLine = bRevealed
+					? FString::Printf(TEXT("Spirit: REVEALED  alert %.0f%%"), Alert01 * 100.f)
+					: TEXT("Spirit: hidden");
+				Canvas->SetDrawColor(bRevealed ? FColor(255, 180, 90) : FColor(160, 190, 255));
+				Canvas->DrawText(Font, StealthLine, BarX, BarY + 16.f, TextScale * 0.95f, TextScale * 0.95f);
+				Canvas->SetDrawColor(FColor::White);
+
+				HomeWorldStealthHud::DrawScreenEdgePulse(this, Alert01, bRevealed);
+
+				static bool bLoggedStealthHudOnce = false;
+				if (!bLoggedStealthHudOnce && (bHidden || bRevealed))
+				{
+					UE_LOG(LogHomeWorld, Log, TEXT("STEALTH: HUD alert tick enabled (hidden=%d revealed=%d)"),
+						bHidden ? 1 : 0, bRevealed ? 1 : 0);
+					bLoggedStealthHudOnce = true;
+				}
 			}
 		}
 	}

@@ -4,6 +4,7 @@ Append only. Date · decision · why.
 
 | Date (ET) | Decision | Why |
 |---|---|---|
+| 2026-09-21 | **SS-B STRATEGY APPROVED** — Lead typed **`APPROVE SS-B STRATEGY`** (chat, 2026-09-21 ET). Unlocks **SS-B** ([Docs/31_SPIRIT_STEALTH_FEEL.md](../31_SPIRIT_STEALTH_FEEL.md): hidden/revealed feel, alert HUD tick, NPC torch carriers). **Do not** stamp SS-B APPROVED until Lead **`APPROVE SS-B`**. | SS-A closed on Docs/25; SS-B is feel-only (no crouch, no kill-on-detect, SS-A logs preserved). |
 | 2026-09-21 | **Docs/30 Demo Spine CLOSED / COMPLETE** — Lead **`APPROVE DS-A`** (chat, 2026-09-21 ET; truncated **`APPROVE DS-`** → DS-A). DS-A impl track done; **DS-B+** not opened. **PROVE-BATCH** on DESKTOP remains deferred (placement crash / PIE MCP timeouts — no invented PASS greps). | DS-A merged main (`7d579f9` / PR #136); docs stamp closes DS track like SS-A on Docs/25. |
 | 2026-09-21 | **DS STRATEGY APPROVED** — Lead typed **`APPROVE DEMO-SPINE`** (chat, 2026-09-21 ET). Unlocks **DS-A** ([Docs/30_DEMO_SPINE.md](../30_DEMO_SPINE.md): visible campfire → tent → cottage on VS_MVP). **Do not** stamp DS-A APPROVED until Lead **`APPROVE DS-A`**. | GC-B/C logs exist; DS-A makes path walkable without cheats-only UX. KEEP-LOCAL level save OK. |
 | 2026-09-21 | **Docs/25 Spirit Stealth CLOSED / COMPLETE** — Lead **`APPROVE SS-A`** (chat, 2026-09-21 ET). SS-A impl track done; **SS-B** not opened (locked bible LATER scope only). | SS-A merged main (`7bc577f` / PR #133); docs stamp closes SS track like CD-A on Docs/23. |

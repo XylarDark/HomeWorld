@@ -9,8 +9,11 @@
 
 class AHomeWorldSpiritLitVolume;
 
+class UPointLightComponent;
+class USkeletalMeshComponent;
+
 /**
- * SS-A: spirit-form lit / alert stub (A2 pressure). Logs STEALTH:* — no kill, no kidnap, no homestead combat.
+ * SS-A/SS-B: spirit-form lit / alert (A2 pressure) + readable hidden/revealed feel. Logs STEALTH:* — no kill, no kidnap, no homestead combat.
  */
 UCLASS(ClassGroup = (HomeWorld), meta = (BlueprintSpawnableComponent))
 class HOMEWORLD_API UHomeWorldSpiritStealthComponent : public UActorComponent
@@ -25,6 +28,14 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Stealth|SS-A")
 	float GetAlertLevel() const { return AlertLevel; }
+
+	/** SS-B: true when spirit is unlit (hidden fantasy cue active). */
+	UFUNCTION(BlueprintCallable, Category = "Stealth|SS-B")
+	bool IsSpiritHiddenCueActive() const;
+
+	/** SS-B: true when lit or alert is rising (revealed fantasy cue). */
+	UFUNCTION(BlueprintCallable, Category = "Stealth|SS-B")
+	bool IsSpiritRevealedCueActive() const;
 
 	void NotifyLitVolumeEntered(EHomeWorldSpiritLitSourceKind SourceKind, AHomeWorldSpiritLitVolume* Volume);
 	void NotifyLitVolumeExited(AHomeWorldSpiritLitVolume* Volume);
@@ -43,6 +54,18 @@ protected:
 
 	void UpdateAlert(float DeltaTime);
 	void TryLogClear();
+	void UpdateFeelVisuals();
+	void EnsureFeelLight();
+	void ApplyMeshFeelTint(bool bRevealed, float Alert01);
+
+	UPROPERTY(Transient)
+	TObjectPtr<UPointLightComponent> FeelLight;
+
+	UPROPERTY(Transient)
+	bool bFeelLightSpawned = false;
+
+	UPROPERTY(Transient)
+	bool bLastRevealedCue = false;
 
 	UPROPERTY(Transient)
 	int32 LitOverlapCount = 0;
