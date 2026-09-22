@@ -748,3 +748,8 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 - Lead **`APPROVE CD STRATEGY`** → [Docs/23_COMBAT_DREAM_IMPL.md](../Docs/23_COMBAT_DREAM_IMPL.md), handoff [Docs/handoffs/CD_A_STUBS.md](../Docs/handoffs/CD_A_STUBS.md), `DECISIONS.md` CD strategy row (Docs/22 GC **CLOSED** on main via #127).
 - C++: minigame stubs (`MINIGAME:*`), boss placeholder volume (`BOSS:PHASE_*`, `BOSS:SEAL`), `place_vs_mvp_cd_stubs.py`, cheats `hw.Minigame.*` / `hw.Boss.Status`. **CD-A APPROVED** stamped in follow-on docs PR (Lead **`APPROVE CD-A`**, 2026-09-21 ET).
 
+## 2026-09-22 — PA-D save before dress reload (cloud)
+
+- **Fix:** `place_vs_mvp_pa_d.py` saves level after PA-D spawn and before `run_dress_refresh()` so `load_level` in dress does not wipe unsaved cliffs/planters/fence/path stones.
+- **PR:** #149 (`cursor/pa-d-save-before-dress-1f4a`).
+

@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **APPROVED** — Lead **`APPROVE PA-D`**, 2026-09-22 ET · **awaiting DESKTOP evidence** |
+| **Status** | **APPROVED** — Lead **`APPROVE PA-D`**, 2026-09-22 ET · DESKTOP import/place verified (KEEP-LOCAL map/mesh Content on DESKTOP; no `.uasset` in cloud PRs) · **awaiting formal Shot 1/2 for PA-E** (PA-D not CLOSED) |
 | **Host** | **DESKTOP-21CT3H0** (Conductor parent — MCP / PIE) |
 | **Track** | Whole **PA track not CLOSED** — **PA-E LOCKED** until Shot 1/2 evidence + Lead **`APPROVE PA-E`** |
 | **Impl doc** | [32_PROTOTYPE_ASSETS.md](../32_PROTOTYPE_ASSETS.md) |
@@ -85,8 +85,8 @@ Dress script: [place_vs_mvp_dress.py](../../Content/Python/place_vs_mvp_dress.py
 
 - [x] Lead **`APPROVE PA-D`** stamped (2026-09-22 ET)
 - [x] Tranche-1/2 FBX on `main`
-- [ ] DESKTOP: Safe-Build + batch import
-- [ ] DESKTOP: `place_vs_mvp_dress.py` on `L_VS_MVP_Markers`
+- [x] DESKTOP: Safe-Build + batch import (done 2026-09-22 ET — Homestead meshes under `/Game/HomeWorld/Meshes/Homestead/` including SM_Cliff_*, SM_Planter_*, SM_Garden_Fence_Seg, SM_PathStone_*, cabin parts, pine family)
+- [x] DESKTOP: `place_vs_mvp_pa_d.py` on `L_VS_MVP_Markers` (after save-before-dress fix in PR #149; evidence: 16× `PA_D_*` cliffs/planters/fence/path + refreshed `DRESS_*` cabin/pines/glider/island/lookout)
 - [ ] Evidence appended (log excerpt / viewport capture) — **pending**
 - [ ] PA-E Shot 1/2 + Lead close gate — **LOCKED**
 

@@ -9316,3 +9316,11 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 **Pending:** Optional island rim; PA-D batch import + place on DESKTOP (Lead **`APPROVE PA-D`** not granted).
 
 **Errors:** None.
+
+## 2026-09-22 — PA-D dress reload wipe fix (cloud)
+
+**Completed:** `Content/Python/place_vs_mvp_pa_d.py` — `save_current_level()` after PA-D placement, before `run_dress_refresh()` (dress `create_or_load_level`/`load_level` dropped unsaved actors). PR #149.
+
+**Pending:** Windows verify PA-D count > 0 after full script run.
+
+**Errors:** None.
