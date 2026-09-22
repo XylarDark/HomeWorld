@@ -1,3 +1,7 @@
+## 2026-09-22 — PA-D Homestead place script (cloud)
+
+- Lead **APPROVE PA-D** → `Content/Python/place_vs_mvp_pa_d.py` (cliffs, planters, fence, path stones + `place_vs_mvp_dress` refresh); `place_vs_mvp_dress.py` SM_Cabin exact + Pine S/M/L. PR pending; DESKTOP run after batch_import.
+
 ## 2026-09-22 — SS-B spirit stealth feel (cloud, IN PROGRESS)
 
 - Lead **`APPROVE SS-B STRATEGY`** (2026-09-21 ET) → [Docs/31_SPIRIT_STEALTH_FEEL.md](../Docs/31_SPIRIT_STEALTH_FEEL.md) **SS-B STRATEGY APPROVED / SS-B IN PROGRESS**; [Docs/handoffs/SS_B_STEALTH_FEEL.md](../Docs/handoffs/SS_B_STEALTH_FEEL.md); `DECISIONS.md` SS-B strategy row. **SS-B not stamped APPROVED.**
