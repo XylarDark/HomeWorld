@@ -1,3 +1,7 @@
+## 2026-09-22 — PA-E pretick wait probe + re-entry fix (cloud)
+
+- Post-#165 DESKTOP (~15:01 ET): pretick responsive, **Shot1** ~38KB on disk, report **`file_missing`** (wait probe **`MIN_BYTES`**, nested **`POSED`** re-entry). [capture_shotlist_viewport.py](../Content/Python/capture_shotlist_viewport.py): **`PREPARING`** lock, **`_find_fresh_capture_path`** on timeout/final drain, **`MIN_BYTES`** validation-only. KNOWN_ERRORS + AUTOMATION_GAPS + CAPTURE_REDUNDANCY note. Gap **OPEN** — DESKTOP re-prove.
+
 ## 2026-09-22 — PA-E DESKTOP prove FAIL post-#163 (docs only, blocking wait)
 
 - **`C:\dev\HomeWorld`**, ~14:45–14:53 ET after **#163** @ `d0d074d`: MCP **`capture_shotlist_viewport.py`** — level load OK; Shot 1+2 AutomationLibrary **`kwargs_delay_force_gv`**; **`task_done: false`** (~90s poll each); **no PNG** (~120s wait); Editor **Not Responding**; killed in **`final_drain`**; **no** **`pa_e_capture_report.json`**; **no** new **`Saved/Screenshots/PA_E/`** stills. Research logged: async HighResShot + **main-thread `time.sleep` poll** footgun → **`register_slate_pre_tick_callback`** (rung 1). Merged **#164** @ `aac7893`. KNOWN_ERRORS + AUTOMATION_GAPS + [DEFECT_PA_E](../Docs/qa/DEFECT_PA_E_shot_capture_automation.md). Gap **OPEN** — **no PASS claim**.
