@@ -33,6 +33,10 @@ After **#159** merged (~12:51–13:01 ET), same host path. Console **`HighResSho
 
 After **#163** merged @ **`d0d074d`**, MCP **`execute_python_script("capture_shotlist_viewport.py")`** on **`C:\dev\HomeWorld`** (~14:45–14:53 ET / log UTC 18:45–18:52). Level load OK. Shot 1 + Shot 2: **AutomationLibrary** path with **`kwargs_delay_force_gv`**; **`AutomationEditorTask` `task_done: false`** after ~90s poll each; **no PNG** after ~120s file wait; Editor **Not Responding** throughout; session killed during **`final_drain`** (~75s). **No** **`Saved/pa_e_capture_report.json`**; **no** new **`Shot1_lookout.png`** / **`Shot2_cabin_garden.png`**. **Likely cause:** blocking **`time.sleep`** / poll on Editor Python **main thread** prevents Slate ticks required for async **`take_high_res_screenshot`**. **Next rung 1:** **`unreal.register_slate_pre_tick_callback`** wait (see [AUTOMATION_GAPS.md](../../docs/Automation/AUTOMATION_GAPS.md) research log). Defect **OPEN** — **not** shotlist PASS; do **not** treat AutomationLibrary primary as proven.
 
+## Incident — 2026-09-22 ET post-#166 (DESKTOP prove, document only)
+
+After **#166** @ **`ee32888`**, MCP **`capture_shotlist_viewport.py`** (AL + Slate pretick): Editor **Responding**; report **`ok: false`** — Shot1 ~38KB **mean luminance ~0**, Shot2 ~143KB **mean ~0.3** (**near_black** / failed luminance gates). Pretick path is **not** shotlist PASS. **Next rung 1:** [capture_shotlist.py](../../Content/Python/capture_shotlist.py) → MRQ one-frame ([CAPTURE_REDUNDANCY.md](../../docs/Automation/CAPTURE_REDUNDANCY.md)). Defect **OPEN**.
+
 ## Policy
 
 - **Do not** invent still paths or mark Shot 1/2 **PASS** from automated captures alone.

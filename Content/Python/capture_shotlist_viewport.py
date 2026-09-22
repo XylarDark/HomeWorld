@@ -1,8 +1,12 @@
-"""PA-E / shotlist viewport capture — Editor Python only.
+"""PA-E / shotlist viewport capture — AutomationLibrary diagnostic (not PASS primary).
+
+**Primary (DESKTOP prove):** [capture_shotlist.py](capture_shotlist.py) /
+[capture_shotlist_mrq.py](capture_shotlist_mrq.py) — Movie Render Queue one-frame.
+This script remains for AL + Slate pre-tick diagnostics after post-#166 near-black PNGs.
 
 Loads L_VS_MVP_Markers, poses level viewport for Shot 1 (lookout) and Shot 2
 (cabin/garden), lit + game view, then **AutomationLibrary.take_high_res_screenshot**
-(primary, one request in flight) with **Slate pre-tick** wait (not blocking sleep
+(one request in flight) with **Slate pre-tick** wait (not blocking sleep
 on the editor main thread after invoke), validates PNGs, writes
 Saved/pa_e_capture_report.json.
 
@@ -18,7 +22,8 @@ Forum refs:
 Policy: [docs/Automation/CAPTURE_REDUNDANCY.md](docs/Automation/CAPTURE_REDUNDANCY.md) § Shotlist.
 Multi-form console HighResShot ladders are **not** used.
 
-Run: MCP execute_python_script("capture_shotlist_viewport.py") or UnrealEditor-Cmd
+Run: MCP execute_python_script("capture_shotlist_viewport.py") — diagnostic only.
+Primary: execute_python_script("capture_shotlist.py"). UnrealEditor-Cmd
 -ExecutePythonScript=... (uses vnp_editor_keep_alive).
 
 Does NOT claim shotlist PASS — DESKTOP must verify report + stills.

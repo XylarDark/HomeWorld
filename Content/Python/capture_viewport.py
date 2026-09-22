@@ -6,7 +6,7 @@
 # Console HighResShot first (Epic doc order: filename= then resolution);
 # AutomationLibrary fallback if no PNG on disk.
 # https://dev.epicgames.com/documentation/en-us/unreal-engine/taking-screenshots-in-unreal-engine
-# See capture_shotlist_viewport.py / CAPTURE_REDUNDANCY.md.
+# See capture_shotlist.py (MRQ primary) / capture_shotlist_viewport.py / CAPTURE_REDUNDANCY.md.
 
 import json
 import os
