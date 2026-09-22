@@ -9224,3 +9224,13 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 **Errors:** none.
 
+---
+
+## 2026-09-21 — MV-A track CLOSED (docs stamp, cloud agent)
+
+**Task:** Lead **`APPROVE MV-A`** — stamp Docs/24 Movement **CLOSED / COMPLETE** (MV-A code already on main PR #130).
+
+**Delivered:** `Docs/24_MOVEMENT_IMPL.md`, `Docs/handoffs/MV_A_TRAVERSAL.md`, `Docs/canon/DECISIONS.md`, `Docs/README.md` index row; thin `PHASE_BOARD` + `SESSION_SUMMARY` updates. Docs-only. **SS-A** spirit stealth out of scope for MV close.
+
+**Remaining:** Next product track TBD (Lead gate) — e.g. **SS-A** impl separate from bible lock.
+

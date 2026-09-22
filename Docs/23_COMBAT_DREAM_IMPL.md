@@ -85,7 +85,7 @@ Docs/22 Gather & Craft: CLOSED / COMPLETE — Lead APPROVE GC-C 2026-09-21 ET
 Docs/23 Combat & Dream: CLOSED / COMPLETE — Lead APPROVE CD-A 2026-09-21 ET
 ```
 
-**Next product track (separate):** MV-A (Movement impl) — TBD Lead gate.
+**Next product track (separate):** **SS-A** (spirit stealth impl) or Lead-named track — TBD Lead gate. Docs/24 Movement **CLOSED** — Lead **`APPROVE MV-A`**, 2026-09-21 ET.
 
 ---
 

@@ -2,11 +2,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **IN PROGRESS** — await Lead **`APPROVE MV-A`** |
+| **Status** | **APPROVED / CLOSED** — Lead **`APPROVE MV-A`**, 2026-09-21 ET |
 | **Track** | MV-A |
 | **Gate** | Lead **`APPROVE MV STRATEGY`** — **GRANTED** 2026-09-21 ET (Lead typed **`MV-A`**) |
-| **Close gate** | Lead **`APPROVE MV-A`** (pending) |
-| **Impl doc** | [24_MOVEMENT_IMPL.md](../24_MOVEMENT_IMPL.md) |
+| **Close gate** | Lead **`APPROVE MV-A`** — **GRANTED** 2026-09-21 ET |
+| **Impl doc** | [24_MOVEMENT_IMPL.md](../24_MOVEMENT_IMPL.md) — **CLOSED / COMPLETE** |
 | **Bible** | [MOVEMENT_BIBLE.md](../MOVEMENT_BIBLE.md) |
 
 ---
@@ -19,6 +19,7 @@
 - Tame → mount boost on same CMC
 - FALLBACK glide unchanged path; **dusk** blocks new glide start
 - Possess remains CD stub — do not deepen
+- **Out of scope:** [SPIRIT_STEALTH_BIBLE.md](../SPIRIT_STEALTH_BIBLE.md) / **SS-A** — separate track
 
 ---
 
@@ -60,14 +61,18 @@ Blink targets actors tagged **`SpiritAnchor`**, **`SpiritBlink`**, **`Shrine_POI
 
 ## Done criteria
 
-- [ ] Sprint + mantle/vault log `MOVE:*`
-- [ ] FALLBACK glide still works; dusk blocks new start
-- [ ] Spirit blink once after sleep/spirit form (`MOVE: SPIRIT_BLINK` or hook)
-- [ ] Mount boost uses one CMC after tame
-- [ ] Lead **`APPROVE MV-A`** → [Docs/24](../24_MOVEMENT_IMPL.md) **CLOSED / COMPLETE**
+- [x] Sprint + mantle/vault log `MOVE:*`
+- [x] FALLBACK glide still works; dusk blocks new start
+- [x] Spirit blink once after sleep/spirit form (`MOVE: SPIRIT_BLINK` or hook)
+- [x] Mount boost uses one CMC after tame
+- [x] Lead **`APPROVE MV-A`**, 2026-09-21 ET → [Docs/24](../24_MOVEMENT_IMPL.md) **CLOSED / COMPLETE**
 
 ---
 
 ## Forbidden (recheck)
 
-Procgen, spirit flight, full parkour kit, second CMC, swim, free-flight upgrade of FALLBACK, invisible rim walls.
+Procgen, spirit flight, full parkour kit, second CMC, swim, free-flight upgrade of FALLBACK, invisible rim walls, **SS-A spirit stealth** (torch reveal, found-out loops).
+
+---
+
+Lead **`APPROVE MV-A`**, 2026-09-21 ET — **GRANTED**. **MV** implementation track **CLOSED / COMPLETE** (merged main `349d3e4` / PR #130). **Do not stamp phase gates in PR** — chat only.
