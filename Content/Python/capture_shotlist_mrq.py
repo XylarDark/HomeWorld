@@ -294,9 +294,10 @@ class _MrqOrchestrator:
     def _write_report_and_finish(self) -> None:
         if self.phase == _Phase.DONE:
             return
-        all_pass = all(r.get("pass") for r in self.results) if self.results else False
+        status = common.summarize_capture_report(self.results)
+        all_pass = status["capture_pass"]
         report = {
-            "ok": all_pass,
+            **status,
             "prefix": PREFIX.strip(":"),
             "primary_path": PRIMARY_PATH,
             "wait_mechanism": WAIT_MECHANISM,
@@ -317,8 +318,12 @@ class _MrqOrchestrator:
             "policy": (
                 "Movie Render Queue one-frame PNG (PIE executor, deferred lit pass, warm-up); "
                 "PASS = lit homestead visible (luminance gate), not file-exists-only; "
+                "near-black = prove loop in progress (inventory→aim→capture→bug-fix), not closed FAIL; "
                 "AL near-black = OPEN viewport capture bug (wrong buffer/pose/game-view)"
             ),
+            "lead_prove_loop": list(common.LEAD_PROVE_LOOP),
+            "homestead_diagnostic_path": common.homestead_diagnostic_path(),
+            "homestead_diagnostic_script": "pa_e_homestead_capture_diagnostic.py",
             "prove_criteria": common.PROVE_CRITERIA,
             "desktop_conductor_checklist": common.desktop_conductor_checklist(),
             "al_viewport_capture_bug": {
@@ -330,6 +335,7 @@ class _MrqOrchestrator:
                     "HighResShot not bound to shot camera",
                 ],
                 "diagnostic_script": "capture_shotlist_viewport.py",
+                "homestead_centroid_script": "pa_e_homestead_capture_diagnostic.py",
             },
             "epic_refs": [
                 "https://dev.epicgames.com/documentation/en-us/unreal-engine/python-api/class/MoviePipelineQueueSubsystem?application_version=5.7",
@@ -709,13 +715,19 @@ def main() -> None:
     mrq_ok = bool(mrq_probe.get("available"))
 
     level_ok = common.load_level(PREFIX)
-    viewport_prep: dict[str, Any] = {}
+    homestead_diag = common.write_homestead_capture_diagnostic(PREFIX)
+    viewport_prep: dict[str, Any] = {"homestead_diagnostic": homestead_diag}
     _set_night_phase(viewport_prep)
     _apply_mrq_scene_prep(viewport_prep)
 
     if not mrq_ok:
         report = {
             "ok": False,
+            "capture_pass": False,
+            "closed_fail": True,
+            "prove_loop_status": "blocked",
+            "lead_prove_loop": list(common.LEAD_PROVE_LOOP),
+            "homestead_diagnostic_path": common.homestead_diagnostic_path(),
             "prefix": PREFIX.strip(":"),
             "primary_path": PRIMARY_PATH,
             "mrq_available": False,

@@ -32,11 +32,69 @@ PROVE_CRITERIA = {
     "min_bytes": MIN_BYTES,
     "min_mean_luminance": MIN_MEAN_LUMINANCE,
     "file_exists_alone_is_not_pass": True,
+    "black_stills_not_closed_fail": True,
     "note": (
-        "Lead-visible scene content in Editor must appear in stills; near-black PNGs "
-        "indicate wrong pose/game-view/buffer/camera binding, not missing level content."
+        "Near-black PNGs start the prove loop (in progress), not a closed FAIL. "
+        "Lead-visible lit geometry when rotating viewport means wrong aim/buffer — fix pose/lighting/capture."
     ),
 }
+
+# Lead hard rule — required loop before any failure claim (docs + report).
+LEAD_PROVE_LOOP = (
+    {
+        "step": 1,
+        "id": "inventory",
+        "action": "Confirm homestead dress/mesh actors are IN the loaded level (DRESS_*, SM_Cabin, island kit).",
+    },
+    {
+        "step": 2,
+        "id": "aim",
+        "action": "Aim viewport/shot cameras AT confirmed actor bounds centroids (not void); re-aim CAM_* or bounds-offset if needed.",
+    },
+    {
+        "step": 3,
+        "id": "capture_inspect",
+        "action": "Capture + inspect luminance/content; near-black = loop continues, not closed FAIL.",
+    },
+    {
+        "step": 4,
+        "id": "bugfix",
+        "action": "Fix pose / lighting / game-view / buffer / MRQ binding until stills show intended homestead.",
+    },
+)
+
+# Actors that must be present for step 1 (any match counts toward inventory).
+HOMESTEAD_INVENTORY_NEEDLES = (
+    "DRESS_",
+    "SM_Cabin",
+    "SM_Island",
+    "SM_Lookout",
+    "VS_MVP/Dress",
+)
+
+# Per-shot framing targets (union bounds centroid used for look-at).
+SHOT_FRAMING_NEEDLES: dict[str, tuple[str, ...]] = {
+    "shot1": (
+        "DRESS_SM_Island",
+        "SM_Island",
+        "SM_Lookout",
+        "Lookout",
+        "DRESS_SM_Cabin",
+        "SM_Cabin",
+        "Cabin",
+    ),
+    "shot2": (
+        "DRESS_SM_Cabin",
+        "SM_Cabin",
+        "Cabin",
+        "Garden",
+        "Planter",
+        "Path",
+        "Fence",
+    ),
+}
+
+DRESS_LABEL_PREFIX = "DRESS_"
 
 SHOTS = (
     {
@@ -228,8 +286,13 @@ def validate_png(path: Optional[str]) -> dict:
         return out
     if lum < MIN_MEAN_LUMINANCE:
         out["error"] = "near_black"
+        out["prove_loop_status"] = "in_progress"
+        out["closed_fail"] = False
+        out["lead_rule"] = "Near-black is not a closed FAIL — complete LEAD_PROVE_LOOP before claiming failure."
+        out["prove_loop"] = list(LEAD_PROVE_LOOP)
         return out
     out["pass"] = True
+    out["prove_loop_status"] = "complete"
     return out
 
 
@@ -244,20 +307,298 @@ def copy_to_desktop(local_path: str, filename: str) -> dict:
         return {"copied": False, "desktop_path": dest, "error": str(e)}
 
 
+def homestead_diagnostic_path() -> str:
+    return abs_path(os.path.join(project_dir(), "Saved", "pa_e_homestead_capture_diagnostic.json"))
+
+
+def _actor_folder(actor) -> str:
+    try:
+        return str(actor.get_folder_path() or "")
+    except Exception:
+        return ""
+
+
+def _actor_matches_needles(actor, needles: tuple[str, ...]) -> bool:
+    label = actor_label(actor)
+    folder = _actor_folder(actor).replace("\\", "/")
+    label_l = label.lower()
+    for n in needles:
+        nl = n.lower()
+        if nl in label_l or nl in folder.lower():
+            return True
+    return False
+
+
+def _bounds_dict(actor) -> dict[str, Any]:
+    origin, extent = actor.get_actor_bounds(False)
+    return {
+        "label": actor_label(actor),
+        "class": actor.get_class().get_name() if actor.get_class() else "",
+        "folder": _actor_folder(actor),
+        "origin": [origin.x, origin.y, origin.z],
+        "extent": [extent.x, extent.y, extent.z],
+        "centroid": [origin.x, origin.y, origin.z],
+    }
+
+
+def inventory_homestead_in_level(shot_id: Optional[str] = None) -> dict[str, Any]:
+    """Step 1: actors in loaded level matching homestead / shot framing needles."""
+    needles = HOMESTEAD_INVENTORY_NEEDLES
+    framing = SHOT_FRAMING_NEEDLES.get(shot_id or "", ())
+    actors_all: list = []
+    actors_framing: list = []
+    for a in unreal.EditorLevelLibrary.get_all_level_actors():
+        if not a:
+            continue
+        if _actor_matches_needles(a, needles):
+            actors_all.append(a)
+        if framing and _actor_matches_needles(a, framing):
+            actors_framing.append(a)
+    combined_all = combined_bounds_from_actors(actors_all)
+    combined_framing = combined_bounds_from_actors(actors_framing) if actors_framing else combined_all
+    return {
+        "level_path": LEVEL_PATH,
+        "homestead_actor_count": len(actors_all),
+        "framing_actor_count": len(actors_framing),
+        "homestead_actors_sample": [_bounds_dict(a) for a in actors_all[:40]],
+        "framing_actors_sample": [_bounds_dict(a) for a in actors_framing[:40]],
+        "homestead_bounds": combined_all,
+        "framing_bounds": combined_framing,
+        "inventory_ok": len(actors_all) > 0,
+        "framing_ok": combined_framing is not None,
+    }
+
+
+def combined_bounds_from_actors(actors: list) -> Optional[dict[str, Any]]:
+    if not actors:
+        return None
+    min_x = min_y = min_z = float("inf")
+    max_x = max_y = max_z = float("-inf")
+    labels: list[str] = []
+    for a in actors:
+        try:
+            origin, extent = a.get_actor_bounds(False)
+        except Exception:
+            continue
+        labels.append(actor_label(a))
+        for sx in (-1, 1):
+            for sy in (-1, 1):
+                for sz in (-1, 1):
+                    x = origin.x + extent.x * sx
+                    y = origin.y + extent.y * sy
+                    z = origin.z + extent.z * sz
+                    min_x, max_x = min(min_x, x), max(max_x, x)
+                    min_y, max_y = min(min_y, y), max(max_y, y)
+                    min_z, max_z = min(min_z, z), max(max_z, z)
+    if min_x == float("inf"):
+        return None
+    cx = (min_x + max_x) * 0.5
+    cy = (min_y + max_y) * 0.5
+    cz = (min_z + max_z) * 0.5
+    return {
+        "centroid": [cx, cy, cz],
+        "extent": [(max_x - min_x) * 0.5, (max_y - min_y) * 0.5, (max_z - min_z) * 0.5],
+        "min": [min_x, min_y, min_z],
+        "max": [max_x, max_y, max_z],
+        "actor_labels": labels[:50],
+        "actor_count": len(labels),
+    }
+
+
+def _vector_from_list(values: list[float]) -> "unreal.Vector":
+    return unreal.Vector(values[0], values[1], values[2])
+
+
+def look_at_rotation(from_loc: "unreal.Vector", to_loc: "unreal.Vector") -> "unreal.Rotator":
+    try:
+        return unreal.MathLibrary.find_look_at_rotation(from_loc, to_loc)
+    except Exception:
+        pass
+    dx = to_loc.x - from_loc.x
+    dy = to_loc.y - from_loc.y
+    dz = to_loc.z - from_loc.z
+    yaw = unreal.MathLibrary.deg_atan2(dy, dx) if hasattr(unreal.MathLibrary, "deg_atan2") else 0.0
+    horiz = (dx * dx + dy * dy) ** 0.5
+    pitch = -unreal.MathLibrary.deg_atan2(dz, horiz) if hasattr(unreal.MathLibrary, "deg_atan2") else -15.0
+    return unreal.Rotator(pitch=pitch, yaw=yaw, roll=0.0)
+
+
+def camera_forward_alignment(from_loc: "unreal.Vector", rot: "unreal.Rotator", target: "unreal.Vector") -> dict[str, Any]:
+    """Diagnostic: how well camera forward points at target centroid."""
+    fwd = unreal.MathLibrary.get_forward_vector(rot)
+    delta = target - from_loc
+    dist = delta.length()
+    if dist < 1.0:
+        return {"distance_uu": dist, "forward_dot_to_target": None, "aim_ok": False}
+    delta_n = unreal.Vector(delta.x / dist, delta.y / dist, delta.z / dist)
+    dot = fwd.x * delta_n.x + fwd.y * delta_n.y + fwd.z * delta_n.z
+    return {
+        "distance_uu": round(dist, 2),
+        "forward_dot_to_target": round(dot, 4),
+        "aim_ok": dot > 0.3,
+    }
+
+
+def _camera_pose_from_bounds(shot_id: str, bounds: dict[str, Any]) -> tuple[Any, Any, dict[str, Any]]:
+    meta: dict[str, Any] = {"pose_source": "homestead_bounds"}
+    c = bounds["centroid"]
+    ext = bounds["extent"]
+    target = _vector_from_list(c)
+    if shot_id == "shot1":
+        loc = unreal.Vector(
+            target.x - ext[0] * 1.2,
+            target.y - ext[1] * 0.9,
+            target.z + ext[2] + 250.0,
+        )
+    else:
+        loc = unreal.Vector(
+            target.x + ext[0] * 0.45,
+            target.y - ext[1] * 1.0,
+            target.z + ext[2] * 0.35 + 120.0,
+        )
+    rot = look_at_rotation(loc, target)
+    meta["target_centroid"] = c
+    meta["camera_location"] = [loc.x, loc.y, loc.z]
+    meta["camera_rotation"] = [rot.pitch, rot.yaw, rot.roll]
+    return loc, rot, meta
+
+
 def resolve_camera_transform(shot: dict, cam) -> tuple[Any, Any, dict[str, Any]]:
-    meta: dict[str, Any] = {"used_camera_actor": bool(cam)}
+    """Step 2: prefer in-level CAM; aim at homestead framing bounds; avoid void-pointing hardcoded pose."""
+    shot_id = shot.get("id", "")
+    inventory = inventory_homestead_in_level(shot_id)
+    meta: dict[str, Any] = {
+        "used_camera_actor": bool(cam),
+        "prove_loop_step1_inventory": inventory,
+    }
+    bounds = inventory.get("framing_bounds") or inventory.get("homestead_bounds")
+    target: Optional[unreal.Vector] = None
+    if bounds and bounds.get("centroid"):
+        target = _vector_from_list(bounds["centroid"])
+        meta["framing_target_centroid"] = bounds["centroid"]
+
     if cam:
         loc = cam.get_actor_location()
-        rot = cam.get_actor_rotation()
         meta["camera_label"] = actor_label(cam)
+        rot = cam.get_actor_rotation()
+        if target is not None:
+            align_before = camera_forward_alignment(loc, rot, target)
+            meta["aim_before"] = align_before
+            if not align_before.get("aim_ok"):
+                rot = look_at_rotation(loc, target)
+                try:
+                    cam.set_actor_rotation(rot, False)
+                    meta["camera_reaimed_at_homestead"] = True
+                except Exception as e:
+                    meta["camera_reaim_error"] = str(e)
+                meta["aim_after"] = camera_forward_alignment(loc, rot, target)
+            meta["pose_source"] = "in_level_camera_aim_at_bounds"
+        else:
+            meta["pose_source"] = "in_level_camera_no_bounds"
+            meta["warning"] = "inventory empty — camera may point at void; run place_vs_mvp_dress.py"
         meta["location"] = [loc.x, loc.y, loc.z]
         meta["rotation"] = [rot.pitch, rot.yaw, rot.roll]
         return loc, rot, meta
+
+    if bounds:
+        loc, rot, pose_meta = _camera_pose_from_bounds(shot_id, bounds)
+        meta.update(pose_meta)
+        return loc, rot, meta
+
     loc = meters_to_ue(tuple(shot["fallback_location_m"]))
     rot = euler_deg_to_rotator(*tuple(shot["fallback_rotation_deg"]))
+    meta["pose_source"] = "hardcoded_fallback_last_resort"
     meta["fallback_location_m"] = list(shot["fallback_location_m"])
     meta["fallback_rotation_deg"] = list(shot["fallback_rotation_deg"])
+    meta["warning"] = "No homestead inventory and no CAM — hardcoded pose may point into void"
     return loc, rot, meta
+
+
+def write_homestead_capture_diagnostic(log_prefix: str = "pa_e_homestead_capture_diagnostic:") -> dict[str, Any]:
+    """Steps 1–2 snapshot: inventory + camera vs homestead centroids → Saved JSON."""
+    payload: dict[str, Any] = {
+        "lead_prove_loop": list(LEAD_PROVE_LOOP),
+        "prove_criteria": dict(PROVE_CRITERIA),
+        "level_path": LEVEL_PATH,
+        "shots": [build_shot_diagnostic(shot) for shot in SHOTS],
+        "diagnostic_script": "pa_e_homestead_capture_diagnostic.py",
+        "note": (
+            "Near-black captures are prove-loop in progress, not a closed FAIL. "
+            "Use framing_bounds centroids to aim CAM_* before MRQ/AL capture."
+        ),
+    }
+    path = homestead_diagnostic_path()
+    try:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(payload, f, indent=2)
+        payload["written_path"] = path
+        log(log_prefix, "diagnostic written", {"path": path})
+    except OSError as e:
+        payload["write_error"] = str(e)
+        log(log_prefix, "diagnostic write failed", {"error": str(e)})
+    return payload
+
+
+def summarize_capture_report(shots: list[dict[str, Any]]) -> dict[str, Any]:
+    """Report-level status: ok = capture PASS; near-black is not closed_fail."""
+    capture_pass = bool(shots) and all(r.get("pass") for r in shots)
+    closed_fail = False
+    near_black_only = True
+    for r in shots:
+        validation = r.get("validation") or {}
+        if validation.get("closed_fail") is True:
+            closed_fail = True
+            near_black_only = False
+            break
+        err = validation.get("error") or r.get("error")
+        if err == "near_black":
+            continue
+        if not r.get("pass"):
+            near_black_only = False
+            if err not in (None, "near_black"):
+                closed_fail = True
+    if capture_pass:
+        prove_loop_status = "complete"
+    elif near_black_only and not closed_fail:
+        prove_loop_status = "in_progress"
+    elif closed_fail:
+        prove_loop_status = "blocked"
+    else:
+        prove_loop_status = "in_progress"
+    return {
+        "ok": capture_pass,
+        "capture_pass": capture_pass,
+        "closed_fail": closed_fail,
+        "prove_loop_status": prove_loop_status,
+        "black_stills_not_closed_fail": True,
+        "lead_rule": (
+            "Do not treat near-black stills as closed FAIL — complete LEAD_PROVE_LOOP "
+            "(inventory → aim → capture/inspect → bug-fix) before claiming failure."
+        ),
+    }
+
+
+def build_shot_diagnostic(shot: dict) -> dict[str, Any]:
+    """Camera vs homestead centroids for DESKTOP (MCP execute_python_script diagnostic helper)."""
+    shot_id = shot["id"]
+    inv = inventory_homestead_in_level(shot_id)
+    cam = find_camera(shot["camera_labels"])
+    entry: dict[str, Any] = {
+        "shot_id": shot_id,
+        "inventory": inv,
+        "camera_labels": shot["camera_labels"],
+        "camera_found": actor_label(cam) if cam else None,
+    }
+    bounds = inv.get("framing_bounds") or inv.get("homestead_bounds")
+    if cam and bounds and bounds.get("centroid"):
+        loc = cam.get_actor_location()
+        rot = cam.get_actor_rotation()
+        target = _vector_from_list(bounds["centroid"])
+        entry["camera_location"] = [loc.x, loc.y, loc.z]
+        entry["target_centroid"] = bounds["centroid"]
+        entry["alignment"] = camera_forward_alignment(loc, rot, target)
+    return entry
 
 
 def ensure_cinematics_folder() -> None:
@@ -268,12 +609,13 @@ def ensure_cinematics_folder() -> None:
 def desktop_conductor_checklist() -> list[str]:
     """Checks Conductor runs on DESKTOP when capture fails or MRQ plugins block."""
     return [
+        "Lead prove loop: (1) inventory homestead in level, (2) aim cameras at bounds centroids, "
+        "(3) capture+inspect luminance, (4) bug-fix until lit — near-black is NOT closed FAIL.",
+        "Run execute_python_script('pa_e_homestead_capture_diagnostic.py') → Saved/pa_e_homestead_capture_diagnostic.json",
         "Safe-Build after MovieRenderPipeline plugins; confirm MRQ Python types import.",
-        "Open L_VS_MVP_Markers; rotate viewport — Lead must see homestead geometry/lighting.",
-        "Select CAM_Hero / CAM_CabinClose; confirm framing matches Shot 1/2 before capture.",
-        "Run execute_python_script('capture_shotlist.py'); read Saved/pa_e_capture_report.json.",
-        "If AL diagnostic (capture_shotlist_viewport.py) still near-black: OPEN viewport capture bug — wrong game-view, pilot, or HighResShot buffer — not 'no content'.",
-        "PASS only when both PNGs pass bytes + mean_luminance gates and show lit homestead (not empty/unlit buffer).",
+        "If inventory_ok false: run place_vs_mvp_dress.py + batch_import on DESKTOP.",
+        "Run execute_python_script('capture_shotlist.py'); read Saved/pa_e_capture_report.json prove_loop fields.",
+        "PASS only when both PNGs pass bytes + mean_luminance and show lit homestead (not file-exists-only).",
     ]
 
 

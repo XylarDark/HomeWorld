@@ -207,13 +207,22 @@ Examples **not** in current PR scope:
 
 ### DESKTOP prove bar (non-negotiable)
 
+**Lead hard rule — prove loop before any failure claim:** Do **not** treat near-black stills as a **closed FAIL**. Required order:
+
+1. **Inventory** — confirm homestead dress/mesh actors are **in** the loaded level (`DRESS_*`, cabin/island kit).
+2. **Aim** — point viewport/shot cameras at **confirmed actor bounds centroids** (MRQ uses in-level `CAM_Hero` / `CAM_CabinClose` with re-aim at framing bounds; avoid hardcoded poses into void).
+3. **Capture + inspect** — run [capture_shotlist.py](../../Content/Python/capture_shotlist.py) (MRQ primary); read mean luminance; near-black ⇒ loop continues.
+4. **Bug-fix** — pose / lighting / game-view / pilot / buffer until stills show intended homestead.
+
+**Diagnostic (steps 1–2 only):** MCP `execute_python_script("pa_e_homestead_capture_diagnostic.py")` → `Saved/pa_e_homestead_capture_diagnostic.json` (camera vs homestead centroids).
+
 | Requirement | Not sufficient |
 |-------------|----------------|
 | Both `Shot1_lookout.png` + `Shot2_cabin_garden.png` under `Saved/Screenshots/PA_E/` | PNG exists but near-black |
-| `Saved/pa_e_capture_report.json` **`ok: true`** | `ok: false` or missing luminance |
+| `Saved/pa_e_capture_report.json` **`ok: true`** (capture PASS) | `ok: false` with **`closed_fail: false`** and **`prove_loop_status: in_progress`** — near-black only; **not** a closed automation FAIL |
 | Mean luminance ≥ **8** (0–255 scale) per shot | “File wrote so PASS” |
-| Lead-visible homestead framing (CAM_Hero / CAM_CabinClose) | Empty/unlit capture buffer |
+| Lead-visible homestead framing (CAM_Hero / CAM_CabinClose aimed at inventory bounds) | Empty/unlit capture buffer |
 
-Report includes **`prove_criteria`** and **`desktop_conductor_checklist`** from [capture_shotlist_mrq.py](../../Content/Python/capture_shotlist_mrq.py).
+Report includes **`lead_prove_loop`**, **`prove_criteria`**, **`closed_fail`**, **`prove_loop_status`**, and **`desktop_conductor_checklist`** from [capture_shotlist_mrq.py](../../Content/Python/capture_shotlist_mrq.py).
 
 **Poses:** [P6_FIX_shot1.md](../../Docs/handoffs/P6_FIX_shot1.md) · [CAM_Hero.md](../../Lib/00_Core/CAM_Hero.md) · [00_SHOTLIST.md](../../Docs/00_SHOTLIST.md).

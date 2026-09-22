@@ -35,7 +35,7 @@ After **#163** merged @ **`d0d074d`**, MCP **`execute_python_script("capture_sho
 
 ## Incident — 2026-09-22 ET post-#166 (DESKTOP prove, document only)
 
-After **#166** @ **`ee32888`**, MCP **`capture_shotlist_viewport.py`** (AL + Slate pretick): Editor **Responding**; report **`ok: false`** — near-black PNGs (luminance gates fail). **Lead (in Editor):** rotating viewport shows **lit homestead** — near-black stills are **wrong capture binding** (pose / game-view / pilot / empty buffer), **not** absent content. **Next:** MRQ primary [capture_shotlist.py](../../Content/Python/capture_shotlist.py); keep AL bug **OPEN** for fix/diagnostic. Defect **OPEN** until **lit non-black** stills (not file-exists-only).
+After **#166** @ **`ee32888`**, MCP **`capture_shotlist_viewport.py`** (AL + Slate pretick): Editor **Responding**; report **`ok: false`** — near-black PNGs (luminance gates fail). **Lead (in Editor):** rotating viewport shows **lit homestead** — near-black stills are **wrong capture binding** (pose / game-view / pilot / empty buffer), **not** absent content. **Lead hard rule:** near-black ⇒ **`closed_fail: false`**, prove loop **in progress** (inventory → aim at bounds → capture → bug-fix) — **not** a closed automation FAIL. **Next:** MRQ primary [capture_shotlist.py](../../Content/Python/capture_shotlist.py) with bounds-aim; **`pa_e_homestead_capture_diagnostic.py`** for camera vs centroid dump; keep AL bug **OPEN**. Defect **OPEN** until **lit non-black** stills (not file-exists-only).
 
 ## Policy
 

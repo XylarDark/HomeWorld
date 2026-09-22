@@ -1,3 +1,7 @@
+## 2026-09-22 — PA-E Lead prove loop + centroid diagnostic (cloud, PR #167)
+
+- **Hard rule:** near-black stills ⇒ **`closed_fail: false`**, **`prove_loop_status: in_progress`** — inventory → aim at homestead bounds → capture/inspect → bug-fix; not a closed FAIL while Lead sees lit geometry in viewport. [pa_e_shotlist_common.py](../Content/Python/pa_e_shotlist_common.py): `LEAD_PROVE_LOOP`, bounds-aim `resolve_camera_transform`, `summarize_capture_report`, `write_homestead_capture_diagnostic`. New [pa_e_homestead_capture_diagnostic.py](../Content/Python/pa_e_homestead_capture_diagnostic.py) for DESKTOP. MRQ report: `lead_prove_loop`, `homestead_diagnostic_path`. Docs: CAPTURE_REDUNDANCY 4-step bar, AUTOMATION_GAPS, KNOWN_ERRORS, DEFECT. Gap **OPEN** — DESKTOP lit stills + `ok: true`; no cloud PASS.
+
 ## 2026-09-22 — PA-E MRQ + Lead capture clarification (cloud)
 
 - MRQ remains primary; **quality bar unchanged** — DESKTOP PASS requires **lit non-black homestead** stills (luminance gates), not file-exists-only. Near-black AL PNGs while Lead sees viewport content = **OPEN viewport capture bug** (pose/game-view/pilot/buffer). Hardened MRQ: CAM possessable binding, camera-cut preroll + `MoviePipelineAntiAliasingSetting` warm-up, deferred pass enabled, per-shot `editor_prep` diagnostics + report `desktop_conductor_checklist`. Docs: CAPTURE_REDUNDANCY prove bar, AUTOMATION_GAPS AL bug row, KNOWN_ERRORS, DEFECT.

@@ -45,6 +45,8 @@ except ImportError:
     print("capture_shotlist_viewport: Run inside Unreal Editor.")
     raise
 
+import pa_e_shotlist_common as common
+
 PREFIX = "capture_shotlist_viewport:"
 LEVEL_PATH = "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers"
 RES_X, RES_Y = 1920, 1080
@@ -441,9 +443,10 @@ class _ShotlistOrchestrator:
     def _write_report_and_finish(self) -> None:
         if self.phase == _Phase.DONE:
             return
-        all_pass = all(r.get("pass") for r in self.results) if self.results else False
+        status = common.summarize_capture_report(self.results)
+        all_pass = status["capture_pass"]
         report = {
-            "ok": all_pass,
+            **status,
             "prefix": PREFIX.strip(":"),
             "primary_path": PRIMARY_PATH,
             "wait_mechanism": SLATE_WAIT_MECHANISM,
@@ -459,8 +462,11 @@ class _ShotlistOrchestrator:
             "shots": self.results,
             "driver_error": self._driver_error,
             "state_machine_phases": [p.value for p in _Phase],
+            "lead_prove_loop": list(common.LEAD_PROVE_LOOP),
+            "homestead_diagnostic_script": "pa_e_homestead_capture_diagnostic.py",
             "policy": (
                 "AutomationLibrary + slate pre-tick wait (post-#163: blocking sleep freezes ticks); "
+                "near-black = prove loop in progress, not closed FAIL; "
                 "no console multi-form ladder; does not claim shotlist PASS — verify on DESKTOP; "
                 "no host ImageGrab"
             ),
