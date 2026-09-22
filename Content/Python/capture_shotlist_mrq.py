@@ -242,6 +242,7 @@ class _MrqOrchestrator:
             fail_msg = exec_err or "executor_start_failed"
             self._finish_shot_failure(fail_msg, pose_meta, purge)
             return
+        self._job_meta["latent_wait_contract"] = common.MRQ_LATENT_WAIT_CONTRACT
         self.phase = _Phase.WAIT_RENDER
         _log("MRQ render started", {"shot": shot["id"], "staging": self._staging_dir})
 
