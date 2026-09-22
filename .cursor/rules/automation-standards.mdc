@@ -4,7 +4,7 @@ description: "Standards for automation that drives or configures Editor/engine f
 alwaysApply: false
 globs: "**/Content/Python/**, **/Tools/**, **/.github/workflows/**"
 priority: 9
-version: 1.2
+version: 1.4
 ---
 
 # Automation Standards
@@ -13,9 +13,29 @@ version: 1.2
 
 **Policy:** When we have the ability to interact with the Unreal Editor UI automatically (e.g. PyAutoGUI-based scripts in `Content/Python/gui_automation/`, ref-image clickers, capture-and-run flows), that is the **default method**. Prefer running or instructing the GUI automation script for the step; treat manual Editor steps only as **fallback** when GUI automation is unavailable (e.g. ref images not captured, script not runnable in the current environment) or has failed. Document and maintain ref images and scripts so GUI automation can be used by default where it exists. See [docs/GUI_AUTOMATION_WHY_AND_WHEN.md](../../docs/GUI_AUTOMATION_WHY_AND_WHEN.md) and [docs/MANUAL_EDITOR_TUTORIAL.md](../../docs/MANUAL_EDITOR_TUTORIAL.md).
 
-## Docs-first (console / API hardening)
+## Universal tooling practice (Lead lock-in, 2026-09-22)
 
-- **Before** using or hardening Unreal console commands, Editor Python APIs, or similar tooling: read **official Epic (or vendor) docs** first unless exact usage is already in repo policy or agent memory; do not lock in syntax from failed DESKTOP proves alone. See [docs/Automation/CAPTURE_REDUNDANCY.md](../../docs/Automation/CAPTURE_REDUNDANCY.md) § Docs-first.
+Applies to **every** automation / tooling gap (any tool surface). Canonical detail: [docs/Automation/CAPTURE_REDUNDANCY.md](../../docs/Automation/CAPTURE_REDUNDANCY.md) (universal redundancy + practice doc; shotlist is one instance). Policy block: [docs/Automation/AUTOMATION_GAPS.md](../../docs/Automation/AUTOMATION_GAPS.md).
+
+### Docs-first
+
+- Read **official Epic (or vendor) docs** before inventing or hardening console commands, Editor Python APIs, MCP usage, commandlets, or similar — unless usage is already in repo policy or agent memory.
+- Match documented **parameter order**, **context**, and **output paths**; do not infer syntax only from failed DESKTOP proves.
+
+### Proven-results first
+
+- Before custom inventiveness (long waits, variant ladders, novel stacks): prioritize **docs** plus **proven community/industry patterns** that already work for the same goal.
+- Custom approaches only after those are checked and unfit, or Lead **`APPROVE TOOL SCOUT`** / **`APPROVE TOOL BUILD`**.
+
+### Research on dead-ends
+
+- After rung-1 hardening **fails with evidence**, run **one proactive public research pass** (forums, issues, known bugs); log in AUTOMATION_GAPS research log **before** recommending SCOUT/BUILD or asking Lead open-ended “does anyone else hit this?”
+
+### Gated redundancy ladder
+
+- **Rung 1:** UE/host built-ins and already-in-repo scripts (re-try after engine/tool updates).
+- **Rung 2:** Scout third-party tools only after **`APPROVE TOOL SCOUT <name>`** — **no auto-install**.
+- **Rung 3:** Net-new stacks only after **`APPROVE TOOL BUILD <name>`** — no unprompted frameworks.
 
 ## Variables with no access (automation)
 
