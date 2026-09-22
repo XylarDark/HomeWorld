@@ -29,7 +29,10 @@ RES_X, RES_Y = 1920, 1080
 MIN_BYTES = 50 * 1024
 MIN_MEAN_LUMINANCE = 8.0  # reject near-black (0–255 scale)
 SETTLE_FRAMES = 12
-WAIT_FILE_SEC = 45.0
+WAIT_FILE_SEC = 120.0
+STABLE_POLL_INTERVAL = 0.35
+STABLE_SIZE_POLLS = 4
+FINAL_DRAIN_SEC = 45.0
 
 DESKTOP_PA_E = r"C:\Users\User\Desktop\HomeWorld_PA_E"
 
@@ -69,6 +72,51 @@ def _saved_pa_e_dir() -> str:
     path = os.path.join(_project_dir(), "Saved", "Screenshots", "PA_E")
     os.makedirs(path, exist_ok=True)
     return path
+
+
+def _shot_dest_abs(filename: str) -> str:
+    return os.path.normpath(os.path.join(_saved_pa_e_dir(), filename))
+
+
+def _path_for_ue(abs_path: str) -> str:
+    """AutomationLibrary / HighResShot: absolute path, forward slashes."""
+    return os.path.normpath(abs_path).replace("\\", "/")
+
+
+def _engine_search_roots() -> list[str]:
+    """UE often writes relative HighResShot paths under Engine Binaries Win64 (engine CWD)."""
+    roots: list[str] = []
+    seen: set[str] = set()
+
+    def add(p: str) -> None:
+        p = os.path.normpath(p)
+        if p not in seen and os.path.isdir(p):
+            seen.add(p)
+            roots.append(p)
+
+    try:
+        eng = unreal.Paths.engine_dir()
+        if eng:
+            win64 = os.path.join(eng, "Binaries", "Win64")
+            add(win64)
+            add(os.path.join(win64, "PA_E"))
+    except Exception:
+        pass
+    try:
+        eng_b = unreal.Paths.engine_binary_dir()
+        if eng_b:
+            add(eng_b)
+            add(os.path.join(eng_b, "PA_E"))
+    except Exception:
+        pass
+    cwd = os.getcwd()
+    add(cwd)
+    add(os.path.join(cwd, "PA_E"))
+    screens = os.path.join(_project_dir(), "Saved", "Screenshots")
+    add(screens)
+    add(_saved_pa_e_dir())
+    add(os.path.join(screens, "WindowsEditor"))
+    return roots
 
 
 def _report_path() -> str:
@@ -197,91 +245,149 @@ def _pose_viewport(
 
 
 def _take_high_res_screenshot(
-    filename_for_ue: str,
+    dest_abs: str,
     camera,
-) -> tuple[str, Optional[str]]:
-    """Single capture; returns (method, error)."""
+) -> tuple[str, Optional[str], str]:
+    """Single capture; returns (method, error, path_passed_to_ue)."""
+    ue_path = _path_for_ue(dest_abs)
     last_err: Optional[str] = None
     attempts = (
         ("kwargs_force_gv", lambda: unreal.AutomationLibrary.take_high_res_screenshot(
-            RES_X, RES_Y, filename_for_ue, camera=camera, force_game_view=True
+            RES_X, RES_Y, ue_path, camera=camera, force_game_view=True
         )),
         ("positional_force_gv", lambda: unreal.AutomationLibrary.take_high_res_screenshot(
-            RES_X, RES_Y, filename_for_ue, camera, True
+            RES_X, RES_Y, ue_path, camera, True
         )),
-        ("legacy", lambda: unreal.AutomationLibrary.take_high_res_screenshot(
-            RES_X, RES_Y, filename_for_ue, camera
+        ("legacy_abs", lambda: unreal.AutomationLibrary.take_high_res_screenshot(
+            RES_X, RES_Y, ue_path, camera
         )),
     )
     for name, fn in attempts:
         try:
             fn()
-            return name, None
+            return name, None, ue_path
         except TypeError:
             continue
         except Exception as e:
             last_err = str(e)
     try:
-        rel = "Saved/Screenshots/PA_E/" + os.path.basename(filename_for_ue)
         unreal.SystemLibrary.execute_console_command(
             None,
-            'HighResShot %dx%d filename="%s"' % (RES_X, RES_Y, rel.replace("\\", "/")),
+            'HighResShot %dx%d filename="%s"' % (RES_X, RES_Y, ue_path),
         )
-        return "HighResShot_console", None
+        return "HighResShot_console_abs", None, ue_path
     except Exception as e2:
-        return "failed", last_err or str(e2)
+        return "failed", last_err or str(e2), ue_path
 
 
-def _newest_png_under(root: str, since_mtime: float) -> Optional[str]:
-    if not os.path.isdir(root):
-        return None
+def _find_named_png(
+    basename: str,
+    since_mtime: float,
+    roots: Optional[list[str]] = None,
+) -> Optional[str]:
+    """Newest matching basename under search roots (mtime >= since)."""
+    roots = roots if roots is not None else _engine_search_roots()
     best: Optional[str] = None
     best_m = since_mtime
-    for dirpath, _dirs, files in os.walk(root):
-        for f in files:
-            if not f.lower().endswith(".png"):
-                continue
-            p = os.path.join(dirpath, f)
+    for root in roots:
+        if not os.path.isdir(root):
+            continue
+        direct = os.path.join(root, basename)
+        if os.path.isfile(direct):
             try:
-                m = os.path.getmtime(p)
+                m = os.path.getmtime(direct)
             except OSError:
-                continue
+                m = 0
             if m >= since_mtime and m >= best_m:
-                best = p
+                best = direct
                 best_m = m
+        try:
+            for name in os.listdir(root):
+                if name.lower() != basename.lower():
+                    continue
+                p = os.path.join(root, name)
+                if not os.path.isfile(p):
+                    continue
+                try:
+                    m = os.path.getmtime(p)
+                except OSError:
+                    continue
+                if m >= since_mtime and m >= best_m:
+                    best = p
+                    best_m = m
+        except OSError:
+            continue
     return best
 
 
-def _wait_for_capture(dest_abs: str, since_mtime: float) -> Optional[str]:
-    """Wait for PNG at dest or newest under Saved/Screenshots."""
-    deadline = time.time() + WAIT_FILE_SEC
-    screens = os.path.join(_project_dir(), "Saved", "Screenshots")
-    base = os.path.basename(dest_abs)
+def _copy_into_dest(source: str, dest_abs: str) -> bool:
+    if source == dest_abs:
+        return True
+    try:
+        os.makedirs(os.path.dirname(dest_abs), exist_ok=True)
+        shutil.copy2(source, dest_abs)
+        return os.path.isfile(dest_abs)
+    except Exception:
+        return False
+
+
+def _file_size_stable(path: str) -> bool:
+    if not os.path.isfile(path):
+        return False
+    try:
+        sizes = []
+        for _ in range(STABLE_SIZE_POLLS):
+            sizes.append(os.path.getsize(path))
+            if sizes[-1] < MIN_BYTES:
+                time.sleep(STABLE_POLL_INTERVAL)
+                continue
+            time.sleep(STABLE_POLL_INTERVAL)
+        return len(sizes) >= STABLE_SIZE_POLLS and sizes[-1] >= MIN_BYTES and sizes[-1] == sizes[-2]
+    except OSError:
+        return False
+
+
+def _wait_for_capture(dest_abs: str, since_mtime: float, timeout_sec: float) -> tuple[Optional[str], dict]:
+    """Poll absolute dest + engine Win64/PA_E fallbacks until size stable."""
+    meta: dict[str, Any] = {
+        "dest_abs": dest_abs,
+        "timeout_sec": timeout_sec,
+        "discovered_from": None,
+        "wait_elapsed_sec": 0.0,
+        "stable": False,
+    }
+    basename = os.path.basename(dest_abs)
+    deadline = time.time() + timeout_sec
+    t0 = time.time()
     while time.time() < deadline:
-        if os.path.isfile(dest_abs) and os.path.getsize(dest_abs) >= MIN_BYTES:
-            return dest_abs
-        for candidate in (
-            _newest_png_under(_saved_pa_e_dir(), since_mtime),
-            _newest_png_under(screens, since_mtime),
-        ):
-            if candidate and os.path.getsize(candidate) >= MIN_BYTES:
-                if candidate != dest_abs:
-                    try:
-                        shutil.copy2(candidate, dest_abs)
-                    except Exception:
-                        return candidate
-                return dest_abs if os.path.isfile(dest_abs) else candidate
-        if os.path.isfile(dest_abs) and os.path.getsize(dest_abs) > 0:
-            time.sleep(0.25)
-            continue
-        alt = os.path.join(screens, "WindowsEditor", base)
-        if os.path.isfile(alt):
-            try:
-                shutil.copy2(alt, dest_abs)
-            except Exception:
-                return alt
-        time.sleep(0.25)
-    return dest_abs if os.path.isfile(dest_abs) else None
+        _settle_viewport(frames=2)
+        if os.path.isfile(dest_abs) and _file_size_stable(dest_abs):
+            meta["stable"] = True
+            meta["discovered_from"] = dest_abs
+            meta["wait_elapsed_sec"] = round(time.time() - t0, 2)
+            return dest_abs, meta
+        found = _find_named_png(basename, since_mtime)
+        if found and os.path.getsize(found) >= MIN_BYTES:
+            if _copy_into_dest(found, dest_abs) and _file_size_stable(dest_abs):
+                meta["stable"] = True
+                meta["discovered_from"] = found
+                meta["wait_elapsed_sec"] = round(time.time() - t0, 2)
+                return dest_abs, meta
+            if os.path.isfile(found) and _file_size_stable(found):
+                meta["discovered_from"] = found
+                meta["wait_elapsed_sec"] = round(time.time() - t0, 2)
+                return found, meta
+        time.sleep(STABLE_POLL_INTERVAL)
+    meta["wait_elapsed_sec"] = round(time.time() - t0, 2)
+    if os.path.isfile(dest_abs):
+        meta["discovered_from"] = dest_abs
+        return dest_abs, meta
+    found = _find_named_png(basename, since_mtime)
+    if found:
+        _copy_into_dest(found, dest_abs)
+        meta["discovered_from"] = found
+        return dest_abs if os.path.isfile(dest_abs) else found, meta
+    return None, meta
 
 
 def _mean_luminance(path: str) -> Optional[float]:
@@ -340,12 +446,12 @@ def _capture_shot(shot: dict) -> dict:
     )
     pose_meta["fallback_source"] = shot.get("fallback_source")
     _settle_viewport()
-    dest = os.path.join(_saved_pa_e_dir(), shot["filename"])
+    dest = _shot_dest_abs(shot["filename"])
     since = time.time()
-    rel_name = "PA_E/" + shot["filename"]
-    method, cap_err = _take_high_res_screenshot(rel_name, cam if cam else None)
-    _settle_viewport(frames=6)
-    resolved = _wait_for_capture(dest, since)
+    method, cap_err, ue_path = _take_high_res_screenshot(dest, cam if cam else None)
+    _log("capture invoked", {"id": shot["id"], "method": method, "ue_path": ue_path})
+    _settle_viewport(frames=8)
+    resolved, wait_meta = _wait_for_capture(dest, since, WAIT_FILE_SEC)
     validation = _validate_png(resolved)
     desktop = _copy_to_desktop(resolved, shot["filename"]) if resolved else {"copied": False}
     entry = {
@@ -353,7 +459,11 @@ def _capture_shot(shot: dict) -> dict:
         "filename": shot["filename"],
         "capture_method": method,
         "capture_error": cap_err,
+        "ue_path": ue_path,
         "saved_path": resolved,
+        "wait": wait_meta,
+        "engine_search_roots": _engine_search_roots(),
+        "capture_since": since,
         "pose": pose_meta,
         "validation": validation,
         "desktop_copy": desktop,
@@ -361,6 +471,46 @@ def _capture_shot(shot: dict) -> dict:
     }
     _log("shot done", {"id": shot["id"], "pass": entry["pass"], "bytes": validation.get("bytes")})
     return entry
+
+
+def _final_drain_shots(results: list[dict]) -> list[dict]:
+    """Late async flush: re-poll after last shot before disarming keep_alive."""
+    _log("final_drain start", {"sec": FINAL_DRAIN_SEC})
+    deadline = time.time() + FINAL_DRAIN_SEC
+    while time.time() < deadline:
+        any_pending = False
+        for entry in results:
+            if entry.get("pass"):
+                continue
+            any_pending = True
+            dest = _shot_dest_abs(entry["filename"])
+            since = float(entry.get("capture_since") or 0.0)
+            resolved, wait_meta = _wait_for_capture(dest, since, timeout_sec=5.0)
+            entry["wait_final"] = wait_meta
+            if resolved:
+                validation = _validate_png(resolved)
+                entry["validation"] = validation
+                entry["saved_path"] = resolved
+                entry["desktop_copy"] = _copy_to_desktop(resolved, entry["filename"])
+                entry["pass"] = bool(validation.get("pass"))
+        if not any_pending:
+            break
+        _settle_viewport(frames=4)
+    for entry in results:
+        if entry.get("pass"):
+            continue
+        dest = _shot_dest_abs(entry["filename"])
+        since = float(entry.get("capture_since") or 0.0)
+        resolved, wait_meta = _wait_for_capture(dest, since, timeout_sec=FINAL_DRAIN_SEC)
+        entry["wait_final"] = wait_meta
+        if resolved:
+            validation = _validate_png(resolved)
+            entry["validation"] = validation
+            entry["saved_path"] = resolved
+            entry["desktop_copy"] = _copy_to_desktop(resolved, entry["filename"])
+            entry["pass"] = bool(validation.get("pass"))
+    _log("final_drain done")
+    return results
 
 
 def main() -> None:
@@ -384,6 +534,7 @@ def main() -> None:
         viewport_prep["night_phase"] = "skipped"
 
     results = [_capture_shot(s) for s in SHOTS]
+    results = _final_drain_shots(results)
     all_pass = all(r.get("pass") for r in results)
 
     report = {
@@ -405,6 +556,8 @@ def main() -> None:
         json.dump(report, f, indent=2)
     _log("report written", {"path": _report_path(), "all_pass": all_pass})
 
+    _log("finished", {"all_pass": all_pass})
+
     try:
         if keep_ok:
             import vnp_editor_keep_alive as keep
@@ -412,8 +565,6 @@ def main() -> None:
             keep.disarm()
     except Exception:
         pass
-
-    _log("finished", {"all_pass": all_pass})
 
 
 if __name__ == "__main__":

@@ -1,3 +1,7 @@
+## 2026-09-22 — PA-E capture absolute path + async drain (cloud, rung 1)
+
+- [capture_shotlist_viewport.py](../Content/Python/capture_shotlist_viewport.py): absolute `Saved/Screenshots/PA_E/` for HighResShot; Engine Win64/PA_E copy fallbacks; 120s stable-size wait + final drain before keep_alive disarm. Supersedes conflicted PR #155. Gap **OPEN** — no DESKTOP PASS claim.
+
 ## 2026-09-22 — Capture redundancy ladder + shotlist viewport script (cloud)
 
 - Lead policy: [docs/Automation/CAPTURE_REDUNDANCY.md](Automation/CAPTURE_REDUNDANCY.md) — **gated global ladder** (rung 1 built-in/repo; rung 2 **`APPROVE TOOL SCOUT`**; rung 3 **`APPROVE TOOL BUILD`**; no auto-install / no unprompted stacks); shotlist PA-E uses rung-1 script; ban host ImageGrab for shotlist PASS.
