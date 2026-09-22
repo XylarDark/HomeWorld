@@ -199,8 +199,10 @@ SHOT_CAMERA_Z_MARGIN_UU = 120.0
 SHOT1_HERO_ANCHOR_NEEDLES: tuple[str, ...] = ("ANCHOR_SM_Cabin", "Lookout_Pad", "IslandTop")
 SHOT1_WIDE_STANDOFF_UU = (-2200.0, -1800.0, 900.0)
 SHOT1_LOOKAT_Z_ELEVATE_UU = 150.0
-SHOT2_WIDE_STANDOFF_UU = (400.0, -1400.0, 650.0)
+# Modest strafe from (400,-1400): +X/+Y clears left-third pine occluding cabin (DESKTOP P0.2).
+SHOT2_WIDE_STANDOFF_UU = (650.0, -1150.0, 650.0)
 SHOT2_LOOKAT_Z_OFFSET_UU = 180.0
+SHOT2_LOOKAT_XY_BIAS_UU = (90.0, 60.0)
 SHOT2_CABIN_ANCHOR_NEEDLES: tuple[str, ...] = ("ANCHOR_SM_Cabin",)
 SHOT2_CABIN_FOUNDATION_FALLBACK_NEEDLES: tuple[str, ...] = ("DRESS_SM_Cabin", "SM_Cabin")
 SHOT_POSE_MAX_ABS_XY_UU = 3000.0
@@ -215,6 +217,19 @@ SHOT_AIM_DISTANCE_UU: dict[str, tuple[float, float]] = {
 }
 
 DRESS_LABEL_PREFIX = "DRESS_"
+
+_WIDE_ANCHOR_POSE_SOURCES = frozenset({"wide_hero_anchor", "wide_cabin_anchor"})
+
+
+def _look_target_for_pose_meta(
+    bounds_centroid_target: "unreal.Vector",
+    pose_meta: Optional[dict[str, Any]],
+) -> "unreal.Vector":
+    """Wide anchor poses look at anchor+offset — not dress bounds centroid (aim_ok / meta)."""
+    if pose_meta and pose_meta.get("target_centroid"):
+        return _vector_from_list(pose_meta["target_centroid"])
+    return bounds_centroid_target
+
 
 MRQ_PIE_LIGHTING_NOTE = (
     "MoviePipelinePIEExecutor renders a PIE world (load_map / MRQ job can wipe Editor TMP lights). "
@@ -1204,13 +1219,15 @@ def _wide_cabin_anchor_pose(
         anchor = [-600.0, -100.0, 0.0]
         meta["anchor_point_source"] = "prove_fallback_anchor_uu"
     ax, ay, az = anchor[0], anchor[1], anchor[2]
-    target = unreal.Vector(ax, ay, az + SHOT2_LOOKAT_Z_OFFSET_UU)
+    bx, by = SHOT2_LOOKAT_XY_BIAS_UU
+    target = unreal.Vector(ax + bx, ay + by, az + SHOT2_LOOKAT_Z_OFFSET_UU)
     ox, oy, oz = SHOT2_WIDE_STANDOFF_UU
     loc = unreal.Vector(ax + ox, ay + oy, az + oz)
     meta["pose_source"] = "wide_cabin_anchor"
     meta["pose_method"] = "wide_cabin_anchor_actor_location_standoff"
     meta["standoff_uu"] = list(SHOT2_WIDE_STANDOFF_UU)
     meta["lookat_z_offset_uu"] = SHOT2_LOOKAT_Z_OFFSET_UU
+    meta["lookat_xy_bias_uu"] = list(SHOT2_LOOKAT_XY_BIAS_UU)
     clamp_b = _synthetic_anchor_bounds(anchor)
     loc = _clamp_camera_pose_loc(loc, clamp_b, meta)
     loc = _clamp_camera_pose_loc(loc, clamp_b, meta)
@@ -1291,6 +1308,7 @@ def resolve_camera_transform(shot: dict, cam) -> tuple[Any, Any, dict[str, Any]]
                 loc, rot, target, dress_bounds=bounds, shot_id=shot_id
             )
             loc_b, rot_b, bounds_pose_meta = _camera_pose_from_bounds(shot_id, bounds, shot)
+            look_target = _look_target_for_pose_meta(target, bounds_pose_meta)
             err = _apply_camera_transform(cam, loc_b, rot_b)
             if err:
                 meta["bounds_relocate_error"] = err
@@ -1298,10 +1316,12 @@ def resolve_camera_transform(shot: dict, cam) -> tuple[Any, Any, dict[str, Any]]
                 loc, rot = loc_b, rot_b
                 meta["camera_relocated_from_bounds"] = True
                 meta["bounds_pose"] = bounds_pose_meta
-            align = camera_forward_alignment(loc, rot, target, dress_bounds=bounds, shot_id=shot_id)
+            align = camera_forward_alignment(
+                loc, rot, look_target, dress_bounds=bounds, shot_id=shot_id
+            )
             meta["aim_after_bounds_relocate"] = align
             meta["pose_source"] = bounds_pose_meta.get("pose_source", "homestead_bounds_relocate")
-            if bounds_pose_meta.get("pose_source") in ("wide_hero_anchor", "wide_cabin_anchor"):
+            if bounds_pose_meta.get("pose_source") in _WIDE_ANCHOR_POSE_SOURCES:
                 meta["pose_source"] = bounds_pose_meta["pose_source"]
             elif bounds_pose_meta.get("doc_location_m"):
                 meta["pose_source"] = "shotlist_doc_fallback_relocate"
@@ -1340,12 +1360,12 @@ def resolve_camera_transform(shot: dict, cam) -> tuple[Any, Any, dict[str, Any]]
                     if shot:
                         meta["fallback_location_m"] = list(shot.get("fallback_location_m") or [])
                 align_doc = camera_forward_alignment(
-                    loc, rot, target, dress_bounds=bounds, shot_id=shot_id
+                    loc, rot, look_target, dress_bounds=bounds, shot_id=shot_id
                 )
                 meta["aim_after_doc_fallback"] = align_doc
                 if not align_doc.get("aim_ok"):
                     loc_stay = cam.get_actor_location()
-                    rot_reaim = look_at_rotation(loc_stay, target)
+                    rot_reaim = look_at_rotation(loc_stay, look_target)
                     err_re = _apply_camera_transform(cam, loc_stay, rot_reaim)
                     if err_re:
                         meta["camera_reaim_error"] = err_re
@@ -1353,9 +1373,10 @@ def resolve_camera_transform(shot: dict, cam) -> tuple[Any, Any, dict[str, Any]]
                         loc, rot = loc_stay, rot_reaim
                         meta["camera_reaimed_at_homestead"] = True
                     meta["aim_after"] = camera_forward_alignment(
-                        loc, rot, target, dress_bounds=bounds, shot_id=shot_id
+                        loc, rot, look_target, dress_bounds=bounds, shot_id=shot_id
                     )
-                    meta["pose_source"] = "in_level_camera_aim_at_bounds"
+                    if meta.get("pose_source") not in _WIDE_ANCHOR_POSE_SOURCES:
+                        meta["pose_source"] = "in_level_camera_aim_at_bounds"
                 else:
                     meta["aim_after"] = align_doc
             else:
