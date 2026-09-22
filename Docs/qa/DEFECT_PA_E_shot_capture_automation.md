@@ -25,9 +25,9 @@ Host Windows **ImageGrab** of the Unreal window during a remote PA-E Shot 1/2 at
 
 - **Do not** invent still paths or mark Shot 1/2 **PASS** from automated captures alone.
 - **Do not** call host ImageGrab shotlist **PASS** while another UI owns focus.
-- **Do not** claim **`APPROVE PA-E`** or close the PA track from this defect stub.
+- **Track close (2026-09-22 ET):** Lead **`APPROVE PA-E`** closed Docs/32 with formal Shot 1/2 stills **deferred/accepted** — this defect and AUTOMATION_GAPS row stay **OPEN** for future automation (no shotlist PASS from ImageGrab files above).
 - **Stop grinding remote ImageGrab for PA-E** — focus is not reliable unattended.
-- **Current path:** Lead **manual viewport capture** for Shot 1 and Shot 2; attach to PA-E handoff when ready.
+- **Future path:** Viewport-only capture API / GUI automation — see [docs/Automation/AUTOMATION_GAPS.md](../../docs/Automation/AUTOMATION_GAPS.md).
 
 ## References
 

@@ -3,11 +3,11 @@
 | Field | Value |
 |-------|-------|
 | **Track ID** | **PA** — Prototype Assets (Homestead dress) |
-| **Status** | **PA STRATEGY APPROVED** · **PA-A CLOSED / COMPLETE** · **PA-C IN PROGRESS** (tranche-2 **DONE**; optional island rim only) · **PA-D IN PROGRESS** (DESKTOP batch import + place — Lead **`APPROVE PA-D`** **GRANTED** 2026-09-22 ET) · **PA-E LOCKED** · track **not CLOSED** |
+| **Status** | **CLOSED / COMPLETE** — Lead **`APPROVE PA-E`**, 2026-09-22 ET · **PA-A / PA-C / PA-D / PA-E CLOSED** (PA-C optional island rim **deferred/accepted**) |
 | **Date** | 2026-09-22 |
 | **Author** | Cloud agent (HomeWorld) |
 | **Scope locked** | **Homestead kit only** — Lead **`APPROVE PA STRATEGY — homestead kit only`**, 2026-09-22 ET (planetside out) |
-| **Prior tracks** | [30_DEMO_SPINE.md](30_DEMO_SPINE.md) **CLOSED** · [31_SPIRIT_STEALTH_FEEL.md](31_SPIRIT_STEALTH_FEEL.md) **IN PROGRESS** (orthogonal) |
+| **Prior tracks** | [30_DEMO_SPINE.md](30_DEMO_SPINE.md) **CLOSED** · [31_SPIRIT_STEALTH_FEEL.md](31_SPIRIT_STEALTH_FEEL.md) **CLOSED / COMPLETE** (orthogonal) |
 | **Prefix** | **PA** — do **not** reuse DS / SS / GC gate strings |
 
 ---
@@ -18,11 +18,13 @@ Lead **`APPROVE PA STRATEGY`** — **GRANTED** (chat, 2026-09-22 ET; Lead typed 
 
 Lead **`APPROVE PA-A`** — **GRANTED** (chat, 2026-09-22 ET). Gap audit **accepted**; **PA-A CLOSED / COMPLETE**.
 
-Lead **`APPROVE PA-C`** — **GRANTED** (chat, 2026-09-22 ET). **PA-C IN PROGRESS** — tranche-1 cliffs + pine **DONE**; tranche-2 cabin, path stones, planters, fence, glider perch **DONE** (FBX on `AssetCreation/Exports/Homestead/`).
+Lead **`APPROVE PA-C`** — **GRANTED** (chat, 2026-09-22 ET). **PA-C CLOSED** — tranche-1/2 meshes **DONE**; optional island rim **deferred/accepted** with Lead **`APPROVE PA-E`**.
 
-Lead **`APPROVE PA-D`** — **GRANTED** (chat, 2026-09-22 ET). **PA-D IN PROGRESS** — DESKTOP **`batch_import_asset_creation.py`** + **`place_vs_mvp_dress.py`** on **DESKTOP-21CT3H0**; evidence pending. **Do not** stamp PA-D **CLOSED**, **PA-E done**, or **whole PA track CLOSED** until Lead **`APPROVE PA-E`** + Shot 1/2 evidence.
+Lead **`APPROVE PA-D`** — **GRANTED** (chat, 2026-09-22 ET). **PA-D CLOSED** — DESKTOP import + place on **DESKTOP-21CT3H0**; evidence `C:\dev\HomeWorld\Saved\pa_d_place_report.json` (16× `PA_D_*` on `L_VS_MVP_Markers`).
 
-**Handoffs:** [handoffs/PA_STRATEGY.md](handoffs/PA_STRATEGY.md) — **APPROVED / CLOSED** (PA-0) · [handoffs/PA_A_GAP_AUDIT.md](handoffs/PA_A_GAP_AUDIT.md) — **APPROVED / CLOSED** (PA-A) · [handoffs/PA_C_BLENDER.md](handoffs/PA_C_BLENDER.md) · [handoffs/PA_C_TRANCHE1.md](handoffs/PA_C_TRANCHE1.md) · [handoffs/PA_C_TRANCHE2.md](handoffs/PA_C_TRANCHE2.md) · [handoffs/PA_D_IMPORT_PLACE.md](handoffs/PA_D_IMPORT_PLACE.md) — **APPROVED** (awaiting DESKTOP evidence).
+Lead **`APPROVE PA-E`** — **GRANTED** (chat, 2026-09-22 ET). **PA-E CLOSED** — whole **PA track CLOSED / COMPLETE**. Formal Shot 1/2 stills **deferred/accepted** (not shotlist PASS from ImageGrab) — see [handoffs/PA_E_SHOTS.md](handoffs/PA_E_SHOTS.md).
+
+**Handoffs:** [handoffs/PA_STRATEGY.md](handoffs/PA_STRATEGY.md) — **APPROVED / CLOSED** (PA-0) · [handoffs/PA_A_GAP_AUDIT.md](handoffs/PA_A_GAP_AUDIT.md) — **APPROVED / CLOSED** (PA-A) · [handoffs/PA_C_BLENDER.md](handoffs/PA_C_BLENDER.md) · [handoffs/PA_C_TRANCHE1.md](handoffs/PA_C_TRANCHE1.md) · [handoffs/PA_C_TRANCHE2.md](handoffs/PA_C_TRANCHE2.md) · [handoffs/PA_D_IMPORT_PLACE.md](handoffs/PA_D_IMPORT_PLACE.md) — **CLOSED** · [handoffs/PA_E_SHOTS.md](handoffs/PA_E_SHOTS.md) — **APPROVED / CLOSED**
 
 **Kit plate (refs):** [refs/ai/homestead_kit_plate_labeled.jpg](refs/ai/homestead_kit_plate_labeled.jpg) · [../AssetCreation/RefImages/homestead_kit_plate_labeled.jpg](../AssetCreation/RefImages/homestead_kit_plate_labeled.jpg) · sidecar [refs/ai/homestead_kit_plate_labeled.sidecar.json](refs/ai/homestead_kit_plate_labeled.sidecar.json)
 
@@ -128,9 +130,9 @@ Workflow index: [AssetCreation/README.md](../AssetCreation/README.md).
 | **PA-0** | Strategy + kit plate stamp | CLOUD | **APPROVED / CLOSED** | Lead **`APPROVE PA STRATEGY`**, 2026-09-22 ET |
 | **PA-A** | Gap audit (mesh vs plate vs VS_MVP placement) | CLOUD+DESKTOP | **CLOSED / COMPLETE** | Lead **`APPROVE PA-A`**, 2026-09-22 ET |
 | **PA-B** | Optional orthos / AI_Sources drafts | CLOUD+Lead | **OPTIONAL** | Parallel to PA-C if Lead requests |
-| **PA-C** | Blender rebuild / upgrade | DESKTOP+Blender MCP | **IN PROGRESS** — tranche-2 **DONE**; optional island rim only | Lead **`APPROVE PA-C`**, 2026-09-22 ET |
-| **PA-D** | Import + place + master material bind | DESKTOP | **IN PROGRESS** | Lead **`APPROVE PA-D`**, 2026-09-22 ET — [handoffs/PA_D_IMPORT_PLACE.md](handoffs/PA_D_IMPORT_PLACE.md) |
-| **PA-E** | Shot 1 + Shot 2 evidence + close | DESKTOP+Lead | **LOCKED** | Lead **`APPROVE PA-E`** (TBD string) |
+| **PA-C** | Blender rebuild / upgrade | DESKTOP+Blender MCP | **CLOSED** — tranche-2 **DONE**; optional island rim **deferred/accepted** | Lead **`APPROVE PA-C`**, 2026-09-22 ET |
+| **PA-D** | Import + place + master material bind | DESKTOP | **CLOSED / COMPLETE** | Lead **`APPROVE PA-D`**, 2026-09-22 ET — [handoffs/PA_D_IMPORT_PLACE.md](handoffs/PA_D_IMPORT_PLACE.md) |
+| **PA-E** | Shot 1 + Shot 2 evidence + close | DESKTOP+Lead | **CLOSED / COMPLETE** | Lead **`APPROVE PA-E`**, 2026-09-22 ET — [handoffs/PA_E_SHOTS.md](handoffs/PA_E_SHOTS.md) |
 
 ---
 
@@ -161,7 +163,7 @@ Lead **`APPROVE PA-A`** — verdicts **accepted** (chat, 2026-09-22 ET). Full ha
 5. ~~Planters~~ **DONE** (tranche 2 — A/B/C 240/336/240 tris)
 6. ~~Fence~~ **DONE** (tranche 2 — 100 tris)
 7. ~~Glider perch~~ **DONE** (tranche 2 — 132 tris)
-8. Optional island rim — **PENDING** (optional)
+8. Optional island rim — **deferred/accepted** with Lead **`APPROVE PA-E`**
 
 **UE cliff place (PA-D):** Lookout `(7.5, -5.5, -4)`, CabinFace `(-7, -4.5, -3)`, Rear `(0, 5, -2.5)` — portable origins at export `(0,0,0)`.
 
@@ -171,11 +173,12 @@ Lead **`APPROVE PA-A`** — verdicts **accepted** (chat, 2026-09-22 ET). Full ha
 
 ## DONE-WHEN (track close — PA-E)
 
-- [ ] **Shot 1** and **Shot 2** readable in PIE without primitive homestead shapes (boxes/cylinders) on locked kit list
-- [ ] Allowlisted mesh promote + [AI_ASSET_LOG.md](AI_ASSET_LOG.md) rows for AI-influenced assets
-- [ ] Lead gate to close track (string TBD at PA STRATEGY approve)
+- [x] Homestead dress placed on VS_MVP — DESKTOP `pa_d_place_report.json` (16× `PA_D_*` + refreshed `DRESS_*`) **accepted** with Lead **`APPROVE PA-E`**
+- [x] **Shot 1** and **Shot 2** formal stills — **deferred/accepted** with Lead gate — **not** shotlist PASS from failed ImageGrab (`C:\Users\User\Desktop\HomeWorld_PA_E\`) — see [handoffs/PA_E_SHOTS.md](handoffs/PA_E_SHOTS.md), [qa/DEFECT_PA_E_shot_capture_automation.md](qa/DEFECT_PA_E_shot_capture_automation.md)
+- [x] Allowlisted mesh promote path documented; [AI_ASSET_LOG.md](AI_ASSET_LOG.md) rows when AI-influenced assets promoted on DESKTOP
+- [x] Lead **`APPROVE PA-E`** → whole PA track **CLOSED / COMPLETE** (2026-09-22 ET)
 
-**Evidence:** VS_MVP PIE captures / shot cameras per [00_SHOTLIST.md](00_SHOTLIST.md); DESKTOP owner per [WINDOWS_BRIDGE.md](../docs/Setup/WINDOWS_BRIDGE.md).
+**Evidence:** Place report on DESKTOP; shot cameras per [00_SHOTLIST.md](00_SHOTLIST.md); automation gap [docs/Automation/AUTOMATION_GAPS.md](../docs/Automation/AUTOMATION_GAPS.md) (PA-E Shot 1/2 remains OPEN for future automation).
 
 ---
 
@@ -197,10 +200,16 @@ Lead **`APPROVE PA-A`** — verdicts **accepted** (chat, 2026-09-22 ET). Full ha
 |------|-------------|---------|
 | 0 | **`APPROVE PA STRATEGY`** | PA-A gap audit — **DONE** 2026-09-22 ET |
 | 1 | **`APPROVE PA-A`** (gap audit accepted) | PA-C Blender queue — **DONE** 2026-09-22 ET |
-| 2 | **`APPROVE PA-C`** (2026-09-22 ET) + tranche-1/2 meshes | PA-C **IN PROGRESS** (rim optional); **PA-D OPEN** |
-| 3 | **`APPROVE PA-D`** — **DONE** 2026-09-22 ET + DESKTOP import/place evidence | PA-E prep — **PA-D IN PROGRESS** |
-| 4 | **PA-E** + Lead close gate | Whole PA track — **not CLOSED** |
+| 2 | **`APPROVE PA-C`** (2026-09-22 ET) + tranche-1/2 meshes | PA-D import/place — **DONE** |
+| 3 | **`APPROVE PA-D`** — **DONE** 2026-09-22 ET + DESKTOP import/place evidence | PA-E prep — **DONE** |
+| 4 | **`APPROVE PA-E`** | Whole PA track — **DONE** 2026-09-22 ET |
 
 ---
 
-*Docs/32 Prototype Assets — **PA-C IN PROGRESS** (tranche-2 **DONE**; optional rim) · **PA-D IN PROGRESS** (Lead **`APPROVE PA-D`** granted) — homestead kit only — track **not CLOSED** (2026-09-22 ET).*
+## Next gates
+
+**PA-C+ / planetside dress / optional island rim mesh** — Lead TBD. Do not open without Lead gate string prefixed **`PA`**.
+
+---
+
+*Docs/32 Prototype Assets — **CLOSED / COMPLETE** — Lead **`APPROVE PA-E`**, 2026-09-22 ET — homestead kit only.*

@@ -5,7 +5,7 @@
 | **Status** | Lead **`APPROVE PA-C`** **GRANTED** (chat, 2026-09-22 ET) · **IN PROGRESS** (optional island rim only) |
 | **Tranche 1** | **COMPLETE** — cliffs (3) + pine foliage upgrade |
 | **Tranche 2** | **COMPLETE** — cabin, path stones, planters, fence, glider perch |
-| **Track** | Whole **PA track not CLOSED** — **PA-D OPEN** (import/place); PA-E evidence **LOCKED** until Lead **`APPROVE PA-E`** |
+| **Track** | Whole **PA track CLOSED / COMPLETE** — Lead **`APPROVE PA-E`**, 2026-09-22 ET — [PA_E_SHOTS.md](PA_E_SHOTS.md) |
 | **Host** | DESKTOP + Blender MCP (export) · CLOUD (mesh land + docs) |
 | **Impl doc** | [32_PROTOTYPE_ASSETS.md](../32_PROTOTYPE_ASSETS.md) |
 | **Prior** | [PA_A_GAP_AUDIT.md](PA_A_GAP_AUDIT.md) **APPROVED / CLOSED** — Lead **`APPROVE PA-A`**, 2026-09-22 ET |
