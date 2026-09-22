@@ -2,8 +2,10 @@
 
 Source of truth: `Docs/MOVEMENT_BIBLE.md`.
 
+**Out of scope (MV-A / #130):** Spirit stealth (hidden default, torch reveal, A2 alert) — **SS-A** track per `Docs/SPIRIT_STEALTH_BIBLE.md` + `Docs/SPIRIT_STEALTH_IMPL_PROMPT.md`. Do not add crouch or lit/alert volumes in MV-A unless Lead explicitly merges tracks.
+
 ```
-Implement HomeWorld movement per Docs/MOVEMENT_BIBLE.md NOW section only. Change only character / glide / mantle / mount-mode files required. Do not implement procgen, spirit flight, or full parkour.
+Implement HomeWorld movement per Docs/MOVEMENT_BIBLE.md NOW section only. Change only character / glide / mantle / mount-mode files required. Do not implement procgen, spirit flight, full parkour, or spirit stealth (SS-A).
 
 LOCKED NOW
 - One CharacterMovementComponent (or equivalent). No second mover.

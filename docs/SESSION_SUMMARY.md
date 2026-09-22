@@ -1,3 +1,8 @@
+## 2026-09-22 ET — SPIRIT_STEALTH bible LOCKED (docs-only, cloud)
+
+- Lead locks 2026-09-21 ET chat: spirit **hidden default**, torch reveal (NPC / campfire / spirit torch), found-out **A2 alert** (not crouch, not kidnap, not kill-on-detect); body vs spirit torch split.
+- Added `Docs/SPIRIT_STEALTH_BIBLE.md`, `Docs/SPIRIT_STEALTH_IMPL_PROMPT.md`; amends `DAYNIGHT_BIBLE`, `MOVEMENT_BIBLE`, `Docs/canon/DECISIONS.md`, `DO_NOT.md`, `VERBS.md`; MV-A (#130) **excludes** SS-A — pending Lead **`approve`** on PR.
+
 ## 2026-09-21 ET — CD-A track CLOSED (docs stamp, cloud)
 
 - Lead **`APPROVE CD-A`** → `Docs/23_COMBAT_DREAM_IMPL.md` **CLOSED / COMPLETE**; `Docs/handoffs/CD_A_STUBS.md` **APPROVED / CLOSED**; `Docs/canon/DECISIONS.md` row. CD-A on main `50faeab` (PR #128). Next: **MV-A** TBD — not in this PR.

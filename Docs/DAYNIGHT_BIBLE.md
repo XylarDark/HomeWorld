@@ -2,7 +2,8 @@
 
 **Status:** LOCKED (Lead interview 2026-09-20 ET)  
 **Pointers:** `Docs/CAMERA_BIBLE.md`, `Docs/canon/VERBS.md`, `Docs/canon/SCHEMA.md`, `Docs/21_REAP_SOW.md`, `Docs/canon/FEEL.md`  
-**Amends:** Older GDD “dusk auto-spirit at shrine” and “portal night-only” — this file wins for day/night/transit form rules.
+**Amends:** Older GDD “dusk auto-spirit at shrine” and “portal night-only” — this file wins for day/night/transit form rules.  
+**Spirit stealth (2026-09-21):** Body **no-torch darkness → soft shrine kidnap** stays **body-only** preparedness fail. Spirit **found-out in torch light** = alert/pressure per [`SPIRIT_STEALTH_BIBLE.md`](SPIRIT_STEALTH_BIBLE.md) — **not** kidnap, **not** crouch stealth.
 
 ---
 
@@ -64,6 +65,14 @@ Mid-glide if dusk would begin: **finish or land under day rules**; do not start 
 **Design intent:** Force preparedness. **Not** a common return path. **Not** HP combat, weapons, or aggro loops. Scripted soft fail only. Homestead remains non-combat.
 
 **TODO:** Torch as equippable — may need a tiny equipment exception or held item outside 6-slot RES grid. Stamp item ID + rules in `SCHEMA.md` / `DECISIONS.md` before coding. Proposed: `ITEM_TORCH` held/offhand, not a 7th RES stack.
+
+### Spirit stealth vs body darkness (Lead 2026-09-21)
+
+| Rule | Body (physical) | Spirit (after sleep) |
+|---|---|---|
+| No torch in darkness | Soft **shrine kidnap** home (this bible) | **No** kidnap from stealth alert |
+| Torch / fire light | Mundane safety; **does not** reveal spirits by default | Campfire / NPC torch / **spirit torch** can **lit + reveal** — see [`SPIRIT_STEALTH_BIBLE.md`](SPIRIT_STEALTH_BIBLE.md) |
+| Found-out | N/A (visibility normal) | **A2** alert meter — flee light or finish interact quickly |
 
 ## Spirit sickness
 
