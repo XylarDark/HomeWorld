@@ -1,3 +1,7 @@
+## 2026-09-22 — PA-E Slate pre-tick capture wait (cloud, post-#163)
+
+- [capture_shotlist_viewport.py](../Content/Python/capture_shotlist_viewport.py): **`register_slate_pre_tick_callback`** state machine + keep_alive; no blocking sleep after `take_high_res_screenshot`. Report `primary_path: automation_library_slate_pretick`. [CAPTURE_REDUNDANCY.md](Automation/CAPTURE_REDUNDANCY.md) § Shotlist wait updated (post-#163 blocking-wait footgun). Gap **OPEN** — DESKTOP re-prove.
+
 ## 2026-09-22 — PA-E shotlist AutomationLibrary primary (cloud, rung 1)
 
 - [capture_shotlist_viewport.py](../Content/Python/capture_shotlist_viewport.py): **proven-results-first** — **`AutomationLibrary.take_high_res_screenshot`** primary with Slate tick spacing (one request per shot, ~120s file wait, ~75s final drain); **retired** multi-form console **HighResShot** × **330s** ladder. [CAPTURE_REDUNDANCY.md](Automation/CAPTURE_REDUNDANCY.md) § Shotlist aligned; MRQ one-frame noted as next rung-1 option if AL fails. Gap **OPEN** — DESKTOP re-prove; no PASS claim.
