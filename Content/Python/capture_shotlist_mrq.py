@@ -39,8 +39,9 @@ import pa_e_shotlist_common as common
 
 PREFIX = "capture_shotlist_mrq:"
 PRIMARY_PATH = "movie_render_queue_one_frame"
-WAIT_MECHANISM = "register_slate_pre_tick_callback_and_executor_delegate"
-WAIT_RENDER_SEC = 300.0
+WAIT_MECHANISM = common.MRQ_WAIT_MECHANISM
+WAIT_RENDER_SEC = common.MRQ_WAIT_RENDER_BUDGET_SEC
+INTER_SHOT_DRAIN_SEC = common.MRQ_INTER_SHOT_DRAIN_SEC
 CUSTOM_START = common.ONE_FRAME_START
 CUSTOM_END = common.ONE_FRAME_END
 
@@ -286,7 +287,7 @@ class _MrqOrchestrator:
         world, wl = vnp.resolve_mrq_pie_render_world()
         if not (world and wl in ("pie", "game_world")):
             self._pie_night_stack_attempts += 1
-            if self._pie_night_stack_attempts >= 120:
+            if self._pie_night_stack_attempts >= common.MRQ_PIE_WORLD_WAIT_MAX_ATTEMPTS:
                 self._job_meta["mrq_pie_world_night_stack"] = {
                     "ok": False,
                     "error": "pie_world_never_available",
@@ -299,7 +300,7 @@ class _MrqOrchestrator:
         centroid = self._centroid_for_pie_night_stack()
         recapture_log = self._job_meta.setdefault("mrq_pie_skylight_recapture_ticks", [])
 
-        if att == 1 or att % 8 == 0:
+        if att == 1 or att % common.MRQ_PIE_FULL_STACK_EVERY_N_TICKS == 0:
             meta = vnp.apply_mrq_pie_homestead_night_stack(
                 centroid, world=world, world_label=wl
             )
@@ -308,7 +309,7 @@ class _MrqOrchestrator:
             meta["tick_attempt"] = att
             self._job_meta["mrq_pie_world_night_stack"] = meta
             self._job_meta["mrq_pie_world_context"] = wl
-        elif att % 2 == 0:
+        elif att % common.MRQ_PIE_SKYLIGHT_RECAPTURE_EVERY_N_TICKS == 0:
             recap = vnp.refresh_mrq_pie_skylight_recapture(world)
             recap["tick_attempt"] = att
             recapture_log.append(recap)
@@ -374,6 +375,18 @@ class _MrqOrchestrator:
                 saved = mrq_out
         validation = common.validate_png(saved)
         pose_meta = (self._sequence_meta.get("pose") or {}) if self._sequence_meta else {}
+        if not saved:
+            wait_meta = common.classify_mrq_wait_outcome(
+                error="executor_idle_no_png",
+                executor_finished=bool(self._job_meta.get("executor_finished")),
+                rendering=False,
+                png_path=None,
+                timed_out=bool(self._job_meta.get("timeout")),
+            )
+            validation.setdefault("error", "executor_idle_no_png")
+            validation["wait_outcome"] = wait_meta
+            validation["closed_fail"] = wait_meta["closed_fail"]
+            validation["prove_loop_status"] = wait_meta["prove_loop_status"]
         validation = common.finalize_shot_validation(validation, shot["id"], pose_meta)
         desktop = common.copy_to_desktop(saved, shot["filename"]) if saved else {"copied": False}
         harness_pass = bool(validation.get("harness_pass"))
@@ -387,7 +400,9 @@ class _MrqOrchestrator:
             "primary_path": PRIMARY_PATH,
             "wait_mechanism": WAIT_MECHANISM,
             "wait_render_budget_sec": WAIT_RENDER_SEC,
+            "latent_wait_contract": common.MRQ_LATENT_WAIT_CONTRACT,
             "saved_path": saved,
+            "saved_path_stamp": common.stamp_file_artifact(saved),
             "validation": validation,
             "desktop_copy": desktop,
             "harness_pass": harness_pass,
@@ -400,7 +415,7 @@ class _MrqOrchestrator:
         if self.shot_index >= len(common.SHOTS):
             self.phase = _Phase.WRITE_REPORT
         else:
-            self._inter_shot_drain_deadline = time.time() + 120.0
+            self._inter_shot_drain_deadline = time.time() + INTER_SHOT_DRAIN_SEC
             self.phase = _Phase.INTER_SHOT_DRAIN
             _log("inter_shot_drain start", {"next_shot": common.SHOTS[self.shot_index]["id"]})
 
@@ -425,6 +440,16 @@ class _MrqOrchestrator:
             return
         validation = common.validate_png(None)
         validation["error"] = error
+        wait_meta = common.classify_mrq_wait_outcome(
+            error=error,
+            executor_finished=bool(self._job_meta.get("executor_finished")),
+            rendering=self._is_subsystem_rendering(),
+            png_path=self._job_meta.get("mrq_output_path"),
+            timed_out=bool(self._job_meta.get("timeout")),
+        )
+        validation["wait_outcome"] = wait_meta
+        validation["closed_fail"] = wait_meta["closed_fail"]
+        validation["prove_loop_status"] = wait_meta["prove_loop_status"]
         entry = {
             "id": shot["id"],
             "filename": shot["filename"],
@@ -445,7 +470,7 @@ class _MrqOrchestrator:
         if self.shot_index >= len(common.SHOTS):
             self.phase = _Phase.WRITE_REPORT
         else:
-            self._inter_shot_drain_deadline = time.time() + 120.0
+            self._inter_shot_drain_deadline = time.time() + INTER_SHOT_DRAIN_SEC
             self.phase = _Phase.INTER_SHOT_DRAIN
 
     def _write_report_and_finish(self) -> None:
@@ -476,6 +501,11 @@ class _MrqOrchestrator:
             "resolution": [common.RES_X, common.RES_Y],
             "custom_playback_range": [CUSTOM_START, CUSTOM_END],
             "wait_render_budget_sec": WAIT_RENDER_SEC,
+            "latent_wait_contract": common.MRQ_LATENT_WAIT_CONTRACT,
+            "artifact_stamps": common.build_pa_e_artifact_stamps(self.results),
+            "fresh_prove_purge": self.viewport_prep.get("fresh_prove_purge"),
+            "fixture_inventory_editor": self.viewport_prep.get("fixture_inventory_editor")
+            or common.inventory_pa_e_session_fixtures(),
             "cinematics_dir": common.CINEMATICS_PA_E_DIR,
             "shots": self.results,
             "driver_error": self._driver_error,
@@ -639,6 +669,12 @@ def _ensure_shot_level_sequence(
     # Transform tracks; live actor relocate does not change the MRQ frame (post-#172 DESKTOP scrap).
     camera_actor, cam_meta = _ensure_spawned_cine_camera(shot["id"], loc, rot)
     meta.update(cam_meta)
+    meta["fixture_lifecycle"] = {
+        "world_context": "editor",
+        "mrq_camera": cam_meta,
+        "cleaned": False,
+        "note": "PA_E_MRQ_* updated in editor world for MRQ sequence binding",
+    }
     meta["mrq_camera_source"] = "spawned_pa_e_mrq_cine"
     if in_level_cam is not None:
         meta["in_level_cam_reference"] = common.actor_label(in_level_cam)
@@ -977,10 +1013,12 @@ def main() -> None:
     except Exception as e:
         _log("keep_alive import/arm skipped", {"error": str(e)})
 
-    mrq_probe = _probe_mrq()
-    mrq_ok = bool(mrq_probe.get("available"))
+    fresh_prove = common.purge_all_pa_e_shot_pngs_if_fresh_prove()
+    _log("fresh_prove_purge", fresh_prove)
 
     conductor_preflight = common.conductor_mrq_capture_preflight(PREFIX)
+    mrq_probe = conductor_preflight.get("mrq_probe") or _probe_mrq()
+    mrq_ok = bool(mrq_probe.get("available"))
     if not conductor_preflight.get("ready"):
         common.write_blocked_capture_report(
             prefix=PREFIX,
@@ -993,7 +1031,11 @@ def main() -> None:
             level_loaded=False,
             keep_python_script_alive=keep_ok,
             mrq_probe=mrq_probe,
-            extra={"conductor_preflight": conductor_preflight},
+            extra={
+                "conductor_preflight": conductor_preflight,
+                "fresh_prove_purge": fresh_prove,
+                "latent_wait_contract": common.MRQ_LATENT_WAIT_CONTRACT,
+            },
         )
         if keep_ok:
             try:
@@ -1028,6 +1070,8 @@ def main() -> None:
         "world_gate": world_recheck,
         "finish_loading": arrange_gate.get("finish_loading"),
         "homestead_night_environment": arrange_gate.get("lighting"),
+        "fresh_prove_purge": fresh_prove,
+        "fixture_inventory_editor": common.inventory_pa_e_session_fixtures(),
     }
     viewport_prep.update(arrange_gate.get("view") or {})
 

@@ -16,6 +16,7 @@ One-line **Cause→Avoid** rows; narratives → [DEFECT_PA_E](../Docs/qa/DEFECT_
 - **Binary capture_pass false PASS:** treat **`capture_outcome`** + **`visual_framing_pass`**; near-black ⇒ **`soft_fail`**, not closed FAIL unless **`void_still_after_visible_sky_stack`**.
 - **Stale Sequencer vs live Arrange:** MRQ Level Sequence possessable Transform on `CAM_*` stale after live relocate → spawn/update `PA_E_MRQ_{shot}` at resolved pose or rebuild possessable and clear tracks.
 - **Dirty prove patch:** uncommitted `pa_e_shotlist_common.py` during prove → `git checkout <sha> -- Content/Python/pa_e_shotlist_common.py` after merge.
+- **MRQ plugin miss cryptic import:** MovieRenderPipeline disabled/stale Python → **`conductor_mrq_capture_preflight`** + **`probe_mrq_tool_readiness`** **`blocked_reason`** (`mrq_unavailable` / `editor_restart_required`) before queue Act.
 
 **UE 5.8 — MassEntity plugin missing (2026-09-19, Docs/22 U58-C):** Safe-Build against Launcher UE 5.8 failed with `Unable to find plugin 'MassEntity' (referenced via HomeWorld.uproject)`. **Cause:** MassEntity was deprecated (engine-moved) and the stub plugin is **removed** from UE 5.8 installs; MassGameplay / MassAI remain. **Fix:** Remove `{ "Name": "MassEntity", "Enabled": true }` from `HomeWorld.uproject` Plugins; keep MassGameplay, MassAI, StateTree, ZoneGraph, SmartObjects. See [Docs/22_UE58_UPGRADE.md](../Docs/22_UE58_UPGRADE.md). *(Do not duplicate this entry — cross-link only when documenting Mass-related build failures.)*
 

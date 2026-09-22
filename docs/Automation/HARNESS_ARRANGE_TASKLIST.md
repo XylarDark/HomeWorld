@@ -13,11 +13,20 @@
 | P0-5 | Docs: CAPTURE_REDUNDANCY, KNOWN_ERRORS, AUTOMATION_GAPS, automation-standards | Done (PR) |
 | P0-6 | Assert harden: center-crop + bright-pixel fraction + shot-pair diversity (block global-mean speckle PASS) | Done (follow-up PR) |
 | P0-7 | Arrange: per-shot `aim_bounds` centroids, ray vs dress AABB, MRQ per-shot night reapply note | Done (follow-up PR) |
-| P0-8 | Arrange: bounds **relocate** CAM (not reaim-only); exclude Cliff from aim needles; ray required for `aim_ok` | PR (cloud) |
+| P0-8 | Arrange: bounds **relocate** CAM (not reaim-only); exclude Cliff from aim needles; ray required for `aim_ok` | Done (PR) |
 
-**P1 (follow-up):** Three-state **`capture_outcome`** (`pass` / `soft_fail` / `closed_fail`) + framing-intent gate + MRQ conductor preflight — **Done (PR)** in [pa_e_shotlist_common.py](../../Content/Python/pa_e_shotlist_common.py) + [capture_shotlist_mrq.py](../../Content/Python/capture_shotlist_mrq.py). Remaining: NF2-B evidence scripts parity.
+**P1 (follow-up):** Three-state reports everywhere (`blocked` / `in_progress` / `pass`) with consistent `closed_fail` semantics across PIE harnesses and NF2-B evidence scripts. **Done on main (#180).**
 
-**P2 (follow-up):** Golden-image compare pipeline after a trusted capture path produces lit PNGs (Epic Screenshot Comparison Tool — scout only until Lead gate).
+**P2 (industry harness — PA-E / MRQ):** Fixture lifecycle, latent waits, plugin probe, artifact stamps (this track — **not** golden-image SCOUT).
+
+| ID | Task | Status |
+|----|------|--------|
+| P2-1 | TMP + `PA_E_MRQ_*` fixture lifecycle helpers + report stamps (`reseed_pa_e_tmp_fixtures_for_capture`, `inventory_pa_e_session_fixtures`, optional `teardown_pa_e_session_fixtures`) | PR (cloud) |
+| P2-2 | Central `MRQ_LATENT_WAIT_CONTRACT` (56/16 warm-up, PIE stack tick cadence, Slate pre-tick budgets); wait miss → `classify_mrq_wait_outcome` soft/closed fail | PR (cloud) |
+| P2-3 | `probe_mrq_tool_readiness()` wired into `conductor_mrq_capture_preflight` (clear blocked reason, not import crash) | PR (cloud) |
+| P2-4 | `artifact_stamps` in `pa_e_capture_report.json` (paths + mtimes); `PA_E_FRESH_PROVE=1` optional full purge only at prove start | PR (cloud) |
+
+**P2-gated (Lead `APPROVE TOOL SCOUT` only):** Epic Screenshot Comparison / golden-image pipeline after trusted lit capture path — docs scout only until gate; **not** part of industry P2 PR.
 
 **P3 (follow-up):** Full harness audit — every Editor Python “prove” script calls Arrange or documents why not (non-shotlist tests).
 

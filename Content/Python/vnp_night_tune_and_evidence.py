@@ -339,6 +339,15 @@ def _spawn_actor_in_world(world, unreal_class, location: "unreal.Vector", rotati
     return None
 
 
+def actors_for_pa_e_world(world=None) -> list:
+    """Public wrapper for PA-E fixture lifecycle (editor vs PIE actor lists)."""
+    return _actors_for_world(world)
+
+
+def pa_e_world_context_label(world=None) -> str:
+    return _world_path_label(world)
+
+
 def resolve_mrq_pie_render_world() -> tuple[Any, str]:
     """World MoviePipelinePIEExecutor actually renders (not Editor TMP session actors)."""
     try:
