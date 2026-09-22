@@ -373,7 +373,10 @@ class _MrqOrchestrator:
                 self._job_meta["copy_error"] = str(e)
                 saved = mrq_out
         validation = common.validate_png(saved)
+        pose_meta = (self._sequence_meta.get("pose") or {}) if self._sequence_meta else {}
+        validation = common.finalize_shot_validation(validation, shot["id"], pose_meta)
         desktop = common.copy_to_desktop(saved, shot["filename"]) if saved else {"copied": False}
+        harness_pass = bool(validation.get("harness_pass"))
         entry = {
             "id": shot["id"],
             "filename": shot["filename"],
@@ -387,7 +390,8 @@ class _MrqOrchestrator:
             "saved_path": saved,
             "validation": validation,
             "desktop_copy": desktop,
-            "pass": bool(validation.get("pass")),
+            "harness_pass": harness_pass,
+            "pass": harness_pass,
         }
         self.results.append(entry)
         _log("shot done", {"id": shot["id"], "pass": entry["pass"], "bytes": validation.get("bytes")})
@@ -477,10 +481,12 @@ class _MrqOrchestrator:
             "driver_error": self._driver_error,
             "policy": (
                 "Movie Render Queue one-frame PNG (PIE executor, deferred lit pass, warm-up); "
-                "PASS = lit homestead visible (luminance gate), not file-exists-only; "
-                "near-black = prove loop in progress (inventory→aim→capture→bug-fix), not closed FAIL; "
+                "capture_outcome pass = harness + Lead visual framing; capture_pass = harness only; "
+                "luminance PASS ≠ framing PASS (wide anchor + aim_ok + Lead eyeball); "
+                "near-black = soft_fail / prove loop, not closed FAIL unless void after visible_sky_stack_ok; "
                 "AL near-black = OPEN viewport capture bug (wrong buffer/pose/game-view)"
             ),
+            "conductor_preflight": self.viewport_prep.get("conductor_preflight"),
             "lead_prove_loop": list(common.LEAD_PROVE_LOOP),
             "universal_testing_preconditions": list(common.UNIVERSAL_TESTING_PRECONDITIONS),
             "homestead_diagnostic_path": common.homestead_diagnostic_path(),
@@ -962,6 +968,7 @@ def main() -> None:
     reset_mrq_session_guards()
     _MAIN_ENTRY_ACTIVE = True
     _log("started")
+    common.reload_pa_e_capture_python_modules()
     keep_ok = False
     try:
         import vnp_editor_keep_alive as keep
@@ -973,7 +980,35 @@ def main() -> None:
     mrq_probe = _probe_mrq()
     mrq_ok = bool(mrq_probe.get("available"))
 
+    conductor_preflight = common.conductor_mrq_capture_preflight(PREFIX)
+    if not conductor_preflight.get("ready"):
+        common.write_blocked_capture_report(
+            prefix=PREFIX,
+            primary_path=PRIMARY_PATH,
+            arrange_gate={
+                "ready": False,
+                "blocked_reasons": conductor_preflight.get("blocked_reasons") or [],
+                "conductor_preflight": conductor_preflight,
+            },
+            level_loaded=False,
+            keep_python_script_alive=keep_ok,
+            mrq_probe=mrq_probe,
+            extra={"conductor_preflight": conductor_preflight},
+        )
+        if keep_ok:
+            try:
+                import vnp_editor_keep_alive as keep
+
+                keep.disarm()
+            except Exception:
+                pass
+        _release_main_entry()
+        return
+
     level_ok = common.load_level(PREFIX)
+    world_recheck = common.ensure_markers_editor_world(PREFIX)
+    if not world_recheck.get("ok"):
+        level_ok = False
     arrange_gate = common.arrange_pa_e_shotlist(
         PREFIX,
         level_loaded=level_ok,
@@ -989,6 +1024,8 @@ def main() -> None:
     viewport_prep: dict[str, Any] = {
         "homestead_diagnostic": homestead_diag,
         "arrange_gate": arrange_gate,
+        "conductor_preflight": conductor_preflight,
+        "world_gate": world_recheck,
         "finish_loading": arrange_gate.get("finish_loading"),
         "homestead_night_environment": arrange_gate.get("lighting"),
     }

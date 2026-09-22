@@ -1,3 +1,7 @@
+## 2026-09-22 — PA-E harness P1: three-state + framing gate + conductor preflight (cloud)
+
+- **P1 Lead-approved:** [pa_e_shotlist_common.py](../Content/Python/pa_e_shotlist_common.py) — **`capture_outcome`** (`pass`/`soft_fail`/`closed_fail`), **`finalize_shot_validation`** (luminance vs framing intent, Lead eyeball stamp), **`conductor_mrq_capture_preflight`** (Markers world reload, VNP module reload). MRQ [capture_shotlist_mrq.py](../Content/Python/capture_shotlist_mrq.py) wires preflight + guards; night gate prefers **`visible_sky_stack_ok`**. Docs: CAPTURE_REDUNDANCY, KNOWN_ERRORS, HARNESS P1. **DESKTOP re-prove required** after merge (cloud has no UE).
+
 ## 2026-09-22 — PA-E MRQ visible sky iteration (post-#178 FAIL)
 
 - DESKTOP #178: PIE `stack_ok` but sky still void; **height_fog absent**. **Fix:** spawn/tune **ExponentialHeightFog** in PIE; atmo @ **world origin**; MRQ skylight **hemisphere fill** (skip early black recapture); warm-up **56/16**; full stack + recapture on Slate ticks during MRQ wait. Report **`visible_sky_stack_ok`**. Gap **OPEN** — DESKTOP re-prove top-band RGB.
