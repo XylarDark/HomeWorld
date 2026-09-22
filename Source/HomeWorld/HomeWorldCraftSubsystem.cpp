@@ -6,6 +6,9 @@
 #include "HomeWorldInventorySubsystem.h"
 #include "HomeWorldInventoryTypes.h"
 #include "HomeWorldStoreTransferComponent.h"
+#include "Engine/StaticMeshActor.h"
+#include "Engine/StaticMesh.h"
+#include "Components/StaticMeshComponent.h"
 #include "Engine/World.h"
 #include "Engine/GameInstance.h"
 #include "EngineUtils.h"
@@ -225,6 +228,94 @@ bool UHomeWorldCraftSubsystem::SpendForRecipe(
 	return true;
 }
 
+namespace
+{
+	AActor* FindDemoSpineActor(UWorld* World, const FName Label, const FName Tag)
+	{
+		if (!World)
+		{
+			return nullptr;
+		}
+		for (TActorIterator<AActor> It(World); It; ++It)
+		{
+			AActor* Actor = *It;
+			if (!Actor)
+			{
+				continue;
+			}
+			if (Actor->ActorHasTag(Tag))
+			{
+				return Actor;
+			}
+#if WITH_EDITOR
+			if (Actor->GetActorLabel().Equals(Label.ToString(), ESearchCase::CaseSensitive))
+			{
+				return Actor;
+			}
+#endif
+			if (Actor->GetName().StartsWith(Label.ToString()))
+			{
+				return Actor;
+			}
+		}
+		return nullptr;
+	}
+}
+
+void UHomeWorldCraftSubsystem::RevealDemoCottageShell(UWorld* World)
+{
+	if (!World)
+	{
+		return;
+	}
+	static const FName CottageLabel(TEXT("GP_Demo_Cottage"));
+	static const FName CottageTag(TEXT("DS_Demo_Cottage"));
+
+	AActor* Cottage = FindDemoSpineActor(World, CottageLabel, CottageTag);
+	if (Cottage)
+	{
+		Cottage->SetActorHiddenInGame(false);
+		Cottage->SetActorEnableCollision(ECollisionEnabled::QueryAndPhysics);
+		UE_LOG(LogTemp, Log, TEXT("DS-A: cottage revealed (GP_Demo_Cottage)"));
+		return;
+	}
+
+	FVector SpawnLoc(0.f, 0.f, 0.f);
+	if (AActor* Kitchen = FindDemoSpineActor(World, FName(TEXT("GP_PH_CottageKitchen")), FName(TEXT("GC_PlaceholderVolume"))))
+	{
+		SpawnLoc = Kitchen->GetActorLocation() + FVector(0.f, 0.f, -80.f);
+	}
+	else if (AHomeWorldCharacter* Char = Cast<AHomeWorldCharacter>(World->GetFirstPlayerController()
+		? World->GetFirstPlayerController()->GetPawn()
+		: nullptr))
+	{
+		SpawnLoc = Char->GetActorLocation() + Char->GetActorForwardVector() * 350.f;
+	}
+
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+	AStaticMeshActor* Blockout = World->SpawnActor<AStaticMeshActor>(SpawnLoc, FRotator::ZeroRotator, Params);
+	if (!Blockout)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("DS-A: cottage spawn failed"));
+		return;
+	}
+	Blockout->Tags.AddUnique(CottageTag);
+	Blockout->Tags.AddUnique(CottageLabel);
+#if WITH_EDITOR
+	Blockout->SetActorLabel(CottageLabel.ToString());
+#endif
+	if (UStaticMeshComponent* MeshComp = Blockout->GetStaticMeshComponent())
+	{
+		if (UStaticMesh* Cube = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Cube.Cube")))
+		{
+			MeshComp->SetStaticMesh(Cube);
+		}
+		MeshComp->SetWorldScale3D(FVector(3.5f, 2.8f, 2.2f));
+	}
+	UE_LOG(LogTemp, Log, TEXT("DS-A: cottage spawned runtime blockout (GP_Demo_Cottage)"));
+}
+
 AHomeWorldCraftStation* UHomeWorldCraftSubsystem::SpawnPlaceableStation(
 	UWorld* World,
 	const EHomeWorldCraftStationKind Kind,
@@ -254,6 +345,10 @@ AHomeWorldCraftStation* UHomeWorldCraftSubsystem::SpawnPlaceableStation(
 		Station->Tags.AddUnique(FName(TEXT("GC_Kitchen")));
 	}
 	Station->Tags.AddUnique(FName(*ActorLabel));
+#if WITH_EDITOR
+	Station->SetActorLabel(ActorLabel);
+#endif
+	Station->RefreshDemoSpineVisuals();
 	return Station;
 }
 
@@ -269,6 +364,8 @@ void UHomeWorldCraftSubsystem::UnlockCottageIfNeeded(AHomeWorldCharacter* Charac
 	}
 	bCottageUnlocked = true;
 	UE_LOG(LogTemp, Log, TEXT("PROGRESS:COTTAGE_UNLOCK"));
+	UWorld* World = Character ? Character->GetWorld() : nullptr;
+	RevealDemoCottageShell(World);
 }
 
 void UHomeWorldCraftSubsystem::ApplyRecipeOutcome(

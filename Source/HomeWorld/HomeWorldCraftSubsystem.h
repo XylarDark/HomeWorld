@@ -49,6 +49,7 @@ private:
 	bool SpendOneFromStored(UWorld* World, FName ResourceId);
 	void ApplyRecipeOutcome(AHomeWorldCharacter* Character, EHomeWorldCraftRecipeId Recipe, AHomeWorldCraftStation* StationContext);
 	void UnlockCottageIfNeeded(AHomeWorldCharacter* Character);
+	void RevealDemoCottageShell(UWorld* World);
 	AHomeWorldCraftStation* SpawnPlaceableStation(
 		UWorld* World,
 		EHomeWorldCraftStationKind Kind,

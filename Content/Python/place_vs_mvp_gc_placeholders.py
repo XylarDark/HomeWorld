@@ -1,4 +1,5 @@
 # place_vs_mvp_gc_placeholders.py — GC-C shop + cottage room placeholder volumes on L_VS_MVP_Markers.
+# DS-A: GP_Demo_Cottage blockout (hidden until unlock) + readable room markers at PIE.
 # Run after Safe-Build; idempotent GP_PH_* actors.
 
 from __future__ import annotations
@@ -11,7 +12,7 @@ except ImportError:
     print("ERROR: Run inside Unreal Editor.")
     sys.exit(1)
 
-PREFIX = "GC-PlaceholderPlace:"
+PREFIX = "DS-PlaceholderPlace:"
 LEVEL_PATH = "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers"
 TARGET_CLASS = "/Script/HomeWorld.HomeWorldGcPlaceholderVolume"
 FOLDER = "VS_MVP/Markers/GC_Placeholders"
@@ -89,6 +90,14 @@ def _ensure_placeholder(cls, label: str, kind: int, loc: unreal.Vector):
         actor.set_editor_property("placeholder_kind", kind)
     except Exception as e:
         _log("placeholder_kind warn " + label + ": " + str(e))
+    try:
+        tags = list(actor.get_editor_property("tags") or [])
+        tag_name = unreal.Name(label)
+        if tag_name not in tags:
+            tags.append(tag_name)
+            actor.set_editor_property("tags", tags)
+    except Exception:
+        pass
     return actor
 
 
@@ -105,8 +114,14 @@ def main() -> int:
         loc = base + offset
         if _ensure_placeholder(cls, label, kind, loc):
             ok += 1
+    try:
+        import vs_mvp_ds_visual_helpers as ds_vis
+
+        ds_vis.ensure_cottage_blockout(base, unreal.Vector(0.0, -120.0, 0.0))
+    except Exception as e:
+        _log("DS-A cottage blockout warn: " + str(e))
     unreal.EditorLevelLibrary.save_current_level()
-    _log("DONE placeholders placed=%d/%d" % (ok, len(PLACEHOLDERS)))
+    _log("DONE placeholders placed=%d/%d (GP_Demo_Cottage hidden until unlock)" % (ok, len(PLACEHOLDERS)))
     return 0 if ok == len(PLACEHOLDERS) else 4
 
 

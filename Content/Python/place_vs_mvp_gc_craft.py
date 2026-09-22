@@ -1,4 +1,5 @@
 # place_vs_mvp_gc_craft.py — GC-B hub craft point on L_VS_MVP_Markers (bootstrap campfire recipe).
+# DS-A: readable hub label + visible mesh at PIE via AHomeWorldCraftStation (KEEP-LOCAL save optional).
 # Run after Safe-Build; idempotent GP_Craft_Hub actor.
 
 from __future__ import annotations
@@ -12,7 +13,7 @@ except ImportError:
     print("ERROR: Run inside Unreal Editor.")
     sys.exit(1)
 
-PREFIX = "GC-CraftPlace:"
+PREFIX = "DS-CraftPlace:"
 LEVEL_PATH = "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers"
 TARGET_CLASS = "/Script/HomeWorld.HomeWorldCraftStation"
 HUB_LABEL = "GP_Craft_Hub"
@@ -83,8 +84,14 @@ def main() -> int:
         actor.set_editor_property("station_kind", STATION_KIND_HUB)
     except Exception as e:
         _log("station_kind warn: " + str(e))
+    try:
+        import vs_mvp_ds_visual_helpers as ds_vis
+
+        ds_vis.refresh_craft_station_visual(actor)
+    except Exception as e:
+        _log("DS-A visual hint warn: " + str(e))
     unreal.EditorLevelLibrary.save_current_level()
-    _log("DONE hub craft point at homestead")
+    _log("DONE hub craft point GP_Craft_Hub (label CRAFT HUB at PIE)")
     return 0
 
 
