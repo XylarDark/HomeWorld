@@ -1756,8 +1756,10 @@ def summarize_capture_report(shots: list[dict[str, Any]]) -> dict[str, Any]:
     shot_pair = validate_shot_pair_diversity(pair_paths)
     if not shot_pair.get("pass"):
         capture_pass = False
+        harness_pass = False
         for r in shots:
             r["pass"] = False
+            r["harness_pass"] = False
             validation = r.setdefault("validation", {})
             if validation.get("pass"):
                 validation["pass"] = False
