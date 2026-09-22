@@ -688,7 +688,7 @@ def _rebuild_camera_cut(sequence, camera_actor, meta: dict[str, Any]) -> None:
 def _resolve_possessable_binding(ext_seq, sequence, camera_actor, meta: dict[str, Any]):
     """Always possess the spawned PA_E_MRQ_* camera — never reuse stale CAM_Hero bindings."""
     binding = ext_seq.add_possessable(sequence, camera_actor)
-    meta["binding_match"] = "add_possessable_spawned_mrq_camera"
+    meta["binding_match"] = "add_possessable_mrq_cam"
     meta["possessable_actor_label"] = common.actor_label(camera_actor)
     return binding
 
