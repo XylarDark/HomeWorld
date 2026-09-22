@@ -67,7 +67,7 @@ These are **intentionally separate**. On case-insensitive filesystems (macOS/Win
 | [28_TASTE_GATES.md](28_TASTE_GATES.md) | Taste Gates (TG) — detect/queue/resume human taste limits | **CLOSED / COMPLETE** — Lead **`APPROVE TG-E`**, 2026-09-19 ET |
 | [29_TASTE_PROFILER.md](29_TASTE_PROFILER.md) | Taste Profiler (TP) — durable profile + session promote | **CLOSED / COMPLETE** — Lead **`APPROVE TP-E`**, 2026-09-19 ET |
 | [30_DEMO_SPINE.md](30_DEMO_SPINE.md) | Demo Spine (DS) — visible campfire → tent → cottage | **CLOSED / COMPLETE** — Lead **`APPROVE DS-A`**, 2026-09-21 ET |
-| [32_PROTOTYPE_ASSETS.md](32_PROTOTYPE_ASSETS.md) | Prototype Assets (PA) — homestead low-poly dress | **PA-D IN PROGRESS** — Lead **`APPROVE PA-D`**, 2026-09-22 ET · [PA_D_IMPORT_PLACE.md](handoffs/PA_D_IMPORT_PLACE.md); PA-C rim optional; track **not CLOSED** |
+| [32_PROTOTYPE_ASSETS.md](32_PROTOTYPE_ASSETS.md) | Prototype Assets (PA) — homestead low-poly dress | **CLOSED / COMPLETE** — Lead **`APPROVE PA-E`**, 2026-09-22 ET · [PA_E_SHOTS.md](handoffs/PA_E_SHOTS.md); formal Shot 1/2 stills **deferred/accepted** |
 | [17_HS_AUDIT_SIGN_OFF.md](17_HS_AUDIT_SIGN_OFF.md) | HS-F sign-off & re-grade | **IN PROGRESS** (PENDING **`SIGN OFF HS AUDIT`**) |
 - **HR3-C branch protection (PENDING LEAD APPLY):** [15c_HR3_C_BRANCH_PROTECTION.md](15c_HR3_C_BRANCH_PROTECTION.md) — Lead checklist in [docs/Setup/CI_SETUP.md](../docs/Setup/CI_SETUP.md); handoff [handoffs/HR3_C_BRANCH_PROTECTION.md](handoffs/HR3_C_BRANCH_PROTECTION.md)
 - **Start swarm:** [../START_HERE.md](../START_HERE.md)

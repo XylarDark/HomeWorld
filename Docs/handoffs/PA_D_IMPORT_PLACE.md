@@ -2,13 +2,13 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **APPROVED** — Lead **`APPROVE PA-D`**, 2026-09-22 ET · DESKTOP import/place verified (KEEP-LOCAL map/mesh Content on DESKTOP; no `.uasset` in cloud PRs) · **awaiting formal Shot 1/2 for PA-E** (PA-D not CLOSED) |
+| **Status** | **CLOSED / COMPLETE** — Lead **`APPROVE PA-D`**, 2026-09-22 ET · DESKTOP import/place verified · **PA-E CLOSED** via Lead **`APPROVE PA-E`**, 2026-09-22 ET |
 | **Host** | **DESKTOP-21CT3H0** (Conductor parent — MCP / PIE) |
-| **Track** | Whole **PA track not CLOSED** — **PA-E LOCKED** until Shot 1/2 evidence + Lead **`APPROVE PA-E`** |
+| **Track** | Whole **PA track CLOSED / COMPLETE** — [PA_E_SHOTS.md](PA_E_SHOTS.md) |
 | **Impl doc** | [32_PROTOTYPE_ASSETS.md](../32_PROTOTYPE_ASSETS.md) |
 | **Prior** | [PA_C_BLENDER.md](PA_C_BLENDER.md) · [PA_C_TRANCHE2.md](PA_C_TRANCHE2.md) — tranche-1/2 FBX on `main` |
 
-**Do not** stamp **PA-D CLOSED**, **PA-E done**, or **whole PA track CLOSED** in a cloud PR — DESKTOP runs import/place and attaches evidence first.
+**PA-D CLOSED** on DESKTOP place evidence + Lead **`APPROVE PA-E`** docs stamp (2026-09-22 ET). Formal Shot 1/2 stills **deferred/accepted** — not shotlist PASS from ImageGrab.
 
 ---
 
@@ -87,8 +87,8 @@ Dress script: [place_vs_mvp_dress.py](../../Content/Python/place_vs_mvp_dress.py
 - [x] Tranche-1/2 FBX on `main`
 - [x] DESKTOP: Safe-Build + batch import (done 2026-09-22 ET — Homestead meshes under `/Game/HomeWorld/Meshes/Homestead/` including SM_Cliff_*, SM_Planter_*, SM_Garden_Fence_Seg, SM_PathStone_*, cabin parts, pine family)
 - [x] DESKTOP: `place_vs_mvp_pa_d.py` on `L_VS_MVP_Markers` (after save-before-dress fix in PR #149; evidence: 16× `PA_D_*` cliffs/planters/fence/path + refreshed `DRESS_*` cabin/pines/glider/island/lookout)
-- [ ] Evidence appended (log excerpt / viewport capture) — **pending**
-- [ ] PA-E Shot 1/2 + Lead close gate — **LOCKED**
+- [x] Place evidence — `C:\dev\HomeWorld\Saved\pa_d_place_report.json` (16× `PA_D_*` on `L_VS_MVP_Markers`)
+- [x] PA-E Shot 1/2 + Lead close gate — **CLOSED** via Lead **`APPROVE PA-E`**, 2026-09-22 ET ([PA_E_SHOTS.md](PA_E_SHOTS.md); formal stills **deferred/accepted**)
 
 ---
 
@@ -100,4 +100,4 @@ Dress script: [place_vs_mvp_dress.py](../../Content/Python/place_vs_mvp_dress.py
 
 ## Gate
 
-Lead **`APPROVE PA-D`** grants DESKTOP import/place work only. **PA-D CLOSED** requires DESKTOP evidence + Conductor stamp (or Lead **`APPROVE PA-E`** prep complete). **PA track** closes on **PA-E**, not PA-D.
+Lead **`APPROVE PA-D`** granted DESKTOP import/place. **PA-D CLOSED** with place report + Lead **`APPROVE PA-E`**. Whole **PA track** closed on **PA-E** (2026-09-22 ET).
