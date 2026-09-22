@@ -12,8 +12,9 @@ Canon preset: Lib/07_Night_SpiritLayer/PRESET_Homestead_Night.md
 Public API (no screenshots):
 - apply_homestead_night_tune() — cvars + fog + warm/cool lights
 - verify_homestead_night_lighting_stack() — moon + skylight/directional + cabin warm
-- apply_mrq_pie_homestead_night_stack() — Phase-2 companion: exposure clamps, TMP reconfigure,
-  SkyAtmosphere + moon dir index 1 + SkyLight recapture (MRQ PIE void-sky fix)
+- apply_mrq_pie_homestead_night_stack() — exposure/SupportSkyAtmosphere, TMP in target world,
+  SkyAtmosphere + moon AtmosphereSunLightIndex 0 + SkyLight RecaptureSky (MRQ PIE void-sky fix)
+- apply_mrq_pie_homestead_night_stack_in_render_world() — call after PIE executor starts
 
 Writes Saved/vnp_night_evidence.json (full main() only).
 """
@@ -243,6 +244,110 @@ MRQ_PIE_NIGHT_EXPOSURE_CVARS: tuple[str, ...] = (
     "r.DefaultFeature.AutoExposure.MaxBrightness 2.0",
 )
 
+# Epic single Atmosphere Sun Light uses index 0; index 1 with one directional → void sky (forums).
+MRQ_PIE_ATMOSPHERE_SUN_INDEX = 0
+
+MRQ_PIE_RENDER_CVARS: tuple[str, ...] = (
+    "r.SupportSkyAtmosphere 1",
+) + MRQ_PIE_NIGHT_EXPOSURE_CVARS
+
+_DEFAULT_HOMESTEAD_CENTROID = (-600.0, -100.0, 150.0)
+_CENTROID_Z_MIN_SANE = -200.0
+_CENTROID_Z_MAX_SANE = 50000.0
+
+
+def _sanitize_homestead_centroid(homestead_centroid: list[float] | None) -> dict[str, Any]:
+    """Reject void/insane dress centroids (e.g. cliff Z≈-3656) before moon aim/placement."""
+    if not homestead_centroid or len(homestead_centroid) < 3:
+        used = list(_DEFAULT_HOMESTEAD_CENTROID)
+        return {"used": used, "rejected": None, "reason": "missing_or_short"}
+    try:
+        cx = float(homestead_centroid[0])
+        cy = float(homestead_centroid[1])
+        cz = float(homestead_centroid[2])
+    except (TypeError, ValueError):
+        used = list(_DEFAULT_HOMESTEAD_CENTROID)
+        return {"used": used, "rejected": list(homestead_centroid), "reason": "non_numeric"}
+    insane = (
+        cz < _CENTROID_Z_MIN_SANE
+        or cz > _CENTROID_Z_MAX_SANE
+        or abs(cx) > 1.0e6
+        or abs(cy) > 1.0e6
+    )
+    if insane:
+        return {
+            "used": list(_DEFAULT_HOMESTEAD_CENTROID),
+            "rejected": [cx, cy, cz],
+            "reason": "insane_centroid",
+        }
+    return {"used": [cx, cy, cz], "rejected": None, "reason": "ok"}
+
+
+def _world_path_label(world) -> str:
+    if world is None:
+        return "editor"
+    try:
+        pn = (world.get_path_name() or "").upper()
+        if "UEDPIE" in pn or "PIE" in pn:
+            return "pie"
+    except Exception:
+        pass
+    return "runtime"
+
+
+def _is_editor_world(world) -> bool:
+    return _world_path_label(world) == "editor"
+
+
+def _actors_for_world(world) -> list:
+    if world is None or _is_editor_world(world):
+        return unreal.EditorLevelLibrary.get_all_level_actors()
+    try:
+        return list(unreal.GameplayStatics.get_all_actors_of_class(world, unreal.Actor))
+    except Exception:
+        return []
+
+
+def _spawn_actor_in_world(world, unreal_class, location: "unreal.Vector", rotation: "unreal.Rotator"):
+    if world is None or _is_editor_world(world):
+        return unreal.EditorLevelLibrary.spawn_actor_from_class(unreal_class, location, rotation)
+    transform = unreal.Transform(
+        location,
+        rotation,
+        unreal.Vector(1.0, 1.0, 1.0),
+    )
+    try:
+        actor = unreal.GameplayStatics.begin_deferred_actor_spawn_from_class(
+            world,
+            unreal_class,
+            transform,
+            unreal.ActorSpawnParameters(),
+        )
+        if actor:
+            return unreal.GameplayStatics.finish_spawning_actor(actor, transform)
+    except Exception:
+        pass
+    return None
+
+
+def resolve_mrq_pie_render_world() -> tuple[Any, str]:
+    """World MoviePipelinePIEExecutor actually renders (not Editor TMP session actors)."""
+    try:
+        worlds = unreal.EditorLevelLibrary.get_pie_worlds(include_dedicated_server=False)
+        if worlds:
+            return worlds[0], "pie"
+    except Exception:
+        pass
+    try:
+        ues = unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem)
+        if ues and hasattr(ues, "get_game_world"):
+            gw = ues.get_game_world()
+            if gw and _world_path_label(gw) != "editor":
+                return gw, "game_world"
+    except Exception:
+        pass
+    return unreal.EditorLevelLibrary.get_editor_world(), "editor_fallback"
+
 
 def _spawn_light_if_missing(
     actors: list,
@@ -250,16 +355,19 @@ def _spawn_light_if_missing(
     unreal_class,
     location: "unreal.Vector",
     rotation: "unreal.Rotator | None" = None,
+    *,
+    world=None,
 ) -> tuple[Any, bool]:
     for a in actors:
         if _actor_label(a) == label:
             return a, False
     rot = rotation if rotation is not None else unreal.Rotator(roll=0.0, pitch=0.0, yaw=0.0)
-    actor = unreal.EditorLevelLibrary.spawn_actor_from_class(unreal_class, location, rot)
+    actor = _spawn_actor_in_world(world, unreal_class, location, rot)
     if actor:
         try:
             actor.set_actor_label(label)
-            actor.set_folder_path(TMP_PA_E_ARRANGE_FOLDER)
+            if _is_editor_world(world):
+                actor.set_folder_path(TMP_PA_E_ARRANGE_FOLDER)
         except Exception:
             pass
     return actor, True
@@ -302,7 +410,7 @@ def _configure_directional_moon(
     actor,
     intensity: float = 3.5,
     *,
-    atmosphere_sun_index: int = 1,
+    atmosphere_sun_index: int = MRQ_PIE_ATMOSPHERE_SUN_INDEX,
 ) -> list[str]:
     applied: list[str] = []
     lc = _light_component(actor)
@@ -370,17 +478,23 @@ def _configure_cabin_warm_point(actor, intensity: float = 1200.0) -> list[str]:
 
 
 def _homestead_centroid_xyz(homestead_centroid: list[float] | None) -> tuple[float, float, float]:
-    if homestead_centroid and len(homestead_centroid) >= 3:
-        return homestead_centroid[0], homestead_centroid[1], homestead_centroid[2]
-    return -600.0, -100.0, 150.0
+    meta = _sanitize_homestead_centroid(homestead_centroid)
+    u = meta["used"]
+    return u[0], u[1], u[2]
 
 
-def apply_mrq_pie_night_exposure_cvars() -> dict:
-    """Auto-exposure clamps so MRQ deferred frames keep readable night sky (not void black)."""
-    meta: dict = {"commands": [], "ok": True, "preset_doc": PRESET_HOMESTEAD_NIGHT_DOC}
-    for cmd in MRQ_PIE_NIGHT_EXPOSURE_CVARS:
+def apply_mrq_pie_night_exposure_cvars(world=None) -> dict:
+    """Auto-exposure + SupportSkyAtmosphere in the world MRQ renders (PIE or Editor)."""
+    meta: dict = {
+        "commands": [],
+        "ok": True,
+        "preset_doc": PRESET_HOMESTEAD_NIGHT_DOC,
+        "world_context": _world_path_label(world),
+    }
+    ctx = world if world is not None else None
+    for cmd in MRQ_PIE_RENDER_CVARS:
         try:
-            unreal.SystemLibrary.execute_console_command(None, cmd)
+            unreal.SystemLibrary.execute_console_command(ctx, cmd)
             meta["commands"].append({"cmd": cmd, "ok": True})
         except Exception as e:
             meta["ok"] = False
@@ -388,36 +502,82 @@ def apply_mrq_pie_night_exposure_cvars() -> dict:
     return meta
 
 
-def _ensure_sky_atmosphere(homestead_centroid: list[float] | None) -> dict:
+def _apply_tod_phase_in_world(world, phase: int = 2) -> dict[str, Any]:
+    meta: dict[str, Any] = {"phase": phase, "applied": False}
+    cmd = "hw.TimeOfDay.Phase %d" % int(phase)
+    ctx = world if world is not None else None
+    try:
+        unreal.SystemLibrary.execute_console_command(ctx, cmd)
+        meta["applied"] = True
+        meta["command"] = cmd
+    except Exception as e:
+        meta["error"] = str(e)
+    return meta
+
+
+def _ensure_sky_atmosphere(
+    homestead_centroid: list[float] | None,
+    *,
+    world=None,
+) -> dict:
     """Sky Atmosphere required for directional Atmosphere Sun Light + MRQ sky (community/Epic)."""
     cx, cy, cz = _homestead_centroid_xyz(homestead_centroid)
-    actors = unreal.EditorLevelLibrary.get_all_level_actors()
+    actors = _actors_for_world(world)
     for a in actors:
         if not a:
             continue
         cls = a.get_class().get_name() if a.get_class() else ""
         if "SkyAtmosphere" in cls:
-            return {"present": True, "spawned": False, "label": _actor_label(a)}
+            return {
+                "present": True,
+                "spawned": False,
+                "label": _actor_label(a),
+                "world_context": _world_path_label(world),
+            }
     atmo_cls = getattr(unreal, "SkyAtmosphere", None)
     if atmo_cls is None:
         return {"present": False, "spawned": False, "error": "SkyAtmosphere class missing"}
     loc = unreal.Vector(cx, cy, cz + 200.0)
-    actor = unreal.EditorLevelLibrary.spawn_actor_from_class(
-        atmo_cls, loc, unreal.Rotator(0.0, 0.0, 0.0)
+    actor = _spawn_actor_in_world(
+        world, atmo_cls, loc, unreal.Rotator(0.0, 0.0, 0.0)
     )
     if actor:
         try:
             actor.set_actor_label(TMP_SKY_ATMO_LABEL)
-            actor.set_folder_path(TMP_PA_E_ARRANGE_FOLDER)
+            if _is_editor_world(world):
+                actor.set_folder_path(TMP_PA_E_ARRANGE_FOLDER)
         except Exception:
             pass
-        return {"present": True, "spawned": True, "label": TMP_SKY_ATMO_LABEL}
+        return {
+            "present": True,
+            "spawned": True,
+            "label": TMP_SKY_ATMO_LABEL,
+            "world_context": _world_path_label(world),
+        }
     return {"present": False, "spawned": False, "error": "spawn_failed"}
 
 
-def reconfigure_pa_e_mrq_night_fixtures(homestead_centroid: list[float] | None = None) -> dict:
-    """Force moon index 1 + SkyLight fill + recapture on existing TMP/in-level lights (MRQ PIE path)."""
-    actors = unreal.EditorLevelLibrary.get_all_level_actors()
+def _recapture_skylights_in_actors(actors: list) -> int:
+    count = 0
+    for a in actors:
+        if not a:
+            continue
+        cls = a.get_class().get_name() if a.get_class() else ""
+        if "SkyLight" not in cls:
+            continue
+        cfg = _configure_skylight(a)
+        if "recapture_sky" in cfg:
+            count += 1
+    return count
+
+
+def reconfigure_pa_e_mrq_night_fixtures(
+    homestead_centroid: list[float] | None = None,
+    *,
+    world=None,
+) -> dict:
+    """Moon AtmosphereSunLightIndex 0 + SkyLight fill + RecaptureSky in target world."""
+    actors = _actors_for_world(world)
     tuned: list[dict] = []
     recaptures = 0
     cx, cy, cz = _homestead_centroid_xyz(homestead_centroid)
@@ -439,7 +599,7 @@ def reconfigure_pa_e_mrq_night_fixtures(homestead_centroid: list[float] | None =
                 a.set_actor_rotation(moon_rot, False)
             except Exception:
                 pass
-            cfg = _configure_directional_moon(a, atmosphere_sun_index=1)
+            cfg = _configure_directional_moon(a, atmosphere_sun_index=MRQ_PIE_ATMOSPHERE_SUN_INDEX)
             tuned.append({"label": label, "class": cls, "configured": cfg})
             continue
 
@@ -460,46 +620,84 @@ def reconfigure_pa_e_mrq_night_fixtures(homestead_centroid: list[float] | None =
                     }
                 )
 
+    extra_recaptures = _recapture_skylights_in_actors(actors)
+    recaptures += extra_recaptures
     return {
         "lights_reconfigured": tuned,
         "skylight_recaptures": recaptures,
         "homestead_centroid_used": [cx, cy, cz],
+        "world_context": _world_path_label(world),
+        "atmosphere_sun_index": MRQ_PIE_ATMOSPHERE_SUN_INDEX,
     }
 
 
 def apply_mrq_pie_homestead_night_stack(
     homestead_centroid: list[float] | None = None,
+    *,
+    world=None,
+    world_label: str | None = None,
 ) -> dict:
-    """Full MRQ PIE night stack: exposure cvars, TMP (re)seed, atmosphere, tune, recapture."""
-    exposure = apply_mrq_pie_night_exposure_cvars()
-    reseed = reseed_pa_e_tmp_night_fixtures(homestead_centroid, force_mrq_pie=True)
-    atmosphere = _ensure_sky_atmosphere(homestead_centroid)
-    reconfigure = reconfigure_pa_e_mrq_night_fixtures(homestead_centroid)
-    tune = apply_homestead_night_tune()
-    verify = verify_homestead_night_lighting_stack()
+    """Full MRQ PIE night stack in the world that will be rendered (Editor pre-pass and/or PIE)."""
+    centroid_meta = _sanitize_homestead_centroid(homestead_centroid)
+    used_centroid = centroid_meta["used"]
+    wlabel = world_label or _world_path_label(world)
+    exposure = apply_mrq_pie_night_exposure_cvars(world)
+    tod = _apply_tod_phase_in_world(world, phase=2)
+    reseed = reseed_pa_e_tmp_night_fixtures(
+        used_centroid, force_mrq_pie=True, world=world
+    )
+    atmosphere = _ensure_sky_atmosphere(used_centroid, world=world)
+    reconfigure = reconfigure_pa_e_mrq_night_fixtures(used_centroid, world=world)
+    actors = _actors_for_world(world)
+    tune = apply_homestead_night_tune(actors)
+    verify = verify_homestead_night_lighting_stack(actors)
     return {
         "ok": bool(exposure.get("ok") and tune.get("ok") and verify.get("stack_ok")),
+        "world_context": wlabel,
+        "homestead_centroid": centroid_meta,
         "exposure_cvars": exposure,
+        "time_of_day": tod,
         "tmp_fixture_reseed": reseed,
         "sky_atmosphere": atmosphere,
         "mrq_fixture_reconfigure": reconfigure,
         "night_tune": tune,
         "lighting_stack_verify": verify,
         "stack_ok": bool(verify.get("stack_ok")),
+        "atmosphere_sun_index": MRQ_PIE_ATMOSPHERE_SUN_INDEX,
         "note": (
-            "MRQ PIE respawns world — reconfigure + SkyLight recapture + moon AtmosphereSunLightIndex 1 "
-            "before each job; do not switch to day for void sky."
+            "MoviePipelinePIEExecutor renders a PIE copy — TMP/atmo spawned only in Editor do not "
+            "transfer; re-apply stack in PIE world + RecaptureSky + AtmosphereSunLightIndex 0."
         ),
     }
+
+
+def apply_mrq_pie_homestead_night_stack_in_render_world(
+    homestead_centroid: list[float] | None = None,
+) -> dict[str, Any]:
+    """Apply night stack in MRQ PIE / game world (call after executor starts PIE)."""
+    world, label = resolve_mrq_pie_render_world()
+    if world is None:
+        return {
+            "ok": False,
+            "stack_ok": False,
+            "error": "no_render_world",
+            "world_context": label,
+        }
+    out = apply_mrq_pie_homestead_night_stack(
+        homestead_centroid, world=world, world_label=label
+    )
+    out["render_world_resolved"] = True
+    return out
 
 
 def reseed_pa_e_tmp_night_fixtures(
     homestead_centroid: list[float] | None = None,
     *,
     force_mrq_pie: bool = False,
+    world=None,
 ) -> dict:
     """Idempotent TMP moon + skylight + cabin warm after load_level (prove without saving .umap)."""
-    actors = unreal.EditorLevelLibrary.get_all_level_actors()
+    actors = _actors_for_world(world)
     verify_before = verify_homestead_night_lighting_stack(actors)
     if verify_before.get("stack_ok") and not force_mrq_pie:
         return {
@@ -523,16 +721,23 @@ def reseed_pa_e_tmp_night_fixtures(
         moon_rot = unreal.Rotator(roll=0.0, pitch=-45.0, yaw=0.0)
 
     moon, moon_new = _spawn_light_if_missing(
-        actors, TMP_MOON_LABEL, unreal.DirectionalLight, moon_loc, moon_rot
+        actors,
+        TMP_MOON_LABEL,
+        unreal.DirectionalLight,
+        moon_loc,
+        moon_rot,
+        world=world,
     )
     if moon:
-        cfg = _configure_directional_moon(moon, atmosphere_sun_index=1)
+        cfg = _configure_directional_moon(moon, atmosphere_sun_index=MRQ_PIE_ATMOSPHERE_SUN_INDEX)
         if moon_new:
             spawned.append({"label": TMP_MOON_LABEL, "class": "DirectionalLight", "configured": cfg})
         elif force_mrq_pie:
             spawned.append({"label": TMP_MOON_LABEL, "class": "DirectionalLight", "reconfigured": cfg})
 
-    sky, sky_new = _spawn_light_if_missing(actors, TMP_SKY_LABEL, unreal.SkyLight, sky_loc)
+    sky, sky_new = _spawn_light_if_missing(
+        actors, TMP_SKY_LABEL, unreal.SkyLight, sky_loc, world=world
+    )
     if sky:
         cfg = _configure_skylight(sky)
         if sky_new:
@@ -541,7 +746,7 @@ def reseed_pa_e_tmp_night_fixtures(
             spawned.append({"label": TMP_SKY_LABEL, "class": "SkyLight", "reconfigured": cfg})
 
     cabin, cabin_new = _spawn_light_if_missing(
-        actors, TMP_CABIN_WARM_LABEL, unreal.PointLight, cabin_loc
+        actors, TMP_CABIN_WARM_LABEL, unreal.PointLight, cabin_loc, world=world
     )
     if cabin:
         cfg = _configure_cabin_warm_point(cabin)
@@ -554,12 +759,14 @@ def reseed_pa_e_tmp_night_fixtures(
                 {"label": TMP_CABIN_WARM_LABEL, "class": "PointLight", "reconfigured": cfg}
             )
 
-    actors_after = unreal.EditorLevelLibrary.get_all_level_actors()
+    actors_after = _actors_for_world(world)
     verify_after = verify_homestead_night_lighting_stack(actors_after)
     out: dict = {
         "skipped": False,
         "force_mrq_pie": force_mrq_pie,
+        "world_context": _world_path_label(world),
         "homestead_centroid_used": [cx, cy, cz],
+        "homestead_centroid_sanitize": _sanitize_homestead_centroid(homestead_centroid),
         "spawned": spawned,
         "verify_before": verify_before,
         "verify_after": verify_after,

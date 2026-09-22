@@ -102,6 +102,7 @@ class _MrqOrchestrator:
         self._executor_success = False
         self._in_tick = False
         self._inter_shot_drain_deadline = 0.0
+        self._pie_night_stack_attempts = 0
 
     def start(self) -> bool:
         if self._tick_handle is not None:
@@ -226,6 +227,7 @@ class _MrqOrchestrator:
             return
         self._executor_finished = False
         self._executor_success = False
+        self._pie_night_stack_attempts = 0
         self._render_since = time.time()
         self._wait_deadline = time.time() + WAIT_RENDER_SEC
         exec_ok, self._executor, exec_err = _start_pie_executor(
@@ -263,7 +265,53 @@ class _MrqOrchestrator:
             {"success": self._executor_success, "rendering": self._is_subsystem_rendering()},
         )
 
+    def _try_apply_mrq_pie_world_night_stack(self) -> None:
+        """Editor TMP/atmo do not transfer — seed sky stack in the PIE world MRQ renders."""
+        if self._job_meta.get("mrq_pie_world_stack_done"):
+            return
+        import vnp_night_tune_and_evidence as vnp
+
+        world, wl = vnp.resolve_mrq_pie_render_world()
+        if world and wl in ("pie", "game_world"):
+            centroid: Optional[list[float]] = None
+            pose = self._sequence_meta.get("pose") or {}
+            reapply = pose.get("mrq_pie_night_reapply") or {}
+            stack = reapply.get("mrq_pie_night_stack") or {}
+            cent = stack.get("homestead_centroid") or {}
+            if cent.get("used"):
+                centroid = cent["used"]
+            else:
+                rc = stack.get("mrq_fixture_reconfigure") or {}
+                if rc.get("homestead_centroid_used"):
+                    centroid = rc["homestead_centroid_used"]
+            meta = vnp.apply_mrq_pie_homestead_night_stack_in_render_world(centroid)
+            self._pie_night_stack_attempts += 1
+            self._job_meta["mrq_pie_world_night_stack"] = meta
+            self._job_meta["mrq_pie_world_stack_attempts"] = self._pie_night_stack_attempts
+            self._job_meta["mrq_pie_world_context"] = wl
+            if meta.get("stack_ok") or self._pie_night_stack_attempts >= 4:
+                self._job_meta["mrq_pie_world_stack_done"] = True
+            _log(
+                "mrq pie world night stack",
+                {
+                    "attempt": self._pie_night_stack_attempts,
+                    "stack_ok": meta.get("stack_ok"),
+                    "world": wl,
+                    "atmo": (meta.get("sky_atmosphere") or {}).get("present"),
+                },
+            )
+            return
+        self._pie_night_stack_attempts += 1
+        if self._pie_night_stack_attempts >= 90:
+            self._job_meta["mrq_pie_world_stack_done"] = True
+            self._job_meta["mrq_pie_world_night_stack"] = {
+                "ok": False,
+                "error": "pie_world_never_available",
+                "attempts": self._pie_night_stack_attempts,
+            }
+
     def _poll_render_wait(self) -> None:
+        self._try_apply_mrq_pie_world_night_stack()
         now = time.time()
         rendering = self._is_subsystem_rendering()
         found = _newest_png_since(self._staging_dir, self._render_since)
@@ -710,7 +758,7 @@ def _add_mrq_pie_night_console_settings(cfg, meta: dict[str, Any]) -> None:
     try:
         import vnp_night_tune_and_evidence as vnp
 
-        cvar_cmds = vnp.MRQ_PIE_NIGHT_EXPOSURE_CVARS
+        cvar_cmds = vnp.MRQ_PIE_RENDER_CVARS
     except Exception as e:
         meta["mrq_pie_console_cvars"] = {"error": str(e)}
         return

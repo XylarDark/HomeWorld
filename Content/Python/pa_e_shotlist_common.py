@@ -232,11 +232,11 @@ def _look_target_for_pose_meta(
 
 
 MRQ_PIE_LIGHTING_NOTE = (
-    "MoviePipelinePIEExecutor renders a PIE world (load_map / MRQ job can wipe Editor TMP lights). "
-    "Before each MRQ job call reapply_night_environment_for_mrq_shot: Phase 2 + PRESET tune + "
-    "apply_mrq_pie_homestead_night_stack (moon Directional AtmosphereSunLightIndex 1, SkyLight fill + "
-    "RecaptureSky, SkyAtmosphere, exposure Min/Max clamps). Cabin lit + void black sky = PIE sky/atmo "
-    "not refreshed — not a day-phase fix. Refs: UE 5.8 MRQ/PIE, MoviePipelineDeferredPass, SkyLight recapture."
+    "MoviePipelinePIEExecutor renders a PIE world — Editor session TMP/atmo do not transfer. "
+    "Pre-job: reapply_night_environment_for_mrq_shot (Editor). During MRQ wait: "
+    "apply_mrq_pie_homestead_night_stack_in_render_world (PIE spawn + AtmosphereSunLightIndex 0 + "
+    "RecaptureSky + SkyAtmosphere + exposure/SupportSkyAtmosphere cvars). Void sky + lit geo = stack "
+    "never applied in PIE — not a day-phase fix."
 )
 
 SHOTS = (
