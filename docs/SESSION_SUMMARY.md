@@ -1,3 +1,7 @@
+## 2026-09-22 — PA-E capture abspath + stale purge + luminance gate (cloud, rung 1)
+
+- DESKTOP re-prove after #156 still FAIL (relative paths, Shot1 missing, Shot2 stale false-pass). [capture_shotlist_viewport.py](../Content/Python/capture_shotlist_viewport.py): `abspath(project_dir)`; purge PNGs before capture; PIL luminance required; mtime ≥ capture_since; multi game-view API attempts; AutomationEditorTask poll. KNOWN_ERRORS + AUTOMATION_GAPS note. Gap **OPEN** — no DESKTOP PASS claim.
+
 ## 2026-09-22 — PA-E capture absolute path + async drain (cloud, rung 1)
 
 - [capture_shotlist_viewport.py](../Content/Python/capture_shotlist_viewport.py): absolute `Saved/Screenshots/PA_E/` for HighResShot; Engine Win64/PA_E copy fallbacks; 120s stable-size wait + final drain before keep_alive disarm. Supersedes conflicted PR #155. Gap **OPEN** — no DESKTOP PASS claim.
