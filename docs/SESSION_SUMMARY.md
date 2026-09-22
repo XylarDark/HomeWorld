@@ -1,3 +1,7 @@
+## 2026-09-21 ET — MV-A track CLOSED (docs stamp, cloud)
+
+- Lead **`APPROVE MV-A`** → `Docs/24_MOVEMENT_IMPL.md` **CLOSED / COMPLETE**; `Docs/handoffs/MV_A_TRAVERSAL.md` **APPROVED / CLOSED**; `Docs/canon/DECISIONS.md` row. MV-A on main `349d3e4` (PR #130). **SS-A** (spirit stealth) separate — not part of MV close. Next track TBD — not in this PR.
+
 ## 2026-09-22 ET — SPIRIT_STEALTH bible LOCKED (docs-only, cloud)
 
 - Lead locks 2026-09-21 ET chat: spirit **hidden default**, torch reveal (NPC / campfire / spirit torch), found-out **A2 alert** (not crouch, not kidnap, not kill-on-detect); body vs spirit torch split.

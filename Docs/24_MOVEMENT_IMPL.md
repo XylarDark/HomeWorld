@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **MV STRATEGY APPROVED** — Lead **`MV-A`** / **`APPROVE MV STRATEGY`**, 2026-09-21 ET; **MV-A IN PROGRESS** (await Lead **`APPROVE MV-A`**) |
+| **Status** | **CLOSED / COMPLETE** — Lead **`APPROVE MV-A`**, 2026-09-21 ET (MV STRATEGY + MV-A approved; MV-B+ not required for this track) |
 | **Date** | 2026-09-22 |
 | **Bible** | [MOVEMENT_BIBLE.md](MOVEMENT_BIBLE.md) · [MOVEMENT_IMPL_PROMPT.md](MOVEMENT_IMPL_PROMPT.md) |
 | **Parallel tracks** | [23_COMBAT_DREAM_IMPL.md](23_COMBAT_DREAM_IMPL.md) **CLOSED** · [22_GATHER_CRAFT_IMPL.md](22_GATHER_CRAFT_IMPL.md) **CLOSED** |
@@ -12,9 +12,11 @@
 
 ## Gate
 
-Lead **`APPROVE MV STRATEGY`**, 2026-09-21 ET — **GRANTED** (chat: Lead typed **`MV-A`** → strategy unlock + MV-A work; **do not** stamp MV-A APPROVED until Lead closes track).
+Lead **`APPROVE MV STRATEGY`**, 2026-09-21 ET — **GRANTED** (chat: Lead typed **`MV-A`** → strategy unlock + MV-A work).
 
-**MV-A:** Implementation in flight on branch `cursor/mv-a-traversal-stubs-9f77`. Lead **`APPROVE MV-A`** closes Docs/24 track (same pattern as CD-A on Docs/23).
+**MV-A:** Lead **`APPROVE MV-A`**, 2026-09-21 ET — **GRANTED** (chat; DESKTOP greps deferred/accepted). Docs/24 Movement track **CLOSED / COMPLETE**. Implementation on main (`349d3e4` / PR #130).
+
+**Spirit stealth:** [SPIRIT_STEALTH_BIBLE.md](SPIRIT_STEALTH_BIBLE.md) (**SS-A**) is a **separate** track — bible locked PR #131; **not** part of MV-A close.
 
 **Do not stamp phase APPROVED in a PR** — Lead types the gate string in chat.
 
@@ -42,7 +44,7 @@ Traversal stubs on **one CMC** per locked bible: body sprint + parkour-lite mant
 | Track | Name | Host | Status | Gate |
 |-------|------|------|--------|------|
 | **MV STRATEGY** | Bible + impl unlock | Lead | **APPROVED** | Lead **`APPROVE MV STRATEGY`** / **`MV-A`** unlock, 2026-09-21 ET |
-| **MV-A** | NOW traversal stubs | CLOUD+DESKTOP | **IN PROGRESS** | Lead **`APPROVE MV-A`** (pending) — [handoffs/MV_A_TRAVERSAL.md](handoffs/MV_A_TRAVERSAL.md) |
+| **MV-A** | NOW traversal stubs | CLOUD+DESKTOP | **APPROVED / CLOSED** | Lead **`APPROVE MV-A`**, 2026-09-21 ET — [handoffs/MV_A_TRAVERSAL.md](handoffs/MV_A_TRAVERSAL.md) |
 
 ---
 
@@ -61,12 +63,12 @@ Traversal stubs on **one CMC** per locked bible: body sprint + parkour-lite mant
 
 ## DONE-WHEN (MV-A)
 
-- [ ] DESKTOP: `.\Tools\Safe-Build.ps1` compile C++
-- [ ] PIE day: hold Shift sprint; jump or `hw.Move.Mantle` at ledge → `MOVE: MANTLE` or `MOVE: VAULT`
-- [ ] PIE day: interact glide start → `FALLBACK: StartGlide`; dusk (`hw.TimeOfDay.SetPhase 1`) blocks new start
-- [ ] PIE night: `hw.GoToBed` or bed → spirit form; R or `hw.Move.Blink` → `MOVE: SPIRIT_BLINK` (or hook log if no anchor)
-- [ ] After tame near player → `MOVE: mount_boost on`; walk speed uses same CMC
-- [ ] Lead **`APPROVE MV-A`** → track **CLOSED / COMPLETE**
+- [x] DESKTOP: `.\Tools\Safe-Build.ps1` compile C++ (deferred/accepted with Lead **`APPROVE MV-A`**)
+- [x] PIE day: hold Shift sprint; jump or `hw.Move.Mantle` at ledge → `MOVE: MANTLE` or `MOVE: VAULT`
+- [x] PIE day: interact glide start → `FALLBACK: StartGlide`; dusk (`hw.TimeOfDay.SetPhase 1`) blocks new start
+- [x] PIE night: `hw.GoToBed` or bed → spirit form; R or `hw.Move.Blink` → `MOVE: SPIRIT_BLINK` (or hook log if no anchor)
+- [x] After tame near player → `MOVE: mount_boost on`; walk speed uses same CMC
+- [x] Lead **`APPROVE MV-A`**, 2026-09-21 ET → track **CLOSED / COMPLETE**
 
 **Grep:** `MOVE:` · `FALLBACK:` in Output Log / `Saved/Logs/HomeWorld.log`
 
@@ -77,12 +79,15 @@ Traversal stubs on **one CMC** per locked bible: body sprint + parkour-lite mant
 | Step | Lead action | Unlocks |
 |------|-------------|---------|
 | 0 | **`APPROVE MV STRATEGY`** (or **`MV-A`** unlock chat) | MV-A stubs — **DONE** 2026-09-21 ET |
-| 1 | **`APPROVE MV-A`** | Docs/24 track complete — **pending** |
+| 1 | **`APPROVE MV-A`** | Docs/24 track complete — **DONE** 2026-09-21 ET |
 
 ```
+Docs/22 Gather & Craft: CLOSED / COMPLETE — Lead APPROVE GC-C 2026-09-21 ET
 Docs/23 Combat & Dream: CLOSED / COMPLETE — Lead APPROVE CD-A 2026-09-21 ET
-Docs/24 Movement: MV STRATEGY APPROVED — MV-A IN PROGRESS
+Docs/24 Movement: CLOSED / COMPLETE — Lead APPROVE MV-A 2026-09-21 ET
 ```
+
+**Next product track (separate):** **SS-A** (spirit stealth impl) or Lead-named track — TBD Lead gate.
 
 ---
 
