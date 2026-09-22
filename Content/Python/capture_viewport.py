@@ -7,6 +7,7 @@
 # AutomationLibrary fallback if no PNG on disk.
 # https://dev.epicgames.com/documentation/en-us/unreal-engine/taking-screenshots-in-unreal-engine
 # See capture_shotlist.py (MRQ primary) / capture_shotlist_viewport.py / CAPTURE_REDUNDANCY.md.
+# Harness P3 exempt: generic viewport still utility — not shotlist prove; no Arrange gate.
 
 import json
 import os

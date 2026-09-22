@@ -560,6 +560,100 @@ def conductor_mrq_capture_preflight(log_prefix: str = "") -> dict[str, Any]:
     return preflight
 
 
+def conductor_night_evidence_preflight(
+    log_prefix: str = "",
+    *,
+    attempt_markers_reload: bool = False,
+) -> dict[str, Any]:
+    """Non-MRQ preflight for VNP/NF2 night evidence (module reload + Markers world + VNP API)."""
+    import vnp_night_tune_and_evidence as vnp
+
+    module_reload = reload_pa_e_capture_python_modules()
+    if attempt_markers_reload:
+        world_gate = ensure_markers_editor_world(log_prefix)
+    else:
+        world_gate = dict(editor_world_markers_status())
+        world_gate["reloaded"] = False
+    night_path_ok = all(
+        hasattr(vnp, name)
+        for name in (
+            "apply_homestead_night_tune",
+            "verify_homestead_night_lighting_stack",
+            "reseed_pa_e_tmp_night_fixtures",
+        )
+    )
+    blocked: list[str] = []
+    if not world_gate.get("ok"):
+        blocked.append("wrong_editor_world")
+    if not night_path_ok:
+        blocked.append("vnp_night_stack_api_missing")
+    if module_reload.get("errors"):
+        blocked.append("module_reload_errors")
+    preflight = {
+        "ready": len(blocked) == 0,
+        "blocked_reasons": blocked,
+        "module_reload": module_reload,
+        "world_gate": world_gate,
+        "night_stack_api_ok": night_path_ok,
+        "doc": "docs/Automation/CAPTURE_REDUNDANCY.md",
+        "note": "No MRQ probe — use conductor_mrq_capture_preflight for PA-E MRQ prove.",
+    }
+    if log_prefix:
+        log(log_prefix, "conductor_night_evidence_preflight", {"ready": preflight["ready"], "blocked": blocked})
+    return preflight
+
+
+def summarize_evidence_png_harness(
+    png_paths: list[str],
+    *,
+    arrange_gate: Optional[dict[str, Any]] = None,
+) -> dict[str, Any]:
+    """P1 three-state fields for VNP/NF2 evidence JSON (harness luminance; not PA-E framing finalize)."""
+    arrange_ready = True if arrange_gate is None else bool(arrange_gate.get("ready"))
+    validations: list[dict[str, Any]] = []
+    for path in png_paths:
+        v = validate_png(path)
+        v["harness_pass"] = bool(v.get("luminance_pass"))
+        validations.append(v)
+
+    harness_pass = arrange_ready and bool(png_paths) and all(v.get("harness_pass") for v in validations)
+    closed_fail = False
+    if arrange_gate and not arrange_ready:
+        for reason in arrange_gate.get("blocked_reasons") or []:
+            if reason in ("wrong_editor_world", "level_load_failed"):
+                closed_fail = True
+                break
+    for v in validations:
+        if v.get("closed_fail") is True:
+            closed_fail = True
+            break
+
+    if harness_pass and not closed_fail:
+        prove_loop_status = "complete"
+    elif not arrange_ready and not closed_fail:
+        prove_loop_status = "blocked"
+    elif closed_fail:
+        prove_loop_status = "blocked"
+    else:
+        prove_loop_status = "in_progress"
+
+    outcome_fields = capture_outcome_report_fields(
+        harness_pass=harness_pass,
+        visual_framing_pass=False,
+        closed_fail=closed_fail,
+        prove_loop_status=prove_loop_status,
+    )
+    return {
+        **outcome_fields,
+        "png_validations": validations,
+        "harness_pass": harness_pass,
+        "capture_pass": harness_pass,
+        "arrange_ready": arrange_ready,
+        "harness_not_visual": True,
+        "note": "VNP/NF2 evidence — luminance harness only; no lead_visual_framing_approved.",
+    }
+
+
 def load_level(log_prefix: str) -> bool:
     log(log_prefix, "load_level start", {"path": LEVEL_PATH})
     try:

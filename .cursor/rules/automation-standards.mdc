@@ -4,7 +4,7 @@ description: "Standards for automation that drives or configures Editor/engine f
 alwaysApply: false
 globs: "**/Content/Python/**, **/Tools/**, **/.github/workflows/**"
 priority: 9
-version: 1.10
+version: 1.11
 ---
 
 # Automation Standards
@@ -52,6 +52,20 @@ Before trusting **any** automation pass/fail output, verify setup in order: **(1
 - **Rung 1:** UE/host built-ins and already-in-repo scripts (re-try after engine/tool updates).
 - **Rung 2:** Scout third-party tools only after **`APPROVE TOOL SCOUT <name>`** — **no auto-install**.
 - **Rung 3:** Net-new stacks only after **`APPROVE TOOL BUILD <name>`** — no unprompted frameworks.
+
+### Universal gap checklist (any automation — token-lean)
+
+1. **Docs-first** — vendor docs before new syntax/waits/stacks.
+2. **Proven-results** — adopt documented patterns before custom ladders.
+3. **Rung-1 harden** — MCP/Python/gui_automation/commandlets already in repo.
+4. **Dead-end research** — one public pass + AUTOMATION_GAPS research log before SCOUT/BUILD or Lead ping-pong.
+5. **Lead gates** — **`APPROVE TOOL SCOUT`** / **`APPROVE TOOL BUILD`** only; no auto-install.
+
+Capture/MRQ/HighResShot/NirCmd/OBS are **examples** of the ladder in [CAPTURE_REDUNDANCY.md](../../docs/Automation/CAPTURE_REDUNDANCY.md) § Shotlist instance — not the policy scope limit.
+
+### Harness Arrange (P3 — Editor prove scripts)
+
+Every Editor Python **prove/capture/evidence** script must call **`conductor_mrq_capture_preflight`** / **`conductor_night_evidence_preflight`** + **`arrange_pa_e_shotlist`** (or **`reset_mrq_session_guards`** on MRQ re-prove), **or** carry **Harness P3 exempt** in the module docstring and appear in [HARNESS_ARRANGE_TASKLIST.md](../../docs/Automation/HARNESS_ARRANGE_TASKLIST.md) P3 table.
 
 ## Variables with no access (automation)
 

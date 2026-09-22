@@ -1,4 +1,5 @@
-﻿import unreal, json, os, time
+﻿"""Harness P3 exempt: PL-D preview homestead spike — not canonical shotlist prove."""
+import unreal, json, os, time
 
 OUT_DIR = os.path.join(unreal.SystemLibrary.get_project_directory(), "Maps", "Preview_Homestead_Night")
 os.makedirs(OUT_DIR, exist_ok=True)
