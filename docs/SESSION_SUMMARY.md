@@ -1,3 +1,7 @@
+## 2026-09-22 — PA-E MRQ PIE readable night sky (P0.1)
+
+- Post-#175 DESKTOP: MRQ stills — cabin lit, **void black sky**. **Fix:** `apply_mrq_pie_homestead_night_stack` + per-shot `reapply_night_environment_for_mrq_shot` (`mrq_pie_shot=True`); MRQ exposure ConsoleVariableSetting. KNOWN_ERRORS + CAPTURE_REDUNDANCY. Gap **OPEN** — DESKTOP re-prove.
+
 ## 2026-09-22 — PA-E DESKTOP prove miss log (TOKEN-LEAN policy)
 
 - Lead: **TOKEN-LEAN** known errors — harness one-line Cause→Avoid + KNOWN_ERRORS index (`pa-e-*` keys); six DESKTOP rows minified; no long narratives in agent memory. [automation-standards.mdc](../.cursor/rules/automation-standards.mdc) v1.9, [CAPTURE_REDUNDANCY.md](Automation/CAPTURE_REDUNDANCY.md), [KNOWN_ERRORS.md](KNOWN_ERRORS.md) § Index.
