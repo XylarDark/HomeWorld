@@ -4,7 +4,7 @@ description: "Standards for automation that drives or configures Editor/engine f
 alwaysApply: false
 globs: "**/Content/Python/**, **/Tools/**, **/.github/workflows/**"
 priority: 9
-version: 1.8
+version: 1.9
 ---
 
 # Automation Standards
@@ -21,7 +21,13 @@ Applies to **every** automation / tooling gap (any tool surface). Canonical deta
 
 When Lead corrects a **proven** miss (DESKTOP evidence, false PASS/FAIL), fold it into the repo **immediately**: blocking gate, assert threshold, or one row in `PROVE_CRITERIA` — **not** a long runbook or rediscovering the same rule in chat. Prefer **compact hard rules** over verbose prose.
 
-**Log reasons along the way:** When a prove miss is understood, append a **token-lean** **Cause → Symptom → Avoid** row to **`docs/KNOWN_ERRORS.md`** (and a one-line harness rule if needed) **in that session** — not only at phase-end.
+### TOKEN-LEAN known errors (Lead, 2026-09-22)
+
+- **Harness first:** one-line **Cause→Avoid** hard rule here and/or CAPTURE_REDUNDANCY; **KNOWN_ERRORS** gets the same line + index key ([docs/KNOWN_ERRORS.md](../../docs/KNOWN_ERRORS.md) § Index).
+- **Along the way:** log when the miss is understood — not only phase-end.
+- **No verbose KNOWN_ERRORS / agent memory:** narratives → DEFECT, AUTOMATION_GAPS, SESSION_LOG; memory/profile holds **≤1–2 sentence** compressed rules only.
+
+**PA-E DESKTOP prove (mirror index keys):** `pa-e-world` assert loaded world before Arrange · `pa-e-thread` game thread only · `pa-e-mcp-alive` check Editor before relaunch on socket drop · `pa-e-aim-visual` ready/aim_ok ≠ visual PASS · `pa-e-seq-stale` sync MRQ sequence to Arrange pose · `pa-e-git-dirty` reset prove-touched files after merge.
 
 ### Testing preconditions (universal — before PASS/FAIL claims)
 

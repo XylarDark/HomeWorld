@@ -2,6 +2,21 @@
 
 Record errors and their fixes here so they are not repeated. See `.cursor/rules/07-ai-agent-behavior.mdc` (Error recurrence prevention) and `05-error-handling.mdc` (Learning from errors).
 
+## Format — TOKEN-LEAN (Lead, 2026-09-22)
+
+New rows: **one line** (`Cause → Avoid`; symptom only if non-obvious). **Harness first:** mirror as one-line hard rules in [.cursor/rules/automation-standards.mdc](../.cursor/rules/automation-standards.mdc) / [Automation/CAPTURE_REDUNDANCY.md](Automation/CAPTURE_REDUNDANCY.md). **No long narratives here** — use [DEFECT_PA_E](../Docs/qa/DEFECT_PA_E_shot_capture_automation.md), [AUTOMATION_GAPS](Automation/AUTOMATION_GAPS.md), [SESSION_LOG](SESSION_LOG.md). Agent memory/profile: **≤1–2 sentence** compressed rules only.
+
+### Index — PA-E DESKTOP prove (2026-09-22)
+
+| Key | Avoid |
+|-----|--------|
+| `pa-e-world` | Assert loaded world (`L_VS_MVP_Markers`) or `load_level`; not `level_path` alone. |
+| `pa-e-thread` | Editor APIs on MCP game thread only; no `threading.Thread`. |
+| `pa-e-mcp-alive` | On MCP socket drop: check Editor process, port 55557, report/PNG mtimes before relaunch. |
+| `pa-e-aim-visual` | `ready`/`aim_ok` ≠ visual PASS; center-crop assert; aim cabin/island center. |
+| `pa-e-seq-stale` | MRQ possessable Transform can override live CAM; refresh `PA_E_MRQ_{shot}` or clear tracks. |
+| `pa-e-git-dirty` | After merge: `git checkout <sha> -- Content/Python/pa_e_shotlist_common.py`. |
+
 **UE 5.8 — MassEntity plugin missing (2026-09-19, Docs/22 U58-C):** Safe-Build against Launcher UE 5.8 failed with `Unable to find plugin 'MassEntity' (referenced via HomeWorld.uproject)`. **Cause:** MassEntity was deprecated (engine-moved) and the stub plugin is **removed** from UE 5.8 installs; MassGameplay / MassAI remain. **Fix:** Remove `{ "Name": "MassEntity", "Enabled": true }` from `HomeWorld.uproject` Plugins; keep MassGameplay, MassAI, StateTree, ZoneGraph, SmartObjects. See [Docs/22_UE58_UPGRADE.md](../Docs/22_UE58_UPGRADE.md). *(Do not duplicate this entry — cross-link only when documenting Mass-related build failures.)*
 
 **UE 5.8 vs 5.7 BuildId module skip / editor hang (2026-09-20+, GC→PA DESKTOP prove):** Opening **UE 5.7** against modules/DLLs built for **UE 5.8** logs BuildId mismatch and **skips** `UnrealEditor-HomeWorld.dll`; Editor may hang (~320 MB, no MCP). **Cause:** Wrong engine association vs last Safe-Build. **Fix:** DESKTOP prove must use **UE 5.8** only (`EngineAssociation` **UE_5.8**, `Build-HomeWorld.bat` / `.\Tools\Safe-Build.ps1` on **DESKTOP-21CT3H0**). See [Docs/canon/PLAYTEST.md](../Docs/canon/PLAYTEST.md), [Docs/canon/DECISIONS.md](../Docs/canon/DECISIONS.md) (2026-09-20 row).
@@ -34,17 +49,17 @@ Record errors and their fixes here so they are not repeated. See `.cursor/rules/
 
 **PA-E global-mean luminance false PASS on sparse speckles — post-#170 DESKTOP (2026-09-22):** MRQ report **`ok: true`**, **`capture_pass: true`**, **`luminance_source: stdlib_png`**, global mean **~8.71** while host Pillow showed **~93% pure black (L=0)**, center 200×200 mean **≈0**, Shot1 ≈ Shot2 (same scrap; fence/rocks on right edge — not homestead lookout/cabin framing). **Cause:** Assert used **global mean ≥8 only**; edge speckles inflated mean. Arrange had **`ready: true`** with **`forward_dot` 1.0** but wrong framing centroid (edge dress pulled aim). **Fix:** [pa_e_shotlist_common.py](../Content/Python/pa_e_shotlist_common.py) — **center-crop mean**, **fraction L&gt;8 / L&gt;1**, **mostly-black cap**, **shot-pair MSE/hash**; per-shot **`aim_bounds`** (primary dress needles, exclude Fence/Rock); **`forward_ray_hits_dress_aabb`** in Arrange gate; MRQ **reapply night** per shot. **Do not treat as PASS** until lit homestead visible — expect **`capture_pass: false`** on current black stills until setup fixed.
 
-**PA-E wrong editor world vs level_path string (2026-09-22, DESKTOP prove):** **Cause:** Arrange/report cited **`L_VS_MVP_Markers`** while **`get_editor_world().get_name()`** was **MainMenu**. **Symptom:** inventory **0**, pose **`hardcoded_fallback_last_resort`**. **Avoid:** Before Arrange/capture, assert world name contains **`L_VS_MVP_Markers`** (or **`load_level`**); never trust **`level_path`** alone.
+**PA-E `pa-e-world` (2026-09-22):** `level_path` said VS_MVP while world was MainMenu → inventory 0. **Avoid:** assert `get_editor_world()` or `load_level` before Arrange.
 
-**PA-E Unreal API on Python daemon thread (2026-09-22, DESKTOP prove):** **Cause:** **`capture_shotlist_mrq.main()`** armed on **`threading.Thread`**. **Symptom:** `EditorLevelLibrary: Attempted to access Unreal API from outside the main game thread`. **Avoid:** MCP **`execute_python_script`** on game thread only; no daemon threads for Editor APIs.
+**PA-E `pa-e-thread` (2026-09-22):** MRQ on `threading.Thread` → game-thread EditorLevelLibrary error. **Avoid:** MCP `execute_python_script` on game thread only.
 
-**MCP client disconnect ≠ UnrealEditor dead (2026-09-22, PA-E DESKTOP):** **Cause:** Long MRQ **`execute_python_script`** can reset TCP client while Editor continues (or crash separately). **Symptom:** Unneeded relaunch / duplicate prove. **Avoid:** After socket errors, check **`UnrealEditor` process**, MCP port **55557**, report/PNG **mtimes** before relaunching.
+**PA-E `pa-e-mcp-alive` (2026-09-22):** Long MRQ run dropped MCP TCP; Editor may still run. **Avoid:** verify process, :55557, artifact mtimes before relaunch.
 
-**PA-E relocate + ray hit still scrap-framing (2026-09-22, post-#172 DESKTOP):** **Cause:** **`homestead_bounds_relocate`** + Cliff exclude + **`forward_ray_hits_dress_aabb` true** still aim at edge dress, not homestead hero. **Symptom:** MRQ stills ~**90% black**, fence/rock scrap on right; center-crop assert FAIL (**center** ~**0.25**). **Avoid:** Do not treat Arrange **`ready`/`aim_ok`** as visual PASS; use Lead-eyeball or center-crop assert; next fix **pose/target** (cabin/island center), not Cliff excludes alone.
+**PA-E `pa-e-aim-visual` (2026-09-22):** relocate + ray hit but scrap/black stills (~90% black). **Avoid:** `ready`/`aim_ok` ≠ PASS; center-crop; fix pose to cabin/island center.
 
-**PA-E stale Sequencer transform vs live Arrange (2026-09-22, DESKTOP prove):** **Cause:** MRQ reuses Level Sequences with possessable-bound **`CAM_*`**; old **Transform** tracks override live actor pose after **`homestead_bounds_relocate`**. **Symptom:** Same scrap framing (fence/rock on right) despite Arrange relocate on in-level CAM. **Avoid:** Spawn/update **`PA_E_MRQ_{shot}`** at resolved pose each run, or rebuild possessable and clear transform tracks; never assume live **`CAM_*`** relocate updates MRQ frames.
+**PA-E `pa-e-seq-stale` (2026-09-22):** MRQ sequence possessable Transform stale vs live `homestead_bounds_relocate`. **Avoid:** `PA_E_MRQ_{shot}` at resolved pose or rebuild possessable / clear tracks.
 
-**PA-E dirty prove patch vs merged main (2026-09-22, DESKTOP):** **Cause:** Uncommitted local edits to **`pa_e_shotlist_common.py`** during prove. **Symptom:** DESKTOP behavior diverges from merged PR. **Avoid:** After merge, **`git checkout <sha> -- Content/Python/pa_e_shotlist_common.py`**; do not leave orphan prove patches.
+**PA-E `pa-e-git-dirty` (2026-09-22):** Uncommitted `pa_e_shotlist_common.py` during prove. **Avoid:** `git checkout <sha> --` that file after merge.
 
 **PA-E MRQ PIE executor finished delegate arity — post-#168 DESKTOP FAIL (2026-09-22):** After Arrange gate `ready: true`, [capture_shotlist_mrq.py](../Content/Python/capture_shotlist_mrq.py) failed `executor_start_failed` with log `OnMoviePipelineExecutorFinished: Callable has the incorrect number of arguments (expected 2, got 3)` — bound handler used `(executor, success, info)` but Epic **OnMoviePipelineExecutorFinished** is **`(pipeline_executor, success)`** only ([UE 5.8 Python API](https://dev.epicgames.com/documentation/en-us/unreal-engine/python-api/class/OnMoviePipelineExecutorFinished?application_version=5.8)). Nested pre-tick during `render_queue_with_executor_instance` without a **PREPARING** lock duplicated shot1 attempts / LogPython lines. **Fix:** 2-arg handler + `add_callable_unique` when available; **PREPARING** phase lock; module `_ACTIVE_DRIVER` single-orchestrator guard; report top-level **`executor_start_error`**. Re-prove: MCP `execute_python_script("capture_shotlist.py")` after gate ready.
 
