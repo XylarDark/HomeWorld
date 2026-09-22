@@ -1,3 +1,7 @@
+## 2026-09-22 — PA-E Arrange bounds relocate + cliff exclude (cloud)
+
+- Post-#171 DESKTOP: Arrange **`in_level_camera_aim_at_bounds`** only (wrong **Y** vs P6_FIX doc; cliff actors poisoned centroid). **Fix:** [pa_e_shotlist_common.py](../Content/Python/pa_e_shotlist_common.py) — **`homestead_bounds_relocate`** / doc fallback **`set_actor_location`**; exclude **Cliff** from aim needles; **`aim_ok`** requires **`forward_ray_hits_dress_aabb`**. KNOWN_ERRORS + CAPTURE_REDUNDANCY + HARNESS P0-8. Gap **OPEN** — DESKTOP re-prove framing.
+
 ## 2026-09-22 — PA-E assert harden + Arrange aim_bounds (cloud, post-#170)
 
 - DESKTOP after **#170**: **`capture_pass: true`** with global mean ~8.7 but ~93% black pixels (center ~0); Shot1 ≈ Shot2 scrap on frame edge. **Fix:** [pa_e_shotlist_common.py](../Content/Python/pa_e_shotlist_common.py) — center-crop + L&gt;8/L&gt;1 fractions + shot-pair MSE/hash; per-shot **`aim_bounds`** (exclude edge Fence/Rock), ray vs dress AABB in Arrange; MRQ **`reapply_night_environment_for_mrq_shot`** per job. Viewport `_validate_png` delegates to shared assert. KNOWN_ERRORS + CAPTURE_REDUNDANCY + HARNESS_ARRANGE P0-6/7. **Policy:** Lead-correction → harness (compact gates in-repo, CAPTURE_REDUNDANCY practice #5). Gap **OPEN** — DESKTOP should see **`capture_pass: false`** until lit homestead framing.

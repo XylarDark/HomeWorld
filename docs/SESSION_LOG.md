@@ -9448,3 +9448,11 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 **Pending:** DESKTOP re-prove — expect `capture_pass: false` on current mostly-black MRQ stills until framing/lighting fixed.
 
 **Errors:** None in cloud py_compile.
+
+## 2026-09-22 — PA-E Arrange bounds relocate (cloud)
+
+**Completed:** [pa_e_shotlist_common.py](../Content/Python/pa_e_shotlist_common.py) — relocate CAM from `aim_bounds` / shotlist doc meters before reaim-only fallback; Cliff excluded from shot1/shot2 aim needles; `aim_ok` requires ray hit on dress AABB when bounds exist. Docs: KNOWN_ERRORS, CAPTURE_REDUNDANCY, HARNESS_ARRANGE P0-8.
+
+**Pending:** DESKTOP re-prove MRQ/arrange gate (`pose_source: homestead_bounds_relocate`, no Cliff in `aim_bounds_labels_sample`).
+
+**Errors:** None (py_compile OK).
