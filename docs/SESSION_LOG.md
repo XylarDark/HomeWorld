@@ -9376,3 +9376,11 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 **Pending:** Windows verify PA-D count > 0 after full script run.
 
 **Errors:** None.
+
+## 2026-09-22 — PA-E capture rung-1 abspath stale purge (cloud)
+
+**Completed:** DESKTOP re-prove after #156 still FAIL — relative `ue_path`/`dest_abs`, Shot1 missing, Shot2 stale near-black false-pass. Updated `Content/Python/capture_shotlist_viewport.py` (abspath project_dir/dest/ue, pre-shot PNG purge, PIL luminance required, mtime gate, game-view API attempts, AutomationEditorTask poll). Thin KNOWN_ERRORS / AUTOMATION_GAPS / SESSION_SUMMARY.
+
+**Pending:** DESKTOP re-run `capture_shotlist_viewport.py`; verify `Saved/pa_e_capture_report.json` with absolute paths and both shots pass luminance.
+
+**Errors:** None (cloud; no UE prove).
