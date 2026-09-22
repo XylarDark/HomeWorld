@@ -861,3 +861,9 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 - **Fix:** `place_vs_mvp_pa_d.py` saves level after PA-D spawn and before `run_dress_refresh()` so `load_level` in dress does not wipe unsaved cliffs/planters/fence/path stones.
 - **PR:** #149 (`cursor/pa-d-save-before-dress-1f4a`).
 
+## 2026-09-22 — PA-E shot1/2 camera pose (cloud, post-#172)
+
+- **Fix:** `pa_e_shotlist_common.py` — shot1/2 use CAM_Hero / CAM_CabinClose **doc meters** + look_at **aim_bounds** dress centroid (extent offsets grazed AABB, fence on frame); **`distance_band_ok`** on **`aim_ok`**.
+- **KNOWN_ERRORS:** relocate + ray hit ≠ visual framing PASS.
+- **PR:** `cursor/pa-e-camera-pose-framing-0534` (DESKTOP re-prove MRQ after merge).
+
