@@ -1,3 +1,7 @@
+## 2026-09-22 — PA-0 prototype assets strategy (cloud, OPEN)
+
+- PA-0 docs-only: [Docs/32_PROTOTYPE_ASSETS.md](../Docs/32_PROTOTYPE_ASSETS.md) **OPEN** (homestead-only); [Docs/handoffs/PA_STRATEGY.md](../Docs/handoffs/PA_STRATEGY.md) **READY FOR Lead APPROVE PA STRATEGY**; kit plate + sidecar in `AssetCreation/RefImages/` and `Docs/refs/ai/`. **Not approved.**
+
 ## 2026-09-22 — SS-B spirit stealth feel (cloud, IN PROGRESS)
 
 - Lead **`APPROVE SS-B STRATEGY`** (2026-09-21 ET) → [Docs/31_SPIRIT_STEALTH_FEEL.md](../Docs/31_SPIRIT_STEALTH_FEEL.md) **SS-B STRATEGY APPROVED / SS-B IN PROGRESS**; [Docs/handoffs/SS_B_STEALTH_FEEL.md](../Docs/handoffs/SS_B_STEALTH_FEEL.md); `DECISIONS.md` SS-B strategy row. **SS-B not stamped APPROVED.**
