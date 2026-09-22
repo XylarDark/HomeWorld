@@ -94,7 +94,7 @@ Dress script: [place_vs_mvp_dress.py](../../Content/Python/place_vs_mvp_dress.py
 
 ## Blockers
 
-- PA-E Shot 1/2 automation unreliable (Cmd HighResShot / host grab) — **Lead manual viewport capture**; see [DEFECT_PA_E_shot_capture_automation.md](../qa/DEFECT_PA_E_shot_capture_automation.md), [docs/KNOWN_ERRORS.md](../../docs/KNOWN_ERRORS.md) and [docs/Automation/AUTOMATION_GAPS.md](../../docs/Automation/AUTOMATION_GAPS.md) (2026-09-22 backfill). **Not CLOSED** on this pointer alone.
+- PA-E Shot 1/2 automation unreliable (Cmd HighResShot / host grab) — **Lead manual viewport capture**; see [DEFECT_PA_E_shot_capture_automation.md](../qa/DEFECT_PA_E_shot_capture_automation.md), [docs/KNOWN_ERRORS.md](../../docs/KNOWN_ERRORS.md) and [docs/Automation/AUTOMATION_GAPS.md](../../docs/Automation/AUTOMATION_GAPS.md) (2026-09-22 backfill). **2026-09-22 ET:** Conductor remote host ImageGrab under `C:\Users\User\Desktop\HomeWorld_PA_E\` produced chat/desktop/chrome captures — **not** shotlist PASS; **stop remote ImageGrab for PA-E**. **Not CLOSED** on this pointer alone.
 
 ---
 

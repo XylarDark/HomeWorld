@@ -1,6 +1,6 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **Docs/32 PA-D import + place — IN PROGRESS** — Lead **`APPROVE PA-D`**, 2026-09-22 ET — [32_PROTOTYPE_ASSETS.md](../Docs/32_PROTOTYPE_ASSETS.md) · [PA_D_IMPORT_PLACE.md](../Docs/handoffs/PA_D_IMPORT_PLACE.md). Orthogonal: **Docs/31 SS-B** (pending **`APPROVE SS-B`**). PA track **not CLOSED** until PA-E.
+**Current phase:** **Docs/32 PA-D import + place — IN PROGRESS** — Lead **`APPROVE PA-D`**, 2026-09-22 ET — [32_PROTOTYPE_ASSETS.md](../Docs/32_PROTOTYPE_ASSETS.md) · [PA_D_IMPORT_PLACE.md](../Docs/handoffs/PA_D_IMPORT_PLACE.md). Orthogonal: **Docs/31 SS-B** **CLOSED / COMPLETE** — Lead **`APPROVE SS-B`**, 2026-09-21 ET (`a03940a` / PR #138); DESKTOP STEALTH greps **deferred/accepted**. PA track **not CLOSED** until PA-E.
 
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **Conductor** (parent DESKTOP) / **DESKTOP-21CT3H0**
@@ -194,6 +194,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | MV-A-traversal | MV-A | CLOUD+DESKTOP | **CLOSED** | Source/ + Docs/handoffs/ | [MV_A_TRAVERSAL.md](../Docs/handoffs/MV_A_TRAVERSAL.md) · Lead **`APPROVE MV-A`**, 2026-09-21 ET — Docs/24 **CLOSED / COMPLETE** (`349d3e4` / PR #130) |
 | SS-A-stealth | SS-A | CLOUD+DESKTOP | **CLOSED** | Source/ + Content/Python + Docs/handoffs/ | [SS_A_STEALTH_STUBS.md](../Docs/handoffs/SS_A_STEALTH_STUBS.md) · Lead **`APPROVE SS-A`**, 2026-09-21 ET — Docs/25 **CLOSED / COMPLETE** (`7bc577f` / PR #133) |
 | DS-A-hearth | DS-A | CLOUD+DESKTOP | **CLOSED** | Source/ + Content/Python + Docs/handoffs/ | [DS_A_VISIBLE_HEARTH.md](../Docs/handoffs/DS_A_VISIBLE_HEARTH.md) · Lead **`APPROVE DS-A`**, 2026-09-21 ET — Docs/30 **CLOSED / COMPLETE** (`7d579f9` / PR #136); PROVE-BATCH **deferred** |
+| SS-B-feel | SS-B | CLOUD+DESKTOP | **CLOSED** | Source/ + Content/Python + Docs/handoffs/ | [SS_B_STEALTH_FEEL.md](../Docs/handoffs/SS_B_STEALTH_FEEL.md) · Lead **`APPROVE SS-B`**, 2026-09-21 ET — Docs/31 **CLOSED / COMPLETE** (`a03940a` / PR #138); DESKTOP STEALTH greps **deferred/accepted** |
 | PA-0-strategy | PA-0 | CLOUD | **APPROVED / CLOSED** | Docs/ + AssetCreation/RefImages/ + Docs/refs/ai/ | [PA_STRATEGY.md](../Docs/handoffs/PA_STRATEGY.md) · Lead **`APPROVE PA STRATEGY`**, 2026-09-22 ET — homestead kit only |
 | PA-A-gap-audit | PA-A | CLOUD+DESKTOP | **APPROVED / CLOSED** | [PA_A_GAP_AUDIT.md](../Docs/handoffs/PA_A_GAP_AUDIT.md) | Lead **`APPROVE PA-A`**, 2026-09-22 ET — gap table accepted |
 | PA-C-blender | PA-C | DESKTOP+Blender MCP | **IN PROGRESS** — tranche-2 **DONE**; optional rim | [PA_C_BLENDER.md](../Docs/handoffs/PA_C_BLENDER.md) · [PA_C_TRANCHE2.md](../Docs/handoffs/PA_C_TRANCHE2.md) | Lead **`APPROVE PA-C`**, 2026-09-22 ET — cabin/path/planters/fence/glider landed |

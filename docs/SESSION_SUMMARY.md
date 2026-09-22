@@ -1,3 +1,8 @@
+## 2026-09-22 — SS-B close stamp + PA-E ImageGrab miss (cloud, docs)
+
+- Lead **`APPROVE SS-B`** (2026-09-21 ET) → `Docs/31_SPIRIT_STEALTH_FEEL.md` **CLOSED / COMPLETE**; `Docs/handoffs/SS_B_STEALTH_FEEL.md` **APPROVED / CLOSED**; `Docs/canon/DECISIONS.md` row; thin README / PHASE_BOARD / SESSION_* updates. Supersedes conflicted PR #139. **DESKTOP** STEALTH PIE greps **deferred/accepted** — not stamped PASS. **No APPROVE PA-E.**
+- Conductor remote PA-E Shot 1/2 host **ImageGrab** (2026-09-22 ET, Lead away): `Shot1_lookout.png` (~525KB) = Grok Bot chat/desktop; `Shot2_cabin_garden.png` (~376KB) = Editor chrome — not shotlist-grade. Strengthened KNOWN_ERRORS / AUTOMATION_GAPS / [DEFECT_PA_E_shot_capture_automation.md](../Docs/qa/DEFECT_PA_E_shot_capture_automation.md). Evidence folder `C:\Users\User\Desktop\HomeWorld_PA_E\`. **Stop grinding remote ImageGrab for PA-E**; Lead manual viewport stills.
+
 ## 2026-09-22 — SWARM_OPS §11 operational memory backfill (cloud)
 
 - Docs-only: [docs/KNOWN_ERRORS.md](KNOWN_ERRORS.md) + [docs/Automation/AUTOMATION_GAPS.md](Automation/AUTOMATION_GAPS.md) entries for GC→PA DESKTOP failures (2026-09-20–22); [Docs/qa/DEFECT_PA_E_shot_capture_automation.md](../Docs/qa/DEFECT_PA_E_shot_capture_automation.md); [PA_D_IMPORT_PLACE.md](../Docs/handoffs/PA_D_IMPORT_PLACE.md) Blockers pointer. **No APPROVE PA-E**; Lead still manual Shot 1/2.
