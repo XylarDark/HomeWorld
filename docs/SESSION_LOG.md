@@ -9276,3 +9276,19 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 **Remaining:** Next product track Lead-named TBD — **DS-B+** not opened.
 
+
+## 2026-09-22 — PA-0 prototype assets strategy (cloud, docs-only)
+
+**Completed:** PA-0 docs stamp — `Docs/32_PROTOTYPE_ASSETS.md` (OPEN, homestead-only), `Docs/handoffs/PA_STRATEGY.md`, kit plate refs + sidecar, README/DECISIONS/SESSION_SUMMARY/PHASE_BOARD updates. PR #141, SHA `3e58a4b`.
+
+**Pending:** Lead **`APPROVE PA STRATEGY`** (not stamped). PA-A…E locked until approve.
+
+**Errors:** None.
+
+## 2026-09-22 — PA STRATEGY APPROVED (cloud, docs-only)
+
+**Completed:** Lead **`APPROVE PA STRATEGY — homestead kit only`**, 2026-09-22 ET — stamped Docs/32, PA_STRATEGY handoff, README, DECISIONS, SESSION_SUMMARY, PHASE_BOARD. PA-A unlocked, not started. PR #141 updated.
+
+**Pending:** PA-A gap audit.
+
+**Errors:** None.

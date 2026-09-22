@@ -1,3 +1,11 @@
+## 2026-09-22 — PA STRATEGY APPROVED (cloud)
+
+- Lead **`APPROVE PA STRATEGY — homestead kit only`**, 2026-09-22 ET → [Docs/32_PROTOTYPE_ASSETS.md](../Docs/32_PROTOTYPE_ASSETS.md) **PA STRATEGY APPROVED** · **PA-A OPEN**; [Docs/handoffs/PA_STRATEGY.md](../Docs/handoffs/PA_STRATEGY.md) **APPROVED / CLOSED** (strategy stamp). Scope: homestead kit only. PR #141. **PA-A gap audit not started.**
+
+## 2026-09-22 — PA-0 prototype assets strategy (cloud, OPEN)
+
+- PA-0 docs-only: kit plate + sidecar in `AssetCreation/RefImages/` and `Docs/refs/ai/` (superseded by approve stamp above).
+
 ## 2026-09-22 — SS-B spirit stealth feel (cloud, IN PROGRESS)
 
 - Lead **`APPROVE SS-B STRATEGY`** (2026-09-21 ET) → [Docs/31_SPIRIT_STEALTH_FEEL.md](../Docs/31_SPIRIT_STEALTH_FEEL.md) **SS-B STRATEGY APPROVED / SS-B IN PROGRESS**; [Docs/handoffs/SS_B_STEALTH_FEEL.md](../Docs/handoffs/SS_B_STEALTH_FEEL.md); `DECISIONS.md` SS-B strategy row. **SS-B not stamped APPROVED.**
