@@ -1,3 +1,7 @@
+## 2026-09-22 — PA-C tranche-2 land (cloud)
+
+- Tranche-2 FBX in `AssetCreation/Exports/Homestead/`: upgraded `SM_Cabin.fbx`, `SM_Glider_Perch.fbx`; new path stones ×3, planters ×3, `SM_Garden_Fence_Seg.fbx`. [Docs/handoffs/PA_C_TRANCHE2.md](../Docs/handoffs/PA_C_TRANCHE2.md) · [PA_C_BLENDER.md](../Docs/handoffs/PA_C_BLENDER.md). **Docs/32** tranche-2 **DONE**; **PA-D OPEN** (no Lead **`APPROVE PA-D`**). No `.uasset`. PA track **not CLOSED** (optional island rim).
+
 ## 2026-09-22 — PA-C tranche-1 land (cloud)
 
 - Lead **`APPROVE PA-C`**, 2026-09-22 ET → [Docs/32_PROTOTYPE_ASSETS.md](../Docs/32_PROTOTYPE_ASSETS.md) **PA-C IN PROGRESS** (tranche-1 cliffs+pines **DONE**); [Docs/handoffs/PA_C_BLENDER.md](../Docs/handoffs/PA_C_BLENDER.md) + [PA_C_TRANCHE1.md](../Docs/handoffs/PA_C_TRANCHE1.md). FBX: `SM_Cliff_{LookoutFace,CabinFace,Rear}.fbx` + upgraded `SM_Pine_Homestead.fbx` in `AssetCreation/Exports/Homestead/`. **No `.uasset`**. PA track **not CLOSED** (cabin→path→planters→fence→glider→rim remain).

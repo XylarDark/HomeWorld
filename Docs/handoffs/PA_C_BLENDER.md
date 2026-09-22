@@ -2,14 +2,15 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | Lead **`APPROVE PA-C`** **GRANTED** (chat, 2026-09-22 ET) · **IN PROGRESS** |
-| **Tranche 1** | **COMPLETE** — cliffs (3) + pine foliage upgrade landed in `AssetCreation/Exports/Homestead/` |
-| **Track** | Whole **PA track not CLOSED** — PA-D import / PA-E evidence still **LOCKED** until remaining PA-C queue + Lead PA-E gate |
+| **Status** | Lead **`APPROVE PA-C`** **GRANTED** (chat, 2026-09-22 ET) · **IN PROGRESS** (optional island rim only) |
+| **Tranche 1** | **COMPLETE** — cliffs (3) + pine foliage upgrade |
+| **Tranche 2** | **COMPLETE** — cabin, path stones, planters, fence, glider perch |
+| **Track** | Whole **PA track not CLOSED** — **PA-D OPEN** (import/place); PA-E evidence **LOCKED** until Lead **`APPROVE PA-E`** |
 | **Host** | DESKTOP + Blender MCP (export) · CLOUD (mesh land + docs) |
 | **Impl doc** | [32_PROTOTYPE_ASSETS.md](../32_PROTOTYPE_ASSETS.md) |
 | **Prior** | [PA_A_GAP_AUDIT.md](PA_A_GAP_AUDIT.md) **APPROVED / CLOSED** — Lead **`APPROVE PA-A`**, 2026-09-22 ET |
 
-**Do not** stamp whole **PA track CLOSED** or **PA-E done** until Shot 1/2 evidence.
+**Do not** stamp **`APPROVE PA-D`**, whole **PA track CLOSED**, or **PA-E done** until Shot 1/2 evidence + Lead PA-E gate.
 
 ---
 
@@ -21,7 +22,7 @@ Lead typed in chat (2026-09-22 ET):
 APPROVE PA-C
 ```
 
-Unlocks continued PA-C Blender work and PA-D prep on DESKTOP. **Tranche 1** meshes are review-ready on branch; no `.uasset` in this land.
+Unlocks PA-C Blender work and **PA-D prep** on DESKTOP. Tranche 1–2 FBX landed in `AssetCreation/Exports/Homestead/`; no `.uasset` in cloud land.
 
 ---
 
@@ -38,18 +39,36 @@ Evidence: [PA_C_TRANCHE1.md](PA_C_TRANCHE1.md) · manifest rows in [MVP_EXPORT_M
 
 ---
 
+## Tranche 2 — delivered meshes
+
+| Asset | Action | Tris | Notes |
+|-------|--------|-----:|-------|
+| `SM_Cabin` | UPGRADE | 1680 | Rustic log/gable; UCX 5.5×4.5×5.5 |
+| `SM_PathStone_A` | CREATE | 24 | M_PathStone |
+| `SM_PathStone_B` | CREATE | 20 | M_PathStone |
+| `SM_PathStone_C` | CREATE | 28 | M_PathStone |
+| `SM_Planter_A` | CREATE | 240 | Raised bed + soil/plant proxies |
+| `SM_Planter_B` | CREATE | 336 | M_Nurtured plant slot |
+| `SM_Planter_C` | CREATE | 240 | M_GatherHerb plant slot |
+| `SM_Garden_Fence_Seg` | CREATE | 100 | Post-and-rail; M_WoodCabin |
+| `SM_Glider_Perch` | UPGRADE | 132 | Plank platform + rails + perch |
+
+Evidence: [PA_C_TRANCHE2.md](PA_C_TRANCHE2.md) · manifest rows in [MVP_EXPORT_MANIFEST.md](../../AssetCreation/Exports/MVP_EXPORT_MANIFEST.md).
+
+---
+
 ## PA-C queue status
 
 | # | Item | Status |
 |---|------|--------|
 | 1 | Cliff modules | **DONE** (tranche 1) |
 | 2 | Pines S/M/L | **DONE** (tranche 1) |
-| 3 | Cabin | **PENDING** |
-| 4 | Path stones | **PENDING** |
-| 5 | Planters ×3 | **PENDING** |
-| 6 | Fence segments | **PENDING** |
-| 7 | Glider perch | **PENDING** |
-| 8 | Optional island rim | **PENDING** |
+| 3 | Cabin | **DONE** (tranche 2) |
+| 4 | Path stones | **DONE** (tranche 2) |
+| 5 | Planters ×3 | **DONE** (tranche 2) |
+| 6 | Fence segments | **DONE** (tranche 2) |
+| 7 | Glider perch | **DONE** (tranche 2) |
+| 8 | Optional island rim | **PENDING** (optional) |
 
 **KEEP (no mesh unless polish):** IslandTop, Lookout pad, Soft shrine, Islets optional.
 
@@ -63,13 +82,13 @@ Cliff assemblies export at **(0,0,0)** with geometry relative to graybox empty o
 - CabinFace: `(-7.0, -4.5, -3.0)`
 - Rear: `(0.0, 5.0, -2.5)`
 
+Cabin portable kit origin `(0,0,0)` — place at `SOCKET_Cabin` (−6, 1, 0) per tranche-2 report.
+
 ---
 
-## DESKTOP chain (next)
+## DESKTOP chain (PA-D — OPEN)
 
 ```text
-# Remaining PA-C queue in Blender MCP + STYLE_GUIDE
-# AssetCreation/Blender/export_to_asset_creation.py
 .\Tools\Safe-Build.ps1
 execute_python_script("batch_import_asset_creation.py")
 execute_python_script("place_vs_mvp_dress.py")
@@ -83,7 +102,8 @@ Cloud agents: land FBX + docs only — [WINDOWS_BRIDGE.md](../../docs/Setup/WIND
 
 - [x] Lead **`APPROVE PA-C`** stamped (2026-09-22 ET)
 - [x] Tranche 1 FBX in `AssetCreation/Exports/Homestead/`
-- [x] Tranche report + this handoff
-- [ ] Tranche 2+ Blender exports (DESKTOP)
-- [ ] PA-D import + master bind (DESKTOP)
+- [x] Tranche 2 FBX in `AssetCreation/Exports/Homestead/`
+- [x] Tranche 1 + 2 reports + this handoff
+- [ ] Optional island rim (DESKTOP / Lead optional)
+- [ ] PA-D import + master bind (DESKTOP) — **OPEN**, not Lead-approved
 - [ ] PA-E Shot 1/2 evidence (DESKTOP + Lead)
