@@ -1093,8 +1093,13 @@ def _validate_png(path: Optional[str]) -> dict:
         return out
     if lum < MIN_MEAN_LUMINANCE:
         out["error"] = "near_black"
+        out["prove_loop_status"] = "in_progress"
+        out["closed_fail"] = False
+        out["lead_rule"] = common.PROVE_CRITERIA.get("note", "")
+        out["prove_loop"] = list(common.LEAD_PROVE_LOOP)
         return out
     out["pass"] = True
+    out["prove_loop_status"] = "complete"
     return out
 
 
