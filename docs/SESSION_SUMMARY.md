@@ -1,6 +1,27 @@
-## 2026-09-22 — PA-D Homestead place script (cloud)
+## 2026-09-22 — PA-D APPROVED + place script (cloud)
 
-- Lead **APPROVE PA-D** → `Content/Python/place_vs_mvp_pa_d.py` (cliffs, planters, fence, path stones + `place_vs_mvp_dress` refresh); `place_vs_mvp_dress.py` SM_Cabin exact + Pine S/M/L. PR pending; DESKTOP run after batch_import.
+- Lead **`APPROVE PA-D`**, 2026-09-22 ET → [Docs/32_PROTOTYPE_ASSETS.md](../Docs/32_PROTOTYPE_ASSETS.md) **PA-D IN PROGRESS**; [Docs/handoffs/PA_D_IMPORT_PLACE.md](../Docs/handoffs/PA_D_IMPORT_PLACE.md) **APPROVED** (awaiting DESKTOP evidence). `DECISIONS.md` + `PHASE_BOARD` + `Docs/README` minimal update. **No `.uasset`**. PA track **not CLOSED** (PA-E locked).
+- PR #145: `Content/Python/place_vs_mvp_pa_d.py` (cliffs, planters, fence, path stones + `place_vs_mvp_dress` refresh); `place_vs_mvp_dress.py` SM_Cabin exact + Pine S/M/L. DESKTOP run after batch_import.
+
+## 2026-09-22 — PA-C tranche-2 land (cloud)
+
+- Tranche-2 FBX in `AssetCreation/Exports/Homestead/`: upgraded `SM_Cabin.fbx`, `SM_Glider_Perch.fbx`; new path stones ×3, planters ×3, `SM_Garden_Fence_Seg.fbx`. [Docs/handoffs/PA_C_TRANCHE2.md](../Docs/handoffs/PA_C_TRANCHE2.md) · [PA_C_BLENDER.md](../Docs/handoffs/PA_C_BLENDER.md). **Docs/32** tranche-2 **DONE**; **PA-D OPEN** (no Lead **`APPROVE PA-D`**). No `.uasset`. PA track **not CLOSED** (optional island rim).
+
+## 2026-09-22 — PA-C tranche-1 land (cloud)
+
+- Lead **`APPROVE PA-C`**, 2026-09-22 ET → [Docs/32_PROTOTYPE_ASSETS.md](../Docs/32_PROTOTYPE_ASSETS.md) **PA-C IN PROGRESS** (tranche-1 cliffs+pines **DONE**); [Docs/handoffs/PA_C_BLENDER.md](../Docs/handoffs/PA_C_BLENDER.md) + [PA_C_TRANCHE1.md](../Docs/handoffs/PA_C_TRANCHE1.md). FBX: `SM_Cliff_{LookoutFace,CabinFace,Rear}.fbx` + upgraded `SM_Pine_Homestead.fbx` in `AssetCreation/Exports/Homestead/`. **No `.uasset`**. PA track **not CLOSED** (cabin→path→planters→fence→glider→rim remain).
+
+## 2026-09-22 — PA-A gap audit APPROVED (cloud)
+
+- Lead **`APPROVE PA-A`**, 2026-09-22 ET → [Docs/32_PROTOTYPE_ASSETS.md](../Docs/32_PROTOTYPE_ASSETS.md) **PA-A CLOSED / COMPLETE** · **PA-C OPEN / IN PROGRESS ready**; [Docs/handoffs/PA_A_GAP_AUDIT.md](../Docs/handoffs/PA_A_GAP_AUDIT.md) **APPROVED / CLOSED**. Gap table + Blender queue stamped. **PA track not CLOSED** (no PA-C approve / no PA-E).
+
+## 2026-09-22 — PA STRATEGY APPROVED (cloud)
+
+- Lead **`APPROVE PA STRATEGY — homestead kit only`**, 2026-09-22 ET → [Docs/32_PROTOTYPE_ASSETS.md](../Docs/32_PROTOTYPE_ASSETS.md) **PA STRATEGY APPROVED** · **PA-A OPEN**; [Docs/handoffs/PA_STRATEGY.md](../Docs/handoffs/PA_STRATEGY.md) **APPROVED / CLOSED** (strategy stamp). Scope: homestead kit only. PR #141. **PA-A gap audit not started.**
+
+## 2026-09-22 — PA-0 prototype assets strategy (cloud, OPEN)
+
+- PA-0 docs-only: kit plate + sidecar in `AssetCreation/RefImages/` and `Docs/refs/ai/` (superseded by approve stamp above).
 
 ## 2026-09-22 — SS-B spirit stealth feel (cloud, IN PROGRESS)
 

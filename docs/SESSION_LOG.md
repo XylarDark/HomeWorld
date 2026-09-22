@@ -9276,3 +9276,43 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 **Remaining:** Next product track Lead-named TBD — **DS-B+** not opened.
 
+
+## 2026-09-22 — PA-0 prototype assets strategy (cloud, docs-only)
+
+**Completed:** PA-0 docs stamp — `Docs/32_PROTOTYPE_ASSETS.md` (OPEN, homestead-only), `Docs/handoffs/PA_STRATEGY.md`, kit plate refs + sidecar, README/DECISIONS/SESSION_SUMMARY/PHASE_BOARD updates. PR #141, SHA `3e58a4b`.
+
+**Pending:** Lead **`APPROVE PA STRATEGY`** (not stamped). PA-A…E locked until approve.
+
+**Errors:** None.
+
+## 2026-09-22 — PA STRATEGY APPROVED (cloud, docs-only)
+
+**Completed:** Lead **`APPROVE PA STRATEGY — homestead kit only`**, 2026-09-22 ET — stamped Docs/32, PA_STRATEGY handoff, README, DECISIONS, SESSION_SUMMARY, PHASE_BOARD. PA-A unlocked, not started. PR #141 updated.
+
+**Pending:** PA-A gap audit.
+
+**Errors:** None.
+
+## 2026-09-22 — PA-A gap audit APPROVED (cloud, docs-only)
+
+**Completed:** Lead **`APPROVE PA-A`**, 2026-09-22 ET — stamped Docs/32, PA_A_GAP_AUDIT handoff, README, DECISIONS, SESSION_SUMMARY, PHASE_BOARD. PA-A **CLOSED / COMPLETE**; PA-C **OPEN / IN PROGRESS ready**. Whole PA track **not CLOSED**.
+
+**Pending:** PA-C Blender queue on DESKTOP (cliffs first).
+
+**Errors:** None.
+
+## 2026-09-22 — PA-C tranche-1 cliffs + pine (cloud land)
+
+**Completed:** Lead **`APPROVE PA-C`**, 2026-09-22 ET — unpacked tranche-1 tarball; byte-copied four FBX to `AssetCreation/Exports/Homestead/`; stamped Docs/32, PA_C_BLENDER + PA_C_TRANCHE1 handoffs, MVP_EXPORT_MANIFEST, DECISIONS, PHASE_BOARD, Docs/README, SESSION_SUMMARY. Tris: Lookout 864, Cabin 648, Rear 540, Pine 472.
+
+**Pending:** PA-C tranche 2+ (cabin, path, planters, fence, glider, optional rim); PA-D import on DESKTOP.
+
+**Errors:** None.
+
+## 2026-09-22 — PA-C tranche-2 cabin path planters fence glider (cloud land)
+
+**Completed:** Unpacked tranche-2 tarball; replaced `SM_Cabin.fbx`, `SM_Glider_Perch.fbx`; added path stones ×3, planters ×3, `SM_Garden_Fence_Seg.fbx` under `AssetCreation/Exports/Homestead/`. Stamped Docs/32 (tranche-2 DONE, PA-D OPEN), PA_C_BLENDER, PA_C_TRANCHE2, MVP_EXPORT_MANIFEST, DECISIONS, PHASE_BOARD, Docs/README, SESSION_SUMMARY. No `.uasset`.
+
+**Pending:** Optional island rim; PA-D batch import + place on DESKTOP (Lead **`APPROVE PA-D`** not granted).
+
+**Errors:** None.
