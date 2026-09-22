@@ -77,6 +77,7 @@ SHOTS = (
 class _Phase(str, Enum):
     IDLE = "idle"
     POSED = "posed"
+    PREPARING = "preparing"
     CAPTURE_PENDING = "capture_pending"
     WAITING_FILE = "waiting_file"
     INTER_SHOT_SETTLE = "inter_shot_settle"
@@ -113,20 +114,17 @@ class _StableSizeTracker:
         self.samples.append(size)
         if len(self.samples) > STABLE_SIZE_POLLS:
             self.samples = self.samples[-STABLE_SIZE_POLLS:]
-        if size < MIN_BYTES:
-            self.last_size = size
-            self.same_count = 0
-            return False
         if size == self.last_size:
             self.same_count += 1
         else:
             self.last_size = size
             self.same_count = 1
+        # MIN_BYTES is enforced in _validate_png only — small but complete PNGs must not
+        # block wait discovery (post-#165 DESKTOP: ~38KB Shot1 timed out as file_missing).
         return (
             self.same_count >= 2
             and len(self.samples) >= STABLE_SIZE_POLLS
             and self.samples[-1] == self.samples[-2]
-            and self.samples[-1] >= MIN_BYTES
         )
 
 
@@ -205,6 +203,8 @@ class _ShotlistOrchestrator:
     def _tick(self) -> None:
         if self.phase == _Phase.POSED:
             self._begin_shot_prepare()
+        elif self.phase == _Phase.PREPARING:
+            pass
         elif self.phase == _Phase.CAPTURE_PENDING:
             self._invoke_capture_once()
         elif self.phase == _Phase.WAITING_FILE:
@@ -221,9 +221,16 @@ class _ShotlistOrchestrator:
             self._disarm_only()
 
     def _begin_shot_prepare(self) -> None:
+        if self.phase != _Phase.POSED:
+            return
+        # Lock before pose/purge/logging — nested pre_tick while still POSED re-entered
+        # prepare and stacked multiple take_high_res_screenshot calls (post-#165).
+        self.phase = _Phase.PREPARING
+        self._capture_in_flight = True
         if self.shot_index >= len(SHOTS):
             self.phase = _Phase.FINAL_DRAIN
             self._final_drain_deadline = time.time() + FINAL_DRAIN_SEC
+            self._capture_in_flight = False
             _log("final_drain start", {"sec": FINAL_DRAIN_SEC})
             return
         shot = SHOTS[self.shot_index]
@@ -248,11 +255,10 @@ class _ShotlistOrchestrator:
         self._stable.reset()
         self._task = None
         self._task_poll = {"had_task": False}
-        self._capture_in_flight = False
         self.phase = _Phase.CAPTURE_PENDING
 
     def _invoke_capture_once(self) -> None:
-        if self._capture_in_flight:
+        if self.phase != _Phase.CAPTURE_PENDING:
             return
         if not self._current_shot:
             self.phase = _Phase.WRITE_REPORT
@@ -324,7 +330,12 @@ class _ShotlistOrchestrator:
                 "timeout; task_done=%s file authoritative if appears later in final_drain"
                 % task_done,
             )
-            self._finish_shot(None)
+            resolved = _find_fresh_capture_path(self._dest_abs, self._capture_since)
+            if resolved:
+                self._wait_meta["discovered_from"] = resolved
+                self._wait_meta["stable"] = False
+                self._wait_meta["timeout_authoritative"] = True
+            self._finish_shot(resolved)
             return
 
     def _finish_shot(self, resolved: Optional[str]) -> None:
@@ -332,6 +343,8 @@ class _ShotlistOrchestrator:
         if not shot:
             self.phase = _Phase.WRITE_REPORT
             return
+        if not resolved and self._dest_abs and self._capture_since:
+            resolved = _find_fresh_capture_path(self._dest_abs, self._capture_since)
         cap = dict(self._capture_meta)
         cap["saved_path"] = resolved
         cap["wait"] = dict(self._wait_meta)
@@ -397,7 +410,24 @@ class _ShotlistOrchestrator:
                 entry["saved_path"] = resolved
                 entry["desktop_copy"] = _copy_to_desktop(resolved, entry["filename"])
                 entry["pass"] = bool(validation.get("pass"))
-        if not any_pending or now >= self._final_drain_deadline:
+        if now >= self._final_drain_deadline:
+            for entry in self.results:
+                if entry.get("pass"):
+                    continue
+                dest = _shot_dest_abs(entry["filename"])
+                since = float(entry.get("capture_since") or 0.0)
+                resolved = _find_fresh_capture_path(dest, since)
+                if resolved:
+                    validation = _validate_png(resolved)
+                    entry["validation"] = validation
+                    entry["saved_path"] = resolved
+                    entry["desktop_copy"] = _copy_to_desktop(resolved, entry["filename"])
+                    entry["pass"] = bool(validation.get("pass"))
+                    entry["wait_final"] = entry.get("wait_final") or {}
+                    entry["wait_final"]["final_authoritative"] = True
+            _log("final_drain done")
+            self.phase = _Phase.WRITE_REPORT
+        elif not any_pending:
             _log("final_drain done")
             self.phase = _Phase.WRITE_REPORT
 
@@ -968,6 +998,24 @@ def _copy_into_dest(source: str, dest_abs: str) -> bool:
         return False
 
 
+def _find_fresh_capture_path(dest_abs: str, since_mtime: float) -> Optional[str]:
+    """Return newest PNG for this shot with mtime >= since (no MIN_BYTES / stability gate)."""
+    basename = os.path.basename(dest_abs)
+    if (
+        os.path.isfile(dest_abs)
+        and _mtime_at_least(dest_abs, since_mtime)
+    ):
+        return dest_abs
+    found = _find_named_png(basename, since_mtime)
+    if found and _mtime_at_least(found, since_mtime):
+        if found != dest_abs:
+            _copy_into_dest(found, dest_abs)
+        if os.path.isfile(dest_abs) and _mtime_at_least(dest_abs, since_mtime):
+            return dest_abs
+        return found
+    return None
+
+
 def _probe_capture_file(
     dest_abs: str,
     since_mtime: float,
@@ -985,13 +1033,12 @@ def _probe_capture_file(
         return dest_abs, meta
     found = _find_named_png(basename, since_mtime)
     if found and _mtime_at_least(found, since_mtime):
-        if os.path.getsize(found) >= MIN_BYTES:
-            if found != dest_abs:
-                _copy_into_dest(found, dest_abs)
-            check_path = dest_abs if os.path.isfile(dest_abs) else found
-            if _mtime_at_least(check_path, since_mtime) and stable.observe(check_path):
-                meta["discovered_from"] = found
-                return check_path, meta
+        if found != dest_abs:
+            _copy_into_dest(found, dest_abs)
+        check_path = dest_abs if os.path.isfile(dest_abs) else found
+        if _mtime_at_least(check_path, since_mtime) and stable.observe(check_path):
+            meta["discovered_from"] = found
+            return check_path, meta
     return None, meta
 
 
