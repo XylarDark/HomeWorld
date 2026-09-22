@@ -190,6 +190,9 @@ class _MrqOrchestrator:
         cam = common.find_camera(shot["camera_labels"])
         loc, rot, pose_meta = common.resolve_camera_transform(shot, cam)
         pose_meta["fallback_source"] = shot.get("fallback_source")
+        pose_meta["mrq_pie_night_reapply"] = common.reapply_night_environment_for_mrq_shot(
+            shot["id"], PREFIX
+        )
         prep = common.apply_lit_game_view_for_capture()
         finish = common.finish_loading_before_capture()
         viewport_diag = common.sync_editor_viewport_to_camera(cam, loc, rot)
