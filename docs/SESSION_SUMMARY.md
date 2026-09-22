@@ -1,7 +1,12 @@
 ## 2026-09-22 ET — SPIRIT_STEALTH bible LOCKED (docs-only, cloud)
 
 - Lead locks 2026-09-21 ET chat: spirit **hidden default**, torch reveal (NPC / campfire / spirit torch), found-out **A2 alert** (not crouch, not kidnap, not kill-on-detect); body vs spirit torch split.
-- Added `Docs/SPIRIT_STEALTH_BIBLE.md`, `Docs/SPIRIT_STEALTH_IMPL_PROMPT.md`; amends `DAYNIGHT_BIBLE`, `MOVEMENT_BIBLE`, `Docs/canon/DECISIONS.md`, `DO_NOT.md`, `VERBS.md`; MV-A (#130) **excludes** SS-A — pending Lead **`approve`** on PR.
+- Added `Docs/SPIRIT_STEALTH_BIBLE.md`, `Docs/SPIRIT_STEALTH_IMPL_PROMPT.md`; amends `DAYNIGHT_BIBLE`, `MOVEMENT_BIBLE`, `Docs/canon/DECISIONS.md`, `DO_NOT.md`, `VERBS.md`; MV-A (#130) **excludes** SS-A — merged main `19d0ca6` (PR #131).
+
+## 2026-09-22 ET — MV-A traversal stubs (cloud, IN PROGRESS)
+
+- Lead **`MV-A`** chat → **`APPROVE MV STRATEGY`**; [Docs/24_MOVEMENT_IMPL.md](../Docs/24_MOVEMENT_IMPL.md) + [Docs/handoffs/MV_A_TRAVERSAL.md](../Docs/handoffs/MV_A_TRAVERSAL.md); `DECISIONS.md` MV strategy row (alongside SPIRIT_STEALTH lock). MV-A **not** stamped APPROVED (Lead closes later).
+- C++: `HomeWorldTraversalComponent` (sprint, mantle/vault, spirit blink, mount boost, soft fall reset on one CMC); dusk blocks FALLBACK glide start; cheats `hw.Move.Mantle` / `hw.Move.Blink`. PR #130; DESKTOP Safe-Build + PIE prove pending.
 
 ## 2026-09-21 ET — CD-A track CLOSED (docs stamp, cloud)
 
