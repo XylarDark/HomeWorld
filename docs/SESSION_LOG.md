@@ -9258,6 +9258,22 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 ---
 
+## 2026-09-22 — PA-E capture DESKTOP prove FAIL post-#159 (docs only)
+
+**Evidence:** `C:\dev\HomeWorld`, ~12:51–13:01 ET after **#159** merged. Console `HighResShot 1920x1080 filename="C:/dev/HomeWorld/Saved/Screenshots/PA_E/ShotN_....png"` for Shot 1 + Shot 2; `_focus_level_viewport` focus OK; ~120s wait → no file; AutomationLibrary fallback `task_done: false`, `file_produced_by: null`; MCP 600s timeout / Editor Not Responding during `_final_drain`; no new `Saved/pa_e_capture_report.json`; no new `Shot*.png` under `Saved/Screenshots/PA_E/`.
+
+**Delivered:** Docs-only append to KNOWN_ERRORS, AUTOMATION_GAPS, DEFECT_PA_E, SESSION_* . **No code.** Gap **OPEN**; rung 1 HighResShot variants **exhausted** unless Lead SCOUT/BUILD. **No shotlist PASS.**
+
+---
+
+## 2026-09-22 — PA-E capture DESKTOP prove FAIL post-#157 (docs only)
+
+**Evidence:** `C:\dev\HomeWorld\Saved\pa_e_capture_report.json` — `ok: false`; `game_view: true`; `AutomationEditorTask` `task_done: false`; `file_missing`; `pil_available: false`; no new PNGs in `Saved/Screenshots/PA_E/`.
+
+**Delivered:** Document-only (consolidates draft PR #158). Gap **OPEN**; no shotlist PASS.
+
+---
+
 ## 2026-09-22 — PA-E capture absolute path + async drain (cloud)
 
 **Fix:** `capture_shotlist_viewport.py` — absolute `Saved/Screenshots/PA_E/` paths for AutomationLibrary/HighResShot; discover/copy from Engine `Binaries/Win64/PA_E/`; longer stable-size poll + final drain before keep_alive disarm. Rung 1 only. No DESKTOP PASS claim.
