@@ -12,7 +12,7 @@
 
 Apply in order **before** escalating rungs or asking Lead open-ended “does anyone else hit this?”
 
-**TOKEN-LEAN logging:** One-line **Cause→Avoid** in this doc / [automation-standards.mdc](../../.cursor/rules/automation-standards.mdc) first; [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) § Index + matching row; narratives elsewhere. Log **along the way**, not only phase-end (automation-standards v1.9).
+**KNOWN_ERROR_LOG:** [automation-standards.mdc](../../.cursor/rules/automation-standards.mdc) v1.10 § KNOWN_ERROR_LOG; bullets in [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) § PA-E DESKTOP prove misses.
 
 ### Testing preconditions (Lead lock-in — **all** automation, not capture-only)
 

@@ -4,7 +4,7 @@ description: "Standards for automation that drives or configures Editor/engine f
 alwaysApply: false
 globs: "**/Content/Python/**, **/Tools/**, **/.github/workflows/**"
 priority: 9
-version: 1.9
+version: 1.10
 ---
 
 # Automation Standards
@@ -21,13 +21,9 @@ Applies to **every** automation / tooling gap (any tool surface). Canonical deta
 
 When Lead corrects a **proven** miss (DESKTOP evidence, false PASS/FAIL), fold it into the repo **immediately**: blocking gate, assert threshold, or one row in `PROVE_CRITERIA` — **not** a long runbook or rediscovering the same rule in chat. Prefer **compact hard rules** over verbose prose.
 
-### TOKEN-LEAN known errors (Lead, 2026-09-22)
+### KNOWN_ERROR_LOG (Lead hard rule)
 
-- **Harness first:** one-line **Cause→Avoid** hard rule here and/or CAPTURE_REDUNDANCY; **KNOWN_ERRORS** gets the same line + index key ([docs/KNOWN_ERRORS.md](../../docs/KNOWN_ERRORS.md) § Index).
-- **Along the way:** log when the miss is understood — not only phase-end.
-- **No verbose KNOWN_ERRORS / agent memory:** narratives → DEFECT, AUTOMATION_GAPS, SESSION_LOG; memory/profile holds **≤1–2 sentence** compressed rules only.
-
-**PA-E DESKTOP prove (mirror index keys):** `pa-e-world` assert loaded world before Arrange · `pa-e-thread` game thread only · `pa-e-mcp-alive` check Editor before relaunch on socket drop · `pa-e-aim-visual` ready/aim_ok ≠ visual PASS · `pa-e-seq-stale` sync MRQ sequence to Arrange pose · `pa-e-git-dirty` reset prove-touched files after merge.
+**KNOWN_ERROR_LOG:** Along-the-way logging required. Always-on = one-line Cause→Avoid only. Detail lives in [docs/KNOWN_ERRORS.md](../../docs/KNOWN_ERRORS.md) (retrieve on failure). Never paste episode narratives into agent profile memory or alwaysApply rules. Cap new always-on gate additions; prefer pointers to KNOWN_ERRORS section anchors (e.g. § PA-E DESKTOP prove misses).
 
 ### Testing preconditions (universal — before PASS/FAIL claims)
 
