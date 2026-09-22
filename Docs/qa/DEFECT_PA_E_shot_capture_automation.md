@@ -8,7 +8,7 @@
 
 ## Symptom
 
-DESKTOP attempts to produce Shot 1/2 stills via **UnrealEditor-Cmd** (`-ExecutePythonScript` + HighResShot) and/or host **ImageGrab** did not yield usable shotlist evidence: missing files, tiny PNGs, nearly black frames (path stones only), or full-desktop grabs with Message Log / chrome.
+DESKTOP attempts to produce Shot 1/2 stills via **UnrealEditor-Cmd** (`-ExecutePythonScript` + HighResShot) and/or host **ImageGrab** did not yield usable shotlist evidence: missing files, tiny PNGs, nearly black frames (path stones only), or full-desktop grabs with Message Log / chrome. **2026-09-22 follow-up:** scripts used non-doc **`HighResShot` order** (resolution before `filename=`) and **short file waits** while PNGs could land **~268s** later — see [CAPTURE_REDUNDANCY.md](../../docs/Automation/CAPTURE_REDUNDANCY.md) and KNOWN_ERRORS (parameter-order + wait race).
 
 ## Incident — 2026-09-22 ET (Conductor remote, Lead away)
 
@@ -32,7 +32,7 @@ Host Windows **ImageGrab** of the Unreal window during a remote PA-E Shot 1/2 at
 
 Follow [docs/Automation/CAPTURE_REDUNDANCY.md](../../docs/Automation/CAPTURE_REDUNDANCY.md) (**Lead-gated global ladder** + shotlist instance):
 
-1. **Rung 1 (no gate):** [Content/Python/capture_shotlist_viewport.py](../../Content/Python/capture_shotlist_viewport.py) — UE built-ins only (`take_high_res_screenshot`, keep_alive, etc.) → `Saved/pa_e_capture_report.json`.
+1. **Rung 1 (no gate):** [Content/Python/capture_shotlist_viewport.py](../../Content/Python/capture_shotlist_viewport.py) — Epic doc-ordered console **`HighResShot`**, `finish_loading_before_screenshot`, `take_high_res_screenshot(..., delay=…)`, 330s file-first wait → `Saved/pa_e_capture_report.json`.
 2. **Rung 2:** Free-tool **SCOUT backlog** (names only) — requires Lead **`APPROVE TOOL SCOUT <name>`**; **no auto-install**.
 3. **Rung 3:** Net-new custom stacks — requires Lead **`APPROVE TOOL BUILD <name>`**; not host ImageGrab for PASS.
 

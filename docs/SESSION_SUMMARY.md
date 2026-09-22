@@ -1,6 +1,10 @@
+## 2026-09-22 — Epic doc-aligned HighResShot + AutomationLibrary (cloud, rung 1)
+
+- [capture_shotlist_viewport.py](../Content/Python/capture_shotlist_viewport.py) / [capture_viewport.py](../Content/Python/capture_viewport.py): **`filename=` before resolution** console ladder with per-form **330s** file wait; `Saved/Screenshots/Windows`; `finish_loading_before_screenshot`, `delay` on `take_high_res_screenshot`, Lit via `set_editor_viewport_view_mode`; inter-shot Slate settle. Implements Lead **docs-first** policy ([#160](https://github.com/XylarDark/HomeWorld/pull/160) / [CAPTURE_REDUNDANCY.md](Automation/CAPTURE_REDUNDANCY.md) § Docs-first); FOCUSVIEWPORT unverified; KNOWN_ERRORS / AUTOMATION_GAPS / DEFECT_PA_E. Gap **OPEN** — DESKTOP re-prove required.
+
 ## 2026-09-22 — Docs-first console/API policy (Lead lock-in, cloud)
 
-- Lead policy: read official Epic/vendor docs before hardening console commands / Editor Python APIs — [docs/Automation/CAPTURE_REDUNDANCY.md](Automation/CAPTURE_REDUNDANCY.md) § Docs-first; [AUTOMATION_GAPS.md](Automation/AUTOMATION_GAPS.md) + research log; [.cursor/rules/automation-standards.mdc](../.cursor/rules/automation-standards.mdc). Motivating miss: **HighResShot** parameter order vs [Taking Screenshots](https://dev.epicgames.com/documentation/en-us/unreal-engine/taking-screenshots-in-unreal-engine). Docs-only; no script changes in this PR.
+- Lead policy: read official Epic/vendor docs before hardening console commands / Editor Python APIs — [docs/Automation/CAPTURE_REDUNDANCY.md](Automation/CAPTURE_REDUNDANCY.md) § Docs-first; [AUTOMATION_GAPS.md](Automation/AUTOMATION_GAPS.md) + research log; [.cursor/rules/automation-standards.mdc](../.cursor/rules/automation-standards.mdc). Motivating miss: **HighResShot** parameter order vs [Taking Screenshots](https://dev.epicgames.com/documentation/en-us/unreal-engine/taking-screenshots-in-unreal-engine). Merged **#160** (docs-only); script alignment in **#161**.
 
 ## 2026-09-22 — PA-E console HighResShot primary (cloud, rung 1)
 
