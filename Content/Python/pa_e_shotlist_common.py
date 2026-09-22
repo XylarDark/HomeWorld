@@ -201,7 +201,12 @@ SHOT1_WIDE_STANDOFF_UU = (-2200.0, -1800.0, 900.0)
 SHOT1_LOOKAT_Z_ELEVATE_UU = 150.0
 SHOT2_WIDE_STANDOFF_UU = (400.0, -1400.0, 650.0)
 SHOT2_LOOKAT_Z_OFFSET_UU = 180.0
+SHOT2_CABIN_ANCHOR_NEEDLES: tuple[str, ...] = ("ANCHOR_SM_Cabin",)
+SHOT2_CABIN_FOUNDATION_FALLBACK_NEEDLES: tuple[str, ...] = ("DRESS_SM_Cabin", "SM_Cabin")
 SHOT_POSE_MAX_ABS_XY_UU = 3000.0
+SHOT_POSE_ABSOLUTE_MIN_Z_UU = 80.0
+SHOT_BOUNDS_MAX_EXTENT_UU = 2500.0
+SHOT_BOUNDS_MIN_Z_SANE_UU = -400.0
 
 # Expected camera–dress-centroid distance (UU) for aim_ok when ray hits AABB (grazing edge hits ≠ hero framing).
 SHOT_AIM_DISTANCE_UU: dict[str, tuple[float, float]] = {
@@ -857,13 +862,97 @@ def inventory_homestead_in_level(shot_id: Optional[str] = None) -> dict[str, Any
 
 
 def bounds_for_needles(needles: tuple[str, ...], shot_id: str) -> Optional[dict[str, Any]]:
+    actors = find_actors_by_needles(needles, shot_id)
+    return combined_bounds_from_actors(actors) if actors else None
+
+
+def find_actors_by_needles(needles: tuple[str, ...], shot_id: str) -> list:
     actors: list = []
     for a in unreal.EditorLevelLibrary.get_all_level_actors():
         if not a:
             continue
         if _actor_matches_needles(a, needles) and not _actor_excluded_for_shot(a, shot_id):
             actors.append(a)
-    return combined_bounds_from_actors(actors) if actors else None
+    return actors
+
+
+def bounds_sane_for_camera_pose(bounds: Optional[dict[str, Any]]) -> bool:
+    """Dress AABB with huge extent or min.z void — do not use centroid for camera anchor."""
+    if not bounds:
+        return False
+    ext = bounds.get("extent") or [0.0, 0.0, 0.0]
+    try:
+        if max(float(ext[0]), float(ext[1]), float(ext[2])) > SHOT_BOUNDS_MAX_EXTENT_UU:
+            return False
+    except (TypeError, IndexError, ValueError):
+        return False
+    bmin = bounds.get("min")
+    if bmin and len(bmin) > 2 and float(bmin[2]) < SHOT_BOUNDS_MIN_Z_SANE_UU:
+        return False
+    return True
+
+
+def _actor_location_xyz(actor) -> list[float]:
+    loc = actor.get_actor_location()
+    return [loc.x, loc.y, loc.z]
+
+
+def _midpoint_xyz(points: list[list[float]]) -> list[float]:
+    n = len(points)
+    return [sum(p[i] for p in points) / n for i in range(3)]
+
+
+def _synthetic_anchor_bounds(anchor: list[float]) -> dict[str, Any]:
+    ax, ay, az = anchor[0], anchor[1], anchor[2]
+    return {
+        "centroid": [ax, ay, az],
+        "min": [ax - 100.0, ay - 100.0, az],
+        "extent": [200.0, 200.0, 200.0],
+    }
+
+
+def resolve_anchor_point(
+    *,
+    shot_id: str,
+    primary_needles: tuple[str, ...],
+    fallback_needles: tuple[str, ...],
+    bounds_fallback: dict[str, Any],
+    meta: dict[str, Any],
+    prefer_single_actor: bool = False,
+) -> Optional[list[float]]:
+    """Prefer graybox **actor location** over dress-bounds centroid (extent spikes → void poses)."""
+    actors = find_actors_by_needles(primary_needles, shot_id)
+    if prefer_single_actor and actors:
+        pt = _actor_location_xyz(actors[0])
+        meta["anchor_actor"] = actor_label(actors[0])
+        meta["anchor_point_source"] = "primary_actor_location"
+        meta["anchor_point"] = pt
+        return pt
+    if actors:
+        pt = _midpoint_xyz([_actor_location_xyz(a) for a in actors])
+        meta["anchor_actors"] = [actor_label(a) for a in actors]
+        meta["anchor_point_source"] = "primary_actors_midpoint"
+        meta["anchor_point"] = pt
+        return pt
+    fb_actors = find_actors_by_needles(fallback_needles, shot_id)
+    if fb_actors:
+        pt = _actor_location_xyz(fb_actors[0])
+        meta["anchor_actor"] = actor_label(fb_actors[0])
+        meta["anchor_point_source"] = "foundation_actor_location"
+        meta["anchor_point"] = pt
+        return pt
+    b = bounds_for_needles(fallback_needles, shot_id) or bounds_fallback
+    if bounds_sane_for_camera_pose(b):
+        meta["anchor_point_source"] = "bounds_centroid_sane"
+        meta["anchor_point"] = list(b["centroid"])
+        return list(b["centroid"])
+    meta["anchor_point_source"] = "refused_insane_bounds"
+    if b:
+        meta["anchor_bounds_refused"] = {
+            "min_z": (b.get("min") or [None, None, None])[2],
+            "extent": b.get("extent"),
+        }
+    return None
 
 
 def _clamp_camera_z_above_dress(
@@ -893,8 +982,14 @@ def _clamp_camera_pose_loc(
     margin_uu: float = SHOT_CAMERA_Z_MARGIN_UU,
     max_abs_xy: float = SHOT_POSE_MAX_ABS_XY_UU,
 ) -> "unreal.Vector":
-    """Clamp Z above dress and |X|/|Y| — raw extent math produced Z≪0 and |Y|>3000 on DESKTOP."""
-    loc = _clamp_camera_z_above_dress(loc, bounds, meta, margin_uu=margin_uu)
+    """Clamp Z above dress and |X|/|Y| — insane bounds min.z must not lift void cameras (post-#174 shot2)."""
+    bounds_ok = bounds_sane_for_camera_pose(bounds)
+    meta["clamp_bounds_sane"] = bounds_ok
+    if bounds_ok:
+        loc = _clamp_camera_z_above_dress(loc, bounds, meta, margin_uu=margin_uu)
+    if loc.z < SHOT_POSE_ABSOLUTE_MIN_Z_UU:
+        meta["camera_z_absolute_clamped"] = {"from": loc.z, "to": SHOT_POSE_ABSOLUTE_MIN_Z_UU}
+        loc = unreal.Vector(loc.x, loc.y, SHOT_POSE_ABSOLUTE_MIN_Z_UU)
     x, y, z = loc.x, loc.y, loc.z
     clamped = False
     if abs(x) > max_abs_xy:
@@ -1062,44 +1157,67 @@ def _wide_hero_anchor_pose(
     meta: dict[str, Any],
     shot: Optional[dict[str, Any]],
 ) -> tuple[Any, Any, "unreal.Vector", dict[str, Any]]:
-    anchor_b = bounds_for_needles(SHOT1_HERO_ANCHOR_NEEDLES, "shot1") or bounds_fallback
-    c = anchor_b["centroid"]
-    target = unreal.Vector(c[0], c[1], c[2] + SHOT1_LOOKAT_Z_ELEVATE_UU)
+    anchor = resolve_anchor_point(
+        shot_id="shot1",
+        primary_needles=SHOT1_HERO_ANCHOR_NEEDLES,
+        fallback_needles=SHOT1_HERO_ANCHOR_NEEDLES,
+        bounds_fallback=bounds_fallback,
+        meta=meta,
+        prefer_single_actor=False,
+    )
+    if anchor is None:
+        anchor = list(bounds_fallback.get("centroid") or [0.0, 0.0, 0.0])
+        meta["anchor_point_source"] = "bounds_fallback_last_resort"
+    ax, ay, az = anchor[0], anchor[1], anchor[2]
+    target = unreal.Vector(ax, ay, az + SHOT1_LOOKAT_Z_ELEVATE_UU)
     dx, dy, dz = SHOT1_WIDE_STANDOFF_UU
     loc = unreal.Vector(target.x + dx, target.y + dy, target.z + dz)
     meta["pose_source"] = "wide_hero_anchor"
-    meta["pose_method"] = "wide_hero_anchor_standoff_from_graybox_anchors"
+    meta["pose_method"] = "wide_hero_anchor_actor_midpoint_standoff"
     meta["anchor_needles"] = list(SHOT1_HERO_ANCHOR_NEEDLES)
     meta["standoff_uu"] = list(SHOT1_WIDE_STANDOFF_UU)
     meta["lookat_z_elevate_uu"] = SHOT1_LOOKAT_Z_ELEVATE_UU
     if shot:
         meta["doc_location_m"] = list(shot.get("fallback_location_m") or (-9.0, -4.0, 5.8))
-    loc = _clamp_camera_pose_loc(loc, anchor_b, meta)
+    clamp_b = _synthetic_anchor_bounds(anchor)
+    loc = _clamp_camera_pose_loc(loc, clamp_b, meta)
+    loc = _clamp_camera_pose_loc(loc, clamp_b, meta)
     rot = look_at_rotation(loc, target)
     meta["target_centroid"] = [target.x, target.y, target.z]
-    meta["anchor_bounds_centroid"] = c
-    return loc, rot, target, anchor_b
+    meta["camera_location"] = [loc.x, loc.y, loc.z]
+    return loc, rot, target, clamp_b
 
 
 def _wide_cabin_anchor_pose(
     bounds_fallback: dict[str, Any],
     meta: dict[str, Any],
 ) -> tuple[Any, Any, "unreal.Vector", dict[str, Any]]:
-    cabin_b = bounds_for_needles(SHOT2_CABIN_AIM_NEEDLES, "shot2") or bounds_fallback
-    c = cabin_b["centroid"]
-    target = unreal.Vector(c[0], c[1], c[2] + SHOT2_LOOKAT_Z_OFFSET_UU)
+    anchor = resolve_anchor_point(
+        shot_id="shot2",
+        primary_needles=SHOT2_CABIN_ANCHOR_NEEDLES,
+        fallback_needles=SHOT2_CABIN_FOUNDATION_FALLBACK_NEEDLES,
+        bounds_fallback=bounds_fallback,
+        meta=meta,
+        prefer_single_actor=True,
+    )
+    if anchor is None:
+        anchor = [-600.0, -100.0, 0.0]
+        meta["anchor_point_source"] = "prove_fallback_anchor_uu"
+    ax, ay, az = anchor[0], anchor[1], anchor[2]
+    target = unreal.Vector(ax, ay, az + SHOT2_LOOKAT_Z_OFFSET_UU)
     ox, oy, oz = SHOT2_WIDE_STANDOFF_UU
-    loc = unreal.Vector(c[0] + ox, c[1] + oy, c[2] + oz)
+    loc = unreal.Vector(ax + ox, ay + oy, az + oz)
     meta["pose_source"] = "wide_cabin_anchor"
-    meta["pose_method"] = "wide_cabin_anchor_standoff_look_at_cabin_elevated"
+    meta["pose_method"] = "wide_cabin_anchor_actor_location_standoff"
     meta["standoff_uu"] = list(SHOT2_WIDE_STANDOFF_UU)
     meta["lookat_z_offset_uu"] = SHOT2_LOOKAT_Z_OFFSET_UU
-    meta["aim_centroid_source"] = "cabin_only"
-    loc = _clamp_camera_pose_loc(loc, cabin_b, meta)
+    clamp_b = _synthetic_anchor_bounds(anchor)
+    loc = _clamp_camera_pose_loc(loc, clamp_b, meta)
+    loc = _clamp_camera_pose_loc(loc, clamp_b, meta)
     rot = look_at_rotation(loc, target)
     meta["target_centroid"] = [target.x, target.y, target.z]
-    meta["cabin_bounds_centroid"] = c
-    return loc, rot, target, cabin_b
+    meta["camera_location"] = [loc.x, loc.y, loc.z]
+    return loc, rot, target, clamp_b
 
 
 def _camera_pose_from_bounds(
