@@ -14,7 +14,10 @@ Every FBX written for first UE import staging. Assembly **roots** that are Empti
 | Homestead | `SM_Glider_Perch.fbx` | 15116 | SM_Glider_Perch |
 | Homestead | `SM_IslandTop.fbx` | 15676 | SM_IslandTop |
 | Homestead | `SM_Lookout_Pad.fbx` | 15116 | SM_Lookout_Pad |
-| Homestead | `SM_Pine_Homestead.fbx` | 55676 | SM_Pine_Homestead_{S,M,L}_Trunk/Foliage_* (roots Empty) |
+| Homestead | `SM_Cliff_LookoutFace.fbx` | 31772 | SM_Cliff_LookoutFace — **PA-C tranche 1** (864 tris, M_CliffRock) |
+| Homestead | `SM_Cliff_CabinFace.fbx` | 27548 | SM_Cliff_CabinFace — **PA-C tranche 1** (648 tris, M_CliffRock) |
+| Homestead | `SM_Cliff_Rear.fbx` | 25564 | SM_Cliff_Rear — **PA-C tranche 1** (540 tris, M_CliffRock) |
+| Homestead | `SM_Pine_Homestead.fbx` | 55612 | SM_Pine_Homestead_{S,M,L}_Trunk/Foliage_* — **PA-C upgrade** (472 tris; foliage Z-stack fix) |
 | Forest | `SM_Planet_GroundPlate.fbx` | 15148 | SM_Planet_GroundPlate |
 | Forest | `SM_Roof_Hamlet.fbx` | 35100 | SM_Roof_Hamlet_0{1,2,3}_Body/PitchA/PitchB |
 | Forest | `SM_Shrine_Return.fbx` | 29036 | Base/Posts/Lintel/Glow + UCX_SM_Shrine_Return (root Empty) |
@@ -24,8 +27,10 @@ Every FBX written for first UE import staging. Assembly **roots** that are Empti
 | Gatherables | `SM_Shrine_Homestead.fbx` | 29036 | Base/Posts/Lintel/PortalGlow + UCX_SM_Shrine_Homestead (root Empty) |
 | Transit | `SM_Islets.fbx` | 35580 | SM_Islet_0{1,2,3}_Body/Top/Torn (roots Empty) |
 
-**FBX count:** 13  
-**Total bytes:** 425644  
+**FBX count:** 16  
+**Total bytes:** 510464  
+
+**PA-C tranche 1 (2026-09-22 ET):** three cliff assemblies + pine upgrade-in-place. Cliff UE place at graybox origins — see [PA_C_TRANCHE1.md](../../Docs/handoffs/PA_C_TRANCHE1.md).
 
 ## Sidecar
 

@@ -9300,3 +9300,11 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 **Pending:** PA-C Blender queue on DESKTOP (cliffs first).
 
 **Errors:** None.
+
+## 2026-09-22 — PA-C tranche-1 cliffs + pine (cloud land)
+
+**Completed:** Lead **`APPROVE PA-C`**, 2026-09-22 ET — unpacked tranche-1 tarball; byte-copied four FBX to `AssetCreation/Exports/Homestead/`; stamped Docs/32, PA_C_BLENDER + PA_C_TRANCHE1 handoffs, MVP_EXPORT_MANIFEST, DECISIONS, PHASE_BOARD, Docs/README, SESSION_SUMMARY. Tris: Lookout 864, Cabin 648, Rear 540, Pine 472.
+
+**Pending:** PA-C tranche 2+ (cabin, path, planters, fence, glider, optional rim); PA-D import on DESKTOP.
+
+**Errors:** None.
