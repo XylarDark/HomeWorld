@@ -2,6 +2,8 @@
 
 **P0 (this PR):** Blocking Arrange gate before PA-E capture Act/Assert.
 
+**Habit:** Lead-correction → harness — proven misses (e.g. assert before Arrange, speckle false PASS) land as **code gates + one policy row** in [CAPTURE_REDUNDANCY.md](CAPTURE_REDUNDANCY.md) / [automation-standards.mdc](../../.cursor/rules/automation-standards.mdc); no chat-only checklist.
+
 | ID | Task | Status |
 |----|------|--------|
 | P0-1 | Shared gate API `arrange_pa_e_shotlist` / `assert_environment_ready` in `pa_e_shotlist_common.py` | Done (PR) |

@@ -49,6 +49,7 @@ When `ready: false`, scripts write `Saved/pa_e_capture_report.json` with **`prov
 | 2 | **Proven-results first** | Patterns that already work for others (docs + community/industry) before custom ladders, long blocking waits, or novel stacks. |
 | 3 | **Research on dead-ends** | After rung-1 hardening **fails with evidence**, one proactive **public** research pass (forums, issues, known bugs) — record in gap research log — **before** recommending SCOUT/BUILD or bouncing the question to Lead. |
 | 4 | **Gated redundancy ladder** | Rung 1 built-in / in-repo → **`APPROVE TOOL SCOUT`** → **`APPROVE TOOL BUILD`**; **no auto-install**; no unprompted new frameworks. |
+| 5 | **Lead-correction → harness** | Proven Lead corrections become **blocking gates / `PROVE_CRITERIA` in code** in the same PR window — compact thresholds, not chat-only checklists. Examples: Arrange before assert; wrong stills ⇒ fix gate + setup (do not move on); global mean alone insufficient (center crop, non-black fraction, shot uniqueness). |
 
 Details below. Rung gates unchanged from prior Lead lock-in.
 

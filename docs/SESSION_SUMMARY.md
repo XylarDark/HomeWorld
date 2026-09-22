@@ -1,6 +1,6 @@
 ## 2026-09-22 — PA-E assert harden + Arrange aim_bounds (cloud, post-#170)
 
-- DESKTOP after **#170**: **`capture_pass: true`** with global mean ~8.7 but ~93% black pixels (center ~0); Shot1 ≈ Shot2 scrap on frame edge. **Fix:** [pa_e_shotlist_common.py](../Content/Python/pa_e_shotlist_common.py) — center-crop + L&gt;8/L&gt;1 fractions + shot-pair MSE/hash; per-shot **`aim_bounds`** (exclude edge Fence/Rock), ray vs dress AABB in Arrange; MRQ **`reapply_night_environment_for_mrq_shot`** per job. Viewport `_validate_png` delegates to shared assert. KNOWN_ERRORS + CAPTURE_REDUNDANCY + HARNESS_ARRANGE P0-6/7. Gap **OPEN** — DESKTOP should see **`capture_pass: false`** until lit homestead framing.
+- DESKTOP after **#170**: **`capture_pass: true`** with global mean ~8.7 but ~93% black pixels (center ~0); Shot1 ≈ Shot2 scrap on frame edge. **Fix:** [pa_e_shotlist_common.py](../Content/Python/pa_e_shotlist_common.py) — center-crop + L&gt;8/L&gt;1 fractions + shot-pair MSE/hash; per-shot **`aim_bounds`** (exclude edge Fence/Rock), ray vs dress AABB in Arrange; MRQ **`reapply_night_environment_for_mrq_shot`** per job. Viewport `_validate_png` delegates to shared assert. KNOWN_ERRORS + CAPTURE_REDUNDANCY + HARNESS_ARRANGE P0-6/7. **Policy:** Lead-correction → harness (compact gates in-repo, CAPTURE_REDUNDANCY practice #5). Gap **OPEN** — DESKTOP should see **`capture_pass: false`** until lit homestead framing.
 
 ## 2026-09-22 — PA-E MRQ shot sequencing + luminance without Editor PIL (cloud)
 
