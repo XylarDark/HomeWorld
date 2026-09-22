@@ -1,3 +1,7 @@
+## 2026-09-22 — PA-E DESKTOP prove miss log (token-lean KNOWN_ERRORS)
+
+- Lead practice: log **Cause → Symptom → Avoid** along the way. Added five DESKTOP prove rows (wrong world vs `level_path`, Unreal API on daemon thread, MCP disconnect vs Editor alive, post-#172 scrap-framing despite relocate/ray, dirty `pa_e_shotlist_common.py` vs merge) + **along-the-way** rule in [automation-standards.mdc](../.cursor/rules/automation-standards.mdc) v1.8 and [CAPTURE_REDUNDANCY.md](Automation/CAPTURE_REDUNDANCY.md).
+
 ## 2026-09-22 — PA-E Arrange bounds relocate + cliff exclude (cloud)
 
 - Post-#171 DESKTOP: Arrange **`in_level_camera_aim_at_bounds`** only (wrong **Y** vs P6_FIX doc; cliff actors poisoned centroid). **Fix:** [pa_e_shotlist_common.py](../Content/Python/pa_e_shotlist_common.py) — **`homestead_bounds_relocate`** / doc fallback **`set_actor_location`**; exclude **Cliff** from aim needles; **`aim_ok`** requires **`forward_ray_hits_dress_aabb`**. KNOWN_ERRORS + CAPTURE_REDUNDANCY + HARNESS P0-8. Gap **OPEN** — DESKTOP re-prove framing.
