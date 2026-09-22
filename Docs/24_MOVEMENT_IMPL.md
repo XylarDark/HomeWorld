@@ -90,4 +90,4 @@ Docs/24 Movement: MV STRATEGY APPROVED — MV-A IN PROGRESS
 
 PoE-scale procgen, spirit flight, full parkour kit, swim, second CMC, free-flight upgrade of FALLBACK — **do not implement** without a new Lead track.
 
-**Future (Lead design note, not MV-A):** night spirit **stealth** + **spirit torches** that light the spirit world and can reveal/find the player — separate DAYNIGHT/MOVEMENT bible amend; no torch detection, stealth meters, or fail loops in MV-A.
+**Future (not MV-A):** spirit stealth + spirit torches — locked in [SPIRIT_STEALTH_BIBLE.md](SPIRIT_STEALTH_BIBLE.md) (**SS-A** later); MV-A does not implement torch detection, stealth meters, shadow volumes, or found-out fail loops.
