@@ -1,3 +1,7 @@
+## 2026-09-22 — PA-D APPROVED (docs stamp, cloud)
+
+- Lead **`APPROVE PA-D`**, 2026-09-22 ET → [Docs/32_PROTOTYPE_ASSETS.md](../Docs/32_PROTOTYPE_ASSETS.md) **PA-D IN PROGRESS**; [Docs/handoffs/PA_D_IMPORT_PLACE.md](../Docs/handoffs/PA_D_IMPORT_PLACE.md) **APPROVED** (awaiting DESKTOP evidence). `DECISIONS.md` + `PHASE_BOARD` + `Docs/README` minimal update. **No `.uasset`**. PA track **not CLOSED** (PA-E locked).
+
 ## 2026-09-22 — PA-C tranche-2 land (cloud)
 
 - Tranche-2 FBX in `AssetCreation/Exports/Homestead/`: upgraded `SM_Cabin.fbx`, `SM_Glider_Perch.fbx`; new path stones ×3, planters ×3, `SM_Garden_Fence_Seg.fbx`. [Docs/handoffs/PA_C_TRANCHE2.md](../Docs/handoffs/PA_C_TRANCHE2.md) · [PA_C_BLENDER.md](../Docs/handoffs/PA_C_BLENDER.md). **Docs/32** tranche-2 **DONE**; **PA-D OPEN** (no Lead **`APPROVE PA-D`**). No `.uasset`. PA track **not CLOSED** (optional island rim).
