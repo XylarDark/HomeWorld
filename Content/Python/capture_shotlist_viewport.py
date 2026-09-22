@@ -2,7 +2,9 @@
 
 **Primary (DESKTOP prove):** [capture_shotlist.py](capture_shotlist.py) /
 [capture_shotlist_mrq.py](capture_shotlist_mrq.py) — Movie Render Queue one-frame.
-This script remains for AL + Slate pre-tick diagnostics after post-#166 near-black PNGs.
+This script is **diagnostic** for the **OPEN** AutomationLibrary viewport capture bug
+(near-black PNG while Lead sees lit homestead when rotating viewport — wrong pose /
+game-view / pilot / buffer, not missing content).
 
 Loads L_VS_MVP_Markers, poses level viewport for Shot 1 (lookout) and Shot 2
 (cabin/garden), lit + game view, then **AutomationLibrary.take_high_res_screenshot**

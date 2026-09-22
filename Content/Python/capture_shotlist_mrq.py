@@ -5,6 +5,11 @@ Loads L_VS_MVP_Markers, ensures minimal Level Sequences under
 may save tiny .uasset binaries locally), queues MRQ jobs with custom one-frame
 playback range, PNG deferred pass, async PIE executor + Slate pre-tick wait.
 
+Near-black AutomationLibrary stills are an **OPEN viewport capture bug** (wrong pose /
+game-view / pilot / empty buffer) — scene content is visible to Lead in Editor;
+MRQ must frame the same in-level **CAM_Hero** / **CAM_CabinClose** with deferred
+lit pass + warm-up. PASS requires **lit homestead** stills, not file-exists-only.
+
 Policy: [docs/Automation/CAPTURE_REDUNDANCY.md](docs/Automation/CAPTURE_REDUNDANCY.md)
 Primary entry: capture_shotlist.py or this script via MCP
 execute_python_script("capture_shotlist_mrq.py").
@@ -145,6 +150,19 @@ class _MrqOrchestrator:
         cam = common.find_camera(shot["camera_labels"])
         loc, rot, pose_meta = common.resolve_camera_transform(shot, cam)
         pose_meta["fallback_source"] = shot.get("fallback_source")
+        prep = common.apply_lit_game_view_for_capture()
+        finish = common.finish_loading_before_capture()
+        viewport_diag = common.sync_editor_viewport_to_camera(cam, loc, rot)
+        pose_meta["editor_prep"] = {
+            "lit_game_view": prep,
+            "finish_loading": finish,
+            "viewport_sync": viewport_diag,
+        }
+        if cam:
+            pose_meta["in_level_camera"] = common.actor_label(cam)
+        else:
+            pose_meta["in_level_camera"] = None
+            pose_meta["warning"] = "no CAM_* actor — using fallback transform; verify vs Lead-visible framing"
         sequence, seq_meta = _ensure_shot_level_sequence(shot, cam, loc, rot)
         self._sequence_meta = {**seq_meta, "pose": pose_meta, "purge_before_capture": purge}
         if sequence is None:
@@ -297,10 +315,22 @@ class _MrqOrchestrator:
             "shots": self.results,
             "driver_error": self._driver_error,
             "policy": (
-                "Movie Render Queue one-frame PNG (PIE executor); Slate pre-tick wait; "
-                "AutomationLibrary pretick retired as PASS path after post-#166 black frames; "
-                "does not claim shotlist PASS — verify on DESKTOP"
+                "Movie Render Queue one-frame PNG (PIE executor, deferred lit pass, warm-up); "
+                "PASS = lit homestead visible (luminance gate), not file-exists-only; "
+                "AL near-black = OPEN viewport capture bug (wrong buffer/pose/game-view)"
             ),
+            "prove_criteria": common.PROVE_CRITERIA,
+            "desktop_conductor_checklist": common.desktop_conductor_checklist(),
+            "al_viewport_capture_bug": {
+                "status": "OPEN",
+                "symptom": "AutomationLibrary/HighResShot PNG on disk but near-black while Lead sees scene when rotating viewport",
+                "likely_causes": [
+                    "wrong viewport game-view or unlit buffer",
+                    "camera pilot / pose mismatch vs CAM_Hero / CAM_CabinClose",
+                    "HighResShot not bound to shot camera",
+                ],
+                "diagnostic_script": "capture_shotlist_viewport.py",
+            },
             "epic_refs": [
                 "https://dev.epicgames.com/documentation/en-us/unreal-engine/python-api/class/MoviePipelineQueueSubsystem?application_version=5.7",
                 "https://dev.epicgames.com/documentation/en-us/unreal-engine/python-api/class/MoviePipelineOutputSetting?application_version=5.7",
@@ -495,19 +525,36 @@ def _rebuild_camera_cut(sequence, camera_actor, meta: dict[str, Any]) -> None:
         if cut_track is None:
             cut_track = ext_seq.add_track(sequence, unreal.MovieSceneCameraCutTrack)
 
-    bindings = ext_seq.get_bindings(sequence)
-    if bindings:
-        binding = bindings[0]
-        meta["reused_binding"] = True
-    else:
-        binding = ext_seq.add_possessable(sequence, camera_actor)
-        meta["new_binding"] = True
+    binding = _resolve_possessable_binding(ext_seq, sequence, camera_actor, meta)
     binding_id = ext_seq.get_binding_id(sequence, binding)
     section = ext_track.add_section(cut_track)
-    ext_section.set_range(section, 0, 1)
+    preroll = common.MRQ_CAMERA_CUT_PREROLL_FRAME
+    ext_section.set_range(section, preroll, 1)
     section.set_editor_property("camera_binding_id", binding_id)
     meta["camera_binding_id"] = str(binding_id)
+    meta["camera_cut_range"] = [preroll, 1]
     meta["camera_cut_track"] = True
+    meta["possessable_actor"] = common.actor_label(camera_actor)
+
+
+def _resolve_possessable_binding(ext_seq, sequence, camera_actor, meta: dict[str, Any]):
+    label = common.actor_label(camera_actor)
+    find_by_name = getattr(ext_seq, "find_binding_by_name", None)
+    if callable(find_by_name):
+        try:
+            found = find_by_name(sequence, label)
+            if found is not None:
+                meta["binding_match"] = "find_binding_by_name"
+                return found
+        except Exception as e:
+            meta["find_binding_by_name_error"] = str(e)
+    bindings = ext_seq.get_bindings(sequence)
+    if len(bindings) == 1:
+        meta["binding_match"] = "single_existing_binding"
+        return bindings[0]
+    binding = ext_seq.add_possessable(sequence, camera_actor)
+    meta["binding_match"] = "add_possessable"
+    return binding
 
 
 def _clear_queue(queue) -> None:
@@ -568,8 +615,12 @@ def _queue_one_frame_job(
     )
     png_cls, png_name = _resolve_class("MoviePipelineImageSequenceOutput_PNG")
     if deferred_cls:
-        cfg.find_or_add_setting_by_class(deferred_cls)
+        deferred = cfg.find_or_add_setting_by_class(deferred_cls)
         meta["deferred_pass"] = deferred_name
+        try:
+            deferred.set_is_enabled(True)
+        except Exception:
+            pass
     else:
         meta["deferred_pass"] = "missing"
     if png_cls:
@@ -594,6 +645,23 @@ def _queue_one_frame_job(
         pass
     meta["custom_playback_range"] = [CUSTOM_START, CUSTOM_END]
     meta["resolution"] = [common.RES_X, common.RES_Y]
+
+    aa_cls = getattr(unreal, "MoviePipelineAntiAliasingSetting", None)
+    if aa_cls is not None:
+        try:
+            aa = cfg.find_or_add_setting_by_class(aa_cls)
+            aa.engine_warm_up_count = common.MRQ_ENGINE_WARMUP_COUNT
+            aa.render_warm_up_count = common.MRQ_RENDER_WARMUP_COUNT
+            aa.render_warm_up_frames = True
+            aa.use_camera_cut_for_warm_up = True
+            meta["anti_aliasing_warmup"] = {
+                "engine_warm_up_count": common.MRQ_ENGINE_WARMUP_COUNT,
+                "render_warm_up_count": common.MRQ_RENDER_WARMUP_COUNT,
+                "render_warm_up_frames": True,
+                "use_camera_cut_for_warm_up": True,
+            }
+        except Exception as e:
+            meta["anti_aliasing_warmup_error"] = str(e)
     return True, meta
 
 
@@ -622,6 +690,11 @@ def _set_night_phase(viewport_prep: dict[str, Any]) -> None:
         viewport_prep["night_phase"] = "skipped"
 
 
+def _apply_mrq_scene_prep(viewport_prep: dict[str, Any]) -> None:
+    viewport_prep["finish_loading"] = common.finish_loading_before_capture()
+    viewport_prep.update(common.apply_lit_game_view_for_capture())
+
+
 def main() -> None:
     _log("started")
     keep_ok = False
@@ -638,6 +711,7 @@ def main() -> None:
     level_ok = common.load_level(PREFIX)
     viewport_prep: dict[str, Any] = {}
     _set_night_phase(viewport_prep)
+    _apply_mrq_scene_prep(viewport_prep)
 
     if not mrq_ok:
         report = {
@@ -648,6 +722,8 @@ def main() -> None:
             "mrq_probe": mrq_probe,
             "level_loaded": level_ok,
             "keep_python_script_alive": keep_ok,
+            "prove_criteria": common.PROVE_CRITERIA,
+            "desktop_conductor_checklist": common.desktop_conductor_checklist(),
             "shots": [],
             "policy": "Enable MovieRenderPipeline + MovieRenderPipelineEditor in HomeWorld.uproject then Safe-Build",
         }

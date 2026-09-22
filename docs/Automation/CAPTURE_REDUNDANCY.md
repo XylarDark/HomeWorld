@@ -140,8 +140,8 @@ Formal stills for [Docs/00_SHOTLIST.md](../../Docs/00_SHOTLIST.md), PA-E evidenc
 
 | Item | Notes |
 |------|--------|
-| **`AutomationLibrary.take_high_res_screenshot`** + **Slate pre-tick wait** | **Retired as shotlist PASS primary (post-#166 DESKTOP)** — pretick responsive but **near-black** PNGs (Shot1 mean luminance ~0, Shot2 ~0.3) despite file write; kept as **diagnostic** in [capture_shotlist_viewport.py](../../Content/Python/capture_shotlist_viewport.py). Report `primary_path: automation_library_slate_pretick`. |
-| **Movie Render Queue (MRQ) one-frame still** | **Primary (canonical, Lead-approved post-#166)** — [capture_shotlist.py](../../Content/Python/capture_shotlist.py) → [capture_shotlist_mrq.py](../../Content/Python/capture_shotlist_mrq.py): `MoviePipelineQueueSubsystem`, custom playback range (one frame), deferred PNG pass, `MoviePipelinePIEExecutor`, Slate pre-tick + executor delegate + keep_alive. Level Sequences under `/Game/HomeWorld/Cinematics/PA_E/` (runtime create-if-missing). Plugins: **MovieRenderPipeline**, **MovieRenderPipelineEditor**, **SequencerScripting** in `HomeWorld.uproject`. **Gap OPEN** until DESKTOP re-prove. Epic: [MoviePipelineQueueSubsystem Python](https://dev.epicgames.com/documentation/en-us/unreal-engine/python-api/class/MoviePipelineQueueSubsystem?application_version=5.7), [MoviePipelineOutputSetting](https://dev.epicgames.com/documentation/en-us/unreal-engine/python-api/class/MoviePipelineOutputSetting?application_version=5.7). |
+| **`AutomationLibrary.take_high_res_screenshot`** + **Slate pre-tick wait** | **OPEN bug — viewport capture path (not PASS primary).** Pretick can write PNGs that are **near-black** while Lead **sees lit homestead** when rotating the viewport → wrong **pose / game-view / camera pilot / HighResShot buffer**, not absent content. Diagnostic: [capture_shotlist_viewport.py](../../Content/Python/capture_shotlist_viewport.py). Quality bar unchanged: **lit non-black** stills required. |
+| **Movie Render Queue (MRQ) one-frame still** | **Primary (canonical).** [capture_shotlist.py](../../Content/Python/capture_shotlist.py) → [capture_shotlist_mrq.py](../../Content/Python/capture_shotlist_mrq.py): in-level **CAM_Hero** / **CAM_CabinClose** possessable + camera-cut (with preroll for warm-up), **deferred lit** PNG pass, `MoviePipelineAntiAliasingSetting` engine/GPU warm-up, `MoviePipelinePIEExecutor`, Slate pre-tick + keep_alive. **PASS** = luminance + bytes gates + visible homestead — **not** file-exists-only. Plugins: **MovieRenderPipeline**, **MovieRenderPipelineEditor**, **SequencerScripting**. **Gap OPEN** until DESKTOP re-prove. |
 | Console **`HighResShot`** multi-form ladder | **Retired as shotlist primary** — post-#161 DESKTOP burned ~30+ min on five forms × **330s** waits (incl. after immediate **`Bad input`**). Epic doc order still valid for ad-hoc console use; not the canonical shotlist script path. [Taking Screenshots](https://dev.epicgames.com/documentation/en-us/unreal-engine/taking-screenshots-in-unreal-engine) |
 | `AutomationLibrary.set_editor_viewport_view_mode` (Lit) | Preferred over console `viewmode lit` when exposed |
 | Viewport focus (best-effort) | LevelEditorSubsystem / UnrealEditorSubsystem APIs when present; console **`FOCUSVIEWPORT`** / **`focus`** — **undocumented / unverified** (no Epic console doc); do not invent new console aliases |
@@ -203,6 +203,17 @@ Examples **not** in current PR scope:
 | 2026-09-22 | `Rotator` positional mis-pose | [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) — keyword `pitch` / `yaw` / `roll` |
 | 2026-09-22 | **post-#163** AL primary + MCP blocking wait → Not Responding, no PNG/report | [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) · [DEFECT_PA_E_shot_capture_automation.md](../../Docs/qa/DEFECT_PA_E_shot_capture_automation.md) · AUTOMATION_GAPS research log |
 
-**Track status:** Lead **`APPROVE PA-E`** closed Docs/32; formal Shot 1/2 stills **deferred/accepted**. Automation gap **OPEN** until DESKTOP proves **MRQ one-frame** script ([capture_shotlist.py](../../Content/Python/capture_shotlist.py)) + report with **lit non-black** stills (post-#166 AL pretick wrote black/near-black PNGs — not PASS).
+**Track status:** Lead **`APPROVE PA-E`** closed Docs/32; formal Shot 1/2 stills **deferred/accepted**. Automation gap **OPEN** until DESKTOP proves **MRQ one-frame** ([capture_shotlist.py](../../Content/Python/capture_shotlist.py)) with **lit non-black homestead** stills (mean luminance ≥ gate). **Separate OPEN bug:** AL/HighResShot near-black while viewport shows content — fix pose/game-view/pilot/buffer; do **not** lower quality targets.
+
+### DESKTOP prove bar (non-negotiable)
+
+| Requirement | Not sufficient |
+|-------------|----------------|
+| Both `Shot1_lookout.png` + `Shot2_cabin_garden.png` under `Saved/Screenshots/PA_E/` | PNG exists but near-black |
+| `Saved/pa_e_capture_report.json` **`ok: true`** | `ok: false` or missing luminance |
+| Mean luminance ≥ **8** (0–255 scale) per shot | “File wrote so PASS” |
+| Lead-visible homestead framing (CAM_Hero / CAM_CabinClose) | Empty/unlit capture buffer |
+
+Report includes **`prove_criteria`** and **`desktop_conductor_checklist`** from [capture_shotlist_mrq.py](../../Content/Python/capture_shotlist_mrq.py).
 
 **Poses:** [P6_FIX_shot1.md](../../Docs/handoffs/P6_FIX_shot1.md) · [CAM_Hero.md](../../Lib/00_Core/CAM_Hero.md) · [00_SHOTLIST.md](../../Docs/00_SHOTLIST.md).

@@ -35,7 +35,7 @@ After **#163** merged @ **`d0d074d`**, MCP **`execute_python_script("capture_sho
 
 ## Incident — 2026-09-22 ET post-#166 (DESKTOP prove, document only)
 
-After **#166** @ **`ee32888`**, MCP **`capture_shotlist_viewport.py`** (AL + Slate pretick): Editor **Responding**; report **`ok: false`** — Shot1 ~38KB **mean luminance ~0**, Shot2 ~143KB **mean ~0.3** (**near_black** / failed luminance gates). Pretick path is **not** shotlist PASS. **Next rung 1:** [capture_shotlist.py](../../Content/Python/capture_shotlist.py) → MRQ one-frame ([CAPTURE_REDUNDANCY.md](../../docs/Automation/CAPTURE_REDUNDANCY.md)). Defect **OPEN**.
+After **#166** @ **`ee32888`**, MCP **`capture_shotlist_viewport.py`** (AL + Slate pretick): Editor **Responding**; report **`ok: false`** — near-black PNGs (luminance gates fail). **Lead (in Editor):** rotating viewport shows **lit homestead** — near-black stills are **wrong capture binding** (pose / game-view / pilot / empty buffer), **not** absent content. **Next:** MRQ primary [capture_shotlist.py](../../Content/Python/capture_shotlist.py); keep AL bug **OPEN** for fix/diagnostic. Defect **OPEN** until **lit non-black** stills (not file-exists-only).
 
 ## Policy
 

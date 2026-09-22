@@ -22,6 +22,21 @@ MIN_MEAN_LUMINANCE = 8.0
 DESKTOP_PA_E = r"C:\Users\User\Desktop\HomeWorld_PA_E"
 ONE_FRAME_START = 0
 ONE_FRAME_END = 1
+# MRQ warm-up (Epic MoviePipelineAntiAliasingSetting — engine + GPU discard frames)
+MRQ_ENGINE_WARMUP_COUNT = 32
+MRQ_RENDER_WARMUP_COUNT = 8
+MRQ_CAMERA_CUT_PREROLL_FRAME = -32
+
+PROVE_CRITERIA = {
+    "requires_lit_homestead_visible": True,
+    "min_bytes": MIN_BYTES,
+    "min_mean_luminance": MIN_MEAN_LUMINANCE,
+    "file_exists_alone_is_not_pass": True,
+    "note": (
+        "Lead-visible scene content in Editor must appear in stills; near-black PNGs "
+        "indicate wrong pose/game-view/buffer/camera binding, not missing level content."
+    ),
+}
 
 SHOTS = (
     {
@@ -248,3 +263,98 @@ def resolve_camera_transform(shot: dict, cam) -> tuple[Any, Any, dict[str, Any]]
 def ensure_cinematics_folder() -> None:
     if not unreal.EditorAssetLibrary.does_directory_exist(CINEMATICS_PA_E_DIR):
         unreal.EditorAssetLibrary.make_directory(CINEMATICS_PA_E_DIR)
+
+
+def desktop_conductor_checklist() -> list[str]:
+    """Checks Conductor runs on DESKTOP when capture fails or MRQ plugins block."""
+    return [
+        "Safe-Build after MovieRenderPipeline plugins; confirm MRQ Python types import.",
+        "Open L_VS_MVP_Markers; rotate viewport — Lead must see homestead geometry/lighting.",
+        "Select CAM_Hero / CAM_CabinClose; confirm framing matches Shot 1/2 before capture.",
+        "Run execute_python_script('capture_shotlist.py'); read Saved/pa_e_capture_report.json.",
+        "If AL diagnostic (capture_shotlist_viewport.py) still near-black: OPEN viewport capture bug — wrong game-view, pilot, or HighResShot buffer — not 'no content'.",
+        "PASS only when both PNGs pass bytes + mean_luminance gates and show lit homestead (not empty/unlit buffer).",
+    ]
+
+
+def finish_loading_before_capture() -> dict[str, Any]:
+    meta: dict[str, Any] = {"called": False}
+    try:
+        fn = getattr(unreal.AutomationLibrary, "finish_loading_before_screenshot", None)
+        if callable(fn):
+            fn()
+            meta["called"] = True
+    except Exception as e:
+        meta["error"] = str(e)
+    return meta
+
+
+def apply_lit_game_view_for_capture() -> dict[str, Any]:
+    """Align editor with lit + game view before MRQ/AL (same intent as viewport script)."""
+    applied: dict[str, Any] = {}
+    lit_method: Optional[str] = None
+    try:
+        set_vm = getattr(unreal.AutomationLibrary, "set_editor_viewport_view_mode", None)
+        if callable(set_vm):
+            mode = getattr(unreal, "ViewModeIndex", None)
+            if mode is not None and hasattr(mode, "VMI_LIT"):
+                set_vm(mode.VMI_LIT)
+                lit_method = "AutomationLibrary.set_editor_viewport_view_mode(VMI_LIT)"
+    except Exception as e:
+        applied["automation_view_mode_error"] = str(e)
+    if not lit_method:
+        try:
+            unreal.SystemLibrary.execute_console_command(None, "viewmode lit")
+            lit_method = "console_viewmode_lit"
+        except Exception as e:
+            applied["viewmode_error"] = str(e)
+    applied["viewmode"] = lit_method or "unknown"
+
+    game_view = False
+    try:
+        ues = unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem)
+        if ues and hasattr(ues, "editor_set_game_view"):
+            ues.editor_set_game_view(True)
+            game_view = True
+            applied["game_view_method"] = "UnrealEditorSubsystem.editor_set_game_view"
+    except Exception as e:
+        applied["game_view_error"] = str(e)
+    if not game_view:
+        try:
+            unreal.SystemLibrary.execute_console_command(None, "gameview")
+            game_view = True
+            applied["game_view_method"] = "console_gameview"
+        except Exception:
+            pass
+    applied["game_view"] = game_view
+    return applied
+
+
+def sync_editor_viewport_to_camera(cam, loc, rot) -> dict[str, Any]:
+    """Pose editor viewport to shot camera (diagnostic — Lead-visible framing check)."""
+    meta: dict[str, Any] = {"viewport_set": False, "pilot": False}
+    try:
+        ues = unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem)
+        if ues and hasattr(ues, "set_level_viewport_camera_info"):
+            ues.set_level_viewport_camera_info(loc, rot)
+            meta["viewport_set"] = True
+            meta["viewport_api"] = "UnrealEditorSubsystem.set_level_viewport_camera_info"
+    except Exception as e:
+        meta["viewport_ues_error"] = str(e)
+    if not meta["viewport_set"]:
+        try:
+            unreal.EditorLevelLibrary.set_level_viewport_camera_info(loc, rot)
+            meta["viewport_set"] = True
+            meta["viewport_api"] = "EditorLevelLibrary.set_level_viewport_camera_info"
+        except Exception as e:
+            meta["viewport_error"] = str(e)
+    if cam:
+        try:
+            unreal.EditorLevelLibrary.pilot_level_actor(cam)
+            meta["pilot"] = True
+            meta["pilot_label"] = actor_label(cam)
+        except Exception as e:
+            meta["pilot_error"] = str(e)
+    meta["location"] = [loc.x, loc.y, loc.z]
+    meta["rotation"] = [rot.pitch, rot.yaw, rot.roll]
+    return meta
