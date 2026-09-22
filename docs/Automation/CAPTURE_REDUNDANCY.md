@@ -24,6 +24,8 @@ Applies to **all** tooling gaps on this ladder (not only capture).
 
 **Motivating miss (2026-09-22):** Automation issued `HighResShot 1920x1080 filename="…"` without a docs-first check; Epic documents **`filename=` before dimensions**.
 
+**Undocumented console strings:** If Epic docs do not cover a string the repo uses (e.g. **`FOCUSVIEWPORT`** / **`focus`** for viewport focus), log in [AUTOMATION_GAPS.md](AUTOMATION_GAPS.md) and prefer Editor subsystem APIs when exposed — do not invent new console aliases.
+
 ---
 
 ### Rung 1 — Built-in / already-in-repo (no gate)
@@ -85,14 +87,19 @@ Formal stills for [Docs/00_SHOTLIST.md](../../Docs/00_SHOTLIST.md), PA-E evidenc
 
 | Item | Notes |
 |------|--------|
-| Console **`HighResShot`** via `execute_console_command` (absolute `filename=`) | **Primary** in [capture_shotlist_viewport.py](../../Content/Python/capture_shotlist_viewport.py); viewport focus + pump before capture |
-| `unreal.AutomationLibrary.take_high_res_screenshot(..., force_game_view=True)` | **Fallback** if console wait finds no fresh PNG; AutomationEditorTask may stall on some DESKTOP runs |
+| Console **`HighResShot`** via `execute_console_command` | **Primary** — doc order **`HighResShot filename=<abs forward-slash path> 1920x1080`** first; one form per tick, **wait up to ~330s for PNG** before next form (Epic: global one-request flag). Search `Saved/Screenshots/PA_E/`, **`Windows`**, **`WindowsEditor`**, Engine Win64. [Taking Screenshots](https://dev.epicgames.com/documentation/en-us/unreal-engine/taking-screenshots-in-unreal-engine) |
+| `AutomationLibrary.take_high_res_screenshot(..., delay≈0.35, force_game_view=True)` | **Fallback** after console ladder misses; call **`finish_loading_before_screenshot()`** first; **`is_task_done()` false is non-fatal** while file wait continues |
+| `AutomationLibrary.set_editor_viewport_view_mode` (Lit) | Preferred over console `viewmode lit` when exposed |
+| Viewport focus (best-effort) | LevelEditorSubsystem / UnrealEditorSubsystem APIs when present; console **`FOCUSVIEWPORT`** / **`focus`** — **undocumented / unverified** (no Epic console doc); do not invent new console aliases |
 | `EditorPythonScripting.set_keep_python_script_alive(True)` | [vnp_editor_keep_alive.py](../../Content/Python/vnp_editor_keep_alive.py) |
-| Lit + game view | `viewmode lit`; `UnrealEditorSubsystem.editor_set_game_view(True)` when exposed |
+| Lit + game view | AutomationLibrary Lit when exposed; else `viewmode lit`; `UnrealEditorSubsystem.editor_set_game_view(True)` when exposed |
+| Inter-shot spacing | Extra Slate tick settle between Shot 1 and Shot 2 so HighResShot requests are not stomped |
 | **Canonical script** | [capture_shotlist_viewport.py](../../Content/Python/capture_shotlist_viewport.py) → `Saved/Screenshots/PA_E/`, `Saved/pa_e_capture_report.json`, copy to `C:/Users/User/Desktop/HomeWorld_PA_E/` |
 | **Utility** | [capture_viewport.py](../../Content/Python/capture_viewport.py) |
 
-Epic: [Scripting the Unreal Editor Using Python](https://dev.epicgames.com/documentation/en-us/unreal-engine/scripting-the-unreal-editor-using-python) · [FULL_AUTOMATION_RESEARCH.md](FULL_AUTOMATION_RESEARCH.md) §10b.
+Epic: [Taking Screenshots](https://dev.epicgames.com/documentation/en-us/unreal-engine/taking-screenshots-in-unreal-engine) · [Scripting the Unreal Editor Using Python](https://dev.epicgames.com/documentation/en-us/unreal-engine/scripting-the-unreal-editor-using-python) · [FULL_AUTOMATION_RESEARCH.md](FULL_AUTOMATION_RESEARCH.md) §10b.
+
+**Wait race (DESKTOP 2026-09-22):** Shot2 PNG appeared ~268s after AutomationLibrary invoke while an earlier 120s script timeout had already given up — rung-1 scripts now use **330s file-first wait** and treat AutomationEditorTask stall as non-fatal until the wait ends.
 
 ### Rung 2 — SCOUT backlog only (not installed; needs `APPROVE TOOL SCOUT`)
 

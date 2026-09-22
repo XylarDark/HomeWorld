@@ -9400,3 +9400,11 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 **Pending:** DESKTOP re-run; confirm `file_produced_by` and both shots pass in `Saved/pa_e_capture_report.json`.
 
 **Errors:** None (cloud; no UE prove).
+
+## 2026-09-22 — Epic doc-aligned capture scripts (cloud)
+
+**Completed:** Align `capture_shotlist_viewport.py` and `capture_viewport.py` with Epic Taking Screenshots + AutomationLibrary (doc-ordered HighResShot, 330s file wait, finish_loading, delay, view mode API). Updated CAPTURE_REDUNDANCY, KNOWN_ERRORS, AUTOMATION_GAPS, DEFECT_PA_E.
+
+**Pending:** DESKTOP re-prove PA-E capture report.
+
+**Errors:** None (cloud; no UE prove).
