@@ -1,3 +1,8 @@
+## 2026-09-22 — PA-E P0.2/P0.3 shot2 framing + pose_source (cloud, post-#175)
+
+- **P0.2:** `SHOT2_WIDE_STANDOFF_UU` (650,-1150,650) + `SHOT2_LOOKAT_XY_BIAS_UU` — modest strafe off (400,-1400) to reduce left pine on wide cabin frame.
+- **P0.3:** `resolve_camera_transform` aims/validates vs anchor look target (`_look_target_for_pose_meta`); reaim-only no longer overwrites **`wide_cabin_anchor`** / **`wide_hero_anchor`** with **`in_level_camera_aim_at_bounds`**. KNOWN_ERRORS one-liner.
+
 ## 2026-09-22 — PA-E DESKTOP prove miss log (TOKEN-LEAN policy)
 
 - Lead: **TOKEN-LEAN** known errors — harness one-line Cause→Avoid + KNOWN_ERRORS index (`pa-e-*` keys); six DESKTOP rows minified; no long narratives in agent memory. [automation-standards.mdc](../.cursor/rules/automation-standards.mdc) v1.9, [CAPTURE_REDUNDANCY.md](Automation/CAPTURE_REDUNDANCY.md), [KNOWN_ERRORS.md](KNOWN_ERRORS.md) § Index.
