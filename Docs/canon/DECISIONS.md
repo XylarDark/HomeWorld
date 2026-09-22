@@ -4,6 +4,7 @@ Append only. Date · decision · why.
 
 | Date (ET) | Decision | Why |
 |---|---|---|
+| 2026-09-21 | **MV STRATEGY APPROVED** — Lead typed **`MV-A`** (chat, 2026-09-21 ET) → treat as **`APPROVE MV STRATEGY`**; unlocks **MV-A** ([Docs/24_MOVEMENT_IMPL.md](../24_MOVEMENT_IMPL.md): sprint, mantle/vault, spirit blink, mount CMC mode). **Do not** stamp MV-A APPROVED until Lead closes track. | Movement bible NOW stubs; CD/GC tracks closed on main — parallel MV track only. |
 | 2026-09-21 | **Docs/23 Combat & Dream CLOSED / COMPLETE** — Lead **`APPROVE CD-A`** (chat, 2026-09-21 ET). CD-A impl track done; **CD-B** not opened (locked bible scope only). Next gate **MV-A** separate TBD. | CD-A merged main (`50faeab` / PR #128); docs stamp closes CD track like GC-C on Docs/22. |
 | 2026-09-21 | **CD STRATEGY APPROVED** — Lead **`APPROVE CD STRATEGY`** (chat, 2026-09-21 ET). Unlocks **CD-A** ([Docs/23_COMBAT_DREAM_IMPL.md](../23_COMBAT_DREAM_IMPL.md): minigame stubs + boss phase volume). **Docs/22 GC track CLOSED** on main (`APPROVE GC-C`); CD-A is separate from GC placeholders. | Lead gate; seal/banish boss model + four planet minigame families per `COMBAT_DREAM_BIBLE.md`. |
 | 2026-09-21 | **Docs/22 Gather & Craft CLOSED / COMPLETE** — Lead **`APPROVE GC-C`** (chat, 2026-09-21 ET). GC-A…C impl track done; next gates **CD-A** / **MV-A** separate TBD. | GC-C merged main (`7061e18` / PR #126); docs stamp closes GC track like RS-E on Docs/21. |

@@ -1022,6 +1022,44 @@ namespace
 		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Wake — phase set to Dawn (Phase 3). List 56 T3. For morning (Day/0) run hw.TimeOfDay.Phase 0."));
 	}
 
+	void CmdMoveMantle(const TArray<FString>& Args)
+	{
+		UWorld* World = HomeWorldPlayWorld::Resolve();
+		if (!World)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Move.Mantle requires a play world (PIE or game)."));
+			return;
+		}
+		APlayerController* PC = World->GetFirstPlayerController();
+		AHomeWorldCharacter* Char = PC ? Cast<AHomeWorldCharacter>(PC->GetPawn()) : nullptr;
+		if (!Char)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Move.Mantle — no AHomeWorldCharacter pawn."));
+			return;
+		}
+		const bool bOk = Char->TryMantleOrVault();
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Move.Mantle %s (grep MOVE: MANTLE or MOVE: VAULT)."), bOk ? TEXT("ok") : TEXT("no ledge"));
+	}
+
+	void CmdMoveBlink(const TArray<FString>& Args)
+	{
+		UWorld* World = HomeWorldPlayWorld::Resolve();
+		if (!World)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Move.Blink requires a play world (PIE or game)."));
+			return;
+		}
+		APlayerController* PC = World->GetFirstPlayerController();
+		AHomeWorldCharacter* Char = PC ? Cast<AHomeWorldCharacter>(PC->GetPawn()) : nullptr;
+		if (!Char)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Move.Blink — no AHomeWorldCharacter pawn."));
+			return;
+		}
+		const bool bOk = Char->TrySpiritBlink();
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Move.Blink %s (grep MOVE: SPIRIT_BLINK)."), bOk ? TEXT("ok") : TEXT("failed"));
+	}
+
 	void CmdTimeOfDaySetPhase(const TArray<FString>& Args)
 	{
 		if (Args.Num() < 1)
@@ -1323,6 +1361,16 @@ void FHomeWorldModule::StartupModule()
 		TEXT("hw.Craft.FishGear"),
 		TEXT("GC-B stub: RECIPE_FISH_GEAR spend + log."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdCraftFishGear),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Move.Mantle"),
+		TEXT("MV-A: try mantle/vault from current facing (grep MOVE: MANTLE / MOVE: VAULT)."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdMoveMantle),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Move.Blink"),
+		TEXT("MV-A: spirit blink toward SpiritAnchor/Shrine tag (grep MOVE: SPIRIT_BLINK). Spirit form + anchor in range."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdMoveBlink),
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.Minigame.Heal"),
