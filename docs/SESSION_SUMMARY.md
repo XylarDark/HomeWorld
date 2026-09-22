@@ -1,3 +1,9 @@
+## 2026-09-22 — Capture redundancy ladder + shotlist viewport script (cloud)
+
+- Lead policy: [docs/Automation/CAPTURE_REDUNDANCY.md](Automation/CAPTURE_REDUNDANCY.md) (UE built-ins → free tools → project Python; ban host ImageGrab for shotlist PASS).
+- [Content/Python/capture_shotlist_viewport.py](../Content/Python/capture_shotlist_viewport.py) — PA-E Shot 1/2 on `L_VS_MVP_Markers`, `Saved/pa_e_capture_report.json`, CopyToBox desktop copy.
+- [DEFECT_PA_E](../Docs/qa/DEFECT_PA_E_shot_capture_automation.md) + AUTOMATION_GAPS PA-E row → ladder + script; gap **OPEN** until DESKTOP prove. **No shotlist PASS claim.**
+
 ## 2026-09-22 — PA-E close stamp (cloud, docs)
 
 - Lead **`APPROVE PA-E`**, 2026-09-22 ET → [Docs/32_PROTOTYPE_ASSETS.md](../Docs/32_PROTOTYPE_ASSETS.md) **CLOSED / COMPLETE** (whole PA track); [Docs/handoffs/PA_E_SHOTS.md](../Docs/handoffs/PA_E_SHOTS.md) **APPROVED / CLOSED**; [PA_D_IMPORT_PLACE.md](../Docs/handoffs/PA_D_IMPORT_PLACE.md) **CLOSED**; `DECISIONS.md` row; thin README / PHASE_BOARD / SESSION_* updates. Place evidence **`C:\dev\HomeWorld\Saved\pa_d_place_report.json`** **accepted**. Formal Shot 1/2 stills **deferred/accepted** — **not** PASS from `HomeWorld_PA_E` ImageGrab. **No `.uasset`.**
