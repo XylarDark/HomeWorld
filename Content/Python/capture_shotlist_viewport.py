@@ -1073,35 +1073,8 @@ def _mean_luminance(path: str) -> Optional[float]:
 
 
 def _validate_png(path: Optional[str]) -> dict:
-    out: dict[str, Any] = {"path": path, "pass": False}
-    if not path or not os.path.isfile(path):
-        out["error"] = "file_missing"
-        return out
-    size = os.path.getsize(path)
-    out["bytes"] = size
-    if size < MIN_BYTES:
-        out["error"] = "file_too_small"
-        return out
-    lum = _mean_luminance(path)
-    out["mean_luminance"] = lum
-    out["pil_available"] = _pil_available()
-    if lum is None:
-        if not _pil_available():
-            out["error"] = "pil_unavailable"
-            out["install_note"] = "Install Pillow into the Unreal Editor Python used by -ExecutePythonScript"
-        else:
-            out["error"] = "luminance_read_failed"
-        return out
-    if lum < MIN_MEAN_LUMINANCE:
-        out["error"] = "near_black"
-        out["prove_loop_status"] = "in_progress"
-        out["closed_fail"] = False
-        out["lead_rule"] = common.PROVE_CRITERIA.get("note", "")
-        out["prove_loop"] = list(common.LEAD_PROVE_LOOP)
-        return out
-    out["pass"] = True
-    out["prove_loop_status"] = "complete"
-    return out
+    """Shared PA-E assert gates (mean + center-crop + bright-pixel coverage)."""
+    return common.validate_png(path)
 
 
 def _copy_to_desktop(local_path: str, filename: str) -> dict:

@@ -9440,3 +9440,11 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 **Pending:** Lead-gated impl PR for tick-callback wait; DESKTOP re-prove.
 
 **Errors:** DESKTOP capture failure (documented; no code fix in this PR).
+
+## 2026-09-22 — PA-E assert harden post-#170 false PASS (cloud)
+
+**Completed:** Hardened [pa_e_shotlist_common.py](../Content/Python/pa_e_shotlist_common.py) `validate_png` (center-crop, bright-pixel fraction, mostly-black cap, shot-pair MSE/hash); per-shot `aim_bounds` + Arrange ray/AABB; MRQ per-shot night reapply; viewport uses shared validate. Docs: KNOWN_ERRORS, CAPTURE_REDUNDANCY, HARNESS_ARRANGE P0-6/7, AUTOMATION_GAPS research log.
+
+**Pending:** DESKTOP re-prove — expect `capture_pass: false` on current mostly-black MRQ stills until framing/lighting fixed.
+
+**Errors:** None in cloud py_compile.

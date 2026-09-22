@@ -4,6 +4,7 @@ Used by capture_shotlist_mrq.py (primary) and capture_shotlist_viewport.py (diag
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import shutil
@@ -22,6 +23,13 @@ CINEMATICS_PA_E_DIR = "/Game/HomeWorld/Cinematics/PA_E"
 RES_X, RES_Y = 1920, 1080
 MIN_BYTES = 50 * 1024
 MIN_MEAN_LUMINANCE = 8.0
+# Global mean alone passes ~6% edge speckles on ~93% black (post-#170 DESKTOP) — require coverage + center read.
+MIN_CENTER_CROP_MEAN_LUMINANCE = 12.0
+MIN_FRACTION_L_GT_1 = 0.18
+MIN_FRACTION_L_GT_8 = 0.10
+MIN_FRACTION_PURE_BLACK_L0 = 0.85
+SHOT_PAIR_COMPARE_SIZE = 48
+SHOT_PAIR_MAX_MSE = 4.0
 DESKTOP_PA_E = r"C:\Users\User\Desktop\HomeWorld_PA_E"
 ONE_FRAME_START = 0
 ONE_FRAME_END = 1
@@ -113,6 +121,11 @@ PROVE_CRITERIA = {
     "requires_lit_homestead_visible": True,
     "min_bytes": MIN_BYTES,
     "min_mean_luminance": MIN_MEAN_LUMINANCE,
+    "min_center_crop_mean_luminance": MIN_CENTER_CROP_MEAN_LUMINANCE,
+    "min_fraction_l_gt_1": MIN_FRACTION_L_GT_1,
+    "min_fraction_l_gt_8": MIN_FRACTION_L_GT_8,
+    "max_fraction_pure_black_l0": MIN_FRACTION_PURE_BLACK_L0,
+    "shot_pair_max_mse_at_compare_size": SHOT_PAIR_MAX_MSE,
     "file_exists_alone_is_not_pass": True,
     "black_stills_not_closed_fail": True,
     "night_readable_requires_preset_tune": True,
@@ -153,11 +166,44 @@ SHOT_FRAMING_NEEDLES: dict[str, tuple[str, ...]] = {
         "Garden",
         "Planter",
         "Path",
-        "Fence",
     ),
 }
 
+# Aim / look-at centroid: dress + hero mass — excludes edge Fence/Rock that pull framing off-shot.
+SHOT_AIM_PRIMARY_NEEDLES: dict[str, tuple[str, ...]] = {
+    "shot1": (
+        "DRESS_SM_Island",
+        "SM_Island",
+        "DRESS_SM_Lookout",
+        "SM_Lookout",
+        "Lookout",
+        "DRESS_SM_Cabin",
+        "SM_Cabin",
+    ),
+    "shot2": (
+        "DRESS_SM_Cabin",
+        "SM_Cabin",
+        "Cabin",
+        "Garden",
+        "Planter",
+        "Path",
+    ),
+}
+
+SHOT_FRAMING_EXCLUDE: dict[str, tuple[str, ...]] = {
+    "shot1": ("Fence", "Rock", "Planter", "Path"),
+    "shot2": ("Fence", "Rock", "Lookout", "SM_Lookout"),
+}
+
 DRESS_LABEL_PREFIX = "DRESS_"
+
+MRQ_PIE_LIGHTING_NOTE = (
+    "MoviePipelinePIEExecutor renders a PIE world. Editor-session TMP lights under VS_MVP/TMP_PA_E_Arrange "
+    "may not match MRQ exposure until reseed_pa_e_tmp_night_fixtures() + apply_homestead_night_tune() run "
+    "after load and again immediately before each MRQ job. If stack_ok in Editor but MRQ stills are dark, "
+    "verify deferred lit pass, warm-up counts, and Epic MRQ PIE / exposure settings (do not switch to day). "
+    "Refs: Movie Render Queue overview (UE 5.8), MoviePipelineDeferredPass, MoviePipelinePIEExecutor."
+)
 
 SHOTS = (
     {
@@ -489,6 +535,169 @@ def mean_luminance(path: str) -> tuple[Optional[float], str]:
     return None, "none"
 
 
+def _luminance_from_rgb(r: int, g: int, b: int) -> int:
+    return int(0.2126 * r + 0.7152 * g + 0.0722 * b)
+
+
+def _decode_png_l_grid(path: str) -> tuple[Optional[list[int]], int, int, str]:
+    """Return (luminance grid row-major, width, height, source)."""
+    try:
+        from PIL import Image
+    except ImportError:
+        pass
+    else:
+        try:
+            with Image.open(path) as im:
+                im = im.convert("RGB")
+                width, height = im.size
+                pixels = list(im.getdata())
+                grid = [_luminance_from_rgb(r, g, b) for r, g, b in pixels]
+                return grid, width, height, "pil"
+        except Exception:
+            pass
+    try:
+        with open(path, "rb") as f:
+            sig = f.read(8)
+        if sig != b"\x89PNG\r\n\x1a\n":
+            return None, 0, 0, "none"
+        width = height = 0
+        bit_depth = color_type = 0
+        idat = bytearray()
+        with open(path, "rb") as f:
+            f.read(8)
+            while True:
+                hdr = f.read(8)
+                if len(hdr) < 8:
+                    break
+                length, ctype = struct.unpack(">I4s", hdr)
+                data = f.read(length)
+                f.read(4)
+                if ctype == b"IHDR" and len(data) >= 13:
+                    width, height, bit_depth, color_type = struct.unpack(">IIBB", data[:10])
+                elif ctype == b"IDAT":
+                    idat.extend(data)
+                elif ctype == b"IEND":
+                    break
+        if bit_depth != 8 or color_type not in (2, 6) or width <= 0 or height <= 0:
+            return None, 0, 0, "none"
+        bpp = 3 if color_type == 2 else 4
+        raw = zlib.decompress(bytes(idat))
+        rgb_bytes = _png_unfilter_scanlines(raw, width, height, bpp)
+        if not rgb_bytes:
+            return None, 0, 0, "none"
+        grid: list[int] = []
+        total = width * height
+        for idx in range(total):
+            o = idx * bpp
+            grid.append(_luminance_from_rgb(rgb_bytes[o], rgb_bytes[o + 1], rgb_bytes[o + 2]))
+        return grid, width, height, "stdlib_png"
+    except (OSError, zlib.error):
+        return None, 0, 0, "none"
+
+
+def analyze_png_luminance_content(path: str) -> dict[str, Any]:
+    """Coverage + center-crop metrics — blocks global-mean false PASS on sparse speckles."""
+    grid, width, height, source = _decode_png_l_grid(path)
+    out: dict[str, Any] = {"luminance_source": source, "width": width, "height": height}
+    if not grid or width <= 0 or height <= 0:
+        out["error"] = "luminance_decode_failed"
+        return out
+    total = len(grid)
+    hist = [0] * 256
+    for lv in grid:
+        hist[min(255, max(0, lv))] += 1
+    mean = sum(i * hist[i] for i in range(256)) / total
+    out["mean_luminance"] = float(mean)
+    out["fraction_l_eq_0"] = hist[0] / total
+    out["fraction_l_gt_1"] = sum(hist[i] for i in range(2, 256)) / total
+    out["fraction_l_gt_8"] = sum(hist[i] for i in range(9, 256)) / total
+    x0, x1 = width // 4, (width * 3) // 4
+    y0, y1 = height // 4, (height * 3) // 4
+    center_vals: list[int] = []
+    for y in range(y0, y1):
+        row = y * width
+        for x in range(x0, x1):
+            center_vals.append(grid[row + x])
+    center_total = len(center_vals) or 1
+    out["center_crop_mean_luminance"] = float(sum(center_vals) / center_total)
+    out["center_crop_fraction"] = 0.5
+    try:
+        with open(path, "rb") as f:
+            out["sha256"] = hashlib.sha256(f.read()).hexdigest()
+    except OSError:
+        out["sha256"] = None
+    return out
+
+
+def _downsample_l_grid(grid: list[int], width: int, height: int, size: int) -> list[float]:
+    if width <= 0 or height <= 0:
+        return []
+    out: list[float] = []
+    for sy in range(size):
+        y = min(height - 1, int((sy + 0.5) * height / size))
+        row = y * width
+        for sx in range(size):
+            x = min(width - 1, int((sx + 0.5) * width / size))
+            out.append(float(grid[row + x]))
+    return out
+
+
+def _mse(a: list[float], b: list[float]) -> Optional[float]:
+    if len(a) != len(b) or not a:
+        return None
+    return sum((x - y) ** 2 for x, y in zip(a, b)) / len(a)
+
+
+def validate_shot_pair_diversity(paths: list[tuple[str, Optional[str]]]) -> dict[str, Any]:
+    """When both shots exist, reject near-identical mostly-black scrap (post-#170)."""
+    out: dict[str, Any] = {"pass": True, "compare_size": SHOT_PAIR_COMPARE_SIZE}
+    existing = [(sid, p) for sid, p in paths if p and os.path.isfile(p)]
+    if len(existing) < 2:
+        out["skipped"] = "need_two_files"
+        return out
+    metrics: list[dict[str, Any]] = []
+    samples: list[list[float]] = []
+    hashes: list[str] = []
+    for sid, path in existing:
+        content = analyze_png_luminance_content(path)
+        content["shot_id"] = sid
+        metrics.append(content)
+        grid, w, h, _src = _decode_png_l_grid(path)
+        if grid:
+            samples.append(_downsample_l_grid(grid, w, h, SHOT_PAIR_COMPARE_SIZE))
+        sha = content.get("sha256")
+        if sha:
+            hashes.append(sha)
+    out["shots"] = metrics
+    if len(hashes) == 2 and hashes[0] == hashes[1]:
+        out["pass"] = False
+        out["error"] = "shots_identical_hash"
+        out["prove_loop_status"] = "in_progress"
+        out["closed_fail"] = False
+        return out
+    if len(samples) == 2:
+        mse = _mse(samples[0], samples[1])
+        out["mse_downsampled"] = mse
+        if mse is not None and mse <= SHOT_PAIR_MAX_MSE:
+            out["pass"] = False
+            out["error"] = "shots_near_identical"
+            out["prove_loop_status"] = "in_progress"
+            out["closed_fail"] = False
+    return out
+
+
+def _mark_prove_loop_in_progress(out: dict[str, Any], error: str) -> None:
+    out["error"] = error
+    out["pass"] = False
+    out["prove_loop_status"] = "in_progress"
+    out["closed_fail"] = False
+    out["lead_rule"] = (
+        "Near-black / wrong framing / sparse speckle is not a closed FAIL — "
+        "complete LEAD_PROVE_LOOP (fix Arrange setup before claiming success)."
+    )
+    out["prove_loop"] = list(LEAD_PROVE_LOOP)
+
+
 def validate_png(path: Optional[str]) -> dict:
     out: dict[str, Any] = {"path": path, "pass": False}
     if not path or not os.path.isfile(path):
@@ -499,11 +708,13 @@ def validate_png(path: Optional[str]) -> dict:
     if size < MIN_BYTES:
         out["error"] = "file_too_small"
         return out
-    lum, lum_source = mean_luminance(path)
-    out["mean_luminance"] = lum
-    out["luminance_source"] = lum_source
+    content = analyze_png_luminance_content(path)
+    out.update(content)
     out["pil_available"] = pil_available()
-    if lum is None:
+    lum = content.get("mean_luminance")
+    lum_source = content.get("luminance_source", "none")
+    out["luminance_source"] = lum_source
+    if lum is None or content.get("error") == "luminance_decode_failed":
         out["error"] = "luminance_unavailable"
         out["install_note"] = (
             "Editor Pillow missing; stdlib PNG decode failed. "
@@ -511,11 +722,23 @@ def validate_png(path: Optional[str]) -> dict:
         )
         return out
     if lum < MIN_MEAN_LUMINANCE:
-        out["error"] = "near_black"
-        out["prove_loop_status"] = "in_progress"
-        out["closed_fail"] = False
-        out["lead_rule"] = "Near-black is not a closed FAIL — complete LEAD_PROVE_LOOP before claiming failure."
-        out["prove_loop"] = list(LEAD_PROVE_LOOP)
+        _mark_prove_loop_in_progress(out, "near_black")
+        return out
+    center_mean = content.get("center_crop_mean_luminance")
+    if center_mean is None or center_mean < MIN_CENTER_CROP_MEAN_LUMINANCE:
+        _mark_prove_loop_in_progress(out, "center_crop_near_black")
+        return out
+    frac_gt_8 = content.get("fraction_l_gt_8")
+    frac_gt_1 = content.get("fraction_l_gt_1")
+    frac_black = content.get("fraction_l_eq_0")
+    if frac_gt_8 is not None and frac_gt_8 < MIN_FRACTION_L_GT_8:
+        _mark_prove_loop_in_progress(out, "sparse_speckle_insufficient_l_gt_8")
+        return out
+    if frac_gt_1 is not None and frac_gt_1 < MIN_FRACTION_L_GT_1:
+        _mark_prove_loop_in_progress(out, "sparse_speckle_insufficient_l_gt_1")
+        return out
+    if frac_black is not None and frac_black > MIN_FRACTION_PURE_BLACK_L0:
+        _mark_prove_loop_in_progress(out, "mostly_pure_black")
         return out
     out["pass"] = True
     out["prove_loop_status"] = "complete"
@@ -567,31 +790,55 @@ def _bounds_dict(actor) -> dict[str, Any]:
     }
 
 
+def _actor_excluded_for_shot(actor, shot_id: str) -> bool:
+    exclude = SHOT_FRAMING_EXCLUDE.get(shot_id or "", ())
+    if not exclude:
+        return False
+    label = actor_label(actor)
+    folder = _actor_folder(actor).replace("\\", "/")
+    label_l = label.lower()
+    for n in exclude:
+        nl = n.lower()
+        if nl in label_l or nl in folder.lower():
+            return True
+    return False
+
+
 def inventory_homestead_in_level(shot_id: Optional[str] = None) -> dict[str, Any]:
     """Step 1: actors in loaded level matching homestead / shot framing needles."""
     needles = HOMESTEAD_INVENTORY_NEEDLES
     framing = SHOT_FRAMING_NEEDLES.get(shot_id or "", ())
+    aim_primary = SHOT_AIM_PRIMARY_NEEDLES.get(shot_id or "", ())
     actors_all: list = []
     actors_framing: list = []
+    actors_aim: list = []
     for a in unreal.EditorLevelLibrary.get_all_level_actors():
         if not a:
             continue
         if _actor_matches_needles(a, needles):
             actors_all.append(a)
-        if framing and _actor_matches_needles(a, framing):
+        if framing and _actor_matches_needles(a, framing) and not _actor_excluded_for_shot(a, shot_id or ""):
             actors_framing.append(a)
+        if aim_primary and _actor_matches_needles(a, aim_primary) and not _actor_excluded_for_shot(a, shot_id or ""):
+            actors_aim.append(a)
     combined_all = combined_bounds_from_actors(actors_all)
     combined_framing = combined_bounds_from_actors(actors_framing) if actors_framing else combined_all
+    combined_aim = combined_bounds_from_actors(actors_aim) if actors_aim else combined_framing
     return {
         "level_path": LEVEL_PATH,
+        "shot_id": shot_id,
         "homestead_actor_count": len(actors_all),
         "framing_actor_count": len(actors_framing),
+        "aim_primary_actor_count": len(actors_aim),
         "homestead_actors_sample": [_bounds_dict(a) for a in actors_all[:40]],
         "framing_actors_sample": [_bounds_dict(a) for a in actors_framing[:40]],
+        "aim_primary_actors_sample": [_bounds_dict(a) for a in actors_aim[:40]],
         "homestead_bounds": combined_all,
         "framing_bounds": combined_framing,
+        "aim_bounds": combined_aim,
         "inventory_ok": len(actors_all) > 0,
         "framing_ok": combined_framing is not None,
+        "aim_bounds_ok": combined_aim is not None,
     }
 
 
@@ -649,8 +896,41 @@ def look_at_rotation(from_loc: "unreal.Vector", to_loc: "unreal.Vector") -> "unr
     return unreal.Rotator(pitch=pitch, yaw=yaw, roll=0.0)
 
 
-def camera_forward_alignment(from_loc: "unreal.Vector", rot: "unreal.Rotator", target: "unreal.Vector") -> dict[str, Any]:
-    """Diagnostic: how well camera forward points at target centroid."""
+def _ray_intersects_aabb(
+    origin: tuple[float, float, float],
+    direction: tuple[float, float, float],
+    bmin: tuple[float, float, float],
+    bmax: tuple[float, float, float],
+    max_t: float = 500000.0,
+) -> bool:
+    tmin = 0.0
+    tmax = max_t
+    for i in range(3):
+        o, d, mn, mx = origin[i], direction[i], bmin[i], bmax[i]
+        if abs(d) < 1e-8:
+            if o < mn or o > mx:
+                return False
+            continue
+        inv = 1.0 / d
+        t1 = (mn - o) * inv
+        t2 = (mx - o) * inv
+        if t1 > t2:
+            t1, t2 = t2, t1
+        tmin = max(tmin, t1)
+        tmax = min(tmax, t2)
+        if tmax < tmin:
+            return False
+    return tmax >= tmin
+
+
+def camera_forward_alignment(
+    from_loc: "unreal.Vector",
+    rot: "unreal.Rotator",
+    target: "unreal.Vector",
+    *,
+    dress_bounds: Optional[dict[str, Any]] = None,
+) -> dict[str, Any]:
+    """Diagnostic: forward dot to target + optional ray hit on dress AABB."""
     fwd = unreal.MathLibrary.get_forward_vector(rot)
     delta = target - from_loc
     dist = delta.length()
@@ -658,10 +938,22 @@ def camera_forward_alignment(from_loc: "unreal.Vector", rot: "unreal.Rotator", t
         return {"distance_uu": dist, "forward_dot_to_target": None, "aim_ok": False}
     delta_n = unreal.Vector(delta.x / dist, delta.y / dist, delta.z / dist)
     dot = fwd.x * delta_n.x + fwd.y * delta_n.y + fwd.z * delta_n.z
+    ray_hits = None
+    if dress_bounds and dress_bounds.get("min") and dress_bounds.get("max"):
+        bmin = tuple(dress_bounds["min"])
+        bmax = tuple(dress_bounds["max"])
+        ray_hits = _ray_intersects_aabb(
+            (from_loc.x, from_loc.y, from_loc.z),
+            (fwd.x, fwd.y, fwd.z),
+            bmin,
+            bmax,
+        )
+    aim_ok = dot > 0.3 and (ray_hits is not False)
     return {
         "distance_uu": round(dist, 2),
         "forward_dot_to_target": round(dot, 4),
-        "aim_ok": dot > 0.3,
+        "forward_ray_hits_dress_aabb": ray_hits,
+        "aim_ok": aim_ok,
     }
 
 
@@ -697,18 +989,29 @@ def resolve_camera_transform(shot: dict, cam) -> tuple[Any, Any, dict[str, Any]]
         "used_camera_actor": bool(cam),
         "prove_loop_step1_inventory": inventory,
     }
-    bounds = inventory.get("framing_bounds") or inventory.get("homestead_bounds")
+    bounds = (
+        inventory.get("aim_bounds")
+        or inventory.get("framing_bounds")
+        or inventory.get("homestead_bounds")
+    )
     target: Optional[unreal.Vector] = None
     if bounds and bounds.get("centroid"):
         target = _vector_from_list(bounds["centroid"])
         meta["framing_target_centroid"] = bounds["centroid"]
+        meta["expected_framing"] = {
+            "aim_bounds_centroid": bounds["centroid"],
+            "aim_bounds_min": bounds.get("min"),
+            "aim_bounds_max": bounds.get("max"),
+            "aim_bounds_actor_count": bounds.get("actor_count"),
+            "aim_bounds_labels_sample": (bounds.get("actor_labels") or [])[:12],
+        }
 
     if cam:
         loc = cam.get_actor_location()
         meta["camera_label"] = actor_label(cam)
         rot = cam.get_actor_rotation()
         if target is not None:
-            align_before = camera_forward_alignment(loc, rot, target)
+            align_before = camera_forward_alignment(loc, rot, target, dress_bounds=bounds)
             meta["aim_before"] = align_before
             if not align_before.get("aim_ok"):
                 rot = look_at_rotation(loc, target)
@@ -717,7 +1020,7 @@ def resolve_camera_transform(shot: dict, cam) -> tuple[Any, Any, dict[str, Any]]
                     meta["camera_reaimed_at_homestead"] = True
                 except Exception as e:
                     meta["camera_reaim_error"] = str(e)
-                meta["aim_after"] = camera_forward_alignment(loc, rot, target)
+                meta["aim_after"] = camera_forward_alignment(loc, rot, target, dress_bounds=bounds)
             meta["pose_source"] = "in_level_camera_aim_at_bounds"
         else:
             meta["pose_source"] = "in_level_camera_no_bounds"
@@ -781,26 +1084,52 @@ def write_homestead_capture_diagnostic(
 
 
 def summarize_capture_report(shots: list[dict[str, Any]]) -> dict[str, Any]:
-    """Report-level status: ok = capture PASS; near-black is not closed_fail."""
+    """Report-level status: ok = capture PASS; near-black / speckle is not closed_fail."""
     capture_pass = bool(shots) and all(r.get("pass") for r in shots)
     closed_fail = False
-    near_black_only = True
+    setup_quality_errors = (
+        "near_black",
+        "center_crop_near_black",
+        "sparse_speckle_insufficient_l_gt_8",
+        "sparse_speckle_insufficient_l_gt_1",
+        "mostly_pure_black",
+        "global_mean_false_pass_speckle",
+        "shots_identical_hash",
+        "shots_near_identical",
+    )
+    setup_only = True
     for r in shots:
         validation = r.get("validation") or {}
         if validation.get("closed_fail") is True:
             closed_fail = True
-            near_black_only = False
+            setup_only = False
             break
         err = validation.get("error") or r.get("error")
-        if err == "near_black":
+        if err in setup_quality_errors:
             continue
         if not r.get("pass"):
-            near_black_only = False
-            if err not in (None, "near_black"):
+            setup_only = False
+            if err not in (None, *setup_quality_errors):
                 closed_fail = True
+
+    pair_paths = [(r.get("id", ""), (r.get("validation") or {}).get("path") or r.get("saved_path")) for r in shots]
+    shot_pair = validate_shot_pair_diversity(pair_paths)
+    if not shot_pair.get("pass"):
+        capture_pass = False
+        for r in shots:
+            r["pass"] = False
+            validation = r.setdefault("validation", {})
+            if validation.get("pass"):
+                validation["pass"] = False
+            if not validation.get("error"):
+                validation["error"] = shot_pair.get("error")
+                validation["prove_loop_status"] = "in_progress"
+                validation["closed_fail"] = False
+        setup_only = setup_only and shot_pair.get("error") in setup_quality_errors
+
     if capture_pass:
         prove_loop_status = "complete"
-    elif near_black_only and not closed_fail:
+    elif setup_only and not closed_fail:
         prove_loop_status = "in_progress"
     elif closed_fail:
         prove_loop_status = "blocked"
@@ -811,10 +1140,12 @@ def summarize_capture_report(shots: list[dict[str, Any]]) -> dict[str, Any]:
         "capture_pass": capture_pass,
         "closed_fail": closed_fail,
         "prove_loop_status": prove_loop_status,
+        "shot_pair_validation": shot_pair,
         "black_stills_not_closed_fail": True,
         "lead_rule": (
-            "Do not treat near-black stills as closed FAIL — complete LEAD_PROVE_LOOP "
-            "(inventory → aim → capture/inspect → bug-fix) before claiming failure."
+            "Do not treat near-black / speckle / identical wrong stills as closed FAIL — "
+            "complete LEAD_PROVE_LOOP (inventory → aim → lighting → capture/inspect → bug-fix) "
+            "before claiming success."
         ),
     }
 
@@ -830,14 +1161,19 @@ def build_shot_diagnostic(shot: dict) -> dict[str, Any]:
         "camera_labels": shot["camera_labels"],
         "camera_found": actor_label(cam) if cam else None,
     }
-    bounds = inv.get("framing_bounds") or inv.get("homestead_bounds")
+    bounds = inv.get("aim_bounds") or inv.get("framing_bounds") or inv.get("homestead_bounds")
     if cam and bounds and bounds.get("centroid"):
         loc = cam.get_actor_location()
         rot = cam.get_actor_rotation()
         target = _vector_from_list(bounds["centroid"])
         entry["camera_location"] = [loc.x, loc.y, loc.z]
         entry["target_centroid"] = bounds["centroid"]
-        entry["alignment"] = camera_forward_alignment(loc, rot, target)
+        entry["expected_framing"] = {
+            "aim_bounds_centroid": bounds["centroid"],
+            "aim_bounds_min": bounds.get("min"),
+            "aim_bounds_max": bounds.get("max"),
+        }
+        entry["alignment"] = camera_forward_alignment(loc, rot, target, dress_bounds=bounds)
     return entry
 
 
@@ -857,7 +1193,9 @@ def desktop_conductor_checklist() -> list[str]:
         "Safe-Build after MovieRenderPipeline plugins; confirm MRQ Python types import.",
         "If inventory_ok false: run place_vs_mvp_dress.py + batch_import on DESKTOP.",
         "Run execute_python_script('capture_shotlist.py'); read Saved/pa_e_capture_report.json prove_loop fields.",
-        "PASS only when both PNGs pass bytes + mean_luminance and show lit homestead (not file-exists-only).",
+        "Until framing/lighting fixed: expect capture_pass false on mostly-black MRQ stills (~93% L=0, global mean ~8.7).",
+        "PASS only when both PNGs pass bytes + mean + center-crop + bright-pixel fraction + shot-pair diversity "
+        "(not file-exists-only or global-mean speckle PASS).",
     ]
 
 
@@ -918,6 +1256,7 @@ def apply_pa_e_homestead_night_environment(
         "night_tune_module": PA_E_SHOTLIST_TIME_OF_DAY["night_tune_module"],
         "phase_2_alone_insufficient": PA_E_SHOTLIST_TIME_OF_DAY["phase_2_alone_insufficient"],
         "do_not_switch_to_day": PA_E_SHOTLIST_TIME_OF_DAY["do_not_switch_to_day"],
+        "mrq_pie_lighting_note": MRQ_PIE_LIGHTING_NOTE,
     }
     block["time_of_day"] = apply_pa_e_shotlist_time_of_day(log_prefix)
     tune = vnp.apply_homestead_night_tune()
@@ -1070,19 +1409,19 @@ def probe_mrq_tool_readiness() -> dict[str, Any]:
 
 
 def aim_shot_cameras_for_capture(log_prefix: str = "") -> dict[str, Any]:
-    """Step 2: re-aim CAM_* at framing/homestead bounds centroids (find_look_at_rotation)."""
+    """Step 2: re-aim CAM_* at per-shot aim_bounds centroids (find_look_at_rotation)."""
     shots_aim: list[dict[str, Any]] = []
     all_aim_ok = True
     for shot in SHOTS:
         cam = find_camera(shot["camera_labels"])
         loc, rot, pose_meta = resolve_camera_transform(shot, cam)
         inv = pose_meta.get("prove_loop_step1_inventory") or inventory_homestead_in_level(shot["id"])
-        bounds = inv.get("framing_bounds") or inv.get("homestead_bounds")
+        bounds = inv.get("aim_bounds") or inv.get("framing_bounds") or inv.get("homestead_bounds")
         aim_meta = pose_meta.get("aim_after") or pose_meta.get("aim_before")
         aim_ok = False
         if bounds and bounds.get("centroid"):
             target = _vector_from_list(bounds["centroid"])
-            aim_meta = camera_forward_alignment(loc, rot, target)
+            aim_meta = camera_forward_alignment(loc, rot, target, dress_bounds=bounds)
             aim_ok = bool(aim_meta.get("aim_ok"))
         elif aim_meta is not None:
             aim_ok = bool(aim_meta.get("aim_ok"))
@@ -1098,15 +1437,32 @@ def aim_shot_cameras_for_capture(log_prefix: str = "") -> dict[str, Any]:
                 "camera_labels": shot["camera_labels"],
                 "camera_label": pose_meta.get("camera_label"),
                 "pose_source": pose_meta.get("pose_source"),
+                "expected_framing": pose_meta.get("expected_framing"),
                 "aim_ok": aim_ok,
                 "aim": aim_meta,
                 "inventory_ok": inv.get("inventory_ok"),
+                "aim_bounds_ok": inv.get("aim_bounds_ok"),
             }
         )
     out = {"shots": shots_aim, "aim_ok": all_aim_ok}
     if log_prefix:
         log(log_prefix, "aim_shot_cameras", {"aim_ok": all_aim_ok})
     return out
+
+
+def reapply_night_environment_for_mrq_shot(shot_id: str, log_prefix: str = "") -> dict[str, Any]:
+    """Re-apply Phase 2 + PRESET tune before each MRQ PIE job (Editor TMP ≠ PIE world)."""
+    inv = inventory_homestead_in_level(shot_id)
+    bounds = inv.get("aim_bounds") or inv.get("framing_bounds") or inv.get("homestead_bounds")
+    centroid = bounds.get("centroid") if bounds else None
+    block = apply_pa_e_homestead_night_environment(
+        log_prefix,
+        reseed_tmp_fixtures=True,
+        homestead_centroid=centroid,
+    )
+    block["shot_id"] = shot_id
+    block["mrq_pie_lighting_note"] = MRQ_PIE_LIGHTING_NOTE
+    return block
 
 
 def arrange_pa_e_shotlist(
@@ -1121,6 +1477,15 @@ def arrange_pa_e_shotlist(
     if not level_loaded:
         blocked_reasons.append("level_load_failed")
 
+    per_shot_inventory: list[dict[str, Any]] = []
+    for shot in SHOTS:
+        inv = inventory_homestead_in_level(shot["id"])
+        per_shot_inventory.append({"shot_id": shot["id"], "inventory": inv})
+        if not inv.get("inventory_ok"):
+            blocked_reasons.append(f"inventory_empty_{shot['id']}")
+        if not inv.get("aim_bounds_ok"):
+            blocked_reasons.append(f"aim_bounds_missing_{shot['id']}")
+
     inventory = inventory_homestead_in_level()
     if not inventory.get("inventory_ok"):
         blocked_reasons.append("inventory_empty")
@@ -1133,6 +1498,10 @@ def arrange_pa_e_shotlist(
     aim = aim_shot_cameras_for_capture(log_prefix)
     if not aim.get("aim_ok"):
         blocked_reasons.append("camera_aim_not_at_homestead")
+    for shot_aim in aim.get("shots") or []:
+        alignment = shot_aim.get("aim") or {}
+        if alignment.get("forward_ray_hits_dress_aabb") is False:
+            blocked_reasons.append(f"camera_ray_misses_dress_bounds_{shot_aim.get('shot_id')}")
 
     finish_loading = finish_loading_before_capture()
     lighting = apply_pa_e_homestead_night_environment(
@@ -1157,8 +1526,10 @@ def arrange_pa_e_shotlist(
         "blocked_reasons": blocked_reasons,
         "level_loaded": level_loaded,
         "inventory": inventory,
+        "per_shot_inventory": per_shot_inventory,
         "aim": aim,
         "lighting": lighting,
+        "mrq_pie_lighting_note": MRQ_PIE_LIGHTING_NOTE,
         "view": view,
         "finish_loading": finish_loading,
         "tool_readiness": tool_readiness,

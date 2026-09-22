@@ -9,6 +9,8 @@
 | P0-3 | TMP night fixture re-seed after `load_level` (`vnp_night_tune_and_evidence.reseed_pa_e_tmp_night_fixtures`) | Done (PR) |
 | P0-4 | Diagnostic single-write JSON (`level_loaded`, `homestead_night_environment`, `arrange_gate`) | Done (PR) |
 | P0-5 | Docs: CAPTURE_REDUNDANCY, KNOWN_ERRORS, AUTOMATION_GAPS, automation-standards | Done (PR) |
+| P0-6 | Assert harden: center-crop + bright-pixel fraction + shot-pair diversity (block global-mean speckle PASS) | Done (follow-up PR) |
+| P0-7 | Arrange: per-shot `aim_bounds` centroids, ray vs dress AABB, MRQ per-shot night reapply note | Done (follow-up PR) |
 
 **P1 (follow-up):** Three-state reports everywhere (`blocked` / `in_progress` / `pass`) with consistent `closed_fail` semantics across PIE harnesses and NF2-B evidence scripts.
 
