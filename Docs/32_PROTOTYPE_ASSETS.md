@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Track ID** | **PA** — Prototype Assets (Homestead dress) |
-| **Status** | **PA STRATEGY APPROVED** · **PA-A OPEN** (track **not CLOSED**) |
+| **Status** | **PA STRATEGY APPROVED** · **PA-A CLOSED / COMPLETE** · **PA-C OPEN / IN PROGRESS ready** (track **not CLOSED**) |
 | **Date** | 2026-09-22 |
 | **Author** | Cloud agent (HomeWorld) |
 | **Scope locked** | **Homestead kit only** — Lead **`APPROVE PA STRATEGY — homestead kit only`**, 2026-09-22 ET (planetside out) |
@@ -16,9 +16,9 @@
 
 Lead **`APPROVE PA STRATEGY`** — **GRANTED** (chat, 2026-09-22 ET; Lead typed **`APPROVE PA STRATEGY — homestead kit only`**).
 
-Unlocks **PA-A** gap audit. **Do not** stamp PA-A/C/D/E done in docs until evidence exists.
+Lead **`APPROVE PA-A`** — **GRANTED** (chat, 2026-09-22 ET). Gap audit **accepted**; **PA-A CLOSED / COMPLETE**. Unlocks **PA-C** (Blender upgrade/create). **Do not** stamp **`APPROVE PA-C`**, PA-D/E done, or **whole PA track CLOSED** until PA-E evidence.
 
-**Handoff:** [handoffs/PA_STRATEGY.md](handoffs/PA_STRATEGY.md) — **APPROVED / CLOSED** (strategy stamp only).
+**Handoffs:** [handoffs/PA_STRATEGY.md](handoffs/PA_STRATEGY.md) — **APPROVED / CLOSED** (PA-0) · [handoffs/PA_A_GAP_AUDIT.md](handoffs/PA_A_GAP_AUDIT.md) — **APPROVED / CLOSED** (PA-A).
 
 **Kit plate (refs):** [refs/ai/homestead_kit_plate_labeled.jpg](refs/ai/homestead_kit_plate_labeled.jpg) · [../AssetCreation/RefImages/homestead_kit_plate_labeled.jpg](../AssetCreation/RefImages/homestead_kit_plate_labeled.jpg) · sidecar [refs/ai/homestead_kit_plate_labeled.sidecar.json](refs/ai/homestead_kit_plate_labeled.sidecar.json)
 
@@ -122,11 +122,37 @@ Workflow index: [AssetCreation/README.md](../AssetCreation/README.md).
 | Phase | Name | Host | Status | Gate |
 |-------|------|------|--------|------|
 | **PA-0** | Strategy + kit plate stamp | CLOUD | **APPROVED / CLOSED** | Lead **`APPROVE PA STRATEGY`**, 2026-09-22 ET |
-| **PA-A** | Gap audit (mesh vs plate vs VS_MVP placement) | CLOUD+DESKTOP | **OPEN** | Unlocked by PA STRATEGY |
-| **PA-B** | Optional orthos / AI_Sources drafts | CLOUD+Lead | **LOCKED** | After PA-A |
-| **PA-C** | Blender rebuild / upgrade | DESKTOP+Blender MCP | **LOCKED** | Per-asset evidence |
-| **PA-D** | Import + place + master material bind | DESKTOP | **LOCKED** | `batch_import` + dress scripts |
+| **PA-A** | Gap audit (mesh vs plate vs VS_MVP placement) | CLOUD+DESKTOP | **CLOSED / COMPLETE** | Lead **`APPROVE PA-A`**, 2026-09-22 ET |
+| **PA-B** | Optional orthos / AI_Sources drafts | CLOUD+Lead | **OPTIONAL** | Parallel to PA-C if Lead requests |
+| **PA-C** | Blender rebuild / upgrade | DESKTOP+Blender MCP | **OPEN / IN PROGRESS ready** | Unlocked by PA-A; per-asset evidence |
+| **PA-D** | Import + place + master material bind | DESKTOP | **LOCKED** | After PA-C meshes |
 | **PA-E** | Shot 1 + Shot 2 evidence + close | DESKTOP+Lead | **LOCKED** | Lead **`APPROVE PA-E`** (TBD string) |
+
+---
+
+## PA-A accepted gap audit (2026-09-22 ET)
+
+Lead **`APPROVE PA-A`** — verdicts **accepted** (chat, 2026-09-22 ET). Full handoff: [handoffs/PA_A_GAP_AUDIT.md](handoffs/PA_A_GAP_AUDIT.md).
+
+| Piece | Verdict |
+|-------|---------|
+| Cabin | UPGRADE |
+| IslandTop | KEEP (light rim later) |
+| Cliff modules | CREATE (highest risk) |
+| Pine S/M/L | UPGRADE (foliage collapsed) |
+| Planters×3 | CREATE |
+| Fence segs | CREATE |
+| Path stones | CREATE |
+| Lookout pad | KEEP |
+| Glider perch | UPGRADE |
+| Soft shrine | KEEP |
+| Islets | KEEP optional |
+
+### PA-C ordered queue (Blender — DESKTOP)
+
+1. Cliffs → 2. Pines → 3. Cabin → 4. Path → 5. Planters → 6. Fence → 7. Glider perch → 8. Optional island rim
+
+**KEEP (no PA-C mesh unless polish):** IslandTop (rim optional), Lookout pad, Soft shrine, Islets optional.
 
 ---
 
@@ -157,8 +183,10 @@ Workflow index: [AssetCreation/README.md](../AssetCreation/README.md).
 | Step | Lead action | Unlocks |
 |------|-------------|---------|
 | 0 | **`APPROVE PA STRATEGY`** | PA-A gap audit — **DONE** 2026-09-22 ET |
-| 1 | **PA-A** (gap audit evidence) | PA-B…E — **pending** |
+| 1 | **`APPROVE PA-A`** (gap audit accepted) | PA-C Blender queue — **DONE** 2026-09-22 ET |
+| 2 | **PA-C** (per-asset Blender evidence) | PA-D import — **in progress ready** |
+| 3 | **PA-E** + Lead close gate | Whole PA track — **not CLOSED** |
 
 ---
 
-*Docs/32 Prototype Assets — **PA STRATEGY APPROVED** — homestead kit only — **PA-A OPEN** (2026-09-22 ET).*
+*Docs/32 Prototype Assets — **PA-A CLOSED / COMPLETE** — **PA-C OPEN / IN PROGRESS ready** — homestead kit only — track **not CLOSED** (2026-09-22 ET).*
