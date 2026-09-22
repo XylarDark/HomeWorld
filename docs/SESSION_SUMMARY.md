@@ -1,6 +1,7 @@
-## 2026-09-22 — PA-D APPROVED (docs stamp, cloud)
+## 2026-09-22 — PA-D APPROVED + place script (cloud)
 
 - Lead **`APPROVE PA-D`**, 2026-09-22 ET → [Docs/32_PROTOTYPE_ASSETS.md](../Docs/32_PROTOTYPE_ASSETS.md) **PA-D IN PROGRESS**; [Docs/handoffs/PA_D_IMPORT_PLACE.md](../Docs/handoffs/PA_D_IMPORT_PLACE.md) **APPROVED** (awaiting DESKTOP evidence). `DECISIONS.md` + `PHASE_BOARD` + `Docs/README` minimal update. **No `.uasset`**. PA track **not CLOSED** (PA-E locked).
+- PR #145: `Content/Python/place_vs_mvp_pa_d.py` (cliffs, planters, fence, path stones + `place_vs_mvp_dress` refresh); `place_vs_mvp_dress.py` SM_Cabin exact + Pine S/M/L. DESKTOP run after batch_import.
 
 ## 2026-09-22 — PA-C tranche-2 land (cloud)
 
