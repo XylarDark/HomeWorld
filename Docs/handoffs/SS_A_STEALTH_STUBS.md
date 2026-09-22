@@ -2,12 +2,13 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **IN PROGRESS** — awaiting Lead **`APPROVE SS-A`** |
+| **Status** | **APPROVED / CLOSED** — Lead **`APPROVE SS-A`**, 2026-09-21 ET |
 | **Track** | SS-A |
 | **Gate** | Lead **`APPROVE SS STRATEGY`** — **GRANTED** 2026-09-21 ET (chat **`SS-A`** unlock) |
-| **Close gate** | Lead **`APPROVE SS-A`** — **pending** |
-| **Impl doc** | [25_SPIRIT_STEALTH_IMPL.md](../25_SPIRIT_STEALTH_IMPL.md) |
+| **Close gate** | Lead **`APPROVE SS-A`** — **GRANTED** 2026-09-21 ET (chat) |
+| **Impl doc** | [25_SPIRIT_STEALTH_IMPL.md](../25_SPIRIT_STEALTH_IMPL.md) — **CLOSED / COMPLETE** |
 | **Bible** | [SPIRIT_STEALTH_BIBLE.md](../SPIRIT_STEALTH_BIBLE.md) |
+| **Main** | `7bc577f` / PR #133 |
 
 ---
 
@@ -69,8 +70,8 @@ Base anchor: near `GP_RS_AnimalDen` / camp path (same pattern as CD-A).
 
 ## Close checklist
 
-- [ ] DESKTOP greps `STEALTH:` per table above
-- [ ] No crouch binding added
-- [ ] Lead **`APPROVE SS-A`** — stamp Docs/25 SS-A **APPROVED / CLOSED** (chat only; not in PR title as APPROVED)
+- [x] DESKTOP greps `STEALTH:` per table above (deferred/accepted with Lead **`APPROVE SS-A`**)
+- [x] No crouch binding added
+- [x] Lead **`APPROVE SS-A`** — Docs/25 SS-A **APPROVED / CLOSED** (2026-09-21 ET)
 
 Lead **`APPROVE SS-A`** closes the SS-A track; **SS-B** remains locked bible LATER scope.

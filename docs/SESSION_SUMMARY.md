@@ -17,6 +17,10 @@
 - Lead **`MV-A`** chat → **`APPROVE MV STRATEGY`**; [Docs/24_MOVEMENT_IMPL.md](../Docs/24_MOVEMENT_IMPL.md) + [Docs/handoffs/MV_A_TRAVERSAL.md](../Docs/handoffs/MV_A_TRAVERSAL.md); `DECISIONS.md` MV strategy row (alongside SPIRIT_STEALTH lock). MV-A **not** stamped APPROVED (Lead closes later).
 - C++: `HomeWorldTraversalComponent` (sprint, mantle/vault, spirit blink, mount boost, soft fall reset on one CMC); dusk blocks FALLBACK glide start; cheats `hw.Move.Mantle` / `hw.Move.Blink`. PR #130; DESKTOP Safe-Build + PIE prove pending.
 
+## 2026-09-21 ET — SS-A track CLOSED (docs stamp, cloud)
+
+- Lead **`APPROVE SS-A`** → `Docs/25_SPIRIT_STEALTH_IMPL.md` **CLOSED / COMPLETE**; `Docs/handoffs/SS_A_STEALTH_STUBS.md` **APPROVED / CLOSED**; `Docs/canon/DECISIONS.md` row. SS-A on main `7bc577f` (PR #133). Next: Lead-named track TBD — not in this PR.
+
 ## 2026-09-21 ET — CD-A track CLOSED (docs stamp, cloud)
 
 - Lead **`APPROVE CD-A`** → `Docs/23_COMBAT_DREAM_IMPL.md` **CLOSED / COMPLETE**; `Docs/handoffs/CD_A_STUBS.md` **APPROVED / CLOSED**; `Docs/canon/DECISIONS.md` row. CD-A on main `50faeab` (PR #128). Next: **MV-A** TBD — not in this PR.

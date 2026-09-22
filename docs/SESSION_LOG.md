@@ -9234,3 +9234,13 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 **Remaining:** Next product track TBD (Lead gate) — e.g. **SS-A** impl separate from bible lock.
 
+---
+
+## 2026-09-21 — SS-A track CLOSED (docs stamp, cloud agent)
+
+**Task:** Lead **`APPROVE SS-A`** — stamp Docs/25 Spirit Stealth **CLOSED / COMPLETE** (SS-A code already on main PR #133).
+
+**Delivered:** `Docs/25_SPIRIT_STEALTH_IMPL.md`, `Docs/handoffs/SS_A_STEALTH_STUBS.md`, `Docs/canon/DECISIONS.md`, `Docs/README.md` index row; thin `PHASE_BOARD` + `SESSION_SUMMARY` updates. Docs-only.
+
+**Remaining:** Next product track Lead-named TBD — **SS-B** not opened.
+
