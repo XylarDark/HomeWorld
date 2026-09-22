@@ -2,6 +2,7 @@
 
 #include "HomeWorldBeastTameComponent.h"
 #include "HomeWorldCharacter.h"
+#include "HomeWorldTraversalComponent.h"
 #include "HomeWorldInventorySubsystem.h"
 #include "HomeWorldTimeOfDaySubsystem.h"
 #include "Components/SphereComponent.h"
@@ -110,6 +111,28 @@ void UHomeWorldBeastTameComponent::SetTameState(EHomeWorldBeastTameState NewStat
 	UE_LOG(LogTemp, Log, TEXT("TAME: %s -> %s on '%s'"),
 		BeastStateLabel(Old), BeastStateLabel(NewState),
 		GetOwner() ? *GetOwner()->GetName() : TEXT("(none)"));
+
+	if (NewState == EHomeWorldBeastTameState::Tamed || NewState == EHomeWorldBeastTameState::Helper)
+	{
+		UWorld* World = GetWorld();
+		if (World && GetOwner())
+		{
+			if (APlayerController* PC = World->GetFirstPlayerController())
+			{
+				if (AHomeWorldCharacter* Char = Cast<AHomeWorldCharacter>(PC->GetPawn()))
+				{
+					const float Dist = FVector::Dist(Char->GetActorLocation(), GetOwner()->GetActorLocation());
+					if (Dist <= ProximityRadiusCm * 2.f)
+					{
+						if (UHomeWorldTraversalComponent* Traversal = Char->FindComponentByClass<UHomeWorldTraversalComponent>())
+						{
+							Traversal->SetMountBoostActive(true);
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 void UHomeWorldBeastTameComponent::UpdateProximity(AHomeWorldCharacter* NearbyPlayer)

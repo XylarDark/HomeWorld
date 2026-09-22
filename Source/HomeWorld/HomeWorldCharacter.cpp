@@ -3,6 +3,7 @@
 #include "HomeWorldCharacter.h"
 #include "HomeWorldFallbackGlideComponent.h"
 #include "HomeWorldSoftBoundsComponent.h"
+#include "HomeWorldTraversalComponent.h"
 #include "HomeWorldShrinePortalComponent.h"
 #include "BuildPlacementSupport.h"
 #include "AbilitySystemComponent.h"
@@ -85,6 +86,7 @@ AHomeWorldCharacter::AHomeWorldCharacter(const FObjectInitializer& ObjectInitial
 
 	FallbackGlideComponent = CreateDefaultSubobject<UHomeWorldFallbackGlideComponent>(TEXT("FallbackGlideComponent"));
 	SoftBoundsComponent = CreateDefaultSubobject<UHomeWorldSoftBoundsComponent>(TEXT("SoftBoundsComponent"));
+	TraversalComponent = CreateDefaultSubobject<UHomeWorldTraversalComponent>(TEXT("TraversalComponent"));
 }
 
 UAbilitySystemComponent* AHomeWorldCharacter::GetAbilitySystemComponent() const
@@ -130,6 +132,10 @@ void AHomeWorldCharacter::BeginPlay()
 			TimeOfDay->OnPhaseChanged.AddDynamic(this, &AHomeWorldCharacter::OnTimeOfDayPhaseChanged);
 			SyncFormWithTimeOfDay();
 		}
+	}
+	if (TraversalComponent)
+	{
+		TraversalComponent->ApplyFormMovementTuning(GetIsSpiritForm());
 	}
 }
 
@@ -294,9 +300,14 @@ void AHomeWorldCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	{
 		EnhancedInput->BindAction(PrimaryAttackAction, ETriggerEvent::Triggered, this, &AHomeWorldCharacter::OnPrimaryAttackTriggered);
 	}
-	if (DodgeAction && DodgeAbilityClass)
+	if (DodgeAction)
 	{
-		EnhancedInput->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &AHomeWorldCharacter::OnDodgeTriggered);
+		EnhancedInput->BindAction(DodgeAction, ETriggerEvent::Started, this, &AHomeWorldCharacter::OnSprintStarted);
+		EnhancedInput->BindAction(DodgeAction, ETriggerEvent::Completed, this, &AHomeWorldCharacter::OnSprintCompleted);
+		if (DodgeAbilityClass)
+		{
+			EnhancedInput->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &AHomeWorldCharacter::OnDodgeTriggered);
+		}
 	}
 	if (InteractAction && InteractAbilityClass)
 	{
@@ -441,8 +452,47 @@ void AHomeWorldCharacter::OnAstralDeathTriggered(const FInputActionValue& Value)
 	RequestAstralDeath();
 }
 
+void AHomeWorldCharacter::OnSprintStarted(const FInputActionValue& Value)
+{
+	if (TraversalComponent)
+	{
+		TraversalComponent->SetSprintHeld(true);
+	}
+}
+
+void AHomeWorldCharacter::OnSprintCompleted(const FInputActionValue& Value)
+{
+	if (TraversalComponent)
+	{
+		TraversalComponent->SetSprintHeld(false);
+	}
+}
+
+void AHomeWorldCharacter::Jump()
+{
+	if (TraversalComponent && TraversalComponent->TryMantleOrVault())
+	{
+		return;
+	}
+	Super::Jump();
+}
+
+bool AHomeWorldCharacter::TryMantleOrVault()
+{
+	return TraversalComponent ? TraversalComponent->TryMantleOrVault() : false;
+}
+
+bool AHomeWorldCharacter::TrySpiritBlink()
+{
+	return TraversalComponent ? TraversalComponent->TrySpiritBlink() : false;
+}
+
 void AHomeWorldCharacter::OnSpiritShieldTriggered(const FInputActionValue& Value)
 {
+	if (GetIsSpiritForm() && TrySpiritBlink())
+	{
+		return;
+	}
 	UE_LOG(LogTemp, Log, TEXT("HomeWorld: SpiritShield input triggered"));
 	if (!AbilitySystemComponent)
 	{
@@ -1139,6 +1189,11 @@ void AHomeWorldCharacter::ApplyFormForPhase(EHomeWorldTimeOfDayPhase Phase)
 	const int32 PhaseIdx = FMath::Clamp(static_cast<int32>(Phase), 0, 3);
 	const TCHAR* FormLabel = bSpirit ? TEXT("spirit") : TEXT("body");
 	UE_LOG(LogTemp, Log, TEXT("FORM: %s form (phase=%s; NightMix driven by TimeOfDaySubsystem)"), FormLabel, PhaseNames[PhaseIdx]);
+
+	if (TraversalComponent)
+	{
+		TraversalComponent->ApplyFormMovementTuning(bSpirit);
+	}
 
 	PlaySoftFormSwapFeedback(Phase, bSpirit);
 }

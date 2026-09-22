@@ -23,6 +23,7 @@ class UInputAction;
 class UInputMappingContext;
 class UHomeWorldFallbackGlideComponent;
 class UHomeWorldSoftBoundsComponent;
+class UHomeWorldTraversalComponent;
 
 UCLASS(Blueprintable)
 /**
@@ -113,6 +114,16 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Form", meta = (DisplayName = "Sync Form With Time Of Day"))
 	void SyncFormWithTimeOfDay();
 
+	/** MV-A: parkour-lite mantle/vault (body, day). */
+	UFUNCTION(BlueprintCallable, Category = "Movement|MV-A", meta = (DisplayName = "Try Mantle Or Vault"))
+	bool TryMantleOrVault();
+
+	/** MV-A: spirit blink toward shrine/anchor tags (night/spirit). */
+	UFUNCTION(BlueprintCallable, Category = "Movement|MV-A", meta = (DisplayName = "Try Spirit Blink"))
+	bool TrySpiritBlink();
+
+	virtual void Jump() override;
+
 protected:
 	virtual void PossessedBy(AController* NewController) override;
 
@@ -123,6 +134,10 @@ protected:
 	/** V1 soft pushback when leaving hero island bounds (no navmesh). */
 	UPROPERTY(VisibleAnywhere, Category = "Walk|Bounds")
 	TObjectPtr<UHomeWorldSoftBoundsComponent> SoftBoundsComponent;
+
+	/** MV-A: sprint / mantle / blink / mount boost on single CMC. */
+	UPROPERTY(VisibleAnywhere, Category = "Movement|MV-A")
+	TObjectPtr<UHomeWorldTraversalComponent> TraversalComponent;
 
 	/** NP-C: spirit form flag — Night/Dusk true, Day/Dawn false. SYS reads via GetIsSpiritForm(). */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Form")
@@ -302,6 +317,8 @@ protected:
 	void OnPlaceTriggered(const FInputActionValue& Value);
 	void OnAstralDeathTriggered(const FInputActionValue& Value);
 	void OnSpiritShieldTriggered(const FInputActionValue& Value);
+	void OnSprintStarted(const FInputActionValue& Value);
+	void OnSprintCompleted(const FInputActionValue& Value);
 
 	void ApplyFormForPhase(EHomeWorldTimeOfDayPhase Phase);
 	/** Docs/27 NF2-A: soft glow + optional sound/particle when form actually changes. */

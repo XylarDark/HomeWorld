@@ -168,9 +168,15 @@ bool UHomeWorldFallbackGlideComponent::StartGlide()
 	{
 		if (UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>())
 		{
+			const EHomeWorldTimeOfDayPhase Phase = TimeOfDay->GetCurrentPhase();
 			if (TimeOfDay->GetIsNight())
 			{
 				LOG_FALLBACK(TEXT("StartGlide blocked — night phase (day/body glide only)"));
+				return false;
+			}
+			if (Phase == EHomeWorldTimeOfDayPhase::Dusk)
+			{
+				LOG_FALLBACK(TEXT("StartGlide blocked — dusk buffer (no new glide start)"));
 				return false;
 			}
 		}

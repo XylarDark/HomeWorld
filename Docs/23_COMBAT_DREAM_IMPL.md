@@ -17,7 +17,7 @@ Lead **`APPROVE CD STRATEGY`**, 2026-09-21 ET — **GRANTED** (chat). Unlocks **
 
 **CD-A:** Lead **`APPROVE CD-A`**, 2026-09-21 ET — **GRANTED** (chat; DESKTOP greps deferred/accepted). Docs/23 Combat & Dream track **CLOSED / COMPLETE**. Implementation on main (`50faeab` / PR #128).
 
-**Next gate:** None on CD — **MV-A** is a separate track TBD (Lead gate). **CD-B** remains locked bible scope only; no Lead track opened.
+**Next gate:** None on CD — **MV-A** is a separate track ([Docs/24_MOVEMENT_IMPL.md](24_MOVEMENT_IMPL.md); Lead **`APPROVE MV STRATEGY`** / **`MV-A`** unlock 2026-09-21 ET). **CD-B** remains locked bible scope only; no Lead track opened.
 
 **Do not stamp phase APPROVED in a PR** — Lead types the gate string in chat.
 
