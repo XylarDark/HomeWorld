@@ -379,9 +379,10 @@ class _MrqOrchestrator:
                 "homestead_centroid_script": "pa_e_homestead_capture_diagnostic.py",
             },
             "epic_refs": [
-                "https://dev.epicgames.com/documentation/en-us/unreal-engine/python-api/class/MoviePipelineQueueSubsystem?application_version=5.7",
-                "https://dev.epicgames.com/documentation/en-us/unreal-engine/python-api/class/MoviePipelineOutputSetting?application_version=5.7",
-                "https://forums.unrealengine.com/t/unable-to-render-movie-render-queue-pie-executor-from-commandline-python-script/2556294",
+                "https://dev.epicgames.com/documentation/en-us/unreal-engine/python-api/class/OnMoviePipelineExecutorFinished?application_version=5.8",
+                "https://dev.epicgames.com/documentation/en-us/unreal-engine/python-api/class/MoviePipelineQueueSubsystem?application_version=5.8",
+                "https://dev.epicgames.com/documentation/en-us/unreal-engine/python-api/class/MoviePipelineOutputSetting?application_version=5.8",
+                "https://forums.unrealengine.com/t/unable-to-execute-moviepipelinequeue-from-python/467250",
             ],
             "ladder_doc": "docs/Automation/CAPTURE_REDUNDANCY.md",
             "ladder_rung": "1_built_in_and_in_repo",
