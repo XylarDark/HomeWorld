@@ -12,6 +12,8 @@
 
 Apply in order **before** escalating rungs or asking Lead open-ended “does anyone else hit this?”
 
+**KNOWN_ERROR_LOG:** [automation-standards.mdc](../../.cursor/rules/automation-standards.mdc) v1.10 § KNOWN_ERROR_LOG; bullets in [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) § PA-E DESKTOP prove misses.
+
 ### Testing preconditions (Lead lock-in — **all** automation, not capture-only)
 
 Before trusting **any** pass/fail output (CI, Editor Python, MCP harness, MRQ, screenshots, PIE tests, commandlets):

@@ -2,6 +2,19 @@
 
 Record errors and their fixes here so they are not repeated. See `.cursor/rules/07-ai-agent-behavior.mdc` (Error recurrence prevention) and `05-error-handling.mdc` (Learning from errors).
 
+## Format — TOKEN-LEAN (Lead, 2026-09-22)
+
+One-line **Cause→Avoid** rows; narratives → [DEFECT_PA_E](../Docs/qa/DEFECT_PA_E_shot_capture_automation.md), [AUTOMATION_GAPS](Automation/AUTOMATION_GAPS.md), [SESSION_LOG](SESSION_LOG.md). Policy: [.cursor/rules/automation-standards.mdc](../.cursor/rules/automation-standards.mdc) § KNOWN_ERROR_LOG.
+
+### PA-E DESKTOP prove misses (2026-09-22)
+
+- **World ≠ level_path:** report/`level_path` claimed `L_VS_MVP_Markers` while world was MainMenu → assert `get_editor_world()` or `load_level` before Arrange.
+- **Unreal off game thread:** `capture_shotlist_mrq.main()` on `threading.Thread` → MCP `execute_python_script` on game thread only.
+- **MCP disconnect ≠ Editor dead:** long MRQ run dropped MCP TCP → verify Editor process, port 55557, report/PNG mtimes before relaunch.
+- **Aim ok ≠ visual:** `homestead_bounds_relocate` + ray hit but ~90% black / scrap framing → `ready`/`aim_ok` ≠ PASS; center-crop assert; fix pose toward cabin/island center.
+- **Stale Sequencer vs live Arrange:** MRQ Level Sequence possessable Transform on `CAM_*` stale after live relocate → spawn/update `PA_E_MRQ_{shot}` at resolved pose or rebuild possessable and clear tracks.
+- **Dirty prove patch:** uncommitted `pa_e_shotlist_common.py` during prove → `git checkout <sha> -- Content/Python/pa_e_shotlist_common.py` after merge.
+
 **UE 5.8 — MassEntity plugin missing (2026-09-19, Docs/22 U58-C):** Safe-Build against Launcher UE 5.8 failed with `Unable to find plugin 'MassEntity' (referenced via HomeWorld.uproject)`. **Cause:** MassEntity was deprecated (engine-moved) and the stub plugin is **removed** from UE 5.8 installs; MassGameplay / MassAI remain. **Fix:** Remove `{ "Name": "MassEntity", "Enabled": true }` from `HomeWorld.uproject` Plugins; keep MassGameplay, MassAI, StateTree, ZoneGraph, SmartObjects. See [Docs/22_UE58_UPGRADE.md](../Docs/22_UE58_UPGRADE.md). *(Do not duplicate this entry — cross-link only when documenting Mass-related build failures.)*
 
 **UE 5.8 vs 5.7 BuildId module skip / editor hang (2026-09-20+, GC→PA DESKTOP prove):** Opening **UE 5.7** against modules/DLLs built for **UE 5.8** logs BuildId mismatch and **skips** `UnrealEditor-HomeWorld.dll`; Editor may hang (~320 MB, no MCP). **Cause:** Wrong engine association vs last Safe-Build. **Fix:** DESKTOP prove must use **UE 5.8** only (`EngineAssociation` **UE_5.8**, `Build-HomeWorld.bat` / `.\Tools\Safe-Build.ps1` on **DESKTOP-21CT3H0**). See [Docs/canon/PLAYTEST.md](../Docs/canon/PLAYTEST.md), [Docs/canon/DECISIONS.md](../Docs/canon/DECISIONS.md) (2026-09-20 row).

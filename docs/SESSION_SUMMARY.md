@@ -1,3 +1,7 @@
+## 2026-09-22 — PA-E DESKTOP prove miss log (TOKEN-LEAN policy)
+
+- Lead: **TOKEN-LEAN** known errors — harness one-line Cause→Avoid + KNOWN_ERRORS index (`pa-e-*` keys); six DESKTOP rows minified; no long narratives in agent memory. [automation-standards.mdc](../.cursor/rules/automation-standards.mdc) v1.9, [CAPTURE_REDUNDANCY.md](Automation/CAPTURE_REDUNDANCY.md), [KNOWN_ERRORS.md](KNOWN_ERRORS.md) § Index.
+
 ## 2026-09-22 — PA-E Arrange bounds relocate + cliff exclude (cloud)
 
 - Post-#171 DESKTOP: Arrange **`in_level_camera_aim_at_bounds`** only (wrong **Y** vs P6_FIX doc; cliff actors poisoned centroid). **Fix:** [pa_e_shotlist_common.py](../Content/Python/pa_e_shotlist_common.py) — **`homestead_bounds_relocate`** / doc fallback **`set_actor_location`**; exclude **Cliff** from aim needles; **`aim_ok`** requires **`forward_ray_hits_dress_aabb`**. KNOWN_ERRORS + CAPTURE_REDUNDANCY + HARNESS P0-8. Gap **OPEN** — DESKTOP re-prove framing.

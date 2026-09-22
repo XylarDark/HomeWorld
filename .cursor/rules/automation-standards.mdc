@@ -4,7 +4,7 @@ description: "Standards for automation that drives or configures Editor/engine f
 alwaysApply: false
 globs: "**/Content/Python/**, **/Tools/**, **/.github/workflows/**"
 priority: 9
-version: 1.7
+version: 1.10
 ---
 
 # Automation Standards
@@ -20,6 +20,10 @@ Applies to **every** automation / tooling gap (any tool surface). Canonical deta
 ### Lead-correction → harness (habit, token-efficient)
 
 When Lead corrects a **proven** miss (DESKTOP evidence, false PASS/FAIL), fold it into the repo **immediately**: blocking gate, assert threshold, or one row in `PROVE_CRITERIA` — **not** a long runbook or rediscovering the same rule in chat. Prefer **compact hard rules** over verbose prose.
+
+### KNOWN_ERROR_LOG (Lead hard rule)
+
+**KNOWN_ERROR_LOG:** Along-the-way logging required. Always-on = one-line Cause→Avoid only. Detail lives in [docs/KNOWN_ERRORS.md](../../docs/KNOWN_ERRORS.md) (retrieve on failure). Never paste episode narratives into agent profile memory or alwaysApply rules. Cap new always-on gate additions; prefer pointers to KNOWN_ERRORS section anchors (e.g. § PA-E DESKTOP prove misses).
 
 ### Testing preconditions (universal — before PASS/FAIL claims)
 
