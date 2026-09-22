@@ -1,7 +1,7 @@
 # Docs/MOVEMENT_BIBLE.md
 
 **Status:** LOCKED (Lead vision 2026-09-20 ET; Conductor scoped “bit of everything” NOW/LATER)  
-**Pointers:** `Docs/CAMERA_BIBLE.md`, `Docs/DAYNIGHT_BIBLE.md`, `Docs/HOMESTEAD_BIBLE.md`, `Docs/09_FALLBACK_GLIDE.md`, `Docs/canon/DO_NOT.md`
+**Pointers:** `Docs/CAMERA_BIBLE.md`, `Docs/DAYNIGHT_BIBLE.md`, `Docs/HOMESTEAD_BIBLE.md`, `Docs/SPIRIT_STEALTH_BIBLE.md`, `Docs/09_FALLBACK_GLIDE.md`, `Docs/canon/DO_NOT.md`
 
 ---
 
@@ -68,6 +68,7 @@ Movement is the action layer on an immersive-scale fantasy planet: by day, effic
 | Blink | Short **teleport/blink** to linked shrine / marked spirit anchors (moonlight portals remain for longer hops) |
 | Possess | Object/NPC possess = **stub/TODO** (log + one placeholder interact) — full kit LATER |
 | Flight | **Not NOW** — see LATER |
+| Stealth | **Hidden by default** in spirit form; torch light can expose — **no crouch**; alert/pressure **A2** per [`SPIRIT_STEALTH_BIBLE.md`](SPIRIT_STEALTH_BIBLE.md). **MV-A (#130)** does not implement SS-A |
 
 ### Day loop emphasis
 
@@ -96,6 +97,7 @@ First planet is the **tutorial planet**: authored layout that eases players into
 - Second CharacterMovement / parallel controllers  
 - Invisible walls as primary bounds  
 - Spirit full flight in NOW without Lead amend  
+- Crouch / stance stealth (use torch-light reveal per `SPIRIT_STEALTH_BIBLE`)  
 - Combat as the primary action replacement for traversal depth  
 - Procgen planet as NOW requirement  
 

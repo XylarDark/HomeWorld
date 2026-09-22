@@ -2,7 +2,7 @@
 
 Sacred systems and forbidden tropes. Prefer this over improvising mid-code.
 
-**Sources:** `Docs/00_CANON.md` §7; `Docs/01_GDD_MVP.md` §12; `Docs/21_REAP_SOW.md`; Lead 2026-09-20 combat framing A (amended 2026-09-21 — [COMBAT_DREAM_BIBLE.md](../COMBAT_DREAM_BIBLE.md)); [HOMESTEAD_BIBLE.md](../HOMESTEAD_BIBLE.md); [GATHER_CRAFT_BIBLE.md](../GATHER_CRAFT_BIBLE.md) (Lead 2026-09-21)
+**Sources:** `Docs/00_CANON.md` §7; `Docs/01_GDD_MVP.md` §12; `Docs/21_REAP_SOW.md`; Lead 2026-09-20 combat framing A (amended 2026-09-21 — [COMBAT_DREAM_BIBLE.md](../COMBAT_DREAM_BIBLE.md)); [HOMESTEAD_BIBLE.md](../HOMESTEAD_BIBLE.md); [GATHER_CRAFT_BIBLE.md](../GATHER_CRAFT_BIBLE.md) (Lead 2026-09-21); [SPIRIT_STEALTH_BIBLE.md](../SPIRIT_STEALTH_BIBLE.md) (Lead 2026-09-21)
 
 ## Sacred (do not break / replace silently)
 
@@ -30,6 +30,9 @@ Sacred systems and forbidden tropes. Prefer this over improvising mid-code.
 | Co-op drop-in on hub (MVP) | HOMESTEAD_BIBLE — NPC family instead |
 | Extra biome / second beast / 7th resource | MVP lock |
 | Night flight | Canon |
+| Crouch / stance stealth | [SPIRIT_STEALTH_BIBLE.md](../SPIRIT_STEALTH_BIBLE.md) — torch-light reveal + A2 alert only |
+| Spirit kill-on-detect / homestead spirit detection combat | Spirit found-out = pressure meter, not combat loop |
+| Merging body mundane torch with spirit reveal | Two torch systems — body safety vs spirit illuminate/reveal |
 | Photoreal / grimdark / sci-fi kits | Tone |
 | Silent refactors / deleting working files | Harness |
 | Worker self-approving a phase | Swarm |

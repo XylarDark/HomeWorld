@@ -3,7 +3,7 @@
 **Status:** LOCKED allowlist  
 **Rule:** If a verb is not listed here (or in the Docs/21 site actions below), **do not implement it**.
 
-**Sources:** `Docs/00_CANON.md` §3; `Docs/01_GDD_MVP.md` §4; `Docs/21_REAP_SOW.md`; [COMBAT_DREAM_BIBLE.md](../COMBAT_DREAM_BIBLE.md) (Lead 2026-09-21); [GATHER_CRAFT_BIBLE.md](../GATHER_CRAFT_BIBLE.md) (Lead 2026-09-21)
+**Sources:** `Docs/00_CANON.md` §3; `Docs/01_GDD_MVP.md` §4; `Docs/21_REAP_SOW.md`; [COMBAT_DREAM_BIBLE.md](../COMBAT_DREAM_BIBLE.md) (Lead 2026-09-21); [GATHER_CRAFT_BIBLE.md](../GATHER_CRAFT_BIBLE.md) (Lead 2026-09-21); [SPIRIT_STEALTH_BIBLE.md](../SPIRIT_STEALTH_BIBLE.md) (Lead 2026-09-21)
 
 ## Day / body only
 
@@ -26,6 +26,11 @@
 | V7 | Nurture ×2 | Homestead N1 crop + N2 stored → `M_Nurtured` |
 | RS-Sow | Nurture / influence sites | Night half of Docs/21 site kit |
 | RS-Dream | Placeholder dream-convert | Den/camp: heal/recruit; **convert, not kill**; no homestead |
+| SS-SpiritStealth | Spirit hidden default | After sleep→spirit: not shown in unlit spirit space; **no crouch** |
+| SS-FleeLight | Leave lit volume | Exit campfire/NPC torch/spirit torch overlap → alert decays; log `STEALTH: CLEAR` |
+| SS-QuickInteract | Interact under light pressure | Complete named interact before alert peak while **lit** (SS-A stub) |
+
+Spirit stealth volume enter (implementation): log `STEALTH: LIT enter`; alert ticks → `STEALTH: ALERT` — not separate player-facing verb rows beyond SS-* above.
 
 ## Planet — non-boss minigames (stubs NOW)
 
@@ -56,6 +61,7 @@ Boss volume enter (implementation): log `BOSS:PHASE_DAY` or `BOSS:PHASE_NIGHT` f
 ## Forbidden verb patterns
 
 - Homestead combat / attack / aggro (any phase)
+- Crouch / sneak stance as stealth (use SS-* + torch light per SPIRIT_STEALTH bible)
 - Free-flight / night glide
 - Crafting tree / unlisted recipe craft (named recipes only — [GATHER_CRAFT_BIBLE.md](../GATHER_CRAFT_BIBLE.md))
 - Kill win-condition combat (including bosses)
