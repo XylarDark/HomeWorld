@@ -12,6 +12,8 @@ Canon preset: Lib/07_Night_SpiritLayer/PRESET_Homestead_Night.md
 Public API (no screenshots):
 - apply_homestead_night_tune() — cvars + fog + warm/cool lights
 - verify_homestead_night_lighting_stack() — moon + skylight/directional + cabin warm
+- apply_mrq_pie_homestead_night_stack() — Phase-2 companion: exposure clamps, TMP reconfigure,
+  SkyAtmosphere + moon dir index 1 + SkyLight recapture (MRQ PIE void-sky fix)
 
 Writes Saved/vnp_night_evidence.json (full main() only).
 """
@@ -229,6 +231,17 @@ TMP_PA_E_ARRANGE_FOLDER = "VS_MVP/TMP_PA_E_Arrange"
 TMP_MOON_LABEL = "lit_moon"
 TMP_SKY_LABEL = "TMP_PA_E_SkyLight"
 TMP_CABIN_WARM_LABEL = "lit_cabinwarm"
+TMP_SKY_ATMO_LABEL = "TMP_PA_E_SkyAtmosphere"
+
+# PRESET world.sky_color #0B1630 — readable open-sky ambient when capture sees void black.
+_PRESET_SKY_AMBIENT_LINEAR = unreal.LinearColor(0.043, 0.086, 0.188, 1.0)
+
+MRQ_PIE_NIGHT_EXPOSURE_CVARS: tuple[str, ...] = (
+    "r.DefaultFeature.AutoExposure 1",
+    "r.DefaultFeature.AutoExposure.Bias 0",
+    "r.DefaultFeature.AutoExposure.MinBrightness 0.03",
+    "r.DefaultFeature.AutoExposure.MaxBrightness 2.0",
+)
 
 
 def _spawn_light_if_missing(
@@ -252,12 +265,47 @@ def _spawn_light_if_missing(
     return actor, True
 
 
-def _configure_directional_moon(actor, intensity: float = 3.5) -> list[str]:
-    applied: list[str] = []
+def _light_component(actor):
     try:
-        lc = actor.light_component if hasattr(actor, "light_component") else actor.root_component
+        return actor.light_component if hasattr(actor, "light_component") else actor.root_component
     except Exception:
-        lc = actor.root_component
+        return actor.root_component if actor else None
+
+
+def _invoke_recapture_skylight(comp) -> bool:
+    """RecaptureSky after atmosphere/moon changes — MRQ PIE needs fresh cubemap (Epic forums)."""
+    if comp is None:
+        return False
+    for target in (comp,):
+        for name in ("recapture_sky", "RecaptureSky"):
+            fn = getattr(target, name, None)
+            if callable(fn):
+                try:
+                    fn()
+                    return True
+                except Exception:
+                    pass
+    sky_cls = getattr(unreal, "SkyLightComponent", None)
+    if sky_cls is not None:
+        for name in ("recapture_sky", "RecaptureSky"):
+            fn = getattr(sky_cls, name, None)
+            if callable(fn):
+                try:
+                    fn(comp)
+                    return True
+                except Exception:
+                    pass
+    return False
+
+
+def _configure_directional_moon(
+    actor,
+    intensity: float = 3.5,
+    *,
+    atmosphere_sun_index: int = 1,
+) -> list[str]:
+    applied: list[str] = []
+    lc = _light_component(actor)
     warm = unreal.LinearColor(1.0, 0.88, 0.55, 1.0)
     if lc:
         if _try_set(lc, "light_color", warm):
@@ -266,17 +314,41 @@ def _configure_directional_moon(actor, intensity: float = 3.5) -> list[str]:
             applied.append("intensity")
         if _try_set(lc, "mobility", unreal.ComponentMobility.MOVABLE):
             applied.append("movable")
+        for prop in ("atmosphere_sun_light", "b_atmosphere_sun_light", "AtmosphereSunLight"):
+            if _try_set(lc, prop, True):
+                applied.append("atmosphere_sun_light")
+                break
+        for prop in ("atmosphere_sun_light_index", "AtmosphereSunLightIndex"):
+            if _try_set(lc, prop, int(atmosphere_sun_index)):
+                applied.append("atmosphere_sun_light_index=%d" % atmosphere_sun_index)
+                break
+        if _try_set(lc, "affects_world", True):
+            applied.append("affects_world")
     return applied
 
 
-def _configure_skylight(actor) -> list[str]:
+def _configure_skylight(actor, *, intensity: float = 1.35) -> list[str]:
     applied: list[str] = []
-    try:
-        comp = actor.light_component if hasattr(actor, "light_component") else actor.root_component
-    except Exception:
-        comp = actor.root_component
-    if comp and _try_set(comp, "intensity", 1.2):
-        applied.append("intensity")
+    comp = _light_component(actor)
+    if comp:
+        if _try_set(comp, "intensity", intensity):
+            applied.append("intensity")
+        if _try_set(comp, "mobility", unreal.ComponentMobility.MOVABLE):
+            applied.append("movable")
+        for prop in ("real_time_capture", "b_real_time_capture", "RealTimeCapture"):
+            if _try_set(comp, prop, True):
+                applied.append("real_time_capture")
+                break
+        for prop in ("lower_hemisphere_is_black", "b_lower_hemisphere_is_black"):
+            if _try_set(comp, prop, False):
+                applied.append("lower_hemisphere_not_black")
+                break
+        for prop in ("lower_hemisphere_color", "LowerHemisphereColor"):
+            if _try_set(comp, prop, _PRESET_SKY_AMBIENT_LINEAR):
+                applied.append("lower_hemisphere_color=preset_sky")
+                break
+        if _invoke_recapture_skylight(comp):
+            applied.append("recapture_sky")
     return applied
 
 
@@ -297,11 +369,139 @@ def _configure_cabin_warm_point(actor, intensity: float = 1200.0) -> list[str]:
     return applied
 
 
-def reseed_pa_e_tmp_night_fixtures(homestead_centroid: list[float] | None = None) -> dict:
+def _homestead_centroid_xyz(homestead_centroid: list[float] | None) -> tuple[float, float, float]:
+    if homestead_centroid and len(homestead_centroid) >= 3:
+        return homestead_centroid[0], homestead_centroid[1], homestead_centroid[2]
+    return -600.0, -100.0, 150.0
+
+
+def apply_mrq_pie_night_exposure_cvars() -> dict:
+    """Auto-exposure clamps so MRQ deferred frames keep readable night sky (not void black)."""
+    meta: dict = {"commands": [], "ok": True, "preset_doc": PRESET_HOMESTEAD_NIGHT_DOC}
+    for cmd in MRQ_PIE_NIGHT_EXPOSURE_CVARS:
+        try:
+            unreal.SystemLibrary.execute_console_command(None, cmd)
+            meta["commands"].append({"cmd": cmd, "ok": True})
+        except Exception as e:
+            meta["ok"] = False
+            meta["commands"].append({"cmd": cmd, "ok": False, "error": str(e)})
+    return meta
+
+
+def _ensure_sky_atmosphere(homestead_centroid: list[float] | None) -> dict:
+    """Sky Atmosphere required for directional Atmosphere Sun Light + MRQ sky (community/Epic)."""
+    cx, cy, cz = _homestead_centroid_xyz(homestead_centroid)
+    actors = unreal.EditorLevelLibrary.get_all_level_actors()
+    for a in actors:
+        if not a:
+            continue
+        cls = a.get_class().get_name() if a.get_class() else ""
+        if "SkyAtmosphere" in cls:
+            return {"present": True, "spawned": False, "label": _actor_label(a)}
+    atmo_cls = getattr(unreal, "SkyAtmosphere", None)
+    if atmo_cls is None:
+        return {"present": False, "spawned": False, "error": "SkyAtmosphere class missing"}
+    loc = unreal.Vector(cx, cy, cz + 200.0)
+    actor = unreal.EditorLevelLibrary.spawn_actor_from_class(
+        atmo_cls, loc, unreal.Rotator(0.0, 0.0, 0.0)
+    )
+    if actor:
+        try:
+            actor.set_actor_label(TMP_SKY_ATMO_LABEL)
+            actor.set_folder_path(TMP_PA_E_ARRANGE_FOLDER)
+        except Exception:
+            pass
+        return {"present": True, "spawned": True, "label": TMP_SKY_ATMO_LABEL}
+    return {"present": False, "spawned": False, "error": "spawn_failed"}
+
+
+def reconfigure_pa_e_mrq_night_fixtures(homestead_centroid: list[float] | None = None) -> dict:
+    """Force moon index 1 + SkyLight fill + recapture on existing TMP/in-level lights (MRQ PIE path)."""
+    actors = unreal.EditorLevelLibrary.get_all_level_actors()
+    tuned: list[dict] = []
+    recaptures = 0
+    cx, cy, cz = _homestead_centroid_xyz(homestead_centroid)
+    target = unreal.Vector(cx, cy, cz)
+
+    for a in actors:
+        if not a:
+            continue
+        label = _actor_label(a)
+        label_l = label.lower()
+        cls = a.get_class().get_name() if a.get_class() else ""
+
+        if "DirectionalLight" in cls and (
+            label == TMP_MOON_LABEL or any(n in label_l for n in _MOON_LABEL_NEEDLES)
+        ):
+            try:
+                moon_loc = a.get_actor_location()
+                moon_rot = unreal.MathLibrary.find_look_at_rotation(moon_loc, target)
+                a.set_actor_rotation(moon_rot, False)
+            except Exception:
+                pass
+            cfg = _configure_directional_moon(a, atmosphere_sun_index=1)
+            tuned.append({"label": label, "class": cls, "configured": cfg})
+            continue
+
+        if "SkyLight" in cls:
+            cfg = _configure_skylight(a)
+            if "recapture_sky" in cfg:
+                recaptures += 1
+            tuned.append({"label": label, "class": cls, "configured": cfg})
+            continue
+
+        if label == TMP_CABIN_WARM_LABEL or any(n in label_l for n in _CABIN_WARM_NEEDLES):
+            if "PointLight" in cls or "SpotLight" in cls or "RectLight" in cls:
+                tuned.append(
+                    {
+                        "label": label,
+                        "class": cls,
+                        "configured": _configure_cabin_warm_point(a),
+                    }
+                )
+
+    return {
+        "lights_reconfigured": tuned,
+        "skylight_recaptures": recaptures,
+        "homestead_centroid_used": [cx, cy, cz],
+    }
+
+
+def apply_mrq_pie_homestead_night_stack(
+    homestead_centroid: list[float] | None = None,
+) -> dict:
+    """Full MRQ PIE night stack: exposure cvars, TMP (re)seed, atmosphere, tune, recapture."""
+    exposure = apply_mrq_pie_night_exposure_cvars()
+    reseed = reseed_pa_e_tmp_night_fixtures(homestead_centroid, force_mrq_pie=True)
+    atmosphere = _ensure_sky_atmosphere(homestead_centroid)
+    reconfigure = reconfigure_pa_e_mrq_night_fixtures(homestead_centroid)
+    tune = apply_homestead_night_tune()
+    verify = verify_homestead_night_lighting_stack()
+    return {
+        "ok": bool(exposure.get("ok") and tune.get("ok") and verify.get("stack_ok")),
+        "exposure_cvars": exposure,
+        "tmp_fixture_reseed": reseed,
+        "sky_atmosphere": atmosphere,
+        "mrq_fixture_reconfigure": reconfigure,
+        "night_tune": tune,
+        "lighting_stack_verify": verify,
+        "stack_ok": bool(verify.get("stack_ok")),
+        "note": (
+            "MRQ PIE respawns world — reconfigure + SkyLight recapture + moon AtmosphereSunLightIndex 1 "
+            "before each job; do not switch to day for void sky."
+        ),
+    }
+
+
+def reseed_pa_e_tmp_night_fixtures(
+    homestead_centroid: list[float] | None = None,
+    *,
+    force_mrq_pie: bool = False,
+) -> dict:
     """Idempotent TMP moon + skylight + cabin warm after load_level (prove without saving .umap)."""
     actors = unreal.EditorLevelLibrary.get_all_level_actors()
     verify_before = verify_homestead_night_lighting_stack(actors)
-    if verify_before.get("stack_ok"):
+    if verify_before.get("stack_ok") and not force_mrq_pie:
         return {
             "skipped": True,
             "reason": "stack_already_ok",
@@ -310,12 +510,7 @@ def reseed_pa_e_tmp_night_fixtures(homestead_centroid: list[float] | None = None
             "spawned": [],
         }
 
-    if homestead_centroid and len(homestead_centroid) >= 3:
-        cx, cy, cz = homestead_centroid[0], homestead_centroid[1], homestead_centroid[2]
-    else:
-        # PRESET graybox cabin warm origin (meters) → UE cm
-        cx, cy, cz = -600.0, -100.0, 150.0
-
+    cx, cy, cz = _homestead_centroid_xyz(homestead_centroid)
     target = unreal.Vector(cx, cy, cz)
     moon_loc = unreal.Vector(cx - 8000.0, cy - 6000.0, cz + 12000.0)
     sky_loc = unreal.Vector(cx, cy, cz + 400.0)
@@ -330,29 +525,40 @@ def reseed_pa_e_tmp_night_fixtures(homestead_centroid: list[float] | None = None
     moon, moon_new = _spawn_light_if_missing(
         actors, TMP_MOON_LABEL, unreal.DirectionalLight, moon_loc, moon_rot
     )
-    if moon and moon_new:
-        spawned.append({"label": TMP_MOON_LABEL, "class": "DirectionalLight", "configured": _configure_directional_moon(moon)})
+    if moon:
+        cfg = _configure_directional_moon(moon, atmosphere_sun_index=1)
+        if moon_new:
+            spawned.append({"label": TMP_MOON_LABEL, "class": "DirectionalLight", "configured": cfg})
+        elif force_mrq_pie:
+            spawned.append({"label": TMP_MOON_LABEL, "class": "DirectionalLight", "reconfigured": cfg})
 
     sky, sky_new = _spawn_light_if_missing(actors, TMP_SKY_LABEL, unreal.SkyLight, sky_loc)
-    if sky and sky_new:
-        spawned.append({"label": TMP_SKY_LABEL, "class": "SkyLight", "configured": _configure_skylight(sky)})
+    if sky:
+        cfg = _configure_skylight(sky)
+        if sky_new:
+            spawned.append({"label": TMP_SKY_LABEL, "class": "SkyLight", "configured": cfg})
+        elif force_mrq_pie:
+            spawned.append({"label": TMP_SKY_LABEL, "class": "SkyLight", "reconfigured": cfg})
 
     cabin, cabin_new = _spawn_light_if_missing(
         actors, TMP_CABIN_WARM_LABEL, unreal.PointLight, cabin_loc
     )
-    if cabin and cabin_new:
-        spawned.append(
-            {
-                "label": TMP_CABIN_WARM_LABEL,
-                "class": "PointLight",
-                "configured": _configure_cabin_warm_point(cabin),
-            }
-        )
+    if cabin:
+        cfg = _configure_cabin_warm_point(cabin)
+        if cabin_new:
+            spawned.append(
+                {"label": TMP_CABIN_WARM_LABEL, "class": "PointLight", "configured": cfg}
+            )
+        elif force_mrq_pie:
+            spawned.append(
+                {"label": TMP_CABIN_WARM_LABEL, "class": "PointLight", "reconfigured": cfg}
+            )
 
     actors_after = unreal.EditorLevelLibrary.get_all_level_actors()
     verify_after = verify_homestead_night_lighting_stack(actors_after)
-    return {
+    out: dict = {
         "skipped": False,
+        "force_mrq_pie": force_mrq_pie,
         "homestead_centroid_used": [cx, cy, cz],
         "spawned": spawned,
         "verify_before": verify_before,
@@ -360,6 +566,9 @@ def reseed_pa_e_tmp_night_fixtures(homestead_centroid: list[float] | None = None
         "stack_ok_after_reseed": bool(verify_after.get("stack_ok")),
         "note": "TMP actors under VS_MVP/TMP_PA_E_Arrange — re-run after load_level; optional KEEP-LOCAL save.",
     }
+    if force_mrq_pie:
+        out["reason"] = "mrq_pie_force_reconfigure"
+    return out
 
 
 def verify_homestead_night_lighting_stack(actors: list | None = None) -> dict:
