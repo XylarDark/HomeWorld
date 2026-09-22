@@ -9424,3 +9424,11 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 **Pending:** DESKTOP re-prove PA-E capture report.
 
 **Errors:** None (cloud; no UE prove).
+
+## 2026-09-22 — Universal tooling practice suite (Lead lock-in, docs only, cloud)
+
+**Completed:** Reframed [CAPTURE_REDUNDANCY.md](Automation/CAPTURE_REDUNDANCY.md) as canonical **universal** tooling redundancy + practice (docs-first, proven-results first, research on dead-ends, gated ladder); consolidated [AUTOMATION_GAPS.md](Automation/AUTOMATION_GAPS.md) policy block; [automation-standards.mdc](../.cursor/rules/automation-standards.mdc) v1.4; [DOCS_LAYOUT.md](DOCS_LAYOUT.md) blurb. Capture arc examples only under non-exhaustive instance sections.
+
+**Pending:** PR merge; no code/DESKTOP prove.
+
+**Errors:** None.
