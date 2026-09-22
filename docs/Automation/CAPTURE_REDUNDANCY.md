@@ -8,9 +8,27 @@
 
 ## Global ladder (all tooling gaps)
 
+### Docs-first (Lead policy, 2026-09-22)
+
+Applies to **all** tooling gaps on this ladder (not only capture).
+
+**Before** using or hardening Unreal **console commands**, **Editor Python APIs**, or similar tooling: read the **official Epic (or vendor) documentation** for that command/API **first**, unless the exact usage is already recorded in repo policy (e.g. [KNOWN_ERRORS.md](../KNOWN_ERRORS.md), this file) or durable agent memory.
+
+- Match documented **parameter order**, **required context** (e.g. PIE vs editor viewport), and **default save paths**.
+- Do **not** learn or lock in usage **only** from failed DESKTOP proves — consult docs (or `/parallel-extract` on Epic URLs per [11-parallel-plugin.mdc](../../.cursor/rules/11-parallel-plugin.mdc)) before adding retries, alternate command strings, or wait logic.
+
+**Reference docs (capture examples):**
+
+- Epic [Taking Screenshots](https://dev.epicgames.com/documentation/en-us/unreal-engine/taking-screenshots-in-unreal-engine) — e.g. `HighResShot filename=PATH (XxY OR Multiplier) …`, PIE/standalone framing
+- Epic [AutomationLibrary (Python API)](https://dev.epicgames.com/documentation/en-us/unreal-engine/python-api/class/AutomationLibrary?application_version=5.8) — e.g. `take_high_res_screenshot`
+
+**Motivating miss (2026-09-22):** Automation issued `HighResShot 1920x1080 filename="…"` without a docs-first check; Epic documents **`filename=` before dimensions**.
+
+---
+
 ### Rung 1 — Built-in / already-in-repo (no gate)
 
-**Exhaust first, every time.** Re-try when the engine, MCP plugin, or repo scripts change (e.g. UE 5.8 `AutomationLibrary` improvements).
+**Exhaust first, every time.** Re-try when the engine, MCP plugin, or repo scripts change (e.g. UE 5.8 `AutomationLibrary` improvements). **Docs-first** (above) applies before hardening any rung-1 console/API call.
 
 | Allowed without a new gate | Examples |
 |----------------------------|----------|

@@ -1,3 +1,7 @@
+## 2026-09-22 — Docs-first console/API policy (Lead lock-in, cloud)
+
+- Lead policy: read official Epic/vendor docs before hardening console commands / Editor Python APIs — [docs/Automation/CAPTURE_REDUNDANCY.md](Automation/CAPTURE_REDUNDANCY.md) § Docs-first; [AUTOMATION_GAPS.md](Automation/AUTOMATION_GAPS.md) + research log; [.cursor/rules/automation-standards.mdc](../.cursor/rules/automation-standards.mdc). Motivating miss: **HighResShot** parameter order vs [Taking Screenshots](https://dev.epicgames.com/documentation/en-us/unreal-engine/taking-screenshots-in-unreal-engine). Docs-only; no script changes in this PR.
+
 ## 2026-09-22 — PA-E console HighResShot primary (cloud, rung 1)
 
 - DESKTOP after #157: AutomationLibrary **AutomationEditorTask** stall → both shots `file_missing`. [capture_shotlist_viewport.py](../Content/Python/capture_shotlist_viewport.py): console **HighResShot** primary (multi cmd forms), viewport focus + Slate tick pump, AutomationLibrary fallback only; `file_produced_by` in report. [capture_viewport.py](../Content/Python/capture_viewport.py) same order. KNOWN_ERRORS + AUTOMATION_GAPS note. Gap **OPEN** — no DESKTOP PASS claim.

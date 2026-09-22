@@ -9385,6 +9385,14 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 **Errors:** None (cloud; no UE prove).
 
+## 2026-09-22 — Docs-first console/API policy (Lead lock-in, cloud)
+
+**Completed:** Lead lock-in docs — CAPTURE_REDUNDANCY § Docs-first, AUTOMATION_GAPS policy + research log, automation-standards.mdc bullet. HighResShot motivating case cited; Epic Taking Screenshots link.
+
+**Pending:** Optional follow-up PR to align capture script console syntax with Epic docs after docs-first review.
+
+**Errors:** None.
+
 ## 2026-09-22 — PA-E console HighResShot primary after AutomationEditorTask stall (cloud)
 
 **Completed:** After #157 DESKTOP FAIL (AutomationEditorTask never done, file_missing). Hardened `capture_shotlist_viewport.py` — console HighResShot primary, viewport focus, Slate pump, AutomationLibrary fallback; `capture_viewport.py` console-first. KNOWN_ERRORS / AUTOMATION_GAPS / SESSION_SUMMARY.
