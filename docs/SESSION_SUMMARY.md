@@ -709,6 +709,10 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 - Lead **`APPROVE GC STRATEGY`** → `Docs/22_GATHER_CRAFT_IMPL.md`, handoff `Docs/handoffs/GC_A_SITE_RES.md`, `DECISIONS.md` strategy row.
 - C++: `EHomeWorldGatherSiteKind`, pile `GatherSiteKind`, flint/grass flavor logs; Python `homeworld_gc_site_setup.py` + VS_MVP placement scripts. GC-B/C not in PR.
 
+## 2026-09-22 — Split greybox keyart + ART bible (cloud)
+
+- Lead approved adding `refs/keyart_homestead_planetside_split.jpg`; `Docs/02_ART_BIBLE.md` north stars now list night + split dual-zone refs. Docs/asset only.
+
 ## 2026-09-22 — DS-A visible demo spine (cloud)
 
 - Lead **`APPROVE DEMO-SPINE`** → `Docs/30_DEMO_SPINE.md`, handoff `Docs/handoffs/DS_A_VISIBLE_HEARTH.md`, `DECISIONS.md` DS strategy row.
