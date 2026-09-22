@@ -597,7 +597,7 @@ def _invoke_automation_library_shot(
 def _capture_with_console_then_fallback(
     dest_abs: str,
     camera,
-    since_mtime: float,
+    _since_mtime: float,
 ) -> dict[str, Any]:
     """Console first (doc-ordered forms + per-form wait); AutomationLibrary if all miss."""
     finish_load = _finish_loading_before_screenshot()
