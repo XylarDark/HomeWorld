@@ -1,8 +1,9 @@
 """PA-E / shotlist viewport capture — Editor Python only.
 
 Loads L_VS_MVP_Markers, poses level viewport for Shot 1 (lookout) and Shot 2
-(cabin/garden), lit + game view, take_high_res_screenshot (force_game_view),
-validates PNGs, writes Saved/pa_e_capture_report.json.
+(cabin/garden), lit + game view, console HighResShot (primary) with
+AutomationLibrary fallback if no PNG appears, validates PNGs, writes
+Saved/pa_e_capture_report.json.
 
 Run: MCP execute_python_script("capture_shotlist_viewport.py") or UnrealEditor-Cmd
 -ExecutePythonScript=... (uses vnp_editor_keep_alive).
@@ -29,6 +30,7 @@ RES_X, RES_Y = 1920, 1080
 MIN_BYTES = 50 * 1024
 MIN_MEAN_LUMINANCE = 8.0  # reject near-black (0–255 scale)
 SETTLE_FRAMES = 12
+POST_CONSOLE_SETTLE_FRAMES = 8
 WAIT_FILE_SEC = 120.0
 STABLE_POLL_INTERVAL = 0.35
 STABLE_SIZE_POLLS = 4
@@ -286,12 +288,85 @@ def _set_lit_and_game_view() -> dict:
 
 def _settle_viewport(frames: int = SETTLE_FRAMES) -> None:
     for _ in range(frames):
-        try:
-            if hasattr(unreal.AutomationLibrary, "automation_wait_for_loading"):
-                unreal.AutomationLibrary.automation_wait_for_loading(None, 0.05)
-        except Exception:
-            pass
+        _pump_editor_once()
         time.sleep(0.05)
+
+
+def _pump_editor_once() -> None:
+    try:
+        if hasattr(unreal.AutomationLibrary, "automation_wait_for_loading"):
+            unreal.AutomationLibrary.automation_wait_for_loading(None, 0.05)
+    except Exception:
+        pass
+    try:
+        if hasattr(unreal, "SlateApplication"):
+            app = unreal.SlateApplication.get()
+            if app is not None and hasattr(app, "tick"):
+                app.tick(0.033)
+    except Exception:
+        pass
+
+
+def _focus_level_viewport() -> dict[str, Any]:
+    """Bring level viewport to foreground / realtime before HighResShot."""
+    attempts: list[dict[str, Any]] = []
+    any_ok = False
+
+    def try_call(label: str, fn) -> None:
+        nonlocal any_ok
+        try:
+            fn()
+            attempts.append({"method": label, "ok": True})
+            any_ok = True
+        except Exception as e:
+            attempts.append({"method": label, "ok": False, "error": str(e)})
+
+    try:
+        les = unreal.get_editor_subsystem(unreal.LevelEditorSubsystem)
+        if les:
+            for attr in (
+                "set_level_viewport_realtime",
+                "editor_set_level_viewport_realtime",
+            ):
+                if hasattr(les, attr):
+                    try_call(
+                        "LevelEditorSubsystem.%s" % attr,
+                        lambda a=attr: getattr(les, a)(True),
+                    )
+            for attr in ("focus_level_viewport", "set_focus_to_level_viewport"):
+                if hasattr(les, attr):
+                    try_call(
+                        "LevelEditorSubsystem.%s" % attr,
+                        lambda a=attr: getattr(les, a)(),
+                    )
+    except Exception as e:
+        attempts.append({"method": "LevelEditorSubsystem", "ok": False, "error": str(e)})
+
+    try:
+        ues = unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem)
+        if ues:
+            for attr in (
+                "focus_level_viewport",
+                "set_focus_to_level_viewport",
+                "editor_focus_viewport",
+            ):
+                if hasattr(ues, attr):
+                    try_call(
+                        "UnrealEditorSubsystem.%s" % attr,
+                        lambda a=attr: getattr(ues, a)(),
+                    )
+    except Exception as e:
+        attempts.append({"method": "UnrealEditorSubsystem", "ok": False, "error": str(e)})
+
+    for cmd in ("FOCUSVIEWPORT", "focus"):
+        try_call(
+            "console_%s" % cmd,
+            lambda c=cmd: unreal.SystemLibrary.execute_console_command(None, c),
+        )
+
+    meta = {"attempts": attempts, "any_ok": any_ok}
+    _log("viewport_focus", meta)
+    return meta
 
 
 def _pose_viewport(
@@ -368,11 +443,40 @@ def _poll_automation_editor_task(task: Any, timeout_sec: float = 60.0) -> dict[s
     return meta
 
 
-def _take_high_res_screenshot(
+def _invoke_console_high_res_shot(dest_abs: str) -> dict[str, Any]:
+    """Primary capture: Editor console HighResShot with absolute forward-slash path."""
+    ue_path = _path_for_ue(dest_abs)
+    meta: dict[str, Any] = {
+        "ue_path": ue_path,
+        "commands_tried": [],
+        "method_used": None,
+        "error": None,
+    }
+    commands = (
+        ("HighResShot_res_filename", 'HighResShot %dx%d filename="%s"' % (RES_X, RES_Y, ue_path)),
+        ("HighResShot_filename_only", 'HighResShot filename="%s"' % ue_path),
+        ("HighResShot_res", "HighResShot %dx%d" % (RES_X, RES_Y)),
+    )
+    last_err: Optional[str] = None
+    for label, cmd in commands:
+        meta["commands_tried"].append({"label": label, "cmd": cmd})
+        try:
+            unreal.SystemLibrary.execute_console_command(None, cmd)
+            meta["method_used"] = label
+            _log("console HighResShot invoked", {"label": label, "ue_path": ue_path})
+            return meta
+        except Exception as e:
+            last_err = str(e)
+            meta["commands_tried"][-1]["error"] = last_err
+    meta["error"] = last_err or "all console HighResShot forms failed"
+    return meta
+
+
+def _invoke_automation_library_shot(
     dest_abs: str,
     camera,
 ) -> tuple[str, Optional[str], str, Any, dict[str, Any]]:
-    """Single capture; returns (method, error, path_passed_to_ue, task, task_poll)."""
+    """Fallback capture when console HighResShot did not produce a file."""
     ue_path = _path_for_ue(dest_abs)
     last_err: Optional[str] = None
     attempts = (
@@ -390,19 +494,75 @@ def _take_high_res_screenshot(
         try:
             task = fn()
             poll = _poll_automation_editor_task(task)
+            _log("AutomationLibrary fallback invoked", {"method": name, "task_poll": poll})
             return name, None, ue_path, task, poll
         except TypeError:
             continue
         except Exception as e:
             last_err = str(e)
-    try:
-        unreal.SystemLibrary.execute_console_command(
-            None,
-            'HighResShot %dx%d filename="%s"' % (RES_X, RES_Y, ue_path),
-        )
-        return "HighResShot_console_abs", None, ue_path, None, {"had_task": False}
-    except Exception as e2:
-        return "failed", last_err or str(e2), ue_path, None, {"had_task": False}
+    return "automation_failed", last_err or "AutomationLibrary unavailable", ue_path, None, {
+        "had_task": False,
+    }
+
+
+def _capture_with_console_then_fallback(
+    dest_abs: str,
+    camera,
+    since_mtime: float,
+) -> dict[str, Any]:
+    """Console first; AutomationLibrary only if wait finds no fresh PNG."""
+    focus = _focus_level_viewport()
+    console = _invoke_console_high_res_shot(dest_abs)
+    _settle_viewport(frames=POST_CONSOLE_SETTLE_FRAMES)
+
+    resolved, wait_meta = _wait_for_capture(dest_abs, since_mtime, WAIT_FILE_SEC)
+    out: dict[str, Any] = {
+        "viewport_focus": focus,
+        "console_capture": console,
+        "primary_path": "console",
+        "capture_method": console.get("method_used") or "console_failed",
+        "capture_error": console.get("error"),
+        "ue_path": console.get("ue_path"),
+        "automation_task_poll": {"had_task": False},
+        "automation_fallback": None,
+        "saved_path": resolved,
+        "wait": wait_meta,
+        "file_produced_by": console.get("method_used") if resolved else None,
+    }
+
+    if resolved:
+        _log("capture file from console path", {"dest": dest_abs, "method": out["file_produced_by"]})
+        return out
+
+    _log("console path produced no file; trying AutomationLibrary fallback", {"dest": dest_abs})
+    fallback_since = time.time()
+    method, cap_err, ue_path, _task, task_poll = _invoke_automation_library_shot(
+        dest_abs, camera
+    )
+    _settle_viewport(frames=POST_CONSOLE_SETTLE_FRAMES)
+    resolved_fb, wait_fb = _wait_for_capture(dest_abs, fallback_since, WAIT_FILE_SEC)
+    out["automation_fallback"] = {
+        "capture_method": method,
+        "capture_error": cap_err,
+        "ue_path": ue_path,
+        "automation_task_poll": task_poll,
+        "wait": wait_fb,
+        "capture_since": fallback_since,
+    }
+    out["capture_method"] = method
+    out["capture_error"] = cap_err
+    out["ue_path"] = ue_path
+    out["automation_task_poll"] = task_poll
+    out["primary_path"] = "console_then_automation_fallback"
+    out["wait"] = {"console_wait": wait_meta, "fallback_wait": wait_fb}
+    if resolved_fb:
+        out["saved_path"] = resolved_fb
+        out["file_produced_by"] = method
+        _log("capture file from AutomationLibrary fallback", {"dest": dest_abs, "method": method})
+    else:
+        out["saved_path"] = None
+        out["file_produced_by"] = None
+    return out
 
 
 def _find_named_png(
@@ -588,15 +748,17 @@ def _capture_shot(shot: dict) -> dict:
     dest = _shot_dest_abs(shot["filename"])
     purge = _purge_stale_shot_pngs(dest)
     since = time.time()
-    method, cap_err, ue_path, cap_task, task_poll = _take_high_res_screenshot(
-        dest, cam if cam else None
-    )
+    cap = _capture_with_console_then_fallback(dest, cam if cam else None, since)
+    resolved = cap.get("saved_path")
     _log(
         "capture invoked",
-        {"id": shot["id"], "method": method, "ue_path": ue_path, "dest_abs": dest},
+        {
+            "id": shot["id"],
+            "method": cap.get("capture_method"),
+            "file_produced_by": cap.get("file_produced_by"),
+            "dest_abs": dest,
+        },
     )
-    _settle_viewport(frames=8)
-    resolved, wait_meta = _wait_for_capture(dest, since, WAIT_FILE_SEC)
     validation = _validate_png(resolved)
     desktop = _copy_to_desktop(resolved, shot["filename"]) if resolved else {"copied": False}
     entry = {
@@ -604,12 +766,17 @@ def _capture_shot(shot: dict) -> dict:
         "filename": shot["filename"],
         "dest_abs": dest,
         "purge_before_capture": purge,
-        "capture_method": method,
-        "capture_error": cap_err,
-        "ue_path": ue_path,
-        "automation_task_poll": task_poll,
+        "capture_method": cap.get("capture_method"),
+        "capture_error": cap.get("capture_error"),
+        "file_produced_by": cap.get("file_produced_by"),
+        "primary_path": cap.get("primary_path"),
+        "ue_path": cap.get("ue_path"),
+        "viewport_focus": cap.get("viewport_focus"),
+        "console_capture": cap.get("console_capture"),
+        "automation_fallback": cap.get("automation_fallback"),
+        "automation_task_poll": cap.get("automation_task_poll"),
         "saved_path": resolved,
-        "wait": wait_meta,
+        "wait": cap.get("wait"),
         "engine_search_roots": _engine_search_roots(),
         "capture_since": since,
         "pose": pose_meta,

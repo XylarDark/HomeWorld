@@ -1,3 +1,7 @@
+## 2026-09-22 — PA-E console HighResShot primary (cloud, rung 1)
+
+- DESKTOP after #157: AutomationLibrary **AutomationEditorTask** stall → both shots `file_missing`. [capture_shotlist_viewport.py](../Content/Python/capture_shotlist_viewport.py): console **HighResShot** primary (multi cmd forms), viewport focus + Slate tick pump, AutomationLibrary fallback only; `file_produced_by` in report. [capture_viewport.py](../Content/Python/capture_viewport.py) same order. KNOWN_ERRORS + AUTOMATION_GAPS note. Gap **OPEN** — no DESKTOP PASS claim.
+
 ## 2026-09-22 — PA-E capture abspath + stale purge + luminance gate (cloud, rung 1)
 
 - DESKTOP re-prove after #156 still FAIL (relative paths, Shot1 missing, Shot2 stale false-pass). [capture_shotlist_viewport.py](../Content/Python/capture_shotlist_viewport.py): `abspath(project_dir)`; purge PNGs before capture; PIL luminance required; mtime ≥ capture_since; multi game-view API attempts; AutomationEditorTask poll. KNOWN_ERRORS + AUTOMATION_GAPS note. Gap **OPEN** — no DESKTOP PASS claim.

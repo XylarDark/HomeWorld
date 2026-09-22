@@ -67,7 +67,8 @@ Formal stills for [Docs/00_SHOTLIST.md](../../Docs/00_SHOTLIST.md), PA-E evidenc
 
 | Item | Notes |
 |------|--------|
-| `unreal.AutomationLibrary.take_high_res_screenshot(..., force_game_view=True)` | Viewport/game view; **one capture per shot**; wait for async PNG |
+| Console **`HighResShot`** via `execute_console_command` (absolute `filename=`) | **Primary** in [capture_shotlist_viewport.py](../../Content/Python/capture_shotlist_viewport.py); viewport focus + pump before capture |
+| `unreal.AutomationLibrary.take_high_res_screenshot(..., force_game_view=True)` | **Fallback** if console wait finds no fresh PNG; AutomationEditorTask may stall on some DESKTOP runs |
 | `EditorPythonScripting.set_keep_python_script_alive(True)` | [vnp_editor_keep_alive.py](../../Content/Python/vnp_editor_keep_alive.py) |
 | Lit + game view | `viewmode lit`; `UnrealEditorSubsystem.editor_set_game_view(True)` when exposed |
 | **Canonical script** | [capture_shotlist_viewport.py](../../Content/Python/capture_shotlist_viewport.py) → `Saved/Screenshots/PA_E/`, `Saved/pa_e_capture_report.json`, copy to `C:/Users/User/Desktop/HomeWorld_PA_E/` |

@@ -3,8 +3,8 @@
 # Callable via MCP execute_python_script("capture_viewport.py").
 # Result metadata written to Saved/screenshot_result.json.
 #
-# take_high_res_screenshot is asynchronous — wait for the PNG on disk before
-# treating capture as success (see capture_shotlist_viewport.py / CAPTURE_REDUNDANCY.md).
+# Console HighResShot first; AutomationLibrary fallback if no PNG on disk.
+# See capture_shotlist_viewport.py / CAPTURE_REDUNDANCY.md.
 
 import json
 import os
@@ -28,8 +28,25 @@ def _output_dir():
     return out
 
 
-def _take_high_res(resolution_x, resolution_y, filename, result):
-    """AutomationLibrary with force_game_view when the UE build supports it."""
+def _console_high_res(resolution_x, resolution_y, filepath, result):
+    """Primary: HighResShot console command (absolute path, forward slashes)."""
+    ue_path = os.path.abspath(filepath).replace("\\", "/")
+    commands = (
+        ("ConsoleCommand_res_filename", 'HighResShot %dx%d filename="%s"' % (resolution_x, resolution_y, ue_path)),
+        ("ConsoleCommand_filename_only", 'HighResShot filename="%s"' % ue_path),
+    )
+    for method, cmd in commands:
+        try:
+            unreal.SystemLibrary.execute_console_command(None, cmd)
+            result["method"] = method
+            return True
+        except Exception as e:
+            result.setdefault("console_errors", []).append({method: str(e)})
+    return False
+
+
+def _take_high_res_automation_fallback(resolution_x, resolution_y, filename, result):
+    """Fallback: AutomationLibrary when console HighResShot did not write a PNG."""
     if not hasattr(unreal, "AutomationLibrary"):
         return False
     attempts = (
@@ -47,6 +64,7 @@ def _take_high_res(resolution_x, resolution_y, filename, result):
         try:
             fn()
             result["method"] = method
+            result["used_automation_fallback"] = True
             return True
         except TypeError:
             continue
@@ -75,32 +93,25 @@ def capture(filename=None, resolution_x=1920, resolution_y=1080):
     result = {"requested": filepath, "captured": False, "async_note": "wait_for_png_on_disk"}
 
     since = time.time()
-    if _take_high_res(resolution_x, resolution_y, filename, result):
+    if _console_high_res(resolution_x, resolution_y, filepath, result):
         if _wait_for_file(filepath, since):
             result["captured"] = True
             result["path"] = filepath
+            result["file_produced_by"] = result.get("method")
             _write_result(result)
             return filepath
-        result["error"] = "AutomationLibrary invoked but PNG missing or too small after wait"
+
+    fallback_since = time.time()
+    if _take_high_res_automation_fallback(resolution_x, resolution_y, filename, result):
+        if _wait_for_file(filepath, fallback_since):
+            result["captured"] = True
+            result["path"] = filepath
+            result["file_produced_by"] = result.get("method")
+            _write_result(result)
+            return filepath
+        result["error"] = "AutomationLibrary fallback invoked but PNG missing or too small after wait"
         _write_result(result)
         return None
-
-    # Method 2: Console command
-    try:
-        cmd = "HighResShot %dx%d filename=\"%s\"" % (
-            resolution_x,
-            resolution_y,
-            filepath.replace("\\", "/"),
-        )
-        unreal.SystemLibrary.execute_console_command(None, cmd)
-        result["method"] = "ConsoleCommand"
-        if _wait_for_file(filepath, since):
-            result["captured"] = True
-            result["path"] = filepath
-            _write_result(result)
-            return filepath
-    except Exception as e:
-        result["method2_error"] = str(e)
 
     # Method 3: ScreenshotTools if available
     try:
