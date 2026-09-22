@@ -1,6 +1,6 @@
-## 2026-09-22 — PA-E DESKTOP prove miss log (token-lean KNOWN_ERRORS)
+## 2026-09-22 — PA-E DESKTOP prove miss log (TOKEN-LEAN policy)
 
-- Lead practice: log **Cause → Symptom → Avoid** along the way. Added DESKTOP prove rows (wrong world vs `level_path`, Unreal API on daemon thread, MCP disconnect vs Editor alive, post-#172 scrap-framing despite relocate/ray, **stale Sequencer transform vs live Arrange**, dirty `pa_e_shotlist_common.py` vs merge) + **along-the-way** rule in [automation-standards.mdc](../.cursor/rules/automation-standards.mdc) v1.8 and [CAPTURE_REDUNDANCY.md](Automation/CAPTURE_REDUNDANCY.md).
+- Lead: **TOKEN-LEAN** known errors — harness one-line Cause→Avoid + KNOWN_ERRORS index (`pa-e-*` keys); six DESKTOP rows minified; no long narratives in agent memory. [automation-standards.mdc](../.cursor/rules/automation-standards.mdc) v1.9, [CAPTURE_REDUNDANCY.md](Automation/CAPTURE_REDUNDANCY.md), [KNOWN_ERRORS.md](KNOWN_ERRORS.md) § Index.
 
 ## 2026-09-22 — PA-E Arrange bounds relocate + cliff exclude (cloud)
 
