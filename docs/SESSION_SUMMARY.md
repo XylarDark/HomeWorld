@@ -1,3 +1,7 @@
+## 2026-09-22 — PA-E shotlist AutomationLibrary primary (cloud, rung 1)
+
+- [capture_shotlist_viewport.py](../Content/Python/capture_shotlist_viewport.py): **proven-results-first** — **`AutomationLibrary.take_high_res_screenshot`** primary with Slate tick spacing (one request per shot, ~120s file wait, ~75s final drain); **retired** multi-form console **HighResShot** × **330s** ladder. [CAPTURE_REDUNDANCY.md](Automation/CAPTURE_REDUNDANCY.md) § Shotlist aligned; MRQ one-frame noted as next rung-1 option if AL fails. Gap **OPEN** — DESKTOP re-prove; no PASS claim.
+
 ## 2026-09-22 — Universal tooling practice suite (Lead lock-in, docs only)
 
 - Lead lock-in for **any** automation gap: (1) Docs-first, (2) Proven-results first, (3) Research on dead-ends before SCOUT/BUILD/Lead ping, (4) Gated ladder — [CAPTURE_REDUNDANCY.md](Automation/CAPTURE_REDUNDANCY.md) (canonical universal doc; shotlist instance only); [AUTOMATION_GAPS.md](Automation/AUTOMATION_GAPS.md); [automation-standards.mdc](../.cursor/rules/automation-standards.mdc) v1.4. Capture arc cited only under Examples (non-exhaustive).

@@ -1,15 +1,15 @@
 """PA-E / shotlist viewport capture — Editor Python only.
 
 Loads L_VS_MVP_Markers, poses level viewport for Shot 1 (lookout) and Shot 2
-(cabin/garden), lit + game view, console HighResShot (primary) with
-AutomationLibrary fallback if no PNG appears, validates PNGs, writes
-Saved/pa_e_capture_report.json.
+(cabin/garden), lit + game view, then **AutomationLibrary.take_high_res_screenshot**
+(primary, one request per shot, Slate tick spacing) with file-first wait, validates
+PNGs, writes Saved/pa_e_capture_report.json.
 
-Console HighResShot parameter order per Epic UE 5.8 "Taking Screenshots":
-  HighResShot filename=PATH (XxY OR Multiplier) ...
-  https://dev.epicgames.com/documentation/en-us/unreal-engine/taking-screenshots-in-unreal-engine
-HighResShot is a global one-request-per-tick flag — try one command form, wait
-for file on disk, then try the next form only if the PNG is still missing.
+Policy: proven-results-first (docs/Automation/CAPTURE_REDUNDANCY.md § Shotlist; PR #162).
+Multi-form console HighResShot wait ladders are **not** used (retired post-#161 DESKTOP burn).
+
+Epic UE 5.8: AutomationLibrary.take_high_res_screenshot(res_x, res_y, filename, ...),
+finish_loading_before_screenshot(), set_editor_viewport_view_mode.
 
 Run: MCP execute_python_script("capture_shotlist_viewport.py") or UnrealEditor-Cmd
 -ExecutePythonScript=... (uses vnp_editor_keep_alive).
@@ -37,12 +37,13 @@ MIN_BYTES = 50 * 1024
 MIN_MEAN_LUMINANCE = 8.0  # reject near-black (0–255 scale)
 SETTLE_FRAMES = 12
 INTER_SHOT_SETTLE_FRAMES = 24
-POST_CONSOLE_SETTLE_FRAMES = 8
-WAIT_FILE_SEC = 330.0
+POST_CAPTURE_SETTLE_FRAMES = 8
+WAIT_FILE_SEC = 120.0
 CAPTURE_DELAY_SEC = 0.35
 STABLE_POLL_INTERVAL = 0.35
 STABLE_SIZE_POLLS = 4
-FINAL_DRAIN_SEC = 45.0
+FINAL_DRAIN_SEC = 75.0
+PRIMARY_PATH = "automation_library_slate_tick"
 
 DESKTOP_PA_E = r"C:\Users\User\Desktop\HomeWorld_PA_E"
 
@@ -348,7 +349,7 @@ def _pump_editor_once() -> None:
 
 
 def _focus_level_viewport() -> dict[str, Any]:
-    """Bring level viewport to foreground / realtime before HighResShot."""
+    """Bring level viewport to foreground / realtime before capture."""
     attempts: list[dict[str, Any]] = []
     any_ok = False
 
@@ -453,7 +454,7 @@ def _pose_viewport(
     return meta
 
 
-def _poll_automation_editor_task(task: Any, timeout_sec: float = 60.0) -> dict[str, Any]:
+def _poll_automation_editor_task(task: Any, timeout_sec: float = WAIT_FILE_SEC) -> dict[str, Any]:
     """If take_high_res_screenshot returns AutomationEditorTask, wait for is_task_done."""
     meta: dict[str, Any] = {
         "had_task": task is not None,
@@ -466,7 +467,7 @@ def _poll_automation_editor_task(task: Any, timeout_sec: float = 60.0) -> dict[s
     if not callable(done_fn):
         meta["poll_skipped"] = "no is_task_done"
         return meta
-    poll_cap = min(timeout_sec, 45.0)
+    poll_cap = min(timeout_sec, 90.0)
     deadline = time.time() + poll_cap
     t0 = time.time()
     while time.time() < deadline:
@@ -486,65 +487,11 @@ def _poll_automation_editor_task(task: Any, timeout_sec: float = 60.0) -> dict[s
     return meta
 
 
-def _high_res_shot_console_command_forms(ue_path: str) -> tuple[tuple[str, str], ...]:
-    """Doc-first order (Epic Taking Screenshots), then legacy res-before-filename."""
-    return (
-        (
-            "HighResShot_filename_res_quoted",
-            'HighResShot filename="%s" %dx%d' % (ue_path, RES_X, RES_Y),
-        ),
-        (
-            "HighResShot_filename_res",
-            "HighResShot filename=%s %dx%d" % (ue_path, RES_X, RES_Y),
-        ),
-        ("HighResShot_filename_only_quoted", 'HighResShot filename="%s"' % ue_path),
-        ("HighResShot_filename_only", "HighResShot filename=%s" % ue_path),
-        (
-            "HighResShot_res_filename_legacy",
-            'HighResShot %dx%d filename="%s"' % (RES_X, RES_Y, ue_path),
-        ),
-    )
-
-
-def _invoke_console_high_res_shot_sequence(dest_abs: str) -> dict[str, Any]:
-    """Try each HighResShot form once; wait for PNG before next (no stacked requests)."""
-    ue_path = _path_for_ue(dest_abs)
-    meta: dict[str, Any] = {
-        "ue_path": ue_path,
-        "commands_tried": [],
-        "method_used": None,
-        "error": None,
-        "saved_path": None,
-    }
-    last_err: Optional[str] = None
-    for label, cmd in _high_res_shot_console_command_forms(ue_path):
-        attempt_since = time.time()
-        entry: dict[str, Any] = {"label": label, "cmd": cmd, "attempt_since": attempt_since}
-        meta["commands_tried"].append(entry)
-        try:
-            unreal.SystemLibrary.execute_console_command(None, cmd)
-            _log("console HighResShot invoked", {"label": label, "ue_path": ue_path})
-        except Exception as e:
-            last_err = str(e)
-            entry["error"] = last_err
-            continue
-        _settle_viewport(frames=POST_CONSOLE_SETTLE_FRAMES)
-        resolved, wait_meta = _wait_for_capture(dest_abs, attempt_since, WAIT_FILE_SEC)
-        entry["wait"] = wait_meta
-        if resolved:
-            meta["method_used"] = label
-            meta["saved_path"] = resolved
-            meta["wait"] = wait_meta
-            return meta
-    meta["error"] = last_err or "no console HighResShot form produced a fresh PNG"
-    return meta
-
-
 def _invoke_automation_library_shot(
     dest_abs: str,
     camera,
 ) -> tuple[str, Optional[str], str, Any, dict[str, Any]]:
-    """Fallback capture when console HighResShot did not produce a file."""
+    """Primary capture: AutomationLibrary.take_high_res_screenshot (one invoke per shot)."""
     ue_path = _path_for_ue(dest_abs)
     last_err: Optional[str] = None
     delay = CAPTURE_DELAY_SEC
@@ -582,8 +529,8 @@ def _invoke_automation_library_shot(
     for name, fn in attempts:
         try:
             task = fn()
-            poll = _poll_automation_editor_task(task)
-            _log("AutomationLibrary fallback invoked", {"method": name, "task_poll": poll})
+            poll = _poll_automation_editor_task(task, timeout_sec=WAIT_FILE_SEC)
+            _log("AutomationLibrary primary invoked", {"method": name, "task_poll": poll})
             return name, None, ue_path, task, poll
         except TypeError:
             continue
@@ -594,67 +541,38 @@ def _invoke_automation_library_shot(
     }
 
 
-def _capture_with_console_then_fallback(
+def _capture_automation_library_primary(
     dest_abs: str,
     camera,
-    _since_mtime: float,
 ) -> dict[str, Any]:
-    """Console first (doc-ordered forms + per-form wait); AutomationLibrary if all miss."""
+    """One AutomationLibrary request per shot; file on disk is authoritative."""
     finish_load = _finish_loading_before_screenshot()
     focus = _focus_level_viewport()
-    console = _invoke_console_high_res_shot_sequence(dest_abs)
-    resolved = console.get("saved_path")
-    wait_meta = console.get("wait") or {}
-    out: dict[str, Any] = {
-        "finish_loading_before_screenshot": finish_load,
-        "viewport_focus": focus,
-        "console_capture": console,
-        "primary_path": "console",
-        "capture_method": console.get("method_used") or "console_failed",
-        "capture_error": console.get("error"),
-        "ue_path": console.get("ue_path"),
-        "automation_task_poll": {"had_task": False},
-        "automation_fallback": None,
-        "saved_path": resolved,
-        "wait": wait_meta,
-        "file_produced_by": console.get("method_used") if resolved else None,
-    }
-
-    if resolved:
-        _log("capture file from console path", {"dest": dest_abs, "method": out["file_produced_by"]})
-        return out
-
-    _log("console path produced no file; trying AutomationLibrary fallback", {"dest": dest_abs})
-    finish_load_fb = _finish_loading_before_screenshot()
-    fallback_since = time.time()
+    capture_since = time.time()
     method, cap_err, ue_path, _task, task_poll = _invoke_automation_library_shot(
         dest_abs, camera
     )
-    _settle_viewport(frames=POST_CONSOLE_SETTLE_FRAMES)
-    resolved_fb, wait_fb = _wait_for_capture(dest_abs, fallback_since, WAIT_FILE_SEC)
-    out["automation_fallback"] = {
-        "finish_loading_before_screenshot": finish_load_fb,
+    _settle_viewport(frames=POST_CAPTURE_SETTLE_FRAMES)
+    resolved, wait_meta = _wait_for_capture(dest_abs, capture_since, WAIT_FILE_SEC)
+    out: dict[str, Any] = {
+        "finish_loading_before_screenshot": finish_load,
+        "viewport_focus": focus,
+        "primary_path": PRIMARY_PATH,
         "capture_method": method,
         "capture_error": cap_err,
         "ue_path": ue_path,
         "automation_task_poll": task_poll,
-        "wait": wait_fb,
-        "capture_since": fallback_since,
+        "capture_since": capture_since,
         "capture_delay_sec": CAPTURE_DELAY_SEC,
+        "wait_file_budget_sec": WAIT_FILE_SEC,
+        "saved_path": resolved,
+        "wait": wait_meta,
+        "file_produced_by": method if resolved else None,
     }
-    out["capture_method"] = method
-    out["capture_error"] = cap_err
-    out["ue_path"] = ue_path
-    out["automation_task_poll"] = task_poll
-    out["primary_path"] = "console_then_automation_fallback"
-    out["wait"] = {"console_wait": wait_meta, "fallback_wait": wait_fb}
-    if resolved_fb:
-        out["saved_path"] = resolved_fb
-        out["file_produced_by"] = method
-        _log("capture file from AutomationLibrary fallback", {"dest": dest_abs, "method": method})
+    if resolved:
+        _log("capture file from AutomationLibrary", {"dest": dest_abs, "method": method})
     else:
-        out["saved_path"] = None
-        out["file_produced_by"] = None
+        _log("capture missing after file wait", {"dest": dest_abs, "method": method})
     return out
 
 
@@ -842,7 +760,7 @@ def _capture_shot(shot: dict) -> dict:
     dest = _shot_dest_abs(shot["filename"])
     purge = _purge_stale_shot_pngs(dest)
     since = time.time()
-    cap = _capture_with_console_then_fallback(dest, cam if cam else None, since)
+    cap = _capture_automation_library_primary(dest, cam if cam else None)
     resolved = cap.get("saved_path")
     _log(
         "capture invoked",
@@ -866,9 +784,8 @@ def _capture_shot(shot: dict) -> dict:
         "primary_path": cap.get("primary_path"),
         "ue_path": cap.get("ue_path"),
         "viewport_focus": cap.get("viewport_focus"),
-        "console_capture": cap.get("console_capture"),
-        "automation_fallback": cap.get("automation_fallback"),
         "automation_task_poll": cap.get("automation_task_poll"),
+        "wait_file_budget_sec": cap.get("wait_file_budget_sec"),
         "saved_path": resolved,
         "wait": cap.get("wait"),
         "engine_search_roots": _engine_search_roots(),
@@ -954,6 +871,7 @@ def main() -> None:
     report = {
         "ok": all_pass,
         "prefix": PREFIX.strip(":"),
+        "primary_path": PRIMARY_PATH,
         "project_dir_abs": _project_dir(),
         "pil_available": _pil_available(),
         "level_path": LEVEL_PATH,
@@ -961,10 +879,17 @@ def main() -> None:
         "viewport_prep": viewport_prep,
         "keep_python_script_alive": keep_ok,
         "resolution": [RES_X, RES_Y],
+        "wait_file_budget_sec": WAIT_FILE_SEC,
+        "final_drain_sec": FINAL_DRAIN_SEC,
         "shots": results,
-        "policy": "Does not claim shotlist PASS — verify on DESKTOP; no host ImageGrab",
+        "policy": (
+            "Proven-results-first (#162): AutomationLibrary slate-tick primary; "
+            "no multi-form console HighResShot ladder; does not claim shotlist PASS — "
+            "verify on DESKTOP; no host ImageGrab"
+        ),
         "ladder_doc": "docs/Automation/CAPTURE_REDUNDANCY.md",
         "ladder_rung": "1_built_in_and_in_repo",
+        "next_rung1_if_primary_fails": "MRQ one-frame still (documented only; not in this script)",
         "scout_requires": "APPROVE TOOL SCOUT <name>",
         "build_requires": "APPROVE TOOL BUILD <name>",
     }

@@ -140,19 +140,20 @@ Formal stills for [Docs/00_SHOTLIST.md](../../Docs/00_SHOTLIST.md), PA-E evidenc
 
 | Item | Notes |
 |------|--------|
-| Console **`HighResShot`** via `execute_console_command` | **Primary** — doc order **`HighResShot filename=<abs forward-slash path> 1920x1080`** first; one form per tick, **wait up to ~330s for PNG** before next form (Epic: global one-request flag). Search `Saved/Screenshots/PA_E/`, **`Windows`**, **`WindowsEditor`**, Engine Win64. [Taking Screenshots](https://dev.epicgames.com/documentation/en-us/unreal-engine/taking-screenshots-in-unreal-engine) |
-| `AutomationLibrary.take_high_res_screenshot(..., delay≈0.35, force_game_view=True)` | **Fallback** after console ladder misses; call **`finish_loading_before_screenshot()`** first; **`is_task_done()` false is non-fatal** while file wait continues |
+| **`AutomationLibrary.take_high_res_screenshot`** (Slate tick) | **Primary** — **one request per shot** after pose + **`finish_loading_before_screenshot()`** + viewport focus + lit/game view; kwargs **`delay≈0.35`**, **`force_game_view=True`**, absolute forward-slash path under `Saved/Screenshots/PA_E/`; pump Slate between Shot 1 and Shot 2; **`is_task_done()` false is non-fatal** while **~120s file-first wait** (+ **~75s final drain**) runs. Report `primary_path: automation_library_slate_tick`. [AutomationLibrary (Python)](https://dev.epicgames.com/documentation/en-us/unreal-engine/python-api/class/AutomationLibrary?application_version=5.8) |
+| **Movie Render Queue (MRQ) one-frame still** | **Next rung-1 alternative** if AutomationLibrary primary fails on DESKTOP — proven industry path; needs Level Sequences — **document only** in this PR unless trivial stubs already exist; do not implement full MRQ pipeline here |
+| Console **`HighResShot`** multi-form ladder | **Retired as shotlist primary** — post-#161 DESKTOP burned ~30+ min on five forms × **330s** waits (incl. after immediate **`Bad input`**). Epic doc order still valid for ad-hoc console use; not the canonical shotlist script path. [Taking Screenshots](https://dev.epicgames.com/documentation/en-us/unreal-engine/taking-screenshots-in-unreal-engine) |
 | `AutomationLibrary.set_editor_viewport_view_mode` (Lit) | Preferred over console `viewmode lit` when exposed |
 | Viewport focus (best-effort) | LevelEditorSubsystem / UnrealEditorSubsystem APIs when present; console **`FOCUSVIEWPORT`** / **`focus`** — **undocumented / unverified** (no Epic console doc); do not invent new console aliases |
 | `EditorPythonScripting.set_keep_python_script_alive(True)` | [vnp_editor_keep_alive.py](../../Content/Python/vnp_editor_keep_alive.py) |
 | Lit + game view | AutomationLibrary Lit when exposed; else `viewmode lit`; `UnrealEditorSubsystem.editor_set_game_view(True)` when exposed |
-| Inter-shot spacing | Extra Slate tick settle between Shot 1 and Shot 2 so HighResShot requests are not stomped |
+| Inter-shot spacing | Extra Slate tick settle between Shot 1 and Shot 2 so a second capture is not fired while the first is in flight |
 | **Canonical script** | [capture_shotlist_viewport.py](../../Content/Python/capture_shotlist_viewport.py) → `Saved/Screenshots/PA_E/`, `Saved/pa_e_capture_report.json`, copy to `C:/Users/User/Desktop/HomeWorld_PA_E/` |
-| **Utility** | [capture_viewport.py](../../Content/Python/capture_viewport.py) |
+| **Utility** | [capture_viewport.py](../../Content/Python/capture_viewport.py) — may still console-first for generic viewport stills; shotlist instance follows AutomationLibrary primary |
 
 Epic: [Taking Screenshots](https://dev.epicgames.com/documentation/en-us/unreal-engine/taking-screenshots-in-unreal-engine) · [Scripting the Unreal Editor Using Python](https://dev.epicgames.com/documentation/en-us/unreal-engine/scripting-the-unreal-editor-using-python) · [FULL_AUTOMATION_RESEARCH.md](FULL_AUTOMATION_RESEARCH.md) §10b.
 
-**Wait race (DESKTOP 2026-09-22):** Shot2 PNG appeared ~268s after AutomationLibrary invoke while an earlier 120s script timeout had already given up — rung-1 scripts now use **330s file-first wait** and treat AutomationEditorTask stall as non-fatal until the wait ends.
+**Wait policy (2026-09-22, proven-results-first):** Shot2 PNG appeared ~268s after a **single** AutomationLibrary invoke on an earlier run; **multi-form 330s console ladders** were the anti-pattern. Shotlist script uses **one invoke + ~120s file wait per shot** and **final drain** — extend budget on DESKTOP only with evidence, not by multiplying forms.
 
 ### Rung 2 — SCOUT backlog only (not installed; needs `APPROVE TOOL SCOUT`)
 
