@@ -1,3 +1,7 @@
+## 2026-09-22 — PA-C tranche-1 land (cloud)
+
+- Lead **`APPROVE PA-C`**, 2026-09-22 ET → [Docs/32_PROTOTYPE_ASSETS.md](../Docs/32_PROTOTYPE_ASSETS.md) **PA-C IN PROGRESS** (tranche-1 cliffs+pines **DONE**); [Docs/handoffs/PA_C_BLENDER.md](../Docs/handoffs/PA_C_BLENDER.md) + [PA_C_TRANCHE1.md](../Docs/handoffs/PA_C_TRANCHE1.md). FBX: `SM_Cliff_{LookoutFace,CabinFace,Rear}.fbx` + upgraded `SM_Pine_Homestead.fbx` in `AssetCreation/Exports/Homestead/`. **No `.uasset`**. PA track **not CLOSED** (cabin→path→planters→fence→glider→rim remain).
+
 ## 2026-09-22 — PA-A gap audit APPROVED (cloud)
 
 - Lead **`APPROVE PA-A`**, 2026-09-22 ET → [Docs/32_PROTOTYPE_ASSETS.md](../Docs/32_PROTOTYPE_ASSETS.md) **PA-A CLOSED / COMPLETE** · **PA-C OPEN / IN PROGRESS ready**; [Docs/handoffs/PA_A_GAP_AUDIT.md](../Docs/handoffs/PA_A_GAP_AUDIT.md) **APPROVED / CLOSED**. Gap table + Blender queue stamped. **PA track not CLOSED** (no PA-C approve / no PA-E).
