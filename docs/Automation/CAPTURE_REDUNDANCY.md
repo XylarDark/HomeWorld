@@ -12,6 +12,19 @@
 
 Apply in order **before** escalating rungs or asking Lead open-ended “does anyone else hit this?”
 
+### Testing preconditions (Lead lock-in — **all** automation, not capture-only)
+
+Before trusting **any** pass/fail output (CI, Editor Python, MCP harness, MRQ, screenshots, PIE tests, commandlets):
+
+| Step | Verify |
+|------|--------|
+| 1 | **Content in level** — required actors/assets are present in the **loaded** level/world, not assumed from paths alone. |
+| 2 | **Camera aim** — viewport/shot cameras point at that content (e.g. bounds centroids), not void or stale hardcoded poses. |
+| 3 | **Lighting / TOD / view mode** — time-of-day phase, lighting, and editor view mode match **test or shotlist intent**; **record** phase/commands used in the report (implicit `hw.TimeOfDay.Phase 2` without doc alignment is a precondition smell). |
+| 4 | **Capture / inspect** — run the tool, then inspect artifacts and logs before claiming PASS or closed FAIL. |
+
+PA-E capture maps step 1–2 to [pa_e_homestead_capture_diagnostic.py](../../Content/Python/pa_e_homestead_capture_diagnostic.py) and `LEAD_PROVE_LOOP` in [pa_e_shotlist_common.py](../../Content/Python/pa_e_shotlist_common.py). Shotlist stills: **thematic readable night** for Shot 1–2 per [00_SHOTLIST.md](../Docs/00_SHOTLIST.md) — **`homestead_night_environment`** in `Saved/pa_e_capture_report.json` (Phase 2 + PRESET tune + stack verify); **not** day phase and **not** Phase 2 without tune.
+
 | # | Practice | Summary |
 |---|----------|---------|
 | 1 | **Docs-first** | Official vendor docs for any tool surface before inventing/hardening (unless already in repo policy / agent memory). Parameter order, required context, save paths. |
@@ -140,15 +153,15 @@ Formal stills for [Docs/00_SHOTLIST.md](../../Docs/00_SHOTLIST.md), PA-E evidenc
 
 | Item | Notes |
 |------|--------|
-| **`AutomationLibrary.take_high_res_screenshot`** + **Slate pre-tick wait** | **Primary (canonical script, #165)** — **one request in flight per shot** after pose + **`finish_loading_before_screenshot()`** + viewport focus + lit/game view; kwargs **`delay≈0.35`**, **`force_game_view=True`**, absolute forward-slash path under `Saved/Screenshots/PA_E/`. **Wait:** `unreal.register_slate_pre_tick_callback` state machine + [vnp_editor_keep_alive.py](../../Content/Python/vnp_editor_keep_alive.py) (not blocking `time.sleep` after invoke). **Footgun (post-#163 DESKTOP FAIL, #164):** pre-#165 script used **main-thread blocking poll** → Editor **Not Responding**, `is_task_done()` false, no PNG — that path is **retired**. Each pre-tick: check **`is_task_done()`** and **file on disk** (file authoritative); wall-clock timeout inside callback only. Inter-shot spacing = **pre-tick frame counter**. Report `primary_path: automation_library_slate_pretick`, `wait_mechanism: register_slate_pre_tick_callback`. **Gap OPEN** until DESKTOP re-proves pretick (no PASS claim). Forum: [wait for take_high_res_screenshot](https://forums.unrealengine.com/t/how-to-wait-for-take-high-res-screenshot/139285), [Python HighResScreenshot](https://forums.unrealengine.com/t/python-api-highrescreenshot/132783). [AutomationLibrary (Python)](https://dev.epicgames.com/documentation/en-us/unreal-engine/python-api/class/AutomationLibrary?application_version=5.8) |
-| **Movie Render Queue (MRQ) one-frame still** | **Next rung-1 alternative** if AutomationLibrary primary fails on DESKTOP — proven industry path; needs Level Sequences — **document only** in this PR unless trivial stubs already exist; do not implement full MRQ pipeline here |
+| **`AutomationLibrary.take_high_res_screenshot`** + **Slate pre-tick wait** | **OPEN bug — viewport capture path (not PASS primary).** Pretick can write PNGs that are **near-black** while Lead **sees lit homestead** when rotating the viewport → wrong **pose / game-view / camera pilot / HighResShot buffer**, not absent content. Diagnostic: [capture_shotlist_viewport.py](../../Content/Python/capture_shotlist_viewport.py). Quality bar unchanged: **lit non-black** stills required. |
+| **Movie Render Queue (MRQ) one-frame still** | **Primary (canonical).** [capture_shotlist.py](../../Content/Python/capture_shotlist.py) → [capture_shotlist_mrq.py](../../Content/Python/capture_shotlist_mrq.py): in-level **CAM_Hero** / **CAM_CabinClose** possessable + camera-cut (with preroll for warm-up), **deferred lit** PNG pass, `MoviePipelineAntiAliasingSetting` engine/GPU warm-up, `MoviePipelinePIEExecutor`, Slate pre-tick + keep_alive. **PASS** = luminance + bytes gates + visible homestead — **not** file-exists-only. Plugins: **MovieRenderPipeline**, **MovieRenderPipelineEditor**, **SequencerScripting**. **Gap OPEN** until DESKTOP re-prove. |
 | Console **`HighResShot`** multi-form ladder | **Retired as shotlist primary** — post-#161 DESKTOP burned ~30+ min on five forms × **330s** waits (incl. after immediate **`Bad input`**). Epic doc order still valid for ad-hoc console use; not the canonical shotlist script path. [Taking Screenshots](https://dev.epicgames.com/documentation/en-us/unreal-engine/taking-screenshots-in-unreal-engine) |
 | `AutomationLibrary.set_editor_viewport_view_mode` (Lit) | Preferred over console `viewmode lit` when exposed |
 | Viewport focus (best-effort) | LevelEditorSubsystem / UnrealEditorSubsystem APIs when present; console **`FOCUSVIEWPORT`** / **`focus`** — **undocumented / unverified** (no Epic console doc); do not invent new console aliases |
 | `EditorPythonScripting.set_keep_python_script_alive(True)` | [vnp_editor_keep_alive.py](../../Content/Python/vnp_editor_keep_alive.py) |
 | Lit + game view | AutomationLibrary Lit when exposed; else `viewmode lit`; `UnrealEditorSubsystem.editor_set_game_view(True)` when exposed |
 | Inter-shot spacing | Extra Slate tick settle between Shot 1 and Shot 2 so a second capture is not fired while the first is in flight |
-| **Canonical script** | [capture_shotlist_viewport.py](../../Content/Python/capture_shotlist_viewport.py) → `Saved/Screenshots/PA_E/`, `Saved/pa_e_capture_report.json`, copy to `C:/Users/User/Desktop/HomeWorld_PA_E/` |
+| **Canonical script** | [capture_shotlist.py](../../Content/Python/capture_shotlist.py) (MRQ) → `Saved/Screenshots/PA_E/`, `Saved/pa_e_capture_report.json`, copy to `C:/Users/User/Desktop/HomeWorld_PA_E/`. Diagnostic: [capture_shotlist_viewport.py](../../Content/Python/capture_shotlist_viewport.py) |
 | **Utility** | [capture_viewport.py](../../Content/Python/capture_viewport.py) — may still console-first for generic viewport stills; shotlist instance follows AutomationLibrary primary |
 
 Epic: [Taking Screenshots](https://dev.epicgames.com/documentation/en-us/unreal-engine/taking-screenshots-in-unreal-engine) · [Scripting the Unreal Editor Using Python](https://dev.epicgames.com/documentation/en-us/unreal-engine/scripting-the-unreal-editor-using-python) · [FULL_AUTOMATION_RESEARCH.md](FULL_AUTOMATION_RESEARCH.md) §10b.
@@ -203,6 +216,27 @@ Examples **not** in current PR scope:
 | 2026-09-22 | `Rotator` positional mis-pose | [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) — keyword `pitch` / `yaw` / `roll` |
 | 2026-09-22 | **post-#163** AL primary + MCP blocking wait → Not Responding, no PNG/report | [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) · [DEFECT_PA_E_shot_capture_automation.md](../../Docs/qa/DEFECT_PA_E_shot_capture_automation.md) · AUTOMATION_GAPS research log |
 
-**Track status:** Lead **`APPROVE PA-E`** closed Docs/32; formal Shot 1/2 stills **deferred/accepted**. Automation gap **OPEN** until DESKTOP proves rung-1 script + report with **Slate pre-tick** wait (#165; Conductor — not cloud). **Post-#163:** blocking-wait script path **failed** on DESKTOP; pretick rewrite is rung-1 **implemented**, not yet **proven**.
+**Track status:** Lead **`APPROVE PA-E`** closed Docs/32; formal Shot 1/2 stills **deferred/accepted**. Automation gap **OPEN** until DESKTOP proves **MRQ one-frame** ([capture_shotlist.py](../../Content/Python/capture_shotlist.py)) with **lit non-black homestead** stills (mean luminance ≥ gate). **Separate OPEN bug:** AL/HighResShot near-black while viewport shows content — fix pose/game-view/pilot/buffer; do **not** lower quality targets.
+
+### DESKTOP prove bar (non-negotiable)
+
+**Lead hard rule — prove loop before any failure claim:** Do **not** treat near-black stills as a **closed FAIL**. Required order:
+
+1. **Inventory** — confirm homestead dress/mesh actors are **in** the loaded level (`DRESS_*`, cabin/island kit).
+2. **Aim** — point viewport/shot cameras at **confirmed actor bounds centroids** (MRQ uses in-level `CAM_Hero` / `CAM_CabinClose` with re-aim at framing bounds; avoid hardcoded poses into void).
+3. **Lighting / TOD / view mode** — phase and lit game view match **shotlist intent**; report **`time_of_day`** (PA-E shots 1–2: **Night** phase 2 per [00_SHOTLIST.md](../Docs/00_SHOTLIST.md), not undocumented implicit console).
+4. **Capture + inspect** — run [capture_shotlist.py](../../Content/Python/capture_shotlist.py) (MRQ primary); read mean luminance; near-black ⇒ loop continues.
+5. **Bug-fix** — pose / lighting / game-view / pilot / buffer until stills show intended homestead.
+
+**Diagnostic (steps 1–2 only):** MCP `execute_python_script("pa_e_homestead_capture_diagnostic.py")` → `Saved/pa_e_homestead_capture_diagnostic.json` (camera vs homestead centroids).
+
+| Requirement | Not sufficient |
+|-------------|----------------|
+| Both `Shot1_lookout.png` + `Shot2_cabin_garden.png` under `Saved/Screenshots/PA_E/` | PNG exists but near-black |
+| `Saved/pa_e_capture_report.json` **`ok: true`** (capture PASS) | `ok: false` with **`closed_fail: false`** and **`prove_loop_status: in_progress`** — near-black only; **not** a closed automation FAIL |
+| Mean luminance ≥ **8** (0–255 scale) per shot | “File wrote so PASS” |
+| Lead-visible homestead framing (CAM_Hero / CAM_CabinClose aimed at inventory bounds) | Empty/unlit capture buffer |
+
+Report includes **`lead_prove_loop`**, **`prove_criteria`**, **`closed_fail`**, **`prove_loop_status`**, and **`desktop_conductor_checklist`** from [capture_shotlist_mrq.py](../../Content/Python/capture_shotlist_mrq.py).
 
 **Poses:** [P6_FIX_shot1.md](../../Docs/handoffs/P6_FIX_shot1.md) · [CAM_Hero.md](../../Lib/00_Core/CAM_Hero.md) · [00_SHOTLIST.md](../../Docs/00_SHOTLIST.md).

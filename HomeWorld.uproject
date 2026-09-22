@@ -98,6 +98,18 @@
                     {
                         "Name":  "MeshTerrainMode",
                         "Enabled":  true
+                    },
+                    {
+                        "Name":  "MovieRenderPipeline",
+                        "Enabled":  true
+                    },
+                    {
+                        "Name":  "MovieRenderPipelineEditor",
+                        "Enabled":  true
+                    },
+                    {
+                        "Name":  "SequencerScripting",
+                        "Enabled":  true
                     }
                 ],
     "TargetPlatforms":  [

@@ -7,7 +7,13 @@ CAM_CabinClose, CAM_PortalNight). Uses AutomationLibrary.take_high_res_screensho
 and optional compare_image_against_reference when a golden exists under
 Saved/VNP_Evidence/Goldens/.
 
-Writes Saved/vnp_night_evidence.json.
+Canon preset: Lib/07_Night_SpiritLayer/PRESET_Homestead_Night.md
+
+Public API (no screenshots):
+- apply_homestead_night_tune() — cvars + fog + warm/cool lights
+- verify_homestead_night_lighting_stack() — moon + skylight/directional + cabin warm
+
+Writes Saved/vnp_night_evidence.json (full main() only).
 """
 from __future__ import annotations
 
@@ -20,6 +26,12 @@ import unreal
 OUT = unreal.Paths.project_saved_dir() + "vnp_night_evidence.json"
 SHOT_DIR = unreal.Paths.project_saved_dir() + "VNP_Evidence/"
 GOLDEN_DIR = SHOT_DIR + "Goldens/"
+PRESET_HOMESTEAD_NIGHT_DOC = "Lib/07_Night_SpiritLayer/PRESET_Homestead_Night.md"
+
+# Expected in-level signals per PRESET_Homestead_Night (readable night, not pitch black).
+_MOON_LABEL_NEEDLES = ("lit_moon", "moon_disc", "moon")
+_SKY_AMBIENT_CLASSES = ("SkyLight", "DirectionalLight")
+_CABIN_WARM_NEEDLES = ("lit_cabinwarm", "lit_cabinwindows", "cabinwindow", "cabin_warm", "window")
 
 # Canon shot → preferred actor labels (Maps/VS_MVP README + place_vs_mvp_markers CAM)
 SHOT_CAMERA_BINDINGS = [
@@ -115,27 +127,27 @@ def _compare_to_golden(shot_id: str, abs_path: str) -> dict | None:
         return {"golden": golden, "compared": False, "error": str(e)}
 
 
-def _stat_fps() -> str:
-    try:
-        unreal.SystemLibrary.execute_console_command(None, "stat fps")
-    except Exception:
-        pass
-    return "stat fps requested (see Editor viewport); record manually if needed"
+def apply_project_night_cvars() -> dict:
+    """MegaLights + fog SSS — readable night ambient per PRESET_Homestead_Night."""
+    meta: dict = {"commands": [], "ok": True}
+    for cmd in (
+        "r.Fog.ScreenSpaceScattering 1",
+        "r.MegaLights.EnableForProject 1",
+    ):
+        try:
+            unreal.SystemLibrary.execute_console_command(None, cmd)
+            meta["commands"].append({"cmd": cmd, "ok": True})
+        except Exception as e:
+            meta["ok"] = False
+            meta["commands"].append({"cmd": cmd, "ok": False, "error": str(e)})
+    meta["preset_doc"] = PRESET_HOMESTEAD_NIGHT_DOC
+    return meta
 
 
-def main() -> None:
-    _ensure_dir(SHOT_DIR)
-    try:
-        unreal.SystemLibrary.execute_console_command(None, "r.Fog.ScreenSpaceScattering 1")
-        unreal.SystemLibrary.execute_console_command(None, "r.MegaLights.EnableForProject 1")
-    except Exception as e:
-        unreal.log_warning("VNP night: cvar set failed: %s" % e)
-
-    actors = unreal.EditorLevelLibrary.get_all_level_actors()
-    fog_tuned = []
-    lights_tuned = []
-    cameras = []
-
+def _tune_level_night_lighting(actors: list) -> tuple[list, list]:
+    """Warm point/spot, cool directional, volumetric fog — returns (fog_tuned, lights_tuned)."""
+    fog_tuned: list = []
+    lights_tuned: list = []
     warm = unreal.LinearColor(1.0, 0.72, 0.35, 1.0)
     cool = unreal.LinearColor(0.55, 0.65, 0.95, 1.0)
 
@@ -144,9 +156,6 @@ def main() -> None:
             continue
         name = _actor_label(a)
         cls = a.get_class().get_name() if a.get_class() else ""
-
-        if "CameraActor" in cls or "CineCamera" in cls:
-            cameras.append(name)
 
         if "ExponentialHeightFog" in cls or "HeightFog" in cls:
             comp = a.root_component
@@ -192,6 +201,97 @@ def main() -> None:
                 lc = a.root_component
             if lc and _try_set(lc, "light_color", cool):
                 lights_tuned.append({"actor": name, "class": cls, "applied": ["light_color=cool_moon"]})
+
+    return fog_tuned, lights_tuned
+
+
+def apply_homestead_night_tune(actors: list | None = None) -> dict:
+    """Apply PRESET_Homestead_Night tune (cvars + fog + lights). No screenshots."""
+    cvars = apply_project_night_cvars()
+    if actors is None:
+        actors = unreal.EditorLevelLibrary.get_all_level_actors()
+    fog_tuned, lights_tuned = _tune_level_night_lighting(actors)
+    return {
+        "ok": bool(cvars.get("ok")),
+        "preset_doc": PRESET_HOMESTEAD_NIGHT_DOC,
+        "project_cvars": cvars,
+        "fog_tuned": fog_tuned,
+        "lights_tuned_count": len(lights_tuned),
+        "lights_tuned_sample": lights_tuned[:12],
+        "note": "Phase 2 alone does not apply this tune — call before PA-E/MRQ capture.",
+    }
+
+
+def verify_homestead_night_lighting_stack(actors: list | None = None) -> dict:
+    """Verify moon + sky ambient + cabin warm signals exist (readable thematic night)."""
+    if actors is None:
+        actors = unreal.EditorLevelLibrary.get_all_level_actors()
+    moon_hits: list[str] = []
+    sky_hits: list[str] = []
+    cabin_hits: list[str] = []
+    fog_hits: list[str] = []
+
+    for a in actors:
+        if not a:
+            continue
+        label = _actor_label(a)
+        label_l = label.lower()
+        cls = a.get_class().get_name() if a.get_class() else ""
+
+        if any(n in label_l for n in _MOON_LABEL_NEEDLES):
+            moon_hits.append(label)
+        if any(c in cls for c in _SKY_AMBIENT_CLASSES):
+            sky_hits.append("%s (%s)" % (label, cls))
+        if any(n in label_l for n in _CABIN_WARM_NEEDLES):
+            cabin_hits.append(label)
+        if "PointLight" in cls or "SpotLight" in cls or "RectLight" in cls:
+            if "cabin" in label_l or "lit_" in label_l or "window" in label_l:
+                cabin_hits.append("%s (%s)" % (label, cls))
+        if "ExponentialHeightFog" in cls or "HeightFog" in cls:
+            fog_hits.append(label)
+
+    moon_ok = len(moon_hits) > 0
+    sky_ok = len(sky_hits) > 0
+    cabin_ok = len(cabin_hits) > 0
+    stack_ok = moon_ok and sky_ok and cabin_ok
+    return {
+        "stack_ok": stack_ok,
+        "preset_doc": PRESET_HOMESTEAD_NIGHT_DOC,
+        "moon": {"ok": moon_ok, "actors": moon_hits[:20]},
+        "skylight_or_moon_key": {"ok": sky_ok, "actors": sky_hits[:20]},
+        "cabin_warm_or_windows": {"ok": cabin_ok, "actors": cabin_hits[:20]},
+        "height_fog": {"present": bool(fog_hits), "actors": fog_hits[:10]},
+        "phase_2_alone_insufficient": (
+            "hw.TimeOfDay.Phase 2 sets gameplay night phase only; "
+            "readable sky/moon/stars + cabin emissives require PRESET tune and in-level LIT actors."
+        ),
+        "do_not_switch_to_day": "Fix night stack per preset — do not use day phase to dodge black stills.",
+    }
+
+
+def _stat_fps() -> str:
+    try:
+        unreal.SystemLibrary.execute_console_command(None, "stat fps")
+    except Exception:
+        pass
+    return "stat fps requested (see Editor viewport); record manually if needed"
+
+
+def main() -> None:
+    _ensure_dir(SHOT_DIR)
+    tune = apply_homestead_night_tune()
+    verify = verify_homestead_night_lighting_stack()
+    actors = unreal.EditorLevelLibrary.get_all_level_actors()
+    fog_tuned = tune.get("fog_tuned") or []
+    lights_tuned_count = tune.get("lights_tuned_count") or 0
+    lights_tuned_sample = tune.get("lights_tuned_sample") or []
+    cameras = []
+    for a in actors:
+        if not a:
+            continue
+        cls = a.get_class().get_name() if a.get_class() else ""
+        if "CameraActor" in cls or "CineCamera" in cls:
+            cameras.append(_actor_label(a))
 
     evidence = []
     for shot_id, needles in SHOT_CAMERA_BINDINGS:
@@ -270,9 +370,12 @@ def main() -> None:
         "ok": True,
         "phase": "VNP-N0/N1/N2 + WTR-C",
         "level": level_name,
+        "preset_doc": PRESET_HOMESTEAD_NIGHT_DOC,
+        "night_tune": tune,
+        "lighting_stack_verify": verify,
         "fog_tuned": fog_tuned,
-        "lights_tuned_count": len(lights_tuned),
-        "lights_tuned_sample": lights_tuned[:12],
+        "lights_tuned_count": lights_tuned_count,
+        "lights_tuned_sample": lights_tuned_sample,
         "cameras_found": cameras[:40],
         "camera_bindings": {
             "shot1_lookout": "CAM_Hero",
@@ -281,14 +384,12 @@ def main() -> None:
         },
         "evidence": evidence,
         "fps_note": _stat_fps(),
-        "project_cvars": {
-            "r.MegaLights.EnableForProject": True,
-            "r.Fog.ScreenSpaceScattering": 1,
-        },
+        "project_cvars": tune.get("project_cvars", {}),
         "ad_status": "pending_AD",
         "notes": [
             "Warm windows vs cool moon per Docs/02_ART_BIBLE; not grimdark.",
             "Shots 1/2/5 bound to CAM_Hero / CAM_CabinClose / CAM_PortalNight.",
+            "Phase 2 + PRESET tune required for readable night — see apply_homestead_night_tune().",
             "Optional goldens: Saved/VNP_Evidence/Goldens/<shot_id>.png",
             "Content map changes KEEP-LOCAL until Lead allowlist commit.",
         ],

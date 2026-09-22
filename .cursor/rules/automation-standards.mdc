@@ -4,7 +4,7 @@ description: "Standards for automation that drives or configures Editor/engine f
 alwaysApply: false
 globs: "**/Content/Python/**, **/Tools/**, **/.github/workflows/**"
 priority: 9
-version: 1.4
+version: 1.6
 ---
 
 # Automation Standards
@@ -16,6 +16,10 @@ version: 1.4
 ## Universal tooling practice (Lead lock-in, 2026-09-22)
 
 Applies to **every** automation / tooling gap (any tool surface). Canonical detail: [docs/Automation/CAPTURE_REDUNDANCY.md](../../docs/Automation/CAPTURE_REDUNDANCY.md) (universal redundancy + practice doc; shotlist is one instance). Policy block: [docs/Automation/AUTOMATION_GAPS.md](../../docs/Automation/AUTOMATION_GAPS.md).
+
+### Testing preconditions (universal — before PASS/FAIL claims)
+
+Before trusting **any** automation pass/fail output, verify setup in order: **(1)** content in loaded level, **(2)** camera aimed at that content, **(3)** lighting / time-of-day / **preset tune** match intent (PA-E night: Phase 2 + `PRESET_Homestead_Night` — Phase 2 alone insufficient; do not switch to day for black stills) — **record** in reports, **(4)** capture or run harness then inspect output. Do not treat missing preconditions as a closed FAIL without this loop. Full table: CAPTURE_REDUNDANCY.md § Testing preconditions.
 
 ### Docs-first
 

@@ -1,8 +1,14 @@
-"""PA-E / shotlist viewport capture — Editor Python only.
+"""PA-E / shotlist viewport capture — AutomationLibrary diagnostic (not PASS primary).
+
+**Primary (DESKTOP prove):** [capture_shotlist.py](capture_shotlist.py) /
+[capture_shotlist_mrq.py](capture_shotlist_mrq.py) — Movie Render Queue one-frame.
+This script is **diagnostic** for the **OPEN** AutomationLibrary viewport capture bug
+(near-black PNG while Lead sees lit homestead when rotating viewport — wrong pose /
+game-view / pilot / buffer, not missing content).
 
 Loads L_VS_MVP_Markers, poses level viewport for Shot 1 (lookout) and Shot 2
 (cabin/garden), lit + game view, then **AutomationLibrary.take_high_res_screenshot**
-(primary, one request in flight) with **Slate pre-tick** wait (not blocking sleep
+(one request in flight) with **Slate pre-tick** wait (not blocking sleep
 on the editor main thread after invoke), validates PNGs, writes
 Saved/pa_e_capture_report.json.
 
@@ -18,7 +24,8 @@ Forum refs:
 Policy: [docs/Automation/CAPTURE_REDUNDANCY.md](docs/Automation/CAPTURE_REDUNDANCY.md) § Shotlist.
 Multi-form console HighResShot ladders are **not** used.
 
-Run: MCP execute_python_script("capture_shotlist_viewport.py") or UnrealEditor-Cmd
+Run: MCP execute_python_script("capture_shotlist_viewport.py") — diagnostic only.
+Primary: execute_python_script("capture_shotlist.py"). UnrealEditor-Cmd
 -ExecutePythonScript=... (uses vnp_editor_keep_alive).
 
 Does NOT claim shotlist PASS — DESKTOP must verify report + stills.
@@ -37,6 +44,8 @@ try:
 except ImportError:
     print("capture_shotlist_viewport: Run inside Unreal Editor.")
     raise
+
+import pa_e_shotlist_common as common
 
 PREFIX = "capture_shotlist_viewport:"
 LEVEL_PATH = "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers"
@@ -434,9 +443,10 @@ class _ShotlistOrchestrator:
     def _write_report_and_finish(self) -> None:
         if self.phase == _Phase.DONE:
             return
-        all_pass = all(r.get("pass") for r in self.results) if self.results else False
+        status = common.summarize_capture_report(self.results)
+        all_pass = status["capture_pass"]
         report = {
-            "ok": all_pass,
+            **status,
             "prefix": PREFIX.strip(":"),
             "primary_path": PRIMARY_PATH,
             "wait_mechanism": SLATE_WAIT_MECHANISM,
@@ -452,8 +462,12 @@ class _ShotlistOrchestrator:
             "shots": self.results,
             "driver_error": self._driver_error,
             "state_machine_phases": [p.value for p in _Phase],
+            "lead_prove_loop": list(common.LEAD_PROVE_LOOP),
+            "universal_testing_preconditions": list(common.UNIVERSAL_TESTING_PRECONDITIONS),
+            "homestead_diagnostic_script": "pa_e_homestead_capture_diagnostic.py",
             "policy": (
                 "AutomationLibrary + slate pre-tick wait (post-#163: blocking sleep freezes ticks); "
+                "near-black = prove loop in progress, not closed FAIL; "
                 "no console multi-form ladder; does not claim shotlist PASS — verify on DESKTOP; "
                 "no host ImageGrab"
             ),
@@ -1080,8 +1094,13 @@ def _validate_png(path: Optional[str]) -> dict:
         return out
     if lum < MIN_MEAN_LUMINANCE:
         out["error"] = "near_black"
+        out["prove_loop_status"] = "in_progress"
+        out["closed_fail"] = False
+        out["lead_rule"] = common.PROVE_CRITERIA.get("note", "")
+        out["prove_loop"] = list(common.LEAD_PROVE_LOOP)
         return out
     out["pass"] = True
+    out["prove_loop_status"] = "complete"
     return out
 
 
@@ -1109,12 +1128,7 @@ def main() -> None:
     level_ok = _load_level()
     viewport_prep = _set_lit_and_game_view()
     _settle_viewport_before_first_capture()
-
-    try:
-        unreal.SystemLibrary.execute_console_command(None, "hw.TimeOfDay.Phase 2")
-        viewport_prep["night_phase"] = 2
-    except Exception:
-        viewport_prep["night_phase"] = "skipped"
+    viewport_prep["homestead_night_environment"] = common.apply_pa_e_homestead_night_environment(PREFIX)
 
     orch = _ShotlistOrchestrator(
         keep_ok=keep_ok,

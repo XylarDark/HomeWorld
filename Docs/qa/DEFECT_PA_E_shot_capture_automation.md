@@ -33,6 +33,10 @@ After **#159** merged (~12:51–13:01 ET), same host path. Console **`HighResSho
 
 After **#163** merged @ **`d0d074d`**, MCP **`execute_python_script("capture_shotlist_viewport.py")`** on **`C:\dev\HomeWorld`** (~14:45–14:53 ET / log UTC 18:45–18:52). Level load OK. Shot 1 + Shot 2: **AutomationLibrary** path with **`kwargs_delay_force_gv`**; **`AutomationEditorTask` `task_done: false`** after ~90s poll each; **no PNG** after ~120s file wait; Editor **Not Responding** throughout; session killed during **`final_drain`** (~75s). **No** **`Saved/pa_e_capture_report.json`**; **no** new **`Shot1_lookout.png`** / **`Shot2_cabin_garden.png`**. **Likely cause:** blocking **`time.sleep`** / poll on Editor Python **main thread** prevents Slate ticks required for async **`take_high_res_screenshot`**. **Next rung 1:** **`unreal.register_slate_pre_tick_callback`** wait (see [AUTOMATION_GAPS.md](../../docs/Automation/AUTOMATION_GAPS.md) research log). Defect **OPEN** — **not** shotlist PASS; do **not** treat AutomationLibrary primary as proven.
 
+## Incident — 2026-09-22 ET post-#166 (DESKTOP prove, document only)
+
+After **#166** @ **`ee32888`**, MCP **`capture_shotlist_viewport.py`** (AL + Slate pretick): Editor **Responding**; report **`ok: false`** — near-black PNGs (luminance gates fail). **Lead (in Editor):** rotating viewport shows **lit homestead** — near-black stills are **wrong capture binding** (pose / game-view / pilot / empty buffer), **not** absent content. **Lead hard rule:** near-black ⇒ **`closed_fail: false`**, prove loop **in progress** (inventory → aim at bounds → capture → bug-fix) — **not** a closed automation FAIL. **Next:** MRQ primary [capture_shotlist.py](../../Content/Python/capture_shotlist.py) with bounds-aim; **`pa_e_homestead_capture_diagnostic.py`** for camera vs centroid dump; keep AL bug **OPEN**. Defect **OPEN** until **lit non-black** stills (not file-exists-only).
+
 ## Policy
 
 - **Do not** invent still paths or mark Shot 1/2 **PASS** from automated captures alone.

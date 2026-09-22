@@ -1,3 +1,19 @@
+## 2026-09-22 — Universal testing preconditions + explicit PA-E TOD (cloud, PR #167)
+
+- Lead lock-in: verify content in level, camera aim, lighting/TOD/view mode, then capture/inspect — stamped in CAPTURE_REDUNDANCY + `automation-standards.mdc` v1.5. PA-E capture: explicit **Night phase 2** per `Docs/00_SHOTLIST.md` Shot 1–2 via `apply_pa_e_shotlist_time_of_day`; report `viewport_prep.time_of_day` (replaces undocumented bare `night_phase`).
+
+## 2026-09-22 — PA-E Lead prove loop + centroid diagnostic (cloud, PR #167)
+
+- **Hard rule:** near-black stills ⇒ **`closed_fail: false`**, **`prove_loop_status: in_progress`** — inventory → aim at homestead bounds → capture/inspect → bug-fix; not a closed FAIL while Lead sees lit geometry in viewport. [pa_e_shotlist_common.py](../Content/Python/pa_e_shotlist_common.py): `LEAD_PROVE_LOOP`, bounds-aim `resolve_camera_transform`, `summarize_capture_report`, `write_homestead_capture_diagnostic`. New [pa_e_homestead_capture_diagnostic.py](../Content/Python/pa_e_homestead_capture_diagnostic.py) for DESKTOP. MRQ report: `lead_prove_loop`, `homestead_diagnostic_path`. Docs: CAPTURE_REDUNDANCY 4-step bar, AUTOMATION_GAPS, KNOWN_ERRORS, DEFECT. Gap **OPEN** — DESKTOP lit stills + `ok: true`; no cloud PASS.
+
+## 2026-09-22 — PA-E MRQ + Lead capture clarification (cloud)
+
+- MRQ remains primary; **quality bar unchanged** — DESKTOP PASS requires **lit non-black homestead** stills (luminance gates), not file-exists-only. Near-black AL PNGs while Lead sees viewport content = **OPEN viewport capture bug** (pose/game-view/pilot/buffer). Hardened MRQ: CAM possessable binding, camera-cut preroll + `MoviePipelineAntiAliasingSetting` warm-up, deferred pass enabled, per-shot `editor_prep` diagnostics + report `desktop_conductor_checklist`. Docs: CAPTURE_REDUNDANCY prove bar, AUTOMATION_GAPS AL bug row, KNOWN_ERRORS, DEFECT.
+
+## 2026-09-22 — PA-E MRQ one-frame shotlist capture (cloud, post-#166)
+
+- Lead-approved rung-1 pivot after post-#166 DESKTOP: AL pretick wrote **black/near-black** PNGs (`ok: false`). Added [capture_shotlist_mrq.py](../Content/Python/capture_shotlist_mrq.py) + canonical [capture_shotlist.py](../Content/Python/capture_shotlist.py); [pa_e_shotlist_common.py](../Content/Python/pa_e_shotlist_common.py); enabled **MovieRenderPipeline** / **MovieRenderPipelineEditor** / **SequencerScripting** in `HomeWorld.uproject`. Updated CAPTURE_REDUNDANCY, AUTOMATION_GAPS, KNOWN_ERRORS. Gap **OPEN** — DESKTOP re-prove MRQ on **DESKTOP-21CT3H0** (Safe-Build after plugin enable); **no PASS claim**.
+
 ## 2026-09-22 — PA-E pretick wait probe + re-entry fix (cloud)
 
 - Post-#165 DESKTOP (~15:01 ET): pretick responsive, **Shot1** ~38KB on disk, report **`file_missing`** (wait probe **`MIN_BYTES`**, nested **`POSED`** re-entry). [capture_shotlist_viewport.py](../Content/Python/capture_shotlist_viewport.py): **`PREPARING`** lock, **`_find_fresh_capture_path`** on timeout/final drain, **`MIN_BYTES`** validation-only. KNOWN_ERRORS + AUTOMATION_GAPS + CAPTURE_REDUNDANCY note. Gap **OPEN** — DESKTOP re-prove.
