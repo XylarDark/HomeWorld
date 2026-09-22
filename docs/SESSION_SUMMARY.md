@@ -1,3 +1,7 @@
+## 2026-09-22 — SS-B track CLOSED (docs stamp, cloud)
+
+- Lead **`APPROVE SS-B`** (2026-09-21 ET; pre-authorized when SS-B impl merged) → `Docs/31_SPIRIT_STEALTH_FEEL.md` **CLOSED / COMPLETE**; `Docs/handoffs/SS_B_STEALTH_FEEL.md` **APPROVED / CLOSED**; `Docs/canon/DECISIONS.md` row. SS-B on main `a03940a` (PR #138). **DESKTOP** STEALTH PIE greps **deferred/accepted** — not stamped PASS. Next track Lead TBD.
+
 ## 2026-09-22 — SS-B spirit stealth feel (cloud, IN PROGRESS)
 
 - Lead **`APPROVE SS-B STRATEGY`** (2026-09-21 ET) → [Docs/31_SPIRIT_STEALTH_FEEL.md](../Docs/31_SPIRIT_STEALTH_FEEL.md) **SS-B STRATEGY APPROVED / SS-B IN PROGRESS**; [Docs/handoffs/SS_B_STEALTH_FEEL.md](../Docs/handoffs/SS_B_STEALTH_FEEL.md); `DECISIONS.md` SS-B strategy row. **SS-B not stamped APPROVED.**

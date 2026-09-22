@@ -1,6 +1,6 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **Docs/31 Spirit Stealth feel (SS-B) — IN PROGRESS** — Lead **`APPROVE SS-B STRATEGY`**, 2026-09-21 ET — [31_SPIRIT_STEALTH_FEEL.md](../Docs/31_SPIRIT_STEALTH_FEEL.md). Close: Lead **`APPROVE SS-B`**. DS track **CLOSED** on Docs/30.
+**Current phase:** **Next product track TBD (Lead)** — Docs/31 SS-B **CLOSED / COMPLETE** — Lead **`APPROVE SS-B`**, 2026-09-21 ET — [31_SPIRIT_STEALTH_FEEL.md](../Docs/31_SPIRIT_STEALTH_FEEL.md) (`a03940a` / PR #138); DESKTOP STEALTH greps **deferred/accepted**. DS track **CLOSED** on Docs/30.
 
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **Conductor** (parent DESKTOP) / **DESKTOP-21CT3H0**
@@ -194,6 +194,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | MV-A-traversal | MV-A | CLOUD+DESKTOP | **CLOSED** | Source/ + Docs/handoffs/ | [MV_A_TRAVERSAL.md](../Docs/handoffs/MV_A_TRAVERSAL.md) · Lead **`APPROVE MV-A`**, 2026-09-21 ET — Docs/24 **CLOSED / COMPLETE** (`349d3e4` / PR #130) |
 | SS-A-stealth | SS-A | CLOUD+DESKTOP | **CLOSED** | Source/ + Content/Python + Docs/handoffs/ | [SS_A_STEALTH_STUBS.md](../Docs/handoffs/SS_A_STEALTH_STUBS.md) · Lead **`APPROVE SS-A`**, 2026-09-21 ET — Docs/25 **CLOSED / COMPLETE** (`7bc577f` / PR #133) |
 | DS-A-hearth | DS-A | CLOUD+DESKTOP | **CLOSED** | Source/ + Content/Python + Docs/handoffs/ | [DS_A_VISIBLE_HEARTH.md](../Docs/handoffs/DS_A_VISIBLE_HEARTH.md) · Lead **`APPROVE DS-A`**, 2026-09-21 ET — Docs/30 **CLOSED / COMPLETE** (`7d579f9` / PR #136); PROVE-BATCH **deferred** |
+| SS-B-feel | SS-B | CLOUD+DESKTOP | **CLOSED** | Source/ + Content/Python + Docs/handoffs/ | [SS_B_STEALTH_FEEL.md](../Docs/handoffs/SS_B_STEALTH_FEEL.md) · Lead **`APPROVE SS-B`**, 2026-09-21 ET — Docs/31 **CLOSED / COMPLETE** (`a03940a` / PR #138); DESKTOP STEALTH greps **deferred/accepted** |
 | UASSET-policy | Docs/20 | CLOUD+Lead | CND+Lead | Docs/ + config/ + scripts/ | [20_UASSET_AI_POLICY.md](../Docs/20_UASSET_AI_POLICY.md) · [AI_ASSET_LOG.md](../Docs/AI_ASSET_LOG.md) — **APPROVED / CLOSED** Lead **`APPROVE UASSET POLICY`**, 2026-09-17 ET (PR #108) |
 | HS-F-sign-off | HS-F | CLOUD+Lead | CND+Lead | Docs/ | [17_HS_AUDIT_SIGN_OFF.md](../Docs/17_HS_AUDIT_SIGN_OFF.md) — **CLOSED** Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET |
 | HS-E-bootstrap | HS-E | CLOUD+Lead+DESKTOP | CND+Lead | Docs/ | [17e_HS_CONTENT_BOOTSTRAP.md](../Docs/17e_HS_CONTENT_BOOTSTRAP.md) · [HS_E_CONTENT_BOOTSTRAP.md](../Docs/handoffs/HS_E_CONTENT_BOOTSTRAP.md) — **APPROVED / CLOSED** Lead **`APPROVE HS-E`**, 2026-09-17 ET (KEEP-LOCAL) |

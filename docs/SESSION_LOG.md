@@ -9256,6 +9256,18 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 ---
 
+## 2026-09-22 — SS-B track CLOSED (docs stamp, cloud agent)
+
+**Task:** Lead **`APPROVE SS-B`**, 2026-09-21 ET — stamp Docs/31 Spirit Stealth feel **CLOSED / COMPLETE** (SS-B code already on main PR #138).
+
+**Delivered:** `Docs/31_SPIRIT_STEALTH_FEEL.md`, `Docs/handoffs/SS_B_STEALTH_FEEL.md`, `Docs/canon/DECISIONS.md`, `Docs/README.md` index row; thin `PHASE_BOARD` + `SESSION_SUMMARY` updates. Docs-only.
+
+**Deferred:** DESKTOP PIE greps `STEALTH: LIT` / `ALERT` / `CLEAR` — **deferred/accepted** with Lead gate; not stamped PASS.
+
+**Remaining:** Next product track Lead-named TBD — **SS-C+** not opened.
+
+---
+
 ## 2026-09-22 — DS-A visible demo spine (cloud)
 
 **Task:** Lead **`APPROVE DEMO-SPINE`** — DS-A visible campfire → tent → cottage on VS_MVP.

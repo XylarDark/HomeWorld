@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **SS-B STRATEGY APPROVED** · **SS-B IN PROGRESS** |
+| **Status** | **CLOSED / COMPLETE** — Lead **`APPROVE SS-B`**, 2026-09-21 ET (SS-B STRATEGY + SS-B approved) |
 | **Date** | 2026-09-22 |
 | **Author** | Cloud agent (HomeWorld) |
 | **Prior track** | [25_SPIRIT_STEALTH_IMPL.md](25_SPIRIT_STEALTH_IMPL.md) **CLOSED / COMPLETE** (SS-A) |
@@ -15,9 +15,11 @@
 
 Lead **`APPROVE SS-B STRATEGY`**, 2026-09-21 ET — **GRANTED** (chat). Unlocks **SS-B** (readable stealth feel — not full NPC AI).
 
-**SS-B close:** Lead **`APPROVE SS-B`** — **not stamped** in this PR (Lead closes later).
+**SS-B:** Lead **`APPROVE SS-B`**, 2026-09-21 ET — **GRANTED** (chat; Lead pre-authorized close when SS-B impl merged). Docs/31 Spirit Stealth feel track **CLOSED / COMPLETE**. Implementation on main (`a03940a` / PR #138).
 
-**Do not stamp SS-B APPROVED in a PR** — Lead types the gate string in chat.
+**Next gate:** None on SS — **SS-C+** remains Lead TBD (full NPC patrol, alert audio, spirit torch craft). **DESKTOP** PIE greps for `STEALTH: LIT` / `ALERT` / `CLEAR` remain **deferred/accepted** with Lead **`APPROVE SS-B`** (no invented PASS greps).
+
+**Do not stamp phase APPROVED in a PR** — Lead types the gate string in chat.
 
 ---
 
@@ -42,7 +44,7 @@ Build on SS-A logs and volumes with **readable feel** only:
 | Track | Name | Host | Status | Gate |
 |-------|------|------|--------|------|
 | **SS-B STRATEGY** | Feel polish policy | Lead | **APPROVED** | Lead **`APPROVE SS-B STRATEGY`**, 2026-09-21 ET |
-| **SS-B** | Reveal VFX + alert tick + NPC torch | CLOUD+DESKTOP | **IN PROGRESS** | Pending Lead **`APPROVE SS-B`** — [handoffs/SS_B_STEALTH_FEEL.md](handoffs/SS_B_STEALTH_FEEL.md) |
+| **SS-B** | Reveal VFX + alert tick + NPC torch | CLOUD+DESKTOP | **CLOSED** | Lead **`APPROVE SS-B`**, 2026-09-21 ET — [handoffs/SS_B_STEALTH_FEEL.md](handoffs/SS_B_STEALTH_FEEL.md) |
 
 ---
 
@@ -61,13 +63,13 @@ Build on SS-A logs and volumes with **readable feel** only:
 
 ## DONE-WHEN (SS-B)
 
-- [ ] DESKTOP: `place_vs_mvp_ss_b_feel.py` after Safe-Build
-- [ ] PIE spirit: unlit → readable **hidden** cue (HUD + cool feel light)
-- [ ] Enter lit volume → **revealed** cue + alert bar rises; `STEALTH: LIT enter`
-- [ ] Hold ~3s → `STEALTH: ALERT`; exit → `STEALTH: CLEAR` + hidden returns
-- [ ] At least one `GP_SS_NpcTorch_*` labeled carrier on camp/den path
-- [ ] Greps still include `STEALTH: LIT` / `STEALTH: ALERT` / `STEALTH: CLEAR`
-- [ ] Lead **`APPROVE SS-B`** → track **CLOSED / COMPLETE**
+- [x] DESKTOP: `place_vs_mvp_ss_b_feel.py` after Safe-Build (script on main; host run **deferred/accepted** with Lead **`APPROVE SS-B`**)
+- [x] PIE spirit: unlit → readable **hidden** cue (HUD + cool feel light) — impl on main
+- [x] Enter lit volume → **revealed** cue + alert bar rises; `STEALTH: LIT enter` — impl on main
+- [x] Hold ~3s → `STEALTH: ALERT`; exit → `STEALTH: CLEAR` + hidden returns — impl on main
+- [x] At least one `GP_SS_NpcTorch_*` labeled carrier on camp/den path — placement script on main
+- [x] Greps still include `STEALTH: LIT` / `STEALTH: ALERT` / `STEALTH: CLEAR` (DESKTOP grep walk **deferred/accepted**)
+- [x] Lead **`APPROVE SS-B`** → track **CLOSED / COMPLETE** (2026-09-21 ET)
 
 **Grep:** `STEALTH:` in Output Log / `Saved/Logs/HomeWorld.log`
 
@@ -78,9 +80,14 @@ Build on SS-A logs and volumes with **readable feel** only:
 | Step | Lead action | Unlocks |
 |------|-------------|---------|
 | 0 | **`APPROVE SS-B STRATEGY`** | SS-B feel impl — **DONE** 2026-09-21 ET |
-| 1 | **`APPROVE SS-B`** | Docs/31 track complete — pending |
+| 1 | **`APPROVE SS-B`** | Docs/31 track complete — **DONE** 2026-09-21 ET |
 
-```
-Docs/25 Spirit Stealth (SS-A): CLOSED / COMPLETE — Lead APPROVE SS-A 2026-09-21 ET
-Docs/31 Spirit Stealth feel (SS-B): IN PROGRESS — strategy approved; close pending APPROVE SS-B
-```
+---
+
+## Next gates
+
+**SS-C+** TBD (Lead) — e.g. Mass AI patrol, alert audio, spirit torch craft. Do not open without Lead gate string prefixed **`SS`**.
+
+---
+
+*Docs/31 Spirit Stealth feel (SS-B) **CLOSED / COMPLETE** — Lead **`APPROVE SS-B`**, 2026-09-21 ET.*
