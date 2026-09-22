@@ -32,7 +32,7 @@ MESH_ROOTS = (
 # anchor_key -> mesh prefix (spawn all matching StaticMeshes except UCX_/M_)
 ANCHOR_MESH_RULES = (
     ("SM_IslandTop", "SM_IslandTop"),
-    ("SM_Cabin", "SM_Cabin_"),
+    ("SM_Cabin", "SM_Cabin"),
     ("SM_Lookout_Pad", "SM_Lookout_Pad"),
     ("SM_Glider_Perch", "SM_Glider_Perch"),
     ("SM_Shrine_Homestead", "SM_Shrine_Homestead_"),
@@ -54,7 +54,9 @@ EXTRA_RULES = (
     ("SM_Shrine_Return", "SM_Roof_Hamlet_01", (0.0, 0.0, 0.0), False),
     ("SM_Shrine_Return", "SM_Roof_Hamlet_02", (2.0, 0.0, 0.0), False),
     ("SM_Shrine_Return", "SM_Roof_Hamlet_03", (-2.0, 0.0, 0.0), False),
-    ("SM_Cabin", "SM_Pine_Homestead_M_", (0.0, 3.0, 0.0), True),
+    ("SM_Cabin", "SM_Pine_Homestead_S", (-2.5, 3.0, 0.0), True),
+    ("SM_Cabin", "SM_Pine_Homestead_M", (0.0, 3.0, 0.0), True),
+    ("SM_Cabin", "SM_Pine_Homestead_L", (2.5, 3.0, 0.0), True),
 )
 
 

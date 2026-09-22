@@ -1,3 +1,36 @@
+## 2026-09-22 — SWARM_OPS §11 operational memory backfill (cloud)
+
+- Docs-only: [docs/KNOWN_ERRORS.md](KNOWN_ERRORS.md) + [docs/Automation/AUTOMATION_GAPS.md](Automation/AUTOMATION_GAPS.md) entries for GC→PA DESKTOP failures (2026-09-20–22); [Docs/qa/DEFECT_PA_E_shot_capture_automation.md](../Docs/qa/DEFECT_PA_E_shot_capture_automation.md); [PA_D_IMPORT_PLACE.md](../Docs/handoffs/PA_D_IMPORT_PLACE.md) Blockers pointer. **No APPROVE PA-E**; Lead still manual Shot 1/2.
+
+## 2026-09-22 — PA-D APPROVED + place script (cloud)
+
+- Lead **`APPROVE PA-D`**, 2026-09-22 ET → [Docs/32_PROTOTYPE_ASSETS.md](../Docs/32_PROTOTYPE_ASSETS.md) **PA-D IN PROGRESS**; [Docs/handoffs/PA_D_IMPORT_PLACE.md](../Docs/handoffs/PA_D_IMPORT_PLACE.md) **APPROVED** (awaiting DESKTOP evidence). `DECISIONS.md` + `PHASE_BOARD` + `Docs/README` minimal update. **No `.uasset`**. PA track **not CLOSED** (PA-E locked).
+- PR #145: `Content/Python/place_vs_mvp_pa_d.py` (cliffs, planters, fence, path stones + `place_vs_mvp_dress` refresh); `place_vs_mvp_dress.py` SM_Cabin exact + Pine S/M/L. DESKTOP run after batch_import.
+
+## 2026-09-22 — PA-C tranche-2 land (cloud)
+
+- Tranche-2 FBX in `AssetCreation/Exports/Homestead/`: upgraded `SM_Cabin.fbx`, `SM_Glider_Perch.fbx`; new path stones ×3, planters ×3, `SM_Garden_Fence_Seg.fbx`. [Docs/handoffs/PA_C_TRANCHE2.md](../Docs/handoffs/PA_C_TRANCHE2.md) · [PA_C_BLENDER.md](../Docs/handoffs/PA_C_BLENDER.md). **Docs/32** tranche-2 **DONE**; **PA-D OPEN** (no Lead **`APPROVE PA-D`**). No `.uasset`. PA track **not CLOSED** (optional island rim).
+
+## 2026-09-22 — PA-C tranche-1 land (cloud)
+
+- Lead **`APPROVE PA-C`**, 2026-09-22 ET → [Docs/32_PROTOTYPE_ASSETS.md](../Docs/32_PROTOTYPE_ASSETS.md) **PA-C IN PROGRESS** (tranche-1 cliffs+pines **DONE**); [Docs/handoffs/PA_C_BLENDER.md](../Docs/handoffs/PA_C_BLENDER.md) + [PA_C_TRANCHE1.md](../Docs/handoffs/PA_C_TRANCHE1.md). FBX: `SM_Cliff_{LookoutFace,CabinFace,Rear}.fbx` + upgraded `SM_Pine_Homestead.fbx` in `AssetCreation/Exports/Homestead/`. **No `.uasset`**. PA track **not CLOSED** (cabin→path→planters→fence→glider→rim remain).
+
+## 2026-09-22 — PA-A gap audit APPROVED (cloud)
+
+- Lead **`APPROVE PA-A`**, 2026-09-22 ET → [Docs/32_PROTOTYPE_ASSETS.md](../Docs/32_PROTOTYPE_ASSETS.md) **PA-A CLOSED / COMPLETE** · **PA-C OPEN / IN PROGRESS ready**; [Docs/handoffs/PA_A_GAP_AUDIT.md](../Docs/handoffs/PA_A_GAP_AUDIT.md) **APPROVED / CLOSED**. Gap table + Blender queue stamped. **PA track not CLOSED** (no PA-C approve / no PA-E).
+
+## 2026-09-22 — PA STRATEGY APPROVED (cloud)
+
+- Lead **`APPROVE PA STRATEGY — homestead kit only`**, 2026-09-22 ET → [Docs/32_PROTOTYPE_ASSETS.md](../Docs/32_PROTOTYPE_ASSETS.md) **PA STRATEGY APPROVED** · **PA-A OPEN**; [Docs/handoffs/PA_STRATEGY.md](../Docs/handoffs/PA_STRATEGY.md) **APPROVED / CLOSED** (strategy stamp). Scope: homestead kit only. PR #141. **PA-A gap audit not started.**
+
+## 2026-09-22 — PA-0 prototype assets strategy (cloud, OPEN)
+
+- PA-0 docs-only: kit plate + sidecar in `AssetCreation/RefImages/` and `Docs/refs/ai/` (superseded by approve stamp above).
+
+## 2026-09-22 — SS-B HUD UE 5.8 compile fix (cloud)
+
+- PR [#147](https://github.com/XylarDark/HomeWorld/pull/147): `HomeWorldHUD.cpp` — protected `Canvas` (lambda in `DrawHUD`), `DrawTile` + `BLEND_Translucent` + `SetDrawColor`, `bSpiritHiddenCue` rename. Rebased on main (PA-D #146). DESKTOP Safe-Build verify pending.
+
 ## 2026-09-22 — SS-B spirit stealth feel (cloud, IN PROGRESS)
 
 - Lead **`APPROVE SS-B STRATEGY`** (2026-09-21 ET) → [Docs/31_SPIRIT_STEALTH_FEEL.md](../Docs/31_SPIRIT_STEALTH_FEEL.md) **SS-B STRATEGY APPROVED / SS-B IN PROGRESS**; [Docs/handoffs/SS_B_STEALTH_FEEL.md](../Docs/handoffs/SS_B_STEALTH_FEEL.md); `DECISIONS.md` SS-B strategy row. **SS-B not stamped APPROVED.**
@@ -722,4 +755,9 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 - Lead **`APPROVE CD STRATEGY`** → [Docs/23_COMBAT_DREAM_IMPL.md](../Docs/23_COMBAT_DREAM_IMPL.md), handoff [Docs/handoffs/CD_A_STUBS.md](../Docs/handoffs/CD_A_STUBS.md), `DECISIONS.md` CD strategy row (Docs/22 GC **CLOSED** on main via #127).
 - C++: minigame stubs (`MINIGAME:*`), boss placeholder volume (`BOSS:PHASE_*`, `BOSS:SEAL`), `place_vs_mvp_cd_stubs.py`, cheats `hw.Minigame.*` / `hw.Boss.Status`. **CD-A APPROVED** stamped in follow-on docs PR (Lead **`APPROVE CD-A`**, 2026-09-21 ET).
+
+## 2026-09-22 — PA-D save before dress reload (cloud)
+
+- **Fix:** `place_vs_mvp_pa_d.py` saves level after PA-D spawn and before `run_dress_refresh()` so `load_level` in dress does not wipe unsaved cliffs/planters/fence/path stones.
+- **PR:** #149 (`cursor/pa-d-save-before-dress-1f4a`).
 

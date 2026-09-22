@@ -18,26 +18,6 @@
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/Pawn.h"
 
-namespace HomeWorldStealthHud
-{
-	static void DrawScreenEdgePulse(AHUD* HUD, float Alert01, bool bRevealed)
-	{
-		if (!HUD || !HUD->Canvas || !bRevealed)
-		{
-			return;
-		}
-		const int32 W = HUD->Canvas->ClipX;
-		const int32 H = HUD->Canvas->ClipY;
-		const int32 Thickness = FMath::Clamp(static_cast<int32>(6.f + Alert01 * 18.f), 4, 24);
-		const uint8 Alpha = static_cast<uint8>(FMath::Clamp(40.f + Alert01 * 160.f, 30.f, 220.f));
-		const FColor EdgeColor(255, 120, 40, Alpha);
-		HUD->Canvas->DrawTile(HUD->Canvas->DefaultTexture, 0.f, 0.f, static_cast<float>(W), static_cast<float>(Thickness), 0.f, 0.f, 1.f, 1.f, EdgeColor);
-		HUD->Canvas->DrawTile(HUD->Canvas->DefaultTexture, 0.f, static_cast<float>(H - Thickness), static_cast<float>(W), static_cast<float>(Thickness), 0.f, 0.f, 1.f, 1.f, EdgeColor);
-		HUD->Canvas->DrawTile(HUD->Canvas->DefaultTexture, 0.f, 0.f, static_cast<float>(Thickness), static_cast<float>(H), 0.f, 0.f, 1.f, 1.f, EdgeColor);
-		HUD->Canvas->DrawTile(HUD->Canvas->DefaultTexture, static_cast<float>(W - Thickness), 0.f, static_cast<float>(Thickness), static_cast<float>(H), 0.f, 0.f, 1.f, 1.f, EdgeColor);
-	}
-}
-
 void AHomeWorldHUD::DrawHUD()
 {
 	Super::DrawHUD();
@@ -442,17 +422,22 @@ void AHomeWorldHUD::DrawHUD()
 				const float Alert01 = Stealth->GetAlertLevel();
 				const bool bLit = Stealth->IsSpiritLit();
 				const bool bRevealed = Stealth->IsSpiritRevealedCueActive();
-				const bool bHidden = Stealth->IsSpiritHiddenCueActive();
+				const bool bSpiritHiddenCue = Stealth->IsSpiritHiddenCueActive();
 
 				const float BarW = 180.f;
 				const float BarH = 10.f;
 				const float BarX = Canvas->ClipX - BarW - 28.f;
 				const float BarY = 28.f;
-				Canvas->DrawTile(Canvas->DefaultTexture, BarX, BarY, BarW, BarH, 0.f, 0.f, 1.f, 1.f, FColor(30, 30, 40, 200));
+				auto DrawSolidTile = [this](float TileX, float TileY, float TileW, float TileH, const FColor& Color)
+				{
+					Canvas->SetDrawColor(Color);
+					Canvas->DrawTile(
+						Canvas->DefaultTexture, TileX, TileY, TileW, TileH, 0.f, 0.f, 1.f, 1.f, BLEND_Translucent);
+				};
+				DrawSolidTile(BarX, BarY, BarW, BarH, FColor(30, 30, 40, 200));
 				if (Alert01 > 0.01f || bLit)
 				{
-					const FColor Fill(255, 140, 50, 230);
-					Canvas->DrawTile(Canvas->DefaultTexture, BarX, BarY, BarW * Alert01, BarH, 0.f, 0.f, 1.f, 1.f, Fill);
+					DrawSolidTile(BarX, BarY, BarW * Alert01, BarH, FColor(255, 140, 50, 230));
 				}
 
 				const FString StealthLine = bRevealed
@@ -462,13 +447,31 @@ void AHomeWorldHUD::DrawHUD()
 				Canvas->DrawText(Font, StealthLine, BarX, BarY + 16.f, TextScale * 0.95f, TextScale * 0.95f);
 				Canvas->SetDrawColor(FColor::White);
 
-				HomeWorldStealthHud::DrawScreenEdgePulse(this, Alert01, bRevealed);
+				if (bRevealed)
+				{
+					const int32 W = static_cast<int32>(Canvas->ClipX);
+					const int32 H = static_cast<int32>(Canvas->ClipY);
+					const int32 Thickness =
+						FMath::Clamp(static_cast<int32>(6.f + Alert01 * 18.f), 4, 24);
+					const uint8 EdgeAlpha =
+						static_cast<uint8>(FMath::Clamp(40.f + Alert01 * 160.f, 30.f, 220.f));
+					const FColor EdgeColor(255, 120, 40, EdgeAlpha);
+					DrawSolidTile(0.f, 0.f, static_cast<float>(W), static_cast<float>(Thickness), EdgeColor);
+					DrawSolidTile(
+						0.f, static_cast<float>(H - Thickness), static_cast<float>(W),
+						static_cast<float>(Thickness), EdgeColor);
+					DrawSolidTile(
+						0.f, 0.f, static_cast<float>(Thickness), static_cast<float>(H), EdgeColor);
+					DrawSolidTile(
+						static_cast<float>(W - Thickness), 0.f, static_cast<float>(Thickness),
+						static_cast<float>(H), EdgeColor);
+				}
 
 				static bool bLoggedStealthHudOnce = false;
-				if (!bLoggedStealthHudOnce && (bHidden || bRevealed))
+				if (!bLoggedStealthHudOnce && (bSpiritHiddenCue || bRevealed))
 				{
 					UE_LOG(LogHomeWorld, Log, TEXT("STEALTH: HUD alert tick enabled (hidden=%d revealed=%d)"),
-						bHidden ? 1 : 0, bRevealed ? 1 : 0);
+						bSpiritHiddenCue ? 1 : 0, bRevealed ? 1 : 0);
 					bLoggedStealthHudOnce = true;
 				}
 			}

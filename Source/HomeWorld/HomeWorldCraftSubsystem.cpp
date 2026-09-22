@@ -275,7 +275,7 @@ void UHomeWorldCraftSubsystem::RevealDemoCottageShell(UWorld* World)
 	if (Cottage)
 	{
 		Cottage->SetActorHiddenInGame(false);
-		Cottage->SetActorEnableCollision(ECollisionEnabled::QueryAndPhysics);
+		Cottage->SetActorEnableCollision(true);
 		UE_LOG(LogTemp, Log, TEXT("DS-A: cottage revealed (GP_Demo_Cottage)"));
 		return;
 	}
