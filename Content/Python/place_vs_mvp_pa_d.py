@@ -186,6 +186,14 @@ def main():
         stone_name = PATH_STONE_NAMES[i % len(PATH_STONE_NAMES)]
         place_exact_mesh(mesh_index, stone_name, loc, counts, optional=True)
 
+    # place_vs_mvp_dress.main() -> create_or_load_level() -> load_level reloads from disk
+    # and drops actors that were spawned but not saved yet.
+    try:
+        unreal.EditorLevelLibrary.save_current_level()
+        _log("Saved after PA-D spawn (before dress reload)", {"path": LEVEL_PATH})
+    except Exception as exc:
+        _log("Save after PA-D spawn warning", {"error": str(exc)})
+
     run_dress_refresh()
 
     try:
