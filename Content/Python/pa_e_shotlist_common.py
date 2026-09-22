@@ -232,11 +232,11 @@ def _look_target_for_pose_meta(
 
 
 MRQ_PIE_LIGHTING_NOTE = (
-    "MoviePipelinePIEExecutor renders a PIE world. Editor-session TMP lights under VS_MVP/TMP_PA_E_Arrange "
-    "may not match MRQ exposure until reseed_pa_e_tmp_night_fixtures() + apply_homestead_night_tune() run "
-    "after load and again immediately before each MRQ job. If stack_ok in Editor but MRQ stills are dark, "
-    "verify deferred lit pass, warm-up counts, and Epic MRQ PIE / exposure settings (do not switch to day). "
-    "Refs: Movie Render Queue overview (UE 5.8), MoviePipelineDeferredPass, MoviePipelinePIEExecutor."
+    "MoviePipelinePIEExecutor renders a PIE world (load_map / MRQ job can wipe Editor TMP lights). "
+    "Before each MRQ job call reapply_night_environment_for_mrq_shot: Phase 2 + PRESET tune + "
+    "apply_mrq_pie_homestead_night_stack (moon Directional AtmosphereSunLightIndex 1, SkyLight fill + "
+    "RecaptureSky, SkyAtmosphere, exposure Min/Max clamps). Cabin lit + void black sky = PIE sky/atmo "
+    "not refreshed — not a day-phase fix. Refs: UE 5.8 MRQ/PIE, MoviePipelineDeferredPass, SkyLight recapture."
 )
 
 SHOTS = (
@@ -1622,6 +1622,7 @@ def apply_pa_e_homestead_night_environment(
     *,
     reseed_tmp_fixtures: bool = True,
     homestead_centroid: Optional[list[float]] = None,
+    mrq_pie_shot: bool = False,
 ) -> dict[str, Any]:
     """Phase 2 + PRESET tune + lighting stack verify before PA-E/MRQ capture."""
     import vnp_night_tune_and_evidence as vnp
@@ -1632,22 +1633,39 @@ def apply_pa_e_homestead_night_environment(
         "phase_2_alone_insufficient": PA_E_SHOTLIST_TIME_OF_DAY["phase_2_alone_insufficient"],
         "do_not_switch_to_day": PA_E_SHOTLIST_TIME_OF_DAY["do_not_switch_to_day"],
         "mrq_pie_lighting_note": MRQ_PIE_LIGHTING_NOTE,
+        "mrq_pie_shot": mrq_pie_shot,
     }
     block["time_of_day"] = apply_pa_e_shotlist_time_of_day(log_prefix)
-    tune = vnp.apply_homestead_night_tune()
-    verify = vnp.verify_homestead_night_lighting_stack()
+    tune: dict[str, Any]
+    verify: dict[str, Any]
     reseed_meta: Optional[dict[str, Any]] = None
-    if reseed_tmp_fixtures and not verify.get("stack_ok"):
+    if mrq_pie_shot:
         if homestead_centroid is None:
             inv = inventory_homestead_in_level()
             bounds = inv.get("homestead_bounds") or inv.get("framing_bounds")
             if bounds and bounds.get("centroid"):
                 homestead_centroid = bounds["centroid"]
-        reseed_meta = vnp.reseed_pa_e_tmp_night_fixtures(homestead_centroid)
-        block["tmp_fixture_reseed"] = reseed_meta
-        if reseed_meta.get("stack_ok_after_reseed"):
-            tune = vnp.apply_homestead_night_tune()
-            verify = vnp.verify_homestead_night_lighting_stack()
+        mrq_stack = vnp.apply_mrq_pie_homestead_night_stack(homestead_centroid)
+        block["mrq_pie_night_stack"] = mrq_stack
+        tune = mrq_stack.get("night_tune") or vnp.apply_homestead_night_tune()
+        verify = mrq_stack.get("lighting_stack_verify") or vnp.verify_homestead_night_lighting_stack()
+        reseed_meta = mrq_stack.get("tmp_fixture_reseed")
+        if reseed_meta:
+            block["tmp_fixture_reseed"] = reseed_meta
+    else:
+        tune = vnp.apply_homestead_night_tune()
+        verify = vnp.verify_homestead_night_lighting_stack()
+        if reseed_tmp_fixtures and not verify.get("stack_ok"):
+            if homestead_centroid is None:
+                inv = inventory_homestead_in_level()
+                bounds = inv.get("homestead_bounds") or inv.get("framing_bounds")
+                if bounds and bounds.get("centroid"):
+                    homestead_centroid = bounds["centroid"]
+            reseed_meta = vnp.reseed_pa_e_tmp_night_fixtures(homestead_centroid)
+            block["tmp_fixture_reseed"] = reseed_meta
+            if reseed_meta.get("stack_ok_after_reseed"):
+                tune = vnp.apply_homestead_night_tune()
+                verify = vnp.verify_homestead_night_lighting_stack()
     block["night_tune"] = tune
     block["lighting_stack_verify"] = verify
     block["environment_preconditions_ok"] = bool(
@@ -1828,7 +1846,7 @@ def aim_shot_cameras_for_capture(log_prefix: str = "") -> dict[str, Any]:
 
 
 def reapply_night_environment_for_mrq_shot(shot_id: str, log_prefix: str = "") -> dict[str, Any]:
-    """Re-apply Phase 2 + PRESET tune before each MRQ PIE job (Editor TMP ≠ PIE world)."""
+    """Re-apply Phase 2 + PRESET + MRQ PIE sky stack immediately before each MRQ job."""
     inv = inventory_homestead_in_level(shot_id)
     bounds = inv.get("aim_bounds") or inv.get("framing_bounds") or inv.get("homestead_bounds")
     centroid = bounds.get("centroid") if bounds else None
@@ -1836,9 +1854,14 @@ def reapply_night_environment_for_mrq_shot(shot_id: str, log_prefix: str = "") -
         log_prefix,
         reseed_tmp_fixtures=True,
         homestead_centroid=centroid,
+        mrq_pie_shot=True,
     )
     block["shot_id"] = shot_id
     block["mrq_pie_lighting_note"] = MRQ_PIE_LIGHTING_NOTE
+    block["mrq_pie_reapply"] = True
+    if log_prefix:
+        stack = (block.get("mrq_pie_night_stack") or {}).get("stack_ok")
+        log(log_prefix, "mrq_pie_night_reapply", {"shot_id": shot_id, "stack_ok": stack})
     return block
 
 

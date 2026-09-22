@@ -705,6 +705,51 @@ def _clear_queue(queue) -> None:
             delete_job(job)
 
 
+def _add_mrq_pie_night_console_settings(cfg, meta: dict[str, Any]) -> None:
+    """Push exposure clamps into MRQ job so PIE render world matches Editor night stack."""
+    try:
+        import vnp_night_tune_and_evidence as vnp
+
+        cvar_cmds = vnp.MRQ_PIE_NIGHT_EXPOSURE_CVARS
+    except Exception as e:
+        meta["mrq_pie_console_cvars"] = {"error": str(e)}
+        return
+    setting_cls = getattr(unreal, "MoviePipelineConsoleVariableSetting", None)
+    if setting_cls is None:
+        meta["mrq_pie_console_cvars"] = "MoviePipelineConsoleVariableSetting_missing"
+        return
+    try:
+        setting = cfg.find_or_add_setting_by_class(setting_cls)
+        applied: list[dict[str, Any]] = []
+        for cmd in cvar_cmds:
+            parts = cmd.split()
+            if len(parts) < 2:
+                continue
+            name, value = parts[0], parts[1]
+            ok = False
+            for method_name in ("add_or_update_console_variable", "add_console_variable", "set_console_variable"):
+                fn = getattr(setting, method_name, None)
+                if not callable(fn):
+                    continue
+                try:
+                    fn(name, value)
+                    ok = True
+                    break
+                except TypeError:
+                    try:
+                        fn(name, value, True)
+                        ok = True
+                        break
+                    except Exception:
+                        pass
+                except Exception:
+                    pass
+            applied.append({"name": name, "value": value, "ok": ok})
+        meta["mrq_pie_console_cvars"] = applied
+    except Exception as e:
+        meta["mrq_pie_console_cvars_error"] = str(e)
+
+
 def _queue_one_frame_job(
     subsystem,
     sequence,
@@ -800,6 +845,7 @@ def _queue_one_frame_job(
             }
         except Exception as e:
             meta["anti_aliasing_warmup_error"] = str(e)
+    _add_mrq_pie_night_console_settings(cfg, meta)
     return True, meta
 
 

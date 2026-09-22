@@ -1,3 +1,7 @@
+## 2026-09-22 — PA-E MRQ PIE readable night sky (P0.1)
+
+- Post-#175 DESKTOP: MRQ stills — cabin lit, **void black sky**. **Fix:** `apply_mrq_pie_homestead_night_stack` + per-shot `reapply_night_environment_for_mrq_shot` (`mrq_pie_shot=True`); MRQ exposure ConsoleVariableSetting. KNOWN_ERRORS + CAPTURE_REDUNDANCY. Gap **OPEN** — DESKTOP re-prove.
+
 ## 2026-09-22 — PA-E P0.2/P0.3 shot2 framing + pose_source (cloud, post-#175)
 
 - **P0.2:** `SHOT2_WIDE_STANDOFF_UU` (650,-1150,650) + `SHOT2_LOOKAT_XY_BIAS_UU` — modest strafe off (400,-1400) to reduce left pine on wide cabin frame.
