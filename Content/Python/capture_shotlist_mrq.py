@@ -692,7 +692,7 @@ def _start_pie_executor(subsystem, on_finished: Callable) -> tuple[bool, Any]:
 def _apply_mrq_scene_prep(viewport_prep: dict[str, Any]) -> None:
     viewport_prep["finish_loading"] = common.finish_loading_before_capture()
     viewport_prep.update(common.apply_lit_game_view_for_capture())
-    viewport_prep["time_of_day"] = common.apply_pa_e_shotlist_time_of_day(PREFIX)
+    viewport_prep["homestead_night_environment"] = common.apply_pa_e_homestead_night_environment(PREFIX)
 
 
 def main() -> None:
@@ -720,6 +720,7 @@ def main() -> None:
             "closed_fail": True,
             "prove_loop_status": "blocked",
             "lead_prove_loop": list(common.LEAD_PROVE_LOOP),
+            "universal_testing_preconditions": list(common.UNIVERSAL_TESTING_PRECONDITIONS),
             "homestead_diagnostic_path": common.homestead_diagnostic_path(),
             "prefix": PREFIX.strip(":"),
             "primary_path": PRIMARY_PATH,

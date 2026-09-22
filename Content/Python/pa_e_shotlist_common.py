@@ -27,17 +27,11 @@ MRQ_ENGINE_WARMUP_COUNT = 32
 MRQ_RENDER_WARMUP_COUNT = 8
 MRQ_CAMERA_CUT_PREROLL_FRAME = -32
 
-PROVE_CRITERIA = {
-    "requires_lit_homestead_visible": True,
-    "min_bytes": MIN_BYTES,
-    "min_mean_luminance": MIN_MEAN_LUMINANCE,
-    "file_exists_alone_is_not_pass": True,
-    "black_stills_not_closed_fail": True,
-    "note": (
-        "Near-black PNGs start the prove loop (in progress), not a closed FAIL. "
-        "Lead-visible lit geometry when rotating viewport means wrong aim/buffer — fix pose/lighting/capture."
-    ),
-}
+_PHASE_2_ALONE_INSUFFICIENT = (
+    "hw.TimeOfDay.Phase 2 sets gameplay night phase only. Readable thematic night requires "
+    "PRESET_Homestead_Night tune (sky/moon/stars ambient, fog SSS, warm cabin emissives) — "
+    "apply_homestead_night_tune() + verify moon/skylight/cabin stack before capture."
+)
 
 # Lead hard rule — required loop before any failure claim (docs + report).
 LEAD_PROVE_LOOP = (
@@ -78,7 +72,10 @@ UNIVERSAL_TESTING_PRECONDITIONS = (
     {
         "step": 3,
         "id": "lighting_tod_view",
-        "action": "Lighting, time-of-day phase, and view mode match shot/test intent; record phase/commands in report.",
+        "action": (
+            "Lighting, time-of-day, and PRESET tune match shot intent (PA-E: Phase 2 + "
+            "PRESET_Homestead_Night tune — Phase 2 alone insufficient); record in report."
+        ),
     },
     {
         "step": 4,
@@ -93,10 +90,36 @@ PA_E_SHOTLIST_TIME_OF_DAY = {
     "phase_name": "Night",
     "console_command": "hw.TimeOfDay.Phase 2",
     "shotlist_doc": "Docs/00_SHOTLIST.md",
+    "preset_canon": "Lib/07_Night_SpiritLayer/PRESET_Homestead_Night.md",
+    "night_tune_module": "Content/Python/vnp_night_tune_and_evidence.py",
     "shotlist_intent": "Shot 1 homestead night lookout; Shot 2 cabin+garden close at night (warm windows vs moonlight).",
+    "phase_2_alone_insufficient": (
+        "hw.TimeOfDay.Phase 2 sets gameplay night phase only. Readable thematic night requires "
+        "PRESET_Homestead_Night tune (sky/moon/stars ambient, fog SSS, warm cabin emissives) — "
+        "apply_homestead_night_tune() + verify moon/skylight/cabin stack before capture."
+    ),
+    "do_not_switch_to_day": (
+        "Do not switch shotlist capture to day phase to dodge black stills — fix night lighting stack."
+    ),
     "note": (
-        "Use explicit phase in code/report — do not silently set night without documenting intent. "
-        "Day phase (0) only when shotlist or test doc requires day (e.g. Shot 4 planet day)."
+        "Use explicit phase + night tune in code/report. Day phase (0) only when shotlist requires day (e.g. Shot 4)."
+    ),
+}
+
+PROVE_CRITERIA = {
+    "requires_lit_homestead_visible": True,
+    "min_bytes": MIN_BYTES,
+    "min_mean_luminance": MIN_MEAN_LUMINANCE,
+    "file_exists_alone_is_not_pass": True,
+    "black_stills_not_closed_fail": True,
+    "night_readable_requires_preset_tune": True,
+    "preset_canon": "Lib/07_Night_SpiritLayer/PRESET_Homestead_Night.md",
+    "phase_2_alone_insufficient": _PHASE_2_ALONE_INSUFFICIENT,
+    "do_not_switch_to_day": PA_E_SHOTLIST_TIME_OF_DAY["do_not_switch_to_day"],
+    "note": (
+        "Near-black PNGs start the prove loop (in progress), not a closed FAIL. "
+        "Lead-visible lit geometry when rotating viewport means wrong aim/buffer — fix pose/lighting/capture. "
+        "Night must be readable (moon/sky/cabin emissives), not pitch black — Phase 2 + PRESET tune."
     ),
 }
 
@@ -650,7 +673,8 @@ def desktop_conductor_checklist() -> list[str]:
         "Lead prove loop: (1) inventory homestead in level, (2) aim cameras at bounds centroids, "
         "(3) capture+inspect luminance, (4) bug-fix until lit — near-black is NOT closed FAIL.",
         "Run execute_python_script('pa_e_homestead_capture_diagnostic.py') → Saved/pa_e_homestead_capture_diagnostic.json",
-        "Confirm report time_of_day matches shotlist intent (PA-E shots 1–2: Night phase 2 per Docs/00_SHOTLIST.md)",
+        "Confirm report homestead_night_environment: Phase 2 + night tune + lighting_stack_verify.stack_ok "
+        "(PRESET_Homestead_Night.md; Phase 2 alone insufficient — do not switch to day for black stills)",
         "Safe-Build after MovieRenderPipeline plugins; confirm MRQ Python types import.",
         "If inventory_ok false: run place_vs_mvp_dress.py + batch_import on DESKTOP.",
         "Run execute_python_script('capture_shotlist.py'); read Saved/pa_e_capture_report.json prove_loop fields.",
@@ -693,11 +717,42 @@ def apply_time_of_day_phase(phase: int, log_prefix: str = "") -> dict[str, Any]:
 
 
 def apply_pa_e_shotlist_time_of_day(log_prefix: str = "") -> dict[str, Any]:
-    """Shotlist-aligned TOD for PA-E stills (night for shots 1–2). Always log in capture report."""
+    """Shotlist-aligned TOD for PA-E stills (night for shots 1–2). Phase 2 alone is insufficient."""
     block = dict(PA_E_SHOTLIST_TIME_OF_DAY)
     applied = apply_time_of_day_phase(block["phase"], log_prefix)
     block["apply_result"] = applied
     block["applied"] = applied.get("applied", False)
+    return block
+
+
+def apply_pa_e_homestead_night_environment(log_prefix: str = "") -> dict[str, Any]:
+    """Phase 2 + PRESET tune + lighting stack verify before PA-E/MRQ capture."""
+    import vnp_night_tune_and_evidence as vnp
+
+    block: dict[str, Any] = {
+        "preset_canon": PA_E_SHOTLIST_TIME_OF_DAY["preset_canon"],
+        "night_tune_module": PA_E_SHOTLIST_TIME_OF_DAY["night_tune_module"],
+        "phase_2_alone_insufficient": PA_E_SHOTLIST_TIME_OF_DAY["phase_2_alone_insufficient"],
+        "do_not_switch_to_day": PA_E_SHOTLIST_TIME_OF_DAY["do_not_switch_to_day"],
+    }
+    block["time_of_day"] = apply_pa_e_shotlist_time_of_day(log_prefix)
+    tune = vnp.apply_homestead_night_tune()
+    verify = vnp.verify_homestead_night_lighting_stack()
+    block["night_tune"] = tune
+    block["lighting_stack_verify"] = verify
+    block["environment_preconditions_ok"] = bool(
+        block["time_of_day"].get("applied")
+        and tune.get("ok")
+        and verify.get("stack_ok")
+    )
+    if not verify.get("stack_ok"):
+        block["warning"] = (
+            "Homestead night stack incomplete (moon/skylight/cabin warm) — pitch-black risk; "
+            "dress LIT actors per PRESET_Homestead_Night.md then re-run diagnostic."
+        )
+        log(log_prefix, "night stack verify failed", {"verify": verify})
+    elif log_prefix:
+        log(log_prefix, "homestead night environment applied", {"stack_ok": True})
     return block
 
 

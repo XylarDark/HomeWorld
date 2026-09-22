@@ -24,8 +24,10 @@ PREFIX = "pa_e_homestead_capture_diagnostic:"
 def main() -> None:
     common.log(PREFIX, "started")
     level_ok = common.load_level(PREFIX)
+    night_env = common.apply_pa_e_homestead_night_environment(PREFIX)
     payload = common.write_homestead_capture_diagnostic(PREFIX)
     payload["level_loaded"] = level_ok
+    payload["homestead_night_environment"] = night_env
     common.log(
         PREFIX,
         "done",

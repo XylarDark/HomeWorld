@@ -19,7 +19,7 @@ Applies to **every** automation / tooling gap (any tool surface). Canonical deta
 
 ### Testing preconditions (universal — before PASS/FAIL claims)
 
-Before trusting **any** automation pass/fail output, verify setup in order: **(1)** content in loaded level, **(2)** camera aimed at that content, **(3)** lighting / time-of-day / view mode match intent — **record** phase and view prep in reports, **(4)** capture or run harness then inspect output. Do not treat missing preconditions as a closed FAIL without this loop. Full table: CAPTURE_REDUNDANCY.md § Testing preconditions.
+Before trusting **any** automation pass/fail output, verify setup in order: **(1)** content in loaded level, **(2)** camera aimed at that content, **(3)** lighting / time-of-day / **preset tune** match intent (PA-E night: Phase 2 + `PRESET_Homestead_Night` — Phase 2 alone insufficient; do not switch to day for black stills) — **record** in reports, **(4)** capture or run harness then inspect output. Do not treat missing preconditions as a closed FAIL without this loop. Full table: CAPTURE_REDUNDANCY.md § Testing preconditions.
 
 ### Docs-first
 

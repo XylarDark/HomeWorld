@@ -1128,7 +1128,7 @@ def main() -> None:
     level_ok = _load_level()
     viewport_prep = _set_lit_and_game_view()
     _settle_viewport_before_first_capture()
-    viewport_prep["time_of_day"] = common.apply_pa_e_shotlist_time_of_day(PREFIX)
+    viewport_prep["homestead_night_environment"] = common.apply_pa_e_homestead_night_environment(PREFIX)
 
     orch = _ShotlistOrchestrator(
         keep_ok=keep_ok,

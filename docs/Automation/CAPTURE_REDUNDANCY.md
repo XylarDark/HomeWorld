@@ -23,7 +23,7 @@ Before trusting **any** pass/fail output (CI, Editor Python, MCP harness, MRQ, s
 | 3 | **Lighting / TOD / view mode** — time-of-day phase, lighting, and editor view mode match **test or shotlist intent**; **record** phase/commands used in the report (implicit `hw.TimeOfDay.Phase 2` without doc alignment is a precondition smell). |
 | 4 | **Capture / inspect** — run the tool, then inspect artifacts and logs before claiming PASS or closed FAIL. |
 
-PA-E capture maps step 1–2 to [pa_e_homestead_capture_diagnostic.py](../../Content/Python/pa_e_homestead_capture_diagnostic.py) and `LEAD_PROVE_LOOP` in [pa_e_shotlist_common.py](../../Content/Python/pa_e_shotlist_common.py). Shotlist stills: **night** for Shot 1–2 per [00_SHOTLIST.md](../Docs/00_SHOTLIST.md) — scripts use **explicit** Phase 2 with `time_of_day` in `Saved/pa_e_capture_report.json`; use Phase 0 (day) only when the shotlist or test doc requires day.
+PA-E capture maps step 1–2 to [pa_e_homestead_capture_diagnostic.py](../../Content/Python/pa_e_homestead_capture_diagnostic.py) and `LEAD_PROVE_LOOP` in [pa_e_shotlist_common.py](../../Content/Python/pa_e_shotlist_common.py). Shotlist stills: **thematic readable night** for Shot 1–2 per [00_SHOTLIST.md](../Docs/00_SHOTLIST.md) — **`homestead_night_environment`** in `Saved/pa_e_capture_report.json` (Phase 2 + PRESET tune + stack verify); **not** day phase and **not** Phase 2 without tune.
 
 | # | Practice | Summary |
 |---|----------|---------|
