@@ -2,14 +2,21 @@
 
 Loads L_VS_MVP_Markers, poses level viewport for Shot 1 (lookout) and Shot 2
 (cabin/garden), lit + game view, then **AutomationLibrary.take_high_res_screenshot**
-(primary, one request per shot, Slate tick spacing) with file-first wait, validates
-PNGs, writes Saved/pa_e_capture_report.json.
+(primary, one request in flight) with **Slate pre-tick** wait (not blocking sleep
+on the editor main thread after invoke), validates PNGs, writes
+Saved/pa_e_capture_report.json.
 
-Policy: proven-results-first (docs/Automation/CAPTURE_REDUNDANCY.md § Shotlist; PR #162).
-Multi-form console HighResShot wait ladders are **not** used (retired post-#161 DESKTOP burn).
+Wait pattern (post-#163 DESKTOP): async HighResShot needs editor ticks; blocking
+``time.sleep`` / settle loops in Python freeze ticks and leave ``is_task_done()`` false.
+Community pattern: ``unreal.register_slate_pre_tick_callback`` — fire one capture,
+check task + file on later ticks, unregister when finished.
 
-Epic UE 5.8: AutomationLibrary.take_high_res_screenshot(res_x, res_y, filename, ...),
-finish_loading_before_screenshot(), set_editor_viewport_view_mode.
+Forum refs:
+- https://forums.unrealengine.com/t/how-to-wait-for-take-high-res-screenshot/139285
+- https://forums.unrealengine.com/t/python-api-highrescreenshot/132783
+
+Policy: [docs/Automation/CAPTURE_REDUNDANCY.md](docs/Automation/CAPTURE_REDUNDANCY.md) § Shotlist.
+Multi-form console HighResShot ladders are **not** used.
 
 Run: MCP execute_python_script("capture_shotlist_viewport.py") or UnrealEditor-Cmd
 -ExecutePythonScript=... (uses vnp_editor_keep_alive).
@@ -22,7 +29,8 @@ import json
 import os
 import shutil
 import time
-from typing import Any, Optional
+from enum import Enum
+from typing import Any, Callable, Optional
 
 try:
     import unreal
@@ -37,13 +45,12 @@ MIN_BYTES = 50 * 1024
 MIN_MEAN_LUMINANCE = 8.0  # reject near-black (0–255 scale)
 SETTLE_FRAMES = 12
 INTER_SHOT_SETTLE_FRAMES = 24
-POST_CAPTURE_SETTLE_FRAMES = 8
 WAIT_FILE_SEC = 120.0
 CAPTURE_DELAY_SEC = 0.35
-STABLE_POLL_INTERVAL = 0.35
 STABLE_SIZE_POLLS = 4
 FINAL_DRAIN_SEC = 75.0
-PRIMARY_PATH = "automation_library_slate_tick"
+PRIMARY_PATH = "automation_library_slate_pretick"
+SLATE_WAIT_MECHANISM = "register_slate_pre_tick_callback"
 
 DESKTOP_PA_E = r"C:\Users\User\Desktop\HomeWorld_PA_E"
 
@@ -65,6 +72,388 @@ SHOTS = (
         "fallback_source": "Lib/00_Core/GRAYBOX_LAYOUT.md CAM_CabinClose (blender euler from JSON)",
     },
 )
+
+
+class _Phase(str, Enum):
+    IDLE = "idle"
+    POSED = "posed"
+    CAPTURE_PENDING = "capture_pending"
+    WAITING_FILE = "waiting_file"
+    INTER_SHOT_SETTLE = "inter_shot_settle"
+    FINAL_DRAIN = "final_drain"
+    WRITE_REPORT = "write_report"
+    DISARM = "disarm"
+    DONE = "done"
+
+
+class _StableSizeTracker:
+    """Tick-based file size stability (no sleep between polls)."""
+
+    __slots__ = ("last_size", "same_count", "samples")
+
+    def __init__(self) -> None:
+        self.last_size = -1
+        self.same_count = 0
+        self.samples: list[int] = []
+
+    def reset(self) -> None:
+        self.last_size = -1
+        self.same_count = 0
+        self.samples = []
+
+    def observe(self, path: str) -> bool:
+        if not os.path.isfile(path):
+            self.reset()
+            return False
+        try:
+            size = os.path.getsize(path)
+        except OSError:
+            self.reset()
+            return False
+        self.samples.append(size)
+        if len(self.samples) > STABLE_SIZE_POLLS:
+            self.samples = self.samples[-STABLE_SIZE_POLLS:]
+        if size < MIN_BYTES:
+            self.last_size = size
+            self.same_count = 0
+            return False
+        if size == self.last_size:
+            self.same_count += 1
+        else:
+            self.last_size = size
+            self.same_count = 1
+        return (
+            self.same_count >= 2
+            and len(self.samples) >= STABLE_SIZE_POLLS
+            and self.samples[-1] == self.samples[-2]
+            and self.samples[-1] >= MIN_BYTES
+        )
+
+
+class _ShotlistOrchestrator:
+    """Async shotlist driver: one HighResShot in flight; Slate pre-tick state machine."""
+
+    def __init__(
+        self,
+        *,
+        keep_ok: bool,
+        level_ok: bool,
+        viewport_prep: dict[str, Any],
+    ) -> None:
+        self.keep_ok = keep_ok
+        self.level_ok = level_ok
+        self.viewport_prep = viewport_prep
+        self.phase = _Phase.IDLE
+        self.shot_index = 0
+        self.results: list[dict[str, Any]] = []
+        self._tick_handle: Any = None
+        self._settle_frames_left = 0
+        self._current_shot: Optional[dict] = None
+        self._current_cam: Any = None
+        self._dest_abs = ""
+        self._capture_since = 0.0
+        self._wait_deadline = 0.0
+        self._task: Any = None
+        self._task_poll: dict[str, Any] = {}
+        self._capture_meta: dict[str, Any] = {}
+        self._wait_meta: dict[str, Any] = {}
+        self._stable = _StableSizeTracker()
+        self._wait_t0 = 0.0
+        self._final_drain_deadline = 0.0
+        self._driver_error: Optional[str] = None
+        self._capture_in_flight = False
+
+    def start(self) -> bool:
+        register = getattr(unreal, "register_slate_pre_tick_callback", None)
+        if not callable(register):
+            self._driver_error = "register_slate_pre_tick_callback unavailable"
+            _log("slate pre_tick unavailable", {"error": self._driver_error})
+            return False
+        try:
+            self._tick_handle = register(self._on_slate_pre_tick)
+        except Exception as e:
+            self._driver_error = str(e)
+            _log("slate pre_tick register failed", {"error": self._driver_error})
+            return False
+        self.phase = _Phase.POSED
+        self.shot_index = 0
+        _log(
+            "slate pre_tick driver armed",
+            {"mechanism": SLATE_WAIT_MECHANISM, "wait_file_sec": WAIT_FILE_SEC},
+        )
+        return True
+
+    def _unregister_tick(self) -> None:
+        if self._tick_handle is None:
+            return
+        unregister = getattr(unreal, "unregister_slate_pre_tick_callback", None)
+        if callable(unregister):
+            try:
+                unregister(self._tick_handle)
+            except Exception as e:
+                _log("slate pre_tick unregister failed", {"error": str(e)})
+        self._tick_handle = None
+
+    def _on_slate_pre_tick(self, _delta: float) -> None:
+        try:
+            self._tick()
+        except Exception as e:
+            _log("orchestrator tick error", {"error": str(e), "phase": self.phase.value})
+            self.phase = _Phase.WRITE_REPORT
+            self._driver_error = self._driver_error or str(e)
+
+    def _tick(self) -> None:
+        if self.phase == _Phase.POSED:
+            self._begin_shot_prepare()
+        elif self.phase == _Phase.CAPTURE_PENDING:
+            self._invoke_capture_once()
+        elif self.phase == _Phase.WAITING_FILE:
+            self._poll_capture_wait()
+        elif self.phase == _Phase.INTER_SHOT_SETTLE:
+            self._settle_frames_left -= 1
+            if self._settle_frames_left <= 0:
+                self.phase = _Phase.POSED
+        elif self.phase == _Phase.FINAL_DRAIN:
+            self._tick_final_drain()
+        elif self.phase == _Phase.WRITE_REPORT:
+            self._write_report_and_finish()
+        elif self.phase == _Phase.DISARM:
+            self._disarm_only()
+
+    def _begin_shot_prepare(self) -> None:
+        if self.shot_index >= len(SHOTS):
+            self.phase = _Phase.FINAL_DRAIN
+            self._final_drain_deadline = time.time() + FINAL_DRAIN_SEC
+            _log("final_drain start", {"sec": FINAL_DRAIN_SEC})
+            return
+        shot = SHOTS[self.shot_index]
+        self._current_shot = shot
+        _log("shot start", {"id": shot["id"], "phase": "posed"})
+        self._current_cam = _find_camera(shot["camera_labels"])
+        pose_meta = _pose_viewport(
+            self._current_cam,
+            tuple(shot["fallback_location_m"]),
+            tuple(shot["fallback_rotation_deg"]),
+        )
+        pose_meta["fallback_source"] = shot.get("fallback_source")
+        _finish_loading_before_screenshot()
+        self._dest_abs = _shot_dest_abs(shot["filename"])
+        purge = _purge_stale_shot_pngs(self._dest_abs)
+        self._capture_meta = {
+            "pose": pose_meta,
+            "purge_before_capture": purge,
+            "dest_abs": self._dest_abs,
+        }
+        self._capture_since = time.time()
+        self._stable.reset()
+        self._task = None
+        self._task_poll = {"had_task": False}
+        self._capture_in_flight = False
+        self.phase = _Phase.CAPTURE_PENDING
+
+    def _invoke_capture_once(self) -> None:
+        if self._capture_in_flight:
+            return
+        if not self._current_shot:
+            self.phase = _Phase.WRITE_REPORT
+            return
+        finish_load = _finish_loading_before_screenshot()
+        focus = _focus_level_viewport()
+        method, cap_err, ue_path, task = _invoke_automation_library_shot_only(
+            self._dest_abs,
+            self._current_cam if self._current_cam else None,
+        )
+        self._capture_in_flight = True
+        self._task = task
+        self._task_poll = _task_snapshot(task)
+        self._wait_t0 = time.time()
+        self._wait_deadline = time.time() + WAIT_FILE_SEC
+        self._wait_meta = {
+            "dest_abs": self._dest_abs,
+            "timeout_sec": WAIT_FILE_SEC,
+            "wait_mechanism": SLATE_WAIT_MECHANISM,
+            "discovered_from": None,
+            "wait_elapsed_sec": 0.0,
+            "stable": False,
+        }
+        self._capture_meta.update(
+            {
+                "finish_loading_before_screenshot": finish_load,
+                "viewport_focus": focus,
+                "primary_path": PRIMARY_PATH,
+                "capture_method": method,
+                "capture_error": cap_err,
+                "ue_path": ue_path,
+                "automation_task_poll": self._task_poll,
+                "capture_since": self._capture_since,
+                "capture_delay_sec": CAPTURE_DELAY_SEC,
+                "wait_file_budget_sec": WAIT_FILE_SEC,
+            }
+        )
+        _log(
+            "AutomationLibrary invoke (one in flight)",
+            {"method": method, "task_poll": self._task_poll},
+        )
+        self.phase = _Phase.WAITING_FILE
+
+    def _poll_capture_wait(self) -> None:
+        now = time.time()
+        self._wait_meta["wait_elapsed_sec"] = round(now - self._wait_t0, 2)
+        task_done = _task_is_done(self._task)
+        if task_done is True:
+            self._task_poll["task_done"] = True
+            self._task_poll["note"] = "task_done; file on disk is authoritative"
+
+        resolved, probe = _probe_capture_file(
+            self._dest_abs,
+            self._capture_since,
+            self._stable,
+        )
+        self._wait_meta.update(probe)
+        if resolved:
+            self._wait_meta["stable"] = True
+            self._wait_meta["discovered_from"] = probe.get("discovered_from")
+            self._finish_shot(resolved)
+            return
+        if task_done is True and resolved is None:
+            pass
+        if now >= self._wait_deadline:
+            self._task_poll["task_done"] = task_done
+            self._task_poll.setdefault(
+                "note",
+                "timeout; task_done=%s file authoritative if appears later in final_drain"
+                % task_done,
+            )
+            self._finish_shot(None)
+            return
+
+    def _finish_shot(self, resolved: Optional[str]) -> None:
+        shot = self._current_shot
+        if not shot:
+            self.phase = _Phase.WRITE_REPORT
+            return
+        cap = dict(self._capture_meta)
+        cap["saved_path"] = resolved
+        cap["wait"] = dict(self._wait_meta)
+        cap["file_produced_by"] = cap.get("capture_method") if resolved else None
+        cap["automation_task_poll"] = dict(self._task_poll)
+        if resolved:
+            _log("capture file from AutomationLibrary", {"dest": self._dest_abs})
+        else:
+            _log("capture missing after slate wait", {"dest": self._dest_abs})
+        validation = _validate_png(resolved)
+        desktop = _copy_to_desktop(resolved, shot["filename"]) if resolved else {"copied": False}
+        entry = {
+            "id": shot["id"],
+            "filename": shot["filename"],
+            "dest_abs": self._dest_abs,
+            "purge_before_capture": cap.get("purge_before_capture"),
+            "capture_method": cap.get("capture_method"),
+            "capture_error": cap.get("capture_error"),
+            "file_produced_by": cap.get("file_produced_by"),
+            "primary_path": PRIMARY_PATH,
+            "ue_path": cap.get("ue_path"),
+            "viewport_focus": cap.get("viewport_focus"),
+            "automation_task_poll": cap.get("automation_task_poll"),
+            "wait_file_budget_sec": WAIT_FILE_SEC,
+            "wait_mechanism": SLATE_WAIT_MECHANISM,
+            "saved_path": resolved,
+            "wait": cap.get("wait"),
+            "engine_search_roots": _engine_search_roots(),
+            "capture_since": self._capture_since,
+            "pose": cap.get("pose"),
+            "validation": validation,
+            "desktop_copy": desktop,
+            "pass": bool(validation.get("pass")),
+        }
+        self.results.append(entry)
+        _log("shot done", {"id": shot["id"], "pass": entry["pass"], "bytes": validation.get("bytes")})
+        self._capture_in_flight = False
+        self.shot_index += 1
+        if self.shot_index < len(SHOTS):
+            self._settle_frames_left = INTER_SHOT_SETTLE_FRAMES
+            self.phase = _Phase.INTER_SHOT_SETTLE
+            _log("inter_shot_settle", {"frames": INTER_SHOT_SETTLE_FRAMES})
+        else:
+            self.phase = _Phase.FINAL_DRAIN
+            self._final_drain_deadline = time.time() + FINAL_DRAIN_SEC
+            _log("final_drain start", {"sec": FINAL_DRAIN_SEC})
+
+    def _tick_final_drain(self) -> None:
+        now = time.time()
+        any_pending = False
+        for entry in self.results:
+            if entry.get("pass"):
+                continue
+            any_pending = True
+            dest = _shot_dest_abs(entry["filename"])
+            since = float(entry.get("capture_since") or 0.0)
+            tracker = _StableSizeTracker()
+            resolved, wait_meta = _probe_capture_file(dest, since, tracker)
+            entry["wait_final"] = wait_meta
+            if resolved:
+                validation = _validate_png(resolved)
+                entry["validation"] = validation
+                entry["saved_path"] = resolved
+                entry["desktop_copy"] = _copy_to_desktop(resolved, entry["filename"])
+                entry["pass"] = bool(validation.get("pass"))
+        if not any_pending or now >= self._final_drain_deadline:
+            _log("final_drain done")
+            self.phase = _Phase.WRITE_REPORT
+
+    def _write_report_and_finish(self) -> None:
+        if self.phase == _Phase.DONE:
+            return
+        all_pass = all(r.get("pass") for r in self.results) if self.results else False
+        report = {
+            "ok": all_pass,
+            "prefix": PREFIX.strip(":"),
+            "primary_path": PRIMARY_PATH,
+            "wait_mechanism": SLATE_WAIT_MECHANISM,
+            "project_dir_abs": _project_dir(),
+            "pil_available": _pil_available(),
+            "level_path": LEVEL_PATH,
+            "level_loaded": self.level_ok,
+            "viewport_prep": self.viewport_prep,
+            "keep_python_script_alive": self.keep_ok,
+            "resolution": [RES_X, RES_Y],
+            "wait_file_budget_sec": WAIT_FILE_SEC,
+            "final_drain_sec": FINAL_DRAIN_SEC,
+            "shots": self.results,
+            "driver_error": self._driver_error,
+            "state_machine_phases": [p.value for p in _Phase],
+            "policy": (
+                "AutomationLibrary + slate pre-tick wait (post-#163: blocking sleep freezes ticks); "
+                "no console multi-form ladder; does not claim shotlist PASS — verify on DESKTOP; "
+                "no host ImageGrab"
+            ),
+            "forum_refs": [
+                "https://forums.unrealengine.com/t/how-to-wait-for-take-high-res-screenshot/139285",
+                "https://forums.unrealengine.com/t/python-api-highrescreenshot/132783",
+            ],
+            "ladder_doc": "docs/Automation/CAPTURE_REDUNDANCY.md",
+            "ladder_rung": "1_built_in_and_in_repo",
+            "scout_requires": "APPROVE TOOL SCOUT <name>",
+            "build_requires": "APPROVE TOOL BUILD <name>",
+        }
+        with open(_report_path(), "w", encoding="utf-8") as f:
+            json.dump(report, f, indent=2)
+        _log("report written", {"path": _report_path(), "all_pass": all_pass})
+        _log("finished", {"all_pass": all_pass})
+        self._unregister_tick()
+        self.phase = _Phase.DISARM
+        self._disarm_only()
+        self.phase = _Phase.DONE
+
+    def _disarm_only(self) -> None:
+        if not self.keep_ok:
+            return
+        try:
+            import vnp_editor_keep_alive as keep
+
+            keep.disarm()
+        except Exception:
+            pass
 
 
 def _log(msg: str, data: Optional[dict] = None) -> None:
@@ -98,7 +487,7 @@ def _shot_dest_abs(filename: str) -> str:
 
 
 def _path_for_ue(abs_path: str) -> str:
-    """AutomationLibrary / HighResShot: absolute path, forward slashes."""
+    """AutomationLibrary: absolute path, forward slashes."""
     return _abs_path(abs_path).replace("\\", "/")
 
 
@@ -139,7 +528,7 @@ def _purge_stale_shot_pngs(dest_abs: str) -> dict[str, Any]:
 
 
 def _engine_search_roots() -> list[str]:
-    """UE often writes relative HighResShot paths under Engine Binaries Win64 (engine CWD)."""
+    """UE often writes relative paths under Engine Binaries Win64 (engine CWD)."""
     roots: list[str] = []
     seen: set[str] = set()
 
@@ -281,7 +670,7 @@ def _set_lit_and_game_view() -> dict:
     game_view = False
     game_view_method: Optional[str] = None
 
-    def try_gv(label: str, fn) -> None:
+    def try_gv(label: str, fn: Callable[[], None]) -> None:
         nonlocal game_view, game_view_method
         if game_view:
             return
@@ -327,33 +716,25 @@ def _set_lit_and_game_view() -> dict:
     return applied
 
 
-def _settle_viewport(frames: int = SETTLE_FRAMES) -> None:
+def _settle_viewport_before_first_capture(frames: int = SETTLE_FRAMES) -> None:
+    """Short sleep settle only before the first capture (level load); not used after invoke."""
     for _ in range(frames):
-        _pump_editor_once()
+        try:
+            if hasattr(unreal, "SlateApplication"):
+                app = unreal.SlateApplication.get()
+                if app is not None and hasattr(app, "tick"):
+                    app.tick(0.033)
+        except Exception:
+            pass
         time.sleep(0.05)
 
 
-def _pump_editor_once() -> None:
-    try:
-        if hasattr(unreal.AutomationLibrary, "automation_wait_for_loading"):
-            unreal.AutomationLibrary.automation_wait_for_loading(None, 0.05)
-    except Exception:
-        pass
-    try:
-        if hasattr(unreal, "SlateApplication"):
-            app = unreal.SlateApplication.get()
-            if app is not None and hasattr(app, "tick"):
-                app.tick(0.033)
-    except Exception:
-        pass
-
-
 def _focus_level_viewport() -> dict[str, Any]:
-    """Bring level viewport to foreground / realtime before capture."""
+    """Bring level viewport to foreground / realtime before HighResShot."""
     attempts: list[dict[str, Any]] = []
     any_ok = False
 
-    def try_call(label: str, fn) -> None:
+    def try_call(label: str, fn: Callable[[], None]) -> None:
         nonlocal any_ok
         try:
             fn()
@@ -454,12 +835,12 @@ def _pose_viewport(
     return meta
 
 
-def _poll_automation_editor_task(task: Any, timeout_sec: float = WAIT_FILE_SEC) -> dict[str, Any]:
-    """If take_high_res_screenshot returns AutomationEditorTask, wait for is_task_done."""
+def _task_snapshot(task: Any) -> dict[str, Any]:
     meta: dict[str, Any] = {
         "had_task": task is not None,
         "task_type": type(task).__name__ if task is not None else None,
         "task_done": None,
+        "poll_skipped": None,
     }
     if task is None:
         return meta
@@ -467,31 +848,30 @@ def _poll_automation_editor_task(task: Any, timeout_sec: float = WAIT_FILE_SEC) 
     if not callable(done_fn):
         meta["poll_skipped"] = "no is_task_done"
         return meta
-    poll_cap = min(timeout_sec, 90.0)
-    deadline = time.time() + poll_cap
-    t0 = time.time()
-    while time.time() < deadline:
-        try:
-            if done_fn():
-                meta["task_done"] = True
-                meta["poll_elapsed_sec"] = round(time.time() - t0, 2)
-                meta["note"] = "task_done; file wait on disk is authoritative"
-                return meta
-        except Exception as e:
-            meta["poll_error"] = str(e)
-            break
-        _settle_viewport(frames=1)
-    meta["task_done"] = False
-    meta["note"] = "task_done false is non-fatal while file wait continues"
-    meta["poll_elapsed_sec"] = round(time.time() - t0, 2)
+    try:
+        meta["task_done"] = bool(done_fn())
+    except Exception as e:
+        meta["poll_error"] = str(e)
     return meta
 
 
-def _invoke_automation_library_shot(
+def _task_is_done(task: Any) -> Optional[bool]:
+    if task is None:
+        return None
+    done_fn = getattr(task, "is_task_done", None)
+    if not callable(done_fn):
+        return None
+    try:
+        return bool(done_fn())
+    except Exception:
+        return None
+
+
+def _invoke_automation_library_shot_only(
     dest_abs: str,
     camera,
-) -> tuple[str, Optional[str], str, Any, dict[str, Any]]:
-    """Primary capture: AutomationLibrary.take_high_res_screenshot (one invoke per shot)."""
+) -> tuple[str, Optional[str], str, Any]:
+    """Fire take_high_res_screenshot once; caller waits on Slate pre-tick (no blocking poll)."""
     ue_path = _path_for_ue(dest_abs)
     last_err: Optional[str] = None
     delay = CAPTURE_DELAY_SEC
@@ -529,51 +909,12 @@ def _invoke_automation_library_shot(
     for name, fn in attempts:
         try:
             task = fn()
-            poll = _poll_automation_editor_task(task, timeout_sec=WAIT_FILE_SEC)
-            _log("AutomationLibrary primary invoked", {"method": name, "task_poll": poll})
-            return name, None, ue_path, task, poll
+            return name, None, ue_path, task
         except TypeError:
             continue
         except Exception as e:
             last_err = str(e)
-    return "automation_failed", last_err or "AutomationLibrary unavailable", ue_path, None, {
-        "had_task": False,
-    }
-
-
-def _capture_automation_library_primary(
-    dest_abs: str,
-    camera,
-) -> dict[str, Any]:
-    """One AutomationLibrary request per shot; file on disk is authoritative."""
-    finish_load = _finish_loading_before_screenshot()
-    focus = _focus_level_viewport()
-    capture_since = time.time()
-    method, cap_err, ue_path, _task, task_poll = _invoke_automation_library_shot(
-        dest_abs, camera
-    )
-    _settle_viewport(frames=POST_CAPTURE_SETTLE_FRAMES)
-    resolved, wait_meta = _wait_for_capture(dest_abs, capture_since, WAIT_FILE_SEC)
-    out: dict[str, Any] = {
-        "finish_loading_before_screenshot": finish_load,
-        "viewport_focus": focus,
-        "primary_path": PRIMARY_PATH,
-        "capture_method": method,
-        "capture_error": cap_err,
-        "ue_path": ue_path,
-        "automation_task_poll": task_poll,
-        "capture_since": capture_since,
-        "capture_delay_sec": CAPTURE_DELAY_SEC,
-        "wait_file_budget_sec": WAIT_FILE_SEC,
-        "saved_path": resolved,
-        "wait": wait_meta,
-        "file_produced_by": method if resolved else None,
-    }
-    if resolved:
-        _log("capture file from AutomationLibrary", {"dest": dest_abs, "method": method})
-    else:
-        _log("capture missing after file wait", {"dest": dest_abs, "method": method})
-    return out
+    return "automation_failed", last_err or "AutomationLibrary unavailable", ue_path, None
 
 
 def _find_named_png(
@@ -627,68 +968,30 @@ def _copy_into_dest(source: str, dest_abs: str) -> bool:
         return False
 
 
-def _file_size_stable(path: str) -> bool:
-    if not os.path.isfile(path):
-        return False
-    try:
-        sizes = []
-        for _ in range(STABLE_SIZE_POLLS):
-            sizes.append(os.path.getsize(path))
-            if sizes[-1] < MIN_BYTES:
-                time.sleep(STABLE_POLL_INTERVAL)
-                continue
-            time.sleep(STABLE_POLL_INTERVAL)
-        return len(sizes) >= STABLE_SIZE_POLLS and sizes[-1] >= MIN_BYTES and sizes[-1] == sizes[-2]
-    except OSError:
-        return False
-
-
-def _wait_for_capture(dest_abs: str, since_mtime: float, timeout_sec: float) -> tuple[Optional[str], dict]:
-    """Poll absolute dest + engine Win64/PA_E fallbacks until size stable."""
-    meta: dict[str, Any] = {
-        "dest_abs": dest_abs,
-        "timeout_sec": timeout_sec,
-        "discovered_from": None,
-        "wait_elapsed_sec": 0.0,
-        "stable": False,
-    }
+def _probe_capture_file(
+    dest_abs: str,
+    since_mtime: float,
+    stable: _StableSizeTracker,
+) -> tuple[Optional[str], dict[str, Any]]:
+    """Non-blocking single-tick probe for fresh PNG (task wait path)."""
+    meta: dict[str, Any] = {"discovered_from": None}
     basename = os.path.basename(dest_abs)
-    deadline = time.time() + timeout_sec
-    t0 = time.time()
-    while time.time() < deadline:
-        _settle_viewport(frames=2)
-        if (
-            os.path.isfile(dest_abs)
-            and _mtime_at_least(dest_abs, since_mtime)
-            and _file_size_stable(dest_abs)
-        ):
-            meta["stable"] = True
-            meta["discovered_from"] = dest_abs
-            meta["wait_elapsed_sec"] = round(time.time() - t0, 2)
-            return dest_abs, meta
-        found = _find_named_png(basename, since_mtime)
-        if found and os.path.getsize(found) >= MIN_BYTES and _mtime_at_least(found, since_mtime):
-            if _copy_into_dest(found, dest_abs) and _mtime_at_least(dest_abs, since_mtime) and _file_size_stable(dest_abs):
-                meta["stable"] = True
-                meta["discovered_from"] = found
-                meta["wait_elapsed_sec"] = round(time.time() - t0, 2)
-                return dest_abs, meta
-            if os.path.isfile(found) and _file_size_stable(found) and _mtime_at_least(found, since_mtime):
-                meta["discovered_from"] = found
-                meta["wait_elapsed_sec"] = round(time.time() - t0, 2)
-                return found, meta
-        time.sleep(STABLE_POLL_INTERVAL)
-    meta["wait_elapsed_sec"] = round(time.time() - t0, 2)
-    if os.path.isfile(dest_abs) and _mtime_at_least(dest_abs, since_mtime):
+    if (
+        os.path.isfile(dest_abs)
+        and _mtime_at_least(dest_abs, since_mtime)
+        and stable.observe(dest_abs)
+    ):
         meta["discovered_from"] = dest_abs
-        meta["stable"] = _file_size_stable(dest_abs)
         return dest_abs, meta
     found = _find_named_png(basename, since_mtime)
     if found and _mtime_at_least(found, since_mtime):
-        _copy_into_dest(found, dest_abs)
-        meta["discovered_from"] = found
-        dest_ok = os.path.isfile(dest_abs) and _mtime_at_least(dest_abs, since_mtime)
-        return (dest_abs if dest_ok else found), meta
+        if os.path.getsize(found) >= MIN_BYTES:
+            if found != dest_abs:
+                _copy_into_dest(found, dest_abs)
+            check_path = dest_abs if os.path.isfile(dest_abs) else found
+            if _mtime_at_least(check_path, since_mtime) and stable.observe(check_path):
+                meta["discovered_from"] = found
+                return check_path, meta
     return None, meta
 
 
@@ -746,99 +1049,6 @@ def _copy_to_desktop(local_path: str, filename: str) -> dict:
         return {"copied": False, "desktop_path": dest, "error": str(e)}
 
 
-def _capture_shot(shot: dict) -> dict:
-    _log("shot start", {"id": shot["id"]})
-    cam = _find_camera(shot["camera_labels"])
-    pose_meta = _pose_viewport(
-        cam,
-        tuple(shot["fallback_location_m"]),
-        tuple(shot["fallback_rotation_deg"]),
-    )
-    pose_meta["fallback_source"] = shot.get("fallback_source")
-    _settle_viewport()
-    _finish_loading_before_screenshot()
-    dest = _shot_dest_abs(shot["filename"])
-    purge = _purge_stale_shot_pngs(dest)
-    since = time.time()
-    cap = _capture_automation_library_primary(dest, cam if cam else None)
-    resolved = cap.get("saved_path")
-    _log(
-        "capture invoked",
-        {
-            "id": shot["id"],
-            "method": cap.get("capture_method"),
-            "file_produced_by": cap.get("file_produced_by"),
-            "dest_abs": dest,
-        },
-    )
-    validation = _validate_png(resolved)
-    desktop = _copy_to_desktop(resolved, shot["filename"]) if resolved else {"copied": False}
-    entry = {
-        "id": shot["id"],
-        "filename": shot["filename"],
-        "dest_abs": dest,
-        "purge_before_capture": purge,
-        "capture_method": cap.get("capture_method"),
-        "capture_error": cap.get("capture_error"),
-        "file_produced_by": cap.get("file_produced_by"),
-        "primary_path": cap.get("primary_path"),
-        "ue_path": cap.get("ue_path"),
-        "viewport_focus": cap.get("viewport_focus"),
-        "automation_task_poll": cap.get("automation_task_poll"),
-        "wait_file_budget_sec": cap.get("wait_file_budget_sec"),
-        "saved_path": resolved,
-        "wait": cap.get("wait"),
-        "engine_search_roots": _engine_search_roots(),
-        "capture_since": since,
-        "pose": pose_meta,
-        "validation": validation,
-        "desktop_copy": desktop,
-        "pass": bool(validation.get("pass")),
-    }
-    _log("shot done", {"id": shot["id"], "pass": entry["pass"], "bytes": validation.get("bytes")})
-    return entry
-
-
-def _final_drain_shots(results: list[dict]) -> list[dict]:
-    """Late async flush: re-poll after last shot before disarming keep_alive."""
-    _log("final_drain start", {"sec": FINAL_DRAIN_SEC})
-    deadline = time.time() + FINAL_DRAIN_SEC
-    while time.time() < deadline:
-        any_pending = False
-        for entry in results:
-            if entry.get("pass"):
-                continue
-            any_pending = True
-            dest = _shot_dest_abs(entry["filename"])
-            since = float(entry.get("capture_since") or 0.0)
-            resolved, wait_meta = _wait_for_capture(dest, since, timeout_sec=5.0)
-            entry["wait_final"] = wait_meta
-            if resolved:
-                validation = _validate_png(resolved)
-                entry["validation"] = validation
-                entry["saved_path"] = resolved
-                entry["desktop_copy"] = _copy_to_desktop(resolved, entry["filename"])
-                entry["pass"] = bool(validation.get("pass"))
-        if not any_pending:
-            break
-        _settle_viewport(frames=4)
-    for entry in results:
-        if entry.get("pass"):
-            continue
-        dest = _shot_dest_abs(entry["filename"])
-        since = float(entry.get("capture_since") or 0.0)
-        resolved, wait_meta = _wait_for_capture(dest, since, timeout_sec=FINAL_DRAIN_SEC)
-        entry["wait_final"] = wait_meta
-        if resolved:
-            validation = _validate_png(resolved)
-            entry["validation"] = validation
-            entry["saved_path"] = resolved
-            entry["desktop_copy"] = _copy_to_desktop(resolved, entry["filename"])
-            entry["pass"] = bool(validation.get("pass"))
-    _log("final_drain done")
-    return results
-
-
 def main() -> None:
     _log("started")
     keep_ok = False
@@ -851,7 +1061,7 @@ def main() -> None:
 
     level_ok = _load_level()
     viewport_prep = _set_lit_and_game_view()
-    _settle_viewport()
+    _settle_viewport_before_first_capture()
 
     try:
         unreal.SystemLibrary.execute_console_command(None, "hw.TimeOfDay.Phase 2")
@@ -859,53 +1069,35 @@ def main() -> None:
     except Exception:
         viewport_prep["night_phase"] = "skipped"
 
-    results: list[dict] = []
-    for idx, s in enumerate(SHOTS):
-        if idx > 0:
-            _log("inter_shot_settle", {"frames": INTER_SHOT_SETTLE_FRAMES})
-            _settle_viewport(frames=INTER_SHOT_SETTLE_FRAMES)
-        results.append(_capture_shot(s))
-    results = _final_drain_shots(results)
-    all_pass = all(r.get("pass") for r in results)
-
-    report = {
-        "ok": all_pass,
-        "prefix": PREFIX.strip(":"),
-        "primary_path": PRIMARY_PATH,
-        "project_dir_abs": _project_dir(),
-        "pil_available": _pil_available(),
-        "level_path": LEVEL_PATH,
-        "level_loaded": level_ok,
-        "viewport_prep": viewport_prep,
-        "keep_python_script_alive": keep_ok,
-        "resolution": [RES_X, RES_Y],
-        "wait_file_budget_sec": WAIT_FILE_SEC,
-        "final_drain_sec": FINAL_DRAIN_SEC,
-        "shots": results,
-        "policy": (
-            "Proven-results-first (#162): AutomationLibrary slate-tick primary; "
-            "no multi-form console HighResShot ladder; does not claim shotlist PASS — "
-            "verify on DESKTOP; no host ImageGrab"
-        ),
-        "ladder_doc": "docs/Automation/CAPTURE_REDUNDANCY.md",
-        "ladder_rung": "1_built_in_and_in_repo",
-        "next_rung1_if_primary_fails": "MRQ one-frame still (documented only; not in this script)",
-        "scout_requires": "APPROVE TOOL SCOUT <name>",
-        "build_requires": "APPROVE TOOL BUILD <name>",
-    }
-    with open(_report_path(), "w", encoding="utf-8") as f:
-        json.dump(report, f, indent=2)
-    _log("report written", {"path": _report_path(), "all_pass": all_pass})
-
-    _log("finished", {"all_pass": all_pass})
-
-    try:
+    orch = _ShotlistOrchestrator(
+        keep_ok=keep_ok,
+        level_ok=level_ok,
+        viewport_prep=viewport_prep,
+    )
+    if not orch.start():
+        report = {
+            "ok": False,
+            "prefix": PREFIX.strip(":"),
+            "primary_path": PRIMARY_PATH,
+            "wait_mechanism": SLATE_WAIT_MECHANISM,
+            "driver_error": orch._driver_error,
+            "level_loaded": level_ok,
+            "keep_python_script_alive": keep_ok,
+            "shots": [],
+            "policy": "Slate pre-tick driver failed to register",
+        }
+        with open(_report_path(), "w", encoding="utf-8") as f:
+            json.dump(report, f, indent=2)
         if keep_ok:
-            import vnp_editor_keep_alive as keep
+            try:
+                import vnp_editor_keep_alive as keep
 
-            keep.disarm()
-    except Exception:
-        pass
+                keep.disarm()
+            except Exception:
+                pass
+        return
+
+    # keep_alive + pre_tick callback run the state machine; main returns without blocking wait.
 
 
 if __name__ == "__main__":
