@@ -155,6 +155,8 @@ Epic: [Taking Screenshots](https://dev.epicgames.com/documentation/en-us/unreal-
 
 **Wait policy (2026-09-22+, proven-results-first):** Shot2 PNG appeared ~268s after a **single** AutomationLibrary invoke on an earlier run; **multi-form 330s console ladders** were the anti-pattern. **Blocking-wait anti-pattern (post-#163 DESKTOP, #164):** synchronous **`time.sleep`** / settle loops while waiting for **`AutomationEditorTask`** or disk on the **main thread** are **not** “Slate tick spacing”; they **block** ticks under MCP (Editor **Not Responding**, no PNG). **Rung-1 fix (#165):** **`register_slate_pre_tick_callback`** + `set_keep_python_script_alive(True)` ([vnp_editor_keep_alive.py](../../Content/Python/vnp_editor_keep_alive.py)) in [capture_shotlist_viewport.py](../../Content/Python/capture_shotlist_viewport.py). **One invoke + ~120s tick-driven file wait per shot** + **~75s final drain** — extend budget on DESKTOP only with evidence, not by multiplying forms or blocking the main thread. Research + options (MRQ, NirCmd): [AUTOMATION_GAPS.md](AUTOMATION_GAPS.md) research log post-#163.
 
+**Post-#165 pretick prove (~15:01 ET, 2026-09-22):** Pretick kept Editor **Responding** and wrote **`Shot1_lookout.png`** (~38KB) quickly, but report **`file_missing`** because **`MIN_BYTES` gated the wait probe** (not just `_validate_png`) and nested **`POSED`** re-entry fired multiple invokes. Follow-up hardening: **`PREPARING`** phase lock at prepare entry; **`_find_fresh_capture_path`** on timeout/final drain (mtime ≥ `capture_since` authoritative); **`MIN_BYTES` validation-only**.
+
 ### Rung 2 — SCOUT backlog only (not installed; needs `APPROVE TOOL SCOUT`)
 
 Candidates to document if UE rung-1 path fails on DESKTOP — **names + why only**:
