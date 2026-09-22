@@ -10,14 +10,27 @@
 
 DESKTOP attempts to produce Shot 1/2 stills via **UnrealEditor-Cmd** (`-ExecutePythonScript` + HighResShot) and/or host **ImageGrab** did not yield usable shotlist evidence: missing files, tiny PNGs, nearly black frames (path stones only), or full-desktop grabs with Message Log / chrome.
 
+## Incident — 2026-09-22 ET (Conductor remote, Lead away)
+
+Host Windows **ImageGrab** of the Unreal window during a remote PA-E Shot 1/2 attempt. Evidence staged under **`C:\Users\User\Desktop\HomeWorld_PA_E\`**:
+
+| File | Size (approx.) | Actual content | Shotlist usable? |
+|------|----------------|----------------|------------------|
+| `Shot1_lookout.png` | ~525 KB | **Grok Bot chat** / Windows desktop — **not** lit viewport / lookout composition | **No** |
+| `Shot2_cabin_garden.png` | ~376 KB | Unreal **Editor chrome** (Outliner, Content Browser, “Executing Python Script” banner); partial cabin glow only — **not** clean Shot 2 | **No** |
+
+**Root cause:** Host ImageGrab cannot force a clean lit viewport when **another UI owns focus** (agent chat, panels, or desktop in front of the game view).
+
 ## Policy
 
 - **Do not** invent still paths or mark Shot 1/2 **PASS** from automated captures alone.
+- **Do not** call host ImageGrab shotlist **PASS** while another UI owns focus.
 - **Do not** claim **`APPROVE PA-E`** or close the PA track from this defect stub.
+- **Stop grinding remote ImageGrab for PA-E** — focus is not reliable unattended.
 - **Current path:** Lead **manual viewport capture** for Shot 1 and Shot 2; attach to PA-E handoff when ready.
 
 ## References
 
-- [docs/KNOWN_ERRORS.md](../../docs/KNOWN_ERRORS.md) — PA-E HighResShot / ImageGrab / Rotator entries (2026-09-22)
+- [docs/KNOWN_ERRORS.md](../../docs/KNOWN_ERRORS.md) — PA-E HighResShot / ImageGrab focus entries (2026-09-22)
 - [docs/Automation/AUTOMATION_GAPS.md](../../docs/Automation/AUTOMATION_GAPS.md) — PA-E Shot 1/2 gap (2026-09-22)
 - [Docs/handoffs/PA_D_IMPORT_PLACE.md](../handoffs/PA_D_IMPORT_PLACE.md) — PA-E owns formal shots; PA-D not CLOSED on shots alone

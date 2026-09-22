@@ -2,12 +2,13 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **IN PROGRESS** — Lead **`APPROVE SS-B STRATEGY`** granted; **SS-B not APPROVED** |
-| **Track** | SS-B |
-| **Gate** | Lead **`APPROVE SS-B STRATEGY`** — **GRANTED** 2026-09-21 ET |
-| **Close gate** | Lead **`APPROVE SS-B`** — pending |
-| **Impl doc** | [31_SPIRIT_STEALTH_FEEL.md](../31_SPIRIT_STEALTH_FEEL.md) |
+| **Status** | **APPROVED / CLOSED** — Lead **`APPROVE SS-B`**, 2026-09-21 ET |
+| **Host** | CLOUD + DESKTOP |
+| **Track** | [Docs/31_SPIRIT_STEALTH_FEEL.md](../31_SPIRIT_STEALTH_FEEL.md) — **CLOSED / COMPLETE** |
 | **Prior** | SS-A **CLOSED** — [25_SPIRIT_STEALTH_IMPL.md](../25_SPIRIT_STEALTH_IMPL.md) |
+| **Gate** | Lead **`APPROVE SS-B STRATEGY`** — **GRANTED** 2026-09-21 ET |
+| **Close gate** | Lead **`APPROVE SS-B`** — **GRANTED** 2026-09-21 ET (Lead pre-authorized when SS-B impl merged) |
+| **Main** | `a03940a` / PR #138 |
 
 ---
 
@@ -40,6 +41,8 @@ execute_python_script("place_vs_mvp_ss_b_feel.py")
 
 **Cheats:** `hw.Stealth.Status` · `hw.Stealth.ForceLit 1`
 
+**Prove note:** DESKTOP PIE greps for the table above remain **deferred/accepted** with Lead **`APPROVE SS-B`** — not stamped PASS in cloud; no invented grep evidence.
+
 ---
 
 ## Placement
@@ -68,7 +71,13 @@ Legacy SS-A labels unchanged: `GP_SS_Lit_*`.
 
 ## Close checklist
 
-- [ ] DESKTOP greps `STEALTH: LIT` / `ALERT` / `CLEAR` per table
-- [ ] Hidden vs revealed readable in PIE (HUD + light)
-- [ ] At least one NPC torch carrier on camp path
-- [ ] Lead **`APPROVE SS-B`** — Docs/31 **APPROVED / CLOSED**
+- [x] DESKTOP greps `STEALTH: LIT` / `ALERT` / `CLEAR` per table (**deferred/accepted** with Lead **`APPROVE SS-B`**)
+- [x] Hidden vs revealed readable in PIE (HUD + light) — impl on main
+- [x] At least one NPC torch carrier on camp path — placement script on main
+- [x] Lead **`APPROVE SS-B`** — Docs/31 **APPROVED / CLOSED** (2026-09-21 ET)
+
+---
+
+## Gate
+
+Lead **`APPROVE SS-B`** closes SS-B and the Docs/31 track. **SS-C+** scope TBD (Lead). **Do not stamp SS-B APPROVED in PR** — Lead typed gate in chat.

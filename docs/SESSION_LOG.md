@@ -9246,6 +9246,30 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 ---
 
+## 2026-09-22 — SS-B track CLOSED (docs stamp, cloud agent)
+
+**Task:** Lead **`APPROVE SS-B`**, 2026-09-21 ET — stamp Docs/31 Spirit Stealth feel **CLOSED / COMPLETE** (SS-B code already on main PR #138). Supersedes conflicted PR #139.
+
+**Delivered:** `Docs/31_SPIRIT_STEALTH_FEEL.md`, `Docs/handoffs/SS_B_STEALTH_FEEL.md`, `Docs/canon/DECISIONS.md`, `Docs/README.md` index row; thin `PHASE_BOARD` + `SESSION_SUMMARY` updates. Docs-only.
+
+**Deferred:** DESKTOP PIE greps `STEALTH: LIT` / `ALERT` / `CLEAR` — **deferred/accepted** with Lead gate; not stamped PASS.
+
+**Remaining:** Next product track Lead-named TBD — **SS-C+** not opened.
+
+---
+
+## 2026-09-22 — PA-E ImageGrab chat/chrome miss (docs, cloud)
+
+**Task:** Record Conductor remote PA-E Shot 1/2 host ImageGrab failure while Lead away (2026-09-22 ET).
+
+**Facts:** `C:\Users\User\Desktop\HomeWorld_PA_E\Shot1_lookout.png` (~525KB) captured Grok Bot chat / Windows desktop — not viewport. `Shot2_cabin_garden.png` (~376KB) captured Unreal Editor chrome (Outliner, Content Browser, Executing Python Script) with partial cabin glow — not clean Shot 2.
+
+**Delivered:** Strengthened `docs/KNOWN_ERRORS.md`, `docs/Automation/AUTOMATION_GAPS.md`, `Docs/qa/DEFECT_PA_E_shot_capture_automation.md`, `PA_D_IMPORT_PLACE.md` Blockers pointer.
+
+**Policy:** Do **not** call host ImageGrab shotlist PASS while another UI owns focus; prefer Lead manual viewport stills; stop grinding remote ImageGrab for PA-E. **No APPROVE PA-E.**
+
+---
+
 ## 2026-09-22 — SS-B spirit stealth feel (cloud)
 
 **Task:** Lead **`APPROVE SS-B STRATEGY`** — SS-B feel polish (hidden/revealed cues, alert HUD, NPC torch carriers).
