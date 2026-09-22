@@ -221,7 +221,7 @@ bool UHomeWorldCraftSubsystem::SpendForRecipe(
 				--Remaining;
 				continue;
 			}
-			UE_LOG(LogTemp, Warning, TEXT("CRAFT: spend fail mid-recipe %s"), *HomeWorldCraft::GetCraftLogLabel(Recipe));
+			UE_LOG(LogTemp, Warning, TEXT("CRAFT: spend fail mid-recipe %s"), HomeWorldCraft::GetCraftLogLabel(Recipe));
 			return false;
 		}
 	}
