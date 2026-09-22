@@ -3,7 +3,9 @@
 ## Status: LOCKED (P2) — ID P2_AD_bible — 2026-09-16
 
 **Owner:** AD (art half of Track C).  
-**North star:** `refs/keyart_homestead_night.jpg`  
+**North stars:**
+- `refs/keyart_homestead_night.jpg` — single-frame night homestead (look + Shot 1 composition).
+- `refs/keyart_homestead_planetside_split.jpg` — diagonal split greybox: night floating homestead (top-left) + day planetside camp with tents, portal, campfire (bottom-right); dual-zone layout north star for demo greybox.
 **Canon inputs:** `Docs/00_CANON.md`, `Docs/00_SHOTLIST.md`  
 **Out of scope:** material parameter sheets (TA → `Docs/02_MATERIAL_SHEET.md`); no new locations, props, biomes, or master shader families.
 
