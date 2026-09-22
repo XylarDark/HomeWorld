@@ -21,6 +21,14 @@ Host Windows **ImageGrab** of the Unreal window during a remote PA-E Shot 1/2 at
 
 **Root cause:** Host ImageGrab cannot force a clean lit viewport when **another UI owns focus** (agent chat, panels, or desktop in front of the game view).
 
+## Incident — 2026-09-22 ET post-#157 (DESKTOP prove, document only)
+
+Live Editor run on **`C:\dev\HomeWorld`** after **#157** (~12:46 ET). Report: **`Saved/pa_e_capture_report.json`**, **`ok: false`**. Absolute paths + **`game_view: true`**; **`AutomationEditorTask` `task_done: false`**; **`file_missing`**; **`pil_available: false`**; no new PNGs under **`Saved/Screenshots/PA_E/`**. **Not** shotlist PASS.
+
+## Incident — 2026-09-22 ET post-#159 (DESKTOP prove, document only)
+
+After **#159** merged (~12:51–13:01 ET), same host path. Console **`HighResShot`** with absolute `filename=` for Shot 1 + Shot 2; **`_focus_level_viewport`** OK; **no PNG** after ~120s wait per shot. Fallback **AutomationLibrary**: **`task_done: false`**, **`file_produced_by: null`**, both shots fail. MCP **600s timeout** / Editor **Not Responding** during **`_final_drain`**; **no** new **`pa_e_capture_report.json`** (prior report renamed pre-run). **No** new **`Shot*.png`** under **`Saved/Screenshots/PA_E/`**. Defect **still OPEN**; **rung 1 HighResShot variants exhausted** unless Lead gates SCOUT/BUILD. **Not** shotlist PASS.
+
 ## Policy
 
 - **Do not** invent still paths or mark Shot 1/2 **PASS** from automated captures alone.

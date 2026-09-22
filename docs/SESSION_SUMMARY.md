@@ -1,6 +1,14 @@
+## 2026-09-22 — PA-E DESKTOP prove FAIL post-#159 (docs only)
+
+- **`C:\dev\HomeWorld`**, ~12:51–13:01 ET after **#159**: console **HighResShot** logged for Shot 1/2 + viewport focus OK → **no PNG** (~120s each); AutomationLibrary fallback **`task_done: false`**, **`file_produced_by: null`**; MCP **600s timeout** during `final_drain`; **no** new **`pa_e_capture_report.json`**; **no** new **`Shot*.png`** under **`Saved/Screenshots/PA_E/`**. KNOWN_ERRORS + AUTOMATION_GAPS + [DEFECT_PA_E](../Docs/qa/DEFECT_PA_E_shot_capture_automation.md). Gap **OPEN**; pre-#161 rung-1 variants exhausted on that prove — **#161** adds doc-ordered ladder + **330s** wait; DESKTOP re-prove still required. **No PASS claim.**
+
+## 2026-09-22 — PA-E DESKTOP prove FAIL post-#157 (docs only)
+
+- **`C:\dev\HomeWorld`**, ~12:46 ET: **`Saved/pa_e_capture_report.json`** **`ok: false`** — **`AutomationEditorTask` stall**, **`file_missing`**, **`pil_available: false`**. Document-only append. Gap **OPEN**.
+
 ## 2026-09-22 — Epic doc-aligned HighResShot + AutomationLibrary (cloud, rung 1)
 
-- [capture_shotlist_viewport.py](../Content/Python/capture_shotlist_viewport.py) / [capture_viewport.py](../Content/Python/capture_viewport.py): **`filename=` before resolution** console ladder with per-form **330s** file wait; `Saved/Screenshots/Windows`; `finish_loading_before_screenshot`, `delay` on `take_high_res_screenshot`, Lit via `set_editor_viewport_view_mode`; inter-shot Slate settle. Implements Lead **docs-first** policy ([#160](https://github.com/XylarDark/HomeWorld/pull/160) / [CAPTURE_REDUNDANCY.md](Automation/CAPTURE_REDUNDANCY.md) § Docs-first); FOCUSVIEWPORT unverified; KNOWN_ERRORS / AUTOMATION_GAPS / DEFECT_PA_E. Gap **OPEN** — DESKTOP re-prove required.
+- [capture_shotlist_viewport.py](../Content/Python/capture_shotlist_viewport.py) / [capture_viewport.py](../Content/Python/capture_viewport.py): **`filename=` before resolution** console ladder with per-form **330s** file wait; `Saved/Screenshots/Windows`; `finish_loading_before_screenshot`, `delay` on `take_high_res_screenshot`, Lit via `set_editor_viewport_view_mode`; inter-shot Slate settle. Implements Lead **docs-first** policy ([#160](https://github.com/XylarDark/HomeWorld/pull/160) / [CAPTURE_REDUNDANCY.md](Automation/CAPTURE_REDUNDANCY.md) § Docs-first); FOCUSVIEWPORT unverified; KNOWN_ERRORS / AUTOMATION_GAPS / DEFECT_PA_E. Merged **#161** @ `89eaf94`. Gap **OPEN** — DESKTOP re-prove required.
 
 ## 2026-09-22 — Docs-first console/API policy (Lead lock-in, cloud)
 
