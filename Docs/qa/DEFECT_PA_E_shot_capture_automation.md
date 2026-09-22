@@ -29,6 +29,10 @@ Live Editor run on **`C:\dev\HomeWorld`** after **#157** (~12:46 ET). Report: **
 
 After **#159** merged (~12:51–13:01 ET), same host path. Console **`HighResShot`** with absolute `filename=` for Shot 1 + Shot 2; **`_focus_level_viewport`** OK; **no PNG** after ~120s wait per shot. Fallback **AutomationLibrary**: **`task_done: false`**, **`file_produced_by: null`**, both shots fail. MCP **600s timeout** / Editor **Not Responding** during **`_final_drain`**; **no** new **`pa_e_capture_report.json`** (prior report renamed pre-run). **No** new **`Shot*.png`** under **`Saved/Screenshots/PA_E/`**. Defect **still OPEN**; **rung 1 HighResShot variants exhausted** unless Lead gates SCOUT/BUILD. **Not** shotlist PASS.
 
+## Incident — 2026-09-22 ET post-#163 (DESKTOP prove, document only)
+
+After **#163** merged @ **`d0d074d`**, MCP **`execute_python_script("capture_shotlist_viewport.py")`** on **`C:\dev\HomeWorld`** (~14:45–14:53 ET / log UTC 18:45–18:52). Level load OK. Shot 1 + Shot 2: **AutomationLibrary** path with **`kwargs_delay_force_gv`**; **`AutomationEditorTask` `task_done: false`** after ~90s poll each; **no PNG** after ~120s file wait; Editor **Not Responding** throughout; session killed during **`final_drain`** (~75s). **No** **`Saved/pa_e_capture_report.json`**; **no** new **`Shot1_lookout.png`** / **`Shot2_cabin_garden.png`**. **Likely cause:** blocking **`time.sleep`** / poll on Editor Python **main thread** prevents Slate ticks required for async **`take_high_res_screenshot`**. **Next rung 1:** **`unreal.register_slate_pre_tick_callback`** wait (see [AUTOMATION_GAPS.md](../../docs/Automation/AUTOMATION_GAPS.md) research log). Defect **OPEN** — **not** shotlist PASS; do **not** treat AutomationLibrary primary as proven.
+
 ## Policy
 
 - **Do not** invent still paths or mark Shot 1/2 **PASS** from automated captures alone.
@@ -40,7 +44,7 @@ After **#159** merged (~12:51–13:01 ET), same host path. Console **`HighResSho
 
 Follow [docs/Automation/CAPTURE_REDUNDANCY.md](../../docs/Automation/CAPTURE_REDUNDANCY.md) (**Lead-gated global ladder** + shotlist instance):
 
-1. **Rung 1 (no gate):** [Content/Python/capture_shotlist_viewport.py](../../Content/Python/capture_shotlist_viewport.py) — Epic doc-ordered console **`HighResShot`**, `finish_loading_before_screenshot`, `take_high_res_screenshot(..., delay=…)`, 330s file-first wait → `Saved/pa_e_capture_report.json`.
+1. **Rung 1 (no gate):** [Content/Python/capture_shotlist_viewport.py](../../Content/Python/capture_shotlist_viewport.py) — **`AutomationLibrary.take_high_res_screenshot`** primary with **non-blocking** async wait (**`register_slate_pre_tick_callback`** — not main-thread `time.sleep` poll); `finish_loading_before_screenshot`, kwargs `delay` / `force_game_view` → `Saved/pa_e_capture_report.json`. **Post-#163 DESKTOP FAIL** until tick-callback prove.
 2. **Rung 2:** Free-tool **SCOUT backlog** (names only) — requires Lead **`APPROVE TOOL SCOUT <name>`**; **no auto-install**.
 3. **Rung 3:** Net-new custom stacks — requires Lead **`APPROVE TOOL BUILD <name>`**; not host ImageGrab for PASS.
 

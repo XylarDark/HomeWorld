@@ -9432,3 +9432,11 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 **Pending:** PR merge; no code/DESKTOP prove.
 
 **Errors:** None.
+
+## 2026-09-22 — PA-E DESKTOP FAIL post-#163 + blocking-wait research (docs only, cloud)
+
+**Completed:** Document-only filing for DESKTOP prove after **#163** @ `d0d074d` (MCP `capture_shotlist_viewport.py`, Editor Not Responding, no PNG/report). Updated KNOWN_ERRORS, AUTOMATION_GAPS (gap row + research log), CAPTURE_REDUNDANCY shotlist footgun, DEFECT_PA_E incident, SESSION_SUMMARY. Research: async HighResShot + main-thread blocking poll → `register_slate_pre_tick_callback`; next options (A) tick-callback wait, (B) MRQ one-frame, (C) SCOUT NirCmd.
+
+**Pending:** Lead-gated impl PR for tick-callback wait; DESKTOP re-prove.
+
+**Errors:** DESKTOP capture failure (documented; no code fix in this PR).
