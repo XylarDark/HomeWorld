@@ -140,7 +140,7 @@ Formal stills for [Docs/00_SHOTLIST.md](../../Docs/00_SHOTLIST.md), PA-E evidenc
 
 | Item | Notes |
 |------|--------|
-| **`AutomationLibrary.take_high_res_screenshot`** (Slate tick) | **Primary** — **one request per shot** after pose + **`finish_loading_before_screenshot()`** + viewport focus + lit/game view; kwargs **`delay≈0.35`**, **`force_game_view=True`**, absolute forward-slash path under `Saved/Screenshots/PA_E/`; pump Slate between Shot 1 and Shot 2; **`is_task_done()` false is non-fatal** while **~120s file-first wait** (+ **~75s final drain**) runs. Report `primary_path: automation_library_slate_tick`. [AutomationLibrary (Python)](https://dev.epicgames.com/documentation/en-us/unreal-engine/python-api/class/AutomationLibrary?application_version=5.8) |
+| **`AutomationLibrary.take_high_res_screenshot`** (Slate tick) | **Primary (intent)** — **one request per shot** after pose + **`finish_loading_before_screenshot()`** + viewport focus + lit/game view; kwargs **`delay≈0.35`**, **`force_game_view=True`**, absolute forward-slash path under `Saved/Screenshots/PA_E/`; **`is_task_done()` false is non-fatal** while file wait runs. **Footgun (post-#163 DESKTOP FAIL):** **`time.sleep` / blocking poll on the Editor Python main thread** (typical MCP `execute_python_script` path) **freezes Slate ticks** — async capture never completes, Editor **Not Responding**, no PNG. **Do not claim primary “works”** until DESKTOP proves **`register_slate_pre_tick_callback`** (or equivalent non-blocking wait). Report `primary_path: automation_library_slate_tick`. [AutomationLibrary (Python)](https://dev.epicgames.com/documentation/en-us/unreal-engine/python-api/class/AutomationLibrary?application_version=5.8) |
 | **Movie Render Queue (MRQ) one-frame still** | **Next rung-1 alternative** if AutomationLibrary primary fails on DESKTOP — proven industry path; needs Level Sequences — **document only** in this PR unless trivial stubs already exist; do not implement full MRQ pipeline here |
 | Console **`HighResShot`** multi-form ladder | **Retired as shotlist primary** — post-#161 DESKTOP burned ~30+ min on five forms × **330s** waits (incl. after immediate **`Bad input`**). Epic doc order still valid for ad-hoc console use; not the canonical shotlist script path. [Taking Screenshots](https://dev.epicgames.com/documentation/en-us/unreal-engine/taking-screenshots-in-unreal-engine) |
 | `AutomationLibrary.set_editor_viewport_view_mode` (Lit) | Preferred over console `viewmode lit` when exposed |
@@ -153,7 +153,7 @@ Formal stills for [Docs/00_SHOTLIST.md](../../Docs/00_SHOTLIST.md), PA-E evidenc
 
 Epic: [Taking Screenshots](https://dev.epicgames.com/documentation/en-us/unreal-engine/taking-screenshots-in-unreal-engine) · [Scripting the Unreal Editor Using Python](https://dev.epicgames.com/documentation/en-us/unreal-engine/scripting-the-unreal-editor-using-python) · [FULL_AUTOMATION_RESEARCH.md](FULL_AUTOMATION_RESEARCH.md) §10b.
 
-**Wait policy (2026-09-22, proven-results-first):** Shot2 PNG appeared ~268s after a **single** AutomationLibrary invoke on an earlier run; **multi-form 330s console ladders** were the anti-pattern. Shotlist script uses **one invoke + ~120s file wait per shot** and **final drain** — extend budget on DESKTOP only with evidence, not by multiplying forms.
+**Wait policy (2026-09-22, proven-results-first):** Shot2 PNG appeared ~268s after a **single** AutomationLibrary invoke on an earlier run; **multi-form 330s console ladders** were the anti-pattern. Shotlist script uses **one invoke + file wait per shot** — extend **duration** on DESKTOP only with evidence, not by multiplying console forms. **Blocking-wait anti-pattern (post-#163):** synchronous **`time.sleep`** loops while waiting for **`AutomationEditorTask`** or disk on the **main thread** are **not** “Slate tick spacing”; they **block** ticks when run under MCP. Preferred rung-1 fix: **`unreal.register_slate_pre_tick_callback`** (research log in [AUTOMATION_GAPS.md](AUTOMATION_GAPS.md)).
 
 ### Rung 2 — SCOUT backlog only (not installed; needs `APPROVE TOOL SCOUT`)
 
@@ -199,7 +199,8 @@ Examples **not** in current PR scope:
 | 2026-09-22 | Cmd ok but missing/tiny/black | [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) · [DEFECT_PA_E_shot_capture_automation.md](../../Docs/qa/DEFECT_PA_E_shot_capture_automation.md) |
 | 2026-09-22 | ImageGrab → chat/desktop/chrome | [PA_E_SHOTS.md](../../Docs/handoffs/PA_E_SHOTS.md) (track closed; automation gap **OPEN**) |
 | 2026-09-22 | `Rotator` positional mis-pose | [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) — keyword `pitch` / `yaw` / `roll` |
+| 2026-09-22 | **post-#163** AL primary + MCP blocking wait → Not Responding, no PNG/report | [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) · [DEFECT_PA_E_shot_capture_automation.md](../../Docs/qa/DEFECT_PA_E_shot_capture_automation.md) · AUTOMATION_GAPS research log |
 
-**Track status:** Lead **`APPROVE PA-E`** closed Docs/32; formal Shot 1/2 stills **deferred/accepted**. Automation gap **OPEN** until DESKTOP proves rung-1 script + report (Conductor — not cloud).
+**Track status:** Lead **`APPROVE PA-E`** closed Docs/32; formal Shot 1/2 stills **deferred/accepted**. Automation gap **OPEN** until DESKTOP proves rung-1 script + report with **non-blocking** async wait (Conductor — not cloud). **Post-#163:** AutomationLibrary primary path **not** proven on DESKTOP.
 
 **Poses:** [P6_FIX_shot1.md](../../Docs/handoffs/P6_FIX_shot1.md) · [CAM_Hero.md](../../Lib/00_Core/CAM_Hero.md) · [00_SHOTLIST.md](../../Docs/00_SHOTLIST.md).

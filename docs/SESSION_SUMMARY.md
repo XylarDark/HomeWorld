@@ -1,3 +1,7 @@
+## 2026-09-22 — PA-E DESKTOP prove FAIL post-#163 (docs only, blocking wait)
+
+- **`C:\dev\HomeWorld`**, ~14:45–14:53 ET after **#163** @ `d0d074d`: MCP **`capture_shotlist_viewport.py`** — level load OK; Shot 1+2 AutomationLibrary **`kwargs_delay_force_gv`**; **`task_done: false`** (~90s poll each); **no PNG** (~120s wait); Editor **Not Responding**; killed in **`final_drain`**; **no** **`pa_e_capture_report.json`**; **no** new **`Saved/Screenshots/PA_E/`** stills. Research logged: async HighResShot + **main-thread `time.sleep` poll** footgun → **`register_slate_pre_tick_callback`** (rung 1 next). KNOWN_ERRORS + AUTOMATION_GAPS + [DEFECT_PA_E](../Docs/qa/DEFECT_PA_E_shot_capture_automation.md). Gap **OPEN** — **no PASS claim**; AL primary not proven until tick-callback DESKTOP run.
+
 ## 2026-09-22 — PA-E shotlist AutomationLibrary primary (cloud, rung 1)
 
 - [capture_shotlist_viewport.py](../Content/Python/capture_shotlist_viewport.py): **proven-results-first** — **`AutomationLibrary.take_high_res_screenshot`** primary with Slate tick spacing (one request per shot, ~120s file wait, ~75s final drain); **retired** multi-form console **HighResShot** × **330s** ladder. [CAPTURE_REDUNDANCY.md](Automation/CAPTURE_REDUNDANCY.md) § Shotlist aligned; MRQ one-frame noted as next rung-1 option if AL fails. Gap **OPEN** — DESKTOP re-prove; no PASS claim.
