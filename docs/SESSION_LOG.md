@@ -9258,6 +9258,12 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 
 ---
 
+## 2026-09-22 — PA-E capture absolute path + async drain (cloud)
+
+**Fix:** `capture_shotlist_viewport.py` — absolute `Saved/Screenshots/PA_E/` paths for AutomationLibrary/HighResShot; discover/copy from Engine `Binaries/Win64/PA_E/`; longer stable-size poll + final drain before keep_alive disarm. Rung 1 only. No DESKTOP PASS claim.
+
+---
+
 ## 2026-09-22 — Capture redundancy ladder + shotlist viewport script (cloud)
 
 **Task:** Lock Lead capture policy; add `capture_shotlist_viewport.py`, `CAPTURE_REDUNDANCY.md`; update PA-E defect/gap pointers.
