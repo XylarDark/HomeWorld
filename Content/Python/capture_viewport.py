@@ -225,18 +225,19 @@ def _wait_for_file(filepath, since_mtime, basename, wait_sec=None):
     return None
 
 
-def console_high_res_invoke_once(resolution_x, resolution_y, filepath, result):
+def console_high_res_invoke_once(resolution_x, resolution_y, filepath, result, world=None):
     """Fire doc-ordered HighResShot once (no file wait — use slate tick probe)."""
     ue_path = _path_for_ue(filepath)
     result["ue_path"] = ue_path
     result["console_attempts"] = []
     _finish_loading_before_screenshot()
     _set_lit_view_mode()
+    world_context = world
     for method, cmd in _high_res_shot_commands(resolution_x, resolution_y, ue_path):
         entry = {"method": method, "cmd": cmd}
         result["console_attempts"].append(entry)
         try:
-            unreal.SystemLibrary.execute_console_command(None, cmd)
+            unreal.SystemLibrary.execute_console_command(world_context, cmd)
             result["method"] = method
             return True
         except Exception as e:
