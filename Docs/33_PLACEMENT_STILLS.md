@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Track ID** | **PS** — Placement Stills (testing-stills suite) |
-| **Status** | **DRAFT** — pending Lead **`APPROVE PS STRATEGY`** |
+| **Status** | **APPROVED** — **PS-0 CLOSED** — Lead **`APPROVE PS STRATEGY — homestead kit only`**, 2026-09-22/23 ET |
 | **Date** | 2026-09-23 |
 | **Author** | Cloud agent (Conductor packet) |
 | **Scope locked (P0)** | **Homestead kit on `L_VS_MVP_Markers` only** — same footprint as closed [32_PROTOTYPE_ASSETS.md](32_PROTOTYPE_ASSETS.md) (PA); planetside dress **OUT** |
@@ -14,7 +14,7 @@
 
 ## Gate
 
-Lead **`APPROVE PS STRATEGY`** — **PENDING** (unlocks **PS-A**).
+Lead **`APPROVE PS STRATEGY — homestead kit only`** — **GRANTED** 2026-09-22/23 ET (unlocks **PS-A**). Scope: **homestead kit only** on Markers — no planetside dress.
 
 **Approval ladder (track):**
 
@@ -27,7 +27,7 @@ Lead **`APPROVE PS STRATEGY`** — **PENDING** (unlocks **PS-A**).
 | PS-D | **`APPROVE PS-D`** | PS-E close |
 | PS-E | **`APPROVE PS-E`** | PS track **CLOSED / COMPLETE** |
 
-**Handoff:** [handoffs/PS_STRATEGY.md](handoffs/PS_STRATEGY.md) (PS-0 stub)
+**Handoff:** [handoffs/PS_STRATEGY.md](handoffs/PS_STRATEGY.md) (PS-0 **CLOSED**) · **PS-A inventory:** [handoffs/PS_A_INVENTORY.md](handoffs/PS_A_INVENTORY.md)
 
 ---
 
@@ -162,7 +162,7 @@ Enough views to catch **floaters**, **cliff underside gaps**, and **composition 
 | Phase | Focus | Deliverable | Host |
 |-------|--------|-------------|------|
 | **PS-0** | Strategy | This doc + [PS_STRATEGY.md](handoffs/PS_STRATEGY.md) | CLOUD |
-| **PS-A** | Metrics + angle **inventory** | Actor list, cam label map, threshold table, bounds JSON spec | CLOUD → DESKTOP verify |
+| **PS-A** | Metrics + angle **inventory** | [PS_A_INVENTORY.md](handoffs/PS_A_INVENTORY.md) — actor list, cam map, thresholds, bounds schema | CLOUD → DESKTOP verify |
 | **PS-B** | Camera/fixture **Arrange** | Idempotent spawn/aim of `PS_*` or relocated `CAM_*`; Arrange gate `Saved/ps_arrange_gate.json` | DESKTOP |
 | **PS-C** | Metric asserts + still capture | `ps_placement_metrics.json` + MRQ/viewport still folder `Saved/ps_stills/` | DESKTOP |
 | **PS-D** | Lead eyeball vs benchmarks | Checklist vs key-art / plate / stamped stills; defects filed | Lead + QA |
@@ -195,4 +195,4 @@ Enough views to catch **floaters**, **cliff underside gaps**, and **composition 
 
 ---
 
-*PS-0 draft — awaiting Lead **`APPROVE PS STRATEGY`**. Conductor: homestead-first; no binary commits in strategy PR.*
+*PS-0 **CLOSED** (Lead stamp 2026-09-22/23 ET). **PS-A** inventory in [PS_A_INVENTORY.md](handoffs/PS_A_INVENTORY.md); gate **`APPROVE PS-A`** pending DESKTOP live verify + Lead.*

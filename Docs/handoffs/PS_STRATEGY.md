@@ -2,12 +2,13 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **DRAFT** — pending Lead **`APPROVE PS STRATEGY`** |
-| **Track** | PS-0 **OPEN** → PS-A locked until strategy gate |
-| **Host** | CLOUD (strategy stamp) · DESKTOP (inventory + prove after PS-B) |
+| **Status** | **APPROVED / CLOSED** — PS-0 **CLOSED** |
+| **Lead stamp** | **`APPROVE PS STRATEGY — homestead kit only`**, 2026-09-22/23 ET (Luke Thompson) |
+| **Track** | PS-0 **CLOSED** → **PS-A** **OPEN** (inventory) |
+| **Host** | CLOUD (strategy + inventory docs) · DESKTOP (live verify after PS-A) |
 | **Impl doc** | [33_PLACEMENT_STILLS.md](../33_PLACEMENT_STILLS.md) |
 | **Scope locked** | **Homestead kit on `L_VS_MVP_Markers` only** — same footprint as closed PA ([32_PROTOTYPE_ASSETS.md](../32_PROTOTYPE_ASSETS.md)) |
-| **Close gate (PS-0)** | Lead **`APPROVE PS STRATEGY`** |
+| **Close gate (PS-0)** | Lead **`APPROVE PS STRATEGY`** — **GRANTED** |
 
 ---
 
@@ -17,6 +18,7 @@
 |------|------|
 | Strategy doc | [Docs/33_PLACEMENT_STILLS.md](../33_PLACEMENT_STILLS.md) |
 | This handoff | [Docs/handoffs/PS_STRATEGY.md](PS_STRATEGY.md) |
+| PS-A inventory | [Docs/handoffs/PS_A_INVENTORY.md](PS_A_INVENTORY.md) |
 
 **Not in this handoff:** `.uasset`, `.umap`, new MRQ sequences, gameplay C++.
 
@@ -24,19 +26,13 @@
 
 ## Lead gate (record)
 
-Pending Lead chat stamp:
-
-```text
-APPROVE PS STRATEGY
-```
-
-Optional scope clarifier (if Lead repeats PA lock):
-
 ```text
 APPROVE PS STRATEGY — homestead kit only
 ```
 
 Unlocks **PS-A** (metrics + angle inventory on Markers level).
+
+**Next gate:** **`APPROVE PS-A`** — see [PS_A_INVENTORY.md](PS_A_INVENTORY.md).
 
 ---
 
@@ -52,9 +48,9 @@ Unlocks **PS-A** (metrics + angle inventory on Markers level).
 
 ## Next (PS-A)
 
-1. Enumerate actors + anchors from `place_vs_mvp_dress.py` / `place_vs_mvp_pa_d.py`.
-2. Map existing `CAM_*` labels vs proposed `PS_*` gaps ([pa_e_shotlist_common.py](../../Content/Python/pa_e_shotlist_common.py)).
-3. Publish threshold table + `Saved/ps_placement_metrics.json` schema draft in handoff `PS_A_INVENTORY.md` (future PR).
+1. ~~Enumerate actors + anchors from dress / pa_d scripts~~ → [PS_A_INVENTORY.md](PS_A_INVENTORY.md)
+2. ~~Map `CAM_*` vs proposed `PS_*` gaps~~ → same
+3. DESKTOP: live counts + cam label confirm → then Lead **`APPROVE PS-A`**
 
 ---
 
@@ -78,5 +74,5 @@ Cloud agents: docs + scripts proposal only — [WINDOWS_BRIDGE.md](../../docs/Se
 
 - [x] Strategy doc [33_PLACEMENT_STILLS.md](../33_PLACEMENT_STILLS.md)
 - [x] Handoff stub (this file)
-- [ ] Lead **`APPROVE PS STRATEGY`**
-- [ ] PS-A inventory handoff (separate PR after gate)
+- [x] Lead **`APPROVE PS STRATEGY — homestead kit only`**
+- [x] PS-A inventory handoff [PS_A_INVENTORY.md](PS_A_INVENTORY.md)
