@@ -4,8 +4,8 @@
 |-------|-------|
 | **Status** | **APPROVED / CLOSED** — PS-0 **CLOSED** |
 | **Lead stamp** | **`APPROVE PS STRATEGY — homestead kit only`**, 2026-09-22/23 ET (Luke Thompson) |
-| **Track** | PS-0 **CLOSED** · PS-A **CLOSED** → **PS-B** **OPEN** (Arrange) |
-| **Host** | CLOUD (strategy + inventory docs) · DESKTOP (live verify after PS-A) |
+| **Track** | PS-0 **CLOSED** · PS-A **CLOSED** · PS-B **CLOSED** → **PS-C** **OPEN** |
+| **Host** | CLOUD (strategy + inventory docs) · DESKTOP (live verify) |
 | **Impl doc** | [33_PLACEMENT_STILLS.md](../33_PLACEMENT_STILLS.md) |
 | **Scope locked** | **Homestead kit on `L_VS_MVP_Markers` only** — same footprint as closed PA ([32_PROTOTYPE_ASSETS.md](../32_PROTOTYPE_ASSETS.md)) |
 | **Close gate (PS-0)** | Lead **`APPROVE PS STRATEGY`** — **GRANTED** |
@@ -19,7 +19,8 @@
 | Strategy doc | [Docs/33_PLACEMENT_STILLS.md](../33_PLACEMENT_STILLS.md) |
 | This handoff | [Docs/handoffs/PS_STRATEGY.md](PS_STRATEGY.md) |
 | PS-A inventory | [Docs/handoffs/PS_A_INVENTORY.md](PS_A_INVENTORY.md) — **CLOSED** |
-| PS-B Arrange | [Docs/handoffs/PS_B_ARRANGE.md](PS_B_ARRANGE.md) |
+| PS-B Arrange | [Docs/handoffs/PS_B_ARRANGE.md](PS_B_ARRANGE.md) — **CLOSED** |
+| PS-C metrics | [Docs/handoffs/PS_C_METRICS.md](PS_C_METRICS.md) — **OPEN** |
 
 **Not in this handoff:** `.uasset`, `.umap`, new MRQ sequences, gameplay C++.
 
@@ -31,9 +32,7 @@
 APPROVE PS STRATEGY — homestead kit only
 ```
 
-Unlocks **PS-A** (metrics + angle inventory on Markers level).
-
-**Next gate:** **`APPROVE PS-B`** — see [PS_B_ARRANGE.md](PS_B_ARRANGE.md) (PS-A closed Lead **`APPROVE PS-A`**, 2026-09-22 ET).
+**Next gate:** **`APPROVE PS-C`** — see [PS_C_METRICS.md](PS_C_METRICS.md) (PS-B closed Lead **`APPROVE PS-B`**, 2026-09-22 ET).
 
 ---
 
@@ -47,11 +46,11 @@ Unlocks **PS-A** (metrics + angle inventory on Markers level).
 
 ---
 
-## Next (PS-B)
+## Next (PS-C)
 
-1. DESKTOP: markers → dress → pa_d → **`arrange_ps_homestead.py`** ([PS_B_ARRANGE.md](PS_B_ARRANGE.md))
-2. Inspect `Saved/ps_arrange_gate.json` + viewport on key `PS_*` views
-3. Lead **`APPROVE PS-B`** → PS-C metrics + stills
+1. DESKTOP: markers → dress → pa_d → arrange → **`ps_placement_prove.py`** ([PS_C_METRICS.md](PS_C_METRICS.md))
+2. Inspect `Saved/ps_placement_metrics.json` + `Saved/ps_stills/manifest.json` + `Saved/ps_c_prove_gate.json`
+3. Lead **`APPROVE PS-C`** → PS-D eyeball vs benchmarks
 
 ---
 
@@ -64,7 +63,6 @@ execute_python_script("place_vs_mvp_markers.py")
 execute_python_script("place_vs_mvp_dress.py")
 execute_python_script("place_vs_mvp_pa_d.py")
 execute_python_script("arrange_ps_homestead.py")
-# Future PS-C:
 execute_python_script("ps_placement_prove.py")
 ```
 
@@ -78,3 +76,4 @@ Cloud agents: docs + scripts proposal only — [WINDOWS_BRIDGE.md](../../docs/Se
 - [x] Handoff stub (this file)
 - [x] Lead **`APPROVE PS STRATEGY — homestead kit only`**
 - [x] PS-A inventory handoff [PS_A_INVENTORY.md](PS_A_INVENTORY.md)
+- [x] PS-B Arrange closed — [PS_B_ARRANGE.md](PS_B_ARRANGE.md)

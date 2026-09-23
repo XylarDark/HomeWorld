@@ -27,7 +27,7 @@ Lead **`APPROVE PS STRATEGY — homestead kit only`** — **GRANTED** 2026-09-22
 | PS-D | **`APPROVE PS-D`** | PS-E close |
 | PS-E | **`APPROVE PS-E`** | PS track **CLOSED / COMPLETE** |
 
-**Handoff:** [handoffs/PS_STRATEGY.md](handoffs/PS_STRATEGY.md) (PS-0 **CLOSED**) · PS-A **CLOSED** ([handoffs/PS_A_INVENTORY.md](handoffs/PS_A_INVENTORY.md)) · **PS-B OPEN** ([handoffs/PS_B_ARRANGE.md](handoffs/PS_B_ARRANGE.md))
+**Handoff:** [handoffs/PS_STRATEGY.md](handoffs/PS_STRATEGY.md) (PS-0 **CLOSED**) · PS-A **CLOSED** ([handoffs/PS_A_INVENTORY.md](handoffs/PS_A_INVENTORY.md)) · PS-B **CLOSED** ([handoffs/PS_B_ARRANGE.md](handoffs/PS_B_ARRANGE.md)) · **PS-C OPEN** ([handoffs/PS_C_METRICS.md](handoffs/PS_C_METRICS.md))
 
 ---
 
@@ -163,12 +163,12 @@ Enough views to catch **floaters**, **cliff underside gaps**, and **composition 
 |-------|--------|-------------|------|
 | **PS-0** | Strategy | This doc + [PS_STRATEGY.md](handoffs/PS_STRATEGY.md) | CLOUD |
 | **PS-A** | Metrics + angle **inventory** | [PS_A_INVENTORY.md](handoffs/PS_A_INVENTORY.md) — **CLOSED** Lead **`APPROVE PS-A`**, 2026-09-22 ET | CLOUD+DESKTOP |
-| **PS-B** | Camera/fixture **Arrange** | [PS_B_ARRANGE.md](handoffs/PS_B_ARRANGE.md) · `arrange_ps_homestead.py` → `Saved/ps_arrange_gate.json` | DESKTOP |
-| **PS-C** | Metric asserts + still capture | `ps_placement_metrics.json` + MRQ/viewport still folder `Saved/ps_stills/` | DESKTOP |
+| **PS-B** | Camera/fixture **Arrange** | [PS_B_ARRANGE.md](handoffs/PS_B_ARRANGE.md) · `arrange_ps_homestead.py` → `Saved/ps_arrange_gate.json` — **CLOSED** Lead **`APPROVE PS-B`**, 2026-09-22 ET | DESKTOP |
+| **PS-C** | Metric asserts + still capture | [PS_C_METRICS.md](handoffs/PS_C_METRICS.md) · `ps_placement_prove.py` → `ps_placement_metrics.json` + `Saved/ps_stills/` | DESKTOP |
 | **PS-D** | Lead eyeball vs benchmarks | Checklist vs key-art / plate / stamped stills; defects filed | Lead + QA |
 | **PS-E** | Close | PHASE_BOARD **CLOSED**; optional pointer handoff for planetside PS-P2 | Lead |
 
-**PS-C script sketch (future — not PS-0):** New module e.g. `ps_placement_prove.py` calling shared Arrange from `pa_e_shotlist_common.py` where applicable; **do not** fork PA-E gate strings.
+**PS-C script:** [ps_placement_prove.py](../Content/Python/ps_placement_prove.py) — reads `ps_arrange_gate.json`, metrics sample, viewport stills; **do not** fork PA-E gate strings.
 
 ---
 
@@ -195,4 +195,4 @@ Enough views to catch **floaters**, **cliff underside gaps**, and **composition 
 
 ---
 
-*PS-0 **CLOSED** · PS-A **CLOSED** (Lead **`APPROVE PS-A`**, 2026-09-22 ET). **PS-B** Arrange **OPEN** — [PS_B_ARRANGE.md](handoffs/PS_B_ARRANGE.md); gate **`APPROVE PS-B`** after DESKTOP Arrange prove + eyeball.*
+*PS-0 **CLOSED** · PS-A **CLOSED** · PS-B **CLOSED** (Lead **`APPROVE PS-B`**, 2026-09-22 ET). **PS-C** metrics + stills **OPEN** — [PS_C_METRICS.md](handoffs/PS_C_METRICS.md); gate **`APPROVE PS-C`** after DESKTOP prove.*

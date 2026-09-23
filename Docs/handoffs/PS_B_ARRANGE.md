@@ -2,8 +2,8 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **GATE READY** — pending Lead **`APPROVE PS-B`** after DESKTOP Arrange prove + eyeball |
-| **Track** | PS-B (Arrange) · PS-A **CLOSED** |
+| **Status** | **APPROVED / CLOSED** — Lead **`APPROVE PS-B`**, 2026-09-22 ET (Luke Thompson) |
+| **Track** | PS-B (Arrange) **CLOSED** · PS-C **OPEN** |
 | **Scope** | Homestead **`L_VS_MVP_Markers`** only |
 | **Host** | **DESKTOP** (spawn/aim) · CLOUD (script + handoff) |
 | **Impl** | [arrange_ps_homestead.py](../../Content/Python/arrange_ps_homestead.py) |
@@ -16,7 +16,24 @@
 APPROVE PS-B
 ```
 
-Grant after DESKTOP runs Arrange, inspects viewport framing on key `PS_*` views, and accepts `Saved/ps_arrange_gate.json` with `ready_for_ps_c: true` (pose quality is still Lead eyeball — not auto-PASS).
+**Stamped:** Lead **`APPROVE PS-B`**, 2026-09-22 ET — unlocks **PS-C** ([PS_C_METRICS.md](PS_C_METRICS.md)).
+
+---
+
+## DESKTOP prove (stamped)
+
+`arrange_ps_homestead.py` on **`L_VS_MVP_Markers`**:
+
+| Check | Result |
+|-------|--------|
+| `ready_for_ps_c` | **true** |
+| `blocked_reasons` | **[]** |
+| `DRESS_*` | **90** |
+| `PA_D_*` | **16** |
+| Required `PS_*` cameras | **Seven** spawned (N/E/S/W iso + Cliff + Path + Garden) |
+| `CAM_Hero` / `CAM_CabinClose` | Relocated; **`PA_E_MRQ_shot1`/`shot2`** relocated when present |
+| `ps_dress_bounds.json` | Written (**106** source actors in bounds pass) |
+| Lead viewport eyeball | N iso + cliff underside + path corridor — **accepted** |
 
 ---
 
@@ -54,36 +71,22 @@ Grant after DESKTOP runs Arrange, inspects viewport framing on key `PS_*` views,
 - `ps_dress_bounds.json` — schema [PS_A_INVENTORY.md](PS_A_INVENTORY.md) §4
 - `ps_arrange_gate.json` — world ok, counts, cam presence, `ready_for_ps_c`, `blocked_reasons`
 
-**Optional flag:** Edit `INCLUDE_PS_SHRINE_READ = True` in script (or call `arrange_ps_homestead(include_shrine=True)` from REPL) before re-run.
-
 ---
 
 ## DONE-WHEN (PS-B)
 
-- [ ] DESKTOP: chain markers → dress → pa_d → **`arrange_ps_homestead.py`** on Markers world
-- [ ] `Saved/ps_arrange_gate.json` — `world_ok: true`, `ready_for_ps_c: true`, no `blocked_reasons`
-- [ ] `Saved/ps_dress_bounds.json` — non-placeholder `dress_aabb` from live `DRESS_*` (+ `PA_D_*`)
-- [ ] All six required `PS_*` cameras exist under **`VS_MVP/PS`**; `CAM_Hero` / `CAM_CabinClose` relocated (not deleted)
-- [ ] Lead viewport eyeball on N iso + cliff underside + path corridor (prototype framing)
-- [ ] Lead **`APPROVE PS-B`** → unlock **PS-C** metrics + still capture
+- [x] DESKTOP: chain markers → dress → pa_d → **`arrange_ps_homestead.py`** on Markers world
+- [x] `Saved/ps_arrange_gate.json` — `world_ok: true`, `ready_for_ps_c: true`, no `blocked_reasons`
+- [x] `Saved/ps_dress_bounds.json` — non-placeholder `dress_aabb` from live `DRESS_*` (+ `PA_D_*`)
+- [x] All six required `PS_*` cameras exist under **`VS_MVP/PS`**; `CAM_Hero` / `CAM_CabinClose` relocated (not deleted)
+- [x] Lead viewport eyeball on N iso + cliff underside + path corridor (prototype framing)
+- [x] Lead **`APPROVE PS-B`** → unlock **PS-C** metrics + still capture
 
 ---
 
-## DESKTOP prove checklist
+## Next track
 
-1. Confirm world token **`L_VS_MVP_Markers`** (script hard-fails otherwise).
-2. Counts in gate JSON align with inventory baseline: **`DRESS_*` ≈ 90**, **`PA_D_*` = 16** (when optional PA-D meshes present).
-3. Five JSON cams present; **`PA_E_MRQ_shot1`/`shot2`** noted in `relocate_cameras` if in level.
-4. No **`Shot1`/`Shot2`/`CAM_CabinGarden`** actors.
-5. Pilot **`PS_N_HighIso`**, **`PS_Cliff_Underside`**, **`PS_Path_Corridor`** — homestead kit framed, not void.
-6. Append gate path + one-line framing note to session log before **`APPROVE PS-B`**.
-
----
-
-## PS-C pointer (not this PR)
-
-- New module sketch: `ps_placement_prove.py` — read `ps_arrange_gate.json`, assert metrics catalog, capture to `Saved/ps_stills/` via extended PA-E MRQ/viewport patterns.
-- No golden SCOUT, no NirCmd in PS-B.
+**PS-C** — [PS_C_METRICS.md](PS_C_METRICS.md) · **`execute_python_script("ps_placement_prove.py")`**
 
 ---
 
