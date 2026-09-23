@@ -4,6 +4,8 @@
 # Chain (DESKTOP): markers → dress → pa_d → arrange_ps_homestead.py → this script.
 # Harness P3 exempt: PS track prove (Arrange gate via ps_arrange_gate.json / arrange_ps_homestead).
 # Writes Saved/ps_placement_metrics.json, Saved/ps_stills/*, Saved/ps_c_prove_gate.json.
+# Stills: register_slate_pre_tick_callback + keep_python_script_alive (PA-E pretick pattern;
+# no blocking time.sleep while waiting for HighResShot / AutomationLibrary).
 
 from __future__ import annotations
 
@@ -13,7 +15,8 @@ import os
 import sys
 import time
 from datetime import datetime, timezone
-from typing import Any, Optional
+from enum import Enum
+from typing import Any, Callable, Optional
 
 try:
     import unreal
@@ -70,6 +73,9 @@ STILL_CAM_LABELS = (
 )
 
 STILL_RES_X, STILL_RES_Y = 1600, 900
+PS_C_WAIT_FILE_SEC = 120.0
+PS_C_INTER_SHOT_SETTLE_FRAMES = 16
+PS_C_SLATE_MECHANISM = "register_slate_pre_tick_callback"
 TRACE_TOP_OFFSET_UU = 120.0
 TRACE_DEPTH_UU = 12000.0
 # PS-C baseline: metric over-threshold → soft_fail (Lead tunes before closed_fail).
@@ -671,7 +677,277 @@ def _load_capture_viewport():
     return cv
 
 
-def _automation_abs_screenshot(filepath: str, cam) -> tuple[bool, list[str]]:
+class _PsCStillsPhase(str, Enum):
+    IDLE = "idle"
+    POSED = "posed"
+    PREPARING = "preparing"
+    CAPTURE_PENDING = "capture_pending"
+    WAITING_FILE = "waiting_file"
+    INTER_SHOT_SETTLE = "inter_shot_settle"
+    WRITE_MANIFEST = "write_manifest"
+    DISARM = "disarm"
+    DONE = "done"
+
+
+class _PsCStillsOrchestrator:
+    """Seven PS stills — one HighResShot/AL invoke in flight; Slate pre-tick wait."""
+
+    def __init__(
+        self,
+        *,
+        world,
+        stills_dir: str,
+        gate_context: dict[str, Any],
+        on_finished: Callable[[list[dict[str, Any]], str], None],
+    ) -> None:
+        self.world = world
+        self.stills_dir = stills_dir
+        self.gate_context = gate_context
+        self.on_finished = on_finished
+        self.phase = _PsCStillsPhase.IDLE
+        self.shot_index = 0
+        self.entries: list[dict[str, Any]] = []
+        self._tick_handle: Any = None
+        self._settle_frames_left = 0
+        self._cam_label = ""
+        self._filepath = ""
+        self._cam: Any = None
+        self._since = 0.0
+        self._wait_deadline = 0.0
+        self._methods: list[str] = []
+        self._capture_result: dict[str, Any] = {}
+        self._task: Any = None
+        self._stable: Any = None
+        self._driver_error: Optional[str] = None
+        self._cv: Any = None
+
+    def start(self) -> bool:
+        register = getattr(unreal, "register_slate_pre_tick_callback", None)
+        if not callable(register):
+            self._driver_error = "register_slate_pre_tick_callback unavailable"
+            return False
+        self._cv = _load_capture_viewport()
+        self._stable = self._cv._StableSizeTracker()
+        try:
+            self._tick_handle = register(self._on_slate_pre_tick)
+        except Exception as e:
+            self._driver_error = str(e)
+            return False
+        self.phase = _PsCStillsPhase.POSED
+        self.shot_index = 0
+        _log(
+            "stills slate driver armed",
+            {"mechanism": PS_C_SLATE_MECHANISM, "wait_file_sec": PS_C_WAIT_FILE_SEC},
+        )
+        return True
+
+    def _unregister_tick(self) -> None:
+        if self._tick_handle is None:
+            return
+        unregister = getattr(unreal, "unregister_slate_pre_tick_callback", None)
+        if callable(unregister):
+            try:
+                unregister(self._tick_handle)
+            except Exception:
+                pass
+        self._tick_handle = None
+
+    def _on_slate_pre_tick(self, _delta: float) -> None:
+        try:
+            self._tick()
+        except Exception as e:
+            _log("stills orchestrator tick error", {"error": str(e), "phase": self.phase.value})
+            self.phase = _PsCStillsPhase.WRITE_MANIFEST
+            self._driver_error = self._driver_error or str(e)
+
+    def _tick(self) -> None:
+        if self.phase == _PsCStillsPhase.POSED:
+            self._begin_shot_prepare()
+        elif self.phase == _PsCStillsPhase.CAPTURE_PENDING:
+            self._invoke_capture_once()
+        elif self.phase == _PsCStillsPhase.WAITING_FILE:
+            self._poll_capture_wait()
+        elif self.phase == _PsCStillsPhase.INTER_SHOT_SETTLE:
+            self._settle_frames_left -= 1
+            if self._settle_frames_left <= 0:
+                self.phase = _PsCStillsPhase.POSED
+        elif self.phase == _PsCStillsPhase.WRITE_MANIFEST:
+            self._finish_all()
+        elif self.phase == _PsCStillsPhase.DISARM:
+            self._disarm_keep_alive()
+
+    def _begin_shot_prepare(self) -> None:
+        if self.phase != _PsCStillsPhase.POSED:
+            return
+        self.phase = _PsCStillsPhase.PREPARING
+        if self.shot_index >= len(STILL_CAM_LABELS):
+            self.phase = _PsCStillsPhase.WRITE_MANIFEST
+            return
+        self._cam_label = STILL_CAM_LABELS[self.shot_index]
+        self._filepath = _resolve_still_path(self.stills_dir, self._cam_label)
+        self._cam = _find_actor_label(self._cam_label)
+        self._methods = []
+        self._capture_result = {}
+        self._task = None
+        if not self._cam:
+            self.entries.append(
+                {
+                    "camera_label": self._cam_label,
+                    "path": self._filepath,
+                    "capture_outcome": OUTCOME_CLOSED,
+                    "error": "camera_missing",
+                    "file_exists": False,
+                }
+            )
+            self.shot_index += 1
+            self.phase = _PsCStillsPhase.POSED
+            return
+        os.makedirs(os.path.dirname(self._filepath), exist_ok=True)
+        _pilot_camera(self._cam)
+        self._cv._finish_loading_before_screenshot()
+        lit = self._cv._set_lit_view_mode()
+        if lit:
+            self._methods.append(lit)
+        self._cv._settle_pump_only(frames=12)
+        self._since = time.time()
+        self._stable.reset()
+        self.phase = _PsCStillsPhase.CAPTURE_PENDING
+
+    def _invoke_capture_once(self) -> None:
+        if self.phase != _PsCStillsPhase.CAPTURE_PENDING:
+            return
+        fired = self._cv.console_high_res_invoke_once(
+            STILL_RES_X, STILL_RES_Y, self._filepath, self._capture_result
+        )
+        if fired:
+            self._methods.append(
+                f"capture_viewport_console:{self._capture_result.get('method')}"
+            )
+        else:
+            ok_al, al_methods, task = _automation_abs_screenshot(self._filepath, self._cam)
+            self._methods.extend(al_methods)
+            self._task = task
+        self._wait_deadline = time.time() + PS_C_WAIT_FILE_SEC
+        self.phase = _PsCStillsPhase.WAITING_FILE
+
+    def _poll_capture_wait(self) -> None:
+        found = self._cv.probe_png_ready(
+            self._filepath, self._since, os.path.basename(self._filepath), self._stable
+        )
+        if found:
+            self._finish_shot(found)
+            return
+        if time.time() >= self._wait_deadline:
+            self._finish_shot(self._filepath if os.path.isfile(self._filepath) else None)
+
+    def _finish_shot(self, resolved_path: Optional[str]) -> None:
+        entry = _finalize_still_entry(
+            self._cam_label,
+            self._filepath,
+            self._methods,
+            since=self._since,
+            resolved_on_disk=resolved_path,
+        )
+        self.entries.append(entry)
+        self.shot_index += 1
+        if self.shot_index < len(STILL_CAM_LABELS):
+            self._settle_frames_left = PS_C_INTER_SHOT_SETTLE_FRAMES
+            self.phase = _PsCStillsPhase.INTER_SHOT_SETTLE
+        else:
+            self.phase = _PsCStillsPhase.WRITE_MANIFEST
+
+    def _finish_all(self) -> None:
+        if self.phase == _PsCStillsPhase.DONE:
+            return
+        manifest_path = _write_stills_manifest(self.entries, self.stills_dir)
+        self.on_finished(self.entries, manifest_path)
+        self._unregister_tick()
+        self.phase = _PsCStillsPhase.DISARM
+        self._disarm_keep_alive()
+        self.phase = _PsCStillsPhase.DONE
+
+    def _disarm_keep_alive(self) -> None:
+        try:
+            import vnp_editor_keep_alive as keep
+
+            keep.disarm()
+        except Exception:
+            pass
+
+
+_ACTIVE_PS_C_STILLS: Optional[_PsCStillsOrchestrator] = None
+
+
+def _finalize_still_entry(
+    cam_label: str,
+    filepath: str,
+    methods: list[str],
+    *,
+    since: float,
+    resolved_on_disk: Optional[str],
+) -> dict[str, Any]:
+    entry: dict[str, Any] = {"camera_label": cam_label, "path": filepath, "methods": methods}
+    entry["capture_path"] = (
+        "slate_pretick capture_viewport HighResShot abs + AutomationLibrary abs "
+        "(Saved/ps_stills/)"
+    )
+    entry["wait_mechanism"] = PS_C_SLATE_MECHANISM
+    if not os.path.isfile(filepath):
+        copied = _copy_newest_png_matching(
+            (cam_label, os.path.basename(filepath)), filepath, since
+        )
+        if copied:
+            methods.append(f"copied_from:{copied}")
+    if not os.path.isfile(filepath):
+        shot_ids = MRQ_SHOT_STILL_FALLBACK.get(cam_label)
+        if shot_ids:
+            copied = _copy_newest_png_matching(shot_ids, filepath, since - 86400.0)
+            if copied:
+                methods.append(f"pa_e_mrq_fallback_copy:{copied}")
+    entry["methods"] = methods
+    entry["file_exists"] = os.path.isfile(filepath)
+    if not entry["file_exists"]:
+        entry["capture_outcome"] = OUTCOME_SOFT
+        entry["note"] = "png_missing_black_or_path_soft_fail"
+        return entry
+    size = os.path.getsize(filepath)
+    entry["bytes"] = size
+    lum, lum_src = common.mean_luminance(filepath)
+    entry["mean_luminance"] = lum
+    entry["luminance_source"] = lum_src
+    if size < common.MIN_BYTES:
+        entry["capture_outcome"] = OUTCOME_SOFT
+        entry["note"] = "file_too_small"
+        return entry
+    if lum is None or (lum is not None and lum < common.MIN_MEAN_LUMINANCE):
+        entry["capture_outcome"] = OUTCOME_SOFT
+        entry["note"] = "black_or_dark_still_soft_fail_not_closed_without_arrange_miss"
+        return entry
+    entry["capture_outcome"] = OUTCOME_PASS
+    if resolved_on_disk:
+        entry["resolved_path"] = resolved_on_disk
+    return entry
+
+
+def _write_stills_manifest(entries: list[dict[str, Any]], stills_dir: str) -> str:
+    manifest = {
+        "version": 1,
+        "generated_at_iso": datetime.now(timezone.utc).isoformat(),
+        "capture_path": (
+            "slate pre-tick: capture_viewport console HighResShot (absolute Saved/ps_stills/) + "
+            "AutomationLibrary abs; optional PA-E MRQ PNG copy for CAM_Hero/CAM_CabinClose"
+        ),
+        "wait_mechanism": PS_C_SLATE_MECHANISM,
+        "resolution": [STILL_RES_X, STILL_RES_Y],
+        "stills": entries,
+    }
+    manifest_path = os.path.join(stills_dir, "manifest.json")
+    with open(manifest_path, "w", encoding="utf-8") as f:
+        json.dump(manifest, f, indent=2, default=str)
+    return manifest_path
+
+
+def _automation_abs_screenshot(filepath: str, cam) -> tuple[bool, list[str], Any]:
     """Absolute-path AutomationLibrary (PL-D / capture_shotlist_viewport pattern)."""
     methods: list[str] = []
     ue_path = os.path.abspath(filepath).replace("\\", "/")
@@ -692,14 +968,14 @@ def _automation_abs_screenshot(filepath: str, cam) -> tuple[bool, list[str]]:
     )
     for name, fn in attempts:
         try:
-            fn()
+            task = fn()
             methods.append(name)
-            return True, methods
+            return True, methods, task
         except TypeError:
             continue
         except Exception as e:
             methods.append(f"{name}_fail:{e}")
-    return False, methods
+    return False, methods, None
 
 
 def _copy_newest_png_matching(needles: tuple[str, ...], dest: str, since: float) -> Optional[str]:
@@ -738,116 +1014,146 @@ def _copy_newest_png_matching(needles: tuple[str, ...], dest: str, since: float)
     return None
 
 
-def _capture_still_from_camera(
-    cam_label: str,
-    filepath: str,
+def _build_ps_c_gate(
     *,
-    world,
+    blocked: list[str],
+    pre_closed: bool,
+    dress_count: int,
+    pa_d_count: int,
+    arrange_gate: dict[str, Any],
+    dress_path: str,
+    metrics: Optional[dict[str, Any]],
+    metrics_path: str,
+    still_entries: list[dict[str, Any]],
+    manifest_path: str,
+    stills_in_progress: bool = False,
+    driver_error: Optional[str] = None,
 ) -> dict[str, Any]:
-    entry: dict[str, Any] = {"camera_label": cam_label, "path": filepath}
-    cam = _find_actor_label(cam_label)
-    if not cam:
-        entry["capture_outcome"] = OUTCOME_CLOSED
-        entry["error"] = "camera_missing"
-        return entry
+    stills_present = sum(1 for e in still_entries if e.get("file_exists"))
+    stills_required = len(STILL_CAM_LABELS)
+    capture_outcomes = [e.get("capture_outcome", OUTCOME_SOFT) for e in still_entries]
 
-    os.makedirs(os.path.dirname(filepath), exist_ok=True)
-    _pilot_camera(cam)
-    methods: list[str] = []
-    since = time.time()
-    cv = _load_capture_viewport()
-    cv._finish_loading_before_screenshot()
-    lit = cv._set_lit_view_mode()
-    if lit:
-        methods.append(lit)
-    for _ in range(12):
-        cv._pump_editor_once()
+    placement_outcome = metrics.get("placement_outcome") if metrics else OUTCOME_CLOSED
+    if pre_closed:
+        placement_outcome = OUTCOME_CLOSED
 
-    capture_result: dict[str, Any] = {}
-    if cv._console_high_res(STILL_RES_X, STILL_RES_Y, filepath, capture_result):
-        methods.append(f"capture_viewport_console:{capture_result.get('method')}")
-    else:
-        ok_al, al_methods = _automation_abs_screenshot(filepath, cam)
-        methods.extend(al_methods)
-        if ok_al:
-            cv._settle()
-            found = cv._wait_for_file(
-                filepath, since, os.path.basename(filepath)
-            )
-            if found:
-                methods.append("automation_abs_wait_ok")
-        if not os.path.isfile(filepath):
-            ue_path = os.path.abspath(filepath).replace("\\", "/")
-            try:
-                unreal.SystemLibrary.execute_console_command(
-                    world,
-                    f'HighResShot filename="{ue_path}" {STILL_RES_X}x{STILL_RES_Y}',
-                )
-                methods.append("HighResShot_abs_filename_first")
-            except Exception as e:
-                methods.append(f"HighResShot_abs_fail:{e}")
-            cv._settle()
-            cv._wait_for_file(filepath, since, os.path.basename(filepath))
+    ready_for_ps_d = (
+        not pre_closed
+        and not stills_in_progress
+        and metrics is not None
+        and stills_present >= stills_required
+        and placement_outcome in (OUTCOME_PASS, OUTCOME_SOFT)
+    )
+    if not ready_for_ps_d and not stills_in_progress:
+        if metrics is None:
+            blocked = list(blocked) + ["metrics_not_written"]
+        if stills_present < stills_required:
+            blocked = list(blocked) + [f"stills_incomplete:{stills_present}/{stills_required}"]
 
-    if not os.path.isfile(filepath):
-        copied = _copy_newest_png_matching((cam_label, os.path.basename(filepath)), filepath, since)
-        if copied:
-            methods.append(f"copied_from:{copied}")
-
-    if not os.path.isfile(filepath):
-        shot_ids = MRQ_SHOT_STILL_FALLBACK.get(cam_label)
-        if shot_ids:
-            copied = _copy_newest_png_matching(shot_ids, filepath, since - 86400.0)
-            if copied:
-                methods.append(f"pa_e_mrq_fallback_copy:{copied}")
-
-    entry["methods"] = methods
-    entry["capture_path"] = "capture_viewport HighResShot abs + AutomationLibrary abs (no relative fname)"
-    entry["file_exists"] = os.path.isfile(filepath)
-    if not entry["file_exists"]:
-        entry["capture_outcome"] = OUTCOME_SOFT
-        entry["note"] = "png_missing_black_or_path_soft_fail"
-        return entry
-
-    size = os.path.getsize(filepath)
-    entry["bytes"] = size
-    lum, lum_src = common.mean_luminance(filepath)
-    entry["mean_luminance"] = lum
-    entry["luminance_source"] = lum_src
-    if size < common.MIN_BYTES:
-        entry["capture_outcome"] = OUTCOME_SOFT
-        entry["note"] = "file_too_small"
-        return entry
-    if lum is None or (lum is not None and lum < common.MIN_MEAN_LUMINANCE):
-        entry["capture_outcome"] = OUTCOME_SOFT
-        entry["note"] = "black_or_dark_still_soft_fail_not_closed_without_arrange_miss"
-        return entry
-    entry["capture_outcome"] = OUTCOME_PASS
-    return entry
+    gate: dict[str, Any] = {
+        "version": 1,
+        "track": "PS-C",
+        "level_path": common.LEVEL_PATH,
+        "preconditions": {
+            "dress_count": dress_count,
+            "pa_d_count": pa_d_count,
+            "ps_arrange_gate_ready_for_ps_c": bool(arrange_gate.get("ready_for_ps_c")),
+        },
+        "placement_outcome": placement_outcome,
+        "stills_present_count": stills_present,
+        "stills_required_count": stills_required,
+        "stills_capture_outcomes": capture_outcomes,
+        "stills_in_progress": stills_in_progress,
+        "stills_wait_mechanism": PS_C_SLATE_MECHANISM,
+        "metrics_path": metrics_path if metrics else None,
+        "stills_manifest_path": manifest_path or None,
+        "dress_bounds_path": dress_path,
+        "ready_for_ps_d": ready_for_ps_d,
+        "blocked_reasons": blocked,
+        "generated_at_iso": datetime.now(timezone.utc).isoformat(),
+        "gate_string": "APPROVE PS-C",
+        "note": (
+            "ready_for_ps_d = metrics + still files on disk; PS-D is Lead eyeball vs benchmarks. "
+            "Black/dark stills → soft_fail on capture, not closed_fail if Arrange gate was ready."
+        ),
+    }
+    if driver_error:
+        gate["stills_driver_error"] = driver_error
+    return gate
 
 
-def _capture_stills(world) -> tuple[list[dict[str, Any]], str]:
+def _write_ps_c_gate_file(gate: dict[str, Any]) -> str:
+    gate_path = _project_saved_path("ps_c_prove_gate.json")
+    with open(gate_path, "w", encoding="utf-8") as f:
+        json.dump(gate, f, indent=2, default=str)
+    gate["written_path"] = gate_path
+    return gate_path
+
+
+def _on_ps_c_stills_finished(
+    entries: list[dict[str, Any]], manifest_path: str, ctx: dict[str, Any]
+) -> None:
+    global _ACTIVE_PS_C_STILLS
+    _ACTIVE_PS_C_STILLS = None
+    blocked = list(ctx.get("blocked") or [])
+    gate = _build_ps_c_gate(
+        blocked=blocked,
+        pre_closed=bool(ctx.get("pre_closed")),
+        dress_count=int(ctx.get("dress_count") or 0),
+        pa_d_count=int(ctx.get("pa_d_count") or 0),
+        arrange_gate=ctx.get("arrange_gate") or {},
+        dress_path=str(ctx.get("dress_path") or ""),
+        metrics=ctx.get("metrics"),
+        metrics_path=str(ctx.get("metrics_path") or ""),
+        still_entries=entries,
+        manifest_path=manifest_path,
+        stills_in_progress=False,
+        driver_error=ctx.get("driver_error"),
+    )
+    _write_ps_c_gate_file(gate)
+    _log(
+        "prove complete (stills async)",
+        {
+            "ready_for_ps_d": gate.get("ready_for_ps_d"),
+            "placement_outcome": gate.get("placement_outcome"),
+            "stills": gate.get("stills_present_count"),
+            "blocked": blocked,
+        },
+    )
+
+
+def _start_ps_c_stills_async(world, gate_context: dict[str, Any]) -> tuple[bool, Optional[str]]:
+    global _ACTIVE_PS_C_STILLS
+    if _ACTIVE_PS_C_STILLS is not None:
+        return False, "ps_c_stills_driver_already_active"
     stills_dir = _project_saved_path("ps_stills")
     os.makedirs(stills_dir, exist_ok=True)
-    entries: list[dict[str, Any]] = []
-    for label in STILL_CAM_LABELS:
-        path = _resolve_still_path(stills_dir, label)
-        entries.append(_capture_still_from_camera(label, path, world=world))
+    keep_ok = False
+    try:
+        import vnp_editor_keep_alive as keep
 
-    manifest = {
-        "version": 1,
-        "generated_at_iso": datetime.now(timezone.utc).isoformat(),
-        "capture_path": (
-            "capture_viewport.py console HighResShot (absolute path under Saved/ps_stills/) + "
-            "AutomationLibrary abs; optional PA-E MRQ PNG copy for CAM_Hero/CAM_CabinClose"
-        ),
-        "resolution": [STILL_RES_X, STILL_RES_Y],
-        "stills": entries,
-    }
-    manifest_path = os.path.join(stills_dir, "manifest.json")
-    with open(manifest_path, "w", encoding="utf-8") as f:
-        json.dump(manifest, f, indent=2, default=str)
-    return entries, manifest_path
+        keep_ok = keep.arm()
+    except Exception as e:
+        return False, f"keep_alive_arm_failed:{e}"
+    gate_context["keep_python_script_alive"] = keep_ok
+    orch = _PsCStillsOrchestrator(
+        world=world,
+        stills_dir=stills_dir,
+        gate_context=gate_context,
+        on_finished=_on_ps_c_stills_finished,
+    )
+    if not orch.start():
+        gate_context["driver_error"] = orch._driver_error
+        if keep_ok:
+            try:
+                import vnp_editor_keep_alive as keep
+
+                keep.disarm()
+            except Exception:
+                pass
+        return False, orch._driver_error or "slate_driver_start_failed"
+    _ACTIVE_PS_C_STILLS = orch
+    return True, None
 
 
 def prove_ps_placement(*, skip_stills: bool = False) -> dict[str, Any]:
@@ -903,67 +1209,52 @@ def prove_ps_placement(*, skip_stills: bool = False) -> dict[str, Any]:
             json.dump(metrics, f, indent=2, default=str)
         _log("wrote ps_placement_metrics.json", {"path": metrics_path})
 
-    if not skip_stills and not pre_closed:
-        still_entries, manifest_path = _capture_stills(world)
-    elif skip_stills:
+    stills_in_progress = False
+    driver_error: Optional[str] = None
+
+    if skip_stills:
         blocked.append("stills_skipped_by_flag")
-
-    stills_present = sum(1 for e in still_entries if e.get("file_exists"))
-    stills_required = len(STILL_CAM_LABELS)
-    capture_outcomes = [e.get("capture_outcome", OUTCOME_SOFT) for e in still_entries]
-
-    placement_outcome = metrics.get("placement_outcome") if metrics else OUTCOME_CLOSED
-    if pre_closed:
-        placement_outcome = OUTCOME_CLOSED
-
-    ready_for_ps_d = (
-        not pre_closed
-        and metrics is not None
-        and stills_present >= stills_required
-        and placement_outcome in (OUTCOME_PASS, OUTCOME_SOFT)
-    )
-    if not ready_for_ps_d:
-        if metrics is None:
-            blocked.append("metrics_not_written")
-        if stills_present < stills_required:
-            blocked.append(f"stills_incomplete:{stills_present}/{stills_required}")
-
-    gate: dict[str, Any] = {
-        "version": 1,
-        "track": "PS-C",
-        "level_path": common.LEVEL_PATH,
-        "preconditions": {
+    elif not pre_closed:
+        gate_context = {
+            "blocked": blocked,
+            "pre_closed": pre_closed,
             "dress_count": dress_count,
             "pa_d_count": pa_d_count,
-            "ps_arrange_gate_ready_for_ps_c": bool(arrange_gate.get("ready_for_ps_c")),
-        },
-        "placement_outcome": placement_outcome,
-        "stills_present_count": stills_present,
-        "stills_required_count": stills_required,
-        "stills_capture_outcomes": capture_outcomes,
-        "metrics_path": metrics_path if metrics else None,
-        "stills_manifest_path": manifest_path or None,
-        "dress_bounds_path": dress_path,
-        "ready_for_ps_d": ready_for_ps_d,
-        "blocked_reasons": blocked,
-        "generated_at_iso": datetime.now(timezone.utc).isoformat(),
-        "gate_string": "APPROVE PS-C",
-        "note": (
-            "ready_for_ps_d = metrics + still files on disk; PS-D is Lead eyeball vs benchmarks. "
-            "Black/dark stills → soft_fail on capture, not closed_fail if Arrange gate was ready."
-        ),
-    }
+            "arrange_gate": arrange_gate,
+            "dress_path": dress_path,
+            "metrics": metrics,
+            "metrics_path": metrics_path,
+        }
+        started, err = _start_ps_c_stills_async(world, gate_context)
+        if started:
+            stills_in_progress = True
+            blocked = list(blocked) + ["stills_async_slate_driver"]
+        else:
+            driver_error = err
+            blocked.append(f"stills_driver_failed:{err}")
 
-    gate_path = _project_saved_path("ps_c_prove_gate.json")
-    with open(gate_path, "w", encoding="utf-8") as f:
-        json.dump(gate, f, indent=2, default=str)
-    gate["written_path"] = gate_path
+    gate = _build_ps_c_gate(
+        blocked=blocked,
+        pre_closed=pre_closed,
+        dress_count=dress_count,
+        pa_d_count=pa_d_count,
+        arrange_gate=arrange_gate,
+        dress_path=dress_path,
+        metrics=metrics,
+        metrics_path=metrics_path,
+        still_entries=still_entries,
+        manifest_path=manifest_path,
+        stills_in_progress=stills_in_progress,
+        driver_error=driver_error,
+    )
+    _write_ps_c_gate_file(gate)
     _log(
         "prove complete",
         {
-            "ready_for_ps_d": ready_for_ps_d,
-            "placement_outcome": placement_outcome,
-            "stills": stills_present,
+            "ready_for_ps_d": gate.get("ready_for_ps_d"),
+            "placement_outcome": gate.get("placement_outcome"),
+            "stills_in_progress": stills_in_progress,
+            "stills": gate.get("stills_present_count"),
             "blocked": blocked,
         },
     )
@@ -976,8 +1267,10 @@ def main() -> None:
         json.dumps(
             {
                 "ok": gate.get("ready_for_ps_d"),
+                "stills_in_progress": gate.get("stills_in_progress"),
                 "placement_outcome": gate.get("placement_outcome"),
                 "gate_path": gate.get("written_path"),
+                "wait_mechanism": gate.get("stills_wait_mechanism"),
             },
             indent=2,
         )

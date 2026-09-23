@@ -935,3 +935,7 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 - DESKTOP first run: island max-Z proxy + relative screenshot path → mass closed_fail, 0/7 stills. Harden: multi line-trace, no island proxy, soft baseline, capture_viewport absolute HighResShot, PA-E MRQ PNG fallback for hero/cabin.
 
+## 2026-09-23 — PS-C-1 slate stills harden (cloud)
+
+- Ticket PS-C-1: MCP mid-prove FAppTime Ensure / 300s empty — stills path moved to **`register_slate_pre_tick_callback`** + **`vnp_editor_keep_alive`** (PA-E pretick pattern); **`capture_viewport.console_high_res_invoke_once`** + tick **`probe_png_ready`** (no blocking **`time.sleep`** in settle/wait). Gate written when async stills finish. KNOWN_ERRORS Cause→Avoid row. DESKTOP re-prove pending — no PASS claim.
+

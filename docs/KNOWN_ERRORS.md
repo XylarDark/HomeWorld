@@ -10,6 +10,7 @@ One-line **Cause→Avoid** rows; narratives → [DEFECT_PA_E](../Docs/qa/DEFECT_
 
 - **World ≠ level_path:** report/`level_path` claimed `L_VS_MVP_Markers` while world was MainMenu → assert `get_editor_world()` or `load_level` before Arrange.
 - **Unreal off game thread:** `capture_shotlist_mrq.main()` on `threading.Thread` → MCP `execute_python_script` on game thread only.
+- **PS-C MCP stills FAppTime / 300s hang:** `ps_placement_prove` blocking `capture_viewport` `time.sleep` + `_console_high_res` wait on MCP main thread → **`register_slate_pre_tick_callback`** + `keep_python_script_alive` + `console_high_res_invoke_once` (one shot, tick file probe); absolute paths under **`Saved/ps_stills/`**.
 - **MCP disconnect ≠ Editor dead:** long MRQ run dropped MCP TCP → verify Editor process, port 55557, report/PNG mtimes before relaunch.
 - **Aim ok ≠ visual:** `homestead_bounds_relocate` + ray hit but ~90% black / scrap framing → `ready`/`aim_ok` ≠ PASS; center-crop assert; fix pose toward cabin/island center.
 - **Luminance ≠ framing:** center-crop/mean PASS without wide anchor + `aim_ok` → **`capture_outcome: soft_fail`**; **`capture_pass`** is harness-only — Lead eyeball for visual (`lead_visual_framing_approved`).
