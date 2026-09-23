@@ -92,6 +92,18 @@ Lead steer ──► Conductor
 
 ---
 
+## Host Pulse (ops — not a product phase)
+
+Tool-agnostic external heartbeat for pending Acts. Spec: [Docs/handoffs/HOST_PULSE.md](../Docs/handoffs/HOST_PULSE.md).
+
+| Aggregate | Meaning | Chat |
+|-----------|---------|------|
+| `healthy` | Targets OK within stall threshold (default **300s**, floor 5m) | Quiet |
+| `blocked` | Host/tool down during pending Act | Transition notify |
+| `failed` | Explicit fail signal | Transition notify |
+
+Product `soft_fail`/`closed_fail` remain Test-owned and apply only after Act. No `APPROVE *` for pulse. **Primary MVP:** Conductor **5m** pulse (direct re-check). Optional DESKTOP helper → `Saved/host_pulse.json` is nice-to-have, not mandatory.
+
 ## See also
 
 | Doc | Role |
