@@ -6,7 +6,7 @@
 | **Slug** | HOST_PULSE_AGNOSTIC |
 | **Mode** | HYBRID — Design docs → Implement tools → Conductor routine consumes |
 | **Status** | DESIGN READY — pending Implement packet |
-| **Date** | 2026-09-22 ET |
+| **Date** | 2026-09-22 ET (console-kill stamp 2026-09-23) |
 | **Owner** | HomeWorld Design |
 | **Next** | Conductor opens Implement packet |
 
@@ -28,13 +28,14 @@ External **tool-agnostic** heartbeat so Conductor detects stalls early when wait
 | `blocked` | Host/tool down or no OK within threshold **during a pending Act** | Yes — transition only |
 | `failed` | Explicit fail signal from check or helper | Yes — transition only |
 
-**Product scores** (`soft_fail` / `closed_fail` on PS-C etc.) remain on Test’s sheet and apply **only after Arrange+map OK and Act actually ran**. Host/MCP/tool down = **`blocked`**, never product closed_fail.
+**Product scores** (`soft_fail` / `closed_fail` on PS-C etc.) remain on Test’s sheet and apply **only after Arrange+map OK and Act actually ran**. Host/MCP/tool down = **`blocked`**, never product closed_fail. **Console-kill** (Lead closes an attached UE log console mid-Act) = **`blocked`**, never product `closed_fail`.
 
 ## Constraints (Lead)
 
 1. Grok Bot cron **cannot** fire faster than **5 minutes**.
 2. **Primary path (MVP):** Conductor routine polls watched targets **at 5m cadence** (aligned with bot limit) and applies the **300s stall floor**. Conductor may **re-check targets directly** — no sub-5m local watcher is a **hard Design requirement**.
 3. **Optional (nice-to-have):** A DESKTOP **multi-target pulse helper** may poll on the same cadence (≥5m) or less frequently, and write `Saved/host_pulse.json` for Conductor to **read** instead of duplicating checks. Helper is **not mandatory for MVP**; Implement defers `Tools/host_pulse` unless Conductor scopes it in the Implement packet.
+4. **Console-kill:** Do **not** close a black console attached to UE during a pending Act; use in-editor **Output Log**, or leave the console alone.
 
 ## Target record (schema)
 
@@ -136,17 +137,37 @@ When a **pending Act** on DESKTOP hits Editor/MCP/host failure mid-run — Edito
 | Recover cycles | **one** only |
 | Total stall before Lead | ≤ 10 min |
 
-**Detect:** Editor `Responding=False` **or** MCP open but no progress **or** host unreachable **or** prove spawn abort with no gate file.
+**Detect:** Editor `Responding=False` **or** MCP open but no progress **or** host unreachable **or** prove spawn abort with no gate file **or** **console-kill** (below).
 
 **Recover once:**
 
-1. Kill `UnrealEditor` + `CrashReportClient`
+1. Kill `UnrealEditor` + `CrashReportClient` (skip if console-kill already terminated the editor — go to relaunch)
 2. Relaunch **UE 5.8 binary only** (Skip Restore click once if that dialog appears)
 3. Wait MCP ≤3 min → re-run **one** Arrange+Act
 
-**Stop (don’t thrash):** Second hang, MCP dead after relaunch, or host still unreachable → mark **`blocked`**, Windows toast + chat, park the Act. No flag roulette, no 3rd kill, no parallel Fix invent.
+**Stop (don’t thrash):** Second hang, MCP dead after relaunch, host still unreachable, **or second mid-Act exit (including console-kill)** → mark **`blocked`**, Windows toast + chat, park the Act. No flag roulette, no 3rd kill, no parallel Fix invent.
 
-**Scoring:** Host/MCP down / mid-Act drop = **`blocked`**, never product `closed_fail`. Product `soft_fail` / `closed_fail` only after Arrange+map OK and Act completed (same as § States).
+**Scoring:** Host/MCP down / mid-Act drop / console-kill = **`blocked`**, never product `closed_fail`. Product `soft_fail` / `closed_fail` only after Arrange+map OK and Act completed (same as § States).
+
+**Fix gate:** Open **Fix** only if the *Act* caused hang/Ensure — **not** because Lead closed the attached console.
+
+### Console-kill (log window closes UE)
+
+**Detect:** `UnrealEditor` process gone **and** MCP closed after Lead closes an attached log/console window mid-Act (or any prove launch that used a killable `-log` console) → aggregate **`blocked`**, never product `closed_fail`.
+
+**Prove launch rule:** Launch UE 5.8 binary with map; write logs to `Saved/Logs` only — **do not** open a closeable external `-log` / console window when avoidable.
+
+**Lead rule:** Do not close a black console attached to UE; use in-editor Output Log, or leave the console alone.
+
+**Recover once:** Same as **Recover once** above — relaunch UE 5.8, MCP ≤3 min, one Arrange+Act. Second exit mid-Act → park + toast.
+
+### KNOWN_ERRORS — Cause → Avoid (console-kill)
+
+| Cause | Avoid |
+|-------|-------|
+| Closing attached UE log console kills the editor process. | Prove launch without closeable console; Lead uses Output Log; Host Pulse scores console-kill as **`blocked`**. |
+
+(Full operational log: [docs/KNOWN_ERRORS.md](../../docs/KNOWN_ERRORS.md) when stamped there.)
 
 ## What Design did not invent
 
