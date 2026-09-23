@@ -7,7 +7,7 @@
 # Harness P3 exempt: PS track prove (Arrange gate via ps_arrange_gate.json / arrange_ps_homestead).
 # Writes Saved/ps_placement_metrics.json, Saved/ps_stills/*, Saved/ps_c_prove_gate.json.
 # Stills: full 7 = slate pre-tick driver + pump-until-done (≤300s). One-cam bite =
-# capture_viewport sync wait on canonical abs path (single AL invoke, no async driver).
+# CAP001_SETTLE_AFTER_YIELD_V1 Phase A: single AL fire + act_fired_at stamp, return (Phase B = host).
 
 from __future__ import annotations
 
@@ -110,6 +110,7 @@ PS_C_PS_CAM_PREFIX = "PS_"
 PS_C_STABLE_POLLS_REQUIRED = 2
 PS_C_SLATE_MECHANISM = "register_slate_pre_tick_callback"
 PS_C_DRIVE_MECHANISM = "slate_callback_plus_pump_until_done"
+CAP001_SETTLE_AFTER_YIELD_V1 = "CAP001_SETTLE_AFTER_YIELD_V1"
 TRACE_TOP_OFFSET_UU = 120.0
 TRACE_DEPTH_UU = 12000.0
 # PS-C baseline: metric over-threshold → soft_fail (Lead tunes before closed_fail).
@@ -1277,7 +1278,7 @@ def _ps_c_gate_hold_until_canonical_paths(
 
 
 def _automation_abs_screenshot_one_invoke(filepath: str, cam) -> tuple[bool, list[str], Any]:
-    """Single AL invoke (one-cam sync — no second-round fire-and-forget)."""
+    """Single AL invoke (one-cam Phase A — fire only; no in-script wait)."""
     cv = _load_capture_viewport()
     dest_abs = cv._ensure_abs_dest(filepath)
     ue_path = cv._path_for_ue(dest_abs)
@@ -1312,86 +1313,108 @@ def _automation_abs_screenshot_one_invoke(filepath: str, cam) -> tuple[bool, lis
     return False, methods, None
 
 
-def _ps_c_one_cam_sync_capture_still(
+def _cap001_phase_a_stamp(
+    *,
+    cam_label: str,
+    canonical_path_abs: str,
+    act_fired_at: Optional[float],
+    fire_ok: bool,
+    fire_error: Optional[str],
+    methods: list[str],
+) -> dict[str, Any]:
+    """Conductor-readable Phase B inputs (host poll after MCP yield)."""
+    return {
+        "contract": CAP001_SETTLE_AFTER_YIELD_V1,
+        "phase": "A",
+        "camera_label": cam_label,
+        "canonical_still_path_abs": canonical_path_abs,
+        "act_fired_at": act_fired_at,
+        "fire_ok": fire_ok,
+        "fire_error": fire_error,
+        "methods": methods,
+    }
+
+
+def _ps_c_one_cam_phase_a_fire_and_return(
     world,
     cam_label: str,
     stills_dir: str,
-) -> tuple[list[dict[str, Any]], float, Optional[float], Optional[str], list[str]]:
-    """CAP-001 bite: one AL invoke + slate-pumped wait_for_png_on_disk before act_end."""
+) -> tuple[
+    list[dict[str, Any]],
+    float,
+    Optional[float],
+    Optional[str],
+    list[str],
+    dict[str, Any],
+]:
+    """CAP001 Phase A: one AL fire, stamp act_fired_at + path, return (no in-script PNG wait)."""
     blocked: list[str] = []
     cv = _load_capture_viewport()
     act_start = time.time()
-    path = _ps_c_canonical_still_path(cam_label)
+    path = common.abs_path(_ps_c_canonical_still_path(cam_label))
     _ = stills_dir
+    _ = world
     cam = _find_actor_label(cam_label)
+    act_fired_at: Optional[float] = None
+    fire_error: Optional[str] = None
+
     if not cam:
+        fire_error = "camera_missing"
         blocked.append(f"one_cam_camera_missing:{cam_label}")
-        return [], act_start, None, "camera_missing", blocked
+        stamp = _cap001_phase_a_stamp(
+            cam_label=cam_label,
+            canonical_path_abs=path,
+            act_fired_at=None,
+            fire_ok=False,
+            fire_error=fire_error,
+            methods=["CAP001_SETTLE_AFTER_YIELD_V1:phase_a_fire_only"],
+        )
+        return [], act_start, None, fire_error, blocked, stamp
 
     _purge_ps_c_still_png(path)
     _pilot_camera(cam)
     _focus_ps_c_viewport()
-    methods: list[str] = ["one_cam:writer_contract_wait_for_png_on_disk"]
+    methods: list[str] = ["CAP001_SETTLE_AFTER_YIELD_V1:phase_a_fire_only"]
     lit = cv._set_lit_view_mode()
     if lit:
         methods.append(lit)
-    cv._settle_pump_only(frames=PS_C_INTER_SHOT_SETTLE_FRAMES)
 
-    wait_since_mtime = time.time()
-    ok, al_methods, task = _automation_abs_screenshot_one_invoke(path, cam)
+    act_fired_at = time.time()
+    ok, al_methods, _task = _automation_abs_screenshot_one_invoke(path, cam)
     methods.extend(al_methods)
     if not ok:
+        act_fired_at = None
+        fire_error = "automation_invoke_failed"
         blocked.append("one_cam_automation_invoke_failed")
-        return [], act_start, None, "automation_invoke_failed", blocked
 
-    cv._pump_editor_once()
-    _log(
-        "one-cam contract wait (single wait_for_png_on_disk gate before act_end)",
-        {
-            "path": path,
-            "wait_since_mtime": wait_since_mtime,
-            "wait_sec": PS_C_ONE_CAM_WAIT_FILE_SEC,
-            "has_automation_task": task is not None,
-        },
+    stamp = _cap001_phase_a_stamp(
+        cam_label=cam_label,
+        canonical_path_abs=path,
+        act_fired_at=act_fired_at,
+        fire_ok=ok,
+        fire_error=fire_error,
+        methods=methods,
     )
-    found = cv.wait_for_png_on_disk(
-        path,
-        wait_since_mtime,
-        wait_sec=PS_C_ONE_CAM_WAIT_FILE_SEC,
-        automation_task=task,
-    )
+    entry: dict[str, Any] = {
+        "camera_label": cam_label,
+        "path": path,
+        "methods": methods,
+        "act_fired_at": act_fired_at,
+        "canonical_still_path_abs": path,
+        "capture_outcome": OUTCOME_SOFT if ok else OUTCOME_SOFT,
+        "counts_toward_gate": False,
+        "fresh_this_act": False,
+        "file_exists": False,
+        "exists": False,
+        "on_disk": False,
+        "note": "cap001_phase_a_pending_host_settle_after_mcp_yield",
+    }
+    if fire_error:
+        entry["error"] = fire_error
 
-    if not found or not os.path.isfile(path):
-        stamp = common.stamp_file_artifact(path)
-        blocked.append(
-            f"one_cam_sync_wait_failed:{cam_label}:{json.dumps(stamp, default=str)}"
-        )
-        return [], act_start, None, "one_cam_sync_wait_failed", blocked
-
-    # act_end / gate scoring only after wait_for_png_on_disk succeeded (hard gate).
-    act_end = time.time()
-    entry = _finalize_still_entry(
-        cam_label,
-        path,
-        methods,
-        since=wait_since_mtime,
-        resolved_on_disk=found,
-        act_end=act_end,
-    )
-    if not entry.get("counts_toward_gate"):
-        blocked.append("one_cam_still_not_stable_in_act_window")
-        stamp = common.stamp_file_artifact(path)
-        blocked.append(f"settle_polled_path:{cam_label}:{json.dumps(stamp, default=str)}")
-    _log(
-        "one-cam sync capture complete",
-        {
-            "path": path,
-            "act_end": act_end,
-            "counts_toward_gate": entry.get("counts_toward_gate"),
-            "bytes": entry.get("bytes"),
-        },
-    )
-    return [entry], act_start, act_end, None, blocked
+    _log("one-cam Phase A fire+stamp+return", stamp)
+    driver_err = fire_error if not ok else None
+    return [entry], act_start, None, driver_err, blocked, stamp
 
 
 def _load_capture_viewport():
@@ -1927,10 +1950,11 @@ def _write_stills_manifest(
     *,
     act_since: Optional[float] = None,
     act_end: Optional[float] = None,
+    cap001_phase_a: Optional[dict[str, Any]] = None,
 ) -> str:
     stills_dir = _ps_c_stills_dir_abs()
     rows = entries
-    if act_since is not None:
+    if act_since is not None and cap001_phase_a is None:
         rows = _reconcile_still_entries_from_disk(
             entries, act_since, stills_dir, act_end=act_end
         )
@@ -1962,6 +1986,10 @@ def _write_stills_manifest(
         "resolution": [STILL_RES_X, STILL_RES_Y],
         "stills": rows,
     }
+    if cap001_phase_a is not None:
+        manifest["cap001_settle_after_yield_v1"] = cap001_phase_a
+        manifest["act_fired_at"] = cap001_phase_a.get("act_fired_at")
+        manifest["canonical_still_path_abs"] = cap001_phase_a.get("canonical_still_path_abs")
     manifest_path = os.path.join(stills_dir, "manifest.json")
     with open(manifest_path, "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=2, default=str)
@@ -2057,6 +2085,7 @@ def _build_ps_c_gate(
     stills_disk_audit: Optional[dict[str, Any]] = None,
     prove_mode: str = "full",
     one_cam_label: Optional[str] = None,
+    cap001_phase_a: Optional[dict[str, Any]] = None,
 ) -> dict[str, Any]:
     stills_required = len(_still_labels())
     one_cam_bite = prove_mode == "one_cam"
@@ -2092,7 +2121,15 @@ def _build_ps_c_gate(
         and gate_count_matches_disk
         and (one_cam_bite or metrics_ok)
     )
-    if not ready_for_ps_d and not stills_in_progress:
+    cap001_phase_a_pending = (
+        one_cam_bite
+        and cap001_phase_a is not None
+        and bool(cap001_phase_a.get("fire_ok"))
+    )
+    if cap001_phase_a_pending:
+        blocked = list(blocked) + ["cap001_phase_b_settle_pending_after_mcp_yield"]
+
+    if not ready_for_ps_d and not stills_in_progress and not cap001_phase_a_pending:
         if metrics is None and not one_cam_bite:
             blocked = list(blocked) + ["metrics_not_written"]
         if stills_present < stills_required:
@@ -2144,6 +2181,10 @@ def _build_ps_c_gate(
     if one_cam_bite:
         gate["one_cam_bite_pass"] = ready_for_ps_d
         gate["one_cam_stills_required_count"] = stills_required
+    if cap001_phase_a is not None:
+        gate["cap001_settle_after_yield_v1"] = cap001_phase_a
+        gate["act_fired_at"] = cap001_phase_a.get("act_fired_at")
+        gate["canonical_still_path_abs"] = cap001_phase_a.get("canonical_still_path_abs")
     if driver_error:
         gate["stills_driver_error"] = driver_error
     return gate
@@ -2271,6 +2312,7 @@ def prove_ps_placement(
     stills_act_settled_at: Optional[float] = None
     stills_disk_audit: Optional[dict[str, Any]] = None
     stills_dir = _ps_c_stills_dir_abs()
+    cap001_phase_a: Optional[dict[str, Any]] = None
 
     if skip_stills:
         blocked.append("stills_skipped_by_flag")
@@ -2282,7 +2324,8 @@ def prove_ps_placement(
             stills_act_settled_at,
             driver_error,
             cap_blocked,
-        ) = _ps_c_one_cam_sync_capture_still(world, bite_label, stills_dir)
+            cap001_phase_a,
+        ) = _ps_c_one_cam_phase_a_fire_and_return(world, bite_label, stills_dir)
         blocked.extend(cap_blocked)
         if driver_error:
             blocked.append(f"stills_driver_failed:{driver_error}")
@@ -2291,6 +2334,7 @@ def prove_ps_placement(
             stills_dir,
             act_since=stills_act_started_at,
             act_end=stills_act_settled_at,
+            cap001_phase_a=cap001_phase_a,
         )
         stills_disk_audit = _audit_ps_stills_disk(
             stills_dir, stills_act_started_at, stills_act_settled_at
@@ -2379,6 +2423,7 @@ def prove_ps_placement(
         stills_disk_audit=stills_disk_audit,
         prove_mode=prove_mode,
         one_cam_label=one_cam_active if isinstance(one_cam_active, str) else None,
+        cap001_phase_a=cap001_phase_a,
     )
     gate["gate_written_at"] = time.time()
     _write_ps_c_gate_file(gate)
@@ -2405,6 +2450,9 @@ def main() -> None:
                 "prove_mode": gate.get("prove_mode"),
                 "one_cam_label": gate.get("one_cam_label"),
                 "one_cam_bite_pass": gate.get("one_cam_bite_pass"),
+                "act_fired_at": gate.get("act_fired_at"),
+                "canonical_still_path_abs": gate.get("canonical_still_path_abs"),
+                "cap001_settle_after_yield_v1": gate.get("cap001_settle_after_yield_v1"),
                 "stills_present_count": gate.get("stills_present_count"),
                 "stills_required_count": gate.get("stills_required_count"),
                 "stills_in_progress": gate.get("stills_in_progress"),
