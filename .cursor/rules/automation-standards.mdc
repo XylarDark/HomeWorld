@@ -85,3 +85,7 @@ When programming automation that drives or configures **Editor or engine feature
    When upgrading the engine or a plugin (e.g. UE 5.7 → 5.8, or UnrealMCP update), re-run the access check for affected features and update AUTOMATION_GAPS and KNOWN_ERRORS so we do not assume old limitations remain or that previously working properties still exist.
 
 **Worked example:** PCG — use Python/MCP where possible; use GUI automation (e.g. `pcg_apply_manual_steps.py`, reference images) where the API does not expose a setting. If a step still cannot be automated, append to `docs/AUTOMATION_GAPS.md` with a suggested approach (e.g. new ref image, different UI flow) for a future session to implement.
+
+## Portable harness (DevHarness upstream)
+
+This rule is **HomeWorld-canonical** for UE Editor automation (GUI default, AUTOMATION_GAPS, PA-E). Stack-agnostic prove/capture habits: [docs/guides/automation-harness.md](../../docs/guides/automation-harness.md). Opt-in mirror: [.agents/skills-extras/automation-standards/SKILL.md](../../.agents/skills-extras/automation-standards/SKILL.md) (synced from DevEnvTemplate pin).

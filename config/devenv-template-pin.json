@@ -2,14 +2,14 @@
   "path": "DevEnvTemplate",
   "remote": "https://github.com/XylarDark/DevEnvTemplate.git",
   "branch": "master",
-  "sha": "0eafcfba2dbb431493078d9d47fcc1ed5ad45d7a",
-  "shortSha": "0eafcfb",
+  "sha": "8be41708e3c1c0bf0b64b6bd4ba9b268d82a7bf0",
+  "shortSha": "8be4170",
   "docPaths": [
     "docs/Setup/CURSOR_DEV.md",
     "Docs/13b_HR2_B_COLD_CLONE.md"
   ],
   "hr2Phase": "HR2-B",
-  "updated": "2026-09-19",
+  "updated": "2026-09-23",
   "productName": "DevHarness",
-  "note": "Product rebranded DevHarness; vendored path remains DevEnvTemplate/. Taste Gates PR #31; Taste Profiler PR #32."
+  "note": "DevHarness PR #33 — portable harness practices (automation-harness guide, extras skills)."
 }

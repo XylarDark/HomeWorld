@@ -24,11 +24,11 @@ Pinned checkout: [DevEnvTemplate/](../../DevEnvTemplate/) **gitlink** — bumped
 
 | Field | Value |
 |-------|-------|
-| **Pinned SHA** | `0eafcfba2dbb431493078d9d47fcc1ed5ad45d7a` |
+| **Pinned SHA** | `8be41708e3c1c0bf0b64b6bd4ba9b268d82a7bf0` |
 | **Canonical registry** | [config/devenv-template-pin.json](../../config/devenv-template-pin.json) — CI reads this; update with CURSOR_DEV when bumping pin |
 | **Remote** | `https://github.com/XylarDark/DevEnvTemplate.git` |
 | **Template branch** | `master` (not `main`) |
-| **HR-B2 delta** | Multi-agent swarm guide + extras skill (+2 commits from `213673f`) |
+| **HR-B2 delta** | PR #33 portable harness practices (`8be4170`; automation-harness guide + extras skills) |
 | **Doctor policy** | [DOCTOR_POLICY.md](DOCTOR_POLICY.md) — accepted declines for UE game host |
 | **HR2-B handoff** | [Docs/13b_HR2_B_COLD_CLONE.md](../../Docs/13b_HR2_B_COLD_CLONE.md) — cold-clone runbook + CI guard |
 

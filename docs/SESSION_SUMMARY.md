@@ -903,3 +903,9 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 - **KNOWN_ERRORS:** relocate + ray hit ≠ visual PASS; possessable CAM_* + stale sequence Transform ≠ Arrange pose.
 - **PR:** #174 `cursor/pa-e-camera-pose-framing-0534` (DESKTOP re-prove MRQ after merge).
 
+## 2026-09-23 — DevHarness pin 8be4170 (cloud)
+
+- Bump `DevEnvTemplate` to **`8be41708e3c1c0bf0b64b6bd4ba9b268d82a7bf0`** (DevHarness PR #33 harness practices).
+- Pin registry + CURSOR_DEV + HR2-B canonical table; `automation-harness` guide + extras skills; host `automation-standards.mdc` cross-link only.
+- PR: `cursor/bump-devharness-pin-8be4170-80e0` (draft).
+

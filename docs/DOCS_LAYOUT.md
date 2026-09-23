@@ -68,6 +68,7 @@ Template MCP hygiene and plan-integration (layer sync). HomeWorld MCP install st
 |------|--------|
 | [guides/mcp-hygiene.md](guides/mcp-hygiene.md) | Treat `.cursor/mcp.json` as a production change. |
 | [guides/cursor-plan-integration.md](guides/cursor-plan-integration.md) | Plan mode with Human Use ownership. |
+| [guides/automation-harness.md](guides/automation-harness.md) | Portable prove/capture harness (DevHarness PR #33; host UE policy in `.cursor/rules/automation-standards.mdc`). |
 
 ### operational/
 
