@@ -122,6 +122,11 @@ def _find_actor_label(label: str):
     return None
 
 
+def _still_cam_labels_missing() -> list[str]:
+    """Prove still labels that must exist after PS-B Arrange (inventory gate)."""
+    return [lbl for lbl in STILL_CAM_LABELS if _find_actor_label(lbl) is None]
+
+
 def _actor_aabb(actor) -> Optional[dict[str, list[float]]]:
     try:
         origin, extent = actor.get_actor_bounds(False)
@@ -242,13 +247,21 @@ def _ensure_arrange_gate() -> tuple[dict[str, Any], list[str]]:
     blocked: list[str] = []
     gate_path = _project_saved_path("ps_arrange_gate.json")
     gate = _load_json(gate_path)
-    if gate and gate.get("ready_for_ps_c"):
+    missing_cams = _still_cam_labels_missing()
+    if gate and gate.get("ready_for_ps_c") and not missing_cams:
         gate["read_from"] = gate_path
         return gate, blocked
 
+    if gate and gate.get("ready_for_ps_c") and missing_cams:
+        _log(
+            "stale ps_arrange_gate ready but prove cameras missing; re-running arrange",
+            {"missing": missing_cams},
+        )
+        blocked.append(f"stale_arrange_gate_missing_cams:{','.join(missing_cams)}")
+
     if gate and not gate.get("ready_for_ps_c"):
         blocked.append("ps_arrange_gate_not_ready")
-    else:
+    elif not gate:
         blocked.append("ps_arrange_gate_missing")
 
     if ps_arrange is None:
@@ -869,7 +882,19 @@ def _reconcile_still_entries_from_disk(
         ent = dict(by_label.get(label) or {"camera_label": label, "path": path, "methods": []})
         ent["path"] = path
         since = float(ent.get("capture_since") or act_since)
-        if _ps_still_fresh_on_disk(path, since):
+        resolved = _find_fresh_ps_still_path(path, since)
+        if resolved and resolved != path:
+            methods = list(ent.get("methods") or [])
+            if f"reconcile_copy:{resolved}" not in methods:
+                methods.append(f"reconcile_copy:{resolved}")
+            ent = _finalize_still_entry(
+                label,
+                path,
+                methods,
+                since=since,
+                resolved_on_disk=resolved,
+            )
+        elif _ps_still_fresh_on_disk(path, since):
             methods = list(ent.get("methods") or [])
             ent = _finalize_still_entry(
                 label,
@@ -880,6 +905,13 @@ def _reconcile_still_entries_from_disk(
             )
         else:
             ent["file_exists"] = os.path.isfile(path)
+            ent["exists"] = ent["file_exists"]
+            if ent["file_exists"]:
+                try:
+                    ent["bytes"] = os.path.getsize(path)
+                    ent["file_mtime"] = os.path.getmtime(path)
+                except OSError:
+                    pass
             ent["fresh_this_act"] = False
             ent["counts_toward_gate"] = False
             if ent.get("file_exists") and not _mtime_at_least(path, since):
@@ -889,6 +921,7 @@ def _reconcile_still_entries_from_disk(
                 ent.setdefault("capture_outcome", OUTCOME_SOFT)
                 ent.setdefault("note", "png_missing_black_or_path_soft_fail")
         ent["counts_toward_gate"] = bool(ent.get("fresh_this_act"))
+        ent["exists"] = bool(ent.get("file_exists"))
         reconciled.append(ent)
     return reconciled
 
@@ -1232,7 +1265,12 @@ class _PsCStillsOrchestrator:
     def _finish_all(self) -> None:
         if self.phase == _PsCStillsPhase.DONE:
             return
-        self._manifest_path = _write_stills_manifest(self.entries, self.stills_dir)
+        self.entries = _reconcile_still_entries_from_disk(
+            list(self.entries), self._act_started_at, self.stills_dir
+        )
+        self._manifest_path = _write_stills_manifest(
+            self.entries, self.stills_dir, act_since=self._act_started_at
+        )
         self._unregister_tick()
         self.phase = _PsCStillsPhase.DISARM
         self._disarm_keep_alive()
@@ -1344,6 +1382,7 @@ def _finalize_still_entry(
     since: float,
     resolved_on_disk: Optional[str],
 ) -> dict[str, Any]:
+    filepath = common.abs_path(filepath)
     entry: dict[str, Any] = {"camera_label": cam_label, "path": filepath, "methods": methods}
     entry["capture_path"] = (
         "slate_pretick capture_viewport HighResShot abs + AutomationLibrary abs "
@@ -1365,6 +1404,7 @@ def _finalize_still_entry(
                 methods.append(f"pa_e_mrq_fallback_copy:{copied}")
     entry["methods"] = methods
     entry["file_exists"] = os.path.isfile(filepath)
+    entry["exists"] = entry["file_exists"]
     if not entry["file_exists"]:
         entry["capture_outcome"] = OUTCOME_SOFT
         entry["note"] = "png_missing_black_or_path_soft_fail"
@@ -1401,7 +1441,29 @@ def _finalize_still_entry(
     return entry
 
 
-def _write_stills_manifest(entries: list[dict[str, Any]], stills_dir: str) -> str:
+def _write_stills_manifest(
+    entries: list[dict[str, Any]],
+    stills_dir: str,
+    *,
+    act_since: Optional[float] = None,
+) -> str:
+    stills_dir = common.abs_path(stills_dir)
+    rows = entries
+    if act_since is not None:
+        rows = _reconcile_still_entries_from_disk(entries, act_since, stills_dir)
+    for ent in rows:
+        path = common.abs_path(str(ent.get("path") or ""))
+        if path:
+            ent["path"] = path
+            on_disk = os.path.isfile(path)
+            ent["file_exists"] = on_disk
+            ent["exists"] = on_disk
+            if on_disk:
+                try:
+                    ent["bytes"] = os.path.getsize(path)
+                    ent["file_mtime"] = os.path.getmtime(path)
+                except OSError:
+                    pass
     manifest = {
         "version": 1,
         "generated_at_iso": datetime.now(timezone.utc).isoformat(),
@@ -1411,7 +1473,7 @@ def _write_stills_manifest(entries: list[dict[str, Any]], stills_dir: str) -> st
         ),
         "wait_mechanism": PS_C_SLATE_MECHANISM,
         "resolution": [STILL_RES_X, STILL_RES_Y],
-        "stills": entries,
+        "stills": rows,
     }
     manifest_path = os.path.join(stills_dir, "manifest.json")
     with open(manifest_path, "w", encoding="utf-8") as f:
@@ -1710,7 +1772,9 @@ def prove_ps_placement(*, skip_stills: bool = False) -> dict[str, Any]:
                 still_entries = _reconcile_still_entries_from_disk(
                     list(orch.entries), stills_act_started_at, stills_dir
                 )
-                manifest_path = _write_stills_manifest(still_entries, stills_dir)
+                manifest_path = _write_stills_manifest(
+                    still_entries, stills_dir, act_since=stills_act_started_at
+                )
                 stills_disk_audit = _audit_ps_stills_disk(stills_dir, stills_act_started_at)
                 driver_error = orch._driver_error
                 if not completed:
