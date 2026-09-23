@@ -2531,6 +2531,8 @@ def prove_ps_placement(
         cap001_phase_b: Optional[dict[str, Any]] = None
         if _cap001_env_phase_b_absorb_only():
             cap001_phase_a = _cap001_load_phase_a_from_saved_gate()
+            if cap001_phase_a is None:
+                blocked.append("cap001_phase_b_absorb_missing_phase_a_gate")
             still_entries = _cap001_load_still_entries_from_manifest()
             stills_act_started_at = None
             manifest_existing = _cap001_load_json_sidecar(
