@@ -1,3 +1,7 @@
+## 2026-09-23 — PS-C-CAP-001 absolute ps_stills paths (cloud, rung-1)
+
+- **Ticket PS-C-CAP-001:** HighResShot ladder **Bad input** when dest was basename/cwd-relative → orphan PNG, **0/7** gate. **Fix:** `capture_viewport._ensure_abs_dest`; `ps_placement_prove._resolve_still_path` + AL path guard under **`Saved/ps_stills/`**; KNOWN_ERRORS Cause→Avoid. Draft PR — DESKTOP re-prove `CAM_CabinClose` + full `ps_placement_prove.py`.
+
 ## 2026-09-23 — UE_BIBLE anti-ladder hard rules (cloud)
 
 - **Docs-only:** [UE_BIBLE.md](../Docs/UE_BIBLE.md) §2b — Conductor/Lead harness locks (one repro before ladder PR, no third ladder, one Fix per root cause); Cause→Avoid table; HighResShot freeze + MRQ pointer. [PDF_CYCLE.md](../swarm/PDF_CYCLE.md) Host Pulse one-liner. Branch `cursor/ue-bible-anti-ladder-b3a5` — draft PR, not merged.

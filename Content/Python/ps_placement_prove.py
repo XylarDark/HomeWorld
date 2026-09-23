@@ -693,8 +693,10 @@ def _pilot_camera(cam) -> None:
 
 
 def _resolve_still_path(stills_dir: str, cam_label: str) -> str:
+    """Absolute path under {Project}/Saved/ps_stills/ (never basename-only / engine CWD)."""
     safe = cam_label.replace("/", "_")
-    return os.path.join(stills_dir, f"{safe}.png")
+    base = common.abs_path(stills_dir)
+    return common.abs_path(os.path.join(base, f"{safe}.png"))
 
 
 def _mtime_at_least(path: str, since: float) -> bool:
@@ -950,7 +952,7 @@ class _PsCStillsOrchestrator:
         gate_context: dict[str, Any],
     ) -> None:
         self.world = world
-        self.stills_dir = stills_dir
+        self.stills_dir = common.abs_path(stills_dir)
         self.gate_context = gate_context
         self.phase = _PsCStillsPhase.IDLE
         self.shot_index = 0
@@ -1420,7 +1422,11 @@ def _write_stills_manifest(entries: list[dict[str, Any]], stills_dir: str) -> st
 def _automation_abs_screenshot(filepath: str, cam) -> tuple[bool, list[str], Any]:
     """Absolute-path AutomationLibrary (PL-D / capture_shotlist_viewport pattern)."""
     methods: list[str] = []
-    ue_path = os.path.abspath(filepath).replace("\\", "/")
+    ue_path = common.abs_path(filepath).replace("\\", "/")
+    if "/Saved/ps_stills/" not in ue_path.replace("\\", "/"):
+        ue_path = common.abs_path(
+            os.path.join(common.project_dir(), "Saved", "ps_stills", os.path.basename(filepath))
+        ).replace("\\", "/")
     delay = 0.35
     attempts = (
         ("abs_kwargs_force_gv", lambda: unreal.AutomationLibrary.take_high_res_screenshot(
