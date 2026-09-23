@@ -104,7 +104,7 @@ Tool-agnostic external heartbeat for pending Acts. Spec: [Docs/handoffs/HOST_PUL
 
 Product `soft_fail`/`closed_fail` remain Test-owned and apply only after Act. No `APPROVE *` for pulse. **Primary MVP:** Conductor **5m** pulse (direct re-check). Optional DESKTOP helper → `Saved/host_pulse.json` is nice-to-have, not mandatory. **Mid-Act DESKTOP stall:** hard recovery budgets in [HOST_PULSE.md § DESKTOP stall protocol](../Docs/handoffs/HOST_PULSE.md#desktop-stall-protocol-conductor-owned) (Conductor-owned; one recover cycle, ≤10 min before Lead). **Console-kill** (Lead closes attached UE log console) → **`blocked`**, not product fail — [HOST_PULSE.md § Console-kill](../Docs/handoffs/HOST_PULSE.md#console-kill-log-window-closes-ue).
 
-**UE prove one-shot:** [Docs/UE_BIBLE.md](../Docs/UE_BIBLE.md) — HomeWorld DESKTOP/MCP do/don’t (logging, stall budgets, PS-C lessons, cheap-iterate locks); not a generic Unreal wiki.
+**UE prove one-shot:** [Docs/UE_BIBLE.md](../Docs/UE_BIBLE.md) — HomeWorld DESKTOP/MCP do/don’t (logging, stall budgets, PS-C lessons, cheap-iterate locks); not a generic Unreal wiki. **Anti-ladder hard rules:** [UE_BIBLE §2b](../Docs/UE_BIBLE.md#2b-anti-ladder-harness-hard-rules) (Conductor/Lead — one repro before ladder PR; no third ladder).
 
 ---
 

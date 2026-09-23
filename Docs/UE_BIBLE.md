@@ -32,6 +32,35 @@ HomeWorld prove runs on **DESKTOP** via **warm Editor + MCP (55557)** and `execu
 
 ---
 
+## 2b. Anti-ladder (harness hard rules)
+
+**Conductor / Lead company lock** — when a mid-Act harness path fails, do not stack wait/retry/console/MRQ variants in parallel PRs.
+
+| # | Rule |
+|---|------|
+| 1 | **Mid-Act fail** → exactly **one** Epic 5.8 + forums/docs pass and **one-cam** minimal repro (single shot / single Act) **before** any new wait, retry, or ladder PR. |
+| 2 | **Second fail on the same writer** (same script + same failure class) → **stop**; pick an alternate **proven** path or **park** (Lead gate) — **no third ladder**. |
+| 3 | Conductor opens at most **one Fix ticket per root cause**; no parallel cloud thrash on the same defect. |
+
+**Tied locks (do not re-litigate here):**
+
+| Lock | Pointer |
+|------|---------|
+| Docs / forums first | §2 **before brute force**; [CAPTURE_REDUNDANCY.md](../docs/Automation/CAPTURE_REDUNDANCY.md) § Docs-first |
+| Keep UE warm | §3 **Keep editor up**; §3b cheap iterate |
+| **HighResShot under MCP** (blocking wait / empty PNG) | Known hole — **freeze** new HighResShot/console wait ladders; Slate pretick + proven AL path per [KNOWN_ERRORS.md](../docs/KNOWN_ERRORS.md) PA-E rows |
+| **MRQ one-frame** | Product bet **after** capture ladders stop — rung-1 option in CAPTURE_REDUNDANCY; **no** new Implement scope without Lead gate |
+
+| Cause | Avoid |
+|-------|--------|
+| First DESKTOP miss on capture/MCP | New 330s wait PR before one doc pass + one-cam repro |
+| Same script fails twice with same symptom | Third console form / fourth cloud Fix PR |
+| Multiple cloud agents on one root cause | Parallel “try harder” merges — one Fix owner |
+| HighResShot ladder exhausted | More HighResShot variants — freeze; pretick/MRQ per locked pointers |
+| MRQ still failing mid-ladder stack | MRQ plugin/graph invent while HighResShot ladder still open — park or finish ladder policy first |
+
+---
+
 ## 3. Keep editor up
 
 | Prefer | Avoid |
