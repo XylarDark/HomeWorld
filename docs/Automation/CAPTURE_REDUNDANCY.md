@@ -2,6 +2,8 @@
 
 **Canonical doc (filename legacy: `CAPTURE_REDUNDANCY.md`):** Lead policy for **any** automation / tooling gap — console and Editor Python APIs, PIE harnesses, GUI automation, MCP extensions, host utilities, builds, commandlets, wait/retry logic. **Not** scoped to screenshots or shotlist; those are one **instance** below.
 
+**Procedure-agnostic evidence protocol (universal):** § [Procedure-agnostic evidence protocol](#procedure-agnostic-evidence-protocol-lead-lock-in-2026-09-23) — **track-agnostic** rules for the HomeWorld Co **bot-company dev workflow** (Design → Implement → Test → Fix lanes on **any** track: PS, PA-E, PIE harnesses, future work). Capture inherits; it does not own setup truth. Lane ops companion (not this protocol’s name): [PDF_CYCLE.md](../../swarm/PDF_CYCLE.md).
+
 **Canonical gap log:** [AUTOMATION_GAPS.md](AUTOMATION_GAPS.md) · **Instance (shotlist / PA-E):** § [Shotlist / PA-E capture](#shotlist--pa-e-capture-instance).
 
 **Cursor rule mirror:** [.cursor/rules/automation-standards.mdc](../../.cursor/rules/automation-standards.mdc).
@@ -13,6 +15,74 @@
 Apply in order **before** escalating rungs or asking Lead open-ended “does anyone else hit this?”
 
 **KNOWN_ERROR_LOG:** [automation-standards.mdc](../../.cursor/rules/automation-standards.mdc) v1.10 § KNOWN_ERROR_LOG; bullets in [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) § PA-E DESKTOP prove misses.
+
+## Procedure-agnostic evidence protocol (Lead lock-in, 2026-09-23)
+
+**Scope:** **Track-agnostic** criteria for how the dev team runs **any** product track — not capture-only, not a single product codename. In the **Design → Implement → Test → Fix** lanes, **Test** (and Conductor on DESKTOP) score evidence using these rules whenever an **Act** step writes artifacts (screenshots, JSON metrics, logs, CI reports). Examples: Placement Stills (PS), PA-E, PIE harnesses. **Design** handoffs cite this section and map local DONE-WHEN / Arrange gates — they do not fork policy.
+
+### 1. Pre-evidence DONE-WHEN (blocks Act)
+
+Before **any** Act or artifact run, required **labels / actor ids / paths** must be a **subset** of:
+
+- the track **Design inventory** (handoff tables, metric IDs, camera labels), **and**
+- what **Arrange** (or equivalent setup gate) has **placed or verified in the loaded world**.
+
+If the intersection is incomplete → **do not Act** (no capture, no metric sweep, no “discovery” pass). Fix upstream:
+
+- **Design** patches inventory / DONE-WHEN, **or**
+- **Arrange** places or relocates actors, aim, lighting/TOD, tool readiness.
+
+**Forbidden:** Inferring missing actors, wrong level paths, or void aim from empty PNGs, zero counts, or proxy geometry invented inside the Act script.
+
+### 2. Artifacts confirm; they do not discover
+
+**Setup math lives in Design + Arrange first:**
+
+| Concern | Owned by (before Act) | Act may only |
+|---------|------------------------|--------------|
+| Pose / look-at / camera pilot | Arrange gate + Design DONE-WHEN | Confirm ray hits, centroids, labels resolved |
+| Bounds / AABB / dress envelope | Design schema + Arrange `*_bounds.json` | Assert metrics against frozen bounds |
+| Lighting / TOD / view mode / preset tune | Design intent + Arrange | Record phase/commands; luminance confirms lit stack |
+| Tool readiness (MRQ, plugins, paths) | Arrange preflight | Write artifacts; fail closed only if setup was ready |
+
+Screenshots, logs, and JSON reports **confirm** that Arrange-ready world state; they **must not** be the first place the pipeline learns inventory or aim.
+
+### 3. Score on real signals (automation)
+
+Automation **pass / soft_fail / closed_fail** must use **observable signals in the Act window**, for example:
+
+- File **mtime + byte size** within the prove window (not `exists` alone).
+- **Metric values** (UU deltas, overlap, luminance, center-crop fractions) against Design thresholds.
+- Gate JSON flags (`inventory_ok`, `aim_ok`, `ready_for_ps_c`, …) stamped **before** Act when the track defines them.
+
+**Not sufficient as closed_fail:**
+
+- **`exists` alone** on an output path.
+- **Near-black / empty frame** when Arrange reported setup-ready — use **`soft_fail`** and loop setup (lighting, view mode, path, buffer), not **`closed_fail`** without setup evidence.
+- **Taste, hero framing, mood, benchmark match** — **Lead `APPROVE-*` gate only** (e.g. PS-D, PA-E visual framing stamp). Automation must not emit **`closed_fail`** for eyeball-only gaps.
+
+### 4. One Fix root after research
+
+When Act fails with evidence after Arrange was ready:
+
+1. **Repo docs** — this protocol, track handoff, [KNOWN_ERRORS.md](../KNOWN_ERRORS.md).
+2. **Proven Epic / forum / industry pattern** — [Docs-first](#docs-first-lead-policy-2026-09-22) + [Proven-results first](#proven-results-first-lead-policy-2026-09-22) + [Research on dead-ends](#research-on-dead-ends-lead-policy-2026-09-22).
+3. **One Fix** — single root-cause change in the same PR window when possible.
+
+**Default anti-patterns:** DESKTOP **thrash ladders** (multi-form console hunts, long blocking main-thread waits, repeated unparked re-proves without a hypothesis). **Over-park** (deferring with “run again later”) without logging gap research. Escalate rung 2/3 only per global ladder below.
+
+### Outcomes vocabulary (procedure-agnostic)
+
+| Situation | Automation outcome |
+|-----------|----------------------|
+| Missing inventory actor, missing world label, wrong path/level **after** setup was declared ready | **`closed_fail`** or **block Act** (fix Design or Arrange — not Act discovery) |
+| Dark / empty artifact **with file on disk** when Arrange/setup was ready | **`soft_fail`** — fix lighting/TOD/view/capture path |
+| Wrong metric vs threshold with valid traces | **`soft_fail`** or **`closed_fail`** per track table (physics vs data bug) |
+| Aim / framing / taste / benchmark mood | **Lead gate only** — not automation **`closed_fail`** |
+
+Track-specific mapping examples: [PS_A_INVENTORY.md](../../Docs/handoffs/PS_A_INVENTORY.md) § Protocol · [PS_C_METRICS.md](../../Docs/handoffs/PS_C_METRICS.md) § Protocol · PA-E § [P0 Arrange gate](#p0-arrange-gate-blocks-capture--2026-09-22) + [DESKTOP prove bar](#desktop-prove-bar-non-negotiable).
+
+---
 
 ### Testing preconditions (Lead lock-in — **all** automation, not capture-only)
 

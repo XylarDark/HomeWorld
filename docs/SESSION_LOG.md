@@ -9456,3 +9456,11 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 **Pending:** DESKTOP re-prove MRQ/arrange gate (`pose_source: homestead_bounds_relocate`, no Cliff in `aim_bounds_labels_sample`).
 
 **Errors:** None (py_compile OK).
+
+## 2026-09-23 — Procedure-agnostic evidence protocol (docs-only, cloud)
+
+**Completed:** Baked track-agnostic team workflow protocol into CAPTURE_REDUNDANCY.md; PS-A/PS-C handoff § Protocol; Docs/33 harness pointer; DOCS_LAYOUT blurb. Lead ask: not PDF-named protocol — bot-company Design→Implement→Test→Fix on any track.
+
+**Remaining:** Merge PR; no DESKTOP/code changes.
+
+**Errors:** None.

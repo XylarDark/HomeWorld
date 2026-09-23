@@ -61,6 +61,7 @@ Build a **systematic testing-stills suite** so homestead kit placement on VS_MVP
 
 | Practice | Source |
 |----------|--------|
+| **Procedure-agnostic evidence protocol** | [docs/Automation/CAPTURE_REDUNDANCY.md](../docs/Automation/CAPTURE_REDUNDANCY.md) § Procedure-agnostic — team workflow rules (Design→Test→Fix); pre-evidence DONE-WHEN, confirm-not-discover, real-signal scoring, one Fix; **Test scores any track** against it |
 | **Arrange before Act** | [docs/Automation/HARNESS_ARRANGE_TASKLIST.md](../docs/Automation/HARNESS_ARRANGE_TASKLIST.md) · `arrange_pa_e_shotlist()` pattern in [pa_e_shotlist_common.py](../Content/Python/pa_e_shotlist_common.py) |
 | **Three-state outcomes** | `pass` / `soft_fail` / `closed_fail` — [docs/Automation/CAPTURE_REDUNDANCY.md](../docs/Automation/CAPTURE_REDUNDANCY.md) |
 | **Docs-first / proven-results / gated SCOUT** | [docs/Automation/automation-standards.mdc](../.cursor/rules/automation-standards.mdc) (via CAPTURE_REDUNDANCY ladder) |
