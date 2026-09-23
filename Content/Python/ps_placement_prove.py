@@ -1550,14 +1550,55 @@ def _cap001_shot2_for_cabin_close() -> Optional[dict[str, Any]]:
     return common._shot_def("shot2")  # type: ignore[attr-defined]
 
 
+def _cap001_cabin_aim_bounds_centroid() -> Optional[list[float]]:
+    inv = common.inventory_homestead_in_level("shot2")
+    bounds = (
+        inv.get("aim_bounds")
+        or inv.get("framing_bounds")
+        or inv.get("homestead_bounds")
+    )
+    if bounds and bounds.get("centroid"):
+        return list(bounds["centroid"])
+    return None
+
+
 def _cap001_prepare_one_cam_lit_aim_before_fire(
     cam,
     cam_label: str,
 ) -> tuple[list[str], list[str], dict[str, Any]]:
-    """Lit + game view, PA-E shot2 cabin aim, loading finish, slate warm (pre-AL)."""
-    methods: list[str] = [CAP001_DARK_STILL_LIT_AIM_V1]
+    """Night stack + exposure, then lit/aim/warm (pre-AL one-cam)."""
+    methods: list[str] = [
+        CAP001_DARK_STILL_NIGHT_STACK_V2,
+        CAP001_DARK_STILL_LIT_AIM_V1,
+    ]
     blocked: list[str] = []
-    prep_meta: dict[str, Any] = {"camera_label": cam_label}
+    prep_meta: dict[str, Any] = {
+        "camera_label": cam_label,
+        "has_v2": True,
+        CAP001_DARK_STILL_NIGHT_STACK_V2: True,
+    }
+
+    homestead_centroid = _cap001_cabin_aim_bounds_centroid()
+    prep_meta["homestead_centroid"] = homestead_centroid
+    night_env = common.apply_pa_e_homestead_night_environment(
+        LOG_PREFIX,
+        reseed_tmp_fixtures=True,
+        homestead_centroid=homestead_centroid,
+        mrq_pie_shot=False,
+    )
+    prep_meta["night_environment"] = night_env
+    prep_meta["lighting_stack_verify"] = night_env.get("lighting_stack_verify")
+    prep_meta["environment_preconditions_ok"] = night_env.get("environment_preconditions_ok")
+    methods.append("apply_pa_e_homestead_night_environment")
+    if not night_env.get("environment_preconditions_ok"):
+        blocked.append("cap001_night_stack_preconditions_not_ok")
+
+    import vnp_night_tune_and_evidence as vnp
+
+    importlib.reload(vnp)
+    exposure_cvars = vnp.apply_mrq_pie_night_exposure_cvars()
+    prep_meta["exposure_cvars"] = exposure_cvars
+    methods.append("apply_mrq_pie_night_exposure_cvars")
 
     view = common.apply_lit_game_view_for_capture()
     prep_meta["lit_game_view"] = view
