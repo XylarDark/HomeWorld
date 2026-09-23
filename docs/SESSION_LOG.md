@@ -9464,3 +9464,11 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 **Pending:** DESKTOP re-prove one-cam `CAM_CabinClose` + full `execute_python_script("ps_placement_prove.py")` → 7 fresh PNGs, `ready_for_ps_d` true.
 
 **Errors:** None (py_compile OK).
+
+## 2026-09-23 — PS-C manifest reconcile + stale arrange gate (PR #198)
+
+**Completed:** `ps_placement_prove` — disk reconcile before manifest write; `exists` mirrors `file_exists`; stale `ps_arrange_gate` re-runs Arrange when `STILL_CAM_LABELS` missing; removed `MovieRenderPipelineEditor` from `HomeWorld.uproject`; KNOWN_ERRORS rows (manifest race, camera_missing, bogus MRQ editor plugin).
+
+**Pending:** DESKTOP one Act `execute_python_script("ps_placement_prove.py")` after Arrange-ready level — inspect `Saved/ps_c_prove_gate.json` + `Saved/ps_stills/manifest.json` (7 fresh PNGs, no PS_* `camera_missing`).
+
+**Errors:** None (py_compile OK).
