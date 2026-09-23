@@ -125,6 +125,29 @@ When a helper is deployed, it writes this file; Conductor may **read** it instea
 - Notify only on **transition** into `blocked` / `failed` while a pending Act is set.
 - Quiet when `aggregate=healthy`.
 
+## DESKTOP stall protocol (Conductor-owned)
+
+When a **pending Act** on DESKTOP hits Editor/MCP/host failure mid-run — Editor Not Responding, MCP zombie, machine drop, or prove hang / spawn abort with no gate file — Conductor follows this protocol. It does **not** replace the **5m** MVP pulse or the **300s** stall floor; it caps **active recovery** so Conductor does not thrash.
+
+| Budget | Limit |
+|--------|-------|
+| MCP up | ≤ 3 min |
+| Act/script | ≤ 5 min |
+| Recover cycles | **one** only |
+| Total stall before Lead | ≤ 10 min |
+
+**Detect:** Editor `Responding=False` **or** MCP open but no progress **or** host unreachable **or** prove spawn abort with no gate file.
+
+**Recover once:**
+
+1. Kill `UnrealEditor` + `CrashReportClient`
+2. Relaunch **UE 5.8 binary only** (Skip Restore click once if that dialog appears)
+3. Wait MCP ≤3 min → re-run **one** Arrange+Act
+
+**Stop (don’t thrash):** Second hang, MCP dead after relaunch, or host still unreachable → mark **`blocked`**, Windows toast + chat, park the Act. No flag roulette, no 3rd kill, no parallel Fix invent.
+
+**Scoring:** Host/MCP down / mid-Act drop = **`blocked`**, never product `closed_fail`. Product `soft_fail` / `closed_fail` only after Arrange+map OK and Act completed (same as § States).
+
 ## What Design did not invent
 
 - [x] No new product phase / Docs/34 track
