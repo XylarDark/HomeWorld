@@ -94,6 +94,7 @@ PS_C_INTER_SHOT_SETTLE_FRAMES = 8
 PS_C_DRIVE_TIMEOUT_SEC = 300.0
 PS_C_WAIT_RETRY_TICKS = 6
 PS_C_FINAL_DRAIN_SEC = 12.0
+PS_C_GATE_SETTLE_SEC = 120.0
 PS_C_PS_CAM_PREFIX = "PS_"
 PS_C_STABLE_POLLS_REQUIRED = 2
 PS_C_SLATE_MECHANISM = "register_slate_pre_tick_callback"
@@ -272,22 +273,21 @@ def _dress_bounds_from_file() -> tuple[Optional[dict[str, Any]], str]:
     return None, path
 
 
-def _ensure_arrange_gate() -> tuple[dict[str, Any], list[str]]:
-    """Return arrange gate dict; run Arrange if missing or not ready."""
+def _ensure_arrange_gate() -> tuple[dict[str, Any], list[str], bool]:
+    """Return arrange gate, blocked reasons, and whether prove may Act (cameras in level)."""
     blocked: list[str] = []
     gate_path = _project_saved_path("ps_arrange_gate.json")
     gate = _load_json(gate_path)
     missing_cams = _still_cam_labels_missing()
     if gate and gate.get("ready_for_ps_c") and not missing_cams:
         gate["read_from"] = gate_path
-        return gate, blocked
+        return gate, blocked, True
 
     if gate and gate.get("ready_for_ps_c") and missing_cams:
         _log(
-            "stale ps_arrange_gate ready but prove cameras missing; re-running arrange",
+            "stale ps_arrange_gate ready but prove cameras missing; re-running arrange_ps_homestead",
             {"missing": missing_cams},
         )
-        blocked.append(f"stale_arrange_gate_missing_cams:{','.join(missing_cams)}")
 
     if gate and not gate.get("ready_for_ps_c"):
         blocked.append("ps_arrange_gate_not_ready")
@@ -296,18 +296,30 @@ def _ensure_arrange_gate() -> tuple[dict[str, Any], list[str]]:
 
     if ps_arrange is None:
         blocked.append("arrange_ps_homestead_import_failed")
-        return gate or {}, blocked
+        return gate or {}, blocked, False
 
-    _log("running arrange_ps_homestead (gate missing or not ready)")
+    _log(
+        "running arrange_ps_homestead.py",
+        {"missing_before": missing_cams, "gate_ready": bool(gate and gate.get("ready_for_ps_c"))},
+    )
     try:
         gate = ps_arrange.arrange_ps_homestead()
     except Exception as e:
         blocked.append(f"arrange_failed:{e}")
-        return gate or {}, blocked
+        return gate or {}, blocked, False
+
+    missing_after = _still_cam_labels_missing()
+    if missing_after:
+        blocked.append(f"inventory_cameras_missing_closed_fail:{','.join(missing_after)}")
+        if not gate.get("ready_for_ps_c"):
+            blocked.append("arrange_still_not_ready_for_ps_c")
+        return gate, blocked, False
 
     if not gate.get("ready_for_ps_c"):
         blocked.append("arrange_still_not_ready_for_ps_c")
-    return gate, blocked
+        return gate, blocked, False
+
+    return gate, blocked, True
 
 
 def _sample_metric_actors() -> tuple[list, dict[str, Any]]:
@@ -749,6 +761,34 @@ def _mtime_at_least(path: str, since: float) -> bool:
         return False
 
 
+def _mtime_in_act_window(path: str, act_start: float, act_end: Optional[float]) -> bool:
+    """True when file mtime is within [act_start, act_end] (inclusive slack)."""
+    path = common.abs_path(path)
+    if not _mtime_at_least(path, act_start):
+        return False
+    if act_end is None:
+        return True
+    try:
+        return os.path.getmtime(path) <= act_end + 0.05
+    except OSError:
+        return False
+
+
+def _ps_still_counts_for_gate(
+    path: str, act_start: float, act_end: Optional[float]
+) -> bool:
+    """Gate truth: on disk, MIN_BYTES, mtime inside Act window (excludes stale + post-settle)."""
+    path = common.abs_path(path)
+    if not os.path.isfile(path):
+        return False
+    try:
+        if os.path.getsize(path) < common.MIN_BYTES:
+            return False
+    except OSError:
+        return False
+    return _mtime_in_act_window(path, act_start, act_end)
+
+
 def _ps_c_engine_search_roots() -> list[str]:
     """Engine Win64 / Saved search roots (PA-E shotlist pattern)."""
     roots: list[str] = []
@@ -851,25 +891,21 @@ def _task_is_done(task: Any) -> Optional[bool]:
         return None
 
 
-def _ps_still_fresh_on_disk(path: str, act_since: float) -> bool:
-    path = common.abs_path(path)
-    if not os.path.isfile(path):
-        return False
-    try:
-        if os.path.getsize(path) < common.MIN_BYTES:
-            return False
-    except OSError:
-        return False
-    return _mtime_at_least(path, act_since)
+def _ps_still_fresh_on_disk(
+    path: str, act_since: float, act_end: Optional[float] = None
+) -> bool:
+    return _ps_still_counts_for_gate(path, act_since, act_end)
 
 
-def _audit_ps_stills_disk(stills_dir: str, act_since: float) -> dict[str, Any]:
-    """Authoritative fresh PNG count for gate (mtime >= capture act, MIN_BYTES)."""
+def _audit_ps_stills_disk(
+    stills_dir: str, act_since: float, act_end: Optional[float] = None
+) -> dict[str, Any]:
+    """Authoritative fresh PNG count for gate (Act window mtime + MIN_BYTES)."""
     per_label: list[dict[str, Any]] = []
     fresh_count = 0
     for label in STILL_CAM_LABELS:
         path = common.abs_path(_resolve_still_path(stills_dir, label))
-        fresh = _ps_still_fresh_on_disk(path, act_since)
+        fresh = _ps_still_fresh_on_disk(path, act_since, act_end)
         mtime: Optional[float] = None
         if os.path.isfile(path):
             try:
@@ -885,6 +921,7 @@ def _audit_ps_stills_disk(stills_dir: str, act_since: float) -> dict[str, Any]:
                 "fresh_this_act": fresh,
                 "file_mtime": mtime,
                 "capture_act_since": act_since,
+                "capture_act_end": act_end,
             }
         )
     return {
@@ -892,6 +929,7 @@ def _audit_ps_stills_disk(stills_dir: str, act_since: float) -> dict[str, Any]:
         "required_count": len(STILL_CAM_LABELS),
         "per_label": per_label,
         "stills_dir": common.abs_path(stills_dir),
+        "capture_act_end": act_end,
     }
 
 
@@ -899,6 +937,8 @@ def _reconcile_still_entries_from_disk(
     entries: list[dict[str, Any]],
     act_since: float,
     stills_dir: str,
+    *,
+    act_end: Optional[float] = None,
 ) -> list[dict[str, Any]]:
     """Align manifest rows with disk truth; never count stale file_exists toward gate."""
     by_label: dict[str, dict[str, Any]] = {}
@@ -923,8 +963,9 @@ def _reconcile_still_entries_from_disk(
                 methods,
                 since=since,
                 resolved_on_disk=resolved,
+                act_end=act_end,
             )
-        elif _ps_still_fresh_on_disk(path, since):
+        elif _ps_still_fresh_on_disk(path, since, act_end):
             methods = list(ent.get("methods") or [])
             ent = _finalize_still_entry(
                 label,
@@ -932,11 +973,15 @@ def _reconcile_still_entries_from_disk(
                 methods,
                 since=since,
                 resolved_on_disk=path,
+                act_end=act_end,
             )
         else:
-            ent["file_exists"] = os.path.isfile(path)
-            ent["exists"] = ent["file_exists"]
-            if ent["file_exists"]:
+            on_disk = os.path.isfile(path)
+            in_window = _ps_still_counts_for_gate(path, since, act_end) if on_disk else False
+            ent["on_disk"] = on_disk
+            ent["file_exists"] = in_window
+            ent["exists"] = in_window
+            if on_disk:
                 try:
                     ent["bytes"] = os.path.getsize(path)
                     ent["file_mtime"] = os.path.getmtime(path)
@@ -944,10 +989,13 @@ def _reconcile_still_entries_from_disk(
                     pass
             ent["fresh_this_act"] = False
             ent["counts_toward_gate"] = False
-            if ent.get("file_exists") and not _mtime_at_least(path, since):
+            if on_disk and not _mtime_at_least(path, since):
                 ent["capture_outcome"] = OUTCOME_SOFT
                 ent["note"] = ent.get("note") or "stale_png_reuse_mtime_before_capture"
-            elif not ent.get("file_exists"):
+            elif on_disk and act_end is not None and not _mtime_in_act_window(path, since, act_end):
+                ent["capture_outcome"] = OUTCOME_SOFT
+                ent["note"] = ent.get("note") or "post_settle_png_landing_excluded_from_gate"
+            elif not on_disk:
                 ent.setdefault("capture_outcome", OUTCOME_SOFT)
                 ent.setdefault("note", "png_missing_black_or_path_soft_fail")
         ent["counts_toward_gate"] = bool(ent.get("fresh_this_act"))
@@ -956,33 +1004,86 @@ def _reconcile_still_entries_from_disk(
     return reconciled
 
 
-def _ps_c_post_drive_final_drain(orch: "_PsCStillsOrchestrator", max_sec: float) -> None:
-    """Late PNG landing — tick pump without sleep (PA-E final_drain pattern)."""
+def _ps_c_pending_tasks_done(orch: "_PsCStillsOrchestrator") -> bool:
+    for task in list(getattr(orch, "_pending_automation_tasks", []) or []):
+        done = _task_is_done(task)
+        if done is False:
+            return False
+    return True
+
+
+def _ps_c_poll_late_still_pngs(orch: "_PsCStillsOrchestrator", act_end: Optional[float]) -> None:
+    """One pass: copy/probe late PNGs into orch.entries (keep slate pump in settle loop)."""
     if orch.phase != _PsCStillsPhase.DONE:
         return
-    deadline = time.time() + max_sec
-    cv = orch._cv or _load_capture_viewport()
     act = orch._act_started_at
+    for idx, label in enumerate(STILL_CAM_LABELS):
+        if idx >= len(orch.entries):
+            break
+        ent = orch.entries[idx]
+        if ent.get("fresh_this_act") and ent.get("counts_toward_gate"):
+            continue
+        path = common.abs_path(ent.get("path") or _resolve_still_path(orch.stills_dir, label))
+        since = float(ent.get("capture_since") or act)
+        found = _find_fresh_ps_still_path(path, since)
+        if found and _ps_still_counts_for_gate(found, since, act_end):
+            orch.entries[idx] = _finalize_still_entry(
+                label,
+                path,
+                list(ent.get("methods") or []),
+                since=since,
+                resolved_on_disk=found,
+                act_end=act_end,
+            )
+
+
+def _ps_c_settle_stills_before_gate(
+    orch: "_PsCStillsOrchestrator",
+    stills_dir: str,
+    act_start: float,
+    max_sec: float,
+) -> tuple[list[dict[str, Any]], float]:
+    """Wait for in-flight AL/console writes; gate must not run until settle completes."""
+    cv = orch._cv or _load_capture_viewport()
+    deadline = time.time() + max_sec
+    stable_polls = 0
+    required = len(STILL_CAM_LABELS)
+    _log(
+        "stills gate settle start",
+        {"max_sec": max_sec, "pending_tasks": len(getattr(orch, "_pending_automation_tasks", []) or [])},
+    )
     while time.time() < deadline:
-        for idx, label in enumerate(STILL_CAM_LABELS):
-            if idx >= len(orch.entries):
-                break
-            ent = orch.entries[idx]
-            if ent.get("fresh_this_act"):
-                continue
-            path = common.abs_path(ent.get("path") or _resolve_still_path(orch.stills_dir, label))
-            since = float(ent.get("capture_since") or act)
-            found = _find_fresh_ps_still_path(path, since)
-            if found:
-                orch.entries[idx] = _finalize_still_entry(
-                    label,
-                    path,
-                    list(ent.get("methods") or []),
-                    since=since,
-                    resolved_on_disk=found,
-                )
+        act_end_probe = time.time()
+        for task in list(getattr(orch, "_pending_automation_tasks", []) or []):
+            _task_is_done(task)
         cv._pump_editor_once()
-        orch._on_slate_pre_tick(0.033)
+        if orch._tick_handle is not None:
+            orch._on_slate_pre_tick(0.033)
+        _ps_c_poll_late_still_pngs(orch, act_end_probe)
+        audit = _audit_ps_stills_disk(stills_dir, act_start, act_end_probe)
+        fresh = int(audit.get("fresh_count", 0))
+        tasks_done = _ps_c_pending_tasks_done(orch)
+        if fresh >= required and tasks_done:
+            stable_polls += 1
+            if stable_polls >= PS_C_STABLE_POLLS_REQUIRED:
+                break
+        else:
+            stable_polls = 0
+    act_end = time.time()
+    orch._unregister_tick()
+    orch._disarm_keep_alive()
+    still_entries = _reconcile_still_entries_from_disk(
+        list(orch.entries), act_start, stills_dir, act_end=act_end
+    )
+    _log(
+        "stills gate settle complete",
+        {
+            "act_end": act_end,
+            "fresh": _audit_ps_stills_disk(stills_dir, act_start, act_end).get("fresh_count"),
+            "tasks_done": _ps_c_pending_tasks_done(orch),
+        },
+    )
+    return still_entries, act_end
 
 
 def _load_capture_viewport():
@@ -1044,6 +1145,11 @@ class _PsCStillsOrchestrator:
         self._ticks_in_wait = 0
         self._act_started_at = 0.0
         self._al_second_round = False
+        self._pending_automation_tasks: list[Any] = []
+
+    def _track_automation_task(self, task: Any) -> None:
+        if task is not None:
+            self._pending_automation_tasks.append(task)
 
     def _uses_ps_placement_cam(self) -> bool:
         return self._cam_label.startswith(PS_C_PS_CAM_PREFIX)
@@ -1214,12 +1320,14 @@ class _PsCStillsOrchestrator:
                 _ok_al, al_methods, task = _automation_abs_screenshot(self._filepath, self._cam)
                 self._methods.extend(al_methods)
                 self._task = task
+                self._track_automation_task(task)
                 self._al_invoked = True
                 self._methods.append("ps_cam:console_then_AutomationLibrary_abs")
         elif not self._al_invoked:
             _ok_al, al_methods, task = _automation_abs_screenshot(self._filepath, self._cam)
             self._methods.extend(al_methods)
             self._task = task
+            self._track_automation_task(task)
             self._al_invoked = True
             self._methods.append("primary:AutomationLibrary_abs")
         else:
@@ -1295,22 +1403,13 @@ class _PsCStillsOrchestrator:
     def _finish_all(self) -> None:
         if self.phase == _PsCStillsPhase.DONE:
             return
-        self.entries = _reconcile_still_entries_from_disk(
-            list(self.entries), self._act_started_at, self.stills_dir
-        )
-        self._manifest_path = _write_stills_manifest(
-            self.entries, self.stills_dir, act_since=self._act_started_at
-        )
-        self._unregister_tick()
-        self.phase = _PsCStillsPhase.DISARM
-        self._disarm_keep_alive()
         self.phase = _PsCStillsPhase.DONE
         _log(
-            "stills driver finished",
+            "stills driver finished pending gate settle",
             {
                 "shots": len(self.entries),
-                "manifest": self._manifest_path,
                 "drive_ticks": self._drive_ticks,
+                "pending_tasks": len(self._pending_automation_tasks),
             },
         )
 
@@ -1411,6 +1510,7 @@ def _finalize_still_entry(
     *,
     since: float,
     resolved_on_disk: Optional[str],
+    act_end: Optional[float] = None,
 ) -> dict[str, Any]:
     filepath = common.abs_path(filepath)
     entry: dict[str, Any] = {"camera_label": cam_label, "path": filepath, "methods": methods}
@@ -1433,26 +1533,38 @@ def _finalize_still_entry(
             if copied:
                 methods.append(f"pa_e_mrq_fallback_copy:{copied}")
     entry["methods"] = methods
-    entry["file_exists"] = os.path.isfile(filepath)
-    entry["exists"] = entry["file_exists"]
-    if not entry["file_exists"]:
+    on_disk = os.path.isfile(filepath)
+    entry["on_disk"] = on_disk
+    if not on_disk:
+        entry["file_exists"] = False
+        entry["exists"] = False
         entry["capture_outcome"] = OUTCOME_SOFT
         entry["note"] = "png_missing_black_or_path_soft_fail"
         entry["counts_toward_gate"] = False
         return entry
     try:
         entry["file_mtime"] = os.path.getmtime(filepath)
+        entry["bytes"] = os.path.getsize(filepath)
     except OSError:
         entry["file_mtime"] = None
-    if not _mtime_at_least(filepath, since):
-        entry["capture_outcome"] = OUTCOME_SOFT
-        entry["note"] = "stale_png_reuse_mtime_before_capture"
+    if not _ps_still_counts_for_gate(filepath, since, act_end):
+        entry["file_exists"] = False
+        entry["exists"] = False
         entry["fresh_this_act"] = False
         entry["counts_toward_gate"] = False
+        if not _mtime_at_least(filepath, since):
+            entry["capture_outcome"] = OUTCOME_SOFT
+            entry["note"] = "stale_png_reuse_mtime_before_capture"
+        elif act_end is not None and not _mtime_in_act_window(filepath, since, act_end):
+            entry["capture_outcome"] = OUTCOME_SOFT
+            entry["note"] = "post_settle_png_landing_excluded_from_gate"
+        else:
+            entry["capture_outcome"] = OUTCOME_SOFT
+            entry["note"] = "file_too_small_or_outside_act_window"
         return entry
-    entry["fresh_this_act"] = True
-    entry["counts_toward_gate"] = True
-    size = os.path.getsize(filepath)
+    entry["file_exists"] = True
+    entry["exists"] = True
+    size = int(entry.get("bytes") or os.path.getsize(filepath))
     entry["bytes"] = size
     lum, lum_src = common.mean_luminance(filepath)
     entry["mean_luminance"] = lum
@@ -1460,11 +1572,19 @@ def _finalize_still_entry(
     if size < common.MIN_BYTES:
         entry["capture_outcome"] = OUTCOME_SOFT
         entry["note"] = "file_too_small"
+        entry["fresh_this_act"] = False
+        entry["counts_toward_gate"] = False
+        entry["file_exists"] = False
+        entry["exists"] = False
         return entry
     if lum is None or (lum is not None and lum < common.MIN_MEAN_LUMINANCE):
         entry["capture_outcome"] = OUTCOME_SOFT
         entry["note"] = "black_or_dark_still_soft_fail_not_closed_without_arrange_miss"
+        entry["fresh_this_act"] = False
+        entry["counts_toward_gate"] = False
         return entry
+    entry["fresh_this_act"] = True
+    entry["counts_toward_gate"] = True
     entry["capture_outcome"] = OUTCOME_PASS
     if resolved_on_disk:
         entry["resolved_path"] = resolved_on_disk
@@ -1476,19 +1596,24 @@ def _write_stills_manifest(
     stills_dir: str,
     *,
     act_since: Optional[float] = None,
+    act_end: Optional[float] = None,
 ) -> str:
     stills_dir = common.abs_path(stills_dir)
     rows = entries
     if act_since is not None:
-        rows = _reconcile_still_entries_from_disk(entries, act_since, stills_dir)
+        rows = _reconcile_still_entries_from_disk(
+            entries, act_since, stills_dir, act_end=act_end
+        )
     for ent in rows:
         path = common.abs_path(str(ent.get("path") or ""))
-        if path:
+        if path and act_since is not None:
             ent["path"] = path
-            on_disk = os.path.isfile(path)
-            ent["file_exists"] = on_disk
-            ent["exists"] = on_disk
-            if on_disk:
+            in_window = _ps_still_counts_for_gate(path, act_since, act_end)
+            ent["on_disk"] = os.path.isfile(path)
+            ent["file_exists"] = in_window
+            ent["exists"] = in_window
+            ent["counts_toward_gate"] = bool(in_window and ent.get("fresh_this_act"))
+            if ent["on_disk"] and not in_window:
                 try:
                     ent["bytes"] = os.path.getsize(path)
                     ent["file_mtime"] = os.path.getmtime(path)
@@ -1497,6 +1622,8 @@ def _write_stills_manifest(
     manifest = {
         "version": 1,
         "generated_at_iso": datetime.now(timezone.utc).isoformat(),
+        "capture_act_started_at": act_since,
+        "capture_act_settled_at": act_end,
         "capture_path": (
             "slate pre-tick: purge stale PNG; PS_* = console HighResShot abs then AL; CAM_* = AL then "
             "console ladder on ticks; absolute Saved/ps_stills/; gate counts disk-fresh only"
@@ -1597,6 +1724,7 @@ def _build_ps_c_gate(
     stills_in_progress: bool = False,
     driver_error: Optional[str] = None,
     stills_act_started_at: Optional[float] = None,
+    stills_act_settled_at: Optional[float] = None,
     stills_disk_audit: Optional[dict[str, Any]] = None,
 ) -> dict[str, Any]:
     stills_required = len(STILL_CAM_LABELS)
@@ -1657,6 +1785,7 @@ def _build_ps_c_gate(
         "stills_required_count": stills_required,
         "stills_capture_outcomes": capture_outcomes,
         "stills_capture_act_started_at": stills_act_started_at,
+        "stills_capture_act_settled_at": stills_act_settled_at,
         "stills_disk_audit": stills_disk_audit,
         "stills_in_progress": stills_in_progress,
         "stills_wait_mechanism": PS_C_DRIVE_MECHANISM,
@@ -1751,12 +1880,12 @@ def prove_ps_placement(*, skip_stills: bool = False) -> dict[str, Any]:
         blocked.append("pa_d_count_zero")
         pre_closed = True
 
-    arrange_gate, arrange_blocked = _ensure_arrange_gate()
+    arrange_gate, arrange_blocked, cameras_ready = _ensure_arrange_gate()
     blocked.extend(arrange_blocked)
-    if arrange_blocked and any(
-        b in arrange_blocked
-        for b in ("arrange_failed:", "arrange_ps_homestead_import_failed", "dress_count_zero")
-    ):
+    if not cameras_ready:
+        pre_closed = True
+        blocked.append("prove_closed_fail_inventory_cameras_before_act")
+    if any(b.startswith("arrange_failed:") for b in arrange_blocked):
         pre_closed = True
 
     dress_bounds, dress_path = _dress_bounds_from_file()
@@ -1782,6 +1911,7 @@ def prove_ps_placement(*, skip_stills: bool = False) -> dict[str, Any]:
     stills_in_progress = False
     driver_error: Optional[str] = None
     stills_act_started_at: Optional[float] = None
+    stills_act_settled_at: Optional[float] = None
     stills_disk_audit: Optional[dict[str, Any]] = None
     stills_dir = _project_saved_path("ps_stills")
 
@@ -1804,14 +1934,21 @@ def prove_ps_placement(*, skip_stills: bool = False) -> dict[str, Any]:
             if orch is not None:
                 completed = _drive_ps_c_stills_orchestrator(orch, PS_C_DRIVE_TIMEOUT_SEC)
                 stills_act_started_at = orch._act_started_at
-                _ps_c_post_drive_final_drain(orch, PS_C_FINAL_DRAIN_SEC)
-                still_entries = _reconcile_still_entries_from_disk(
-                    list(orch.entries), stills_act_started_at, stills_dir
+                still_entries, stills_act_settled_at = _ps_c_settle_stills_before_gate(
+                    orch,
+                    stills_dir,
+                    stills_act_started_at,
+                    PS_C_GATE_SETTLE_SEC,
                 )
                 manifest_path = _write_stills_manifest(
-                    still_entries, stills_dir, act_since=stills_act_started_at
+                    still_entries,
+                    stills_dir,
+                    act_since=stills_act_started_at,
+                    act_end=stills_act_settled_at,
                 )
-                stills_disk_audit = _audit_ps_stills_disk(stills_dir, stills_act_started_at)
+                stills_disk_audit = _audit_ps_stills_disk(
+                    stills_dir, stills_act_started_at, stills_act_settled_at
+                )
                 driver_error = orch._driver_error
                 if not completed:
                     blocked = list(blocked) + ["stills_driver_timeout"]
@@ -1821,7 +1958,9 @@ def prove_ps_placement(*, skip_stills: bool = False) -> dict[str, Any]:
             blocked.append(f"stills_driver_failed:{err}")
 
     if stills_act_started_at is not None and stills_disk_audit is None:
-        stills_disk_audit = _audit_ps_stills_disk(stills_dir, stills_act_started_at)
+        stills_disk_audit = _audit_ps_stills_disk(
+            stills_dir, stills_act_started_at, stills_act_settled_at
+        )
 
     gate = _build_ps_c_gate(
         blocked=blocked,
@@ -1837,8 +1976,10 @@ def prove_ps_placement(*, skip_stills: bool = False) -> dict[str, Any]:
         stills_in_progress=stills_in_progress,
         driver_error=driver_error,
         stills_act_started_at=stills_act_started_at,
+        stills_act_settled_at=stills_act_settled_at,
         stills_disk_audit=stills_disk_audit,
     )
+    gate["gate_written_at"] = time.time()
     _write_ps_c_gate_file(gate)
     _log(
         "prove complete",
