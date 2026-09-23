@@ -117,8 +117,10 @@ CAP001_POST_NIGHT_AL_READY_V1 = "CAP001_POST_NIGHT_AL_READY_V1"
 CAP001_AL_AFTER_MCP_DISCONNECT_V1 = "CAP001_AL_AFTER_MCP_DISCONNECT_V1"
 CAP001_FIRE_ONLY_AL_READY_WIRE_V1 = "CAP001_FIRE_ONLY_AL_READY_WIRE_V1"
 CAP001_FIRE_ON_SLATE_TICK_V1 = "CAP001_FIRE_ON_SLATE_TICK_V1"
+CAP001_FIRE_ON_POST_TICK_AFTER_YIELD_V1 = "CAP001_FIRE_ON_POST_TICK_AFTER_YIELD_V1"
 CAP001_PHASE_B_SIDECAR = "ps_c_cap001_phase_b.json"
-CAP001_FIRE_ONLY_PRETICK_PUMP_SEC = 5.0
+CAP001_POST_TICK_FIRE_SIDECAR = "ps_c_cap001_post_tick_fire.json"
+PS_C_SLATE_POST_TICK_MECHANISM = "register_slate_post_tick_callback"
 PS_C_POST_NIGHT_WARM_FRAMES = 6
 TRACE_TOP_OFFSET_UU = 120.0
 TRACE_DEPTH_UU = 12000.0
@@ -1367,8 +1369,89 @@ def _automation_abs_screenshot_one_invoke(
     return False, methods, None, last_task_meta
 
 
-class _Cap001FireOnlyPretickDriver:
-    """FIRE_ONLY: arm slate pretick + keep_alive; fire AL once on first tick (not inline)."""
+def _cap001_prep_viewport_realtime_and_invalidate() -> dict[str, Any]:
+    """PREP_ONLY: force level viewport realtime + invalidate before MCP disconnect."""
+    meta: dict[str, Any] = {CAP001_FIRE_ON_POST_TICK_AFTER_YIELD_V1: True}
+    try:
+        les = unreal.get_editor_subsystem(unreal.LevelEditorSubsystem)
+        if les:
+            for attr in (
+                "editor_set_viewport_realtime",
+                "editor_set_level_viewport_realtime",
+                "set_level_viewport_realtime",
+            ):
+                if hasattr(les, attr):
+                    getattr(les, attr)(True)
+                    meta["realtime_ok"] = True
+                    meta["realtime_method"] = f"LevelEditorSubsystem.{attr}"
+                    break
+            for attr in (
+                "editor_invalidate_viewports",
+                "invalidate_viewports",
+                "editor_invalidate_all_viewports",
+            ):
+                if hasattr(les, attr):
+                    getattr(les, attr)()
+                    meta["invalidate_ok"] = True
+                    meta["invalidate_method"] = f"LevelEditorSubsystem.{attr}"
+                    break
+    except Exception as exc:
+        meta["prep_viewport_error"] = str(exc)
+    return meta
+
+
+def _cap001_patch_gate_after_post_tick_fire(
+    *,
+    cam_label: str,
+    canonical_path_abs: str,
+    act_fired_at: float,
+    fire_ok: bool,
+    fire_error: Optional[str],
+    methods: list[str],
+    task_meta: dict[str, Any],
+) -> None:
+    """Post-yield post-tick AL: stamp gate + sidecar for host Phase B."""
+    payload: dict[str, Any] = {
+        "contract": CAP001_SETTLE_AFTER_YIELD_V1,
+        "phase": "A",
+        "camera_label": cam_label,
+        "canonical_still_path_abs": canonical_path_abs,
+        "act_fired_at": act_fired_at,
+        "fire_ok": fire_ok,
+        "fire_error": fire_error,
+        "armed_post_tick": True,
+        "post_tick_al_fired": True,
+        CAP001_FIRE_ON_POST_TICK_AFTER_YIELD_V1: True,
+        "methods": methods,
+        "al_task": task_meta,
+        "task_valid": task_meta.get("task_valid"),
+        "post_tick_fired_at": time.time(),
+    }
+    sidecar_path = _project_saved_path(CAP001_POST_TICK_FIRE_SIDECAR)
+    try:
+        with open(sidecar_path, "w", encoding="utf-8") as f:
+            json.dump(payload, f, indent=2, default=str)
+    except OSError as exc:
+        _log("cap001 post-tick sidecar write failed", {"error": str(exc)})
+    gate_path = _project_saved_path("ps_c_prove_gate.json")
+    gate = _cap001_load_json_sidecar(gate_path)
+    if not gate:
+        return
+    cap = gate.get("cap001_settle_after_yield_v1")
+    if isinstance(cap, dict):
+        cap.update(payload)
+        gate["cap001_settle_after_yield_v1"] = cap
+    gate["act_fired_at"] = act_fired_at
+    gate["canonical_still_path_abs"] = canonical_path_abs
+    try:
+        with open(gate_path, "w", encoding="utf-8") as f:
+            json.dump(gate, f, indent=2, default=str)
+    except OSError as exc:
+        _log("cap001 post-tick gate patch failed", {"error": str(exc)})
+
+
+class _Cap001FireOnlyPostTickDriver:
+    """FIRE_ONLY: arm slate post-tick + keep_alive; AL fires on first post-tick after MCP yield."""
 
     def __init__(
         self,
@@ -1384,11 +1467,8 @@ class _Cap001FireOnlyPretickDriver:
         self.wire_methods = wire_methods
         self.wire_meta = wire_meta
         self._tick_handle: Any = None
-        self._registered_tick_callable = _cap001_fire_only_slate_dispatcher
+        self._registered_tick_callable = _cap001_fire_only_post_tick_dispatcher
         self._fired = False
-        self._fire_ok = False
-        self._act_fired_at: Optional[float] = None
-        self._fire_error: Optional[str] = None
         self._task: Any = None
         self._pending_automation_tasks: list[Any] = []
         self._driver_error: Optional[str] = None
@@ -1411,9 +1491,9 @@ class _Cap001FireOnlyPretickDriver:
             self.wire_meta["keep_python_script_alive"] = self._keep_alive_armed
         except Exception as exc:
             return False, f"keep_alive_arm_failed:{exc}"
-        register = getattr(unreal, "register_slate_pre_tick_callback", None)
+        register = getattr(unreal, "register_slate_post_tick_callback", None)
         if not callable(register):
-            return False, "register_slate_pre_tick_callback unavailable"
+            return False, "register_slate_post_tick_callback unavailable"
         _PS_C_DRIVER_ROOTS.append(self)
         _PS_C_SLATE_CALLBACK_REFS.append(self._registered_tick_callable)
         try:
@@ -1422,23 +1502,23 @@ class _Cap001FireOnlyPretickDriver:
             self._driver_error = str(exc)
             return False, str(exc)
         self.wire_methods.append(
-            f"fire_only:{PS_C_SLATE_MECHANISM}:{CAP001_FIRE_ON_SLATE_TICK_V1}"
+            f"fire_only:{PS_C_SLATE_POST_TICK_MECHANISM}:{CAP001_FIRE_ON_POST_TICK_AFTER_YIELD_V1}"
         )
         return True, None
 
     def _unregister_tick(self) -> None:
         if self._tick_handle is None:
             return
-        unregister = getattr(unreal, "unregister_slate_pre_tick_callback", None)
+        unregister = getattr(unreal, "unregister_slate_post_tick_callback", None)
         if callable(unregister):
             try:
                 unregister(self._tick_handle)
             except Exception:
                 pass
         self._tick_handle = None
-        self.wire_methods.append("fire_only:pretick_unregistered_after_al_fire")
+        self.wire_methods.append("fire_only:post_tick_unregistered_after_al_fire")
 
-    def _on_slate_pre_tick(self, _delta: float) -> None:
+    def _on_slate_post_tick(self, _delta: float) -> None:
         if self._fired or self._in_tick:
             return
         self._in_tick = True
@@ -1452,36 +1532,40 @@ class _Cap001FireOnlyPretickDriver:
                 require_valid_al_task=True,
                 al_delay=0.0,
             )
-            self.wire_methods.extend(al_methods)
-            self.wire_methods.append(f"{CAP001_FIRE_ON_SLATE_TICK_V1}:pretick_al_fire")
-            self.wire_meta["al_task"] = task_meta
-            self.wire_meta["task_valid"] = task_meta.get("task_valid")
+            fire_methods = list(self.wire_methods) + list(al_methods)
+            fire_methods.append(f"{CAP001_FIRE_ON_POST_TICK_AFTER_YIELD_V1}:post_tick_al_fire")
             self._track_automation_task(task)
             self._task = task
-            self._fire_ok = ok
-            self._act_fired_at = act_fired_at if ok else None
-            self._fire_error = (
-                None if ok else "automation_invoke_failed_or_invalid_task"
+            fire_error = None if ok else "automation_invoke_failed_or_invalid_task"
+            _cap001_patch_gate_after_post_tick_fire(
+                cam_label=self.cam_label,
+                canonical_path_abs=self.path,
+                act_fired_at=act_fired_at if ok else None,
+                fire_ok=ok,
+                fire_error=fire_error,
+                methods=fire_methods,
+                task_meta=task_meta,
             )
             self._unregister_tick()
         finally:
             self._in_tick = False
 
 
-def _cap001_fire_only_al_ready_and_arm_pretick(
+def _cap001_fire_only_al_ready_and_arm_post_tick(
     cam,
     path: str,
     cam_label: str,
 ) -> tuple[bool, Optional[float], Optional[str], list[str], dict[str, Any]]:
-    """Post-MCP FIRE_ONLY: AL_READY bind, arm pretick+keep_alive, pump until AL fires (no PNG wait)."""
+    """Post-MCP FIRE_ONLY: AL_READY bind, arm post-tick only (no inline / same-script AL)."""
     global _ACTIVE_CAP001_FIRE_ONLY
     wire_methods: list[str] = [
         CAP001_FIRE_ONLY_AL_READY_WIRE_V1,
-        CAP001_FIRE_ON_SLATE_TICK_V1,
+        CAP001_FIRE_ON_POST_TICK_AFTER_YIELD_V1,
     ]
     wire_meta: dict[str, Any] = {
         CAP001_FIRE_ONLY_AL_READY_WIRE_V1: True,
-        CAP001_FIRE_ON_SLATE_TICK_V1: True,
+        CAP001_FIRE_ON_POST_TICK_AFTER_YIELD_V1: True,
+        "armed_post_tick": True,
     }
     _pilot_camera(cam)
     wire_methods.append("fire_only:pre_al_pilot_camera")
@@ -1501,30 +1585,14 @@ def _cap001_fire_only_al_ready_and_arm_pretick(
             wire_methods,
             wire_meta,
         )
-    driver = _Cap001FireOnlyPretickDriver(cam, path, cam_label, wire_methods, wire_meta)
+    driver = _Cap001FireOnlyPostTickDriver(cam, path, cam_label, wire_methods, wire_meta)
     started, err = driver.start()
     if not started:
-        return False, None, err or "pretick_arm_failed", wire_methods, wire_meta
+        wire_meta["armed_post_tick"] = False
+        return False, None, err or "post_tick_arm_failed", wire_methods, wire_meta
     _ACTIVE_CAP001_FIRE_ONLY = driver
-    wire_methods.append("fire_only:slate_pretick_armed")
-    deadline = time.time() + CAP001_FIRE_ONLY_PRETICK_PUMP_SEC
-    while not driver._fired and time.time() < deadline:
-        driver._on_slate_pre_tick(0.033)
-        cv._pump_editor_once()
-    if not driver._fired:
-        driver._unregister_tick()
-        return False, None, "cap001_fire_only_pretick_fire_timeout", wire_methods, wire_meta
-    wire_methods.extend(driver.wire_methods)
-    wire_meta.update(driver.wire_meta)
-    wire_meta["pretick_fired_same_script"] = True
-    wire_meta["rooted_automation_tasks"] = len(driver._pending_automation_tasks)
-    return (
-        driver._fire_ok,
-        driver._act_fired_at,
-        driver._fire_error,
-        wire_methods,
-        wire_meta,
-    )
+    wire_methods.append("fire_only:slate_post_tick_armed")
+    return True, None, None, wire_methods, wire_meta
 
 
 def _cap001_env_truthy(name: str) -> bool:
@@ -1565,6 +1633,7 @@ def _cap001_load_json_sidecar(path: str) -> Optional[dict[str, Any]]:
 
 def _cap001_load_phase_a_from_saved_gate() -> Optional[dict[str, Any]]:
     gate = _cap001_load_json_sidecar(_project_saved_path("ps_c_prove_gate.json"))
+    post_tick = _cap001_load_json_sidecar(_project_saved_path(CAP001_POST_TICK_FIRE_SIDECAR))
     if not gate:
         return None
     cap = gate.get("cap001_settle_after_yield_v1")
@@ -1572,6 +1641,18 @@ def _cap001_load_phase_a_from_saved_gate() -> Optional[dict[str, Any]]:
         if cap.get("phase") == "B" and isinstance(cap.get("phase_a"), dict):
             return cap["phase_a"]
         if cap.get("phase") == "A":
+            if cap.get("act_fired_at") is None and isinstance(post_tick, dict):
+                if post_tick.get("post_tick_al_fired") and post_tick.get("act_fired_at"):
+                    merged = dict(cap)
+                    merged.update(
+                        {
+                            "act_fired_at": post_tick.get("act_fired_at"),
+                            "fire_ok": post_tick.get("fire_ok"),
+                            "fire_error": post_tick.get("fire_error"),
+                            "post_tick_al_fired": True,
+                        }
+                    )
+                    return merged
             return cap
     act_fired = gate.get("act_fired_at")
     path_abs = gate.get("canonical_still_path_abs")
@@ -1751,6 +1832,7 @@ def _cap001_phase_a_stamp(
     fire_error: Optional[str],
     methods: list[str],
     lit_aim_prep: Optional[dict[str, Any]] = None,
+    armed_post_tick: bool = False,
 ) -> dict[str, Any]:
     """Conductor-readable Phase B inputs (host poll after MCP yield)."""
     stamp: dict[str, Any] = {
@@ -1763,6 +1845,9 @@ def _cap001_phase_a_stamp(
         "fire_error": fire_error,
         "methods": methods,
     }
+    if armed_post_tick:
+        stamp["armed_post_tick"] = True
+        stamp[CAP001_FIRE_ON_POST_TICK_AFTER_YIELD_V1] = True
     if lit_aim_prep is not None:
         stamp[CAP001_DARK_STILL_LIT_AIM_V1] = lit_aim_prep
     return stamp
@@ -1990,16 +2075,16 @@ def _ps_c_one_cam_phase_a_fire_and_return(
             "cap001:fire_only_after_mcp_disconnect",
         ]
         _purge_ps_c_still_png(path)
-        ok, act_fired_at, fire_error, wire_methods, wire_meta = (
-            _cap001_fire_only_al_ready_and_arm_pretick(cam, path, cam_label)
+        arm_ok, _act_unused, fire_error, wire_methods, wire_meta = (
+            _cap001_fire_only_al_ready_and_arm_post_tick(cam, path, cam_label)
         )
         methods.extend(wire_methods)
-        if fire_error:
+        ok = False
+        act_fired_at = None
+        if not arm_ok:
             blocked.append("one_cam_automation_invoke_failed")
-            if wire_meta.get("task_valid") is False:
-                blocked.append(
-                    f"cap001_fire_only_invalid_al_task:{wire_meta.get('al_task', {}).get('reason')}"
-                )
+            if fire_error:
+                blocked.append(f"cap001_fire_only_post_tick_arm:{fire_error}")
         lit_aim_prep = {
             "cap001_mode": "fire_only",
             CAP001_AL_AFTER_MCP_DISCONNECT_V1: True,
@@ -2015,8 +2100,17 @@ def _ps_c_one_cam_phase_a_fire_and_return(
             "cap001:prep_only_before_mcp_disconnect",
         ]
         methods.extend(prep_methods)
+        prep_viewport = _cap001_prep_viewport_realtime_and_invalidate()
+        lit_aim_prep["prep_viewport_realtime"] = prep_viewport
+        methods.append(
+            f"prep_only:{prep_viewport.get('realtime_method', 'realtime_skip')}"
+        )
+        methods.append(
+            f"prep_only:{prep_viewport.get('invalidate_method', 'invalidate_skip')}"
+        )
         lit_aim_prep["cap001_mode"] = "prep_only"
         lit_aim_prep[CAP001_AL_AFTER_MCP_DISCONNECT_V1] = True
+        lit_aim_prep[CAP001_FIRE_ON_POST_TICK_AFTER_YIELD_V1] = True
         act_fired_at = None
         ok = False
     else:
@@ -2032,6 +2126,9 @@ def _ps_c_one_cam_phase_a_fire_and_return(
         if fire_error:
             blocked.append("one_cam_automation_invoke_failed")
 
+    armed_post_tick = bool(
+        fire_only and not prep_only and lit_aim_prep.get("armed_post_tick")
+    )
     stamp = _cap001_phase_a_stamp(
         cam_label=cam_label,
         canonical_path_abs=path,
@@ -2040,6 +2137,7 @@ def _ps_c_one_cam_phase_a_fire_and_return(
         fire_error=fire_error,
         methods=methods,
         lit_aim_prep=lit_aim_prep,
+        armed_post_tick=armed_post_tick,
     )
     if prep_only and not fire_only:
         stamp[CAP001_AL_AFTER_MCP_DISCONNECT_V1] = "prep_only"
@@ -2047,6 +2145,8 @@ def _ps_c_one_cam_phase_a_fire_and_return(
         stamp["act_fired_at"] = None
     elif fire_only and not prep_only:
         stamp[CAP001_AL_AFTER_MCP_DISCONNECT_V1] = "fire_only"
+        stamp["fire_ok"] = False
+        stamp["act_fired_at"] = None
 
     note = "cap001_phase_a_pending_host_settle_after_mcp_yield"
     if prep_only and not fire_only:
@@ -2481,16 +2581,16 @@ class _PsCStillsOrchestrator:
 
 
 _ACTIVE_PS_C_STILLS: Optional[_PsCStillsOrchestrator] = None
-_ACTIVE_CAP001_FIRE_ONLY: Optional[_Cap001FireOnlyPretickDriver] = None
+_ACTIVE_CAP001_FIRE_ONLY: Optional[_Cap001FireOnlyPostTickDriver] = None
 _PS_C_SLATE_CALLBACK_REFS: list[Any] = []
 _PS_C_DRIVER_ROOTS: list[Any] = []
 
 
-def _cap001_fire_only_slate_dispatcher(delta: float) -> None:
-    """Module-level FIRE_ONLY pretick (strong ref; survives MCP yield after arm)."""
+def _cap001_fire_only_post_tick_dispatcher(delta: float) -> None:
+    """Module-level FIRE_ONLY post-tick (first fire after MCP script yield)."""
     drv = _ACTIVE_CAP001_FIRE_ONLY
     if drv is not None:
-        drv._on_slate_pre_tick(delta)
+        drv._on_slate_post_tick(delta)
 
 
 def _ps_c_slate_pre_tick_dispatcher(delta: float) -> None:
@@ -2804,7 +2904,10 @@ def _build_ps_c_gate(
     cap001_phase_a_pending = (
         one_cam_bite
         and cap001_phase_a is not None
-        and bool(cap001_phase_a.get("fire_ok"))
+        and (
+            bool(cap001_phase_a.get("fire_ok"))
+            or bool(cap001_phase_a.get("armed_post_tick"))
+        )
         and not cap001_settled_phase_b
     )
     if cap001_phase_a_pending:
