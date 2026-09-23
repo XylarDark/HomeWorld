@@ -962,3 +962,9 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 - DESKTOP: gate frozen **`stills_in_progress: true`**, 0 PNGs — async slate callback never advanced after MCP return. Fix: module-level tick dispatcher + **`_drive_ps_c_stills_orchestrator`** (pump/tick until DONE, ≤300s); prove returns with **`stills_in_progress: false`** and updated gate; viewport focus before capture. KNOWN_ERRORS PS-C-2 row. No PASS claim.
 
+## 2026-09-23 — PS-C-CAP-001 re-verify + PS-C-CAM-002 (cloud, PR #198)
+
+- **Ticket A:** Manifest **`exists`/`file_exists`** aligned with canonical **`Saved/ps_stills/`** disk stat before write; **`_finish_all`** + **`_write_stills_manifest(..., act_since=)`** reconcile; gate still uses **`_audit_ps_stills_disk`** for fresh count.
+- **Ticket B:** Stale **`ps_arrange_gate.json`** → **`_still_cam_labels_missing()`** forces **`arrange_ps_homestead`** re-run when prove cameras absent.
+- **Boot:** Removed bogus **`MovieRenderPipelineEditor`** from **`HomeWorld.uproject`**; KNOWN_ERRORS Cause→Avoid rows. DESKTOP re-prove pending.
+
