@@ -116,7 +116,9 @@ CAP001_DARK_STILL_NIGHT_STACK_V2 = "CAP001_DARK_STILL_NIGHT_STACK_V2"
 CAP001_POST_NIGHT_AL_READY_V1 = "CAP001_POST_NIGHT_AL_READY_V1"
 CAP001_AL_AFTER_MCP_DISCONNECT_V1 = "CAP001_AL_AFTER_MCP_DISCONNECT_V1"
 CAP001_FIRE_ONLY_AL_READY_WIRE_V1 = "CAP001_FIRE_ONLY_AL_READY_WIRE_V1"
+CAP001_FIRE_ON_SLATE_TICK_V1 = "CAP001_FIRE_ON_SLATE_TICK_V1"
 CAP001_PHASE_B_SIDECAR = "ps_c_cap001_phase_b.json"
+CAP001_FIRE_ONLY_PRETICK_PUMP_SEC = 5.0
 PS_C_POST_NIGHT_WARM_FRAMES = 6
 TRACE_TOP_OFFSET_UU = 120.0
 TRACE_DEPTH_UU = 12000.0
@@ -1318,6 +1320,7 @@ def _automation_abs_screenshot_one_invoke(
     cam,
     *,
     require_valid_al_task: bool = False,
+    al_delay: Optional[float] = None,
 ) -> tuple[bool, list[str], Any, dict[str, Any]]:
     """Single AL invoke (one-cam Phase A — fire only; no in-script wait)."""
     cv = _load_capture_viewport()
@@ -1327,7 +1330,9 @@ def _automation_abs_screenshot_one_invoke(
         f"al_canonical_dest:{ue_path}",
         "one_cam:AutomationLibrary_abs_sync_single",
     ]
-    delay = 0.35
+    delay = 0.35 if al_delay is None else al_delay
+    if al_delay is not None:
+        methods.append(f"al_delay:{delay}")
     attempts = (
         ("abs_kwargs_force_gv", lambda: unreal.AutomationLibrary.take_high_res_screenshot(
             STILL_RES_X, STILL_RES_Y, ue_path, camera=cam, delay=delay, force_game_view=True
@@ -1362,13 +1367,122 @@ def _automation_abs_screenshot_one_invoke(
     return False, methods, None, last_task_meta
 
 
-def _cap001_fire_only_al_ready_and_invoke(
+class _Cap001FireOnlyPretickDriver:
+    """FIRE_ONLY: arm slate pretick + keep_alive; fire AL once on first tick (not inline)."""
+
+    def __init__(
+        self,
+        cam: Any,
+        path: str,
+        cam_label: str,
+        wire_methods: list[str],
+        wire_meta: dict[str, Any],
+    ) -> None:
+        self.cam = cam
+        self.path = path
+        self.cam_label = cam_label
+        self.wire_methods = wire_methods
+        self.wire_meta = wire_meta
+        self._tick_handle: Any = None
+        self._registered_tick_callable = _cap001_fire_only_slate_dispatcher
+        self._fired = False
+        self._fire_ok = False
+        self._act_fired_at: Optional[float] = None
+        self._fire_error: Optional[str] = None
+        self._task: Any = None
+        self._pending_automation_tasks: list[Any] = []
+        self._driver_error: Optional[str] = None
+        self._keep_alive_armed = False
+        self._in_tick = False
+
+    def _track_automation_task(self, task: Any) -> None:
+        if task is not None:
+            self._pending_automation_tasks.append(task)
+            _PS_C_DRIVER_ROOTS.append(task)
+
+    def start(self) -> tuple[bool, Optional[str]]:
+        global _ACTIVE_PS_C_STILLS
+        if _ACTIVE_PS_C_STILLS is not None:
+            return False, "ps_c_stills_driver_active"
+        try:
+            import vnp_editor_keep_alive as keep
+
+            self._keep_alive_armed = bool(keep.arm())
+            self.wire_meta["keep_python_script_alive"] = self._keep_alive_armed
+        except Exception as exc:
+            return False, f"keep_alive_arm_failed:{exc}"
+        register = getattr(unreal, "register_slate_pre_tick_callback", None)
+        if not callable(register):
+            return False, "register_slate_pre_tick_callback unavailable"
+        _PS_C_DRIVER_ROOTS.append(self)
+        _PS_C_SLATE_CALLBACK_REFS.append(self._registered_tick_callable)
+        try:
+            self._tick_handle = register(self._registered_tick_callable)
+        except Exception as exc:
+            self._driver_error = str(exc)
+            return False, str(exc)
+        self.wire_methods.append(
+            f"fire_only:{PS_C_SLATE_MECHANISM}:{CAP001_FIRE_ON_SLATE_TICK_V1}"
+        )
+        return True, None
+
+    def _unregister_tick(self) -> None:
+        if self._tick_handle is None:
+            return
+        unregister = getattr(unreal, "unregister_slate_pre_tick_callback", None)
+        if callable(unregister):
+            try:
+                unregister(self._tick_handle)
+            except Exception:
+                pass
+        self._tick_handle = None
+        self.wire_methods.append("fire_only:pretick_unregistered_after_al_fire")
+
+    def _on_slate_pre_tick(self, _delta: float) -> None:
+        if self._fired or self._in_tick:
+            return
+        self._in_tick = True
+        try:
+            self._fired = True
+            _focus_ps_c_viewport()
+            act_fired_at = time.time()
+            ok, al_methods, task, task_meta = _automation_abs_screenshot_one_invoke(
+                self.path,
+                self.cam,
+                require_valid_al_task=True,
+                al_delay=0.0,
+            )
+            self.wire_methods.extend(al_methods)
+            self.wire_methods.append(f"{CAP001_FIRE_ON_SLATE_TICK_V1}:pretick_al_fire")
+            self.wire_meta["al_task"] = task_meta
+            self.wire_meta["task_valid"] = task_meta.get("task_valid")
+            self._track_automation_task(task)
+            self._task = task
+            self._fire_ok = ok
+            self._act_fired_at = act_fired_at if ok else None
+            self._fire_error = (
+                None if ok else "automation_invoke_failed_or_invalid_task"
+            )
+            self._unregister_tick()
+        finally:
+            self._in_tick = False
+
+
+def _cap001_fire_only_al_ready_and_arm_pretick(
     cam,
     path: str,
+    cam_label: str,
 ) -> tuple[bool, Optional[float], Optional[str], list[str], dict[str, Any]]:
-    """Post-MCP FIRE_ONLY: minimal pre-AL bind then AL with task validity gate."""
-    wire_methods: list[str] = [CAP001_FIRE_ONLY_AL_READY_WIRE_V1]
-    wire_meta: dict[str, Any] = {CAP001_FIRE_ONLY_AL_READY_WIRE_V1: True}
+    """Post-MCP FIRE_ONLY: AL_READY bind, arm pretick+keep_alive, pump until AL fires (no PNG wait)."""
+    global _ACTIVE_CAP001_FIRE_ONLY
+    wire_methods: list[str] = [
+        CAP001_FIRE_ONLY_AL_READY_WIRE_V1,
+        CAP001_FIRE_ON_SLATE_TICK_V1,
+    ]
+    wire_meta: dict[str, Any] = {
+        CAP001_FIRE_ONLY_AL_READY_WIRE_V1: True,
+        CAP001_FIRE_ON_SLATE_TICK_V1: True,
+    }
     _pilot_camera(cam)
     wire_methods.append("fire_only:pre_al_pilot_camera")
     cv = _load_capture_viewport()
@@ -1379,18 +1493,38 @@ def _cap001_fire_only_al_ready_and_invoke(
     wire_methods.append(f"fire_only:apply_lit_game_view:{view.get('viewmode')}")
     _focus_ps_c_viewport()
     wire_methods.append("fire_only:focus_viewport")
-    act_fired_at = time.time()
-    ok, al_methods, _task, task_meta = _automation_abs_screenshot_one_invoke(
-        path, cam, require_valid_al_task=True
+    if _ACTIVE_CAP001_FIRE_ONLY is not None:
+        return (
+            False,
+            None,
+            "cap001_fire_only_driver_already_active",
+            wire_methods,
+            wire_meta,
+        )
+    driver = _Cap001FireOnlyPretickDriver(cam, path, cam_label, wire_methods, wire_meta)
+    started, err = driver.start()
+    if not started:
+        return False, None, err or "pretick_arm_failed", wire_methods, wire_meta
+    _ACTIVE_CAP001_FIRE_ONLY = driver
+    wire_methods.append("fire_only:slate_pretick_armed")
+    deadline = time.time() + CAP001_FIRE_ONLY_PRETICK_PUMP_SEC
+    while not driver._fired and time.time() < deadline:
+        driver._on_slate_pre_tick(0.033)
+        cv._pump_editor_once()
+    if not driver._fired:
+        driver._unregister_tick()
+        return False, None, "cap001_fire_only_pretick_fire_timeout", wire_methods, wire_meta
+    wire_methods.extend(driver.wire_methods)
+    wire_meta.update(driver.wire_meta)
+    wire_meta["pretick_fired_same_script"] = True
+    wire_meta["rooted_automation_tasks"] = len(driver._pending_automation_tasks)
+    return (
+        driver._fire_ok,
+        driver._act_fired_at,
+        driver._fire_error,
+        wire_methods,
+        wire_meta,
     )
-    wire_methods.extend(al_methods)
-    wire_meta["al_task"] = task_meta
-    wire_meta["task_valid"] = task_meta.get("task_valid")
-    fire_error: Optional[str] = None
-    if not ok:
-        act_fired_at = None
-        fire_error = "automation_invoke_failed_or_invalid_task"
-    return ok, act_fired_at, fire_error, wire_methods, wire_meta
 
 
 def _cap001_env_truthy(name: str) -> bool:
@@ -1857,7 +1991,7 @@ def _ps_c_one_cam_phase_a_fire_and_return(
         ]
         _purge_ps_c_still_png(path)
         ok, act_fired_at, fire_error, wire_methods, wire_meta = (
-            _cap001_fire_only_al_ready_and_invoke(cam, path)
+            _cap001_fire_only_al_ready_and_arm_pretick(cam, path, cam_label)
         )
         methods.extend(wire_methods)
         if fire_error:
@@ -2347,8 +2481,16 @@ class _PsCStillsOrchestrator:
 
 
 _ACTIVE_PS_C_STILLS: Optional[_PsCStillsOrchestrator] = None
+_ACTIVE_CAP001_FIRE_ONLY: Optional[_Cap001FireOnlyPretickDriver] = None
 _PS_C_SLATE_CALLBACK_REFS: list[Any] = []
 _PS_C_DRIVER_ROOTS: list[Any] = []
+
+
+def _cap001_fire_only_slate_dispatcher(delta: float) -> None:
+    """Module-level FIRE_ONLY pretick (strong ref; survives MCP yield after arm)."""
+    drv = _ACTIVE_CAP001_FIRE_ONLY
+    if drv is not None:
+        drv._on_slate_pre_tick(delta)
 
 
 def _ps_c_slate_pre_tick_dispatcher(delta: float) -> None:
