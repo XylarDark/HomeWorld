@@ -103,6 +103,9 @@ PS_C_ONE_CAM_DRIVE_TIMEOUT_SEC = 120.0
 PS_C_WAIT_RETRY_TICKS = 6
 PS_C_FINAL_DRAIN_SEC = 12.0
 PS_C_GATE_SETTLE_SEC = 120.0
+PS_C_ONE_CAM_GATE_SETTLE_SEC = 180.0
+# Grace poll after driver settle/hold so gate file mtime never precedes async AL PNG landing.
+PS_C_ONE_CAM_GATE_DEFER_SEC = 45.0
 # Windows/FAT mtime often 1s — allow gate stamp slightly after file mtime (not post-gate async).
 PS_C_ACT_END_MTIME_SLACK_SEC = 1.05
 PS_C_PS_CAM_PREFIX = "PS_"
@@ -802,11 +805,24 @@ def _pilot_camera(cam) -> None:
         pass
 
 
+def _ps_c_stills_dir_abs() -> str:
+    """Canonical Saved/ps_stills under project_dir (AL write ≡ settle ≡ gate score)."""
+    path = common.abs_path(os.path.join(common.project_dir(), "Saved", "ps_stills"))
+    os.makedirs(path, exist_ok=True)
+    return path
+
+
+def _ps_c_canonical_still_path(cam_label: str) -> str:
+    """Single abs path for a still label — same as capture_viewport._ensure_abs_dest."""
+    cv = _load_capture_viewport()
+    safe = cam_label.replace("/", "_")
+    return cv._ensure_abs_dest(os.path.join(_ps_c_stills_dir_abs(), f"{safe}.png"))
+
+
 def _resolve_still_path(stills_dir: str, cam_label: str) -> str:
     """Absolute path under {Project}/Saved/ps_stills/ (never basename-only / engine CWD)."""
-    safe = cam_label.replace("/", "_")
-    base = common.abs_path(stills_dir)
-    return common.abs_path(os.path.join(base, f"{safe}.png"))
+    _ = stills_dir
+    return _ps_c_canonical_still_path(cam_label)
 
 
 def _mtime_at_least(path: str, since: float) -> bool:
@@ -1088,16 +1104,28 @@ def _ps_c_path_stable_for_gate(
 
 
 def _ps_c_all_still_paths_stable(
-    stills_dir: str,
     act_start: float,
     labels: tuple[str, ...],
     trackers: dict[str, Any],
 ) -> bool:
     for label in labels:
-        path = common.abs_path(_resolve_still_path(stills_dir, label))
+        path = _ps_c_canonical_still_path(label)
         if not _ps_c_path_stable_for_gate(path, act_start, trackers[label]):
             return False
     return True
+
+
+def _ps_c_probe_canonical_still_paths(
+    orch: "_PsCStillsOrchestrator",
+    act_start: float,
+    trackers: dict[str, Any],
+) -> None:
+    """Pull async AL/console PNG onto canonical abs paths (probe_png_ready each tick)."""
+    cv = orch._cv or _load_capture_viewport()
+    for label in orch._still_labels:
+        path = _ps_c_canonical_still_path(label)
+        tracker = trackers[label]
+        cv.probe_png_ready(path, act_start, os.path.basename(path), tracker)
 
 
 def _ps_c_poll_late_still_pngs(orch: "_PsCStillsOrchestrator", act_end: Optional[float]) -> None:
@@ -1131,19 +1159,21 @@ def _ps_c_settle_stills_before_gate(
     stills_dir: str,
     act_start: float,
     max_sec: float,
-) -> tuple[list[dict[str, Any]], float, list[str]]:
-    """Wait for stable abs-path PNGs (AL/slate flush); act_end stamped only after stable."""
+) -> tuple[list[dict[str, Any]], float, list[str], bool]:
+    """Wait for stable PNG on canonical abs paths; gate/manifest only after paths_ready."""
     cv = orch._cv or _load_capture_viewport()
     deadline = time.time() + max_sec
     stable_polls = 0
     labels = orch._still_labels
     trackers = {label: cv._StableSizeTracker() for label in labels}
+    canonical = {label: _ps_c_canonical_still_path(label) for label in labels}
     settle_blocked: list[str] = []
     _log(
         "stills gate settle start",
         {
             "max_sec": max_sec,
             "labels": list(labels),
+            "canonical_paths": canonical,
             "pending_tasks": len(getattr(orch, "_pending_automation_tasks", []) or []),
             "mechanism": "AutomationLibrary_probe_png_ready_stable_size",
         },
@@ -1154,8 +1184,9 @@ def _ps_c_settle_stills_before_gate(
         cv._pump_editor_once()
         if orch._tick_handle is not None:
             orch._on_slate_pre_tick(0.033)
+        _ps_c_probe_canonical_still_paths(orch, act_start, trackers)
         _ps_c_poll_late_still_pngs(orch, None)
-        paths_stable = _ps_c_all_still_paths_stable(stills_dir, act_start, labels, trackers)
+        paths_stable = _ps_c_all_still_paths_stable(act_start, labels, trackers)
         tasks_done = _ps_c_pending_tasks_done(orch)
         if paths_stable and tasks_done:
             stable_polls += 1
@@ -1167,40 +1198,120 @@ def _ps_c_settle_stills_before_gate(
         cv._pump_editor_once()
         if orch._tick_handle is not None:
             orch._on_slate_pre_tick(0.033)
-    act_end = time.time()
-    paths_stable_final = _ps_c_all_still_paths_stable(stills_dir, act_start, labels, trackers)
+        _ps_c_probe_canonical_still_paths(orch, act_start, trackers)
+    paths_stable_final = _ps_c_all_still_paths_stable(act_start, labels, trackers)
     if not paths_stable_final:
         settle_blocked.append("one_cam_still_not_stable_in_act_window")
         for label in labels:
-            path = common.abs_path(_resolve_still_path(stills_dir, label))
-            on_disk = os.path.isfile(path)
-            note = "png_missing_or_not_stable_before_gate"
-            if on_disk:
-                try:
-                    sz = os.path.getsize(path)
-                    mt = os.path.getmtime(path)
-                    if sz < common.MIN_BYTES:
-                        note = f"below_min_bytes:{sz}"
-                    elif not _mtime_at_least(path, act_start):
-                        note = "stale_mtime_before_act_start"
-                    else:
-                        note = "size_not_stable_yet"
-                except OSError:
-                    pass
-            settle_blocked.append(f"settle_path:{label}:{note}")
-    still_entries = _reconcile_still_entries_from_disk(
-        list(orch.entries), act_start, stills_dir, act_end=act_end
-    )
+            path = canonical[label]
+            stamp = common.stamp_file_artifact(path)
+            settle_blocked.append(f"settle_polled_path:{label}:{json.dumps(stamp, default=str)}")
+    paths_ready = paths_stable_final
+    act_end: Optional[float] = time.time() if paths_ready else None
+    still_entries: list[dict[str, Any]] = []
+    if paths_ready:
+        act_end = time.time()
+        still_entries = _reconcile_still_entries_from_disk(
+            list(orch.entries), act_start, stills_dir, act_end=act_end
+        )
     _log(
         "stills gate settle complete",
         {
             "act_end": act_end,
             "paths_stable_final": paths_stable_final,
-            "fresh": _audit_ps_stills_disk(stills_dir, act_start, act_end).get("fresh_count"),
+            "paths_ready": paths_ready,
+            "fresh": (
+                _audit_ps_stills_disk(stills_dir, act_start, act_end).get("fresh_count")
+                if paths_ready
+                else 0
+            ),
             "tasks_done": _ps_c_pending_tasks_done(orch),
+            "canonical_paths": canonical,
         },
     )
-    return still_entries, act_end, settle_blocked
+    return still_entries, act_end, settle_blocked, paths_ready
+
+
+def _ps_c_gate_hold_until_canonical_paths(
+    orch: "_PsCStillsOrchestrator",
+    stills_dir: str,
+    act_start: float,
+    max_sec: float,
+) -> tuple[list[dict[str, Any]], float, list[str], bool]:
+    """One-cam: forbid gate until canonical abs path has MIN_BYTES + stable (AL async flush)."""
+    cv = orch._cv or _load_capture_viewport()
+    labels = orch._still_labels
+    trackers = {label: cv._StableSizeTracker() for label in labels}
+    canonical = {label: _ps_c_canonical_still_path(label) for label in labels}
+    blocked: list[str] = []
+    deadline = time.time() + max_sec
+    stable_polls = 0
+    _log("one-cam gate hold until canonical path ready", {"max_sec": max_sec, "paths": canonical})
+    while time.time() < deadline:
+        for task in list(getattr(orch, "_pending_automation_tasks", []) or []):
+            _task_is_done(task)
+        cv._pump_editor_once()
+        if orch._tick_handle is not None:
+            orch._on_slate_pre_tick(0.033)
+        _ps_c_probe_canonical_still_paths(orch, act_start, trackers)
+        if _ps_c_all_still_paths_stable(act_start, labels, trackers) and _ps_c_pending_tasks_done(
+            orch
+        ):
+            stable_polls += 1
+            if stable_polls >= PS_C_STABLE_POLLS_REQUIRED:
+                act_end = time.time()
+                still_entries = _reconcile_still_entries_from_disk(
+                    list(orch.entries), act_start, stills_dir, act_end=act_end
+                )
+                _log("one-cam gate hold satisfied", {"act_end": act_end, "paths": canonical})
+                return still_entries, act_end, blocked, True
+        else:
+            stable_polls = 0
+    for label in labels:
+        blocked.append(
+            f"gate_hold_timeout:{label}:{json.dumps(common.stamp_file_artifact(canonical[label]), default=str)}"
+        )
+    act_end = time.time()
+    still_entries = _reconcile_still_entries_from_disk(
+        list(orch.entries), act_start, stills_dir, act_end=act_end
+    )
+    return still_entries, act_end, blocked, False
+
+
+def _ps_c_poll_one_cam_until_gate_ready(
+    act_start: float,
+    max_sec: float,
+) -> tuple[bool, float, list[str]]:
+    """Final canonical-path poll (AL write ≡ settle ≡ gate); no HighResShot ladder."""
+    labels = _still_labels()
+    cv = _load_capture_viewport()
+    trackers = {label: cv._StableSizeTracker() for label in labels}
+    canonical = {label: _ps_c_canonical_still_path(label) for label in labels}
+    blocked: list[str] = []
+    deadline = time.time() + max_sec
+    stable_polls = 0
+    _log(
+        "one-cam gate defer poll (canonical abs only)",
+        {"max_sec": max_sec, "canonical_paths": canonical},
+    )
+    while time.time() < deadline:
+        cv._pump_editor_once()
+        for label in labels:
+            path = canonical[label]
+            cv.probe_png_ready(path, act_start, os.path.basename(path), trackers[label])
+        if _ps_c_all_still_paths_stable(act_start, labels, trackers):
+            stable_polls += 1
+            if stable_polls >= PS_C_STABLE_POLLS_REQUIRED:
+                _log("one-cam gate defer satisfied", {"paths": canonical})
+                return True, time.time(), blocked
+        else:
+            stable_polls = 0
+    for label in labels:
+        path = canonical[label]
+        blocked.append(
+            f"gate_defer_timeout:{label}:{json.dumps(common.stamp_file_artifact(path), default=str)}"
+        )
+    return False, time.time(), blocked
 
 
 def _load_capture_viewport():
@@ -1737,7 +1848,7 @@ def _write_stills_manifest(
     act_since: Optional[float] = None,
     act_end: Optional[float] = None,
 ) -> str:
-    stills_dir = common.abs_path(stills_dir)
+    stills_dir = _ps_c_stills_dir_abs()
     rows = entries
     if act_since is not None:
         rows = _reconcile_still_entries_from_disk(
@@ -1780,11 +1891,10 @@ def _write_stills_manifest(
 def _automation_abs_screenshot(filepath: str, cam) -> tuple[bool, list[str], Any]:
     """Absolute-path AutomationLibrary (PL-D / capture_shotlist_viewport pattern)."""
     methods: list[str] = []
-    ue_path = common.abs_path(filepath).replace("\\", "/")
-    if "/Saved/ps_stills/" not in ue_path.replace("\\", "/"):
-        ue_path = common.abs_path(
-            os.path.join(common.project_dir(), "Saved", "ps_stills", os.path.basename(filepath))
-        ).replace("\\", "/")
+    cv = _load_capture_viewport()
+    dest_abs = cv._ensure_abs_dest(filepath)
+    ue_path = cv._path_for_ue(dest_abs)
+    methods.append(f"al_canonical_dest:{ue_path}")
     delay = 0.35
     attempts = (
         ("abs_kwargs_force_gv", lambda: unreal.AutomationLibrary.take_high_res_screenshot(
@@ -1971,8 +2081,7 @@ def _start_ps_c_stills_async(world, gate_context: dict[str, Any]) -> tuple[bool,
     global _ACTIVE_PS_C_STILLS
     if _ACTIVE_PS_C_STILLS is not None:
         return False, "ps_c_stills_driver_already_active"
-    stills_dir = _project_saved_path("ps_stills")
-    os.makedirs(stills_dir, exist_ok=True)
+    stills_dir = _ps_c_stills_dir_abs()
     keep_ok = False
     try:
         import vnp_editor_keep_alive as keep
@@ -2081,7 +2190,7 @@ def prove_ps_placement(
     stills_act_started_at: Optional[float] = None
     stills_act_settled_at: Optional[float] = None
     stills_disk_audit: Optional[dict[str, Any]] = None
-    stills_dir = _project_saved_path("ps_stills")
+    stills_dir = _ps_c_stills_dir_abs()
 
     if skip_stills:
         blocked.append("stills_skipped_by_flag")
@@ -2114,15 +2223,59 @@ def prove_ps_placement(
                     _purge_ps_c_still_png(_resolve_still_path(stills_dir, lbl))
                 completed = _drive_ps_c_stills_orchestrator(orch, drive_timeout)
                 stills_act_started_at = orch._act_started_at
-                still_entries, stills_act_settled_at, settle_blocked = (
+                settle_sec = (
+                    PS_C_ONE_CAM_GATE_SETTLE_SEC
+                    if prove_mode == "one_cam"
+                    else PS_C_GATE_SETTLE_SEC
+                )
+                still_entries, stills_act_settled_at, settle_blocked, paths_ready = (
                     _ps_c_settle_stills_before_gate(
                         orch,
                         stills_dir,
                         stills_act_started_at,
-                        PS_C_GATE_SETTLE_SEC,
+                        settle_sec,
                     )
                 )
                 blocked.extend(settle_blocked)
+                if prove_mode == "one_cam" and not paths_ready:
+                    still_entries, stills_act_settled_at, hold_blocked, paths_ready = (
+                        _ps_c_gate_hold_until_canonical_paths(
+                            orch,
+                            stills_dir,
+                            stills_act_started_at,
+                            PS_C_ONE_CAM_GATE_SETTLE_SEC,
+                        )
+                    )
+                    blocked.extend(hold_blocked)
+                elif prove_mode == "one_cam" and paths_ready:
+                    stills_act_settled_at = time.time()
+                    still_entries = _reconcile_still_entries_from_disk(
+                        list(orch.entries),
+                        stills_act_started_at,
+                        stills_dir,
+                        act_end=stills_act_settled_at,
+                    )
+                if prove_mode == "one_cam" and stills_act_started_at is not None:
+                    fresh_pre_manifest = sum(
+                        1 for e in still_entries if e.get("counts_toward_gate")
+                    )
+                    if fresh_pre_manifest < len(_still_labels()):
+                        defer_ready, defer_act_end, defer_blocked = (
+                            _ps_c_poll_one_cam_until_gate_ready(
+                                stills_act_started_at,
+                                PS_C_ONE_CAM_GATE_DEFER_SEC,
+                            )
+                        )
+                        blocked.extend(defer_blocked)
+                        if defer_ready:
+                            stills_act_settled_at = defer_act_end
+                            still_entries = _reconcile_still_entries_from_disk(
+                                list(orch.entries) if orch else still_entries,
+                                stills_act_started_at,
+                                stills_dir,
+                                act_end=stills_act_settled_at,
+                            )
+                            paths_ready = True
                 manifest_path = _write_stills_manifest(
                     still_entries,
                     stills_dir,
