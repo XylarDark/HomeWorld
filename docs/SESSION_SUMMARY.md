@@ -1,12 +1,10 @@
-<<<<<<< HEAD
 ## 2026-09-23 — Docs/33 Placement Stills (PS) strategy draft (cloud)
 
 - **PS-0:** [33_PLACEMENT_STILLS.md](../Docs/33_PLACEMENT_STILLS.md) — homestead-only placement stills suite (metrics catalog, multi-angle cams, benchmark sources, PS-A…E gates ending **`APPROVE PS STRATEGY`**). Handoff [PS_STRATEGY.md](../Docs/handoffs/PS_STRATEGY.md). Reuses PA-E harness patterns (`pa_e_shotlist_common`, HARNESS_ARRANGE); no `.uasset` commits. PHASE_BOARD + Docs/README updated. **Pending Lead gate.**
-=======
+
 ## 2026-09-23 — PDF development cycle ops doc (cloud)
 
 - Added [swarm/PDF_CYCLE.md](../swarm/PDF_CYCLE.md) (Design → Implement → Test → Fix companion to SWARM_OPS); Grok sidebar agents HomeWorld Design/Implement/Test/Fix + Conductor parent; tiny SWARM_OPS §0 pointer.
->>>>>>> 8789979 (docs(swarm): add PDF_CYCLE companion for Design-Implement-Test-Fix loop)
 
 ## 2026-09-22 — Harness P3 audit + universal tooling checklist (cloud)
 
@@ -939,3 +937,6 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 - Ticket PS-C-1: MCP mid-prove FAppTime Ensure / 300s empty — stills path moved to **`register_slate_pre_tick_callback`** + **`vnp_editor_keep_alive`** (PA-E pretick pattern); **`capture_viewport.console_high_res_invoke_once`** + tick **`probe_png_ready`** (no blocking **`time.sleep`** in settle/wait). Gate written when async stills finish. KNOWN_ERRORS Cause→Avoid row. DESKTOP re-prove pending — no PASS claim.
 
+## 2026-09-23 — Host Pulse console-kill stamp (cloud)
+
+- Docs-only: [HOST_PULSE.md](../Docs/handoffs/HOST_PULSE.md) § Console-kill + Cause→Avoid; [PDF_CYCLE.md](../swarm/PDF_CYCLE.md) § Host Pulse pointer. PR **#193** draft `cursor/host-pulse-console-kill-b3a5`.
