@@ -9472,3 +9472,11 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 **Pending:** DESKTOP one Act `execute_python_script("ps_placement_prove.py")` after Arrange-ready level — inspect `Saved/ps_c_prove_gate.json` + `Saved/ps_stills/manifest.json` (7 fresh PNGs, no PS_* `camera_missing`).
 
 **Errors:** None (py_compile OK).
+
+## 2026-09-23 — PS-C re-prove deepen gate settle + inventory closed_fail (PR #198)
+
+**Completed:** `_ps_c_settle_stills_before_gate` (pending AL tasks, Act window mtime scoring, gate after settle); `inventory_cameras_missing_closed_fail` blocks Act when Arrange cannot place handoff cams; KNOWN_ERRORS post-gate race row.
+
+**Pending:** DESKTOP re-prove § in PR #198.
+
+**Errors:** None (py_compile OK).
