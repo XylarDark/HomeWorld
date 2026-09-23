@@ -1,3 +1,7 @@
+## 2026-09-23 — ONE_SHOT_BITES Design schema (cloud)
+
+- **Docs-only (Lead/Design):** [ONE_SHOT_BITES.md](Automation/ONE_SHOT_BITES.md) — Conductor board one-shot criteria, bot-company Design→Implement→Test→Fix loop, PS-A→E mapping, failure modes. CAPTURE_REDUNDANCY § Procedure-agnostic evidence protocol + pointers (33_PLACEMENT_STILLS, SWARM_OPS, DOCS_LAYOUT). Branch `cursor/design-one-shot-bites-7c8f`.
+
 ## 2026-09-23 — UE_BIBLE anti-ladder hard rules (cloud)
 
 - **Docs-only:** [UE_BIBLE.md](../Docs/UE_BIBLE.md) §2b — Conductor/Lead harness locks (one repro before ladder PR, no third ladder, one Fix per root cause); Cause→Avoid table; HighResShot freeze + MRQ pointer. [PDF_CYCLE.md](../swarm/PDF_CYCLE.md) Host Pulse one-liner. Branch `cursor/ue-bible-anti-ladder-b3a5` — draft PR, not merged.

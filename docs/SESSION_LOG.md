@@ -9456,3 +9456,11 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 **Pending:** DESKTOP re-prove MRQ/arrange gate (`pose_source: homestead_bounds_relocate`, no Cliff in `aim_bounds_labels_sample`).
 
 **Errors:** None (py_compile OK).
+
+## 2026-09-23 — ONE_SHOT_BITES process doc (cloud, Design lane)
+
+**Completed:** [docs/Automation/ONE_SHOT_BITES.md](Automation/ONE_SHOT_BITES.md) (bite criteria, hosts, failure modes, PS mapping); CAPTURE_REDUNDANCY evidence protocol section; light pointers in Docs/33, swarm/SWARM_OPS, DOCS_LAYOUT.
+
+**Pending:** Lead review; Conductor adopts on board rows.
+
+**Errors:** None.
