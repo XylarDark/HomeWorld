@@ -1,3 +1,7 @@
+## 2026-09-23 — Docs/33 Placement Stills (PS) strategy draft (cloud)
+
+- **PS-0:** [33_PLACEMENT_STILLS.md](../Docs/33_PLACEMENT_STILLS.md) — homestead-only placement stills suite (metrics catalog, multi-angle cams, benchmark sources, PS-A…E gates ending **`APPROVE PS STRATEGY`**). Handoff [PS_STRATEGY.md](../Docs/handoffs/PS_STRATEGY.md). Reuses PA-E harness patterns (`pa_e_shotlist_common`, HARNESS_ARRANGE); no `.uasset` commits. PHASE_BOARD + Docs/README updated. **Pending Lead gate.**
+
 ## 2026-09-22 — Harness P3 audit + universal tooling checklist (cloud)
 
 - **P3:** [HARNESS_ARRANGE_TASKLIST.md](Automation/HARNESS_ARRANGE_TASKLIST.md) prove-script matrix; wired **`conductor_night_evidence_preflight`** + **`summarize_evidence_png_harness`** for NF2-B/VNP; NF2-B **`capture_outcome`** parity; viewport **`reload_pa_e_capture_python_modules`**. Exempt docstrings for host/utility/spikes. **automation-standards.mdc** v1.11 universal gap checklist; CAPTURE_REDUNDANCY P3 pointer. **DESKTOP re-prove** NF2-B / PA-E after merge.
