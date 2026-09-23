@@ -13,6 +13,7 @@ import json
 import os
 import sys
 import time
+from typing import Optional
 
 try:
     import unreal
@@ -20,10 +21,13 @@ except ImportError:
     print("ERROR: Run this script inside Unreal Editor.")
     sys.exit(1)
 
-WAIT_FILE_SEC = 330.0
+WAIT_FILE_SEC = 120.0
 MIN_BYTES = 1024
 CAPTURE_DELAY_SEC = 0.35
 POST_CONSOLE_SETTLE_FRAMES = 8
+SLATE_WAIT_MECHANISM = "register_slate_pre_tick_callback"
+# Blocking file wait cap for generic capture(); PS-C uses slate driver (no main-thread sleep).
+WAIT_FILE_SEC_LEGACY = 330.0
 
 
 def _abs_project_dir():
@@ -73,10 +77,14 @@ def _pump_editor_once():
         pass
 
 
-def _settle(frames=POST_CONSOLE_SETTLE_FRAMES):
-    for _ in range(frames):
+def _settle_pump_only(frames=POST_CONSOLE_SETTLE_FRAMES):
+    """Advance Slate/editor without time.sleep (safe on MCP main thread between invokes)."""
+    for _ in range(max(1, frames)):
         _pump_editor_once()
-        time.sleep(0.05)
+
+
+def _settle(frames=POST_CONSOLE_SETTLE_FRAMES):
+    _settle_pump_only(frames)
 
 
 def _finish_loading_before_screenshot():
@@ -128,31 +136,113 @@ def _high_res_shot_commands(resolution_x, resolution_y, ue_path):
     )
 
 
-def _wait_for_file(filepath, since_mtime, basename):
-    deadline = time.time() + WAIT_FILE_SEC
-    while time.time() < deadline:
-        _settle(frames=2)
-        if (
-            os.path.isfile(filepath)
-            and os.path.getsize(filepath) >= MIN_BYTES
-            and os.path.getmtime(filepath) >= since_mtime - 0.05
-        ):
-            return filepath
-        for root in _screenshot_search_roots():
-            candidate = os.path.join(root, basename)
-            if (
-                os.path.isfile(candidate)
-                and os.path.getsize(candidate) >= MIN_BYTES
-                and os.path.getmtime(candidate) >= since_mtime - 0.05
-            ):
-                if candidate != filepath:
-                    os.makedirs(os.path.dirname(filepath), exist_ok=True)
-                    import shutil
+class _StableSizeTracker:
+    """Tick-based PNG size stability (no sleep between polls)."""
 
-                    shutil.copy2(candidate, filepath)
-                return filepath
-        time.sleep(0.25)
+    __slots__ = ("last_size", "same_count")
+
+    def __init__(self) -> None:
+        self.last_size = -1
+        self.same_count = 0
+
+    def reset(self) -> None:
+        self.last_size = -1
+        self.same_count = 0
+
+    def observe(self, path: str) -> bool:
+        if not os.path.isfile(path):
+            self.reset()
+            return False
+        try:
+            size = os.path.getsize(path)
+        except OSError:
+            self.reset()
+            return False
+        if size == self.last_size:
+            self.same_count += 1
+        else:
+            self.last_size = size
+            self.same_count = 1
+        return self.same_count >= 2 and size >= MIN_BYTES
+
+
+def _mtime_at_least(path: str, since_mtime: float) -> bool:
+    try:
+        return os.path.getmtime(path) >= since_mtime - 0.05
+    except OSError:
+        return False
+
+
+def _copy_candidate_to_dest(candidate: str, filepath: str) -> bool:
+    if candidate == filepath:
+        return os.path.isfile(filepath)
+    try:
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        import shutil
+
+        shutil.copy2(candidate, filepath)
+        return os.path.isfile(filepath)
+    except OSError:
+        return False
+
+
+def probe_png_ready(
+    filepath: str,
+    since_mtime: float,
+    basename: str,
+    stable: Optional["_StableSizeTracker"] = None,
+) -> Optional[str]:
+    """Single-tick probe for fresh PNG (PS-C / slate drivers)."""
+    if (
+        os.path.isfile(filepath)
+        and os.path.getsize(filepath) >= MIN_BYTES
+        and _mtime_at_least(filepath, since_mtime)
+    ):
+        if stable is None or stable.observe(filepath):
+            return filepath
+    for root in _screenshot_search_roots():
+        candidate = os.path.join(root, basename)
+        if (
+            os.path.isfile(candidate)
+            and os.path.getsize(candidate) >= MIN_BYTES
+            and _mtime_at_least(candidate, since_mtime)
+        ):
+            if _copy_candidate_to_dest(candidate, filepath):
+                check = filepath if os.path.isfile(filepath) else candidate
+                if stable is None or stable.observe(check):
+                    return check
     return None
+
+
+def _wait_for_file(filepath, since_mtime, basename, wait_sec=None):
+    deadline = time.time() + (wait_sec if wait_sec is not None else WAIT_FILE_SEC_LEGACY)
+    stable = _StableSizeTracker()
+    while time.time() < deadline:
+        found = probe_png_ready(filepath, since_mtime, basename, stable)
+        if found:
+            return found
+        _settle_pump_only(frames=2)
+    return None
+
+
+def console_high_res_invoke_once(resolution_x, resolution_y, filepath, result):
+    """Fire doc-ordered HighResShot once (no file wait — use slate tick probe)."""
+    ue_path = _path_for_ue(filepath)
+    result["ue_path"] = ue_path
+    result["console_attempts"] = []
+    _finish_loading_before_screenshot()
+    _set_lit_view_mode()
+    for method, cmd in _high_res_shot_commands(resolution_x, resolution_y, ue_path):
+        entry = {"method": method, "cmd": cmd}
+        result["console_attempts"].append(entry)
+        try:
+            unreal.SystemLibrary.execute_console_command(None, cmd)
+            result["method"] = method
+            return True
+        except Exception as e:
+            entry["error"] = str(e)
+            continue
+    return False
 
 
 def _console_high_res(resolution_x, resolution_y, filepath, result):
