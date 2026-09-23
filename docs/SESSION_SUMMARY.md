@@ -1,3 +1,7 @@
+## 2026-09-23 — PS-C-3 fresh stills capture harden (cloud, post-#195)
+
+- **Ticket PS-C-3:** DESKTOP re-prove after #195 — driver returned in ~300s but **0/7 fresh PNGs** (5× PS_* missing; CAM_* stale mtime pass). **Fix:** [ps_placement_prove.py](../Content/Python/ps_placement_prove.py) — purge before shot; **AutomationLibrary abs primary** + console HighResShot ladder on slate ticks; per-shot wait from drive deadline; **`mtime ≥ capture_since`** for pass/MRQ copy (no 86400h reuse); [capture_viewport.py](../Content/Python/capture_viewport.py) console index API. KNOWN_ERRORS PS-C-3 row. **Draft PR — DESKTOP Conductor re-prove only (no PASS claim).**
+
 ## 2026-09-23 — Docs/33 Placement Stills (PS) strategy draft (cloud)
 
 - **PS-0:** [33_PLACEMENT_STILLS.md](../Docs/33_PLACEMENT_STILLS.md) — homestead-only placement stills suite (metrics catalog, multi-angle cams, benchmark sources, PS-A…E gates ending **`APPROVE PS STRATEGY`**). Handoff [PS_STRATEGY.md](../Docs/handoffs/PS_STRATEGY.md). Reuses PA-E harness patterns (`pa_e_shotlist_common`, HARNESS_ARRANGE); no `.uasset` commits. PHASE_BOARD + Docs/README updated. **Pending Lead gate.**
