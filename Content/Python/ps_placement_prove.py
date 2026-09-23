@@ -111,6 +111,7 @@ PS_C_STABLE_POLLS_REQUIRED = 2
 PS_C_SLATE_MECHANISM = "register_slate_pre_tick_callback"
 PS_C_DRIVE_MECHANISM = "slate_callback_plus_pump_until_done"
 CAP001_SETTLE_AFTER_YIELD_V1 = "CAP001_SETTLE_AFTER_YIELD_V1"
+CAP001_DARK_STILL_LIT_AIM_V1 = "CAP001_DARK_STILL_LIT_AIM_V1"
 CAP001_PHASE_B_SIDECAR = "ps_c_cap001_phase_b.json"
 TRACE_TOP_OFFSET_UU = 120.0
 TRACE_DEPTH_UU = 12000.0
@@ -1523,9 +1524,10 @@ def _cap001_phase_a_stamp(
     fire_ok: bool,
     fire_error: Optional[str],
     methods: list[str],
+    lit_aim_prep: Optional[dict[str, Any]] = None,
 ) -> dict[str, Any]:
     """Conductor-readable Phase B inputs (host poll after MCP yield)."""
-    return {
+    stamp: dict[str, Any] = {
         "contract": CAP001_SETTLE_AFTER_YIELD_V1,
         "phase": "A",
         "camera_label": cam_label,
@@ -1535,6 +1537,84 @@ def _cap001_phase_a_stamp(
         "fire_error": fire_error,
         "methods": methods,
     }
+    if lit_aim_prep is not None:
+        stamp[CAP001_DARK_STILL_LIT_AIM_V1] = lit_aim_prep
+    return stamp
+
+
+def _cap001_shot2_for_cabin_close() -> Optional[dict[str, Any]]:
+    for shot in common.SHOTS:
+        if shot.get("id") == "shot2":
+            return shot
+    return common._shot_def("shot2")  # type: ignore[attr-defined]
+
+
+def _cap001_prepare_one_cam_lit_aim_before_fire(
+    cam,
+    cam_label: str,
+) -> tuple[list[str], list[str], dict[str, Any]]:
+    """Lit + game view, PA-E shot2 cabin aim, loading finish, slate warm (pre-AL)."""
+    methods: list[str] = [CAP001_DARK_STILL_LIT_AIM_V1]
+    blocked: list[str] = []
+    prep_meta: dict[str, Any] = {"camera_label": cam_label}
+
+    view = common.apply_lit_game_view_for_capture()
+    prep_meta["lit_game_view"] = view
+    methods.append(f"apply_lit_game_view:{view.get('viewmode')}")
+
+    if cam_label == "CAM_CabinClose":
+        shot = _cap001_shot2_for_cabin_close()
+        if shot is None:
+            blocked.append("cap001_shot2_missing_design_bounce")
+            prep_meta["aim_error"] = "shot2_def_missing"
+        else:
+            loc, rot, aim_meta = common.resolve_camera_transform(shot, cam)
+            prep_meta["resolve_camera_transform"] = {
+                k: aim_meta.get(k)
+                for k in (
+                    "pose_source",
+                    "aim_after",
+                    "aim_after_bounds_relocate",
+                    "aim_before",
+                    "camera_relocated_from_bounds",
+                    "camera_relocated_wide_cabin_anchor",
+                    "expected_framing",
+                )
+            }
+            aim_after = (
+                aim_meta.get("aim_after")
+                or aim_meta.get("aim_after_bounds_relocate")
+                or aim_meta.get("aim_after_doc_fallback")
+                or {}
+            )
+            prep_meta["aim_ok"] = bool(aim_after.get("aim_ok"))
+            prep_meta["forward_ray_hits_dress_aabb"] = aim_after.get(
+                "forward_ray_hits_dress_aabb"
+            )
+            inv = aim_meta.get("prove_loop_step1_inventory") or {}
+            prep_meta["aim_bounds_ok"] = inv.get("aim_bounds_ok")
+            if not inv.get("aim_bounds_ok"):
+                blocked.append("cap001_aim_bounds_missing_cabin_dress_labels")
+            elif not prep_meta.get("aim_ok"):
+                blocked.append("cap001_cabin_aim_not_ok")
+                if aim_after.get("forward_ray_hits_dress_aabb") is False:
+                    blocked.append("cap001_forward_ray_miss_dress_aabb")
+            sync = common.sync_editor_viewport_to_camera(cam, loc, rot)
+            prep_meta["viewport_sync"] = sync
+            methods.append(f"sync_editor_viewport:{sync.get('viewport_api')}")
+            _pilot_camera(cam)
+    else:
+        _pilot_camera(cam)
+        prep_meta["aim_skipped"] = "non_CAM_CabinClose_one_cam_label"
+
+    _focus_ps_c_viewport()
+    cv = _load_capture_viewport()
+    if cv._finish_loading_before_screenshot():
+        methods.append("AutomationLibrary.finish_loading_before_screenshot")
+    cv._settle_pump_only(frames=PS_C_INTER_SHOT_SETTLE_FRAMES)
+    methods.append(f"slate_warm_pump_frames:{PS_C_INTER_SHOT_SETTLE_FRAMES}")
+    prep_meta["slate_warm_frames"] = PS_C_INTER_SHOT_SETTLE_FRAMES
+    return methods, blocked, prep_meta
 
 
 def _ps_c_one_cam_phase_a_fire_and_return(
@@ -1573,13 +1653,13 @@ def _ps_c_one_cam_phase_a_fire_and_return(
         )
         return [], act_start, None, fire_error, blocked, stamp
 
+    prep_methods, prep_blocked, lit_aim_prep = _cap001_prepare_one_cam_lit_aim_before_fire(
+        cam, cam_label
+    )
+    blocked.extend(prep_blocked)
     _purge_ps_c_still_png(path)
-    _pilot_camera(cam)
-    _focus_ps_c_viewport()
     methods: list[str] = ["CAP001_SETTLE_AFTER_YIELD_V1:phase_a_fire_only"]
-    lit = cv._set_lit_view_mode()
-    if lit:
-        methods.append(lit)
+    methods.extend(prep_methods)
 
     act_fired_at = time.time()
     ok, al_methods, _task = _automation_abs_screenshot_one_invoke(path, cam)
@@ -1596,6 +1676,7 @@ def _ps_c_one_cam_phase_a_fire_and_return(
         fire_ok=ok,
         fire_error=fire_error,
         methods=methods,
+        lit_aim_prep=lit_aim_prep,
     )
     entry: dict[str, Any] = {
         "camera_label": cam_label,
@@ -1603,6 +1684,7 @@ def _ps_c_one_cam_phase_a_fire_and_return(
         "methods": methods,
         "act_fired_at": act_fired_at,
         "canonical_still_path_abs": path,
+        "cap001_dark_still_lit_aim_v1": lit_aim_prep,
         "capture_outcome": OUTCOME_SOFT if ok else OUTCOME_SOFT,
         "counts_toward_gate": False,
         "fresh_this_act": False,
