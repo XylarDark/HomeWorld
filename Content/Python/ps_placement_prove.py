@@ -1,11 +1,13 @@
 # ps_placement_prove.py
 # PS-C: Automated placement metrics + viewport still capture on L_VS_MVP_Markers.
 # Run in Unreal Editor or MCP: execute_python_script("ps_placement_prove.py").
+# One-cam bite (CAP-001 isolate): set PS_C_ONE_CAM_LABEL=CAM_CabinClose or PS_C_ONE_CAM=1
+# before Act, or argv --one-cam CAM_CabinClose. Full 7-still path when unset (Conductor default later).
 # Chain (DESKTOP): markers → dress → pa_d → arrange_ps_homestead.py → this script.
 # Harness P3 exempt: PS track prove (Arrange gate via ps_arrange_gate.json / arrange_ps_homestead).
 # Writes Saved/ps_placement_metrics.json, Saved/ps_stills/*, Saved/ps_c_prove_gate.json.
-# Stills: slate pre-tick state machine + pump-until-done (≤300s, no sleep) so MCP prove
-# always finalizes gate and PNGs; module-level callback + keep_python_script_alive.
+# Stills: full 7 = slate pre-tick driver + pump-until-done (≤300s). One-cam bite =
+# CAP001_SETTLE_AFTER_YIELD_V1 Phase A: single AL fire + act_fired_at stamp, return (Phase B = host).
 
 from __future__ import annotations
 
@@ -62,6 +64,22 @@ CORE_DRESS_SUBSTRINGS = (
 
 CLIFF_LABEL_MARKERS = ("Cliff",)
 
+# Design canon: Docs/handoffs/PS_C_METRICS.md § Still capture set (7 PNGs).
+# Maps PS-A strategy IDs (PS_A_INVENTORY.md §2): PS_Lookout_Hero→CAM_Hero,
+# PS_Cabin_ThreeQuarter→CAM_CabinClose; spawned PS_* per PS-B arrange_ps_homestead.
+# Do not add labels here without Lead/Design handoff update (no invented cams).
+_PS_C_STILL_LABELS_CANON = frozenset(
+    {
+        "PS_N_HighIso",
+        "PS_E_HighIso",
+        "PS_Cliff_Underside",
+        "PS_Path_Corridor",
+        "PS_Garden_Close",
+        "CAM_Hero",
+        "CAM_CabinClose",
+    }
+)
+
 STILL_CAM_LABELS = (
     "PS_N_HighIso",
     "PS_E_HighIso",
@@ -72,16 +90,38 @@ STILL_CAM_LABELS = (
     "CAM_CabinClose",
 )
 
+# Runtime still set (full 7 default; one-cam bite overrides per Act — see PS_C_ONE_CAM_LABEL).
+_ACTIVE_STILL_CAM_LABELS: tuple[str, ...] = STILL_CAM_LABELS
+PS_C_ONE_CAM_DEFAULT_LABEL = "CAM_CabinClose"
+
 STILL_RES_X, STILL_RES_Y = 1600, 900
 PS_C_WAIT_FILE_SEC = 48.0
+PS_C_ONE_CAM_WAIT_FILE_SEC = 72.0
 PS_C_INTER_SHOT_SETTLE_FRAMES = 8
 PS_C_DRIVE_TIMEOUT_SEC = 300.0
+PS_C_ONE_CAM_DRIVE_TIMEOUT_SEC = 120.0
 PS_C_WAIT_RETRY_TICKS = 6
 PS_C_FINAL_DRAIN_SEC = 12.0
+PS_C_GATE_SETTLE_SEC = 120.0
+PS_C_ONE_CAM_GATE_SETTLE_SEC = 180.0
+# Windows/FAT mtime often 1s — allow gate stamp slightly after file mtime (not post-gate async).
+PS_C_ACT_END_MTIME_SLACK_SEC = 1.05
 PS_C_PS_CAM_PREFIX = "PS_"
 PS_C_STABLE_POLLS_REQUIRED = 2
 PS_C_SLATE_MECHANISM = "register_slate_pre_tick_callback"
 PS_C_DRIVE_MECHANISM = "slate_callback_plus_pump_until_done"
+CAP001_SETTLE_AFTER_YIELD_V1 = "CAP001_SETTLE_AFTER_YIELD_V1"
+CAP001_DARK_STILL_LIT_AIM_V1 = "CAP001_DARK_STILL_LIT_AIM_V1"
+CAP001_DARK_STILL_NIGHT_STACK_V2 = "CAP001_DARK_STILL_NIGHT_STACK_V2"
+CAP001_POST_NIGHT_AL_READY_V1 = "CAP001_POST_NIGHT_AL_READY_V1"
+CAP001_AL_AFTER_MCP_DISCONNECT_V1 = "CAP001_AL_AFTER_MCP_DISCONNECT_V1"
+CAP001_FIRE_ONLY_AL_READY_WIRE_V1 = "CAP001_FIRE_ONLY_AL_READY_WIRE_V1"
+CAP001_FIRE_ON_SLATE_TICK_V1 = "CAP001_FIRE_ON_SLATE_TICK_V1"
+CAP001_FIRE_ON_POST_TICK_AFTER_YIELD_V1 = "CAP001_FIRE_ON_POST_TICK_AFTER_YIELD_V1"
+CAP001_PHASE_B_SIDECAR = "ps_c_cap001_phase_b.json"
+CAP001_POST_TICK_FIRE_SIDECAR = "ps_c_cap001_post_tick_fire.json"
+PS_C_SLATE_POST_TICK_MECHANISM = "register_slate_post_tick_callback"
+PS_C_POST_NIGHT_WARM_FRAMES = 6
 TRACE_TOP_OFFSET_UU = 120.0
 TRACE_DEPTH_UU = 12000.0
 # PS-C baseline: metric over-threshold → soft_fail (Lead tunes before closed_fail).
@@ -98,6 +138,51 @@ MRQ_SHOT_STILL_FALLBACK = {
     "CAM_Hero": ("shot1", "Shot1_lookout"),
     "CAM_CabinClose": ("shot2", "Shot2_cabin"),
 }
+
+
+def _still_labels() -> tuple[str, ...]:
+    return _ACTIVE_STILL_CAM_LABELS
+
+
+def _resolve_one_cam_label_from_env_or_argv() -> Optional[str]:
+    """One-cam bite: env PS_C_ONE_CAM_LABEL / PS_C_ONE_CAM or argv --one-cam <label>."""
+    import sys
+
+    for i, arg in enumerate(sys.argv):
+        if arg in ("--one-cam", "--one_cam") and i + 1 < len(sys.argv):
+            return sys.argv[i + 1].strip()
+    raw = (os.environ.get("PS_C_ONE_CAM_LABEL") or os.environ.get("PS_C_ONE_CAM") or "").strip()
+    if raw.lower() in ("1", "true", "yes", "bite"):
+        return PS_C_ONE_CAM_DEFAULT_LABEL
+    return raw or None
+
+
+def _apply_prove_still_label_set(
+    one_cam_label: Optional[str] = None,
+) -> dict[str, Any]:
+    """Configure full vs one-cam still Act (Design canon labels only)."""
+    global _ACTIVE_STILL_CAM_LABELS
+    label = one_cam_label if one_cam_label is not None else _resolve_one_cam_label_from_env_or_argv()
+    if not label:
+        _ACTIVE_STILL_CAM_LABELS = STILL_CAM_LABELS
+        return {
+            "prove_mode": "full",
+            "stills_required_count": len(STILL_CAM_LABELS),
+            "still_labels": list(_ACTIVE_STILL_CAM_LABELS),
+        }
+    if label not in _PS_C_STILL_LABELS_CANON:
+        return {
+            "prove_mode": "one_cam_invalid",
+            "one_cam_label": label,
+            "error": f"one_cam_label_not_in_design_canon:{label}",
+        }
+    _ACTIVE_STILL_CAM_LABELS = (label,)
+    return {
+        "prove_mode": "one_cam",
+        "one_cam_label": label,
+        "stills_required_count": 1,
+        "still_labels": [label],
+    }
 
 
 def _log(msg: str, data: Optional[dict[str, Any]] = None) -> None:
@@ -120,6 +205,25 @@ def _find_actor_label(label: str):
         if common.actor_label(a) == label:
             return a
     return None
+
+
+def _still_cam_labels_missing() -> list[str]:
+    """Prove still labels that must exist after PS-B Arrange (inventory gate)."""
+    return [lbl for lbl in _still_labels() if _find_actor_label(lbl) is None]
+
+
+def _prove_still_labels_drift_from_design() -> Optional[str]:
+    """None if STILL_CAM_LABELS matches PS-C handoff; else bounce-to-Design message."""
+    current = frozenset(STILL_CAM_LABELS)
+    if current == _PS_C_STILL_LABELS_CANON:
+        return None
+    only_prove = sorted(current - _PS_C_STILL_LABELS_CANON)
+    only_canon = sorted(_PS_C_STILL_LABELS_CANON - current)
+    return (
+        "prove_camera_labels_drift_design_bounce:"
+        f"prove_only={only_prove or []};canon_only={only_canon or []};"
+        "patch Docs/handoffs/PS_C_METRICS.md + PS_A_INVENTORY.md — do not invent cams"
+    )
 
 
 def _actor_aabb(actor) -> Optional[dict[str, list[float]]]:
@@ -237,34 +341,53 @@ def _dress_bounds_from_file() -> tuple[Optional[dict[str, Any]], str]:
     return None, path
 
 
-def _ensure_arrange_gate() -> tuple[dict[str, Any], list[str]]:
-    """Return arrange gate dict; run Arrange if missing or not ready."""
+def _ensure_arrange_gate() -> tuple[dict[str, Any], list[str], bool]:
+    """Return arrange gate, blocked reasons, and whether prove may Act (cameras in level)."""
     blocked: list[str] = []
     gate_path = _project_saved_path("ps_arrange_gate.json")
     gate = _load_json(gate_path)
-    if gate and gate.get("ready_for_ps_c"):
+    missing_cams = _still_cam_labels_missing()
+    if gate and gate.get("ready_for_ps_c") and not missing_cams:
         gate["read_from"] = gate_path
-        return gate, blocked
+        return gate, blocked, True
+
+    if gate and gate.get("ready_for_ps_c") and missing_cams:
+        _log(
+            "stale ps_arrange_gate ready but prove cameras missing; re-running arrange_ps_homestead",
+            {"missing": missing_cams},
+        )
 
     if gate and not gate.get("ready_for_ps_c"):
         blocked.append("ps_arrange_gate_not_ready")
-    else:
+    elif not gate:
         blocked.append("ps_arrange_gate_missing")
 
     if ps_arrange is None:
         blocked.append("arrange_ps_homestead_import_failed")
-        return gate or {}, blocked
+        return gate or {}, blocked, False
 
-    _log("running arrange_ps_homestead (gate missing or not ready)")
+    _log(
+        "running arrange_ps_homestead.py",
+        {"missing_before": missing_cams, "gate_ready": bool(gate and gate.get("ready_for_ps_c"))},
+    )
     try:
         gate = ps_arrange.arrange_ps_homestead()
     except Exception as e:
         blocked.append(f"arrange_failed:{e}")
-        return gate or {}, blocked
+        return gate or {}, blocked, False
+
+    missing_after = _still_cam_labels_missing()
+    if missing_after:
+        blocked.append(f"inventory_cameras_missing_closed_fail:{','.join(missing_after)}")
+        if not gate.get("ready_for_ps_c"):
+            blocked.append("arrange_still_not_ready_for_ps_c")
+        return gate, blocked, False
 
     if not gate.get("ready_for_ps_c"):
         blocked.append("arrange_still_not_ready_for_ps_c")
-    return gate, blocked
+        return gate, blocked, False
+
+    return gate, blocked, True
 
 
 def _sample_metric_actors() -> tuple[list, dict[str, Any]]:
@@ -692,9 +815,24 @@ def _pilot_camera(cam) -> None:
         pass
 
 
-def _resolve_still_path(stills_dir: str, cam_label: str) -> str:
+def _ps_c_stills_dir_abs() -> str:
+    """Canonical Saved/ps_stills under project_dir (AL write ≡ settle ≡ gate score)."""
+    path = common.abs_path(os.path.join(common.project_dir(), "Saved", "ps_stills"))
+    os.makedirs(path, exist_ok=True)
+    return path
+
+
+def _ps_c_canonical_still_path(cam_label: str) -> str:
+    """Single abs path for a still label — same as capture_viewport._ensure_abs_dest."""
+    cv = _load_capture_viewport()
     safe = cam_label.replace("/", "_")
-    return os.path.join(stills_dir, f"{safe}.png")
+    return cv._ensure_abs_dest(os.path.join(_ps_c_stills_dir_abs(), f"{safe}.png"))
+
+
+def _resolve_still_path(stills_dir: str, cam_label: str) -> str:
+    """Absolute path under {Project}/Saved/ps_stills/ (never basename-only / engine CWD)."""
+    _ = stills_dir
+    return _ps_c_canonical_still_path(cam_label)
 
 
 def _mtime_at_least(path: str, since: float) -> bool:
@@ -702,6 +840,34 @@ def _mtime_at_least(path: str, since: float) -> bool:
         return os.path.getmtime(path) >= since - 0.05
     except OSError:
         return False
+
+
+def _mtime_in_act_window(path: str, act_start: float, act_end: Optional[float]) -> bool:
+    """True when file mtime is within [act_start, act_end] (inclusive slack)."""
+    path = common.abs_path(path)
+    if not _mtime_at_least(path, act_start):
+        return False
+    if act_end is None:
+        return True
+    try:
+        return os.path.getmtime(path) <= act_end + PS_C_ACT_END_MTIME_SLACK_SEC
+    except OSError:
+        return False
+
+
+def _ps_still_counts_for_gate(
+    path: str, act_start: float, act_end: Optional[float]
+) -> bool:
+    """Gate truth: on disk, MIN_BYTES, mtime inside Act window (excludes stale + post-settle)."""
+    path = common.abs_path(path)
+    if not os.path.isfile(path):
+        return False
+    try:
+        if os.path.getsize(path) < common.MIN_BYTES:
+            return False
+    except OSError:
+        return False
+    return _mtime_in_act_window(path, act_start, act_end)
 
 
 def _ps_c_engine_search_roots() -> list[str]:
@@ -806,25 +972,21 @@ def _task_is_done(task: Any) -> Optional[bool]:
         return None
 
 
-def _ps_still_fresh_on_disk(path: str, act_since: float) -> bool:
-    path = common.abs_path(path)
-    if not os.path.isfile(path):
-        return False
-    try:
-        if os.path.getsize(path) < common.MIN_BYTES:
-            return False
-    except OSError:
-        return False
-    return _mtime_at_least(path, act_since)
+def _ps_still_fresh_on_disk(
+    path: str, act_since: float, act_end: Optional[float] = None
+) -> bool:
+    return _ps_still_counts_for_gate(path, act_since, act_end)
 
 
-def _audit_ps_stills_disk(stills_dir: str, act_since: float) -> dict[str, Any]:
-    """Authoritative fresh PNG count for gate (mtime >= capture act, MIN_BYTES)."""
+def _audit_ps_stills_disk(
+    stills_dir: str, act_since: float, act_end: Optional[float] = None
+) -> dict[str, Any]:
+    """Authoritative fresh PNG count for gate (Act window mtime + MIN_BYTES)."""
     per_label: list[dict[str, Any]] = []
     fresh_count = 0
-    for label in STILL_CAM_LABELS:
+    for label in _still_labels():
         path = common.abs_path(_resolve_still_path(stills_dir, label))
-        fresh = _ps_still_fresh_on_disk(path, act_since)
+        fresh = _ps_still_fresh_on_disk(path, act_since, act_end)
         mtime: Optional[float] = None
         if os.path.isfile(path):
             try:
@@ -840,13 +1002,15 @@ def _audit_ps_stills_disk(stills_dir: str, act_since: float) -> dict[str, Any]:
                 "fresh_this_act": fresh,
                 "file_mtime": mtime,
                 "capture_act_since": act_since,
+                "capture_act_end": act_end,
             }
         )
     return {
         "fresh_count": fresh_count,
-        "required_count": len(STILL_CAM_LABELS),
+        "required_count": len(_still_labels()),
         "per_label": per_label,
         "stills_dir": common.abs_path(stills_dir),
+        "capture_act_end": act_end,
     }
 
 
@@ -854,6 +1018,8 @@ def _reconcile_still_entries_from_disk(
     entries: list[dict[str, Any]],
     act_since: float,
     stills_dir: str,
+    *,
+    act_end: Optional[float] = None,
 ) -> list[dict[str, Any]]:
     """Align manifest rows with disk truth; never count stale file_exists toward gate."""
     by_label: dict[str, dict[str, Any]] = {}
@@ -862,12 +1028,25 @@ def _reconcile_still_entries_from_disk(
         if label:
             by_label[str(label)] = ent
     reconciled: list[dict[str, Any]] = []
-    for label in STILL_CAM_LABELS:
+    for label in _still_labels():
         path = common.abs_path(_resolve_still_path(stills_dir, label))
         ent = dict(by_label.get(label) or {"camera_label": label, "path": path, "methods": []})
         ent["path"] = path
         since = float(ent.get("capture_since") or act_since)
-        if _ps_still_fresh_on_disk(path, since):
+        resolved = _find_fresh_ps_still_path(path, since)
+        if resolved and resolved != path:
+            methods = list(ent.get("methods") or [])
+            if f"reconcile_copy:{resolved}" not in methods:
+                methods.append(f"reconcile_copy:{resolved}")
+            ent = _finalize_still_entry(
+                label,
+                path,
+                methods,
+                since=since,
+                resolved_on_disk=resolved,
+                act_end=act_end,
+            )
+        elif _ps_still_fresh_on_disk(path, since, act_end):
             methods = list(ent.get("methods") or [])
             ent = _finalize_still_entry(
                 label,
@@ -875,49 +1054,1134 @@ def _reconcile_still_entries_from_disk(
                 methods,
                 since=since,
                 resolved_on_disk=path,
+                act_end=act_end,
             )
         else:
-            ent["file_exists"] = os.path.isfile(path)
+            on_disk = os.path.isfile(path)
+            in_window = _ps_still_counts_for_gate(path, since, act_end) if on_disk else False
+            ent["on_disk"] = on_disk
+            ent["file_exists"] = in_window
+            ent["exists"] = in_window
+            if on_disk:
+                try:
+                    ent["bytes"] = os.path.getsize(path)
+                    ent["file_mtime"] = os.path.getmtime(path)
+                except OSError:
+                    pass
             ent["fresh_this_act"] = False
             ent["counts_toward_gate"] = False
-            if ent.get("file_exists") and not _mtime_at_least(path, since):
+            if on_disk and not _mtime_at_least(path, since):
                 ent["capture_outcome"] = OUTCOME_SOFT
                 ent["note"] = ent.get("note") or "stale_png_reuse_mtime_before_capture"
-            elif not ent.get("file_exists"):
+            elif on_disk and act_end is not None and not _mtime_in_act_window(path, since, act_end):
+                ent["capture_outcome"] = OUTCOME_SOFT
+                ent["note"] = ent.get("note") or "post_settle_png_landing_excluded_from_gate"
+            elif not on_disk:
                 ent.setdefault("capture_outcome", OUTCOME_SOFT)
                 ent.setdefault("note", "png_missing_black_or_path_soft_fail")
         ent["counts_toward_gate"] = bool(ent.get("fresh_this_act"))
+        ent["exists"] = bool(ent.get("file_exists"))
         reconciled.append(ent)
     return reconciled
 
 
-def _ps_c_post_drive_final_drain(orch: "_PsCStillsOrchestrator", max_sec: float) -> None:
-    """Late PNG landing — tick pump without sleep (PA-E final_drain pattern)."""
+def _ps_c_pending_tasks_done(orch: "_PsCStillsOrchestrator") -> bool:
+    for task in list(getattr(orch, "_pending_automation_tasks", []) or []):
+        done = _task_is_done(task)
+        if done is False:
+            return False
+    return True
+
+
+def _ps_c_path_stable_for_gate(
+    path: str,
+    act_start: float,
+    tracker: Any,
+) -> bool:
+    """capture_viewport _StableSizeTracker: MIN_BYTES + mtime >= act_start + size stable."""
+    path = common.abs_path(path)
+    if not os.path.isfile(path) or not _mtime_at_least(path, act_start):
+        tracker.reset()
+        return False
+    try:
+        if os.path.getsize(path) < common.MIN_BYTES:
+            tracker.reset()
+            return False
+    except OSError:
+        tracker.reset()
+        return False
+    return bool(tracker.observe(path))
+
+
+def _ps_c_all_still_paths_stable(
+    act_start: float,
+    labels: tuple[str, ...],
+    trackers: dict[str, Any],
+) -> bool:
+    for label in labels:
+        path = _ps_c_canonical_still_path(label)
+        if not _ps_c_path_stable_for_gate(path, act_start, trackers[label]):
+            return False
+    return True
+
+
+def _ps_c_probe_canonical_still_paths(
+    orch: "_PsCStillsOrchestrator",
+    act_start: float,
+    trackers: dict[str, Any],
+) -> None:
+    """Pull async AL/console PNG onto canonical abs paths (probe_png_ready each tick)."""
+    cv = orch._cv or _load_capture_viewport()
+    for label in orch._still_labels:
+        path = _ps_c_canonical_still_path(label)
+        tracker = trackers[label]
+        cv.probe_png_ready(path, act_start, os.path.basename(path), tracker)
+
+
+def _ps_c_poll_late_still_pngs(orch: "_PsCStillsOrchestrator", act_end: Optional[float]) -> None:
+    """One pass: copy/probe late PNGs into orch.entries (keep slate pump in settle loop)."""
     if orch.phase != _PsCStillsPhase.DONE:
         return
-    deadline = time.time() + max_sec
-    cv = orch._cv or _load_capture_viewport()
     act = orch._act_started_at
+    labels = orch._still_labels
+    for idx, label in enumerate(labels):
+        if idx >= len(orch.entries):
+            break
+        ent = orch.entries[idx]
+        if ent.get("fresh_this_act") and ent.get("counts_toward_gate"):
+            continue
+        path = common.abs_path(ent.get("path") or _resolve_still_path(orch.stills_dir, label))
+        since = float(ent.get("capture_since") or act)
+        found = _find_fresh_ps_still_path(path, since)
+        if found and _ps_still_counts_for_gate(found, since, act_end):
+            orch.entries[idx] = _finalize_still_entry(
+                label,
+                path,
+                list(ent.get("methods") or []),
+                since=since,
+                resolved_on_disk=found,
+                act_end=act_end,
+            )
+
+
+def _ps_c_settle_stills_before_gate(
+    orch: "_PsCStillsOrchestrator",
+    stills_dir: str,
+    act_start: float,
+    max_sec: float,
+) -> tuple[list[dict[str, Any]], float, list[str], bool]:
+    """Wait for stable PNG on canonical abs paths; gate/manifest only after paths_ready."""
+    cv = orch._cv or _load_capture_viewport()
+    deadline = time.time() + max_sec
+    stable_polls = 0
+    labels = orch._still_labels
+    trackers = {label: cv._StableSizeTracker() for label in labels}
+    canonical = {label: _ps_c_canonical_still_path(label) for label in labels}
+    settle_blocked: list[str] = []
+    _log(
+        "stills gate settle start",
+        {
+            "max_sec": max_sec,
+            "labels": list(labels),
+            "canonical_paths": canonical,
+            "pending_tasks": len(getattr(orch, "_pending_automation_tasks", []) or []),
+            "mechanism": "AutomationLibrary_probe_png_ready_stable_size",
+        },
+    )
     while time.time() < deadline:
-        for idx, label in enumerate(STILL_CAM_LABELS):
-            if idx >= len(orch.entries):
-                break
-            ent = orch.entries[idx]
-            if ent.get("fresh_this_act"):
-                continue
-            path = common.abs_path(ent.get("path") or _resolve_still_path(orch.stills_dir, label))
-            since = float(ent.get("capture_since") or act)
-            found = _find_fresh_ps_still_path(path, since)
-            if found:
-                orch.entries[idx] = _finalize_still_entry(
-                    label,
-                    path,
-                    list(ent.get("methods") or []),
-                    since=since,
-                    resolved_on_disk=found,
-                )
+        for task in list(getattr(orch, "_pending_automation_tasks", []) or []):
+            _task_is_done(task)
         cv._pump_editor_once()
-        orch._on_slate_pre_tick(0.033)
+        if orch._tick_handle is not None:
+            orch._on_slate_pre_tick(0.033)
+        _ps_c_probe_canonical_still_paths(orch, act_start, trackers)
+        _ps_c_poll_late_still_pngs(orch, None)
+        paths_stable = _ps_c_all_still_paths_stable(act_start, labels, trackers)
+        tasks_done = _ps_c_pending_tasks_done(orch)
+        if paths_stable and tasks_done:
+            stable_polls += 1
+            if stable_polls >= PS_C_STABLE_POLLS_REQUIRED:
+                break
+        else:
+            stable_polls = 0
+    for _ in range(4):
+        cv._pump_editor_once()
+        if orch._tick_handle is not None:
+            orch._on_slate_pre_tick(0.033)
+        _ps_c_probe_canonical_still_paths(orch, act_start, trackers)
+    paths_stable_final = _ps_c_all_still_paths_stable(act_start, labels, trackers)
+    if not paths_stable_final:
+        settle_blocked.append("one_cam_still_not_stable_in_act_window")
+        for label in labels:
+            path = canonical[label]
+            stamp = common.stamp_file_artifact(path)
+            settle_blocked.append(f"settle_polled_path:{label}:{json.dumps(stamp, default=str)}")
+    paths_ready = paths_stable_final
+    act_end: Optional[float] = time.time() if paths_ready else None
+    still_entries: list[dict[str, Any]] = []
+    if paths_ready:
+        act_end = time.time()
+        still_entries = _reconcile_still_entries_from_disk(
+            list(orch.entries), act_start, stills_dir, act_end=act_end
+        )
+    _log(
+        "stills gate settle complete",
+        {
+            "act_end": act_end,
+            "paths_stable_final": paths_stable_final,
+            "paths_ready": paths_ready,
+            "fresh": (
+                _audit_ps_stills_disk(stills_dir, act_start, act_end).get("fresh_count")
+                if paths_ready
+                else 0
+            ),
+            "tasks_done": _ps_c_pending_tasks_done(orch),
+            "canonical_paths": canonical,
+        },
+    )
+    return still_entries, act_end, settle_blocked, paths_ready
+
+
+def _ps_c_gate_hold_until_canonical_paths(
+    orch: "_PsCStillsOrchestrator",
+    stills_dir: str,
+    act_start: float,
+    max_sec: float,
+) -> tuple[list[dict[str, Any]], float, list[str], bool]:
+    """One-cam: forbid gate until canonical abs path has MIN_BYTES + stable (AL async flush)."""
+    cv = orch._cv or _load_capture_viewport()
+    labels = orch._still_labels
+    trackers = {label: cv._StableSizeTracker() for label in labels}
+    canonical = {label: _ps_c_canonical_still_path(label) for label in labels}
+    blocked: list[str] = []
+    deadline = time.time() + max_sec
+    stable_polls = 0
+    _log("one-cam gate hold until canonical path ready", {"max_sec": max_sec, "paths": canonical})
+    while time.time() < deadline:
+        for task in list(getattr(orch, "_pending_automation_tasks", []) or []):
+            _task_is_done(task)
+        cv._pump_editor_once()
+        if orch._tick_handle is not None:
+            orch._on_slate_pre_tick(0.033)
+        _ps_c_probe_canonical_still_paths(orch, act_start, trackers)
+        if _ps_c_all_still_paths_stable(act_start, labels, trackers) and _ps_c_pending_tasks_done(
+            orch
+        ):
+            stable_polls += 1
+            if stable_polls >= PS_C_STABLE_POLLS_REQUIRED:
+                act_end = time.time()
+                still_entries = _reconcile_still_entries_from_disk(
+                    list(orch.entries), act_start, stills_dir, act_end=act_end
+                )
+                _log("one-cam gate hold satisfied", {"act_end": act_end, "paths": canonical})
+                return still_entries, act_end, blocked, True
+        else:
+            stable_polls = 0
+    for label in labels:
+        blocked.append(
+            f"gate_hold_timeout:{label}:{json.dumps(common.stamp_file_artifact(canonical[label]), default=str)}"
+        )
+    act_end = time.time()
+    still_entries = _reconcile_still_entries_from_disk(
+        list(orch.entries), act_start, stills_dir, act_end=act_end
+    )
+    return still_entries, act_end, blocked, False
+
+
+def _cap001_al_task_fire_ok(task: Any) -> tuple[bool, dict[str, Any]]:
+    """fire_ok requires AutomationEditorTask when is_valid_task API exists."""
+    meta: dict[str, Any] = {
+        "task_type": type(task).__name__ if task is not None else None,
+    }
+    if task is None:
+        meta["task_valid"] = False
+        meta["reason"] = "no_automation_editor_task_returned"
+        return False, meta
+    valid_fn = getattr(task, "is_valid_task", None)
+    if callable(valid_fn):
+        try:
+            valid = bool(valid_fn())
+            meta["task_valid"] = valid
+            meta["is_valid_task"] = valid
+            if not valid:
+                meta["reason"] = "is_valid_task_false"
+            return valid, meta
+        except Exception as exc:
+            meta["task_valid"] = False
+            meta["is_valid_task_error"] = str(exc)
+            meta["reason"] = "is_valid_task_exception"
+            return False, meta
+    meta["task_valid"] = False
+    meta["reason"] = "is_valid_task_api_absent"
+    meta["is_valid_task_api"] = "absent"
+    return False, meta
+
+
+def _automation_abs_screenshot_one_invoke(
+    filepath: str,
+    cam,
+    *,
+    require_valid_al_task: bool = False,
+    al_delay: Optional[float] = None,
+) -> tuple[bool, list[str], Any, dict[str, Any]]:
+    """Single AL invoke (one-cam Phase A — fire only; no in-script wait)."""
+    cv = _load_capture_viewport()
+    dest_abs = cv._ensure_abs_dest(filepath)
+    ue_path = cv._path_for_ue(dest_abs)
+    methods: list[str] = [
+        f"al_canonical_dest:{ue_path}",
+        "one_cam:AutomationLibrary_abs_sync_single",
+    ]
+    delay = 0.35 if al_delay is None else al_delay
+    if al_delay is not None:
+        methods.append(f"al_delay:{delay}")
+    attempts = (
+        ("abs_kwargs_force_gv", lambda: unreal.AutomationLibrary.take_high_res_screenshot(
+            STILL_RES_X, STILL_RES_Y, ue_path, camera=cam, delay=delay, force_game_view=True
+        )),
+        ("abs_kwargs_gv", lambda: unreal.AutomationLibrary.take_high_res_screenshot(
+            STILL_RES_X, STILL_RES_Y, ue_path, camera=cam, force_game_view=True
+        )),
+        ("abs_positional_gv", lambda: unreal.AutomationLibrary.take_high_res_screenshot(
+            STILL_RES_X, STILL_RES_Y, ue_path, cam, True
+        )),
+        ("abs_legacy", lambda: unreal.AutomationLibrary.take_high_res_screenshot(
+            STILL_RES_X, STILL_RES_Y, ue_path, cam
+        )),
+    )
+    last_task_meta: dict[str, Any] = {}
+    for name, fn in attempts:
+        try:
+            task = fn()
+            methods.append(name)
+            if require_valid_al_task:
+                fire_ok, task_meta = _cap001_al_task_fire_ok(task)
+                last_task_meta = task_meta
+                methods.append(f"al_task_gate:{json.dumps(task_meta, default=str)}")
+                if fire_ok:
+                    return True, methods, task, task_meta
+                continue
+            return True, methods, task, {}
+        except TypeError:
+            continue
+        except Exception as e:
+            methods.append(f"{name}_fail:{e}")
+    return False, methods, None, last_task_meta
+
+
+def _cap001_prep_viewport_realtime_and_invalidate() -> dict[str, Any]:
+    """PREP_ONLY: force level viewport realtime + invalidate before MCP disconnect."""
+    meta: dict[str, Any] = {CAP001_FIRE_ON_POST_TICK_AFTER_YIELD_V1: True}
+    try:
+        les = unreal.get_editor_subsystem(unreal.LevelEditorSubsystem)
+        if les:
+            for attr in (
+                "editor_set_viewport_realtime",
+                "editor_set_level_viewport_realtime",
+                "set_level_viewport_realtime",
+            ):
+                if hasattr(les, attr):
+                    getattr(les, attr)(True)
+                    meta["realtime_ok"] = True
+                    meta["realtime_method"] = f"LevelEditorSubsystem.{attr}"
+                    break
+            for attr in (
+                "editor_invalidate_viewports",
+                "invalidate_viewports",
+                "editor_invalidate_all_viewports",
+            ):
+                if hasattr(les, attr):
+                    getattr(les, attr)()
+                    meta["invalidate_ok"] = True
+                    meta["invalidate_method"] = f"LevelEditorSubsystem.{attr}"
+                    break
+    except Exception as exc:
+        meta["prep_viewport_error"] = str(exc)
+    return meta
+
+
+def _cap001_patch_gate_after_post_tick_fire(
+    *,
+    cam_label: str,
+    canonical_path_abs: str,
+    act_fired_at: float,
+    fire_ok: bool,
+    fire_error: Optional[str],
+    methods: list[str],
+    task_meta: dict[str, Any],
+) -> None:
+    """Post-yield post-tick AL: stamp gate + sidecar for host Phase B."""
+    payload: dict[str, Any] = {
+        "contract": CAP001_SETTLE_AFTER_YIELD_V1,
+        "phase": "A",
+        "camera_label": cam_label,
+        "canonical_still_path_abs": canonical_path_abs,
+        "act_fired_at": act_fired_at,
+        "fire_ok": fire_ok,
+        "fire_error": fire_error,
+        "armed_post_tick": True,
+        "post_tick_al_fired": True,
+        CAP001_FIRE_ON_POST_TICK_AFTER_YIELD_V1: True,
+        "methods": methods,
+        "al_task": task_meta,
+        "task_valid": task_meta.get("task_valid"),
+        "post_tick_fired_at": time.time(),
+    }
+    sidecar_path = _project_saved_path(CAP001_POST_TICK_FIRE_SIDECAR)
+    try:
+        with open(sidecar_path, "w", encoding="utf-8") as f:
+            json.dump(payload, f, indent=2, default=str)
+    except OSError as exc:
+        _log("cap001 post-tick sidecar write failed", {"error": str(exc)})
+    gate_path = _project_saved_path("ps_c_prove_gate.json")
+    gate = _cap001_load_json_sidecar(gate_path)
+    if not gate:
+        return
+    cap = gate.get("cap001_settle_after_yield_v1")
+    if isinstance(cap, dict):
+        cap.update(payload)
+        gate["cap001_settle_after_yield_v1"] = cap
+    gate["act_fired_at"] = act_fired_at
+    gate["canonical_still_path_abs"] = canonical_path_abs
+    try:
+        with open(gate_path, "w", encoding="utf-8") as f:
+            json.dump(gate, f, indent=2, default=str)
+    except OSError as exc:
+        _log("cap001 post-tick gate patch failed", {"error": str(exc)})
+
+
+class _Cap001FireOnlyPostTickDriver:
+    """FIRE_ONLY: arm slate post-tick + keep_alive; AL fires on first post-tick after MCP yield."""
+
+    def __init__(
+        self,
+        cam: Any,
+        path: str,
+        cam_label: str,
+        wire_methods: list[str],
+        wire_meta: dict[str, Any],
+    ) -> None:
+        self.cam = cam
+        self.path = path
+        self.cam_label = cam_label
+        self.wire_methods = wire_methods
+        self.wire_meta = wire_meta
+        self._tick_handle: Any = None
+        self._registered_tick_callable = _cap001_fire_only_post_tick_dispatcher
+        self._fired = False
+        self._task: Any = None
+        self._pending_automation_tasks: list[Any] = []
+        self._driver_error: Optional[str] = None
+        self._keep_alive_armed = False
+        self._in_tick = False
+
+    def _track_automation_task(self, task: Any) -> None:
+        if task is not None:
+            self._pending_automation_tasks.append(task)
+            _PS_C_DRIVER_ROOTS.append(task)
+
+    def start(self) -> tuple[bool, Optional[str]]:
+        global _ACTIVE_PS_C_STILLS
+        if _ACTIVE_PS_C_STILLS is not None:
+            return False, "ps_c_stills_driver_active"
+        try:
+            import vnp_editor_keep_alive as keep
+
+            self._keep_alive_armed = bool(keep.arm())
+            self.wire_meta["keep_python_script_alive"] = self._keep_alive_armed
+        except Exception as exc:
+            return False, f"keep_alive_arm_failed:{exc}"
+        register = getattr(unreal, "register_slate_post_tick_callback", None)
+        if not callable(register):
+            return False, "register_slate_post_tick_callback unavailable"
+        _PS_C_DRIVER_ROOTS.append(self)
+        _PS_C_SLATE_CALLBACK_REFS.append(self._registered_tick_callable)
+        try:
+            self._tick_handle = register(self._registered_tick_callable)
+        except Exception as exc:
+            self._driver_error = str(exc)
+            return False, str(exc)
+        self.wire_methods.append(
+            f"fire_only:{PS_C_SLATE_POST_TICK_MECHANISM}:{CAP001_FIRE_ON_POST_TICK_AFTER_YIELD_V1}"
+        )
+        return True, None
+
+    def _unregister_tick(self) -> None:
+        if self._tick_handle is None:
+            return
+        unregister = getattr(unreal, "unregister_slate_post_tick_callback", None)
+        if callable(unregister):
+            try:
+                unregister(self._tick_handle)
+            except Exception:
+                pass
+        self._tick_handle = None
+        self.wire_methods.append("fire_only:post_tick_unregistered_after_al_fire")
+
+    def _on_slate_post_tick(self, _delta: float) -> None:
+        if self._fired or self._in_tick:
+            return
+        self._in_tick = True
+        try:
+            self._fired = True
+            _focus_ps_c_viewport()
+            act_fired_at = time.time()
+            ok, al_methods, task, task_meta = _automation_abs_screenshot_one_invoke(
+                self.path,
+                self.cam,
+                require_valid_al_task=True,
+                al_delay=0.0,
+            )
+            fire_methods = list(self.wire_methods) + list(al_methods)
+            fire_methods.append(f"{CAP001_FIRE_ON_POST_TICK_AFTER_YIELD_V1}:post_tick_al_fire")
+            self._track_automation_task(task)
+            self._task = task
+            fire_error = None if ok else "automation_invoke_failed_or_invalid_task"
+            _cap001_patch_gate_after_post_tick_fire(
+                cam_label=self.cam_label,
+                canonical_path_abs=self.path,
+                act_fired_at=act_fired_at if ok else None,
+                fire_ok=ok,
+                fire_error=fire_error,
+                methods=fire_methods,
+                task_meta=task_meta,
+            )
+            self._unregister_tick()
+        finally:
+            self._in_tick = False
+
+
+def _cap001_fire_only_al_ready_and_arm_post_tick(
+    cam,
+    path: str,
+    cam_label: str,
+) -> tuple[bool, Optional[float], Optional[str], list[str], dict[str, Any]]:
+    """Post-MCP FIRE_ONLY: AL_READY bind, arm post-tick only (no inline / same-script AL)."""
+    global _ACTIVE_CAP001_FIRE_ONLY
+    wire_methods: list[str] = [
+        CAP001_FIRE_ONLY_AL_READY_WIRE_V1,
+        CAP001_FIRE_ON_POST_TICK_AFTER_YIELD_V1,
+    ]
+    wire_meta: dict[str, Any] = {
+        CAP001_FIRE_ONLY_AL_READY_WIRE_V1: True,
+        CAP001_FIRE_ON_POST_TICK_AFTER_YIELD_V1: True,
+        "armed_post_tick": True,
+    }
+    _pilot_camera(cam)
+    wire_methods.append("fire_only:pre_al_pilot_camera")
+    cv = _load_capture_viewport()
+    wire_meta["finish_loading"] = cv._finish_loading_before_screenshot()
+    wire_methods.append("fire_only:finish_loading_before_screenshot")
+    view = common.apply_lit_game_view_for_capture()
+    wire_meta["lit_game_view"] = view
+    wire_methods.append(f"fire_only:apply_lit_game_view:{view.get('viewmode')}")
+    _focus_ps_c_viewport()
+    wire_methods.append("fire_only:focus_viewport")
+    if _ACTIVE_CAP001_FIRE_ONLY is not None:
+        return (
+            False,
+            None,
+            "cap001_fire_only_driver_already_active",
+            wire_methods,
+            wire_meta,
+        )
+    driver = _Cap001FireOnlyPostTickDriver(cam, path, cam_label, wire_methods, wire_meta)
+    started, err = driver.start()
+    if not started:
+        wire_meta["armed_post_tick"] = False
+        return False, None, err or "post_tick_arm_failed", wire_methods, wire_meta
+    _ACTIVE_CAP001_FIRE_ONLY = driver
+    wire_methods.append("fire_only:slate_post_tick_armed")
+    return True, None, None, wire_methods, wire_meta
+
+
+def _cap001_env_truthy(name: str) -> bool:
+    raw = (os.environ.get(name) or "").strip().lower()
+    return raw in ("1", "true", "yes")
+
+
+def _cap001_env_phase_b_absorb_only() -> bool:
+    """Conductor: host poll wrote phase B sidecar — absorb gate without re-firing AL."""
+    return _cap001_env_truthy("PS_C_CAP001_PHASE_B_ABSORB")
+
+
+def _cap001_env_prep_only() -> bool:
+    """Script1: night + POST_NIGHT + lit/aim prep; no AL (MCP disconnect before fire)."""
+    return _cap001_env_truthy("PS_C_CAP001_PREP_ONLY")
+
+
+def _cap001_env_fire_only() -> bool:
+    """Script2: single AL fire after MCP reconnect; no night/prep re-run."""
+    return _cap001_env_truthy("PS_C_CAP001_FIRE_ONLY")
+
+
+def _cap001_phase_b_sidecar_path() -> str:
+    return _project_saved_path(CAP001_PHASE_B_SIDECAR)
+
+
+def _cap001_load_json_sidecar(path: str) -> Optional[dict[str, Any]]:
+    if not os.path.isfile(path):
+        return None
+    try:
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        return data if isinstance(data, dict) else None
+    except (OSError, json.JSONDecodeError) as e:
+        _log("cap001 sidecar read failed", {"path": path, "error": str(e)})
+        return None
+
+
+def _cap001_load_phase_a_from_saved_gate() -> Optional[dict[str, Any]]:
+    gate = _cap001_load_json_sidecar(_project_saved_path("ps_c_prove_gate.json"))
+    post_tick = _cap001_load_json_sidecar(_project_saved_path(CAP001_POST_TICK_FIRE_SIDECAR))
+    if not gate:
+        return None
+    cap = gate.get("cap001_settle_after_yield_v1")
+    if isinstance(cap, dict):
+        if cap.get("phase") == "B" and isinstance(cap.get("phase_a"), dict):
+            return cap["phase_a"]
+        if cap.get("phase") == "A":
+            if cap.get("act_fired_at") is None and isinstance(post_tick, dict):
+                if post_tick.get("post_tick_al_fired") and post_tick.get("act_fired_at"):
+                    merged = dict(cap)
+                    merged.update(
+                        {
+                            "act_fired_at": post_tick.get("act_fired_at"),
+                            "fire_ok": post_tick.get("fire_ok"),
+                            "fire_error": post_tick.get("fire_error"),
+                            "post_tick_al_fired": True,
+                        }
+                    )
+                    return merged
+            return cap
+    act_fired = gate.get("act_fired_at")
+    path_abs = gate.get("canonical_still_path_abs")
+    label = gate.get("one_cam_label")
+    if act_fired is not None and path_abs and label:
+        return {
+            "contract": CAP001_SETTLE_AFTER_YIELD_V1,
+            "phase": "A",
+            "camera_label": label,
+            "canonical_still_path_abs": path_abs,
+            "act_fired_at": act_fired,
+            "fire_ok": True,
+            "fire_error": None,
+        }
+    return None
+
+
+def _cap001_load_still_entries_from_manifest() -> list[dict[str, Any]]:
+    manifest_path = os.path.join(_ps_c_stills_dir_abs(), "manifest.json")
+    manifest = _cap001_load_json_sidecar(manifest_path)
+    if not manifest:
+        return []
+    stills = manifest.get("stills")
+    return list(stills) if isinstance(stills, list) else []
+
+
+def _cap001_validate_phase_b_settle(
+    phase_a: dict[str, Any],
+    phase_b: dict[str, Any],
+) -> tuple[bool, str]:
+    if not phase_a.get("fire_ok"):
+        return False, "phase_a_not_fire_ok"
+    act_fired = phase_a.get("act_fired_at")
+    if act_fired is None:
+        return False, "phase_a_no_act_fired_at"
+    path_a = common.abs_path(str(phase_a.get("canonical_still_path_abs") or ""))
+    path_b = common.abs_path(
+        str(phase_b.get("canonical_still_path_abs") or path_a or "")
+    )
+    if not path_a or path_a != path_b:
+        return False, "canonical_path_mismatch"
+    b_fired = phase_b.get("act_fired_at")
+    if b_fired is not None and abs(float(b_fired) - float(act_fired)) > 0.5:
+        return False, "act_fired_at_mismatch"
+    if phase_b.get("settle_ok") is False:
+        return False, "phase_b_settle_ok_false"
+    if not os.path.isfile(path_b):
+        return False, "png_missing_on_disk"
+    try:
+        size = os.path.getsize(path_b)
+        mtime = os.path.getmtime(path_b)
+    except OSError as exc:
+        return False, f"stat_failed:{exc}"
+    if size < common.MIN_BYTES:
+        return False, "below_min_bytes"
+    if mtime < float(act_fired) - 0.05:
+        return False, "mtime_before_act_fired_at"
+    stamp_bytes = phase_b.get("bytes")
+    if stamp_bytes is not None:
+        try:
+            if int(stamp_bytes) < common.MIN_BYTES:
+                return False, "phase_b_stamp_bytes_below_min"
+        except (TypeError, ValueError):
+            pass
+    return True, "ok"
+
+
+def _cap001_apply_phase_b_to_entries(
+    phase_a: dict[str, Any],
+    phase_b: dict[str, Any],
+    entries: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    act_fired = float(phase_a["act_fired_at"])
+    path = common.abs_path(str(phase_a["canonical_still_path_abs"]))
+    cam_label = str(phase_a.get("camera_label") or "")
+    act_end = float(
+        phase_b.get("settle_observed_at")
+        or phase_b.get("host_poll_at")
+        or time.time()
+    )
+    methods_base = ["CAP001_SETTLE_AFTER_YIELD_V1:phase_b_host_absorbed"]
+    if not entries:
+        entries = [
+            {
+                "camera_label": cam_label,
+                "path": path,
+                "methods": list(methods_base),
+            }
+        ]
+    updated: list[dict[str, Any]] = []
+    matched = False
+    for ent in entries:
+        e = dict(ent)
+        if str(e.get("camera_label")) == cam_label:
+            matched = True
+            merged_methods = list(e.get("methods") or []) + methods_base
+            e = _finalize_still_entry(
+                cam_label,
+                path,
+                merged_methods,
+                since=act_fired,
+                resolved_on_disk=path,
+                act_end=act_end,
+            )
+            e["cap001_phase"] = "B"
+            e["act_fired_at"] = act_fired
+            e["canonical_still_path_abs"] = path
+        updated.append(e)
+    if not matched:
+        updated.append(
+            _finalize_still_entry(
+                cam_label,
+                path,
+                methods_base,
+                since=act_fired,
+                resolved_on_disk=path,
+                act_end=act_end,
+            )
+        )
+        updated[-1]["cap001_phase"] = "B"
+    return updated
+
+
+def _cap001_try_absorb_phase_b(
+    phase_a: Optional[dict[str, Any]],
+    entries: list[dict[str, Any]],
+    blocked: list[str],
+) -> tuple[
+    Optional[dict[str, Any]],
+    Optional[dict[str, Any]],
+    list[dict[str, Any]],
+    list[str],
+    Optional[float],
+    bool,
+]:
+    """Read host Phase B sidecar; score gate from settle evidence (not Phase A alone)."""
+    if phase_a is None or not phase_a.get("fire_ok"):
+        return None, phase_a, entries, blocked, None, False
+    phase_b = _cap001_load_json_sidecar(_cap001_phase_b_sidecar_path())
+    if phase_b is None:
+        return None, phase_a, entries, blocked, None, False
+    ok, reason = _cap001_validate_phase_b_settle(phase_a, phase_b)
+    if not ok:
+        blocked = list(blocked) + [f"cap001_phase_b_invalid:{reason}"]
+        return phase_b, phase_a, entries, blocked, None, False
+    entries = _cap001_apply_phase_b_to_entries(phase_a, phase_b, entries)
+    act_settled = float(
+        phase_b.get("settle_observed_at")
+        or phase_b.get("host_poll_at")
+        or time.time()
+    )
+    combined: dict[str, Any] = {
+        "contract": CAP001_SETTLE_AFTER_YIELD_V1,
+        "phase": "B",
+        "settle_ok": True,
+        "act_fired_at": phase_a.get("act_fired_at"),
+        "canonical_still_path_abs": phase_a.get("canonical_still_path_abs"),
+        "camera_label": phase_a.get("camera_label"),
+        "phase_a": phase_a,
+        "phase_b": phase_b,
+    }
+    blocked = [
+        b
+        for b in blocked
+        if b != "cap001_phase_b_settle_pending_after_mcp_yield"
+    ]
+    _log("cap001 Phase B absorbed into gate scoring", {"path": combined.get("canonical_still_path_abs")})
+    return phase_b, combined, entries, blocked, act_settled, True
+
+
+def _cap001_phase_a_stamp(
+    *,
+    cam_label: str,
+    canonical_path_abs: str,
+    act_fired_at: Optional[float],
+    fire_ok: bool,
+    fire_error: Optional[str],
+    methods: list[str],
+    lit_aim_prep: Optional[dict[str, Any]] = None,
+    armed_post_tick: bool = False,
+) -> dict[str, Any]:
+    """Conductor-readable Phase B inputs (host poll after MCP yield)."""
+    stamp: dict[str, Any] = {
+        "contract": CAP001_SETTLE_AFTER_YIELD_V1,
+        "phase": "A",
+        "camera_label": cam_label,
+        "canonical_still_path_abs": canonical_path_abs,
+        "act_fired_at": act_fired_at,
+        "fire_ok": fire_ok,
+        "fire_error": fire_error,
+        "methods": methods,
+    }
+    if armed_post_tick:
+        stamp["armed_post_tick"] = True
+        stamp[CAP001_FIRE_ON_POST_TICK_AFTER_YIELD_V1] = True
+    if lit_aim_prep is not None:
+        stamp[CAP001_DARK_STILL_LIT_AIM_V1] = lit_aim_prep
+    return stamp
+
+
+def _cap001_shot2_for_cabin_close() -> Optional[dict[str, Any]]:
+    for shot in common.SHOTS:
+        if shot.get("id") == "shot2":
+            return shot
+    return common._shot_def("shot2")  # type: ignore[attr-defined]
+
+
+def _cap001_cabin_aim_bounds_centroid() -> Optional[list[float]]:
+    inv = common.inventory_homestead_in_level("shot2")
+    bounds = (
+        inv.get("aim_bounds")
+        or inv.get("framing_bounds")
+        or inv.get("homestead_bounds")
+    )
+    if bounds and bounds.get("centroid"):
+        return list(bounds["centroid"])
+    return None
+
+
+def _cap001_tmp_fixture_reseed_ran(night_env: dict[str, Any]) -> bool:
+    reseed = night_env.get("tmp_fixture_reseed")
+    if isinstance(reseed, dict):
+        if reseed.get("skipped"):
+            return False
+        if reseed.get("spawned"):
+            return True
+        if reseed.get("stack_ok_after_reseed"):
+            return True
+    lifecycle = night_env.get("fixture_lifecycle")
+    if isinstance(lifecycle, dict):
+        rs = lifecycle.get("reseed")
+        if isinstance(rs, dict) and not rs.get("skipped"):
+            if rs.get("spawned"):
+                return True
+    return False
+
+
+def _cap001_prepare_one_cam_lit_aim_before_fire(
+    cam,
+    cam_label: str,
+) -> tuple[list[str], list[str], dict[str, Any]]:
+    """Night stack + exposure, then lit/aim/warm (pre-AL one-cam)."""
+    methods: list[str] = [
+        CAP001_DARK_STILL_NIGHT_STACK_V2,
+        CAP001_POST_NIGHT_AL_READY_V1,
+        CAP001_DARK_STILL_LIT_AIM_V1,
+    ]
+    blocked: list[str] = []
+    prep_meta: dict[str, Any] = {
+        "camera_label": cam_label,
+        "has_v2": True,
+        CAP001_DARK_STILL_NIGHT_STACK_V2: True,
+        CAP001_POST_NIGHT_AL_READY_V1: True,
+    }
+    cv = _load_capture_viewport()
+    cam_loc_sync: Any = None
+    cam_rot_sync: Any = None
+
+    homestead_centroid = _cap001_cabin_aim_bounds_centroid()
+    prep_meta["homestead_centroid"] = homestead_centroid
+    night_env = common.apply_pa_e_homestead_night_environment(
+        LOG_PREFIX,
+        reseed_tmp_fixtures=True,
+        homestead_centroid=homestead_centroid,
+        mrq_pie_shot=False,
+    )
+    prep_meta["night_environment"] = night_env
+    lighting_verify = night_env.get("lighting_stack_verify") or {}
+    prep_meta["lighting_stack_verify"] = lighting_verify
+    prep_meta["lighting_stack_stack_ok"] = lighting_verify.get("stack_ok")
+    prep_meta["environment_preconditions_ok"] = night_env.get("environment_preconditions_ok")
+    methods.append("apply_pa_e_homestead_night_environment")
+    if not night_env.get("environment_preconditions_ok"):
+        blocked.append("cap001_night_stack_preconditions_not_ok")
+
+    import vnp_night_tune_and_evidence as vnp
+
+    importlib.reload(vnp)
+    exposure_cvars = vnp.apply_mrq_pie_night_exposure_cvars()
+    prep_meta["exposure_cvars"] = exposure_cvars
+    methods.append("apply_mrq_pie_night_exposure_cvars")
+
+    prep_meta["post_night_finish_loading"] = cv._finish_loading_before_screenshot()
+    methods.append("post_night:finish_loading_before_screenshot")
+    if _cap001_tmp_fixture_reseed_ran(night_env):
+        cv._settle_pump_only(frames=PS_C_POST_NIGHT_WARM_FRAMES)
+        prep_meta["post_night_warm_frames"] = PS_C_POST_NIGHT_WARM_FRAMES
+        prep_meta["reseed_ran"] = True
+        methods.append(f"post_night:slate_warm_pump_frames:{PS_C_POST_NIGHT_WARM_FRAMES}")
+    else:
+        prep_meta["reseed_skipped"] = True
+        prep_meta["post_night_warm_frames"] = 0
+
+    view = common.apply_lit_game_view_for_capture()
+    prep_meta["lit_game_view"] = view
+    methods.append(f"apply_lit_game_view:{view.get('viewmode')}")
+
+    if cam_label == "CAM_CabinClose":
+        shot = _cap001_shot2_for_cabin_close()
+        if shot is None:
+            blocked.append("cap001_shot2_missing_design_bounce")
+            prep_meta["aim_error"] = "shot2_def_missing"
+        else:
+            loc, rot, aim_meta = common.resolve_camera_transform(shot, cam)
+            prep_meta["resolve_camera_transform"] = {
+                k: aim_meta.get(k)
+                for k in (
+                    "pose_source",
+                    "aim_after",
+                    "aim_after_bounds_relocate",
+                    "aim_before",
+                    "camera_relocated_from_bounds",
+                    "camera_relocated_wide_cabin_anchor",
+                    "expected_framing",
+                )
+            }
+            aim_after = (
+                aim_meta.get("aim_after")
+                or aim_meta.get("aim_after_bounds_relocate")
+                or aim_meta.get("aim_after_doc_fallback")
+                or {}
+            )
+            prep_meta["aim_ok"] = bool(aim_after.get("aim_ok"))
+            prep_meta["forward_ray_hits_dress_aabb"] = aim_after.get(
+                "forward_ray_hits_dress_aabb"
+            )
+            inv = aim_meta.get("prove_loop_step1_inventory") or {}
+            prep_meta["aim_bounds_ok"] = inv.get("aim_bounds_ok")
+            if not inv.get("aim_bounds_ok"):
+                blocked.append("cap001_aim_bounds_missing_cabin_dress_labels")
+            elif not prep_meta.get("aim_ok"):
+                blocked.append("cap001_cabin_aim_not_ok")
+                if aim_after.get("forward_ray_hits_dress_aabb") is False:
+                    blocked.append("cap001_forward_ray_miss_dress_aabb")
+            cam_loc_sync, cam_rot_sync = loc, rot
+            sync = common.sync_editor_viewport_to_camera(cam, loc, rot)
+            prep_meta["viewport_sync"] = sync
+            methods.append(f"sync_editor_viewport:{sync.get('viewport_api')}")
+            _pilot_camera(cam)
+    else:
+        _pilot_camera(cam)
+        prep_meta["aim_skipped"] = "non_CAM_CabinClose_one_cam_label"
+
+    prep_meta["final_finish_loading"] = cv._finish_loading_before_screenshot()
+    methods.append("final:finish_loading_before_screenshot")
+    cv._settle_pump_only(frames=PS_C_INTER_SHOT_SETTLE_FRAMES)
+    methods.append(f"final:slate_warm_pump_frames:{PS_C_INTER_SHOT_SETTLE_FRAMES}")
+    prep_meta["slate_warm_frames"] = PS_C_INTER_SHOT_SETTLE_FRAMES
+    if cam_loc_sync is not None and cam_rot_sync is not None:
+        prep_meta["final_viewport_resync"] = common.sync_editor_viewport_to_camera(
+            cam, cam_loc_sync, cam_rot_sync
+        )
+        _pilot_camera(cam)
+        methods.append("final:re_pilot_and_sync_viewport_after_spawn")
+    _focus_ps_c_viewport()
+    return methods, blocked, prep_meta
+
+
+def _cap001_one_cam_invoke_al_fire(
+    cam,
+    path: str,
+) -> tuple[bool, Optional[float], Optional[str], list[str]]:
+    """Single AL invoke (combined path — legacy task gate off)."""
+    act_fired_at = time.time()
+    ok, al_methods, _task, _task_meta = _automation_abs_screenshot_one_invoke(path, cam)
+    fire_error: Optional[str] = None
+    if not ok:
+        act_fired_at = None
+        fire_error = "automation_invoke_failed"
+    return ok, act_fired_at, fire_error, al_methods
+
+
+def _ps_c_one_cam_phase_a_fire_and_return(
+    world,
+    cam_label: str,
+    stills_dir: str,
+) -> tuple[
+    list[dict[str, Any]],
+    float,
+    Optional[float],
+    Optional[str],
+    list[str],
+    dict[str, Any],
+]:
+    """CAP001 Phase A: prep-only, fire-only (post-MCP), or combined prep+fire."""
+    blocked: list[str] = []
+    act_start = time.time()
+    path = common.abs_path(_ps_c_canonical_still_path(cam_label))
+    _ = stills_dir
+    _ = world
+    cam = _find_actor_label(cam_label)
+    act_fired_at: Optional[float] = None
+    fire_error: Optional[str] = None
+    prep_only = _cap001_env_prep_only()
+    fire_only = _cap001_env_fire_only()
+    if prep_only and fire_only:
+        blocked.append("cap001_prep_only_and_fire_only_both_set")
+
+    if not cam:
+        fire_error = "camera_missing"
+        blocked.append(f"one_cam_camera_missing:{cam_label}")
+        stamp = _cap001_phase_a_stamp(
+            cam_label=cam_label,
+            canonical_path_abs=path,
+            act_fired_at=None,
+            fire_ok=False,
+            fire_error=fire_error,
+            methods=["CAP001_SETTLE_AFTER_YIELD_V1:phase_a"],
+        )
+        return [], act_start, None, fire_error, blocked, stamp
+
+    lit_aim_prep: dict[str, Any] = {}
+    methods: list[str] = []
+    ok = False
+
+    if fire_only and not prep_only:
+        methods = [
+            CAP001_SETTLE_AFTER_YIELD_V1 + ":phase_a_fire_only",
+            CAP001_AL_AFTER_MCP_DISCONNECT_V1,
+            "cap001:fire_only_after_mcp_disconnect",
+        ]
+        _purge_ps_c_still_png(path)
+        arm_ok, _act_unused, fire_error, wire_methods, wire_meta = (
+            _cap001_fire_only_al_ready_and_arm_post_tick(cam, path, cam_label)
+        )
+        methods.extend(wire_methods)
+        ok = False
+        act_fired_at = None
+        if not arm_ok:
+            blocked.append("one_cam_automation_invoke_failed")
+            if fire_error:
+                blocked.append(f"cap001_fire_only_post_tick_arm:{fire_error}")
+        lit_aim_prep = {
+            "cap001_mode": "fire_only",
+            CAP001_AL_AFTER_MCP_DISCONNECT_V1: True,
+            **wire_meta,
+        }
+    elif prep_only and not fire_only:
+        prep_methods, prep_blocked, lit_aim_prep = _cap001_prepare_one_cam_lit_aim_before_fire(
+            cam, cam_label
+        )
+        blocked.extend(prep_blocked)
+        methods = [
+            CAP001_AL_AFTER_MCP_DISCONNECT_V1,
+            "cap001:prep_only_before_mcp_disconnect",
+        ]
+        methods.extend(prep_methods)
+        prep_viewport = _cap001_prep_viewport_realtime_and_invalidate()
+        lit_aim_prep["prep_viewport_realtime"] = prep_viewport
+        methods.append(
+            f"prep_only:{prep_viewport.get('realtime_method', 'realtime_skip')}"
+        )
+        methods.append(
+            f"prep_only:{prep_viewport.get('invalidate_method', 'invalidate_skip')}"
+        )
+        lit_aim_prep["cap001_mode"] = "prep_only"
+        lit_aim_prep[CAP001_AL_AFTER_MCP_DISCONNECT_V1] = True
+        lit_aim_prep[CAP001_FIRE_ON_POST_TICK_AFTER_YIELD_V1] = True
+        act_fired_at = None
+        ok = False
+    else:
+        prep_methods, prep_blocked, lit_aim_prep = _cap001_prepare_one_cam_lit_aim_before_fire(
+            cam, cam_label
+        )
+        blocked.extend(prep_blocked)
+        methods = ["CAP001_SETTLE_AFTER_YIELD_V1:phase_a_combined_prep_and_fire"]
+        methods.extend(prep_methods)
+        _purge_ps_c_still_png(path)
+        ok, act_fired_at, fire_error, al_methods = _cap001_one_cam_invoke_al_fire(cam, path)
+        methods.extend(al_methods)
+        if fire_error:
+            blocked.append("one_cam_automation_invoke_failed")
+
+    armed_post_tick = bool(
+        fire_only and not prep_only and lit_aim_prep.get("armed_post_tick")
+    )
+    stamp = _cap001_phase_a_stamp(
+        cam_label=cam_label,
+        canonical_path_abs=path,
+        act_fired_at=act_fired_at,
+        fire_ok=ok,
+        fire_error=fire_error,
+        methods=methods,
+        lit_aim_prep=lit_aim_prep,
+        armed_post_tick=armed_post_tick,
+    )
+    if prep_only and not fire_only:
+        stamp[CAP001_AL_AFTER_MCP_DISCONNECT_V1] = "prep_only"
+        stamp["fire_ok"] = False
+        stamp["act_fired_at"] = None
+    elif fire_only and not prep_only:
+        stamp[CAP001_AL_AFTER_MCP_DISCONNECT_V1] = "fire_only"
+        stamp["fire_ok"] = False
+        stamp["act_fired_at"] = None
+
+    note = "cap001_phase_a_pending_host_settle_after_mcp_yield"
+    if prep_only and not fire_only:
+        note = "cap001_prep_only_no_al_mcp_disconnect_before_fire"
+    entry: dict[str, Any] = {
+        "camera_label": cam_label,
+        "path": path,
+        "methods": methods,
+        "act_fired_at": act_fired_at,
+        "canonical_still_path_abs": path,
+        "cap001_dark_still_lit_aim_v1": lit_aim_prep,
+        "capture_outcome": OUTCOME_SOFT,
+        "counts_toward_gate": False,
+        "fresh_this_act": False,
+        "file_exists": False,
+        "exists": False,
+        "on_disk": False,
+        "note": note,
+    }
+    if fire_error:
+        entry["error"] = fire_error
+
+    _log(
+        "one-cam Phase A",
+        {
+            "stamp": stamp,
+            "prep_only": prep_only,
+            "fire_only": fire_only,
+            "fire_ok": ok,
+        },
+    )
+    driver_err = fire_error if not ok and not (prep_only and not fire_only) else None
+    if prep_only and not fire_only:
+        driver_err = None
+    return [entry], act_start, None, driver_err, blocked, stamp
 
 
 def _load_capture_viewport():
@@ -950,8 +2214,17 @@ class _PsCStillsOrchestrator:
         gate_context: dict[str, Any],
     ) -> None:
         self.world = world
-        self.stills_dir = stills_dir
+        self.stills_dir = common.abs_path(stills_dir)
         self.gate_context = gate_context
+        self._still_labels = tuple(gate_context.get("still_labels") or _still_labels())
+        self._wait_file_sec = float(
+            gate_context.get("wait_file_sec")
+            or (
+                PS_C_ONE_CAM_WAIT_FILE_SEC
+                if gate_context.get("prove_mode") == "one_cam"
+                else PS_C_WAIT_FILE_SEC
+            )
+        )
         self.phase = _PsCStillsPhase.IDLE
         self.shot_index = 0
         self.entries: list[dict[str, Any]] = []
@@ -979,6 +2252,11 @@ class _PsCStillsOrchestrator:
         self._ticks_in_wait = 0
         self._act_started_at = 0.0
         self._al_second_round = False
+        self._pending_automation_tasks: list[Any] = []
+
+    def _track_automation_task(self, task: Any) -> None:
+        if task is not None:
+            self._pending_automation_tasks.append(task)
 
     def _uses_ps_placement_cam(self) -> bool:
         return self._cam_label.startswith(PS_C_PS_CAM_PREFIX)
@@ -1062,10 +2340,10 @@ class _PsCStillsOrchestrator:
         if self.phase != _PsCStillsPhase.POSED:
             return
         self.phase = _PsCStillsPhase.PREPARING
-        if self.shot_index >= len(STILL_CAM_LABELS):
+        if self.shot_index >= len(self._still_labels):
             self.phase = _PsCStillsPhase.WRITE_MANIFEST
             return
-        self._cam_label = STILL_CAM_LABELS[self.shot_index]
+        self._cam_label = self._still_labels[self.shot_index]
         self._filepath = _resolve_still_path(self.stills_dir, self._cam_label)
         self._cam = _find_actor_label(self._cam_label)
         self._methods = []
@@ -1108,11 +2386,11 @@ class _PsCStillsOrchestrator:
 
     def _reset_wait_deadline(self) -> None:
         now = time.time()
-        shots_left = max(1, len(STILL_CAM_LABELS) - self.shot_index)
+        shots_left = max(1, len(self._still_labels) - self.shot_index)
         remaining_drive = max(0.0, self._drive_deadline - now)
         floor = 16.0 if self._uses_ps_placement_cam() else 12.0
         per_shot = min(
-            PS_C_WAIT_FILE_SEC,
+            self._wait_file_sec,
             max(floor, (remaining_drive - 1.5) / shots_left),
         )
         self._wait_deadline = now + per_shot
@@ -1141,7 +2419,17 @@ class _PsCStillsOrchestrator:
             return
         _focus_ps_c_viewport()
         self._cv._finish_loading_before_screenshot()
-        if self._uses_ps_placement_cam():
+        one_cam = self.gate_context.get("prove_mode") == "one_cam"
+        if one_cam:
+            # One-cam bite: proven shotlist path — AutomationLibrary abs only (no HighResShot ladder).
+            if not self._al_invoked:
+                _ok_al, al_methods, task = _automation_abs_screenshot(self._filepath, self._cam)
+                self._methods.extend(al_methods)
+                self._task = task
+                self._track_automation_task(task)
+                self._al_invoked = True
+                self._methods.append("one_cam:AutomationLibrary_abs_only")
+        elif self._uses_ps_placement_cam():
             # PS placement cams: doc-ordered HighResShot abs first, then AL (viewport pilot).
             if self._console_cmd_index == 0:
                 self._invoke_console_ladder_step()
@@ -1149,12 +2437,14 @@ class _PsCStillsOrchestrator:
                 _ok_al, al_methods, task = _automation_abs_screenshot(self._filepath, self._cam)
                 self._methods.extend(al_methods)
                 self._task = task
+                self._track_automation_task(task)
                 self._al_invoked = True
                 self._methods.append("ps_cam:console_then_AutomationLibrary_abs")
         elif not self._al_invoked:
             _ok_al, al_methods, task = _automation_abs_screenshot(self._filepath, self._cam)
             self._methods.extend(al_methods)
             self._task = task
+            self._track_automation_task(task)
             self._al_invoked = True
             self._methods.append("primary:AutomationLibrary_abs")
         else:
@@ -1176,7 +2466,9 @@ class _PsCStillsOrchestrator:
             self._methods.append("automation_task_done_no_file_yet")
         self._ticks_in_wait += 1
         if self._ticks_in_wait > 0 and self._ticks_in_wait % PS_C_WAIT_RETRY_TICKS == 0:
-            if self._console_cmd_index < self._console_cmd_total:
+            if self.gate_context.get("prove_mode") == "one_cam":
+                pass
+            elif self._console_cmd_index < self._console_cmd_total:
                 if self._invoke_console_ladder_step():
                     self._reset_wait_deadline()
             elif not self._al_invoked:
@@ -1185,13 +2477,14 @@ class _PsCStillsOrchestrator:
                 return
         if time.time() >= self._wait_deadline:
             drive_left = self._drive_deadline - time.time()
-            if (
-                self._console_cmd_index < self._console_cmd_total
-                and drive_left > 4.0
-            ):
-                if self._invoke_console_ladder_step():
-                    self._reset_wait_deadline()
-                    return
+            if self.gate_context.get("prove_mode") != "one_cam":
+                if (
+                    self._console_cmd_index < self._console_cmd_total
+                    and drive_left > 4.0
+                ):
+                    if self._invoke_console_ladder_step():
+                        self._reset_wait_deadline()
+                        return
             if not self._al_second_round and drive_left > 6.0:
                 self._al_second_round = True
                 self._al_invoked = False
@@ -1221,7 +2514,7 @@ class _PsCStillsOrchestrator:
         )
         self.entries.append(entry)
         self.shot_index += 1
-        if self.shot_index < len(STILL_CAM_LABELS):
+        if self.shot_index < len(self._still_labels):
             self._settle_frames_left = PS_C_INTER_SHOT_SETTLE_FRAMES
             self.phase = _PsCStillsPhase.INTER_SHOT_SETTLE
         else:
@@ -1230,17 +2523,13 @@ class _PsCStillsOrchestrator:
     def _finish_all(self) -> None:
         if self.phase == _PsCStillsPhase.DONE:
             return
-        self._manifest_path = _write_stills_manifest(self.entries, self.stills_dir)
-        self._unregister_tick()
-        self.phase = _PsCStillsPhase.DISARM
-        self._disarm_keep_alive()
         self.phase = _PsCStillsPhase.DONE
         _log(
-            "stills driver finished",
+            "stills driver finished pending gate settle",
             {
                 "shots": len(self.entries),
-                "manifest": self._manifest_path,
                 "drive_ticks": self._drive_ticks,
+                "pending_tasks": len(self._pending_automation_tasks),
             },
         )
 
@@ -1254,8 +2543,8 @@ class _PsCStillsOrchestrator:
 
     def _abort_in_flight_and_remaining(self) -> None:
         labels_done = {e.get("camera_label") for e in self.entries}
-        while self.shot_index < len(STILL_CAM_LABELS):
-            label = STILL_CAM_LABELS[self.shot_index]
+        while self.shot_index < len(self._still_labels):
+            label = self._still_labels[self.shot_index]
             if label not in labels_done:
                 path = _resolve_still_path(self.stills_dir, label)
                 if (
@@ -1292,8 +2581,16 @@ class _PsCStillsOrchestrator:
 
 
 _ACTIVE_PS_C_STILLS: Optional[_PsCStillsOrchestrator] = None
+_ACTIVE_CAP001_FIRE_ONLY: Optional[_Cap001FireOnlyPostTickDriver] = None
 _PS_C_SLATE_CALLBACK_REFS: list[Any] = []
 _PS_C_DRIVER_ROOTS: list[Any] = []
+
+
+def _cap001_fire_only_post_tick_dispatcher(delta: float) -> None:
+    """Module-level FIRE_ONLY post-tick (first fire after MCP script yield)."""
+    drv = _ACTIVE_CAP001_FIRE_ONLY
+    if drv is not None:
+        drv._on_slate_post_tick(delta)
 
 
 def _ps_c_slate_pre_tick_dispatcher(delta: float) -> None:
@@ -1341,7 +2638,9 @@ def _finalize_still_entry(
     *,
     since: float,
     resolved_on_disk: Optional[str],
+    act_end: Optional[float] = None,
 ) -> dict[str, Any]:
+    filepath = common.abs_path(filepath)
     entry: dict[str, Any] = {"camera_label": cam_label, "path": filepath, "methods": methods}
     entry["capture_path"] = (
         "slate_pretick capture_viewport HighResShot abs + AutomationLibrary abs "
@@ -1362,25 +2661,38 @@ def _finalize_still_entry(
             if copied:
                 methods.append(f"pa_e_mrq_fallback_copy:{copied}")
     entry["methods"] = methods
-    entry["file_exists"] = os.path.isfile(filepath)
-    if not entry["file_exists"]:
+    on_disk = os.path.isfile(filepath)
+    entry["on_disk"] = on_disk
+    if not on_disk:
+        entry["file_exists"] = False
+        entry["exists"] = False
         entry["capture_outcome"] = OUTCOME_SOFT
         entry["note"] = "png_missing_black_or_path_soft_fail"
         entry["counts_toward_gate"] = False
         return entry
     try:
         entry["file_mtime"] = os.path.getmtime(filepath)
+        entry["bytes"] = os.path.getsize(filepath)
     except OSError:
         entry["file_mtime"] = None
-    if not _mtime_at_least(filepath, since):
-        entry["capture_outcome"] = OUTCOME_SOFT
-        entry["note"] = "stale_png_reuse_mtime_before_capture"
+    if not _ps_still_counts_for_gate(filepath, since, act_end):
+        entry["file_exists"] = False
+        entry["exists"] = False
         entry["fresh_this_act"] = False
         entry["counts_toward_gate"] = False
+        if not _mtime_at_least(filepath, since):
+            entry["capture_outcome"] = OUTCOME_SOFT
+            entry["note"] = "stale_png_reuse_mtime_before_capture"
+        elif act_end is not None and not _mtime_in_act_window(filepath, since, act_end):
+            entry["capture_outcome"] = OUTCOME_SOFT
+            entry["note"] = "post_settle_png_landing_excluded_from_gate"
+        else:
+            entry["capture_outcome"] = OUTCOME_SOFT
+            entry["note"] = "file_too_small_or_outside_act_window"
         return entry
-    entry["fresh_this_act"] = True
-    entry["counts_toward_gate"] = True
-    size = os.path.getsize(filepath)
+    entry["file_exists"] = True
+    entry["exists"] = True
+    size = int(entry.get("bytes") or os.path.getsize(filepath))
     entry["bytes"] = size
     lum, lum_src = common.mean_luminance(filepath)
     entry["mean_luminance"] = lum
@@ -1388,29 +2700,71 @@ def _finalize_still_entry(
     if size < common.MIN_BYTES:
         entry["capture_outcome"] = OUTCOME_SOFT
         entry["note"] = "file_too_small"
+        entry["fresh_this_act"] = False
+        entry["counts_toward_gate"] = False
+        entry["file_exists"] = False
+        entry["exists"] = False
         return entry
     if lum is None or (lum is not None and lum < common.MIN_MEAN_LUMINANCE):
         entry["capture_outcome"] = OUTCOME_SOFT
         entry["note"] = "black_or_dark_still_soft_fail_not_closed_without_arrange_miss"
+        entry["fresh_this_act"] = False
+        entry["counts_toward_gate"] = False
         return entry
+    entry["fresh_this_act"] = True
+    entry["counts_toward_gate"] = True
     entry["capture_outcome"] = OUTCOME_PASS
     if resolved_on_disk:
         entry["resolved_path"] = resolved_on_disk
     return entry
 
 
-def _write_stills_manifest(entries: list[dict[str, Any]], stills_dir: str) -> str:
+def _write_stills_manifest(
+    entries: list[dict[str, Any]],
+    stills_dir: str,
+    *,
+    act_since: Optional[float] = None,
+    act_end: Optional[float] = None,
+    cap001_phase_a: Optional[dict[str, Any]] = None,
+) -> str:
+    stills_dir = _ps_c_stills_dir_abs()
+    rows = entries
+    if act_since is not None and cap001_phase_a is None:
+        rows = _reconcile_still_entries_from_disk(
+            entries, act_since, stills_dir, act_end=act_end
+        )
+    for ent in rows:
+        path = common.abs_path(str(ent.get("path") or ""))
+        if path and act_since is not None:
+            ent["path"] = path
+            in_window = _ps_still_counts_for_gate(path, act_since, act_end)
+            ent["on_disk"] = os.path.isfile(path)
+            ent["file_exists"] = in_window
+            ent["exists"] = in_window
+            ent["counts_toward_gate"] = bool(in_window and ent.get("fresh_this_act"))
+            if ent["on_disk"] and not in_window:
+                try:
+                    ent["bytes"] = os.path.getsize(path)
+                    ent["file_mtime"] = os.path.getmtime(path)
+                except OSError:
+                    pass
     manifest = {
         "version": 1,
         "generated_at_iso": datetime.now(timezone.utc).isoformat(),
+        "capture_act_started_at": act_since,
+        "capture_act_settled_at": act_end,
         "capture_path": (
             "slate pre-tick: purge stale PNG; PS_* = console HighResShot abs then AL; CAM_* = AL then "
             "console ladder on ticks; absolute Saved/ps_stills/; gate counts disk-fresh only"
         ),
         "wait_mechanism": PS_C_SLATE_MECHANISM,
         "resolution": [STILL_RES_X, STILL_RES_Y],
-        "stills": entries,
+        "stills": rows,
     }
+    if cap001_phase_a is not None:
+        manifest["cap001_settle_after_yield_v1"] = cap001_phase_a
+        manifest["act_fired_at"] = cap001_phase_a.get("act_fired_at")
+        manifest["canonical_still_path_abs"] = cap001_phase_a.get("canonical_still_path_abs")
     manifest_path = os.path.join(stills_dir, "manifest.json")
     with open(manifest_path, "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=2, default=str)
@@ -1420,7 +2774,10 @@ def _write_stills_manifest(entries: list[dict[str, Any]], stills_dir: str) -> st
 def _automation_abs_screenshot(filepath: str, cam) -> tuple[bool, list[str], Any]:
     """Absolute-path AutomationLibrary (PL-D / capture_shotlist_viewport pattern)."""
     methods: list[str] = []
-    ue_path = os.path.abspath(filepath).replace("\\", "/")
+    cv = _load_capture_viewport()
+    dest_abs = cv._ensure_abs_dest(filepath)
+    ue_path = cv._path_for_ue(dest_abs)
+    methods.append(f"al_canonical_dest:{ue_path}")
     delay = 0.35
     attempts = (
         ("abs_kwargs_force_gv", lambda: unreal.AutomationLibrary.take_high_res_screenshot(
@@ -1499,9 +2856,14 @@ def _build_ps_c_gate(
     stills_in_progress: bool = False,
     driver_error: Optional[str] = None,
     stills_act_started_at: Optional[float] = None,
+    stills_act_settled_at: Optional[float] = None,
     stills_disk_audit: Optional[dict[str, Any]] = None,
+    prove_mode: str = "full",
+    one_cam_label: Optional[str] = None,
+    cap001_phase_a: Optional[dict[str, Any]] = None,
 ) -> dict[str, Any]:
-    stills_required = len(STILL_CAM_LABELS)
+    stills_required = len(_still_labels())
+    one_cam_bite = prove_mode == "one_cam"
     capture_outcomes = [e.get("capture_outcome", OUTCOME_SOFT) for e in still_entries]
     stills_manifest_fresh = sum(
         1 for e in still_entries if e.get("counts_toward_gate") or e.get("fresh_this_act")
@@ -1517,20 +2879,42 @@ def _build_ps_c_gate(
     stills_present = disk_fresh
     gate_count_matches_disk = stills_manifest_fresh == disk_fresh
 
-    placement_outcome = metrics.get("placement_outcome") if metrics else OUTCOME_CLOSED
+    if metrics is not None:
+        placement_outcome = metrics.get("placement_outcome", OUTCOME_CLOSED)
+    elif one_cam_bite:
+        placement_outcome = OUTCOME_SOFT
+    else:
+        placement_outcome = OUTCOME_CLOSED
     if pre_closed:
         placement_outcome = OUTCOME_CLOSED
 
+    metrics_ok = metrics is not None and placement_outcome in (OUTCOME_PASS, OUTCOME_SOFT)
     ready_for_ps_d = (
         not pre_closed
         and not stills_in_progress
-        and metrics is not None
         and stills_present >= stills_required
         and gate_count_matches_disk
-        and placement_outcome in (OUTCOME_PASS, OUTCOME_SOFT)
+        and (one_cam_bite or metrics_ok)
     )
-    if not ready_for_ps_d and not stills_in_progress:
-        if metrics is None:
+    cap001_settled_phase_b = (
+        cap001_phase_a is not None
+        and cap001_phase_a.get("phase") == "B"
+        and bool(cap001_phase_a.get("settle_ok"))
+    )
+    cap001_phase_a_pending = (
+        one_cam_bite
+        and cap001_phase_a is not None
+        and (
+            bool(cap001_phase_a.get("fire_ok"))
+            or bool(cap001_phase_a.get("armed_post_tick"))
+        )
+        and not cap001_settled_phase_b
+    )
+    if cap001_phase_a_pending:
+        blocked = list(blocked) + ["cap001_phase_b_settle_pending_after_mcp_yield"]
+
+    if not ready_for_ps_d and not stills_in_progress and not cap001_phase_a_pending:
+        if metrics is None and not one_cam_bite:
             blocked = list(blocked) + ["metrics_not_written"]
         if stills_present < stills_required:
             blocked = list(blocked) + [f"stills_incomplete:{stills_present}/{stills_required}"]
@@ -1544,6 +2928,8 @@ def _build_ps_c_gate(
     gate: dict[str, Any] = {
         "version": 1,
         "track": "PS-C",
+        "prove_mode": prove_mode,
+        "one_cam_label": one_cam_label,
         "level_path": common.LEVEL_PATH,
         "preconditions": {
             "dress_count": dress_count,
@@ -1559,6 +2945,7 @@ def _build_ps_c_gate(
         "stills_required_count": stills_required,
         "stills_capture_outcomes": capture_outcomes,
         "stills_capture_act_started_at": stills_act_started_at,
+        "stills_capture_act_settled_at": stills_act_settled_at,
         "stills_disk_audit": stills_disk_audit,
         "stills_in_progress": stills_in_progress,
         "stills_wait_mechanism": PS_C_DRIVE_MECHANISM,
@@ -1571,10 +2958,19 @@ def _build_ps_c_gate(
         "generated_at_iso": datetime.now(timezone.utc).isoformat(),
         "gate_string": "APPROVE PS-C",
         "note": (
-            "ready_for_ps_d = metrics + still files on disk; PS-D is Lead eyeball vs benchmarks. "
-            "Black/dark stills → soft_fail on capture, not closed_fail if Arrange gate was ready."
+            "ready_for_ps_d = metrics + still files on disk (full); one_cam bite = 1/1 Act-window still only. "
+            "PS-D is Lead eyeball vs benchmarks. Black/dark stills → soft_fail on capture, not closed_fail if Arrange gate was ready."
         ),
     }
+    if one_cam_bite:
+        gate["one_cam_bite_pass"] = ready_for_ps_d
+        gate["one_cam_stills_required_count"] = stills_required
+    if cap001_phase_a is not None:
+        gate["cap001_settle_after_yield_v1"] = cap001_phase_a
+        gate["act_fired_at"] = cap001_phase_a.get("act_fired_at")
+        gate["canonical_still_path_abs"] = cap001_phase_a.get("canonical_still_path_abs")
+        if cap001_settled_phase_b:
+            gate["cap001_phase_b_sidecar_path"] = _cap001_phase_b_sidecar_path()
     if driver_error:
         gate["stills_driver_error"] = driver_error
     return gate
@@ -1592,8 +2988,7 @@ def _start_ps_c_stills_async(world, gate_context: dict[str, Any]) -> tuple[bool,
     global _ACTIVE_PS_C_STILLS
     if _ACTIVE_PS_C_STILLS is not None:
         return False, "ps_c_stills_driver_already_active"
-    stills_dir = _project_saved_path("ps_stills")
-    os.makedirs(stills_dir, exist_ok=True)
+    stills_dir = _ps_c_stills_dir_abs()
     keep_ok = False
     try:
         import vnp_editor_keep_alive as keep
@@ -1621,11 +3016,31 @@ def _start_ps_c_stills_async(world, gate_context: dict[str, Any]) -> tuple[bool,
     return True, None
 
 
-def prove_ps_placement(*, skip_stills: bool = False) -> dict[str, Any]:
+def prove_ps_placement(
+    *,
+    skip_stills: bool = False,
+    one_cam_label: Optional[str] = None,
+) -> dict[str, Any]:
     """PS-C entry: preconditions, metrics, stills, gate sidecar."""
     global _ACTIVE_PS_C_STILLS
     blocked: list[str] = []
     pre_closed = False
+
+    prove_mode_info = _apply_prove_still_label_set(one_cam_label)
+    prove_mode = str(prove_mode_info.get("prove_mode") or "full")
+    one_cam_active = prove_mode_info.get("one_cam_label")
+    if prove_mode_info.get("error"):
+        blocked.append(str(prove_mode_info["error"]))
+        pre_closed = True
+        _log("prove blocked: invalid one-cam label", prove_mode_info)
+    elif prove_mode == "one_cam":
+        _log("prove one-cam bite Act", prove_mode_info)
+    else:
+        label_drift = _prove_still_labels_drift_from_design()
+        if label_drift:
+            blocked.append(label_drift)
+            pre_closed = True
+            _log("prove blocked: still camera labels ≠ Design handoff", {"reason": label_drift})
 
     try:
         world_status = common.editor_world_markers_status()
@@ -1647,12 +3062,12 @@ def prove_ps_placement(*, skip_stills: bool = False) -> dict[str, Any]:
         blocked.append("pa_d_count_zero")
         pre_closed = True
 
-    arrange_gate, arrange_blocked = _ensure_arrange_gate()
+    arrange_gate, arrange_blocked, cameras_ready = _ensure_arrange_gate()
     blocked.extend(arrange_blocked)
-    if arrange_blocked and any(
-        b in arrange_blocked
-        for b in ("arrange_failed:", "arrange_ps_homestead_import_failed", "dress_count_zero")
-    ):
+    if not cameras_ready:
+        pre_closed = True
+        blocked.append("prove_closed_fail_inventory_cameras_before_act")
+    if any(b.startswith("arrange_failed:") for b in arrange_blocked):
         pre_closed = True
 
     dress_bounds, dress_path = _dress_bounds_from_file()
@@ -1668,22 +3083,79 @@ def prove_ps_placement(*, skip_stills: bool = False) -> dict[str, Any]:
     world = unreal.EditorLevelLibrary.get_editor_world()
     island = _find_actor_label("DRESS_SM_IslandTop")
 
-    if not pre_closed and dress_bounds:
+    if not pre_closed and dress_bounds and prove_mode != "one_cam":
         metrics = _compute_metrics(world=world, dress_bounds=dress_bounds, island_actor=island)
         os.makedirs(os.path.dirname(metrics_path), exist_ok=True)
         with open(metrics_path, "w", encoding="utf-8") as f:
             json.dump(metrics, f, indent=2, default=str)
         _log("wrote ps_placement_metrics.json", {"path": metrics_path})
+    elif prove_mode == "one_cam" and not pre_closed:
+        _log("one-cam bite: skipping full placement metrics (still writer isolate)")
 
     stills_in_progress = False
     driver_error: Optional[str] = None
     stills_act_started_at: Optional[float] = None
+    stills_act_settled_at: Optional[float] = None
     stills_disk_audit: Optional[dict[str, Any]] = None
-    stills_dir = _project_saved_path("ps_stills")
+    stills_dir = _ps_c_stills_dir_abs()
+    cap001_phase_a: Optional[dict[str, Any]] = None
 
     if skip_stills:
         blocked.append("stills_skipped_by_flag")
+    elif not pre_closed and prove_mode == "one_cam":
+        bite_label = str(one_cam_active or _still_labels()[0])
+        cap001_phase_b: Optional[dict[str, Any]] = None
+        if _cap001_env_phase_b_absorb_only():
+            cap001_phase_a = _cap001_load_phase_a_from_saved_gate()
+            if cap001_phase_a is None:
+                blocked.append("cap001_phase_b_absorb_missing_phase_a_gate")
+            still_entries = _cap001_load_still_entries_from_manifest()
+            stills_act_started_at = None
+            manifest_existing = _cap001_load_json_sidecar(
+                os.path.join(stills_dir, "manifest.json")
+            )
+            if manifest_existing:
+                stills_act_started_at = manifest_existing.get("capture_act_started_at")
+            if stills_act_started_at is None and cap001_phase_a:
+                stills_act_started_at = float(cap001_phase_a.get("act_fired_at") or time.time())
+            driver_error = None
+            _log("one-cam CAP001 Phase B absorb-only (no AL re-fire)", {"label": bite_label})
+        else:
+            (
+                still_entries,
+                stills_act_started_at,
+                stills_act_settled_at,
+                driver_error,
+                cap_blocked,
+                cap001_phase_a,
+            ) = _ps_c_one_cam_phase_a_fire_and_return(world, bite_label, stills_dir)
+            blocked.extend(cap_blocked)
+            if driver_error:
+                blocked.append(f"stills_driver_failed:{driver_error}")
+        (
+            cap001_phase_b,
+            cap001_combined,
+            still_entries,
+            blocked,
+            phase_b_act_end,
+            _phase_b_absorbed,
+        ) = _cap001_try_absorb_phase_b(cap001_phase_a, still_entries, blocked)
+        if cap001_combined is not None:
+            cap001_phase_a = cap001_combined
+        if phase_b_act_end is not None:
+            stills_act_settled_at = phase_b_act_end
+        manifest_path = _write_stills_manifest(
+            still_entries,
+            stills_dir,
+            act_since=stills_act_started_at,
+            act_end=stills_act_settled_at,
+            cap001_phase_a=cap001_phase_a,
+        )
+        stills_disk_audit = _audit_ps_stills_disk(
+            stills_dir, stills_act_started_at, stills_act_settled_at
+        )
     elif not pre_closed:
+        drive_timeout = PS_C_DRIVE_TIMEOUT_SEC
         gate_context = {
             "blocked": blocked,
             "pre_closed": pre_closed,
@@ -1693,29 +3165,60 @@ def prove_ps_placement(*, skip_stills: bool = False) -> dict[str, Any]:
             "dress_path": dress_path,
             "metrics": metrics,
             "metrics_path": metrics_path,
+            "prove_mode": prove_mode,
+            "still_labels": list(_still_labels()),
+            "wait_file_sec": PS_C_WAIT_FILE_SEC,
         }
         started, err = _start_ps_c_stills_async(world, gate_context)
         if started:
             orch = _ACTIVE_PS_C_STILLS
             if orch is not None:
-                completed = _drive_ps_c_stills_orchestrator(orch, PS_C_DRIVE_TIMEOUT_SEC)
+                for lbl in orch._still_labels:
+                    _purge_ps_c_still_png(_resolve_still_path(stills_dir, lbl))
+                completed = _drive_ps_c_stills_orchestrator(orch, drive_timeout)
                 stills_act_started_at = orch._act_started_at
-                _ps_c_post_drive_final_drain(orch, PS_C_FINAL_DRAIN_SEC)
-                still_entries = _reconcile_still_entries_from_disk(
-                    list(orch.entries), stills_act_started_at, stills_dir
+                still_entries, stills_act_settled_at, settle_blocked, paths_ready = (
+                    _ps_c_settle_stills_before_gate(
+                        orch,
+                        stills_dir,
+                        stills_act_started_at,
+                        PS_C_GATE_SETTLE_SEC,
+                    )
                 )
-                manifest_path = _write_stills_manifest(still_entries, stills_dir)
-                stills_disk_audit = _audit_ps_stills_disk(stills_dir, stills_act_started_at)
+                blocked.extend(settle_blocked)
+                if paths_ready and stills_act_settled_at is not None:
+                    still_entries = _reconcile_still_entries_from_disk(
+                        list(orch.entries),
+                        stills_act_started_at,
+                        stills_dir,
+                        act_end=stills_act_settled_at,
+                    )
+                manifest_path = _write_stills_manifest(
+                    still_entries,
+                    stills_dir,
+                    act_since=stills_act_started_at,
+                    act_end=stills_act_settled_at,
+                )
+                stills_disk_audit = _audit_ps_stills_disk(
+                    stills_dir, stills_act_started_at, stills_act_settled_at
+                )
                 driver_error = orch._driver_error
                 if not completed:
                     blocked = list(blocked) + ["stills_driver_timeout"]
+                try:
+                    orch._unregister_tick()
+                    orch._disarm_keep_alive()
+                except Exception:
+                    pass
                 _ACTIVE_PS_C_STILLS = None
         else:
             driver_error = err
             blocked.append(f"stills_driver_failed:{err}")
 
     if stills_act_started_at is not None and stills_disk_audit is None:
-        stills_disk_audit = _audit_ps_stills_disk(stills_dir, stills_act_started_at)
+        stills_disk_audit = _audit_ps_stills_disk(
+            stills_dir, stills_act_started_at, stills_act_settled_at
+        )
 
     gate = _build_ps_c_gate(
         blocked=blocked,
@@ -1731,8 +3234,13 @@ def prove_ps_placement(*, skip_stills: bool = False) -> dict[str, Any]:
         stills_in_progress=stills_in_progress,
         driver_error=driver_error,
         stills_act_started_at=stills_act_started_at,
+        stills_act_settled_at=stills_act_settled_at,
         stills_disk_audit=stills_disk_audit,
+        prove_mode=prove_mode,
+        one_cam_label=one_cam_active if isinstance(one_cam_active, str) else None,
+        cap001_phase_a=cap001_phase_a,
     )
+    gate["gate_written_at"] = time.time()
     _write_ps_c_gate_file(gate)
     _log(
         "prove complete",
@@ -1748,11 +3256,20 @@ def prove_ps_placement(*, skip_stills: bool = False) -> dict[str, Any]:
 
 
 def main() -> None:
-    gate = prove_ps_placement()
+    bite_label = _resolve_one_cam_label_from_env_or_argv()
+    gate = prove_ps_placement(one_cam_label=bite_label)
     print(
         json.dumps(
             {
                 "ok": gate.get("ready_for_ps_d"),
+                "prove_mode": gate.get("prove_mode"),
+                "one_cam_label": gate.get("one_cam_label"),
+                "one_cam_bite_pass": gate.get("one_cam_bite_pass"),
+                "act_fired_at": gate.get("act_fired_at"),
+                "canonical_still_path_abs": gate.get("canonical_still_path_abs"),
+                "cap001_settle_after_yield_v1": gate.get("cap001_settle_after_yield_v1"),
+                "stills_present_count": gate.get("stills_present_count"),
+                "stills_required_count": gate.get("stills_required_count"),
                 "stills_in_progress": gate.get("stills_in_progress"),
                 "placement_outcome": gate.get("placement_outcome"),
                 "gate_path": gate.get("written_path"),

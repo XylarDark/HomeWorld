@@ -9456,3 +9456,27 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 **Pending:** DESKTOP re-prove MRQ/arrange gate (`pose_source: homestead_bounds_relocate`, no Cliff in `aim_bounds_labels_sample`).
 
 **Errors:** None (py_compile OK).
+
+## 2026-09-23 — PS-C-CAP-001 absolute HighResShot paths (cloud)
+
+**Completed:** PS-C rung-1 path harden — `capture_viewport._ensure_abs_dest`, `ps_placement_prove._resolve_still_path` / AL guard for `Saved/ps_stills/`; KNOWN_ERRORS PS-C-CAP-001 row.
+
+**Pending:** DESKTOP re-prove one-cam `CAM_CabinClose` + full `execute_python_script("ps_placement_prove.py")` → 7 fresh PNGs, `ready_for_ps_d` true.
+
+**Errors:** None (py_compile OK).
+
+## 2026-09-23 — PS-C manifest reconcile + stale arrange gate (PR #198)
+
+**Completed:** `ps_placement_prove` — disk reconcile before manifest write; `exists` mirrors `file_exists`; stale `ps_arrange_gate` re-runs Arrange when `STILL_CAM_LABELS` missing; removed `MovieRenderPipelineEditor` from `HomeWorld.uproject`; KNOWN_ERRORS rows (manifest race, camera_missing, bogus MRQ editor plugin).
+
+**Pending:** DESKTOP one Act `execute_python_script("ps_placement_prove.py")` after Arrange-ready level — inspect `Saved/ps_c_prove_gate.json` + `Saved/ps_stills/manifest.json` (7 fresh PNGs, no PS_* `camera_missing`).
+
+**Errors:** None (py_compile OK).
+
+## 2026-09-23 — PS-C re-prove deepen gate settle + inventory closed_fail (PR #198)
+
+**Completed:** `_ps_c_settle_stills_before_gate` (pending AL tasks, Act window mtime scoring, gate after settle); `inventory_cameras_missing_closed_fail` blocks Act when Arrange cannot place handoff cams; KNOWN_ERRORS post-gate race row.
+
+**Pending:** DESKTOP re-prove § in PR #198.
+
+**Errors:** None (py_compile OK).
