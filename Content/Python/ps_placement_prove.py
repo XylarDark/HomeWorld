@@ -143,6 +143,20 @@ def _still_cam_labels_missing() -> list[str]:
     return [lbl for lbl in STILL_CAM_LABELS if _find_actor_label(lbl) is None]
 
 
+def _prove_still_labels_drift_from_design() -> Optional[str]:
+    """None if STILL_CAM_LABELS matches PS-C handoff; else bounce-to-Design message."""
+    current = frozenset(STILL_CAM_LABELS)
+    if current == _PS_C_STILL_LABELS_CANON:
+        return None
+    only_prove = sorted(current - _PS_C_STILL_LABELS_CANON)
+    only_canon = sorted(_PS_C_STILL_LABELS_CANON - current)
+    return (
+        "prove_camera_labels_drift_design_bounce:"
+        f"prove_only={only_prove or []};canon_only={only_canon or []};"
+        "patch Docs/handoffs/PS_C_METRICS.md + PS_A_INVENTORY.md — do not invent cams"
+    )
+
+
 def _actor_aabb(actor) -> Optional[dict[str, list[float]]]:
     try:
         origin, extent = actor.get_actor_bounds(False)
@@ -1710,6 +1724,12 @@ def prove_ps_placement(*, skip_stills: bool = False) -> dict[str, Any]:
     global _ACTIVE_PS_C_STILLS
     blocked: list[str] = []
     pre_closed = False
+
+    label_drift = _prove_still_labels_drift_from_design()
+    if label_drift:
+        blocked.append(label_drift)
+        pre_closed = True
+        _log("prove blocked: still camera labels ≠ Design handoff", {"reason": label_drift})
 
     try:
         world_status = common.editor_world_markers_status()
