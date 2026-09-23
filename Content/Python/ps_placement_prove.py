@@ -4,8 +4,8 @@
 # Chain (DESKTOP): markers → dress → pa_d → arrange_ps_homestead.py → this script.
 # Harness P3 exempt: PS track prove (Arrange gate via ps_arrange_gate.json / arrange_ps_homestead).
 # Writes Saved/ps_placement_metrics.json, Saved/ps_stills/*, Saved/ps_c_prove_gate.json.
-# Stills: register_slate_pre_tick_callback + keep_python_script_alive (PA-E pretick pattern;
-# no blocking time.sleep while waiting for HighResShot / AutomationLibrary).
+# Stills: slate pre-tick state machine + pump-until-done (≤300s, no sleep) so MCP prove
+# always finalizes gate and PNGs; module-level callback + keep_python_script_alive.
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ import sys
 import time
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Any, Callable, Optional
+from typing import Any, Optional
 
 try:
     import unreal
@@ -75,7 +75,9 @@ STILL_CAM_LABELS = (
 STILL_RES_X, STILL_RES_Y = 1600, 900
 PS_C_WAIT_FILE_SEC = 120.0
 PS_C_INTER_SHOT_SETTLE_FRAMES = 16
+PS_C_DRIVE_TIMEOUT_SEC = 300.0
 PS_C_SLATE_MECHANISM = "register_slate_pre_tick_callback"
+PS_C_DRIVE_MECHANISM = "slate_callback_plus_pump_until_done"
 TRACE_TOP_OFFSET_UU = 120.0
 TRACE_DEPTH_UU = 12000.0
 # PS-C baseline: metric over-threshold → soft_fail (Lead tunes before closed_fail).
@@ -651,6 +653,26 @@ def _compute_metrics(
     }
 
 
+def _focus_ps_c_viewport() -> None:
+    """Bring level viewport to foreground before HighResShot (shotlist pattern)."""
+    try:
+        les = unreal.get_editor_subsystem(unreal.LevelEditorSubsystem)
+        if les:
+            for attr in ("editor_set_level_viewport_realtime", "set_level_viewport_realtime"):
+                if hasattr(les, attr):
+                    getattr(les, attr)(True)
+            for attr in ("set_focus_to_level_viewport", "focus_level_viewport"):
+                if hasattr(les, attr):
+                    getattr(les, attr)()
+                    break
+    except Exception:
+        pass
+    try:
+        unreal.SystemLibrary.execute_console_command(None, "FOCUSVIEWPORT")
+    except Exception:
+        pass
+
+
 def _pilot_camera(cam) -> None:
     try:
         unreal.EditorLevelLibrary.set_level_viewport_camera_info(
@@ -698,12 +720,10 @@ class _PsCStillsOrchestrator:
         world,
         stills_dir: str,
         gate_context: dict[str, Any],
-        on_finished: Callable[[list[dict[str, Any]], str], None],
     ) -> None:
         self.world = world
         self.stills_dir = stills_dir
         self.gate_context = gate_context
-        self.on_finished = on_finished
         self.phase = _PsCStillsPhase.IDLE
         self.shot_index = 0
         self.entries: list[dict[str, Any]] = []
@@ -720,6 +740,10 @@ class _PsCStillsOrchestrator:
         self._stable: Any = None
         self._driver_error: Optional[str] = None
         self._cv: Any = None
+        self._in_tick = False
+        self._manifest_path = ""
+        self._drive_ticks = 0
+        self._registered_tick_callable: Any = None
 
     def start(self) -> bool:
         register = getattr(unreal, "register_slate_pre_tick_callback", None)
@@ -728,8 +752,11 @@ class _PsCStillsOrchestrator:
             return False
         self._cv = _load_capture_viewport()
         self._stable = self._cv._StableSizeTracker()
+        self._registered_tick_callable = _ps_c_slate_pre_tick_dispatcher
+        _PS_C_SLATE_CALLBACK_REFS.append(self._registered_tick_callable)
+        _PS_C_DRIVER_ROOTS.append(self)
         try:
-            self._tick_handle = register(self._on_slate_pre_tick)
+            self._tick_handle = register(self._registered_tick_callable)
         except Exception as e:
             self._driver_error = str(e)
             return False
@@ -737,7 +764,12 @@ class _PsCStillsOrchestrator:
         self.shot_index = 0
         _log(
             "stills slate driver armed",
-            {"mechanism": PS_C_SLATE_MECHANISM, "wait_file_sec": PS_C_WAIT_FILE_SEC},
+            {
+                "mechanism": PS_C_SLATE_MECHANISM,
+                "drive_mechanism": PS_C_DRIVE_MECHANISM,
+                "wait_file_sec": PS_C_WAIT_FILE_SEC,
+                "drive_timeout_sec": PS_C_DRIVE_TIMEOUT_SEC,
+            },
         )
         return True
 
@@ -753,16 +785,26 @@ class _PsCStillsOrchestrator:
         self._tick_handle = None
 
     def _on_slate_pre_tick(self, _delta: float) -> None:
+        if self._in_tick:
+            return
+        self._in_tick = True
         try:
             self._tick()
+            self._drive_ticks += 1
         except Exception as e:
             _log("stills orchestrator tick error", {"error": str(e), "phase": self.phase.value})
             self.phase = _PsCStillsPhase.WRITE_MANIFEST
             self._driver_error = self._driver_error or str(e)
+        finally:
+            self._in_tick = False
 
     def _tick(self) -> None:
         if self.phase == _PsCStillsPhase.POSED:
             self._begin_shot_prepare()
+            if self.phase == _PsCStillsPhase.CAPTURE_PENDING:
+                self._invoke_capture_once()
+        elif self.phase == _PsCStillsPhase.PREPARING:
+            pass
         elif self.phase == _PsCStillsPhase.CAPTURE_PENDING:
             self._invoke_capture_once()
         elif self.phase == _PsCStillsPhase.WAITING_FILE:
@@ -816,8 +858,13 @@ class _PsCStillsOrchestrator:
     def _invoke_capture_once(self) -> None:
         if self.phase != _PsCStillsPhase.CAPTURE_PENDING:
             return
+        _focus_ps_c_viewport()
         fired = self._cv.console_high_res_invoke_once(
-            STILL_RES_X, STILL_RES_Y, self._filepath, self._capture_result
+            STILL_RES_X,
+            STILL_RES_Y,
+            self._filepath,
+            self._capture_result,
+            world=self.world,
         )
         if fired:
             self._methods.append(
@@ -859,12 +906,19 @@ class _PsCStillsOrchestrator:
     def _finish_all(self) -> None:
         if self.phase == _PsCStillsPhase.DONE:
             return
-        manifest_path = _write_stills_manifest(self.entries, self.stills_dir)
-        self.on_finished(self.entries, manifest_path)
+        self._manifest_path = _write_stills_manifest(self.entries, self.stills_dir)
         self._unregister_tick()
         self.phase = _PsCStillsPhase.DISARM
         self._disarm_keep_alive()
         self.phase = _PsCStillsPhase.DONE
+        _log(
+            "stills driver finished",
+            {
+                "shots": len(self.entries),
+                "manifest": self._manifest_path,
+                "drive_ticks": self._drive_ticks,
+            },
+        )
 
     def _disarm_keep_alive(self) -> None:
         try:
@@ -876,6 +930,45 @@ class _PsCStillsOrchestrator:
 
 
 _ACTIVE_PS_C_STILLS: Optional[_PsCStillsOrchestrator] = None
+_PS_C_SLATE_CALLBACK_REFS: list[Any] = []
+_PS_C_DRIVER_ROOTS: list[Any] = []
+
+
+def _ps_c_slate_pre_tick_dispatcher(delta: float) -> None:
+    """Module-level Slate callback (strong ref; survives MCP script return)."""
+    orch = _ACTIVE_PS_C_STILLS
+    if orch is not None:
+        orch._on_slate_pre_tick(delta)
+
+
+def _drive_ps_c_stills_orchestrator(
+    orch: _PsCStillsOrchestrator, timeout_sec: float
+) -> bool:
+    """Pump Slate + run driver ticks until DONE or timeout (no time.sleep)."""
+    deadline = time.time() + timeout_sec
+    cv = orch._cv or _load_capture_viewport()
+    last_log = time.time()
+    while orch.phase != _PsCStillsPhase.DONE and time.time() < deadline:
+        orch._on_slate_pre_tick(0.033)
+        cv._pump_editor_once()
+        if time.time() - last_log >= 15.0:
+            last_log = time.time()
+            _log(
+                "stills drive progress",
+                {
+                    "phase": orch.phase.value,
+                    "shot_index": orch.shot_index,
+                    "entries": len(orch.entries),
+                    "drive_ticks": orch._drive_ticks,
+                },
+            )
+    if orch.phase != _PsCStillsPhase.DONE:
+        orch._driver_error = orch._driver_error or "stills_driver_timeout"
+        _log("stills drive timeout", {"phase": orch.phase.value, "timeout_sec": timeout_sec})
+        orch.phase = _PsCStillsPhase.WRITE_MANIFEST
+        orch._finish_all()
+        return False
+    return True
 
 
 def _finalize_still_entry(
@@ -1064,7 +1157,8 @@ def _build_ps_c_gate(
         "stills_required_count": stills_required,
         "stills_capture_outcomes": capture_outcomes,
         "stills_in_progress": stills_in_progress,
-        "stills_wait_mechanism": PS_C_SLATE_MECHANISM,
+        "stills_wait_mechanism": PS_C_DRIVE_MECHANISM,
+        "stills_slate_callback": PS_C_SLATE_MECHANISM,
         "metrics_path": metrics_path if metrics else None,
         "stills_manifest_path": manifest_path or None,
         "dress_bounds_path": dress_path,
@@ -1090,38 +1184,6 @@ def _write_ps_c_gate_file(gate: dict[str, Any]) -> str:
     return gate_path
 
 
-def _on_ps_c_stills_finished(
-    entries: list[dict[str, Any]], manifest_path: str, ctx: dict[str, Any]
-) -> None:
-    global _ACTIVE_PS_C_STILLS
-    _ACTIVE_PS_C_STILLS = None
-    blocked = list(ctx.get("blocked") or [])
-    gate = _build_ps_c_gate(
-        blocked=blocked,
-        pre_closed=bool(ctx.get("pre_closed")),
-        dress_count=int(ctx.get("dress_count") or 0),
-        pa_d_count=int(ctx.get("pa_d_count") or 0),
-        arrange_gate=ctx.get("arrange_gate") or {},
-        dress_path=str(ctx.get("dress_path") or ""),
-        metrics=ctx.get("metrics"),
-        metrics_path=str(ctx.get("metrics_path") or ""),
-        still_entries=entries,
-        manifest_path=manifest_path,
-        stills_in_progress=False,
-        driver_error=ctx.get("driver_error"),
-    )
-    _write_ps_c_gate_file(gate)
-    _log(
-        "prove complete (stills async)",
-        {
-            "ready_for_ps_d": gate.get("ready_for_ps_d"),
-            "placement_outcome": gate.get("placement_outcome"),
-            "stills": gate.get("stills_present_count"),
-            "blocked": blocked,
-        },
-    )
-
-
 def _start_ps_c_stills_async(world, gate_context: dict[str, Any]) -> tuple[bool, Optional[str]]:
     global _ACTIVE_PS_C_STILLS
     if _ACTIVE_PS_C_STILLS is not None:
@@ -1140,7 +1202,6 @@ def _start_ps_c_stills_async(world, gate_context: dict[str, Any]) -> tuple[bool,
         world=world,
         stills_dir=stills_dir,
         gate_context=gate_context,
-        on_finished=_on_ps_c_stills_finished,
     )
     if not orch.start():
         gate_context["driver_error"] = orch._driver_error
@@ -1158,6 +1219,7 @@ def _start_ps_c_stills_async(world, gate_context: dict[str, Any]) -> tuple[bool,
 
 def prove_ps_placement(*, skip_stills: bool = False) -> dict[str, Any]:
     """PS-C entry: preconditions, metrics, stills, gate sidecar."""
+    global _ACTIVE_PS_C_STILLS
     blocked: list[str] = []
     pre_closed = False
 
@@ -1227,8 +1289,15 @@ def prove_ps_placement(*, skip_stills: bool = False) -> dict[str, Any]:
         }
         started, err = _start_ps_c_stills_async(world, gate_context)
         if started:
-            stills_in_progress = True
-            blocked = list(blocked) + ["stills_async_slate_driver"]
+            orch = _ACTIVE_PS_C_STILLS
+            if orch is not None:
+                completed = _drive_ps_c_stills_orchestrator(orch, PS_C_DRIVE_TIMEOUT_SEC)
+                still_entries = list(orch.entries)
+                manifest_path = orch._manifest_path or ""
+                driver_error = orch._driver_error
+                if not completed:
+                    blocked = list(blocked) + ["stills_driver_timeout"]
+                _ACTIVE_PS_C_STILLS = None
         else:
             driver_error = err
             blocked.append(f"stills_driver_failed:{err}")
