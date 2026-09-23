@@ -13,7 +13,7 @@ import json
 import os
 import sys
 import time
-from typing import Optional
+from typing import Any, Optional
 
 try:
     import unreal
@@ -240,20 +240,42 @@ def _wait_for_file(filepath, since_mtime, basename, wait_sec=None):
     return None
 
 
+def _automation_task_tick(task: Any) -> None:
+    if task is None:
+        return
+    done_fn = getattr(task, "is_task_done", None)
+    if not callable(done_fn):
+        return
+    try:
+        done_fn()
+    except Exception:
+        pass
+
+
 def wait_for_png_on_disk(
     filepath: str,
     since_mtime: float,
     *,
     wait_sec: Optional[float] = None,
     basename: Optional[str] = None,
+    automation_task: Any = None,
 ) -> Optional[str]:
     """Slate-pump blocking wait until abs PNG exists (MIN_BYTES + stable size).
 
-    Used by PS-C one-cam sync capture and capture() fallbacks — not for MCP sleep-free drivers.
+    Co-waits ``AutomationEditorTask.is_task_done()`` each tick when *automation_task*
+    is set (no busy-sleep). Used by PS-C one-cam contract and capture() fallbacks.
     """
     filepath = _ensure_abs_dest(filepath)
     bn = basename or os.path.basename(filepath)
-    return _wait_for_file(filepath, since_mtime, bn, wait_sec=wait_sec)
+    deadline = time.time() + (wait_sec if wait_sec is not None else WAIT_FILE_SEC_LEGACY)
+    stable = _StableSizeTracker()
+    while time.time() < deadline:
+        _automation_task_tick(automation_task)
+        found = probe_png_ready(filepath, since_mtime, bn, stable)
+        if found:
+            return found
+        _settle_pump_only(frames=2)
+    return None
 
 
 def console_high_res_invoke_once(resolution_x, resolution_y, filepath, result, world=None):

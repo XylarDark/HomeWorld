@@ -1334,11 +1334,12 @@ def _ps_c_one_cam_sync_capture_still(
     cam_label: str,
     stills_dir: str,
 ) -> tuple[list[dict[str, Any]], float, Optional[float], Optional[str], list[str]]:
-    """CAP-001 bite: capture_viewport sync wait on canonical path (no async slate driver)."""
+    """CAP-001 bite: one AL invoke + slate-pumped wait_for_png_on_disk before act_end."""
     blocked: list[str] = []
     cv = _load_capture_viewport()
     act_start = time.time()
     path = _ps_c_canonical_still_path(cam_label)
+    _ = stills_dir
     cam = _find_actor_label(cam_label)
     if not cam:
         blocked.append(f"one_cam_camera_missing:{cam_label}")
@@ -1347,42 +1348,35 @@ def _ps_c_one_cam_sync_capture_still(
     _purge_ps_c_still_png(path)
     _pilot_camera(cam)
     _focus_ps_c_viewport()
-    methods: list[str] = ["one_cam:capture_viewport_sync_wait"]
+    methods: list[str] = ["one_cam:writer_contract_wait_for_png_on_disk"]
     lit = cv._set_lit_view_mode()
     if lit:
         methods.append(lit)
     cv._settle_pump_only(frames=PS_C_INTER_SHOT_SETTLE_FRAMES)
 
-    capture_since = time.time()
+    wait_since_mtime = time.time()
     ok, al_methods, task = _automation_abs_screenshot_one_invoke(path, cam)
     methods.extend(al_methods)
     if not ok:
         blocked.append("one_cam_automation_invoke_failed")
         return [], act_start, None, "automation_invoke_failed", blocked
 
-    methods.extend(_ps_c_flush_editor_for_still_wait(cv, world))
-
-    basename = os.path.basename(path)
-    stable = cv._StableSizeTracker()
-    deadline = time.time() + PS_C_ONE_CAM_WAIT_FILE_SEC
-    found: Optional[str] = None
+    cv._pump_editor_once()
     _log(
-        "one-cam sync wait on canonical path",
-        {"path": path, "wait_sec": PS_C_ONE_CAM_WAIT_FILE_SEC},
+        "one-cam contract wait (single wait_for_png_on_disk gate before act_end)",
+        {
+            "path": path,
+            "wait_since_mtime": wait_since_mtime,
+            "wait_sec": PS_C_ONE_CAM_WAIT_FILE_SEC,
+            "has_automation_task": task is not None,
+        },
     )
-    while time.time() < deadline:
-        if task is not None:
-            _task_is_done(task)
-        cv._pump_editor_once()
-        found = cv.probe_png_ready(path, act_start, basename, stable)
-        if found:
-            break
-
-    if not found:
-        methods.append("one_cam:capture_viewport_wait_for_png_on_disk")
-        methods.extend(_ps_c_flush_editor_for_still_wait(cv, world))
-        remaining = max(8.0, deadline - time.time())
-        found = cv.wait_for_png_on_disk(path, capture_since, wait_sec=remaining)
+    found = cv.wait_for_png_on_disk(
+        path,
+        wait_since_mtime,
+        wait_sec=PS_C_ONE_CAM_WAIT_FILE_SEC,
+        automation_task=task,
+    )
 
     if not found or not os.path.isfile(path):
         stamp = common.stamp_file_artifact(path)
@@ -1391,12 +1385,13 @@ def _ps_c_one_cam_sync_capture_still(
         )
         return [], act_start, None, "one_cam_sync_wait_failed", blocked
 
+    # act_end / gate scoring only after wait_for_png_on_disk succeeded (hard gate).
     act_end = time.time()
     entry = _finalize_still_entry(
         cam_label,
         path,
         methods,
-        since=capture_since,
+        since=wait_since_mtime,
         resolved_on_disk=found,
         act_end=act_end,
     )
