@@ -1587,7 +1587,9 @@ def _cap001_prepare_one_cam_lit_aim_before_fire(
         mrq_pie_shot=False,
     )
     prep_meta["night_environment"] = night_env
-    prep_meta["lighting_stack_verify"] = night_env.get("lighting_stack_verify")
+    lighting_verify = night_env.get("lighting_stack_verify") or {}
+    prep_meta["lighting_stack_verify"] = lighting_verify
+    prep_meta["lighting_stack_stack_ok"] = lighting_verify.get("stack_ok")
     prep_meta["environment_preconditions_ok"] = night_env.get("environment_preconditions_ok")
     methods.append("apply_pa_e_homestead_night_environment")
     if not night_env.get("environment_preconditions_ok"):
