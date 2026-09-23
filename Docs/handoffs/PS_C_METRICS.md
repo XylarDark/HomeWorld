@@ -20,6 +20,20 @@ Grant after DESKTOP runs prove, inspects `Saved/ps_placement_metrics.json` + `Sa
 
 ---
 
+## Protocol (track-agnostic team workflow — Test confirms)
+
+Canonical rules: [docs/Automation/CAPTURE_REDUNDANCY.md](../../docs/Automation/CAPTURE_REDUNDANCY.md) § **Procedure-agnostic evidence protocol** (HomeWorld Co Design → Implement → Test → Fix lanes).
+
+| Universal rule | PS-C mapping |
+|----------------|--------------|
+| **Pre-evidence DONE-WHEN** | **`ps_arrange_gate.json`** `ready_for_ps_c: true` + [PS_A_INVENTORY.md](PS_A_INVENTORY.md) labels in level. Else **block Act** (re-run [arrange_ps_homestead.py](../../Content/Python/arrange_ps_homestead.py)) — do not infer missing kit from empty stills. |
+| **Artifacts confirm** | Pose/look-at, dress AABB, TOD/view for stills set in **PS-B Arrange** + Design §3 thresholds; prove script **confirms** traces/metrics/luminance. |
+| **Score on real signals** | Metrics: real UU values per actor; stills: **bytes + mean luminance** in manifest, **mtime within Act window**; gate `placement_outcome`. Not **`exists` alone**. Black PNG when Arrange ready → **`soft_fail`** per still — not **`closed_fail`** without setup proof. |
+| **One Fix after research** | Docs → Epic screenshot path order / trace pattern → one script fix ([GAP_SOLUTIONS_RESEARCH.md](../../docs/Automation/GAP_SOLUTIONS_RESEARCH.md) if dead-end) — not multi-hour console ladders default. |
+| **Outcomes** | Wrong level, missing `PS_*`/`CAM_*`, missing metrics actor after ready → **`closed_fail`**. Dark/empty with file → **`soft_fail`**. Framing vs [33_PLACEMENT_STILLS.md](../33_PLACEMENT_STILLS.md) benchmarks → **PS-D** **`APPROVE PS-D`** only. |
+
+---
+
 ## Metrics catalog (thresholds)
 
 From [PS_A_INVENTORY.md](PS_A_INVENTORY.md) §3 · [33_PLACEMENT_STILLS.md](../33_PLACEMENT_STILLS.md):

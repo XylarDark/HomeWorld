@@ -1,3 +1,7 @@
+## 2026-09-23 — Procedure-agnostic evidence protocol (cloud, Lead Design lane)
+
+- **Docs-only PR:** [CAPTURE_REDUNDANCY.md](Automation/CAPTURE_REDUNDANCY.md) § Procedure-agnostic evidence protocol — track-agnostic bot-company workflow (Design→Implement→Test→Fix): pre-evidence DONE-WHEN, artifacts confirm-not-discover, real-signal scoring, one Fix after research; outcomes vocabulary. PS pointers: [PS_A_INVENTORY.md](../Docs/handoffs/PS_A_INVENTORY.md), [PS_C_METRICS.md](../Docs/handoffs/PS_C_METRICS.md) § Protocol; [33_PLACEMENT_STILLS.md](../Docs/33_PLACEMENT_STILLS.md) harness table. **Test scores any track** against universal rules. Branch `cursor/procedure-agnostic-protocol-1deb`.
+
 ## 2026-09-23 — UE_BIBLE anti-ladder hard rules (cloud)
 
 - **Docs-only:** [UE_BIBLE.md](../Docs/UE_BIBLE.md) §2b — Conductor/Lead harness locks (one repro before ladder PR, no third ladder, one Fix per root cause); Cause→Avoid table; HighResShot freeze + MRQ pointer. [PDF_CYCLE.md](../swarm/PDF_CYCLE.md) Host Pulse one-liner. Branch `cursor/ue-bible-anti-ladder-b3a5` — draft PR, not merged.

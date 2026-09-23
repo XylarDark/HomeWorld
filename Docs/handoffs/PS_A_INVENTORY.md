@@ -20,6 +20,20 @@ APPROVE PS-A
 
 ---
 
+## Protocol (track-agnostic team workflow — not capture-owned)
+
+Canonical rules: [docs/Automation/CAPTURE_REDUNDANCY.md](../../docs/Automation/CAPTURE_REDUNDANCY.md) § **Procedure-agnostic evidence protocol** (HomeWorld Co Design → Implement → Test → Fix lanes).
+
+| Universal rule | PS-A mapping |
+|----------------|--------------|
+| **Pre-evidence DONE-WHEN** | §1–§2 inventory + §2 camera map define required labels; Act phases (PS-C+) may run only if DESKTOP/live verify shows those labels ⊆ loaded **`L_VS_MVP_Markers`** world. Missing label → patch this doc or run placement scripts — **no** metric/capture discovery. |
+| **Artifacts confirm** | §3 thresholds + §4 bounds schema are **Design truth**; PS-B Arrange writes bounds/aim; PS-C JSON/stills **confirm** only. |
+| **Score on real signals** | Inventory close used **live actor counts** (stamped table), not path-assume. Future PS-C: mtime+bytes, metric UU values — not file-exists-only. |
+| **One Fix after research** | Placement script or inventory doc fix — not DESKTOP thrash or new cam ids in PS-A (inventory-only phase). |
+| **Outcomes** | Missing `DRESS_*` / `PA_D_*` / JSON `CAM_*` after setup-ready → **`closed_fail`** or block PS-C. Dark still with file → **`soft_fail`**. Benchmark/taste → **PS-D** Lead **`APPROVE PS-D`** only. |
+
+---
+
 ## DESKTOP live verify (stamped counts)
 
 Measured on **DESKTOP-21CT3H0** before PS-A close (homestead Markers chain):
