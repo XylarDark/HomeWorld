@@ -974,3 +974,8 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 - DESKTOP **`cd7c258` ~11:38:** gate before **`CAM_CabinClose.png`**, **`settle_path` missing** while PNG on canonical disk — AL async vs non-unified poll path.
 - Fix: **`_ps_c_canonical_still_path`** (AL ≡ settle ≡ manifest/gate); **`act_end`** only when **`paths_ready`**; gate defer poll before manifest; KNOWN_ERRORS row. Conductor: **one Act after PR** only; CAM-002 hold.
 
+## 2026-09-23 — PS-C-CAP-001 one-cam sync writer (cloud, PR #198 `fd8aa8c`)
+
+- DESKTOP **`98c7b36` ~12:09:** path canon OK; async driver + early **`act_end`** → settle **`exists:false`**, PNG same second as gate.
+- Fix: **`_ps_c_one_cam_sync_capture_still`** + **`capture_viewport.wait_for_png_on_disk`** (single AL, render flush, no slate driver/defer). CAM-002 hold.
+
