@@ -1,3 +1,7 @@
+## 2026-09-23 — UE_BIBLE anti-ladder hard rules (cloud)
+
+- **Docs-only:** [UE_BIBLE.md](../Docs/UE_BIBLE.md) §2b — Conductor/Lead harness locks (one repro before ladder PR, no third ladder, one Fix per root cause); Cause→Avoid table; HighResShot freeze + MRQ pointer. [PDF_CYCLE.md](../swarm/PDF_CYCLE.md) Host Pulse one-liner. Branch `cursor/ue-bible-anti-ladder-b3a5` — draft PR, not merged.
+
 ## 2026-09-23 — PS-C-3 fresh stills + gate/disk parity (cloud, post-#195)
 
 - **Ticket PS-C-3:** DESKTOP scored **closed_fail** — **flaky capture** (5× PS_* `png_missing` + timeout) + **false metric proxy** (gate `file_exists` vs stale CAM mtimes). **Fix:** PS_* **console HighResShot abs then AL**; wait-deadline console/AL retry rounds; post-drive **final drain** + **`_audit_ps_stills_disk`**; gate **`stills_present_count` = disk-fresh**, **`gate_count_matches_disk`**. Epic screenshot doc + forum tick-wait cited in KNOWN_ERRORS. Draft **#196** — DESKTOP re-prove only.
