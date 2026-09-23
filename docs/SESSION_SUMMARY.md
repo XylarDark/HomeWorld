@@ -967,4 +967,5 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 - **Ticket A:** Manifest **`exists`/`file_exists`** aligned with canonical **`Saved/ps_stills/`** disk stat before write; **`_finish_all`** + **`_write_stills_manifest(..., act_since=)`** reconcile; gate still uses **`_audit_ps_stills_disk`** for fresh count.
 - **Ticket B:** Stale **`ps_arrange_gate.json`** → **`_still_cam_labels_missing()`** forces **`arrange_ps_homestead`** re-run when prove cameras absent.
 - **Boot:** Removed bogus **`MovieRenderPipelineEditor`** from **`HomeWorld.uproject`**; KNOWN_ERRORS Cause→Avoid rows. DESKTOP re-prove pending.
+- **Design binding:** Prove 7 labels verified = **`PS_C_METRICS.md`** = PS-A map (no three-way mismatch); **`_prove_still_labels_drift_from_design`** blocks agent-invented cams.
 
