@@ -1,6 +1,6 @@
-## 2026-09-23 — PS-C-3 fresh stills capture harden (cloud, post-#195)
+## 2026-09-23 — PS-C-3 fresh stills + gate/disk parity (cloud, post-#195)
 
-- **Ticket PS-C-3:** DESKTOP re-prove after #195 — driver returned in ~300s but **0/7 fresh PNGs** (5× PS_* missing; CAM_* stale mtime pass). **Fix:** [ps_placement_prove.py](../Content/Python/ps_placement_prove.py) — purge before shot; **AutomationLibrary abs primary** + console HighResShot ladder on slate ticks; per-shot wait from drive deadline; **`mtime ≥ capture_since`** for pass/MRQ copy (no 86400h reuse); [capture_viewport.py](../Content/Python/capture_viewport.py) console index API. KNOWN_ERRORS PS-C-3 row. **Draft PR — DESKTOP Conductor re-prove only (no PASS claim).**
+- **Ticket PS-C-3:** DESKTOP scored **closed_fail** — **flaky capture** (5× PS_* `png_missing` + timeout) + **false metric proxy** (gate `file_exists` vs stale CAM mtimes). **Fix:** PS_* **console HighResShot abs then AL**; wait-deadline console/AL retry rounds; post-drive **final drain** + **`_audit_ps_stills_disk`**; gate **`stills_present_count` = disk-fresh**, **`gate_count_matches_disk`**. Epic screenshot doc + forum tick-wait cited in KNOWN_ERRORS. Draft **#196** — DESKTOP re-prove only.
 
 ## 2026-09-23 — Docs/33 Placement Stills (PS) strategy draft (cloud)
 
