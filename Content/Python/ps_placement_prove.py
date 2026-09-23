@@ -1276,23 +1276,6 @@ def _ps_c_gate_hold_until_canonical_paths(
     return still_entries, act_end, blocked, False
 
 
-def _ps_c_flush_editor_for_still_wait(cv: Any, world: Any) -> list[str]:
-    """Editor flush before disk poll (AL async flush — not timeout-only defer)."""
-    notes: list[str] = []
-    for cmd, tag in (
-        ("FlushAsyncLoading", "console:FlushAsyncLoading"),
-        ("r.FlushRenderingCommands", "console:r.FlushRenderingCommands"),
-    ):
-        try:
-            unreal.SystemLibrary.execute_console_command(world, cmd)
-            notes.append(tag)
-        except Exception as e:
-            notes.append(f"{tag}_fail:{e}")
-    cv._finish_loading_before_screenshot()
-    cv._settle(frames=16)
-    return notes
-
-
 def _automation_abs_screenshot_one_invoke(filepath: str, cam) -> tuple[bool, list[str], Any]:
     """Single AL invoke (one-cam sync — no second-round fire-and-forget)."""
     cv = _load_capture_viewport()
