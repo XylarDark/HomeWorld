@@ -8,6 +8,21 @@
 
 ---
 
+## Prove-size / one-shot ladder (Test lock-in — any track)
+
+HomeWorld **Test** locked prove sizing for Conductor Act on **every** track (PS, PA-E-style capture, env iteration, harness). Wording is normative for packets and board rows.
+
+| # | Rule | Requirement |
+|---|------|-------------|
+| 1 | **Bite = one closed DONE-WHEN** | One bite closes **one** DONE-WHEN — e.g. **one label**, **one cam**, or **one metric** — **not** a full 7-still scene until **CAP+CAM** (capture path + camera aim contract) are green on a minimal slice. |
+| 2 | **Pre-Act** | That bite’s labels must be **⊆ inventory ∩ Arrange actors** in the **loaded** level, or **block** — **no Act**. |
+| 3 | **PASS** | Score **Act-window `mtime` + `bytes`** (never exists-only). **Black + file** ⇒ **`soft_fail`**; **missing setup** (labels, Arrange, gate) ⇒ **`closed_fail`**. |
+| 4 | **Ladder** | **1-cam green → N-cam set → full PS-C** (or track equivalent). **No whole-scene Act** while per-item defects stay open (e.g. **CAP-001** capture path, **CAM-002** aim — or track-specific IDs on the Test packet). |
+
+**Post–PR #198:** If **deepen** / extended research is still **red** (inconclusive or open tooling gap), Conductor **prefers one-cam Act first** before widening to N-cam or full-scene prove — same ladder, smaller Act surface ([UE_BIBLE.md](../../Docs/UE_BIBLE.md) §2b one-cam minimal repro aligns with this row).
+
+---
+
 ## Purpose / hosts
 
 | Host | Owns | Typical one-shot work |
@@ -69,22 +84,27 @@ Fix laps that add `CAM_*` / `PS_*` actors to “frame better” are Design scope
 
 ## Bite criteria
 
-**DONE-WHEN checklist** — Conductor may schedule a row only when the packet satisfies **all** rows.
+**DONE-WHEN checklist** — Conductor may schedule a row only when the packet satisfies **all** rows **and** [Prove-size / one-shot ladder](#prove-size--one-shot-ladder-test-lock-in--any-track).
 
 | # | Criterion | Required content |
 |---|-----------|------------------|
 | 1 | **One named risk** | Single sentence: what fails if this bite slips (e.g. “cliff underside float undetected”). |
-| 2 | **One DONE-WHEN math set** | Frozen numbers Design owns: look-at target(s), dress **AABB** or anchor envelope, TOD phase + preset IDs, key light/exposure cvars — copied into inventory + Arrange sidecar **before** Implement. |
-| 3 | **Labels ⊆ inventory ∩ world** | Explicit label prefix list (`DRESS_*`, `PA_D_*`, `PS_*` cams, …); DESKTOP verify step named in Test packet. |
-| 4 | **Exactly one Act artifact class** | Choose **one**: `stills` **OR** `metrics JSON` **OR** `arrange/harness gate JSON` **OR** `docs/handoff only` — not multiple primary classes in the same bite. |
-| 5 | **Score signals named** | e.g. `Saved/ps_arrange_gate.json` fields (`ready`, `aim_ok`, …); PNG **mtime ≥ capture_since** and **bytes ≥ MIN_BYTES**; metric IDs in `ps_placement_metrics.json`; CI job names for CLOUD-only bites. |
-| 6 | **Host column** | `CLOUD` \| `DESKTOP` \| `Lead` per stage on the packet. |
-| 7 | **Outcome mapping** | How `pass` / `soft_fail` / `closed_fail` / Lead-later apply ([CAPTURE_REDUNDANCY.md](CAPTURE_REDUNDANCY.md) three-state + PS metric vs visual split). |
+| 2 | **One closed DONE-WHEN** | **One** label, **one** cam, **one** metric, or **one** gate field family per bite — not multi-cam / multi-metric bundles until ladder step allows (see § Prove-size ladder). |
+| 3 | **One DONE-WHEN math set** | Frozen numbers Design owns: look-at target(s), dress **AABB** or anchor envelope, TOD phase + preset IDs, key light/exposure cvars — copied into inventory + Arrange sidecar **before** Implement. |
+| 4 | **Pre-Act: labels ⊆ inventory ∩ Arrange** | Explicit label list; DESKTOP verify **Arrange actors** present — else **block Act** (no capture/metrics run). |
+| 5 | **Exactly one Act artifact class** | Choose **one**: `stills` **OR** `metrics JSON` **OR** `arrange/harness gate JSON` **OR** `docs/handoff only` — not multiple primary classes in the same bite. |
+| 6 | **Score signals named** | Act-window **`mtime` + `bytes`** (never exists-only); gate JSON fields; metric IDs; **`soft_fail`** vs **`closed_fail`** per ladder rule 3. |
+| 7 | **Host column** | `CLOUD` \| `DESKTOP` \| `Lead` per stage on the packet. |
+| 8 | **Outcome mapping** | How `pass` / `soft_fail` / `closed_fail` / Lead-later apply ([CAPTURE_REDUNDANCY.md](CAPTURE_REDUNDANCY.md) three-state + PS metric vs visual split). |
+| 9 | **Ladder step** | Which rung: **1-cam** \| **N-cam set** \| **full track prove**; open CAP/CAM (or track) defects forbid whole-scene Act. |
 
 **Template (fill before Implement):**
 
 ```yaml
 bite_id: "{TRACK}-{slug}"
+prove_size: one_label | one_cam | one_metric | one_gate_family  # one closed DONE-WHEN
+ladder_step: 1_cam | n_cam_set | full_track_prove
+open_defects_block_whole_scene: []   # e.g. CAP-001, CAM-002
 risk: ""
 done_when_math:
   look_at: []          # actor or bounds id + centroid rule
@@ -135,7 +155,7 @@ flowchart LR
 | 3 | Implement | Ships **one** bite; exclusive paths on packet. |
 | 4 | Test | Publishes Test packet (checklist + signal names); no DESKTOP execution in sidebar Test on cloud-only hosts. |
 | 5 | Conductor | **Act** on DESKTOP when packet says so; returns logs/JSON/PNG paths. |
-| 6 | Test | Scores signals; **`pass`** only if pre-evidence DONE-WHEN was met **and** asserts green. |
+| 6 | Test | Scores **Act-window mtime+bytes**; **`pass`** only if pre-Act labels ⊆ inventory ∩ Arrange **and** DONE-WHEN met; black+file ⇒ **soft_fail**; missing setup ⇒ **closed_fail**. |
 | 7 | Fix | **One root** after [CAPTURE_REDUNDANCY.md](CAPTURE_REDUNDANCY.md) dead-end research if tooling-related; defect-linked paths only. |
 | 8 | Conductor | Next bite **only** after gate green or Lead **WAIVE**; else repeat Fix → Test or bounce Design if inventory/labels wrong. |
 
@@ -150,20 +170,35 @@ flowchart LR
 
 ## Apply to Placement Stills / asset-env iteration after PS-C
 
-[Docs/33_PLACEMENT_STILLS.md](../../Docs/33_PLACEMENT_STILLS.md) is the **reference track** for successive one-shots. Map phases to bites (do **not** merge phases into one DESKTOP prove):
+[Docs/33_PLACEMENT_STILLS.md](../../Docs/33_PLACEMENT_STILLS.md) is the **reference track** for successive one-shots. Map phases to bites (do **not** merge phases into one DESKTOP prove).
+
+### PS prove-size ladder (Test lock-in)
+
+Applies § [Prove-size / one-shot ladder](#prove-size--one-shot-ladder-test-lock-in--any-track) to PS-C stills/metrics:
+
+| Rung | Bite shape | Gate to advance |
+|------|------------|-----------------|
+| **0** | Pre-Act: labels ⊆ inventory ∩ **`ps_arrange_gate.json`** actors | `ready: true`; else **block** — no Act |
+| **1** | **One cam** — one `PS_*` (or one reused `CAM_*`) still and/or metrics tied to **one** view | Act-window **mtime+bytes** green; CAP+CAM green for **that** cam |
+| **2** | **N-cam set** — add cams incrementally (e.g. iso quartet, then hero pair) | Each cam was rung-1 green; no open **CAP-001** / **CAM-002** (or PS Test packet IDs) |
+| **3** | **Full PS-C** — full metric catalog + full angle catalog per [33 § Camera catalog](../../Docs/33_PLACEMENT_STILLS.md) | All rung-2 sets green; then PS-D Lead eyeball |
+
+**Forbidden:** Full **7-still** (or full catalog) scene Act while **CAP-001** (capture path) or **CAM-002** (aim/framing contract) remain open on the Test packet. After **#198**, if deepen/research is still red, stay on **rung 1 (one-cam Act)** until minimal capture is green.
+
+### Phase map (unchanged scope; finer bites inside PS-C)
 
 | Phase | One-shot focus | Artifact class (exclusive) | DONE-WHEN math owner |
 |-------|----------------|------------------------------|----------------------|
 | **PS-A** | Metrics + angle **inventory** | `docs` + `Saved/` schema JSON | Catalog IDs, cam list, threshold **TBD→frozen** |
 | **PS-B** | Camera/fixture **Arrange** | `gate` — `ps_arrange_gate.json` | look-at + AABB + TOD/light stack per PS-A inventory |
-| **PS-C** | Metric asserts + still capture | **Split bites**: (C1) `metrics` only, (C2) `stills` subset per cam **or** single cam family — never both as one “do everything” Act |
+| **PS-C** | Metric asserts + still capture | **Ladder bites only**: one metric and/or **one cam** per Act lap; rung 1 → 2 → 3 — never C1+C2+full grid in one Act |
 | **PS-D** | Lead framing vs benchmarks | `Lead` eyeball checklist | Metrics/stills **`pass`** or documented **soft_fail** + WAIVE |
 
 **After PS-C green** — env / asset iteration bites (homestead kit only until Lead opens a new track):
 
 | Bite type | Scope | DONE-WHEN hint |
 |-----------|--------|----------------|
-| **Hero kit pass** | One hero mesh family (e.g. cabin module set) | Greybox collision + ground metrics on **that** label set; one **PS_*` cam** or iso pair |
+| **Hero kit pass** | One hero mesh family (e.g. cabin module set) | **One label** metrics first; then **one cam**; greybox before uprez — not full scene |
 | **Modular filler** | Path stones / fence segment | `pair_overlap` + `ground_z_delta` on listed `PA_D_*` only |
 | **Greybox before uprez** | Blockout scale/proxy only | Metrics **`pass`** before material/uprez bite; no stills gate on uprez in same bite |
 | **One biome / camera set** | Single TOD + 2–3 judgment cams | Reuse Arrange; add **at most one** new `PS_*` per Design bite |

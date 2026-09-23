@@ -31,7 +31,7 @@ Lead **`APPROVE PS STRATEGY — homestead kit only`** — **GRANTED** 2026-09-22
 
 ---
 
-**One-shot bites:** PS-A→E map to successive Conductor one-shots (schema in [docs/Automation/ONE_SHOT_BITES.md](../docs/Automation/ONE_SHOT_BITES.md)); PS-C metrics vs stills stay **separate** artifact classes per bite.
+**One-shot bites:** PS-A→E map to successive Conductor one-shots ([ONE_SHOT_BITES.md](../docs/Automation/ONE_SHOT_BITES.md)); **Test prove-size ladder:** one label / one cam / one metric per bite → 1-cam green → N-cam → full PS-C; pre-Act labels ⊆ inventory ∩ Arrange or **block**; PASS = Act-window mtime+bytes (not exists-only).
 
 ## Goal
 
