@@ -9456,3 +9456,11 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 **Pending:** DESKTOP re-prove MRQ/arrange gate (`pose_source: homestead_bounds_relocate`, no Cliff in `aim_bounds_labels_sample`).
 
 **Errors:** None (py_compile OK).
+
+## 2026-09-23 — PS-C-CAP-001 absolute HighResShot paths (cloud)
+
+**Completed:** PS-C rung-1 path harden — `capture_viewport._ensure_abs_dest`, `ps_placement_prove._resolve_still_path` / AL guard for `Saved/ps_stills/`; KNOWN_ERRORS PS-C-CAP-001 row.
+
+**Pending:** DESKTOP re-prove one-cam `CAM_CabinClose` + full `execute_python_script("ps_placement_prove.py")` → 7 fresh PNGs, `ready_for_ps_d` true.
+
+**Errors:** None (py_compile OK).
