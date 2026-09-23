@@ -104,10 +104,15 @@ Tool-agnostic external heartbeat for pending Acts. Spec: [Docs/handoffs/HOST_PUL
 
 Product `soft_fail`/`closed_fail` remain Test-owned and apply only after Act. No `APPROVE *` for pulse. **Primary MVP:** Conductor **5m** pulse (direct re-check). Optional DESKTOP helper → `Saved/host_pulse.json` is nice-to-have, not mandatory. **Mid-Act DESKTOP stall:** hard recovery budgets in [HOST_PULSE.md § DESKTOP stall protocol](../Docs/handoffs/HOST_PULSE.md#desktop-stall-protocol-conductor-owned) (Conductor-owned; one recover cycle, ≤10 min before Lead). **Console-kill** (Lead closes attached UE log console) → **`blocked`**, not product fail — [HOST_PULSE.md § Console-kill](../Docs/handoffs/HOST_PULSE.md#console-kill-log-window-closes-ue).
 
+**UE prove one-shot:** [Docs/UE_BIBLE.md](../Docs/UE_BIBLE.md) — HomeWorld DESKTOP/MCP do/don’t (logging, stall budgets, PS-C lessons, cheap-iterate locks); not a generic Unreal wiki.
+
+---
+
 ## See also
 
 | Doc | Role |
 |-----|------|
+| [Docs/UE_BIBLE.md](../Docs/UE_BIBLE.md) | DESKTOP/MCP prove operator bible (token-lean) |
 | [SWARM_OPS.md](SWARM_OPS.md) | Full process, gates, QA law |
 | [PHASE_BOARD.md](PHASE_BOARD.md) | Conductor-only status rows |
 | [CLOUD_AGENT_PACKET.md](CLOUD_AGENT_PACKET.md) | Cloud assignee header + evidence |
