@@ -62,6 +62,22 @@ CORE_DRESS_SUBSTRINGS = (
 
 CLIFF_LABEL_MARKERS = ("Cliff",)
 
+# Design canon: Docs/handoffs/PS_C_METRICS.md § Still capture set (7 PNGs).
+# Maps PS-A strategy IDs (PS_A_INVENTORY.md §2): PS_Lookout_Hero→CAM_Hero,
+# PS_Cabin_ThreeQuarter→CAM_CabinClose; spawned PS_* per PS-B arrange_ps_homestead.
+# Do not add labels here without Lead/Design handoff update (no invented cams).
+_PS_C_STILL_LABELS_CANON = frozenset(
+    {
+        "PS_N_HighIso",
+        "PS_E_HighIso",
+        "PS_Cliff_Underside",
+        "PS_Path_Corridor",
+        "PS_Garden_Close",
+        "CAM_Hero",
+        "CAM_CabinClose",
+    }
+)
+
 STILL_CAM_LABELS = (
     "PS_N_HighIso",
     "PS_E_HighIso",
