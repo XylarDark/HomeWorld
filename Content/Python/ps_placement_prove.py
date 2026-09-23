@@ -1631,7 +1631,6 @@ def _ps_c_one_cam_phase_a_fire_and_return(
 ]:
     """CAP001 Phase A: one AL fire, stamp act_fired_at + path, return (no in-script PNG wait)."""
     blocked: list[str] = []
-    cv = _load_capture_viewport()
     act_start = time.time()
     path = common.abs_path(_ps_c_canonical_still_path(cam_label))
     _ = stills_dir
