@@ -113,7 +113,9 @@ PS_C_DRIVE_MECHANISM = "slate_callback_plus_pump_until_done"
 CAP001_SETTLE_AFTER_YIELD_V1 = "CAP001_SETTLE_AFTER_YIELD_V1"
 CAP001_DARK_STILL_LIT_AIM_V1 = "CAP001_DARK_STILL_LIT_AIM_V1"
 CAP001_DARK_STILL_NIGHT_STACK_V2 = "CAP001_DARK_STILL_NIGHT_STACK_V2"
+CAP001_POST_NIGHT_AL_READY_V1 = "CAP001_POST_NIGHT_AL_READY_V1"
 CAP001_PHASE_B_SIDECAR = "ps_c_cap001_phase_b.json"
+PS_C_POST_NIGHT_WARM_FRAMES = 6
 TRACE_TOP_OFFSET_UU = 120.0
 TRACE_DEPTH_UU = 12000.0
 # PS-C baseline: metric over-threshold → soft_fail (Lead tunes before closed_fail).
@@ -1562,6 +1564,24 @@ def _cap001_cabin_aim_bounds_centroid() -> Optional[list[float]]:
     return None
 
 
+def _cap001_tmp_fixture_reseed_ran(night_env: dict[str, Any]) -> bool:
+    reseed = night_env.get("tmp_fixture_reseed")
+    if isinstance(reseed, dict):
+        if reseed.get("skipped"):
+            return False
+        if reseed.get("spawned"):
+            return True
+        if reseed.get("stack_ok_after_reseed"):
+            return True
+    lifecycle = night_env.get("fixture_lifecycle")
+    if isinstance(lifecycle, dict):
+        rs = lifecycle.get("reseed")
+        if isinstance(rs, dict) and not rs.get("skipped"):
+            if rs.get("spawned"):
+                return True
+    return False
+
+
 def _cap001_prepare_one_cam_lit_aim_before_fire(
     cam,
     cam_label: str,
@@ -1569,6 +1589,7 @@ def _cap001_prepare_one_cam_lit_aim_before_fire(
     """Night stack + exposure, then lit/aim/warm (pre-AL one-cam)."""
     methods: list[str] = [
         CAP001_DARK_STILL_NIGHT_STACK_V2,
+        CAP001_POST_NIGHT_AL_READY_V1,
         CAP001_DARK_STILL_LIT_AIM_V1,
     ]
     blocked: list[str] = []
@@ -1576,7 +1597,11 @@ def _cap001_prepare_one_cam_lit_aim_before_fire(
         "camera_label": cam_label,
         "has_v2": True,
         CAP001_DARK_STILL_NIGHT_STACK_V2: True,
+        CAP001_POST_NIGHT_AL_READY_V1: True,
     }
+    cv = _load_capture_viewport()
+    cam_loc_sync: Any = None
+    cam_rot_sync: Any = None
 
     homestead_centroid = _cap001_cabin_aim_bounds_centroid()
     prep_meta["homestead_centroid"] = homestead_centroid
@@ -1601,6 +1626,17 @@ def _cap001_prepare_one_cam_lit_aim_before_fire(
     exposure_cvars = vnp.apply_mrq_pie_night_exposure_cvars()
     prep_meta["exposure_cvars"] = exposure_cvars
     methods.append("apply_mrq_pie_night_exposure_cvars")
+
+    prep_meta["post_night_finish_loading"] = cv._finish_loading_before_screenshot()
+    methods.append("post_night:finish_loading_before_screenshot")
+    if _cap001_tmp_fixture_reseed_ran(night_env):
+        cv._settle_pump_only(frames=PS_C_POST_NIGHT_WARM_FRAMES)
+        prep_meta["post_night_warm_frames"] = PS_C_POST_NIGHT_WARM_FRAMES
+        prep_meta["reseed_ran"] = True
+        methods.append(f"post_night:slate_warm_pump_frames:{PS_C_POST_NIGHT_WARM_FRAMES}")
+    else:
+        prep_meta["reseed_skipped"] = True
+        prep_meta["post_night_warm_frames"] = 0
 
     view = common.apply_lit_game_view_for_capture()
     prep_meta["lit_game_view"] = view
@@ -1643,6 +1679,7 @@ def _cap001_prepare_one_cam_lit_aim_before_fire(
                 blocked.append("cap001_cabin_aim_not_ok")
                 if aim_after.get("forward_ray_hits_dress_aabb") is False:
                     blocked.append("cap001_forward_ray_miss_dress_aabb")
+            cam_loc_sync, cam_rot_sync = loc, rot
             sync = common.sync_editor_viewport_to_camera(cam, loc, rot)
             prep_meta["viewport_sync"] = sync
             methods.append(f"sync_editor_viewport:{sync.get('viewport_api')}")
@@ -1651,13 +1688,18 @@ def _cap001_prepare_one_cam_lit_aim_before_fire(
         _pilot_camera(cam)
         prep_meta["aim_skipped"] = "non_CAM_CabinClose_one_cam_label"
 
-    _focus_ps_c_viewport()
-    cv = _load_capture_viewport()
-    if cv._finish_loading_before_screenshot():
-        methods.append("AutomationLibrary.finish_loading_before_screenshot")
+    prep_meta["final_finish_loading"] = cv._finish_loading_before_screenshot()
+    methods.append("final:finish_loading_before_screenshot")
     cv._settle_pump_only(frames=PS_C_INTER_SHOT_SETTLE_FRAMES)
-    methods.append(f"slate_warm_pump_frames:{PS_C_INTER_SHOT_SETTLE_FRAMES}")
+    methods.append(f"final:slate_warm_pump_frames:{PS_C_INTER_SHOT_SETTLE_FRAMES}")
     prep_meta["slate_warm_frames"] = PS_C_INTER_SHOT_SETTLE_FRAMES
+    if cam_loc_sync is not None and cam_rot_sync is not None:
+        prep_meta["final_viewport_resync"] = common.sync_editor_viewport_to_camera(
+            cam, cam_loc_sync, cam_rot_sync
+        )
+        _pilot_camera(cam)
+        methods.append("final:re_pilot_and_sync_viewport_after_spawn")
+    _focus_ps_c_viewport()
     return methods, blocked, prep_meta
 
 
