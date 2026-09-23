@@ -2,8 +2,8 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **GATE READY** — pending Lead **`APPROVE PS-A`** after DESKTOP live verify |
-| **Track** | PS-A (inventory) · PS-0 **CLOSED** |
+| **Status** | **APPROVED / CLOSED** — Lead **`APPROVE PS-A`**, 2026-09-22 ET (Luke Thompson) |
+| **Track** | PS-A (inventory) **CLOSED** · PS-B **OPEN** |
 | **Scope** | **Homestead kit only** — `L_VS_MVP_Markers` ([33_PLACEMENT_STILLS.md](../33_PLACEMENT_STILLS.md)) |
 | **Host** | CLOUD (this doc) · **DESKTOP** fills live counts / confirms cam labels |
 | **Impl** | [33_PLACEMENT_STILLS.md](../33_PLACEMENT_STILLS.md) metrics + camera catalogs |
@@ -15,6 +15,23 @@
 ```text
 APPROVE PS-A
 ```
+
+**Stamped:** Lead **`APPROVE PS-A`**, 2026-09-22 ET — unlocks **PS-B** Arrange ([PS_B_ARRANGE.md](PS_B_ARRANGE.md)).
+
+---
+
+## DESKTOP live verify (stamped counts)
+
+Measured on **DESKTOP-21CT3H0** before PS-A close (homestead Markers chain):
+
+| Check | Result |
+|-------|--------|
+| World | **`L_VS_MVP_Markers`** |
+| `DRESS_*` count | **90** |
+| `PA_D_*` count | **16** (3 cliffs / 3 planters / 5 fence / 5 path) |
+| JSON `CAM_*` | All five present (`CAM_CabinClose`, `CAM_GlideDepart`, `CAM_Hero`, `CAM_LandingDay`, `CAM_PortalNight`) |
+| MRQ session cams | **`PA_E_MRQ_shot1`**, **`PA_E_MRQ_shot2`** present |
+| Forbidden aliases | **None** — no `Shot1` / `Shot2` / `CAM_CabinGarden` |
 
 ---
 
@@ -191,17 +208,13 @@ Either **`center` + `extent`** or **`minmax`** required when non-placeholder; me
 - [x] Camera map: 10 PS IDs vs `CAM_*` / `PA_E_MRQ_*` / new `PS_*` flags
 - [x] Prototype threshold table frozen with tune note
 - [x] `Saved/ps_dress_bounds.json` schema documented
-- [ ] **DESKTOP:** Live actor counts for `DRESS_*` / `PA_D_*`; confirm five JSON `CAM_*` exist; note any `CAM_CabinGarden` / `Shot1`/`Shot2` alias actors in level
-- [ ] Lead **`APPROVE PS-A`**
+- [x] **DESKTOP:** Live actor counts for `DRESS_*` / `PA_D_*`; confirm five JSON `CAM_*` exist; no `CAM_CabinGarden` / `Shot1`/`Shot2` alias actors (see stamped table above)
+- [x] Lead **`APPROVE PS-A`**
 
 ---
 
-## DESKTOP verify checklist (next)
+## Next track
 
-1. Open Markers → run markers → dress → pa_d chain (see [PS_STRATEGY.md](PS_STRATEGY.md)).
-2. Export actor label counts: `DRESS_*`, `PA_D_*` (expect PA-D **16** if all optional meshes present).
-3. Confirm cameras: `CAM_CabinClose`, `CAM_Hero`, `CAM_GlideDepart`, `CAM_LandingDay`, `CAM_PortalNight`.
-4. After PA-E Arrange/MRQ: note whether `PA_E_MRQ_shot1` / `PA_E_MRQ_shot2` exist (ephemeral vs saved — **TBD**).
-5. Append counts to session log or `Saved/ps_a_desktop_verify.json` (local only).
+**PS-B** Arrange — [PS_B_ARRANGE.md](PS_B_ARRANGE.md) · `arrange_ps_homestead.py` on DESKTOP.
 
 Cloud: [WINDOWS_BRIDGE.md](../../docs/Setup/WINDOWS_BRIDGE.md).

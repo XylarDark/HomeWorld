@@ -917,3 +917,7 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 - Lead **`APPROVE PS STRATEGY — homestead kit only`** — PS-0 **CLOSED**; PHASE_BOARD → **PS-A**; [PS_A_INVENTORY.md](../Docs/handoffs/PS_A_INVENTORY.md) (actors, cam map, thresholds, bounds schema).
 
+## 2026-09-23 — PS-A closed / PS-B Arrange opened (cloud)
+
+- Lead **`APPROVE PS-A`**, 2026-09-22 ET — inventory **CLOSED** (DESKTOP counts stamped); PHASE_BOARD → **PS-B**; [PS_B_ARRANGE.md](../Docs/handoffs/PS_B_ARRANGE.md) + `Content/Python/arrange_ps_homestead.py` (`Saved/ps_dress_bounds.json`, `Saved/ps_arrange_gate.json`). **`APPROVE PS-B`** pending DESKTOP Arrange prove + eyeball.
+
