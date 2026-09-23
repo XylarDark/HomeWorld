@@ -31,6 +31,8 @@ Lead **`APPROVE PS STRATEGY — homestead kit only`** — **GRANTED** 2026-09-22
 
 ---
 
+**One-shot bites:** PS-A→E map to successive Conductor one-shots (schema in [docs/Automation/ONE_SHOT_BITES.md](../docs/Automation/ONE_SHOT_BITES.md)); PS-C metrics vs stills stay **separate** artifact classes per bite.
+
 ## Goal
 
 Build a **systematic testing-stills suite** so homestead kit placement on VS_MVP can be judged with **prototype-worthy confidence**:

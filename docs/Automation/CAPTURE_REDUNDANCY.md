@@ -6,6 +6,23 @@
 
 **Cursor rule mirror:** [.cursor/rules/automation-standards.mdc](../../.cursor/rules/automation-standards.mdc).
 
+**One-shot scheduling (Design):** Big UE/env/capture asks are sliced per [ONE_SHOT_BITES.md](ONE_SHOT_BITES.md) before Conductor board Act — schema before data.
+
+---
+
+## Procedure-agnostic evidence protocol
+
+Host-agnostic rules for **any** prove/capture/harness bite (stills, metrics, gates, CI). Conductor **Design** packets must satisfy this before DESKTOP Act.
+
+| Rule | Meaning |
+|------|---------|
+| **Pre-evidence DONE-WHEN** | Inventory, aim math, TOD/light numbers, and label lists are **frozen and verified** before Act — not inferred from artifacts. |
+| **Artifacts confirm, not discover** | PNG/JSON/logs **confirm** arranged state; they do not replace Arrange or level inventory queries. |
+| **Score real signals** | Prefer **mtime + bytes** windows, gate JSON fields, metric IDs, luminance/thresholds — not file-exists-only. |
+| **One Fix root** | After dead-end research ([Research on dead-ends](#research-on-dead-ends-lead-policy-2026-09-22)), each Fix lap addresses **one** proved root cause; no new cameras or tracks in Fix. |
+
+Bite checklist and board loop: [ONE_SHOT_BITES.md](ONE_SHOT_BITES.md).
+
 ---
 
 ## Universal practice suite (Lead lock-in, 2026-09-22)

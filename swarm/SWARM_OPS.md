@@ -7,7 +7,7 @@ Aligned with [DevEnvTemplate](https://github.com/XylarDark/DevEnvTemplate) **fil
 
 ## 0. When to use this file (mode routing)
 
-**See also:** [PDF_CYCLE.md](PDF_CYCLE.md) — Lead-approved **Design → Implement → Test → Fix** sidebar loop (companion; canon/process split unchanged).
+**See also:** [PDF_CYCLE.md](PDF_CYCLE.md) — Lead-approved **Design → Implement → Test → Fix** sidebar loop (companion; canon/process split unchanged). **Design** slices big asks into board **one-shots**: [docs/Automation/ONE_SHOT_BITES.md](../docs/Automation/ONE_SHOT_BITES.md) (bot-company track; not a “PDF cycle” label in packets).
 
 Not every HomeWorld chat is a swarm session. Before loading role cards or wave packets, classify **SWARM / NON-SWARM / HYBRID** per [docs/human-use/SWARM_MODE_ROUTING.md](../docs/human-use/SWARM_MODE_ROUTING.md) (skill `swarm-mode-routing`). This ops file applies when mode is **SWARM** (or the Conductor half of **HYBRID**). UE engineering tracks stay NON-SWARM even if they update `PHASE_BOARD`.
 
