@@ -1,6 +1,8 @@
 # ps_placement_prove.py
 # PS-C: Automated placement metrics + viewport still capture on L_VS_MVP_Markers.
 # Run in Unreal Editor or MCP: execute_python_script("ps_placement_prove.py").
+# One-cam bite (CAP-001 isolate): set PS_C_ONE_CAM_LABEL=CAM_CabinClose or PS_C_ONE_CAM=1
+# before Act, or argv --one-cam CAM_CabinClose. Full 7-still path when unset (Conductor default later).
 # Chain (DESKTOP): markers → dress → pa_d → arrange_ps_homestead.py → this script.
 # Harness P3 exempt: PS track prove (Arrange gate via ps_arrange_gate.json / arrange_ps_homestead).
 # Writes Saved/ps_placement_metrics.json, Saved/ps_stills/*, Saved/ps_c_prove_gate.json.
@@ -88,10 +90,16 @@ STILL_CAM_LABELS = (
     "CAM_CabinClose",
 )
 
+# Runtime still set (full 7 default; one-cam bite overrides per Act — see PS_C_ONE_CAM_LABEL).
+_ACTIVE_STILL_CAM_LABELS: tuple[str, ...] = STILL_CAM_LABELS
+PS_C_ONE_CAM_DEFAULT_LABEL = "CAM_CabinClose"
+
 STILL_RES_X, STILL_RES_Y = 1600, 900
 PS_C_WAIT_FILE_SEC = 48.0
+PS_C_ONE_CAM_WAIT_FILE_SEC = 72.0
 PS_C_INTER_SHOT_SETTLE_FRAMES = 8
 PS_C_DRIVE_TIMEOUT_SEC = 300.0
+PS_C_ONE_CAM_DRIVE_TIMEOUT_SEC = 120.0
 PS_C_WAIT_RETRY_TICKS = 6
 PS_C_FINAL_DRAIN_SEC = 12.0
 PS_C_GATE_SETTLE_SEC = 120.0
@@ -115,6 +123,51 @@ MRQ_SHOT_STILL_FALLBACK = {
     "CAM_Hero": ("shot1", "Shot1_lookout"),
     "CAM_CabinClose": ("shot2", "Shot2_cabin"),
 }
+
+
+def _still_labels() -> tuple[str, ...]:
+    return _ACTIVE_STILL_CAM_LABELS
+
+
+def _resolve_one_cam_label_from_env_or_argv() -> Optional[str]:
+    """One-cam bite: env PS_C_ONE_CAM_LABEL / PS_C_ONE_CAM or argv --one-cam <label>."""
+    import sys
+
+    for i, arg in enumerate(sys.argv):
+        if arg in ("--one-cam", "--one_cam") and i + 1 < len(sys.argv):
+            return sys.argv[i + 1].strip()
+    raw = (os.environ.get("PS_C_ONE_CAM_LABEL") or os.environ.get("PS_C_ONE_CAM") or "").strip()
+    if raw.lower() in ("1", "true", "yes", "bite"):
+        return PS_C_ONE_CAM_DEFAULT_LABEL
+    return raw or None
+
+
+def _apply_prove_still_label_set(
+    one_cam_label: Optional[str] = None,
+) -> dict[str, Any]:
+    """Configure full vs one-cam still Act (Design canon labels only)."""
+    global _ACTIVE_STILL_CAM_LABELS
+    label = one_cam_label if one_cam_label is not None else _resolve_one_cam_label_from_env_or_argv()
+    if not label:
+        _ACTIVE_STILL_CAM_LABELS = STILL_CAM_LABELS
+        return {
+            "prove_mode": "full",
+            "stills_required_count": len(STILL_CAM_LABELS),
+            "still_labels": list(_ACTIVE_STILL_CAM_LABELS),
+        }
+    if label not in _PS_C_STILL_LABELS_CANON:
+        return {
+            "prove_mode": "one_cam_invalid",
+            "one_cam_label": label,
+            "error": f"one_cam_label_not_in_design_canon:{label}",
+        }
+    _ACTIVE_STILL_CAM_LABELS = (label,)
+    return {
+        "prove_mode": "one_cam",
+        "one_cam_label": label,
+        "stills_required_count": 1,
+        "still_labels": [label],
+    }
 
 
 def _log(msg: str, data: Optional[dict[str, Any]] = None) -> None:
@@ -141,7 +194,7 @@ def _find_actor_label(label: str):
 
 def _still_cam_labels_missing() -> list[str]:
     """Prove still labels that must exist after PS-B Arrange (inventory gate)."""
-    return [lbl for lbl in STILL_CAM_LABELS if _find_actor_label(lbl) is None]
+    return [lbl for lbl in _still_labels() if _find_actor_label(lbl) is None]
 
 
 def _prove_still_labels_drift_from_design() -> Optional[str]:
@@ -903,7 +956,7 @@ def _audit_ps_stills_disk(
     """Authoritative fresh PNG count for gate (Act window mtime + MIN_BYTES)."""
     per_label: list[dict[str, Any]] = []
     fresh_count = 0
-    for label in STILL_CAM_LABELS:
+    for label in _still_labels():
         path = common.abs_path(_resolve_still_path(stills_dir, label))
         fresh = _ps_still_fresh_on_disk(path, act_since, act_end)
         mtime: Optional[float] = None
@@ -926,7 +979,7 @@ def _audit_ps_stills_disk(
         )
     return {
         "fresh_count": fresh_count,
-        "required_count": len(STILL_CAM_LABELS),
+        "required_count": len(_still_labels()),
         "per_label": per_label,
         "stills_dir": common.abs_path(stills_dir),
         "capture_act_end": act_end,
@@ -947,7 +1000,7 @@ def _reconcile_still_entries_from_disk(
         if label:
             by_label[str(label)] = ent
     reconciled: list[dict[str, Any]] = []
-    for label in STILL_CAM_LABELS:
+    for label in _still_labels():
         path = common.abs_path(_resolve_still_path(stills_dir, label))
         ent = dict(by_label.get(label) or {"camera_label": label, "path": path, "methods": []})
         ent["path"] = path
@@ -1017,7 +1070,8 @@ def _ps_c_poll_late_still_pngs(orch: "_PsCStillsOrchestrator", act_end: Optional
     if orch.phase != _PsCStillsPhase.DONE:
         return
     act = orch._act_started_at
-    for idx, label in enumerate(STILL_CAM_LABELS):
+    labels = orch._still_labels
+    for idx, label in enumerate(labels):
         if idx >= len(orch.entries):
             break
         ent = orch.entries[idx]
@@ -1047,7 +1101,7 @@ def _ps_c_settle_stills_before_gate(
     cv = orch._cv or _load_capture_viewport()
     deadline = time.time() + max_sec
     stable_polls = 0
-    required = len(STILL_CAM_LABELS)
+    required = len(orch._still_labels)
     _log(
         "stills gate settle start",
         {"max_sec": max_sec, "pending_tasks": len(getattr(orch, "_pending_automation_tasks", []) or [])},
@@ -1118,6 +1172,15 @@ class _PsCStillsOrchestrator:
         self.world = world
         self.stills_dir = common.abs_path(stills_dir)
         self.gate_context = gate_context
+        self._still_labels = tuple(gate_context.get("still_labels") or _still_labels())
+        self._wait_file_sec = float(
+            gate_context.get("wait_file_sec")
+            or (
+                PS_C_ONE_CAM_WAIT_FILE_SEC
+                if gate_context.get("prove_mode") == "one_cam"
+                else PS_C_WAIT_FILE_SEC
+            )
+        )
         self.phase = _PsCStillsPhase.IDLE
         self.shot_index = 0
         self.entries: list[dict[str, Any]] = []
@@ -1233,10 +1296,10 @@ class _PsCStillsOrchestrator:
         if self.phase != _PsCStillsPhase.POSED:
             return
         self.phase = _PsCStillsPhase.PREPARING
-        if self.shot_index >= len(STILL_CAM_LABELS):
+        if self.shot_index >= len(self._still_labels):
             self.phase = _PsCStillsPhase.WRITE_MANIFEST
             return
-        self._cam_label = STILL_CAM_LABELS[self.shot_index]
+        self._cam_label = self._still_labels[self.shot_index]
         self._filepath = _resolve_still_path(self.stills_dir, self._cam_label)
         self._cam = _find_actor_label(self._cam_label)
         self._methods = []
@@ -1279,11 +1342,11 @@ class _PsCStillsOrchestrator:
 
     def _reset_wait_deadline(self) -> None:
         now = time.time()
-        shots_left = max(1, len(STILL_CAM_LABELS) - self.shot_index)
+        shots_left = max(1, len(self._still_labels) - self.shot_index)
         remaining_drive = max(0.0, self._drive_deadline - now)
         floor = 16.0 if self._uses_ps_placement_cam() else 12.0
         per_shot = min(
-            PS_C_WAIT_FILE_SEC,
+            self._wait_file_sec,
             max(floor, (remaining_drive - 1.5) / shots_left),
         )
         self._wait_deadline = now + per_shot
@@ -1394,7 +1457,7 @@ class _PsCStillsOrchestrator:
         )
         self.entries.append(entry)
         self.shot_index += 1
-        if self.shot_index < len(STILL_CAM_LABELS):
+        if self.shot_index < len(self._still_labels):
             self._settle_frames_left = PS_C_INTER_SHOT_SETTLE_FRAMES
             self.phase = _PsCStillsPhase.INTER_SHOT_SETTLE
         else:
@@ -1423,8 +1486,8 @@ class _PsCStillsOrchestrator:
 
     def _abort_in_flight_and_remaining(self) -> None:
         labels_done = {e.get("camera_label") for e in self.entries}
-        while self.shot_index < len(STILL_CAM_LABELS):
-            label = STILL_CAM_LABELS[self.shot_index]
+        while self.shot_index < len(self._still_labels):
+            label = self._still_labels[self.shot_index]
             if label not in labels_done:
                 path = _resolve_still_path(self.stills_dir, label)
                 if (
@@ -1726,8 +1789,11 @@ def _build_ps_c_gate(
     stills_act_started_at: Optional[float] = None,
     stills_act_settled_at: Optional[float] = None,
     stills_disk_audit: Optional[dict[str, Any]] = None,
+    prove_mode: str = "full",
+    one_cam_label: Optional[str] = None,
 ) -> dict[str, Any]:
-    stills_required = len(STILL_CAM_LABELS)
+    stills_required = len(_still_labels())
+    one_cam_bite = prove_mode == "one_cam"
     capture_outcomes = [e.get("capture_outcome", OUTCOME_SOFT) for e in still_entries]
     stills_manifest_fresh = sum(
         1 for e in still_entries if e.get("counts_toward_gate") or e.get("fresh_this_act")
@@ -1743,20 +1809,25 @@ def _build_ps_c_gate(
     stills_present = disk_fresh
     gate_count_matches_disk = stills_manifest_fresh == disk_fresh
 
-    placement_outcome = metrics.get("placement_outcome") if metrics else OUTCOME_CLOSED
+    if metrics is not None:
+        placement_outcome = metrics.get("placement_outcome", OUTCOME_CLOSED)
+    elif one_cam_bite:
+        placement_outcome = OUTCOME_SOFT
+    else:
+        placement_outcome = OUTCOME_CLOSED
     if pre_closed:
         placement_outcome = OUTCOME_CLOSED
 
+    metrics_ok = metrics is not None and placement_outcome in (OUTCOME_PASS, OUTCOME_SOFT)
     ready_for_ps_d = (
         not pre_closed
         and not stills_in_progress
-        and metrics is not None
         and stills_present >= stills_required
         and gate_count_matches_disk
-        and placement_outcome in (OUTCOME_PASS, OUTCOME_SOFT)
+        and (one_cam_bite or metrics_ok)
     )
     if not ready_for_ps_d and not stills_in_progress:
-        if metrics is None:
+        if metrics is None and not one_cam_bite:
             blocked = list(blocked) + ["metrics_not_written"]
         if stills_present < stills_required:
             blocked = list(blocked) + [f"stills_incomplete:{stills_present}/{stills_required}"]
@@ -1770,6 +1841,8 @@ def _build_ps_c_gate(
     gate: dict[str, Any] = {
         "version": 1,
         "track": "PS-C",
+        "prove_mode": prove_mode,
+        "one_cam_label": one_cam_label,
         "level_path": common.LEVEL_PATH,
         "preconditions": {
             "dress_count": dress_count,
@@ -1798,10 +1871,13 @@ def _build_ps_c_gate(
         "generated_at_iso": datetime.now(timezone.utc).isoformat(),
         "gate_string": "APPROVE PS-C",
         "note": (
-            "ready_for_ps_d = metrics + still files on disk; PS-D is Lead eyeball vs benchmarks. "
-            "Black/dark stills → soft_fail on capture, not closed_fail if Arrange gate was ready."
+            "ready_for_ps_d = metrics + still files on disk (full); one_cam bite = 1/1 Act-window still only. "
+            "PS-D is Lead eyeball vs benchmarks. Black/dark stills → soft_fail on capture, not closed_fail if Arrange gate was ready."
         ),
     }
+    if one_cam_bite:
+        gate["one_cam_bite_pass"] = ready_for_ps_d
+        gate["one_cam_stills_required_count"] = stills_required
     if driver_error:
         gate["stills_driver_error"] = driver_error
     return gate
@@ -1848,17 +1924,31 @@ def _start_ps_c_stills_async(world, gate_context: dict[str, Any]) -> tuple[bool,
     return True, None
 
 
-def prove_ps_placement(*, skip_stills: bool = False) -> dict[str, Any]:
+def prove_ps_placement(
+    *,
+    skip_stills: bool = False,
+    one_cam_label: Optional[str] = None,
+) -> dict[str, Any]:
     """PS-C entry: preconditions, metrics, stills, gate sidecar."""
     global _ACTIVE_PS_C_STILLS
     blocked: list[str] = []
     pre_closed = False
 
-    label_drift = _prove_still_labels_drift_from_design()
-    if label_drift:
-        blocked.append(label_drift)
+    prove_mode_info = _apply_prove_still_label_set(one_cam_label)
+    prove_mode = str(prove_mode_info.get("prove_mode") or "full")
+    one_cam_active = prove_mode_info.get("one_cam_label")
+    if prove_mode_info.get("error"):
+        blocked.append(str(prove_mode_info["error"]))
         pre_closed = True
-        _log("prove blocked: still camera labels ≠ Design handoff", {"reason": label_drift})
+        _log("prove blocked: invalid one-cam label", prove_mode_info)
+    elif prove_mode == "one_cam":
+        _log("prove one-cam bite Act", prove_mode_info)
+    else:
+        label_drift = _prove_still_labels_drift_from_design()
+        if label_drift:
+            blocked.append(label_drift)
+            pre_closed = True
+            _log("prove blocked: still camera labels ≠ Design handoff", {"reason": label_drift})
 
     try:
         world_status = common.editor_world_markers_status()
@@ -1901,12 +1991,14 @@ def prove_ps_placement(*, skip_stills: bool = False) -> dict[str, Any]:
     world = unreal.EditorLevelLibrary.get_editor_world()
     island = _find_actor_label("DRESS_SM_IslandTop")
 
-    if not pre_closed and dress_bounds:
+    if not pre_closed and dress_bounds and prove_mode != "one_cam":
         metrics = _compute_metrics(world=world, dress_bounds=dress_bounds, island_actor=island)
         os.makedirs(os.path.dirname(metrics_path), exist_ok=True)
         with open(metrics_path, "w", encoding="utf-8") as f:
             json.dump(metrics, f, indent=2, default=str)
         _log("wrote ps_placement_metrics.json", {"path": metrics_path})
+    elif prove_mode == "one_cam" and not pre_closed:
+        _log("one-cam bite: skipping full placement metrics (still writer isolate)")
 
     stills_in_progress = False
     driver_error: Optional[str] = None
@@ -1918,6 +2010,11 @@ def prove_ps_placement(*, skip_stills: bool = False) -> dict[str, Any]:
     if skip_stills:
         blocked.append("stills_skipped_by_flag")
     elif not pre_closed:
+        drive_timeout = (
+            PS_C_ONE_CAM_DRIVE_TIMEOUT_SEC
+            if prove_mode == "one_cam"
+            else PS_C_DRIVE_TIMEOUT_SEC
+        )
         gate_context = {
             "blocked": blocked,
             "pre_closed": pre_closed,
@@ -1927,12 +2024,19 @@ def prove_ps_placement(*, skip_stills: bool = False) -> dict[str, Any]:
             "dress_path": dress_path,
             "metrics": metrics,
             "metrics_path": metrics_path,
+            "prove_mode": prove_mode,
+            "still_labels": list(_still_labels()),
+            "wait_file_sec": (
+                PS_C_ONE_CAM_WAIT_FILE_SEC if prove_mode == "one_cam" else PS_C_WAIT_FILE_SEC
+            ),
         }
         started, err = _start_ps_c_stills_async(world, gate_context)
         if started:
             orch = _ACTIVE_PS_C_STILLS
             if orch is not None:
-                completed = _drive_ps_c_stills_orchestrator(orch, PS_C_DRIVE_TIMEOUT_SEC)
+                for lbl in orch._still_labels:
+                    _purge_ps_c_still_png(_resolve_still_path(stills_dir, lbl))
+                completed = _drive_ps_c_stills_orchestrator(orch, drive_timeout)
                 stills_act_started_at = orch._act_started_at
                 still_entries, stills_act_settled_at = _ps_c_settle_stills_before_gate(
                     orch,
@@ -1978,6 +2082,8 @@ def prove_ps_placement(*, skip_stills: bool = False) -> dict[str, Any]:
         stills_act_started_at=stills_act_started_at,
         stills_act_settled_at=stills_act_settled_at,
         stills_disk_audit=stills_disk_audit,
+        prove_mode=prove_mode,
+        one_cam_label=one_cam_active if isinstance(one_cam_active, str) else None,
     )
     gate["gate_written_at"] = time.time()
     _write_ps_c_gate_file(gate)
@@ -1995,11 +2101,17 @@ def prove_ps_placement(*, skip_stills: bool = False) -> dict[str, Any]:
 
 
 def main() -> None:
-    gate = prove_ps_placement()
+    bite_label = _resolve_one_cam_label_from_env_or_argv()
+    gate = prove_ps_placement(one_cam_label=bite_label)
     print(
         json.dumps(
             {
                 "ok": gate.get("ready_for_ps_d"),
+                "prove_mode": gate.get("prove_mode"),
+                "one_cam_label": gate.get("one_cam_label"),
+                "one_cam_bite_pass": gate.get("one_cam_bite_pass"),
+                "stills_present_count": gate.get("stills_present_count"),
+                "stills_required_count": gate.get("stills_required_count"),
                 "stills_in_progress": gate.get("stills_in_progress"),
                 "placement_outcome": gate.get("placement_outcome"),
                 "gate_path": gate.get("written_path"),
