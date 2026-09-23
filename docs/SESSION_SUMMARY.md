@@ -969,3 +969,8 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 - **Boot:** Removed bogus **`MovieRenderPipelineEditor`** from **`HomeWorld.uproject`**; KNOWN_ERRORS Cause→Avoid rows. DESKTOP re-prove pending.
 - **Design binding:** Prove 7 labels verified = **`PS_C_METRICS.md`** = PS-A map (no three-way mismatch); **`_prove_still_labels_drift_from_design`** blocks agent-invented cams.
 
+## 2026-09-23 — PS-C-CAP-001 one-cam path canon (cloud, PR #198 `baef6e1`)
+
+- DESKTOP **`cd7c258` ~11:38:** gate before **`CAM_CabinClose.png`**, **`settle_path` missing** while PNG on canonical disk — AL async vs non-unified poll path.
+- Fix: **`_ps_c_canonical_still_path`** (AL ≡ settle ≡ manifest/gate); **`act_end`** only when **`paths_ready`**; gate defer poll before manifest; KNOWN_ERRORS row. Conductor: **one Act after PR** only; CAM-002 hold.
+
