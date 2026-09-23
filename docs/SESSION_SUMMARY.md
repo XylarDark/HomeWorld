@@ -925,3 +925,7 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 - Lead **`APPROVE PS-B`**, 2026-09-22 ET — Arrange **CLOSED** (DESKTOP prove stamped in [PS_B_ARRANGE.md](../Docs/handoffs/PS_B_ARRANGE.md)); PHASE_BOARD → **PS-C**; [PS_C_METRICS.md](../Docs/handoffs/PS_C_METRICS.md) + `Content/Python/ps_placement_prove.py` (`Saved/ps_placement_metrics.json`, `Saved/ps_stills/`, `Saved/ps_c_prove_gate.json`). **`APPROVE PS-C`** pending DESKTOP prove.
 
+## 2026-09-23 — PS-C prove harden after DESKTOP 71bb847 (cloud)
+
+- DESKTOP first run: island max-Z proxy + relative screenshot path → mass closed_fail, 0/7 stills. Harden: multi line-trace, no island proxy, soft baseline, capture_viewport absolute HighResShot, PA-E MRQ PNG fallback for hero/cabin.
+
