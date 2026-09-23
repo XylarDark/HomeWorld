@@ -921,3 +921,7 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 
 - Lead **`APPROVE PS-A`**, 2026-09-22 ET — inventory **CLOSED** (DESKTOP counts stamped); PHASE_BOARD → **PS-B**; [PS_B_ARRANGE.md](../Docs/handoffs/PS_B_ARRANGE.md) + `Content/Python/arrange_ps_homestead.py` (`Saved/ps_dress_bounds.json`, `Saved/ps_arrange_gate.json`). **`APPROVE PS-B`** pending DESKTOP Arrange prove + eyeball.
 
+## 2026-09-23 — PS-B closed / PS-C metrics+stills opened (cloud)
+
+- Lead **`APPROVE PS-B`**, 2026-09-22 ET — Arrange **CLOSED** (DESKTOP prove stamped in [PS_B_ARRANGE.md](../Docs/handoffs/PS_B_ARRANGE.md)); PHASE_BOARD → **PS-C**; [PS_C_METRICS.md](../Docs/handoffs/PS_C_METRICS.md) + `Content/Python/ps_placement_prove.py` (`Saved/ps_placement_metrics.json`, `Saved/ps_stills/`, `Saved/ps_c_prove_gate.json`). **`APPROVE PS-C`** pending DESKTOP prove.
+
