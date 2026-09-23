@@ -103,6 +103,8 @@ PS_C_ONE_CAM_DRIVE_TIMEOUT_SEC = 120.0
 PS_C_WAIT_RETRY_TICKS = 6
 PS_C_FINAL_DRAIN_SEC = 12.0
 PS_C_GATE_SETTLE_SEC = 120.0
+# Windows/FAT mtime often 1s — allow gate stamp slightly after file mtime (not post-gate async).
+PS_C_ACT_END_MTIME_SLACK_SEC = 1.05
 PS_C_PS_CAM_PREFIX = "PS_"
 PS_C_STABLE_POLLS_REQUIRED = 2
 PS_C_SLATE_MECHANISM = "register_slate_pre_tick_callback"
@@ -822,7 +824,7 @@ def _mtime_in_act_window(path: str, act_start: float, act_end: Optional[float]) 
     if act_end is None:
         return True
     try:
-        return os.path.getmtime(path) <= act_end + 0.05
+        return os.path.getmtime(path) <= act_end + PS_C_ACT_END_MTIME_SLACK_SEC
     except OSError:
         return False
 
@@ -1065,6 +1067,39 @@ def _ps_c_pending_tasks_done(orch: "_PsCStillsOrchestrator") -> bool:
     return True
 
 
+def _ps_c_path_stable_for_gate(
+    path: str,
+    act_start: float,
+    tracker: Any,
+) -> bool:
+    """capture_viewport _StableSizeTracker: MIN_BYTES + mtime >= act_start + size stable."""
+    path = common.abs_path(path)
+    if not os.path.isfile(path) or not _mtime_at_least(path, act_start):
+        tracker.reset()
+        return False
+    try:
+        if os.path.getsize(path) < common.MIN_BYTES:
+            tracker.reset()
+            return False
+    except OSError:
+        tracker.reset()
+        return False
+    return bool(tracker.observe(path))
+
+
+def _ps_c_all_still_paths_stable(
+    stills_dir: str,
+    act_start: float,
+    labels: tuple[str, ...],
+    trackers: dict[str, Any],
+) -> bool:
+    for label in labels:
+        path = common.abs_path(_resolve_still_path(stills_dir, label))
+        if not _ps_c_path_stable_for_gate(path, act_start, trackers[label]):
+            return False
+    return True
+
+
 def _ps_c_poll_late_still_pngs(orch: "_PsCStillsOrchestrator", act_end: Optional[float]) -> None:
     """One pass: copy/probe late PNGs into orch.entries (keep slate pump in settle loop)."""
     if orch.phase != _PsCStillsPhase.DONE:
@@ -1096,36 +1131,63 @@ def _ps_c_settle_stills_before_gate(
     stills_dir: str,
     act_start: float,
     max_sec: float,
-) -> tuple[list[dict[str, Any]], float]:
-    """Wait for in-flight AL/console writes; gate must not run until settle completes."""
+) -> tuple[list[dict[str, Any]], float, list[str]]:
+    """Wait for stable abs-path PNGs (AL/slate flush); act_end stamped only after stable."""
     cv = orch._cv or _load_capture_viewport()
     deadline = time.time() + max_sec
     stable_polls = 0
-    required = len(orch._still_labels)
+    labels = orch._still_labels
+    trackers = {label: cv._StableSizeTracker() for label in labels}
+    settle_blocked: list[str] = []
     _log(
         "stills gate settle start",
-        {"max_sec": max_sec, "pending_tasks": len(getattr(orch, "_pending_automation_tasks", []) or [])},
+        {
+            "max_sec": max_sec,
+            "labels": list(labels),
+            "pending_tasks": len(getattr(orch, "_pending_automation_tasks", []) or []),
+            "mechanism": "AutomationLibrary_probe_png_ready_stable_size",
+        },
     )
     while time.time() < deadline:
-        act_end_probe = time.time()
         for task in list(getattr(orch, "_pending_automation_tasks", []) or []):
             _task_is_done(task)
         cv._pump_editor_once()
         if orch._tick_handle is not None:
             orch._on_slate_pre_tick(0.033)
-        _ps_c_poll_late_still_pngs(orch, act_end_probe)
-        audit = _audit_ps_stills_disk(stills_dir, act_start, act_end_probe)
-        fresh = int(audit.get("fresh_count", 0))
+        _ps_c_poll_late_still_pngs(orch, None)
+        paths_stable = _ps_c_all_still_paths_stable(stills_dir, act_start, labels, trackers)
         tasks_done = _ps_c_pending_tasks_done(orch)
-        if fresh >= required and tasks_done:
+        if paths_stable and tasks_done:
             stable_polls += 1
             if stable_polls >= PS_C_STABLE_POLLS_REQUIRED:
                 break
         else:
             stable_polls = 0
+    for _ in range(4):
+        cv._pump_editor_once()
+        if orch._tick_handle is not None:
+            orch._on_slate_pre_tick(0.033)
     act_end = time.time()
-    orch._unregister_tick()
-    orch._disarm_keep_alive()
+    paths_stable_final = _ps_c_all_still_paths_stable(stills_dir, act_start, labels, trackers)
+    if not paths_stable_final:
+        settle_blocked.append("one_cam_still_not_stable_in_act_window")
+        for label in labels:
+            path = common.abs_path(_resolve_still_path(stills_dir, label))
+            on_disk = os.path.isfile(path)
+            note = "png_missing_or_not_stable_before_gate"
+            if on_disk:
+                try:
+                    sz = os.path.getsize(path)
+                    mt = os.path.getmtime(path)
+                    if sz < common.MIN_BYTES:
+                        note = f"below_min_bytes:{sz}"
+                    elif not _mtime_at_least(path, act_start):
+                        note = "stale_mtime_before_act_start"
+                    else:
+                        note = "size_not_stable_yet"
+                except OSError:
+                    pass
+            settle_blocked.append(f"settle_path:{label}:{note}")
     still_entries = _reconcile_still_entries_from_disk(
         list(orch.entries), act_start, stills_dir, act_end=act_end
     )
@@ -1133,11 +1195,12 @@ def _ps_c_settle_stills_before_gate(
         "stills gate settle complete",
         {
             "act_end": act_end,
+            "paths_stable_final": paths_stable_final,
             "fresh": _audit_ps_stills_disk(stills_dir, act_start, act_end).get("fresh_count"),
             "tasks_done": _ps_c_pending_tasks_done(orch),
         },
     )
-    return still_entries, act_end
+    return still_entries, act_end, settle_blocked
 
 
 def _load_capture_viewport():
@@ -1375,7 +1438,17 @@ class _PsCStillsOrchestrator:
             return
         _focus_ps_c_viewport()
         self._cv._finish_loading_before_screenshot()
-        if self._uses_ps_placement_cam():
+        one_cam = self.gate_context.get("prove_mode") == "one_cam"
+        if one_cam:
+            # One-cam bite: proven shotlist path — AutomationLibrary abs only (no HighResShot ladder).
+            if not self._al_invoked:
+                _ok_al, al_methods, task = _automation_abs_screenshot(self._filepath, self._cam)
+                self._methods.extend(al_methods)
+                self._task = task
+                self._track_automation_task(task)
+                self._al_invoked = True
+                self._methods.append("one_cam:AutomationLibrary_abs_only")
+        elif self._uses_ps_placement_cam():
             # PS placement cams: doc-ordered HighResShot abs first, then AL (viewport pilot).
             if self._console_cmd_index == 0:
                 self._invoke_console_ladder_step()
@@ -1412,7 +1485,9 @@ class _PsCStillsOrchestrator:
             self._methods.append("automation_task_done_no_file_yet")
         self._ticks_in_wait += 1
         if self._ticks_in_wait > 0 and self._ticks_in_wait % PS_C_WAIT_RETRY_TICKS == 0:
-            if self._console_cmd_index < self._console_cmd_total:
+            if self.gate_context.get("prove_mode") == "one_cam":
+                pass
+            elif self._console_cmd_index < self._console_cmd_total:
                 if self._invoke_console_ladder_step():
                     self._reset_wait_deadline()
             elif not self._al_invoked:
@@ -1421,13 +1496,14 @@ class _PsCStillsOrchestrator:
                 return
         if time.time() >= self._wait_deadline:
             drive_left = self._drive_deadline - time.time()
-            if (
-                self._console_cmd_index < self._console_cmd_total
-                and drive_left > 4.0
-            ):
-                if self._invoke_console_ladder_step():
-                    self._reset_wait_deadline()
-                    return
+            if self.gate_context.get("prove_mode") != "one_cam":
+                if (
+                    self._console_cmd_index < self._console_cmd_total
+                    and drive_left > 4.0
+                ):
+                    if self._invoke_console_ladder_step():
+                        self._reset_wait_deadline()
+                        return
             if not self._al_second_round and drive_left > 6.0:
                 self._al_second_round = True
                 self._al_invoked = False
@@ -2038,12 +2114,15 @@ def prove_ps_placement(
                     _purge_ps_c_still_png(_resolve_still_path(stills_dir, lbl))
                 completed = _drive_ps_c_stills_orchestrator(orch, drive_timeout)
                 stills_act_started_at = orch._act_started_at
-                still_entries, stills_act_settled_at = _ps_c_settle_stills_before_gate(
-                    orch,
-                    stills_dir,
-                    stills_act_started_at,
-                    PS_C_GATE_SETTLE_SEC,
+                still_entries, stills_act_settled_at, settle_blocked = (
+                    _ps_c_settle_stills_before_gate(
+                        orch,
+                        stills_dir,
+                        stills_act_started_at,
+                        PS_C_GATE_SETTLE_SEC,
+                    )
                 )
+                blocked.extend(settle_blocked)
                 manifest_path = _write_stills_manifest(
                     still_entries,
                     stills_dir,
@@ -2054,8 +2133,20 @@ def prove_ps_placement(
                     stills_dir, stills_act_started_at, stills_act_settled_at
                 )
                 driver_error = orch._driver_error
+                fresh_after_settle = int(stills_disk_audit.get("fresh_count", 0))
                 if not completed:
-                    blocked = list(blocked) + ["stills_driver_timeout"]
+                    if prove_mode == "one_cam" and fresh_after_settle >= len(_still_labels()):
+                        _log(
+                            "one-cam: driver timeout ignored after settle fresh PNG",
+                            {"fresh": fresh_after_settle},
+                        )
+                    else:
+                        blocked = list(blocked) + ["stills_driver_timeout"]
+                try:
+                    orch._unregister_tick()
+                    orch._disarm_keep_alive()
+                except Exception:
+                    pass
                 _ACTIVE_PS_C_STILLS = None
         else:
             driver_error = err
