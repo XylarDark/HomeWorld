@@ -6,8 +6,8 @@
 # Chain (DESKTOP): markers → dress → pa_d → arrange_ps_homestead.py → this script.
 # Harness P3 exempt: PS track prove (Arrange gate via ps_arrange_gate.json / arrange_ps_homestead).
 # Writes Saved/ps_placement_metrics.json, Saved/ps_stills/*, Saved/ps_c_prove_gate.json.
-# Stills: slate pre-tick state machine + pump-until-done (≤300s, no sleep) so MCP prove
-# always finalizes gate and PNGs; module-level callback + keep_python_script_alive.
+# Stills: full 7 = slate pre-tick driver + pump-until-done (≤300s). One-cam bite =
+# capture_viewport sync wait on canonical abs path (single AL invoke, no async driver).
 
 from __future__ import annotations
 
@@ -104,8 +104,6 @@ PS_C_WAIT_RETRY_TICKS = 6
 PS_C_FINAL_DRAIN_SEC = 12.0
 PS_C_GATE_SETTLE_SEC = 120.0
 PS_C_ONE_CAM_GATE_SETTLE_SEC = 180.0
-# Grace poll after driver settle/hold so gate file mtime never precedes async AL PNG landing.
-PS_C_ONE_CAM_GATE_DEFER_SEC = 45.0
 # Windows/FAT mtime often 1s — allow gate stamp slightly after file mtime (not post-gate async).
 PS_C_ACT_END_MTIME_SLACK_SEC = 1.05
 PS_C_PS_CAM_PREFIX = "PS_"
@@ -1278,40 +1276,144 @@ def _ps_c_gate_hold_until_canonical_paths(
     return still_entries, act_end, blocked, False
 
 
-def _ps_c_poll_one_cam_until_gate_ready(
-    act_start: float,
-    max_sec: float,
-) -> tuple[bool, float, list[str]]:
-    """Final canonical-path poll (AL write ≡ settle ≡ gate); no HighResShot ladder."""
-    labels = _still_labels()
+def _ps_c_flush_editor_for_still_wait(cv: Any, world: Any) -> list[str]:
+    """Editor flush before disk poll (AL async flush — not timeout-only defer)."""
+    notes: list[str] = []
+    for cmd, tag in (
+        ("FlushAsyncLoading", "console:FlushAsyncLoading"),
+        ("r.FlushRenderingCommands", "console:r.FlushRenderingCommands"),
+    ):
+        try:
+            unreal.SystemLibrary.execute_console_command(world, cmd)
+            notes.append(tag)
+        except Exception as e:
+            notes.append(f"{tag}_fail:{e}")
+    cv._finish_loading_before_screenshot()
+    cv._settle(frames=16)
+    return notes
+
+
+def _automation_abs_screenshot_one_invoke(filepath: str, cam) -> tuple[bool, list[str], Any]:
+    """Single AL invoke (one-cam sync — no second-round fire-and-forget)."""
     cv = _load_capture_viewport()
-    trackers = {label: cv._StableSizeTracker() for label in labels}
-    canonical = {label: _ps_c_canonical_still_path(label) for label in labels}
+    dest_abs = cv._ensure_abs_dest(filepath)
+    ue_path = cv._path_for_ue(dest_abs)
+    methods: list[str] = [
+        f"al_canonical_dest:{ue_path}",
+        "one_cam:AutomationLibrary_abs_sync_single",
+    ]
+    delay = 0.35
+    attempts = (
+        ("abs_kwargs_force_gv", lambda: unreal.AutomationLibrary.take_high_res_screenshot(
+            STILL_RES_X, STILL_RES_Y, ue_path, camera=cam, delay=delay, force_game_view=True
+        )),
+        ("abs_kwargs_gv", lambda: unreal.AutomationLibrary.take_high_res_screenshot(
+            STILL_RES_X, STILL_RES_Y, ue_path, camera=cam, force_game_view=True
+        )),
+        ("abs_positional_gv", lambda: unreal.AutomationLibrary.take_high_res_screenshot(
+            STILL_RES_X, STILL_RES_Y, ue_path, cam, True
+        )),
+        ("abs_legacy", lambda: unreal.AutomationLibrary.take_high_res_screenshot(
+            STILL_RES_X, STILL_RES_Y, ue_path, cam
+        )),
+    )
+    for name, fn in attempts:
+        try:
+            task = fn()
+            methods.append(name)
+            return True, methods, task
+        except TypeError:
+            continue
+        except Exception as e:
+            methods.append(f"{name}_fail:{e}")
+    return False, methods, None
+
+
+def _ps_c_one_cam_sync_capture_still(
+    world,
+    cam_label: str,
+    stills_dir: str,
+) -> tuple[list[dict[str, Any]], float, Optional[float], Optional[str], list[str]]:
+    """CAP-001 bite: capture_viewport sync wait on canonical path (no async slate driver)."""
     blocked: list[str] = []
-    deadline = time.time() + max_sec
-    stable_polls = 0
+    cv = _load_capture_viewport()
+    act_start = time.time()
+    path = _ps_c_canonical_still_path(cam_label)
+    cam = _find_actor_label(cam_label)
+    if not cam:
+        blocked.append(f"one_cam_camera_missing:{cam_label}")
+        return [], act_start, None, "camera_missing", blocked
+
+    _purge_ps_c_still_png(path)
+    _pilot_camera(cam)
+    _focus_ps_c_viewport()
+    methods: list[str] = ["one_cam:capture_viewport_sync_wait"]
+    lit = cv._set_lit_view_mode()
+    if lit:
+        methods.append(lit)
+    cv._settle_pump_only(frames=PS_C_INTER_SHOT_SETTLE_FRAMES)
+
+    capture_since = time.time()
+    ok, al_methods, task = _automation_abs_screenshot_one_invoke(path, cam)
+    methods.extend(al_methods)
+    if not ok:
+        blocked.append("one_cam_automation_invoke_failed")
+        return [], act_start, None, "automation_invoke_failed", blocked
+
+    methods.extend(_ps_c_flush_editor_for_still_wait(cv, world))
+
+    basename = os.path.basename(path)
+    stable = cv._StableSizeTracker()
+    deadline = time.time() + PS_C_ONE_CAM_WAIT_FILE_SEC
+    found: Optional[str] = None
     _log(
-        "one-cam gate defer poll (canonical abs only)",
-        {"max_sec": max_sec, "canonical_paths": canonical},
+        "one-cam sync wait on canonical path",
+        {"path": path, "wait_sec": PS_C_ONE_CAM_WAIT_FILE_SEC},
     )
     while time.time() < deadline:
+        if task is not None:
+            _task_is_done(task)
         cv._pump_editor_once()
-        for label in labels:
-            path = canonical[label]
-            cv.probe_png_ready(path, act_start, os.path.basename(path), trackers[label])
-        if _ps_c_all_still_paths_stable(act_start, labels, trackers):
-            stable_polls += 1
-            if stable_polls >= PS_C_STABLE_POLLS_REQUIRED:
-                _log("one-cam gate defer satisfied", {"paths": canonical})
-                return True, time.time(), blocked
-        else:
-            stable_polls = 0
-    for label in labels:
-        path = canonical[label]
+        found = cv.probe_png_ready(path, act_start, basename, stable)
+        if found:
+            break
+
+    if not found:
+        methods.append("one_cam:capture_viewport_wait_for_png_on_disk")
+        methods.extend(_ps_c_flush_editor_for_still_wait(cv, world))
+        remaining = max(8.0, deadline - time.time())
+        found = cv.wait_for_png_on_disk(path, capture_since, wait_sec=remaining)
+
+    if not found or not os.path.isfile(path):
+        stamp = common.stamp_file_artifact(path)
         blocked.append(
-            f"gate_defer_timeout:{label}:{json.dumps(common.stamp_file_artifact(path), default=str)}"
+            f"one_cam_sync_wait_failed:{cam_label}:{json.dumps(stamp, default=str)}"
         )
-    return False, time.time(), blocked
+        return [], act_start, None, "one_cam_sync_wait_failed", blocked
+
+    act_end = time.time()
+    entry = _finalize_still_entry(
+        cam_label,
+        path,
+        methods,
+        since=capture_since,
+        resolved_on_disk=found,
+        act_end=act_end,
+    )
+    if not entry.get("counts_toward_gate"):
+        blocked.append("one_cam_still_not_stable_in_act_window")
+        stamp = common.stamp_file_artifact(path)
+        blocked.append(f"settle_polled_path:{cam_label}:{json.dumps(stamp, default=str)}")
+    _log(
+        "one-cam sync capture complete",
+        {
+            "path": path,
+            "act_end": act_end,
+            "counts_toward_gate": entry.get("counts_toward_gate"),
+            "bytes": entry.get("bytes"),
+        },
+    )
+    return [entry], act_start, act_end, None, blocked
 
 
 def _load_capture_viewport():
@@ -2194,12 +2296,29 @@ def prove_ps_placement(
 
     if skip_stills:
         blocked.append("stills_skipped_by_flag")
-    elif not pre_closed:
-        drive_timeout = (
-            PS_C_ONE_CAM_DRIVE_TIMEOUT_SEC
-            if prove_mode == "one_cam"
-            else PS_C_DRIVE_TIMEOUT_SEC
+    elif not pre_closed and prove_mode == "one_cam":
+        bite_label = str(one_cam_active or _still_labels()[0])
+        (
+            still_entries,
+            stills_act_started_at,
+            stills_act_settled_at,
+            driver_error,
+            cap_blocked,
+        ) = _ps_c_one_cam_sync_capture_still(world, bite_label, stills_dir)
+        blocked.extend(cap_blocked)
+        if driver_error:
+            blocked.append(f"stills_driver_failed:{driver_error}")
+        manifest_path = _write_stills_manifest(
+            still_entries,
+            stills_dir,
+            act_since=stills_act_started_at,
+            act_end=stills_act_settled_at,
         )
+        stills_disk_audit = _audit_ps_stills_disk(
+            stills_dir, stills_act_started_at, stills_act_settled_at
+        )
+    elif not pre_closed:
+        drive_timeout = PS_C_DRIVE_TIMEOUT_SEC
         gate_context = {
             "blocked": blocked,
             "pre_closed": pre_closed,
@@ -2211,9 +2330,7 @@ def prove_ps_placement(
             "metrics_path": metrics_path,
             "prove_mode": prove_mode,
             "still_labels": list(_still_labels()),
-            "wait_file_sec": (
-                PS_C_ONE_CAM_WAIT_FILE_SEC if prove_mode == "one_cam" else PS_C_WAIT_FILE_SEC
-            ),
+            "wait_file_sec": PS_C_WAIT_FILE_SEC,
         }
         started, err = _start_ps_c_stills_async(world, gate_context)
         if started:
@@ -2223,59 +2340,22 @@ def prove_ps_placement(
                     _purge_ps_c_still_png(_resolve_still_path(stills_dir, lbl))
                 completed = _drive_ps_c_stills_orchestrator(orch, drive_timeout)
                 stills_act_started_at = orch._act_started_at
-                settle_sec = (
-                    PS_C_ONE_CAM_GATE_SETTLE_SEC
-                    if prove_mode == "one_cam"
-                    else PS_C_GATE_SETTLE_SEC
-                )
                 still_entries, stills_act_settled_at, settle_blocked, paths_ready = (
                     _ps_c_settle_stills_before_gate(
                         orch,
                         stills_dir,
                         stills_act_started_at,
-                        settle_sec,
+                        PS_C_GATE_SETTLE_SEC,
                     )
                 )
                 blocked.extend(settle_blocked)
-                if prove_mode == "one_cam" and not paths_ready:
-                    still_entries, stills_act_settled_at, hold_blocked, paths_ready = (
-                        _ps_c_gate_hold_until_canonical_paths(
-                            orch,
-                            stills_dir,
-                            stills_act_started_at,
-                            PS_C_ONE_CAM_GATE_SETTLE_SEC,
-                        )
-                    )
-                    blocked.extend(hold_blocked)
-                elif prove_mode == "one_cam" and paths_ready:
-                    stills_act_settled_at = time.time()
+                if paths_ready and stills_act_settled_at is not None:
                     still_entries = _reconcile_still_entries_from_disk(
                         list(orch.entries),
                         stills_act_started_at,
                         stills_dir,
                         act_end=stills_act_settled_at,
                     )
-                if prove_mode == "one_cam" and stills_act_started_at is not None:
-                    fresh_pre_manifest = sum(
-                        1 for e in still_entries if e.get("counts_toward_gate")
-                    )
-                    if fresh_pre_manifest < len(_still_labels()):
-                        defer_ready, defer_act_end, defer_blocked = (
-                            _ps_c_poll_one_cam_until_gate_ready(
-                                stills_act_started_at,
-                                PS_C_ONE_CAM_GATE_DEFER_SEC,
-                            )
-                        )
-                        blocked.extend(defer_blocked)
-                        if defer_ready:
-                            stills_act_settled_at = defer_act_end
-                            still_entries = _reconcile_still_entries_from_disk(
-                                list(orch.entries) if orch else still_entries,
-                                stills_act_started_at,
-                                stills_dir,
-                                act_end=stills_act_settled_at,
-                            )
-                            paths_ready = True
                 manifest_path = _write_stills_manifest(
                     still_entries,
                     stills_dir,
@@ -2286,15 +2366,8 @@ def prove_ps_placement(
                     stills_dir, stills_act_started_at, stills_act_settled_at
                 )
                 driver_error = orch._driver_error
-                fresh_after_settle = int(stills_disk_audit.get("fresh_count", 0))
                 if not completed:
-                    if prove_mode == "one_cam" and fresh_after_settle >= len(_still_labels()):
-                        _log(
-                            "one-cam: driver timeout ignored after settle fresh PNG",
-                            {"fresh": fresh_after_settle},
-                        )
-                    else:
-                        blocked = list(blocked) + ["stills_driver_timeout"]
+                    blocked = list(blocked) + ["stills_driver_timeout"]
                 try:
                     orch._unregister_tick()
                     orch._disarm_keep_alive()
