@@ -1,3 +1,7 @@
+## 2026-09-23 — PS-C-3 fresh stills + gate/disk parity (cloud, post-#195)
+
+- **Ticket PS-C-3:** DESKTOP scored **closed_fail** — **flaky capture** (5× PS_* `png_missing` + timeout) + **false metric proxy** (gate `file_exists` vs stale CAM mtimes). **Fix:** PS_* **console HighResShot abs then AL**; wait-deadline console/AL retry rounds; post-drive **final drain** + **`_audit_ps_stills_disk`**; gate **`stills_present_count` = disk-fresh**, **`gate_count_matches_disk`**. Epic screenshot doc + forum tick-wait cited in KNOWN_ERRORS. Draft **#196** — DESKTOP re-prove only.
+
 ## 2026-09-23 — Docs/33 Placement Stills (PS) strategy draft (cloud)
 
 - **PS-0:** [33_PLACEMENT_STILLS.md](../Docs/33_PLACEMENT_STILLS.md) — homestead-only placement stills suite (metrics catalog, multi-angle cams, benchmark sources, PS-A…E gates ending **`APPROVE PS STRATEGY`**). Handoff [PS_STRATEGY.md](../Docs/handoffs/PS_STRATEGY.md). Reuses PA-E harness patterns (`pa_e_shotlist_common`, HARNESS_ARRANGE); no `.uasset` commits. PHASE_BOARD + Docs/README updated. **Pending Lead gate.**

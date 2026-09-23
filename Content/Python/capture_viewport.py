@@ -226,24 +226,39 @@ def _wait_for_file(filepath, since_mtime, basename, wait_sec=None):
 
 
 def console_high_res_invoke_once(resolution_x, resolution_y, filepath, result, world=None):
-    """Fire doc-ordered HighResShot once (no file wait — use slate tick probe)."""
+    """Fire first doc-ordered HighResShot form (no file wait — use slate tick probe)."""
+    return console_high_res_invoke_at_index(
+        resolution_x, resolution_y, filepath, result, 0, world=world
+    )
+
+
+def console_high_res_invoke_at_index(
+    resolution_x, resolution_y, filepath, result, command_index: int, world=None
+) -> bool:
+    """Fire one HighResShot console form by index (Epic doc-ordered ladder)."""
     ue_path = _path_for_ue(filepath)
     result["ue_path"] = ue_path
-    result["console_attempts"] = []
-    _finish_loading_before_screenshot()
-    _set_lit_view_mode()
-    world_context = world
-    for method, cmd in _high_res_shot_commands(resolution_x, resolution_y, ue_path):
-        entry = {"method": method, "cmd": cmd}
-        result["console_attempts"].append(entry)
-        try:
-            unreal.SystemLibrary.execute_console_command(world_context, cmd)
-            result["method"] = method
-            return True
-        except Exception as e:
-            entry["error"] = str(e)
-            continue
-    return False
+    if "console_attempts" not in result:
+        result["console_attempts"] = []
+    commands = _high_res_shot_commands(resolution_x, resolution_y, ue_path)
+    if command_index < 0 or command_index >= len(commands):
+        return False
+    method, cmd = commands[command_index]
+    entry = {"method": method, "cmd": cmd, "index": command_index}
+    result["console_attempts"].append(entry)
+    try:
+        unreal.SystemLibrary.execute_console_command(world, cmd)
+        result["method"] = method
+        result["last_console_index"] = command_index
+        return True
+    except Exception as e:
+        entry["error"] = str(e)
+        return False
+
+
+def console_high_res_command_count(resolution_x, resolution_y, filepath) -> int:
+    ue_path = _path_for_ue(filepath)
+    return len(_high_res_shot_commands(resolution_x, resolution_y, ue_path))
 
 
 def _console_high_res(resolution_x, resolution_y, filepath, result):
