@@ -27,7 +27,7 @@ Lead **`APPROVE PS STRATEGY — homestead kit only`** — **GRANTED** 2026-09-22
 | PS-D | **`APPROVE PS-D`** | PS-E close |
 | PS-E | **`APPROVE PS-E`** | PS track **CLOSED / COMPLETE** |
 
-**Handoff:** [handoffs/PS_STRATEGY.md](handoffs/PS_STRATEGY.md) (PS-0 **CLOSED**) · **PS-A inventory:** [handoffs/PS_A_INVENTORY.md](handoffs/PS_A_INVENTORY.md)
+**Handoff:** [handoffs/PS_STRATEGY.md](handoffs/PS_STRATEGY.md) (PS-0 **CLOSED**) · PS-A **CLOSED** ([handoffs/PS_A_INVENTORY.md](handoffs/PS_A_INVENTORY.md)) · **PS-B OPEN** ([handoffs/PS_B_ARRANGE.md](handoffs/PS_B_ARRANGE.md))
 
 ---
 
@@ -162,8 +162,8 @@ Enough views to catch **floaters**, **cliff underside gaps**, and **composition 
 | Phase | Focus | Deliverable | Host |
 |-------|--------|-------------|------|
 | **PS-0** | Strategy | This doc + [PS_STRATEGY.md](handoffs/PS_STRATEGY.md) | CLOUD |
-| **PS-A** | Metrics + angle **inventory** | [PS_A_INVENTORY.md](handoffs/PS_A_INVENTORY.md) — actor list, cam map, thresholds, bounds schema | CLOUD → DESKTOP verify |
-| **PS-B** | Camera/fixture **Arrange** | Idempotent spawn/aim of `PS_*` or relocated `CAM_*`; Arrange gate `Saved/ps_arrange_gate.json` | DESKTOP |
+| **PS-A** | Metrics + angle **inventory** | [PS_A_INVENTORY.md](handoffs/PS_A_INVENTORY.md) — **CLOSED** Lead **`APPROVE PS-A`**, 2026-09-22 ET | CLOUD+DESKTOP |
+| **PS-B** | Camera/fixture **Arrange** | [PS_B_ARRANGE.md](handoffs/PS_B_ARRANGE.md) · `arrange_ps_homestead.py` → `Saved/ps_arrange_gate.json` | DESKTOP |
 | **PS-C** | Metric asserts + still capture | `ps_placement_metrics.json` + MRQ/viewport still folder `Saved/ps_stills/` | DESKTOP |
 | **PS-D** | Lead eyeball vs benchmarks | Checklist vs key-art / plate / stamped stills; defects filed | Lead + QA |
 | **PS-E** | Close | PHASE_BOARD **CLOSED**; optional pointer handoff for planetside PS-P2 | Lead |
@@ -195,4 +195,4 @@ Enough views to catch **floaters**, **cliff underside gaps**, and **composition 
 
 ---
 
-*PS-0 **CLOSED** (Lead stamp 2026-09-22/23 ET). **PS-A** inventory in [PS_A_INVENTORY.md](handoffs/PS_A_INVENTORY.md); gate **`APPROVE PS-A`** pending DESKTOP live verify + Lead.*
+*PS-0 **CLOSED** · PS-A **CLOSED** (Lead **`APPROVE PS-A`**, 2026-09-22 ET). **PS-B** Arrange **OPEN** — [PS_B_ARRANGE.md](handoffs/PS_B_ARRANGE.md); gate **`APPROVE PS-B`** after DESKTOP Arrange prove + eyeball.*

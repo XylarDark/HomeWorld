@@ -1,6 +1,6 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **Docs/33 Placement Stills (PS) — PS-A (inventory)** — Lead **`APPROVE PS STRATEGY — homestead kit only`**, 2026-09-22/23 ET — PS-0 **CLOSED** · [33_PLACEMENT_STILLS.md](../Docs/33_PLACEMENT_STILLS.md) · [PS_A_INVENTORY.md](../Docs/handoffs/PS_A_INVENTORY.md). Prior: **Docs/32 PA — CLOSED / COMPLETE**. **FALLBACK FLIGHT armed.**
+**Current phase:** **Docs/33 Placement Stills (PS) — PS-B (Arrange)** — PS-A **CLOSED** Lead **`APPROVE PS-A`**, 2026-09-22 ET · [PS_B_ARRANGE.md](../Docs/handoffs/PS_B_ARRANGE.md) · [33_PLACEMENT_STILLS.md](../Docs/33_PLACEMENT_STILLS.md). Prior: **Docs/32 PA — CLOSED / COMPLETE**. **FALLBACK FLIGHT armed.**
 
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **Conductor** (parent DESKTOP) / **DESKTOP-21CT3H0**
@@ -140,7 +140,7 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | **U58F-F** | MCP decision | CLOUD | **APPROVED** | Keep UnrealMCP · [U58F_F_MCP_DECISION.md](../Docs/handoffs/U58F_F_MCP_DECISION.md) |
 | **U58F-G** | Mesh Terrain spike | DESKTOP | **SPIKE READY** | Plugin on · sandbox only · [U58F_G_MESH_TERRAIN.md](../Docs/handoffs/U58F_G_MESH_TERRAIN.md) |
 
-**Current track:** **Docs/33 PS** — **PS-A inventory** (gate **`APPROVE PS-A`** after DESKTOP verify). PS-0 **CLOSED** (Lead stamp 2026-09-22/23 ET). Docs/32 PA **CLOSED**.
+**Current track:** **Docs/33 PS** — **PS-B Arrange** (gate **`APPROVE PS-B`** after DESKTOP Arrange prove). PS-A **CLOSED** Lead **`APPROVE PS-A`**, 2026-09-22 ET. PS-0 **CLOSED**. Docs/32 PA **CLOSED**.
 
 ### Docs/29 Taste Profiler (TP)
 
@@ -197,7 +197,8 @@ MVP vertical slice and post-audit product wrap are **CLOSED**. **Harness Refine 
 | SS-B-feel | SS-B | CLOUD+DESKTOP | **CLOSED** | Source/ + Content/Python + Docs/handoffs/ | [SS_B_STEALTH_FEEL.md](../Docs/handoffs/SS_B_STEALTH_FEEL.md) · Lead **`APPROVE SS-B`**, 2026-09-21 ET — Docs/31 **CLOSED / COMPLETE** (`a03940a` / PR #138); DESKTOP STEALTH greps **deferred/accepted** |
 | PA-0-strategy | PA-0 | CLOUD | **APPROVED / CLOSED** | Docs/ + AssetCreation/RefImages/ + Docs/refs/ai/ | [PA_STRATEGY.md](../Docs/handoffs/PA_STRATEGY.md) · Lead **`APPROVE PA STRATEGY`**, 2026-09-22 ET — homestead kit only |
 | PS-0-strategy | PS-0 | CLOUD | **APPROVED / CLOSED** | [33_PLACEMENT_STILLS.md](../Docs/33_PLACEMENT_STILLS.md) | [PS_STRATEGY.md](../Docs/handoffs/PS_STRATEGY.md) — Lead **`APPROVE PS STRATEGY — homestead kit only`**, 2026-09-22/23 ET |
-| PS-A-inventory | PS-A | CLOUD+DESKTOP | **GATE READY** | [PS_A_INVENTORY.md](../Docs/handoffs/PS_A_INVENTORY.md) | Live `DRESS_*`/`PA_D_*` counts + `CAM_*` confirm → Lead **`APPROVE PS-A`** |
+| PS-A-inventory | PS-A | CLOUD+DESKTOP | **APPROVED / CLOSED** | [PS_A_INVENTORY.md](../Docs/handoffs/PS_A_INVENTORY.md) | Lead **`APPROVE PS-A`**, 2026-09-22 ET — DRESS **90** / PA_D **16** / five JSON cams |
+| PS-B-arrange | PS-B | CLOUD+DESKTOP | **GATE READY** | [PS_B_ARRANGE.md](../Docs/handoffs/PS_B_ARRANGE.md) | `arrange_ps_homestead.py` → `Saved/ps_arrange_gate.json` → Lead **`APPROVE PS-B`** |
 | PA-A-gap-audit | PA-A | CLOUD+DESKTOP | **APPROVED / CLOSED** | [PA_A_GAP_AUDIT.md](../Docs/handoffs/PA_A_GAP_AUDIT.md) | Lead **`APPROVE PA-A`**, 2026-09-22 ET — gap table accepted |
 | PA-C-blender | PA-C | DESKTOP+Blender MCP | **IN PROGRESS** — tranche-2 **DONE**; optional rim | [PA_C_BLENDER.md](../Docs/handoffs/PA_C_BLENDER.md) · [PA_C_TRANCHE2.md](../Docs/handoffs/PA_C_TRANCHE2.md) | Lead **`APPROVE PA-C`**, 2026-09-22 ET — cabin/path/planters/fence/glider landed |
 | PA-D-import | PA-D | DESKTOP | **CLOSED** | [PA_D_IMPORT_PLACE.md](../Docs/handoffs/PA_D_IMPORT_PLACE.md) | Lead **`APPROVE PA-D`** + place report; PA-E **CLOSED** — Lead **`APPROVE PA-E`**, 2026-09-22 ET |
