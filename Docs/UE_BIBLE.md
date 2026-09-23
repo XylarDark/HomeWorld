@@ -23,8 +23,9 @@ HomeWorld prove runs on **DESKTOP** via **warm Editor + MCP (55557)** and `execu
 
 | Gate | Rule |
 |------|------|
-| **Docs-first** | Epic 5.8 docs + in-repo policy before new console syntax, waits, or Editor Python APIs ([CAPTURE_REDUNDANCY.md](../docs/Automation/CAPTURE_REDUNDANCY.md), [automation-standards.mdc](../.cursor/rules/automation-standards.mdc)). |
-| **Forums / research** | After rung-1 fail with evidence, one public research pass → log in [AUTOMATION_GAPS.md](../docs/Automation/AUTOMATION_GAPS.md); no invented console commands without docs check. |
+| **Before brute force** | **Epic 5.8 docs + UE forums / proven patterns** (repo rung 1, CAPTURE_REDUNDANCY) **before** custom wait ladders, console variants, or novel stacks — Test/Fix do not “try harder” first. |
+| **Docs-first** | Same policy for new Editor Python APIs, MCP usage, commandlets ([automation-standards.mdc](../.cursor/rules/automation-standards.mdc)). |
+| **Forums / research** | After rung-1 fail **with evidence**, one public pass → [AUTOMATION_GAPS.md](../docs/Automation/AUTOMATION_GAPS.md); no invented console commands. |
 | **No invented greps** | Evidence tables from real `Saved/Logs/HomeWorld.log` / gate JSON — see [18_VERIFY_PROVE.md](18_VERIFY_PROVE.md). |
 | **Fix scope** | Defect-linked paths only ([PDF_CYCLE.md](../swarm/PDF_CYCLE.md)); re-Test same checklist. |
 | **Tooling ladder** | Rung 1 in-repo hardening only unless Lead **`APPROVE TOOL SCOUT`** / **`APPROVE TOOL BUILD`**. |
@@ -35,11 +36,26 @@ HomeWorld prove runs on **DESKTOP** via **warm Editor + MCP (55557)** and `execu
 
 | Prefer | Avoid |
 |--------|--------|
-| **Warm session:** Editor already open, MCP green, map loaded (`L_VS_MVP_Markers` for PS/PA tracks) | Cold launch at start of every micro-step |
+| **Warm session:** Editor already open, MCP green, map loaded (`L_VS_MVP_Markers` for PS/PA tracks) | Cold launch after every Python tweak |
 | **One prove Act** per MCP script invocation when possible | Chaining long blocking scripts on MCP main thread |
-| **Cold start + recover** only under [HOST_PULSE § DESKTOP stall protocol](handoffs/HOST_PULSE.md#desktop-stall-protocol-conductor-owned): **one** kill+relaunch cycle, UE **5.8** binary | Second hang, third kill, flag roulette |
+| **Cold start + recover** only under [HOST_PULSE § DESKTOP stall protocol](handoffs/HOST_PULSE.md#desktop-stall-protocol-conductor-owned): **one** kill+relaunch, UE **5.8** binary | Second hang, third kill, flag roulette |
+| **Full Editor relaunch + Safe-Build** only when C++ **reflection** changes (`UCLASS` / `UFUNCTION` / `UPROPERTY`, new reflected types) | Restarting UE for `.cpp` **body-only** fixes (use Live Coding — §3b) |
 
 After recover: wait MCP ≤3 min → re-run **one** Arrange+Act, then stop if still stuck (`blocked`).
+
+---
+
+## 3b. Cheap iterate (Lead locks)
+
+**Split:** **VS Code / Cursor** = edit files; **DESKTOP Editor** = live world + MCP. **Act** always **`execute_python_script("<script>.py")`** on the warm session ([MCP_SETUP.md](../docs/Setup/MCP_SETUP.md)) — not a one-off local `py` against a cold Editor for prove scoring.
+
+| Cause | Avoid |
+|-------|--------|
+| Restart UE after each Python edit | Edit `Content/Python/` in IDE → **`importlib.reload(module)`** in orchestrator path → re-run **same Act** via MCP; **never** `reload(unreal)` |
+| Safe-Build for every C++ typo in a function body | **Live Coding** for implementation-only `.cpp` / `.h` body edits |
+| Live Coding after new `UProperty` / RPC / class spec | **Full rebuild** (`Safe-Build` on DESKTOP) for **`UCLASS` / `UFUNCTION` / `UPROPERTY`** (reflection/schema); then relaunch if MCP/module load requires it |
+| Prove from cloud shell or non-MCP Python | Cloud merges/docs; **Conductor parent** runs Act on **DESKTOP-21CT3H0** only ([WINDOWS_BRIDGE.md](../docs/Setup/WINDOWS_BRIDGE.md)) |
+| Brute-force capture/console before docs | §2 **before brute force** — forums + Epic 5.8 + in-repo pretick/MRQ patterns first |
 
 ---
 
@@ -48,9 +64,9 @@ After recover: wait MCP ≤3 min → re-run **one** Arrange+Act, then stop if st
 | Item | Rule |
 |------|------|
 | **Primary log** | `Saved/Logs/HomeWorld.log` (+ filtered copies under `Saved/Logs/` when Watcher runs — see [AUTOMATION_EDITOR_LOG.md](../docs/Automation/AUTOMATION_EDITOR_LOG.md)). |
-| **ABSLOG / launch** | Prove launches must keep **attached** logging visible to operators (project **ABSLOG** / `-log` discipline on DESKTOP). |
-| **Never** | Separate **closeable** external `-log` console as the only prove log sink — if Lead closes it, Conductor loses stall evidence (**console-kill**). |
-| **Lead** | Do **not** close the attached prove console during a pending Act → treat as **`blocked`** (same class as host/tool down mid-Act). |
+| **ABSLOG + Saved/Logs** | Prove truth in **`Saved/Logs/HomeWorld.log`** and attached **ABSLOG** discipline on DESKTOP — not a detached log elsewhere. |
+| **Never** | **Closeable** standalone `-log` console as the only sink; Lead closing attached prove log = **console-kill** → score **`blocked`**, not product fail. |
+| **Lead** | Do **not** close the attached prove console during a pending Act (same as host down mid-Act). |
 | **Gate artifacts** | `Saved/*_prove_gate.json`, capture reports, `Saved/ps_stills/manifest.json` — KEEP-LOCAL, not git. |
 
 Before greps: `log LogTemp Log` in PIE when scoring verbs ([CONSOLE_COMMANDS.md](../docs/CONSOLE_COMMANDS.md)).
@@ -104,6 +120,8 @@ Aligned with [HOST_PULSE.md](handoffs/HOST_PULSE.md) (5m pulse, 300s floor) and 
 | Stamp **`blocked`** for host/MCP/console-kill/modal | Protects Test sheet from false **`closed_fail`**. |
 | Tail **`Saved/Logs/HomeWorld.log`** + gate JSON for evidence | Files-only handoffs ([SWARM_OPS.md](../swarm/SWARM_OPS.md)). |
 | One **UE 5.8** relaunch recover per stall protocol | HOST_PULSE hard cap. |
+| **IDE edit** → **`importlib.reload`** → MCP **re-run Act** on warm Editor | Cheap Python iterate without cold start. |
+| **Live Coding** for C++ body fixes during Fix lap | Full Safe-Build only when reflection surface changes. |
 
 ### Don’t
 
@@ -113,6 +131,9 @@ Aligned with [HOST_PULSE.md](handoffs/HOST_PULSE.md) (5m pulse, 300s floor) and 
 | Claim PASS without DESKTOP gate file + honest outcomes | No invented greps/stills. |
 | **`closed_fail`** on black still when Arrange was ready | Lead policy → **`soft_fail`** + prove loop. |
 | Run **`capture_shotlist_mrq.main()`** on `threading.Thread` | MCP must stay on game thread. |
+| **`reload(unreal)`** or restart Editor for every `.py` save | Breaks MCP session; use `importlib.reload` on project modules only. |
+| Cold-start **`py Content/Python/...`** for scored prove | Act must be MCP against live DESKTOP session. |
+| Brute-force waits/console before Epic + forums + rung 1 | §2 hard gate for Test/Fix. |
 | Close attached **prove `-log` / ABSLOG** console | **console-kill** → **`blocked`**. |
 | Auto-install tools / NirCmd / parallel capture stacks | Ladder gates ([CAPTURE_REDUNDANCY.md](../docs/Automation/CAPTURE_REDUNDANCY.md)). |
 | Third kill / parallel Fix invent after budget exhausted | Park Act; notify Lead. |
@@ -132,6 +153,8 @@ Aligned with [HOST_PULSE.md](handoffs/HOST_PULSE.md) (5m pulse, 300s floor) and 
 | [../docs/Automation/CAPTURE_REDUNDANCY.md](../docs/Automation/CAPTURE_REDUNDANCY.md) | Docs-first, redundancy ladder |
 | [../docs/Setup/WINDOWS_BRIDGE.md](../docs/Setup/WINDOWS_BRIDGE.md) | Cloud vs DESKTOP split |
 | [../docs/Setup/MCP_SETUP.md](../docs/Setup/MCP_SETUP.md) | MCP 55557 |
+| [../docs/Setup/BUILD_POLICY.md](../docs/Setup/BUILD_POLICY.md) | Safe-Build vs Live Coding on DESKTOP |
+| [../.cursor/rules/00-core-principles.mdc](../.cursor/rules/00-core-principles.mdc) | `importlib.reload` idempotency |
 | [18_VERIFY_PROVE.md](18_VERIFY_PROVE.md) | VP2 DESKTOP grep prove (closed; pattern reference) |
 | [../Content/Python/ps_placement_prove.py](../Content/Python/ps_placement_prove.py) | PS-C Act (read-only for operators) |
 | [../.cursor/skills/pcg-validate/SKILL.md](../.cursor/skills/pcg-validate/SKILL.md) | PCG validate when prove touches PCG |
