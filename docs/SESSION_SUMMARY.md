@@ -913,3 +913,7 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 - Pin registry + CURSOR_DEV + HR2-B canonical table; `automation-harness` guide + extras skills; host `automation-standards.mdc` cross-link only.
 - PR: `cursor/bump-devharness-pin-8be4170-80e0` (draft).
 
+## 2026-09-23 — PS-0 strategy approved + PS-A inventory (cloud)
+
+- Lead **`APPROVE PS STRATEGY — homestead kit only`** — PS-0 **CLOSED**; PHASE_BOARD → **PS-A**; [PS_A_INVENTORY.md](../Docs/handoffs/PS_A_INVENTORY.md) (actors, cam map, thresholds, bounds schema).
+
