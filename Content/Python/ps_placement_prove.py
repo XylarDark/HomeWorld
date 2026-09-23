@@ -111,6 +111,7 @@ PS_C_STABLE_POLLS_REQUIRED = 2
 PS_C_SLATE_MECHANISM = "register_slate_pre_tick_callback"
 PS_C_DRIVE_MECHANISM = "slate_callback_plus_pump_until_done"
 CAP001_SETTLE_AFTER_YIELD_V1 = "CAP001_SETTLE_AFTER_YIELD_V1"
+CAP001_PHASE_B_SIDECAR = "ps_c_cap001_phase_b.json"
 TRACE_TOP_OFFSET_UU = 120.0
 TRACE_DEPTH_UU = 12000.0
 # PS-C baseline: metric over-threshold → soft_fail (Lead tunes before closed_fail).
@@ -1313,6 +1314,207 @@ def _automation_abs_screenshot_one_invoke(filepath: str, cam) -> tuple[bool, lis
     return False, methods, None
 
 
+def _cap001_env_phase_b_absorb_only() -> bool:
+    """Conductor: host poll wrote phase B sidecar — absorb gate without re-firing AL."""
+    raw = (os.environ.get("PS_C_CAP001_PHASE_B_ABSORB") or "").strip().lower()
+    return raw in ("1", "true", "yes")
+
+
+def _cap001_phase_b_sidecar_path() -> str:
+    return _project_saved_path(CAP001_PHASE_B_SIDECAR)
+
+
+def _cap001_load_json_sidecar(path: str) -> Optional[dict[str, Any]]:
+    if not os.path.isfile(path):
+        return None
+    try:
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        return data if isinstance(data, dict) else None
+    except (OSError, json.JSONDecodeError) as e:
+        _log("cap001 sidecar read failed", {"path": path, "error": str(e)})
+        return None
+
+
+def _cap001_load_phase_a_from_saved_gate() -> Optional[dict[str, Any]]:
+    gate = _cap001_load_json_sidecar(_project_saved_path("ps_c_prove_gate.json"))
+    if not gate:
+        return None
+    cap = gate.get("cap001_settle_after_yield_v1")
+    if isinstance(cap, dict):
+        if cap.get("phase") == "B" and isinstance(cap.get("phase_a"), dict):
+            return cap["phase_a"]
+        if cap.get("phase") == "A":
+            return cap
+    act_fired = gate.get("act_fired_at")
+    path_abs = gate.get("canonical_still_path_abs")
+    label = gate.get("one_cam_label")
+    if act_fired is not None and path_abs and label:
+        return {
+            "contract": CAP001_SETTLE_AFTER_YIELD_V1,
+            "phase": "A",
+            "camera_label": label,
+            "canonical_still_path_abs": path_abs,
+            "act_fired_at": act_fired,
+            "fire_ok": True,
+            "fire_error": None,
+        }
+    return None
+
+
+def _cap001_load_still_entries_from_manifest() -> list[dict[str, Any]]:
+    manifest_path = os.path.join(_ps_c_stills_dir_abs(), "manifest.json")
+    manifest = _cap001_load_json_sidecar(manifest_path)
+    if not manifest:
+        return []
+    stills = manifest.get("stills")
+    return list(stills) if isinstance(stills, list) else []
+
+
+def _cap001_validate_phase_b_settle(
+    phase_a: dict[str, Any],
+    phase_b: dict[str, Any],
+) -> tuple[bool, str]:
+    if not phase_a.get("fire_ok"):
+        return False, "phase_a_not_fire_ok"
+    act_fired = phase_a.get("act_fired_at")
+    if act_fired is None:
+        return False, "phase_a_no_act_fired_at"
+    path_a = common.abs_path(str(phase_a.get("canonical_still_path_abs") or ""))
+    path_b = common.abs_path(
+        str(phase_b.get("canonical_still_path_abs") or path_a or "")
+    )
+    if not path_a or path_a != path_b:
+        return False, "canonical_path_mismatch"
+    b_fired = phase_b.get("act_fired_at")
+    if b_fired is not None and abs(float(b_fired) - float(act_fired)) > 0.5:
+        return False, "act_fired_at_mismatch"
+    if phase_b.get("settle_ok") is False:
+        return False, "phase_b_settle_ok_false"
+    if not os.path.isfile(path_b):
+        return False, "png_missing_on_disk"
+    try:
+        size = os.path.getsize(path_b)
+        mtime = os.path.getmtime(path_b)
+    except OSError as exc:
+        return False, f"stat_failed:{exc}"
+    if size < common.MIN_BYTES:
+        return False, "below_min_bytes"
+    if mtime < float(act_fired) - 0.05:
+        return False, "mtime_before_act_fired_at"
+    stamp_bytes = phase_b.get("bytes")
+    if stamp_bytes is not None:
+        try:
+            if int(stamp_bytes) < common.MIN_BYTES:
+                return False, "phase_b_stamp_bytes_below_min"
+        except (TypeError, ValueError):
+            pass
+    return True, "ok"
+
+
+def _cap001_apply_phase_b_to_entries(
+    phase_a: dict[str, Any],
+    phase_b: dict[str, Any],
+    entries: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    act_fired = float(phase_a["act_fired_at"])
+    path = common.abs_path(str(phase_a["canonical_still_path_abs"]))
+    cam_label = str(phase_a.get("camera_label") or "")
+    act_end = float(
+        phase_b.get("settle_observed_at")
+        or phase_b.get("host_poll_at")
+        or time.time()
+    )
+    methods_base = ["CAP001_SETTLE_AFTER_YIELD_V1:phase_b_host_absorbed"]
+    if not entries:
+        entries = [
+            {
+                "camera_label": cam_label,
+                "path": path,
+                "methods": list(methods_base),
+            }
+        ]
+    updated: list[dict[str, Any]] = []
+    matched = False
+    for ent in entries:
+        e = dict(ent)
+        if str(e.get("camera_label")) == cam_label:
+            matched = True
+            merged_methods = list(e.get("methods") or []) + methods_base
+            e = _finalize_still_entry(
+                cam_label,
+                path,
+                merged_methods,
+                since=act_fired,
+                resolved_on_disk=path,
+                act_end=act_end,
+            )
+            e["cap001_phase"] = "B"
+            e["act_fired_at"] = act_fired
+            e["canonical_still_path_abs"] = path
+        updated.append(e)
+    if not matched:
+        updated.append(
+            _finalize_still_entry(
+                cam_label,
+                path,
+                methods_base,
+                since=act_fired,
+                resolved_on_disk=path,
+                act_end=act_end,
+            )
+        )
+        updated[-1]["cap001_phase"] = "B"
+    return updated
+
+
+def _cap001_try_absorb_phase_b(
+    phase_a: Optional[dict[str, Any]],
+    entries: list[dict[str, Any]],
+    blocked: list[str],
+) -> tuple[
+    Optional[dict[str, Any]],
+    Optional[dict[str, Any]],
+    list[dict[str, Any]],
+    list[str],
+    Optional[float],
+    bool,
+]:
+    """Read host Phase B sidecar; score gate from settle evidence (not Phase A alone)."""
+    if phase_a is None or not phase_a.get("fire_ok"):
+        return None, phase_a, entries, blocked, None, False
+    phase_b = _cap001_load_json_sidecar(_cap001_phase_b_sidecar_path())
+    if phase_b is None:
+        return None, phase_a, entries, blocked, None, False
+    ok, reason = _cap001_validate_phase_b_settle(phase_a, phase_b)
+    if not ok:
+        blocked = list(blocked) + [f"cap001_phase_b_invalid:{reason}"]
+        return phase_b, phase_a, entries, blocked, None, False
+    entries = _cap001_apply_phase_b_to_entries(phase_a, phase_b, entries)
+    act_settled = float(
+        phase_b.get("settle_observed_at")
+        or phase_b.get("host_poll_at")
+        or time.time()
+    )
+    combined: dict[str, Any] = {
+        "contract": CAP001_SETTLE_AFTER_YIELD_V1,
+        "phase": "B",
+        "settle_ok": True,
+        "act_fired_at": phase_a.get("act_fired_at"),
+        "canonical_still_path_abs": phase_a.get("canonical_still_path_abs"),
+        "camera_label": phase_a.get("camera_label"),
+        "phase_a": phase_a,
+        "phase_b": phase_b,
+    }
+    blocked = [
+        b
+        for b in blocked
+        if b != "cap001_phase_b_settle_pending_after_mcp_yield"
+    ]
+    _log("cap001 Phase B absorbed into gate scoring", {"path": combined.get("canonical_still_path_abs")})
+    return phase_b, combined, entries, blocked, act_settled, True
+
+
 def _cap001_phase_a_stamp(
     *,
     cam_label: str,
@@ -2121,10 +2323,16 @@ def _build_ps_c_gate(
         and gate_count_matches_disk
         and (one_cam_bite or metrics_ok)
     )
+    cap001_settled_phase_b = (
+        cap001_phase_a is not None
+        and cap001_phase_a.get("phase") == "B"
+        and bool(cap001_phase_a.get("settle_ok"))
+    )
     cap001_phase_a_pending = (
         one_cam_bite
         and cap001_phase_a is not None
         and bool(cap001_phase_a.get("fire_ok"))
+        and not cap001_settled_phase_b
     )
     if cap001_phase_a_pending:
         blocked = list(blocked) + ["cap001_phase_b_settle_pending_after_mcp_yield"]
@@ -2185,6 +2393,8 @@ def _build_ps_c_gate(
         gate["cap001_settle_after_yield_v1"] = cap001_phase_a
         gate["act_fired_at"] = cap001_phase_a.get("act_fired_at")
         gate["canonical_still_path_abs"] = cap001_phase_a.get("canonical_still_path_abs")
+        if cap001_settled_phase_b:
+            gate["cap001_phase_b_sidecar_path"] = _cap001_phase_b_sidecar_path()
     if driver_error:
         gate["stills_driver_error"] = driver_error
     return gate
@@ -2318,17 +2528,44 @@ def prove_ps_placement(
         blocked.append("stills_skipped_by_flag")
     elif not pre_closed and prove_mode == "one_cam":
         bite_label = str(one_cam_active or _still_labels()[0])
+        cap001_phase_b: Optional[dict[str, Any]] = None
+        if _cap001_env_phase_b_absorb_only():
+            cap001_phase_a = _cap001_load_phase_a_from_saved_gate()
+            still_entries = _cap001_load_still_entries_from_manifest()
+            stills_act_started_at = None
+            manifest_existing = _cap001_load_json_sidecar(
+                os.path.join(stills_dir, "manifest.json")
+            )
+            if manifest_existing:
+                stills_act_started_at = manifest_existing.get("capture_act_started_at")
+            if stills_act_started_at is None and cap001_phase_a:
+                stills_act_started_at = float(cap001_phase_a.get("act_fired_at") or time.time())
+            driver_error = None
+            _log("one-cam CAP001 Phase B absorb-only (no AL re-fire)", {"label": bite_label})
+        else:
+            (
+                still_entries,
+                stills_act_started_at,
+                stills_act_settled_at,
+                driver_error,
+                cap_blocked,
+                cap001_phase_a,
+            ) = _ps_c_one_cam_phase_a_fire_and_return(world, bite_label, stills_dir)
+            blocked.extend(cap_blocked)
+            if driver_error:
+                blocked.append(f"stills_driver_failed:{driver_error}")
         (
+            cap001_phase_b,
+            cap001_combined,
             still_entries,
-            stills_act_started_at,
-            stills_act_settled_at,
-            driver_error,
-            cap_blocked,
-            cap001_phase_a,
-        ) = _ps_c_one_cam_phase_a_fire_and_return(world, bite_label, stills_dir)
-        blocked.extend(cap_blocked)
-        if driver_error:
-            blocked.append(f"stills_driver_failed:{driver_error}")
+            blocked,
+            phase_b_act_end,
+            _phase_b_absorbed,
+        ) = _cap001_try_absorb_phase_b(cap001_phase_a, still_entries, blocked)
+        if cap001_combined is not None:
+            cap001_phase_a = cap001_combined
+        if phase_b_act_end is not None:
+            stills_act_settled_at = phase_b_act_end
         manifest_path = _write_stills_manifest(
             still_entries,
             stills_dir,
