@@ -1319,10 +1319,24 @@ def _automation_abs_screenshot_one_invoke(filepath: str, cam) -> tuple[bool, lis
     return False, methods, None
 
 
+def _cap001_env_truthy(name: str) -> bool:
+    raw = (os.environ.get(name) or "").strip().lower()
+    return raw in ("1", "true", "yes")
+
+
 def _cap001_env_phase_b_absorb_only() -> bool:
     """Conductor: host poll wrote phase B sidecar — absorb gate without re-firing AL."""
-    raw = (os.environ.get("PS_C_CAP001_PHASE_B_ABSORB") or "").strip().lower()
-    return raw in ("1", "true", "yes")
+    return _cap001_env_truthy("PS_C_CAP001_PHASE_B_ABSORB")
+
+
+def _cap001_env_prep_only() -> bool:
+    """Script1: night + POST_NIGHT + lit/aim prep; no AL (MCP disconnect before fire)."""
+    return _cap001_env_truthy("PS_C_CAP001_PREP_ONLY")
+
+
+def _cap001_env_fire_only() -> bool:
+    """Script2: single AL fire after MCP reconnect; no night/prep re-run."""
+    return _cap001_env_truthy("PS_C_CAP001_FIRE_ONLY")
 
 
 def _cap001_phase_b_sidecar_path() -> str:
@@ -1704,6 +1718,20 @@ def _cap001_prepare_one_cam_lit_aim_before_fire(
     return methods, blocked, prep_meta
 
 
+def _cap001_one_cam_invoke_al_fire(
+    cam,
+    path: str,
+) -> tuple[bool, Optional[float], Optional[str], list[str]]:
+    """Single AL invoke; returns (fire_ok, act_fired_at, fire_error, al_methods)."""
+    act_fired_at = time.time()
+    ok, al_methods, _task = _automation_abs_screenshot_one_invoke(path, cam)
+    fire_error: Optional[str] = None
+    if not ok:
+        act_fired_at = None
+        fire_error = "automation_invoke_failed"
+    return ok, act_fired_at, fire_error, al_methods
+
+
 def _ps_c_one_cam_phase_a_fire_and_return(
     world,
     cam_label: str,
@@ -1716,7 +1744,7 @@ def _ps_c_one_cam_phase_a_fire_and_return(
     list[str],
     dict[str, Any],
 ]:
-    """CAP001 Phase A: one AL fire, stamp act_fired_at + path, return (no in-script PNG wait)."""
+    """CAP001 Phase A: prep-only, fire-only (post-MCP), or combined prep+fire."""
     blocked: list[str] = []
     act_start = time.time()
     path = common.abs_path(_ps_c_canonical_still_path(cam_label))
@@ -1725,6 +1753,10 @@ def _ps_c_one_cam_phase_a_fire_and_return(
     cam = _find_actor_label(cam_label)
     act_fired_at: Optional[float] = None
     fire_error: Optional[str] = None
+    prep_only = _cap001_env_prep_only()
+    fire_only = _cap001_env_fire_only()
+    if prep_only and fire_only:
+        blocked.append("cap001_prep_only_and_fire_only_both_set")
 
     if not cam:
         fire_error = "camera_missing"
@@ -1735,25 +1767,53 @@ def _ps_c_one_cam_phase_a_fire_and_return(
             act_fired_at=None,
             fire_ok=False,
             fire_error=fire_error,
-            methods=["CAP001_SETTLE_AFTER_YIELD_V1:phase_a_fire_only"],
+            methods=["CAP001_SETTLE_AFTER_YIELD_V1:phase_a"],
         )
         return [], act_start, None, fire_error, blocked, stamp
 
-    prep_methods, prep_blocked, lit_aim_prep = _cap001_prepare_one_cam_lit_aim_before_fire(
-        cam, cam_label
-    )
-    blocked.extend(prep_blocked)
-    _purge_ps_c_still_png(path)
-    methods: list[str] = ["CAP001_SETTLE_AFTER_YIELD_V1:phase_a_fire_only"]
-    methods.extend(prep_methods)
+    lit_aim_prep: dict[str, Any] = {}
+    methods: list[str] = []
+    ok = False
 
-    act_fired_at = time.time()
-    ok, al_methods, _task = _automation_abs_screenshot_one_invoke(path, cam)
-    methods.extend(al_methods)
-    if not ok:
+    if fire_only and not prep_only:
+        methods = [
+            CAP001_SETTLE_AFTER_YIELD_V1 + ":phase_a_fire_only",
+            CAP001_AL_AFTER_MCP_DISCONNECT_V1,
+            "cap001:fire_only_after_mcp_disconnect",
+        ]
+        _purge_ps_c_still_png(path)
+        _focus_ps_c_viewport()
+        ok, act_fired_at, fire_error, al_methods = _cap001_one_cam_invoke_al_fire(cam, path)
+        methods.extend(al_methods)
+        if fire_error:
+            blocked.append("one_cam_automation_invoke_failed")
+        lit_aim_prep = {"cap001_mode": "fire_only", CAP001_AL_AFTER_MCP_DISCONNECT_V1: True}
+    elif prep_only and not fire_only:
+        prep_methods, prep_blocked, lit_aim_prep = _cap001_prepare_one_cam_lit_aim_before_fire(
+            cam, cam_label
+        )
+        blocked.extend(prep_blocked)
+        methods = [
+            CAP001_AL_AFTER_MCP_DISCONNECT_V1,
+            "cap001:prep_only_before_mcp_disconnect",
+        ]
+        methods.extend(prep_methods)
+        lit_aim_prep["cap001_mode"] = "prep_only"
+        lit_aim_prep[CAP001_AL_AFTER_MCP_DISCONNECT_V1] = True
         act_fired_at = None
-        fire_error = "automation_invoke_failed"
-        blocked.append("one_cam_automation_invoke_failed")
+        ok = False
+    else:
+        prep_methods, prep_blocked, lit_aim_prep = _cap001_prepare_one_cam_lit_aim_before_fire(
+            cam, cam_label
+        )
+        blocked.extend(prep_blocked)
+        methods = ["CAP001_SETTLE_AFTER_YIELD_V1:phase_a_combined_prep_and_fire"]
+        methods.extend(prep_methods)
+        _purge_ps_c_still_png(path)
+        ok, act_fired_at, fire_error, al_methods = _cap001_one_cam_invoke_al_fire(cam, path)
+        methods.extend(al_methods)
+        if fire_error:
+            blocked.append("one_cam_automation_invoke_failed")
 
     stamp = _cap001_phase_a_stamp(
         cam_label=cam_label,
@@ -1764,6 +1824,16 @@ def _ps_c_one_cam_phase_a_fire_and_return(
         methods=methods,
         lit_aim_prep=lit_aim_prep,
     )
+    if prep_only and not fire_only:
+        stamp[CAP001_AL_AFTER_MCP_DISCONNECT_V1] = "prep_only"
+        stamp["fire_ok"] = False
+        stamp["act_fired_at"] = None
+    elif fire_only and not prep_only:
+        stamp[CAP001_AL_AFTER_MCP_DISCONNECT_V1] = "fire_only"
+
+    note = "cap001_phase_a_pending_host_settle_after_mcp_yield"
+    if prep_only and not fire_only:
+        note = "cap001_prep_only_no_al_mcp_disconnect_before_fire"
     entry: dict[str, Any] = {
         "camera_label": cam_label,
         "path": path,
@@ -1771,19 +1841,29 @@ def _ps_c_one_cam_phase_a_fire_and_return(
         "act_fired_at": act_fired_at,
         "canonical_still_path_abs": path,
         "cap001_dark_still_lit_aim_v1": lit_aim_prep,
-        "capture_outcome": OUTCOME_SOFT if ok else OUTCOME_SOFT,
+        "capture_outcome": OUTCOME_SOFT,
         "counts_toward_gate": False,
         "fresh_this_act": False,
         "file_exists": False,
         "exists": False,
         "on_disk": False,
-        "note": "cap001_phase_a_pending_host_settle_after_mcp_yield",
+        "note": note,
     }
     if fire_error:
         entry["error"] = fire_error
 
-    _log("one-cam Phase A fire+stamp+return", stamp)
-    driver_err = fire_error if not ok else None
+    _log(
+        "one-cam Phase A",
+        {
+            "stamp": stamp,
+            "prep_only": prep_only,
+            "fire_only": fire_only,
+            "fire_ok": ok,
+        },
+    )
+    driver_err = fire_error if not ok and not (prep_only and not fire_only) else None
+    if prep_only and not fire_only:
+        driver_err = None
     return [entry], act_start, None, driver_err, blocked, stamp
 
 
