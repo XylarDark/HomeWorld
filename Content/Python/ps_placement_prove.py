@@ -1284,7 +1284,41 @@ def _ps_c_gate_hold_until_canonical_paths(
     return still_entries, act_end, blocked, False
 
 
-def _automation_abs_screenshot_one_invoke(filepath: str, cam) -> tuple[bool, list[str], Any]:
+def _cap001_al_task_fire_ok(task: Any) -> tuple[bool, dict[str, Any]]:
+    """fire_ok requires AutomationEditorTask when is_valid_task API exists."""
+    meta: dict[str, Any] = {
+        "task_type": type(task).__name__ if task is not None else None,
+    }
+    if task is None:
+        meta["task_valid"] = False
+        meta["reason"] = "no_automation_editor_task_returned"
+        return False, meta
+    valid_fn = getattr(task, "is_valid_task", None)
+    if callable(valid_fn):
+        try:
+            valid = bool(valid_fn())
+            meta["task_valid"] = valid
+            meta["is_valid_task"] = valid
+            if not valid:
+                meta["reason"] = "is_valid_task_false"
+            return valid, meta
+        except Exception as exc:
+            meta["task_valid"] = False
+            meta["is_valid_task_error"] = str(exc)
+            meta["reason"] = "is_valid_task_exception"
+            return False, meta
+    meta["task_valid"] = False
+    meta["reason"] = "is_valid_task_api_absent"
+    meta["is_valid_task_api"] = "absent"
+    return False, meta
+
+
+def _automation_abs_screenshot_one_invoke(
+    filepath: str,
+    cam,
+    *,
+    require_valid_al_task: bool = False,
+) -> tuple[bool, list[str], Any, dict[str, Any]]:
     """Single AL invoke (one-cam Phase A — fire only; no in-script wait)."""
     cv = _load_capture_viewport()
     dest_abs = cv._ensure_abs_dest(filepath)
@@ -1308,16 +1342,55 @@ def _automation_abs_screenshot_one_invoke(filepath: str, cam) -> tuple[bool, lis
             STILL_RES_X, STILL_RES_Y, ue_path, cam
         )),
     )
+    last_task_meta: dict[str, Any] = {}
     for name, fn in attempts:
         try:
             task = fn()
             methods.append(name)
-            return True, methods, task
+            if require_valid_al_task:
+                fire_ok, task_meta = _cap001_al_task_fire_ok(task)
+                last_task_meta = task_meta
+                methods.append(f"al_task_gate:{json.dumps(task_meta, default=str)}")
+                if fire_ok:
+                    return True, methods, task, task_meta
+                continue
+            return True, methods, task, {}
         except TypeError:
             continue
         except Exception as e:
             methods.append(f"{name}_fail:{e}")
-    return False, methods, None
+    return False, methods, None, last_task_meta
+
+
+def _cap001_fire_only_al_ready_and_invoke(
+    cam,
+    path: str,
+) -> tuple[bool, Optional[float], Optional[str], list[str], dict[str, Any]]:
+    """Post-MCP FIRE_ONLY: minimal pre-AL bind then AL with task validity gate."""
+    wire_methods: list[str] = [CAP001_FIRE_ONLY_AL_READY_WIRE_V1]
+    wire_meta: dict[str, Any] = {CAP001_FIRE_ONLY_AL_READY_WIRE_V1: True}
+    _pilot_camera(cam)
+    wire_methods.append("fire_only:pre_al_pilot_camera")
+    cv = _load_capture_viewport()
+    wire_meta["finish_loading"] = cv._finish_loading_before_screenshot()
+    wire_methods.append("fire_only:finish_loading_before_screenshot")
+    view = common.apply_lit_game_view_for_capture()
+    wire_meta["lit_game_view"] = view
+    wire_methods.append(f"fire_only:apply_lit_game_view:{view.get('viewmode')}")
+    _focus_ps_c_viewport()
+    wire_methods.append("fire_only:focus_viewport")
+    act_fired_at = time.time()
+    ok, al_methods, _task, task_meta = _automation_abs_screenshot_one_invoke(
+        path, cam, require_valid_al_task=True
+    )
+    wire_methods.extend(al_methods)
+    wire_meta["al_task"] = task_meta
+    wire_meta["task_valid"] = task_meta.get("task_valid")
+    fire_error: Optional[str] = None
+    if not ok:
+        act_fired_at = None
+        fire_error = "automation_invoke_failed_or_invalid_task"
+    return ok, act_fired_at, fire_error, wire_methods, wire_meta
 
 
 def _cap001_env_truthy(name: str) -> bool:
@@ -1723,9 +1796,9 @@ def _cap001_one_cam_invoke_al_fire(
     cam,
     path: str,
 ) -> tuple[bool, Optional[float], Optional[str], list[str]]:
-    """Single AL invoke; returns (fire_ok, act_fired_at, fire_error, al_methods)."""
+    """Single AL invoke (combined path — legacy task gate off)."""
     act_fired_at = time.time()
-    ok, al_methods, _task = _automation_abs_screenshot_one_invoke(path, cam)
+    ok, al_methods, _task, _task_meta = _automation_abs_screenshot_one_invoke(path, cam)
     fire_error: Optional[str] = None
     if not ok:
         act_fired_at = None
@@ -1783,12 +1856,21 @@ def _ps_c_one_cam_phase_a_fire_and_return(
             "cap001:fire_only_after_mcp_disconnect",
         ]
         _purge_ps_c_still_png(path)
-        _focus_ps_c_viewport()
-        ok, act_fired_at, fire_error, al_methods = _cap001_one_cam_invoke_al_fire(cam, path)
-        methods.extend(al_methods)
+        ok, act_fired_at, fire_error, wire_methods, wire_meta = (
+            _cap001_fire_only_al_ready_and_invoke(cam, path)
+        )
+        methods.extend(wire_methods)
         if fire_error:
             blocked.append("one_cam_automation_invoke_failed")
-        lit_aim_prep = {"cap001_mode": "fire_only", CAP001_AL_AFTER_MCP_DISCONNECT_V1: True}
+            if wire_meta.get("task_valid") is False:
+                blocked.append(
+                    f"cap001_fire_only_invalid_al_task:{wire_meta.get('al_task', {}).get('reason')}"
+                )
+        lit_aim_prep = {
+            "cap001_mode": "fire_only",
+            CAP001_AL_AFTER_MCP_DISCONNECT_V1: True,
+            **wire_meta,
+        }
     elif prep_only and not fire_only:
         prep_methods, prep_blocked, lit_aim_prep = _cap001_prepare_one_cam_lit_aim_before_fire(
             cam, cam_label
