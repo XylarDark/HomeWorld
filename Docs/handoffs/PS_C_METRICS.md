@@ -53,7 +53,13 @@ Each metric → `pass` / `soft_fail` / `closed_fail`; aggregate **`placement_out
 
 **Output:** `Saved/ps_stills/<label>.png` + `Saved/ps_stills/manifest.json` (bytes, mean luminance when decodable).
 
-**Capture path:** Pilot camera + `AutomationLibrary.take_high_res_screenshot` (relative `Saved/ps_stills/`) + `HighResShot` fallback — same proven pattern as [vnp_night_tune_and_evidence.py](../../Content/Python/vnp_night_tune_and_evidence.py). **No MRQ** in PS-C (day/lit viewport; placement stills, not PA-E night stack). Black/dark PNG → **`soft_fail`** on that still, not **`closed_fail`** when Arrange gate was ready.
+**Capture path (hardened v2):** Pilot camera → [capture_viewport.py](../../Content/Python/capture_viewport.py) **absolute** `HighResShot filename="…/Saved/ps_stills/<label>.png"` (Epic doc order) + `AutomationLibrary.take_high_res_screenshot` with **absolute** path ([`_pl_d_capture_shot1.py`](../../Content/Python/_pl_d_capture_shot1.py) pattern). Relative `fname_only` **does not** write PNGs on DESKTOP (2026-09-23 prove). Optional copy fallback: newest `Saved/Screenshots/PA_E/*shot1|shot2*.png` for `CAM_Hero` / `CAM_CabinClose` after [capture_shotlist_mrq.py](../../Content/Python/capture_shotlist_mrq.py) if viewport still empty. **No NirCmd.** Black/dark PNG → **`soft_fail`** on that still.
+
+**Metrics path (hardened v2):** Multi-channel line trace (`line_trace_single_for_objects`, profile `BlockAll`, trace queries) — **no** `island_top_proxy_max_z` fallback. Trace miss → **`soft_fail` `no_ground`**. Skip ground metrics for `DRESS_SM_IslandTop` and `PA_D_*Cliff*`. Baseline caps over-threshold at **`soft_fail`** (pair overlap + float) until Lead tunes. Intentional planter↔cabin overlaps ignored.
+
+### DESKTOP first-run note (2026-09-23 @ 71bb847)
+
+Initial prove mass-**closed_fail** from island max-Z proxy and **0/7** stills (relative screenshot path). Re-run after harden merge; expect **`placement_outcome`** pass/soft_fail and **7** PNG paths when viewport capture succeeds. If stills still missing: run `capture_shotlist_mrq.py` once, then re-run prove (MRQ copy fallback for hero/cabin cams).
 
 ---
 

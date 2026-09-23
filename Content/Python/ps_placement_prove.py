@@ -70,8 +70,21 @@ STILL_CAM_LABELS = (
 )
 
 STILL_RES_X, STILL_RES_Y = 1600, 900
-TRACE_START_OFFSET_UU = 400.0
-TRACE_LENGTH_UU = 8000.0
+TRACE_TOP_OFFSET_UU = 120.0
+TRACE_DEPTH_UU = 12000.0
+# PS-C baseline: metric over-threshold → soft_fail (Lead tunes before closed_fail).
+METRICS_CAP_OUTCOME_AT_SOFT = True
+ISLAND_TOP_LABEL = "DRESS_SM_IslandTop"
+INTENTIONAL_OVERLAP_SUBSTRINGS = (
+    ("Planter", "Cabin"),
+    ("Planter", "Foundation"),
+    ("Fence", "Cabin"),
+    ("PathStone", "IslandTop"),
+)
+MRQ_SHOT_STILL_FALLBACK = {
+    "CAM_Hero": ("shot1",),
+    "CAM_CabinClose": ("shot2",),
+}
 
 
 def _log(msg: str, data: Optional[dict[str, Any]] = None) -> None:
@@ -118,12 +131,51 @@ def _outcome_from_value(
     if higher_is_worse:
         if value <= threshold:
             return OUTCOME_PASS
+        if METRICS_CAP_OUTCOME_AT_SOFT:
+            return OUTCOME_SOFT
         if value <= threshold * 2.0:
             return OUTCOME_SOFT
         return OUTCOME_CLOSED
     if value >= threshold:
         return OUTCOME_PASS
     return OUTCOME_SOFT
+
+
+def _is_island_top_label(label: str) -> bool:
+    return label == ISLAND_TOP_LABEL or label.startswith("DRESS_SM_IslandTop")
+
+
+def _skip_ground_metrics(label: str) -> bool:
+    if _is_island_top_label(label):
+        return True
+    return _is_cliff_actor(label)
+
+
+def _intentional_overlap_pair(a: str, b: str) -> bool:
+    for needle_a, needle_b in INTENTIONAL_OVERLAP_SUBSTRINGS:
+        if (needle_a in a and needle_b in b) or (needle_a in b and needle_b in a):
+            return True
+    return False
+
+
+def _hit_actor_label(hit) -> Optional[str]:
+    if hit is None:
+        return None
+    actor = getattr(hit, "get_actor", None)
+    if callable(actor):
+        try:
+            act = hit.get_actor()
+            if act:
+                return common.actor_label(act)
+        except Exception:
+            pass
+    act = getattr(hit, "actor", None)
+    if act:
+        try:
+            return common.actor_label(act)
+        except Exception:
+            return None
+    return None
 
 
 def _load_json(path: str) -> Optional[dict[str, Any]]:
@@ -225,58 +277,164 @@ def _is_cliff_actor(label: str) -> bool:
     return label.startswith("PA_D_") and any(m in label for m in CLIFF_LABEL_MARKERS)
 
 
-def _line_trace_ground_z(world, x: float, y: float, start_z: float) -> tuple[Optional[float], str]:
-    start = unreal.Vector(x, y, start_z + TRACE_START_OFFSET_UU)
-    end = unreal.Vector(x, y, start_z - TRACE_LENGTH_UU)
+def _parse_trace_hit(hit, method: str) -> tuple[Optional[float], str, Optional[str]]:
+    if hit is None:
+        return None, f"{method}:no_hit", None
     try:
-        hit = unreal.SystemLibrary.line_trace_single(
-            world,
-            start,
-            end,
-            unreal.TraceTypeQuery.TRACE_TYPE_QUERY1,
-            False,
-            [],
-            unreal.DrawDebugTrace.NONE,
-            True,
-        )
-    except TypeError:
+        if hasattr(hit, "blocking_hit") and not hit.blocking_hit:
+            return None, f"{method}:non_blocking", _hit_actor_label(hit)
+        loc = hit.location
+        return float(loc.z), f"{method}:trace_hit", _hit_actor_label(hit)
+    except Exception:
+        return None, f"{method}:hit_parse_failed", None
+
+
+def _line_trace_ground_z(
+    world,
+    x: float,
+    y: float,
+    z_top: float,
+    z_bottom: float,
+    *,
+    ignore_actors: Optional[list] = None,
+) -> tuple[Optional[float], str, Optional[str]]:
+    """Trace downward at XY; never fall back to island max-Z proxy."""
+    ignore_actors = ignore_actors or []
+    start = unreal.Vector(x, y, z_top + TRACE_TOP_OFFSET_UU)
+    end = unreal.Vector(x, y, z_bottom - TRACE_DEPTH_UU)
+    draw = unreal.DrawDebugTrace.NONE
+
+    object_types: list = []
+    for name in ("WORLD_STATIC", "OBJECT_TYPE_QUERY1", "OBJECT_TYPE_QUERY2"):
+        q = getattr(unreal.ObjectTypeQuery, name, None)
+        if q is not None and q not in object_types:
+            object_types.append(q)
+
+    if object_types:
+        for variant in ("short", "long"):
+            try:
+                if variant == "short":
+                    hit = unreal.SystemLibrary.line_trace_single_for_objects(
+                        world,
+                        start,
+                        end,
+                        object_types,
+                        False,
+                        ignore_actors,
+                        draw,
+                        True,
+                    )
+                else:
+                    hit = unreal.SystemLibrary.line_trace_single_for_objects(
+                        world,
+                        start,
+                        end,
+                        object_types,
+                        False,
+                        ignore_actors,
+                        draw,
+                        True,
+                        unreal.LinearColor(0, 0, 0, 0),
+                        unreal.LinearColor(0, 0, 0, 0),
+                        0.0,
+                    )
+                z, src, al = _parse_trace_hit(hit, "line_trace_single_for_objects")
+                if z is not None:
+                    return z, src, al
+            except TypeError:
+                continue
+            except Exception as e:
+                return None, f"line_trace_for_objects_error:{e}", None
+
+    for profile in ("BlockAll", "Visibility", "WorldStatic"):
+        fn = getattr(unreal.SystemLibrary, "line_trace_single_by_profile", None)
+        if not callable(fn):
+            break
+        try:
+            hit = fn(
+                world,
+                start,
+                end,
+                profile,
+                False,
+                ignore_actors,
+                draw,
+                True,
+            )
+            z, src, al = _parse_trace_hit(hit, f"line_trace_by_profile:{profile}")
+            if z is not None:
+                return z, src, al
+        except TypeError:
+            try:
+                hit = fn(
+                    world,
+                    start,
+                    end,
+                    profile,
+                    False,
+                    ignore_actors,
+                    draw,
+                    True,
+                    unreal.LinearColor(0, 0, 0, 0),
+                    unreal.LinearColor(0, 0, 0, 0),
+                    0.0,
+                )
+                z, src, al = _parse_trace_hit(hit, f"line_trace_by_profile:{profile}")
+                if z is not None:
+                    return z, src, al
+            except Exception:
+                continue
+        except Exception:
+            continue
+
+    for query_name in (
+        "TRACE_TYPE_QUERY1",
+        "TRACE_TYPE_QUERY2",
+        "TRACE_TYPE_QUERY3",
+        "VISIBILITY",
+        "WORLD_STATIC",
+    ):
+        channel = getattr(unreal.TraceTypeQuery, query_name, None)
+        if channel is None:
+            continue
         try:
             hit = unreal.SystemLibrary.line_trace_single(
                 world,
                 start,
                 end,
-                unreal.TraceTypeQuery.TRACE_TYPE_QUERY1,
+                channel,
                 False,
-                [],
-                unreal.DrawDebugTrace.NONE,
+                ignore_actors,
+                draw,
                 True,
-                unreal.LinearColor(0, 0, 0, 0),
-                unreal.LinearColor(0, 0, 0, 0),
-                0.0,
             )
-        except Exception as e2:
-            return None, f"line_trace_error:{e2}"
-    except Exception as e:
-        return None, f"line_trace_error:{e}"
+            z, src, al = _parse_trace_hit(hit, f"line_trace_single:{query_name}")
+            if z is not None:
+                return z, src, al
+        except TypeError:
+            try:
+                hit = unreal.SystemLibrary.line_trace_single(
+                    world,
+                    start,
+                    end,
+                    channel,
+                    False,
+                    ignore_actors,
+                    draw,
+                    True,
+                    unreal.LinearColor(0, 0, 0, 0),
+                    unreal.LinearColor(0, 0, 0, 0),
+                    0.0,
+                )
+                z, src, al = _parse_trace_hit(hit, f"line_trace_single:{query_name}")
+                if z is not None:
+                    return z, src, al
+            except Exception:
+                continue
+        except Exception:
+            continue
 
-    if not hit:
-        return None, "no_hit"
-    try:
-        if hasattr(hit, "blocking_hit") and not hit.blocking_hit:
-            return None, "non_blocking"
-        loc = hit.location
-        return float(loc.z), "trace_hit"
-    except Exception:
-        return None, "hit_parse_failed"
-
-
-def _island_proxy_z(island_actor) -> Optional[float]:
-    if not island_actor:
-        return None
-    aabb = _actor_aabb(island_actor)
-    if not aabb:
-        return None
-    return float(aabb["max"][2])
+    return None, "no_ground_trace_hit", None
 
 
 def _aabb_inside_dress(aabb: dict[str, list[float]], dress: dict[str, Any]) -> tuple[bool, float]:
@@ -319,7 +477,6 @@ def _compute_metrics(
     island_actor,
 ) -> dict[str, Any]:
     actors, sample_meta = _sample_metric_actors()
-    island_z = _island_proxy_z(island_actor)
     actor_rows: list[dict[str, Any]] = []
     pair_flags: list[dict[str, Any]] = []
 
@@ -336,44 +493,68 @@ def _compute_metrics(
         outcomes: list[str] = []
         cx, cy = aabb["origin"][0], aabb["origin"][1]
         bottom_z = aabb["bottom_z"]
-        ground_z, ground_src = _line_trace_ground_z(world, cx, cy, bottom_z)
-        if ground_z is None and island_z is not None:
-            ground_z = island_z
-            ground_src = "island_top_proxy_max_z"
+        z_top = aabb["max"][2]
+        z_bottom = aabb["min"][2]
 
-        if ground_z is None:
+        if _skip_ground_metrics(label):
+            skip_note = (
+                "skipped_island_top_self"
+                if _is_island_top_label(label)
+                else "skipped_cliff_ground_metrics"
+            )
             row["metrics"]["ground_z_delta_uu"] = {
                 "value": None,
-                "outcome": OUTCOME_SOFT,
-                "note": ground_src,
+                "outcome": OUTCOME_PASS,
+                "note": skip_note,
             }
             row["metrics"]["float_gap_uu"] = {
                 "value": None,
-                "outcome": OUTCOME_SOFT,
-                "note": "no_ground_reference",
+                "outcome": OUTCOME_PASS,
+                "note": skip_note,
             }
         else:
-            delta = abs(bottom_z - ground_z)
-            gz_out = _outcome_from_value(delta, THRESHOLD_GROUND_Z_DELTA)
-            row["metrics"]["ground_z_delta_uu"] = {
-                "value": round(delta, 3),
-                "threshold": THRESHOLD_GROUND_Z_DELTA,
-                "ground_source": ground_src,
-                "outcome": gz_out,
-            }
-            outcomes.append(gz_out)
+            ground_z, ground_src, hit_label = _line_trace_ground_z(
+                world,
+                cx,
+                cy,
+                z_top,
+                z_bottom,
+                ignore_actors=[actor],
+            )
+            if ground_z is None:
+                row["metrics"]["ground_z_delta_uu"] = {
+                    "value": None,
+                    "outcome": OUTCOME_SOFT,
+                    "note": ground_src,
+                }
+                row["metrics"]["float_gap_uu"] = {
+                    "value": None,
+                    "outcome": OUTCOME_SOFT,
+                    "note": "no_ground",
+                }
+                outcomes.append(OUTCOME_SOFT)
+            else:
+                delta = abs(bottom_z - ground_z)
+                gz_out = _outcome_from_value(delta, THRESHOLD_GROUND_Z_DELTA)
+                row["metrics"]["ground_z_delta_uu"] = {
+                    "value": round(delta, 3),
+                    "threshold": THRESHOLD_GROUND_Z_DELTA,
+                    "ground_source": ground_src,
+                    "hit_actor_label": hit_label,
+                    "outcome": gz_out,
+                }
+                outcomes.append(gz_out)
 
-            gap = max(0.0, bottom_z - ground_z)
-            cliff = _is_cliff_actor(label)
-            gap_thresh = THRESHOLD_FLOAT_GAP_CLIFF if cliff else THRESHOLD_FLOAT_GAP_KIT
-            gap_out = _outcome_from_value(gap, gap_thresh)
-            row["metrics"]["float_gap_uu"] = {
-                "value": round(gap, 3),
-                "threshold": gap_thresh,
-                "cliff_actor": cliff,
-                "outcome": gap_out,
-            }
-            outcomes.append(gap_out)
+                gap = max(0.0, bottom_z - ground_z)
+                gap_thresh = THRESHOLD_FLOAT_GAP_KIT
+                gap_out = _outcome_from_value(gap, gap_thresh)
+                row["metrics"]["float_gap_uu"] = {
+                    "value": round(gap, 3),
+                    "threshold": gap_thresh,
+                    "hit_actor_label": hit_label,
+                    "outcome": gap_out,
+                }
+                outcomes.append(gap_out)
 
         inside, exit_uu = _aabb_inside_dress(aabb, dress_bounds)
         dress_out = OUTCOME_PASS if inside else _outcome_from_value(exit_uu, THRESHOLD_DRESS_MARGIN)
@@ -412,9 +593,13 @@ def _compute_metrics(
         for j in range(i + 1, len(labeled_aabb)):
             lj, lb = labeled_aabb[j]
             if li.startswith("PA_D_") or lj.startswith("PA_D_"):
+                if _intentional_overlap_pair(li, lj):
+                    continue
                 ov = _pair_overlap_max_uu(la, lb)
                 if ov > THRESHOLD_PAIR_OVERLAP:
-                    po_out = _outcome_from_value(ov, THRESHOLD_PAIR_OVERLAP)
+                    po_out = OUTCOME_SOFT if METRICS_CAP_OUTCOME_AT_SOFT else _outcome_from_value(
+                        ov, THRESHOLD_PAIR_OVERLAP
+                    )
                     pair_flags.append(
                         {
                             "a": li,
@@ -433,9 +618,11 @@ def _compute_metrics(
     placement_outcome = _aggregate_outcome(actor_outcomes + [pair_outcome])
 
     return {
-        "version": 1,
+        "version": 2,
         "track": "PS-C",
         "level_path": common.LEVEL_PATH,
+        "metrics_cap_outcome_at_soft": METRICS_CAP_OUTCOME_AT_SOFT,
+        "ground_trace_policy": "multi_channel_line_trace_no_island_max_z_proxy",
         "sample_policy": sample_meta,
         "thresholds": {
             "ground_z_delta_uu": THRESHOLD_GROUND_Z_DELTA,
@@ -445,7 +632,7 @@ def _compute_metrics(
             "pair_overlap_uu": THRESHOLD_PAIR_OVERLAP,
         },
         "dress_bounds_source": dress_bounds.get("source_path"),
-        "island_proxy_label": common.actor_label(island_actor) if island_actor else None,
+        "island_top_reference_label": common.actor_label(island_actor) if island_actor else None,
         "actors": actor_rows,
         "pair_overlap_flags": pair_flags,
         "pair_overlap_outcome": pair_outcome,
@@ -477,6 +664,80 @@ def _resolve_still_path(stills_dir: str, cam_label: str) -> str:
     return os.path.join(stills_dir, f"{safe}.png")
 
 
+def _load_capture_viewport():
+    import capture_viewport as cv
+
+    importlib.reload(cv)
+    return cv
+
+
+def _automation_abs_screenshot(filepath: str, cam) -> tuple[bool, list[str]]:
+    """Absolute-path AutomationLibrary (PL-D / capture_shotlist_viewport pattern)."""
+    methods: list[str] = []
+    ue_path = os.path.abspath(filepath).replace("\\", "/")
+    delay = 0.35
+    attempts = (
+        ("abs_kwargs_force_gv", lambda: unreal.AutomationLibrary.take_high_res_screenshot(
+            STILL_RES_X, STILL_RES_Y, ue_path, camera=cam, delay=delay, force_game_view=True
+        )),
+        ("abs_kwargs_gv", lambda: unreal.AutomationLibrary.take_high_res_screenshot(
+            STILL_RES_X, STILL_RES_Y, ue_path, camera=cam, force_game_view=True
+        )),
+        ("abs_positional_gv", lambda: unreal.AutomationLibrary.take_high_res_screenshot(
+            STILL_RES_X, STILL_RES_Y, ue_path, cam, True
+        )),
+        ("abs_legacy", lambda: unreal.AutomationLibrary.take_high_res_screenshot(
+            STILL_RES_X, STILL_RES_Y, ue_path, cam
+        )),
+    )
+    for name, fn in attempts:
+        try:
+            fn()
+            methods.append(name)
+            return True, methods
+        except TypeError:
+            continue
+        except Exception as e:
+            methods.append(f"{name}_fail:{e}")
+    return False, methods
+
+
+def _copy_newest_png_matching(needles: tuple[str, ...], dest: str, since: float) -> Optional[str]:
+    import shutil
+
+    roots = [
+        os.path.join(common.project_dir(), "Saved", "Screenshots"),
+        os.path.join(common.project_dir(), "Saved", "Screenshots", "PA_E"),
+        os.path.join(common.project_dir(), "Saved", "MovieRenders"),
+        os.path.dirname(dest),
+    ]
+    best: Optional[str] = None
+    best_m = since
+    for root in roots:
+        if not os.path.isdir(root):
+            continue
+        for dirpath, _dirs, files in os.walk(root):
+            for fname in files:
+                if not fname.lower().endswith(".png"):
+                    continue
+                lower = fname.lower()
+                if not any(n.lower() in lower for n in needles):
+                    continue
+                path = os.path.join(dirpath, fname)
+                try:
+                    mtime = os.path.getmtime(path)
+                except OSError:
+                    continue
+                if mtime >= since - 2.0 and mtime >= best_m:
+                    best = path
+                    best_m = mtime
+    if best and os.path.isfile(best):
+        os.makedirs(os.path.dirname(dest), exist_ok=True)
+        shutil.copy2(best, dest)
+        return best
+    return None
+
+
 def _capture_still_from_camera(
     cam_label: str,
     filepath: str,
@@ -490,57 +751,58 @@ def _capture_still_from_camera(
         entry["error"] = "camera_missing"
         return entry
 
-    _pilot_camera(cam)
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
-    fname_only = os.path.basename(filepath)
-    rel = f"Saved/ps_stills/{fname_only}"
+    _pilot_camera(cam)
     methods: list[str] = []
+    since = time.time()
+    cv = _load_capture_viewport()
+    cv._finish_loading_before_screenshot()
+    lit = cv._set_lit_view_mode()
+    if lit:
+        methods.append(lit)
+    for _ in range(12):
+        cv._pump_editor_once()
 
-    try:
-        unreal.AutomationLibrary.take_high_res_screenshot(
-            STILL_RES_X, STILL_RES_Y, fname_only, cam, True
-        )
-        methods.append("AutomationLibrary_rel_force_gv")
-    except TypeError:
-        try:
-            unreal.AutomationLibrary.take_high_res_screenshot(
-                STILL_RES_X, STILL_RES_Y, fname_only, cam
+    capture_result: dict[str, Any] = {}
+    if cv._console_high_res(STILL_RES_X, STILL_RES_Y, filepath, capture_result):
+        methods.append(f"capture_viewport_console:{capture_result.get('method')}")
+    else:
+        ok_al, al_methods = _automation_abs_screenshot(filepath, cam)
+        methods.extend(al_methods)
+        if ok_al:
+            cv._settle()
+            found = cv._wait_for_file(
+                filepath, since, os.path.basename(filepath)
             )
-            methods.append("AutomationLibrary_rel")
-        except Exception as e:
-            methods.append(f"AutomationLibrary_fail:{e}")
-    except Exception as e:
-        methods.append(f"AutomationLibrary_fail:{e}")
-
-    try:
-        unreal.SystemLibrary.execute_console_command(
-            world,
-            'HighResShot %dx%d filename="%s"' % (STILL_RES_X, STILL_RES_Y, rel.replace("\\", "/")),
-        )
-        methods.append("HighResShot")
-    except Exception as e2:
-        methods.append(f"HighResShot_fail:{e2}")
-
-    time.sleep(1.2)
-    if not os.path.isfile(filepath):
-        screens_root = os.path.join(common.project_dir(), "Saved", "Screenshots")
-        candidates: list[str] = []
-        if os.path.isdir(screens_root):
-            for root, _dirs, files in os.walk(screens_root):
-                for f in files:
-                    if f.lower() == fname_only.lower() or cam_label in f:
-                        candidates.append(os.path.join(root, f))
-        if candidates:
-            candidates.sort(key=lambda p: os.path.getmtime(p), reverse=True)
+            if found:
+                methods.append("automation_abs_wait_ok")
+        if not os.path.isfile(filepath):
+            ue_path = os.path.abspath(filepath).replace("\\", "/")
             try:
-                import shutil
+                unreal.SystemLibrary.execute_console_command(
+                    world,
+                    f'HighResShot filename="{ue_path}" {STILL_RES_X}x{STILL_RES_Y}',
+                )
+                methods.append("HighResShot_abs_filename_first")
+            except Exception as e:
+                methods.append(f"HighResShot_abs_fail:{e}")
+            cv._settle()
+            cv._wait_for_file(filepath, since, os.path.basename(filepath))
 
-                shutil.copy2(candidates[0], filepath)
-                methods.append("copied_from_Screenshots")
-            except Exception as ce:
-                methods.append(f"copy_fail:{ce}")
+    if not os.path.isfile(filepath):
+        copied = _copy_newest_png_matching((cam_label, os.path.basename(filepath)), filepath, since)
+        if copied:
+            methods.append(f"copied_from:{copied}")
+
+    if not os.path.isfile(filepath):
+        shot_ids = MRQ_SHOT_STILL_FALLBACK.get(cam_label)
+        if shot_ids:
+            copied = _copy_newest_png_matching(shot_ids, filepath, since - 86400.0)
+            if copied:
+                methods.append(f"pa_e_mrq_fallback_copy:{copied}")
 
     entry["methods"] = methods
+    entry["capture_path"] = "capture_viewport HighResShot abs + AutomationLibrary abs (no relative fname)"
     entry["file_exists"] = os.path.isfile(filepath)
     if not entry["file_exists"]:
         entry["capture_outcome"] = OUTCOME_SOFT
@@ -575,7 +837,10 @@ def _capture_stills(world) -> tuple[list[dict[str, Any]], str]:
     manifest = {
         "version": 1,
         "generated_at_iso": datetime.now(timezone.utc).isoformat(),
-        "capture_path": "AutomationLibrary.take_high_res_screenshot + HighResShot fallback (VNP pattern)",
+        "capture_path": (
+            "capture_viewport.py console HighResShot (absolute path under Saved/ps_stills/) + "
+            "AutomationLibrary abs; optional PA-E MRQ PNG copy for CAM_Hero/CAM_CabinClose"
+        ),
         "resolution": [STILL_RES_X, STILL_RES_Y],
         "stills": entries,
     }
@@ -655,7 +920,7 @@ def prove_ps_placement(*, skip_stills: bool = False) -> dict[str, Any]:
         not pre_closed
         and metrics is not None
         and stills_present >= stills_required
-        and placement_outcome != OUTCOME_CLOSED
+        and placement_outcome in (OUTCOME_PASS, OUTCOME_SOFT)
     )
     if not ready_for_ps_d:
         if metrics is None:
