@@ -7,6 +7,9 @@ invent. See [OWNERSHIP.md](OWNERSHIP.md).
 Settled boundaries: [architecture/HOMEWORLD_TRADEOFFS.md](../architecture/HOMEWORLD_TRADEOFFS.md).
 Standing prompt for a new boundary: [tradeoff-analyst-brief.md](../architecture/tradeoff-analyst-brief.md).
 
+Module depth inside the game client: [HOMEWORLD_DESIGN.md](../architecture/HOMEWORLD_DESIGN.md).
+Standing prompt: [design-complexity-brief.md](../architecture/design-complexity-brief.md).
+
 Unreal-specific notes (engine version, render pipeline, Data Assets, plugins, Epic
 C++) belong in [templates/unreal](../templates/unreal/README.md) and
 [`.cursor/rules/21-unreal-engine.mdc`](../../.cursor/rules/21-unreal-engine.mdc).

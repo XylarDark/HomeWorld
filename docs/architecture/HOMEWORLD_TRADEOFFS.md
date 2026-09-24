@@ -2,6 +2,8 @@
 
 Least-worst choices already fixed by the vision and the conventions. The standing prompt for a later review is [tradeoff-analyst-brief.md](tradeoff-analyst-brief.md). Harness copy: [DevEnvTemplate/docs/architecture/tradeoffs.md](../../DevEnvTemplate/docs/architecture/tradeoffs.md).
 
+Code inside the game quantum: [HOMEWORLD_DESIGN.md](HOMEWORLD_DESIGN.md).
+
 Do not look for a better shape. These are the accepted costs. Anything not in the table is **not decided**.
 
 ## Ranked characteristics (from vision, not a wishlist)

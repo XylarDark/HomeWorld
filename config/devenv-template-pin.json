@@ -2,8 +2,8 @@
   "path": "DevEnvTemplate",
   "remote": "https://github.com/XylarDark/DevEnvTemplate.git",
   "branch": "master",
-  "sha": "f3eac4e8461a96fbf41960611f97b41500ea7247",
-  "shortSha": "f3eac4e",
+  "sha": "002773adbf4e4476e523eda338ff48d0ffbe7d7e",
+  "shortSha": "002773a",
   "docPaths": [
     "docs/Setup/CURSOR_DEV.md",
     "Docs/13b_HR2_B_COLD_CLONE.md"
@@ -11,5 +11,5 @@
   "hr2Phase": "HR2-B",
   "updated": "2026-09-23",
   "productName": "DevHarness",
-  "note": "DevHarness PR #34 — architecture trade-off brief and extras skill."
+  "note": "DevHarness PR #35 — design complexity brief and extras skill."
 }

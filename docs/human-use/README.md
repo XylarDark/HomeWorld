@@ -23,6 +23,8 @@ Start here: **[OWNERSHIP.md](OWNERSHIP.md)** (jobs, split, alert shape). Then
 
 **Architecture trade-offs** (least-worst boundaries, not a new service map): [../architecture/HOMEWORLD_TRADEOFFS.md](../architecture/HOMEWORLD_TRADEOFFS.md) · skill `architecture-tradeoffs`.
 
+**Design complexity** (depth inside the game client): [../architecture/HOMEWORLD_DESIGN.md](../architecture/HOMEWORLD_DESIGN.md) · skill `design-complexity`.
+
 **Swarm vs coding chat:** [SWARM_MODE_ROUTING.md](SWARM_MODE_ROUTING.md) — detect SWARM / NON-SWARM / HYBRID + ModelClass at task start (skill `swarm-mode-routing`). Research: [SWARM_ROUTING_RESEARCH.md](../Automation/SWARM_ROUTING_RESEARCH.md).
 
 This is agentic engineering, not vibe coding. The model can leave the syntax. It
