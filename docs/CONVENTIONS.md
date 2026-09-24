@@ -19,6 +19,8 @@ HomeWorld is developed **programmatically by default**: maximize C++ (and Python
 
 When adding new features, prefer C++ for the core implementation; use Blueprint for data and content integration, not for control flow or gameplay logic.
 
+**Architecture trade-offs:** The game is one deployable client. C++ is the single writer of gameplay behavior; Blueprint assigns content. The harness is a separate repo. Do not split gameplay into services. Full map and what we are not deciding yet: [docs/architecture/HOMEWORLD_TRADEOFFS.md](architecture/HOMEWORLD_TRADEOFFS.md). Standing prompt for later reviews: [tradeoff-analyst-brief.md](architecture/tradeoff-analyst-brief.md).
+
 **Debug instrumentation and log-driven validation:** When implementing new features, add minimal debug instrumentation (entry/exit, key branches, critical values, and for user-triggered actions: trigger + outcome) by default. Every feature must be **validatable from logs** (Output Log, log files, or test output) so you can confirm it works without prompting for logging. See `.cursor/rules/16-feature-debug-instrumentation.mdc`.
 
 ---

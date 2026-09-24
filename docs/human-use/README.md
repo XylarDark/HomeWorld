@@ -21,6 +21,8 @@ Start here: **[OWNERSHIP.md](OWNERSHIP.md)** (jobs, split, alert shape). Then
 
 **Taste Profiler** (durable prefs; read before inventing): [taste-profiler.md](taste-profiler.md) · [taste-profile.md](taste-profile.md) · skill `taste-profiler` · [Docs/29](../../Docs/29_TASTE_PROFILER.md).
 
+**Architecture trade-offs** (least-worst boundaries, not a new service map): [../architecture/HOMEWORLD_TRADEOFFS.md](../architecture/HOMEWORLD_TRADEOFFS.md) · skill `architecture-tradeoffs`.
+
 **Swarm vs coding chat:** [SWARM_MODE_ROUTING.md](SWARM_MODE_ROUTING.md) — detect SWARM / NON-SWARM / HYBRID + ModelClass at task start (skill `swarm-mode-routing`). Research: [SWARM_ROUTING_RESEARCH.md](../Automation/SWARM_ROUTING_RESEARCH.md).
 
 This is agentic engineering, not vibe coding. The model can leave the syntax. It

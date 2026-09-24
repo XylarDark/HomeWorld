@@ -4,6 +4,9 @@ You own purpose, private knowledge, and vision. The agent owns flesh-out only af
 you decide (or skip). Blank fields are a missing **taste** decision, not a prompt to
 invent. See [OWNERSHIP.md](OWNERSHIP.md).
 
+Settled boundaries: [architecture/HOMEWORLD_TRADEOFFS.md](../architecture/HOMEWORLD_TRADEOFFS.md).
+Standing prompt for a new boundary: [tradeoff-analyst-brief.md](../architecture/tradeoff-analyst-brief.md).
+
 Unreal-specific notes (engine version, render pipeline, Data Assets, plugins, Epic
 C++) belong in [templates/unreal](../templates/unreal/README.md) and
 [`.cursor/rules/21-unreal-engine.mdc`](../../.cursor/rules/21-unreal-engine.mdc).
