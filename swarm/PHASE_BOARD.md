@@ -4,7 +4,8 @@
 
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **Conductor** (parent DESKTOP) / **DESKTOP-21CT3H0**
-**Blocked by:** none — next track TBD (Taste Gate if inventing)
+**ball:** Conductor (ProveOps B refine / harness idle — CAP product Do held)
+**Blocked by:** none — next track TBD (Taste Gate if inventing) · CAP-002 Do **HELD**
 **Sign-off doc:** [Docs/17_HS_AUDIT_SIGN_OFF.md](../Docs/17_HS_AUDIT_SIGN_OFF.md) — **SIGNED OFF** Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET.
 
 
@@ -23,6 +24,21 @@ Status values: `LOCKED` `OPEN` `IN PROGRESS` `GATE FAILED` `CLOSED` `GATE READY`
 
 ---
 
+## CAP park fitness (ProveOps A — no product Do from this board alone)
+
+Conductor-only status. Increment **`ladders`** only when a Fix SHA lands on that CAP writer. Lead moves `Do: HELD` → greenlit.
+
+| CAP | State | Evidence | ladders | Do |
+|-----|-------|----------|---------|-----|
+| **CAP-001** STOP_AL | parked | soft_fail `81798e8` | 1 | Do: NO |
+| **CAP-002** SceneCapture | EXIT accepted | SC2D→RT `RTF_RGBA8`→PNG; settle-after-yield | 0 | Do: HELD |
+
+Roster while CAP product open: Conductor + Test + Fix. Design / Implement **parked**. Ban: AL · sync-writer · wait knobs · N-cam · third ladder.
+
+
+
+---
+
 ## Host owner lane (HR3-D convention)
 
 Every **active** post-audit / HR / VP row must name **who runs evidence**:
@@ -32,6 +48,13 @@ Every **active** post-audit / HR / VP row must name **who runs evidence**:
 | **CLOUD** | Cursor cloud agent (Linux VM) — docs, C++ source, CI; no MCP/PIE |
 | **DESKTOP** | **DESKTOP-21CT3H0** — Conductor **parent** only ([HR3_A_WINDOWS_EXEC.md](../Docs/handoffs/HR3_A_WINDOWS_EXEC.md)); Task executors **FAIL** |
 | **Lead** | Human — GitHub Settings, **`APPROVE *`** gates |
+
+
+### Legend — `ball:` (wake law)
+
+| Field | Meaning |
+|-------|---------|
+| **ball:** | Current ball-holder seat name (Conductor / Design / Implement / Test / Fix). Only the ball-holder may post Act narrative. Non-ball-holders: **≤5 lines + path(s)** or silence. Conductor posts **one digest** per Act (gate + paths + SHA + next string). |
 
 **DESKTOP Shell law (HS-B):** Conductor **parent** session only — never assign DESKTOP Shell / MCP / PIE to Cursor **Task** executors or cloud Linux VMs. Happy path: [WINDOWS_BRIDGE.md](../docs/Setup/WINDOWS_BRIDGE.md) · [SWARM_OPS.md](SWARM_OPS.md) §16. Re-verify rule: [HR3_D_EVIDENCE_LANE.md](../Docs/handoffs/HR3_D_EVIDENCE_LANE.md).
 
