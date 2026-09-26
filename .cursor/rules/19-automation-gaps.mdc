@@ -2,6 +2,7 @@
 name: "Automation gap handling"
 description: "When a task hits a logged automation gap, try programmatic solution first, then GUI automation; update AUTOMATION_GAPS with outcomes."
 alwaysApply: false
+globs: "docs/Automation/AUTOMATION_GAPS.md"
 priority: 5
 version: 1.0
 ---

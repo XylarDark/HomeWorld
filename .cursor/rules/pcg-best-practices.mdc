@@ -2,6 +2,7 @@
 name: "PCG Best Practices"
 description: "Before changing PCG graphs or adding nodes, check best practices and no-access docs"
 alwaysApply: false
+globs: "**/*PCG*, **/docs/PCG/**"
 priority: 5
 version: 1.0
 ---
