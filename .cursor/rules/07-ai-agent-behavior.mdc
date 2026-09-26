@@ -3,196 +3,56 @@ name: "AI Agent Behavior Rules"
 description: "Follow agent behavior protocols when performing any task to ensure cleanup, error recording, and safe tool usage"
 alwaysApply: true
 priority: 9
-version: 1.0
+version: 2.0
 ---
 
 # AI Agent Behavior Rules
 
-## Session Continuity (progress-file pattern)
+Short always-on card (HARNESS_OPT bite 6.3). Full MCP workflow → `09-mcp-workflow.mdc`. Idempotency / `init_unreal` → `00-core-principles.mdc`. Error/MCP validation tables → `05-error-handling.mdc`. Engine pin → `ue58-sources.mdc` (not 5.7).
 
-At the **start** of every task:
-1. **Tasks complete alert (legacy — quarantine):** If `Saved/Logs/automation_tasks_complete.md` exists, **prepend a prominent note**: pre-swarm agent loop **removed WAVE F** — do not run `Start-AllAgents*`. Active driver: [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md) + Conductor — [START_HERE.md](../../START_HERE.md). See [docs/Automation/AGENT_COMPANY.md](../../docs/Automation/AGENT_COMPANY.md) (history only).
-2. **Automation exit alert (automatic):** If `Saved/Logs/automation_exit_alert.md` exists, read it and **prepend a short automation exit summary** to your first response (exit reason, exit code, round, pending tasks, last message). Also read **Saved/Logs/automation_terminal_capture.log** (last 50 lines) and include any relevant error lines from the terminal in the summary so errors that only appeared in the external terminal are reported in chat. The user must be informed without having to ask. Then proceed with the user's request. Do not repeat the same alert in the same conversation unless the user asks again.
-3. **Latest completion (automatic):** If neither automation_tasks_complete.md nor automation_exit_alert.md exists, but `Saved/Logs/automation_last_completion.json` exists, read it and **prepend a short line** to your first response: "Latest automation: Round N completed at [timestamp]. CURRENT_TASK_LIST may have been updated. Run .\Tools\Get-AutomationStatus.ps1 to see if the loop is still running." This informs the user when something (a round) has completed even while the run may still be in progress.
-4. **Automation progress in chat:** When the user asks "automation status", "what's the agent doing", "show me agent progress", "what has happened", or similar, read **Saved/Logs/automation_heartbeat.log** (tail, last 25–30 lines), **Saved/Logs/automation_status_latest.txt** if present, and **Saved/Logs/automation_terminal_capture.log** (tail, last 40–50 lines) so any errors that appeared only in the terminal are included. Summarize: current round, elapsed time, last log lines, and any errors from the terminal capture so the user sees progress and errors in chat.
-5. **Swarm / Conductor / HR track (default post-audit):** Read `docs/SESSION_SUMMARY.md` and `swarm/PHASE_BOARD.md` — **not** the full `docs/SESSION_LOG.md` unless debugging a specific past incident.
-6. **Legacy task-list track (quarantine):** Read `docs/TaskLists/DAILY_STATE.md` for yesterday/today when explicitly on that track. Full SESSION_LOG only when needed.
+## WAVE F quarantine
 
-**Quarantine — pre-swarm automation loop:** `CURRENT_TASK_LIST`, `Start-AllAgents*`, `run_automation_cycle.py` **removed WAVE F**. Do not resurrect. Active coordination: [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md) + Conductor.
+Pre-swarm agent-company loop (`Start-AllAgents*`, `run_automation_cycle.py`, `CURRENT_TASK_LIST`) is **deleted**. Do not run or resurrect.
 
-At the **end** of every task:
-1. **Swarm / Conductor:** Append a dated block to `docs/SESSION_SUMMARY.md`; update `swarm/PHASE_BOARD.md` when status changes.
-2. **Legacy / UE engineering:** Append a summary to `docs/SESSION_LOG.md` (date, tasks completed/remaining, errors, key decisions).
-3. **Legacy DAILY_STATE (when using task lists):** Update `docs/TaskLists/DAILY_STATE.md` so the next session has correct yesterday/today/tomorrow:
-   - **Yesterday** = what was completed or in progress this session (short bullet list).
-   - **Today** = the tasks for the **next** day (copy from `docs/TaskLists/30_DAY_SCHEDULE.md` for the next Day N).
-   - **Tomorrow** = the day after that (copy from 30_DAY_SCHEDULE for Day N+1).
-   - **Current day** = set to the next day number (the day that will be "today" when the user starts the next session).
-   If no schedule work was done, you may leave Current day unchanged and only update Yesterday with what was done.
+**Active driver:** [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md) + **Conductor** — [START_HERE.md](../../START_HERE.md). Cloud packets: [swarm/CLOUD_AGENT_PACKET.md](../../swarm/CLOUD_AGENT_PACKET.md). History only: [docs/Automation/AGENT_COMPANY.md](../../docs/Automation/AGENT_COMPANY.md).
 
-## Conversation and context
+## Session alerts (read at start)
 
-- **New logical task:** When starting a new logical unit of work, prefer a new conversation so the agent stays focused. Use **@Past Chats** to bring in only the prior context you need instead of continuing a long thread.
-- **Long threads:** If the conversation is long and the agent seems confused or distracted, summarize progress and start a new chat with that summary as the first message.
+If present, prepend a short note then continue the user’s ask (do not repeat in the same conversation unless asked):
 
-## Context Window Awareness
+| File | Action |
+|------|--------|
+| `Saved/Logs/automation_tasks_complete.md` | WAVE F note + SWARM_OPS/Conductor pointer |
+| `Saved/Logs/automation_exit_alert.md` | Exit summary; also tail `Saved/Logs/automation_terminal_capture.log` (~50 lines) for errors |
+| `Saved/Logs/automation_last_completion.json` | One-line “latest automation Round N @ timestamp” if neither alert above exists |
 
-Manage context proactively to stay effective on long-horizon tasks:
+Status asks (“automation status”, “what’s the agent doing”): tail `automation_heartbeat.log`, `automation_status_latest.txt`, `automation_terminal_capture.log`.
 
-- **Targeted reads over full dumps:** Read specific line ranges or use semantic search instead of dumping entire large files.
-- **Search strategy:** Use `Grep` for exact symbol/string lookup; use `SemanticSearch` for exploratory "how/where" questions; use `Glob` for finding files by name pattern.
-- **Subtask decomposition:** Break large tasks into smaller subtasks. Complete and report on each subtask before starting the next. Use the `Task` tool to delegate independent sub-problems in parallel when possible.
-- **Avoid context pollution:** Don't read files you don't need. Don't re-read files whose content you already have in context.
+**Default track:** read `docs/SESSION_SUMMARY.md` + `swarm/PHASE_BOARD.md` (not full `SESSION_LOG` unless debugging).
 
-## Automation driver (post-audit)
+**End of task:** append dated block to `SESSION_SUMMARY.md`; update `PHASE_BOARD.md` when status changes. Legacy task-list / DAILY_STATE only when explicitly on that track.
 
-**Active:** MVP lookdev swarm — [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md) + **Conductor** ([START_HERE.md](../../START_HERE.md)). Cloud agents: [swarm/CLOUD_AGENT_PACKET.md](../../swarm/CLOUD_AGENT_PACKET.md); Windows handoff: [docs/Setup/WINDOWS_BRIDGE.md](../../docs/Setup/WINDOWS_BRIDGE.md).
-
-**Quarantine (removed WAVE F):** `Start-AllAgents*`, `run_automation_cycle.py`, agent-company loop — do **not** run or resurrect. History: [docs/Automation/AGENT_COMPANY.md](../../docs/Automation/AGENT_COMPANY.md). When the user says **"start agents"** in a **swarm** context, boot Conductor per START_HERE — not the deleted pre-swarm loop.
-
-## Tool Usage
-
-- Use `@file` references for context, not full file dumps
-- Read files before editing (don't assume structure)
-- Use semantic search for understanding codebase
-- Batch related operations when possible
-- Verify changes with linter/tests
-- **Avoid PowerShell output limiting in terminal commands** - never use `Select-Object -First N` as it causes VPN/network issues
-  - Prefer direct commands or command-specific flags for output control
-  - Accept full output - modern terminals handle large output well
-
-## When to Ask for Confirmation
-
-- Breaking changes
-- Large refactorings (> 10 files)
-- Security-sensitive changes
-- Changes to core architecture
-- When user intent is unclear
-
-## Code Generation
-
-- Generate complete, working code (no TODOs)
-- Include error handling
-- Add comments for complex logic
-- Follow project patterns
-- Verify code compiles/runs
-- **Verifiable goals:** For feature work, prefer defining or running tests as the success criterion; iterate until tests pass or document why tests are deferred. Give the agent a clear target to iterate against (see `/run-tests-and-fix` in `.cursor/commands/`).
-
-## File Management
-
-- Read files before editing
-- Preserve existing structure when possible
-- Update related files (tests, docs)
-- Don't create unnecessary files
-
-## Session Cleanup (mandatory before ending a task)
-
-Temporary files created during a session **must be deleted** before the task is considered complete. This includes:
-
-1. **Diagnostic/result JSON files** in the project root (e.g. `pie_results.json`, `gamemode_check.json`, `fix_result.json`) — these are not project artifacts.
-2. **One-off Python scripts** in `Content/Python/` created for debugging, diagnostics, or one-time fixes (e.g. `find_pawn.py`, `check_gamemode.py`, `delete_stale_asset.py`). Keep only reusable/idempotent setup scripts.
-3. **Temporary log or dump files** anywhere in the workspace that were created for intermediate inspection.
-
-**How to distinguish keep vs. delete:**
-- **Keep:** Scripts referenced by `bootstrap_project.py` or other orchestrators, config JSON files in `Content/Python/`, project docs.
-- **Delete:** Scripts written to diagnose a specific issue in this session, result/output JSON files written by those scripts, any file whose only consumer was the agent in this conversation.
-
-**When to clean up:** After the task's objectives are verified and before reporting results to the user. Do not leave cleanup for a future session.
-
-**Prefer reusable tools over one-off scripts:** Before creating a new diagnostic script, check if `mcp_harness.py`, `pie_test_runner.py`, or `blueprint_inspector.py` can handle the task. These are permanent utility scripts in `Content/Python/` that write results to `Saved/`. See `09-mcp-workflow.mdc` (Agent utility scripts).
-
-## Communication
-
-- Explain approach before implementing
-- Show reasoning for decisions
-- Flag uncertainties
-- Provide alternatives when blocked
-- Never apologize (be professional)
-
-## Terminal Command Patterns
-
-**PowerShell Compatibility:**
-- Always use `;` not `&&` for command chaining in PowerShell
-- Use separate commands when chaining is complex
-- Example: `cd project; npm install` not `cd project && npm install`
-
-**Path Navigation:**
-- Always check paths exist before navigating: `if (Test-Path "path") { Set-Location "path" }`
-- Use `Join-Path` for path construction
-- Use absolute paths from workspace root when possible
-
-## File Editing Patterns
-
-**When Files Are Blocked by Globalignore:**
-- If file creation/editing is blocked (e.g., `.env.example`):
-  1. Check if file exists and is gitignored
-  2. Use `git update-index --no-assume-unchanged <file>` to temporarily unignore
-  3. Make changes
-  4. Use `git update-index --assume-unchanged <file>` to re-ignore if needed
-  5. Alternative: Use programmatic file creation (Python/Node script) instead of direct editing
-
-## Validation Schema Alignment
-
-**When Creating Validation Schemas:**
-- Always verify API request types match validation schema structure
-- If API uses flat structure (e.g., `depth_min`, `depth_max`) but schema expects nested (e.g., `depth_range.min`), adapt schema to match API
-- Test validation with actual API request objects before finalizing
-- Document any structural differences between API types and validation schemas
-
-## Dependency Management
-
-**When Adding Testing Infrastructure:**
-- Add all testing dependencies to package.json before writing tests
-- Include: test framework, test utilities, type definitions, coverage tools
-- Verify dependencies are installed before running tests
-- Document required devDependencies in project setup instructions
-
-## Feature development: research and tutorials first
-
-When developing a **new feature** (new system, new UE subsystem, new plugin use, or significant new capability): (1) **Research first** — use **only UE 5.7–specific sources**: Epic Unreal Engine 5.7 docs, docs/KNOWN_ERRORS.md, docs/UE57_TECH.md, docs/UE57_EDITOR_UI.md, and project feature docs (e.g. PCG_BEST_PRACTICES.md). Do not rely on training data or other engine versions. See **ue57-sources.mdc**. (2) **Tutorials first** — follow tutorials that target UE 5.7 (or explicitly match 5.7) before customizing. (3) **Then expand** — extend or adapt only where the project explicitly needs something different. This is policy: research then tutorials then implement then expand. For deep research, recommend /parallel-research or /parallel-extract with "UE 5.7" in the query (see 11-parallel-plugin.mdc) and integrate the result.
-
-## Debug Mode
-
-For **hard-to-reproduce or subtle bugs** (regressions, race conditions, performance issues), suggest **Cursor Debug Mode**: the user reproduces the bug while the agent collects runtime data, instruments code with logging, generates hypotheses, and applies targeted fixes based on evidence. Do not guess; use instrumentation and hypotheses. See Cursor docs: Debug Mode for tricky bugs.
-
-## Error Recurrence Prevention
-
-- **When an error occurs** (build, lint, test, or runtime): Clearly note what failed (command, file, or step), likely cause, and the fix applied. Do not continue as if the error was unimportant.
-- **Where to record:**
-  - If the project has `docs/KNOWN_ERRORS.md` or `docs/LESSONS_LEARNED.md`, add a short entry there (error summary + fix + context).
-  - If not, state the error and fix in the response and suggest creating `docs/KNOWN_ERRORS.md` for future reference.
-- **Before similar changes:** When about to make changes in the same area or of the same type (e.g., same build system, same API, same refactor), check `docs/KNOWN_ERRORS.md` or `docs/LESSONS_LEARNED.md` if present, and avoid repeating a previously encountered and documented error.
-
-## MCP Safety Checklist
+## MCP safety (4 lines)
 
 Before any MCP call:
-- [ ] `blueprint_name` is a short name, not a full `/Game/` path (crashes Editor otherwise)
-- [ ] `docs/KNOWN_ERRORS.md` checked for the tool + property combination being used
-- [ ] Fallback plan ready (Python script or GUI automation, or log to docs/AUTOMATION_GAPS.md) in case MCP cannot resolve the target; do not assume manual steps for the user (see 20-full-automation-no-manual-steps.mdc)
 
-## AI Agent Checklist
+1. `blueprint_name` is a **short name**, not a full `/Game/` path (full path crashes the Editor).
+2. Check `docs/KNOWN_ERRORS.md` for the tool + property combination.
+3. Have a fallback (Python script / GUI automation / log `docs/Automation/AUTOMATION_GAPS.md`) — no “manual steps for the user” (see `20-full-automation-no-manual-steps.mdc`).
+4. Full envelope and tool order → **`09-mcp-workflow.mdc`** (host-canonical).
 
-- [ ] **Taste Gates** — on a taste limit (vision/map/patterns/next-track invent), load `.cursor/skills/taste-gate/SKILL.md`; **read** [taste-profile.md](../../docs/human-use/taste-profile.md) first; emit OWNERSHIP alert; queue; stop — do not invent ([docs/human-use/taste-gates.md](../../docs/human-use/taste-gates.md), Docs/28)
-- [ ] **Taste Profiler** — durable prefs in taste-profile.md; stage candidates; promote only after Lead confirm ([docs/human-use/taste-profiler.md](../../docs/human-use/taste-profiler.md), Docs/29)
-- [ ] **Swarm driver** — post-audit work uses Conductor + SWARM_OPS; do not run deleted `Start-AllAgents*` / `run_automation_cycle.py` (see Automation driver section)
-- [ ] **Tasks complete alert** — if `Saved/Logs/automation_tasks_complete.md` exists, prepend a prominent "All tasks complete; generate a new task list" note (see Session Continuity)
-- [ ] **Automation exit alert** — if `Saved/Logs/automation_exit_alert.md` exists, read it and prepend a short summary so the user is informed automatically (see Session Continuity)
-- [ ] **CURRENT_TASK_LIST (loop):** When completing a task from CURRENT_TASK_LIST, set only that task to **completed**; leave all other tasks' status unchanged so the loop continues to the next pending task
-- [ ] **Latest completion** — if neither of the above exists but `Saved/Logs/automation_last_completion.json` exists, prepend "Latest automation: Round N completed at [time]; run Get-AutomationStatus to see if still running" so the user is informed when a round has completed
-- [ ] **Session continuity** — swarm: read `docs/SESSION_SUMMARY.md` + `swarm/PHASE_BOARD.md`; legacy: SESSION_LOG + DAILY_STATE (see Session Continuity)
-- [ ] **Daily state read** — read `docs/TaskLists/DAILY_STATE.md` at task start so "yesterday" and "today" are available when the user asks
-- [ ] **New feature: research and tutorials first** — when developing a new feature: use **UE 5.7–specific sources only** (Epic 5.7 docs, project docs); see `ue57-sources.mdc` and Feature development above.
-- [ ] **Log-driven validation** — when implementing a feature, include a robust log-driven way to validate it (entry/exit, user-triggered actions, success/fail). The user must not have to prompt for logging to confirm the feature works. See `.cursor/rules/16-feature-debug-instrumentation.mdc`.
-- [ ] **UE 5.7 check** — before C++/Blueprint/PCG or plugin changes: check `unreal-cpp.mdc` pitfalls table and `docs/KNOWN_ERRORS.md`; use UE 5.7 docs for API/UI; after engine/plugin upgrade, re-verify automation access (see `automation-standards.mdc` and `docs/UE57_TECH.md`). For any Unreal-related lookups, use only 5.7 sources per `ue57-sources.mdc`.
-- [ ] **PCG Generate produces nothing** — when the user reports that PCG Generate shows no instances: follow [docs/PCG_SETUP.md](docs/PCG_SETUP.md) "Generate produces nothing (checklist)" and the **pcg-validate** skill (ordered checklist, Output Log, Surface Sampler Debug).
-- [ ] Context gathered before changes
-- [ ] Changes are complete
-- [ ] Related files updated
-- [ ] Code follows project patterns
-- [ ] User informed of approach
-- [ ] Errors encountered during the task are noted and recorded; known errors checked before repeating similar work
-- [ ] MCP safety checklist passed before any MCP calls
-- [ ] Scripts that create assets/actors are idempotent (check-before-create, no duplicates on re-run)
-- [ ] **Session cleanup done** — temporary scripts, result JSON files, and diagnostic artifacts deleted (see Session Cleanup section)
-- [ ] **Session summary updated** — swarm: append `docs/SESSION_SUMMARY.md` + PHASE_BOARD if needed; legacy: append `docs/SESSION_LOG.md`
-- [ ] **Daily state updated** — update `docs/TaskLists/DAILY_STATE.md` (Yesterday = this session's work; Today = next day's tasks; Tomorrow = day after; Current day = next) so the next session has correct context
+## Taste / ownership
+
+On a taste limit (vision / map / patterns / next-track invent): load `.cursor/skills/taste-gate/SKILL.md`; read [taste-profile.md](../../docs/human-use/taste-profile.md); emit OWNERSHIP alert; queue; **stop** — do not invent ([taste-gates.md](../../docs/human-use/taste-gates.md)).
+
+## Log-driven validation
+
+Prefer evidence files + greps over narrative. New feature debug instrumentation → **`16-feature-debug-instrumentation.mdc`**. Record instructive failures in `docs/KNOWN_ERRORS.md`.
+
+## Cleanup
+
+Delete session-only temp scripts and agent-only result JSON before reporting done. Do not leave cleanup for a future session.
+
+## UE / research pointer
+
+HomeWorld targets **UE 5.8**. Use `ue58-sources.mdc` / `ue58-editor-ui.mdc` (and `21`/`22`). Do not prefer 5.7 docs for live work.
