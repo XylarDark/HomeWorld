@@ -41,6 +41,7 @@ HomeWorld vendors [DevEnvTemplate/](DevEnvTemplate/) as a **gitlink** to **DevHa
 | Layer | Status |
 | ----- | ------ |
 | **Agent context** | `.agents/skills/` (core), `.agents/skills-extras/` (opt-in catalog), stack rules `21-unreal-engine.mdc` / `22-unreal-editor-ui.mdc` |
+| **Architecture A–E** | `.agents/skills/architecture-trade-offs-design-depth/` — load before inventing boundaries, module APIs, data/replication, team ownership, or integration points (Layers A–E; cite only, no fork) |
 | **Operational memory** | `docs/KNOWN_ERRORS.md`, `docs/Automation/AUTOMATION_GAPS.md` (canonical), `docs/operational/automation-gaps.md` (pointer), `docs/DOCS_LAYOUT.md`, `docs/human-use/` (steer / taste / test; [cursor-cannot](docs/human-use/cursor-cannot/README.md)) |
 | **Doctor** | Nested under `DevEnvTemplate/` (not `.devenv/`); `npm run doctor` / `doctor:build` / `sync` from repo root |
 
