@@ -2,8 +2,8 @@
   "path": "DevEnvTemplate",
   "remote": "https://github.com/XylarDark/DevEnvTemplate.git",
   "branch": "master",
-  "sha": "739b8a522b1d088582b4e316e42184f97c94708d",
-  "shortSha": "739b8a5",
+  "sha": "8c4442a6c01432d8257a7a5db31168d21faba4c5",
+  "shortSha": "8c4442a",
   "docPaths": [
     "docs/Setup/CURSOR_DEV.md",
     "Docs/13b_HR2_B_COLD_CLONE.md"
@@ -11,5 +11,5 @@
   "hr2Phase": "HR2-B",
   "updated": "2026-09-26",
   "productName": "DevHarness",
-  "note": "DevHarness PR #36 \u2014 Architecture Trade-Offs A\u2013E extras skill + AGENTS pointer (blob 107a511)."
+  "note": "DevHarness tip after #37\u201339 (A\u2013E SYNC dual-source, core\u2192extras path, lean-extra alias). Blob A\u2013E remains 107a511."
 }
