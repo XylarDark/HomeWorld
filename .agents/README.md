@@ -27,6 +27,7 @@ Optional skills for hosts that want deeper coverage. They are **not** copied by 
 
 | Skill | Trigger |
 | ----- | ------- |
+| [architecture-trade-offs-design-depth](skills-extras/architecture-trade-offs-design-depth/SKILL.md) | Boundaries, module APIs, data/replication, team ownership, integration (Layers A–E; sync [SYNC.md](skills-extras/architecture-trade-offs-design-depth/SYNC.md)) |
 | [automation-standards](skills-extras/automation-standards/SKILL.md) | Automation driving external tools, APIs, or CI |
 | [code-structure](skills-extras/code-structure/SKILL.md) | Modules, naming, file layout, performance budgets |
 | [data-pipeline-safety](skills-extras/data-pipeline-safety/SKILL.md) | Author-owned databases, CMS, infra state, binaries |
