@@ -41,7 +41,7 @@ HomeWorld vendors [DevEnvTemplate/](DevEnvTemplate/) as a **gitlink** to **DevHa
 | Layer | Status |
 | ----- | ------ |
 | **Agent context** | `.agents/skills/` (core), `.agents/skills-extras/` (opt-in catalog), stack rules `21-unreal-engine.mdc` / `22-unreal-editor-ui.mdc` |
-| **Architecture A–E** | `.agents/skills/architecture-trade-offs-design-depth/` — copy of DET extras writer (blob `107a5118c95c1bf0b1b3d1755796632bff41b535`; [SYNC.md](.agents/skills/architecture-trade-offs-design-depth/SYNC.md)). Load before inventing boundaries/APIs; cite only, no fork |
+| **Architecture A–E** | `.agents/skills-extras/architecture-trade-offs-design-depth/` — opt-in copy of DET extras writer (blob `107a5118c95c1bf0b1b3d1755796632bff41b535`; [SYNC.md](.agents/skills-extras/architecture-trade-offs-design-depth/SYNC.md)). Load before inventing boundaries/APIs; cite only, no fork |
 | **Operational memory** | `docs/KNOWN_ERRORS.md`, `docs/Automation/AUTOMATION_GAPS.md` (canonical), `docs/operational/automation-gaps.md` (pointer), `docs/DOCS_LAYOUT.md`, `docs/human-use/` (steer / taste / test; [cursor-cannot](docs/human-use/cursor-cannot/README.md)) |
 | **Doctor** | Nested under `DevEnvTemplate/` (not `.devenv/`); `npm run doctor` / `doctor:build` / `sync` from repo root |
 
