@@ -4,7 +4,7 @@
 
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **Conductor** (parent DESKTOP) / **DESKTOP-21CT3H0**
-**ball:** Design (ENV art look-lock inventory from Lead brief; CAP-002 Do still HELD)
+**ball:** Conductor (EA-LOOKLOCK APPROVED; wait Lead SCOUT bite name — CAP-002 Do still HELD)
 **Blocked by:** none — next track TBD (Taste Gate if inventing) · CAP-002 Do **HELD**
 **Sign-off doc:** [Docs/17_HS_AUDIT_SIGN_OFF.md](../Docs/17_HS_AUDIT_SIGN_OFF.md) — **SIGNED OFF** Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET.
 
@@ -33,7 +33,7 @@ Conductor-only status. Increment **`ladders`** only when a Fix SHA lands on that
 | **CAP-001** STOP_AL | parked | soft_fail `81798e8` | 1 | Do: NO |
 | **CAP-002** SceneCapture | EXIT accepted | SC2D→RT `RTF_RGBA8`→PNG; settle-after-yield | 0 | Do: HELD |
 
-**Parallel (Lead 2026-09-26):** Design unparked for look-lock inventory only — source [ENV_ART_DIRECTOR_BRIEF.md](../Docs/handoffs/ENV_ART_DIRECTOR_BRIEF.md). Implement stays parked until Design DONE-WHEN + Lead greenlight. CAP Do unchanged.
+**EA-LOOKLOCK (Lead 2026-09-26 ET):** **`APPROVE EA-LOOKLOCK`** — merged #212 (`5d87c33`) + #213 (`8c2a2e5`). Inventory: [EA_LOOKLOCK_INVENTORY.md](../Docs/handoffs/EA_LOOKLOCK_INVENTORY.md). Design parked. Implement **parked** until Lead names a SCOUT bite. CAP-002 Do still **HELD**.
 
 Roster while CAP product open: Conductor + Test + Fix. Design / Implement **parked**. Ban: AL · sync-writer · wait knobs · N-cam · third ladder.
 
