@@ -2,7 +2,7 @@
 name: "Git Workflow Standards"
 description: "Follow Conventional Commits and branch naming rules when committing or creating branches to keep history clean"
 alwaysApply: false
-globs: "**/*.{cpp,h,py,md,mdc,json,yml,yaml}, **/.github/**"
+globs: "**/.github/**"
 priority: 5
 version: 1.0
 ---

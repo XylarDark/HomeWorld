@@ -2,7 +2,7 @@
 name: "Plan first"
 description: "For complex work, use the Cursor plan feature when user says 'make a plan'; save to .cursor/plans/ only when user explicitly asks"
 alwaysApply: false
-globs: "**/*.{cpp,h,py,md,mdc,json,yml,yaml}, **/Source/**, **/Content/**, docs/**, Docs/**"
+globs: "**/Source/**, **/Content/**, **/*.{cpp,h,py}"
 priority: 7
 ---
 

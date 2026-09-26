@@ -2,7 +2,7 @@
 name: "UE 5.7 Editor UI — Epic docs only"
 description: "When giving Unreal Editor UI instructions, use only Epic's UE 5.7 documentation; cite the doc URL"
 alwaysApply: false
-globs: "**/*.uproject, **/Source/**, **/Content/**, **/Config/**, **/Plugins/**"
+globs: "docs/UE/UE57_*.md"
 priority: 7
 version: 1.1
 ---
