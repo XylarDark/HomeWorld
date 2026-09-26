@@ -27,8 +27,8 @@ One proven cold-clone path: empty `DevEnvTemplate/` → submodule init → `doct
 | Field | Value |
 |-------|-------|
 | **Registry** | [config/devenv-template-pin.json](../config/devenv-template-pin.json) |
-| **Full SHA** | `8be41708e3c1c0bf0b64b6bd4ba9b268d82a7bf0` |
-| **Short SHA** | `8be4170` |
+| **Full SHA** | `002773adbf4e4476e523eda338ff48d0ffbe7d7e` |
+| **Short SHA** | `002773a` |
 | **Remote** | `https://github.com/XylarDark/DevEnvTemplate.git` |
 | **Branch** | `master` |
 
