@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **GATE READY** — pending Lead **`APPROVE EA-LOOKLOCK`** |
+| **Status** | **APPROVED / CLOSED** — Lead **`APPROVE EA-LOOKLOCK`**, 2026-09-26 ET |
 | **Host** | CLOUD (this doc) · Lead (taste gate) · **no DESKTOP Act** |
 | **Source brief** | [ENV_ART_DIRECTOR_BRIEF.md](ENV_ART_DIRECTOR_BRIEF.md) (PR #212 — merge if still open) |
 | **Canon parent** | [Docs/00_CANON.md](../00_CANON.md) **LOCKED** — inventory **⊆** canon ∩ brief; no new product track |
@@ -185,7 +185,7 @@ Invented boundary: **docs quantum** `EA-LOOKLOCK` = frozen label inventory + pro
 - [x] Prove cam catalog with look-at / TOD freeze schema (§6)
 - [x] Ten-master constraint restated (§7)
 - [x] A–E 15-q for inventory quantum (§8)
-- [ ] Lead **`APPROVE EA-LOOKLOCK`**
+- [x] Lead **`APPROVE EA-LOOKLOCK`** (2026-09-26 ET)
 - [ ] Brief on `main` (`Docs/handoffs/ENV_ART_DIRECTOR_BRIEF.md` via #212 merge if needed)
 
 ---
