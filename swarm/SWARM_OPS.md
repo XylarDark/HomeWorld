@@ -274,6 +274,20 @@ When cloud clone / workspace returns **ResourceExhausted** (or equivalent):
 
 Packet: [CLOUD_AGENT_PACKET.md](CLOUD_AGENT_PACKET.md).
 
+### Host-tool decision table (Conductor quantum — CO_BOTS_PROCESS_REFINE)
+
+Conductor is **one** orchestration quantum with three **runtimes** (Grok Bot room, Cursor cloud, DESKTOP parent). Do not add a seat per runtime. GitHub Contents API is a **degrade path for CLOUD file I/O only**.
+
+| Condition | Legal tool | Illegal |
+|-----------|------------|---------|
+| Cloud workspace/clone ResourceExhausted **or** cloud agent usage blocked | GitHub Contents API / `gh api` for **file + branch + PR** on harness/docs | Pretend the API is a DESKTOP shell; run Editor Python via API |
+| Cloud agent healthy | Cloud agent for **CLOUD**-tagged Host rows (docs/C++/CI); merge and **return** | DESKTOP MCP, PIE, Editor Python Act from the cloud VM |
+| Host tag **DESKTOP** / prove Act / MCP 55557 | Conductor **parent only** on **DESKTOP-21CT3H0** | Task executors, cloud VM, GitHub API “running” Python |
+| CAP product Do **not** greenlit | Park + Research or ProveOps **B** only | “Just one more form/wait” on a parked CAP |
+| Need a new MCP / host daemon / marketplace plugin | Stop. Lead `APPROVE TOOL SCOUT/BUILD` | Invent DESKTOP MCP trials as research |
+
+See also §4a Host tags · §16 DESKTOP parent-only · [PDF_CYCLE.md](PDF_CYCLE.md) Host Pulse.
+
 ## 15. Lead digests (HS-B — debt #6)
 
 Prefer **phase-end digests** (one message: gate status + PR URL(s) + merge SHA(s) + next `APPROVE *` string) over per-CI / per-push spam. Stamp PRs for Lead gates remain valid; Conductor batches the Lead-facing narrative.
