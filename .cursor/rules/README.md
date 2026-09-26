@@ -12,14 +12,13 @@ This directory contains Cursor rules for the HomeWorld project. It includes tech
 
 ### Globbed / legacy (00–06 and peers — not alwaysApply)
 
-- **00-core-principles.mdc**, **01-code-quality.mdc**, **02-security.mdc**, **03-testing.mdc**, **04-git-workflow.mdc**, **05-error-handling.mdc**, **06-documentation.mdc** (06 = @-mention / manual only) — narrowed globs; see HARNESS_OPT bite 6.1
+- **00-core-principles.mdc**, **03-testing.mdc**, **05-error-handling.mdc** — narrowed globs (bite 6.1). **01/02/04/06/17** deleted bite 6.2 → existing skills (`code-structure`, `secure-coding`, `documentation`, `plan-first`).
 - **16-feature-debug-instrumentation.mdc** - Debug instrumentation policy for new features
-- **17-plan-first.mdc** - Plan before code for complex/multi-file work; see [docs/SPEC_AND_PLAN.md](../../docs/SPEC_AND_PLAN.md)
 - **19-docs-directory-structure.mdc** - Place new docs in correct docs/ subdir per [docs/DOCS_LAYOUT.md](../../docs/DOCS_LAYOUT.md)
 
 ### Stack-Specific Rules (Conditional, from DevEnvTemplate)
 
-- **10-typescript.mdc**, **11-javascript.mdc**, **12-python.mdc**, **13-markdown.mdc**, **14-json-yaml.mdc**, **15-shell-scripts.mdc**, **20-frontend-frameworks.mdc** - Apply when editing matching file types.
+- **12-python.mdc**, **14-json-yaml.mdc**, **15-shell-scripts.mdc** - Apply when editing matching file types. (**11-javascript**, **13-markdown** retired bite 6.2; DET-generic **01/02/04/06/17** deleted — use `.agents/skills` equivalents.)
 
 ### HomeWorld-Specific Rules (Unreal)
 
