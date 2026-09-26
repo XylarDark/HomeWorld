@@ -2,7 +2,7 @@
 name: "UE 5.7 — Always use 5.7-specific sources (HISTORICAL)"
 description: "HISTORICAL: HomeWorld targets UE 5.8. Use ue58-sources.mdc. Kept for 5.7-era docs only."
 alwaysApply: false
-globs: "**/*.uproject, **/Source/**, **/Content/**, **/Config/**, **/Plugins/**"
+globs: "docs/UE/UE57_*.md"
 priority: 6
 version: 1.2
 ---

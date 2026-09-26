@@ -4,20 +4,18 @@ This directory contains Cursor rules for the HomeWorld project. It includes tech
 
 ## Structure
 
-### Always-Applied Rules (Core, from DevEnvTemplate)
+### Always-Applied Rules (HR-B2 session-wide trio)
 
-- **00-core-principles.mdc** - Reasoning transparency, professional communication, pre-flight checklist
-- **01-code-quality.mdc** - Code organization, design principles, performance awareness
-- **02-security.mdc** - OWASP Top 10, secrets management, security checklist
-- **03-testing.mdc** - Testing philosophy, test pyramid, test structure
-- **04-git-workflow.mdc** - Commit messages, branch naming, git best practices
-- **05-error-handling.mdc** - Defensive programming, error patterns, edge cases
-- **06-documentation.mdc** - Code comments, API docs, documentation standards
 - **07-ai-agent-behavior.mdc** - Meta-rules for AI agent tool usage and communication
-- **08-project-context.mdc** - DevEnvTemplate context (generic); for HomeWorld see [AGENTS.md](../../AGENTS.md) and `docs/`
+- **08-project-context.mdc** - HomeWorld / DevEnvTemplate context; see also [AGENTS.md](../../AGENTS.md) and `docs/`
+- **20-full-automation-no-manual-steps.mdc** - Autonomy invariant (AUTOMATION_GAPS; no “manual steps”)
+
+### Globbed / legacy (00–06 and peers — not alwaysApply)
+
+- **00-core-principles.mdc**, **01-code-quality.mdc**, **02-security.mdc**, **03-testing.mdc**, **04-git-workflow.mdc**, **05-error-handling.mdc**, **06-documentation.mdc** (06 = @-mention / manual only) — narrowed globs; see HARNESS_OPT bite 6.1
 - **16-feature-debug-instrumentation.mdc** - Debug instrumentation policy for new features
 - **17-plan-first.mdc** - Plan before code for complex/multi-file work; see [docs/SPEC_AND_PLAN.md](../../docs/SPEC_AND_PLAN.md)
-- **19-docs-directory-structure.mdc** - Place new docs in correct docs/ subdir per [docs/DOCS_LAYOUT.md](../../docs/DOCS_LAYOUT.md); keep docs organized.
+- **19-docs-directory-structure.mdc** - Place new docs in correct docs/ subdir per [docs/DOCS_LAYOUT.md](../../docs/DOCS_LAYOUT.md)
 
 ### Stack-Specific Rules (Conditional, from DevEnvTemplate)
 

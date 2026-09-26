@@ -2,7 +2,6 @@
 name: "Documentation Standards"
 description: "Follow documentation and commenting standards when writing code or docs to keep knowledge current and accessible"
 alwaysApply: false
-globs: "docs/**, Docs/**, **/*.{cpp,h,py,md,mdc}"
 priority: 7
 version: 1.0
 ---
