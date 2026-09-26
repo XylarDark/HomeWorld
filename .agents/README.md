@@ -22,12 +22,16 @@ security, multi-agent coordination, and token-efficient context — the minimum 
 
 ## Extras (`.agents/skills-extras/`)
 
+
+> Lean extras `architecture-tradeoffs` and `design-complexity` are **subsets of** `architecture-trade-offs-design-depth` (A–E). Do not load a lean skill together with full A–E.
 Optional skills for hosts that want deeper coverage. They are **not** copied by default and are
 **not** loaded until you opt in — keeping the dormant-skill surface small.
 
 | Skill | Trigger |
 | ----- | ------- |
 | [architecture-trade-offs-design-depth](skills-extras/architecture-trade-offs-design-depth/SKILL.md) | Boundaries, module APIs, data/replication, team ownership, integration (Layers A–E; sync [SYNC.md](skills-extras/architecture-trade-offs-design-depth/SYNC.md)) |
+| [architecture-tradeoffs](skills-extras/architecture-tradeoffs/SKILL.md) | Lean A-only subset of A–E — do not load with full A–E |
+| [design-complexity](skills-extras/design-complexity/SKILL.md) | Lean B-only subset of A–E — do not load with full A–E |
 | [automation-standards](skills-extras/automation-standards/SKILL.md) | Automation driving external tools, APIs, or CI |
 | [code-structure](skills-extras/code-structure/SKILL.md) | Modules, naming, file layout, performance budgets |
 | [data-pipeline-safety](skills-extras/data-pipeline-safety/SKILL.md) | Author-owned databases, CMS, infra state, binaries |
