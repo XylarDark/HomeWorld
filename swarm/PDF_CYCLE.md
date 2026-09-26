@@ -94,6 +94,9 @@ Lead steer ──► Conductor
 
 ## Host Pulse (ops — not a product phase)
 
+**Host-tool pick:** when cloud is blocked or Host is DESKTOP, follow the decision table in [SWARM_OPS.md](SWARM_OPS.md) §14 (GitHub Contents API vs cloud agent vs DESKTOP-21CT3H0 parent) — one Conductor quantum, three runtimes.
+
+
 Tool-agnostic external heartbeat for pending Acts. Spec: [Docs/handoffs/HOST_PULSE.md](../Docs/handoffs/HOST_PULSE.md).
 
 | Aggregate | Meaning | Chat |
