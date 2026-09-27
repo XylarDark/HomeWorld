@@ -27,12 +27,11 @@ Default DET adopters copy the **six** core skills. HomeWorld also keeps small HW
 
 ### Live `.cursor/skills/` (see also that README)
 
-Only these live project skills stay on the cursor scan path after the budget Do:
+Only these project skills stay on the cursor scan path after the budget Do:
 
-- `pcg-validate`
-- `ue58-api-check`
-- `automation-gap-solutions`
-- Tombstones (if present): `ue57-api-check`, `demo-map-setup`, `homestead-setup` — WAVE F / historical; not live workflows
+- Live: `pcg-validate`, `ue58-api-check`, `automation-gap-solutions`
+- Tombstone: `ue57-api-check` (prefer ue58)
+- Retired WAVE F: `demo-map-setup`, `homestead-setup` deleted
 
 Lean A/B and taste twins are **not** duplicated under `.cursor/skills/` (retired).
 
