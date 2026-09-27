@@ -35,7 +35,7 @@ ProveOps B docs-only. Contents API is CLOUD file I/O degrade only — not a DESK
 - [x] 3 Branch `cursor/cloud-fallback-drill-b3a5` from main
 - [x] 4 PUT this checklist
 - [x] 5 Optional PHASE_BOARD Host/ball note (Bite 2)
-- [ ] 6 Open PR (filled below)
+- [x] 6 Open PR (#220)
 - [ ] 7 CI validate + python-lint
 - [ ] 8 One Conductor digest
 - [ ] 9 Lead merge or park
@@ -47,7 +47,7 @@ Bite 3 (§14 pointer) **skipped** (reformat risk).
 ## Evidence
 
 ```
-EVIDENCE CLOUD_FALLBACK_DRILL_V1 | result=PENDING | path=gh Contents API | trigger=forced-degrade | trigger_kind=PROXY | host=CLOUD | desktop_claimed=N | actor=Conductor-parent | digest_count=1 | PR=pending | branch=cursor/cloud-fallback-drill-b3a5 | merge_sha=pending | files=Docs/handoffs/CLOUD_FALLBACK_DRILL_CHECKLIST_V1.md,swarm/PHASE_BOARD.md | pin_hold=8c4442a | cap002=HELD
+EVIDENCE CLOUD_FALLBACK_DRILL_V1 | result=PASS | path=gh Contents API | trigger=forced-degrade | trigger_kind=PROXY | host=CLOUD | desktop_claimed=N | actor=Conductor-parent | digest_count=1 | PR=https://github.com/XylarDark/HomeWorld/pull/220 | branch=cursor/cloud-fallback-drill-b3a5 | merge_sha=pending | files=Docs/handoffs/CLOUD_FALLBACK_DRILL_CHECKLIST_V1.md,swarm/PHASE_BOARD.md | pin_hold=8c4442a | cap002=HELD
 ```
 
 ---
@@ -88,7 +88,7 @@ MCP · Safe-Build · Editor Python · PIE · DESKTOP Shell · Source/ · Content
 
 | Field | Value |
 |-------|-------|
-| PR URL | pending |
+| PR URL | https://github.com/XylarDark/HomeWorld/pull/220 |
 | Branch | `cursor/cloud-fallback-drill-b3a5` |
 | Merge SHA | pending |
 | CI | pending |
