@@ -2,7 +2,7 @@
 name: "MCP-First Workflow"
 description: "Use MCP first, then Python/GUI automation; never document manual steps for the user. Log automation gaps to docs/AUTOMATION_GAPS.md."
 alwaysApply: false
-globs: "**/Content/Python/**, **/Source/**, **/*.uproject, **/Tools/**"
+globs: "**/Content/Python/**, **/*.uproject, **/Tools/**"
 priority: 10
 version: 1.1
 ---
