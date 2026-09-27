@@ -76,8 +76,8 @@ Reports and harness JSON should use three states, not binary pass/fail:
 | State | Meaning |
 | ----- | ------- |
 | **pass** | Preconditions met; automated asserts satisfied. |
-| **soft_fail** | Harness/metrics OK but human visual or taste stamp still required (framing, composition). |
-| **closed_fail** | Hard precondition miss, readiness `false`, or assert threshold failed. |
+| **soft_fail** | Arrange `ready:false` / blocked report (no Act) **or** harness/metrics OK but Lead visual/taste stamp still required. Maps to `capture_outcome: soft_fail`, `ok: false`, `closed_fail: false`, `prove_loop_status: blocked` (arrange) or `in_progress` (taste). Cite `Docs/handoffs/TEST_SCORE_PACKET_V1.md` + `CAPTURE_REDUNDANCY` P0. |
+| **closed_fail** | Proved-wrong **after Act attempted**: void after `visible_sky_stack_ok`, framing aim miss with lit scrap, assert threshold failed, wrong/incomplete setup after Act. **Not** arrange `ready:false`. |
 
 Equivalent labels (`blocked` / `in_progress` / `pass`) are fine if documented once.
 
