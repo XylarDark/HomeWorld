@@ -93,7 +93,7 @@ Fix laps that add `CAM_*` / `PS_*` actors to “frame better” are Design scope
 | 3 | **One DONE-WHEN math set** | Frozen numbers Design owns: look-at target(s), dress **AABB** or anchor envelope, TOD phase + preset IDs, key light/exposure cvars — copied into inventory + Arrange sidecar **before** Implement. |
 | 4 | **Pre-Act: labels ⊆ inventory ∩ Arrange** | Explicit label list; DESKTOP verify **Arrange actors** present — else **block Act** (no capture/metrics run). |
 | 5 | **Exactly one Act artifact class** | Choose **one**: `stills` **OR** `metrics JSON` **OR** `arrange/harness gate JSON` **OR** `docs/handoff only` — not multiple primary classes in the same bite. |
-| 6 | **Score signals named** | Act-window **`mtime` + `bytes`** (never exists-only); gate JSON fields; metric IDs; **`soft_fail`** vs **`closed_fail`** per ladder rule 3. |
+| 6 | **Score signals named** | Act-window **`mtime` + `bytes`** (never exists-only); gate JSON fields; metric IDs; **`soft_fail`** vs **`closed_fail`** per ladder rule 3. Packet: [TEST_SCORE_PACKET_V1.md](../../Docs/handoffs/TEST_SCORE_PACKET_V1.md). |
 | 7 | **Host column** | `CLOUD` \| `DESKTOP` \| `Lead` per stage on the packet. |
 | 8 | **Outcome mapping** | How `pass` / `soft_fail` / `closed_fail` / Lead-later apply ([CAPTURE_REDUNDANCY.md](CAPTURE_REDUNDANCY.md) three-state + PS metric vs visual split). |
 | 9 | **Ladder step** | Which rung: **1-cam** \| **N-cam set** \| **full track prove**; open CAP/CAM (or track) defects forbid whole-scene Act. |
