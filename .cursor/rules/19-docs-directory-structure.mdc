@@ -2,7 +2,7 @@
 name: "Docs directory structure"
 description: "When generating or adding documentation, place it in the correct docs/ subdirectory per DOCS_LAYOUT; keep everything organized."
 alwaysApply: false
-globs: "docs/**, Docs/**, **/*.md"
+globs: "docs/**, Docs/**"
 priority: 19
 version: 1.0
 ---
