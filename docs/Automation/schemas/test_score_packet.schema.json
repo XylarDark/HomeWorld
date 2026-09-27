@@ -1,0 +1,94 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://homeworld.local/schemas/test_score_packet.schema.json",
+  "title": "hw.test_score_packet/v1",
+  "description": "Lean Test score extract over Saved arrange/capture artifacts. exists-only is not PASS: when stamps[].exists is true, bytes and mtime are required.",
+  "type": "object",
+  "required": ["schema", "act_sha", "three_state", "stamps"],
+  "additionalProperties": true,
+  "properties": {
+    "schema": {
+      "type": "string",
+      "const": "hw.test_score_packet/v1"
+    },
+    "act_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$",
+      "description": "PROXY bind: Act packet / git tip. One score per act_sha."
+    },
+    "track": {
+      "type": "string"
+    },
+    "artifact_class": {
+      "type": "string",
+      "enum": ["gate", "metrics", "stills", "docs"]
+    },
+    "score_paths": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "arrange": {
+      "type": "object",
+      "properties": {
+        "ready": { "type": "boolean" },
+        "blocked_reasons": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": true
+    },
+    "three_state": {
+      "type": "object",
+      "required": ["capture_outcome", "ok", "closed_fail", "prove_loop_status"],
+      "additionalProperties": true,
+      "properties": {
+        "capture_outcome": {
+          "type": "string",
+          "enum": ["pass", "soft_fail", "closed_fail"]
+        },
+        "ok": {
+          "type": "boolean",
+          "description": "true only when capture_outcome is pass"
+        },
+        "closed_fail": { "type": "boolean" },
+        "prove_loop_status": {
+          "type": "string",
+          "enum": ["blocked", "in_progress", "pass"]
+        },
+        "capture_pass": { "type": "boolean" },
+        "visual_framing_pass": { "type": "boolean" },
+        "lead_visual_framing_approved": { "type": "boolean" },
+        "capture_outcome_open": { "type": "boolean" }
+      }
+    },
+    "stamps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "exists"],
+        "additionalProperties": true,
+        "properties": {
+          "path": { "type": "string" },
+          "exists": { "type": "boolean" },
+          "bytes": { "type": ["integer", "null"], "minimum": 0 },
+          "mtime": { "type": ["number", "null"] },
+          "mtime_iso": { "type": ["string", "null"] }
+        },
+        "if": { "properties": { "exists": { "const": true } }, "required": ["exists"] },
+        "then": { "required": ["bytes", "mtime"] }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "luminance_pass": { "type": ["boolean", "null"] },
+        "mean_luminance": { "type": ["number", "null"] },
+        "center_crop_mean_luminance": { "type": ["number", "null"] },
+        "fraction_l_gt_1": { "type": ["number", "null"] },
+        "fraction_l_gt_8": { "type": ["number", "null"] }
+      }
+    }
+  }
+}
