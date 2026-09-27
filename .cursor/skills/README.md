@@ -10,13 +10,13 @@ Cursor discovers `description` on every turn for each `SKILL.md` here. Keep this
 | `ue58-api-check` | Live Unreal **5.8** API / doc sourcing |
 | `automation-gap-solutions` | Pointer into `docs/Automation/AUTOMATION_GAPS.md` |
 
-## Tombstones (historical / WAVE F)
+## Tombstones
 
 | Skill | Role |
 |-------|------|
 | `ue57-api-check` | Prefer `ue58-api-check`; UE57 docs only under `docs/UE/UE57_*` |
-| `demo-map-setup` | WAVE F — DemoMap removed; use VS_MVP + `Docs/04*` |
-| `homestead-setup` | WAVE F — homestead maps removed |
+
+**Retired (WAVE F):** `demo-map-setup`, `homestead-setup` — deleted; use VS_MVP + `Docs/04*`.
 
 ## Not here (by design)
 
