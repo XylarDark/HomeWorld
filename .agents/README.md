@@ -3,11 +3,13 @@
 Procedural knowledge for AI agents. Each skill's `description` is read on every turn to decide
 relevance; the body loads only when that description matches the task.
 
-## Core (`.agents/skills/`)
+**Skill load budget (EXIT SKILL_LOAD_BUDGET_V1):** keep the discoverable set small. Extras and A–E full are **cite / copy-in only** — never paste skill bodies into `AGENTS.md`. Do not copy `architecture-trade-offs-design-depth` onto a Cursor scan path (`.agents/skills/` or `.cursor/skills/`). Do not load lean A/B together with full A–E.
 
-Default adopters copy **only** these six core skills. They cover workflow, planning, verification,
-security, multi-agent coordination, and token-efficient context — the minimum the doctor and
-`AGENTS.md` expect.
+## Discoverable (Cursor scan paths)
+
+### Core + HW-local (`.agents/skills/`)
+
+Default DET adopters copy the **six** core skills. HomeWorld also keeps small HW-local skills in this tree (discoverable).
 
 | Skill | Trigger |
 | ----- | ------- |
@@ -17,19 +19,33 @@ security, multi-agent coordination, and token-efficient context — the minimum 
 | [secure-coding](skills/secure-coding/SKILL.md) | Input, secrets, auth, or dependencies |
 | [token-efficient-context](skills/token-efficient-context/SKILL.md) | Planning multi-file work, agent runs, tokens, MCP, or editing rules/skills/AGENTS.md |
 | [verification-evidence](skills/verification-evidence/SKILL.md) | Audits, health checks, guard tests, CI gates |
+| [swarm-mode-routing](skills/swarm-mode-routing/SKILL.md) | HW-local: first-hop swarm / NON-SWARM mode detect |
+| [taste-gate](skills/taste-gate/SKILL.md) | HW-local: lookdev / “does this feel right” (single discoverable home) |
+| [taste-profiler](skills/taste-profiler/SKILL.md) | HW-local: twin of taste-gate |
 
 `integrateCursorRules` copies core skills into a host's `.agents/skills/` automatically.
 
+### Live `.cursor/skills/` (see also that README)
+
+Only these live project skills stay on the cursor scan path after the budget Do:
+
+- `pcg-validate`
+- `ue58-api-check`
+- `automation-gap-solutions`
+- Tombstones (if present): `ue57-api-check`, `demo-map-setup`, `homestead-setup` — WAVE F / historical; not live workflows
+
+Lean A/B and taste twins are **not** duplicated under `.cursor/skills/` (retired).
+
 ## Extras (`.agents/skills-extras/`)
 
-
 > Lean extras `architecture-tradeoffs` and `design-complexity` are **subsets of** `architecture-trade-offs-design-depth` (A–E). Do not load a lean skill together with full A–E.
+
 Optional skills for hosts that want deeper coverage. They are **not** copied by default and are
-**not** loaded until you opt in — keeping the dormant-skill surface small.
+**not** loaded until you opt in — keeping the dormant-skill surface small. Path is `skills-extras` (not an official Cursor skills scan dir).
 
 | Skill | Trigger |
 | ----- | ------- |
-| [architecture-trade-offs-design-depth](skills-extras/architecture-trade-offs-design-depth/SKILL.md) | Boundaries, module APIs, data/replication, team ownership, integration (Layers A–E; sync [SYNC.md](skills-extras/architecture-trade-offs-design-depth/SYNC.md)) |
+| [architecture-trade-offs-design-depth](skills-extras/architecture-trade-offs-design-depth/SKILL.md) | Boundaries, module APIs, data/replication, team ownership, integration (Layers A–E; sync [SYNC.md](skills-extras/architecture-trade-offs-design-depth/SYNC.md)). **Cite-only in seats. Never discoverable.** |
 | [architecture-tradeoffs](skills-extras/architecture-tradeoffs/SKILL.md) | Lean A-only subset of A–E — do not load with full A–E |
 | [design-complexity](skills-extras/design-complexity/SKILL.md) | Lean B-only subset of A–E — do not load with full A–E |
 | [automation-standards](skills-extras/automation-standards/SKILL.md) | Automation driving external tools, APIs, or CI |
@@ -40,6 +56,8 @@ Optional skills for hosts that want deeper coverage. They are **not** copied by 
 | [documentation](skills-extras/documentation/SKILL.md) | Comments, README, or anything under `docs/` |
 | [exclusive-resource-access](skills-extras/exclusive-resource-access/SKILL.md) | Browsers, ports, devices, or other single-user resources |
 | [testing-standards](skills-extras/testing-standards/SKILL.md) | Adding or updating tests or test frameworks |
+| [taste-gate](skills-extras/taste-gate/SKILL.md) | Pointer → `.agents/skills/taste-gate` (no second body) |
+| [taste-profiler](skills-extras/taste-profiler/SKILL.md) | Pointer → `.agents/skills/taste-profiler` |
 
 ### Opt in to extras
 
@@ -50,11 +68,9 @@ Copy the skills you need into the host's active skills directory:
 cp -r .agents/skills-extras/testing-standards .agents/skills/
 ```
 
-Or copy all extras:
+**Never** copy `architecture-trade-offs-design-depth` into `.agents/skills/` or `.cursor/skills/` on HomeWorld — seats cite; dual-source writer stays DET extras.
 
-```bash
-cp -r .agents/skills-extras/* .agents/skills/
-```
+Or copy selected extras (avoid wholesale `cp -r .agents/skills-extras/*` on HomeWorld — that would put A–E on a scan path).
 
 When running the doctor's agent-layer integration with extras:
 
@@ -62,9 +78,6 @@ When running the doctor's agent-layer integration with extras:
 npm run doctor:fix
 # The integration API accepts includeSkillExtras: true when called programmatically.
 ```
-
-Hosts that already copied the full skill set before this split can leave extra skills in place;
-nothing breaks. New adopters start with the six core skills above.
 
 ## Authoring
 
