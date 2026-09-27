@@ -2,7 +2,7 @@
 name: "UE 5.8 Editor UI — Epic docs only"
 description: "When giving Unreal Editor UI instructions, use only Epic's UE 5.8 documentation; cite the doc URL"
 alwaysApply: false
-globs: "**/*.uproject, **/Source/**, **/Content/**, **/Config/**, **/Plugins/**"
+globs: "**/*.uproject, **/Source/**, **/Config/**, **/Plugins/**"
 priority: 7
 version: 1.0
 ---

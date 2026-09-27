@@ -2,30 +2,47 @@
 
 This directory contains Cursor rules for the HomeWorld project. It includes technology-agnostic rules from [DevEnvTemplate](../DevEnvTemplate) and HomeWorld-specific Unreal rules.
 
-## Structure
+## Attach policy (ALWAYSAPPLY_AUDIT_V1)
 
-### Always-Applied Rules (HR-B2 session-wide trio)
+### AlwaysApply — N=3 (session-wide trio)
 
-- **07-ai-agent-behavior.mdc** - Meta-rules for AI agent tool usage and communication
-- **08-project-context.mdc** - HomeWorld / DevEnvTemplate context; see also [AGENTS.md](../../AGENTS.md) and `docs/`
-- **20-full-automation-no-manual-steps.mdc** - Autonomy invariant (AUTOMATION_GAPS; no “manual steps”)
+Do **not** grow or shrink this set without a new Research EXIT.
 
-### Globbed / legacy (00–06 and peers — not alwaysApply)
+| File | Role |
+|------|------|
+| `07-ai-agent-behavior.mdc` | Slim agent card (WAVE F refuse, MCP pointer, taste-gate) |
+| `08-project-context.mdc` | Session project card (overlaps `AGENTS.md`; accepted tax) |
+| `20-full-automation-no-manual-steps.mdc` | Autonomy invariant + host-gate cite to SWARM_OPS |
 
-- **00-core-principles.mdc**, **03-testing.mdc**, **05-error-handling.mdc** — narrowed globs (bite 6.1). **01/02/04/06/17** deleted bite 6.2 → existing skills (`code-structure`, `secure-coding`, `documentation`, `plan-first`).
-- **16-feature-debug-instrumentation.mdc** - Debug instrumentation policy for new features
-- **19-docs-directory-structure.mdc** - Place new docs in correct docs/ subdir per [docs/DOCS_LAYOUT.md](../../docs/DOCS_LAYOUT.md)
+Host legality (DESKTOP parent-only, no cloud DESKTOP trials): [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md) §14 / §16 — cite, do not fork into new alwaysApply rules.
 
-### Stack-Specific Rules (Conditional, from DevEnvTemplate)
+### Opt-in by glob (not alwaysApply)
 
-- **12-python.mdc**, **14-json-yaml.mdc**, **15-shell-scripts.mdc** - Apply when editing matching file types. (**11-javascript**, **13-markdown** retired bite 6.2; DET-generic **01/02/04/06/17** deleted — use `.agents/skills` equivalents.)
+| Group | Files (typical) |
+|-------|-----------------|
+| Code | `00-core-principles`, `05-error-handling`, `16-feature-debug-instrumentation` |
+| Python | `12-python` |
+| Shell | `15-shell-scripts` |
+| JSON/YAML | `14-json-yaml` |
+| Tests | `03-testing` |
+| MCP | `09-mcp-workflow` (Python/Tools/uproject — not Source) |
+| Automation bible | `automation-standards` |
+| Game content | `18-game-development-principles` (uasset/umap/Maps/Lib — not Content/**) |
+| UE live | `21-unreal-engine`, `22-unreal-editor-ui`, `unreal-*`, `ue58-sources`, `ue58-editor-ui` (ue58: uproject/Source/Config/Plugins — not Content/**) |
+| Docs layout | `19-docs-directory-structure` (`docs/**`, `Docs/**` only) |
+| Gaps procedure | `19-automation-gaps` (`docs/Automation/AUTOMATION_GAPS.md`) |
+| Plugins | `10-compound-engineering`, `11-parallel-plugin` (`.cursor/**`) |
+| PCG | `pcg-best-practices` |
 
-### HomeWorld-Specific Rules (Unreal)
+### Description-only
 
-- **unreal-project.mdc** - Project layout, .uproject, Config (`**/*.uproject`, `**/Config/*.ini`)
-- **unreal-cpp.mdc** - C++ conventions (`**/*.cpp`, `**/*.h`)
-- **unreal-blueprint.mdc** - Blueprint vs C++ (`**/*.uasset`)
-- **unreal-gas.mdc** - Gameplay Ability System
+- `19-automation-cycle.mdc` — WAVE F quarantine pointer; do **not** resurrect cycle bodies.
+
+### Historical (narrow)
+
+- `ue57-sources.mdc`, `ue57-editor-ui.mdc` — glob only `docs/UE/UE57_*.md`; prefer ue58 for active work.
+
+Retired (bite 6.2, stay deleted): `01`/`02`/`04`/`06`/`11-javascript`/`13-markdown`/`17` → skills.
 
 ## Canonical examples
 
@@ -38,5 +55,6 @@ Full list and links: [docs/UE/UE57_TECH.md](../../docs/UE/UE57_TECH.md).
 
 ## Maintenance
 
-- To refresh rules from DevEnvTemplate: copy `DevEnvTemplate/.cursor/rules/*.mdc` to `.cursor/rules/` (preserve `unreal-*.mdc`).
+- To refresh rules from DevEnvTemplate: copy `DevEnvTemplate/.cursor/rules/*.mdc` to `.cursor/rules/` (**preserve** HW `unreal-*` / `ue58-*` / alwaysApply trio `07`/`08`/`20`).
 - See [docs/Setup/CURSOR_DEV.md](../../docs/Setup/CURSOR_DEV.md) and [DevEnvTemplate/BOOTSTRAP.md](../DevEnvTemplate/BOOTSTRAP.md) for setup and usage.
+- Sync must **not** inject retired always-on rules or grow alwaysApply without Research (PIN_SYNC NEVER_AUTO for growth/shrink).

@@ -2,7 +2,7 @@
 name: "UE 5.8 — Always use 5.8-specific sources"
 description: "For any Unreal Engine API, UI, plugin, or documentation: use only UE 5.8–specific sources; do not rely on training data or other engine versions"
 alwaysApply: false
-globs: "**/*.uproject, **/Source/**, **/Content/**, **/Config/**, **/Plugins/**"
+globs: "**/*.uproject, **/Source/**, **/Config/**, **/Plugins/**"
 priority: 6
 version: 1.0
 ---

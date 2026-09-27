@@ -27,7 +27,7 @@ Current expected: pin = DET `master`. Tip-vs-`main` “ahead” is **not** autom
 | **D** Docs-only / fitness-doc (`SYNC.md` greps, CHANGELOG, lean-extra prose, guides) | **MAY_DRIFT** until Lead gate | HW may copy markdown without bump |
 | **S** Skills-extras / canon blob (writer `SKILL.md`, `hash-object` Canon line) | **MUST_BUMP_PIN** after commit is on DET **`master`**, same HW PR or immediate follow-up **+** copy extras | Submodule records writer commit |
 | **C** Doctor / CLI / dist / sync-layers that inject into HW / package engine | **MUST_BUMP_PIN** (same PR) + `npm run doctor:build` when Class C | Checkout SHA **is** the CLI |
-| Rules migration touching alwaysApply trio `07`/`08`/`20` | **NEVER_AUTO** | Wait ALWAYSAPPLY_AUDIT |
+| Rules migration touching alwaysApply trio `07`/`08`/`20` | **NEVER_AUTO for growth or shrink** | ALWAYSAPPLY_AUDIT_V1 locked N=3 (07/08/20). Further cardinality change = new Research. |
 | DET PR base `main` while pin is `master` | **NEVER_AUTO** | DET hygiene; merge onto `master` first |
 | CAP / EA / product on DET | **NEVER_AUTO** | No pin coupling |
 
