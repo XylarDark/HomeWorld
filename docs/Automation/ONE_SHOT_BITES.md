@@ -16,7 +16,7 @@ HomeWorld **Test** locked prove sizing for Conductor Act on **every** track (PS,
 |---|------|-------------|
 | 1 | **Bite = one closed DONE-WHEN** | One bite closes **one** DONE-WHEN — e.g. **one label**, **one cam**, or **one metric** — **not** a full 7-still scene until **CAP+CAM** (capture path + camera aim contract) are green on a minimal slice. |
 | 2 | **Pre-Act** | That bite’s labels must be **⊆ inventory ∩ Arrange actors** in the **loaded** level, or **block** — **no Act**. |
-| 3 | **PASS** | Score **Act-window `mtime` + `bytes`** (never exists-only). **Black + file** ⇒ **`soft_fail`**; **missing setup** (labels, Arrange, gate) ⇒ **`closed_fail`**. |
+| 3 | **PASS** | Score **Act-window `mtime` + `bytes`** (never exists-only). **Black + file** ⇒ **`soft_fail`**. Pre-Act Arrange `ready:false` / labels ∉ inventory ∩ Arrange → **block Act**, `soft_fail`, `prove_loop_status: blocked`, `closed_fail: false`. **After Act attempted**, wrong/incomplete setup → **`closed_fail`**. Cite [TEST_SCORE_PACKET_V1.md](../../Docs/handoffs/TEST_SCORE_PACKET_V1.md). |
 | 4 | **Ladder** | **1-cam green → N-cam set → full PS-C** (or track equivalent). **No whole-scene Act** while per-item defects stay open (e.g. **CAP-001** capture path, **CAM-002** aim — or track-specific IDs on the Test packet). |
 
 **Post–PR #198:** If **deepen** / extended research is still **red** (inconclusive or open tooling gap), Conductor **prefers one-cam Act first** before widening to N-cam or full-scene prove — same ladder, smaller Act surface ([UE_BIBLE.md](../../Docs/UE_BIBLE.md) §2b one-cam minimal repro aligns with this row).
@@ -155,7 +155,7 @@ flowchart LR
 | 3 | Implement | Ships **one** bite; exclusive paths on packet. |
 | 4 | Test | Publishes Test packet (checklist + signal names); no DESKTOP execution in sidebar Test on cloud-only hosts. |
 | 5 | Conductor | **Act** on DESKTOP when packet says so; returns logs/JSON/PNG paths. |
-| 6 | Test | Scores **Act-window mtime+bytes**; **`pass`** only if pre-Act labels ⊆ inventory ∩ Arrange **and** DONE-WHEN met; black+file ⇒ **soft_fail**; missing setup ⇒ **closed_fail**. |
+| 6 | Test | Scores **Act-window mtime+bytes**; **`pass`** only if pre-Act labels ⊆ inventory ∩ Arrange **and** DONE-WHEN met; black+file ⇒ **soft_fail**; pre-Act arrange-block ⇒ **soft_fail** / `closed_fail: false`; **after Act attempted** wrong/incomplete setup ⇒ **closed_fail**. |
 | 7 | Fix | **One root** after [CAPTURE_REDUNDANCY.md](CAPTURE_REDUNDANCY.md) dead-end research if tooling-related; defect-linked paths only. |
 | 8 | Conductor | Next bite **only** after gate green or Lead **WAIVE**; else repeat Fix → Test or bounce Design if inventory/labels wrong. |
 
