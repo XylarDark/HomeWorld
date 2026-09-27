@@ -4,7 +4,7 @@
 
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **Conductor** (parent DESKTOP) / **DESKTOP-21CT3H0**
-**ball:** Conductor (CLOUD_FALLBACK_DRILL_V1 Host=CLOUD · Contents API forced-degrade · CAP-002 Do HELD · EA SCOUT wait Lead)
+**ball:** Conductor (MARKETPLACE_SCOUT_V1 Host=CLOUD · Docs/handoffs/MARKETPLACE_POLICY_V1.md · CAP-002 Do HELD · pin HOLD 8c4442a · EA SCOUT wait Lead)
 **Blocked by:** none — next track TBD (Taste Gate if inventing) · CAP-002 Do **HELD**
 **Sign-off doc:** [Docs/17_HS_AUDIT_SIGN_OFF.md](../Docs/17_HS_AUDIT_SIGN_OFF.md) — **SIGNED OFF** Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET.
 
@@ -35,6 +35,8 @@ Conductor-only status. Increment **`ladders`** only when a Fix SHA lands on that
 
 **CLOUD_FALLBACK_DRILL_V1 (ProveOps B):** Host `CLOUD` · ball Conductor · path `Docs/handoffs/CLOUD_FALLBACK_DRILL_CHECKLIST_V1.md` · branch `cursor/cloud-fallback-drill-b3a5` · CAP-002 Do still **HELD**. Evidence: `path=gh Contents API` · trigger PROXY `forced-degrade`.
 
+
+**MARKETPLACE_SCOUT_V1 (ProveOps B):** Host `CLOUD` · ball Conductor · KEEP/REJECT/CANDIDATE source [MARKETPLACE_POLICY_V1.md](../Docs/handoffs/MARKETPLACE_POLICY_V1.md) · CAP-002 Do still **HELD** · pin HOLD `8c4442a` · Host for any later tool Act per SWARM_OPS §14 · no live install in this Act.
 **EA-LOOKLOCK (Lead 2026-09-26 ET):** **`APPROVE EA-LOOKLOCK`** — merged #212 (`5d87c33`) + #213 (`8c2a2e5`). Inventory: [EA_LOOKLOCK_INVENTORY.md](../Docs/handoffs/EA_LOOKLOCK_INVENTORY.md). Design parked. Implement **parked** until Lead names a SCOUT bite. CAP-002 Do still **HELD**.
 
 Roster while CAP product open: Conductor + Test + Fix. Design / Implement **parked**. Ban: AL · sync-writer · wait knobs · N-cam · third ladder.
