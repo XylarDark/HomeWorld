@@ -24,7 +24,7 @@ Pinned checkout: [DevEnvTemplate/](../../DevEnvTemplate/) **gitlink** — bumped
 
 | Field | Value |
 |-------|-------|
-| **Pinned SHA** | `8c4442a6c01432d8257a7a5db31168d21faba4c5` |
+| **Pinned SHA** | `0a273065f7386e411873a548adb4c1786da0c976` |
 | **Canonical registry** | [config/devenv-template-pin.json](../../config/devenv-template-pin.json) — CI reads this; update with CURSOR_DEV when bumping pin |
 | **Pin sync policy** | [Docs/handoffs/PIN_SYNC_POLICY.md](../../Docs/handoffs/PIN_SYNC_POLICY.md) — classes D/S/C; bump only from DET `master`; NEVER point gitlink at `main` |
 | **Remote** | `https://github.com/XylarDark/DevEnvTemplate.git` |
