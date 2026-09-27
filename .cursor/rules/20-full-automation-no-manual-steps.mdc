@@ -25,6 +25,18 @@ The project is set up for **fully autonomous** automation. The agent does not as
 
 4. **Session output.** Do not end a task or session with instructions for the user to perform manual work. If a step could not be automated, append an entry to `docs/AUTOMATION_GAPS.md`, set the task/day to **blocked** (or skip with reason), and in session summary state that the gap was logged for a future automation pass.
 
+
+## Host gate (cite, do not fork)
+
+Autonomy is **not** a license to run Editor/MCP/GUI on the wrong host.
+Follow [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md) §14 host-tool table and §16 DESKTOP parent-only:
+
+- DESKTOP Shell / MCP 55557 / PIE / Editor Python / PyAutoGUI → Conductor **parent** on **DESKTOP-21CT3H0** only.
+- Cloud / Task executor → do **not** invent DESKTOP trials. Log the gap or hand off to Conductor parent. Contents API is file+PR degrade only.
+- New MCP / host daemon / marketplace plugin → stop for Lead `APPROVE TOOL SCOUT/BUILD`.
+
+“No manual steps for the user” still holds. Wrong-host automation is an illegal trial, not a required next step.
+
 ## Logging automation gaps
 
 **File:** `docs/AUTOMATION_GAPS.md`
