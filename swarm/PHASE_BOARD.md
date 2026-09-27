@@ -1,11 +1,11 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **Docs/33 Placement Stills (PS) — PS-C (metrics + stills)** — PS-B **CLOSED** Lead **`APPROVE PS-B`**, 2026-09-22 ET · [PS_C_METRICS.md](../Docs/handoffs/PS_C_METRICS.md) · [33_PLACEMENT_STILLS.md](../Docs/33_PLACEMENT_STILLS.md). Prior: **Docs/32 PA — CLOSED / COMPLETE**. **FALLBACK FLIGHT armed.**
+**Current phase:** **Harness / bot optimization — idle** (Lead lock 2026-09-27 ET: CAP + EA DROPPED from backlog; horizon = harness/bot only). Prior product: Docs/33 PS-C history — [PS_C_METRICS.md](../Docs/handoffs/PS_C_METRICS.md). **FALLBACK FLIGHT armed.**
 
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **Conductor** (parent DESKTOP) / **DESKTOP-21CT3H0**
-**ball:** Conductor (MARKETPLACE_SCOUT_V1 Host=CLOUD · Docs/handoffs/MARKETPLACE_POLICY_V1.md · CAP-002 Do HELD · pin HOLD 8c4442a · EA SCOUT wait Lead)
-**Blocked by:** none — next track TBD (Taste Gate if inventing) · CAP-002 Do **HELD**
+**ball:** Conductor — harness idle (pin tip `0a27306` / full `0a273065f7386e411873a548adb4c1786da0c976` equals DET master; CAP+EA DROPPED Lead 2026-09-27)
+**Blocked by:** none — next harness bite only when Lead names one. CAP/EA product Do **DROPPED** (not HELD).
 **Sign-off doc:** [Docs/17_HS_AUDIT_SIGN_OFF.md](../Docs/17_HS_AUDIT_SIGN_OFF.md) — **SIGNED OFF** Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET.
 
 
@@ -24,26 +24,22 @@ Status values: `LOCKED` `OPEN` `IN PROGRESS` `GATE FAILED` `CLOSED` `GATE READY`
 
 ---
 
-## CAP park fitness (ProveOps A — no product Do from this board alone)
+## CAP / EA backlog (historical — Lead DROPPED 2026-09-27)
 
-Conductor-only status. Increment **`ladders`** only when a Fix SHA lands on that CAP writer. Lead moves `Do: HELD` → greenlit.
+Lead lock: CAP product track and EA/env art are **off the backlog** (not shelved). No CAP Do, no EA SCOUT, no ProveOps-as-default roster. Design / Implement are **not** parked for CAP. KEEP seats: Conductor, Design, Implement, Test, Fix, eggbot.
 
-| CAP | State | Evidence | ladders | Do |
-|-----|-------|----------|---------|-----|
-| **CAP-001** STOP_AL | parked | soft_fail `81798e8` | 1 | Do: NO |
-| **CAP-002** SceneCapture | EXIT accepted | SC2D→RT `RTF_RGBA8`→PNG; settle-after-yield | 0 | Do: HELD |
+| Track | State | Evidence (history) | ladders | Do |
+|-------|-------|--------------------|---------|-----|
+| **CAP-001** STOP_AL | **DROPPED** | soft_fail `81798e8` (writer closed) | 1 | Do: DROPPED |
+| **CAP-002** SceneCapture | **DROPPED** | EXIT accepted earlier; SC2D→RT→PNG envelope historical | 0 | Do: DROPPED |
+| **EA / EA SCOUT** | **DROPPED** | EA-LOOKLOCK APPROVED history: [EA_LOOKLOCK_INVENTORY.md](../Docs/handoffs/EA_LOOKLOCK_INVENTORY.md) · #212/#213 | — | Do: DROPPED |
 
-**CLOUD_FALLBACK_DRILL_V1 (ProveOps B):** Host `CLOUD` · ball Conductor · path `Docs/handoffs/CLOUD_FALLBACK_DRILL_CHECKLIST_V1.md` · branch `cursor/cloud-fallback-drill-b3a5` · CAP-002 Do still **HELD**. Evidence: `path=gh Contents API` · trigger PROXY `forced-degrade`.
+**Pin tip (live):** `0a27306` (superseded stale HOLD `8c4442a`).
 
+**ProveOps:** not the default roster. Optional pattern only for a future Lead-named **non-CAP** prove.
 
-**MARKETPLACE_SCOUT_V1 (ProveOps B):** Host `CLOUD` · ball Conductor · KEEP/REJECT/CANDIDATE source [MARKETPLACE_POLICY_V1.md](../Docs/handoffs/MARKETPLACE_POLICY_V1.md) · CAP-002 Do still **HELD** · pin HOLD `8c4442a` · Host for any later tool Act per SWARM_OPS §14 · no live install in this Act.
-**EA-LOOKLOCK (Lead 2026-09-26 ET):** **`APPROVE EA-LOOKLOCK`** — merged #212 (`5d87c33`) + #213 (`8c2a2e5`). Inventory: [EA_LOOKLOCK_INVENTORY.md](../Docs/handoffs/EA_LOOKLOCK_INVENTORY.md). Design parked. Implement **parked** until Lead names a SCOUT bite. CAP-002 Do still **HELD**.
+**Round-1 harness residue (closed / not the ball):** CLOUD_FALLBACK · MARKETPLACE_POLICY · DET pin sync — see Docs/handoffs/*. Do not revive MARKETPLACE_SCOUT or CAP as live ball.
 
-Roster while CAP product open: Conductor + Test + Fix. Design / Implement **parked**. Ban: AL · sync-writer · wait knobs · N-cam · third ladder.
-
-
-
----
 
 ## Host owner lane (HR3-D convention)
 
