@@ -4,7 +4,7 @@
 
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **Conductor** (parent DESKTOP) / **DESKTOP-21CT3H0**
-**ball:** Conductor (EA-LOOKLOCK APPROVED; wait Lead SCOUT bite name — CAP-002 Do still HELD)
+**ball:** Conductor (CLOUD_FALLBACK_DRILL_V1 Host=CLOUD · Contents API forced-degrade · CAP-002 Do HELD · EA SCOUT wait Lead)
 **Blocked by:** none — next track TBD (Taste Gate if inventing) · CAP-002 Do **HELD**
 **Sign-off doc:** [Docs/17_HS_AUDIT_SIGN_OFF.md](../Docs/17_HS_AUDIT_SIGN_OFF.md) — **SIGNED OFF** Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET.
 
@@ -32,6 +32,8 @@ Conductor-only status. Increment **`ladders`** only when a Fix SHA lands on that
 |-----|-------|----------|---------|-----|
 | **CAP-001** STOP_AL | parked | soft_fail `81798e8` | 1 | Do: NO |
 | **CAP-002** SceneCapture | EXIT accepted | SC2D→RT `RTF_RGBA8`→PNG; settle-after-yield | 0 | Do: HELD |
+
+**CLOUD_FALLBACK_DRILL_V1 (ProveOps B):** Host `CLOUD` · ball Conductor · path `Docs/handoffs/CLOUD_FALLBACK_DRILL_CHECKLIST_V1.md` · branch `cursor/cloud-fallback-drill-b3a5` · CAP-002 Do still **HELD**. Evidence: `path=gh Contents API` · trigger PROXY `forced-degrade`.
 
 **EA-LOOKLOCK (Lead 2026-09-26 ET):** **`APPROVE EA-LOOKLOCK`** — merged #212 (`5d87c33`) + #213 (`8c2a2e5`). Inventory: [EA_LOOKLOCK_INVENTORY.md](../Docs/handoffs/EA_LOOKLOCK_INVENTORY.md). Design parked. Implement **parked** until Lead names a SCOUT bite. CAP-002 Do still **HELD**.
 
