@@ -1122,20 +1122,32 @@ bool AHomeWorldCharacter::TryHarvestInFront()
 		return bOk;
 	}
 
-	// List 56 / T2 + T3: Bed (tag Bed) — go to bed (day) or wake (night). Interact: if night → AdvanceToDawn; else → SetPhase(Night).
-	if (HitActor && HitActor->ActorHasTag(FName("Bed")))
+	// List 56 / T2 + T3 + T0 #11: Bed / NODE_BED -- go to bed (day) or wake (night).
+	// Go-to-bed grants sleep gate (GrantSpiritSleepGate); spirit only if rune unlocked (#7).
+	// Phase-alone SetPhase(Night) without this path = closed_fail for FORM_SPIRIT. Soft-kidnap != bed.
+	if (HitActor && (HitActor->ActorHasTag(FName("Bed")) || HitActor->ActorHasTag(FName("NODE_BED"))))
 	{
 		if (UHomeWorldTimeOfDaySubsystem* Tod = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>())
 		{
 			if (Tod->GetIsNight())
 			{
 				Tod->AdvanceToDawn();
-				UE_LOG(LogTemp, Log, TEXT("HomeWorld: Wake (interact at bed) — phase set to Dawn. MVP List 56 T3."));
+				UE_LOG(LogTemp, Log, TEXT("HomeWorld: Wake (interact at bed) -- phase set to Dawn. MVP List 56 T3."));
 			}
 			else
 			{
-				Tod->SetPhase(EHomeWorldTimeOfDayPhase::Night);
-				UE_LOG(LogTemp, Log, TEXT("HomeWorld: Go to bed (interact) — phase set to Night. MVP List 8 / List 56."));
+				// T0 #11: bed path grants sleep gate then form via CanEnterSpiritForm (not phase alone).
+				if (bRuneGateUnlocked)
+				{
+					TryBedSleepSpirit();
+				}
+				else
+				{
+					Tod->SetPhase(EHomeWorldTimeOfDayPhase::Night);
+					GrantSpiritSleepGate();
+					UE_LOG(LogTemp, Log,
+						TEXT("NODE_BED: sleep gate Night FORM_BODY (need NODE_RUNE for FORM_SPIRIT TOD_NIGHT_SPIRIT CAM_T0_BED; not phase-alone spirit; #9 w/o bed stay FORM_BODY)"));
+				}
 			}
 			return true;
 		}
@@ -1924,6 +1936,63 @@ bool AHomeWorldCharacter::TryBootPlanetsideNightHome()
 		ShowInteractFeedback(TEXT("NODE_GLIDER: EJECT_HOME latch"), FColor::Green);
 	}
 	return true;
+}
+
+bool AHomeWorldCharacter::TryBedSleepSpirit()
+{
+	// T0_M11 NODE_BED / TOD_NIGHT_SPIRIT / FORM_SPIRIT / CAM_T0_BED / NODE_RUNE
+	// Architecture Trade-Offs A-E: prefer existing GrantSpiritSleepGate / CanEnterSpiritForm /
+	// ApplyFormForPhase -- no parallel form service, no invent WP/form APIs (Arch B).
+	// Anti closed_fail: phase-only spirit; spirit w/o bed+rune; soft-kidnap != bed.
+	// #9 Night@home w/o bed stay FORM_BODY -- do not break (cite only).
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
+	if (!TimeOfDay)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NODE_BED: sleep-spirit skipped - TimeOfDay missing"));
+		return false;
+	}
+
+	if (!bRuneGateUnlocked)
+	{
+		UE_LOG(LogTemp, Log,
+			TEXT("NODE_BED: sleep-spirit skipped - need NODE_RUNE first (hw.Rune.Unlock); bed->spirit without unlock = closed_fail"));
+		ShowInteractFeedback(TEXT("NODE_BED: unlock rune first"), FColor::Yellow);
+		return false;
+	}
+
+	if (bBedSpiritGranted && bIsSpiritForm && bSpiritSleepGateGranted)
+	{
+		UE_LOG(LogTemp, Log,
+			TEXT("NODE_BED: TOD_NIGHT_SPIRIT FORM_SPIRIT CAM_T0_BED NODE_RUNE (already granted; GrantSpiritSleepGate latch; not phase-alone; not soft-kidnap; #9 w/o bed stay FORM_BODY)"));
+		ShowInteractFeedback(TEXT("NODE_BED: already spirit"), FColor::Green);
+		return true;
+	}
+
+	// Night then sleep gate -- SyncFormVia GrantSpiritSleepGate applies FORM_SPIRIT when CanEnterSpiritForm.
+	if (!TimeOfDay->GetIsNight())
+	{
+		TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Night);
+	}
+	GrantSpiritSleepGate();
+
+	bBedSpiritGranted = true;
+	if (bIsSpiritForm)
+	{
+		UE_LOG(LogTemp, Log,
+			TEXT("NODE_BED: TOD_NIGHT_SPIRIT FORM_SPIRIT CAM_T0_BED NODE_RUNE (GrantSpiritSleepGate + CanEnterSpiritForm; not phase-alone; not soft-kidnap; #9 w/o bed stay FORM_BODY)"));
+		ShowInteractFeedback(TEXT("NODE_BED: FORM_SPIRIT"), FColor::Green);
+		return true;
+	}
+
+	UE_LOG(LogTemp, Log,
+		TEXT("NODE_BED: sleep gate granted but FORM_BODY (unexpected; need Night + NODE_RUNE; not phase-alone spirit)"));
+	ShowInteractFeedback(TEXT("NODE_BED: sleep gate only"), FColor::Yellow);
+	return false;
 }
 
 void AHomeWorldCharacter::SyncFormWithTimeOfDay()
