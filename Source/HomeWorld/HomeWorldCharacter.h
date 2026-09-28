@@ -146,6 +146,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Form", meta = (DisplayName = "Sync Form With Time Of Day"))
 	void SyncFormWithTimeOfDay();
 
+	/**
+	 * T0 #1 NODE_WAKE: emit named homestead start-day wake beat (TOD_DAY / FORM_BODY / CAM_T0_WAKE).
+	 * Extends existing PlayerStart / UHomeWorldTimeOfDaySubsystem hooks -- no parallel wake service (Arch B).
+	 * Not PlayerStart alone; not PROXY SM_ProxyWakeMarker; not bed->Dawn alone (those = closed_fail).
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Wake|T0", meta = (DisplayName = "Try Emit NODE_WAKE Start-Day Beat"))
+	void TryEmitNodeWakeStartDayBeat();
+
 	/** MV-A: parkour-lite mantle/vault (body, day). */
 	UFUNCTION(BlueprintCallable, Category = "Movement|MV-A", meta = (DisplayName = "Try Mantle Or Vault"))
 	bool TryMantleOrVault();
@@ -375,6 +383,9 @@ protected:
 	float MovementRightAxis = 0.f;
 
 	EHomeWorldTimeOfDayPhase LastAppliedFormPhase = EHomeWorldTimeOfDayPhase::Day;
+
+	/** T0 #1: once per Day phase - NODE_WAKE start-day beat already emitted. */
+	bool bNodeWakeEmittedForCurrentDay = false;
 
 	/** VP-C PA-06: on-screen interact feedback (debug overlay). */
 	void ShowInteractFeedback(const FString& Message, FColor Color = FColor::Green) const;
