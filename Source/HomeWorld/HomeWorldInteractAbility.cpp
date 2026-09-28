@@ -48,6 +48,11 @@ void UHomeWorldInteractAbility::ActivateAbility(const FGameplayAbilitySpecHandle
 	}
 	if (!bHandled)
 	{
+		// T0 #7 NODE_RUNE: day field-path rune unlock -> SetRuneGateUnlocked (not PROXY / not spirit-on-phase).
+		bHandled = Character->TryNodeRuneInteractInFront();
+	}
+	if (!bHandled)
+	{
 		// T0 #6 NODE_FIELD_GATHER: field herb/seed collect near landing (not dress/GP_Store/PROXY/plant; not ungated Gather.Flowers).
 		bHandled = Character->TryNodeFieldGatherInteractInFront();
 	}
