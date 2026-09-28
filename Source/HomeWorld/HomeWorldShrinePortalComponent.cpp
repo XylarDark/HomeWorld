@@ -164,6 +164,27 @@ bool UHomeWorldShrinePortalComponent::TryPortalTransit(AActor* InstigatorActor)
 	return true;
 }
 
+bool UHomeWorldShrinePortalComponent::TryPortalTransitToDestination(AActor* InstigatorActor, FName OverrideDestinationLabel)
+{
+	// T0 #13 home->camp: reuse TryPortalTransit with temporary DestinationLabel override.
+	// Architecture Trade-Offs B: no parallel portal service. Restore label so home<->planet pair stays intact.
+	if (OverrideDestinationLabel.IsNone())
+	{
+		LOG_PORTAL_FALLBACK(TEXT("failed -- OverrideDestinationLabel none (NODE_PORTAL_CAMP required for #13)"));
+		return false;
+	}
+	const FName SavedLabel = DestinationLabel;
+	DestinationLabel = OverrideDestinationLabel;
+	const bool bOk = TryPortalTransit(InstigatorActor);
+	DestinationLabel = SavedLabel;
+	if (bOk)
+	{
+		LOG_PORTAL_FALLBACK(TEXT("T0 camp transit via override '%s' (not home<->planet alone)"),
+			*OverrideDestinationLabel.ToString());
+	}
+	return bOk;
+}
+
 void UHomeWorldShrinePortalComponent::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {

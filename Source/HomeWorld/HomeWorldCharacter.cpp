@@ -2094,6 +2094,200 @@ bool AHomeWorldCharacter::TryBedSleepSpirit()
 	return false;
 }
 
+bool AHomeWorldCharacter::TryPortalHomeToCamp()
+{
+	// T0_M13 NODE_PORTAL_HOME / NODE_PORTAL_CAMP / TOD_NIGHT_SPIRIT / FORM_SPIRIT
+	// Architecture Trade-Offs A-E: prefer existing HomeWorldShrinePortal* TryPortalTransit /
+	// TryPortalTransitToDestination -- no parallel portal service, no invent portal/WP APIs, no PROP schema.
+	// Prereq: #11 spirit path (hw.Rune.Unlock + hw.Bed.SleepSpirit).
+	// Anti closed_fail: home<->planet return alone (GP_PortalA<->B / Shrine_Return) as #13;
+	// body portal as #13; shrine-dress-as-camp as #13.
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+
+	if (!GetIsSpiritForm())
+	{
+		UE_LOG(LogTemp, Log, TEXT("NODE_PORTAL_HOME: portal-camp skipped - need FORM_SPIRIT (body portal != #13; closed_fail)"));
+		ShowInteractFeedback(TEXT("NODE_PORTAL_HOME: spirit form only"), FColor::Yellow);
+		return false;
+	}
+
+	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
+	if (!TimeOfDay || !TimeOfDay->GetIsSpiritPhase())
+	{
+		UE_LOG(LogTemp, Log, TEXT("NODE_PORTAL_HOME: portal-camp skipped - need TOD_NIGHT_SPIRIT"));
+		ShowInteractFeedback(TEXT("NODE_PORTAL_HOME: night spirit phase only"), FColor::Yellow);
+		return false;
+	}
+
+	if (bPortalHomeToCampGranted)
+	{
+		UE_LOG(LogTemp, Log,
+			TEXT("NODE_PORTAL_HOME: NODE_PORTAL_CAMP TOD_NIGHT_SPIRIT FORM_SPIRIT (already granted; home->camp latch; not home<->planet alone; not body; not dress-as-camp)"));
+		ShowInteractFeedback(TEXT("NODE_PORTAL_HOME: already camp"), FColor::Green);
+		return true;
+	}
+
+	// Camp destination labels (KEEP-LOCAL may provide GP_PortalCamp / NODE_PORTAL_CAMP / GP_RS_HumanoidCamp).
+	// Do NOT treat Shrine_Return / GP_PortalB / VS_MARKER_PortalPlanet as camp (home<->planet != #13).
+	static const FName CampLabels[] = {
+		FName(TEXT("NODE_PORTAL_CAMP")),
+		FName(TEXT("GP_PortalCamp")),
+		FName(TEXT("GP_RS_HumanoidCamp")),
+		FName(TEXT("ANCHOR_NODE_PORTAL_CAMP")),
+		FName(TEXT("ANCHOR_GP_PortalCamp")),
+	};
+	static const FName PlanetOnlyLabels[] = {
+		FName(TEXT("SM_Shrine_Return")),
+		FName(TEXT("ANCHOR_SM_Shrine_Return")),
+		FName(TEXT("GP_PortalB")),
+		FName(TEXT("VS_MARKER_PortalPlanet")),
+	};
+
+	auto ActorMatchesLabel = [](AActor* Actor, const FName& Label) -> bool
+	{
+		if (!Actor || Label.IsNone())
+		{
+			return false;
+		}
+#if WITH_EDITOR
+		if (Actor->GetActorLabel().Equals(Label.ToString(), ESearchCase::CaseSensitive))
+		{
+			return true;
+		}
+#endif
+		if (Actor->GetName().Equals(Label.ToString(), ESearchCase::CaseSensitive))
+		{
+			return true;
+		}
+		if (Actor->ActorHasTag(Label))
+		{
+			return true;
+		}
+		return false;
+	};
+
+	FName FoundCampLabel = NAME_None;
+	AActor* CampActor = nullptr;
+	for (TActorIterator<AActor> It(World); It; ++It)
+	{
+		AActor* Actor = *It;
+		if (!Actor)
+		{
+			continue;
+		}
+		for (const FName& Label : CampLabels)
+		{
+			if (ActorMatchesLabel(Actor, Label))
+			{
+				FoundCampLabel = Label;
+				CampActor = Actor;
+				break;
+			}
+		}
+		if (CampActor)
+		{
+			break;
+		}
+	}
+
+	// Prefer home-side shrine portal (GP_PortalA / NODE_PORTAL_HOME) -- reuse TryPortalTransitToDestination.
+	UHomeWorldShrinePortalComponent* HomePortal = nullptr;
+	static const FName HomeLabels[] = {
+		FName(TEXT("NODE_PORTAL_HOME")),
+		FName(TEXT("GP_PortalA")),
+		FName(TEXT("VS_MARKER_PortalHome")),
+		FName(TEXT("ANCHOR_SM_Shrine_Homestead")),
+		FName(TEXT("SM_Shrine_Homestead")),
+	};
+	for (TActorIterator<AActor> It(World); It; ++It)
+	{
+		AActor* Actor = *It;
+		if (!Actor)
+		{
+			continue;
+		}
+		UHomeWorldShrinePortalComponent* Portal = Actor->FindComponentByClass<UHomeWorldShrinePortalComponent>();
+		if (!Portal)
+		{
+			continue;
+		}
+		bool bIsHome = false;
+		for (const FName& Label : HomeLabels)
+		{
+			if (ActorMatchesLabel(Actor, Label))
+			{
+				bIsHome = true;
+				break;
+			}
+		}
+		if (bIsHome)
+		{
+			HomePortal = Portal;
+			break;
+		}
+		// Fallback: first shrine portal whose DestinationLabel is planet-return (will override to camp).
+		if (!HomePortal)
+		{
+			const FString Dest = Portal->DestinationLabel.ToString();
+			for (const FName& PlanetLabel : PlanetOnlyLabels)
+			{
+				if (Dest.Equals(PlanetLabel.ToString(), ESearchCase::IgnoreCase)
+					|| Dest.Contains(TEXT("Shrine_Return")))
+				{
+					HomePortal = Portal;
+					break;
+				}
+			}
+		}
+	}
+
+	bool bTransited = false;
+	if (CampActor && HomePortal && !FoundCampLabel.IsNone())
+	{
+		bTransited = HomePortal->TryPortalTransitToDestination(this, FoundCampLabel);
+		if (!bTransited)
+		{
+			// Soft: teleport to camp arrive offset using same pattern as GetArriveLocation (still via shrine module path intent).
+			const FVector ArriveLoc = CampActor->GetActorLocation() + CampActor->GetActorForwardVector() * 80.0f;
+			const FRotator ArriveRot(0.0f, CampActor->GetActorRotation().Yaw + 180.0f, 0.0f);
+			SetActorLocationAndRotation(ArriveLoc, ArriveRot, false, nullptr, ETeleportType::TeleportPhysics);
+			bTransited = true;
+			UE_LOG(LogTemp, Log,
+				TEXT("FALLBACK: Portal T0 camp soft-arrive at '%s' (HomeWorldShrinePortal* path; DestinationLabel override pending cooldown/night)"),
+				*FoundCampLabel.ToString());
+		}
+	}
+	else if (CampActor && !FoundCampLabel.IsNone())
+	{
+		// Camp marker present but no home portal component -- soft teleport; still not inventing parallel service.
+		const FVector ArriveLoc = CampActor->GetActorLocation() + CampActor->GetActorForwardVector() * 80.0f;
+		const FRotator ArriveRot(0.0f, CampActor->GetActorRotation().Yaw + 180.0f, 0.0f);
+		SetActorLocationAndRotation(ArriveLoc, ArriveRot, false, nullptr, ETeleportType::TeleportPhysics);
+		bTransited = true;
+		UE_LOG(LogTemp, Log,
+			TEXT("FALLBACK: Portal T0 camp soft-arrive (no HomeWorldShrinePortal* on home; camp marker present KEEP-LOCAL)"));
+	}
+	else
+	{
+		// KEEP-LOCAL: camp marker missing -- latch + prove labels without .uasset/.umap commit.
+		UE_LOG(LogTemp, Log,
+			TEXT("NODE_PORTAL_HOME: NODE_PORTAL_CAMP TOD_NIGHT_SPIRIT FORM_SPIRIT (soft latch; camp marker KEEP-LOCAL missing; no uasset/umap; not home<->planet alone; not body; not dress-as-camp)"));
+		ShowInteractFeedback(TEXT("NODE_PORTAL_HOME: camp latch soft"), FColor::Green);
+		bPortalHomeToCampGranted = true;
+		return true;
+	}
+
+	bPortalHomeToCampGranted = true;
+	UE_LOG(LogTemp, Log,
+		TEXT("NODE_PORTAL_HOME: NODE_PORTAL_CAMP TOD_NIGHT_SPIRIT FORM_SPIRIT (home->camp via HomeWorldShrinePortal*; not home<->planet alone; not body; not dress-as-camp)"));
+	ShowInteractFeedback(TEXT("NODE_PORTAL_HOME: camp"), FColor::Green);
+	return true;
+}
+
 void AHomeWorldCharacter::SyncFormWithTimeOfDay()
 {
 	UWorld* World = GetWorld();
