@@ -383,30 +383,63 @@ namespace
 
 	void CmdInventoryDump(const TArray<FString>& Args)
 	{
+		// T0 #4: inventory open/use gated by NODE_BACKPACK equip (ungated inventory-lite = closed_fail).
 		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Inventory.Dump requires a play world (PIE or game)."));
 			return;
 		}
-		UGameInstance* GI = World->GetGameInstance();
-		if (!GI) return;
-		UHomeWorldInventorySubsystem* Inv = GI->GetSubsystem<UHomeWorldInventorySubsystem>();
-		if (!Inv) { UE_LOG(LogTemp, Warning, TEXT("HomeWorld: InventorySubsystem not found.")); return; }
-		UE_LOG(LogTemp, Log, TEXT("INVENTORY: dump begin (slots=%d total=%d)"), Inv->GetSlotCount(), Inv->GetTotalPhysicalGoods());
-		for (int32 Si = 0; Si < Inv->GetSlotCount(); ++Si)
+		APlayerController* PC = World->GetFirstPlayerController();
+		AHomeWorldCharacter* Char = PC ? Cast<AHomeWorldCharacter>(PC->GetPawn()) : nullptr;
+		if (!Char)
 		{
-			const FHomeWorldInventorySlot Slot = Inv->GetSlot(Si);
-			if (Slot.IsEmpty())
-			{
-				UE_LOG(LogTemp, Log, TEXT("INVENTORY: slot[%d]=empty"), Si);
-			}
-			else
-			{
-				UE_LOG(LogTemp, Log, TEXT("INVENTORY: slot[%d]=%s x%d"), Si, *Slot.ResId.ToString(), Slot.Count);
-			}
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Inventory.Dump - no AHomeWorldCharacter pawn."));
+			return;
 		}
-		UE_LOG(LogTemp, Log, TEXT("INVENTORY: dump end"));
+		const bool bOk = Char->TryOpenInventoryGated();
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Inventory.Dump %s (NODE_BACKPACK inventory gate; not inventory-lite alone)."),
+			bOk ? TEXT("ok") : TEXT("rejected"));
+	}
+
+	void CmdBackpackEquip(const TArray<FString>& Args)
+	{
+		UWorld* World = HomeWorldPlayWorld::Resolve();
+		if (!World)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Backpack.Equip requires a play world (PIE or game)."));
+			return;
+		}
+		APlayerController* PC = World->GetFirstPlayerController();
+		AHomeWorldCharacter* Char = PC ? Cast<AHomeWorldCharacter>(PC->GetPawn()) : nullptr;
+		if (!Char)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Backpack.Equip - no AHomeWorldCharacter pawn."));
+			return;
+		}
+		const bool bOk = Char->TryEquipNodeBackpack();
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Backpack.Equip %s (NODE_BACKPACK equip->inventory gate; not PROXY)."),
+			bOk ? TEXT("ok") : TEXT("failed"));
+	}
+
+	void CmdInventoryOpen(const TArray<FString>& Args)
+	{
+		UWorld* World = HomeWorldPlayWorld::Resolve();
+		if (!World)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Inventory.Open requires a play world (PIE or game)."));
+			return;
+		}
+		APlayerController* PC = World->GetFirstPlayerController();
+		AHomeWorldCharacter* Char = PC ? Cast<AHomeWorldCharacter>(PC->GetPawn()) : nullptr;
+		if (!Char)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Inventory.Open - no AHomeWorldCharacter pawn."));
+			return;
+		}
+		const bool bOk = Char->TryOpenInventoryGated();
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Inventory.Open %s (NODE_BACKPACK inventory gate)."),
+			bOk ? TEXT("ok") : TEXT("rejected"));
 	}
 
 	void CmdPlaceWall(const TArray<FString>& Args)
@@ -1253,7 +1286,7 @@ void FHomeWorldModule::StartupModule()
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.Inventory.Dump"),
-		TEXT("PL-C: Log six inventory slots as INVENTORY: lines. Thin readout companion to HUD Inv[n]."),
+		TEXT("T0 #4 / PL-C: inventory open gated by NODE_BACKPACK equip; logs INVENTORY slots when latch set."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdInventoryDump),
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
@@ -1445,6 +1478,16 @@ void FHomeWorldModule::StartupModule()
 		TEXT("hw.Kettle.Brew"),
 		TEXT("T0 #2 NODE_KETTLE: spend RES_HERB -> tea; tea-gates sprint ~half day (TOD_DAY FORM_BODY). Not PROXY/meal/ungated alone."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdKettleBrew),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Backpack.Equip"),
+		TEXT("T0 #4 NODE_BACKPACK: equip latch -> inventory open gated (TOD_DAY FORM_BODY). Not inventory-lite alone / not PROXY."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdBackpackEquip),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Inventory.Open"),
+		TEXT("T0 #4 NODE_BACKPACK: inventory open/use requires backpack equip latch. Ungated inventory-lite = closed_fail."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdInventoryOpen),
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.TimeOfDay.SetPhase"),

@@ -187,6 +187,29 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Plant|T0", meta = (DisplayName = "Is NODE_PLANT_SLOT Day Planted"))
 	bool IsNodePlantSlotDayPlanted() const;
 
+	/**
+	 * T0 #4 NODE_BACKPACK: equip backpack -> inventory access gate.
+	 * Extends existing UHomeWorldInventorySubsystem -- no parallel inventory service, no new schema (Arch B).
+	 * Not inventory-lite alone; not PROXY SM_ProxyBackpack alone (those = closed_fail).
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Backpack|T0", meta = (DisplayName = "Try Equip NODE_BACKPACK"))
+	bool TryEquipNodeBackpack();
+
+	/** Trace/tag NODE_BACKPACK / Backpack interact -> TryEquipNodeBackpack (world beat, not PROXY alone). */
+	UFUNCTION(BlueprintCallable, Category = "Backpack|T0", meta = (DisplayName = "Try NODE_BACKPACK Interact In Front"))
+	bool TryNodeBackpackInteractInFront();
+
+	/** True after NODE_BACKPACK equip latch this session. */
+	UFUNCTION(BlueprintCallable, Category = "Backpack|T0", meta = (DisplayName = "Is Backpack Equipped"))
+	bool IsBackpackEquipped() const { return bBackpackEquipped; }
+
+	/**
+	 * Inventory open/use gated by backpack equip latch (existing inventory-lite slots).
+	 * Ungated inventory-lite alone = closed_fail for MUST #4.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Backpack|T0", meta = (DisplayName = "Try Open Inventory Gated"))
+	bool TryOpenInventoryGated();
+
 	/** MV-A: parkour-lite mantle/vault (body, day). */
 	UFUNCTION(BlueprintCallable, Category = "Movement|MV-A", meta = (DisplayName = "Try Mantle Or Vault"))
 	bool TryMantleOrVault();
@@ -426,6 +449,9 @@ protected:
 	/** T0 #2: tea sprint duration seconds (~half day stub; night stub is 120s). */
 	UPROPERTY(EditDefaultsOnly, Category = "Kettle|T0", meta = (ClampMin = "1.0"))
 	float TeaSprintHalfDaySeconds = 60.f;
+
+	/** T0 #4: backpack equip latch -- inventory open/use requires this (not inventory-lite alone). */
+	bool bBackpackEquipped = false;
 
 	/** VP-C PA-06: on-screen interact feedback (debug overlay). */
 	void ShowInteractFeedback(const FString& Message, FColor Color = FColor::Green) const;
