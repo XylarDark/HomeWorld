@@ -1328,6 +1328,33 @@ void CmdPlantSlot(const TArray<FString>& Args)
 			bOk ? TEXT("ok") : TEXT("failed"));
 	}
 
+
+	void CmdCampNight(const TArray<FString>& Args)
+	{
+		UWorld* World = HomeWorldPlayWorld::Resolve();
+		if (!World)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.CampNight requires a play world (PIE or game)."));
+			return;
+		}
+		APlayerController* PC = World->GetFirstPlayerController();
+		AHomeWorldCharacter* Char = PC ? Cast<AHomeWorldCharacter>(PC->GetPawn()) : nullptr;
+		if (!Char)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.CampNight - no AHomeWorldCharacter pawn."));
+			return;
+		}
+		// Arrange prereqs: hw.Rune.Unlock then hw.Bed.SleepSpirit (#11) -> FORM_SPIRIT / TOD_NIGHT_SPIRIT.
+		// Optional: hw.Portal.Camp (#13) to arrive camp — not required for Source emit soft latch.
+		if (!Char->GetIsSpiritForm())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.CampNight - need FORM_SPIRIT; run hw.Rune.Unlock then hw.Bed.SleepSpirit (#11 path). body camp-night = closed_fail."));
+		}
+		const bool bOk = Char->TryCampNight();
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.CampNight %s (NODE_GUARD NODE_SLEEPER TOD_NIGHT_SPIRIT FORM_SPIRIT CAM_T0_CAMP_NIGHT; avoid-1 + soothe-2 via UHomeWorldSpiritStealthComponent; soothe != convert; not GP_SS_Lit alone; not stealth-alone)."),
+			bOk ? TEXT("ok") : TEXT("failed"));
+	}
+
 	void CmdKettleBrew(const TArray<FString>& Args)
 	{
 		UWorld* World = HomeWorldPlayWorld::Resolve();
@@ -1687,6 +1714,11 @@ void FHomeWorldModule::StartupModule()
 		TEXT("hw.Portal.Camp"),
 		TEXT("T0 #13 NODE_PORTAL_HOME->NODE_PORTAL_CAMP: spirit home->camp portal (TOD_NIGHT_SPIRIT FORM_SPIRIT). Prereq hw.Rune.Unlock + hw.Bed.SleepSpirit. Via HomeWorldShrinePortal*; not home<->planet alone; not body; not dress-as-camp."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdPortalCamp),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.CampNight"),
+		TEXT("T0 #14 camp night: avoid 1 NODE_GUARD + soothe 2 NODE_SLEEPER (TOD_NIGHT_SPIRIT FORM_SPIRIT CAM_T0_CAMP_NIGHT). Prereq hw.Rune.Unlock + hw.Bed.SleepSpirit. Via UHomeWorldSpiritStealthComponent; soothe != convert; not GP_SS_Lit alone; not stealth-alone."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdCampNight),
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.Kettle.Brew"),
