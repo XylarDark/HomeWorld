@@ -1329,6 +1329,144 @@ bool AHomeWorldCharacter::TryNodeKettleInteractInFront()
 	return TryBrewNodeKettleTea();
 }
 
+bool AHomeWorldCharacter::IsNodePlantSlotDayPlanted() const
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+	for (TActorIterator<AActor> It(World); It; ++It)
+	{
+		if (UHomeWorldNurtureComponent* Nurture = It->FindComponentByClass<UHomeWorldNurtureComponent>())
+		{
+			if (Nurture->GetTargetId() == EHomeWorldNurtureTargetId::N1_Crop && Nurture->GetIsDayPlantedGivenHerb())
+			{
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+bool AHomeWorldCharacter::TryPlantNodePlantSlotHerb()
+{
+	// T0_M3 NODE_PLANT_SLOT / TOD_DAY / FORM_BODY
+	// Architecture Trade-Offs A-E: prefer existing HomeWorldNurtureTarget / N1 planter / inventory RES_HERB
+	// -- no parallel plant service, no new schema, no invent plant/WP APIs.
+	// Anti closed_fail: GP_N1_Crop nurture-only != day plant-given-herb; PROXY SM_ProxyPlantSlot alone != world plant;
+	// TryNurtureInFront / spirit nurture != plant beat. #12 nurture DEFER (same slot identity only).
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
+	if (!TimeOfDay || TimeOfDay->GetCurrentPhase() != EHomeWorldTimeOfDayPhase::Day)
+	{
+		UE_LOG(LogTemp, Log, TEXT("NODE_PLANT_SLOT: plant skipped - need TOD_DAY"));
+		ShowInteractFeedback(TEXT("NODE_PLANT_SLOT: day only"), FColor::Yellow);
+		return false;
+	}
+	if (bIsSpiritForm)
+	{
+		UE_LOG(LogTemp, Log, TEXT("NODE_PLANT_SLOT: plant skipped - need FORM_BODY"));
+		ShowInteractFeedback(TEXT("NODE_PLANT_SLOT: body form only"), FColor::Yellow);
+		return false;
+	}
+
+	UHomeWorldNurtureComponent* Slot = nullptr;
+	for (TActorIterator<AActor> It(World); It; ++It)
+	{
+		if (UHomeWorldNurtureComponent* Nurture = It->FindComponentByClass<UHomeWorldNurtureComponent>())
+		{
+			if (Nurture->GetTargetId() == EHomeWorldNurtureTargetId::N1_Crop)
+			{
+				Slot = Nurture;
+				break;
+			}
+		}
+	}
+	if (!Slot)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NODE_PLANT_SLOT: plant failed - no N1_Crop HomeWorldNurtureTarget slot in world"));
+		ShowInteractFeedback(TEXT("NODE_PLANT_SLOT: no plant slot"), FColor::Yellow);
+		return false;
+	}
+
+	if (Slot->GetIsDayPlantedGivenHerb())
+	{
+		UE_LOG(LogTemp, Log,
+			TEXT("NODE_PLANT_SLOT: day plant given herb TOD_DAY FORM_BODY (already planted; same slot for #12; not TryNurture; not PROXY SM_ProxyPlantSlot)"));
+		ShowInteractFeedback(TEXT("NODE_PLANT_SLOT: already planted"), FColor::Green);
+		return true;
+	}
+
+	UGameInstance* GI = World->GetGameInstance();
+	UHomeWorldInventorySubsystem* Inv = GI ? GI->GetSubsystem<UHomeWorldInventorySubsystem>() : nullptr;
+	if (!Inv)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NODE_PLANT_SLOT: plant failed - no InventorySubsystem"));
+		return false;
+	}
+	if (!Inv->SpendResource(HomeWorldInventory::RES_HERB, 1))
+	{
+		UE_LOG(LogTemp, Log, TEXT("NODE_PLANT_SLOT: plant failed - need RES_HERB (given herb)"));
+		ShowInteractFeedback(TEXT("NODE_PLANT_SLOT: need RES_HERB"), FColor::Yellow);
+		return false;
+	}
+
+	Slot->MarkDayPlantedGivenHerb();
+	UE_LOG(LogTemp, Log,
+		TEXT("NODE_PLANT_SLOT: day plant given herb TOD_DAY FORM_BODY (not GP_N1 nurture-only; not PROXY SM_ProxyPlantSlot; not TryNurture; #12 DEFER)"));
+	ShowInteractFeedback(TEXT("NODE_PLANT_SLOT: day plant given herb"), FColor::Green);
+	return true;
+}
+
+bool AHomeWorldCharacter::TryNodePlantSlotInteractInFront()
+{
+	FHitResult Hit;
+	if (!TraceInteractHit(Hit))
+	{
+		return false;
+	}
+	AActor* HitActor = GetInteractTargetActor(Hit);
+	if (!HitActor)
+	{
+		return false;
+	}
+
+	static const FName PlantTags[] = {
+		FName(TEXT("NODE_PLANT_SLOT")),
+		FName(TEXT("PlantSlot")),
+	};
+	bool bIsPlantSlot = false;
+	for (const FName& Tag : PlantTags)
+	{
+		if (HitActor->ActorHasTag(Tag))
+		{
+			bIsPlantSlot = true;
+			break;
+		}
+	}
+	// Prefer N1 nurture target as the world plant slot (same identity #12 uses) -- not PROXY mesh alone.
+	if (UHomeWorldNurtureComponent* Nurture = HitActor->FindComponentByClass<UHomeWorldNurtureComponent>())
+	{
+		if (Nurture->GetTargetId() == EHomeWorldNurtureTargetId::N1_Crop)
+		{
+			bIsPlantSlot = true;
+		}
+	}
+	if (!bIsPlantSlot)
+	{
+		return false;
+	}
+
+	// World interact beat -- PROXY SM_ProxyPlantSlot alone without plant/spend = closed_fail.
+	// Do NOT call TryNurtureInFront here (spirit nurture = #12, not day plant).
+	return TryPlantNodePlantSlotHerb();
+}
+
 void AHomeWorldCharacter::SyncFormWithTimeOfDay()
 {
 	UWorld* World = GetWorld();

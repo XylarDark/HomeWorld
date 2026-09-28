@@ -170,6 +170,23 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Kettle|T0", meta = (DisplayName = "Is Tea Sprint Gate Active"))
 	bool IsTeaSprintGateActive() const;
 
+	/**
+	 * T0 #3 NODE_PLANT_SLOT: day plant given herb (RES_HERB) into plant slot.
+	 * Extends HomeWorldNurtureTarget / N1 / inventory -- no parallel plant service, no new schema (Arch B).
+	 * Not GP_N1_Crop nurture-only; not PROXY SM_ProxyPlantSlot alone; not TryNurtureInFront (closed_fail).
+	 * Marks same slot identity later #12 uses -- does NOT implement #12.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Plant|T0", meta = (DisplayName = "Try Plant NODE_PLANT_SLOT Herb"))
+	bool TryPlantNodePlantSlotHerb();
+
+	/** Trace/tag NODE_PLANT_SLOT / PlantSlot / N1 interact -> TryPlantNodePlantSlotHerb (world beat, not PROXY alone). */
+	UFUNCTION(BlueprintCallable, Category = "Plant|T0", meta = (DisplayName = "Try NODE_PLANT_SLOT Interact In Front"))
+	bool TryNodePlantSlotInteractInFront();
+
+	/** True if N1 NODE_PLANT_SLOT has been day-planted with given herb this session. */
+	UFUNCTION(BlueprintCallable, Category = "Plant|T0", meta = (DisplayName = "Is NODE_PLANT_SLOT Day Planted"))
+	bool IsNodePlantSlotDayPlanted() const;
+
 	/** MV-A: parkour-lite mantle/vault (body, day). */
 	UFUNCTION(BlueprintCallable, Category = "Movement|MV-A", meta = (DisplayName = "Try Mantle Or Vault"))
 	bool TryMantleOrVault();
