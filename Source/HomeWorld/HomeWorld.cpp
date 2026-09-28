@@ -1191,6 +1191,26 @@ namespace
 			bOk ? TEXT("ok") : TEXT("failed"));
 	}
 
+void CmdPlanetsideBootHome(const TArray<FString>& Args)
+	{
+		UWorld* World = HomeWorldPlayWorld::Resolve();
+		if (!World)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Planetside.BootHome requires a play world (PIE or game)."));
+			return;
+		}
+		APlayerController* PC = World->GetFirstPlayerController();
+		AHomeWorldCharacter* Char = PC ? Cast<AHomeWorldCharacter>(PC->GetPawn()) : nullptr;
+		if (!Char)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Planetside.BootHome - no AHomeWorldCharacter pawn."));
+			return;
+		}
+		const bool bOk = Char->TryBootPlanetsideNightHome();
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Planetside.BootHome %s (NODE_GLIDER EJECT_HOME TOD_NIGHT_HOME FORM_BODY planetside night boot home; StartGlideHome; not day-camp #8; not FALLBACK down; not soft-kidnap)."),
+			bOk ? TEXT("ok") : TEXT("failed"));
+	}
+
 void CmdPlantSlot(const TArray<FString>& Args)
 	{
 		UWorld* World = HomeWorldPlayWorld::Resolve();
@@ -1545,6 +1565,11 @@ void FHomeWorldModule::StartupModule()
 		TEXT("hw.DayCamp.Eject"),
 		TEXT("T0 #8 NODE_DAY_CAMP: cartoon EJECT_HOME launch->glider->home (TOD_DAY FORM_BODY CAM_T0_CAMP_DAY). StartGlideHome reverse CRUMB; not FALLBACK/PROXY/script-camp/convert."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdDayCampEject),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Planetside.BootHome"),
+		TEXT("T0 #10 planetside night glider boot home: Night w/o bed FORM_BODY -> EJECT_HOME via StartGlideHome (TOD_NIGHT_HOME NODE_GLIDER). Not day-camp #8; not FALLBACK down; not soft-kidnap."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdPlanetsideBootHome),
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.Plant.Slot"),

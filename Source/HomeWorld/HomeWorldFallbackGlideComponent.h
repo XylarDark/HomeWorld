@@ -33,10 +33,11 @@ public:
 	/**
 	 * EJECT_HOME: reverse CRUMB path (Landing -> Depart_Lookout / home).
 	 * Reuses same glide machinery as StartGlide -- not a parallel eject service (Arch B).
-	 * Distinct from island->planet FALLBACK StartGlide (that alone = closed_fail for MUST #8).
+	 * Distinct from island->planet FALLBACK StartGlide (that alone = closed_fail for MUST #8/#10).
+	 * bAllowNightPhase: MUST #10 planetside night boot may pass true; #8 day-camp leaves default false.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Transit|EJECT_HOME")
-	bool StartGlideHome();
+	bool StartGlideHome(bool bAllowNightPhase = false);
 
 	/** Abort glide and restore walk movement. Idempotent. */
 	UFUNCTION(BlueprintCallable, Category = "Transit|FALLBACK")
