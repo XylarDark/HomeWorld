@@ -107,11 +107,42 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Spirit", meta = (DisplayName = "Get Spirit Id For Death"))
 	FName GetSpiritIdForDeath();
 
-	/** NP-C: true when TimeOfDay phase is Night or Dusk (spirit form; no free-flight). */
+	/** T0 #9: true only when named spirit gates grant form (not phase alone). */
 	UFUNCTION(BlueprintCallable, Category = "Form", meta = (DisplayName = "Is Spirit Form"))
 	bool GetIsSpiritForm() const { return bIsSpiritForm; }
 
-	/** Apply body/spirit form from current TimeOfDay phase. Callable from Blueprint for tests. */
+	/** T0 #9: sleep gate granted (bed path). Default false until #11. */
+	UFUNCTION(BlueprintCallable, Category = "Form|Gates", meta = (DisplayName = "Is Spirit Sleep Gate Granted"))
+	bool IsSpiritSleepGateGranted() const { return bSpiritSleepGateGranted; }
+
+	/** T0 #7 hook: rune unlock before bed→spirit. Default false until #7. */
+	UFUNCTION(BlueprintCallable, Category = "Form|Gates", meta = (DisplayName = "Is Rune Gate Unlocked"))
+	bool IsRuneGateUnlocked() const { return bRuneGateUnlocked; }
+
+	/** T0 #7: unlock/clear rune gate (no spirit until sleep gate also granted). */
+	UFUNCTION(BlueprintCallable, Category = "Form|Gates", meta = (DisplayName = "Set Rune Gate Unlocked"))
+	void SetRuneGateUnlocked(bool bUnlocked);
+
+	/**
+	 * T0 #11 hook: grant sleep gate then sync form.
+	 * Spirit still requires rune gate (#7). Does not invent a second form service.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Form|Gates", meta = (DisplayName = "Grant Spirit Sleep Gate"))
+	void GrantSpiritSleepGate();
+
+	/** Clear sleep gate (Day/Dawn / wake). */
+	UFUNCTION(BlueprintCallable, Category = "Form|Gates", meta = (DisplayName = "Clear Spirit Sleep Gate"))
+	void ClearSpiritSleepGate();
+
+	/** Named gates: sleep + rune. Phase alone never grants spirit (T0 TOD_NIGHT_HOME). */
+	UFUNCTION(BlueprintCallable, Category = "Form|Gates", meta = (DisplayName = "Can Enter Spirit Form"))
+	bool CanEnterSpiritForm() const;
+
+	/** Day body verbs (sprint/mantle/craft-day path): Day or Dawn only. Off at Dusk/Night. */
+	UFUNCTION(BlueprintCallable, Category = "Form|Gates", meta = (DisplayName = "Are Day Body Abilities Allowed"))
+	bool AreDayBodyAbilitiesAllowed() const;
+
+	/** Apply body/spirit form from current TimeOfDay phase + named gates. Callable from Blueprint for tests. */
 	UFUNCTION(BlueprintCallable, Category = "Form", meta = (DisplayName = "Sync Form With Time Of Day"))
 	void SyncFormWithTimeOfDay();
 
@@ -144,9 +175,17 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Stealth|SS-A")
 	TObjectPtr<UHomeWorldSpiritStealthComponent> SpiritStealthComponent;
 
-	/** NP-C: spirit form flag — Night/Dusk true, Day/Dawn false. SYS reads via GetIsSpiritForm(). */
+	/** T0 #9: spirit form flag — granted only via named gates (sleep + rune), not phase alone. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Form")
 	bool bIsSpiritForm = false;
+
+	/** T0 #11: bed/sleep gate. Cleared on Day/Dawn. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Form|Gates")
+	bool bSpiritSleepGateGranted = false;
+
+	/** T0 #7: rune unlock gate. Default locked until Implement #7. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Form|Gates")
+	bool bRuneGateUnlocked = false;
 
 	/**
 	 * Docs/27 NF2-A: optional soft handmade sting on body↔spirit form swap.
