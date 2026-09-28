@@ -1150,6 +1150,27 @@ namespace
 			bOk ? TEXT("ok") : TEXT("failed"));
 	}
 
+
+	void CmdRuneUnlock(const TArray<FString>& Args)
+	{
+		UWorld* World = HomeWorldPlayWorld::Resolve();
+		if (!World)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Rune.Unlock requires a play world (PIE or game)."));
+			return;
+		}
+		APlayerController* PC = World->GetFirstPlayerController();
+		AHomeWorldCharacter* Char = PC ? Cast<AHomeWorldCharacter>(PC->GetPawn()) : nullptr;
+		if (!Char)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Rune.Unlock - no AHomeWorldCharacter pawn."));
+			return;
+		}
+		const bool bOk = Char->TryUnlockNodeRune();
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Rune.Unlock %s (NODE_RUNE day field-path unlock; SetRuneGateUnlocked; not PROXY SM_ProxyRune; not spirit on phase alone)."),
+			bOk ? TEXT("ok") : TEXT("failed"));
+	}
+
 	void CmdPlantSlot(const TArray<FString>& Args)
 	{
 		UWorld* World = HomeWorldPlayWorld::Resolve();
@@ -1494,6 +1515,11 @@ void FHomeWorldModule::StartupModule()
 		TEXT("hw.FieldGather.Collect"),
 		TEXT("T0 #6 NODE_FIELD_GATHER: field herb/seed collect (CAM_T0_FIELD). Not dress/GP_Store/PROXY/plant; not ungated Gather.Flowers."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdFieldGatherCollect),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Rune.Unlock"),
+		TEXT("T0 #7 NODE_RUNE: day field-path rune unlock -> SetRuneGateUnlocked (TOD_DAY FORM_BODY). Not PROXY/spirit-on-phase. Bed->spirit without unlock = closed_fail."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdRuneUnlock),
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.Plant.Slot"),

@@ -1696,6 +1696,82 @@ bool AHomeWorldCharacter::TryNodeFieldGatherInteractInFront()
 	return TryCollectNodeFieldGather();
 }
 
+bool AHomeWorldCharacter::TryUnlockNodeRune()
+{
+	// T0_M7 NODE_RUNE / TOD_DAY / FORM_BODY
+	// Architecture Trade-Offs A-E: prefer existing SetRuneGateUnlocked / bRuneGateUnlocked /
+	// CanEnterSpiritForm -- no parallel form service, no invent WP/form APIs (Arch B).
+	// Anti closed_fail: PROXY SM_ProxyRune alone != world unlock; spirit on phase alone != beat;
+	// bed->spirit without unlock = closed_fail (#11 HOLD until unlock). #11 / #9 DEFER.
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
+	if (!TimeOfDay || TimeOfDay->GetCurrentPhase() != EHomeWorldTimeOfDayPhase::Day)
+	{
+		UE_LOG(LogTemp, Log, TEXT("NODE_RUNE: unlock skipped - need TOD_DAY"));
+		ShowInteractFeedback(TEXT("NODE_RUNE: day only"), FColor::Yellow);
+		return false;
+	}
+	if (bIsSpiritForm)
+	{
+		UE_LOG(LogTemp, Log, TEXT("NODE_RUNE: unlock skipped - need FORM_BODY"));
+		ShowInteractFeedback(TEXT("NODE_RUNE: body form only"), FColor::Yellow);
+		return false;
+	}
+
+	if (bRuneGateUnlocked)
+	{
+		UE_LOG(LogTemp, Log,
+			TEXT("NODE_RUNE: unlock TOD_DAY FORM_BODY (already unlocked; SetRuneGateUnlocked latch; not PROXY SM_ProxyRune; not spirit on phase alone; bed->spirit without unlock = closed_fail)"));
+		ShowInteractFeedback(TEXT("NODE_RUNE: already unlocked"), FColor::Green);
+		return true;
+	}
+
+	SetRuneGateUnlocked(true);
+	UE_LOG(LogTemp, Log,
+		TEXT("NODE_RUNE: unlock TOD_DAY FORM_BODY (SetRuneGateUnlocked; not PROXY SM_ProxyRune alone; not spirit on phase alone; bed->spirit without unlock = closed_fail; #11 HOLD until unlock)"));
+	ShowInteractFeedback(TEXT("NODE_RUNE: unlocked"), FColor::Green);
+	return true;
+}
+
+bool AHomeWorldCharacter::TryNodeRuneInteractInFront()
+{
+	FHitResult Hit;
+	if (!TraceInteractHit(Hit))
+	{
+		return false;
+	}
+	AActor* HitActor = GetInteractTargetActor(Hit);
+	if (!HitActor)
+	{
+		return false;
+	}
+
+	static const FName RuneTags[] = {
+		FName(TEXT("NODE_RUNE")),
+		FName(TEXT("Rune")),
+	};
+	bool bIsRune = false;
+	for (const FName& Tag : RuneTags)
+	{
+		if (HitActor->ActorHasTag(Tag))
+		{
+			bIsRune = true;
+			break;
+		}
+	}
+	if (!bIsRune)
+	{
+		return false;
+	}
+
+	// World interact beat -- PROXY SM_ProxyRune alone without unlock latch = closed_fail.
+	return TryUnlockNodeRune();
+}
+
 void AHomeWorldCharacter::SyncFormWithTimeOfDay()
 {
 	UWorld* World = GetWorld();

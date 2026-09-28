@@ -228,6 +228,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "FieldGather|T0", meta = (DisplayName = "Is Field Gather Collected"))
 	bool IsFieldGatherCollected() const { return bFieldGatherCollected; }
 
+	/**
+	 * T0 #7 NODE_RUNE: day field-path rune unlock interact -> SetRuneGateUnlocked.
+	 * Prefer existing gate hooks (bRuneGateUnlocked / CanEnterSpiritForm) -- no parallel form service (Arch B).
+	 * Not PROXY SM_ProxyRune alone; not spirit on phase alone; bed->spirit without unlock = closed_fail.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Rune|T0", meta = (DisplayName = "Try Unlock NODE_RUNE"))
+	bool TryUnlockNodeRune();
+
+	/** Trace/tag NODE_RUNE / Rune interact -> TryUnlockNodeRune (world beat, not PROXY alone). */
+	UFUNCTION(BlueprintCallable, Category = "Rune|T0", meta = (DisplayName = "Try NODE_RUNE Interact In Front"))
+	bool TryNodeRuneInteractInFront();
+
 	/** MV-A: parkour-lite mantle/vault (body, day). */
 	UFUNCTION(BlueprintCallable, Category = "Movement|MV-A", meta = (DisplayName = "Try Mantle Or Vault"))
 	bool TryMantleOrVault();
@@ -265,7 +277,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Form|Gates")
 	bool bSpiritSleepGateGranted = false;
 
-	/** T0 #7: rune unlock gate. Default locked until Implement #7. */
+	/** T0 #7: rune unlock gate. Set via TryUnlockNodeRune / hw.Rune.Unlock (NODE_RUNE). */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Form|Gates")
 	bool bRuneGateUnlocked = false;
 
