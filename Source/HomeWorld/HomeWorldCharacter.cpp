@@ -849,6 +849,8 @@ bool AHomeWorldCharacter::TryHealSpiritInFront()
 
 bool AHomeWorldCharacter::TryNurtureInFront()
 {
+	// Existing homestead nurture path (V7). T0 #12 N1 NODE_PLANT_SLOT gated inside TryNurture
+	// (same-slot day plant #3 + FORM_SPIRIT / TOD_NIGHT_SPIRIT). No parallel nurture service.
 	if (!GetIsSpiritForm())
 	{
 		ShowInteractFeedback(TEXT("NURTURE: night/spirit form only"), FColor::Yellow);
@@ -868,9 +870,16 @@ bool AHomeWorldCharacter::TryNurtureInFront()
 	if (UHomeWorldNurtureComponent* Nurture = HitActor->FindComponentByClass<UHomeWorldNurtureComponent>())
 	{
 		const bool bResult = Nurture->TryNurture(this);
-		ShowInteractFeedback(
-			bResult ? TEXT("NURTURE: success — M_Nurtured on") : TEXT("NURTURE: need required RES in inventory"),
-			bResult ? FColor::Green : FColor::Yellow);
+		FString Feedback = bResult ? TEXT("NURTURE: success - M_Nurtured on") : TEXT("NURTURE: need required RES in inventory");
+		if (!bResult && Nurture->GetTargetId() == EHomeWorldNurtureTargetId::N1_Crop && !Nurture->GetIsDayPlantedGivenHerb())
+		{
+			Feedback = TEXT("NODE_PLANT_SLOT: need day plant first (#3)");
+		}
+		else if (bResult && Nurture->GetTargetId() == EHomeWorldNurtureTargetId::N1_Crop)
+		{
+			Feedback = TEXT("NODE_PLANT_SLOT: spirit nurture");
+		}
+		ShowInteractFeedback(Feedback, bResult ? FColor::Green : FColor::Yellow);
 		return bResult;
 	}
 	return false;
@@ -1477,6 +1486,96 @@ bool AHomeWorldCharacter::TryNodePlantSlotInteractInFront()
 	// World interact beat -- PROXY SM_ProxyPlantSlot alone without plant/spend = closed_fail.
 	// Do NOT call TryNurtureInFront here (spirit nurture = #12, not day plant).
 	return TryPlantNodePlantSlotHerb();
+}
+
+bool AHomeWorldCharacter::IsNodePlantSlotSpiritNurtured() const
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+	for (TActorIterator<AActor> It(World); It; ++It)
+	{
+		if (UHomeWorldNurtureComponent* Nurture = It->FindComponentByClass<UHomeWorldNurtureComponent>())
+		{
+			if (Nurture->GetTargetId() == EHomeWorldNurtureTargetId::N1_Crop
+				&& Nurture->GetIsDayPlantedGivenHerb()
+				&& Nurture->GetIsNurtured())
+			{
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+bool AHomeWorldCharacter::TryNurtureNodePlantSlot()
+{
+	// T0_M12 NODE_PLANT_SLOT / TOD_NIGHT_SPIRIT / FORM_SPIRIT
+	// Architecture Trade-Offs A-E: prefer existing TryNurture / HomeWorldNurtureComponent / N1 slot
+	// -- no parallel nurture service, no new schema, no invent nurture/WP APIs.
+	// Prereq: #3 day plant same NODE_PLANT_SLOT + #11 spirit path (rune+bed).
+	// Anti closed_fail: different-slot N2; body-form nurture as #12; day-plant-alone as spirit nurture.
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+
+	if (!GetIsSpiritForm())
+	{
+		UE_LOG(LogTemp, Log, TEXT("NODE_PLANT_SLOT: nurture skipped - need FORM_SPIRIT"));
+		ShowInteractFeedback(TEXT("NODE_PLANT_SLOT: spirit form only"), FColor::Yellow);
+		return false;
+	}
+
+	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
+	if (!TimeOfDay || !TimeOfDay->GetIsSpiritPhase())
+	{
+		UE_LOG(LogTemp, Log, TEXT("NODE_PLANT_SLOT: nurture skipped - need TOD_NIGHT_SPIRIT"));
+		ShowInteractFeedback(TEXT("NODE_PLANT_SLOT: night spirit phase only"), FColor::Yellow);
+		return false;
+	}
+
+	UHomeWorldNurtureComponent* Slot = nullptr;
+	for (TActorIterator<AActor> It(World); It; ++It)
+	{
+		if (UHomeWorldNurtureComponent* Nurture = It->FindComponentByClass<UHomeWorldNurtureComponent>())
+		{
+			if (Nurture->GetTargetId() == EHomeWorldNurtureTargetId::N1_Crop)
+			{
+				Slot = Nurture;
+				break;
+			}
+		}
+	}
+	if (!Slot)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NODE_PLANT_SLOT: nurture failed - no N1_Crop HomeWorldNurtureTarget slot in world"));
+		ShowInteractFeedback(TEXT("NODE_PLANT_SLOT: no plant slot"), FColor::Yellow);
+		return false;
+	}
+
+	if (!Slot->GetIsDayPlantedGivenHerb())
+	{
+		UE_LOG(LogTemp, Log,
+			TEXT("NODE_PLANT_SLOT: nurture failed - need day plant given herb first (#3 same-slot prereq; unplanted != spirit nurture; not different-slot N2)"));
+		ShowInteractFeedback(TEXT("NODE_PLANT_SLOT: need day plant first"), FColor::Yellow);
+		return false;
+	}
+
+	// N1 only -- never score N2_Stored as #12 same-slot prove.
+	const bool bOk = Slot->TryNurture(this);
+	if (bOk)
+	{
+		ShowInteractFeedback(TEXT("NODE_PLANT_SLOT: spirit nurture"), FColor::Green);
+	}
+	else
+	{
+		ShowInteractFeedback(TEXT("NODE_PLANT_SLOT: nurture need RES_SEED"), FColor::Yellow);
+	}
+	return bOk;
 }
 
 bool AHomeWorldCharacter::TryEquipNodeBackpack()

@@ -174,7 +174,7 @@ public:
 	 * T0 #3 NODE_PLANT_SLOT: day plant given herb (RES_HERB) into plant slot.
 	 * Extends HomeWorldNurtureTarget / N1 / inventory -- no parallel plant service, no new schema (Arch B).
 	 * Not GP_N1_Crop nurture-only; not PROXY SM_ProxyPlantSlot alone; not TryNurtureInFront (closed_fail).
-	 * Marks same slot identity later #12 uses -- does NOT implement #12.
+	 * Marks same slot identity #12 nurture uses (day plant only -- not spirit nurture).
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Plant|T0", meta = (DisplayName = "Try Plant NODE_PLANT_SLOT Herb"))
 	bool TryPlantNodePlantSlotHerb();
@@ -186,6 +186,19 @@ public:
 	/** True if N1 NODE_PLANT_SLOT has been day-planted with given herb this session. */
 	UFUNCTION(BlueprintCallable, Category = "Plant|T0", meta = (DisplayName = "Is NODE_PLANT_SLOT Day Planted"))
 	bool IsNodePlantSlotDayPlanted() const;
+
+	/**
+	 * T0 #12 NODE_PLANT_SLOT: spirit nurture on same N1 slot as day plant (#3).
+	 * Prefer existing TryNurture / HomeWorldNurtureComponent -- no parallel nurture service (Arch B).
+	 * Prereq: #3 day plant mark + #11 spirit path (FORM_SPIRIT / TOD_NIGHT_SPIRIT).
+	 * Not different-slot N2; not body-form nurture; not day-plant-alone (those = closed_fail).
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Nurture|T0", meta = (DisplayName = "Try Nurture NODE_PLANT_SLOT Spirit"))
+	bool TryNurtureNodePlantSlot();
+
+	/** True if N1 NODE_PLANT_SLOT is day-planted and spirit-nurtured (M_Nurtured) this session. */
+	UFUNCTION(BlueprintCallable, Category = "Nurture|T0", meta = (DisplayName = "Is NODE_PLANT_SLOT Spirit Nurtured"))
+	bool IsNodePlantSlotSpiritNurtured() const;
 
 	/**
 	 * T0 #4 NODE_BACKPACK: equip backpack -> inventory access gate.
