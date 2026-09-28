@@ -470,6 +470,7 @@ protected:
 
 	/** T0 #4: backpack equip latch -- inventory open/use requires this (not inventory-lite alone). */
 	bool bBackpackEquipped = false;
+	bool bFieldGatherCollected = false;
 
 	/** VP-C PA-06: on-screen interact feedback (debug overlay). */
 	void ShowInteractFeedback(const FString& Message, FColor Color = FColor::Green) const;
