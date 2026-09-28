@@ -43,6 +43,11 @@ void UHomeWorldInteractAbility::ActivateAbility(const FGameplayAbilitySpecHandle
 	}
 	if (!bHandled)
 	{
+		// T0 #4 NODE_BACKPACK: equip -> inventory gate (not inventory-lite alone / not PROXY-as-equip).
+		bHandled = Character->TryNodeBackpackInteractInFront();
+	}
+	if (!bHandled)
+	{
 		// T0 #3 NODE_PLANT_SLOT: day plant given herb (not TryNurture / not PROXY-as-plant).
 		bHandled = Character->TryNodePlantSlotInteractInFront();
 	}

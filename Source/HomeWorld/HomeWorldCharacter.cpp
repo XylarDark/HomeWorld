@@ -1467,6 +1467,139 @@ bool AHomeWorldCharacter::TryNodePlantSlotInteractInFront()
 	return TryPlantNodePlantSlotHerb();
 }
 
+bool AHomeWorldCharacter::TryEquipNodeBackpack()
+{
+	// T0_M4 NODE_BACKPACK / TOD_DAY / FORM_BODY
+	// Architecture Trade-Offs A-E: prefer existing UHomeWorldInventorySubsystem
+	// -- no parallel inventory service, no new schema, no invent backpack/WP APIs.
+	// Anti closed_fail: ungated inventory-lite alone != equip->inventory;
+	// PROXY SM_ProxyBackpack alone != world equip.
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
+	if (!TimeOfDay || TimeOfDay->GetCurrentPhase() != EHomeWorldTimeOfDayPhase::Day)
+	{
+		UE_LOG(LogTemp, Log, TEXT("NODE_BACKPACK: equip skipped - need TOD_DAY"));
+		ShowInteractFeedback(TEXT("NODE_BACKPACK: day only"), FColor::Yellow);
+		return false;
+	}
+	if (bIsSpiritForm)
+	{
+		UE_LOG(LogTemp, Log, TEXT("NODE_BACKPACK: equip skipped - need FORM_BODY"));
+		ShowInteractFeedback(TEXT("NODE_BACKPACK: body form only"), FColor::Yellow);
+		return false;
+	}
+
+	if (bBackpackEquipped)
+	{
+		UE_LOG(LogTemp, Log,
+			TEXT("NODE_BACKPACK: equip TOD_DAY FORM_BODY (already equipped; inventory gated; not inventory-lite alone; not PROXY SM_ProxyBackpack)"));
+		ShowInteractFeedback(TEXT("NODE_BACKPACK: already equipped"), FColor::Green);
+		return true;
+	}
+
+	bBackpackEquipped = true;
+	UE_LOG(LogTemp, Log,
+		TEXT("NODE_BACKPACK: equip TOD_DAY FORM_BODY (gates inventory open/use; not inventory-lite alone; not PROXY SM_ProxyBackpack)"));
+	ShowInteractFeedback(TEXT("NODE_BACKPACK: equipped - inventory gated"), FColor::Green);
+	return true;
+}
+
+bool AHomeWorldCharacter::TryNodeBackpackInteractInFront()
+{
+	FHitResult Hit;
+	if (!TraceInteractHit(Hit))
+	{
+		return false;
+	}
+	AActor* HitActor = GetInteractTargetActor(Hit);
+	if (!HitActor)
+	{
+		return false;
+	}
+
+	static const FName BackpackTags[] = {
+		FName(TEXT("NODE_BACKPACK")),
+		FName(TEXT("Backpack")),
+	};
+	bool bIsBackpack = false;
+	for (const FName& Tag : BackpackTags)
+	{
+		if (HitActor->ActorHasTag(Tag))
+		{
+			bIsBackpack = true;
+			break;
+		}
+	}
+	if (!bIsBackpack)
+	{
+		return false;
+	}
+
+	// World interact beat -- PROXY SM_ProxyBackpack alone without equip latch = closed_fail.
+	return TryEquipNodeBackpack();
+}
+
+bool AHomeWorldCharacter::TryOpenInventoryGated()
+{
+	// Inventory open/use requires NODE_BACKPACK equip latch (existing UHomeWorldInventorySubsystem).
+	// Ungated inventory-lite alone = closed_fail for MUST #4.
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
+	if (!TimeOfDay || TimeOfDay->GetCurrentPhase() != EHomeWorldTimeOfDayPhase::Day)
+	{
+		UE_LOG(LogTemp, Log, TEXT("NODE_BACKPACK: inventory rejected - need TOD_DAY"));
+		ShowInteractFeedback(TEXT("NODE_BACKPACK: day only"), FColor::Yellow);
+		return false;
+	}
+	if (bIsSpiritForm)
+	{
+		UE_LOG(LogTemp, Log, TEXT("NODE_BACKPACK: inventory rejected - need FORM_BODY"));
+		ShowInteractFeedback(TEXT("NODE_BACKPACK: body form only"), FColor::Yellow);
+		return false;
+	}
+	if (!bBackpackEquipped)
+	{
+		UE_LOG(LogTemp, Log,
+			TEXT("NODE_BACKPACK: inventory rejected - need equip (ungated inventory-lite = closed_fail; not PROXY SM_ProxyBackpack)"));
+		ShowInteractFeedback(TEXT("NODE_BACKPACK: need equip first"), FColor::Yellow);
+		return false;
+	}
+
+	UGameInstance* GI = World->GetGameInstance();
+	UHomeWorldInventorySubsystem* Inv = GI ? GI->GetSubsystem<UHomeWorldInventorySubsystem>() : nullptr;
+	if (!Inv)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NODE_BACKPACK: inventory failed - no InventorySubsystem"));
+		return false;
+	}
+
+	UE_LOG(LogTemp, Log,
+		TEXT("NODE_BACKPACK: inventory gated open TOD_DAY FORM_BODY (slots=%d total=%d; not inventory-lite alone; not PROXY SM_ProxyBackpack)"),
+		Inv->GetSlotCount(), Inv->GetTotalPhysicalGoods());
+	for (int32 Si = 0; Si < Inv->GetSlotCount(); ++Si)
+	{
+		const FHomeWorldInventorySlot Slot = Inv->GetSlot(Si);
+		if (Slot.IsEmpty())
+		{
+			UE_LOG(LogTemp, Log, TEXT("INVENTORY: slot[%d]=empty"), Si);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("INVENTORY: slot[%d]=%s x%d"), Si, *Slot.ResId.ToString(), Slot.Count);
+		}
+	}
+	ShowInteractFeedback(TEXT("NODE_BACKPACK: inventory open (gated)"), FColor::Green);
+	return true;
+}
+
 void AHomeWorldCharacter::SyncFormWithTimeOfDay()
 {
 	UWorld* World = GetWorld();
