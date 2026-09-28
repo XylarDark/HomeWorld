@@ -35,6 +35,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Portal|FALLBACK")
 	bool TryPortalTransit(AActor* InstigatorActor);
 
+	/**
+	 * T0 #13: transit using OverrideDestinationLabel (NODE_PORTAL_CAMP) via same TryPortalTransit path.
+	 * Prefer existing shrine portal -- no parallel portal service. Restores DestinationLabel after attempt.
+	 * Not home<->planet return alone (GP_PortalA<->B / Shrine_Return) as #13.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Portal|T0")
+	bool TryPortalTransitToDestination(AActor* InstigatorActor, FName OverrideDestinationLabel);
+
 	virtual void PostInitProperties() override;
 	virtual void BeginPlay() override;
 

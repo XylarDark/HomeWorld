@@ -1303,6 +1303,31 @@ void CmdPlantSlot(const TArray<FString>& Args)
 			bOk ? TEXT("ok") : TEXT("failed"));
 	}
 
+	void CmdPortalCamp(const TArray<FString>& Args)
+	{
+		UWorld* World = HomeWorldPlayWorld::Resolve();
+		if (!World)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Portal.Camp requires a play world (PIE or game)."));
+			return;
+		}
+		APlayerController* PC = World->GetFirstPlayerController();
+		AHomeWorldCharacter* Char = PC ? Cast<AHomeWorldCharacter>(PC->GetPawn()) : nullptr;
+		if (!Char)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Portal.Camp - no AHomeWorldCharacter pawn."));
+			return;
+		}
+		// Arrange prereqs: hw.Rune.Unlock then hw.Bed.SleepSpirit (#11) -> FORM_SPIRIT / TOD_NIGHT_SPIRIT.
+		if (!Char->GetIsSpiritForm())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Portal.Camp - need FORM_SPIRIT; run hw.Rune.Unlock then hw.Bed.SleepSpirit (#11 path). body portal = closed_fail."));
+		}
+		const bool bOk = Char->TryPortalHomeToCamp();
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Portal.Camp %s (NODE_PORTAL_HOME NODE_PORTAL_CAMP TOD_NIGHT_SPIRIT FORM_SPIRIT; HomeWorldShrinePortal*; not home<->planet alone; not body; not dress-as-camp)."),
+			bOk ? TEXT("ok") : TEXT("failed"));
+	}
+
 	void CmdKettleBrew(const TArray<FString>& Args)
 	{
 		UWorld* World = HomeWorldPlayWorld::Resolve();
@@ -1657,6 +1682,11 @@ void FHomeWorldModule::StartupModule()
 		TEXT("hw.Nurture.Slot"),
 		TEXT("T0 #12 NODE_PLANT_SLOT: spirit nurture same N1 slot as #3 day plant (TOD_NIGHT_SPIRIT FORM_SPIRIT). Prereq hw.Plant.Slot + hw.Rune.Unlock + hw.Bed.SleepSpirit; RES_SEED via hw.Gather.Seed. Not N2/body/day-plant-alone."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdNurtureSlot),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Portal.Camp"),
+		TEXT("T0 #13 NODE_PORTAL_HOME->NODE_PORTAL_CAMP: spirit home->camp portal (TOD_NIGHT_SPIRIT FORM_SPIRIT). Prereq hw.Rune.Unlock + hw.Bed.SleepSpirit. Via HomeWorldShrinePortal*; not home<->planet alone; not body; not dress-as-camp."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdPortalCamp),
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.Kettle.Brew"),

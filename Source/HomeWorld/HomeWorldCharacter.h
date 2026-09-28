@@ -295,6 +295,19 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Bed|T0", meta = (DisplayName = "Is Bed Spirit Granted"))
 	bool IsBedSpiritGranted() const { return bBedSpiritGranted; }
 
+	/**
+	 * T0 #13 NODE_PORTAL_HOME -> NODE_PORTAL_CAMP: spirit home portal to camp.
+	 * Prefer existing HomeWorldShrinePortal* TryPortalTransitToDestination -- no parallel portal service (Arch B).
+	 * Prereq: #11 spirit path (FORM_SPIRIT / TOD_NIGHT_SPIRIT via hw.Rune.Unlock + hw.Bed.SleepSpirit).
+	 * Not home<->planet return alone (GP_PortalA<->B); not body portal; not shrine-dress-as-camp (those = closed_fail).
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Portal|T0", meta = (DisplayName = "Try Portal Home To Camp"))
+	bool TryPortalHomeToCamp();
+
+	/** True after NODE_PORTAL_HOME -> NODE_PORTAL_CAMP latch this session. */
+	UFUNCTION(BlueprintCallable, Category = "Portal|T0", meta = (DisplayName = "Is Portal Home To Camp Granted"))
+	bool IsPortalHomeToCampGranted() const { return bPortalHomeToCampGranted; }
+
 	/** MV-A: parkour-lite mantle/vault (body, day). */
 	UFUNCTION(BlueprintCallable, Category = "Movement|MV-A", meta = (DisplayName = "Try Mantle Or Vault"))
 	bool TryMantleOrVault();
@@ -547,6 +560,9 @@ protected:
 
 	/** T0 #11: bed->spirit latch after GrantSpiritSleepGate + rune (NODE_BED this session). */
 	bool bBedSpiritGranted = false;
+
+	/** T0 #13: spirit home->camp portal latch (NODE_PORTAL_HOME -> NODE_PORTAL_CAMP this session). */
+	bool bPortalHomeToCampGranted = false;
 
 	/** VP-C PA-06: on-screen interact feedback (debug overlay). */
 	void ShowInteractFeedback(const FString& Message, FColor Color = FColor::Green) const;
