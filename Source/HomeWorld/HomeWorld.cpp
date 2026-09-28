@@ -1491,6 +1491,11 @@ void FHomeWorldModule::StartupModule()
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdSkyEnsureDefaultDay),
 		ECVF_Default);
 	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.FieldGather.Collect"),
+		TEXT("T0 #6 NODE_FIELD_GATHER: field herb/seed collect (CAM_T0_FIELD). Not dress/GP_Store/PROXY/plant; not ungated Gather.Flowers."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdFieldGatherCollect),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.Plant.Slot"),
 		TEXT("T0 #3 NODE_PLANT_SLOT: spend RES_HERB -> day plant given herb on N1 slot (TOD_DAY FORM_BODY). Not nurture/PROXY. #12 DEFER."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdPlantSlot),
