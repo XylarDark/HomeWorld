@@ -1,0 +1,153 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://homeworld.local/schemas/prop_arrange_gate.schema.json",
+  "title": "hw.prop_arrange_gate/v1",
+  "description": "Arrange readiness gate for math-first prop setup (CAP-PROP-GATE). Shape aligns with CAPTURE_REDUNDANCY P0 Arrange (ready, blocked_reasons, inventory, aim, lighting, tool_readiness). ready:false ≠ closed_fail. exists-only ≠ PASS. Stamps bind hw.test_score_packet/v1. Bright/day default. No stills required to score Arrange.",
+  "type": "object",
+  "required": [
+    "schema",
+    "ready",
+    "blocked_reasons",
+    "inventory",
+    "aim",
+    "lighting",
+    "tool_readiness",
+    "three_state"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "schema": {
+      "type": "string",
+      "const": "hw.prop_arrange_gate/v1"
+    },
+    "ready": {
+      "type": "boolean",
+      "description": "true only when inventory∩world, aim math, lighting/TOD, and tool_readiness all ok. false blocks Act — soft_fail, closed_fail false."
+    },
+    "blocked_reasons": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Human-readable blockers when ready is false."
+    },
+    "inventory": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["ok", "labels_required", "labels_present", "missing_labels"],
+      "properties": {
+        "ok": { "type": "boolean" },
+        "labels_required": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "labels_present": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "missing_labels": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "prop_inventory_ref": {
+          "type": "string",
+          "description": "Path or id of Design prop inventory instance (PROP_INVENTORY_V1)."
+        },
+        "transform_ok": { "type": "boolean" },
+        "aabb_ok": { "type": "boolean" },
+        "overlap_ok": { "type": "boolean" },
+        "ground_ok": { "type": "boolean" }
+      }
+    },
+    "aim": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["ok"],
+      "properties": {
+        "ok": { "type": "boolean" },
+        "look_at_target": { "type": "string" },
+        "forward_ray_hits_dress_aabb": { "type": ["boolean", "null"] },
+        "envelope_id": { "type": "string" }
+      }
+    },
+    "lighting": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["ok", "phase", "preset_id"],
+      "properties": {
+        "ok": { "type": "boolean" },
+        "phase": {
+          "type": "string",
+          "default": "day",
+          "description": "Prop automation default day (bright). Night = Lead taste later; bots must not PASS night mood."
+        },
+        "preset_id": { "type": "string" },
+        "stack_verify": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "stack_ok": { "type": ["boolean", "null"] }
+      }
+    },
+    "tool_readiness": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["ok"],
+      "properties": {
+        "ok": { "type": "boolean" },
+        "notes": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "mrq_status": {
+          "type": "string",
+          "description": "Informational only this bite — no MRQ/AL/SC2D writers in CAP-PROP-GATE docs lap."
+        }
+      }
+    },
+    "three_state": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["capture_outcome", "ok", "closed_fail", "prove_loop_status"],
+      "properties": {
+        "capture_outcome": {
+          "type": "string",
+          "enum": ["pass", "soft_fail", "closed_fail"]
+        },
+        "ok": {
+          "type": "boolean",
+          "description": "true only when capture_outcome is pass"
+        },
+        "closed_fail": {
+          "type": "boolean",
+          "description": "false when ready:false (Arrange block). true only after Act attempted with proved-wrong setup."
+        },
+        "prove_loop_status": {
+          "type": "string",
+          "enum": ["blocked", "in_progress", "pass", "scored"]
+        }
+      }
+    },
+    "stamps": {
+      "type": "array",
+      "description": "Bind to hw.test_score_packet/v1 stamps: exists alone is not PASS — bytes+mtime required when exists.",
+      "items": {
+        "type": "object",
+        "required": ["path", "exists"],
+        "additionalProperties": true,
+        "properties": {
+          "path": { "type": "string" },
+          "exists": { "type": "boolean" },
+          "bytes": { "type": ["integer", "null"], "minimum": 0 },
+          "mtime": { "type": ["number", "null"] },
+          "mtime_iso": { "type": ["string", "null"] }
+        },
+        "if": { "properties": { "exists": { "const": true } }, "required": ["exists"] },
+        "then": { "required": ["bytes", "mtime"] }
+      }
+    },
+    "act_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$",
+      "description": "Optional PROXY bind for future DESKTOP Act; one score per act_sha."
+    }
+  }
+}

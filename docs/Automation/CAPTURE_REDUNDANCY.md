@@ -27,6 +27,15 @@ Before trusting **any** pass/fail output (CI, Editor Python, MCP harness, MRQ, s
 
 PA-E capture maps step 1–2 to [pa_e_homestead_capture_diagnostic.py](../../Content/Python/pa_e_homestead_capture_diagnostic.py) and `LEAD_PROVE_LOOP` in [pa_e_shotlist_common.py](../../Content/Python/pa_e_shotlist_common.py). Shotlist stills: **thematic readable night** for Shot 1–2 per [00_SHOTLIST.md](../Docs/00_SHOTLIST.md) — **`homestead_night_environment`** in `Saved/pa_e_capture_report.json` (Phase 2 + PRESET tune + stack verify); **not** day phase and **not** Phase 2 without tune.
 
+### Prop arrange (math-first) — CAP-PROP-GATE
+
+| Lock | Rule |
+|------|------|
+| **Math-first** | Score Arrange readiness via inventory ∩ world, golden transforms, AABB/overlap/ground — **not** still discovery. Schema: [`prop_arrange_gate.schema.json`](schemas/prop_arrange_gate.schema.json) · handoff [`PROP_ARRANGE_GATE_V1.md`](../../Docs/handoffs/PROP_ARRANGE_GATE_V1.md). Inventory freeze: [`PROP_INVENTORY_V1.md`](../../Docs/handoffs/PROP_INVENTORY_V1.md). |
+| **Bright / day default** | Prop automation TOD/lighting default is **day** (readable props). Night lookdev = Lead later; bots must **not** PASS night mood. |
+| **Stills confirm-only** | After `ready: true` only. Stills do not invent placement. CAP product (SC2D / stills-first loop / CAP-001–002) stays **PARK** per EXIT `CAP_SWARM_CAPTURE_AND_AI_PROP_SETUP_V1`. |
+| **Score rules** | `ready: false` ⇒ block Act · `soft_fail` · `closed_fail: false` · `prove_loop_status: blocked`. Exists-only PNG/JSON ≠ PASS. Stamps bind `hw.test_score_packet/v1`. |
+
 ### P0 Arrange gate (blocks capture — 2026-09-22)
 
 **API:** `arrange_pa_e_shotlist()` / alias `assert_environment_ready()` in [pa_e_shotlist_common.py](../../Content/Python/pa_e_shotlist_common.py). **Artifact:** `Saved/pa_e_arrange_gate.json` (`ready`, `blocked_reasons`, `inventory`, `aim`, `lighting`, `tool_readiness`).
