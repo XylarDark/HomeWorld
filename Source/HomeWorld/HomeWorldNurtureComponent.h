@@ -31,6 +31,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Nurture")
 	bool GetIsNurtured() const { return bNurtured; }
 
+	/** T0 #3: day plant-given-herb mark on same NODE_PLANT_SLOT (later #12; not nurture). */
+	UFUNCTION(BlueprintCallable, Category = "Nurture|Plant|T0")
+	bool GetIsDayPlantedGivenHerb() const { return bDayPlantedGivenHerb; }
+
+	/** Mark N1 plant slot as day-planted (caller spent RES_HERB). Not TryNurture / not #12. */
+	UFUNCTION(BlueprintCallable, Category = "Nurture|Plant|T0")
+	void MarkDayPlantedGivenHerb();
+
 	UFUNCTION(BlueprintCallable, Category = "Nurture")
 	EHomeWorldNurtureTargetId GetTargetId() const { return TargetId; }
 
@@ -59,6 +67,10 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Nurture")
 	bool bNurtured = false;
+
+	/** T0 #3 runtime mark: day plant given herb on this NODE_PLANT_SLOT (same identity for #12). Not save schema. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Nurture|Plant|T0")
+	bool bDayPlantedGivenHerb = false;
 
 private:
 	bool IsNightSpiritHomesteadAllowed(AHomeWorldCharacter* Character) const;

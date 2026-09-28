@@ -1095,6 +1095,27 @@ namespace
 			bOk ? TEXT("ok") : TEXT("incomplete"));
 	}
 
+
+	void CmdPlantSlot(const TArray<FString>& Args)
+	{
+		UWorld* World = HomeWorldPlayWorld::Resolve();
+		if (!World)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Plant.Slot requires a play world (PIE or game)."));
+			return;
+		}
+		APlayerController* PC = World->GetFirstPlayerController();
+		AHomeWorldCharacter* Char = PC ? Cast<AHomeWorldCharacter>(PC->GetPawn()) : nullptr;
+		if (!Char)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Plant.Slot - no AHomeWorldCharacter pawn."));
+			return;
+		}
+		const bool bOk = Char->TryPlantNodePlantSlotHerb();
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Plant.Slot %s (NODE_PLANT_SLOT day plant given herb; not nurture; not PROXY)."),
+			bOk ? TEXT("ok") : TEXT("failed"));
+	}
+
 	void CmdKettleBrew(const TArray<FString>& Args)
 	{
 		UWorld* World = HomeWorldPlayWorld::Resolve();
@@ -1415,6 +1436,11 @@ void FHomeWorldModule::StartupModule()
 		TEXT("T0_DEFAULT_SKYBOX_DAY: force Day + ensure Engine stock bright day sky (SKY_DEFAULT_DAY / TOD_DAY / ENV_T0_HOME). Not NF2_B night lookdev."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdSkyEnsureDefaultDay),
 		ECVF_Default);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Plant.Slot"),
+		TEXT("T0 #3 NODE_PLANT_SLOT: spend RES_HERB -> day plant given herb on N1 slot (TOD_DAY FORM_BODY). Not nurture/PROXY. #12 DEFER."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdPlantSlot),
+		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.Kettle.Brew"),
 		TEXT("T0 #2 NODE_KETTLE: spend RES_HERB -> tea; tea-gates sprint ~half day (TOD_DAY FORM_BODY). Not PROXY/meal/ungated alone."),

@@ -55,6 +55,11 @@ void UHomeWorldNurtureComponent::BeginPlay()
 	{
 		Owner->Tags.AddUnique(FName(TEXT("NurtureTarget")));
 		Owner->Tags.AddUnique(FName(TargetLabel()));
+		// T0 #3 / #12: N1 crop is the NODE_PLANT_SLOT identity (day plant + later spirit nurture).
+		if (TargetId == EHomeWorldNurtureTargetId::N1_Crop)
+		{
+			Owner->Tags.AddUnique(FName(TEXT("NODE_PLANT_SLOT")));
+		}
 	}
 
 	UE_LOG(LogTemp, Log, TEXT("NURTURE: component ready target=%s nurtured=%d requires=%s"),
@@ -86,6 +91,18 @@ void UHomeWorldNurtureComponent::ConfigureTarget(EHomeWorldNurtureTargetId InTar
 	{
 		RequiredResourceId = HomeWorldInventory::RES_SEED;
 	}
+}
+
+
+void UHomeWorldNurtureComponent::MarkDayPlantedGivenHerb()
+{
+	// Runtime slot mark only -- not TryNurture, not M_Nurtured, not #12 spirit nurture.
+	bDayPlantedGivenHerb = true;
+	if (AActor* Owner = GetOwner())
+	{
+		Owner->Tags.AddUnique(FName(TEXT("NODE_PLANT_SLOT")));
+	}
+	UE_LOG(LogTemp, Log, TEXT("NODE_PLANT_SLOT: slot marked day-planted (same identity for later #12 nurture; not TryNurture)"));
 }
 
 void UHomeWorldNurtureComponent::ApplyPersistedNurtured(bool bInNurtured)
