@@ -257,6 +257,19 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "DayCamp|T0", meta = (DisplayName = "Is Day Camp Eject Triggered"))
 	bool IsDayCampEjectTriggered() const { return bDayCampEjectTriggered; }
 
+	/**
+	 * T0 #10 planetside night boot home: Night w/o bed + FORM_BODY -> EJECT_HOME via StartGlideHome.
+	 * Prefer existing StartGlideHome (bAllowNightPhase) -- no parallel eject service (Arch B).
+	 * Distinct from MUST #8 TryEjectNodeDayCamp / hw.DayCamp.Eject (day-camp cartoon).
+	 * Not FALLBACK StartGlide / TryStartFallbackGlide down; not soft-kidnap-as-boot; cite #9 TOD_NIGHT_HOME law (do not re-Act #9).
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Planetside|T0", meta = (DisplayName = "Try Boot Planetside Night Home"))
+	bool TryBootPlanetsideNightHome();
+
+	/** True after planetside night NODE_GLIDER EJECT_HOME boot latch this session. */
+	UFUNCTION(BlueprintCallable, Category = "Planetside|T0", meta = (DisplayName = "Is Planetside Night Boot Triggered"))
+	bool IsPlanetsideNightBootTriggered() const { return bPlanetsideNightBootTriggered; }
+
 	/** MV-A: parkour-lite mantle/vault (body, day). */
 	UFUNCTION(BlueprintCallable, Category = "Movement|MV-A", meta = (DisplayName = "Try Mantle Or Vault"))
 	bool TryMantleOrVault();
@@ -503,6 +516,9 @@ protected:
 
 	/** T0 #8: day camp EJECT_HOME latch (NODE_DAY_CAMP cartoon eject this session). */
 	bool bDayCampEjectTriggered = false;
+
+	/** T0 #10: planetside night glider boot home latch (NODE_GLIDER EJECT_HOME this session). */
+	bool bPlanetsideNightBootTriggered = false;
 
 	/** VP-C PA-06: on-screen interact feedback (debug overlay). */
 	void ShowInteractFeedback(const FString& Message, FColor Color = FColor::Green) const;

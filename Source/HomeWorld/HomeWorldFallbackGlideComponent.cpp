@@ -216,7 +216,7 @@ bool UHomeWorldFallbackGlideComponent::StartGlide()
 	return true;
 }
 
-bool UHomeWorldFallbackGlideComponent::StartGlideHome()
+bool UHomeWorldFallbackGlideComponent::StartGlideHome(bool bAllowNightPhase)
 {
 	// EJECT_HOME reverse path: same CRUMB_* machinery as StartGlide, reverse order
 	// (Landing -> ... -> Depart_Lookout / home). Not island->planet FALLBACK StartGlide.
@@ -246,14 +246,14 @@ bool UHomeWorldFallbackGlideComponent::StartGlideHome()
 		return false;
 	}
 
-	if (bRequireDayPhase)
+	if (bRequireDayPhase && !bAllowNightPhase)
 	{
 		if (UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>())
 		{
 			const EHomeWorldTimeOfDayPhase Phase = TimeOfDay->GetCurrentPhase();
 			if (TimeOfDay->GetIsNight())
 			{
-				UE_LOG(LogTemp, Log, TEXT("EJECT_HOME: StartGlideHome blocked — night phase (day/body eject only)"));
+				UE_LOG(LogTemp, Log, TEXT("EJECT_HOME: StartGlideHome blocked — night phase (day/body eject only; planetside night boot passes bAllowNightPhase)"));
 				return false;
 			}
 			if (Phase == EHomeWorldTimeOfDayPhase::Dusk)

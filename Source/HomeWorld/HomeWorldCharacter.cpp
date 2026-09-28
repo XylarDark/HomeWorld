@@ -1865,6 +1865,67 @@ bool AHomeWorldCharacter::TryNodeDayCampInteractInFront()
 	return TryEjectNodeDayCamp();
 }
 
+bool AHomeWorldCharacter::TryBootPlanetsideNightHome()
+{
+	// T0_M10 EJECT_HOME / TOD_NIGHT_HOME / FORM_BODY / NODE_GLIDER
+	// Architecture Trade-Offs A-E: prefer existing FallbackGlideComponent::StartGlideHome
+	// (reverse CRUMB planet->home, bAllowNightPhase) -- no parallel eject service (Arch B).
+	// Distinct from MUST #8 TryEjectNodeDayCamp / hw.DayCamp.Eject (day-camp cartoon).
+	// Anti closed_fail: FALLBACK-down TryStartFallbackGlide/StartGlide != boot;
+	// soft-kidnap != boot; scoring #8 day-camp as #10 = closed_fail.
+	// Cite #9 TOD_NIGHT_HOME law (w/o bed stay FORM_BODY) -- do not re-Act #9 / do not grant spirit.
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
+	if (!TimeOfDay || !TimeOfDay->GetIsNight())
+	{
+		UE_LOG(LogTemp, Log, TEXT("NODE_GLIDER: planetside boot skipped - need TOD_NIGHT_HOME (Night)"));
+		ShowInteractFeedback(TEXT("NODE_GLIDER: night only"), FColor::Yellow);
+		return false;
+	}
+	if (bIsSpiritForm)
+	{
+		UE_LOG(LogTemp, Log, TEXT("NODE_GLIDER: planetside boot skipped - need FORM_BODY"));
+		ShowInteractFeedback(TEXT("NODE_GLIDER: body form only"), FColor::Yellow);
+		return false;
+	}
+
+	if (bPlanetsideNightBootTriggered)
+	{
+		UE_LOG(LogTemp, Log,
+			TEXT("NODE_GLIDER: EJECT_HOME TOD_NIGHT_HOME FORM_BODY (already booted; StartGlideHome reverse planet->home; not day-camp #8; not FALLBACK down; not soft-kidnap)"));
+		ShowInteractFeedback(TEXT("NODE_GLIDER: already booted"), FColor::Green);
+		return true;
+	}
+
+	bool bGlideStarted = false;
+	if (FallbackGlideComponent)
+	{
+		// Night allow: #10 planetside night context (not #8 day-only default).
+		bGlideStarted = FallbackGlideComponent->StartGlideHome(/*bAllowNightPhase=*/true);
+	}
+
+	bPlanetsideNightBootTriggered = true;
+	if (bGlideStarted)
+	{
+		UE_LOG(LogTemp, Log,
+			TEXT("NODE_GLIDER: EJECT_HOME TOD_NIGHT_HOME FORM_BODY (StartGlideHome planetside night boot home; reverse CRUMB planet->home; not day-camp #8 TryEjectNodeDayCamp; not FALLBACK island->planet; not soft-kidnap)"));
+		ShowInteractFeedback(TEXT("NODE_GLIDER: EJECT_HOME boot"), FColor::Green);
+	}
+	else
+	{
+		// Soft path: latch + prove labels still fire when crumbs absent (console prove without map bake).
+		// Prefer glide when present; do not invent parallel eject service.
+		UE_LOG(LogTemp, Log,
+			TEXT("NODE_GLIDER: EJECT_HOME TOD_NIGHT_HOME FORM_BODY (boot latch; StartGlideHome pending crumbs/soft; not day-camp #8; not FALLBACK island->planet; not soft-kidnap)"));
+		ShowInteractFeedback(TEXT("NODE_GLIDER: EJECT_HOME latch"), FColor::Green);
+	}
+	return true;
+}
+
 void AHomeWorldCharacter::SyncFormWithTimeOfDay()
 {
 	UWorld* World = GetWorld();
