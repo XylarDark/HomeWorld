@@ -6,6 +6,10 @@
 
 **Related:** [HARNESS_ARRANGE_TASKLIST.md](HARNESS_ARRANGE_TASKLIST.md) · [Docs/33_PLACEMENT_STILLS.md](../../Docs/33_PLACEMENT_STILLS.md) (PS track instance) · [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md) (Conductor law).
 
+### Prop inventory (math-first) — CAP-INV-SCHEMA
+
+Design freezes prop presence/pose in [`docs/Automation/schemas/prop_inventory.schema.json`](schemas/prop_inventory.schema.json) + [`Docs/handoffs/PROP_INVENTORY_V1.md`](../../Docs/handoffs/PROP_INVENTORY_V1.md) **before** any stills Act. Prefer math (golden transform / AABB / overlap / ground) over visual nudge; bright/`day` default; stills confirm-only later (`CAP-PROP-GATE`). Parent EXIT: `Docs/handoffs/research/EXIT_CAP_SWARM_CAPTURE_AND_AI_PROP_SETUP_V1.md`.
+
 ---
 
 ## Prove-size / one-shot ladder (Test lock-in — any track)
