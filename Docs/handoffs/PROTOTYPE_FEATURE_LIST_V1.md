@@ -2,12 +2,13 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **DRAFT — awaiting Lead `APPROVE-PROTOTYPE-LIST`** |
+| **Status** | **APPROVED** — Lead stamped `APPROVE-PROTOTYPE-LIST` 2026-09-27 ET (HomeWorld Co) |
 | **Host** | CLOUD (this doc) · Lead (taste + APPROVE) · **no DESKTOP Act from Design** |
 | **Source EXIT** | Interview EXIT — SCOPE — `PROTOTYPE_T0_V1` (ACCEPTED + greenlit 2026-09-27 ET) |
 | **Narrative bible** | Lead T0 narrative (`LEAD_NARRATIVE_Q2`) = vision; mechanics below = **T0 implemented floor** |
 | **Supersedes** | Thin Spine candidate **A** as SCOPE target (historical Research lean only) |
 | **Pins** | CAP/EA **DROPPED** · DET pin HOLD `0a27306` · map canon `Maps/VS_MVP` · no AGENTS/A–E rewrite |
+| **Feel cites** | `GAME_DESIGN_MOVEMENT_ENV_CANON_V1` · `GAME_FEEL_CANON_V1` · `PROP_INVENTORY_V1` (T0_FEEL_PROP_FREEZE) — SCOPE feel overlay ACCEPTED; Bite B list amend HOLD |
 | **Cite** | [HomeWorld Co ops](sand-workflow:homeworld-co-ops) · CAPTURE_REDUNDANCY · ONE_SHOT_BITES · [Architecture Trade-Offs A–E](sand-workflow:architecture-trade-offs-design-depth) (canon blob `107a511`) — **stream/partition-ready** for bigger planetsides |
 
 ---
@@ -18,7 +19,7 @@
 APPROVE-PROTOTYPE-LIST
 ```
 
-Unlocks Conductor to open **one** Implement bite: **gap inventory + walk-script** vs T0 MUST beats on existing `Maps/VS_MVP` actors. All other T0 mechanic implementation stays **DEFER** until that bite’s DONE-WHEN. Design does **not** declare this APPROVE.
+**STAMPED** 2026-09-27 ET in HomeWorld Co (Lead). Unlocks Conductor to open **one** Implement bite: **gap inventory + walk-script** vs T0 MUST beats on existing `Maps/VS_MVP` actors. All other T0 mechanic implementation stays **DEFER** until that bite’s DONE-WHEN. Design does **not** declare this APPROVE.
 
 ---
 
@@ -196,4 +197,4 @@ Labels ⊆ this inventory ∩ `Maps/VS_MVP` world. Freeze look-at / AABB / TOD *
 - [ ] CUT rows: death · quarantine maps · CAP/EA
 - [ ] Stream/partition cite present; no invented WP API
 - [ ] First Implement bite = gap inventory only
-- [ ] Stamp: `APPROVE-PROTOTYPE-LIST`
+- [x] Stamp: `APPROVE-PROTOTYPE-LIST` (Lead, 2026-09-27 ET)
