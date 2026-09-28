@@ -1,4 +1,6 @@
-# RESEARCH EXIT — GAME_DESIGN_MOVEMENT_ENV_V1
+# EXIT GAME_DESIGN_MOVEMENT_ENV_V1
+
+**Kind:** RESEARCH EXIT — GAME_DESIGN_MOVEMENT_ENV_V1
 
 **File protocol:** Lead / Conductor paste. Canonical intended path: `Docs/handoffs/research/EXIT_GAME_DESIGN_MOVEMENT_ENV_V1.md`  
 **Prompt:** `PROMPT_GAME_DESIGN_MOVEMENT_ENV_V1`  
