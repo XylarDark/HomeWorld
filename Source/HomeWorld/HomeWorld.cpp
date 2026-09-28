@@ -1171,7 +1171,27 @@ namespace
 			bOk ? TEXT("ok") : TEXT("failed"));
 	}
 
-	void CmdPlantSlot(const TArray<FString>& Args)
+		void CmdDayCampEject(const TArray<FString>& Args)
+	{
+		UWorld* World = HomeWorldPlayWorld::Resolve();
+		if (!World)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.DayCamp.Eject requires a play world (PIE or game)."));
+			return;
+		}
+		APlayerController* PC = World->GetFirstPlayerController();
+		AHomeWorldCharacter* Char = PC ? Cast<AHomeWorldCharacter>(PC->GetPawn()) : nullptr;
+		if (!Char)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.DayCamp.Eject - no AHomeWorldCharacter pawn."));
+			return;
+		}
+		const bool bOk = Char->TryEjectNodeDayCamp();
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.DayCamp.Eject %s (NODE_DAY_CAMP EJECT_HOME launch→glider→home; CAM_T0_CAMP_DAY; StartGlideHome; not FALLBACK down; not PROXY SM_ProxyDayCamp; not GP_RS_HumanoidCamp*; not convert stub)."),
+			bOk ? TEXT("ok") : TEXT("failed"));
+	}
+
+void CmdPlantSlot(const TArray<FString>& Args)
 	{
 		UWorld* World = HomeWorldPlayWorld::Resolve();
 		if (!World)
@@ -1520,6 +1540,11 @@ void FHomeWorldModule::StartupModule()
 		TEXT("hw.Rune.Unlock"),
 		TEXT("T0 #7 NODE_RUNE: day field-path rune unlock -> SetRuneGateUnlocked (TOD_DAY FORM_BODY). Not PROXY/spirit-on-phase. Bed->spirit without unlock = closed_fail."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdRuneUnlock),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.DayCamp.Eject"),
+		TEXT("T0 #8 NODE_DAY_CAMP: cartoon EJECT_HOME launch->glider->home (TOD_DAY FORM_BODY CAM_T0_CAMP_DAY). StartGlideHome reverse CRUMB; not FALLBACK/PROXY/script-camp/convert."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdDayCampEject),
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.Plant.Slot"),

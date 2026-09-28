@@ -240,6 +240,23 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Rune|T0", meta = (DisplayName = "Try NODE_RUNE Interact In Front"))
 	bool TryNodeRuneInteractInFront();
 
+	/**
+	 * T0 #8 NODE_DAY_CAMP: day camp cartoon eject -> EJECT_HOME (launch->glider->home).
+	 * Prefer existing UHomeWorldFallbackGlideComponent::StartGlideHome -- no parallel eject service (Arch B).
+	 * Not FALLBACK island->planet StartGlide alone; not PROXY SM_ProxyDayCamp; not convert stub;
+	 * not script-only GP_RS_HumanoidCamp* (those = closed_fail).
+	 */
+	UFUNCTION(BlueprintCallable, Category = "DayCamp|T0", meta = (DisplayName = "Try Eject NODE_DAY_CAMP"))
+	bool TryEjectNodeDayCamp();
+
+	/** Trace/tag NODE_DAY_CAMP / DayCamp interact -> TryEjectNodeDayCamp (world beat, not PROXY alone). */
+	UFUNCTION(BlueprintCallable, Category = "DayCamp|T0", meta = (DisplayName = "Try NODE_DAY_CAMP Interact In Front"))
+	bool TryNodeDayCampInteractInFront();
+
+	/** True after NODE_DAY_CAMP EJECT_HOME latch this session. */
+	UFUNCTION(BlueprintCallable, Category = "DayCamp|T0", meta = (DisplayName = "Is Day Camp Eject Triggered"))
+	bool IsDayCampEjectTriggered() const { return bDayCampEjectTriggered; }
+
 	/** MV-A: parkour-lite mantle/vault (body, day). */
 	UFUNCTION(BlueprintCallable, Category = "Movement|MV-A", meta = (DisplayName = "Try Mantle Or Vault"))
 	bool TryMantleOrVault();
@@ -483,6 +500,9 @@ protected:
 	/** T0 #4: backpack equip latch -- inventory open/use requires this (not inventory-lite alone). */
 	bool bBackpackEquipped = false;
 	bool bFieldGatherCollected = false;
+
+	/** T0 #8: day camp EJECT_HOME latch (NODE_DAY_CAMP cartoon eject this session). */
+	bool bDayCampEjectTriggered = false;
 
 	/** VP-C PA-06: on-screen interact feedback (debug overlay). */
 	void ShowInteractFeedback(const FString& Message, FColor Color = FColor::Green) const;
