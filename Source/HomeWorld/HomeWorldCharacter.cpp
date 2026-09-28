@@ -133,6 +133,8 @@ void AHomeWorldCharacter::BeginPlay()
 		{
 			TimeOfDay->OnPhaseChanged.AddDynamic(this, &AHomeWorldCharacter::OnTimeOfDayPhaseChanged);
 			SyncFormWithTimeOfDay();
+			// T0 #1 NODE_WAKE: homestead start-day beat via existing TOD + spawn hooks (not PlayerStart alone).
+			TryEmitNodeWakeStartDayBeat();
 		}
 	}
 	if (TraversalComponent)
@@ -1170,6 +1172,48 @@ void AHomeWorldCharacter::Move(const FInputActionValue& Value)
 	}
 }
 
+void AHomeWorldCharacter::TryEmitNodeWakeStartDayBeat()
+{
+	// T0_M1 NODE_WAKE / TOD_DAY / FORM_BODY / CAM_T0_WAKE
+	// Architecture Trade-Offs A-E: prefer existing GP_PlayerStart / PlayerStart_VS_MVP /
+	// UHomeWorldTimeOfDaySubsystem hooks -- no parallel wake service, no new schema, no invent wake/WP APIs.
+	// Anti closed_fail: PlayerStart alone != NODE_WAKE; PROXY SM_ProxyWakeMarker != world wake;
+	// bed->Dawn alone (AdvanceToDawn) != start-day beat.
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
+	if (!TimeOfDay)
+	{
+		return;
+	}
+
+	const EHomeWorldTimeOfDayPhase Phase = TimeOfDay->GetCurrentPhase();
+	if (Phase != EHomeWorldTimeOfDayPhase::Day)
+	{
+		// Leaving Day (or sitting on Dawn/Dusk/Night) clears the once-per-Day latch.
+		bNodeWakeEmittedForCurrentDay = false;
+		return;
+	}
+
+	// Wake prove requires FORM_BODY at Day.
+	if (bIsSpiritForm)
+	{
+		return;
+	}
+
+	if (bNodeWakeEmittedForCurrentDay)
+	{
+		return;
+	}
+	bNodeWakeEmittedForCurrentDay = true;
+
+	UE_LOG(LogTemp, Log,
+		TEXT("NODE_WAKE: start-day beat TOD_DAY FORM_BODY CAM_T0_WAKE (homestead; not PlayerStart alone; not PROXY SM_ProxyWakeMarker; not bed->Dawn alone)"));
+}
+
 void AHomeWorldCharacter::SyncFormWithTimeOfDay()
 {
 	UWorld* World = GetWorld();
@@ -1188,6 +1232,8 @@ void AHomeWorldCharacter::SyncFormWithTimeOfDay()
 void AHomeWorldCharacter::OnTimeOfDayPhaseChanged(EHomeWorldTimeOfDayPhase NewPhase)
 {
 	ApplyFormForPhase(NewPhase);
+	// T0 #1: Day entry (not Dawn/bed->AdvanceToDawn alone) can emit NODE_WAKE start-day beat.
+	TryEmitNodeWakeStartDayBeat();
 }
 
 bool AHomeWorldCharacter::CanEnterSpiritForm() const
