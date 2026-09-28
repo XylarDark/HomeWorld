@@ -44,6 +44,7 @@ Pointer rows only. **Do not load in seats.** Abstracts ≤2 lines. No AGENTS dum
 | 8 | Cursor Rules + `AGENTS.md` vendor docs | https://cursor.com/docs/rules.md | Rules vs AGENTS vs skills; keep AGENTS thin. Vendor docs only — not tip blogs. | do not load in seats |
 | 9 | Optional second-wave: *Software Engineering at Google*; *Observability Engineering* (Majors et al.) | book pointers | Pin discipline / “engineering ≠ programming”; wide events for “what did the worker do.” Still pointer-only; never a sixth layer. | do not load in seats |
 | 10 | Game design — movement + env cluster (Swink *Game Feel*; Totten level architecture; Lynch nodes/paths; Level Design Book blockout) | [`GAME_DESIGN_MOVEMENT_ENV_CANON_V1.md`](GAME_DESIGN_MOVEMENT_ENV_CANON_V1.md) | Pointer cluster for T0 glide/weight/path/greybox prove language. Not a sixth A–E layer; seats cite path only. | do not load in seats |
+| 11 | Game design — feel / juice cluster (Swink polish leg; Juice It or Lose It; Screenshake; MDA; Schell Feedback; Gabler juicy) | [`GAME_FEEL_CANON_V1.md`](GAME_FEEL_CANON_V1.md) | Pointer cluster for verb confirm / feedback dose / nurture-soothe juice language. Not a sixth A–E layer; weight/glide stay in movement-env canon. | do not load in seats |
 
 ---
 
