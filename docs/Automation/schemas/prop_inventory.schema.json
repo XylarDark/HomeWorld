@@ -1,0 +1,190 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://homeworld.local/schemas/prop_inventory.schema.json",
+  "title": "hw.prop_inventory/v1",
+  "description": "Design-owned frozen prop inventory for math-first presence+pose scoring without stills. CAP-INV-SCHEMA. Bright/day default for tod_light.phase. Stills confirm-only later (CAP-PROP-GATE).",
+  "definitions": {
+    "prop_item": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "label",
+        "class",
+        "mesh",
+        "golden_transform",
+        "aabb",
+        "look_at",
+        "tod_light",
+        "overlap",
+        "ground",
+        "prove_labels"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Stable actor / inventory label (must appear in prove_labels ∩ world)."
+        },
+        "class": {
+          "type": "string",
+          "minLength": 1,
+          "description": "UE actor class id or path."
+        },
+        "mesh": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Mesh asset path or id (proxy ok)."
+        },
+        "golden_transform": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["location", "rotation", "scale", "loc_tol_cm", "rot_tol_deg"],
+          "properties": {
+            "location": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": { "type": "number" },
+              "description": "World location cm XYZ."
+            },
+            "rotation": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": { "type": "number" },
+              "description": "Rotation degrees Pitch Yaw Roll (or project convention documented in inventory)."
+            },
+            "scale": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": { "type": "number" }
+            },
+            "loc_tol_cm": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Max |delta| per axis vs golden location, cm."
+            },
+            "rot_tol_deg": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Max |delta| per axis vs golden rotation, degrees."
+            }
+          }
+        },
+        "aabb": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": ["extent_min_cm", "envelope_id"],
+          "properties": {
+            "extent_min_cm": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": { "type": "number", "minimum": 0 },
+              "description": "Minimum half-extents (or full extents) cm XYZ for dress envelope checks."
+            },
+            "envelope_id": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Named dress AABB / envelope id in Arrange."
+            }
+          }
+        },
+        "look_at": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": ["target"],
+          "properties": {
+            "target": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Look-at target actor label or bounds id (frozen before Act)."
+            }
+          }
+        },
+        "tod_light": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": ["phase", "preset_id", "stack_verify"],
+          "properties": {
+            "phase": {
+              "type": "string",
+              "default": "day",
+              "description": "TOD phase. Capture/prop automation default is day (bright). Night = Lead taste later; bots must not PASS night mood."
+            },
+            "preset_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "stack_verify": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Named lighting stack ids to verify (Arrange), not lookdev taste."
+            }
+          }
+        },
+        "overlap": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": ["forbid_labels", "allow_touch_cm"],
+          "properties": {
+            "forbid_labels": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "allow_touch_cm": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        },
+        "ground": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": ["method", "z_delta_max_cm"],
+          "properties": {
+            "method": {
+              "type": "string",
+              "minLength": 1,
+              "description": "e.g. raycast_down, snap_z, inventory_z."
+            },
+            "z_delta_max_cm": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        },
+        "prove_labels": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Labels that must be ⊆ inventory ∩ world before Act; else block Act soft_fail closed_fail false."
+        }
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "required": ["props"],
+      "additionalProperties": true,
+      "properties": {
+        "schema": {
+          "type": "string",
+          "const": "hw.prop_inventory/v1"
+        },
+        "props": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/definitions/prop_item" }
+        }
+      }
+    },
+    {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/prop_item" }
+    }
+  ]
+}
