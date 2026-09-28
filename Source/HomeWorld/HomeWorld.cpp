@@ -1074,8 +1074,26 @@ namespace
 			return;
 		}
 		TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Night);
-		// T0 #9: phase→Night only. Spirit requires named sleep+rune gates (#11+#7); do not auto-spirit.
-		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.GoToBed — phase set to Night (Phase 2). FORM stays body until sleep+rune gates (T0 TOD_NIGHT_HOME)."));
+		// T0 #11: bed console path grants sleep gate; spirit only if rune unlocked (#7).
+		// Phase-alone (hw.TimeOfDay.SetPhase 2) still stays FORM_BODY without GrantSpiritSleepGate (#9).
+		APlayerController* PC = World->GetFirstPlayerController();
+		AHomeWorldCharacter* Char = PC ? Cast<AHomeWorldCharacter>(PC->GetPawn()) : nullptr;
+		if (Char)
+		{
+			Char->GrantSpiritSleepGate();
+			if (Char->GetIsSpiritForm())
+			{
+				UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.GoToBed -- Night + GrantSpiritSleepGate -> FORM_SPIRIT (NODE_BED path; rune unlocked)."));
+			}
+			else
+			{
+				UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.GoToBed -- Night + sleep gate; FORM stays body until NODE_RUNE (T0 TOD_NIGHT_HOME / #9+#7). Use hw.Bed.SleepSpirit after hw.Rune.Unlock for full #11 prove."));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.GoToBed -- phase set to Night (Phase 2). No pawn for sleep gate."));
+		}
 	}
 
 	void CmdWake(const TArray<FString>& Args)
@@ -1208,6 +1226,31 @@ void CmdPlanetsideBootHome(const TArray<FString>& Args)
 		}
 		const bool bOk = Char->TryBootPlanetsideNightHome();
 		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Planetside.BootHome %s (NODE_GLIDER EJECT_HOME TOD_NIGHT_HOME FORM_BODY planetside night boot home; StartGlideHome; not day-camp #8; not FALLBACK down; not soft-kidnap)."),
+			bOk ? TEXT("ok") : TEXT("failed"));
+	}
+
+void CmdBedSleepSpirit(const TArray<FString>& Args)
+	{
+		UWorld* World = HomeWorldPlayWorld::Resolve();
+		if (!World)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Bed.SleepSpirit requires a play world (PIE or game)."));
+			return;
+		}
+		APlayerController* PC = World->GetFirstPlayerController();
+		AHomeWorldCharacter* Char = PC ? Cast<AHomeWorldCharacter>(PC->GetPawn()) : nullptr;
+		if (!Char)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Bed.SleepSpirit - no AHomeWorldCharacter pawn."));
+			return;
+		}
+		// Arrange: rune first (hw.Rune.Unlock). Do not invent parallel form service.
+		if (!Char->IsRuneGateUnlocked())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Bed.SleepSpirit - rune locked; run hw.Rune.Unlock first (NODE_RUNE prereq #7). bed->spirit without unlock = closed_fail."));
+		}
+		const bool bOk = Char->TryBedSleepSpirit();
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Bed.SleepSpirit %s (NODE_BED TOD_NIGHT_SPIRIT FORM_SPIRIT CAM_T0_BED NODE_RUNE; GrantSpiritSleepGate; not phase-alone; not soft-kidnap; #9 w/o bed stay FORM_BODY)."),
 			bOk ? TEXT("ok") : TEXT("failed"));
 	}
 
@@ -1533,7 +1576,7 @@ void FHomeWorldModule::StartupModule()
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.GoToBed"),
-		TEXT("Go to bed: set time-of-day to Night (Phase 2). T0 #9: does not grant spirit alone (needs sleep+rune gates). Alternative: hw.TimeOfDay.Phase 2."),
+		TEXT("Go to bed: Night + GrantSpiritSleepGate. Spirit only if NODE_RUNE unlocked (#7+#11). Phase-alone (hw.TimeOfDay.Phase 2) stays body (#9). Full prove: hw.Bed.SleepSpirit after hw.Rune.Unlock."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdGoToBed),
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
@@ -1570,6 +1613,11 @@ void FHomeWorldModule::StartupModule()
 		TEXT("hw.Planetside.BootHome"),
 		TEXT("T0 #10 planetside night glider boot home: Night w/o bed FORM_BODY -> EJECT_HOME via StartGlideHome (TOD_NIGHT_HOME NODE_GLIDER). Not day-camp #8; not FALLBACK down; not soft-kidnap."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdPlanetsideBootHome),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Bed.SleepSpirit"),
+		TEXT("T0 #11 NODE_BED: after hw.Rune.Unlock, grant GrantSpiritSleepGate -> FORM_SPIRIT (TOD_NIGHT_SPIRIT CAM_T0_BED NODE_RUNE). Not phase-alone; not soft-kidnap; #9 w/o bed stay FORM_BODY."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdBedSleepSpirit),
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.Plant.Slot"),

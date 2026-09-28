@@ -270,6 +270,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Planetside|T0", meta = (DisplayName = "Is Planetside Night Boot Triggered"))
 	bool IsPlanetsideNightBootTriggered() const { return bPlanetsideNightBootTriggered; }
 
+	/**
+	 * T0 #11 NODE_BED: bed sleep-gate -> spirit (after NODE_RUNE).
+	 * Prefer existing GrantSpiritSleepGate / CanEnterSpiritForm / ApplyFormForPhase -- no parallel form service (Arch B).
+	 * Requires IsRuneGateUnlocked (#7). Phase-alone / spirit w/o bed+rune / soft-kidnap = closed_fail. #9 w/o bed stay FORM_BODY.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Bed|T0", meta = (DisplayName = "Try Bed Sleep Spirit"))
+	bool TryBedSleepSpirit();
+
+	/** True after NODE_BED bed->spirit latch this session (sleep+rune). */
+	UFUNCTION(BlueprintCallable, Category = "Bed|T0", meta = (DisplayName = "Is Bed Spirit Granted"))
+	bool IsBedSpiritGranted() const { return bBedSpiritGranted; }
+
 	/** MV-A: parkour-lite mantle/vault (body, day). */
 	UFUNCTION(BlueprintCallable, Category = "Movement|MV-A", meta = (DisplayName = "Try Mantle Or Vault"))
 	bool TryMantleOrVault();
@@ -519,6 +531,9 @@ protected:
 
 	/** T0 #10: planetside night glider boot home latch (NODE_GLIDER EJECT_HOME this session). */
 	bool bPlanetsideNightBootTriggered = false;
+
+	/** T0 #11: bed->spirit latch after GrantSpiritSleepGate + rune (NODE_BED this session). */
+	bool bBedSpiritGranted = false;
 
 	/** VP-C PA-06: on-screen interact feedback (debug overlay). */
 	void ShowInteractFeedback(const FString& Message, FColor Color = FColor::Green) const;
