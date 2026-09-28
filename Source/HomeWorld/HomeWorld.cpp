@@ -1068,6 +1068,26 @@ namespace
 		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Wake — phase set to Dawn (Phase 3). List 56 T3. For morning (Day/0) run hw.TimeOfDay.Phase 0."));
 	}
 
+	void CmdKettleBrew(const TArray<FString>& Args)
+	{
+		UWorld* World = HomeWorldPlayWorld::Resolve();
+		if (!World)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Kettle.Brew requires a play world (PIE or game)."));
+			return;
+		}
+		APlayerController* PC = World->GetFirstPlayerController();
+		AHomeWorldCharacter* Char = PC ? Cast<AHomeWorldCharacter>(PC->GetPawn()) : nullptr;
+		if (!Char)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Kettle.Brew - no AHomeWorldCharacter pawn."));
+			return;
+		}
+		const bool bOk = Char->TryBrewNodeKettleTea();
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Kettle.Brew %s (NODE_KETTLE herbs->tea; tea-gates sprint ~half day)."),
+			bOk ? TEXT("ok") : TEXT("failed"));
+	}
+
 	void CmdMoveMantle(const TArray<FString>& Args)
 	{
 		UWorld* World = HomeWorldPlayWorld::Resolve();
@@ -1362,6 +1382,11 @@ void FHomeWorldModule::StartupModule()
 		TEXT("hw.Wake"),
 		TEXT("Wake: advance time-of-day to Dawn (Phase 3). Only has effect when current phase is Night. Use in PIE for List 56 T3 verification. In-world: interact or overlap bed at night."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdWake),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Kettle.Brew"),
+		TEXT("T0 #2 NODE_KETTLE: spend RES_HERB -> tea; tea-gates sprint ~half day (TOD_DAY FORM_BODY). Not PROXY/meal/ungated alone."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdKettleBrew),
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.TimeOfDay.SetPhase"),

@@ -154,6 +154,22 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Wake|T0", meta = (DisplayName = "Try Emit NODE_WAKE Start-Day Beat"))
 	void TryEmitNodeWakeStartDayBeat();
 
+	/**
+	 * T0 #2 NODE_KETTLE: brew tea from herbs (RES_HERB) via existing inventory + day-verb sprint gate.
+	 * Extends inventory / Traversal day-verb hooks -- no parallel tea service, no new schema (Arch B).
+	 * Not PROXY SM_ProxyKettle alone; not meal-BP-as-tea; not ungated sprint alone (those = closed_fail).
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Kettle|T0", meta = (DisplayName = "Try Brew NODE_KETTLE Tea"))
+	bool TryBrewNodeKettleTea();
+
+	/** Trace/tag NODE_KETTLE / Kettle interact -> TryBrewNodeKettleTea (world beat, not PROXY alone). */
+	UFUNCTION(BlueprintCallable, Category = "Kettle|T0", meta = (DisplayName = "Try NODE_KETTLE Interact In Front"))
+	bool TryNodeKettleInteractInFront();
+
+	/** True while tea sprint gate is active (TOD_DAY / FORM_BODY, within ~half-day window). */
+	UFUNCTION(BlueprintCallable, Category = "Kettle|T0", meta = (DisplayName = "Is Tea Sprint Gate Active"))
+	bool IsTeaSprintGateActive() const;
+
 	/** MV-A: parkour-lite mantle/vault (body, day). */
 	UFUNCTION(BlueprintCallable, Category = "Movement|MV-A", meta = (DisplayName = "Try Mantle Or Vault"))
 	bool TryMantleOrVault();
@@ -386,6 +402,13 @@ protected:
 
 	/** T0 #1: once per Day phase - NODE_WAKE start-day beat already emitted. */
 	bool bNodeWakeEmittedForCurrentDay = false;
+
+	/** T0 #2: world-time end of tea-gated sprint (~half day). 0 = inactive. */
+	float TeaSprintEndWorldTime = 0.f;
+
+	/** T0 #2: tea sprint duration seconds (~half day stub; night stub is 120s). */
+	UPROPERTY(EditDefaultsOnly, Category = "Kettle|T0", meta = (ClampMin = "1.0"))
+	float TeaSprintHalfDaySeconds = 60.f;
 
 	/** VP-C PA-06: on-screen interact feedback (debug overlay). */
 	void ShowInteractFeedback(const FString& Message, FColor Color = FColor::Green) const;
