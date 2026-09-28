@@ -48,6 +48,11 @@ void UHomeWorldInteractAbility::ActivateAbility(const FGameplayAbilitySpecHandle
 	}
 	if (!bHandled)
 	{
+		// T0 #6 NODE_FIELD_GATHER: field herb/seed collect near landing (not dress/GP_Store/PROXY/plant; not ungated Gather.Flowers).
+		bHandled = Character->TryNodeFieldGatherInteractInFront();
+	}
+	if (!bHandled)
+	{
 		// T0 #3 NODE_PLANT_SLOT: day plant given herb (not TryNurture / not PROXY-as-plant).
 		bHandled = Character->TryNodePlantSlotInteractInFront();
 	}

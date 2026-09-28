@@ -1129,6 +1129,27 @@ namespace
 	}
 
 
+
+	void CmdFieldGatherCollect(const TArray<FString>& Args)
+	{
+		UWorld* World = HomeWorldPlayWorld::Resolve();
+		if (!World)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.FieldGather.Collect requires a play world (PIE or game)."));
+			return;
+		}
+		APlayerController* PC = World->GetFirstPlayerController();
+		AHomeWorldCharacter* Char = PC ? Cast<AHomeWorldCharacter>(PC->GetPawn()) : nullptr;
+		if (!Char)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.FieldGather.Collect - no AHomeWorldCharacter pawn."));
+			return;
+		}
+		const bool bOk = Char->TryCollectNodeFieldGather();
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.FieldGather.Collect %s (NODE_FIELD_GATHER field herb/seed; CAM_T0_FIELD; not dress/GP_Store/PROXY/plant; not ungated Gather.Flowers)."),
+			bOk ? TEXT("ok") : TEXT("failed"));
+	}
+
 	void CmdPlantSlot(const TArray<FString>& Args)
 	{
 		UWorld* World = HomeWorldPlayWorld::Resolve();

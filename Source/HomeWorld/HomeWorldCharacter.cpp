@@ -1600,6 +1600,102 @@ bool AHomeWorldCharacter::TryOpenInventoryGated()
 	return true;
 }
 
+
+bool AHomeWorldCharacter::TryCollectNodeFieldGather()
+{
+	// T0_M6 NODE_FIELD_GATHER / TOD_DAY / FORM_BODY / CAM_T0_FIELD
+	// Architecture Trade-Offs A-E: prefer existing inventory RES_HERB / RES_SEED
+	// -- no parallel gather service, no new schema, no invent gather/WP APIs.
+	// Anti closed_fail: dress-only != beat; GP_Store alone != NODE_FIELD_GATHER;
+	// PROXY SM_ProxyFieldGather alone != world beat; NODE_PLANT_SLOT (#3) != field gather;
+	// ungated hw.Gather.Flowers alone != this named beat. Glide (#5) cite only.
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
+	if (!TimeOfDay || TimeOfDay->GetCurrentPhase() != EHomeWorldTimeOfDayPhase::Day)
+	{
+		UE_LOG(LogTemp, Log, TEXT("NODE_FIELD_GATHER: collect skipped - need TOD_DAY"));
+		ShowInteractFeedback(TEXT("NODE_FIELD_GATHER: day only"), FColor::Yellow);
+		return false;
+	}
+	if (bIsSpiritForm)
+	{
+		UE_LOG(LogTemp, Log, TEXT("NODE_FIELD_GATHER: collect skipped - need FORM_BODY"));
+		ShowInteractFeedback(TEXT("NODE_FIELD_GATHER: body form only"), FColor::Yellow);
+		return false;
+	}
+
+	UGameInstance* GI = World->GetGameInstance();
+	UHomeWorldInventorySubsystem* Inv = GI ? GI->GetSubsystem<UHomeWorldInventorySubsystem>() : nullptr;
+	if (!Inv)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NODE_FIELD_GATHER: collect failed - no InventorySubsystem"));
+		return false;
+	}
+
+	if (bFieldGatherCollected)
+	{
+		UE_LOG(LogTemp, Log,
+			TEXT("NODE_FIELD_GATHER: field collect TOD_DAY FORM_BODY CAM_T0_FIELD (already collected; RES_HERB/RES_SEED via inventory; not dress/GP_Store/PROXY SM_ProxyFieldGather; not NODE_PLANT_SLOT; not ungated Gather.Flowers)"));
+		ShowInteractFeedback(TEXT("NODE_FIELD_GATHER: already collected"), FColor::Green);
+		return true;
+	}
+
+	const bool bHerb = Inv->TryAddResource(HomeWorldInventory::RES_HERB, 1);
+	const bool bSeed = Inv->TryAddResource(HomeWorldInventory::RES_SEED, 1);
+	if (!bHerb && !bSeed)
+	{
+		UE_LOG(LogTemp, Log, TEXT("NODE_FIELD_GATHER: collect failed - inventory full (need RES_HERB/RES_SEED path)"));
+		ShowInteractFeedback(TEXT("NODE_FIELD_GATHER: inventory full"), FColor::Yellow);
+		return false;
+	}
+
+	bFieldGatherCollected = true;
+	UE_LOG(LogTemp, Log,
+		TEXT("NODE_FIELD_GATHER: field collect TOD_DAY FORM_BODY CAM_T0_FIELD (RES_HERB+%d RES_SEED+%d; not dress/GP_Store alone; not PROXY SM_ProxyFieldGather; not NODE_PLANT_SLOT; not ungated Gather.Flowers; glide #5 cite only)"),
+		bHerb ? 1 : 0, bSeed ? 1 : 0);
+	ShowInteractFeedback(TEXT("NODE_FIELD_GATHER: field collect herb/seed"), FColor::Green);
+	return true;
+}
+
+bool AHomeWorldCharacter::TryNodeFieldGatherInteractInFront()
+{
+	FHitResult Hit;
+	if (!TraceInteractHit(Hit))
+	{
+		return false;
+	}
+	AActor* HitActor = GetInteractTargetActor(Hit);
+	if (!HitActor)
+	{
+		return false;
+	}
+
+	static const FName FieldGatherTags[] = {
+		FName(TEXT("NODE_FIELD_GATHER")),
+		FName(TEXT("FieldGather")),
+	};
+	bool bIsFieldGather = false;
+	for (const FName& Tag : FieldGatherTags)
+	{
+		if (HitActor->ActorHasTag(Tag))
+		{
+			bIsFieldGather = true;
+			break;
+		}
+	}
+	if (!bIsFieldGather)
+	{
+		return false;
+	}
+
+	// World interact beat -- PROXY SM_ProxyFieldGather / dress / GP_Store alone without collect latch = closed_fail.
+	return TryCollectNodeFieldGather();
+}
+
 void AHomeWorldCharacter::SyncFormWithTimeOfDay()
 {
 	UWorld* World = GetWorld();

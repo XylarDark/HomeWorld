@@ -210,6 +210,24 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Backpack|T0", meta = (DisplayName = "Try Open Inventory Gated"))
 	bool TryOpenInventoryGated();
 
+
+	/**
+	 * T0 #6 NODE_FIELD_GATHER: field herb/seed collect near landing (CAM_T0_FIELD).
+	 * Extends existing inventory RES_HERB / RES_SEED -- no parallel gather service, no new schema (Arch B).
+	 * Not dress-only; not GP_Store alone; not PROXY SM_ProxyFieldGather; not NODE_PLANT_SLOT (#3);
+	 * not ungated hw.Gather.Flowers alone (those = closed_fail). Glide #5 cite only.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "FieldGather|T0", meta = (DisplayName = "Try Collect NODE_FIELD_GATHER"))
+	bool TryCollectNodeFieldGather();
+
+	/** Trace/tag NODE_FIELD_GATHER / FieldGather interact -> TryCollectNodeFieldGather (world beat, not PROXY alone). */
+	UFUNCTION(BlueprintCallable, Category = "FieldGather|T0", meta = (DisplayName = "Try NODE_FIELD_GATHER Interact In Front"))
+	bool TryNodeFieldGatherInteractInFront();
+
+	/** True after NODE_FIELD_GATHER field collect latch this session. */
+	UFUNCTION(BlueprintCallable, Category = "FieldGather|T0", meta = (DisplayName = "Is Field Gather Collected"))
+	bool IsFieldGatherCollected() const { return bFieldGatherCollected; }
+
 	/** MV-A: parkour-lite mantle/vault (body, day). */
 	UFUNCTION(BlueprintCallable, Category = "Movement|MV-A", meta = (DisplayName = "Try Mantle Or Vault"))
 	bool TryMantleOrVault();
