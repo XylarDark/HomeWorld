@@ -1168,7 +1168,6 @@ namespace
 			bOk ? TEXT("ok") : TEXT("failed"));
 	}
 
-
 	void CmdRuneUnlock(const TArray<FString>& Args)
 	{
 		UWorld* World = HomeWorldPlayWorld::Resolve();
@@ -1345,7 +1344,7 @@ void CmdPlantSlot(const TArray<FString>& Args)
 			return;
 		}
 		// Arrange prereqs: hw.Rune.Unlock then hw.Bed.SleepSpirit (#11) -> FORM_SPIRIT / TOD_NIGHT_SPIRIT.
-		// Optional: hw.Portal.Camp (#13) to arrive camp — not required for Source emit soft latch.
+		// Optional: hw.Portal.Camp (#13) to arrive camp ï¿½ not required for Source emit soft latch.
 		if (!Char->GetIsSpiritForm())
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.CampNight - need FORM_SPIRIT; run hw.Rune.Unlock then hw.Bed.SleepSpirit (#11 path). body camp-night = closed_fail."));

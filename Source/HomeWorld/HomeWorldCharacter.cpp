@@ -2348,7 +2348,7 @@ bool AHomeWorldCharacter::TryCampNight()
 		}
 	}
 
-	// Soothe 2 sleepers via stealth soothe verb — never ReportFoeConverted (convert != soothe).
+	// Soothe 2 sleepers via stealth soothe verb ï¿½ never ReportFoeConverted (convert != soothe).
 	while (Stealth->GetSleepersSoothedThisSession() < 2)
 	{
 		if (!Stealth->TrySootheNodeSleeper())
