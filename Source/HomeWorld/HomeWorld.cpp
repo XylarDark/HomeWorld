@@ -1129,6 +1129,27 @@ namespace
 	}
 
 
+
+	void CmdFieldGatherCollect(const TArray<FString>& Args)
+	{
+		UWorld* World = HomeWorldPlayWorld::Resolve();
+		if (!World)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.FieldGather.Collect requires a play world (PIE or game)."));
+			return;
+		}
+		APlayerController* PC = World->GetFirstPlayerController();
+		AHomeWorldCharacter* Char = PC ? Cast<AHomeWorldCharacter>(PC->GetPawn()) : nullptr;
+		if (!Char)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.FieldGather.Collect - no AHomeWorldCharacter pawn."));
+			return;
+		}
+		const bool bOk = Char->TryCollectNodeFieldGather();
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.FieldGather.Collect %s (NODE_FIELD_GATHER field herb/seed; CAM_T0_FIELD; not dress/GP_Store/PROXY/plant; not ungated Gather.Flowers)."),
+			bOk ? TEXT("ok") : TEXT("failed"));
+	}
+
 	void CmdPlantSlot(const TArray<FString>& Args)
 	{
 		UWorld* World = HomeWorldPlayWorld::Resolve();
@@ -1469,6 +1490,11 @@ void FHomeWorldModule::StartupModule()
 		TEXT("T0_DEFAULT_SKYBOX_DAY: force Day + ensure Engine stock bright day sky (SKY_DEFAULT_DAY / TOD_DAY / ENV_T0_HOME). Not NF2_B night lookdev."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdSkyEnsureDefaultDay),
 		ECVF_Default);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.FieldGather.Collect"),
+		TEXT("T0 #6 NODE_FIELD_GATHER: field herb/seed collect (CAM_T0_FIELD). Not dress/GP_Store/PROXY/plant; not ungated Gather.Flowers."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdFieldGatherCollect),
+		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.Plant.Slot"),
 		TEXT("T0 #3 NODE_PLANT_SLOT: spend RES_HERB -> day plant given herb on N1 slot (TOD_DAY FORM_BODY). Not nurture/PROXY. #12 DEFER."),
