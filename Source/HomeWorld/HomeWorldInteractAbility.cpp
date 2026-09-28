@@ -38,6 +38,11 @@ void UHomeWorldInteractAbility::ActivateAbility(const FGameplayAbilitySpecHandle
 	}
 	if (!bHandled)
 	{
+		// T0 #2 NODE_KETTLE: herbs->tea before other day interacts (not meal-BP-as-tea).
+		bHandled = Character->TryNodeKettleInteractInFront();
+	}
+	if (!bHandled)
+	{
 		bHandled = Character->TryTameBeastInFront();
 	}
 	if (!bHandled)

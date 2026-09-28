@@ -460,13 +460,22 @@ void AHomeWorldCharacter::OnSprintStarted(const FInputActionValue& Value)
 {
 	if (!AreDayBodyAbilitiesAllowed())
 	{
-		UE_LOG(LogTemp, Log, TEXT("FORM: day verb rejected — sprint (TOD_NIGHT_HOME body night)"));
+		UE_LOG(LogTemp, Log, TEXT("FORM: day verb rejected - sprint (TOD_NIGHT_HOME body night)"));
+		return;
+	}
+	// T0 #2: tea gates sprint. Ungated day-verb sprint alone = closed_fail for MUST #2.
+	if (!IsTeaSprintGateActive())
+	{
+		UE_LOG(LogTemp, Log,
+			TEXT("NODE_KETTLE: sprint rejected - need tea (ungated sprint alone = closed_fail for MUST #2; not meal-BP-as-tea)"));
 		return;
 	}
 	if (TraversalComponent)
 	{
 		TraversalComponent->SetSprintHeld(true);
 	}
+	UE_LOG(LogTemp, Log,
+		TEXT("NODE_KETTLE: tea-gated sprint TOD_DAY FORM_BODY (half-day gate active; not ungated MV alone)"));
 }
 
 void AHomeWorldCharacter::OnSprintCompleted(const FInputActionValue& Value)
@@ -1214,6 +1223,110 @@ void AHomeWorldCharacter::TryEmitNodeWakeStartDayBeat()
 		TEXT("NODE_WAKE: start-day beat TOD_DAY FORM_BODY CAM_T0_WAKE (homestead; not PlayerStart alone; not PROXY SM_ProxyWakeMarker; not bed->Dawn alone)"));
 }
 
+bool AHomeWorldCharacter::IsTeaSprintGateActive() const
+{
+	UWorld* World = GetWorld();
+	if (!World || TeaSprintEndWorldTime <= 0.f)
+	{
+		return false;
+	}
+	if (bIsSpiritForm)
+	{
+		return false;
+	}
+	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
+	if (!TimeOfDay || TimeOfDay->GetCurrentPhase() != EHomeWorldTimeOfDayPhase::Day)
+	{
+		return false;
+	}
+	return World->GetTimeSeconds() < TeaSprintEndWorldTime;
+}
+
+bool AHomeWorldCharacter::TryBrewNodeKettleTea()
+{
+	// T0_M2 NODE_KETTLE / TOD_DAY / FORM_BODY
+	// Architecture Trade-Offs A-E: prefer existing inventory RES_HERB + Traversal day-verb sprint
+	// -- no parallel tea service, no new schema, no invent kettle/tea/WP APIs.
+	// Anti closed_fail: PROXY SM_ProxyKettle alone != world kettle; meal-BP != tea;
+	// ungated sprint alone != tea-gated sprint.
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
+	if (!TimeOfDay || TimeOfDay->GetCurrentPhase() != EHomeWorldTimeOfDayPhase::Day)
+	{
+		UE_LOG(LogTemp, Log, TEXT("NODE_KETTLE: brew skipped - need TOD_DAY"));
+		ShowInteractFeedback(TEXT("NODE_KETTLE: day only"), FColor::Yellow);
+		return false;
+	}
+	if (bIsSpiritForm)
+	{
+		UE_LOG(LogTemp, Log, TEXT("NODE_KETTLE: brew skipped - need FORM_BODY"));
+		ShowInteractFeedback(TEXT("NODE_KETTLE: body form only"), FColor::Yellow);
+		return false;
+	}
+
+	UGameInstance* GI = World->GetGameInstance();
+	UHomeWorldInventorySubsystem* Inv = GI ? GI->GetSubsystem<UHomeWorldInventorySubsystem>() : nullptr;
+	if (!Inv)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NODE_KETTLE: brew failed - no InventorySubsystem"));
+		return false;
+	}
+	if (!Inv->SpendResource(HomeWorldInventory::RES_HERB, 1))
+	{
+		UE_LOG(LogTemp, Log, TEXT("NODE_KETTLE: brew failed - need RES_HERB (herbs->tea)"));
+		ShowInteractFeedback(TEXT("NODE_KETTLE: need RES_HERB"), FColor::Yellow);
+		return false;
+	}
+
+	const float Duration = FMath::Max(1.f, TeaSprintHalfDaySeconds);
+	TeaSprintEndWorldTime = World->GetTimeSeconds() + Duration;
+
+	UE_LOG(LogTemp, Log,
+		TEXT("NODE_KETTLE: tea brew TOD_DAY FORM_BODY (herbs->tea; gates sprint ~half day=%.0fs; not PROXY SM_ProxyKettle; not meal-BP-as-tea)"),
+		Duration);
+	ShowInteractFeedback(TEXT("NODE_KETTLE: tea ready - sprint gated ~half day"), FColor::Green);
+	return true;
+}
+
+bool AHomeWorldCharacter::TryNodeKettleInteractInFront()
+{
+	FHitResult Hit;
+	if (!TraceInteractHit(Hit))
+	{
+		return false;
+	}
+	AActor* HitActor = GetInteractTargetActor(Hit);
+	if (!HitActor)
+	{
+		return false;
+	}
+
+	static const FName KettleTags[] = {
+		FName(TEXT("NODE_KETTLE")),
+		FName(TEXT("Kettle")),
+	};
+	bool bIsKettle = false;
+	for (const FName& Tag : KettleTags)
+	{
+		if (HitActor->ActorHasTag(Tag))
+		{
+			bIsKettle = true;
+			break;
+		}
+	}
+	if (!bIsKettle)
+	{
+		return false;
+	}
+
+	// World interact beat -- PROXY mesh alone (SM_ProxyKettle without interact/brew) = closed_fail.
+	return TryBrewNodeKettleTea();
+}
+
 void AHomeWorldCharacter::SyncFormWithTimeOfDay()
 {
 	UWorld* World = GetWorld();
@@ -1234,7 +1347,18 @@ void AHomeWorldCharacter::OnTimeOfDayPhaseChanged(EHomeWorldTimeOfDayPhase NewPh
 	ApplyFormForPhase(NewPhase);
 	// T0 #1: Day entry (not Dawn/bed->AdvanceToDawn alone) can emit NODE_WAKE start-day beat.
 	TryEmitNodeWakeStartDayBeat();
+	// T0 #2: tea sprint gate is Day-scoped (~half day within TOD_DAY).
+	if (NewPhase != EHomeWorldTimeOfDayPhase::Day && TeaSprintEndWorldTime > 0.f)
+	{
+		TeaSprintEndWorldTime = 0.f;
+		if (TraversalComponent)
+		{
+			TraversalComponent->SetSprintHeld(false);
+		}
+		UE_LOG(LogTemp, Log, TEXT("NODE_KETTLE: tea sprint gate cleared (left TOD_DAY)"));
+	}
 }
+
 
 bool AHomeWorldCharacter::CanEnterSpiritForm() const
 {
