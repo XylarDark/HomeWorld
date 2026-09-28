@@ -456,6 +456,11 @@ void AHomeWorldCharacter::OnAstralDeathTriggered(const FInputActionValue& Value)
 
 void AHomeWorldCharacter::OnSprintStarted(const FInputActionValue& Value)
 {
+	if (!AreDayBodyAbilitiesAllowed())
+	{
+		UE_LOG(LogTemp, Log, TEXT("FORM: day verb rejected — sprint (TOD_NIGHT_HOME body night)"));
+		return;
+	}
 	if (TraversalComponent)
 	{
 		TraversalComponent->SetSprintHeld(true);
@@ -481,6 +486,11 @@ void AHomeWorldCharacter::Jump()
 
 bool AHomeWorldCharacter::TryMantleOrVault()
 {
+	if (!AreDayBodyAbilitiesAllowed())
+	{
+		UE_LOG(LogTemp, Log, TEXT("FORM: day verb rejected — mantle (TOD_NIGHT_HOME body night)"));
+		return false;
+	}
 	return TraversalComponent ? TraversalComponent->TryMantleOrVault() : false;
 }
 
@@ -1180,15 +1190,76 @@ void AHomeWorldCharacter::OnTimeOfDayPhaseChanged(EHomeWorldTimeOfDayPhase NewPh
 	ApplyFormForPhase(NewPhase);
 }
 
+bool AHomeWorldCharacter::CanEnterSpiritForm() const
+{
+	// Named gates only (Architecture B): hide phase auto-spirit. #7 rune + #11 sleep.
+	return bSpiritSleepGateGranted && bRuneGateUnlocked;
+}
+
+bool AHomeWorldCharacter::AreDayBodyAbilitiesAllowed() const
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return true;
+	}
+	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
+	if (!TimeOfDay)
+	{
+		return true;
+	}
+	const EHomeWorldTimeOfDayPhase Phase = TimeOfDay->GetCurrentPhase();
+	// Day verbs off at Dusk/Night (T0 TOD_NIGHT_HOME) — Night remains active; form stays body without gates.
+	return Phase == EHomeWorldTimeOfDayPhase::Day || Phase == EHomeWorldTimeOfDayPhase::Dawn;
+}
+
+void AHomeWorldCharacter::SetRuneGateUnlocked(bool bUnlocked)
+{
+	if (bRuneGateUnlocked == bUnlocked)
+	{
+		return;
+	}
+	bRuneGateUnlocked = bUnlocked;
+	UE_LOG(LogTemp, Log, TEXT("FORM: rune gate %s"), bUnlocked ? TEXT("unlocked") : TEXT("locked"));
+	SyncFormWithTimeOfDay();
+}
+
+void AHomeWorldCharacter::GrantSpiritSleepGate()
+{
+	bSpiritSleepGateGranted = true;
+	UE_LOG(LogTemp, Log, TEXT("FORM: sleep gate granted (NODE_BED path; spirit still needs rune gate)"));
+	SyncFormWithTimeOfDay();
+}
+
+void AHomeWorldCharacter::ClearSpiritSleepGate()
+{
+	if (!bSpiritSleepGateGranted)
+	{
+		return;
+	}
+	bSpiritSleepGateGranted = false;
+	UE_LOG(LogTemp, Log, TEXT("FORM: sleep gate cleared"));
+}
+
 void AHomeWorldCharacter::ApplyFormForPhase(EHomeWorldTimeOfDayPhase Phase)
 {
-	if (Phase == LastAppliedFormPhase && (Phase == EHomeWorldTimeOfDayPhase::Night) == bIsSpiritForm)
+	const bool bSpiritCapablePhase =
+		(Phase == EHomeWorldTimeOfDayPhase::Night || Phase == EHomeWorldTimeOfDayPhase::Dusk);
+
+	if (!bSpiritCapablePhase)
+	{
+		ClearSpiritSleepGate();
+	}
+
+	// T0 #9 TOD_NIGHT_HOME: Night/Dusk without named gates → FORM_BODY (no auto-spirit).
+	const bool bSpirit = bSpiritCapablePhase && CanEnterSpiritForm();
+
+	if (Phase == LastAppliedFormPhase && bIsSpiritForm == bSpirit)
 	{
 		return;
 	}
 	LastAppliedFormPhase = Phase;
 
-	const bool bSpirit = (Phase == EHomeWorldTimeOfDayPhase::Night || Phase == EHomeWorldTimeOfDayPhase::Dusk);
 	if (bIsSpiritForm == bSpirit)
 	{
 		return;
@@ -1198,7 +1269,8 @@ void AHomeWorldCharacter::ApplyFormForPhase(EHomeWorldTimeOfDayPhase Phase)
 	static const TCHAR* PhaseNames[] = { TEXT("Day"), TEXT("Dusk"), TEXT("Night"), TEXT("Dawn") };
 	const int32 PhaseIdx = FMath::Clamp(static_cast<int32>(Phase), 0, 3);
 	const TCHAR* FormLabel = bSpirit ? TEXT("spirit") : TEXT("body");
-	UE_LOG(LogTemp, Log, TEXT("FORM: %s form (phase=%s; NightMix driven by TimeOfDaySubsystem)"), FormLabel, PhaseNames[PhaseIdx]);
+	UE_LOG(LogTemp, Log, TEXT("FORM: %s form (phase=%s; gates sleep=%d rune=%d; NightMix driven by TimeOfDaySubsystem)"),
+		FormLabel, PhaseNames[PhaseIdx], bSpiritSleepGateGranted ? 1 : 0, bRuneGateUnlocked ? 1 : 0);
 
 	if (TraversalComponent)
 	{
