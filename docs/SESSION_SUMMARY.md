@@ -1,3 +1,7 @@
+## 2026-09-23 — PS-C-CAP-001 absolute ps_stills paths (cloud, rung-1)
+
+- **Ticket PS-C-CAP-001:** HighResShot ladder **Bad input** when dest was basename/cwd-relative → orphan PNG, **0/7** gate. **Fix:** `capture_viewport._ensure_abs_dest`; `ps_placement_prove._resolve_still_path` + AL path guard under **`Saved/ps_stills/`**; KNOWN_ERRORS Cause→Avoid. Draft PR — DESKTOP re-prove `CAM_CabinClose` + full `ps_placement_prove.py`.
+
 ## 2026-09-23 — UE_BIBLE anti-ladder hard rules (cloud)
 
 - **Docs-only:** [UE_BIBLE.md](../Docs/UE_BIBLE.md) §2b — Conductor/Lead harness locks (one repro before ladder PR, no third ladder, one Fix per root cause); Cause→Avoid table; HighResShot freeze + MRQ pointer. [PDF_CYCLE.md](../swarm/PDF_CYCLE.md) Host Pulse one-liner. Branch `cursor/ue-bible-anti-ladder-b3a5` — draft PR, not merged.
@@ -957,4 +961,21 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 ## 2026-09-23 — PS-C-2 stills driver completes (cloud)
 
 - DESKTOP: gate frozen **`stills_in_progress: true`**, 0 PNGs — async slate callback never advanced after MCP return. Fix: module-level tick dispatcher + **`_drive_ps_c_stills_orchestrator`** (pump/tick until DONE, ≤300s); prove returns with **`stills_in_progress: false`** and updated gate; viewport focus before capture. KNOWN_ERRORS PS-C-2 row. No PASS claim.
+
+## 2026-09-23 — PS-C-CAP-001 re-verify + PS-C-CAM-002 (cloud, PR #198)
+
+- **Ticket A:** Manifest **`exists`/`file_exists`** aligned with canonical **`Saved/ps_stills/`** disk stat before write; **`_finish_all`** + **`_write_stills_manifest(..., act_since=)`** reconcile; gate still uses **`_audit_ps_stills_disk`** for fresh count.
+- **Ticket B:** Stale **`ps_arrange_gate.json`** → **`_still_cam_labels_missing()`** forces **`arrange_ps_homestead`** re-run when prove cameras absent.
+- **Boot:** Removed bogus **`MovieRenderPipelineEditor`** from **`HomeWorld.uproject`**; KNOWN_ERRORS Cause→Avoid rows. DESKTOP re-prove pending.
+- **Design binding:** Prove 7 labels verified = **`PS_C_METRICS.md`** = PS-A map (no three-way mismatch); **`_prove_still_labels_drift_from_design`** blocks agent-invented cams.
+
+## 2026-09-23 — PS-C-CAP-001 one-cam path canon (cloud, PR #198 `baef6e1`)
+
+- DESKTOP **`cd7c258` ~11:38:** gate before **`CAM_CabinClose.png`**, **`settle_path` missing** while PNG on canonical disk — AL async vs non-unified poll path.
+- Fix: **`_ps_c_canonical_still_path`** (AL ≡ settle ≡ manifest/gate); **`act_end`** only when **`paths_ready`**; gate defer poll before manifest; KNOWN_ERRORS row. Conductor: **one Act after PR** only; CAM-002 hold.
+
+## 2026-09-23 — PS-C-CAP-001 one-cam sync writer (cloud, PR #198 `fd8aa8c`)
+
+- DESKTOP **`98c7b36` ~12:09:** path canon OK; async driver + early **`act_end`** → settle **`exists:false`**, PNG same second as gate.
+- Fix: **`_ps_c_one_cam_sync_capture_still`** + **`capture_viewport.wait_for_png_on_disk`** (single AL, render flush, no slate driver/defer). CAM-002 hold.
 
