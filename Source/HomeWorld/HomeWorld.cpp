@@ -1041,7 +1041,8 @@ namespace
 			return;
 		}
 		TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Night);
-		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.GoToBed — phase set to Night (Phase 2). Player \"wakes\" in astral / night phase. MVP tutorial List 8 step 8."));
+		// T0 #9: phase→Night only. Spirit requires named sleep+rune gates (#11+#7); do not auto-spirit.
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.GoToBed — phase set to Night (Phase 2). FORM stays body until sleep+rune gates (T0 TOD_NIGHT_HOME)."));
 	}
 
 	void CmdWake(const TArray<FString>& Args)
@@ -1349,7 +1350,7 @@ void FHomeWorldModule::StartupModule()
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.GoToBed"),
-		TEXT("Go to bed: set time-of-day to Night (Phase 2). Player \"wakes\" in astral / night phase. Use for MVP tutorial List 8 step 8 verification. Alternative: hw.TimeOfDay.Phase 2."),
+		TEXT("Go to bed: set time-of-day to Night (Phase 2). T0 #9: does not grant spirit alone (needs sleep+rune gates). Alternative: hw.TimeOfDay.Phase 2."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdGoToBed),
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
