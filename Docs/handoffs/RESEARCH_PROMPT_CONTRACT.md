@@ -1,6 +1,14 @@
 # Research prompt contract (ProveOps B)
 
-**Owner:** Conductor posts paste-ready prompts in HomeWorld Co. Lead runs them through an external LLM and returns a Research EXIT. Conductor **ACCEPT**s EXIT → Lead greenlights Do.
+**Owner:** Conductor writes paste-ready prompts to `Docs/handoffs/research/PROMPT_<ID>.md` and posts the **path** (optional ≤5-line digest) in HomeWorld Co. Lead runs the **file** through an external LLM and returns EXIT as `Docs/handoffs/research/EXIT_<ID>.md`. Conductor **ACCEPT**s EXIT → Lead greenlights Do. Chat is not the canonical prompt/EXIT body.
+
+## File protocol (Lead lock 2026-09-27)
+
+- Every Research **prompt** MUST exist as `Docs/handoffs/research/PROMPT_<ID>.md` before Co treats it as live.
+- Every Research **EXIT** MUST exist as `Docs/handoffs/research/EXIT_<ID>.md` before `ACCEPT EXIT`.
+- Interview EXIT SCOPE/IMPLEMENTATION prompts use the same `PROMPT_` / `EXIT_` naming under that folder.
+- Fitness greps A–D run on those **files** (`$P` / `$E`), never a chat scrape.
+- Folder README: `Docs/handoffs/research/README.md`.
 
 Cite: Co skill `homeworld-co-ops` · EXIT `CO_BOTS_PROCESS_REFINE_V1`.
 
@@ -39,7 +47,7 @@ Conductor re-runs on every Research prompt (`$P`) and every EXIT (`$E`) before `
 ### A. Prompt — seven exact heading names (FAIL if any missing)
 
 ```bash
-# $P = path to the paste-ready Research prompt
+# $P = Docs/handoffs/research/PROMPT_<ID>.md (canonical file)
 for h in 'ROLE' 'CONTEXT' 'CANON' 'ASK' 'NON-GOALS' 'DONE-WHEN' 'child Research needed?'; do
   grep -E "^#{0,3}[[:space:]]*${h}" "$P" || echo "FAIL missing heading: $h"
 done
@@ -50,7 +58,7 @@ Pass = all seven match as headings (leading `#` optional; name exact).
 ### B. EXIT — required sections + paste-ready (FAIL if any missing)
 
 ```bash
-# $E = path to the returned Research EXIT (full file, not chat slice)
+# $E = Docs/handoffs/research/EXIT_<ID>.md (full file, not chat slice)
 for h in 'Diagnosis' 'Do bites' 'eggbot' 'child Research' 'Accept checklist'; do
   grep -E "$h" "$E" || echo "FAIL missing EXIT section: $h"
 done
