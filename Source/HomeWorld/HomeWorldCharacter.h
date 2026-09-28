@@ -308,6 +308,20 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Portal|T0", meta = (DisplayName = "Is Portal Home To Camp Granted"))
 	bool IsPortalHomeToCampGranted() const { return bPortalHomeToCampGranted; }
 
+
+	/**
+	 * T0 #14 camp night: avoid 1 NODE_GUARD + soothe 2 NODE_SLEEPER (CAM_T0_CAMP_NIGHT).
+	 * Prefer UHomeWorldSpiritStealthComponent -- no parallel stealth service (Arch B).
+	 * Prereq: #11 spirit path (FORM_SPIRIT / TOD_NIGHT_SPIRIT via hw.Rune.Unlock + hw.Bed.SleepSpirit).
+	 * convert != soothe (never ReportFoeConverted); stealth-alone / GP_SS_Lit alone / convert-as-soothe = closed_fail.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "CampNight|T0", meta = (DisplayName = "Try Camp Night Avoid Soothe"))
+	bool TryCampNight();
+
+	/** True after camp night avoid-1 + soothe-2 latch this session. */
+	UFUNCTION(BlueprintCallable, Category = "CampNight|T0", meta = (DisplayName = "Is Camp Night Granted"))
+	bool IsCampNightGranted() const { return bCampNightGranted; }
+
 	/** MV-A: parkour-lite mantle/vault (body, day). */
 	UFUNCTION(BlueprintCallable, Category = "Movement|MV-A", meta = (DisplayName = "Try Mantle Or Vault"))
 	bool TryMantleOrVault();
@@ -563,6 +577,10 @@ protected:
 
 	/** T0 #13: spirit home->camp portal latch (NODE_PORTAL_HOME -> NODE_PORTAL_CAMP this session). */
 	bool bPortalHomeToCampGranted = false;
+
+
+	/** T0 #14: camp night avoid-1 guard + soothe-2 sleepers latch this session. */
+	bool bCampNightGranted = false;
 
 	/** VP-C PA-06: on-screen interact feedback (debug overlay). */
 	void ShowInteractFeedback(const FString& Message, FColor Color = FColor::Green) const;

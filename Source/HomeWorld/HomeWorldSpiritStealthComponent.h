@@ -48,6 +48,33 @@ public:
 
 	void LogStatus() const;
 
+
+	/**
+	 * T0 #14 NODE_GUARD: spirit avoid one camp-night guard (stealth path; not convert).
+	 * Soft OK when KEEP-LOCAL world actor missing (Present?=N; no .uasset/.umap invent).
+	 * convert != soothe; stealth-alone without soothe sleepers = incomplete for #14.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Stealth|T0|CampNight")
+	bool TryAvoidNodeGuard();
+
+	/**
+	 * T0 #14 NODE_SLEEPER: soothe one camp-night sleeper (care verb).
+	 * NOT ReportFoeConverted / convert stub (convert != soothe = closed_fail).
+	 * Soft OK when KEEP-LOCAL world actor missing.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Stealth|T0|CampNight")
+	bool TrySootheNodeSleeper();
+
+	UFUNCTION(BlueprintCallable, Category = "Stealth|T0|CampNight")
+	int32 GetGuardsAvoidedThisSession() const { return GuardsAvoidedCount; }
+
+	UFUNCTION(BlueprintCallable, Category = "Stealth|T0|CampNight")
+	int32 GetSleepersSoothedThisSession() const { return SleepersSoothedCount; }
+
+	/** True when avoid>=1 and soothe>=2 this session (MUST #14 beat). */
+	UFUNCTION(BlueprintCallable, Category = "Stealth|T0|CampNight")
+	bool IsCampNightBeatComplete() const { return GuardsAvoidedCount >= 1 && SleepersSoothedCount >= 2; }
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -87,6 +114,15 @@ protected:
 
 	UPROPERTY(Transient)
 	EHomeWorldSpiritLitSourceKind LastEnterSourceKind = EHomeWorldSpiritLitSourceKind::Campfire;
+
+
+	/** T0 #14: guards avoided this session (need 1). */
+	UPROPERTY(Transient)
+	int32 GuardsAvoidedCount = 0;
+
+	/** T0 #14: sleepers soothed this session (need 2). Not convert count. */
+	UPROPERTY(Transient)
+	int32 SleepersSoothedCount = 0;
 
 	static constexpr float AlertRisePerSecond = 0.35f;
 	static constexpr float AlertDecayPerSecond = 0.55f;

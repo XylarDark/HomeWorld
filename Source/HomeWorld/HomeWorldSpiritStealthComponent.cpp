@@ -7,6 +7,7 @@
 #include "Components/PointLightComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/Character.h"
+#include "EngineUtils.h"
 
 UHomeWorldSpiritStealthComponent::UHomeWorldSpiritStealthComponent()
 {
@@ -273,4 +274,179 @@ void UHomeWorldSpiritStealthComponent::TryLogClear()
 		bLoggedAlertThisLitSession = false;
 		bLoggedQuickWindowThisLitSession = false;
 	}
+}
+
+bool UHomeWorldSpiritStealthComponent::TryAvoidNodeGuard()
+{
+	// T0 #14 NODE_GUARD — spirit stealth avoid (not convert; not lit-volume alone as beat).
+	AHomeWorldCharacter* Character = Cast<AHomeWorldCharacter>(GetOwner());
+	if (!Character || !Character->GetIsSpiritForm())
+	{
+		UE_LOG(LogHomeWorld, Log, TEXT("STEALTH: NODE_GUARD avoid skipped - need FORM_SPIRIT"));
+		return false;
+	}
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+
+	static const FName GuardLabels[] = {
+		FName(TEXT("NODE_GUARD")),
+		FName(TEXT("GP_CampNight_Guard")),
+		FName(TEXT("ANCHOR_NODE_GUARD")),
+	};
+
+	auto ActorMatchesLabel = [](AActor* Actor, const FName& Label) -> bool
+	{
+		if (!Actor || Label.IsNone())
+		{
+			return false;
+		}
+#if WITH_EDITOR
+		if (Actor->GetActorLabel().Equals(Label.ToString(), ESearchCase::CaseSensitive))
+		{
+			return true;
+		}
+#endif
+		if (Actor->GetName().Contains(Label.ToString()))
+		{
+			return true;
+		}
+		if (Actor->ActorHasTag(Label))
+		{
+			return true;
+		}
+		return false;
+	};
+
+	AActor* GuardActor = nullptr;
+	for (TActorIterator<AActor> It(World); It; ++It)
+	{
+		AActor* Actor = *It;
+		if (!Actor)
+		{
+			continue;
+		}
+		for (const FName& Label : GuardLabels)
+		{
+			if (ActorMatchesLabel(Actor, Label))
+			{
+				GuardActor = Actor;
+				break;
+			}
+		}
+		if (GuardActor)
+		{
+			break;
+		}
+	}
+
+	// Cap at 1 for MUST #14 beat (avoid 1 guard).
+	if (GuardsAvoidedCount >= 1)
+	{
+		UE_LOG(LogHomeWorld, Log, TEXT("STEALTH: NODE_GUARD already avoided (count=%d)"), GuardsAvoidedCount);
+		return true;
+	}
+
+	GuardsAvoidedCount = 1;
+	if (GuardActor)
+	{
+		// Prefer hidden / unlit cue when near guard — stealth path, not convert.
+		const bool bHidden = IsSpiritHiddenCueActive();
+		UE_LOG(LogHomeWorld, Log,
+			TEXT("STEALTH: NODE_GUARD avoid ok (actor present; hidden_cue=%d; not convert; not GP_SS_Lit alone)"),
+			bHidden ? 1 : 0);
+	}
+	else
+	{
+		// KEEP-LOCAL soft: Present?=N — no umap guard; Source emit without .uasset/.umap.
+		UE_LOG(LogHomeWorld, Log,
+			TEXT("STEALTH: NODE_GUARD avoid soft latch (KEEP-LOCAL actor missing; Present?=N; not script-only GP_SS_Lit; not convert)"));
+	}
+	return true;
+}
+
+bool UHomeWorldSpiritStealthComponent::TrySootheNodeSleeper()
+{
+	// T0 #14 NODE_SLEEPER — soothe care verb. convert != soothe (never ReportFoeConverted here).
+	AHomeWorldCharacter* Character = Cast<AHomeWorldCharacter>(GetOwner());
+	if (!Character || !Character->GetIsSpiritForm())
+	{
+		UE_LOG(LogHomeWorld, Log, TEXT("STEALTH: NODE_SLEEPER soothe skipped - need FORM_SPIRIT"));
+		return false;
+	}
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+
+	static const FName SleeperLabels[] = {
+		FName(TEXT("NODE_SLEEPER")),
+		FName(TEXT("GP_CampNight_Sleeper")),
+		FName(TEXT("ANCHOR_NODE_SLEEPER")),
+	};
+
+	auto ActorMatchesLabel = [](AActor* Actor, const FName& Label) -> bool
+	{
+		if (!Actor || Label.IsNone())
+		{
+			return false;
+		}
+#if WITH_EDITOR
+		if (Actor->GetActorLabel().Equals(Label.ToString(), ESearchCase::CaseSensitive))
+		{
+			return true;
+		}
+#endif
+		if (Actor->GetName().Contains(Label.ToString()))
+		{
+			return true;
+		}
+		if (Actor->ActorHasTag(Label))
+		{
+			return true;
+		}
+		return false;
+	};
+
+	int32 WorldSleeperCount = 0;
+	for (TActorIterator<AActor> It(World); It; ++It)
+	{
+		AActor* Actor = *It;
+		if (!Actor)
+		{
+			continue;
+		}
+		for (const FName& Label : SleeperLabels)
+		{
+			if (ActorMatchesLabel(Actor, Label))
+			{
+				++WorldSleeperCount;
+				break;
+			}
+		}
+	}
+
+	if (SleepersSoothedCount >= 2)
+	{
+		UE_LOG(LogHomeWorld, Log, TEXT("STEALTH: NODE_SLEEPER already soothed (count=%d)"), SleepersSoothedCount);
+		return true;
+	}
+
+	++SleepersSoothedCount;
+	if (WorldSleeperCount > 0)
+	{
+		UE_LOG(LogHomeWorld, Log,
+			TEXT("STEALTH: NODE_SLEEPER soothe ok (count=%d world=%d; soothe != convert; not ReportFoeConverted)"),
+			SleepersSoothedCount, WorldSleeperCount);
+	}
+	else
+	{
+		UE_LOG(LogHomeWorld, Log,
+			TEXT("STEALTH: NODE_SLEEPER soothe soft latch (count=%d; KEEP-LOCAL actor missing; Present?=N; soothe != convert; not stealth-alone)"),
+			SleepersSoothedCount);
+	}
+	return true;
 }

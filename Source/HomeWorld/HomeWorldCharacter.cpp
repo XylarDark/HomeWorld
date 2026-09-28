@@ -2288,6 +2288,93 @@ bool AHomeWorldCharacter::TryPortalHomeToCamp()
 	return true;
 }
 
+
+bool AHomeWorldCharacter::TryCampNight()
+{
+	// T0_M14 NODE_GUARD / NODE_SLEEPER / TOD_NIGHT_SPIRIT / FORM_SPIRIT / CAM_T0_CAMP_NIGHT
+	// Architecture Trade-Offs A-E: prefer existing UHomeWorldSpiritStealthComponent --
+	// no parallel stealth service, no invent PROP schema, no .uasset/.umap.
+	// Prereq: #11 spirit path (hw.Rune.Unlock + hw.Bed.SleepSpirit).
+	// Anti closed_fail: script-only GP_SS_Lit_*; stealth-alone without soothe;
+	// convert-as-soothe (ReportFoeConverted); PROP invent.
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+
+	if (!GetIsSpiritForm())
+	{
+		UE_LOG(LogTemp, Log, TEXT("NODE_GUARD: camp-night skipped - need FORM_SPIRIT (body stealth != #14; closed_fail)"));
+		ShowInteractFeedback(TEXT("NODE_GUARD: spirit form only"), FColor::Yellow);
+		return false;
+	}
+
+	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
+	if (!TimeOfDay || !TimeOfDay->GetIsSpiritPhase())
+	{
+		UE_LOG(LogTemp, Log, TEXT("NODE_GUARD: camp-night skipped - need TOD_NIGHT_SPIRIT"));
+		ShowInteractFeedback(TEXT("NODE_GUARD: night spirit phase only"), FColor::Yellow);
+		return false;
+	}
+
+	if (bCampNightGranted)
+	{
+		UE_LOG(LogTemp, Log,
+			TEXT("NODE_GUARD: NODE_SLEEPER TOD_NIGHT_SPIRIT FORM_SPIRIT CAM_T0_CAMP_NIGHT (already granted; avoid-1 + soothe-2 latch; not convert; not GP_SS_Lit alone; not stealth-alone)"));
+		ShowInteractFeedback(TEXT("NODE_GUARD: camp night already"), FColor::Green);
+		return true;
+	}
+
+	UHomeWorldSpiritStealthComponent* Stealth = SpiritStealthComponent;
+	if (!Stealth)
+	{
+		Stealth = FindComponentByClass<UHomeWorldSpiritStealthComponent>();
+	}
+	if (!Stealth)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NODE_GUARD: camp-night failed - no UHomeWorldSpiritStealthComponent (Arch B require stealth module)"));
+		ShowInteractFeedback(TEXT("NODE_GUARD: no stealth component"), FColor::Yellow);
+		return false;
+	}
+
+	// Avoid 1 guard via stealth component (soft OK when KEEP-LOCAL missing).
+	if (Stealth->GetGuardsAvoidedThisSession() < 1)
+	{
+		if (!Stealth->TryAvoidNodeGuard())
+		{
+			UE_LOG(LogTemp, Log, TEXT("NODE_GUARD: avoid failed"));
+			return false;
+		}
+	}
+
+	// Soothe 2 sleepers via stealth soothe verb — never ReportFoeConverted (convert != soothe).
+	while (Stealth->GetSleepersSoothedThisSession() < 2)
+	{
+		if (!Stealth->TrySootheNodeSleeper())
+		{
+			UE_LOG(LogTemp, Log, TEXT("NODE_SLEEPER: soothe failed (soothe != convert)"));
+			return false;
+		}
+	}
+
+	if (!Stealth->IsCampNightBeatComplete())
+	{
+		// Stealth-alone / incomplete soothe = not #14 PASS.
+		UE_LOG(LogTemp, Log,
+			TEXT("NODE_GUARD: camp-night incomplete (avoid=%d soothe=%d; need 1+2; stealth-alone = closed_fail)"),
+			Stealth->GetGuardsAvoidedThisSession(), Stealth->GetSleepersSoothedThisSession());
+		ShowInteractFeedback(TEXT("NODE_GUARD: incomplete beat"), FColor::Yellow);
+		return false;
+	}
+
+	bCampNightGranted = true;
+	UE_LOG(LogTemp, Log,
+		TEXT("NODE_GUARD: NODE_SLEEPER TOD_NIGHT_SPIRIT FORM_SPIRIT CAM_T0_CAMP_NIGHT (avoid-1 + soothe-2 via UHomeWorldSpiritStealthComponent; soothe != convert; not GP_SS_Lit alone; not stealth-alone)"));
+	ShowInteractFeedback(TEXT("NODE_GUARD: camp night"), FColor::Green);
+	return true;
+}
+
 void AHomeWorldCharacter::SyncFormWithTimeOfDay()
 {
 	UWorld* World = GetWorld();
