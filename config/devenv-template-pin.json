@@ -2,8 +2,8 @@
   "path": "DevEnvTemplate",
   "remote": "https://github.com/XylarDark/DevEnvTemplate.git",
   "branch": "master",
-  "sha": "0a273065f7386e411873a548adb4c1786da0c976",
-  "shortSha": "0a27306",
+  "sha": "a9d1cc47c49389dba8aacf0bbede31684a4ce28a",
+  "shortSha": "a9d1cc4",
   "docPaths": [
     "docs/Setup/CURSOR_DEV.md",
     "Docs/13b_HR2_B_COLD_CLONE.md"
@@ -11,5 +11,5 @@
   "hr2Phase": "HR2-B",
   "updated": "2026-09-27",
   "productName": "DevHarness",
-  "note": "DET_HARNESS_SYNC #41 Class S testing-standards ALIGN + portable guides. Lead authorized after DET #41 Class S merge."
+  "note": "DET #42 reading-canon Class D port on master. Lead authorized after DET #42 merge."
 }
