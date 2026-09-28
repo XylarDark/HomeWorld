@@ -1068,6 +1068,33 @@ namespace
 		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Wake — phase set to Dawn (Phase 3). List 56 T3. For morning (Day/0) run hw.TimeOfDay.Phase 0."));
 	}
 
+	
+	void CmdSkyEnsureDefaultDay(const TArray<FString>& Args)
+	{
+		UWorld* World = HomeWorldPlayWorld::Resolve();
+		if (!World)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Sky.EnsureDefaultDay requires a play world (PIE or game)."));
+			return;
+		}
+		UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
+		if (!TimeOfDay)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Sky.EnsureDefaultDay - TimeOfDaySubsystem not found."));
+			return;
+		}
+		// Force Day path (SetPhase Day clears non-Day latch then Ensure emits SKY_DEFAULT_DAY).
+		// If already Day, bounce via Dusk then Day so prove can re-grep (Dusk clears latch; avoids Dawn PersistDawnSnapshot; not NF2_B night).
+		if (TimeOfDay->GetCurrentPhase() == EHomeWorldTimeOfDayPhase::Day)
+		{
+			TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Dusk);
+		}
+		TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Day);
+		const bool bOk = TimeOfDay->EnsureDefaultBrightDaySky(true);
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Sky.EnsureDefaultDay %s (SKY_DEFAULT_DAY / TOD_DAY / ENV_T0_HOME)."),
+			bOk ? TEXT("ok") : TEXT("incomplete"));
+	}
+
 	void CmdKettleBrew(const TArray<FString>& Args)
 	{
 		UWorld* World = HomeWorldPlayWorld::Resolve();
@@ -1383,6 +1410,11 @@ void FHomeWorldModule::StartupModule()
 		TEXT("Wake: advance time-of-day to Dawn (Phase 3). Only has effect when current phase is Night. Use in PIE for List 56 T3 verification. In-world: interact or overlap bed at night."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdWake),
 		ECVF_Cheat);
+		IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Sky.EnsureDefaultDay"),
+		TEXT("T0_DEFAULT_SKYBOX_DAY: force Day + ensure Engine stock bright day sky (SKY_DEFAULT_DAY / TOD_DAY / ENV_T0_HOME). Not NF2_B night lookdev."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdSkyEnsureDefaultDay),
+		ECVF_Default);
 	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.Kettle.Brew"),
 		TEXT("T0 #2 NODE_KETTLE: spend RES_HERB -> tea; tea-gates sprint ~half day (TOD_DAY FORM_BODY). Not PROXY/meal/ungated alone."),

@@ -135,6 +135,8 @@ void AHomeWorldCharacter::BeginPlay()
 			SyncFormWithTimeOfDay();
 			// T0 #1 NODE_WAKE: homestead start-day beat via existing TOD + spawn hooks (not PlayerStart alone).
 			TryEmitNodeWakeStartDayBeat();
+			// T0_DEFAULT_SKYBOX_DAY: Engine stock day sky via existing TOD (not kettle / other T0).
+			TimeOfDay->EnsureDefaultBrightDaySky(true);
 		}
 	}
 	if (TraversalComponent)

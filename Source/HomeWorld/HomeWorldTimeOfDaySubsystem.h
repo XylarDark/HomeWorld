@@ -84,6 +84,16 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "TimeOfDay")
 	FOnTimeOfDayPhaseChanged OnPhaseChanged;
 
+
+	/**
+	 * T0_DEFAULT_SKYBOX_DAY: ensure Engine-stock bright day sky on Day (NightMix=0).
+	 * Finds or runtime-spawns stock SkyAtmosphere + day DirectionalLight + SkyLight.
+	 * Architecture Trade-Offs A-E: prefer existing TOD Day + Engine defaults -- no parallel sky API, no custom HDRI, no new schema.
+	 * Emits greppable SKY_DEFAULT_DAY / TOD_DAY / ENV_T0_HOME. Anti closed_fail: NF2_B night-as-day, black sky-as-pass.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "TimeOfDay|Sky", meta = (DisplayName = "Ensure Default Bright Day Sky"))
+	virtual bool EnsureDefaultBrightDaySky(bool bEmitBeatLog = true);
+
 	/** True when phase is Night or Dusk (spirit-capable per Docs/03_GAMEPLAY_MVP §4). */
 	UFUNCTION(BlueprintCallable, Category = "TimeOfDay", meta = (DisplayName = "Get Is Spirit Phase"))
 	virtual bool GetIsSpiritPhase() const;
@@ -94,4 +104,7 @@ private:
 
 	/** Last phase broadcast from SetPhase (avoids duplicate OnPhaseChanged). */
 	EHomeWorldTimeOfDayPhase LastBroadcastPhase = EHomeWorldTimeOfDayPhase::Day;
+
+	/** T0_DEFAULT_SKYBOX_DAY: once-per-Day latch for SKY_DEFAULT_DAY beat emit. */
+	bool bSkyDefaultDayEmittedForCurrentDay = false;
 };
