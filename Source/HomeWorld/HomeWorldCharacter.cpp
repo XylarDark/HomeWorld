@@ -1772,6 +1772,99 @@ bool AHomeWorldCharacter::TryNodeRuneInteractInFront()
 	return TryUnlockNodeRune();
 }
 
+bool AHomeWorldCharacter::TryEjectNodeDayCamp()
+{
+	// T0_M8 NODE_DAY_CAMP / EJECT_HOME / TOD_DAY / FORM_BODY / CAM_T0_CAMP_DAY
+	// Architecture Trade-Offs A-E: prefer existing FallbackGlideComponent::StartGlideHome
+	// (reverse CRUMB toward home) -- no parallel eject service (Arch B).
+	// Anti closed_fail: script-only GP_RS_HumanoidCamp* != world camp; PROXY SM_ProxyDayCamp != beat;
+	// island->planet FALLBACK StartGlide alone != EJECT_HOME; convert stub != eject.
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
+	if (!TimeOfDay || TimeOfDay->GetCurrentPhase() != EHomeWorldTimeOfDayPhase::Day)
+	{
+		UE_LOG(LogTemp, Log, TEXT("NODE_DAY_CAMP: eject skipped - need TOD_DAY"));
+		ShowInteractFeedback(TEXT("NODE_DAY_CAMP: day only"), FColor::Yellow);
+		return false;
+	}
+	if (bIsSpiritForm)
+	{
+		UE_LOG(LogTemp, Log, TEXT("NODE_DAY_CAMP: eject skipped - need FORM_BODY"));
+		ShowInteractFeedback(TEXT("NODE_DAY_CAMP: body form only"), FColor::Yellow);
+		return false;
+	}
+
+	if (bDayCampEjectTriggered)
+	{
+		UE_LOG(LogTemp, Log,
+			TEXT("NODE_DAY_CAMP: EJECT_HOME TOD_DAY FORM_BODY CAM_T0_CAMP_DAY (already ejected; StartGlideHome reverse CRUMB; not FALLBACK down; not PROXY SM_ProxyDayCamp; not GP_RS_HumanoidCamp* script-only; not convert stub)"));
+		ShowInteractFeedback(TEXT("NODE_DAY_CAMP: already ejected"), FColor::Green);
+		return true;
+	}
+
+	bool bGlideStarted = false;
+	if (FallbackGlideComponent)
+	{
+		bGlideStarted = FallbackGlideComponent->StartGlideHome();
+	}
+
+	bDayCampEjectTriggered = true;
+	if (bGlideStarted)
+	{
+		UE_LOG(LogTemp, Log,
+			TEXT("NODE_DAY_CAMP: EJECT_HOME TOD_DAY FORM_BODY CAM_T0_CAMP_DAY (StartGlideHome launch→glider→home; reverse CRUMB; not FALLBACK island→planet alone; not PROXY SM_ProxyDayCamp; not GP_RS_HumanoidCamp* script-only; not convert stub)"));
+		ShowInteractFeedback(TEXT("NODE_DAY_CAMP: EJECT_HOME glide"), FColor::Green);
+	}
+	else
+	{
+		// Soft path: latch + prove labels still fire when crumbs absent (console prove without map bake).
+		// Prefer glide when present; do not invent parallel eject service.
+		UE_LOG(LogTemp, Log,
+			TEXT("NODE_DAY_CAMP: EJECT_HOME TOD_DAY FORM_BODY CAM_T0_CAMP_DAY (eject latch; StartGlideHome pending crumbs/soft; not FALLBACK island→planet alone; not PROXY SM_ProxyDayCamp; not GP_RS_HumanoidCamp* script-only; not convert stub)"));
+		ShowInteractFeedback(TEXT("NODE_DAY_CAMP: EJECT_HOME latch"), FColor::Green);
+	}
+	return true;
+}
+
+bool AHomeWorldCharacter::TryNodeDayCampInteractInFront()
+{
+	FHitResult Hit;
+	if (!TraceInteractHit(Hit))
+	{
+		return false;
+	}
+	AActor* HitActor = GetInteractTargetActor(Hit);
+	if (!HitActor)
+	{
+		return false;
+	}
+
+	static const FName DayCampTags[] = {
+		FName(TEXT("NODE_DAY_CAMP")),
+		FName(TEXT("DayCamp")),
+	};
+	bool bIsDayCamp = false;
+	for (const FName& Tag : DayCampTags)
+	{
+		if (HitActor->ActorHasTag(Tag))
+		{
+			bIsDayCamp = true;
+			break;
+		}
+	}
+	if (!bIsDayCamp)
+	{
+		return false;
+	}
+
+	// World interact beat -- PROXY SM_ProxyDayCamp alone without eject latch = closed_fail.
+	return TryEjectNodeDayCamp();
+}
+
 void AHomeWorldCharacter::SyncFormWithTimeOfDay()
 {
 	UWorld* World = GetWorld();

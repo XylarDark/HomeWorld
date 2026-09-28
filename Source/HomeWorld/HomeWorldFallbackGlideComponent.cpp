@@ -216,6 +216,98 @@ bool UHomeWorldFallbackGlideComponent::StartGlide()
 	return true;
 }
 
+bool UHomeWorldFallbackGlideComponent::StartGlideHome()
+{
+	// EJECT_HOME reverse path: same CRUMB_* machinery as StartGlide, reverse order
+	// (Landing -> ... -> Depart_Lookout / home). Not island->planet FALLBACK StartGlide.
+	if (bIsGliding)
+	{
+		UE_LOG(LogTemp, Log, TEXT("EJECT_HOME: StartGlideHome skipped — already gliding"));
+		return false;
+	}
+
+	if (!CachedCharacter)
+	{
+		CachedCharacter = Cast<ACharacter>(GetOwner());
+		if (CachedCharacter)
+		{
+			CachedMovement = CachedCharacter->GetCharacterMovement();
+		}
+	}
+	if (!CachedCharacter || !CachedMovement)
+	{
+		UE_LOG(LogTemp, Log, TEXT("EJECT_HOME: StartGlideHome failed — owner is not a Character"));
+		return false;
+	}
+
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+
+	if (bRequireDayPhase)
+	{
+		if (UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>())
+		{
+			const EHomeWorldTimeOfDayPhase Phase = TimeOfDay->GetCurrentPhase();
+			if (TimeOfDay->GetIsNight())
+			{
+				UE_LOG(LogTemp, Log, TEXT("EJECT_HOME: StartGlideHome blocked — night phase (day/body eject only)"));
+				return false;
+			}
+			if (Phase == EHomeWorldTimeOfDayPhase::Dusk)
+			{
+				UE_LOG(LogTemp, Log, TEXT("EJECT_HOME: StartGlideHome blocked — dusk buffer"));
+				return false;
+			}
+		}
+	}
+
+	TArray<FVector> ForwardCrumbs;
+	if (!ResolveCrumbPath(World, ForwardCrumbs))
+	{
+		UE_LOG(LogTemp, Log, TEXT("EJECT_HOME: StartGlideHome failed — CRUMB path unresolved"));
+		return false;
+	}
+
+	CrumbLocations.Reset();
+	for (int32 Index = ForwardCrumbs.Num() - 1; Index >= 0; --Index)
+	{
+		CrumbLocations.Add(ForwardCrumbs[Index]);
+	}
+
+	const float ClampedDuration = FMath::Clamp(GlideDurationSeconds, 25.0f, 40.0f);
+	float TotalPathLength = 0.0f;
+	for (int32 Index = 1; Index < CrumbLocations.Num(); ++Index)
+	{
+		TotalPathLength += FVector::Dist(CrumbLocations[Index - 1], CrumbLocations[Index]);
+	}
+	if (TotalPathLength <= KINDA_SMALL_NUMBER)
+	{
+		UE_LOG(LogTemp, Log, TEXT("EJECT_HOME: StartGlideHome failed — zero path length"));
+		CrumbLocations.Reset();
+		return false;
+	}
+
+	ApplyGlideMovementLock();
+	CachedCharacter->SetActorLocation(CrumbLocations[0]);
+
+	CurrentSegmentIndex = 0;
+	SegmentAlpha = 0.0f;
+	const float SegmentLength = FVector::Dist(CrumbLocations[0], CrumbLocations[1]);
+	SegmentDuration = (SegmentLength / TotalPathLength) * ClampedDuration;
+	SegmentDuration = FMath::Max(SegmentDuration, 0.5f);
+
+	bHomeboundGlide = true;
+	bIsGliding = true;
+	SetComponentTickEnabled(true);
+
+	UE_LOG(LogTemp, Log, TEXT("EJECT_HOME: StartGlideHome — launch→glider→home %d crumbs, duration %.1fs (reverse CRUMB; not FALLBACK down)"),
+		CrumbLocations.Num(), ClampedDuration);
+	return true;
+}
+
 void UHomeWorldFallbackGlideComponent::CancelGlide()
 {
 	if (!bIsGliding)
@@ -261,7 +353,14 @@ void UHomeWorldFallbackGlideComponent::AdvanceGlide(float DeltaTime)
 	{
 		if (EndIndex >= CrumbLocations.Num() - 1)
 		{
-			LOG_FALLBACK(TEXT("Reached CRUMB_Landing — glide complete"));
+			if (bHomeboundGlide)
+			{
+				UE_LOG(LogTemp, Log, TEXT("EJECT_HOME: reached home (CRUMB_Depart_Lookout / reverse end) — glide complete"));
+			}
+			else
+			{
+				LOG_FALLBACK(TEXT("Reached CRUMB_Landing — glide complete"));
+			}
 			FinishGlide(true);
 			return;
 		}
@@ -286,6 +385,7 @@ void UHomeWorldFallbackGlideComponent::AdvanceGlide(float DeltaTime)
 void UHomeWorldFallbackGlideComponent::FinishGlide(bool bCompleted)
 {
 	bIsGliding = false;
+	bHomeboundGlide = false;
 	SetComponentTickEnabled(false);
 	RestoreMovement();
 	CrumbLocations.Reset();

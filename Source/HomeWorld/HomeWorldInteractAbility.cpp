@@ -53,6 +53,11 @@ void UHomeWorldInteractAbility::ActivateAbility(const FGameplayAbilitySpecHandle
 	}
 	if (!bHandled)
 	{
+		// T0 #8 NODE_DAY_CAMP: cartoon EJECT_HOME via StartGlideHome (not FALLBACK/PROXY/script-camp/convert).
+		bHandled = Character->TryNodeDayCampInteractInFront();
+	}
+	if (!bHandled)
+	{
 		// T0 #6 NODE_FIELD_GATHER: field herb/seed collect near landing (not dress/GP_Store/PROXY/plant; not ungated Gather.Flowers).
 		bHandled = Character->TryNodeFieldGatherInteractInFront();
 	}

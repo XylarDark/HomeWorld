@@ -30,6 +30,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Transit|FALLBACK")
 	bool StartGlide();
 
+	/**
+	 * EJECT_HOME: reverse CRUMB path (Landing -> Depart_Lookout / home).
+	 * Reuses same glide machinery as StartGlide -- not a parallel eject service (Arch B).
+	 * Distinct from island->planet FALLBACK StartGlide (that alone = closed_fail for MUST #8).
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Transit|EJECT_HOME")
+	bool StartGlideHome();
+
 	/** Abort glide and restore walk movement. Idempotent. */
 	UFUNCTION(BlueprintCallable, Category = "Transit|FALLBACK")
 	void CancelGlide();
@@ -74,6 +82,8 @@ protected:
 	float SegmentAlpha = 0.0f;
 	float SegmentDuration = 0.0f;
 	bool bIsGliding = false;
+	/** True while traversing reverse crumbs toward home (EJECT_HOME), not FALLBACK down. */
+	bool bHomeboundGlide = false;
 	bool bSavedOrientRotationToMovement = true;
 	bool bSavedUseControllerRotationYaw = false;
 	EMovementMode SavedMovementMode = MOVE_Walking;
