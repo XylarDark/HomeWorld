@@ -141,13 +141,27 @@ bool UHomeWorldNurtureComponent::TryNurture(AHomeWorldCharacter* Character)
 
 	if (!IsNightSpiritHomesteadAllowed(Character))
 	{
-		UE_LOG(LogTemp, Log, TEXT("NURTURE: soft fail %s — day or body form"), *TargetLabel().ToString());
+		UE_LOG(LogTemp, Log, TEXT("NURTURE: soft fail %s - day or body form"), *TargetLabel().ToString());
+		return false;
+	}
+
+	// T0 #12: N1 NODE_PLANT_SLOT spirit nurture requires same-slot day plant mark (#3).
+	// Different-slot / unplanted nurture scored as #12 = closed_fail.
+	if (TargetId == EHomeWorldNurtureTargetId::N1_Crop && !bDayPlantedGivenHerb)
+	{
+		UE_LOG(LogTemp, Log,
+			TEXT("NODE_PLANT_SLOT: nurture failed - need day plant given herb first (#3 same-slot prereq; unplanted != spirit nurture; not different-slot N2)"));
 		return false;
 	}
 
 	if (bNurtured)
 	{
-		UE_LOG(LogTemp, Log, TEXT("NURTURE: soft success %s — already nurtured (M_Nurtured on)"), *TargetLabel().ToString());
+		if (TargetId == EHomeWorldNurtureTargetId::N1_Crop)
+		{
+			UE_LOG(LogTemp, Log,
+				TEXT("NODE_PLANT_SLOT: spirit nurture TOD_NIGHT_SPIRIT FORM_SPIRIT (already nurtured; same slot as #3 day plant; not different-slot N2; not body-form; not day-plant-alone)"));
+		}
+		UE_LOG(LogTemp, Log, TEXT("NURTURE: soft success %s - already nurtured (M_Nurtured on)"), *TargetLabel().ToString());
 		return true;
 	}
 
@@ -172,6 +186,11 @@ bool UHomeWorldNurtureComponent::TryNurture(AHomeWorldCharacter* Character)
 	}
 
 	bNurtured = true;
+	if (TargetId == EHomeWorldNurtureTargetId::N1_Crop)
+	{
+		UE_LOG(LogTemp, Log,
+			TEXT("NODE_PLANT_SLOT: spirit nurture TOD_NIGHT_SPIRIT FORM_SPIRIT (same slot as #3 day plant; not different-slot N2; not body-form; not day-plant-alone)"));
+	}
 	UE_LOG(LogTemp, Log, TEXT("NURTURE: success %s M_Nurtured=1 consumed 1x %s"),
 		*TargetLabel().ToString(), *RequiredResourceId.ToString());
 	ApplyNurturedVisual();

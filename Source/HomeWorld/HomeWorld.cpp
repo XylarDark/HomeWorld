@@ -1274,6 +1274,35 @@ void CmdPlantSlot(const TArray<FString>& Args)
 			bOk ? TEXT("ok") : TEXT("failed"));
 	}
 
+	void CmdNurtureSlot(const TArray<FString>& Args)
+	{
+		UWorld* World = HomeWorldPlayWorld::Resolve();
+		if (!World)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Nurture.Slot requires a play world (PIE or game)."));
+			return;
+		}
+		APlayerController* PC = World->GetFirstPlayerController();
+		AHomeWorldCharacter* Char = PC ? Cast<AHomeWorldCharacter>(PC->GetPawn()) : nullptr;
+		if (!Char)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Nurture.Slot - no AHomeWorldCharacter pawn."));
+			return;
+		}
+		// Arrange prereqs documented: hw.Plant.Slot (day) then spirit via hw.Rune.Unlock + hw.Bed.SleepSpirit; RES_SEED via hw.Gather.Seed.
+		if (!Char->IsNodePlantSlotDayPlanted())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Nurture.Slot - plant slot not day-planted; run hw.Plant.Slot in Day/body first (#3 same-slot prereq). unplanted = closed_fail."));
+		}
+		if (!Char->GetIsSpiritForm())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Nurture.Slot - need FORM_SPIRIT; run hw.Rune.Unlock then hw.Bed.SleepSpirit (#11 path). body nurture = closed_fail."));
+		}
+		const bool bOk = Char->TryNurtureNodePlantSlot();
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Nurture.Slot %s (NODE_PLANT_SLOT TOD_NIGHT_SPIRIT FORM_SPIRIT; same slot as #3; not N2; not body; not day-plant-alone)."),
+			bOk ? TEXT("ok") : TEXT("failed"));
+	}
+
 	void CmdKettleBrew(const TArray<FString>& Args)
 	{
 		UWorld* World = HomeWorldPlayWorld::Resolve();
@@ -1621,8 +1650,13 @@ void FHomeWorldModule::StartupModule()
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.Plant.Slot"),
-		TEXT("T0 #3 NODE_PLANT_SLOT: spend RES_HERB -> day plant given herb on N1 slot (TOD_DAY FORM_BODY). Not nurture/PROXY. #12 DEFER."),
+		TEXT("T0 #3 NODE_PLANT_SLOT: spend RES_HERB -> day plant given herb on N1 slot (TOD_DAY FORM_BODY). Not nurture/PROXY. Same slot identity for #12."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdPlantSlot),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Nurture.Slot"),
+		TEXT("T0 #12 NODE_PLANT_SLOT: spirit nurture same N1 slot as #3 day plant (TOD_NIGHT_SPIRIT FORM_SPIRIT). Prereq hw.Plant.Slot + hw.Rune.Unlock + hw.Bed.SleepSpirit; RES_SEED via hw.Gather.Seed. Not N2/body/day-plant-alone."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdNurtureSlot),
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.Kettle.Brew"),
