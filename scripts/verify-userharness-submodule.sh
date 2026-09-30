@@ -5,7 +5,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-PIN_FILE="config/userharness-pin.json"
+PIN_FILE="Config/userharness-pin.json"
 if [ ! -f "$PIN_FILE" ]; then
   echo "::error::Missing pin registry: $PIN_FILE"
   exit 1

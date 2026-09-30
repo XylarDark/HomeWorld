@@ -22,7 +22,7 @@ last_mapped_at: 2026-09-28
 - Used by subsystems such as leaderboard / session / NFT stubs (`HomeWorldLeaderboardSubsystem`, `HomeWorldNFTSubsystem`, `HomeWorldSessionSubsystem`) — treat as optional remote surfaces; do not invent new SaaS in GSD host phases
 
 **DevHarness / UserHarness:**
-- Vendored gitlink `UserHarness/` pinned via `config/userharness-pin.json`
+- Vendored gitlink `UserHarness/` pinned via `Config/userharness-pin.json`
 - npm scripts: `doctor`, `sync`, `sync:apply`
 
 **GitHub Actions:**

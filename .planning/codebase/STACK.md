@@ -67,7 +67,7 @@ last_mapped_at: 2026-09-28
 
 **Environment:**
 - `Config/` UE ini defaults
-- `config/preflight-ue.json`, `config/userharness-pin.json`
+- `Config/preflight-ue.json`, `Config/userharness-pin.json`
 - Secrets: `.env*` gitignored; `.cursor/mcp.json` gitignored (use `.example`)
 
 **Build:**

@@ -71,7 +71,7 @@ One honest policy for Mannequins / Manny provenance + bootstrap / preflight expe
 | Guards | Rejects config still on `/Engine/...`; fails if mesh/ABP `does_asset_exist` is false |
 | Do **not** | Re-run legacy `vp_b_apply_character.py` after PL-A |
 
-### Preflight — `config/preflight-ue.json` + `scripts/preflight-ue.js`
+### Preflight — `Config/preflight-ue.json` + `scripts/preflight-ue.js`
 
 | Item | Value |
 |------|-------|
@@ -225,7 +225,7 @@ git status
 | HS-E policy filing | [Docs/17e_HS_CONTENT_BOOTSTRAP.md](17e_HS_CONTENT_BOOTSTRAP.md) | This doc — KEEP-LOCAL stamped; PENDING **`APPROVE HS-E`** |
 | DESKTOP handoff | [handoffs/HS_E_CONTENT_BOOTSTRAP.md](handoffs/HS_E_CONTENT_BOOTSTRAP.md) | Conductor-parent checklist — do not fake |
 | Board | [swarm/PHASE_BOARD.md](../swarm/PHASE_BOARD.md) | HS-E **IN PROGRESS**; policy **KEEP-LOCAL** recorded |
-| Preflight | `config/preflight-ue.json` + `scripts/preflight-ue.js` | Explicit Mannequins dir fail-loud |
+| Preflight | `Config/preflight-ue.json` + `scripts/preflight-ue.js` | Explicit Mannequins dir fail-loud |
 | Preflight docs | [docs/Setup/UE_PREFLIGHT.md](../docs/Setup/UE_PREFLIGHT.md) | KEEP-LOCAL / cold-clone section |
 
 **Not in this PR:** `.uasset`/`.umap` · Engine-path config rewrite · LFS enablement · DESKTOP proof claims · product phase unlocks · **`APPROVE HS-E`** stamp.

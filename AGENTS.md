@@ -36,7 +36,7 @@
 
 ## DevHarness (adopted layers)
 
-HomeWorld vendors [UserHarness/](UserHarness/) as a **gitlink** to **DevHarness** (product rename 2026-09-19 — pinned SHA; registry: [config/userharness-pin.json](config/userharness-pin.json)) and adopts these layers:
+HomeWorld vendors [UserHarness/](UserHarness/) as a **gitlink** to **DevHarness** (product rename 2026-09-19 — pinned SHA; registry: [Config/userharness-pin.json](Config/userharness-pin.json)) and adopts these layers:
 
 | Layer | Status |
 | ----- | ------ |

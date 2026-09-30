@@ -13,7 +13,7 @@
 ## Performance / content
 
 - Exactly **10** master materials (`Docs/00_CANON.md` §6).
-- `.uasset` / `.umap` only via `config/uasset-allowlist.json` + Git LFS (`Docs/20`).
+- `.uasset` / `.umap` only via `Config/uasset-allowlist.json` + Git LFS (`Docs/20`).
 - Mannequins **KEEP-LOCAL** — do not bulk-commit Marketplace mannequin trees.
 - Generated assets: log tool/prompt/edit in `Docs/AI_ASSET_LOG.md`; stay hand-replaceable.
 

@@ -22,7 +22,7 @@
 | # | Item | Path |
 |---|------|------|
 | 1 | Host preflight script | `scripts/preflight-ue.js` |
-| 2 | Blocker config | `config/preflight-ue.json` |
+| 2 | Blocker config | `Config/preflight-ue.json` |
 | 3 | npm scripts | `package.json` → `preflight:ue`, `preflight:ue:test` |
 | 4 | Editor deep checks | `Content/Python/preflight_ue_editor.py` |
 | 5 | Policy doc | [docs/Setup/UE_PREFLIGHT.md](../../docs/Setup/UE_PREFLIGHT.md) |

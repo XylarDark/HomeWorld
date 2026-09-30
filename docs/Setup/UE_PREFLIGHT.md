@@ -19,7 +19,7 @@
 | `HW_PREFLIGHT_SKIP_MCP=1 npm run preflight:ue` | Cloud CI | Same as `--skip-mcp` (env alias) |
 | `npm run preflight:ue:test` | Any | Unit tests for exit codes |
 
-Config (machine-readable): [config/preflight-ue.json](../../config/preflight-ue.json).
+Config (machine-readable): [Config/preflight-ue.json](../../Config/preflight-ue.json).
 
 ---
 
@@ -102,7 +102,7 @@ Lead policy **`HS-E POLICY KEEP-LOCAL`** (2026-09-17 ET): character mesh/ABP sta
 
 **Never** `git add` Mannequins `.uasset`/`.umap` (excluded from [Docs/20 allowlist](../../Docs/20_UASSET_AI_POLICY.md)). Do not claim DESKTOP path proof from cloud agents.
 
-Config key: `content.requiredLocalDirs` in [config/preflight-ue.json](../../config/preflight-ue.json).
+Config key: `content.requiredLocalDirs` in [Config/preflight-ue.json](../../Config/preflight-ue.json).
 
 ### Docs/20 allowlisted assets (warn-only)
 

@@ -10,9 +10,9 @@
 
 | # | Name | Where it lives | Mutable by |
 |---|------|----------------|-----------|
-| 1 | **`XylarDark/UserHarness`** | GitHub repo URL; `.gitmodules` `url`; `remote` in `config/userharness-pin.json`; "Remote" row in [CURSOR_DEV.md](../../docs/Setup/CURSOR_DEV.md) + [13b](../13b_HR2_B_COLD_CLONE.md) | **Lead only**, in GitHub UI. Not a commit. |
-| 2 | **`UserHarness/`** | Submodule path on disk; gitlink entry in `git ls-tree`; `path` in `config/userharness-pin.json`; `submodule "UserHarness"` in `.gitmodules` | Commit (P5, done 2026-09-30) |
-| 3 | **`DevHarness`** | `productName` in `config/userharness-pin.json`; the `## DevHarness (adopted layers)` heading in `AGENTS.md` | Commit |
+| 1 | **`XylarDark/UserHarness`** | GitHub repo URL; `.gitmodules` `url`; `remote` in `Config/userharness-pin.json`; "Remote" row in [CURSOR_DEV.md](../../docs/Setup/CURSOR_DEV.md) + [13b](../13b_HR2_B_COLD_CLONE.md) | **Lead only**, in GitHub UI. Not a commit. |
+| 2 | **`UserHarness/`** | Submodule path on disk; gitlink entry in `git ls-tree`; `path` in `Config/userharness-pin.json`; `submodule "UserHarness"` in `.gitmodules` | Commit (P5, done 2026-09-30) |
+| 3 | **`DevHarness`** | `productName` in `Config/userharness-pin.json`; the `## DevHarness (adopted layers)` heading in `AGENTS.md` | Commit |
 
 **They are not synonyms and must not be interchanged.** 1 and 2 must match — a submodule whose path and URL disagree breaks cold clones. 3 is a prose label and is allowed to differ from 1 and 2.
 

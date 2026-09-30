@@ -16,7 +16,7 @@ HomeWorld/
 ├── Content/                 # UE assets + Content/Python automation
 ├── Maps/                    # VS_MVP + Preview_* levels
 ├── Config/                  # UE ini
-├── config/                  # Harness JSON (preflight, DET pin)
+├── Config/                  # Harness JSON (preflight, DET pin)
 ├── Plugins/                 # UnrealMCP (gitignored install)
 ├── scripts/                 # Node doctor/preflight/evidence
 ├── docs/                    # UE engineering docs (lowercase)

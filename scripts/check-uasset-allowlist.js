@@ -21,7 +21,7 @@ function parseArgs(argv) {
 function printHelp() {
   console.log(`Usage: node scripts/check-uasset-allowlist.js [--strict]
 
-  Warns when required allowlisted assets from config/uasset-allowlist.json are absent.
+  Warns when required allowlisted assets from Config/uasset-allowlist.json are absent.
   --strict  Exit 1 if any required asset is missing (default: exit 0 with warnings)`);
 }
 

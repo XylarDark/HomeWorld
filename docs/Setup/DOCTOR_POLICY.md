@@ -4,7 +4,7 @@ HomeWorld is a **Unreal Engine 5.8 game host** (C++, Python Editor automation, m
 
 **Canonical doctor commands:** [CURSOR_DEV.md](CURSOR_DEV.md) — `npm run doctor:build` (after pin bump or fresh clone), **`npm run doctor:ue`** (UE host — trust exit code), `npm run doctor` (raw template output).
 
-**Decline registry (machine-readable):** [config/doctor-ue-declines.json](../../config/doctor-ue-declines.json) — keep in sync with the table below.
+**Decline registry (machine-readable):** [Config/doctor-ue-declines.json](../../Config/doctor-ue-declines.json) — keep in sync with the table below.
 
 **HR-B2 evidence:** [Docs/11e_HR_B2_HANDOFF.md](../../Docs/11e_HR_B2_HANDOFF.md). **HR2-A:** [Docs/13a_HR2_A_HANDOFF.md](../../Docs/13a_HR2_A_HANDOFF.md). **HR3-B (game harness, not doctor):** [UE_PREFLIGHT.md](UE_PREFLIGHT.md) — `npm run preflight:ue` for MCP/assets/PIE blockers; keep separate from doctor declines.
 

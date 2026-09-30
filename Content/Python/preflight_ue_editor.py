@@ -21,7 +21,7 @@ except ImportError:
     sys.exit(1)
 
 PREFIX = "PreflightUE"
-CONFIG_REL = "config/preflight-ue.json"
+CONFIG_REL = "Config/preflight-ue.json"
 CHAR_CONFIG_REL = "Content/Python/character_blueprint_config.json"
 OUT_REL = "Saved/preflight_ue_editor.json"
 

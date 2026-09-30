@@ -58,9 +58,9 @@ function printHelp() {
 
 Options:
   --skip-mcp              Skip UnrealMCP port ${55557} probe (cloud CI; or HW_PREFLIGHT_SKIP_MCP=1)
-  --assets-only           Repo-side config/script checks only (no MCP, disk assets, or editor JSON)
+  --assets-only           Repo-side Config/script checks only (no MCP, disk assets, or editor JSON)
   --require-editor        Fail when Saved/preflight_ue_editor.json is missing or reports blockers
-  --simulate-fail=CODE    Inject a blocker for dry-run / unit tests (see config/preflight-ue.json blockerCodes)
+  --simulate-fail=CODE    Inject a blocker for dry-run / unit tests (see Config/preflight-ue.json blockerCodes)
   -h, --help              Show this help
 
 Exit codes: 0 pass, 1 blocker(s), 2 misconfiguration`);

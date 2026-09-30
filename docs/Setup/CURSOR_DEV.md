@@ -26,7 +26,7 @@ Pinned checkout: [UserHarness/](../../UserHarness/) **gitlink** — bumped HR-B2
 |-------|-------|
 | **Pinned SHA** | `a9d1cc47c49389dba8aacf0bbede31684a4ce28a` |
 | **Pinned SHA (short)** | `a9d1cc4` — DET #42 reading-canon Class D port on `master` (2026-09-27) |
-| **Canonical registry** | [config/userharness-pin.json](../../config/userharness-pin.json) — CI reads this; update with CURSOR_DEV when bumping pin |
+| **Canonical registry** | [Config/userharness-pin.json](../../Config/userharness-pin.json) — CI reads this; update with CURSOR_DEV when bumping pin |
 | **Pin sync policy** | [Docs/handoffs/PIN_SYNC_POLICY.md](../../Docs/handoffs/PIN_SYNC_POLICY.md) — classes D/S/C; bump only from DET `master`; NEVER point gitlink at `main` |
 | **Remote** | `https://github.com/XylarDark/UserHarness.git` |
 | **Template branch** | `master` (not `main`) |
@@ -46,7 +46,7 @@ npm run doctor:build   # once: install + build under UserHarness/
 npm run doctor:ue      # UE host: exit 0 when only DOCTOR_POLICY declines remain
 ```
 
-Verify pin matches registry: `git ls-tree HEAD UserHarness` should equal `config/userharness-pin.json` → `sha`.
+Verify pin matches registry: `git ls-tree HEAD UserHarness` should equal `Config/userharness-pin.json` → `sha`.
 
 **Node 22 `EBADENGINE`:** Template prefers Node **24+**; HomeWorld host allows Node 20+. Warnings on Node 22 are an **accepted decline** — doctor still runs.
 
@@ -59,7 +59,7 @@ Verify pin matches registry: `git ls-tree HEAD UserHarness` should equal `config
 3. **Apply auto-fixes:** `npm run doctor:fix`.
 4. **Rebuild doctor CLI:** `npm run doctor:build` (after template pin bump).
 
-Decline list: [config/doctor-ue-declines.json](../../config/doctor-ue-declines.json). HR2-A handoff: [Docs/13a_HR2_A_HANDOFF.md](../../Docs/13a_HR2_A_HANDOFF.md).
+Decline list: [Config/doctor-ue-declines.json](../../Config/doctor-ue-declines.json). HR2-A handoff: [Docs/13a_HR2_A_HANDOFF.md](../../Docs/13a_HR2_A_HANDOFF.md).
 
 ### UE preflight (HR3-B)
 

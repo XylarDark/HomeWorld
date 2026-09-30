@@ -87,7 +87,7 @@ jobs:
         run: bash scripts/verify-userharness-submodule.sh
 
       - name: Validate preflight-ue config JSON (HR3-B)
-        run: python3 -c "import json; json.load(open('config/preflight-ue.json'))"
+        run: python3 -c "import json; json.load(open('Config/preflight-ue.json'))"
 
       - name: UE preflight repo checks (HR3-B — cloud assets-only)
         run: npm run preflight:ue -- --skip-mcp --assets-only

@@ -27,7 +27,7 @@ Make `npm run doctor:ue` exit **0** on the UE game host when only [DOCTOR_POLICY
 | # | Item | Path |
 |---|------|------|
 | 1 | UE doctor wrapper | `scripts/doctor-ue.js` |
-| 2 | Decline registry (machine-readable) | `config/doctor-ue-declines.json` |
+| 2 | Decline registry (machine-readable) | `Config/doctor-ue-declines.json` |
 | 3 | npm script | `package.json` → `doctor:ue` |
 | 4 | Policy update | [docs/Setup/DOCTOR_POLICY.md](../docs/Setup/DOCTOR_POLICY.md) |
 | 5 | Dev runbook | [docs/Setup/CURSOR_DEV.md](../docs/Setup/CURSOR_DEV.md) |
@@ -78,10 +78,10 @@ doctor:ue exit: 0 (only accepted declines remain)
 
 1. `doctor:ue` runs the same DevEnvTemplate CLI as `npm run doctor` (stdio inherited).
 2. Reads `.devenv/health-report.json` critical `message` fields.
-3. Compares against `config/doctor-ue-declines.json` (synced with DOCTOR_POLICY table).
+3. Compares against `Config/doctor-ue-declines.json` (synced with DOCTOR_POLICY table).
 4. Exit **0** if every critical is in the decline set; exit **1** if any actionable critical remains.
 
-Adding a new accepted decline: update **both** `config/doctor-ue-declines.json` and DOCTOR_POLICY.md.
+Adding a new accepted decline: update **both** `Config/doctor-ue-declines.json` and DOCTOR_POLICY.md.
 
 ---
 

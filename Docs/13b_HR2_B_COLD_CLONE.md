@@ -26,7 +26,7 @@ One proven cold-clone path: empty `UserHarness/` → submodule init → `doctor:
 
 | Field | Value |
 |-------|-------|
-| **Registry** | [config/userharness-pin.json](../config/userharness-pin.json) |
+| **Registry** | [Config/userharness-pin.json](../Config/userharness-pin.json) |
 | **Full SHA** | `a9d1cc47c49389dba8aacf0bbede31684a4ce28a` |
 | **Short SHA** | `a9d1cc4` |
 | **Remote** | `https://github.com/XylarDark/UserHarness.git` |
@@ -35,7 +35,7 @@ One proven cold-clone path: empty `UserHarness/` → submodule init → `doctor:
 The local path and gitlink were renamed `DevEnvTemplate` → `UserHarness` in P5. The
 upstream GitHub repo was renamed to `XylarDark/UserHarness` by the Lead on 2026-09-30,
 so `remote` now names the new URL in this table, in `.gitmodules`, and in
-`config/userharness-pin.json`. The old URL still resolves via GitHub's rename redirect,
+`Config/userharness-pin.json`. The old URL still resolves via GitHub's rename redirect,
 but do not reintroduce it. See [PIN_SYNC_POLICY.md](handoffs/PIN_SYNC_POLICY.md).
 
 Verify locally:
@@ -45,7 +45,7 @@ git ls-tree HEAD UserHarness          # commit must match pin JSON
 git submodule status UserHarness      # prefix space = init OK; - = not init
 ```
 
-**Pin bump policy:** When changing the gitlink, update **all** of: `.gitmodules` (if URL changes), `config/userharness-pin.json`, [docs/Setup/CURSOR_DEV.md](../docs/Setup/CURSOR_DEV.md), and this doc. CI fails if gitlink ≠ registry SHA.
+**Pin bump policy:** When changing the gitlink, update **all** of: `.gitmodules` (if URL changes), `Config/userharness-pin.json`, [docs/Setup/CURSOR_DEV.md](../docs/Setup/CURSOR_DEV.md), and this doc. CI fails if gitlink ≠ registry SHA.
 
 ---
 
@@ -73,7 +73,7 @@ Human-facing copy: [docs/Setup/CURSOR_DEV.md](../docs/Setup/CURSOR_DEV.md) § In
 
 [validate.yml](../.github/workflows/validate.yml) step **UserHarness pin + submodule (HR2-B)** runs [scripts/verify-userharness-submodule.sh](../scripts/verify-userharness-submodule.sh):
 
-1. Gitlink SHA at `HEAD` must match `config/userharness-pin.json`.
+1. Gitlink SHA at `HEAD` must match `Config/userharness-pin.json`.
 2. `docs/Setup/CURSOR_DEV.md` must cite the full SHA.
 3. If `UserHarness/` is empty, runs `git submodule update --init --recursive` (cold-clone simulation).
 4. Checked-out submodule HEAD must match documented pin.
@@ -86,7 +86,7 @@ Fails PR when pointer drifts without registry/doc update. Does **not** run full 
 
 | # | Item | Path |
 |---|------|------|
-| 1 | Pin registry | `config/userharness-pin.json` |
+| 1 | Pin registry | `Config/userharness-pin.json` |
 | 2 | CI verify script | `scripts/verify-userharness-submodule.sh` |
 | 3 | validate.yml step | `.github/workflows/validate.yml` |
 | 4 | Runbook (human) | [docs/Setup/CURSOR_DEV.md](../docs/Setup/CURSOR_DEV.md) |

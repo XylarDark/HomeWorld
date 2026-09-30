@@ -6,7 +6,7 @@
 | **Date** | 2026-09-17 (ET) |
 | **Author** | Conductor executor (cloud) |
 | **Supersedes** | Blanket “never commit `.uasset`/`.umap`” hard rule (HS-E era) — see [17e_HS_CONTENT_BOOTSTRAP.md](17e_HS_CONTENT_BOOTSTRAP.md) |
-| **Machine config** | [config/uasset-allowlist.json](../config/uasset-allowlist.json) · [`.gitattributes`](../.gitattributes) |
+| **Machine config** | [Config/uasset-allowlist.json](../Config/uasset-allowlist.json) · [`.gitattributes`](../.gitattributes) |
 
 **Gate:** Lead **`APPROVE UASSET POLICY`**, 2026-09-17 ET — **policy live**. Allowlist active per §2; default KEEP-LOCAL elsewhere. Extend only via §7 + **`APPROVE UASSET ALLOWLIST <id>`**.
 
@@ -106,7 +106,7 @@ Missing allowlisted LFS objects → run `git lfs pull`; if still missing, DESKTO
 
 ## 7. Extending the allowlist
 
-1. File PR updating this doc §2 + [config/uasset-allowlist.json](../config/uasset-allowlist.json) + `.gitattributes`
+1. File PR updating this doc §2 + [Config/uasset-allowlist.json](../Config/uasset-allowlist.json) + `.gitattributes`
 2. Lead review — no drive-by expansions
 3. Lead types **`APPROVE UASSET ALLOWLIST <id>`** (e.g. `APPROVE UASSET ALLOWLIST INPUT`) in PR or gate thread
 4. Conductor stamps PHASE_BOARD + merges
