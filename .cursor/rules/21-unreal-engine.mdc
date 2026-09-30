@@ -36,7 +36,7 @@ This rule applies when the repo layout indicates an **Unreal Engine** project (s
 ## 5. Automation and Editor scripting
 
 - Prefer **official automation** (Editor utility widgets, Python Editor Script Plugin where supported, command-line flags documented by Epic) in **descending** order of stability. Treat **UI automation** as last resort; see the `automation-standards` skill.
-- **Engine-specific pitfall tables** (renamed APIs, deprecated macros) belong in **your project’s** `docs/KNOWN_ERRORS.md` or `docs/UE/`—not in DevEnvTemplate.
+- **Engine-specific pitfall tables** (renamed APIs, deprecated macros) belong in **your project’s** `docs/KNOWN_ERRORS.md` or `docs/UE/`—not in UserHarness.
 
 ## 6. Optional Cursor / MCP integrations
 

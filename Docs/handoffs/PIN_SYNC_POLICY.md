@@ -1,8 +1,8 @@
-# PIN_SYNC_POLICY — DevEnvTemplate pin / sync
+# PIN_SYNC_POLICY — UserHarness pin / sync
 
 **Status:** ACTIVE — from Research EXIT `PIN_SYNC_POLICY_V1` (Lead Do 2026-09-27 ET)  
 **Owner:** Conductor proposes · Lead gates SHA · Implement lands four-surface bump PR  
-**Pin branch:** DET **`master`** only (`config/devenv-template-pin.json` → `branch`)
+**Pin branch:** DET **`master`** only (`config/userharness-pin.json` → `branch`)
 
 Cite: [CURSOR_DEV.md](../../docs/Setup/CURSOR_DEV.md) · EXIT archive Co · dual-source A–E `SYNC.md` fitness greps.
 
@@ -12,7 +12,7 @@ Cite: [CURSOR_DEV.md](../../docs/Setup/CURSOR_DEV.md) · EXIT archive Co · dual
 
 | Ref | Role |
 |-----|------|
-| HW gitlink + `config/devenv-template-pin.json` + CURSOR_DEV table + 13b **canonical** row | Same SHA — contracted pin |
+| HW gitlink + `config/userharness-pin.json` + CURSOR_DEV table + 13b **canonical** row | Same SHA — contracted pin |
 | DET **`master`** | Pin branch tip — must equal pin when healthy |
 | DET **`main`** | May diverge (Class D / wrong-base PRs). **Never** point gitlink at `main` while pin.json says `master`. |
 
@@ -39,8 +39,8 @@ Current expected: pin = DET `master`. Tip-vs-`main` “ahead” is **not** autom
 
 | # | Surface | Notes |
 |---|---------|--------|
-| 1 | git submodule gitlink `DevEnvTemplate` | `git ls-tree HEAD DevEnvTemplate` |
-| 2 | `config/devenv-template-pin.json` | `sha`, `shortSha`, `updated`, `note`; `branch` stays `"master"` |
+| 1 | git submodule gitlink `UserHarness` | `git ls-tree HEAD UserHarness` |
+| 2 | `config/userharness-pin.json` | `sha`, `shortSha`, `updated`, `note`; `branch` stays `"master"` |
 | 3 | `docs/Setup/CURSOR_DEV.md` pin table | Full SHA (CI greps) |
 | 4 | `Docs/13b_HR2_B_COLD_CLONE.md` **canonical** SHA row only | Keep dated historical evidence blocks |
 
@@ -66,9 +66,9 @@ Optional same PR: HW extras `SKILL.md` / `SYNC.md` when Class **S** (dual-source
 
 ```bash
 # A) Pin-surface equality (HW root)
-PIN=$(python3 -c "import json; print(json.load(open('config/devenv-template-pin.json'))['sha'])")
-BRANCH=$(python3 -c "import json; print(json.load(open('config/devenv-template-pin.json'))['branch'])")
-GITLINK=$(git ls-tree HEAD DevEnvTemplate | awk '{print $3}')
+PIN=$(python3 -c "import json; print(json.load(open('config/userharness-pin.json'))['sha'])")
+BRANCH=$(python3 -c "import json; print(json.load(open('config/userharness-pin.json'))['branch'])")
+GITLINK=$(git ls-tree HEAD UserHarness | awk '{print $3}')
 test "$PIN" = "$GITLINK"
 grep -q "$PIN" docs/Setup/CURSOR_DEV.md
 # B) DET pin branch tip
@@ -80,7 +80,7 @@ git hash-object .agents/skills-extras/architecture-trade-offs-design-depth/SKILL
 # expect Canon blob from SYNC.md (107a511… until Lead ack change)
 ```
 
-CI: `scripts/verify-devenv-submodule.sh` enforces surfaces 1–3.
+CI: `scripts/verify-userharness-submodule.sh` enforces surfaces 1–3.
 
 ---
 

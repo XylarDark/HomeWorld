@@ -1,6 +1,6 @@
 # HomeWorld architecture trade-offs
 
-Least-worst choices already fixed by the vision and the conventions. The standing prompt for a later review is [tradeoff-analyst-brief.md](tradeoff-analyst-brief.md). Harness copy: [DevEnvTemplate/docs/architecture/tradeoffs.md](../../DevEnvTemplate/docs/architecture/tradeoffs.md).
+Least-worst choices already fixed by the vision and the conventions. The standing prompt for a later review is [tradeoff-analyst-brief.md](tradeoff-analyst-brief.md). Harness copy: [UserHarness/docs/architecture/tradeoffs.md](../../UserHarness/docs/architecture/tradeoffs.md).
 
 Code inside the game quantum: [HOMEWORLD_DESIGN.md](HOMEWORLD_DESIGN.md).
 
@@ -20,7 +20,7 @@ Scale-out, multi-region availability, and a dedicated backend are not drivers. D
 | Quantum | Deploys as | Static coupling kept inside |
 |---------|------------|-----------------------------|
 | **Game** | One UE client (`Source/HomeWorld`, `Content/`, `Config/`) | Gameplay types, GAS, maps, assets the client loads |
-| **Harness** | DevHarness repo, pinned gitlink `DevEnvTemplate/` | Doctor, skills, sync. It does not compile into the game |
+| **Harness** | DevHarness repo, pinned gitlink `UserHarness/` | Doctor, skills, sync. It does not compile into the game |
 
 `Docs/` (product canon) and `docs/` (engineering notes) are two document trees in the same game repo. They are not two services. On Windows only one folder name is visible at a time. That cost stays.
 

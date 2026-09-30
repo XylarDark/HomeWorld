@@ -1,7 +1,7 @@
 # Cursor Rules Directory
 
 HomeWorld-specific Unreal rules plus technology-agnostic rules inherited from the
-[UserHarness pin](../DevEnvTemplate). Rules are **opt-in by glob or
+[UserHarness pin](../../UserHarness). Rules are **opt-in by glob or
 agent-requested**; `AGENTS.md` is the single always-on surface.
 
 ## Attach policy
@@ -83,12 +83,12 @@ Rules point to canonical examples in the repo rather than inlining long code.
 ## Maintenance
 
 - Refresh from the UserHarness pin by copying
-  `DevEnvTemplate/.cursor/rules/*.mdc` → `.cursor/rules/`, **preserving** the
+  `UserHarness/.cursor/rules/*.mdc` → `.cursor/rules/`, **preserving** the
   HomeWorld `unreal-*` / `ue58-*` rules, the tombstones, and the zero
   `alwaysApply` count.
 - Never introduce a reference to a retired rule. The retirement map is
-  `DevEnvTemplate/scripts/tools/cursor-rules-adapter.ts`:
+  `UserHarness/scripts/tools/cursor-rules-adapter.ts`:
   `02-security.mdc` → `.agents/skills/secure-coding`;
   `04-git-workflow.mdc` → `AGENTS.md` (conventions).
 - See [docs/Setup/CURSOR_DEV.md](../../docs/Setup/CURSOR_DEV.md) and
-  [DevEnvTemplate/BOOTSTRAP.md](../DevEnvTemplate/BOOTSTRAP.md).
+  [UserHarness/BOOTSTRAP.md](../../UserHarness/BOOTSTRAP.md).

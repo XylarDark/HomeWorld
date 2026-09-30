@@ -70,6 +70,6 @@ grep -nEi 'install without|no mcp.json until BUILD|Co seats must not self-instal
 git diff --name-only | grep -E '(^|/)mcp\.json$|Setup-MCP\.bat|Plugins/UnrealMCP' && echo FAIL live MCP surface
 
 # Pin / A–E blob unchanged
-python3 -c "import json; print(json.load(open('config/devenv-template-pin.json'))['sha'])" | grep -q 8c4442a
+python3 -c "import json; print(json.load(open('config/userharness-pin.json'))['sha'])" | grep -q 8c4442a
 git hash-object .agents/skills-extras/architecture-trade-offs-design-depth/SKILL.md | grep -q 107a5118c95c1bf0b1b3d1755796632bff41b535
 ```

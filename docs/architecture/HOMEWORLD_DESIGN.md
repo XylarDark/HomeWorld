@@ -1,6 +1,6 @@
 # HomeWorld design complexity
 
-Hard Parts already fixed the quanta in [HOMEWORLD_TRADEOFFS.md](HOMEWORLD_TRADEOFFS.md). This page is how code **inside** the game quantum stays cheap to change. The standing prompt is [design-complexity-brief.md](design-complexity-brief.md). Harness copy: [DevEnvTemplate/docs/architecture/design-complexity.md](../../DevEnvTemplate/docs/architecture/design-complexity.md).
+Hard Parts already fixed the quanta in [HOMEWORLD_TRADEOFFS.md](HOMEWORLD_TRADEOFFS.md). This page is how code **inside** the game quantum stays cheap to change. The standing prompt is [design-complexity-brief.md](design-complexity-brief.md). Harness copy: [UserHarness/docs/architecture/design-complexity.md](../../UserHarness/docs/architecture/design-complexity.md).
 
 Working code is not the goal. A design that stays obvious under change is the goal.
 

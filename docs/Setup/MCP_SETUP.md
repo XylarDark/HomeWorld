@@ -125,7 +125,7 @@ Example shape (see [`.cursor/mcp.json.example`](../../.cursor/mcp.json.example))
 }
 ```
 
-After creating or modifying this file, **fully quit and relaunch Cursor**. Hygiene notes: [DevEnvTemplate MCP hygiene](../../DevEnvTemplate/docs/guides/mcp-hygiene.md) (never commit secrets; prefer `${env:NAME}`).
+After creating or modifying this file, **fully quit and relaunch Cursor**. Hygiene notes: [UserHarness MCP hygiene](../../UserHarness/docs/guides/mcp-hygiene.md) (never commit secrets; prefer `${env:NAME}`).
 
 ### 5. Verify
 
@@ -230,7 +230,7 @@ When connected, the AI agent follows `.cursor/rules/09-mcp-workflow.mdc`:
 
 ## External AI / LLM-generated scripts
 
-External LLMs can generate Python that is then run via MCP (`execute_python_script`) or via the Editor (Tools → Execute Python Script). Conventions, example prompts, and a sample script are in [EXTERNAL_AI_AUTOMATION.md](EXTERNAL_AI_AUTOMATION.md). Always review generated code before running.
+External LLMs can generate Python that is then run via MCP (`execute_python_script`) or via the Editor (Tools → Execute Python Script). Conventions, example prompts, and a sample script are in [EXTERNAL_AI_AUTOMATION.md](../Automation/EXTERNAL_AI_AUTOMATION.md). Always review generated code before running.
 
 ## Troubleshooting
 

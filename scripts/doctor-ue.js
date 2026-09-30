@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * UE host doctor wrapper (HR2-A).
- * Runs DevEnvTemplate doctor, then treats DOCTOR_POLICY accepted declines as non-fatal.
+ * Runs UserHarness doctor, then treats DOCTOR_POLICY accepted declines as non-fatal.
  * Exit 0 when only accepted declines remain; exit 1 when any other critical is present.
  */
 const { spawnSync } = require('child_process');
@@ -13,7 +13,7 @@ const declinesPath = path.join(projectRoot, 'config', 'doctor-ue-declines.json')
 const reportPath = path.join(projectRoot, '.devenv', 'health-report.json');
 const doctorCli = path.join(
   projectRoot,
-  'DevEnvTemplate',
+  'UserHarness',
   'dist',
   'scripts',
   'doctor',
@@ -49,7 +49,7 @@ function readCriticalMessages() {
 
 function main() {
   if (!fs.existsSync(doctorCli)) {
-    console.error('doctor:ue — DevEnvTemplate doctor CLI not built. Run: npm run doctor:build');
+    console.error('doctor:ue — UserHarness doctor CLI not built. Run: npm run doctor:build');
     process.exit(2);
   }
 

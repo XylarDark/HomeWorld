@@ -53,8 +53,8 @@ Setup and environment: MCP, CI, local tools, ref images, Cursor dev.
 | [Setup/CI_SETUP.md](Setup/CI_SETUP.md) | CI (GitHub Actions) configuration. |
 | [Setup/HORDE_LOCAL_SETUP.md](Setup/HORDE_LOCAL_SETUP.md) | Horde local setup (if used). |
 | [Setup/REF_IMAGES_SETUP_TUTORIAL.md](Setup/REF_IMAGES_SETUP_TUTORIAL.md) | Reference images for GUI automation. |
-| [Setup/CURSOR_DEV.md](Setup/CURSOR_DEV.md) | Cursor and dev environment; DevEnvTemplate init runbook. |
-| [Setup/DOCTOR_POLICY.md](Setup/DOCTOR_POLICY.md) | DevEnvTemplate doctor accepted declines for UE game host (HR-B2). |
+| [Setup/CURSOR_DEV.md](Setup/CURSOR_DEV.md) | Cursor and dev environment; UserHarness init runbook. |
+| [Setup/DOCTOR_POLICY.md](Setup/DOCTOR_POLICY.md) | UserHarness doctor accepted declines for UE game host (HR-B2). |
 | [Setup/CI_POLICY.md](Setup/CI_POLICY.md) | When validate.yml vs ci.yml; docs-only PRs; `[skip ci]`. |
 | [Setup/WINDOWS_BRIDGE.md](Setup/WINDOWS_BRIDGE.md) | Cloud agent → self-hosted CI → DESKTOP Editor/MCP. |
 | [Setup/BUILD_POLICY.md](Setup/BUILD_POLICY.md) | Safe-Build vs Build-HomeWorld.bat for agents vs humans. |
@@ -80,7 +80,7 @@ Template operational-memory entry shapes (layer sync). HomeWorld canonical autom
 
 ### human-use/
 
-Human jobs: steer, taste, test (DevEnvTemplate operational layer). Agents name the
+Human jobs: steer, taste, test (UserHarness operational layer). Agents name the
 job and stop when a decision you own is missing. Applies anywhere in the tree.
 
 | File | Purpose |

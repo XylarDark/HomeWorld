@@ -125,10 +125,10 @@ NODE_ENV=development
 
 > **Localize on copy.** HomeWorld has no Node `preflight` gate for the game. Equivalent
 > release checks are Editor/PIE validation, `docs/KNOWN_ERRORS.md`, and CI
-> (`.github/workflows/validate.yml`). Nested DevEnvTemplate can still run
+> (`.github/workflows/validate.yml`). Nested UserHarness can still run
 > `npm run doctor` for repo-hygiene gaps.
 
-When hardening tooling around DevEnvTemplate itself, start with `npm run doctor` from the
+When hardening tooling around UserHarness itself, start with `npm run doctor` from the
 repo root (or `npm run doctor '--' --fast` while shaping). For game releases, prefer
 PIE/`pie_test_runner.py`, Safe-Build, and the project CI workflow over a Node preflight.
 

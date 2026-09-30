@@ -4,7 +4,7 @@
 
 **Problem solved:** VP-A ran verb greps and filed a hard-fail only after PIE — ABP skeleton missing, empty BP mesh. Preflight exits **non-zero** on those blocker classes **before** wasting a phase on empty `FORM:` greps.
 
-**Related:** [DOCTOR_POLICY.md](DOCTOR_POLICY.md) (DevEnvTemplate host hygiene — separate concern), [WINDOWS_BRIDGE.md](WINDOWS_BRIDGE.md) (cloud → DESKTOP lane), [MCP_SETUP.md](MCP_SETUP.md) (port 55557).
+**Related:** [DOCTOR_POLICY.md](DOCTOR_POLICY.md) (UserHarness host hygiene — separate concern), [WINDOWS_BRIDGE.md](WINDOWS_BRIDGE.md) (cloud → DESKTOP lane), [MCP_SETUP.md](MCP_SETUP.md) (port 55557).
 
 ---
 
@@ -131,7 +131,7 @@ Cloud/CI may run `npm run evidence:grep:test` (fixture logs only — not a subst
 
 | Tool | Purpose |
 |------|---------|
-| **`npm run doctor:ue`** | DevEnvTemplate health — accepted UE-host **declines** ([DOCTOR_POLICY.md](DOCTOR_POLICY.md)) |
+| **`npm run doctor:ue`** | UserHarness health — accepted UE-host **declines** ([DOCTOR_POLICY.md](DOCTOR_POLICY.md)) |
 | **`npm run preflight:ue`** | **Game harness** — MCP, slice assets, PIE prerequisites |
 
 Do not extend doctor policy for PIE blockers; keep preflight separate (HR3-B).

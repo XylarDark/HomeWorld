@@ -41,7 +41,7 @@ When a PR changes **any** of these paths, **`build-win64` is required** (green o
 - `Content/Python/*.json` valid
 - **Required docs** at canonical paths (see [DOCS_LAYOUT.md](../DOCS_LAYOUT.md)) — not quarantine stubs under `docs/workflow/` or `docs/tasks/`
 - C++ header/source pairing (warnings)
-- **DevEnvTemplate pin + submodule** — gitlink matches [config/devenv-template-pin.json](../../config/devenv-template-pin.json); empty submodule dir is inited in CI ([scripts/verify-devenv-submodule.sh](../../scripts/verify-devenv-submodule.sh); HR2-B)
+- **UserHarness pin + submodule** — gitlink matches [config/userharness-pin.json](../../config/userharness-pin.json); empty submodule dir is inited in CI ([scripts/verify-userharness-submodule.sh](../../scripts/verify-userharness-submodule.sh); HR2-B)
 - Git hygiene (no `__pycache__`, temp JSON in root)
 
 **Docs-only PRs:** `validate` + `python-lint` jobs are **sufficient**. `ci.yml` does **not** run (no C++ path changes). No Win64 build required.

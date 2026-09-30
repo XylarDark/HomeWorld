@@ -18,21 +18,21 @@ the detection protocol says SWARM or HYBRID.
 
 ## Project facts
 
-> **Localize on copy.** HomeWorld-specific facts (rewritten from DevEnvTemplate).
+> **Localize on copy.** HomeWorld-specific facts (rewritten from UserHarness).
 
 - Unreal Engine **5.7** (C++ + Blueprint content); Python Editor automation under `Content/Python/`.
-- Nested [DevEnvTemplate/](../../../DevEnvTemplate/) provides `npm run doctor` / `npm run sync` (Node 20+ on host; template prefers 24+).
+- Nested [UserHarness/](../../../UserHarness/) provides `npm run doctor` / `npm run sync` (Node 20+ on host; template prefers 24+).
 - `AGENTS.md` at the repo root is the canonical always-loaded project context.
 - Documentation lives under `docs/` per `docs/DOCS_LAYOUT.md`. Topic docs belong in subdirs (`docs/Setup/`, `docs/PCG/`, `docs/Automation/`, `docs/operational/`, `docs/human-use/`, etc.) — not new top-level files under `docs/`.
 
 ## Commands
 
-> **Localize on copy.** HomeWorld host scripts (plus DevEnvTemplate doctor under `DevEnvTemplate/`).
+> **Localize on copy.** HomeWorld host scripts (plus UserHarness doctor under `UserHarness/`).
 
 ```
-npm run doctor            # DevEnvTemplate health check (from repo root)
+npm run doctor            # UserHarness health check (from repo root)
 npm run doctor:fix        # health check with auto-fix
-npm run doctor:build      # install + build nested DevEnvTemplate
+npm run doctor:build      # install + build nested UserHarness
 npm run sync              # dry-run layer sync (agent-context + operational-memory)
 npm run sync:apply        # apply missing layer files only
 .\Tools\Safe-Build.ps1    # C++ Editor target build (closes Editor if needed)

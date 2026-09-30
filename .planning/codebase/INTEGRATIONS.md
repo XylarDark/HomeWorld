@@ -21,8 +21,8 @@ last_mapped_at: 2026-09-28
 - `HTTP`, `Json`, `JsonUtilities` in `HomeWorld.Build.cs`
 - Used by subsystems such as leaderboard / session / NFT stubs (`HomeWorldLeaderboardSubsystem`, `HomeWorldNFTSubsystem`, `HomeWorldSessionSubsystem`) — treat as optional remote surfaces; do not invent new SaaS in GSD host phases
 
-**DevHarness / DevEnvTemplate:**
-- Vendored gitlink `DevEnvTemplate/` pinned via `config/devenv-template-pin.json`
+**DevHarness / UserHarness:**
+- Vendored gitlink `UserHarness/` pinned via `config/userharness-pin.json`
 - npm scripts: `doctor`, `sync`, `sync:apply`
 
 **GitHub Actions:**

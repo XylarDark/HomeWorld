@@ -22,7 +22,7 @@ HomeWorld/
 ├── docs/                    # UE engineering docs (lowercase)
 ├── Docs/                    # MVP swarm canon (capital D)
 ├── swarm/                   # PHASE_BOARD, SWARM_OPS, agents
-├── DevEnvTemplate/          # DevHarness gitlink
+├── UserHarness/          # DevHarness gitlink
 ├── AssetCreation/, blender/, Lib/, refs/, VisionBoard/
 ├── .opencode/               # GSD Core runtime (UNTRACKED — do not commit)
 ├── .planning/               # GSD host planning (this tree)

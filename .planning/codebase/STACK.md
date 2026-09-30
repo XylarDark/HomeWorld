@@ -60,14 +60,14 @@ last_mapped_at: 2026-09-28
 - `MassGameplay`, `MassAI`, `StateTree`, `ZoneGraph`
 
 **Infrastructure / harness:**
-- `DevEnvTemplate/` (DevHarness gitlink) — doctor / sync layers
+- `UserHarness/` (DevHarness gitlink) — doctor / sync layers
 - `Plugins/UnrealMCP/` — gitignored external MCP plugin (Editor live tools)
 
 ## Configuration
 
 **Environment:**
 - `Config/` UE ini defaults
-- `config/preflight-ue.json`, `config/devenv-template-pin.json`
+- `config/preflight-ue.json`, `config/userharness-pin.json`
 - Secrets: `.env*` gitignored; `.cursor/mcp.json` gitignored (use `.example`)
 
 **Build:**

@@ -114,5 +114,5 @@ Cursor **Task** executor subagents do **not** expose the tools needed for Window
 - [swarm/CLOUD_AGENT_PACKET.md](../../swarm/CLOUD_AGENT_PACKET.md) — DESKTOP owner = Conductor parent; Contents API fallback; batch digests
 - [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md) — Conductor / evidence gates · §16 DESKTOP parent-only · §13 session resume
 - [Docs/17b_HS_SWARM_OPS.md](../../Docs/17b_HS_SWARM_OPS.md) — HS-B ops tighten (PENDING APPROVE HS-B)
-- [CURSOR_DEV.md](CURSOR_DEV.md) — DevEnvTemplate init on any host
+- [CURSOR_DEV.md](CURSOR_DEV.md) — UserHarness init on any host
 - [Docs/11b_HR_B_HANDOFF.md](../../Docs/11b_HR_B_HANDOFF.md) — HR-B checklist

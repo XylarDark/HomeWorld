@@ -18,7 +18,7 @@
 
 ## Goal
 
-One proven cold-clone path: empty `DevEnvTemplate/` → submodule init → `doctor:build` → `doctor:ue`, with CI enforcing gitlink ↔ documented pin hygiene.
+One proven cold-clone path: empty `UserHarness/` → submodule init → `doctor:build` → `doctor:ue`, with CI enforcing gitlink ↔ documented pin hygiene.
 
 ---
 
@@ -26,20 +26,26 @@ One proven cold-clone path: empty `DevEnvTemplate/` → submodule init → `doct
 
 | Field | Value |
 |-------|-------|
-| **Registry** | [config/devenv-template-pin.json](../config/devenv-template-pin.json) |
+| **Registry** | [config/userharness-pin.json](../config/userharness-pin.json) |
 | **Full SHA** | `a9d1cc47c49389dba8aacf0bbede31684a4ce28a` |
 | **Short SHA** | `a9d1cc4` |
 | **Remote** | `https://github.com/XylarDark/DevEnvTemplate.git` |
 | **Branch** | `master` |
 
+The local path and gitlink were renamed `DevEnvTemplate` → `UserHarness` in P5. The
+**remote still names `XylarDark/DevEnvTemplate`**: the upstream GitHub repo has not
+been renamed, and rewriting the URL before that happens would break every cold clone.
+Renaming it is a Lead action; when it lands, update `remote` here and in
+`config/userharness-pin.json` together. See [PIN_SYNC_POLICY.md](handoffs/PIN_SYNC_POLICY.md).
+
 Verify locally:
 
 ```bash
-git ls-tree HEAD DevEnvTemplate          # commit must match pin JSON
-git submodule status DevEnvTemplate      # prefix space = init OK; - = not init
+git ls-tree HEAD UserHarness          # commit must match pin JSON
+git submodule status UserHarness      # prefix space = init OK; - = not init
 ```
 
-**Pin bump policy:** When changing the gitlink, update **all** of: `.gitmodules` (if URL changes), `config/devenv-template-pin.json`, [docs/Setup/CURSOR_DEV.md](../docs/Setup/CURSOR_DEV.md), and this doc. CI fails if gitlink ≠ registry SHA.
+**Pin bump policy:** When changing the gitlink, update **all** of: `.gitmodules` (if URL changes), `config/userharness-pin.json`, [docs/Setup/CURSOR_DEV.md](../docs/Setup/CURSOR_DEV.md), and this doc. CI fails if gitlink ≠ registry SHA.
 
 ---
 
@@ -48,8 +54,8 @@ git submodule status DevEnvTemplate      # prefix space = init OK; - = not init
 From repo root after `git clone` (no prior submodule init):
 
 ```bash
-git submodule update --init --recursive DevEnvTemplate
-npm run doctor:build    # once: install + build nested DevEnvTemplate
+git submodule update --init --recursive UserHarness
+npm run doctor:build    # once: install + build nested UserHarness
 npm run doctor:ue       # UE host: exit 0 when only DOCTOR_POLICY declines remain
 ```
 
@@ -65,11 +71,11 @@ Human-facing copy: [docs/Setup/CURSOR_DEV.md](../docs/Setup/CURSOR_DEV.md) § In
 
 ## CI guard
 
-[validate.yml](../.github/workflows/validate.yml) step **DevEnvTemplate pin + submodule (HR2-B)** runs [scripts/verify-devenv-submodule.sh](../scripts/verify-devenv-submodule.sh):
+[validate.yml](../.github/workflows/validate.yml) step **UserHarness pin + submodule (HR2-B)** runs [scripts/verify-userharness-submodule.sh](../scripts/verify-userharness-submodule.sh):
 
-1. Gitlink SHA at `HEAD` must match `config/devenv-template-pin.json`.
+1. Gitlink SHA at `HEAD` must match `config/userharness-pin.json`.
 2. `docs/Setup/CURSOR_DEV.md` must cite the full SHA.
-3. If `DevEnvTemplate/` is empty, runs `git submodule update --init --recursive` (cold-clone simulation).
+3. If `UserHarness/` is empty, runs `git submodule update --init --recursive` (cold-clone simulation).
 4. Checked-out submodule HEAD must match documented pin.
 
 Fails PR when pointer drifts without registry/doc update. Does **not** run full `doctor:build` in CI (too slow); cold-clone evidence below covers that path.
@@ -80,8 +86,8 @@ Fails PR when pointer drifts without registry/doc update. Does **not** run full 
 
 | # | Item | Path |
 |---|------|------|
-| 1 | Pin registry | `config/devenv-template-pin.json` |
-| 2 | CI verify script | `scripts/verify-devenv-submodule.sh` |
+| 1 | Pin registry | `config/userharness-pin.json` |
+| 2 | CI verify script | `scripts/verify-userharness-submodule.sh` |
 | 3 | validate.yml step | `.github/workflows/validate.yml` |
 | 4 | Runbook (human) | [docs/Setup/CURSOR_DEV.md](../docs/Setup/CURSOR_DEV.md) |
 | 5 | Onboarding pointer | [AGENTS.md](../AGENTS.md) § Dev environment setup |

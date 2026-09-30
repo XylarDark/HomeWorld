@@ -3,13 +3,13 @@
 HomeWorld is set up so that AI agents and humans follow the same conventions when working in Cursor.
 
 - **Agent context:** [AGENTS.md](../../AGENTS.md) at the repo root gives a short project summary, the **programmatic-by-default** policy, and where code and docs live. Use it to onboard agents and tools.
-- **Agent skills:** Layer-synced from DevEnvTemplate into [`.agents/skills/`](../../.agents/skills/) (agent-workflow, plan-first, secure-coding, etc.). Skills load when relevant; they do not replace HomeWorld always-applied rules.
+- **Agent skills:** Layer-synced from UserHarness into [`.agents/skills/`](../../.agents/skills/) (agent-workflow, plan-first, secure-coding, etc.). Skills load when relevant; they do not replace HomeWorld always-applied rules.
 - **Cursor rules:** Under [.cursor/rules/](../../.cursor/rules/), file-specific rules apply when you work with:
   - **Unreal C++** (`**/*.cpp`, `**/*.h`): naming, UPROPERTY/UFUNCTION, module boundaries, include order.
   - **Unreal Blueprint** (`**/*.uasset`): when to use Blueprint vs C++, naming, and that core movement/input/camera are in C++.
   - **Unreal project/config** (`**/*.uproject`, `**/Config/*.ini`): project layout, game module, plugins, default pawn and game mode.
   - **UE stack (glob-scoped from template):** `21-unreal-engine.mdc`, `22-unreal-editor-ui.mdc` — general Unreal practices; HomeWorld keeps version-specific policy in `ue58-sources.mdc` / `ue58-editor-ui.mdc` and [UE58_TECH.md](../UE/UE58_TECH.md) (5.7 history: [UE57_TECH.md](../UE/UE57_TECH.md)).
-  - **HomeWorld / DevEnvTemplate always-applied rules** (00–20 series and project-specific): still in use. Newer DevEnvTemplate **retires** those always-on files for *new* adoptions (migrate into `AGENTS.md` + skills). HomeWorld **keeps** them until a dedicated migration; do not delete them during routine sync.
+  - **HomeWorld / UserHarness always-applied rules** (00–20 series and project-specific): still in use. Newer UserHarness **retires** those always-on files for *new* adoptions (migrate into `AGENTS.md` + skills). HomeWorld **keeps** them until a dedicated migration; do not delete them during routine sync.
 - **Build → Editor → MCP (agents):** **`.\Tools\Safe-Build.ps1`** → open Editor → verify MCP (port 55557). See [BUILD_POLICY.md](BUILD_POLICY.md), [MCP_SETUP.md](MCP_SETUP.md), [WINDOWS_BRIDGE.md](WINDOWS_BRIDGE.md). Humans with Editor already closed may still use `Build-HomeWorld.bat` directly.
 - **Rules token budget:** HR-B2 reduced `alwaysApply: true` from **15 → 3** (session-wide: `07`, `08`, `20`). See [Docs/11e_HR_B2_HANDOFF.md](../../Docs/11e_HR_B2_HANDOFF.md). Doctor rule-budget critical: **accepted decline** — [DOCTOR_POLICY.md](DOCTOR_POLICY.md).
 - **Compound Engineering plugin:** Recommending its commands when the use case fits is policy; the agent suggests plugin workflows (e.g. `/workflowsreview`, `/workflowsplan`) instead of doing that work inline. See [.cursor/rules/10-compound-engineering.mdc](../../.cursor/rules/10-compound-engineering.mdc).
@@ -18,15 +18,15 @@ When asking Cursor to change C++ or Blueprint behavior, the rules ensure suggest
 
 **Pinned environment (toolchain, MCP, Cursor plugins):** [DEV_ENV_MATRIX.md](DEV_ENV_MATRIX.md). Optional recommended VS Code/Cursor extensions: repo [`.vscode/extensions.json`](../../.vscode/extensions.json).
 
-## DevEnvTemplate (doctor + layer sync)
+## UserHarness (doctor + layer sync)
 
-Pinned checkout: [DevEnvTemplate/](../../DevEnvTemplate/) **gitlink** — bumped HR-B2 to template `master`.
+Pinned checkout: [UserHarness/](../../UserHarness/) **gitlink** — bumped HR-B2 to template `master`.
 
 | Field | Value |
 |-------|-------|
 | **Pinned SHA** | `a9d1cc47c49389dba8aacf0bbede31684a4ce28a` |
 | **Pinned SHA (short)** | `a9d1cc4` — DET #42 reading-canon Class D port on `master` (2026-09-27) |
-| **Canonical registry** | [config/devenv-template-pin.json](../../config/devenv-template-pin.json) — CI reads this; update with CURSOR_DEV when bumping pin |
+| **Canonical registry** | [config/userharness-pin.json](../../config/userharness-pin.json) — CI reads this; update with CURSOR_DEV when bumping pin |
 | **Pin sync policy** | [Docs/handoffs/PIN_SYNC_POLICY.md](../../Docs/handoffs/PIN_SYNC_POLICY.md) — classes D/S/C; bump only from DET `master`; NEVER point gitlink at `main` |
 | **Remote** | `https://github.com/XylarDark/DevEnvTemplate.git` |
 | **Template branch** | `master` (not `main`) |
@@ -34,23 +34,23 @@ Pinned checkout: [DevEnvTemplate/](../../DevEnvTemplate/) **gitlink** — bumped
 | **Doctor policy** | [DOCTOR_POLICY.md](DOCTOR_POLICY.md) — accepted declines for UE game host |
 | **HR2-B handoff** | [Docs/13b_HR2_B_COLD_CLONE.md](../../Docs/13b_HR2_B_COLD_CLONE.md) — cold-clone runbook + CI guard |
 
-Full template docs: [DevEnvTemplate/docs/SYNC.md](../../DevEnvTemplate/docs/SYNC.md), [BOOTSTRAP.md](../../DevEnvTemplate/BOOTSTRAP.md).
+Full template docs: [UserHarness/docs/SYNC.md](../../UserHarness/docs/SYNC.md), [BOOTSTRAP.md](../../UserHarness/BOOTSTRAP.md).
 
 ### Init runbook (fresh clone — idempotent)
 
 From repo root after clone (idempotent — safe on re-run):
 
 ```bash
-git submodule update --init --recursive DevEnvTemplate
-npm run doctor:build   # once: install + build under DevEnvTemplate/
+git submodule update --init --recursive UserHarness
+npm run doctor:build   # once: install + build under UserHarness/
 npm run doctor:ue      # UE host: exit 0 when only DOCTOR_POLICY declines remain
 ```
 
-Verify pin matches registry: `git ls-tree HEAD DevEnvTemplate` should equal `config/devenv-template-pin.json` → `sha`.
+Verify pin matches registry: `git ls-tree HEAD UserHarness` should equal `config/userharness-pin.json` → `sha`.
 
 **Node 22 `EBADENGINE`:** Template prefers Node **24+**; HomeWorld host allows Node 20+. Warnings on Node 22 are an **accepted decline** — doctor still runs.
 
-**Empty `DevEnvTemplate/`:** Normal on fresh clone — run submodule init before any `npm run doctor*` command. CI runs the same init via [scripts/verify-devenv-submodule.sh](../../scripts/verify-devenv-submodule.sh).
+**Empty `UserHarness/`:** Normal on fresh clone — run submodule init before any `npm run doctor*` command. CI runs the same init via [scripts/verify-userharness-submodule.sh](../../scripts/verify-userharness-submodule.sh).
 
 ### Doctor (ongoing)
 
@@ -82,7 +82,7 @@ npm run sync:apply
 PowerShell: if npm mangles flags, call the CLI directly:
 
 ```powershell
-node DevEnvTemplate/dist/scripts/sync/cli.js --layer agent-context,operational-memory --template ./DevEnvTemplate --project-root .
+node UserHarness/dist/scripts/sync/cli.js --layer agent-context,operational-memory --template ./UserHarness --project-root .
 ```
 
 **Canonical automation gaps for HomeWorld:** [docs/Automation/AUTOMATION_GAPS.md](../Automation/AUTOMATION_GAPS.md). The template entry shape at `docs/operational/automation-gaps.md` is a pointer only.

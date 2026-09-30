@@ -37,7 +37,7 @@ inventory. Read it there rather than trusting the copy below — a second copy o
 is a second thing to keep current, and it is always the copy that goes stale.
 
 > **Localize on copy.** The two tables below and the link-checking command further down
-> describe DevEnvTemplate's docs tree and its tooling. A host project has its own layout
+> describe UserHarness's docs tree and its tooling. A host project has its own layout
 > and may have no link checker at all; replace them rather than leaving them to mislead.
 
 | File                           | Purpose                                  |

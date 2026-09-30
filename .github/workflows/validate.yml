@@ -83,8 +83,8 @@ jobs:
             fi
           done
 
-      - name: DevEnvTemplate pin + submodule (HR2-B)
-        run: bash scripts/verify-devenv-submodule.sh
+      - name: UserHarness pin + submodule (HR2-B)
+        run: bash scripts/verify-userharness-submodule.sh
 
       - name: Validate preflight-ue config JSON (HR3-B)
         run: python3 -c "import json; json.load(open('config/preflight-ue.json'))"

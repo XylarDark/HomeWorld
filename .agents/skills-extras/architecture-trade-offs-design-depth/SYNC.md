@@ -1,6 +1,6 @@
 # A–E dual-source sync
 
-**Writer:** `DevEnvTemplate/.agents/skills-extras/architecture-trade-offs-design-depth/SKILL.md`  
+**Writer:** `UserHarness/.agents/skills-extras/architecture-trade-offs-design-depth/SKILL.md`  
 **Canon blob:** `107a5118c95c1bf0b1b3d1755796632bff41b535` (`git hash-object` of `SKILL.md`)  
 **Copies (byte-identical; no second body):** HomeWorld `.agents/skills-extras/architecture-trade-offs-design-depth/SKILL.md` · Co Grok skill `architecture-trade-offs-design-depth`
 
@@ -21,7 +21,7 @@ From a checkout that has both repos (or via `gh api` + `git hash-object` on down
 
 ```bash
 # 1) DET writer
-git -C DevEnvTemplate hash-object .agents/skills-extras/architecture-trade-offs-design-depth/SKILL.md
+git -C UserHarness hash-object .agents/skills-extras/architecture-trade-offs-design-depth/SKILL.md
 # expect: 107a5118c95c1bf0b1b3d1755796632bff41b535   (or updated Canon blob with Lead ack)
 
 # 2) HW extras copy on current main (example tip — replace ref as needed)

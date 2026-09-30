@@ -29,7 +29,7 @@ last_mapped_at: 2026-09-28
 - Depends on: Editor modules + Python plugin
 - Used by: DESKTOP Conductor parent for evidence / kit dress
 
-**Harness / ops (repo root + `swarm/` + `DevEnvTemplate/`):**
+**Harness / ops (repo root + `swarm/` + `UserHarness/`):**
 - Purpose: Doctor, preflight, evidence greps, CI, swarm PHASE_BOARD
 - Does not implement gameplay; gates and routes work
 

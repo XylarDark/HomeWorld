@@ -36,7 +36,7 @@
 
 ## DevHarness (adopted layers)
 
-HomeWorld vendors [DevEnvTemplate/](DevEnvTemplate/) as a **gitlink** to **DevHarness** (product rename 2026-09-19 — pinned SHA; registry: [config/devenv-template-pin.json](config/devenv-template-pin.json)) and adopts these layers:
+HomeWorld vendors [UserHarness/](UserHarness/) as a **gitlink** to **DevHarness** (product rename 2026-09-19 — pinned SHA; registry: [config/userharness-pin.json](config/userharness-pin.json)) and adopts these layers:
 
 | Layer | Status |
 | ----- | ------ |
@@ -45,7 +45,7 @@ HomeWorld vendors [DevEnvTemplate/](DevEnvTemplate/) as a **gitlink** to **DevHa
 | **Skill load** | Discoverable catalog is `.agents/README.md` + `.cursor/skills/README.md`; extras and A–E full are cite/copy-in only — never paste skill bodies here. |
 | **Research prompts** | [Docs/handoffs/RESEARCH_PROMPT_CONTRACT.md](Docs/handoffs/RESEARCH_PROMPT_CONTRACT.md) — Conductor paste-ready ROLE/CONTEXT/CANON/ASK/NON-GOALS/DONE-WHEN/child Research |
 | **Operational memory** | `docs/KNOWN_ERRORS.md`, `docs/Automation/AUTOMATION_GAPS.md` (canonical), `docs/operational/automation-gaps.md` (pointer), `docs/DOCS_LAYOUT.md`, `docs/human-use/` (steer / taste / test; [cursor-cannot](docs/human-use/cursor-cannot/README.md)) |
-| **Doctor** | Nested under `DevEnvTemplate/` (not `.devenv/`); `npm run doctor` / `doctor:build` / `sync` from repo root |
+| **Doctor** | Nested under `UserHarness/` (not `.devenv/`); `npm run doctor` / `doctor:build` / `sync` from repo root |
 
 ### Loop engineering (`/loop-engineer`, global skill)
 
@@ -71,7 +71,7 @@ Two orchestration systems coexist. They are **nested, not alternatives**:
 
 - Harness always-on context lives in **`AGENTS.md` only** — Cursor rules are opt-in by glob or agent-requested (`alwaysApply: 0`, as of the P4 trim; see [.cursor/rules/README.md](.cursor/rules/README.md)). Do not add an always-apply rule.
 - Do **not** require Node 24+ on the host for day-to-day UE work; doctor may warn `EBADENGINE` under Node 22 — accepted for now.
-- Do **not** vendor a second checkout under `.devenv/`; `DevEnvTemplate/` is the doctor root.
+- Do **not** vendor a second checkout under `.devenv/`; `UserHarness/` is the doctor root.
 - Do **not** add ESLint / TypeScript unit-test gates for the game host; doctor “Node stack” criticals for missing TS/ESLint/JS tests are **accepted declines** (this repo is UE 5.8 + Python automation). Full matrix: [docs/Setup/DOCTOR_POLICY.md](docs/Setup/DOCTOR_POLICY.md).
 - Automation gaps for game systems stay in [docs/Automation/AUTOMATION_GAPS.md](docs/Automation/AUTOMATION_GAPS.md), not the template stub.
 
@@ -89,7 +89,7 @@ Blender-first MVP production kit: canon in **`Docs/`**, kits in **`Lib/`**, coor
 
 ## Dev environment setup
 
-1. Install UE 5.8, clone this repo, init DevEnvTemplate: `git submodule update --init --recursive DevEnvTemplate` → `npm run doctor:build` once → `npm run doctor:ue` (UE host exit code; see [docs/Setup/CURSOR_DEV.md](docs/Setup/CURSOR_DEV.md), [Docs/13b_HR2_B_COLD_CLONE.md](Docs/13b_HR2_B_COLD_CLONE.md)).
+1. Install UE 5.8, clone this repo, init UserHarness: `git submodule update --init --recursive UserHarness` → `npm run doctor:build` once → `npm run doctor:ue` (UE host exit code; see [docs/Setup/CURSOR_DEV.md](docs/Setup/CURSOR_DEV.md), [Docs/13b_HR2_B_COLD_CLONE.md](Docs/13b_HR2_B_COLD_CLONE.md)).
 2. Run `Setup-MCP.bat` (one-time MCP bridge install).
 3. **Build → Editor → MCP chain:** Run `.\Tools\Safe-Build.ps1` (closes Editor if needed, then builds — see [docs/Setup/BUILD_POLICY.md](docs/Setup/BUILD_POLICY.md)).
 4. Open Unreal Editor (`HomeWorld.uproject`), restart Cursor, verify MCP green dot (port 55557 — [docs/Setup/MCP_SETUP.md](docs/Setup/MCP_SETUP.md)).
