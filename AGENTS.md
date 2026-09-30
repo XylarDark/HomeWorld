@@ -47,6 +47,26 @@ HomeWorld vendors [DevEnvTemplate/](DevEnvTemplate/) as a **gitlink** to **DevHa
 | **Operational memory** | `docs/KNOWN_ERRORS.md`, `docs/Automation/AUTOMATION_GAPS.md` (canonical), `docs/operational/automation-gaps.md` (pointer), `docs/DOCS_LAYOUT.md`, `docs/human-use/` (steer / taste / test; [cursor-cannot](docs/human-use/cursor-cannot/README.md)) |
 | **Doctor** | Nested under `DevEnvTemplate/` (not `.devenv/`); `npm run doctor` / `doctor:build` / `sync` from repo root |
 
+### Loop engineering (`/loop-engineer`, global skill)
+
+Two orchestration systems coexist. They are **nested, not alternatives**:
+
+| Tool | Layer | Role |
+| ---- | ----- | ---- |
+| **GSD** | Architecture, top-down | discuss → plan → execute → verify → ship, behind 8 human gates. Plans a phase. |
+| **loop-engineer** | Implementation, bottom-up | Executes **one** goal to a machine-checkable stop condition. Never plans, never gates. |
+
+**Run `/loop-engineer` only inside one already-gated GSD plan**, where the human decisions were taken at the gate and the loop has no new decision to make. Its own contract is "fully autonomous, never pause for user input, no plan-approval gate" — that is safe only while the decisions it could have made were already made.
+
+**Non-goals — do not violate:**
+
+- **Not the continuity layer.** It has no resume: every invocation starts a fresh loop, and `<LOOP_ID>_DONE/` is bookkeeping nothing reads back. Continuity stays in `swarm/PHASE_BOARD.md`, `Docs/handoffs/SESSION_HANDOFF_*.md`, `docs/SESSION_SUMMARY.md`, and `.planning/STATE.md`. Never point `/loop-engineer` at a continuity task.
+- **Never point it at a product decision.** The human owns taste and scope ([docs/human-use/OWNERSHIP.md](docs/human-use/OWNERSHIP.md)); a loop that auto-skips past 3 verifier failures cannot ask.
+- **Answer Q3 (auto-commit) `no` in a shared tree.** With `yes` it commits `PLAN.md` + `STATUS.md` per task, producing commits nobody staged by path.
+- **Its budget is a turn counter, not a cost ceiling.** `MAX_TURNS` counts agent invocations only; there is no dollar/token limit. Set it deliberately per loop.
+- **Subagents run sequentially in OpenCode** (upstream #14195, re-reported #29638), so wall-clock and cost per turn are higher than on a parallel platform.
+- State lives in `loop-stack/<LOOP_ID>/`; cross-loop memory in `loop-stack/.global/MEMORY.md` (tracked). Goal output goes to the project directory, **never** inside `loop-stack/`.
+
 **Accepted declines (do not re-litigate every session):**
 
 - Keep HomeWorld **always-applied** Cursor rules (`00–20`, `ue57-*`, etc.) until a dedicated migration to AGENTS.md + skills; template retires those for *new* adoptions only.
