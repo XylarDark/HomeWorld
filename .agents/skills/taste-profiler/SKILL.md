@@ -1,3 +1,13 @@
+---
+name: Taste Profiler
+description: >-
+  Use to maintain the durable taste profile and session candidates:
+  bootstrap, stage, promote (Lead-gated). Triggers: taste profile upkeep,
+  promoting a candidate into canon, recording a taste decision, taste
+  onboarding, or any change to Docs/28_TASTE_GATES.md or
+  Docs/29_TASTE_PROFILER.md.
+---
+
 # Taste Profiler
 
 Maintain the durable taste profile and session candidates. Bootstrap → stage → promote (Lead-gated). Never invent product feel.

@@ -1,3 +1,13 @@
+---
+name: Taste Gate
+description: >-
+  Use when the agent hits a human taste limit and must stop instead of
+  inventing product feel: detect, alert, queue, stop. Then scribe the answer
+  and resume agent-owned work. Triggers: "decide the feel", art direction,
+  taste question, human-only judgment, cursor-cannot topic, ambiguity the
+  agent is tempted to guess at.
+---
+
 # Taste Gate
 
 When the agent hits a **human taste limit**, stop inventing. Detect → alert → queue → stop. After the human answers, scribe and resume agent-owned work.
