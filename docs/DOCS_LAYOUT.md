@@ -21,7 +21,25 @@ These paths are **intentionally outside** lowercase `docs/`. Do not merge `Docs/
 | **`START_HERE.md`** | Human Lead entry for MVP lookdev swarm; gates and on-demand specialist spawn. |
 | **`HOMEWORLD_MVP_SWARM_BRIEF.md`** | Game canon brief for the swarm (Human Lead owns changes after P0). |
 
-**UE project docs** stay in **`docs/`** (this tree). **MVP swarm docs** stay in **`Docs/`**. On case-insensitive filesystems, Git may only expose one casing locally — see [Docs/README.md](../Docs/README.md).
+**UE project docs** stay in **`docs/`** (this tree). **MVP swarm docs** stay in **`Docs/`**.
+
+### Case collisions between the two trees — resolved 2026-09-30
+
+The two directories differ only in case, so on a case-insensitive filesystem (Windows) they are **one** directory. Git can still track both, but only one file per basename can exist on disk. This bit twice and is now fixed:
+
+| Collision | Was | Now |
+|-----------|-----|-----|
+| Both trees had a `README.md` | `Docs/README.md` (canon) and `docs/README.md` (engineering) — the 46-line engineering doc had **no on-disk presence on Windows**; `AGENTS.md` linked to it and silently got the wrong document | `docs/README_ENGINEERING.md` |
+| `Config/` vs `config/` | `Config/` (5 UE `.ini`) and `config/` (4 tooling `.json`) — a new UE `.ini` added under `config/` on Windows would be ignored by UE on Linux | one `Config/`, 9 files |
+
+**Rules that follow:**
+
+- **Never give a file in `Docs/` the same basename as a file in `docs/`.** The directories are intentionally separate; the *basenames* must be too.
+- `Config/` is UE's directory and the single source of truth for both `.ini` and tooling `.json`. All tooling JSON lives there, capital C. There is no lowercase `config/`.
+- Check with `git ls-files` after any add in these trees. On Windows, `git add docs/foo.md` records the path with the **on-disk** casing, so it can silently land in `Docs/`. When a case-only change is needed, use `git update-index --cacheinfo` rather than `git add`.
+- The check that proves it: `git clone` must print no `colliding group` warning.
+
+See [README_ENGINEERING.md](README_ENGINEERING.md) for the engineering index and [Docs/README.md](../Docs/README.md) for the canon index.
 
 ---
 

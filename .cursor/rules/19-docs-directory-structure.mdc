@@ -35,6 +35,7 @@ When generating or adding **any documentation** (or other structured content und
 
 - Check [docs/DOCS_LAYOUT.md](docs/DOCS_LAYOUT.md) for the full table and single-source-of-truth rules.
 - If the topic does not fit an existing subdir, add a new subdirectory, update DOCS_LAYOUT and docs/README_ENGINEERING.md, then add the file there.
+- **Never reuse a basename that already exists in the other doc tree.** `Docs/` and `docs/` are one directory on Windows, so a `README.md` in both is a collision: only one exists on disk, links silently resolve to the wrong file, and `git checkout` on one can overwrite the other. This already happened twice (both `README.md`, and `Config/` vs `config/`) and was fixed 2026-09-30. After adding any file in either tree, run `git ls-files` to confirm the recorded casing is what you intended.
 
 ## Applies to
 
