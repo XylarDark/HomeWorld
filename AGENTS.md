@@ -12,7 +12,7 @@
 
 ---
 
-**Project:** HomeWorld — Unreal Engine 5.8 game (Open World / World Partition). Targets UE 5.8 (compatible with 5.8.x). Theme: "Love as Epic Quest"; Act 1 focus is lone wanderer (explore → fight → build). **Lock:** Engine 5.8 only; platform PC + Steam Early Access; do not add engine or platform variants without team decision.
+**Project:** HomeWorld — Unreal Engine 5.8 game (Open World / World Partition). Targets UE 5.8 (compatible with 5.8.x). Theme: "Love as Epic Quest"; Act 1 focus is lone wanderer (explore → fight → build). **Lock:** Engine 5.8 only; platform PC + Steam Early Access; do not add engine or platform variants without team decision. **Review trigger (2026-09-30):** 5.8 is the last *planned* UE5 release and a UE6 timeline is public, so this lock has a visible expiry — it stays until a team decision, but reassess when UE6 enters planning, or when 5.8 features this project depends on are still Experimental past their stabilization window. Recorded in [Docs/handoffs/HR4_A_SKILL_EVAL.md](Docs/handoffs/HR4_A_SKILL_EVAL.md).
 
 **Programmatic by default:** Prefer C++ (and Python automation) over Blueprints. New gameplay systems, movement, input, abilities, and core logic are implemented in C++; Blueprint is for content, level design, and designer overrides only. For abilities: implement logic in a C++ ability subclass (e.g. `UHomeWorldInteractAbility`) and reparent the GA_* Blueprint to that class so no Blueprint graph wiring is required. See [docs/CONVENTIONS.md](docs/CONVENTIONS.md) for the code-first checklist and C++ vs Blueprint split.
 

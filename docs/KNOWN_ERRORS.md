@@ -6,6 +6,8 @@ Record errors and their fixes here so they are not repeated. See `.cursor/rules/
 
 One-line **Cause→Avoid** rows; narratives → [DEFECT_PA_E](../Docs/qa/DEFECT_PA_E_shot_capture_automation.md), [AUTOMATION_GAPS](Automation/AUTOMATION_GAPS.md), [SESSION_LOG](SESSION_LOG.md). Policy: [.cursor/rules/automation-standards.mdc](../.cursor/rules/automation-standards.mdc) § KNOWN_ERROR_LOG.
 
+**Before adding a row here, check the root-cause rules.** Most of the PA-E / PS-C rows below are the *same* bug seen from different angles: `execute_python_script` returns before async Editor work finishes, and the caller then scores state that has not settled. The invariant, the correct arm → yield → verify shape, and the `UnrealEditor-Cmd` cutoff live in [.cursor/rules/09-mcp-workflow.mdc](../.cursor/rules/09-mcp-workflow.mdc) § **The game-thread rule** (added 2026-09-30; 22 rows, 8 acronyms, one cause). The dated rows stay as the evidence trail — add a new row only when it is a genuinely new cause.
+
 ### PA-E DESKTOP prove misses (2026-09-22)
 
 - **World ≠ level_path:** report/`level_path` claimed `L_VS_MVP_Markers` while world was MainMenu → assert `get_editor_world()` or `load_level` before Arrange.

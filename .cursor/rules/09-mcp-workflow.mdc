@@ -76,6 +76,55 @@ Two requirements on anything run this way:
   along with any result JSON they wrote to the project root. Keep only scripts
   that are reusable and referenced by orchestrators like `bootstrap_project.py`.
 
+## The game-thread rule (read before any async Editor work)
+
+**UnrealMCP executes tool calls on the game thread, serially.** Epic's own
+documentation of the first-party MCP server states it plainly: *"executing Tool
+invocations on the game thread serially, meaning clients should not issue
+overlapping Tool calls."* Two consequences drive most of the failure modes in
+[docs/KNOWN_ERRORS.md](../../docs/KNOWN_ERRORS.md):
+
+1. **`execute_python_script` returns before async work finishes.** When the
+   script ends, the MCP call yields and the Editor resumes ticking — but work
+   queued through `AutomationLibrary`, `HighResShot`, MRQ, PCG generation or a
+   level load is still in flight. Anything the script (or the host) inspects at
+   that moment is a **race**, not a result.
+2. **Blocking the game thread stops the Editor.** `time.sleep`, a busy-poll
+   loop, or a synchronous wait for a screenshot prevents Slate ticks, so the
+   queued task can never complete and the Editor presents as hung or Not
+   Responding.
+
+### Required shape: arm → yield → verify
+
+| Phase | Where | Do |
+|---|---|---|
+| **Arm** | MCP script #1 | Set up state; fire the async call **once**; stamp intent (`act_fired_at`, canonical absolute path); **return immediately** |
+| **Yield** | MCP call returns | Do nothing. The Editor ticks. This is not a pause to fill. |
+| **Verify** | Host, after yield | Poll the **on-disk artifact** — file exists, `mtime ≥ act_fired_at`, `bytes ≥ MIN_BYTES` — then score |
+
+Rules that follow:
+
+- **`fire_ok` is not a result.** It means the call returned. The gate may only
+  pass on evidence read after the yield.
+- **Register a tick callback; never sleep.** Use
+  `register_slate_pre_tick_callback` / `register_slate_post_tick_callback` to
+  drive work, and unregister after firing. A bound method registered from a
+  script that then returns is lost, because no further ticks are dispatched to
+  it — register on a **module-level** function.
+- **Do not chain async stages into one MCP script.** Prepare in one call, fire
+  in another, verify after the second returns.
+- **Absolute paths only.** Editor CWD is Engine `Win64`, not the project root,
+  so a bare filename writes outside `Saved/`.
+
+### When not to use MCP at all
+
+Batch import, bulk placement, MRQ runs, and anything that takes more than a few
+seconds belong in **`UnrealEditor-Cmd`**. See
+[docs/Setup/MCP_SETUP.md](../../docs/Setup/MCP_SETUP.md). MCP is an assistance
+layer for short, verifiable operations — not the primary builder for long
+sequences. See [`docs/KNOWN_ERRORS.md`](../../docs/KNOWN_ERRORS.md) for the
+18 dated entries that produced this rule.
+
 ## Critical MCP safety rules (prevent Editor crashes)
 
 1. **Never pass a full asset path as `blueprint_name`.** `FindBlueprintByName`

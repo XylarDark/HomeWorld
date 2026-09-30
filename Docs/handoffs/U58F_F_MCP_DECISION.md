@@ -65,6 +65,47 @@ Epic tools worth **wrapping into UnrealMCP or Python later** (not enabling Epic 
 
 ---
 
+## Revisit triggers (added 2026-09-30, HR4-A)
+
+The decision above stands. What it lacked was a condition for reopening it.
+Reopen **only** when one of these is true:
+
+1. Epic's `ModelContextProtocol` leaves **Experimental**, or `ToolsetRegistry`
+   stabilises enough that its API stop-movers stop being a factor.
+2. UnrealMCP lacks a tool we actually need **and** Epic's toolsets expose it —
+   the top three candidates are already listed above (`PCGToolset`,
+   `EditorAppToolset` `CaptureViewport`, `LogsToolset`).
+3. UE6 planning opens. Epic has signalled **MCP as core infrastructure into
+   Unreal Engine 6**, which makes the automation surface something to write
+   against the plugin rather than the port.
+
+Do **not** reopen for: "the official plugin exists", "it is free", or "the tool
+count is lower". None of those were the deciding factors.
+
+### Facts recorded 2026-09-30 (from Epic's docs + the 5.8 release thread)
+
+- **Game-thread serialisation.** *"executing Tool invocations on the game thread
+  serially, meaning clients should not issue overlapping Tool calls."* This is the
+  documented root cause of the 22-row async/yield cluster in `KNOWN_ERRORS.md`.
+  See [`.cursor/rules/09-mcp-workflow.mdc`](../../.cursor/rules/09-mcp-workflow.mdc)
+  § The game-thread rule.
+- **Live Coding does not propagate new `UFUNCTION` declarations** — independent
+  confirmation that `Safe-Build` is mandatory, not stylistic.
+- **Tool Search is on by default** (`Enable Tool Search = true`): `tools/list`
+  returns 3 meta-tools instead of every schema. Worth borrowing as a design
+  lesson; **not** a reason to migrate.
+- **Security posture:** loopback only, **no authentication**, HTTP+SSE only, no
+  stdio or WebSocket. Relevant to the threat model if the port is ever widened.
+- **Headless path exists:** `-ModelContextProtocolStartServer`,
+  `-ModelContextProtocolPort=N`.
+- **Confirmed setup gap.** Release-thread #7: *"you need to enable manually the
+  toolset registries otherwise the MCP doesn't do anything."* The release
+  announcement does not mention it, so enabling only "Unreal MCP" yields a server
+  that silently does nothing.
+- **Battle-testing is thin.** The 102-post 5.8 release thread contains 3 MCP
+  posts, one of them a naming joke. Low community maturity is a reason for
+  patience, not for adoption.
+
 ## Stamp
 
 1. **Primary:** UnrealMCP remains the only MCP server HomeWorld automation depends on.
