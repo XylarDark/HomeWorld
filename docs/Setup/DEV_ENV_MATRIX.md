@@ -1,5 +1,12 @@
 # Development environment matrix
 
+> **QUARANTINE - WAVE F removed.** The agent-company loop this page documents was
+> **removed in WAVE F**. Its scripts now live in [`Tools/history/`](../../Tools/history/)
+> and **must not be run**; [`docs/Automation/AGENT_COMPANY.md`](AGENT_COMPANY.md) is the
+> historical design. **Active driver:** [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md)
+> + **Conductor** - [START_HERE.md](../../START_HERE.md).
+> Read this page for history and for the lessons, not for steps to execute.
+
 **When to use this:** Pin what a healthy HomeWorld machine looks like before onboarding or when debugging “works on my machine.” For step-by-step first setup, start with [SETUP.md](../SETUP.md).
 
 **Related:** [CI_SETUP.md](CI_SETUP.md) (runner parity), [MCP_SETUP.md](MCP_SETUP.md), [AUTOMATION_READINESS.md](../Automation/AUTOMATION_READINESS.md), [EDITOR_BUILD_PROTOCOL.md](../Editor/EDITOR_BUILD_PROTOCOL.md).

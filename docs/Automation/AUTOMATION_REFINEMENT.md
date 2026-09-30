@@ -1,5 +1,12 @@
 # Automation refinement: from agent actions and errors to rules and strategy
 
+> **QUARANTINE - WAVE F removed.** The agent-company loop this page documents was
+> **removed in WAVE F**. Its scripts now live in [`Tools/history/`](../../Tools/history/)
+> and **must not be run**; [`docs/Automation/AGENT_COMPANY.md`](AGENT_COMPANY.md) is the
+> historical design. **Active driver:** [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md)
+> + **Conductor** - [START_HERE.md](../../START_HERE.md).
+> Read this page for history and for the lessons, not for steps to execute.
+
 **Goal:** Use every automation run (main loop, fix agent, loop-breaker) and every error to **update project rules and refine development strategy** over time, so the same failures are avoided and the loop gets more reliable.
 
 ---

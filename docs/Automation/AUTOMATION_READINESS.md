@@ -1,5 +1,12 @@
 # Automation readiness
 
+> **QUARANTINE - WAVE F removed.** The agent-company loop this page documents was
+> **removed in WAVE F**. Its scripts now live in [`Tools/history/`](../../Tools/history/)
+> and **must not be run**; [`docs/Automation/AGENT_COMPANY.md`](AGENT_COMPANY.md) is the
+> historical design. **Active driver:** [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md)
+> + **Conductor** - [START_HERE.md](../../START_HERE.md).
+> Read this page for history and for the lessons, not for steps to execute.
+
 This page tells you **what’s ready to run** and **what you must do first** before using the 30-day automation loop (Cursor agents + Editor + scripts).
 
 ---

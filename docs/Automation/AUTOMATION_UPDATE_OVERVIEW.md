@@ -1,5 +1,12 @@
 # Automation update: work accomplished, tools used, and gaps
 
+> **QUARANTINE - WAVE F removed.** The agent-company loop this page documents was
+> **removed in WAVE F**. Its scripts now live in [`Tools/history/`](../../Tools/history/)
+> and **must not be run**; [`docs/Automation/AGENT_COMPANY.md`](AGENT_COMPANY.md) is the
+> historical design. **Active driver:** [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md)
+> + **Conductor** - [START_HERE.md](../../START_HERE.md).
+> Read this page for history and for the lessons, not for steps to execute.
+
 **Purpose:** One-place overview of what automatic development has accomplished, what tools we use, how we use (or don’t use) the Editor and UI, and which steps we skip because we cannot automate them.
 
 **Last updated:** 2026-03-03.

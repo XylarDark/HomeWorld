@@ -1,15 +1,23 @@
-# Refine rules from runs (Refiner agent)
+# Refine rules from runs
 
-Run the **Refiner** role from the agent company: read run history and errors, update rules and strategy so the same failures don't recur.
+Fold what past runs and errors taught us back into the rules, so the same failures do not recur.
 
-**What to do:** From project root, run:
+**What to do:** Read the run history and error log, then update the affected docs and rules.
 
-```powershell
-.\Tools\Run-RefinerAgent.ps1
-```
+- `Saved/Logs/agent_run_history.ndjson` — one NDJSON line per run (main, fix, loop_breaker): `ts`, `role`, `round`, `exit_code`, `error_summary`, `trigger_exit_code`, `suggested_rule_update`, `suggested_strategy`.
+- `Saved/Logs/automation_errors.log` — raw error text.
 
-Optionally with `-Model <name>` if you want a specific model. The Refiner reads Saved/Logs/agent_run_history.ndjson, Saved/Logs/automation_errors.log, and (if present) Saved/Logs/automation_loop_breaker_report.md, then updates docs/KNOWN_ERRORS.md, .cursor/rules, AGENTS.md, or workflow docs as needed.
+From those, update as needed: `docs/KNOWN_ERRORS.md`, `.cursor/rules/`, `AGENTS.md`, `docs/Automation/AUTOMATION_GAPS.md`.
 
-> **Quarantine:** Pre-swarm agent company removed WAVE F — [docs/Automation/AGENT_COMPANY.md](../../docs/Automation/AGENT_COMPANY.md) (history). Active: [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md) + Conductor.
+**Rules for this pass:**
 
-See docs/Automation/AUTOMATION_REFINEMENT.md (how run history is used). When run history or the Guardian report mentions an automation gap (Level Streaming, State Tree, PCG), the Refiner suggests a follow-up task to implement a solution or add GUI automation; see docs/Automation/AUTOMATION_GAPS.md and .cursor/skills/automation-gap-solutions/SKILL.md.
+- Every change must be traceable to a specific record above. No speculative rules.
+- Prefer editing an existing entry over appending a near-duplicate.
+- When a run mentions an automation gap (Level Streaming, State Tree, PCG), add it to `docs/Automation/AUTOMATION_GAPS.md` (canonical) — do not invent a new doc.
+
+**Related:** [docs/Automation/AUTOMATION_REFINEMENT.md](../../docs/Automation/AUTOMATION_REFINEMENT.md) (how run history is used) ·
+[.cursor/skills/automation-gap-solutions/SKILL.md](../../.cursor/skills/automation-gap-solutions/SKILL.md) ·
+[docs/Automation/AGENT_COMPANY.md](../../docs/Automation/AGENT_COMPANY.md) (history — the Refiner *role* this replaced).
+
+> **Quarantine:** the pre-swarm agent company and `Tools/Run-RefinerAgent.ps1` were **removed in WAVE F**.
+> Active driver: [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md) + Conductor — [START_HERE.md](../../START_HERE.md).

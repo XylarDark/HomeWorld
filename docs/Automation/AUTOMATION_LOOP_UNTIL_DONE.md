@@ -1,5 +1,12 @@
 # Running the automation loop until the task list is done
 
+> **QUARANTINE - WAVE F removed.** The agent-company loop this page documents was
+> **removed in WAVE F**. Its scripts now live in [`Tools/history/`](../../Tools/history/)
+> and **must not be run**; [`docs/Automation/AGENT_COMPANY.md`](AGENT_COMPANY.md) is the
+> historical design. **Active driver:** [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md)
+> + **Conductor** - [START_HERE.md](../../START_HERE.md).
+> Read this page for history and for the lessons, not for steps to execute.
+
 **Goal:** Have the development cycle run session after session until every task in the **current task list** is completed (or the loop is stopped). The loop is driven by a single 10-task list; it exits only when that list has no pending/in_progress tasks, or when a stop sentinel or Guardian report applies. This doc explains what the agent can and cannot do, and what tooling you need.
 
 ---

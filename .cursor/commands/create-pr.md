@@ -10,7 +10,7 @@ Create a well-structured pull request with Conventional Commits and proper branc
    - Verify branch is up to date with main (rebase or merge as per team preference).
 
 2. **Commit message**
-   - Use Conventional Commits: `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, etc. (see `.cursor/rules/04-git-workflow.mdc`).
+   - Use Conventional Commits: `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, etc. (see **Code style** in [AGENTS.md](../../AGENTS.md)).
    - Branch naming: `feat/`, `fix/`, `docs/`, etc. (e.g. `feat/pcg-volume-bounds`).
    - PowerShell: use `;` not `&&` for chaining; use here-strings for multi-line commit messages.
 

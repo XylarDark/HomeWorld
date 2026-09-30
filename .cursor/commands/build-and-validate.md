@@ -13,7 +13,7 @@ Compile the project and optionally run PIE validation. Use when verifying C++, p
    - Open Editor, run PIE, then via MCP: `execute_python_script("pie_test_runner.py")`, and read `Saved/pie_test_results.json` for ground contact, character, PCG, etc.
 
 4. **When touching C++ / PCG / plugins**
-   - Before or after changes, check [.cursor/rules/unreal-cpp.mdc](../.cursor/rules/unreal-cpp.mdc) (pitfalls table) and [docs/KNOWN_ERRORS.md](../docs/KNOWN_ERRORS.md). See [docs/UE/UE57_TECH.md](../docs/UE/UE57_TECH.md) for the full UE 5.7 tech entry point.
+   - Before or after changes, check [.cursor/rules/unreal-cpp.mdc](../.cursor/rules/unreal-cpp.mdc) (pitfalls table) and [docs/KNOWN_ERRORS.md](../docs/KNOWN_ERRORS.md). See [docs/UE/UE58_TECH.md](../docs/UE/UE58_TECH.md) for the full UE 5.8 tech entry point.
 
 ## Success
 
