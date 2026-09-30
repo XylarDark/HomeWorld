@@ -6,7 +6,7 @@
 |------|------|
 | **[START_HERE.md](START_HERE.md)** | Swarm entry — Human Lead gates, Conductor boot |
 | **`Docs/`** (capital D) | **Signed MVP product canon** — GDD, art bible, export table, audit WAVEs ([Docs/README.md](Docs/README.md)) |
-| **`docs/`** (lowercase) | UE 5.8 engineering — setup, PCG, automation, known errors ([docs/README.md](docs/README.md)) |
+| **`docs/`** (lowercase) | UE 5.8 engineering — setup, PCG, automation, known errors ([docs/README_ENGINEERING.md](docs/README_ENGINEERING.md)) |
 
 **Do not treat** [VisionBoard/MVP/](VisionBoard/MVP/README.md) or [docs/Automation/AGENT_COMPANY.md](docs/Automation/AGENT_COMPANY.md) as MVP product canon — see quarantine pointers there. Long-horizon theme/stack: [VisionBoard/Core/VISION.md](VisionBoard/Core/VISION.md).
 

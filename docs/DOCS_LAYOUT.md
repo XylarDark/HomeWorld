@@ -29,7 +29,7 @@ These paths are **intentionally outside** lowercase `docs/`. Do not merge `Docs/
 
 | File | Purpose |
 |------|--------|
-| [README.md](README.md) | Documentation index; links to VisionBoard, TaskLists, workflow, and subdirs. |
+| [README_ENGINEERING.md](README_ENGINEERING.md) | Documentation index; links to VisionBoard, TaskLists, workflow, and subdirs. |
 | [DOCS_LAYOUT.md](DOCS_LAYOUT.md) | This file — canonical directory structure and placement rules. |
 | [CONVENTIONS.md](CONVENTIONS.md) | Code and project conventions (C++ vs Blueprint, naming). |
 | [CONTENT_LAYOUT.md](CONTENT_LAYOUT.md) | Content paths (`/Game/HomeWorld/`), script index, Python/config paths. |
@@ -233,4 +233,4 @@ Workflow index; daily flow. Do not move; already structured.
 - **Setup:** [SETUP.md](SETUP.md) is the main onboarding entry; Setup/ holds detailed subs (MCP, CI, etc.).
 - **Errors:** [KNOWN_ERRORS.md](KNOWN_ERRORS.md) is the single place for recorded errors; check before similar work.
 
-When adding a new doc, place it in the subdirectory above that matches its topic. If the topic is new, add a new subdirectory and update this file and docs/README.md.
+When adding a new doc, place it in the subdirectory above that matches its topic. If the topic is new, add a new subdirectory and update this file and docs/README_ENGINEERING.md.

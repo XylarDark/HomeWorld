@@ -34,7 +34,7 @@ When generating or adding **any documentation** (or other structured content und
 ## When in doubt
 
 - Check [docs/DOCS_LAYOUT.md](docs/DOCS_LAYOUT.md) for the full table and single-source-of-truth rules.
-- If the topic does not fit an existing subdir, add a new subdirectory, update DOCS_LAYOUT and docs/README.md, then add the file there.
+- If the topic does not fit an existing subdir, add a new subdirectory, update DOCS_LAYOUT and docs/README_ENGINEERING.md, then add the file there.
 
 ## Applies to
 

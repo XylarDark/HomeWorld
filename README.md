@@ -12,7 +12,7 @@
 | **[Docs/](Docs/README.md)** | **Signed MVP product canon** — GDD, art bible, export/UE handoff, audit WAVEs |
 | **[swarm/SWARM_OPS.md](swarm/SWARM_OPS.md)** | Swarm process — Human Use, evidence gates |
 | **[AGENTS.md](AGENTS.md)** | Agent / Cursor context (UE 5.7, MCP, build policy) |
-| **[docs/](docs/README.md)** | UE engineering docs — setup, PCG, automation, known errors |
+| **[docs/](docs/README_ENGINEERING.md)** | UE engineering docs — setup, PCG, automation, known errors |
 
 **Quarantine (history only):** [VisionBoard/MVP/](VisionBoard/MVP/README.md) · [docs/Automation/AGENT_COMPANY.md](docs/Automation/AGENT_COMPANY.md)
 
