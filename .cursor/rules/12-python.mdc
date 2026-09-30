@@ -62,7 +62,7 @@ version: 1.0
 **`Content/Python/init_unreal.py`** runs when the Editor loads (Unreal's standard startup location). It must stay minimal and only call idempotent setup (e.g. Enhanced Input). Do not add heavy bootstrap or user prompts. Scripts invoked from `init_unreal.py` must be safe to run every session (check-before-create, no duplicates).
 
 - **Canonical example (level/landscape):** `Content/Python/level_loader.py` — idempotent helpers, check-before-create, UE 5.8 Python API (e.g. `get_actor_bounds` tuple return).
-- **Canonical example (PCG automation):** `Content/Python/create_pcg_forest.py` — graph creation, pin wiring; see `docs/PCG_VARIABLES_NO_ACCESS.md` for settings automation cannot set.
+- **Canonical example (PCG automation):** `Content/Python/create_pcg_forest.py` — graph creation, pin wiring; see `docs/PCG/PCG_VARIABLES_NO_ACCESS.md` for settings automation cannot set.
 
 ### Idempotency (critical)
 

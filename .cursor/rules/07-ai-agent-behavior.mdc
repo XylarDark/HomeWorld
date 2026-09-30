@@ -1,58 +1,44 @@
 ---
-name: "AI Agent Behavior Rules"
-description: "Follow agent behavior protocols when performing any task to ensure cleanup, error recording, and safe tool usage"
-alwaysApply: true
+name: "AI Agent Behavior Rules — RETIRED"
+description: "RETIRED P4. Content moved to AGENTS.md and the named rules. Do not restore; AGENTS.md is the always-on surface."
+alwaysApply: false
 priority: 9
-version: 2.0
+version: 3.0
 ---
 
-# AI Agent Behavior Rules
+# AI Agent Behavior Rules — RETIRED (P4)
 
-Short always-on card (HARNESS_OPT bite 6.3). Full MCP workflow → `09-mcp-workflow.mdc`. Idempotency / `init_unreal` → `00-core-principles.mdc`. Error/MCP validation tables → `05-error-handling.mdc`. Engine pin → `ue58-sources.mdc` (not 5.7).
+This rule was an `alwaysApply: true` session-wide card. It is **retired**, not
+deleted, so that any surviving reference to it resolves to a pointer instead of
+silently loading stale guidance.
 
-## WAVE F quarantine
+**Why:** it duplicated `AGENTS.md` almost line for line, and its one non-
+duplicated section was dead. The "Session alerts" table instructed the agent to
+read `Saved/Logs/automation_tasks_complete.md`, `automation_exit_alert.md`,
+`automation_last_completion.json`, `automation_heartbeat.log`,
+`automation_status_latest.txt` and `automation_terminal_capture.log` at the
+start of every session. Those files still exist on disk because the WAVE F
+agent-company loop that wrote them was deleted, so they are frozen stale
+output: an agent was being told to read a heartbeat that can no longer update.
 
-Pre-swarm agent-company loop (`Start-AllAgents*`, `run_automation_cycle.py`, `CURRENT_TASK_LIST`) is **deleted**. Do not run or resurrect.
+Retiring it also closes the `docs/Setup/DOCTOR_POLICY.md` finding **"Always-
+Applied Rule Budget Exceeded"** (HR-B2 had already cut 15 → 3; this takes 3 → 0).
 
-**Active driver:** [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md) + **Conductor** — [START_HERE.md](../../START_HERE.md). Cloud packets: [swarm/CLOUD_AGENT_PACKET.md](../../swarm/CLOUD_AGENT_PACKET.md). History only: [docs/Automation/AGENT_COMPANY.md](../../docs/Automation/AGENT_COMPANY.md).
+## Where the content went
 
-## Session alerts (read at start)
+| Was here | Now lives in |
+|---|---|
+| Session continuity, handoff resume, SESSION_SUMMARY append | `AGENTS.md` → Session ops / Daily workflow |
+| Research-before-implement, error recording, temp cleanup | `AGENTS.md` → Feature development policy / Testing |
+| "Show your thinking", never say sorry (LLM tone policing) | Deleted — see `00-core-principles.mdc` v2.0, this is boilerplate an advanced model does not need |
+| WAVE F refuse + SWARM_OPS pointer | `AGENTS.md` → Quarantine bullet; `19-automation-cycle.mdc` |
+| UE 5.8 pin, not 5.7 | `AGENTS.md` → Lock; `ue58-sources.mdc` |
+| MCP safety (4 crash rules) | `09-mcp-workflow.mdc` → Critical MCP safety rules |
+| One-off script cleanup | `09-mcp-workflow.mdc` → Cleanup requirement |
+| Taste / human-ownership | `AGENTS.md` + `taste-gate` and `taste-profiler` skills |
 
-If present, prepend a short note then continue the user’s ask (do not repeat in the same conversation unless asked):
+## Do not
 
-| File | Action |
-|------|--------|
-| `Saved/Logs/automation_tasks_complete.md` | WAVE F note + SWARM_OPS/Conductor pointer |
-| `Saved/Logs/automation_exit_alert.md` | Exit summary; also tail `Saved/Logs/automation_terminal_capture.log` (~50 lines) for errors |
-| `Saved/Logs/automation_last_completion.json` | One-line “latest automation Round N @ timestamp” if neither alert above exists |
-
-Status asks (“automation status”, “what’s the agent doing”): tail `automation_heartbeat.log`, `automation_status_latest.txt`, `automation_terminal_capture.log`.
-
-**Default track:** read `docs/SESSION_SUMMARY.md` + `swarm/PHASE_BOARD.md` (not full `SESSION_LOG` unless debugging).
-
-**End of task:** append dated block to `SESSION_SUMMARY.md`; update `PHASE_BOARD.md` when status changes. Legacy task-list / DAILY_STATE only when explicitly on that track.
-
-## MCP safety (4 lines)
-
-Before any MCP call:
-
-1. `blueprint_name` is a **short name**, not a full `/Game/` path (full path crashes the Editor).
-2. Check `docs/KNOWN_ERRORS.md` for the tool + property combination.
-3. Have a fallback (Python script / GUI automation / log `docs/Automation/AUTOMATION_GAPS.md`) — no “manual steps for the user” (see `20-full-automation-no-manual-steps.mdc`).
-4. Full envelope and tool order → **`09-mcp-workflow.mdc`** (host-canonical).
-
-## Taste / ownership
-
-On a taste limit (vision / map / patterns / next-track invent): load `.cursor/skills/taste-gate/SKILL.md`; read [taste-profile.md](../../docs/human-use/taste-profile.md); emit OWNERSHIP alert; queue; **stop** — do not invent ([taste-gates.md](../../docs/human-use/taste-gates.md)).
-
-## Log-driven validation
-
-Prefer evidence files + greps over narrative. New feature debug instrumentation → **`16-feature-debug-instrumentation.mdc`**. Record instructive failures in `docs/KNOWN_ERRORS.md`.
-
-## Cleanup
-
-Delete session-only temp scripts and agent-only result JSON before reporting done. Do not leave cleanup for a future session.
-
-## UE / research pointer
-
-HomeWorld targets **UE 5.8**. Use `ue58-sources.mdc` / `ue58-editor-ui.mdc` (and `21`/`22`). Do not prefer 5.7 docs for live work.
+Do not restore this rule, and do not add a new `alwaysApply: true` rule. The
+harness contract is zero always-apply rules with `AGENTS.md` as the single
+always-on surface. See `.cursor/rules/README.md` → Attach policy.

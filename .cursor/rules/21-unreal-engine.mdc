@@ -14,7 +14,7 @@ This rule applies when the repo layout indicates an **Unreal Engine** project (s
 ## 1. Engine version and documentation
 
 - **Do not rely on model training data** for APIs, blueprint nodes, plugin behavior, or Editor menu paths. They change between versions.
-- **Pin the version** in project docs (e.g. `docs/UE/README.md` or `README.md`) and/or from `*.uproject` (`EngineAssociation`).
+- **Pin the version** in project docs ([docs/UE/UE58_TECH.md](../../docs/UE/UE58_TECH.md) is the current pin) and/or from `*.uproject` (`EngineAssociation`).
 - **Prefer official Epic documentation** for the **pinned** version. When searching the web, include the version (e.g. “Unreal Engine 5.8”) in the query.
 - **If docs conflict with the local Editor**, trust the Editor and record the discrepancy in [docs/KNOWN_ERRORS.md](../../docs/KNOWN_ERRORS.md).
 

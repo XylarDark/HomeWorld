@@ -1,60 +1,94 @@
 # Cursor Rules Directory
 
-This directory contains Cursor rules for the HomeWorld project. It includes technology-agnostic rules from [DevEnvTemplate](../DevEnvTemplate) and HomeWorld-specific Unreal rules.
+HomeWorld-specific Unreal rules plus technology-agnostic rules inherited from the
+[UserHarness pin](../DevEnvTemplate). Rules are **opt-in by glob or
+agent-requested**; `AGENTS.md` is the single always-on surface.
 
-## Attach policy (ALWAYSAPPLY_AUDIT_V1)
+## Attach policy
 
-### AlwaysApply — N=3 (session-wide trio)
+### alwaysApply: 0
 
-Do **not** grow or shrink this set without a new Research EXIT.
+**No rule is `alwaysApply: true`.** `AGENTS.md` carries the always-on context.
+Rules load when a glob matches the files being touched, or when the agent asks
+for one by description. Adding an always-apply rule is a regression — see
+`Docs/handoffs/PIN_SYNC_POLICY.md` (NEVER_AUTO for growth/shrink) and the
+"Always-Applied Rule Budget Exceeded" row in
+[docs/Setup/DOCTOR_POLICY.md](../../docs/Setup/DOCTOR_POLICY.md).
 
-| File | Role |
-|------|------|
-| `07-ai-agent-behavior.mdc` | Slim agent card (WAVE F refuse, MCP pointer, taste-gate) |
-| `08-project-context.mdc` | Session project card (overlaps `AGENTS.md`; accepted tax) |
-| `20-full-automation-no-manual-steps.mdc` | Autonomy invariant + host-gate cite to SWARM_OPS |
+History: HR-B2 cut 15 → 3, and P4 cut 3 → 0 by retiring `07-ai-agent-behavior`
+and `08-project-context` (both were near-duplicates of `AGENTS.md`) and
+glob-scoping `20-full-automation-no-manual-steps` (whose invariant is already
+stated in `AGENTS.md`). Those two files are kept as **tombstones** — retired, not
+deleted — so a surviving reference resolves to a pointer instead of silently
+loading stale guidance.
 
-Host legality (DESKTOP parent-only, no cloud DESKTOP trials): [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md) §14 / §16 — cite, do not fork into new alwaysApply rules.
+| Was always-apply | Now | Why |
+|---|---|---|
+| `07-ai-agent-behavior.mdc` | tombstone, `alwaysApply: false` | Duplicated `AGENTS.md`; its only unique section read `Saved/Logs/automation_*` files frozen since WAVE F deleted the loop that wrote them |
+| `08-project-context.mdc` | tombstone, `alwaysApply: false` | A stale fork of `AGENTS.md`, with 3 references to files that do not exist |
+| `20-full-automation-no-manual-steps.mdc` | `alwaysApply: false`, globs `Content/Python`, `Tools`, `.github/workflows`, `docs/Automation`, `.cursor/skills` | Invariant is in `AGENTS.md`; this file keeps the gap-log format and the host gate |
 
-### Opt-in by glob (not alwaysApply)
+### Opt-in by glob
 
-| Group | Files (typical) |
-|-------|-----------------|
+| Group | Files |
+|---|---|
 | Code | `00-core-principles`, `05-error-handling`, `16-feature-debug-instrumentation` |
+| Tests | `03-testing` |
 | Python | `12-python` |
 | Shell | `15-shell-scripts` |
 | JSON/YAML | `14-json-yaml` |
-| Tests | `03-testing` |
-| MCP | `09-mcp-workflow` (Python/Tools/uproject — not Source) |
-| Automation bible | `automation-standards` |
-| Game content | `18-game-development-principles` (uasset/umap/Maps/Lib — not Content/**) |
-| UE live | `21-unreal-engine`, `22-unreal-editor-ui`, `unreal-*`, `ue58-sources`, `ue58-editor-ui` (ue58: uproject/Source/Config/Plugins — not Content/**) |
-| Docs layout | `19-docs-directory-structure` (`docs/**`, `Docs/**` only) |
-| Gaps procedure | `19-automation-gaps` (`docs/Automation/AUTOMATION_GAPS.md`) |
+| MCP | `09-mcp-workflow` (transport, capability, crash rules); `09b-mcp-utility-scripts` (harness scripts + envelope) |
+| Automation policy | `automation-standards` (tooling ladder, Lead gates); `19-automation-gaps` (gap procedure + log format pointer) |
+| Lookdev evidence | `lookdev-evidence-standards` (PA-E, MRQ, capture preconditions) |
+| Automation invariant | `20-full-automation-no-manual-steps` |
+| Game content | `18-game-development-principles` (`.uasset`/`.umap`/`Maps/`/`Lib/`) |
+| UE live | `21-unreal-engine`, `22-unreal-editor-ui`, `unreal-*`, `ue58-sources`, `ue58-editor-ui` |
+| Docs layout | `19-docs-directory-structure` (`docs/**`, `Docs/**`) |
 | Plugins | `10-compound-engineering`, `11-parallel-plugin` (`.cursor/**`) |
 | PCG | `pcg-best-practices` |
 
-### Description-only
+### Description-only (agent-requested)
 
-- `19-automation-cycle.mdc` — WAVE F quarantine pointer; do **not** resurrect cycle bodies.
+- `07-ai-agent-behavior.mdc`, `08-project-context.mdc` — **tombstones.** Say
+  retired; do not restore.
+- `19-automation-cycle.mdc` — WAVE F quarantine pointer; do **not** resurrect
+  cycle bodies.
 
-### Historical (narrow)
+### Historical (narrow glob)
 
-- `ue57-sources.mdc`, `ue57-editor-ui.mdc` — glob only `docs/UE/UE57_*.md`; prefer ue58 for active work.
+- `ue57-sources.mdc`, `ue57-editor-ui.mdc` — glob `docs/UE/UE57_*.md` only.
+  Prefer `ue58-*` for active work. Both are marked HISTORICAL.
 
-Retired (bite 6.2, stay deleted): `01`/`02`/`04`/`06`/`11-javascript`/`13-markdown`/`17` → skills.
+### Retired — stay deleted
+
+`01`, `02`, `04`, `06`, `11-javascript`, `13-markdown`, `17` → migrated to
+`.agents/skills/` or `AGENTS.md`.
+
+Note `11-javascript` was retired for exactly the reason P4 finished: this is a
+UE C++/Python host with no JavaScript product surface. P4 removed the surviving
+TypeScript and JS examples from `05-error-handling.mdc` and rewrote
+`03-testing.mdc`, which had carried Vitest/Jest/React Testing Library/`npm
+install` instructions into a repo that has no `package.json` test setup.
 
 ## Canonical examples
 
-Rules should point to **canonical examples** in the repo (e.g. `Source/HomeWorld/` or `Content/Python/`) instead of inlining long code.
+Rules point to canonical examples in the repo rather than inlining long code.
 
-- **C++:** `unreal-cpp.mdc` — pawn: `HomeWorldCharacter.h/.cpp`; GAS: `HomeWorldGameplayAbility.h`, `HomeWorldAttributeSet.h`.
-- **Python:** `12-python.mdc` — level/landscape: `level_loader.py`; PCG automation: `create_pcg_forest.py` (see `docs/PCG/PCG_VARIABLES_NO_ACCESS.md` for limits).
-
-Full list and links: [docs/UE/UE57_TECH.md](../../docs/UE/UE57_TECH.md).
+- **C++:** `unreal-cpp.mdc` → pawn `HomeWorldCharacter.h/.cpp`; GAS:
+  `HomeWorldGameplayAbility.h`, `HomeWorldAttributeSet.h`.
+- **Python:** `12-python.mdc` → level/landscape `level_loader.py`; PCG
+  automation `create_pcg_forest.py` (limits in
+  [`docs/PCG/PCG_VARIABLES_NO_ACCESS.md`](../../docs/PCG/PCG_VARIABLES_NO_ACCESS.md)).
 
 ## Maintenance
 
-- To refresh rules from DevEnvTemplate: copy `DevEnvTemplate/.cursor/rules/*.mdc` to `.cursor/rules/` (**preserve** HW `unreal-*` / `ue58-*` / alwaysApply trio `07`/`08`/`20`).
-- See [docs/Setup/CURSOR_DEV.md](../../docs/Setup/CURSOR_DEV.md) and [DevEnvTemplate/BOOTSTRAP.md](../DevEnvTemplate/BOOTSTRAP.md) for setup and usage.
-- Sync must **not** inject retired always-on rules or grow alwaysApply without Research (PIN_SYNC NEVER_AUTO for growth/shrink).
+- Refresh from the UserHarness pin by copying
+  `DevEnvTemplate/.cursor/rules/*.mdc` → `.cursor/rules/`, **preserving** the
+  HomeWorld `unreal-*` / `ue58-*` rules, the tombstones, and the zero
+  `alwaysApply` count.
+- Never introduce a reference to a retired rule. The retirement map is
+  `DevEnvTemplate/scripts/tools/cursor-rules-adapter.ts`:
+  `02-security.mdc` → `.agents/skills/secure-coding`;
+  `04-git-workflow.mdc` → `AGENTS.md` (conventions).
+- See [docs/Setup/CURSOR_DEV.md](../../docs/Setup/CURSOR_DEV.md) and
+  [DevEnvTemplate/BOOTSTRAP.md](../DevEnvTemplate/BOOTSTRAP.md).

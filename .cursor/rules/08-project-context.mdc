@@ -1,66 +1,38 @@
 ---
-name: "HomeWorld Project Context"
-description: "Load HomeWorld project context when working in this repo to understand structure, stack, and conventions"
-alwaysApply: true
+name: "HomeWorld Project Context — RETIRED"
+description: "RETIRED P4. AGENTS.md is the single project-context surface. Do not restore this duplicate card."
+alwaysApply: false
 priority: 8
-version: 1.0
+version: 2.0
 ---
 
-# HomeWorld Project Context
+# HomeWorld Project Context — RETIRED (P4)
 
-## Project Purpose
+This rule was an `alwaysApply: true` project card. It is **retired**, not
+deleted, so any surviving reference resolves to a pointer.
 
-HomeWorld is a co-op ARPG survival game with family sim elements, built in Unreal Engine 5.8. Players explore, fight, build, and nurture bonds. Target: 8-12h campaign + endgame; PC, Steam Early Access.
+**Why:** it was a stale fork of `AGENTS.md`. Every section had a counterpart
+that was already better maintained:
 
-## Tech Stack
+| Was here | Now lives in |
+|---|---|
+| Project purpose, UE 5.8, PC + Steam EA | `AGENTS.md` → MVP canon table + Lock |
+| Tech stack, enabled plugins | `AGENTS.md` → Stack (enabled plugins) |
+| Key Principles (programmatic-first, MCP-first, idempotency, automation) | `AGENTS.md` throughout; details in `00-core-principles.mdc` |
+| Project Structure, Key Files | `AGENTS.md` → MVP canon table (`Docs/` vs `docs/`) |
+| Conventions (naming, UE 5.8 sources, PowerShell `;`) | `AGENTS.md` → Code style |
+| Onboarding Quick-Start (5 steps) | `AGENTS.md` → Dev environment setup (same 5 steps) |
 
-- Unreal Engine 5.8 (C++ game module + Blueprint for content)
-- Enhanced Input, PCG, Gameplay Abilities, Steam Sockets, Day Sequence
-- Python Editor scripting for automation (`Content/Python/`)
-- MCP bridge for Cursor-to-Editor live control (UnrealMCP plugin)
-- Git + LFS for version control (.uasset, .umap tracked via LFS)
+It also carried three references to files that do not exist, all of which would
+have sent an agent looking for a doc that is not in the repo:
+`docs/TASKLIST.md`, `docs/MCP_SETUP.md` (real path `docs/Setup/MCP_SETUP.md`),
+and `docs/PCG_BEST_PRACTICES.md` (real path `docs/PCG/PCG_BEST_PRACTICES.md`).
 
-## Key Principles
+It was also the wrong place for a product fact: the "8-12h campaign + endgame"
+target is signed MVP canon and belongs in `Docs/`, not in an agent rule.
 
-- **Programmatic by default**: Maximize C++ and Python; minimize Blueprint logic. Gameplay systems, movement, input, camera, combat, and **abilities** in C++; Blueprint for content and asset assignment only. For abilities: implement in C++ ability classes and reparent GA_* Blueprints to them (no Blueprint graph wiring by default)
-- **MCP-first**: When the Editor is running and MCP is connected, prefer live Editor manipulation via MCP tools
-- **Error recording**: Document errors in `docs/KNOWN_ERRORS.md` so they are not repeated; check it before similar work
-- **Full automation**: Automate all Editor/engine steps (Python scripts, MCP, GUI automation). If a step cannot be automated, log to docs/Automation/AUTOMATION_GAPS.md for a future session; do not document manual steps for the user. See 20-full-automation-no-manual-steps.mdc.
-- **Idempotent scripts**: All Python setup/automation scripts must check for existing assets/actors before creating new ones; re-runs must be safe and produce the same result (see `00-core-principles.mdc` Idempotency Protocol)
-- **Critical setup on load**: Enhanced Input is applied automatically when the Editor opens via `Content/Python/init_unreal.py`. Do not require users to run `setup_enhanced_input.py` for normal setup—only for troubleshooting if movement fails after load.
+## Do not
 
-## Project Structure
-
-- `Source/HomeWorld/` - C++ game module (character, game mode, components)
-- `Content/` - UE content (maps, Blueprints, assets, Python scripts)
-- `Config/` - DefaultEngine.ini, DefaultInput.ini, etc.
-- `Plugins/` - Local plugins (UnrealMCP; gitignored)
-- `.cursor/rules/` - Cursor AI rules (shipped with the repo)
-- `docs/` - Setup, conventions, task guides, known errors
-
-## Key Files
-
-- `HomeWorld.uproject` - Project descriptor (plugins, modules)
-- `AGENTS.md` - Top-level agent context
-- `docs/TASKLIST.md` - Master task list with links to detailed docs
-- `docs/SETUP.md` - Developer onboarding (Engine, plugins, MCP, rules, Git)
-- `docs/KNOWN_ERRORS.md` - Recorded errors and fixes
-- `docs/MCP_SETUP.md` - MCP bridge installation and troubleshooting
-- `docs/PCG_BEST_PRACTICES.md` - PCG minimal graph, automation and GUI automation; check before changing PCG graphs (see also `pcg-best-practices.mdc`). `docs/Automation/AUTOMATION_GAPS.md` - logged steps that need an automatic solution (no manual steps).
-
-## Conventions
-
-- C++ naming: PascalCase types, camelCase locals; Unreal prefixes (A, U, F, E, I)
-- UE 5.8 target: check `unreal-cpp.mdc` API pitfalls table before using deprecated APIs
-- **Unreal-related information:** Use **only UE 5.8–specific sources** (Epic 5.8 docs, docs/UE/UE58_TECH.md, docs/UE/UE58_EDITOR_UI.md when present, docs/KNOWN_ERRORS.md). Do not rely on training data or other engine versions. See **ue58-sources.mdc**.
-- PowerShell shell: use `;` not `&&` for command chaining
-- Batch files in project root for common operations (build, open VS, run scripts, MCP setup)
-- Debug logs go to `Saved/Logs/` (gitignored)
-
-## Onboarding Quick-Start
-
-1. Clone repo, open `HomeWorld.uproject`
-2. Run `Setup-MCP.bat` (one-time MCP bridge install)
-3. Run `.\Tools\Safe-Build.ps1` (compile C++ module + plugins; closes Editor if needed)
-4. Open Editor, restart Cursor, verify MCP green dot (port 55557)
-5. Follow `docs/TASKLIST.md` for current work
+Do not restore this card or create a replacement "project context" rule.
+`AGENTS.md` is the always-on surface. If project context is missing there, add
+it to `AGENTS.md`, not to a new always-apply rule.

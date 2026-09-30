@@ -1,91 +1,78 @@
 ---
 name: "Automation standards"
-description: "Standards for automation that drives or configures Editor/engine features (Python, MCP, commandlets)"
+description: "Standards for choosing and escalating automation tooling: docs-first, proven results, the gated redundancy ladder, and the Lead approval tokens that unlock third-party tools."
 alwaysApply: false
 globs: "**/Content/Python/**, **/Tools/**, **/.github/workflows/**"
 priority: 9
-version: 1.11
+version: 2.0
 ---
 
 # Automation Standards
 
-## Editor UI automation as default
+**Split in P4.** This file is the general tooling policy — what to reach for, in
+what order, and what needs Lead approval. Two things moved out:
 
-**Policy:** When we have the ability to interact with the Unreal Editor UI automatically (e.g. PyAutoGUI-based scripts in `Content/Python/gui_automation/`, ref-image clickers, capture-and-run flows), that is the **default method**. Prefer running or instructing the GUI automation script for the step; treat manual Editor steps only as **fallback** when GUI automation is unavailable (e.g. ref images not captured, script not runnable in the current environment) or has failed. Document and maintain ref images and scripts so GUI automation can be used by default where it exists. See [docs/GUI_AUTOMATION_WHY_AND_WHEN.md] (GUI_AUTOMATION_WHY_AND_WHEN.md — not in repo) and [docs/MANUAL_EDITOR_TUTORIAL.md] (MANUAL_EDITOR_TUTORIAL.md — not in repo).
+- the PA-E / MRQ / capture precondition rules are lookdev evidence policy and now
+  live in [`lookdev-evidence-standards.mdc`](lookdev-evidence-standards.mdc);
+- the "variables with no access" procedure now has a single canonical home in
+  [`19-automation-gaps.mdc`](19-automation-gaps.mdc). **Do not restate it here.**
 
-## Universal tooling practice (Lead lock-in, 2026-09-22)
+## Editor UI automation is the default
 
-Applies to **every** automation / tooling gap (any tool surface). Canonical detail: [docs/Automation/CAPTURE_REDUNDANCY.md](../../docs/Automation/CAPTURE_REDUNDANCY.md) (universal redundancy + practice doc; shotlist is one instance). Policy block: [docs/Automation/AUTOMATION_GAPS.md](../../docs/Automation/AUTOMATION_GAPS.md).
+When we can drive the Unreal Editor UI automatically, that is the **default
+method** — not a fallback. Prefer running the GUI automation script; treat
+manual Editor steps as fallback only when GUI automation is unavailable (ref
+images not captured, script not runnable here) or has failed.
 
-### Lead-correction → harness (habit, token-efficient)
+Maintain ref images and scripts so the default path stays available. Patterns:
+`docs/Automation/FULL_AUTOMATION_RESEARCH.md` §10.
 
-When Lead corrects a **proven** miss (DESKTOP evidence, false PASS/FAIL), fold it into the repo **immediately**: blocking gate, assert threshold, or one row in `PROVE_CRITERIA` — **not** a long runbook or rediscovering the same rule in chat. Prefer **compact hard rules** over verbose prose.
+## KNOWN_ERROR_LOG (Lead hard rule)
 
-### KNOWN_ERROR_LOG (Lead hard rule)
+Along-the-way logging is required, but **always-on it is one line: Cause → Avoid.**
+Detail belongs in [`docs/KNOWN_ERRORS.md`](../../docs/KNOWN_ERRORS.md), retrieved
+on failure. Never paste episode narratives into agent profile memory or into an
+always-apply rule. Cap new always-on gate additions; prefer a pointer to a
+KNOWN_ERRORS section anchor (e.g. § PA-E DESKTOP prove misses).
 
-**KNOWN_ERROR_LOG:** Along-the-way logging required. Always-on = one-line Cause→Avoid only. Detail lives in [docs/KNOWN_ERRORS.md](../../docs/KNOWN_ERRORS.md) (retrieve on failure). Never paste episode narratives into agent profile memory or alwaysApply rules. Cap new always-on gate additions; prefer pointers to KNOWN_ERRORS section anchors (e.g. § PA-E DESKTOP prove misses).
+## Fold corrections into the harness immediately
 
-### Testing preconditions (universal — before PASS/FAIL claims)
+When the Lead corrects a **proven** miss (DESKTOP evidence, false PASS/FAIL),
+fold it into the repo at once: a blocking gate, an assert threshold, or one row in
+`PROVE_CRITERIA`. Not a long runbook, and not rediscovering the same rule in
+chat next time. Prefer compact hard rules over verbose prose.
 
-Before trusting **any** automation pass/fail output, verify setup in order: **(1)** content in loaded level, **(2)** camera aimed at that content, **(3)** lighting / time-of-day / **preset tune** match intent (PA-E night: Phase 2 + `PRESET_Homestead_Night` — Phase 2 alone insufficient; do not switch to day for black stills) — **record** in reports, **(4)** capture or run harness then inspect output. Do not treat missing preconditions as a closed FAIL without this loop. Full table: CAPTURE_REDUNDANCY.md § Testing preconditions.
+## The ladder
 
-**PA-E capture (enforced in code):** **`conductor_mrq_capture_preflight()`** + **`reset_mrq_session_guards()`** before MRQ `main()`; Markers world + VNP reload. Then **`arrange_pa_e_shotlist()`** after `load_level` — **do not** start MRQ when `ready: false`. Reports: **`capture_outcome`** three-state; **`capture_pass`** ≠ visual PASS (luminance ≠ framing). Cause→Avoid: KNOWN_ERRORS § PA-E DESKTOP prove misses.
+Work down this list. Do not skip rungs because a rung is slow.
 
-**PA-E MRQ void sky:** `stack_ok` ≠ visible sky — need PIE **height fog** + atmo @ origin + warm-up ticks (`visible_sky_stack_ok`). Cause→Avoid: [KNOWN_ERRORS.md](../../docs/KNOWN_ERRORS.md) (PA-E MRQ PIE void black sky).
+1. **Docs-first** — read official Epic (or vendor) docs before inventing or
+   hardening console commands, Editor Python APIs, MCP usage, or commandlets,
+   unless the usage is already in repo policy. Match documented **parameter
+   order**, **context**, and **output paths**; do not infer syntax from a failed
+   prove.
+2. **Proven-results first** — prioritise docs plus proven community/industry
+   patterns for the same goal, before custom ladders, long waits, or novel
+   stacks.
+3. **Rung 1 — harden what exists** — UE/host built-ins and scripts already in the
+   repo. Re-try after engine or tool updates.
+4. **Research on dead-ends** — after rung-1 hardening fails *with evidence*, run
+   **one** proactive public research pass (forums, issues, known bugs) and log
+   it in the AUTOMATION_GAPS research log, *before* recommending escalation or
+   asking the Lead an open-ended question.
+5. **Rung 2 — third-party tools** — only after **`APPROVE TOOL SCOUT <name>`**.
+   No auto-install.
+6. **Rung 3 — net-new stacks** — only after **`APPROVE TOOL BUILD <name>`**. No
+   unprompted frameworks.
 
-### Docs-first
-
-- Read **official Epic (or vendor) docs** before inventing or hardening console commands, Editor Python APIs, MCP usage, commandlets, or similar — unless usage is already in repo policy or agent memory.
-- Match documented **parameter order**, **context**, and **output paths**; do not infer syntax only from failed DESKTOP proves.
-
-### Proven-results first
-
-- Before custom inventiveness (long waits, variant ladders, novel stacks): prioritize **docs** plus **proven community/industry patterns** that already work for the same goal.
-- Custom approaches only after those are checked and unfit, or Lead **`APPROVE TOOL SCOUT`** / **`APPROVE TOOL BUILD`**.
-
-### Research on dead-ends
-
-- After rung-1 hardening **fails with evidence**, run **one proactive public research pass** (forums, issues, known bugs); log in AUTOMATION_GAPS research log **before** recommending SCOUT/BUILD or asking Lead open-ended “does anyone else hit this?”
-
-### Gated redundancy ladder
-
-- **Rung 1:** UE/host built-ins and already-in-repo scripts (re-try after engine/tool updates).
-- **Rung 2:** Scout third-party tools only after **`APPROVE TOOL SCOUT <name>`** — **no auto-install**.
-- **Rung 3:** Net-new stacks only after **`APPROVE TOOL BUILD <name>`** — no unprompted frameworks.
-
-### Universal gap checklist (any automation — token-lean)
-
-1. **Docs-first** — vendor docs before new syntax/waits/stacks.
-2. **Proven-results** — adopt documented patterns before custom ladders.
-3. **Rung-1 harden** — MCP/Python/gui_automation/commandlets already in repo.
-4. **Dead-end research** — one public pass + AUTOMATION_GAPS research log before SCOUT/BUILD or Lead ping-pong.
-5. **Lead gates** — **`APPROVE TOOL SCOUT`** / **`APPROVE TOOL BUILD`** only; no auto-install.
-
-Capture/MRQ/HighResShot/NirCmd/OBS are **examples** of the ladder in [CAPTURE_REDUNDANCY.md](../../docs/Automation/CAPTURE_REDUNDANCY.md) § Shotlist instance — not the policy scope limit.
-
-### Harness Arrange (P3 — Editor prove scripts)
-
-Every Editor Python **prove/capture/evidence** script must call **`conductor_mrq_capture_preflight`** / **`conductor_night_evidence_preflight`** + **`arrange_pa_e_shotlist`** (or **`reset_mrq_session_guards`** on MRQ re-prove), **or** carry **Harness P3 exempt** in the module docstring and appear in [HARNESS_ARRANGE_TASKLIST.md](../../docs/Automation/HARNESS_ARRANGE_TASKLIST.md) P3 table.
-
-## Variables with no access (automation)
-
-When programming automation that drives or configures **Editor or engine features** (Python Editor scripts, MCP-driven workflows, commandlets, GUI automation), follow this procedure. The project is **fully autonomous**; do not document "manual steps" for the user. See **20-full-automation-no-manual-steps.mdc**.
-
-1. **Identify required variables/settings**  
-   Use **Epic Unreal Engine 5.8 documentation** (or version-explicit sources that match 5.8) to list every setting or variable necessary for the feature (e.g. "set in Details," "configure in the node," "assign in the panel"). Do not rely on training data or other engine versions. See **ue58-sources.mdc**.
-
-2. **Check access from our automation**  
-   For each required variable/setting, verify whether it can be **set (or read) reliably** from: MCP, Python Editor API, **GUI automation** (PyAutoGUI, screenshots, reference images — see `Content/Python/gui_automation/`, `docs/FULL_AUTOMATION_RESEARCH.md` §10), or C++ commandlets. Use API docs, introspection, and existing GUI automation patterns. "Reliably" includes correct property names, no protected/read-only members, and stable behavior across relevant minor engine versions.
-
-3. **When automation cannot set a required value**  
-   - **Try GUI automation** (Editor-driven: capture refs, PyAutoGUI, click/type) before concluding "no access."  
-   - **If still no access:** Do **not** document a manual step for the user. Instead, **log an entry to `docs/Automation/AUTOMATION_GAPS.md`** (date, feature/task, what is needed, why automation didn't cover it, suggested approach for future automation). Optionally record the variable/setting in a feature-specific doc (e.g. `docs/PCG_VARIABLES_NO_ACCESS.md`) for technical reference, but the resolution path is automation or log-gap, not "user must do X."
-
-4. **Re-check on engine/API upgrades**  
-   When upgrading the engine or a plugin (e.g. UE 5.7 → 5.8, or UnrealMCP update), re-run the access check for affected features and update AUTOMATION_GAPS and KNOWN_ERRORS so we do not assume old limitations remain or that previously working properties still exist.
-
-**Worked example:** PCG — use Python/MCP where possible; use GUI automation (e.g. `pcg_apply_manual_steps.py`, reference images) where the API does not expose a setting. If a step still cannot be automated, append to `docs/Automation/AUTOMATION_GAPS.md` with a suggested approach (e.g. new ref image, different UI flow) for a future session to implement.
+Capture/MRQ/HighResShot/NirCmd/OBS are **examples** of this ladder
+(`docs/Automation/CAPTURE_REDUNDANCY.md` § Shotlist instance), not the limit of
+its scope.
 
 ## Portable harness (DevHarness upstream)
 
-This rule is **HomeWorld-canonical** for UE Editor automation (GUI default, AUTOMATION_GAPS, PA-E). Stack-agnostic prove/capture habits: [docs/guides/automation-harness.md](../../docs/guides/automation-harness.md). Opt-in mirror: [.agents/skills-extras/automation-standards/SKILL.md](../../.agents/skills-extras/automation-standards/SKILL.md) (synced from DevEnvTemplate pin).
+This rule is **HomeWorld-canonical** for UE Editor automation. Stack-agnostic
+prove/capture habits: [`docs/guides/automation-harness.md`](../../docs/guides/automation-harness.md).
+Opt-in mirror:
+[`.agents/skills-extras/automation-standards/SKILL.md`](../../.agents/skills-extras/automation-standards/SKILL.md)
+(synced from the UserHarness pin).

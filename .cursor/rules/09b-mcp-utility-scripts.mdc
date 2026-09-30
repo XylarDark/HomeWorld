@@ -1,0 +1,62 @@
+---
+name: "MCP agent utility scripts"
+description: "Use when writing or running a Content/Python harness script that exchanges Saved/*_request.json and Saved/*_response.json with the agent. Defines the shared envelope and the existing script catalogue."
+alwaysApply: false
+globs: "**/Content/Python/**/mcp_*.py, **/Content/Python/**/pie_test_runner.py, **/Content/Python/**/*_inspector.py, **/Content/Python/**/capture_*.py, Saved/*_request.json, Saved/*_response.json"
+priority: 9
+version: 1.0
+---
+
+# MCP agent utility scripts
+
+**Split out of `09-mcp-workflow.mdc` in P4.** These scripts exist so that routine
+Editor questions do not need a one-off diagnostic script each time. Prefer
+extending one of these over writing a new throwaway.
+
+## Catalogue
+
+| Script | Purpose | How to use |
+|---|---|---|
+| `mcp_harness.py` | Structured command-response bridge | Write `Saved/mcp_request.json`, run via MCP, read `Saved/mcp_response.json` |
+| `pie_test_runner.py` | PIE validation (ground contact, character, animation, PCG) | Run via MCP, read `Saved/pie_test_results.json` |
+| `blueprint_inspector.py` | Reads Blueprint structure as JSON | Write `Saved/blueprint_inspect_request.json`, run via MCP, read `Saved/blueprint_inspect_result.json` |
+| `layout_blueprint_nodes.py` | Spaces Blueprint graph nodes in a grid | Write `Saved/layout_blueprint_request.json` as `{"path": "/Game/.../BP_Name"}`, run via MCP, read the `_result.json` |
+| `capture_viewport.py` | Screenshot capture | Run via MCP, read `Saved/screenshot_result.json` |
+
+`mcp_harness.py` commands: `ping`, `asset_exists`, `get_actors`, `world_info`,
+`pawn_info`, `blueprint_defaults`, `pie_status`, `start_pie`, `stop_pie`.
+
+## Required envelope
+
+Any script that exchanges structured data with the agent must use this shape, so
+tooling stays uniform and a caller can parse results without special-casing.
+
+**Request** — `Saved/<tool>_request.json`:
+
+```json
+{ "command": "<command_name>", "args": { } }
+```
+
+**Response** — `Saved/<tool>_response.json`:
+
+```json
+{ "ok": true, "command": "<command_name>", "result": { }, "error": null }
+```
+
+On failure, `ok` is `false` and `error` holds a human-readable message. Never
+write a result file on failure — a stale success file from a previous run is
+indistinguishable from a fresh one.
+
+## Rules for these scripts
+
+- **Idempotent** — check before create; a re-run must be a no-op, not a
+  duplicate. See `00-core-principles.mdc`.
+- **Reload siblings** — long-lived Editor sessions cache modules, so
+  orchestrators must `importlib.reload()` any sibling they import.
+- **Log to the Output Log** — `execute_python_script` output does not reach the
+  MCP response. If a result field is not enough to know what happened, log it.
+- **Delete one-offs when done** — a diagnostic written for one session is
+  removed at the end of that session, with any result JSON it wrote.
+
+Transport, capability surface, and crash-prevention rules:
+[`09-mcp-workflow.mdc`](09-mcp-workflow.mdc).

@@ -1,111 +1,70 @@
 ---
 name: "Testing Standards"
-description: "Follow test pyramid and AAA patterns when writing or updating tests to ensure coverage and reliability"
+description: "Use when writing or updating a test in this repo: the Python unittest suite, the PIE runner, or a C++ automation test. Covers what each layer is for and how to keep Editor tests from being flaky."
 alwaysApply: false
-globs: "**/tests/**, **/test_*.py, **/*.{test,spec}.{js,ts,py}, Content/Python/tests/**"
+globs: "**/tests/**, **/test_*.py, Content/Python/tests/**, Source/**/*.cpp, Source/**/*.h"
 priority: 4
-version: 1.0
+version: 2.0
 ---
 
 # Testing Standards
 
-## Testing Philosophy
+**Rewritten in P4.** The previous version was a generic JS/TS testing playbook —
+Vitest, Jest, Mocha, React Testing Library, jsdom, `npm install`, and a
+`package.json` test-script checklist. There is no JavaScript product surface in
+this repo, which is why ESLint and JS unit tests are listed as accepted declines
+in [`docs/Setup/DOCTOR_POLICY.md`](../../docs/Setup/DOCTOR_POLICY.md). It also
+told the agent to set up a test framework, when a working one is already wired.
 
-- Tests are documentation of expected behavior
-- Tests should be fast, isolated, and repeatable
-- Prefer many small tests over few large tests
-- Test behavior, not implementation
-- Aim for high coverage of critical paths (not necessarily 100%)
+The test surface in this repo is three layers. Match the test to the layer.
 
-## Test Pyramid
+| Layer | What it covers | How to run |
+|---|---|---|
+| **Python unit tests** | Pure logic: material rules, level-loader helpers, input assets, project setup | `Content/Python/tests/test_*.py`, auto-discovered by the `PythonAutomationTest` plugin — Editor → Tools → Test Automation |
+| **PIE validation** | Does it actually work in a running game: character spawn, ground contact, animation, PCG | `execute_python_script("pie_test_runner.py")` via MCP, then read `Saved/pie_test_results.json` |
+| **C++ automation** | Engine-side behaviour | `Source/HomeWorld/`, `Source/HomeWorldEditor/`; run under the Automation system |
 
-- **Unit Tests** (70%): Fast, isolated, test individual functions/classes
-- **Integration Tests** (20%): Test interactions between components
-- **E2E Tests** (10%): Test complete user workflows
+A logic bug is a unit-test failure. A "it compiles but nothing happens in PIE"
+bug is a PIE-runner result, not something a unit test can reach.
 
-## Test Structure (AAA Pattern)
+## Editor tests are flaky by nature
 
-```typescript
-test('should calculate total with tax', () => {
-  // Arrange: Set up test data
-  const items = [{ price: 10 }, { price: 20 }];
-  const taxRate = 0.1;
-  
-  // Act: Execute the code being tested
-  const total = calculateTotal(items, taxRate);
-  
-  // Assert: Verify the result
-  expect(total).toBe(33);
-});
-```
+Level load plus World Partition streaming makes Editor tests non-deterministic.
+The project already has the mitigations: a smart level loader and latent tests.
+See [`docs/Testing/LEVEL_TESTING_PLAN.md`](../../docs/Testing/LEVEL_TESTING_PLAN.md).
 
-## Test Naming
+- Do not "fix" a flaky Editor test by loosening the assertion. Find out what
+  state the test assumed and did not establish.
+- Assert on things you set up in the test, not on global Editor state left over
+  from the previous test.
+- Log the precondition you depend on. When a test fails only sometimes, the
+  missing log line is the bug.
 
-- Describe what is being tested: `should return error when email is invalid`
-- Use "should" or "when" to describe behavior
-- Be specific about the scenario
+## Writing a test
 
-## Test Coverage
+- **Name it for the behaviour:** `test_gives_nurtured_mesh_when_herb_is_gathered`
+  beats `test_gather_2`. The name is the documentation.
+- **Cover the error path, not just the happy one.** Most real bugs in this repo
+  are the missing property, the absent asset, the deferred `destroy_actor`.
+- **Cover the edges:** empty, missing, and boundary values.
+- **Clean up what you create** — an Editor test that leaves an actor behind
+  breaks the test after it. This is the same check-before-create rule as
+  `00-core-principles.mdc`, applied to teardown.
+- **Keep unit tests fast and pure.** If a test needs the Editor running, it
+  belongs in the PIE layer instead.
 
-- Test happy paths
-- Test error cases
-- Test edge cases (empty inputs, null values, boundary conditions)
-- Test concurrent access when applicable
+## Before claiming a fix works
 
-## Test Isolation
+A test that was never run proves nothing. Run the suite, and for anything
+touching the Editor or C++, run `.\Tools\Safe-Build.ps1` and a PIE pass — then
+quote the actual result. Unverified is not verified; see
+`verification-evidence` and [`docs/KNOWN_ERRORS.md`](../../docs/KNOWN_ERRORS.md)
+for the project's standard on evidence.
 
-- Each test should be independent
-- No shared state between tests
-- Clean up after each test
-- Use fixtures for test data
-- Mock external dependencies
+## Checklist
 
-## Test Performance
-
-- Unit tests: < 5 seconds total
-- Integration tests: < 60 seconds total
-- E2E tests: < 5 minutes total
-- Cancel tests that exceed timeouts
-
-## Testing Infrastructure Setup
-
-**When Adding Testing to a Project:**
-1. **Add Dependencies First:**
-   - Test framework (Vitest, Jest, Mocha, etc.)
-   - Test utilities (React Testing Library, Testing Library, etc.)
-   - Type definitions (@types packages)
-   - Coverage tools (if needed)
-   - Test environment setup (jsdom, etc.)
-
-2. **Create Configuration:**
-   - Test config file (vitest.config.ts, jest.config.js, etc.)
-   - Test setup file (test-utils/setup.ts)
-   - Test utilities (test-utils/index.tsx)
-
-3. **Add Test Scripts:**
-   - `test`: Run all tests
-   - `test:watch`: Watch mode
-   - `test:coverage`: Coverage report
-   - `test:ui`: UI mode (if supported)
-
-4. **Verify Setup:**
-   - Run `npm install` to install dependencies
-   - Create a simple test to verify setup works
-   - Run test suite to ensure no errors
-
-**Dependency Checklist:**
-- [ ] Test framework added to devDependencies
-- [ ] Test utilities added to devDependencies
-- [ ] Type definitions added to devDependencies
-- [ ] Test environment (jsdom) added if needed
-- [ ] Configuration files created
-- [ ] Test scripts added to package.json
-- [ ] Initial test passes
-
-## Testing Checklist
-
-- [ ] New features have tests
-- [ ] Tests are fast and isolated
-- [ ] Error cases are tested
-- [ ] Edge cases are covered
-- [ ] Tests are readable and maintainable
+- [ ] Test lives in the layer that can actually reach the behaviour
+- [ ] Name states the expected behaviour
+- [ ] Error and edge cases covered, not just the happy path
+- [ ] Cleans up everything it creates
+- [ ] Suite actually run, and the result quoted — not assumed

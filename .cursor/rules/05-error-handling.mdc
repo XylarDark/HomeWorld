@@ -43,11 +43,16 @@ Before writing or reviewing C++ that touches engine APIs, check for deprecated p
 - **Python `get_actor_bounds()`** returns an `(origin, extent)` tuple from `actor.get_actor_bounds(False)`. The old 4-arg form with out-parameters silently fails. See `12-python.mdc`.
 - **`FPaths::IsRelativePath`** was renamed to `FPaths::IsRelative` in UE 5.7.
 
-## MCP Input Validation
+## MCP input validation
 
-Before calling any MCP tool, validate the arguments to prevent Editor crashes:
+MCP tool arguments are an untrusted-input boundary, and two of them can take the
+whole Editor down rather than fail. **The canonical list of crash-prevention
+rules lives in [`09-mcp-workflow.mdc`](09-mcp-workflow.mdc) → Critical MCP safety
+rules** — it is not restated here, so that the two cannot drift.
 
-- **`blueprint_name`:** Must be a short name only (e.g. `BP_GameMode`). Never pass a full `/Game/...` asset path — the plugin prepends `/Game/Blueprints/` causing a double-slash fatal crash.
-- **`property_name`:** Inherited C++ UPROPERTY names may not resolve. If `set_blueprint_property` returns "Property not found", fall back to Python Editor scripts.
-- **`component_name`:** C++ constructor-created components (e.g. `CharacterMesh0`) are invisible to MCP. Use Python scripts instead.
-- **Always check `docs/KNOWN_ERRORS.md`** before using MCP tools on new Blueprint types.
+The short version: `blueprint_name` takes a short name only (a full `/Game/...`
+path produces `/Game/Blueprints//Game/...` and a fatal crash), and properties or
+components that come from a C++ parent or constructor are invisible to MCP — fall
+back to a Python Editor script. Check
+[`docs/KNOWN_ERRORS.md`](../../docs/KNOWN_ERRORS.md) before using MCP against a
+new Blueprint type.

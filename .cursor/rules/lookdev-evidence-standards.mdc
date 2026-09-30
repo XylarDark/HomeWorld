@@ -1,0 +1,62 @@
+---
+name: "Lookdev evidence standards"
+description: "Use when writing or running an Editor prove/capture/evidence script (PA-E, MRQ, night shots): preflight calls, shotlist gating, three-state capture_outcome, and the testing preconditions before any PASS/FAIL claim."
+alwaysApply: false
+globs: "**/Content/Python/**/*capture*.py, **/Content/Python/**/*mrq*.py, **/Content/Python/**/*prove*.py, Lib/**, swarm/**, Maps/Preview_*/**"
+priority: 9
+version: 1.0
+---
+
+# Lookdev evidence standards
+
+**Split out of `automation-standards.mdc` in P4.** These rules are about
+*evidence* — producing a screenshot or render that a human can judge, and not
+claiming it passes. They are not general tooling policy; see
+[`automation-standards.mdc`](automation-standards.mdc) for that.
+
+Universal principle, applying to every tool surface: redundancy first, custom
+tooling last. Canonical detail:
+[`docs/Automation/CAPTURE_REDUNDANCY.md`](../../docs/Automation/CAPTURE_REDUNDANCY.md).
+
+## Testing preconditions — before any PASS/FAIL claim
+
+Before trusting **any** automation pass/fail output, verify setup in order:
+
+1. Content is in the loaded level
+2. Camera is aimed at that content
+3. Lighting / time-of-day / **preset tune** match intent — for PA-E night,
+   Phase 2 *and* `PRESET_Homestead_Night`; **Phase 2 alone is insufficient, and
+   do not switch to day for a black still**
+4. Capture or run the harness, then inspect the output
+
+**Record** which preconditions held. Do not treat missing preconditions as a
+closed FAIL without running this loop. Full table: `CAPTURE_REDUNDANCY.md`
+§ Testing preconditions.
+
+## PA-E capture (enforced in code)
+
+- `conductor_mrq_capture_preflight()` + `reset_mrq_session_guards()` **before**
+  MRQ `main()`; Markers world + VNP reload.
+- `arrange_pa_e_shotlist()` **after** `load_level` — do **not** start MRQ when
+  `ready: false`.
+- Reports use **`capture_outcome`** as a three-state value.
+- **`capture_pass` ≠ visual PASS** — luminance is not framing.
+- Cause→Avoid: `docs/KNOWN_ERRORS.md` § PA-E DESKTOP prove misses.
+
+## PA-E MRQ void sky
+
+`stack_ok` ≠ visible sky. A black frame needs PIE **height fog** plus atmosphere
+at the origin plus warm-up ticks — the check is `visible_sky_stack_ok`. Cause→Avoid:
+[`docs/KNOWN_ERRORS.md`](../../docs/KNOWN_ERRORS.md) (PA-E MRQ PIE void black sky).
+
+## Harness Arrange
+
+Every Editor Python **prove / capture / evidence** script must call
+`conductor_mrq_capture_preflight` / `conductor_night_evidence_preflight` +
+`arrange_pa_e_shotlist` (or `reset_mrq_session_guards` on an MRQ re-prove), **or**
+carry `Harness P3 exempt` in the module docstring **and** appear in
+[`HARNESS_ARRANGE_TASKLIST.md`](../../docs/Automation/HARNESS_ARRANGE_TASKLIST.md)
+P3 table.
+
+The exemption is the only escape hatch, and it has to be visible in two places,
+so that "I could not call the preflight" cannot quietly become the norm.

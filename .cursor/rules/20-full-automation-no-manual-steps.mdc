@@ -1,57 +1,94 @@
 ---
 name: "Full automation — no manual steps"
-description: "Automation runs fully autonomously; do not create or rely on manual steps. Log automation gaps to a file for future solution sessions."
-alwaysApply: true
+description: "Use when writing, running, or reviewing any automation: do not emit manual steps for the user, and log anything not automatable to docs/Automation/AUTOMATION_GAPS.md."
+alwaysApply: false
+globs: "**/Content/Python/**, **/Tools/**, **/.github/workflows/**, docs/Automation/**, .cursor/skills/**"
 priority: 1
-version: 1.0
+version: 2.0
 ---
 
 # Full automation — no manual steps
 
-The project is set up for **fully autonomous** automation. The agent does not assume the user can or will perform manual work during or between sessions. There is no ability to "go in the middle of a session and perform manual work"; the agent must automate or log gaps.
+**This rule was `alwaysApply: true` until P4.** The invariant it carries is
+stated in `AGENTS.md` (Full automation), which remains the always-on surface.
+This file is the detail: *how* to log a gap, and which host may run what.
+
+The project is set up for **fully autonomous** automation. Do not assume the
+user can or will perform manual work during or between sessions. There is no
+"go in the middle of a session and click this" step; automate it or log the gap.
 
 ## Policy
 
-1. **Do not create or document "manual steps" for the user.** Do not output "Your step:", "Manual: do X", or task-guide instructions that require the user to perform Editor or CLI actions. The automation loop runs without human intervention.
+1. **Do not create or document manual steps for the user.** No "Your step:",
+   no "Manual: do X", no task-guide instructions requiring the user to perform
+   Editor or CLI actions. The automation loop runs without human intervention.
 
 2. **Automation order.** For any Editor or engine task, use in order:
-   - **MCP** (when Editor is running and connected)
-   - **Python Editor scripts** (Content/Python, run via MCP or commandlet)
-   - **GUI automation** (Editor-driven: PyAutoGUI, screenshots, reference images, click/key sequences) — see `Content/Python/gui_automation/`, `docs/FULL_AUTOMATION_RESEARCH.md` §10
-   - **C++ commandlets** where they can set the required state
-   If none of these can accomplish the task, do **not** fall back to "document the manual step." Instead, log the gap (see below).
+   - **MCP** — when the Editor is running and connected
+   - **Python Editor scripts** — `Content/Python/`, via MCP or commandlet
+   - **GUI automation** — Editor-driven (PyAutoGUI, screenshots, reference
+     images, click/key sequences). See `docs/Automation/FULL_AUTOMATION_RESEARCH.md` §10
+   - **C++ commandlets** — where they can set the required state
 
-3. **When something cannot be automated:** Log it to **`docs/Automation/AUTOMATION_GAPS.md`** with enough context for a **future chat session** to design and implement an automatic solution. The user will start dedicated sessions to address entries in that file. Do not leave the resolution as "the user must do X."
+   If none can accomplish the task, **do not** fall back to "document the manual
+   step." Log the gap instead.
 
-4. **Session output.** Do not end a task or session with instructions for the user to perform manual work. If a step could not be automated, append an entry to `docs/Automation/AUTOMATION_GAPS.md`, set the task/day to **blocked** (or skip with reason), and in session summary state that the gap was logged for a future automation pass.
+3. **When something cannot be automated**, log it to
+   **`docs/Automation/AUTOMATION_GAPS.md`** with enough context for a *future*
+   session to design and implement an automatic solution. Never leave the
+   resolution as "the user must do X."
 
+4. **Session output.** Do not end a task or session with instructions for the
+   user to perform manual work. If a step could not be automated: append the gap
+   entry, mark the task/day **blocked** (or skip with a reason), and state in the
+   session summary that the gap was logged for a future automation pass.
+
+Note: the `Content/Python/gui_automation/` directory cited by earlier revisions
+of this rule was **removed WAVE F** and does not exist. Do not cite it. Live
+GUI-automation and introspection scripts live directly in `Content/Python/`.
 
 ## Host gate (cite, do not fork)
 
-Autonomy is **not** a license to run Editor/MCP/GUI on the wrong host.
-Follow [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md) §14 host-tool table and §16 DESKTOP parent-only:
+Autonomy is **not** a licence to run Editor/MCP/GUI on the wrong host. Follow
+[swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md) §14 host-tool table and §16
+DESKTOP parent-only:
 
-- DESKTOP Shell / MCP 55557 / PIE / Editor Python / PyAutoGUI → Conductor **parent** on **DESKTOP-21CT3H0** only.
-- Cloud / Task executor → do **not** invent DESKTOP trials. Log the gap or hand off to Conductor parent. Contents API is file+PR degrade only.
-- New MCP / host daemon / marketplace plugin → stop for Lead `APPROVE TOOL SCOUT/BUILD`.
+- DESKTOP Shell / MCP 55557 / PIE / Editor Python / PyAutoGUI → Conductor
+  **parent** on **DESKTOP-21CT3H0** only.
+- Cloud / task executor → do **not** invent DESKTOP trials. Log the gap or hand
+  off to the Conductor parent. Contents API is file+PR degrade only.
+- New MCP / host daemon / marketplace plugin → stop for Lead
+  `APPROVE TOOL SCOUT` / `APPROVE TOOL BUILD`.
 
-“No manual steps for the user” still holds. Wrong-host automation is an illegal trial, not a required next step.
+"No manual steps for the user" still holds. A wrong-host trial is an illegal
+step, not a required next step.
 
 ## Logging automation gaps
 
-**File:** `docs/Automation/AUTOMATION_GAPS.md`
+**File:** [`docs/Automation/AUTOMATION_GAPS.md`](../../docs/Automation/AUTOMATION_GAPS.md)
+— append; do not remove original entries.
 
-**Per entry, include:**
-- **Date** (YYYY-MM-DD)
-- **Feature / task** (e.g. "Day 11 – Place Mass Spawner on DemoMap", "PCG – assign graph in Details")
-- **What is needed** (one sentence: what would need to happen for the feature to be complete)
-- **Why current automation didn't cover it** (e.g. "No MCP/Python API for adding Mass Spawner to level", "Selector in UI not scriptable")
-- **Suggested approach for future automation** (e.g. "GUI automation: capture ref image for Modes panel, then PyAutoGUI to click Mass Spawner and set config", "Research UE 5.8 Mass Spawner Python API")
+Per entry include:
 
-Append new entries; do not remove original gap entries. **When a gap is addressed** (automation solution implemented and verified), **note it in docs/Automation/AUTOMATION_GAPS.md** (e.g. Research log or Addressed subsection: date, gap id, how addressed, link). Adding the resolution keeps the file as the single record of both open and closed gaps.
+| Field | Example |
+|---|---|
+| **Date** | `2026-09-30` |
+| **Feature / task** | "PCG — assign graph in Details panel" |
+| **What is needed** | one sentence: what must happen for the feature to be complete |
+| **Why automation didn't cover it** | "No MCP/Python API for adding Mass Spawner to level"; "selector in UI not scriptable" |
+| **Suggested approach** | "GUI automation: capture ref image for Modes panel, then PyAutoGUI"; "Research UE 5.8 Mass Spawner Python API" |
+
+**When a gap is addressed** (solution implemented and verified), note it in the
+same file — Research log or Addressed subsection: date, gap id, how it was
+addressed, and a link. That keeps one record of both open and closed gaps.
 
 ## References
 
-- GUI automation: `Content/Python/gui_automation/`, `docs/FULL_AUTOMATION_RESEARCH.md` (Editor-driven GUI automation)
-- Variables with no API access: `automation-standards.mdc` (now: attempt GUI automation; if still not possible, log to AUTOMATION_GAPS.md)
-- Cycle/blocked: `19-automation-cycle.mdc` (blocked_reason; do not suggest "manual step X")
+- Gap **procedure** (identify required setting → check access from MCP / Python
+  / GUI / commandlet → log if none works → re-check on engine upgrade):
+  [`19-automation-gaps.mdc`](19-automation-gaps.mdc). This rule owns the log
+  *format*; that rule owns the *procedure*. Do not restate the procedure here.
+- GUI automation patterns: `docs/Automation/FULL_AUTOMATION_RESEARCH.md` §10
+- Tooling ladder and Lead gates: [`automation-standards.mdc`](automation-standards.mdc)
+- Host legality: [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md) §14 / §16
+- WAVE F cycle quarantine: [`19-automation-cycle.mdc`](19-automation-cycle.mdc)

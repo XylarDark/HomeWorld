@@ -1,116 +1,105 @@
 ---
 name: "MCP-First Workflow"
-description: "Use MCP first, then Python/GUI automation; never document manual steps for the user. Log automation gaps to docs/Automation/AUTOMATION_GAPS.md."
+description: "Use when driving the Unreal Editor via MCP: prefer MCP over scripting, execute_python_script semantics, and the crash-prevention rules for blueprint_name and inherited properties."
 alwaysApply: false
-globs: "**/Content/Python/**, **/*.uproject, **/Tools/**"
+globs: "**/*.uproject, **/Tools/**, .cursor/mcp.json"
 priority: 10
-version: 1.1
+version: 2.0
 ---
 
 # MCP-First Workflow
 
+**Split in P4.** This file is the MCP transport, capability surface, and safety
+rules. The reusable agent utility scripts and their request/response envelope
+moved to [`09b-mcp-utility-scripts.mdc`](09b-mcp-utility-scripts.mdc) — load that
+when writing or reading a `Saved/*_request.json` harness script.
+
 ## When MCP tools are available
 
-When the Unreal Editor is running and MCP tools (unrealMCP) are connected:
+When the Editor is running and `unrealMCP` is connected:
 
-1. **Use MCP tools first** for any Editor task — spawning actors, setting properties, creating assets, configuring Blueprints, manipulating the level, reading Editor state.
-2. **Save reusable operations** as Python scripts in `Content/Python/` alongside MCP usage, so the same work can be re-run without MCP.
-3. **Verify changes** by querying Editor state after each MCP action (e.g. list actors, get property values) rather than assuming success.
-
-## Prioritization order
-
-| Priority | Method | When to use |
-|----------|--------|-------------|
-| 1 | MCP tools (live Editor) | Any Editor manipulation when connected |
-| 2 | Python Editor scripts | Batch/repeatable operations; offline-capable workflows |
-| 3 | GUI automation (PyAutoGUI, ref images, screenshots) | Editor-driven automation when MCP/Python have no API (see Content/Python/gui_automation, docs/FULL_AUTOMATION_RESEARCH.md §10) |
-| 4 | Log to docs/Automation/AUTOMATION_GAPS.md | When no automation (MCP, Python, GUI) can accomplish the task; do not output "manual steps" for the user (see 20-full-automation-no-manual-steps.mdc) |
+1. **Use MCP tools first** for any Editor task — spawning actors, setting
+   properties, creating assets, configuring Blueprints, manipulating the level,
+   reading Editor state.
+2. **Save reusable operations** as Python scripts in `Content/Python/` alongside
+   MCP usage, so the same work can be re-run without MCP.
+3. **Verify** by querying Editor state after each MCP action (list actors, get
+   property values) rather than assuming success.
 
 ## When MCP is unavailable
 
-If MCP tools are not listed or connection fails (Editor closed, plugin not loaded):
-- Fall back to Python Editor scripts or GUI automation (if Editor can be driven another way). Do not produce "manual step-by-step instructions" for the user.
-- If a step cannot be automated, log it to docs/Automation/AUTOMATION_GAPS.md and set task/day to blocked. See 20-full-automation-no-manual-steps.mdc.
+If the tools are not listed or the connection fails (Editor closed, plugin not
+loaded): fall back to Python Editor scripts or GUI automation. Do not produce
+manual step-by-step instructions for the user — see
+[`20-full-automation-no-manual-steps.mdc`](20-full-automation-no-manual-steps.mdc).
+If no automation can accomplish the step, log it to `docs/Automation/AUTOMATION_GAPS.md`
+and mark the task blocked.
 
-## Editor startup scripts
+## Connection details
 
-**`Content/Python/init_unreal.py`** runs automatically when the Unreal Editor loads. It applies Enhanced Input setup (IA_Move, IA_Look, IMC_Default, etc.) so movement works in PIE without a manual script run.
+- **Plugin:** UnrealMCP — TCP server on port **55557**, auto-starts with the Editor
+- **Config:** `.cursor/mcp.json` in the workspace root
+- **Setup and troubleshooting:** [docs/Setup/MCP_SETUP.md](../../docs/Setup/MCP_SETUP.md)
 
-- **Do not** instruct users or document "run setup_enhanced_input.py" as a normal first step after opening the project. Enhanced Input is already applied on load.
-- **Do** suggest running `setup_enhanced_input.py` only when **troubleshooting** (e.g. movement still broken after opening the Editor, or Python startup was disabled).
-- When adding other critical setup that must exist for core gameplay, consider invoking it from `init_unreal.py` and keep that file minimal and idempotent.
+## Capability surface
 
-## MCP connection details
+**Can do:** actor CRUD, Blueprint creation and component setup, Blueprint node
+graph wiring, viewport control, property get/set, project settings, level
+manipulation, **Python script execution** (`execute_python_script`), **console
+commands** (`execute_console_command`).
 
-- **Plugin:** UnrealMCP (TCP server on port 55557, auto-starts with Editor)
-- **Python server:** `C:\tools\unreal-mcp\Python\unreal_mcp_server.py` (launched by Cursor via `uv run`)
-- **Config:** `.cursor/mcp.json` in workspace root
-- **Docs:** `docs/MCP_SETUP.md`
-
-## What MCP can and cannot do
-
-**Can do:** Actor CRUD, Blueprint creation and component setup, Blueprint node graph wiring, viewport control, property get/set, project settings, level manipulation, **Python script execution** (`execute_python_script`), **console commands** (`execute_console_command`).
-
-**Cannot do:** Animation Blueprint state machine editing (AnimGraph visual graph API is not exposed).
+**Cannot do:** Animation Blueprint state machine editing — the AnimGraph visual
+graph API is not exposed.
 
 ## Executing Python scripts via MCP
 
-Use `execute_python_script` to run any Python Editor script directly from Cursor:
+`execute_python_script` replaces "Tools > Execute Python Script" for all
+automated scripts.
 
-- **Relative paths** are resolved against `Content/Python/` (e.g. `setup_enhanced_input.py`).
-- **Absolute paths** work as-is (e.g. `C:/dev/HomeWorld/Content/Python/create_demo_from_scratch.py`).
-- Script output goes to the Editor's **Output Log**, not the MCP response.
+- **Relative paths** resolve against `Content/Python/` (e.g. `pie_test_runner.py`).
+- **Absolute paths** work as-is.
+- Script output goes to the Editor's **Output Log**, not the MCP response — so a
+  silent script is a logging bug, not a transport bug. See
+  [`16-feature-debug-instrumentation.mdc`](16-feature-debug-instrumentation.mdc).
 - The script runs with full access to the `unreal` Python module.
 
-This replaces the manual "Tools > Execute Python Script" step for all automated scripts.
+Two requirements on anything run this way:
 
-**Module caching caveat:** The Editor Python session caches imported modules. If you edit a script that is imported by another (e.g. `create_pcg_forest.py` imported by `create_demo_from_scratch.py`), the changes won't take effect until the importing script calls `importlib.reload()`. All orchestrator scripts in this project already do this.
-
-**Idempotency requirement:** Scripts executed via MCP must be safe to re-run. Check for existing assets/actors before creating. See `00-core-principles.mdc` (Idempotency Protocol).
-
-**Cleanup requirement:** One-off diagnostic scripts (created to inspect state, fix a specific issue, or gather data for a single session) must be deleted before the task ends. Only keep scripts that are reusable and referenced by orchestrators like `bootstrap_project.py`. Result JSON files written to the project root by these scripts must also be deleted. See `07-ai-agent-behavior.mdc` (Session Cleanup).
-
-## Agent utility scripts
-
-These reusable scripts eliminate the need for one-off diagnostic scripts:
-
-| Script | Purpose | How to use |
-|--------|---------|------------|
-| `mcp_harness.py` | Structured command-response bridge | Write `Saved/mcp_request.json`, run via MCP, read `Saved/mcp_response.json` |
-| `pie_test_runner.py` | PIE validation checks (ground, character, PCG) | Run via MCP, read `Saved/pie_test_results.json` |
-| `blueprint_inspector.py` | Read Blueprint structure as JSON | Write `Saved/blueprint_inspect_request.json`, run via MCP, read `Saved/blueprint_inspect_result.json` |
-| `layout_blueprint_nodes.py` | Space Blueprint graph nodes in a grid | Optional: write `Saved/layout_blueprint_request.json` with `{"path": "/Game/.../BP_Name"}`, run via MCP, read `Saved/layout_blueprint_result.json` |
-| `capture_viewport.py` | Screenshot capture | Run via MCP, read `Saved/screenshot_result.json` |
-
-**MCP harness commands:** `ping`, `asset_exists`, `get_actors`, `world_info`, `pawn_info`, `blueprint_defaults`, `pie_status`, `start_pie`, `stop_pie`.
-
-### Harness request/response schema
-
-All agent utility scripts that exchange data with the agent must follow this envelope so tooling stays consistent:
-
-**Request** (`Saved/<tool>_request.json`):
-```json
-{ "command": "<command_name>", "args": { ... } }
-```
-
-**Response** (`Saved/<tool>_response.json`):
-```json
-{ "ok": true, "command": "<command_name>", "result": { ... }, "error": null }
-```
-
-On failure, `ok` is `false` and `error` contains a human-readable message. New utility scripts must follow this format.
-
-## C++ build from agent
-
-The agent can trigger C++ builds via Shell: **`.\Tools\Safe-Build.ps1`** (not `Build-HomeWorld.bat` directly). Monitor `Build-HomeWorld.log` for completion (look for "Exit code:" at the end). The build must be run when PIE is not active. See [docs/Setup/BUILD_POLICY.md](../../docs/Setup/BUILD_POLICY.md).
-
-## Automated tests
-
-The `PythonAutomationTest` plugin is enabled. Test files in `Content/Python/tests/` (named `test_*.py`) are auto-discovered by the Editor's Test Automation window. Run from Editor (Tools > Test Automation) or command line.
+- **Module caching.** The Editor Python session caches imported modules. If a
+  script is imported by another (`create_pcg_forest.py` imported by
+  `create_demo_from_scratch.py`), edits do not take effect until the importer
+  calls `importlib.reload()`. All orchestrators in this project already do.
+- **Idempotency.** Must be safe to re-run — check for existing assets/actors
+  before creating. See `00-core-principles.mdc`.
+- **Cleanup.** One-off diagnostic scripts (written to inspect state, fix one
+  issue, gather data for a single session) must be deleted before the task ends,
+  along with any result JSON they wrote to the project root. Keep only scripts
+  that are reusable and referenced by orchestrators like `bootstrap_project.py`.
 
 ## Critical MCP safety rules (prevent Editor crashes)
 
-1. **Never pass full asset paths as `blueprint_name`** — `FindBlueprintByName` prepends `/Game/Blueprints/`, so passing `/Game/Foo/BP_Bar` creates the invalid path `/Game/Blueprints//Game/Foo/BP_Bar` which **crashes the Editor**. Always pass only the short name (e.g. `BP_GameMode`).
-2. **Inherited C++ properties are invisible** — `set_blueprint_property` cannot find `UPROPERTY` members inherited from C++ parent classes. Use Python Editor scripts for those.
-3. **Inherited C++ components are invisible** — `set_component_property` cannot find components created in the C++ constructor (e.g. `CharacterMesh0`). Use Python Editor scripts.
-4. **Blueprint search is path-limited** — If a Blueprint is stored outside `/Game/Blueprints/`, MCP may not find it by short name. Verify with `find_actors_by_name` first; fall back to Python scripts if not found.
+1. **Never pass a full asset path as `blueprint_name`.** `FindBlueprintByName`
+   prepends `/Game/Blueprints/`, so `/Game/Foo/BP_Bar` becomes
+   `/Game/Blueprints//Game/Foo/BP_Bar` and **crashes the Editor**. Pass only the
+   short name (e.g. `BP_GameMode`).
+2. **Inherited C++ properties are invisible.** `set_blueprint_property` cannot
+   find `UPROPERTY` members inherited from a C++ parent. Use a Python Editor script.
+3. **Inherited C++ components are invisible.** `set_component_property` cannot
+   find components created in a C++ constructor (e.g. `CharacterMesh0`). Use a
+   Python Editor script.
+4. **Blueprint search is path-limited.** A Blueprint stored outside
+   `/Game/Blueprints/` may not be found by short name. Verify with
+   `find_actors_by_name` first, then fall back to Python.
+
+Always check [`docs/KNOWN_ERRORS.md`](../../docs/KNOWN_ERRORS.md) before using
+MCP tools against a new Blueprint type.
+
+## Build and test entry points
+
+- **C++ build:** `.\Tools\Safe-Build.ps1` — never `Build-HomeWorld.bat` directly.
+  Monitor `Build-HomeWorld.log` for "Exit code:". Do not build while PIE is
+  active. See [docs/Setup/BUILD_POLICY.md](../../docs/Setup/BUILD_POLICY.md).
+- **Tests:** the `PythonAutomationTest` plugin auto-discovers
+  `Content/Python/tests/test_*.py` via Editor → Tools → Test Automation.
+  PIE validation: run `pie_test_runner.py` via MCP, read
+  `Saved/pie_test_results.json`.
