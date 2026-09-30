@@ -1,6 +1,6 @@
 # Milady Character Import Pipeline – One-Time Setup
 
-One-time setup for the Milady chibi protagonist import pipeline. For the full task roadmap see [MILADY_IMPORT_ROADMAP.md](tasks/MILADY_IMPORT_ROADMAP.md).
+One-time setup for the Milady chibi protagonist import pipeline. For the full task roadmap see [MILADY_IMPORT_ROADMAP.md](../TaskLists/TaskSpecs/MILADY_IMPORT_ROADMAP.md).
 
 ---
 
@@ -25,7 +25,7 @@ One-time setup for the Milady chibi protagonist import pipeline. For the full ta
 
 ## API keys
 
-- **Meshy:** Set in Editor (plugin settings) or via environment variable. Do not commit keys; document in `.env.example` with a placeholder (e.g. `MESHY_API_KEY=`). See [02-security.mdc](.cursor/rules/02-security.mdc).
+- **Meshy:** Set in Editor (plugin settings) or via environment variable. Do not commit keys; document in `.env.example` with a placeholder (e.g. `MESHY_API_KEY=`). See [secure-coding](../../.agents/skills/secure-coding/SKILL.md).
 - **Ethereum RPC (optional):** For NFT verification, use Infura/Alchemy mainnet URL. Store in config (e.g. `DefaultGame.ini` section or Blueprint) or env; never commit secrets.
 
 ---
@@ -37,7 +37,7 @@ After setup, ensure Milady content folders exist. Run from Editor:
 - **Tools → Execute Python Script** → `Content/Python/ensure_milady_folders.py`  
   or run via MCP: `execute_python_script("ensure_milady_folders.py")`.
 
-Paths created (per [CONTENT_LAYOUT.md](CONTENT_LAYOUT.md)):
+Paths created (per [CONTENT_LAYOUT.md](../CONTENT_LAYOUT.md)):
 
 - `/Game/HomeWorld/Milady/Meshes`
 - `/Game/HomeWorld/Milady/Materials`
@@ -50,7 +50,7 @@ Generated imports (e.g. from Meshy) can go under `Milady/Generated` or `Milady/M
 
 ## Known issues and plugin order
 
-- **VRM4U:** If import fails on a given GLB/VRM, check plugin’s issue tracker for UE 5.7-specific fixes. Document any “variables with no access” (import options automation cannot set) in `docs/MILADY_VARIABLES_NO_ACCESS.md` or [KNOWN_ERRORS.md](KNOWN_ERRORS.md) per [automation-standards.mdc](.cursor/rules/automation-standards.mdc).
+- **VRM4U:** If import fails on a given GLB/VRM, check plugin’s issue tracker for UE 5.7-specific fixes. Document any “variables with no access” (import options automation cannot set) in `docs/MILADY_VARIABLES_NO_ACCESS.md` or [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) per [automation-standards.mdc](.cursor/rules/automation-standards.mdc).
 - **Meshy:** Confirm plugin supports “image to 3D” with GLB/VRM output. Async job completion and download path may require project-specific wiring.
 - **Web3:** Read-only contract calls (`balanceOf`, `tokenURI`) do not require a private key; wallet connect is for address only.
 
@@ -64,4 +64,4 @@ Generated imports (e.g. from Meshy) can go under `Milady/Generated` or `Milady/M
 
 ---
 
-**See also:** [SETUP.md](SETUP.md), [CONTENT_LAYOUT.md](CONTENT_LAYOUT.md), [MILADY_IMPORT_ROADMAP.md](tasks/MILADY_IMPORT_ROADMAP.md).
+**See also:** [SETUP.md](../SETUP.md), [CONTENT_LAYOUT.md](../CONTENT_LAYOUT.md), [MILADY_IMPORT_ROADMAP.md](../TaskLists/TaskSpecs/MILADY_IMPORT_ROADMAP.md).

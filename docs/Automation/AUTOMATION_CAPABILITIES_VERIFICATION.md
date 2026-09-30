@@ -22,7 +22,7 @@
 | **RunAutomationLoop.ps1** | Yes | Watch, Start-AutomationSession | Reads NEXT_SESSION_PROMPT.md; after exit 0 runs Safe-Build if C++/Build.cs changed; uses Test-HasPendingTasks on CURRENT_TASK_LIST.md to continue; checks stop sentinel (Saved/Logs/agent_stop_requested) at round start. |
 | **Guard-AutomationLoop.ps1** | Yes | Watch (when loop detected) | Reads automation_errors.log, automation_loop.log, watcher.log, **editor_output_full.txt**; writes automation_loop_breaker_report.md. |
 | **Run-RefinerAgent.ps1** | Yes | User / AGENTS.md / Refiner role | Reads agent_run_history.ndjson, automation_errors.log, Guardian report; suggests Gap-Solver when gaps mentioned. |
-| **Run-GapSolverAgent.ps1** | Yes | User / AGENTS.md / Refiner prompt | Implements solutions for docs/AUTOMATION_GAPS.md; referenced in Refiner prompt and automation-gap-solutions skill. |
+| **Run-GapSolverAgent.ps1** | Yes | User / AGENTS.md / Refiner prompt | Implements solutions for docs/Automation/AUTOMATION_GAPS.md; referenced in Refiner prompt and automation-gap-solutions skill. |
 | **Safe-Build.ps1** | Yes | RunAutomationLoop | Close Editor, build, retry once on Editor-related failure; -LaunchEditorAfter for post-build relaunch. |
 | **Start-AutomationSession.ps1** | Yes | User / Start-AllAgents | Installs CLI if needed, then RunAutomationLoop. |
 

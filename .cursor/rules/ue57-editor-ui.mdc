@@ -1,6 +1,6 @@
 ---
-name: "UE 5.7 Editor UI — Epic docs only"
-description: "When giving Unreal Editor UI instructions, use only Epic's UE 5.7 documentation; cite the doc URL"
+name: "UE 5.7 Editor UI — Epic docs only (HISTORICAL)"
+description: "HISTORICAL: HomeWorld targets UE 5.8. Use ue58-editor-ui.mdc. This rule only applies to editing docs/UE/UE57_*.md."
 alwaysApply: false
 globs: "docs/UE/UE57_*.md"
 priority: 7
@@ -23,7 +23,7 @@ This rule is the **Editor UI** part of the broader UE 5.7 sourcing policy. See *
 
 ## Where to document verified UI steps
 
-- **Project doc:** [docs/UE57_EDITOR_UI.md](../docs/UE57_EDITOR_UI.md) — UE 5.7–sourced Editor UI procedures (Content Browser, Show Engine Content, basic shapes, etc.). Update this when we confirm steps against Epic 5.7 docs or user feedback.
+- **Project doc:** [docs/UE/UE57_EDITOR_UI.md](../../docs/UE/UE57_EDITOR_UI.md) — UE 5.7–sourced Editor UI procedures (Content Browser, Show Engine Content, basic shapes, etc.). Update this when we confirm steps against Epic 5.7 docs or user feedback.
 - Task docs (e.g. `docs/TaskLists/TaskSpecs/DAY11_FAMILY_SPAWN.md`) should link to UE57_EDITOR_UI.md for Editor UI sequences rather than inlining possibly outdated steps.
 
 ## Quick reference (Epic 5.7)

@@ -1,6 +1,6 @@
 ﻿# Exclude from Cursor agent indexing (context/search).
 # Reduces noise and avoids sensitive content in chat (Practice 22, agentic-coding).
-# See AGENTS.md and .cursor/rules/02-security.mdc.
+# See AGENTS.md and the secure-coding skill (.agents/skills/secure-coding/).
 
 # Build and engine artifacts
 Binaries/

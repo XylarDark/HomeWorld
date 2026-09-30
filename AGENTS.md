@@ -149,7 +149,7 @@ Exact invocations the agent should use (see [docs/SETUP.md](docs/SETUP.md) and [
 
 - **C++:** PascalCase types, camelCase locals; Unreal prefixes (`A`, `U`, `F`, `E`, `I`). Include own header first. See `.cursor/rules/unreal-cpp.mdc`.
 - **Python:** PEP 8, type hints, 4-space indent. UE scripts must be idempotent (check-before-create). See `.cursor/rules/12-python.mdc`.
-- **Commits:** Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`). See `.cursor/rules/04-git-workflow.mdc`.
+- **Commits:** Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`). Stage by explicit path — see [swarm/SWARM_OPS.md](swarm/SWARM_OPS.md) and [PR and commit guidelines](#pr-and-commit-guidelines) below.
 - **Feature debug instrumentation and log-driven validation:** When implementing features, include a **robust, log-driven way to validate** that they work (entry/exit, user-triggered actions, success/fail in logs). The user must not have to prompt for logging to confirm implementation. See `.cursor/rules/16-feature-debug-instrumentation.mdc`.
 
 ## PR and commit guidelines
@@ -162,7 +162,7 @@ Exact invocations the agent should use (see [docs/SETUP.md](docs/SETUP.md) and [
 
 - Never commit secrets, API keys, or `.env` files. Use `.env.example` for templates.
 - `Saved/`, `Plugins/UnrealMCP/`, and `__pycache__/` are gitignored.
-- Validate all external input at boundaries. See `.cursor/rules/02-security.mdc`.
+- Validate all external input at boundaries. See the [secure-coding](.agents/skills/secure-coding/SKILL.md) skill.
 
 ## Setup and validation
 

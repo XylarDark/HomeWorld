@@ -1,6 +1,6 @@
 # Doctor policy — HomeWorld accepted declines
 
-HomeWorld is a **Unreal Engine 5.7 game host** (C++, Python Editor automation, minimal root `package.json` for DevEnvTemplate doctor/sync only). The DevEnvTemplate doctor scores against a **Node/TS app** profile by default. Several **critical** findings are **accepted declines** — not bugs to fix by inventing a fake Node application.
+HomeWorld is a **Unreal Engine 5.8 game host** (C++, Python Editor automation, minimal root `package.json` for DevEnvTemplate doctor/sync only). The DevEnvTemplate doctor scores against a **Node/TS app** profile by default. Several **critical** findings are **accepted declines** — not bugs to fix by inventing a fake Node application.
 
 **Canonical doctor commands:** [CURSOR_DEV.md](CURSOR_DEV.md) — `npm run doctor:build` (after pin bump or fresh clone), **`npm run doctor:ue`** (UE host — trust exit code), `npm run doctor` (raw template output).
 
@@ -17,7 +17,7 @@ HomeWorld is a **Unreal Engine 5.7 game host** (C++, Python Editor automation, m
 | **TypeScript Not Configured** | Game logic is **C++** (`Source/HomeWorld/`). Root `package.json` exists only for DevEnvTemplate CLI wrappers, not a TS product surface. | [AGENTS.md](../../AGENTS.md) DevEnvTemplate table |
 | **ESLint Not Configured** | No JS/TS product codebase. Python lint runs in CI (`validate.yml` python-lint). Adding ESLint would be template cosplay, not game quality. | [AGENTS.md](../../AGENTS.md), `.github/workflows/validate.yml` |
 | **No JS Unit Tests Detected** | Tests: **Python** (`Content/Python/tests/`), **UE Test Automation**, **PIE** (`pie_test_runner.py`). Doctor does not detect UE/Python test harness as “JS unit tests.” | [AGENTS.md](../../AGENTS.md) Testing section |
-| **Secrets Handling Not Detected** | Secrets policy: no `.env` in repo; `.env.example` templates; OWASP rules in glob-scoped `02-security.mdc`; gitignore for `Saved/`, plugins. Doctor looks for Node-specific secret scanners. | [02-security.mdc](../../.cursor/rules/02-security.mdc), [AGENTS.md](../../AGENTS.md) Security |
+| **Secrets Handling Not Detected** | Secrets policy: no `.env` in repo; `.env.example` templates; OWASP rules in the [secure-coding](../../.agents/skills/secure-coding/SKILL.md) skill; gitignore for `Saved/`, plugins. Doctor looks for Node-specific secret scanners. | [secure-coding](../../.agents/skills/secure-coding/SKILL.md), [AGENTS.md](../../AGENTS.md) Security |
 | **Always-Applied Rule Budget Exceeded** | HomeWorld **keeps** session-wide rules (`07`, `08`, `20`) until dedicated AGENTS.md + skills migration. HR-B2 reduced always-on count **15 → 3** (307 lines; threshold 200). Remaining budget gap is **accepted** until incremental migration or Lead approves retiring `07`/`08` content to skills. | [Docs/11e_HR_B2_HANDOFF.md](../../Docs/11e_HR_B2_HANDOFF.md), [CURSOR_DEV.md](CURSOR_DEV.md) |
 
 ---

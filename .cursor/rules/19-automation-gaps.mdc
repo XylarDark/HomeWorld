@@ -15,23 +15,23 @@ When a task corresponds to a **logged automation gap**:
 
 ## 1. Read context
 
-- Read [docs/AUTOMATION_GAPS.md](../../docs/AUTOMATION_GAPS.md) and the "Solution approaches" section.
-- If applicable, read [docs/FULL_AUTOMATION_RESEARCH.md](../../docs/FULL_AUTOMATION_RESEARCH.md) and [docs/PCG_VARIABLES_NO_ACCESS.md](../../docs/PCG_VARIABLES_NO_ACCESS.md).
+- Read [docs/Automation/AUTOMATION_GAPS.md](../../docs/Automation/AUTOMATION_GAPS.md) and the "Solution approaches" section.
+- If applicable, read [docs/FULL_AUTOMATION_RESEARCH.md](../../docs/Automation/FULL_AUTOMATION_RESEARCH.md) and [docs/PCG_VARIABLES_NO_ACCESS.md](../../docs/PCG/PCG_VARIABLES_NO_ACCESS.md).
 
 ## 2. Prefer programmatic, then GUI (default for Editor UI), then document
 
 1. **Programmatic first:** Existing C++/Blueprint reuse, Python API, or commandlet. Try before falling back.
-2. **GUI automation (default for Editor UI):** When a step requires Editor UI interaction and a GUI automation script exists (e.g. in `Content/Python/gui_automation/`), **use it as the default method**. Run or instruct running the script (with ref images captured if needed); treat manual steps only as fallback when GUI is unavailable or fails. See [automation-standards.mdc](automation-standards.mdc) (Editor UI automation as default) and [docs/GUI_AUTOMATION_WHY_AND_WHEN.md](../../docs/GUI_AUTOMATION_WHY_AND_WHEN.md).
+2. **GUI automation (default for Editor UI):** When a step requires Editor UI interaction and a GUI automation script exists (e.g. in `Content/Python/gui_automation/`), **use it as the default method**. Run or instruct running the script (with ref images captured if needed); treat manual steps only as fallback when GUI is unavailable or fails. See [automation-standards.mdc](automation-standards.mdc) (Editor UI automation as default) and [docs/GUI_AUTOMATION_WHY_AND_WHEN.md] (GUI_AUTOMATION_WHY_AND_WHEN.md — not in repo).
 3. **Document only** if neither is viable; do not output "manual steps" for the user — log to AUTOMATION_GAPS with suggested approach.
 
 ## 3. Gap-specific guidance
 
 - **Portal / Level Streaming (Gap 1):** Spawn [AHomeWorldDungeonEntrance](../../Source/HomeWorld/HomeWorldDungeonEntrance.h) (or BP) at portal position and set `LevelToOpen` from [planetoid_map_config.json](../../Content/Python/planetoid_map_config.json). Implemented in [place_portal_placeholder.py](../../Content/Python/place_portal_placeholder.py). If Python cannot set the property, document and/or add GUI automation.
-- **PCG no-access steps:** Run or instruct running [pcg_apply_manual_steps.py](../../Content/Python/gui_automation/pcg_apply_manual_steps.py) with Editor focused and refs present; if refs missing, run [capture_pcg_refs.py](../../Content/Python/gui_automation/capture_pcg_refs.py) per [refs/README.md](../../Content/Python/gui_automation/refs/README.md).
-- **State Tree (Gap 2):** No high-level Python API for graph editing. Use [state_tree_apply_defend_branch.py](../../Content/Python/gui_automation/state_tree_apply_defend_branch.py) with refs in [refs/state_tree/](../../Content/Python/gui_automation/refs/state_tree/), or one-time manual per [DAY12_ROLE_PROTECTOR.md](../../docs/TaskLists/TaskSpecs/DAY12_ROLE_PROTECTOR.md).
+- **PCG no-access steps:** The former `pcg_apply_manual_steps.py` / `capture_pcg_refs.py` GUI-automation scripts were **removed WAVE F** — do not cite them. Use [pcg_settings_introspect.py](../../Content/Python/pcg_settings_introspect.py) to find settable properties and [create_pcg_forest.py](../../Content/Python/create_pcg_forest.py) for graph work. Settings with no API access are listed in `docs/PCG/PCG_VARIABLES_NO_ACCESS.md`; log them as gaps rather than asking the user to click.
+- **State Tree (Gap 2):** No high-level Python API for graph editing, and the former `state_tree_apply_defend_branch.py` GUI-automation script was **removed WAVE F** — do not cite it. Enumerate the real surface with [state_tree_api_introspect.py](../../Content/Python/state_tree_api_introspect.py), then drive it or document the GUI path per [DAY12_ROLE_PROTECTOR.md](../../docs/TaskLists/TaskSpecs/DAY12_ROLE_PROTECTOR.md).
 
 ## 4. After implementing or attempting
 
-Update [docs/AUTOMATION_GAPS.md](../../docs/AUTOMATION_GAPS.md) (e.g. add "Solution: …" or "Research: …" and date in the Research log) and/or [docs/GAP_SOLUTIONS_RESEARCH.md](../../docs/GAP_SOLUTIONS_RESEARCH.md).
+Update [docs/Automation/AUTOMATION_GAPS.md](../../docs/Automation/AUTOMATION_GAPS.md) (e.g. add "Solution: …" or "Research: …" and date in the Research log) and/or [docs/GAP_SOLUTIONS_RESEARCH.md](../../docs/Automation/GAP_SOLUTIONS_RESEARCH.md).
 
 **If a gap is fully or partially addressed:** Add a dated entry to AUTOMATION_GAPS.md (Research log or Addressed subsection) stating which gap was addressed, how (programmatic / GUI automation / commandlet), and a link to the script or doc. This is project policy so the gaps file tracks both open and closed gaps.

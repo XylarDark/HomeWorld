@@ -21,7 +21,7 @@ When generating or adding **any documentation** (or other structured content und
    - **Maps/** — DemoMap, Homestead, level guides
    - **Automation/** — Agent company, gaps, loop, refinement, research
    - **Editor/** — Build protocol, launch, polish, manual tutorial
-   - **UE/** — UE 5.7 tech, Editor UI
+   - **UE/** — UE 5.8 tech, Editor UI (5.7 retained as history)
    - **Assets/** — Asset workflow, Milady
    - **Testing/** — Level testing, validation
    - **MVP/** — Gap analysis, feasibility

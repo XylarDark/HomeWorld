@@ -21,9 +21,9 @@ The project is set up for **fully autonomous** automation. The agent does not as
    - **C++ commandlets** where they can set the required state
    If none of these can accomplish the task, do **not** fall back to "document the manual step." Instead, log the gap (see below).
 
-3. **When something cannot be automated:** Log it to **`docs/AUTOMATION_GAPS.md`** with enough context for a **future chat session** to design and implement an automatic solution. The user will start dedicated sessions to address entries in that file. Do not leave the resolution as "the user must do X."
+3. **When something cannot be automated:** Log it to **`docs/Automation/AUTOMATION_GAPS.md`** with enough context for a **future chat session** to design and implement an automatic solution. The user will start dedicated sessions to address entries in that file. Do not leave the resolution as "the user must do X."
 
-4. **Session output.** Do not end a task or session with instructions for the user to perform manual work. If a step could not be automated, append an entry to `docs/AUTOMATION_GAPS.md`, set the task/day to **blocked** (or skip with reason), and in session summary state that the gap was logged for a future automation pass.
+4. **Session output.** Do not end a task or session with instructions for the user to perform manual work. If a step could not be automated, append an entry to `docs/Automation/AUTOMATION_GAPS.md`, set the task/day to **blocked** (or skip with reason), and in session summary state that the gap was logged for a future automation pass.
 
 
 ## Host gate (cite, do not fork)
@@ -39,16 +39,16 @@ Follow [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md) §14 host-tool table and �
 
 ## Logging automation gaps
 
-**File:** `docs/AUTOMATION_GAPS.md`
+**File:** `docs/Automation/AUTOMATION_GAPS.md`
 
 **Per entry, include:**
 - **Date** (YYYY-MM-DD)
 - **Feature / task** (e.g. "Day 11 – Place Mass Spawner on DemoMap", "PCG – assign graph in Details")
 - **What is needed** (one sentence: what would need to happen for the feature to be complete)
 - **Why current automation didn't cover it** (e.g. "No MCP/Python API for adding Mass Spawner to level", "Selector in UI not scriptable")
-- **Suggested approach for future automation** (e.g. "GUI automation: capture ref image for Modes panel, then PyAutoGUI to click Mass Spawner and set config", "Research UE 5.7 Mass Spawner Python API")
+- **Suggested approach for future automation** (e.g. "GUI automation: capture ref image for Modes panel, then PyAutoGUI to click Mass Spawner and set config", "Research UE 5.8 Mass Spawner Python API")
 
-Append new entries; do not remove original gap entries. **When a gap is addressed** (automation solution implemented and verified), **note it in docs/AUTOMATION_GAPS.md** (e.g. Research log or Addressed subsection: date, gap id, how addressed, link). Adding the resolution keeps the file as the single record of both open and closed gaps.
+Append new entries; do not remove original gap entries. **When a gap is addressed** (automation solution implemented and verified), **note it in docs/Automation/AUTOMATION_GAPS.md** (e.g. Research log or Addressed subsection: date, gap id, how addressed, link). Adding the resolution keeps the file as the single record of both open and closed gaps.
 
 ## References
 

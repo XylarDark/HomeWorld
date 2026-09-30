@@ -11,7 +11,7 @@ version: 1.11
 
 ## Editor UI automation as default
 
-**Policy:** When we have the ability to interact with the Unreal Editor UI automatically (e.g. PyAutoGUI-based scripts in `Content/Python/gui_automation/`, ref-image clickers, capture-and-run flows), that is the **default method**. Prefer running or instructing the GUI automation script for the step; treat manual Editor steps only as **fallback** when GUI automation is unavailable (e.g. ref images not captured, script not runnable in the current environment) or has failed. Document and maintain ref images and scripts so GUI automation can be used by default where it exists. See [docs/GUI_AUTOMATION_WHY_AND_WHEN.md](../../docs/GUI_AUTOMATION_WHY_AND_WHEN.md) and [docs/MANUAL_EDITOR_TUTORIAL.md](../../docs/MANUAL_EDITOR_TUTORIAL.md).
+**Policy:** When we have the ability to interact with the Unreal Editor UI automatically (e.g. PyAutoGUI-based scripts in `Content/Python/gui_automation/`, ref-image clickers, capture-and-run flows), that is the **default method**. Prefer running or instructing the GUI automation script for the step; treat manual Editor steps only as **fallback** when GUI automation is unavailable (e.g. ref images not captured, script not runnable in the current environment) or has failed. Document and maintain ref images and scripts so GUI automation can be used by default where it exists. See [docs/GUI_AUTOMATION_WHY_AND_WHEN.md] (GUI_AUTOMATION_WHY_AND_WHEN.md — not in repo) and [docs/MANUAL_EDITOR_TUTORIAL.md] (MANUAL_EDITOR_TUTORIAL.md — not in repo).
 
 ## Universal tooling practice (Lead lock-in, 2026-09-22)
 
@@ -72,19 +72,19 @@ Every Editor Python **prove/capture/evidence** script must call **`conductor_mrq
 When programming automation that drives or configures **Editor or engine features** (Python Editor scripts, MCP-driven workflows, commandlets, GUI automation), follow this procedure. The project is **fully autonomous**; do not document "manual steps" for the user. See **20-full-automation-no-manual-steps.mdc**.
 
 1. **Identify required variables/settings**  
-   Use **Epic Unreal Engine 5.7 documentation** (or version-explicit sources that match 5.7) to list every setting or variable necessary for the feature (e.g. "set in Details," "configure in the node," "assign in the panel"). Do not rely on training data or other engine versions. See **ue57-sources.mdc**.
+   Use **Epic Unreal Engine 5.8 documentation** (or version-explicit sources that match 5.8) to list every setting or variable necessary for the feature (e.g. "set in Details," "configure in the node," "assign in the panel"). Do not rely on training data or other engine versions. See **ue58-sources.mdc**.
 
 2. **Check access from our automation**  
    For each required variable/setting, verify whether it can be **set (or read) reliably** from: MCP, Python Editor API, **GUI automation** (PyAutoGUI, screenshots, reference images — see `Content/Python/gui_automation/`, `docs/FULL_AUTOMATION_RESEARCH.md` §10), or C++ commandlets. Use API docs, introspection, and existing GUI automation patterns. "Reliably" includes correct property names, no protected/read-only members, and stable behavior across relevant minor engine versions.
 
 3. **When automation cannot set a required value**  
    - **Try GUI automation** (Editor-driven: capture refs, PyAutoGUI, click/type) before concluding "no access."  
-   - **If still no access:** Do **not** document a manual step for the user. Instead, **log an entry to `docs/AUTOMATION_GAPS.md`** (date, feature/task, what is needed, why automation didn't cover it, suggested approach for future automation). Optionally record the variable/setting in a feature-specific doc (e.g. `docs/PCG_VARIABLES_NO_ACCESS.md`) for technical reference, but the resolution path is automation or log-gap, not "user must do X."
+   - **If still no access:** Do **not** document a manual step for the user. Instead, **log an entry to `docs/Automation/AUTOMATION_GAPS.md`** (date, feature/task, what is needed, why automation didn't cover it, suggested approach for future automation). Optionally record the variable/setting in a feature-specific doc (e.g. `docs/PCG_VARIABLES_NO_ACCESS.md`) for technical reference, but the resolution path is automation or log-gap, not "user must do X."
 
 4. **Re-check on engine/API upgrades**  
    When upgrading the engine or a plugin (e.g. UE 5.7 → 5.8, or UnrealMCP update), re-run the access check for affected features and update AUTOMATION_GAPS and KNOWN_ERRORS so we do not assume old limitations remain or that previously working properties still exist.
 
-**Worked example:** PCG — use Python/MCP where possible; use GUI automation (e.g. `pcg_apply_manual_steps.py`, reference images) where the API does not expose a setting. If a step still cannot be automated, append to `docs/AUTOMATION_GAPS.md` with a suggested approach (e.g. new ref image, different UI flow) for a future session to implement.
+**Worked example:** PCG — use Python/MCP where possible; use GUI automation (e.g. `pcg_apply_manual_steps.py`, reference images) where the API does not expose a setting. If a step still cannot be automated, append to `docs/Automation/AUTOMATION_GAPS.md` with a suggested approach (e.g. new ref image, different UI flow) for a future session to implement.
 
 ## Portable harness (DevHarness upstream)
 

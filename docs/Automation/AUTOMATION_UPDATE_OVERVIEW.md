@@ -128,7 +128,7 @@ So: we **use the Editor** as an execution and asset/level backend via MCP and Py
 
 ## 4. Steps we skip (or document) because we cannot accomplish them
 
-These are logged in **docs/AUTOMATION_GAPS.md** and/or **docs/PCG_VARIABLES_NO_ACCESS.md** and in task docs. We are **not** silently failing; we mark tasks Done with notes like “X logged in AUTOMATION_GAPS” or “manual step in doc” where we can’t automate.
+These are logged in **docs/Automation/AUTOMATION_GAPS.md** and/or **docs/PCG_VARIABLES_NO_ACCESS.md** and in task docs. We are **not** silently failing; we mark tasks Done with notes like “X logged in AUTOMATION_GAPS” or “manual step in doc” where we can’t automate.
 
 ### 4.1 Logged in AUTOMATION_GAPS.md
 
@@ -183,9 +183,9 @@ So for PCG we automate volume placement, tagging, Surface Sampler params, and (w
 
 ## 6. References
 
-- [PROJECT_STATE_AND_TASK_LIST.md](workflow/PROJECT_STATE_AND_TASK_LIST.md) — Work done and task list (T1–T10).
+- [PROJECT_STATE_AND_TASK_LIST.md](../TaskLists/PROJECT_STATE_AND_TASK_LIST.md) — Work done and task list (T1–T10).
 - [AUTOMATION_GAPS.md](AUTOMATION_GAPS.md) — Logged gaps (Level Streaming, State Tree graph).
-- [PCG_VARIABLES_NO_ACCESS.md](PCG_VARIABLES_NO_ACCESS.md) — PCG settings automation cannot set.
+- [PCG_VARIABLES_NO_ACCESS.md](../PCG/PCG_VARIABLES_NO_ACCESS.md) — PCG settings automation cannot set.
 - [AGENT_COMPANY.md](AGENT_COMPANY.md) — Roles and accountability.
-- [09-mcp-workflow.mdc](../.cursor/rules/09-mcp-workflow.mdc) — What MCP can and cannot do.
-- [ANIMGRAPH_AUTOMATION_SPIKE.md](tasks/ANIMGRAPH_AUTOMATION_SPIKE.md) — AnimGraph automation deferred.
+- [09-mcp-workflow.mdc](../../.cursor/rules/09-mcp-workflow.mdc) — What MCP can and cannot do.
+- [ANIMGRAPH_AUTOMATION_SPIKE.md](../TaskLists/TaskSpecs/ANIMGRAPH_AUTOMATION_SPIKE.md) — AnimGraph automation deferred.
