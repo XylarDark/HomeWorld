@@ -11,8 +11,6 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$commonScript = Join-Path $PSScriptRoot "Common-Automation.ps1"
-if (Test-Path -LiteralPath $commonScript) { . $commonScript }
 $ProjectRoot = $null
 if ($env:HOMEWORLD_PROJECT -and (Test-Path -LiteralPath $env:HOMEWORLD_PROJECT)) {
     $ProjectRoot = $env:HOMEWORLD_PROJECT.TrimEnd("\", "/")
@@ -138,13 +136,33 @@ try {
         Assert-HomeWorldEditorDll -Root $ProjectRoot
         Write-SafeLog "Build succeeded."
         if ($LaunchEditorAfter -and $editorWasRunning) {
-            Write-SafeLog "Launching Editor and waiting for MCP (port 55557)..."
-            $cycleScript = Join-Path $ProjectRoot "Content\Python\run_automation_cycle.py"
-            if ((Test-Path -LiteralPath $cycleScript) -and (Test-UE_EDITORSet)) {
-                & python $cycleScript --no-build --launch-and-wait
-                if ($LASTEXITCODE -ne 0) { Write-SafeLog "Editor launch/wait failed (non-fatal)." }
+            $ueEditor = $env:UE_EDITOR
+            $uproject = Join-Path $ProjectRoot "HomeWorld.uproject"
+            if (-not $ueEditor -or -not (Test-Path -LiteralPath $ueEditor)) {
+                Write-SafeLog "Skipping LaunchEditorAfter: UE_EDITOR is not set or does not exist."
+            } elseif (-not (Test-Path -LiteralPath $uproject)) {
+                Write-SafeLog "Skipping LaunchEditorAfter: $uproject not found."
             } else {
-                Write-SafeLog "Skipping LaunchEditorAfter (run_automation_cycle.py or UE_EDITOR missing)."
+                Write-SafeLog "Launching Editor and waiting for MCP (port 55557)..."
+                Start-Process -FilePath $ueEditor -ArgumentList @($uproject) -WorkingDirectory $ProjectRoot | Out-Null
+                $mcpDeadline = (Get-Date).AddSeconds(180)
+                $mcpUp = $false
+                while ((Get-Date) -lt $mcpDeadline) {
+                    if (Get-NetTCPConnection -LocalPort 55557 -State Listen -ErrorAction SilentlyContinue) {
+                        $mcpUp = $true
+                        break
+                    }
+                    if (-not (Test-EditorRunning)) {
+                        Write-SafeLog "Editor exited during launch; aborting MCP wait."
+                        break
+                    }
+                    Start-Sleep -Seconds 3
+                }
+                if ($mcpUp) {
+                    Write-SafeLog "MCP port 55557 is listening."
+                } else {
+                    Write-SafeLog "MCP port 55557 did not open within 180s (non-fatal)."
+                }
             }
         }
     } else {
