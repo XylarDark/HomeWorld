@@ -48,6 +48,19 @@ __pycache__/
 # .devenv workspace (auto-added)
 .devenv/
 
+# GSD installer output. 759 files / 11.3 MB of vendored generated code
+# (gsd-core, hooks, commands, skills, agents, scripts, plugins), regenerated
+# by re-running the GSD installer. Not HomeWorld-authored; keeps history clean.
+# Tracked exceptions are local config, not installer output - they are absent
+# from .opencode/gsd-file-manifest.json and carry the `gsd` MCP registration.
+.opencode/*
+!.opencode/opencode.json
+!.opencode/settings.json
+
+# .planning/ (GSD project state: PROJECT, ROADMAP, STATE, REQUIREMENTS,
+# CONTEXT, config.json, codebase/, onboarding/) is authored and IS tracked.
+# It is the durable, reviewable answer to a gitignored agent_run_history.
+
 # KEEP-LOCAL Mannequins (Docs/17e HS-E) — Epic TP High Characters copy per DESKTOP;
 # never commit. Cold clone: copy from UE_5.8 TemplateResources (see Docs/17e).
 Content/Characters/
