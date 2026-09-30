@@ -29,14 +29,14 @@ One proven cold-clone path: empty `UserHarness/` → submodule init → `doctor:
 | **Registry** | [config/userharness-pin.json](../config/userharness-pin.json) |
 | **Full SHA** | `a9d1cc47c49389dba8aacf0bbede31684a4ce28a` |
 | **Short SHA** | `a9d1cc4` |
-| **Remote** | `https://github.com/XylarDark/DevEnvTemplate.git` |
+| **Remote** | `https://github.com/XylarDark/UserHarness.git` |
 | **Branch** | `master` |
 
 The local path and gitlink were renamed `DevEnvTemplate` → `UserHarness` in P5. The
-**remote still names `XylarDark/DevEnvTemplate`**: the upstream GitHub repo has not
-been renamed, and rewriting the URL before that happens would break every cold clone.
-Renaming it is a Lead action; when it lands, update `remote` here and in
-`config/userharness-pin.json` together. See [PIN_SYNC_POLICY.md](handoffs/PIN_SYNC_POLICY.md).
+upstream GitHub repo was renamed to `XylarDark/UserHarness` by the Lead on 2026-09-30,
+so `remote` now names the new URL in this table, in `.gitmodules`, and in
+`config/userharness-pin.json`. The old URL still resolves via GitHub's rename redirect,
+but do not reintroduce it. See [PIN_SYNC_POLICY.md](handoffs/PIN_SYNC_POLICY.md).
 
 Verify locally:
 

@@ -1,6 +1,6 @@
 {
   "path": "UserHarness",
-  "remote": "https://github.com/XylarDark/DevEnvTemplate.git",
+  "remote": "https://github.com/XylarDark/UserHarness.git",
   "branch": "master",
   "sha": "a9d1cc47c49389dba8aacf0bbede31684a4ce28a",
   "shortSha": "a9d1cc4",
@@ -12,6 +12,6 @@
   "updated": "2026-09-30",
   "productName": "DevHarness",
   "renamedFrom": "DevEnvTemplate",
-  "note": "P5 path migration. Local path/gitlink renamed DevEnvTemplate -> UserHarness; `remote` deliberately still names XylarDark/DevEnvTemplate because the upstream GitHub repo has NOT been renamed. Renaming `remote` before the Lead renames the repo on GitHub would break every cold clone. See Docs/handoffs/PIN_SYNC_POLICY.md.",
+  "note": "P5 path migration + 2026-09-30 Lead rename. Local path/gitlink renamed DevEnvTemplate -> UserHarness (P5); the upstream GitHub repo was then renamed to XylarDark/UserHarness by the Lead, so `remote` now points at the new URL. The old URL resolves only via GitHub rename redirect - do not reintroduce it. See Docs/handoffs/PIN_SYNC_POLICY.md.",
   "previousNote": "DET #42 reading-canon Class D port on master. Lead authorized after DET #42 merge."
 }

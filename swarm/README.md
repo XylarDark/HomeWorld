@@ -1,6 +1,6 @@
 # HomeWorld Swarm Kit
 
-The conductor reads these files. Specialists receive **only** their role card plus canon slices listed in the wave packet — not the full brief ([DevEnvTemplate](https://github.com/XylarDark/DevEnvTemplate) thin-context practice).
+The conductor reads these files. Specialists receive **only** their role card plus canon slices listed in the wave packet — not the full brief ([DevEnvTemplate](https://github.com/XylarDark/UserHarness) thin-context practice).
 
 **Human Lead:** [START_HERE.md](../START_HERE.md) · **Process:** [SWARM_OPS.md](SWARM_OPS.md) (Human Use gates, evidence, git safety, KNOWN_ERRORS) · **On-demand agents:** [.cursor/agents/](../.cursor/agents/README.md)
 

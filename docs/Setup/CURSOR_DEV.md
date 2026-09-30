@@ -28,7 +28,7 @@ Pinned checkout: [UserHarness/](../../UserHarness/) **gitlink** — bumped HR-B2
 | **Pinned SHA (short)** | `a9d1cc4` — DET #42 reading-canon Class D port on `master` (2026-09-27) |
 | **Canonical registry** | [config/userharness-pin.json](../../config/userharness-pin.json) — CI reads this; update with CURSOR_DEV when bumping pin |
 | **Pin sync policy** | [Docs/handoffs/PIN_SYNC_POLICY.md](../../Docs/handoffs/PIN_SYNC_POLICY.md) — classes D/S/C; bump only from DET `master`; NEVER point gitlink at `main` |
-| **Remote** | `https://github.com/XylarDark/DevEnvTemplate.git` |
+| **Remote** | `https://github.com/XylarDark/UserHarness.git` |
 | **Template branch** | `master` (not `main`) |
 | **HR-B2 delta** | PR #33 portable harness practices (`8be4170`; automation-harness guide + extras skills) |
 | **Doctor policy** | [DOCTOR_POLICY.md](DOCTOR_POLICY.md) — accepted declines for UE game host |

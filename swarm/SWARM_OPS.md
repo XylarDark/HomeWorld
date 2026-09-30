@@ -3,7 +3,7 @@
 **Runtime for the conductor.** This is the coordination script.  
 Canon stays in `HOMEWORLD_MVP_SWARM_BRIEF.md`. If ops and canon conflict, **canon wins on design**, **ops wins on process**.
 
-Aligned with [DevEnvTemplate](https://github.com/XylarDark/DevEnvTemplate) **files-only** practices and HomeWorld [docs/human-use/](../docs/human-use/) (steer / taste / test). UE automation company rules stay in [AGENTS.md](../AGENTS.md) and `docs/` — this file governs the MVP lookdev swarm only.
+Aligned with [DevEnvTemplate](https://github.com/XylarDark/UserHarness) **files-only** practices and HomeWorld [docs/human-use/](../docs/human-use/) (steer / taste / test). UE automation company rules stay in [AGENTS.md](../AGENTS.md) and `docs/` — this file governs the MVP lookdev swarm only.
 
 ## 0. When to use this file (mode routing)
 
