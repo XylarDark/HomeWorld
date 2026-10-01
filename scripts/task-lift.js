@@ -588,6 +588,25 @@ function rate(list, key) {
 }
 
 /**
+ * The one key format for a (task, arm, trial) cell.
+ *
+ * WHY THIS FUNCTION EXISTS
+ *
+ * The resume set and the run loop each built this key themselves, and they built it
+ * differently: the set used `${t > 1 ? '#'+t : ''}` (trial 1 bare) while the loop used
+ * `${trials > 1 ? '#'+trial : ''}` (trial 1 suffixed whenever trials > 1). Under
+ * `--trials 2` those sets are disjoint for trial 1, so `done.has(key)` was ALWAYS false
+ * and --resume re-ran every cell from the start, appending duplicates on top of the
+ * results it was supposed to preserve. R4 ended with 29 results for 24 cells.
+ *
+ * Two copies of a key format is one too many. Anything that must agree on cell
+ * identity goes through here.
+ */
+function cellKey(taskId, condition, trial, trials) {
+  return `${taskId}/${condition}${trials > 1 ? `#${trial}` : ''}`;
+}
+
+/**
  * Exact two-sided McNemar test on the discordant pairs.
  *
  * WHY THIS AND NOT A PROPORTION DELTA
@@ -632,7 +651,7 @@ function summarize(results, { minValidPerCell = 1, dry = false } = {}) {
   // 8 runs, one timeout used to discard all eight.
   const cells = {};
   for (const r of results) {
-    const key = `${r.taskId}/${r.condition}`;
+    const key = `${r.taskId}/${r.condition}`; // aggregate per CELL, so no trial suffix
     cells[key] = (cells[key] || 0) + (r.voided ? 0 : 1);
   }
   const shortCells = Object.entries(cells).filter(([, n]) => n < minValidPerCell);
@@ -909,6 +928,12 @@ const TRANSIENT_PATTERNS = [
   /HTTP 5\d\d/,
   /ECONNRESET|ECONNREFUSED|ETIMEDOUT|EAI_AGAIN|ENOTFOUND/,
   /socket hang up|premature close|fetch failed/i,
+  // A session the HOST stopped is infrastructure, not an outcome. R4 lost six runs
+  // to `[error/aborted] Session interrupted: shutdown` and retried none of them,
+  // because the first classifier had no idea this string existed. A shutdown is the
+  // clearest possible "this did not happen" signal: the agent never finished, so
+  // there is nothing to preserve by not trying again.
+  /\[error\/aborted\]|session interrupted|interrupted: shutdown|got shutdown/i,
 ];
 
 /**
@@ -1009,11 +1034,12 @@ function main(argv) {
       process.stderr.write(`${PREFIX} resume: could not read prior results (${e.message}); starting fresh\n`);
     }
   }
+  // A VOID cell is re-attempted on resume, never skipped. `void` means the run
+  // explicitly did not happen, so it is the one case where re-running is safe and
+  // skipping is wrong - the first version skipped it and permanently burned six cells
+  // into the results file, which then dropped three of four pairs.
   const done = new Set(
-    results.map((r) => {
-      const t = r.trial || 1;
-      return `${r.taskId}/${r.condition}${t > 1 ? `#${t}` : ''}`;
-    })
+    results.filter((r) => !r.voided).map((r) => cellKey(r.taskId, r.condition, r.trial || 1, trials))
   );
 
   const base = fs.mkdtempSync(path.join(os.tmpdir(), 'tasklift-'));
@@ -1051,7 +1077,7 @@ function main(argv) {
         // A cell key therefore carries its trial index so --resume can tell
         // "trial 1 done" from "all trials done".
         for (let trial = 1; trial <= trials; trial++) {
-          const key = `${task.id}/${condition}${trials > 1 ? `#${trial}` : ''}`;
+          const key = cellKey(task.id, condition, trial, trials);
           if (done.has(key)) {
             process.stderr.write(`${PREFIX} ${key} ... skipped (already in results)\n`);
             continue;
@@ -1059,6 +1085,16 @@ function main(argv) {
           process.stderr.write(`${PREFIX} ${key} ...\n`);
           const r = runTask(roots[condition], task, { dry, model });
           results.push({ ...r, condition, trial });
+          // Replace any prior VOID entry for this cell so a resumed cell is counted
+          // once, and only on its valid attempt.
+          const prior = results.findIndex(
+            (x) =>
+              x.taskId === task.id &&
+              x.condition === condition &&
+              (x.trial || 1) === trial &&
+              x.voided
+          );
+          if (prior !== -1) results.splice(prior, 1);
           if (r.agent.error) process.stderr.write(`${PREFIX}   agent error: ${r.agent.error}\n`);
           if (r.voided) process.stderr.write(`${PREFIX}   VOID - excluded from its own cell\n`);
 
@@ -1162,6 +1198,7 @@ module.exports = {
   listFiles,
   matchFiles,
   ARMS,
+  cellKey,
   ablateFor,
   verifyAblation,
   scoreControl,

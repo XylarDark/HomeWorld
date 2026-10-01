@@ -837,6 +837,45 @@ test('the report says "not significant" rather than presenting a bare delta', ()
   assert.match(md, /Not significant/, 'a bare delta with no verdict must not be the whole story');
 });
 
+test('resume and the run loop agree on what a cell is called', () => {
+  // The bug R4 exposed. The resume set built `task/with` for trial 1 while the loop
+  // built `task/with#1` (because trials > 1), so `done.has(key)` was never true and
+  // --resume re-ran every cell from the start, appending duplicates to the results it
+  // was meant to preserve: 29 entries for 24 cells.
+  //
+  // The failure is invisible when trials === 1 - both formats agree there. It only
+  // bites the first trial of a multi-trial run, which is exactly the case resume
+  // exists to serve.
+  for (const trials of [1, 2, 3]) {
+    for (const trial of [1, 2, 3]) {
+      if (trial > trials) continue;
+      const fromSet = M.cellKey('t', 'with', trial, trials);
+      const fromLoop = M.cellKey('t', 'with', trial, trials);
+      assert.strictEqual(fromSet, fromLoop);
+    }
+  }
+  // Pin the actual shapes so a future edit cannot quietly reintroduce the mismatch.
+  assert.strictEqual(M.cellKey('t', 'with', 1, 1), 't/with');
+  assert.strictEqual(M.cellKey('t', 'with', 1, 2), 't/with#1');
+  assert.strictEqual(M.cellKey('t', 'with', 2, 2), 't/with#2');
+  assert.strictEqual(M.cellKey('t', 'docs-only', 1, 2), 't/docs-only#1');
+});
+
+test('a host shutdown is transient and must be retried', () => {
+  // R4 lost six runs to this exact string and retried none. A shutdown is the host
+  // stopping the session - the agent never finished, so nothing is preserved by not
+  // trying again.
+  for (const err of [
+    '[error/aborted] Session interrupted: shutdown',
+    '[error/aborted] got shutdown',
+    'Session interrupted',
+  ]) {
+    assert.ok(M.isTransient(err, false), `"${err}" must be treated as retryable infrastructure`);
+  }
+  // Still not transient: a refusal is the agent's own outcome.
+  assert.ok(!M.isTransient('[error/provider] the model refused to continue', false));
+});
+
 test('trials raise the minimum valid runs a cell needs', () => {
   // One trial per cell is noise-dominated: a single timeout or one unusual answer
   // moves the rate as much as any real effect. `--min-valid` defaults to the trial
