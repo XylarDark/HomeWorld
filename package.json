@@ -38,6 +38,9 @@
     "tasklift:write": "node scripts/task-lift.js --run --out-md Docs/qa/TASK_LIFT.md --out-json Docs/qa/TASK_LIFT.json",
     "decisions:check": "node scripts/decision-log.js",
     "decisions:test": "node --test scripts/decision-log.test.js",
+    "scope:reconcile": "node scripts/scope-reconcile.js",
+    "scope:reconcile:write": "node scripts/scope-reconcile.js --write Docs/qa/T0_SCOPE_RECONCILIATION.md",
+    "scope:reconcile:test": "node --test scripts/scope-reconcile.test.js",
     "outcome:test": "node --test scripts/outcome.test.js"
   },
   "engines": {
