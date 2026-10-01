@@ -645,6 +645,44 @@ test('min-valid-per-cell is enforced when repeats are in play', () => {
   assert.strictEqual(res.shortCells[0].required, 3);
 });
 
+test('noneMatch does not fire on a line that rejects the banned term', () => {
+  // Found by the first real taste run: the correct answer said "not photoreal, not a
+  // scan" - it was REJECTING the canon's banned look - and the naive noneMatch
+  // failed it. A check that punishes stating the rule is a bad check.
+  const check = {
+    kind: 'noneMatch',
+    glob: '**/spec.md',
+    pattern: 'photoreal|grimdark|sci-?fi|pbr scan',
+    unless: '(?i)\\b(not|never|no|avoid|without|refus\\w*|reject\\w*)\\b',
+  };
+  const rejecting = fixture({
+    'spec.md': 'Roughness stays high. Not photoreal, no grimdark, never a pbr scan.\n',
+  });
+  assert.strictEqual(M.evaluateCheck(rejecting, check, new Set()).pass, true);
+
+  const using = fixture({ 'spec.md': 'Roughness from a photoreal pbr scan of real grass.\n' });
+  assert.strictEqual(M.evaluateCheck(using, check, new Set()).pass, false, 'genuine use must still fail');
+});
+
+test('noneMatch without an unless clause behaves as before', () => {
+  const dir = fixture({ 'f.md': 'photoreal\n' });
+  assert.strictEqual(M.evaluateCheck(dir, { kind: 'noneMatch', glob: '**/f.md', pattern: 'photoreal' }, new Set()).pass, false);
+});
+
+test('the NightMix range check accepts the ways people actually write it', () => {
+  // Brittle phrasing matching measures punctuation, not knowledge. The first run
+  // failed this because the agent declared NightMix without writing "0 to 1".
+  const check = { kind: 'anyMatches', glob: '**/spec.md', pattern: '0\\s*(?:→|->|–|—|-|to|through)\\s*1' };
+  for (const phrasing of ['NightMix 0→1', 'NightMix 0 to 1', 'NightMix 0-1', 'NightMix 0 – 1', 'NightMix 0 through 1']) {
+    const dir = fixture({ 'spec.md': `${phrasing} shifts the masters.\n` });
+    assert.strictEqual(
+      M.evaluateCheck(dir, check, new Set()).pass,
+      true,
+      `should accept "${phrasing}"`
+    );
+  }
+});
+
 test('only transport failures are retried, never a substantive non-zero exit', () => {
   // Retrying a run that failed for a substantive reason would silently replace a
   // measurement with a more flattering one.

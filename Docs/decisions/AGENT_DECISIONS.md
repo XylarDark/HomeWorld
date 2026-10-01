@@ -266,3 +266,44 @@ skipped.
   transient while "the model refused to continue" is not.
 - **Reverses if:** Repeats per cell arrive and a mixed-effects model replaces the
   paired proportion. The pairing rule survives that; only the estimator changes.
+
+### DEC-0013 — The pilot selects and records its model (2026-10-01)
+
+- **Area:** code design
+- **Decision:** `--model` is passed through to the driver and the model id is recorded
+  in `meta` and printed in the report.
+- **Rationale:** The runner never selected a model, so it inherited the client default
+  — which sits on the OpenCode Console account returning `402 Insufficient account
+  funds`. A harness experiment was therefore hostage to an unrelated billing state,
+  and I had been treating "the pilot is blocked" as a fact when the paid model was
+  only one of several. Free models (`space-bunny-free`, `nemotron-3-ultra-free`) were
+  verified to complete real work. The alternative — leaving the model implicit —
+  is rejected for a second reason: a result that does not name its model cannot be
+  reproduced, and judge/model identity is part of the measurement (the same reason
+  the scorer version is pinned).
+- **Evidence:** Probe: both free models created a file, exit 0. Two real paired runs
+  (`asset-naming`, `art-master-spec`) then completed with 0 void.
+- **Reverses if:** Never on recording the model. Selecting it by default can change.
+
+### DEC-0014 — Two taste checks were wrong; the harness arm "losing" was my bug, not its result (2026-10-01)
+
+- **Area:** code design
+- **Decision:** `noneMatch` gains an optional `unless` pattern so a banned term on a
+  line that negates it is not a hit; the `NightMix` range pattern accepts the several
+  ways a range is actually written. Both fixes are pinned by tests in both directions.
+- **Rationale:** The first real taste run reported the with-harness arm at 0.78
+  against the ablated arm's 1.0 — a −22pp lift, the preregistered "harness scored
+  worse" verdict. It was an artifact. The arm that *read the canon* quoted the
+  canon's prohibition ("not photoreal, no grimdark") and a bare banned-term regex
+  failed it for being correct. The asymmetry matters more than the bug: the arm that
+  consults the documentation is structurally more likely to name the banned words,
+  so this check was biased against the harness by construction. I recorded the verdict
+  before investigating it, which is why the preregistration mattered — it forced the
+  number to be examined rather than believed.
+- **Evidence:** Re-run after the fix: 1.0 in both arms. Two checks, two runs, four
+  agent sessions on a free model.
+- **Reverses if:** n/a — these are correctness fixes.
+- **Note on the remaining result:** both tasks now score 1.0 in both arms, i.e. a
+  **null**. Under the preregistered rule that is *inconclusive*, and the correct
+  sentence is "this benchmark did not detect an effect", not "the harness does not
+  help". n=1 task, n=1 trial. Do not upgrade that sentence.

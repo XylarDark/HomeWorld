@@ -285,9 +285,12 @@ function extractAgentError(stdout, stderr) {
 }
 
 /** Run one agent session in `root`. Never throws; transport problems are reported. */
-function runAgent(root, prompt, timeoutMs = AGENT_TIMEOUT_MS) {
+function runAgent(root, prompt, timeoutMs = AGENT_TIMEOUT_MS, model) {
   const bin = resolveAgentBin();
-  const r = spawnSync(bin, ['run', '--standalone', '--auto', '--format', 'json', prompt], {
+  const args = ['run', '--standalone', '--auto', '--format', 'json'];
+  if (model) args.push('--model', model);
+  args.push(prompt);
+  const r = spawnSync(bin, args, {
     cwd: root,
     encoding: 'utf8',
     timeout: timeoutMs,
@@ -384,8 +387,20 @@ function evaluateCheck(root, check, createdAfterSeed) {
     case 'noneMatch': {
       const targets = readTargets();
       if (targets.length === 0) return result(false, 'no target file', { subjectPresent: false });
-      const hits = targets.filter((t) => patterns.test(fs.readFileSync(path.join(root, t), 'utf8')));
-      return result(hits.length === 0, hits[0] ? `matched in ${hits[0]}` : 'clean');
+      // A banned term that appears on a line which ALSO negates it is the spec
+      // *rejecting* the thing, not using it. Measured, not assumed: the first real
+      // taste run failed this check because the answer said "not photoreal, not a
+      // scan" - the correct behaviour, tripping the naive pattern.
+      const unless = check.unless ? compilePattern(check.unless, check) : null;
+      const hits = [];
+      for (const t of targets) {
+        for (const line of fs.readFileSync(path.join(root, t), 'utf8').split(/\r?\n/)) {
+          if (!patterns.test(line)) continue;
+          if (unless && unless.test(line)) continue;
+          hits.push(`${t}: ${line.trim().slice(0, 60)}`);
+        }
+      }
+      return result(hits.length === 0, hits.length === 0 ? 'clean' : hits[0]);
     }
 
     case 'allLinesMatch': {
@@ -731,6 +746,7 @@ function renderMarkdown(results, summary, meta, ablation) {
   lines.push('');
   lines.push(`- commit: \`${meta.commit}\``);
   if (meta.manifest) lines.push(`- task manifest: \`${meta.manifest}\``);
+  lines.push(`- model: \`${meta.model}\``);
   if (s.pairedTasks !== undefined && s.droppedPairs && s.droppedPairs.length > 0) {
     lines.push(
       `- dropped pairs (one arm had no valid run, so it cannot be compared): ${s.droppedPairs.join(', ')}`
@@ -778,11 +794,17 @@ const sleep = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 
  *
  * Retries are capped and spaced so a rate-limited provider is not hammered, which
  * would extend the outage it is recovering from.
+ *
+ * `model` is passed through to the driver. It matters more than it looks: the
+ * default model sits on the OpenCode Console account, which returned
+ * `402 Insufficient account funds`, while the free models complete real work. A
+ * harness experiment should not be held hostage to a billing state, and a result
+ * recorded against a named model is a result you can reproduce.
  */
-function runAgentWithRetry(root, prompt, { attempts = 3, backoffMs = 5000, timeoutMs } = {}) {
+function runAgentWithRetry(root, prompt, { attempts = 3, backoffMs = 5000, timeoutMs, model } = {}) {
   let last = null;
   for (let i = 1; i <= attempts; i++) {
-    last = runAgent(root, prompt, timeoutMs);
+    last = runAgent(root, prompt, timeoutMs, model);
     if (last.ok) return { ...last, attempts: i };
     if (!isTransient(last.error, last.timedOut)) {
       return { ...last, attempts: i, retriedOut: false };
@@ -806,6 +828,9 @@ function main(argv) {
   const only = onlyIdx !== -1 ? argv[onlyIdx + 1] : null;
   const resume = argv.includes('--resume');
   const manifestPath = readFlag(argv, '--manifest') || MANIFEST;
+  // Read before the run loop, not near the summary: it is used per-run, and a
+  // `const` declared after its use is a temporal-dead-zone crash, not a fallback.
+  const model = readFlag(argv, '--model');
 
   // Spending guard. Every agent session costs money, and the previous default was
   // to run them unless `--dry` was passed - so asking for a report cost 8 sessions.
@@ -872,7 +897,7 @@ function main(argv) {
           continue;
         }
         process.stderr.write(`${PREFIX} ${key} ...\n`);
-        const r = runTask(roots[condition], task, { dry });
+        const r = runTask(roots[condition], task, { dry, model });
         results.push({ ...r, condition });
         if (r.agent.error) process.stderr.write(`${PREFIX}   agent error: ${r.agent.error}\n`);
         if (r.voided) process.stderr.write(`${PREFIX}   VOID - excluded from every rate\n`);
@@ -913,6 +938,9 @@ function main(argv) {
   const meta = {
     commit: firstLine(spawnSync('git', ['rev-parse', '--short', 'HEAD'], { cwd: PROJECT_ROOT, encoding: 'utf8' })),
     manifest: manifestPath,
+    // Recorded because a result you cannot name the model for is not reproducible.
+    // Empty means "whatever the client's default is", which is itself worth knowing.
+    model: model || '(client default)',
     agentBin: resolveAgentBin(),
     agentVersion: firstLine(spawnSync(resolveAgentBin(), ['--version'], { encoding: 'utf8' })),
   };
