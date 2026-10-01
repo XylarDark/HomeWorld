@@ -104,6 +104,70 @@ function parseRubric(output) {
 }
 
 /**
+ * The judge's nine criteria, in the fixed order rubric-eval reports them.
+ *
+ * The CLI prints two shapes depending on outcome — a named table on pass and a
+ * numbered list on fail — but the numbered list is ordered, and its order is
+ * stable across runs. Mapping by index lets both shapes feed one vocabulary, so
+ * criterion scores can be aggregated across the corpus instead of looked at per
+ * rule.
+ */
+const CRITERIA = [
+  'Description Clarity',
+  'Instruction Clarity',
+  'Example Quality',
+  'Documentation Completeness',
+  'Scope Definition',
+  'Professional Tone',
+  'Trigger Simulation',
+  'Workflow Completeness',
+  'Error Handling Quality',
+];
+
+// Numbered form: `3. [RUBRIC_EVAL-MEDIUM] [5/10] Examples are helpful, ...`
+// Item 10 is the overall verdict and carries no `/10`, so it is not matched.
+const CRITERION_LINE_RE = /^\s*(\d{1,2})\.\s*\[RUBRIC_EVAL-[A-Z_]+\]\s*\[(\d{1,2})\/10\]/gm;
+// Named-table form: `| Description Clarity | 7/10 | Yes | ...`
+const CRITERION_TABLE_RE = /^\|\s*([A-Z][A-Za-z ]+?)\s*\|\s*(\d{1,2})\/10\s*\|/gm;
+
+/**
+ * Extract per-criterion scores (each /10) from one run.
+ * Returns {} when nothing parseable is present — never partial guesses, and
+ * never throws. Criterion data is a bonus over the composite score, so a miss
+ * here must not be able to fail a run that otherwise scored.
+ */
+function parseCriteria(output) {
+  let text;
+  if (typeof output === 'string') {
+    text = output;
+  } else if (output && typeof output === 'object') {
+    text = `${output.stdout || ''}${output.stderr || ''}`;
+  } else {
+    return {};
+  }
+  const out = {};
+  let m;
+  CRITERION_LINE_RE.lastIndex = 0;
+  while ((m = CRITERION_LINE_RE.exec(text)) !== null) {
+    const idx = Number(m[1]);
+    const score = Number(m[2]);
+    if (idx >= 1 && idx <= CRITERIA.length && Number.isFinite(score)) {
+      out[CRITERIA[idx - 1]] = score;
+    }
+  }
+  // Fall back to the named table only if the numbered form yielded nothing.
+  if (Object.keys(out).length === 0) {
+    CRITERION_TABLE_RE.lastIndex = 0;
+    while ((m = CRITERION_TABLE_RE.exec(text)) !== null) {
+      const name = m[1].trim();
+      const score = Number(m[2]);
+      if (CRITERIA.includes(name) && Number.isFinite(score)) out[name] = score;
+    }
+  }
+  return out;
+}
+
+/**
  * Build a short, diagnostic reason from a run that produced no score.
  *
  * `spawnSync` returns `status`/`signal`, NOT `code` (that field is for the async
@@ -126,14 +190,14 @@ function failureReason(proc) {
   return bits.join(' - ');
 }
 
-/** Run rubric-eval once. Returns {score} or {score:null, reason}. */
+/** Run rubric-eval once. Returns {score, criteria} or {score:null, reason}. */
 function runRubricOnce(tool, skillDir) {
   const proc = spawnSync(tool, ['rubric-eval', skillDir, '-r', 'cli'], {
     encoding: 'utf8',
     maxBuffer: 32 * 1024 * 1024,
   });
   const parsed = parseRubric(proc);
-  if (parsed) return parsed;
+  if (parsed) return { ...parsed, criteria: parseCriteria(proc) };
   return { score: null, reason: failureReason(proc) };
 }
 
@@ -256,6 +320,16 @@ function main() {
       const scores = runs.map((x) => x.score).filter((x) => x !== null);
       const mean = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : null;
       const attempts = runs.reduce((a, x) => a + (x.attempts || 1), 0);
+      // Criterion scores are averaged over whichever runs reported them; a rule
+      // judged but with unparseable criteria simply contributes none.
+      const critAcc = {};
+      for (const run of runs) {
+        for (const [k, v] of Object.entries(run.criteria || {})) (critAcc[k] ||= []).push(v);
+      }
+      const criteria = {};
+      for (const [k, arr] of Object.entries(critAcc)) {
+        criteria[k] = Number((arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(2));
+      }
       const cls = sibling.classifyTombstone(rule);
       results.push({
         file: rule.file,
@@ -268,6 +342,7 @@ function main() {
         spread:
           scores.length > 1 ? Number((Math.max(...scores) - Math.min(...scores)).toFixed(2)) : null,
         runs: scores,
+        criteria,
         // A rule that needed a retry is flaky - surface it, do not hide it.
         attempts,
         retried: attempts > runs.length,
@@ -290,6 +365,21 @@ function main() {
   const spreads = scored.map((r) => r.spread).filter((x) => x !== null);
   const pad = (s, n) => String(s).padEnd(n);
 
+  // Aggregate each criterion across the corpus. This is what turns "the judge
+  // finds the corpus mediocre" into a specific, editable target list.
+  const critAcc = {};
+  for (const r of results) {
+    for (const [k, v] of Object.entries(r.criteria || {})) (critAcc[k] ||= []).push(v);
+  }
+  const criteriaSummary = Object.fromEntries(
+    Object.entries(critAcc)
+      .map(([k, arr]) => [
+        k,
+        { mean: Number((arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(2)), n: arr.length },
+      ])
+      .sort((a, b) => a[1].mean - b[1].mean)
+  );
+
   console.log('');
   console.log(`${PREFIX} - LLM-as-judge rubric eval on .cursor/rules/*.mdc`);
   console.log(`  judge      : ${cred.provider} / ${judgeModel}  (scorer v${toolVersion})`);
@@ -308,6 +398,13 @@ function main() {
     }
   }
   console.log(`  threshold  : 70 (rubric-eval's own gate)`);
+  const critEntries = Object.entries(criteriaSummary);
+  if (critEntries.length) {
+    console.log('  criteria   : mean /10 across the corpus, weakest first');
+    for (const [k, v] of critEntries) {
+      console.log(`               ${pad(k, 26)} ${v.mean.toFixed(1)}  (n=${v.n})`);
+    }
+  }
   console.log('');
   for (const r of [...results].sort((a, b) => (a.score ?? -1) - (b.score ?? -1))) {
     const s = r.score === null ? 'UNSCORED' : r.score.toFixed(1);
@@ -353,6 +450,7 @@ function main() {
     judgedCount: scored.length,
     unscoredCount: unscored.length,
     mean: mean === null ? null : Number(mean.toFixed(2)),
+    criteria: criteriaSummary,
     belowThreshold: scored.filter((r) => r.score < 70).map((r) => r.file),
     results,
   };
@@ -381,7 +479,9 @@ if (require.main === module) main();
 
 module.exports = {
   PREFIX,
+  CRITERIA,
   parseRubric,
+  parseCriteria,
   detectCredential,
   resolveTool,
   failureReason,

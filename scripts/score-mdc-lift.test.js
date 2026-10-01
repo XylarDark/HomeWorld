@@ -18,7 +18,7 @@ const test = require('node:test');
 
 const script = path.join(__dirname, 'score-mdc-lift.js');
 const projectRoot = path.resolve(__dirname, '..');
-const { parseRubric, detectCredential, resolveTool, failureReason, scoreWithRetries } = require('./score-mdc-lift.js');
+const { parseRubric, parseCriteria, CRITERIA, detectCredential, resolveTool, failureReason, scoreWithRetries } = require('./score-mdc-lift.js');
 
 const CRED_VARS = ['SKILL_EVAL_LLM_PROVIDER', 'NVIDIA_API_KEY', 'OPENAI_API_KEY', 'ANTHROPIC_API_KEY'];
 
@@ -222,4 +222,45 @@ test('scoreWithRetries is UNSCORED only after every attempt misses', () => {
   assert.strictEqual(r.attempts, 3, 'retries=2 means 3 attempts total');
   assert.strictEqual(calls, 3);
   assert.match(r.reason, /still prose/);
+});
+
+test('parseCriteria reads the numbered form, ignoring the item-10 verdict', () => {
+  // Item 10 is the overall verdict and carries no `/10`, so it must not be
+  // mistaken for a tenth criterion.
+  const out = [
+    '  LLM Rubric Score: 57.7/100',
+    '  1. [RUBRIC_EVAL-LOW] [8/10] Description is clear, specific, and explains WHEN',
+    '  2. [RUBRIC_EVAL-MEDIUM] [6/10] Instructions are easy to follow',
+    '  3. [RUBRIC_EVAL-MEDIUM] [5/10] Examples are helpful',
+    ' 10. [RUBRIC_EVAL-HIGH] Rubric evaluation failed: score 57.7/100 is below the bar',
+  ].join('\n');
+  const c = parseCriteria(out);
+  assert.strictEqual(c['Description Clarity'], 8);
+  assert.strictEqual(c['Instruction Clarity'], 6);
+  assert.strictEqual(c['Example Quality'], 5);
+  assert.strictEqual(Object.keys(c).length, 3, 'the verdict line must not add a criterion');
+});
+
+test('parseCriteria maps all nine criteria by their fixed order', () => {
+  const lines = CRITERIA.map((_, i) => `  ${i + 1}. [RUBRIC_EVAL-LOW] [${i + 1}/10] text`);
+  const c = parseCriteria(lines.join('\n'));
+  assert.deepStrictEqual(Object.keys(c), CRITERIA);
+  assert.strictEqual(c['Error Handling Quality'], 9);
+});
+
+test('parseCriteria falls back to the named table when no numbered list is present', () => {
+  const table = [
+    '| Criterion                  | Score | Pass |',
+    '| Description Clarity        | 7/10  | Yes  |',
+    '| Example Quality            | 0/10  | No   |',
+  ].join('\n');
+  const c = parseCriteria(table);
+  assert.strictEqual(c['Description Clarity'], 7);
+  assert.strictEqual(c['Example Quality'], 0, 'a real 0/10 must be kept, not dropped');
+});
+
+test('parseCriteria returns {} rather than throwing on bad input', () => {
+  for (const bad of [undefined, null, '', {}, 42, []]) {
+    assert.deepStrictEqual(parseCriteria(bad), {});
+  }
 });
