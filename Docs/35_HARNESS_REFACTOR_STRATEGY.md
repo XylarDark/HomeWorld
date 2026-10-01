@@ -147,6 +147,27 @@ The harness is doing its job when **the product moves and agents are cheap to su
 
 ---
 
+### Phase 5 — STOP — **DONE**
+
+Delivered: [36_HARNESS_MAINTENANCE_CONTRACT.md](36_HARNESS_MAINTENANCE_CONTRACT.md).
+
+The maintenance contract is the phase. It states what the harness now is, the three
+triggers that justify touching it, the six-month kill rule, the success signals, and
+an explicit escape hatch: **if the harness-to-product commit ratio has not inverted
+within three months, delete the harness** and rely on `AGENTS.md` plus the build gate.
+
+### Phase 3 — PROVE it behaves — **OPEN, deliberately the last thing**
+
+Revised per *Week 1 – Agentic Engineering*: **behaviour tests, not Catch2 unit
+tests.** Unit-level TDD is *"impractical for most cases"* when the unit is a class;
+BDD is *"a perfect fit for LLM-assisted engineering."*
+
+Toolchain verified present 2026-10-01 (`dotnet`, `vswhere`, `UE_5.8`), so this is
+feasible. It is left last deliberately: it is the only phase whose size is unknown,
+and it needs a real build cycle rather than another context-starved pass.
+
+---
+
 ## 5. Honest gaps in this strategy
 
 1. **The PDFs you referenced are not in the repo.** I found no `.pdf` anywhere under `C:\dev\HomeWorld`. I have designed against the written material only — the taste interview, the art-pipeline research, and the harness research. If the loop-engineering design PDFs carry constraints I am missing, attach them and I will revise before Phase 1.
