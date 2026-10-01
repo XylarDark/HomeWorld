@@ -683,6 +683,69 @@ test('the NightMix range check accepts the ways people actually write it', () =>
   }
 });
 
+test('a correct answer worded differently still passes the shot-brief checks', () => {
+  // R1: run 1 failed the harness arm on two art-shot-brief checks because they
+  // demanded the literal strings "Cabin amber" and a bare neon-ban, not because the
+  // answer was wrong. This fixture says the same thing in different words.
+  const task = M.loadTasks(TASTE_MANIFEST).tasks.find((t) => t.id === 'art-shot-brief');
+  const worded = fixture({});
+  // Seed FIRST, then write the agent's output. Seeding after writing makes
+  // `newOnly` treat the brief as pre-existing and every check returns `void` - which
+  // made the first version of the "wrong brief" test below pass for the wrong reason.
+  const seeded = M.seed(worded, {});
+  fs.mkdirSync(path.join(worded, 'Docs', 'qa'), { recursive: true });
+  fs.writeFileSync(
+    path.join(worded, 'Docs', 'qa', 'shot-shrine-night.md'),
+    '# Shot brief — spirit shrine, night\n\n' +
+      '| Shot | Pass when | Fail when |\n|---|---|---|\n' +
+      '| Shrine night | the cyan crystal answers the amber window light from the porch | the gate goes tech; geometry rebuilt for night |\n\n' +
+      'Light: the shrine jewel is cyan. The porch window is the warm key it answers. The sky holds navy.\n\n' +
+      'Geometry: no new meshes — it reuses the same masters, shifted by NightMix.\n',
+    'utf8'
+  );
+  const failed = task.checks
+    .map((c) => M.evaluateCheck(worded, c, seeded))
+    .filter((r) => !r.pass)
+    .map((r) => `${r.label} (${r.verdict})`);
+  assert.deepStrictEqual(failed, [], `a correct, differently-worded brief failed: ${failed.join('; ')}`);
+});
+
+test('a genuinely wrong brief still fails the shot-brief checks', () => {
+  // The other half of R1. Loosening checks to accept wording must not accept anything.
+  const task = M.loadTasks(TASTE_MANIFEST).tasks.find((t) => t.id === 'art-shot-brief');
+  const wrong = fixture({});
+  const seeded = M.seed(wrong, {});
+  fs.mkdirSync(path.join(wrong, 'Docs', 'qa'), { recursive: true });
+  fs.writeFileSync(
+    path.join(wrong, 'Docs', 'qa', 'shot-shrine-night.md'),
+    '# Shrine night\n\nA neon portal ring glowing blue, rebuilt as fresh geometry for the night, ' +
+      'lit by a small moon.\n',
+    'utf8'
+  );
+  const results = task.checks.map((c) => M.evaluateCheck(wrong, c, seeded));
+  // Guard the guard: if every check is `void` the file was never seen and this test
+  // would pass while proving nothing.
+  assert.ok(
+    results.some((r) => r.subjectPresent),
+    'the wrong brief was never read - this test would be vacuous'
+  );
+  const failed = results.filter((r) => !r.pass);
+  assert.ok(failed.length >= 3, `a wrong brief passed ${task.checks.length - failed.length} checks`);
+});
+
+test('the verdict-vocabulary check is not satisfied by the word "pass"', () => {
+  // It accepted `pass` as an alternative, which appears in almost any sentence about
+  // proving something - so the check could not fail.
+  const task = M.loadTasks(TASTE_MANIFEST).tasks.find((t) => t.id === 'mechanic-beat-packet');
+  const check = task.checks.find((c) => c.label.includes('verdict vocabulary'));
+  const vague = fixture({
+    'Docs/qa/T0_M4_backpack_packet.md':
+      '# Packet\n\nT0_M4 MUST #4. This will pass once implemented. Prove labels are named. DONE-WHEN done.\n',
+  });
+  const seeded = M.seed(vague, {});
+  assert.strictEqual(M.evaluateCheck(vague, check, seeded).pass, false, '"will pass" must not satisfy it');
+});
+
 test('trials raise the minimum valid runs a cell needs', () => {
   // One trial per cell is noise-dominated: a single timeout or one unusual answer
   // moves the rate as much as any real effect. `--min-valid` defaults to the trial

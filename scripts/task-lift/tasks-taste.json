@@ -35,10 +35,9 @@
         { "class": "completion", "kind": "matches", "path": "Docs/qa/shot-shrine-night.md", "pattern": "shrine", "label": "names the subject" },
         { "class": "conformance", "kind": "anyMatches", "glob": "Docs/qa/shot-shrine-night.md", "newOnly": true, "pattern": "Pass when|PASS when|pass criteria|\\|\\s*Pass", "label": "states explicit pass criteria" },
         { "class": "conformance", "kind": "anyMatches", "glob": "Docs/qa/shot-shrine-night.md", "newOnly": true, "pattern": "Fail when|FAIL when|fail criteria|\\|\\s*Fail", "label": "states explicit fail criteria" },
-        { "class": "conformance", "kind": "anyMatches", "glob": "Docs/qa/shot-shrine-night.md", "newOnly": true, "pattern": "Crystal cyan", "label": "names the locked palette chip the shrine uses" },
-        { "class": "conformance", "kind": "anyMatches", "glob": "Docs/qa/shot-shrine-night.md", "newOnly": true, "pattern": "Cabin amber|Cabin gold|cabin amber", "label": "pairs the shrine light against the cabin key" },
-        { "class": "conformance", "kind": "anyMatches", "glob": "Docs/qa/shot-shrine-night.md", "newOnly": true, "pattern": "same master|same masters|same material", "label": "reuses the existing masters rather than rebuilding for night" },
-        { "class": "conformance", "kind": "noneMatch", "glob": "Docs/qa/shot-shrine-night.md", "newOnly": true, "pattern": "neon (?:tech )?(?:portal|ring|glow)|technological portal|sci-?fi portal", "label": "the shrine is a handmade spirit cue, not a tech gate" }
+        { "class": "conformance", "kind": "anyMatches", "glob": "Docs/qa/shot-shrine-night.md", "newOnly": true, "pattern": "(?i)crystal cyan|cyan (?:crystal|shard|jewel|light)|the cyan", "label": "names the locked palette chip the shrine uses" },
+        { "class": "conformance", "kind": "anyMatches", "glob": "Docs/qa/shot-shrine-night.md", "newOnly": true, "pattern": "(?i)cabin amber|cabin gold|amber window|warm window|window light|porch light|cabin's warm|cabin warm", "label": "pairs the shrine light against the cabin key" },
+        { "class": "conformance", "kind": "anyMatches", "glob": "Docs/qa/shot-shrine-night.md", "newOnly": true, "pattern": "(?i)same master|same material|no new mesh|not rebuild|reuses the|reuse the", "label": "reuses the existing masters rather than rebuilding for night" }
       ],
       "control": {
         "Docs/qa/shot-shrine-night.md": "# Shot brief — spirit shrine, night\n\n**Subject:** the handmade spirit shrine beyond the cabin, answering the cabin's own light.\n\n| Shot | Pass when | Fail when |\n|---|---|---|\n| Spirit shrine night | Crystal cyan inner shard answering Cabin amber from the porch; tight bloom, not lawn-wide neon; the same masters carry the night | Neon tech portal; geometry rebuilt for night; the cyan swamps the warm key |\n\n## Light\n\nCrystal cyan is the jewel. Cabin amber stays the warm key it always is, and the shrine\nanswers it rather than replacing it. Navy sky holds the background.\n\n## Geometry\n\nNo new meshes. The same masters, shifted by NightMix, exactly as every other night shot\nin the project.\n"
@@ -73,7 +72,7 @@
         { "class": "conformance", "kind": "anyMatches", "path": "Docs/qa/T0_M4_backpack_packet.md", "pattern": "DONE-WHEN", "label": "states DONE-WHEN" },
         { "class": "conformance", "kind": "anyMatches", "path": "Docs/qa/T0_M4_backpack_packet.md", "pattern": "Anti", "label": "carries the Anti row" },
         { "class": "conformance", "kind": "anyMatches", "path": "Docs/qa/T0_M4_backpack_packet.md", "pattern": "Trade-Offs|Tradeoffs", "label": "carries the A-E trade-off section" },
-        { "class": "conformance", "kind": "anyMatches", "path": "Docs/qa/T0_M4_backpack_packet.md", "pattern": "soft_fail|closed_fail|pass", "label": "uses the three-state verdict vocabulary" },
+        { "class": "conformance", "kind": "anyMatches", "path": "Docs/qa/T0_M4_backpack_packet.md", "pattern": "soft_fail|closed_fail", "label": "uses the three-state verdict vocabulary" },
         { "class": "conformance", "kind": "noneMatch", "path": "Docs/qa/T0_M4_backpack_packet.md", "pattern": "\\|\\s*\\*\\*Status\\*\\*\\s*\\|\\s*\\**\\s*(ACCEPTED|APPROVED|APPROVE|PASS)", "label": "does not mark itself approved - design does not self-approve" }
       ],
       "control": {
