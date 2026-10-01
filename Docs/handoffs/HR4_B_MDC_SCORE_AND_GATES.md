@@ -463,22 +463,47 @@ actually retried, so it is a flakiness indicator, not a count of everything the
 provider touched.)
 
 The judge's own log makes this hard to diagnose, because the wording is
-misleading. A reply that cannot be parsed raises a `JSONDecodeError`, and the
-message printed is **`LLM not configured - using fallback response`** —
-the handler for `LLMClientError` at `inference/client.py:343`, which is the
-*first branch of a generic failure handler*, not a statement about
+misleading. `inference/client.py` `process()` catches `LLMClientError` **first**
+and prints **`LLM not configured - using fallback response`** — the handler at
+line 343, the *first branch of a generic failure handler*, not a statement about
 configuration. The provider was configured and judged 29 other rules in the same
-process. Recorded in `docs/KNOWN_ERRORS.md` with both failure shapes.
+process. `inference/types.py:15` shows `EmptyLLMResponseError` **subclasses**
+`LLMClientError`, so an **empty completion** is reported as a configuration
+fault.
 
-Mechanically this is consistent with `RUBRIC_MAX_TOKENS = 4096` (0.4.0): a longer
-input invites a longer judge preamble, and a reply that overruns the cap is cut
-mid-object and cannot be recovered by the brace-slicing fallback. It is
-*consistent*, not proven — the UNSCORED pair's mean size (6,246 B) is ~2.5× the
-mean of the 29 judged rules (2,541 B), but size alone does not decide it:
-`03-testing.mdc` (3,692 B) lost a sample and `unreal-cpp.mdc` (2,899 B) failed
-once early on and later scored. **Not yet actioned:** bounding or splitting
-`09-mcp-workflow.mdc` is a plausible reduction to be judged at `--repeat 4`
-against the pooled SD before it is believed.
+That is now **proven**, not inferred. Wrapping
+`openai.resources.chat.completions.Completions.create` and re-running the real
+`rubric-eval` on `09-mcp-workflow.mdc` printed:
+
+    RESPONSE finish_reason='length' content_len=0
+             model='nvidia/nemotron-3-super-120b-a12b' max_tokens=4096
+    USAGE    prompt=2587 completion=4096 reasoning=4096
+    COMPLETIONS-RAISED EmptyLLMResponseError: LLM returned empty response content
+    WARNING  LLM not configured - using fallback response
+
+`RUBRIC_MAX_TOKENS = 4096` (`constants.py:392`) is the `default_max_tokens` of
+`RubricEvalValidator` (`rubric_eval.py:194`) and has **no env or CLI override**
+(`rubric-eval --help` exposes only `--min-score`, `-r`, `-o`). On this judge —
+`nvidia/nemotron-3-super-120b-a12b`, a reasoning model — those 4096 tokens are
+**shared between reasoning and content**. On the two largest rules the model
+spent all 4096 on reasoning and returned `content=""`, so the judge raised
+`EmptyLLMResponseError`, fell back, and printed "not configured".
+
+A size sweep on throwaway copies (bodies truncated to 100 / 50 / 25 % of body
+lines, never touching `.cursor/rules/`) shows the effect is **probabilistic, not
+a byte cutoff**:
+
+| rule | 100 % | 50 % | 25 % |
+|---|---|---|---|
+| `09-mcp-workflow.mdc` | UNSCORED | UNSCORED | 57.7 |
+| `20-full-automation-no-manual-steps.mdc` | UNSCORED | 70.5 | 60.9 |
+
+Halving the largest rule **still failed** (3,516 B) while `03-testing.mdc`
+scored at 3,692 B — so size alone does not decide it, and a bounded rule is not
+a reliable fix. **Not actioned, deliberately:** bounding `09-mcp-workflow.mdc`
+would edit the agent behaviour spec (a content decision), and the sweep shows it
+would not reliably work. The available remedies are all ask-first: pin a
+non-reasoning `--judge-model`, take an upstream fix, or accept 2/31 UNSCORED.
 
 ### The two measurements disagree, and that is the finding
 
