@@ -27,6 +27,7 @@ const {
   resolveTool,
   failureReason,
   scoreWithRetries,
+  pooledWithinSd,
   hashSkillDir,
   cacheKeyFor,
   isValidSample,
@@ -435,4 +436,42 @@ test('CLI rejects --judge-model with no value, and with a blank value', () => {
     assert.strictEqual(r.status, 2);
     assert.match(r.stderr, /--judge-model needs a model name/);
   }
+});
+
+// ---------------------------------------------------------------------------
+// Uncertainty (W2.5). The corpus mean must not read as exact.
+// ---------------------------------------------------------------------------
+
+test('pooledWithinSd measures within-rule jitter, not the spread between rules', () => {
+  // Two rules with identical internal spread and very different means. The
+  // 30-point difference between them is signal; folding it in would let a
+  // measure of "how much the judge wobbles" grow with the corpus's variety.
+  const sd = pooledWithinSd([
+    [50, 52],
+    [80, 82],
+  ]);
+  assert.ok(Math.abs(sd - Math.SQRT2) < 1e-9, `expected ~1.414, got ${sd}`);
+});
+
+test('pooledWithinSd returns null when no rule has two samples', () => {
+  // Under --repeat 1 there is no evidence about jitter, so any number would be
+  // invented. Null says "unmeasured"; 0 would say "perfectly stable".
+  assert.strictEqual(pooledWithinSd([]), null);
+  assert.strictEqual(pooledWithinSd([[60], [70]]), null);
+  assert.strictEqual(pooledWithinSd(null), null);
+  assert.strictEqual(pooledWithinSd(undefined), null);
+});
+
+test('pooledWithinSd drops unusable samples instead of reading them as 0', () => {
+  const sd = pooledWithinSd([[10, null, 10, NaN]]);
+  assert.strictEqual(sd, 0, 'the real pair is identical, so jitter is 0');
+});
+
+test('pooledWithinSd pools by degrees of freedom across rules', () => {
+  // [0,2] -> ss 2, df 1 ; [10,12,14] -> ss 8, df 2 ; pooled = 10/3
+  const sd = pooledWithinSd([
+    [0, 2],
+    [10, 12, 14],
+  ]);
+  assert.ok(Math.abs(sd - Math.sqrt(10 / 3)) < 1e-9, `got ${sd}`);
 });

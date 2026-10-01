@@ -351,6 +351,31 @@ function saveCache(file, cache, warn) {
   }
 }
 
+/**
+ * Pooled within-rule standard deviation, across every rule that has 2+ samples.
+ *
+ * This is the honest resolution of the judge: how much a single rule's own score
+ * moves between identical runs. It deliberately does NOT include between-rule
+ * variance — that is signal, not noise, and folding it in would inflate the
+ * figure while pretending it measured the judge.
+ *
+ * Returns null when no rule has two samples (e.g. a --repeat 1 sweep), because
+ * in that case there is no evidence about jitter and a number would be invented.
+ */
+function pooledWithinSd(sampleGroups) {
+  let sumSquares = 0;
+  let degreesOfFreedom = 0;
+  for (const group of sampleGroups || []) {
+    const xs = (group || []).filter((x) => Number.isFinite(x));
+    if (xs.length < 2) continue;
+    const m = xs.reduce((a, b) => a + b, 0) / xs.length;
+    sumSquares += xs.reduce((a, b) => a + (b - m) ** 2, 0);
+    degreesOfFreedom += xs.length - 1;
+  }
+  if (degreesOfFreedom === 0) return null;
+  return Math.sqrt(sumSquares / degreesOfFreedom);
+}
+
 function parseArgs(argv) {
   const opts = {
     json: null,
@@ -560,6 +585,12 @@ function main() {
   const scores = scored.map((r) => r.score);
   const mean = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : null;
   const spreads = scored.map((r) => r.spread).filter((x) => x !== null);
+  // Judge noise only. The SE of the corpus mean says how precisely THAT mean is
+  // pinned down against judge jitter; it says nothing about which rules are in
+  // the corpus, which is the larger source of variation in practice.
+  const withinRuleSd = pooledWithinSd(scored.map((r) => r.runs));
+  const seOfMean =
+    withinRuleSd === null || scored.length === 0 ? null : withinRuleSd / Math.sqrt(scored.length);
   const pad = (s, n) => String(s).padEnd(n);
 
   // Aggregate each criterion across the corpus. This is what turns "the judge
@@ -596,7 +627,8 @@ function main() {
     );
   }
   if (scores.length) {
-    console.log(`  mean       : ${mean.toFixed(1)}  (range ${Math.min(...scores).toFixed(1)}-${Math.max(...scores).toFixed(1)})`);
+    const seText = seOfMean === null ? '' : ` +/- ${seOfMean.toFixed(1)} SE (judge noise only)`;
+    console.log(`  mean       : ${mean.toFixed(1)}${seText}  (range ${Math.min(...scores).toFixed(1)}-${Math.max(...scores).toFixed(1)})`);
     if (spreads.length) {
       console.log(`  jitter     : mean spread ${(spreads.reduce((a, b) => a + b, 0) / spreads.length).toFixed(1)} pts over ${opts.repeat} run(s) — a single run is not a measurement`);
     }
@@ -634,6 +666,12 @@ function main() {
         ? Number((spreads.reduce((a, b) => a + b, 0) / spreads.length).toFixed(2))
         : null,
       maxSpread: spreads.length ? Number(Math.max(...spreads).toFixed(2)) : null,
+      // Pooled within-rule SD and the SE it implies for the corpus mean. Reported
+      // so a reader can see the precision of the mean against judge noise instead
+      // of reading 60.9 as exact. Null under --repeat 1: with one sample per rule
+      // there is no evidence about jitter, and a number would be invented.
+      withinRuleSd: withinRuleSd === null ? null : Number(withinRuleSd.toFixed(2)),
+      standardErrorOfMean: seOfMean === null ? null : Number(seOfMean.toFixed(2)),
       // The judge sometimes answers in prose and emits no score; that attempt is
       // retried. retriedCount > 0 means the provider is flaky right now, which
       // a reader needs to know before trusting an UNSCORED or a tight delta.
@@ -702,6 +740,7 @@ module.exports = {
   resolveTool,
   failureReason,
   scoreWithRetries,
+  pooledWithinSd,
   hashSkillDir,
   cacheKeyFor,
   isValidSample,
