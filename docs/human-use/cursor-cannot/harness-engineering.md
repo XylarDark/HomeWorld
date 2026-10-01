@@ -41,14 +41,41 @@ build it and call it closed."
 - Do not add a mutation-testing CI job, a CRAP action, or a custom observability
   product to "close" this slice. Those are other Cursor-cannot files.
 
+## What the harness now does about early victory
+
+The PDF's central warning is "stop agents declaring victory too early." Four
+mechanisms exist, and each was added after the harness produced a confident wrong
+number rather than because the PDF suggested it:
+
+| Mechanism | Guards against | Command |
+| --------- | -------------- | ------- |
+| **Ablation verification** — the "without harness" arm is proven to have no harness left in it | Two arms that agree for the wrong reason, reported as "no effect" | `npm run tasklift` |
+| **Void runs** — an agent that never ran is excluded from the denominator, not scored 0 | A crashed run read as a weak one | `npm run tasklift` |
+| **Positive control** — each task's known-good answer must score 100% | An unsatisfiable check reporting a permanent 0% that reads as "the harness doesn't help" | `npm run tasklift:control` |
+| **Decision-log enforcement** — a boundary change without a written reason fails | A decision made in the gap a removed human stamp used to fill | `npm run decisions:check` |
+
+The common failure these share: an instrument that cannot fail, or cannot tell
+success from absence, reports a number that looks like evidence. The first pilot
+did all four at once and produced `lift: 0.25` from eight rejected agent sessions.
+
+**Still absent:** a competing-model adversarial pass. The PDF asks for one; nothing
+in `scripts/` implements it, and the agent now owns self-review — which is exactly
+where a sycophantic model flatters its own work. A same-model adversarial pass is
+weak; the PDF means a different provider. Not built; see
+[AGENT_DECISIONS.md](../../decisions/AGENT_DECISIONS.md) for what would have to be
+true to add it.
+
 ## Harness Test responsibilities (portable)
 
 Stop **early victory** from metric proxies. The harness — scripts, reports, skills — must:
 
 1. **Arrange before Act** — preflight gates that block capture/run when `ready: false`, or
    document **Harness exempt** where Arrange cannot apply.
-2. **Three-state outcomes** — `pass` / `soft_fail` / `closed_fail` (or equivalent). A harness
-   green is not a human visual or taste PASS.
+2. **Three-state outcomes** — `pass` / `soft_fail` / `closed_fail`, defined once in
+   [`scripts/outcome.js`](../../../../scripts/outcome.js) and shared. `void` is the
+   *absence* of a state, not a fourth one: an unmeasured subject is excluded from
+   the denominator rather than scored 0. A harness green is not a human visual or
+   taste PASS.
 3. **Metric ≠ visual** — luminance, checksums, screenshot size, and DOM snapshots prove the
    pipeline ran; framing, composition, and taste need a human stamp (see
    [taste-gates.md](../taste-gates.md) when taste limits apply).

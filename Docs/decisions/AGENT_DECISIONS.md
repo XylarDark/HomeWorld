@@ -130,3 +130,80 @@ skipped.
 - **Does not touch:** `T0-gaps-vs-inventories-stamp` (game mechanic canon) and
   `T0-prove-results` (Test: beat acceptance) stay human. This decision moved a
   harness question, not a product one.
+
+### DEC-0006 — `void` is the absence of a state, not a fourth state (2026-10-01)
+
+- **Area:** code design
+- **Decision:** Adopt one shared outcome vocabulary in `scripts/outcome.js`: `pass`,
+  `soft_fail`, `closed_fail` for a subject that was actually measured, plus `void`
+  for one that was not. `void` is excluded from the denominator, never scored 0.
+- **Rationale:** Three tools had grown their own outcome words and a reader would
+  reasonably assume they matched. They did not, and the mismatch had teeth: the void
+  pilot reported eight runs that produced nothing as a conformance delta, because
+  the only honest-sounding option was to call them failures. The alternative was to
+  keep `pass`/`fail` and rely on prose warnings. Rejected — the warning would be in
+  the report nobody reads, while the number would be in the report somebody quotes.
+- **Evidence:** `scripts/outcome.js`; the `verdictFor` ordering rule is pinned by a
+  test asserting an absent subject is `void` even when `pass: true`.
+- **Reverses if:** Never by convenience. If `void` is ever mapped to `closed_fail`,
+  the pilot bug returns.
+
+### DEC-0007 — Verify the ablation, and ship a positive control (2026-10-01)
+
+- **Area:** code design
+- **Decision:** `buildWorktree` refuses to measure an arm whose harness surfaces
+  survived the delete, and every task carries a `control` fixture that must score
+  100% (`npm run tasklift:control`).
+- **Rationale:** The alternative was to trust the ablation and read the number. Two
+  silent failure modes sat behind that trust. If a delete half-fails, the "without
+  harness" arm is a "with harness" arm in disguise, the arms agree, and the finding
+  is "no effect" — biased toward the comfortable answer. If a check's pattern can
+  never be satisfied, the eval reports a permanent shortfall that reads as "the
+  harness does not help". Both produce a confident wrong number, which is the exact
+  failure this instrument exists to avoid.
+- **Evidence:** `verifyAblation`; `scoreControl`; the four control fixtures reach
+  100% (8/8, 9/9, 6/6, 5/5). A test builds a throwaway tree with a surviving surface
+  and asserts the check fails.
+- **Reverses if:** Never. These only ever report a problem; they cannot manufacture a
+  result.
+
+### DEC-0008 — Tombstones exempt from the scope requirement, by `description:` only (2026-10-01)
+
+- **Area:** code design
+- **Decision:** The `globs:` conformance check becomes `declaresScope`: a live rule
+  must declare globs, a rule whose `description:` self-declares as retired or
+  quarantined is exempt (scored `soft_fail`, not a clean pass).
+- **Rationale:** I first proposed *loosening* this check, on the grounds that 3 of 31
+  rules lack `globs:` so a faithful copy of those would fail. Checking before acting
+  showed all three are deliberate tombstones — `07-ai-agent-behavior` and
+  `08-project-context` are `RETIRED P4`, `19-automation-cycle` is `QUARANTINE WAVE F`,
+  all with `alwaysApply: false`. Loosening would have hidden three dead rules behind a
+  passing check. Every live rule has `alwaysApply: false`, so `globs:` is the only
+  trigger a new rule has; the check is correct and the exceptions are intentional.
+- **Evidence:** `.cursor/rules/*.mdc` frontmatter — 31/31 `alwaysApply: false`,
+  28/31 with `globs:`; the three without are the tombstones. Discriminate on
+  `description:`, never body text, matching the rule `harness-coverage.js` already
+  uses.
+- **Reverses if:** A tombstone is ever revived, its `description:` stops declaring
+  retirement and the check applies to it again. That is the intended behaviour.
+
+### DEC-0009 — An unlogged boundary change fails; the DEC entry must be in the same commit (2026-10-01)
+
+- **Area:** harness refactor
+- **Decision:** `npm run decisions:check` exits non-zero when a commit touching a
+  boundary surface ships without adding a `DEC-NNNN` entry **in that same commit**.
+- **Rationale:** The 2026-10-01 reset made the written record the only evidence that
+  an agent-owned decision was ever made, and a record nothing checks is a suggestion.
+  The first version accepted an entry from any *later* commit and was rejected on
+  inspection: one entry appended at the end of a branch excuses every unlogged change
+  before it, which is decorative rather than enforcing. Scope is deliberately narrow —
+  it checks that the reasoning was written down, not that it was good. Judging
+  reasoning is a human taste call; recording it is mechanical.
+- **Evidence:** `scripts/decision-log.js`; tests build a throwaway git repo and assert
+  both the violation and the same-commit clearance, including that a later entry does
+  **not** cover an earlier commit. Run against this repo's own history it flags three
+  pre-rule commits, including my own `e937c9a`.
+- **Reverses if:** The same-commit rule proves impractical in practice. Then amend or
+  squash — do not weaken the check, or it stops catching the thing it exists for.
+- **Baseline:** the rule applies from this commit forward. Commits made before it are
+  backfilled here, not re-litigated.

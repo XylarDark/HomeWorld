@@ -1,7 +1,8 @@
 {
   "$comment": "Task-level eval: does the harness layer change what the agent produces? Prompts are IDENTICAL in both conditions. Checks split into two classes so the comparison controls for basic competence: `completion` = was the task done at all; `conformance` = does the artifact follow this repo's documented conventions. Lift is measured on `conformance` only. A harness that merely makes the agent do more work is not a lift.",
   "$globRule": "Checks with a `glob` resolve ONLY against files the agent created after seeding, never pre-existing files. Without that, the harness arm gets a free pass by matching any of the 31 rules already in .cursor/rules.",
-  "version": 1,
+  "$controlRule": "Every task carries a `control` fixture: the files a CORRECT agent would produce. `npm run tasklift:control` scores it and must reach 100%. This is the positive control — without it, an unsatisfiable pattern would report a permanent 0% that reads as 'the harness does not help' rather than 'the instrument is broken'.",
+  "version": 2,
   "tasks": [
     {
       "id": "known-errors-entry",
@@ -19,7 +20,10 @@
         { "class": "conformance", "kind": "matches", "path": "docs/KNOWN_ERRORS.md", "pattern": "\\*\\*Context:?\\*\\*", "label": "has the optional Context field" },
         { "class": "conformance", "kind": "matches", "path": "docs/KNOWN_ERRORS.md", "pattern": "\\d{4}-\\d{2}-\\d{2}", "label": "Context carries an ISO date" },
         { "class": "conformance", "kind": "matches", "path": "docs/KNOWN_ERRORS.md", "pattern": "HomeWorldGameMode", "label": "cites the file the error came from" }
-      ]
+      ],
+      "control": {
+        "docs/KNOWN_ERRORS.md": "# Known Errors\n\n## Entry format\n\n- **Error:** <code> and the symptom\n- **Cause:** why it happens\n- **Fix:** what to do about it\n- **Context:** <iso date> and where it was seen\n\n## Entries\n\n### C4456: declaration of 'Z' hides previous local declaration\n\n- **Error:** `error C4456` at `Source/HomeWorld/HomeWorldGameMode.cpp:412`\n- **Cause:** an inner declaration shadowed the enclosing `Z`\n- **Fix:** rename the inner variable so it no longer shadows the outer one\n- **Context:** 2026-10-01 — HomeWorldGameMode build\n"
+      }
     },
     {
       "id": "ue58-rule",
@@ -31,12 +35,15 @@
         { "class": "conformance", "kind": "anyMatches", "glob": ".cursor/rules/*.mdc", "newOnly": true, "pattern": "^name:", "label": "frontmatter has a name" },
         { "class": "conformance", "kind": "anyMatches", "glob": ".cursor/rules/*.mdc", "newOnly": true, "pattern": "^description:", "label": "frontmatter has a description" },
         { "class": "conformance", "kind": "anyMatches", "glob": ".cursor/rules/*.mdc", "newOnly": true, "pattern": "^alwaysApply:", "label": "frontmatter sets alwaysApply explicitly" },
-        { "class": "conformance", "kind": "anyMatches", "glob": ".cursor/rules/*.mdc", "newOnly": true, "pattern": "^globs:", "label": "frontmatter scopes via globs" },
+        { "class": "conformance", "kind": "declaresScope", "glob": ".cursor/rules/*.mdc", "newOnly": true, "label": "frontmatter scopes via globs (or self-declares as a tombstone)" },
         { "class": "conformance", "kind": "anyMatches", "glob": ".cursor/rules/*.mdc", "newOnly": true, "pattern": "^priority:", "label": "frontmatter carries a priority" },
         { "class": "conformance", "kind": "anyMatches", "glob": ".cursor/rules/*.mdc", "newOnly": true, "pattern": "^version:", "label": "frontmatter carries a version" },
         { "class": "conformance", "kind": "anyMatches", "glob": ".cursor/rules/*.mdc", "newOnly": true, "pattern": "5\\.8", "label": "anchors the pitfall to UE 5.8" },
         { "class": "conformance", "kind": "anyNewFiles", "glob": ".cursor/rules/*.mdc", "newOnly": true, "label": "landed in the project rule directory" }
-      ]
+      ],
+      "control": {
+        ".cursor/rules/ue58-controller-player-state.mdc": "---\nname: \"UE 5.8 AController::GetPlayerState is templated\"\ndescription: \"Calling GetPlayerState() on an AController in UE 5.8 does not compile as written; the accessor is templated on the player type.\"\nalwaysApply: false\nglobs: \"Source/HomeWorld/**/*.cpp\"\npriority: 5\nversion: 1.0\n---\n\n# GetPlayerState on an AController (UE 5.8)\n\nIn UE 5.8 `AController::GetPlayerState()` is templated, so calling it on a plain\ncontroller does not compile. Cast to `APlayerController` first, or name the type\nyou actually want. Anchor: UE 5.8 only.\n"
+      }
     },
     {
       "id": "powershell-helper",
@@ -50,7 +57,10 @@
         { "class": "conformance", "kind": "anyMatches", "glob": "**/*.ps1", "newOnly": true, "pattern": "(?i)-LiteralPath", "label": "uses -LiteralPath rather than -Path" },
         { "class": "conformance", "kind": "anyMatches", "glob": "**/*.ps1", "newOnly": true, "pattern": "(?i)(\\.SYNOPSIS|<\\#)", "label": "has comment-based help" },
         { "class": "conformance", "kind": "noneMatch", "glob": "**/*.ps1", "newOnly": true, "pattern": "&&", "label": "no && chaining (invalid in Windows PowerShell)" }
-      ]
+      ],
+      "control": {
+        "Tools/check-uasset-age.ps1": "<#\n.SYNOPSIS\n  Lists .uasset files under Content/HomeWorld/Meshes that are newer than HEAD.\n#>\nSet-StrictMode -Version Latest\n$ErrorActionPreference = 'Stop'\n\n$meshes = Join-Path $PSScriptRoot '..\\Content\\HomeWorld\\Meshes'\n$head = Get-Item -LiteralPath (Join-Path $PSScriptRoot '..\\.git\\HEAD')\n\nGet-ChildItem -LiteralPath $meshes -Recurse -Filter '*.uasset' |\n    Where-Object { $_.LastWriteTime -gt $head.LastWriteTime } |\n    ForEach-Object { Write-Output $_.FullName }\n"
+      }
     },
     {
       "id": "commit-message",
@@ -62,8 +72,11 @@
         { "class": "conformance", "kind": "anyMatches", "glob": "**/COMMIT_MSG.txt", "newOnly": true, "pattern": "^(feat|fix|docs|chore|refactor|test|perf|build|ci|style)(\\([^)]+\\))?!?:\\s+\\S", "label": "has a valid Conventional Commits type prefix" },
         { "class": "conformance", "kind": "commitSubjectCase", "glob": "**/COMMIT_MSG.txt", "newOnly": true, "label": "subject is lowercase after the prefix" },
         { "class": "conformance", "kind": "commitSubjectLength", "glob": "**/COMMIT_MSG.txt", "newOnly": true, "max": 72, "label": "subject is at most 72 characters" },
-        { "class": "conformance", "kind": "noneMatch", "glob": "**/COMMIT_MSG.txt", "newOnly": true, "pattern": "\\.\\s*$", "multiline": false, "label": "subject has no trailing period" }
-      ]
+        { "class": "conformance", "kind": "commitSubjectNoPeriod", "glob": "**/COMMIT_MSG.txt", "newOnly": true, "label": "subject has no trailing period" }
+      ],
+      "control": {
+        "COMMIT_MSG.txt": "fix(t0): correct the m3 prove script and note the regression\n\nThe m3 prove script reported a pass even when the gate actors were never\nspawned. It now fails closed when no actor is found, and a regression note was\nadded to the known-errors record.\n"
+      }
     }
   ]
 }

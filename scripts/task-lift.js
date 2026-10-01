@@ -50,6 +50,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { spawnSync } = require('node:child_process');
+const { verdictFor, isTombstoneDescription } = require('./outcome.js');
 
 const PREFIX = '[task-lift]';
 const PROJECT_ROOT = path.resolve(__dirname, '..');
@@ -184,8 +185,30 @@ function matchFiles(root, glob, allowed) {
 }
 
 /**
- * Create a worktree at HEAD. When `ablate` is set, delete the harness surfaces.
- * Throws with the git error rather than returning a half-built tree.
+ * Confirm the ablation actually removed the harness surfaces.
+ *
+ * Without this the experiment is unfalsifiable: if a delete silently half-fails —
+ * a path typo, Windows case-folding, a tool recreating `.cursor` — the "without
+ * harness" arm is secretly a *with harness* arm, and the two arms agree for a
+ * reason that has nothing to do with the harness. That failure is silent and it
+ * biases toward finding no effect, which is the comfortable direction to be wrong
+ * in. So it is checked, and it is reported into the JSON.
+ */
+function verifyAblation(root) {
+  const present = ABLATE_PATHS.filter((p) => fs.existsSync(path.join(root, p)));
+  return {
+    ok: present.length === 0,
+    present,
+    checked: ABLATE_PATHS.length,
+    // A reader must be able to see the arms differ, not take it on trust.
+    fileCount: listFiles(root).length,
+  };
+}
+
+/**
+ * Create a worktree at HEAD. When `ablate` is set, delete the harness surfaces and
+ * verify the deletion. Throws with the git error rather than returning a half-built
+ * tree, and throws on an incomplete ablation rather than measuring a fake arm.
  */
 function buildWorktree(dest, ablate) {
   const r = spawnSync('git', ['worktree', 'add', '--detach', dest, 'HEAD'], {
@@ -199,6 +222,13 @@ function buildWorktree(dest, ablate) {
     for (const p of ABLATE_PATHS) {
       const full = path.join(dest, p);
       if (fs.existsSync(full)) fs.rmSync(full, { recursive: true, force: true });
+    }
+    const v = verifyAblation(dest);
+    if (!v.ok) {
+      throw new Error(
+        `ablation incomplete, refusing to measure a fake "without harness" arm. ` +
+          `Still present: ${v.present.join(', ')}`
+      );
     }
   }
   return dest;
@@ -301,6 +331,17 @@ function evaluateCheck(root, check, createdAfterSeed) {
   const base = { class: check.class, label: check.label, kind: check.kind };
   const patterns = check.pattern ? compilePattern(check.pattern, check) : null;
 
+  // Every result carries a verdict from the shared vocabulary (scripts/outcome.js).
+  // `void` is the absence of a measurement, not a failure: it is what stops a
+  // missing subject from being reported as a wrong one.
+  const result = (pass, detail, { subjectPresent = true, soft = false } = {}) => ({
+    ...base,
+    pass,
+    detail,
+    subjectPresent,
+    verdict: verdictFor({ subjectPresent, pass, soft }),
+  });
+
   const readTargets = () => {
     if (check.path) {
       const full = path.join(root, check.path);
@@ -312,62 +353,91 @@ function evaluateCheck(root, check, createdAfterSeed) {
   };
 
   switch (check.kind) {
-    case 'exists':
-      return { ...base, pass: fs.existsSync(path.join(root, check.path)), detail: check.path };
+    case 'exists': {
+      const present = fs.existsSync(path.join(root, check.path));
+      return result(present, check.path, { subjectPresent: present });
+    }
 
     case 'matches': {
       const full = path.join(root, check.path);
-      if (!fs.existsSync(full)) return { ...base, pass: false, detail: 'file absent' };
-      return { ...base, pass: patterns.test(fs.readFileSync(full, 'utf8')), detail: check.path };
+      if (!fs.existsSync(full)) return result(false, 'file absent', { subjectPresent: false });
+      return result(patterns.test(fs.readFileSync(full, 'utf8')), check.path);
     }
 
     case 'lacks': {
       const full = path.join(root, check.path);
-      if (!fs.existsSync(full)) return { ...base, pass: false, detail: 'file absent' };
-      return { ...base, pass: !patterns.test(fs.readFileSync(full, 'utf8')), detail: check.path };
+      if (!fs.existsSync(full)) return result(false, 'file absent', { subjectPresent: false });
+      return result(!patterns.test(fs.readFileSync(full, 'utf8')), check.path);
     }
 
     case 'anyMatches': {
       const targets = readTargets();
-      if (targets.length === 0) return { ...base, pass: false, detail: 'no target file' };
+      if (targets.length === 0) return result(false, 'no target file', { subjectPresent: false });
       const hits = targets.filter((t) => patterns.test(fs.readFileSync(path.join(root, t), 'utf8')));
-      return { ...base, pass: hits.length > 0, detail: hits[0] || `none of ${targets.length} targets` };
+      return result(hits.length > 0, hits[0] || `none of ${targets.length} targets`);
     }
 
     case 'noneMatch': {
       const targets = readTargets();
-      if (targets.length === 0) return { ...base, pass: false, detail: 'no target file' };
+      if (targets.length === 0) return result(false, 'no target file', { subjectPresent: false });
       const hits = targets.filter((t) => patterns.test(fs.readFileSync(path.join(root, t), 'utf8')));
-      return { ...base, pass: hits.length === 0, detail: hits[0] ? `matched in ${hits[0]}` : 'clean' };
+      return result(hits.length === 0, hits[0] ? `matched in ${hits[0]}` : 'clean');
+    }
+
+    case 'declaresScope': {
+      // A live rule must declare how it is scoped. A tombstone must not: this repo
+      // keeps three rules alive as pointers with `alwaysApply: false` and no globs,
+      // and requiring globs of them would push a future agent to "fix" a retired
+      // rule back into an always-on load. Discriminate on the self-declared
+      // `description:` only, never on body text.
+      const targets = readTargets();
+      if (targets.length === 0) return result(false, 'no target file', { subjectPresent: false });
+      for (const t of targets) {
+        const text = fs.readFileSync(path.join(root, t), 'utf8');
+        const fm = /^---\r?\n([\s\S]*?)\r?\n---/.exec(text);
+        const description = fm ? (/^description:\s*(.*)$/m.exec(fm[1]) || [])[1] : '';
+        if (isTombstoneDescription(description)) return result(true, `${t} (tombstone)`, { soft: true });
+        if (/^globs:/m.test(fm ? fm[1] : '')) return result(true, t);
+      }
+      return result(false, 'no globs and no tombstone declaration');
     }
 
     case 'anyNewFiles': {
       const targets = readTargets();
-      return { ...base, pass: targets.length > 0, detail: `${targets.length} new file(s)` };
+      return result(targets.length > 0, `${targets.length} new file(s)`, {
+        subjectPresent: targets.length > 0,
+      });
     }
 
     case 'commitSubjectCase': {
       const targets = readTargets();
-      if (targets.length === 0) return { ...base, pass: false, detail: 'no message file' };
+      if (targets.length === 0) return result(false, 'no message file', { subjectPresent: false });
       const subject = commitSubject(fs.readFileSync(path.join(root, targets[0]), 'utf8'));
       const after = subject.replace(/^(\w+)(\([^)]*\))?!?:\s*/, '');
       // The type prefix is legitimately lowercase; only the subject text is judged.
-      return { ...base, pass: after === after.toLowerCase(), detail: subject.slice(0, 80) };
+      return result(after === after.toLowerCase(), subject.slice(0, 80));
+    }
+
+    case 'commitSubjectNoPeriod': {
+      // Judged on the SUBJECT, not the end of the file. A `noneMatch` on `\.\s*$`
+      // looks at end-of-string, so a well-formed message whose body ends in a
+      // sentence failed a check labelled "subject has no trailing period".
+      const targets = readTargets();
+      if (targets.length === 0) return result(false, 'no message file', { subjectPresent: false });
+      const subject = commitSubject(fs.readFileSync(path.join(root, targets[0]), 'utf8'));
+      const bad = /\.$/.test(subject.trim());
+      return result(!bad, bad ? 'subject ends with a period' : 'clean');
     }
 
     case 'commitSubjectLength': {
       const targets = readTargets();
-      if (targets.length === 0) return { ...base, pass: false, detail: 'no message file' };
+      if (targets.length === 0) return result(false, 'no message file', { subjectPresent: false });
       const subject = commitSubject(fs.readFileSync(path.join(root, targets[0]), 'utf8'));
-      return {
-        ...base,
-        pass: subject.length <= (check.max || 72),
-        detail: `${subject.length} chars`,
-      };
+      return result(subject.length <= (check.max || 72), `${subject.length} chars`);
     }
 
     default:
-      return { ...base, pass: false, detail: `unknown check kind: ${check.kind}` };
+      return result(false, `unknown check kind: ${check.kind}`, { subjectPresent: false });
   }
 }
 
@@ -399,6 +469,45 @@ function runTask(worktreeRoot, task, { dry }) {
     completionTotal: byClass('completion').length,
     conformanceTotal: byClass('conformance').length,
   };
+}
+
+/**
+ * Score a task's `control` fixture: the files a *correct* agent would produce.
+ *
+ * This is the positive control the manifest lacked. Without it, a check whose
+ * pattern can never be satisfied would report a permanent 0% forever, and that
+ * reads as "the harness does not help" rather than "the instrument is broken" —
+ * the same shape of error as scoring eight crashed runs as a weak agent.
+ *
+ * Returns per-check results plus a pass rate. `ok` is true only at a clean sweep.
+ */
+function scoreControl(task) {
+  const control = task.control || {};
+  const files = Object.keys(control);
+  if (files.length === 0) {
+    return { taskId: task.id, ok: false, reason: 'no control fixture declared', checks: [], rate: null };
+  }
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'tasklift-control-'));
+  try {
+    for (const [rel, content] of Object.entries(control)) {
+      const full = path.join(root, rel);
+      fs.mkdirSync(path.dirname(full), { recursive: true });
+      fs.writeFileSync(full, content, 'utf8');
+    }
+    // The fixture IS the agent's output, so the "created after seed" baseline is
+    // empty: every control file counts as new, exactly as a real run would see it.
+    const checks = task.checks.map((c) => evaluateCheck(root, c, new Set()));
+    const passed = checks.filter((c) => c.pass).length;
+    return {
+      taskId: task.id,
+      ok: passed === checks.length,
+      reason: passed === checks.length ? null : `${passed}/${checks.length} checks failed`,
+      rate: checks.length ? passed / checks.length : null,
+      checks,
+    };
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
 }
 
 function rate(list, key) {
@@ -442,7 +551,7 @@ function agentExitedClean(agent) {
   return true; // unknown: do not invent a failure
 }
 
-function renderMarkdown(results, summary, meta) {
+function renderMarkdown(results, summary, meta, ablation) {
   const pct = (v) => (v === null ? 'n/a' : (v * 100).toFixed(0) + '%');
   const pp = (a, b) => (a === null || b === null ? 'n/a' : ((a - b) * 100).toFixed(0) + 'pp');
   const s = summary;
@@ -485,8 +594,24 @@ function renderMarkdown(results, summary, meta) {
     }
     lines.push('');
   }
-  lines.push('## Result');
-  lines.push('');
+  if (ablation) {
+    const w = ablation.without || {};
+    const withPresent = (ablation.with && ablation.with.present) || [];
+    lines.push('## Ablation check');
+    lines.push('');
+    lines.push(
+      'The two arms must genuinely differ. If a harness file survived the delete, ' +
+        'the "without" arm would be a "with" arm in disguise and the whole comparison ' +
+        'would be void — silently, and in the direction that finds no effect. This is ' +
+        'verified, not assumed.'
+    );
+    lines.push('');
+    lines.push(`- **without** — ${w.ok ? 'all ' + w.checked + ' harness surfaces confirmed absent' : '**INCOMPLETE: still present — ' + (w.present || []).join(', ') + '**'}`);
+    lines.push(`- **without** — ${w.fileCount} files remain in the ablated tree`);
+    lines.push(`- **with** — ${withPresent.length} of ${(ablation.with && ablation.with.checked) || ABLATE_PATHS.length} harness surfaces present (expected: non-zero)`);
+    lines.push('');
+  }
+  lines.push('## Result');  lines.push('');
   lines.push('| Measure | With harness | Without | Delta |');
   lines.push('|---|---|---|---|');
   lines.push(`| Task completion (control) | ${pct(s.completionWith)} | ${pct(s.completionWithout)} | ${pp(s.completionWith, s.completionWithout)} |`);
@@ -551,9 +676,20 @@ function main(argv) {
   process.stderr.write(`${PREFIX} worktrees under ${base}\n`);
 
   const results = [];
+  let ablation = null;
   try {
     buildWorktree(roots.with, false);
     buildWorktree(roots.without, true);
+    // Recorded so a reader can see the arms genuinely differ, rather than trusting
+    // that the delete worked. `with` is expected to still hold the harness.
+    ablation = {
+      without: verifyAblation(roots.without),
+      with: {
+        present: ABLATE_PATHS.filter((p) => fs.existsSync(path.join(roots.with, p))),
+        checked: ABLATE_PATHS.length,
+        fileCount: listFiles(roots.with).length,
+      },
+    };
 
     for (const task of tasks) {
       for (const condition of ['with', 'without']) {
@@ -589,10 +725,12 @@ function main(argv) {
     agentVersion: firstLine(spawnSync(resolveAgentBin(), ['--version'], { encoding: 'utf8' })),
   };
 
+  const payload = { tool: PREFIX, dry, meta, summary, ablation, results };
+
   if (argv.includes('--json')) {
-    process.stdout.write(`${JSON.stringify({ tool: PREFIX, dry, meta, summary, results }, null, 2)}\n`);
+    process.stdout.write(`${JSON.stringify(payload, null, 2)}\n`);
   } else {
-    process.stdout.write(renderMarkdown(results, summary, meta));
+    process.stdout.write(renderMarkdown(results, summary, meta, ablation));
   }
 
   // Emit both reports from this one pass. Running the eval twice to produce a JSON
@@ -602,16 +740,12 @@ function main(argv) {
   if (writeMd || writeJson) {
     if (writeMd) {
       fs.mkdirSync(path.dirname(writeMd), { recursive: true });
-      fs.writeFileSync(writeMd, renderMarkdown(results, summary, meta), 'utf8');
+      fs.writeFileSync(writeMd, renderMarkdown(results, summary, meta, ablation), 'utf8');
       process.stderr.write(`${PREFIX} wrote ${writeMd}\n`);
     }
     if (writeJson) {
       fs.mkdirSync(path.dirname(writeJson), { recursive: true });
-      fs.writeFileSync(
-        writeJson,
-        `${JSON.stringify({ tool: PREFIX, dry, meta, summary, results }, null, 2)}\n`,
-        'utf8'
-      );
+      fs.writeFileSync(writeJson, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
       process.stderr.write(`${PREFIX} wrote ${writeJson}\n`);
     }
   }
@@ -646,6 +780,8 @@ module.exports = {
   firstLine,
   listFiles,
   matchFiles,
+  verifyAblation,
+  scoreControl,
   seed,
   evaluateCheck,
   commitSubject,

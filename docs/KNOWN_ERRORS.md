@@ -616,3 +616,27 @@ For each entry use:
 - **Cause:** The `fixture()` helper in `scripts/task-lift.test.js` called `fs.mkdtempSync` and never removed the directory. It was the **test** helper leaking, not `runAgent` or the worktree teardown — the git worktree registry was clean and the directories held no `.git` checkout in most cases.
 - **Fix:** Track every directory `fixture()` creates in a module-level array and remove them all from a single `process.on('exit')` handler. Verified: a full `npm run tasklift:test` run leaves 0 orphaned directories.
 - **Context:** 2026-10-01, `scripts/task-lift.test.js`. When auditing `%TEMP%` for leftover worktrees, expect test fixtures too — check whether the directory holds a `.git` entry before treating it as a worktree.
+
+### task-lift: the ablation was never verified, so a half-failed delete would read as "no effect"
+- **Error:** `buildWorktree` deleted `ABLATE_PATHS` and moved on. Nothing checked the deletion had worked, and no test exercised it — the only related test asserted that `ABLATE_PATHS` *lists* the right names. The "without harness" arm could therefore be a "with harness" arm in disguise.
+- **Cause:** The delete loop trusts `fs.rmSync` and `fs.existsSync`. Both can report success for a path that was never removed — a case mismatch on Windows, a path that a tool recreates, a path that does not exist under the name assumed. Every one of those yields the same result: both arms see the same harness, they agree, and the report says "no effect". It biases toward the comfortable answer and produces no error.
+- **Fix:** `verifyAblation(root)` returns `{ok, present, checked, fileCount}`; `buildWorktree` **throws** rather than measure a fake arm, and the result is recorded in the JSON and printed in the report as an "Ablation check" section. A test builds a throwaway tree with all six surfaces present and asserts `ok === false`. Verified live: a dry run reports "all 6 harness surfaces confirmed absent", 4134 files remaining, and 6 of 6 present in the `with` arm.
+- **Context:** 2026-10-01, `scripts/task-lift.js`. Same failure direction as the void pilot: an instrument that cannot fail reports a number that looks like evidence.
+
+### task-lift: no positive control, so an unsatisfiable check would look like a weak harness
+- **Error:** Every check test used a hand-built one-off check. Nothing asserted that a *correct* answer scores 100% against the real manifest.
+- **Cause:** The manifest's patterns were never exercised end to end. A pattern that no real output can satisfy would report a permanent 0% on every run forever, and that reads as "the harness does not help" rather than "the instrument is broken" — indistinguishable from a genuine null result.
+- **Fix:** Each task now carries a `control` fixture — the files a correct agent would produce. `scoreControl` scores it; `npm run tasklift:control` exits non-zero below 100%. Current state: 8/8, 9/9, 6/6, 5/5. `scripts/task-lift-control.js` is the runnable form.
+- **Context:** 2026-10-01, `scripts/task-lift/tasks.json` v2.
+
+### task-lift: `no trailing period` checked the end of the file, not the subject
+- **Error:** The conformance check labelled "subject has no trailing period" was `noneMatch` on `\.\s*$` with `multiline: false`. `$` then means end-of-**string**, so a well-formed Conventional Commits message whose *body* ended in a sentence failed a check about the *subject*.
+- **Cause:** A regex written for a single-line field was applied to a multi-line file. The mismatch was invisible because the label described the intent, not the implementation.
+- **Fix:** New check kind `commitSubjectNoPeriod` reads the subject via `commitSubject()` and tests that. Covered by a test with a body ending in a period (must pass) and a subject ending in one (must fail).
+- **Context:** 2026-10-01, `scripts/task-lift/tasks.json`.
+
+### PowerShell: `spawnSync` rejects arguments containing NUL bytes
+- **Error:** `TypeError [ERR_INVALID_ARG_VALUE]: The argument 'args[1]' must be a string without null bytes` from `git log --format=<NUL>%H<NUL>%s`.
+- **Cause:** NUL is a valid string character in JS but not in a Windows process argument. The usual NUL-as-field-separator trick for parsing `git log` cannot be passed through `spawnSync` on this platform.
+- **Fix:** Use a space separator with a fixed-width hash — `--format=%H %s` — and split on the first space, which is unambiguous because the hash is 40 hex characters. `scripts/decision-log.js` does this.
+- **Context:** 2026-10-01, `scripts/decision-log.js`. Also note `Set-Content -Encoding utf8` in Windows PowerShell 5.1 writes a **BOM**, which put a stray `﻿` at the start of a git commit subject; use `[System.IO.File]::WriteAllText($path, $text, (New-Object System.Text.UTF8Encoding $false))` for commit messages. And PowerShell has no `<<<` herestring — a command block containing one fails at **parse** time, so every statement in that block is silently skipped, including any `git add` before it. That is how a 4-file commit once swallowed 22 files.

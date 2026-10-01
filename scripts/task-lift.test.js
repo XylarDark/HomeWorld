@@ -360,3 +360,115 @@ test('newOnly actually withholds pre-existing files', () => {
   const after = M.evaluateCheck(dir, check, seeded);
   assert.strictEqual(after.pass, false, 'must not fall back to a pre-existing file');
 });
+
+// ---------------------------------------------------------------------------
+// 2026-10-01: the three gaps found while auditing the instrument against the
+// harness best practices. Each of these could produce a confident wrong number.
+// ---------------------------------------------------------------------------
+
+test('verifyAblation reports a surviving harness surface as a failure', () => {
+  // The whole experiment is unfalsifiable without this. If a delete half-fails, the
+  // "without harness" arm is a "with harness" arm in disguise, the arms agree, and
+  // the finding is "no effect" — silently, and in the comfortable direction.
+  const survivors = {};
+  for (const p of M.ABLATE_PATHS) survivors[p] = 'x';
+  const dirty = fixture(survivors);
+  const v = M.verifyAblation(dirty);
+  assert.strictEqual(v.ok, false, 'a surviving surface must fail the check');
+  assert.deepStrictEqual(v.present.slice().sort(), M.ABLATE_PATHS.slice().sort());
+  assert.strictEqual(v.checked, M.ABLATE_PATHS.length);
+});
+
+test('verifyAblation passes when every surface is gone', () => {
+  const clean = fixture({ 'README.md': 'no harness here' });
+  const v = M.verifyAblation(clean);
+  assert.strictEqual(v.ok, true);
+  assert.deepStrictEqual(v.present, []);
+  assert.ok(v.fileCount > 0, 'the file count is recorded so a reader can compare arms');
+});
+
+test('every task control fixture scores 100%', () => {
+  // The positive control. Without it, a check whose pattern can never be satisfied
+  // reports a permanent 0% that reads as "the harness does not help" rather than
+  // "the instrument cannot register success".
+  for (const task of M.loadTasks().tasks) {
+    const r = M.scoreControl(task);
+    const failed = r.checks.filter((c) => !c.pass).map((c) => `${c.label} (${c.verdict})`);
+    assert.strictEqual(
+      r.ok,
+      true,
+      `control for ${task.id} did not reach 100%: ${r.reason} -> ${failed.join('; ')}`
+    );
+    assert.strictEqual(r.rate, 1);
+  }
+});
+
+test('a task with no control fixture is reported, not silently skipped', () => {
+  const r = M.scoreControl({ id: 'x', checks: [] });
+  assert.strictEqual(r.ok, false);
+  assert.match(r.reason, /no control fixture/);
+});
+
+test('declaresScope accepts a live rule that scopes via globs', () => {
+  const dir = fixture({
+    '.cursor/rules/a.mdc':
+      '---\nname: "x"\ndescription: "a live rule"\nalwaysApply: false\nglobs: "src/**/*.cpp"\n---\n\nbody\n',
+  });
+  const r = M.evaluateCheck(dir, { kind: 'declaresScope', glob: '.cursor/rules/*.mdc' }, new Set());
+  assert.strictEqual(r.pass, true);
+  assert.strictEqual(r.verdict, 'pass');
+});
+
+test('declaresScope accepts a tombstone that declares retirement in description', () => {
+  // Three rules in this repo are deliberate tombstones with alwaysApply:false and no
+  // globs. Requiring globs of them would push a future agent to "fix" a retired rule
+  // back into an always-on load.
+  const dir = fixture({
+    '.cursor/rules/b.mdc':
+      '---\nname: "x RETIRED"\ndescription: "RETIRED P4. Do not restore this duplicate card."\nalwaysApply: false\n---\n\nbody\n',
+  });
+  const r = M.evaluateCheck(dir, { kind: 'declaresScope', glob: '.cursor/rules/*.mdc' }, new Set());
+  assert.strictEqual(r.pass, true);
+  assert.strictEqual(r.verdict, 'soft_fail', 'a tombstone is a weak pass, not a clean one');
+});
+
+test('declaresScope rejects a live rule with neither globs nor a tombstone note', () => {
+  const dir = fixture({
+    '.cursor/rules/c.mdc':
+      '---\nname: "x"\ndescription: "a live rule"\nalwaysApply: false\n---\n\nbody\n',
+  });
+  const r = M.evaluateCheck(dir, { kind: 'declaresScope', glob: '.cursor/rules/*.mdc' }, new Set());
+  assert.strictEqual(r.pass, false);
+  assert.strictEqual(r.verdict, 'closed_fail');
+});
+
+test('declaresScope is void, not failed, when the agent wrote no rule', () => {
+  const dir = fixture({});
+  const r = M.evaluateCheck(dir, { kind: 'declaresScope', glob: '.cursor/rules/*.mdc' }, new Set());
+  assert.strictEqual(r.verdict, 'void', 'no file is not the same as a wrong file');
+});
+
+test('commitSubjectNoPeriod judges the subject, not the end of the file', () => {
+  // The old check was a `noneMatch` on `\.\s*$`, which reads end-of-string. A
+  // well-formed message whose body ended in a sentence failed a check labelled
+  // "subject has no trailing period".
+  const ok = fixture({ 'COMMIT_MSG.txt': 'fix: correct the prove script\n\nThe body ends in a sentence.\n' });
+  assert.strictEqual(
+    M.evaluateCheck(ok, { kind: 'commitSubjectNoPeriod', glob: '**/COMMIT_MSG.txt' }, new Set()).pass,
+    true,
+    'a body ending in a period must not fail a subject check'
+  );
+  const bad = fixture({ 'COMMIT_MSG.txt': 'fix: correct the prove script.\n\nbody\n' });
+  const r = M.evaluateCheck(bad, { kind: 'commitSubjectNoPeriod', glob: '**/COMMIT_MSG.txt' }, new Set());
+  assert.strictEqual(r.pass, false);
+  assert.match(r.detail, /subject ends with a period/);
+});
+
+test('an absent subject is void across every check kind that looks for a file', () => {
+  // One rule, applied uniformly: "no target" is never "wrong target".
+  const dir = fixture({});
+  for (const kind of ['anyMatches', 'noneMatch', 'declaresScope', 'anyNewFiles']) {
+    const r = M.evaluateCheck(dir, { kind, glob: '**/*.mdc' }, new Set());
+    assert.strictEqual(r.verdict, 'void', `${kind} must be void when nothing exists`);
+  }
+});
