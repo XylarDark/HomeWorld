@@ -65,6 +65,11 @@ Only after Lead/AD confirm, explicit “promote”, or `APPROVE *` that implies 
 - Auto-promote from logs or Memories
 - Duplicate palette chips from the art bible
 - Open a product Docs track without Lead name or Taste Gate
+- **Stage an architecture, code-design, or refactor decision here.** Those are
+  agent-owned since 2026-10-01 and belong in
+  [AGENT_DECISIONS.md](../../../Docs/decisions/AGENT_DECISIONS.md). This profile is
+  for art and mechanic taste plus process prefs; routing an engineering call
+  through it is a way to get a stamp the Lead deliberately removed
 
 ## With Taste Gates
 

@@ -1,8 +1,17 @@
-# Architecture (human-owned) — Taste
+# Architecture — agent-owned
 
-You own purpose, private knowledge, and vision. The agent owns flesh-out only after
-you decide (or skip). Blank fields are a missing **taste** decision, not a prompt to
-invent. See [OWNERSHIP.md](OWNERSHIP.md).
+**Owner: agent.** You decide and record it. As of 2026-10-01 this is no longer a
+human taste gate — see [OWNERSHIP.md](OWNERSHIP.md#ownership-map) and
+[AGENT_DECISIONS.md](../decisions/AGENT_DECISIONS.md).
+
+Fill a section when a task actually touches it. Do not fill it to look thorough,
+and do not stop a task to ask permission to draw a boundary. What still belongs to
+the human is art design, game mechanic design, and the test bar — none of which
+this file covers.
+
+Every decision here that changes a boundary gets a row in the decision log. The
+log is what makes agent-owned architecture auditable; a boundary changed without a
+row is the failure mode this file now has to avoid.
 
 Settled boundaries: [architecture/HOMEWORLD_TRADEOFFS.md](../architecture/HOMEWORLD_TRADEOFFS.md).
 Standing prompt for a new boundary: [tradeoff-analyst-brief.md](../architecture/tradeoff-analyst-brief.md).
@@ -15,19 +24,24 @@ C++) belong in [templates/unreal](../templates/unreal/README.md) and
 [`.cursor/rules/21-unreal-engine.mdc`](../../.cursor/rules/21-unreal-engine.mdc).
 Unity: [templates/unity](../templates/unity/README.md).
 
-## Options the agent must offer
+## How the agent fills this in
 
-When purpose is not decided **for this task** (and this is not a one-line skip).
-Put any draft in the alert; do not write this file until I confirm.
+1. **Draft the boundary in the log, not in an alert.** One sentence of purpose, the
+   files it touches, and the alternative you rejected.
+2. **Then write it here** if the change is durable — a shape that future tasks will
+   keep hitting belongs in the file, not only in the log.
+3. **One-line change to existing code?** No entry, no file edit. Routine.
 
-1. **Accept or edit the agent’s draft** (recommended when the task is architectural) —
-   one-sentence purpose and map grounded in the files this task touches.
-2. **I'll fill `architecture.md` myself** — agent waits.
-3. **Reuse existing architecture** — treat [docs/architecture/overview.md](../architecture/overview.md)
-   as the vision; I'll add only private knowledge in chat.
-4. **Dictate in chat** — agent restates my wording, I confirm, then it scribes.
-5. **Skip this gate** — typo, one-file change, or I accept the current layout. Agent
-   records the skip and does not tick the checklist.
+Three shapes of outcome, and what each owes you:
+
+| Outcome | Log entry | This file |
+|---|---|---|
+| Boundary moved or created | **Required** | Update it |
+| Existing boundary confirmed, nothing moved | Optional | Leave it |
+| Typo, one-file fix, no boundary involved | None | Leave it |
+
+The rule that used to require your confirmation is gone. What replaced it is the
+requirement that the decision be written down.
 
 ## What is not on the public internet
 
@@ -84,8 +98,6 @@ Where new code, content, tests, and docs go.
 
 ## Post-implementation checklist
 
-What “done” means for this cycle. The agent must not tick these for you.
-
-- [ ]
-- [ ]
-- [ ]
+What “done” means for this cycle. **The agent must not tick these** — completion
+is a **Test** job and stays human (see [OWNERSHIP.md](OWNERSHIP.md#ownership-map)).
+The agent supplies the evidence; you decide whether it is satisfied.

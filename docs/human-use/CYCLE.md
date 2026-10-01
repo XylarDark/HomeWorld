@@ -11,11 +11,12 @@ step** and **which job** (steer, taste, or test). If that owner is the human, it
 the agent, it says so and executes — it still will not invent a human decision.
 
 ```
-Taste: Architecture (human)  →  flesh-out (agent)
-Steer: Environment (human)   →  verify command is now evidence
-Test:  Test contract (human) →  implement (agent)
-Test:  Outcome rubric (human) → independent grade (verifier), then implement again if needs_revision
-Test:  Review (human)        →  done, or Optimize (human, then agent)
+Taste: Art / mechanic feel (human) → flesh-out (agent)
+—:     Architecture (agent)         → decide, log, implement
+Steer: Environment (human)          → verify command is now evidence
+Test:  Test contract (human)       → implement (agent)
+Test:  Outcome rubric (human)      → independent grade (verifier), then implement again if needs_revision
+Test:  Review (human)              → done, or Optimize (agent measures, human owns the budget)
 ```
 
 ## Detect whose turn it is
@@ -26,18 +27,20 @@ says `(fill in)`.
 | If this task | Job | Phase | Owner |
 | ------------ | --- | ----- | ----- |
 | Typo or one-line fix | — | Implement | **Agent** — one owner sentence, then the fix |
-| Would change vision, map, patterns, or public shape, and that is not decided *for this task* | Taste | Architecture | **Human** — alert |
+| Would invent art feel, a tone, a shot, a beat or a mechanic | Taste | Feel | **Human** — alert |
+| Would move a module boundary, reshape the directory map, or add an always-on file | — | Architecture | **Agent** — decide, then log |
 | Needs a verify bar and none was named this chat (or in [environment.md](environment.md)) | Steer | Environment | **Human** — alert |
 | Adds or changes behavior and no scenario exists *for this task* (and not an “existing suite” pick) | Test | Test contract | **Human** — alert |
 | Has a bar (scenarios or existing suite) but no gradeable rubric, and not skipped | Test | Outcome | **Human** — alert |
 | Product code for this task is not done | — | Implement | **Agent** — still stop on a mid-task human fork |
 | Rubric filled and last grade is not `satisfied` | Test | Grade | **Verifier** — not the implementer |
 | Evidence exists and ship / no-ship is not decided | Test | Review | **Human** — alert |
-| The human asked for a performance pass | Test | Optimize | **Human**, then agent |
+| Code or the harness is slower than it should be | — | Optimize | **Agent** — name the metric, measure, log; human owns the budget |
 | Else | — | Done / maintenance | Human says if a new cycle starts |
 
-**Mid-task forks** (new shared util, new MCP, ingest into always-on files) use the
-same alert even when the phase is Implement. Do not wait until review.
+**Mid-task forks** (new shared util, new MCP, ingest into always-on files) are
+**agent-owned** and need no alert — log the decision and continue. What still
+stops mid-task is a Taste fork (feel) or a Test fork (the bar).
 
 `docs/human-use/` missing: no catalog on disk. Still do not silently take a
 human-owned decision.
@@ -71,13 +74,12 @@ Typo or one-line fix: `Owner: agent — one-line fix in <path>`, then the fix.
 - **Pick a listed default** — agent records it and writes only what you chose.
 - **Skip** — agent proceeds and states the skip. It does not tick your sign-off.
 
-## 1. Architecture (human) — Taste
+## 1. Architecture (agent) — —
 
-File: [architecture.md](architecture.md). You own purpose, private knowledge, vision,
-map, patterns, and the post-implementation checklist.
-
-**Agent after it:** flesh-out — classes, interfaces, call sites. Does not change the
-vision.
+File: [architecture.md](architecture.md). **The agent owns purpose, directory map,
+module depth, and patterns.** Decide it, log it in
+[AGENT_DECISIONS.md](../decisions/AGENT_DECISIONS.md), then flesh out — classes,
+interfaces, call sites. No alert. This was human-owned until 2026-10-01.
 
 ## 2. Environment (human) — Steer
 
@@ -106,7 +108,9 @@ File: [review.md](review.md). You own ship/no-ship. The agent supplies graphs an
 complexity; it does not review the diff as if a junior human wrote it, and it does
 not tick your boxes.
 
-## 6. Optimize (human, then agent) — Test
+## 6. Optimize (agent measures, human owns the budget) — Test
 
-File: [optimization.md](optimization.md). You own the numbers and the ask. The agent
-does not start a cycle here.
+File: [optimization.md](optimization.md). The agent names the metric, measures
+before and after, and picks the A/B winner — logging the numbers with the
+decision. The human decides whether the resulting budget is acceptable. The agent
+does not start a cycle here because the code "looks slow."

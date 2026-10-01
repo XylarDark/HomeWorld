@@ -24,9 +24,21 @@ Durable Lead/process taste that **Taste Gates read first**, then stage and promo
 2. Confirm promote (“promote”, pick option, or `APPROVE *`) so the agent updates `taste-profile.md`.
 3. Reject staged candidates that should not become durable.
 
+## Scope (since 2026-10-01)
+
+This profile holds **art and mechanic taste, plus process prefs**. It does not hold
+engineering decisions — architecture, module boundaries, code design and harness
+refactoring are agent-owned and are recorded in
+[AGENT_DECISIONS.md](../decisions/AGENT_DECISIONS.md) instead.
+
+Promotion stays Lead-gated, but only because the *content* is taste. A harness or
+architecture call must never be staged here as a way to get a human stamp on an
+agent-owned decision; that is the route this reset closed.
+
 ## What the agent must not do
 
 - Rewrite the durable profile without your confirm
+- Stage an architecture, code-design or refactor decision here
 - Treat Cursor Memories as team taste canon
 - Duplicate the art bible palette into the profile
-- Invent the next product track because the profile is thin
+- Invent the next **product** track because the profile is thin

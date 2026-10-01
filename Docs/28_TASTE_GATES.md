@@ -53,13 +53,26 @@ Agents should stop on taste forks ([OWNERSHIP.md](../docs/human-use/OWNERSHIP.md
 Fire a Taste Gate when **any** is true and undecided **for this task**:
 
 1. Would change product vision, GDD fantasy, art bible tone, or shot list (e.g. sixth shot).
-2. Would pick next Docs track / surface feel without Lead or Docs/26-style interview.
-3. Would invent architecture purpose / directory map ([architecture.md](../docs/human-use/architecture.md) still `(fill in)` for this task).
+2. Would pick the next **product** Docs track / surface feel without Lead or Docs/26-style interview.
+3. ~~Would invent architecture purpose / directory map~~ — **WITHDRAWN 2026-10-01.** Architecture is agent-owned; decide and log it.
 4. Would assign AD reject/approve on stills without AD or Lead waive.
 5. Would reopen a CLOSED track’s feel targets.
-6. PHASE_BOARD says next track TBD and agent would start product work anyway.
+6. PHASE_BOARD says next **product** track TBD and agent would start product work anyway.
 
-**Do not fire** for: typo/one-line; flesh-out of already-decided taste; implement after Lead `APPROVE` unlock.
+**Do not fire** for: typo/one-line; flesh-out of already-decided taste; implement after Lead `APPROVE` unlock; **architecture, module boundaries, code design, a new shared util, which metric to optimize, harness refactoring, or the next harness Docs track** — every one of those is agent-owned and recorded in [AGENT_DECISIONS.md](../Docs/decisions/AGENT_DECISIONS.md).
+
+### Scope change, 2026-10-01
+
+Heuristic **3** is withdrawn outright, and **2 / 5 / 6** are narrowed to *product*
+tracks. A Taste Gate is now an art or game-mechanic limit and nothing else
+([taste-gates.md](../docs/human-use/taste-gates.md)). The gate machinery did not
+change — the trigger set did. Firing heuristic 3 today is a bug: it recreates a
+human approval the Lead removed, and `Saved/taste_gates_pending.json` would fill
+with questions the agent was supposed to answer itself.
+
+On the word *environment*: isolation and permission posture stay human
+([environment.md](../docs/human-use/environment.md)) and are **not** art
+environment design. Conflating the two would have stripped a Steer gate.
 
 ---
 

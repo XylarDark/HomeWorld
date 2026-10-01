@@ -75,9 +75,14 @@ Two orchestration systems coexist. They are **nested, not alternatives**:
 - Do **not** add ESLint / TypeScript unit-test gates for the game host; doctor “Node stack” criticals for missing TS/ESLint/JS tests are **accepted declines** (this repo is UE 5.8 + Python automation). Full matrix: [docs/Setup/DOCTOR_POLICY.md](docs/Setup/DOCTOR_POLICY.md).
 - Automation gaps for game systems stay in [docs/Automation/AUTOMATION_GAPS.md](docs/Automation/AUTOMATION_GAPS.md), not the template stub.
 
-The human **steers**, **makes taste**, and **tests**; the agent executes. See
-[docs/human-use/OWNERSHIP.md](docs/human-use/OWNERSHIP.md). Do not invent a human
-decision or a product listed under [cursor-cannot](docs/human-use/cursor-cannot/README.md).
+The human makes **taste** (art design and game mechanic design), **tests** (what
+"done" means, ship/no-ship, beat acceptance), and owns **isolation and permission
+posture**. The agent owns architecture, code design, and harness refactoring, and
+records those calls in [Docs/decisions/AGENT_DECISIONS.md](Docs/decisions/AGENT_DECISIONS.md).
+See [docs/human-use/OWNERSHIP.md](docs/human-use/OWNERSHIP.md) for the full map. Do
+not invent a human decision or a product listed under
+[cursor-cannot](docs/human-use/cursor-cannot/README.md) — and do not ask for
+approval on a boundary the agent owns, which is a bug in the ask, not caution.
 
 Refresh layers: `npm run sync` (dry-run) then `npm run sync:apply`. Details: [docs/Setup/CURSOR_DEV.md](docs/Setup/CURSOR_DEV.md).
 
@@ -134,7 +139,7 @@ Exact invocations the agent should use (see [docs/SETUP.md](docs/SETUP.md) and [
 ## Boundaries
 
 - **Never:** Commit secrets, API keys, or `.env`; edit `Plugins/UnrealMCP/` or `Saved/` (they are not project code); change engine version (UE 5.8 only) or target platform (PC + Steam Early Access) without a team decision.
-- **Ask first:** CI/schema changes (`.github/workflows/`, JSON schema files), adding or upgrading dependencies, or broad refactors that touch many modules.
+- **Agent-owned, decide then log** (was "Ask first" before 2026-10-01): CI/schema changes (`.github/workflows/`, JSON schema files), adding or upgrading dependencies, and broad refactors that touch many modules. Record each in [Docs/decisions/AGENT_DECISIONS.md](Docs/decisions/AGENT_DECISIONS.md) with the alternative you rejected. See [OWNERSHIP.md](docs/human-use/OWNERSHIP.md#ownership-map).
 - **Game content:** Automation preserves existing content; create-if-missing, update-in-place. See [.cursor/rules/18-game-development-principles.mdc](.cursor/rules/18-game-development-principles.mdc).
 - **Combat and night encounters:** **Placeholder only** until a full vision board pass on combat mechanics — placeholder abilities, UI, and spawn stubs are fine; avoid deep combat system work. **We do not kill foes** — combat **strips them of their sin** and **converts them to their "loved" version**; converted monsters can become **vendors**, **helpers**, **quest givers**, or **homestead pets/workers**. **Combat variety:** Defend (waves at home) = defenses + **ranged** or **ground AOE**; planetoid (away from home) = **combos** + **single-target**; end-game = use either style in either situation. Night encounters: waves at home + packs on planetoid + bosses at key points; goal = limited time per night, clear planetoid in one night. **Planetoid and homestead:** Homestead lands on planetoid, you venture out; complete planetoid → move to another. See [VisionBoard/Core/VISION.md](VisionBoard/Core/VISION.md) § Day and night, § Combat variety.
 

@@ -7,7 +7,7 @@ Reviewed, versioned summary of Lead/process taste and locked decisions.
 **Updates:** Stage in `Saved/taste_profile_session.json`; promote only after Lead/AD confirm or `APPROVE *`.  
 **Precedence:** latest Lead chat / `APPROVE *` > this file > never invent.
 
-**Last promoted:** 2026-09-19 (Lead **`APPROVE TP-E`** — Docs/29 CLOSED; profile stays live)
+**Last promoted:** 2026-10-01 (ownership reset — see §2 and §5; not an `APPROVE` stamp)
 
 ---
 
@@ -31,11 +31,14 @@ Reviewed, versioned summary of Lead/process taste and locked decisions.
 | Pref | Value (seeded) |
 |------|----------------|
 | Question budget | Max **2** Q per turn (Docs/26-style) |
-| Timebox bias | Prefer thin slice + Lead `APPROVE` to close |
+| Timebox bias | Prefer thin slice; no `APPROVE` needed to close a *harness* slice |
 | Evidence bar | DESKTOP / Saved evidence or explicit Lead accept of prior pack |
 | Stills / AD | AD or Lead waive for shot accept/reject — do not self-approve |
-| Next product track | Lead-named or Taste Gate interview — **do not invent** |
-| Harness tracks | Docs/NN engineering OK without inventing product feel |
+| Next **product** track | Lead-named or Taste Gate interview — do not invent |
+| Next **harness** track | Agent picks and proceeds. No gate, no ask |
+| Harness / code / architecture | **Agent-owned.** Decide, then log in [AGENT_DECISIONS.md](../decisions/AGENT_DECISIONS.md). Do not raise a Taste Gate for these |
+| Test bar | Human-owned and unchanged: what "done" means, rubrics, verify command, ship/no-ship, beat acceptance |
+| Isolation / permissions | Human-owned Steer: isolation, web reach, permission posture |
 
 ---
 
@@ -49,6 +52,7 @@ Reviewed, versioned summary of Lead/process taste and locked decisions.
 | 2026-09-19 | `APPROVE NF2-E` | Docs/27 Night Feel Build CLOSED |
 | 2026-09-19 | `APPROVE NF-A` | Docs/26 Night Feel CLOSED |
 | 2026-09-16 | P2 art bible LOCKED | Tone: warm / handmade / hopeful |
+| 2026-10-01 | Ownership reset (Lead decision, not an `APPROVE` stamp) | Taste = art + mechanics only. Architecture, code design and harness refactor moved to the agent, which records them in [AGENT_DECISIONS.md](../decisions/AGENT_DECISIONS.md). **Test** and isolation/permissions unchanged — still human. Prior `APPROVE *` stamps on harness/architecture work are history, not live gates |
 
 *(Keep last ~10; older rows may archive to SESSION_SUMMARY.)*
 
@@ -58,16 +62,32 @@ Reviewed, versioned summary of Lead/process taste and locked decisions.
 
 | Id | Fork | Handoff |
 |----|------|---------|
-| — | Next product Docs track TBD | Use Taste Gate / Lead name — see TP-D prove when active |
+| — | Next **product** Docs track TBD | Use Taste Gate / Lead name — see TP-D prove when active |
+
+The next **harness** Docs track is not a gap. The agent picks it.
 
 ---
 
 ## 5. Do-not
 
+**Art and mechanics (human taste — the agent must not invent these):**
+
 - Photoreal; grimdark; sci-fi; cutesy-infantile (art bible)
 - Sixth shot / expand shot list without Lead
 - Deep combat systems (placeholder only)
 - Invent next Docs product track while PHASE_BOARD says TBD
-- Dual Epic MCP; Mesh Terrain replace of VS_MVP Landscape without gate
+- Mesh Terrain replace of VS_MVP Landscape without gate
+- Self-approve a still, a beat, or a mechanic
+
+**Process (unchanged):**
+
 - Auto-promote session candidates; Cursor Memories as canon
 - Resurrect WAVE F `Start-AllAgents*`
+- Dual Epic MCP
+
+**The agent now owns these — do not gate them, but do not do them silently:**
+
+- Module boundaries, directory map, shared utils, new skills, harness refactoring,
+  which metric to optimize. Each needs a decision-log entry, not a human approval.
+  A decision made in place of a gate that is *not* written down is the failure this
+  reset could produce.

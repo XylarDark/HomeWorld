@@ -1,10 +1,16 @@
 # Cursor cannot: Harness Engineering (PDF 3.1)
 
-**Label:** Cursor cannot. **Job:** Test (and Steer for interrupt).
+**Label:** Cursor cannot. **Owner:** Agent, since 2026-10-01 (was: human Test).
 
 The PDF’s harness is everything outside the model: instructions, tools, environment,
 state, and verification. Most of that is this repo’s `AGENTS.md`, skills, and
 Human Use. Two pieces are **not** Cursor products.
+
+Nothing in this file is a gate you are asked to work. The agent now designs and
+improves its own harness, and logs the decisions that matter
+([AGENT_DECISIONS.md](../../decisions/AGENT_DECISIONS.md)). The limit below is
+not "we need a human for this" — it is "this product does not exist, so do not
+build it and call it closed."
 
 ## What the PDF asked
 
@@ -20,16 +26,20 @@ Human Use. Two pieces are **not** Cursor products.
   built-in second-model reviewer that runs on every change.
 - We already require **counts** from a named verify command and a **separate
   verifier** pass for the outcome rubric. That is policy, not a Cursor feature.
-- An adversarial pass is an optional Human Use choice: **you** start a second
-  chat. See [review.md](../review.md).
+- An adversarial pass is optional and is now the agent's to run: spawn the
+  competing review as a subagent or a second session. It used to be a second chat
+  you opened by hand.
 
-## What you do
+## What the agent does
 
-- **Test:** treat “I’m done” as a claim. Run the verify command you named. Launch
-  or role-switch to the verifier; the implementer does not grade itself.
-- **Steer:** if you want a competing model, you open that chat. The agent waits.
+- **Early-victory defence is the agent's job.** Treat "I'm done" as a claim. Run
+  the named verify command, and keep the separate verifier pass — the implementer
+  does not grade itself. This is **Test** and still terminates at a human for
+  ship/no-ship, but nothing waits on a human to *run* the check.
+- **Harness design and refactoring are the agent's.** Rules, skills, scripts,
+  scorers, CI. Decide, then log.
 - Do not add a mutation-testing CI job, a CRAP action, or a custom observability
-  product to “close” this slice. Those are other Cursor-cannot files.
+  product to "close" this slice. Those are other Cursor-cannot files.
 
 ## Harness Test responsibilities (portable)
 

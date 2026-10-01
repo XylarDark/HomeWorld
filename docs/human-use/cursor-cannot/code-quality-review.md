@@ -1,10 +1,16 @@
 # Cursor cannot: Code Quality Review (PDF section 4)
 
-**Label:** Cursor cannot. **Job:** Test.
+**Label:** Cursor cannot. **Owner:** Agent, since 2026-10-01 (was: human Test).
 
 The PDF wants objective metrics instead of reading the agent’s diff like junior
 human code. Cursor will not run those metrics as gates. This template will not
 add them on the GitHub Actions free tier.
+
+Reviewing its own diff is now the agent's job, not a handoff to you. That is a
+weaker position than the PDF's independent reviewer, and it is stated here so the
+gap is visible rather than implied: the agent cannot act as a genuinely
+independent reviewer of its own work. **Ship/no-ship remains a human Test
+decision** ([OWNERSHIP.md](../OWNERSHIP.md#ownership-map)).
 
 ## What the PDF asked
 
@@ -29,14 +35,18 @@ add them on the GitHub Actions free tier.
 - No dependency-matrix tool ships in this template.
 - CRAP is **judgment** on [review.md](../review.md), not an Action.
 
-## What you do
+## What the agent does
 
-Use [review.md](../review.md):
+Use [review.md](../review.md) for the shape:
 
-- Ask for graphs; validate order against architecture.
-- Read complexity the agent reported; split or accept.
-- Ship / no-ship is yours. Coverage % and CRAP are optional notes, not a green
-  check.
+- Draw graphs; validate ordering against architecture.
+- Report complexity for the files it touched, and split or accept on that basis.
+- Record the call in [AGENT_DECISIONS.md](../../decisions/AGENT_DECISIONS.md) when
+  a boundary moves, naming the alternative it rejected.
+
+Coverage % and CRAP remain optional notes, not a green check — the tooling does not
+exist. Supplying them to the human as if they did would be the failure this file
+exists to prevent.
 
 Do not add a mutation-testing CI job, a CRAP Action, or `npx skills@latest add …`
-to this repository to “complete” the PDF.
+to this repository to "complete" the PDF.

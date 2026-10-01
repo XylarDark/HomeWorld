@@ -1,9 +1,9 @@
 ---
 name: Taste Gate
 description: >-
-  Use when the agent hits a human taste limit and must stop instead of
-  inventing product feel: detect, alert, queue, stop. Then scribe the answer
-  and resume agent-owned work. Triggers: "decide the feel", art direction,
+  Use when the agent hits a human taste limit in ART or GAME MECHANICS and must
+  stop instead of inventing product feel: detect, alert, queue, stop. Then scribe
+  the answer and resume agent-owned work. Triggers: "decide the feel", art direction,
   taste question, human-only judgment, cursor-cannot topic, ambiguity the
   agent is tempted to guess at.
 ---
@@ -14,9 +14,26 @@ When the agent hits a **human taste limit**, stop inventing. Detect → alert �
 
 **Canon:** [Docs/28_TASTE_GATES.md](../../../Docs/28_TASTE_GATES.md) · [taste-gates.md](../../../docs/human-use/taste-gates.md) · [taste-profile.md](../../../docs/human-use/taste-profile.md) · [OWNERSHIP.md](../../../docs/human-use/OWNERSHIP.md)
 
+## Scope: what counts as a taste limit
+
+Since **2026-10-01** this skill covers **art design and game mechanic design only**:
+
+| Load this skill | Do NOT load this skill |
+| --------------- | ---------------------- |
+| Art bible, palette, tone, "is this the product" | Module boundary, directory map, architecture |
+| Shot list, framing, still accept/reject | New shared util, new skill, `mcp.json` entry |
+| Beat, inventory, mechanic design | Which metric to optimize, which variant won |
+| Reopening a **feel** target on a CLOSED track | Harness refactor; next **harness** Docs track |
+| Next **product** track with no Lead name | Any Test question (rubric, ship, verify bar) |
+
+For the right-hand column the agent decides and writes a row to
+[AGENT_DECISIONS.md](../../../Docs/decisions/AGENT_DECISIONS.md). Loading this
+skill for one of those is a bug: it manufactures a human gate the Lead no longer
+owns and stalls a decision the agent was supposed to make.
+
 ## When to load
 
-Load this skill when any **taste-limit heuristic** from Docs/28 is true and undecided for this task (vision/GDD/art bible/shot invent; next Docs track feel; architecture `(fill in)`; AD still verdict; reopen CLOSED feel; PHASE_BOARD next TBD but agent would start product work).
+Load this skill when a **taste-limit heuristic** from Docs/28 is true *and falls in the art/mechanics scope above*, undecided for this task. Docs/28 heuristic **3 (architecture) is withdrawn**, and 2/5/6 are withdrawn **when they concern a harness track** — see [taste-gates.md](../../../docs/human-use/taste-gates.md).
 
 **Do not load** for typo/one-line, flesh-out of locked taste, or work after an explicit Lead `APPROVE *` unlock for that phase.
 
@@ -95,6 +112,8 @@ Do not start Round N+1 until Round N is answered or skipped.
 ## Non-goals
 
 - Auto-approve or invent product feel
+- Raising a gate for architecture, code design, or a refactor to obtain a human
+  stamp on an agent-owned decision
 - Resurrect `Start-AllAgents*` / agent-company loop (WAVE F)
 - Preference-model training from Lead chat
 - Building cursor-cannot products
