@@ -74,8 +74,17 @@ re-baselining. Do not treat this as a regression.
 ## Weakest signal (triage, not a gate)
 
 Per-criterion means identify where the corpus is actually thin. Example Quality
-and Error Handling Quality are the two lowest. **These drove a bounded content
-pass on a single rule, judged before and after with `--only … --repeat 8`.**
+and Error Handling Quality are the two lowest.
+
+**A bounded content pass has since run on the weakest live rule**
+(`14-json-yaml.mdc`): worked examples only, judged before and after with
+`--only … --repeat 8`. Score **54.1 → 77.89** (Δ **+23.8**), Example Quality
+**0 → 8.5**, Error Handling **1.5 → 8.0**. Two independent after-runs agreed to
+**0.06 pts**. Full record:
+[Docs/handoffs/SKILL_LIFT_CONSOLIDATION.md](../../Docs/handoffs/SKILL_LIFT_CONSOLIDATION.md) §10.
+
+This does **not** move the corpus mean above, which stays the 29-rule cold
+measurement. A single-rule change is a single-rule change.
 
 ## Reproducing
 

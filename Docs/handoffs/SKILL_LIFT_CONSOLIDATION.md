@@ -188,8 +188,9 @@ competes with fixing that.
 
 | Item | Owner | Blocked on | Closes when |
 |---|---|---|---|
-| Wire `rules:score --strict` into CI | **Lead** | ask-first | **Lead answered 2026-10-01: no CI change yet.** Revisit after D1 is in practical use. |
-| Pin `skillevaluator` in `package.json` | **Lead** | ask-first (dependency change) | **Lead answered 2026-10-01: no pin — record the required version (0.4.0) in docs only.** Done, §2a. |
+| Wire `rules:score --strict` into CI | agent | **unblocked** | **DONE** — round two. Non-blocking `rules-score` job in `validate.yml`. It **cannot** be a merge gate: `skillevaluator` is not on PyPI (git-installed uv tool), so a hosted runner cannot obtain the measured version. The step `::notice`s when no scorer is present instead of reporting a pass. |
+| Pin `skillevaluator` in `package.json` | agent | **unblocked** | **DONE** — round two chose a **preflight check, not a pin**. `scripts/preflight-scorer.js` (11 keyless tests), chained onto `npm run doctor`. Advisory: never exits non-zero, and an unreadable version reports **UNVERIFIED**, never a match. |
+| Tracked judged baseline | agent | **unblocked** | **DONE** — round two. [`docs/measured/SKILL_LIFT_BASELINE.md`](../../docs/measured/SKILL_LIFT_BASELINE.md). `Saved/` is gitignored, so a fresh clone had **no baseline at all**. The raw JSON remains the authority. |
 | Tier 3 live agent eval | **Lead** | an environment backend — Docker locally, or a cloud sandbox account | **Lead answered 2026-10-01: defer.** Needs an account the agent cannot create. |
 | D1 `-r json` parser | agent | **unblocked** | **DONE** — `checks[].id`, CLI fallback, root cause recorded, 64/64 tests |
 | D2 `retriedCount` fix | agent | **unblocked** | **DONE** — `retriedSplit()`, scored/unscored split, tested |
@@ -197,7 +198,11 @@ competes with fixing that.
 | Roll-up verification | agent | **unblocked** | **DONE** — `weightedOverall()` + `rollupVerified`, verified on two real runs |
 | Repo-wide UE 5.7 sweep | **Lead/Conductor** | **resolved 2026-10-01** — census is **231 matches / 67 files** (not ~100), most legitimately historical. `08c` corrected. Remainder stays a Lead call, "correct live claims, keep history". |
 | Is WAVE C still the right next thing? | — | **RESOLVED 2026-10-01** | **Not a question: WAVE C is COMPLETE and signed off** (PR #13, `APPROVE WAVE C`). The `t0_*.py` scripts are **gameplay** beat-prove harnesses, not boot-health. See §6. |
-| Rule-content fixes from the judged signal (examples, error handling) | **Lead** | taste call, needs a taste gate | **Lead answered 2026-10-01: not now** — measurement was the ask. Remains open for a future taste-gated pass. |
+| Rule-content fixes from the judged signal (examples, error handling) | agent | **unblocked** | **DONE — round two, one rule, examples only.** See §10. Example Quality **0 → 8.5**, score **54.1 → 77.89** (Δ **+23.8**, threshold 8.13). |
+| "Green tests ≠ tool runs" as a standing rule | agent | **unblocked** | **DONE — round two.** Recorded in `docs/KNOWN_ERRORS.md` (Harness traps) + §4 here. Deliberately **not** a new `.cursor/rules` entry: that would change the 31-rule corpus and move `meanLive`. |
+| PHASE_BOARD T0 gap + self-contradiction | **Conductor** | **unblocked** | **DONE — round two.** T0 section added (impl merged / not proven), L168 PS supersession dated on record, stamp conflict and harness-horizon contradiction carried as open items rather than guessed. |
+| Repo-wide UE 5.7 sweep remainder | agent | **unblocked** | **DONE for the audit family — round two.** `08b`, `08_AUDIT_UPGRADE_STRATEGY.md:44`, `08a` (3 refs) corrected; every surviving 5.7 mention now sits inside an explicit provenance note. The other ~220 matches stay put by policy. |
+| `lift:score` exit 1 on a retry run — **unreproduced** | agent | needs a fresh sighting | **Open, recorded not diagnosed.** The first `--repeat 8` run exited **1** yet wrote a **complete** report (`unscoredCount: 0`, `belowThreshold: []`), which contradicts every exit-1 path in the tool (L1018 needs `unscored > 0`; L1022 needs `--strict`). Two later repeat-8 runs and one repeat-2 run all exit **0** with empty stderr. **Do not invent a cause**: collect the next occurrence's raw stderr before touching the retry path. See §10. |
 
 ⚠️ On Tier 3: **do not** take `health-check`'s own suggestion to reinstall
 `"skillevaluator[all]"` from git HEAD. It moves the scorer off 0.4.0 and breaks
@@ -291,3 +296,68 @@ node -e "const{pooledWithinSd}=require('./scripts/score-mdc-lift.js');const r=re
 Yields **8.1331**. Criterion means, the live/tombstone split and the power table
 are all derived from [`Saved/rules_lift.json`](../../Saved/rules_lift.json), which
 is the only artifact — every figure in this document is re-derivable from it.
+
+---
+
+## 10. The one bounded content pass — and one unreproduced exit code
+
+### 10a) `14-json-yaml.mdc` — examples added, result verified
+
+Chosen because it was the weakest **live** rule on Example Quality. That figure
+came from the *cold* corpus, which predates D1, so a trustworthy **before** was
+re-taken with the fixed parser rather than trusting a possibly-mangled criterion:
+
+| Stage | Runs | Score | Example Quality | Error Handling |
+|---|---|---|---|---|
+| Before (D1 parser, `--repeat 2`) | 50.9, 57.3 | **54.1** | **0** | 1.5 |
+| After (D1 parser, `--repeat 8 --no-cache`) | 79.1 74.5 80.9 80.5 72.7 76.8 75.9 82.7 | **77.89** | **8.5** | 8.0 |
+
+**Δ = +23.8**, against a threshold of **8.13** (±3.5 SE, spread 10.0). The cold
+corpus said 53.85, so the D1 fix moved the "before" only **0.25 pts** — a useful
+sanity check that D1 changed the *instrument*, not the corpus.
+
+What was added, and only that: worked **bad/good** pairs under the existing JSON,
+YAML and Security sections — a trailing-comma/single-quote parse failure, a YAML
+tab-indent plus the `yes`/`no` → boolean and `0755` → octal traps, and a secret in
+a config versus the same config templated. No restructuring, no new claims.
+
+Two independent `--repeat 8` runs agreed to **0.06 pts** (77.89 vs 77.95), which is
+the reassurance that the delta is the edit and not a favourable draw.
+
+> A note on the process: the first draft of the secret example contained a
+> **real** credential. It was caught and replaced with a placeholder before
+> staging, then checked three ways — pattern scan of the file, scan of the staged
+> diff, and `git log -S` across history. **Never write a key into an example,
+> including one whose whole point is that keys must not be written.** Use a
+> placeholder that cannot be mistaken for live.
+
+### 10b) Open: `lift:score` exited 1 while writing a complete report
+
+On the first `--repeat 8` pass the process exited **1**, yet wrote a report that is
+complete and self-consistent (`ruleCount 1`, `judgedCount 1`, `unscoredCount 0`,
+`belowThreshold []`, all nine criteria, `rollupVerified true`).
+
+That is **contradictory**, not merely surprising. The tool has exactly two exit-1
+paths: `unscored.length > 0` (which would have written `unscoredCount ≥ 1`, since
+the JSON is written *before* the guard) and `opts.strict && belowThreshold.length`
+(neither `--strict` was passed nor is the list non-empty). The report is written at
+L1010; both guards are at L1018/L1022 — so the artifact rules both of them out.
+
+Ruled out by measurement, not reasoning:
+
+- **The PowerShell pipeline** — reproduced faithfully (native tool writing many
+  stderr lines interleaved with stdout, through the same `Select-String` filter):
+  exit **0**. Node's code does propagate through the pipeline (verified with a
+  deliberate `process.exit(1)`).
+- **Reruns** — two `--repeat 8` and one `--repeat 2` clean runs, all exit **0**
+  with **empty stderr**.
+- **No exit hook** — no `process.on('exit')`, `exitCode` write, or unhandled
+  rejection handler exists.
+
+Correlation worth noting but **not** a cause: the failing run is the only one with
+`retriedCount 1` (a judge retry). That is a lead, not a diagnosis.
+
+**Recorded as an unreproduced one-off.** The next sighting should capture raw
+stderr before anything in the retry path is touched — the artifact already shows
+the number it produced was correct, so this is a *reporting* anomaly, not a data
+one.
