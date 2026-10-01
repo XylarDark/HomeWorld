@@ -398,3 +398,92 @@ skipped.
   be off for Layer A structure.
 - **Evidence:** art bible §1, §7, §10; Docs/20 §4; research §3 and §6.
 - **Reverses if:** n/a — these are correctness gates.
+
+---
+
+### DEC-0019 — "The spec reader measures and reports; it does not place primitives over authored geometry" (2026-10-01)
+
+- **Area:** architecture
+- **Decision:** `graybox_spec_reader.py` is read-only by default. `place_missing=True`
+  is check-before-create and **never overwrites** an existing object. The reader
+  verifies the live blend against `Lib/01_Homestead/*.json` and emits a report.
+- **Rationale:** The handoff asked for a reader that "emits placed primitives into
+  Blender". Taken literally that would overwrite authored work — the blend holds a
+  1680-tri cabin, 864/648/540-tri cliff assemblies and 472-tri pines, all exported
+  and in `MVP_EXPORT_MANIFEST.md`. Rejected because asset policy is
+  create-if-missing / update-in-place, and because greyboxing is the *output* of the
+  pipeline, not its input: replacing modelled geometry with cubes discards the
+  refinement the spec is supposed to support (criterion 3).
+- **Evidence:** `AssetCreation/Exports/MVP_EXPORT_MANIFEST.md` tris per asset;
+  live measurement of `blender/floating_island_homestead_LIB.blend`;
+  AGENTS.md "Automation preserves existing content".
+- **Reverses if:** a future spec *is* the geometry — i.e. a greybox class that has
+  no authored master at all. Then placement becomes the only way to build it, and
+  should be a separate explicit mode rather than this script's default.
+
+---
+
+### DEC-0020 — "Two spec sources stay: the five JSON specs and the GRAYBOX_LAYOUT table, parsed not rewritten" (2026-10-01)
+
+- **Area:** architecture
+- **Decision:** Read layout data from both `Lib/01_Homestead/*.json` (5 specs, rich
+  schema) and the `GRAYBOX_LAYOUT.md` table (39 volumes). Do **not** rewrite
+  `GRAYBOX_LAYOUT.md` into a new JSON canon file.
+- **Rationale:** The JSON specs are the better schema and already exist; converting
+  them into markdown would lose `separate_from`, `rejects[]`, `sockets[]` and
+  `graybox_map[]`. The 39-volume table is cited by `CAM_Hero.md`, the PA-C tranche
+  handoffs and the taste gates, so forking it into a machine file creates a second
+  source that must be kept in sync — the exact failure mode `place_vs_mvp_pa_d.py`
+  already demonstrates. Rejected alternative: "generate the .md from a JSON canon".
+- **Evidence:** `Lib/01_Homestead/KIT_README.md`; `Lib/00_Core/CAM_HERO.md`
+  references; `Content/Python/place_vs_mvp_pa_d.py:23` (spec in a comment, values
+  hardcoded).
+- **Reverses if:** the layout grows a field that cannot survive a markdown table, or
+  a third consumer needs the 39 volumes and the table stops being authoritative.
+
+---
+
+### DEC-0021 — "Family assignment is an explicit table with a reported-unassigned state, not keyword inference" (2026-10-01)
+
+- **Area:** code design
+- **Decision:** `VOLUME_FAMILY_MAP` maps volume name → family explicitly.
+  Unmapped volumes get `family_status == "unassigned"` and are **excluded from the
+  assertion while still being reported**. Never silently treated as passing.
+- **Rationale:** First implementation inferred families by substring-matching the
+  Role column. It returned `spine` for all 29 spec volumes, which zeroed the
+  collision assertion's input — a check that passes because its input was empty is
+  more dangerous than no check, because it reports a green result. An explicit
+  table is also reviewable: the Lead can audit every assignment on one screen
+  rather than trusting a regex.
+- **Evidence:** measured first run — `volumes_assertable: 0` despite 29 volumes;
+  4 of 7 families absent from the layout entirely (see the coverage gap in
+  `TASTE_GATE_GRAYBOX_SILHOUETTE.md`).
+- **Reverses if:** volume count grows past the point where a table is unmaintainable
+  *and* family assignment becomes derivable from a canon field (i.e. the specs grow
+  a `family` key — the handoff's suggestion). Then read the field instead.
+
+---
+
+### DEC-0022 — "Silhouette distinctness is measured by band + openness, not aspect ratio alone" (2026-10-01)
+
+- **Area:** architecture
+- **Decision:** The collision assertion compares **verticality band** first, then
+  aspect within `ASPECT_TOLERANCE`, and uses estimated **openness** to downgrade a
+  collision from `blocking` to `warn`. Aspect ratio is reported as a cheap input,
+  never as the verdict.
+- **Rationale:** The handoff proposed "two volumes from different families may not
+  share an aspect ratio within the same scale band". Aspect ratio is a *proxy for*
+  silhouette and fails in both directions: a 1:1:1 pyramid and a 1:1:1 cube both
+  give 1.00 and are not the same shape (this is exactly the measured
+  `SM_Cabin` vs `SM_PineValley_Block_A` defect), while two unmistakably different
+  flat plates at 0.05 and 0.06 would false-positive. Band-first also encodes the
+  locked signatures directly — spirit is tall, gather is flat — so a violation of
+  the taste gate is caught rather than merely flagged. Openness exists because one
+  locked signature is "tall thin vertical **with a see-through gap**", and no pure
+  proportion metric can see a gap.
+- **Evidence:** `homeworld_graybox_silhouette.py`; measured collision
+  `SM_BeastPad_01` (nurture, aspect 0.05) vs `SM_SpiritWound_01` (spirit, aspect
+  0.17), both flat band.
+- **Reverses if:** a measured eye threshold replaces `ASPECT_TOLERANCE`. Until then
+  this is a **house standard with no cited basis** — the report says so on its face,
+  and a collision is a prompt to look, not proof of a defect.

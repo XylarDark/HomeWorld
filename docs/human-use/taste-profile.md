@@ -46,6 +46,7 @@ Reviewed, versioned summary of Lead/process taste and locked decisions.
 
 | Date | Phrase / source | Outcome |
 |------|-----------------|--------|
+| 2026-10-01 | `TG-GRAYBOX-SILHOUETTE` 2/2 | **Silhouette distinctness is mechanical, not polish.** Seven locked per-family silhouettes (gather / nurture_tame / heal / spirit / stealth / build_place / combat) — art bible §8 gains the table. **Traversal is the spine**: no silhouette of its own, inherits neighbouring material, excluded from the assertion. Hub volumes carry `family: build_place`; the cabin is that family's signature landmark, **not** an eighth family. |
 | 2026-09-19 | `APPROVE TP-E` | Docs/29 Taste Profiler CLOSED; profile + skills stay live |
 | 2026-09-19 | `APPROVE TP-D` | Docs/29 prove accepted; next product track still TBD (no invent) |
 | 2026-09-19 | `APPROVE TG-E` | Docs/28 Taste Gates CLOSED; skill stays live |
