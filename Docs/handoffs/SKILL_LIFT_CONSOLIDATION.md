@@ -95,9 +95,30 @@ criterion mean by **≤0.16/10**, so the **ranking was safe** — Example Qualit
 > flags any run where that stops holding — an upstream shape change surfaces
 > instead of passing silently.
 >
-> **Not re-run.** `Saved/rules_lift.json` predates D1 and stays the canonical
-> artifact. D1 pays off on the next **targeted** run; whole-corpus re-judging
-> remains retired (§5).
+> **Not re-run corpus-wide.** `Saved/rules_lift.json` predates D1 and stays the
+> canonical artifact. D1 pays off on the next **targeted** run; whole-corpus
+> re-judging remains retired (§5).
+>
+> **D1 proven end-to-end 2026-10-01**, not just by unit test — one live judge run
+> (`--only 15-shell-scripts.mdc --repeat 1 --no-cache`, judge
+> `nvidia/nemotron-3-super-120b-a12b`, scorer 0.4.0):
+>
+> | Field | Value | Meaning |
+> |---|---|---|
+> | `criteriaSource` | `json` | the JSON path answered, not the CLI table |
+> | criteria present | **9 / 9** | fixed denominator; the old parser would drop rows here |
+> | `fullCriteriaSamples` | `1/1` | the sample carried the full nine |
+> | `rollupVerified` | `true` | `weightedOverall` reproduced the scorer's own composite |
+> | `importance` | 9 criteria | per-criterion weights now captured |
+> | `judge.retriedCount` | `0` (0 scored / 0 unscored) | D2 field present and correct |
+> | `mean` / `meanLive` | `69.5` / `69.5` (1 live, 0 tomb) | P3 field present |
+>
+> That single run also **caught a defect the 64/64 unit tests could not**: the
+> new console line called `.toFixed()` on a `null` `meanTombstone` and crashed,
+> because a `--only` run on a live rule has no tombstones. The bad call sat in
+> `main()`, which no keyless test can reach. Fixed by extracting `formatLiveSplit()`
+> so the null-on-either-side shape is testable, plus 5 regression tests (69/69 now).
+> *A green test suite is not evidence the tool runs; the run is.*
 
 **D2 · `judge.retriedCount` undercounted.** It counted only *scored* rules — 7 in
 the cold report, against **9** rules that actually retried. Reporting-side only;

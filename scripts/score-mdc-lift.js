@@ -321,6 +321,24 @@ function retriedSplit(results) {
 }
 
 /**
+ * Format the live/tombstone console line, or null when there is nothing to say.
+ *
+ * Either side can be null — a `--only` run may hit no tombstones, or only
+ * tombstones. Formatting a null here crashed a real run on 2026-10-01 after
+ * 64/64 unit tests passed, because the crash lived in main()'s console call
+ * where no keyless test could reach it. Extracting the formatter is what makes
+ * this shape testable at all.
+ */
+function formatLiveSplit(meanLive, liveCount, meanTombstone, tombstoneCount) {
+  if (meanLive === null || meanLive === undefined) return null;
+  const tomb =
+    meanTombstone === null || meanTombstone === undefined
+      ? 'none'
+      : `${meanTombstone.toFixed(1)} over ${tombstoneCount}`;
+  return `  live split : meanLive ${meanLive.toFixed(1)} over ${liveCount} live rule(s); tombstones ${tomb} (a policy split, not a quality ranking)`;
+}
+
+/**
  * Live vs tombstone split (P3).
  *
  * A rule that declares itself QUARANTINE / RETIRED / HISTORICAL is not meant to
@@ -888,9 +906,8 @@ function main() {
     if (spreads.length) {
       console.log(`  jitter     : mean spread ${(spreads.reduce((a, b) => a + b, 0) / spreads.length).toFixed(1)} pts over ${opts.repeat} run(s) — a single run is not a measurement`);
     }
-    if (meanLive !== null) {
-      console.log(`  live split : meanLive ${meanLive.toFixed(1)} over ${liveCount} live rule(s); tombstones ${meanTombstone.toFixed(1)} over ${tombstoneCount} (a policy split, not a quality ranking)`);
-    }
+    const liveLine = formatLiveSplit(meanLive, liveCount, meanTombstone, tombstoneCount);
+    if (liveLine) console.log(liveLine);
   }
   console.log(`  threshold  : 70 (rubric-eval's own gate)`);
   const critEntries = Object.entries(criteriaSummary);
@@ -1023,6 +1040,7 @@ module.exports = {
   weightedOverall,
   retriedSplit,
   liveSplit,
+  formatLiveSplit,
   detectCredential,
   resolveTool,
   failureReason,

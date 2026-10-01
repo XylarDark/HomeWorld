@@ -26,6 +26,7 @@ const {
   weightedOverall,
   retriedSplit,
   liveSplit,
+  formatLiveSplit,
   CRITERIA,
   CRITERION_IDS,
   IMPORTANCE_WEIGHTS,
@@ -823,4 +824,53 @@ test('liveSplit reproduces the recorded cold corpus split', () => {
   assert.strictEqual(s.tombstoneCount, 5);
   assert.ok(Math.abs(s.meanLive - 66.25) < 0.01, `meanLive was ${s.meanLive}`);
   assert.ok(Math.abs(s.meanTombstone - 43.45) < 0.01, `meanTombstone was ${s.meanTombstone}`);
+});
+
+// ---------------------------------------------------------------------------
+// The live-split console line must survive either side being null.
+//
+// Regression: a real `--only 15-shell-scripts.mdc` run crashed with
+// `Cannot read properties of null (reading 'toFixed')` AFTER 64/64 tests passed,
+// because the bad format call sat in main()'s console.log where no keyless test
+// could reach it. The formatter is extracted so this shape is now testable.
+// ---------------------------------------------------------------------------
+
+test('formatLiveSplit says "none" instead of crashing when there are no tombstones', () => {
+  // The exact case that crashed: one live rule, zero tombstones.
+  const line = formatLiveSplit(68.2, 1, null, 0);
+  assert.ok(line, 'expected a line');
+  assert.ok(line.includes('tombstones none'), line);
+  assert.ok(line.includes('meanLive 68.2'), line);
+});
+
+test('formatLiveSplit handles a tombstone-only run', () => {
+  const line = formatLiveSplit(null, 0, 76.35, 1);
+  assert.strictEqual(line, null, 'no live rules means nothing worth reporting');
+});
+
+test('formatLiveSplit formats both sides when both are present', () => {
+  // 66.25 and 43.45 are the recorded cold-corpus figures. toFixed rounds
+  // half-away-from-zero, so they display as 66.3 and 43.5.
+  const line = formatLiveSplit(66.25, 24, 43.45, 5);
+  assert.ok(line.includes('meanLive 66.3 over 24'), line);
+  assert.ok(line.includes('tombstones 43.5 over 5'), line);
+});
+
+test('formatLiveSplit returns null for absent input rather than throwing', () => {
+  assert.strictEqual(formatLiveSplit(undefined, 0, undefined, 0), null);
+  assert.strictEqual(formatLiveSplit(null, 0, null, 0), null);
+});
+
+test('formatLiveSplit never throws for any combination a run can produce', () => {
+  // Exhaustive over the real domain: one side measured, neither, or both.
+  for (const [ml, lc, mt, tc] of [
+    [68.2, 1, null, 0],
+    [68.2, 1, 43.4, 5],
+    [0, 1, 0, 1],
+    [null, 0, 43.4, 5],
+    [undefined, undefined, 76.35, 1],
+  ]) {
+    const line = formatLiveSplit(ml, lc, mt, tc);
+    assert.ok(line === null || typeof line === 'string', `bad return for ${ml}/${mt}`);
+  }
 });
