@@ -71,7 +71,11 @@ function toolCandidates(explicit) {
 
 /** Resolve the SkillEvaluator executable, or null when not installed. */
 function resolveTool(explicit) {
-  for (const candidate of toolCandidates(explicit)) {
+  // An explicit --tool is authoritative. Falling back to a PATH lookup would
+  // silently substitute a different scorer while the report names the one the
+  // caller asked for.
+  if (explicit) return fs.existsSync(explicit) ? explicit : null;
+  for (const candidate of toolCandidates(null)) {
     if (candidate.includes(path.sep)) {
       if (fs.existsSync(candidate)) return candidate;
     } else {
@@ -81,6 +85,49 @@ function resolveTool(explicit) {
     }
   }
   return null;
+}
+
+/**
+ * Read the scorer's own version string.
+ *
+ * Scores are only comparable against scores produced by the same scorer. The
+ * rubric moved between SkillEvaluator 0.3.0 and 0.4.0, so an unanchored number
+ * cannot be reproduced or compared. Recorded in every report; returns
+ * 'unknown' rather than throwing, because a missing version must not fail a run
+ * whose scores are otherwise valid (the report then says so out loud).
+ */
+function toolVersion(tool) {
+  const probe = spawnSync(tool, ['--version'], { encoding: 'utf8' });
+  const out = `${probe.stdout || ''}${probe.stderr || ''}`.trim();
+  const m = /(\d+\.\d+\.\d+[^\s,)]*)/.exec(out);
+  return m ? m[1] : 'unknown';
+}
+
+/**
+ * Classify a rule as a self-declared tombstone.
+ *
+ * A tombstone exists to be short: its whole job is to say "this was removed,
+ * do not resurrect, use X instead". SkillEvaluator applies a -15 warning for
+ * any guide-only skill under 20 body lines, which is a correct penalty for an
+ * under-written rule and a FALSE signal for a correct tombstone. No structural
+ * gate can tell those two apart by length alone.
+ *
+ * The discriminator used here is an explicit self-declaration in the rule's own
+ * `description:` — it must START with a status marker. Body text is deliberately
+ * ignored: 14 of 31 rules mention "deprecated"/"removed" somewhere, mostly to
+ * describe UE APIs or deleted tools, and matching those would exempt most of
+ * the corpus and make the classification worthless.
+ *
+ * Exempting a tombstone never removes its score from any report. It only stops
+ * a length penalty from being presented as a quality defect.
+ */
+const TOMBSTONE_MARKERS = /^(QUARANTINE|HISTORICAL|RETIRED|DEPRECATED|ARCHIVED|NO LONGER)/i;
+
+function classifyTombstone(rule) {
+  const desc = String(rule.description || '').trim();
+  const m = TOMBSTONE_MARKERS.exec(desc);
+  if (!m) return { tombstone: false, marker: null };
+  return { tombstone: true, marker: m[1].toUpperCase() };
 }
 
 /**
@@ -254,11 +301,21 @@ function main() {
 
   const tool = resolveTool(opts.tool);
   if (!tool) {
-    console.error(`${PREFIX} - SkillEvaluator not found. Install it with:`);
-    console.error(`${PREFIX}   uv tool install --python 3.13 "skillevaluator[all] @ git+https://github.com/NVIDIA/SkillEvaluator.git"`);
+    // An explicit --tool that cannot be resolved is a refusal, never a reason
+    // to fall through to a different binary on PATH. Silently swapping the
+    // scorer would attribute one scorer's numbers to another.
+    console.error(
+      opts.tool
+        ? `${PREFIX} - SkillEvaluator not found at "${opts.tool}". Not falling back to PATH: an explicit --tool is never substituted (exit 2).`
+        : `${PREFIX} - SkillEvaluator not found. Install it with:`
+    );
+    if (!opts.tool) {
+      console.error(`${PREFIX}   uv tool install --python 3.13 "skillevaluator[all] @ git+https://github.com/NVIDIA/SkillEvaluator.git"`);
+    }
     console.error(`${PREFIX} - Refusing to emit a report without the real scorer (exit 2).`);
     process.exit(2);
   }
+  const scorerVersion = toolVersion(tool);
 
   const files = fs
     .readdirSync(rulesAbs)
@@ -277,6 +334,7 @@ function main() {
       const rule = readRule(path.join(rulesAbs, file), rulesAbs);
       const dir = materializeSkill(rule, tmpRoot);
       const run = runQualityCheck(tool, dir);
+      const cls = classifyTombstone(rule);
       results.push({
         file: rule.file,
         relPath: rule.relPath,
@@ -289,6 +347,8 @@ function main() {
         bytes: rule.bytes,
         score: run.parsed ? run.parsed.score : null,
         grade: run.parsed ? run.parsed.grade : null,
+        tombstone: cls.tombstone,
+        tombstoneMarker: cls.marker,
         unscoredReason: run.parsed
           ? null
           : run.spawnError || `unparseable output (exit ${run.code})`,
@@ -309,12 +369,18 @@ function main() {
     ? scoredList.reduce((a, b) => a + b, 0) / scoredList.length
     : 0;
   const below = scored.filter((r) => r.score < opts.threshold);
+  // Split the below-threshold set by whether a length penalty is a fair test.
+  // The tombstone scores stay in `below` and in every report — they are simply
+  // not counted as quality defects, and do not fail --strict.
+  const belowActionable = below.filter((r) => !r.tombstone);
+  const belowTombstone = below.filter((r) => r.tombstone);
+  const tombstones = results.filter((r) => r.tombstone);
   const missingName = results.filter((r) => !r.hasDeclaredName);
 
   const pad = (s, n) => String(s).padEnd(n);
   console.log('');
   console.log(`${PREFIX} - SkillEvaluator quality-check on .cursor/rules/*.mdc`);
-  console.log(`  tool       : ${tool}`);
+  console.log(`  tool       : ${tool}  (v${scorerVersion}${scorerVersion === 'unknown' ? ' — UNVERIFIED, not comparable' : ''})`);
   console.log(`  rules      : ${results.length} (${scored.length} scored, ${unscored.length} UNSCORED)`);
   if (scoredList.length) {
     const lo = Math.min(...scoredList);
@@ -323,12 +389,16 @@ function main() {
     console.log(`  offset     : +${FORMAT_OFFSET_COMPOSITE} format artifact (metadata.author/tags have no .mdc`);
     console.log(`               equivalent) -> true mean ~${(mean + FORMAT_OFFSET_COMPOSITE).toFixed(1)}, best ~${(hi + FORMAT_OFFSET_COMPOSITE).toFixed(1)}`);
   }
-  console.log(`  threshold  : ${opts.threshold}  -> ${below.length} below`);
+  console.log(`  threshold  : ${opts.threshold}  -> ${belowActionable.length} below needing work, ${belowTombstone.length} below as tombstone`);
+  if (tombstones.length) {
+    console.log(`  tombstones : ${tombstones.length} self-declared (${[...new Set(tombstones.map((r) => r.tombstoneMarker))].sort().join(', ')}) — exempt from the length penalty, scores still reported`);
+  }
   console.log('');
   for (const r of [...results].sort((a, b) => (a.score ?? -1) - (b.score ?? -1))) {
     const s = r.score === null ? 'UNSCORED' : `${r.score.toFixed(1)} (${r.grade})`;
     const flag = r.hasDeclaredName ? '' : '  [!] no frontmatter name';
-    console.log(`  ${pad(r.file, 40)} ${pad(s, 16)}${flag}`);
+    const tomb = r.tombstone ? `  [${r.tombstoneMarker}]` : '';
+    console.log(`  ${pad(r.file, 40)} ${pad(s, 16)}${tomb}${flag}`);
   }
   for (const r of unscored) {
     console.error(`${PREFIX} - UNSCORED ${r.file}: ${r.unscoredReason}`);
@@ -339,9 +409,13 @@ function main() {
 
   const report = {
     tool: PREFIX,
-    version: 1,
+    version: 2,
     generatedAt: new Date().toISOString(),
     scorer: tool,
+    // Anchor for reproducibility. The rubric is version-dependent, so a score
+    // without its scorer version cannot be compared with any other score.
+    scorerVersion,
+    rubricComparable: scorerVersion !== 'unknown',
     rulesDir: opts.rulesDir,
     threshold: opts.threshold,
     declaredAdaptations: [
@@ -363,6 +437,12 @@ function main() {
     missingNameCount: missingName.length,
     mean: Number(mean.toFixed(2)),
     belowThreshold: below.map((r) => r.file),
+    // Split so a consumer cannot mistake a length-penalized tombstone for a
+    // rule that needs work. `belowThreshold` is retained unchanged above.
+    belowThresholdNeedingWork: belowActionable.map((r) => r.file),
+    belowThresholdTombstone: belowTombstone.map((r) => r.file),
+    tombstoneRuleCount: tombstones.length,
+    tombstoneRules: tombstones.map((r) => ({ file: r.file, marker: r.tombstoneMarker })),
     results,
   };
 
@@ -378,8 +458,11 @@ function main() {
     console.error(`${PREFIX} - ${unscored.length} rule(s) UNSCORED; report is not trustworthy`);
     process.exit(1);
   }
-  if (opts.strict && below.length > 0) {
-    console.error(`${PREFIX} - --strict: ${below.length} rule(s) below ${opts.threshold}`);
+  if (opts.strict && belowActionable.length > 0) {
+    console.error(`${PREFIX} - --strict: ${belowActionable.length} rule(s) below ${opts.threshold}: ${belowActionable.map((r) => r.file).join(', ')}`);
+    if (belowTombstone.length) {
+      console.error(`${PREFIX} - ${belowTombstone.length} tombstone(s) also below but exempt (short by design): ${belowTombstone.map((r) => r.file).join(', ')}`);
+    }
     process.exit(1);
   }
   process.exit(0);
@@ -397,6 +480,9 @@ module.exports = {
   yamlQuote,
   slugify,
   parseScore,
+  toolVersion,
+  TOMBSTONE_MARKERS,
+  classifyTombstone,
   readRule,
   materializeSkill,
   resolveTool,

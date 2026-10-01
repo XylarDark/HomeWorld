@@ -19,6 +19,8 @@ const {
   yamlQuote,
   slugify,
   parseScore,
+  toolVersion,
+  classifyTombstone,
   readRule,
   materializeSkill,
 } = require('./score-mdc-rules.js');
@@ -127,6 +129,18 @@ test('CLI exits 2 and refuses a report when the scorer is missing', () => {
   const r = runCli(['--tool', path.join(os.tmpdir(), 'definitely-not-here'), '--limit', '1']);
   assert.strictEqual(r.status, 2);
   assert.match(r.stderr, /SkillEvaluator not found/);
+  // It must refuse rather than crash: a stack trace is not a clean refusal.
+  assert.doesNotMatch(r.stderr, /at Object|node:internal|TypeError/);
+});
+
+test('an explicit --tool is never silently substituted by a PATH binary', () => {
+  // Falling back would attribute one scorer's numbers to another, which is the
+  // fail-open trap. Even though a real skillevaluator IS on this machine, a
+  // bogus --tool must exit 2 rather than quietly using it.
+  const r = runCli(['--tool', path.join(os.tmpdir(), 'definitely-not-here'), '--limit', '1']);
+  assert.strictEqual(r.status, 2);
+  assert.match(r.stderr, /never substituted|not falling back/i);
+  assert.doesNotMatch(r.stdout, /mean\s+:/, 'must not emit a scored report');
 });
 
 test('CLI exits 2 on an unknown argument', () => {
@@ -145,4 +159,69 @@ test('declared offsets and defaults are self-consistent', () => {
   // 5 points each for metadata.author and metadata.tags, weighted 0.35.
   assert.strictEqual(FORMAT_OFFSET_COMPOSITE, 3.5);
   assert.strictEqual(DEFAULT_THRESHOLD, 80);
+});
+
+test('classifyTombstone fires only on a self-declaration in the description', () => {
+  // The corpus declares five tombstones, each by starting its description
+  // with a status marker.
+  for (const desc of [
+    'QUARANTINE - WAVE F / run_automation_cycle removed. Do not resurrect.',
+    'HISTORICAL: HomeWorld targets UE 5.8. Use ue58-sources.mdc.',
+    'RETIRED P4. AGENTS.md is the single project-context surface.',
+    'DEPRECATED - replaced by the 5.8 rules.',
+  ]) {
+    const c = classifyTombstone({ description: desc });
+    assert.strictEqual(c.tombstone, true, `should classify as tombstone: ${desc}`);
+    assert.ok(c.marker, 'marker must be recorded');
+  }
+  // A marker anywhere else in the sentence is not a self-declaration.
+  assert.strictEqual(classifyTombstone({ description: 'Use when the API is deprecated' }).tombstone, false);
+  assert.strictEqual(classifyTombstone({ description: 'Apply when quarantine rules apply' }).tombstone, false);
+  assert.strictEqual(classifyTombstone({ description: 'Never run the retired agent loop' }).tombstone, false);
+  assert.strictEqual(classifyTombstone({ description: '' }).tombstone, false);
+});
+
+test('classifyTombstone ignores body-only mentions of removed/deprecated', () => {
+  // The real hazard: 14 of 31 rules mention "deprecated"/"removed" somewhere,
+  // almost always describing a UE API or a deleted tool rather than the rule
+  // itself. Matching body text would exempt most of the corpus.
+  const dir = path.join(projectRoot, '.cursor/rules');
+  for (const file of ['unreal-cpp.mdc', '00-core-principles.mdc', '05-error-handling.mdc', '20-full-automation-no-manual-steps.mdc', '19-automation-gaps.mdc']) {
+    const rule = readRule(path.join(dir, file), dir);
+    assert.strictEqual(
+      classifyTombstone(rule).tombstone,
+      false,
+      `${file} must stay substantive — it mentions removed/deprecated only in its body`
+    );
+  }
+});
+
+test('the tombstone corpus is exactly the five self-declared rules', () => {
+  const dir = path.join(projectRoot, '.cursor/rules');
+  const files = fs.readdirSync(dir).filter((f) => f.endsWith('.mdc'));
+  const tombs = files
+    .filter((f) => classifyTombstone(readRule(path.join(dir, f), dir)).tombstone)
+    .sort();
+  assert.deepStrictEqual(tombs, [
+    '07-ai-agent-behavior.mdc',
+    '08-project-context.mdc',
+    '19-automation-cycle.mdc',
+    'ue57-editor-ui.mdc',
+    'ue57-sources.mdc',
+  ]);
+});
+
+test('toolVersion reads a semver from --version output', () => {
+  const probe = spawnSync(process.execPath, ['--version'], { encoding: 'utf8' });
+  const v = toolVersion(process.execPath);
+  assert.match(v, /^\d+\.\d+\.\d+/);
+  assert.ok(v !== 'unknown', `expected a version from: ${probe.stdout}`);
+});
+
+test('toolVersion returns unknown rather than throwing when unparseable', () => {
+  // A missing version must not fail a run whose scores are otherwise valid;
+  // the report carries rubricComparable:false instead.
+  const stub = path.join(tmpDir(), 'fake-tool.js');
+  fs.writeFileSync(stub, 'console.log("no version here");\n', 'utf8');
+  assert.strictEqual(toolVersion(process.execPath + ' ' + stub), 'unknown');
 });

@@ -32,20 +32,45 @@ npm run rules:score -- --json Saved/rules_score.json --strict
 
 ### Result — 31/31 scored, 0 unscored
 
+Scores below are **SkillEvaluator 0.4.0**, recorded in the report as
+`scorerVersion` + `rubricComparable` so any future run can tell whether its
+numbers are comparable.
+
 | Metric | Value |
 |---|---|
-| Mean | **87.3** (range 79.5–91.5) |
+| Mean | **87.4** (range 79.5–91.5) |
 | Grade A | 4 (`09b-mcp-utility-scripts` 91.5, `11-parallel-plugin` 91.5, `00-core-principles` 91.0, `15-shell-scripts` 90.2) |
-| Below 80 | **1** — `19-automation-cycle.mdc` (79.5, C) |
-| Mean + declared format offset | ~90.8 |
+| Below 80 needing work | **0** |
+| Below 80 as tombstone | 1 — `19-automation-cycle.mdc` (79.5, C, `QUARANTINE`) |
+| Mean + declared format offset | ~90.9 |
+| Version delta vs 0.3.0 | 87.3 → **87.4** (rubric effectively unchanged for this corpus) |
 
-**The single C-grade is the WAVE F tombstone** — 12 lines that exist precisely
-to be short and redirect to `swarm/SWARM_OPS.md`. The scorer penalizes it for
-having "very little content (15 lines)". That is a **false signal for the
+**The single sub-80 rule is the WAVE F tombstone** — 12 lines that exist
+precisely to be short and redirect to `swarm/SWARM_OPS.md`. The scorer flags it
+for *"very little content (15 lines)"*. That is a **false signal for the
 tombstone class**: a well-formed tombstone is short on purpose, and no
 structural gate can tell that apart from under-writing. This is the same
 correctness gap as ρ = 0.14 in arXiv 2608.20614, observed directly in our own
 corpus.
+
+### Tombstones are now classified, not just penalized
+
+The scorer discriminates on an **explicit self-declaration**: the `description:`
+must *start* with `QUARANTINE|HISTORICAL|RETIRED|DEPRECATED|ARCHIVED|NO
+LONGER`. That yields exactly five rules — `07-ai-agent-behavior` (RETIRED P4),
+`08-project-context` (RETIRED P4), `19-automation-cycle` (QUARANTINE),
+`ue57-editor-ui` and `ue57-sources` (HISTORICAL) — with **zero** false
+positives.
+
+Matching on *body* text instead would have been useless: **14 of 31 rules**
+mention "deprecated"/"removed" somewhere, almost always describing a UE API or a
+deleted tool (`unreal-cpp.mdc` on deprecated UE APIs, `19-automation-gaps.mdc`
+on removed scripts). Those five are locked down by a test that asserts they stay
+substantive.
+
+Exempting never hides a number. Tombstone scores stay in every report and in the
+table; they are only excluded from "needs work" and from `--strict`, which now
+**passes** at 0 actionable rules below threshold.
 
 ### Declared adaptations (in the JSON report, not buried in prose)
 
@@ -69,12 +94,34 @@ instead of 87.3, and **two** rules looked below threshold instead of one.
 composite points. Recorded in
 [KNOWN_ERRORS.md](../../docs/KNOWN_ERRORS.md) § Harness traps.
 
+### Two more harness bugs the tests caught, both mine
+
+1. **Scorer substitution.** `resolveTool` fell through from an explicit
+   `--tool` to a bare PATH lookup, so requesting scorer X could silently run
+   scorer Y while the report named X — one rubric's numbers attributed to
+   another. An explicit `--tool` is now authoritative and is never substituted.
+2. **A refusal became a crash.** `toolVersion(tool)` was called *before* the
+   not-found guard, so a missing scorer produced an `ERR_INVALID_ARG_TYPE` stack
+   trace and `exit 1` instead of the intended clean `exit 2`. Caught by the
+   pre-existing fail-loud test. A refusal must be a message, never a trace.
+
+### The version anchor exists because the version moved
+
+Installing the Tier 3 extra silently took SkillEvaluator **0.3.0 → 0.4.0**. The
+mean moved only 87.3 → 87.4, but adding one missing frontmatter `name:` moved
+`16-feature-debug-instrumentation.mdc` **85.5 → 89.8** — scores drift with the
+rubric *and* with the input. Every report therefore records `scorerVersion` and
+`rubricComparable`; a run that cannot read the version sets
+`rubricComparable: false` rather than emitting numbers that merely look
+comparable.
+
 ### Real defect found and fixed
 
 `16-feature-debug-instrumentation.mdc` was missing `name:`, `priority:` and
 `version:` — the only rule of 31 without them, so it was unaddressable by name.
 Added. Verified `priority` is decorative (nothing reads it; values mirror the
-filename number), so adding it changes no load order.
+filename number), so adding it changes no load order. The `name:` alone was
+worth **+4.3** to that rule's score.
 
 ## Finding 2 — the submodule gate verified a SHA but never the URL
 
@@ -122,25 +169,81 @@ deleting changes behavior in the one case I cannot rule out (OpenCode started
 from a directory *above* the project). Making them portable cannot be worse than
 what shipped.
 
+## Skill Lift — corrected characterization
+
+HR4-A recorded Tier 3 as requiring Docker. **That was an over-generalization
+from a single `health-check` line.** The Tier 3 extra installed cleanly and
+`harbor==0.13.2` imports fine; the `harbor CLI not found` message was only a
+`PATH` problem, since `uv tool install` puts `harbor.exe` in
+`…\uv\tools\skillevaluator\Scripts\` without linking it. With `PATH` corrected,
+`docker prerequisite` reports its actual reason: *"Docker Compose v2 is required
+for Tier 3 — Docker mode: [WinError 2]"*.
+
+Crucially, `harbor` ships **many** environment backends, not just Docker:
+`docker/`, `modal`, `e2b`, `runloop`, `daytona`, `gke`, `singularity`,
+`novita`, `wandb`, `langsmith`, `cwsandbox`, `islo`, `tensorlake`,
+`apple_container`, `use_computer`, `tar_transfer`. Docker is only the **default
+local** backend.
+
+| Tier | Blocked on | Docker needed? |
+|---|---|---|
+| **1** static | nothing — **works** | no |
+| **2** dedup / inter-skill similarity | **a paid LLM provider key only** | **no** |
+| **3** live agent eval | **a key + *some* environment backend** | only if you choose the Docker backend |
+
+So the real blocker for Tier 2 is a single credential, not a hypervisor. Tier 3
+is reachable without Docker at all, via any of the cloud sandbox backends —
+each of which needs its own account.
+
+`skillevaluator health-check` also confirms there is **no provider configured**:
+no `SKILL_EVAL_LLM_PROVIDER`, and no `NVIDIA_API_KEY` / `OPENAI_API_KEY` /
+`ANTHROPIC_API_KEY` in the environment. No LLM-judged number can be produced
+until a human supplies one. **This is a Lead action — a credential, not an
+engineering task.**
+
+## Two prior open items closed by measurement
+
+**`UserHarness/docs/BEST-PRACTICES.md` — no action justified.** The retire/split
+question assumed 25 KB of context bloat. Measured, it is 1016 lines / 25,576 B
+/ 112 headings / 106 code fences — a dense reference, not filler. But a grep of
+**535 live files** (`.agents/`, `.cursor/`, `docs/`, `AGENTS.md`) finds **zero**
+path references, and `npm run sync` (dry run) reports *"No files were
+modified"* — it belongs to neither live layer. It is never copied into agent
+context, so it costs **zero** context budget. Retiring or splitting it would be
+pure churn inside a submodule that also carries uncommitted work. **Premise
+overturned by measurement; left untouched.**
+
+**`scope-refinement` duplicate — byte-identical, user's call.** Both
+`.cursor/skills/scope-refinement/SKILL.md` and
+`.agents/skills-extras/scope-refinement/SKILL.md` are 1960 B,
+SHA-256 `A8F965840527C1C9…`, and each directory contains only that one file.
+`AGENTS.md` establishes `.agents/skills/` as **core** and `.agents/skills-extras/`
+as the **opt-in catalog**, so the `.cursor/` copy is the redundant one. It is
+untracked in-progress work, so it has not been touched — deleting a human's
+uncommitted file is not an agent decision. **Adopting the stated convention means
+removing the `.cursor/skills/scope-refinement/` copy.**
+
 ## Gates
 
 | Gate | Result |
 |---|---|
-| `npm run rules:score:test` | **12/12 pass** |
+| `npm run rules:score:test` | **18/18 pass** |
+| `npm run rules:score -- --strict` | exit 0 (0 actionable below 80) |
 | `bash scripts/verify-userharness-submodule.sh` | exit 0 |
 | `npm run preflight:ue:test` | 5/5 pass |
 | `npm run preflight:ue -- --skip-mcp --assets-only` | repo + assets + JSON PASS |
+| `npm run sync` (dry run) | no files to modify |
 | `.github/workflows/` | **not modified** |
 
 ## Still open
 
-- **No Skill Lift number.** Tier 3 needs Docker (absent) and a paid provider
-  key (unset). Tiers 1–2 only. Unchanged from HR4-A.
-- **Tombstones are structurally penalized.** A future gate should exempt rules
-  whose description declares `QUARANTINE`/`HISTORICAL`/`RETIRED`, rather than
-  leaving every future run to explain the same false signal.
+- **No Skill Lift number.** Blocked solely on a paid provider key (Tier 2) and a
+  key plus an environment backend (Tier 3). Lead action.
 - **Structural score is not value.** ρ = 0.14 still stands; this corpus is
-  healthy on form, which says nothing about whether the rules help.
+  healthy on form, which says nothing about whether the rules help. Only a
+  provider key closes this.
+- **`scope-refinement` duplicate** — removal of the `.cursor/` copy awaits the
+  human's word.
 
 ## Sources
 
