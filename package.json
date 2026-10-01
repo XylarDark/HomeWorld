@@ -32,6 +32,8 @@
     "tasklift": "node scripts/task-lift.js --run",
     "tasklift:dry": "node scripts/task-lift.js --dry",
     "tasklift:control": "node scripts/task-lift-control.js",
+    "tasklift:control:taste": "node scripts/task-lift-control.js --manifest scripts/task-lift/tasks-taste.json",
+    "tasklift:run:taste": "node scripts/task-lift.js --run --manifest scripts/task-lift/tasks-taste.json --out-md Docs/qa/TASK_LIFT_TASTE.md --out-json Docs/qa/TASK_LIFT_TASTE.json",
     "tasklift:test": "node --test scripts/task-lift.test.js",
     "tasklift:write": "node scripts/task-lift.js --run --out-md Docs/qa/TASK_LIFT.md --out-json Docs/qa/TASK_LIFT.json",
     "decisions:check": "node scripts/decision-log.js",

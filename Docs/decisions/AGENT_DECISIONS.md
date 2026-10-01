@@ -207,3 +207,62 @@ skipped.
   squash — do not weaken the check, or it stops catching the thing it exists for.
 - **Baseline:** the rule applies from this commit forward. Commits made before it are
   backfilled here, not re-litigated.
+
+### DEC-0010 — Spending agent sessions requires `--run` (2026-10-01)
+
+- **Area:** harness refactor
+- **Decision:** The runner refuses to start agent sessions unless `--run` is passed.
+  The old default was the opposite: agents ran unless `--dry` was passed.
+- **Rationale:** Asking for a report cost eight real sessions, and I paid that twice
+  before noticing. A default that spends money when the caller only wanted output is
+  the wrong default for anything expensive. The alternative — keeping the permissive
+  default and documenting it — was rejected because the documentation is what I
+  failed to read the first time.
+- **Evidence:** `main()` returns 2 with a message naming both flags; a test spawns the
+  runner without `--run` and asserts exit 2, and another asserts every spending npm
+  script passes `--run` explicitly.
+- **Reverses if:** Never on the guard itself. If a wrapper genuinely needs a
+  different default, give it its own flag rather than inverting this one.
+
+### DEC-0011 — The taste beats are the benchmark; the chores are an instrument sanity set (2026-10-01)
+
+- **Area:** code design
+- **Decision:** Keep both manifests. `tasks.json` (chores) is a sanity set; the new
+  `tasks-taste.json` (art master spec, shot brief, asset naming, T0 beat packet) is the
+  benchmark. The decision rule is preregistered in
+  `Docs/qa/TASK_LIFT_PREREGISTRATION.md` before any taste data exists.
+- **Rationale:** The chore tasks are at ceiling — both arms already do those jobs — so
+  they measure the instrument and nothing else, which is worth having but is not
+  evidence about the harness. The alternative was to swap the chores out, which
+  would have thrown away a validated sanity set. Stating the threshold (`d ≥ 0.25`)
+  in advance matters: any non-null number can be called large if "large" is defined
+  afterwards.
+- **Evidence:** Both manifests' controls reach 100% (chores 8/8, 9/9, 6/6, 5/5;
+  taste 10/10, 7/7, 4/4, 10/10). A test also scores a deliberately wrong art answer
+  against the same checks and asserts it fails, so the checks are not merely
+  satisfiable but discriminating.
+- **Reverses if:** The taste benchmark turns out to be at ceiling too, or the checks
+  prove sensitive to wording rather than to knowing the canon.
+
+### DEC-0012 — Compare paired tasks only, and never retry a substantive failure (2026-10-01)
+
+- **Area:** code design
+- **Decision:** A task contributes to the lift only when **both** its arms have a
+  valid run. Retries happen only for transport failures (429, 5xx, dropped socket,
+  timeout) — never for a non-zero exit that is not transport noise.
+- **Rationale:** Two failure modes found while implementing P0. First, a single void
+  run discarded the whole experiment, which made the instrument too brittle to
+  survive ordinary infrastructure noise. Second — and worse — excluding the void run
+  but keeping its partner's task produced an *unpaired* comparison: averaging
+  `a/with` against `a/without + b/without` while `b/with` is missing compares two
+  groups built from different subjects. That is the same fallacy as comparing
+  independent proportions, and my first implementation of the fix introduced it.
+  On retries: retrying a run that failed substantively would silently replace a
+  measurement with a more flattering one, which is worse than a void.
+- **Evidence:** `summarize` reports `pairedTasks`, `droppedPairs` and `validByCell`;
+  a dry run additionally withholds the lift, because scoring an untouched worktree
+  produced a "0pp" that was an artifact of no agent running. Tests pin the pairing,
+  the dropped-pair reporting, the dry-run withholding, and that a timeout is
+  transient while "the model refused to continue" is not.
+- **Reverses if:** Repeats per cell arrive and a mixed-effects model replaces the
+  paired proportion. The pairing rule survives that; only the estimator changes.

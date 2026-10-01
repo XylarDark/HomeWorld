@@ -640,3 +640,21 @@ For each entry use:
 - **Cause:** NUL is a valid string character in JS but not in a Windows process argument. The usual NUL-as-field-separator trick for parsing `git log` cannot be passed through `spawnSync` on this platform.
 - **Fix:** Use a space separator with a fixed-width hash — `--format=%H %s` — and split on the first space, which is unambiguous because the hash is 40 hex characters. `scripts/decision-log.js` does this.
 - **Context:** 2026-10-01, `scripts/decision-log.js`. Also note `Set-Content -Encoding utf8` in Windows PowerShell 5.1 writes a **BOM**, which put a stray `﻿` at the start of a git commit subject; use `[System.IO.File]::WriteAllText($path, $text, (New-Object System.Text.UTF8Encoding $false))` for commit messages. And PowerShell has no `<<<` herestring — a command block containing one fails at **parse** time, so every statement in that block is silently skipped, including any `git add` before it. That is how a 4-file commit once swallowed 22 files.
+
+### task-lift: the runner spent agent sessions when asked for a report
+- **Error:** `node scripts/task-lift.js --out-md <path>` executed all 8 agent sessions. The intent was to re-render a report from existing data. The invocation cost 8 real sessions, and I paid it twice before noticing.
+- **Cause:** The switch was inverted. `const dry = argv.includes('--dry')` meant agents ran unless `--dry` was **passed**, so the safe mode was opt-in and spending was the default. The header comment even documented `--run` as the full-run flag, while the code never read it.
+- **Fix:** Spending now requires `--run`; without it the runner exits 2 and names both flags. Every spending npm script passes `--run` explicitly, and a test both spawns the runner without the flag (asserting exit 2) and greps `package.json` so a new entry point cannot bypass the guard.
+- **Context:** 2026-10-01, `scripts/task-lift.js`. General rule: **for anything that costs money, the safe mode is the default and spending is opt-in.**
+
+### task-lift: excluding a void run still compared unmatched arms
+- **Error:** A per-cell void fix removed a crashed run from its own cell, but the summary still averaged `a/with` against `a/without + b/without` while `b/with` was missing — reporting a confident lift from two groups built out of different subjects.
+- **Cause:** Filtering the void run and then comparing the arms' means treats the two conditions as independent samples. They are not: the unit of comparison is the **task**, and a task contributes only when both of its arms have a valid run. The bug was introduced *by* the fix for the previous defect, which is the usual way a repair opens a new one.
+- **Fix:** `summarize` builds `completePairs` — tasks with a valid run in both arms — and computes every rate and the lift over those only. `pairedTasks` and `droppedPairs` are reported so an incomplete run is visible rather than silently absorbed.
+- **Context:** 2026-10-01, `scripts/task-lift.js`. A test pins the dropped-pair reporting and asserts no lift is produced when no task has both arms.
+
+### task-lift: a dry run reported a "0pp lift" that was an artifact of nothing running
+- **Error:** `--dry` scored an untouched worktree in both arms, so both arms read 0% conformance and the report printed a lift of `0pp`.
+- **Cause:** `summarize` had no notion of whether anything was actually measured. Zero from an unrun agent and zero from a bad answer were indistinguishable in the output.
+- **Fix:** `summarize` takes `dry` and sets `lift: null` with the reason "dry run - no agent executed, so nothing was measured". The same reasoning is why void runs are excluded from the denominator rather than scored 0.
+- **Context:** 2026-10-01, `scripts/task-lift.js`. Also fixed in the same pass: a `retries` counter computed as `attempts - 1` without flooring, which reported **-8** for eight first-try dry runs.

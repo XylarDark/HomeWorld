@@ -15,13 +15,14 @@
  * Exit code is non-zero on any failure, so this can gate a run.
  */
 
-const { loadTasks, scoreControl, PREFIX } = require('./task-lift.js');
+const { loadTasks, scoreControl, readFlag, PREFIX } = require('./task-lift.js');
 
 function main(argv) {
   const onlyIdx = argv.indexOf('--only');
   const only = onlyIdx !== -1 ? argv[onlyIdx + 1] : null;
+  const manifestPath = readFlag(argv, '--manifest');
 
-  const manifest = loadTasks();
+  const manifest = loadTasks(manifestPath || undefined);
   const tasks = only ? manifest.tasks.filter((t) => t.id === only) : manifest.tasks;
   if (tasks.length === 0) {
     process.stderr.write(`${PREFIX} ERROR - no task matched --only ${only}\n`);
@@ -32,6 +33,7 @@ function main(argv) {
   const failed = reports.filter((r) => !r.ok);
 
   process.stdout.write('# Task-lift positive control\n\n');
+  process.stdout.write(`- task manifest: \`${manifestPath || 'default'}\`\n\n`);
   process.stdout.write(
     'Each task ships a `control` fixture: the files a correct agent would produce. ' +
       'This must score 100%. A shortfall means a check is unsatisfiable, not that the ' +

@@ -1,0 +1,84 @@
+{
+  "$comment": "TASK-LIFT TASTE BEATS — the real benchmark. The chore set in tasks.json is at ceiling: both arms already do those jobs well, so it measures the instrument and nothing else. These tasks are drawn from the project's LOCKED art canon and its T0 beat-packet format, where knowing the recorded decision is the whole difference between a right and a wrong artifact.",
+  "$armCaveat": "READ THIS BEFORE QUOTING A NUMBER. ABLATE_PATHS removes AGENTS.md, .cursor, .agents, swarm, UserHarness and START_HERE.md — but NOT Docs/. The art bible and the T0 beat packets are therefore reachable by BOTH arms. So this benchmark measures whether the harness POINTS AN AGENT AT the recorded canon, not whether the canon was available. That is a real and interesting question, and it is not the same as 'the harness adds knowledge'. The third arm (`--arms with,docs-only,without`) exists to separate the two; it is not wired yet.",
+  "$positiveControl": "Every task carries a `control` fixture and must score 100% via `npm run tasklift:control -- --manifest scripts/task-lift/tasks-taste.json`. If a control does not reach 100%, a check is unsatisfiable and the task measures nothing.",
+  "$verdicts": "Checks use the shared vocabulary in scripts/outcome.js. An absent file is `void`, not a failure, and is excluded from the denominator rather than scored 0.",
+  "version": 1,
+  "tasks": [
+    {
+      "id": "art-master-spec",
+      "area": "art",
+      "prompt": "Write a master material spec for the homestead ground surface — spring grass with scattered lupine. Save it to Docs/qa/art-master-ground.md. Follow whatever material contract this project already documents, and if the project already has a master that covers this surface, use it rather than adding a new one.",
+      "seed": {},
+      "checks": [
+        { "class": "completion", "kind": "matches", "path": "Docs/qa/art-master-ground.md", "pattern": "M_", "label": "names the master material it uses" },
+        { "class": "conformance", "kind": "anyMatches", "glob": "Docs/qa/art-master-ground.md", "newOnly": true, "pattern": "M_StylizedGrass|M_FoliageCard", "label": "reuses an existing master instead of inventing a family" },
+        { "class": "conformance", "kind": "anyMatches", "glob": "Docs/qa/art-master-ground.md", "newOnly": true, "pattern": "BaseColor", "label": "declares BaseColor" },
+        { "class": "conformance", "kind": "anyMatches", "glob": "Docs/qa/art-master-ground.md", "newOnly": true, "pattern": "Roughness", "label": "declares Roughness" },
+        { "class": "conformance", "kind": "anyMatches", "glob": "Docs/qa/art-master-ground.md", "newOnly": true, "pattern": "Variation", "label": "declares Variation" },
+        { "class": "conformance", "kind": "anyMatches", "glob": "Docs/qa/art-master-ground.md", "newOnly": true, "pattern": "NightMix", "label": "declares NightMix" },
+        { "class": "conformance", "kind": "anyMatches", "glob": "Docs/qa/art-master-ground.md", "newOnly": true, "pattern": "0\\s*(?:→|->|to)\\s*1", "label": "NightMix is expressed as a 0 to 1 range" },
+        { "class": "conformance", "kind": "anyMatches", "glob": "Docs/qa/art-master-ground.md", "newOnly": true, "pattern": "ground contact|ground-contact|origin", "label": "states the origin convention" },
+        { "class": "conformance", "kind": "anyMatches", "glob": "Docs/qa/art-master-ground.md", "newOnly": true, "pattern": "meters|metres|\\bm\\b", "label": "states the unit is meters" },
+        { "class": "conformance", "kind": "noneMatch", "glob": "Docs/qa/art-master-ground.md", "newOnly": true, "pattern": "photoreal|grimdark|sci-?fi|scan(?:ned)? (?:wood|texture)|pbr scan", "label": "avoids the canon's rejected look language" }
+      ],
+      "control": {
+        "Docs/qa/art-master-ground.md": "# Master material spec — homestead ground (spring grass + lupine)\n\n## Which master\n\nInstance the existing `M_StylizedGrass` for the ground plane and `M_FoliageCard` for the\nlupine sprays. The project keeps a fixed set of masters; this surface does not get a new\nfamily.\n\n## Parameters\n\n| Parameter | Range | Notes |\n|---|---|---|\n| BaseColor | sRGB | Spring grass, quiet; lupine is the loud accent |\n| Roughness | 0.75–0.9 | Handmade, never a wet scan |\n| Variation | 0.15–0.35 | Break the plane without noise |\n| NightMix | 0→1 | Night is this parameter shifting, not a second mesh |\n| Emissive | none | The window and fire are the emissives; ground is not |\n\n## Placement\n\nScale is in meters. The origin sits at ground contact so the card instances onto the\nterrace edge without an offset.\n\n## Palette\n\nSpring grass / lupine from the locked palette. Cool navy sky bounce at night, never a\nmuddy mid-gray.\n"
+      }
+    },
+    {
+      "id": "art-shot-brief",
+      "area": "art",
+      "prompt": "Write a shot brief for the spirit shrine at night. Save it to Docs/qa/shot-shrine-night.md. State it the way this project's shot approvals are stated, including what makes the shot fail.",
+      "seed": {},
+      "checks": [
+        { "class": "completion", "kind": "matches", "path": "Docs/qa/shot-shrine-night.md", "pattern": "shrine", "label": "names the subject" },
+        { "class": "conformance", "kind": "anyMatches", "glob": "Docs/qa/shot-shrine-night.md", "newOnly": true, "pattern": "Pass when|PASS when|pass criteria|\\|\\s*Pass", "label": "states explicit pass criteria" },
+        { "class": "conformance", "kind": "anyMatches", "glob": "Docs/qa/shot-shrine-night.md", "newOnly": true, "pattern": "Fail when|FAIL when|fail criteria|\\|\\s*Fail", "label": "states explicit fail criteria" },
+        { "class": "conformance", "kind": "anyMatches", "glob": "Docs/qa/shot-shrine-night.md", "newOnly": true, "pattern": "Crystal cyan", "label": "names the locked palette chip the shrine uses" },
+        { "class": "conformance", "kind": "anyMatches", "glob": "Docs/qa/shot-shrine-night.md", "newOnly": true, "pattern": "Cabin amber|Cabin gold|cabin amber", "label": "pairs the shrine light against the cabin key" },
+        { "class": "conformance", "kind": "anyMatches", "glob": "Docs/qa/shot-shrine-night.md", "newOnly": true, "pattern": "same master|same masters|same material", "label": "reuses the existing masters rather than rebuilding for night" },
+        { "class": "conformance", "kind": "noneMatch", "glob": "Docs/qa/shot-shrine-night.md", "newOnly": true, "pattern": "neon (?:tech )?(?:portal|ring|glow)|technological portal|sci-?fi portal", "label": "the shrine is a handmade spirit cue, not a tech gate" }
+      ],
+      "control": {
+        "Docs/qa/shot-shrine-night.md": "# Shot brief — spirit shrine, night\n\n**Subject:** the handmade spirit shrine beyond the cabin, answering the cabin's own light.\n\n| Shot | Pass when | Fail when |\n|---|---|---|\n| Spirit shrine night | Crystal cyan inner shard answering Cabin amber from the porch; tight bloom, not lawn-wide neon; the same masters carry the night | Neon tech portal; geometry rebuilt for night; the cyan swamps the warm key |\n\n## Light\n\nCrystal cyan is the jewel. Cabin amber stays the warm key it always is, and the shrine\nanswers it rather than replacing it. Navy sky holds the background.\n\n## Geometry\n\nNo new meshes. The same masters, shifted by NightMix, exactly as every other night shot\nin the project.\n"
+      }
+    },
+    {
+      "id": "asset-naming",
+      "area": "art",
+      "prompt": "Name four assets for a garden detail pass: a second stone path tile, a weathered wooden planter, a moth, and a firefly effect. Write the list to Docs/qa/asset-names.txt, one name per line, using this project's asset naming contract.",
+      "seed": {},
+      "checks": [
+        { "class": "completion", "kind": "matches", "path": "Docs/qa/asset-names.txt", "pattern": "SM_|FX_|M_", "label": "produced prefixed names" },
+        { "class": "conformance", "kind": "allLinesMatch", "path": "Docs/qa/asset-names.txt", "pattern": "^(M_|SM_|SK_|FX_|PCG_|BP_|CAM_|LIT_)[A-Za-z0-9_]+$", "label": "every name uses an approved prefix and no spaces" },
+        { "class": "conformance", "kind": "noneMatch", "path": "Docs/qa/asset-names.txt", "pattern": "^(MI_|MAT_|T_|Tex_|MASTER_|New) ", "label": "does not invent a prefix outside the contract" },
+        { "class": "conformance", "kind": "anyMatches", "path": "Docs/qa/asset-names.txt", "pattern": "_Day|_Night|_Spirit|_Nurtured|_World|_Stored", "label": "uses a contract suffix where one applies" }
+      ],
+      "control": {
+        "Docs/qa/asset-names.txt": "SM_PathStone_B\nSM_Planter_D\nSK_Moth\nFX_Firefly_Night\n"
+      }
+    },
+    {
+      "id": "mechanic-beat-packet",
+      "area": "mechanic",
+      "prompt": "Write a design packet for T0 MUST beat #4 (backpack) in the same format this project's other T0 beat packets use. Save it to Docs/qa/T0_M4_backpack_packet.md. Files only — do not act on it.",
+      "seed": {},
+      "checks": [
+        { "class": "completion", "kind": "matches", "path": "Docs/qa/T0_M4_backpack_packet.md", "pattern": "T0_M4|MUST #4|MUST #", "label": "identifies the beat" },
+        { "class": "conformance", "kind": "anyMatches", "path": "Docs/qa/T0_M4_backpack_packet.md", "pattern": "\\*\\*Bite id\\*\\*", "label": "carries the Bite id field" },
+        { "class": "conformance", "kind": "anyMatches", "path": "Docs/qa/T0_M4_backpack_packet.md", "pattern": "\\*\\*Present\\?\\*\\*", "label": "carries the Present? field" },
+        { "class": "conformance", "kind": "anyMatches", "path": "Docs/qa/T0_M4_backpack_packet.md", "pattern": "\\*\\*CAP\\*\\*", "label": "carries the CAP field" },
+        { "class": "conformance", "kind": "anyMatches", "path": "Docs/qa/T0_M4_backpack_packet.md", "pattern": "\\*\\*Packet class\\*\\*", "label": "carries the Packet class field" },
+        { "class": "conformance", "kind": "anyMatches", "path": "Docs/qa/T0_M4_backpack_packet.md", "pattern": "DONE-WHEN", "label": "states DONE-WHEN" },
+        { "class": "conformance", "kind": "anyMatches", "path": "Docs/qa/T0_M4_backpack_packet.md", "pattern": "Anti", "label": "carries the Anti row" },
+        { "class": "conformance", "kind": "anyMatches", "path": "Docs/qa/T0_M4_backpack_packet.md", "pattern": "Trade-Offs|Tradeoffs", "label": "carries the A-E trade-off section" },
+        { "class": "conformance", "kind": "anyMatches", "path": "Docs/qa/T0_M4_backpack_packet.md", "pattern": "soft_fail|closed_fail|pass", "label": "uses the three-state verdict vocabulary" },
+        { "class": "conformance", "kind": "noneMatch", "path": "Docs/qa/T0_M4_backpack_packet.md", "pattern": "\\|\\s*\\*\\*Status\\*\\*\\s*\\|\\s*\\**\\s*(ACCEPTED|APPROVED|APPROVE|PASS)", "label": "does not mark itself approved - design does not self-approve" }
+      ],
+      "control": {
+        "Docs/qa/T0_M4_backpack_packet.md": "# T0_M4_BACKPACK_PACKET_V1 - MUST #4 Design packet (Arrange + DONE-WHEN freeze)\n\n| Field | Value |\n|---|---|\n| **Status** | **DRAFT** - Design files-only; Design does **not** self-APPROVE |\n| **Bite id** | `T0_M4_BACKPACK_PACKET_V1` |\n| **MUST** | #4 - Backpack holds gathered items |\n| **Present?** | **Partial** |\n| **CAP** | **CAP PARKED** |\n| **Host** | CLOUD docs-only |\n| **Map** | `Maps/VS_MVP` |\n| **Packet class** | Mechanic inventory freeze - Arrange + DONE-WHEN + prove labels for **Test files-only**. **Not** a Source Act. |\n\n## Architecture Trade-Offs A-E\n\n| **A - Contract** | Prove labels `NODE_BACKPACK` - `TOD_DAY` - `FORM_BODY`. |\n| **B - Module** | Prefer the existing inventory path - no parallel carry service. |\n| **C - Evidence** | Law = grep on named labels. CAP **PARKED**. No DESKTOP PASS/FAIL from Design. |\n| **D - Seats** | Design freezes here; Test files-only. |\n| **E - Stability** | A proxy mesh standing in for the real slot is `closed_fail`. |\n\n## Expected / Found / Arrange / DONE-WHEN / Depends / Anti\n\n| Row | Value |\n|---|---|\n| **Expected (T0)** | Gathered items live in the backpack. Body (`FORM_BODY`). |\n| **Found** | Partial. |\n| **Arrange** | Day - `FORM_BODY` - gather - item enters `NODE_BACKPACK`. |\n| **DONE-WHEN** | Below - Test files-only greps; **no DESKTOP Act** from Design |\n| **Anti** | no Content/Python/Source - no DESKTOP PASS/FAIL from Design - Design does not self-APPROVE |\n"
+      }
+    }
+  ]
+}

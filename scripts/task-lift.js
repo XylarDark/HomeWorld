@@ -62,7 +62,11 @@ const ABLATE_PATHS = ['AGENTS.md', '.cursor', '.agents', 'swarm', 'UserHarness',
 const AGENT_TIMEOUT_MS = 15 * 60 * 1000;
 
 function loadTasks(file = MANIFEST) {
-  return JSON.parse(fs.readFileSync(file, 'utf8'));
+  const raw = JSON.parse(fs.readFileSync(file, 'utf8'));
+  // Record which manifest produced a result. Two manifests share one JSON filename
+  // in practice, and a report that does not say which set it measured is unreadable.
+  raw.manifestPath = file;
+  return raw;
 }
 
 /**
@@ -384,6 +388,27 @@ function evaluateCheck(root, check, createdAfterSeed) {
       return result(hits.length === 0, hits[0] ? `matched in ${hits[0]}` : 'clean');
     }
 
+    case 'allLinesMatch': {
+      // Every non-blank line must match. Used where the rule is about the whole set -
+      // "every asset name uses an approved prefix" cannot be checked by asking
+      // whether ANY line matches, which would pass a list of five names where one is
+      // right and four are invented.
+      const full = path.join(root, check.path);
+      if (!fs.existsSync(full)) return result(false, 'file absent', { subjectPresent: false });
+      const lines = fs
+        .readFileSync(full, 'utf8')
+        .split(/\r?\n/)
+        .map((l) => l.trim())
+        .filter((l) => l.length > 0);
+      if (lines.length === 0) return result(false, 'file has no content lines', { subjectPresent: false });
+      const bad = lines.filter((l) => !patterns.test(l));
+      return result(
+        bad.length === 0,
+        bad.length === 0 ? `${lines.length} lines conform` : `non-conforming: ${bad[0].slice(0, 60)}`,
+        { soft: lines.length < (check.min || 1) }
+      );
+    }
+
     case 'declaresScope': {
       // A live rule must declare how it is scoped. A tombstone must not: this repo
       // keeps three rules alive as pointers with `alwaysApply: false` and no globs,
@@ -442,9 +467,11 @@ function evaluateCheck(root, check, createdAfterSeed) {
 }
 
 /** Run one task in one condition and score every check. */
-function runTask(worktreeRoot, task, { dry }) {
+function runTask(worktreeRoot, task, { dry, ...retryOpts } = {}) {
   const createdAfterSeed = seed(worktreeRoot, task);
-  const agent = dry ? { status: 0, dry: true, ok: true } : runAgent(worktreeRoot, task.prompt);
+  const agent = dry
+    ? { status: 0, dry: true, ok: true, attempts: 0 }
+    : runAgentWithRetry(worktreeRoot, task.prompt, retryOpts);
 
   const checks = task.checks.map((c) => evaluateCheck(worktreeRoot, c, createdAfterSeed));
   const byClass = (cls) => checks.filter((c) => c.class === cls);
@@ -515,32 +542,71 @@ function rate(list, key) {
   return vals.length === 0 ? null : vals.reduce((a, b) => a + b, 0) / vals.length;
 }
 
-function summarize(results) {
+function summarize(results, { minValidPerCell = 1, dry = false } = {}) {
   const voidedRuns = results.filter((r) => r.voided);
   const valid = results.filter((r) => !r.voided);
-  const withArm = valid.filter((r) => r.condition === 'with');
-  const withoutArm = valid.filter((r) => r.condition === 'without');
+
+  // Per-cell accounting. A void run voids ITS cell, not the whole experiment: with
+  // 8 runs, one timeout used to discard all eight.
+  const cells = {};
+  for (const r of results) {
+    const key = `${r.taskId}/${r.condition}`;
+    cells[key] = (cells[key] || 0) + (r.voided ? 0 : 1);
+  }
+  const shortCells = Object.entries(cells).filter(([, n]) => n < minValidPerCell);
+  const missingCells = Object.keys(cells).filter((k) => cells[k] === 0);
+
+  // PAIRED analysis. A task contributes to the comparison only if BOTH of its arms
+  // have a valid run. Comparing a/with against (a/without + b/without) while b/with is
+  // missing is an unpaired proportion comparison - the same fallacy as comparing two
+  // groups built from different subjects. Dropped pairs are reported, not hidden.
+  const taskIds = [...new Set(results.map((r) => r.taskId))];
+  const completePairs = taskIds.filter(
+    (t) => (cells[`${t}/with`] || 0) >= minValidPerCell && (cells[`${t}/without`] || 0) >= minValidPerCell
+  );
+  const droppedPairs = taskIds.filter((t) => !completePairs.includes(t));
+  const paired = valid.filter((r) => completePairs.includes(r.taskId));
+  const withArm = paired.filter((r) => r.condition === 'with');
+  const withoutArm = paired.filter((r) => r.condition === 'without');
+
   const conf = (l) => rate(l, 'conformance');
   const comp = (l) => rate(l, 'completion');
   const lift =
     conf(withArm) !== null && conf(withoutArm) !== null ? conf(withArm) - conf(withoutArm) : null;
+  const enough = completePairs.length > 0;
+
   return {
-    tasks: new Set(results.map((r) => r.taskId)).size,
+    tasks: taskIds.length,
+    pairedTasks: completePairs.length,
+    droppedPairs,
     // Rates describe only the runs that measured something.
     validRuns: valid.length,
     voidedRuns: voidedRuns.length,
+    validByCell: cells,
+    missingCells,
+    shortCells: shortCells.map(([k, n]) => ({ cell: k, valid: n, required: minValidPerCell })),
     completionWith: comp(withArm),
     completionWithout: comp(withoutArm),
     conformanceWith: conf(withArm),
     conformanceWithout: conf(withoutArm),
-    // A lift over a partial set is worse than none: it still reads as data.
-    lift: voidedRuns.length > 0 ? null : lift,
+    // Withheld when nothing was measured, when a dry run produced the numbers, or
+    // when no task has both arms. A lift over a partial set is worse than none: it
+    // still reads as data.
+    lift: enough && !dry ? lift : null,
+    liftWithheld: dry
+      ? 'dry run - no agent executed, so nothing was measured'
+      : enough
+        ? null
+        : 'no task has a valid run in both arms',
     failures: results.filter((r) => r.agent && r.agent.timedOut).length,
     // Count any run the agent did not complete cleanly, not only spawn-level ones.
     // Counting only `r.error` reported 0 errors for 8 quota-blocked runs. A missing
     // `status` is not treated as a failure, so synthetic fixtures stay meaningful.
     agentErrors: results.filter((r) => r.agent && (r.agent.error || !agentExitedClean(r.agent)))
       .length,
+    // Retries, not attempts: a first-try success is 0. A dry run has no attempts and
+    // must not contribute a negative count.
+    retries: results.reduce((n, r) => n + Math.max(0, ((r.agent && r.agent.attempts) || 1) - 1), 0),
   };
 }
 
@@ -580,16 +646,20 @@ function renderMarkdown(results, summary, meta, ablation) {
     lines.push('');
     lines.push(
       `${s.voidedRuns} of ${s.voidedRuns + s.validRuns} agent runs did not complete. Their checks ` +
-        'scored worktrees that no agent ever touched, so they are excluded from every rate ' +
-        'below and the lift is withheld rather than reported over a partial set. ' +
-        '**Do not quote any number from this file.**'
+        'scored worktrees that no agent ever touched. Each is excluded from its own cell only; ' +
+        (s.lift === null
+          ? 'the lift is withheld because a cell has no valid run.'
+          : 'the remaining cells still produced a lift — treat it with the missing cell in mind.') +
+        (s.voidedRuns >= s.validRuns
+          ? ' **More runs failed than succeeded: treat every number below as unusable.**'
+          : '')
     );
     lines.push('');
-    lines.push('| Task | Condition | Exit | Reported error |');
-    lines.push('|---|---|---|---|');
+    lines.push('| Task | Condition | Exit | Attempts | Reported error |');
+    lines.push('|---|---|---|---|---|');
     for (const r of results.filter((x) => x.voided)) {
       lines.push(
-        `| ${r.taskId} | ${r.condition} | ${r.agent.status} | ${r.agent.error || '(none reported)'} |`
+        `| ${r.taskId} | ${r.condition} | ${r.agent.status} | ${r.agent.attempts || 1} | ${r.agent.error || '(none reported)'} |`
       );
     }
     lines.push('');
@@ -616,8 +686,20 @@ function renderMarkdown(results, summary, meta, ablation) {
   lines.push('|---|---|---|---|');
   lines.push(`| Task completion (control) | ${pct(s.completionWith)} | ${pct(s.completionWithout)} | ${pp(s.completionWith, s.completionWithout)} |`);
   lines.push(`| Convention conformance | ${pct(s.conformanceWith)} | ${pct(s.conformanceWithout)} | ${pp(s.conformanceWith, s.conformanceWithout)} |`);
-  const liftText = s.lift === null ? `withheld — ${s.voidedRuns} void run(s)` : pp(s.conformanceWithout, s.conformanceWith);
+  const liftText = s.lift === null ? `withheld — ${s.liftWithheld || 'insufficient data'}` : pp(s.conformanceWithout, s.conformanceWith);
   lines.push(`| **Lift on conformance** | — | — | **${liftText}** |`);
+  lines.push('');
+  lines.push(
+    `Agent sessions: ${results.length} run, ${s.validRuns} measured, ${s.voidedRuns} void, ` +
+      `${s.retries} retried after a transport failure.`
+  );
+  if (s.voidedRuns > 0) {
+    lines.push('');
+    lines.push(
+      'A void run is excluded from its own cell, not from the whole experiment. ' +
+        'A cell with no valid run still withholds the lift.'
+    );
+  }
   lines.push('');
   lines.push('## Per-task detail');
   lines.push('');
@@ -648,6 +730,12 @@ function renderMarkdown(results, summary, meta, ablation) {
   lines.push('## Run identity');
   lines.push('');
   lines.push(`- commit: \`${meta.commit}\``);
+  if (meta.manifest) lines.push(`- task manifest: \`${meta.manifest}\``);
+  if (s.pairedTasks !== undefined && s.droppedPairs && s.droppedPairs.length > 0) {
+    lines.push(
+      `- dropped pairs (one arm had no valid run, so it cannot be compared): ${s.droppedPairs.join(', ')}`
+    );
+  }
   lines.push(`- agent binary: \`${meta.agentBin}\` (${meta.agentVersion})`);
   lines.push('- driver: `opencode run --standalone --auto` (fresh process, no parent session context)');
   lines.push(`- ablation: git worktree at the same commit with ${ABLATE_PATHS.join(', ')} deleted`);
@@ -658,24 +746,109 @@ function renderMarkdown(results, summary, meta, ablation) {
   return lines.join('\n');
 }
 
+/** Failures worth retrying: the infrastructure, not the agent's work. */
+const TRANSIENT_PATTERNS = [
+  /HTTP 429/,
+  /rate limit/i,
+  /HTTP 5\d\d/,
+  /ECONNRESET|ECONNREFUSED|ETIMEDOUT|EAI_AGAIN|ENOTFOUND/,
+  /socket hang up|premature close|fetch failed/i,
+];
+
+/**
+ * True when a failure is transport noise rather than a result.
+ *
+ * This distinction is the whole reason a retry loop is safe here. A 429 or a
+ * dropped socket says nothing about the harness and should be retried. A non-zero
+ * exit that is NOT transport noise is the agent's own outcome - it may have
+ * refused, crashed, or finished - and retrying it would quietly replace a
+ * measurement with a more flattering one.
+ */
+function isTransient(error, timedOut) {
+  if (timedOut) return true;
+  const e = String(error || '');
+  if (!e) return false;
+  return TRANSIENT_PATTERNS.some((re) => re.test(e));
+}
+
+const sleep = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+
+/**
+ * Run one agent session, retrying only transport failures.
+ *
+ * Retries are capped and spaced so a rate-limited provider is not hammered, which
+ * would extend the outage it is recovering from.
+ */
+function runAgentWithRetry(root, prompt, { attempts = 3, backoffMs = 5000, timeoutMs } = {}) {
+  let last = null;
+  for (let i = 1; i <= attempts; i++) {
+    last = runAgent(root, prompt, timeoutMs);
+    if (last.ok) return { ...last, attempts: i };
+    if (!isTransient(last.error, last.timedOut)) {
+      return { ...last, attempts: i, retriedOut: false };
+    }
+    if (i < attempts) {
+      const wait = backoffMs * i;
+      process.stderr.write(
+        `${PREFIX}   transport failure (${last.timedOut ? 'timeout' : last.error}), ` +
+          `retry ${i}/${attempts - 1} in ${wait}ms\n`
+      );
+      sleep(wait);
+    }
+  }
+  return { ...last, attempts, retriedOut: true };
+}
+
 function main(argv) {
   const dry = argv.includes('--dry');
   const keep = argv.includes('--keep');
   const onlyIdx = argv.indexOf('--only');
   const only = onlyIdx !== -1 ? argv[onlyIdx + 1] : null;
+  const resume = argv.includes('--resume');
+  const manifestPath = readFlag(argv, '--manifest') || MANIFEST;
 
-  const manifest = loadTasks();
+  // Spending guard. Every agent session costs money, and the previous default was
+  // to run them unless `--dry` was passed - so asking for a report cost 8 sessions.
+  // Now the opposite: `--run` is required, and this message says so.
+  if (!dry && !argv.includes('--run')) {
+    process.stderr.write(
+      `${PREFIX} refusing to start agent sessions without --run.\n` +
+        `${PREFIX}   --dry    run the pipeline with no agent sessions (free)\n` +
+        `${PREFIX}   --run    spend agent sessions: one real agent run per task per condition\n` +
+        `${PREFIX} This guard exists because asking for a report previously ran the\n` +
+        `${PREFIX} whole suite. Pass --dry to explore first.\n`
+    );
+    return 2;
+  }
+
+  const manifest = loadTasks(manifestPath);
   const tasks = only ? manifest.tasks.filter((t) => t.id === only) : manifest.tasks;
   if (tasks.length === 0) {
     process.stderr.write(`${PREFIX} ERROR - no task matched --only ${only}\n`);
     return 2;
   }
 
+  const writeJsonEarly = readFlag(argv, '--out-json');
+  let results = [];
+  if (resume && writeJsonEarly && fs.existsSync(writeJsonEarly)) {
+    try {
+      const prior = JSON.parse(fs.readFileSync(writeJsonEarly, 'utf8'));
+      if (Array.isArray(prior.results)) {
+        results = prior.results;
+        process.stderr.write(
+          `${PREFIX} resume: ${results.length} prior run(s) from ${writeJsonEarly}\n`
+        );
+      }
+    } catch (e) {
+      process.stderr.write(`${PREFIX} resume: could not read prior results (${e.message}); starting fresh\n`);
+    }
+  }
+  const done = new Set(results.map((r) => `${r.taskId}/${r.condition}`));
+
   const base = fs.mkdtempSync(path.join(os.tmpdir(), 'tasklift-'));
   const roots = { with: path.join(base, 'with'), without: path.join(base, 'without') };
   process.stderr.write(`${PREFIX} worktrees under ${base}\n`);
 
-  const results = [];
   let ablation = null;
   try {
     buildWorktree(roots.with, false);
@@ -693,10 +866,27 @@ function main(argv) {
 
     for (const task of tasks) {
       for (const condition of ['with', 'without']) {
-        process.stderr.write(`${PREFIX} ${task.id} / ${condition} ...\n`);
+        const key = `${task.id}/${condition}`;
+        if (done.has(key)) {
+          process.stderr.write(`${PREFIX} ${key} ... skipped (already in results)\n`);
+          continue;
+        }
+        process.stderr.write(`${PREFIX} ${key} ...\n`);
         const r = runTask(roots[condition], task, { dry });
         results.push({ ...r, condition });
         if (r.agent.error) process.stderr.write(`${PREFIX}   agent error: ${r.agent.error}\n`);
+        if (r.voided) process.stderr.write(`${PREFIX}   VOID - excluded from every rate\n`);
+
+        // Persist after EVERY run. An experiment that dies at task 6 of 8 must not
+        // cost all eight sessions.
+        if (writeJsonEarly) {
+          fs.mkdirSync(path.dirname(writeJsonEarly), { recursive: true });
+          fs.writeFileSync(
+            writeJsonEarly,
+            `${JSON.stringify({ tool: PREFIX, dry, ablation, results }, null, 2)}\n`,
+            'utf8'
+          );
+        }
       }
     }
   } finally {
@@ -718,9 +908,11 @@ function main(argv) {
     }
   }
 
-  const summary = summarize(results);
+  const minValid = Number(readFlag(argv, '--min-valid') || 1);
+  const summary = summarize(results, { minValidPerCell: minValid, dry });
   const meta = {
     commit: firstLine(spawnSync('git', ['rev-parse', '--short', 'HEAD'], { cwd: PROJECT_ROOT, encoding: 'utf8' })),
+    manifest: manifestPath,
     agentBin: resolveAgentBin(),
     agentVersion: firstLine(spawnSync(resolveAgentBin(), ['--version'], { encoding: 'utf8' })),
   };
@@ -782,6 +974,7 @@ module.exports = {
   matchFiles,
   verifyAblation,
   scoreControl,
+  isTransient,
   seed,
   evaluateCheck,
   commitSubject,

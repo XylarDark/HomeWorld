@@ -16,6 +16,8 @@ const path = require('node:path');
 
 const M = require('./task-lift.js');
 
+const TASTE_MANIFEST = path.join(__dirname, 'task-lift', 'tasks-taste.json');
+
 const fixtureDirs = [];
 
 // Without this, every run leaves one `tasklift-*` directory in %TEMP%. 147 had
@@ -271,6 +273,43 @@ test('the write script runs the eval once, not twice', () => {
   assert.ok(cmd.includes('--out-md') && cmd.includes('--out-json'), 'both outputs must be requested');
 });
 
+test('every script that spends agent sessions says --run explicitly', () => {
+  // The old default was to run agents unless --dry was passed, so asking for a
+  // report cost eight sessions. Every spending entry point must now opt in, or the
+  // guard is bypassed and nobody notices.
+  const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'));
+  const spending = Object.entries(pkg.scripts).filter(
+    ([name, cmd]) => /scripts\/task-lift\.js/.test(cmd) && !name.includes('dry') && !name.includes('test')
+  );
+  assert.ok(spending.length > 0, 'expected at least one spending script');
+  for (const [name, cmd] of spending) {
+    assert.ok(
+      /(^|\s)--run(\s|$)/.test(cmd),
+      `${name} spends agent sessions without --run: ${cmd}`
+    );
+  }
+});
+
+test('the runner refuses to spend without --run', () => {
+  // Behavioural proof of the guard, not just a grep of package.json.
+  const { spawnSync } = require('node:child_process');
+  const r = spawnSync(
+    process.execPath,
+    [path.join(__dirname, 'task-lift.js'), '--out-md', path.join(os.tmpdir(), 'must-not-exist.md')],
+    { encoding: 'utf8', cwd: path.join(__dirname, '..') }
+  );
+  assert.strictEqual(r.status, 2, 'must exit 2 without --run');
+  assert.match(r.stderr, /refusing to start agent sessions/);
+});
+
+test('both manifests declare a control for every task', () => {
+  for (const file of [M.MANIFEST, TASTE_MANIFEST]) {
+    for (const t of M.loadTasks(file).tasks) {
+      assert.ok(t.control && Object.keys(t.control).length > 0, `${file} / ${t.id} has no control`);
+    }
+  }
+});
+
 test('the ablation list covers the always-on agent context', () => {
   for (const p of ['AGENTS.md', '.cursor', '.agents', 'swarm']) {
     assert.ok(M.ABLATE_PATHS.includes(p), `ablation must remove ${p}`);
@@ -471,4 +510,149 @@ test('an absent subject is void across every check kind that looks for a file', 
     const r = M.evaluateCheck(dir, { kind, glob: '**/*.mdc' }, new Set());
     assert.strictEqual(r.verdict, 'void', `${kind} must be void when nothing exists`);
   }
+});
+
+// ---------------------------------------------------------------------------
+// The taste-beat benchmark, and the P0 runner guarantees.
+// ---------------------------------------------------------------------------
+
+test('the taste-beat benchmark controls all reach 100%', () => {
+  // The chore set is at ceiling - both arms already do those jobs. The taste beats
+  // are the real benchmark, and they are only meaningful if a correct answer can
+  // score full marks. If one cannot, the task measures the check, not the harness.
+  for (const task of M.loadTasks(TASTE_MANIFEST).tasks) {
+    const r = M.scoreControl(task);
+    const failed = r.checks.filter((c) => !c.pass).map((c) => `${c.label} (${c.verdict})`);
+    assert.strictEqual(
+      r.ok,
+      true,
+      `taste control ${task.id} did not reach 100%: ${r.reason} -> ${failed.join('; ')}`
+    );
+  }
+});
+
+test('a taste check actually rejects a wrong answer', () => {
+  // A control reaching 100% only proves the checks CAN pass. It does not prove they
+  // would catch a bad artifact. This is the other half: the same checks, scored
+  // against a plausible-but-wrong answer, must fail.
+  const bad = {
+    'Docs/qa/art-master-ground.md':
+      '# Ground material\n\nNew family `MAT_GrassScan` - photoreal scanned grass, PBR scan based.\nScale 1.\n',
+  };
+  const dir = fixture(bad);
+  const seeded = M.seed(dir, {});
+  const task = M.loadTasks(TASTE_MANIFEST).tasks.find((t) => t.id === 'art-master-spec');
+  const results = task.checks.map((c) => M.evaluateCheck(dir, c, seeded));
+  const passed = results.filter((r) => r.pass).length;
+  assert.ok(
+    passed < task.checks.length,
+    `a photoreal new-family answer scored ${passed}/${task.checks.length}; the checks are too weak`
+  );
+  // Specifically, the two most important ones.
+  const reuse = results.find((r) => r.label.includes('reuses an existing master'));
+  const look = results.find((r) => r.label.includes('rejected look language'));
+  assert.strictEqual(reuse.pass, false, 'must reject inventing a new master family');
+  assert.strictEqual(look.pass, false, 'must reject photoreal scan language');
+});
+
+test('allLinesMatch fails when only some lines conform', () => {
+  // The exact gap an `anyMatches` check would hide: five names, four right.
+  const dir = fixture({ 'names.txt': 'SM_PathStone_B\nMAT_Planter\nSK_Moth\n' });
+  const any_ = M.evaluateCheck(dir, { kind: 'anyMatches', path: 'names.txt', pattern: '^SM_' }, new Set());
+  const all = M.evaluateCheck(
+    dir,
+    { kind: 'allLinesMatch', path: 'names.txt', pattern: '^(M_|SM_|SK_)[A-Za-z0-9_]+$' },
+    new Set()
+  );
+  assert.strictEqual(any_.pass, true, 'anyMatches is satisfied by one good line - which is the bug');
+  assert.strictEqual(all.pass, false, 'allLinesMatch must reject the list');
+  assert.match(all.detail, /MAT_Planter/);
+});
+
+test('the manifest path is recorded so a report says which set it measured', () => {
+  assert.strictEqual(M.loadTasks(TASTE_MANIFEST).manifestPath, TASTE_MANIFEST);
+});
+
+test('a dry run withholds the lift instead of reporting an artifact zero', () => {
+  // In dry mode nothing is measured, so a conformance rate of 0 in both arms and a
+  // "0pp lift" is an artifact of no agent running. Reporting it as a number is the
+  // same class of error as scoring a crashed run.
+  const s = M.summarize(
+    [
+      { taskId: 'a', condition: 'with', voided: false, conformance: 0, completion: 0, agent: { status: 0, error: null, attempts: 1 } },
+      { taskId: 'a', condition: 'without', voided: false, conformance: 0, completion: 0, agent: { status: 0, error: null, attempts: 1 } },
+    ],
+    { dry: true }
+  );
+  assert.strictEqual(s.lift, null);
+  assert.match(s.liftWithheld, /dry run/);
+  assert.strictEqual(s.retries, 0, 'a first-try success is zero retries, never negative');
+});
+
+test('one void run voids its own cell, not the whole experiment', () => {
+  // With 8 runs, a single timeout used to discard all eight. That made the
+  // instrument too brittle to survive ordinary infrastructure noise.
+  const ok = (taskId, condition, conf) => ({
+    taskId,
+    condition,
+    voided: false,
+    conformance: conf,
+    completion: 1,
+    agent: { status: 0, error: null, attempts: 1 },
+  });
+  const dead = (taskId, condition) => ({
+    taskId,
+    condition,
+    voided: true,
+    conformance: 0,
+    completion: 0,
+    agent: { status: 1, error: 'timeout', attempts: 3 },
+  });
+  const s = M.summarize([ok('a', 'with', 1), ok('a', 'without', 0.5), dead('b', 'with'), ok('b', 'without', 0.5)]);
+  assert.strictEqual(s.voidedRuns, 1);
+  // Task b is dropped because only one of its arms has a valid run. Comparing
+  // a/with against a/without+b/without would be an unpaired comparison.
+  assert.deepStrictEqual(s.droppedPairs, ['b']);
+  assert.strictEqual(s.pairedTasks, 1);
+  assert.strictEqual(s.lift, 0.5, 'the complete pair still yields a lift');
+  assert.deepStrictEqual(s.validByCell, { 'a/with': 1, 'a/without': 1, 'b/with': 0, 'b/without': 1 });
+  assert.strictEqual(s.retries, 2, 'the dead run took 3 attempts = 2 retries');
+  assert.deepStrictEqual(s.missingCells, ['b/with']);
+});
+
+test('a task with only one valid arm is dropped rather than compared unpaired', () => {
+  const s = M.summarize([
+    { taskId: 'a', condition: 'with', voided: false, conformance: 1, completion: 1, agent: { status: 0, error: null, attempts: 1 } },
+    { taskId: 'a', condition: 'without', voided: true, conformance: 0, completion: 0, agent: { status: 1, error: 'x', attempts: 1 } },
+  ]);
+  assert.strictEqual(s.lift, null, 'no complete pair means no lift');
+  assert.deepStrictEqual(s.missingCells, ['a/without']);
+  assert.deepStrictEqual(s.droppedPairs, ['a']);
+});
+
+test('min-valid-per-cell is enforced when repeats are in play', () => {
+  const one = (condition, conf) => ({
+    taskId: 'a',
+    condition,
+    voided: false,
+    conformance: conf,
+    completion: 1,
+    agent: { status: 0, error: null, attempts: 1 },
+  });
+  const res = M.summarize([one('with', 1), one('without', 0)], { minValidPerCell: 3 });
+  assert.strictEqual(res.lift, null, 'one trial per cell is below the minimum asked for');
+  assert.strictEqual(res.shortCells.length, 2);
+  assert.strictEqual(res.shortCells[0].required, 3);
+});
+
+test('only transport failures are retried, never a substantive non-zero exit', () => {
+  // Retrying a run that failed for a substantive reason would silently replace a
+  // measurement with a more flattering one.
+  assert.ok(M.isTransient('[error/provider.quota] (HTTP 429) Rate limit exceeded', false));
+  assert.ok(M.isTransient('[error/provider] (HTTP 503) upstream unavailable', false));
+  assert.ok(M.isTransient('socket hang up', false));
+  assert.ok(M.isTransient('', true), 'a timeout is transport, not a result');
+  assert.ok(!M.isTransient('[error/provider] the model refused to continue', false));
+  assert.ok(!M.isTransient(null, false), 'no error is not a transport failure');
+  assert.ok(!M.isTransient('exit 1', false));
 });
