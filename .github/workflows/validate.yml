@@ -118,6 +118,49 @@ jobs:
           if [ $ERRORS -ne 0 ]; then exit 1; fi
           echo "Git hygiene OK"
 
+  # Structural rule score — NON-BLOCKING by Lead decision (2026-10-01).
+  #
+  # It cannot be a merge gate: `skillevaluator` is not published on PyPI (it is a
+  # git-installed uv tool), so a hosted runner has no way to obtain the exact
+  # version this corpus was measured with. Scoring against an arbitrary version
+  # would produce numbers that look comparable and are not.
+  #
+  # So this step is honest about its own reach: it RUNS the gate when a scorer is
+  # present, and when one is not it says so out loud rather than reporting a pass.
+  # `continue-on-error` is belt-and-braces, not the mechanism.
+  rules-score:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Locate the scorer
+        id: scorer
+        run: |
+          if command -v skillevaluator >/dev/null 2>&1; then
+            echo "found=$(command -v skillevaluator)" >> "$GITHUB_OUTPUT"
+            echo "version=$(skillevaluator --version 2>/dev/null || echo unknown)" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=" >> "$GITHUB_OUTPUT"
+            echo "version=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Structural rule score (non-blocking)
+        run: |
+          if [ -z "${{ steps.scorer.outputs.found }}" ]; then
+            echo "::notice title=Structural rule score not run::skillevaluator is not published on PyPI and is a git-installed uv tool, so this runner cannot obtain the version the corpus was measured with (required: 0.4.0). Run 'npm run rules:score -- --strict' locally. This is a skipped gate, not a passing one."
+            exit 0
+          fi
+          echo "scorer version: ${{ steps.scorer.outputs.version }} (required: 0.4.0)"
+          if [ "${{ steps.scorer.outputs.version }}" != "0.4.0" ]; then
+            echo "::warning title=Scorer version drift::${{ steps.scorer.outputs.version }} is not 0.4.0. Scores from a different rubric version are a different measurement and are not comparable with docs/measured/SKILL_LIFT_BASELINE.md"
+          fi
+          npm run rules:score -- --strict
+
   python-lint:
     runs-on: ubuntu-latest
     steps:

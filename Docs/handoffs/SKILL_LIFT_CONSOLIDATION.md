@@ -225,6 +225,22 @@ execution scope was the agent-unblocked work only.
 never committed; user untracked work and the dirty `UserHarness` submodule are
 not touched; no product decisions are invented.
 
+### 2b) Second interview decisions — 2026-10-01 (round two)
+
+Every option was new — none of these existed as choices in round one, because
+none of them had been reached yet.
+
+| Question | Decision | Consequence |
+|---|---|---|
+| Make "green tests ≠ tool runs" a standing rule? | **KNOWN_ERRORS + register, no new `.cursor/rules` entry** | Recorded as a Harness trap. Deliberately *not* a rule: adding one would change the 31-rule corpus and move `meanLive` |
+| Preserve the judged baseline, which is gitignored? | **Commit a small tracked baseline summary** | A fresh clone otherwise has no baseline at all. Full 21 KB-per-run judge reports stay uncommitted |
+| Revisit the CI gate now D1 is proven? | **Wire as a non-blocking check** | Surfaces structural drift in the PR UI without blocking merges. Replaces "no change yet" |
+| Guard the scorer version? | **Preflight check, not a `package.json` pin** | `npm run doctor` asserts the installed scorer is 0.4.0 and warns otherwise. Catches the 0.3.0 → 0.4.0 class of drift where it happens |
+| Rule-content pass on the judged signal? | **One rule, examples only** | Weakest live rule, then one targeted `--only … --repeat 8` run accepting only Δ > 8.13 |
+| PHASE_BOARD T0 gap + self-contradiction? | **Delegate to the Conductor** | It owns the board; it can separate documented status from inference |
+| 5.7 sweep remainder? | **Just the three siblings** | `08b_HARNESS_GAP.md`, `08_AUDIT_UPGRADE_STRATEGY.md`, `08a_INVENTORY.md` — same audit family, same defect class as 08c. The other ~220 matches stay put |
+| Branch policy | **Keep fast-forwarding `main`** | Agent stages by explicit path, runs gates, fast-forwards when the branch is a clean FF |
+
 ---
 
 ## 6. WAVE C — resolved: complete, not superseded

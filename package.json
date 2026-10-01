@@ -4,7 +4,7 @@
   "private": true,
   "description": "HomeWorld Unreal project - root scripts for UserHarness doctor and layer sync",
   "scripts": {
-    "doctor": "node UserHarness/dist/scripts/doctor/cli.js --project-root .",
+    "doctor": "node UserHarness/dist/scripts/doctor/cli.js --project-root . ; node scripts/preflight-scorer.js",
     "doctor:ue": "node scripts/doctor-ue.js",
     "preflight:ue": "node scripts/preflight-ue.js",
     "preflight:ue:test": "node --test scripts/preflight-ue.test.js",
@@ -20,7 +20,9 @@
     "rules:score": "node scripts/score-mdc-rules.js",
     "rules:score:test": "node --test scripts/score-mdc-rules.test.js",
     "lift:score": "node scripts/score-mdc-lift.js",
-    "lift:score:test": "node --test scripts/score-mdc-lift.test.js"
+    "lift:score:test": "node --test scripts/score-mdc-lift.test.js",
+    "preflight:scorer": "node scripts/preflight-scorer.js",
+    "preflight:scorer:test": "node --test scripts/preflight-scorer.test.js"
   },
   "engines": {
     "node": ">=20.0.0"

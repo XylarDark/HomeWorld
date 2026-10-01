@@ -45,7 +45,7 @@ Owner tracks (when known): **CND** Conductor · **UE** Unreal/automation · **IN
 | `refs/keyart_homestead_night.jpg` | **KEEP** | Key-art north star for night look | AD / Lead |
 | `Source/HomeWorld/` (core character, GM, input, interact, TOD, inventory) | **UPGRADE** | Boot + MVP verbs substrate; align to Docs/03 / FALLBACK glide | UE / GP |
 | `Source/HomeWorld/` (NFT, Milady, Leaderboard, Wallet, Family/Mass-heavy) | **QUARANTINE** | Off signed 8-verb slice; defer polish systems (WAVE E) | UE |
-| `Source/HomeWorldEditor/` commandlets | **UPGRADE** | Keep for PCG/MEC tooling; verify UE 5.7.x boot (WAVE C) | UE |
+| `Source/HomeWorldEditor/` commandlets | **UPGRADE** | Keep for PCG/MEC tooling; verify UE 5.8 boot — *WAVE C boot-health completed (PR #13); see [Docs/08c_BOOT_HEALTH.md](08c_BOOT_HEALTH.md) and [Docs/22_UE58_UPGRADE.md](22_UE58_UPGRADE.md) U58-C* | UE |
 | `Content/HomeWorld/` (structure) | **UPGRADE** | Product content root; Meshes/* per Docs/04; old Demo/Homestead layout TBD WAVE D | INT / UE |
 | `Content/StylizedProvencal/`, `Content/Man/` | **QUARANTINE** | Third-party / sample look packs; not swarm kit canon | UE / AD |
 | `Content/Python/batch_import_asset_creation.py` | **KEEP** | Docs/05 first-pass importer (Meshes categories) | INT |
@@ -69,7 +69,7 @@ Owner tracks (when known): **CND** Conductor · **UE** Unreal/automation · **IN
 | `package.json` doctor/sync scripts | **UPGRADE** | Depend on populated `DevEnvTemplate/dist` | UE |
 | `AGENTS.md`, `.cursor/`, `.agents/` | **UPGRADE** | Still cite VisionBoard/TaskLists as primary; add Docs/swarm pointers | CND / UE |
 | `Config/` | **KEEP** | Project defaults; touch only for boot health (WAVE C) | UE |
-| `HomeWorld.uproject` | **KEEP** | Plugin set for UE 5.7; no audit churn | UE |
+| `HomeWorld.uproject` | **KEEP** | Plugin set for UE 5.8; no audit churn — *corrected 2026-10-01, authoring text read 5.7; project is locked to UE 5.8 (`EngineAssociation: 5.8`)* | UE |
 | `.github/workflows/` | **KEEP** | CI/validate | UE |
 | `README-Automation.md` (root) | **QUARANTINE** | Documents old loop; supersede via docs + swarm pointers | UE |
 | `README.md`, `CONTRIBUTING.md`, `LICENSE` | **KEEP** / **UPGRADE** | README should surface Docs/ + START_HERE | Lead |
@@ -129,7 +129,7 @@ Intentional UE/session/automation docs (`DOCS_LAYOUT.md` already documents the s
 
 **QUARANTINE (defer WAVE E polish):** NFT, Milady import, Leaderboard, Wallet, Family/Spirit roster/assignment heavy paths, ProtectorAttack combat emphasis, DungeonEntrance sprawl beyond slice, SmartObject/Mass-oriented controller wiring that is not required for the signed 8 verbs + FALLBACK glide.
 
-**Editor module:** Keep commandlets; verify compile/boot under UE 5.7.x in WAVE C.
+**Editor module:** Keep commandlets; verify compile/boot under UE 5.8 — *WAVE C completed (PR #13); 5.8 boot re-proved by [Docs/22_UE58_UPGRADE.md](22_UE58_UPGRADE.md) U58-C.*
 
 ---
 

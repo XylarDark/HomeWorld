@@ -120,10 +120,10 @@ npm run doctor
 
 | | |
 |---|---|
-| **Board** | WAVE B deliverable ready — harness gap doc + pointer-align PR |
-| **Actions** | Review PR; comment **`APPROVE WAVE B`** on PR to unlock WAVE C (boot health) |
-| **Gate** | `APPROVE WAVE B` — do not start WAVE C/D until granted |
-| **Next (after gate)** | WAVE C — Editor opens UE **5.8.x** without assert; Safe-Build green; close GoToBed/Meal boot-health class · *corrected 2026-10-01 — authoring text read 5.7.x, pre-dating the UE 5.8-only lock (AGENTS.md); gate still `APPROVE WAVE B`* |
+| **Board** | WAVE B deliverable ready — harness gap doc + pointer-align PR · *closed — WAVE B COMPLETE (PR #12 merged), WAVE C COMPLETE (PR #13, `Docs/08_AUDIT_SIGN_OFF.md` gate CLOSED)* |
+| **Actions** | ~~Review PR; comment **`APPROVE WAVE B`** on PR to unlock WAVE C (boot health)~~ · *done — WAVE B gate granted; WAVE C and WAVE D both completed* |
+| **Gate** | `APPROVE WAVE B` — ~~do not start WAVE C/D until granted~~ · *granted; gate satisfied* |
+| **Next (after gate)** | ~~WAVE C~~ — *completed 2026-09-17, PR #13; deliverable [Docs/08c_BOOT_HEALTH.md](08c_BOOT_HEALTH.md). Editor opened UE **5.8** without assert (5.8.2-56702186, re-proved by [Docs/22_UE58_UPGRADE.md](22_UE58_UPGRADE.md) U58-C); Safe-Build green; GoToBed/Meal boot-health class CLOSED. This row is historical, not a live plan.* · *corrected 2026-10-01 — authoring text read 5.7.x, pre-dating the UE 5.8-only lock (AGENTS.md)* |
 
 ```
 STOP — Lead approval required

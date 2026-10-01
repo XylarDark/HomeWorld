@@ -41,7 +41,7 @@ Diff HomeWorld vs current DevEnvTemplate (AGENTS, Safe-Build, MCP, session log, 
 
 ### WAVE C — Boot health
 
-Editor must open on UE 5.7.x without assert. Includes GoToBed/Meal constructor fix class of bugs; Safe-Build green.
+Editor must open on UE 5.8 without assert. Includes GoToBed/Meal constructor fix class of bugs; Safe-Build green. — *corrected 2026-10-01; authoring text read 5.7.x, pre-dating the UE 5.8-only lock (AGENTS.md). WAVE C completed on 2026-09-17 (PR #13); 5.8 boot re-proved by [Docs/22_UE58_UPGRADE.md](22_UE58_UPGRADE.md) U58-C.*
 
 - **Deliverable:** [08c_BOOT_HEALTH.md](08c_BOOT_HEALTH.md) — green editor open evidence + known crash list closed
 - **Gate:** Lead **APPROVE WAVE C**
