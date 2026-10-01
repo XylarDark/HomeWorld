@@ -21,6 +21,12 @@ See **ue58-sources.mdc** for the full sourcing policy. This is the ONLY Editor U
 4. **Use exact names from the doc.**
 5. **If the doc doesn't cover a control**, do not guess — log to AUTOMATION_GAPS or update UE58_EDITOR_UI after verification.
 
+## One verified copy, not N
+
+When a control is verified, record it in `docs/UE/` **once**. Anyone else who needs
+it reads that file. Do not re-derive it per agent, per session, or per doc: the
+second copy of a menu path is the first one that goes stale.
+
 ## Where to document verified UI steps
 
 - **Project doc:** [docs/UE/UE58_EDITOR_UI.md](../../docs/UE/UE58_EDITOR_UI.md)

@@ -40,7 +40,7 @@ HomeWorld vendors [UserHarness/](UserHarness/) as a **gitlink** to **DevHarness*
 
 | Layer | Status |
 | ----- | ------ |
-| **Agent context** | `.agents/skills/` (core), `.agents/skills-extras/` (opt-in catalog), stack rules `21-unreal-engine.mdc` / `22-unreal-editor-ui.mdc` |
+| **Agent context** | `.agents/skills/` (core), `.agents/skills-extras/` (opt-in catalog), stack rules `21-unreal-engine.mdc` / `ue58-editor-ui.mdc` |
 | **Architecture A–E** | `.agents/skills-extras/architecture-trade-offs-design-depth/` — opt-in copy of DET extras writer (blob `107a5118c95c1bf0b1b3d1755796632bff41b535`; [SYNC.md](.agents/skills-extras/architecture-trade-offs-design-depth/SYNC.md)). Load before inventing boundaries/APIs; cite only, no fork |
 | **Skill load** | Discoverable catalog is `.agents/README.md` + `.cursor/skills/README.md`; extras and A–E full are cite/copy-in only — never paste skill bodies here. |
 | **Research prompts** | [Docs/handoffs/RESEARCH_PROMPT_CONTRACT.md](Docs/handoffs/RESEARCH_PROMPT_CONTRACT.md) — Conductor paste-ready ROLE/CONTEXT/CANON/ASK/NON-GOALS/DONE-WHEN/child Research |
