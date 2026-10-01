@@ -35,6 +35,7 @@ const {
   cacheRead,
   cacheStore,
   saveCache,
+  flushCache,
 } = require('./score-mdc-lift.js');
 
 const CRED_VARS = ['SKILL_EVAL_LLM_PROVIDER', 'NVIDIA_API_KEY', 'OPENAI_API_KEY', 'ANTHROPIC_API_KEY'];
@@ -466,6 +467,26 @@ test('saveCache reports failure without throwing when the path is unusable', () 
   assert.strictEqual(saveCache(file, { version: 1, entries: {} }, (m) => warnings.push(m)), false);
   assert.strictEqual(warnings.length, 1);
   fs.rmSync(path.dirname(path.dirname(file)), { recursive: true, force: true });
+});
+
+test('flushCache persists only when the rule actually judged something', () => {
+  // The per-rule flush is what makes a >1h pass crash-safe: samples that live only
+  // in memory are samples lost to a restart. The guard matters the other way too -
+  // a fully cached pass must not rewrite the same file once per rule.
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hw-cache-test-'));
+  const file = path.join(dir, 'nested', 'c.json');
+  const cache = { version: 1, entries: {} };
+  cacheStore(cache, 'k', [{ score: 61 }]);
+
+  assert.strictEqual(flushCache(file, cache, 0, () => {}), false, 'nothing judged -> no write');
+  assert.strictEqual(fs.existsSync(file), false, 'and no file is created');
+
+  assert.strictEqual(flushCache(file, cache, 2, () => {}), true);
+  assert.strictEqual(cacheRead(loadCache(file, () => {}), 'k').length, 1);
+
+  // A null cache path (--no-cache) is a no-op, never a crash.
+  assert.strictEqual(flushCache(null, cache, 3, () => {}), false);
+  fs.rmSync(dir, { recursive: true, force: true });
 });
 
 test('CLI rejects --cache with no value (exit 2, before any provider work)', () => {

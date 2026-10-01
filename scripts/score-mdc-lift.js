@@ -352,6 +352,22 @@ function saveCache(file, cache, warn) {
 }
 
 /**
+ * Persist the cache after a rule, but only when that rule actually judged
+ * something.
+ *
+ * A full pass runs for well over an hour and has already been killed mid-run by
+ * a restart, so samples held only in memory are samples lost. Flushing per rule
+ * makes the cache a running ledger: whatever completed before a crash is still
+ * reusable, and the next run resumes from there instead of starting over. The
+ * fresh-count guard keeps a fully cached pass from rewriting the same file once
+ * per rule for no reason.
+ */
+function flushCache(file, cache, freshCount, warn) {
+  if (!file || !freshCount) return false;
+  return saveCache(file, cache, warn);
+}
+
+/**
  * Pooled within-rule standard deviation, across every rule that has 2+ samples.
  *
  * This is the honest resolution of the judge: how much a single rule's own score
@@ -498,6 +514,16 @@ function main() {
   const results = [];
   let cacheHits = 0;
   let fromCacheSamples = 0;
+  // Declared before the loop because the cache is flushed per rule, not at the
+  // end; `cacheWarned` keeps a persistently unwritable path from spamming a
+  // warning line per rule.
+  let cacheWritten = false;
+  let cacheWarned = false;
+  const warnOnce = (m) => {
+    if (cacheWarned) return;
+    cacheWarned = true;
+    console.error(m);
+  };
   try {
     for (const file of files) {
       const rule = sibling.readRule(path.join(rulesAbs, file), rulesAbs);
@@ -568,6 +594,9 @@ function main() {
         fromCacheSamples += samplesFromCache;
       }
       cacheStore(cache, key, freshSamples);
+      // Flush per rule, not at the end: a pass that dies mid-run must not take its
+      // already-judged samples with it.
+      if (flushCache(cacheFile, cache, freshSamples.length, warnOnce)) cacheWritten = true;
 
       const shown =
         mean === null
@@ -578,7 +607,13 @@ function main() {
   } finally {
     fs.rmSync(tmpRoot, { recursive: true, force: true });
   }
-  const cacheWritten = opts.noCache ? false : saveCache(cacheFile, cache, (m) => console.error(m));
+  // The cache was already flushed after each rule that judged anything, so a crash
+  // here loses nothing. `cacheWritten` is whatever those flushes reported.
+  if (!opts.noCache && !cacheWritten) {
+    // Nothing was judged from scratch (a fully cached pass) - still persist, so a
+    // first cold run that found an existing file keeps it on disk.
+    cacheWritten = saveCache(cacheFile, cache, warnOnce);
+  }
 
   const scored = results.filter((r) => r.score !== null);
   const unscored = results.filter((r) => r.score === null);
@@ -748,4 +783,5 @@ module.exports = {
   cacheRead,
   cacheStore,
   saveCache,
+  flushCache,
 };
