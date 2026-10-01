@@ -16,8 +16,23 @@ const path = require('node:path');
 
 const M = require('./task-lift.js');
 
+const fixtureDirs = [];
+
+// Without this, every run leaves one `tasklift-*` directory in %TEMP%. 147 had
+// accumulated; a stale fixture is indistinguishable from a real leftover worktree.
+process.on('exit', () => {
+  for (const dir of fixtureDirs) {
+    try {
+      fs.rmSync(dir, { recursive: true, force: true });
+    } catch {
+      /* best effort */
+    }
+  }
+});
+
 function fixture(files) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'tasklift-'));
+  fixtureDirs.push(dir);
   for (const [rel, content] of Object.entries(files)) {
     const full = path.join(dir, rel);
     fs.mkdirSync(path.dirname(full), { recursive: true });
@@ -142,11 +157,14 @@ test('summary lift is null when an arm produced nothing, not zero', () => {
 
 test('summary counts timeouts and agent errors', () => {
   const s = M.summarize([
-    { taskId: 'a', condition: 'with', completion: 1, conformance: 1, agent: { timedOut: true } },
-    { taskId: 'a', condition: 'without', completion: 0, conformance: 0, agent: { error: 'boom' } },
+    { taskId: 'a', condition: 'with', voided: false, completion: 1, conformance: 1, agent: { status: null, timedOut: true } },
+    { taskId: 'a', condition: 'without', voided: true, completion: 0, conformance: 0, agent: { status: 0, error: 'boom' } },
   ]);
   assert.strictEqual(s.failures, 1);
-  assert.strictEqual(s.agentErrors, 1);
+  // A timeout is also an unclean exit, so it counts in both; `boom` counts once.
+  assert.strictEqual(s.agentErrors, 2);
+  assert.strictEqual(s.voidedRuns, 1);
+  assert.strictEqual(s.lift, null, 'a timed-out run must not produce a lift');
 });
 
 test('the manifest declares a valid harness and both check classes', () => {
@@ -257,4 +275,88 @@ test('the ablation list covers the always-on agent context', () => {
   for (const p of ['AGENTS.md', '.cursor', '.agents', 'swarm']) {
     assert.ok(M.ABLATE_PATHS.includes(p), `ablation must remove ${p}`);
   }
+});
+
+// ---------------------------------------------------------------------------
+// Regressions from the 2026-10-01 pilot, which reported lift 0.25 while all
+// eight agents had been rejected by the provider and had done nothing at all.
+// ---------------------------------------------------------------------------
+
+test('extractAgentError finds the real reason in the event stream', () => {
+  // spawnSync gives no `error` for a clean non-zero exit. The reason is an event.
+  const stdout = [
+    '{"type":"step_start","timestamp":1,"sessionID":"s","part":{}}',
+    '{"type":"error","timestamp":2,"sessionID":"s","error":{"type":"provider.quota","message":"Rate limit exceeded. Please try again later.","status":429}}',
+  ].join('\n');
+  const err = M.extractAgentError(stdout, '');
+  assert.match(err, /Rate limit exceeded/);
+  assert.match(err, /429/, 'the provider status code must survive');
+  assert.match(err, /provider\.quota/, 'the error type must survive');
+});
+
+test('extractAgentError ignores noise and survives a partial line', () => {
+  assert.strictEqual(M.extractAgentError('{"type":"step_start","part":{}}\n', ''), null);
+  // A truncated last line must not throw and must not invent an error.
+  assert.strictEqual(M.extractAgentError('{"type":"error","error":', ''), null);
+});
+
+test('a clean non-zero exit counts as an agent error', () => {
+  // The exact bug: `error` was only set from r.error, so 8 quota-blocked runs
+  // reported agentErrors 0 and the failure looked like a weak result.
+  const s = M.summarize([
+    { taskId: 't', condition: 'with', voided: true, conformance: 0, completion: 0, agent: { status: 1, error: null } },
+  ]);
+  assert.strictEqual(s.agentErrors, 1, 'a non-zero exit with no spawn error is still an error');
+  assert.strictEqual(s.voidedRuns, 1);
+});
+
+test('summarize refuses a lift when any run is void', () => {
+  // A lift over a partial set reads as data. It must be null, not a number.
+  const s = M.summarize([
+    { taskId: 'a', condition: 'with', voided: false, conformance: 1, completion: 1, agent: { status: 0, error: null } },
+    { taskId: 'a', condition: 'without', voided: true, conformance: 0, completion: 0, agent: { status: 1, error: 'x' } },
+  ]);
+  assert.strictEqual(s.lift, null, 'lift must be null when any run is void');
+  assert.strictEqual(s.validRuns, 1);
+  assert.strictEqual(s.voidedRuns, 1);
+});
+
+test('summarize still reports a lift when every run is valid', () => {
+  const s = M.summarize([
+    { taskId: 'a', condition: 'with', voided: false, conformance: 0.75, completion: 1, agent: { status: 0, error: null } },
+    { taskId: 'a', condition: 'without', voided: false, conformance: 0.25, completion: 1, agent: { status: 0, error: null } },
+  ]);
+  assert.strictEqual(s.lift, 0.5);
+  assert.strictEqual(s.voidedRuns, 0);
+});
+
+test('every glob check in the manifest is newOnly', () => {
+  // The exact bug: `ue58-rule` omitted newOnly on all 9 checks, so they matched the
+  // 31 pre-existing .cursor/rules/*.mdc. The harness arm won by matching files it
+  // never wrote — precisely the confound the ablation exists to remove.
+  const tasks = M.loadTasks().tasks;
+  const offenders = [];
+  for (const task of tasks) {
+    for (const c of task.checks) {
+      if (!c.glob) continue; // path-based checks are seeded by the task itself
+      if (c.newOnly === true) continue;
+      if (c.newOnlyIntent) continue; // explicit whole-tree opt-out
+      offenders.push(`${task.id}/${c.label}`);
+    }
+  }
+  assert.deepStrictEqual(offenders, [], `glob checks must be newOnly: ${offenders.join(', ')}`);
+});
+
+test('newOnly actually withholds pre-existing files', () => {
+  // Behavioural proof for the guard above: a seeded file must not satisfy a check.
+  const dir = fixture({ '.cursor/rules/old.mdc': 'name: old\ndescription: old\n' });
+  const seeded = M.seed(dir, {});
+  fs.writeFileSync(path.join(dir, '.cursor/rules/new.mdc'), 'name: new\n', 'utf8');
+  const check = { kind: 'anyMatches', glob: '.cursor/rules/*.mdc', newOnly: true, pattern: 'name:' };
+  const res = M.evaluateCheck(dir, check, seeded);
+  assert.strictEqual(res.pass, true, 'passes on the file the agent created');
+  // Now delete the new file: the check must fail rather than fall back to `old.mdc`.
+  fs.unlinkSync(path.join(dir, '.cursor/rules/new.mdc'));
+  const after = M.evaluateCheck(dir, check, seeded);
+  assert.strictEqual(after.pass, false, 'must not fall back to a pre-existing file');
 });

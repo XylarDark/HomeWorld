@@ -27,15 +27,15 @@
       "prompt": "Write a Cursor rule file that warns about calling GetPlayerState() on an AController in Unreal Engine 5.8, where the accessor is templated. Put it where the project's other rules live and give it the same metadata the project's rules carry.",
       "seed": {},
       "checks": [
-        { "class": "completion", "kind": "anyMatches", "glob": ".cursor/rules/*.mdc", "pattern": "GetPlayerState", "label": "a rule naming the pitfall was created" },
-        { "class": "conformance", "kind": "anyMatches", "glob": ".cursor/rules/*.mdc", "pattern": "^name:", "label": "frontmatter has a name" },
-        { "class": "conformance", "kind": "anyMatches", "glob": ".cursor/rules/*.mdc", "pattern": "^description:", "label": "frontmatter has a description" },
-        { "class": "conformance", "kind": "anyMatches", "glob": ".cursor/rules/*.mdc", "pattern": "^alwaysApply:", "label": "frontmatter sets alwaysApply explicitly" },
-        { "class": "conformance", "kind": "anyMatches", "glob": ".cursor/rules/*.mdc", "pattern": "^globs:", "label": "frontmatter scopes via globs" },
-        { "class": "conformance", "kind": "anyMatches", "glob": ".cursor/rules/*.mdc", "pattern": "^priority:", "label": "frontmatter carries a priority" },
-        { "class": "conformance", "kind": "anyMatches", "glob": ".cursor/rules/*.mdc", "pattern": "^version:", "label": "frontmatter carries a version" },
-        { "class": "conformance", "kind": "anyMatches", "glob": ".cursor/rules/*.mdc", "pattern": "5\\.8", "label": "anchors the pitfall to UE 5.8" },
-        { "class": "conformance", "kind": "anyNewFiles", "glob": ".cursor/rules/*.mdc", "label": "landed in the project rule directory" }
+        { "class": "completion", "kind": "anyMatches", "glob": ".cursor/rules/*.mdc", "newOnly": true, "pattern": "GetPlayerState", "label": "a rule naming the pitfall was created" },
+        { "class": "conformance", "kind": "anyMatches", "glob": ".cursor/rules/*.mdc", "newOnly": true, "pattern": "^name:", "label": "frontmatter has a name" },
+        { "class": "conformance", "kind": "anyMatches", "glob": ".cursor/rules/*.mdc", "newOnly": true, "pattern": "^description:", "label": "frontmatter has a description" },
+        { "class": "conformance", "kind": "anyMatches", "glob": ".cursor/rules/*.mdc", "newOnly": true, "pattern": "^alwaysApply:", "label": "frontmatter sets alwaysApply explicitly" },
+        { "class": "conformance", "kind": "anyMatches", "glob": ".cursor/rules/*.mdc", "newOnly": true, "pattern": "^globs:", "label": "frontmatter scopes via globs" },
+        { "class": "conformance", "kind": "anyMatches", "glob": ".cursor/rules/*.mdc", "newOnly": true, "pattern": "^priority:", "label": "frontmatter carries a priority" },
+        { "class": "conformance", "kind": "anyMatches", "glob": ".cursor/rules/*.mdc", "newOnly": true, "pattern": "^version:", "label": "frontmatter carries a version" },
+        { "class": "conformance", "kind": "anyMatches", "glob": ".cursor/rules/*.mdc", "newOnly": true, "pattern": "5\\.8", "label": "anchors the pitfall to UE 5.8" },
+        { "class": "conformance", "kind": "anyNewFiles", "glob": ".cursor/rules/*.mdc", "newOnly": true, "label": "landed in the project rule directory" }
       ]
     },
     {

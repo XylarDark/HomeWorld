@@ -222,6 +222,34 @@ function seed(root, task) {
   return new Set(listFiles(root));
 }
 
+/**
+ * Pull the real failure reason out of opencode's JSON event stream.
+ *
+ * A non-zero exit is not an error to `spawnSync`: `r.error` stays null unless the
+ * process failed to launch, was killed, or blew the buffer. The actual reason is
+ * in stdout as a `{"type":"error",...}` event. Without this, a quota-blocked run
+ * looks exactly like a run that did nothing wrong.
+ */
+function extractAgentError(stdout, stderr) {
+  let reason = null;
+  for (const line of String(stdout || '').split('\n')) {
+    if (!line.includes('"type":"error"')) continue;
+    let ev;
+    try {
+      ev = JSON.parse(line);
+    } catch {
+      continue; // partial line
+    }
+    const e = ev.error;
+    if (!e) continue;
+    const text = typeof e === 'string' ? e : e.message || e.type || JSON.stringify(e);
+    const kind = typeof e === 'object' && e.type ? `/${e.type}` : '';
+    const code = typeof e === 'object' && e.status ? ` (HTTP ${e.status})` : '';
+    reason = `[error${kind}]${code} ${text}`.trim();
+  }
+  return reason || (String(stderr || '').trim() || null);
+}
+
 /** Run one agent session in `root`. Never throws; transport problems are reported. */
 function runAgent(root, prompt, timeoutMs = AGENT_TIMEOUT_MS) {
   const bin = resolveAgentBin();
@@ -231,16 +259,23 @@ function runAgent(root, prompt, timeoutMs = AGENT_TIMEOUT_MS) {
     timeout: timeoutMs,
     maxBuffer: 32 * 1024 * 1024,
   });
+  // Keep the last lines, then keep the END of them: the failure event is the last
+  // thing written, and slicing from the front used to cut it off exactly where the
+  // message began.
   const tail = (r.stdout || '')
     .split('\n')
+    .filter(Boolean)
     .slice(-3)
     .join('\n')
-    .slice(0, 400);
+    .slice(-400);
+  const error = r.error ? r.error.message : extractAgentError(r.stdout, r.stderr);
   return {
     status: r.status,
     signal: r.signal,
     timedOut: Boolean(r.error && r.error.code === 'ETIMEDOUT'),
-    error: r.error ? r.error.message : null,
+    error,
+    // A run is only good if the agent exited clean AND reported no error event.
+    ok: r.status === 0 && !r.error && !error,
     outputTail: tail,
   };
 }
@@ -339,7 +374,7 @@ function evaluateCheck(root, check, createdAfterSeed) {
 /** Run one task in one condition and score every check. */
 function runTask(worktreeRoot, task, { dry }) {
   const createdAfterSeed = seed(worktreeRoot, task);
-  const agent = dry ? { status: 0, dry: true } : runAgent(worktreeRoot, task.prompt);
+  const agent = dry ? { status: 0, dry: true, ok: true } : runAgent(worktreeRoot, task.prompt);
 
   const checks = task.checks.map((c) => evaluateCheck(worktreeRoot, c, createdAfterSeed));
   const byClass = (cls) => checks.filter((c) => c.class === cls);
@@ -348,9 +383,14 @@ function runTask(worktreeRoot, task, { dry }) {
     return list.length === 0 ? null : list.filter((c) => c.pass).length / list.length;
   };
 
+  // A run whose agent never succeeded is not a measurement: its checks describe a
+  // worktree nobody touched. Scoring them reports a broken agent as a weak one.
+  const voided = !agent.ok;
+
   return {
     taskId: task.id,
     agent,
+    voided,
     checks,
     completion: rate('completion'),
     conformance: rate('conformance'),
@@ -367,20 +407,39 @@ function rate(list, key) {
 }
 
 function summarize(results) {
-  const withArm = results.filter((r) => r.condition === 'with');
-  const withoutArm = results.filter((r) => r.condition === 'without');
+  const voidedRuns = results.filter((r) => r.voided);
+  const valid = results.filter((r) => !r.voided);
+  const withArm = valid.filter((r) => r.condition === 'with');
+  const withoutArm = valid.filter((r) => r.condition === 'without');
   const conf = (l) => rate(l, 'conformance');
   const comp = (l) => rate(l, 'completion');
+  const lift =
+    conf(withArm) !== null && conf(withoutArm) !== null ? conf(withArm) - conf(withoutArm) : null;
   return {
     tasks: new Set(results.map((r) => r.taskId)).size,
+    // Rates describe only the runs that measured something.
+    validRuns: valid.length,
+    voidedRuns: voidedRuns.length,
     completionWith: comp(withArm),
     completionWithout: comp(withoutArm),
     conformanceWith: conf(withArm),
     conformanceWithout: conf(withoutArm),
-    lift: conf(withArm) !== null && conf(withoutArm) !== null ? conf(withArm) - conf(withoutArm) : null,
+    // A lift over a partial set is worse than none: it still reads as data.
+    lift: voidedRuns.length > 0 ? null : lift,
     failures: results.filter((r) => r.agent && r.agent.timedOut).length,
-    agentErrors: results.filter((r) => r.agent && r.agent.error).length,
+    // Count any run the agent did not complete cleanly, not only spawn-level ones.
+    // Counting only `r.error` reported 0 errors for 8 quota-blocked runs. A missing
+    // `status` is not treated as a failure, so synthetic fixtures stay meaningful.
+    agentErrors: results.filter((r) => r.agent && (r.agent.error || !agentExitedClean(r.agent)))
+      .length,
   };
+}
+
+/** true when the agent process is known to have failed. */
+function agentExitedClean(agent) {
+  if (typeof agent.status === 'number') return agent.status === 0;
+  if (agent.status === null) return false; // killed by signal or timeout
+  return true; // unknown: do not invent a failure
 }
 
 function renderMarkdown(results, summary, meta) {
@@ -407,12 +466,33 @@ function renderMarkdown(results, summary, meta) {
       'as often, the conformance delta means nothing.'
   );
   lines.push('');
+  if (s.voidedRuns > 0) {
+    lines.push('## **Void run — this file contains no data**');
+    lines.push('');
+    lines.push(
+      `${s.voidedRuns} of ${s.voidedRuns + s.validRuns} agent runs did not complete. Their checks ` +
+        'scored worktrees that no agent ever touched, so they are excluded from every rate ' +
+        'below and the lift is withheld rather than reported over a partial set. ' +
+        '**Do not quote any number from this file.**'
+    );
+    lines.push('');
+    lines.push('| Task | Condition | Exit | Reported error |');
+    lines.push('|---|---|---|---|');
+    for (const r of results.filter((x) => x.voided)) {
+      lines.push(
+        `| ${r.taskId} | ${r.condition} | ${r.agent.status} | ${r.agent.error || '(none reported)'} |`
+      );
+    }
+    lines.push('');
+  }
   lines.push('## Result');
   lines.push('');
   lines.push('| Measure | With harness | Without | Delta |');
   lines.push('|---|---|---|---|');
   lines.push(`| Task completion (control) | ${pct(s.completionWith)} | ${pct(s.completionWithout)} | ${pp(s.completionWith, s.completionWithout)} |`);
   lines.push(`| Convention conformance | ${pct(s.conformanceWith)} | ${pct(s.conformanceWithout)} | ${pp(s.conformanceWith, s.conformanceWithout)} |`);
+  const liftText = s.lift === null ? `withheld — ${s.voidedRuns} void run(s)` : pp(s.conformanceWithout, s.conformanceWith);
+  lines.push(`| **Lift on conformance** | — | — | **${liftText}** |`);
   lines.push('');
   lines.push('## Per-task detail');
   lines.push('');
@@ -421,6 +501,13 @@ function renderMarkdown(results, summary, meta) {
     const o = results.find((r) => r.taskId === taskId && r.condition === 'without');
     lines.push(`### ${taskId}`);
     lines.push('');
+    if (w.voided || o.voided) {
+      lines.push(
+        '> **VOID** — the agent did not complete at least one condition of this task. The ' +
+          'scores below describe an untouched worktree and are not a measurement.'
+      );
+      lines.push('');
+    }
     lines.push(`- with: completion ${pct(w.completion)}, conformance ${pct(w.conformance)}`);
     lines.push(`- without: completion ${pct(o.completion)}, conformance ${pct(o.conformance)}`);
     lines.push('');
@@ -562,6 +649,7 @@ module.exports = {
   seed,
   evaluateCheck,
   commitSubject,
+  extractAgentError,
   runAgent,
   runTask,
   summarize,
