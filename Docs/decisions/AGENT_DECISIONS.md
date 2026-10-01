@@ -537,3 +537,66 @@ skipped.
   the spirit shrines exist on both homestead and planet-side, which is already
   true and is handled by `SM_Shrine_Homestead` / `SM_Shrine_Return` sharing one
   family across two kits rather than by merging directories.
+
+---
+
+### DEC-0033 "Re-point the harness at the game, not at the agent tooling" (2026-10-01)
+
+- **Area:** harness architecture — the governing decision for all harness work
+- **Context change:** The harness is now explicitly tuned for **one human developer running multiple
+  agents, working on game design with C++ in Unreal Engine 5.8.** That reframe was not assumed when
+  the harness was built.
+- **Decision:** Harness effort goes to (1) proving the game compiles, (2) proving the game runs,
+  (3) protecting taste boundaries, and (4) minimising one person's review cost. Self-measurement
+  of the agent harness is frozen, not extended.
+
+- **Evidence gathered 2026-10-01 (the audit that forced this):**
+  - The JS harness is 7,517 LOC against 45,109 LOC of product C++/Python.
+  - **All 11 npm test scripts test harness tooling. Not one tests the product.**
+  - **Zero `IMPLEMENT_SIMPLE_AUTOMATION_TEST` macros exist in `Source/`.** There are no C++ tests
+    to run, so "it compiles" is currently the only automated fact about the game.
+  - `ci.yml` proves compilation only. `validate.yml` runs `npm run test:all`, which is
+    self-referential.
+  - The working build/test entry points (`Tools/Safe-Build.ps1`, `Tools/RunTests.ps1`) are
+    PowerShell outside the npm harness, so the documented and the verified path are different paths.
+  - 24 of 32 commits on the branch were harness work; the product did not move.
+  - The evaluation harness (`task-lift.js`) has produced **zero** product decisions, and its
+    readings change sign depending on which model runs it (R4: with-arm leads 0.75 vs 0.65;
+    R5: with-arm trails 0.314 vs 0.556). It measures harness-x-model interaction, not the harness.
+  - `decisions:check` was red for 14 commits and caught nothing.
+
+- **Rationale:** For a one-person team the binding constraint is **review attention**, not agent
+  throughput. A solo dev has a few hours of real review a day. Gates that cost attention are a tax
+  on the scarcest resource in the company, and gates that cannot fail are worse than no gate. A
+  harness that watches the watchers while never compiling the game is inverted relative to need.
+
+- **Rejected:**
+  - Extending `task-lift.js` (R6, more trials, cost accounting). It has answered its question:
+    *this benchmark did not detect an effect.* More precision cannot rescue an instrument whose
+    reading flips with the model.
+  - Growing the rules/skills corpus for its own sake. Agent context is a commodity; a de-facto
+    cross-tool standard exists and we over-invested in managing it locally.
+  - Keeping `decisions:check` strict. Same-commit enforcement is an idealisation that penalises
+    exactly the batching a solo dev already has to do. Recorded as a deliberate relaxation with
+    the failure mode stated: a boundary change can now ship without its reasoning, and that is
+    accepted because the alternative produced 100% friction and 0% findings.
+
+- **Target harness shape (what to build, in priority order):**
+  1. **One command that proves the game is real.** Wire `Tools/Safe-Build.ps1` and
+     `Tools/RunTests.ps1` into `npm run verify`, so build truth lives where gates are read.
+  2. **First C++ automation tests.** Until `Source/` contains at least one
+     `IMPLEMENT_SIMPLE_AUTOMATION_TEST`, no harness can assert anything about behaviour.
+     Start with things a solo dev would otherwise check by hand after every agent change.
+  3. **UE Editor ownership lock.** With multiple agents, only one may drive the Editor at a time;
+     this is a hazard with no web-dev equivalent and it is currently unguarded.
+  4. **Assumption disclosure per change.** Each agent states what it invented. This is the cheapest
+     possible protection for a single reviewer and it scales with agent count.
+  5. **Taste-boundary enforcement stays as-is** (`docs/human-use/cursor-cannot/`, taste gates).
+     It is the highest-value part of the existing harness because it is the only thing standing
+     between agent initiative and unrequested game design.
+
+- **Reverses if:** the team grows past a point where one person is no longer the integration
+  bottleneck, or the evaluation harness produces a decision that changes what the team builds.
+  The second is the real test of this decision and it has not happened yet.
+- **Consequence:** `Docs/qa/HARNESS_REFINEMENT_TASKS.md` R5/R6 are superseded by this entry and
+  should not be started.
