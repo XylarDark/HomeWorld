@@ -237,13 +237,72 @@ removing the `.cursor/skills/scope-refinement/` copy.**
 
 ## Still open
 
-- **No Skill Lift number.** Blocked solely on a paid provider key (Tier 2) and a
-  key plus an environment backend (Tier 3). Lead action.
-- **Structural score is not value.** ρ = 0.14 still stands; this corpus is
-  healthy on form, which says nothing about whether the rules help. Only a
-  provider key closes this.
+- **Tier 2 / Tier 3 not run.** Tier 1 has both a structural score and a judged
+  verdict now. Tier 2 (semantic dedup) and Tier 3 (live agent eval) remain
+  unrun; Tier 3 still needs an environment backend beyond Docker. `health-check`
+  reports `docker prerequisite: fail` while `Harbor agents: pass`.
+- **Jitter dominates small deltas.** With ~6.4 points of spread on one rule, any
+  future before/after comparison needs `--repeat 3` or more before a change can
+  be called real. `meanSpread` is recorded so this stays visible.
 - **`scope-refinement` duplicate** — removal of the `.cursor/` copy awaits the
   human's word.
+
+## Skill Lift — MEASURED (Tier 1 LLM judge)
+
+Unblocked once `SKILL_EVAL_LLM_PROVIDER` + a key were available. Judge:
+**`nv_build` / `nvidia/nemotron-3-super-120b-a12b`**, scorer v0.4.0.
+
+```
+$env:SKILL_EVAL_LLM_PROVIDER="nv_build"
+$env:NVIDIA_API_KEY="<key>"
+npm run lift:score -- --repeat 2 --json Saved/rules_lift.json
+npm run lift:score:test          # 13 tests, no key required
+```
+
+### The judge is not deterministic — so a single run is not a measurement
+
+The same `19-automation-cycle.mdc` scored **57.7 / 58.6 / 60.5** on three
+consecutive runs: **~6.4 points of spread** on identical bytes with an identical
+judge. That is larger than most of the differences between rules, so a
+single-run score — or a sub-3-point delta presented as a regression — would be
+false precision. `--repeat N` measures that jitter and the report records
+`meanSpread` / `maxSpread` next to the mean.
+
+This is the reason `score-mdc-lift.js` refuses to run at all without a
+credential: with no judge there is no measurement, and a missing measurement
+must never be reported as a pass. Exit 2, no report file written. The key is read
+from the environment only — the report stores the **variable name and character
+count**, never the value, and a test asserts no key-shaped token can appear in
+CLI output.
+
+### The two measurements disagree, and that is the finding
+
+`quality-check` (structural, deterministic) puts the corpus at **87.4**.
+`rubric-eval` (LLM judge, sampled) puts it far lower — the judged verdict lands
+mostly in the 50s–60s against rubric-eval's own 70 gate.
+
+**These numbers must not be averaged, diffed, or read as a deficit.** They answer
+different questions. The gap is not a quality regression; it is ρ = 0.14 made
+concrete: rules can look structurally immaculate and still be judged mediocre,
+because "has a `name:` and 5 sections" is not the same as "changes what an agent
+does". `score-mdc-lift.js` records `comparability.againstQualityCheck: false` so
+no future consumer merges them by accident.
+
+The judged scores are reported for **shape**, not for rank. The recurring weak
+criteria are the same across rules — **Example Quality**, **Workflow
+Completeness**, and **Error Handling Quality** score lowest, while **Description
+Clarity** and **Professional Tone** score highest. That is actionable: the
+corpus tells agents *what* to do well and *how to handle failure* poorly. Note
+the one structural outlier, the WAVE F tombstone, is judged lowest of all
+(~57–63) — correct for what it is, and the structural scorer already classifies
+it as a tombstone rather than a rule needing work.
+
+### Provider support (corrected earlier claim)
+
+`skillevaluator` 0.4.0 accepts exactly five providers — `openai`, `anthropic`,
+`nv_build`, `bedrock`, `openai-compatible`. **There is no xAI/Grok provider and
+no `XAI_API_KEY`**, so a consumer Grok or X Premium subscription cannot serve as
+the judge regardless of billing. `health-check` now passes on `nv_build`.
 
 ## Sources
 
