@@ -22,7 +22,17 @@
     "lift:score": "node scripts/score-mdc-lift.js",
     "lift:score:test": "node --test scripts/score-mdc-lift.test.js",
     "preflight:scorer": "node scripts/preflight-scorer.js",
-    "preflight:scorer:test": "node --test scripts/preflight-scorer.test.js"
+    "preflight:scorer:test": "node --test scripts/preflight-scorer.test.js",
+    "t0:evidence": "node scripts/t0-evidence.js",
+    "t0:evidence:test": "node --test scripts/t0-evidence.test.js",
+    "t0:evidence:write": "node scripts/t0-evidence.js > Docs/qa/T0_BEAT_EVIDENCE.md",
+    "harness:coverage": "node scripts/harness-coverage.js",
+    "harness:coverage:test": "node --test scripts/harness-coverage.test.js",
+    "harness:coverage:write": "node scripts/harness-coverage.js > Docs/qa/HARNESS_COVERAGE.md",
+    "tasklift": "node scripts/task-lift.js --run",
+    "tasklift:dry": "node scripts/task-lift.js --dry",
+    "tasklift:test": "node --test scripts/task-lift.test.js",
+    "tasklift:write": "node scripts/task-lift.js --run --json > Docs/qa/TASK_LIFT.json ; node scripts/task-lift.js --run > Docs/qa/TASK_LIFT.md"
   },
   "engines": {
     "node": ">=20.0.0"
