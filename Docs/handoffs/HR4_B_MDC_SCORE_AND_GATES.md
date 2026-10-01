@@ -258,7 +258,7 @@ Copy-Item -Recurse .agents\skills-extras\scope-refinement .agents\skills\
 |---|---|
 | `npm run rules:score:test` | **18/18 pass** |
 | `npm run rules:score -- --strict` | exit 0 (0 actionable below 80) |
-| `npm run lift:score:test` | **13/13 pass** (no key or network required) |
+| `npm run lift:score:test` | **48/48 pass** (no key or network required) |
 | `npm run lift:score` | exits **2** with no report when no credential is set (fail-loud) |
 | `bash scripts/verify-userharness-submodule.sh` | exit 0 |
 | `npm run preflight:ue:test` | 5/5 pass |
@@ -269,37 +269,84 @@ Copy-Item -Recurse .agents\skills-extras\scope-refinement .agents\skills\
 ## Still open
 
 - **Tier 2 / Tier 3 not run.** Tier 1 has both a structural score and a judged
-  verdict now. Tier 2 (semantic dedup) and Tier 3 (live agent eval) remain
-  unrun; Tier 3 still needs an environment backend beyond Docker. `health-check`
-  reports `docker prerequisite: fail` while `Harbor agents: pass`.
-- **Jitter dominates small deltas.** With ~6.4 points of spread on one rule, any
-  future before/after comparison needs `--repeat 3` or more before a change can
-  be called real. `meanSpread` is recorded so this stays visible.
+  verdict now. Tier 2 (`similarity-check`, which has a native `--type rules` and
+  needs no materialization) and Tier 3 (live agent eval) remain unrun; Tier 3
+  still needs an environment backend beyond Docker. `health-check` reports
+  `docker prerequisite: fail` while `Harbor agents: pass`.
+- **Jitter dominates small deltas — quantified.** Pooled within-rule SD is
+  **8.13** points (28 df), mean spread 7.22, max 35.5. At 80% power / 95%
+  confidence, detecting a change on **one rule** needs ~**114 judged samples per
+  side for 3 points**, ~41 for 5, ~16 for 8 — i.e. roughly **29 full-corpus
+  passes at `--repeat 4`** to call a 3-point move real. `meanSpread` /
+  `pooledWithinSd` / `standardErrorOfMean` are recorded so this stays visible.
+- **Two of 31 rules are UNSCORED, and they are the two largest.** The judged mean
+  covers 29 rules and is therefore *not* the corpus mean; `09-mcp-workflow.mdc`
+  and `20-full-automation-no-manual-steps.mdc` fail deterministically (8/8
+  attempts), unlike the 7 rules retries repaired. Bounding or splitting the
+  largest rule is the plausible reduction, still unproven — see the Skill Lift
+  section.
+- **The judged score is a diagnostic, not a regression gate.** Because a single
+  rule moves ±8 points between identical runs, no single-rule judged delta under
+  ~8 points is evidence of anything. The deterministic structural gate
+  (`rules:score --strict`) stays the regression gate; the judge is for triage —
+  which criteria are weak, corpus-wide — not for gating an edit.
 - **`scope-refinement` duplicate — CLOSED.** The `.cursor/skills/` copy was
   removed on the human's instruction; the canonical extras copy is intact. It is
   now opt-in (no longer auto-discoverable) — see the resolution note above for
   the observed consequence and the opt-in command.
 
-## Skill Lift — MEASURED (Tier 1 LLM judge)
+## Skill Lift — MEASURED over 29 of 31 rules (Tier 1 LLM judge)
 
 Unblocked once `SKILL_EVAL_LLM_PROVIDER` + a key were available. Judge:
-**`nv_build` / `nvidia/nemotron-3-super-120b-a12b`**, scorer v0.4.0.
+**`nv_build` / `nvidia/nemotron-3-super-120b-a12b`**, scorer v0.4.0, at
+`--repeat 2 --retries 3`.
 
 ```
 $env:SKILL_EVAL_LLM_PROVIDER="nv_build"
 $env:NVIDIA_API_KEY="<key>"
-npm run lift:score -- --repeat 2 --json Saved/rules_lift.json
-npm run lift:score:test          # 13 tests, no key required
+npm run lift:score -- --repeat 2 --retries 3 --json Saved/rules_lift.json
+npm run lift:score:test          # 48 tests, no key required
 ```
+
+| | structural (`quality-check`) | judged (`rubric-eval`) |
+|---|---|---|
+| rules measured | **31 / 31** | **29 / 31** |
+| mean | **87.4** | **62.3** |
+| median | — | **67.5** |
+| range | — | 22.8 – 78.6 |
+| against its own gate | 0 actionable below 80 | **19 / 29 below 70** |
+| repeatability | exact (deterministic) | ±**8.1** pts (pooled within-rule SD) |
+
+The corpus clears its structural gate and fails its judged one. Both numbers are
+real, and they are not the same measurement
+(`comparability.againstQualityCheck: false`).
+
+**Read the corpus mean as 29 rules, not 31.** The two it cannot cover are the
+**two largest** rules in the corpus, so the mean is not the corpus mean — see
+"Two rules stay UNSCORED" below. The mean (62.3) also sits ~5 points under the
+median (67.5): it is a low tail of retired and quarantined tombstones that drags
+it down, not a mediocre typical rule.
 
 ### The judge is not deterministic — so a single run is not a measurement
 
-The same `19-automation-cycle.mdc` scored **57.7 / 58.6 / 60.5** on three
-consecutive runs: **~6.4 points of spread** on identical bytes with an identical
-judge. That is larger than most of the differences between rules, so a
-single-run score — or a sub-3-point delta presented as a regression — would be
-false precision. `--repeat N` measures that jitter and the report records
-`meanSpread` / `maxSpread` next to the mean.
+The earlier text here rested on one rule scoring **57.7 / 58.6 / 60.5** (~6.4
+points). The full corpus shows the jitter is worse: **mean spread 7.22**, **max
+spread 35.5**, **pooled within-rule SD 8.13** (28 df). Identical bytes, identical
+judge:
+
+| rule | run 1 | run 2 | spread |
+|---|---|---|---|
+| `19-automation-cycle.mdc` | 5.0 | 40.5 | **35.5** |
+| `07-ai-agent-behavior.mdc` | 52.7 | 22.3 | **30.4** |
+| `22-unreal-editor-ui.mdc` | 35.9 | 64.5 | **28.6** |
+| `08-project-context.mdc` | 53.6 | 40.0 | 13.6 |
+| `unreal-cpp.mdc` | 66.8 | 67.3 | 0.5 |
+
+A single-run score — or a sub-8-point delta presented as a regression — is false
+precision. `--repeat N` measures the jitter and the report records `meanSpread` /
+`maxSpread` / `pooledWithinSd` / `standardErrorOfMean` beside the mean.
+`19-automation-cycle.mdc` has been seen as low as **5.0** here and as high as
+**60.5** in this harness earlier, so its spread is not a property of one bad run.
 
 This is the reason `score-mdc-lift.js` refuses to run at all without a
 credential: with no judge there is no measurement, and a missing measurement
@@ -308,11 +355,58 @@ from the environment only — the report stores the **variable name and characte
 count**, never the value, and a test asserts no key-shaped token can appear in
 CLI output.
 
-### The two measurements disagree, and that is the finding
+### What the corpus is actually weak at
 
-`quality-check` (structural, deterministic) puts the corpus at **87.4**.
-`rubric-eval` (LLM judge, sampled) puts it far lower — the judged verdict lands
-mostly in the 50s–60s against rubric-eval's own 70 gate.
+Corpus criterion means (0–10, weakest first):
+
+| criterion | mean /10 | n |
+|---|---|---|
+| Example Quality | **3.7** | 24 |
+| Error Handling Quality | 4.8 | 22 |
+| Workflow Completeness | 6.0 | 23 |
+| Documentation Completeness | 6.3 | 24 |
+| Trigger Simulation | 6.5 | 23 |
+| Instruction Clarity | 7.2 | 29 |
+| Description Clarity | 7.3 | 29 |
+| Scope Definition | 7.5 | 24 |
+| Professional Tone | 8.1 | 23 |
+
+The ordering is consistent across rules and reduces to one line: **the corpus
+tells agents what to do and how to talk, and is weakest exactly where it would
+change behaviour — worked examples, failure modes, and end-to-end workflows.**
+`Example Quality` at 3.7/10 is the largest deficit and is the criterion a
+structural check cannot see at all. (`n` varies 22–29 because per-criterion
+capture depends on the CLI's table shape; the criterion means cover a subset and
+are not weighted to the whole corpus.)
+
+### Two rules stay UNSCORED, and it is not flakiness
+
+`09-mcp-workflow.mdc` (7,760 B) and `20-full-automation-no-manual-steps.mdc`
+(4,732 B) — **the two largest rules in the corpus** — produced no score in **8
+attempts each** (2 samples × 4 attempts), in *both* full passes. That is
+deterministic for these two files, and it is a different failure from the
+transient one retries do repair: **7 other rules** missed on their first attempt
+and scored normally on retry, while these two never did.
+
+The judge's own log makes this hard to diagnose, because the wording is
+misleading. A reply that cannot be parsed raises a `JSONDecodeError`, and the
+message printed is **`LLM not configured - using fallback response`** —
+the handler for `LLMClientError` at `inference/client.py:343`, which is the
+*first branch of a generic failure handler*, not a statement about
+configuration. The provider was configured and judged 29 other rules in the same
+process. Recorded in `docs/KNOWN_ERRORS.md` with both failure shapes.
+
+Mechanically this is consistent with `RUBRIC_MAX_TOKENS = 4096` (0.4.0): a longer
+input invites a longer judge preamble, and a reply that overruns the cap is cut
+mid-object and cannot be recovered by the brace-slicing fallback. It is
+*consistent*, not proven — the UNSCORED pair's mean size (6,246 B) is ~2.5× the
+mean of the 29 judged rules (2,541 B), but size alone does not decide it:
+`03-testing.mdc` (3,692 B) lost a sample and `unreal-cpp.mdc` (2,899 B) failed
+once early on and later scored. **Not yet actioned:** bounding or splitting
+`09-mcp-workflow.mdc` is a plausible reduction to be judged at `--repeat 4`
+against the pooled SD before it is believed.
+
+### The two measurements disagree, and that is the finding
 
 **These numbers must not be averaged, diffed, or read as a deficit.** They answer
 different questions. The gap is not a quality regression; it is ρ = 0.14 made
@@ -321,14 +415,13 @@ because "has a `name:` and 5 sections" is not the same as "changes what an agent
 does". `score-mdc-lift.js` records `comparability.againstQualityCheck: false` so
 no future consumer merges them by accident.
 
-The judged scores are reported for **shape**, not for rank. The recurring weak
-criteria are the same across rules — **Example Quality**, **Workflow
-Completeness**, and **Error Handling Quality** score lowest, while **Description
-Clarity** and **Professional Tone** score highest. That is actionable: the
-corpus tells agents *what* to do well and *how to handle failure* poorly. Note
-the one structural outlier, the WAVE F tombstone, is judged lowest of all
-(~57–63) — correct for what it is, and the structural scorer already classifies
-it as a tombstone rather than a rule needing work.
+The tombstoned rules are judged lowest, which is the expected direction: the
+**WAVE F quarantine tombstone `19-automation-cycle.mdc` is the lowest rule in the
+corpus at 22.8**, with `ue57-sources.mdc` (33.9, HISTORICAL),
+`07-ai-agent-behavior.mdc` (37.5, RETIRED) and `08-project-context.mdc` (46.8,
+RETIRED) filling four of the bottom five. The earlier text called the tombstone
+"judged lowest of all (~57–63)": the direction was right, the number was
+extrapolated from two rules and is wrong by ~35 points.
 
 ### Provider support (corrected earlier claim)
 
