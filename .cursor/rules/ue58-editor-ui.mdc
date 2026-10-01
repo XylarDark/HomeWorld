@@ -9,7 +9,7 @@ version: 1.0
 
 # UE 5.8 Editor UI instructions
 
-See **ue58-sources.mdc** for the full sourcing policy. Supersedes **ue57-editor-ui.mdc** for active work.
+See **ue58-sources.mdc** for the full sourcing policy. This is the ONLY Editor UI rule: the 5.7 rule was deleted as historical (DEC-0035).
 
 ## Policy
 

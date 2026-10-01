@@ -20,7 +20,7 @@ version: 1.0
 
 ## UE 5.7 / 5.8 API pitfalls
 
-For Unreal lookups use **only UE 5.8–specific sources**; see **ue58-sources.mdc** (5.7 history: ue57-sources.mdc).
+For Unreal lookups use **only UE 5.8–specific sources**; see **ue58-sources.mdc**.
 
 These APIs changed or were removed in UE 5.7 and remain relevant on **5.8**. Check `docs/KNOWN_ERRORS.md` for the full list (including **UE 5.8** entries).
 

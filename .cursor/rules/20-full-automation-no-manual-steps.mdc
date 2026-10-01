@@ -91,4 +91,4 @@ addressed, and a link. That keeps one record of both open and closed gaps.
 - GUI automation patterns: `docs/Automation/FULL_AUTOMATION_RESEARCH.md` §10
 - Tooling ladder and Lead gates: [`automation-standards.mdc`](automation-standards.mdc)
 - Host legality: [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md) §14 / §16
-- WAVE F cycle quarantine: [`19-automation-cycle.mdc`](19-automation-cycle.mdc)
+- WAVE F cycle quarantine: see the "Quarantine" bullet in `AGENTS.md`.

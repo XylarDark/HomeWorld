@@ -9,7 +9,7 @@ version: 1.0
 
 # UE 5.8 sourcing policy
 
-Supersedes **ue57-sources.mdc** for active development. Keep ue57-* as historical pointers only.
+This is the ONLY sourcing policy. The 5.7 rule was deleted as historical (DEC-0035).
 
 ## Rule
 

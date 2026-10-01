@@ -18,14 +18,11 @@ for one by description. Adding an always-apply rule is a regression — see
 History: HR-B2 cut 15 → 3, and P4 cut 3 → 0 by retiring `07-ai-agent-behavior`
 and `08-project-context` (both were near-duplicates of `AGENTS.md`) and
 glob-scoping `20-full-automation-no-manual-steps` (whose invariant is already
-stated in `AGENTS.md`). Those two files are kept as **tombstones** — retired, not
-deleted — so a surviving reference resolves to a pointer instead of silently
-loading stale guidance.
+stated in `AGENTS.md`). 
 
 | Was always-apply | Now | Why |
 |---|---|---|
-| `07-ai-agent-behavior.mdc` | tombstone, `alwaysApply: false` | Duplicated `AGENTS.md`; its only unique section read `Saved/Logs/automation_*` files frozen since WAVE F deleted the loop that wrote them |
-| `08-project-context.mdc` | tombstone, `alwaysApply: false` | A stale fork of `AGENTS.md`, with 3 references to files that do not exist |
+ `08-project-context.mdc` | tombstone, `alwaysApply: false` | A stale fork of `AGENTS.md`, with 3 references to files that do not exist |
 | `20-full-automation-no-manual-steps.mdc` | `alwaysApply: false`, globs `Content/Python`, `Tools`, `.github/workflows`, `docs/Automation`, `.cursor/skills` | Invariant is in `AGENTS.md`; this file keeps the gap-log format and the host gate |
 
 ### Opt-in by glob

@@ -4,7 +4,7 @@ When to use a spec or plan before implementation, and where plans live.
 
 ## When to plan first
 
-For **complex or multi-file work**, the agent should propose a short implementation plan and get approval before editing. For **new features**, the plan should be informed by research (Epic/UE docs, best practices) and by following tutorials first, then expanding; see [.cursor/rules/07-ai-agent-behavior.mdc](../.cursor/rules/07-ai-agent-behavior.mdc) (Feature development: research and tutorials first). See [.cursor/rules/17-plan-first.mdc](../.cursor/rules/17-plan-first.mdc) for the rule and when to skip.
+For **complex or multi-file work**, the agent should propose a short implementation plan and get approval before editing. For **new features**, the plan should be informed by research (Epic/UE docs, best practices) and by following tutorials first, then expanding; see [AGENTS.md](../AGENTS.md) (Feature development: research and tutorials first). See [the plan-first skill](../the plan-first skill) for the rule and when to skip.
 
 ## Where plans and task lists live
 
@@ -19,4 +19,4 @@ For very large features, a more formal flow is: agree on a short spec or require
 ## References
 
 - Cursor: [Best practices for coding with agents](https://cursor.com/blog/agent-best-practices) (plan before code; keep plans in chat unless the user asks to save).
-- Project: [.cursor/rules/17-plan-first.mdc](../.cursor/rules/17-plan-first.mdc), [AGENTS.md](../AGENTS.md) (Commands, Boundaries).
+- Project: [the plan-first skill](../the plan-first skill), [AGENTS.md](../AGENTS.md) (Commands, Boundaries).
