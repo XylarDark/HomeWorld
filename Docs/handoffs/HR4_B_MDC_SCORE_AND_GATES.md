@@ -381,10 +381,11 @@ judge:
 
 A single-run score — or a sub-8-point delta presented as a regression — is false
 precision. `--repeat N` measures the jitter and the report records `meanSpread` /
-`maxSpread` / `pooledWithinSd` / `standardErrorOfMean` beside the mean — on this
+`maxSpread` / `withinRuleSd` / `standardErrorOfMean` beside the mean — on this
 corpus **7.22 / 35.5 / 8.13 / 1.51**, the SD over the 28 rules that had two
-samples (`pooledWithinSd` is the tool's own computation, re-checked directly
-against the saved report).
+samples. (The field is `withinRuleSd`; it is produced by the tool's
+`pooledWithinSd()` helper, which was re-called directly on the saved report to
+confirm the value.)
 `19-automation-cycle.mdc` has been seen as low as **5.0** here and as high as
 **60.5** in this harness earlier, so its spread is not a property of one bad run.
 
@@ -393,7 +394,36 @@ credential: with no judge there is no measurement, and a missing measurement
 must never be reported as a pass. Exit 2, no report file written. The key is read
 from the environment only — the report stores the **variable name and character
 count**, never the value, and a test asserts no key-shaped token can appear in
-CLI output.
+CLI output. The judge model is recorded too (`judge.modelPinned`,
+`judge.modelSource`): this run used the provider's default
+(`modelSource: health-check`), and `--judge-model NAME` pins it explicitly — a
+verdict from a different judge is a different measurement, exactly as a verdict
+from a different scorer version is.
+
+### The cache makes a re-measurement nearly free
+
+`scripts/score-mdc-lift.js` keys a content cache on `sha256(materialized
+SKILL.md) | judgeModel | scorerVersion` and reuses stored samples up to
+`--repeat` before judging anything new. Only *fresh* samples are stored, entries
+cap at 8, a corrupt cache is treated as empty, and the flush happens **per rule**
+— so a crash keeps whatever already completed instead of losing the run's work.
+
+Measured on a second full pass over the identical corpus:
+
+| | cold pass | cached pass |
+|---|---|---|
+| rules served from cache | 0 / 31 | **29 / 31** (57 samples) |
+| judge calls (`attemptsTotal`) | 88 | **48** |
+| rules needing a retry | 7 | **1** |
+| mean | 62.32 | **62.32** |
+
+Only `03-testing.mdc` (a missing second sample) and the two UNSCORED rules
+needed new judge calls. The mean is **identical**, which is the point — the cache
+returns the same measurement, not a new one. The two UNSCORED rules are the
+exception *by construction*: they have no samples to cache, so every pass
+re-attempts them — and in this second, independent pass they failed again,
+**8 attempts each**, with the identical `LLM not configured` warning. That is the
+difference between a deterministic miss and a flaky one, observed twice.
 
 ### What the corpus is actually weak at
 
