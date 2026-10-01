@@ -79,6 +79,52 @@ test('parseRubric returns null rather than throwing on bad input types', () => {
   }
 });
 
+test('a genuine 0 is a measurement and must survive, not be read as a miss', () => {
+  // The contract is "null means unmeasured". A judge really can score 0, and that
+  // must be recorded: treating 0 as a miss would both discard a real failure and
+  // let a transport failure pass as a grade. scoreWithRetries must therefore test
+  // `!== null`, never truthiness.
+  assert.deepStrictEqual(parseRubric({ stdout: '  LLM Rubric Score: 0.0/100\n' }), { score: 0 });
+  const r = scoreWithRetries(() => ({ score: 0, criteria: {}, reason: null }), 2);
+  assert.strictEqual(r.score, 0);
+  assert.strictEqual(r.attempts, 1, 'a real 0 must not be retried as if it were a miss');
+});
+
+test('the SkillEvaluator transport fallback is UNSCORED, and its warning explains why', () => {
+  // Verified against skillevaluator 0.4.0 internals: a non-JSON judge reply makes
+  // the validator return _UnavailableRubricReport, which rubric_eval.py intercepts
+  // and converts into a judge failure (check_name="llm_unavailable"). The CLI then
+  // prints no `LLM Rubric Score:` line at all - the 0 inside the fallback dict is
+  // an internal sentinel that never reaches the report. The only correct reading
+  // of this output is UNSCORED, and failureReason must surface the warning that
+  // says so, including the reply length that distinguishes prose from truncation.
+  const out = {
+    status: 0,
+    stdout: [
+      'WARNING LLM call failed (Could not extract valid JSON from LLM response (8123 chars)) - using fallback response',
+      'LLM judge unavailable; rubric evaluation did not run',
+      '',
+    ].join('\n'),
+    stderr: '',
+  };
+  assert.strictEqual(parseRubric(out), null);
+  const reason = failureReason(out);
+  assert.match(reason, /no score line/);
+  assert.match(reason, /Could not extract valid JSON/);
+  assert.match(reason, /8123 chars/);
+});
+
+test('a truncated judge reply is UNSCORED, not a partial score', () => {
+  // RUBRIC_MAX_TOKENS is 4096 on 0.4.0, so a chatty judge can overrun the cap and
+  // cut the JSON mid-object. A half-parsed verdict is worse than no verdict, and
+  // the absent score line is what makes it correctly unreadable.
+  const out = {
+    status: 0,
+    stdout: '{"overall_pass": false, "score": 42, "checks": [{"id": "description_clarity", "score": 6',
+  };
+  assert.strictEqual(parseRubric(out), null);
+});
+
 test('detectCredential reports unconfigured when nothing is set', () => {
   const c = detectCredential();
   assert.strictEqual(c.configured, false);
