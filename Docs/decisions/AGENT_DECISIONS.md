@@ -487,3 +487,53 @@ skipped.
 - **Reverses if:** a measured eye threshold replaces `ASPECT_TOLERANCE`. Until then
   this is a **house standard with no cited basis** — the report says so on its face,
   and a collision is a prompt to look, not proof of a defect.
+
+---
+
+### DEC-0023 — "Zone type is one enum keyed to the seven families; the shipped biome/alignment enums are not deleted" (2026-10-01)
+
+- **Area:** architecture
+- **Decision:** Add a single zone-type enum keyed to the seven mechanic families
+  (gather, nurture_tame, heal, spirit, stealth, build_place, combat) as the
+  vocabulary for art and level design. **Do not delete or repurpose
+  `EBiomeType` or `EPlanetoidAlignment`** — they stay, demoted to terrain
+  dressing / weather inputs. `EPlanetoidAlignment` is explicitly not a zone type.
+- **Rationale:** `TG-ZONE-VOCABULARY` Q2 (Lead, 2026-10-01) settled that the
+  mechanic family is the zone type. `HomeWorldPlanetoidTypes.h` already ships a
+  4-biome × 3-alignment pair that predates the taste decision by seven months and
+  is referenced from `docs/CONSOLE_COMMANDS.md`, `HomeWorldGameMode.h` and
+  `PLANETOID_BIOMES.md`. Deleting them would break working console commands and
+  re-litigate a settled product fork; overloading them would make a biome look
+  like a mechanic, which is the exact confusion the Lead's answer removed. A new
+  enum keeps the two axes separable at the type level instead of by convention.
+- **Rejected:** reusing `EBiomeType` as the zone type (re-opens fork A, breaks
+  "one family per section" — the Lead rejected paired families twice in Round 4);
+  modelling family as a tag/soft-reference (keeps the ambiguity the gate closed);
+  deleting the old enums as "wrong" (they are still correct for terrain).
+- **Evidence:** `HomeWorldPlanetoidTypes.h`; `HomeWorldGameMode.h:239-259`;
+  `docs/CONSOLE_COMMANDS.md:217-218`; `TASTE_GATE_ZONE_VOCABULARY.md` § Settled.
+- **Reverses if:** the Lead later decides biomes *are* sections, which re-opens
+  fork A and would make this enum redundant rather than wrong.
+
+---
+
+### DEC-0024 — "The env-art prototype is a new Lib/02_Zones kit, not an edit to the homestead kit" (2026-10-01)
+
+- **Area:** architecture
+- **Decision:** The authorised env-art prototype lands in a **new
+  `Lib/02_Zones/<FAMILY>/` kit** with its own spec JSON, reusing the loader in
+  `homeworld_graybox_spec.py`. It does not add volumes to `Lib/01_Homestead/`.
+- **Rationale:** `TG-ZONE-VOCABULARY` Q1 authorised exactly one zone for one
+  mechanic family. Homestead is `build_place` and is already at its greybox
+  ceiling — the report has 7 blocking findings there. Writing the new family's
+  volumes into the homestead kit would mix two families in one directory, which
+  is the vocabulary collision the gate just resolved, and would make the
+  collision assertion unable to tell them apart. One directory per family makes
+  "one family per section" a property of the file tree rather than a convention.
+- **Evidence:** `docs/qa/GRAYBOX_SPEC_REPORT.md` (7 blocking, homestead);
+  `homeworld_graybox_spec.py` resolves spec dirs by path and needs no change to
+  accept a sibling.
+- **Reverses if:** a family genuinely spans regions rather than sections — e.g.
+  the spirit shrines exist on both homestead and planet-side, which is already
+  true and is handled by `SM_Shrine_Homestead` / `SM_Shrine_Return` sharing one
+  family across two kits rather than by merging directories.

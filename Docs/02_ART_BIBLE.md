@@ -176,6 +176,41 @@ One main key at a time: dusk sun, campfire, or shrine cyan, plus a cooler fill. 
 
 Readable silhouettes beat detail.
 
+### Per-family signature silhouettes (2026-10-01)
+
+A **zone type is a mechanic family**, not a biome. TG-ZONE-FAMILY settled that a section
+*is* a family of mechanics and that geography is authored to announce it; TG-ZONE-VOCABULARY
+confirmed the family is the art vocabulary and that `EBiomeType` is terrain dressing only.
+The consequence is mechanical, not polish:
+
+> A family that cannot be told apart **by shape from 20 m away** has failed its section.
+> No HUD may rescue it.
+
+Every family therefore carries one signature silhouette, and no two families may share a
+scale band. This table is **locked taste** — see
+[handoffs/TASTE_GATE_GRAYBOX_SILHOUETTE.md](handoffs/TASTE_GATE_GRAYBOX_SILHOUETTE.md) and
+taste-profile §3. Machine form: `Content/Python/homeworld_graybox_silhouette.py`.
+
+| Family | Signature silhouette at 20 m |
+|---|---|
+| `gather` | low wide soft mound, reads as a spreading patch |
+| `nurture_tame` | broad low pad with a raised rim you can see over |
+| `heal` | narrow upright, single soft column |
+| `spirit` | tall thin vertical **with a see-through gap** |
+| `stealth` | low broken horizontal, never a closed mass |
+| `build_place` | flat square plate, deliberately dull |
+| `combat` | jagged asymmetric wedge, tallest in frame |
+
+**Traversal is the spine, not a family.** Paths, the lookout pad, the glide perch, islets and
+the landing circle carry no silhouette of their own; they inherit the neighbouring family's
+material and are excluded from the collision check. Hub volumes (cabin, garden, pines) carry
+`build_place` — the cabin is that family's signature landmark.
+
+**Current state:** only `build_place` has authored volumes. `heal`, `stealth` and `combat`
+have **no volume anywhere** in the 39-volume layout, so those families are taught nowhere.
+`gather`, `nurture_tame` and `spirit` are measured and **non-conforming**: they read flatter
+and squarer than their signature. Authoring them is level design — Lead-owned, not invented.
+
 ---
 
 ## 9. Shots — approval criteria

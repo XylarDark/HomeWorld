@@ -1,13 +1,15 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **Harness / bot optimization — idle** (Lead lock 2026-09-27 ET: CAP + EA DROPPED from backlog; horizon = harness/bot only). Prior product: Docs/33 PS-C history — [PS_C_METRICS.md](../Docs/handoffs/PS_C_METRICS.md). **FALLBACK FLIGHT armed.**
+**Current phase:** **Harness idle; ENV-ART PROTOTYPE is the live ball** (Lead 2026-10-01, `TG-ZONE-VOCABULARY` Round 1). **Scope: one greybox-tier zone prototype, cut for ONE mechanic family.** Harness work is parked, not abandoned. Supersedes the 2026-09-27 lock "horizon = harness/bot only / EA-env art off the backlog" — that lock is **superseded, not deleted**; see § CAP / EA backlog (historical) for the original text. Prior product: Docs/33 PS-C history — [PS_C_METRICS.md](../Docs/handoffs/PS_C_METRICS.md). **FALLBACK FLIGHT armed.**
+
+**Zone-type vocabulary (Lead 2026-10-01, `TG-ZONE-VOCABULARY` Q2):** the **seven mechanic families** from [TASTE_GATE_ZONE_FAMILY.md](../Docs/handoffs/TASTE_GATE_ZONE_FAMILY.md) are the zone type for art and level design. `EBiomeType` (Desert/Forest/Marsh/Canyon) drops to **terrain dressing + weather only** and is out of the art vocabulary. `EPlanetoidAlignment` is **not** a zone type. **Neither C++ enum is deleted** — biome keeps working as an input.
 
 **Live product track:** **T0 / PROTOTYPE** — 14 MUST beats on `Maps/VS_MVP`, Lead `APPROVE-PROTOTYPE-LIST` 2026-09-27 ET (see § T0 / PROTOTYPE track). T0 implementation is merged on `main`; **no T0 beat has a tracked prove result.** Whether T0 *supersedes* this line's harness-only horizon is **not decidable from the tree** — see § Open items → `T0-vs-harness-horizon`.
 
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **Conductor** (parent DESKTOP) / **DESKTOP-21CT3H0**
-**ball:** Conductor — harness idle (pin tip `a9d1cc4` / full `a9d1cc47c49389dba8aacf0bbede31684a4ce28a` equals UserHarness master; CAP+EA DROPPED Lead 2026-09-27)
-**Blocked by:** none — next harness bite only when Lead names one. CAP/EA product Do **DROPPED** (not HELD).
+**ball:** Conductor — **env-art prototype** (greybox tier, one mechanic family). Harness idle (pin tip `a9d1cc4` / full `a9d1cc47c49389dba8aacf0bbede31684a4ce28a` equals UserHarness master; harness work parked, not abandoned — Lead 2026-10-01)
+**Blocked by:** none. Env-art prototype authorised for one zone; a second family, new biome art, or a `Content/` promote is a **fresh gate**, not covered by this lift.
 **Sign-off doc:** [Docs/17_HS_AUDIT_SIGN_OFF.md](../Docs/17_HS_AUDIT_SIGN_OFF.md) — **SIGNED OFF** Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET.
 
 
@@ -27,6 +29,11 @@ Status values: `LOCKED` `OPEN` `IN PROGRESS` `GATE FAILED` `CLOSED` `GATE READY`
 ---
 
 ## CAP / EA backlog (historical — Lead DROPPED 2026-09-27)
+
+> **SUPERSEDED IN PART, 2026-10-01 (`TG-ZONE-VOCABULARY` Q1).** The *EA/env-art* half of this
+> lock is **LIFTED** and scoped to one greybox zone prototype — see **Current phase** at the top.
+> The *CAP* half (the ProveOps product track) is still dropped. The original text is kept
+> verbatim below as history; do not read it as the current horizon.
 
 Lead lock: CAP product track and EA/env art are **off the backlog** (not shelved). No CAP Do, no EA SCOUT, no ProveOps-as-default roster. Design / Implement are **not** parked for CAP. KEEP seats: Conductor, Design, Implement, Test, Fix, eggbot.
 
