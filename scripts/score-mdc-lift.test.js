@@ -426,3 +426,13 @@ test('CLI rejects --cache with no value (exit 2, before any provider work)', () 
   assert.strictEqual(r.status, 2);
   assert.match(r.stderr, /--cache needs a file path/);
 });
+
+test('CLI rejects --judge-model with no value, and with a blank value', () => {
+  // rubric-eval has no --model flag, so this is the only way to pin the judge.
+  // Getting it silently wrong would attribute a verdict to the wrong model.
+  for (const args of [['--judge-model'], ['--judge-model', '   ']]) {
+    const r = runCli(args);
+    assert.strictEqual(r.status, 2);
+    assert.match(r.stderr, /--judge-model needs a model name/);
+  }
+});

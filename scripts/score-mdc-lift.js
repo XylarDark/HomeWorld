@@ -12,6 +12,12 @@
  *   --retries N    attempts per sample before it counts as UNSCORED (default 2)
  *   --cache FILE   sample cache, default Saved/lift-cache.json
  *   --no-cache     ignore and do not write the cache (clean before/after)
+ *   --judge-model NAME  pin the judge (SKILL_EVAL_JUDGE_MODEL for the child)
+ *
+ * Choosing a judge: rubric-eval has NO --model, --temperature, or JSON-mode flag
+ * (verified against its --help). The judge is selected purely by environment, so
+ * --judge-model is the supported way to pin it. There is therefore no way to ask
+ * the judge for strict JSON from here; the retry path is the mitigation.
  *
  * Caching: a judged score is only meaningful relative to the judge and the
  * scorer, so samples are keyed by content hash + judge model + scorer version.
@@ -210,11 +216,18 @@ function failureReason(proc) {
   return bits.join(' - ');
 }
 
-/** Run rubric-eval once. Returns {score, criteria} or {score:null, reason}. */
-function runRubricOnce(tool, skillDir) {
+/**
+ * Run rubric-eval once. Returns {score, criteria} or {score:null, reason}.
+ *
+ * `env` is threaded through so a caller can pin the judge model for the child
+ * process (SKILL_EVAL_JUDGE_MODEL). rubric-eval has no --model flag, so the
+ * environment is the only way to choose a judge — see the header note.
+ */
+function runRubricOnce(tool, skillDir, env) {
   const proc = spawnSync(tool, ['rubric-eval', skillDir, '-r', 'cli'], {
     encoding: 'utf8',
     maxBuffer: 32 * 1024 * 1024,
+    env: env || process.env,
   });
   const parsed = parseRubric(proc);
   if (parsed) return { ...parsed, criteria: parseCriteria(proc) };
@@ -346,6 +359,7 @@ function parseArgs(argv) {
     retries: RETRIES_DEFAULT,
     cache: CACHE_DEFAULT,
     noCache: false,
+    judgeModel: null,
     rulesDir: '.cursor/rules',
     tool: null,
     limit: null,
@@ -358,6 +372,7 @@ function parseArgs(argv) {
     else if (a === '--retries') opts.retries = Number(argv[++i]);
     else if (a === '--cache') opts.cache = argv[++i];
     else if (a === '--no-cache') opts.noCache = true;
+    else if (a === '--judge-model') opts.judgeModel = argv[++i];
     else if (a === '--rules-dir') opts.rulesDir = argv[++i];
     else if (a === '--tool') opts.tool = argv[++i];
     else if (a === '--only') opts.only = argv[++i];
@@ -378,6 +393,10 @@ function parseArgs(argv) {
   }
   if (opts.cache !== null && typeof opts.cache !== 'string') {
     console.error(`${PREFIX} - --cache needs a file path`);
+    return null;
+  }
+  if (opts.judgeModel !== null && (typeof opts.judgeModel !== 'string' || !opts.judgeModel.trim())) {
+    console.error(`${PREFIX} - --judge-model needs a model name`);
     return null;
   }
   return opts;
@@ -423,11 +442,27 @@ function main() {
   if (opts.only) files = files.filter((f) => f.toLowerCase() === opts.only.toLowerCase());
   if (opts.limit) files = files.slice(0, opts.limit);
 
+  // rubric-eval exposes no --model flag, so the judge is chosen by environment.
+  // Pin it when asked: a run must record the judge that actually answered, and a
+  // judge change is a measurement change, exactly like a scorer upgrade.
+  const childEnv = opts.judgeModel
+    ? {
+        ...process.env,
+        SKILL_EVAL_JUDGE_MODEL: opts.judgeModel,
+        SKILL_EVAL_LLM_MODEL: opts.judgeModel,
+      }
+    : process.env;
+
   // Identify the judge so the number is anchored to a model, not just a tool.
-  const probe = spawnSync(tool, ['health-check'], { encoding: 'utf8', maxBuffer: 8 * 1024 * 1024 });
+  const probe = spawnSync(tool, ['health-check'], {
+    encoding: 'utf8',
+    maxBuffer: 8 * 1024 * 1024,
+    env: childEnv,
+  });
   const health = `${probe.stdout || ''}${probe.stderr || ''}`;
   const model = MODEL_RE.exec(health);
-  const judgeModel = model ? `nvidia/${model[1]}` : 'unknown';
+  const judgeModel = opts.judgeModel || (model ? `nvidia/${model[1]}` : 'unknown');
+  const judgeModelSource = opts.judgeModel ? 'flag' : model ? 'health-check' : 'unknown';
   const toolVersion = sibling.toolVersion(tool);
 
   const cacheFile = opts.noCache ? null : path.resolve(projectRoot, opts.cache);
@@ -459,7 +494,7 @@ function main() {
       const freshSamples = [];
       for (let i = samples.length; i < opts.repeat; i += 1) {
         freshRuns += 1;
-        const r = scoreWithRetries(() => runRubricOnce(tool, dir), opts.retries);
+        const r = scoreWithRetries(() => runRubricOnce(tool, dir, childEnv), opts.retries);
         attempts += r.attempts || 1;
         if (r.score === null) {
           reason = r.reason;
@@ -591,6 +626,7 @@ function main() {
       provider: cred.provider,
       model: judgeModel,
       modelPinned: judgeModel !== 'unknown',
+      modelSource: judgeModelSource,
       // Jitter is a property of LLM judging, not of any rule. Recorded so a
       // reader never mistakes a one-run delta for a real regression.
       repeats: opts.repeat,
