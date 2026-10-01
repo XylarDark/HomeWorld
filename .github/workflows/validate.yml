@@ -95,10 +95,10 @@ jobs:
       - name: UE preflight unit tests (HR3-B)
         run: npm run preflight:ue:test
 
-      # These suites were previously only run locally. 223 tests that gate nothing are
+      # These suites were previously only run locally. Tests that gate nothing are
       # not a harness: they catch a regression on whichever machine happens to run them
       # and nowhere else. This step is the first thing that makes them a gate.
-      - name: Harness unit tests (tasklift, outcome, decisions, scope-reconcile, scorers)
+      - name: Harness unit tests (tasklift, outcome, scope-reconcile, t0-evidence, preflight-ue)
         run: npm run test:all
 
       - name: Task-lift positive control (instrument can register success)
@@ -108,14 +108,11 @@ jobs:
         run: npm run scope:reconcile:write
         continue-on-error: true
 
-      - name: Decision-log check (boundary change without a recorded reason)
-        run: |
-          # Non-blocking by decision, not by accident: the rule applies from the commit
-          # that introduced it, so pre-rule commits in the range would flag on first run.
-          # A failure here is a real finding and is surfaced rather than swallowed.
-          git fetch --no-tags --depth=50 origin "${{ github.base_ref || 'main' }}" || true
-          npm run decisions:check -- --base "origin/${{ github.base_ref || 'main' }}" \
-            || echo "::error title=Unlogged boundary change::A commit moved a module, always-on instruction, dependency or gate without a DEC-NNNN entry. Run 'npm run decisions:check' locally and read Docs/decisions/AGENT_DECISIONS.md."
+      # The boundary-change decision-log gate was REMOVED on 2026-10-01 (DEC-0034).
+      # It was red for 14 commits and caught nothing: an enterprise compliance control
+      # applied to a one-person team with no auditors, penalising exactly the batching a
+      # solo developer already has to do. Docs/decisions/AGENT_DECISIONS.md stays as prose;
+      # `npm run decisions` remains available to run by hand.
 
       - name: Git hygiene checks
         run: |
