@@ -664,14 +664,22 @@ function summarize(results, { minValidPerCell = 1, dry = false } = {}) {
   for (const taskId of completePairs) {
     const w = results.filter((r) => r.taskId === taskId && r.condition === 'with' && !r.voided);
     const o = results.filter((r) => r.taskId === taskId && r.condition === 'without' && !r.voided);
-    if (!w.length || !o.length) continue;
-    const n = Math.min(w.length, o.length);
-    for (let i = 0; i < n; i++) {
-      const cw = (w[i].checks || [])[i];
-      const co = (o[i].checks || [])[i];
-      if (!cw || !co) continue;
-      if (cw.class !== 'conformance') continue;
-      perCheck.push({ task: taskId, label: cw.label, withPass: cw.pass, withoutPass: co.pass });
+    // Pair every run against every run across the two arms, then walk the CHECKS
+    // inside each pair. An earlier version took `n = min(w.length, o.length)` and
+    // looped to `n`, which at 1 trial compared exactly ONE check per task - and then
+    // reported "no discordant pairs" on a run whose arms differed by 23 points.
+    for (const wr of w) {
+      for (const or of o) {
+        const wChecks = wr.checks || [];
+        const oChecks = or.checks || [];
+        const n = Math.min(wChecks.length, oChecks.length);
+        for (let i = 0; i < n; i++) {
+          const cw = wChecks[i];
+          const co = oChecks[i];
+          if (cw.class !== 'conformance') continue;
+          perCheck.push({ task: taskId, label: cw.label, withPass: cw.pass, withoutPass: co.pass });
+        }
+      }
     }
   }
   const significance = mcnemarExact(

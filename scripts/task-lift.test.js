@@ -760,6 +760,35 @@ test('the third arm isolates the rules corpus from the entry points', () => {
   assert.ok(M.ARMS.without.length > M.ARMS['docs-only'].length, 'without must remove strictly more');
 });
 
+test('McNemar pairs every check, not one check per task', () => {
+  // Found by R4: `n` was min(w.length, o.length) - the number of RUNS - so at one
+  // trial it compared a single check per task and reported "no discordant pairs" on
+  // a run whose arms differed by 23 points. The most dangerous possible output: a
+  // confident "nothing to see" over data that plainly differed.
+  const run = (condition, passes) => ({
+    taskId: 'a',
+    condition,
+    voided: false,
+    conformance: passes.filter(Boolean).length / passes.length,
+    completion: 1,
+    agent: { status: 0, error: null, attempts: 1 },
+    checks: passes.map((p, i) => ({
+      class: 'conformance',
+      label: `c${i}`,
+      kind: 'anyMatches',
+      pass: p,
+      verdict: p ? 'pass' : 'closed_fail',
+    })),
+  });
+  const w = run('with', [true, true, false, true, true]);
+  const o = run('without', [true, false, false, false, true]);
+  const s = M.summarize([w, o]);
+  assert.strictEqual(s.pairedConformanceChecks, 5, 'all five checks must be paired');
+  assert.strictEqual(s.significance.b, 2, 'with-only passes');
+  assert.strictEqual(s.significance.c, 0);
+  assert.strictEqual(s.discordant.length, 2);
+});
+
 test('an unknown arm fails before anything is spent', () => {
   assert.throws(() => M.ablateFor('nope'), /unknown arm/);
 });
