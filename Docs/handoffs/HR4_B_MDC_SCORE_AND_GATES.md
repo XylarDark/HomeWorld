@@ -381,7 +381,10 @@ judge:
 
 A single-run score — or a sub-8-point delta presented as a regression — is false
 precision. `--repeat N` measures the jitter and the report records `meanSpread` /
-`maxSpread` / `pooledWithinSd` / `standardErrorOfMean` beside the mean.
+`maxSpread` / `pooledWithinSd` / `standardErrorOfMean` beside the mean — on this
+corpus **7.22 / 35.5 / 8.13 / 1.51**, the SD over the 28 rules that had two
+samples (`pooledWithinSd` is the tool's own computation, re-checked directly
+against the saved report).
 `19-automation-cycle.mdc` has been seen as low as **5.0** here and as high as
 **60.5** in this harness earlier, so its spread is not a property of one bad run.
 
@@ -420,10 +423,14 @@ are not weighted to the whole corpus.)
 
 `09-mcp-workflow.mdc` (7,760 B) and `20-full-automation-no-manual-steps.mdc`
 (4,732 B) — **the two largest rules in the corpus** — produced no score in **8
-attempts each** (2 samples × 4 attempts), in *both* full passes. That is
-deterministic for these two files, and it is a different failure from the
-transient one retries do repair: **7 other rules** missed on their first attempt
-and scored normally on retry, while these two never did.
+attempts each** (2 samples × 4 attempts) in the saved pass, and were the two
+largest of the **6** rules the earlier pass lost (the other 4 recovered on retry —
+`docs/KNOWN_ERRORS.md`). That makes these two deterministic, and it is a
+different failure from the transient one retries do repair: **7 scored rules**
+missed an attempt and then scored normally, while these two never did. (Note
+`judge.retriedCount` counts only *scored* rules — 7 — against **9** rules that
+actually retried, so it is a flakiness indicator, not a count of everything the
+provider touched.)
 
 The judge's own log makes this hard to diagnose, because the wording is
 misleading. A reply that cannot be parsed raises a `JSONDecodeError`, and the
