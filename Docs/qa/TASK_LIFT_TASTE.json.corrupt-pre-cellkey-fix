@@ -1,0 +1,2691 @@
+{
+  "tool": "[task-lift]",
+  "dry": false,
+  "ablation": {
+    "with": {
+      "removed": [],
+      "without": {
+        "ok": true,
+        "present": [],
+        "checked": 0,
+        "fileCount": 4265
+      },
+      "with": {
+        "present": [],
+        "checked": 0,
+        "fileCount": 4265
+      }
+    },
+    "docs-only": {
+      "removed": [
+        ".cursor",
+        ".agents",
+        "UserHarness"
+      ],
+      "without": {
+        "ok": true,
+        "present": [],
+        "checked": 3,
+        "fileCount": 4173
+      },
+      "with": {
+        "present": [],
+        "checked": 3,
+        "fileCount": 4173
+      }
+    },
+    "without": {
+      "removed": [
+        "AGENTS.md",
+        ".cursor",
+        ".agents",
+        "swarm",
+        "UserHarness",
+        "START_HERE.md"
+      ],
+      "without": {
+        "ok": true,
+        "present": [],
+        "checked": 6,
+        "fileCount": 4144
+      },
+      "with": {
+        "present": [],
+        "checked": 6,
+        "fileCount": 4144
+      }
+    }
+  },
+  "results": [
+    {
+      "taskId": "art-master-spec",
+      "agent": {
+        "status": 0,
+        "signal": null,
+        "timedOut": false,
+        "error": null,
+        "ok": true,
+        "outputTail": "de the doc link its canon sources rather than restate them as a second source of truth, but the file is marked `SPEC — files only, not an approval`, since AD owns the look, TA owns the ranges, and workers don't self-approve.\\n\\nVerified: all relative links resolve, and the doc carries no rejected-look language outside an explicit rejects list.\",\"time\":{\"start\":1790881610781,\"end\":1790881615957}}}\r",
+        "attempts": 1
+      },
+      "voided": false,
+      "checks": [
+        {
+          "class": "completion",
+          "label": "names the master material it uses",
+          "kind": "matches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "reuses an existing master instead of inventing a family",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "declares BaseColor",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "declares Roughness",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "declares Variation",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "declares NightMix",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "NightMix is expressed as a 0 to 1 range",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "states the origin convention",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "states the unit is meters",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "avoids the canon's rejected look language (quoting a rejection is not using it)",
+          "kind": "noneMatch",
+          "pass": true,
+          "detail": "clean",
+          "subjectPresent": true,
+          "verdict": "pass"
+        }
+      ],
+      "completion": 1,
+      "conformance": 1,
+      "completionPassed": 1,
+      "conformancePassed": 9,
+      "completionTotal": 1,
+      "conformanceTotal": 9,
+      "condition": "docs-only",
+      "trial": 1
+    },
+    {
+      "taskId": "art-master-spec",
+      "agent": {
+        "status": 0,
+        "signal": null,
+        "timedOut": false,
+        "error": null,
+        "ok": true,
+        "outputTail": "(`M_FoliageCard`) on the grounds that `RES_FIBER`'s world sources are fern/vine/flax, not lupine. That's me reading the resource table rather than an explicit statement that \\\"lupine is not gatherable\\\" — if lupine is in fact meant to become gatherable later, §1 already routes that case to `M_GatherHerb`, so it stays inside the ten either way.\",\"time\":{\"start\":1790881714839,\"end\":1790881721028}}}\r",
+        "attempts": 1
+      },
+      "voided": false,
+      "checks": [
+        {
+          "class": "completion",
+          "label": "names the master material it uses",
+          "kind": "matches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "reuses an existing master instead of inventing a family",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "declares BaseColor",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "declares Roughness",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "declares Variation",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "declares NightMix",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "NightMix is expressed as a 0 to 1 range",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "states the origin convention",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "states the unit is meters",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "avoids the canon's rejected look language (quoting a rejection is not using it)",
+          "kind": "noneMatch",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        }
+      ],
+      "completion": 1,
+      "conformance": 0,
+      "completionPassed": 1,
+      "conformancePassed": 0,
+      "completionTotal": 1,
+      "conformanceTotal": 9,
+      "condition": "docs-only",
+      "trial": 2
+    },
+    {
+      "taskId": "art-master-spec",
+      "agent": {
+        "status": 0,
+        "signal": null,
+        "timedOut": false,
+        "error": null,
+        "ok": true,
+        "outputTail": "firmation with defaults as fallback.\\n\\nOne thing worth your call: I asserted lupine is *decorative and not harvestable*. I inferred that from it being absent from canon's six resources and from the art bible listing it as a detail-kit piece — but if lupine is meant to become gatherable, §1's routing changes and `M_GatherHerb` becomes correct.\",\"time\":{\"start\":1790881887199,\"end\":1790881892700}}}\r",
+        "attempts": 1
+      },
+      "voided": false,
+      "checks": [
+        {
+          "class": "completion",
+          "label": "names the master material it uses",
+          "kind": "matches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "reuses an existing master instead of inventing a family",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "declares BaseColor",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "declares Roughness",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "declares Variation",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "declares NightMix",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "NightMix is expressed as a 0 to 1 range",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "states the origin convention",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "states the unit is meters",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "avoids the canon's rejected look language (quoting a rejection is not using it)",
+          "kind": "noneMatch",
+          "pass": false,
+          "detail": "Docs/qa/art-master-ground.md: Photoreal grass or leaf scans, grimdark value ranges, sci-fi",
+          "subjectPresent": true,
+          "verdict": "closed_fail"
+        }
+      ],
+      "completion": 1,
+      "conformance": 0.8888888888888888,
+      "completionPassed": 1,
+      "conformancePassed": 8,
+      "completionTotal": 1,
+      "conformanceTotal": 9,
+      "condition": "without",
+      "trial": 1
+    },
+    {
+      "taskId": "art-shot-brief",
+      "agent": {
+        "status": 0,
+        "signal": null,
+        "timedOut": false,
+        "error": null,
+        "ok": true,
+        "outputTail": "ortalNight` and forbade a new hero cam, because that inventory line is placement-suite bookkeeping, not shot canon, and the shotlist/reel both bind Shot 5 to `CAM_PortalNight`. If AD/LIT wants a dedicated shrine-read angle, that's a separate camera decision worth a gate — say the word and I'll add it as a scoped variant rather than a new shot.\",\"time\":{\"start\":1790882174265,\"end\":1790882178395}}}\r",
+        "attempts": 1
+      },
+      "voided": false,
+      "checks": [
+        {
+          "class": "completion",
+          "label": "names the subject",
+          "kind": "matches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "states explicit pass criteria",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "states explicit fail criteria",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "none of 1 targets",
+          "subjectPresent": true,
+          "verdict": "closed_fail"
+        },
+        {
+          "class": "conformance",
+          "label": "names the locked palette chip the shrine uses",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "pairs the shrine light against the cabin key",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "reuses the existing masters rather than rebuilding for night",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        }
+      ],
+      "completion": 1,
+      "conformance": 0.8,
+      "completionPassed": 1,
+      "conformancePassed": 4,
+      "completionTotal": 1,
+      "conformanceTotal": 5,
+      "condition": "with",
+      "trial": 1
+    },
+    {
+      "taskId": "art-shot-brief",
+      "agent": {
+        "status": 0,
+        "signal": null,
+        "timedOut": false,
+        "error": null,
+        "ok": true,
+        "outputTail": "ote for your judgment, not mine to decide: the brief itself is the only artifact here, and the as-is verdict is my evidence read, not a QA signature. It states QA judges the gate and that a taste waiver is not a QA pass — but if a filed QA defect for Shot 5 already exists elsewhere, this should be reconciled with it rather than standing alone.\",\"time\":{\"start\":1790882303857,\"end\":1790882310580}}}\r",
+        "attempts": 1
+      },
+      "voided": false,
+      "checks": [
+        {
+          "class": "completion",
+          "label": "names the subject",
+          "kind": "matches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "states explicit pass criteria",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "states explicit fail criteria",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "names the locked palette chip the shrine uses",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "pairs the shrine light against the cabin key",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "reuses the existing masters rather than rebuilding for night",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        }
+      ],
+      "completion": 1,
+      "conformance": 0,
+      "completionPassed": 1,
+      "conformancePassed": 0,
+      "completionTotal": 1,
+      "conformanceTotal": 5,
+      "condition": "with",
+      "trial": 2
+    },
+    {
+      "taskId": "art-shot-brief",
+      "agent": {
+        "status": 0,
+        "signal": null,
+        "timedOut": false,
+        "error": null,
+        "ok": true,
+        "outputTail": "o carry the shot instead.\\n2. Moon rule: if `LIT_Moon` lands in frame it must be huge/warm, but the shot must not reframe to chase it — the Shot 2 precedent in `LIT_Moon.md` §5, extended rather than invented.\\n\\n§5 lists evidence paths and §6 states the brief approves nothing — QA judges, authors file evidence, and a READY claim is not a PASS.\",\"time\":{\"start\":1790882405756,\"end\":1790882413411}}}\r",
+        "attempts": 1
+      },
+      "voided": false,
+      "checks": [
+        {
+          "class": "completion",
+          "label": "names the subject",
+          "kind": "matches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "states explicit pass criteria",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "states explicit fail criteria",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "names the locked palette chip the shrine uses",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "none of 1 targets",
+          "subjectPresent": true,
+          "verdict": "closed_fail"
+        },
+        {
+          "class": "conformance",
+          "label": "pairs the shrine light against the cabin key",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "reuses the existing masters rather than rebuilding for night",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        }
+      ],
+      "completion": 1,
+      "conformance": 0.8,
+      "completionPassed": 1,
+      "conformancePassed": 4,
+      "completionTotal": 1,
+      "conformanceTotal": 5,
+      "condition": "docs-only",
+      "trial": 1
+    },
+    {
+      "taskId": "art-shot-brief",
+      "agent": {
+        "status": 0,
+        "signal": null,
+        "timedOut": false,
+        "error": null,
+        "ok": true,
+        "outputTail": "ntive: the art bible names the `Crystal cyan` chip but gives it no hex, the way the moon does. So \\\"tight bloom\\\" is currently a look note with no measurable value behind it. I fixed the *direction* and routed the number to TA as a preset amendment — inventing a hex would have been me quietly making a material decision that isn't mine to make.\",\"time\":{\"start\":1790882569561,\"end\":1790882575923}}}\r",
+        "attempts": 1
+      },
+      "voided": false,
+      "checks": [
+        {
+          "class": "completion",
+          "label": "names the subject",
+          "kind": "matches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "states explicit pass criteria",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "states explicit fail criteria",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "names the locked palette chip the shrine uses",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "pairs the shrine light against the cabin key",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "reuses the existing masters rather than rebuilding for night",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        }
+      ],
+      "completion": 1,
+      "conformance": 1,
+      "completionPassed": 1,
+      "conformancePassed": 5,
+      "completionTotal": 1,
+      "conformanceTotal": 5,
+      "condition": "without",
+      "trial": 1
+    },
+    {
+      "taskId": "asset-naming",
+      "agent": {
+        "status": 0,
+        "signal": null,
+        "timedOut": false,
+        "error": null,
+        "ok": true,
+        "outputTail": "`'s wood masters reads as \\\"weathered\\\" — I inferred `M_WoodWild`; if weathered means grey-driftwood, that's `M_WoodCabin` with a tweak.\\n- Whether a firefly is a single `FX_` emissive or a `PCG_`-spawned swarm.\\n\\nWant me to raise the answer-key contamination as a defect file, or move the control fixtures out of the agent-readable tree first?\",\"time\":{\"start\":1790882710715,\"end\":1790882719794}}}\r",
+        "attempts": 1
+      },
+      "voided": false,
+      "checks": [
+        {
+          "class": "completion",
+          "label": "produced prefixed names",
+          "kind": "matches",
+          "pass": true,
+          "detail": "Docs/qa/asset-names.txt",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "every name uses an approved prefix and no spaces",
+          "kind": "allLinesMatch",
+          "pass": true,
+          "detail": "4 lines conform",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "does not invent a prefix outside the contract",
+          "kind": "noneMatch",
+          "pass": true,
+          "detail": "clean",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "uses a contract suffix where one applies",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/asset-names.txt",
+          "subjectPresent": true,
+          "verdict": "pass"
+        }
+      ],
+      "completion": 1,
+      "conformance": 1,
+      "completionPassed": 1,
+      "conformancePassed": 3,
+      "completionTotal": 1,
+      "conformanceTotal": 3,
+      "condition": "with",
+      "trial": 1
+    },
+    {
+      "taskId": "asset-naming",
+      "agent": {
+        "status": 0,
+        "signal": null,
+        "timedOut": false,
+        "error": null,
+        "ok": true,
+        "outputTail": "naming` cannot distinguish an agent that read the canon from one that read the fixture. `art-master-spec` and `art-shot-brief` have the same exposure. If you want the benchmark to measure anything on these three, the controls need to live outside the repo the agent can reach (the `$armCaveat` notes already flag that `Docs/` survives ablation).\",\"time\":{\"start\":1790882786334,\"end\":1790882791255}}}\r",
+        "attempts": 1
+      },
+      "voided": false,
+      "checks": [
+        {
+          "class": "completion",
+          "label": "produced prefixed names",
+          "kind": "matches",
+          "pass": true,
+          "detail": "Docs/qa/asset-names.txt",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "every name uses an approved prefix and no spaces",
+          "kind": "allLinesMatch",
+          "pass": true,
+          "detail": "4 lines conform",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "does not invent a prefix outside the contract",
+          "kind": "noneMatch",
+          "pass": true,
+          "detail": "clean",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "uses a contract suffix where one applies",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/asset-names.txt",
+          "subjectPresent": true,
+          "verdict": "pass"
+        }
+      ],
+      "completion": 1,
+      "conformance": 1,
+      "completionPassed": 1,
+      "conformancePassed": 3,
+      "completionTotal": 1,
+      "conformanceTotal": 3,
+      "condition": "with",
+      "trial": 2
+    },
+    {
+      "taskId": "asset-naming",
+      "agent": {
+        "status": 0,
+        "signal": null,
+        "timedOut": false,
+        "error": null,
+        "ok": true,
+        "outputTail": "er per canon §6.\\n\\n4. **`SK_Moth` has no master to cite.** The ten masters have no bug/insect entry, and canon forbids an 11th. Before this mesh gets built, TA/PROP have to decide which of the ten it instances (`M_FoliageCard` or `M_BeastStylized` are the plausible reads). That's an open gap, not something I should have invented a master for.\",\"time\":{\"start\":1790882855323,\"end\":1790882861196}}}\r",
+        "attempts": 1
+      },
+      "voided": false,
+      "checks": [
+        {
+          "class": "completion",
+          "label": "produced prefixed names",
+          "kind": "matches",
+          "pass": true,
+          "detail": "Docs/qa/asset-names.txt",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "every name uses an approved prefix and no spaces",
+          "kind": "allLinesMatch",
+          "pass": true,
+          "detail": "4 lines conform",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "does not invent a prefix outside the contract",
+          "kind": "noneMatch",
+          "pass": true,
+          "detail": "clean",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "uses a contract suffix where one applies",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/asset-names.txt",
+          "subjectPresent": true,
+          "verdict": "pass"
+        }
+      ],
+      "completion": 1,
+      "conformance": 1,
+      "completionPassed": 1,
+      "conformancePassed": 3,
+      "completionTotal": 1,
+      "conformanceTotal": 3,
+      "condition": "docs-only",
+      "trial": 1
+    },
+    {
+      "taskId": "asset-naming",
+      "agent": {
+        "status": 0,
+        "signal": null,
+        "timedOut": false,
+        "error": null,
+        "ok": true,
+        "outputTail": "rather than author a new variant, change line 1 back to `SM_PathStone_B`.\\n\\nOne thing to confirm on your side: whether the weathered planter is a **new mesh shape** (D is right) or a **material variant of an existing planter** (then it should be `MI_` off `SM_Planter_A`, not a new `SM_`). That's a modeling call, so I left it as the mesh name.\",\"time\":{\"start\":1790882962052,\"end\":1790882968134}}}\r",
+        "attempts": 1
+      },
+      "voided": false,
+      "checks": [
+        {
+          "class": "completion",
+          "label": "produced prefixed names",
+          "kind": "matches",
+          "pass": true,
+          "detail": "Docs/qa/asset-names.txt",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "every name uses an approved prefix and no spaces",
+          "kind": "allLinesMatch",
+          "pass": true,
+          "detail": "4 lines conform",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "does not invent a prefix outside the contract",
+          "kind": "noneMatch",
+          "pass": true,
+          "detail": "clean",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "uses a contract suffix where one applies",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/asset-names.txt",
+          "subjectPresent": true,
+          "verdict": "pass"
+        }
+      ],
+      "completion": 1,
+      "conformance": 1,
+      "completionPassed": 1,
+      "conformancePassed": 3,
+      "completionTotal": 1,
+      "conformanceTotal": 3,
+      "condition": "docs-only",
+      "trial": 2
+    },
+    {
+      "taskId": "asset-naming",
+      "agent": {
+        "status": 0,
+        "signal": null,
+        "timedOut": false,
+        "error": null,
+        "ok": true,
+        "outputTail": "of `SM_PathStone_B / SM_Planter_D / SK_Moth / FX_Firefly_Night`. I diverged on two of the four — `B` because that tile is already exported (real collision), and `SM_` over `SK_` for the moth on the evidence above. Both still satisfy that file's conformance checks, but if `SK_Moth` was a deliberate call (rigged wing flap), it's a one-word swap.\",\"time\":{\"start\":1790883079589,\"end\":1790883087112}}}\r",
+        "attempts": 1
+      },
+      "voided": false,
+      "checks": [
+        {
+          "class": "completion",
+          "label": "produced prefixed names",
+          "kind": "matches",
+          "pass": true,
+          "detail": "Docs/qa/asset-names.txt",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "every name uses an approved prefix and no spaces",
+          "kind": "allLinesMatch",
+          "pass": true,
+          "detail": "4 lines conform",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "does not invent a prefix outside the contract",
+          "kind": "noneMatch",
+          "pass": true,
+          "detail": "clean",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "uses a contract suffix where one applies",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/asset-names.txt",
+          "subjectPresent": true,
+          "verdict": "pass"
+        }
+      ],
+      "completion": 1,
+      "conformance": 1,
+      "completionPassed": 1,
+      "conformancePassed": 3,
+      "completionTotal": 1,
+      "conformanceTotal": 3,
+      "condition": "without",
+      "trial": 1
+    },
+    {
+      "taskId": "asset-naming",
+      "agent": {
+        "status": 0,
+        "signal": null,
+        "timedOut": false,
+        "error": null,
+        "ok": true,
+        "outputTail": " *new meshes beyond the shipped A/B/C*. If you actually meant re-issuing an existing variant, the answer is `SM_PathStone_B` and `SM_Planter_B`. Likewise `SM_Moth` is generic; the art bible's moth is tied to crystals and flower beds, so `SM_Moth_Crystal` is defensible if you want it locked to the shrine read. Say the word and I'll switch them.\",\"time\":{\"start\":1790883168090,\"end\":1790883173779}}}\r",
+        "attempts": 1
+      },
+      "voided": false,
+      "checks": [
+        {
+          "class": "completion",
+          "label": "produced prefixed names",
+          "kind": "matches",
+          "pass": true,
+          "detail": "Docs/qa/asset-names.txt",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "every name uses an approved prefix and no spaces",
+          "kind": "allLinesMatch",
+          "pass": true,
+          "detail": "4 lines conform",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "does not invent a prefix outside the contract",
+          "kind": "noneMatch",
+          "pass": true,
+          "detail": "clean",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "uses a contract suffix where one applies",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/asset-names.txt",
+          "subjectPresent": true,
+          "verdict": "pass"
+        }
+      ],
+      "completion": 1,
+      "conformance": 1,
+      "completionPassed": 1,
+      "conformancePassed": 3,
+      "completionTotal": 1,
+      "conformanceTotal": 3,
+      "condition": "without",
+      "trial": 2
+    },
+    {
+      "taskId": "mechanic-beat-packet",
+      "agent": {
+        "status": 0,
+        "signal": null,
+        "timedOut": false,
+        "error": null,
+        "ok": true,
+        "outputTail": "ial integrity over matching the fixture; flagging in case you wanted the other tradeoff.\\n\\nOne deviation worth naming: the packet is a near-restatement of an existing complete canon artifact rather than new design work. If you wanted a genuinely *new* beat packet for a bite that isn't yet frozen, tell me which one and I'll write that instead.\",\"time\":{\"start\":1790883281042,\"end\":1790883292983}}}\r",
+        "attempts": 1
+      },
+      "voided": false,
+      "checks": [
+        {
+          "class": "completion",
+          "label": "identifies the beat",
+          "kind": "matches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the Bite id field",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the Present? field",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the CAP field",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the Packet class field",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "states DONE-WHEN",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the Anti row",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the A-E trade-off section",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "uses the three-state verdict vocabulary",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "does not mark itself approved - design does not self-approve",
+          "kind": "noneMatch",
+          "pass": true,
+          "detail": "clean",
+          "subjectPresent": true,
+          "verdict": "pass"
+        }
+      ],
+      "completion": 1,
+      "conformance": 1,
+      "completionPassed": 1,
+      "conformancePassed": 9,
+      "completionTotal": 1,
+      "conformanceTotal": 9,
+      "condition": "with",
+      "trial": 1
+    },
+    {
+      "taskId": "mechanic-beat-packet",
+      "agent": {
+        "status": 0,
+        "signal": null,
+        "timedOut": false,
+        "error": null,
+        "ok": true,
+        "outputTail": "estatement note pointing at the handoff as bite of record — the prove packet requires the handoff stay untouched, so I didn't edit it. Worth a Conductor decision on whether the QA-path copy should exist at all.\\n\\nVerification: 10/10 on the task's checks via the repo's own `evaluateCheck`; control instrument 4/4 at 100%; no scratch files left.\",\"time\":{\"start\":1790883538525,\"end\":1790883545597}}}\r",
+        "attempts": 1
+      },
+      "voided": false,
+      "checks": [
+        {
+          "class": "completion",
+          "label": "identifies the beat",
+          "kind": "matches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the Bite id field",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the Present? field",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the CAP field",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the Packet class field",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "states DONE-WHEN",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the Anti row",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the A-E trade-off section",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "uses the three-state verdict vocabulary",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "does not mark itself approved - design does not self-approve",
+          "kind": "noneMatch",
+          "pass": true,
+          "detail": "clean",
+          "subjectPresent": true,
+          "verdict": "pass"
+        }
+      ],
+      "completion": 1,
+      "conformance": 1,
+      "completionPassed": 1,
+      "conformancePassed": 9,
+      "completionTotal": 1,
+      "conformanceTotal": 9,
+      "condition": "with",
+      "trial": 2
+    },
+    {
+      "taskId": "mechanic-beat-packet",
+      "agent": {
+        "status": 0,
+        "signal": null,
+        "timedOut": false,
+        "error": null,
+        "ok": true,
+        "outputTail": " the generated evidence ledger. `T0_BEAT_EVIDENCE.md` in that folder is itself machine-generated (\\\"Regenerate with `npm run t0:evidence`\\\"), so hand-written design canon sitting beside it is a bit off-pattern.\\n\\nIf you'd rather it match canon, it's a clean move to `Docs/handoffs/T0_M4_BACKPACK_GATE_V2.md` — say the word and I'll relocate it.\",\"time\":{\"start\":1790883656212,\"end\":1790883663733}}}\r",
+        "attempts": 1
+      },
+      "voided": false,
+      "checks": [
+        {
+          "class": "completion",
+          "label": "identifies the beat",
+          "kind": "matches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the Bite id field",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the Present? field",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the CAP field",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the Packet class field",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "states DONE-WHEN",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the Anti row",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the A-E trade-off section",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "uses the three-state verdict vocabulary",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "does not mark itself approved - design does not self-approve",
+          "kind": "noneMatch",
+          "pass": true,
+          "detail": "clean",
+          "subjectPresent": true,
+          "verdict": "pass"
+        }
+      ],
+      "completion": 1,
+      "conformance": 1,
+      "completionPassed": 1,
+      "conformancePassed": 9,
+      "completionTotal": 1,
+      "conformanceTotal": 9,
+      "condition": "docs-only",
+      "trial": 1
+    },
+    {
+      "taskId": "mechanic-beat-packet",
+      "agent": {
+        "status": 0,
+        "signal": null,
+        "timedOut": false,
+        "error": null,
+        "ok": true,
+        "outputTail": "gn doesn't own that call).\\n\\nOne thing worth flagging either way: the packet labels its bite `T0_M4_BACKPACK_GATE_V2` while V1 lives at a different path. That's intentional and documented in its `Supersession` table, but it means the V1-supersession itself remains an open Conductor routing call — Design explicitly declines to mark it on disk.\",\"time\":{\"start\":1790883718965,\"end\":1790883726611}}}\r",
+        "attempts": 1
+      },
+      "voided": false,
+      "checks": [
+        {
+          "class": "completion",
+          "label": "identifies the beat",
+          "kind": "matches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the Bite id field",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the Present? field",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the CAP field",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the Packet class field",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "states DONE-WHEN",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the Anti row",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the A-E trade-off section",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "uses the three-state verdict vocabulary",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "does not mark itself approved - design does not self-approve",
+          "kind": "noneMatch",
+          "pass": true,
+          "detail": "clean",
+          "subjectPresent": true,
+          "verdict": "pass"
+        }
+      ],
+      "completion": 1,
+      "conformance": 1,
+      "completionPassed": 1,
+      "conformancePassed": 9,
+      "completionTotal": 1,
+      "conformanceTotal": 9,
+      "condition": "docs-only",
+      "trial": 2
+    },
+    {
+      "taskId": "mechanic-beat-packet",
+      "agent": {
+        "status": 0,
+        "signal": null,
+        "timedOut": false,
+        "error": null,
+        "ok": true,
+        "outputTail": "ICT** per the evidence ledger.\\n\\nTwo notes: I left the existing handoff packet untouched (the new file is marked a QA-path restatement of the same bite, not a supersede) — say the word if you'd rather consolidate. Also, `git status` shows ~100 pre-existing deletions under `.agents/`, `.cursor/`, `swarm/`, and `AGENTS.md` that I did not touch.\",\"time\":{\"start\":1790883871798,\"end\":1790883876630}}}\r",
+        "attempts": 1
+      },
+      "voided": false,
+      "checks": [
+        {
+          "class": "completion",
+          "label": "identifies the beat",
+          "kind": "matches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the Bite id field",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the Present? field",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the CAP field",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the Packet class field",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "states DONE-WHEN",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the Anti row",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the A-E trade-off section",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "uses the three-state verdict vocabulary",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "does not mark itself approved - design does not self-approve",
+          "kind": "noneMatch",
+          "pass": true,
+          "detail": "clean",
+          "subjectPresent": true,
+          "verdict": "pass"
+        }
+      ],
+      "completion": 1,
+      "conformance": 1,
+      "completionPassed": 1,
+      "conformancePassed": 9,
+      "completionTotal": 1,
+      "conformanceTotal": 9,
+      "condition": "without",
+      "trial": 1
+    },
+    {
+      "taskId": "mechanic-beat-packet",
+      "agent": {
+        "status": 1,
+        "signal": null,
+        "timedOut": false,
+        "error": "[error/aborted] Session interrupted: shutdown",
+        "ok": false,
+        "outputTail": "\\\"label\\\":\\\"Rewrite it from scratch\\\",\\\"description\\\":\\\"Overwrite with a freshly authored packet in the same format, accepting churn and discarding the verified existing content.\\\"}]}]}\"},\"time\":{\"start\":1790883933475,\"end\":1790883933494}}}}\r\n{\"type\":\"error\",\"timestamp\":1790883933812,\"sessionID\":\"ses_f0700ac3affeGU7e7VMEpFoVrK\",\"error\":{\"type\":\"aborted\",\"message\":\"Session interrupted: shutdown\"}}\r",
+        "attempts": 1,
+        "retriedOut": false
+      },
+      "voided": true,
+      "checks": [
+        {
+          "class": "completion",
+          "label": "identifies the beat",
+          "kind": "matches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the Bite id field",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the Present? field",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the CAP field",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the Packet class field",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "states DONE-WHEN",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the Anti row",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "carries the A-E trade-off section",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "uses the three-state verdict vocabulary",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/T0_M4_backpack_packet.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "does not mark itself approved - design does not self-approve",
+          "kind": "noneMatch",
+          "pass": true,
+          "detail": "clean",
+          "subjectPresent": true,
+          "verdict": "pass"
+        }
+      ],
+      "completion": 1,
+      "conformance": 1,
+      "completionPassed": 1,
+      "conformancePassed": 9,
+      "completionTotal": 1,
+      "conformanceTotal": 9,
+      "condition": "without",
+      "trial": 2
+    },
+    {
+      "taskId": "art-master-spec",
+      "agent": {
+        "status": 0,
+        "signal": null,
+        "timedOut": false,
+        "error": null,
+        "ok": true,
+        "outputTail": "lf of the palette chip — isn't recorded anywhere. `Docs/02_ART_BIBLE.md` §7 names the chip only as \\\"Spring grass / lupine — Quiet ground, loud flowers.\\\" That's a Lead/AD call, so §8 routes the bloom to the `M_FoliageCard` palette range and stops, rather than my picking a hex. If you want a specific violet-blue locked in, that's yours to say.\",\"time\":{\"start\":1790884179440,\"end\":1790884186242}}}\r",
+        "attempts": 1
+      },
+      "voided": false,
+      "checks": [
+        {
+          "class": "completion",
+          "label": "names the master material it uses",
+          "kind": "matches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "reuses an existing master instead of inventing a family",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "declares BaseColor",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "declares Roughness",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "declares Variation",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "declares NightMix",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "NightMix is expressed as a 0 to 1 range",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "states the origin convention",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "states the unit is meters",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "avoids the canon's rejected look language (quoting a rejection is not using it)",
+          "kind": "noneMatch",
+          "pass": false,
+          "detail": "Docs/qa/art-master-ground.md: - A **photoreal** grass or flower scan. Also **grimdark**, *",
+          "subjectPresent": true,
+          "verdict": "closed_fail"
+        }
+      ],
+      "completion": 1,
+      "conformance": 0.8888888888888888,
+      "completionPassed": 1,
+      "conformancePassed": 8,
+      "completionTotal": 1,
+      "conformanceTotal": 9,
+      "condition": "with",
+      "trial": 1
+    },
+    {
+      "taskId": "art-master-spec",
+      "agent": {
+        "status": 0,
+        "signal": null,
+        "timedOut": false,
+        "error": null,
+        "ok": true,
+        "outputTail": "an inventing a value.\\n\\nTwo notes for you: the file is untracked and I left it uncommitted (you didn't ask for a commit, and a prior draft was also left uncommitted). And the header marks it **DRAFT / does not self-approve** — per the ownership split, an art surface is TA-owned, so the spec needs a tech-artist pass before anything gets built.\",\"time\":{\"start\":1790884262541,\"end\":1790884267702}}}\r",
+        "attempts": 1
+      },
+      "voided": false,
+      "checks": [
+        {
+          "class": "completion",
+          "label": "names the master material it uses",
+          "kind": "matches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "reuses an existing master instead of inventing a family",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "declares BaseColor",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "declares Roughness",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "declares Variation",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "declares NightMix",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "NightMix is expressed as a 0 to 1 range",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "states the origin convention",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "states the unit is meters",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "avoids the canon's rejected look language (quoting a rejection is not using it)",
+          "kind": "noneMatch",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        }
+      ],
+      "completion": 1,
+      "conformance": 0,
+      "completionPassed": 1,
+      "conformancePassed": 0,
+      "completionTotal": 1,
+      "conformanceTotal": 9,
+      "condition": "with",
+      "trial": 2
+    },
+    {
+      "taskId": "art-master-spec",
+      "agent": {
+        "status": 0,
+        "signal": null,
+        "timedOut": false,
+        "error": null,
+        "ok": true,
+        "outputTail": "ask surfaced `scripts/task-lift/tasks-taste.json`, which contains this exact prompt plus a stored reference answer and its pass/fail patterns. I did **not** copy it — I derived the spec from `Docs/02`, `Lib/06`, and the art bible, then verified against the JSON. You may want to know that file exists if you didn't expect it to hold answer keys.\",\"time\":{\"start\":1790884419964,\"end\":1790884424523}}}\r",
+        "attempts": 1
+      },
+      "voided": false,
+      "checks": [
+        {
+          "class": "completion",
+          "label": "names the master material it uses",
+          "kind": "matches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "reuses an existing master instead of inventing a family",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "declares BaseColor",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "declares Roughness",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "declares Variation",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "declares NightMix",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "NightMix is expressed as a 0 to 1 range",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "states the origin convention",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "states the unit is meters",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "avoids the canon's rejected look language (quoting a rejection is not using it)",
+          "kind": "noneMatch",
+          "pass": true,
+          "detail": "clean",
+          "subjectPresent": true,
+          "verdict": "pass"
+        }
+      ],
+      "completion": 1,
+      "conformance": 1,
+      "completionPassed": 1,
+      "conformancePassed": 9,
+      "completionTotal": 1,
+      "conformanceTotal": 9,
+      "condition": "docs-only",
+      "trial": 1
+    },
+    {
+      "taskId": "art-master-spec",
+      "agent": {
+        "status": 0,
+        "signal": null,
+        "timedOut": false,
+        "error": null,
+        "ok": true,
+        "outputTail": "pine | Homestead ground | Quiet ground, loud flowers\\\"* — so grass sits slightly lean-lush but held quiet, with the violet-blue bloom as the single loud accent.\\n\\nOne note: the working tree has a large set of pre-existing deletions (`.cursor/`, `.agents/`, `swarm/`, `AGENTS.md`, etc.) that I did not touch. My only change is the new spec file.\",\"time\":{\"start\":1790884508601,\"end\":1790884512491}}}\r",
+        "attempts": 1
+      },
+      "voided": false,
+      "checks": [
+        {
+          "class": "completion",
+          "label": "names the master material it uses",
+          "kind": "matches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "reuses an existing master instead of inventing a family",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "declares BaseColor",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "declares Roughness",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "declares Variation",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "declares NightMix",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "NightMix is expressed as a 0 to 1 range",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "states the origin convention",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "states the unit is meters",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "avoids the canon's rejected look language (quoting a rejection is not using it)",
+          "kind": "noneMatch",
+          "pass": true,
+          "detail": "clean",
+          "subjectPresent": true,
+          "verdict": "pass"
+        }
+      ],
+      "completion": 1,
+      "conformance": 1,
+      "completionPassed": 1,
+      "conformancePassed": 9,
+      "completionTotal": 1,
+      "conformanceTotal": 9,
+      "condition": "without",
+      "trial": 1
+    },
+    {
+      "taskId": "art-master-spec",
+      "agent": {
+        "status": 0,
+        "signal": null,
+        "timedOut": false,
+        "error": null,
+        "ok": true,
+        "outputTail": "n, not a resource. My routing keeps it as an instance of an existing cluster material, so it creates neither a new master nor a seventh `RES_` type — but the decorative-vs-gatherable boundary is TA's to confirm, not mine to assume.\\n\\nQA check #10 in the spec is \\\"no invented canon\\\" — values either trace to a locked source or are marked open.\",\"time\":{\"start\":1790884635048,\"end\":1790884641602}}}\r",
+        "attempts": 1
+      },
+      "voided": false,
+      "checks": [
+        {
+          "class": "completion",
+          "label": "names the master material it uses",
+          "kind": "matches",
+          "pass": true,
+          "detail": "Docs/qa/art-master-ground.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "reuses an existing master instead of inventing a family",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "declares BaseColor",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "declares Roughness",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "declares Variation",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "declares NightMix",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "NightMix is expressed as a 0 to 1 range",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "states the origin convention",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "states the unit is meters",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "avoids the canon's rejected look language (quoting a rejection is not using it)",
+          "kind": "noneMatch",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        }
+      ],
+      "completion": 1,
+      "conformance": 0,
+      "completionPassed": 1,
+      "conformancePassed": 0,
+      "completionTotal": 1,
+      "conformanceTotal": 9,
+      "condition": "without",
+      "trial": 2
+    },
+    {
+      "taskId": "art-shot-brief",
+      "agent": {
+        "status": 0,
+        "signal": null,
+        "timedOut": false,
+        "error": null,
+        "ok": true,
+        "outputTail": "ster-ground.md` §8 uses for the unresolved lupine bloom.\\n\\nAll 19 citations resolve. The one exception is `docs/Automation/CAPTURE_REDUNDANCY.md`, which only exists under `Docs/` on this checkout — that's the documented case-collision between the two trees, and the path I used matches what the sibling file in that same directory already uses.\",\"time\":{\"start\":1790885004782,\"end\":1790885009339}}}\r",
+        "attempts": 1
+      },
+      "voided": false,
+      "checks": [
+        {
+          "class": "completion",
+          "label": "names the subject",
+          "kind": "matches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "states explicit pass criteria",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "states explicit fail criteria",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "names the locked palette chip the shrine uses",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "pairs the shrine light against the cabin key",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "reuses the existing masters rather than rebuilding for night",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        }
+      ],
+      "completion": 1,
+      "conformance": 1,
+      "completionPassed": 1,
+      "conformancePassed": 5,
+      "completionTotal": 1,
+      "conformanceTotal": 5,
+      "condition": "with",
+      "trial": 1
+    },
+    {
+      "taskId": "art-shot-brief",
+      "agent": {
+        "status": 0,
+        "signal": null,
+        "timedOut": false,
+        "error": null,
+        "ok": true,
+        "outputTail": "ed as the **Human Lead's** job, per `AGENTS.md` ownership.\\n\\nOne caveat worth flagging: the existing `shot5_portal_night.png` was already judged **PASS as a beat** in P6 — it was explicitly *not* held to key-art composition. So the shot is not unproven; what it lacks is a brief to be scored against. The file says that, and claims no approval.\",\"time\":{\"start\":1790885167714,\"end\":1790885173220}}}\r",
+        "attempts": 1
+      },
+      "voided": false,
+      "checks": [
+        {
+          "class": "completion",
+          "label": "names the subject",
+          "kind": "matches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "states explicit pass criteria",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "states explicit fail criteria",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "names the locked palette chip the shrine uses",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "pairs the shrine light against the cabin key",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "reuses the existing masters rather than rebuilding for night",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        }
+      ],
+      "completion": 1,
+      "conformance": 1,
+      "completionPassed": 1,
+      "conformancePassed": 5,
+      "completionTotal": 1,
+      "conformanceTotal": 5,
+      "condition": "docs-only",
+      "trial": 1
+    },
+    {
+      "taskId": "art-shot-brief",
+      "agent": {
+        "status": 0,
+        "signal": null,
+        "timedOut": false,
+        "error": null,
+        "ok": true,
+        "outputTail": " binding* has rows for Shots 1 and 2 only. **Shot 5 has no binding row.** That's LIT's call, not the brief's.\\n2. Beat acceptance is yours. The brief claims no approval and judges no frame — it explicitly marks itself SPEC and states that only QA can fail a gate and only you can accept a beat. That separation is intact, and I left it that way.\",\"time\":{\"start\":1790885358738,\"end\":1790885367804}}}\r",
+        "attempts": 2
+      },
+      "voided": false,
+      "checks": [
+        {
+          "class": "completion",
+          "label": "names the subject",
+          "kind": "matches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "states explicit pass criteria",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "states explicit fail criteria",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "names the locked palette chip the shrine uses",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "pairs the shrine light against the cabin key",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "reuses the existing masters rather than rebuilding for night",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        }
+      ],
+      "completion": 1,
+      "conformance": 0,
+      "completionPassed": 1,
+      "conformancePassed": 0,
+      "completionTotal": 1,
+      "conformanceTotal": 5,
+      "condition": "docs-only",
+      "trial": 2
+    },
+    {
+      "taskId": "art-shot-brief",
+      "agent": {
+        "status": 0,
+        "signal": null,
+        "timedOut": false,
+        "error": null,
+        "ok": true,
+        "outputTail": "mber`, and a banned-term check tripped by a *correct* answer that names neon while rejecting it. I used `Crystal cyan answering cabin gold` and the art bible's own \\\"handmade spirit cue, not a tech gate\\\" phrasing as the load-bearing terms, which may help if this is re-run — but that's a side effect of citing canon, not me targeting the check.\",\"time\":{\"start\":1790885478292,\"end\":1790885487191}}}\r",
+        "attempts": 1
+      },
+      "voided": false,
+      "checks": [
+        {
+          "class": "completion",
+          "label": "names the subject",
+          "kind": "matches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "states explicit pass criteria",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "states explicit fail criteria",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "names the locked palette chip the shrine uses",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "pairs the shrine light against the cabin key",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "reuses the existing masters rather than rebuilding for night",
+          "kind": "anyMatches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        }
+      ],
+      "completion": 1,
+      "conformance": 1,
+      "completionPassed": 1,
+      "conformancePassed": 5,
+      "completionTotal": 1,
+      "conformanceTotal": 5,
+      "condition": "without",
+      "trial": 1
+    },
+    {
+      "taskId": "art-shot-brief",
+      "agent": {
+        "status": 0,
+        "signal": null,
+        "timedOut": false,
+        "error": null,
+        "ok": true,
+        "outputTail": "that's recorded.\\n- **§7e** — `Docs/08d_CONTENT_CANON.md` cites `Maps/Preview_Portal_Night/` as a look-proof folder. That directory doesn't exist.\\n\\nJudgement calls left to humans, not guessed: the crystal cyan swatch, bloom spec, and camera aim. `M_SpiritUnlit`'s documented defaults are cited as defaults only, not promoted to a pinned value.\",\"time\":{\"start\":1790885760086,\"end\":1790885768818}}}\r",
+        "attempts": 2
+      },
+      "voided": false,
+      "checks": [
+        {
+          "class": "completion",
+          "label": "names the subject",
+          "kind": "matches",
+          "pass": true,
+          "detail": "Docs/qa/shot-shrine-night.md",
+          "subjectPresent": true,
+          "verdict": "pass"
+        },
+        {
+          "class": "conformance",
+          "label": "states explicit pass criteria",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "states explicit fail criteria",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "names the locked palette chip the shrine uses",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "pairs the shrine light against the cabin key",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        },
+        {
+          "class": "conformance",
+          "label": "reuses the existing masters rather than rebuilding for night",
+          "kind": "anyMatches",
+          "pass": false,
+          "detail": "no target file",
+          "subjectPresent": false,
+          "verdict": "void"
+        }
+      ],
+      "completion": 1,
+      "conformance": 0,
+      "completionPassed": 1,
+      "conformancePassed": 0,
+      "completionTotal": 1,
+      "conformanceTotal": 5,
+      "condition": "without",
+      "trial": 2
+    }
+  ]
+}
