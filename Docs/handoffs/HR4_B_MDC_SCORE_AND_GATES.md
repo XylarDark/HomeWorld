@@ -192,8 +192,18 @@ local** backend.
 | **3** live agent eval | **a key + *some* environment backend** | only if you choose the Docker backend |
 
 So the real blocker for Tier 2 is a single credential, not a hypervisor. Tier 3
-is reachable without Docker at all, via any of the cloud sandbox backends —
+is reachable without Docker at all, via any of the cloud sandbox backends -
 each of which needs its own account.
+
+Re-verified 2026-10-01, and the state is unchanged: `harbor.exe` is on disk but
+unlinked, `Harbor agents` and `OpenCode runtime credential` both **pass**, and
+the single failing row is `docker prerequisite`. Correct `PATH` and that row
+reports its actual reason (*Docker Compose v2 is required for Tier 3 Docker
+mode*). So Tier 3 is blocked on exactly **one** thing: an environment backend —
+Docker locally, or a cloud sandbox account. **Do not** take `health-check`'s own
+suggestion to reinstall `"skillevaluator[all]"`; it pulls from **git HEAD**, not
+the pinned 0.4.0, and would move the scorer version out from under
+`Saved/rules_lift.json`.
 
 `skillevaluator health-check` at the time of writing confirmed there was **no
 provider configured**: no `SKILL_EVAL_LLM_PROVIDER`, and no `NVIDIA_API_KEY` /
@@ -489,6 +499,16 @@ That is now **proven**, not inferred. Wrapping
 spent all 4096 on reasoning and returned `content=""`, so the judge raised
 `EmptyLLMResponseError`, fell back, and printed "not configured".
 
+The same model asked to `say ok` with `max_tokens=64` returns
+`finish_reason='length'`, `content_len=0`, `reasoning=64` — it spends the budget
+thinking and never reaches the answer. So the failure needs **no large input at
+all**: rule size only raises the odds, which is also why retries never repair it.
+`--judge-model` is not a way out today either — `/v1/models` lists 81 models, but
+this credential reaches exactly one function, and
+`nvidia/nemotron-4-340b-instruct`, `nvidia/llama-3.1-nemotron-70b-instruct` and
+`mistralai/mistral-large-2-instruct` all return **404** from
+`/v1/chat/completions` (bare, `nvidia/`- and `nvidia/nvidia/`-prefixed alike).
+
 A size sweep on throwaway copies (bodies truncated to 100 / 50 / 25 % of body
 lines, never touching `.cursor/rules/`) shows the effect is **probabilistic, not
 a byte cutoff**:
@@ -502,8 +522,10 @@ Halving the largest rule **still failed** (3,516 B) while `03-testing.mdc`
 scored at 3,692 B — so size alone does not decide it, and a bounded rule is not
 a reliable fix. **Not actioned, deliberately:** bounding `09-mcp-workflow.mdc`
 would edit the agent behaviour spec (a content decision), and the sweep shows it
-would not reliably work. The available remedies are all ask-first: pin a
-non-reasoning `--judge-model`, take an upstream fix, or accept 2/31 UNSCORED.
+would not reliably work. The available remedies are all ask-first: a credential
+that can reach a non-reasoning judge, an upstream fix to the shared
+reasoning/content budget, or accepting 2/31 UNSCORED. The options, with what
+each would cost, are set out in the decision brief at the end of this document.
 
 ### The two measurements disagree, and that is the finding
 
@@ -535,3 +557,32 @@ the judge regardless of billing. `health-check` now passes on `nv_build`.
 - NVIDIA SkillEvaluator — <https://github.com/NVIDIA/SkillEvaluator>
 - OpenCode, *Permissions* (wildcards, home expansion, external directories) — <https://opencode.ai/docs/permissions/>
 - [PIN_SYNC_POLICY.md](PIN_SYNC_POLICY.md) · [NAMING_CONTRACT.md](NAMING_CONTRACT.md)
+
+## Decision brief — the 2 UNSCORED rules (Lead call)
+
+The evidence is above; this is only the choice, with costs. **No option was
+taken — every one is ask-first.**
+
+**The finding in one line:** the judge (`nvidia/nemotron-3-super-120b-a12b`) is a
+reasoning model, SkillEvaluator gives reasoning and content a *shared* 4096-token
+budget, and the two largest rules make the model reason until that budget is
+gone — so it returns an empty reply, which the scorer then reports as the false
+`LLM not configured`.
+
+| Option | Needs | Buys | Cost / risk |
+|---|---|---|---|
+| **A. Accept 2/31 UNSCORED** | nothing | 29/31 judged today; gap documented and explained | Judged coverage stays **93.5 %**. Both rules keep their structural score (31/31 pass) but get no judged triage number. |
+| **B. Bound the two rules** | a content decision on the agent behaviour spec | *maybe* makes them scorable | **Does not reliably work** — halving `09-mcp-workflow.mdc` still failed. Rewrites canon to chase a symptom the evidence says it does not fix. |
+| **C. Different judge credential** | an NVIDIA Build key provisioned for a non-reasoning model | `--judge-model` becomes usable; the budget race disappears | **Re-baselines, does not complete.** The recorded mean 62.32 is judge-specific, so a new judge is a *new baseline*, not a repair. No such key is on hand. |
+| **D. Upstream fix / newer scorer** | a SkillEvaluator release separating reasoning from content budget | fixes it for everyone, keeps the judge | Out of our control, and upgrading the scorer breaks comparability with the saved corpus — a `[tier3]` reinstall already moved 0.3.0 → 0.4.0 once. |
+
+**Recommendation (the Lead decides, not this document):** **A now; C or D later.**
+A costs nothing and blocks nothing, since the cause is already recorded. B is the
+one to refuse explicitly. C and D are worth raising, but neither repairs the
+*current* corpus, because **the judge identity is part of the measurement**.
+
+**Do not** read the 2 UNSCORED rules as a quality signal in either direction —
+they are *unmeasured*. And do not promote the judged number into a gate: the
+pooled within-rule SD is **8.13**, so it is a triage instrument. The
+deterministic `rules:score --strict` remains the regression gate and passes
+31/31.
