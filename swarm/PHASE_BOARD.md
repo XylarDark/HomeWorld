@@ -4,7 +4,7 @@
 
 **Flight fallback armed:** YES — scripted glide along CRUMB_*/GLIDE_SPLINE + portal both ways (Lead: FALLBACK FLIGHT 2026-09-16)  
 **Active owners:** **Conductor** (parent DESKTOP) / **DESKTOP-21CT3H0**
-**ball:** Conductor — harness idle (pin tip `0a27306` / full `0a273065f7386e411873a548adb4c1786da0c976` equals DET master; CAP+EA DROPPED Lead 2026-09-27)
+**ball:** Conductor — harness idle (pin tip `a9d1cc4` / full `a9d1cc47c49389dba8aacf0bbede31684a4ce28a` equals UserHarness master; CAP+EA DROPPED Lead 2026-09-27)
 **Blocked by:** none — next harness bite only when Lead names one. CAP/EA product Do **DROPPED** (not HELD).
 **Sign-off doc:** [Docs/17_HS_AUDIT_SIGN_OFF.md](../Docs/17_HS_AUDIT_SIGN_OFF.md) — **SIGNED OFF** Lead **`SIGN OFF HS AUDIT`**, 2026-09-17 ET.
 
@@ -34,7 +34,7 @@ Lead lock: CAP product track and EA/env art are **off the backlog** (not shelved
 | **CAP-002** SceneCapture | **DROPPED** | EXIT accepted earlier; SC2D→RT→PNG envelope historical | 0 | Do: DROPPED |
 | **EA / EA SCOUT** | **DROPPED** | EA-LOOKLOCK APPROVED history: [EA_LOOKLOCK_INVENTORY.md](../Docs/handoffs/EA_LOOKLOCK_INVENTORY.md) · #212/#213 | — | Do: DROPPED |
 
-**Pin tip (live):** `0a27306` (superseded stale HOLD `8c4442a`).
+**Pin tip (live):** `a9d1cc4` (superseded stale HOLD `8c4442a`).
 
 **ProveOps:** not the default roster. Optional pattern only for a future Lead-named **non-CAP** prove.
 

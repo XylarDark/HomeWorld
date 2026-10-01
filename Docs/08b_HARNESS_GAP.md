@@ -16,7 +16,7 @@
 
 ## Executive summary
 
-HomeWorld adopts DevEnvTemplate as a **git submodule** (agent-context + operational-memory layers + doctor). The host **AGENTS.md**, **Safe-Build** stack, **MCP** setup, **session ops** (`SESSION_LOG`, `DAILY_STATE`), and **swarm ops** (`swarm/SWARM_OPS.md`) are **intentionally richer** than the template baseline — the template is a generic doctor; HomeWorld is a UE 5.7 game with a signed MVP swarm canon in capital **`Docs/`**.
+HomeWorld adopts DevEnvTemplate as a **git submodule** (agent-context + operational-memory layers + doctor). The host **AGENTS.md**, **Safe-Build** stack, **MCP** setup, **session ops** (`SESSION_LOG`, `DAILY_STATE`), and **swarm ops** (`swarm/SWARM_OPS.md`) are **intentionally richer** than the template baseline — the template is a generic doctor; HomeWorld is a UE **5.8** game *(corrected 2026-10-01 — authoring text read 5.7, pre-dating the UE 5.8-only lock in AGENTS.md)* with a signed MVP swarm canon in capital **`Docs/`**.
 
 This WAVE closes **documentation pointer gaps** (README, AGENTS, build policy, quarantine banners) and records remaining harness diffs for WAVE C/F. No gameplay C++ was changed.
 
@@ -110,9 +110,9 @@ npm run doctor
 | Field | Value |
 |-------|-------|
 | **PR** | [#10 — Docs/05: place_vs_mvp_markers + first-pass handoff](https://github.com/XylarDark/HomeWorld/pull/10) |
-| **State** | OPEN, GitHub **mergeable** |
-| **CI** | **validate** job **FAILED** — missing `docs/workflow/30_DAY_SCHEDULE.md` (path moved to `docs/TaskLists/` per DOCS_LAYOUT) |
-| **Action** | **Not merged** — dirty CI; does not block WAVE B. Fix CI on #10 branch or merge after validate green. |
+| **State** | **MERGED** 2026-09-17T01:56:26Z — *corrected 2026-10-01; read OPEN at authoring, PR has since merged* |
+| **CI** | **validate** job **FAILED at time of writing** — missing `docs/workflow/30_DAY_SCHEDULE.md` (path moved to `docs/TaskLists/` per DOCS_LAYOUT) · *corrected 2026-10-01 — historical status of PR #10 pre-merge; not asserted as current CI state, and no claim here on whether CI was ever made green* |
+| **Action** | **Merged** 2026-09-17 — the earlier "not merged / dirty CI" instruction is **superseded by the merge** and is kept only as history. *Corrected 2026-10-01; no claim here about whether CI was made green before or after the merge.* |
 
 ---
 
@@ -123,7 +123,7 @@ npm run doctor
 | **Board** | WAVE B deliverable ready — harness gap doc + pointer-align PR |
 | **Actions** | Review PR; comment **`APPROVE WAVE B`** on PR to unlock WAVE C (boot health) |
 | **Gate** | `APPROVE WAVE B` — do not start WAVE C/D until granted |
-| **Next (after gate)** | WAVE C — Editor opens UE 5.7.x without assert; Safe-Build green; close GoToBed/Meal boot-health class |
+| **Next (after gate)** | WAVE C — Editor opens UE **5.8.x** without assert; Safe-Build green; close GoToBed/Meal boot-health class · *corrected 2026-10-01 — authoring text read 5.7.x, pre-dating the UE 5.8-only lock (AGENTS.md); gate still `APPROVE WAVE B`* |
 
 ```
 STOP — Lead approval required
