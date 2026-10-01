@@ -18,7 +18,7 @@ const test = require('node:test');
 
 const script = path.join(__dirname, 'score-mdc-lift.js');
 const projectRoot = path.resolve(__dirname, '..');
-const { parseRubric, detectCredential, resolveTool } = require('./score-mdc-lift.js');
+const { parseRubric, detectCredential, resolveTool, failureReason, scoreWithRetries } = require('./score-mdc-lift.js');
 
 const CRED_VARS = ['SKILL_EVAL_LLM_PROVIDER', 'NVIDIA_API_KEY', 'OPENAI_API_KEY', 'ANTHROPIC_API_KEY'];
 
@@ -154,4 +154,72 @@ test('the refusal message documents the env vars but never a value', () => {
   assert.match(text, /NVIDIA_API_KEY/);
   assert.match(text, /never written/, 'must state that the key is not persisted');
   assert.ok(!/nvapi-[A-Za-z0-9]/.test(text), 'no key-shaped token may appear in CLI output');
+});
+
+test('CLI exits 2 on a negative --retries', () => {
+  const r = runCli(['--retries', '-1']);
+  assert.strictEqual(r.status, 2);
+  assert.match(r.stderr, /--retries must be a non-negative integer/);
+});
+
+test('failureReason reports status and signal, never the nonexistent proc.code', () => {
+  // spawnSync returns status/signal, not code. Reading proc.code printed
+  // "exit undefined" for every failure and hid the real cause.
+  const reason = failureReason({ status: 3, signal: null, stdout: '', stderr: '' });
+  assert.match(reason, /status 3/);
+  assert.doesNotMatch(reason, /undefined/);
+});
+
+test('failureReason surfaces the SkillEvaluator warning that explains a miss', () => {
+  const reason = failureReason({
+    status: 1,
+    stdout: 'noise\nWARNING  LLM call failed (Could not extract valid JSON from LLM response (2382 chars)) - using fallback response\nmore',
+    stderr: '',
+  });
+  assert.match(reason, /Could not extract valid JSON/);
+});
+
+test('failureReason handles a spawn error without throwing', () => {
+  const reason = failureReason({ error: new Error('ENOENT'), stdout: '', stderr: '' });
+  assert.match(reason, /spawn failed: ENOENT/);
+});
+
+test('scoreWithRetries returns the first success without retrying', () => {
+  let calls = 0;
+  const r = scoreWithRetries(() => {
+    calls += 1;
+    return { score: 71 };
+  }, 3);
+  assert.deepStrictEqual(
+    { score: r.score, attempts: r.attempts },
+    { score: 71, attempts: 1 }
+  );
+  assert.strictEqual(calls, 1);
+});
+
+test('scoreWithRetries retries a missed attempt and reports how many it took', () => {
+  // The judge intermittently answers in prose (no score line). That is
+  // transient, so the miss is retried rather than recorded as UNSCORED.
+  const responses = [
+    { score: null, reason: 'no score line' },
+    { score: null, reason: 'no score line' },
+    { score: 64.2 },
+  ];
+  let calls = 0;
+  const r = scoreWithRetries(() => responses[calls++], 5);
+  assert.strictEqual(r.score, 64.2);
+  assert.strictEqual(r.attempts, 3);
+  assert.strictEqual(calls, 3);
+});
+
+test('scoreWithRetries is UNSCORED only after every attempt misses', () => {
+  let calls = 0;
+  const r = scoreWithRetries(() => {
+    calls += 1;
+    return { score: null, reason: 'still prose' };
+  }, 2);
+  assert.strictEqual(r.score, null);
+  assert.strictEqual(r.attempts, 3, 'retries=2 means 3 attempts total');
+  assert.strictEqual(calls, 3);
+  assert.match(r.reason, /still prose/);
 });

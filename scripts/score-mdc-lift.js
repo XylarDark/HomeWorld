@@ -32,6 +32,9 @@ const { spawnSync } = require('child_process');
 const PREFIX = 'lift:score';
 const projectRoot = path.resolve(__dirname, '..');
 const REPEATS_DEFAULT = 1;
+// The judge intermittently returns prose instead of JSON, giving no score. That
+// is transient, so each attempt is retried; see scoreWithRetries().
+const RETRIES_DEFAULT = 2;
 const SCORE_RE = /LLM Rubric Score:\s*([0-9]+(?:\.[0-9]+)?)\s*\/\s*100/;
 const MODEL_RE = /nvidia\/([A-Za-z0-9._-]+)/;
 const PROVIDER_RE = /SKILL_EVAL_LLM_PROVIDER/i;
@@ -100,20 +103,60 @@ function parseRubric(output) {
   return { score: Number(m[1]) };
 }
 
+/**
+ * Build a short, diagnostic reason from a run that produced no score.
+ *
+ * `spawnSync` returns `status`/`signal`, NOT `code` (that field is for the async
+ * API). Reading `proc.code` printed "exit undefined" for every failure and threw
+ * away the one piece of data needed to tell a crash from a bad response.
+ */
+function failureReason(proc) {
+  const text = `${proc.stdout || ''}${proc.stderr || ''}`;
+  const warn = text
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .find((l) => /WARNING|LLM call failed|Error/i.test(l));
+  const bits = [];
+  if (proc.error) {
+    bits.push(`spawn failed: ${proc.error.message}`);
+  } else {
+    bits.push(`no score line (status ${proc.status}${proc.signal ? `, signal ${proc.signal}` : ''})`);
+  }
+  if (warn) bits.push(warn.slice(0, 140));
+  return bits.join(' - ');
+}
+
 /** Run rubric-eval once. Returns {score} or {score:null, reason}. */
-function runRubric(tool, skillDir) {
+function runRubricOnce(tool, skillDir) {
   const proc = spawnSync(tool, ['rubric-eval', skillDir, '-r', 'cli'], {
     encoding: 'utf8',
     maxBuffer: 32 * 1024 * 1024,
   });
   const parsed = parseRubric(proc);
   if (parsed) return parsed;
-  return {
-    score: null,
-    reason: proc.error
-      ? `spawn failed: ${proc.error.message}`
-      : `unparseable rubric output (exit ${proc.code})`,
-  };
+  return { score: null, reason: failureReason(proc) };
+}
+
+/**
+ * Retry wrapper for a single judge attempt.
+ *
+ * The judge intermittently answers in prose instead of JSON; SkillEvaluator then
+ * logs `Could not extract valid JSON ... using fallback response` and emits no
+ * numeric score. Observed on 6 of 31 rules in one clean full-corpus pass, and the
+ * same rules score normally on a later attempt — so this is transient, and a
+ * single miss must be retried rather than recorded as UNSCORED.
+ *
+ * A rule is UNSCORED only after every attempt misses; the reported `attempts`
+ * makes a flaky rule visible instead of silently average-looking.
+ */
+function scoreWithRetries(attempt, retries) {
+  let last = { score: null, reason: 'no attempt made' };
+  for (let i = 0; i <= retries; i += 1) {
+    const r = attempt(i);
+    if (r.score !== null) return { ...r, attempts: i + 1 };
+    last = r;
+  }
+  return { score: null, reason: last.reason, attempts: retries + 1 };
 }
 
 function parseArgs(argv) {
@@ -121,6 +164,7 @@ function parseArgs(argv) {
     json: null,
     strict: false,
     repeat: REPEATS_DEFAULT,
+    retries: RETRIES_DEFAULT,
     rulesDir: '.cursor/rules',
     tool: null,
     limit: null,
@@ -130,6 +174,7 @@ function parseArgs(argv) {
     const a = argv[i];
     if (a === '--json') opts.json = argv[++i];
     else if (a === '--repeat') opts.repeat = Number(argv[++i]);
+    else if (a === '--retries') opts.retries = Number(argv[++i]);
     else if (a === '--rules-dir') opts.rulesDir = argv[++i];
     else if (a === '--tool') opts.tool = argv[++i];
     else if (a === '--only') opts.only = argv[++i];
@@ -142,6 +187,10 @@ function parseArgs(argv) {
   }
   if (!Number.isInteger(opts.repeat) || opts.repeat < 1) {
     console.error(`${PREFIX} - --repeat must be a positive integer`);
+    return null;
+  }
+  if (!Number.isInteger(opts.retries) || opts.retries < 0) {
+    console.error(`${PREFIX} - --retries must be a non-negative integer`);
     return null;
   }
   return opts;
@@ -201,9 +250,12 @@ function main() {
       const rule = sibling.readRule(path.join(rulesAbs, file), rulesAbs);
       const dir = sibling.materializeSkill(rule, tmpRoot);
       const runs = [];
-      for (let r = 0; r < opts.repeat; r += 1) runs.push(runRubric(tool, dir));
+      for (let r = 0; r < opts.repeat; r += 1) {
+        runs.push(scoreWithRetries(() => runRubricOnce(tool, dir), opts.retries));
+      }
       const scores = runs.map((x) => x.score).filter((x) => x !== null);
       const mean = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : null;
+      const attempts = runs.reduce((a, x) => a + (x.attempts || 1), 0);
       const cls = sibling.classifyTombstone(rule);
       results.push({
         file: rule.file,
@@ -216,9 +268,15 @@ function main() {
         spread:
           scores.length > 1 ? Number((Math.max(...scores) - Math.min(...scores)).toFixed(2)) : null,
         runs: scores,
+        // A rule that needed a retry is flaky - surface it, do not hide it.
+        attempts,
+        retried: attempts > runs.length,
         unscoredReason: scores.length ? null : runs[0].reason,
       });
-      const shown = mean === null ? 'UNSCORED' : `${mean.toFixed(1)}${opts.repeat > 1 ? ` (spread ${(Math.max(...scores) - Math.min(...scores)).toFixed(1)})` : ''}`;
+      const shown =
+        mean === null
+          ? `UNSCORED (${runs[0].reason})`
+          : `${mean.toFixed(1)}${opts.repeat > 1 ? ` (spread ${(Math.max(...scores) - Math.min(...scores)).toFixed(1)})` : ''}${attempts > runs.length ? ` [${attempts} attempts]` : ''}`;
       process.stderr.write(`${PREFIX} - ${file} ${shown}\n`);
     }
   } finally {
@@ -237,6 +295,12 @@ function main() {
   console.log(`  judge      : ${cred.provider} / ${judgeModel}  (scorer v${toolVersion})`);
   console.log(`  credential : ${cred.credentialVar}, ${cred.credentialLength} chars (value never recorded)`);
   console.log(`  rules      : ${results.length} (${scored.length} judged, ${unscored.length} UNSCORED)`);
+  const retriedCount = scored.filter((r) => r.retried).length;
+  if (retriedCount > 0 || unscored.length > 0) {
+    console.log(
+      `  judge flakiness : ${retriedCount} rule(s) needed a retry; the judge sometimes returns prose instead of JSON (--retries ${opts.retries})`
+    );
+  }
   if (scores.length) {
     console.log(`  mean       : ${mean.toFixed(1)}  (range ${Math.min(...scores).toFixed(1)}-${Math.max(...scores).toFixed(1)})`);
     if (spreads.length) {
@@ -268,6 +332,12 @@ function main() {
         ? Number((spreads.reduce((a, b) => a + b, 0) / spreads.length).toFixed(2))
         : null,
       maxSpread: spreads.length ? Number(Math.max(...spreads).toFixed(2)) : null,
+      // The judge sometimes answers in prose and emits no score; that attempt is
+      // retried. retriedCount > 0 means the provider is flaky right now, which
+      // a reader needs to know before trusting an UNSCORED or a tight delta.
+      retries: opts.retries,
+      retriedCount: scored.filter((r) => r.retried).length,
+      attemptsTotal: results.reduce((a, r) => a + (r.attempts || 1), 0),
     },
     comparability: {
       againstQualityCheck: false,
@@ -314,4 +384,6 @@ module.exports = {
   parseRubric,
   detectCredential,
   resolveTool,
+  failureReason,
+  scoreWithRetries,
 };
