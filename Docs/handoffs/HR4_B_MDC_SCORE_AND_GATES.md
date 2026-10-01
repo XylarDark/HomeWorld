@@ -558,10 +558,11 @@ the judge regardless of billing. `health-check` now passes on `nv_build`.
 - OpenCode, *Permissions* (wildcards, home expansion, external directories) — <https://opencode.ai/docs/permissions/>
 - [PIN_SYNC_POLICY.md](PIN_SYNC_POLICY.md) · [NAMING_CONTRACT.md](NAMING_CONTRACT.md)
 
-## Decision brief — the 2 UNSCORED rules (Lead call)
+## Decision record — the 2 UNSCORED rules (Lead call)
 
-The evidence is above; this is only the choice, with costs. **No option was
-taken — every one is ask-first.**
+Four options were put to the Lead with their costs. **A was adopted and B was
+refused on 2026-10-01 — see the decision record at the end of this section.**
+The table below is the evidence that choice was made on; it is kept intact.
 
 **The finding in one line:** the judge (`nvidia/nemotron-3-super-120b-a12b`) is a
 reasoning model, SkillEvaluator gives reasoning and content a *shared* 4096-token
@@ -576,10 +577,26 @@ gone — so it returns an empty reply, which the scorer then reports as the fals
 | **C. Different judge credential** | an NVIDIA Build key provisioned for a non-reasoning model | `--judge-model` becomes usable; the budget race disappears | **Re-baselines, does not complete.** The recorded mean 62.32 is judge-specific, so a new judge is a *new baseline*, not a repair. No such key is on hand. |
 | **D. Upstream fix / newer scorer** | a SkillEvaluator release separating reasoning from content budget | fixes it for everyone, keeps the judge | Out of our control, and upgrading the scorer breaks comparability with the saved corpus — a `[tier3]` reinstall already moved 0.3.0 → 0.4.0 once. |
 
-**Recommendation (the Lead decides, not this document):** **A now; C or D later.**
-A costs nothing and blocks nothing, since the cause is already recorded. B is the
-one to refuse explicitly. C and D are worth raising, but neither repairs the
-*current* corpus, because **the judge identity is part of the measurement**.
+### DECISION — taken 2026-10-01 (Lead direction)
+
+**A is adopted. B is refused. C and D are deferred, not closed.**
+
+- **A — accept 2/31 UNSCORED. ADOPTED.** The two rules keep their structural
+  score (31/31 pass) and are simply unmeasured by the judge. Judged coverage is
+  **93.5 %**, the cause is proven and recorded, and nothing downstream is
+  blocked. This is the resting position; no further work is owed on it.
+- **B — bound the two rules. REFUSED**, permanently for this corpus. It edits
+  the agent behaviour spec to chase a symptom the evidence says it does not
+  fix (halving the largest rule still failed). Recorded as a refusal so the
+  idea does not return as a proposal.
+- **C — different judge credential. DEFERRED.** Only worth taking alongside a
+  deliberate **re-baseline**, because the judge identity is part of the
+  measurement: it does not complete the corpus, it starts a new one.
+- **D — upstream fix / newer scorer. DEFERRED**, out of our control.
+
+Consequence of A: **the corpus figure is 29 of 31 and that is the final
+denominator for this track.** Later runs should not "fix" the two by splitting
+or trimming the rules.
 
 **Do not** read the 2 UNSCORED rules as a quality signal in either direction —
 they are *unmeasured*. And do not promote the judged number into a gate: the
