@@ -22,7 +22,9 @@
 | **WAVE C** | **THIS DELIVERABLE** — editor boot + Safe-Build green path; known crash list **CLOSED** |
 | **WAVE D** | NOT STARTED — blocked until Lead `APPROVE WAVE C` |
 
-WAVE C scope: confirm UE **5.7.x** Editor opens without the known assert class; document Safe-Build as the agent build entry; close the boot-blocking crash table. No gameplay features, no Content canon decisions (that is WAVE D).
+WAVE C scope: confirm UE **5.8** Editor opens without the known assert class; document Safe-Build as the agent build entry; close the boot-blocking crash table. No gameplay features, no Content canon decisions (that is WAVE D).
+
+> **Engine note (corrected 2026-10-01).** This WAVE was authored and evidenced on UE **5.7.x / 5.7.4**. The project is now locked to **UE 5.8** (`HomeWorld.uproject` → `EngineAssociation: 5.8`), and the boot-health substance was re-proved on 5.8 by [Docs/22_UE58_UPGRADE.md](22_UE58_UPGRADE.md) **U58-C "First open + Safe-Build" — APPROVED** (2026-09-19, engine `5.8.2-56702186`, Safe-Build exit 0). Engine labels below are updated to 5.8; the historical 5.7.4 observations are retained where they describe what was observed at authoring.
 
 ---
 
@@ -30,7 +32,7 @@ WAVE C scope: confirm UE **5.7.x** Editor opens without the known assert class; 
 
 | Item | Value |
 |------|-------|
-| **Engine** | Unreal Engine **5.7.x** (validated on **5.7.4** — DESKTOP-21CT3H0) |
+| **Engine** | Unreal Engine **5.8** (validated on **5.8.2-56702186** — DESKTOP-21CT3H0). WAVE C was authored/evidenced on **5.7.4**; 5.8 re-validated by [Docs/22_UE58_UPGRADE.md](22_UE58_UPGRADE.md) **U58-C** (APPROVED 2026-09-19) |
 | **Project** | `HomeWorld.uproject` from repo root |
 | **Agent build entry** | **`.\Tools\Safe-Build.ps1`** (closes Editor → invokes `Build-HomeWorld.bat` → retries once on Live Coding / exit code 6) |
 | **Human build entry** | `Build-HomeWorld.bat` when Editor already closed |
@@ -54,7 +56,7 @@ All boot-blocking items below are **CLOSED** on main after the cited PRs merged.
 
 | ID | Symptom | Root cause | Fix PR | Status |
 |----|---------|------------|--------|--------|
-| **BOOT-001** | Fatal assert on Editor load: `NewObject` with empty name during CDO construction (`SetCollisionProfileName` in `UBoxComponent` subclass ctor) | `UHomeWorldGoToBedTriggerComponent` / `UHomeWorldMealTriggerComponent` called `SetCollisionProfileName` (and related box setup) in **constructors**; UE 5.7.4 runs `NewObject(NAME_None)` on CDO path | [#5](https://github.com/XylarDark/HomeWorld/pull/5) — defer profile init; FObjectInitializer + `PostInitProperties` | **CLOSED** |
+| **BOOT-001** | Fatal assert on Editor load: `NewObject` with empty name during CDO construction (`SetCollisionProfileName` in `UBoxComponent` subclass ctor) | `UHomeWorldGoToBedTriggerComponent` / `UHomeWorldMealTriggerComponent` called `SetCollisionProfileName` (and related box setup) in **constructors**; the CDO path ran `NewObject(NAME_None)` (observed on 5.7.4 at authoring) | [#5](https://github.com/XylarDark/HomeWorld/pull/5) — defer profile init; FObjectInitializer + `PostInitProperties` | **CLOSED** |
 | **BOOT-002** | `HomeWorldEditor` compile failure: `IsBoundToObject` not a member of dynamic delegate | `FOnNightStarted` in `HomeWorldGameMode` used deprecated/nonexistent `IsBoundToObject` | [#7](https://github.com/XylarDark/HomeWorld/pull/7) — `RemoveDynamic` / `AddDynamic` | **CLOSED** |
 | **BOOT-003** | Compile failure: `SetGenerateOverlapEvents` misuse in trigger ctors (same boot-health class as BOOT-001) | Overlap flag set in ctor before CDO-safe init path | [#7](https://github.com/XylarDark/HomeWorld/pull/7) — moved to safe init alongside profile deferral | **CLOSED** |
 | **BOOT-004** | Editor still assert on load after partial ctor fix — box extent / profile / overlap in ctor | Residual ctor-side `SetBoxExtent`, `SetCollisionProfileName`, `SetGenerateOverlapEvents` on trigger components | [#8](https://github.com/XylarDark/HomeWorld/pull/8) — all box setup in `PostInitProperties` | **CLOSED** |
@@ -73,7 +75,8 @@ No open boot-blocking asserts remain in the known list.
 | Check | Result | Notes |
 |-------|--------|-------|
 | **Safe-Build green** | PASS | C++ module compiles after PRs #5–#9 on DESKTOP-21CT3H0 |
-| **Editor opens** | PASS | UE 5.7.x loads project without BOOT-001 assert class |
+| **Editor opens** | PASS | UE 5.8 loads project without BOOT-001 assert class — see [Docs/22_UE58_UPGRADE.md](22_UE58_UPGRADE.md) U58-C (5.8.2-56702186) |
+| **UE 5.8 re-validation** | PASS | BOOT-001…005 closure re-evidenced on the locked engine: [Docs/22_UE58_UPGRADE.md](22_UE58_UPGRADE.md) **U58-C "First open + Safe-Build" — APPROVED** 2026-09-19 (Safe-Build exit 0, MCP + RS PIE smoke). Closes the gap where §3's CLOSED claims rested only on a 5.7.4 anchor. |
 | **Docs/05 first pass** | PASS | FBX import, markers, MPC stub — see below |
 
 ### Docs/05 first-pass handoff (DESKTOP-21CT3H0)

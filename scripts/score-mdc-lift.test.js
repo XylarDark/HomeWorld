@@ -21,7 +21,14 @@ const projectRoot = path.resolve(__dirname, '..');
 const {
   parseRubric,
   parseCriteria,
+  parseRubricJson,
+  readRubricJson,
+  weightedOverall,
+  retriedSplit,
+  liveSplit,
   CRITERIA,
+  CRITERION_IDS,
+  IMPORTANCE_WEIGHTS,
   CACHE_MAX_SAMPLES,
   detectCredential,
   resolveTool,
@@ -541,4 +548,279 @@ test('pooledWithinSd pools by degrees of freedom across rules', () => {
     [10, 12, 14],
   ]);
   assert.ok(Math.abs(sd - Math.sqrt(10 / 3)) < 1e-9, `got ${sd}`);
+});
+// ---------------------------------------------------------------------------
+// D1: criteria come from `-r json` checks[].id, not the CLI text table.
+//
+// The fixture below mirrors real skillevaluator 0.4.0 output captured on
+// 2026-10-01. Note `criterion` is the FULL rubric question text, so an
+// implementation that keyed on it would fail here — `id` is the only safe key.
+// ---------------------------------------------------------------------------
+
+const REAL_REPORT = {
+  rubric_eval: {
+    execution_status: 'succeeded',
+    overall_score: 70.5,
+    overall_pass: false,
+    judge_score: 72,
+    skill_name: 'shell-script-standards',
+    aggregation: {
+      method: 'importance_weighted_mean',
+      importance_weights: { high: 3, medium: 2, low: 1 },
+      min_score: 70,
+    },
+    checks: [
+      {
+        id: 'description_clarity',
+        criterion: 'Description is clear, specific, and explains WHEN to use the skill',
+        importance: 'high',
+        pass: true,
+        score: 8,
+      },
+      {
+        id: 'instruction_clarity',
+        criterion: 'Instructions are easy to follow with clear action steps',
+        importance: 'high',
+        pass: true,
+        score: 8,
+      },
+      {
+        id: 'example_quality',
+        criterion:
+          'Examples are helpful, relevant, show proper usage, AND cover sufficient query variations for robust skill detection',
+        importance: 'high',
+        pass: false,
+        score: 5,
+      },
+      {
+        id: 'documentation_completeness',
+        criterion: 'All necessary information is present (purpose, scripts, parameters)',
+        importance: 'medium',
+        pass: true,
+        score: 7,
+      },
+      {
+        id: 'scope_definition',
+        criterion:
+          'Skill scope is well-defined (clear boundaries, not too broad/narrow)',
+        importance: 'medium',
+        pass: true,
+        score: 8,
+      },
+      {
+        id: 'professional_tone',
+        criterion: 'Documentation uses professional, consistent tone and formatting',
+        importance: 'low',
+        pass: true,
+        score: 9,
+      },
+      {
+        id: 'trigger_simulation',
+        criterion:
+          'Mentally test the skill description against 5 plausible user queries that SHOULD trigger it and 3 that should NOT. Does the description enable correct routing without false positives or false negatives?',
+        importance: 'high',
+        pass: true,
+        score: 7,
+      },
+      {
+        id: 'workflow_completeness',
+        criterion:
+          'Do the instructions cover a complete end-to-end workflow? Identify any steps where the user or agent would need to figure out what to do next without guidance.',
+        importance: 'high',
+        pass: false,
+        score: 6,
+      },
+      {
+        id: 'error_handling_quality',
+        criterion:
+          'Are the documented error scenarios realistic and actionable? Would the solutions actually help resolve the issues, or are they generic boilerplate?',
+        importance: 'medium',
+        pass: true,
+        score: 7,
+      },
+    ],
+  },
+};
+
+test('parseRubricJson maps all nine checks by id, giving criteria a fixed denominator', () => {
+  // The whole point of D1: the CLI text silently lost rows to line-wrapping, so
+  // 7 of 29 cold-corpus rules carried partial criteria. checks[] is always nine.
+  const r = parseRubricJson(REAL_REPORT);
+  assert.ok(r, 'expected a parse');
+  assert.strictEqual(Object.keys(r.criteria).length, CRITERIA.length);
+  for (const name of CRITERIA) {
+    assert.ok(Number.isFinite(r.criteria[name]), `missing criterion ${name}`);
+  }
+  assert.strictEqual(r.checkCount, 9);
+  assert.strictEqual(r.criteria['Example Quality'], 5);
+  assert.strictEqual(r.criteria['Workflow Completeness'], 6);
+});
+
+test('parseRubricJson keys on id, never on the full criterion question text', () => {
+  const r = parseRubricJson(REAL_REPORT);
+  // If the parser had keyed on `criterion`, these keys would be sentences.
+  for (const name of Object.keys(r.criteria)) assert.ok(CRITERIA.includes(name));
+  assert.ok(!Object.keys(r.criteria).some((k) => k.includes('?')));
+});
+
+test('parseRubricJson reads importance alongside each criterion', () => {
+  const r = parseRubricJson(REAL_REPORT);
+  assert.strictEqual(r.importance['Example Quality'], 'high');
+  assert.strictEqual(r.importance['Professional Tone'], 'low');
+  assert.strictEqual(r.importance['Scope Definition'], 'medium');
+});
+
+test('weightedOverall reproduces the scorer composite, verified on two real runs', () => {
+  // Captured live from skillevaluator 0.4.0 on 2026-10-01.
+  const checks = REAL_REPORT.rubric_eval.checks;
+  // 10 * (24+24+15+14+16+9+21+18+14) / 22 = 10 * 155/22 = 70.45 -> 70.5
+  assert.strictEqual(weightedOverall(checks), 70.5);
+  assert.strictEqual(weightedOverall(checks), REAL_REPORT.rubric_eval.overall_score);
+  // A second real run of the same rule: workflow_completeness 6 -> 8.
+  const lifted = checks.map((c) => (c.id === 'workflow_completeness' ? { ...c, score: 8 } : c));
+  // 10 * 161/22 = 73.18 -> 73.2
+  assert.strictEqual(weightedOverall(lifted), 73.2);
+});
+
+test('parseRubricJson sets rollupVerified only when we reproduce the reported score', () => {
+  assert.strictEqual(parseRubricJson(REAL_REPORT).rollupVerified, true);
+  const tampered = {
+    rubric_eval: { ...REAL_REPORT.rubric_eval, overall_score: 91 },
+  };
+  assert.strictEqual(
+    parseRubricJson(tampered).rollupVerified,
+    false,
+    'a mismatch means the JSON shape changed upstream and must not pass silently'
+  );
+});
+
+test('parseRubricJson returns null rather than a partial guess', () => {
+  for (const bad of [
+    null,
+    undefined,
+    42,
+    [],
+    '',
+    '{not json',
+    {},
+    { rubric_eval: null },
+    { rubric_eval: {} },
+    { rubric_eval: { checks: [] } },
+    { rubric_eval: { checks: [{ id: 'not_a_real_criterion', score: 5 }] } },
+    { rubric_eval: { checks: [{ id: 'example_quality' }] } },
+  ]) {
+    assert.strictEqual(parseRubricJson(bad), null, `expected null for ${JSON.stringify(bad)}`);
+  }
+});
+
+test('parseRubricJson never reports an unscored run as a zero', () => {
+  // The fail-open trap: 0 must mean "measured, awful", never "unmeasured".
+  const r = parseRubricJson({ rubric_eval: { checks: null, overall_score: null } });
+  assert.strictEqual(r, null);
+});
+
+test('readRubricJson reads the one report file and tolerates its absence', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'liftjson-'));
+  try {
+    assert.strictEqual(readRubricJson(dir), null, 'no report yet');
+    fs.writeFileSync(path.join(dir, 'skillevaluator-rubric.json'), JSON.stringify(REAL_REPORT));
+    const got = parseRubricJson(readRubricJson(dir));
+    assert.strictEqual(Object.keys(got.criteria).length, 9);
+    assert.strictEqual(readRubricJson(path.join(dir, 'nope')), null);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('CRITERION_IDS covers exactly CRITERIA, so a renamed upstream id fails loudly', () => {
+  const mapped = Object.values(CRITERION_IDS).sort();
+  assert.deepStrictEqual(mapped, [...CRITERIA].sort());
+  assert.strictEqual(Object.keys(CRITERION_IDS).length, CRITERIA.length);
+});
+
+test('IMPORTANCE_WEIGHTS covers exactly the importances the scorer emits', () => {
+  assert.deepStrictEqual(Object.keys(IMPORTANCE_WEIGHTS).sort(), ['high', 'low', 'medium']);
+  const seen = new Set(REAL_REPORT.rubric_eval.checks.map((c) => c.importance));
+  for (const imp of seen) assert.ok(imp in IMPORTANCE_WEIGHTS, `unweighted importance ${imp}`);
+});
+
+test('weightedOverall returns null when there is nothing to weight', () => {
+  assert.strictEqual(weightedOverall([]), null);
+  assert.strictEqual(weightedOverall(null), null);
+  assert.strictEqual(weightedOverall([{ id: 'x', score: 5 }]), null, 'unknown importance is skipped');
+  assert.strictEqual(weightedOverall([{ id: 'x', importance: 'high' }]), null, 'no score is skipped');
+});
+
+// ---------------------------------------------------------------------------
+// D2: retries are counted over every rule, including those that ended UNSCORED.
+// ---------------------------------------------------------------------------
+
+test('retriedSplit counts retries that ended UNSCORED instead of hiding them', () => {
+  // This is the exact defect: scored-only counting reported 7 for a run in which
+  // 9 rules retried, because the two that never scored were filtered out.
+  const results = [
+    { file: 'a.mdc', score: 70, retried: true },
+    { file: 'b.mdc', score: 71, retried: true },
+    { file: 'c.mdc', score: null, retried: true, unscoredReason: 'no score line' },
+    { file: 'd.mdc', score: null, retried: true, unscoredReason: 'no score line' },
+    { file: 'e.mdc', score: 80, retried: false },
+  ];
+  assert.deepStrictEqual(retriedSplit(results), {
+    retriedCount: 4,
+    retriedScored: 2,
+    retriedUnscored: 2,
+  });
+});
+
+test('retriedSplit tolerates junk and empty input', () => {
+  assert.deepStrictEqual(retriedSplit([]), {
+    retriedCount: 0,
+    retriedScored: 0,
+    retriedUnscored: 0,
+  });
+  assert.deepStrictEqual(retriedSplit(null), {
+    retriedCount: 0,
+    retriedScored: 0,
+    retriedUnscored: 0,
+  });
+  assert.strictEqual(retriedSplit([null, undefined, { retried: 'yes' }]).retriedCount, 1);
+});
+
+// ---------------------------------------------------------------------------
+// P3: the live/tombstone split, pinned to the recorded cold corpus.
+// ---------------------------------------------------------------------------
+
+test('liveSplit separates live rules from tombstones', () => {
+  const results = [
+    { score: 80, tombstone: false },
+    { score: 60, tombstone: false },
+    { score: 40, tombstone: true },
+    { score: null, tombstone: false },
+  ];
+  const s = liveSplit(results);
+  assert.strictEqual(s.liveCount, 2);
+  assert.strictEqual(s.tombstoneCount, 1);
+  assert.strictEqual(s.meanLive, 70);
+  assert.strictEqual(s.meanTombstone, 40);
+});
+
+test('liveSplit returns null means rather than zero when a side is empty', () => {
+  const only = liveSplit([{ score: 55, tombstone: false }]);
+  assert.strictEqual(only.meanLive, 55);
+  assert.strictEqual(only.meanTombstone, null, 'no tombstones is unmeasured, not 0');
+  const none = liveSplit([]);
+  assert.strictEqual(none.meanLive, null);
+  assert.strictEqual(none.liveCount, 0);
+});
+
+test('liveSplit reproduces the recorded cold corpus split', () => {
+  // Guards the headline claim in Docs/handoffs/SKILL_LIFT_CONSOLIDATION.md
+  // against drift in how tombstones are classified.
+  const reportPath = path.join(projectRoot, 'Saved', 'rules_lift.json');
+  if (!fs.existsSync(reportPath)) return; // artifact is gitignored; skip when absent
+  const s = liveSplit(JSON.parse(fs.readFileSync(reportPath, 'utf8')).results);
+  assert.strictEqual(s.liveCount, 24);
+  assert.strictEqual(s.tombstoneCount, 5);
+  assert.ok(Math.abs(s.meanLive - 66.25) < 0.01, `meanLive was ${s.meanLive}`);
+  assert.ok(Math.abs(s.meanTombstone - 43.45) < 0.01, `meanTombstone was ${s.meanTombstone}`);
 });

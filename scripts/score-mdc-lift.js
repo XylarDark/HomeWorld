@@ -194,6 +194,155 @@ function parseCriteria(output) {
 }
 
 /**
+ * rubric-eval `-r json` output: the RELIABLE criteria source.
+ *
+ * The CLI text is now a fallback rather than the primary. It prints a box-drawn
+ * table whose Criterion column WRAPS across lines when the terminal is narrow,
+ * and the numbered "Failure Details" list is matched by row index — so a wrapped
+ * row silently loses its criterion. Measured consequence in the cold corpus:
+ * 7 of 29 rules carried partial criteria, 5 of them missing 7 of 9, even though
+ * the scorer had emitted all nine. `checks[]` is always exactly nine and is
+ * keyed by a stable `id`, so it has neither failure mode.
+ *
+ * Shape verified against skillevaluator 0.4.0 on 2026-10-01:
+ *   rubric_eval.checks[].id           description_clarity | instruction_clarity | ...
+ *   rubric_eval.checks[].criterion    the FULL rubric question text, not a short
+ *                                    name — so `id` is the only safe key
+ *   rubric_eval.checks[].score        0-10
+ *   rubric_eval.checks[].importance   high | medium | low
+ *   rubric_eval.overall_score         0-100, importance-weighted (weightedOverall)
+ *   rubric_eval.judge_score           0-100, the judge's own unweighted figure
+ */
+const CRITERION_IDS = {
+  description_clarity: 'Description Clarity',
+  instruction_clarity: 'Instruction Clarity',
+  example_quality: 'Example Quality',
+  documentation_completeness: 'Documentation Completeness',
+  scope_definition: 'Scope Definition',
+  professional_tone: 'Professional Tone',
+  trigger_simulation: 'Trigger Simulation',
+  workflow_completeness: 'Workflow Completeness',
+  error_handling_quality: 'Error Handling Quality',
+};
+
+/** `rubric_eval.aggregation` names the method importance_weighted_mean. */
+const IMPORTANCE_WEIGHTS = { high: 3, medium: 2, low: 1 };
+
+/**
+ * Reproduce the scorer's own composite: 10 * sum(w*s) / sum(w).
+ *
+ * Verified twice against real scorer output — 75.0 and 70.5, each matching
+ * `overall_score` exactly — so it is used as a CHECK on the parse rather than a
+ * formula we trust blindly. If this disagrees with the reported score, the JSON
+ * shape changed upstream and the run is flagged rather than silently accepted.
+ */
+function weightedOverall(checks) {
+  let num = 0;
+  let den = 0;
+  for (const c of checks || []) {
+    const w = IMPORTANCE_WEIGHTS[c && c.importance];
+    if (!Number.isFinite(w) || !Number.isFinite(c.score)) continue;
+    num += w * c.score;
+    den += w;
+  }
+  return den === 0 ? null : Number(((10 * num) / den).toFixed(1));
+}
+
+/** Read the one report file rubric-eval writes. Null if absent/unreadable. */
+function readRubricJson(dir) {
+  try {
+    const file = path.join(dir, 'skillevaluator-rubric.json');
+    return fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Parse a `-r json` report. Returns null when unusable so the caller falls back
+ * to the CLI text — never a partial guess, and never throws.
+ */
+function parseRubricJson(json) {
+  let doc = json;
+  if (typeof json === 'string') {
+    try {
+      doc = JSON.parse(json);
+    } catch {
+      return null;
+    }
+  }
+  if (!doc || typeof doc !== 'object') return null;
+  const re = doc.rubric_eval;
+  if (!re || typeof re !== 'object') return null;
+  const checks = Array.isArray(re.checks) ? re.checks : null;
+  if (!checks || checks.length === 0) return null;
+
+  const criteria = {};
+  const importance = {};
+  for (const c of checks) {
+    const name = CRITERION_IDS[c && c.id];
+    if (!name || !Number.isFinite(c.score)) continue;
+    criteria[name] = c.score;
+    importance[name] = c.importance || null;
+  }
+  if (Object.keys(criteria).length === 0) return null;
+
+  const overall = Number.isFinite(re.overall_score) ? re.overall_score : null;
+  const derived = weightedOverall(checks);
+  return {
+    criteria,
+    importance,
+    overallScore: overall,
+    judgeScore: Number.isFinite(re.judge_score) ? re.judge_score : null,
+    derivedOverall: derived,
+    // True = we reproduced the scorer's own composite from the checks we read.
+    rollupVerified: overall !== null && derived !== null && Math.abs(derived - overall) <= 0.1,
+    checkCount: checks.length,
+  };
+}
+
+/**
+ * Split retries by outcome (D2).
+ *
+ * Counting only the rules that ended up scored hid the retries that ended
+ * UNSCORED — the most informative ones, since those are the judge failing
+ * repeatedly. The cold report claimed 7 against the 9 rules that actually
+ * retried for exactly this reason. Every number a reader needs to judge the
+ * judge comes from here, so none of it can be quietly filtered away.
+ */
+function retriedSplit(results) {
+  const all = (results || []).filter((r) => r && r.retried);
+  const scored = all.filter((r) => r.score !== null);
+  return {
+    retriedCount: all.length,
+    retriedScored: scored.length,
+    retriedUnscored: all.length - scored.length,
+  };
+}
+
+/**
+ * Live vs tombstone split (P3).
+ *
+ * A rule that declares itself QUARANTINE / RETIRED / HISTORICAL is not meant to
+ * be live guidance, so `meanLive` describes what a reader is actually served.
+ * This is a POLICY split and NOT a quality ranking: in the cold corpus the
+ * highest-scoring tombstone (ue57-editor-ui, 76.35) outranked 23 of the 24 live
+ * rules, so a judge score cannot decide what to keep or retire.
+ */
+function liveSplit(results) {
+  const scored = (results || []).filter((r) => r && r.score !== null);
+  const live = scored.filter((r) => !r.tombstone);
+  const tomb = scored.filter((r) => r.tombstone);
+  const avg = (xs) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null);
+  return {
+    meanLive: avg(live.map((r) => r.score)),
+    liveCount: live.length,
+    meanTombstone: avg(tomb.map((r) => r.score)),
+    tombstoneCount: tomb.length,
+  };
+}
+
+/**
  * Build a short, diagnostic reason from a run that produced no score.
  *
  * `spawnSync` returns `status`/`signal`, NOT `code` (that field is for the async
@@ -224,14 +373,52 @@ function failureReason(proc) {
  * environment is the only way to choose a judge — see the header note.
  */
 function runRubricOnce(tool, skillDir, env) {
-  const proc = spawnSync(tool, ['rubric-eval', skillDir, '-r', 'cli'], {
-    encoding: 'utf8',
-    maxBuffer: 32 * 1024 * 1024,
-    env: env || process.env,
-  });
-  const parsed = parseRubric(proc);
-  if (parsed) return { ...parsed, criteria: parseCriteria(proc) };
-  return { score: null, reason: failureReason(proc) };
+  // `-r cli,json` is honored exactly by the scorer, so the proven CLI text is
+  // unchanged for reading the score, and the JSON adds a criteria source that
+  // cannot lose a row to line-wrapping. `-o` is required: without it the scorer
+  // writes html+json into ./reports on every call.
+  const reportsDir = fs.mkdtempSync(path.join(os.tmpdir(), 'skilleval-'));
+  try {
+    const proc = spawnSync(tool, ['rubric-eval', skillDir, '-r', 'cli,json', '-o', reportsDir], {
+      encoding: 'utf8',
+      maxBuffer: 32 * 1024 * 1024,
+      env: env || process.env,
+    });
+    const json = parseRubricJson(readRubricJson(reportsDir));
+    const parsed = parseRubric(proc);
+
+    if (parsed) {
+      // The CLI score stays primary: it is what the recorded corpus measured, so
+      // taking it keeps every score comparable with Saved/rules_lift.json.
+      const useJson = json !== null;
+      return {
+        ...parsed,
+        criteria: useJson ? json.criteria : parseCriteria(proc),
+        criteriaSource: useJson ? 'json' : 'cli',
+        importance: useJson ? json.importance : null,
+        judgeScore: json ? json.judgeScore : null,
+        derivedOverall: json ? json.derivedOverall : null,
+        rollupVerified: json ? json.rollupVerified : null,
+      };
+    }
+    // No CLI score line, but the JSON still carries one. A run must not be lost
+    // just because the human-facing summary was missing.
+    if (json && json.overallScore !== null) {
+      return {
+        score: json.overallScore,
+        criteria: json.criteria,
+        criteriaSource: 'json',
+        importance: json.importance,
+        judgeScore: json.judgeScore,
+        derivedOverall: json.derivedOverall,
+        rollupVerified: json.rollupVerified,
+      };
+    }
+    return { score: null, reason: failureReason(proc) };
+  } finally {
+    // Never leave a ~21 KB report per judge call behind.
+    fs.rmSync(reportsDir, { recursive: true, force: true });
+  }
 }
 
 /**
@@ -550,7 +737,13 @@ function main() {
         if (r.score === null) {
           reason = r.reason;
         } else {
-          const s = { score: r.score, criteria: r.criteria || {} };
+          const s = {
+            score: r.score,
+            criteria: r.criteria || {},
+            criteriaSource: r.criteriaSource || 'cli',
+            importance: r.importance || null,
+            rollupVerified: r.rollupVerified === true,
+          };
           samples.push(s);
           freshSamples.push(s);
         }
@@ -558,7 +751,9 @@ function main() {
 
       const scores = samples.map((s) => s.score);
       const mean = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : null;
-      // Criterion scores are averaged over whichever samples reported them.
+      // Criterion scores are averaged over whichever samples reported them. With
+      // the JSON source every sample reports all nine, so the denominator is now
+      // the sample count; the CLI fallback can still deliver a short row.
       const critAcc = {};
       for (const s of samples) {
         for (const [k, v] of Object.entries(s.criteria || {})) (critAcc[k] ||= []).push(v);
@@ -566,6 +761,13 @@ function main() {
       const criteria = {};
       for (const [k, arr] of Object.entries(critAcc)) {
         criteria[k] = Number((arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(2));
+      }
+      // How many samples carried a full nine, and where the criteria came from.
+      const fullSamples = samples.filter((s) => Object.keys(s.criteria || {}).length === CRITERIA.length)
+        .length;
+      const importance = {};
+      for (const s of samples) {
+        for (const [k, v] of Object.entries(s.importance || {})) if (v) importance[k] = v;
       }
       const cls = sibling.classifyTombstone(rule);
       results.push({
@@ -580,6 +782,15 @@ function main() {
           scores.length > 1 ? Number((Math.max(...scores) - Math.min(...scores)).toFixed(2)) : null,
         runs: scores,
         criteria,
+        // D1 instrumentation: `fullCriteriaSamples`/`samples` is the criteria
+        // denominator made visible, so a short row can never hide again.
+        criteriaSource: samples.length ? samples[samples.length - 1].criteriaSource : null,
+        fullCriteriaSamples: fullSamples,
+        criteriaSamples: samples.length,
+        importance: Object.keys(importance).length ? importance : null,
+        // D2/P4: we reproduced the scorer's importance-weighted composite from
+        // the checks we read. False would mean the JSON shape changed upstream.
+        rollupVerified: samples.length ? samples.every((s) => s.rollupVerified) : null,
         samplesFromCache,
         cached: samplesFromCache > 0,
         // Attempts spent in THIS run only; a cached sample carries none.
@@ -620,6 +831,12 @@ function main() {
   const scores = scored.map((r) => r.score);
   const mean = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : null;
   const spreads = scored.map((r) => r.spread).filter((x) => x !== null);
+  // Live vs tombstone split. A rule that declares itself QUARANTINE / RETIRED /
+  // HISTORICAL is not meant to be live guidance, so `meanLive` is the figure that
+  // describes what a reader is actually served. This is a POLICY split, not a
+  // quality ranking: the highest-scoring tombstone (ue57-editor-ui, 76.35)
+  // outranks 23 of the 24 live rules, so judge score does not track rule status.
+  const { meanLive, liveCount, meanTombstone, tombstoneCount } = liveSplit(results);
   // Judge noise only. The SE of the corpus mean says how precisely THAT mean is
   // pinned down against judge jitter; it says nothing about which rules are in
   // the corpus, which is the larger source of variation in practice.
@@ -655,10 +872,14 @@ function main() {
       `  cache      : ${cacheHits}/${results.length} rule(s) served from ${path.relative(projectRoot, cacheFile).split(path.sep).join('/')} (${fromCacheSamples} sample(s) reused)`
     );
   }
-  const retriedCount = scored.filter((r) => r.retried).length;
+  // D2: count EVERY rule that needed a retry, not only the ones that ended up
+  // scored. A rule can retry and still land UNSCORED, and those are the most
+  // informative retries — the old `scored.filter(...)` hid exactly them, which is
+  // why the cold report claimed 7 against the 9 rules that actually retried.
+  const { retriedCount, retriedScored, retriedUnscored } = retriedSplit(results);
   if (retriedCount > 0 || unscored.length > 0) {
     console.log(
-      `  judge flakiness : ${retriedCount} rule(s) needed a retry; the judge sometimes returns prose instead of JSON (--retries ${opts.retries})`
+      `  judge flakiness : ${retriedCount} rule(s) needed a retry (${retriedScored} scored, ${retriedUnscored} ended UNSCORED); the judge sometimes returns prose instead of JSON (--retries ${opts.retries})`
     );
   }
   if (scores.length) {
@@ -666,6 +887,9 @@ function main() {
     console.log(`  mean       : ${mean.toFixed(1)}${seText}  (range ${Math.min(...scores).toFixed(1)}-${Math.max(...scores).toFixed(1)})`);
     if (spreads.length) {
       console.log(`  jitter     : mean spread ${(spreads.reduce((a, b) => a + b, 0) / spreads.length).toFixed(1)} pts over ${opts.repeat} run(s) — a single run is not a measurement`);
+    }
+    if (meanLive !== null) {
+      console.log(`  live split : meanLive ${meanLive.toFixed(1)} over ${liveCount} live rule(s); tombstones ${meanTombstone.toFixed(1)} over ${tombstoneCount} (a policy split, not a quality ranking)`);
     }
   }
   console.log(`  threshold  : 70 (rubric-eval's own gate)`);
@@ -710,13 +934,23 @@ function main() {
       // The judge sometimes answers in prose and emits no score; that attempt is
       // retried. retriedCount > 0 means the provider is flaky right now, which
       // a reader needs to know before trusting an UNSCORED or a tight delta.
+      // D2: counted over ALL results, so retries that ended UNSCORED are included.
       retries: opts.retries,
-      retriedCount: scored.filter((r) => r.retried).length,
+      retriedCount,
+      retriedScored,
+      retriedUnscored,
       attemptsTotal: results.reduce((a, r) => a + (r.attempts || 1), 0),
     },
     comparability: {
       againstQualityCheck: false,
       note: 'rubric-eval (LLM judge) and quality-check (structural) are different measurements. Their numbers must not be averaged or diffed. arXiv 2608.20614 measures rho = 0.14 between structural gates and LLM-judged quality.',
+    },
+    criterionProvenance: {
+      source: 'rubric-eval -r json checks[].id',
+      rollup: '10 * sum(importance_weight * score) / sum(importance_weight), high=3 medium=2 low=1',
+      rollupVerifiedCount: results.filter((r) => r.rollupVerified === true).length,
+      fullCriteriaRules: results.filter((r) => r.fullCriteriaSamples > 0).length,
+      note: 'The CLI text table wraps on narrow terminals and its numbered form is matched by row index, which silently dropped criteria: 7 of 29 rules in the cold corpus carried partial criteria. checks[] is always nine and is keyed by a stable id, so `criteria` now has a fixed denominator (criteriaSamples).',
     },
     credential: {
       provider: cred.provider,
@@ -737,8 +971,19 @@ function main() {
     judgedCount: scored.length,
     unscoredCount: unscored.length,
     mean: mean === null ? null : Number(mean.toFixed(2)),
+    // A tombstone is not meant to be live guidance, so `meanLive` is the figure
+    // that describes the corpus a reader is actually served. `mean` stays all-29
+    // so it remains comparable with the saved report. Neither is a quality
+    // ranking: the highest-scoring tombstone outranks 23 of 24 live rules.
+    meanLive: meanLive === null ? null : Number(meanLive.toFixed(2)),
+    liveCount,
+    tombstoneCount,
+    meanTombstone: meanTombstone === null ? null : Number(meanTombstone.toFixed(2)),
     criteria: criteriaSummary,
     belowThreshold: scored.filter((r) => r.score < 70).map((r) => r.file),
+    belowThresholdLive: (results || [])
+      .filter((r) => r && r.score !== null && !r.tombstone && r.score < 70)
+      .map((r) => r.file),
     results,
   };
 
@@ -767,10 +1012,17 @@ if (require.main === module) main();
 module.exports = {
   PREFIX,
   CRITERIA,
+  CRITERION_IDS,
+  IMPORTANCE_WEIGHTS,
   CACHE_DEFAULT,
   CACHE_MAX_SAMPLES,
   parseRubric,
+  parseRubricJson,
   parseCriteria,
+  readRubricJson,
+  weightedOverall,
+  retriedSplit,
+  liveSplit,
   detectCredential,
   resolveTool,
   failureReason,

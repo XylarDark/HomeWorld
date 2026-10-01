@@ -66,24 +66,44 @@ signal, nothing more.
 
 ---
 
-## 4. Measurement defects — found, unfixed. Fix before spending more calls
+## 4. Measurement defects — both FIXED 2026-10-01 (code landed, not yet re-run)
 
-**D1 · Criterion denominators vary.** `parseCriteria` reads the judge's **CLI
-text table** (`scripts/score-mdc-lift.js:165`), and the merge at `:564` averages
-each criterion over only the samples whose table listed it. So 7 of 29 rules
-contribute partial criteria (5 of them miss 7 of 9), and each criterion mean has
-an **unknown denominator**.
-*Effect is bounded but real:* recomputing on the 22 rules carrying all nine
-criteria shifts every criterion mean by **≤0.16/10**, so the **ranking is safe**
-— Example Quality ~3.6–3.7 and Error Handling Quality 4.8 remain clearly
-weakest. But do not quote the absolute means to two decimals as if exact.
-**Fix:** switch the parser to `-r json` (`overall_score` / `judge_score` /
-`checks[]`) for a deterministic nine criteria per sample. This is a defect fix,
-not a nice-to-have.
+**D1 · Criterion denominators varied.** `parseCriteria` read the judge's **CLI
+text table**, and the merge averaged each criterion over only the samples whose
+table listed it. So 7 of 29 rules contributed partial criteria (5 of them missing
+7 of 9) and every criterion mean had an **unknown denominator**. *Effect was
+bounded but real:* recomputing on the 22 rules carrying all nine shifted each
+criterion mean by **≤0.16/10**, so the **ranking was safe** — Example Quality
+~3.6–3.7 and Error Handling Quality 4.8 remain clearly weakest.
 
-**D2 · `judge.retriedCount` undercounts.** It counts only *scored* rules — 7 in
+> **Root cause found, and it was not "a partial report".** The CLI prints a
+> box-drawn table whose Criterion column **wraps across lines on a narrow
+> terminal**, and its numbered "Failure Details" list is matched **by row index** —
+> so a wrapped row silently loses its criterion. The scorer had emitted all nine
+> every time. This is why the loss was intermittent and rule-dependent.
+>
+> **Fix (landed).** `runRubricOnce` now runs `-r cli,json -o <tmpdir>` and parses
+> `rubric_eval.checks[]`, which is **always exactly nine** and is keyed by a
+> stable `id` (e.g. `example_quality`). The stable key is `id`, **not**
+> `criterion` — the latter is the full rubric question text. The CLI text is
+> retained as fallback and `criteriaSource` records which one answered. Denominators
+> are now explicit per rule as `fullCriteriaSamples`/`criteriaSamples`.
+>
+> **Verified bonus.** `rubric_eval.aggregation` names the roll-up, and
+> `weightedOverall()` reproduces it: `10 · Σ(w·s)/Σ(w)` with high=3, medium=2,
+> low=1. Confirmed exactly against two real runs (70.5 and 75.0). `rollupVerified`
+> flags any run where that stops holding — an upstream shape change surfaces
+> instead of passing silently.
+>
+> **Not re-run.** `Saved/rules_lift.json` predates D1 and stays the canonical
+> artifact. D1 pays off on the next **targeted** run; whole-corpus re-judging
+> remains retired (§5).
+
+**D2 · `judge.retriedCount` undercounted.** It counted only *scored* rules — 7 in
 the cold report, against **9** rules that actually retried. Reporting-side only;
-needs no re-run.
+needed no re-run. **Fix (landed):** `retriedSplit()` counts every rule that
+retried and reports `retriedScored` / `retriedUnscored` separately, so retries
+that ended UNSCORED — the most diagnostic ones — can no longer be filtered out.
 
 ---
 
@@ -147,15 +167,16 @@ competes with fixing that.
 
 | Item | Owner | Blocked on | Closes when |
 |---|---|---|---|
-| Wire `rules:score --strict` into CI | **Lead** | ask-first | Lead rules yes/no |
-| Pin `skillevaluator` in `package.json` | **Lead** | ask-first (dependency change) | Lead decides |
-| Tier 3 live agent eval | **Lead** | an environment backend — Docker locally, or a cloud sandbox account | account exists |
-| D1 `-r json` parser | agent | **unblocked** | implemented + tested |
-| D2 `retriedCount` fix | agent | **unblocked** | one line + test |
-| `meanLive` alongside `mean` | agent | **unblocked** | report shows both |
-| Repo-wide UE 5.7 sweep | **Lead/Conductor** | ownership of ~100 matches | triaged; `08c` first |
-| Is WAVE C still the right next thing? | **Lead** | Lead call — the untracked `t0_m*_*.py` boot probes suggest later boot-health work exists | confirmed or replaced |
-| Rule-content fixes from the judged signal (examples, error handling) | **Lead** | taste call, needs a taste gate | Lead decides what to change |
+| Wire `rules:score --strict` into CI | **Lead** | ask-first | **Lead answered 2026-10-01: no CI change yet.** Revisit after D1 is in practical use. |
+| Pin `skillevaluator` in `package.json` | **Lead** | ask-first (dependency change) | **Lead answered 2026-10-01: no pin — record the required version (0.4.0) in docs only.** Done, §2a. |
+| Tier 3 live agent eval | **Lead** | an environment backend — Docker locally, or a cloud sandbox account | **Lead answered 2026-10-01: defer.** Needs an account the agent cannot create. |
+| D1 `-r json` parser | agent | **unblocked** | **DONE** — `checks[].id`, CLI fallback, root cause recorded, 64/64 tests |
+| D2 `retriedCount` fix | agent | **unblocked** | **DONE** — `retriedSplit()`, scored/unscored split, tested |
+| `meanLive` alongside `mean` | agent | **unblocked** | **DONE** — `liveSplit()`, tested against the recorded 24/5 split |
+| Roll-up verification | agent | **unblocked** | **DONE** — `weightedOverall()` + `rollupVerified`, verified on two real runs |
+| Repo-wide UE 5.7 sweep | **Lead/Conductor** | **resolved 2026-10-01** — census is **231 matches / 67 files** (not ~100), most legitimately historical. `08c` corrected. Remainder stays a Lead call, "correct live claims, keep history". |
+| Is WAVE C still the right next thing? | — | **RESOLVED 2026-10-01** | **Not a question: WAVE C is COMPLETE and signed off** (PR #13, `APPROVE WAVE C`). The `t0_*.py` scripts are **gameplay** beat-prove harnesses, not boot-health. See §6. |
+| Rule-content fixes from the judged signal (examples, error handling) | **Lead** | taste call, needs a taste gate | **Lead answered 2026-10-01: not now** — measurement was the ask. Remains open for a future taste-gated pass. |
 
 ⚠️ On Tier 3: **do not** take `health-check`'s own suggestion to reinstall
 `"skillevaluator[all]"` from git HEAD. It moves the scorer off 0.4.0 and breaks
@@ -164,8 +185,56 @@ comparability with `Saved/rules_lift.json`. The real fault is only that
 
 ---
 
-## 8. What would change this strategy
+## 2a) Lead interview decisions — 2026-10-01
 
+Conducted as a structured interview; **all recommendations were accepted**, so
+execution scope was the agent-unblocked work only.
+
+| Question | Decision | Consequence |
+|---|---|---|
+| Execution scope | **Harness defects only** | D1, D2, `meanLive`, roll-up verification — no CI, no dependency, no product surface |
+| CI gate for `rules:score --strict` | **No CI change yet** | Ask-first item stays open; wire after D1 is in practical use |
+| Pin `skillevaluator` in `package.json`? | **Record version in docs, no pin** | Keeps a Python/uv CLI out of a Node manifest. **Required scorer version: `skillevaluator` 0.4.0** — comparability with `Saved/rules_lift.json` depends on it, and 0.3.0 → 0.4.0 already moved the corpus mean once |
+| UE 5.7 sweep depth | **Correct live claims, keep history** | Policy for whenever the sweep is authorised — do not falsify the `KNOWN_ERRORS` 5.7 history or the literal `ue57-*` rule filenames |
+| Tier 3 live agent eval | **Defer — needs an account** | Blocked on an environment backend only, not on the CLI |
+| Judged-signal content work | **Not now** | Measurement was the ask; rule prose is a separate taste-gated job |
+| WAVE C direction | **Conductor assesses first** | Assessment returned — §6 |
+
+**Standing constraints reaffirmed:** the judge credential stays env-only and is
+never committed; user untracked work and the dirty `UserHarness` submodule are
+not touched; no product decisions are invented.
+
+---
+
+## 6. WAVE C — resolved: complete, not superseded
+
+Referred to the Conductor as record owner. **Verdict: WAVE C is done and signed
+off.** It is not next, and it is not superseded. Two findings killed the premise
+of the referral.
+
+| Finding | Evidence | Conclusion |
+|---|---|---|
+| WAVE C completed long ago | `Docs/08_AUDIT_UPGRADE_STRATEGY.md` **COMPLETE**; `Docs/08_AUDIT_SIGN_OFF.md` gate **CLOSED** with `APPROVE WAVE C`; `08d_CONTENT_CANON.md` WAVE C COMPLETE; `Docs/README.md`; `swarm/PHASE_BOARD.md` Docs/08–10 **CLOSED** (PR #13) | The "Next (after gate) → WAVE C" row is a historical pointer, not a live plan |
+| The `t0_*.py` scripts are **not** boot-health | Zero matches for any 08c boot term (`SetCollisionProfileName`, `PostInitProperties`, `NewObject`, `FObjectInitializer`, BOOT-00x, C2084) across all 17. `t0_m10_planetside_boot_prove.py` is the **gameplay beat** "planetside night boot home"; `t0_m12/m13_map_probe.py` are world inspectors | The referral premise was **wrong**. "boot" in T0 is a gameplay verb. T0 *builds on* WAVE-C-fixed code — it is a consumer, not a replacement |
+| The 5.7.4 anchor was a real, small defect | `Docs/08c_BOOT_HEALTH.md` asserted 5.7.x/5.7.4 against a 5.8 lock; substance already re-proved on 5.8 by `Docs/22_UE58_UPGRADE.md` **U58-C** (APPROVED, `5.8.2-56702186`, Safe-Build exit 0) | **Corrected** — 4 lines + a 5.8 re-validation evidence row, gate block untouched |
+| Repo-wide 5.7 census is larger than assumed | **231 matches / 67 files** (not ~100). Heaviest: `docs/KNOWN_ERRORS.md` 46, `docs/SESSION_LOG.md` 27, `docs/PCG/PCG_VARIABLES_NO_ACCESS.md` 16 | Much is legitimate history. A mechanical 5.7→5.8 rewrite would falsify true records. Remainder is a Lead call under "correct live claims, keep history" |
+| T0 governance is inconsistent (separate issue) | `swarm/PHASE_BOARD.md` has **zero** T0 rows, and L3 ("Harness / bot optimization — idle") contradicts L168 ("Current track: Docs/33 PS"). `APPROVE-T0-MECHANIC-INV` box is unchecked while M1–M14 merged (#255–#268) | **Not a boot-health issue.** Board/record consistency for a live track — flagged, not actioned |
+
+**Correction applied.** `Docs/08c_BOOT_HEALTH.md` engine labels now read 5.8
+(`5.8.2-56702186`), with an explicit provenance note that the WAVE was authored on
+5.7.4 and superseded by Docs/22 U58-C, plus a §4 evidence row so §3's CLOSED
+crash table has a 5.8-shaped anchor instead of only a 5.7 one. The BOOT-001 root
+cause keeps its historical observation, relabelled as observed at authoring.
+
+**Unanswerable from the tree** (recorded, not guessed): whether
+`APPROVE-T0-MECHANIC-INV` was ever stamped outside the document, and whether any
+T0 beat was proved green in a *tracked* sense — the `Saved/t0_*_gate.json` files
+are gitignored local runtime state, and the sampled `t0_m14` is self-reported
+`"provisional": true`.
+
+---
+
+## 8. What would change this strategy
 - **A non-reasoning judge credential** → re-baseline (not a completion), after
   which per-criterion work becomes trustworthy and the 2/31 gap closes.
 - **A scorer that separates reasoning from content budget** → fixes the 2/31 and
