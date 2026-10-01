@@ -1,164 +1,257 @@
 # Docs/02_ART_BIBLE.md
 
-## Status: LOCKED (P2) — ID P2_AD_bible — 2026-09-16
+## Status: LOCKED — supersedes P2_AD_bible (2026-09-16) — updated 2026-09-30
 
 **Owner:** AD (art half of Track C).  
-**North stars:**
-- `refs/keyart_homestead_night.jpg` — single-frame night homestead (look + Shot 1 composition).
-- `refs/keyart_homestead_planetside_split.jpg` — diagonal split greybox: night floating homestead (top-left) + day planetside camp with tents, portal, campfire (bottom-right); dual-zone layout north star for demo greybox.
+**Single source of truth:** this file. `AssetCreation/STYLE_GUIDE.md` keeps the Blender export preset only and must not restate look law. `VisionBoard/` holds prompts and encoded key art; it does not override this bible.
+
+**North stars (2026-09-30):**
+
+- `VisionBoard/KeyArt/homestead_dusk_baseline.jpg.b64` — dusk homestead contract. Expressive player looking back, warm cabin, lupine bee, crystal moth, cropped moss-bear with readable eyes.
+- `VisionBoard/KeyArt/player_expression_sheet.jpg.b64` — face lock (calm, smile, worry, awe, determination, startle).
+- `VisionBoard/KeyArt/homestead_dusk_face_pass.jpg.b64` — earlier face-pass of the same homestead, before living micro-details.
+- Planetside camp is a locked location *test* (player approaching three larger armed enemies at a fire, starry pine-mountain backdrop). Encode when the still is exported; do not treat the 2026-09-16 split greybox as the current planetside contract.
+
+Older refs `refs/keyart_homestead_night.jpg` and `refs/keyart_homestead_planetside_split.jpg` remain historical. They are not the current contract.
+
 **Canon inputs:** `Docs/00_CANON.md`, `Docs/00_SHOTLIST.md`  
-**Out of scope:** material parameter sheets (TA → `Docs/02_MATERIAL_SHEET.md`); no new locations, props, biomes, or master shader families.
+**Out of scope for this file:** material parameter sheets (TA → `Docs/02_MATERIAL_SHEET.md`).
 
-Tone lock: warm, readable, handmade, hopeful. Not cutesy-infantile. Not grim. Not photoreal. Not sci-fi.
+Tone lock: warm, readable, handmade, hopeful. Fantasy, not high fantasy. Cartoon, not Disney. Closest cousins: Breath of the Wild + Pixar sincerity. Not cutesy-infantile. Not grim. Not photoreal. Not sci-fi.
 
 ---
 
-## 1. Palette (from key art)
+## 1. What the game looks like
 
-Primary contrast is **warm cabin amber vs cool moonlight**. Keep both readable in the same frame; never collapse into muddy mid-gray or pitch black.
+HomeWorld is **semi-polygon with detail on top**.
 
-| Chip | Role | Target range / notes |
+- Big forms are faceted low-poly masses. Not flat untextured low poly. Not photoreal. Not Mario-Galaxy soft clay.
+- Surface life sits on those facets: wood grain, moss clumps, flower clusters, crystal faces, leather straps.
+- Most of the frame is scenery ahead of the player.
+- The world is large. The player is small. Enemies and beasts are huge and often cropped.
+- Planetoid read: close horizon, ground can feel like it bends away, thin air, deep zenith, readable constellations at night.
+
+If a change makes the facets disappear, it is the wrong kind of beauty.
+
+Rejected: flat shade, posterized color bands, chunky-toy restyle, photoreal scans, featureless hooded player.
+
+---
+
+## 2. Locked key art
+
+### Homestead (primary contract)
+
+Dusk on the floating-island hub.
+
+- Faceted Zelda/Pixar adventurer looking back, readable face.
+- Log cabin with warm uneven windows, porch lamp, hanging herbs.
+- Lupine beds with one living visitor (bee).
+- Shrine crystal with a moth.
+- Giant cropped moss-bear with brow shelves and eyes that look.
+- Warm sun left, cool forest right, thin air, planetoid moon.
+
+### Planetside (second location test)
+
+Night camp on the planet below.
+
+- Same player approaching a campfire.
+- Three dangerous enemies, all much larger than the player, varying height among themselves.
+- Club, sword, bow and arrows. Faceted stone-and-leather brutes, readable faces.
+- Starry sky with readable constellations, mountain ridge, pine forest.
+- Fire is the homestead-window trick: the only warm light.
+
+If a new biome cannot produce a shot this clear, the biome is not ready.
+
+---
+
+## 3. Player
+
+Unique but non-descript. A person, not a logo.
+
+- Young-adult adventurer, slightly androgynous.
+- Short geometric hair in a few faceted clumps.
+- Muted charcoal-brown coat. One warm scarf accent. No ornate armor.
+- Head slightly large. Eyes graphic and clear.
+- Face built from planes that act: brows, eyelids, mouth corners.
+- Not a featureless hood. Not a realistic hoodie. Not a Disney princess. Not a high-fantasy chosen one.
+
+Spend triangles on the face. The coat stays cheap.
+
+Emotion kit to author: calm, smile, worry, awe, determination, startle.
+
+The player is a scale ruler and an actor in close shots. The world still carries the wide frame. Family silhouettes from Shot 1 may share this face kit later (different hair and accent). That is open, not locked.
+
+---
+
+## 4. Creatures and enemies
+
+Same face law as the player.
+
+- Eyes, brow shelves, lids, a muzzle or mouth that can change.
+- A snarl and a soft look are two poses of one face, not two models.
+- Beasts and humanoid brutes stay faceted stone / moss / leather.
+- Scale: much larger than the player. Tallest members may crop the frame.
+- A group must vary in height.
+
+Homestead guardian: giant moss-bear, often cropped, threat or quiet watcher depending on pose and light.
+
+Planetside camp: three armed brutes around a fire. Dangerous, readable, not gore, not cute Disney animals.
+
+The 2026-09-16 “no extra beasts / no combat staging” reject is superseded for the homestead bear and the planetside camp only. Do not add a fourth enemy species or a new combat arena until those two reads are built.
+
+---
+
+## 5. Two-layer build method
+
+### Layer A — Structure
+
+Cheap mass that holds silhouette, collision, and facet lighting. Cut facets on purpose. Shade by face. Hard edges. Do not smooth into subdivision clay. Collision uses the structure, never the flowers.
+
+### Layer B — Detail kit
+
+Reusable pieces snapped onto the mass. Starter kit: moss clump, lupine sprig, fence module, path stone, wood trim strip, window pane, extra crystal shard.
+
+If a piece cannot be reused on three props, it is too unique. Hero exceptions: crystal, beast/enemy heads, cabin door, player face.
+
+### Layer C — One living eye per important object
+
+| Object | Cheap mass | The eye (pay here) | Cull far away |
+|---|---|---|---|
+| Player | Simple coat | Face | Never in intimate cam |
+| Beast / enemy | Faceted body | Eyes + brows | Eyes stay |
+| Cabin | Faceted logs | Brightest window + door leak + smoke + one porch item | Smoke and porch item |
+| Flower bed | Instanced sprigs | One leaning hero stalk + one bug + two dew drops | Bug and dew |
+| Crystal | Outer gem | Inner shard + pulse + moth | Moth |
+| Campfire | Log pile | Flame + one pot or rack | Spark detail |
+
+A second eye on the same object usually adds noise, not life.
+
+---
+
+## 6. Camera
+
+Two distances. Same assets. Never rescale to cheat a lens.
+
+| Mode | Distance | What must read | What may simplify |
+|---|---|---|---|
+| Intimate | Low, over-shoulder or first-person among beds / fire | Faces, grain, moss, petals, dew, moth, window leak | Far forest already impostors |
+| Default / vista | About 20 ft+, orbit allowed | Silhouettes: cabin, arch, beast crop, horizon, enemy group | Sprig LOD2, no interior |
+
+Default travel camera stays far so the world stays large.
+
+---
+
+## 7. Palette and lighting
+
+Primary contrast is **warm amber vs cool night / forest**. Keep both readable. Never collapse into muddy mid-gray or pitch black.
+
+| Chip | Role | Notes |
 |---|---|---|
-| Moon warm yellow | Hero sky disc | `#FFD56A`–`#FFE28A`; huge soft-edged disc, never tiny white |
-| Cabin amber | Window / porch emissive | Warm amber / golden; ~2700–3200K feel; always lit at night |
-| Navy sky | Night backdrop | Deep navy → dark purple; dense soft stars |
-| Peach clouds | Horizon / mid-sky | Peach, pale pink, cream highlights on voluminous soft forms |
-| Cool moonlight fill | Night key on world | Soft cool / neutral rim on cliff tops, pine crowns, grass edges |
-| Spring grass | Homestead + planet ground | Saturated spring greens; keep lively under NightMix |
-| Warm dark wood | Cabin / planters / rails | Handmade warm brown; not scan wood |
-| Cool gray-violet cliff | Layered torn rock | Cool purple-gray / charcoal in shadow; readable strata |
-| Horizon glow | Distant atmosphere | Soft cyan/blue into peach at curved world edge |
-| Spirit hurt | Spirit overlay (hurt) | Cooler, thinner unlit cue — readable wound, not horror gore |
-| Spirit healed | Spirit overlay (healed) | Softer warmer / clearer unlit resolve — hopeful, handmade |
+| Cabin amber | Window / porch / door leak | Warm golden; one window brighter than the others |
+| Fire amber | Planetside key | Same job as the window |
+| Crystal cyan | Shrine jewel | Tight bloom, inner shard, no lawn-wide neon |
+| Navy sky | Night backdrop | Deep zenith, readable constellations |
+| Warm horizon | Dusk | Thin air, close planetoid limb |
+| Spring grass / lupine | Homestead ground | Quiet ground, loud flowers |
+| Warm dark wood | Cabin / planters / rails | Handmade, not scan wood |
+| Moss stone | Bear / brutes / shrine | Faceted, moss on upward and shaded faces |
 
-**Do:** high silhouette contrast; warm windows punch against cool night; saturated but soft PBR.  
-**Don’t:** desaturate into grimdark; bleach moon to white; kill window emissive; muddy day grade.
+Night is a parameter + overlay, not a second map. `NightMix` 0→1 shifts the ten masters. Do not duplicate meshes to “do night.”
+
+Emotion is climate around the same silhouette: window color, garden health, sky, smoke, beast proximity, fire alive or dead. Do not rebuild the cabin to change mood.
+
+One main key at a time: dusk sun, campfire, or shrine cyan, plus a cooler fill. Emissives are jewels.
 
 ---
 
-## 2. Shape language
+## 8. Shape language (kept)
 
 | Element | Rule |
 |---|---|
-| Cliff / island | **Layered torn earth** — blocky staggered strata, jagged underside. Separate top plate from cliff face in kit thinking. |
-| Island silhouette | Never pancake disc or cylinder plug. Edge must read as broken earth. |
-| Pines | **Stylized pines only** — conical, slightly fluffy, clear tiered foliage cards. No second tree species. |
-| Cabin | Simple rustic log / gabled handmade form; stone foundation ok; cozy, not ornate Victorian or sci-fi prefab. |
-| Family / figures | Clean dark **readable silhouettes** (adult + two children at lookout edge in Shot 1). |
-| Floating islets | Small jagged rock crumbs with same pine language; transit crumbs, not new biomes. |
-| Planet below | Curved livable world: pine valley, winding path, 2–3 hamlet roof silhouettes, distant snow peak. |
-| Shrine / portal | Soft handmade spirit cue; not tech gate, neon ring, or dungeon mouth. |
+| Cliff / island | Layered torn earth. Never a pancake disc or cylinder plug. |
+| Pines | Stylized conical pines. No second tree species in MVP. |
+| Cabin | Simple rustic log, gabled, stone chimney ok. Cozy, not Victorian, not sci-fi. |
+| Shrine / portal | Handmade spirit cue. Not a tech gate or neon ring. |
+| Planet below | Pine valley, path, mountain ridge, camp clearing. |
 
-Readable silhouettes beat detail. If a mass fails the thumbnail test, fix the mass before adding props.
+Readable silhouettes beat detail.
 
 ---
 
-## 3. Lighting rules — Day vs Night / NightMix
+## 9. Shots — approval criteria
 
-Night is a **parameter + overlay**, not a second map or rebuilt geometry.
-
-### Night (Homestead_Night / spirit-capable)
-
-- **Key:** huge warm moon — soft top/side cool-neutral fill and rim.
-- **Accent:** cabin window emissive (amber) lighting porch / nearby fence / planters.
-- **Fill:** cool forest / cliff; shadows stay deep **blue–purple**, never pure black.
-- **Sky:** navy + stars + peach clouds + distant snow peak readable.
-- **Spirit layer:** soft unlit / emissive cue via `M_SpiritUnlit` (+ NightMix). Hopeful, not horror.
-- **NightMix intent:** `NightMix` 0→1 shifts masters toward cool night overlay while preserving base identity. Driven later by GameState time float; do not invent per-mesh night duplicates.
-
-### Day (Planet_Day / landing clearing)
-
-- Hopeful clear daylight; readable open ground at landing circle.
-- Same pine / grass / rock / path language as homestead.
-- Optional homestead cliff/sky hint above to keep “same world below the lookout.”
-- Reject grim overcast that kills hopeful day read; reject muddy day grade.
-
-### Shared
-
-- Two MVP lighting presets: **Homestead_Night**, **Planet_Day** (optional Planet_Night_Spirit).
-- Warm-vs-cool contrast must survive on night shots (1, 2, 5) and remain coherent on glide (3).
-- Moon size is a **feature**, not a decoration.
-
----
-
-## 4. Shots 1–5 — approval criteria
-
-Approve only against `Docs/00_SHOTLIST.md` + key art. Exactly five shots; do not invent a sixth framing as a new location.
+Approve against `Docs/00_SHOTLIST.md` plus the 2026-09-30 north stars.
 
 | Shot | Pass when | Fail when |
 |---|---|---|
-| **1 Homestead night lookout** | Key-art match: cabin left warm windows; garden + path; adult + two kids at right cliff; huge warm moon; navy sky; peach clouds; snow peak; layered torn cliff; planet pine valley + path + 2–3 rooftops; islets; warm vs cool | Photoreal/muddy/grim/sci-fi; extra tree species; tiny white moon; dark windows; pancake/cylinder; family unreadable; planet missing path/rooftops/valley |
-| **2 Cabin + garden close** | Warm glowing windows; raised planters with colorful plant read; stone/dirt path; night cool fill vs warm emissive | Dark/dead windows; muddy/grim light; photoreal wood; extra biome props; drift into Shot 1 moon-hero wide |
-| **3 Glide departure** | Lookout edge as departure; glide/scripted path toward planet; islets along transit; valley still readable; same pine language | Free-flight sim/HUD; new transit biome or sci-fi vehicle; pancake edge; loss of warm-vs-cool if night; extra trees |
-| **4 Planet landing clearing, day** | Day landing circle; matching pines; path continuity into slice; open hopeful ground | Different biome; photoreal/muddy day; sci-fi pad; grimdark overcast; extra beast/combat staging |
-| **5 Spirit portal arrival, night** | Night + spirit layer; shrine link island ↔ planet; same masters/pines; soft emissive spirit cue | Sci-fi portal/hard neon; grimdark void; photoreal/muddy night; new location/biome; combat/free-flight framing |
+| Homestead dusk contract | Expressive player, uneven warm windows, bee, moth, cropped bear eyes, facets intact | Hooded blank, dead windows, smoothed meshes, photoreal |
+| Cabin close | One brighter window, door leak, one porch item, facet wood | Clutter kit, dark windows, scan wood |
+| Glide | Lookout edge, islets, same pine language, world stays large | Free-flight sim, new biome, rescaled assets |
+| Planet camp | Three larger enemies of different heights, fire as the warm eye, stars + mountain + pines | Same-size crowd, gore, Disney animals, grim void |
+| Spirit shrine night | Crystal cyan answering cabin gold, same masters | Neon tech portal, rebuilt geometry for night |
 
-**Global style rejects (all shots):** photoreal scans; muddy palettes; grimdark; sci-fi; extra tree species; tiny white moon; dark cabin windows; pancake/cylinder islands.
-
----
-
-## 5. Hard rejects (art)
-
-From canon + shot lock — AD rejects on sight:
-
-- Photoreal scans / Quixel-style bark and rock
-- Grimdark, horror void, muddy desaturated grades
-- Sci-fi kits, neon tech portals, free-flight sim framing
-- Pancake or cylinder islands
-- Tiny white moons
-- Dark / dead cabin windows at night
-- Extra biomes or tree species beyond stylized pines
-- Extra beasts, combat staging, crafting spectacle sets
-- New locations or flavor props not in homestead / planet canon kit
-- One-off shader families outside the ten masters
-- Rebuild geometry just to “do night”
+**Still rejected:** photoreal scans, grimdark, sci-fi kits, pancake islands, tiny white moon, dead night windows, extra tree species, smoothing facets away, rescaling per camera, legendary outfits.
 
 ---
 
-## 6. Naming reminders (meshes / materials)
+## 10. Naming and masters (unchanged)
 
 Prefixes: `M_` `SM_` `SK_` `FX_` `PCG_` `BP_` `CAM_` `LIT_`  
 Suffixes: `_Day` `_Night` `_Spirit` `_Nurtured` `_World` `_Stored`
 
-**Ten masters only** (instance; do not invent families):
+Ten masters only (instance; do not invent families):
 
-1. `M_StylizedGrass`  
-2. `M_CliffRock`  
-3. `M_WoodCabin`  
-4. `M_WoodWild`  
-5. `M_FoliageCard`  
-6. `M_PathStone`  
-7. `M_GatherHerb`  
-8. `M_BeastStylized`  
-9. `M_SpiritUnlit`  
+1. `M_StylizedGrass`
+2. `M_CliffRock`
+3. `M_WoodCabin`
+4. `M_WoodWild`
+5. `M_FoliageCard`
+6. `M_PathStone`
+7. `M_GatherHerb`
+8. `M_BeastStylized`
+9. `M_SpiritUnlit`
 10. `M_Nurtured`
 
-Each exposes: BaseColor, Roughness, Variation, NightMix 0–1, optional Emissive.  
-Scale: meters; adult 1.8 m; cabin 5–6 m; island 18–24 m; pines 6–12 m. Origins at ground contact; apply scale.
+Each exposes BaseColor, Roughness, Variation, NightMix 0–1, optional Emissive.  
+Scale: meters. Adult about 1.7–1.8 m. Enemies much larger. Origins at ground contact. Apply scale.
 
-AD does not author the material sheet — TA owns parameter ranges and NightMix demo notes.
+AD does not author the material sheet. TA owns parameter ranges.
 
----
-
-## 7. Scope fence — no new locations or props
-
-Allowed masses and props are those already implied by canon topology and kit lists only:
-
-- Hero island: cabin, garden/planters, path, pines, lookout, shrine, glider perch, fence  
-- Transit: air current / islets / glide line (scripted stand-in ok)  
-- Planet slice: forest path, gather nodes, one beast pad, one spirit-wound site, landing circle, return shrine, 2–3 hamlet roof silhouettes  
-
-Do **not** add: extra rooms, new biomes, alien flora, sci-fi vehicles, combat sets, dungeon portals, or flavor props outside the kit. If it is not required by the eight MVP verbs or Shots 1–5, it is out.
+Nanite is optional on solid static masses. Not on the player, flowers, bugs, or moths. Those use instances and LODs.
 
 ---
 
-## 8. Downstream consumers
+## 11. Pipeline
+
+Blender library first. Unreal is assembly.
+
+- `HW_Kit_Structure` — cabin, shrine, path, fence, player body, beast/enemy bodies
+- `HW_Kit_Detail` — moss, sprigs, chips, trim, panes, shards, bugs, moths
+- `HW_Atlas` — shared trim / moss / flower / rock
+- `HW_Hero` — crystal, heads, door handle, player face
+
+Profile the expensive view: flower beds, or the campfire looking up at the tallest enemy.
+
+---
+
+## 12. Open, not locked
+
+- Partner / child using the same face kit
+- Day-body planetside palette of the camp
+- Dawn-after-storm homestead
+- Enemy species beyond moss-bear and the three camp brutes
+
+Until those lock, default to the player kit, the three-armed camp, and the moss-bear.
+
+---
+
+## 13. Downstream
 
 | Role | Use this bible for |
 |---|---|
-| TA | Chip targets + NightMix intent while authoring 10 masters (sheet is theirs) |
-| ENV-H / ENV-P / PROP | Silhouette + pine + cliff rules; cite a master per mesh |
-| LIT | Day/night presets; moon size; warm windows vs cool fill |
-| QA | Shot 1–5 pass/fail against this doc + shotlist + key art |
+| TA | Chips, NightMix, ten masters |
+| ENV / PROP | Facets, kit reuse, one living eye |
+| LIT | Dusk sun, fire, crystal, moon size |
+| QA | Homestead baseline + camp test + shot table |
 
-**Evidence / lock:** Palette, shape, lighting, shot gates, rejects, and naming frozen for WAVE 1 Track C art half. Date 2026-09-16. ID `P2_AD_bible`.
+**Evidence:** 2026-09-16 P2 lock retained where it does not conflict. 2026-09-30 player, living-eye, homestead baseline, and planetside camp supersede the hooded silhouette and the no-beast reject.
