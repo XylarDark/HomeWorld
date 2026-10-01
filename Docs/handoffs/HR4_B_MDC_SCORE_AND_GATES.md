@@ -26,7 +26,7 @@ the **actual `skillevaluator` binary** score it. The repo is never modified.
 
 ```
 npm run rules:score            # human table
-npm run rules:score:test       # 12 unit tests, no scorer required
+npm run rules:score:test       # 18 unit tests, no scorer required
 npm run rules:score -- --json Saved/rules_score.json --strict
 ```
 
@@ -195,11 +195,15 @@ So the real blocker for Tier 2 is a single credential, not a hypervisor. Tier 3
 is reachable without Docker at all, via any of the cloud sandbox backends —
 each of which needs its own account.
 
-`skillevaluator health-check` also confirms there is **no provider configured**:
-no `SKILL_EVAL_LLM_PROVIDER`, and no `NVIDIA_API_KEY` / `OPENAI_API_KEY` /
-`ANTHROPIC_API_KEY` in the environment. No LLM-judged number can be produced
-until a human supplies one. **This is a Lead action — a credential, not an
-engineering task.**
+`skillevaluator health-check` at the time of writing confirmed there was **no
+provider configured**: no `SKILL_EVAL_LLM_PROVIDER`, and no `NVIDIA_API_KEY` /
+`OPENAI_API_KEY` / `ANTHROPIC_API_KEY` in the environment, so no LLM-judged
+number could be produced. **That was a Lead action — a credential, not an
+engineering task — and it has since been supplied.** `health-check` now reads
+`Public LLM provider | pass | nv_build / nvidia/nemotron-3-super-120b-a12b`, and
+the judged measurement follows under *Skill Lift — MEASURED* below. This
+paragraph is kept only as the historical state that blocked it; it no longer
+describes the tree.
 
 ## Two prior open items closed by measurement
 
@@ -213,15 +217,40 @@ context, so it costs **zero** context budget. Retiring or splitting it would be
 pure churn inside a submodule that also carries uncommitted work. **Premise
 overturned by measurement; left untouched.**
 
-**`scope-refinement` duplicate — byte-identical, user's call.** Both
+**`scope-refinement` duplicate — removed (human authorised).** Both
 `.cursor/skills/scope-refinement/SKILL.md` and
-`.agents/skills-extras/scope-refinement/SKILL.md` are 1960 B,
-SHA-256 `A8F965840527C1C9…`, and each directory contains only that one file.
-`AGENTS.md` establishes `.agents/skills/` as **core** and `.agents/skills-extras/`
-as the **opt-in catalog**, so the `.cursor/` copy is the redundant one. It is
-untracked in-progress work, so it has not been touched — deleting a human's
-uncommitted file is not an agent decision. **Adopting the stated convention means
-removing the `.cursor/skills/scope-refinement/` copy.**
+`.agents/skills-extras/scope-refinement/SKILL.md` were 1960 B,
+SHA-256 `A8F965840527C1C9…`, each directory containing only that one file.
+Resolution required deciding *which catalog is canonical*, not merely which file
+is redundant — and the answer was not the one the file layout suggests:
+
+- `UserHarness/.agents/README.md` lists `scope-refinement` among the **extras**,
+  and `UserHarness/docs/human-use/README.md` calls it an **"opt-in skill"**.
+- `.cursor/skills/README.md` enumerates exactly three live skills
+  (`pcg-validate`, `ue58-api-check`, `automation-gap-solutions`) plus the
+  `ue57-api-check` tombstone, and has a *"Not here (by design)"* section for
+  skills deliberately kept off the scan path. `scope-refinement` appears in
+  **neither** list.
+
+So the canonical home is `.agents/skills-extras/scope-refinement/`, and the
+`.cursor/skills/` copy was an unlisted duplicate sitting on a **Cursor scan
+path** — where every `SKILL.md` `description` is read on every turn. Removing it
+frees scan budget and matches the documented set. The removal is **lossless**:
+the kept copy is byte-identical (verified by hash before and after), so there is
+no orphaned content to recover.
+
+**Observed consequence (not inferred):** the harness immediately reported
+`scope-refinement` as *no longer available*. That is the honest edge of the
+decision — `.cursor/skills/` was the only scan path surfacing it, so the skill is
+now genuinely **opt-in** rather than auto-discoverable. That is the documented
+intent, but it is a behaviour change, not a no-op: to make it discoverable again,
+copy it onto a live scan path (`.agents/skills/`), **not** back to
+`.cursor/skills/`:
+
+```powershell
+# opt back in on a LIVE scan path (not back to .cursor/skills/)
+Copy-Item -Recurse .agents\skills-extras\scope-refinement .agents\skills\
+```
 
 ## Gates
 
@@ -229,6 +258,8 @@ removing the `.cursor/skills/scope-refinement/` copy.**
 |---|---|
 | `npm run rules:score:test` | **18/18 pass** |
 | `npm run rules:score -- --strict` | exit 0 (0 actionable below 80) |
+| `npm run lift:score:test` | **13/13 pass** (no key or network required) |
+| `npm run lift:score` | exits **2** with no report when no credential is set (fail-loud) |
 | `bash scripts/verify-userharness-submodule.sh` | exit 0 |
 | `npm run preflight:ue:test` | 5/5 pass |
 | `npm run preflight:ue -- --skip-mcp --assets-only` | repo + assets + JSON PASS |
@@ -244,8 +275,10 @@ removing the `.cursor/skills/scope-refinement/` copy.**
 - **Jitter dominates small deltas.** With ~6.4 points of spread on one rule, any
   future before/after comparison needs `--repeat 3` or more before a change can
   be called real. `meanSpread` is recorded so this stays visible.
-- **`scope-refinement` duplicate** — removal of the `.cursor/` copy awaits the
-  human's word.
+- **`scope-refinement` duplicate — CLOSED.** The `.cursor/skills/` copy was
+  removed on the human's instruction; the canonical extras copy is intact. It is
+  now opt-in (no longer auto-discoverable) — see the resolution note above for
+  the observed consequence and the opt-in command.
 
 ## Skill Lift — MEASURED (Tier 1 LLM judge)
 
