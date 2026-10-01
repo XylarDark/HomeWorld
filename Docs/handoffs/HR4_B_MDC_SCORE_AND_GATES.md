@@ -252,6 +252,43 @@ copy it onto a live scan path (`.agents/skills/`), **not** back to
 Copy-Item -Recurse .agents\skills-extras\scope-refinement .agents\skills\
 ```
 
+## Tier 2 — semantic similarity, measured
+
+Tier 2 was recorded as blocked on **"a paid LLM provider key only"**. With the
+key present it runs — but **not the way the plan assumed**, and the difference is
+the same schema mismatch as Tier 1.
+
+**`--type rules` cannot see this corpus at all.** `similarity-check
+.cursor/rules --type rules` exits 1 with `No rules content found to compare` and
+`files_scanned: 0`, because its discovery reads the rule's name from a **`title`**
+frontmatter field — and **0 of 31** rules have one. Cursor writes `name:`, so the
+scanner finds nothing. This is not a broken tree or an empty folder; it is the
+tool's "rules" support not matching Cursor's rule schema. The plan recorded Tier
+2 as *"needs no materialization"*: **that was wrong.** The corpus must be
+materialized into Agent Skills first — the skill discovery path reads `name:`,
+which our rules do have.
+
+```
+# 1. materialize .cursor/rules/*.mdc -> <dir>/<slug>/SKILL.md  (shared materializer)
+# 2. then, and only then:
+skillevaluator similarity-check <materialized-dir> --type skill `
+  --save-catalog Saved/rules_catalog.json -r cli
+```
+
+**Result:** `Similarity Check | PASS`, **31 entries indexed**, catalog saved to
+`Saved/rules_catalog.json` (1,383,401 B; gitignored, machine-local). Exactly
+**one** pair exceeds the default 0.75 threshold:
+
+| pair | score |
+|---|---|
+| `ue57-sources.mdc` ⇄ `ue57-editor-ui.mdc` | **0.792** |
+
+Both are the **UE 5.7 HISTORICAL tombstones** that point at their 5.8
+replacements, so a near-identical pair is the expected state, not a defect — and
+both are already classified as tombstones by the structural scorer. No live rule
+duplicates another. (Descriptions are embedded, not bodies; `--full-body` was not
+used.)
+
 ## Gates
 
 | Gate | Result |
@@ -268,11 +305,11 @@ Copy-Item -Recurse .agents\skills-extras\scope-refinement .agents\skills\
 
 ## Still open
 
-- **Tier 2 / Tier 3 not run.** Tier 1 has both a structural score and a judged
-  verdict now. Tier 2 (`similarity-check`, which has a native `--type rules` and
-  needs no materialization) and Tier 3 (live agent eval) remain unrun; Tier 3
-  still needs an environment backend beyond Docker. `health-check` reports
-  `docker prerequisite: fail` while `Harbor agents: pass`.
+- **Tier 3 not run.** Tier 1 (structural + judged) and **Tier 2 (semantic
+  similarity, now measured — see the section above)** are both done. Tier 3 (live
+  agent eval) remains unrun: it needs an environment backend beyond Docker —
+  `health-check` reports `docker prerequisite: fail` while `Harbor agents: pass`,
+  and `harbor` ships many non-Docker backends, each needing its own account.
 - **Jitter dominates small deltas — quantified.** Pooled within-rule SD is
   **8.13** points (28 df), mean spread 7.22, max 35.5. At 80% power / 95%
   confidence, detecting a change on **one rule** needs ~**114 judged samples per
