@@ -307,3 +307,94 @@ skipped.
   **null**. Under the preregistered rule that is *inconclusive*, and the correct
   sentence is "this benchmark did not detect an effect", not "the harness does not
   help". n=1 task, n=1 trial. Do not upgrade that sentence.
+---
+
+### DEC-0015 — "Hunyuan3D and TRELLIS are on a do-not-use list; the pipeline fails closed on free tiers" (2026-10-01)
+
+- **Area:** architecture / tooling
+- **Decision:** Neither Hunyuan3D-2/2.1 nor TRELLIS/2 may be used to produce any asset
+  that reaches `Content/`. Meshy and Tripo are usable **only on a paid tier**; free-tier
+  output must cause a hard failure at generation time, not a warning. Tier is asserted
+  at generation, recorded in the sidecar, and re-checked at promote.
+- **Rationale:** Read from the license files, not vendor pages. Hunyuan3D's license
+  opens by stating it *"DOES NOT APPLY IN THE EUROPEAN UNION, UNITED KINGDOM AND SOUTH
+  KOREA"*, and §5.c forbids using outputs outside that Territory. We target PC + Steam
+  Early Access, where EU distribution is the normal case. TRELLIS is MIT on the code
+  while the project page states the materials are *"not intended for commercial
+  exploitation or use"* — a real ambiguity I decline to resolve by guess. Meshy free is
+  CC BY 4.0 (attribution mandatory in a shipped game); Tripo free retains all IP rights
+  in outputs. No agent running unattended will notice a tier change underneath it, so
+  the pipeline must fail closed rather than warn.
+- **Evidence:** `Tencent-Hunyuan/Hunyuan3D-2.1` LICENSE §1.l and §5.c; `microsoft/TRELLIS`
+  LICENSE + `trellis3d.github.io`; `docs.meshy.ai` terms; Tripo ToS 5.2.1.
+  Full write-up in [Docs/34_ART_PIPELINE_RESEARCH.md](../../Docs/34_ART_PIPELINE_RESEARCH.md) §2.
+- **Reverses if:** legal counsel clears a specific tool in writing. Hunyuan's clause is
+  explicit enough that this would need a negotiated licence, not a reading.
+- **Note:** this is the finding I would act on first if the reader acts on one thing.
+  It is cheap to comply with now and expensive to unwind after assets ship.
+
+---
+
+### DEC-0016 — "The kit pipeline is deterministic batch variant generation, not AI mesh generation" (2026-10-01)
+
+- **Area:** architecture
+- **Decision:** Build the pipeline around a checked-in generator producing kit variants
+  and instance sets from an authored master. AI mesh generation is an **experiment gated
+  behind measurement**, not the pipeline. The existing 30-minute rule stands until it is
+  replaced by real numbers.
+- **Rationale:** The research recommended the opposite — native low-poly generation now
+  exists and our 12–1,680 tri budgets sit inside its native range, which was not true
+  when the 30-minute rule was written. I am not taking that recommendation. (1) The
+  highest-leverage agent task here is thirty consistent cliff-module variants, which
+  nobody hand-models and which code does deterministically under a seed. Generation
+  gives a *different* rock, not a variant of *our* rock. (2) Everything in `HW_Hero`
+  needs authored topology: the art bible says the face is built from planes that act and
+  to spend triangles on the face — no generator produces deliberate deformation-zone
+  edge flow, which is why Hunyuan's own PolyGen paper headlines that property as its
+  contribution. (3) Compliance cost does not shrink with volume; every AI asset owes a
+  sidecar, a log row and a licence note.
+- **Rejected:** adopting generation as the pipeline on the strength of vendor marketing
+  ("built low, not crushed"), which is explicitly unbenchmarked and, per the 2026 survey
+  arXiv 2604.23629, unfalsifiable while no game-readiness benchmark exists.
+- **Evidence:** arXiv 2604.23629 (assetization bottleneck); arXiv 2509.12815 (PolyGen);
+  art bible §3 and §5. Test to run: one prop class, 10–35 assets, measured cleanup minutes
+  vs the 30-minute rule, one paid Meshy Pro month (~$20 / 1,000 credits ≈ 35–50 assets).
+- **Reverses if:** that measurement shows cleanup cost below 30 min at our poly budgets
+  **and** the facet-read assertion passes. Both, not either.
+
+---
+
+### DEC-0017 — "The generator is reviewed code the agent invokes; the agent does not improvise Blender code" (2026-10-01)
+
+- **Area:** code design
+- **Decision:** Blender-side generation lives in a checked-in, human-reviewed script
+  driven by a declarative spec. The agent runs it and reports deltas; it does not author
+  fresh `bpy` per run.
+- **Rationale:** LLM-authored `bpy` is improvised — different code each run, no grouped
+  undo, no output schema. That makes runs non-reproducible and unreviewable, which is
+  precisely the property that lets an unattended agent do useful work. Seeded
+  determinism is the property worth buying. This converts the task from "agent writes
+  Blender code" to "agent runs a parameterised generator and reports what changed".
+- **Evidence:** architectural pattern corroborated by `mcp-blender-agent`'s stated
+  problem (README only, not audited); determinism requirement corroborated by Ubisoft's
+  procedural pipeline (GDC 2018, *"the generation needs to yield the same result given
+  the same inputs"*).
+- **Reverses if:** n/a — this is a correctness property for unattended operation.
+
+---
+
+### DEC-0018 — "The pre-import gate fails closed on name, scale, budget, facet read, master, and tier" (2026-10-01)
+
+- **Area:** architecture
+- **Decision:** No mesh reaches `Content/` without passing six assertions: name allocated
+  from `MVP_EXPORT_MANIFEST.md` (never invented, one writer, serialized); measured bbox
+  height within per-class tolerance with pivot Z == 0; per-class poly budget; **visible
+  planar facets still present under a hard-shaded master**; one of the ten masters only,
+  generated textures inadmissible; paid tier confirmed.
+- **Rationale:** Each of the seven known batch failure modes from the research maps to
+  exactly one of these. The facet-read check is the one that cannot be inferred from a
+  file listing — it is the only assertion that catches the failure mode the art bible
+  calls *"the wrong kind of beauty"* (§1), and it is the reason texture generation must
+  be off for Layer A structure.
+- **Evidence:** art bible §1, §7, §10; Docs/20 §4; research §3 and §6.
+- **Reverses if:** n/a — these are correctness gates.
