@@ -6,6 +6,20 @@
  *   node scripts/score-mdc-lift.js [options]
  *   npm run lift:score -- [--json Saved/rules_lift.json] [--repeat N] [--strict]
  *
+ * Options of note:
+ *   --repeat N     independent judge samples per rule (jitter is real; 1 is a
+ *                  sweep, 3+ before calling any before/after delta real)
+ *   --retries N    attempts per sample before it counts as UNSCORED (default 2)
+ *   --cache FILE   sample cache, default Saved/lift-cache.json
+ *   --no-cache     ignore and do not write the cache (clean before/after)
+ *
+ * Caching: a judged score is only meaningful relative to the judge and the
+ * scorer, so samples are keyed by content hash + judge model + scorer version.
+ * An unchanged rule under the same judge is reused instead of re-judged, which
+ * turns a 31-rule re-measure from ~60 judge calls into ~2 after an edit. The
+ * cache trades cost, not jitter — every sample is still one draw — and it may
+ * mix draws from different days, so use --no-cache for a defensible delta.
+ *
  * Companion to score-mdc-rules.js. That one measures STRUCTURE with Tier 1
  * `quality-check` (no LLM, deterministic). This one measures a real LLM judge's
  * verdict via Tier 1 `rubric-eval`. They are different measurements and their
@@ -27,6 +41,7 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const crypto = require('crypto');
 const { spawnSync } = require('child_process');
 
 const PREFIX = 'lift:score';
@@ -35,6 +50,11 @@ const REPEATS_DEFAULT = 1;
 // The judge intermittently returns prose instead of JSON, giving no score. That
 // is transient, so each attempt is retried; see scoreWithRetries().
 const RETRIES_DEFAULT = 2;
+const CACHE_DEFAULT = 'Saved/lift-cache.json';
+// Bound the cache so a long-lived checkout cannot grow it without limit. More
+// samples than --repeat are kept on purpose: a later run at a higher repeat
+// reuses them instead of re-judging.
+const CACHE_MAX_SAMPLES = 8;
 const SCORE_RE = /LLM Rubric Score:\s*([0-9]+(?:\.[0-9]+)?)\s*\/\s*100/;
 const MODEL_RE = /nvidia\/([A-Za-z0-9._-]+)/;
 const PROVIDER_RE = /SKILL_EVAL_LLM_PROVIDER/i;
@@ -223,12 +243,109 @@ function scoreWithRetries(attempt, retries) {
   return { score: null, reason: last.reason, attempts: retries + 1 };
 }
 
+/**
+ * Content hash of the artifact that is actually judged.
+ *
+ * Hash the MATERIALIZED SKILL.md, not the source .mdc: the materializer is what
+ * turns a rule into the prompt, so if its output changes (e.g. a frontmatter
+ * field starts being passed through), the hash changes and the cached verdict is
+ * correctly discarded. Hashing the source would silently reuse a verdict taken
+ * against different bytes.
+ */
+function hashSkillDir(dir) {
+  const skill = path.join(dir, 'SKILL.md');
+  const buf = fs.existsSync(skill) ? fs.readFileSync(skill) : Buffer.from('');
+  return crypto.createHash('sha256').update(buf).digest('hex').slice(0, 16);
+}
+
+/**
+ * Cache key. A judged score is only meaningful relative to the judge and the
+ * scorer that produced it, so both are part of the identity — a key of just the
+ * content would let a model swap or a scorer upgrade silently reuse stale
+ * numbers. This is the cache equivalent of `scorerVersion` in the report.
+ */
+function cacheKeyFor(dir, judgeModel, scorerVersion) {
+  return `${hashSkillDir(dir)}|${judgeModel}|${scorerVersion}`;
+}
+
+/** A cached sample is usable only if it carries a finite numeric score. */
+function isValidSample(s) {
+  return Boolean(s) && typeof s === 'object' && Number.isFinite(s.score);
+}
+
+/**
+ * Load the cache. Never throws and never fabricates.
+ *
+ * A missing file is a cold cache (normal). A corrupt file is treated as cold
+ * with a warning — the run proceeds and simply re-judges. The one thing that
+ * must NOT happen is a parse failure being read as "these rules scored well".
+ */
+function loadCache(file, warn) {
+  const empty = { version: 1, entries: {} };
+  if (!file || !fs.existsSync(file)) return empty;
+  let text;
+  try {
+    text = fs.readFileSync(file, 'utf8');
+  } catch (err) {
+    if (warn) warn(`${PREFIX} - cache unreadable (${err.message}); re-judging everything`);
+    return empty;
+  }
+  try {
+    const parsed = JSON.parse(text);
+    if (!parsed || typeof parsed !== 'object' || typeof parsed.entries !== 'object' || !parsed.entries) {
+      throw new Error('unexpected shape');
+    }
+    parsed.version = parsed.version || 1;
+    return parsed;
+  } catch (err) {
+    if (warn) warn(`${PREFIX} - cache corrupt (${err.message}); re-judging everything`);
+    return empty;
+  }
+}
+
+/** Read usable samples for a key. Returns [] on any miss or malformed entry. */
+function cacheRead(cache, key) {
+  if (!cache || !cache.entries) return [];
+  const entry = cache.entries[key];
+  if (!entry || !Array.isArray(entry.samples)) return [];
+  return entry.samples.filter(isValidSample);
+}
+
+/**
+ * Append freshly judged samples to a key.
+ *
+ * `fresh` must contain ONLY samples judged in this run — passing the merged list
+ * would re-append samples that came from the cache and inflate the entry with
+ * duplicates of itself on every run.
+ */
+function cacheStore(cache, key, fresh) {
+  if (!cache || !cache.entries || fresh.length === 0) return;
+  const prev = Array.isArray(cache.entries[key] && cache.entries[key].samples)
+    ? cache.entries[key].samples.filter(isValidSample)
+    : [];
+  cache.entries[key] = { samples: prev.concat(fresh).slice(-CACHE_MAX_SAMPLES) };
+}
+
+/** Persist the cache. A write failure is a warning, never a run failure. */
+function saveCache(file, cache, warn) {
+  try {
+    fs.mkdirSync(path.dirname(path.resolve(file)), { recursive: true });
+    fs.writeFileSync(path.resolve(file), `${JSON.stringify(cache, null, 2)}\n`, 'utf8');
+    return true;
+  } catch (err) {
+    if (warn) warn(`${PREFIX} - could not write cache (${err.message}); results are still valid`);
+    return false;
+  }
+}
+
 function parseArgs(argv) {
   const opts = {
     json: null,
     strict: false,
     repeat: REPEATS_DEFAULT,
     retries: RETRIES_DEFAULT,
+    cache: CACHE_DEFAULT,
+    noCache: false,
     rulesDir: '.cursor/rules',
     tool: null,
     limit: null,
@@ -239,6 +356,8 @@ function parseArgs(argv) {
     if (a === '--json') opts.json = argv[++i];
     else if (a === '--repeat') opts.repeat = Number(argv[++i]);
     else if (a === '--retries') opts.retries = Number(argv[++i]);
+    else if (a === '--cache') opts.cache = argv[++i];
+    else if (a === '--no-cache') opts.noCache = true;
     else if (a === '--rules-dir') opts.rulesDir = argv[++i];
     else if (a === '--tool') opts.tool = argv[++i];
     else if (a === '--only') opts.only = argv[++i];
@@ -255,6 +374,10 @@ function parseArgs(argv) {
   }
   if (!Number.isInteger(opts.retries) || opts.retries < 0) {
     console.error(`${PREFIX} - --retries must be a non-negative integer`);
+    return null;
+  }
+  if (opts.cache !== null && typeof opts.cache !== 'string') {
+    console.error(`${PREFIX} - --cache needs a file path`);
     return null;
   }
   return opts;
@@ -307,24 +430,52 @@ function main() {
   const judgeModel = model ? `nvidia/${model[1]}` : 'unknown';
   const toolVersion = sibling.toolVersion(tool);
 
+  const cacheFile = opts.noCache ? null : path.resolve(projectRoot, opts.cache);
+  const cache = opts.noCache
+    ? { version: 1, entries: {} }
+    : loadCache(cacheFile, (m) => console.error(m));
   const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'hw-lift-'));
   const results = [];
+  let cacheHits = 0;
+  let fromCacheSamples = 0;
   try {
     for (const file of files) {
       const rule = sibling.readRule(path.join(rulesAbs, file), rulesAbs);
       const dir = sibling.materializeSkill(rule, tmpRoot);
-      const runs = [];
-      for (let r = 0; r < opts.repeat; r += 1) {
-        runs.push(scoreWithRetries(() => runRubricOnce(tool, dir), opts.retries));
+      const key = cacheKeyFor(dir, judgeModel, toolVersion);
+
+      // Cached samples first. An unchanged rule under the same judge and scorer
+      // has already been measured; re-judging it spends a call to learn nothing.
+      // This is what makes a re-measure cheap after a corpus edit.
+      const cachedSamples = cacheRead(cache, key);
+      const samples = cachedSamples
+        .slice(0, opts.repeat)
+        .map((s) => ({ score: s.score, criteria: s.criteria || {} }));
+      const samplesFromCache = samples.length;
+
+      let attempts = 0;
+      let freshRuns = 0;
+      let reason = 'not judged';
+      const freshSamples = [];
+      for (let i = samples.length; i < opts.repeat; i += 1) {
+        freshRuns += 1;
+        const r = scoreWithRetries(() => runRubricOnce(tool, dir), opts.retries);
+        attempts += r.attempts || 1;
+        if (r.score === null) {
+          reason = r.reason;
+        } else {
+          const s = { score: r.score, criteria: r.criteria || {} };
+          samples.push(s);
+          freshSamples.push(s);
+        }
       }
-      const scores = runs.map((x) => x.score).filter((x) => x !== null);
+
+      const scores = samples.map((s) => s.score);
       const mean = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : null;
-      const attempts = runs.reduce((a, x) => a + (x.attempts || 1), 0);
-      // Criterion scores are averaged over whichever runs reported them; a rule
-      // judged but with unparseable criteria simply contributes none.
+      // Criterion scores are averaged over whichever samples reported them.
       const critAcc = {};
-      for (const run of runs) {
-        for (const [k, v] of Object.entries(run.criteria || {})) (critAcc[k] ||= []).push(v);
+      for (const s of samples) {
+        for (const [k, v] of Object.entries(s.criteria || {})) (critAcc[k] ||= []).push(v);
       }
       const criteria = {};
       for (const [k, arr] of Object.entries(critAcc)) {
@@ -343,20 +494,31 @@ function main() {
           scores.length > 1 ? Number((Math.max(...scores) - Math.min(...scores)).toFixed(2)) : null,
         runs: scores,
         criteria,
-        // A rule that needed a retry is flaky - surface it, do not hide it.
+        samplesFromCache,
+        cached: samplesFromCache > 0,
+        // Attempts spent in THIS run only; a cached sample carries none.
         attempts,
-        retried: attempts > runs.length,
-        unscoredReason: scores.length ? null : runs[0].reason,
+        // A fresh sample needing more than one attempt is flakiness now. A fully
+        // cached rule is not flaky now, whatever it cost the run that measured it.
+        retried: freshRuns > 0 && attempts > freshRuns,
+        unscoredReason: scores.length ? null : reason,
       });
+      if (samplesFromCache > 0) {
+        cacheHits += 1;
+        fromCacheSamples += samplesFromCache;
+      }
+      cacheStore(cache, key, freshSamples);
+
       const shown =
         mean === null
-          ? `UNSCORED (${runs[0].reason})`
-          : `${mean.toFixed(1)}${opts.repeat > 1 ? ` (spread ${(Math.max(...scores) - Math.min(...scores)).toFixed(1)})` : ''}${attempts > runs.length ? ` [${attempts} attempts]` : ''}`;
+          ? `UNSCORED (${reason})`
+          : `${mean.toFixed(1)}${opts.repeat > 1 ? ` (spread ${(Math.max(...scores) - Math.min(...scores)).toFixed(1)})` : ''}${samplesFromCache ? ` [${samplesFromCache} cached]` : ''}${attempts > freshRuns ? ` [${attempts} attempts]` : ''}`;
       process.stderr.write(`${PREFIX} - ${file} ${shown}\n`);
     }
   } finally {
     fs.rmSync(tmpRoot, { recursive: true, force: true });
   }
+  const cacheWritten = opts.noCache ? false : saveCache(cacheFile, cache, (m) => console.error(m));
 
   const scored = results.filter((r) => r.score !== null);
   const unscored = results.filter((r) => r.score === null);
@@ -385,6 +547,13 @@ function main() {
   console.log(`  judge      : ${cred.provider} / ${judgeModel}  (scorer v${toolVersion})`);
   console.log(`  credential : ${cred.credentialVar}, ${cred.credentialLength} chars (value never recorded)`);
   console.log(`  rules      : ${results.length} (${scored.length} judged, ${unscored.length} UNSCORED)`);
+  if (opts.noCache) {
+    console.log('  cache      : disabled (--no-cache)');
+  } else {
+    console.log(
+      `  cache      : ${cacheHits}/${results.length} rule(s) served from ${path.relative(projectRoot, cacheFile).split(path.sep).join('/')} (${fromCacheSamples} sample(s) reused)`
+    );
+  }
   const retriedCount = scored.filter((r) => r.retried).length;
   if (retriedCount > 0 || unscored.length > 0) {
     console.log(
@@ -446,6 +615,15 @@ function main() {
       recorded: false,
       note: 'credential value is never persisted; only the variable name and length',
     },
+    cache: {
+      enabled: !opts.noCache,
+      path: cacheFile ? path.relative(projectRoot, cacheFile).split(path.sep).join('/') : null,
+      written: cacheWritten,
+      rulesServed: cacheHits,
+      samplesReused: fromCacheSamples,
+      maxSamplesPerKey: CACHE_MAX_SAMPLES,
+      note: 'cached samples are prior draws from the same judge+scorer. Reuse cuts cost, not jitter, and mixes samples across days — use --no-cache for a clean before/after measurement.',
+    },
     ruleCount: results.length,
     judgedCount: scored.length,
     unscoredCount: unscored.length,
@@ -480,10 +658,19 @@ if (require.main === module) main();
 module.exports = {
   PREFIX,
   CRITERIA,
+  CACHE_DEFAULT,
+  CACHE_MAX_SAMPLES,
   parseRubric,
   parseCriteria,
   detectCredential,
   resolveTool,
   failureReason,
   scoreWithRetries,
+  hashSkillDir,
+  cacheKeyFor,
+  isValidSample,
+  loadCache,
+  cacheRead,
+  cacheStore,
+  saveCache,
 };

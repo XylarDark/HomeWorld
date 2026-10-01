@@ -18,7 +18,23 @@ const test = require('node:test');
 
 const script = path.join(__dirname, 'score-mdc-lift.js');
 const projectRoot = path.resolve(__dirname, '..');
-const { parseRubric, parseCriteria, CRITERIA, detectCredential, resolveTool, failureReason, scoreWithRetries } = require('./score-mdc-lift.js');
+const {
+  parseRubric,
+  parseCriteria,
+  CRITERIA,
+  CACHE_MAX_SAMPLES,
+  detectCredential,
+  resolveTool,
+  failureReason,
+  scoreWithRetries,
+  hashSkillDir,
+  cacheKeyFor,
+  isValidSample,
+  loadCache,
+  cacheRead,
+  cacheStore,
+  saveCache,
+} = require('./score-mdc-lift.js');
 
 const CRED_VARS = ['SKILL_EVAL_LLM_PROVIDER', 'NVIDIA_API_KEY', 'OPENAI_API_KEY', 'ANTHROPIC_API_KEY'];
 
@@ -263,4 +279,150 @@ test('parseCriteria returns {} rather than throwing on bad input', () => {
   for (const bad of [undefined, null, '', {}, 42, []]) {
     assert.deepStrictEqual(parseCriteria(bad), {});
   }
+});
+
+// ---------------------------------------------------------------------------
+// Cache (W2.1). The cache exists to make a re-measure cheap without making a
+// stale verdict look fresh, so the tests that matter are the ones proving it
+// MISSES when the bytes, the judge, or the scorer change.
+// ---------------------------------------------------------------------------
+
+/** Make a throwaway materialized-skill dir with a given SKILL.md body. */
+function makeSkillDir(body) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hw-cache-test-'));
+  fs.writeFileSync(path.join(dir, 'SKILL.md'), body, 'utf8');
+  return dir;
+}
+
+test('hashSkillDir is stable for identical bytes', () => {
+  const a = makeSkillDir('# hello\n');
+  const b = makeSkillDir('# hello\n');
+  assert.strictEqual(hashSkillDir(a), hashSkillDir(b));
+  fs.rmSync(a, { recursive: true, force: true });
+  fs.rmSync(b, { recursive: true, force: true });
+});
+
+test('hashSkillDir changes when the judged bytes change', () => {
+  const a = makeSkillDir('# hello\n');
+  const b = makeSkillDir('# hello!\n');
+  assert.notStrictEqual(hashSkillDir(a), hashSkillDir(b));
+  fs.rmSync(a, { recursive: true, force: true });
+  fs.rmSync(b, { recursive: true, force: true });
+});
+
+test('hashSkillDir does not throw on a missing SKILL.md', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hw-cache-test-'));
+  assert.doesNotThrow(() => hashSkillDir(dir));
+  assert.strictEqual(typeof hashSkillDir(dir), 'string');
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('cacheKeyFor changes with the judge model — a different judge is a different measurement', () => {
+  const dir = makeSkillDir('# skill\n');
+  const a = cacheKeyFor(dir, 'nvidia/model-a', '0.4.0');
+  const b = cacheKeyFor(dir, 'nvidia/model-b', '0.4.0');
+  assert.notStrictEqual(a, b);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('cacheKeyFor changes with the scorer version — a scorer upgrade invalidates verdicts', () => {
+  const dir = makeSkillDir('# skill\n');
+  const a = cacheKeyFor(dir, 'nvidia/model-a', '0.4.0');
+  const b = cacheKeyFor(dir, 'nvidia/model-a', '0.5.0');
+  assert.notStrictEqual(a, b);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('isValidSample accepts only a finite numeric score', () => {
+  assert.ok(isValidSample({ score: 71 }));
+  assert.ok(isValidSample({ score: 0 }), 'a real 0 is a valid score');
+  assert.ok(!isValidSample(null));
+  assert.ok(!isValidSample({}));
+  assert.ok(!isValidSample({ score: null }));
+  assert.ok(!isValidSample({ score: '71' }));
+  assert.ok(!isValidSample({ score: NaN }));
+  assert.ok(!isValidSample({ score: Infinity }));
+});
+
+test('cacheRead returns [] on a miss and filters unusable samples', () => {
+  const cache = { version: 1, entries: { k: { samples: [{ score: 60 }, { score: null }, { junk: 1 }] } } };
+  assert.deepStrictEqual(cacheRead(cache, 'missing'), []);
+  assert.deepStrictEqual(cacheRead(cache, 'k'), [{ score: 60 }]);
+  assert.deepStrictEqual(cacheRead(null, 'k'), []);
+});
+
+test('cacheStore appends only fresh samples, never re-appending the cached ones', () => {
+  // The bug this guards: passing the merged list would duplicate the entry with
+  // itself on every run, so the cache would grow without bound and quietly
+  // weight old draws more heavily.
+  const cache = { version: 1, entries: {} };
+  cacheStore(cache, 'k', [{ score: 60 }]);
+  cacheStore(cache, 'k', []); // a run that was fully served from cache
+  assert.strictEqual(cache.entries.k.samples.length, 1);
+  cacheStore(cache, 'k', [{ score: 70 }]);
+  assert.strictEqual(cache.entries.k.samples.length, 2);
+});
+
+test('cacheStore caps the entry so a long-lived checkout cannot grow it without limit', () => {
+  const cache = { version: 1, entries: {} };
+  for (let i = 0; i < CACHE_MAX_SAMPLES + 5; i += 1) cacheStore(cache, 'k', [{ score: i }]);
+  assert.strictEqual(cache.entries.k.samples.length, CACHE_MAX_SAMPLES);
+  // It keeps the most recent, not the oldest.
+  const last = cache.entries.k.samples[CACHE_MAX_SAMPLES - 1];
+  assert.strictEqual(last.score, CACHE_MAX_SAMPLES + 4);
+});
+
+test('loadCache treats a missing file as a cold cache, not an error', () => {
+  const missing = path.join(os.tmpdir(), `hw-no-such-cache-${Date.now()}.json`);
+  assert.deepStrictEqual(loadCache(missing, () => {}), { version: 1, entries: {} });
+});
+
+test('loadCache warns and re-judges on a corrupt cache rather than trusting it', () => {
+  const file = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'hw-cache-test-')), 'c.json');
+  fs.writeFileSync(file, '{ this is not json', 'utf8');
+  const warnings = [];
+  const cache = loadCache(file, (m) => warnings.push(m));
+  assert.deepStrictEqual(cache.entries, {});
+  assert.strictEqual(warnings.length, 1);
+  assert.match(warnings[0], /corrupt/);
+  fs.rmSync(path.dirname(file), { recursive: true, force: true });
+});
+
+test('loadCache warns on an unexpected shape instead of returning junk', () => {
+  const file = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'hw-cache-test-')), 'c.json');
+  fs.writeFileSync(file, JSON.stringify({ version: 1, entries: 'not-an-object' }), 'utf8');
+  const warnings = [];
+  const cache = loadCache(file, (m) => warnings.push(m));
+  assert.deepStrictEqual(cache.entries, {});
+  assert.strictEqual(warnings.length, 1);
+  fs.rmSync(path.dirname(file), { recursive: true, force: true });
+});
+
+test('saveCache/loadCache round-trips samples', () => {
+  const file = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'hw-cache-test-')), 'nested', 'c.json');
+  const cache = { version: 1, entries: {} };
+  cacheStore(cache, 'k', [{ score: 55.5, criteria: { 'Example Quality': 4 } }]);
+  assert.ok(saveCache(file, cache, () => {}));
+  const back = loadCache(file, () => {});
+  const samples = cacheRead(back, 'k');
+  assert.strictEqual(samples.length, 1);
+  assert.strictEqual(samples[0].score, 55.5);
+  assert.strictEqual(samples[0].criteria['Example Quality'], 4);
+  fs.rmSync(path.dirname(path.dirname(file)), { recursive: true, force: true });
+});
+
+test('saveCache reports failure without throwing when the path is unusable', () => {
+  const warnings = [];
+  // A path whose parent is a FILE cannot be created as a directory.
+  const file = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'hw-cache-test-')), 'afile', 'c.json');
+  fs.writeFileSync(path.dirname(file), 'x', 'utf8');
+  assert.strictEqual(saveCache(file, { version: 1, entries: {} }, (m) => warnings.push(m)), false);
+  assert.strictEqual(warnings.length, 1);
+  fs.rmSync(path.dirname(path.dirname(file)), { recursive: true, force: true });
+});
+
+test('CLI rejects --cache with no value (exit 2, before any provider work)', () => {
+  const r = runCli(['--cache']);
+  assert.strictEqual(r.status, 2);
+  assert.match(r.stderr, /--cache needs a file path/);
 });
