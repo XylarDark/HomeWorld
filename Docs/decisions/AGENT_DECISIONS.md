@@ -600,3 +600,79 @@ skipped.
   The second is the real test of this decision and it has not happened yet.
 - **Consequence:** `Docs/qa/HARNESS_REFINEMENT_TASKS.md` R5/R6 are superseded by this entry and
   should not be started.
+
+---
+
+### DEC-0034 "Correction to DEC-0033: the sign-flip is the EXPECTED result, not evidence of a broken harness" (2026-10-01)
+
+- **Area:** harness — corrects the inference in DEC-0033
+- **Why this entry exists:** DEC-0033 concluded that because `task-lift.js` readings flip sign
+  depending on which model runs them, the instrument may be "measuring harness-x-model
+  interaction" rather than the harness. **That inference was wrong, and it was mine.** It is
+  corrected here rather than left standing, because a wrong decision left in the log is worse
+  than no decision.
+
+- **The evidence that corrects it (VERIFIED from the paper):**
+  *"Evaluating AGENTS.md: Are Repository-Level Context Files Helpful for Coding Agents?"*
+  Gloaugen, Muendler, Mueller, Raychev, Vechev. arXiv **2602.11988** (v3 2026-09-29),
+  ICLR 2026 Workshop on Memory for LLM-Based Agentic Systems, ETH Zurich + LogicStar.ai.
+  Code: `eth-sri/agentbench`, MIT.
+
+  | Condition | Task success | Steps | Cost |
+  |---|---|---|---|
+  | LLM-generated context file | **-3%** (marginal negative) | +2.45 to +3.92 | **+20% / +23%** |
+  | Developer-written context file | **+4%** (marginal positive) | +3.34 | up to +19% |
+
+  **The mechanism is the part that matters:** instructions in context files **are followed**.
+  Repo-specific tooling was used **1.6x/instance when mentioned vs <0.01x when not mentioned**;
+  repo tools **2.5x vs <0.05x**. Context files reliably increase steps and cost, and reliably
+  get followed. What they do **not** reliably do is move a binary task-success metric.
+  Their own recommendation is to omit LLM-generated context files and include only minimal
+  requirements (e.g. specific tooling to use).
+
+- **Reinterpretation of our own data:** R4 (space-bunny-free) gave with-arm 0.75 vs without 0.65.
+  R5 (nemotron) gave with-arm 0.314 vs without 0.556. A sign flip between models is the
+  **expected** outcome at 4 tasks x 2 conditions, not evidence the harness is broken or harmful.
+  The likely cause of our instability is that **a single discordant pair flips McNemar** at
+  this n — the fix is more tasks with fewer checks each, not a bigger instrument.
+
+- **Consequence for DEC-0033:** the *cuts* stand. The *diagnosis* is corrected. DEC-0033's
+  evidence list should be read with the following removed: any inference that the sign-flip
+  indicates the harness measures harness-x-model interaction rather than the harness.
+
+- **Cuts ADOPTED on this evidence (each is a deletion, not a build):**
+  1. **`score-mdc-lift.js` (1,006 LOC) + `score-mdc-rules.js` (462 LOC) + their tests — DELETE.**
+     Structural lint-scoring of markdown. Our own `task-lift.js` header already states these
+     "measure the inputs - how good the rule text is. Neither can answer the only question that
+     matters." The paper makes the general point concrete: score the behaviour, not the text.
+  2. **The `decisions:check` boundary gate — DELETE the gate, keep the log file as prose.**
+     An enterprise compliance control applied to a team with no auditors. It was red for 14
+     commits and caught nothing.
+  3. **The tombstone-retirement apparatus — DELETE.** Tombstones exist to avoid dangling
+     references and accumulate only because nothing ever deletes. Let the refresh script fail
+     loudly on a dangling ref instead.
+  4. **`.cursor/rules/` 25 files -> 6-8.** `AGENTS.md` is now a **Linux Foundation standard**
+     (Agentic AI Foundation, announced 2025-12-09; `agentsmd/agents.md`, 24.7k stars, MIT,
+     60k+ projects, read by opencode/Cursor/Codex/Aider/goose and others). Keep only what is
+     genuinely UE-5.8-and-HomeWorld-specific; the tech-agnostic ones belong in `AGENTS.md` or
+     nowhere.
+  5. **promptfoo replaces the evaluation *mechanism*; McNemar stays.** promptfoo (25.6k stars,
+     MIT, ~3M npm downloads/month, now part of OpenAI) already supports `copy_working_dir: 'git'`
+     (a clone of the current commit, no remote), templated `working_dir` so two rows can point
+     at two pre-built worktrees, the `opencode:sdk` provider, `trajectory:*` assertions that read
+     what the agent DID rather than what it says it did, and a `skill-used` assertion. That
+     replaces our worktree builder, process-spawn plumbing and glob->RegExp compiler. **We keep
+     McNemar and the three-arm design - promptfoo has NO statistical significance testing.**
+  6. **`eth-sri/agentbench` already ran our experiment** at proper scale (3-arm true file-removal
+     ablation, 4 agents, 438 instances, MIT). We do not need to re-derive their finding; we should
+     cite it.
+
+- **UE C++ testing — corrected by this research:** for pure C++ unit tests, the intended tool is
+  the **Catch2-based Low-Level Test (LLT)** framework in UE5, not Automation Test Framework.
+  Epic's own ATF documentation states ATF is "not ideal for pure unit testing." **Gauntlet is
+  AAA-scale, requires a source build of the engine, and is overbuilt for 1-3 people** - gate it
+  behind real multiplayer need. `Source/` currently contains **zero** automation tests.
+
+- **Reverses if:** a future run at adequate n shows context files move conformance reliably in
+  the positive direction. That would justify keeping the eval harness - but not the deleted
+  pieces, whose arguments were never about statistical power.
