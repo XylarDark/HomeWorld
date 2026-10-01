@@ -1,7 +1,10 @@
 ---
+name: "Feature Debug Instrumentation"
 description: Add debug instrumentation when implementing new features for faster debugging
 alwaysApply: false
 globs: "**/Source/**, **/Content/Python/**, **/Tools/**, **/.github/workflows/**"
+priority: 16
+version: 1.0
 ---
 
 # Feature debug instrumentation (policy)

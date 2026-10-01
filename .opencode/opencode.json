@@ -1,10 +1,12 @@
 {
   "permission": {
     "read": {
-      "C:/dev/HomeWorld/.opencode/gsd-core/*": "allow"
+      "*/.opencode/gsd-core/*": "allow",
+      "*\\.opencode\\gsd-core\\*": "allow"
     },
     "external_directory": {
-      "C:/dev/HomeWorld/.opencode/gsd-core/*": "allow"
+      "*/.opencode/gsd-core/*": "allow",
+      "*\\.opencode\\gsd-core\\*": "allow"
     }
   },
   "mcp": {

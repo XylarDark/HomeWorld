@@ -16,7 +16,9 @@
     "sync:all": "node UserHarness/dist/scripts/sync/cli.js --layer all --template ./UserHarness --project-root .",
     "evidence:grep": "node scripts/evidence-grep.js",
     "evidence:grep:test": "node --test scripts/evidence-grep.test.js",
-    "check:uasset-allowlist": "node scripts/check-uasset-allowlist.js"
+    "check:uasset-allowlist": "node scripts/check-uasset-allowlist.js",
+    "rules:score": "node scripts/score-mdc-rules.js",
+    "rules:score:test": "node --test scripts/score-mdc-rules.test.js"
   },
   "engines": {
     "node": ">=20.0.0"
