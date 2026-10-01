@@ -31,7 +31,11 @@
     "scope:reconcile:test": "node --test scripts/scope-reconcile.test.js",
     "test:all": "node --test \"scripts/*.test.js\"",
     "outcome:test": "node --test scripts/outcome.test.js",
-    "decisions": "node scripts/decision-log.js"
+    "decisions": "node scripts/decision-log.js",
+    "verify": "node scripts/verify.js",
+    "verify:fast": "node scripts/verify.js --tier fast",
+    "verify:ue": "node scripts/verify.js --tier ue",
+    "editor:lock": "node scripts/editor-lock.js"
   },
   "engines": {
     "node": ">=20.0.0"

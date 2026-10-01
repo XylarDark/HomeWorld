@@ -95,10 +95,16 @@ jobs:
       - name: UE preflight unit tests (HR3-B)
         run: npm run preflight:ue:test
 
+      # The one command that proves the game is real. On CI the JS tier only: the
+      # C++ build runs in the ci.yml workflow's own build step, and Safe-Build needs
+      # a Windows host with the Editor toolchain. See Docs/35_HARNESS_REFACTOR_STRATEGY.md.
+      - name: Verify (JS tier - see ci.yml for the C++ build)
+        run: npm run verify:fast
+
       # These suites were previously only run locally. Tests that gate nothing are
       # not a harness: they catch a regression on whichever machine happens to run them
       # and nowhere else. This step is the first thing that makes them a gate.
-      - name: Harness unit tests (tasklift, outcome, scope-reconcile, t0-evidence, preflight-ue)
+      - name: Harness unit tests (tasklift, outcome, scope-reconcile, t0-evidence, preflight-ue, editor-lock)
         run: npm run test:all
 
       - name: Task-lift positive control (instrument can register success)

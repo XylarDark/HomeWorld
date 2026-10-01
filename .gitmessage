@@ -1,0 +1,48 @@
+# =============================================================================
+# HomeWorld commit template
+# =============================================================================
+# ONE developer, SEVERAL agents. Your review attention is the scarcest resource in
+# the company, so this asks for the one thing that makes a diff cheap to review:
+# what the agent INVENTED, stated up front rather than discovered on read.
+#
+# Delete any section that genuinely does not apply. An unfilled template that
+# says "N/A" everywhere is worse than no template, because it trains you to skip it.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# ASSUMPTIONS  <- the section that matters. Fill it in or delete it.
+# -----------------------------------------------------------------------------
+# What did you decide that I did not tell you?
+#
+# Anything you chose between two defensible options. Anything you could not verify
+# and proceeded anyway. Anything that touches art, game feel, mechanics, palette,
+# silhouette, or scope - those are MINE, not yours (see docs/human-use/OWNERSHIP.md
+# and docs/human-use/cursor-cannot/). If you had to make one to finish, say so here
+# so I can reverse it in one minute instead of finding it in the diff.
+#
+# Assumed:
+# -
+# Could not verify:
+# -
+
+# -----------------------------------------------------------------------------
+# VERIFIED  <- what did you actually run?
+# -----------------------------------------------------------------------------
+# Not "tests pass". Name the command and the result.
+#
+# Verified:
+# - <command> -> <result>
+#
+# -----------------------------------------------------------------------------
+# NOT DONE  <- what did you deliberately skip?
+# -----------------------------------------------------------------------------
+# The most valuable line in this template. An agent that reports its omissions is
+# safe to supervise; one that silently drops half the task is not.
+#
+# Not done:
+# -
+
+# -----------------------------------------------------------------------------
+# Conventional Commits: feat / fix / docs / test / refactor / chore / perf
+# Scope when it helps. Body explains WHY, not what - the diff already says what.
+# =============================================================================
