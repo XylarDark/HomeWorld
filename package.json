@@ -41,6 +41,7 @@
     "scope:reconcile": "node scripts/scope-reconcile.js",
     "scope:reconcile:write": "node scripts/scope-reconcile.js --write Docs/qa/T0_SCOPE_RECONCILIATION.md",
     "scope:reconcile:test": "node --test scripts/scope-reconcile.test.js",
+    "test:all": "node --test \"scripts/*.test.js\"",
     "outcome:test": "node --test scripts/outcome.test.js"
   },
   "engines": {

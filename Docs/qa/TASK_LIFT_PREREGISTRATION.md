@@ -88,3 +88,53 @@ the previous default was to run them — asking for a report cost eight sessions
 
 Budget note: 4 tasks × 2 conditions = 8 agent sessions per trial. The recommended
 first honest run is `--trials 2` (16 sessions) once the provider is healthy.
+
+---
+
+# Results log (appended after data — do not edit the decision rule above)
+
+## Run 1 — 2026-10-01, all 4 taste tasks, `opencode/space-bunny-free`, 1 trial, 8 sessions
+
+**7 measured, 1 void** (`mechanic-beat-packet` / `without` — the session aborted with
+`Session interrupted: shutdown`). Paired tasks: **3**; dropped: `mechanic-beat-packet`.
+
+| Measure | With | Without | Delta |
+|---|---|---|---|
+| Task completion (control) | 100% | 100% | 0pp |
+| Convention conformance | 88.9% | 96.3% | **−7.4pp** |
+
+**Verdict against the rule fixed above:** `b = 0` (so not INVALID), `d = −0.074`, which
+lands in **"Harness arm scored worse — treat as a defect to investigate, not as a
+finding to celebrate."**
+
+**What that does and does not mean.** It does **not** mean the harness is harmful.
+n = 3 paired tasks at 1 trial, and the delta is driven by **three individual checks**:
+
+- `art-master-spec` — **without** failed *"avoids the rejected look language"*: the
+  ablated arm used photoreal / scan language where the harness arm did not. This is
+  the one failure that points the harness's way, and it is the only check on that task
+  that separates the arms.
+- `art-shot-brief` — **with** failed *"pairs the shrine light against the cabin key"*
+  and *"the shrine is a handmade spirit cue, not a tech gate"*. Both require a
+  specific recorded term or a banned-term absence.
+- The dropped task's 10 failures are all `void` — the agent never wrote the file.
+
+**The most likely explanation is still the check, not the harness.** The two
+`art-shot-brief` checks are the same shape as the two flaws already found and fixed
+in this instrument: `pairs the shrine light against the cabin key` requires the
+literal phrase `Cabin amber`, so an answer that says "the cabin's warm window light"
+fails on wording while knowing the canon perfectly. `handmade spirit cue, not a tech
+gate` is a banned-term check that can still be tripped by a *correct* answer that names
+the neon portal while rejecting it — the `unless` negation guard was added to the
+**material** check but not to the **shot** check.
+
+**Therefore the next step is auditing the remaining taste checks for phrasing
+sensitivity, not drawing a conclusion about the harness.** Two prior instances of this
+exact defect were each found only by running the thing.
+
+**Control outcome:** completion was identical at 100% in both arms, so the conformance
+delta is not explained by the harness arm doing less work — which is what the control
+exists to rule out, and it did its job.
+
+**Still unrun:** `--trials 2`, the `docs-only` third arm, and any significance test.
+The benchmark has one trial per cell and no power.

@@ -683,6 +683,30 @@ test('the NightMix range check accepts the ways people actually write it', () =>
   }
 });
 
+test('trials raise the minimum valid runs a cell needs', () => {
+  // One trial per cell is noise-dominated: a single timeout or one unusual answer
+  // moves the rate as much as any real effect. `--min-valid` defaults to the trial
+  // count, so asking for 2 trials cannot be satisfied by 1.
+  const one = (condition, conf) => ({
+    taskId: 'a',
+    condition,
+    trial: 1,
+    voided: false,
+    conformance: conf,
+    completion: 1,
+    agent: { status: 0, error: null, attempts: 1 },
+  });
+  const two = (condition, conf, trial) => ({ ...one(condition, conf), trial });
+  assert.strictEqual(M.summarize([one('with', 1), one('without', 0)], { minValidPerCell: 2 }).lift, null);
+  assert.strictEqual(
+    M.summarize([one('with', 1), one('with', 1), one('without', 0), two('without', 0, 2)], {
+      minValidPerCell: 2,
+    }).lift,
+    1,
+    'two valid runs per cell should satisfy the requirement'
+  );
+});
+
 test('only transport failures are retried, never a substantive non-zero exit', () => {
   // Retrying a run that failed for a substantive reason would silently replace a
   // measurement with a more flattering one.

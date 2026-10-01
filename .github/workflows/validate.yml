@@ -95,6 +95,28 @@ jobs:
       - name: UE preflight unit tests (HR3-B)
         run: npm run preflight:ue:test
 
+      # These suites were previously only run locally. 223 tests that gate nothing are
+      # not a harness: they catch a regression on whichever machine happens to run them
+      # and nowhere else. This step is the first thing that makes them a gate.
+      - name: Harness unit tests (tasklift, outcome, decisions, scope-reconcile, scorers)
+        run: npm run test:all
+
+      - name: Task-lift positive control (instrument can register success)
+        run: npm run tasklift:control && npm run tasklift:control:taste
+
+      - name: T0 scope reconciliation (declared scope vs the tree)
+        run: npm run scope:reconcile:write
+        continue-on-error: true
+
+      - name: Decision-log check (boundary change without a recorded reason)
+        run: |
+          # Non-blocking by decision, not by accident: the rule applies from the commit
+          # that introduced it, so pre-rule commits in the range would flag on first run.
+          # A failure here is a real finding and is surfaced rather than swallowed.
+          git fetch --no-tags --depth=50 origin "${{ github.base_ref || 'main' }}" || true
+          npm run decisions:check -- --base "origin/${{ github.base_ref || 'main' }}" \
+            || echo "::error title=Unlogged boundary change::A commit moved a module, always-on instruction, dependency or gate without a DEC-NNNN entry. Run 'npm run decisions:check' locally and read Docs/decisions/AGENT_DECISIONS.md."
+
       - name: Git hygiene checks
         run: |
           ERRORS=0

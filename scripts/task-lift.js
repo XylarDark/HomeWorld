@@ -831,6 +831,7 @@ function main(argv) {
   // Read before the run loop, not near the summary: it is used per-run, and a
   // `const` declared after its use is a temporal-dead-zone crash, not a fallback.
   const model = readFlag(argv, '--model');
+  const trials = Math.max(1, Number(readFlag(argv, '--trials') || 1));
 
   // Spending guard. Every agent session costs money, and the previous default was
   // to run them unless `--dry` was passed - so asking for a report cost 8 sessions.
@@ -868,7 +869,12 @@ function main(argv) {
       process.stderr.write(`${PREFIX} resume: could not read prior results (${e.message}); starting fresh\n`);
     }
   }
-  const done = new Set(results.map((r) => `${r.taskId}/${r.condition}`));
+  const done = new Set(
+    results.map((r) => {
+      const t = r.trial || 1;
+      return `${r.taskId}/${r.condition}${t > 1 ? `#${t}` : ''}`;
+    })
+  );
 
   const base = fs.mkdtempSync(path.join(os.tmpdir(), 'tasklift-'));
   const roots = { with: path.join(base, 'with'), without: path.join(base, 'without') };
@@ -891,26 +897,32 @@ function main(argv) {
 
     for (const task of tasks) {
       for (const condition of ['with', 'without']) {
-        const key = `${task.id}/${condition}`;
-        if (done.has(key)) {
-          process.stderr.write(`${PREFIX} ${key} ... skipped (already in results)\n`);
-          continue;
-        }
-        process.stderr.write(`${PREFIX} ${key} ...\n`);
-        const r = runTask(roots[condition], task, { dry, model });
-        results.push({ ...r, condition });
-        if (r.agent.error) process.stderr.write(`${PREFIX}   agent error: ${r.agent.error}\n`);
-        if (r.voided) process.stderr.write(`${PREFIX}   VOID - excluded from every rate\n`);
+        // Trials repeat the same cell. One trial per cell is noise-dominated: a single
+        // timeout or one unusual answer moves the rate as much as any real effect.
+        // A cell key therefore carries its trial index so --resume can tell
+        // "trial 1 done" from "all trials done".
+        for (let trial = 1; trial <= trials; trial++) {
+          const key = `${task.id}/${condition}${trials > 1 ? `#${trial}` : ''}`;
+          if (done.has(key)) {
+            process.stderr.write(`${PREFIX} ${key} ... skipped (already in results)\n`);
+            continue;
+          }
+          process.stderr.write(`${PREFIX} ${key} ...\n`);
+          const r = runTask(roots[condition], task, { dry, model });
+          results.push({ ...r, condition, trial });
+          if (r.agent.error) process.stderr.write(`${PREFIX}   agent error: ${r.agent.error}\n`);
+          if (r.voided) process.stderr.write(`${PREFIX}   VOID - excluded from its own cell\n`);
 
-        // Persist after EVERY run. An experiment that dies at task 6 of 8 must not
-        // cost all eight sessions.
-        if (writeJsonEarly) {
-          fs.mkdirSync(path.dirname(writeJsonEarly), { recursive: true });
-          fs.writeFileSync(
-            writeJsonEarly,
-            `${JSON.stringify({ tool: PREFIX, dry, ablation, results }, null, 2)}\n`,
-            'utf8'
-          );
+          // Persist after EVERY run. An experiment that dies at task 6 of 8 must not
+          // cost all eight sessions.
+          if (writeJsonEarly) {
+            fs.mkdirSync(path.dirname(writeJsonEarly), { recursive: true });
+            fs.writeFileSync(
+              writeJsonEarly,
+              `${JSON.stringify({ tool: PREFIX, dry, ablation, results }, null, 2)}\n`,
+              'utf8'
+            );
+          }
         }
       }
     }
@@ -933,7 +945,7 @@ function main(argv) {
     }
   }
 
-  const minValid = Number(readFlag(argv, '--min-valid') || 1);
+  const minValid = Number(readFlag(argv, '--min-valid') || Math.max(1, trials));
   const summary = summarize(results, { minValidPerCell: minValid, dry });
   const meta = {
     commit: firstLine(spawnSync('git', ['rev-parse', '--short', 'HEAD'], { cwd: PROJECT_ROOT, encoding: 'utf8' })),
