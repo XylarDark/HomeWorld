@@ -91,6 +91,30 @@ function runPs1(rel, argv = []) {
   return run('powershell', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', path.join(PROJECT_ROOT, rel), ...argv]);
 }
 
+/**
+ * Run UE automation tests headlessly.
+ *
+ * The editor path is pinned rather than taken from $env:UE_EDITOR. On this machine
+ * UE_EDITOR was already set to a 5.7 binary, and the 5.7 editor cannot load the 5.8
+ * project - it aborts on a missing PCGPrimitives plugin. Silently trusting the
+ * environment variable meant a green-looking failure that was really the wrong engine.
+ */
+function runUECmd(execCmds) {
+  const editor = process.env.HW_UNREAL_EDITOR
+    || 'C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Binaries\\Win64\\UnrealEditor-Cmd.exe';
+  if (!fs.existsSync(editor)) {
+    process.stderr.write(`verify: editor not found at ${editor}\n`);
+    return 1;
+  }
+  const r = spawnSync(editor, [
+    path.join(PROJECT_ROOT, 'HomeWorld.uproject'),
+    `-ExecCmds=${execCmds}`,
+    '-unattended', '-nop4', '-nosplash', '-NullRHI',
+    '-TestExit=Automation Test Queue Empty',
+  ], { cwd: PROJECT_ROOT, stdio: 'inherit', shell: false });
+  return r.status === null ? 1 : r.status;
+}
+
 /** UE-only steps, wrapped in the editor lock so two agents cannot collide. */
 function withEditorLock(label, fn) {
   const owner = `verify:${process.pid}`;
@@ -124,7 +148,7 @@ if (results[results.length - 1] && tier === 'ue') {
   } else {
     results.push(
       step('ue automation tests', () =>
-        withEditorLock('ue-tests', () => runPs1('Tools/RunTests.ps1', ['-Group', 'Smoke']))
+        withEditorLock('ue-tests', () => runUECmd('Automation RunTests HomeWorld.;Quit'))
       )
     );
   }
