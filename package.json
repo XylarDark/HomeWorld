@@ -32,7 +32,7 @@
     "tasklift": "node scripts/task-lift.js --run",
     "tasklift:dry": "node scripts/task-lift.js --dry",
     "tasklift:test": "node --test scripts/task-lift.test.js",
-    "tasklift:write": "node scripts/task-lift.js --run --json > Docs/qa/TASK_LIFT.json ; node scripts/task-lift.js --run > Docs/qa/TASK_LIFT.md"
+    "tasklift:write": "node scripts/task-lift.js --run --out-md Docs/qa/TASK_LIFT.md --out-json Docs/qa/TASK_LIFT.json"
   },
   "engines": {
     "node": ">=20.0.0"

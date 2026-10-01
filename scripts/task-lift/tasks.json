@@ -1,0 +1,69 @@
+{
+  "$comment": "Task-level eval: does the harness layer change what the agent produces? Prompts are IDENTICAL in both conditions. Checks split into two classes so the comparison controls for basic competence: `completion` = was the task done at all; `conformance` = does the artifact follow this repo's documented conventions. Lift is measured on `conformance` only. A harness that merely makes the agent do more work is not a lift.",
+  "$globRule": "Checks with a `glob` resolve ONLY against files the agent created after seeding, never pre-existing files. Without that, the harness arm gets a free pass by matching any of the 31 rules already in .cursor/rules.",
+  "version": 1,
+  "tasks": [
+    {
+      "id": "known-errors-entry",
+      "area": "docs",
+      "prompt": "The C++ build failed with `error C4456: declaration of 'Z' hides previous local declaration` at Source/HomeWorld/HomeWorldGameMode.cpp:412. Record this in the project's record of known errors, following the entry format the project documents.",
+      "seed": {
+        "docs/KNOWN_ERRORS.md": "# Known Errors\n\n## Entry format\n\n(placeholder)\n\n## Entries\n"
+      },
+      "checks": [
+        { "class": "completion", "kind": "matches", "path": "docs/KNOWN_ERRORS.md", "pattern": "C4456", "label": "the error code is recorded" },
+        { "class": "completion", "kind": "matches", "path": "docs/KNOWN_ERRORS.md", "pattern": "###\\s+\\S", "label": "a new entry heading was added" },
+        { "class": "conformance", "kind": "matches", "path": "docs/KNOWN_ERRORS.md", "pattern": "\\*\\*Error:?\\*\\*", "label": "has an Error field" },
+        { "class": "conformance", "kind": "matches", "path": "docs/KNOWN_ERRORS.md", "pattern": "\\*\\*Cause:?\\*\\*", "label": "has a Cause field" },
+        { "class": "conformance", "kind": "matches", "path": "docs/KNOWN_ERRORS.md", "pattern": "\\*\\*Fix:?\\*\\*", "label": "has a Fix field" },
+        { "class": "conformance", "kind": "matches", "path": "docs/KNOWN_ERRORS.md", "pattern": "\\*\\*Context:?\\*\\*", "label": "has the optional Context field" },
+        { "class": "conformance", "kind": "matches", "path": "docs/KNOWN_ERRORS.md", "pattern": "\\d{4}-\\d{2}-\\d{2}", "label": "Context carries an ISO date" },
+        { "class": "conformance", "kind": "matches", "path": "docs/KNOWN_ERRORS.md", "pattern": "HomeWorldGameMode", "label": "cites the file the error came from" }
+      ]
+    },
+    {
+      "id": "ue58-rule",
+      "area": "rules",
+      "prompt": "Write a Cursor rule file that warns about calling GetPlayerState() on an AController in Unreal Engine 5.8, where the accessor is templated. Put it where the project's other rules live and give it the same metadata the project's rules carry.",
+      "seed": {},
+      "checks": [
+        { "class": "completion", "kind": "anyMatches", "glob": ".cursor/rules/*.mdc", "pattern": "GetPlayerState", "label": "a rule naming the pitfall was created" },
+        { "class": "conformance", "kind": "anyMatches", "glob": ".cursor/rules/*.mdc", "pattern": "^name:", "label": "frontmatter has a name" },
+        { "class": "conformance", "kind": "anyMatches", "glob": ".cursor/rules/*.mdc", "pattern": "^description:", "label": "frontmatter has a description" },
+        { "class": "conformance", "kind": "anyMatches", "glob": ".cursor/rules/*.mdc", "pattern": "^alwaysApply:", "label": "frontmatter sets alwaysApply explicitly" },
+        { "class": "conformance", "kind": "anyMatches", "glob": ".cursor/rules/*.mdc", "pattern": "^globs:", "label": "frontmatter scopes via globs" },
+        { "class": "conformance", "kind": "anyMatches", "glob": ".cursor/rules/*.mdc", "pattern": "^priority:", "label": "frontmatter carries a priority" },
+        { "class": "conformance", "kind": "anyMatches", "glob": ".cursor/rules/*.mdc", "pattern": "^version:", "label": "frontmatter carries a version" },
+        { "class": "conformance", "kind": "anyMatches", "glob": ".cursor/rules/*.mdc", "pattern": "5\\.8", "label": "anchors the pitfall to UE 5.8" },
+        { "class": "conformance", "kind": "anyNewFiles", "glob": ".cursor/rules/*.mdc", "label": "landed in the project rule directory" }
+      ]
+    },
+    {
+      "id": "powershell-helper",
+      "area": "tools",
+      "prompt": "Write a PowerShell helper script that checks whether every .uasset under Content/HomeWorld/Meshes is newer than the last git commit, and prints one line per stale file.",
+      "seed": {},
+      "checks": [
+        { "class": "completion", "kind": "anyMatches", "glob": "**/*.ps1", "newOnly": true, "pattern": "(?i)\\.uasset", "label": "a script targeting .uasset files was written" },
+        { "class": "conformance", "kind": "anyMatches", "glob": "**/*.ps1", "newOnly": true, "pattern": "Set-StrictMode", "label": "enables strict mode" },
+        { "class": "conformance", "kind": "anyMatches", "glob": "**/*.ps1", "newOnly": true, "pattern": "\\$ErrorActionPreference", "label": "sets an error preference" },
+        { "class": "conformance", "kind": "anyMatches", "glob": "**/*.ps1", "newOnly": true, "pattern": "(?i)-LiteralPath", "label": "uses -LiteralPath rather than -Path" },
+        { "class": "conformance", "kind": "anyMatches", "glob": "**/*.ps1", "newOnly": true, "pattern": "(?i)(\\.SYNOPSIS|<\\#)", "label": "has comment-based help" },
+        { "class": "conformance", "kind": "noneMatch", "glob": "**/*.ps1", "newOnly": true, "pattern": "&&", "label": "no && chaining (invalid in Windows PowerShell)" }
+      ]
+    },
+    {
+      "id": "commit-message",
+      "area": "git",
+      "prompt": "Write a Conventional Commits message for this change and save it as COMMIT_MSG.txt: the T0_M3 beat's prove script was corrected so it no longer reports a pass when the gate actors were never spawned, and a regression note was added to the known-errors record.",
+      "seed": {},
+      "checks": [
+        { "class": "completion", "kind": "anyMatches", "glob": "**/COMMIT_MSG.txt", "newOnly": true, "pattern": "(?i)t0_m3|prove", "label": "a message naming the work was written" },
+        { "class": "conformance", "kind": "anyMatches", "glob": "**/COMMIT_MSG.txt", "newOnly": true, "pattern": "^(feat|fix|docs|chore|refactor|test|perf|build|ci|style)(\\([^)]+\\))?!?:\\s+\\S", "label": "has a valid Conventional Commits type prefix" },
+        { "class": "conformance", "kind": "commitSubjectCase", "glob": "**/COMMIT_MSG.txt", "newOnly": true, "label": "subject is lowercase after the prefix" },
+        { "class": "conformance", "kind": "commitSubjectLength", "glob": "**/COMMIT_MSG.txt", "newOnly": true, "max": 72, "label": "subject is at most 72 characters" },
+        { "class": "conformance", "kind": "noneMatch", "glob": "**/COMMIT_MSG.txt", "newOnly": true, "pattern": "\\.\\s*$", "multiline": false, "label": "subject has no trailing period" }
+      ]
+    }
+  ]
+}
