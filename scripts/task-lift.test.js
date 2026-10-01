@@ -746,6 +746,68 @@ test('the verdict-vocabulary check is not satisfied by the word "pass"', () => {
   assert.strictEqual(M.evaluateCheck(vague, check, seeded).pass, false, '"will pass" must not satisfy it');
 });
 
+test('the third arm isolates the rules corpus from the entry points', () => {
+  // R2. `Docs/` survives every arm, so two arms could only ever show "the harness
+  // points at the canon" - never whether the effect came from the 31 rule files or
+  // from AGENTS.md naming the documents. `docs-only` keeps the pointers and drops the
+  // mechanical layer, which makes both contrasts available.
+  assert.deepStrictEqual(Object.keys(M.ARMS).sort(), ['docs-only', 'with', 'without']);
+  assert.deepStrictEqual(M.ARMS.with, [], 'the with arm removes nothing');
+  assert.ok(M.ARMS['docs-only'].includes('.cursor'), 'docs-only must drop the rule corpus');
+  assert.ok(M.ARMS['docs-only'].includes('.agents'), 'docs-only must drop the skill corpus');
+  assert.ok(!M.ARMS['docs-only'].includes('AGENTS.md'), 'docs-only KEEPS the entry points');
+  assert.ok(M.ARMS.without.includes('AGENTS.md'), 'without drops everything the two-arm run dropped');
+  assert.ok(M.ARMS.without.length > M.ARMS['docs-only'].length, 'without must remove strictly more');
+});
+
+test('an unknown arm fails before anything is spent', () => {
+  assert.throws(() => M.ablateFor('nope'), /unknown arm/);
+});
+
+test('McNemar reports no p-value when the arms agreed everywhere', () => {
+  // Reporting "p = 1" from an absence of discordance would be inventing a result
+  // from an absence - the exact fault this instrument keeps catching.
+  const r = M.mcnemarExact([true, true, false], [true, true, false]);
+  assert.strictEqual(r.n, 0);
+  assert.strictEqual(r.p, null);
+  assert.match(r.note, /no discordant pairs/);
+});
+
+test('McNemar uses only discordant pairs and is exact', () => {
+  // 5-0 discordant is the classic McNemar boundary: p = 2 * 0.5^5 = 0.0625.
+  const clean = M.mcnemarExact([true, true, true, true, true], [false, false, false, false, false]);
+  assert.strictEqual(clean.b, 5);
+  assert.strictEqual(clean.c, 0);
+  assert.strictEqual(clean.n, 5);
+  assert.ok(Math.abs(clean.p - 0.0625) < 1e-9, `expected 0.0625, got ${clean.p}`);
+
+  // A split disagreement is the weakest possible signal.
+  const split = M.mcnemarExact([true, false], [false, true]);
+  assert.strictEqual(split.p, 1);
+});
+
+test('the report says "not significant" rather than presenting a bare delta', () => {
+  const row = (conf, pass) => ({
+    taskId: 'a',
+    condition: conf ? 'with' : 'without',
+    voided: false,
+    conformance: conf ? 1 : 0,
+    completion: 1,
+    agent: { status: 0, error: null, attempts: 1 },
+    checks: [{ class: 'conformance', label: 'c1', kind: 'anyMatches', pass, verdict: pass ? 'pass' : 'closed_fail' }],
+  });
+  const s = M.summarize([row(true, true), row(false, false)]);
+  assert.strictEqual(s.significance.n, 1);
+  assert.strictEqual(s.significance.p, 1);
+  const md = M.renderMarkdown(
+    [row(true, true), row(false, false)],
+    s,
+    { commit: 'x', model: 'm' },
+    null
+  );
+  assert.match(md, /Not significant/, 'a bare delta with no verdict must not be the whole story');
+});
+
 test('trials raise the minimum valid runs a cell needs', () => {
   // One trial per cell is noise-dominated: a single timeout or one unusual answer
   // moves the rate as much as any real effect. `--min-valid` defaults to the trial

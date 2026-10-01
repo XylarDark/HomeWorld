@@ -198,12 +198,42 @@ function matchFiles(root, glob, allowed) {
  * biases toward finding no effect, which is the comfortable direction to be wrong
  * in. So it is checked, and it is reported into the JSON.
  */
-function verifyAblation(root) {
-  const present = ABLATE_PATHS.filter((p) => fs.existsSync(path.join(root, p)));
+/**
+ * The arms, and what each one removes.
+ *
+ * WHY A THIRD ARM (the limit this removes)
+ *
+ * `Docs/` survives every arm, because the art bible and the T0 packets live there.
+ * So a two-arm comparison can only ever answer "does the harness point an agent at
+ * the canon" - it cannot separate that from "the agent would have found the canon
+ * anyway", and it cannot say whether the effect comes from the rule corpus or from
+ * AGENTS.md simply naming the documents.
+ *
+ * `docs-only` sits between: the agent keeps the narrative entry points (AGENTS.md,
+ * START_HERE.md, swarm/) that name where the canon lives, and loses the mechanical
+ * layer - the 31 `.cursor/rules/*.mdc` and the `.agents/skills` corpus. Comparing
+ * `with` against `docs-only` isolates the rules corpus; `docs-only` against `without`
+ * isolates the entry points. Neither contrast is available with two arms.
+ */
+const ARMS = Object.freeze({
+  with: [],
+  'docs-only': ['.cursor', '.agents', 'UserHarness'],
+  without: ABLATE_PATHS,
+});
+
+function ablateFor(arm) {
+  if (!Object.prototype.hasOwnProperty.call(ARMS, arm)) {
+    throw new Error(`unknown arm "${arm}"; expected one of ${Object.keys(ARMS).join(', ')}`);
+  }
+  return ARMS[arm];
+}
+
+function verifyAblation(root, paths = ABLATE_PATHS) {
+  const present = paths.filter((p) => fs.existsSync(path.join(root, p)));
   return {
     ok: present.length === 0,
     present,
-    checked: ABLATE_PATHS.length,
+    checked: paths.length,
     // A reader must be able to see the arms differ, not take it on trust.
     fileCount: listFiles(root).length,
   };
@@ -223,15 +253,15 @@ function buildWorktree(dest, ablate) {
   if (r.status !== 0) throw new Error(`git worktree add failed: ${r.stderr || r.stdout}`);
 
   if (ablate) {
-    for (const p of ABLATE_PATHS) {
+    const paths = Array.isArray(ablate) ? ablate : ABLATE_PATHS;
+    for (const p of paths) {
       const full = path.join(dest, p);
       if (fs.existsSync(full)) fs.rmSync(full, { recursive: true, force: true });
     }
-    const v = verifyAblation(dest);
+    const v = verifyAblation(dest, paths);
     if (!v.ok) {
       throw new Error(
-        `ablation incomplete, refusing to measure a fake "without harness" arm. ` +
-          `Still present: ${v.present.join(', ')}`
+        `ablation incomplete, refusing to measure a fake arm. Still present: ${v.present.join(', ')}`
       );
     }
   }
@@ -557,6 +587,43 @@ function rate(list, key) {
   return vals.length === 0 ? null : vals.reduce((a, b) => a + b, 0) / vals.length;
 }
 
+/**
+ * Exact two-sided McNemar test on the discordant pairs.
+ *
+ * WHY THIS AND NOT A PROPORTION DELTA
+ *
+ * The two arms are not independent samples of two populations - they are the same
+ * tasks run twice. A difference of proportions throws away that pairing and reports
+ * a number with no dispersion and no test. McNemar uses only the *discordant* pairs
+ * (harness right / without wrong, and the reverse), which is the part of the data
+ * that carries signal, and it is exact at the sample sizes this pilot can afford.
+ *
+ * Returns null when there are no discordant pairs: then the arms agreed everywhere
+ * and the test has nothing to say. Reporting "p = 1" there would be inventing a
+ * result from an absence, which is the exact fault this instrument keeps catching.
+ */
+function mcnemarExact(withPass, withoutPass) {
+  const b = withPass.filter((w, i) => w && !withoutPass[i]).length; // harness right
+  const c = withPass.filter((w, i) => !w && withoutPass[i]).length; // without right
+  const n = b + c;
+  if (n === 0) return { b, c, n, p: null, note: 'no discordant pairs - the arms agreed everywhere' };
+
+  // Two-sided exact binomial against p = 0.5.
+  const k = Math.min(b, c);
+  let tail = 0;
+  for (let i = 0; i <= k; i++) {
+    tail += binom(n, i) / Math.pow(2, n);
+  }
+  const p = Math.min(1, tail * 2);
+  return { b, c, n, p };
+}
+
+function binom(n, k) {
+  let r = 1;
+  for (let i = 0; i < k; i++) r = (r * (n - i)) / (i + 1);
+  return r;
+}
+
 function summarize(results, { minValidPerCell = 1, dry = false } = {}) {
   const voidedRuns = results.filter((r) => r.voided);
   const valid = results.filter((r) => !r.voided);
@@ -590,10 +657,41 @@ function summarize(results, { minValidPerCell = 1, dry = false } = {}) {
     conf(withArm) !== null && conf(withoutArm) !== null ? conf(withArm) - conf(withoutArm) : null;
   const enough = completePairs.length > 0;
 
+  // Per-check paired outcomes across the complete tasks only. A check present in one
+  // arm but not the other is a manifest problem, not data, so the paired vectors are
+  // cut to their common length rather than padded.
+  const perCheck = [];
+  for (const taskId of completePairs) {
+    const w = results.filter((r) => r.taskId === taskId && r.condition === 'with' && !r.voided);
+    const o = results.filter((r) => r.taskId === taskId && r.condition === 'without' && !r.voided);
+    if (!w.length || !o.length) continue;
+    const n = Math.min(w.length, o.length);
+    for (let i = 0; i < n; i++) {
+      const cw = (w[i].checks || [])[i];
+      const co = (o[i].checks || [])[i];
+      if (!cw || !co) continue;
+      if (cw.class !== 'conformance') continue;
+      perCheck.push({ task: taskId, label: cw.label, withPass: cw.pass, withoutPass: co.pass });
+    }
+  }
+  const significance = mcnemarExact(
+    perCheck.map((p) => p.withPass),
+    perCheck.map((p) => p.withoutPass)
+  );
+
+  const byArm = {};
+  for (const arm of new Set(valid.map((r) => r.condition))) {
+    const list = paired.filter((r) => r.condition === arm);
+    byArm[arm] = { conformance: conf(list), completion: comp(list), runs: list.length };
+  }
+
   return {
     tasks: taskIds.length,
     pairedTasks: completePairs.length,
     droppedPairs,
+    // Every arm is reported, not just the two the lift is computed from. With three
+    // arms the middle one is the interesting one and must not be invisible.
+    byArm,
     // Rates describe only the runs that measured something.
     validRuns: valid.length,
     voidedRuns: voidedRuns.length,
@@ -614,6 +712,11 @@ function summarize(results, { minValidPerCell = 1, dry = false } = {}) {
         ? null
         : 'no task has a valid run in both arms',
     failures: results.filter((r) => r.agent && r.agent.timedOut).length,
+    pairedConformanceChecks: perCheck.length,
+    significance,
+    // Discordant checks are the actionable list: these are the specific conventions
+    // where one arm did something the other did not.
+    discordant: perCheck.filter((p) => p.withPass !== p.withoutPass),
     // Count any run the agent did not complete cleanly, not only spawn-level ones.
     // Counting only `r.error` reported 0 errors for 8 quota-blocked runs. A missing
     // `status` is not treated as a failure, so synthetic fixtures stay meaningful.
@@ -696,6 +799,22 @@ function renderMarkdown(results, summary, meta, ablation) {
     lines.push(`- **with** — ${withPresent.length} of ${(ablation.with && ablation.with.checked) || ABLATE_PATHS.length} harness surfaces present (expected: non-zero)`);
     lines.push('');
   }
+  if (ablation && Object.keys(ablation).length > 1) {
+    lines.push('| Arm | Harness surfaces present (of checked) | Files in tree |');
+    lines.push('|---|---|---|');
+    for (const [arm, v] of Object.entries(ablation)) {
+      lines.push(`| \`${arm}\` | ${(v.with && v.with.present ? v.with.present.length : 0)} of ${(v.with && v.with.checked) || 0} | ${(v.with && v.with.fileCount) || 0} |`);
+    }
+    lines.push('');
+  }
+  if (s.byArm && Object.keys(s.byArm).length > 1) {
+    lines.push('| Arm | Conformance | Completion | Runs |');
+    lines.push('|---|---|---|---|');
+    for (const [arm, v] of Object.entries(s.byArm)) {
+      lines.push(`| \`${arm}\` | ${pct(v.conformance)} | ${pct(v.completion)} | ${v.runs} |`);
+    }
+    lines.push('');
+  }
   lines.push('## Result');  lines.push('');
   lines.push('| Measure | With harness | Without | Delta |');
   lines.push('|---|---|---|---|');
@@ -714,6 +833,19 @@ function renderMarkdown(results, summary, meta, ablation) {
       'A void run is excluded from its own cell, not from the whole experiment. ' +
         'A cell with no valid run still withholds the lift.'
     );
+  }
+  if (s.significance && s.significance.n > 0) {
+    const g = s.significance;
+    lines.push('');
+    lines.push(
+      `Paired McNemar over ${s.pairedConformanceChecks} conformance checks: ${g.b} where only the ` +
+        `harness arm passed, ${g.c} where only the ablated arm passed (p = ` +
+        `${g.p < 0.001 ? '<0.001' : g.p.toFixed(3)}). ` +
+        `${g.p < 0.05 ? 'Significant at 5%.' : '**Not significant — at this sample size, treat any delta above as noise.**'}`
+    );
+  } else if (s.significance) {
+    lines.push('');
+    lines.push(`Paired McNemar: ${s.significance.note}. No p-value is reported from an absence of discordance.`);
   }
   lines.push('');
   lines.push('## Per-task detail');
@@ -877,26 +1009,35 @@ function main(argv) {
   );
 
   const base = fs.mkdtempSync(path.join(os.tmpdir(), 'tasklift-'));
-  const roots = { with: path.join(base, 'with'), without: path.join(base, 'without') };
+  const armNames = (readFlag(argv, '--arms') || 'with,without')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+  for (const a of armNames) ablateFor(a); // fail fast on a typo, before spending anything
+  const roots = Object.fromEntries(armNames.map((a) => [a, path.join(base, a)]));
   process.stderr.write(`${PREFIX} worktrees under ${base}\n`);
 
   let ablation = null;
   try {
-    buildWorktree(roots.with, false);
-    buildWorktree(roots.without, true);
-    // Recorded so a reader can see the arms genuinely differ, rather than trusting
-    // that the delete worked. `with` is expected to still hold the harness.
-    ablation = {
-      without: verifyAblation(roots.without),
-      with: {
-        present: ABLATE_PATHS.filter((p) => fs.existsSync(path.join(roots.with, p))),
-        checked: ABLATE_PATHS.length,
-        fileCount: listFiles(roots.with).length,
-      },
-    };
-
+    for (const a of armNames) buildWorktree(roots[a], ablateFor(a));
+    ablation = Object.fromEntries(
+      armNames.map((a) => [
+        a,
+        {
+          removed: ablateFor(a),
+          // Expected-absent surfaces, verified per arm rather than against one global
+          // list: with three arms a single check cannot say which one was under-built.
+          without: verifyAblation(roots[a], ablateFor(a)),
+          with: {
+            present: ablateFor(a).filter((p) => fs.existsSync(path.join(roots[a], p))),
+            checked: ablateFor(a).length,
+            fileCount: listFiles(roots[a]).length,
+          },
+        },
+      ])
+    );
     for (const task of tasks) {
-      for (const condition of ['with', 'without']) {
+      for (const condition of armNames) {
         // Trials repeat the same cell. One trial per cell is noise-dominated: a single
         // timeout or one unusual answer moves the rate as much as any real effect.
         // A cell key therefore carries its trial index so --resume can tell
@@ -1012,9 +1153,12 @@ module.exports = {
   firstLine,
   listFiles,
   matchFiles,
+  ARMS,
+  ablateFor,
   verifyAblation,
   scoreControl,
   isTransient,
+  mcnemarExact,
   seed,
   evaluateCheck,
   commitSubject,
