@@ -764,7 +764,14 @@ function agentExitedClean(agent) {
 
 function renderMarkdown(results, summary, meta, ablation) {
   const pct = (v) => (v === null ? 'n/a' : (v * 100).toFixed(0) + '%');
-  const pp = (a, b) => (a === null || b === null ? 'n/a' : ((a - b) * 100).toFixed(0) + 'pp');
+  // Always sign the result. An unsigned "10pp" does not tell a reader whether the
+  // harness gained or lost; on a headline claim that ambiguity is the whole point of
+  // the number, so the direction is printed rather than left to the reader.
+  const pp = (a, b) => {
+    if (a === null || b === null) return 'n/a';
+    const d = (a - b) * 100;
+    return (d > 0 ? '+' : '') + d.toFixed(0) + 'pp';
+  };
   const s = summary;
   const lines = [];
 
@@ -847,7 +854,13 @@ function renderMarkdown(results, summary, meta, ablation) {
   lines.push('|---|---|---|---|');
   lines.push(`| Task completion (control) | ${pct(s.completionWith)} | ${pct(s.completionWithout)} | ${pp(s.completionWith, s.completionWithout)} |`);
   lines.push(`| Convention conformance | ${pct(s.conformanceWith)} | ${pct(s.conformanceWithout)} | ${pp(s.conformanceWith, s.conformanceWithout)} |`);
-  const liftText = s.lift === null ? `withheld — ${s.liftWithheld || 'insufficient data'}` : pp(s.conformanceWithout, s.conformanceWith);
+  // Argument order is load-bearing: pp(a, b) renders (a - b), so the HARNESS arm must
+  // be the minuend. Passing conformanceWithout first inverted the sign of the
+  // headline number in every report produced so far - a run where the harness won by
+  // 10 points printed "-10pp". A magnitude-only test would have passed it, so the
+  // regression test below pins the SIGN, not the size.
+  const liftText =
+    s.lift === null ? `withheld - ${s.liftWithheld || 'insufficient data'}` : pp(s.conformanceWith, s.conformanceWithout);
   lines.push(`| **Lift on conformance** | — | — | **${liftText}** |`);
   lines.push('');
   lines.push(

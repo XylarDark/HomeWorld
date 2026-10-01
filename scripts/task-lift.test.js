@@ -837,6 +837,45 @@ test('the report says "not significant" rather than presenting a bare delta', ()
   assert.match(md, /Not significant/, 'a bare delta with no verdict must not be the whole story');
 });
 
+test('the report prints the lift with the harness as the minuend', () => {
+  // The rendered report inverted the sign of the headline number. renderMarkdown
+  // called pp(conformanceWithout, conformanceWith) and pp(a,b) is (a-b), so a run
+  // where the harness beat the ablated arm by 10 points printed "-10pp".
+  //
+  // The dangerous part: a magnitude assertion passes that bug perfectly. The
+  // assertion below checks the SIGN, because the sign is the whole claim.
+  const row = (conf, pass) => ({
+    taskId: 'a',
+    condition: conf ? 'with' : 'without',
+    voided: false,
+    conformance: pass ? 1 : 0,
+    completion: 1,
+    agent: { status: 0, error: null, attempts: 1 },
+    checks: [{ class: 'conformance', label: 'c1', kind: 'anyMatches', pass, verdict: pass ? 'pass' : 'closed_fail' }],
+  });
+  const s = M.summarize([row(true, true), row(true, false), row(false, false), row(false, false)]);
+  assert.ok(s.lift > 0, `harness must lead in the summary too, got ${s.lift}`);
+
+  const win = M.renderMarkdown(
+    [row(true, true), row(true, false), row(false, false), row(false, false)],
+    s,
+    { commit: 'x', model: 'm' },
+    null
+  );
+  assert.match(win, /\*\*\+50pp\*\*/, 'harness ahead must render as a positive lift');
+  assert.doesNotMatch(win, /-50pp/, 'a harness win must never print as a loss');
+
+  // And the mirror case: an ablated-arm win must print negative.
+  const lose = M.summarize([row(true, false), row(true, false), row(false, true), row(false, true)]);
+  const lossMd = M.renderMarkdown(
+    [row(true, false), row(true, false), row(false, true), row(false, true)],
+    lose,
+    { commit: 'x', model: 'm' },
+    null
+  );
+  assert.match(lossMd, /\*\*-100pp\*\*/, 'ablated ahead must render as a negative lift');
+});
+
 test('resume and the run loop agree on what a cell is called', () => {
   // The bug R4 exposed. The resume set built `task/with` for trial 1 while the loop
   // built `task/with#1` (because trials > 1), so `done.has(key)` was never true and
