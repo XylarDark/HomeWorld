@@ -281,7 +281,10 @@ conversion is what happens to foes you **defeat**. A converted actor is not a sl
 it is not a calmed one. Conflating them lets the player defeat the three and unlock the captive —
 which inverts the beat, because the design is that the *gentle* path is the only path.
 
-### P1 — #17 Spirit-stealth — **N (new, 2026-10-02)**
+### P1 — #17 Spirit-stealth — **CLOSED (`APPROVE SS-A`, 2026-09-21)** · extend for the camp
+
+⚠️ **CORRECTED 2026-10-02 — this row previously read `Found: Nothing`, and that was false.** See
+the correction block below before touching the Found column.
 
 Named by the Lead as the means of reaching the guards: *"use your spirit form and spirit-stealth
 gameplay to get to the guards."*
@@ -290,11 +293,31 @@ gameplay to get to the guards."*
 |-------|-------|
 | **Labels** | `NODE_GUARD` · `FORM_SPIRIT` · `TOD_NIGHT_SPIRIT` · `SM_Camp_Torch` · `SM_Camp_Fire` |
 | **Expected** | **Spirit-blue light is visibility.** Getting close to the campfire's blue centre, or into the glow around the patrolling guard's blue torch, makes you **visible to the guard** |
-| **Found** | **Nothing.** No stealth state, no awareness, no detection, no light-to-visibility link |
+| **Found** | **CLOSED and implemented** — `HomeWorldSpiritStealthComponent.{h,cpp}` (414-line .cpp), `HomeWorldSpiritLitVolume.h`, `EHomeWorldSpiritLitSourceKind` (Campfire / NpcTorch / SpiritTorch reveal; BodyMundaneTorch does not). `Docs/25_SPIRIT_STEALTH_IMPL.md` **CLOSED / COMPLETE**, all DONE-WHEN ticked. Feel layer in `Docs/31_SPIRIT_STEALTH_FEEL.md` |
 | **Arrange** | Night · at the camp · after #13 |
 | **DONE-WHEN** | You are unseen outside both light radii · entering **either** radius makes you visible **legibly** · the torch radius **moves with the guard**, so a patrolling guard sweeps a moving pocket of danger · breaking back out of the light stops it |
 | **Depends** | #11 spirit · #13 camp reachable · #15 touch rule |
 | **Anti** | Stealth as a stat roll · invisibility as a toggle with no counter · a guard who cannot notice anything · light with no visual tell |
+
+#### The false negative, and what it cost — recorded because it will happen again
+
+I recorded this as *"**Nothing.** No stealth state, no awareness, no detection"* on 2026-10-02.
+Every one of those four things exists, and the track was already **CLOSED with a Lead stamp**.
+
+**The cause was not missing documentation — it was a missing pointer.** The must list answers
+*"what must be true"*; *"is it built?"* is answered in the per-subsystem **track docs**, and
+nothing in the T0 track pointed at `Docs/25_SPIRIT_STEALTH_IMPL.md`. So the answer was a shrug.
+
+**This is the same failure class as the broken shrine.** The shrines were in no spec, so a lintel
+sitting on the ground survived every gate. There a geometry check had nothing to measure; here an
+index had nothing to point at. Both are "nothing referenced it".
+
+**Two rules now follow, and both are enforced rather than noted:**
+
+1. The `Found` column may say `N` **only** if no `APPROVE`-stamped track doc claims the mechanic.
+   The cross-link table is `Docs/CANON_MAP.md` §3.
+2. `Content/Python/tests/test_canon_map.py` asserts #17 cites its stamp and can never read `N`
+   again. **A map nobody checks goes stale, and stale is how this happened.**
 
 **Settled 2026-10-02 by the Lead — this is BOTH a light level and a per-actor area, not either
 or, and they are the same mechanic:**
@@ -466,17 +489,20 @@ Cheats: existing only when a bite DONE-WHEN names them (`Docs/30`).
 Three musts that existed as prose in spec files and were tracked nowhere. Added as **P1**,
 all three currently `N` (absent, not partial):
 
-| # | Must | Blocks |
-|---|---|---|
-| **#15** | What a spirit may **TOUCH** | #12 nurture, #16 rescue — sits under both |
-| **#16** | Free the captive, gated on sleepers **ASLEEP** | the rescue climax; #14's whole purpose |
-| **#17** | **Spirit-stealth** | #14 outright — it is the named way in |
+| # | Must | Blocks | State |
+|---|---|---|---|
+| **#15** | What a spirit may **TOUCH** | #12 nurture, #16 rescue — sits under both | N |
+| **#16** | Free the captive, gated on sleepers **ASLEEP** | the rescue climax; #14's whole purpose | N |
+| **#17** | **Spirit-stealth** | #14 outright — it is the named way in | **CLOSED — this was wrong, see the #17 correction** |
 
 **Two of these are P1 only because `VISION_BOARD` V2b moved them.** Before *"gather by day,
 tend by night"* there was no night-time tending at all, so "can a spirit touch soil" was an idle
 question. The moment the garden and the rescue both became night verbs, the permission table
 became load-bearing for two of the fourteen existing musts.
 
-**#17's shape is the one thing on this list I cannot decide.** Detection cone, light level, and
-per-actor awareness are three systems, not three parameters. Queued as the single Lead question
-in `T0_EXECUTION_PHASES.md`.
+**#17 is CLOSED, not open.** I queued its shape as the single Lead question I could not answer,
+then asked it — and the answer (*spirit-blue campfire + the guard's blue torch*) was **already the
+LOCKED bible**: `SPIRIT_STEALTH_BIBLE.md` line 1 reads *"torch-class light (NPC-carried torches,
+campfires, spirit torches) can illuminate the spirit world"*, closed under `APPROVE SS-A`. The
+question was never open, and neither was the mechanic. That is the index failure, not a taste
+call — see `Docs/CANON_MAP.md` §1 and §3.
