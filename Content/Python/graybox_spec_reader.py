@@ -464,6 +464,10 @@ def run(place_missing: bool = False, **kwargs: Any) -> dict[str, Any]:
     measured = measure_scene(names)
 
     findings: list[dict[str, Any]] = []
+    # Recorded so the Markdown table resolves spec modules exactly as `verify` did.
+    # Without it the table printed *(absent)* for every mirrored pair while the
+    # checks underneath were passing against the authored mesh.
+    alias_resolutions: dict[str, str] = {}
     for volume in volumes:
         # Resolve through the alias table so a spec module authored as a
         # mirrored pair is verified against what is actually in the blend.
@@ -483,6 +487,7 @@ def run(place_missing: bool = False, **kwargs: Any) -> dict[str, Any]:
             continue
         findings.extend(verify(volume, row))
         if matched_as and matched_as != volume.name:
+            alias_resolutions[volume.name] = matched_as
             findings.append(
                 {
                     "criterion": "1_location",
@@ -535,6 +540,8 @@ def run(place_missing: bool = False, **kwargs: Any) -> dict[str, Any]:
         "blender": bpy.app.version_string,
         "blend_file": bpy.data.filepath,
         "spec_ids": list(all_spec_ids()),
+        "volume_names": names,
+        "alias_resolutions": alias_resolutions,
         "volumes_measured": len(measured),
         "volumes_present": sum(1 for m in measured.values() if m is not None),
         "volumes_assertable": len(assertable),
@@ -551,6 +558,55 @@ def run(place_missing: bool = False, **kwargs: Any) -> dict[str, Any]:
         "by_criterion": by_criterion,
         "passed": not blocking,
     }
+
+
+def _resolve_measurement(
+    name: str,
+    measurements: dict[str, Any],
+    resolutions: dict[str, str],
+) -> tuple[dict[str, Any] | None, str | None]:
+    """The measurement row that actually satisfies this volume, and where it came from.
+
+    A spec names a *module*; the blend authors some of those as mirrored pairs, so
+    the object holding the geometry is named `..._Front`/`_Side` or `..._L`/`_R`.
+    `VOLUME_ALIASES` exists for that, and `verify` walks it before checking
+    `1_location` and `2_sized` - which is why the verifier reports those volumes as
+    checked. The table has to resolve the same way. Emitting `*(absent)*` for a spec
+    name whose geometry is measured two rows below it is the false finding
+    VOLUME_ALIASES was written to prevent, and it is the one output that teaches the
+    Lead to stop reading the report.
+
+    `resolutions` is what the verifier recorded, so the table and the checks cannot
+    disagree. When a report dict predates that key, the same walk is redone from the
+    alias table - the same table, so it cannot drift.
+    """
+    row = measurements.get(name)
+    if row is not None:
+        return row, None
+
+    recorded = resolutions.get(name)
+    candidates = [recorded] if recorded else list(resolve_alias(name))
+    for candidate in candidates:
+        if not candidate or candidate == name:
+            continue
+        row = measurements.get(candidate)
+        if row is not None:
+            return row, candidate
+    return None, None
+
+
+def _bbox_cell(row: dict[str, Any]) -> str:
+    bbox = row.get("bbox")
+    if bbox is None:
+        return "*(non-mesh)*"
+    return "%.4f × %.4f × %.4f" % (bbox[0], bbox[1], bbox[2])
+
+
+def _origin_cell(row: dict[str, Any]) -> str:
+    origin = row.get("world_origin")
+    if origin is None:
+        return "—"
+    return "%.4f, %.4f, %.4f" % (origin[0], origin[1], origin[2])
 
 
 def to_markdown(report: dict[str, Any]) -> str:
@@ -583,22 +639,52 @@ def to_markdown(report: dict[str, Any]) -> str:
         "|---|---|---|",
     ]
     measurements = report.get("measurements") or {}
-    for name in sorted(measurements.keys()):
-        row = measurements.get(name)
+    resolutions = report.get("alias_resolutions") or {}
+
+    # One row per spec volume. A volume authored as a mirrored pair is measured
+    # under its alias, so the row shows the alias's numbers and names the object it
+    # came from - otherwise the table says "absent" about geometry it is printing
+    # a size for two lines later.
+    #
+    # Alphabetical, as before. The specs are read in layout order and the table was
+    # read alphabetically; switching to spec order churns every row in the diff for
+    # no gain in legibility.
+    declared = report.get("volume_names") or []
+    spec_names = sorted(declared) if declared else sorted(measurements.keys())
+
+    # Alias halves are rendered on their spec volume's row, so they must not also get
+    # one of their own. `alias_only` deliberately does NOT subtract the declared
+    # names: the second loop below already skips anything in `spec_names`, so a
+    # declared volume keeps its own row even when it is also an alias half
+    # elsewhere. Subtracting here looked safer and was dead code.
+    alias_only: set[str] = set()
+    if declared:
+        for volume_name in spec_names:
+            for alias in resolve_alias(volume_name):
+                if alias != volume_name:
+                    alias_only.add(alias)
+
+    def _row(name: str, row: dict[str, Any], resolved_as: str | None) -> str:
+        origin = _origin_cell(row)
+        if resolved_as:
+            origin = "%s (via `%s`)" % (origin, resolved_as)
+        return "| `%s` | %s | %s |" % (name, _bbox_cell(row), origin)
+
+    for name in spec_names:
+        row, resolved_as = _resolve_measurement(name, measurements, resolutions)
         if row is None:
             lines.append("| `%s` | *(absent)* | — |" % name)
+        else:
+            lines.append(_row(name, row, resolved_as))
+
+    # Measured objects that no spec volume names, and that are not one of its alias
+    # halves. This is the only place alias halves are filtered: `alias_only` holds
+    # names that are not declared volumes, so they cannot appear in the loop above,
+    # and a second check inside that loop would be unreachable.
+    for name in sorted(measurements):
+        if name in spec_names or name in alias_only:
             continue
-        bbox = row.get("bbox")
-        origin = row.get("world_origin")
-        if bbox is None:
-            bbox_s = "*(non-mesh)*"
-        else:
-            bbox_s = "%.4f × %.4f × %.4f" % (bbox[0], bbox[1], bbox[2])
-        if origin is None:
-            origin_s = "—"
-        else:
-            origin_s = "%.4f, %.4f, %.4f" % (origin[0], origin[1], origin[2])
-        lines.append("| `%s` | %s | %s |" % (name, bbox_s, origin_s))
+        lines.append(_row(name, measurements[name], None))
 
     lines += ["", "## Findings by criterion", "", "| Criterion | Count |", "|---|---|"]
     for criterion, count in sorted(report.get("by_criterion", {}).items()):
