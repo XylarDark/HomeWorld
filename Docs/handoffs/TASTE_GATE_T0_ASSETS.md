@@ -409,10 +409,40 @@ conversion. **Zero new musts, zero new mechanics** — a persistence rule and on
 
 ### The narrative, as the Lead stated it
 
-> *"A loved one accompanies you in your journey, then when you visit the camp, they are
-> kidnapped and you are booted to the homestead. Then to access the planetside you need to go
-> spirit form and travel down, release the negative emotions from the camp guards so they
-> sleep, then rescue your loved one."*
+> **First statement (Round 5).** *"A loved one accompanies you in your journey, then when you
+> visit the camp, they are kidnapped and you are booted to the homestead. Then to access the
+> planetside you need to go spirit form and travel down, release the negative emotions from the
+> camp guards so they sleep, then rescue your loved one."*
+
+> **Second statement (refined, Lead 2026-10-02) — this is the canonical sequence.**
+> *"You will stumble upon the camp **during the day** and your loved one will be taken and you
+> will be booted back to the homeworld. **During the night** you will use your **spirit form and
+> spirit-stealth gameplay** to get to the guards and **ease their suffering so that they go to
+> bed. Once they are in bed, you will free your loved one.**"*
+
+The refinement changed three things, all of them load-bearing:
+
+| Change | Consequence |
+|---|---|
+| **Camp is found by DAY, not at night** | **#8 finally has a cause.** `M8` was `T0_M8_DAY_CAMP_EJECT` — "cartoon `EJECT_HOME` from day camp" — with nothing to eject you *from*. Now there is |
+| **Spirit-stealth is the means of approach** | A mechanic that **does not exist** in the must list. See below |
+| **"Once they are in bed, you will free your loved one"** | **The soothe becomes a lock.** #14 finally has something downstream of it |
+
+**Why this order is the strongest version of the story.** You lose them by day and get them back
+by night, so the game's own day/night loop *is* the stakes — and choosing to become spirit is a
+strategic act rather than a menu tick. It also makes the rescue two-stage: reaching the guards
+and putting them to sleep is the work, freeing the companion is the reward.
+
+**One actor, two tests.** The single `NODE_GUARD` ejects you by day (Q22 — you were seen) and is
+what you must avoid by night (spirit-stealth). Same character, opposite solutions: be unseen by
+day, then be unseen again by night.
+
+### What this exposes that does not exist
+
+| Missing | Why it blocks |
+|---|---|
+| **`SPIRIT_STEALTH`** | The named means of reaching the guards. There is a stealth **family** (`NODE_RUNE`, M7 — a gate flag on the ground) but nothing for moving unseen in spirit form. **Without it M14 is unreachable** |
+| **`SLEEPER_STATE_ASLEEP`** | The gate needs *asleep*, not *converted*. Conflating them would let a converted sleeper open the lashings, which inverts the beat |
 
 ### This is the Act 2 rescue arc, pulled into the prototype
 

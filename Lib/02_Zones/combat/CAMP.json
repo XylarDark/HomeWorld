@@ -1,12 +1,23 @@
 {
   "id": "CAMP",
   "type": "SM_ zone",
-  "status": "SPEC_READY_NOT_BUILT",
+  "status": "SEQUENCE_DEFINED_GEOMETRY_NOT_BUILT",
   "date": "2026-10-02",
   "phase": "T0_M8_M13_M14_plus_R5",
   "owner": "agent",
   "family": "combat",
   "role": "The camp. Serves MUST #8 (day eject), #13 (portal arrival) and #14 (night: avoid 1 guard, soothe 2 sleepers), and after TASTE_GATE_T0_ASSETS Round 5 it is also where the companion is taken. This is the first spec to cover the camp; previously NO spec named it, which is the same coverage gap that hid the shrine defect (lintel on the ground, posts stacked) for the whole pipeline.",
+  "sequence": {
+    "settled_by": "Lead, 2026-10-02, second refinement",
+    "day": "You stumble upon the camp IN DAYLIGHT. The companion is taken. You are ejected back to the homestead.",
+    "night": "You take spirit form (bed AND rune), travel down, and use SPIRIT-STEALTH to reach the guards. You ease their suffering so they go to bed. Once they are in bed, you free the companion.",
+    "why_this_order_is_the_right_one": [
+      "It uses the game's own day/night loop as the stakes. You LOSE them by day and GET them back by night, so the choice to become spirit is the strategic act rather than a menu tick.",
+      "It gives M8 a reason to exist. #8 was 'cartoon EJECT_HOME from day camp' with no cause; now it has one.",
+      "It makes the rescue two-stage instead of a walk. Reaching the guards and putting them to sleep is the work; freeing the companion is the reward."
+    ],
+    "the_one_guard_is_the_same_actor_twice": "The single NODE_GUARD is what ejects you BY DAY (you were seen) and what you must avoid BY NIGHT (spirit-stealth). One actor, two tests, opposite solutions - be unseen by day, then be unseen again by night. The Lead's 'a guard wakes' (Q22) is the daytime half."
+  },
   "units": "meters",
   "apply_scale": true,
   "origin": "assembly_origin",
@@ -39,15 +50,40 @@
   "triggers": [
     {
       "name": "EJECT_TRIGGER_GUARD_WAKES",
+      "phase": "DAY",
       "shape": "sphere",
       "radius_m": 6.0,
       "at_offset": [3.0, -2.0, 1.8],
       "on_player_enter_with_guard_aware": "kidnap the companion; eject player to homestead",
-      "settled": "Q22, Lead 2026-10-02 - A GUARD WAKES. This is the first trigger of any kind in T0; there is no death, no capture and no failure state anywhere else in the prototype."
+      "settled": "Q22, Lead 2026-10-02 - A GUARD WAKES. This is the first trigger of any kind in T0; there is no death, no capture and no failure state anywhere else in the prototype.",
+      "reads_as": "The daytime half of the guard's job. You were seen in daylight, which is why you go home empty-handed."
+    },
+    {
+      "name": "FREEDOM_GATED_ON_SLEEPERS_ASLEEP",
+      "phase": "NIGHT",
+      "shape": "sphere",
+      "radius_m": 1.5,
+      "at_offset": [0.0, 4.0, 0.0],
+      "on_interact": "free the companion",
+      "condition": "BOTH NODE_SLEEPER actors must be ASLEEP. Not calmed-as-in-converted - ASLEEP, in bed.",
+      "settled": "Lead 2026-10-02: 'Once they are in bed, you will free your loved one.'",
+      "why_this_is_the_whole_beat": "This is the only condition in the camp that makes M14 non-optional. Until now 'soothe 2 sleepers' was a must with nothing downstream of it - you could skip it and the night still ended. Now skipping it means you stand next to your companion and cannot open the lashings, because two people are awake and grieving. The soothe is not a side objective; it is the lock on the door.",
+      "anti": "Freeing the companion with either sleeper awake is a FAIL, exactly as killing a sleeper is. There is no force option."
+    },
+    {
+      "name": "NODE_PORTAL_CAMP_ARRIVAL",
+      "phase": "NIGHT",
+      "shape": "sphere",
+      "radius_m": 2.0,
+      "at_offset": [0.0, 0.0, 0.0],
+      "on_enter": "player arrives in spirit form; spirit-stealth becomes available",
+      "note": "Reuses shrine language per the must list. #13."
     }
   ],
   "new_labels_needed": [
-    "NODE_CAPTIVE - Round 5 puts a loved one in this camp. No label in T0_MECHANIC_INVENTORIES_V1 names them. The must list needs one before this is buildable without inventing."
+    "NODE_CAPTIVE - Round 5 puts a loved one in this camp. No label in T0_MECHANIC_INVENTORIES_V1 names them. The must list needs one before this is buildable without inventing.",
+    "SPIRIT_STEALTH - the Lead named 'spirit-stealth gameplay' as the means of reaching the guards. The must list has a stealth FAMILY (M7, NODE_RUNE, a gate flag on the ground) but nothing for moving UNSEEN while in spirit form. This is a mechanic with no must behind it, and it is now load-bearing: without it there is no way to reach the guards.",
+    "SLEEPER_STATE_ASLEEP - the freedom trigger needs a state on the sleeper actors that is distinct from 'converted'. Nothing in the roster or the role enum carries it."
   ],
   "open_questions": [
     "Q15, still parked: is the clearing ~84 m across as the old measurement suggested, or a smaller one? The ZONE is settled (pine forest with camp); its SIZE is not. The 18 x 18 m above is a placeholder chosen so all four beat nodes and a guard patrol fit with room to walk around them - it is not a recommendation.",

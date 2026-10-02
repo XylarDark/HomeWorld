@@ -176,6 +176,40 @@ correction.
 **Anti, extended:** a guard killed rather than calmed is a fail, exactly as killing a sleeper is.
 The law is the point.
 
+#### The rescue is now gated on #14 — Lead, 2026-10-02 (second refinement)
+
+> *"You will stumble upon the camp during the day and your loved one will be taken and you
+> will be booted back to the homeworld. During the night you will use your spirit form and
+> spirit-stealth gameplay to get to the guards and ease their suffering so that they go to
+> bed. Once they are in bed, you will free your loved one."*
+
+**This gives #14 a downstream consequence, which it never had.** Until now "soothe 2 sleepers"
+was a must with nothing behind it — you could skip it and the night still resolved. Now:
+
+| | |
+|---|---|
+| **Day** | Stumble on the camp in daylight → companion taken → ejected home. **This is what #8 was for.** It had no cause until now |
+| **Night** | Spirit form (bed **and** rune) → travel down → **spirit-stealth** to the guards → ease their suffering so they go to **bed** → free the companion |
+| **The lock** | Freeing the companion requires **both sleepers ASLEEP**. Not "converted" — asleep, in bed |
+| **Anti** | Freeing them with either sleeper awake is a **fail**, exactly as killing a sleeper is. No force option |
+
+**#14 stops being skippable.** Skip the soothe and you stand beside your companion unable to
+open the lashings, because two people are awake and grieving. That is the whole beat: the soothe
+is not a side objective, it is the lock on the door.
+
+**One actor, two tests.** The single `NODE_GUARD` ejects you *by day* (Q22 — you were seen) and
+is what you must avoid *by night* (spirit-stealth). Opposite solutions to the same character.
+
+#### Two musts this exposes, and neither exists
+
+| Missing | Why it is load-bearing |
+|---|---|
+| **`SPIRIT_STEALTH`** | The Lead named spirit-stealth as *the* means of reaching the guards. The must list has a stealth **family** — `NODE_RUNE`, M7, a gate flag on the ground — but nothing for moving **unseen while in spirit form**. Without it there is no way to reach the guards, so M14 is unreachable |
+| **`SLEEPER_STATE_ASLEEP`** | The freedom gate needs a state distinct from "converted". Neither the roster nor `EConvertedFoeRole` carries sleep/asleep, and conflating the two would let a *converted* sleeper satisfy a gate that should require a *sleeping* one — which inverts the beat |
+
+Both are recorded in `Lib/02_Zones/combat/CAMP.json` under `new_labels_needed`. Neither is a
+taste question and neither is written yet.
+
 ### P2 — #1 Wake / start day — Partial
 
 | Field | Value |
