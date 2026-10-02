@@ -1182,3 +1182,95 @@ Homestead/*.uasset` greybox props, `blender/floating_island_homestead_LIB.blend1
 `docs/` files from other streams (`decisions/DISAGREEMENTS.md`, `handoffs/TASTE_GATE_SCOPE_
 R1-R4.md`, `qa/*`, `human-use/scope-refinement.md`). Committing another stream's work is
 not mine to do.
+
+## 2026-10-02 (session 3) - the gate that made six verbs unreachable, and a report that called six present volumes absent
+
+### Landed
+
+- `d4f4ed0` - the beat-node interactable gate now knows the seven beat-node tags. `ActorHasInteractableComponent`
+  recognised only `AHomeWorldResourcePile`, `AHomeWorldCraftStation` and six named components, none of them a
+  beat-node tag. A correctly tagged prop with a colliding collider was still rejected, and
+  `FindInteractTargetInCone` did not rescue it because line 2668 re-checks the same gate. Placement was never
+  going to fix those six beats. Added `namespace HomeWorldT0BeatNodes` with `TagsPerNode()` as the only place a
+  tag is spelled, `AllTags()` derived by flattening it, and `TagsFor` / `ActorCarriesTagFor` /
+  `ActorCarriesAnyBeatNodeTag` on top. Seven verbs dropped from about 17 lines of duplicated tag loop each to one
+  call.
+- `daaed6b` - `HomeWorldBeatNodeGateTests.cpp`: a 14-row table over **hardcoded** tag literals (reading them
+  from the implementation's own table would make the test tautological), plus an end-to-end trace-to-verb test on
+  #7 rune and #4 backpack because both are resource-free. Tag identity comes from the Actor **tag**, not
+  `SetActorLabel` - the `WITH_EDITOR` label branch does not exist at runtime.
+- `daaed6b` - extracted `HomeWorldTestWorld.h` (`FScopedWorld`, `SpawnCharacter`), replacing three
+  byte-equivalent copies across the camp-night and day-gate tests. Note for anyone using it:
+  `APawn::GetControlRotation()` returns `FRotator::ZeroRotator` with no controller, and a zero rotator points
+  +X, so the fixture's aiming depends on that.
+- `68f0dd4` - 11 `Found` cells in `Docs/handoffs/T0_MECHANIC_INVENTORIES_V1.md`. Nine read `Still unbuilt: no
+  NODE_X in any .umap`, which reads as "place the prop and the beat closes". It would not have. Two were stale
+  about the camp, which has had actors placed in `L_VS_MVP_Markers` since `4920c90`. None of the rewrites change a
+  verdict - they only stop the doc naming the wrong blocker.
+- `000927d` - the greybox report no longer calls six present volumes absent. `VOLUME_ALIASES` exists because the
+  specs name *modules* while the blend authors some as mirrored pairs (`_Front`/`_Side`, `_L`/`_R`, the hero
+  island as `SM_IslandTop`), and its own docstring says reporting one of those as not present "is a false
+  finding that trains the Lead to ignore the report". The verifier honoured that - `measure_scene` expands every
+  alias and `verify` walks `resolve_alias` before checking `1_location` and `2_sized`. `to_markdown` did not: it
+  iterated the raw measurements dict, so it printed `*(absent)*` for the spec name and the geometry holding the
+  real size two lines below. Half the fix was in place; the half anyone reads was not. Six rows now read as
+  resolved with a `via` annotation naming the object measured, and the `2_sized` mismatch for `SM_Island_Hero`
+  surfaces precisely (y 10.700 vs spec 14.000) instead of hiding behind "absent".
+- `6e0b2e4` - `ASSEMBLY_FOOTPRINTS` was documented as "half-extents" while the containment check halves each axis
+  first. The data are full extents. Comment only, no value and no behaviour changed, but a wrong comment on a
+  tolerance constant is load-bearing: the comment is what a reader trusts when the number looks wrong. Provenance
+  is now per entry, because the original claimed `overall_size_m` for all three and only the cabin has one.
+
+### Verification - what is proven and what is not
+
+- **The `NodeGate` fix is NOT verified.** `UnrealEditor-Cmd.exe HomeWorld.uproject -ExecCmds="Automation RunTests
+  HomeWorld.T0; Quit" -unattended -NullRHI` logs `Ready to start automation` and then emits nothing: no report
+  export, `Quit` never fires. The same command returned 16/16 green earlier the same day. Ruled out by
+  measurement - it stalls with a filter matching zero tests, with and without `-NullRHI`, with an explicit clean
+  map argument, with the asset registry cache deleted, on an idle box. Reading `AutomationCommandline.cpp`,
+  `FWaitForInteractiveFrameRate` passes and `FindWorkers` / `HandleRefreshTimeout` never log, so the command queue
+  is going empty rather than searching for a worker. Recorded in `docs/KNOWN_ERRORS.md`.
+- **No green UE suite may be claimed from an earlier run.** The host Python suite is the only harness currently
+  executable, and it is green at 70.
+- So the beat-node gate fix is compile-verified and unit-tested but never executed. `HomeWorld.T0.NodeGate.*` is
+  red-before / green-after on paper only. Stated plainly rather than rounded up.
+- Two flag traps worth remembering: `-TestExit=` cannot contain spaces (`FParse::Value` stops at whitespace), so
+  `-TestExit="Automation Test Queue Empty"` silently degrades to `TestExit: Automation` and exits at startup. And
+  `-ExecutePythonScript` is run-and-exit - the editor quits when the script returns - so the `t0_m*_prove.py` PIE
+  harness is unrunnable by construction. The space form of that flag is not parsed at all; the editor idles
+  forever.
+
+### The mutation harnesses earned their keep twice
+
+- `_mutate_graybox_aliases.py` found dead code in my own first version of the alias fix: an `alias_only` check
+  inside the spec-name loop that could never fire, because `alias_only` holds names that are *not* declared
+  volumes. Removing it changed nothing; a second, subtler one followed, a subtraction subsumed by the next loop's
+  own condition.
+- The same harness then scored its own declared survivor as killed, because survival was computed from the test
+  name instead of the run. `detected = test is None or test in failed` makes every `None` entry a guaranteed
+  kill, so the file would have reported evidence it did not have.
+- `_mutate_graybox_extents.py`'s first M1 removed `* 0.5`, which *widens* the containment box, while claiming to
+  tighten it. It killed the mutation either way, but the wrong half of the matched pair. A harness that reports
+  the kill it got as the kill it wanted will one day report a miss as a hit.
+- Standing traps, all three still live: an uncompilable mutation is not evidence (UE treats C4702 unreachable
+  code as an error, so `return nullptr;` at a function top can never be scored); a regex matching nothing must be
+  reported as HARNESS BUG and scored a survivor, not skipped; adding a `case` that already exists fails to
+  compile (C2196), so edit the existing return instead.
+
+### Durable lesson
+
+> A gate that is not reachable is not a missing prop, and a finding that is not true is worse than a missing
+> check. Both halves of this session are the same shape: something downstream was reporting faithfully on a
+> subject it had never actually looked at, and the report said so in words nobody questioned. The tell in each
+> case was a doc that explained the intent correctly - the alias table's docstring, the must list's
+> `Still unbuilt` clause - sitting next to code that did the opposite.
+
+### Not mine - left untouched and reported, not committed
+
+- `blender/floating_island_homestead_LIB.blend1` is untracked. The `.blend` itself is byte- and mtime-identical
+  across the regeneration runs - the reader ran read-only with `place=False` - and neither was committed.
+- `92e2dbc` (the Lead's porch exclusion) also edits `Content/Python/graybox_spec_reader.py`. Checked intact. It
+  is also why the regenerated report's blocking count reads 5 and not 8: that commit removed three porch findings,
+  not my renderer change, which cannot touch `findings`.
+- Ruff reports 194 findings across `Content/Python/`. Pre-existing and in other files; the three I touched are
+  clean.
