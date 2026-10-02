@@ -37,13 +37,13 @@
   "modules": [
     { "name": "SM_Camp_Fire", "size_m": [1.6, 1.6, 1.2], "role": "jagged_asymmetric_wedge_tallest_in_frame", "measured_from": "authored, not built" },
     { "name": "SM_Camp_GuardStake", "size_m": [0.4, 0.4, 0.9], "role": "marks_where_the_guard_holds_post", "measured_from": "authored, not built" },
-    { "name": "SM_Camp_Bedroll_A", "size_m": [1.9, 0.7, 0.4], "role": "sleeper_one", "measured_from": "authored, not built" },
-    { "name": "SM_Camp_Bedroll_B", "size_m": [1.9, 0.7, 0.4], "role": "sleeper_two", "measured_from": "authored, not built" },
+    { "name": "SM_Camp_Bedroll_A", "size_m": [1.9, 0.7, 0.4], "at_offset": [-2.5, 2.0, 0.0], "role": "sleeper_one", "measured_from": "authored, not built" },
+    { "name": "SM_Camp_Bedroll_B", "size_m": [1.9, 0.7, 0.4], "at_offset": [-2.5, 3.2, 0.0], "role": "sleeper_two", "measured_from": "authored, not built", "note": "Offset 1.2 m along Y from A. Two bedrolls at the same offset would overlap and fail the collision check." },
     { "name": "SM_Camp_Lashings", "size_m": [0.6, 0.6, 1.5], "role": "holds_the_companion - the thing you must calm a guard to reach", "measured_from": "authored, not built", "new_in_round_5": true }
   ],
   "beat_nodes": [
     { "label": "NODE_GUARD", "at_offset": [3.0, -2.0, 0.0], "actor": "AHomeWorldCharacter or NPC placeholder", "note": "A NODE is where the guard holds post. The guard is an ACTOR, not greybox geometry - do not model a guard as a prop." },
-    { "label": "NODE_SLEEPER", "at_offset": [-2.5, 2.5, 0.0], "count": 2, "actor": "as above", "note": "Two. Soothed, never killed - the conversion law." },
+    { "label": "NODE_SLEEPER", "at_offset": [-2.5, 2.0, 0.0], "count": 2, "spacing_m": 1.2, "actor": "as above", "note": "Two, laid side by side along +Y and individually visible. DEFECT FIXED 2026-10-02: both were originally authored at the same offset (-2.5, +2.5), which is two bedrolls occupying the same 1.9 x 0.7 m footprint - overlapping geometry that the collision check would have failed on the first run. Separated along Y by 1.2 m." },
     { "label": "NODE_CAPTIVE", "at_offset": [0.0, 4.0, 0.0], "actor": "the companion", "note": "NEW in Round 5. No T0 label exists for this yet - see new_labels_needed." },
     { "label": "NODE_PORTAL_CAMP", "at_offset": [0.0, 0.0, 0.0], "note": "Arrival point for #13. Reuses shrine language per the must list." }
   ],

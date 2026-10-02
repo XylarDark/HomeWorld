@@ -193,6 +193,172 @@ Eleven objects, three angles each, 33 images — plus the two extra views above,
 
 ---
 
+# PART 2B — THE CAMP (do this LAST)
+
+Added 2026-10-02, after Round 5 gave the camp a narrative. Everything above was written when
+the camp was "a zone that does not exist yet". It now has a sequence, four beat nodes and a
+gated rescue, so it needs its own plan rather than one line inside Zone 2.
+
+Source of truth for every number here: `Lib/02_Zones/combat/CAMP.json`. **Where this document
+and that file disagree, the file wins.** (DEC-0019: the spec is truth, the image is
+composition.)
+
+## 2B-0. What I need from you, and what I need you to check
+
+Two images. The first is the blocker; the second decides whether the beat works.
+
+**One decision I cannot make for you:** the layout must let the player **see the captive from
+the portal**. If they can see them, the rescue is a choice and "once they are in bed" carries
+weight. If the captive is hidden behind the fire or behind a bedroll, the rescue is a walk and
+all that weight lands on a door nobody was looking at. Prompt 2B-2 is drawn to answer exactly
+this, so **when you send it back, tell me whether the captive is visible from the arrival
+point.**
+
+---
+
+## 2B-1. The camp clearing — top-down measured grid
+
+This is the blocker. Without it, `M8`, `M13` and `M14` cannot be built and three prove scripts
+(`t0_m8_day_camp_eject_prove`, `t0_m13_portal_camp_prove`, `t0_m14_camp_night_prove`) have
+nothing to run against.
+
+```
+Top-down measured site plan of a small forest camp clearing in a pine forest,
+orthographic from DIRECTLY ABOVE, no perspective, no tilt. A 1-metre cyan grid
+across the whole drawing, a labelled 0-20 m scale bar bottom-left, and leader
+lines to label boxes giving every object's name and size in metres.
+
+The clearing is roughly 18 x 18 m of walkable ground. Soft irregular treeline
+all around the edge - tall pines forming a closed boundary. The ground inside
+is bare dirt, trampled flat, trodden paths radiating from the fire.
+
+Place these objects at these positions, all in metres from the clearing centre
+(0,0) with +Y toward the top of the drawing:
+
+  SM_Camp_Fire         1.6 x 1.6 x 1.2 m    at (0.0, 0.0)     jagged asymmetric
+                                                            wedge of split logs and
+                                                            stones, leaning, tallest
+                                                            thing in the frame, visibly
+                                                            UNEVEN - one side high,
+                                                            one side collapsed low
+  SM_Camp_GuardStake   0.4 x 0.4 x 0.9 m    at (+3.0, -2.0)   a rough driven stake with
+                                                            a scrap of cloth on it,
+                                                            marking where a guard
+                                                            stands. Small and low -
+                                                            do NOT make it a totem
+  SM_Camp_Bedroll_A    1.9 x 0.7 x 0.4 m    at (-2.5, +2.0)   a plain bedroll, laid out,
+                                                            low to the ground
+  SM_Camp_Bedroll_B    1.9 x 0.7 x 0.4 m    at (-2.5, +3.2)   a second bedroll, parallel
+                                                            to the first, offset so BOTH
+                                                            are individually visible
+  SM_Camp_Lashings     0.6 x 0.6 x 1.5 m    at (0.0, +4.0)    rope and stakes holding a
+                                                            person upright, gently -
+                                                            this is RESTRAINT FOR
+                                                            CAPTURE, not a cage or prison
+
+Two critical relationships:
+
+1. The lashings at (0, +4.0) must be DIRECTLY VISIBLE from the arrival point at (0, 0) - an
+   unbroken line of sight across open ground with nothing in between. This is the whole beat:
+   the player must be able to see who they came for.
+
+2. The guard stake at (+3.0, -2.0) and the two bedrolls near (-2.5, +2.6) must be on roughly
+   OPPOSITE sides of the fire, so the player cannot simply walk past one to reach the other.
+
+Drop shadows straight down, no sun angle, so the plan reads flat and measurable.
+
+Style: clean technical line drawing, white background, black outlines, one accent colour per
+object family. This is a working drawing, not an illustration.
+```
+
+**Then measure it back**, same as 1A: put the saved image in the Blender scene at true scale,
+add a `SM_ScaleRef_Adult` (0.6 × 0.4 × 1.8 m) beside the fire, and check whether the drawn
+proportions match the spec. **If they disagree, the spec wins and the image is composition
+only.** This is not hypothetical — the homestead image came back with 2 of 8 labels mirrored
+and `SM_Pine_A` mislabelled as `SM_Cabin`.
+
+---
+
+## 2B-2. The camp at night, from the arrival point — **the image that decides the beat**
+
+Not for modelling. For one question: **can the player see the captive when they arrive?**
+
+This is the spirit-form approach. The player arrives at the portal at (0, 0) as spirit, at
+night. Standing eye height 1.7 m, looking toward +Y. This must be the player's actual view,
+because if the captive is hidden in this image they are hidden in the game.
+
+```
+First-person view standing at the centre of a small forest camp clearing AT NIGHT,
+eye height 1.7 m, looking toward the far side. A cold blue-white spirit glow is the
+only light on YOU - everything else is lit by a low, dying campfire.
+
+Looking straight ahead about 4 m away, a person is held upright by rope and stakes
+near the cold fire. They are clearly VISIBLE and clearly a person - you can tell at a
+glance that this is who you came for. They are lit by the fire from the side.
+
+To your right and slightly behind, about 3.6 m away, a rough stake with a scrap of
+cloth - the guard's post. It is EMPTY. Nobody is standing there. The guard is asleep
+somewhere out of frame.
+
+To your left, about 3.5 m away, two bedrolls laid side by side on the ground. Both
+figures are asleep, breathing slowly, clearly peaceful rather than unconscious. Their
+faces are visible and calm.
+
+Mood: quiet, cold, blue-grey. The fire is nearly out - deep orange, low, guttering.
+Pine trunks as black silhouettes against a starless night sky. No combat, no enemies
+visible, no weapons drawn.
+
+Rendered as a clean faceted low-poly game screenshot: flat shaded, hard edges, visible
+planar facets, no smooth subdivision, no texture detail, no text, no watermark.
+Cartoon and handmade in feel - readable, simple, melancholy - not photoreal, not
+gritty, not horror, not neon.
+```
+
+**What I am checking in the returned image, in this order:**
+
+1. **Is the captive visible?** Not "can I infer where they are" — *visible*.
+2. Does anything block the sightline from (0,0) to (0,+4)? A log, a bedroll, the fire's high side.
+3. Do the two sleepers read as *peaceful*, or as unconscious or dead? If peaceful is not
+   achievable in one prompt, say so — *"ease their suffering"* is a different beat from *"knock
+   them out"*, and the second one is not this game.
+
+---
+
+## 2B-3. Camp asset sheets
+
+Same template as PART 2, same three angles. **Five objects**, and the one that matters is last.
+
+```
+A single [OBJECT] on a plain flat mid-grey background, centred, filling about
+70% of the frame, lit by even soft light from the front with no harsh shadows,
+no cast shadow on the ground, no props, no scenery, no other objects.
+
+Rendered as a clean faceted low-poly game asset: flat shaded, hard edges,
+visible planar facets, no smooth subdivision, no texture, no decal, no text
+label, no watermark. Cartoon and handmade in feel - warm, readable, simple -
+not photoreal, not gritty, not sci-fi, not neon.
+
+[PASTE THE SIZE AND SHAPE NOTE BELOW]
+```
+
+| Object | Size (m) | Paste this shape note |
+|---|---|---|
+| `SM_Camp_Fire` | 1.6 × 1.6 × 1.2 | A fire pit of split logs and grey stones. JAGGED AND ASYMMETRIC — one side of the pile stands roughly twice as high as the other. It should look like it was built in a hurry by someone in pain, not arranged. This is the tallest object in the camp and must read so from any angle |
+| `SM_Camp_GuardStake` | 0.4 × 0.4 × 0.9 | A rough wooden stake driven into the ground with a scrap of faded cloth tied near the top. Small, low, unglamorous. It marks a position; it is not a totem, not a banner, not a signpost |
+| `SM_Camp_Bedroll_A` | 1.9 × 0.7 × 0.4 | A plain bedroll — a folded mat and a blanket — laid flat on bare ground. Low and wide. No pillow, no frame, no decoration |
+| `SM_Camp_Bedroll_B` | 1.9 × 0.7 × 0.4 | Identical to `SM_Camp_Bedroll_A`. Generate as a near-copy so the two sleepers read as a pair |
+| `SM_Camp_Lashings` | 0.6 × 0.6 × 1.5 | Rope and short stakes holding a person upright, gently. THE MOST IMPORTANT OBJECT IN THE SET. It must read as *restraint through capture* — rope, not iron; not a cage, not a cell, not a stockade, not a gallows, no lock, no padlock, no bars, no door. If it reads as a lock, players will kill the guard to open it and the beat is dead |
+
+**Three angles for each: front elevation, 3/4 view, top-down.** Fifteen images for this part.
+
+**Why `SM_Camp_Lashings` gets its own warning:** it is the only object in the entire prototype
+where the player's likely instinct is to break the rule. A cage reads as a puzzle with one
+solution — force it. The whole design is that the only way through is to calm the guards down,
+so the lashings must not look like something you can unlock. If the image comes back reading
+like a cage, **send it again and tell me** — that is a real finding, not a nitpick.
+
+---
+
 # PART 3 — VERIFICATION, and the order to do this in
 
 ## Measure before you build
