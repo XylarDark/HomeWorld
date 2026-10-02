@@ -676,3 +676,81 @@ skipped.
 - **Reverses if:** a future run at adequate n shows context files move conformance reliably in
   the positive direction. That would justify keeping the eval harness - but not the deleted
   pieces, whose arguments were never about statistical power.
+
+---
+
+### DEC-0035 "Not finished: the instruction corpus is 10.8x the published ceiling, and .agents/ was never audited" (2026-10-01)
+
+- **Area:** harness — **overturns the implicit "Phase 4 is done" conclusion**
+- **Trigger:** Lead asked whether this matches what solo devs actually do and whether the
+  harness can now be considered complete. Research was commissioned specifically because the
+  prior work had **never investigated solo-dev practice** - it inferred it from tool pricing and
+  team-size reasoning. That was an argument from plausibility, not evidence.
+
+- **Finding 1 — our instruction corpus is an order of magnitude over budget.**
+  Measured on disk 2026-10-01:
+
+  | Surface | Files | Lines |
+  |---|---|---|
+  | `.cursor/rules/*.mdc` | 25 | 1,088 |
+  | `.agents/**` | 25 | 2,166 |
+  | **Total agent instructions** | **50** | **3,254** |
+
+  Against published ceilings: HumanLayer's root `CLAUDE.md` is **under 60 lines** with a
+  consensus ceiling of **under 300**; OpenAI's `AGENTS.md` is **~100 lines** because it is a
+  *table of contents* with `docs/` as the system of record; frontier models follow roughly
+  **150-200 instructions**, and instruction-following **decays uniformly as count rises**, not
+  only at the tail. Claude Code's own system prompt already spends ~50 of that budget.
+
+  **We are ~10.8x the consensus ceiling.** Phase 4 stopped at 25 rules and called it done.
+  It was not done. Worse, **`.agents/` (2,166 lines) was never audited at all** - the entire
+  Phase 4 exercise looked only at `.cursor/rules`, which is the *smaller* of the two surfaces.
+
+- **Finding 2 — the strongest published evidence says added instruction can be NET NEGATIVE.**
+  Dan Luu, 160 runs per condition, Sept 2026: **Default (no instructions) scored above
+  average**; TDD underperformed; large third-party test skills **underperformed while costing
+  26-41% more**. Henry Pan, independently: harness complexity grew **55% LOC with solve count
+  flat**, and rule-based harnesses trap the task model in "a policy maze". Ronacher: *"if you
+  stop using it, it's a failed automation, delete it"* - and 95% of his workflow is talking to
+  the machine. Boris Cherny deletes his `CLAUDE.md` every six months.
+
+  This *supports* the Phase 1-2 deletions and it also says **we did not go far enough.**
+  R5's dose-response (with 0.311 / docs-only 0.563 / without 0.667) is consistent with these
+  findings rather than an anomaly.
+
+- **Finding 3 — OpenAI tried the thing we have and published why it failed.**
+  One big `AGENTS.md` failed four named ways: context crowding, **"too much guidance becomes
+  non-guidance"**, instant rot, and no mechanical verifiability. Their fix is the shape we
+  should adopt: `AGENTS.md` as a ~100-line index, `docs/` as the system of record, guidance
+  **enforced by linters**, plus a doc-gardening agent.
+
+- **Finding 4 — our multi-agent model may be wrong.** Cognition: writes should stay
+  **single-threaded**. Simon Willison: **one significant change under review at a time**;
+  parallelism is for research, PoCs and low-stakes maintenance. Christopher Meiklejohn
+  documents **real data loss from migration collisions across agent worktrees**. We have been
+  treating parallel agent writes as the goal; the evidence says writes serialise and only
+  *research* parallelises.
+
+- **Decision:** the harness is **NOT complete**. Continue. Three specific reductions remain,
+  each evidence-backed rather than taste-led:
+  1. **`.agents/` audit** - 2,166 lines, never examined, larger than the corpus we trimmed.
+  2. **Fold `.cursor/rules/` toward the ceiling** - target `AGENTS.md` ~100 lines and a total
+     always-reachable instruction surface under 300 lines. Move detail into `docs/` (already
+     the canon) and enforce the invariants that matter with deterministic checks instead of
+     prose. "Claude is not a linter": style and formatting rules belong in tools, not prompts.
+  3. **Adopt the six-month deletion rhythm** Cherny uses, promoted from my kill rule to a
+     scheduled event.
+
+- **Rejected:** declaring the harness complete. Four of the five completion criteria in
+  Docs/36 are met, but criterion 1 - "every category solo devs report using is present" -
+  cannot be asserted while a whole instruction surface is unaudited, and criterion 2 -
+  "nothing we have is doing nothing" - fails for 3,254 lines of instructions against a 300-line
+  ceiling.
+
+- **Honest caveat:** no published harness-to-product-code ratio from solo developers exists.
+  I searched and did not find one, so our 4,250 LOC cannot be benchmarked against a number. The
+  instruction-budget findings above are the strongest available proxy and they are unambiguous.
+
+- **Reverses if:** measurement at adequate n shows the corpus size is not the constraint. That
+  is testable, and Dan Luu's result is the strongest prior against us being right - but it is a
+  prior from *other* tasks, not from HomeWorld.
