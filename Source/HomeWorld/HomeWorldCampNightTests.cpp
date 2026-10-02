@@ -10,6 +10,7 @@
 #include "HomeWorldCampNightTypes.h"
 #include "HomeWorldCharacter.h"
 #include "HomeWorldSpiritStealthComponent.h"
+#include "HomeWorldTestWorld.h"
 #include "HomeWorldTimeOfDaySubsystem.h"
 
 /**
@@ -45,40 +46,8 @@
 
 namespace HomeWorldCampNightTest
 {
-	/** A world plus its time-of-day subsystem, torn down together. */
-	struct FScopedWorld
-	{
-		UWorld* World = nullptr;
-		UHomeWorldTimeOfDaySubsystem* TimeOfDay = nullptr;
-
-		explicit FScopedWorld(const TCHAR* What)
-		{
-			World = UWorld::CreateWorld(EWorldType::Game, false);
-			if (World)
-			{
-				TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
-			}
-		}
-
-		~FScopedWorld()
-		{
-			if (World)
-			{
-				World->DestroyWorld(false);
-				World = nullptr;
-				TimeOfDay = nullptr;
-			}
-		}
-
-		bool Ok(FAutomationTestBase* Test) const
-		{
-			if (!Test->TestNotNull(TEXT("test world"), World))
-			{
-				return false;
-			}
-			return Test->TestNotNull(TEXT("time of day subsystem"), TimeOfDay);
-		}
-	};
+	// The world fixture is HomeWorldTestWorld::FScopedWorld - shared with the day gate and
+	// beat node gate tests so that teardown has exactly one home.
 
 	/**
 	 * A spirit-formed character with a stealth component.
@@ -104,7 +73,7 @@ namespace HomeWorldCampNightTest
 	};
 
 	/** Build the spirit-form fixture. Returns an invalid fixture if anything failed. */
-	FScopedSpirit MakeSpirit(FAutomationTestBase* Test, FScopedWorld& Scope)
+	FScopedSpirit MakeSpirit(FAutomationTestBase* Test, HomeWorldTestWorld::FScopedWorld& Scope)
 	{
 		FScopedSpirit Fixture;
 		Fixture.World = Scope.World;
@@ -414,7 +383,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FEaseDirectionTest::RunTest(const FString& Parameters)
 {
-	HomeWorldCampNightTest::FScopedWorld Scope(TEXT("M14 ease-direction"));
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("M14 ease-direction"));
 	if (!Scope.Ok(this))
 	{
 		return false;
@@ -468,11 +437,10 @@ bool FFreedomGateTest::RunTest(const FString& Parameters)
 {
 	using HomeWorldCampNightTest::EaseAllThree;
 	using HomeWorldCampNightTest::FScopedSpirit;
-	using HomeWorldCampNightTest::FScopedWorld;
 	using HomeWorldCampNightTest::MakeCamp;
 	using HomeWorldCampNightTest::MakeSpirit;
 
-	FScopedWorld Scope(TEXT("M16 freedom"));
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("M16 freedom"));
 	if (!Scope.Ok(this))
 	{
 		return false;
@@ -572,10 +540,9 @@ bool FSoftLatchContainmentTest::RunTest(const FString& Parameters)
 {
 	using HomeWorldCampNightTest::EaseAllThree;
 	using HomeWorldCampNightTest::FScopedSpirit;
-	using HomeWorldCampNightTest::FScopedWorld;
 	using HomeWorldCampNightTest::MakeSpirit;
 
-	FScopedWorld Scope(TEXT("M14 soft latch"));
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("M14 soft latch"));
 	if (!Scope.Ok(this))
 	{
 		return false;
@@ -658,11 +625,10 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 bool FTouchThroughComponentTest::RunTest(const FString& Parameters)
 {
 	using HomeWorldCampNightTest::FScopedSpirit;
-	using HomeWorldCampNightTest::FScopedWorld;
 	using HomeWorldCampNightTest::MakeSpirit;
 	using HomeWorldCampNightTest::Value;
 
-	FScopedWorld Scope(TEXT("M15 component"));
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("M15 component"));
 	if (!Scope.Ok(this))
 	{
 		return false;
@@ -699,11 +665,10 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 bool FCampNightCompletionRedirectTest::RunTest(const FString& Parameters)
 {
 	using HomeWorldCampNightTest::FScopedSpirit;
-	using HomeWorldCampNightTest::FScopedWorld;
 	using HomeWorldCampNightTest::MakeCamp;
 	using HomeWorldCampNightTest::MakeSpirit;
 
-	FScopedWorld Scope(TEXT("M14 redirect"));
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("M14 redirect"));
 	if (!Scope.Ok(this))
 	{
 		return false;
@@ -767,11 +732,10 @@ bool FCampActorsAreDiscoveredTest::RunTest(const FString& Parameters)
 {
 	using HomeWorldCampNightTest::EaseAllThree;
 	using HomeWorldCampNightTest::FScopedSpirit;
-	using HomeWorldCampNightTest::FScopedWorld;
 	using HomeWorldCampNightTest::MakeRealCamp;
 	using HomeWorldCampNightTest::MakeSpirit;
 
-	FScopedWorld Scope(TEXT("M14 placed actors"));
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("M14 placed actors"));
 	if (!Scope.Ok(this))
 	{
 		return false;

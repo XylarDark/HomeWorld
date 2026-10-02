@@ -4,6 +4,8 @@
 
 #if WITH_DEV_AUTOMATION_TESTS
 
+#include "HomeWorldTestWorld.h"
+
 #include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "HomeWorldCharacter.h"
@@ -17,14 +19,30 @@
  *
  * Each of these five beats has a two-sided law in T0_MECHANIC_INVENTORIES_V1. The positive
  * side - "with the prop placed and the right resource in hand, the beat completes" - needs
- * a placed actor in a world and a real interact trace. That is PIE work, and it is what the
- * Lead's prove run covers. Asserting it here would need a fixture world with placed props,
- * which is a much larger harness than the laws are worth.
+ * a placed actor in a world and a real interact trace. The negative side needs nothing: each
+ * gate REFUSES under a wrong phase or the wrong form, and the refusal is the law. That is
+ * what this file pins. If a later pass "simplifies" one of these guards - drops the day check
+ * because it seems redundant, or lets the spirit form use a day prop - nothing else in the
+ * tree would notice.
  *
- * The negative side needs nothing: each gate REFUSES under a wrong phase or the wrong form,
- * and the refusal is the law. That is what this file pins. If a later pass "simplifies" one
- * of these guards - drops the day check because it seems redundant, or lets the spirit form
- * use a day prop - nothing else in the tree would notice.
+ * CORRECTION 2026-10-02. This file used to say the positive side "is PIE work, and it is what
+ * the Lead's prove run covers", and declined to assert it as not worth the harness. Both
+ * halves of that were wrong, and the second one is why five beats sat at NO_VERDICT:
+ *
+ *   - It is not PIE work. A `UWorld::CreateWorld(EWorldType::Game, ...)` world runs line
+ *     traces and registers components. PIE supplies a pawn, a controller and a HUD, and none
+ *     of these gates read any of them. The harness was one struct away.
+ *   - The prove run cannot cover it. `-ExecutePythonScript` is run-and-exit in UE: the editor
+ *     quits the moment the script returns, so a deferred `editor_request_begin_play()` never
+ *     gets a tick to run in. Measured, not assumed - see HomeWorldBeatNodeGateTests.cpp.
+ *
+ * The positive halves now live in HomeWorldBeatNodeGateTests.cpp, where they are asserted
+ * against real placed props rather than deferred to a harness that cannot execute.
+ *
+ * One consequence is worth flagging: the deferral was not merely missing evidence. While
+ * those props were never placed, the interactable gate that every one of these verbs passes
+ * through did not know the beat-node tags existed, so placing them would not have produced
+ * a working beat either. Those two facts had to be found together.
  *
  * Per the Anti rows, each beat also names a substitute that must NOT count. Those are marked
  * in the individual tests.
@@ -33,51 +51,8 @@
  * check by hand after an agent change, in the project's own vocabulary.
  */
 
-namespace HomeWorldDayGateTest
-{
-	/** A world + TimeOfDay, torn down together. Leaked worlds poison later tests. */
-	struct FScopedWorld
-	{
-		UWorld* World = nullptr;
-		UHomeWorldTimeOfDaySubsystem* TimeOfDay = nullptr;
-
-		explicit FScopedWorld(const TCHAR* /*What*/)
-		{
-			World = UWorld::CreateWorld(EWorldType::Game, false);
-			if (World)
-			{
-				TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
-			}
-		}
-
-		~FScopedWorld()
-		{
-			if (World)
-			{
-				World->DestroyWorld(false);
-				World = nullptr;
-				TimeOfDay = nullptr;
-			}
-		}
-
-		bool Ok(class FAutomationTestBase* Test) const
-		{
-			return Test->TestNotNull(TEXT("test world"), World)
-				&& Test->TestNotNull(TEXT("time of day subsystem"), TimeOfDay);
-		}
-	};
-
-	static AHomeWorldCharacter* SpawnCharacter(UWorld* World)
-	{
-		if (!World || !GEngine)
-		{
-			return nullptr;
-		}
-		FActorSpawnParameters Params;
-		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		return World->SpawnActor<AHomeWorldCharacter>(Params);
-	}
-}
+// The world + character fixture now lives in HomeWorldTestWorld.h, shared with the camp
+// night and beat node gate tests. See that header for why teardown must have one home.
 
 /**
  * The shared day-gate law, checked on all five beats at once.
@@ -94,7 +69,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FDayGatesRefuseAtDuskAndNightTest::RunTest(const FString& Parameters)
 {
-	HomeWorldDayGateTest::FScopedWorld Scope(TEXT("day-gates"));
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("day-gates"));
 	if (!Scope.Ok(this))
 	{
 		AddError(TEXT("cannot reach the day gates without a world"));
@@ -115,7 +90,7 @@ bool FDayGatesRefuseAtDuskAndNightTest::RunTest(const FString& Parameters)
 		const TCHAR* PhaseName = Pass == 0 ? TEXT("Dusk") : TEXT("Night");
 
 		Scope.TimeOfDay->SetPhase(Phase);
-		AHomeWorldCharacter* Character = HomeWorldDayGateTest::SpawnCharacter(Scope.World);
+		AHomeWorldCharacter* Character = HomeWorldTestWorld::SpawnCharacter(Scope.World);
 		if (!TestNotNull(FString::Printf(TEXT("character at %s"), PhaseName), Character))
 		{
 			return false;
@@ -166,14 +141,14 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FInventoryGatedByBackpackTest::RunTest(const FString& Parameters)
 {
-	HomeWorldDayGateTest::FScopedWorld Scope(TEXT("M4 backpack"));
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("M4 backpack"));
 	if (!Scope.Ok(this))
 	{
 		return false;
 	}
 
 	Scope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Day);
-	AHomeWorldCharacter* Character = HomeWorldDayGateTest::SpawnCharacter(Scope.World);
+	AHomeWorldCharacter* Character = HomeWorldTestWorld::SpawnCharacter(Scope.World);
 	if (!TestNotNull(TEXT("character"), Character))
 	{
 		return false;
@@ -204,14 +179,14 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FTeaGateOffWithoutBrewTest::RunTest(const FString& Parameters)
 {
-	HomeWorldDayGateTest::FScopedWorld Scope(TEXT("M2 kettle"));
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("M2 kettle"));
 	if (!Scope.Ok(this))
 	{
 		return false;
 	}
 
 	Scope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Day);
-	AHomeWorldCharacter* Character = HomeWorldDayGateTest::SpawnCharacter(Scope.World);
+	AHomeWorldCharacter* Character = HomeWorldTestWorld::SpawnCharacter(Scope.World);
 	if (!TestNotNull(TEXT("character"), Character))
 	{
 		return false;
@@ -242,7 +217,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FPlantAndNurtureAreDistinctMarksTest::RunTest(const FString& Parameters)
 {
-	HomeWorldDayGateTest::FScopedWorld Scope(TEXT("M3/M12 plant"));
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("M3/M12 plant"));
 	if (!Scope.Ok(this))
 	{
 		return false;
@@ -251,7 +226,7 @@ bool FPlantAndNurtureAreDistinctMarksTest::RunTest(const FString& Parameters)
 	// Day and body. This world has no placed N1 crop, which is exactly the state the
 	// inventories describe as the gap: the slot is not marked.
 	Scope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Day);
-	AHomeWorldCharacter* Character = HomeWorldDayGateTest::SpawnCharacter(Scope.World);
+	AHomeWorldCharacter* Character = HomeWorldTestWorld::SpawnCharacter(Scope.World);
 	if (!TestNotNull(TEXT("character"), Character))
 	{
 		return false;
