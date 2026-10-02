@@ -1,0 +1,71 @@
+{
+  "id": "SPIRIT_SHRINE",
+  "type": "SM_ module family",
+  "status": "SPEC_READY",
+  "date": "2026-10-02",
+  "phase": "T0_M11 spirit family",
+  "owner": "agent",
+  "family": "spirit",
+  "role": "The two spirit shrines. One family, one silhouette, two locations - which is the point: the same read must work at the homestead and on the planet side, or the family is not a family.",
+  "units": "meters",
+  "apply_scale": true,
+  "origin": "ground_contact",
+  "size_m": { "x": 1.2, "y": 0.9, "z": 2.4 },
+  "world_origin": [-2.0, 3.5, 0.0],
+  "materials": [
+    { "slot": "base", "master": "M_CliffRock" },
+    { "slot": "posts_lintel", "master": "M_WoodCabin" },
+    { "slot": "glow", "master": "M_SpiritUnlit" }
+  ],
+  "modules": [
+    { "name": "SM_Shrine_Homestead_Base", "size_m": [1.2, 0.9, 0.25], "role": "base" },
+    { "name": "SM_Shrine_Homestead_Post_L", "size_m": [0.18, 0.18, 2.2], "role": "upright_left" },
+    { "name": "SM_Shrine_Homestead_Post_R", "size_m": [0.18, 0.18, 2.2], "role": "upright_right" },
+    { "name": "SM_Shrine_Homestead_Lintel", "size_m": [1.2, 0.2, 0.2], "role": "lintel_across_the_top" },
+    { "name": "SM_Shrine_Homestead_PortalGlow", "size_m": [0.7, 0.15, 1.8], "role": "light_in_the_gap" }
+  ],
+  "state_model": {
+    "wound_open": [
+      "SM_Shrine_Homestead_Base",
+      "SM_Shrine_Homestead_Post_L",
+      "SM_Shrine_Homestead_Post_R",
+      "SM_Shrine_Homestead_Lintel",
+      "SM_Shrine_Homestead_PortalGlow"
+    ]
+  },
+  "sibling": {
+    "volume": "SM_Shrine_Return",
+    "at": [6.0, -75.0, -95.0],
+    "rule": "Same family, same silhouette, different location. A spirit site on the homestead and a spirit site on the planet side must be recognisable as the same kind of thing. If the two read differently, the family is not legible and the design has failed.",
+    "built_to_match": true
+  },
+  "measured": {
+    "homestead": { "footprint_m": 1.2, "height_m": 2.4, "aspect": 2.0, "band": "tall", "z": [0.0, 2.4] },
+    "return": { "footprint_m": 1.2, "height_m": 2.4, "aspect": 2.0, "band": "tall", "z": [-95.0, -92.6] },
+    "note": "Both built identically, 2026-10-02. They now match, which is the requirement."
+  },
+  "defect_found": {
+    "volume": "SM_Shrine_Homestead, then SM_Shrine_Return",
+    "what": "The homestead shrine's lintel sat at Z 0-0.25 (ground level) and both posts stood at X -2.0, occupying the same column. It was a solid block with decoration, not a gate with a gap. The return shrine had the same lintel-at-ground fault with its posts correctly spread.",
+    "how_found": "GATE 2 measured the assembly envelope rather than trusting the band number. The band said 'mid', which was the symptom; the parts list showed the cause.",
+    "fix": "Both shrines rebuilt as the same gate: base 1.2 x 0.9 x 0.25, two 0.18 posts at +/-0.5 running 2.2 m, a 1.2 m lintel across the top at Z 2.2-2.4, and the glow inside the gap.",
+    "before": { "homestead": { "aspect": 1.29 }, "return": { "aspect": 1.38 } },
+    "after": { "both": { "aspect": 2.0, "band": "tall" } }
+  },
+  "agent_error_recorded": {
+    "what_happened": "The first correction pass set obj.scale on meshes whose dimensions were already non-unit, so scale compounded: a 0.2 m post became 0.032 m, and the return shrine was moved to world Z -189 (about 100 m underground) because world coordinates were assigned to parented children and the parent's -95 was added twice.",
+    "how_caught": "Re-measuring the assembly after the edit. The envelope read 4.07 m for a 1.9 m gate, which is impossible, and the Z read was 95 m below where the root sits.",
+    "fix": "Wrote the box dimensions into the mesh with bmesh at scale 1.0, and used LOCAL offsets from the assembly root rather than world coordinates.",
+    "lesson": "obj.scale is not a size. For a mesh with non-unit data, setting scale multiplies. And a parented child's location is relative to the parent, so world coordinates double-count the parent transform."
+  },
+  "open_questions": [
+    "Both shrines are 2.4 m tall, which is above an adult at 1.8 m. That is defensible for a gate you walk through, but it makes spirit the tallest thing in the prototype apart from the peak. Is that right, or should the shrines come down to roughly 2.0 m and read 'tall' by being narrower instead? Queued for the Lead - it is a proportion judgement, not a defect."
+  ],
+  "rejects": [
+    "solid_block",
+    "lintel_at_ground",
+    "stacked_posts",
+    "neon_tech_portal",
+    "two_different_silhouettes_for_one_family"
+  ]
+}
