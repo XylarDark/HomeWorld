@@ -136,6 +136,8 @@ const results = [];
 results.push(step('js suite', () => run('node', ['--test', 'scripts/*.test.js'])));
 if (results[results.length - 1]) {
   results.push(step('instruction budget', () => run('node', ['scripts/instruction-budget.js'])));
+  results.push(step('cyclomatic complexity', () => run('node', ['scripts/complexity-check.js'])));
+  results.push(step('anti-sycophancy', () => run('node', ['scripts/anti-sycophancy.js'])));
 }
 
 if (process.argv.includes('--strict-tree')) {

@@ -20,6 +20,8 @@
 
 **Stack (enabled plugins):** Enhanced Input, PCG, Gameplay Abilities, Steam Sockets, Day Sequence. For Week 2 family agents, enable UE 5.8 recommended Mass Entity + Mass AI, StateTree, ZoneGraph, SmartObjects (see [docs/SETUP.md](docs/SETUP.md)). Config in `Config/`; project layout and rules in `.cursor/rules/` (Unreal C++, Blueprint, project).
 
+**Context discipline:** past ~60k tokens of conversation you are in what the Agentic Engineering material calls the **dumb zone** - instruction-following and recall both degrade. Above it: write state to a .md file, summarise open threads and next actions there, and start a fresh session from that file. Do not carry the context forward and hope. Split research across agents rather than deepening one thread.
+
 **MCP-first development:** When the Unreal Editor is running and MCP tools are connected (unrealMCP), prefer live Editor manipulation via MCP over writing scripts or giving manual instructions. See `.cursor/rules/09-mcp-workflow.mdc` and [docs/Setup/MCP_SETUP.md](docs/Setup/MCP_SETUP.md). For using external LLMs to generate Editor automation scripts, see [docs/Automation/EXTERNAL_AI_AUTOMATION.md](docs/Automation/EXTERNAL_AI_AUTOMATION.md).
 
 **Parallelism:** research, read-only investigation and low-stakes maintenance may run alongside each other. **Writes serialise** - one significant change under review at a time. Two agents must not edit the same files in one tree, and an agent finding uncommitted tracked changes it did not make must stop and report rather than commit or stash them. Check with `npm run tree:check`.
