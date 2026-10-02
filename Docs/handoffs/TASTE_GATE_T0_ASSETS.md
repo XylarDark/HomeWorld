@@ -286,7 +286,15 @@ Held so Round 1 is answerable in two questions. Already queued:
 
 ---
 
-## Round 4 — RESOLVED 2026-10-02: THE FIRST CONVERTED FOE
+## Round 4 — RESOLVED 2026-10-02: THE FIRST CONVERTED FOE — **SUPERSEDED BY ROUND 5**
+
+> **Superseded 2026-10-02 by Round 5.** The Lead replaced the converted-foe NPC with a
+> **travelling companion** — family, not converts. There is **one** NPC in the prototype, not
+> two, so the vendor and the `QuestGiver` role are **not** built. Kept below because the
+> conversion mechanic still carries the theme: the guards are **calmed, not killed**, which is
+> the same law pointed at whoever is holding your loved one. That is where Round 4's thinking
+> ended up living.
+
 
 Raised by the Lead, 2026-10-02: *"generate something that can satisfy our Love as an
 Epic Quest narrative, something small enough for the prototype."*
@@ -451,24 +459,36 @@ wake (guard detection fires), a timer runs out, or entering the camp volume at a
 answer changes what the player is punished for**, and only one of them makes the kidnapping
 feel forced rather than scripted.
 
-Recorded as **Q22**, the single blocking fork below. Everything else in Round 5 is settled.
+Recorded as **Q22**, settled below.
 
-### Q22 — What ejects you from the camp to the homestead? **(blocking)**
+### Q22 — What ejects you from the camp to the homestead? — **A GUARD WAKES**
 
 T0 has **no death, no capture and no failure state.** "Booted" is a story word; mechanically
-something has to trigger the transition, and each answer punishes the player for something
+something had to trigger the transition, and each answer punishes the player for something
 different.
 
-- **A (recommended)** — **A guard wakes.** You were seen, or you lingered, and detection fires.
-  Cost: it makes the *avoid* half of M14 load-bearing for the first time — the guard stop is no
-  longer flavour, it is what costs you the loved one. That is the best version, because it means
-  the kidnapping is **your fault** and the rescue is the correction.
-- **B** — **You reach the camp and they are simply gone.** No trigger, no failure. The event
-  plays when you arrive. Cost: the player is a passenger. `M14`'s "avoid 1 guard" becomes
-  optional, because nothing is at stake while you do it.
-- **C** — **A timer.** You have until nightfall. Cost: it adds a clock to a prototype with no
-  timer anywhere else, and it argues with `M9`/`M11`, where nightfall is a *choice* you make
-  rather than a deadline you meet.
+**Settled: A (2026-10-02, Lead).** You were seen, or you lingered, and detection fires.
+
+**This is the answer with the most consequence, which is why it was offered first.** It makes
+the *avoid* half of `M14` load-bearing for the first time. Until now "avoid 1 guard" was
+flavour sitting next to "soothe 2 sleepers"; now the guard stop is the thing that costs you your
+loved one. So:
+
+- **the kidnapping is your fault** — you were seen, or you dawdled
+- **the rescue is the correction** — and it uses the *other* half of the same must
+- **the guard is not an obstacle**, they are the person between you and the captive, and they
+  can be **calmed instead of killed** — the same law as homestead combat, pointed at whoever is
+  holding your loved one
+
+**Rejected:** *B* (they are simply gone) would have made `M14`'s guard stop optional and the
+player a passenger. *C* (a timer until nightfall) would have introduced the only clock in the
+prototype and argued with `M9`/`M11`, where nightfall is a **choice** you make rather than a
+deadline you meet — it would have turned spirit form into a race, changing what that gate feels
+like.
+
+**Written into the must list**, not only here: `T0_MECHANIC_INVENTORIES_V1.md` #14 now carries
+the narrative load and an extended anti — *a guard killed rather than calmed is a fail, exactly
+as killing a sleeper is.*
 
 
 

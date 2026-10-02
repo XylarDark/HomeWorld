@@ -155,6 +155,27 @@ Each row: **Expected (T0)** · **Found (gap)** · **Arrange** · **DONE-WHEN** �
 | **Depends** | #11 spirit · #13 camp reach (soft) |
 | **Anti** | `hw.Conversion.Test` ≠ soothe |
 
+#### Narrative load, added 2026-10-02 — this must is the rescue
+
+`TASTE_GATE_T0_ASSETS` Round 5 put the family in the prototype and superseded V1. The
+companion travels with you, the camp takes them, and **you are sent back to the homestead**.
+Q22 answered **a guard wakes** — detection fires and ejects you.
+
+**That makes `NODE_GUARD` load-bearing for the first time.** Until now "avoid 1 guard" was
+flavour next to "soothe 2 sleepers". Now the guard stop is the thing that costs you your loved
+one, so **both halves of #14 are earned**: the kidnapping is your doing and the rescue is the
+correction.
+
+| | |
+|---|---|
+| **The story, in must terms** | *release the negative emotions from the camp guards so they sleep* = **soothe 2 sleepers, convert-not-kill** |
+| **The guard's new job** | Not an obstacle. The person between you and the captive, who can be **calmed instead of killed** — the same law as homestead combat, pointed at whoever is holding your loved one |
+| **New musts implied** | Travelling companion · the captive (held → freed → home) · detection-fires eject · the return leg. **None exist yet** |
+| **Blocking** | `camp_named_objects: []` — the camp does not exist, so the middle of this story is unbuilt |
+
+**Anti, extended:** a guard killed rather than calmed is a fail, exactly as killing a sleeper is.
+The law is the point.
+
 ### P2 — #1 Wake / start day — Partial
 
 | Field | Value |
