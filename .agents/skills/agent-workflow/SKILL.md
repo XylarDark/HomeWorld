@@ -1,6 +1,6 @@
 ---
 name: agent-workflow
-description: Use when carrying out any coding task in this repo end-to-end - covers human vs agent ownership at the start of work anywhere in the tree, context gathering, PowerShell and npm command patterns, research-before-implement policy, error recording in docs/KNOWN_ERRORS.md, and the mandatory temp-file cleanup before reporting results.
+description: Use when a coding task needs PowerShell or npm command patterns, research-before-implement, KNOWN_ERRORS recording, or temp-file cleanup. Not for a one-file typo or a path already named.
 ---
 
 # Agent workflow
