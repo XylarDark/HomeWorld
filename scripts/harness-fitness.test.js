@@ -91,6 +91,23 @@ test('product premise: an exactly-balanced window passes (tied is not over budge
 
 /* --------------------------------------------------------------- premise 1 */
 
+test('product premise: a commit that only edits Docs is not harness work', () => {
+  // P1-P8 of PRODUCT_SPRINT_01 are docs: commits and must count as product. If the
+  // classifier called them harness, the fitness check would keep reporting a
+  // harness crisis while the team shipped the sprint - a false alarm, which is
+  // the failure mode that makes a gate get ignored.
+  const commits = [
+    'docs(taste): round 2 resolved',
+    'docs(art): pipeline research',
+    'feat: conversion behaviour test',
+    'feat: tame transitions test',
+    'docs: sprint 01 plan',
+    'fix: shrine proportion',
+  ];
+  const r = premiseProduct(commits);
+  assert.strictEqual(r.ok, true, `docs commits are product work: ${r.detail}`);
+});
+
 test('shape premise: reads the real package.json', () => {
   const r = premiseShape();
   assert.strictEqual(r.ok, true, `six declared commands must be present: ${r.detail}`);
