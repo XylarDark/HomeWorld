@@ -36,8 +36,8 @@ const fs = require('fs');
 const path = require('path');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..');
-const FEATURE_LIST = path.join(PROJECT_ROOT, 'docs', 'handoffs', 'PROTOTYPE_FEATURE_LIST_V1.md');
-const HANDOFFS = path.join(PROJECT_ROOT, 'docs', 'handoffs');
+const FEATURE_LIST = path.join(PROJECT_ROOT, 'Docs', 'handoffs', 'PROTOTYPE_FEATURE_LIST_V1.md');
+const HANDOFFS = path.join(PROJECT_ROOT, 'Docs', 'handoffs');
 const EVIDENCE = require('./t0-evidence.js');
 
 /** Split a markdown table row into trimmed cells. */
