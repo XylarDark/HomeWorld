@@ -49,6 +49,7 @@ from homeworld_graybox_spec import (  # noqa: E402
     all_spec_ids,
     family_for,
     load_all_specs,
+    load_all_zone_specs,
     resolve_alias,
     volume_family_status,
 )
@@ -348,6 +349,13 @@ def place(volume: Volume) -> str:
     """Create a volume if absent. Never overwrites authored geometry.
 
     Returns 'created', 'exists' or 'skipped'.
+
+    A child module is placed at its ASSEMBLY's origin, not at (0,0,0). The first
+    version read volume.origin directly, and for every module that inherits its
+    assembly origin that is the zero vector -- so placing a kettle put its body and
+    handle at world zero while the spec said (-4.5, 3.2, 0). The verifier then
+    correctly reported them as outside the assembly footprint, which is how the bug
+    surfaced. See DEC-0025.
     """
     if bpy is None:
         raise RuntimeError("place requires bpy; run inside Blender")
@@ -358,13 +366,21 @@ def place(volume: Volume) -> str:
     if volume.size_m == (0.0, 0.0, 0.0):
         return "skipped"  # spec names the module without a size
 
-    bpy.ops.mesh.primitive_cube_add(size=1.0, location=volume.origin)
+    # Where this part actually goes.
+    if volume.origin_is_explicit:
+        location = volume.origin
+    elif volume.assembly_origin is not None:
+        location = volume.assembly_origin
+    else:
+        location = volume.origin
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=location)
     obj = bpy.context.active_object
     obj.name = volume.name
     obj.data.name = volume.name
     obj.scale = volume.size_m
     bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
-    obj.location = volume.origin
+    obj.location = location
 
     # Move the lowest vertex to ground contact if the spec asserts it.
     if volume.pivot_is_ground_contact:
@@ -381,9 +397,16 @@ def place(volume: Volume) -> str:
 
 
 def _all_volumes() -> list[Volume]:
-    """Every volume across every Lib/01 spec, family already resolved."""
+    """Every volume across every spec: Lib/01 homestead and Lib/02 zone kits.
+
+    Both sources feed one verification pass. They are kept separate in the repo
+    (DEC-0020) because the 39-volume layout table is cited elsewhere, but the
+    report has to cover both or it would read PASS while a zone prop is missing.
+    """
     volumes: list[Volume] = []
     for spec in load_all_specs():
+        volumes.extend(spec.volumes)
+    for spec in load_all_zone_specs():
         volumes.extend(spec.volumes)
     return volumes
 
@@ -416,6 +439,13 @@ def run(place_missing: bool = False) -> dict[str, Any]:
             if row is not None:
                 matched_as = candidate
                 break
+        # An assembly read is a SYNTHESIS: the union of its parts' bounding boxes,
+        # computed so the collision check has a zone-level unit to measure. It is not
+        # a real object and must never be demanded in the scene -- the first version
+        # that placed it created a duplicate object per beat state, which is exactly
+        # the "rival object" failure the spirit work is told to avoid.
+        if volume.is_assembly_read and row is None:
+            continue
         findings.extend(verify(volume, row))
         if matched_as and matched_as != volume.name:
             findings.append(

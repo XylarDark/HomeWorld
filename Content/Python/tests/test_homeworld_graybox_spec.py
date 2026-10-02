@@ -33,8 +33,11 @@ from homeworld_graybox_spec import (  # noqa: E402
     all_spec_ids,
     family_for,
     load_all_specs,
+    load_zone_spec,
     resolve_alias,
     volume_family_status,
+    zone_dirs,
+    zone_spec_paths,
 )
 
 
@@ -45,7 +48,15 @@ def _all_volumes():
     return volumes
 
 
-def _volume(name, size, family, origin=(0.0, 0.0, 0.0), role="", explicit=True):
+def _volume(name, size, family, origin=(0.0, 0.0, 0.0), role="", explicit=True, assembly_read=True):
+    """A test volume.
+
+    Defaults to ``assembly_read=True`` because that is what the collision check now
+    measures: a family signature describes how a PLACE reads at 20 m, so the whole
+    assembly is the unit, not its parts. Pass ``assembly_read=False`` to model a
+    single bolt, which is still measured and budgeted but is not held to a
+    zone-level proportion (DEC-0026).
+    """
     return Volume(
         name=name,
         size_m=size,
@@ -55,6 +66,7 @@ def _volume(name, size, family, origin=(0.0, 0.0, 0.0), role="", explicit=True):
         spec_id="TEST",
         family_status="assigned",
         origin_is_explicit=explicit,
+        is_assembly_read=assembly_read,
     )
 
 
@@ -69,6 +81,61 @@ def test_five_specs_load():
         "SM_Cliff",
         "SM_IslandTop",
     }
+
+
+def test_zone_kits_are_one_directory_per_family():
+    """DEC-0024: 'one family per section' as a property of the file tree."""
+    dirs = zone_dirs()
+    assert dirs, "Lib/02_Zones should exist once zone props are authored"
+    for family in dirs:
+        assert family in MECHANIC_FAMILIES, (
+            "zone directory %r is not one of the seven mechanic families" % family
+        )
+
+
+def test_a_zone_spec_must_agree_with_its_directory():
+    """A spec whose family key disagrees with its folder is an error, not a warning.
+
+    It would otherwise move a volume out of the collision assertion silently, and
+    a check that quietly stops checking is worse than no check (DEC-0021).
+    """
+    for family, spec_id in zone_spec_paths():
+        raw = load_zone_spec(family, spec_id)
+        assert raw.get("family") == family, spec_id
+
+
+def test_zone_specs_name_only_canon_masters():
+    for family, spec_id in zone_spec_paths():
+        raw = load_zone_spec(family, spec_id)
+        for slot in raw.get("materials") or []:
+            master = slot.get("master") if isinstance(slot, dict) else slot
+            assert master in MASTER_NAMES, "%s names %s" % (spec_id, master)
+
+
+def test_a_nurtured_part_is_not_present_before_the_nurture_beat():
+    """#12 must be falsifiable.
+
+    If the sprout existed from the start, a run could not tell whether nurturing had
+    done anything - the beat would pass by default. The T0 #12 Anti row calls out
+    'day-plant-alone' as closed_fail.
+    """
+    for family, spec_id in zone_spec_paths():
+        raw = load_zone_spec(family, spec_id)
+        states = raw.get("state_model")
+        if not isinstance(states, dict):
+            continue
+        day = set(states.get("day_planted") or [])
+        nurtured = set(states.get("spirit_nurtured") or [])
+        grown = set(raw.get("nurtured_modules") and
+                    [m["name"] for m in raw["nurtured_modules"] if "name" in m] or [])
+        assert grown, "%s declares a state model but no post-action parts" % spec_id
+        assert not (grown & day), (
+            "%s: %s exists before the nurture beat, so #12 is unfalsifiable"
+            % (spec_id, sorted(grown & day))
+        )
+        assert grown <= nurtured, (
+            "%s: a post-action part is missing from the nurtured state" % spec_id
+        )
 
 
 def test_every_spec_declares_meters_and_applied_scale():
@@ -218,6 +285,26 @@ def test_same_family_may_share_a_silhouette():
     a = _volume("SM_GardenBed_A", (1.8, 1.0, 0.5), FAMILY_BUILD_PLACE)
     b = _volume("SM_GardenBed_B", (1.6, 0.9, 0.5), FAMILY_BUILD_PLACE)
     assert silhouette.find_collisions([a, b]) == []
+
+
+def test_a_part_is_measured_but_not_held_to_a_zone_proportion():
+    """A kettle handle is not a 'flat square plate'.
+
+    A family signature is a statement about how a place reads at 20 m. Asserting it
+    against an individual part produced three false findings on the three Queue-B
+    props, because a handle, a soil pad and a monolith each violate a zone-level
+    band while being perfectly correct as parts.
+    """
+    handle = _volume(
+        "SM_Kettle_Handle", (0.12, 0.12, 0.1), FAMILY_BUILD_PLACE, assembly_read=False
+    )
+    assert handle.is_assertable is False, "a part is not the unit the signature describes"
+    # Still a real volume with real dimensions - excluded from the collision check,
+    # not excluded from existence.
+    assert handle.size_m == (0.12, 0.12, 0.1)
+
+    kettle = _volume("SM_NODE_KETTLE_DAY", (0.5, 0.5, 0.35), FAMILY_BUILD_PLACE)
+    assert kettle.is_assertable is True, "the whole prop IS the unit"
 
 
 def test_spirit_must_measure_tall_not_flat():

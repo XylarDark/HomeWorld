@@ -1,0 +1,46 @@
+{
+  "id": "NODE_PLANT_SLOT",
+  "type": "SM_ prop",
+  "status": "SPEC_READY",
+  "date": "2026-10-02",
+  "phase": "T0_M3 + T0_M12",
+  "owner": "agent",
+  "family": "heal",
+  "role": "Day plant given herb (MUST #3) then spirit nurture on the same slot (MUST #12). The slot is one volume; the two marks are states, not two objects.",
+  "units": "meters",
+  "apply_scale": true,
+  "origin": "ground_contact",
+  "size_m": { "x": 0.9, "y": 0.9, "z": 0.8 },
+  "world_origin": [-3.0, -1.5, 0.0],
+  "assembly_read_note": "The day state is a bare soil pad, which cannot read as heal - heal is 'narrow upright, single soft column'. The family only appears once the sprout exists after #12. This is reported as a non-conformance rather than fixed by giving the soil an upright, because a planted-but-untended slot SHOULD read flat: an empty pad that already looked like a heal site would be claiming a mechanic the player has not performed. Queued for the interview.",
+  "materials": [
+    { "slot": "plant_day", "master": "M_GatherHerb" },
+    { "slot": "plant_nurtured", "master": "M_Nurtured" },
+    { "slot": "soil", "master": "M_CliffRock" }
+  ],
+  "modules": [
+    { "name": "SM_PlantSlot_Soil", "size_m": [0.9, 0.9, 0.12], "role": "soil_pad" }
+  ],
+  "nurtured_modules": [
+    { "name": "SM_PlantSlot_Sprout", "size_m": [0.5, 0.5, 0.68], "role": "plant_upright_after_nurture" }
+  ],
+  "sockets": [
+    { "name": "SOCKET_PlantSlot_N1", "origin": [-3.0, -1.5, 0.0] }
+  ],
+  "rejects": [
+    "glow_alone_is_not_a_plant",
+    "n2_stored_only",
+    "body_form_nurture",
+    "separate_slot_for_nurture"
+  ],
+  "silhouette_note": "Family 'heal' is 'narrow upright, single soft column' and has NO volume anywhere in the 39-volume layout - this is the first. The soil pad is the day state; the sprout is the NURTURED state, split out because a sprout that exists before #12 would make the nurture beat unfalsifiable - you could not tell whether nurturing did anything. The sprout is narrow-upright rather than a wide planted bed, because a bed would collide with gather's 'low wide soft mound'.",
+  "state_model": {
+    "day_planted": ["SM_PlantSlot_Soil"],
+    "spirit_nurtured": ["SM_PlantSlot_Soil", "SM_PlantSlot_Sprout"],
+    "law": "T0 #12 Anti row: 'N2 stored-only', 'body-form nurture', 'separate slot for nurture' are all closed_fail. One slot, two marks, sprout appears only on nurture."
+  },
+  "open_questions": [
+    "Should the plant slot read as a heal site (narrow upright, the family's signature) or as part of the garden? The heal family has no other volume, so this prop is the family's entire visual presence in the prototype.",
+    "Heal is currently taught nowhere. Is T0_M12 the beat that should teach it, or is heal out of scope for the prototype entirely?"
+  ]
+}

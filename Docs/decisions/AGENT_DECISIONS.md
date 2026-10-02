@@ -540,6 +540,52 @@ skipped.
 
 ---
 
+### DEC-0025 — "A child part is placed at its assembly origin, never at world zero" (2026-10-02)
+
+- **Area:** code design
+- **Decision:** `place()` resolves a part's location from `origin_is_explicit`,
+  else `assembly_origin`, else `volume.origin`. A part that inherits its assembly's
+  origin is never placed at `(0,0,0)`.
+- **Rationale:** The first version read `volume.origin` directly. For every module
+  that inherits its assembly origin — which is most of them, because
+  `CABIN_MODULES` and the zone props name sub-modules without restating positions —
+  that value *is* the zero vector. Placing the kettle put its body and handle at
+  world origin while the spec said `(-4.5, 3.2, 0)`.
+- **Evidence:** the verifier caught it rather than the build. `place=True` reported
+  `SM_Kettle_Body: child module sits outside assembly 'None' footprint (module at
+  0.000, 0.000; assembly centre -4.500, 3.200)`. Three props, three false
+  findings, one root cause.
+- **Reverses if:** a spec gives a part its own offset relative to the assembly
+  (e.g. a porch post 1.3 m forward of the cabin centre). Then the offset is
+  meaningful and should be added to the assembly origin rather than replacing it.
+
+---
+
+### DEC-0026 — "A family signature is asserted against the assembly read, not against each part" (2026-10-02)
+
+- **Area:** architecture
+- **Decision:** Only synthesised **assembly reads** are assertable. Individual
+  parts are still measured, budgeted and master-checked, but are not held to a
+  zone-level proportion.
+- **Rationale:** A locked signature is a statement about how a **place** reads at
+  20 m — *narrow upright, single soft column*. Asserting it against a kettle
+  handle produced three false findings, because a handle is not supposed to be a
+  "flat square plate". The original collision check was measuring bolts and
+  firing on them. The assembly bounding volume is the unit that actually faces
+  the player.
+- **Rejected:** (a) keep asserting parts and add a per-part exception list — that
+  is an unbounded list of apologias for a wrong unit; (b) drop the assertion for
+  props entirely — the props are exactly where the families first appear, so
+  dropping them would leave `heal` and `stealth` with no check at all.
+- **Evidence:** authoring `NODE_KETTLE`, `NODE_RUNE`, `NODE_PLANT_SLOT` — three
+  parts across three families, three false `4_distinct` findings, one root cause.
+  Pinned by `test_a_part_is_measured_but_not_held_to_a_zone_proportion`.
+- **Reverses if:** a future family is defined by a *part* rather than a whole —
+  e.g. a shrine defined by its lintel alone. Then part-level assertion returns for
+  that family specifically.
+
+---
+
 ### DEC-0033 "Re-point the harness at the game, not at the agent tooling" (2026-10-01)
 
 - **Area:** harness architecture — the governing decision for all harness work

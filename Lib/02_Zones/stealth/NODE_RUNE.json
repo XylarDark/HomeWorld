@@ -1,0 +1,41 @@
+{
+  "id": "NODE_RUNE",
+  "type": "SM_ prop",
+  "status": "SPEC_READY_WITH_OPEN_QUESTIONS",
+  "date": "2026-10-02",
+  "phase": "T0_M7",
+  "owner": "agent",
+  "family": "stealth",
+  "role": "Day field-path rune. MUST #7 - gates bed to spirit. Anti row: PROXY SM_ProxyRune alone is not the beat; spirit on phase alone is not the beat.",
+  "units": "meters",
+  "apply_scale": true,
+  "origin": "ground_contact",
+  "size_m": { "x": 1.6, "y": 0.4, "z": 0.9 },
+  "world_origin": [2.0, 0.0, 0.0],
+  "materials": [
+    { "slot": "stone", "master": "M_CliffRock" }
+  ],
+  "modules": [
+    { "name": "SM_Rune_Stone", "size_m": [1.6, 0.4, 0.9], "role": "low_broken_stone" }
+  ],
+  "sockets": [
+    { "name": "SOCKET_Rune", "origin": [2.0, 0.0, 0.0] }
+  ],
+  "rejects": [
+    "proxy_alone",
+    "neon_ring",
+    "floating_tech_totem",
+    "single_tall_monolith"
+  ],
+  "open_questions": [
+    "Is the rune a stealth-family volume at all? MUST #7 is a GATE FLAG, and the stealth family is 'low broken horizontal, never a closed mass'. A single tall monolith measured 2.00 - the steepest possible contradiction of that signature - so the first pass was authored as a low broken stone instead.",
+    "If a broken low stone does not read as 'unlock', does the rune need to carry the spirit family instead, so it reads as the thing that admits you to spirit rather than as a stealth site?",
+    "Does the rune need a visible gap like spirit, or does its whole job read at a low horizontal? These are different props and only the Lead can say which."
+  ],
+  "measured": {
+    "aspect": 0.56,
+    "band": "low",
+    "conforms_to_locked_signature": true
+  },
+  "note": "Kept CONFORMING rather than reshaped twice. The alternative - an ailing monolith that violates the signature - would have been a worse answer, because 'low broken' is what the family means. Whether the rune BELONGS to stealth at all is a taste question queued for the interview, not something the spec should decide by geometry."
+}

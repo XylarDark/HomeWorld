@@ -99,6 +99,10 @@ SECTION_VOLUME_COUNT: tuple[int, int] = (20, 40)
 HOMESTEAD_SPEC_DIR_REL = os.path.join("Lib", "01_Homestead")
 GRAYBOX_LAYOUT_REL = os.path.join("Lib", "00_Core", "GRAYBOX_LAYOUT.md")
 
+#: Zone kits, one directory per mechanic family (DEC-0024). "one family per
+#: section" becomes a property of the file tree rather than a convention.
+ZONES_ROOT_DIR_REL = os.path.join("Lib", "02_Zones")
+
 
 def project_root() -> str:
     """Absolute path to the HomeWorld project root, from this file's location."""
@@ -132,6 +136,64 @@ def all_spec_ids() -> tuple[str, ...]:
         with open(os.path.join(directory, name), "r", encoding="utf-8") as handle:
             ids.append(str(json.load(handle).get("id") or os.path.splitext(name)[0]))
     return tuple(ids)
+
+
+def zone_dirs() -> list[str]:
+    """One directory per mechanic family under Lib/02_Zones, in a stable order.
+
+    The directory NAME is the family, which is the point of DEC-0024: it makes
+    "one family per section" a property of the tree rather than a convention
+    someone has to remember.
+    """
+    root = os.path.join(project_root(), ZONES_ROOT_DIR_REL)
+    if not os.path.isdir(root):
+        return []
+    return [name for name in sorted(os.listdir(root)) if os.path.isdir(os.path.join(root, name))]
+
+
+def zone_spec_paths() -> list[tuple[str, str]]:
+    """(family, spec id) for every zone spec, in a stable order."""
+    root = os.path.join(project_root(), ZONES_ROOT_DIR_REL)
+    found: list[tuple[str, str]] = []
+    for family in zone_dirs():
+        family_dir = os.path.join(root, family)
+        for name in sorted(os.listdir(family_dir)):
+            if not name.endswith(".json"):
+                continue
+            with open(os.path.join(family_dir, name), "r", encoding="utf-8") as handle:
+                spec_id = str(json.load(handle).get("id") or os.path.splitext(name)[0])
+            found.append((family, spec_id))
+    return found
+
+
+def load_zone_spec(family: str, spec_id: str) -> dict[str, Any]:
+    """Load one Lib/02_Zones spec by family directory and spec id."""
+    path = os.path.join(
+        project_root(), ZONES_ROOT_DIR_REL, family, "%s.json" % spec_id
+    )
+    if not os.path.isfile(path):
+        raise FileNotFoundError("Zone spec not found: %s" % path)
+    with open(path, "r", encoding="utf-8") as handle:
+        return json.load(handle)
+
+
+def load_all_zone_specs() -> tuple[Spec, ...]:
+    """Load and parse every zone spec across every family directory."""
+    specs = []
+    for family, spec_id in zone_spec_paths():
+        raw = load_zone_spec(family, spec_id)
+        parsed = parse_spec(raw)
+        # The directory is authoritative for family; a mismatch is a real error
+        # rather than a warning, because it would silently move a volume out of
+        # the collision assertion.
+        declared = raw.get("family")
+        if declared and declared != family:
+            raise ValueError(
+                "zone spec %s declares family '%s' but lives under '%s'"
+                % (spec_id, declared, family)
+            )
+        specs.append(parsed)
+    return tuple(specs)
 
 
 # --------------------------------------------------------------------------
@@ -169,6 +231,10 @@ class Volume:
     assembly_origin: tuple[float, float, float] | None = None
     #: Assembly root object name, when this volume is a child module.
     assembly: str | None = None
+    #: True for a synthesised whole-assembly read rather than a real part. A family
+    #: signature describes how a ZONE reads at 20 m, so this -- not the individual
+    #: bolts -- is what the collision check measures. See DEC-0026.
+    is_assembly_read: bool = False
 
     @property
     def is_assertable(self) -> bool:
@@ -177,8 +243,18 @@ class Volume:
         False for helpers, for terrain the Lead ruled out by design (the spine),
         and for volumes with no family assignment -- an unassigned volume is
         *skipped and reported*, never quietly treated as passing.
+
+        Only ASSEMBLY READS assert. A family signature is a statement about how a
+        place reads at 20 m, and asserting it against a kettle handle produced
+        three false findings: a handle is not meant to be a "flat square plate".
+        Parts are still measured, budgeted and master-checked; they just do not
+        get held to a zone-level proportion. See DEC-0026.
         """
-        return self.family_status == "assigned" and self.family != FAMILY_SPINE
+        return (
+            self.is_assembly_read
+            and self.family_status == "assigned"
+            and self.family != FAMILY_SPINE
+        )
 
     @property
     def height_m(self) -> float:
@@ -445,6 +521,11 @@ def _parse_volumes(spec_id: str, raw: dict[str, Any]) -> tuple[Volume, ...]:
       * a single top-level ``size_m`` + ``world_origin`` (island top)
     """
     volumes: list[Volume] = []
+    is_assembly_read = False
+
+    # A zone spec names its family once at the top level; every module in it
+    # inherits that unless the table says otherwise.
+    module_family = str(raw.get("family") or "") or None
 
     # An assembly's own world origin. Bare module/mesh name lists (CABIN_MODULES,
     # GARDEN_BLOCKING) name sub-modules without restating their origins: the
@@ -464,13 +545,20 @@ def _parse_volumes(spec_id: str, raw: dict[str, Any]) -> tuple[Volume, ...]:
         ground_contact: bool,
         explicit_origin: bool = False,
     ) -> None:
+        # A zone spec may carry a family on each module; otherwise fall back to
+        # the table. Either way the family is data, never inferred.
+        family = family_for(name)
+        status = volume_family_status(name)
+        if family == FAMILY_SPINE and status == "unassigned" and module_family:
+            family = module_family
+            status = "assigned"
         volumes.append(
             Volume(
                 name=name,
                 size_m=size,
                 origin=origin,
-                family=family_for(name),
-                family_status=volume_family_status(name),
+                family=family,
+                family_status=status,
                 role=role,
                 spec_id=spec_id,
                 is_helper=name.startswith(HELPER_PREFIXES),
@@ -478,6 +566,7 @@ def _parse_volumes(spec_id: str, raw: dict[str, Any]) -> tuple[Volume, ...]:
                 origin_is_explicit=explicit_origin,
                 assembly_origin=assembly_origin if not explicit_origin else None,
                 assembly=assembly_name if not explicit_origin else None,
+                is_assembly_read=is_assembly_read,
             )
         )
 
@@ -516,6 +605,56 @@ def _parse_volumes(spec_id: str, raw: dict[str, Any]) -> tuple[Volume, ...]:
             if isinstance(mesh_name, str):
                 _add(mesh_name, (0.0, 0.0, 0.0), (0.0, 0.0, 0.0), "blocking", False)
 
+    # 1c. nurtured_modules[] -- parts that only exist AFTER a later beat acts.
+    # Kept out of the always-present set on purpose: a sprout present before #12 would
+    # make the nurture beat unfalsifiable, because you could not tell whether
+    # nurturing had done anything. Measured against its own state list, not the
+    # day-state list.
+    nurtured = raw.get("nurtured_modules")
+    if isinstance(nurtured, list):
+        for module in nurtured:
+            if not isinstance(module, dict) or "name" not in module:
+                continue
+            size_raw = module.get("size_m")
+            if not isinstance(size_raw, (list, tuple)):
+                continue
+            _add(
+                str(module["name"]),
+                _as_vec3(size_raw, "nurtured size_m"),
+                _as_vec3(module.get("origin", [0.0, 0.0, 0.0]), "nurtured origin"),
+                str(module.get("role") or "post_action"),
+                bool(module.get("origin") is not None),
+                explicit_origin=bool(module.get("origin") is not None),
+            )
+
+    # 1d. the ASSEMBLY read. A family signature describes how a ZONE reads at 20 m,
+    # not how each part reads: a kettle handle is not a "flat square plate", and
+    # asserting otherwise made the collision check fire on parts of the same prop.
+    # The assembly bounding volume is the unit that actually faces the player, so
+    # it is the unit measured. See DEC-0026.
+    states = raw.get("state_model")
+    if isinstance(states, dict):
+        is_assembly_read = True
+        for state_name in sorted(states):
+            members = states.get(state_name)
+            if not isinstance(members, list) or not members:
+                continue
+            named = [v for v in volumes if v.name in members]
+            if not named:
+                continue
+            # Union of the member parts: the envelope the player sees in this state.
+            sx = max(v.size_m[0] for v in named)
+            sy = max(v.size_m[1] for v in named)
+            sz = max(v.size_m[2] for v in named)
+            _add(
+                "SM_%s_%s" % (spec_id, state_name.upper()),
+                (sx, sy, sz),
+                _as_vec3(raw.get("world_origin", [0.0, 0.0, 0.0]), "world_origin"),
+                "assembly_read_%s" % state_name,
+                str(raw.get("origin") or "") == "ground_contact",
+                explicit_origin=True,
+            )
+
     # 2. variants[] -- pines carry height_m, not size_m.
     variants = raw.get("variants")
     if isinstance(variants, list):
@@ -534,18 +673,21 @@ def _parse_volumes(spec_id: str, raw: dict[str, Any]) -> tuple[Volume, ...]:
                 explicit_origin=has_origin,
             )
 
-    # 3. single volume -- the island top.
+    # 3. a single unnamed volume -- the island top (Lib/01) and the zone prop envelope
+    #    (Lib/02). Only synthesised when the spec does NOT already name its parts in
+    #    modules[]; a zone spec carries a top-level size_m as the ENVELOPE of its
+    #    modules, and emitting that as a volume invented an "SM_IslandTop" kettle.
     size = raw.get("size_m")
-    if isinstance(size, dict):
+    if isinstance(size, dict) and not isinstance(raw.get("modules"), list):
         x = float(size.get("x") or 0.0)
         y = float(size.get("y") or 0.0)
         z = float(size.get("z_crust") or size.get("z") or 0.0)
-        name = str(raw.get("graybox_map", ["SM_IslandTop"])[0])
+        name = str(raw.get("graybox_map", [raw.get("id") or "SM_Volume"])[0])
         _add(
             name,
             (x, y, z),
             _as_vec3(raw.get("world_origin", [0.0, 0.0, 0.0]), "world_origin"),
-            "island_plateau_top",
+            str(raw.get("role") or "single_volume"),
             str(raw.get("origin") or "") == "ground_contact",
         )
 
