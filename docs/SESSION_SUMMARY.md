@@ -1274,3 +1274,42 @@ not mine to do.
   not my renderer change, which cannot touch `findings`.
 - Ruff reports 194 findings across `Content/Python/`. Pre-existing and in other files; the three I touched are
   clean.
+
+### CORRECTION - the `### Landed` list above is wrong about `d4f4ed0`
+
+Appended rather than edited, per the append-only rule, so the mistake stays on the record.
+
+**`d4f4ed0` is not landed.** It is the tip of branch `keep/interact-gate` and is **not an ancestor of
+`main`** (`git merge-base --is-ancestor d4f4ed0 HEAD` exits 1). On `main`,
+`ActorHasInteractableComponent` still recognises only `AHomeWorldResourcePile`, `AHomeWorldCraftStation`
+and six named components, and no beat-node tag, so all six affected verbs are unreachable in every world.
+The "Landed" bullet above, and the nine must-list cells written in `68f0dd4` that said the gate "is now
+fixed in `d4f4ed0`", were both false. Both now say so.
+
+Two things made this survivable for a while and neither was checked:
+
+- **The commit succeeded.** A commit that was created is not a commit that is reachable from the branch
+  that ships. `d4f4ed0` resolved as a hash, and every subsequent command that referenced it succeeded -
+  `git show`, `git log --all` - because those ask whether it exists, not whether `main` has it.
+- **The checkpoint summary said "Landed".** I carried that forward and then wrote nine rows on its
+  authority. A prior summary is a claim, not evidence, exactly like a test result that never ran.
+
+The check is one command: `git merge-base --is-ancestor <sha> HEAD`. It costs nothing and it is the
+difference between "the fix exists somewhere" and "the fix is in the branch we ship".
+
+Two further consequences:
+
+- `docs/KNOWN_ERRORS.md` gained its automation-harness-stall entry and its gate-defect entry **inside
+  `d4f4ed0`**, so neither was on `main` either. Both are re-recorded on `main`.
+- **The order of the whole session was wrong, not just one claim.** The six-verb blocker was found, fixed,
+  tested, written up and treated as closed while `main` never received it. Every subsequent piece of work -
+  the must-list correction, this summary, the `000927d` and `6e0b2e4` commits - was reasoned from the
+  premise that `main` had the gate fix. It did not. Whether those commits are still correct is a question
+  worth asking explicitly; on inspection they touch disjoint files (`Content/Python/`, `Docs/qa/`,
+  `Docs/handoffs/`) and never depend on the C++ gate, so they stand, but that should have been checked when
+  the premise broke rather than after.
+
+**Not merged unilaterally.** `git merge-tree main keep/interact-gate` exits 0 and the two file sets are
+disjoint from `87d42c8..main`, so the merge is mechanically clean. A branch named `keep/` may be parked on
+purpose by someone who intends to review or rebase it, and this is not mine to decide. Flagged to the Lead
+instead of merged.
