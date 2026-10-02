@@ -94,6 +94,18 @@ ASSEMBLY_FOOTPRINTS: dict[str, tuple[float, float]] = {
     "SM_Island_Hero": (21.0, 14.0),
 }
 
+#: Cabin porch modules are authored as a front overhang outside the cabin body
+#: box (Design lock 2026-10-02). Skip the SM_Cabin ASSEMBLY_FOOTPRINTS
+#: containment check for these names only — do not widen the cabin box, and do
+#: not loosen 1_location for any other module.
+CABIN_PORCH_OUTSIDE_BODY: frozenset[str] = frozenset(
+    {
+        "SM_Cabin_Porch_Deck",
+        "SM_Cabin_Porch_Post",
+        "SM_Cabin_Porch_Rail",
+    }
+)
+
 
 # --------------------------------------------------------------------------
 # Measurement
@@ -224,7 +236,10 @@ def verify(volume: Volume, measured: dict[str, Any] | None) -> list[dict[str, An
         half_y = ASSEMBLY_FOOTPRINTS.get(volume.assembly, (4.0, 4.0))[1] * 0.5
         outside_x = abs(actual_origin[0] - ax) > half_x + POSITION_TOLERANCE_M
         outside_y = abs(actual_origin[1] - ay) > half_y + POSITION_TOLERANCE_M
-        if outside_x or outside_y:
+        # Porch overhang is intentional; body box stays SM_Cabin (5.5×4.5).
+        if (
+            outside_x or outside_y
+        ) and volume.name not in CABIN_PORCH_OUTSIDE_BODY:
             findings.append(
                 {
                     "criterion": "1_location",
