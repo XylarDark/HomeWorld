@@ -360,11 +360,24 @@ def place(volume: Volume) -> str:
     if bpy is None:
         raise RuntimeError("place requires bpy; run inside Blender")
 
-    if bpy.data.objects.get(volume.name) is not None:
-        return "exists"
+    # Check every alias, not just the spec name. SM_Island_Hero resolves to SM_IslandTop
+    # because the blend already holds the plateau under that name; testing only the spec
+    # name created a second 21x14 box beside the first, which is the "rival object"
+    # failure the spirit work is told to avoid.
+    for candidate in resolve_alias(volume.name):
+        if bpy.data.objects.get(candidate) is not None:
+            return "exists"
 
     if volume.size_m == (0.0, 0.0, 0.0):
         return "skipped"  # spec names the module without a size
+
+    # An assembly read is a SYNTHESIS - the union of its parts' boxes, computed so the
+    # collision check has a zone-level unit. It is not geometry. Placing it grew a
+    # duplicate object per beat state, which is the "rival object" failure the spirit
+    # work is explicitly told to avoid, so it is refused here rather than cleaned up
+    # afterwards. See DEC-0026.
+    if volume.is_assembly_read:
+        return "synthesis"
 
     # Where this part actually goes.
     if volume.origin_is_explicit:

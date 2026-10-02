@@ -1,0 +1,64 @@
+{
+  "id": "SPIRIT_WOUND_MARKER",
+  "type": "SM_ module family",
+  "status": "SPEC_READY",
+  "date": "2026-10-02",
+  "phase": "T0_M11 spirit family",
+  "owner": "agent",
+  "family": "spirit",
+  "role": "Replaces the flat crater SM_SpiritWound_01. TG-T0-ASSETS Q2 (Lead, 2026-10-02): a vertical wound, not a hole. Shares the shrine's read - tall thin vertical with a see-through gap - so the whole spirit family announces itself by one shape.",
+  "units": "meters",
+  "apply_scale": true,
+  "origin": "ground_contact",
+  "size_m": { "x": 1.1, "y": 1.1, "z": 2.4 },
+  "world_origin": [-4.0, -115.0, -95.0],
+  "materials": [
+    { "slot": "stone", "master": "M_CliffRock" },
+    { "slot": "lintel", "master": "M_WoodWild" },
+    { "slot": "wound_glow", "master": "M_SpiritUnlit" }
+  ],
+  "modules": [
+    { "name": "SM_Wound_Plinth", "size_m": [1.1, 1.1, 0.35], "role": "broken_base" },
+    { "name": "SM_Wound_Post_L", "size_m": [0.18, 0.18, 2.05], "role": "upright_left" },
+    { "name": "SM_Wound_Post_R", "size_m": [0.18, 0.18, 1.75], "role": "upright_right_short" },
+    { "name": "SM_Wound_Lintel_Broken", "size_m": [0.9, 0.16, 0.16], "role": "broken_lintel" },
+    { "name": "SM_Wound_Glow", "size_m": [0.14, 0.14, 1.1], "role": "wound_light_in_the_gap" }
+  ],
+  "assembly_read": {
+    "whole": "the union of all modules: a tall thin vertical with an open gap you can see daylight through"
+  },
+  "state_model": {
+    "wound_open": [
+      "SM_Wound_Plinth",
+      "SM_Wound_Post_L",
+      "SM_Wound_Post_R",
+      "SM_Wound_Lintel_Broken",
+      "SM_Wound_Glow"
+    ]
+  },
+  "design_notes": {
+    "why_asymmetric": "The right post is shorter and the lintel is broken, so it reads as DAMAGED rather than built. A symmetrical gate would read as a shrine - a thing that works - and this is a wound, which is a thing that was broken. Asymmetry is the entire difference between 'portal' and 'injury'.",
+    "why_a_gap": "The locked spirit signature is 'tall thin vertical WITH a see-through gap'. The gap is load-bearing and is not a proportion - it is the one family whose signature no amount of resizing can satisfy (TG-GRAYBOX-SILHOUETTE Q8).",
+    "why_the_glow_is_inside": "The glow sits IN the gap, not on a plate above it, so light reads as coming through the break. A flat glow plate was the crater's tell and is what made the old volume read as ground rather than as spirit."
+  },
+  "replaces": {
+    "volume": "SM_SpiritWound_01",
+    "removed_parts": ["SM_SpiritWound_01_Crater", "SM_SpiritWound_01_Glow"],
+    "why": "A 3x3x0.35 crater with a 1.8x1.8x0.2 glow plate measured band 'flat'. Spirit requires 'tall'. The crater could not satisfy that without becoming a different object, which is the fork TG-T0-ASSETS Q2 was opened for."
+  },
+  "rejects": [
+    "crater",
+    "symmetrical_gate",
+    "neon_tech_portal",
+    "flat_glow_plate",
+    "soothe_as_convert"
+  ],
+  "measured_target": {
+    "band": "tall",
+    "aspect": 2.18,
+    "note": "0.18 posts on a 1.1 plinth, 2.4 tall. The plinth is wide relative to the posts, which is what previously pulled the assembly into 'mid' - the shrine fix narrows its base for the same reason. Verify with graybox_spec_reader.py, do not trust this number."
+  },
+  "open_questions": [
+    "Q2 answered the shape. It did not answer whether the wound is the SAME object as a shrine or a sibling: if a player reaches a shrine and a wound, are they meant to read as the same kind of thing? Both are now tall-thin-with-a-gap. Sharing a silhouette is what makes the family legible; it may also make the two places feel interchangeable. Queued for Round 2."
+  ]
+}

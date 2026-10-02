@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | **Gate id** | `TG-T0-ASSETS` |
-| **Status** | **PENDING** — Round 1 issued 2026-10-02 |
+| **Status** | **RESOLVED Round 1** (2/2) · **Round 2 PENDING** |
 | **Job** | **taste** (art design + game mechanic design) |
 | **Heuristic** | Docs/28 **1** — would change art bible §8 shape language or a shot; and the families that are untaught are a **product** gap (6) |
 | **Owner** | human |
@@ -32,7 +32,43 @@ mutation-verified**, covering the P0 form law and all five day-gated beats.
 
 ---
 
-## Round 1 — PENDING
+## Round 1 — RESOLVED 2026-10-02
+
+### Settled
+
+| Fork | Answer | Consequence |
+|---|---|---|
+| **Q1 — the camp** | **One reference image + firing line** (2026-10-02, Lead) | The Lead supplies one camp image, the guard's line of sight, and the two sleeper positions. The agent authors greybox at ten masters; the Lead judges the silhouette at 20 m. **The camp is authorised. GATE 1 opens.** |
+| **Q2 — the spirit wound** | **Standing marker** (2026-10-02, Lead) | `SM_SpiritWound_01` becomes a vertical spirit form — a cracked standing stone or broken arch, same family and same see-through gap as the shrines. The wound stops being a hole you stand in and becomes a thing you approach. **No documented exception is created; the whole `spirit` family now shares one read.** |
+
+### What is now owed, and by whom
+
+| Owed | Owner | Blocks |
+|---|---|---|
+| **One camp reference image** | Lead | authoring GATE 1 |
+| **Guard's firing line** — where the guard looks | Lead | M14 "avoid 1" is only possible if the line is drawn |
+| **Two sleeper positions** relative to the approach | Lead | M14 "soothe 2" |
+| Standing-marker spec for the wound | agent | unblocked — Q2 answered |
+
+⚠️ **Recorded so it is not re-opened:** a vertical wound was chosen over a crater on the
+grounds that *"a wound you stand in front of"* and *"a wound you are inside"* are different
+stories, and only the vertical one reads as spirit. The crater idea was not dismissed — it was
+declined **with** its cost named: it would have been the one spirit volume that does not read
+as spirit, requiring a standing exception on every report.
+
+### Consequence chain
+
+1. `SM_SpiritWound_01` is re-specified as a standing marker, not a crater. Same volume name,
+   same beat, same prove label — different object. The `flat` → `tall` non-conformance
+   recorded in `GRAYBOX_SPEC_REPORT.md` resolves by **re-authoring**, not by exception.
+2. Because the wound now shares the shrine's read, `heal`, `stealth` and `combat` are the only
+   families still with no volume — and Q2 removed one of the three ways spirit could have
+   absorbed them. **Round 2 Q3 is sharper now, not softer.**
+3. GATE 1 is unblocked as soon as the image and the firing line arrive. Until then the agent
+   can author the ground and the ridge, but not the guard or the sleepers — those two are
+   layout, and layout is the Lead's.
+
+---
 
 ### Q1 — The camp. What is it, and does it take your images?
 

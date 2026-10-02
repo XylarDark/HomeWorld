@@ -126,9 +126,15 @@ def test_a_nurtured_part_is_not_present_before_the_nurture_beat():
             continue
         day = set(states.get("day_planted") or [])
         nurtured = set(states.get("spirit_nurtured") or [])
-        grown = set(raw.get("nurtured_modules") and
-                    [m["name"] for m in raw["nurtured_modules"] if "name" in m] or [])
-        assert grown, "%s declares a state model but no post-action parts" % spec_id
+        # A state model is not necessarily about post-action parts. The spirit wound
+        # has one state ('wound_open') that contains every part from the start - it
+        # replaces a crater, it does not grow. Only assert the falsifiability rule
+        # where a spec actually has a post-action part.
+        grown_modules = raw.get("nurtured_modules") or []
+        if not grown_modules:
+            continue
+        grown = {m["name"] for m in grown_modules if "name" in m}
+        assert grown, "%s declares post-action parts but none are named" % spec_id
         assert not (grown & day), (
             "%s: %s exists before the nurture beat, so #12 is unfalsifiable"
             % (spec_id, sorted(grown & day))
