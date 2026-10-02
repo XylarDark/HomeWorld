@@ -672,28 +672,44 @@ discovery survives, and it means something because it is contrast.
 camp placement is level design, but the constraint that settles it — an ungateable scripted
 climax — is engineering. **Veto it if you disagree; do not let me quietly build it otherwise.**
 
-### Q24 — Can a spirit touch a garden?
+### Q24 — Can a spirit tend? — **YES. GATHER BY DAY, TEND BY NIGHT**
 
-*"Dung to pick up for **fertilizer during the night-time**."* Night is spirit form — bed **and**
-rune, both gates. So "at night" may mean *as a spirit*, and that is a real question:
+*"Gather by day, tend by night will be the theme throughout the game."*
 
-- **A (recommended)** — **Gather dung by day, apply it by day, after sleeping.** Dung in the
-  inventory overnight; the act of putting it on the beds is a daylight action. Cost: night has
-  no domestic purpose, so the loop is gather→sleep→tend rather than gather→tend-as-spirit.
-  Nothing new.
-- **B** — **Spirit form tends the garden.** You put the dung down as a spirit at night. Cost:
-  this makes spirit form a *caretaker's* form and not only a stealth or combat form, which is a
-  genuine change to what night **is** — and VISION_BOARD V2 currently says night is for spirit
-  work, not chores. It also needs a rule for what a spirit can and cannot touch, and that rule
-  is load-bearing for the camp rescue too.
-- **C** — **Dung becomes fertilizer automatically on sleep.** Pick up by day, sleep, and the
-  garden beds are richer at dawn. No night action at all. Cost: it is the smallest option, and
-  the player never *does* anything with the dung, which makes gathering it pointless.
+The question was about fertilizer. The answer was a **principle for the whole game**, and it is
+now `VISION_BOARD.md` **V2b**.
 
-**B is the interesting one and the expensive one.** If night can be domestic, the homestead stops
-being a place you sleep in and becomes a place you *tend*, and the day/night loop gets a second
-verb. That is worth more than anything else in this round — and it is a change to V2, not a
-detail, so it is yours.
+| | |
+|---|---|
+| **Day** | **gather** — herbs, dung, berries, wood. A collector, hands full, nothing asked of you |
+| **Night** | **tend** — soil, sleeping guards, a captive, a garden. A caretaker, and something depends on you |
+
+**It is the same act in both places, which is what makes it a theme and not a rule.** Easing a
+guard's grief until they can sleep, and spreading compost so a plant can grow, are one gesture:
+*you make it possible for something to rest.* The homestead garden and the camp rescue are not
+two features — they are the same verb in two places, which is why the player needs no tutorial to
+understand the camp when they arrive.
+
+**Dung yield: `RES_SEED`.** Compost is the seed resource's natural sibling, so this adds **no
+seventh resource** and the locked six stay intact. `M_Nurtured` already existed with nothing
+pointing at it, as did `RES_SEED`. Six resources that were collected and never used now have a
+purpose.
+
+**What it left unwritten — the most load-bearing gap in the prototype:**
+
+> **What may a spirit TOUCH?** Soil, yes. A rope, to free the captive? A sleeping guard?
+
+Both the garden and the camp rescue need this answer and **it does not exist in `Source/`**. It
+is a rule, not a feature, and everything built tonight sits on top of it.
+
+**Second cost:** night is now **mandatory for homestead progress**. If tending only happens at
+night, a player who cannot reach spirit form cannot advance the garden at all. That is a hard
+dependency on `M11` — and `M11` requires bed **and** rune, both gates. It needs a fallback or
+an explicit, legible failure.
+
+**Third, and softer:** night is meant to be calm and caretaking; the camp night is a tense stealth
+rescue. Not a contradiction — different nights — but the game has to be able to be both, and
+that is an art-direction demand rather than a mechanic.
 
 ---
 

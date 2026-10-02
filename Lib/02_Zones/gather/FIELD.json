@@ -33,7 +33,7 @@
     { "name": "SM_Beast_Pad_B", "size_m": [2.6, 1.4, 2.2], "at_offset": [12.0, -6.0, 0.0], "role": "great_beast_tameable", "measured_from": "authored, not built", "binds_to": "AHomeWorldBeastPad" },
     { "name": "SM_Gather_Bush_01", "size_m": [0.8, 0.8, 0.6], "at_offset": [-6.0, -10.0, 0.0], "count": 4, "spacing_m": 4.0, "yields": "RES_BERRY", "measured_from": "authored, not built" },
     { "name": "SM_Herb_Clump_01", "size_m": [0.7, 0.7, 0.5], "at_offset": [2.0, 4.0, 0.0], "count": 5, "yields": "RES_HERB", "measured_from": "authored, not built" },
-    { "name": "SM_Dung_Pile_01", "size_m": [0.5, 0.5, 0.15], "at_offset": [-9.0, -4.0, 0.0], "count": 6, "yields": "PENDING - see gap_fertilizer", "measured_from": "authored, not built" }
+    { "name": "SM_Dung_Pile_01", "size_m": [0.5, 0.5, 0.15], "at_offset": [-9.0, -4.0, 0.0], "count": 6, "yields": "RES_SEED", "measured_from": "authored, not built", "applied_as": "night-time tending, per VISION_BOARD V2b. Moves a garden bed's soil state; rendered with M_Nurtured." }
   ],
   "treeline": {
     "name": "SM_Treeline_Forest",
@@ -51,17 +51,14 @@
     { "thing": "Six-resource inventory", "exists_at": "TryAddResource / GetResource", "resources": "RES_HERB, RES_SEED, RES_WOOD, RES_BERRY, RES_FIBER, RES_STONE" }
   ],
   "gap_fertilizer": {
-    "status": "THE ONLY NEW SYSTEM IN THIS ZONE",
-    "what_the_lead_asked": "dung to pick up for fertilizer during the night-time",
-    "what_exists": "Nothing. No Fertiliz or Dung anywhere in Source/.",
-    "why_dung_is_not_just_a_resource": "The six-resource inventory is a locked list. Adding RES_DUNG would make it seven and break that. The cleanest reading is that dung is a GATHERABLE that yields an existing resource, and fertilizer is what that resource becomes when applied - not a seventh slot.",
-    "candidate_mapping": {
-      "recommended": "Dung yields RES_SEED (compost IS the seed resource's natural sibling) and applying it to a garden bed raises its yield tier. No new resource, no new inventory slot.",
-      "rejected": "A RES_DUNG slot - breaks the locked six.",
-      "rejected": "Dung yields RES_WOOD or RES_FIBER - physically wrong and would confuse the resource table."
-    },
-    "blocking_fork": "Q24, still open - can a SPIRIT apply fertilizer at night? Night is spirit form, so 'during the night-time' may mean as a spirit. That is a change to VISION_BOARD V2, not a detail.",
-    "decision": "Deferred to Q24. The dung piles are authored and placed; only the YIELD is undecided, and it is recorded as PENDING rather than guessed so nothing downstream builds on a wrong assumption."
+    "status": "RESOLVED 2026-10-02 - Q24 answered by the Lead, and it was not about fertilizer",
+    "the_question_asked": "Can a SPIRIT apply fertilizer at night? Night is spirit form, so 'during the night-time' might mean as a spirit.",
+    "the_answer": "'Gather by day, tend by night will be the theme throughout the game.'",
+    "what_it_actually_settled": "V2b in VISION_BOARD - a principle for the whole game, not a crafting verb. Night is for TENDING, and tending includes soil, sleeping guards and a captive. The same gesture in both places: you make it possible for something to rest.",
+    "dung_yield": "RES_SEED",
+    "why_res_seed": "Compost is the seed resource's natural sibling, so this adds NO seventh resource and the locked six-resource inventory is intact. Adding RES_DUNG would have broken it. Applying dung moves a garden bed's soil state, rendered with the existing M_Nurtured master - both of which already existed with nothing pointing at them.",
+    "what_it_left_unwritten": "THE SINGLE MOST LOAD-BEARING UNWRITTEN RULE IN THE PROTOTYPE: what may a spirit TOUCH? Soil, yes. A rope, to free the captive? A sleeping guard? Both the garden and the camp rescue depend on the answer, and it does not exist in Source/. Recorded rather than guessed.",
+    "secondary_risk": "Night is now mandatory for homestead progress - if tending only happens at night, a player who cannot reach spirit form cannot advance the garden at all. That is a strong dependency on M11 (bed AND rune) and needs a fallback or an explicit, legible failure."
   },
   "measured": null,
   "measured_note": "DELIBERATELY NULL. Nothing here is built. Every size is authored from the 1.8 m adult reference and tagged 'authored, not built'. A reader run will report FIELD as MISSING, which is the correct report.",

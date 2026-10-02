@@ -94,6 +94,42 @@ are meant to change rather than in a form capable of changing it.
 not work. Rune alone does not work. Phase alone never works — that is the `closed_fail` case,
 and four behaviour tests assert it.
 
+### V2b — **Gather by day, tend by night**
+
+`TASTE_GATE_T0_ASSETS` Round 6, Lead 2026-10-02: *"Gather by day, tend by night will be the
+theme throughout the game."*
+
+| | |
+|---|---|
+| **Day** | you **gather** — herbs, dung, berries, wood. You are a collector, hands full, nothing asked of you |
+| **Night** | you **tend** — soil, sleeping guards, a captive, a garden. You are a caretaker, and something depends on you |
+
+**This is the principle, not the dung.** It arrived as a question about fertilizer and turned
+out to be the answer to *why night exists at all*. V2 said night is a **form you become** and
+left it at that — a form for what? V2b supplies the verb.
+
+**It is the same act in both places, and that is what makes it a theme rather than a rule.**
+Easing a guard's grief until they can sleep, and spreading compost on a bed so a plant can
+grow, are one gesture: *you make it possible for something to rest.* The homestead garden and
+the camp rescue are not two features — they are the same verb in two places, which is why the
+player needs no tutorial to understand the camp when they arrive.
+
+**What it resolves.** Six resources that were collected and never used had a purpose. Night
+gained a verb besides combat, so the loop is a **pair** rather than a sequence. And the
+`M_Nurtured` master plus `RES_SEED` already existed with nothing pointing at them.
+
+**What it costs, honestly:**
+
+| | |
+|---|---|
+| **A rule nobody has written** | What may a spirit **touch**? Soil, yes. A rope, to free someone? A sleeping guard? The camp rescue needs this answer and so does the garden. It is the single most load-bearing unwritten rule in the prototype |
+| **Register conflict** | Night is meant to be *calm and caretaking*. The camp night is a tense stealth rescue. Not a contradiction — different nights — but the game has to be able to be both, and that is an art-direction demand, not a mechanic |
+| **Night is now mandatory for progress** | If tending only happens at night, a player who cannot reach spirit form cannot advance the homestead at all. That is a strong dependency on `M11` and needs a fallback or an explicit failure |
+
+**The dung question this settles:** dung yields **`RES_SEED`** — compost is the seed resource's
+natural sibling, so this adds **no seventh resource** and breaks nothing. Applying it moves a
+garden bed's soil state, rendered with the existing `M_Nurtured` master.
+
 ### V3 — This document is the board; `VISION.md` keeps the theme
 
 `VISION.md` is **not** rewritten or retired. It remains the long-horizon campaign and the
