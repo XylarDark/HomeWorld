@@ -19,7 +19,7 @@ Content and levels are authored by designers and level authors. Code and automat
 - **If it is absent:** create it once, then fall into the "exists" path on every future run.
 - **Re-runs must be safe:** multiple runs must not create duplicates, destroy existing instances, or overwrite designer edits.
 
-This is the same contract as the Idempotency Protocol in [00-core-principles.mdc](00-core-principles.mdc), applied to content rather than to scripts.
+Idempotency applied to content rather than to scripts: check before create, never duplicate, never destroy existing content.
 
 ## Destructive paths are opt-in
 
@@ -51,4 +51,4 @@ Use GUI automation (PyAutoGUI, ref images, Editor-driven scripts) to set it. Do 
 - [ ] Config-driven values come from config; anything not automatable is logged with a suggested approach
 - [ ] Any destructive option is opt-in, named clearly, and documented
 
-See also: [00-core-principles.mdc](00-core-principles.mdc) (Idempotency), [automation-standards.mdc](automation-standards.mdc) (variables with no access).
+See also: [automation-standards.mdc](automation-standards.mdc).

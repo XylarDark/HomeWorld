@@ -60,7 +60,7 @@ automated scripts.
 - **Absolute paths** work as-is.
 - Script output goes to the Editor's **Output Log**, not the MCP response — so a
   silent script is a logging bug, not a transport bug. See
-  [`16-feature-debug-instrumentation.mdc`](16-feature-debug-instrumentation.mdc).
+  `.cursor/rules/03-testing.mdc`.
 - The script runs with full access to the `unreal` Python module.
 
 Two requirements on anything run this way:
@@ -70,7 +70,7 @@ Two requirements on anything run this way:
   `create_demo_from_scratch.py`), edits do not take effect until the importer
   calls `importlib.reload()`. All orchestrators in this project already do.
 - **Idempotency.** Must be safe to re-run — check for existing assets/actors
-  before creating. See `00-core-principles.mdc`.
+  before creating. 
 - **Cleanup.** One-off diagnostic scripts (written to inspect state, fix one
   issue, gather data for a single session) must be deleted before the task ends,
   along with any result JSON they wrote to the project root. Keep only scripts

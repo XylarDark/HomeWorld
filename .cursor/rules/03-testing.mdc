@@ -49,7 +49,7 @@ See [`docs/Testing/LEVEL_TESTING_PLAN.md`](../../docs/Testing/LEVEL_TESTING_PLAN
 - **Cover the edges:** empty, missing, and boundary values.
 - **Clean up what you create** — an Editor test that leaves an actor behind
   breaks the test after it. This is the same check-before-create rule as
-  `00-core-principles.mdc`, applied to teardown.
+  standard practice, applied to teardown.
 - **Keep unit tests fast and pure.** If a test needs the Editor running, it
   belongs in the PIE layer instead.
 

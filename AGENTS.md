@@ -32,7 +32,7 @@
 
 **Feature development (policy):** When developing a **new feature**, research Epic/UE docs and best practices first; **follow tutorials first**, then expand.
 
-**Compound Engineering plugin:** The plugin is installed; **recommending its commands when appropriate is policy**. When a task is a good use case for a plugin workflow (plan, review, changelog, docs lookup, etc.), recommend the corresponding slash command instead of doing that workflow yourself. The situation-to-command mapping is in [.cursor/rules/10-compound-engineering.mdc](.cursor/rules/10-compound-engineering.mdc). Use **context7** MCP for up-to-date library/framework docs when relevant. Optional one-time: run `/setup` in Cursor to configure review agents for this project.
+**Research:** when a task needs current external facts, use the available research tooling and cite a primary source. Details in [docs/Automation/FULL_AUTOMATION_RESEARCH.md](docs/Automation/FULL_AUTOMATION_RESEARCH.md).
 
 ## DevHarness (adopted layers)
 
@@ -153,9 +153,9 @@ Exact invocations the agent should use (see [docs/SETUP.md](docs/SETUP.md) and [
 ## Code style
 
 - **C++:** PascalCase types, camelCase locals; Unreal prefixes (`A`, `U`, `F`, `E`, `I`). Include own header first. See `.cursor/rules/unreal-cpp.mdc`.
-- **Python:** PEP 8, type hints, 4-space indent. UE scripts must be idempotent (check-before-create). See `.cursor/rules/12-python.mdc`.
+- **Python:** PEP 8, type hints, 4-space indent. UE scripts must be idempotent (check-before-create).
 - **Commits:** Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`). Stage by explicit path — see [swarm/SWARM_OPS.md](swarm/SWARM_OPS.md) and [PR and commit guidelines](#pr-and-commit-guidelines) below.
-- **Feature debug instrumentation and log-driven validation:** When implementing features, include a **robust, log-driven way to validate** that they work (entry/exit, user-triggered actions, success/fail in logs). The user must not have to prompt for logging to confirm implementation. See `.cursor/rules/16-feature-debug-instrumentation.mdc`.
+- **Feature debug instrumentation and log-driven validation:** When implementing features, include a **robust, log-driven way to validate** that they work (entry/exit, user-triggered actions, success/fail in logs). The user must not have to prompt for logging to confirm implementation.
 
 ## PR and commit guidelines
 

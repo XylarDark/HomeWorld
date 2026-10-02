@@ -19,7 +19,7 @@ This is the ONLY sourcing policy. The 5.7 rule was deleted as historical (DEC-00
 2. **Prefer in order:**
    - **Epic Unreal Engine 5.8 documentation:** https://dev.epicgames.com/documentation/en-us/unreal-engine/ (filter or search for "Unreal Engine 5.8").
    - **Project docs:** `docs/UE/UE58_TECH.md`, `docs/UE/UE58_EDITOR_UI.md`, `docs/KNOWN_ERRORS.md`, and feature docs (e.g. `docs/PCG/PCG_SETUP.md`, `docs/PCG/PCG_VARIABLES_NO_ACCESS.md`).
-   - **Project rules:** `unreal-cpp.mdc` (pitfalls table), `ue58-editor-ui.mdc` (Editor UI), `12-python.mdc` (Python API table).
+   - **Project rules:** `unreal-cpp.mdc` (pitfalls table), `ue58-editor-ui.mdc` (Editor UI), the UE 5.8 Python API.
 3. **When looking something up:** Use web search or `/parallel-search` with **"Unreal Engine 5.8"** (or "UE 5.8") in the query.
 4. **When giving instructions:** Cite the Epic 5.8 doc URL when steps come from it. Use exact option/menu/API names from the 5.8 doc.
 5. **Tutorials:** Prefer guides that explicitly target **UE 5.8** (or 5.7 if 5.8 is scarce); cross-check with Epic 5.8 docs.
@@ -28,7 +28,7 @@ This is the ONLY sourcing policy. The 5.7 rule was deleted as historical (DEC-00
 
 - **C++ and Blueprint APIs** — Epic 5.8 API reference and `unreal-cpp.mdc` / `docs/KNOWN_ERRORS.md`.
 - **Editor UI** — Epic 5.8 docs and `docs/UE/UE58_EDITOR_UI.md`; see `ue58-editor-ui.mdc`.
-- **Python Editor API** — 5.8 Python API and `12-python.mdc`; see KNOWN_ERRORS for signature changes.
+- **Python Editor API** — 5.8 Python API and the UE 5.8 Python API; see KNOWN_ERRORS for signature changes.
 - **Plugins** (PCG, GAS, Mass, State Tree, etc.) — Epic 5.8 plugin docs. **MassEntity** is not a separate plugin in 5.8 — use MassGameplay / MassAI only.
 - **Automation and “no access”** — Epic 5.8 docs; see `automation-standards.mdc`.
 

@@ -50,7 +50,7 @@ indistinguishable from a fresh one.
 ## Rules for these scripts
 
 - **Idempotent** — check before create; a re-run must be a no-op, not a
-  duplicate. See `00-core-principles.mdc`.
+  duplicate. 
 - **Reload siblings** — long-lived Editor sessions cache modules, so
   orchestrators must `importlib.reload()` any sibling they import.
 - **Log to the Output Log** — `execute_python_script` output does not reach the
