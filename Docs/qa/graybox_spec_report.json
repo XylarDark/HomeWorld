@@ -1,0 +1,1571 @@
+{
+  "blend_file": "C:\\dev\\HomeWorld\\blender\\floating_island_homestead_LIB.blend",
+  "blender": "5.2.2 LTS",
+  "blocking_count": 8,
+  "by_criterion": {
+    "1_location": 20,
+    "2_sized": 2,
+    "4_distinct": 1,
+    "master_binding": 2
+  },
+  "collisions": [],
+  "families_present": [
+    "heal",
+    "spirit"
+  ],
+  "family_conformance": [
+    {
+      "detail": "measures flat but the locked signature for 'heal' is narrow upright, single soft column",
+      "volume": "SM_NODE_PLANT_SLOT_DAY_PLANTED"
+    }
+  ],
+  "findings": [
+    {
+      "criterion": "1_location",
+      "detail": "spec module resolved to authored object 'SM_Cabin_Window_Frame_Front'",
+      "severity": "info",
+      "volume": "SM_Cabin_Window_Frame"
+    },
+    {
+      "criterion": "1_location",
+      "detail": "spec module resolved to authored object 'SM_Cabin_Window_Pane_Front'",
+      "severity": "info",
+      "volume": "SM_Cabin_Window_Pane"
+    },
+    {
+      "criterion": "1_location",
+      "detail": "child module sits outside assembly 'SM_Cabin' footprint (module at -6.000, -2.100; assembly centre -6.000, 1.000)",
+      "severity": "blocking",
+      "volume": "SM_Cabin_Porch_Deck"
+    },
+    {
+      "criterion": "1_location",
+      "detail": "child module sits outside assembly 'SM_Cabin' footprint (module at -7.300, -2.700; assembly centre -6.000, 1.000)",
+      "severity": "blocking",
+      "volume": "SM_Cabin_Porch_Post"
+    },
+    {
+      "criterion": "1_location",
+      "detail": "spec module resolved to authored object 'SM_Cabin_Porch_Post_L'",
+      "severity": "info",
+      "volume": "SM_Cabin_Porch_Post"
+    },
+    {
+      "criterion": "1_location",
+      "detail": "child module sits outside assembly 'SM_Cabin' footprint (module at -7.300, -2.700; assembly centre -6.000, 1.000)",
+      "severity": "blocking",
+      "volume": "SM_Cabin_Porch_Rail"
+    },
+    {
+      "criterion": "1_location",
+      "detail": "spec module resolved to authored object 'SM_Cabin_Porch_Rail_L'",
+      "severity": "info",
+      "volume": "SM_Cabin_Porch_Rail"
+    },
+    {
+      "criterion": "1_location",
+      "detail": "spec module resolved to authored object 'SM_GardenBed_Soil_A'",
+      "severity": "info",
+      "volume": "SM_GardenBed_Soil"
+    },
+    {
+      "criterion": "1_location",
+      "detail": "assembly root (EMPTY); geometry on children",
+      "severity": "info",
+      "volume": "SM_Pine_Homestead_S"
+    },
+    {
+      "criterion": "1_location",
+      "detail": "assembly root (EMPTY); geometry on children",
+      "severity": "info",
+      "volume": "SM_Pine_Homestead_M"
+    },
+    {
+      "criterion": "1_location",
+      "detail": "assembly root (EMPTY); geometry on children",
+      "severity": "info",
+      "volume": "SM_Pine_Homestead_L"
+    },
+    {
+      "criterion": "1_location",
+      "detail": "assembly root (EMPTY); geometry on children",
+      "severity": "info",
+      "volume": "SM_Cliff_LookoutFace"
+    },
+    {
+      "criterion": "1_location",
+      "detail": "assembly root (EMPTY); geometry on children",
+      "severity": "info",
+      "volume": "SM_Cliff_CabinFace"
+    },
+    {
+      "criterion": "1_location",
+      "detail": "assembly root (EMPTY); geometry on children",
+      "severity": "info",
+      "volume": "SM_Cliff_Rear"
+    },
+    {
+      "criterion": "2_sized",
+      "detail": "y bbox 10.700 vs spec 14.000 (off by 3.300, tolerance 1.400)",
+      "severity": "blocking",
+      "volume": "SM_Island_Hero"
+    },
+    {
+      "criterion": "2_sized",
+      "detail": "origin is not at ground contact (lowest vertex at Z -0.450)",
+      "severity": "blocking",
+      "volume": "SM_Island_Hero"
+    },
+    {
+      "criterion": "1_location",
+      "detail": "spec module resolved to authored object 'SM_IslandTop'",
+      "severity": "info",
+      "volume": "SM_Island_Hero"
+    },
+    {
+      "criterion": "1_location",
+      "detail": "parented to 'SM_Shrine_Homestead', spec assembly is 'None'",
+      "severity": "warn",
+      "volume": "SM_Shrine_Homestead_Base"
+    },
+    {
+      "criterion": "1_location",
+      "detail": "parented to 'SM_Shrine_Homestead', spec assembly is 'None'",
+      "severity": "warn",
+      "volume": "SM_Shrine_Homestead_Post_L"
+    },
+    {
+      "criterion": "1_location",
+      "detail": "parented to 'SM_Shrine_Homestead', spec assembly is 'None'",
+      "severity": "warn",
+      "volume": "SM_Shrine_Homestead_Post_R"
+    },
+    {
+      "criterion": "1_location",
+      "detail": "parented to 'SM_Shrine_Homestead', spec assembly is 'None'",
+      "severity": "warn",
+      "volume": "SM_Shrine_Homestead_Lintel"
+    },
+    {
+      "criterion": "1_location",
+      "detail": "parented to 'SM_Shrine_Homestead', spec assembly is 'None'",
+      "severity": "warn",
+      "volume": "SM_Shrine_Homestead_PortalGlow"
+    },
+    {
+      "criterion": "master_binding",
+      "detail": "material in the blend is neither one of the ten masters nor an allowed instance (art bible S10)",
+      "severity": "blocking",
+      "volume": "M_FamilySilhouette"
+    },
+    {
+      "criterion": "master_binding",
+      "detail": "material in the blend is neither one of the ten masters nor an allowed instance (art bible S10)",
+      "severity": "blocking",
+      "volume": "M_ValleyNight"
+    },
+    {
+      "criterion": "4_distinct",
+      "detail": "measures flat but the locked signature for 'heal' is narrow upright, single soft column",
+      "severity": "blocking",
+      "volume": "SM_NODE_PLANT_SLOT_DAY_PLANTED"
+    }
+  ],
+  "measurements": {
+    "SM_Cabin_Chimney": {
+      "bbox": [
+        0.6,
+        0.6,
+        1.8
+      ],
+      "lowest_vert_z_world": 4.2,
+      "materials": [
+        "M_CliffRock"
+      ],
+      "name": "SM_Cabin_Chimney",
+      "origin_z_world": 4.2,
+      "parent": "SM_Cabin",
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -7.8,
+        1.2,
+        4.2
+      ]
+    },
+    "SM_Cabin_Door": {
+      "bbox": [
+        1.0,
+        0.1,
+        2.0
+      ],
+      "lowest_vert_z_world": 0.4,
+      "materials": [
+        "M_WoodCabin"
+      ],
+      "name": "SM_Cabin_Door",
+      "origin_z_world": 0.4,
+      "parent": "SM_Cabin",
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -6.0,
+        -1.35,
+        0.4
+      ]
+    },
+    "SM_Cabin_Foundation": {
+      "bbox": [
+        5.7,
+        4.7,
+        0.4
+      ],
+      "lowest_vert_z_world": -0.0,
+      "materials": [
+        "M_CliffRock"
+      ],
+      "name": "SM_Cabin_Foundation",
+      "origin_z_world": 0.0,
+      "parent": "SM_Cabin",
+      "pivot_is_ground_contact": true,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -6.0,
+        1.0,
+        0.0
+      ]
+    },
+    "SM_Cabin_Porch_Deck": {
+      "bbox": [
+        3.0,
+        1.5,
+        0.2
+      ],
+      "lowest_vert_z_world": 0.4,
+      "materials": [
+        "M_WoodCabin"
+      ],
+      "name": "SM_Cabin_Porch_Deck",
+      "origin_z_world": 0.4,
+      "parent": "SM_Cabin",
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -6.0,
+        -2.1,
+        0.4
+      ]
+    },
+    "SM_Cabin_Porch_Post": null,
+    "SM_Cabin_Porch_Post_L": {
+      "bbox": [
+        0.15,
+        0.15,
+        1.4
+      ],
+      "lowest_vert_z_world": 0.6,
+      "materials": [
+        "M_WoodCabin"
+      ],
+      "name": "SM_Cabin_Porch_Post_L",
+      "origin_z_world": 0.6,
+      "parent": "SM_Cabin",
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -7.3,
+        -2.7,
+        0.6
+      ]
+    },
+    "SM_Cabin_Porch_Post_R": {
+      "bbox": [
+        0.15,
+        0.15,
+        1.4
+      ],
+      "lowest_vert_z_world": 0.6,
+      "materials": [
+        "M_WoodCabin"
+      ],
+      "name": "SM_Cabin_Porch_Post_R",
+      "origin_z_world": 0.6,
+      "parent": "SM_Cabin",
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -4.7,
+        -2.7,
+        0.6
+      ]
+    },
+    "SM_Cabin_Porch_Rail": null,
+    "SM_Cabin_Porch_Rail_L": {
+      "bbox": [
+        1.2,
+        0.1,
+        0.6
+      ],
+      "lowest_vert_z_world": 1.6,
+      "materials": [
+        "M_WoodCabin"
+      ],
+      "name": "SM_Cabin_Porch_Rail_L",
+      "origin_z_world": 1.6,
+      "parent": "SM_Cabin",
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -7.3,
+        -2.7,
+        1.6
+      ]
+    },
+    "SM_Cabin_Porch_Rail_R": {
+      "bbox": [
+        1.2,
+        0.1,
+        0.6
+      ],
+      "lowest_vert_z_world": 1.6,
+      "materials": [
+        "M_WoodCabin"
+      ],
+      "name": "SM_Cabin_Porch_Rail_R",
+      "origin_z_world": 1.6,
+      "parent": "SM_Cabin",
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -4.7,
+        -2.7,
+        1.6
+      ]
+    },
+    "SM_Cabin_Roof_A": {
+      "bbox": [
+        5.8,
+        2.2445,
+        1.6551
+      ],
+      "lowest_vert_z_world": 2.8544,
+      "materials": [
+        "M_WoodCabin"
+      ],
+      "name": "SM_Cabin_Roof_A",
+      "origin_z_world": 3.6,
+      "parent": "SM_Cabin",
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -6.1,
+        -0.1,
+        3.6
+      ]
+    },
+    "SM_Cabin_Roof_B": {
+      "bbox": [
+        5.8,
+        2.2445,
+        1.6551
+      ],
+      "lowest_vert_z_world": 2.8544,
+      "materials": [
+        "M_WoodCabin"
+      ],
+      "name": "SM_Cabin_Roof_B",
+      "origin_z_world": 3.6,
+      "parent": "SM_Cabin",
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -6.1,
+        2.1,
+        3.6
+      ]
+    },
+    "SM_Cabin_Wall_Back": {
+      "bbox": [
+        5.5,
+        0.25,
+        2.8
+      ],
+      "lowest_vert_z_world": 0.4,
+      "materials": [
+        "M_WoodCabin"
+      ],
+      "name": "SM_Cabin_Wall_Back",
+      "origin_z_world": 0.4,
+      "parent": "SM_Cabin",
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -6.0,
+        3.25,
+        0.4
+      ]
+    },
+    "SM_Cabin_Wall_Front": {
+      "bbox": [
+        5.5,
+        0.25,
+        2.8
+      ],
+      "lowest_vert_z_world": 0.4,
+      "materials": [
+        "M_WoodCabin"
+      ],
+      "name": "SM_Cabin_Wall_Front",
+      "origin_z_world": 0.4,
+      "parent": "SM_Cabin",
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -6.0,
+        -1.25,
+        0.4
+      ]
+    },
+    "SM_Cabin_Wall_Side_L": {
+      "bbox": [
+        0.25,
+        4.5,
+        2.8
+      ],
+      "lowest_vert_z_world": 0.4,
+      "materials": [
+        "M_WoodCabin"
+      ],
+      "name": "SM_Cabin_Wall_Side_L",
+      "origin_z_world": 0.4,
+      "parent": "SM_Cabin",
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -8.75,
+        1.0,
+        0.4
+      ]
+    },
+    "SM_Cabin_Wall_Side_R": {
+      "bbox": [
+        0.25,
+        4.5,
+        2.8
+      ],
+      "lowest_vert_z_world": 0.4,
+      "materials": [
+        "M_WoodCabin"
+      ],
+      "name": "SM_Cabin_Wall_Side_R",
+      "origin_z_world": 0.4,
+      "parent": "SM_Cabin",
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -3.25,
+        1.0,
+        0.4
+      ]
+    },
+    "SM_Cabin_Window_Frame": null,
+    "SM_Cabin_Window_Frame_Front": {
+      "bbox": [
+        1.2,
+        0.1,
+        1.0
+      ],
+      "lowest_vert_z_world": 1.4,
+      "materials": [
+        "M_WoodCabin"
+      ],
+      "name": "SM_Cabin_Window_Frame_Front",
+      "origin_z_world": 1.4,
+      "parent": "SM_Cabin",
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -4.8,
+        -1.38,
+        1.4
+      ]
+    },
+    "SM_Cabin_Window_Frame_Side": {
+      "bbox": [
+        0.1,
+        1.2,
+        1.0
+      ],
+      "lowest_vert_z_world": 1.4,
+      "materials": [
+        "M_WoodCabin"
+      ],
+      "name": "SM_Cabin_Window_Frame_Side",
+      "origin_z_world": 1.4,
+      "parent": "SM_Cabin",
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -8.88,
+        1.5,
+        1.4
+      ]
+    },
+    "SM_Cabin_Window_Pane": null,
+    "SM_Cabin_Window_Pane_Front": {
+      "bbox": [
+        1.1,
+        0.05,
+        0.9
+      ],
+      "lowest_vert_z_world": 1.45,
+      "materials": [
+        "M_WoodCabin_Window"
+      ],
+      "name": "SM_Cabin_Window_Pane_Front",
+      "origin_z_world": 1.45,
+      "parent": "SM_Cabin",
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -4.8,
+        -1.42,
+        1.45
+      ]
+    },
+    "SM_Cabin_Window_Pane_Side": {
+      "bbox": [
+        0.05,
+        1.1,
+        0.9
+      ],
+      "lowest_vert_z_world": 1.45,
+      "materials": [
+        "M_WoodCabin_Window"
+      ],
+      "name": "SM_Cabin_Window_Pane_Side",
+      "origin_z_world": 1.45,
+      "parent": "SM_Cabin",
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -8.92,
+        1.5,
+        1.45
+      ]
+    },
+    "SM_Cliff_CabinFace": {
+      "name": "SM_Cliff_CabinFace",
+      "parent": null,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "type": "EMPTY",
+      "world_origin": [
+        -7.0,
+        -4.5,
+        -3.0
+      ]
+    },
+    "SM_Cliff_Chunk_Torn": {
+      "bbox": [
+        2.5,
+        2.0,
+        3.0
+      ],
+      "lowest_vert_z_world": 0.0,
+      "materials": [
+        "M_CliffRock"
+      ],
+      "name": "SM_Cliff_Chunk_Torn",
+      "origin_z_world": 0.0,
+      "parent": null,
+      "pivot_is_ground_contact": true,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "SM_Cliff_LookoutFace": {
+      "name": "SM_Cliff_LookoutFace",
+      "parent": null,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "type": "EMPTY",
+      "world_origin": [
+        7.5,
+        -5.5,
+        -4.0
+      ]
+    },
+    "SM_Cliff_Rear": {
+      "name": "SM_Cliff_Rear",
+      "parent": null,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "type": "EMPTY",
+      "world_origin": [
+        0.0,
+        5.0,
+        -2.5
+      ]
+    },
+    "SM_Cliff_Slab_A": {
+      "bbox": [
+        3.0,
+        1.2,
+        1.5
+      ],
+      "lowest_vert_z_world": 0.0,
+      "materials": [
+        "M_CliffRock"
+      ],
+      "name": "SM_Cliff_Slab_A",
+      "origin_z_world": 0.0,
+      "parent": null,
+      "pivot_is_ground_contact": true,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "SM_Cliff_Slab_B": {
+      "bbox": [
+        2.5,
+        1.0,
+        1.2
+      ],
+      "lowest_vert_z_world": -0.0,
+      "materials": [
+        "M_CliffRock"
+      ],
+      "name": "SM_Cliff_Slab_B",
+      "origin_z_world": 0.0,
+      "parent": null,
+      "pivot_is_ground_contact": true,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "SM_Cliff_Slab_C": {
+      "bbox": [
+        2.0,
+        0.9,
+        1.0
+      ],
+      "lowest_vert_z_world": 0.0,
+      "materials": [
+        "M_CliffRock"
+      ],
+      "name": "SM_Cliff_Slab_C",
+      "origin_z_world": 0.0,
+      "parent": null,
+      "pivot_is_ground_contact": true,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "SM_GardenBed_A": {
+      "bbox": [
+        1.8,
+        1.0,
+        0.5
+      ],
+      "lowest_vert_z_world": 0.0,
+      "materials": [
+        "M_WoodCabin"
+      ],
+      "name": "SM_GardenBed_A",
+      "origin_z_world": 0.0,
+      "parent": null,
+      "pivot_is_ground_contact": true,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -4.2,
+        0.2,
+        0.0
+      ]
+    },
+    "SM_GardenBed_B": {
+      "bbox": [
+        1.6,
+        0.9,
+        0.5
+      ],
+      "lowest_vert_z_world": 0.0,
+      "materials": [
+        "M_WoodCabin"
+      ],
+      "name": "SM_GardenBed_B",
+      "origin_z_world": 0.0,
+      "parent": null,
+      "pivot_is_ground_contact": true,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -2.6,
+        0.8,
+        0.0
+      ]
+    },
+    "SM_GardenBed_C": {
+      "bbox": [
+        1.2,
+        0.8,
+        0.45
+      ],
+      "lowest_vert_z_world": 0.0,
+      "materials": [
+        "M_WoodCabin"
+      ],
+      "name": "SM_GardenBed_C",
+      "origin_z_world": 0.0,
+      "parent": null,
+      "pivot_is_ground_contact": true,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -3.5,
+        -0.4,
+        0.0
+      ]
+    },
+    "SM_GardenBed_Soil": null,
+    "SM_GardenBed_Soil_A": {
+      "bbox": [
+        1.6,
+        0.84,
+        0.08
+      ],
+      "lowest_vert_z_world": 0.42,
+      "materials": [
+        "M_StylizedGrass_Dry"
+      ],
+      "name": "SM_GardenBed_Soil_A",
+      "origin_z_world": 0.42,
+      "parent": null,
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -4.2,
+        0.2,
+        0.42
+      ]
+    },
+    "SM_GardenBed_Soil_B": {
+      "bbox": [
+        1.4,
+        0.74,
+        0.08
+      ],
+      "lowest_vert_z_world": 0.42,
+      "materials": [
+        "M_StylizedGrass_Dry"
+      ],
+      "name": "SM_GardenBed_Soil_B",
+      "origin_z_world": 0.42,
+      "parent": null,
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -2.6,
+        0.8,
+        0.42
+      ]
+    },
+    "SM_GardenBed_Soil_C": {
+      "bbox": [
+        1.0,
+        0.64,
+        0.08
+      ],
+      "lowest_vert_z_world": 0.38,
+      "materials": [
+        "M_StylizedGrass_Dry"
+      ],
+      "name": "SM_GardenBed_Soil_C",
+      "origin_z_world": 0.38,
+      "parent": null,
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -3.5,
+        -0.4,
+        0.38
+      ]
+    },
+    "SM_IslandTop": {
+      "bbox": [
+        19.3,
+        10.7,
+        0.45
+      ],
+      "lowest_vert_z_world": -0.45,
+      "materials": [
+        "M_StylizedGrass"
+      ],
+      "name": "SM_IslandTop",
+      "origin_z_world": 0.0,
+      "parent": null,
+      "pivot_is_ground_contact": false,
+      "polys": 18,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 60,
+      "type": "MESH",
+      "world_origin": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "SM_Island_Hero": null,
+    "SM_Kettle_Body": {
+      "bbox": [
+        0.5,
+        0.5,
+        0.35
+      ],
+      "lowest_vert_z_world": -0.175,
+      "materials": [],
+      "name": "SM_Kettle_Body",
+      "origin_z_world": 0.0,
+      "parent": null,
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -4.5,
+        3.2,
+        0.0
+      ]
+    },
+    "SM_Kettle_Handle": {
+      "bbox": [
+        0.12,
+        0.12,
+        0.1
+      ],
+      "lowest_vert_z_world": -0.05,
+      "materials": [],
+      "name": "SM_Kettle_Handle",
+      "origin_z_world": 0.0,
+      "parent": null,
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -4.5,
+        3.2,
+        0.0
+      ]
+    },
+    "SM_NODE_PLANT_SLOT_DAY_PLANTED": {
+      "bbox": [
+        0.9,
+        0.9,
+        0.12
+      ],
+      "lowest_vert_z_world": 0.0,
+      "materials": [],
+      "name": "SM_NODE_PLANT_SLOT_DAY_PLANTED",
+      "origin_z_world": 0.06,
+      "parent": null,
+      "pivot_is_ground_contact": true,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -3.0,
+        -1.5,
+        0.06
+      ]
+    },
+    "SM_NODE_PLANT_SLOT_SPIRIT_NURTURED": null,
+    "SM_Pine_Homestead_L": {
+      "name": "SM_Pine_Homestead_L",
+      "parent": null,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "type": "EMPTY",
+      "world_origin": [
+        -8.0,
+        -2.0,
+        0.0
+      ]
+    },
+    "SM_Pine_Homestead_M": {
+      "name": "SM_Pine_Homestead_M",
+      "parent": null,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "type": "EMPTY",
+      "world_origin": [
+        3.0,
+        3.0,
+        0.0
+      ]
+    },
+    "SM_Pine_Homestead_S": {
+      "name": "SM_Pine_Homestead_S",
+      "parent": null,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "type": "EMPTY",
+      "world_origin": [
+        6.2,
+        2.2,
+        0.0
+      ]
+    },
+    "SM_PlantSlot_Soil": {
+      "bbox": [
+        0.9,
+        0.9,
+        0.12
+      ],
+      "lowest_vert_z_world": -0.06,
+      "materials": [],
+      "name": "SM_PlantSlot_Soil",
+      "origin_z_world": 0.0,
+      "parent": null,
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -3.0,
+        -1.5,
+        0.0
+      ]
+    },
+    "SM_PlantSlot_Sprout": {
+      "bbox": [
+        0.5,
+        0.5,
+        0.68
+      ],
+      "lowest_vert_z_world": -0.34,
+      "materials": [],
+      "name": "SM_PlantSlot_Sprout",
+      "origin_z_world": 0.0,
+      "parent": null,
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -3.0,
+        -1.5,
+        0.0
+      ]
+    },
+    "SM_Rune_Stone": {
+      "bbox": [
+        1.6,
+        0.4,
+        0.9
+      ],
+      "lowest_vert_z_world": -0.45,
+      "materials": [],
+      "name": "SM_Rune_Stone",
+      "origin_z_world": 0.0,
+      "parent": null,
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        2.0,
+        0.0,
+        0.0
+      ]
+    },
+    "SM_SPIRIT_SHRINE_WOUND_OPEN": null,
+    "SM_SPIRIT_WOUND_MARKER_WOUND_OPEN": null,
+    "SM_Shrine_Homestead_Base": {
+      "bbox": [
+        1.2,
+        0.9,
+        0.25
+      ],
+      "lowest_vert_z_world": 0.0,
+      "materials": [
+        "M_CliffRock"
+      ],
+      "name": "SM_Shrine_Homestead_Base",
+      "origin_z_world": 0.125,
+      "parent": "SM_Shrine_Homestead",
+      "pivot_is_ground_contact": true,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -2.0,
+        3.5,
+        0.125
+      ]
+    },
+    "SM_Shrine_Homestead_Lintel": {
+      "bbox": [
+        1.2,
+        0.2,
+        0.2
+      ],
+      "lowest_vert_z_world": 2.2,
+      "materials": [
+        "M_WoodCabin"
+      ],
+      "name": "SM_Shrine_Homestead_Lintel",
+      "origin_z_world": 2.3,
+      "parent": "SM_Shrine_Homestead",
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -2.0,
+        3.5,
+        2.3
+      ]
+    },
+    "SM_Shrine_Homestead_PortalGlow": {
+      "bbox": [
+        0.7,
+        0.15,
+        1.8
+      ],
+      "lowest_vert_z_world": 0.2,
+      "materials": [
+        "M_SpiritUnlit"
+      ],
+      "name": "SM_Shrine_Homestead_PortalGlow",
+      "origin_z_world": 1.1,
+      "parent": "SM_Shrine_Homestead",
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -2.0,
+        3.5,
+        1.1
+      ]
+    },
+    "SM_Shrine_Homestead_Post_L": {
+      "bbox": [
+        0.18,
+        0.18,
+        2.2
+      ],
+      "lowest_vert_z_world": 0.0,
+      "materials": [
+        "M_WoodCabin"
+      ],
+      "name": "SM_Shrine_Homestead_Post_L",
+      "origin_z_world": 1.1,
+      "parent": "SM_Shrine_Homestead",
+      "pivot_is_ground_contact": true,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -2.5,
+        3.5,
+        1.1
+      ]
+    },
+    "SM_Shrine_Homestead_Post_R": {
+      "bbox": [
+        0.18,
+        0.18,
+        2.2
+      ],
+      "lowest_vert_z_world": 0.0,
+      "materials": [
+        "M_WoodCabin"
+      ],
+      "name": "SM_Shrine_Homestead_Post_R",
+      "origin_z_world": 1.1,
+      "parent": "SM_Shrine_Homestead",
+      "pivot_is_ground_contact": true,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -1.5,
+        3.5,
+        1.1
+      ]
+    },
+    "SM_Wound_Glow": {
+      "bbox": [
+        0.14,
+        0.14,
+        1.1
+      ],
+      "lowest_vert_z_world": -95.55,
+      "materials": [],
+      "name": "SM_Wound_Glow",
+      "origin_z_world": -95.0,
+      "parent": null,
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -4.0,
+        -115.0,
+        -95.0
+      ]
+    },
+    "SM_Wound_Lintel_Broken": {
+      "bbox": [
+        0.9,
+        0.16,
+        0.16
+      ],
+      "lowest_vert_z_world": -95.08,
+      "materials": [],
+      "name": "SM_Wound_Lintel_Broken",
+      "origin_z_world": -95.0,
+      "parent": null,
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -4.0,
+        -115.0,
+        -95.0
+      ]
+    },
+    "SM_Wound_Plinth": {
+      "bbox": [
+        1.1,
+        1.1,
+        0.35
+      ],
+      "lowest_vert_z_world": -95.175,
+      "materials": [],
+      "name": "SM_Wound_Plinth",
+      "origin_z_world": -95.0,
+      "parent": null,
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -4.0,
+        -115.0,
+        -95.0
+      ]
+    },
+    "SM_Wound_Post_L": {
+      "bbox": [
+        0.18,
+        0.18,
+        2.05
+      ],
+      "lowest_vert_z_world": -96.025,
+      "materials": [],
+      "name": "SM_Wound_Post_L",
+      "origin_z_world": -95.0,
+      "parent": null,
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -4.0,
+        -115.0,
+        -95.0
+      ]
+    },
+    "SM_Wound_Post_R": {
+      "bbox": [
+        0.18,
+        0.18,
+        1.75
+      ],
+      "lowest_vert_z_world": -95.875,
+      "materials": [],
+      "name": "SM_Wound_Post_R",
+      "origin_z_world": -95.0,
+      "parent": null,
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        -4.0,
+        -115.0,
+        -95.0
+      ]
+    }
+  },
+  "passed": false,
+  "placed": {},
+  "spec_ids": [
+    "CABIN_MODULES",
+    "GARDEN_BLOCKING",
+    "PINES_HOMESTEAD",
+    "SM_Cliff",
+    "SM_IslandTop"
+  ],
+  "unassigned": [],
+  "volumes_assertable": 4,
+  "volumes_measured": 60,
+  "volumes_present": 51
+}
