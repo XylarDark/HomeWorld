@@ -1121,3 +1121,64 @@ must map to `LOGIC_DONE`, not `PARTIAL`), and it caught a typo of mine in the ha
 > A `Found` column is a snapshot of whatever you happened to have open. Three times now a
 > mechanic read as absent because no document pointed at the file holding it. The fix is not
 > "look harder" - it is **two documents that must agree, machine-checked.**
+
+---
+
+## 2026-10-02 (session 2) - the camp exists, and the test that proves it was green for the wrong reason
+
+Continuation of `11e8afb`. Lead answered three parked questions: correct `FANTASY.md` to the
+Lone Wanderer, greybox the camp from `CAMP.json` now, and stop treating `Docs/` and `docs/`
+as two trees.
+
+### Landed
+- **`AHomeWorldCampActor`** (`Source/HomeWorld/HomeWorldCampActor.{h,cpp}`). An `ACharacter`,
+  not a greybox prop, because `CAMP.json` `rejects` lists that. Identity is carried by an
+  actor **tag**; the editor-label branch is `#if WITH_EDITOR` and never runs at runtime.
+- **Four actors placed** into `L_VS_MVP_Markers` by `Content/Python/t0_place_camp.py`
+  (idempotent, `placed=0 reused=4`): `NODE_GUARD`, `NODE_SLEEPER_A`, `NODE_SLEEPER_B`,
+  `NODE_CAPTIVE`. Every position derived from `CAMP.json` - trigger offsets and module
+  offsets - not invented. Four UE 5.8 API bugs fixed along the way
+  (`EditorLevelLibrary` deprecated, `set_actor_location` needs explicit `sweep`, enum by
+  string, label stomping).
+- **DEC-0029** - `Docs/VISION_BOARD.md` (V2b) is the operative vision for prototype scope;
+  `00_CANON.md` / `canon/*` / `01_GDD_MVP.md` are an earlier cut, valid as Act 2+ background.
+  `Docs/` and `docs/` are one directory on this case-insensitive filesystem.
+- `FANTASY.md` protagonist corrected. `measured` in `CAMP.json` stays `null` on purpose.
+
+### The finding worth keeping
+A new test - `HomeWorld.T0.M14.PlacedActorsAreDiscovered` - asserts real placed actors are
+found by tag alone and the strict gate opens. **18/18 T0 tests green.**
+
+Then the mutation harness said otherwise:
+
+- **M6 survived.** M6 disables the tag *and* object-name match in `FindCampActorInWorld`.
+  It should have failed the new test. It didn't, because `SetActorLabel` had left every
+  actor labelled `NODE_GUARD` / `NODE_SLEEPER`, and `FindCampActorInWorld` also matches the
+  editor label - **a branch that is `#if WITH_EDITOR` and therefore does not exist in a
+  packaged build.**
+- So the test was green against a camp that soft-latches everywhere it actually ships.
+  The three matching routes are editor label / tag / `GetName()`; only the last two survive
+  a cook. A test that lets the editor label answer asks the wrong question and gets the
+  right answer.
+- Fix: `MakeRealCamp` now renames each actor to an opaque `CampGarrison_N`, which strips the
+  label **and** the object name (`SetActorLabel` renames the object too), leaving the tag as
+  the only route. It also places actors the way the script does - role change, then
+  `RerunConstructionScripts`, **no** direct `RefreshCampIdentity()` call, because calling it
+  explicitly would have masked a broken `OnConstruction`.
+- **9/9 mutations killed**, restored tree re-verified green. Two harness bugs fixed on the
+  way: M6's first form (`return nullptr;` at the top of the function) does not compile -
+  it makes the body unreachable and UE treats C4702 as an error, so it was never scorable;
+  and M2's pattern was one tab short, so it matched nothing and was correctly reported as a
+  HARNESS BUG rather than scored.
+
+### Durable lesson
+> The green test and the shipped build are different questions. Ask which code path the test
+> actually exercised, not which one the test name implies. `#if WITH_EDITOR` is a hole in
+> every in-editor test suite.
+
+### Not mine - left untouched and reported, not committed
+34 untracked files predate this session (Sep 16 - Oct 1): 11 `Content/HomeWorld/Meshes/
+Homestead/*.uasset` greybox props, `blender/floating_island_homestead_LIB.blend1`, and
+`docs/` files from other streams (`decisions/DISAGREEMENTS.md`, `handoffs/TASTE_GATE_SCOPE_
+R1-R4.md`, `qa/*`, `human-use/scope-refinement.md`). Committing another stream's work is
+not mine to do.

@@ -2,14 +2,31 @@
 
 This directory is **Blender-first MVP swarm canon**: GDD slices, art bible, material sheet, WAVE handoffs, and QA placeholders for the multi-agent production kit.
 
-## Do not merge with `docs/`
+## `Docs/` and `docs/` are ONE directory (there is no split)
 
-| Path | Purpose |
-|------|---------|
-| **`Docs/`** (this tree) | MVP swarm operating system — canon, handoffs, shot list, kit-facing specs linked from `Lib/` |
-| **`docs/`** (lowercase) | Unreal Engine 5.8 project documentation — setup, automation, PCG, task lists, known errors |
+**This section used to assert the opposite, and it was wrong.** It said:
 
-These are **intentionally separate**. On case-insensitive filesystems (macOS/Windows defaults), Git may only check out one of the two names locally — clone on Linux CI or use a case-sensitive volume if you need both trees simultaneously.
+> *These are intentionally separate. On case-insensitive filesystems Git may only check out one
+> of the two names locally…*
+
+On this project's filesystem — Windows, case-insensitive — **`Docs/` and `docs/` are the same
+441-file directory.** Not two trees that occasionally collide: one tree, reachable under either
+name. Verified by hash: both spellings enumerate 441 files / 3999 KB, identical.
+
+Consequences that are easy to trip over:
+
+- **Any cross-reference using the other casing still resolves.** Nothing is broken by writing
+  `docs/KNOWN_ERRORS.md` in a doc that lives at `Docs/`.
+- **There is no "signed canon vs engineering" boundary on disk.** The distinction is real as an
+  *editorial convention* — product canon lives in `VisionBoard/`, `Docs/VISION_BOARD.md`,
+  `Docs/canon/`, the LOCKED bibles and `Docs/0*`; engineering lives in `docs/Setup/`,
+  `docs/Automation/`, `docs/UE/`, `docs/PCG/` — but it is enforced by naming discipline and the
+  subdirectory prefixes, **not** by the top-level folder.
+- **Do not try to sync between the two spellings.** There is nothing to sync.
+
+If the split is ever wanted for real, it needs a case-sensitive volume and a genuine move, plus
+a fix to every cross-reference. Recorded as an open item in `Docs/CANON_MAP.md` §7 and
+[DEC-0029](decisions/AGENT_DECISIONS.md#dec-0029).
 
 ## Entry points
 

@@ -1,7 +1,7 @@
 {
   "id": "CAMP",
   "type": "SM_ zone",
-  "status": "SEQUENCE_DEFINED_GEOMETRY_NOT_BUILT",
+  "status": "SEQUENCE_DEFINED_ACTORS_PLACED_GEOMETRY_NOT_BUILT",
   "date": "2026-10-02",
   "phase": "T0_M8_M13_M14_plus_R5",
   "owner": "agent",
@@ -159,6 +159,33 @@
     "Layout inside the clearing - where the fire sits relative to the bedrolls, which side the lashings are on, where the portal opens - is the Lead's. It decides whether the player can see the captive from the portal, which decides whether the rescue reads as a choice or a scripted walk.",
     "Does the lashings read as a cage? A cage invites killing the guard to open it, which inverts the beat. The whole point is that the only way through is to calm them."
   ],
+  "greybox_placement": {
+    "placed": "2026-10-02, Lead decision ('greybox the camp from CAMP.json now')",
+    "why_this_pass_exists": "Until actors exist in a .umap, every calm count in MUST #14 is a SOFT LATCH: TryEaseCampActor grants bEased with bSoftLatch = true and SatisfiesFreedomGateStrict() rejects it. The beat certified itself against nothing - the same defect as the shrine's lintel lying on the ground.",
+    "actor_class": "AHomeWorldCampActor (Source/HomeWorld/HomeWorldCampActor.h), an ACharacter and not a greybox prop, because `rejects` lists modeling_an_actor_as_greybox_prop. The calm state stays on UHomeWorldSpiritStealthComponent; the actor's only job is to answer 'is there actually someone here?'",
+    "how": "Content/Python/t0_place_camp.py - idempotent, opens L_VS_MVP_Markers, writes Saved/t0_camp_placement.json",
+    "positions_are_derived_not_invented": {
+      "NODE_GUARD": "triggers[EJECT_TRIGGER_GUARD_WAKES].at_offset - that trigger fires on 'player enter with guard aware', so it marks the guard's post",
+      "NODE_SLEEPER_A": "modules[SM_Camp_Bedroll_A].at_offset",
+      "NODE_SLEEPER_B": "modules[SM_Camp_Bedroll_B].at_offset",
+      "NODE_CAPTIVE": "triggers[FREEDOM_GATED_ON_ALL_THREE_CALM].at_offset - its on_interact is 'free the companion', so it sits on the captive"
+    },
+    "still_NOT_placed": [
+      "SM_Camp_Fire_Blue and SM_Camp_Torch - BOTH have radius_m: null by Lead choice, with the note that guessing a number would be authoring gameplay as art. The guard's moving torch stays out until that radius is set, which also keeps MUST #17's camp geometry parked.",
+      "SM_Camp_Fire, SM_Camp_Bedroll_A/B, SM_Camp_Lashings, SM_Camp_GuardStake - the art modules. Their measured_from is 'authored, not built'. The camp art is waiting on the paused camp image; greyboxing the art would make a reader report measurements nobody took.",
+      "Guard patrol movement - AI patrol is not implemented. The guard stands at its post."
+    ],
+    "labels_note": "The two sleepers are labelled NODE_SLEEPER_A and NODE_SLEEPER_B. C++ discovery tries NODE_SLEEPER and falls through to GetName().Contains(...), which both resolve, and the script asserts there are exactly 2 - because if that ever stops resolving, every sleeper count silently goes soft again.",
+    "layout_still_the_leads": "open_questions below reserves the clearing LAYOUT. Nothing placed here depends on it: each actor went where this spec's own numbers put it.",
+    "verified_2026_10_02": {
+      "claim": "A placed camp actor is discoverable at RUNTIME, so MUST #14's counts are real and not soft latches.",
+      "test": "HomeWorld.T0.M14.PlacedActorsAreDiscovered (Source/HomeWorld/HomeWorldCampNightTests.cpp) - real AHomeWorldCampActor instances, placed the way t0_place_camp.py places them (role change, then RerunConstructionScripts, no hand-added tag), then eased, then the STRICT gate read. Asserts calmed == 3, IsFreedomUnlockedStrict(), TryFreeCaptive(), and both sleeper ordinals separately.",
+      "18_t0_tests_green": true,
+      "mutations_killed": "9/9 in Content/Python/tests/_mutate_camp_night.py, restored tree re-verified green after the run.",
+      "the_mutation_that_caught_a_real_defect": "M6 disables the tag AND object-name match in FindCampActorInWorld. It SURVIVED the first version of the test, because SetActorLabel had left every actor labelled NODE_GUARD / NODE_SLEEPER and FindCampActorInWorld also matches the editor label - a branch that is #if WITH_EDITOR and therefore absent from a packaged build. So the test was green against a camp that soft-latches everywhere it actually ships. Fix: MakeRealCamp now renames each actor to an opaque 'CampGarrison_N', which strips the label AND the object name (SetActorLabel renames the object too), leaving the tag as the only thing that can carry discovery. M6 is now killed.",
+      "why_this_matters_beyond_this_test": "FindCampActorInWorld has three ways to match: an editor label, a tag, and GetName().Contains(). Only the last two exist in a packaged build. Any test that lets the editor label answer will pass in-editor and fail in the shipping build - which is the same shape as the defects this pass has been chasing: something green that was never asked the question."
+    }
+  },
   "measured": null,
   "measured_note": "DELIBERATELY NULL. Nothing here is built, so there is nothing to measure. Every size above is authored from the 1.8 m adult reference and the must labels, and is recorded as 'authored, not built' per module. A reader run will report this assembly as MISSING until it exists - that is the correct report, and it should not be suppressed.",
   "why_this_spec_exists_first": [

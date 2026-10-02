@@ -1,6 +1,10 @@
 # START HERE
 
-> **Repo layout:** This tree lives inside the **HomeWorld UE 5.7** repo. MVP swarm canon is under **`Docs/`** (capital D). Unreal project docs stay in **`docs/`** (lowercase). See [Docs/README.md](Docs/README.md) — do not merge the two trees.
+> **Repo layout:** This tree lives inside the **HomeWorld UE 5.8** repo. MVP swarm canon is under
+> **`Docs/`**, Unreal project docs under **`docs/`** — see [Docs/README.md](Docs/README.md).
+> **These are ONE directory on Windows, not two trees** (both spellings enumerate the same 441
+> files); the split is an editorial convention carried by subdirectory prefixes. There is nothing
+> to merge and nothing to sync.
 
 ## Human Lead (you)
 

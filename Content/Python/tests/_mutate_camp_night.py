@@ -32,6 +32,9 @@ TYPES = os.path.join(REPO, "Source", "HomeWorld", "HomeWorldCampNightTypes.h")
 #: the header, matched nothing, and was reported SKIPPED rather than KILLED - so a mutation
 #: that never applied was nearly recorded as a test weakness.
 TYPES_CPP = os.path.join(REPO, "Source", "HomeWorld", "HomeWorldCampNightTypes.cpp")
+#: The placed actors. Their self-tagging is what stops #14 soft-latching, and a break there is
+#: invisible to every other test because they all hand-tag their own stand-ins.
+CAMP_ACTOR = os.path.join(REPO, "Source", "HomeWorld", "HomeWorldCampActor.cpp")
 
 # (name, file, pattern, replacement, test path fragment that MUST fail)
 MUTATIONS = [
@@ -45,7 +48,10 @@ MUTATIONS = [
     (
         "M2: a spirit is allowed to touch an actor's BODY",
         TYPES_CPP,
-        r"(case EHomeWorldSpiritTouchTarget::ActorBody:\s*\n\t\tdefault:\s*\n\t\t)return EHomeWorldSpiritTouchVerdict::Refused;",
+        # Three tabs before the return, not two. The file is tab-indented one level deeper
+        # than a naive reading of a GitHub diff suggests, and `\t\t\)` silently matched
+        # nothing - the harness caught it as a HARNESS BUG rather than scoring it.
+        r"(case EHomeWorldSpiritTouchTarget::ActorBody:\s*\n\t\tdefault:\s*\n\t\t\t)return EHomeWorldSpiritTouchVerdict::Refused;",
         r"\1return EHomeWorldSpiritTouchVerdict::Allowed;",
         "HomeWorld.T0.M15.SpiritTouchTable",
     ),
@@ -71,11 +77,48 @@ MUTATIONS = [
         "HomeWorld.T0.M14.EaseDirection",
     ),
     (
+        # The first version of this was `return nullptr;` at the top of the function, which
+        # is the obvious way to break it and CANNOT BE SCORED: it makes the rest of the body
+        # unreachable, UE compiles C4702 as an error, build() raises, and a mutation that
+        # never got as far as running gets filed under a crash instead of under a result.
+        #
+        # So it now breaks the SAME behaviour the honest way - the match never succeeds -
+        # which compiles, runs, and is killed by a test for the right reason.
         "M6: the camp actor lookup silently fails again (soft latch everywhere)",
         STEALTH,
-        r"(static AActor\* FindCampActorInWorld\(UWorld\* World, EHomeWorldCampRole Role, int32 Ordinal\)\s*\n\{\s*\n)",
-        r"\1\treturn nullptr;\n",
-        "HomeWorld.T0.M16.FreedomGate",
+        r"return Actor->GetName\(\)\.Contains\(Label\.ToString\(\)\) \|\| Actor->ActorHasTag\(Label\);",
+        "return false;",
+        "HomeWorld.T0.M14.PlacedActorsAreDiscovered",
+    ),
+    # --- the placed actors must tag THEMSELVES, or #14 silently soft-latches again --------
+    (
+        "M7: a placed camp actor stops tagging itself (discovery breaks, nothing goes red)",
+        CAMP_ACTOR,
+        r"\tTags\.AddUnique\(Label\);",
+        "\t// Tags.AddUnique(Label);",
+        "HomeWorld.T0.M14.PlacedActorsAreDiscovered",
+    ),
+    (
+        # An earlier version of this INSERTED a second `case EHomeWorldCampRole::Sleeper:`
+        # rather than editing the existing one, and the build died with C2196 "case value
+        # already used". A mutation that fails to compile is not scored - it never becomes
+        # evidence either way - so it edits the real return instead.
+        "M8: the label helper returns a role-blind constant (guard/sleeper/captive indistinguishable)",
+        CAMP_ACTOR,
+        r'(case EHomeWorldCampRole::Sleeper:\s*\n\t\t\treturn TEXT\("NODE_SLEEPER"\);)',
+        r'case EHomeWorldCampRole::Sleeper:\n\t\t\treturn TEXT("NODE_GUARD");',
+        "HomeWorld.T0.M14.PlacedActorsAreDiscovered",
+    ),
+    (
+        # The editor-placement path. `OnConstruction` is what tags an actor a human dragged
+        # into the level, and it is the path `t0_place_camp.py` leans on. Removing the
+        # constructor's own call is not enough to catch this: the constructor already
+        # tagged the DEFAULT role, so the actor keeps a plausible-looking but WRONG tag.
+        "M9: OnConstruction stops re-tagging, so a role flip keeps the default role's tag",
+        CAMP_ACTOR,
+        r"(void AHomeWorldCampActor::OnConstruction\(const FTransform& Transform\)\s*\n\{\s*\n\tSuper::OnConstruction\(Transform\);)(.*?)(\n\tRefreshCampIdentity\(\);)",
+        r"\1\2",
+        "HomeWorld.T0.M14.PlacedActorsAreDiscovered",
     ),
 ]
 

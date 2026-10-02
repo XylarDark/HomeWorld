@@ -1,4 +1,4 @@
-﻿"""T0_M14 camp night prove - BeginPlay/Arrange helpers for Conductor DESKTOP."""
+"""T0_M14 camp night prove - BeginPlay/Arrange helpers for Conductor DESKTOP."""
 import unreal
 import json
 import os
@@ -94,12 +94,57 @@ def act_camp_night():
         except Exception as e:
             notes.append("latched_err %s" % e)
 
+    # ---- MUST #14 evidence, not the courtesy --------------------------------
+    # This replaced a read of GetGuardsAvoidedThisSession / GetSleepersSoothedThisSession.
+    # Both are marked LEGACY in HomeWorldSpiritStealthComponent.h and documented as reading
+    # nothing - they are the old counters no gate consults. Proving #14 off them proved the
+    # wrong thing: they tick even when no actor exists in the level at all, which is exactly
+    # the soft latch the strict gate exists to reject.
+    #
+    # The beat now: ease all THREE actors, then read the STRICT gate.
+    strict = None
+    soft = None
+    calmed = None
+    eased = []
+    freed = None
     guards = None
     sleepers = None
     if pawn:
         try:
             stealth = pawn.get_component_by_class(unreal.load_class(None, "/Script/HomeWorld.HomeWorldSpiritStealthComponent"))
             if stealth:
+                for role_name, ordinal in (("GUARD", 0), ("SLEEPER", 0), ("SLEEPER", 1)):
+                    try:
+                        role_value = getattr(unreal.HomeWorldCampRole, role_name)
+                        ok_ease = bool(stealth.try_ease_camp_actor(role_value, ordinal))
+                        eased.append("%s#%d=%s" % (role_name, ordinal, ok_ease))
+                        notes.append("ease %s#%d -> %s" % (role_name, ordinal, ok_ease))
+                    except Exception as e:
+                        eased.append("%s#%d=err:%s" % (role_name, ordinal, e))
+                        notes.append("ease %s#%d err %s" % (role_name, ordinal, e))
+
+                try:
+                    calmed = int(stealth.get_calmed_actor_count())
+                except Exception as e:
+                    notes.append("calmed_err %s" % e)
+                try:
+                    soft = bool(stealth.is_freedom_unlocked())
+                except Exception as e:
+                    notes.append("soft_err %s" % e)
+                try:
+                    strict = bool(stealth.is_freedom_unlocked_strict())
+                except Exception as e:
+                    notes.append("strict_err %s" % e)
+                try:
+                    freed = bool(stealth.try_free_captive())
+                    notes.append("try_free_captive=%s is_captive_freed=%s"
+                                 % (freed, stealth.is_captive_freed()))
+                except Exception as e:
+                    notes.append("free_err %s" % e)
+
+                notes.append("EVIDENCE calm=%s soft=%s strict=%s freed=%s"
+                             % (calmed, soft, strict, freed))
+
                 if hasattr(stealth, "get_guards_avoided_this_session"):
                     guards = int(stealth.get_guards_avoided_this_session())
                 if hasattr(stealth, "get_sleepers_soothed_this_session"):
@@ -108,16 +153,30 @@ def act_camp_night():
         except Exception as e:
             notes.append("stealth_counts_err %s" % e)
 
+    # ok means the STRICT gate opened with real actors behind it, all three calmed, and the
+    # captive actually came free. A soft-only pass is explicitly NOT a pass - that inversion
+    # is the whole defect this restructure exists to stop.
+    ok = bool(strict) and bool(freed) and calmed == 3
+    if not ok:
+        notes.append("NOT_PROVEN strict=%s freed=%s calmed=%s (want strict=True freed=True calmed=3)"
+                     % (strict, freed, calmed))
+
     _write(
         "t0_m14_camp_night_py_act.json",
         {
-            "ok": bool(camp_ok or latched),
+            "ok": ok,
+            "verdict": "PROVEN" if ok else "NOT_PROVEN",
+            "calmed_actor_count": calmed,
+            "freedom_unlocked_soft": soft,
+            "freedom_unlocked_strict": strict,
+            "captive_freed": freed,
+            "eased": eased,
             "method": method,
             "camp_ok": camp_ok,
             "latched": latched,
             "spirit": spirit,
-            "guards_avoided": guards,
-            "sleepers_soothed": sleepers,
+            "legacy_guards_avoided": guards,
+            "legacy_sleepers_soothed": sleepers,
             "notes": notes,
             "labels": [
                 "NODE_GUARD",
@@ -126,13 +185,14 @@ def act_camp_night():
                 "FORM_SPIRIT",
                 "CAM_T0_CAMP_NIGHT",
             ],
-            "anti": ["GP_SS_Lit_alone", "stealth-alone", "convert-as-soothe", "body-form"],
+            "anti": ["GP_SS_Lit_alone", "stealth-alone", "convert-as-soothe", "body-form",
+                     "legacy-counters-are-not-evidence", "soft-latch-is-not-a-pass"],
             "ts_utc": datetime.now(timezone.utc).isoformat(),
         },
     )
     unreal.log(
-        "CAMP_NIGHT_PROVE: act done camp=%s latched=%s method=%s"
-        % (camp_ok, latched, method)
+        "CAMP_NIGHT_PROVE: verdict=%s calm=%s soft=%s strict=%s freed=%s"
+        % ("PROVEN" if ok else "NOT_PROVEN", calmed, soft, strict, freed)
     )
 
 

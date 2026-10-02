@@ -6,8 +6,17 @@
 |------|------|
 | **[START_HERE.md](START_HERE.md)** | Swarm entry — Human Lead gates, Conductor boot |
 | **[Docs/VISION_BOARD.md](Docs/VISION_BOARD.md)** | **CANON for product work — read this before scoping anything.** The prototype in one page: the game, the seven mechanic families, the three zones, the 13 musts, and the four moments it must feel like. Settled by the Lead 2026-10-02 (`TG-T0-ASSETS` Round 3): the game is the **Lone Wanderer** and night is **a form you become**. `VisionBoard/Core/VISION.md` keeps **theme + long-horizon campaign**; the March docs under `VisionBoard/MVP/` are **superseded for prototype scope** |
-| **`Docs/`** (capital D) | **Signed MVP product canon** — GDD, art bible, export table, audit WAVEs ([Docs/README.md](Docs/README.md)) |
-| **`docs/`** (lowercase) | UE 5.8 engineering — setup, PCG, automation, known errors ([docs/README_ENGINEERING.md](docs/README_ENGINEERING.md)) |
+| **[Docs/CANON_MAP.md](Docs/CANON_MAP.md)** | **Start here when you need to find the answer to something.** A topic-keyed index over this tree, machine-checked so it cannot go stale |
+| **`Docs/`** | **Product canon** — GDD, art bible, vision board, `canon/` pillars, LOCKED bibles, WAVE handoffs ([Docs/README.md](Docs/README.md)) |
+| **`docs/`** | **UE 5.8 engineering** — setup, PCG, automation, known errors ([docs/README_ENGINEERING.md](docs/README_ENGINEERING.md)) |
+
+> **`Docs/` and `docs/` are ONE directory on this machine, not two trees.** Windows is
+> case-insensitive: both spellings enumerate the same 441 files. The product/engineering split
+> above is an **editorial convention carried by subdirectory prefixes** (`docs/Setup/`,
+> `docs/Automation/`, `docs/UE/`, `docs/PCG/` for engineering; `Docs/canon/`, `Docs/0*`, the
+> LOCKED bibles for product), **not** by the top-level folder name. Either casing resolves in
+> any cross-reference. Do not try to sync between them — there is nothing to sync. Settled by
+> Lead 2026-10-02; [DEC-0029](Docs/decisions/AGENT_DECISIONS.md#dec-0029).
 
 **Do not treat** [VisionBoard/MVP/](VisionBoard/MVP/README.md) or [docs/Automation/AGENT_COMPANY.md](docs/Automation/AGENT_COMPANY.md) as MVP product canon — see quarantine pointers there. Long-horizon theme/stack: [VisionBoard/Core/VISION.md](VisionBoard/Core/VISION.md).
 

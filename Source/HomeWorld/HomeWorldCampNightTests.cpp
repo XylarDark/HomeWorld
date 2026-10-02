@@ -6,6 +6,7 @@
 
 #include "Engine/Engine.h"
 #include "Engine/World.h"
+#include "HomeWorldCampActor.h"
 #include "HomeWorldCampNightTypes.h"
 #include "HomeWorldCharacter.h"
 #include "HomeWorldSpiritStealthComponent.h"
@@ -177,6 +178,92 @@ namespace HomeWorldCampNightTest
 			{
 				Actor->Tags.Add(FName(Tag));
 			}
+		}
+	}
+
+	/**
+	 * The REAL actors, not tagged stand-ins.
+	 *
+	 * MakeCamp above spawns plain AActors and bolts tags on by hand, so it proves the
+	 * component's LOOKUP works. It cannot prove the placed actors ever become findable at
+	 * runtime, and that is the link that matters now the camp exists in a .umap: a placed
+	 * AHomeWorldCampActor has to carry the tag itself, from its constructor and
+	 * OnConstruction, or every count silently returns to soft-latching and #14 goes back to
+	 * certifying itself against nobody.
+	 *
+	 * The two sleepers are spawned as separate actors, because a dict or a single-actor
+	 * shortcut would pass while the outliner could not tell them apart - which is exactly the
+	 * bug the placement script hit.
+	 */
+	static void MakeRealCamp(FAutomationTestBase* Test, UWorld* World)
+	{
+		struct FEntry
+		{
+			EHomeWorldCampRole Role;
+			int32 Ordinal;
+		};
+
+		const FEntry Entries[] = {
+			{EHomeWorldCampRole::Guard, 0},
+			{EHomeWorldCampRole::Sleeper, 0},
+			{EHomeWorldCampRole::Sleeper, 1},
+			{EHomeWorldCampRole::Captive, 0},
+		};
+
+		for (const FEntry& Entry : Entries)
+		{
+			FActorSpawnParameters Params;
+			Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			AHomeWorldCampActor* Actor = World->SpawnActor<AHomeWorldCampActor>(Params);
+			if (!Test->TestNotNull(
+					FString::Printf(TEXT("spawned camp actor role=%d ord=%d"),
+						static_cast<int32>(Entry.Role), Entry.Ordinal), Actor))
+			{
+				continue;
+			}
+
+			// Deliberately AFTER spawn, and with NO hand-added tag and NO direct
+			// RefreshCampIdentity() call - only a role change followed by
+			// RerunConstructionScripts(), which is exactly what dragging an actor into the
+			// level does. Calling RefreshCampIdentity() here instead would have been the
+			// friendlier test and the worthless one: it would let a completely broken
+			// OnConstruction pass, which is the path a real placement actually depends on.
+			Actor->CampRole = Entry.Role;
+#if WITH_EDITOR
+			Actor->RerunConstructionScripts();
+#else
+			Actor->RefreshCampIdentity();
+#endif
+
+			const TCHAR* RoleName = Entry.Role == EHomeWorldCampRole::Guard
+				? TEXT("NODE_GUARD")
+				: (Entry.Role == EHomeWorldCampRole::Sleeper
+					? TEXT("NODE_SLEEPER") : TEXT("NODE_CAPTIVE"));
+			Test->TestTrue(
+				FString::Printf(TEXT("placed actor tagged %s with no help"), RoleName),
+				Actor->ActorHasTag(FName(RoleName)));
+
+#if WITH_EDITOR
+			// THEN take the name away.
+			//
+			// Mutation M6 - disabling the tag AND object-name match in FindCampActorInWorld -
+			// SURVIVED the first version of this test. The reason is the point of the whole
+			// rewrite: SetActorLabel had left every actor labelled NODE_GUARD / NODE_SLEEPER,
+			// and FindCampActorInWorld also matches the editor label, so discovery kept
+			// working through the one branch that is `#if WITH_EDITOR` and therefore DOES NOT
+			// EXIST in a packaged build.
+			//
+			// So this test could pass green against a camp that soft-latches everywhere it
+			// actually ships. Renaming each actor to an opaque name strips the label AND the
+			// object name, because SetActorLabel renames the object too. After this line the
+			// TAG is the only thing that can carry discovery, which is the real shipped
+			// condition.
+			//
+			// The name is chosen to share no substring with any of the three labels per role
+			// (NODE_*, GP_CampNight_*, ANCHOR_NODE_*), so it cannot match by accident.
+			Actor->SetActorLabel(
+				FString::Printf(TEXT("CampGarrison_%d"), static_cast<int32>(Entry.Ordinal) + 1));
+#endif
 		}
 	}
 
@@ -643,6 +730,89 @@ bool FCampNightCompletionRedirectTest::RunTest(const FString& Parameters)
 
 	Stealth->TryEaseCampActor(EHomeWorldCampRole::Guard, 0);
 	TestTrue(TEXT("all three calmed completes #14"), Stealth->IsCampNightBeatComplete());
+
+	return true;
+}
+
+/**
+ * The placed actors are discoverable, so the beat stops soft-latching.
+ *
+ * THE GAP THIS CLOSES. Every other M14/M16 test builds its own stand-in actors with
+ * hand-added tags, so all of them pass whether or not a real placed AHomeWorldCampActor would
+ * ever be found. The gate is a fail-open BY DESIGN - a missing actor still grants the count
+ * and marks a soft latch - so a camp that is present in the .umap but untagged, misspelled,
+ * or given the wrong role would degrade to soft-latching with not one red test. That is the
+ * exact state #14 was certified in before this pass, and it shipped green.
+ *
+ * So this asserts the OTHER side of the same coin: real actors, placed the way
+ * `t0_place_camp.py` places them, and the strict gate - the evidence half - opens. If discovery
+ * breaks, this fails. If the fail-open quietly starts hiding a broken camp again, this fails.
+ *
+ * It also pins the two-sleeper cardinality, because dropping to one sleeper would satisfy a
+ * naive "an actor was found" check while leaving the gate permanently shut for the player.
+ *
+ * WHY THE TAG IS ASSERTED DIRECTLY AND NOT ONLY VIA THE COUNT. FindCampActorInWorld matches
+ * on an editor label OR a tag, and the label branch is `#if WITH_EDITOR` - it does not exist
+ * in a packaged build. So a camp that is fully discoverable HERE can still soft-latch
+ * everywhere SHIPPES, and the count assertions alone would stay green. MakeRealCamp asserts
+ * the tag directly for that reason: the tag is the only part of discovery that survives the
+ * editor-only compile.
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FCampActorsAreDiscoveredTest,
+	"HomeWorld.T0.M14.PlacedActorsAreDiscovered",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FCampActorsAreDiscoveredTest::RunTest(const FString& Parameters)
+{
+	using HomeWorldCampNightTest::EaseAllThree;
+	using HomeWorldCampNightTest::FScopedSpirit;
+	using HomeWorldCampNightTest::FScopedWorld;
+	using HomeWorldCampNightTest::MakeRealCamp;
+	using HomeWorldCampNightTest::MakeSpirit;
+
+	FScopedWorld Scope(TEXT("M14 placed actors"));
+	if (!Scope.Ok(this))
+	{
+		return false;
+	}
+
+	MakeRealCamp(this, Scope.World);
+
+	FScopedSpirit Fixture = MakeSpirit(this, Scope);
+	if (!Fixture.Ok(this))
+	{
+		return false;
+	}
+	UHomeWorldSpiritStealthComponent* Stealth = Fixture.Stealth;
+
+	TestEqual(TEXT("a fresh camp is nobody calmed"), Stealth->GetCalmedActorCount(), 0);
+
+	// MakeRealCamp has by now stripped every editor label and object name, so from here on
+	// the only thing that can make an actor discoverable is the TAG it set on itself. These
+	// two assertions are therefore the shipped-build condition, not the editor one.
+	EaseAllThree(Stealth);
+
+	TestEqual(TEXT("all three PLACED actors were found by TAG alone - no soft latch"),
+		Stealth->GetCalmedActorCount(), 3);
+	TestTrue(TEXT("the STRICT gate opens when real actors are present"),
+		Stealth->IsFreedomUnlockedStrict());
+	TestTrue(TEXT("#16 frees the companion once all three are really calm"),
+		Stealth->TryFreeCaptive());
+
+	// Sleeper cardinality, asserted directly. Ordinal 1 must resolve to a DIFFERENT actor from
+	// ordinal 0; if the lookup returned the first match for both, the count would still be 3
+	// while only two people existed, and the scene would be lying.
+	bool bEased = false;
+	bool bAsleep = false;
+	TestTrue(TEXT("sleeper 0 state is readable"),
+		Stealth->GetCampActorState(EHomeWorldCampRole::Sleeper, 0, bEased, bAsleep));
+	TestTrue(TEXT("sleeper 0 was eased"), bEased);
+	TestTrue(TEXT("sleeper 1 state is readable"),
+		Stealth->GetCampActorState(EHomeWorldCampRole::Sleeper, 1, bEased, bAsleep));
+	TestTrue(TEXT("sleeper 1 was eased"), bEased);
+	TestTrue(TEXT("the guard was eased too"),
+		Stealth->GetCampActorState(EHomeWorldCampRole::Guard, 0, bEased, bAsleep) && bEased);
 
 	return true;
 }
