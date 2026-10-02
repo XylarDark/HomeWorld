@@ -100,6 +100,49 @@ Build toolchain verified present 2026-10-01: `dotnet`, `vswhere`, `UE_5.8`.
 
 ---
 
+## 7a. Self-awareness — `npm run harness:fitness`
+
+The Lead's requirement (2026-10-01): the harness should detect when **it** needs an upgrade as
+the product develops, never outside the bounds set above; and when a problem recurs that is
+*outside* those bounds, it should notice and work out how to handle it in future.
+
+**This is deliberately not a scorer.** §8 forbids "another measurement of the agent harness"
+— that layer produced zero product decisions. So `harness:fitness` measures nothing. It checks
+four premises, each traceable to a number the Lead can check by hand:
+
+| Premise | Reads | Break means |
+|---|---|---|
+| **shape** | the six commands in §1 are present | the harness grew past its own description |
+| **bounds** | the instruction-budget record | above the ceiling — every line is tax on the Lead's reading time |
+| **purposefulness** | `DISAGREEMENTS.md` is non-empty | nothing was questioned, or nothing was written down |
+| **product** | harness vs product commits over 60 | **the escape hatch in §5, checked mechanically so it cannot be quietly deferred** |
+
+A broken premise is an **upgrade signal, not an instruction to build.** Exit 1 signals the
+signal; the caller decides. The script never edits a file, and it never proposes a gate.
+
+**Current reading (2026-10-02): `product` is BROKEN — 37 harness / 23 product, 62% harness.**
+
+⚠️ **This is reported honestly and is not being tuned.** The window is 60 commits, which still
+contains most of the refactor that created the harness, so the ratio is history rather than
+trajectory. The response is *ship product commits*, not *re-measure with a better window* —
+picking the window until it passes is precisely the confidently-wrong-number pattern in
+`AGENT_DECISIONS.md` DEC-0014 and the three bugs named in the Week-1 handoff. Re-read this
+premise in 2027-01, when the refactor has aged out.
+
+### Out-of-bounds problems — `npm run harness:oob -- <signature> <response>`
+
+For failures that are **not** the harness's fault. The discipline: a repeated out-of-bounds
+problem earns a **written response, never a new gate** — a gate is the thing that got deleted
+in §4. One line per problem in [decisions/OUT_OF_BOUNDS.md](decisions/OUT_OF_BOUNDS.md), so
+the next occurrence is visible instead of rediscovered.
+
+Two recorded on 2026-10-02: `ue-editor-lock-contention` (two agents each opened the Editor)
+and `json-blob-in-diff` (a large generated JSON blob in a commit). Both have written
+responses and no gates. The file is capped in practice at 40 lines; past that the responses
+are not working and the problem belongs in `Docs/`, not in a log.
+
+---
+
 ## 8. What not to build next
 
 | | |
