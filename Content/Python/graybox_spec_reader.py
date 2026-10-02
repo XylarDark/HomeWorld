@@ -422,10 +422,19 @@ def _all_volumes() -> list[Volume]:
     return volumes
 
 
-def run(place_missing: bool = False) -> dict[str, Any]:
-    """Full pass: measure, verify, and return a machine-checked report dict."""
+def run(place_missing: bool = False, **kwargs: Any) -> dict[str, Any]:
+    """Full pass: measure, verify, and return a machine-checked report dict.
+
+    ``place=True`` is an alias for ``place_missing=True`` (docstring / MCP callers).
+    When both are set, either true enables place-missing (check-before-create).
+    """
     if bpy is None:
         raise RuntimeError("run() requires bpy; run inside Blender")
+
+    if "place" in kwargs:
+        place_missing = bool(place_missing) or bool(kwargs.pop("place"))
+    if kwargs:
+        raise TypeError("run() got unexpected keyword argument(s): %s" % ", ".join(sorted(kwargs)))
 
     bpy.context.view_layer.update()
 
@@ -551,7 +560,32 @@ def to_markdown(report: dict[str, Any]) -> str:
         "",
     ]
 
-    lines += ["## Findings by criterion", "", "| Criterion | Count |", "|---|---|"]
+    lines += [
+        "",
+        "## Measured bbox",
+        "",
+        "| Name | Bbox xyz (m) | World origin |",
+        "|---|---|---|",
+    ]
+    measurements = report.get("measurements") or {}
+    for name in sorted(measurements.keys()):
+        row = measurements.get(name)
+        if row is None:
+            lines.append("| `%s` | *(absent)* | — |" % name)
+            continue
+        bbox = row.get("bbox")
+        origin = row.get("world_origin")
+        if bbox is None:
+            bbox_s = "*(non-mesh)*"
+        else:
+            bbox_s = "%.4f × %.4f × %.4f" % (bbox[0], bbox[1], bbox[2])
+        if origin is None:
+            origin_s = "—"
+        else:
+            origin_s = "%.4f, %.4f, %.4f" % (origin[0], origin[1], origin[2])
+        lines.append("| `%s` | %s | %s |" % (name, bbox_s, origin_s))
+
+    lines += ["", "## Findings by criterion", "", "| Criterion | Count |", "|---|---|"]
     for criterion, count in sorted(report.get("by_criterion", {}).items()):
         lines.append("| `%s` | %d |" % (criterion, count))
 
