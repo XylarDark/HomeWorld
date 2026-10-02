@@ -134,6 +134,9 @@ function withEditorLock(label, fn) {
 const results = [];
 
 results.push(step('js suite', () => run('node', ['--test', 'scripts/*.test.js'])));
+if (results[results.length - 1]) {
+  results.push(step('instruction budget', () => run('node', ['scripts/instruction-budget.js'])));
+}
 if (results[results.length - 1] && tier !== 'fast') {
   results.push(
     step('c++ build', () =>

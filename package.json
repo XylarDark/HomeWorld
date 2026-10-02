@@ -35,7 +35,9 @@
     "verify": "node scripts/verify.js",
     "verify:fast": "node scripts/verify.js --tier fast",
     "verify:ue": "node scripts/verify.js --tier ue",
-    "editor:lock": "node scripts/editor-lock.js"
+    "editor:lock": "node scripts/editor-lock.js",
+    "budget:instructions": "node scripts/instruction-budget.js",
+    "harness:sweep": "node scripts/harness-sweep.js"
   },
   "engines": {
     "node": ">=20.0.0"
