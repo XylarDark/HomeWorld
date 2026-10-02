@@ -800,3 +800,36 @@ skipped.
 - **Reverses if:** measurement at adequate n shows the corpus size is not the constraint. That
   is testable, and Dan Luu's result is the strongest prior against us being right - but it is a
   prior from *other* tasks, not from HomeWorld.
+
+---
+
+## DEC-0027 - The camp is at a FIXED position, hidden by the treeline, not randomly placed
+
+**Date:** 2026-10-02
+**Decided by:** agent
+**Surface:** level design / quest flow
+
+**Decision.** The camp sits at one authored location at the forest edge. The treeline blocks the
+sightline until the player is roughly 15 m out, so it is discovered on approach rather than
+revealed by luck. A rune prerequisite gates the day-take event.
+
+**Rejected:**
+- *Random placement at the treeline* - maximum surprise, and it produces an **unwinnable
+  save**. The day event (companion taken, ejected) is scripted and not reversible. A player who
+  finds the camp at minute two, before knowing the rune exists or that spirit form needs bed
+  AND rune, has lost the loved one with no route to recovering them. It is also ungateable: with
+  no authored position there is nothing to gate against.
+- *Pre-placed and plainly visible* - kills the discovery the Lead asked for and makes the camp a
+  waypoint from minute one.
+
+**Why this is agent-owned rather than a taste gate.** Level design and placement are normally the
+human's, and `docs/human-use/OWNERSHIP.md` says so. This one is decided here because the
+constraint that settles it is engineering, not preference: an irreversible scripted event at an
+authored location can be made safe, and at a random location it cannot. Recording it here with
+the reasoning attached so it can be vetoed on the record rather than absorbed silently.
+
+**Does not decide:** the treeline's exact density, how far back the sightline is cut, and
+whether the camp is visible from the field at night. Those remain `2B-1` and taste.
+
+**Reverses if:** the world gains a save-scumming or fast-travel system that lets the player
+recover a missed camp, which would remove the dead-save argument entirely.

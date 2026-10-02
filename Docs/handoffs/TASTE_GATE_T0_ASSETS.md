@@ -611,7 +611,93 @@ small.
 
 ---
 
-## Rounds 6+, parked
+## Round 6 — RESOLVED 2026-10-02: THE FIELD, AND WHERE THE CAMP GOES
+
+Raised by the Lead: a wide open field before the camp — *"yellowish long flowing grass swaying
+in the breeze with great beasts roaming around"*. Beasts can be **tamed**. Herbs and **dung**
+are picked up, dung for **fertilizer** at night. The player roams until they reach the edge
+where the camp is.
+
+### Most of this already exists — measured, not assumed
+
+| Lead's ask | Exists? | Evidence |
+|---|---|---|
+| **Taming gameplay** | **YES, built** | `AHomeWorldBeastPad` (`HomeWorldBeastPad.h:17`), `UHomeWorldBeastTameComponent`, states `Wild → Cautious → Tamed → Helper`, logs every transition |
+| **Herbs to pick** | **YES** | `RES_HERB` — 55 references, the most-used resource in the project |
+| Six-resource inventory | **YES** | `RES_HERB`, `RES_SEED`, `RES_WOOD`, `RES_BERRY`, `RES_FIBER`, `RES_STONE` |
+| Open field zone | **YES, prompted** | `GROK_IMAGINE_PROMPTS.md` 1B "ZONE 1: THE OPEN FIELD" |
+| **Dung → fertilizer** | **NO — the only new system here** | No `Fertiliz`/`Dung` anywhere in `Source/` |
+
+**So the scope of this message is one crafting verb, not a new zone.** The zone, the taming and
+the herbs are all already there.
+
+### Q23 — Where does the camp go? — **FIXED POSITION, HIDDEN BY THE TREELINE**
+
+The Lead: *"I am undecided if I want the camp to be placed where they enter the forest or if I
+want the camp pre-placed because I do want the game to feel different as you explore it, not
+knowing what the map is like in front of you as things pop up."*
+
+**Neither. The camp is pre-placed, and the treeline hides it.**
+
+The deciding argument is not taste, it is a dead save:
+
+**The day event is scripted and it is not reversible.** Stumble on the camp → companion taken →
+ejected. If the player finds the camp at minute two, before they know the rune exists or that
+spirit form needs bed **and** rune, they have lost the loved one and **no route to get them
+back**. That is not difficulty. It is a broken save with no continue button.
+
+**A random climax cannot be gated.** With a fixed position I can require the rune before the
+day event fires — "the camp is here, but nobody is watching yet" — which turns "you arrived too
+early" from a dead end into a reason to go back. With a random position I have nothing to gate
+against.
+
+**And you still get the pop-up feeling, because it comes from sightlines, not coordinates.**
+`VISION_BOARD`: *"The world announces what it wants by its shape alone, and if you cannot tell
+from twenty metres away, the design has failed."* A treeline you can see *through* from 20 m,
+with the fire's glow behind it, is exactly that.
+
+**The strongest argument for fixing it is that the field is where the unpredictability lives.**
+Roaming beasts, scattered herbs, dung — that is your "things pop up". If the camp is random
+too, **nothing in the world is a landmark and the forest means nothing**. Fixed-but-hidden, the
+forest edge becomes the one place you *know* something is in there and cannot see it yet. The
+discovery survives, and it means something because it is contrast.
+
+| | Feel | Risk |
+|---|---|---|
+| **Random, at the treeline** | maximum surprise | **unwinnable state.** Losable with no recovery. Cannot be gated |
+| **Pre-placed, plainly visible** | none | kills discovery entirely; the camp is a waypoint from minute one |
+| **Fixed + hidden (chosen)** | **the treeline does the hiding; you discover on approach** | needs the treeline modelled to actually block the view — buildable, and it is in 2B-1 |
+
+**Recorded as an agent decision, not a taste gate** (`Docs/decisions/AGENT_DECISIONS.md`):
+camp placement is level design, but the constraint that settles it — an ungateable scripted
+climax — is engineering. **Veto it if you disagree; do not let me quietly build it otherwise.**
+
+### Q24 — Can a spirit touch a garden?
+
+*"Dung to pick up for **fertilizer during the night-time**."* Night is spirit form — bed **and**
+rune, both gates. So "at night" may mean *as a spirit*, and that is a real question:
+
+- **A (recommended)** — **Gather dung by day, apply it by day, after sleeping.** Dung in the
+  inventory overnight; the act of putting it on the beds is a daylight action. Cost: night has
+  no domestic purpose, so the loop is gather→sleep→tend rather than gather→tend-as-spirit.
+  Nothing new.
+- **B** — **Spirit form tends the garden.** You put the dung down as a spirit at night. Cost:
+  this makes spirit form a *caretaker's* form and not only a stealth or combat form, which is a
+  genuine change to what night **is** — and VISION_BOARD V2 currently says night is for spirit
+  work, not chores. It also needs a rule for what a spirit can and cannot touch, and that rule
+  is load-bearing for the camp rescue too.
+- **C** — **Dung becomes fertilizer automatically on sleep.** Pick up by day, sleep, and the
+  garden beds are richer at dawn. No night action at all. Cost: it is the smallest option, and
+  the player never *does* anything with the dung, which makes gathering it pointless.
+
+**B is the interesting one and the expensive one.** If night can be domestic, the homestead stops
+being a place you sleep in and becomes a place you *tend*, and the day/night loop gets a second
+verb. That is worth more than anything else in this round — and it is a change to V2, not a
+detail, so it is yours.
+
+---
+
+## Rounds 7+, parked
 
 | # | Fork | Waiting on |
 |---|---|---|
