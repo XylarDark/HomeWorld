@@ -2,11 +2,31 @@
 
 | Field | Value |
 |---|---|
-| **Status** | OPEN — starts at P1 |
+| **Status** | **WITHDRAWN 2026-10-02** — superseded by [`T0_PROTOTYPE_TRACK.md`](T0_PROTOTYPE_TRACK.md) |
 | **Date** | 2026-10-02 |
 | **Shape** | 8 tasks, MMMSS increments, one behaviour test each |
 | **Authority** | `Docs/00_CANON.md` · `Docs/03_SYSTEMS_MVP.md` · [AGENTS.md](../AGENTS.md) |
 | **Machine check** | `npm run verify` — C++ build + JS suite. Each task adds one UE automation test. |
+
+> ## WITHDRAWN — do not work from this list
+>
+> This was written from the taste gates **without having read
+> [`T0_MECHANIC_INVENTORIES_V1.md`](../handoffs/T0_MECHANIC_INVENTORIES_V1.md)**, which already
+> scopes the prototype as 14 MUST beats with an approved bite order, a frozen prove-label
+> vocabulary and two verdict classes.
+>
+> Two defects made it unusable, not merely redundant:
+>
+> 1. **It duplicated work already scoped** — P4/P5/P7 overlap beats M12, M11, M13, M14.
+> 2. **Its vocabulary was the alien one.** It used `blocking` / `warn` / `info`. The project's
+>    is `closed_fail` / `soft_fail`, which separates "law broken" from "marker missing" and
+>    was already in `Source/` 57 times.
+>
+> **Survivors:** P1 shipped as commit `6788aab` and stays. P2 (tame transitions) and the art
+> work folded into the T0 track as its art column.
+>
+> Kept as a record of the drift, not as a plan. See
+> [`T0_PROTOTYPE_TRACK.md` §2](T0_PROTOTYPE_TRACK.md) for the correction.
 
 ## Why this list exists
 

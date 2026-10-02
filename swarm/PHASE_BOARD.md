@@ -1,6 +1,8 @@
 # PHASE BOARD — Conductor only writes status rows
 
-**Current phase:** **Harness idle; ENV-ART PROTOTYPE is the live ball** (Lead 2026-10-01, `TG-ZONE-VOCABULARY` Round 1). **Scope: one greybox-tier zone prototype, cut for ONE mechanic family.** Harness work is parked, not abandoned. Supersedes the 2026-09-27 lock "horizon = harness/bot only / EA-env art off the backlog" — that lock is **superseded, not deleted**; see § CAP / EA backlog (historical) for the original text. Prior product: Docs/33 PS-C history — [PS_C_METRICS.md](../Docs/handoffs/PS_C_METRICS.md). **FALLBACK FLIGHT armed.**
+**Current phase:** **T0 / PROTOTYPE MUST work** (Lead 2026-10-02: *"I am not doing taste work right now, I am doing must work for the prototype."*). One track, 13 bites, canonical order from [`T0_MECHANIC_INVENTORIES_V1.md`](../Docs/handoffs/T0_MECHANIC_INVENTORIES_V1.md). **Taste is PARKED. Harness is IDLE, not abandoned.** Env-art and harness stay subject to `Docs/36` §2 and the taste gates. Rollup: [`Docs/TaskLists/T0_PROTOTYPE_TRACK.md`](../Docs/TaskLists/T0_PROTOTYPE_TRACK.md). Supersedes the 2026-09-27 lock "horizon = harness/bot only / EA-env art off the backlog" — that lock is **superseded, not deleted**; see § CAP / EA backlog (historical) for the original text. **FALLBACK FLIGHT armed.**
+
+**Zone-type vocabulary (Lead 2026-10-01, `TG-ZONE-VOCABULARY` Q2):** the **seven mechanic families** from [TASTE_GATE_ZONE_FAMILY.md](../Docs/handoffs/TASTE_GATE_ZONE_FAMILY.md) are the zone type for art and level design. `EBiomeType` (Desert/Forest/Marsh/Canyon) drops to **terrain dressing + weather only** and is out of the art vocabulary. `EPlanetoidAlignment` is **not** a zone type. **Neither C++ enum is deleted** — biome keeps working as an input.
 
 **Zone-type vocabulary (Lead 2026-10-01, `TG-ZONE-VOCABULARY` Q2):** the **seven mechanic families** from [TASTE_GATE_ZONE_FAMILY.md](../Docs/handoffs/TASTE_GATE_ZONE_FAMILY.md) are the zone type for art and level design. `EBiomeType` (Desert/Forest/Marsh/Canyon) drops to **terrain dressing + weather only** and is out of the art vocabulary. `EPlanetoidAlignment` is **not** a zone type. **Neither C++ enum is deleted** — biome keeps working as an input.
 
@@ -28,7 +30,16 @@ Status values: `LOCKED` `OPEN` `IN PROGRESS` `GATE FAILED` `CLOSED` `GATE READY`
 
 ---
 
-### ENV-ART PROTOTYPE — active (Lead 2026-10-01, `TG-ZONE-VOCABULARY` 4/4)
+### ENV-ART PROTOTYPE — enrolled in T0 (Lead 2026-10-02)
+
+> **No longer a separate track.** The Lead folded env art into T0 MUST work because the
+> mechanic families *are* the beats — `T0_M12` is the `heal` family's only prototype
+> appearance, and it currently has no volume anywhere. Art is now a **column in the T0 bite
+> table**, not a parallel workstream. See
+> [`Docs/TaskLists/T0_PROTOTYPE_TRACK.md` §5](../Docs/TaskLists/T0_PROTOTYPE_TRACK.md).
+> Details preserved below.
+
+### ENV-ART PROTOTYPE — original scope (Lead 2026-10-01, `TG-ZONE-VOCABULARY` 4/4)
 
 | Field | Value |
 |---|---|
