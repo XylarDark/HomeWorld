@@ -16,7 +16,7 @@ const net = require('net');
 const path = require('path');
 
 const projectRoot = path.resolve(__dirname, '..');
-const configPath = path.join(projectRoot, 'config', 'preflight-ue.json');
+const configPath = path.join(projectRoot, 'Config', 'preflight-ue.json');
 
 const PREFIX = 'preflight:ue';
 
