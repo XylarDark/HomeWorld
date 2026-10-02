@@ -172,6 +172,60 @@
     }
   ],
   "measurements": {
+    "SM_Beast_Pad_A": {
+      "bbox": [
+        2.6,
+        1.4,
+        2.2
+      ],
+      "lowest_vert_z_world": -96.1,
+      "materials": [],
+      "name": "SM_Beast_Pad_A",
+      "origin_z_world": -95.0,
+      "parent": null,
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        0.0,
+        -80.0,
+        -95.0
+      ]
+    },
+    "SM_Beast_Pad_B": {
+      "bbox": [
+        2.6,
+        1.4,
+        2.2
+      ],
+      "lowest_vert_z_world": -96.1,
+      "materials": [],
+      "name": "SM_Beast_Pad_B",
+      "origin_z_world": -95.0,
+      "parent": null,
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        0.0,
+        -80.0,
+        -95.0
+      ]
+    },
     "SM_Cabin_Chimney": {
       "bbox": [
         0.6,
@@ -698,6 +752,141 @@
         1.45
       ]
     },
+    "SM_Camp_Bedroll_A": {
+      "bbox": [
+        1.9,
+        0.7,
+        0.4
+      ],
+      "lowest_vert_z_world": -95.2,
+      "materials": [],
+      "name": "SM_Camp_Bedroll_A",
+      "origin_z_world": -95.0,
+      "parent": null,
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        20.0,
+        -80.0,
+        -95.0
+      ]
+    },
+    "SM_Camp_Bedroll_B": {
+      "bbox": [
+        1.9,
+        0.7,
+        0.4
+      ],
+      "lowest_vert_z_world": -95.2,
+      "materials": [],
+      "name": "SM_Camp_Bedroll_B",
+      "origin_z_world": -95.0,
+      "parent": null,
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        20.0,
+        -80.0,
+        -95.0
+      ]
+    },
+    "SM_Camp_Fire": {
+      "bbox": [
+        1.6,
+        1.6,
+        1.2
+      ],
+      "lowest_vert_z_world": -95.6,
+      "materials": [],
+      "name": "SM_Camp_Fire",
+      "origin_z_world": -95.0,
+      "parent": null,
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        20.0,
+        -80.0,
+        -95.0
+      ]
+    },
+    "SM_Camp_GuardStake": {
+      "bbox": [
+        0.4,
+        0.4,
+        0.9
+      ],
+      "lowest_vert_z_world": -95.45,
+      "materials": [],
+      "name": "SM_Camp_GuardStake",
+      "origin_z_world": -95.0,
+      "parent": null,
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        20.0,
+        -80.0,
+        -95.0
+      ]
+    },
+    "SM_Camp_Lashings": {
+      "bbox": [
+        0.6,
+        0.6,
+        1.5
+      ],
+      "lowest_vert_z_world": -95.75,
+      "materials": [],
+      "name": "SM_Camp_Lashings",
+      "origin_z_world": -95.0,
+      "parent": null,
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        20.0,
+        -80.0,
+        -95.0
+      ]
+    },
     "SM_Cliff_CabinFace": {
       "name": "SM_Cliff_CabinFace",
       "parent": null,
@@ -857,6 +1046,33 @@
         0.0,
         0.0,
         0.0
+      ]
+    },
+    "SM_Dung_Pile_01": {
+      "bbox": [
+        0.5,
+        0.5,
+        0.15
+      ],
+      "lowest_vert_z_world": -95.075,
+      "materials": [],
+      "name": "SM_Dung_Pile_01",
+      "origin_z_world": -95.0,
+      "parent": null,
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        0.0,
+        -80.0,
+        -95.0
       ]
     },
     "SM_GardenBed_A": {
@@ -1032,6 +1248,60 @@
         -3.5,
         -0.4,
         0.38
+      ]
+    },
+    "SM_Gather_Bush_01": {
+      "bbox": [
+        0.8,
+        0.8,
+        0.6
+      ],
+      "lowest_vert_z_world": -95.3,
+      "materials": [],
+      "name": "SM_Gather_Bush_01",
+      "origin_z_world": -95.0,
+      "parent": null,
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        0.0,
+        -80.0,
+        -95.0
+      ]
+    },
+    "SM_Herb_Clump_01": {
+      "bbox": [
+        0.7,
+        0.7,
+        0.5
+      ],
+      "lowest_vert_z_world": -95.25,
+      "materials": [],
+      "name": "SM_Herb_Clump_01",
+      "origin_z_world": -95.0,
+      "parent": null,
+      "pivot_is_ground_contact": false,
+      "polys": 6,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "scale_applied": true,
+      "tris": 12,
+      "type": "MESH",
+      "world_origin": [
+        0.0,
+        -80.0,
+        -95.0
       ]
     },
     "SM_IslandTop": {
@@ -1556,7 +1826,66 @@
     }
   },
   "passed": false,
-  "placed": {},
+  "placed": {
+    "SM_Beast_Pad_A": "exists",
+    "SM_Beast_Pad_B": "exists",
+    "SM_Cabin_Chimney": "exists",
+    "SM_Cabin_Door": "exists",
+    "SM_Cabin_Foundation": "exists",
+    "SM_Cabin_Porch_Deck": "exists",
+    "SM_Cabin_Porch_Post": "exists",
+    "SM_Cabin_Porch_Rail": "exists",
+    "SM_Cabin_Roof_A": "exists",
+    "SM_Cabin_Roof_B": "exists",
+    "SM_Cabin_Wall_Back": "exists",
+    "SM_Cabin_Wall_Front": "exists",
+    "SM_Cabin_Wall_Side_L": "exists",
+    "SM_Cabin_Wall_Side_R": "exists",
+    "SM_Cabin_Window_Frame": "exists",
+    "SM_Cabin_Window_Pane": "exists",
+    "SM_Camp_Bedroll_A": "exists",
+    "SM_Camp_Bedroll_B": "exists",
+    "SM_Camp_Fire": "exists",
+    "SM_Camp_GuardStake": "exists",
+    "SM_Camp_Lashings": "exists",
+    "SM_Cliff_CabinFace": "exists",
+    "SM_Cliff_Chunk_Torn": "exists",
+    "SM_Cliff_LookoutFace": "exists",
+    "SM_Cliff_Rear": "exists",
+    "SM_Cliff_Slab_A": "exists",
+    "SM_Cliff_Slab_B": "exists",
+    "SM_Cliff_Slab_C": "exists",
+    "SM_Dung_Pile_01": "exists",
+    "SM_GardenBed_A": "exists",
+    "SM_GardenBed_B": "exists",
+    "SM_GardenBed_C": "exists",
+    "SM_GardenBed_Soil": "exists",
+    "SM_Gather_Bush_01": "exists",
+    "SM_Herb_Clump_01": "exists",
+    "SM_Island_Hero": "exists",
+    "SM_Kettle_Body": "exists",
+    "SM_Kettle_Handle": "exists",
+    "SM_NODE_PLANT_SLOT_DAY_PLANTED": "exists",
+    "SM_NODE_PLANT_SLOT_SPIRIT_NURTURED": "synthesis",
+    "SM_Pine_Homestead_L": "exists",
+    "SM_Pine_Homestead_M": "exists",
+    "SM_Pine_Homestead_S": "exists",
+    "SM_PlantSlot_Soil": "exists",
+    "SM_PlantSlot_Sprout": "exists",
+    "SM_Rune_Stone": "exists",
+    "SM_SPIRIT_SHRINE_WOUND_OPEN": "synthesis",
+    "SM_SPIRIT_WOUND_MARKER_WOUND_OPEN": "synthesis",
+    "SM_Shrine_Homestead_Base": "exists",
+    "SM_Shrine_Homestead_Lintel": "exists",
+    "SM_Shrine_Homestead_PortalGlow": "exists",
+    "SM_Shrine_Homestead_Post_L": "exists",
+    "SM_Shrine_Homestead_Post_R": "exists",
+    "SM_Wound_Glow": "exists",
+    "SM_Wound_Lintel_Broken": "exists",
+    "SM_Wound_Plinth": "exists",
+    "SM_Wound_Post_L": "exists",
+    "SM_Wound_Post_R": "exists"
+  },
   "spec_ids": [
     "CABIN_MODULES",
     "GARDEN_BLOCKING",
@@ -1566,6 +1895,6 @@
   ],
   "unassigned": [],
   "volumes_assertable": 4,
-  "volumes_measured": 60,
-  "volumes_present": 51
+  "volumes_measured": 70,
+  "volumes_present": 61
 }
