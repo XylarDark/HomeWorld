@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | **Gate id** | `TG-T0-ASSETS` |
-| **Status** | **RESOLVED — Round 1 (2/2), Round 2 (2/2 answered, 1 recorded expansion)** |
+| **Status** | **Round 3 RESOLVED (2/2).** Rounds 4–5 parked — see §9 |
 | **Job** | **taste** (art design + game mechanic design) |
 | **Heuristic** | Docs/28 **1** — would change art bible §8 shape language or a shot; and the families that are untaught are a **product** gap (6) |
 | **Owner** | human |
@@ -155,7 +155,17 @@ Recorded verbatim because it is a structural decision, not a preference:
 **Consequences, and they are large:**
 
 1. **Combat is a family you travel to**, not a place you happen to be in. Q6-A and Q6-C are
-   both superseded — the camp is not inside the spirit path and not a waypoint on it.
+   both superseded — the camp is a zone of its own with its own mechanic language, reached
+   from the field rather than passed through on the way somewhere.
+
+   ⚠️ **Correction, 2026-10-02.** This entry previously read *"the camp is not inside the
+   spirit path"* — reasoning about the camp's location relative to a **route through
+   space**. That was wrong. `TOD_NIGHT_SPIRIT` is a frozen **prove label**, not a place: it
+   names *the night-time state after bed + sleep-gate + rune, on the planet side*. It
+   appears in 7 T0 prove documents and **nowhere in `VISION.md`, `00_CANON` or `GDD_MVP`**.
+   Canon says *"we go to bed and our astral bodies defend our land"* — night is a **form**,
+   not a corridor. The wording is fixed above; nothing else in this gate depended on it,
+   but it is recorded because the reasoning was wrong, not merely unclear.
 2. **The pine forest is a real environment job.** "Dense, walled, close horizon" is a
    different art problem from "open field", and the existing `SM_PineValley_Block_A/B` are
    massing blocks, not a forest you walk into. This is **more** work than either option I
@@ -177,10 +187,82 @@ is coherent, it matches *"lookout dominance — you see the next two sections an
 their silhouette families"* better than a single zone would, and the Lead has said it plainly.
 But it adds an environment pass and a treeline boundary that no T0 beat currently names.
 
-**Not decided here, and now load-bearing:** does the spirit path run through the open field,
-the forest, or both? And is the wound in the forest? Those follow from Q6 and are Round 3.
+**Not decided here, and now load-bearing:** is the wound in the open field or the pine forest?
+A spirit site in the gather zone teaches gather; the same site in the combat zone muddies
+combat. That is Round 3.
 
-### Q4, Q5, Q7, Q8 — still open, unchanged
+---
+
+## Round 3 — RESOLVED 2026-10-02: THE VISION QUESTION
+
+Round 2's answer exposed a larger problem. **The Vision documents do not currently describe
+the game the musts are building.** Three measured conflicts, all found by reading rather than
+guessed:
+
+| # | Conflict | Sources | Why it blocks |
+|---|---|---|---|
+| **V1** | **Two different games.** *"Act 1 Lone Wanderer — crash-land, scout biomes, fight bosses, claim home. Solo, 2-3h. The family has been taken"* vs *"Act 2 — ruined homestead, repair and rebuild, keep family safe"* | `VISION.md:11`, `:17`, `:26` vs `VISION.md:56`, `:79` | The homestead T0 builds is a **standing home**, not a ruin. No family, no rescue, no repair. One of these is the real game and the other is a different product |
+| **V2** | **Night is three incompatible things.** ① *astral bodies defend the land* ② *day = reap, night = convert* ③ *bed + rune gate a spirit **form*** | `VISION.md` §Day-and-night · `Docs/21` product canon · T0 #9/#11 | T0's spirit is something you **become**. VISION's astral is something you **are** and defend with. These produce different controls, different verbs, and a different night |
+| **V3** | **The Vision board is 6 months stale against the musts.** | `PROTOTYPE_SCOPE.md` and `MVP_TUTORIAL_PLAN.md` last touched **2026-03-08**; `VISION.md` **2026-09-19**; every taste decision is **2026-10-01** | The March docs name *"Claim homestead"* as the vertical-slice moment. T0's moment is the camp night. A Vision board that predates the musts cannot direct them — and the two-zone world shape from Q6 exists in no document at all |
+
+**Q7 — Is this the Lone Wanderer game, or the homestead-and-family game?**
+
+- **A (recommended)** — **Lone Wanderer.** T0 is built on it: solo, no family, a homestead you
+  *hold* rather than repair, and conversion as the answer to combat. `VISION.md:11` wins and
+  `:56`/`:79` become the Act-3 text they were always reaching toward. Cost: the emotional
+  engine of the theme — protecting someone — is absent from the prototype, and the game is
+  harder to feel good about.
+- **B** — **Homestead and family.** T0 becomes the first act of a larger game rather than a
+  self-standing slice. Cost: substantial new content (the family, the rescue, the ruin) that
+  no T0 beat names, and the musts stop being the scope.
+
+**Q8 — When the night falls, what is the player?**
+
+- **A (recommended)** — **A form they become** (T0 as built). Sleep, wake, change. The
+  conversion design fits cleanly: you meet foes in spirit and they become people. Cost: the
+  "defend your land with your astral body" reading of VISION has to be rewritten, not
+  softened.
+- **B** — **A body they defend with** (VISION as written). You remain yourself at night and
+  fight for the homestead. Cost: `TOD_NIGHT_SPIRIT` and the whole form-gate law in T0 #9/#11
+  are re-specified, and the bed/rune gates lose their reason.
+- **C** — **Both, and the night is the seam.** Spirit is a form you can *enter* deliberately
+  rather than a phase you fall into. Cost: strongest fiction, and it needs a third verb
+  nobody has specified.
+
+**Q9 — What is the Vision board's job now?**
+
+Not a question so much as a decision this gate must record. **(a)** rewrite `VISION.md` to
+describe the game the musts are building and mark the March docs as superseded; **(b) leave
+`VISION.md` as long-horizon theme and add a separate short `VISION_PROTOTYPE.md` that the
+musts are actually steered by; **(c)** leave Vision alone and rely on T0 alone.
+
+### Settled
+
+| Fork | Answer | Consequence |
+|---|---|---|
+| **Q7 — which game** | **Lone Wanderer** (2026-10-02, Lead) | `VISION.md:11` wins. `:56`/`:79` are Act-2+ text — deferred, not deleted. No family, no rescue, no ruin. A homestead you **hold**, not repair |
+| **Q8 — what is the night** | **A form they become** (2026-10-02, Lead) | Bed → sleep gate → rune → **spirit** → dawn → body. Not a body you defend with, not a phase that happens to you. VISION's astral-defend reading is **rewritten, not softened** |
+| **Q9 — the board's job** | **(b)** — a new short board; `VISION.md` untouched | `Docs/VISION_BOARD.md` is canon for product work. `VISION.md` **keeps theme + long-horizon campaign and is NOT rewritten or retired.** The March docs are superseded **for prototype scope** only |
+
+**Written to** [`Docs/VISION_BOARD.md`](../VISION_BOARD.md), linked from `AGENTS.md` as the
+first thing to read before scoping anything.
+
+### The costs, recorded so they are not re-litigated
+
+1. **The theme loses its engine in the prototype.** *"Love as Epic Quest"* — and there is
+   nobody to protect. Accepted because the alternative is a rescue arc that no must names.
+2. **The astral-defend fiction is gone.** The player is not a projected body defending a home.
+   They are something else, in a form capable of changing someone. That is a different night.
+3. **A 23,000-character Vision document still describes a bigger game.** Deliberate — it is
+   the reason the prototype exists, and deleting it would be the wrong kind of tidy.
+
+### Still open after Round 3
+
+| # | Fork | Now matters because |
+|---|---|---|
+| Q4 | Plant slot reads as `heal` or as garden? | `heal` is in scope with exactly one volume, so that volume **is** the family |
+| Q5 | Rune: `stealth` or `spirit`? | `stealth` is in scope with exactly one volume — same situation |
+| Q7 | Island-top truth; `M_FamilySilhouette` / `M_ValleyNight` | unchanged; still blocking the report |
 
 | # | Fork | Now matters because |
 |---|---|---|
@@ -200,7 +282,7 @@ Held so Round 1 is answerable in two questions. Already queued:
 | Q5 | **The rune: `stealth` or `spirit`?** | MUST #7 is a *gate flag*, not a place. I authored a low broken stone because stealth means *low broken horizontal, never a closed mass* — but a tall monolith measured 2.00 and I judged the family over the object. A gate flag may deserve a different family entirely |
 | Q6 | **The island top: which document is truth?** | `SM_IslandTop.json` says 21×14×0.5 crust · `GRAYBOX_LAYOUT.md` §1 says 21×14×**4.0** · the blend is 19.3×10.7×0.45. Three answers, none matching |
 | Q7 | **`M_FamilySilhouette` and `M_ValleyNight`** | In the blend, not among the ten masters. Either remap, or justify as named instances — art bible §10 allows instances and the allowed list predates these |
-| Q8 | **Is the camp a *section* or a *place inside the spirit section*?** | TG-ZONE-FAMILY says one family per section. If the camp is its own section it is a `combat` section and needs ~84 m; if it sits inside the spirit path it does not |
+| ~~Q8~~ | ~~Is the camp a section or a place inside the spirit section?~~ | **Superseded by Q6.** The camp is its own zone with its own mechanic language. |
 
 ---
 

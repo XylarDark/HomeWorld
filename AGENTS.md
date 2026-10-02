@@ -5,6 +5,7 @@
 | Path | Role |
 |------|------|
 | **[START_HERE.md](START_HERE.md)** | Swarm entry — Human Lead gates, Conductor boot |
+| **[Docs/VISION_BOARD.md](Docs/VISION_BOARD.md)** | **CANON for product work — read this before scoping anything.** The prototype in one page: the game, the seven mechanic families, the three zones, the 13 musts, and the four moments it must feel like. Settled by the Lead 2026-10-02 (`TG-T0-ASSETS` Round 3): the game is the **Lone Wanderer** and night is **a form you become**. `VisionBoard/Core/VISION.md` keeps **theme + long-horizon campaign**; the March docs under `VisionBoard/MVP/` are **superseded for prototype scope** |
 | **`Docs/`** (capital D) | **Signed MVP product canon** — GDD, art bible, export table, audit WAVEs ([Docs/README.md](Docs/README.md)) |
 | **`docs/`** (lowercase) | UE 5.8 engineering — setup, PCG, automation, known errors ([docs/README_ENGINEERING.md](docs/README_ENGINEERING.md)) |
 
