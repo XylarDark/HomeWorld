@@ -47,11 +47,9 @@ from homeworld_graybox_spec import (  # noqa: E402
     MASTER_NAMES,
     Volume,
     all_spec_ids,
-    family_for,
     load_all_specs,
     load_all_zone_specs,
     resolve_alias,
-    volume_family_status,
 )
 
 #: Per-class poly budget, asserted not assumed (DEC-0018). From

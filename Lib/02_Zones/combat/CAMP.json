@@ -1,0 +1,71 @@
+{
+  "id": "CAMP",
+  "type": "SM_ zone",
+  "status": "SPEC_READY_NOT_BUILT",
+  "date": "2026-10-02",
+  "phase": "T0_M8_M13_M14_plus_R5",
+  "owner": "agent",
+  "family": "combat",
+  "role": "The camp. Serves MUST #8 (day eject), #13 (portal arrival) and #14 (night: avoid 1 guard, soothe 2 sleepers), and after TASTE_GATE_T0_ASSETS Round 5 it is also where the companion is taken. This is the first spec to cover the camp; previously NO spec named it, which is the same coverage gap that hid the shrine defect (lintel on the ground, posts stacked) for the whole pipeline.",
+  "units": "meters",
+  "apply_scale": true,
+  "origin": "assembly_origin",
+  "size_m": { "x": 18.0, "y": 18.0, "z": 1.8 },
+  "world_origin": [20.0, -80.0, -95.0],
+  "why_this_origin": [
+    "Round 2 (Q6) settled the second zone as PINE FOREST WITH CAMP, so the camp is in the forest. Layout inside the forest is still the Lead's.",
+    "Placed ~14 m from SM_Shrine_Return at (6, -75, -95). The return shrine is the spirit node you come down through; the camp is what you come down FOR. Proximity makes the portal read as a door rather than a teleport."
+  ],
+  "materials": [
+    { "slot": "fire_and_wedges", "master": "M_CliffRock" },
+    { "slot": "canvas_and_bedroll", "master": "M_WoodCabin" },
+    { "slot": "spirit_glow", "master": "M_SpiritUnlit" }
+  ],
+  "locked_signature": "jagged asymmetric wedge, tallest in frame",
+  "signature_note": "'Tallest in frame' is read here as RELATIVE dominance - the fire is the tallest thing among its immediate neighbours (0.4 m bedrolls, 0.9 m stakes), not as the band 'tall'. Combat does not need to be tall in itself; it needs to win the frame. This reading is mine and is flagged for the Lead, because ASPECT_BANDS would otherwise read the fire as 'mid' and call it non-conforming.",
+  "modules": [
+    { "name": "SM_Camp_Fire", "size_m": [1.6, 1.6, 1.2], "role": "jagged_asymmetric_wedge_tallest_in_frame", "measured_from": "authored, not built" },
+    { "name": "SM_Camp_GuardStake", "size_m": [0.4, 0.4, 0.9], "role": "marks_where_the_guard_holds_post", "measured_from": "authored, not built" },
+    { "name": "SM_Camp_Bedroll_A", "size_m": [1.9, 0.7, 0.4], "role": "sleeper_one", "measured_from": "authored, not built" },
+    { "name": "SM_Camp_Bedroll_B", "size_m": [1.9, 0.7, 0.4], "role": "sleeper_two", "measured_from": "authored, not built" },
+    { "name": "SM_Camp_Lashings", "size_m": [0.6, 0.6, 1.5], "role": "holds_the_companion - the thing you must calm a guard to reach", "measured_from": "authored, not built", "new_in_round_5": true }
+  ],
+  "beat_nodes": [
+    { "label": "NODE_GUARD", "at_offset": [3.0, -2.0, 0.0], "actor": "AHomeWorldCharacter or NPC placeholder", "note": "A NODE is where the guard holds post. The guard is an ACTOR, not greybox geometry - do not model a guard as a prop." },
+    { "label": "NODE_SLEEPER", "at_offset": [-2.5, 2.5, 0.0], "count": 2, "actor": "as above", "note": "Two. Soothed, never killed - the conversion law." },
+    { "label": "NODE_CAPTIVE", "at_offset": [0.0, 4.0, 0.0], "actor": "the companion", "note": "NEW in Round 5. No T0 label exists for this yet - see new_labels_needed." },
+    { "label": "NODE_PORTAL_CAMP", "at_offset": [0.0, 0.0, 0.0], "note": "Arrival point for #13. Reuses shrine language per the must list." }
+  ],
+  "triggers": [
+    {
+      "name": "EJECT_TRIGGER_GUARD_WAKES",
+      "shape": "sphere",
+      "radius_m": 6.0,
+      "at_offset": [3.0, -2.0, 1.8],
+      "on_player_enter_with_guard_aware": "kidnap the companion; eject player to homestead",
+      "settled": "Q22, Lead 2026-10-02 - A GUARD WAKES. This is the first trigger of any kind in T0; there is no death, no capture and no failure state anywhere else in the prototype."
+    }
+  ],
+  "new_labels_needed": [
+    "NODE_CAPTIVE - Round 5 puts a loved one in this camp. No label in T0_MECHANIC_INVENTORIES_V1 names them. The must list needs one before this is buildable without inventing."
+  ],
+  "open_questions": [
+    "Q15, still parked: is the clearing ~84 m across as the old measurement suggested, or a smaller one? The ZONE is settled (pine forest with camp); its SIZE is not. The 18 x 18 m above is a placeholder chosen so all four beat nodes and a guard patrol fit with room to walk around them - it is not a recommendation.",
+    "Layout inside the clearing - where the fire sits relative to the bedrolls, which side the lashings are on, where the portal opens - is the Lead's. It decides whether the player can see the captive from the portal, which decides whether the rescue reads as a choice or a scripted walk.",
+    "Does the lashings read as a cage? A cage invites killing the guard to open it, which inverts the beat. The whole point is that the only way through is to calm them."
+  ],
+  "measured": null,
+  "measured_note": "DELIBERATELY NULL. Nothing here is built, so there is nothing to measure. Every size above is authored from the 1.8 m adult reference and the must labels, and is recorded as 'authored, not built' per module. A reader run will report this assembly as MISSING until it exists - that is the correct report, and it should not be suppressed.",
+  "why_this_spec_exists_first": [
+    "The reader only validates what a spec names. The shrines were in no spec at all, so a shrine with its lintel on the ground and both posts stacked survived every gate until someone measured the envelope by hand.",
+    "The camp has THREE prove scripts that currently prove nothing: t0_m8_day_camp_eject_prove.py, t0_m13_portal_camp_prove.py, t0_m14_camp_night_prove.py. They have no geometry to run against.",
+    "M8, M13 and M14 are all NO_VERDICT or PROVISIONAL in the must list, and all three are waiting on exactly this."
+  ],
+  "rejects": [
+    "cage_as_the_locked_object",
+    "kill_the_guard_to_open_it",
+    "camp_as_a_tent_village",
+    "modeling_an_actor_as_greybox_prop",
+    "claiming_measurements_for_unbuilt_geometry"
+  ]
+}
