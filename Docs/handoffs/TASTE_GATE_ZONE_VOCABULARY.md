@@ -79,7 +79,79 @@ architecture — agent-owned, logged as DEC-0023, not gated here.
 | Treating `EBiomeType` as already-settled | It predates TG-ZONE-FAMILY (2026-03 vs 2026-10-01) and was never reconciled with it. Shipped code is not a decision the Lead made *about this fork*. |
 | Re-asking scope rounds 1–4 | Closed 2026-09-24. Co-op, persistence, day/night loop, look automation are settled and are not reopened here. |
 
+---
+
+## Round 2 — PENDING (issued 2026-10-01 on Lead request)
+
+Round 1 settled the *vocabulary*. It did not pick a first family, and that is
+level design — Lead-owned. Three families (`heal`, `stealth`, `combat`) have no
+volume anywhere in the 39-volume layout, and `gather` / `spirit` are measured
+**non-conforming to their own locked signatures**, so the choice of first target
+determines everything after it.
+
+### Q7 — Which family gets the first prototype?
+
+**RESOLVED 2026-10-01 → `spirit`.** The only family whose volumes are already placed
+in the world *and* already fail its own locked signature, so the prototype has a measurable
+before and after. Shrines exist on both homestead and planet-side, so it exercises "one
+signature silhouette shared across sections". Clears half of the one collision finding.
+
+### Q8 — Does the greybox author the see-through gap?
+
+**RESOLVED 2026-10-01 → author the gap.** Four posts and a lintel, real topology,
+hard-shaded, ~200 tris. The spirit signature is the only one whose defining feature is not a
+proportion, so resizing boxes cannot satisfy it. The openness term in
+`homeworld_graybox_silhouette.py` gets something real to measure instead of a proxy.
+
+**What this commits the agent to:**
+
+| # | Commitment | Why it follows |
+|---|---|---|
+| 1 | A spirit kit in `Lib/02_Zones/Spirit/` with real open-topology volumes | DEC-0024, one directory per family |
+| 2 | The two shrines must move from `mid` band to `tall` | Measured non-conformance today |
+| 3 | `SM_SpiritWound_01` must move from `flat` and lose its collision with `SM_BeastPad_01` | It is half of the one collision finding |
+| 4 | **No `Content/` promote** | `Docs/20_UASSET_AI_POLICY.md` — drafts only, sidecar + `AI_ASSET_LOG` row on promote |
+| 5 | Openness must be *measured from the gap*, not inferred from thickness | Q8 authorised real topology precisely so the proxy can be replaced |
+
+⚠️ **Recorded honestly:** authoring the gap is the first time this pipeline writes geometry
+that is *not* a box or a scaled box. The art bible (§5 Layer A, "cut facets on purpose, hard
+edges") and DEC-0019 (never overwrite authored geometry) both apply, and the existing
+`SM_Shrine_Homestead` / `SM_Shrine_Return` assemblies already exist in the blend with real
+topology (base/posts/lintel/glow, per `MVP_EXPORT_MANIFEST.md`). **The prototype should
+therefore *correct* those assemblies in place rather than author new ones beside them** —
+otherwise the blend ends up with two rival spirit shrines and criterion 1 fails twice over.
+
+---
+
+Measured evidence, all from `docs/qa/GRAYBOX_SPEC_REPORT.md` and
+`Lib/00_Core/GRAYBOX_LAYOUT.md`:
+
+| Family | Volumes today | Measured conformance to its locked signature |
+|---|---|---|
+| `spirit` | 3 — `SM_Shrine_Homestead`, `SM_Shrine_Return`, `SM_SpiritWound_01` | **2 of 3 fail.** Both shrines read `mid`; `SM_SpiritWound_01` reads `flat`. Signature is *tall thin vertical with a see-through gap*. |
+| `gather` | 1 — `SM_Gather_FirstHarvest` | 1 of 1 fails (reads `low`, signature `flat`). |
+| `nurture_tame` | 1 — `SM_BeastPad_01` | conforms, but **collides** with `SM_SpiritWound_01` (both flat, aspects 0.05 / 0.17). |
+| `build_place` | 14 | already prototyped — the homestead |
+| `heal` / `stealth` / `combat` | **0** | nothing authored anywhere |
+
+- **A (recommended)** — **`spirit`.** It is the only family whose volumes are *already placed in the world* and *already fail their own signature*, so the prototype has a measurable before and after, needs no new level layout invented, and exercises "one signature silhouette shared across sections" — spirit shrines exist on both homestead and planet-side. It also clears the one collision finding, since `SM_SpiritWound_01` is half of that pair.
+- **B** — **`gather`.** The first family a player meets in Act 1 explore → fight → build, so the earliest teachable mechanic. Smaller delta than spirit (1 volume, not 2).
+- **C** — **`combat`.** The clearest gap, and combat is placeholder-only by AGENTS.md so nothing deep is implied. But it authors a family whose mechanics are explicitly deferred, and combat placeholder art is the cheapest possible read to get wrong.
+- **D** — **`heal` or `stealth`.** Also empty. Requires inventing a section from nothing, with no authored geometry to verify against.
+
+### Q8 — If spirit: does the greybox author the *see-through gap*?
+
+Consequence of Q7-A. The spirit signature is the only one whose defining feature is **not a proportion** — *"tall thin vertical **with a see-through gap**"*. A proportion metric cannot see a gap; the openness term in `homeworld_graybox_silhouette.py` only proxies it. So "spirit looks right at 20 m" cannot be finished by resizing boxes.
+
+- **A (recommended)** — **Author the gap in greybox.** Four posts and a lintel, real topology, still hard-shaded and still ~200 tris. Costs more than a box, and it is the only way the "environment alone" read is honestly satisfied at the prototype tier. The openness proxy then has something real to measure.
+- **B** — **Box-and-post silhouette, no authored gap.** Resize to tall-and-thin, mark openness as *deferred*, and accept that spirit is **not yet** announced correctly by shape alone. Cheapest, but the prototype then fails the rule the whole gate exists to enforce, and the report would say so.
+- **C** — **Skip.** Leave spirit alone this round and author the first prototype in a family whose signature *is* pure proportion, where greybox can actually finish the job.
+
+---
+
 ## Round log
 
 - Round 1, 2026-10-01 — Q1 horizon lock, Q2 zone-type axis. **RESOLVED 2/2.**
-- Round 2 — not started. Opens only when the Lead asks, and only for a fork this gate did not settle.
+- Round 2, 2026-10-01 — Q7 first family (**spirit**), Q8 the see-through gap (**author it**). **RESOLVED 2/2.**
+
+**Gate CLOSED.** Round 3 opens only on Lead request, and only for a fork this gate did not settle.

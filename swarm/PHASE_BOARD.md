@@ -28,6 +28,21 @@ Status values: `LOCKED` `OPEN` `IN PROGRESS` `GATE FAILED` `CLOSED` `GATE READY`
 
 ---
 
+### ENV-ART PROTOTYPE — active (Lead 2026-10-01, `TG-ZONE-VOCABULARY` 4/4)
+
+| Field | Value |
+|---|---|
+| Family | **`spirit`** — first env-art prototype |
+| Tier | Greybox / prototype. **Drafts only**, no `Content/` promote (Docs/20) |
+| Kit | `Lib/02_Zones/Spirit/` — new directory per family (DEC-0024) |
+| Topology | **See-through gap authored** — four posts + lintel, ~200 tris (Q8) |
+| Existing assets | Correct `SM_Shrine_Homestead` / `SM_Shrine_Return` **in place**; no rival shrines |
+| Must fix | Both shrines `mid` → `tall`; `SM_SpiritWound_01` `flat` → tall, clearing its collision with `SM_BeastPad_01` |
+| Verification | `Content/Python/graybox_spec_reader.py` against the live blend |
+| Out of scope | Second family, new biome art, `Content/` promote, any `Docs/` track beyond art bible §8 |
+
+---
+
 ## CAP / EA backlog (historical — Lead DROPPED 2026-09-27)
 
 > **SUPERSEDED IN PART, 2026-10-01 (`TG-ZONE-VOCABULARY` Q1).** The *EA/env-art* half of this

@@ -211,6 +211,14 @@ have **no volume anywhere** in the 39-volume layout, so those families are taugh
 `gather`, `nurture_tame` and `spirit` are measured and **non-conforming**: they read flatter
 and squarer than their signature. Authoring them is level design — Lead-owned, not invented.
 
+**First prototype: `spirit`** (Lead, 2026-10-01, `TG-ZONE-VOCABULARY` Round 2). It is the
+only family both already placed in the world *and* already failing its own signature, so the
+before and after are measurable. The **gap is authored in real topology** — four posts and a
+lintel — because the spirit signature is the only one whose defining feature is not a
+proportion. Correct the existing shrine assemblies in place; do not author rival ones beside
+them. Drafts only — nothing promotes to `Content/` without a sidecar and an
+`AI_ASSET_LOG` row (Docs/20).
+
 ---
 
 ## 9. Shots — approval criteria
