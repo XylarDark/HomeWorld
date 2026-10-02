@@ -214,11 +214,32 @@ This is a **fork, not a bug report**, and it is agent-raised.
 6. **Art: spirit proportion** for bites 3, 12, 13, measured against the live blend.
 7. **Art: clear the 7 graybox findings** — after the island-top fork is decided.
 
+**Sequenced:** see [`T0_ROADMAP.md`](T0_ROADMAP.md) for the full gate order.
+
 **Not started, listed so nothing is invisible:**
 
 8. `heal` family volume — needs a decision before bite 8 can be visually done
 9. `gather` family conformance — reads `low`, signature is `flat`
-10. `combat` family volume — the camp, serves bite 4
+10. `combat` family volume — the camp, serves bites 4, 5, 12, 13. **GATE 1 in the roadmap.**
+
+---
+
+## 7a. Measured: the camp does not exist
+
+2026-10-02, live blend via Blender MCP:
+
+```
+camp_named_objects: []          # no Guard, Sleeper, Camp or Soothe mesh anywhere
+VS_MVP_collection_objects: 6
+```
+
+Only five meshes sit near the camp origin `(12, -90, -95)`: a beast, the beast pad, two hurt
+spirits, and one gathering bush. `GP_RS_HumanoidCamp` and `GP_PortalCamp` exist as **code
+markers only**.
+
+⚠️ **M14 is the climax beat — avoid 1 guard, soothe 2 sleepers — and the camp it happens in
+has no geometry.** The 414-line stealth component will fire on an empty plain. This is the
+single highest-leverage art task in the track: one location, four beats blocked.
 
 ---
 
