@@ -27,7 +27,16 @@
 `TG-T0-ASSETS` Round 3, Lead 2026-10-02. Two conflicts in `VISION.md` made the board unable
 to direct anything. Both are now settled.
 
-### V1 — The game is the **Lone Wanderer**
+### V1 — The game is the **Lone Wanderer** — **SUPERSEDED 2026-10-02**
+
+> **SUPERSEDED by the Lead, 2026-10-02.** Kept below verbatim so the change is auditable.
+> The "Is not" list **no longer holds.** V1's stated cost is the reason:
+>
+> *"The theme's engine is 'Love as Epic Quest' — and this removes the thing you love from the
+> prototype. That is a real loss, not a technicality."*
+>
+> The Lead's answer was to put the loved one back and make the rescue a prototype beat. See
+> **V1b** below and `Docs/handoffs/TASTE_GATE_T0_ASSETS.md` Round 5.
 
 `VISION.md:11` wins. `:56` and `:79` were Act-2 text reaching toward a game this prototype is
 not.
@@ -44,6 +53,28 @@ building a rescue arc that no must names.
 
 **Deferred, not deleted:** the family, the rescue and the ruin are **Act 2+ text**. They live
 on in `VISION.md` and nothing in this prototype contradicts them.
+
+### V1b — The **companion**, the camp, and the rescue
+
+`TG-T0-ASSETS` Round 5, Lead 2026-10-02. **This is the Act 2 arc V1 deferred, now in the
+prototype** — because the theme needed it and V1 admitted the loss.
+
+| | |
+|---|---|
+| **Is** | a **loved one who travels with you** · the camp takes them · you are **sent back to the homestead** · spirit form is the only way down to the planet side · you **release the guards' grief so they sleep** · then you **take them home** |
+| **Is not** | a kill quest · a rescue by force · a family you keep safe at night · a ruin you repair |
+
+**Love as Epic Quest is now literal:** someone is at stake, they are taken, and you go into the
+dark to get them back. The conversion law holds — the guards are **calmed, not killed**, which
+is the same gesture as the homestead combat, pointed at the people holding your loved one.
+
+**Most of this already exists as musts.** `M9`/`M11` (day boundary), `M11` (spirit form needs
+bed **and** rune), `M13` (home → camp portal) and `M14` (avoid 1 guard, soothe 2 sleepers,
+convert-not-kill) are **the story**. `M14` in particular is *"release the negative emotions
+from the camp guards so they sleep"* written as a technical requirement eight weeks earlier.
+
+**Genuinely new:** the travelling companion, the captive, the kidnapping trigger, and the
+return leg home. **Blocking:** the camp does not exist, so the middle of this story is unbuilt.
 
 ### V2 — Night is **a form the player becomes**
 

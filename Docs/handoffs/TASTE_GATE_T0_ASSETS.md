@@ -286,6 +286,295 @@ Held so Round 1 is answerable in two questions. Already queued:
 
 ---
 
+## Round 4 — RESOLVED 2026-10-02: THE FIRST CONVERTED FOE
+
+Raised by the Lead, 2026-10-02: *"generate something that can satisfy our Love as an
+Epic Quest narrative, something small enough for the prototype."*
+
+Raised by the Lead, 2026-10-02: *"generate something that can satisfy our Love as an
+Epic Quest narrative, something small enough for the prototype."*
+
+### Why this is a fork and not just something I build
+
+The theme's engine is *"Love as Epic Quest"* — and Round 3 removed it from the prototype **on
+purpose**. There is no family to protect, no rescue, no ruined homestead. The Lead accepted
+that cost rather than build an arc that no must names.
+
+**That leaves a hole, and filling it is a narrative decision, not an implementation one.** The
+obvious filler — a letter, a locket, a photograph — is a new asset, a new place and a new
+interaction, and it risks *explaining* the theme instead of *enacting* it. What carries the
+love is the Lead's call.
+
+### The argument for the recommendation
+
+**The conversion mechanic already carries it, and MUST #14 already exists.** You strip sin
+from someone at the pine forest and they become a person. If that person is *still there in the
+morning* — a vendor at your gate, a worker in your garden — then love is the **accumulated
+result of what you did to other people**, not a character you were handed. That is arguably a
+purer reading of *"we do not kill foes"* than a rescue arc would be.
+
+It is also nearly free. `EConvertedFoeRole` already exists (Vendor, Helper, QuestGiver, Pet,
+Worker), the round-robin already assigns one per conversion, and the log already prints it. The
+narrative is **one character persisting across a day boundary. No new system.**
+
+### Settled
+
+| Fork | Answer | Consequence |
+|---|---|---|
+| **Q16 — what carries the theme** | **The converted persist** (2026-10-02, Lead) | One foe converted at the camp night is **visible in the homestead the next day**, in a role. The theme is enforced by the game's own law rather than by a cutscene, and it gives the player a reason to *return home* rather than only leave |
+| **Q17 — their role** | **Vendor, at the homestead gate** (2026-10-02, Lead) | The one role that changes the **space** rather than adding a behaviour. `EConvertedFoeRole::Vendor` is the round-robin's first value, so a single conversion lands on it with **no new code** |
+
+### What this costs, and what it buys
+
+| | |
+|---|---|
+| **Buys** | The prototype becomes demonstrably *"Love as Epic Quest"* — a reviewer can play it, convert someone, sleep, and find them at the gate the next morning. The theme stops being a document claim |
+| **Costs — and it is real** | **Conversion becomes load-bearing.** A player who converts nobody has an empty homestead. That is a *new state to design for*, not a detail |
+| **Costs** | One placeholder character and one spawn, which is the only new art. No new mechanic: the enum, the round-robin and the log all exist (`HomeWorldGameMode.h:17`, `:148`, `:159`) |
+| **Costs** | The role is `Vendor`, which implies trading. That implies an **exchange** the prototype does not have — beat #2 has tea, beat #6 has gathering, and neither is a shop |
+
+### The unresolved consequence, recorded rather than papered over
+
+Choosing **Vendor** commits to a shop the prototype does not contain. Three ways this goes,
+none of them mine to pick:
+
+| | |
+|---|---|
+| **A gate that is not yet a shop** | The vendor stands there. Nothing is for sale yet. The *presence* is the statement; the commerce arrives with Act 2. Cheapest and fully honest |
+| **One item, given not sold** | The vendor hands you tea — the item beat #2 already makes. Closes the loop: you brew tea by day, and the person you changed brings you some. **No currency, no shop, no new system** |
+| **A real shop** | A trade interface, prices, inventory as currency. Genuinely new work, and no must names it |
+
+**Recorded as Round 5.** It is not blocked — a vendor who stands at a gate is a complete beat
+on its own — but shipping a vendor who cannot vend is the kind of incomplete that a reviewer
+notices immediately.
+
+### The beat this attaches to
+
+Not a new MUST. **M14** (`avoid 1 guard, soothe 2 sleepers`) converts; M9/M11 own the day
+boundary; M1 owns waking. The vendor appears at the homestead on the day after an M14
+conversion. **Zero new musts, zero new mechanics** — a persistence rule and one spawn.
+
+---
+
+- **A (recommended)** — **The converted persist.** One foe converted at the camp night is
+  visible in the homestead the next day, in a role. Prototype cost: **one placeholder
+  character**, one spawn, no new mechanic — the role already exists. The theme is enforced by
+  the game's own law rather than by a cutscene, and it gives the player a reason to *return
+  home* rather than only leave. Cost: it makes conversion **load-bearing** — a player who
+  converts nobody has an empty homestead, which is a new state to design for.
+- **B** — **A trace, not a person.** A converted foe leaves something: a tended garden row, a
+  warm window, footprints. Cheaper than a character, arguably sadder. Cost: a trace is a prop,
+  and props are the part of this pipeline least likely to read; the emotion would ride on
+  lighting, the one lever not yet in the prototype.
+- **C** — **No theme object in the prototype at all.** The prototype proves mechanics; the theme
+  arrives with Act 2. Fully consistent with V1. Cost: *"Love as Epic Quest"* is then not
+  demonstrable by anything a reviewer can play, and the key art cannot be shot.
+- **D** — **A letter or a locket.** One readable object in the homestead. Honest, small, and
+  the conventional answer. Cost: it *states* the theme rather than enacting it, and needs a
+  read interaction that nothing in T0 currently has.
+
+### Q17 — If a converted foe persists, what is their role?
+
+- **A (recommended)** — **Vendor**, at the homestead gate. The one role that changes the
+  *space* rather than adding a behaviour: the homestead has a door and a person at it, which
+  is the cheapest way to make "someone is here now" legible. `EConvertedFoeRole::Vendor` is
+  the round-robin's first value, so a single conversion lands on it naturally.
+- **B** — **Worker**, in the garden. Strongest continuity — the garden you planted in #3 is
+  tended by someone you changed. Weakest legibility: a small figure in green is hard to see.
+- **C** — **Pet**, following you. Most immediately readable as companionship, most
+  conventional. Cost: a follower is new AI behaviour — the only option here needing code that
+  does not exist.
+- **D** — **Defer; decide when the first conversion lands in place.** Judged on the ground
+  rather than on paper.
+
+---
+
+## Round 5 — RESOLVED 2026-10-02: THE COMPANION, THE CAMP, THE RESCUE
+
+### Settled
+
+| Fork | Answer | Consequence |
+|---|---|---|
+| **Q18 — who guides** | **Your family, present from the start** (2026-10-02, Lead) | Lead: *"I just posted a prompt that outlines what I want from the family for the prototype."* **V1 is superseded** — see below. Not merged quietly; replaced on the record |
+| **Q19 — what "guide" means** | **A one-line contextual hint** (2026-10-02, Lead) | Interact → one line, chosen from a table by what the player has done. No dialogue tree, no branching, no conversation system. The cheapest thing that satisfies "guide and inform" |
+| **Q20 — the vendor** | **Withdrawn** | Q18 replaces the converted-foe NPC. There is one NPC in the prototype, not two |
+
+### The narrative, as the Lead stated it
+
+> *"A loved one accompanies you in your journey, then when you visit the camp, they are
+> kidnapped and you are booted to the homestead. Then to access the planetside you need to go
+> spirit form and travel down, release the negative emotions from the camp guards so they
+> sleep, then rescue your loved one."*
+
+### This is the Act 2 rescue arc, pulled into the prototype
+
+V1 said, in the Lead's own words: *"a family that is **taken**, not a family to protect"* and
+*"**Is not**: a rescue mission."* Round 3 deferred the family to Act 2+ text.
+
+**That boundary is gone, and the Lead moved it.** `VISION_BOARD.md` §2 carries a supersede
+marker; V1's "Is not" list no longer holds. This is not a mistake being corrected — the theme
+*"Love as Epic Quest"* had no engine in the prototype, the Lead noticed, and put one back.
+
+### The good news: four of the six beats already exist as musts
+
+| Story beat | Existing must | State |
+|---|---|---|
+| Booted to the homestead | `M9`/`M11` — the day boundary is tested and locked | **exists** |
+| To access planetside you need spirit form | `M11` — bed **+** rune both gates. Neither alone works | **exists, tested** |
+| Travel down | `M13` — home → camp spirit portal | **exists** |
+| Release negative emotions from the guards so they sleep | `M14` — *soothe 2 sleepers, convert-not-kill* | **exists** |
+| Avoid 1 guard | `M14` — `NODE_GUARD` | **exists** |
+| **Companion travels with you** | **nothing** | **new** |
+| **The kidnapping** | **nothing** | **new** |
+| **The rescue and the return** | **nothing** | **new** |
+
+**M14 was already this story.** `T0_MECHANIC_INVENTORIES_V1.md:150` reads:
+`NODE_GUARD` → `NODE_SLEEPER` (x2) → `TOD_NIGHT_SPIRIT` → `FORM_SPIRIT`, expected *"Spirit:
+avoid 1 guard; soothe 2 sleepers (convert-not-kill)"*. The Lead's *"release the negative
+emotions from the camp guards so they sleep"* is a **reframe of an existing must**, not new
+design. The guards already hold something and the only way past them is to calm them down.
+
+### What is genuinely new, and it is not small
+
+| New thing | Cost |
+|---|---|
+| **A follower NPC from minute one** | New AI. Flagged in Q17-C as the only option needing code that does not exist. It is back on the table |
+| **A captive** | A new actor with its own state: held, freed, rescued, home |
+| **The kidnapping event** | A trigger, a cutscene-or-not, and a state transition |
+| **The return leg** | Camp → homestead *with* a person. One-way travel becomes a round trip |
+
+### The one hinge nobody has specified
+
+**What ejects you from the camp to the homestead?** There is no death, no capture, and no
+failure state in T0. "Booted" is the story word; mechanically it must be one of: the guards
+wake (guard detection fires), a timer runs out, or entering the camp volume at all. **Each
+answer changes what the player is punished for**, and only one of them makes the kidnapping
+feel forced rather than scripted.
+
+Recorded as **Q22**, the single blocking fork below. Everything else in Round 5 is settled.
+
+### Q22 — What ejects you from the camp to the homestead? **(blocking)**
+
+T0 has **no death, no capture and no failure state.** "Booted" is a story word; mechanically
+something has to trigger the transition, and each answer punishes the player for something
+different.
+
+- **A (recommended)** — **A guard wakes.** You were seen, or you lingered, and detection fires.
+  Cost: it makes the *avoid* half of M14 load-bearing for the first time — the guard stop is no
+  longer flavour, it is what costs you the loved one. That is the best version, because it means
+  the kidnapping is **your fault** and the rescue is the correction.
+- **B** — **You reach the camp and they are simply gone.** No trigger, no failure. The event
+  plays when you arrive. Cost: the player is a passenger. `M14`'s "avoid 1 guard" becomes
+  optional, because nothing is at stake while you do it.
+- **C** — **A timer.** You have until nightfall. Cost: it adds a clock to a prototype with no
+  timer anywhere else, and it argues with `M9`/`M11`, where nightfall is a *choice* you make
+  rather than a deadline you meet.
+
+
+
+---
+
+## Round 5 history — the conflict as it stood, kept for the record
+
+**The Lead's answer to Q17, and a second instruction in the same breath, are two different
+games.** Stated plainly so nobody merges them by accident.
+
+> Q17 answer: *"The converted persist — vendor at the gate."*
+> Then: *"I want family assets to be NPCs who you can talk to for information and are the
+> defecto quest givers and they are the ones who guide and inform you on what to do next as
+> you tutorial around the prototype."*
+
+### The conflict, measured
+
+| Source | Says |
+|---|---|
+| `Docs/VISION_BOARD.md` §2, V1, settled Round 3 | **You are alone.** No family. *"a family that is taken, not a family to protect."* The family is **Act 2+ text** |
+| This instruction | Family **NPCs are in the prototype**, they talk, they give quests, and they **guide the player through it** |
+
+These are not a nuance. Round 3's answer was asked precisely because the game had two
+irreconcilable products in it, and **V1 chose the one without a family.** This instruction
+brings the family back — as tutors rather than as people to save.
+
+**I am not merging them.** Round 4 said the converted persist *as a vendor*; this says family
+NPCs are *quest givers who teach*. Both are "someone is in the homestead." They are not the
+same someone, and building both means two NPC systems in a prototype that has one beat budget.
+
+### What already exists, so the cost is knowable
+
+| Exists | Where | Reusable for |
+|---|---|---|
+| `EConvertedFoeRole::QuestGiver` | `HomeWorldGameMode.h:21` | **the exact role named.** Already a round-robin value |
+| `AHomeWorldSpiritNpcTorchCarrier` | `HomeWorldSpiritNpcTorchCarrier.h:7` | a labelled NPC prop on the planet path — an NPC actor already exists |
+| `UHomeWorldSpiritRosterSubsystem` | full subsystem | a list of named spirits, with save/load — **a quest-giver roster is the same shape** |
+| `SaveCurrentFamilyRoles` / `LoadFamilyRoles` | `HomeWorldSaveGameSubsystem.h:25`,`:29` | family-role persistence across a restart |
+| `UHomeWorldAIController` | "Base AI controller for family/NPCs" | scaffold only; no behaviour |
+| `TryNurtureInFront` and 5 other trace verbs | `HomeWorldCharacter.h:44–61` | the interact pattern a dialogue beat would follow |
+
+**No dialogue system exists.** No text, no speech, no conversation tree. That is the real cost,
+and it is the same cost whether the NPCs are family or converted.
+
+### Q18 — Are the guides your family, or people you converted?
+
+- **A (recommended)** — **They are people you converted.** One NPC, one role, one system. The
+  thing you *did* is what put them there, which keeps the theme causal: love is the result of
+  conversion, not a tutorial convenience. Cost: they only exist if you converted someone, so
+  a first-time player who has not yet reached M14 has **no guide** — which means the tutorial
+  cannot depend on them.
+- **B** — **They are your family, present from the start.** Always there, always able to guide,
+  which is what a tutorial needs. Cost: **re-opens V1.** `VISION_BOARD` must change, the "you
+  are alone" line goes, and the Act-2 boundary moves. This is a real direction change and it
+  is yours to make — I am not going to quietly rewrite the board.
+- **C** — **Both, and they are different things.** Family guides the *known* path; converted
+  people fill the *unguessed* spaces — a converted vendor at the gate is a reward, not a
+  tutorial. Cost: two NPC roles, two behaviours, and a prototype budget that is 13 bites and
+  not 15.
+
+### Q20 — The vendor who cannot yet vend
+
+Carried forward from Round 4. Q17's answer (**Vendor**) commits to commerce the prototype does
+not have, and Q18 may replace that answer entirely. Still recorded rather than dropped.
+
+- **A (recommended)** — **A gate that is not yet a shop.** The converted stands there; nothing is
+  for sale. The *presence* is the statement; commerce arrives with Act 2. Complete beat on its
+  own, zero new system.
+- **B** — **One item, given rather than sold.** The vendor hands you tea — the item beat #2
+  already makes. Closes the loop: brew by day, and the person you changed brings you some. No
+  currency, no shop.
+- **C** — **A real shop.** Trade interface, prices, inventory-as-currency. Genuinely new work, and
+  no T0 beat names it.
+
+### Q19 — What does "guide and inform" mean with no dialogue system?
+
+This is the scope fork inside the scope fork, and it is the one that decides whether this is
+small.
+
+- **A (recommended)** — **A contextual hint line, gated on state.** Interact with an NPC → one
+  line, chosen from a table by what the player has done: no rune → *"There's a mark in the
+  field."*; rune done, no bed → *"Try the bed before you sleep."* No tree, no branching, no
+  conversation. Cost: it is a tutorial hint wearing an NPC, and a reviewer may find it thin.
+- **B** — **A real dialogue tree with branching.** Several nodes per NPC, state-driven, with
+  choices. Cost: **a dialogue system, a UI, and content.** Genuinely weeks of work, and no T0
+  beat names it. It is the "letter or locket" answer again with more machinery.
+- **C** — **No talking. The NPC's presence and position are the instruction.** They stand where
+  the next thing is; you walk to them and the beat happens. Cost: it may not read at all
+  without a HUD arrow, which **environment alone** forbids.
+
+---
+
+## Rounds 6+, parked
+
+| # | Fork | Waiting on |
+|---|---|---|
+| Q10 | Is the spirit wound in the open field or the pine forest? | Lead |
+| Q11 | Does the plant slot read as `heal` or as part of the garden? | Lead |
+| Q12 | The rune: `stealth` or `spirit`? It is a *gate flag*, not a place | Lead |
+| Q13 | The island top: which document is truth? | Lead |
+| Q14 | `M_FamilySilhouette` and `M_ValleyNight` — remap or justify? | Lead |
+| Q15 | The camp clearing — ~84 m or smaller? The *zone* is settled; its size is not | Lead |
+| Q21 | Shrines at 2.4 m, above a 1.8 m adult — keep, or come down and read `tall` by being narrower? | Lead |
+
+---
+
 ## What is NOT being asked, and why
 
 | Not asked | Why |
