@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | **Gate id** | `TG-T0-ASSETS` |
-| **Status** | **RESOLVED Round 1** (2/2) · **Round 2 PENDING** |
+| **Status** | **RESOLVED — Round 1 (2/2), Round 2 (2/2 answered, 1 recorded expansion)** |
 | **Job** | **taste** (art design + game mechanic design) |
 | **Heuristic** | Docs/28 **1** — would change art bible §8 shape language or a shot; and the families that are untaught are a **product** gap (6) |
 | **Owner** | human |
@@ -121,7 +121,75 @@ spirit has a consistent shape.
 
 ---
 
-## Round 2 — will follow, and it is the bigger one
+## Round 2 — RESOLVED 2026-10-02
+
+### Q3 — the three untaught families — **ALL THREE IN, ONE VOLUME EACH**
+
+`heal`, `stealth` and `combat` are in the prototype. One volume each, not a section each.
+
+| Family | Its one volume | Serves | State |
+|---|---|---|---|
+| `heal` | `SM_PlantSlot_Sprout` on `NODE_PLANT_SLOT` | T0_M12 | **placed** — the post-nurture state is the family's entire visual presence |
+| `stealth` | `SM_Rune_Stone` on `NODE_RUNE` | T0_M7 | **placed** — a low broken stone, band `low` |
+| `combat` | the camp | T0_M8, M10, M13, M14 | **blocked on the reference image** |
+
+**Consequence:** the "no family is untaught" gap closes with geometry that is 3 volumes, not
+three ~84 m sections. That is the cheapest honest reading of *"one family per section, taught
+in isolation"* — the family is **taught by its landmark**, and a landmark is a volume. It
+does **not** mean three sections are authored, and I am not authoring them.
+
+### Q6 — the camp's place in the world — **A CUSTOM ANSWER, LARGER THAN BOTH OPTIONS**
+
+The Lead did not pick a side. They answered a different and better question: **the camp is in
+a different zone, with a different environment and a different game-mechanic language.**
+
+> *"The first zone is the open field, the second is the pine forest with the camp."*
+
+Recorded verbatim because it is a structural decision, not a preference:
+
+| Zone | Environment | Mechanic language | Content |
+|---|---|---|---|
+| **Zone 1 — the open field** | open, low, see far | **gather** · traversal | `SM_LandingCircle`, `SM_Path_Planet_SegA/B/C`, `SM_Gather_FirstHarvest`, field res nodes |
+| **Zone 2 — the pine forest** | dense, walled, close horizon | **`combat`** | the camp, the guard, the two sleepers |
+
+**Consequences, and they are large:**
+
+1. **Combat is a family you travel to**, not a place you happen to be in. Q6-A and Q6-C are
+   both superseded — the camp is not inside the spirit path and not a waypoint on it.
+2. **The pine forest is a real environment job.** "Dense, walled, close horizon" is a
+   different art problem from "open field", and the existing `SM_PineValley_Block_A/B` are
+   massing blocks, not a forest you walk into. This is **more** work than either option I
+   offered, and I am not going to pretend otherwise.
+3. **A boundary is now required between the zones.** TG-ZONE-FAMILY fork B: boundaries are
+   terrain that continues out of view — cliff, ravine, treeline, water. An open field meeting
+   a dense forest is exactly a **treeline** boundary, which is the cheapest one available and
+   the one that reads as terrain rather than as a wall that was placed.
+4. **`SM_PineValley_Block_A` is 10 × 8 × 10 m and resolves to aspect 1.00** — the same value
+   as `SM_Cabin`, and one of the original measured defects. It is now a zone massing block
+   rather than decoration, which makes it a **higher** priority, not a lower one.
+5. **Zone 1 needs a family read too.** It is the `gather` zone, and `SM_Gather_FirstHarvest`
+   currently measures band `low` against a locked `flat` signature. That was a small
+   conformance note yesterday; it is now a zone's entire identity.
+
+⚠️ **This is scope growth and I am flagging it rather than absorbing it silently.** Two zones
+with different mechanic language is a bigger prototype than "13 bites in one location". It
+is coherent, it matches *"lookout dominance — you see the next two sections and recognise
+their silhouette families"* better than a single zone would, and the Lead has said it plainly.
+But it adds an environment pass and a treeline boundary that no T0 beat currently names.
+
+**Not decided here, and now load-bearing:** does the spirit path run through the open field,
+the forest, or both? And is the wound in the forest? Those follow from Q6 and are Round 3.
+
+### Q4, Q5, Q7, Q8 — still open, unchanged
+
+| # | Fork | Now matters because |
+|---|---|---|
+| Q4 | Plant slot reads as `heal` or as garden? | `heal` is now in scope with exactly one volume, so this volume IS the family |
+| Q5 | Rune: `stealth` or `spirit`? | `stealth` is now in scope with exactly one volume — same situation |
+| Q7 | Island-top truth, and `M_FamilySilhouette` / `M_ValleyNight` | unchanged; still blocking the report |
+| Q8 | *(superseded)* camp as section | answered by Q6 |
+
+---
 
 Held so Round 1 is answerable in two questions. Already queued:
 
