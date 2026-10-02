@@ -176,6 +176,33 @@ correction.
 **Anti, extended:** a guard killed rather than calmed is a fail, exactly as killing a sleeper is.
 The law is the point.
 
+#### The three actors are not the same job — Lead, 2026-10-02
+
+> *"A guard will be awake that you need to help ease their thoughts so that they fall asleep, the
+> other two will be asleep and you can ease their thoughts too to keep them sleeping."*
+
+**This corrects the original reading of #14.** `#14` was written *"avoid 1 guard; soothe 2
+sleepers"* and the obvious reading is: one obstacle to avoid, two targets to calm. **That is
+wrong.** All three are calmed. They differ in *which direction* they are moved:
+
+| Actor | Start state | What you do | End state |
+|---|---|---|---|
+| `NODE_GUARD` — the patroller | **AWAKE**, torch lit | reach them unseen, then **ease their thoughts → they fall asleep** | asleep |
+| `NODE_SLEEPER` A | **ASLEEP** | ease their thoughts **→ they keep sleeping** | asleep |
+| `NODE_SLEEPER` B | **ASLEEP** | ease their thoughts **→ they keep sleeping** | asleep |
+
+**So "avoid 1 guard" survives, but as traversal rather than as the goal.** You are not avoiding
+them — you are approaching someone you have to reach, without being seen first. The avoidance is
+how you get there; the calming is why you came.
+
+**The awake one is the hard one and the two sleeping ones are the maintenance.** Putting someone
+to sleep is the act; keeping them asleep is the care. *That is V2b — gather by day, tend by
+night — inside a single must, and it is why the gentle path is not a shortcut here.* There is no
+version of this beat where the efficient thing and the kind thing are different, because there is
+no efficient version.
+
+⚠️ **This widens #16's gate from two actors to three.**
+
 #### The rescue is now gated on #14 — Lead, 2026-10-02 (second refinement)
 
 > *"You will stumble upon the camp during the day and your loved one will be taken and you
@@ -209,6 +236,84 @@ is what you must avoid *by night* (spirit-stealth). Opposite solutions to the sa
 
 Both are recorded in `Lib/02_Zones/combat/CAMP.json` under `new_labels_needed`. Neither is a
 taste question and neither is written yet.
+
+### P1 — #15 What a spirit may TOUCH — **N (new, 2026-10-02)**
+
+Raised by `VISION_BOARD` **V2b** (*"gather by day, tend by night"*), which made the touch
+question load-bearing for two separate beats that both did not exist before it.
+
+| Field | Value |
+|-------|-------|
+| **Labels** | `FORM_SPIRIT` · `NODE_PLANT_SLOT` · `NODE_CAPTIVE` · `NODE_GUARD` · `NODE_SLEEPER` |
+| **Expected** | In spirit form the player may interact with **soil** and with **the captive's ropes**. They may **not** interact with `NODE_GUARD` |
+| **Found** | **Nothing.** No touch rule exists in `Source/`. Not a partial — absent |
+| **Arrange** | Spirit at the garden and at the camp, same form, different permissions |
+| **DONE-WHEN** | Soil interaction succeeds as spirit · rope interaction succeeds as spirit · guard interaction is refused as spirit · **the refusal is logged**, not silent |
+| **Depends** | #11 spirit · #12 nurture |
+| **Anti** | One blanket verb for all spirit interactions · silent refusals · spirit able to calm a guard by touching it |
+
+**Why it is P1 and not a detail.** Both the garden (#12) and the rescue (#16) are *night-time
+tending*, and neither can be built without it. Every rule written tonight sits on top of this.
+
+**Logged refusals matter more than the permissions.** A refusal the player cannot see reads as a
+broken game; a logged one is legible. That is the same lesson as the spirit gate's `closed_fail`
+case, where the whole point was that the failure is visible.
+
+### P1 — #16 Free the captive — gated on sleepers ASLEEP — **N (new, 2026-10-02)**
+
+| Field | Value |
+|-------|-------|
+| **Labels** | `NODE_CAPTIVE` · `NODE_SLEEPER` (×2) · `NODE_GUARD` · `TOD_NIGHT_SPIRIT` · `FORM_SPIRIT` |
+| **Expected** | **All three** actors calm — the awake guard put to sleep, the two sleepers kept asleep — then the captive can be freed. **#14 is the lock on this door** |
+| **Found** | **Nothing.** No captive actor, no sleep state, no calm state, no freedom gate |
+| **Arrange** | Night · after #14 · at the camp |
+| **DONE-WHEN** | All three calm → freed, and the return leg to the homestead is reachable · **any one of the three not calm → refused** · a **killed** actor does not count as calm and does not open the door |
+| **Depends** | #14 soothe · #15 touch rule · #17 stealth (to reach the guard) |
+| **Anti** | Converted-but-not-asleep satisfying the gate · killing an actor to make the count right · forcing the ropes open · calm-on-two-of-three being enough |
+
+**Widened from two actors to three, 2026-10-02.** The gate was first written as "both sleepers
+asleep" before it was known that the **guard is also calmed and also has to be asleep**. An
+actor who is calmed but not yet asleep is not done, so the count is three and all three must
+match.
+
+**The distinction this must exists to enforce:** `EConvertedFoeRole` already has five roles, and
+conversion is what happens to foes you **defeat**. A converted actor is not a sleeping one, and
+it is not a calmed one. Conflating them lets the player defeat the three and unlock the captive —
+which inverts the beat, because the design is that the *gentle* path is the only path.
+
+### P1 — #17 Spirit-stealth — **N (new, 2026-10-02)**
+
+Named by the Lead as the means of reaching the guards: *"use your spirit form and spirit-stealth
+gameplay to get to the guards."*
+
+| Field | Value |
+|-------|-------|
+| **Labels** | `NODE_GUARD` · `FORM_SPIRIT` · `TOD_NIGHT_SPIRIT` · `SM_Camp_Torch` · `SM_Camp_Fire` |
+| **Expected** | **Spirit-blue light is visibility.** Getting close to the campfire's blue centre, or into the glow around the patrolling guard's blue torch, makes you **visible to the guard** |
+| **Found** | **Nothing.** No stealth state, no awareness, no detection, no light-to-visibility link |
+| **Arrange** | Night · at the camp · after #13 |
+| **DONE-WHEN** | You are unseen outside both light radii · entering **either** radius makes you visible **legibly** · the torch radius **moves with the guard**, so a patrolling guard sweeps a moving pocket of danger · breaking back out of the light stops it |
+| **Depends** | #11 spirit · #13 camp reachable · #15 touch rule |
+| **Anti** | Stealth as a stat roll · invisibility as a toggle with no counter · a guard who cannot notice anything · light with no visual tell |
+
+**Settled 2026-10-02 by the Lead — this is BOTH a light level and a per-actor area, not either
+or, and they are the same mechanic:**
+
+| Source | Kind | Behaviour |
+|---|---|---|
+| **Campfire** | static light, **spirit-blue at the centre** | a fixed radius around the fire's middle where you are visible |
+| **Patrolling guard's torch** | **moving** light, blue-tinged | an area around the guard that travels with them |
+
+**Why this is the right shape for this beat.** The guard is not a thing you avoid — it is
+someone you must reach. So avoidance becomes **traversal** rather than the goal, and the mechanic
+rewards patience rather than speed. And because both sources are **spirit-blue**, the player
+learns **one rule — blue means you can be seen here** — in a single glance, from the art alone,
+with no tutorial. That is `VISION_BOARD`'s *"the world announces what it wants by its shape
+alone"* applied to a stealth system: one colour, two forms, static and moving.
+
+⚠️ The moving torch is what makes this non-trivial. A static radius is a lookup; a radius that
+travels with a patrolling actor means the safe pocket changes as they walk, so the player is
+reading a **moving** safe zone rather than a fixed one.
 
 ### P2 — #1 Wake / start day — Partial
 
@@ -353,3 +458,25 @@ Cheats: existing only when a bite DONE-WHEN names them (`Docs/30`).
 - [ ] Bite order respects deps (#9+#7→#11 · #8→#10 · #3→#12 · spirit→#14)
 - [ ] No WP API invent; A–E cite only
 - [ ] Stamp: `APPROVE-T0-MECHANIC-INV`
+
+---
+
+## Added 2026-10-02 — #15, #16, #17
+
+Three musts that existed as prose in spec files and were tracked nowhere. Added as **P1**,
+all three currently `N` (absent, not partial):
+
+| # | Must | Blocks |
+|---|---|---|
+| **#15** | What a spirit may **TOUCH** | #12 nurture, #16 rescue — sits under both |
+| **#16** | Free the captive, gated on sleepers **ASLEEP** | the rescue climax; #14's whole purpose |
+| **#17** | **Spirit-stealth** | #14 outright — it is the named way in |
+
+**Two of these are P1 only because `VISION_BOARD` V2b moved them.** Before *"gather by day,
+tend by night"* there was no night-time tending at all, so "can a spirit touch soil" was an idle
+question. The moment the garden and the rescue both became night verbs, the permission table
+became load-bearing for two of the fourteen existing musts.
+
+**#17's shape is the one thing on this list I cannot decide.** Detection cone, light level, and
+per-actor awareness are three systems, not three parameters. Queued as the single Lead question
+in `T0_EXECUTION_PHASES.md`.

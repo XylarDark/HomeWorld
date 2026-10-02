@@ -41,12 +41,66 @@
     { "name": "SM_Camp_Bedroll_B", "size_m": [1.9, 0.7, 0.4], "at_offset": [-2.5, 3.2, 0.0], "role": "sleeper_two", "measured_from": "authored, not built", "note": "Offset 1.2 m along Y from A. Two bedrolls at the same offset would overlap and fail the collision check." },
     { "name": "SM_Camp_Lashings", "size_m": [0.6, 0.6, 1.5], "role": "holds_the_companion - the thing you must calm a guard to reach", "measured_from": "authored, not built", "new_in_round_5": true }
   ],
-  "beat_nodes": [
-    { "label": "NODE_GUARD", "at_offset": [3.0, -2.0, 0.0], "actor": "AHomeWorldCharacter or NPC placeholder", "note": "A NODE is where the guard holds post. The guard is an ACTOR, not greybox geometry - do not model a guard as a prop." },
-    { "label": "NODE_SLEEPER", "at_offset": [-2.5, 2.0, 0.0], "count": 2, "spacing_m": 1.2, "actor": "as above", "note": "Two, laid side by side along +Y and individually visible. DEFECT FIXED 2026-10-02: both were originally authored at the same offset (-2.5, +2.5), which is two bedrolls occupying the same 1.9 x 0.7 m footprint - overlapping geometry that the collision check would have failed on the first run. Separated along Y by 1.2 m." },
-    { "label": "NODE_CAPTIVE", "at_offset": [0.0, 4.0, 0.0], "actor": "the companion", "note": "NEW in Round 5. No T0 label exists for this yet - see new_labels_needed." },
-    { "label": "NODE_PORTAL_CAMP", "at_offset": [0.0, 0.0, 0.0], "note": "Arrival point for #13. Reuses shrine language per the must list." }
+  "actors": [
+    {
+      "label": "NODE_GUARD",
+      "name": "the patroller",
+      "start_state": "AWAKE",
+      "carries": "a blue-tinged torch, lit",
+      "what_you_do": "reach them unseen, then ease their thoughts",
+      "end_state": "ASLEEP",
+      "difficulty": "the hard one - putting someone to sleep is the act",
+      "note": "NOT an obstacle. 'Avoid 1 guard' survives as TRAVERSAL, not as the goal - you approach someone you have to reach, without being seen first. See T0_MECHANIC_INVENTORIES_V1 #14."
+    },
+    {
+      "label": "NODE_SLEEPER",
+      "name": "sleeper A",
+      "start_state": "ASLEEP",
+      "what_you_do": "ease their thoughts",
+      "end_state": "still ASLEEP",
+      "difficulty": "maintenance, not the act"
+    },
+    {
+      "label": "NODE_SLEEPER",
+      "name": "sleeper B",
+      "start_state": "ASLEEP",
+      "what_you_do": "ease their thoughts",
+      "end_state": "still ASLEEP",
+      "difficulty": "maintenance, not the act"
+    },
+    {
+      "label": "NODE_CAPTIVE",
+      "name": "the companion",
+      "start_state": "HELD",
+      "what_you_do": "free them",
+      "end_state": "FREED, and the return leg is reachable",
+      "gate": "all THREE of the above must be calm"
+    }
   ],
+  "actors_note": "Settled 2026-10-02: all three camp actors are CALMED, which corrects the original reading of M14 as 'one obstacle to avoid, two targets to calm'. They differ only in direction - the guard is moved awake-to-asleep, the two sleepers are kept there. Keeping someone asleep is the care; putting them to sleep is the act. That is V2b inside a single must, and it is why there is no efficient version of this beat to choose over the kind one.",
+  "visibility": {
+    "settled": "Lead 2026-10-02 - BOTH a light level and a per-actor area, and they are the SAME mechanic.",
+    "rule": "Spirit-blue light is visibility. Inside either light radius you are visible to the guard.",
+    "sources": [
+      {
+        "id": "SM_Camp_Fire_Blue",
+        "kind": "static",
+        "what": "a tinge of spirit blue in the CENTRE of the campfire",
+        "behaviour": "a fixed radius where you are visible",
+        "radius_m": null,
+        "radius_note": "DELIBERATELY unset. The Lead specified that it exists and that it is dangerous, not how big. Guessing a number here would be authoring gameplay as art."
+      },
+      {
+        "id": "SM_Camp_Torch",
+        "kind": "MOVING",
+        "what": "the patrolling guard's blue-tinged torch",
+        "behaviour": "an area around the guard that travels with them, so the safe pocket changes as they walk",
+        "radius_m": null,
+        "radius_note": "Same - unset by choice. The moving radius is what makes this non-trivial: a static one is a lookup, a travelling one means reading a moving safe zone."
+      }
+    ],
+    "why_one_colour_is_right": "Both sources are spirit-blue, so the player learns ONE rule - blue means you can be seen here - in a single glance, from the art alone, with no tutorial. That is VISION_BOARD's 'the world announces what it wants by its shape alone' applied to a stealth system: one colour, two forms, static and moving."
+  },
   "triggers": [
     {
       "name": "EJECT_TRIGGER_GUARD_WAKES",
@@ -59,16 +113,17 @@
       "reads_as": "The daytime half of the guard's job. You were seen in daylight, which is why you go home empty-handed."
     },
     {
-      "name": "FREEDOM_GATED_ON_SLEEPERS_ASLEEP",
+      "name": "FREEDOM_GATED_ON_ALL_THREE_CALM",
       "phase": "NIGHT",
       "shape": "sphere",
       "radius_m": 1.5,
       "at_offset": [0.0, 4.0, 0.0],
       "on_interact": "free the companion",
-      "condition": "BOTH NODE_SLEEPER actors must be ASLEEP. Not calmed-as-in-converted - ASLEEP, in bed.",
-      "settled": "Lead 2026-10-02: 'Once they are in bed, you will free your loved one.'",
-      "why_this_is_the_whole_beat": "This is the only condition in the camp that makes M14 non-optional. Until now 'soothe 2 sleepers' was a must with nothing downstream of it - you could skip it and the night still ended. Now skipping it means you stand next to your companion and cannot open the lashings, because two people are awake and grieving. The soothe is not a side objective; it is the lock on the door.",
-      "anti": "Freeing the companion with either sleeper awake is a FAIL, exactly as killing a sleeper is. There is no force option."
+      "condition": "ALL THREE camp actors must be CALM: the guard asleep, and both sleepers still asleep. Not converted - CALMED.",
+      "settled": "Lead 2026-10-02: 'a guard will be awake that you need to help ease their thoughts so that they fall asleep, the other two will be asleep and you can ease their thoughts too to keep them sleeping.'",
+      "widened_from_two_to_three": "This was first written as 'both sleepers asleep' before it was known the guard is also calmed and must also be asleep. The count is three.",
+      "why_this_is_the_whole_beat": "This is the only condition in the camp that makes M14 non-optional. Until now 'soothe 2 sleepers' was a must with nothing downstream of it - you could skip it and the night still ended. Now skipping it means you stand next to your companion and cannot open the lashings, because three people are awake or unsettled. The calming is not a side objective; it is the lock on the door.",
+      "anti": "Freeing the companion with any of the three not calm is a FAIL, exactly as killing one is. There is no force option, and a CONVERTED actor does not count as a calmed one."
     },
     {
       "name": "NODE_PORTAL_CAMP_ARRIVAL",
@@ -81,9 +136,9 @@
     }
   ],
   "new_labels_needed": [
-    "NODE_CAPTIVE - Round 5 puts a loved one in this camp. No label in T0_MECHANIC_INVENTORIES_V1 names them. The must list needs one before this is buildable without inventing.",
-    "SPIRIT_STEALTH - the Lead named 'spirit-stealth gameplay' as the means of reaching the guards. The must list has a stealth FAMILY (M7, NODE_RUNE, a gate flag on the ground) but nothing for moving UNSEEN while in spirit form. This is a mechanic with no must behind it, and it is now load-bearing: without it there is no way to reach the guards.",
-    "SLEEPER_STATE_ASLEEP - the freedom trigger needs a state on the sleeper actors that is distinct from 'converted'. Nothing in the roster or the role enum carries it."
+    "SPIRIT_STEALTH - RESOLVED as must #17. The mechanic is LIGHT-TO-VISIBILITY, not a stat: spirit-blue light makes you visible, from either the campfire's blue centre or the patrolling guard's blue torch. Recorded in T0_MECHANIC_INVENTORIES_V1 #17 and in the visibility block above. Radii deliberately unset.",
+    "SLEEPER_STATE_CALM - must #16 needs a state that is NOT EConvertedFoeRole. A converted actor is a defeated foe; a calmed one is someone you helped. Conflating them lets the player defeat the three and unlock the captive, which inverts the beat.",
+    "NODE_CAPTIVE - RESOLVED as must #16. The actor and the freedom gate are now specified; what does not exist yet is the code."
   ],
   "open_questions": [
     "Q15, still parked: is the clearing ~84 m across as the old measurement suggested, or a smaller one? The ZONE is settled (pine forest with camp); its SIZE is not. The 18 x 18 m above is a placeholder chosen so all four beat nodes and a guard patrol fit with room to walk around them - it is not a recommendation.",
