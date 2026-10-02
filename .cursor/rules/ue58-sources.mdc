@@ -20,7 +20,7 @@ This is the ONLY sourcing policy. The 5.7 rule was deleted as historical (DEC-00
    - **Epic Unreal Engine 5.8 documentation:** https://dev.epicgames.com/documentation/en-us/unreal-engine/ (filter or search for "Unreal Engine 5.8").
    - **Project docs:** `docs/UE/UE58_TECH.md`, `docs/UE/UE58_EDITOR_UI.md`, `docs/KNOWN_ERRORS.md`, and feature docs (e.g. `docs/PCG/PCG_SETUP.md`, `docs/PCG/PCG_VARIABLES_NO_ACCESS.md`).
    - **Project rules:** `unreal-cpp.mdc` (pitfalls table), `ue58-editor-ui.mdc` (Editor UI), the UE 5.8 Python API.
-3. **When looking something up:** Use web search or `/parallel-search` with **"Unreal Engine 5.8"** (or "UE 5.8") in the query.
+3. **When looking something up:** Use web search with **"Unreal Engine 5.8"** (or "UE 5.8") in the query, and cite the Epic doc URL.
 4. **When giving instructions:** Cite the Epic 5.8 doc URL when steps come from it. Use exact option/menu/API names from the 5.8 doc.
 5. **Tutorials:** Prefer guides that explicitly target **UE 5.8** (or 5.7 if 5.8 is scarce); cross-check with Epic 5.8 docs.
 

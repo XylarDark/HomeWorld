@@ -22,7 +22,7 @@
 
 **MCP-first development:** When the Unreal Editor is running and MCP tools are connected (unrealMCP), prefer live Editor manipulation via MCP over writing scripts or giving manual instructions. See `.cursor/rules/09-mcp-workflow.mdc` and [docs/Setup/MCP_SETUP.md](docs/Setup/MCP_SETUP.md). For using external LLMs to generate Editor automation scripts, see [docs/Automation/EXTERNAL_AI_AUTOMATION.md](docs/Automation/EXTERNAL_AI_AUTOMATION.md).
 
-**Parallel plugin:** When the agent sees a need for web search, URL extraction, deep research, or list enrichment, it recommends you run the matching command (`/parallel-search`, `/parallel-extract`, `/parallel-research`, `/parallel-enrich`) and paste the result; the agent then interprets and integrates.
+**Parallelism:** research, read-only investigation and low-stakes maintenance may run alongside each other. **Writes serialise** - one significant change under review at a time. Two agents must not edit the same files in one tree, and an agent finding uncommitted tracked changes it did not make must stop and report rather than commit or stash them. Check with `npm run tree:check`.
 
 **Industry standards (MVP):** [docs/IndustryStandards/INDUSTRY_STANDARDS_FOR_MVP_WORLD_AND_CHARACTERS.md](docs/IndustryStandards/INDUSTRY_STANDARDS_FOR_MVP_WORLD_AND_CHARACTERS.md) — industry-standard approaches for game world, 2D→character, and characters/monsters with MVP commit decisions.
 

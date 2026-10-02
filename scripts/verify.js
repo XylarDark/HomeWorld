@@ -137,6 +137,10 @@ results.push(step('js suite', () => run('node', ['--test', 'scripts/*.test.js'])
 if (results[results.length - 1]) {
   results.push(step('instruction budget', () => run('node', ['scripts/instruction-budget.js'])));
 }
+
+if (process.argv.includes('--strict-tree')) {
+  results.push(step('write serialisation', () => run('node', ['scripts/write-serialisation.js'])));
+}
 if (results[results.length - 1] && tier !== 'fast') {
   results.push(
     step('c++ build', () =>

@@ -37,7 +37,8 @@
     "verify:ue": "node scripts/verify.js --tier ue",
     "editor:lock": "node scripts/editor-lock.js",
     "budget:instructions": "node scripts/instruction-budget.js",
-    "harness:sweep": "node scripts/harness-sweep.js"
+    "harness:sweep": "node scripts/harness-sweep.js",
+    "tree:check": "node scripts/write-serialisation.js"
   },
   "engines": {
     "node": ">=20.0.0"
