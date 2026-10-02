@@ -30,3 +30,7 @@ __pycache__/
 
 # Logs
 *.log
+
+# World Partition generated one-actor files (68% of the tree). Do not index.
+Content/__ExternalActors__/
+Content/__ExternalObjects__/

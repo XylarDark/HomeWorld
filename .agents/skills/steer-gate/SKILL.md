@@ -1,6 +1,6 @@
 ---
 name: steer-gate
-description: Use at the start of every HomeWorld task and whenever a steer, taste, or test decision is missing — name the model limitation, prompt the human with numbered options, then stop before any edit.
+description: Use when a steer, taste, or test decision is missing, or before an edit that sets feel, scope, or what done means. Name the limitation, give numbered options, stop. Not for a typo in a path already named.
 ---
 
 # Steer gate
