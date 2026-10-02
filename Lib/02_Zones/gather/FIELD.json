@@ -6,72 +6,120 @@
   "phase": "T0_R6",
   "owner": "agent",
   "family": "gather",
-  "role": "Zone 1, where the player lands. Wide open meadow, great beasts roaming, herbs to pick, dung for fertilizer. The forest edge at its north side is the boundary into Zone 2, and per DEC-0027 that treeline is what HIDES the camp.",
+  "role": "Zone 1, where the player lands. A natural, UNTOUCHED meadow - no paths, no man-made markers - bounded by four distinct edges: a cliff, a river, and two pine forests. One of the two forests is where the camp generates, and the player chooses which.",
+  "revision": {
+    "date": "2026-10-02",
+    "lead_instruction": "'I do not want a path through the middle of the field, I want the field to be a natural, untouched field except by the animals.'",
+    "what_was_removed": [
+      "SM_Path_Field - DELETED. A trodden path through the meadow contradicts 'untouched' and it also gave the player a route, which is the thing being removed on purpose.",
+      "SM_LandingCircle - DELETED. A ring of stones is a man-made marker. There is nothing in this field that human beings built."
+    ],
+    "what_that_changes_about_play": "With no path and no arrival marker, THE OPENING BEAT BECOMES 'look around and decide where to go'. The first thing the player does is read the land, which is exactly what VISION_BOARD asks for - the world announces what it wants by its shape alone. The three edge types have to each read as inviting and different, and NONE of them may look like the correct answer."
+  },
   "world_origin": [0.0, -80.0, -95.0],
-  "world_bounds_m": { "x": 60.0, "y": 40.0, "z": 0.0 },
-  "note_on_origin": "Matches SM_LandingCircle at (-18, 0) and the existing ZONE 1 layout in GROK_IMAGINE_PROMPTS.md 1B, so the field prompt and this spec agree. Zone 1 sits south of the camp zone at z -95.",
+  "world_bounds_m": { "x": 70.0, "y": 70.0, "z": 0.0 },
+  "bounds_note": "Was 60 x 40 in the first pass. Now roughly square, because four distinct edges need four distinct sides and a rectangle makes two of them feel like leftovers.",
+  "arrival": {
+    "position": "centre of the field, (0, 0)",
+    "marker": "NONE - no ring of stones, no pad, no cleared ground",
+    "note": "The player simply appears in the grass. Their first act is orientation, not navigation."
+  },
   "units": "meters",
+  "edges": [
+    {
+      "id": "EDGE_CLIFF",
+      "at": "north, y = +35.0",
+      "type": "cliff",
+      "status": "BOUNDARY - dead end, no exit, and that is deliberate",
+      "role": "The only edge that reveals scope. Everything else in this zone is local; the cliff is where the player learns the planet is larger than the field.",
+      "drop_m": 28.0,
+      "facing": "torn rock faces, matching the art bible's cliff language - three torn faces, not a clean wall",
+      "why_a_dead_end_is_worth_building": "A boundary that costs the player nothing teaches them nothing. This one costs them a walk to the edge and gives back a view, so it is a real reward and a real limit. If every edge were a door, the field would be a hub and not a place."
+    },
+    {
+      "id": "EDGE_RIVER",
+      "at": "east, x = +35.0",
+      "type": "river",
+      "status": "FUTURE PATH - not traversable in T0",
+      "width_m": 7.0,
+      "role": "A promise, not a door. It should be visible and audible from inside the field so the player knows it goes somewhere, with no crossing in the prototype.",
+      "why_visible_but_closed_is_right": "The Lead named it 'future gameplay'. A river you can see and hear but not cross is a map edge that says the world continues. Hiding it would turn it into a wall and waste the promise."
+    },
+    {
+      "id": "EDGE_FOREST_A",
+      "at": "south, y = -35.0",
+      "type": "pine_forest",
+      "status": "ONE OF THE TWO - may become the camp forest",
+      "role": "Candidate. Entering it is the commitment."
+    },
+    {
+      "id": "EDGE_FOREST_B",
+      "at": "west, x = -35.0",
+      "type": "pine_forest",
+      "status": "ONE OF THE TWO - may become the camp forest",
+      "role": "Candidate. Entering it is the commitment."
+    }
+  ],
+  "camp_placement": {
+    "rule": "The player chooses. Entering EITHER forest edge commits to that one, and the camp generates there.",
+    "the_unchosen_forest": "becomes a future path, leading eventually to another area like the river. Not a dead end and not a punishment - a road they did not take.",
+    "cliff_is_never_a_camp_edge": "The cliff is a boundary. It cannot be chosen, because there is no forest on it.",
+    "THE_HARD_CONSTRAINT": "BOTH forest edges must look IDENTICAL from inside the field - same density, same height, same opacity, same silhouette. If one looks better, fuller, darker or more inviting, the choice stops being a choice and becomes a puzzle with a correct answer, and the player will optimise instead of choosing.",
+    "why_that_is_the_whole_point": "The choice has to be about where the player WANTS to go, not about which answer looks right. Identical edges make it a preference. Different-looking edges make it a test, and tests are the opposite of what 'gather by day, tend by night' is about."
+  },
   "ground_cover": {
     "material": "M_StylizedGrass",
     "height_m": [0.9, 1.2],
     "read": "long flowing grass, waist-to-chest on a 1.8 m adult",
-    "why_the_height_is_a_mechanic_not_a_decoration": "At 1.1 m the grass hides a 0.15 m dung pile. That is deliberate - the Lead said the player 'will roam around and find herbs... and dung'. Roaming only means something if something can be missed. Grass this tall also means a great beast at 2.2 m reads above the grass line while a human-sized animal would not, which is what makes 'great' legible without a label.",
-    "flattened_on_path": "0.35 m along SM_Path_Field - the trodden path is how you navigate and the grass height is the way you read it"
+    "why_the_height_is_a_mechanic_not_a_decoration": "At 1.1 m the grass hides a 0.15 m dung pile, so roaming actually means something. It also means a 2.2 m beast reads above the grass line where a human-sized animal would not, which is what makes 'great' legible without a label.",
+    "no_paths": "0.35 m flattened grass is DELETED along with SM_Path_Field. The field is walked flat by animals, not by people."
   },
   "materials": [
     { "slot": "grass", "master": "M_StylizedGrass" },
     { "slot": "beasts", "master": "M_BeastStylized" },
     { "slot": "herbs", "master": "M_GatherHerb" },
-    { "slot": "treeline_bark", "master": "M_WoodWild" },
-    { "slot": "path_and_stones", "master": "M_PathStone" },
-    { "slot": "fertilizer_if_applied", "master": "M_Nurtured", "note": "Only if Q24 resolves toward a tended garden. M_Nurtured exists and RES_SEED exists; the soil state is what is undecided, not the material." }
+    { "slot": "forest_bark", "master": "M_WoodWild" },
+    { "slot": "cliff_and_stones", "master": "M_CliffRock" },
+    { "slot": "river_water", "master": "M_SpiritUnlit", "note": "Standing in for water. There is no water master among the ten. Flagged rather than invented - a water material may be worth a tenth-plus-one decision from the Lead." },
+    { "slot": "fertilizer_applied", "master": "M_Nurtured" }
   ],
-  "master_binding_note": "First pass at these five slots named M_GrassField, M_FurBeast, M_LeafHerb and M_BarkPine - none of which exist. The ten masters are M_StylizedGrass, M_CliffRock, M_WoodCabin, M_WoodWild, M_FoliageCard, M_PathStone, M_GatherHerb, M_BeastStylized, M_SpiritUnlit, M_Nurtured. Caught by test_zone_specs_name_only_canon_masters, which is the same failure as M_FamilySilhouette and M_ValleyNight earlier in the pipeline. Inventing plausible-looking material names is the exact habit that check exists to stop.",
+  "master_binding_note": "First pass named M_GrassField, M_FurBeast, M_LeafHerb and M_BarkPine - four invented names, none real. Caught by test_zone_specs_name_only_canon_masters, which is the same failure as M_FamilySilhouette and M_ValleyNight earlier in the pipeline.",
   "modules": [
-    { "name": "SM_LandingCircle", "size_m": [8.0, 8.0, 0.2], "at_offset": [-18.0, 0.0, 0.0], "role": "arrival_clearing_ring_of_stones", "measured_from": "authored, not built" },
-    { "name": "SM_Beast_Pad_A", "size_m": [2.6, 1.4, 2.2], "at_offset": [-4.0, 6.0, 0.0], "role": "great_beast_tameable", "measured_from": "authored, not built", "binds_to": "AHomeWorldBeastPad" },
-    { "name": "SM_Beast_Pad_B", "size_m": [2.6, 1.4, 2.2], "at_offset": [12.0, -6.0, 0.0], "role": "great_beast_tameable", "measured_from": "authored, not built", "binds_to": "AHomeWorldBeastPad" },
-    { "name": "SM_Gather_Bush_01", "size_m": [0.8, 0.8, 0.6], "at_offset": [-6.0, -10.0, 0.0], "count": 4, "spacing_m": 4.0, "yields": "RES_BERRY", "measured_from": "authored, not built" },
-    { "name": "SM_Herb_Clump_01", "size_m": [0.7, 0.7, 0.5], "at_offset": [2.0, 4.0, 0.0], "count": 5, "yields": "RES_HERB", "measured_from": "authored, not built" },
-    { "name": "SM_Dung_Pile_01", "size_m": [0.5, 0.5, 0.15], "at_offset": [-9.0, -4.0, 0.0], "count": 6, "yields": "RES_SEED", "measured_from": "authored, not built", "applied_as": "night-time tending, per VISION_BOARD V2b. Moves a garden bed's soil state; rendered with M_Nurtured." }
+    { "name": "SM_Beast_Pad_A", "size_m": [2.6, 1.4, 2.2], "at_offset": [-14.0, 9.0, 0.0], "role": "great_beast_tameable", "binds_to": "AHomeWorldBeastPad", "measured_from": "authored, not built" },
+    { "name": "SM_Beast_Pad_B", "size_m": [2.6, 1.4, 2.2], "at_offset": [13.0, -11.0, 0.0], "role": "great_beast_tameable", "binds_to": "AHomeWorldBeastPad", "measured_from": "authored, not built" },
+    { "name": "SM_Gather_Bush_01", "size_m": [0.8, 0.8, 0.6], "at_offset": [-11.0, -16.0, 0.0], "count": 4, "spacing_m": 5.0, "yields": "RES_BERRY", "measured_from": "authored, not built" },
+    { "name": "SM_Herb_Clump_01", "size_m": [0.7, 0.7, 0.5], "at_offset": [6.0, 8.0, 0.0], "count": 5, "yields": "RES_HERB", "measured_from": "authored, not built" },
+    { "name": "SM_Dung_Pile_01", "size_m": [0.5, 0.5, 0.15], "at_offset": [-6.0, -7.0, 0.0], "count": 6, "yields": "RES_SEED", "applied_as": "night-time tending, per VISION_BOARD V2b. Moves a garden bed's soil state; rendered with M_Nurtured.", "measured_from": "authored, not built" }
   ],
-  "treeline": {
-    "name": "SM_Treeline_Forest",
-    "pine_size_m": [9.0, 9.0, 10.0],
-    "runs_along_y": 20.0,
-    "spans_x": [-30.0, 30.0],
-    "function": "OPAQUE SIGHTLINE BLOCKER - this is the whole point of it",
-    "requirement": "From ANY point in the open meadow, the forest interior must be completely hidden. No gap, no thinner patch, no visible path, no clearing. This is what makes the fixed camp discoverable on approach instead of visible from the landing circle (DEC-0027).",
-    "how_to_verify": "Stand the camera at SM_LandingCircle (-18, 0) at 1.7 m and confirm zero forest interior is visible. Then again from (+20, -15). If any ground or the camp itself is visible from either, DEC-0027 has failed and the camp placement answer needs revisiting.",
-    "caveat": "Ten-metre pines with a closed canopy. The block is free at this scale, but it only works if the canopy actually closes - gaps are the failure mode, not height."
-  },
+  "scatter_rule": "Herbs, berries and dung are scattered with NO clustering and no grid. They must not read as placed. Minimum separation 5 m, no two of the same type adjacent, so the player has to cover ground rather than follow a line.",
   "existing_systems_reused": [
-    { "thing": "Taming", "exists_at": "AHomeWorldBeastPad (HomeWorldBeastPad.h:17) -> UHomeWorldBeastTameComponent", "states": "Wild -> Cautious -> Tamed -> Helper", "note": "Already built with transition logging. The Lead's 'the beast can be tamed' is not new work - the two beast pads above are the only thing that needs authoring." },
+    { "thing": "Taming", "exists_at": "AHomeWorldBeastPad (HomeWorldBeastPad.h:17) -> UHomeWorldBeastTameComponent", "states": "Wild -> Cautious -> Tamed -> Helper", "note": "Already built with transition logging. Not new work - the two beast pads are the only thing needing authoring." },
     { "thing": "Herb gathering", "exists_at": "RES_HERB", "note": "55 references - the most-used resource in the project." },
     { "thing": "Six-resource inventory", "exists_at": "TryAddResource / GetResource", "resources": "RES_HERB, RES_SEED, RES_WOOD, RES_BERRY, RES_FIBER, RES_STONE" }
   ],
   "gap_fertilizer": {
     "status": "RESOLVED 2026-10-02 - Q24 answered by the Lead, and it was not about fertilizer",
-    "the_question_asked": "Can a SPIRIT apply fertilizer at night? Night is spirit form, so 'during the night-time' might mean as a spirit.",
     "the_answer": "'Gather by day, tend by night will be the theme throughout the game.'",
-    "what_it_actually_settled": "V2b in VISION_BOARD - a principle for the whole game, not a crafting verb. Night is for TENDING, and tending includes soil, sleeping guards and a captive. The same gesture in both places: you make it possible for something to rest.",
     "dung_yield": "RES_SEED",
-    "why_res_seed": "Compost is the seed resource's natural sibling, so this adds NO seventh resource and the locked six-resource inventory is intact. Adding RES_DUNG would have broken it. Applying dung moves a garden bed's soil state, rendered with the existing M_Nurtured master - both of which already existed with nothing pointing at them.",
-    "what_it_left_unwritten": "THE SINGLE MOST LOAD-BEARING UNWRITTEN RULE IN THE PROTOTYPE: what may a spirit TOUCH? Soil, yes. A rope, to free the captive? A sleeping guard? Both the garden and the camp rescue depend on the answer, and it does not exist in Source/. Recorded rather than guessed.",
-    "secondary_risk": "Night is now mandatory for homestead progress - if tending only happens at night, a player who cannot reach spirit form cannot advance the garden at all. That is a strong dependency on M11 (bed AND rune) and needs a fallback or an explicit, legible failure."
+    "why_res_seed": "Compost is the seed resource's natural sibling, so this adds NO seventh resource and the locked six stay intact. M_Nurtured and RES_SEED already existed with nothing pointing at them.",
+    "what_it_left_unwritten": "THE MOST LOAD-BEARING UNWRITTEN RULE IN THE PROTOTYPE: what may a spirit TOUCH? Soil, yes. A rope, to free the captive? A sleeping guard? Both the garden and the camp rescue depend on the answer and it does not exist in Source/.",
+    "secondary_risk": "Night is now mandatory for homestead progress - a player who cannot reach spirit form cannot advance the garden at all. Hard dependency on M11 (bed AND rune), needs a fallback or a legible failure."
   },
   "measured": null,
   "measured_note": "DELIBERATELY NULL. Nothing here is built. Every size is authored from the 1.8 m adult reference and tagged 'authored, not built'. A reader run will report FIELD as MISSING, which is the correct report.",
   "open_questions": [
-    "Q15, still parked: the field is 60 x 40 m here, matching the existing 1B prompt. The camp clearing's size is still unsettled (~84 m or smaller) and the two need to agree at the treeline.",
-    "Does the grass sway? 'Swaying in the breeze' is atmosphere, not geometry, and it needs a wind or vertex-animation system that does not exist. Recorded as atmosphere, not a must - but if it is load-bearing for the feel of the field, it is a new system.",
-    "Two great beasts or a herd? Two is authored. 'Great beasts roaming' implies more than two, and a herd reads as a population rather than as two set pieces."
+    "There is no water master among the ten. EDGE_RIVER is bound to M_SpiritUnlit as a placeholder, which is almost certainly wrong for water. Worth a decision from the Lead rather than an eleventh master invented by me.",
+    "Does the grass sway? 'Swaying in the breeze' is atmosphere, not geometry, and needs a wind or vertex-animation system that does not exist. Recorded as atmosphere, not a must - but if it is load-bearing for the feel of an untouched field, it is a new system.",
+    "Two great beasts or a herd? Two are authored. 'Great beasts roaming' implies more, and a herd reads as a population rather than as two set pieces.",
+    "Do the beasts range across the whole field, or do they have territory? With no path and no marker, territorial beasts would double as landmarks."
   ],
   "rejects": [
-    "camp_visible_from_the_landing_circle",
+    "a_path_through_the_field",
+    "a_stone_ring_arrival_marker",
+    "camp_visible_from_the_field_centre",
+    "forests_that_look_different_from_each_other",
     "a_seventh_resource_slot",
     "short_grass_that_hides_nothing",
-    "modeling_a_beast_as_greybox_without_a_beast_pad",
     "claiming_measurements_for_unbuilt_geometry"
   ]
 }

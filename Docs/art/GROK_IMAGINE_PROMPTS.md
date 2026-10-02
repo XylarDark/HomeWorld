@@ -359,6 +359,90 @@ like a cage, **send it again and tell me** — that is a real finding, not a nit
 
 ---
 
+# PART 2C — THE FIELD (no path, four edges)
+
+Rewritten 2026-10-02 after the Lead: *"I do not want a path through the middle of the field, I
+want the field to be a natural, untouched field except by the animals."* Supersedes the rough
+"ZONE 1" block inside 1B. Source of truth: `Lib/02_Zones/gather/FIELD.json`.
+
+**This replaces the old field prompt. Discard anything earlier labelled ZONE 1 — it has a path
+and a stone-ring arrival point, and both are now deleted.**
+
+```
+Top-down measured site plan of a wide natural meadow, orthographic from
+DIRECTLY ABOVE, no perspective, no tilt. A 1-metre cyan grid across the whole
+drawing, a labelled 0-80 m scale bar bottom-left, and leader lines to label
+boxes giving every object's name and size in metres.
+
+The meadow is roughly 70 x 70 m of open ground with NO PATH ANYWHERE and no
+man-made structure of any kind inside it - no ring of stones, no pad, no
+cleared ground, no trail. Long flowing grass across all of it, flattened only
+where animals have walked.
+
+The meadow has FOUR DIFFERENT EDGES, one on each side:
+
+  NORTH — CLIFF. The grass stops at a rocky edge and the ground falls away
+  about 28 m. Torn rock faces with three distinct broken faces. Beyond the
+  drop, nothing but distant open sky and far-off land. A scenic overlook, not
+  a hazard.
+
+  EAST — RIVER. A band of water about 7 m wide running along the eastern edge,
+  with soft muddy banks. Clearly deep enough to be uncrossable. It should read
+  as going somewhere - the water continues off the edge of the drawing.
+
+  SOUTH — PINE FOREST A. A dense closed wall of tall pines.
+
+  WEST — PINE FOREST B. A dense closed wall of tall pines.
+
+CRITICAL - THE TWO FOREST EDGES MUST BE IDENTICAL. Draw them from the same
+template: the same tree height, the same density, the same gaps, the same
+silhouette against the sky. A viewer must not be able to tell which forest is
+"better". They are the same forest, entered from two sides. Also: from anywhere
+in the open meadow the interior of BOTH forests must be completely hidden - no
+gap, no thinner patch, no visible path inside.
+
+Place these, metres from the meadow centre (0,0):
+
+  SM_Beast_Pad_A     2.6 x 1.4 x 2.2 m   at (-14.0, +9.0)   a great beast: broad
+                                                      shoulders, heavy body,
+                                                      small head, calm, grazing
+  SM_Beast_Pad_B     2.6 x 1.4 x 2.2 m   at (+13.0, -11.0)  a second great beast,
+                                                      same build, different angle
+  SM_Herb_Clump      0.7 x 0.7 x 0.5 m   5 of them       at (+6, +8), (+9, +11),
+                                                      (+3, +12), (+10, +6), (+7, +15)
+  SM_Gather_Bush     0.8 x 0.8 x 0.6 m   4 of them       at (-11, -16), (-16, -13),
+                                                      (-13, -19), (-18, -16)
+  SM_Dung_Pile       0.5 x 0.5 x 0.15 m  6 of them       at (-6, -7), (-2, -10),
+                                                      (+1, -5), (-9, -3), (+4, -11),
+                                                      (-11, -8)
+
+Scatter rule, and it matters: these small objects must NOT sit in a grid and
+must NOT cluster by type. No two of the same kind next to each other, minimum
+5 m apart, irregular. They should look dropped by animals wandering, not placed
+by a designer.
+
+Drop shadows straight down, no sun angle, so the plan reads flat and measurable.
+
+Style: clean technical line drawing, white background, black outlines, one accent
+colour per object family. This is a working drawing, not an illustration.
+```
+
+**Three things to check when you send this back:**
+
+1. **Are the two forest edges genuinely indistinguishable?** This is `DEC-0028` working or not.
+   If one reads as fuller or more inviting, the choice becomes a puzzle with a right answer and
+   players will optimise instead of choose — which kills the only reason for the mechanic.
+2. **Is the forest interior hidden from inside the meadow?** Same check as 2B-1. Gaps, not tree
+   height, are the failure mode.
+3. **Does anything man-made survive?** No path, no ring, no marker. If you spot a trail or a
+   stone circle, say so — I will have carried over something I thought I deleted.
+
+**There is no water master among the ten.** `EDGE_RIVER` is currently bound to `M_SpiritUnlit`,
+which is almost certainly wrong for water. Flagged in the spec rather than invented, because an
+eleventh master is your call.
+
+---
+
 # PART 3 — VERIFICATION, and the order to do this in
 
 ## Measure before you build

@@ -833,3 +833,41 @@ whether the camp is visible from the field at night. Those remain `2B-1` and tas
 
 **Reverses if:** the world gains a save-scumming or fast-travel system that lets the player
 recover a missed camp, which would remove the dead-save argument entirely.
+---
+
+## DEC-0028 - The camp forest is CHOSEN by the player, not fixed, not random
+
+**Date:** 2026-10-02
+**Decided by:** agent, from a Lead instruction
+**Surface:** level design / quest flow
+**Supersedes:** DEC-0027's placement method only. Its reasoning survives - see below.
+
+**Decision.** The field has four edges: a cliff (boundary, scenic), a river (future path), and
+two pine forests. **Entering either forest commits to it and the camp generates there.** The
+forest not chosen becomes a future path, eventually leading to an area like the river.
+
+**What survives from DEC-0027.** The whole argument was that a random climax cannot be gated,
+because the day event (companion taken, ejected) is scripted and irreversible. **That still
+holds** - and this answer satisfies it rather than avoiding it: the moment of choice is the
+player walking into a treeline, which is an authored, deterministic moment. It is gateable
+because the player makes it, not because the map did.
+
+**Why this is better than both things I originally offered:**
+
+- It keeps **player agency**. DEC-0027 had the player discovering a fixed place. Here they pick,
+  and the picking is the discovery.
+- It keeps **determinism after the choice**, so the rune can gate the day event and the dead-save
+  problem stays solved.
+- It adds a **second future** the player can see they gave up. The unchosen forest is a road they
+  did not take, which makes the choice feel like it cost something rather than being a formality.
+
+**THE HARD CONSTRAINT, and the reason this is not the lead's to answer casually:** both forest
+edges must look **identical** from inside the field - same density, height, opacity, silhouette.
+If one looks fuller, darker or more inviting, the choice stops being a choice and becomes a
+puzzle with a correct answer. Players will optimise instead of choose, and the whole thing
+becomes a test - which is the opposite of what V2b ("gather by day, tend by night") is for.
+
+**Rejected:** *cliff as a candidate edge* - it is a boundary and has no forest on it.
+
+**Does not decide:** forest density, how far back the sightline is cut, whether the cliff reads
+as safe or dangerous. Those stay in the image prompts and are the Lead's.
