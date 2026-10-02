@@ -85,9 +85,18 @@ HEIGHT_TOLERANCE_M: dict[str, float] = {
 
 POSITION_TOLERANCE_M = 0.25
 
-#: Footprint half-extents (x, y) of assembly roots, used only to check that a
-#: child module sits inside its parent assembly. From GRAYBOX_LAYOUT.md and the
-#: specs' own overall_size_m.
+#: Footprint FULL extents (x, y) of assembly roots, used only to check that a
+#: child module sits inside its parent assembly. SM_Cabin is
+#: CABIN_MODULES.json's own overall_size_m; SM_Garden_Beds and SM_Island_Hero are
+#: hand-entered to the size their specs declare, because those specs do not carry
+#: an overall_size_m field to read them from.
+#:
+#: FULL, not half. The containment check below halves each axis before comparing,
+#: because it asks how far a module sits from the assembly centre. SM_Island_Hero
+#: is 21.0 x 14.0 because that is the island's declared size, not because that is
+#: how far it reaches from its centre. The mistake to avoid is halving the data to
+#: match this comment: 10.5 x 7.0 as half-extents becomes a 5.25 m containment
+#: radius, and every module on the island beyond that starts failing 1_location.
 ASSEMBLY_FOOTPRINTS: dict[str, tuple[float, float]] = {
     "SM_Cabin": (5.5, 4.5),
     "SM_Garden_Beds": (4.0, 2.5),
