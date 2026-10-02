@@ -2,14 +2,14 @@
   "path": "UserHarness",
   "remote": "https://github.com/XylarDark/UserHarness.git",
   "branch": "master",
-  "sha": "a9d1cc47c49389dba8aacf0bbede31684a4ce28a",
-  "shortSha": "a9d1cc4",
+  "sha": "f7a7346a14b0900442b53b724a138344c82c08a7",
+  "shortSha": "f7a7346",
   "docPaths": [
     "docs/Setup/CURSOR_DEV.md",
     "Docs/13b_HR2_B_COLD_CLONE.md"
   ],
   "hr2Phase": "HR2-B",
-  "updated": "2026-09-30",
+  "updated": "2026-10-02",
   "productName": "DevHarness",
   "renamedFrom": "DevEnvTemplate",
   "note": "P5 path migration + 2026-09-30 Lead rename. Local path/gitlink renamed DevEnvTemplate -> UserHarness (P5); the upstream GitHub repo was then renamed to XylarDark/UserHarness by the Lead, so `remote` now points at the new URL. The old URL resolves only via GitHub rename redirect - do not reintroduce it. See Docs/handoffs/PIN_SYNC_POLICY.md.",
