@@ -145,6 +145,146 @@ def test_must_numbering_agrees_between_map_and_canonical_must_list():
         assert tag in must_text, f"{tag} does not appear in the canonical must list"
 
 
+#: The one vocabulary both documents must speak. Two documents that describe the same
+#: state in two vocabularies cannot be compared, so the comparison is what forces the
+#: vocabulary to be one. Order matters: first match wins, so put the specific first.
+_STATE_PATTERNS = (
+    (re.compile(r"CLOSED", re.IGNORECASE), "CLOSED"),
+    (re.compile(r"Logic done"), "LOGIC_DONE"),
+    (re.compile(r"Implemented\s*\(\s*logic\s*\)"), "LOGIC_DONE"),
+    (re.compile(r"Implemented\s*\+\s*tested", re.IGNORECASE), "LOGIC_DONE"),
+    # "Partial (logic), unbuilt (level)" is LOGIC_DONE, not PARTIAL: the logic half is
+    # written, only the level actor is missing. Must precede the bare-Partial pattern.
+    (re.compile(r"Partial\s*\(\s*logic\s*\)", re.IGNORECASE), "LOGIC_DONE"),
+    (re.compile(r"\*\*Y\*\*"), "Y"),
+    (re.compile(r"\*\*N\*\*"), "N"),
+    (re.compile(r"\bPartial\b"), "PARTIAL"),
+)
+
+
+def _state_of(text):
+    for pattern, state in _STATE_PATTERNS:
+        if pattern.search(text):
+            return state
+    return None
+
+
+def _map_found_states(map_text):
+    """Read the Found cell of every row in the CANON_MAP §3 table. Keyed by must number."""
+    states = {}
+    for line in _section(map_text, "## 3.").splitlines():
+        if not line.startswith("|"):
+            continue
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if len(cells) < 4:
+            continue
+        number = cells[0].strip("*").strip()
+        if not re.fullmatch(r"#?\d+", number):
+            continue
+        states[int(number.lstrip("#"))] = cells[2]
+    return states
+
+
+def _must_heading_states(must_text):
+    """Read the state off each must's own '### P0/P1/P2 - #N ... - STATE' heading."""
+    states = {}
+    for line in must_text.splitlines():
+        if not line.startswith("### "):
+            continue
+        match = re.search(r"#(\d+)\b", line)
+        if match:
+            states[int(match.group(1))] = line
+    return states
+
+
+#: #5 is deliberately out of bite order ("full Y"), so the must list never gave it a
+#: heading. Pinned so that a NEW missing heading fails loudly instead of being skipped.
+_NO_HEADING_EXPECTED = {5}
+
+
+def test_found_states_agree_between_map_and_canonical_must_list():
+    """THE test for the four false ``N``s (#2, #7, #8, #10).
+
+    An earlier version of this suite asserted only that must *numbers* appeared in both
+    files, and CANON_MAP §6 nonetheless claimed it checked the ``Found`` values. It did
+    not: two documents could disagree on every single state and still pass. That is the
+    same failure class as the stale rows themselves -- asserting something weaker than
+    the thing you actually need, and calling it coverage.
+
+    This one parses the real ``Found`` cell and the real heading, normalises both to one
+    vocabulary, and compares. Mutating either side to a different state must fail it.
+    """
+    map_states = _map_found_states(_read(CANON_MAP))
+    headings = _must_heading_states(_read(MUST_LIST))
+
+    assert set(map_states) == set(range(1, 18)), (
+        f"CANON_MAP §3 must carry a Found row for all 17 musts; found {sorted(map_states)}"
+    )
+    unexpectedly_present = _NO_HEADING_EXPECTED & set(headings)
+    assert not unexpectedly_present, (
+        f"{sorted(unexpectedly_present)} were declared heading-less but now have a "
+        "heading - delete the allowlist entry so they are compared like every other must"
+    )
+    lost = (set(range(1, 18)) - _NO_HEADING_EXPECTED) - set(headings)
+    assert not lost, (
+        f"these musts lost their '### ' heading in the must list: {sorted(lost)}. A "
+        "deleted heading would silently drop a must out of this comparison"
+    )
+
+    disagreements = []
+    for number in sorted(set(map_states) - _NO_HEADING_EXPECTED):
+        map_state = _state_of(map_states[number])
+        heading_state = _state_of(headings[number])
+        assert map_state is not None, (
+            f"#{number}: CANON_MAP §3 Found cell {map_states[number]!r} uses no known "
+            f"state word. Known: {[s for _, s in _STATE_PATTERNS]}"
+        )
+        assert heading_state is not None, (
+            f"#{number}: must-list heading carries no known state word: {headings[number]!r}"
+        )
+        if map_state != heading_state:
+            disagreements.append(
+                f"#{number}: map says {map_state!r} ({map_states[number]!r}) but the must "
+                f"list heading says {heading_state!r} ({headings[number]!r})"
+            )
+
+    assert not disagreements, (
+        "CANON_MAP §3 and T0_MECHANIC_INVENTORIES_V1.md disagree on what is built. Two "
+        "documents recording built-ness must not drift:\n  "
+        + "\n  ".join(disagreements)
+    )
+
+
+def test_no_must_is_recorded_absent_while_a_t0_hook_is_declared():
+    """A ``Found`` of ``N`` must not survive once the character declares a ``T0 #n`` hook.
+
+    This is the direct check on the four false negatives. #2, #7, #8 and #10 each read
+    ``N`` while ``HomeWorldCharacter.h`` declared the matching hook by name -- a grep
+    miss, not an absence. If someone reintroduces an ``N`` for a numbered hook, this fails.
+    """
+    header = os.path.join(REPO_ROOT, "Source", "HomeWorld", "HomeWorldCharacter.h")
+    assert os.path.exists(header), "HomeWorldCharacter.h is where the T0 hooks are declared"
+    text = _read(header)
+
+    declared = {int(n) for n in re.findall(r"T0 #(\d+)", text)}
+    assert declared, (
+        "no 'T0 #n' markers found in HomeWorldCharacter.h. If the hooks were renamed, "
+        "update this test deliberately -- do not let it pass on an empty set."
+    )
+
+    map_states = _map_found_states(_read(CANON_MAP))
+    wrongly_absent = [
+        n
+        for n in sorted(declared & set(map_states))
+        if _state_of(map_states[n]) in ("N", None)
+    ]
+    assert not wrongly_absent, (
+        f"CANON_MAP §3 records {wrongly_absent} as absent, but HomeWorldCharacter.h "
+        "declares a named T0 hook for each. Either the hook is dead code (delete it and "
+        "say so) or the map is stale (fix it). Do not relax this assertion."
+    )
+
+
 def test_m17_stealth_is_never_recorded_as_absent():
     """THE anti-regression test for the error that motivated this file.
 

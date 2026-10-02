@@ -871,3 +871,51 @@ becomes a test - which is the opposite of what V2b ("gather by day, tend by nigh
 
 **Does not decide:** forest density, how far back the sightline is cut, whether the cliff reads
 as safe or dangerous. Those stay in the image prompts and are the Lead's.
+---
+
+## DEC-0029 - The operative vision is `VISION_BOARD.md`; `00_CANON.md` + `canon/` are superseded FOR PROTOTYPE SCOPE
+
+**This records a decision the Lead already made on 2026-10-02. It does not take a new one.**
+
+Asked "do we have a single source of truth for the canon", the honest finding was that the
+*substance* is singular but nothing says so, so it reads as three. Three documents declare
+themselves authoritative over the same question, and the newest one never names the ones it
+replaces:
+
+| Document | Declares | Last touched |
+| --- | --- | --- |
+| `Docs/00_CANON.md` | `Status: LOCKED (P0)` | pre-T0 |
+| `Docs/canon/*.md` (12 files) | `Status: LOCKED` | 2026-09-21 |
+| `Docs/VISION_BOARD.md` | `CANON for product work` | 2026-10-02 |
+
+`Docs/canon/README.md:3` names `00_CANON.md` and `01_GDD_MVP.md` as the "long sources of truth"
+and `canon/` points at nothing else. `VISION_BOARD.md` never once mentions `00_CANON.md` or
+`canon/`. So the supersession is real but **unrecorded**, which means every new reader has to
+rediscover it - and a reader who starts at `canon/README.md` lands on the September vision and
+never learns it is stale.
+
+**The decision:** for prototype scope, `VISION_BOARD.md` (V2b, gather by day / tend by night) is
+the operative vision. `00_CANON.md`, `canon/*` and `01_GDD_MVP.md` remain valid as **Act 2+
+background** - they are not wrong, they are simply describing a different, earlier cut, and
+VISION_BOARD §2 already defers the family/rescue/ruin text there on purpose.
+
+**Substantively the two agree on the axis**, which is why this was survivable rather than
+loudly broken: both put gathering in the day and tending/nurturing in the night, both forbid
+kill-combat and require convert-not-kill, both keep the homestead non-combat. What changed is
+*who you are* - and there the old set is wrong in one specific, load-bearing line:
+
+> `Docs/canon/FANTASY.md:14` - `| Player | Family co-op caretaker (body by day, spirit by night) |`
+
+VISION_BOARD §1 (Lead, 2026-10-02) says *"You are **alone** and you have **lost something**"*, and
+V1b adds **one** companion who is rescued - Q16/Q18/Q19/Q20 settled on one NPC. So `FANTASY.md` is
+the only sentence in the set that names the protagonist, and it names the wrong one. It also
+contradicts its own sibling `canon/DO_NOT.md:30`, which drops co-op for "NPC family".
+
+**Not decided here, and deliberately so:** I did not edit `FANTASY.md`, `canon/*` or
+`00_CANON.md`. All three are Lead-LOCKED, and "who the player is" is product framing, which the
+ownership map above puts on the **human**. The one-line contradiction is escalated instead. What
+the agent can own - and does - is that the supersession is now written down, plus
+`Docs/CANON_MAP.md` as the entry point that names it.
+
+**Why this is a doc problem and not a taste problem:** the vision was never ambiguous. It was
+invisible from two of its three doors.

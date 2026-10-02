@@ -979,3 +979,145 @@ Full chronological history remains in **SESSION_LOG.md** (~850KB+). CI still req
 - DESKTOP **`98c7b36` ~12:09:** path canon OK; async driver + early **`act_end`** → settle **`exists:false`**, PNG same second as gate.
 - Fix: **`_ps_c_one_cam_sync_capture_still`** + **`capture_viewport.wait_for_png_on_disk`** (single AL, render flush, no slate driver/defer). CAM-002 hold.
 
+
+## 2026-10-02 - T0 #14/#15/#16 as code + doc consolidation (agent)
+
+**Two false negatives found and fixed in one session, both the same defect class.**
+
+`#17 Spirit-stealth` was recorded as `Found: Nothing` while it was LOCKED (2026-09-21),
+implemented (`HomeWorldSpiritStealthComponent.{h,cpp}` + `HomeWorldSpiritLitVolume.h`) and CLOSED
+under `APPROVE SS-A`. `#14` read `no guard/sleeper/soothe` while `TryAvoidNodeGuard` and
+`TrySootheNodeSleeper` sat in the same component. Cause in both cases: **not missing docs, a missing
+pointer.** The must list answers "what must be true"; "is it built?" lives in per-subsystem track
+docs and nothing in the T0 track pointed at them. Same shape as the broken shrine - nothing named it.
+
+Rule now enforced, not remembered: the `Found` column may say `N` only if no `APPROVE`-stamped
+track doc claims the mechanic. `Docs/CANON_MAP.md` �3 is the cross-link; `test_canon_map.py`
+asserts #17 cites its stamp and can never read `N` again.
+
+**Structural findings.** `Docs/` and `docs/` are the SAME directory on this machine (identical
+hashes, 441 md each) - the canon split asserted in `AGENTS.md` and `Docs/README.md` does not exist
+on disk. `Docs/README.md` is a chronological wave log, so it answers "what did WAVE B do?" but not
+"where is the camp-night rescue spec?".
+
+**Camp night, as corrected by the Lead (Q25).** All THREE actors are calmed, not "avoid 1 + soothe 2":
+the guard is eased awake->asleep, the two sleepers eased to *stay* asleep. The gate needs each
+actor BOTH eased AND asleep. Consequences: avoiding the guard never opens the gate; a woken sleeper
+closes it again and re-easing does not put them back to sleep; killed and converted both block it
+(`EConvertedFoeRole` is what happens to foes you defeat - conflating it with care inverts the beat).
+
+**Touch rule (#15), now code.** Allowed: `Soil`, `Lashings`, `ActorMind`. Refused: `ActorBody` -
+a spirit has no hands. `ActorMind` is the exception that lets #14/#16 exist; `ActorBody` is what
+keeps the beat about easing minds rather than dragging bodies. Every verdict logged.
+
+**Fail-open contained.** The gate soft-latches when an actor is absent (kept: a reviewer is never
+hard-blocked by missing content) but marks `bSoftLatch`. `SatisfiesFreedomGateStrict()` refuses
+those and is the evidence half; the gameplay half logs `SOFT_LATCH_ONLY` so the difference is
+visible instead of hidden in a return value. Before this, #14 could certify itself with zero actors
+in the world.
+
+**Evidence.** 17/17 T0 automation tests green headless on UE 5.8.2 (was 8, all 9 new camp tests
+are world-free). `GetCalmedActorCount()` initially read 0 in two tests - correct behaviour, wrong
+assertions: with no camp actors every ease soft-latches. Fixed by building the camp in those tests,
+which also gives `FindCampActorInWorld` its first coverage at all. One assertion was outright wrong
+(the "gate is three wide" check asked a fresh camp to already be complete). Mutation suite
+`_mutate_camp_night.py`: M1 gate bypass, M2 ActorBody allowed, M3 eased-not-required, M4
+converted-as-calm, M5 guard-ease-no-sleep, M6 actor lookup silently fails.
+
+**Host test suite could not run at all** before this session - `pytest Content/Python/tests` aborted
+during collection on 7 Editor-only files. `conftest.py` now detects them by scanning for a
+module-level `import unreal` rather than listing them, and `test_host_collection.py` checks the
+guard from a collected file (pytest does NOT collect test functions out of a conftest, so the first
+self-check was dead code). 53 host tests green, up from zero runnable.
+
+**Also:** `T0_M14_CAMP_NIGHT_GATE_PROVE.md` rewritten against the corrected beat, including a
+`closed_fail` for a *silent* soft latch. `TryCampNight` rewired off the dead two-verb flow - it
+would otherwise never have opened the new gate. Legacy verbs kept callable for Blueprint but marked
+LEGACY.
+
+**Still unbuilt:** the camp. No `NODE_GUARD`/`NODE_SLEEPER`/`NODE_CAPTIVE` in any `.umap`, so every
+real run soft-latches. Blocks M8, M13, M14 and three prove scripts. Blocked on the camp image.
+
+---
+
+## 2026-10-02 - T0 must-list `Found` column: four more false negatives, and a real state check
+
+**Asked:** "How are we on our canon docs health? Did we finish the consolidation and do we
+have a single source of truth now?" - clarified to mean the **bible / vision**, not doc hygiene.
+
+### The canon answer (the substance, not the indices)
+
+The **vision axis is singular and consistent**: gather by day, tend by night; no kill-combat;
+convert-not-kill; homestead non-combat. `VISION_BOARD.md` (V2b), `00_CANON.md`, `01_GDD_MVP.md`
+and `canon/*` all agree on that. **But it reads as three bibles**, because the supersession was
+never written down:
+
+- `00_CANON.md` declares `LOCKED (P0)`; `canon/*.md` (12 files) declare `LOCKED`, last touched
+  2026-09-21; `VISION_BOARD.md` declares `CANON for product work`, 2026-10-02.
+- `canon/README.md:3` names `00_CANON.md` + `01_GDD_MVP.md` as the long sources of truth.
+- **`VISION_BOARD.md` never once names `00_CANON.md` or `canon/`.**
+- One load-bearing stale line: `canon/FANTASY.md:14` says the player is a
+  *"Family co-op caretaker"*; VISION_BOARD §1 says *"You are **alone** and you have **lost
+  something**"* + one rescued companion. It also contradicts its own `canon/DO_NOT.md:30`.
+
+**Recorded as DEC-0029** (records the Lead's 2026-10-02 decision; takes no new one). NOT edited:
+`FANTASY.md` / `canon/*` / `00_CANON.md` are Lead-LOCKED and "who the player is" is product
+framing - human-owned. Escalated instead. `CANON_MAP.md` §0 now states the supersession at the
+door.
+
+### The `Found` column was stale for #1-#13 - a third batch of false negatives
+
+The four `N`s were **grep misses, not absences**. `HomeWorldCharacter.h` declares a named `T0 #n`
+hook for each, and for #2/#7/#8 the absence claim was contradicted by *passing* tests:
+
+| # | row said | actually |
+| --- | --- | --- |
+| 2 | "No kettle/tea path" | `TryBrewNodeKettleTea` + `TryNodeKettleInteractInFront`; `HomeWorld.T0.M2.TeaGateOffWithoutBrew` passes |
+| 7 | "`rune` = 0 hits" | `SetRuneGateUnlocked`; two-gate form; `M9.BothGatesGrantSpirit` passes |
+| 8 | "`eject` = 0" | `TryCampDayEject` emits `NODE_DAY_CAMP`/`EJECT_HOME`/`TOD_DAY`/`FORM_BODY`/`CAM_T0_CAMP_DAY` (`HomeWorldCharacter.cpp:1915`) |
+| 10 | "No reverse boot" | `StartGlideHome(bAllowNightPhase)` reusing the FALLBACK glide component (`HomeWorldCharacter.cpp:2010`) |
+
+Also corrected: #1, #3, #4, #6, #9, #11, #12, #13 rows + the `#15` heading (still read
+`**N (new, 2026-10-02)**` while its row said implemented). Every corrected `Found` row keeps
+**logic** and **level** apart, exactly as #14's does: hooks exist, but **no `.umap` carries
+`NODE_KETTLE` / `NODE_RUNE` / `NODE_DAY_CAMP` / `NODE_BED` / `NODE_PLANT_SLOT` /
+`NODE_PORTAL_CAMP`**, so these have never run against a real world.
+
+### CANON_MAP §6 was an overclaim - now made true
+
+§6 claimed the suite checked that §3's `Found` values agree with the must list. **It did not** -
+it only asserted must *numbers* appeared in both files, so the two documents could disagree on
+every state and still pass. Same failure class as the stale rows. Two new tests fix it:
+
+- `test_found_states_agree_between_map_and_canonical_must_list` - parses the real `Found` cell
+  and the real heading, normalises both to one vocabulary (`N`/`Y`/`Partial`/`Logic done`/
+  `CLOSED`) and compares. Pinned so a *deleted* heading cannot silently drop a must out of the
+  comparison.
+- `test_no_must_is_recorded_absent_while_a_t0_hook_is_declared` - greps `T0 #n` out of
+  `HomeWorldCharacter.h` and fails if any such must is recorded `N`. This is the direct check on
+  the four false negatives.
+
+`_mutate_canon_map.py` extended M9-M13 for them. **13/13 mutations killed.** It earned its keep
+twice: it caught a real ordering bug in the state vocabulary (`Partial (logic), unbuilt (level)`
+must map to `LOGIC_DONE`, not `PARTIAL`), and it caught a typo of mine in the harness itself
+(`agrees` vs `agree`) that had made three mutations look like survivors.
+
+### Also in this commit
+- Camp night as code: `HomeWorldCampNightTypes.{h,cpp}`, `HomeWorldCampNightTests.cpp` (9
+  world-free tests), `HomeWorldSpiritStealthComponent` extended, `TryCampNight` rewired off the
+  dead two-verb flow. **17/17 T0 automation tests green headless on UE 5.8.2.**
+- Legacy verbs kept callable for BP, marked `LEGACY`. Soft latch contained via `bSoftLatch` +
+  `SOFT_LATCH_ONLY`; `SatisfiesFreedomGateStrict()` is the evidence half.
+- `CAMP.json` + `FIELD.json` both carry `spirit_touch`.
+
+### Still blocked / not claimed
+- **Camp geometry unbuilt** (`camp_named_objects: []`) - blocks M8, M13, M14 and three prove
+  scripts. Blocked on the camp image (image work paused by the Lead).
+- **6 beats `NO_VERDICT`** (M2, M3, M4, M6, M7, T0_default). **0 of 14 proven.**
+- `APPROVE-T0-MECHANIC-INV` still unchecked while 13 PRs merged against it.
+- M6 of `_mutate_camp_night.py` still unresolved; M2 repointed to `TYPES_CPP`.
+
+### Durable lesson
+> A `Found` column is a snapshot of whatever you happened to have open. Three times now a
+> mechanic read as absent because no document pointed at the file holding it. The fix is not
+> "look harder" - it is **two documents that must agree, machine-checked.**

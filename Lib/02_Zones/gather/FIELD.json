@@ -16,8 +16,16 @@
     ],
     "what_that_changes_about_play": "With no path and no arrival marker, THE OPENING BEAT BECOMES 'look around and decide where to go'. The first thing the player does is read the land, which is exactly what VISION_BOARD asks for - the world announces what it wants by its shape alone. The three edge types have to each read as inviting and different, and NONE of them may look like the correct answer."
   },
-  "world_origin": [0.0, -80.0, -95.0],
-  "world_bounds_m": { "x": 70.0, "y": 70.0, "z": 0.0 },
+  "world_origin": [
+    0.0,
+    -80.0,
+    -95.0
+  ],
+  "world_bounds_m": {
+    "x": 70.0,
+    "y": 70.0,
+    "z": 0.0
+  },
   "bounds_note": "Was 60 x 40 in the first pass. Now roughly square, because four distinct edges need four distinct sides and a rectangle makes two of them feel like leftovers.",
   "arrival": {
     "position": "centre of the field, (0, 0)",
@@ -69,40 +77,161 @@
   },
   "ground_cover": {
     "material": "M_StylizedGrass",
-    "height_m": [0.9, 1.2],
+    "height_m": [
+      0.9,
+      1.2
+    ],
     "read": "long flowing grass, waist-to-chest on a 1.8 m adult",
     "why_the_height_is_a_mechanic_not_a_decoration": "At 1.1 m the grass hides a 0.15 m dung pile, so roaming actually means something. It also means a 2.2 m beast reads above the grass line where a human-sized animal would not, which is what makes 'great' legible without a label.",
     "no_paths": "0.35 m flattened grass is DELETED along with SM_Path_Field. The field is walked flat by animals, not by people."
   },
   "materials": [
-    { "slot": "grass", "master": "M_StylizedGrass" },
-    { "slot": "beasts", "master": "M_BeastStylized" },
-    { "slot": "herbs", "master": "M_GatherHerb" },
-    { "slot": "forest_bark", "master": "M_WoodWild" },
-    { "slot": "cliff_and_stones", "master": "M_CliffRock" },
-    { "slot": "river_water", "master": "M_SpiritUnlit", "note": "Standing in for water. There is no water master among the ten. Flagged rather than invented - a water material may be worth a tenth-plus-one decision from the Lead." },
-    { "slot": "fertilizer_applied", "master": "M_Nurtured" }
+    {
+      "slot": "grass",
+      "master": "M_StylizedGrass"
+    },
+    {
+      "slot": "beasts",
+      "master": "M_BeastStylized"
+    },
+    {
+      "slot": "herbs",
+      "master": "M_GatherHerb"
+    },
+    {
+      "slot": "forest_bark",
+      "master": "M_WoodWild"
+    },
+    {
+      "slot": "cliff_and_stones",
+      "master": "M_CliffRock"
+    },
+    {
+      "slot": "river_water",
+      "master": "M_SpiritUnlit",
+      "note": "Standing in for water. There is no water master among the ten. Flagged rather than invented - a water material may be worth a tenth-plus-one decision from the Lead."
+    },
+    {
+      "slot": "fertilizer_applied",
+      "master": "M_Nurtured"
+    }
   ],
   "master_binding_note": "First pass named M_GrassField, M_FurBeast, M_LeafHerb and M_BarkPine - four invented names, none real. Caught by test_zone_specs_name_only_canon_masters, which is the same failure as M_FamilySilhouette and M_ValleyNight earlier in the pipeline.",
   "modules": [
-    { "name": "SM_Beast_Pad_A", "size_m": [2.6, 1.4, 2.2], "at_offset": [-14.0, 9.0, 0.0], "role": "great_beast_tameable", "binds_to": "AHomeWorldBeastPad", "measured_from": "authored, not built" },
-    { "name": "SM_Beast_Pad_B", "size_m": [2.6, 1.4, 2.2], "at_offset": [13.0, -11.0, 0.0], "role": "great_beast_tameable", "binds_to": "AHomeWorldBeastPad", "measured_from": "authored, not built" },
-    { "name": "SM_Gather_Bush_01", "size_m": [0.8, 0.8, 0.6], "at_offset": [-11.0, -16.0, 0.0], "count": 4, "spacing_m": 5.0, "yields": "RES_BERRY", "measured_from": "authored, not built" },
-    { "name": "SM_Herb_Clump_01", "size_m": [0.7, 0.7, 0.5], "at_offset": [6.0, 8.0, 0.0], "count": 5, "yields": "RES_HERB", "measured_from": "authored, not built" },
-    { "name": "SM_Dung_Pile_01", "size_m": [0.5, 0.5, 0.15], "at_offset": [-6.0, -7.0, 0.0], "count": 6, "yields": "RES_SEED", "applied_as": "night-time tending, per VISION_BOARD V2b. Moves a garden bed's soil state; rendered with M_Nurtured.", "measured_from": "authored, not built" }
+    {
+      "name": "SM_Beast_Pad_A",
+      "size_m": [
+        2.6,
+        1.4,
+        2.2
+      ],
+      "at_offset": [
+        -14.0,
+        9.0,
+        0.0
+      ],
+      "role": "great_beast_tameable",
+      "binds_to": "AHomeWorldBeastPad",
+      "measured_from": "authored, not built"
+    },
+    {
+      "name": "SM_Beast_Pad_B",
+      "size_m": [
+        2.6,
+        1.4,
+        2.2
+      ],
+      "at_offset": [
+        13.0,
+        -11.0,
+        0.0
+      ],
+      "role": "great_beast_tameable",
+      "binds_to": "AHomeWorldBeastPad",
+      "measured_from": "authored, not built"
+    },
+    {
+      "name": "SM_Gather_Bush_01",
+      "size_m": [
+        0.8,
+        0.8,
+        0.6
+      ],
+      "at_offset": [
+        -11.0,
+        -16.0,
+        0.0
+      ],
+      "count": 4,
+      "spacing_m": 5.0,
+      "yields": "RES_BERRY",
+      "measured_from": "authored, not built"
+    },
+    {
+      "name": "SM_Herb_Clump_01",
+      "size_m": [
+        0.7,
+        0.7,
+        0.5
+      ],
+      "at_offset": [
+        6.0,
+        8.0,
+        0.0
+      ],
+      "count": 5,
+      "yields": "RES_HERB",
+      "measured_from": "authored, not built"
+    },
+    {
+      "name": "SM_Dung_Pile_01",
+      "size_m": [
+        0.5,
+        0.5,
+        0.15
+      ],
+      "at_offset": [
+        -6.0,
+        -7.0,
+        0.0
+      ],
+      "count": 6,
+      "yields": "RES_SEED",
+      "applied_as": "night-time tending, per VISION_BOARD V2b. Moves a garden bed's soil state; rendered with M_Nurtured.",
+      "measured_from": "authored, not built"
+    }
   ],
   "scatter_rule": "Herbs, berries and dung are scattered with NO clustering and no grid. They must not read as placed. Minimum separation 5 m, no two of the same type adjacent, so the player has to cover ground rather than follow a line.",
   "existing_systems_reused": [
-    { "thing": "Taming", "exists_at": "AHomeWorldBeastPad (HomeWorldBeastPad.h:17) -> UHomeWorldBeastTameComponent", "states": "Wild -> Cautious -> Tamed -> Helper", "note": "Already built with transition logging. Not new work - the two beast pads are the only thing needing authoring." },
-    { "thing": "Herb gathering", "exists_at": "RES_HERB", "note": "55 references - the most-used resource in the project." },
-    { "thing": "Six-resource inventory", "exists_at": "TryAddResource / GetResource", "resources": "RES_HERB, RES_SEED, RES_WOOD, RES_BERRY, RES_FIBER, RES_STONE" }
+    {
+      "thing": "Taming",
+      "exists_at": "AHomeWorldBeastPad (HomeWorldBeastPad.h:17) -> UHomeWorldBeastTameComponent",
+      "states": "Wild -> Cautious -> Tamed -> Helper",
+      "note": "Already built with transition logging. Not new work - the two beast pads are the only thing needing authoring."
+    },
+    {
+      "thing": "Herb gathering",
+      "exists_at": "RES_HERB",
+      "note": "55 references - the most-used resource in the project."
+    },
+    {
+      "thing": "Six-resource inventory",
+      "exists_at": "TryAddResource / GetResource",
+      "resources": "RES_HERB, RES_SEED, RES_WOOD, RES_BERRY, RES_FIBER, RES_STONE"
+    }
   ],
+  "spirit_touch": {
+    "settled": "Lead 2026-10-02 (must #15). The law in one line: a spirit has no hands.",
+    "full_table_at": "Lib/02_Zones/combat/CAMP.json -> spirit_touch (one table, two zones)",
+    "at_this_zone": "Soil is ALLOWED - tending the garden is the night's verb (M12). That is the whole of FIELD's involvement: this zone supplies the soil the spirit tends after dark. Note the timing dependency - dung is gathered by day (RES_SEED), soil is worked at night, so a player who cannot reach spirit form cannot advance the garden at all. That is the secondary risk recorded below, and it is a real one.",
+    "why_it_matters_here": "Before this rule existed, 'can a spirit tend soil?' was an idle question because there was no night-time tending to ask it about. VISION_BOARD V2b - gather by day, tend by night - made it load-bearing, and it now gates M12 outright."
+  },
   "gap_fertilizer": {
     "status": "RESOLVED 2026-10-02 - Q24 answered by the Lead, and it was not about fertilizer",
     "the_answer": "'Gather by day, tend by night will be the theme throughout the game.'",
     "dung_yield": "RES_SEED",
     "why_res_seed": "Compost is the seed resource's natural sibling, so this adds NO seventh resource and the locked six stay intact. M_Nurtured and RES_SEED already existed with nothing pointing at them.",
-    "what_it_left_unwritten": "THE MOST LOAD-BEARING UNWRITTEN RULE IN THE PROTOTYPE: what may a spirit TOUCH? Soil, yes. A rope, to free the captive? A sleeping guard? Both the garden and the camp rescue depend on the answer and it does not exist in Source/.",
+    "what_it_left_unwritten": "RESOLVED 2026-10-02 - was: 'THE MOST LOAD-BEARING UNWRITTEN RULE IN THE PROTOTYPE: what may a spirit TOUCH? Soil, yes. A rope, to free the captive? A sleeping guard? Both the garden and the camp rescue depend on the answer and it does not exist in Source/.' The question is answered and the code exists: HomeWorldCampNight::GetSpiritTouchVerdict, enforced and logged by UHomeWorldSpiritStealthComponent::EvaluateSpiritTouch, with nine world-free automation tests. See the spirit_touch block below and CAMP.json for the full four-row table.",
     "secondary_risk": "Night is now mandatory for homestead progress - a player who cannot reach spirit form cannot advance the garden at all. Hard dependency on M11 (bed AND rune), needs a fallback or a legible failure."
   },
   "measured": null,

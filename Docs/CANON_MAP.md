@@ -2,6 +2,31 @@
 
 **Written 2026-10-02, after a consolidation failure that was caught in the act.**
 
+## 0. Which document is the vision
+
+Three documents declare themselves authoritative over the same question, and the newest never
+names the ones it replaces. So, explicitly:
+
+> **For prototype scope the vision is [`Docs/VISION_BOARD.md`](VISION_BOARD.md) — V2b,
+> "gather by day, tend by night".** `Docs/00_CANON.md` (LOCKED P0) and `Docs/canon/*.md`
+> (12 LOCKED files, last touched 2026-09-21) describe an **earlier cut** and are superseded
+> *for prototype scope only*. `Docs/01_GDD_MVP.md` likewise. All three remain valid as
+> **Act 2+ background** — VISION_BOARD §2 defers that text there deliberately.
+>
+> Recorded as [DEC-0029](decisions/AGENT_DECISIONS.md#dec-0029). It takes no new product decision;
+> it writes down the Lead's 2026-10-02 one.
+
+The vision axis is **not** in conflict — old and new both put gathering in the day, tending in
+the night, forbid kill-combat, and require convert-not-kill. What differs is *who you are*, and
+there is exactly one stale line, escalated and not edited (it is Lead-LOCKED and it is product
+framing):
+
+> `Docs/canon/FANTASY.md:14` — `| Player | Family co-op caretaker (body by day, spirit by night) |`
+> vs VISION_BOARD §1 — *"You are **alone** and you have **lost something**"*, plus **one**
+> companion who is rescued (Q16/Q18/Q19/Q20).
+
+**The vision was never ambiguous. It was invisible from two of its three doors.**
+
 ## Why this file exists
 
 While implementing T0 I wrote this into the must list:
@@ -95,22 +120,37 @@ doc claims the mechanic. This table is that cross-link, and §6 makes it machine
 | # | Must | Found — verified against `Source/` | Evidence |
 |---|---|---|---|
 | #1 | Wake / start day | Partial | `HomeWorldTimeOfDaySubsystem` |
-| #2 | Kettle + herbs + sprint | **N** | — |
+| #2 | Kettle + herbs + sprint | **Logic done** | `TryBrewNodeKettleTea` + `TryNodeKettleInteractInFront`; `HomeWorld.T0.M2.TeaGateOffWithoutBrew`. **Level unbuilt** — no `NODE_KETTLE` actor |
 | #3 | Plant given herb | Partial | — |
 | #4 | Backpack → inventory | Partial | `HomeWorldInventorySubsystem` |
 | #5 | *(full Y — excluded from bite order)* | **Y** | — |
 | #6 | Collect herb seeds in field | Partial | `RES_HERB`, 55 refs |
-| #7 | Rune unlock before bed→spirit | **N** | — |
-| #8 | Day camp eject | **N** | — |
-| #9 | Night w/o bed stays body | **Partial, TESTED** | `HomeWorldFormGateTests.cpp`, 4 tests |
-| #10 | Planetside night boot home | **N** | — |
+| #7 | Rune unlock before bed→spirit | **Logic done** | `SetRuneGateUnlocked`; two-gate form in `HomeWorldFormGateTests.cpp`. **Level unbuilt** — no `NODE_RUNE` actor |
+| #8 | Day camp eject | **Logic done** | `TryCampDayEject` emits `NODE_DAY_CAMP`/`EJECT_HOME`/`TOD_DAY`/`FORM_BODY`/`CAM_T0_CAMP_DAY` (`HomeWorldCharacter.cpp:1915`). **Level unbuilt** — no `NODE_DAY_CAMP` actor, no M8 test |
+| #9 | Night w/o bed stays body | Partial | `bSpiritFormGate` + `bSpiritSleepGate`; `HomeWorldFormGateTests.cpp`, 4 tests |
+| #10 | Planetside night boot home | **Logic done** | `StartGlideHome(bAllowNightPhase)` reusing the FALLBACK glide component — `NODE_GLIDER`/`EJECT_HOME`/`TOD_NIGHT_HOME`/`FORM_BODY` (`HomeWorldCharacter.cpp:2010`). **Level unbuilt** — no M10 test |
 | #11 | Bed → spirit | Partial | `bSpiritSleepGateGranted` |
 | #12 | Nurture planted herb | Partial | `HomeWorldNurtureComponent` |
 | #13 | Home portal → camp portal | Partial | `HomeWorldShrinePortalComponent` |
-| **#14** | **Camp night: 3 calmed** | **Partial, untested** | `TryAvoidNodeGuard` / `TrySootheNodeSleeper` — **soft-latches**, see §4 |
-| #15 | What a spirit may touch | **N** | being written this session |
-| #16 | Free the captive, gated | **N** | being written this session |
+| **#14** | **Camp night: 3 calmed** | **Logic done + tested; level unbuilt** | `TryEaseCampActor` / `IsFreedomUnlocked` / `…Strict`; 6 tests in `HomeWorldCampNightTests.cpp`. **Soft-latches** — no camp actors in any `.umap`, see §4 |
+| #15 | What a spirit may touch | **Logic done + tested** | `HomeWorldCampNight::GetSpiritTouchVerdict`; `EvaluateSpiritTouch` logs every verdict; 2 tests |
+| #16 | Free the captive, gated | **Logic done + tested; level unbuilt** | `FHomeWorldCampActorCalm::SatisfiesFreedomGate(Strict)`; `TryFreeCaptive`; 2 tests |
 | **#17** | **Spirit-stealth** | **CLOSED — `APPROVE SS-A` 2026-09-21** ✅ | `Docs/25_SPIRIT_STEALTH_IMPL.md`; `HomeWorldSpiritStealthComponent.{h,cpp}`; `HomeWorldSpiritLitVolume.h`; `Docs/31_SPIRIT_STEALTH_FEEL.md` |
+
+**A second false negative was found and fixed the same day.** #14's row read *"Lit stealth
+volumes only; no guard/sleeper/soothe"* while `TryAvoidNodeGuard` and `TrySootheNodeSleeper` sat
+in the same component, uncredited.
+
+**A third, larger batch: four more `N`s that were all false.** #2 read *"No kettle/tea path"*,
+#7 read *"`rune` = 0 hits"*, #8 read *"`eject` = 0"*, #10 read *"No reverse boot"*. Every one of
+those was a **grep miss, not an absence** — `AHomeWorldCharacter` declares a named `T0 #n` hook
+for each (`TryBrewNodeKettleTea`, `SetRuneGateUnlocked`, `TryCampDayEject`, `StartGlideHome`), and
+#2/#7/#8's absence claims were contradicted by *passing tests*. The rows were written before the
+code landed and never revisited, because revisiting them required opening `HomeWorldCharacter.h`
+— a file no must-list row pointed at. **The lesson generalises: a `Found` column is a snapshot of
+whatever you happened to have open.** So the `Found` state is now machine-compared against the
+must list's own headings (§6, item 2) — two documents that must agree, checked rather than
+remembered.
 
 **Also already built, and previously uncredited to T0:** `HomeWorldBeastPad` +
 `HomeWorldBeastTameComponent` (Wild→Cautious→Tamed→Helper, with transition logging);
@@ -156,9 +196,17 @@ visible in the log rather than hidden in a return value.
 `Content/Python/tests/test_canon_map.py` asserts:
 
 1. every path named in §2 exists on disk;
-2. the §3 `Found` values agree with the headings in `T0_MECHANIC_INVENTORIES_V1.md`;
+2. **the §3 `Found` value for each must equals the state in that must's own heading in
+   `T0_MECHANIC_INVENTORIES_V1.md`** — the two documents that both record built-ness are
+   compared, so neither can drift alone;
 3. §3 names `APPROVE` for #17 (the anti-regression: it may never read `N` again);
 4. the ten masters and six resources named in §2 are the canon sets.
+
+**Item 2 was previously claimed and not tested.** The original suite asserted only that must
+*numbers* appeared in both files, so two documents could disagree on every state and still pass —
+the overclaim was the same failure class as the stale rows it was meant to catch. It is now a
+real comparison, normalised to one vocabulary (`N` / `Y` / `Partial` / `Logic done` / `CLOSED`),
+and mutation-checked: flipping a state in either file has to fail the suite.
 
 A map nobody checks is a map that goes stale — which is how #17 got misread in the first place.
 **Deliberately over-specified rather than convenient:** a doc that fails its own test is cheaper

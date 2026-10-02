@@ -18,6 +18,7 @@ REPO = os.path.normpath(os.path.join(HERE, "..", "..", ".."))
 TEST = os.path.join(HERE, "test_canon_map.py")
 MAP = os.path.join(REPO, "Docs", "CANON_MAP.md")
 MUSTS = os.path.join(REPO, "Docs", "handoffs", "T0_MECHANIC_INVENTORIES_V1.md")
+HEADER = os.path.join(REPO, "Source", "HomeWorld", "HomeWorldCharacter.h")
 
 # (name, file, regex, replacement, tests expected to fail)
 MUTATIONS = [
@@ -76,6 +77,42 @@ MUTATIONS = [
         r"SatisfiesFreedomGateStrict",
         "SatisfiesFreedomGate",
         "test_soft_latch_is_documented_as_a_defect_not_a_feature",
+    ),
+    # --- the two new tests: state agreement + "N while a hook is declared" -------------
+    (
+        "M9: #2 reverted to the false negative ('**N**') while its hook still exists",
+        MAP,
+        r"(\| #2 \|[^\n]*?)\*\*Logic done\*\*",
+        r"\1**N**",
+        "test_no_must_is_recorded_absent_while_a_t0_hook_is_declared",
+    ),
+    (
+        "M10: the must list and the map disagree about #7 (map 'Logic done', heading 'Partial')",
+        MUSTS,
+        r"(### P1 \u2014 #7 Rune unlock[^\n]*?)\*\*Partial \(logic\), unbuilt \(level\)\*\*",
+        r"\1**Partial**",
+        "test_found_states_agree_between_map_and_canonical_must_list",
+    ),
+    (
+        "M11: a must loses its heading, which would silently drop it from the comparison",
+        MUSTS,
+        r"### P2 \u2014 #13 Home portal[^\n]*\n",
+        "",
+        "test_found_states_agree_between_map_and_canonical_must_list",
+    ),
+    (
+        "M12: every 'T0 #n' marker is renamed out of the header, emptying the declared set",
+        HEADER,
+        r"T0 #\d+",
+        "T0 beat",
+        "test_no_must_is_recorded_absent_while_a_t0_hook_is_declared",
+    ),
+    (
+        "M13: #15's map cell downgrades 'Logic done' to 'Partial' against its own heading",
+        MAP,
+        r"(\| #15 \|[^\n]*?)\*\*Logic done \+ tested\*\*",
+        r"\1**Partial**",
+        "test_found_states_agree_between_map_and_canonical_must_list",
     ),
 ]
 

@@ -2321,7 +2321,8 @@ bool AHomeWorldCharacter::TryCampNight()
 	if (bCampNightGranted)
 	{
 		UE_LOG(LogTemp, Log,
-			TEXT("NODE_GUARD: NODE_SLEEPER TOD_NIGHT_SPIRIT FORM_SPIRIT CAM_T0_CAMP_NIGHT (already granted; avoid-1 + soothe-2 latch; not convert; not GP_SS_Lit alone; not stealth-alone)"));
+			TEXT("NODE_GUARD: NODE_SLEEPER TOD_NIGHT_SPIRIT FORM_SPIRIT CAM_T0_CAMP_NIGHT "
+				"(already granted; all-3-calmed latch; not convert; not GP_SS_Lit alone; not stealth-alone)"));
 		ShowInteractFeedback(TEXT("NODE_GUARD: camp night already"), FColor::Green);
 		return true;
 	}
@@ -2338,39 +2339,59 @@ bool AHomeWorldCharacter::TryCampNight()
 		return false;
 	}
 
-	// Avoid 1 guard via stealth component (soft OK when KEEP-LOCAL missing).
-	if (Stealth->GetGuardsAvoidedThisSession() < 1)
+	// MUST #14, as corrected by the Lead 2026-10-02: ALL THREE camp actors are CALMED.
+	//
+	// The guard is not "avoided" and then left alone - they are eased awake->asleep, which
+	// is the hard one. The two sleepers are eased to STAY asleep, which is the maintenance.
+	// This block previously drove the old "avoid 1; soothe 2" counters, which cannot express
+	// that: it left the guard untouched and so could never satisfy the three-actor gate that
+	// IsCampNightBeatComplete() now defers to. Same function, same console command, corrected
+	// semantics.
+	for (int32 SleeperIndex = 0; SleeperIndex < 2; ++SleeperIndex)
 	{
-		if (!Stealth->TryAvoidNodeGuard())
+		bool bEased = false;
+		bool bAsleep = false;
+		if (Stealth->GetCampActorState(EHomeWorldCampRole::Sleeper, SleeperIndex, bEased, bAsleep) && !bEased)
 		{
-			UE_LOG(LogTemp, Log, TEXT("NODE_GUARD: avoid failed"));
-			return false;
+			if (!Stealth->TryEaseCampActor(EHomeWorldCampRole::Sleeper, SleeperIndex))
+			{
+				UE_LOG(LogTemp, Log, TEXT("NODE_SLEEPER: ease failed (soothe != convert)"));
+				return false;
+			}
 		}
 	}
 
-	// Soothe 2 sleepers via stealth soothe verb � never ReportFoeConverted (convert != soothe).
-	while (Stealth->GetSleepersSoothedThisSession() < 2)
 	{
-		if (!Stealth->TrySootheNodeSleeper())
+		bool bEased = false;
+		bool bAsleep = false;
+		if (Stealth->GetCampActorState(EHomeWorldCampRole::Guard, 0, bEased, bAsleep) && !bEased)
 		{
-			UE_LOG(LogTemp, Log, TEXT("NODE_SLEEPER: soothe failed (soothe != convert)"));
-			return false;
+			if (!Stealth->TryEaseCampActor(EHomeWorldCampRole::Guard, 0))
+			{
+				UE_LOG(LogTemp, Log, TEXT("NODE_GUARD: ease failed - they must be reached unseen, then put to sleep"));
+				return false;
+			}
 		}
 	}
 
 	if (!Stealth->IsCampNightBeatComplete())
 	{
-		// Stealth-alone / incomplete soothe = not #14 PASS.
+		// Stealth-alone / incomplete calm = not #14 PASS. The strict half is reported
+		// alongside the gameplay half so a soft-latched run is visibly not evidence.
 		UE_LOG(LogTemp, Log,
-			TEXT("NODE_GUARD: camp-night incomplete (avoid=%d soothe=%d; need 1+2; stealth-alone = closed_fail)"),
-			Stealth->GetGuardsAvoidedThisSession(), Stealth->GetSleepersSoothedThisSession());
+			TEXT("NODE_GUARD: camp-night incomplete (calm=%d/%d strict=%d; stealth-alone = closed_fail)"),
+			Stealth->GetCalmedActorCount(), HomeWorldCampNight::GetGatedActorCount(),
+			Stealth->IsFreedomUnlockedStrict() ? 1 : 0);
 		ShowInteractFeedback(TEXT("NODE_GUARD: incomplete beat"), FColor::Yellow);
 		return false;
 	}
 
 	bCampNightGranted = true;
 	UE_LOG(LogTemp, Log,
-		TEXT("NODE_GUARD: NODE_SLEEPER TOD_NIGHT_SPIRIT FORM_SPIRIT CAM_T0_CAMP_NIGHT (avoid-1 + soothe-2 via UHomeWorldSpiritStealthComponent; soothe != convert; not GP_SS_Lit alone; not stealth-alone)"));
+		TEXT("NODE_GUARD: NODE_SLEEPER TOD_NIGHT_SPIRIT FORM_SPIRIT CAM_T0_CAMP_NIGHT "
+			"(all 3 calmed via UHomeWorldSpiritStealthComponent; guard eased awake->asleep, sleepers kept asleep; "
+			"strict=%d; soothe != convert; not GP_SS_Lit alone; not stealth-alone)"),
+		Stealth->IsFreedomUnlockedStrict() ? 1 : 0);
 	ShowInteractFeedback(TEXT("NODE_GUARD: camp night"), FColor::Green);
 	return true;
 }

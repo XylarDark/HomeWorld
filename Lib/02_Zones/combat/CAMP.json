@@ -135,10 +135,24 @@
       "note": "Reuses shrine language per the must list. #13."
     }
   ],
+  "spirit_touch": {
+    "settled": "Lead 2026-10-02 (must #15). The law in one line: a spirit has no hands.",
+    "implemented_at": "HomeWorldCampNight::GetSpiritTouchVerdict, enforced and logged by UHomeWorldSpiritStealthComponent::EvaluateSpiritTouch",
+    "table": {
+      "Soil": "ALLOWED - tending is the night's verb (M12)",
+      "Lashings": "ALLOWED - untying is the rescue (M16)",
+      "ActorMind": "ALLOWED - easing thoughts is the care verb (M14)",
+      "ActorBody": "REFUSED - a spirit has no hands; ease their thoughts, do not touch them"
+    },
+    "why_mind_is_allowed": "Easing a guard awake->asleep IS the rescue's content, so a blanket refusal would delete the beat. ActorMind is the single exception that lets #14 and #16 exist.",
+    "why_body_is_refused": "A blanket allowance would let the player grab a guard and drag them, and the scene becomes about moving bodies instead of easing minds. The refusal IS the design, not a safety rail.",
+    "logging": "Every verdict is logged, allowed or refused. A refusal the player cannot see reads as a broken game.",
+    "at_this_camp": "The lashings on NODE_CAPTIVE are the LASHINGS row. The guard's and sleepers' bodies are the ActorBody row - refused. Their minds are the ActorMind row - allowed, and that is the whole verb."
+  },
   "new_labels_needed": [
-    "SPIRIT_STEALTH - RESOLVED as must #17. The mechanic is LIGHT-TO-VISIBILITY, not a stat: spirit-blue light makes you visible, from either the campfire's blue centre or the patrolling guard's blue torch. Recorded in T0_MECHANIC_INVENTORIES_V1 #17 and in the visibility block above. Radii deliberately unset.",
-    "SLEEPER_STATE_CALM - must #16 needs a state that is NOT EConvertedFoeRole. A converted actor is a defeated foe; a calmed one is someone you helped. Conflating them lets the player defeat the three and unlock the captive, which inverts the beat.",
-    "NODE_CAPTIVE - RESOLVED as must #16. The actor and the freedom gate are now specified; what does not exist yet is the code."
+    "SPIRIT_STEALTH - RESOLVED as must #17 AND ALREADY BUILT. The mechanic is LIGHT-TO-VISIBILITY: spirit-blue light makes you visible, from either the campfire's blue centre or the patrolling guard's blue torch. Closed under APPROVE SS-A (2026-09-21) with AHomeWorldSpiritLitVolume + UHomeWorldSpiritStealthComponent already implemented. This spec was written before that was checked; see Docs/CANON_MAP.md section 3. Radii deliberately unset - the Lead specified that the areas exist and are dangerous, not how big.",
+    "SLEEPER_STATE_CALM - RESOLVED as FHomeWorldCampActorCalm, a state that is NOT EConvertedFoeRole. A converted actor is a defeated foe; a calmed one is someone you helped. Conflating them would let the player defeat the three and unlock the captive, which inverts the beat. The gate needs BOTH bEased AND bAsleep, so an asleep-but-never-eased sleeper does not open the door.",
+    "NODE_CAPTIVE - RESOLVED as must #16. The actor and the freedom gate are specified AND the logic is implemented (UHomeWorldSpiritStealthComponent::TryFreeCaptive). What does not exist yet is the actor in a .umap, so every count is still a soft latch."
   ],
   "open_questions": [
     "Q15, still parked: is the clearing ~84 m across as the old measurement suggested, or a smaller one? The ZONE is settled (pine forest with camp); its SIZE is not. The 18 x 18 m above is a placeholder chosen so all four beat nodes and a guard patrol fit with room to walk around them - it is not a recommendation.",

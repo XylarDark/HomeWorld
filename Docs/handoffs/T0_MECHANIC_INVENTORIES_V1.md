@@ -89,71 +89,77 @@ Each row: **Expected (T0)** · **Found (gap)** · **Arrange** · **DONE-WHEN** �
 |-------|-------|
 | **Labels** | `TOD_NIGHT_HOME` · `FORM_BODY` · `NODE_BED` (negative prove) |
 | **Expected** | On homestead at Night/Dusk **without** successful bed: stay `FORM_BODY`; **no** spirit; **day abilities off** |
-| **Found** | `ApplyFormForPhase`: Night **or** Dusk → `bIsSpiritForm` without bed — **fails T0 law** |
+| **Found** | **CORRECTED 2026-10-02 — this row previously read `Found: ApplyFormForPhase: Night or Dusk → bIsSpiritForm without bed`, which was stale on both counts.** `AHomeWorldCharacter` now declares `T0 #9` gates by name: `bSpiritFormGate` ("true only when named spirit gates grant form (not phase alone)") and `bSpiritSleepGate` ("sleep gate granted (bed path). Default false until #11"), with `TryGrantSpiritSleepGate` as the only writer. Four tests hold the law: `HomeWorld.T0.M9.NightWithoutGatesStaysBody`, `.M9.DayVerbsOffAtNight`, `.M9.BothGatesGrantSpirit`, `.M9.DayClearsSleepGate`. **Still unbuilt:** no `.umap` carries a `NODE_BED`, so the "without bed" half has never run against a real world |
 | **Arrange** | Homestead · force Night without bed (`hw.TimeOfDay.SetPhase` / dusk) · no `hw.GoToBed` |
 | **DONE-WHEN** | Prove: Night@home w/o bed → `FORM:` body (not spirit) + day verbs rejected/off; bed path still reaches spirit only after #7+#11 gates. Grep: `FORM:` · closed_fail if spirit without bed |
 | **Depends** | Unblocks correct #11; pairs with #7 |
 | **Anti** | Do not “fix” by disabling Night entirely · do not treat soft-kidnap as this law |
 
-### P1 — #2 Kettle + herbs → tea → sprint — N
+### P1 — #2 Kettle + herbs → tea → sprint — **Partial (logic), unbuilt (level)**
 
 | Field | Value |
 |-------|-------|
 | **Labels** | `NODE_KETTLE` · `TOD_DAY` · `FORM_BODY` |
 | **Expected** | Interact kettle + herbs → tea → sprint buff ~half day |
-| **Found** | No kettle/tea path; MV sprint exists ungated; meal BPs ≠ tea |
+| **Found** | **CORRECTED 2026-10-02 — this row previously read `Found: No kettle/tea path`, which was false.** The kettle beat exists: `AHomeWorldCharacter::TryBrewNodeKettleTea()` (`T0 #2 NODE_KETTLE: brew tea from herbs (RES_HERB) via existing inventory + day-verb sprint gate`) and `TryNodeKettleInteractInFront()` (routes a real interact to it, not a proxy). The ungated-sprint defect the row describes is now *tested shut* by `HomeWorld.T0.M2.TeaGateOffWithoutBrew`. **Still unbuilt:** no `NODE_KETTLE` in any `.umap` |
 | **Arrange** | Homestead day · `NODE_KETTLE` interact · herbs available |
 | **DONE-WHEN** | Readable tea craft → sprint buff duration (~half day); ungated MV sprint alone ≠ pass. Prove label `NODE_KETTLE` |
 | **Depends** | — |
 | **Anti** | Do not count `CRAFT:` demo meals as tea |
 
-### P1 — #7 Rune unlock before bed→spirit — N
+### P1 — #7 Rune unlock before bed→spirit — **Partial (logic), unbuilt (level)**
 
 | Field | Value |
 |-------|-------|
 | **Labels** | `NODE_RUNE` · `TOD_DAY` · `FORM_BODY` |
 | **Expected** | Day rune unlock **before** bed→spirit works |
-| **Found** | `rune` = 0 hits; form phase-driven |
+| **Found** | **CORRECTED 2026-10-02 — this row previously read `Found: rune = 0 hits`, which was false.** `SetRuneGateUnlocked` ("T0 #7: unlock/clear rune gate (no spirit until sleep gate also granted)") is declared on `AHomeWorldCharacter`, and spirit form is now two-gated, so rune is load-bearing rather than absent. Exercised by `HomeWorld.T0.M9.BothGatesGrantSpirit` (both gates) and `.M9.NightWithoutGatesStaysBody` (neither). **Still unbuilt:** no dedicated `NODE_RUNE` actor in any `.umap` |
 | **Arrange** | Day field path · `NODE_RUNE` · unlock flag persisted |
 | **DONE-WHEN** | Without unlock: bed cannot grant spirit planetside night; with unlock: #11 may proceed. Prove `NODE_RUNE` |
 | **Depends** | Required by #11 |
 | **Anti** | Do not grant spirit on phase alone |
 
-### P1 — #8 Day camp cartoon eject — N
+### P1 — #8 Day camp cartoon eject — **Partial (logic), unbuilt (level)**
 
 | Field | Value |
 |-------|-------|
 | **Labels** | `NODE_DAY_CAMP` · `EJECT_HOME` · `TOD_DAY` · `FORM_BODY` · `CAM_T0_CAMP_DAY` |
 | **Expected** | Day approach camp → cartoon launch → glider → drop home (**not** lethal) |
-| **Found** | Camp landmark + dream convert stub only; `eject` = 0 |
+| **Found** | **CORRECTED 2026-10-02 — this row previously read `Found: Camp landmark + dream convert stub only; eject = 0`, which was false.** `TryCampDayEject` emits the full label set this row asks for — `NODE_DAY_CAMP` · `EJECT_HOME` · `TOD_DAY` · `FORM_BODY` · `CAM_T0_CAMP_DAY` (`HomeWorldCharacter.cpp:1915-1938`) — and is the family that defines `EJECT_HOME` for #10. **Still unbuilt:** no `NODE_DAY_CAMP` in any `.umap`; no dedicated M8 test |
 | **Arrange** | Day · approach `GP_RS_HumanoidCamp` / `NODE_DAY_CAMP` · body form |
 | **DONE-WHEN** | Threat → `EJECT_HOME` sequence lands homestead; player death CUT; convert stub ≠ pass. Cam `CAM_T0_CAMP_DAY` |
 | **Depends** | Defines `EJECT_HOME` for #10 |
 | **Anti** | No kill · no convert-as-eject |
 
-### P1 — #10 Planetside night boot home — N
+### P1 — #10 Planetside night boot home — **Partial (logic), unbuilt (level)**
 
 | Field | Value |
 |-------|-------|
 | **Labels** | `EJECT_HOME` · `TOD_NIGHT_HOME` · `FORM_BODY` · `NODE_GLIDER` |
 | **Expected** | Planetside at night **without** bed path → glider boot home (same eject family as #8) |
-| **Found** | No reverse boot; bible soft-kidnap ≠ this; FALLBACK is island→planet down only |
+| **Found** | **CORRECTED 2026-10-02 — this row previously read `Found: No reverse boot`, which was false.** `T0 #10` is declared at `HomeWorldCharacter.h:274-275` and implemented via `UHomeWorldFallbackGlideComponent::StartGlideHome(bAllowNightPhase)` — reusing the existing glide component rather than a parallel eject service, so it emits `NODE_GLIDER` · `EJECT_HOME` · `TOD_NIGHT_HOME` · `FORM_BODY` (`HomeWorldCharacter.cpp:2010-2019`). **Still unbuilt:** no dedicated M10 test, and the reverse boot has never run against a live planetside night |
 | **Arrange** | Planetside · Night · no bed/spirit gate · expect eject home |
 | **DONE-WHEN** | Boot home via `EJECT_HOME`; soft-kidnap shrine path ≠ pass |
 | **Depends** | #8 eject path (reuse) · #9 law (stay body) |
 | **Anti** | Do not invent soft-kidnap as T0 eject |
 
-### P1 — #14 Camp night avoid 1 + soothe 2 — N
+### P1 — #14 Camp night — three actors, all calmed — **Implemented (logic), unbuilt (level)**
 
 | Field | Value |
 |-------|-------|
 | **Labels** | `NODE_GUARD` · `NODE_SLEEPER` (×2) · `TOD_NIGHT_SPIRIT` · `FORM_SPIRIT` · `CAM_T0_CAMP_NIGHT` |
-| **Expected** | Spirit: avoid 1 guard; soothe 2 sleepers (convert-not-kill) |
-| **Found** | Lit stealth volumes only; no guard/sleeper/soothe |
+| **Expected** | **All three camp actors calmed.** The guard is eased awake→asleep; the two sleepers are eased to *stay* asleep |
+| **Found** | **Logic implemented and tested** — `UHomeWorldSpiritStealthComponent::TryEaseCampActor` / `IsFreedomUnlocked` / `IsFreedomUnlockedStrict`; lit volumes already existed (#17). Tested by `hw.M14.EaseDirection`, `hw.M16.FreedomGate`, `hw.M14.SoftLatchContained`. **Still unbuilt:** no camp actors exist in any `.umap`, so every count is a soft latch and the strict gate cannot yet pass for real |
 | **Arrange** | Spirit @ camp night · after portals (#13) reachable |
-| **DONE-WHEN** | 1 avoid + 2 soothe readable; kill/convert-as-soothe = fail. Cam `CAM_T0_CAMP_NIGHT` |
-| **Depends** | #11 spirit · #13 camp reach (soft) |
-| **Anti** | `hw.Conversion.Test` ≠ soothe |
+| **DONE-WHEN** | All three eased AND asleep → gate opens · **any one of the three short → refused** · a woken sleeper closes the gate again · kill/convert-as-soothe = fail. Cam `CAM_T0_CAMP_NIGHT` |
+| **Depends** | #11 spirit · #13 camp reach (soft) · #15 touch rule · #17 stealth |
+| **Anti** | `hw.Conversion.Test` ≠ soothe · two of three opening the gate · re-easing a woken sleeper putting them back to sleep |
+
+⚠️ **This row read `Found: Lit stealth volumes only; no guard/sleeper/soothe` until 2026-10-02,
+and that was a second instance of the #17 false negative.** `TryAvoidNodeGuard` and
+`TrySootheNodeSleeper` existed in `HomeWorldSpiritStealthComponent.cpp` the whole time. Two
+independent false negatives in one day is what prompted `Docs/CANON_MAP.md`; the rule is now
+enforced there rather than left to memory.
 
 #### Narrative load, added 2026-10-02 — this must is the rescue
 
@@ -237,7 +243,7 @@ is what you must avoid *by night* (spirit-stealth). Opposite solutions to the sa
 Both are recorded in `Lib/02_Zones/combat/CAMP.json` under `new_labels_needed`. Neither is a
 taste question and neither is written yet.
 
-### P1 — #15 What a spirit may TOUCH — **N (new, 2026-10-02)**
+### P1 - #15 What a spirit may TOUCH - **Implemented + tested**
 
 Raised by `VISION_BOARD` **V2b** (*"gather by day, tend by night"*), which made the touch
 question load-bearing for two separate beats that both did not exist before it.
@@ -246,26 +252,48 @@ question load-bearing for two separate beats that both did not exist before it.
 |-------|-------|
 | **Labels** | `FORM_SPIRIT` · `NODE_PLANT_SLOT` · `NODE_CAPTIVE` · `NODE_GUARD` · `NODE_SLEEPER` |
 | **Expected** | In spirit form the player may interact with **soil** and with **the captive's ropes**. They may **not** interact with `NODE_GUARD` |
-| **Found** | **Nothing.** No touch rule exists in `Source/`. Not a partial — absent |
+| **Found** | **Implemented** — `HomeWorldCampNightTypes.{h,cpp}`, `HomeWorldCampNight::GetSpiritTouchVerdict`; enforced and logged by `UHomeWorldSpiritStealthComponent::EvaluateSpiritTouch`. Tested by `hw.M15.SpiritTouchTable` and `hw.M15.TouchThroughComponent` |
 | **Arrange** | Spirit at the garden and at the camp, same form, different permissions |
 | **DONE-WHEN** | Soil interaction succeeds as spirit · rope interaction succeeds as spirit · guard interaction is refused as spirit · **the refusal is logged**, not silent |
 | **Depends** | #11 spirit · #12 nurture |
 | **Anti** | One blanket verb for all spirit interactions · silent refusals · spirit able to calm a guard by touching it |
 
-**Why it is P1 and not a detail.** Both the garden (#12) and the rescue (#16) are *night-time
-tending*, and neither can be built without it. Every rule written tonight sits on top of this.
+#### THE RULE, as a table — a spirit has no hands
 
-**Logged refusals matter more than the permissions.** A refusal the player cannot see reads as a
-broken game; a logged one is legible. That is the same lesson as the spirit gate's `closed_fail`
-case, where the whole point was that the failure is visible.
+It may work on **what holds and carries** (soil, rope), and it may apply **care to a mind**. It
+may not touch an actor's **body**.
 
-### P1 — #16 Free the captive — gated on sleepers ASLEEP — **N (new, 2026-10-02)**
+| Target | Verdict | Why |
+|---|---|---|
+| `Soil` / `NODE_PLANT_SLOT` | **ALLOWED** | tending is the night's verb — #12 |
+| `Lashings` | **ALLOWED** | untying is the rescue — #16 |
+| `ActorMind` | **ALLOWED** | easing thoughts is the care verb — #14 |
+| `ActorBody` | **REFUSED** | *a spirit has no hands — ease their thoughts, do not touch them* |
+
+**`ActorMind` being allowed is the exception that lets #14 and #16 exist at all.** Easing a guard
+awake→asleep *is* the rescue's content, so a blanket refusal would delete the beat.
+
+**`ActorBody` being refused is what keeps the beat honest.** A blanket allowance would let the
+player grab a guard and drag them, and the scene becomes about moving bodies instead of easing
+minds. The refusal is the design, not a safety rail.
+
+**Every verdict is logged**, allowed or refused. A refusal the player cannot see reads as a
+broken game, which is the same lesson as the spirit gate's `closed_fail` case — the whole point
+there was that the failure is visible.
+
+**`TryFreeCaptive` asserts the lashings verdict rather than assuming it.** If a later edit flips
+the touch table, the rescue fails loudly at the gate instead of quietly contradicting #15.
+
+**Why it was P1 and not a detail.** Both the garden (#12) and the rescue (#16) are *night-time
+tending*, and neither can be built without it. Every rule written that night sits on top of this.
+
+### P1 — #16 Free the captive — gated on all three CALM — **Implemented (logic), unbuilt (level)**
 
 | Field | Value |
 |-------|-------|
 | **Labels** | `NODE_CAPTIVE` · `NODE_SLEEPER` (×2) · `NODE_GUARD` · `TOD_NIGHT_SPIRIT` · `FORM_SPIRIT` |
 | **Expected** | **All three** actors calm — the awake guard put to sleep, the two sleepers kept asleep — then the captive can be freed. **#14 is the lock on this door** |
-| **Found** | **Nothing.** No captive actor, no sleep state, no calm state, no freedom gate |
+| **Found** | **Logic implemented and tested** — `FHomeWorldCampActorCalm::SatisfiesFreedomGate` / `…Strict`, `UHomeWorldSpiritStealthComponent::TryFreeCaptive` / `IsFreedomUnlocked` / `IsFreedomUnlockedStrict`. Tested by `hw.M16.CalmGateLaw` and `hw.M16.FreedomGate`. **Still unbuilt:** no captive actor exists in any `.umap`, so the strict gate cannot yet pass for real |
 | **Arrange** | Night · after #14 · at the camp |
 | **DONE-WHEN** | All three calm → freed, and the return leg to the homestead is reachable · **any one of the three not calm → refused** · a **killed** actor does not count as calm and does not open the door |
 | **Depends** | #14 soothe · #15 touch rule · #17 stealth (to reach the guard) |
@@ -344,7 +372,7 @@ reading a **moving** safe zone rather than a fixed one.
 |-------|-------|
 | **Labels** | `NODE_WAKE` · `TOD_DAY` · `FORM_BODY` · `CAM_T0_WAKE` |
 | **Expected** | Explicit homestead start-day beat |
-| **Found** | `GP_PlayerStart` + day phase; no frozen wake label/log |
+| **Found** | **CORRECTED 2026-10-02 — this row previously read `Found: GP_PlayerStart + day phase; no frozen wake label/log`, which was stale.** `TryEmitNodeWakeStartDayBeat()` is declared on `AHomeWorldCharacter` — `T0 #1 NODE_WAKE: emit named homestead start-day wake beat (TOD_DAY / FORM_BODY / CAM_T0_WAKE)` — and emits all four labels this row requires. **Still unbuilt:** no dedicated `HomeWorld.T0.M1.*` test, and no frozen wake label has been read out of a real Dawn |
 | **Arrange** | PIE spawn / wake → Dawn |
 | **DONE-WHEN** | Frozen `NODE_WAKE` + readable day-start prove (`CAM_T0_WAKE`) |
 | **Depends** | — |
@@ -356,7 +384,7 @@ reading a **moving** safe zone rather than a fixed one.
 |-------|-------|
 | **Labels** | `NODE_PLANT_SLOT` · `TOD_DAY` · `FORM_BODY` |
 | **Expected** | Day plant **given** herb nearby outside → marks slot for spirit nurture |
-| **Found** | Planters + `GP_N1_Crop` nurture exist; not plant-given-herb beat |
+| **Found** | **CORRECTED 2026-10-02 — this row previously read `Found: Planters + GP_N1_Crop nurture exist; not plant-given-herb beat`, which was stale.** The two-marks beat exists as named API: `TryPlantNodePlantSlotHerb()` (#3, day) and `TryNurtureNodePlantSlot()` (#12, spirit), with `IsNodePlantSlotDayPlanted` / `IsNodePlantSlotSpiritNurtured` keeping them distinct. `HomeWorld.T0.M3.PlantAndNurtureAreDistinctMarks` is exactly this row's DONE-WHEN and passes. **Still unbuilt:** no `NODE_PLANT_SLOT` actor placed in any `.umap` |
 | **Arrange** | Outside homestead · given herb in hand/inventory |
 | **DONE-WHEN** | Plant interact marks `NODE_PLANT_SLOT` consumable by #12 |
 | **Depends** | Feeds #12 |
@@ -368,7 +396,7 @@ reading a **moving** safe zone rather than a fixed one.
 |-------|-------|
 | **Labels** | `NODE_BACKPACK` · `TOD_DAY` · `FORM_BODY` |
 | **Expected** | Equip backpack → inventory available |
-| **Found** | Inventory-lite present; no backpack equip gate |
+| **Found** | **CORRECTED 2026-10-02 — this row previously read `Found: Inventory-lite present; no backpack equip gate`, which was stale.** The equip gate exists: `TryEquipNodeBackpack()` (`T0 #4 NODE_BACKPACK: equip backpack -> inventory access gate`), routed from a real interact by `TryNodeBackpackInteractInFront()`, latched by `IsNodeBackpackEquipped`. `HomeWorld.T0.M4.InventoryGatedByBackpack` asserts this row's Anti ("open inventory without equip ≠ T0 pass") and passes. **Still unbuilt:** no `NODE_BACKPACK` actor in any `.umap` |
 | **Arrange** | Homestead day · unequipped → equip |
 | **DONE-WHEN** | Inventory gated by equip; prove `NODE_BACKPACK` |
 | **Depends** | Soft: field gather (#6) |
@@ -380,7 +408,7 @@ reading a **moving** safe zone rather than a fixed one.
 |-------|-------|
 | **Labels** | `NODE_FIELD_GATHER` · `TOD_DAY` · `FORM_BODY` · `CAM_T0_FIELD` |
 | **Expected** | Open-field herb seed collect after glide landing |
-| **Found** | Gather systems + RES meshes; no frozen field nodes near landing |
+| **Found** | **CORRECTED 2026-10-02 — this row previously read `Found: Gather systems + RES meshes; no frozen field nodes near landing`, which was stale.** The beat exists as named API with its own anti-conditions already written into the header comment ("Not dress-only; not `GP_Store` alone; not PROXY `SM_ProxyFieldGather`; not `NODE_PLANT_SLOT` (#3); not ungated `hw.Gather.Flowers` alone"): `TryCollectNodeFieldGather()` (`T0 #6 NODE_FIELD_GATHER` + `CAM_T0_FIELD`), `TryNodeFieldGatherInteractInFront()`, `IsNodeFieldGatherCollected`. **Still unbuilt:** no dedicated M6 test and no frozen field nodes near a landing circle |
 | **Arrange** | Post-#5 landing · field nodes |
 | **DONE-WHEN** | Explicit `NODE_FIELD_GATHER` near landing; `GATHER:` on path |
 | **Depends** | #5 present (Y) |
@@ -392,7 +420,7 @@ reading a **moving** safe zone rather than a fixed one.
 |-------|-------|
 | **Labels** | `NODE_BED` · `TOD_NIGHT_SPIRIT` · `FORM_SPIRIT` · `CAM_T0_BED` · `NODE_RUNE` |
 | **Expected** | After rune: bed → spirit as **night planetside** gate |
-| **Found** | Bed→Night→spirit works; **not** rune-gated; spirit also on Dusk/Night w/o bed |
+| **Found** | **CORRECTED 2026-10-02 — this row previously read `Found: Bed→Night→spirit works; not rune-gated; spirit also on Dusk/Night w/o bed`, which was stale on both counts.** Both named gates are now declared on `AHomeWorldCharacter` — `bSpiritFormGate`, `bSpiritSleepGate` (`T0 #11: bed/sleep gate. Cleared on Day/Dawn`) — written only by `TryGrantSpiritSleepGate`, and form no longer follows phase alone. `HomeWorld.T0.M9.BothGatesGrantSpirit` (rune + bed → spirit) and `.M9.DayClearsSleepGate` (Day clears it) hold it; `.M9.NightWithoutGatesStaysBody` is this row's Anti ("phase-only spirit ≠ pass") and passes. **Still unbuilt:** no `NODE_BED` in any `.umap`, so the bed half has never run for real |
 | **Arrange** | Homestead bed · rune unlocked · prove blocked without rune / without bed |
 | **DONE-WHEN** | Spirit planetside night **only** via bed after rune; #9 still holds w/o bed. Cam `CAM_T0_BED` |
 | **Depends** | **#9 + #7** |
@@ -404,7 +432,7 @@ reading a **moving** safe zone rather than a fixed one.
 |-------|-------|
 | **Labels** | `NODE_PLANT_SLOT` · `TOD_NIGHT_SPIRIT` · `FORM_SPIRIT` |
 | **Expected** | Spirit nurture of **planted given herb** from #3 |
-| **Found** | N1 nurture present; not linked to plant-given slot |
+| **Found** | **CORRECTED 2026-10-02 — this row previously read `Found: N1 nurture present; not linked to plant-given slot`, which was stale.** The link exists: spirit nurture runs on the *same* N1 slot that #3 day-plants, via `TryNurtureNodePlantSlot()` + `IsNodePlantSlotSpiritNurtured`, and `HomeWorld.T0.M3.PlantAndNurtureAreDistinctMarks` is the test that fails if the two marks ever collapse into one. **Still unbuilt:** no `NODE_PLANT_SLOT` placed, so the day-plant → spirit-nurture handoff has never run in a world |
 | **Arrange** | Spirit · `NODE_PLANT_SLOT` from #3 |
 | **DONE-WHEN** | Nurture succeeds on planted slot; day/body nurture ≠ pass |
 | **Depends** | #3 · #11 |
@@ -416,7 +444,7 @@ reading a **moving** safe zone rather than a fixed one.
 |-------|-------|
 | **Labels** | `NODE_PORTAL_HOME` · `NODE_PORTAL_CAMP` · `TOD_NIGHT_SPIRIT` · `FORM_SPIRIT` |
 | **Expected** | Spirit home portal → **camp** portal |
-| **Found** | Home ↔ planet return shrine present; **no** camp portal pair |
+| **Found** | **CORRECTED 2026-10-02 — this row previously read `Found: Home ↔ planet return shrine present; no camp portal pair`, which was stale.** The camp leg is declared and implemented on the existing shrine-portal path (no second subsystem, per this row's Anti): `HomeWorldCharacter.h:299` declares `T0 #13 NODE_PORTAL_HOME -> NODE_PORTAL_CAMP: spirit home portal to camp`, and `HomeWorldCharacter.h:578` declares the latch `T0 #13: spirit home->camp portal latch (NODE_PORTAL_HOME -> NODE_PORTAL_CAMP this session)`. **Still unbuilt:** no dedicated M13 test and no `NODE_PORTAL_CAMP` pair in any `.umap`, so this is what keeps #14 unreachable for real |
 | **Arrange** | Spirit · `NODE_PORTAL_HOME` → `NODE_PORTAL_CAMP` at humanoid camp |
 | **DONE-WHEN** | Pair lands at camp; return-shrine-only ≠ camp beat |
 | **Depends** | #11 · enables #14 reach |
