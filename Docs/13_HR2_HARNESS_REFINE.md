@@ -1,4 +1,5 @@
 # Docs/13 — Harness Refine 2 (HR2) Strategy
+Closed. Do not load.
 
 | Field | Value |
 |-------|-------|

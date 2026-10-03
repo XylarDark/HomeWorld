@@ -1,4 +1,5 @@
 # Docs/15c — HR3-C Branch protection (real checks on `main`)
+Closed. Do not load.
 
 | Field | Value |
 |-------|-------|

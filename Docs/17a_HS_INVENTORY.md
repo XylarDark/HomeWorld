@@ -1,4 +1,5 @@
 # Docs/17a — HS-A Inventory & Debt Ledger (post–Docs/08)
+Closed. Do not load.
 
 | Field | Value |
 |-------|-------|

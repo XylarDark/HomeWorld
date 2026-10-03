@@ -1,4 +1,5 @@
 # Docs/11d — HR-D deferral stamp
+Closed. Do not load.
 
 | Field | Value |
 |-------|-------|

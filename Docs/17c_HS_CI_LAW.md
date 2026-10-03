@@ -1,4 +1,5 @@
 # Docs/17c — HS-C CI as law (branch protection)
+Closed. Do not load.
 
 | Field | Value |
 |-------|-------|

@@ -1,4 +1,5 @@
 # Docs/17g — HS-G Conductor/DESKTOP Ops Diet
+Closed. Do not load.
 
 | Field | Value |
 |-------|-------|

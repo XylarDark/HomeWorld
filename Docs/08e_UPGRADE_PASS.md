@@ -1,4 +1,5 @@
 # Docs/08e — WAVE E Upgrade Pass
+Closed. Do not load.
 
 | Field | Value |
 |-------|-------|
