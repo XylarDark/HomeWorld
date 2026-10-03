@@ -83,13 +83,37 @@ test('the reconciler runs against the real locked scope', () => {
 test('the evidence column is populated, not silently empty', () => {
   // Regression guard for the real bug: collectGates() called without its required
   // Saved directory returns [], which made every beat read NO_ARTIFACT and looked
-  // like a finding rather than a defect in the script.
-  const res = R.reconcile();
-  const withClaim = res.beats.filter((b) => b.claimed !== 'NO_ARTIFACT');
-  assert.ok(
-    withClaim.length > 0,
-    'no beat has a claim; the evidence ledger is not being read'
-  );
+  // like a finding rather than a defect in the script. That regression must still
+  // be caught here — so assert it directly, against a call with no directory.
+  const EVIDENCE = require('./t0-evidence.js');
+  const noDir = (() => {
+    try {
+      return EVIDENCE.collectGates();
+    } catch {
+      return [];
+    }
+  })();
+  assert.deepStrictEqual(noDir, [], 'collectGates with no directory must yield no rows');
+
+  // The populated-ledger half of the guard uses a temp fixture directory, not the
+  // gitignored Saved/ folder: a clean checkout has no Saved/ and must still pass.
+  const fs = require('fs');
+  const os = require('os');
+  const path = require('path');
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 't0-gates-'));
+  try {
+    // NO_VERDICT on purpose: a real artifact that records no pass field. Not a pass.
+    fs.writeFileSync(path.join(tmp, 't0_m1_wake_gate.json'), JSON.stringify({ notes: 'fixture' }));
+    const res = R.reconcile({ savedDir: tmp });
+    assert.ok(res.ok, res.error);
+    const withClaim = res.beats.filter((b) => b.claimed !== 'NO_ARTIFACT');
+    assert.ok(
+      withClaim.length > 0,
+      'no beat has a claim; the evidence ledger is not being read'
+    );
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
 });
 
 test('the rendered report has no uninterpolated template holes', () => {
