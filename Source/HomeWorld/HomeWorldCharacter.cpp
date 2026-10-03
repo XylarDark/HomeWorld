@@ -53,6 +53,123 @@
 #include "TimerManager.h"
 #include "EngineUtils.h"
 
+/**
+ * The T0 beat-node tag contract, declared once.
+ *
+ * WHAT THIS IS FOR
+ *
+ * Each T0 beat verb finds its prop by tag: `TryNodeKettleInteractInFront` accepts
+ * `NODE_KETTLE` or `Kettle`, `TryNodeRuneInteractInFront` accepts `NODE_RUNE` or `Rune`, and
+ * so on for the backpack, the field gather node, the plant slot, the day camp and the bed.
+ * Each also accepts a short alias, because a level artist tagging a prop by hand will reach
+ * for one or the other.
+ *
+ * Those tags used to be written out as a local `static const FName[]` inside each of the
+ * seven verbs. That is fine right up until something else needs to know what the contract
+ * is - and something did: `ActorHasInteractableComponent`, the gate every interact trace has
+ * to pass, listed only `AHomeWorldResourcePile`, `AHomeWorldCraftStation` and six named
+ * components. It knew none of these tags, so a correctly tagged prop with a correctly sized
+ * collider at the right spot was still rejected and every verb behind it returned false.
+ * Placing the beat nodes would not have fixed anything.
+ *
+ * Duplication is not a style complaint here. It is the mechanism: seven copies of a list
+ * cannot drift from one gate that reads a different list, and this is what that drift
+ * looked like. `ActorHasInteractableComponent` and the verbs now read the same table, so the
+ * next tag added to a beat has exactly one place it can be forgotten.
+ *
+ * `FindInteractTargetInCone` re-checks `ActorHasInteractableComponent` on every candidate it
+ * finds, so admitting the tags at the gate also makes the cone fallback able to reach them.
+ * Adding them to the cone's own search list as well would be redundant.
+ */
+namespace HomeWorldT0BeatNodes
+{
+	/** The seven T0 beat props, each identified by a canonical tag and a short alias. */
+	enum class ENode : uint8
+	{
+		Kettle,
+		PlantSlot,
+		Backpack,
+		FieldGather,
+		Rune,
+		DayCamp,
+		Bed,
+	};
+
+	/** The tags that identify one specific beat prop, canonical name first. */
+	static const TArray<TArray<FName>>& TagsPerNode()
+	{
+		static const TArray<TArray<FName>> PerNode = {
+			{ FName(TEXT("NODE_KETTLE")),        FName(TEXT("Kettle")) },
+			{ FName(TEXT("NODE_PLANT_SLOT")),   FName(TEXT("PlantSlot")) },
+			{ FName(TEXT("NODE_BACKPACK")),     FName(TEXT("Backpack")) },
+			{ FName(TEXT("NODE_FIELD_GATHER")), FName(TEXT("FieldGather")) },
+			{ FName(TEXT("NODE_RUNE")),         FName(TEXT("Rune")) },
+			{ FName(TEXT("NODE_DAY_CAMP")),     FName(TEXT("DayCamp")) },
+			{ FName(TEXT("NODE_BED")),          FName(TEXT("Bed")) },
+		};
+		return PerNode;
+	}
+
+	static const TArray<FName>& TagsFor(ENode Node)
+	{
+		return TagsPerNode()[static_cast<uint8>(Node)];
+	}
+
+	/**
+	 * Every beat-node tag, flattened, so the gate can ask one question instead of seven.
+	 *
+	 * Derived from TagsPerNode rather than written out again. Spelling the list twice inside
+	 * the one namespace whose entire job is to stop the list being spelled twice would be
+	 * the same bug in a smaller room.
+	 */
+	static const TArray<FName>& AllTags()
+	{
+		static TArray<FName> Flat;
+		if (Flat.Num() == 0)
+		{
+			for (const TArray<FName>& NodeTags : TagsPerNode())
+			{
+				Flat.Append(NodeTags);
+			}
+		}
+		return Flat;
+	}
+
+	/** True when the actor carries one of the tags for this beat prop. */
+	static bool ActorCarriesTagFor(const AActor* Actor, ENode Node)
+	{
+		if (!Actor)
+		{
+			return false;
+		}
+		for (const FName& Tag : TagsFor(Node))
+		{
+			if (Actor->ActorHasTag(Tag))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/** True when the actor carries any beat-node tag at all. The gate's question. */
+	static bool ActorCarriesAnyBeatNodeTag(const AActor* Actor)
+	{
+		if (!Actor)
+		{
+			return false;
+		}
+		for (const FName& Tag : AllTags())
+		{
+			if (Actor->ActorHasTag(Tag))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+}
+
 AHomeWorldCharacter::AHomeWorldCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
@@ -1134,7 +1251,7 @@ bool AHomeWorldCharacter::TryHarvestInFront()
 	// List 56 / T2 + T3 + T0 #11: Bed / NODE_BED -- go to bed (day) or wake (night).
 	// Go-to-bed grants sleep gate (GrantSpiritSleepGate); spirit only if rune unlocked (#7).
 	// Phase-alone SetPhase(Night) without this path = closed_fail for FORM_SPIRIT. Soft-kidnap != bed.
-	if (HitActor && (HitActor->ActorHasTag(FName("Bed")) || HitActor->ActorHasTag(FName("NODE_BED"))))
+	if (HitActor && HomeWorldT0BeatNodes::ActorCarriesTagFor(HitActor, HomeWorldT0BeatNodes::ENode::Bed))
 	{
 		if (UHomeWorldTimeOfDaySubsystem* Tod = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>())
 		{
@@ -1328,20 +1445,7 @@ bool AHomeWorldCharacter::TryNodeKettleInteractInFront()
 		return false;
 	}
 
-	static const FName KettleTags[] = {
-		FName(TEXT("NODE_KETTLE")),
-		FName(TEXT("Kettle")),
-	};
-	bool bIsKettle = false;
-	for (const FName& Tag : KettleTags)
-	{
-		if (HitActor->ActorHasTag(Tag))
-		{
-			bIsKettle = true;
-			break;
-		}
-	}
-	if (!bIsKettle)
+	if (!HomeWorldT0BeatNodes::ActorCarriesTagFor(HitActor, HomeWorldT0BeatNodes::ENode::Kettle))
 	{
 		return false;
 	}
@@ -1457,19 +1561,9 @@ bool AHomeWorldCharacter::TryNodePlantSlotInteractInFront()
 		return false;
 	}
 
-	static const FName PlantTags[] = {
-		FName(TEXT("NODE_PLANT_SLOT")),
-		FName(TEXT("PlantSlot")),
-	};
-	bool bIsPlantSlot = false;
-	for (const FName& Tag : PlantTags)
-	{
-		if (HitActor->ActorHasTag(Tag))
-		{
-			bIsPlantSlot = true;
-			break;
-		}
-	}
+	// A tag OR an N1 nurture component both identify the slot -- same identity #12 uses.
+	bool bIsPlantSlot = HomeWorldT0BeatNodes::ActorCarriesTagFor(
+		HitActor, HomeWorldT0BeatNodes::ENode::PlantSlot);
 	// Prefer N1 nurture target as the world plant slot (same identity #12 uses) -- not PROXY mesh alone.
 	if (UHomeWorldNurtureComponent* Nurture = HitActor->FindComponentByClass<UHomeWorldNurtureComponent>())
 	{
@@ -1632,20 +1726,7 @@ bool AHomeWorldCharacter::TryNodeBackpackInteractInFront()
 		return false;
 	}
 
-	static const FName BackpackTags[] = {
-		FName(TEXT("NODE_BACKPACK")),
-		FName(TEXT("Backpack")),
-	};
-	bool bIsBackpack = false;
-	for (const FName& Tag : BackpackTags)
-	{
-		if (HitActor->ActorHasTag(Tag))
-		{
-			bIsBackpack = true;
-			break;
-		}
-	}
-	if (!bIsBackpack)
+	if (!HomeWorldT0BeatNodes::ActorCarriesTagFor(HitActor, HomeWorldT0BeatNodes::ENode::Backpack))
 	{
 		return false;
 	}
@@ -1785,20 +1866,7 @@ bool AHomeWorldCharacter::TryNodeFieldGatherInteractInFront()
 		return false;
 	}
 
-	static const FName FieldGatherTags[] = {
-		FName(TEXT("NODE_FIELD_GATHER")),
-		FName(TEXT("FieldGather")),
-	};
-	bool bIsFieldGather = false;
-	for (const FName& Tag : FieldGatherTags)
-	{
-		if (HitActor->ActorHasTag(Tag))
-		{
-			bIsFieldGather = true;
-			break;
-		}
-	}
-	if (!bIsFieldGather)
+	if (!HomeWorldT0BeatNodes::ActorCarriesTagFor(HitActor, HomeWorldT0BeatNodes::ENode::FieldGather))
 	{
 		return false;
 	}
@@ -1861,20 +1929,7 @@ bool AHomeWorldCharacter::TryNodeRuneInteractInFront()
 		return false;
 	}
 
-	static const FName RuneTags[] = {
-		FName(TEXT("NODE_RUNE")),
-		FName(TEXT("Rune")),
-	};
-	bool bIsRune = false;
-	for (const FName& Tag : RuneTags)
-	{
-		if (HitActor->ActorHasTag(Tag))
-		{
-			bIsRune = true;
-			break;
-		}
-	}
-	if (!bIsRune)
+	if (!HomeWorldT0BeatNodes::ActorCarriesTagFor(HitActor, HomeWorldT0BeatNodes::ENode::Rune))
 	{
 		return false;
 	}
@@ -1954,20 +2009,7 @@ bool AHomeWorldCharacter::TryNodeDayCampInteractInFront()
 		return false;
 	}
 
-	static const FName DayCampTags[] = {
-		FName(TEXT("NODE_DAY_CAMP")),
-		FName(TEXT("DayCamp")),
-	};
-	bool bIsDayCamp = false;
-	for (const FName& Tag : DayCampTags)
-	{
-		if (HitActor->ActorHasTag(Tag))
-		{
-			bIsDayCamp = true;
-			break;
-		}
-	}
-	if (!bIsDayCamp)
+	if (!HomeWorldT0BeatNodes::ActorCarriesTagFor(HitActor, HomeWorldT0BeatNodes::ENode::DayCamp))
 	{
 		return false;
 	}
@@ -2626,6 +2668,14 @@ bool AHomeWorldCharacter::ActorHasInteractableComponent(const AActor* Actor)
 		return true;
 	}
 	if (Cast<AHomeWorldCraftStation>(Actor))
+	{
+		return true;
+	}
+	// T0 beat props. These are ordinary greybox actors - a collider and a tag - so nothing
+	// above recognises them, and without this the seven beat verbs are unreachable in any
+	// world no matter what is placed in it. See HomeWorldT0BeatNodes at the top of this file
+	// for why this list and the verbs' lists are now the same list.
+	if (HomeWorldT0BeatNodes::ActorCarriesAnyBeatNodeTag(Actor))
 	{
 		return true;
 	}
