@@ -1313,3 +1313,65 @@ Two further consequences:
 disjoint from `87d42c8..main`, so the merge is mechanically clean. A branch named `keep/` may be parked on
 purpose by someone who intends to review or rebase it, and this is not mine to decide. Flagged to the Lead
 instead of merged.
+### Correction and closure: the gate fix is landed, the build was broken, and the suite is green for the first time
+
+Appended 2026-10-02. This supersedes the two entries above in one respect: the beat-node gate fix is
+now on `main`, and `main` compiles and passes. What follows is the evidence, because the previous
+entries in this file were written on evidence that turned out to be wrong twice.
+
+**1. The harness was never broken. My diagnosis of it was.** The "stall" that was recorded here as an
+environment regression was a PowerShell quoting fault of mine: `-ExecCmds="Automation RunTests ..."`
+reached UE as the single word `Automation`, so `FParse::Value` truncated it and the deferred queue
+idled with nothing queued. PR #277 fixed the invocation. A second, separate mistake: the runner reads
+`UE_EDITOR` from the environment, and that variable pointed at UE 5.7 while the project lock is 5.8,
+so runs were silently executing the wrong engine. With the engine correct, the quoting correct, and
+`Automation RunTests HomeWorld.T0` (a name filter - `RunTest Group:` filters UE groups, not name
+prefixes, and `Group:HomeWorld` matches nothing), UE loads 6615 tests and runs the group in seconds.
+
+**2. The 19/19 green that drove every conclusion in this file was a stale DLL.** `Safe-Build.ps1` had
+not been run after the NodeGate tests landed, so the automation was executing an older binary that
+genuinely passed. The tell was available before the rebuild and is now in KNOWN_ERRORS: a 0.0117s
+duration for a test that builds a `UWorld` and spawns fifteen actors, and 20 `Success` results with
+zero `Fail` across 33 rotated logs. After a rebuild the same command reported
+`NodeGate.AllBeatNodeTagsAreInteractable` **Fail** with 15 errors. A deliberate `AddError` that cannot
+be satisfied was placed at the top of the test to establish that the harness surfaces errors at all;
+it reported `Fail`, which makes the 14 row failures real rather than a silent-pass artefact.
+
+**3. Landing the fix exposed that `main` did not compile.** Cherry-picking `d4f4ed0` conflicted only in
+`docs/KNOWN_ERRORS.md` (resolved by keeping the branch's better quoting entry plus two new ones);
+`HomeWorldCharacter.cpp` applied clean. But the build then failed with **53 errors across four files**,
+three of which this work never touched. Cause: an edit made while removing the deliberate-failure probe
+had deleted the function signature and opening brace of
+`FBeatNodeTagsAreInteractableTest::RunTest`, leaving its body at namespace scope. In a UE unity build
+the orphaned `FScopedWorld Scope(...)` collides with correctly-scoped `Scope` locals in its unity
+siblings, so `C4459: declaration of 'Scope' hides global declaration` fired against
+`HomeWorldCampNightTests.cpp`, `HomeWorldDayGateTests.cpp` and `HomeWorldFormGateTests.cpp` - all
+pristine. That broken state was in `c2bff14` and was reported as done.
+
+What located it was reading the **first** error in the log rather than the last: `error C2059: syntax
+error: 'if'` at line 181, immediately after the orphaned statement. The C4459 lines dominate the log by
+count and are pure downstream noise. `git diff daaed6b -- <file>` then showed the two deleted lines
+immediately. Restored with `git checkout daaed6b -- <file>` rather than by hand-editing back to an
+approximation, so the file is byte-identical to its baseline. `c2bff14` was local-only and never
+pushed, so no shared branch carried it.
+
+**4. Verified state at `df00858`.**
+- `Safe-Build.ps1` exits 0 **against this commit**, confirmed twice: once incrementally, then after
+  deleting `Binaries/Win64/UnrealEditor-HomeWorld.dll` to force a relink.
+- Freshness proven, not assumed: DLL mtime `23:45:28`, newest source under test `23:43:26`. The binary
+  is newer than every file in `Source/HomeWorld`.
+- `Automation RunTests HomeWorld.T0` against that exact DLL: **19 succeeded, 0 failed, exit 0**, every
+  test `err=0`, including both `NodeGate` tests.
+- Host suite **70 passed**. Mutation harnesses 4 killed / 1 survived and 2 killed / 1 survived; the
+  survivors were declared with reasons when those harnesses were written and have not changed.
+
+**What this session's greens are and are not worth.** This 19/19 is the first full-suite result that a
+build can vouch for, so prior T0 verdicts citing automation output are now re-runnable rather than
+void - but they still need re-running before being called proven, and nothing here establishes that
+the beats are *good*, only that the code runs and the asserted laws hold. No playtest was performed.
+
+**Two questions still open, unchanged from before.** `SM_Island_Hero` is authored at 19.3x10.7 against a
+spec of 21x14 (off by 3.3 with 1.4 tolerance); rescaling authored geometry is forbidden, so it is
+either record-target-not-met or reconcile-the-spec, and that is a human call. And the must-list rows
+for these beats should be revisited now that the fix is genuinely landed rather than re-cited from a
+claim.
