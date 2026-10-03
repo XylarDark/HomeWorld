@@ -9,10 +9,10 @@
   },
   "blend_file": "C:\\dev\\HomeWorld\\blender\\floating_island_homestead_LIB.blend",
   "blender": "5.2.2 LTS",
-  "blocking_count": 5,
+  "blocking_count": 4,
   "by_criterion": {
     "1_location": 17,
-    "2_sized": 2,
+    "2_sized": 1,
     "4_distinct": 1,
     "master_binding": 2
   },
@@ -101,12 +101,6 @@
       "volume": "SM_Island_Hero"
     },
     {
-      "criterion": "2_sized",
-      "detail": "origin is not at ground contact (lowest vertex at Z -0.450)",
-      "severity": "blocking",
-      "volume": "SM_Island_Hero"
-    },
-    {
       "criterion": "1_location",
       "detail": "spec module resolved to authored object 'SM_IslandTop'",
       "severity": "info",
@@ -181,6 +175,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": -93.9,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -208,6 +203,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": -93.9,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -237,6 +233,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 6.0,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -266,6 +263,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 2.4,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -295,6 +293,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 0.4,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -324,6 +323,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 0.6,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -354,6 +354,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 2.0,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -383,6 +384,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 2.0,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -413,6 +415,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 2.2,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -442,6 +445,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 2.2,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -471,6 +475,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 4.5095,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -500,6 +505,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 4.5095,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -529,6 +535,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 3.2,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -558,6 +565,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 3.2,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -587,6 +595,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 3.2,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -616,6 +625,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 3.2,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -646,6 +656,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 2.4,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -675,6 +686,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 2.4,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -705,6 +717,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 2.35,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -734,6 +747,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 2.35,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -761,6 +775,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": -94.8,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -788,6 +803,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": -94.8,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -815,6 +831,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": -94.4,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -842,6 +859,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": -94.55,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -869,6 +887,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": -94.25,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -913,6 +932,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 3.0,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -972,6 +992,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 1.5,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -1001,6 +1022,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 1.2,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -1030,6 +1052,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 1.0,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -1057,6 +1080,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": -94.925,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -1086,6 +1110,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 0.5,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -1115,6 +1140,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 0.5,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -1144,6 +1170,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 0.45,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -1174,6 +1201,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 0.5,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -1203,6 +1231,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 0.5,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -1232,6 +1261,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 0.46,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -1259,6 +1289,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": -94.7,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -1286,6 +1317,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": -94.75,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -1315,6 +1347,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 0.0,
       "tris": 60,
       "type": "MESH",
       "world_origin": [
@@ -1343,6 +1376,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 0.175,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -1370,6 +1404,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 0.05,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -1397,6 +1432,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 0.12,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -1470,6 +1506,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 0.06,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -1497,6 +1534,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 0.34,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -1524,6 +1562,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 0.45,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -1555,6 +1594,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 0.25,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -1584,6 +1624,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 2.4,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -1613,6 +1654,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 2.0,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -1642,6 +1684,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 2.2,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -1671,6 +1714,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": 2.2,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -1698,6 +1742,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": -94.45,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -1725,6 +1770,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": -94.92,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -1752,6 +1798,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": -94.825,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -1779,6 +1826,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": -93.975,
       "tris": 12,
       "type": "MESH",
       "world_origin": [
@@ -1806,6 +1854,7 @@
         1.0
       ],
       "scale_applied": true,
+      "top_vert_z_world": -94.125,
       "tris": 12,
       "type": "MESH",
       "world_origin": [

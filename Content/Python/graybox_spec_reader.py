@@ -159,6 +159,10 @@ def measure_object(name: str) -> dict[str, Any] | None:
     zs = [(matrix @ vert.co).z for vert in obj.data.vertices]
     row["origin_z_world"] = round(matrix.translation.z, 4)
     row["lowest_vert_z_world"] = round(min(zs), 4) if zs else None
+    # Top vertex, for volumes whose datum is a walkable top surface rather than
+    # a ground contact. The homestead is a floating island: its crust hangs to
+    # -0.45 while the origin and every socket sit on the top plane.
+    row["top_vert_z_world"] = round(max(zs), 4) if zs else None
     row["pivot_is_ground_contact"] = bool(zs) and abs(min(zs)) <= 0.05
     row["scale_applied"] = all(abs(s - 1.0) <= 1e-4 for s in obj.scale)
     return row
@@ -307,6 +311,49 @@ def verify(volume: Volume, measured: dict[str, Any] | None) -> list[dict[str, An
                 % (measured.get("lowest_vert_z_world") or 0.0),
             }
         )
+
+    # --- floating volume: assert the top datum, not ground contact ---------
+    # A floating island has no ground underneath it, so "ground contact" is
+    # undefined. The datum that actually matters is the walkable top surface:
+    # every socket and every placed prop are positioned against it. This checks
+    # the origin sits at that declared plane AND that the mesh actually rises
+    # to it, so a drifted island -- which would drag every socket off the
+    # surface -- fails here rather than shipping.
+    datum = volume.top_datum_z_m
+    if datum is not None:
+        origin_z = measured.get("origin_z_world")
+        top_z = measured.get("top_vert_z_world")
+        if origin_z is None:
+            findings.append(
+                {
+                    "criterion": "2_sized",
+                    "severity": "blocking",
+                    "volume": volume.name,
+                    "detail": "floating volume declares world_top_z %.3f but origin "
+                    "could not be measured" % datum,
+                }
+            )
+        elif abs(origin_z - datum) > 0.05:
+            findings.append(
+                {
+                    "criterion": "2_sized",
+                    "severity": "blocking",
+                    "volume": volume.name,
+                    "detail": "floating volume origin at Z %.3f, spec declares "
+                    "world_top_z %.3f; every socket is placed against that plane"
+                    % (origin_z, datum),
+                }
+            )
+        if top_z is not None and abs(top_z - datum) > 0.05:
+            findings.append(
+                {
+                    "criterion": "2_sized",
+                    "severity": "blocking",
+                    "volume": volume.name,
+                    "detail": "floating volume walkable top at Z %.3f, spec declares "
+                    "world_top_z %.3f" % (top_z, datum),
+                }
+            )
 
     # --- DEC-0018: poly budget, asserted not assumed ---------------------
     budget = POLY_BUDGET.get(volume.name)

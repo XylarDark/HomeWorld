@@ -8,7 +8,8 @@
   "graybox_map": ["SM_Island_Hero"],
   "units": "meters",
   "apply_scale": true,
-  "origin": "ground_contact",
+  "origin": "top_surface",
+  "origin_note": "The homestead is a FLOATING island: there is no ground underneath it, so ground contact is undefined and cannot be asserted. The datum is the walkable top surface, declared as world_top_z below and matched by all 10 sockets (every one at z 0.0). The crust hangs below that plane to z_crust. Changing this datum would drag every socket off the walkable surface.",
   "size_m": { "x": 21.0, "y": 14.0, "z_crust": 0.5 },
   "world_top_z": 0.0,
   "materials": [

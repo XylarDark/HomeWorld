@@ -222,6 +222,15 @@ class Volume:
     family_status: str = "unassigned"
     is_helper: bool = False
     pivot_is_ground_contact: bool = False
+    #: World Z of the walkable top surface, when the spec declares one. A
+    #: *floating* volume has no ground to contact, so "ground contact" is
+    #: undefined for it; the load-bearing datum is the top surface the player
+    #: stands on. Set from the spec's ``world_top_z``.
+    #:
+    #: The verifier asserts the origin sits at this datum. It does NOT relax the
+    #: pivot check -- it replaces an inapplicable assertion with an applicable
+    #: one, and it can still fail.
+    top_datum_z_m: float | None = None
     materials: tuple[str, ...] = ()
     #: True when the spec gave this volume its own world origin. When False the
     #: volume inherits its assembly's origin and the verifier checks its offset
@@ -544,6 +553,7 @@ def _parse_volumes(spec_id: str, raw: dict[str, Any]) -> tuple[Volume, ...]:
         role: str,
         ground_contact: bool,
         explicit_origin: bool = False,
+        top_datum_z: float | None = None,
     ) -> None:
         # A zone spec may carry a family on each module; otherwise fall back to
         # the table. Either way the family is data, never inferred.
@@ -552,6 +562,13 @@ def _parse_volumes(spec_id: str, raw: dict[str, Any]) -> tuple[Volume, ...]:
         if family == FAMILY_SPINE and status == "unassigned" and module_family:
             family = module_family
             status = "assigned"
+        # A declared top datum means the volume is floating: there is no ground
+        # underneath it, so ground contact cannot be asserted. Suppress it here,
+        # at the point where both facts are known, rather than leaving a spec
+        # able to assert the impossible and fail forever. The datum check in
+        # graybox_spec_reader.verify replaces it and can still fail.
+        if top_datum_z is not None:
+            ground_contact = False
         volumes.append(
             Volume(
                 name=name,
@@ -563,6 +580,7 @@ def _parse_volumes(spec_id: str, raw: dict[str, Any]) -> tuple[Volume, ...]:
                 spec_id=spec_id,
                 is_helper=name.startswith(HELPER_PREFIXES),
                 pivot_is_ground_contact=ground_contact,
+                top_datum_z_m=top_datum_z,
                 origin_is_explicit=explicit_origin,
                 assembly_origin=assembly_origin if not explicit_origin else None,
                 assembly=assembly_name if not explicit_origin else None,
@@ -689,6 +707,9 @@ def _parse_volumes(spec_id: str, raw: dict[str, Any]) -> tuple[Volume, ...]:
             _as_vec3(raw.get("world_origin", [0.0, 0.0, 0.0]), "world_origin"),
             str(raw.get("role") or "single_volume"),
             str(raw.get("origin") or "") == "ground_contact",
+            top_datum_z=(
+                float(raw["world_top_z"]) if raw.get("world_top_z") is not None else None
+            ),
         )
 
     return tuple(volumes)
