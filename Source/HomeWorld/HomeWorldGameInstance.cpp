@@ -5,6 +5,7 @@
 #include "Engine/Engine.h"
 #include "Kismet/GameplayStatics.h"
 #include "UObject/SoftObjectPtr.h"
+#include "Misc/PackageName.h"
 
 void UHomeWorldGameInstance::Init()
 {
@@ -13,7 +14,11 @@ void UHomeWorldGameInstance::Init()
 	// Defaults if not set in Blueprint/config
 	if (GameMapPath.IsNull())
 	{
-		GameMapPath = FSoftObjectPath(TEXT("/Game/HomeWorld/Maps/DemoMap.DemoMap"));
+		// L_VS_MVP_Markers is the only level holding the homestead, the CRUMB_*
+		// glide path, and the field below the island. The previous default,
+		// DemoMap, has never existed in Content, so Play opened nothing.
+		GameMapPath = FSoftObjectPath(TEXT("/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers"));
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: GameMapPath defaulted to %s"), *GameMapPath.ToString());
 	}
 	if (MainMenuMapName.IsEmpty())
 	{
@@ -56,8 +61,28 @@ void UHomeWorldGameInstance::OpenGameMap()
 		return;
 	}
 
-	// Strip asset name suffix for ServerTravel (e.g. /Game/HomeWorld/Maps/DemoMap.DemoMap -> DemoMap)
-	FString MapName = GameMapPath.GetAssetName();
+	// Strip asset name suffix for travel (e.g. /Game/.../L_VS_MVP_Markers.L_VS_MVP_Markers
+	// -> L_VS_MVP_Markers). The trailing "." form is what GameDefaultMap in
+	// DefaultEngine.ini uses; GetAssetName gives us the bare name for both.
+	//
+	// Resolve first and complain loudly if the target is not in the asset
+	// registry. OpenLevel to a missing map is a silent no-op in a packaged
+	// build and a confusing one in-editor -- which is exactly how DemoMap
+	// survived as the default for so long.
+	const FString MapName = GameMapPath.GetAssetName();
+	const FString ObjectPath = GameMapPath.ToString();
+
+	if (!FPackageName::DoesPackageExist(ObjectPath))
+	{
+		UE_LOG(LogTemp, Error,
+			TEXT("HomeWorld: OpenGameMap target does not exist: %s")
+			TEXT(" -- Play will go nowhere. Set GameMapPath on BP_GameInstance ")
+			TEXT("or [/Script/HomeWorld.HomeWorldGameInstance] in DefaultGame.ini."),
+			*ObjectPath);
+		return;
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("HomeWorld: OpenGameMap -> %s"), *ObjectPath);
 	UGameplayStatics::OpenLevel(this, FName(*MapName), true);
 }
 

@@ -17,7 +17,15 @@ class HOMEWORLD_API UHomeWorldGameInstance : public UGameInstance
 	GENERATED_BODY()
 
 public:
-	/** Map to load when Play is clicked (e.g. DemoMap or Homestead). */
+	/**
+	 * Map to load when Play is clicked.
+	 *
+	 * Defaults to L_VS_MVP_Markers, which is the only level that actually
+	 * contains the homestead, the glide crumbs, and the field below. The old
+	 * default was /Game/HomeWorld/Maps/DemoMap, which does not exist in
+	 * Content -- so pressing Play travelled to nothing. Override in a
+	 * Blueprint or in DefaultGame.ini; see KNOWN_ERRORS 2026-10-03.
+	 */
 	UPROPERTY(EditDefaultsOnly, Category = "Menu", meta = (AllowedClasses = "/Script/Engine.World"))
 	FSoftObjectPath GameMapPath;
 
