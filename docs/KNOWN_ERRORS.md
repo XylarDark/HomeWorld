@@ -768,5 +768,12 @@ For each entry use:
 ### `-game` mode plus `-ExecCmds="py <file>"` crashes in the editor Python plugin
 - **Error:** `UnrealEditor-Cmd.exe <proj> <map> -game -unattended -nullrhi -ExecCmds="py C:\...\probe.py"` exits non-zero (3) with an `UnrealEditor-PythonScriptPlugin.dll` callstack and **executes nothing** - no `LogPython` lines for the script at all.
 - **Fix:** use the commandlet form instead, which works: `-run=pythonscript -script=<abs path> -unattended -nopause -nosplash -nullrhi "-abslog=<path>"`. Verified exit 0 on 5.8.2.
-- **Notes that cost time:** the commandlet needs an **absolute** `-script=` path, and `-abslog` is more reliable than a shell `>` redirect for capturing the log (a redirect silently produced no file on one attempt). `EditorLevelLibrary`/`LevelEditorSubsystem.get_all_level_actors` does not exist in 5.8 - use `unreal.get_editor_subsystem(unreal.EditorActorSubsystem).get_all_level_actors()`.
+- **Notes that cost time:** the commandlet needs an **absolute** `-script=` path, and `-abslog` is more reliable than a shell `>` redirect for capturing the log (a redirect silently produced no file on one attempt).
 - **Context:** 2026-10-03, while probing for a headless traversal measurement.
+
+### CORRECTION (2026-10-03): `EditorLevelLibrary.get_all_level_actors` DOES exist in 5.8 — the note above was wrong
+- **The bad claim:** an earlier revision of the entry above said `EditorLevelLibrary` / `LevelEditorSubsystem.get_all_level_actors` "does not exist in 5.8". That was **never verified** and it is false.
+- **Measured, on UE 5.8 (`++UE5+Release-5.8-CL-56702186`), `-run=pythonscript`:** `hasattr(unreal, "EditorLevelLibrary")` → `True`; `hasattr(unreal.EditorLevelLibrary, "get_all_level_actors")` → `True`; calling it returns a real `Array` (length 0 with no map loaded). `EditorActorSubsystem` is also present and works.
+- **Why it matters:** 56 call sites across `Content/Python/*.py` use `EditorLevelLibrary.get_all_level_actors`. Taken at face value, that note would have justified rewriting all 56 — a large, risky, entirely unnecessary change to working scripts.
+- **Rule this establishes:** a "this API is gone / this path does not work" claim is a **measurement claim**. Probe the attribute before recording it. The same session that wrote the wrong note also recorded three claims that were correct, which is exactly why a wrong one is dangerous — a reader cannot tell them apart by tone.
+- **Context:** re-verified after a later session treated the note as fact and started auditing all 56 sites.

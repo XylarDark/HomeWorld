@@ -46,6 +46,8 @@ protected:
 	void CacheDefaultMovement();
 	void UpdateSprintSpeed();
 	void UpdateFallSoftReset(float DeltaTime);
+	/** True when the pawn is falling with walkable ground within DropCorridorProbeCm below. */
+	bool IsOverLandingGround() const;
 	bool ResolveMantleTarget(FVector& OutStandLocation, bool& bOutVault) const;
 	AActor* FindSpiritBlinkTarget() const;
 	bool IsTraversalBlocked() const;
@@ -89,11 +91,33 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Movement|Blink", meta = (ClampMin = "0.5"))
 	float BlinkCooldownSeconds = 2.5f;
 
+	/**
+	 * Soft reset: after this long in the air, put the pawn back on its last
+	 * safe ground. This is a STUCK-prevention net for falls off the homestead
+	 * edge -- it is NOT a drop budget. Lead owns these numbers for feel; the
+	 * polishable fact is that the homestead-to-field drop is ~9500 cm, so any
+	 * FallReset*Cm below that fires mid-drop and strands the player in the air.
+	 * See DropSafety::IsDropCorridorClear and KNOWN_ERRORS 5.8 fall-reset.
+	 */
 	UPROPERTY(EditDefaultsOnly, Category = "Movement|Fall", meta = (ClampMin = "1.0"))
 	float FallResetSeconds = 2.75f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Movement|Fall", meta = (ClampMin = "500.0"))
 	float FallResetDropCm = 2200.f;
+
+	/**
+	 * When true the soft reset stands down once the pawn has entered a drop
+	 * corridor (falling with walkable ground far below), so jumping off the
+	 * homestead edge toward the field lands in the field instead of snapping
+	 * back to the rim. Off by default so the old stuck-net behaviour is
+	 * unchanged until the Lead opts in.
+	 */
+	UPROPERTY(EditDefaultsOnly, Category = "Movement|Fall")
+	bool bRespectDropCorridor = false;
+
+	/** Trace distance used to decide "is there somewhere to land". */
+	UPROPERTY(EditDefaultsOnly, Category = "Movement|Fall", meta = (ClampMin = "1000.0"))
+	float DropCorridorProbeCm = 30000.f;
 
 	bool bSprintHeld = false;
 	bool bMountBoostActive = false;

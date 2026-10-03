@@ -140,6 +140,17 @@ void UHomeWorldTraversalComponent::UpdateFallSoftReset(float DeltaTime)
 	{
 		TimeInFall += DeltaTime;
 		const float Drop = LastSafeGroundLocation.Z - CachedCharacter->GetActorLocation().Z;
+
+		// The homestead->field drop is ~9500 cm. A fall-reset threshold below
+		// that fires mid-drop and teleports the player back to the rim, which
+		// makes "jump off the edge toward the field" impossible. When opted in,
+		// stand down the reset while there is somewhere to actually land.
+		const bool bOverLandingGround = bRespectDropCorridor && IsOverLandingGround();
+		if (bOverLandingGround)
+		{
+			return;
+		}
+
 		if (TimeInFall >= FallResetSeconds || Drop >= FallResetDropCm)
 		{
 			const float FallTime = TimeInFall;
@@ -155,6 +166,34 @@ void UHomeWorldTraversalComponent::UpdateFallSoftReset(float DeltaTime)
 			LOG_MOVE("soft_reset fall (time=%.1fs drop=%.0f cm)", FallTime, Drop);
 		}
 	}
+}
+
+bool UHomeWorldTraversalComponent::IsOverLandingGround() const
+{
+	// Read the fall corridor, not the whole world. Two traces: the movement
+	// channel the pawn actually uses, then Visibility as a fallback for level
+	// geometry that only blocks the camera.
+	UWorld* World = GetWorld();
+	if (!World || !CachedCharacter)
+	{
+		return false;
+	}
+
+	const FVector Start = CachedCharacter->GetActorLocation();
+	const FVector End = Start - FVector(0.f, 0.f, DropCorridorProbeCm);
+
+	FCollisionQueryParams Params(NAME_None, false, CachedCharacter);
+	FHitResult Hit;
+
+	if (World->LineTraceSingleByChannel(Hit, Start, End, ECC_Pawn, Params))
+	{
+		return true;
+	}
+	if (World->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params))
+	{
+		return true;
+	}
+	return false;
 }
 
 void UHomeWorldTraversalComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
