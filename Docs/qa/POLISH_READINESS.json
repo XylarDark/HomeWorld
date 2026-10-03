@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-03T17:14:35+00:00",
+  "generated": "2026-10-03T19:43:21+00:00",
   "process_doc": "Docs/37_POLISH_PASS_PROCESS.md",
   "verdict": "NOT_READY",
   "gates": {
@@ -69,10 +69,10 @@
           "gate": "G-ENV",
           "requirement": "Traversal time measured in-engine against the canon window",
           "source": "Docs/qa/POLISH_BASELINE.json",
-          "measured": "no artifact",
+          "measured": "cabin_to_lookout_s unmeasured; island_circuit_s unmeasured",
           "target": "cabin_to_lookout_s 15-25; island_circuit_s 45-90",
           "state": "MISSING",
-          "note": "No instrument exists. FEEL.md states the windows; nothing reads them. Build the measurement before changing size, not after."
+          "note": "Not yet measured: cabin_to_lookout_s, island_circuit_s. The artifact exists and the keys are declared, but no number has been recorded. Timing a walk needs the desktop editor with cells streamed and a human on the keys."
         },
         {
           "id": "env.traversal_reachable",
@@ -173,10 +173,10 @@
           "gate": "G-FEEL",
           "requirement": "Every TODO tunable has a measured pre-tune value",
           "source": "Docs/qa/POLISH_BASELINE.json",
-          "measured": "0 baselines",
+          "measured": "0/6 measured",
           "target": ">=1 per tunable",
           "state": "MISSING",
-          "note": "FEEL.md lists glide gravity, lateral influence, camera arm, camera pitch bias, night length and gather cooldown as TODO proposals. None has a measured current value."
+          "note": "Still unmeasured: glide_gravity_scale, glide_lateral_influence, camera_arm_length_uu, camera_pitch_bias_deg, night_length_s, gather_cooldown_s. Measured: none."
         },
         {
           "id": "feel.verb_script",

@@ -72,13 +72,28 @@ void UHomeWorldGameInstance::OpenGameMap()
 	const FString MapName = GameMapPath.GetAssetName();
 	const FString ObjectPath = GameMapPath.ToString();
 
-	if (!FPackageName::DoesPackageExist(ObjectPath))
+	// FPackageName::DoesPackageExist() is documented against a PACKAGE NAME
+	// (/Game/Path/Map), while a SoftObjectPath stringifies to an OBJECT PATH
+	// (/Game/Path/Map.Map). Whether the engine tolerates the object-path form is
+	// not something to bet the Play button on -- if it does not, this guard
+	// rejects a perfectly valid map and OpenGameMap never travels, which is the
+	// same class of bug as the missing DemoMap default it replaced.
+	//
+	// So test both forms and accept either. A map exists if EITHER resolves;
+	// a map is missing only when both fail, which cannot happen for a real map.
+	const FString PackagePath = GameMapPath.GetAssetPathString();
+	const bool bExists =
+		FPackageName::DoesPackageExist(PackagePath) ||
+		FPackageName::DoesPackageExist(ObjectPath);
+
+	if (!bExists)
 	{
 		UE_LOG(LogTemp, Error,
 			TEXT("HomeWorld: OpenGameMap target does not exist: %s")
+			TEXT(" (package form tried: %s)")
 			TEXT(" -- Play will go nowhere. Set GameMapPath on BP_GameInstance ")
 			TEXT("or [/Script/HomeWorld.HomeWorldGameInstance] in DefaultGame.ini."),
-			*ObjectPath);
+			*ObjectPath, *PackagePath);
 		return;
 	}
 
@@ -89,8 +104,23 @@ void UHomeWorldGameInstance::OpenGameMap()
 void UHomeWorldGameInstance::OpenCharacterScreen()
 {
 	APlayerController* PC = GetWorld() ? UGameplayStatics::GetPlayerController(GetWorld(), 0) : nullptr;
-	if (!PC || !CharacterScreenWidgetClass)
+	if (!CharacterScreenWidgetClass)
 	{
+		// DefaultGame.ini still points CharacterScreenWidgetClassPath at
+		// /Game/HomeWorld/UI/WBP_CharacterCreate, which does not exist in
+		// Content (only WBP_MainMenu does). ResolveClass returns null, so this
+		// button used to do nothing at all with nothing logged.
+		UE_LOG(LogTemp, Warning,
+			TEXT("HomeWorld: OpenCharacterScreen - no widget class resolved from '%s' ")
+			TEXT("-- the Character button will do nothing. Either build ")
+			TEXT("WBP_CharacterCreate or clear CharacterScreenWidgetClassPath in ")
+			TEXT("DefaultGame.ini."),
+			*CharacterScreenWidgetClassPath.ToString());
+		return;
+	}
+	if (!PC)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HomeWorld: OpenCharacterScreen - no PlayerController"));
 		return;
 	}
 

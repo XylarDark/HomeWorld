@@ -1,0 +1,55 @@
+{
+  "_schema": "POLISH_BASELINE/1",
+  "_what_this_is": "Pre-tune measurements for the polish pass. Every number here is a BEFORE value: what the build does today, so a later change can be judged against it rather than against memory.",
+  "_authority": "Docs/canon/FEEL.md. The windows below are owned by that file; this file only records measurements against them.",
+  "_status": "SEEDED EMPTY. No value in this file has been measured. Null means not measured, and the gate reports MISSING -- not PASS -- until a human fills it in.",
+
+  "_how_to_measure_traversal": [
+    "1. Open Content/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.umap in the DESKTOP editor. Cells must be streamed; a nullrhi commandlet cannot time a walk.",
+    "2. Use the eight-verb script in Docs/qa/POLISH_HUMAN_PLAYTEST.json as the run order, so the timings come from a comparable route each time.",
+    "3. cabin_to_lookout_s: spawn at the cabin PlayerStart, walk the CRUMB_ path to CRUMB_Lookout, stop the timer on arrival. Three runs; record the median.",
+    "4. island_circuit_s: cabin -> lookout -> path stones -> back to cabin, the same loop the canon window describes.",
+    "5. Write the median to measured_s. Do not record a number you did not time."
+  ],
+
+  "_how_to_measure_tunables": [
+    "Each tunable below currently has no measured value. Record the value the build uses TODAY, before any tuning.",
+    "Read the live value out of the editor or log -- do not copy the proposed range out of FEEL.md. The proposal is the destination, not the baseline.",
+    "Record strings for enum-ish choices, numbers for numeric ones. A null here is an open question, and leaving it null is a valid, honest answer."
+  ],
+
+  "cabin_to_lookout_s": {
+    "measured_s": null,
+    "window_s": [15.0, 25.0],
+    "source_window": "Docs/canon/FEEL.md",
+    "runs": [],
+    "note": "Median of three timed walks. Empty until a human times it."
+  },
+  "island_circuit_s": {
+    "measured_s": null,
+    "window_s": [45.0, 90.0],
+    "source_window": "Docs/canon/FEEL.md",
+    "runs": [],
+    "note": "Full circuit. Empty until a human times it."
+  },
+
+  "tunables": {
+    "glide_gravity_scale": null,
+    "glide_lateral_influence": null,
+    "camera_arm_length_uu": null,
+    "camera_pitch_bias_deg": null,
+    "night_length_s": null,
+    "gather_cooldown_s": null
+  },
+
+  "_tunable_notes": {
+    "glide_gravity_scale": "FEEL.md proposes 0.35-0.55x default gravity while on the FALLBACK spline. Read the live value from HomeWorldFallbackGlideComponent.",
+    "glide_lateral_influence": "FEEL.md proposes 0 if FALLBACK is cinematic, else <=15% of corridor width. Canon says FALLBACK = no free steer, so the expected reading may well be 0.",
+    "camera_arm_length_uu": "FEEL.md proposes 350-500 UU. Read from the SpringArm on BP_HomeWorldCharacter.",
+    "camera_pitch_bias_deg": "FEEL.md proposes -8 to -15 degrees. Read from the controller or the SpringArm relative rotation.",
+    "night_length_s": "FEEL.md proposes 90-180 s real time before the rest prompt. See Docs/DAYNIGHT_BIBLE.md.",
+    "gather_cooldown_s": "FEEL.md proposes until dawn OR 60-120 s, matching the SYS 'deplete until dawn' preference. Record which branch is actually implemented."
+  },
+
+  "_waiver_policy": "Do not write a number here to make a gate go green. A null that is honestly null is worth more than a plausible value, because a plausible value cannot be told apart from a real one later."
+}

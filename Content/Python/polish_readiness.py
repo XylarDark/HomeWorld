@@ -266,6 +266,19 @@ TRAVERSAL_TARGETS: dict[str, tuple[float, float]] = {
     "island_circuit_s": (45.0, 90.0),
 }
 
+#: The six tunables Docs/canon/FEEL.md still holds as TODO proposals. Named here so
+#: POLISH_BASELINE.json and the gate agree on what "all of them" means -- without a
+#: list, a file containing one arbitrary key would satisfy ">=1 baseline" and the
+#: gate would go green having measured nothing that matters.
+FEEL_TUNABLES: tuple[str, ...] = (
+    "glide_gravity_scale",
+    "glide_lateral_influence",
+    "camera_arm_length_uu",
+    "camera_pitch_bias_deg",
+    "night_length_s",
+    "gather_cooldown_s",
+)
+
 
 def check_env_world_assembled() -> Check:
     """A world exists to size. This checks external actors, not the .umap filename.
@@ -328,15 +341,31 @@ def check_env_traversal_measured() -> Check:
         )
     rows = []
     bad = []
+    unmeasured = []
     for key, (lo, hi) in TRAVERSAL_TARGETS.items():
         val = (data.get(key) or {}).get("measured_s")
-        if not isinstance(val, (int, float)):
+        if not isinstance(val, (int, float)) or isinstance(val, bool):
+            # Declared but not yet filled in. That is MISSING, not FAIL: FAIL
+            # means "we measured it and it is wrong", and nothing was measured.
+            # Creating POLISH_BASELINE.json with nulls must not make the gate
+            # accuse the world of being mis-sized on the Lead's first run.
             rows.append(f"{key} unmeasured")
-            bad.append(key)
+            unmeasured.append(key)
             continue
         rows.append(f"{key} {val:g}s")
         if not (lo <= float(val) <= hi):
             bad.append(key)
+    if unmeasured:
+        return Check(
+            "env.traversal_measured", "G-ENV",
+            "Traversal time measured in-engine against the canon window",
+            _rel(BASELINE_FILE), "; ".join(rows),
+            "; ".join(f"{k} {v[0]:g}-{v[1]:g}" for k, v in TRAVERSAL_TARGETS.items()),
+            MISSING,
+            "Not yet measured: " + ", ".join(unmeasured) + ". The artifact exists and "
+            "the keys are declared, but no number has been recorded. Timing a walk "
+            "needs the desktop editor with cells streamed and a human on the keys.",
+        )
     if bad:
         return Check(
             "env.traversal_measured", "G-ENV",
@@ -730,11 +759,25 @@ def check_feel_tunable_baselines() -> Check:
             "pitch bias, night length and gather cooldown as TODO proposals. None "
             "has a measured current value.",
         )
+    # A key present with a null value is a declared placeholder, not a baseline.
+    # Counting it would let a freshly-seeded skeleton turn this check PASS and hand
+    # the polish pass a green gate over six unfilled numbers.
+    measured = [k for k, v in baselines.items() if isinstance(v, (int, float, str, bool)) and v is not None]
+    pending = [k for k in FEEL_TUNABLES if k not in measured]
+    measured_str = ", ".join(sorted(measured)[:8]) or "none"
+    if pending:
+        return Check(
+            "feel.tunable_baselines", "G-FEEL",
+            "Every TODO tunable has a measured pre-tune value",
+            _rel(BASELINE_FILE), f"{len(measured)}/{len(FEEL_TUNABLES)} measured",
+            ">=1 per tunable", MISSING,
+            "Still unmeasured: " + ", ".join(pending) + ". Measured: " + measured_str + ".",
+        )
     return Check(
         "feel.tunable_baselines", "G-FEEL",
         "Every TODO tunable has a measured pre-tune value",
-        _rel(BASELINE_FILE), f"{len(baselines)} baselines",
-        ">=1 per tunable", PASS, ", ".join(sorted(baselines)[:8]),
+        _rel(BASELINE_FILE), f"{len(measured)} baselines",
+        ">=1 per tunable", PASS, measured_str,
     )
 
 

@@ -298,6 +298,16 @@ class TraversalWindowsAreReadFromCanon(unittest.TestCase):
     def test_unmeasured_key_is_not_treated_as_zero(self):
         # A missing measurement must not read as 0.0 and pass a `0 <= 0 <= 90`
         # style check; it is unmeasured.
+        #
+        # STATE CORRECTED 2026-10-03. This test used to assert FAIL. FAIL means
+        # "measured, and the number is wrong" -- it accuses the world of being
+        # mis-sized. But nothing was measured: the baseline file was seeded with
+        # nulls and a human has not walked the island. Seeding the skeleton would
+        # have flipped this check RED on the Lead's first run and told them to go
+        # fix geometry that nobody has timed yet. Unmeasured is MISSING.
+        #
+        # The original intent of the test survives the change intact: the state is
+        # still not PASS, which is the property that actually matters.
         with tempfile.TemporaryDirectory() as td:
             p = Path(td) / "baseline.json"
             p.write_text(json.dumps({
@@ -308,10 +318,191 @@ class TraversalWindowsAreReadFromCanon(unittest.TestCase):
             pr.BASELINE_FILE = p
             try:
                 c = pr.check_env_traversal_measured()
-                self.assertEqual(c.state, pr.FAIL)
+                self.assertEqual(c.state, pr.MISSING)
                 self.assertIn("unmeasured", c.measured)
+                self.assertNotEqual(c.state, pr.PASS)
             finally:
                 pr.BASELINE_FILE = saved
+
+    def test_a_fully_seeded_skeleton_reports_missing_not_fail(self):
+        # The regression that motivated separating MISSING from FAIL: shipping the
+        # POLISH_BASELINE.json skeleton -- real artifact, declared keys, all values
+        # null -- must NOT accuse anyone of bad measurements, and must NOT go green.
+        # Both wrong answers hide the same fact: that nobody has played yet.
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td) / "baseline.json"
+            p.write_text(json.dumps({
+                "cabin_to_lookout_s": {"measured_s": None},
+                "island_circuit_s": {"measured_s": None},
+            }), encoding="utf-8")
+            saved = pr.BASELINE_FILE
+            pr.BASELINE_FILE = p
+            try:
+                c = pr.check_env_traversal_measured()
+                self.assertEqual(c.state, pr.MISSING)
+                self.assertNotEqual(c.state, pr.FAIL)
+            finally:
+                pr.BASELINE_FILE = saved
+
+    def test_absent_artifact_is_still_missing(self):
+        # Seeding the skeleton must not have changed how a MISSING FILE reads.
+        # Before, no file meant MISSING with the note "no instrument exists"; now a
+        # file with nulls means MISSING with a different note. Same state, different
+        # guidance -- and the no-file case must not have been lost in the edit.
+        with tempfile.TemporaryDirectory() as td:
+            saved = pr.BASELINE_FILE
+            pr.BASELINE_FILE = Path(td) / "does_not_exist.json"
+            try:
+                c = pr.check_env_traversal_measured()
+                self.assertEqual(c.state, pr.MISSING)
+                self.assertIn("no artifact", c.measured)
+            finally:
+                pr.BASELINE_FILE = saved
+
+    def test_bool_is_not_a_measurement(self):
+        # True is an int in Python, so `isinstance(True, (int, float))` is True.
+        # A stray `true` in hand-edited JSON would otherwise measure a walk of 1
+        # second and report a confident PASS.
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td) / "baseline.json"
+            p.write_text(json.dumps({
+                "cabin_to_lookout_s": {"measured_s": True},
+                "island_circuit_s": {"measured_s": True},
+            }), encoding="utf-8")
+            saved = pr.BASELINE_FILE
+            pr.BASELINE_FILE = p
+            try:
+                self.assertEqual(pr.check_env_traversal_measured().state, pr.MISSING)
+            finally:
+                pr.BASELINE_FILE = saved
+
+
+class TunableBaselines(unittest.TestCase):
+    """A declared placeholder must not be counted as a measured value.
+
+    `POLISH_BASELINE.json` ships with all six FEEL.md tunables present and null, so
+    the human fills in numbers instead of inventing a schema. The hazard is
+    specific and quiet: the check used to report PASS for *any* non-empty `tunables`
+    dict, so seeding six nulls would have turned the G-FEEL gate green over zero
+    measurements.
+    """
+
+    def _baseline(self, td, tunables):
+        p = Path(td) / "baseline.json"
+        p.write_text(json.dumps({"tunables": tunables}), encoding="utf-8")
+        return p
+
+    def test_all_null_tunables_are_not_a_baseline(self):
+        with tempfile.TemporaryDirectory() as td:
+            p = self._baseline(td, {k: None for k in pr.FEEL_TUNABLES})
+            saved = pr.BASELINE_FILE
+            pr.BASELINE_FILE = p
+            try:
+                c = pr.check_feel_tunable_baselines()
+                self.assertEqual(c.state, pr.MISSING)
+                self.assertNotEqual(c.state, pr.PASS)
+                self.assertIn("0/6", c.measured)
+            finally:
+                pr.BASELINE_FILE = saved
+
+    def test_one_arbitrary_key_does_not_satisfy_all_six(self):
+        # Without a named list, one key would clear a ">0 baselines" test and the
+        # gate would report 1/1 measured while five tunables stayed untouched.
+        with tempfile.TemporaryDirectory() as td:
+            p = self._baseline(td, {"glide_gravity_scale": 0.45})
+            saved = pr.BASELINE_FILE
+            pr.BASELINE_FILE = p
+            try:
+                c = pr.check_feel_tunable_baselines()
+                self.assertEqual(c.state, pr.MISSING)
+                self.assertIn("1/6", c.measured)
+                self.assertIn("night_length_s", c.note)
+            finally:
+                pr.BASELINE_FILE = saved
+
+    def test_partial_fill_names_what_is_left(self):
+        with tempfile.TemporaryDirectory() as td:
+            p = self._baseline(td, {
+                "glide_gravity_scale": 0.45,
+                "glide_lateral_influence": 0.0,
+                "camera_arm_length_uu": 420,
+            })
+            saved = pr.BASELINE_FILE
+            pr.BASELINE_FILE = p
+            try:
+                c = pr.check_feel_tunable_baselines()
+                self.assertEqual(c.state, pr.MISSING)
+                for pending in ("camera_pitch_bias_deg", "night_length_s",
+                                "gather_cooldown_s"):
+                    self.assertIn(pending, c.note)
+            finally:
+                pr.BASELINE_FILE = saved
+
+    def test_all_six_measured_passes(self):
+        with tempfile.TemporaryDirectory() as td:
+            p = self._baseline(td, {
+                "glide_gravity_scale": 0.45,
+                "glide_lateral_influence": 0.0,
+                "camera_arm_length_uu": 420,
+                "camera_pitch_bias_deg": -11.0,
+                "night_length_s": 120,
+                "gather_cooldown_s": 90,
+            })
+            saved = pr.BASELINE_FILE
+            pr.BASELINE_FILE = p
+            try:
+                self.assertEqual(pr.check_feel_tunable_baselines().state, pr.PASS)
+            finally:
+                pr.BASELINE_FILE = saved
+
+
+class TheShippedSkeletonIsHonest(unittest.TestCase):
+    """Assert the real artifact on disk, not a fixture.
+
+    A fixture only proves the code behaves. This proves the file that actually ships
+    does not contain invented numbers -- which is the whole claim being made to the
+    human: "these are unfilled, not tuned."
+    """
+
+    def setUp(self):
+        self.path = ROOT / "Docs" / "qa" / "POLISH_BASELINE.json"
+        if not self.path.is_file():
+            self.skipTest("POLISH_BASELINE.json not present")
+        self.data = json.loads(self.path.read_text(encoding="utf-8"))
+
+    def test_no_traversal_window_has_a_measured_value(self):
+        for key in pr.TRAVERSAL_TARGETS:
+            entry = self.data.get(key)
+            self.assertIsNotNone(entry, f"{key} not declared in the skeleton")
+            self.assertIsNone(
+                entry.get("measured_s"),
+                f"{key} carries a measured_s. No human has timed a walk yet -- a "
+                f"number here would be invented and would make the gate pass.",
+            )
+
+    def test_every_feel_tunable_is_declared_and_null(self):
+        tunables = self.data.get("tunables") or {}
+        self.assertEqual(
+            sorted(tunables), sorted(pr.FEEL_TUNABLES),
+            "the skeleton's tunable keys have drifted from FEEL_TUNABLES in the gate",
+        )
+        for key, value in tunables.items():
+            self.assertIsNone(
+                value, f"{key} carries a value ({value!r}) but was never measured"
+            )
+
+    def test_windows_match_canon_not_the_gate(self):
+        # The window belongs to FEEL.md. If the file restates a different one, the
+        # human tunes against the file while the gate judges against canon, and the
+        # two disagree silently.
+        self.assertEqual(
+            self.data["cabin_to_lookout_s"]["window_s"],
+            list(pr.TRAVERSAL_TARGETS["cabin_to_lookout_s"]),
+        )
+        self.assertEqual(
+            self.data["island_circuit_s"]["window_s"],
+            list(pr.TRAVERSAL_TARGETS["island_circuit_s"]),
+        )
 
 
 class ShapeOfTheGate(unittest.TestCase):
