@@ -1375,3 +1375,76 @@ spec of 21x14 (off by 3.3 with 1.4 tolerance); rescaling authored geometry is fo
 either record-target-not-met or reconcile-the-spec, and that is a human call. And the must-list rows
 for these beats should be revisited now that the fix is genuinely landed rather than re-cited from a
 claim.
+---
+
+## 2026-10-03 - the fix is pushed, and the harness under it turned out to be the real story
+
+**Land state.** `main` is clean and `origin/main` is level with it. Five commits, none of them
+carrying a commit that fails to build:
+
+| Commit | What |
+|---|---|
+| `031e711` | the beat-node interactable gate fix, applied to `main` as one commit rather than cherry-picked |
+| `066ba61` | session record correcting the harness and stale-DLL conclusions (append-only) |
+| `296e50f` | the nine must-list rows, which had been corrected to say the fix was parked |
+| `a748271` | `run_ue_automation.py`: it had never once parsed a report |
+| `c2c3d41` | two red rows in the full group that were never about the product |
+
+`git merge-base --is-ancestor 031e711 origin/main` exits 0. Only `Source/HomeWorld/
+HomeWorldCharacter.cpp` changed on the C++ side, and that commit is the one verified against
+`Safe-Build.ps1`.
+
+**The squash decision, made and recorded.** The three earlier commits were replaced by two rather
+than pushed as-is, because `c2bff14` shipped a file with a deleted function signature and its body
+at namespace scope. Nothing pushed carried it. `git log` history is now bisect-safe: every commit
+on `main` compiles.
+
+**`run_ue_automation.py` had never measured anything.** It is the file agents are pointed at
+instead of reading the UE log. It reported `passed: 0, failed: 0` on every run ever, because UE
+writes `index.json` with a UTF-8 BOM, `json.load` raised, the `except` clause caught it, and the
+function returned its not-found branch. Read as `utf-8-sig` now. Four more defects in the same file
+could each have produced a false green on its own - unchecked engine lock, a `--group` selector
+matching no UE group judged by `failed == 0`, an uncleared report directory, and no DLL freshness
+check - and all are now closed. Verified end to end rather than by inspection: `--filter
+HomeWorld.T0` returns exit 0 on UE 5.8, and a 5.7 `UE_EDITOR` is refused before UE is launched.
+
+**Running the full group for the first time found two reds, and they were not the product.** Both
+were `import pytest` at module scope failing inside the engine's bundled Python. Converted to
+`unittest.TestCase`; host pytest collects those natively so nothing was lost.
+
+**But the conversion did not do what it looks like it does, and the positive control is the only
+reason I know that.** A deliberately false assertion was planted in one of the two files: host
+pytest failed it, and the editor run reported **Success**. The editor's Python automation runner
+reports one row per module and only *imports* it. It does not execute `TestCase` methods and never
+executed bare `test_*` functions either. So thirteen green `Editor.Python.*` rows assert nothing,
+and `test_run_ue_automation.py` alone contributes one green row for twelve functions. **Host
+`py -m pytest Content/Python/tests` is the only thing that runs the Python laws** - both file
+docstrings now say so, and there is a KNOWN_ERRORS entry.
+
+Two further traps came out of that work. A `__main__` guard calling `unittest.main()` fails these
+modules, because the runner imports with `__name__` set to `"__main__"` and the block raises
+`SystemExit` out of the import. And both mutation harnesses were matching `FAILED` lines with a
+pattern that captures the class rather than the method for a unittest module, scoring a killed
+mutation as SURVIVED - a false "the test no longer bites" reading, in the one tool whose job is to
+catch exactly that.
+
+**Final state, measured.**
+
+- `Automation RunTests HomeWorld` (full group, first time ever run): **42 succeeded, 0 failed,
+  43 listed, exit 0**, fresh DLL, UE 5.8, `dll_stale: false`.
+- `Automation RunTests HomeWorld.T0`: 19 tests listed, 0 failed.
+- Host suite: **81 passed + 3 subtests**.
+- Mutation harnesses: **4 killed / 1 survived** and **2 killed / 1 survived** - unchanged from
+  before the conversion, now with correct attribution.
+
+**One measurement that is still unexplained.** UE's report counters disagree with UE's own list of
+tests: `succeeded: 19` while listing 20 tests on T0, and 42 while listing 43 on the full group. The
+runner now carries both numbers and warns rather than quietly preferring one. UE's exit code is 255
+on a fully green run, so the report is trusted over the exit code, loudly. Neither is understood;
+both are recorded rather than smoothed over.
+
+**Still not established.** No playtest. 42 green means the code runs and the asserted laws hold.
+It says nothing about whether the beats are any good, and the thirteen Python rows in that total
+are import checks, not law checks. `SM_Island_Hero` remains the open human decision - authored
+19.3x10.7 against a spec of 21x14, rescaling authored geometry forbidden, recommendation
+record-target-not-met, raised with the Lead twice.
