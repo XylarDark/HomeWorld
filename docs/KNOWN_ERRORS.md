@@ -744,3 +744,29 @@ For each entry use:
 - **The one difference that is not a violation:** the committed blob ended with `claim.` and **no trailing newline**. Appending text after an unterminated line requires terminating it, so the diff shows `-claim.` / `+claim.` forever. That is a terminator, not an edit - and it is why append-only on this file is certified by a byte-prefix comparison rather than by reading the diff.
 - **Rule that follows:** for an append-only record, verify with bytes, not with a diff read. A diff that shows no *visible* change is not a diff that shows no change.
 - **Context:** 2026-10-03, while recording the automation-harness findings. The append that triggered it was rewritten; the corrupted file was restored from `HEAD` and re-appended byte-safely.
+
+### UE 5.8 Python: movement property names, and one bad read discarding four good ones
+- **Error:** `CharacterMovementComponent.get_editor_property("max_walk_slope")` raises `Failed to find property 'max_walk_slope'` in 5.8. The property is `walkable_floor_angle` (default 44.77 deg on `BP_HomeWorldCharacter`), and `max_walk_slope` does not appear in `dir(cm)` at all.
+- **Error (the one that costs you the measurement):** reading several movement properties inside one shared `try` block means a single mis-named property discards every good value already written into the same dict. `probe_movement_budget.py` did exactly this - the except branch nulled `walk_speed_cm_s` while `max_acceleration`, `braking_deceleration`, `ground_friction` and `max_step_height` sat unread in the output, and the report claimed the walk speed was unreadable when it had been read successfully.
+- **Fix:** read **one property per try/except**, with the load-bearing value (here `max_walk_speed`) read first and independently. Confirmed values on `BP_HomeWorldCharacter`: `max_walk_speed` 600 cm/s, `max_walk_speed_crouched` 300, `max_acceleration` 2048, `braking_deceleration_walking` 2048, `ground_friction` 8.0, `max_step_height` 45 cm, `walkable_floor_angle` 44.765 deg.
+- **Rule that follows:** in a probe, a failure must be attributable to the single read that failed. A blanket except around several reads converts one typo into a report that looks like missing data.
+- **Context:** 2026-10-03, extracting walk speed to check `Docs/canon/FEEL.md`'s traversal windows against the authored island.
+
+### `ASSEMBLY_FOOTPRINTS` is keyed on the assembly ROOT, not the walkable surface
+- **Error:** `graybox_spec_reader.ASSEMBLY_FOOTPRINTS` holds the island's declared size under `SM_Island_Hero`, but the greybox report measures the walkable slab as `SM_IslandTop`. Looking up the surface mesh returns `None`, which renders in a generated markdown table as a literal "None m" in the row meant to establish credibility.
+- **Why it matters:** the two volumes coincide geometrically only because the island is a single slab. That is an assumption, not a fact, and a report that silently conflates a root with its surface will not notice when that stops being true.
+- **Fix:** name both keys explicitly and label which is which in the output. `Content/Python/traversal_budget.py` does this and asserts in its selftest that the two keys are distinct.
+- **Context:** 2026-10-03, while building the traversal feasibility check.
+
+### World Partition geometry does not exist in a commandlet - do not conclude a map is empty
+- **Error:** `MainMenu.umap` loads under `UnrealEditor-Cmd.exe -run=pythonscript` and reports **14 actors and 0 `StaticMeshActor`s**, despite 1,270 `.uasset` files under `Content/__ExternalActors__/HomeWorld/Maps/MainMenu/`.
+- **Why:** the placed actors live in **World Partition cells**, which stream in only at game time. The tell is in the loaded level itself: `LevelDataLayers`, `Landscape`, `RuntimeVirtualTextureVolume` and `LocationVolume` actors alongside `2 PlayerStart` and no meshes.
+- **Consequence:** **no measurement that depends on placed level geometry can be taken headlessly.** A traversal timing instrument, a distance walk, or a sightline check all require the game running with cells streamed, a pawn driven along a drawn route, and a human on the desktop. Do not build a "measurement" that silently measures nothing.
+- **What to do instead:** separate the checks that only need *numbers* from the ones that need the *world*. Walk speed and authored extents are readable headlessly, and dividing `FEEL.md`'s window by walk speed against the island's perimeter catches a 5.6-lap contradiction that a timing test would only confirm much later.
+- **Context:** 2026-10-03, attempting to build the traversal instrument for the polish readiness gate.
+
+### `-game` mode plus `-ExecCmds="py <file>"` crashes in the editor Python plugin
+- **Error:** `UnrealEditor-Cmd.exe <proj> <map> -game -unattended -nullrhi -ExecCmds="py C:\...\probe.py"` exits non-zero (3) with an `UnrealEditor-PythonScriptPlugin.dll` callstack and **executes nothing** - no `LogPython` lines for the script at all.
+- **Fix:** use the commandlet form instead, which works: `-run=pythonscript -script=<abs path> -unattended -nopause -nosplash -nullrhi "-abslog=<path>"`. Verified exit 0 on 5.8.2.
+- **Notes that cost time:** the commandlet needs an **absolute** `-script=` path, and `-abslog` is more reliable than a shell `>` redirect for capturing the log (a redirect silently produced no file on one attempt). `EditorLevelLibrary`/`LevelEditorSubsystem.get_all_level_actors` does not exist in 5.8 - use `unreal.get_editor_subsystem(unreal.EditorActorSubsystem).get_all_level_actors()`.
+- **Context:** 2026-10-03, while probing for a headless traversal measurement.

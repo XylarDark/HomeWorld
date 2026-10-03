@@ -103,7 +103,9 @@ README is left intact as history.
 | Taste decisions Rounds 1–7 | `Docs/handoffs/TASTE_GATE_T0_ASSETS.md` | R1–6 RESOLVED, R7+ parked |
 | Agent-owned decisions | `Docs/decisions/AGENT_DECISIONS.md` | DEC-0001…**0028** |
 | UE 5.8 engineering | `Docs/SETUP.md`, `KNOWN_ERRORS.md`, `CONVENTIONS.md` | canon |
-| Greybox measurement report | `docs/qa/GRAYBOX_SPEC_REPORT.md` | 8 blocking |
+| Greybox measurement report | `docs/qa/GRAYBOX_SPEC_REPORT.md` | 5 blocking (regenerated 2026-10-02) |
+| **Polish pass entry gates** | `Docs/37_POLISH_PASS_PROCESS.md` | active — enforces via `Content/Python/polish_readiness.py` |
+| **Are we ready to polish?** | `Docs/qa/POLISH_READINESS.md` | generated; G-ENV / G-ASSET / G-FEEL all RED |
 | Map layout | `Maps/VS_MVP/README.md` | primary slice |
 
 ---

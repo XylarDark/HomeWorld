@@ -1,0 +1,212 @@
+{
+  "generated": "2026-10-03T16:36:47+00:00",
+  "process_doc": "Docs/37_POLISH_PASS_PROCESS.md",
+  "verdict": "NOT_READY",
+  "gates": {
+    "G-ENV": {
+      "question": "May we begin sizing and blockout work?",
+      "state": "RED",
+      "max_stage": "S2 ART-BLOCKOUT",
+      "tally": {
+        "PASS": 1,
+        "WAIVED": 1,
+        "FAIL": 4,
+        "MISSING": 1
+      },
+      "checks": [
+        {
+          "id": "env.world_assembled",
+          "gate": "G-ENV",
+          "requirement": "A placed world exists to size",
+          "source": "Content/__ExternalActors__",
+          "measured": "1270 placed actors across 1 maps",
+          "target": ">=1 placed actor",
+          "state": "PASS",
+          "note": "Maps: MainMenu.umap. Note the docs name worlds that do not exist; the assembled homestead is MainMenu."
+        },
+        {
+          "id": "env.island_sized",
+          "gate": "G-ENV",
+          "requirement": "Assembly extents match their declared spec size",
+          "source": "Docs/qa/graybox_spec_report.json",
+          "measured": "1 waived",
+          "target": "0 blocking",
+          "state": "WAIVED",
+          "note": "SM_Island_Hero: ACCEPTED AS MEASURED, NOT RESOLVED. Authored 10.7 m against a 14.0 m spec with 1.4 m tolerance. AGENTS.md forbids rescaling authored geometry, so the spec and the geometry still disagree. Raised 2026-10-03 and not directed otherwise, so it is carried as a recorded waiver rather than an open question."
+        },
+        {
+          "id": "env.pivot_grounded",
+          "gate": "G-ENV",
+          "requirement": "Assembly roots are pivoted at ground contact",
+          "source": "Docs/qa/graybox_spec_report.json",
+          "measured": "1 blocking",
+          "target": "0 blocking",
+          "state": "FAIL",
+          "note": "SM_Island_Hero: origin is not at ground contact (lowest vertex at Z -0.450)"
+        },
+        {
+          "id": "env.master_binding",
+          "gate": "G-ENV",
+          "requirement": "Every material resolves to one of the ten masters (art bible S10)",
+          "source": "Docs/qa/graybox_spec_report.json",
+          "measured": "2 blocking",
+          "target": "0 blocking",
+          "state": "FAIL",
+          "note": "M_FamilySilhouette: material in the blend is neither one of the ten masters nor an allowed instance (art bible S10); M_ValleyNight: material in the blend is neither one of the ten masters nor an allowed instance (art bible S10)"
+        },
+        {
+          "id": "env.family_distinct",
+          "gate": "G-ENV",
+          "requirement": "Silhouette families measure distinctly from one another",
+          "source": "Docs/qa/graybox_spec_report.json",
+          "measured": "1 blocking",
+          "target": "0 blocking",
+          "state": "FAIL",
+          "note": "SM_NODE_PLANT_SLOT_DAY_PLANTED: measures flat but the locked signature for 'heal' is narrow upright, single soft column"
+        },
+        {
+          "id": "env.traversal_measured",
+          "gate": "G-ENV",
+          "requirement": "Traversal time measured in-engine against the canon window",
+          "source": "Docs/qa/POLISH_BASELINE.json",
+          "measured": "no artifact",
+          "target": "cabin_to_lookout_s 15-25; island_circuit_s 45-90",
+          "state": "MISSING",
+          "note": "No instrument exists. FEEL.md states the windows; nothing reads them. Build the measurement before changing size, not after."
+        },
+        {
+          "id": "env.traversal_reachable",
+          "gate": "G-ENV",
+          "requirement": "No canon traversal window contradicts the island size",
+          "source": "Docs/qa/TRAVERSAL_BUDGET.json",
+          "measured": "1 unreachable of 2",
+          "target": "0 unreachable",
+          "state": "FAIL",
+          "note": "island_circuit_s: even the window's FLOOR (45 s) needs 270 m, but one lap of the island is 48 m - 5.6 laps. A circuit that winds is no longer a circuit; one number here is wrong"
+        }
+      ]
+    },
+    "G-ASSET": {
+      "question": "May we begin asset production?",
+      "state": "RED",
+      "max_stage": "S4 DRESS",
+      "tally": {
+        "FAIL": 1,
+        "PASS": 2,
+        "MISSING": 1
+      },
+      "checks": [
+        {
+          "id": "dep.g-env",
+          "gate": "",
+          "requirement": "G-ENV must be GREEN first",
+          "source": "",
+          "measured": "RED",
+          "target": "GREEN",
+          "state": "FAIL",
+          "note": "G-ENV is RED; its stage cannot be entered yet."
+        },
+        {
+          "id": "asset.master_count",
+          "gate": "G-ASSET",
+          "requirement": "Exactly ten master materials exist (art bible S10)",
+          "source": "Content/HomeWorld/Materials/Masters",
+          "measured": "10 masters",
+          "target": "10",
+          "state": "PASS",
+          "note": "M_BeastStylized, M_CliffRock, M_FoliageCard, M_GatherHerb, M_Nurtured, M_PathStone, M_SpiritUnlit, M_StylizedGrass, M_WoodCabin, M_WoodWild"
+        },
+        {
+          "id": "asset.board",
+          "gate": "G-ASSET",
+          "requirement": "Every master mesh has a declared stage and priority",
+          "source": "Docs/qa/POLISH_ASSET_BOARD.json",
+          "measured": "no artifact",
+          "target": "one row per mesh",
+          "state": "MISSING",
+          "note": "No asset board. Without one, 'asset pass 1' has no definition of done and no way to batch review before the expensive stages."
+        },
+        {
+          "id": "asset.poly_budgets",
+          "gate": "G-ASSET",
+          "requirement": "Export manifest declares a poly budget per mesh",
+          "source": "AssetCreation/Exports/MVP_EXPORT_MANIFEST.md",
+          "measured": "declared",
+          "target": "budget per mesh",
+          "state": "PASS",
+          "note": ""
+        }
+      ]
+    },
+    "G-FEEL": {
+      "question": "May we begin mechanics feel work?",
+      "state": "RED",
+      "max_stage": "S5 FEEL TUNE",
+      "tally": {
+        "FAIL": 1,
+        "MISSING": 3,
+        "PASS": 1
+      },
+      "checks": [
+        {
+          "id": "dep.g-asset",
+          "gate": "",
+          "requirement": "G-ASSET must be GREEN first",
+          "source": "",
+          "measured": "RED",
+          "target": "GREEN",
+          "state": "FAIL",
+          "note": "G-ASSET is RED; its stage cannot be entered yet."
+        },
+        {
+          "id": "feel.human_playtest",
+          "gate": "G-FEEL",
+          "requirement": "A human has played the build at a named commit",
+          "source": "Docs/qa/POLISH_HUMAN_PLAYTEST.json",
+          "measured": "never performed",
+          "target": "1 record",
+          "state": "MISSING",
+          "note": "Docs/canon/PLAYTEST.md's last known good is a scripted PIE probe from 2026-09-20, not a play session. A feel pass tuned without a human in the loop is tuning against an imagined player."
+        },
+        {
+          "id": "feel.tunable_baselines",
+          "gate": "G-FEEL",
+          "requirement": "Every TODO tunable has a measured pre-tune value",
+          "source": "Docs/qa/POLISH_BASELINE.json",
+          "measured": "0 baselines",
+          "target": ">=1 per tunable",
+          "state": "MISSING",
+          "note": "FEEL.md lists glide gravity, lateral influence, camera arm, camera pitch bias, night length and gather cooldown as TODO proposals. None has a measured current value."
+        },
+        {
+          "id": "feel.verb_script",
+          "gate": "G-FEEL",
+          "requirement": "Eight-verb script human-run with log greps captured",
+          "source": "Docs/qa/POLISH_HUMAN_PLAYTEST.json",
+          "measured": "0 verbs recorded",
+          "target": "8 verbs, each pass or documented fail",
+          "state": "MISSING",
+          "note": "No human verb record. The only filed run is all-FAIL under a WAIVE (Docs/14 VP-A)."
+        },
+        {
+          "id": "feel.binary_fresh",
+          "gate": "G-FEEL",
+          "requirement": "Last automation run executed tests against a fresh binary",
+          "source": "Saved/automation_run_result.json",
+          "measured": "43 ran, 0 failed",
+          "target": "0 failed",
+          "state": "PASS",
+          "note": "dll_stale=False; report counters disagree with report entries (42 vs 43), unexplained"
+        }
+      ]
+    }
+  },
+  "stages": [
+    "S0 MEASURE",
+    "S1 BLOCKOUT",
+    "S2 ART-BLOCKOUT",
+    "S3 ASSET PRODUCTION",
+    "S4 DRESS",
+    "S5 FEEL TUNE"
+  ]
+}

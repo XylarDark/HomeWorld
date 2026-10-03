@@ -1,0 +1,64 @@
+{
+  "generated": "2026-10-03T16:36:47+00:00",
+  "inputs": {
+    "movement_probe_errors": [],
+    "walk_speed_cm_s": 600.0,
+    "walk_speed_ms": 6.0
+  },
+  "island": {
+    "volume": "SM_IslandTop",
+    "authored_extents_m": [
+      19.3,
+      10.7
+    ],
+    "pivot_is_ground_contact": false,
+    "lowest_vert_z_world": -0.45,
+    "spec_volume": "SM_Island_Hero",
+    "spec_extents_m": [
+      21.0,
+      14.0
+    ],
+    "ellipse_perimeter_m": 48.1,
+    "seconds_per_lap_walked": 8.0
+  },
+  "windows": {
+    "cabin_to_lookout_s": {
+      "window_s": [
+        15.0,
+        25.0
+      ],
+      "shape": "POINT_TO_POINT",
+      "implied_path_length_m": [
+        90.0,
+        150.0
+      ],
+      "lap_walk_time_s": 8.0,
+      "crossings_of_long_axis_floor": 4.7,
+      "state": "REACHABLE",
+      "note": "needs 90-150 m of path, roughly 5-8 crossings of the island's 19 m long axis. A winding route can satisfy this; island size does not contradict it"
+    },
+    "island_circuit_s": {
+      "window_s": [
+        45.0,
+        90.0
+      ],
+      "shape": "CLOSED_LOOP",
+      "implied_path_length_m": [
+        270.0,
+        540.0
+      ],
+      "lap_walk_time_s": 8.0,
+      "crossings_of_long_axis_floor": 14.0,
+      "laps_needed_for_window_floor": 5.6,
+      "state": "NOT_REACHABLE",
+      "note": "even the window's FLOOR (45 s) needs 270 m, but one lap of the island is 48 m - 5.6 laps. A circuit that winds is no longer a circuit; one number here is wrong"
+    }
+  },
+  "verdict": "NOT_REACHABLE",
+  "notes": [
+    "Necessary-condition check on a straight-line lower bound. A NOT_REACHABLE is real and needs a human ruling on which number is wrong. Every REACHABLE here is unfalsified by design - it means size does not contradict the window, not that the walk fits it."
+  ],
+  "windows_failing": [
+    "island_circuit_s"
+  ]
+}

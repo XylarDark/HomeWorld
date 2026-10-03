@@ -1448,3 +1448,106 @@ It says nothing about whether the beats are any good, and the thirteen Python ro
 are import checks, not law checks. `SM_Island_Hero` remains the open human decision - authored
 19.3x10.7 against a spec of 21x14, rescaling authored geometry forbidden, recommendation
 record-target-not-met, raised with the Lead twice.
+## 2026-10-03 (later) — polish readiness gate, and one line of arithmetic that fails
+
+**Question put to me:** how ready are we to start the human polish pass on environment
+size, asset pass 1, and mechanics feel 1; what is industry procedure for it; and set up
+or reuse a pipeline that minimises rework. Directions given: work now, taste only via
+interview, greybox tier only, never overwrite authored geometry, do not commit
+`.blend`/`.uasset`, append-only to this file, temp files in the temp dir and deleted.
+
+### The finding that matters most
+
+`Docs/canon/FEEL.md` declares an island circuit window of 45-90 s. The character walks at
+**600 cm/s (6.0 m/s)** — a number that had never been written down anywhere in the
+project, because it is a C++ default on `ACharacter` sitting in a Blueprint CDO. The
+island as authored is **19.3 x 10.7 m** (spec says 21 x 14, and that disagreement is
+already a recorded waiver). As an ellipse that is a **48 m perimeter, an 8.0 s lap**.
+
+The window's *floor* of 45 s therefore needs **270 m of walking against a 48 m lap: 5.6
+laps**. A circuit that winds five times is not a circuit. Either the island is roughly
+2.3x too small, or the window was a GDD guess never checked against the world, or the
+circuit is meant to be partly flown on FALLBACK (12-25 s in the same table) and even then
+needs 120 m against a 48 m lap. Only one can be true and it is not an engineering call.
+
+This was knowable the moment walk speed and island size both existed. The island was
+authored at 19.3 m long before anyone divided.
+
+### What was built
+
+- `Content/Python/polish_readiness.py` — 16 checks across three gates. Rule:
+  **absence of evidence is not evidence of readiness.** MISSING is never PASS; exit 2 is
+  reserved for "could not measure at all". Waivers key on the finding's full
+  (criterion, volume, detail) identity because the greybox report files several
+  independent blockers under one criterion for one volume. A waiver naming a finding that
+  no longer exists reports STALE. `--selftest` asserts the gate can still fail.
+- `Content/Python/probe_movement_budget.py` — extracts walk speed from the character
+  CDO. Runs inside the editor via `-run=pythonscript`.
+- `Content/Python/traversal_budget.py` — the feasibility check above. Reads `FEEL.md`'s
+  windows by parsing them rather than restating them, so it cannot drift from canon.
+- `Docs/37_POLISH_PASS_PROCESS.md` — the stage ladder, the three gates, the industry
+  grounding, and the ownership boundary.
+- 24 regression tests plus a mutation harness proving the tests can fail.
+
+### Errors found in my own work before shipping (recorded because the pattern recurs)
+
+1. The pivot check originally looked for a criterion named `2_sized_origin`, which does
+   not exist — it matched nothing and would have reported **PASS with the blocker live**.
+   The report files both the island size mismatch and the island pivot under `2_sized`,
+   so the check now narrows by detail text.
+2. `--selftest` could not test the waiver logic, because `_criterion_check` read the real
+   report from disk and the synthetic waivers never matched it. The report is now
+   injectable — left as-is, the guard was unfalsifiable in exactly the situation it
+   exists for.
+3. `_rel` crashed on a path outside the repo. A gate that crashes while describing where
+   it looked has failed at its one job.
+4. The gate covered **4 of the 5 blocking findings and did not say so**, while presenting
+   itself as *the* greybox gate. `4_distinct` was simply absent. This is the worst one: a
+   gate that reports honestly on a subset reads as coverage of the whole. Coverage is now
+   asserted in selftest, and the assertion is itself tested for falsifiability.
+5. `traversal_budget.py` compared a **point-to-point** distance against the island's
+   **perimeter** and reported `cabin_to_lookout_s` NOT_REACHABLE with the note "arithmetic,
+   not an opinion". A 150 m path across a 19 m island just means crossing it about eight
+   times, which is an ordinary winding route. It would have sent someone to re-cut a
+   perfectly good window. Only a **closed loop** is bounded by perimeter, so only that
+   shape may be declared unreachable.
+6. The spec lookup used `SM_IslandTop` where `ASSEMBLY_FOOTPRINTS` is keyed on the
+   assembly root `SM_Island_Hero`, printing a literal "None m" in a credibility table.
+7. The movement probe read several properties in one `try`, so one mis-named property
+   (`max_walk_slope`, which is `walkable_floor_angle` in 5.8) discarded four good values
+   and reported the walk speed as unreadable when it had been read successfully.
+
+### Headline correction to a prior conclusion
+
+An earlier note in this session said the world was not assembled because only two `.umap`
+files exist and the docs call them DemoMap and Homestead. **That was wrong.** `MainMenu.umap`
+carries **1,270 placed external actors** and built HLOD layers. The world is assembled and
+is misnamed in documentation, which is a cheap documentation fix.
+
+Also corrected: `Docs/CANON_MAP.md` claimed 8 blocking greybox findings; the report says 5.
+
+### Still blocked, unchanged
+
+- `SM_Island_Hero` — authored 19.3x10.7 vs spec 21x14, tolerance 1.4. Recorded as a
+  waiver, explicitly **not** a resolution. Raised twice with the Lead, dismissed twice, not
+  re-raising.
+- **Mechanics feel 1 cannot start.** No human has ever played this build. 109 green Python
+  tests and 43 green automation rows are code assertions; they say the verbs fire and
+  nothing about whether the island is the right size or the glide the right shape.
+- The circuit finding needs a human ruling. Waiving it is not available and should not be:
+  two of the three numbers involved would still disagree while the report said the check
+  passed.
+- G-ENV remains RED on the island pivot, two materials outside the ten masters, silhouette
+  distinctness, the circuit contradiction, and the absent timing instrument.
+
+### Rules that follow
+
+- A measurement instrument that needs the game running must not be built as if it does not.
+  Report the missing instrument honestly and check what *can* be checked headlessly.
+- World Partition geometry does not exist in a commandlet — a map reporting 0 meshes under
+  `-run=pythonscript` is not an empty map.
+- When a check narrows within a criterion, assert that the narrower filter matches
+  something. A filter narrower than the data is indistinguishable from "fixed".
+- Verify append-only records in bytes against `git show HEAD:<path>`, and print the byte
+  counts from Python. Piping `git show` through PowerShell reported a 177 KB file as
+  746 bytes.
