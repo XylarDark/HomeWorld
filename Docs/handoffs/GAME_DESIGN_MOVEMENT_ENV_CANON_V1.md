@@ -96,3 +96,15 @@ Example DONE-WHEN lines: `left NODE_GLIDER, arrived field AABB, no load hang` ·
 *End. Cite EXIT GAME_DESIGN_MOVEMENT_ENV_V1 · Lead greenlight 2026-09-27. Design cites for greybox PROP_INVENTORY / feel DONE-WHEN. No Implement movement. CAP PARKED.*
 
 **Score note:** Arrange `ready:false` ⇒ soft_fail path; `closed_fail: false` until post-Act missing MUST / bad eject.
+
+
+---
+
+## Lead lock 2026-10-03, floor entry
+
+Outside the island spec. Not a mesh edit. The camp has no size.
+
+- The level is finally seen by a short move through cover to a hidden vantage. Bushes are an example, not the technique. This stays even when the floor does not change.
+- One floor is a preference until the cost is measured. Do not split the floor on a guess.
+- The camp does not spawn on the forest edge. From the entry, the camp's own edge is visible, whichever way the player comes in, so they can see there is something to check.
+- Other forest spawns are part of the first floor and do not wait on the camp.
