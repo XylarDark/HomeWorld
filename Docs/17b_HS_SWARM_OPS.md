@@ -1,4 +1,5 @@
 # Docs/17b — HS-B Swarm Ops Tighten
+Closed. Do not load.
 
 | Field | Value |
 |-------|-------|

@@ -1,4 +1,5 @@
 # Docs/17 — Harness & Swarm Audit (post–Docs/08)
+Closed. Do not load.
 
 | Field | Value |
 |-------|-------|

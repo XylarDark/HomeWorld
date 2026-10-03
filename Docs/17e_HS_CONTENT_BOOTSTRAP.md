@@ -1,4 +1,5 @@
 # Docs/17e — HS-E Character / Content Bootstrap Canon
+Closed. Do not load.
 
 | Field | Value |
 |-------|-------|
