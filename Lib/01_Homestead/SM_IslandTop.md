@@ -19,7 +19,7 @@ Shot consumers: Shot 1 (path + garden read), Shot 2 (path + planter ground).
 
 | Property | Value |
 |---|---|
-| Footprint target | **~21 m** X × **~14 m** Y (within island 18–24 m) |
+| Footprint target | **~180 m** X × **~100 m** Y (full extents) |
 | Top thickness | 0.3–0.6 m grass/soil crust (visual); walkable face ≈ **Z = 0** |
 | Plateau walkable AABB | X ∈ [−9.5, 9.5], Y ∈ [−5.0, 5.0], Z = 0 (graybox) |
 | Origin | Ground contact at plateau datum **(0, 0, 0)** — top face at Z ≈ 0 |

@@ -45,8 +45,8 @@ _HALF_X = r"        half_x = ASSEMBLY_FOOTPRINTS\.get\(volume\.assembly, \(4\.0,
 MUTATIONS = [
     (
         "M1: the footprint data are corrected to half-extents (box too tight)",
-        r'    "SM_Island_Hero": \(21\.0, 14\.0\),',
-        '    "SM_Island_Hero": (10.5, 7.0),',
+        r'    "SM_Island_Hero": \(180\.0, 100\.0\),',
+        '    "SM_Island_Hero": (90.0, 50.0),',
         "test_a_module_inside_the_island_footprint_is_not_flagged",
         "killed",
     ),

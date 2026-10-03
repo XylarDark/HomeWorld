@@ -5,18 +5,18 @@ axis before comparing - it asks how far a child module sits from its assembly's
 centre, not how big the assembly is. That relationship is easy to break in the
 direction that matters:
 
-    "SM_Island_Hero is (21.0, 14.0) but the comment says half-extents, so the
-     half-extent must be 10.5 x 7.0 - let me fix the data to match the comment."
+    "SM_Island_Hero is (180.0, 100.0) but the comment says half-extents, so the
+     half-extent must be 90.0 x 50.0 - let me fix the data to match the comment."
 
 Nobody would write that on purpose. What happens instead is someone wanting the
 containment box to *reach* something, finding the box too small, and adjusting the
 number that looks wrong. The comment is what they trust, so it has to be right, and
 a correct comment is not enough on its own - this file pins the arithmetic.
 
-The two tests are a matched pair on purpose. The first says a module 8 m out on an
-island whose spec size is 21 m is INSIDE the footprint, which is only true if the
-data are full extents (half of 21 is 10.5, and 8 < 10.5). The second says a module
-12 m out is OUTSIDE, so the check still bites. A box that has been widened until
+The two tests are a matched pair on purpose. The first says a module 89.5 m out on an
+island whose spec size is 180 m is INSIDE the footprint, which is only true if the
+data are full extents (half of 180 is 90, and 89.5 < 90). The second says a module
+91 m out is OUTSIDE, so the check still bites. A box that has been widened until
 nothing fails would pass the first and fail the second; a check that stopped
 checking would do the reverse. Only both together mean the number is doing work.
 
@@ -90,35 +90,35 @@ def _blocking_location_findings(findings):
 
 class GrayboxContainmentExtentsTest(unittest.TestCase):
     def test_a_module_inside_the_island_footprint_is_not_flagged(self):
-        """8 m from a 21 m island's centre is inside. Half-extent data would flag it."""
+        """89.5 m from a 180 m island's centre is inside. Half-extent data would flag it."""
         findings = reader.verify(
-            _child_module("SM_Node_8m_Out", 8.0), _measured_at("SM_Node_8m_Out", 8.0)
+            _child_module("SM_Node_89_5m_Out", 89.5), _measured_at("SM_Node_89_5m_Out", 89.5)
         )
 
         blocking = _blocking_location_findings(findings)
 
         self.assertFalse(
             blocking,
-            "a module 8 m out is inside an island whose declared size is 21 m; it was "
+            "a module 89.5 m out is inside an island whose declared size is 180 m; it was "
             "flagged, so ASSEMBLY_FOOTPRINTS is being read as half-extents: %r" % (blocking,),
         )
 
     def test_a_module_outside_the_island_footprint_is_still_flagged(self):
-        """The other half of the pair: 12 m is past 21/2, so the check must still fire.
+        """The other half of the pair: 91 m is past 180/2, so the check must still fire.
 
         Without this the test above could be satisfied by a containment box wide enough
         to accept anything - which is the failure a loosened constant produces, and the
         one that turns 1_location into a check that always passes.
         """
         findings = reader.verify(
-            _child_module("SM_Node_12m_Out", 12.0), _measured_at("SM_Node_12m_Out", 12.0)
+            _child_module("SM_Node_91m_Out", 91.0), _measured_at("SM_Node_91m_Out", 91.0)
         )
 
         blocking = _blocking_location_findings(findings)
 
         self.assertTrue(
             blocking,
-            "a module 12 m from a 21 m island's centre is outside the footprint and must "
+            "a module 91 m from a 180 m island's centre is outside the footprint and must "
             "be reported - nothing was, so the containment check is not running",
         )
 
@@ -130,7 +130,7 @@ class GrayboxContainmentExtentsTest(unittest.TestCase):
         POSITION_TOLERANCE_M, so it fails only if the check is still live.
         """
         cases = [
-            ("SM_Island_Hero", (21.0, 14.0), 9.0, 12.0),
+            ("SM_Island_Hero", (180.0, 100.0), 89.5, 91.0),
             ("SM_Cabin", (5.5, 4.5), 2.0, 3.5),
             ("SM_Garden_Beds", (4.0, 2.5), 1.5, 2.5),
         ]
