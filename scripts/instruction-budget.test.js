@@ -9,7 +9,8 @@ test('the budget gate can count, and its count is not trivially small', () => {
   // PASSED. A gate that cannot count is worse than no gate, because it manufactures
   // confidence that the budget is respected.
   const m = B.measure();
-  assert.ok(m.alwaysOn > 50, `always-on must be countable, got ${m.alwaysOn}`);
+  // Floor is 23: the slimmed AGENTS.md's measured count, not a pad target.
+  assert.ok(m.alwaysOn >= 23, `always-on must be countable, got ${m.alwaysOn}`);
   assert.ok(m.rules.lines > 500, `rules must be countable, got ${m.rules.lines}`);
   assert.ok(m.skills.lines > 500, `skills must be countable, got ${m.skills.lines}`);
 });
