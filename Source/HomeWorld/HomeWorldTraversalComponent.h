@@ -97,7 +97,7 @@ protected:
 	 * edge -- it is NOT a drop budget. Lead owns these numbers for feel; the
 	 * polishable fact is that the homestead-to-field drop is ~9500 cm, so any
 	 * FallReset*Cm below that fires mid-drop and strands the player in the air.
-	 * See DropSafety::IsDropCorridorClear and KNOWN_ERRORS 5.8 fall-reset.
+	 * See IsOverLandingGround and bRespectDropCorridor below.
 	 */
 	UPROPERTY(EditDefaultsOnly, Category = "Movement|Fall", meta = (ClampMin = "1.0"))
 	float FallResetSeconds = 2.75f;
@@ -106,14 +106,23 @@ protected:
 	float FallResetDropCm = 2200.f;
 
 	/**
-	 * When true the soft reset stands down once the pawn has entered a drop
-	 * corridor (falling with walkable ground far below), so jumping off the
-	 * homestead edge toward the field lands in the field instead of snapping
-	 * back to the rim. Off by default so the old stuck-net behaviour is
-	 * unchanged until the Lead opts in.
+	 * When true the soft reset stands down on any frame where the pawn is
+	 * falling with walkable ground within DropCorridorProbeCm below it.
+	 *
+	 * The Lead's stated intent for the homestead: you can jump off the edge
+	 * toward the starting zone and "no matter what you do while you are
+	 * travelling toward the ground, you will land in the field." With the reset
+	 * at 22 m and the field at 95 m, that intent is unreachable, so this
+	 * defaults ON.
+	 *
+	 * This does not weaken stuck-prevention, because it only stands the reset
+	 * down where there is somewhere to land. Falling off the rear of the island
+	 * into open air still resets, which is what the net is for.
+	 *
+	 * Set false to restore the old unconditional behaviour.
 	 */
 	UPROPERTY(EditDefaultsOnly, Category = "Movement|Fall")
-	bool bRespectDropCorridor = false;
+	bool bRespectDropCorridor = true;
 
 	/** Trace distance used to decide "is there somewhere to land". */
 	UPROPERTY(EditDefaultsOnly, Category = "Movement|Fall", meta = (ClampMin = "1000.0"))
