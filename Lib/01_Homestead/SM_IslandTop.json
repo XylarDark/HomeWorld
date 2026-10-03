@@ -31,6 +31,17 @@
     { "name": "SOCKET_CliffAttach_Cabin", "origin": [-7.0, -4.5, 0.0] },
     { "name": "SOCKET_CliffAttach_Rear", "origin": [0.0, 5.0, 0.0] }
   ],
+  "walk": {
+    "shape": "oval",
+    "speed_m_s": 6.0,
+    "far_edge_m": 90,
+    "far_edge_s": 15,
+    "near_edge_m": 50,
+    "near_edge_s": 8.3,
+    "mantle_on_homestead": false,
+    "glide_start": "walk off the edge only",
+    "note": "The oval is the walk, not the rim. Mantle stays in the game and is not how you move on the homestead. The graybox AABB stays plus or minus 9.5 by 5.0 until the plate is applied. This is not a mesh edit."
+  },
   "glide": {
     "slope_deg": 30,
     "path_m": 150,

@@ -43,6 +43,20 @@ One straight glide. Not the walkable datum, and not a mesh edit.
 
 Other directions have no edge. Camp, hills, and a slower walk are not in this spec.
 
+## 2c. Walk on the homestead
+
+The oval is the walk, not the rim. The graybox box stays ±9.5 by ±5.0 until the plate is applied. This is not a mesh edit.
+
+| Property | Value |
+|---|---|
+| Shape | Oval |
+| Speed | 6.0 m/s, walk only |
+| Far edge | 90 m from the center, 15 s |
+| Near edge | 50 m from the center, 8.3 s |
+| Mantle | Stays in the game. Not a homestead movement. |
+| Glide start | Only by walking off the edge |
+
+
 
 ---
 
