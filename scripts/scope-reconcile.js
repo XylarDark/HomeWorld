@@ -112,7 +112,7 @@ function beatIdsFromPackets() {
   return [...ids].sort((a, b) => Number(a.slice(1)) - Number(b.slice(1)));
 }
 
-function reconcile() {
+function reconcile(options = {}) {
   if (!fs.existsSync(FEATURE_LIST)) {
     return { ok: false, error: `missing ${FEATURE_LIST}` };
   }
@@ -132,7 +132,8 @@ function reconcile() {
   // rather than a defect in this script.
   let evidence = [];
   try {
-    const gates = EVIDENCE.collectGates(path.join(PROJECT_ROOT, 'Saved'));
+    const savedDir = options.savedDir || path.join(PROJECT_ROOT, 'Saved');
+    const gates = EVIDENCE.collectGates(savedDir);
     // Beat ids arrive as `T0_M1`; the scope table is indexed by `M1`.
     evidence = gates.map((g) => ({
       beat: /^T0_(M\d+)$/.exec(g.beat) ? /^T0_(M\d+)$/.exec(g.beat)[1] : g.beat,
