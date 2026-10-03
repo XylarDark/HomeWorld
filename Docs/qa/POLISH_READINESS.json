@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-03T16:36:47+00:00",
+  "generated": "2026-10-03T17:14:35+00:00",
   "process_doc": "Docs/37_POLISH_PASS_PROCESS.md",
   "verdict": "NOT_READY",
   "gates": {
@@ -8,9 +8,9 @@
       "state": "RED",
       "max_stage": "S2 ART-BLOCKOUT",
       "tally": {
-        "PASS": 1,
+        "PASS": 2,
         "WAIVED": 1,
-        "FAIL": 4,
+        "FAIL": 3,
         "MISSING": 1
       },
       "checks": [
@@ -39,10 +39,10 @@
           "gate": "G-ENV",
           "requirement": "Assembly roots are pivoted at ground contact",
           "source": "Docs/qa/graybox_spec_report.json",
-          "measured": "1 blocking",
+          "measured": "0 blocking",
           "target": "0 blocking",
-          "state": "FAIL",
-          "note": "SM_Island_Hero: origin is not at ground contact (lowest vertex at Z -0.450)"
+          "state": "PASS",
+          "note": ""
         },
         {
           "id": "env.master_binding",
@@ -193,10 +193,10 @@
           "gate": "G-FEEL",
           "requirement": "Last automation run executed tests against a fresh binary",
           "source": "Saved/automation_run_result.json",
-          "measured": "43 ran, 0 failed",
+          "measured": "20 ran, 0 failed",
           "target": "0 failed",
           "state": "PASS",
-          "note": "dll_stale=False; report counters disagree with report entries (42 vs 43), unexplained"
+          "note": "dll_stale=False; report counters disagree with report entries (19 vs 20), unexplained"
         }
       ]
     }
