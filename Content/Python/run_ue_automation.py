@@ -97,18 +97,23 @@ def main() -> int:
     args = parser.parse_args()
 
     exec_cmd = f"Automation RunTest Group:{args.group};Quit"
-    cmd = [
-        ue_editor,
-        uproject,
-        f"-ExecCmds={exec_cmd}",
-        f"-ReportExportPath={report_dir_abs}",
-        "-Unattended",
-    ]
-    _log("invoking UE", {"cmd": cmd, "cwd": project_dir})
+    # The exec-cmd value contains spaces, so it must survive argv quoting. UE's
+    # FParse::Value only keeps it whole when the value is wrapped in literal
+    # double quotes in the raw command line. Node/Python list argv escaping
+    # wraps the whole argument instead (`"-ExecCmds=..."`), which turns the
+    # value into just "Automation" - the deferred queue then carries only
+    # `Automation`, and the automation state machine idles without running.
+    cmd_line = (
+        f'"{ue_editor}" "{uproject}" '
+        f'-ExecCmds="{exec_cmd}" '
+        f'-ReportExportPath="{report_dir_abs}" '
+        "-Unattended"
+    )
+    _log("invoking UE", {"cmd": cmd_line, "cwd": project_dir})
 
     try:
         proc = subprocess.run(
-            cmd,
+            cmd_line,
             cwd=project_dir,
             timeout=600,
             capture_output=True,
