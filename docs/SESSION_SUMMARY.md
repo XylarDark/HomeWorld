@@ -1551,3 +1551,122 @@ Also corrected: `Docs/CANON_MAP.md` claimed 8 blocking greybox findings; the rep
 - Verify append-only records in bytes against `git show HEAD:<path>`, and print the byte
   counts from Python. Piping `git show` through PowerShell reported a 177 KB file as
   746 bytes.
+---
+
+## SESSION 2026-10-03 (afternoon) - the world was already built; two things hid it
+
+Lead instruction, verbatim: the homestead is a **floating island**; you jump off
+the edge toward the starting zone and *"no matter what you do while you are
+travelling toward the ground, you will land in the field."* The drop exists to
+convey relative size and speed. Numbers are the Lead's polish-pass work - build
+the skeleton so everything exists to be adjusted.
+
+### Two defects made the game unplayable and invisible
+
+**1. Play went nowhere.** `UHomeWorldGameInstance` defaulted `GameMapPath` to
+`/Game/HomeWorld/Maps/DemoMap`. That asset has never existed in Content.
+Verified against the 5.8 asset registry: DemoMap `false`, Homestead `false`,
+`L_VS_MVP_Markers` `true`, MainMenu `true`. `OpenLevel` to a missing map is a
+silent no-op and nothing covered the menu's travel target. Now defaults to
+`L_VS_MVP_Markers`, logs the choice, and resolves the target before travelling
+so a future miss logs an Error naming the fix.
+
+**2. The fall soft reset cancelled the drop.** `FallResetDropCm = 2200` (22 m)
+and `FallResetSeconds = 2.75` against an authored **95 m / 9500 cm** drop to
+`SM_Planet_GroundPlate` (top at Z -95.0, island walkable surface at Z 0).
+22 m is 23% of the drop; the time limit is 62%. Walking off the rim teleported
+the player back onto the rim, 73 m above the field. The net was written for
+slipping off a small ledge and was never reconciled with an authored 95 m drop.
+Added opt-in `bRespectDropCorridor` + `IsOverLandingGround()` (traces the fall
+corridor for somewhere to land). **Default off**; the tuned values are
+untouched because they are feel and they are the Lead's.
+
+### The world was already in the project
+
+`MainMenu.umap` (the GameDefaultMap) is 25 KB of World Partition plus 1,270
+external actors of kit-bash rock/plank/brick. Grepping all 1,270 for
+`SM_IslandTop`, `SM_Planet_GroundPlate`, `CRUMB_`, `SM_Cabin`, `SM_Lookout`,
+`SM_LandingCircle` returns **MISSING on every one**. That reads exactly like
+"the homestead was never placed."
+
+It was placed. `L_VS_MVP_Markers.umap` (226 KB, not World Partition, so actors
+are inline) holds **78 StaticMeshActors, 25 labelled TargetPoints
+(GP_PlayerStart, GP_GlideStart, GP_PortalA/B, GP_SpiritWisp_A-C,
+GP_Store_BERRY|FIBER|HERB|SEED|STONE|WOOD, GP_N1_Crop, GP_N2_Stored,
+GP_BeastPad), the full CRUMB_* glide path + CRUMB_GlideSpline, 5 cameras,
+6 StoreProps, 4 CampActors, 3 SpiritWisps, 2 NurtureTargets, 2 ShrinePortal
+Triggers, 1 PlayerStart, 1 BeastPad**. Every gameplay class in Source/HomeWorld
+is represented. The blend holds 437 objects including the 80x70 m field, 3
+islets, 16 planet pines and hamlet roofs.
+
+Lesson worth keeping: **do not conclude a map is unbuilt.** A World Partition
+map's geometry lives in `__ExternalActors__`; grep the `.umap` alone is
+meaningless, and an empty result can mean "different level", not "no level".
+Recorded in KNOWN_ERRORS 2026-10-03.
+
+### The island pivot was a wrong assertion, not wrong geometry
+
+`SM_IslandTop.json` declared `"origin": "ground_contact"` while also declaring
+`world_top_z: 0.0` and placing **all 10 sockets at z 0.0**. Those cannot both
+hold: at ground contact the sockets would float 0.5 m above the walkable
+surface. A floating island has no ground to contact, so the criterion was
+about a surface that does not exist there.
+
+Three sources agreed the top surface is the datum:
+- Blender: origin (0,0,0), local Z -0.45..0.0
+- UE 5.8 import: 19.3 x 10.7 x 0.45 m, local Z -45..0 cm
+- Siblings: Lookout_Pad z=0, Glider_Perch z=0, PathStone z=0.02, beds z=0
+
+So the geometry was correct and the check was wrong. Added `top_datum_z_m` read
+from `world_top_z`; a declared datum means floating, so ground contact is no
+longer asserted for it, and `verify()` instead asserts the origin sits at the
+datum **and** the mesh reaches it - two independent blocking failure modes,
+plus "origin unmeasurable is blocking" because absence of evidence is not
+evidence. `measure_object` now reports `top_vert_z_world`. Ground-contact
+volumes are untouched; a test asserts `SM_Cliff_LookoutFace`/`Rear` still hold.
+
+**Criterion swap, not a gate loosening** - and proved to be: the new test drives
+`verify()` with an origin 0.5 m off, a top that never reaches the plane, and an
+unmeasurable origin, requiring a blocking finding each time, and asserts the
+datum landed on exactly one volume.
+
+Graybox report **5 blocking -> 4**. G-ENV FAIL 4 -> FAIL 3.
+
+### A correction to our own KNOWN_ERRORS
+
+An earlier entry claimed `EditorLevelLibrary.get_all_level_actors` "does not
+exist in 5.8". **False.** Measured on `++UE5+Release-5.8-CL-56702186`:
+`hasattr` True, the call returns a real Array. 56 call sites across
+`Content/Python/*.py` use it; taken at face value that note justified rewriting
+all 56 - a large, pointless, risky change to working scripts. Corrected in place.
+**Rule established: "this API is gone" is a measurement claim. Probe it before
+recording it.** A reader cannot tell a wrong entry from a right one by tone.
+
+### Research requested by the Lead
+
+`Docs/38_AI_AGENT_PRACTICE.md`. Headline: CraftBench-UE (arXiv 2609.23142)
+measured that among on-time Blueprint submissions that passed asset checks,
+**42.2% and 50.0% failed explicit runtime assertions**, and C++ beat Blueprint
+by 30-43 points. That is our own positive-control finding in peer-reviewed form.
+METR RCT: AI-allowed work took **19% longer** while developers believed 20%
+faster - a ~40 point perception gap, so measure agent ROI with a clock. Epic
+shipped a first-party MCP in UE 5.8 (`ModelContextProtocol` + `AllToolsets`,
+with a Testing toolset) and an official Claude Code plugin. Stated gaps: no
+primary source for Gauntlet-as-AI-gate, and no credible practitioner spec for
+AI-driven Blender->UE blockout guardrails.
+
+### State
+
+- 116 pytest pass (was 109). `HomeWorld.T0` 19/19, build green on 5.8.
+- Commits this session: `022bef5` fall/drop, `0a0938d` menu map, `ff619b0` island datum.
+- **No .blend or .uasset touched or committed.** No feel value changed.
+
+### Still human-owned, not agent-resolvable
+
+`SM_Island_Hero` 19.3x10.7 vs spec 21x14 (raised twice, dismissed twice, not
+re-raising). `M_FamilySilhouette` and `M_ValleyNight` outside the ten masters -
+rebinding or adding them is a canon call. One `4_distinct` collision on
+`SM_NODE_PLANT_SLOT_DAY_PLANTED`. `Docs/29_TASTE_PROFILER.md` exists and no taste
+profile has ever been bootstrapped. And **no human has played this build**:
+every green row above proves code runs and asserted laws hold, nothing about
+whether the island reads or the glide feels.
