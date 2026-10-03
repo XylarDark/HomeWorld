@@ -19,12 +19,25 @@ data are full extents (half of 21 is 10.5, and 8 < 10.5). The second says a modu
 12 m out is OUTSIDE, so the check still bites. A box that has been widened until
 nothing fails would pass the first and fail the second; a check that stopped
 checking would do the reverse. Only both together mean the number is doing work.
+
+Written as `unittest.TestCase` rather than bare pytest functions, because
+`import pytest` at module scope made this file FAIL to import inside the engine's
+bundled Python (no pytest there), and two red rows in the full automation group
+teach people to ignore the full group. As a TestCase it imports cleanly under both
+interpreters.
+
+WHAT THAT DOES NOT BUY: the editor's automation runner reports ONE row per module
+and only IMPORTS it. It does not execute the assertions - not for bare pytest
+functions and not for unittest TestCases. Verified on 2026-10-03 by planting a
+deliberately false assertion: host pytest failed it, and the editor run still
+reported Success. So a green `Editor.Python.*` row means "this module imports",
+never "these laws hold". The only thing that runs these laws is host pytest:
+`py -m pytest Content/Python/tests`.
 """
 
 import os
 import sys
-
-import pytest
+import unittest
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _PY = os.path.dirname(_HERE)
@@ -75,72 +88,92 @@ def _blocking_location_findings(findings):
     ]
 
 
-def test_a_module_inside_the_island_footprint_is_not_flagged():
-    """8 m from a 21 m island's centre is inside. Half-extent data would flag it."""
-    findings = reader.verify(
-        _child_module("SM_Node_8m_Out", 8.0), _measured_at("SM_Node_8m_Out", 8.0)
-    )
-
-    blocking = _blocking_location_findings(findings)
-
-    assert not blocking, (
-        "a module 8 m out is inside an island whose declared size is 21 m; it was "
-        "flagged, so ASSEMBLY_FOOTPRINTS is being read as half-extents: %r" % (blocking,)
-    )
-
-
-def test_a_module_outside_the_island_footprint_is_still_flagged():
-    """The other half of the pair: 12 m is past 21/2, so the check must still fire.
-
-    Without this the test above could be satisfied by a containment box wide enough
-    to accept anything - which is the failure a loosened constant produces, and the
-    one that turns 1_location into a check that always passes.
-    """
-    findings = reader.verify(
-        _child_module("SM_Node_12m_Out", 12.0), _measured_at("SM_Node_12m_Out", 12.0)
-    )
-
-    blocking = _blocking_location_findings(findings)
-
-    assert blocking, (
-        "a module 12 m from a 21 m island's centre is outside the footprint and must "
-        "be reported - nothing was, so the containment check is not running"
-    )
-
-
-@pytest.mark.parametrize(
-    "assembly, footprint, inside_x, outside_x",
-    [
-        ("SM_Island_Hero", (21.0, 14.0), 9.0, 12.0),
-        ("SM_Cabin", (5.5, 4.5), 2.0, 3.5),
-        ("SM_Garden_Beds", (4.0, 2.5), 1.5, 2.5),
-    ],
-)
-def test_every_footprint_is_read_as_full_extents(assembly, footprint, inside_x, outside_x):
-    """Same boundary arithmetic for all three assemblies, not just the island.
-
-    Each `inside_x` is past the midpoint of its assembly's declared x size, so it
-    fails only if the data are full extents; each `outside_x` is past half plus
-    POSITION_TOLERANCE_M, so it fails only if the check is still live.
-    """
-    assert reader.ASSEMBLY_FOOTPRINTS[assembly] == pytest.approx(footprint)
-
-    half = footprint[0] * 0.5 + reader.POSITION_TOLERANCE_M
-    assert inside_x < half, "test setup: 'inside' point is not inside"
-    assert outside_x > half, "test setup: 'outside' point is not outside"
-
-    inside = _blocking_location_findings(
-        reader.verify(
-            _child_module("SM_Inside", inside_x, assembly),
-            _measured_at("SM_Inside", inside_x),
+class GrayboxContainmentExtentsTest(unittest.TestCase):
+    def test_a_module_inside_the_island_footprint_is_not_flagged(self):
+        """8 m from a 21 m island's centre is inside. Half-extent data would flag it."""
+        findings = reader.verify(
+            _child_module("SM_Node_8m_Out", 8.0), _measured_at("SM_Node_8m_Out", 8.0)
         )
-    )
-    outside = _blocking_location_findings(
-        reader.verify(
-            _child_module("SM_Outside", outside_x, assembly),
-            _measured_at("SM_Outside", outside_x),
-        )
-    )
 
-    assert not inside, "%s: %r should sit inside" % (assembly, inside)
-    assert outside, "%s: %r should sit outside" % (assembly, outside)
+        blocking = _blocking_location_findings(findings)
+
+        self.assertFalse(
+            blocking,
+            "a module 8 m out is inside an island whose declared size is 21 m; it was "
+            "flagged, so ASSEMBLY_FOOTPRINTS is being read as half-extents: %r" % (blocking,),
+        )
+
+    def test_a_module_outside_the_island_footprint_is_still_flagged(self):
+        """The other half of the pair: 12 m is past 21/2, so the check must still fire.
+
+        Without this the test above could be satisfied by a containment box wide enough
+        to accept anything - which is the failure a loosened constant produces, and the
+        one that turns 1_location into a check that always passes.
+        """
+        findings = reader.verify(
+            _child_module("SM_Node_12m_Out", 12.0), _measured_at("SM_Node_12m_Out", 12.0)
+        )
+
+        blocking = _blocking_location_findings(findings)
+
+        self.assertTrue(
+            blocking,
+            "a module 12 m from a 21 m island's centre is outside the footprint and must "
+            "be reported - nothing was, so the containment check is not running",
+        )
+
+    def test_every_footprint_is_read_as_full_extents(self):
+        """Same boundary arithmetic for all three assemblies, not just the island.
+
+        Each `inside_x` is past the midpoint of its assembly's declared x size, so it
+        fails only if the data are full extents; each `outside_x` is past half plus
+        POSITION_TOLERANCE_M, so it fails only if the check is still live.
+        """
+        cases = [
+            ("SM_Island_Hero", (21.0, 14.0), 9.0, 12.0),
+            ("SM_Cabin", (5.5, 4.5), 2.0, 3.5),
+            ("SM_Garden_Beds", (4.0, 2.5), 1.5, 2.5),
+        ]
+
+        for assembly, footprint, inside_x, outside_x in cases:
+            # subTest, so one assembly failing does not hide the other two. A loop
+            # with bare asserts would report only the first failure and leave it
+            # looking like the whole table agrees.
+            with self.subTest(assembly=assembly):
+                actual = tuple(reader.ASSEMBLY_FOOTPRINTS[assembly])
+                self.assertEqual(len(actual), len(footprint), "footprint shape changed")
+                for axis, (got, want) in enumerate(zip(actual, footprint)):
+                    self.assertAlmostEqual(
+                        got, want, places=6,
+                        msg="%s axis %d: declared %r, expected %r"
+                            % (assembly, axis, got, want),
+                    )
+
+                half = footprint[0] * 0.5 + reader.POSITION_TOLERANCE_M
+                self.assertLess(inside_x, half, "test setup: 'inside' point is not inside")
+                self.assertGreater(outside_x, half, "test setup: 'outside' point is not outside")
+
+                inside = _blocking_location_findings(
+                    reader.verify(
+                        _child_module("SM_Inside", inside_x, assembly),
+                        _measured_at("SM_Inside", inside_x),
+                    )
+                )
+                outside = _blocking_location_findings(
+                    reader.verify(
+                        _child_module("SM_Outside", outside_x, assembly),
+                        _measured_at("SM_Outside", outside_x),
+                    )
+                )
+
+                self.assertFalse(inside, "%s: %r should sit inside" % (assembly, inside))
+                self.assertTrue(outside, "%s: %r should sit outside" % (assembly, outside))
+
+
+# No `if __name__ == "__main__": unittest.main()` here, deliberately. The editor's
+# automation runner IMPORTS each module under Content/Python/tests/ with __name__
+# set to "__main__", so that block executes during import: unittest discovers 0 tests
+# against the importing module, prints OK, then calls sys.exit() and raises
+# SystemExit out of the import - which the runner reports as a Fail. Measured on
+# 2026-10-03. Run these with pytest, or `python -m unittest`, both of which work
+# without the block.

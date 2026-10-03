@@ -134,7 +134,14 @@ def main():
                 handle.write(mutated)
 
             code, out = _run_suite()
-            failed = set(re.findall(r"FAILED [^\s:]*::(\w+)", out))
+            # Greedy \S* so the capture is the LAST :: segment, which is the test
+            # name in both layouts pytest emits:
+            #   bare function : file.py::test_name
+            #   unittest      : file.py::ClassName::test_name
+            # The previous `[^\s:]*::(\w+)` captured the class instead of the method
+            # for unittest modules, so a mutation that DID kill the expected test was
+            # scored as a survivor - a false "the test no longer bites" reading.
+            failed = set(re.findall(r"FAILED \S*::(\w+)", out))
             # Survival is read from the run, never assumed. A `test is None` entry
             # means "no test is expected to kill this", and the first version of this
             # harness scored that as `detected = True` by definition - which made a

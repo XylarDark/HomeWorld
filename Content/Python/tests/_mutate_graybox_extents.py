@@ -113,7 +113,14 @@ def main():
                 handle.write(mutated)
 
             code, out = _run_suite()
-            failed = set(re.findall(r"FAILED [^\s:]*::(\w+)", out))
+            # Greedy \S* so the capture is the LAST :: segment, which is the test
+            # name in both layouts pytest emits:
+            #   bare function : file.py::test_name
+            #   unittest      : file.py::ClassName::test_name
+            # The previous `[^\s:]*::(\w+)` captured the class instead of the method
+            # for unittest modules, so a mutation that DID kill the expected test was
+            # scored as a survivor - a false "the test no longer bites" reading.
+            failed = set(re.findall(r"FAILED \S*::(\w+)", out))
             detected = bool(failed) if test is None else test in failed
 
             print("%-4s %s" % ("KILLED" if detected else "SURVIVED", name))
