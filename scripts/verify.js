@@ -108,10 +108,10 @@ function runUECmd(execCmds) {
   }
   const r = spawnSync(editor, [
     path.join(PROJECT_ROOT, 'HomeWorld.uproject'),
-    `-ExecCmds=${execCmds}`,
+    `-ExecCmds="${execCmds}"`,
     '-unattended', '-nop4', '-nosplash', '-NullRHI',
-    '-TestExit=Automation Test Queue Empty',
-  ], { cwd: PROJECT_ROOT, stdio: 'inherit', shell: false });
+    '-TestExit="Automation Test Queue Empty"',
+  ], { cwd: PROJECT_ROOT, stdio: 'inherit', shell: false, windowsVerbatimArguments: true });
   return r.status === null ? 1 : r.status;
 }
 

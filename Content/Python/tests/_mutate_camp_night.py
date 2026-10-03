@@ -186,13 +186,17 @@ def build():
 def run_tests():
     if os.path.exists(LOG):
         os.unlink(LOG)
+    # A single command-line string (not an argv list): the -ExecCmds value must
+    # keep literal quotes in the raw command line or UE's FParse::Value reduces it
+    # to "Automation" and the automation queue idles empty.
+    cmd_line = (
+        f'"{UE}" "{UPROJECT}" '
+        '-ExecCmds="Automation RunTests HomeWorld.T0; Quit" '
+        "-unattended -nopause -NullRHI -nosplash -stdout "
+        f'-abslog="{LOG}"'
+    )
     subprocess.run(
-        [
-            UE, UPROJECT,
-            "-ExecCmds=Automation RunTests HomeWorld.T0; Quit",
-            "-unattended", "-nopause", "-NullRHI", "-nosplash", "-stdout",
-            "-abslog=" + LOG,
-        ],
+        cmd_line,
         cwd=REPO,
         capture_output=True,
         text=True,
