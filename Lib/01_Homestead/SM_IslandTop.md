@@ -27,6 +27,23 @@ Shot consumers: Shot 1 (path + garden read), Shot 2 (path + planter ground).
 
 Silhouette: irregular torn rim in plan (not perfect ellipse). Gentle undulation OK; no tall cliffs on this mesh.
 
+## 2b. Glide off the edge
+
+One straight glide. Not the walkable datum, and not a mesh edit.
+
+| Property | Value |
+|---|---|
+| Slope | 30 degrees |
+| Path along the slope | 150 m |
+| Speed along the slope | 10 m/s |
+| Air time | 15 s |
+| Drop | 75 m, the island above the plains |
+| Forward travel | 130 m |
+| Plains edge | 260 m past the launch, this glide only |
+
+Other directions have no edge. Camp, hills, and a slower walk are not in this spec.
+
+
 ---
 
 ## 3. Materials

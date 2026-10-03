@@ -31,5 +31,16 @@
     { "name": "SOCKET_CliffAttach_Cabin", "origin": [-7.0, -4.5, 0.0] },
     { "name": "SOCKET_CliffAttach_Rear", "origin": [0.0, 5.0, 0.0] }
   ],
+  "glide": {
+    "slope_deg": 30,
+    "path_m": 150,
+    "speed_along_slope_m_s": 10,
+    "air_time_s": 15,
+    "drop_m": 75,
+    "forward_m": 130,
+    "plains_edge_past_launch_m": 260,
+    "plains_edge_scope": "straight glide only; other directions have no edge",
+    "note": "drop_m is how high the island sits above the plains. It is not world_top_z, and world_top_z stays the walkable datum."
+  },
   "rejects": ["pancake_with_cliff", "cylinder", "unique_grass_shader"]
 }
