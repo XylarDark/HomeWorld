@@ -6,7 +6,9 @@
 from __future__ import annotations
 
 import importlib
+import json
 import os
+import re
 import sys
 
 try:
@@ -20,30 +22,135 @@ LEVEL_PATH = "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers"
 PA_D_FOLDER = "VS_MVP/PA_D"
 PA_D_LABEL_PREFIX = "PA_D_"
 
-# Graybox cliff faces (Blender m) — Lib/01_Homestead/SM_Cliff.json
-CLIFF_SPECS = (
-    ("SM_Cliff_LookoutFace", (7.5, -5.5, -4.0)),
-    ("SM_Cliff_CabinFace", (-7.0, -4.5, -3.0)),
-    ("SM_Cliff_Rear", (0.0, 5.0, -2.5)),
+# Spec sources. These are READ, not restated.
+#
+# The cliff faces and the garden zone volume both live in Lib/01_Homestead, and
+# this script used to hardcode copies of them directly under comments citing those
+# files. The copies could drift from the spec with nothing to notice, and a comment
+# citing a file is a claim about that file rather than a link to it -- so a spec
+# edit would silently not apply here. An earlier note in this repo claimed the
+# cliff positions were absent from SM_Cliff.json; they are not, they sit under
+# modules[].origin. Both sources are parsed now, and a source that fails to parse
+# raises rather than falling back to a literal, because a fallback is how the two
+# copies started drifting in the first place.
+LIB_DIR = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+    "Lib", "01_Homestead")
+CLIFF_SPEC_PATH = os.path.join(LIB_DIR, "SM_Cliff.json")
+GARDEN_SPEC_PATH = os.path.join(LIB_DIR, "GARDEN_BLOCKING.md")
+
+
+def _read_cliff_specs(path):
+    """Graybox cliff face placements, in Blender metres, from SM_Cliff.json.
+
+    Returns (specs, names_without_origin). A module listed in graybox_map but
+    carrying no origin is returned in the second list so the caller can fail
+    loudly -- guessing a position for it would be inventing geometry placement.
+    """
+    with open(path, "r", encoding="utf-8-sig") as handle:
+        spec = json.load(handle)
+    wanted = list(spec.get("graybox_map") or [])
+    by_name = {m.get("name"): m for m in (spec.get("modules") or [])}
+    specs, missing = [], []
+    for name in wanted:
+        origin = (by_name.get(name) or {}).get("origin")
+        if origin is None:
+            missing.append(name)
+            continue
+        specs.append((name, tuple(float(v) for v in origin)))
+    if not wanted:
+        raise ValueError(f"{path} declares no graybox_map")
+    return tuple(specs), missing
+
+
+def _read_garden_envelope(path):
+    """The garden zone volume, from the Envelope table in GARDEN_BLOCKING.md.
+
+    That table's volume row reads:
+
+        | Zone volume (graybox) | **4.0 × 2.5 × 0.6 m** at (−3.5, 0.5, 0.0) |
+
+    Returns ((cx, cy, cz), (sx, sy, sz)). Both halves are read from that one row
+    because the placements below are derived from both: the planters from the
+    centre, the fence from the centre and the half-extents. Reading the centre
+    alone would have left the fence behind whenever the spec's envelope moved --
+    the two used to agree only because they were both typed out by hand.
+
+    The minus sign is U+2212 MINUS SIGN, not U+002D HYPHEN-MINUS, and the size
+    separator is U+00D7. A regex written for plain ASCII finds nothing in that
+    row. It was written that way first, and the loud failure is the only reason
+    that was caught rather than papered over with a fallback to the literal this
+    function replaced.
+    """
+    with open(path, "r", encoding="utf-8-sig") as handle:
+        text = handle.read()
+    for line in text.splitlines():
+        if "Zone volume" not in line:
+            continue
+        centre = _XYZ_RE.search(line)
+        size = _SIZE_RE.search(line)
+        if centre and size:
+            return (tuple(_to_float(v) for v in centre.groups()),
+                    tuple(_to_float(v) for v in size.groups()))
+        raise ValueError(
+            f"{path} has a 'Zone volume' row that is missing "
+            + ("the (x, y, z) centre" if not centre else "the N x N x N m size")
+            + f": {line.strip()!r}")
+    raise ValueError(f"{path} has no 'Zone volume' row")
+
+
+# Sign class covers U+002D HYPHEN-MINUS and U+2212 MINUS SIGN. Both appear in
+# Lib/01_Homestead: the JSON specs are ASCII, the Markdown specs are typographic.
+# Escapes are spelled out rather than pasted literally, so the character class is
+# unambiguous to read and to edit. _to_float normalises before float() sees it.
+_MINUSES = "-\u2212"
+_TIMES = "x\u00d7X"
+_NUM = r"[%s]?\d+(?:\.\d+)?" % re.escape(_MINUSES)
+_XYZ_RE = re.compile(r"\(\s*(%s)\s*,\s*(%s)\s*,\s*(%s)\s*\)" % (_NUM, _NUM, _NUM))
+_SIZE_RE = re.compile(
+    r"(%s)\s*[%s]\s*(%s)\s*[%s]\s*(%s)\s*m"
+    % (_NUM, re.escape(_TIMES), _NUM, re.escape(_TIMES), _NUM))
+
+
+def _to_float(text):
+    """float() on a number written with a typographic minus."""
+    return float(str(text).strip().replace("\u2212", "-"))
+
+CLIFF_SPECS, _CLIFF_MISSING_ORIGIN = _read_cliff_specs(CLIFF_SPEC_PATH)
+if _CLIFF_MISSING_ORIGIN:
+    raise ValueError(
+        "SM_Cliff.json lists these in graybox_map but gives them no origin: "
+        + ", ".join(_CLIFF_MISSING_ORIGIN)
+        + ". Add the origin or drop the name; do not let this script invent one.")
+
+GARDEN_CENTER_BL, GARDEN_SIZE_BL = _read_garden_envelope(GARDEN_SPEC_PATH)
+_HALF = tuple(s / 2.0 for s in GARDEN_SIZE_BL)
+
+# Planters straddle the garden centre, so moving the centre in GARDEN_BLOCKING.md
+# moves them. The 0.6 m spacing is kit-local and not spec'd.
+PLANTER_SPECS = tuple(
+    ("SM_Planter_" + suffix,
+     (GARDEN_CENTER_BL[0] + dx, GARDEN_CENTER_BL[1] + dy, GARDEN_CENTER_BL[2]))
+    for suffix, dx, dy in (("A", -0.6, 0.0), ("B", 0.0, 0.0), ("C", 0.6, 0.0))
 )
 
-# Garden center — Lib/01_Homestead/GARDEN_BLOCKING.md
-GARDEN_CENTER_BL = (-3.5, 0.5, 0.0)
-PLANTER_SPECS = (
-    ("SM_Planter_A", (-4.1, 0.5, 0.0)),
-    ("SM_Planter_B", (-3.5, 0.5, 0.0)),
-    ("SM_Planter_C", (-2.9, 0.5, 0.0)),
-)
-
-# Low rail segments around ~4 × 2.5 m garden envelope (Blender m)
+# Low rail segments. The first four are the midpoints of the four envelope edges,
+# derived so they follow the spec's centre and size; the fifth is a corner fillet
+# whose offset is a visual choice and is the one number here that GARDEN_BLOCKING.md
+# does not determine. These were five hand-typed coordinates that happened to match
+# the envelope exactly. Deriving four of them removes a silent-drift risk; the
+# fillet keeps its literal and says so.
 FENCE_SEGMENTS_BL = (
-    (-5.5, 0.5, 0.0),
-    (-3.5, 1.75, 0.0),
-    (-1.5, 0.5, 0.0),
-    (-3.5, -0.75, 0.0),
-    (-4.5, 1.25, 0.0),
+    (GARDEN_CENTER_BL[0] - _HALF[0], GARDEN_CENTER_BL[1], GARDEN_CENTER_BL[2]),
+    (GARDEN_CENTER_BL[0], GARDEN_CENTER_BL[1] + _HALF[1], GARDEN_CENTER_BL[2]),
+    (GARDEN_CENTER_BL[0] + _HALF[0], GARDEN_CENTER_BL[1], GARDEN_CENTER_BL[2]),
+    (GARDEN_CENTER_BL[0], GARDEN_CENTER_BL[1] - _HALF[1], GARDEN_CENTER_BL[2]),
+    (GARDEN_CENTER_BL[0] - 1.0, GARDEN_CENTER_BL[1] + 0.75, GARDEN_CENTER_BL[2]),
 )
 
+# CRUMB path ends. NOT SPEC'D: no file in Lib/01_Homestead declares these two
+# points, and this comment previously sat directly above them implying otherwise.
+# They are kit-local until someone gives them a spec to live in.
 PATH_START_BL = (-6.0, 1.0, 0.0)
 PATH_END_BL = (7.0, -3.5, 0.0)
 PATH_STONE_NAMES = ("SM_PathStone_A", "SM_PathStone_B", "SM_PathStone_C")

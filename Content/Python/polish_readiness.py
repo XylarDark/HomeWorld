@@ -772,16 +772,84 @@ def check_asset_board() -> Check:
             "done and no way to batch review before the expensive stages.",
         )
     assets = data.get("assets") or []
-    staged = [a for a in assets if a.get("stage")]
-    unstage = [a for a in assets if not a.get("stage")]
-    state = PASS if assets and not unstage else (FAIL if assets else MISSING)
+    if not assets:
+        return Check(
+            "asset.board", "G-ASSET",
+            "Every master mesh has a declared stage and priority",
+            _rel(ASSET_BOARD_FILE), "0 assets listed", "one row per master",
+            MISSING,
+            "The board exists but lists no assets. It should carry one row per "
+            "master material, all ten.",
+        )
+
+    staged: list[str] = []
+    undeclared: list[str] = []
+    bad_stage: list[str] = []
+    for asset in assets:
+        name = str(asset.get("name") or "?")
+        code = _stage_code(asset.get("stage"))
+        if asset.get("stage") and code is None:
+            bad_stage.append(f"{name}={asset.get('stage')!r}")
+            continue
+        if code is not None and str(asset.get("priority") or "").strip():
+            staged.append(name)
+        else:
+            undeclared.append(name)
+
+    # MISSING, not FAIL, while rows are blank. An un-triaged asset is an open
+    # question, not a defect; FAIL would accuse the board of being wrong about
+    # production state nobody has recorded yet. This is the same rule the playtest
+    # record follows, for the same reason: FAIL leaves "just write something" as the
+    # only route to green.
+    if bad_stage:
+        return Check(
+            "asset.board", "G-ASSET",
+            "Every master mesh has a declared stage and priority",
+            _rel(ASSET_BOARD_FILE),
+            f"{len(staged)}/{len(assets)} declared",
+            f"{len(assets)}/{len(assets)} declared",
+            FAIL,
+            "Stage is not one of Docs/37_POLISH_PASS_PROCESS.md's ladder: "
+            + "; ".join(bad_stage[:6])
+            + ". Use the rung code (S0..S5) or its full label.",
+        )
+    if undeclared:
+        return Check(
+            "asset.board", "G-ASSET",
+            "Every master mesh has a declared stage and priority",
+            _rel(ASSET_BOARD_FILE),
+            f"{len(staged)}/{len(assets)} declared",
+            f"{len(assets)}/{len(assets)} declared",
+            MISSING,
+            "Declared but not recorded yet: " + ", ".join(undeclared[:6])
+            + ". Each row needs a stage from the S0-S5 ladder and a priority, so a "
+            "batch can be reviewed together at S2 rather than one at a time at S3.",
+        )
     return Check(
         "asset.board", "G-ASSET",
         "Every master mesh has a declared stage and priority",
         _rel(ASSET_BOARD_FILE),
-        f"{len(staged)}/{len(assets)} staged", f"{len(assets)}/{len(assets)} staged",
-        state, f"unstaged: {[a.get('name') for a in unstage][:6]}" if unstage else "",
+        f"{len(staged)}/{len(assets)} declared", f"{len(assets)}/{len(assets)} declared",
+        PASS, ", ".join(staged[:8]),
     )
+
+
+def _stage_code(value: Any) -> str | None:
+    """Normalise a stage entry to its rung code, or None if it names no rung.
+
+    Accepts "S2", "s2" and "S2 ART-BLOCKOUT" so a hand edit cannot fail on
+    punctuation, but rejects "blockout" and "S7" -- a stage that is not on the
+    ladder must not read as declared, or the board claims a production state that
+    Docs/37 does not define.
+    """
+    text = str(value or "").strip().upper()
+    if not text:
+        return None
+    for stage in STAGES:
+        code = stage.split()[0]
+        if text == code or text.startswith(code + " "):
+            return code
+    return None
 
 
 def check_asset_poly_budgets() -> Check:

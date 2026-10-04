@@ -724,6 +724,273 @@ class PlaytestRecordCannotBeFakedGreen(unittest.TestCase):
         self.assertNotIn("9", c.measured)
 
 
+class PaDPlacementsAreReadFromTheSpecs(unittest.TestCase):
+    """place_vs_mvp_pa_d.py must place from Lib/01_Homestead, not from itself.
+
+    It used to hardcode the three cliff faces, the garden centre and the five fence
+    segments directly under comments citing SM_Cliff.json and GARDEN_BLOCKING.md.
+    A comment citing a file is a claim about that file, not a link to it, so a spec
+    edit would silently not apply here.
+
+    Three things have to hold at once, and each has already been broken once:
+
+    1. PARITY. The rewrite must reproduce every coordinate it replaced. This is a
+       placement script; "the refactor was tidy" is not evidence that nothing moved.
+    2. THE REGEXES ACTUALLY MATCH. The first version of the number pattern was
+       written with doubled backslashes (`\\d` in the source), which compiles to a
+       pattern matching a literal backslash followed by 'd'. It raised loudly, which
+       is the only reason it was caught - but the check that caught it was a manual
+       run against the real spec file, which is exactly the kind of check that does
+       not survive. Hence this.
+    3. THE SPECS ARE TYPographic, NOT ASCII. GARDEN_BLOCKING.md writes its minus as
+       U+2212 MINUS SIGN and its size separator as U+00D7. SM_Cliff.json is plain
+       ASCII. A pattern written for one spelling silently finds nothing in the other,
+       which is how a "wired to spec" change can read nothing at all.
+
+    The script needs `unreal` and calls sys.exit without it, so it is imported with a
+    stub. That is why there was no test for it before.
+    """
+
+    SCRIPT = ROOT / "Content" / "Python" / "place_vs_mvp_pa_d.py"
+    CLIFF_SPEC = ROOT / "Lib" / "01_Homestead" / "SM_Cliff.json"
+    GARDEN_SPEC = ROOT / "Lib" / "01_Homestead" / "GARDEN_BLOCKING.md"
+
+    @classmethod
+    def setUpClass(cls):
+        import types
+
+        stub = types.ModuleType("unreal")
+        stub.log = lambda *a, **k: None
+        saved = sys.modules.get("unreal")
+        sys.modules["unreal"] = stub
+        try:
+            spec = importlib.util.spec_from_file_location("place_vs_mvp_pa_d", cls.SCRIPT)
+            cls.pad = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(cls.pad)
+        finally:
+            if saved is None:
+                sys.modules.pop("unreal", None)
+            else:
+                sys.modules["unreal"] = saved
+
+    # -- 1. parity -------------------------------------------------------
+    def test_cliff_faces_are_unchanged(self):
+        self.assertEqual(
+            self.pad.CLIFF_SPECS,
+            (("SM_Cliff_LookoutFace", (7.5, -5.5, -4.0)),
+             ("SM_Cliff_CabinFace", (-7.0, -4.5, -3.0)),
+             ("SM_Cliff_Rear", (0.0, 5.0, -2.5))),
+        )
+
+    def test_garden_centre_and_planters_are_unchanged(self):
+        self.assertEqual(self.pad.GARDEN_CENTER_BL, (-3.5, 0.5, 0.0))
+        self.assertEqual(
+            self.pad.PLANTER_SPECS,
+            (("SM_Planter_A", (-4.1, 0.5, 0.0)),
+             ("SM_Planter_B", (-3.5, 0.5, 0.0)),
+             ("SM_Planter_C", (-2.9, 0.5, 0.0))),
+        )
+
+    def test_fence_segments_are_unchanged(self):
+        self.assertEqual(
+            self.pad.FENCE_SEGMENTS_BL,
+            ((-5.5, 0.5, 0.0), (-3.5, 1.75, 0.0), (-1.5, 0.5, 0.0),
+             (-3.5, -0.75, 0.0), (-4.5, 1.25, 0.0)),
+        )
+
+    def test_path_endpoints_are_unchanged(self):
+        self.assertEqual(self.pad.PATH_START_BL, (-6.0, 1.0, 0.0))
+        self.assertEqual(self.pad.PATH_END_BL, (7.0, -3.5, 0.0))
+
+    # -- 2. the patterns match the real specs ---------------------------
+    def test_the_patterns_match_the_real_spec_files(self):
+        """Reads the shipped specs with the shipped patterns.
+
+        This is the assertion the doubled-backslash bug would have failed. It is
+        deliberately blunt: if a regex stops matching a spec that has not changed,
+        the wiring is broken whether or not anything still parses.
+        """
+        cliff = json.loads(self.CLIFF_SPEC.read_text(encoding="utf-8-sig"))
+        wanted = list(cliff["graybox_map"])
+        self.assertEqual([name for name, _ in self.pad.CLIFF_SPECS], wanted,
+                         "CLIFF_SPECS no longer follows graybox_map")
+
+        garden_text = self.GARDEN_SPEC.read_text(encoding="utf-8-sig")
+        row = next(ln for ln in garden_text.splitlines() if "Zone volume" in ln)
+        self.assertTrue(self.pad._XYZ_RE.search(row),
+                        "centre pattern does not match the shipped GARDEN_BLOCKING.md")
+        self.assertTrue(self.pad._SIZE_RE.search(row),
+                        "size pattern does not match the shipped GARDEN_BLOCKING.md")
+        self.assertEqual(self.pad._read_garden_envelope(str(self.GARDEN_SPEC)),
+                         ((-3.5, 0.5, 0.0), (4.0, 2.5, 0.6)))
+
+    def test_the_shipped_garden_spec_is_typographic(self):
+        """Guards assumption 3, so a future ASCII rewrite cannot pass unnoticed.
+
+        If this ever starts failing because someone normalised the file to ASCII,
+        that is fine - but the ASCII path must be proven to work too (below), not
+        assumed.
+        """
+        text = self.GARDEN_SPEC.read_text(encoding="utf-8-sig")
+        self.assertIn("\u2212", text, "spec no longer uses U+2212; re-check _to_float")
+        self.assertIn("\u00d7", text, "spec no longer uses U+00D7; re-check _SIZE_RE")
+
+    def test_both_spellings_of_every_symbol_parse(self):
+        for minus in ("-", "\u2212"):
+            for times in ("x", "\u00d7"):
+                with self.subTest(minus=ascii(minus), times=ascii(times)):
+                    text = ("| Zone volume | **4.0 %s 2.5 %s 0.6 m** at (%s3.5, 0.5, 0.0) |"
+                            % (times, times, minus))
+                    with tempfile.TemporaryDirectory() as td:
+                        p = Path(td) / "g.md"
+                        p.write_text(text, encoding="utf-8")
+                        self.assertEqual(
+                            self.pad._read_garden_envelope(str(p)),
+                            ((-3.5, 0.5, 0.0), (4.0, 2.5, 0.6)))
+
+    # -- 3. it is actually wired, not coincidentally equal ---------------
+    def test_editing_the_spec_moves_the_fence(self):
+        """The point of reading the spec. Four fence points are derived, so they must
+        follow the envelope; before this they were five literals that merely agreed."""
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td) / "g.md"
+            p.write_text("| Zone volume | **8.0 \u00d7 2.5 \u00d7 0.6 m** at (\u22126.5, 0.5, 0.0) |",
+                         encoding="utf-8")
+            centre, size = self.pad._read_garden_envelope(str(p))
+        self.assertEqual((centre, size), ((-6.5, 0.5, 0.0), (8.0, 2.5, 0.6)))
+        half_x, half_y = size[0] / 2.0, size[1] / 2.0
+        self.assertEqual(centre[0] - half_x, -10.5)
+        self.assertEqual(centre[1] + half_y, 1.75)
+
+    # -- 4. a broken source raises rather than silently placing nothing --
+    def test_a_spec_missing_the_row_raises(self):
+        for label, text in (
+            ("no row", "# Garden\n\nNothing here.\n"),
+            ("no size", "| Zone volume | at (-3.5, 0.5, 0.0) |\n"),
+            ("no centre", "| Zone volume | **4.0 \u00d7 2.5 \u00d7 0.6 m** |\n"),
+        ):
+            with self.subTest(case=label), tempfile.TemporaryDirectory() as td:
+                p = Path(td) / "g.md"
+                p.write_text(text, encoding="utf-8")
+                with self.assertRaises(ValueError):
+                    self.pad._read_garden_envelope(str(p))
+
+    def test_a_greybox_map_name_without_an_origin_is_named_not_invented(self):
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td) / "c.json"
+            p.write_text(json.dumps({"graybox_map": ["SM_Cliff_Rear"],
+                                     "modules": [{"name": "SM_Cliff_Rear"}]}),
+                         encoding="utf-8")
+            specs, missing = self.pad._read_cliff_specs(str(p))
+        self.assertEqual(specs, ())
+        self.assertEqual(missing, ["SM_Cliff_Rear"])
+
+    def test_a_spec_with_no_greybox_map_raises(self):
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td) / "c.json"
+            p.write_text(json.dumps({"graybox_map": [], "modules": []}), encoding="utf-8")
+            with self.assertRaises(ValueError):
+                self.pad._read_cliff_specs(str(p))
+
+
+class AssetBoardCannotBeFakedGreen(unittest.TestCase):
+    """The board exists so a batch can be reviewed at S2, not one asset at S3.
+
+    Its first implementation read `if a.get("stage")` -- truthy -- so a seeded
+    skeleton of nulls counted as ten undeclared assets and reported FAIL. That is
+    the same fabrication trap as the playtest record, and it pushes the writer
+    toward typing anything rather than looking at anything.
+
+    Also: a stage that is not on the ladder must not read as declared. "blockout"
+    or "S7" is not a production state Docs/37 defines, and treating it as one would
+    let the board assert a stage the process has never heard of.
+    """
+
+    SHIPPED = ROOT / "Docs" / "qa" / "POLISH_ASSET_BOARD.json"
+
+    def setUp(self):
+        if not self.SHIPPED.is_file():
+            self.skipTest("POLISH_ASSET_BOARD.json not present")
+        self.saved = pr.ASSET_BOARD_FILE
+        self.addCleanup(setattr, pr, "ASSET_BOARD_FILE", self.saved)
+
+    def _use(self, body):
+        td = tempfile.TemporaryDirectory()
+        p = Path(td.name) / "POLISH_ASSET_BOARD.json"
+        p.write_text(json.dumps(body), encoding="utf-8")
+        pr.ASSET_BOARD_FILE = p
+        self.addCleanup(td.cleanup)
+        return p
+
+    def _shipped(self):
+        return json.loads(self.SHIPPED.read_text(encoding="utf-8"))
+
+    def test_shipped_board_reports_missing_not_fail(self):
+        self._use(self._shipped())
+        c = pr.check_asset_board()
+        self.assertEqual(c.state, pr.MISSING)
+        self.assertNotEqual(c.state, pr.FAIL)
+
+    def test_shipped_board_carries_every_master_and_nothing_else(self):
+        # The masters are read from Content/HomeWorld/Materials/Masters. A board
+        # that quietly drops one would let the check go green over nine.
+        on_disk = {p.stem for p in (ROOT / "Content" / "HomeWorld" / "Materials"
+                                    / "Masters").glob("*.uasset")}
+        listed = [a["name"] for a in self._shipped()["assets"]]
+        self.assertEqual(len(on_disk), pr.EXPECTED_MASTER_COUNT)
+        self.assertEqual(sorted(listed), sorted(on_disk))
+
+    def test_shipped_board_has_no_stage_and_no_priority(self):
+        for asset in self._shipped()["assets"]:
+            with self.subTest(asset=asset["name"]):
+                self.assertIsNone(asset["stage"], "a stage here is a production claim")
+                self.assertIsNone(asset["priority"])
+
+    def test_a_fully_declared_board_reaches_pass(self):
+        # Otherwise this is decoration that can only ever be red.
+        self._use({"assets": [{"name": "M_CliffRock", "stage": "S2",
+                               "priority": 1}]})
+        self.assertEqual(pr.check_asset_board().state, pr.PASS)
+
+    def test_stage_accepts_the_code_or_the_full_label(self):
+        # A hand edit failing on punctuation would be reported as an undeclared
+        # asset, which reads as "nobody triaged this" and is simply wrong.
+        for value in ("S2", "s2", "S2 ART-BLOCKOUT", " S2 "):
+            with self.subTest(stage=value):
+                self.assertEqual(pr._stage_code(value), "S2")
+
+    def test_a_stage_off_the_ladder_is_rejected(self):
+        for value in ("blockout", "S7", "done", "2"):
+            with self.subTest(stage=value):
+                self.assertIsNone(pr._stage_code(value))
+        self._use({"assets": [{"name": "M_CliffRock", "stage": "blockout",
+                               "priority": 1}]})
+        c = pr.check_asset_board()
+        self.assertEqual(c.state, pr.FAIL)
+        self.assertIn("M_CliffRock", c.note)
+
+    def test_a_stage_without_a_priority_is_still_undeclared(self):
+        # The check's own question is "stage and priority". Priority is what makes
+        # batching possible, so a stage alone must not complete a row.
+        self._use({"assets": [{"name": "M_CliffRock", "stage": "S2",
+                               "priority": None}]})
+        c = pr.check_asset_board()
+        self.assertEqual(c.state, pr.MISSING)
+        self.assertIn("M_CliffRock", c.note)
+
+    def test_seven_of_ten_is_not_ten(self):
+        assets = [{"name": f"M_{i}", "stage": "S2", "priority": 1}
+                  for i in range(7)]
+        assets.append({"name": "M_CliffRock", "stage": None, "priority": None})
+        self._use({"assets": assets})
+        self.assertEqual(pr.check_asset_board().state, pr.MISSING)
+
+    def test_a_board_listing_no_assets_is_missing(self):
+        # Present-but-empty must not read as "everything is staged".
+        self._use({"assets": []})
+        self.assertEqual(pr.check_asset_board().state, pr.MISSING)
+
+
 class TheShippedSkeletonIsHonest(unittest.TestCase):
     """Assert the real artifact on disk, not a fixture.
 
