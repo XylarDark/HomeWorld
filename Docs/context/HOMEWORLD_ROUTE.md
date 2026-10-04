@@ -38,6 +38,7 @@ state is not that writer.
 - The stage name stays polish.
 - An agent decision is never settled by what the developer seems to want: name the limitation, give the real options without pre-marking a default, say plainly when the evidence points against the choice in front of you, and ask a decision with the question tool rather than as prose.
 - One dung and one wisp make one spirit fertilizer.
+- It is mixed at the homestead, the spirit spreads it at night, and in the morning one herb pile appears per dung, at random in the field.
 
 ## Left empty on purpose
 
