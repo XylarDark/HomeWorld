@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-04T07:36:44+00:00",
+  "generated": "2026-10-04T07:56:44+00:00",
   "process_doc": "Docs/37_POLISH_PASS_PROCESS.md",
   "verdict": "NOT_READY",
   "gates": {
@@ -187,8 +187,8 @@
       "max_stage": "S5 FEEL TUNE",
       "tally": {
         "FAIL": 1,
-        "MISSING": 3,
-        "PASS": 1
+        "MISSING": 2,
+        "PASS": 2
       },
       "checks": [
         {
@@ -218,11 +218,11 @@
           "gate": "G-FEEL",
           "requirement": "Every TODO tunable has a measured pre-tune value",
           "source": "Docs/qa/POLISH_BASELINE.json",
-          "measured": "0/6 measured",
+          "measured": "6/6 measured (4 numeric, 2 recorded as absent)",
           "target": ">=1 per tunable",
-          "state": "MISSING",
-          "note": "Still unmeasured: glide_gravity_scale, glide_lateral_influence, camera_arm_length_uu, camera_pitch_bias_deg, night_length_s, gather_cooldown_s. Measured: none.",
-          "next_action": "Read each tunables[] key out of Docs/qa/POLISH_BASELINE.json and record what the build uses TODAY, before any tuning. Read the live value from the editor or the log - do not copy the range out of Docs/canon/FEEL.md. The proposal is the destination; this is the baseline."
+          "state": "PASS",
+          "note": "4 numeric, 2 recorded as absent. Each carries a source. Values are BEFORE state read from source on 2026-10-04, not proposals - no FEEL.md tunable has been chosen, and none of these numbers endorses one.",
+          "next_action": ""
         },
         {
           "id": "feel.verb_script",

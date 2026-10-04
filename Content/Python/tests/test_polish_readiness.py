@@ -408,11 +408,25 @@ class TunableBaselines(unittest.TestCase):
             finally:
                 pr.BASELINE_FILE = saved
 
+    def _rec(self, value, source="Some.h:1"):
+        """A well-formed baseline record."""
+        return {"value": value, "source": source}
+
+    def _all_six(self):
+        return {
+            "glide_gravity_scale": self._rec(0.45),
+            "glide_lateral_influence": self._rec(0.0),
+            "camera_arm_length_uu": self._rec(400.0),
+            "camera_pitch_bias_deg": self._rec(-11.0),
+            "night_length_s": self._rec(120.0),
+            "gather_cooldown_s": self._rec(0.0),
+        }
+
     def test_one_arbitrary_key_does_not_satisfy_all_six(self):
         # Without a named list, one key would clear a ">0 baselines" test and the
         # gate would report 1/1 measured while five tunables stayed untouched.
         with tempfile.TemporaryDirectory() as td:
-            p = self._baseline(td, {"glide_gravity_scale": 0.45})
+            p = self._baseline(td, {"glide_gravity_scale": self._rec(0.45)})
             saved = pr.BASELINE_FILE
             pr.BASELINE_FILE = p
             try:
@@ -426,9 +440,9 @@ class TunableBaselines(unittest.TestCase):
     def test_partial_fill_names_what_is_left(self):
         with tempfile.TemporaryDirectory() as td:
             p = self._baseline(td, {
-                "glide_gravity_scale": 0.45,
-                "glide_lateral_influence": 0.0,
-                "camera_arm_length_uu": 420,
+                "glide_gravity_scale": self._rec(0.45),
+                "glide_lateral_influence": self._rec(0.0),
+                "camera_arm_length_uu": self._rec(420),
             })
             saved = pr.BASELINE_FILE
             pr.BASELINE_FILE = p
@@ -443,18 +457,115 @@ class TunableBaselines(unittest.TestCase):
 
     def test_all_six_measured_passes(self):
         with tempfile.TemporaryDirectory() as td:
-            p = self._baseline(td, {
-                "glide_gravity_scale": 0.45,
-                "glide_lateral_influence": 0.0,
-                "camera_arm_length_uu": 420,
-                "camera_pitch_bias_deg": -11.0,
-                "night_length_s": 120,
-                "gather_cooldown_s": 90,
-            })
+            p = self._baseline(td, self._all_six())
             saved = pr.BASELINE_FILE
             pr.BASELINE_FILE = p
             try:
                 self.assertEqual(pr.check_feel_tunable_baselines().state, pr.PASS)
+            finally:
+                pr.BASELINE_FILE = saved
+
+    # --- an unsourced number is not a measurement --------------------------
+    #
+    # POLISH_BASELINE.json's own _waiver_policy: "Do not write a number here to
+    # make a gate go green. A null that is honestly null is worth more than a
+    # plausible value, because a plausible value cannot be told apart from a
+    # real one later." FEEL.md says the mirror image: "do not silently invent in
+    # code". These four tests are the executable form of both sentences.
+
+    def test_a_bare_number_is_not_a_baseline(self):
+        """The shape the skeleton shipped with must not count."""
+        with tempfile.TemporaryDirectory() as td:
+            p = self._baseline(td, dict.fromkeys(pr.FEEL_TUNABLES, 0.45))
+            saved = pr.BASELINE_FILE
+            pr.BASELINE_FILE = p
+            try:
+                c = pr.check_feel_tunable_baselines()
+                self.assertEqual(c.state, pr.MISSING,
+                                 f"bare numbers counted: {c.measured}")
+                self.assertIn("0/6", c.measured)
+            finally:
+                pr.BASELINE_FILE = saved
+
+    def test_a_value_without_a_source_is_not_a_baseline(self):
+        with tempfile.TemporaryDirectory() as td:
+            p = self._baseline(td, dict(self._all_six(),
+                                        night_length_s={"value": 120.0}))
+            saved = pr.BASELINE_FILE
+            pr.BASELINE_FILE = p
+            try:
+                c = pr.check_feel_tunable_baselines()
+                self.assertEqual(c.state, pr.MISSING)
+                self.assertIn("no source", c.note)
+                self.assertIn("5/6", c.measured)
+            finally:
+                pr.BASELINE_FILE = saved
+
+    def test_an_empty_source_is_not_a_source(self):
+        with tempfile.TemporaryDirectory() as td:
+            p = self._baseline(td, dict(self._all_six(),
+                                        night_length_s={"value": 120.0, "source": "  "}))
+            saved = pr.BASELINE_FILE
+            pr.BASELINE_FILE = p
+            try:
+                self.assertEqual(pr.check_feel_tunable_baselines().state, pr.MISSING)
+            finally:
+                pr.BASELINE_FILE = saved
+
+    def test_a_placeholder_string_is_not_a_baseline(self):
+        for junk in ("TBD", "unknown", "n/a", "none", "todo", "-", "?"):
+            with self.subTest(placeholder=junk):
+                with tempfile.TemporaryDirectory() as td:
+                    p = self._baseline(td, dict(self._all_six(),
+                                                night_length_s=self._rec(junk)))
+                    saved = pr.BASELINE_FILE
+                    pr.BASELINE_FILE = p
+                    try:
+                        c = pr.check_feel_tunable_baselines()
+                        self.assertEqual(c.state, pr.MISSING,
+                                         f"{junk!r} counted as a baseline")
+                    finally:
+                        pr.BASELINE_FILE = saved
+
+    def test_recording_that_a_parameter_does_not_exist_is_a_baseline(self):
+        """"The knob does not exist" beats a guess, and must be allowed through.
+
+        Two of the six FEEL.md proposals aim at parameters the build never had.
+        For those the honest baseline is a sentence, not a number, and a gate
+        that only accepts numbers would push the next person into inventing one.
+        """
+        with tempfile.TemporaryDirectory() as td:
+            p = self._baseline(td, dict(self._all_six(),
+                                        glide_gravity_scale=self._rec(
+                                            "no such parameter in the build",
+                                            "HomeWorldFallbackGlideComponent.h:54")))
+            saved = pr.BASELINE_FILE
+            pr.BASELINE_FILE = p
+            try:
+                c = pr.check_feel_tunable_baselines()
+                self.assertEqual(c.state, pr.PASS, c.note)
+                self.assertIn("5 numeric, 1 recorded as absent", c.measured)
+            finally:
+                pr.BASELINE_FILE = saved
+
+    def test_the_tally_separates_numbers_from_absent_parameters(self):
+        """A green row must not read as six numbers when two are absences."""
+        with tempfile.TemporaryDirectory() as td:
+            p = self._baseline(td, dict(self._all_six(),
+                                        glide_gravity_scale=self._rec(
+                                            "no such parameter in the build",
+                                            "x.h:1"),
+                                        camera_pitch_bias_deg=self._rec(
+                                            "no bias parameter in the build",
+                                            "y.h:2")))
+            saved = pr.BASELINE_FILE
+            pr.BASELINE_FILE = p
+            try:
+                c = pr.check_feel_tunable_baselines()
+                self.assertEqual(c.state, pr.PASS, c.note)
+                self.assertIn("6/6", c.measured)
+                self.assertIn("4 numeric", c.measured)
+                self.assertIn("2 recorded as absent", c.measured)
             finally:
                 pr.BASELINE_FILE = saved
 
@@ -1798,15 +1909,63 @@ class TheShippedSkeletonIsHonest(unittest.TestCase):
                 f"number here would be invented and would make the gate pass.",
             )
 
-    def test_every_feel_tunable_is_declared_and_null(self):
+    def test_every_feel_tunable_is_declared_with_a_shape_the_gate_accepts(self):
+        """What replaced "and null".
+
+        The skeleton shipped with six nulls, so this asserted nothing was
+        measured. On 2026-10-04 four were measured from source and two were
+        recorded as parameters the build never had - which is a better baseline
+        than a guess, not a worse one. The invariant that still has to hold is
+        the shape: declared, and either honestly null or a sourced record. Never
+        a bare scalar, because that is indistinguishable from an invented number
+        once it is in the file.
+        """
         tunables = self.data.get("tunables") or {}
         self.assertEqual(
             sorted(tunables), sorted(pr.FEEL_TUNABLES),
             "the skeleton's tunable keys have drifted from FEEL_TUNABLES in the gate",
         )
-        for key, value in tunables.items():
-            self.assertIsNone(
-                value, f"{key} carries a value ({value!r}) but was never measured"
+        for key, entry in tunables.items():
+            if entry is None:
+                continue
+            self.assertIsInstance(
+                entry, dict,
+                f"{key} is a bare {entry!r}. A bare number cannot be told apart "
+                f"from an invented one later; use {{value, source}}.",
+            )
+            self.assertIn("value", entry, f"{key} has no value key")
+            value = entry["value"]
+            if isinstance(value, str):
+                self.assertNotIn(
+                    value.strip().lower(), pr.PLACEHOLDER_VALUES,
+                    f"{key} holds the placeholder {value!r}",
+                )
+            source = entry.get("source")
+            self.assertTrue(
+                isinstance(source, str) and source.strip(),
+                f"{key} carries a value with no source naming where it was read",
+            )
+
+    def test_a_recorded_tunable_does_not_smuggle_in_a_proposed_range(self):
+        """FEEL.md's windows are the destination, not the baseline.
+
+        The row's own next_action says "do not copy the range out of
+        FEEL.md". A recorded BEFORE value that lands exactly on a proposed range
+        bound is how that instruction gets violated without anyone deciding to
+        violate it - so name the possibility rather than pretending it is absent.
+        """
+        tunables = self.data.get("tunables") or {}
+        windows = {"glide_gravity_scale": (0.35, 0.55),
+                   "camera_arm_length_uu": (350.0, 500.0),
+                   "night_length_s": (90.0, 180.0)}
+        for key, (lo, hi) in windows.items():
+            value = (tunables.get(key) or {}).get("value")
+            if not isinstance(value, (int, float)) or isinstance(value, bool):
+                continue
+            self.assertFalse(
+                value in (lo, hi),
+                f"{key} was recorded as exactly {value}, a proposed-range bound. "
+                f"If that is genuinely today's value, the note must say so.",
             )
 
     def test_windows_match_canon_not_the_gate(self):

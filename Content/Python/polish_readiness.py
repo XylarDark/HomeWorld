@@ -1598,6 +1598,54 @@ def check_feel_human_playtest() -> Check:
     )
 
 
+#: Values that look like an answer but are not one. A string is accepted as a
+#: legitimate baseline - "the parameter does not exist" is a more decisive
+#: finding than a number - but only with a source, and never one of these.
+PLACEHOLDER_VALUES = {"", "tbd", "to be determined", "unknown", "n/a", "na",
+                      "?", "-", "none", "todo", "fixme"}
+
+
+def _tunable_baseline(entry: Any) -> tuple[Any, str]:
+    """Return (value, why-not) for one recorded baseline.
+
+    `why` empty means accepted. `why` non-empty means rejected, and that string
+    is what the row's note quotes back, so it has to say which rule fired.
+
+    WHY AN UNSOURCED NUMBER DOES NOT COUNT. `Docs/qa/POLISH_BASELINE.json`
+    carries `_waiver_policy`: "Do not write a number here to make a gate go
+    green. A null that is honestly null is worth more than a plausible value,
+    because a plausible value cannot be told apart from a real one later." A
+    bare number is exactly the thing that policy cannot distinguish from an
+    invention, so a baseline is only a baseline when it says where it was read.
+    FEEL.md says the same thing in the other direction: "do not silently
+    invent in code".
+
+    Two shapes are accepted:
+      {"value": 400.0, "source": "HomeWorldCharacter.h:399", ...}
+      {"value": "no such parameter", "source": "...", ...}
+    A bare scalar is NOT accepted. Nothing in this repo shipped a bare one, so
+    accepting the shape would only widen the door for the next person in a
+    hurry - and it would be indistinguishable from an invented number later,
+    which is the failure the policy exists to prevent.
+    """
+    if not isinstance(entry, dict):
+        return None, "not a {value, source} record"
+    if "value" not in entry:
+        return None, "no value key"
+    value = entry["value"]
+    if value is None:
+        return None, "value is null"
+    if isinstance(value, str):
+        if value.strip().lower() in PLACEHOLDER_VALUES:
+            return None, f"placeholder value {value!r}"
+    elif not isinstance(value, (int, float, bool)):
+        return None, f"value is {type(value).__name__}"
+    source = entry.get("source")
+    if not isinstance(source, str) or not source.strip():
+        return None, "no source - an unsourced number cannot be told from an invented one"
+    return value, ""
+
+
 def check_feel_tunable_baselines() -> Check:
     """Every tunable marked TODO in FEEL.md needs a measured current value.
 
@@ -1624,30 +1672,61 @@ def check_feel_tunable_baselines() -> Check:
             "pitch bias, night length and gather cooldown as TODO proposals. None "
             "has a measured current value.",
         )
-    # A key present with a null value is a declared placeholder, not a baseline.
-    # Counting it would let a freshly-seeded skeleton turn this check PASS and hand
-    # the polish pass a green gate over six unfilled numbers.
-    measured = [k for k, v in baselines.items() if isinstance(v, (int, float, str, bool)) and v is not None]
-    pending = [k for k in FEEL_TUNABLES if k not in measured]
-    measured_str = ", ".join(sorted(measured)[:8]) or "none"
-    if pending:
+    measured: list[str] = []
+    numeric = 0
+    absent_param = 0
+    rejected: dict[str, str] = {}
+    for key in FEEL_TUNABLES:
+        if key not in baselines:
+            rejected[key] = "key absent"
+            continue
+        value, why = _tunable_baseline(baselines[key])
+        # WHY THIS TESTS `why`, NOT THE RETURN VALUE. The first version wrote
+        # `if got is None:` against a helper that always returns a
+        # (value, reason) tuple - so the tuple was never None, every rejected
+        # entry counted as measured, and a file of six nulls went PASS. The
+        # test that was supposed to stop that (`test_all_null_tunables_are_not_a
+        # _baseline`) went green on it. A sentinel you never compare against is
+        # the same fail-open as a missing check: both read as "nothing to do
+        # here" and both are wrong.
+        if why:
+            rejected[key] = why
+            continue
+        measured.append(key)
+        if isinstance(value, (int, float)) and not isinstance(value, bool):
+            numeric += 1
+        elif isinstance(value, str) and "no " in value.lower():
+            absent_param += 1
+    pending = list(FEEL_TUNABLES[len(measured):]) if len(measured) < len(FEEL_TUNABLES) else []
+    # A string baseline is legitimate - "the knob does not exist" beats a guess -
+    # but the tally must say which kind it is, or "6/6" reads as six numbers when
+    # two of them are the absence of a parameter.
+    shape = f"{numeric} numeric, {absent_param} recorded as absent"
+    if pending or rejected:
+        why = "; ".join(f"{k}: {v}" for k, v in sorted(rejected.items())) or "none"
         return Check(
             "feel.tunable_baselines", "G-FEEL",
             "Every TODO tunable has a measured pre-tune value",
-            _rel(BASELINE_FILE), f"{len(measured)}/{len(FEEL_TUNABLES)} measured",
+            _rel(BASELINE_FILE),
+            f"{len(measured)}/{len(FEEL_TUNABLES)} measured ({shape})",
             ">=1 per tunable", MISSING,
-            "Still unmeasured: " + ", ".join(pending) + ". Measured: " + measured_str + ".",
-            next_action="Read each tunables[] key out of Docs/qa/POLISH_BASELINE.json "
-                        "and record what the build uses TODAY, before any tuning. "
-                        "Read the live value from the editor or the log - do not "
-                        "copy the range out of Docs/canon/FEEL.md. The proposal is "
-                        "the destination; this is the baseline.",
+            f"Not a usable baseline: {why}. "
+            f"A baseline is {{value, source}}; an unsourced number is an invention.",
+            next_action="Open the tunables{} block in Docs/qa/POLISH_BASELINE.json. "
+                        "Each key needs a 'value' and a 'source' naming the file and "
+                        "line it was read from. 'no such parameter in the build' is a "
+                        "valid value when that is the finding - an unsourced number, "
+                        "'tbd' and null are not. Never copy the proposed range out of "
+                        "FEEL.md; that is the destination, not the baseline.",
         )
     return Check(
         "feel.tunable_baselines", "G-FEEL",
         "Every TODO tunable has a measured pre-tune value",
-        _rel(BASELINE_FILE), f"{len(measured)} baselines",
-        ">=1 per tunable", PASS, measured_str,
+        _rel(BASELINE_FILE), f"{len(measured)}/{len(FEEL_TUNABLES)} measured ({shape})",
+        ">=1 per tunable", PASS,
+        f"{shape}. Each carries a source. Values are BEFORE state read from "
+        f"source on 2026-10-04, not proposals - no FEEL.md tunable has been "
+        f"chosen, and none of these numbers endorses one.",
     )
 
 

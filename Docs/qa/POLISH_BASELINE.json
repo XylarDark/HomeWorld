@@ -33,13 +33,47 @@
     "note": "Full circuit. Empty until a human times it. Deferred to the polish pass by Lead decision 2026-10-04 - see _deferrals."
   },
 
+  "_tunables_what_this_is": "BEFORE values, measured 2026-10-04 from Source/HomeWorld and Config. NOT chosen values - every proposal in FEEL.md is still open and none of these numbers endorses it. Each entry carries the file and line it was read from, because _waiver_policy says a plausible value must be distinguishable from a real one later, and a bare number cannot be.",
+  "_tunables_how_these_were_read": "Static read of source; no editor was running, so anything a Blueprint or console could override at runtime is recorded as a confidence caveat rather than as certainty. 'confidence: high' means a C++ default or CVar default with no .ini override found and no override found in any .uasset name table. Per docs/KNOWN_ERRORS.md, absence of a string in a name table is not proof of absence - but a Blueprint storing a property override must reference the property name, so absence is stronger evidence here than in the general case.",
+
   "tunables": {
-    "glide_gravity_scale": null,
-    "glide_lateral_influence": null,
-    "camera_arm_length_uu": null,
-    "camera_pitch_bias_deg": null,
-    "night_length_s": null,
-    "gather_cooldown_s": null
+
+    "glide_gravity_scale": {
+      "value": "no such parameter in the build",
+      "source": "Source/HomeWorld/HomeWorldFallbackGlideComponent.h:54 (GlideDurationSeconds = 32.0f, ClampMin 25.0 ClampMax 40.0); HomeWorldFallbackGlideComponent.cpp AdvanceGlide reads no gravity term",
+      "confidence": "high",
+      "note": "FALLBACK glide is spline interpolation over CRUMB_GlideSpline with a duration, not a physics arc. FEEL.md's 0.35-0.55x-gravity proposal has nothing to scale. To make it tunable someone has to add a property first. Baseline for the decision: the knob does not exist."
+    },
+    "glide_lateral_influence": {
+      "value": 0,
+      "source": "Source/HomeWorld/HomeWorldFallbackGlideComponent.cpp - no BindAction, no AddMovementInput, no steer path in the component",
+      "confidence": "medium",
+      "note": "Read as 0 because the component never reads player input while gliding, which matches canon 'FALLBACK = no free steer'. Medium not high: I read the component, not every input path that could reach the character mid-glide. Confirm in-engine before treating it as settled."
+    },
+    "camera_arm_length_uu": {
+      "value": 400.0,
+      "source": "Source/HomeWorld/HomeWorldCharacter.h:399 - UPROPERTY(EditDefaultsOnly, ClampMin 100.0, ClampMax 2000.0) float TargetArmLength = 400.0f; assigned at HomeWorldCharacter.cpp:198",
+      "confidence": "high",
+      "note": "EditDefaultsOnly, so a Blueprint subclass could override it. None found: 'TargetArmLength' appears in 0 .uasset name tables. Also UE's own USpringArmComponent default is 400, so the C++ author may have set it to match rather than to choose. Already inside the proposed 350-500 range."
+    },
+    "camera_pitch_bias_deg": {
+      "value": "no bias parameter in the build; camera pitch follows controller rotation through the spring arm",
+      "source": "no PitchBias / PitchMin / PitchMax anywhere in Source/HomeWorld (162 files); HomeWorldCharacter.cpp:195-198 creates the spring arm with no rotation offset",
+      "confidence": "low",
+      "note": "Weakest of the six. This is absence of an identifier, which is weaker evidence than absence of a parameter I actually read - see _how_these_were_read. Verify in-engine before treating 0 as the baseline."
+    },
+    "night_length_s": {
+      "value": 120.0,
+      "source": "Source/HomeWorld/HomeWorldTimeOfDaySubsystem.cpp:47-49 - CVar hw.TimeOfDay.NightDurationSeconds, default 120.f; read at line 161 when SetPhase(Night) runs",
+      "confidence": "high",
+      "note": "A console variable, so it is runtime-overridable and this is the compiled default, not a guarantee about a play session. No .ini sets it. Inside the proposed 90-180 s window."
+    },
+    "gather_cooldown_s": {
+      "value": 0,
+      "source": "Source/HomeWorld/HomeWorldResourcePile.h:43 - UPROPERTY(EditDefaultsOnly, ClampMin 0.0) float HarvestCooldownSeconds = 0.f; line 39 - bool bDepleteUntilDawn = true",
+      "confidence": "high",
+      "note": "Records which branch FEEL.md asked for: the implemented policy is deplete-until-dawn with a zero-second cooldown, not a 60-120 s timer. So half of that proposal is already decided in code and the open question is only whether dawn-depletion stays. 'HarvestCooldownSeconds' appears in 0 .uasset name tables. This is NOT a recommendation to keep it."
+    }
   },
 
   "_deferrals": {
