@@ -970,7 +970,7 @@ class TheExportChainCannotGoStale(unittest.TestCase):
         """
         body = {
             "measured_at": self._now_iso(),
-            "level": "MainMenu",
+            "level": "L_VS_MVP_Markers",
             "asset": "SM_IslandTop",
             "actors_found": 1,
             "local_bbox_cm": [18000.0, 10000.0, 45.0],
@@ -1281,7 +1281,7 @@ class TheExportChainCannotGoStale(unittest.TestCase):
         with the reason, not quietly accepted.
         """
         self._use_record({
-            "measured_at": self._now_iso(), "level": "MainMenu",
+            "measured_at": self._now_iso(), "level": "L_VS_MVP_Markers",
             "asset": "SM_IslandTop", "actors_found": 1,
             "bbox_cm": [18000.0, 10000.0, 45.0],
         })
@@ -1313,6 +1313,35 @@ class TheExportChainCannotGoStale(unittest.TestCase):
         c = pr.check_env_ue_island_measured()
         self.assertEqual(c.state, pr.FAIL)
         self.assertIn("Sandbox_Preview", c.note)
+
+    def test_a_record_from_main_menu_fails_even_though_it_is_a_real_map(self):
+        """MainMenu is a real .umap and it is the project's DEFAULT map, and it is
+        the wrong one.
+
+        docs/KNOWN_ERRORS.md measured this: L_VS_MVP_Markers carries 78
+        StaticMeshActors including SM_IslandTop, while MainMenu's 1,270 World
+        Partition external actors contain no island, no cabin and no crumbs.
+        DefaultEngine.ini points at MainMenu, so opening "the map" by default
+        lands in a scene with no homestead in it. Accepting either level would
+        mean a measurement of an empty scene reads PASS.
+        """
+        self._use_record(self._record(level="MainMenu"))
+        c = pr.check_env_ue_island_measured()
+        self.assertEqual(c.state, pr.FAIL)
+        self.assertIn("L_VS_MVP_Markers", c.note)
+
+    def test_the_shipping_level_constant_matches_what_the_script_looks_for(self):
+        """The gate and the in-editor script must not drift on this.
+
+        They are two files in two languages edited in different sessions; a
+        constant that disagrees between them would make the row unfixable rather
+        than merely wrong.
+        """
+        script = (ROOT / "Content" / "Python" / "measure_ue_island.py").read_text(
+            encoding="utf-8")
+        self.assertIn('SHIPPING_LEVEL = "%s"' % pr.SHIPPING_LEVEL, script,
+                      "measure_ue_island.py and polish_readiness.py disagree on "
+                      "which level is the shipping one")
 
     def test_a_record_that_predates_the_export_fails(self):
         """A record written before the FBX was last exported describes the previous

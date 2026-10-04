@@ -103,6 +103,15 @@ ISLAND_MESH = "SM_IslandTop"
 #: manifest is ~15 kB. A zero-byte file whose manifest row also said 0 was a
 #: clean PASS - both sides agreed, and both were empty.
 MIN_FBX_BYTES = 1024
+
+#: The level the island is actually placed in. NOT a guess and not a preference:
+#: docs/KNOWN_ERRORS.md ("Which map actually holds the world") measured it -
+#: L_VS_MVP_Markers carries 78 StaticMeshActors including SM_IslandTop, while
+#: MainMenu's 1,270 World Partition external actors contain no island, no
+#: cabin, no crumbs and no landing circle. DefaultEngine.ini points at
+#: MainMenu, which is how the wrong level gets opened by default. Enforcing
+#: the recorded answer is cheaper than re-deriving it every session.
+SHIPPING_LEVEL = "L_VS_MVP_Markers"
 OUT_JSON = ROOT / "Docs" / "qa" / "POLISH_READINESS.json"
 OUT_MD = ROOT / "Docs" / "qa" / "POLISH_READINESS.md"
 
@@ -1064,6 +1073,15 @@ def check_env_ue_island_measured() -> Check:
                        f"The record was taken in {level!r}, which is not a .umap "
                        f"under Content/HomeWorld/Maps. Known levels: "
                        f"{', '.join(sorted(known_levels)) or 'none found'}.", FAIL)
+    if level != SHIPPING_LEVEL:
+        return invalid(
+            f"measured in {level}, not {SHIPPING_LEVEL}",
+            f"The island is placed in {SHIPPING_LEVEL}, so a measurement from "
+            f"{level} describes a scene nobody ships. DefaultEngine.ini defaults "
+            f"to MainMenu, which is how the wrong level gets opened without "
+            f"anyone noticing - see docs/KNOWN_ERRORS.md, 'Which map actually "
+            f"holds the world'. Re-run the script with {SHIPPING_LEVEL} open.",
+            FAIL)
 
     # --- freshness ------------------------------------------------------
     # A record written before the FBX was last exported describes the previous

@@ -12,7 +12,7 @@
   "_what_the_gate_now_requires": [
     "local_bbox_cm - three finite numbers, not strings, not NaN. JSON accepts the bare literal NaN and comparing it with max() used to silently PASS.",
     "asset - must be SM_IslandTop. A number measured from a different mesh cannot answer the question.",
-    "level - must name a .umap that exists under Content/HomeWorld/Maps. A sandbox level is not evidence about the shipping one.",
+    "level - must be exactly L_VS_MVP_Markers. MainMenu is also a real .umap and is the project's DEFAULT map, but the island is not in it.",
     "measured_at - must be ISO 8601, and must not predate the SM_IslandTop.fbx export. A record that outlives its export describes the previous geometry.",
     "no actor at non-unit scale. The script reports these as non_unit_scale_actors."
   ],
@@ -33,12 +33,12 @@
     "Step (e) is the one that gets skipped, and skipping it is how the plate went",
     "missing for a day with nothing going red.",
     "",
-    "OPEN QUESTION, NOT DECIDED HERE. This project has two levels - MainMenu.umap",
-    "(which holds the 1270 placed actors) and VS_MVP/L_VS_MVP_Markers.umap (which",
-    "PLAYTEST.md names as the level you PIE). The gate accepts either and prints",
-    "which one was measured; it does not decide which is canonical, because that is",
-    "a canon call for the Lead. Until it is settled, a measurement from the wrong",
-    "one will still read PASS and say so in its measured column."
+    "RUN IT IN L_VS_MVP_Markers. That is where the island is placed - 78",
+    "StaticMeshActors including SM_IslandTop. MainMenu is also a real .umap and",
+    "is the project's DEFAULT map, but its 1,270 World Partition external actors",
+    "contain no island, no cabin and no crumbs, so it is a scene with no",
+    "homestead in it. The gate rejects a measurement from anywhere else and says",
+    "why. Evidence: docs/KNOWN_ERRORS.md, 'Which map actually holds the world'."
   ],
 
   "_units": "local_bbox_cm is Unreal centimetres. The gate divides by 100 to compare against Blender metres, states the tolerance in metres so a mistaken conversion is visible rather than silent, and derives the X and Y tolerances independently (2% of each axis, floored at 1 m).",
