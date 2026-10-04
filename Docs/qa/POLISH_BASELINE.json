@@ -23,14 +23,14 @@
     "window_s": [15.0, 25.0],
     "source_window": "Docs/canon/FEEL.md",
     "runs": [],
-    "note": "Median of three timed walks. Empty until a human times it."
+    "note": "Median of three timed walks. Empty until a human times it. Deferred to the polish pass by Lead decision 2026-10-04 - see _deferrals."
   },
   "island_circuit_s": {
     "measured_s": null,
     "window_s": [45.0, 90.0],
     "source_window": "Docs/canon/FEEL.md",
     "runs": [],
-    "note": "Full circuit. Empty until a human times it."
+    "note": "Full circuit. Empty until a human times it. Deferred to the polish pass by Lead decision 2026-10-04 - see _deferrals."
   },
 
   "tunables": {
@@ -40,6 +40,18 @@
     "camera_pitch_bias_deg": null,
     "night_length_s": null,
     "gather_cooldown_s": null
+  },
+
+  "_deferrals": {
+    "_what_this_is": "Decisions to leave a row unmeasured on purpose, with the reasoning and the condition that would reverse it. A deferred row and an abandoned row are otherwise indistinguishable in the gate output, and only one of them has somebody waiting on it.",
+    "traversal_measured": {
+      "decision": "Deferred to the polish pass.",
+      "by": "Lead",
+      "date": "2026-10-04",
+      "reasoning": "The island the traversal would be timed on is not the island in the build. The .blend and the export manifest said 180 x 100 m while Unreal was still holding a 19.3 x 10.7 m .uasset imported on 2026-09-28, so a circuit time recorded today would describe the wrong island and would later be cited as if it described the right one. Close the engine gap first, then time the walk.",
+      "reversed_when": "env.ue_island_measured stops reading MISSING. Sequencing: re-import the FBX, re-place the actor, measure, commit - and only then walk the routes.",
+      "not_a_waiver": "env.traversal_measured is still MISSING and still holds G-ENV RED. Deferring is not excusing. The row keeps reporting, and the gate keeps refusing to call the world ready to tune."
+    }
   },
 
   "_tunable_notes": {

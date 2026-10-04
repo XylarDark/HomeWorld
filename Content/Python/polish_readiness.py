@@ -68,6 +68,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import re
 import sys
 from dataclasses import asdict, dataclass, field
@@ -93,7 +94,15 @@ EXPORT_MANIFEST = ROOT / "AssetCreation" / "Exports" / "MVP_EXPORT_MANIFEST.md"
 LIB_BLEND = ROOT / "blender" / "floating_island_homestead_LIB.blend"
 UE_ISLAND_MEASUREMENT = ROOT / "Docs" / "qa" / "UE_ISLAND_MEASUREMENT.json"
 MASTERS_DIR = ROOT / "Content" / "HomeWorld" / "Materials" / "Masters"
-EXPORT_MANIFEST = ROOT / "AssetCreation" / "Exports" / "MVP_EXPORT_MANIFEST.md"
+
+#: The mesh env.ue_island_measured is about. Named here so the gate and the
+#: in-editor script cannot drift apart on what they believe they are measuring.
+ISLAND_MESH = "SM_IslandTop"
+
+#: An FBX smaller than this is not an export; the smallest real one in the
+#: manifest is ~15 kB. A zero-byte file whose manifest row also said 0 was a
+#: clean PASS - both sides agreed, and both were empty.
+MIN_FBX_BYTES = 1024
 OUT_JSON = ROOT / "Docs" / "qa" / "POLISH_READINESS.json"
 OUT_MD = ROOT / "Docs" / "qa" / "POLISH_READINESS.md"
 
@@ -153,6 +162,21 @@ class Check:
     target: str
     state: str
     note: str = ""
+    #: What a person does about this row, if anything. Separate from `note`
+    #: because `note` explains WHY the row is the state it is, and it is
+    #: legitimate for that to be the whole story: "the manifest disagrees with
+    #: disk" is a complete diagnosis. The action is a different sentence, and
+    #: burying it in prose is how it goes missing.
+    #:
+    #: WHY THIS FIELD EXISTS. On 2026-10-04, 6 of the 8 substantive non-PASS rows
+    #: stated a finding and no next step. Someone reading a red gate could see
+    #: what was wrong and still not know what to do about it. A gate that only
+    #: ever complains is not a work list; it is a mood.
+    #:
+    #: Empty means "nobody's move" - genuinely agent-owned and unfinished, or a
+    #: gate-level rollup with nothing to add. test_every_blocked_row_names_an_
+    #: action enforces that this stays deliberate.
+    next_action: str = ""
 
 
 @dataclass
@@ -419,7 +443,7 @@ def check_env_world_assembled() -> Check:
     total = 0
     if ext_root.is_dir():
         total = sum(1 for _ in ext_root.rglob("*.uasset"))
-    maps = sorted(p.name for p in maps_dir.glob("*.umap"))
+    maps = sorted(p.name for p in maps_dir.rglob("*.umap"))
     if total == 0:
         return Check(
             "env.world_assembled", "G-ENV",
@@ -456,6 +480,10 @@ def check_env_traversal_measured() -> Check:
             MISSING,
             "No instrument exists. FEEL.md states the windows; nothing reads them. "
             "Build the measurement before changing size, not after.",
+            next_action="See _how_to_measure_traversal in "
+                        "Docs/qa/POLISH_BASELINE.json for the route. It needs the "
+                        "DESKTOP editor with cells streamed and a human on the "
+                        "keys - a nullrhi commandlet cannot time a walk.",
         )
     rows = []
     bad = []
@@ -483,6 +511,13 @@ def check_env_traversal_measured() -> Check:
             "Not yet measured: " + ", ".join(unmeasured) + ". The artifact exists and "
             "the keys are declared, but no number has been recorded. Timing a walk "
             "needs the desktop editor with cells streamed and a human on the keys.",
+            next_action="Walk each route three times in the DESKTOP editor and "
+                        "record the median into `measured_s` in "
+                        "Docs/qa/POLISH_BASELINE.json. Lead deferred this to the "
+                        "polish pass on 2026-10-04 - and it cannot be done before "
+                        "the island is in the build, because a circuit time over a "
+                        "19.3 m island says nothing about a 180 m one. Sequence: "
+                        "re-import, then measure.",
         )
     if bad:
         return Check(
@@ -493,6 +528,11 @@ def check_env_traversal_measured() -> Check:
             FAIL,
             "Measured and out of window: " + ", ".join(bad) + ". Either the world or "
             "the window is wrong; which one is a human call.",
+            next_action="For each named route, decide whether the world or the "
+                        "window in Docs/canon/FEEL.md is wrong, then change that "
+                        "one. Resizing the island to fit a number is a feel call "
+                        "and belongs to the Lead; editing the window to fit the "
+                        "island is also a feel call, and also belongs to the Lead.",
         )
     return Check(
         "env.traversal_measured", "G-ENV",
@@ -511,6 +551,7 @@ def _criterion_check(
     detail_match: str | None = None,
     report: dict[str, Any] | None = None,
     report_present: bool = True,
+    action: str = "",
 ) -> Check:
     """One greybox criterion as a readiness check, honouring waivers.
 
@@ -546,7 +587,10 @@ def _criterion_check(
         report = _read_json(GRAYBOX_REPORT)
     if report is None:
         return Check(cid, "G-ENV", requirement, src, "no artifact", "0 findings",
-                     MISSING, "Greybox report not found. Regenerate it in Blender.")
+                     MISSING, "Greybox report not found. Regenerate it in Blender.",
+                     next_action="blender --background "
+                                 "blender/floating_island_homestead_LIB.blend "
+                                 "--python Content/Python/graybox_report_driver.py")
 
     hits = [
         f for f in blocking_findings(report)
@@ -569,6 +613,9 @@ def _criterion_check(
             f"{len(hits)} blocking; {len(stale)} stale waiver(s)", "0 findings",
             STALE,
             f"Waived but no longer blocking: {', '.join(stale)}. Remove the waiver.",
+            next_action="Delete the stale waiver row from "
+                        "Docs/qa/polish_waivers.json. Its finding no longer exists, "
+                        "so the waiver is no longer accepting anything.",
         )
 
     waived, open_hits = [], []
@@ -583,7 +630,12 @@ def _criterion_check(
         if len(open_hits) > 4:
             detail += f" (+{len(open_hits) - 4} more)"
         return Check(cid, "G-ENV", requirement, src,
-                     f"{len(open_hits)} blocking", "0 blocking", FAIL, detail)
+                     f"{len(open_hits)} blocking", "0 blocking", FAIL, detail,
+                     next_action=action or (
+                         "Each named item is a judgement call, not a measurement. "
+                         "Either fix the source, or record a scoped waiver in "
+                         "Docs/qa/polish_waivers.json with a rationale - do not "
+                         "delete the finding."))
 
     if waived:
         detail = "; ".join(
@@ -616,6 +668,12 @@ def check_env_master_binding() -> Check:
         "env.master_binding", "master_binding",
         "Every material resolves to one of the ten masters (art bible S10)",
         load_waivers(),
+        action="Bind each material to one of the ten masters in "
+               "Docs/06_VS_MVP_DRESS.md, or declare it an allowed instance of one. "
+               "This is an art-bible decision (S10), so it is the Lead's call, not "
+               "a script's. Lead ruled 2026-10-04 to leave it RED for the art pass "
+               "- so the correct action right now is none, and G-ENV stays RED "
+               "until the art pass lands.",
     )
 
 
@@ -632,34 +690,99 @@ def check_env_family_distinct() -> Check:
         "env.family_distinct", "4_distinct",
         "Silhouette families measure distinctly from one another",
         load_waivers(),
+        action="The named mesh measures flat where its locked signature is 'narrow "
+               "upright, single soft column'. Changing it means editing authored "
+               "geometry, which AGENTS.md forbids the agent doing and which is an "
+               "art decision regardless. Lead ruled 2026-10-04 to leave it RED for "
+               "the art pass - so the correct action right now is none, and G-ENV "
+               "stays RED until then.",
     )
 
 
-def _manifest_rows() -> list[tuple[str, str, int]]:
-    """(category, filename, recorded_size) for every FBX row in the export manifest.
+def _manifest_rows() -> tuple[list[tuple[str, str, int]], list[str]]:
+    """(category, filename, recorded_size) per FBX row, plus rows we could not read.
 
-    The manifest is the only inventory of what Blender has handed to Unreal. It is
-    also, as of 2026-10-04, the only thing that noticed an export had gone stale -
-    see check_env_export_fresh.
+    Returns two lists, not one. A caller that only sees the parsed rows cannot
+    distinguish "the manifest lists 20 exports" from "the manifest lists 23 and 3
+    of them are malformed" - and those are very different states. The first draft
+    skipped anything it could not parse, silently, so three exports could vanish
+    from the staleness inventory while the row still reported PASS.
+
+    Containment is enforced here because the manifest is a markdown table a human
+    edits. Without it, a row reading `../../../../somewhere/else.fbx` stats a file
+    outside the export tree and reports it covered, while the real FBX it was
+    meant to describe drops out of the inventory undetected.
     """
     rows: list[tuple[str, str, int]] = []
+    rejected: list[str] = []
     if not EXPORT_MANIFEST.is_file():
-        return rows
-    for line in EXPORT_MANIFEST.read_text(encoding="utf-8", errors="replace").splitlines():
+        return rows, rejected
+
+    exports_root = EXPORT_MANIFEST.parent.resolve()
+    for line in EXPORT_MANIFEST.read_text(
+            encoding="utf-8", errors="replace").splitlines():
         if ".fbx" not in line or "`" not in line:
             continue
         cells = [c.strip() for c in line.strip().strip("|").split("|")]
-        if len(cells) < 3:
-            continue
-        name = cells[1].strip("`").strip()
+        name = cells[1].strip("`").strip() if len(cells) > 1 else ""
+
+        # Is this an export row at all? The manifest holds more than one table -
+        # collision proxies have `UCX_SM_Cabin` | `5.5 x 4.5 x 5.5` |
+        # `Homestead/SM_Cabin.fbx`, and an export row's own Contents column
+        # mentions UCX names too. Column 2 being an .fbx filename is what
+        # separates them, so anything else is a different table and is skipped
+        # rather than reported as broken.
         if not name.lower().endswith(".fbx"):
             continue
-        try:
-            size = int(cells[2])
-        except ValueError:
+
+        # From here the row CLAIMS to be an export, so anything wrong with it is
+        # a real defect: an export this checker cannot read is an export it
+        # cannot watch, which is the fail-open that shipped in the first draft.
+        reason = ""
+        if len(cells) < 3:
+            reason = "fewer than 3 columns"
+        else:
+            try:
+                int(cells[2])
+            except ValueError:
+                reason = "byte count is not a number: %r" % cells[2]
+        if reason:
+            rejected.append("%s (%s)" % (line.strip()[:70], reason))
             continue
-        rows.append((cells[0], name, size))
-    return rows
+
+        category = cells[0]
+        candidate = (exports_root / category / name).resolve()
+        if (Path(category).name != category
+                or Path(name).name != name
+                or not candidate.is_relative_to(exports_root)):
+            rejected.append("%s / %s (path escapes the export tree)"
+                            % (category, name))
+            continue
+        rows.append((category, name, int(cells[2])))
+    return rows, rejected
+
+
+def _island_fbx() -> Path | None:
+    """The island's exported FBX, located through the manifest rather than guessed."""
+    rows, _ = _manifest_rows()
+    for category, name, _size in rows:
+        if name == ISLAND_MESH + ".fbx":
+            return EXPORT_MANIFEST.parent / category / name
+    return None
+
+
+def _parse_iso(value: Any) -> datetime | None:
+    """datetime.fromisoformat, tolerating a trailing Z. None rather than raising."""
+    if not isinstance(value, str) or not value.strip():
+        return None
+    text = value.strip()
+    if text.endswith(("Z", "z")):
+        text = text[:-1] + "+00:00"
+    try:
+        return datetime.fromisoformat(text)
+    except ValueError:
+        return None
+
 
 
 def check_env_export_fresh() -> Check:
@@ -698,7 +821,7 @@ def check_env_export_fresh() -> Check:
     unverified rather than wrong, and FAIL would push someone to hand-edit a size
     rather than re-run the export.
     """
-    rows = _manifest_rows()
+    rows, rejected = _manifest_rows()
     if not rows:
         return Check(
             "env.export_fresh", "G-ENV",
@@ -707,19 +830,35 @@ def check_env_export_fresh() -> Check:
             MISSING,
             "The export manifest is missing or has no parseable FBX rows. Without it "
             "there is no inventory of what Blender has handed to Unreal.",
+            next_action="Restore or regenerate "
+                        "AssetCreation/Exports/MVP_EXPORT_MANIFEST.md. Its byte "
+                        "counts are the only reference this row has.",
         )
 
     exports_root = EXPORT_MANIFEST.parent
     stale: list[str] = []
     missing: list[str] = []
+    tiny: list[str] = []
+    listed: set[str] = set()
     for category, name, recorded in rows:
+        listed.add(name)
         path = exports_root / category / name
         if not path.is_file():
             missing.append(name)
             continue
         actual = path.stat().st_size
-        if actual != recorded:
+        if actual < MIN_FBX_BYTES or recorded < MIN_FBX_BYTES:
+            tiny.append(f"{name} {actual} bytes on disk, {recorded} in manifest")
+        elif actual != recorded:
             stale.append(f"{name} manifest {recorded} != disk {actual}")
+
+    # The other direction. The first draft only ever walked the manifest, so an
+    # export added to disk without a manifest row was invisible forever: it could
+    # not be found stale because it was not in the inventory. Comparing against
+    # the filesystem too makes the inventory two-sided, and it is why this row
+    # needs no magic row count - adding an export cannot make the row pass by
+    # being unrecorded.
+    unlisted = sorted({p.name for p in exports_root.rglob("*.fbx")} - listed)
 
     blend_mtime = LIB_BLEND.stat().st_mtime if LIB_BLEND.is_file() else None
     behind = 0
@@ -730,6 +869,15 @@ def check_env_export_fresh() -> Check:
             and (exports_root / category / name).stat().st_mtime < blend_mtime - 1.0)
 
     note_bits: list[str] = []
+    if rejected:
+        note_bits.append("manifest rows this check cannot read (an export it "
+                         "cannot read is an export it cannot watch): "
+                         + " | ".join(rejected[:4]))
+    if unlisted:
+        note_bits.append("on disk but not in the manifest: "
+                         + ", ".join(unlisted[:6]))
+    if tiny:
+        note_bits.append("too small to be an export: " + "; ".join(tiny[:4]))
     if stale:
         note_bits.append("re-export needed, size differs from manifest: "
                          + "; ".join(stale))
@@ -740,22 +888,64 @@ def check_env_export_fresh() -> Check:
         f"and is not counted - one object's edit touches the whole file")
 
     question = "Every exported FBX matches the size the manifest recorded"
+    target = f"0 stale of {len(rows)}"
+    notes = " | ".join(note_bits)
+
+    # Order matters: an unreadable or unrecorded inventory makes every other
+    # verdict on this row meaningless, so those come first.
+    if rejected:
+        return Check(
+            "env.export_fresh", "G-ENV", question, _rel(EXPORT_MANIFEST),
+            f"{len(rejected)} unreadable of {len(rows) + len(rejected)}", target,
+            FAIL, notes,
+            next_action="Fix the malformed rows in "
+                        "AssetCreation/Exports/MVP_EXPORT_MANIFEST.md: every FBX "
+                        "row needs Category | `Name.fbx` | byte-count. A row this "
+                        "checker cannot parse is an export it cannot watch.",
+        )
+    if unlisted:
+        return Check(
+            "env.export_fresh", "G-ENV", question, _rel(EXPORT_MANIFEST),
+            f"{len(unlisted)} unlisted of {len(rows)}", target, FAIL, notes,
+            next_action="Add each listed FBX to MVP_EXPORT_MANIFEST.md with its "
+                        "real byte count, or delete the export if it was "
+                        "accidental. Do not add the row with a guessed size - an "
+                        "export nobody recorded is how this chain broke once.",
+        )
+    if tiny:
+        return Check(
+            "env.export_fresh", "G-ENV", question, _rel(EXPORT_MANIFEST),
+            f"{len(tiny)} under {MIN_FBX_BYTES} bytes of {len(rows)}", target,
+            FAIL, notes,
+            next_action=f"Re-export the named FBX from the .blend. A real export "
+                        f"here is ~15 kB or more; a file under {MIN_FBX_BYTES} "
+                        f"bytes means the export failed and wrote a stub. The "
+                        f"smallest real one on disk is 15116 bytes.",
+        )
     if stale:
         return Check(
             "env.export_fresh", "G-ENV", question, _rel(EXPORT_MANIFEST),
-            f"{len(stale)} stale of {len(rows)}", f"0 stale of {len(rows)}",
-            FAIL, " | ".join(note_bits),
+            f"{len(stale)} stale of {len(rows)}", target, FAIL, notes,
+            next_action="Re-export the named FBX from the .blend through "
+                        "AssetCreation/Blender/export_to_asset_creation.py, then "
+                        "update its byte count in "
+                        "AssetCreation/Exports/MVP_EXPORT_MANIFEST.md. Do not hand-"
+                        "edit the size to make this row green - a hand-edited size "
+                        "is exactly the failure this row exists to catch.",
         )
     if missing:
         return Check(
             "env.export_fresh", "G-ENV", question, _rel(EXPORT_MANIFEST),
-            f"0 stale, {len(missing)} absent of {len(rows)}",
-            f"0 stale of {len(rows)}", MISSING, " | ".join(note_bits),
+            f"0 stale, {len(missing)} absent of {len(rows)}", target,
+            MISSING, notes,
+            next_action="Export the missing FBX, or delete its row from the "
+                        "manifest if the object was retired. MISSING rather than "
+                        "FAIL on purpose: hand-fixing the manifest is the wrong "
+                        "move here.",
         )
     return Check(
         "env.export_fresh", "G-ENV", question, _rel(EXPORT_MANIFEST),
-        f"0 stale of {len(rows)}", f"0 stale of {len(rows)}", PASS,
-        " | ".join(note_bits),
+        f"0 stale of {len(rows)}", target, PASS, notes,
     )
 
 
@@ -772,6 +962,15 @@ def check_env_ue_island_measured() -> Check:
     in-editor script writes (Content/Python/measure_ue_island.py). Until somebody
     runs it, this row is MISSING and the gate says so out loud rather than letting
     a Blender-side PASS imply an engine-side one.
+
+    LOCAL, NOT WORLD. The record carries `local_bbox_cm` - the mesh's own
+    bounds - and that is the field compared here. Blender's report is also
+    object-space (`max(xs) - min(xs)` over vertices), so the two are the same
+    kind of quantity. The first draft compared Blender's object-space box
+    against `get_actor_bounds`, which is a world-space AABB. Those disagree
+    whenever the island actor is rotated at all, so the row would have failed
+    on a correctly placed island. World bounds are still recorded, as
+    information; actor scale is checked separately and exactly.
 
     Units: the record is in Unreal centimetres, the comparison is in Blender
     metres. A conversion that is quietly wrong would move the number by 100x, so
@@ -806,51 +1005,169 @@ def check_env_ue_island_measured() -> Check:
         )
         return Check("env.ue_island_measured", "G-ENV", question,
                      _rel(UE_ISLAND_MEASUREMENT), measured, "agrees",
-                     MISSING, note + tail)
+                     MISSING, note + tail,
+                     next_action="1. blender --background "
+                                 "blender/floating_island_homestead_LIB.blend "
+                                 "--python "
+                                 "AssetCreation/Blender/apply_island_plate.py  "
+                                 "(already done 2026-10-04)"
+                                 "  2. re-export SM_IslandTop -> "
+                                 "AssetCreation/Exports/Homestead/"
+                                 "(already done, commit e08b756)"
+                                 "  3. in-editor: re-import the FBX over "
+                                 "Content/HomeWorld/Meshes/Homestead/"
+                                 "SM_IslandTop.uasset"
+                                 "  4. in-editor: re-place the island actor if "
+                                 "its transform moved"
+                                 "  5. in-editor: run "
+                                 "Content/Python/measure_ue_island.py, then commit "
+                                 "Docs/qa/UE_ISLAND_MEASUREMENT.json")
 
     data = _read_json(UE_ISLAND_MEASUREMENT)
     if data is None:
         return unmeasured("no artifact")
 
-    raw = data.get("bbox_cm")
-    if not (isinstance(raw, (list, tuple)) and len(raw) >= 2):
-        return unmeasured("no bbox_cm")
+    def invalid(measured: str, why: str, state: str = MISSING) -> Check:
+        return Check("env.ue_island_measured", "G-ENV", question,
+                     _rel(UE_ISLAND_MEASUREMENT), measured, "agrees", state, why,
+                     next_action="Re-run Content/Python/measure_ue_island.py in "
+                                 "the editor and commit what it writes. It only "
+                                 "reads. Do not hand-edit the record - the record "
+                                 "is the evidence, and editing evidence is how it "
+                                 "stops being any.")
 
-    try:
-        ue_x_m, ue_y_m = float(raw[0]) / 100.0, float(raw[1]) / 100.0
-    except (TypeError, ValueError):
-        return Check(
-            "env.ue_island_measured", "G-ENV", question,
-            _rel(UE_ISLAND_MEASUREMENT), f"unparseable {raw!r}", "agrees", MISSING,
-            "bbox_cm holds something that is not two numbers.",
-        )
+    # --- provenance -----------------------------------------------------
+    # Reading bbox_cm alone meant a record could name any level, any asset and
+    # any date and still pass, forever. Three cheap bindings close that, and each
+    # corresponds to a way this measurement can be worthless.
+    blanks = [k for k in ("asset", "level", "measured_at")
+              if not str(data.get(k) or "").strip()]
+    if blanks:
+        return unmeasured(
+            "no " + ", ".join(blanks),
+            " The record has to say what was measured, where, and when - a bare "
+            "number is not evidence.")
 
-    # 2% of the span, or 1 m, whichever is larger. The point is to catch an
-    # un-reimported asset (180 vs 19.3 is a 9x error), not to adjudicate
-    # centimetre-level disagreement between two engines.
-    tol = max(1.0, source_m[0] * 0.02)
-    off_x = abs(ue_x_m - source_m[0])
-    off_y = abs(ue_y_m - source_m[1])
-    worst = max(off_x, off_y)
-    measured = f"UE {ue_x_m:.1f} x {ue_y_m:.1f} m"
-    target = f"Blender {source_m[0]:.1f} x {source_m[1]:.1f} m"
-    if worst <= tol:
-        state, note = PASS, f"within {tol:.2f} m; raw {list(raw)} cm"
+    if data["asset"] != ISLAND_MESH:
+        return invalid(f"record names {data['asset']!r}",
+                       f"This row is about {ISLAND_MESH}. The record says it "
+                       f"measured {data['asset']!r}, which is a different object, "
+                       f"so its number cannot answer the question. Check that the "
+                       f"island is placed under a mesh named {ISLAND_MESH}.",
+                       FAIL)
+
+    level = str(data["level"])
+    maps_dir = ROOT / "Content" / "HomeWorld" / "Maps"
+    known_levels = {p.stem for p in maps_dir.rglob("*.umap")} if maps_dir.is_dir() else set()
+    if level not in known_levels:
+        return invalid(f"level {level!r} is not a map in this project",
+                       f"The record was taken in {level!r}, which is not a .umap "
+                       f"under Content/HomeWorld/Maps. Known levels: "
+                       f"{', '.join(sorted(known_levels)) or 'none found'}.", FAIL)
+
+    # --- freshness ------------------------------------------------------
+    # A record written before the FBX was last exported describes the previous
+    # export. This is the one legitimate use of a timestamp in this file: it
+    # compares two whole files that are each a complete build of the same thing,
+    # which is exactly what the retracted per-object mtime heuristic could not do.
+    stamp = _parse_iso(data["measured_at"])
+    if stamp is None:
+        return invalid(f"measured_at {data['measured_at']!r} is not a timestamp",
+                       "measured_at must be an ISO 8601 timestamp, as written by "
+                       "the measuring script.")
+    fbx = _island_fbx()
+    if fbx is not None and fbx.is_file():
+        fbx_mtime = fbx.stat().st_mtime
+        try:
+            fresh = stamp.timestamp() >= fbx_mtime - 1.0
+        except (OverflowError, OSError, ValueError):
+            fresh = True
+        if not fresh:
+            return invalid(
+                f"measured {data['measured_at']}, before the {fbx.name} export",
+                f"The measurement predates the FBX export, so it describes the "
+                f"previous geometry. Re-import and re-measure. This row exists "
+                f"because a record that outlives its export is indistinguishable "
+                f"from one that confirms it.", FAIL)
+
+    # --- the numbers ----------------------------------------------------
+    raw = data.get("local_bbox_cm")
+    if raw is None and data.get("bbox_cm") is not None:
+        return invalid("record has bbox_cm but no local_bbox_cm",
+                       "bbox_cm is the actor's WORLD bounds. Blender reports the "
+                       "mesh's object-space dimensions, and the two disagree on "
+                       "any rotated island, so comparing them would fail a correct "
+                       "measurement. The script writes local_bbox_cm - re-run it.")
+    if not (isinstance(raw, (list, tuple)) and len(raw) >= 3):
+        return unmeasured("no local_bbox_cm")
+
+    values = []
+    for v in raw[:3]:
+        # bool is an int subclass, and a numeric string is not a measurement.
+        if isinstance(v, bool) or not isinstance(v, (int, float)):
+            return invalid(f"unparseable local_bbox_cm {list(raw)!r}",
+                           "local_bbox_cm must be three numbers in centimetres.")
+        values.append(float(v))
+
+    if not all(math.isfinite(v) for v in values):
+        # `max(a, b)` returns a whenever b > a is False, and NaN > x is always
+        # False - so a NaN in the second slot used to be silently discarded by
+        # max() and the row reported PASS with "off by nan" in its own note.
+        return invalid(f"non-finite local_bbox_cm {list(raw)!r}",
+                       "NaN and Infinity are not measurements. This is not a "
+                       "hypothetical: JSON accepts the bare literal `NaN`, and "
+                       "comparing it with max() silently passed.")
+
+    scaled = [str(a) for a in (data.get("non_unit_scale_actors") or [])
+              if str(a).strip()]
+    if scaled:
+        return invalid(f"{len(scaled)} actor(s) at non-unit scale",
+                       "The mesh may be the right one and the island still wrong: "
+                       "actor(s) " + ", ".join(scaled) + " are scaled. Reset the "
+                       "transform scale to 1 and re-measure.", FAIL)
+
+    ue_x_m, ue_y_m, ue_z_m = values[0] / 100.0, values[1] / 100.0, values[2] / 100.0
+    src_x, src_y, src_z = source_m[0], source_m[1], source_m[2]
+
+    # 2% of each span independently, floored at 1 m. The first draft derived the
+    # tolerance from X alone and applied it to Y as well, which made the 100 m
+    # axis 3.6% rather than the stated 2%.
+    tol_x = max(1.0, src_x * 0.02)
+    tol_y = max(1.0, src_y * 0.02)
+    # Z is 0.45 m, where 1 m of tolerance would be meaningless, so it gets its
+    # own absolute floor.
+    tol_z = max(0.05, src_z * 0.10)
+
+    off_x = abs(ue_x_m - src_x)
+    off_y = abs(ue_y_m - src_y)
+    off_z = abs(ue_z_m - src_z)
+    # Written as three explicit comparisons rather than max(): with max(), one
+    # NaN decides the verdict by position, not by value.
+    within = off_x <= tol_x and off_y <= tol_y and off_z <= tol_z
+
+    measured = f"UE {ue_x_m:.1f} x {ue_y_m:.1f} x {ue_z_m:.2f} m in {level}"
+    target = f"Blender {src_x:.1f} x {src_y:.1f} x {src_z:.2f} m"
+    if within:
+        state = PASS
+        note = (f"within {tol_x:.2f}/{tol_y:.2f}/{tol_z:.2f} m on X/Y/Z; raw "
+                f"{list(raw)} cm; actor scale 1; measured {data['measured_at']}")
     else:
         state = FAIL
-        note = (f"off by {off_x:.2f} m in X and {off_y:.2f} m in Y, tol {tol:.2f}. "
-                f"Blender says {source_m[0]:.1f} x {source_m[1]:.1f} m, Unreal says "
-                f"{ue_x_m:.1f} x {ue_y_m:.1f} m. The usual cause is an FBX that was "
-                f"re-exported and never re-imported, so the .uasset and the level "
-                f"still hold the older mesh. Re-import and re-place, then re-run "
-                f"the measuring script. Raw: {list(raw)} cm.")
+        note = (f"off by {off_x:.2f} m in X, {off_y:.2f} m in Y, {off_z:.2f} m "
+                f"in Z (tol {tol_x:.2f}/{tol_y:.2f}/{tol_z:.2f}). "
+                f"Blender says {src_x:.1f} x {src_y:.1f} x {src_z:.2f} m, Unreal "
+                f"says {ue_x_m:.1f} x {ue_y_m:.1f} x {ue_z_m:.2f} m. The usual "
+                f"cause is an FBX that was re-exported and never re-imported, so "
+                f"the .uasset and the level still hold the older mesh. Re-import "
+                f"and re-place, then re-run the measuring script. Raw: "
+                f"{list(raw)} cm.")
     return Check(
         "env.ue_island_measured", "G-ENV", question,
         _rel(UE_ISLAND_MEASUREMENT), measured, target, state, note,
     )
 
 
-def _island_bbox_blender_m() -> tuple[float, float] | None:
+def _island_bbox_blender_m() -> tuple[float, float, float] | None:
     """SM_IslandTop's measured footprint in metres, from the greybox report."""
     report = _read_json(GRAYBOX_REPORT)
     if not isinstance(report, dict):
@@ -859,12 +1176,15 @@ def _island_bbox_blender_m() -> tuple[float, float] | None:
     if not isinstance(entry, dict):
         return None
     bbox = entry.get("bbox")
-    if not (isinstance(bbox, (list, tuple)) and len(bbox) >= 2):
+    if not (isinstance(bbox, (list, tuple)) and len(bbox) >= 3):
         return None
     try:
-        return float(bbox[0]), float(bbox[1])
+        values = tuple(float(v) for v in bbox[:3])
     except (TypeError, ValueError):
         return None
+    if not all(math.isfinite(v) for v in values):
+        return None
+    return values
 
 
 def check_env_island_sized() -> Check:
@@ -1047,6 +1367,10 @@ def check_asset_board() -> Check:
             "Stage is not one of Docs/37_POLISH_PASS_PROCESS.md's ladder: "
             + "; ".join(bad_stage[:6])
             + ". Use the rung code (S0..S5) or its full label.",
+            next_action="Correct the stage values in "
+                        "Docs/qa/POLISH_ASSET_BOARD.json to a rung on the "
+                        "Docs/37_POLISH_PASS_PROCESS.md ladder. The gate accepts "
+                        "`S2`, `s2` and `S2 ART-BLOCKOUT` alike.",
         )
     if undeclared:
         return Check(
@@ -1059,6 +1383,11 @@ def check_asset_board() -> Check:
             "Declared but not recorded yet: " + ", ".join(undeclared[:6])
             + ". Each row needs a stage from the S0-S5 ladder and a priority, so a "
             "batch can be reviewed together at S2 rather than one at a time at S3.",
+            next_action="Fill `stage` and `priority` for each row in "
+                        "Docs/qa/POLISH_ASSET_BOARD.json. The ladder is S0..S5 (or "
+                        "its full label); `priority` is 1..10. This is triage, "
+                        "which is the Lead's call - the agent cannot know which "
+                        "master needs work first.",
         )
     return Check(
         "asset.board", "G-ASSET",
@@ -1151,6 +1480,12 @@ def check_feel_human_playtest() -> Check:
             "The record exists and the fields are empty. Fill in commit (the short "
             "sha you played), played_at, and notes. Until then no human has played "
             "this build.",
+            next_action="Play the build once, then write `commit` (git rev-parse "
+                        "--short HEAD), `played_at`, and `notes` into "
+                        "Docs/qa/POLISH_HUMAN_PLAYTEST.json. One honest pass with "
+                        "notes beats three empty ones - the field exists so the "
+                        "polish pass is judged against what happened, not against "
+                        "a memory.",
         )
     return Check(
         "feel.human_playtest", "G-FEEL",
@@ -1199,6 +1534,11 @@ def check_feel_tunable_baselines() -> Check:
             _rel(BASELINE_FILE), f"{len(measured)}/{len(FEEL_TUNABLES)} measured",
             ">=1 per tunable", MISSING,
             "Still unmeasured: " + ", ".join(pending) + ". Measured: " + measured_str + ".",
+            next_action="Read each tunables[] key out of Docs/qa/POLISH_BASELINE.json "
+                        "and record what the build uses TODAY, before any tuning. "
+                        "Read the live value from the editor or the log - do not "
+                        "copy the range out of Docs/canon/FEEL.md. The proposal is "
+                        "the destination; this is the baseline.",
         )
     return Check(
         "feel.tunable_baselines", "G-FEEL",
@@ -1225,6 +1565,11 @@ def check_feel_verb_script() -> Check:
             "8 verbs, each pass or documented fail", MISSING,
             "No human verb record. The only filed run is all-FAIL under a WAIVE "
             "(Docs/14 VP-A).",
+            next_action="Run the eight verbs in the order given in "
+                        "Docs/qa/POLISH_HUMAN_PLAYTEST.json and record pass or a "
+                        "documented fail per verb, in that file. V2 is the "
+                        "walk-off-the-edge test: leave the island in any direction "
+                        "and confirm you land in the field.",
         )
     results = {v: _verb_result(r) for v, r in verbs.items()}
     unrun = [v for v in MVP_VERBS if results.get(v) is None]
@@ -1243,6 +1588,10 @@ def check_feel_verb_script() -> Check:
             "broke. Run them in the order in POLISH_HUMAN_PLAYTEST.json and record "
             "either pass or a documented fail per verb."
             + (f" Keys outside the MVP eight: {', '.join(unknown)}." if unknown else ""),
+            next_action="Open Docs/qa/POLISH_HUMAN_PLAYTEST.json and work the "
+                        "`verbs` map top to bottom. Record what happened, not what "
+                        "was expected - a documented fail is a real result and "
+                        "FAIL already means 'ran and did not pass'.",
         )
     # An extra key does NOT block a pass -- the eight did run, and that is the
     # question this check asks. But it is named in the note rather than dropped,
@@ -1261,6 +1610,11 @@ def check_feel_verb_script() -> Check:
             FAIL,
             "Run and did not pass: " + ", ".join(failed)
             + ". Each needs a documented reason, not a retry until green." + extra,
+            next_action="For each named verb, write down why it failed before "
+                        "touching it again. A verb that fails for a mechanical "
+                        "reason is an agent task; a verb that fails because it does "
+                        "not feel right is the Lead's, and re-running it will not "
+                        "change that.",
         )
     return Check(
         "feel.verb_script", "G-FEEL",
@@ -1450,6 +1804,24 @@ def render_markdown(gates: dict[str, Gate], generated: str) -> str:
             A("")
             for c in notes:
                 A(f"- `{c.id}` — {c.note}")
+            A("")
+        # Next actions come after notes on purpose. A note says why a row is red;
+        # this says what to do. Keeping them in one prose blob is how 6 of 8
+        # blocked rows came to state a finding and no action - a reader could see
+        # what was wrong and still not know what to do about it.
+        blocked = [c for c in g.checks
+                   if c.state in (FAIL, MISSING, STALE) and not c.id.startswith("dep.")]
+        if blocked:
+            A("### What to do")
+            A("")
+            A("| Check | State | Next action |")
+            A("|---|---|---|")
+            for c in blocked:
+                action = c.next_action or "_none recorded - see the note_"
+                A(f"| `{c.id}` | **{c.state}** | {action} |")
+            A("")
+            A("A row with no recorded action is either agent-owned and unfinished,")
+            A("or deliberately held by the Lead. Both are worth saying out loud.")
             A("")
     A("## Stage ladder")
     A("")

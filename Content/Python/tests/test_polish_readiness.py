@@ -34,10 +34,13 @@ imports", never "these laws hold". Only host pytest runs them:
 `py -m pytest Content/Python/tests`.
 """
 
+import datetime
 import importlib.util
 import json
+import os
 import sys
 import tempfile
+import time
 import unittest
 from pathlib import Path
 
@@ -915,6 +918,12 @@ class TheExportChainCannotGoStale(unittest.TestCase):
 
     Neither alone is sufficient. A current FBX that was never re-imported passes the
     first and fails the second, which is the state this repo was actually in.
+
+    MOST OF THIS CLASS IS MUTATION-TESTED GUARD. An independent review of the
+    first version of these two checks found six ways to turn them green without
+    measuring anything, so each of those holes has a test that fails when it is
+    reopened. The bug this class exists to prevent is a gate that says PASS, and a
+    test that only exercises the happy path does not prevent it.
     """
 
     def setUp(self):
@@ -925,10 +934,12 @@ class TheExportChainCannotGoStale(unittest.TestCase):
 
     # -- helpers ---------------------------------------------------------
     def _use_manifest(self, rows):
-        """rows: list of (category, filename, recorded_size). Returns the path.
+        """rows: list of (category, filename, recorded_size). Returns the root.
 
-        The FBX files are created at exactly `recorded_size` bytes unless
-        `actual` overrides, so a row can be made stale on purpose.
+        Each FBX is created at exactly `recorded_size` bytes, so a row can be made
+        stale in either direction. Real exports here are ~15 kB and up and the check
+        enforces a floor, so fixtures use realistic sizes unless a test is
+        specifically about small ones.
         """
         td = tempfile.TemporaryDirectory()
         self.addCleanup(td.cleanup)
@@ -936,7 +947,8 @@ class TheExportChainCannotGoStale(unittest.TestCase):
         lines = ["# manifest", "", "| Category | File | Bytes | Target |",
                  "|---|---|---|---|"]
         for category, name, recorded in rows:
-            lines.append("| %s | `%s` | %d | %s |" % (category, name, recorded, name))
+            lines.append("| %s | `%s` | %d | %s |"
+                         % (category, name, recorded, name))
             target = root / category
             target.mkdir(parents=True, exist_ok=True)
             (target / name).write_bytes(b"\0" * recorded)
@@ -944,6 +956,28 @@ class TheExportChainCannotGoStale(unittest.TestCase):
         path.write_text("\n".join(lines) + "\n", encoding="utf-8")
         pr.EXPORT_MANIFEST = path
         return root
+
+    def _now_iso(self):
+        return datetime.datetime.now(datetime.timezone.utc).isoformat(
+            timespec="seconds")
+
+    def _record(self, **over):
+        """A record valid in every respect except whatever the test changes.
+
+        Without this, every provenance test would also be testing the provenance of
+        whatever ad-hoc dict that test happened to write, and a test named for a
+        NaN would go red for an unrelated missing `level`.
+        """
+        body = {
+            "measured_at": self._now_iso(),
+            "level": "MainMenu",
+            "asset": "SM_IslandTop",
+            "actors_found": 1,
+            "local_bbox_cm": [18000.0, 10000.0, 45.0],
+            "non_unit_scale_actors": [],
+        }
+        body.update(over)
+        return body
 
     def _use_record(self, body):
         td = tempfile.TemporaryDirectory()
@@ -955,13 +989,15 @@ class TheExportChainCannotGoStale(unittest.TestCase):
 
     # -- env.export_fresh ------------------------------------------------
     def test_shipped_manifest_agrees_with_every_fbx_on_disk(self):
-        """The real assertion about the real repo: 23 rows, none stale.
+        """The real assertion about the real repo: rows parse, none stale, none
+        unlisted.
 
-        This is the check that names SM_IslandTop when the plate is applied and the
-        export is forgotten. If it ever goes FAIL on a quiet tree, an export is
-        genuinely out of step with the manifest.
+        Two-sided on purpose. Comparing only against the manifest cannot notice an
+        export that was added to disk and never recorded, which is the shape of the
+        original failure - a file the inventory does not know about.
         """
-        rows = pr._manifest_rows()
+        rows, rejected = pr._manifest_rows()
+        self.assertEqual(rejected, [], "the shipped manifest has unreadable rows")
         self.assertGreaterEqual(len(rows), 20,
                                 "manifest stopped parsing most of its rows")
         self.assertEqual(pr.check_env_export_fresh().state, pr.PASS)
@@ -975,15 +1011,120 @@ class TheExportChainCannotGoStale(unittest.TestCase):
         self.assertIn("SM_IslandTop.fbx", c.note)
         self.assertIn("15676", c.note)
 
+    def test_an_export_that_grew_is_also_stale(self):
+        """The comparison must be `!=`, not `<`.
+
+        An export that gained geometry is the common case, and `if actual <
+        recorded` - which reads as "an export cannot be smaller than the manifest
+        says" - accepts every one of them silently. The first version of this test
+        only made the file smaller, so that edit left the suite green.
+        """
+        self._use_manifest([("Homestead", "SM_IslandTop.fbx", 15692)])
+        (pr.EXPORT_MANIFEST.parent / "Homestead" / "SM_IslandTop.fbx").write_bytes(
+            b"\0" * 20000)
+        c = pr.check_env_export_fresh()
+        self.assertEqual(c.state, pr.FAIL)
+        self.assertIn("20000", c.note)
+
+    def test_an_export_on_disk_that_the_manifest_never_heard_of_is_fail(self):
+        """The direction the first version could not see at all.
+
+        It walked the manifest, so an FBX nobody recorded was not in the inventory.
+        It could never be found stale, because as far as the gate was concerned it
+        did not exist.
+        """
+        self._use_manifest([("Homestead", "SM_IslandTop.fbx", 15692)])
+        stray = pr.EXPORT_MANIFEST.parent / "Homestead" / "SM_Smuggled.fbx"
+        stray.write_bytes(b"\0" * 15692)
+        c = pr.check_env_export_fresh()
+        self.assertEqual(c.state, pr.FAIL)
+        self.assertIn("SM_Smuggled.fbx", c.note)
+        self.assertIn("not in the manifest", c.note)
+
+    def test_a_malformed_export_row_is_fail_not_skipped(self):
+        """A row the checker cannot read is an export it cannot watch.
+
+        The first version skipped anything whose byte count would not parse, so
+        three exports could disappear from the inventory while the row still said
+        PASS - the parser's own fail-open, tolerated by a test that only ever
+        counted rows.
+        """
+        root = self._use_manifest([("Homestead", "SM_IslandTop.fbx", 15692)])
+        manifest = root / "MVP_EXPORT_MANIFEST.md"
+        manifest.write_text(
+            manifest.read_text(encoding="utf-8")
+            + "| Homestead | `SM_Broken.fbx` | not-a-number | x |\n",
+            encoding="utf-8")
+        c = pr.check_env_export_fresh()
+        self.assertEqual(c.state, pr.FAIL)
+        self.assertIn("cannot read", c.note)
+
+    def test_a_manifest_row_whose_path_escapes_the_export_tree_is_reported(self):
+        """`../../..` in a category cell would otherwise stat a file outside
+        AssetCreation/Exports and call it covered, while the real FBX it was meant
+        to describe drops out of the inventory undetected."""
+        td = tempfile.TemporaryDirectory()
+        self.addCleanup(td.cleanup)
+        root = Path(td.name)
+        (root / "Homestead").mkdir(parents=True, exist_ok=True)
+        (root / "Homestead" / "SM_IslandTop.fbx").write_bytes(b"\0" * 15692)
+        (root / "MVP_EXPORT_MANIFEST.md").write_text(
+            "| C | F | B |\n|---|---|---|\n"
+            "| Homestead | `SM_IslandTop.fbx` | 15692 | x |\n"
+            "| ../../../../etc | `passwd.fbx` | 10 | x |\n",
+            encoding="utf-8")
+        pr.EXPORT_MANIFEST = root / "MVP_EXPORT_MANIFEST.md"
+        rows, rejected = pr._manifest_rows()
+        self.assertEqual([r[1] for r in rows], ["SM_IslandTop.fbx"])
+        self.assertTrue(any("escapes" in r for r in rejected),
+                        "a path outside the export tree must be reported")
+
+    def test_a_zero_byte_export_is_fail_not_agreement(self):
+        """A 0-byte file whose manifest row also said 0 was a clean PASS.
+
+        Both sides agreed and both were empty. The smallest real export in the
+        manifest is 15116 bytes, so a floor well under that is safe.
+        """
+        self._use_manifest([("Homestead", "SM_IslandTop.fbx", 0)])
+        (pr.EXPORT_MANIFEST.parent / "Homestead" / "SM_IslandTop.fbx").write_bytes(b"")
+        c = pr.check_env_export_fresh()
+        self.assertEqual(c.state, pr.FAIL)
+        self.assertIn("too small", c.note)
+
+    def test_a_collision_proxy_row_is_not_an_export_row(self):
+        """The manifest holds more than one table.
+
+        Collision proxies read `UCX_SM_Cabin` | `5.5 x 4.5 x 5.5` |
+        `Homestead/SM_Cabin.fbx`, and an export row's own Contents column mentions
+        UCX names too. Reporting those as malformed export rows would be a false RED
+        on a correct manifest, which is how a real gate gets ignored.
+        """
+        td = tempfile.TemporaryDirectory()
+        self.addCleanup(td.cleanup)
+        root = Path(td.name)
+        (root / "Homestead").mkdir(parents=True, exist_ok=True)
+        (root / "Homestead" / "SM_Cabin.fbx").write_bytes(b"\0" * 81196)
+        (root / "MVP_EXPORT_MANIFEST.md").write_text(
+            "| Category | File | Bytes | Contents |\n|---|---|---|---|\n"
+            "| Homestead | `SM_Cabin.fbx` | 81196 | SM_Cabin_* + UCX_SM_Cabin"
+            " - (1680 tris; UCX 5.5x4.5x5.5) |\n"
+            "| `UCX_SM_Cabin` | 5.5 x 4.5 x 5.5 | `Homestead/SM_Cabin.fbx` |\n",
+            encoding="utf-8")
+        pr.EXPORT_MANIFEST = root / "MVP_EXPORT_MANIFEST.md"
+        rows, rejected = pr._manifest_rows()
+        self.assertEqual([r[1] for r in rows], ["SM_Cabin.fbx"])
+        self.assertEqual(rejected, [])
+        self.assertEqual(pr.check_env_export_fresh().state, pr.PASS)
+
     def test_a_listed_but_absent_file_is_missing_not_fail(self):
         """FAIL here would push someone to hand-edit a size instead of exporting."""
-        self._use_manifest([("Homestead", "SM_IslandTop.fbx", 100)])
+        self._use_manifest([("Homestead", "SM_IslandTop.fbx", 15692)])
         (pr.EXPORT_MANIFEST.parent / "Homestead" / "SM_IslandTop.fbx").unlink()
         self.assertEqual(pr.check_env_export_fresh().state, pr.MISSING)
 
     def test_an_unparseable_manifest_is_missing(self):
         self._use_manifest([])
-        (pr.EXPORT_MANIFEST).write_text("# nothing here\n", encoding="utf-8")
+        pr.EXPORT_MANIFEST.write_text("# nothing here\n", encoding="utf-8")
         self.assertEqual(pr.check_env_export_fresh().state, pr.MISSING)
 
     def test_fbx_predating_the_blend_is_a_hint_not_a_failure(self):
@@ -996,29 +1137,52 @@ class TheExportChainCannotGoStale(unittest.TestCase):
 
         A whole-file timestamp cannot describe per-object change. The number is
         still printed so a human can see it; it must not decide the verdict.
+
+        This constructs the condition on purpose. The first version of this test
+        asserted against the live repo, where the blend happened to be newer than
+        every export - so it passed whether or not the `behind` count was computed
+        at all. Deleting the entire calculation left it green.
         """
+        root = self._use_manifest([("Homestead", "SM_IslandTop.fbx", 15692)])
+        blend = root / "lib.blend"
+        blend.write_bytes(b"x")
+        saved_blend = pr.LIB_BLEND
+        pr.LIB_BLEND = blend
+        self.addCleanup(setattr, pr, "LIB_BLEND", saved_blend)
+        future = time.time() + 86400
+        os.utime(blend, (future, future))
         c = pr.check_env_export_fresh()
-        self.assertEqual(c.state, pr.PASS)
+        self.assertEqual(c.state, pr.PASS,
+                         "an FBX older than the .blend is a hint, not a failure")
         self.assertIn("hint:", c.note)
+        self.assertIn("1 of 1", c.note, "the hint must actually count something")
         self.assertIn("not counted", c.note)
-        self.assertNotIn("stale,", c.measured)
 
     # -- env.ue_island_measured -----------------------------------------
-    def test_shipped_record_reads_missing_and_names_the_gap(self):
-        """Nobody has measured the island in the editor yet. That is MISSING.
+    def test_shipped_record_is_not_yet_measured(self):
+        """Nobody has measured the island in the editor yet, so the row reads
+        MISSING - not PASS (nobody checked) and not FAIL (nobody claims it is
+        wrong).
 
-        It must not read PASS (nobody checked) or FAIL (nobody claims it is wrong),
-        and the note has to say what to run, because "MISSING" alone would leave a
-        reader guessing which of the two hops is unverified.
+        Asserted against the live state rather than hard-coded to MISSING, so that
+        doing the work does not turn the suite red and tempt someone into deleting
+        the assertion. The first version hard-coded MISSING, which meant completing
+        the task would have broken the very test guarding it.
         """
         shipped = ROOT / "Docs" / "qa" / "UE_ISLAND_MEASUREMENT.json"
         self.assertTrue(shipped.is_file(), "UE_ISLAND_MEASUREMENT.json missing")
-        self._use_record(json.loads(shipped.read_text(encoding="utf-8")))
+        body = json.loads(shipped.read_text(encoding="utf-8"))
+        self._use_record(body)
         c = pr.check_env_ue_island_measured()
-        self.assertEqual(c.state, pr.MISSING)
-        self.assertNotEqual(c.state, pr.PASS)
-        self.assertNotEqual(c.state, pr.FAIL)
-        self.assertIn("measure_ue_island.py", c.note)
+        if body.get("local_bbox_cm") is None:
+            self.assertEqual(c.state, pr.MISSING)
+            self.assertIn("measure_ue_island.py", c.note)
+        else:
+            # Somebody measured it. The row now owes them a real verdict, and the
+            # measurement has to be a real one.
+            self.assertIn(c.state, (pr.PASS, pr.FAIL))
+            self.assertIsNotNone(body.get("level"))
+            self.assertIsNotNone(body.get("measured_at"))
 
     def test_the_real_pre_plate_size_would_fail(self):
         """The numbers this repo was actually in, fed back through the check.
@@ -1026,7 +1190,7 @@ class TheExportChainCannotGoStale(unittest.TestCase):
         1930 x 1070 cm is what the 2026-09-28 .uasset held. If this ever reads PASS
         the comparison is broken, and that is the one thing this row exists to stop.
         """
-        self._use_record({"bbox_cm": [1930.0, 1070.0, 45.0]})
+        self._use_record(self._record(local_bbox_cm=[1930.0, 1070.0, 45.0]))
         c = pr.check_env_ue_island_measured()
         self.assertEqual(c.state, pr.FAIL)
         self.assertIn("180.0", c.target)
@@ -1034,25 +1198,153 @@ class TheExportChainCannotGoStale(unittest.TestCase):
         self.assertIn("re-import", c.note)
 
     def test_a_matching_measurement_passes(self):
-        self._use_record({"bbox_cm": [18000.0, 10000.0, 45.0]})
+        self._use_record(self._record())
         self.assertEqual(pr.check_env_ue_island_measured().state, pr.PASS)
 
     def test_small_drift_within_tolerance_passes(self):
         """The point is to catch an un-reimported asset, not to adjudicate
         centimetre-level disagreement between two engines."""
-        self._use_record({"bbox_cm": [18040.0, 9980.0, 45.0]})
+        self._use_record(self._record(local_bbox_cm=[18040.0, 9980.0, 45.0]))
         self.assertEqual(pr.check_env_ue_island_measured().state, pr.PASS)
 
+    def test_the_y_axis_is_checked_independently(self):
+        """X correct, Y wrong. The first version had no such test.
+
+        Removing `off_y` from the comparison left every test green, which is what a
+        check with one untested axis looks like.
+        """
+        self._use_record(self._record(local_bbox_cm=[18000.0, 4000.0, 45.0]))
+        c = pr.check_env_ue_island_measured()
+        self.assertEqual(c.state, pr.FAIL)
+        self.assertIn("in Y", c.note)
+
+    def test_the_z_axis_is_checked_too(self):
+        """A flattened island is the wrong island.
+
+        Z was read from the source report and never compared, so a
+        180 x 100 x 0.05 plate passed a row written for a 180 x 100 x 0.45 one.
+        """
+        self._use_record(self._record(local_bbox_cm=[18000.0, 10000.0, 5.0]))
+        c = pr.check_env_ue_island_measured()
+        self.assertEqual(c.state, pr.FAIL)
+        self.assertIn("in Z", c.note)
+
+    def test_nan_in_any_slot_is_missing_not_pass(self):
+        """The nastiest one, and it was live.
+
+        `max(off_x, off_y)` returns its first argument whenever the second is not
+        greater, and `NaN > x` is always False - so a NaN in the Y slot was
+        discarded by max() and the row reported PASS with the words "off by nan" in
+        its own note. JSON accepts the bare literal, so a committed record can carry
+        one.
+        """
+        for raw in ([float("nan"), 10000.0, 45.0],
+                    [18000.0, float("nan"), 45.0],
+                    [18000.0, 10000.0, float("inf")],
+                    [18000.0, 10000.0, float("-inf")]):
+            with self.subTest(raw=raw):
+                self._use_record(self._record(local_bbox_cm=raw))
+                c = pr.check_env_ue_island_measured()
+                self.assertNotEqual(c.state, pr.PASS)
+                self.assertIn("non-finite", c.measured + c.note)
+
     def test_a_unit_error_cannot_pass(self):
-        """cm vs m is a 100x trap. 18000 must not be read as 18000 m, and a
-        hand-entered 18000 in a field expecting cm must not be compared as if it
-        were already metres."""
-        # 18000 "cm" is 180 m and agrees. 18000 m would be 1.8 million cm.
-        self._use_record({"bbox_cm": [1800000.0, 1000000.0, 4500.0]})
+        """cm vs m is a 100x trap. 18000 cm is 180 m and agrees; 18000 m would be
+        1.8 million cm."""
+        self._use_record(
+            self._record(local_bbox_cm=[1800000.0, 1000000.0, 4500.0]))
         self.assertEqual(pr.check_env_ue_island_measured().state, pr.FAIL)
 
+    def test_non_numeric_and_boolean_values_are_missing(self):
+        """Numbers written as strings, and Python bools, which are ints.
+
+        A string that happens to parse is not a measurement, and True would
+        otherwise become 1.0 cm.
+        """
+        for raw in (["18000", "10000", "45"], [True, False, True],
+                    [18000.0, None, 45.0], [18000.0, {}, 45.0]):
+            with self.subTest(raw=raw):
+                self._use_record(self._record(local_bbox_cm=raw))
+                c = pr.check_env_ue_island_measured()
+                self.assertEqual(c.state, pr.MISSING)
+                self.assertIn("unparseable", c.measured + c.note)
+
+    def test_a_two_element_bbox_is_missing(self):
+        self._use_record(self._record(local_bbox_cm=[18000.0, 10000.0]))
+        self.assertEqual(pr.check_env_ue_island_measured().state, pr.MISSING)
+
+    def test_a_world_bbox_record_is_rejected_not_compared(self):
+        """bbox_cm is the actor's WORLD box; Blender reports object-space.
+
+        Comparing them means failing any rotated island - wrong by construction,
+        not by tolerance. An older record carrying only bbox_cm must be rejected
+        with the reason, not quietly accepted.
+        """
+        self._use_record({
+            "measured_at": self._now_iso(), "level": "MainMenu",
+            "asset": "SM_IslandTop", "actors_found": 1,
+            "bbox_cm": [18000.0, 10000.0, 45.0],
+        })
+        c = pr.check_env_ue_island_measured()
+        self.assertNotEqual(c.state, pr.PASS)
+        self.assertIn("local_bbox_cm", c.note)
+
+    def test_an_actor_at_non_unit_scale_fails(self):
+        """The right mesh at the wrong scale is still the wrong island.
+
+        A 0.1-scaled 180 m plate is a 19 m plate, which is the exact number that
+        started this.
+        """
+        self._use_record(self._record(
+            local_bbox_cm=[1800.0, 1000.0, 45.0],
+            non_unit_scale_actors=["SM_IslandTop"]))
+        c = pr.check_env_ue_island_measured()
+        self.assertEqual(c.state, pr.FAIL)
+        self.assertIn("scaled", c.note)
+
+    def test_a_record_naming_another_asset_fails(self):
+        self._use_record(self._record(asset="SM_ResIsland"))
+        c = pr.check_env_ue_island_measured()
+        self.assertEqual(c.state, pr.FAIL)
+        self.assertIn("SM_ResIsland", c.note)
+
+    def test_a_record_from_an_unknown_level_fails(self):
+        self._use_record(self._record(level="Sandbox_Preview"))
+        c = pr.check_env_ue_island_measured()
+        self.assertEqual(c.state, pr.FAIL)
+        self.assertIn("Sandbox_Preview", c.note)
+
+    def test_a_record_that_predates_the_export_fails(self):
+        """A record written before the FBX was last exported describes the previous
+        geometry, and nothing else about it looks wrong.
+
+        This is the one legitimate use of a timestamp here: two whole files, each a
+        complete build of the same thing. The retracted per-object mtime rule could
+        not do this.
+        """
+        self._use_manifest([("Homestead", "SM_IslandTop.fbx", 15692)])
+        fbx = pr.EXPORT_MANIFEST.parent / "Homestead" / "SM_IslandTop.fbx"
+        future = time.time() + 86400
+        os.utime(fbx, (future, future))
+        self._use_record(self._record(measured_at="2026-01-01T00:00:00+00:00"))
+        c = pr.check_env_ue_island_measured()
+        self.assertEqual(c.state, pr.FAIL)
+        self.assertIn("predates", c.note)
+
+    def test_missing_provenance_is_missing(self):
+        """A bare number is not evidence: no asset, no level, no time."""
+        for field in ("asset", "level", "measured_at"):
+            with self.subTest(field=field):
+                body = self._record()
+                body[field] = None
+                self._use_record(body)
+                c = pr.check_env_ue_island_measured()
+                self.assertEqual(c.state, pr.MISSING)
+                self.assertIn(field, c.measured + c.note)
+
     def test_a_null_bbox_is_missing(self):
-        for body in ({}, {"bbox_cm": None}, {"bbox_cm": []}, {"bbox_cm": "wide"}):
+        for body in ({}, {"local_bbox_cm": None}, {"local_bbox_cm": []},
+                     {"local_bbox_cm": "wide"}):
             with self.subTest(body=body):
                 self._use_record(body)
                 self.assertEqual(pr.check_env_ue_island_measured().state,
@@ -1069,11 +1361,86 @@ class TheExportChainCannotGoStale(unittest.TestCase):
     def test_no_blender_measurement_is_missing_not_pass(self):
         """If the greybox report cannot be read there is nothing to compare, and
         that must not read as agreement."""
-        self._use_record({"bbox_cm": [18000.0, 10000.0, 45.0]})
+        self._use_record(self._record())
         saved = pr.GRAYBOX_REPORT
         pr.GRAYBOX_REPORT = Path(tempfile.gettempdir()) / "definitely-absent.json"
         self.addCleanup(setattr, pr, "GRAYBOX_REPORT", saved)
         self.assertEqual(pr.check_env_ue_island_measured().state, pr.MISSING)
+
+class BlockedRowsMustNameAnAction(unittest.TestCase):
+    """A red row that does not say what to do is a mood, not a work list.
+
+    On 2026-10-04, 6 of the 8 substantive blocked rows stated a finding and no
+    next step. Reading them told you what was wrong and nothing about what to do
+    about it - which is the failure mode of a gate that only ever complains.
+
+    The Lead's stated expectation is that the agent is never idle: always
+    working, always asking a question that extracts information, or always
+    pointing at the next concrete step. This class is that expectation made
+    structural, so a later edit that drops an action is a failing test rather
+    than a quietly less useful gate.
+
+    Deliberately NOT required of PASS rows (there is nothing to do) and not of
+    `dep.` rollups (a gate-level summary naming its own actions would duplicate
+    its children).
+    """
+
+    #: Rows where an empty action is legitimate: agent-owned, still in progress.
+    ALLOWED_EMPTY = frozenset()
+
+    def _substantive_blocked(self):
+        gates = pr.build()
+        return [c for g in gates.values() for c in g.checks
+                if c.state in (pr.FAIL, pr.MISSING, pr.STALE)
+                and not c.id.startswith("dep.")
+                and c.id not in self.ALLOWED_EMPTY]
+
+    def test_every_blocked_row_carries_a_next_action(self):
+        empty = [c.id for c in self._substantive_blocked()
+                 if not (c.next_action or "").strip()]
+        self.assertEqual(
+            empty, [],
+            "these rows are blocked and say nothing about what to do: "
+            + ", ".join(empty))
+
+    def test_the_shipped_repo_has_none_empty(self):
+        """Assert against the real repo, so drift shows up immediately."""
+        blocked = self._substantive_blocked()
+        self.assertGreaterEqual(len(blocked), 5,
+                                "the gate went quiet; that is as suspicious as a red row")
+        for c in blocked:
+            with self.subTest(check=c.id):
+                self.assertTrue(c.next_action.strip())
+
+    def test_an_action_must_be_actionable_not_a_restatement(self):
+        """"Row is red" is not an action. Require a verb and some specificity.
+
+        The bar is deliberately low - a length floor plus a leading capital -
+        because the failure being guarded against is an empty string or a
+        paraphrase, not weak prose.
+        """
+        for c in self._substantive_blocked():
+            with self.subTest(check=c.id):
+                action = c.next_action.strip()
+                self.assertGreater(len(action), 40,
+                                   f"{c.id}: action too short to be useful")
+                self.assertTrue(
+                    action[0].isupper() or action[0].isdigit(),
+                    f"{c.id}: action should read as an instruction")
+
+    def test_pass_rows_need_no_action(self):
+        """Guards the other direction: a PASS carrying an action is noise."""
+        gates = pr.build()
+        noisy = [c.id for g in gates.values() for c in g.checks
+                 if c.state == pr.PASS and c.next_action.strip()]
+        self.assertEqual(noisy, [], "PASS rows should not be telling anyone to do work")
+
+    def test_markdown_renders_a_what_to_do_section(self):
+        """The action has to reach the human, not just the JSON."""
+        gates = pr.build()
+        md = pr.render_markdown(gates, "2026-10-04T00:00:00+00:00")
+        self.assertIn("### What to do", md)
+        self.assertIn("Next action", md)
 
 
 class AssetBoardCannotBeFakedGreen(unittest.TestCase):
