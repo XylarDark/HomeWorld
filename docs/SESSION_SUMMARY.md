@@ -1670,3 +1670,131 @@ rebinding or adding them is a canon call. One `4_distinct` collision on
 profile has ever been bootstrapped. And **no human has played this build**:
 every green row above proves code runs and asserted laws hold, nothing about
 whether the island reads or the glide feels.
+
+## SESSION 2026-10-04 (early) - the island got its locked footprint, and four wrong claims got retracted
+
+### The 180 x 100 plate is in, and the rim is generated rather than transported
+
+`SM_IslandTop` now measures exactly **180.0 x 100.0 x 0.45 m** with the top face at
+Z = 0 exactly, satisfying `Lib/01_Homestead/SM_IslandTop.md` outright. Topology is
+preserved: 32 verts, 18 polys, 16-point rim. Nothing else in the scene moved - the
+homestead core simply became interior to a larger island.
+
+The rim is generated on the 90 x 50 ellipse, not carried over from the authored
+19.3 x 10.7 outline. Two transports were tried and both were rejected on
+measurement, which is why `AssetCreation/Blender/apply_island_plate.py` says so
+plainly instead of claiming the authored silhouette was preserved:
+
+1. Carrying each authored vertex's deviation-from-ellipse across gave k up to
+   **1.81** and a **272 x 137** result - 92 m over on X.
+2. Anisotropic scaling to exactly 180 x 100 is clean, but the authored shape
+   pinches 24.6% inside the ellipse at its corners, so the locked 90 x 50 walk
+   oval escaped the rim by **8.9%** at -100 deg. A circuit you can walk off the
+   edge of is not a circuit.
+
+So k is exactly **1.00** at the four axis directions and **1.05 / 1.10 / 1.15**
+elsewhere. **0 of 16** values needed the clamp. Angles are on 5-degree steps and k
+on 0.05 steps at the Lead's direction, so one number can be moved by hand in the
+polish pass: edit `RIM`, re-run, read the `PLATE_` lines.
+
+Two consequences reported rather than silently chosen, both feel judgements:
+
+- **The bulges fall only in the X-dominant directions.** On a 2:1 ellipse the k
+  ceiling collapses to ~1.01-1.02 within 20 deg of the minor axis, so near 70,
+  110, 170, 250 and 285 deg only k = 1.00 fits. Irregularity near the Y axes
+  would need k < 1, which would let the walk oval leave the island.
+- **The walk oval is inscribed and touches the rim at four points** (+-90 X,
+  +-50 Y). That is arithmetic, not choice: the Lead's footprint 180 x 100 and
+  oval semi-axes 90 x 50 are the same numbers.
+
+### Four retractions
+
+Everything below was stated to the Lead earlier and was wrong. Each was caught by
+a measurement, not by reasoning harder.
+
+- **"The island circuit stays NOT_REACHABLE, 1.2 laps."** Wrong.
+  `ellipse_perimeter_m()` takes **full extents** and halves internally; I fed it
+  `(90, 50)`, the walk oval's semi-axes, instead of `(180, 100)`. At 180 x 100 the
+  perimeter is **448.8 m**, a lap is **74.8 s** at 6.0 m/s, which is inside the
+  45-90 s window. The verdict is **REACHABLE**. My original 448.8 m was right all
+  along.
+- **"An invented ninth verb should block PASS."** Wrong. If all eight ran, PASS is
+  honest. The real defect was that the extra key was dropped in silence; it is now
+  named in the note as non-blocking and the count reports eight.
+- **"SM_Cliff.json carries no placements, so that citation is false."** Wrong. The
+  three cliff origins are in `modules[].origin`. My search only matched keys
+  containing `pos`/`loc`/`place`/`bl_`/`xyz`/`transform` and missed `origin`.
+- **"There is mojibake on those lines."** Wrong. The bytes are clean UTF-8 with
+  U+2014; the `?` was PowerShell console rendering. Same false conclusion as the
+  FEEL.md en-dashes earlier.
+
+The common shape: three of the four were **absence of evidence read as evidence**,
+and the fourth was **a measurement claim made from the wrong input**. A narrow
+search returning nothing is not a finding.
+
+### The stale waiver was deleted, not re-issued
+
+`Docs/qa/polish_waivers.json` held a `2_sized` waiver reading "y bbox 10.700 vs
+spec 14.000". Its own un-waive condition had fired - "if the island is later
+resized" - which is what happened. The finding it named no longer exists, so
+keeping it could only ever read STALE. History is kept under `_waiver_history`.
+There is nothing to replace it with: `2_sized` raises no findings at all now, so
+the size question is settled by geometry rather than by a waiver.
+
+### Gate movement, and what is still red because it is human work
+
+Greybox blocking **5 -> 3**, and `2_sized` is **gone** rather than waived. The
+remaining 3 are the art findings the Lead ruled stay RED. Gate G-ENV: FAIL **3 ->
+2**, STALE **2 -> 0**, PASS **2 -> 5**; `island_sized`, `pivot_grounded` and
+`traversal_reachable` all PASS.
+
+Everything still RED is a person, not a task:
+
+- `master_binding` (M_FamilySilhouette, M_ValleyNight), `family_distinct`
+  (SM_NODE_PLANT_SLOT_DAY_PLANTED) - the art pass.
+- `asset.board` **0/10 declared** - skeleton seeded, unfilled on purpose.
+- `human_playtest`, `verb_script`, `tunable_baselines` - all MISSING. **No human
+  has ever played this build.**
+
+### Two new fail-opens, both found by tests written minutes after the code
+
+- `asset.board` tested `if a.get("stage")`, and null is falsy, so a seeded board of
+  nulls read **FAIL** instead of MISSING. Same trap as the playtest record: FAIL
+  leaves "type anything" as the only route to green.
+- The first version of the `place_vs_mvp_pa_d.py` number pattern was written with
+  doubled backslashes (`\\d` in the source, matching a literal backslash) and
+  matched nothing. Only a manual run against the real spec file caught it. It is
+  now a permanent test, mutation-tested by re-introducing the bug.
+
+`place_vs_mvp_pa_d.py` now **reads** `SM_Cliff.json` and `GARDEN_BLOCKING.md`
+instead of restating them under comments that cited them, and raises rather than
+falling back to a literal. The four edge-midpoint fence segments are derived from
+the spec envelope, so editing the envelope moves the rail. Worth noting: the
+Markdown specs are **typographic** where the JSON specs are ASCII - the garden
+writes its minus as U+2212 and its size separator as U+00D7 - so a pattern written
+for one spelling silently finds nothing in the other.
+
+### State
+
+Branch `main` at **a33ae07**, pushed and verified by ancestry. `polish` and
+`origin/polish` untouched at `f218fce` / `9686e68`. Tests **165 pass** (was 134),
+`--selftest` OK at 17 checks. Working tree clean.
+
+The `.blend` was committed at the Lead's explicit direction, against the standing
+"never commit `.blend`" rule: it is already tracked (5 prior commits, most recently
+`ae8ab66` which shipped one with its report), and leaving it uncommitted makes the
+committed report describe geometry nobody else has. Plate first, then the
+instruments, then the measurements - three commits, so the geometry is reviewable
+without the reports that depend on it.
+
+### Still human-owned, not agent-resolvable
+
+**No human has played this build.** `feel.human_playtest` and `feel.verb_script`
+are MISSING, which is the honest reading - not FAIL, because nobody has tried. The
+record reads MISSING so that "no one has played it" can never be recorded as "a
+person played it and it failed", and so that typing something is never the cheapest
+route to green.
+
+**V2 is the row that decides whether 180 x 100 reads as an island.** Jump off the
+edge and land in the field; that is the whole test. Also open: the six feel
+tunables, the ten asset-board stages, and the three G-ENV art findings.
