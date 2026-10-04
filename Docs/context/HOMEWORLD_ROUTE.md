@@ -40,6 +40,7 @@ state is not that writer.
 - One dung and one wisp make one spirit fertilizer.
 - It is mixed at the homestead, the spirit spreads it at night, and in the morning one herb pile appears per dung, at random in the field.
 - Dawn alone does not bring a pile back.
+- That night flight is not the locked first flight.
 
 ## Left empty on purpose
 
