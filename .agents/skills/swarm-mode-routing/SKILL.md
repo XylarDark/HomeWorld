@@ -4,7 +4,7 @@ description: >-
   At task start or ask pivot, choose SWARM vs NON-SWARM vs HYBRID and a ModelClass
   (Auto/Mid/Frontier/Explore) before loading Conductor, role cards, or Blender waves.
   Triggers: Conductor, wave packet, APPROVE P0-P7, FALLBACK FLIGHT, FIX owner id,
-  Blender kit, Lib/, Maps/Preview_, Art Director shot, QA judge, Safe-Build, CI,
+  SOLO, Blender kit, Lib/, Maps/Preview_, Art Director shot, QA judge, Safe-Build, CI,
   PR merge, C++/Python automation, Docs/NN engineering, token efficiency, swarm mode.
 ---
 
@@ -17,10 +17,19 @@ Pick **exactly one** mode, then a **model class**, before heavy context load.
 
 ## First-match summary
 
+0. **SOLO** — Lead typed `SOLO`. Pre-check, not a mode. One chat holds every execution role; taste and test stay human. Fail-closed, never inferred from an idle external runtime.
 1. **SWARM** — Conductor / wave packet / `APPROVE Pn` / Blender+Lib lookdev / multi-role kit / AD or QA judge / active P0–P7 kit work.
 2. **NON-SWARM** — Engine, C++, Python automation, CI, Config, lowercase docs, Docs/NN engineering without specialist fan-out.
 3. **HYBRID** — Engineering enables lookdev; taste/shot gate stays Conductor or AD in another chat.
 4. **Ambiguous** — Prefer NON-SWARM for the next atomic step.
+
+## SOLO
+
+`SOLO` = no second runtime; one OpenCode chat holds the execution roles — Conductor, `world-designer`, `env-*`, `props`, `lighting`, `creatures`, `tech-artist`, `gameplay`, `systems`, `integration`, and an independent `qa` subagent.
+
+Still human: art taste, mechanic canon, shot verdicts, test verdicts. `design` / `art-director` draft inside an alert; nothing is scribed without a yes. `qa` files defects, does not close them.
+
+Mode is still named after SOLO. One owner per path.
 
 ## Model class (after mode)
 

@@ -24,11 +24,33 @@ Agents **do not invent** `APPROVE Pn` in any mode ([OWNERSHIP.md](OWNERSHIP.md))
 
 Run top-down. **First match wins.** State the chosen mode in one line before heavy tool use.
 
+### 0 → SOLO (Lead token only, pre-check)
+
+Runs **before** §1. Lead typed `SOLO` in this session.
+
+**Fail-closed.** Nothing is inferred. Having no external AI answer, or seeing only OpenCode tools, is **not** SOLO — the agent cannot verify that a Grok Conductor or Cursor cloud runtime is idle. Only the typed token arms it.
+
+**What SOLO means:** no second runtime participates. One OpenCode chat holds every execution role.
+
+| Unlocked in this one chat | Still yours |
+|---------------------------|-------------|
+| Conductor orchestration · `world-designer` · `env-homestead` · `env-planet` · `props` · `lighting` · `creatures` · `tech-artist` · `gameplay` · `systems` · `integration` · an independent `qa` subagent | Art taste · mechanic canon · shot verdicts · test verdicts |
+
+**SOLO does not move the three jobs.** `OWNERSHIP.md:26-27` puts art design and mechanic design under human taste; `:85` says never accept its own still. A `design` or `art-director` subagent **drafts inside an alert** — nothing is scribed without a yes (`OWNERSHIP.md:86`). The `qa` subagent files defects; it does not close them.
+
+**SOLO is a runtime condition, not a mode.** §1–§4 still run, and the two output lines are still required. SOLO changes who holds the roles, not which mode the task is.
+
+**Turns off** on any one of: a second runtime re-enters, another agent appears in the tree, or the ask becomes a taste or test call. Then §1–§4 apply unchanged.
+
+**One owner per path.** SOLO does not license two subagents on one file — [multi-agent-collaboration](../../.agents/skills/multi-agent-collaboration/SKILL.md) still governs staging and commits.
+
+---
+
 ### 1 → SWARM (or recommend Conductor boot)
 
 Any of:
 
-- User opened / asked for **Conductor**, pasted a **wave packet**, or typed Lead strings (`APPROVE P0`…`P7`, `FALLBACK FLIGHT`, `FIX {owner} {id}`, `STOP`).
+- User opened / asked for **Conductor**, pasted a **wave packet**, or typed Lead strings (`APPROVE P0`…`P7`, `FALLBACK FLIGHT`, `FIX {owner} {id}`, `STOP`). `SOLO` is a Lead string too — route it to §0 first.
 - Primary artifact is **Blender kit / Lib / Maps/Preview_*** lookdev, art bible shot approval, or multi-role fan-out (ENV-H / PROP / LIT / AD / QA judge).
 - Active **P0–P7** row on [PHASE_BOARD](../../swarm/PHASE_BOARD.md) is IN PROGRESS and the ask is that phase’s kit work.
 - Ask needs **Art Director taste** or **QA judge** with no shared builder memory (shot reject / eight-verb script).
@@ -132,6 +154,7 @@ ModelClass: Auto|Mid|Frontier|Explore — <reason>
 
 ## Checklist (agent)
 
+- [ ] `SOLO` checked first — armed only by the Lead token, never inferred
 - [ ] Mode named: `NON-SWARM` | `SWARM` | `HYBRID`
 - [ ] ModelClass named: `Auto` | `Mid` | `Frontier` | `Explore`
 - [ ] First-match rule applied from this doc

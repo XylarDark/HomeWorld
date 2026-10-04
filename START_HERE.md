@@ -15,6 +15,7 @@ You own **steer**, **taste**, and **test** for the swarm. Agents execute and **a
 | `APPROVE P0` … `APPROVE P7` | Close a phase gate (Test job — only after checklist + artifact paths exist) |
 | `FALLBACK FLIGHT` | Arm scripted glide + portal cut (Steer) |
 | `FIX {owner} {id}` | Assign a fix-only defect ticket |
+| `SOLO` | This session is OpenCode-only — one chat holds every execution role ([routing §0](docs/human-use/SWARM_MODE_ROUTING.md)). Taste and test stay yours |
 | `STOP` | Halt the swarm |
 
 ## Boot the swarm
