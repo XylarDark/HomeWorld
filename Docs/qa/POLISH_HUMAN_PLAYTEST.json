@@ -1,0 +1,83 @@
+{
+  "_schema": "POLISH_HUMAN_PLAYTEST/1",
+  "_what_this_is": "The record of a human playing the build. This is the one thing in the project that no automation can substitute for: green code means the verbs fire, not that the island reads right or the glide feels right.",
+  "_status": "SEEDED EMPTY. No human has played this build. Every field below is null on purpose.",
+  "_do_not": "Do not fill this in to make a gate go green. A playtest record asserts a person sat at the keyboard on a named commit. An invented one is worse than an absent one, because it can never be told apart from a real one later.",
+
+  "commit": null,
+  "played_at": null,
+  "host": null,
+  "build": null,
+  "notes": null,
+
+  "_how_to_run": [
+    "1. Note the short sha you are about to play: `git rev-parse --short HEAD`.",
+    "2. Open Content/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.umap in the DESKTOP editor. This is the level holding the homestead; MainMenu is the menu backdrop.",
+    "3. Press Play. The menu appears (WBP_MainMenu); its Play button travels to L_VS_MVP_Markers via HomeWorldGameInstance::OpenGameMap. If nothing happens, read the log for 'HomeWorld: OpenGameMap' - it names the target it tried and whether it resolved.",
+    "4. Run the verbs below in order. For each: set result to \"pass\", or to a short documented failure. Paste the log line you grepped into log_grep - Docs/14 requires a log excerpt per verb, not a tick.",
+    "5. Fill commit, played_at, host, notes at the top."
+  ],
+
+  "_log_where": "Window > Developer Tools > Output Log in the editor, or Saved/Logs/HomeWorld.log after the run. Every verb below lists the prefix to grep for.",
+
+  "verbs": {
+    "V1": {
+      "name": "Walk homestead",
+      "how": "Walk from the spawn point to the lookout and around the island. You should be able to reach the cabin, the garden beds, the glider perch and the beast pad on foot.",
+      "log_grep": null,
+      "result": null,
+      "note": "Mantle is in the game but is NOT how you move on the homestead. If you find yourself mantling to cross the island, that is a finding, not a success."
+    },
+    "V2": {
+      "name": "Glide island -> planet",
+      "how": "THE MAIN EVENT. Walk off the edge toward the field. No interact, no menu - just step off. Canon: 'no matter what you do while you are travelling toward the ground, you will land in the field.'",
+      "log_grep": null,
+      "result": null,
+      "note": "Glide starts by walking off the edge, NOT by pressing interact. Interact is disabled while on the homestead. Record whether you landed in the field, on the valley lip, or nowhere - and whether the drop conveyed the size of the homestead against the field. The island sits 75 m above the plains per canon; the built field is measured at 95 m. Note which you actually feel, and do not treat the difference as a bug to fix without a ruling."
+    },
+    "V3": {
+      "name": "Gather",
+      "how": "Day Use on a world node (a tree, rock or herb node in the field). Should add +1 to the matching RES_* slot.",
+      "log_grep": null,
+      "result": null
+    },
+    "V4": {
+      "name": "Encounter / tame",
+      "how": "At the beast pad, offer food. wild -> cautious -> tamed (-> helper).",
+      "log_grep": null,
+      "result": null
+    },
+    "V5": {
+      "name": "Portal A <-> B",
+      "how": "Use the shrine portal to travel between homestead and return shrine.",
+      "log_grep": null,
+      "result": null
+    },
+    "V6": {
+      "name": "Heal x3",
+      "how": "As a spirit, consume herb or seed to take a spirit from hurt -> healed.",
+      "log_grep": null,
+      "result": null
+    },
+    "V7": {
+      "name": "Nurture x2",
+      "how": "Homestead N1 crop plus N2 stored -> M_Nurtured.",
+      "log_grep": null,
+      "result": null
+    },
+    "V8": {
+      "name": "Return / dawn",
+      "how": "Portal home and/or Rest to return to body. NightMix should reach 0.",
+      "log_grep": null,
+      "result": null
+    }
+  },
+
+  "_result_values": {
+    "null": "not run yet - this is an open question, not a failure",
+    "pass": "ran and did what the canon says",
+    "anything else": "ran and did not - write what happened in note, do not leave it as a bare word"
+  },
+
+  "_then": "With V2 recorded, fill Docs/qa/POLISH_BASELINE.json: cabin_to_lookout_s and island_circuit_s come from timing this same run. That is the only instrument in the project that can say whether the island is the right size, and it can only be filled by a person who walked it."
+}

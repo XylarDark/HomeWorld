@@ -830,15 +830,24 @@ def check_feel_human_playtest() -> Check:
             "2026-09-20, not a play session. A feel pass tuned without a human in "
             "the loop is tuning against an imagined player.",
         )
-    commit = str(data.get("commit", ""))
+    commit = str(data.get("commit") or "")
     played = data.get("played_at")
     if not commit or not played:
+        # MISSING, not FAIL. The artifact exists but nobody has played yet -- a
+        # seeded skeleton with null fields is not a half-finished playtest, and FAIL
+        # would accuse the record of being unusable when it has simply never been
+        # filled in. FAIL is reserved for a record that names a commit and a
+        # timestamp, which is a claim that can then be checked against the build.
         return Check(
             "feel.human_playtest", "G-FEEL",
             "A human has played the build at a named commit",
             _rel(HUMAN_PLAYTEST_FILE),
-            f"incomplete (commit={commit or 'none'})", "commit + timestamp",
-            FAIL, "A playtest record without a commit cannot be re-tested against.",
+            f"declared, never filled in (commit={commit or 'none'})",
+            "commit + timestamp",
+            MISSING,
+            "The record exists and the fields are empty. Fill in commit (the short "
+            "sha you played), played_at, and notes. Until then no human has played "
+            "this build.",
         )
     return Check(
         "feel.human_playtest", "G-FEEL",
@@ -914,15 +923,89 @@ def check_feel_verb_script() -> Check:
             "No human verb record. The only filed run is all-FAIL under a WAIVE "
             "(Docs/14 VP-A).",
         )
-    failed = sorted(v for v, r in verbs.items() if r != "pass")
-    state = PASS if not failed else FAIL
+    results = {v: _verb_result(r) for v, r in verbs.items()}
+    unrun = [v for v in MVP_VERBS if results.get(v) is None]
+    unknown = [v for v in verbs if v not in MVP_VERBS]
+    if unrun:
+        return Check(
+            "feel.verb_script", "G-FEEL",
+            "Eight-verb script human-run with log greps captured",
+            _rel(HUMAN_PLAYTEST_FILE),
+            f"{len(MVP_VERBS) - len(unrun)}/{len(MVP_VERBS)} run, "
+            f"{len(unrun)} not run",
+            "8 verbs, each pass or documented fail",
+            MISSING,
+            "Declared but never run: " + ", ".join(unrun) + ". A null result is an "
+            "open question, not a failure -- FAIL would say a person tried it and it "
+            "broke. Run them in the order in POLISH_HUMAN_PLAYTEST.json and record "
+            "either pass or a documented fail per verb."
+            + (f" Keys outside the MVP eight: {', '.join(unknown)}." if unknown else ""),
+        )
+    # An extra key does NOT block a pass -- the eight did run, and that is the
+    # question this check asks. But it is named in the note rather than dropped,
+    # because a verb ID outside the locked allowlist usually means someone is
+    # testing a mechanic that does not exist, and a silently-ignored extra row is
+    # how that goes unnoticed. Docs/canon/VERBS.md: "If a verb is not listed here,
+    # do not implement it."
+    extra = f" Not part of the MVP eight: {', '.join(unknown)}." if unknown else ""
+    failed = sorted(v for v, r in results.items() if r != "pass")
+    if failed:
+        return Check(
+            "feel.verb_script", "G-FEEL",
+            "Eight-verb script human-run with log greps captured",
+            _rel(HUMAN_PLAYTEST_FILE),
+            f"{len(results)} verbs, {len(failed)} not passing", "0 not passing",
+            FAIL,
+            "Run and did not pass: " + ", ".join(failed)
+            + ". Each needs a documented reason, not a retry until green." + extra,
+        )
     return Check(
         "feel.verb_script", "G-FEEL",
         "Eight-verb script human-run with log greps captured",
         _rel(HUMAN_PLAYTEST_FILE),
-        f"{len(verbs)} verbs, {len(failed)} not passing", "0 not passing", state,
-        f"not passing: {', '.join(failed)}" if failed else "",
+        f"{len(MVP_VERBS)} of the MVP eight run, all passing", "0 not passing",
+        PASS, ", ".join(MVP_VERBS) + extra,
     )
+
+
+def _verb_result(raw: Any) -> Any:
+    """Read one verb's result, accepting either shape the file may use.
+
+    A verb entry may be a bare result (``"V1": "pass"``) or an object carrying the
+    instructions a human needs while playing (``"V1": {"how": ..., "result": ...}``).
+    The shipped skeleton uses the object form, because a record that says only
+    "V1: pass" cannot be replayed or checked by anyone afterwards.
+
+    A dict with no ``result`` key reads as None -- never as a pass. Treating a
+    missing field as success is how a freshly seeded skeleton ends up reporting
+    that a human played the build when nobody filled anything in.
+    """
+    if isinstance(raw, dict):
+        return raw.get("result")
+    return raw
+
+
+#: The eight MVP verbs, from Docs/canon/VERBS.md (LOCKED allowlist). V3b/V3c are
+#: sub-rows of V3, and RS-*/SS-*/Minigame*/Boss* are site-kit and stub rows rather
+#: than MVP verbs, so they are deliberately not listed here.
+#:
+#: DECLARED, not parsed. VERBS.md puts V1 in two tables (day/body and either/cycle)
+#: and nests V3b/V3c under V3, so "the eight" is a judgement about which rows count
+#: rather than a mechanical read. Declaring it here keeps the gate and the skeleton
+#: file agreeing; a test asserts they agree, which is the drift that could actually
+#: fabricate a green row.
+MVP_VERBS: tuple[str, ...] = ("V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8")
+
+MVP_VERB_NAMES: dict[str, str] = {
+    "V1": "Walk homestead",
+    "V2": "Glide island -> planet (FALLBACK CRUMB_* -> landing)",
+    "V3": "Gather (day Use on a World node -> +1 RES_*)",
+    "V4": "Encounter / tame (beast pad: wild -> cautious -> tamed)",
+    "V5": "Portal A <-> B",
+    "V6": "Heal x3 (spirit hurt -> healed)",
+    "V7": "Nurture x2 (homestead N1 crop + N2 stored)",
+    "V8": "Return / dawn (portal home and/or Rest -> body)",
+}
 
 
 def check_feel_binary_fresh() -> Check:

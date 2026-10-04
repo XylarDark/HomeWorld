@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-04T01:54:50+00:00",
+  "generated": "2026-10-04T02:04:07+00:00",
   "process_doc": "Docs/37_POLISH_PASS_PROCESS.md",
   "verdict": "NOT_READY",
   "gates": {
@@ -173,10 +173,10 @@
           "gate": "G-FEEL",
           "requirement": "A human has played the build at a named commit",
           "source": "Docs/qa/POLISH_HUMAN_PLAYTEST.json",
-          "measured": "never performed",
-          "target": "1 record",
+          "measured": "declared, never filled in (commit=none)",
+          "target": "commit + timestamp",
           "state": "MISSING",
-          "note": "Docs/canon/PLAYTEST.md's last known good is a scripted PIE probe from 2026-09-20, not a play session. A feel pass tuned without a human in the loop is tuning against an imagined player."
+          "note": "The record exists and the fields are empty. Fill in commit (the short sha you played), played_at, and notes. Until then no human has played this build."
         },
         {
           "id": "feel.tunable_baselines",
@@ -193,10 +193,10 @@
           "gate": "G-FEEL",
           "requirement": "Eight-verb script human-run with log greps captured",
           "source": "Docs/qa/POLISH_HUMAN_PLAYTEST.json",
-          "measured": "0 verbs recorded",
+          "measured": "0/8 run, 8 not run",
           "target": "8 verbs, each pass or documented fail",
           "state": "MISSING",
-          "note": "No human verb record. The only filed run is all-FAIL under a WAIVE (Docs/14 VP-A)."
+          "note": "Declared but never run: V1, V2, V3, V4, V5, V6, V7, V8. A null result is an open question, not a failure -- FAIL would say a person tried it and it broke. Run them in the order in POLISH_HUMAN_PLAYTEST.json and record either pass or a documented fail per verb."
         },
         {
           "id": "feel.binary_fresh",

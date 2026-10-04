@@ -582,6 +582,148 @@ class CanonWindowSync(unittest.TestCase):
         self.assertTrue(problems)
 
 
+class PlaytestRecordCannotBeFakedGreen(unittest.TestCase):
+    """The playtest record is the one artifact no automation may stand in for.
+
+    Both checks it feeds used to collapse "not run" into "failed". That is the wrong
+    direction of error twice over: it accuses a person of breaking something they
+    never tried, and -- far worse -- it leaves `"pass"` as the only alternative, so
+    the cheapest way to a green G-FEEL becomes writing eight words of fiction.
+
+    A null must read MISSING. That is the only state that is both true and actionable.
+
+    Each test here is a mutation of the shipped file.
+    """
+
+    SHIPPED = ROOT / "Docs" / "qa" / "POLISH_HUMAN_PLAYTEST.json"
+
+    def setUp(self):
+        if not self.SHIPPED.is_file():
+            self.skipTest("POLISH_HUMAN_PLAYTEST.json not present")
+        self.saved = pr.HUMAN_PLAYTEST_FILE
+        self.addCleanup(setattr, pr, "HUMAN_PLAYTEST_FILE", self.saved)
+
+    def _use(self, body):
+        td = tempfile.TemporaryDirectory()
+        p = Path(td.name) / "POLISH_HUMAN_PLAYTEST.json"
+        p.write_text(json.dumps(body), encoding="utf-8")
+        pr.HUMAN_PLAYTEST_FILE = p
+        self.addCleanup(td.cleanup)
+        return p
+
+    def _shipped(self):
+        return json.loads(self.SHIPPED.read_text(encoding="utf-8"))
+
+    # --- the shipped file ------------------------------------------------
+
+    def test_shipped_record_reports_missing_not_fail(self):
+        # FAIL here would read "a playtest was attempted and did not work". The
+        # truth is nobody has played. The note has to say which.
+        self._use(self._shipped())
+        for check in (pr.check_feel_human_playtest(), pr.check_feel_verb_script()):
+            with self.subTest(check=check.id):
+                self.assertEqual(check.state, pr.MISSING)
+
+    def test_shipped_record_declares_exactly_the_eight_mvp_verbs(self):
+        # If the skeleton and the gate disagree about which eight, the human fills
+        # in the file and the gate scores something else.
+        self.assertEqual(sorted(self._shipped()["verbs"]), sorted(pr.MVP_VERBS))
+
+    def test_shipped_record_contains_no_passing_verb(self):
+        # The fabricated-green guard, on the real artifact. Any non-null result here
+        # is a claim that a person played a build that has never been played.
+        for verb, entry in self._shipped()["verbs"].items():
+            with self.subTest(verb=verb):
+                self.assertIsNone(
+                    pr._verb_result(entry),
+                    f"{verb} already carries a result. No human has played this "
+                    f"build, so any value here would be invented.",
+                )
+
+    def test_shipped_record_names_no_commit(self):
+        data = self._shipped()
+        self.assertIn("commit", data)
+        self.assertIsNone(data["commit"], "a commit here claims a play session")
+        self.assertIsNone(data["played_at"])
+
+    # --- the transitions -------------------------------------------------
+
+    def test_a_filled_in_record_does_reach_pass(self):
+        # A check that can never go green is decoration; it gets ignored and then it
+        # stops catching anything. Prove the happy path actually works, in BOTH the
+        # nested form the skeleton ships and the bare-string form.
+        filled = {
+            "commit": "f218fce", "played_at": "2026-10-04T02:00:00+00:00",
+            "verbs": {v: {"how": "x", "result": "pass"} for v in pr.MVP_VERBS},
+        }
+        self._use(filled)
+        self.assertEqual(pr.check_feel_human_playtest().state, pr.PASS)
+        self.assertEqual(pr.check_feel_verb_script().state, pr.PASS)
+
+        self._use({**filled, "verbs": {v: "pass" for v in pr.MVP_VERBS}})
+        self.assertEqual(pr.check_feel_verb_script().state, pr.PASS)
+
+    def test_one_documented_failure_fails_and_names_the_verb(self):
+        verbs = {v: {"result": "pass"} for v in pr.MVP_VERBS}
+        verbs["V2"] = {"result": "landed on the valley lip, not the field",
+                       "note": "worth a ruling on the 75 m / 95 m delta"}
+        self._use({"commit": "abc1234", "played_at": "2026-10-04", "verbs": verbs})
+        c = pr.check_feel_verb_script()
+        self.assertEqual(c.state, pr.FAIL)
+        self.assertIn("V2", c.note)
+        self.assertNotIn("V1,", c.note.split("Run and did not pass: ")[1])
+
+    def test_a_verb_object_missing_its_result_is_unrun_not_pass(self):
+        # The trap this form invites: seven verbs look filled, and someone adds an
+        # eighth object but forgets `result`. Reading the object itself as a result
+        # would score a dict != "pass" -> FAIL (wrong); reading it as present would
+        # score PASS (worse). It must be MISSING.
+        verbs = {v: {"result": "pass"} for v in pr.MVP_VERBS if v != "V7"}
+        verbs["V7"] = {"how": "crop + stored", "note": "done, forgot the result"}
+        self._use({"commit": "abc1234", "played_at": "2026-10-04", "verbs": verbs})
+        c = pr.check_feel_verb_script()
+        self.assertEqual(c.state, pr.MISSING)
+        self.assertIn("V7", c.note)
+
+    def test_seven_of_eight_is_not_eight(self):
+        # The tempting forgery: run what is easy, record the rest as a blanket pass.
+        verbs = {v: {"result": "pass"} for v in pr.MVP_VERBS if v != "V2"}
+        self._use({"commit": "abc1234", "played_at": "2026-10-04", "verbs": verbs})
+        c = pr.check_feel_verb_script()
+        self.assertEqual(c.state, pr.MISSING)
+        self.assertIn("V2", c.note)
+
+    def test_a_record_without_a_timestamp_is_missing(self):
+        # Commit alone is not enough to re-test against -- the binary moves.
+        verbs = {v: {"result": "pass"} for v in pr.MVP_VERBS}
+        self._use({"commit": "abc1234", "played_at": None, "verbs": verbs})
+        self.assertEqual(pr.check_feel_human_playtest().state, pr.MISSING)
+
+    def test_an_extra_verb_cannot_substitute_for_a_missing_one(self):
+        # V9 is not in the locked allowlist, so marking it "pass" must not buy
+        # coverage for V2. The eight are the eight.
+        verbs = {v: {"result": "pass"} for v in pr.MVP_VERBS if v != "V2"}
+        verbs["V9"] = {"result": "pass"}
+        self._use({"commit": "abc1234", "played_at": "2026-10-04", "verbs": verbs})
+        c = pr.check_feel_verb_script()
+        self.assertEqual(c.state, pr.MISSING)
+        self.assertIn("V2", c.note)
+
+    def test_an_extra_verb_is_named_rather_than_dropped(self):
+        # All eight ran, so PASS is honest -- but an ID outside the allowlist should
+        # be surfaced, because it usually means a mechanic is being tested that
+        # Docs/canon/VERBS.md does not contain.
+        verbs = {v: {"result": "pass"} for v in pr.MVP_VERBS}
+        verbs["V9"] = {"result": "pass"}
+        self._use({"commit": "abc1234", "played_at": "2026-10-04", "verbs": verbs})
+        c = pr.check_feel_verb_script()
+        self.assertEqual(c.state, pr.PASS)
+        self.assertIn("V9", c.note)
+        # and the count reports the eight, not the nine
+        self.assertIn("8", c.measured)
+        self.assertNotIn("9", c.measured)
+
+
 class TheShippedSkeletonIsHonest(unittest.TestCase):
     """Assert the real artifact on disk, not a fixture.
 
