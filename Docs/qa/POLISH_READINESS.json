@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-04T02:04:07+00:00",
+  "generated": "2026-10-04T02:34:12+00:00",
   "process_doc": "Docs/37_POLISH_PASS_PROCESS.md",
   "verdict": "NOT_READY",
   "gates": {
@@ -8,9 +8,8 @@
       "state": "RED",
       "max_stage": "S2 ART-BLOCKOUT",
       "tally": {
-        "PASS": 2,
-        "STALE": 2,
-        "FAIL": 3,
+        "PASS": 5,
+        "FAIL": 2,
         "MISSING": 1
       },
       "checks": [
@@ -29,20 +28,20 @@
           "gate": "G-ENV",
           "requirement": "Assembly extents match their declared spec size",
           "source": "Docs/qa/graybox_spec_report.json",
-          "measured": "2 blocking; 1 stale waiver(s)",
-          "target": "0 findings",
-          "state": "STALE",
-          "note": "Waived but no longer blocking: SM_Island_Hero. Remove the waiver."
+          "measured": "0 blocking",
+          "target": "0 blocking",
+          "state": "PASS",
+          "note": ""
         },
         {
           "id": "env.pivot_grounded",
           "gate": "G-ENV",
           "requirement": "Assembly roots are pivoted at ground contact",
           "source": "Docs/qa/graybox_spec_report.json",
-          "measured": "0 blocking; 1 stale waiver(s)",
-          "target": "0 findings",
-          "state": "STALE",
-          "note": "Waived but no longer blocking: SM_Island_Hero. Remove the waiver."
+          "measured": "0 blocking",
+          "target": "0 blocking",
+          "state": "PASS",
+          "note": ""
         },
         {
           "id": "env.master_binding",
@@ -79,10 +78,10 @@
           "gate": "G-ENV",
           "requirement": "No canon traversal window contradicts the island size",
           "source": "Docs/qa/TRAVERSAL_BUDGET.json",
-          "measured": "1 unreachable of 2",
+          "measured": "0 unreachable of 2",
           "target": "0 unreachable",
-          "state": "FAIL",
-          "note": "island_circuit_s: even the window's FLOOR (45 s) needs 270 m, but one lap of the island is 48 m - 5.6 laps. A circuit that winds is no longer a circuit; one number here is wrong"
+          "state": "PASS",
+          "note": "Size does not contradict any window. This does NOT mean a real walk fits them - the timing instrument is `env.traversal_measured`."
         },
         {
           "id": "env.canon_windows_in_sync",
@@ -131,10 +130,10 @@
           "gate": "G-ASSET",
           "requirement": "Every master mesh has a declared stage and priority",
           "source": "Docs/qa/POLISH_ASSET_BOARD.json",
-          "measured": "no artifact",
-          "target": "one row per mesh",
+          "measured": "0/10 declared",
+          "target": "10/10 declared",
           "state": "MISSING",
-          "note": "No asset board. Without one, 'asset pass 1' has no definition of done and no way to batch review before the expensive stages."
+          "note": "Declared but not recorded yet: M_BeastStylized, M_CliffRock, M_FoliageCard, M_GatherHerb, M_Nurtured, M_PathStone. Each row needs a stage from the S0-S5 ladder and a priority, so a batch can be reviewed together at S2 rather than one at a time at S3."
         },
         {
           "id": "asset.poly_budgets",

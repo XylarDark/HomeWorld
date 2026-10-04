@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-04T01:46:38+00:00",
+  "generated": "2026-10-04T02:34:12+00:00",
   "inputs": {
     "movement_probe_errors": [],
     "walk_speed_cm_s": 600.0,
@@ -8,8 +8,8 @@
   "island": {
     "volume": "SM_IslandTop",
     "authored_extents_m": [
-      19.3,
-      10.7
+      180.0,
+      100.0
     ],
     "pivot_is_ground_contact": false,
     "lowest_vert_z_world": -0.45,
@@ -18,8 +18,8 @@
       180.0,
       100.0
     ],
-    "ellipse_perimeter_m": 48.1,
-    "seconds_per_lap_walked": 8.0
+    "ellipse_perimeter_m": 448.8,
+    "seconds_per_lap_walked": 74.8
   },
   "windows": {
     "cabin_to_lookout_s": {
@@ -32,10 +32,10 @@
         90.0,
         150.0
       ],
-      "lap_walk_time_s": 8.0,
-      "crossings_of_long_axis_floor": 4.7,
+      "lap_walk_time_s": 74.8,
+      "crossings_of_long_axis_floor": 0.5,
       "state": "REACHABLE",
-      "note": "needs 90-150 m of path, roughly 5-8 crossings of the island's 19 m long axis. A winding route can satisfy this; island size does not contradict it"
+      "note": "needs 90-150 m of path, roughly 0-1 crossings of the island's 180 m long axis. A winding route can satisfy this; island size does not contradict it"
     },
     "island_circuit_s": {
       "window_s": [
@@ -47,18 +47,16 @@
         270.0,
         540.0
       ],
-      "lap_walk_time_s": 8.0,
-      "crossings_of_long_axis_floor": 14.0,
-      "laps_needed_for_window_floor": 5.6,
-      "state": "NOT_REACHABLE",
-      "note": "even the window's FLOOR (45 s) needs 270 m, but one lap of the island is 48 m - 5.6 laps. A circuit that winds is no longer a circuit; one number here is wrong"
+      "lap_walk_time_s": 74.8,
+      "crossings_of_long_axis_floor": 1.5,
+      "laps_needed_for_window_floor": 0.6,
+      "state": "REACHABLE",
+      "note": "one lap is 449 m / 74.8 s walked, so the 45-90 s window needs about 0.6-1.2 laps"
     }
   },
-  "verdict": "NOT_REACHABLE",
+  "verdict": "REACHABLE",
   "notes": [
     "Necessary-condition check on a straight-line lower bound. A NOT_REACHABLE is real and needs a human ruling on which number is wrong. Every REACHABLE here is unfalsified by design - it means size does not contradict the window, not that the walk fits it."
   ],
-  "windows_failing": [
-    "island_circuit_s"
-  ]
+  "windows_failing": []
 }

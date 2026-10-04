@@ -1,0 +1,40 @@
+{
+  "_schema": "POLISH_ASSET_BOARD/1",
+  "_what_this_is": "One row per master material, each at a rung of the stage ladder from Docs/37_POLISH_PASS_PROCESS.md. The point is to get MANY assets to 50% and review them together at S2, rather than finishing one at a time at S3 where moving it is expensive.",
+  "_status": "SEEDED EMPTY. Nobody has triaged these yet. Every stage and priority below is null on purpose.",
+  "_do_not": "Do not fill this in to make a gate go green. A stage is a claim about where an asset actually is, made by someone who has looked at it.",
+
+  "_stage_ladder": {
+    "_source": "Docs/37_POLISH_PASS_PROCESS.md section 3",
+    "S0": "MEASURE - instruments exist; numbers recorded at a named commit",
+    "S1": "BLOCKOUT - cheap placeholder geometry; massing, metrics, sightlines. Free, delete and rebuild",
+    "S2": "ART-BLOCKOUT - real shapes, palette, materials by eye. No UV, no texture. Cheap, still blockout underneath",
+    "S3": "ASSET PRODUCTION - unwrap, texture, final materials, LODs. Expensive",
+    "S4": "DRESS - prop placement, clutter, set dressing. Expensive, and placement is coupled to scale",
+    "S5": "FEEL TUNE - movement, camera, timing, juice. Cheap per change, expensive to re-baseline"
+  },
+
+  "_how_to_fill": [
+    "1. For each master: look at it, then set stage to the rung it has actually reached. 'S2' or 'S2 ART-BLOCKOUT' both work.",
+    "2. Set priority. This is the ordering you want to review in, and it is what makes batching work - the point is a batch at S2, not a queue.",
+    "3. Stage must be one of S0..S5. Anything else is rejected rather than counted, so a typo cannot read as a declared state.",
+    "4. Nothing else in this file is read by the gate."
+  ],
+
+  "_note_on_the_two_failing_materials": "M_FamilySilhouette and M_ValleyNight are NOT on this list. They are not one of the ten masters, they fail env.master_binding, and the Lead has ruled they stay RED for the art pass. They do not belong on the master board until they are either remapped onto a master or added to the allowlist by an art decision.",
+
+  "assets": [
+    { "name": "M_BeastStylized", "stage": null, "priority": null, "notes": "Beast bodies. Four-state tame read depends on this staying readable at distance." },
+    { "name": "M_CliffRock",       "stage": null, "priority": null, "notes": "Cliff assemblies and the planet valley lips. 39 users - the most-used material in the blend." },
+    { "name": "M_FoliageCard",     "stage": null, "priority": null, "notes": "83 users. Card-based foliage. The count is why this one probably wants an early decision." },
+    { "name": "M_GatherHerb",      "stage": null, "priority": null, "notes": "Gather nodes, the V3 verb's read." },
+    { "name": "M_Nurtured",        "stage": null, "priority": null, "notes": "N1 crop / N2 stored outcome, the V7 verb's read." },
+    { "name": "M_PathStone",       "stage": null, "priority": null, "notes": "40 users. Landing circle stones and path tiles - the CRUMB_* path the glide lands on." },
+    { "name": "M_SpiritUnlit",     "stage": null, "priority": null, "notes": "Spirit base. Unlit by design, so this one is a silhouette problem, not a lighting one." },
+    { "name": "M_StylizedGrass",   "stage": null, "priority": null, "notes": "Island top crust and landing circles. Now covers 180 x 100 m after the plate, so tiling scale matters more than it did." },
+    { "name": "M_WoodCabin",       "stage": null, "priority": null, "notes": "39 users. Cabin and cottage kitchen." },
+    { "name": "M_WoodWild",        "stage": null, "priority": null, "notes": "21 users. Deadwood and wild timber." }
+  ],
+
+  "_user_counts_measured": "Taken from the live blend 2026-10-04, not estimated. They are here to help you prioritise; the gate ignores them."
+}
