@@ -64,3 +64,13 @@ __pycache__/
 # KEEP-LOCAL Mannequins (Docs/17e HS-E) — Epic TP High Characters copy per DESKTOP;
 # never commit. Cold clone: copy from UE_5.8 TemplateResources (see Docs/17e).
 Content/Characters/
+
+# Blender auto-backup. Written beside the .blend on every save, and a byte-for-byte
+# copy of the PREVIOUS state, so committing it would put two revisions of the same
+# mesh in history for no gain. The .blend itself IS tracked on purpose - AGENTS.md
+# asks for no .blend commits, but the file is already tracked (5 prior commits, most
+# recently ae8ab66 which shipped a blend together with its report) and leaving a
+# tracked file uncommitted makes the committed report describe geometry nobody else
+# has. Only the backup is noise.
+*.blend1
+*.blend2
