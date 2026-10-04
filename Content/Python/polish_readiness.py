@@ -89,6 +89,8 @@ BASELINE_FILE = ROOT / "Docs" / "qa" / "POLISH_BASELINE.json"
 TRAVERSAL_BUDGET = ROOT / "Docs" / "qa" / "TRAVERSAL_BUDGET.json"
 ASSET_BOARD_FILE = ROOT / "Docs" / "qa" / "POLISH_ASSET_BOARD.json"
 HUMAN_PLAYTEST_FILE = ROOT / "Docs" / "qa" / "POLISH_HUMAN_PLAYTEST.json"
+#: Decisions the Lead owns that no gate row can express. See `load_queue`.
+QUEUE_FILE = ROOT / "Docs" / "qa" / "POLISH_QUEUE.json"
 FEEL_CANON = ROOT / "Docs" / "canon" / "FEEL.md"
 EXPORT_MANIFEST = ROOT / "AssetCreation" / "Exports" / "MVP_EXPORT_MANIFEST.md"
 LIB_BLEND = ROOT / "blender" / "floating_island_homestead_LIB.blend"
@@ -161,6 +163,43 @@ RED = "RED"
 # --------------------------------------------------------------------------
 
 
+#: The four kinds of next move, per `Check.action_kind`. Order matters: it is
+#: the order a reader wants them in, and it is deliberately NOT "who is blocking
+#: whom". It is "what kind of thing is owed next".
+#:
+#:   AGENT   the agent's own move, available right now. This is the list that
+#:           answers "is the AI sitting idle?" - if it has entries, the agent has
+#:           work and no reason to be asking you anything.
+#:   DECIDE  a judgment only you can make. The agent stops here rather than invent
+#:           it. `Docs/qa/POLISH_QUEUE.json` holds the ones with no gate row behind
+#:           them.
+#:   DO      labour no agent can perform. Ordered and resumable; a human runs it and
+#:           the result is evidence.
+#:   ENV     nobody owes anything. An editor is closed, a tool is absent. Waiting
+#:           is the correct answer and no one is at fault.
+#:
+#: The distinction is the Lead's own framing and it is the whole point: the agent
+#: should always be doing something - working, asking, or instructing the dev on
+#: work it cannot do - and it should know when the next step is not its own. A row
+#: blocked on a closed editor is not a question to answer; a row needing eight
+#: playtests is not a judgment to make. Collapsing them produces the worst version
+#: of each: a question nobody can answer, and labour nobody was told to do.
+AGENT = "agent"
+DECIDE = "decide"
+DO = "do"
+ENV = "env"
+ACTION_KINDS = (AGENT, DECIDE, DO, ENV)
+
+#: What each kind means, in the reader's terms. Rendered into the markdown so a
+#: reader never has to guess why one red row is a question and another is a chore.
+ACTION_KIND_MEANING = {
+    AGENT: "the agent's own move - no answer needed from you",
+    DECIDE: "a judgment only you can make",
+    DO: "labour no agent can perform",
+    ENV: "an environment, not a person - waiting is correct",
+}
+
+
 @dataclass
 class Check:
     id: str
@@ -186,6 +225,30 @@ class Check:
     #: gate-level rollup with nothing to add. test_every_blocked_row_names_an_
     #: action enforces that this stays deliberate.
     next_action: str = ""
+    #: WHO owes the next move, and what kind of thing they owe. See ACTION_KINDS.
+    #:
+    #: WHY THIS FIELD EXISTS. `next_action` alone rendered three completely
+    #: different situations as one sentence, and they need different things. A
+    #: decision you owe, labour you owe, and an environment that owes nothing are
+    #: not three moods of the same row - they are three different requests, and a
+    #: reader given only the sentence cannot tell which one they are looking at.
+    #:
+    #: WHY IT IS ENFORCED AT CONSTRUCTION. A row that says what to do but not who
+    #: owes it is precisely the failure this field exists to stop, so it must not
+    #: be constructible. A test would only catch it when someone ran the suite.
+    action_kind: str = ""
+
+    def __post_init__(self) -> None:
+        """Reject an action with no owner, and an unknown owner."""
+        if (self.next_action or "").strip() and not self.action_kind:
+            raise ValueError(
+                f"{self.id}: next_action is set but action_kind is empty. "
+                f"Declare one of {', '.join(ACTION_KINDS)} - an action with no "
+                f"owner is the thing this field exists to prevent.")
+        if self.action_kind and self.action_kind not in ACTION_KINDS:
+            raise ValueError(
+                f"{self.id}: action_kind {self.action_kind!r} is not one of "
+                f"{', '.join(ACTION_KINDS)}")
 
 
 @dataclass
@@ -216,6 +279,86 @@ class Gate:
 # Artifact loading. Every loader returns None rather than raising, and every
 # caller treats None as MISSING. A crash here would be a hard error, not a pass.
 # --------------------------------------------------------------------------
+
+
+def load_queue() -> list[dict[str, Any]]:
+    """Decisions the Lead owns that no gate row can see. Newest file wins.
+
+    WHY A QUEUE AND NOT MORE GATE ROWS. A gate row exists to measure something
+    about the build. Some decisions measure nothing at all: "should the gate get
+    a severity ladder" is a question about the instrument, and no artifact turns
+    red or green when it is answered. Those decisions were living in a session
+    handoff, which meant a fresh chat could not see them, nothing ranked them,
+    and nothing recorded that an answer had arrived - which is a stop, not a
+    queue.
+
+    So the queue is a separate artifact read here and rendered beside the gate
+    rows. It is validated strictly by `queue_problems`, because a queue that can
+    look answered without carrying an answer is worse than no queue: it reports
+    a ruling that never happened.
+
+    Unreadable or absent yields an empty list. The gate's own rows are the
+    product measurement and must not depend on this file existing.
+    """
+    data = _read_json(QUEUE_FILE)
+    if not isinstance(data, dict):
+        return []
+    items = data.get("decisions")
+    if not isinstance(items, list):
+        return []
+    return [d for d in items if isinstance(d, dict)]
+
+
+def queue_problems(items: list[dict[str, Any]]) -> list[str]:
+    """Every way the queue can mislead. Empty means it is trustworthy.
+
+    An OPEN decision with no options is a complaint, not a question. One with no
+    `blocks` cannot be ranked against anything else, which is the entire reason
+    this is a list rather than prose. An ANSWERED entry carrying no answer is
+    the dangerous one: someone ticks a decision off, the queue reports the Lead
+    has ruled on it, and the next session builds on a ruling nobody made.
+
+    DEFERRED is deliberately a distinct state from answered. The Lead paused
+    Steam Early Access on 2026-10-04 - that has a known answer ("not now") and is
+    not the same as nobody having reached it. Folding deferred into answered
+    would let the queue forget to raise it again.
+    """
+    problems: list[str] = []
+    seen: set[str] = set()
+    for i, d in enumerate(items):
+        where = f"decisions[{i}]"
+        did = d.get("id")
+        if not isinstance(did, str) or not did.strip():
+            problems.append(f"{where}: no id")
+            did = f"#{i}"
+        elif did in seen:
+            problems.append(f"{where}: duplicate id {did!r}")
+        else:
+            seen.add(did)
+        state = d.get("state")
+        if state not in ("open", "deferred", "answered"):
+            problems.append(f"{where}: state is {state!r}, not open/deferred/answered")
+            continue
+        question = d.get("question")
+        if not isinstance(question, str) or not question.strip():
+            problems.append(f"{where}: no question")
+        elif not question.strip().endswith("?"):
+            problems.append(f"{where}: question is not phrased as a question")
+        if d.get("job") not in ("steer", "taste", "test"):
+            problems.append(f"{where}: job is {d.get('job')!r}, not steer/taste/test")
+        if not isinstance(d.get("blocks"), list) or not d["blocks"]:
+            problems.append(f"{where}: no `blocks` - cannot be ranked against anything")
+        if state == "open":
+            options = d.get("options")
+            if not isinstance(options, list) or len(options) < 2:
+                problems.append(f"{where}: open with fewer than 2 options is not a question")
+            if not str(d.get("recommendation") or "").strip():
+                problems.append(f"{where}: open with no recommendation")
+        if state == "answered" and not str(d.get("answer") or "").strip():
+            problems.append(
+                f"{where}: marked answered with no answer recorded - the fail-open "
+                f"that would let the queue claim a ruling nobody made.")
+    return problems
 
 
 def _rel(path: Path) -> str:
@@ -525,6 +668,7 @@ def check_env_world_assembled() -> Check:
             f"renamed, update SHIPPING_LEVEL in Content/Python/polish_readiness.py to "
             f"match the real one - do not point this row at a different level to make "
             f"it pass.",
+            action_kind=AGENT,
         )
     if _uses_world_partition(umap):
         storage = "external (World Partition)"
@@ -545,6 +689,7 @@ def check_env_world_assembled() -> Check:
             f"Open {SHIPPING_LEVEL} in the editor and confirm it has content, then "
             f"re-run. If the world was placed in a different level, that is a level "
             f"decision, not something to fix in this script.",
+            action_kind=DECIDE,
         )
     return Check(
         "env.world_assembled", "G-ENV",
@@ -578,6 +723,7 @@ def check_env_traversal_measured() -> Check:
                         "Docs/qa/POLISH_BASELINE.json for the route. It needs the "
                         "DESKTOP editor with cells streamed and a human on the "
                         "keys - a nullrhi commandlet cannot time a walk.",
+            action_kind=DO
         )
     rows = []
     bad = []
@@ -612,6 +758,7 @@ def check_env_traversal_measured() -> Check:
                         "the island is in the build, because a circuit time over a "
                         "19.3 m island says nothing about a 180 m one. Sequence: "
                         "re-import, then measure.",
+            action_kind=DO
         )
     if bad:
         return Check(
@@ -627,6 +774,7 @@ def check_env_traversal_measured() -> Check:
                         "one. Resizing the island to fit a number is a feel call "
                         "and belongs to the Lead; editing the window to fit the "
                         "island is also a feel call, and also belongs to the Lead.",
+            action_kind=DECIDE
         )
     return Check(
         "env.traversal_measured", "G-ENV",
@@ -684,7 +832,8 @@ def _criterion_check(
                      MISSING, "Greybox report not found. Regenerate it in Blender.",
                      next_action="blender --background "
                                  "blender/floating_island_homestead_LIB.blend "
-                                 "--python Content/Python/graybox_report_driver.py")
+                                 "--python Content/Python/graybox_report_driver.py",
+                     action_kind=AGENT)
 
     hits = [
         f for f in blocking_findings(report)
@@ -710,6 +859,7 @@ def _criterion_check(
             next_action="Delete the stale waiver row from "
                         "Docs/qa/polish_waivers.json. Its finding no longer exists, "
                         "so the waiver is no longer accepting anything.",
+            action_kind=AGENT
         )
 
     waived, open_hits = [], []
@@ -729,7 +879,8 @@ def _criterion_check(
                          "Each named item is a judgement call, not a measurement. "
                          "Either fix the source, or record a scoped waiver in "
                          "Docs/qa/polish_waivers.json with a rationale - do not "
-                         "delete the finding."))
+                         "delete the finding."),
+                     action_kind=DECIDE)
 
     if waived:
         detail = "; ".join(
@@ -927,6 +1078,7 @@ def check_env_export_fresh() -> Check:
             next_action="Restore or regenerate "
                         "AssetCreation/Exports/MVP_EXPORT_MANIFEST.md. Its byte "
                         "counts are the only reference this row has.",
+            action_kind=AGENT
         )
 
     exports_root = EXPORT_MANIFEST.parent
@@ -996,6 +1148,7 @@ def check_env_export_fresh() -> Check:
                         "AssetCreation/Exports/MVP_EXPORT_MANIFEST.md: every FBX "
                         "row needs Category | `Name.fbx` | byte-count. A row this "
                         "checker cannot parse is an export it cannot watch.",
+            action_kind=AGENT
         )
     if unlisted:
         return Check(
@@ -1005,6 +1158,7 @@ def check_env_export_fresh() -> Check:
                         "real byte count, or delete the export if it was "
                         "accidental. Do not add the row with a guessed size - an "
                         "export nobody recorded is how this chain broke once.",
+            action_kind=AGENT
         )
     if tiny:
         return Check(
@@ -1015,6 +1169,7 @@ def check_env_export_fresh() -> Check:
                         f"here is ~15 kB or more; a file under {MIN_FBX_BYTES} "
                         f"bytes means the export failed and wrote a stub. The "
                         f"smallest real one on disk is 15116 bytes.",
+            action_kind=AGENT
         )
     if stale:
         return Check(
@@ -1026,6 +1181,7 @@ def check_env_export_fresh() -> Check:
                         "AssetCreation/Exports/MVP_EXPORT_MANIFEST.md. Do not hand-"
                         "edit the size to make this row green - a hand-edited size "
                         "is exactly the failure this row exists to catch.",
+            action_kind=AGENT
         )
     if missing:
         return Check(
@@ -1036,6 +1192,7 @@ def check_env_export_fresh() -> Check:
                         "manifest if the object was retired. MISSING rather than "
                         "FAIL on purpose: hand-fixing the manifest is the wrong "
                         "move here.",
+            action_kind=DECIDE
         )
     return Check(
         "env.export_fresh", "G-ENV", question, _rel(EXPORT_MANIFEST),
@@ -1115,7 +1272,8 @@ def check_env_ue_island_measured() -> Check:
                                  "its transform moved"
                                  "  5. in-editor: run "
                                  "Content/Python/measure_ue_island.py, then commit "
-                                 "Docs/qa/UE_ISLAND_MEASUREMENT.json")
+                                 "Docs/qa/UE_ISLAND_MEASUREMENT.json",
+                     action_kind=DO)
 
     data = _read_json(UE_ISLAND_MEASUREMENT)
     if data is None:
@@ -1128,7 +1286,8 @@ def check_env_ue_island_measured() -> Check:
                                  "the editor and commit what it writes. It only "
                                  "reads. Do not hand-edit the record - the record "
                                  "is the evidence, and editing evidence is how it "
-                                 "stops being any.")
+                                 "stops being any.",
+                     action_kind=DO)
 
     # --- provenance -----------------------------------------------------
     # Reading bbox_cm alone meant a record could name any level, any asset and
@@ -1474,6 +1633,7 @@ def check_asset_board() -> Check:
                         "Docs/qa/POLISH_ASSET_BOARD.json to a rung on the "
                         "Docs/37_POLISH_PASS_PROCESS.md ladder. The gate accepts "
                         "`S2`, `s2` and `S2 ART-BLOCKOUT` alike.",
+            action_kind=AGENT
         )
     if undeclared:
         return Check(
@@ -1491,6 +1651,7 @@ def check_asset_board() -> Check:
                         "its full label); `priority` is 1..10. This is triage, "
                         "which is the Lead's call - the agent cannot know which "
                         "master needs work first.",
+            action_kind=DECIDE
         )
     return Check(
         "asset.board", "G-ASSET",
@@ -1589,6 +1750,7 @@ def check_feel_human_playtest() -> Check:
                         "notes beats three empty ones - the field exists so the "
                         "polish pass is judged against what happened, not against "
                         "a memory.",
+            action_kind=DO
         )
     return Check(
         "feel.human_playtest", "G-FEEL",
@@ -1718,6 +1880,7 @@ def check_feel_tunable_baselines() -> Check:
                         "valid value when that is the finding - an unsourced number, "
                         "'tbd' and null are not. Never copy the proposed range out of "
                         "FEEL.md; that is the destination, not the baseline.",
+            action_kind=DO
         )
     return Check(
         "feel.tunable_baselines", "G-FEEL",
@@ -1752,6 +1915,7 @@ def check_feel_verb_script() -> Check:
                         "documented fail per verb, in that file. V2 is the "
                         "walk-off-the-edge test: leave the island in any direction "
                         "and confirm you land in the field.",
+            action_kind=DO
         )
     results = {v: _verb_result(r) for v, r in verbs.items()}
     unrun = [v for v in MVP_VERBS if results.get(v) is None]
@@ -1774,6 +1938,7 @@ def check_feel_verb_script() -> Check:
                         "`verbs` map top to bottom. Record what happened, not what "
                         "was expected - a documented fail is a real result and "
                         "FAIL already means 'ran and did not pass'.",
+            action_kind=DO
         )
     # An extra key does NOT block a pass -- the eight did run, and that is the
     # question this check asks. But it is named in the note rather than dropped,
@@ -1797,6 +1962,7 @@ def check_feel_verb_script() -> Check:
                         "reason is an agent task; a verb that fails because it does "
                         "not feel right is the Lead's, and re-running it will not "
                         "change that.",
+            action_kind=AGENT
         )
     return Check(
         "feel.verb_script", "G-FEEL",
@@ -1996,15 +2162,17 @@ def render_markdown(gates: dict[str, Gate], generated: str) -> str:
         if blocked:
             A("### What to do")
             A("")
-            A("| Check | State | Next action |")
-            A("|---|---|---|")
+            A("| Check | State | Who owes it | Next action |")
+            A("|---|---|---|---|")
             for c in blocked:
                 action = c.next_action or "_none recorded - see the note_"
-                A(f"| `{c.id}` | **{c.state}** | {action} |")
+                who = ACTION_KIND_MEANING.get(c.action_kind, "_unclassified_")
+                A(f"| `{c.id}` | **{c.state}** | {who} | {action} |")
             A("")
             A("A row with no recorded action is either agent-owned and unfinished,")
             A("or deliberately held by the Lead. Both are worth saying out loud.")
             A("")
+    _render_standstill(gates, L.append)
     A("## Stage ladder")
     A("")
     for s in STAGES:
@@ -2014,6 +2182,85 @@ def render_markdown(gates: dict[str, Gate], generated: str) -> str:
       "[Docs/37_POLISH_PASS_PROCESS.md](../37_POLISH_PASS_PROCESS.md).")
     A("")
     return "\n".join(L)
+
+
+def _render_standstill(gates: dict[str, Gate], A) -> None:
+    """The three-state summary: what is waiting on whom, and what is not waiting.
+
+    The Lead's expectation is that the agent is never idle - always working,
+    always asking, or always pointing at work it cannot do itself. That is
+    satisfiable without autonomous development, and this section is how it is
+    made visible: the three states are enumerated separately, so "the agent has
+    stopped" is distinguishable from "the agent is waiting on you", which is
+    distinguishable from "there is nothing left for anyone".
+
+    Decisions from the queue file are merged in with the gate's own `decide`
+    rows, because a reader asking "what is waiting on me" should not have to know
+    which artifact a question happens to live in.
+    """
+    all_checks = [c for g in gates.values() for c in g.checks]
+    blocked = [c for c in all_checks
+               if c.state in (FAIL, MISSING, STALE) and not c.id.startswith("dep.")]
+
+    by_kind = {k: [c for c in blocked if c.action_kind == k] for k in ACTION_KINDS}
+    queue = load_queue()
+    open_decisions = [d for d in queue if d.get("state") == "open"]
+    deferred = [d for d in queue if d.get("state") == "deferred"]
+    problems = queue_problems(queue)
+
+    A("## Where everything is waiting")
+    A("")
+    A("Three states, kept apart on purpose. A question, a chore and a closed")
+    A("editor are not three moods of the same problem.")
+    A("")
+    A(f"- **The agent can act now** — {len(by_kind[AGENT])} row(s). No answer")
+    A("  needed from you; these are the agent's own moves.")
+    A(f"- **Waiting on your judgment** — {len(by_kind[DECIDE])} gate row(s) +")
+    A(f"  {len(open_decisions)} queued decision(s). These stop the agent.")
+    A(f"- **Waiting on your hands** — {len(by_kind[DO])} row(s). Labour no agent")
+    A("  can do; a human runs them and the result is evidence.")
+    A(f"- **Waiting on an environment** — {len(by_kind[ENV])} row(s). Nobody owes")
+    A("  anything and waiting is correct.")
+    A("")
+
+    if open_decisions:
+        A("### Decisions waiting on you")
+        A("")
+        A("| # | Question | Job | Blocks | Recommendation |")
+        A("|---|---|---|---|---|")
+        for d in open_decisions:
+            blocks = "; ".join(str(b) for b in d.get("blocks", []))
+            A(f"| {d.get('id', '?')} | {d.get('question', '')} | "
+              f"{d.get('job', '?')} | {blocks} | {d.get('recommendation', '')} |")
+        A("")
+
+    if by_kind[DO]:
+        A("### Work only you can do")
+        A("")
+        for c in by_kind[DO]:
+            A(f"- **`{c.id}`** ({c.state}) — {c.next_action}")
+        A("")
+
+    if deferred:
+        A("### Deferred, not forgotten")
+        A("")
+        for d in deferred:
+            A(f"- **{d.get('id', '?')}** {d.get('question', '')} — "
+              f"{d.get('deferral_reason') or d.get('answer') or 'deferred'}")
+        A("")
+
+    if not blocked:
+        A("Nothing is blocked. Every row in every gate is green or waived.")
+        A("")
+
+    if problems:
+        A("### The queue is not trustworthy")
+        A("")
+        A("Fix `Docs/qa/POLISH_QUEUE.json` before reading the decisions above:")
+        A("")
+        for p in problems:
+            A(f"- {p}")
+        A("")
 
 
 def selftest(gates: dict[str, Gate]) -> int:

@@ -1787,6 +1787,272 @@ class BlockedRowsMustNameAnAction(unittest.TestCase):
         self.assertIn("Next action", md)
 
 
+class EveryActionSaysWhoOwesIt(unittest.TestCase):
+    """An action with no owner is an incomplete record.
+
+    `next_action` alone rendered three different situations as one sentence: a
+    judgment only the Lead can make, labour only a human can perform, and an
+    environment nobody owes anything to. Those are three different requests. A
+    reader given only the sentence cannot tell a question they should answer
+    from a chore they should do, and the failure mode of each is distinct - one
+    goes unread, the other goes undone.
+
+    `Check.__post_init__` refuses to construct the ambiguous case, so this class
+    is mostly proving the guard fires and that the shipped repo is classified.
+    """
+
+    def _blocked(self):
+        return [c for g in pr.build().values() for c in g.checks
+                if c.state in (pr.FAIL, pr.MISSING, pr.STALE)
+                and not c.id.startswith("dep.")]
+
+    def test_an_action_without_a_kind_cannot_be_constructed(self):
+        with self.assertRaises(ValueError) as ctx:
+            pr.Check("x", "G", "r", "s", "m", "t", pr.MISSING,
+                     next_action="Do the thing that needs doing here.")
+        self.assertIn("action_kind", str(ctx.exception))
+        self.assertIn("x", str(ctx.exception), "the error must name the row")
+
+    def test_an_unknown_kind_is_rejected(self):
+        with self.assertRaises(ValueError) as ctx:
+            pr.Check("x", "G", "r", "s", "m", "t", pr.MISSING,
+                     next_action="Do a thing long enough to pass a length check.",
+                     action_kind="maybe")
+        self.assertIn("maybe", str(ctx.exception))
+
+    def test_every_shipped_blocked_row_is_classified(self):
+        empty = [c.id for c in self._blocked() if not c.action_kind]
+        self.assertEqual(empty, [],
+                         f"blocked rows that do not say who owes them: {empty}")
+
+    def test_the_shipped_rows_use_every_kind_deliberately(self):
+        """A kind nothing uses is a kind nobody reasoned about.
+
+        This is the same reasoning that made `master_binding` and
+        `family_distinct` worth holding RED rather than waiving: a state that
+        exists but has no rows in it is indistinguishable from a state that was
+        never needed. Currently `agent` and `env` legitimately have no rows -
+        the repo is waiting on people, not on a closed editor - so the test
+        names that rather than asserting coverage that does not exist.
+        """
+        used = {c.action_kind for c in self._blocked()}
+        unknown = used - set(pr.ACTION_KINDS)
+        self.assertEqual(unknown, set(), f"unknown kinds in the shipped gate: {unknown}")
+        self.assertIn(pr.DECIDE, used, "no row is classified as needing a judgment")
+        self.assertIn(pr.DO, used, "no row is classified as needing labour")
+
+    def test_the_markdown_renders_the_owner_column(self):
+        """The classification has to reach the reader, not just the JSON."""
+        gates = pr.build()
+        md = pr.render_markdown(gates, "2026-10-04T00:00:00+00:00")
+        self.assertIn("| Check | State | Who owes it | Next action |", md)
+        for kind, meaning in pr.ACTION_KIND_MEANING.items():
+            if any(c.action_kind == kind
+                   for g in gates.values() for c in g.checks):
+                self.assertIn(meaning, md,
+                              f"kind {kind} is in use but its meaning never rendered")
+
+    def test_no_row_can_have_an_action_and_no_owner_through_build(self):
+        """The guard must hold on the real repo, not only in a synthetic call."""
+        for g in pr.build().values():
+            for c in g.checks:
+                if (c.next_action or "").strip():
+                    self.assertTrue(
+                        c.action_kind,
+                        f"{c.id} carries an action with no owner")
+
+
+class TheQueueCannotClaimARulingNobodyMade(unittest.TestCase):
+    """A queue that can look answered without an answer is worse than no queue.
+
+    `Docs/qa/POLISH_QUEUE.json` holds the Lead's open decisions - the ones that
+    measure nothing about the build, so no artifact turns red when they are
+    answered, and therefore cannot be gate rows. Before it existed they lived in
+    a session handoff: invisible to a fresh chat, unranked, and with no way to
+    record that an answer had arrived.
+
+    The dangerous state is `answered` with an empty `answer`. Someone ticks a
+    decision off, the queue reports the Lead has ruled on it, and the next
+    session builds on a ruling nobody made. `deferred` is deliberately a
+    separate state for the same reason - "not now" is an answer, "nobody has got
+    to it" is not, and folding them together loses the difference.
+    """
+
+    def _good(self, **over):
+        d = {"id": "Q1", "state": "open", "job": "steer",
+             "question": "Should the gate get a severity ladder?",
+             "options": ["No", "Yes"], "recommendation": "No",
+             "blocks": ["nothing today"]}
+        d.update(over)
+        return d
+
+    def test_a_well_formed_open_decision_has_no_problems(self):
+        self.assertEqual(pr.queue_problems([self._good()]), [])
+
+    def test_answered_without_an_answer_is_rejected(self):
+        p = pr.queue_problems([self._good(state="answered", answer=None)])
+        self.assertTrue(p, "a decision was allowed to claim a ruling nobody made")
+        self.assertIn("answered", p[0])
+
+    def test_deferred_is_accepted_without_an_answer(self):
+        """"Not now" is an answer. Requiring `answer` here would force a fake one."""
+        self.assertEqual(
+            pr.queue_problems([self._good(state="deferred", answer=None)]), [])
+
+    def test_open_with_one_option_is_not_a_question(self):
+        p = pr.queue_problems([self._good(options=["No"])])
+        self.assertTrue(p)
+        self.assertIn("options", p[0])
+
+    def test_open_with_no_recommendation_is_rejected(self):
+        """An unranked question costs the Lead the reading it was meant to save."""
+        p = pr.queue_problems([self._good(recommendation="")])
+        self.assertTrue(p)
+        self.assertIn("recommendation", p[0])
+
+    def test_a_decision_with_nothing_to_block_is_rejected(self):
+        p = pr.queue_problems([self._good(blocks=[])])
+        self.assertTrue(p)
+        self.assertIn("blocks", p[0])
+
+    def test_a_statement_is_not_a_question(self):
+        p = pr.queue_problems([self._good(question="Add WARN to the gate.")])
+        self.assertTrue(p)
+        self.assertIn("phrased as a question", p[0])
+
+    def test_duplicate_ids_are_rejected(self):
+        p = pr.queue_problems([self._good(), self._good()])
+        self.assertTrue(p)
+        self.assertIn("duplicate", p[0])
+
+    def test_an_unknown_state_is_rejected(self):
+        p = pr.queue_problems([self._good(state="probably")])
+        self.assertTrue(p)
+        self.assertIn("state", p[0])
+
+    def test_a_bad_job_is_rejected(self):
+        p = pr.queue_problems([self._good(job="vibes")])
+        self.assertTrue(p)
+        self.assertIn("job", p[0])
+
+    def test_the_shipped_queue_is_valid(self):
+        shipped = pr.ROOT / "Docs" / "qa" / "POLISH_QUEUE.json"
+        if not shipped.is_file():
+            self.skipTest("POLISH_QUEUE.json not present")
+        self.assertEqual(pr.queue_problems(pr.load_queue()), [],
+                         "the shipped queue would render a warning section")
+
+    def test_the_shipped_queue_holds_the_known_open_decisions(self):
+        shipped = pr.ROOT / "Docs" / "qa" / "POLISH_QUEUE.json"
+        if not shipped.is_file():
+            self.skipTest("POLISH_QUEUE.json not present")
+        blob = shipped.read_text(encoding="utf-8")
+        for topic, why in [
+            ("severity ladder",
+             "recorded in Docs/38_AI_AGENT_PRACTICE.md 11.3 and deliberately not applied"),
+            ("polish",
+             "industry usage means alpha to beta; recorded there as an open question"),
+            ("tutor mode",
+             "the Lead asked for the three-state model on 2026-10-04; whether it is "
+             "named in canon is theirs"),
+            ("Early Access",
+             "paused by the Lead on 2026-10-04 and must stay visible as deferred"),
+        ]:
+            self.assertIn(topic, blob,
+                          f"{topic} dropped from the queue: {why}")
+
+    def test_a_missing_queue_does_not_break_the_gate(self):
+        """The gate's rows are the product measurement; they must not depend here."""
+        saved = pr.QUEUE_FILE
+        pr.QUEUE_FILE = Path(tempfile.gettempdir()) / "definitely-absent.json"
+        self.addCleanup(setattr, pr, "QUEUE_FILE", saved)
+        self.assertEqual(pr.load_queue(), [])
+        self.assertEqual(pr.queue_problems([]), [])
+
+    def test_the_standstill_section_survives_a_missing_queue(self):
+        saved = pr.QUEUE_FILE
+        pr.QUEUE_FILE = Path(tempfile.gettempdir()) / "definitely-absent.json"
+        self.addCleanup(setattr, pr, "QUEUE_FILE", saved)
+        gates = pr.build()
+        md = pr.render_markdown(gates, "2026-10-04T00:00:00+00:00")
+        self.assertIn("## Where everything is waiting", md)
+
+
+class TheStandstillKeepsTheThreeStatesApart(unittest.TestCase):
+    """One red row rendered as one sentence is how a question goes unread.
+
+    The Lead's expectation is that the agent is always doing something: working,
+    asking, or pointing at work it cannot do itself - without autonomous
+    development, and without the agent guessing when the next step is a human's.
+    That is only checkable if the three states are visible separately. These
+    tests assert the summary keeps them apart, because a merged summary would
+    read the same whether the agent was blocked, waiting, or finished.
+    """
+
+    def _md(self):
+        return pr.render_markdown(pr.build(), "2026-10-04T00:00:00+00:00")
+
+    def test_the_summary_names_all_three_waiting_states(self):
+        md = self._md()
+        self.assertIn("## Where everything is waiting", md)
+        for heading in ("The agent can act now", "Waiting on your judgment",
+                        "Waiting on your hands", "Waiting on an environment"):
+            self.assertIn(heading, md, f"the summary omits a state: {heading}")
+
+    def test_counts_match_the_rows_actually_blocked(self):
+        gates = pr.build()
+        blocked = [c for g in gates.values() for c in g.checks
+                   if c.state in (pr.FAIL, pr.MISSING, pr.STALE)
+                   and not c.id.startswith("dep.")]
+        md = self._md()
+        tally = {k: sum(1 for c in blocked if c.action_kind == k)
+                 for k in pr.ACTION_KINDS}
+        self.assertIn(f"{tally[pr.DECIDE]} gate row(s)", md)
+        self.assertIn(f"{tally[pr.DO]} row(s). Labour", md)
+
+    def test_labour_appears_under_its_own_heading_not_the_question_one(self):
+        """The whole point: a chore is not a question.
+
+        If these merge, the eight-verb playtest reads as something to answer
+        rather than something to do, and it silently never happens.
+        """
+        gates = pr.build()
+        md = self._md()
+        start = md.index("### Work only you can do")
+        end = md.index("## Stage ladder")
+        section = md[start:end]
+        for c in gates["G-FEEL"].checks:
+            if c.action_kind == pr.DO and (c.next_action or "").strip():
+                self.assertIn(c.id, section,
+                              f"{c.id} is labour but is not listed as labour")
+
+    def test_deferred_decisions_are_listed_separately_from_open_ones(self):
+        """Folding deferred into open would make it forgotten."""
+        md = self._md()
+        queue = pr.load_queue()
+        deferred = [d for d in queue if d.get("state") == "deferred"]
+        if not deferred:
+            self.skipTest("no deferred decision in the shipped queue")
+        self.assertIn("### Deferred, not forgotten", md)
+        for d in deferred:
+            self.assertIn(str(d.get("id")), md)
+
+    def test_an_invalid_queue_warns_in_the_rendered_output(self):
+        """A broken queue must be loud in the artifact a human actually reads."""
+        saved = pr.QUEUE_FILE
+        td = tempfile.TemporaryDirectory()
+        self.addCleanup(td.cleanup)
+        p = Path(td.name) / "queue.json"
+        p.write_text(json.dumps({"decisions": [
+            {"id": "Q1", "state": "answered", "question": "Anything?",
+             "job": "steer", "blocks": ["x"], "answer": None}]}),
+            encoding="utf-8")
+        pr.QUEUE_FILE = p
+        self.addCleanup(setattr, pr, "QUEUE_FILE", saved)
+        md = self._md()
+        self.assertIn("### The queue is not trustworthy", md)
+
+
 class AssetBoardCannotBeFakedGreen(unittest.TestCase):
     """The board exists so a batch can be reviewed at S2, not one asset at S3.
 

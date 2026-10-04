@@ -1,0 +1,80 @@
+{
+  "_schema": "POLISH_QUEUE/1",
+  "_what_this_is": "Decisions the Lead owns that no gate row can express. A gate row measures something about the build; these measure nothing at all, so nothing turns red or green when they are answered. That is why they live here instead of in the gate.",
+  "_why_a_queue_and_not_a_list_of_asks": "Before this file these decisions lived in a session handoff. A fresh chat could not see them, nothing ranked them against each other, and nothing recorded that an answer had arrived - which is a stop, not a queue.",
+  "_how_to_use": "Answer by setting `state` to \"answered\" and writing the answer in `answer`. A test enforces that an answered entry carries an answer, so a decision cannot be ticked off without one. Set `state` to \"deferred\" only when the answer is a real \"not now\" - deferred is not answered, and the gate keeps listing it so it is not forgotten.",
+  "_validation": "Content/Python/polish_readiness.py::queue_problems checks every field below and the gate prints any problem in a \"The queue is not trustworthy\" section. It is validated strictly because a queue that can look answered without carrying an answer is worse than no queue: it reports a ruling that never happened.",
+  "_not_here": "Gate rows with a `decide` action are already in POLISH_READINESS.md under each gate's \"What to do\" table. Only decisions with no row behind them belong here.",
+
+  "decisions": [
+    {
+      "id": "Q1",
+      "state": "open",
+      "job": "steer",
+      "question": "Should the gate be allowed a severity ladder, so a row can be WARN as well as RED?",
+      "recommendation": "No. Keep master_binding and family_distinct hard RED. The capability is already recorded in Docs/38_AI_AGENT_PRACTICE.md 11.3 and is deliberately not applied, because adding WARN and marking those two rows WARN would quietly undo the 2026-10-04 ruling that they stay RED.",
+      "options": [
+        "No - keep only RED, and keep those two rows RED (recommended)",
+        "Yes - add WARN, and re-render master_binding and family_distinct as WARN"
+      ],
+      "blocks": [
+        "nothing today - the gate is correct as it stands; this decides whether a future row may be soft"
+      ],
+      "asked": "2026-10-04",
+      "answer": null
+    },
+    {
+      "id": "Q2",
+      "state": "open",
+      "job": "steer",
+      "question": "Is \"polish\" the right name for this stage, given the build is at a vertical slice and not at alpha?",
+      "recommendation": "Decide before the name does damage rather than after. Industry usage defines polish as the alpha to beta transition, and this build has no human playtest record, so calling pre-production work \"polish\" sets an expectation the build cannot meet. Renaming is mechanical once you say so, and touches every gate row id, both Docs/qa/POLISH_* files and four canon docs.",
+      "options": [
+        "Rename now, before more docs accumulate the word",
+        "Keep the name and record that it is known-wrong (current state)",
+        "Rename, but keep POLISH_* paths and only change prose"
+      ],
+      "blocks": [
+        "prose accuracy in Docs/qa/POLISH_READINESS.md and POLISH_BASELINE.json",
+        "nothing executable - every gate row id keeps working under either name"
+      ],
+      "asked": "2026-10-04",
+      "answer": null
+    },
+    {
+      "id": "Q3",
+      "state": "open",
+      "job": "taste",
+      "question": "Does tutor mode belong in canon as a third working state alongside working and asking?",
+      "recommendation": "The capability now exists in this file's sibling fields - action_kind separates \"labour only you can do\" from \"a judgment only you can make\" - so the mechanism is built. What is not decided is whether to name it a mode in canon and where its procedures live. That is yours to call, and it is a taste-and-vocabulary question rather than an engineering one.",
+      "options": [
+        "Yes - add a canon row and a Docs/human-use/ page for it",
+        "No - keep it as gate machinery only, not a named mode",
+        "Yes, but after the polish pass, not now"
+      ],
+      "blocks": [
+        "a canon row in Docs/38_AI_AGENT_PRACTICE.md describing the third state",
+        "whether procedures like the eight-verb script get their own Docs/human-use/ page"
+      ],
+      "asked": "2026-10-04",
+      "answer": null
+    },
+    {
+      "id": "Q4",
+      "state": "deferred",
+      "job": "steer",
+      "question": "Build the idea-to-Early-Access pipeline map, one owner per step, indexed on Docs/CANON_MAP.md?",
+      "recommendation": "Largest remaining gap against the vision, but not worth building while Early Access is paused - a pipeline map with no destination describes a journey nobody is taking.",
+      "options": [
+        "Build it now",
+        "Defer until Early Access is active again (chosen 2026-10-04)"
+      ],
+      "blocks": [
+        "nothing while deferred"
+      ],
+      "deferral_reason": "Lead paused Steam Early Access on 2026-10-04 and said to continue the rest of the work. Raised twice before that without an answer; recorded here so it is not lost.",
+      "asked": "2026-10-02",
+      "answer": null
+    }
+  ]
+}

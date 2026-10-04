@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-04T07:56:44+00:00",
+  "generated": "2026-10-04T08:26:03+00:00",
   "process_doc": "Docs/37_POLISH_PASS_PROCESS.md",
   "verdict": "NOT_READY",
   "gates": {
@@ -22,7 +22,8 @@
           "target": ">=1 placed actor in L_VS_MVP_Markers",
           "state": "PASS",
           "note": "Counted in L_VS_MVP_Markers itself, inline (not World Partition). A World Partition level keeps its actors in Content/__ExternalActors__; a non-World-Partition level keeps them inline, so an external-actor count alone reports 0 for this one.",
-          "next_action": ""
+          "next_action": "",
+          "action_kind": ""
         },
         {
           "id": "env.island_sized",
@@ -33,7 +34,8 @@
           "target": "0 blocking",
           "state": "PASS",
           "note": "",
-          "next_action": ""
+          "next_action": "",
+          "action_kind": ""
         },
         {
           "id": "env.pivot_grounded",
@@ -44,7 +46,8 @@
           "target": "0 blocking",
           "state": "PASS",
           "note": "",
-          "next_action": ""
+          "next_action": "",
+          "action_kind": ""
         },
         {
           "id": "env.export_fresh",
@@ -55,7 +58,8 @@
           "target": "0 stale of 23",
           "state": "PASS",
           "note": "hint: 23 of 23 FBX predate the .blend save, which is normal and is not counted - one object's edit touches the whole file",
-          "next_action": ""
+          "next_action": "",
+          "action_kind": ""
         },
         {
           "id": "env.ue_island_measured",
@@ -66,7 +70,8 @@
           "target": "agrees",
           "state": "MISSING",
           "note": "Nobody has measured the island inside Unreal. The Blender side reads 180.0 x 100.0 m, but that is the source, not the mesh the game is built from. This exact gap is how the 2026-10-04 plate went missing: the .blend and the report said 180 x 100 while Unreal was still holding 19.3 x 10.7. Run Content/Python/measure_ue_island.py in the editor - it only reads - and commit what it writes. Hand-writing bbox_cm defeats the point. The record has to say what was measured, where, and when - a bare number is not evidence.",
-          "next_action": "1. blender --background blender/floating_island_homestead_LIB.blend --python AssetCreation/Blender/apply_island_plate.py  (already done 2026-10-04)  2. re-export SM_IslandTop -> AssetCreation/Exports/Homestead/(already done, commit e08b756)  3. in-editor: re-import the FBX over Content/HomeWorld/Meshes/Homestead/SM_IslandTop.uasset  4. in-editor: re-place the island actor if its transform moved  5. in-editor: run Content/Python/measure_ue_island.py, then commit Docs/qa/UE_ISLAND_MEASUREMENT.json"
+          "next_action": "1. blender --background blender/floating_island_homestead_LIB.blend --python AssetCreation/Blender/apply_island_plate.py  (already done 2026-10-04)  2. re-export SM_IslandTop -> AssetCreation/Exports/Homestead/(already done, commit e08b756)  3. in-editor: re-import the FBX over Content/HomeWorld/Meshes/Homestead/SM_IslandTop.uasset  4. in-editor: re-place the island actor if its transform moved  5. in-editor: run Content/Python/measure_ue_island.py, then commit Docs/qa/UE_ISLAND_MEASUREMENT.json",
+          "action_kind": "do"
         },
         {
           "id": "env.master_binding",
@@ -77,7 +82,8 @@
           "target": "0 blocking",
           "state": "FAIL",
           "note": "M_FamilySilhouette: material in the blend is neither one of the ten masters nor an allowed instance (art bible S10); M_ValleyNight: material in the blend is neither one of the ten masters nor an allowed instance (art bible S10)",
-          "next_action": "Bind each material to one of the ten masters in Docs/06_VS_MVP_DRESS.md, or declare it an allowed instance of one. This is an art-bible decision (S10), so it is the Lead's call, not a script's. Lead ruled 2026-10-04 to leave it RED for the art pass - so the correct action right now is none, and G-ENV stays RED until the art pass lands."
+          "next_action": "Bind each material to one of the ten masters in Docs/06_VS_MVP_DRESS.md, or declare it an allowed instance of one. This is an art-bible decision (S10), so it is the Lead's call, not a script's. Lead ruled 2026-10-04 to leave it RED for the art pass - so the correct action right now is none, and G-ENV stays RED until the art pass lands.",
+          "action_kind": "decide"
         },
         {
           "id": "env.family_distinct",
@@ -88,7 +94,8 @@
           "target": "0 blocking",
           "state": "FAIL",
           "note": "SM_NODE_PLANT_SLOT_DAY_PLANTED: measures flat but the locked signature for 'heal' is narrow upright, single soft column",
-          "next_action": "The named mesh measures flat where its locked signature is 'narrow upright, single soft column'. Changing it means editing authored geometry, which AGENTS.md forbids the agent doing and which is an art decision regardless. Lead ruled 2026-10-04 to leave it RED for the art pass - so the correct action right now is none, and G-ENV stays RED until then."
+          "next_action": "The named mesh measures flat where its locked signature is 'narrow upright, single soft column'. Changing it means editing authored geometry, which AGENTS.md forbids the agent doing and which is an art decision regardless. Lead ruled 2026-10-04 to leave it RED for the art pass - so the correct action right now is none, and G-ENV stays RED until then.",
+          "action_kind": "decide"
         },
         {
           "id": "env.traversal_measured",
@@ -99,7 +106,8 @@
           "target": "cabin_to_lookout_s 15-25; island_circuit_s 45-90",
           "state": "MISSING",
           "note": "Not yet measured: cabin_to_lookout_s, island_circuit_s. The artifact exists and the keys are declared, but no number has been recorded. Timing a walk needs the desktop editor with cells streamed and a human on the keys.",
-          "next_action": "Walk each route three times in the DESKTOP editor and record the median into `measured_s` in Docs/qa/POLISH_BASELINE.json. Lead deferred this to the polish pass on 2026-10-04 - and it cannot be done before the island is in the build, because a circuit time over a 19.3 m island says nothing about a 180 m one. Sequence: re-import, then measure."
+          "next_action": "Walk each route three times in the DESKTOP editor and record the median into `measured_s` in Docs/qa/POLISH_BASELINE.json. Lead deferred this to the polish pass on 2026-10-04 - and it cannot be done before the island is in the build, because a circuit time over a 19.3 m island says nothing about a 180 m one. Sequence: re-import, then measure.",
+          "action_kind": "do"
         },
         {
           "id": "env.traversal_reachable",
@@ -110,7 +118,8 @@
           "target": "0 unreachable",
           "state": "PASS",
           "note": "Size does not contradict any window. This does NOT mean a real walk fits them - the timing instrument is `env.traversal_measured`.",
-          "next_action": ""
+          "next_action": "",
+          "action_kind": ""
         },
         {
           "id": "env.canon_windows_in_sync",
@@ -121,7 +130,8 @@
           "target": "same windows",
           "state": "PASS",
           "note": "cabin_to_lookout_s 15-25, island_circuit_s 45-90",
-          "next_action": ""
+          "next_action": "",
+          "action_kind": ""
         }
       ]
     },
@@ -144,7 +154,8 @@
           "target": "GREEN",
           "state": "FAIL",
           "note": "G-ENV is RED; its stage cannot be entered yet.",
-          "next_action": ""
+          "next_action": "",
+          "action_kind": ""
         },
         {
           "id": "asset.master_count",
@@ -155,7 +166,8 @@
           "target": "10",
           "state": "PASS",
           "note": "M_BeastStylized, M_CliffRock, M_FoliageCard, M_GatherHerb, M_Nurtured, M_PathStone, M_SpiritUnlit, M_StylizedGrass, M_WoodCabin, M_WoodWild",
-          "next_action": ""
+          "next_action": "",
+          "action_kind": ""
         },
         {
           "id": "asset.board",
@@ -166,7 +178,8 @@
           "target": "10/10 declared",
           "state": "MISSING",
           "note": "Declared but not recorded yet: M_BeastStylized, M_CliffRock, M_FoliageCard, M_GatherHerb, M_Nurtured, M_PathStone. Each row needs a stage from the S0-S5 ladder and a priority, so a batch can be reviewed together at S2 rather than one at a time at S3.",
-          "next_action": "Fill `stage` and `priority` for each row in Docs/qa/POLISH_ASSET_BOARD.json. The ladder is S0..S5 (or its full label); `priority` is 1..10. This is triage, which is the Lead's call - the agent cannot know which master needs work first."
+          "next_action": "Fill `stage` and `priority` for each row in Docs/qa/POLISH_ASSET_BOARD.json. The ladder is S0..S5 (or its full label); `priority` is 1..10. This is triage, which is the Lead's call - the agent cannot know which master needs work first.",
+          "action_kind": "decide"
         },
         {
           "id": "asset.poly_budgets",
@@ -177,7 +190,8 @@
           "target": "budget per mesh",
           "state": "PASS",
           "note": "",
-          "next_action": ""
+          "next_action": "",
+          "action_kind": ""
         }
       ]
     },
@@ -200,7 +214,8 @@
           "target": "GREEN",
           "state": "FAIL",
           "note": "G-ASSET is RED; its stage cannot be entered yet.",
-          "next_action": ""
+          "next_action": "",
+          "action_kind": ""
         },
         {
           "id": "feel.human_playtest",
@@ -211,7 +226,8 @@
           "target": "commit + timestamp",
           "state": "MISSING",
           "note": "The record exists and the fields are empty. Fill in commit (the short sha you played), played_at, and notes. Until then no human has played this build.",
-          "next_action": "Play the build once, then write `commit` (git rev-parse --short HEAD), `played_at`, and `notes` into Docs/qa/POLISH_HUMAN_PLAYTEST.json. One honest pass with notes beats three empty ones - the field exists so the polish pass is judged against what happened, not against a memory."
+          "next_action": "Play the build once, then write `commit` (git rev-parse --short HEAD), `played_at`, and `notes` into Docs/qa/POLISH_HUMAN_PLAYTEST.json. One honest pass with notes beats three empty ones - the field exists so the polish pass is judged against what happened, not against a memory.",
+          "action_kind": "do"
         },
         {
           "id": "feel.tunable_baselines",
@@ -222,7 +238,8 @@
           "target": ">=1 per tunable",
           "state": "PASS",
           "note": "4 numeric, 2 recorded as absent. Each carries a source. Values are BEFORE state read from source on 2026-10-04, not proposals - no FEEL.md tunable has been chosen, and none of these numbers endorses one.",
-          "next_action": ""
+          "next_action": "",
+          "action_kind": ""
         },
         {
           "id": "feel.verb_script",
@@ -233,7 +250,8 @@
           "target": "8 verbs, each pass or documented fail",
           "state": "MISSING",
           "note": "Declared but never run: V1, V2, V3, V4, V5, V6, V7, V8. A null result is an open question, not a failure -- FAIL would say a person tried it and it broke. Run them in the order in POLISH_HUMAN_PLAYTEST.json and record either pass or a documented fail per verb.",
-          "next_action": "Open Docs/qa/POLISH_HUMAN_PLAYTEST.json and work the `verbs` map top to bottom. Record what happened, not what was expected - a documented fail is a real result and FAIL already means 'ran and did not pass'."
+          "next_action": "Open Docs/qa/POLISH_HUMAN_PLAYTEST.json and work the `verbs` map top to bottom. Record what happened, not what was expected - a documented fail is a real result and FAIL already means 'ran and did not pass'.",
+          "action_kind": "do"
         },
         {
           "id": "feel.binary_fresh",
@@ -244,7 +262,8 @@
           "target": "0 failed",
           "state": "PASS",
           "note": "dll_stale=False; report counters disagree with report entries (19 vs 20), unexplained",
-          "next_action": ""
+          "next_action": "",
+          "action_kind": ""
         }
       ]
     }
