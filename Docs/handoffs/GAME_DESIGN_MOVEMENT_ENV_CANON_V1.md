@@ -106,7 +106,7 @@ Outside the island spec. Not a mesh edit.
 
 - The level is finally seen by a short move through cover to a hidden vantage. Bushes are an example, not the technique. This stays even when the floor does not change.
 - One floor is a preference until the cost is measured. Do not split the floor on a guess.
-- The camp does not spawn on the forest edge. From the entry, the camp's own edge is visible in one look, whichever way the player comes in, so they can see there is something to check. That read has no meter distance, and it is not measured from the landing.
+- The camp still spawns at the first forest edge the player picks. From the entry, the camp's own edge is visible in one look, whichever way the player comes in, so they can see there is something to check. That read has no meter distance, and it is not measured from the landing.
 - Other forest spawns are part of the first floor and do not wait on the camp.
 
 ## Lead lock 2026-10-03, camp size
