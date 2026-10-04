@@ -45,6 +45,7 @@ state is not that writer.
 - The 260 m line is the plains edge on that straight glide only.
 - Other directions have no edge.
 - A cloud ring does not draw that line around the island.
+- Height is one and a half times the current drop.
 
 ## Left empty on purpose
 
