@@ -12,7 +12,7 @@ Every FBX written for first UE import staging. Assembly **roots** that are Empti
 |---|---|---:|---|
 | Homestead | `SM_Cabin.fbx` | 81196 | SM_Cabin_* + UCX_SM_Cabin — **PA-C tranche 2** (1680 tris; rustic log/gable; UCX 5.5×4.5×5.5) |
 | Homestead | `SM_Glider_Perch.fbx` | 17148 | SM_Glider_Perch — **PA-C tranche 2** (132 tris; perch/rail) |
-| Homestead | `SM_IslandTop.fbx` | 15676 | SM_IslandTop |
+| Homestead | `SM_IslandTop.fbx` | 15692 | SM_IslandTop |
 | Homestead | `SM_Lookout_Pad.fbx` | 15116 | SM_Lookout_Pad |
 | Homestead | `SM_Cliff_LookoutFace.fbx` | 31772 | SM_Cliff_LookoutFace — **PA-C tranche 1** (864 tris, M_CliffRock) |
 | Homestead | `SM_Cliff_CabinFace.fbx` | 27548 | SM_Cliff_CabinFace — **PA-C tranche 1** (648 tris, M_CliffRock) |
