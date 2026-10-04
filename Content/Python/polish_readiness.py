@@ -99,7 +99,7 @@ EXPECTED_MASTER_COUNT = 10
 
 #: If this changes, a check was dropped or renamed. Fail loudly rather than
 #: reporting a green run over a smaller set of questions. See WHY #0.
-EXPECTED_CHECKS = 16
+EXPECTED_CHECKS = 17
 
 #: Criteria the greybox report can raise as BLOCKING. Every one of these needs a
 #: check in G-ENV or a recorded decision that it is out of scope. This is the
@@ -259,12 +259,127 @@ def find_key(f: dict[str, Any]) -> tuple[str, str, str]:
 # G-ENV — may we begin sizing and blockout work?
 # --------------------------------------------------------------------------
 
-#: Traversal windows owned by Docs/canon/FEEL.md. Read from that file rather than
-#: restated, so the gate cannot drift from canon. Parsed out of the markdown table.
+#: Traversal windows, DECLARED from Docs/canon/FEEL.md.
+#:
+#: These are a RESTATEMENT, not a parse. An earlier revision of this comment
+#: claimed the values were "read from that file rather than restated, so the gate
+#: cannot drift from canon. Parsed out of the markdown table." That was false --
+#: they are literals, and the same module's docstring admitted "FEEL.md states the
+#: windows; nothing reads them". A comment promising a guarantee the code does not
+#: provide is worse than no comment, because it stops the next reader checking.
+#:
+#: So the drift is now CHECKED instead of asserted: `read_canon_windows()` parses
+#: FEEL.md for real, and `check_env_canon_windows_in_sync` FAILs if these literals
+#: no longer match it. Canon moved on 2026-10-03 (island 21x14 -> 180x100, walk
+#: 6.0 m/s) without touching this table, which is exactly the case the old comment
+#: promised would be impossible.
 TRAVERSAL_TARGETS: dict[str, tuple[float, float]] = {
     "cabin_to_lookout_s": (15.0, 25.0),
     "island_circuit_s": (45.0, 90.0),
 }
+
+#: Which FEEL.md table row supplies which window. Matched on ASCII substrings that
+#: survive the file's typographic characters -- the row reads "Cabin -> lookout walk"
+#: with a real arrow and en-dashes, and an earlier grep-based reader saw mojibake
+#: there and would have matched nothing.
+FEEL_WINDOW_ROWS: dict[str, tuple[str, ...]] = {
+    "cabin_to_lookout_s": ("Cabin", "lookout walk"),
+    "island_circuit_s": ("Island circuit",),
+}
+
+# "~15-25 s", "~12-25 s", with hyphen, en dash or em dash, spaces optional.
+_RANGE_RE = re.compile(
+    r"(\d+(?:\.\d+)?)\s*[-–—]\s*(\d+(?:\.\d+)?)\s*s\b"
+)
+
+
+def read_canon_windows() -> tuple[dict[str, tuple[float, float]], list[str]]:
+    """Parse the traversal windows out of FEEL.md. Returns (windows, problems).
+
+    Returns problems rather than raising: a missing or unreadable canon file has
+    to surface as a RED check, not as a traceback that stops the gate reporting.
+    An empty dict means "could not read canon", which the caller must treat as
+    unknown -- never as "no windows exist".
+    """
+    problems: list[str] = []
+    if not FEEL_CANON.is_file():
+        return {}, [f"{_rel(FEEL_CANON)} is absent"]
+    try:
+        text = FEEL_CANON.read_text(encoding="utf-8-sig", errors="replace")
+    except OSError as exc:
+        return {}, [f"{_rel(FEEL_CANON)} unreadable: {exc}"]
+
+    out: dict[str, tuple[float, float]] = {}
+    for key, needles in FEEL_WINDOW_ROWS.items():
+        row = next(
+            (ln for ln in text.splitlines()
+             if ln.lstrip().startswith("|") and all(n in ln for n in needles)),
+            None,
+        )
+        if row is None:
+            problems.append(f"no FEEL.md table row matching {needles}")
+            continue
+        hit = _RANGE_RE.search(row)
+        if hit is None:
+            problems.append(f"FEEL.md row {needles} has no 'NN-NN s' range: {row.strip()[:70]}")
+            continue
+        lo, hi = float(hit.group(1)), float(hit.group(2))
+        if not 0 < lo <= hi:
+            problems.append(f"FEEL.md row {needles} is not an ascending range: {row.strip()[:70]}")
+            continue
+        out[key] = (lo, hi)
+    return out, problems
+
+
+def check_env_canon_windows_in_sync() -> Check:
+    """The windows this gate judges against must still be the ones canon states.
+
+    A hardcoded window silently becomes a private taste decision the moment canon
+    moves: the gate keeps reporting "inside canon" for a number the Lead has
+    replaced, and nothing says so. This is the check that makes the drift visible.
+    """
+    canon, problems = read_canon_windows()
+    # A partial parse must never read as agreement. If one row came back but
+    # another did not, comparing only the row that parsed would report PASS over
+    # a canon file we demonstrably failed to understand -- the same fail-open as
+    # an absent artifact treated as a clean one.
+    if not canon or problems:
+        return Check(
+            "env.canon_windows_in_sync", "G-ENV",
+            "Gate traversal windows match Docs/canon/FEEL.md",
+            _rel(FEEL_CANON),
+            "could not read canon" if not canon else f"{len(canon)} of "
+            f"{len(FEEL_WINDOW_ROWS)} windows parsed",
+            "same windows",
+            MISSING,
+            "; ".join(problems) + ". The gate is judging against its own literals "
+            "while canon is not fully readable, so nothing can be said about "
+            "agreement.",
+        )
+    drifted = [
+        f"{k}: gate {TRAVERSAL_TARGETS[k][0]:g}-{TRAVERSAL_TARGETS[k][1]:g} "
+        f"vs canon {v[0]:g}-{v[1]:g}"
+        for k, v in sorted(canon.items())
+        if k in TRAVERSAL_TARGETS and TRAVERSAL_TARGETS[k] != v
+    ]
+    missing = [k for k in canon if k not in TRAVERSAL_TARGETS]
+    if drifted or missing:
+        return Check(
+            "env.canon_windows_in_sync", "G-ENV",
+            "Gate traversal windows match Docs/canon/FEEL.md",
+            _rel(FEEL_CANON),
+            "; ".join(drifted) or "window absent from the gate",
+            "same windows", FAIL,
+            "Canon moved and the gate did not. Update TRAVERSAL_TARGETS in this "
+            "file to the values canon now states, or decide deliberately that the "
+            "gate should keep judging the old window -- and say which in the commit.",
+        )
+    return Check(
+        "env.canon_windows_in_sync", "G-ENV",
+        "Gate traversal windows match Docs/canon/FEEL.md",
+        _rel(FEEL_CANON), f"{len(canon)} windows agree", "same windows", PASS,
+        ", ".join(f"{k} {v[0]:g}-{v[1]:g}" for k, v in sorted(canon.items())),
+    )
 
 #: The six tunables Docs/canon/FEEL.md still holds as TODO proposals. Named here so
 #: POLISH_BASELINE.json and the gate agree on what "all of them" means -- without a
@@ -882,6 +997,7 @@ def build() -> dict[str, Gate]:
         check_env_family_distinct(),
         check_env_traversal_measured(),
         check_env_traversal_reachable(),
+        check_env_canon_windows_in_sync(),
     ]
     gates["G-ASSET"].checks = [
         _upstream(gates, "G-ENV"),

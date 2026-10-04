@@ -456,6 +456,132 @@ class TunableBaselines(unittest.TestCase):
                 pr.BASELINE_FILE = saved
 
 
+class CanonWindowSync(unittest.TestCase):
+    """The gate's traversal windows are literals; canon moves; drift must be loud.
+
+    An earlier revision of polish_readiness.py carried the comment "Read from that
+    file rather than restated, so the gate cannot drift from canon. Parsed out of
+    the markdown table." It was false -- the values were dict literals -- and the
+    same module's docstring said "nothing reads them". Canon then moved on
+    2026-10-03 without touching the literals. So the claim is now checked.
+
+    Every test here is a mutation: a plausible edit to canon or to the gate that
+    would otherwise drift silently.
+    """
+
+    def _with_feel(self, body):
+        """Point the gate at a temporary FEEL.md and yield control."""
+        td = tempfile.TemporaryDirectory()
+        p = Path(td.name) / "FEEL.md"
+        p.write_text(body, encoding="utf-8")
+        saved_path, saved_targets = pr.FEEL_CANON, dict(pr.TRAVERSAL_TARGETS)
+        pr.FEEL_CANON = p
+        self.addCleanup(td.cleanup)
+        self.addCleanup(setattr, pr, "FEEL_CANON", saved_path)
+        self.addCleanup(setattr, pr, "TRAVERSAL_TARGETS", saved_targets)
+        return td
+
+    def test_shipped_feel_md_actually_parses(self):
+        # The row is "Cabin -> lookout walk" with a real arrow and en-dashes. A
+        # reader that matched on those characters would find nothing and return an
+        # empty dict -- which, read naively, looks like "canon declares no windows"
+        # rather than "the parse failed". So parse the REAL file.
+        canon, problems = pr.read_canon_windows()
+        self.assertEqual(problems, [], f"shipped FEEL.md failed to parse: {problems}")
+        self.assertEqual(
+            canon,
+            {"cabin_to_lookout_s": (15.0, 25.0), "island_circuit_s": (45.0, 90.0)},
+        )
+
+    def test_shipped_literals_agree_with_shipped_canon(self):
+        self.assertEqual(pr.check_env_canon_windows_in_sync().state, pr.PASS)
+
+    def test_canon_moves_and_the_gate_follows_silently(self):
+        # The whole point. Canon narrows the circuit window; the literals do not
+        # move; the check must FAIL and name both sides rather than keep reporting
+        # "inside canon" for a number the Lead replaced.
+        body = (
+            "| Tunable | Value | Notes |\n|---|---|---|\n"
+            "| Cabin -> lookout walk | ~15-25 s | V1 |\n"
+            "| Island circuit | ~30-60 s | V1 |\n"
+        )
+        self._with_feel(body)
+        c = pr.check_env_canon_windows_in_sync()
+        self.assertEqual(c.state, pr.FAIL)
+        self.assertIn("island_circuit_s", c.measured)
+        self.assertIn("45-90", c.measured)
+        self.assertIn("30-60", c.measured)
+
+    def test_updating_the_literal_clears_the_failure(self):
+        # Otherwise the check is just a permanent FAIL and gets ignored, which is
+        # the same failure mode as a permanent PASS.
+        body = (
+            "| Tunable | Value | Notes |\n|---|---|---|\n"
+            "| Cabin -> lookout walk | ~15-25 s | V1 |\n"
+            "| Island circuit | ~30-60 s | V1 |\n"
+        )
+        self._with_feel(body)
+        pr.TRAVERSAL_TARGETS = dict(pr.TRAVERSAL_TARGETS, island_circuit_s=(30.0, 60.0))
+        self.assertEqual(pr.check_env_canon_windows_in_sync().state, pr.PASS)
+
+    def test_en_dash_and_hyphen_both_parse(self):
+        # FEEL.md uses en-dashes. A hand-edit on Windows will often produce ASCII
+        # hyphens. Both must parse, or a canon edit silently voids the check.
+        for dash in ("-", "\u2013", "\u2014"):
+            with self.subTest(dash=dash):
+                body = (
+                    "| Tunable | Value | Notes |\n|---|---|---|\n"
+                    f"| Cabin -> lookout walk | ~15{dash}25 s | V1 |\n"
+                    f"| Island circuit | ~45{dash}90 s | V1 |\n"
+                )
+                self._with_feel(body)
+                canon, problems = pr.read_canon_windows()
+                self.assertEqual(problems, [])
+                self.assertEqual(canon["cabin_to_lookout_s"], (15.0, 25.0))
+
+    def test_absent_canon_is_missing_not_pass(self):
+        # A vanished FEEL.md must never read as "in sync". It reads MISSING,
+        # because the gate is then judging its own literals against nothing.
+        td = tempfile.TemporaryDirectory()
+        saved = pr.FEEL_CANON
+        pr.FEEL_CANON = Path(td.name) / "gone.md"
+        try:
+            c = pr.check_env_canon_windows_in_sync()
+            self.assertEqual(c.state, pr.MISSING)
+            self.assertNotEqual(c.state, pr.PASS)
+        finally:
+            pr.FEEL_CANON = saved
+            td.cleanup()
+
+    def test_row_without_a_range_is_reported_not_skipped(self):
+        # "not measured yet" in the value cell. Returning an empty dict here is
+        # correct, but it must arrive with a problem attached, or the check
+        # degrades to MISSING for a reason nobody can act on.
+        body = (
+            "| Tunable | Value | Notes |\n|---|---|---|\n"
+            "| Cabin -> lookout walk | TBD | V1 |\n"
+            "| Island circuit | ~45-90 s | V1 |\n"
+        )
+        self._with_feel(body)
+        canon, problems = pr.read_canon_windows()
+        self.assertNotIn("cabin_to_lookout_s", canon)
+        self.assertTrue(any("cabin_to_lookout_s" in p or "lookout" in p
+                            for p in problems), problems)
+        self.assertEqual(pr.check_env_canon_windows_in_sync().state, pr.MISSING)
+
+    def test_descending_range_is_refused(self):
+        # "25-15 s" is a typo, not a window. Accepting it would invert the test.
+        body = (
+            "| Tunable | Value | Notes |\n|---|---|---|\n"
+            "| Cabin -> lookout walk | ~25-15 s | V1 |\n"
+            "| Island circuit | ~45-90 s | V1 |\n"
+        )
+        self._with_feel(body)
+        canon, problems = pr.read_canon_windows()
+        self.assertNotIn("cabin_to_lookout_s", canon)
+        self.assertTrue(problems)
+
+
 class TheShippedSkeletonIsHonest(unittest.TestCase):
     """Assert the real artifact on disk, not a fixture.
 

@@ -9,10 +9,10 @@
   },
   "blend_file": "C:\\dev\\HomeWorld\\blender\\floating_island_homestead_LIB.blend",
   "blender": "5.2.2 LTS",
-  "blocking_count": 4,
+  "blocking_count": 5,
   "by_criterion": {
     "1_location": 17,
-    "2_sized": 1,
+    "2_sized": 2,
     "4_distinct": 1,
     "master_binding": 2
   },
@@ -96,7 +96,13 @@
     },
     {
       "criterion": "2_sized",
-      "detail": "y bbox 10.700 vs spec 14.000 (off by 3.300, tolerance 1.400)",
+      "detail": "x bbox 19.300 vs spec 180.000 (off by 160.700, tolerance 18.000)",
+      "severity": "blocking",
+      "volume": "SM_Island_Hero"
+    },
+    {
+      "criterion": "2_sized",
+      "detail": "y bbox 10.700 vs spec 100.000 (off by 89.300, tolerance 10.000)",
       "severity": "blocking",
       "volume": "SM_Island_Hero"
     },
