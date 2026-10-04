@@ -57,16 +57,29 @@ _spec.loader.exec_module(pr)
 # importable keeps one instance of `pr` shared by both modules - two instances
 # would each hold their own ROOT and the tests would measure different repos.
 sys.path.insert(0, str(SCRIPT.parent))
-CLOSE_SCRIPT = SCRIPT.parent / "session_close.py"
-if not CLOSE_SCRIPT.is_file():
-    raise AssertionError(
-        f"{CLOSE_SCRIPT} is gone. The session-close question is a repo "
-        f"mechanism, not a convenience - its absence means a session can end "
-        f"in silence again.")
-_close_spec = importlib.util.spec_from_file_location("session_close", CLOSE_SCRIPT)
-sc = importlib.util.module_from_spec(_close_spec)
-sys.modules["session_close"] = sc
-_close_spec.loader.exec_module(sc)
+
+
+def _load_sibling(name: str):
+    """Load a sibling script by name, or fail loudly.
+
+    These are repo mechanisms, not conveniences. If one goes missing, a session
+    can end in silence again or an approval can go unchecked, so the absence is
+    an assertion failure rather than a skip - a skipped guard is not a guard.
+    """
+    path = SCRIPT.parent / f"{name}.py"
+    if not path.is_file():
+        raise AssertionError(
+            f"{path} is gone. It is a repo mechanism: its absence removes a "
+            f"guarantee rather than breaking a test.")
+    spec = importlib.util.spec_from_file_location(name, path)
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules[name] = mod
+    spec.loader.exec_module(mod)
+    return mod
+
+
+sc = _load_sibling("session_close")
+tp = _load_sibling("task_phase")
 
 
 def _fixture_findings():
@@ -2067,6 +2080,309 @@ class TheStandstillKeepsTheThreeStatesApart(unittest.TestCase):
         self.addCleanup(setattr, pr, "QUEUE_FILE", saved)
         md = self._md()
         self.assertIn("### The queue is not trustworthy", md)
+
+
+class ApprovalIsNeverSelfGranted(unittest.TestCase):
+    """The one rule of the task ladder that is enforced rather than advised.
+
+    The Lead set the ladder on 2026-10-04: research -> design -> questions ->
+    design refinement/approval -> implementation -> implementation questions /
+    refinement / approval -> testing -> task approval/refinement, "where it
+    makes sense".
+
+    Written as guidance it decays inside a week, because the party that benefits
+    from skipping the middle is the party writing the checklist. So the ladder is
+    in `task_phase.py` and this class guards the one invariant prose cannot hold:
+
+        approval is never self-granted.
+
+    Everything else here is bookkeeping. That one is the load-bearing part, and
+    it is the same defect class as a gate going green over six nulls - a seeded
+    record that reads as progress.
+    """
+
+    #: A record covering every approval phase, so a test exercising one phase is
+    #: not also silently testing the absent-phase rule. Without this, every
+    #: single-phase test failed on the other approval phase being missing - which
+    #: is the checker working, but it hides what each test is actually for.
+    _FILLER = {"phase": "design_approval", "state": "skipped",
+               "reason": "not the phase under test"}
+
+    def _rec(self, *phases, fill=True):
+        listed = [dict(p) for p in phases]
+        if fill:
+            present = {p.get("phase") for p in listed}
+            for ap in tp.APPROVAL_PHASES:
+                if ap not in present:
+                    f = dict(self._FILLER)
+                    f["phase"] = ap
+                    listed.append(f)
+        return {"task": "t", "phases": listed}
+
+    def _ok(self, *phases, **kw):
+        self.assertEqual(tp.phase_problems(self._rec(*phases, **kw)), [])
+
+    def _bad(self, *phases, **kw):
+        self.assertTrue(tp.phase_problems(self._rec(*phases, **kw)))
+
+    # --- THE INVARIANT ----------------------------------------------------
+
+    def test_the_agent_cannot_approve_its_own_work(self):
+        for who in sorted(tp.NON_HUMAN):
+            with self.subTest(by=who):
+                self._bad({"phase": "task_approval", "state": "approved", "by": who})
+
+    def test_approval_naming_nobody_is_rejected(self):
+        """The fail-open. A record that can say approved without saying who."""
+        self._bad({"phase": "task_approval", "state": "approved"})
+        self._bad({"phase": "task_approval", "state": "approved", "by": "   "})
+
+    def test_approval_by_a_named_human_is_accepted(self):
+        self._ok({"phase": "task_approval", "state": "approved", "by": "Lead"})
+
+    def test_the_nonhuman_list_covers_the_obvious_aliases(self):
+        """The temptation is 'agent' in one record and 'AI' in another."""
+        for alias in ("agent", "AI", "assistant", "model", "self", "bot"):
+            self.assertIn(alias.lower(), tp.NON_HUMAN)
+
+    def test_a_non_approval_phase_cannot_claim_approval(self):
+        """Otherwise the ladder becomes a scoreboard rather than a process."""
+        self._bad({"phase": "implementation", "state": "approved", "by": "Lead"})
+        self._bad({"phase": "testing", "state": "approved", "by": "Lead"})
+
+    # --- a skip is a recorded state, not an absence -----------------------
+
+    def test_the_leads_where_it_makes_sense_escape_hatch_works(self):
+        """A task with no design question must be able to say so."""
+        self._ok({"phase": "design_approval", "state": "skipped",
+                  "reason": "No feel, mechanic, or bar involved - agent-owned "
+                            "instrumentation per OWNERSHIP.md."})
+
+    def test_a_skip_without_a_reason_is_rejected(self):
+        """Otherwise 'skipped' becomes the default and the ladder records nothing."""
+        self._bad({"phase": "design_approval", "state": "skipped"})
+
+    def test_an_absent_approval_phase_is_not_the_same_as_not_needed(self):
+        """Absence cannot be told from forgetting, so it is not accepted.
+
+        `fill=False` because filling in the missing phase is exactly what this
+        rule is checking for - with the helper's default, the record would
+        arrive complete and prove nothing.
+        """
+        self.assertTrue(tp.phase_problems(
+            {"task": "t", "phases": [{"phase": "research", "state": "done",
+                                      "evidence": "x"}]}))
+
+    # --- done means evidenced ---------------------------------------------
+
+    def test_done_without_evidence_is_rejected(self):
+        """'Done' is the assertion the process exists to make credible."""
+        self._bad({"phase": "research", "state": "done"})
+
+    def test_needs_revision_without_a_reason_is_rejected(self):
+        """Nobody can act on a revision nobody described."""
+        self._bad({"phase": "implementation_review", "state": "needs_revision"})
+
+    def test_a_later_phase_cannot_be_done_while_an_earlier_one_is_pending(self):
+        """That is the shape of skipping the middle and calling it progress."""
+        self._bad({"phase": "research", "state": "pending"},
+                  {"phase": "testing", "state": "done", "evidence": "x"})
+
+    def test_the_full_ladder_in_order_is_clean(self):
+        self._ok({"phase": "research", "state": "done", "evidence": "x"},
+                 {"phase": "design", "state": "done", "evidence": "y"},
+                 {"phase": "questions", "state": "done", "evidence": "z"},
+                 {"phase": "design_approval", "state": "approved", "by": "Lead"},
+                 {"phase": "implementation", "state": "done", "evidence": "a"},
+                 {"phase": "implementation_review", "state": "done", "evidence": "b"},
+                 {"phase": "testing", "state": "done", "evidence": "c"},
+                 {"phase": "task_approval", "state": "approved", "by": "Lead"})
+
+    # --- the ladder itself is the Lead's, not the agent's -----------------
+
+    def test_the_phase_order_matches_what_the_lead_specified(self):
+        """Asserted as literals, not against tp.PHASE_ORDER.
+
+        Comparing the module to itself is the tautology that let a mutation
+        redefine HELD and rewrite its own expectation three commits ago. This
+        test must fail if someone reorders or renames a phase.
+        """
+        self.assertEqual(tp.PHASE_ORDER, [
+            "research", "design", "questions", "design_approval",
+            "implementation", "implementation_review", "testing", "task_approval"])
+        self.assertEqual(tp.APPROVAL_PHASES, ("design_approval", "task_approval"))
+
+    def test_both_approval_phases_are_human_owned(self):
+        """Approval in two places, on purpose: before building and after."""
+        for ap in tp.APPROVAL_PHASES:
+            self.assertEqual(tp.OWNER[ap], "human",
+                             f"{ap} is an approval phase and must be the human's")
+
+    def test_a_duplicate_phase_is_rejected(self):
+        self._bad({"phase": "research", "state": "done", "evidence": "a"},
+                  {"phase": "research", "state": "done", "evidence": "b"})
+
+    def test_an_unknown_phase_is_rejected(self):
+        self._bad({"phase": "vibes", "state": "done", "evidence": "x"})
+
+    def test_an_unknown_state_is_rejected(self):
+        self._bad({"phase": "research", "state": "probably"})
+
+    def test_a_record_with_no_phases_is_rejected(self):
+        self.assertTrue(tp.phase_problems({"task": "t"}))
+        self.assertTrue(tp.phase_problems({}))
+
+    # --- the shipped example ----------------------------------------------
+
+    def test_the_example_record_passes(self):
+        shipped = ROOT / "Docs" / "tasks" / "EXAMPLE_TASK_PHASE.json"
+        if not shipped.is_file():
+            self.skipTest("EXAMPLE_TASK_PHASE.json not present")
+        problems = tp.phase_problems(json.loads(shipped.read_text(encoding="utf-8")))
+        self.assertEqual(problems, [], "the example a record gets copied from is wrong")
+
+    def test_the_example_stops_at_approval_and_does_not_tick_itself_off(self):
+        """The example must model stopping and asking, not self-approval.
+
+        A copied record that arrives already approved is a record that reports
+        progress nobody made - the exact thing the checker exists to prevent.
+        """
+        shipped = ROOT / "Docs" / "tasks" / "EXAMPLE_TASK_PHASE.json"
+        if not shipped.is_file():
+            self.skipTest("EXAMPLE_TASK_PHASE.json not present")
+        rec = json.loads(shipped.read_text(encoding="utf-8"))
+        final = [p for p in rec["phases"] if p["phase"] == "task_approval"][0]
+        self.assertEqual(final["state"], "pending",
+                         "the example is self-approved; a copy inherits that")
+        for p in rec["phases"]:
+            self.assertNotEqual(p.get("state"), "approved",
+                                f"{p['phase']} is approved in the example")
+
+    def test_the_cli_rejects_a_self_approved_record(self):
+        import subprocess as sp
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td) / "r.json"
+            p.write_text(json.dumps(self._rec(
+                {"phase": "task_approval", "state": "approved", "by": "agent"})))
+            r = sp.run([sys.executable, str(ROOT / "Content" / "Python" / "task_phase.py"),
+                        str(p)], capture_output=True, text=True)
+            self.assertEqual(r.returncode, 1)
+            self.assertIn("self-granted", r.stdout)
+
+    def test_the_cli_accepts_a_clean_record(self):
+        import subprocess as sp
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td) / "r.json"
+            p.write_text(json.dumps(self._rec(
+                {"phase": "research", "state": "skipped",
+                 "reason": "Read the repo; nothing to decide."},
+                {"phase": "design_approval", "state": "skipped",
+                 "reason": "No feel or bar involved."},
+                {"phase": "task_approval", "state": "pending"})))
+            r = sp.run([sys.executable, str(ROOT / "Content" / "Python" / "task_phase.py"),
+                        str(p)], capture_output=True, text=True)
+            self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+
+    def test_canon_states_the_rule_and_the_ladder_in_order(self):
+        """The prose is checked against the code, not trusted.
+
+        Prose is not machine-checkable in general, which is why the ladder lives
+        in code. But canon that silently stops saying the rule is how the code
+        and the document drift: an agent reading only CYCLE.md would find no
+        prohibition and conclude approval is a formality. This is the same class
+        as `check_env_canon_windows_in_sync` - the FEEL.md windows were literals
+        in the gate until a test made drift impossible.
+        """
+        cycle = (ROOT / "docs" / "human-use" / "CYCLE.md")
+        self.assertTrue(cycle.is_file(), "docs/human-use/CYCLE.md is gone")
+        text = cycle.read_text(encoding="utf-8")
+        self.assertIn("Approval is never self-granted", text,
+                      "canon no longer states the rule the code enforces")
+
+        # The documented order must be the code's order, in sequence.
+        #
+        # Prose names differ from identifiers: `design_approval` is written
+        # "design refinement / approval". A naive `name.replace("_", " ")` search
+        # therefore fails on canon that is correct, which is the same defect as
+        # anchoring a search on one heading style and concluding the canon is
+        # broken. The labels are stated here, and the test that the labels match
+        # canon is below.
+        labels = {
+            "research": "research",
+            "design": "design",
+            "questions": "questions",
+            "design_approval": "design refinement / approval",
+            "implementation": "implementation",
+            "implementation_review": "implementation questions / refinement / approval",
+            "testing": "testing",
+            "task_approval": "task approval / refinement",
+        }
+        self.assertEqual(sorted(labels), sorted(tp.PHASE_ORDER),
+                         "a phase was added or renamed and this table is stale")
+
+        def _in_order(haystack: str, where: str) -> None:
+            pos = -1
+            for name in tp.PHASE_ORDER:
+                found = haystack.find(labels[name], pos + 1)
+                self.assertNotEqual(
+                    found, -1,
+                    f"canon {where} does not carry phase {labels[name]!r} "
+                    f"after position {pos}")
+                pos = found
+
+        _in_order(text, "overall")
+
+        # BOTH representations, not either.
+        #
+        # Canon states the ladder as a diagram AND as a table, and a single
+        # `find` scan is satisfied by either one. The first draft of this test
+        # did exactly that, so a mutation that reordered the table while leaving
+        # the diagram alone survived - canon silently disagreeing with itself,
+        # which is the same class of defect as a file whose comment says one
+        # thing and whose code does another. Two statements of one fact must both
+        # be checked or one of them should not exist.
+        rows = [ln for ln in text.splitlines()
+                if ln.startswith("| **") and "**" in ln[4:]]
+        table = "\n".join(rows)
+        self.assertEqual(len(rows), len(tp.PHASE_ORDER),
+                         f"the canon phase table has {len(rows)} rows, expected "
+                         f"{len(tp.PHASE_ORDER)} - one was added, dropped, or "
+                         f"reworded so the row no longer starts with `| **`")
+        _in_order(table, "phase table")
+
+        diagram_start = text.find("```\nresearch")
+        self.assertNotEqual(diagram_start, -1,
+                            "canon no longer carries the ladder diagram")
+        diagram_end = text.find("```", diagram_start + 3)
+        _in_order(text[diagram_start:diagram_end], "ladder diagram")
+
+    def test_canon_documents_the_checker_as_a_runnable_command(self):
+        """A rule with no command is a rule nobody runs.
+
+        Checked as a fenced invocation, not as a substring. The first version
+        asserted `Content/Python/task_phase.py` appears anywhere in the file,
+        which the prose sentence satisfied on its own - so deleting the command
+        block entirely survived, twice. Naming a script is not the same as
+        telling the reader how to run it, and only the second is worth having.
+        """
+        cycle = (ROOT / "docs" / "human-use" / "CYCLE.md").read_text(encoding="utf-8")
+        self.assertIn("python Content/Python/task_phase.py", cycle,
+                      "canon names the checker but never shows the command")
+        self.assertIn("task_phase.py", cycle,
+                      "canon no longer names the checker at all")
+        # The command must be inside a fenced block, so it is copy-pasteable.
+        fenced = [b for b in cycle.split("```") if "task_phase.py" in b]
+        self.assertTrue(any("python " in b for b in fenced),
+                        "the checker is named but not given as a command")
+
+    def test_a_missing_record_exits_two(self):
+        """Absent is not a pass and not a failure of the check - it is absent."""
+        import subprocess as sp
+        r = sp.run([sys.executable,
+                    str(ROOT / "Content" / "Python" / "task_phase.py"),
+                    str(Path(tempfile.gettempdir()) / "definitely-absent.json")],
+                   capture_output=True, text=True)
+        self.assertEqual(r.returncode, 2)
 
 
 class TheSessionNeverEndsInSilence(unittest.TestCase):

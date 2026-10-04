@@ -1,0 +1,52 @@
+{
+  "_schema": "TASK_PHASE/1",
+  "_what_this_is": "An example record for Content/Python/task_phase.py. It exists so the ladder has a worked example, and so a new record can be copied from something that passes rather than from prose.",
+  "_copy_this_not_that": "Copy the shape, not the states. A copied record that arrives with the same states is a record that reports progress nobody made, which is the failure the checker exists to catch.",
+
+  "task": "env.world_assembled must measure the shipping level (2026-10-04)",
+
+  "phases": [
+    {
+      "phase": "research",
+      "state": "done",
+      "evidence": "Content/__ExternalActors__/HomeWorld/Maps/MainMenu - 1270 .uasset. Zero under VS_MVP. L_VS_MVP_Markers.umap is 226,418 bytes with no WorldPartition string; MainMenu has three. Byte-scanned both for SM_IslandTop / SM_Cabin / CRUMB_ / SM_LandingCircle: all present in the former, none in the latter."
+    },
+    {
+      "phase": "design",
+      "state": "done",
+      "evidence": "Storage-mode-aware count keyed to SHIPPING_LEVEL: detect WorldPartition in the package, count external .uasset or inline <Class>_<index> name-table entries, derive the external path from the .umap's own relative path, print level + storage mode in measured."
+    },
+    {
+      "phase": "questions",
+      "state": "skipped",
+      "reason": "No question for the Lead. The correct level was already recorded in docs/KNOWN_ERRORS.md 2026-10-03 with evidence, so asking would have re-litigated a settled fact rather than extracting information."
+    },
+    {
+      "phase": "design_approval",
+      "state": "skipped",
+      "reason": "Engineered as a measurement fix inside a tool the agent owns, with no feel, mechanic, or bar involved. docs/human-use/OWNERSHIP.md puts harness refactoring and instrumentation under the agent. Had this touched what 'done' means, it would have needed the Lead."
+    },
+    {
+      "phase": "implementation",
+      "state": "done",
+      "evidence": "Content/Python/polish_readiness.py - _level_umap, _uses_world_partition, _inline_actor_floor, _external_actor_count, and a rewritten check_env_world_assembled."
+    },
+    {
+      "phase": "implementation_review",
+      "state": "done",
+      "evidence": "Ten mutations applied and reverted one at a time; all ten caught. Two survived the first sweep and both were test bugs of mine - a fixture the test did not point pr.ROOT at, and a greedy regex that returned the right number on the real .umap and the wrong one on a synthetic fixture. Both recorded in docs/KNOWN_ERRORS.md. Not verified: none of this was measured inside Unreal, and the change does not need it."
+    },
+    {
+      "phase": "testing",
+      "state": "done",
+      "evidence": "python -m pytest Content/Python/tests/test_polish_readiness.py -q -> 157 passed. python Content/Python/polish_readiness.py --selftest -> OK, 19 checks."
+    },
+    {
+      "phase": "task_approval",
+      "state": "pending",
+      "note": "The Lead has not accepted commit 2d27b02 as finished. An approval naming a human must be that human's act, so this stays pending until they say so - which is why task_phase.py exits 0 on this file without that field being padded."
+    }
+  ],
+
+  "_why_this_file_is_not_green": "Every phase through testing is evidenced, and task_approval is pending because nobody has approved it. That is the honest state and the checker agrees - it exits 0. The example deliberately stops at the approval phase rather than ticking itself off, so a record copied from this one inherits a task that stops and asks."
+}

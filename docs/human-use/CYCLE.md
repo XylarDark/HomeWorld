@@ -19,6 +19,58 @@ Test:  Outcome rubric (human)      → independent grade (verifier), then implem
 Test:  Review (human)              → done, or Optimize (agent measures, human owns the budget)
 ```
 
+## The task ladder
+
+Set by the Lead on 2026-10-04, **where it makes sense** — a task with no design
+question may skip a phase, but it records the skip and says why.
+
+```
+research → design → questions → design refinement / approval
+        → implementation → implementation questions / refinement / approval
+        → testing → task approval / refinement
+```
+
+| Phase | Owner | What it is |
+| ----- | ----- | ---------- |
+| **research** | agent | Read the repo, measure, do not guess. Ground the task in what exists. |
+| **design** | agent | Propose, with alternatives and what each costs. |
+| **questions** | both | The agent asks what only you know; you answer. |
+| **design refinement / approval** | **human** | The design is agreed *before* it is built. |
+| **implementation** | agent | Build it. |
+| **implementation questions / refinement / approval** | both | Where the agent surfaces **what it did not verify**. |
+| **testing** | agent | Prove it — including proving the guard fails when it should. |
+| **task approval / refinement** | **human** | Accept, refine, or reject. |
+
+Approval sits in **two** places on purpose. Before implementation stops the agent
+building the wrong thing. After implementation is the only point where the
+agent can report what it did not verify, because a reviewer cannot reconstruct
+that later from a diff.
+
+A skip is a recorded state, not an absence. "No design question arose" is a
+legitimate answer; a missing phase is not, because absence cannot be
+distinguished from forgetting.
+
+## The one rule that is enforced, not advised
+
+**Approval is never self-granted.** `Content/Python/task_phase.py` checks this,
+and it is the only part of the ladder that is machine-checkable — taste is not.
+
+```
+python Content/Python/task_phase.py <record.json>
+```
+
+It rejects a phase marked `approved` with nobody named, or approved by the
+agent, a later phase finished while an earlier one is still pending, a `done`
+with no evidence, and a `skipped` with no reason. Those are the four ways this
+process decays into a checklist, and each has a name because each has happened
+here: a seeded record that reads as progress is the same defect as a gate that
+goes green over six nulls.
+
+Approval without a named human is not a soft failure. It is the fail-open this
+module exists to close, and it is worth more than every other check combined —
+because an agent that can approve its own work has not implemented a process, it
+has implemented a rubber stamp.
+
 ## Detect whose turn it is
 
 First match wins. Scope is **this task**, not whether a Human Use template still
