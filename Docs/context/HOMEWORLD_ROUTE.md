@@ -26,6 +26,7 @@ state is not that writer.
 - The cloud layer above the 25 m gap is 50 m tall, the 75 m drop minus that gap. It is a placeholder until human testing.
 - Any jump has more than one spirit-blue cloud, and there is no fixed count.
 - The bottom of the cloud layer is the exit, and the landing stays in the existing field.
+- The wisp is a bit of the signature spirit blue on a cloud, not one of the three wisps at the spirit wound.
 
 ## Left empty on purpose
 
