@@ -41,6 +41,7 @@ state is not that writer.
 - It is mixed at the homestead, the spirit spreads it at night, and in the morning one herb pile appears per dung, at random in the field.
 - Dawn alone does not bring a pile back.
 - That night flight is not the locked first flight.
+- The 75 m drop is how high the island sits above the plains, so every jump off the homestead drops that.
 
 ## Left empty on purpose
 
