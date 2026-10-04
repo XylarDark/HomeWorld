@@ -43,6 +43,7 @@ state is not that writer.
 - That night flight is not the locked first flight.
 - The 75 m drop is how high the island sits above the plains, so every jump off the homestead drops that.
 - The 260 m line is the plains edge on that straight glide only.
+- Other directions have no edge.
 
 ## Left empty on purpose
 
