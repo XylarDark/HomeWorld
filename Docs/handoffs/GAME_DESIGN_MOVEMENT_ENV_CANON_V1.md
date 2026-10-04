@@ -125,3 +125,9 @@ Not a mesh edit. Not the 75 m drop. A hill height does not move the plains edge.
 
 - A field hill is only the ground you walk. Nothing else sits on it.
 - The walk climbs 4 m. That is the hill's height.
+
+## Lead lock 2026-10-03, slower walk
+
+Not a second surface. Does not resize the 6.0 m/s homestead oval.
+
+- The slower walk is 2 m/s.
