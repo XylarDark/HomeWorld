@@ -1798,3 +1798,98 @@ route to green.
 **V2 is the row that decides whether 180 x 100 reads as an island.** Jump off the
 edge and land in the field; that is the whole test. Also open: the six feel
 tunables, the ten asset-board stages, and the three G-ENV art findings.
+
+
+---
+
+## 2026-10-04 (late) - The plate was in Blender and nowhere else
+
+Lead asked whether everything agent-doable was done before the polish pass, and
+for an interview to get what was needed from them. The first question was the
+useful one. Answering it honestly meant asking what a player would actually stand
+on, and the answer was: a 19.3 m island.
+
+### What was found
+
+`SM_IslandTop` measured 180.0000 x 100.0000 x 0.4500 in
+`blender/floating_island_homestead_LIB.blend`, applied and committed earlier the
+same day. `env.island_sized` said PASS. But
+`AssetCreation/Exports/Homestead/SM_IslandTop.fbx` had been written 2026-09-16 and
+still measured **19.3000 x 10.7000 x 0.4500** - 32 verts, the same topology and the
+same Z datum as the plate, so unmistakably the older mesh - and
+`Content/HomeWorld/Meshes/Homestead/SM_IslandTop.uasset` had been imported from it
+on 2026-09-28.
+
+Proved by importing the FBX into a clean Blender and measuring it, not inferred
+from timestamps.
+
+**The gate was not wrong. It was silent about the hop it never measured.** Every
+check read the `.blend`, which is the authoring source of truth. No check read the
+FBX, the `.uasset`, or the actor in the level. `env.world_assembled` counted 1270
+external actors and measured no dimensions;
+`Saved/automation_run_result.json` ran 20 tests and mentioned "island" zero times.
+
+### What was done about it
+
+1. **Re-exported** through `AssetCreation/Blender/export_to_asset_creation.py`,
+   then verified by re-importing the written FBX: `[180.0000 100.0000 0.4500]`, 32
+   verts, top_z 0. `apply_transforms_selected()` re-saved the `.blend` during the
+   export; re-measuring showed nothing moved (loc 0/rot 0/scale 1, 32 verts /
+   18 polys) so the `.blend` was reverted. Manifest row 15676 -> 15692 - the only
+   stale row of 23.
+
+2. **`env.export_fresh`** (new row) - parses every FBX row in
+   `MVP_EXPORT_MANIFEST.md` and compares recorded size to disk. The `.blend -> FBX`
+   hop.
+
+3. **`env.ue_island_measured`** (new row) + **`Content/Python/measure_ue_island.py`**
+   + seeded **`Docs/qa/UE_ISLAND_MEASUREMENT.json`** - the `FBX -> .uasset -> level`
+   hop, which pure Python cannot reach. The script only reads (`get_actor_bounds`),
+   spawns nothing and saves no level. Reads MISSING today: nobody has run it, and
+   the note says so rather than letting a Blender PASS imply an engine PASS.
+
+### Four retractions and one false positive
+
+- **"The mtime rule works."** Wrong - it reported **23 of 23 stale** after one
+  object's geometry changed, because saving the blend touches one file while every
+  export in it legitimately predates that save. A whole-file timestamp cannot
+  describe per-object change. Removed rather than tuned; the count is still printed
+  as a hint, and `test_fbx_predating_the_blend_is_a_hint_not_a_failure` guards it.
+- **"Two notes for two branches is fine."** Wrong - a missing record file and a null
+  `bbox_cm` are the same fact and shipped with different notes. A test caught it;
+  `unmeasured()` now serves both.
+- **`Docs/` vs `docs/`** - `git status` printed the new record at
+  `?? docs/qa/UE_ISLAND_MEASUREMENT.json`. Staged with capital D and confirmed with
+  an `A` line in `git diff --cached --name-status`.
+- **"The manifest is a stale whole."** Wrong - 22 of 23 rows were exact. Its accuracy
+  is what makes it a usable detector.
+
+### Evidence
+
+Both mutations reproduced real numbers rather than invented ones, which is the only
+reason to trust them:
+
+| mutation | result |
+|---|---|
+| manifest back to 15676 | FAIL, `1 stale of 23`, `SM_IslandTop.fbx manifest 15676 != disk 15692` |
+| record holding the real 2026-09-28 uasset size | FAIL, `UE 19.3 x 10.7 m` vs `Blender 180.0 x 100.0 m`, off by 160.70 / 89.30, tol 3.60 |
+| shipped state | `env.export_fresh` PASS `0 stale of 23`; `env.ue_island_measured` MISSING `no bbox_cm` |
+
+`EXPECTED_CHECKS` 17 -> 19. Tests 165 -> 178. `--selftest` OK at 19.
+Gate: **G-ENV RED, FAIL 2 MISSING 2 PASS 6.** G-ASSET RED. G-FEEL RED. NOT_READY.
+
+### State and what is owed
+
+Commits `e08b756` (re-export) and `d80a6a6` (gate rows, script, skeleton, tests),
+pushed to `main`, verified by `git merge-base --is-ancestor`, not by push output.
+`polish` / `origin/polish` untouched at `f218fce` / `9686e68`.
+
+**Still owed, and it is not agent-doable:** the `.uasset` re-import and the actor
+re-place. Both are binary/content steps outside a commit, and the editor is not
+reachable from this session (`unrealMCP` returns null, not an error - itself a
+fail-open worth noting). Until somebody runs `measure_ue_island.py`, the plate is
+authored but unproven in the game.
+
+The rule that paid: **a measurement chain is only as good as its last link, and
+every tool in this repo was reporting on the first.** When a check goes green, ask
+what it did *not* measure. Recorded in `docs/KNOWN_ERRORS.md`.
