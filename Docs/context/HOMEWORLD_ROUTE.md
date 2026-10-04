@@ -18,6 +18,10 @@ need. It writes that fact only into this file, and only after the developer
 says yes. It does not write into the agnostic route file, and the decide
 state is not that writer.
 
+## Recorded
+
+- The gap under the lowest cloud, down to the ground, is 5 seconds of straight glide at the standard speed, with no slowdown in that gap. That height is 25 m, from the 75 m drop over the 15 second window. It is a placeholder until human testing.
+
 ## Left empty on purpose
 
 - Polish-gate ids and gate-chain order: (empty)
