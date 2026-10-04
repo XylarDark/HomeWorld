@@ -102,9 +102,19 @@ Example DONE-WHEN lines: `left NODE_GLIDER, arrived field AABB, no load hang` ·
 
 ## Lead lock 2026-10-03, floor entry
 
-Outside the island spec. Not a mesh edit. The camp has no size.
+Outside the island spec. Not a mesh edit.
 
 - The level is finally seen by a short move through cover to a hidden vantage. Bushes are an example, not the technique. This stays even when the floor does not change.
 - One floor is a preference until the cost is measured. Do not split the floor on a guess.
 - The camp does not spawn on the forest edge. From the entry, the camp's own edge is visible, whichever way the player comes in, so they can see there is something to check.
 - Other forest spawns are part of the first floor and do not wait on the camp.
+
+## Lead lock 2026-10-03, camp size
+
+Outside the island spec. Not a mesh edit. Sized by what has to fit, not by a walk-across time.
+
+- The camp is a circle 7 m across.
+- Inside it: one guard, two sleepers, the captive, a fire, and the camp portal. Nothing else.
+- The fire is 2 m across.
+- The guard, both sleepers, the captive, and the portal sit in one ring around the fire, 1.5 m out from the fire's edge. That ring is 5 m across, center to center through the fire.
+- There is 1 m of ground past where they stand, all the way around. That is the camp's edge.
