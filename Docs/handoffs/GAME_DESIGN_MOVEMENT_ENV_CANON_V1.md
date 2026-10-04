@@ -118,3 +118,10 @@ Outside the island spec. Not a mesh edit. Sized by what has to fit, not by a wal
 - The fire is 2 m across.
 - The guard, both sleepers, the captive, and the portal sit in one ring around the fire, 1.5 m out from the fire's edge. That ring is 5 m across, center to center through the fire.
 - There is 1 m of ground past where they stand, all the way around. That is the camp's edge.
+
+## Lead lock 2026-10-03, field hills
+
+Not a mesh edit. Not the 75 m drop. A hill height does not move the plains edge. The 260 m line stays past the launch only. Sized by what has to fit.
+
+- A field hill is only the ground you walk. Nothing else sits on it.
+- The walk climbs 4 m. That is the hill's height.
