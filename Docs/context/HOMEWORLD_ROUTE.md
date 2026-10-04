@@ -21,6 +21,7 @@ state is not that writer.
 ## Recorded
 
 - The gap under the lowest cloud, down to the ground, is 5 seconds of straight glide at the standard speed, with no slowdown in that gap. That height is 25 m, from the 75 m drop over the 15 second window. It is a placeholder until human testing.
+- Clouds are 6-24 m across. It is a placeholder until human testing.
 
 ## Left empty on purpose
 
