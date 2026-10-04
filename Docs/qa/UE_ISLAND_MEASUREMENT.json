@@ -1,0 +1,33 @@
+{
+  "_schema": "UE_ISLAND_MEASUREMENT/1",
+  "_what_this_is": "How big the island is inside Unreal, in centimetres, as measured by Content/Python/measure_ue_island.py. The gate's env.ue_island_measured row reads bbox_cm and compares it against the Blender source in Docs/qa/graybox_spec_report.json.",
+
+  "_why_it_exists": "On 2026-10-04 the 180 x 100 plate was applied and verified in the .blend, and env.island_sized went PASS. The FBX Unreal consumes still measured 19.3 x 10.7 and the .uasset had been imported from it five days earlier. Every gate row read the Blender source of truth; none read the artefact the game is built from. A player would have stood on a 19 m island while the report said 180 m.",
+
+  "_status": "SEEDED EMPTY. Nobody has run the in-editor measurement yet. bbox_cm is null on purpose and the gate reads MISSING, not FAIL - nobody has measured it, which is not the same as it being wrong.",
+
+  "_how_to_fill": [
+    "1. Open the level in Unreal and run Content/Python/measure_ue_island.py (Scripting workspace, or execute_python_script via MCP).",
+    "2. It writes bbox_cm and the rest of this file. It only reads - it spawns nothing and saves no level.",
+    "3. Commit what it writes. That file is the only evidence the engine has the plate.",
+    "",
+    "If bbox_cm comes back near 1930 x 1070 rather than 18000 x 10000, the asset was",
+    "never re-imported. The order that fixes it:",
+    "  a. blender --background blender/floating_island_homestead_LIB.blend --python AssetCreation/Blender/apply_island_plate.py",
+    "  b. export SM_IslandTop -> AssetCreation/Exports/Homestead/SM_IslandTop.fbx",
+    "  c. re-import the FBX over the existing SM_IslandTop asset",
+    "  d. re-place the island actor if its transform changed",
+    "  e. re-run measure_ue_island.py and commit the result",
+    "",
+    "Step (e) is the one that gets skipped, and skipping it is how the plate went",
+    "missing for a day with nothing going red."
+  ],
+
+  "_units": "bbox_cm is Unreal centimetres. The gate divides by 100 to compare against Blender metres, and states the tolerance in metres so a mistaken conversion is visible rather than silent.",
+
+  "measured_at": null,
+  "level": null,
+  "asset": "SM_IslandTop",
+  "actors_found": null,
+  "bbox_cm": null
+}

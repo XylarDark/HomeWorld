@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-04T02:34:12+00:00",
+  "generated": "2026-10-04T02:53:17+00:00",
   "process_doc": "Docs/37_POLISH_PASS_PROCESS.md",
   "verdict": "NOT_READY",
   "gates": {
@@ -8,9 +8,9 @@
       "state": "RED",
       "max_stage": "S2 ART-BLOCKOUT",
       "tally": {
-        "PASS": 5,
-        "FAIL": 2,
-        "MISSING": 1
+        "PASS": 6,
+        "MISSING": 2,
+        "FAIL": 2
       },
       "checks": [
         {
@@ -42,6 +42,26 @@
           "target": "0 blocking",
           "state": "PASS",
           "note": ""
+        },
+        {
+          "id": "env.export_fresh",
+          "gate": "G-ENV",
+          "requirement": "Every exported FBX matches the size the manifest recorded",
+          "source": "AssetCreation/Exports/MVP_EXPORT_MANIFEST.md",
+          "measured": "0 stale of 23",
+          "target": "0 stale of 23",
+          "state": "PASS",
+          "note": "hint: 23 of 23 FBX predate the .blend save, which is normal and is not counted - one object's edit touches the whole file"
+        },
+        {
+          "id": "env.ue_island_measured",
+          "gate": "G-ENV",
+          "requirement": "The island measured inside Unreal agrees with the Blender source",
+          "source": "Docs/qa/UE_ISLAND_MEASUREMENT.json",
+          "measured": "no bbox_cm",
+          "target": "agrees",
+          "state": "MISSING",
+          "note": "Nobody has measured the island inside Unreal. The Blender side reads 180.0 x 100.0 m, but that is the source, not the mesh the game is built from. This exact gap is how the 2026-10-04 plate went missing: the .blend and the report said 180 x 100 while Unreal was still holding 19.3 x 10.7. Run Content/Python/measure_ue_island.py in the editor - it only reads - and commit what it writes. Hand-writing bbox_cm defeats the point."
         },
         {
           "id": "env.master_binding",

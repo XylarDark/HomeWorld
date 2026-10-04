@@ -893,6 +893,189 @@ class PaDPlacementsAreReadFromTheSpecs(unittest.TestCase):
                 self.pad._read_cliff_specs(str(p))
 
 
+class TheExportChainCannotGoStale(unittest.TestCase):
+    """The FBX Unreal consumes must be current, and somebody must have measured it.
+
+    On 2026-10-04 the island plate was applied and verified in the .blend - it
+    measured 180.0 x 100.0 x 0.45 and `env.island_sized` went PASS. The FBX that
+    Unreal actually consumes still measured 19.3 x 10.7, exported on 2026-09-16,
+    and the .uasset had been imported from it on 2026-09-28.
+
+    Every gate row was reading the Blender source of truth. Not one read the
+    artefact the game is built from, so the gate was green and a player would have
+    stood on a 19 m island. This is the cleanest example in the repo of a green log
+    being worth nothing, and it is why there are now two rows for the chain rather
+    than none.
+
+    Between them the two rows cover:
+
+      env.export_fresh        the .blend -> FBX hop, via the manifest's file sizes.
+      env.ue_island_measured  the FBX -> .uasset -> level hop, via an in-editor
+                              measurement of the real thing.
+
+    Neither alone is sufficient. A current FBX that was never re-imported passes the
+    first and fails the second, which is the state this repo was actually in.
+    """
+
+    def setUp(self):
+        self.saved_manifest = pr.EXPORT_MANIFEST
+        self.saved_record = pr.UE_ISLAND_MEASUREMENT
+        self.addCleanup(setattr, pr, "EXPORT_MANIFEST", self.saved_manifest)
+        self.addCleanup(setattr, pr, "UE_ISLAND_MEASUREMENT", self.saved_record)
+
+    # -- helpers ---------------------------------------------------------
+    def _use_manifest(self, rows):
+        """rows: list of (category, filename, recorded_size). Returns the path.
+
+        The FBX files are created at exactly `recorded_size` bytes unless
+        `actual` overrides, so a row can be made stale on purpose.
+        """
+        td = tempfile.TemporaryDirectory()
+        self.addCleanup(td.cleanup)
+        root = Path(td.name)
+        lines = ["# manifest", "", "| Category | File | Bytes | Target |",
+                 "|---|---|---|---|"]
+        for category, name, recorded in rows:
+            lines.append("| %s | `%s` | %d | %s |" % (category, name, recorded, name))
+            target = root / category
+            target.mkdir(parents=True, exist_ok=True)
+            (target / name).write_bytes(b"\0" * recorded)
+        path = root / "MVP_EXPORT_MANIFEST.md"
+        path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        pr.EXPORT_MANIFEST = path
+        return root
+
+    def _use_record(self, body):
+        td = tempfile.TemporaryDirectory()
+        self.addCleanup(td.cleanup)
+        p = Path(td.name) / "UE_ISLAND_MEASUREMENT.json"
+        p.write_text(json.dumps(body), encoding="utf-8")
+        pr.UE_ISLAND_MEASUREMENT = p
+        return p
+
+    # -- env.export_fresh ------------------------------------------------
+    def test_shipped_manifest_agrees_with_every_fbx_on_disk(self):
+        """The real assertion about the real repo: 23 rows, none stale.
+
+        This is the check that names SM_IslandTop when the plate is applied and the
+        export is forgotten. If it ever goes FAIL on a quiet tree, an export is
+        genuinely out of step with the manifest.
+        """
+        rows = pr._manifest_rows()
+        self.assertGreaterEqual(len(rows), 20,
+                                "manifest stopped parsing most of its rows")
+        self.assertEqual(pr.check_env_export_fresh().state, pr.PASS)
+
+    def test_a_size_mismatch_is_fail(self):
+        self._use_manifest([("Homestead", "SM_IslandTop.fbx", 15692)])
+        (pr.EXPORT_MANIFEST.parent / "Homestead" / "SM_IslandTop.fbx").write_bytes(
+            b"\0" * 15676)
+        c = pr.check_env_export_fresh()
+        self.assertEqual(c.state, pr.FAIL)
+        self.assertIn("SM_IslandTop.fbx", c.note)
+        self.assertIn("15676", c.note)
+
+    def test_a_listed_but_absent_file_is_missing_not_fail(self):
+        """FAIL here would push someone to hand-edit a size instead of exporting."""
+        self._use_manifest([("Homestead", "SM_IslandTop.fbx", 100)])
+        (pr.EXPORT_MANIFEST.parent / "Homestead" / "SM_IslandTop.fbx").unlink()
+        self.assertEqual(pr.check_env_export_fresh().state, pr.MISSING)
+
+    def test_an_unparseable_manifest_is_missing(self):
+        self._use_manifest([])
+        (pr.EXPORT_MANIFEST).write_text("# nothing here\n", encoding="utf-8")
+        self.assertEqual(pr.check_env_export_fresh().state, pr.MISSING)
+
+    def test_fbx_predating_the_blend_is_a_hint_not_a_failure(self):
+        """Regression test for a false positive this check shipped with.
+
+        The first version failed the row when any FBX was older than the .blend.
+        After the plate was applied and the blend re-saved, that reported 23 of 23
+        stale - because saving the blend touches one file and every export in it
+        legitimately predates that save, whether or not their geometry moved.
+
+        A whole-file timestamp cannot describe per-object change. The number is
+        still printed so a human can see it; it must not decide the verdict.
+        """
+        c = pr.check_env_export_fresh()
+        self.assertEqual(c.state, pr.PASS)
+        self.assertIn("hint:", c.note)
+        self.assertIn("not counted", c.note)
+        self.assertNotIn("stale,", c.measured)
+
+    # -- env.ue_island_measured -----------------------------------------
+    def test_shipped_record_reads_missing_and_names_the_gap(self):
+        """Nobody has measured the island in the editor yet. That is MISSING.
+
+        It must not read PASS (nobody checked) or FAIL (nobody claims it is wrong),
+        and the note has to say what to run, because "MISSING" alone would leave a
+        reader guessing which of the two hops is unverified.
+        """
+        shipped = ROOT / "Docs" / "qa" / "UE_ISLAND_MEASUREMENT.json"
+        self.assertTrue(shipped.is_file(), "UE_ISLAND_MEASUREMENT.json missing")
+        self._use_record(json.loads(shipped.read_text(encoding="utf-8")))
+        c = pr.check_env_ue_island_measured()
+        self.assertEqual(c.state, pr.MISSING)
+        self.assertNotEqual(c.state, pr.PASS)
+        self.assertNotEqual(c.state, pr.FAIL)
+        self.assertIn("measure_ue_island.py", c.note)
+
+    def test_the_real_pre_plate_size_would_fail(self):
+        """The numbers this repo was actually in, fed back through the check.
+
+        1930 x 1070 cm is what the 2026-09-28 .uasset held. If this ever reads PASS
+        the comparison is broken, and that is the one thing this row exists to stop.
+        """
+        self._use_record({"bbox_cm": [1930.0, 1070.0, 45.0]})
+        c = pr.check_env_ue_island_measured()
+        self.assertEqual(c.state, pr.FAIL)
+        self.assertIn("180.0", c.target)
+        self.assertIn("19.3", c.measured)
+        self.assertIn("re-import", c.note)
+
+    def test_a_matching_measurement_passes(self):
+        self._use_record({"bbox_cm": [18000.0, 10000.0, 45.0]})
+        self.assertEqual(pr.check_env_ue_island_measured().state, pr.PASS)
+
+    def test_small_drift_within_tolerance_passes(self):
+        """The point is to catch an un-reimported asset, not to adjudicate
+        centimetre-level disagreement between two engines."""
+        self._use_record({"bbox_cm": [18040.0, 9980.0, 45.0]})
+        self.assertEqual(pr.check_env_ue_island_measured().state, pr.PASS)
+
+    def test_a_unit_error_cannot_pass(self):
+        """cm vs m is a 100x trap. 18000 must not be read as 18000 m, and a
+        hand-entered 18000 in a field expecting cm must not be compared as if it
+        were already metres."""
+        # 18000 "cm" is 180 m and agrees. 18000 m would be 1.8 million cm.
+        self._use_record({"bbox_cm": [1800000.0, 1000000.0, 4500.0]})
+        self.assertEqual(pr.check_env_ue_island_measured().state, pr.FAIL)
+
+    def test_a_null_bbox_is_missing(self):
+        for body in ({}, {"bbox_cm": None}, {"bbox_cm": []}, {"bbox_cm": "wide"}):
+            with self.subTest(body=body):
+                self._use_record(body)
+                self.assertEqual(pr.check_env_ue_island_measured().state,
+                                 pr.MISSING)
+
+    def test_a_missing_record_is_missing(self):
+        td = tempfile.TemporaryDirectory()
+        self.addCleanup(td.cleanup)
+        pr.UE_ISLAND_MEASUREMENT = Path(td.name) / "absent.json"
+        c = pr.check_env_ue_island_measured()
+        self.assertEqual(c.state, pr.MISSING)
+        self.assertIn("19.3", c.note, "the note should say what nearly happened")
+
+    def test_no_blender_measurement_is_missing_not_pass(self):
+        """If the greybox report cannot be read there is nothing to compare, and
+        that must not read as agreement."""
+        self._use_record({"bbox_cm": [18000.0, 10000.0, 45.0]})
+        saved = pr.GRAYBOX_REPORT
+        pr.GRAYBOX_REPORT = Path(tempfile.gettempdir()) / "definitely-absent.json"
+        self.addCleanup(setattr, pr, "GRAYBOX_REPORT", saved)
+        self.assertEqual(pr.check_env_ue_island_measured().state, pr.MISSING)
+
+
 class AssetBoardCannotBeFakedGreen(unittest.TestCase):
     """The board exists so a batch can be reviewed at S2, not one asset at S3.
 

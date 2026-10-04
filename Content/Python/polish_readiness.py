@@ -89,6 +89,9 @@ TRAVERSAL_BUDGET = ROOT / "Docs" / "qa" / "TRAVERSAL_BUDGET.json"
 ASSET_BOARD_FILE = ROOT / "Docs" / "qa" / "POLISH_ASSET_BOARD.json"
 HUMAN_PLAYTEST_FILE = ROOT / "Docs" / "qa" / "POLISH_HUMAN_PLAYTEST.json"
 FEEL_CANON = ROOT / "Docs" / "canon" / "FEEL.md"
+EXPORT_MANIFEST = ROOT / "AssetCreation" / "Exports" / "MVP_EXPORT_MANIFEST.md"
+LIB_BLEND = ROOT / "blender" / "floating_island_homestead_LIB.blend"
+UE_ISLAND_MEASUREMENT = ROOT / "Docs" / "qa" / "UE_ISLAND_MEASUREMENT.json"
 MASTERS_DIR = ROOT / "Content" / "HomeWorld" / "Materials" / "Masters"
 EXPORT_MANIFEST = ROOT / "AssetCreation" / "Exports" / "MVP_EXPORT_MANIFEST.md"
 OUT_JSON = ROOT / "Docs" / "qa" / "POLISH_READINESS.json"
@@ -99,7 +102,7 @@ EXPECTED_MASTER_COUNT = 10
 
 #: If this changes, a check was dropped or renamed. Fail loudly rather than
 #: reporting a green run over a smaller set of questions. See WHY #0.
-EXPECTED_CHECKS = 17
+EXPECTED_CHECKS = 19
 
 #: Criteria the greybox report can raise as BLOCKING. Every one of these needs a
 #: check in G-ENV or a recorded decision that it is out of scope. This is the
@@ -632,6 +635,238 @@ def check_env_family_distinct() -> Check:
     )
 
 
+def _manifest_rows() -> list[tuple[str, str, int]]:
+    """(category, filename, recorded_size) for every FBX row in the export manifest.
+
+    The manifest is the only inventory of what Blender has handed to Unreal. It is
+    also, as of 2026-10-04, the only thing that noticed an export had gone stale -
+    see check_env_export_fresh.
+    """
+    rows: list[tuple[str, str, int]] = []
+    if not EXPORT_MANIFEST.is_file():
+        return rows
+    for line in EXPORT_MANIFEST.read_text(encoding="utf-8", errors="replace").splitlines():
+        if ".fbx" not in line or "`" not in line:
+            continue
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if len(cells) < 3:
+            continue
+        name = cells[1].strip("`").strip()
+        if not name.lower().endswith(".fbx"):
+            continue
+        try:
+            size = int(cells[2])
+        except ValueError:
+            continue
+        rows.append((cells[0], name, size))
+    return rows
+
+
+def check_env_export_fresh() -> Check:
+    """Every FBX on disk matches the size the manifest recorded for it.
+
+    WHY THIS EXISTS. On 2026-10-04 the island plate was applied and verified in
+    blender/floating_island_homestead_LIB.blend, which measured 180.0 x 100.0 x
+    0.45, and env.island_sized went PASS. The FBX that Unreal actually consumes
+    still measured 19.3 x 10.7 - the pre-plate geometry, exported on 2026-09-16 -
+    and the .uasset imported from it on 2026-09-28. Every gate row was reading the
+    Blender source of truth and none of them read the artefact the game is built
+    from, so a green gate was describing a mesh that no player could stand on.
+
+    A clean log was not evidence here. The check that would have caught it is a
+    size comparison against a file that was already being maintained, which is why
+    it is a check and not a note. Of 23 FBX rows it named exactly one: SM_IslandTop.
+
+    WHAT THIS CANNOT SEE, STATED PLAINLY. Size is a proxy for geometry, not
+    geometry. It catches an export that did not happen or happened against
+    different source, which is the failure that occurred. It cannot catch an
+    unchanged export that is stale in substance, and it says so rather than
+    claiming more.
+
+    An earlier draft also compared each FBX's mtime against the .blend's and
+    failed the row when any FBX was older. That reported 23 of 23 stale after a
+    single object's geometry changed, because saving the blend touches one file and
+    every export in it legitimately predates that save. A whole-file timestamp
+    cannot describe per-object change, so it was removed rather than tuned. Its
+    number is still printed, labelled as a hint.
+
+    The companion hole - an FBX that is current but was never re-imported - is
+    check_env_ue_island_measured. Together they cover the chain; neither covers it
+    alone.
+
+    MISSING, not FAIL, when the manifest lists a file that is absent: the row is
+    unverified rather than wrong, and FAIL would push someone to hand-edit a size
+    rather than re-run the export.
+    """
+    rows = _manifest_rows()
+    if not rows:
+        return Check(
+            "env.export_fresh", "G-ENV",
+            "Every exported FBX matches the size the manifest recorded",
+            _rel(EXPORT_MANIFEST), "no rows parsed", "0 stale",
+            MISSING,
+            "The export manifest is missing or has no parseable FBX rows. Without it "
+            "there is no inventory of what Blender has handed to Unreal.",
+        )
+
+    exports_root = EXPORT_MANIFEST.parent
+    stale: list[str] = []
+    missing: list[str] = []
+    for category, name, recorded in rows:
+        path = exports_root / category / name
+        if not path.is_file():
+            missing.append(name)
+            continue
+        actual = path.stat().st_size
+        if actual != recorded:
+            stale.append(f"{name} manifest {recorded} != disk {actual}")
+
+    blend_mtime = LIB_BLEND.stat().st_mtime if LIB_BLEND.is_file() else None
+    behind = 0
+    if blend_mtime is not None:
+        behind = sum(
+            1 for category, name, _ in rows
+            if (exports_root / category / name).is_file()
+            and (exports_root / category / name).stat().st_mtime < blend_mtime - 1.0)
+
+    note_bits: list[str] = []
+    if stale:
+        note_bits.append("re-export needed, size differs from manifest: "
+                         + "; ".join(stale))
+    if missing:
+        note_bits.append("listed but not on disk: " + ", ".join(missing[:6]))
+    note_bits.append(
+        f"hint: {behind} of {len(rows)} FBX predate the .blend save, which is normal "
+        f"and is not counted - one object's edit touches the whole file")
+
+    question = "Every exported FBX matches the size the manifest recorded"
+    if stale:
+        return Check(
+            "env.export_fresh", "G-ENV", question, _rel(EXPORT_MANIFEST),
+            f"{len(stale)} stale of {len(rows)}", f"0 stale of {len(rows)}",
+            FAIL, " | ".join(note_bits),
+        )
+    if missing:
+        return Check(
+            "env.export_fresh", "G-ENV", question, _rel(EXPORT_MANIFEST),
+            f"0 stale, {len(missing)} absent of {len(rows)}",
+            f"0 stale of {len(rows)}", MISSING, " | ".join(note_bits),
+        )
+    return Check(
+        "env.export_fresh", "G-ENV", question, _rel(EXPORT_MANIFEST),
+        f"0 stale of {len(rows)}", f"0 stale of {len(rows)}", PASS,
+        " | ".join(note_bits),
+    )
+
+
+def check_env_ue_island_measured() -> Check:
+    """The island as Unreal sees it has been measured, and agrees with Blender.
+
+    check_env_export_fresh proves the FBX is current. This proves the thing after
+    it: that somebody imported the current FBX and measured the result in the
+    editor. Those are different claims and the gap between them is exactly where
+    the 2026-10-04 plate went missing - the FBX was regenerated, but nothing
+    recorded that the .uasset and the level were rebuilt from it.
+
+    Unreal is not reachable from this script, so the measurement is a file an
+    in-editor script writes (Content/Python/measure_ue_island.py). Until somebody
+    runs it, this row is MISSING and the gate says so out loud rather than letting
+    a Blender-side PASS imply an engine-side one.
+
+    Units: the record is in Unreal centimetres, the comparison is in Blender
+    metres. A conversion that is quietly wrong would move the number by 100x, so
+    the tolerance is stated in metres and the raw value is printed beside it.
+    """
+    source_m = _island_bbox_blender_m()
+    if source_m is None:
+        return Check(
+            "env.ue_island_measured", "G-ENV",
+            "The island measured inside Unreal agrees with the Blender source",
+            _rel(UE_ISLAND_MEASUREMENT), "no Blender-side measurement",
+            "agrees", MISSING,
+            "The greybox report has no SM_IslandTop measurement to compare against. "
+            "Regenerate Docs/qa/graybox_spec_report.json first.",
+        )
+
+    question = "The island measured inside Unreal agrees with the Blender source"
+
+    def unmeasured(measured: str, tail: str = "") -> Check:
+        # One note for one condition. A missing file and a null bbox_cm are the
+        # same fact - nobody has measured it - and this repo already shipped one
+        # of them with a terser note than the other, which is how a reader ends up
+        # guessing which hop is unverified. Both say the same thing.
+        note = (
+            "Nobody has measured the island inside Unreal. The Blender side reads "
+            f"{source_m[0]:.1f} x {source_m[1]:.1f} m, but that is the source, not "
+            "the mesh the game is built from. This exact gap is how the 2026-10-04 "
+            "plate went missing: the .blend and the report said 180 x 100 while "
+            "Unreal was still holding 19.3 x 10.7. Run "
+            "Content/Python/measure_ue_island.py in the editor - it only reads - "
+            "and commit what it writes. Hand-writing bbox_cm defeats the point."
+        )
+        return Check("env.ue_island_measured", "G-ENV", question,
+                     _rel(UE_ISLAND_MEASUREMENT), measured, "agrees",
+                     MISSING, note + tail)
+
+    data = _read_json(UE_ISLAND_MEASUREMENT)
+    if data is None:
+        return unmeasured("no artifact")
+
+    raw = data.get("bbox_cm")
+    if not (isinstance(raw, (list, tuple)) and len(raw) >= 2):
+        return unmeasured("no bbox_cm")
+
+    try:
+        ue_x_m, ue_y_m = float(raw[0]) / 100.0, float(raw[1]) / 100.0
+    except (TypeError, ValueError):
+        return Check(
+            "env.ue_island_measured", "G-ENV", question,
+            _rel(UE_ISLAND_MEASUREMENT), f"unparseable {raw!r}", "agrees", MISSING,
+            "bbox_cm holds something that is not two numbers.",
+        )
+
+    # 2% of the span, or 1 m, whichever is larger. The point is to catch an
+    # un-reimported asset (180 vs 19.3 is a 9x error), not to adjudicate
+    # centimetre-level disagreement between two engines.
+    tol = max(1.0, source_m[0] * 0.02)
+    off_x = abs(ue_x_m - source_m[0])
+    off_y = abs(ue_y_m - source_m[1])
+    worst = max(off_x, off_y)
+    measured = f"UE {ue_x_m:.1f} x {ue_y_m:.1f} m"
+    target = f"Blender {source_m[0]:.1f} x {source_m[1]:.1f} m"
+    if worst <= tol:
+        state, note = PASS, f"within {tol:.2f} m; raw {list(raw)} cm"
+    else:
+        state = FAIL
+        note = (f"off by {off_x:.2f} m in X and {off_y:.2f} m in Y, tol {tol:.2f}. "
+                f"Blender says {source_m[0]:.1f} x {source_m[1]:.1f} m, Unreal says "
+                f"{ue_x_m:.1f} x {ue_y_m:.1f} m. The usual cause is an FBX that was "
+                f"re-exported and never re-imported, so the .uasset and the level "
+                f"still hold the older mesh. Re-import and re-place, then re-run "
+                f"the measuring script. Raw: {list(raw)} cm.")
+    return Check(
+        "env.ue_island_measured", "G-ENV", question,
+        _rel(UE_ISLAND_MEASUREMENT), measured, target, state, note,
+    )
+
+
+def _island_bbox_blender_m() -> tuple[float, float] | None:
+    """SM_IslandTop's measured footprint in metres, from the greybox report."""
+    report = _read_json(GRAYBOX_REPORT)
+    if not isinstance(report, dict):
+        return None
+    entry = (report.get("measurements") or {}).get("SM_IslandTop")
+    if not isinstance(entry, dict):
+        return None
+    bbox = entry.get("bbox")
+    if not (isinstance(bbox, (list, tuple)) and len(bbox) >= 2):
+        return None
+    try:
+        return float(bbox[0]), float(bbox[1])
+    except (TypeError, ValueError):
+        return None
+
+
 def check_env_island_sized() -> Check:
     return _criterion_check(
         "env.island_sized", "2_sized",
@@ -1144,6 +1379,8 @@ def build() -> dict[str, Gate]:
         check_env_world_assembled(),
         check_env_island_sized(),
         check_env_pivot(),
+        check_env_export_fresh(),
+        check_env_ue_island_measured(),
         check_env_master_binding(),
         check_env_family_distinct(),
         check_env_traversal_measured(),
