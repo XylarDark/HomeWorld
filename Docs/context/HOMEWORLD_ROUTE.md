@@ -25,6 +25,7 @@ state is not that writer.
 - Cloud spacing is top 3-4 times the diameter, middle 1.5-2.5, and bottom 4-6. It is a placeholder until human testing.
 - The cloud layer above the 25 m gap is 50 m tall, the 75 m drop minus that gap. It is a placeholder until human testing.
 - Any jump has more than one spirit-blue cloud, and there is no fixed count.
+- The bottom of the cloud layer is the exit, and the landing stays in the existing field.
 
 ## Left empty on purpose
 
