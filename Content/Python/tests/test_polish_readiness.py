@@ -52,6 +52,22 @@ pr = importlib.util.module_from_spec(_spec)
 sys.modules["polish_readiness"] = pr
 _spec.loader.exec_module(pr)
 
+# session_close imports polish_readiness by name, so it must be on sys.path and
+# registered before it loads. Loading it via spec first and then making it
+# importable keeps one instance of `pr` shared by both modules - two instances
+# would each hold their own ROOT and the tests would measure different repos.
+sys.path.insert(0, str(SCRIPT.parent))
+CLOSE_SCRIPT = SCRIPT.parent / "session_close.py"
+if not CLOSE_SCRIPT.is_file():
+    raise AssertionError(
+        f"{CLOSE_SCRIPT} is gone. The session-close question is a repo "
+        f"mechanism, not a convenience - its absence means a session can end "
+        f"in silence again.")
+_close_spec = importlib.util.spec_from_file_location("session_close", CLOSE_SCRIPT)
+sc = importlib.util.module_from_spec(_close_spec)
+sys.modules["session_close"] = sc
+_close_spec.loader.exec_module(sc)
+
 
 def _fixture_findings():
     """A synthetic greybox report holding the two real SM_Island_Hero blockers.
@@ -2051,6 +2067,290 @@ class TheStandstillKeepsTheThreeStatesApart(unittest.TestCase):
         self.addCleanup(setattr, pr, "QUEUE_FILE", saved)
         md = self._md()
         self.assertIn("### The queue is not trustworthy", md)
+
+
+class TheSessionNeverEndsInSilence(unittest.TestCase):
+    """A session that stops without a question leaves the Lead disengaged.
+
+    The Lead's stated need, 2026-10-04: after every session the developer should
+    be prompted with a question that advances to the next one, because that is
+    what keeps them on the critical path. This class is that expectation made
+    executable - it is a test, not a habit, because a habit is exactly what
+    erodes on the days when the work went badly.
+
+    The critical path is derived from the gate dependency chain rather than
+    ranked by opinion. `polish_readiness._upstream` encodes the one rule the
+    industry agrees on - a gate cannot open while the gate beneath it is red -
+    so the furthest-back red gate is the path by construction. Ranking by "what
+    has the most problems" or "what was worked on last" would both be wrong in
+    ways a reader could not check.
+    """
+
+    def _q(self, gates=None, queue=None):
+        gates = pr.build() if gates is None else gates
+        return sc.next_question(gates, queue)
+
+    # --- the question always exists ---------------------------------------
+
+    def test_a_question_is_always_produced(self):
+        """There is no repo state in which this script has nothing to ask."""
+        self.assertTrue(self._q()["question"].strip())
+
+    def test_the_question_is_a_question(self):
+        """An assertion is not a question, and it does not invite an answer."""
+        q = self._q()
+        self.assertTrue(
+            q["question"].rstrip().endswith("?"),
+            f"the closing prompt is not a question: {q['question']!r}")
+
+    def test_the_rendered_prompt_contains_the_question_text(self):
+        """The question has to reach the reader, verbatim and unshortened.
+
+        Checked on the payload the renderer actually emitted rather than by
+        asserting a section heading exists. A heading with an empty or truncated
+        body is the silent end this script exists to prevent, and a heading-only
+        test cannot tell the two apart - which is how "ask nothing when nothing
+        is blocked" survived the first mutation run.
+        """
+        gates = pr.build()
+        q = sc.next_question(gates, [])
+        md = sc.render(q, gates)
+        self.assertIn("## Ask this", md)
+        start = md.index("## Ask this")
+        end = md.index("## Not asked, and why")
+        section = md[start:end]
+        self.assertIn(q["question"], section,
+                      "the rendered prompt does not contain the question")
+        self.assertGreater(len(section.strip().splitlines()), 2,
+                           "the prompt section is a heading with no body")
+
+    def test_every_rendered_state_ends_with_a_question(self):
+        """Not just today's state - every branch, including all-green."""
+        def g(state):
+            return {gid: pr.Gate(gid, "q?", "S2 ART-BLOCKOUT",
+                                [pr.Check(f"{gid}.x", gid, "r", "s", "m", "t", state,
+                                          action_kind=pr.AGENT if state == pr.PASS
+                                          else pr.DO,
+                                          next_action=("Do the thing." * 8)
+                                          if state != pr.PASS else "")])
+                    for gid in sc.GATE_ORDER}
+        for st in (pr.FAIL, pr.MISSING, pr.STALE):
+            md = sc.render(self._q(g(st)), g(st))
+            self.assertIn("## Ask this", md, st)
+        md = sc.render(self._q(g(pr.PASS)), g(pr.PASS))
+        self.assertIn("## Ask this", md, "an all-green repo produced no question")
+
+    def test_json_form_carries_the_question(self):
+        q = self._q()
+        self.assertTrue(q["question"].strip())
+        self.assertIn("gate_states", json.dumps(
+            {"k": q["kind"], "q": q["question"], "gate_states":
+             {g: pr.build()[g].state for g in sc.GATE_ORDER}}))
+
+    def test_exit_code_is_zero_even_while_every_gate_is_red(self):
+        """A red gate is this project's normal state, not a failed close."""
+        self.assertEqual(sc.main([]), 0)
+        self.assertEqual(sc.main(["--json"]), 0)
+
+    # --- the critical path is derived, not guessed -------------------------
+
+    def test_the_path_is_the_furthest_back_red_gate(self):
+        """G-ENV red means G-ASSET and G-FEEL are not the path, however red."""
+        self.assertEqual(sc.critical_gate(pr.build()), "G-ENV")
+
+    def test_a_green_earlier_gate_exposes_the_next_one(self):
+        """The path must move when the blocking gate clears, not stay stuck."""
+        gates = pr.build()
+        for c in gates["G-ENV"].checks:
+            if c.id.startswith("dep."):
+                continue
+            gates["G-ENV"].checks[ gates["G-ENV"].checks.index(c) ] = \
+                pr.Check(c.id, c.gate, c.requirement, c.source, "m", c.target,
+                         pr.PASS if c.state != pr.WAIVED else pr.WAIVED)
+        self.assertEqual(sc.critical_gate(gates), "G-ASSET",
+                         "with G-ENV green the path must advance to G-ASSET")
+
+    def test_an_all_green_repo_has_no_critical_gate(self):
+        gates = pr.build()
+        for g in gates.values():
+            g.checks = [pr.Check("x", g.id, "r", "s", "m", "t", pr.PASS)]
+        self.assertIsNone(sc.critical_gate(gates))
+
+    def test_an_all_green_repo_still_asks_something_real(self):
+        """"Nothing is blocked" is not an excuse to ask nothing.
+
+        The tempting answer at an all-green repo is "all clear". That ends the
+        session with silence, which is the failure this script exists to prevent
+        - and it is also uninformative, because a gate that has been RED for
+        days has never once been tested against a real pass. So the all-green
+        branch asks whether the gates are measuring the right thing.
+        """
+        gates = pr.build()
+        for g in gates.values():
+            g.checks = [pr.Check("x", g.id, "r", "s", "m", "t", pr.PASS)]
+        q = sc.next_question(gates, [])
+        self.assertEqual(q["kind"], "none_blocked")
+        self.assertTrue(q["question"].strip(),
+                        "an all-green repo produced an empty question")
+        self.assertTrue(q["question"].rstrip().endswith("?"))
+        # Not a count: a real list of distinct choices. ">= 2" passes just as
+        # well for ["nothing", "nothing"].
+        options = q.get("options") or []
+        self.assertGreaterEqual(len(options), 2,
+                                "an open question with no options is a complaint")
+        self.assertEqual(len(set(options)), len(options),
+                         f"the options repeat: {options}")
+        for o in options:
+            self.assertGreater(len(o.strip()), 8,
+                               f"option too thin to be a choice: {o!r}")
+        self.assertTrue(q.get("recommendation"),
+                        "no recommendation; the Lead would have to choose blind")
+
+    def test_the_all_green_prompt_is_rendered_in_full(self):
+        """The empty-branch case must not render as a bare heading."""
+        gates = pr.build()
+        for g in gates.values():
+            g.checks = [pr.Check("x", g.id, "r", "s", "m", "t", pr.PASS)]
+        q = sc.next_question(gates, [])
+        md = sc.render(q, gates)
+        start = md.index("## Ask this")
+        end = md.index("## Not asked, and why")
+        self.assertIn(q["question"], md[start:end])
+
+    def test_paths_honour_the_upstream_dependency_chain(self):
+        """A gate cannot be the path while the gate beneath it is red.
+
+        Read off `_upstream` rather than restated, so this fails if the
+        dependency is ever dropped.
+        """
+        gates = pr.build()
+        dep = next((c for g in gates.values() for c in g.checks
+                    if c.id == "dep.g-env"), None)
+        self.assertIsNotNone(dep, "G-ASSET no longer declares a dep on G-ENV")
+        self.assertEqual(dep.state, pr.FAIL,
+                         "the dependency is not failing; if that is deliberate "
+                         "the critical-path derivation must be revisited")
+
+    # --- a settled question must not be re-asked --------------------------
+
+    def test_a_held_row_never_becomes_the_question(self):
+        """The bug this class exists to prevent.
+
+        The first version asked the Lead to decide `env.family_distinct`, whose
+        own next_action says "the correct action right now is none, and G-ENV
+        stays RED until then". That is a question with its answer already on
+        file: it invites a re-answer, or the worse conclusion that the agent is
+        blocked on the Lead when it is not.
+        """
+        q = self._q()
+        self.assertNotIn("family_distinct", q.get("row") or "")
+        self.assertNotIn("master_binding", q.get("row") or "")
+
+    def test_held_rows_are_reported_as_deliberately_red(self):
+        """Not asked, but still visible - silent omission is its own lie.
+
+        Asserts the list is NON-EMPTY as well as present. The first version only
+        checked the key existed, which passed just as well with every held row
+        dropped - so a mutation that reported nothing at all survived, and the
+        test was guarding the shape of the output rather than its content.
+        """
+        q = self._q()
+        self.assertIn("held_red", q)
+        self.assertTrue(q["held_red"],
+                        "no held rows reported; two rows are held RED by ruling")
+        for hid in q["held_red"]:
+            self.assertNotIn(hid, q["question"])
+
+    def test_the_two_ruled_rows_are_classified_held(self):
+        """The classification itself, not just the runtime filter.
+
+        `session_close` can also detect a held row from its text, and that
+        redundancy is deliberate. But it means the two ruled rows could be
+        mislabelled DECIDE and everything would still behave - so the label is
+        pinned here, where the decision to park them is actually recorded.
+        """
+        gates = pr.build()
+        kinds = {c.id: c.action_kind for g in gates.values() for c in g.checks}
+        for rid in ("env.master_binding", "env.family_distinct"):
+            # The LITERAL "held", not pr.HELD. Asserting against the constant
+            # makes the test tautological: redefining HELD = "decide" rewrites
+            # the expectation and the mutation survives. A test that cannot fail
+            # under the change it guards is decoration.
+            self.assertEqual(kinds.get(rid), "held",
+                             f"{rid} is decided - deliberately red - and must not "
+                             f"be classified as an open decision")
+        self.assertEqual(pr.ACTION_KINDS,
+                         ("agent", "decide", "do", "env", "held"),
+                         "the kind vocabulary changed; update this test and "
+                         "every row that names one")
+        self.assertIn("held", pr.ACTION_KIND_MEANING)
+
+    def test_the_held_exclusion_is_load_bearing_not_redundant(self):
+        """Guard the runtime filter directly, since the labels mask it.
+
+        With both ruled rows correctly labelled `held`, removing the `_is_held`
+        filter from `gate_decides` changes nothing observable - which is exactly
+        why the first mutation run reported it as surviving. It is defence in
+        depth for the *next* row that arrives mislabelled, so it needs a test
+        that constructs that row rather than hoping one exists.
+        """
+        mislabelled = pr.Check(
+            "env.something_new", "G-ENV", "r", "s", "m", "t", pr.FAIL,
+            note="Lead ruled to leave it RED.",
+            next_action="Bind it - the correct action right now is none, and "
+                        "G-ENV stays RED until the art pass.",
+            action_kind=pr.DECIDE)
+        gates = pr.build()
+        gates["G-ENV"].checks.append(mislabelled)
+        q = sc.next_question(gates, [])
+        self.assertNotEqual(q.get("row"), "env.something_new",
+                            "a parked row was asked as if it were an open decision")
+
+    def test_held_marker_detection_is_reachable_for_a_decide_row(self):
+        """Exercise the text path directly, since shipped rows are now HELD.
+
+        The two ruled rows carry the `held` label, so nothing in the live repo
+        reaches the marker branch any more. That makes it untested code that
+        guards the next mislabelled row - which is exactly the row it exists for.
+        """
+        parked = pr.Check("x", "G-ENV", "r", "s", "m", "t", pr.FAIL,
+                          note="Lead ruled 2026-10-04 to leave it RED.",
+                          next_action="Bind each material to one of the ten "
+                                      "masters - the correct action right now is "
+                                      "none, and G-ENV stays RED until the art pass.",
+                          action_kind=pr.DECIDE)
+        self.assertTrue(sc._is_held(parked))
+
+        live = pr.Check("y", "G-ENV", "r", "s", "m", "t", pr.FAIL,
+                        action_kind=pr.DECIDE,
+                        next_action="Decide whether the window or the island "
+                                    "is wrong, then change that one.")
+        self.assertFalse(sc._is_held(live),
+                         "a real open decision was mistaken for a parked row")
+
+    def test_a_decide_row_with_no_next_step_is_treated_as_held(self):
+        """A decide row that names no action is not deciding anything."""
+        c = pr.Check("x", "G-ENV", "r", "s", "m", "t", pr.MISSING,
+                     action_kind=pr.DECIDE, next_action="")
+        self.assertTrue(sc._is_held(c))
+        c2 = pr.Check("x", "G-ENV", "r", "s", "m", "t", pr.MISSING,
+                      action_kind=pr.DECIDE,
+                      next_action="Decide whether the window or the island is wrong.")
+        self.assertFalse(sc._is_held(c2))
+
+    def test_the_real_open_question_is_the_one_asked(self):
+        """Q1 is genuinely unanswered, so it is what should surface."""
+        q = self._q()
+        self.assertEqual(q["kind"], pr.DECIDE)
+        self.assertEqual(q.get("queued_id"), "Q1")
+
+    def test_held_detection_demotes_and_never_promotes(self):
+        """A false positive costs a skipped question; a false negative costs a
+        wasted session. The bias has to be toward demoting, and the test says so
+        rather than leaving it to taste."""
+        c = pr.Check("x", "G-ENV", "r", "s", "m", "t", pr.MISSING,
+                     action_kind=pr.AGENT, next_action="")
+        self.assertTrue(sc._is_held(c), "held detection must not require DECIDE")
 
 
 class AssetBoardCannotBeFakedGreen(unittest.TestCase):

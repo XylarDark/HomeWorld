@@ -177,6 +177,20 @@ RED = "RED"
 #:           the result is evidence.
 #:   ENV     nobody owes anything. An editor is closed, a tool is absent. Waiting
 #:           is the correct answer and no one is at fault.
+#:   HELD    deliberately red. A ruling already decided this row stays red, and
+#:           the work that would clear it belongs to a later pass. Not a question,
+#:           because the answer is already recorded.
+#:
+#: WHY HELD EXISTS, AND WHY IT WAS NOT FOLDED INTO DECIDE. `env.master_binding`
+#: and `env.family_distinct` are classed DECIDE, and both carry a note saying the
+#: Lead ruled on 2026-10-04 to leave them RED for the art pass. A decision with
+#: its answer already on file is not a decision awaiting anyone. Rendering it as
+#: a question is actively worse than rendering nothing: it invites the Lead to
+#: re-answer a settled question, or to read a red row as an outstanding request
+#: and conclude the agent is blocked on him when it is not. The distinction that
+#: matters here is between "nobody has decided this" and "this is decided, and the
+#: answer is RED" - and both are different from ENV, where nothing is owed by
+#: anyone and the blocker is outside the project.
 #:
 #: The distinction is the Lead's own framing and it is the whole point: the agent
 #: should always be doing something - working, asking, or instructing the dev on
@@ -188,7 +202,8 @@ AGENT = "agent"
 DECIDE = "decide"
 DO = "do"
 ENV = "env"
-ACTION_KINDS = (AGENT, DECIDE, DO, ENV)
+HELD = "held"
+ACTION_KINDS = (AGENT, DECIDE, DO, ENV, HELD)
 
 #: What each kind means, in the reader's terms. Rendered into the markdown so a
 #: reader never has to guess why one red row is a question and another is a chore.
@@ -197,6 +212,7 @@ ACTION_KIND_MEANING = {
     DECIDE: "a judgment only you can make",
     DO: "labour no agent can perform",
     ENV: "an environment, not a person - waiting is correct",
+    HELD: "decided - deliberately red until the art pass",
 }
 
 
@@ -794,6 +810,19 @@ def _criterion_check(
     report: dict[str, Any] | None = None,
     report_present: bool = True,
     action: str = "",
+    #: Declared by the caller rather than inferred here. An action's owner is a
+    #: fact about who owes the work, and this function only sees a criterion
+    #: name - inferring it from the name would put the judgment back inside
+    #: the thing this classification exists to keep outside.
+    #:
+    #: The default is DECIDE, not "". A greybox criterion that a check wants
+    #: closed is a judgment about art or geometry by construction - that is what
+    #: the greybox report measures - and every production caller passes its own
+    #: kind explicitly anyway. The default exists for the many small tests that
+    #: call this helper to exercise one branch; making them all name a kind would
+    #: be ceremony that adds no information, and an empty default would instead
+    #: trip the construction guard for a reason those tests cannot act on.
+    action_kind: str = DECIDE,
 ) -> Check:
     """One greybox criterion as a readiness check, honouring waivers.
 
@@ -880,7 +909,7 @@ def _criterion_check(
                          "Either fix the source, or record a scoped waiver in "
                          "Docs/qa/polish_waivers.json with a rationale - do not "
                          "delete the finding."),
-                     action_kind=DECIDE)
+                     action_kind=action_kind)
 
     if waived:
         detail = "; ".join(
@@ -919,6 +948,7 @@ def check_env_master_binding() -> Check:
                "a script's. Lead ruled 2026-10-04 to leave it RED for the art pass "
                "- so the correct action right now is none, and G-ENV stays RED "
                "until the art pass lands.",
+action_kind=HELD,
     )
 
 
@@ -941,6 +971,7 @@ def check_env_family_distinct() -> Check:
                "art decision regardless. Lead ruled 2026-10-04 to leave it RED for "
                "the art pass - so the correct action right now is none, and G-ENV "
                "stays RED until then.",
+action_kind=HELD,
     )
 
 
@@ -2221,6 +2252,8 @@ def _render_standstill(gates: dict[str, Gate], A) -> None:
     A("  can do; a human runs them and the result is evidence.")
     A(f"- **Waiting on an environment** — {len(by_kind[ENV])} row(s). Nobody owes")
     A("  anything and waiting is correct.")
+    A(f"- **Deliberately red** — {len(by_kind[HELD])} row(s). Already decided and")
+    A("  staying red; not a question, and not yours to re-answer.")
     A("")
 
     if open_decisions:
@@ -2238,6 +2271,16 @@ def _render_standstill(gates: dict[str, Gate], A) -> None:
         A("### Work only you can do")
         A("")
         for c in by_kind[DO]:
+            A(f"- **`{c.id}`** ({c.state}) — {c.next_action}")
+        A("")
+
+    if by_kind[HELD]:
+        A("### Deliberately red, not waiting on you")
+        A("")
+        A("A ruling already decided these stay red until a later pass. Asking you")
+        A("to re-answer them would be worse than staying quiet.")
+        A("")
+        for c in by_kind[HELD]:
             A(f"- **`{c.id}`** ({c.state}) — {c.next_action}")
         A("")
 

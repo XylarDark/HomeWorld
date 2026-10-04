@@ -108,6 +108,7 @@ README is left intact as history.
 | **Are we ready to polish?** | `Docs/qa/POLISH_READINESS.md` | generated; G-ENV / G-ASSET / G-FEEL all RED |
 | **What is waiting on whom?** | same file, "Where everything is waiting" | generated; every blocked row declares agent / decide / do / env |
 | **Decisions the Lead owes that no gate row can express** | `Docs/qa/POLISH_QUEUE.json` | 3 open, 1 deferred (Early Access paused 2026-10-04) |
+| **Ending a session: what to ask next** | `Content/Python/session_close.py` | read-only; derives the critical path from the gate dependency chain |
 | **Where the world actually lives** | `Content/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.umap` | the homestead, crumbs and field. NOT `MainMenu` — see KNOWN_ERRORS 2026-10-03 |
 | **AI-agent practice, researched** | `Docs/38_AI_AGENT_PRACTICE.md` | research; read-only, gates no code |
 | **What the human owns, and when to ask** | `docs/human-use/OWNERSHIP.md` | canon - Steer / Taste / Test |

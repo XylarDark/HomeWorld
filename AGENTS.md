@@ -24,6 +24,8 @@ You cannot take responsibility for a change you cannot explain, you cannot see t
 
 Past ~60k tokens, write `Docs/handoffs/SESSION_HANDOFF_<slice>.md` and start a fresh chat from that file plus [docs/SESSION_SUMMARY.md](docs/SESSION_SUMMARY.md). Do not carry the transcript. One significant write at a time. Uncommitted changes you did not make: stop and report.
 
+**End every session with a question.** Run `python Content/Python/session_close.py` before you stop. It derives the critical path from the gate dependency chain and prints the one question to leave the Lead with — a judgment only they can make, labour only they can do, or a confirmation that the agent should keep working. Do not end a session in silence; a session that simply stops leaves the Lead off the critical path.
+
 ## Build
 
 Agents run `.\Tools\Safe-Build.ps1` only, from repo root. Never `Build-HomeWorld.bat` directly. Chain and MCP port: [docs/Setup/BUILD_POLICY.md](docs/Setup/BUILD_POLICY.md). Cloud agents have no UE.

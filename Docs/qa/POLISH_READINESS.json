@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-04T08:26:03+00:00",
+  "generated": "2026-10-04T08:55:00+00:00",
   "process_doc": "Docs/37_POLISH_PASS_PROCESS.md",
   "verdict": "NOT_READY",
   "gates": {
@@ -83,7 +83,7 @@
           "state": "FAIL",
           "note": "M_FamilySilhouette: material in the blend is neither one of the ten masters nor an allowed instance (art bible S10); M_ValleyNight: material in the blend is neither one of the ten masters nor an allowed instance (art bible S10)",
           "next_action": "Bind each material to one of the ten masters in Docs/06_VS_MVP_DRESS.md, or declare it an allowed instance of one. This is an art-bible decision (S10), so it is the Lead's call, not a script's. Lead ruled 2026-10-04 to leave it RED for the art pass - so the correct action right now is none, and G-ENV stays RED until the art pass lands.",
-          "action_kind": "decide"
+          "action_kind": "held"
         },
         {
           "id": "env.family_distinct",
@@ -95,7 +95,7 @@
           "state": "FAIL",
           "note": "SM_NODE_PLANT_SLOT_DAY_PLANTED: measures flat but the locked signature for 'heal' is narrow upright, single soft column",
           "next_action": "The named mesh measures flat where its locked signature is 'narrow upright, single soft column'. Changing it means editing authored geometry, which AGENTS.md forbids the agent doing and which is an art decision regardless. Lead ruled 2026-10-04 to leave it RED for the art pass - so the correct action right now is none, and G-ENV stays RED until then.",
-          "action_kind": "decide"
+          "action_kind": "held"
         },
         {
           "id": "env.traversal_measured",
