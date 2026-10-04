@@ -1396,6 +1396,210 @@ class TheExportChainCannotGoStale(unittest.TestCase):
         self.addCleanup(setattr, pr, "GRAYBOX_REPORT", saved)
         self.assertEqual(pr.check_env_ue_island_measured().state, pr.MISSING)
 
+class WorldAssembledMeasuresTheShippingLevel(unittest.TestCase):
+    """A row that passes on the wrong level is worse than a red one.
+
+    On 2026-10-04 `env.world_assembled` counted every `.uasset` under
+    Content/__ExternalActors__ and called the total "placed actors". That was
+    1,270 - all of them MainMenu's World Partition kit-bash, which
+    docs/KNOWN_ERRORS.md measures as containing no island, no cabin, no crumbs
+    and no landing circle. L_VS_MVP_Markers, the level SHIPPING_LEVEL names,
+    stores its actors inline and therefore contributed exactly 0 to an
+    external-actor count.
+
+    So the row was passing on the strength of a level the shipping gate is not
+    about, and a note inside the function went further and asserted that "the
+    assembled homestead is MainMenu" - contradicting the SHIPPING_LEVEL
+    comment 320 lines above it and the recorded answer that comment cites. A
+    PASS row is the last place a false claim can hide: nobody reads the prose
+    of a green row, which is exactly why nobody caught it.
+
+    One cause, two symptoms. The row counted a storage mode, not a level:
+    `__ExternalActors__` only exists for World Partition maps, so a fully
+    populated inline level reads as an empty world.
+    """
+
+    # FName entries are NUL-delimited ASCII in a level's name table. The first
+    # draft of this fixture separated them with b"pad", which does not happen
+    # in the format - and it hid a greedy-regex defect that reported 1 actor
+    # for a level holding three. A fixture must model the real bytes, or it
+    # tests a fiction.
+    INLINE = (b"StaticMeshActor_0\x00StaticMeshActor_1\x00CameraActor_0\x00"
+              b"GP_PlayerStart\x00")
+    EMPTY_INLINE = b"no actors in this package at all"
+    WP = b"WorldPartitionWorldPartitionWorldPartition"
+
+    def setUp(self):
+        self.saved_root = pr.ROOT
+        self.addCleanup(setattr, pr, "ROOT", self.saved_root)
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        # Patched here, not per test. The first draft of this class set it in
+        # each test and one of them - the one that reproduces the actual
+        # fail-open - forgot, so it silently measured the real repo, found
+        # MainMenu's 1,270 external actors and passed for the wrong reason. A
+        # mutation test caught it, which is the only reason it is worth
+        # retelling: a fixture the test does not point at is not a fixture.
+        pr.ROOT = self.root
+
+    def _umap(self, rel: str, body: bytes) -> Path:
+        p = self.root / "Content" / "HomeWorld" / "Maps" / rel
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_bytes(body)
+        return p
+
+    def _externals(self, rel_dir: str, n: int) -> None:
+        d = self.root / "Content" / "__ExternalActors__" / "HomeWorld" / "Maps" / rel_dir
+        d.mkdir(parents=True, exist_ok=True)
+        for i in range(n):
+            (d / f"0{i}.uasset").write_bytes(b"actor")
+
+    def _shipping(self, rel: str = "VS_MVP/L_VS_MVP_Markers.umap") -> None:
+        self._umap(rel, self.INLINE)
+
+    # --- the fail-open, in both directions ---------------------------------
+
+    def test_inline_shipping_level_passes_with_no_external_actors_at_all(self):
+        """A populated inline level read as an EMPTY world before this fix."""
+        self._shipping()
+        self.assertFalse((self.root / "Content" / "__ExternalActors__").exists())
+        c = pr.check_env_world_assembled()
+        self.assertEqual(c.state, pr.PASS,
+                         f"inline level with 3 actors reported {c.state}: {c.measured}")
+
+    def test_empty_shipping_level_fails_even_when_another_level_is_populated(self):
+        """The inverse: a busy impostor level must not satisfy the row."""
+        self._shipping()
+        self._umap("MainMenu.umap", self.WP)
+        self._externals("MainMenu", 50)
+        self._umap("VS_MVP/L_VS_MVP_Markers.umap", self.EMPTY_INLINE)
+        c = pr.check_env_world_assembled()
+        self.assertEqual(c.state, pr.MISSING,
+                         "50 external actors in another level satisfied a row about "
+                         f"this one: {c.measured}")
+
+    # --- storage modes are both handled, and named --------------------------
+
+    def test_world_partition_shipping_level_counts_external_files(self):
+        self._umap(f"VS_MVP/{pr.SHIPPING_LEVEL}.umap", self.WP)
+        self._externals("VS_MVP/" + pr.SHIPPING_LEVEL, 3)
+        c = pr.check_env_world_assembled()
+        self.assertEqual(c.state, pr.PASS)
+        self.assertIn("external", c.measured)
+        self.assertIn("3 placed actors", c.measured)
+
+    def test_inline_actor_floor_counts_each_actor_once(self):
+        """A name table stores an FName once; a raw match count would double it.
+
+        `_inline_actor_floor` is a floor, so a small overcount looks harmless.
+        It is not: the number is printed in the row's `measured` field, and an
+        inflated actor count in a measurement string is a false number in a
+        gate. Distinct-instance counting is the guard.
+        """
+        umap = self._umap("MainMenu.umap", self.INLINE + b"\x00" + self.INLINE)
+        self.assertEqual(pr._inline_actor_floor(umap), 3)
+
+    def test_inline_actor_floor_does_not_merge_adjacent_entries(self):
+        """The class-name run must be non-greedy.
+
+        A greedy `[A-Za-z0-9_]{2,50}` swallows every following entry and reports
+        ONE actor for a level holding three. Both forms return 87 on the real
+        L_VS_MVP_Markers, so this was invisible against the repo's own data -
+        the defect only shows on a fixture, which is the argument for having one.
+        """
+        body = (b"StaticMeshActor_0" + b"StaticMeshActor_1" + b"CameraActor_0")
+        umap = self._umap("MainMenu.umap", body)
+        self.assertEqual(pr._inline_actor_floor(umap), 3)
+
+    def test_measurement_names_the_level_and_the_storage_mode(self):
+        self._shipping()
+        c = pr.check_env_world_assembled()
+        self.assertIn(pr.SHIPPING_LEVEL, c.measured)
+        self.assertIn(pr.SHIPPING_LEVEL, c.target)
+        self.assertIn("inline", c.measured)
+
+    def test_external_actor_path_is_derived_from_the_umap_path(self):
+        """A World Partition level nested deeper must still resolve.
+
+        The old code globbed Content/__ExternalActors__/HomeWorld/Maps with no
+        reference to which level it was reporting on, which is how one level's
+        actors became another's evidence.
+        """
+        self._umap(f"A/B/{pr.SHIPPING_LEVEL}.umap", self.WP)
+        self._externals(f"A/B/{pr.SHIPPING_LEVEL}", 2)
+        c = pr.check_env_world_assembled()
+        self.assertEqual(c.state, pr.PASS, c.measured)
+        self.assertIn("2 placed actors", c.measured)
+
+    def test_missing_shipping_level_is_missing_and_says_so(self):
+        self._umap("MainMenu.umap", self.WP)
+        self._externals("MainMenu", 40)
+        c = pr.check_env_world_assembled()
+        self.assertEqual(c.state, pr.MISSING)
+        self.assertIn("not found", c.measured)
+        self.assertIn(pr.SHIPPING_LEVEL, c.next_action)
+        self.assertIn("do not point this row at a different level", c.next_action)
+
+
+class TheRealShippingLevelSaysSo(unittest.TestCase):
+    """Assertions about the actual repo, not about the check's logic.
+
+    Split out from `WorldAssembledMeasuresTheShippingLevel` on purpose. That
+    class points ROOT at a temp fixture; these two read the real Content tree,
+    so sharing a class meant one of the two had to be wrong. A test that
+    patches the world and a test that measures the world should not live in
+    the same setUp, and the failure that forced the split is the argument for
+    the rule.
+    """
+
+    def test_row_never_names_a_level_other_than_the_shipping_one(self):
+        """The false claim lived in a hardcoded note on a PASSING row.
+
+        Derived text can still drift, so this pins the invariant directly: no
+        other level name may appear in the row at all. It is a blunt instrument
+        and that is the point - it fails on the exact sentence that was wrong,
+        without needing to know which level is currently the decoy.
+        """
+        c = pr.check_env_world_assembled()
+        others = [p.stem for p in
+                  (pr.ROOT / "Content" / "HomeWorld" / "Maps").rglob("*.umap")
+                  if p.stem != pr.SHIPPING_LEVEL]
+        self.assertTrue(others, "fixture problem: no decoy level exists to test against")
+        blob = f"{c.measured} {c.target} {c.note} {c.next_action}"
+        for name in others:
+            self.assertNotIn(name, blob,
+                             f"the row names {name}, which is not the shipping level")
+
+    def test_real_shipping_level_still_reads_87(self):
+        """Pin the number against the hand-measured count.
+
+        docs/KNOWN_ERRORS.md recorded 78 StaticMeshActor + 5 CameraActor +
+        4 HomeWorldCampActor = 87 in L_VS_MVP_Markers. This extractor is a
+        different method reaching the same figure, which is the only reason the
+        figure is printed rather than reduced to a yes/no. If this drifts, the
+        storage model changed and the row's wording needs revisiting.
+        """
+        umap = pr._level_umap(pr.SHIPPING_LEVEL)
+        self.assertIsNotNone(umap)
+        self.assertEqual(pr._inline_actor_floor(umap), 87)
+
+
+    def test_real_shipping_level_is_not_world_partition(self):
+        """Pin the discriminator against the actual package.
+
+        If a future edit re-saves this level with World Partition on, its actors
+        move to __ExternalActors__ and the count silently changes meaning
+        rather than the row going red. This test says so out loud instead.
+        """
+        umap = pr._level_umap(pr.SHIPPING_LEVEL)
+        self.assertIsNotNone(umap, f"{pr.SHIPPING_LEVEL}.umap is gone")
+        self.assertFalse(pr._uses_world_partition(umap),
+                         f"{pr.SHIPPING_LEVEL} now stores actors externally; the "
+                         "storage-mode comment in the check is stale")
+        self.assertGreaterEqual(pr._inline_actor_floor(umap), 1)
+
+
 class BlockedRowsMustNameAnAction(unittest.TestCase):
     """A red row that does not say what to do is a mood, not a work list.
 

@@ -431,43 +431,128 @@ FEEL_TUNABLES: tuple[str, ...] = (
 )
 
 
-def check_env_world_assembled() -> Check:
-    """A world exists to size. This checks external actors, not the .umap filename.
-
-    The repo's own docs call the primary worlds 'DemoMap and Homestead'. Neither
-    name exists. The assembled homestead is Content/HomeWorld/Maps/MainMenu.umap
-    with ~1270 external actors. Naming it correctly is a documentation fix; what
-    matters for readiness is that geometry is placed.
-    """
+def _level_umap(level: str) -> Path | None:
+    """Locate a level's .umap by name, wherever it sits under Maps/."""
     maps_dir = ROOT / "Content" / "HomeWorld" / "Maps"
-    ext_root = ROOT / "Content" / "__ExternalActors__" / "HomeWorld" / "Maps"
     if not maps_dir.is_dir():
+        return None
+    for path in sorted(maps_dir.rglob("*.umap")):
+        if path.stem == level:
+            return path
+    return None
+
+
+def _uses_world_partition(umap: Path) -> bool:
+    """True when a level stores its actors outside the .umap.
+
+    The discriminator is a `WorldPartition` string in the package, measured on
+    both shipping levels: MainMenu carries three, L_VS_MVP_Markers none. A
+    World Partition level's geometry lives in `__ExternalActors__`, so
+    counting actors means counting files there, not strings in the .umap.
+    """
+    return b"WorldPartition" in umap.read_bytes()
+
+
+def _inline_actor_floor(umap: Path) -> int:
+    """Distinct inline actor instance names in a non-World-Partition level.
+
+    Actor instances are named `<Class>_<index>` and live in the level's name
+    table as NUL-delimited ASCII entries.
+
+    Two deliberate choices, both found by mutation-testing the first version:
+
+    - **Non-greedy.** The class-name run is `[...]{2,50}?`, not `[...]{2,50}`.
+      A greedy run merges every actor in the package into one match whenever
+      entries are not NUL-delimited, which reported 1 actor for a level holding
+      three. On the real L_VS_MVP_Markers both forms give 87, so the defect was
+      invisible on the only file this repo owns - which is exactly why it needed
+      a synthetic fixture to surface.
+    - **Counted with `set()`.** A name table stores an FName once; raw match
+      counts double it. The number is printed in `measured`, and an inflated
+      actor count in a measurement string is a false number in a gate.
+
+    This is a FLOOR, not a total. It only matches classes whose name ends in
+    `Actor`, so `TargetPoint_3` and `HomeWorldStoreProp_0` are not counted. On
+    L_VS_MVP_Markers it returns 87, which is 78 StaticMeshActor + 5 CameraActor
+    + 4 HomeWorldCampActor - the same figure docs/KNOWN_ERRORS.md reached by
+    hand on 2026-10-03, by a different method. The row only needs ">= 1"; the
+    cross-check is why the number can be printed at all.
+    """
+    return len(set(re.findall(rb"[A-Za-z_][A-Za-z0-9_]{2,50}?Actor_\d+", umap.read_bytes())))
+
+
+def _external_actor_count(umap: Path) -> int:
+    """External actor files for a World Partition level, path derived not guessed."""
+    rel = umap.relative_to(ROOT / "Content")
+    ext_root = ROOT / "Content" / "__ExternalActors__" / rel.parent
+    if not ext_root.is_dir():
+        return 0
+    return sum(1 for _ in (ext_root / umap.stem).rglob("*.uasset"))
+
+
+def check_env_world_assembled() -> Check:
+    """Is a placed world there to size? Measured in the level that ships.
+
+    WHY THIS MEASURES ONE NAMED LEVEL. This check used to count every
+    `__ExternalActors__` file under Content and call the total "placed
+    actors". That number was 1,270 - all of them MainMenu's World Partition
+    kit-bash, which contains no island, no cabin, no crumbs and no landing
+    circle. L_VS_MVP_Markers, the level SHIPPING_LEVEL names, stores its
+    actors inline and therefore contributes exactly 0 to an external-actor
+    count. So the row passed on the strength of a level the shipping gate is
+    not about, and a note in this very function claimed the assembled
+    homestead *was* MainMenu - contradicting the SHIPPING_LEVEL comment 320
+    lines above it and docs/KNOWN_ERRORS.md.
+
+    Two defects, one cause: the check counted a storage mode instead of a
+    level. `__ExternalActors__` only exists for World Partition maps, so a
+    perfectly populated inline level reads as empty. Both storage modes are
+    handled now, and the measurement names the level it came from so it
+    cannot be read as evidence about some other map.
+    """
+    umap = _level_umap(SHIPPING_LEVEL)
+    if umap is None:
         return Check(
             "env.world_assembled", "G-ENV",
             "A placed world exists to size",
-            "Content/HomeWorld/Maps",
-            "maps directory absent", ">=1 map with placed actors", MISSING,
-            "No map directory. Nothing to measure size against.",
+            f"Content/HomeWorld/Maps/**/{SHIPPING_LEVEL}.umap",
+            "level not found", f">=1 placed actor in {SHIPPING_LEVEL}", MISSING,
+            f"{SHIPPING_LEVEL} is the level the island is placed in and the level "
+            f"the gate measures, and no .umap of that name exists under "
+            f"Content/HomeWorld/Maps.",
+            f"Find the level: git ls-files 'Content/HomeWorld/Maps/*.umap'. No .umap is "
+            f"named {SHIPPING_LEVEL}, which is the level this row measures. If it was "
+            f"renamed, update SHIPPING_LEVEL in Content/Python/polish_readiness.py to "
+            f"match the real one - do not point this row at a different level to make "
+            f"it pass.",
         )
-    total = 0
-    if ext_root.is_dir():
-        total = sum(1 for _ in ext_root.rglob("*.uasset"))
-    maps = sorted(p.name for p in maps_dir.rglob("*.umap"))
-    if total == 0:
+    if _uses_world_partition(umap):
+        storage = "external (World Partition)"
+        count = _external_actor_count(umap)
+    else:
+        storage = "inline (not World Partition)"
+        count = _inline_actor_floor(umap)
+    rel = _rel(umap)
+    measured = f"{count} placed actors in {SHIPPING_LEVEL}, {storage}"
+    target = f">=1 placed actor in {SHIPPING_LEVEL}"
+    if count == 0:
         return Check(
             "env.world_assembled", "G-ENV",
             "A placed world exists to size",
-            "Content/__ExternalActors__", f"0 placed actors ({len(maps)} maps)",
-            ">=1 placed actor", MISSING,
-            "Maps exist but carry no external actors. This is an empty level.",
+            rel, measured, target, MISSING,
+            f"{SHIPPING_LEVEL} exists but holds no placed actors in either storage "
+            f"mode. Nothing to size.",
+            f"Open {SHIPPING_LEVEL} in the editor and confirm it has content, then "
+            f"re-run. If the world was placed in a different level, that is a level "
+            f"decision, not something to fix in this script.",
         )
     return Check(
         "env.world_assembled", "G-ENV",
         "A placed world exists to size",
-        "Content/__ExternalActors__", f"{total} placed actors across {len(maps)} maps",
-        ">=1 placed actor", PASS,
-        f"Maps: {', '.join(maps)}. Note the docs name worlds that do not exist; "
-        "the assembled homestead is MainMenu.",
+        rel, measured, target, PASS,
+        f"Counted in {SHIPPING_LEVEL} itself, {storage}. A World Partition level "
+        f"keeps its actors in Content/__ExternalActors__; a non-World-Partition level "
+        f"keeps them inline, so an external-actor count alone reports 0 for this one.",
     )
 
 

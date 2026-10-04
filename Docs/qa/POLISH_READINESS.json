@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-04T07:11:55+00:00",
+  "generated": "2026-10-04T07:36:44+00:00",
   "process_doc": "Docs/37_POLISH_PASS_PROCESS.md",
   "verdict": "NOT_READY",
   "gates": {
@@ -17,11 +17,11 @@
           "id": "env.world_assembled",
           "gate": "G-ENV",
           "requirement": "A placed world exists to size",
-          "source": "Content/__ExternalActors__",
-          "measured": "1270 placed actors across 2 maps",
-          "target": ">=1 placed actor",
+          "source": "Content/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.umap",
+          "measured": "87 placed actors in L_VS_MVP_Markers, inline (not World Partition)",
+          "target": ">=1 placed actor in L_VS_MVP_Markers",
           "state": "PASS",
-          "note": "Maps: L_VS_MVP_Markers.umap, MainMenu.umap. Note the docs name worlds that do not exist; the assembled homestead is MainMenu.",
+          "note": "Counted in L_VS_MVP_Markers itself, inline (not World Partition). A World Partition level keeps its actors in Content/__ExternalActors__; a non-World-Partition level keeps them inline, so an external-actor count alone reports 0 for this one.",
           "next_action": ""
         },
         {
