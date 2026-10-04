@@ -36,6 +36,7 @@ state is not that writer.
 - Taming for now is one small barn that holds one big bull, and the fur is what that bull sheds.
 - Gathering a pile takes one from a pool of piles. There is no cooldown.
 - The stage name stays polish.
+- An agent decision is never settled by what the developer seems to want: name the limitation, give the real options without pre-marking a default, say plainly when the evidence points against the choice in front of you, and ask a decision with the question tool rather than as prose.
 
 ## Left empty on purpose
 
