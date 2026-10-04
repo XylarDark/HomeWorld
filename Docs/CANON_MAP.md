@@ -101,7 +101,7 @@ README is left intact as history.
 | **The 13+4 T0 MUSTs** | `Docs/handoffs/T0_MECHANIC_INVENTORIES_V1.md` | **canonical for T0** |
 | The work queue | `Docs/TaskLists/T0_EXECUTION_PHASES.md` | active |
 | Taste decisions Rounds 1–7 | `Docs/handoffs/TASTE_GATE_T0_ASSETS.md` | R1–6 RESOLVED, R7+ parked |
-| Agent-owned decisions | `Docs/decisions/AGENT_DECISIONS.md` | DEC-0001…**0028** |
+| Agent-owned decisions | `Docs/decisions/AGENT_DECISIONS.md` | DEC-0001…**0035** — all 35 ids present; file *order* is 0001-0026, 0033-0035, 0027-0031, so search by id not by position |
 | UE 5.8 engineering | `Docs/SETUP.md`, `KNOWN_ERRORS.md`, `CONVENTIONS.md` | canon |
 | Greybox measurement report | `docs/qa/GRAYBOX_SPEC_REPORT.md` | 4 blocking (regenerated 2026-10-03) |
 | **Polish pass entry gates** | `Docs/37_POLISH_PASS_PROCESS.md` | active — enforces via `Content/Python/polish_readiness.py` |
@@ -111,7 +111,6 @@ README is left intact as history.
 | **What the human owns, and when to ask** | `docs/human-use/OWNERSHIP.md` | canon - Steer / Taste / Test |
 | **Is the island really 180x100 in the engine?** | `Content/Python/measure_ue_island.py` -> `Docs/qa/UE_ISLAND_MEASUREMENT.json` | in-editor, read-only; gate row `env.ue_island_measured` |
 | **Can we ship AI-assisted work on Steam?** | `Docs/20_UASSET_AI_POLICY.md` §4A | policy - Valve Jan 2026 disclosure rule |
-| **Agent-owned decisions and why** | `Docs/decisions/AGENT_DECISIONS.md` | DEC-0001-**0031** |
 | Map layout | `Maps/VS_MVP/README.md` | primary slice |
 
 ---

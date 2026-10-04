@@ -60,7 +60,9 @@ skipped.
   volume, not quality. Separating the classes means a conformance gain only counts
   if the agent still completed the task at least as often.
 - **Evidence:** Design rationale; no measurement yet. The pilot that motivated it
-  is in `scripts/task-lift.js` and `docs/qa/TASK_LIFT.md`.
+  is in `scripts/task-lift.js` and `Docs/qa/TASK_LIFT_PREREGISTRATION.md`. (Pointer
+  corrected 2026-10-04: it read `docs/qa/TASK_LIFT.md`, which has never existed in
+  git history.)
 - **Reverses if:** A real run shows conformance and completion move together with
   no trade-off, in which case one class is redundant and the manifest can shrink.
 
