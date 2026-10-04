@@ -31,6 +31,7 @@ state is not that writer.
 - There is more than one cloud layer, and there is no fixed count of layers. That is not a split of the 50 m layer.
 - The descent is a steered glide, not a new flight mode.
 - Polish gate rows are red only. A row is not allowed to pass as a warning.
+- Farming lives on the homestead.
 
 ## Left empty on purpose
 
