@@ -32,6 +32,7 @@ state is not that writer.
 - The descent is a steered glide, not a new flight mode.
 - Polish gate rows are red only. A row is not allowed to pass as a warning.
 - Farming lives on the homestead.
+- In the zones, day and night, you collect and nurture so the place provides the plants and animals the homestead needs.
 
 ## Left empty on purpose
 
