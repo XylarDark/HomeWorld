@@ -33,6 +33,7 @@ state is not that writer.
 - Polish gate rows are red only. A row is not allowed to pass as a warning.
 - Farming lives on the homestead.
 - In the zones, day and night, you collect and nurture so the place provides the plants and animals the homestead needs.
+- Taming for now is one small barn that holds one big bull, and the fur is what that bull sheds.
 
 ## Left empty on purpose
 
