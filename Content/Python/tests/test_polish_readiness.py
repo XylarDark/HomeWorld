@@ -36,6 +36,7 @@ imports", never "these laws hold". Only host pytest runs them:
 
 import datetime
 import importlib.util
+import io
 import json
 import os
 import sys
@@ -80,6 +81,7 @@ def _load_sibling(name: str):
 
 sc = _load_sibling("session_close")
 tp = _load_sibling("task_phase")
+nt = _load_sibling("notify")
 
 
 def _fixture_findings():
@@ -2080,6 +2082,297 @@ class TheStandstillKeepsTheThreeStatesApart(unittest.TestCase):
         self.addCleanup(setattr, pr, "QUEUE_FILE", saved)
         md = self._md()
         self.assertIn("### The queue is not trustworthy", md)
+
+
+class NotificationCarriesTheQuestion(unittest.TestCase):
+    """The end-of-session alert, and the one thing it cannot do.
+
+    The Lead asked, 2026-10-04, to be alerted when a session finishes with a
+    question - including when he is on his phone and would otherwise have to ask
+    a bot to screenshot the desktop.
+
+    The interesting part is a negative result, and it is measured rather than
+    assumed. Grok Bot 0.66.0 registers a `grokbot://` URL scheme, which reads
+    like a message channel and is not one: every parameter on every route is an
+    ID or a closed enum, and `open` - the only route buildable without knowing an
+    ID - takes none at all. So the protocol handler raises a window and the
+    Windows toast carries the question.
+
+    These tests exist mostly to stop a future session from "discovering" a text
+    parameter that does not exist and building a notification that silently
+    drops the only part that matters.
+    """
+
+    def test_the_route_table_is_the_measured_one(self):
+        """Asserted as literals, not against the module's own dict.
+
+        A test that compares the module to itself cannot fail under the change
+        it guards - the tautology that let a `HELD = "decide"` mutation rewrite
+        its own expectation two commits ago.
+        """
+        self.assertEqual(
+            {k: (v[0], v[1]) for k, v in nt.GROKBOT_ROUTES.items()},
+            {"agent": ("/v1/agent", ("id",)),
+             "marketplace": ("/v1/marketplace", ("tab", "id")),
+             "plugin-add": ("/v1/plugin/add", ("id",)),
+             "open": ("/v1/open", ()),
+             "create-team-bot": ("/v1/create-team-bot", ()),
+             "settings": ("/v1/settings", ("id",)),
+             "task": ("/v1/task", ("id",)),
+             "sidebar": ("/v1/sidebar", ("target", "automation", "agent", "tab"))},
+            "the grokbot route table drifted from the app bundle")
+
+    def test_the_open_route_takes_no_parameters(self):
+        """The load-bearing fact: `open` cannot carry a question."""
+        self.assertEqual(nt.GROKBOT_ROUTES["open"][1], ())
+
+    def test_no_route_is_claimed_to_carry_text(self):
+        self.assertEqual(nt.GROKBOT_TEXT_ROUTES, frozenset(),
+                         "a route is claimed to carry text. Measured on "
+                         "2026-10-04: none does. Re-test the app before "
+                         "changing this.")
+
+    def test_building_open_produces_the_bare_scheme_url(self):
+        self.assertEqual(nt.grokbot_url("open"), "grokbot://app/v1/open")
+
+    def test_an_unknown_route_is_refused(self):
+        with self.assertRaises(KeyError):
+            nt.grokbot_url("send-message")
+
+    def test_an_unsupported_parameter_is_refused(self):
+        """A payload parameter that does not exist must not silently build.
+
+        The app rejects it at parse time; a URL that opens nothing is
+        indistinguishable from no notification at all.
+        """
+        for bad in ({"text": "hi"}, {"prompt": "hi"}, {"message": "hi"},
+                    {"q": "hi"}, {"body": "hi"}):
+            with self.subTest(param=bad):
+                with self.assertRaises(KeyError):
+                    nt.grokbot_url("open", **bad)
+
+    def test_a_malformed_route_is_refused_rather_than_sent(self):
+        ok, detail = nt.notify_grokbot("open", text="sneaky")
+        self.assertFalse(ok)
+        self.assertIn("REFUSED" if False else "no parameters", detail)
+
+    def test_the_scheme_check_reads_the_registry(self):
+        """Detection is a registry read, not an install-path guess.
+
+        Asserted by making winreg lie. A hardcoded `return True` would satisfy
+        `isinstance(..., bool)` forever while reporting a Grok Bot on hosts that
+        have none - which is how a notification silently becomes a no-op that
+        still claims success.
+        """
+        self.assertIsInstance(nt.grokbot_installed(), bool)
+
+        import winreg
+        real_open = winreg.OpenKey
+
+        def no_such_key(*a, **k):
+            raise OSError(2, "FileNotFound")
+
+        winreg.OpenKey = no_such_key
+        self.addCleanup(setattr, winreg, "OpenKey", real_open)
+        self.assertFalse(nt.grokbot_installed(),
+                         "reported Grok Bot present with nothing in the registry")
+
+        # The fake must patch both OpenKey and QueryValueEx: the real
+        # QueryValueEx rejects a non-PyHKEY object, so faking only OpenKey
+        # fails for the wrong reason and proves nothing.
+        real_qve = winreg.QueryValueEx
+
+        class FakeKey:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *exc):
+                return False
+
+        winreg.OpenKey = lambda *a, **k: FakeKey()
+        winreg.QueryValueEx = lambda *a, **k: ("URL:grokbot", winreg.REG_SZ)
+        self.addCleanup(setattr, winreg, "QueryValueEx", real_qve)
+        self.assertTrue(nt.grokbot_installed())
+
+    def test_an_inspection_failure_is_not_reported_as_absent(self):
+        """"Key not found" and "the check broke" are different answers.
+
+        Only OSError means the key is absent. Anything else is a failed
+        inspection, and reporting that as "no Grok Bot installed" would be a
+        guess dressed as a measurement - which is how a host with the app
+        silently stops raising its window.
+        """
+        import winreg
+        real_open = winreg.OpenKey
+
+        def broken(*a, **k):
+            raise RuntimeError("winreg exploded")
+
+        winreg.OpenKey = broken
+        self.addCleanup(setattr, winreg, "OpenKey", real_open)
+        with self.assertRaises(RuntimeError):
+            nt.grokbot_installed()
+
+    def test_a_non_windows_host_is_not_reported_as_having_grokbot(self):
+        """The platform guard, not just the registry read.
+
+        `winreg` is unavailable off Windows, so the ImportError branch decides
+        the answer there. It must return False - a host with no Grok Bot and no
+        way to ask must not claim the app is installed.
+        """
+        real_platform = nt.sys.platform
+        nt.sys.platform = "linux"
+        self.addCleanup(setattr, nt.sys, "platform", real_platform)
+        # No import mask here: winreg still imports fine on this host, so the
+        # platform guard is the ONLY thing that can return False. Masking the
+        # import too would make the two guards indistinguishable, and deleting
+        # either would still pass.
+        self.assertFalse(nt.grokbot_installed(),
+                         "a non-Windows host reported Grok Bot as installed")
+
+        import builtins
+        real_import = builtins.__import__
+
+        def no_winreg(name, *a, **k):
+            if name == "winreg":
+                raise ImportError("no winreg on this platform")
+            return real_import(name, *a, **k)
+
+        builtins.__import__ = no_winreg
+        self.addCleanup(setattr, builtins, "__import__", real_import)
+        self.assertFalse(nt.grokbot_installed(),
+                         "a host without winreg reported Grok Bot as installed")
+
+    def test_the_reported_channel_matches_what_actually_worked(self):
+        """The report names the channel that carried the question.
+
+        Asserted against faked outcomes in both directions, because a report
+        that always claims success is worse than no report - it teaches the
+        reader to trust a channel that dropped their question.
+        """
+        real_toast = nt.notify_toast
+        self.addCleanup(setattr, nt, "notify_toast", real_toast)
+
+        nt.notify_toast = lambda t, b: (True, "ok")
+        self.assertEqual(
+            nt.notify("t", "b", grokbot=False)["channel_that_carries_the_question"],
+            "toast", "a working toast was not credited")
+
+        nt.notify_toast = lambda t, b: (False, "boom")
+        self.assertEqual(
+            nt.notify("t", "b", grokbot=False)["channel_that_carries_the_question"],
+            "none", "a failed toast was credited with carrying the question")
+
+        nt.notify_toast = lambda t, b: (False, "boom")
+        self.assertFalse(nt.notify("t", "b", grokbot=False)["toast"]["ok"])
+
+    def test_toast_truncation_happens_before_the_limit_not_after(self):
+        """A 400-character question must be cut, not rejected.
+
+        Truncating is a judgement call about the reader; rejecting is a failure.
+        A notification that refuses to appear because the message was slightly
+        too long is the worst of both.
+        """
+        captured = {}
+        real = nt.subprocess.run
+
+        def fake_run(cmd, **kw):
+            captured["env"] = kw.get("env", {})
+            return type("R", (), {"returncode": 0, "stdout": "ok",
+                                  "stderr": ""})()
+
+        nt.subprocess.run = fake_run
+        self.addCleanup(setattr, nt.subprocess, "run", real)
+        ok, _ = nt.notify_toast("title", "q" * 400)
+        self.assertTrue(ok)
+        body = captured["env"]["HW_TOAST_BODY"]
+        self.assertLessEqual(len(body), 320)
+        self.assertTrue(body.endswith("..."))
+
+    def test_text_is_passed_by_env_not_interpolated(self):
+        """A question containing quotes must not become a syntax error.
+
+        Session questions routinely contain apostrophes, arrows and quotes.
+        Building a PowerShell literal out of them is how a notification
+        silently disappears.
+        """
+        captured = {}
+
+        def fake_run(cmd, **kw):
+            captured["cmd"] = cmd
+            captured["env"] = kw.get("env", {})
+            return type("R", (), {"returncode": 0, "stdout": "ok",
+                                  "stderr": ""})()
+
+        real = nt.subprocess.run
+        nt.subprocess.run = fake_run
+        self.addCleanup(setattr, nt.subprocess, "run", real)
+        nasty = """He said "no" -- it's Q1's job; $env:PATH; 'quoted' """
+        ok, _ = nt.notify_toast("t", nasty)
+        self.assertTrue(ok)
+        self.assertEqual(captured["env"]["HW_TOAST_BODY"], nasty)
+        # The payload must not appear in the command line at all.
+        self.assertNotIn("quoted", " ".join(captured["cmd"]))
+
+    def test_a_failing_toast_reports_rather_than_raises(self):
+        def boom(cmd, **kw):
+            raise OSError("no powershell")
+
+        real = nt.subprocess.run
+        nt.subprocess.run = boom
+        self.addCleanup(setattr, nt.subprocess, "run", real)
+        ok, detail = nt.notify_toast("t", "b")
+        self.assertFalse(ok)
+        self.assertIn("OSError", detail)
+
+    def test_the_notification_never_raises_out_of_notify(self):
+        """One broken channel must not take the session close down with it."""
+
+        def boom(*a, **k):
+            raise RuntimeError("channel exploded")
+
+        real = nt.notify_toast
+        nt.notify_toast = boom
+        self.addCleanup(setattr, nt, "notify_toast", real)
+        report = nt.notify("t", "b", grokbot=False)
+        self.assertIn("toast", report)
+        self.assertFalse(report["toast"]["ok"])
+
+    def test_session_close_exposes_notify_and_defaults_it_off(self):
+        """The flags exist, and nothing fires unless --notify is passed.
+
+        "Defaults to off" is the part that matters: a session close that raised
+        a desktop notification because someone forgot a flag would train the
+        reader to ignore the channel that exists to be trusted.
+        """
+        gates = pr.build()
+        q = sc.next_question(gates, [])
+        self.assertIn("## Ask this", sc.render(q, gates))
+
+        # Exercise the real parser rather than grepping for flag strings.
+        saved_out = sys.stdout
+        sys.stdout = io.StringIO()
+        try:
+            code = sc.main(["--json"])
+            payload = json.loads(sys.stdout.getvalue())
+        finally:
+            sys.stdout = saved_out
+        self.assertEqual(code, 0)
+        self.assertIsNone(payload.get("notification"),
+                          "a plain --json close raised a notification")
+        self.assertIn("question", payload)
+
+        sys.stdout = io.StringIO()
+        try:
+            sc.main(["--json", "--notify", "--no-grokbot"])
+            payload = json.loads(sys.stdout.getvalue())
+        finally:
+            sys.stdout = saved_out
+        self.assertIn("notification", payload,
+                      "--notify did not reach the payload")
+
+    def test_an_empty_body_is_refused_rather_than_firing_a_blank_toast(self):
+        self.assertEqual(nt.main(["--title", "t", "--body", ""]), 2)
 
 
 class ApprovalIsNeverSelfGranted(unittest.TestCase):

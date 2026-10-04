@@ -441,6 +441,11 @@ def main(argv: list[str] | None = None) -> int:
         description="Print the question that ends this session.")
     ap.add_argument("--json", action="store_true",
                     help="machine-readable form")
+    ap.add_argument("--notify", action="store_true",
+                    help="raise a desktop toast carrying the question, and bring "
+                         "the Grok Bot window forward")
+    ap.add_argument("--no-grokbot", action="store_true",
+                    help="with --notify, toast only; do not raise Grok Bot")
     args = ap.parse_args(argv)
 
     gates = pr.build()
@@ -448,14 +453,44 @@ def main(argv: list[str] | None = None) -> int:
     problems = pr.queue_problems(queue)
     q = next_question(gates, queue)
 
+    # Notify before printing, so the alert lands while the output is still
+    # being read rather than after. A notification that arrives after you have
+    # already looked away has done half its job.
+    notif = None
+    if args.notify:
+        try:
+            import notify as _notify
+            notif = _notify.notify(
+                "HomeWorld - session finished",
+                q["question"],
+                grokbot=not args.no_grokbot,
+            )
+        except Exception as e:  # never let a notification break a session close
+            notif = {"error": f"{type(e).__name__}: {e}",
+                     "channel_that_carries_the_question": "none"}
+
     if args.json:
         payload = dict(q)
         payload["queue_problems"] = problems
         payload["gate_states"] = {g: gates[g].state for g in GATE_ORDER if g in gates}
+        payload["notification"] = notif
         print(json.dumps(payload, indent=2))
         return 0
 
     print(render(q, gates))
+    if notif:
+        print("\n## Alert raised\n")
+        if notif.get("error"):
+            print(f"  FAILED: {notif['error']}")
+        else:
+            print(f"  toast   : {'ok' if notif['toast']['ok'] else 'FAILED'} "
+                  f"({notif['toast']['detail']})")
+            print(f"  grokbot : {'ok' if notif['grokbot']['ok'] else 'skipped'} "
+                  f"({notif['grokbot']['detail']})")
+            print(f"  carries the question: "
+                  f"{notif['channel_that_carries_the_question']}")
+        print("\n  `grokbot://` raises the window only - it cannot carry a")
+        print("  message. The toast is the channel that carries the question.")
     if problems:
         print("\nThe decision queue is not trustworthy - fix "
               "Docs/qa/POLISH_QUEUE.json before relying on the options above:")
