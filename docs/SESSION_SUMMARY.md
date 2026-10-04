@@ -2029,3 +2029,21 @@ and KNOWN_ERRORS cycle notes from March 2026 that predate this work.
 **Handoff written:** `Docs/handoffs/SESSION_HANDOFF_POLISH_GATES.md` — fresh-chat entry point for
 this slice, carrying the editor steps, the two deliberate REDs, the human-only rows, and the
 repo traps.
+
+
+### And the `git add` skip is finally diagnosed
+
+Commit `0ff1a3b`. The trap that has cost a file twice is no longer folklore.
+`git add <new file under Docs/> <existing path spelled docs/...>` stages **nothing**,
+prints **nothing**, exits **0**. Cause: `core.ignorecase = true` plus one physical Windows
+directory (`Docs/` and `docs/`, DEC-0029) serving **two index trees** - 324 tracked paths under
+`Docs/`, 155 under `docs/`. A lowercase pathspec matches into the new file's own directory, so
+the new file reads as already accounted for. Not a git bug; a configuration where two spellings
+name one file and one name hides the other. Rule: add one path at a time, capital `Docs`, confirm
+with `git diff --cached --name-status`.
+
+`1afade3` hit this bug - it is why the handoff could not be committed the first time.
+
+**Fresh-chat entry point for this slice: `Docs/handoffs/SESSION_HANDOFF_POLISH_GATES.md`.**
+It carries the six editor steps that close the engine gap, the two G-ENV rows that stay RED on
+purpose, the four open Lead decisions, and the repo traps.
