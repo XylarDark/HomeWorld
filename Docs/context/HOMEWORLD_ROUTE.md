@@ -37,6 +37,7 @@ state is not that writer.
 - Gathering a pile takes one from a pool of piles. There is no cooldown.
 - The stage name stays polish.
 - An agent decision is never settled by what the developer seems to want: name the limitation, give the real options without pre-marking a default, say plainly when the evidence points against the choice in front of you, and ask a decision with the question tool rather than as prose.
+- One dung and one wisp make one spirit fertilizer.
 
 ## Left empty on purpose
 
