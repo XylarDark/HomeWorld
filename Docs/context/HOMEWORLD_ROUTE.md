@@ -35,6 +35,7 @@ state is not that writer.
 - In the zones, day and night, you collect and nurture so the place provides the plants and animals the homestead needs.
 - Taming for now is one small barn that holds one big bull, and the fur is what that bull sheds.
 - Gathering a pile takes one from a pool of piles. There is no cooldown.
+- The stage name stays polish.
 
 ## Left empty on purpose
 
