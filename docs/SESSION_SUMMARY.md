@@ -1996,3 +1996,36 @@ re-imported - that still needs the editor, and is still the thing blocking the e
    gate row id, both `Docs/qa/POLISH_*` files and four canon docs. Recorded in
    `Docs/38_AI_AGENT_PRACTICE.md` §11.4, not decided.
 3. **Should the gate get a severity ladder?** See the restraint note above.
+
+---
+
+## 2026-10-04 — auditing the index, and the audit tool was the defect
+
+Commit `a701b15`. Applies last commit's own advice — review the work minutes after writing it —
+to the docs written the session before.
+
+**Found, all three real:**
+- `Docs/CANON_MAP.md` named `Docs/decisions/AGENT_DECISIONS.md` **twice in the same lookup
+  table** with different ranges (0028 and 0031, the second row added by me). A reader cannot
+  resolve a contradiction, so the fix was to delete my row, not to correct both. The surviving
+  row now says **0035**, the true maximum, and notes the file's *order* is 0001-0026, 0033-0035,
+  0027-0031.
+- **DEC-0001 cited `docs/qa/TASK_LIFT.md`, which has never existed in git history** — not
+  deleted, never added. The pilot write-up is `Docs/qa/TASK_LIFT_PREREGISTRATION.md`. Pointer
+  corrected, with the dead path left in the note so the next grep finds the correction.
+- The first pass at this audit **was itself wrong**. Grepping `^### DEC-` returned 0001-0026 then
+  a jump to 0033-0035, and I concluded the numbering had gaps at 0027-0029 and 0032. All of
+  those ids are present, as `##` level-2 headings. The audit tool could only see part of the file
+  and reported the invisible part as absent — a **false RED on a correct file**, which is the
+  exact defect the previous commit spent its effort removing from `polish_readiness.py`. The
+  `3de567d` commit message carries the same wrong belief.
+
+**Also checked and cleared:** nine other unresolved backticked paths were false positives from an
+over-loose regex — engine include paths, an external GitHub slug, a SkillEvaluator package path,
+and KNOWN_ERRORS cycle notes from March 2026 that predate this work.
+
+**Gate unchanged:** G-ENV / G-ASSET / G-FEEL all RED, `NOT_READY`. 114 tests + 69 subtests pass.
+
+**Handoff written:** `Docs/handoffs/SESSION_HANDOFF_POLISH_GATES.md` — fresh-chat entry point for
+this slice, carrying the editor steps, the two deliberate REDs, the human-only rows, and the
+repo traps.
