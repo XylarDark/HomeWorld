@@ -46,6 +46,7 @@ state is not that writer.
 - Other directions have no edge.
 - A cloud ring does not draw that line around the island.
 - Height is one and a half times the current drop.
+- Neutral glide speed is two thirds.
 
 ## Left empty on purpose
 
