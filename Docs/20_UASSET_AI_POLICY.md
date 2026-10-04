@@ -77,6 +77,38 @@ CI / cold-clone: [docs/Setup/CI_SETUP.md](../docs/Setup/CI_SETUP.md) · [13b_HR2
 | **License** | Record tool ToS + output rights in log **license note** column; no uncited third-party weights in shipped assets |
 | **Forbidden** | Raw AI dump straight into `Content/` without promote + log |
 
+### 4A. Store disclosure — the external rule (Valve, January 2026)
+
+Distinct from §4, which is our own pipeline. This one is a platform requirement
+and it is not ours to interpret.
+
+| Fact | Detail |
+|------|--------|
+| **Trigger** | Disclosure is required for AI content **shipped to, and consumed by, players**. |
+| **No trigger** | Using AI for tooling, workflow, code, refactoring or internal efficiency requires **no** disclosure. |
+| **Source** | Valve's Steam content policy update, January 2026. |
+| **Therefore** | The exposure is **placeholders reaching players**, not the fact that we use agents. |
+
+What this forbids in practice: any asset that stands in for finished work and is
+visibly not finished, in a build a player can see — an unpainted face, a
+low-resolution upscale in close view, a stand-in prop that reads as "not done
+yet".
+
+Reference cases, both of which are **placeholder** incidents rather than tooling
+incidents: *Clair Obscur: Expedition 33* (a painted-over programmer's face in an
+early build) and *The Alters*.
+
+**Operating consequence for us.** The greybox tier is not affected — greybox is a
+deliberate, documented, internal representation of massing, and this project has
+no build anywhere near a player. It becomes affected the moment a build is shown
+outside the team. §5's "no binary submit from a cloud agent" is the same instinct
+one stage earlier.
+
+**Open, not decided.** No disclosure has been triggered and none has been made.
+Recorded so that the first time it matters it is written down rather than being
+worked out under deadline. Evidence and reasoning:
+[Docs/38_AI_AGENT_PRACTICE.md](38_AI_AGENT_PRACTICE.md) §11.2.
+
 ---
 
 ## 5. Bot / agent rules

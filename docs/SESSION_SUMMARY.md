@@ -1893,3 +1893,106 @@ authored but unproven in the game.
 The rule that paid: **a measurement chain is only as good as its last link, and
 every tool in this repo was reporting on the first.** When a check goes green, ask
 what it did *not* measure. Recorded in `docs/KNOWN_ERRORS.md`.
+
+---
+
+## 2026-10-04 (evening) - Independent review of tonight's own gate work, and the research landing
+
+### The headline
+
+I ran an adversarial review of the two gate rows I had added earlier the same evening, as
+`Docs/38_AI_AGENT_PRACTICE.md` §9 item 1 recommends. **It found six ways to turn both rows
+green without measuring anything.** All six are closed, each with a test that fails if the
+hole reopens. 178 -> 200 tests. Commit `84d7264`.
+
+Two of the six are worth remembering:
+
+- `max(off_x, off_y)` returned `off_x` whenever `off_y` was NaN, because `NaN > x` is
+  always False. So **a NaN in the Y slot reported PASS**, with the words "off by nan" in the
+  row's own note. `json` accepts the bare literal, so a committed record can carry one.
+- The check compared Blender's **object-space** box against Unreal's **world-space** AABB.
+  Any rotation of the island actor makes those disagree, so the row would have reported FAIL
+  on a correctly placed island. Wrong by construction, not by tolerance - widening the
+  tolerance would have concealed it.
+
+The other four: the manifest parser silently skipped rows it could not read (three exports
+could vanish from the inventory while the row said PASS); the inventory only ran one way, so
+an export on disk that nobody recorded was invisible forever; a `../../..` in a manifest cell
+stat'd a file outside the export tree; and a 0-byte FBX whose manifest row also said 0 was a
+clean PASS because both sides agreed and both were empty.
+
+`measure_ue_island.py` also had a defect worth its own entry: it opened the measurement record
+with `"w"` and wrote only its own keys, so **the first person who did everything right deleted
+the skeleton** - including the `19.3 x 10.7` diagnosis. It now preserves `_`-prefixed keys and
+writes atomically, and any failure writes a `_status: FAILED` record rather than leaving the
+gate to report MISSING with no trace that anyone had tried.
+
+### Retraction: I mis-stated a repo rule to the Lead, and the Lead decided on it
+
+I said re-importing `SM_IslandTop` produces a `.uasset` that "the no-commit rule keeps out of
+history", and offered to lift that rule. **That was wrong.** `Config/uasset-allowlist.json`
+already allowlists `Content/HomeWorld/Meshes`; `SM_IslandTop.uasset` is already tracked; it is
+already LFS-backed with a present 78,829-byte object. No rule ever blocked it - a re-import is
+simply a modified tracked file.
+
+The Lead chose the "lift the rule" option on my false premise. The outcome they wanted (the fix
+cannot be lost) is achieved automatically by existing policy, and the action item is simpler
+and faster than I told them. Recorded in `docs/KNOWN_ERRORS.md` as its own class: *asserting a
+repo rule from memory instead of reading the machine config.* A "the rules prevent X" claim is
+a measurement claim about a config file.
+
+Also worth recording from that check: this git stores LFS objects under `.git/lfs/objects`,
+**not** `%LOCALAPPDATA%\lfs\objects`. The documented default briefly looked like a dangling
+pointer.
+
+### Research landed as canon
+
+- `Docs/38_AI_AGENT_PRACTICE.md` §11 - round two, studio practice rather than papers. GDC 2026
+  (~2,300 professionals): AI use is 81% research, 22% testing/debugging, **5% player-facing**;
+  adoption 97% analytics vs 43% art/design; negative sentiment 18% -> 30% -> **52%**. So the
+  split in `docs/human-use/OWNERSHIP.md` is the mainstream shape, not a doctrine we invented,
+  and the sentiment trend says it is also the defensible one.
+- `Docs/20_UASSET_AI_POLICY.md` §4A - **the Valve January 2026 rule, which until now existed
+  only in chat.** Disclosure is required for AI content *shipped to and consumed by players*;
+  tooling and workflow need none. So the exposure is **placeholders reaching players**, not the
+  fact that we use agents - the reference cases (*Clair Obscur: Expedition 33*, *The Alters*)
+  are both placeholder incidents.
+- `Docs/decisions/AGENT_DECISIONS.md` DEC-0030 and DEC-0031 - the next-action invariant, and
+  the decision to close the fail-opens rather than add a severity ladder.
+- `Docs/CANON_MAP.md` - four new index rows; its advertised DEC range was stale (said 0028, the
+  file had 0029) and is now correct at 0031.
+
+### The restraint worth naming
+
+The research says mature gates ship a rule as a **warning** and promote it to an error only
+once clean. Our gate is binary. Adding a WARN tier and marking `master_binding` and
+`family_distinct` WARN would have made all three gates readable - and would have quietly undone
+the Lead's 2026-10-04 ruling that those two rows stay RED, by another name. **Capability
+recorded, not applied.** It needs its own decision, stated as its own decision.
+
+### Also fixed
+
+- Every blocked gate row now carries an executable next action as a structural field, rendered
+  as a "What to do" table, enforced by a test. All 8 substantive blocked rows have one.
+- `Docs/qa/POLISH_BASELINE.json`: the two traversal notes pointed at a `_deferrals` key that
+  was never written. It exists now.
+- `Docs/qa/POLISH_READINESS.json` / `.md` regenerated. G-ENV FAIL 2 MISSING 2 PASS 6; G-ASSET
+  RED; G-FEEL RED. Verdict unchanged: `NOT_READY`.
+
+### State
+
+`main` is clean and pushed. `polish` / `origin/polish` untouched. The `.uasset` has **not** been
+re-imported - that still needs the editor, and is still the thing blocking the engine gap.
+
+### Open questions for the Lead
+
+1. **Which level is the shipping one?** `docs/KNOWN_ERRORS.md` answers this for the *homestead
+   geometry* - `L_VS_MVP_Markers`, not `MainMenu` - and `measure_ue_island.py` defaults to it.
+   But `env.ue_island_measured` deliberately does **not** enforce it: it accepts any real
+   `.umap` and prints which one it measured. A measurement from the wrong level would still read
+   PASS and say so in its measured column. Tightening that needs the ruling, not a guess.
+2. **Is "polish" the right name for this stage?** Industry usage means the alpha -> beta
+   transition; we have no human playtest, so we are at a vertical slice. Renaming touches every
+   gate row id, both `Docs/qa/POLISH_*` files and four canon docs. Recorded in
+   `Docs/38_AI_AGENT_PRACTICE.md` §11.4, not decided.
+3. **Should the gate get a severity ladder?** See the restraint note above.

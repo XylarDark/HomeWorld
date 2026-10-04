@@ -919,3 +919,69 @@ the agent can own - and does - is that the supersession is now written down, plu
 
 **Why this is a doc problem and not a taste problem:** the vision was never ambiguous. It was
 invisible from two of its three doors.
+
+## DEC-0030 - A blocked gate row must name an executable next action
+
+**Decision:** every non-PASS check in `polish_readiness.py` now carries a `next_action`
+field, separate from its `note`, and a test (`BlockedRowsMustNameAnAction`) fails if any
+substantive blocked row leaves it empty. The rendered markdown gains a **"What to do"**
+table per gate.
+
+**Why.** On 2026-10-04, 6 of the 8 substantive blocked rows stated a finding and no next
+step. Reading them told you what was wrong and nothing about what to do about it. A gate
+that only ever complains is a mood, not a work list.
+
+**Why a separate field and not better prose.** `note` answers *why is this row the state it
+is*, and "the manifest disagrees with disk" is a complete diagnosis - the action is a
+different sentence. Keeping them in one blob is how the action got lost in the first place,
+and a structural field with a test on it cannot drift back.
+
+**Deliberately not required of:** PASS rows (there is nothing to do) and `dep.` rollups (a
+gate-level summary naming its own actions would duplicate its children). A PASS carrying an
+action is noise, and there is a test for that direction too.
+
+**This is the "never idle" commitment made checkable.** `docs/human-use/OWNERSHIP.md`
+already says the agent is always working, asking, or pointing at the next step. This makes
+the third of those three measurable on every gate run instead of a property of how the
+agent happens to be feeling that day.
+
+**Not decided here:** the `ALLOWED_EMPTY` escape hatch is an empty set. It exists so that
+"agent-owned and unfinished" can be declared deliberately later, and it is deliberately
+empty today - nothing is exempt.
+
+## DEC-0031 - Close the fail-opens in the export chain; do NOT add a severity ladder
+
+**Decision, part 1.** An adversarial review of the two gate rows added on 2026-10-04 found
+**six ways to turn them green without measuring anything**. All six are closed, each with a
+test that fails if the hole reopens (178 -> 200 tests). The two that mattered most:
+
+- `max(off_x, off_y)` discarded a NaN in the Y slot and reported **PASS**, with "off by nan"
+  in its own note. `max` returns its first argument whenever the second is not greater, and
+  `NaN > x` is always False - so the verdict depended on argument order.
+- The check compared Blender's **object-space** box against Unreal's **world-space** AABB.
+  Those disagree on any rotated actor, so it would have reported FAIL on a correctly placed
+  island. Wrong by construction, not by tolerance; widening the tolerance would have hidden
+  it rather than fixed it.
+
+**Decision, part 2 - the restraint, which is the point.** The same research that prompted
+this review says mature content-validation tooling ships a new rule as a **warning** and
+promotes it to an error only once it has been clean (`Docs/38_AI_AGENT_PRACTICE.md` §11.3).
+We have a binary gate. Adding a WARN tier and marking `master_binding` and `family_distinct`
+WARN would have made all three gates readable and **would have quietly undone the Lead's
+2026-10-04 ruling** that those two rows stay RED, by another name.
+
+**So the capability is recorded and not applied.** The Lead's decision was made knowing the
+gate could not go green; a change that makes the gate go green *while appearing to honour*
+that decision is exactly the "widen the ask to allow it" failure. It needs a decision of its
+own, on its own merits, stated as such.
+
+**Already satisfied, no work needed:** separating "the check failed" from "the check could not
+run at all" is the substance of a severity ladder, and we have it - MISSING never passes and
+`--selftest` drives the fail-open paths directly.
+
+**Scope note.** This was agent-owned under the ownership map ("refactoring the harness - rules,
+skills, scripts, scorers, CI | Agent | Decide, then log"). No gameplay number, no art
+decision, and no taste call was touched. `env.traversal_measured` remains deferred to the
+polish pass by the Lead, and the traversal instrument research says should be telemetry
+rather than a stopwatch is recorded in `Docs/38_AI_AGENT_PRACTICE.md` §11.5 for when that
+unblocks.

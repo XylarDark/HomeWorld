@@ -235,3 +235,105 @@ is not generating more code; it is refusing to call anything done that we
 cannot demonstrate, and keeping feel in human hands. The gate work in
 `Docs/37_POLISH_PASS_PROCESS.md` is the right shape. Tier 3 is the missing
 piece.
+
+---
+
+## 11. Round two — studio practice, not papers (2026-10-04)
+
+The first round asked what UE developers do with agents. This round asked a
+different question: **is the way we divide work between the Lead and the agent
+normal, and what does the industry do about the specific gaps we have?** Same
+confidence tags.
+
+### 11.1 Our AI/human split is the industry norm, not a doctrine we invented
+
+**GDC 2026 State of the Game Industry** **[A]**, ~2,300 professionals: AI is
+used for research/brainstorming **81%**, admin 47%, prototyping 35%, testing and
+debugging 22%, asset generation 19% — and **player-facing features only 5%**.
+
+Adoption by profession **[A]**: analytics 97%, art/design 43%, QA 37%.
+
+Two readings, and both matter for us:
+
+- The highest adoption is in analytical and back-office work; the lowest is
+  anything a player experiences. That is precisely the split
+  `docs/human-use/OWNERSHIP.md` already encodes — the agent does measurement,
+  refactoring and process; the Lead keeps design, taste and feel.
+- Negative sentiment toward generative AI rose **18% (2024) → 30% (2025) → 52%
+  (2026)** **[A]**. The tooling is not the exposure. **Shipping AI-looking output
+  to players is.** See §11.2.
+
+So the vision in `docs/human-use/OWNERSHIP.md` is not a contrarian position
+**[C]**. It is the mainstream shape, and the sentiment trend says it is also the
+defensible one.
+
+### 11.2 The commercial constraint, which until now existed only in chat
+
+**Valve's January 2026 Steam content policy update** **[A]** requires disclosure
+for **AI content that is shipped to, and consumed by, players**. Using AI for
+tooling, workflow, or internal efficiency **requires no disclosure**.
+
+The risk is therefore **not** that we use agents. It is **placeholders reaching
+players** — and the reference cases are exactly that **[A]**:
+*Clair Obscur: Expedition 33* (a painted-over programmer's face in an early
+build) and *The Alters*. Both are placeholder incidents, not tooling incidents.
+
+This is now written into `Docs/20_UASSET_AI_POLICY.md` §4A so it stops being
+knowledge that only exists in a chat log.
+
+### 11.3 We are behind on one thing: gates have a severity ladder
+
+Automated content validation is standard studio tooling **[A]**, and the mature
+implementations do not have a binary pass/fail. They ship a new rule as a
+**warning**, promote it to an **error** once it has been clean for a while, and
+only then let it block **[A]**. Our `polish_readiness.py` is binary.
+
+We are **not** applying that unilaterally, and the reason is worth recording: on
+2026-10-04 the Lead ruled that `master_binding` and `family_distinct` stay RED in
+G-ENV. Adding a WARN tier and marking those two rows WARN would have quietly
+undone that ruling by another name. The capability is recorded here as an option
+and left for a decision.
+
+One point is already satisfied **[C]**: separating "the check failed" from "the
+check could not run at all" is the substance of a severity ladder, and we have it
+— MISSING never passes, and `--selftest` exercises the fail-open paths directly.
+
+### 11.4 Open question, deliberately not answered here
+
+**"Polish" is the wrong name for this stage.** Industry usage defines polish as
+the **alpha → beta** transition **[A]**. This project has not reached alpha: there
+is no human playtest record, the engine has not been measured, and the asset board
+is 0/10 declared. Calling pre-production work "polish" sets an expectation the
+build cannot meet, and it is why `Docs/qa/POLISH_*` reads as though the game is
+nearly done when it is at a vertical slice.
+
+This is a scope-and-vocabulary call for the Lead. It is **recorded, not decided** —
+renaming a stage would touch every gate row id, both `Docs/qa/POLISH_*` files and
+four canon docs, and that is not a change to make unasked.
+
+### 11.5 Traversal should be telemetry, not a stopwatch
+
+**IO Interactive's *Kane & Lynch* pace-of-movement work** **[A]** treats
+traversal as recorded telemetry analysed in aggregate, not a stopwatch on one
+walk. That is a better instrument for `env.traversal_measured` than the single
+median-of-three the baseline file currently describes: repeated samples plus a
+distribution answer "is this island walkable?" far better than one number answers
+"is this walk 60 seconds?".
+
+The Lead deferred `traversal_measured` to the polish pass on 2026-10-04, so this
+is recorded as the instrument to reach for when the time comes, not as work
+started.
+
+### 11.6 §9 item 1 is done, and it paid for itself immediately
+
+The highest-ranked action in §9 was adversarial self-review before commit. It was
+run on the two gate rows added the same evening **[A]**, and found **six ways to
+turn them green without measuring anything** — including a `max(off_x, off_y)`
+that silently discarded a NaN in the Y slot and reported PASS, and a comparison of
+Blender's object-space box against Unreal's world AABB, which would have failed
+on any rotated island.
+
+Both were written by an agent minutes earlier and both were confidently
+documented, with comments explaining why they were correct. That is the most
+useful data point in this document: **a reviewer finds what the author's own
+reasoning cannot**, and the cost was one background agent.
