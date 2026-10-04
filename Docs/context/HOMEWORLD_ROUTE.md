@@ -44,6 +44,7 @@ state is not that writer.
 - The 75 m drop is how high the island sits above the plains, so every jump off the homestead drops that.
 - The 260 m line is the plains edge on that straight glide only.
 - Other directions have no edge.
+- A cloud ring does not draw that line around the island.
 
 ## Left empty on purpose
 
