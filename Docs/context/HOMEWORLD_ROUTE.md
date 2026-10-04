@@ -28,6 +28,7 @@ state is not that writer.
 - The bottom of the cloud layer is the exit, and the landing stays in the existing field.
 - The wisp is a bit of the signature spirit blue on a cloud, not one of the three wisps at the spirit wound.
 - You collect the wisp on the way down, it stays with you, and you hold one per dung you will mix.
+- There is more than one cloud layer, and there is no fixed count of layers. That is not a split of the 50 m layer.
 
 ## Left empty on purpose
 
