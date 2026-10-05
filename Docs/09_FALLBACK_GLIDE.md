@@ -79,7 +79,7 @@ Map: `/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers`
 
 ### 2. Build C++
 
-On **Windows host DESKTOP-21CT3H0** (UE 5.7 — not available on cloud VM):
+On **Windows host DESKTOP-21CT3H0** (UE 5.8 — not available on cloud VM):
 
 ```powershell
 .\Tools\Safe-Build.ps1
