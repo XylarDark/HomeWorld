@@ -93,6 +93,7 @@ def main():
 
     asset_tools = unreal.AssetToolsHelpers.get_asset_tools()
     tasks = []
+    expected = []
     for category, filepath in files:
         name_no_ext = os.path.splitext(os.path.basename(filepath))[0]
         dest_path = _destination_path(category)
@@ -104,15 +105,35 @@ def main():
         task.save = True
         task.replace_existing = True
         tasks.append(task)
+        expected.append((filepath, task))
         _log("Queued %s -> %s/%s" % (filepath, dest_path, name_no_ext))
 
     _log("Importing %d file(s)..." % len(tasks))
-    result = asset_tools.import_asset_tasks(tasks)
-    if result:
-        _log("Import completed. Check Output Log for any errors.")
-    else:
-        _log("Import returned False; check Output Log for errors.")
-    return 0 if result else 1
+    # UE 5.8: AssetTools.import_asset_tasks() is void in Python and returns None.
+    # Its result is NOT a success flag - treating it as one made every run report
+    # failure even when every asset landed.
+    asset_tools.import_asset_tasks(tasks)
+
+    # Do not guess the output path from the filename. A multi-object FBX yields one
+    # asset per object (SM_Cabin.fbx -> SM_Cabin_Chimney, ...) and a GLB lands under a
+    # nested StaticMeshes/ folder. AssetImportTask.imported_object_paths is what the
+    # importer actually produced, so ask the task instead of the filename.
+    failures = 0
+    for filepath, task in expected:
+        landed = list(task.imported_object_paths)
+        if landed:
+            _log("OK   %s -> %d asset(s): %s"
+                 % (os.path.basename(filepath), len(landed), ", ".join(landed)))
+        else:
+            failures += 1
+            _log("FAIL %s produced no assets" % filepath)
+
+    if failures:
+        _log("Import finished with %d/%d file(s) producing nothing. Check Output Log."
+             % (failures, len(expected)))
+        return 1
+    _log("Import completed: all %d file(s) produced assets." % len(expected))
+    return 0
 
 
 if __name__ == "__main__":
