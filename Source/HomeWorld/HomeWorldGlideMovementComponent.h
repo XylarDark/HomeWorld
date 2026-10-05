@@ -32,13 +32,19 @@ class HOMEWORLD_API UHomeWorldGlideMovementComponent : public UCharacterMovement
 public:
 	UHomeWorldGlideMovementComponent();
 
-	/** Forward airspeed target while gliding. Developer decision 2026-10-05: uniform 5 m/s. */
+	/**
+	 * Forward airspeed target while gliding. Not yet tuned by the developer; still 5 m/s
+	 * from the initial uniform-rate decision.
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Transit|CloudDescent", meta = (ClampMin = "0.0"))
 	float GlideForwardSpeed = 500.0f;
 
-	/** Descent sink rate. Developer decision 2026-10-05: uniform 5 m/s, matching GlideForwardSpeed. */
+	/**
+	 * Descent sink rate. Developer decision 2026-10-05: 30 second descent over the
+	 * recorded 75 m drop, which is 250 cm/s. Forward speed was not part of that call.
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Transit|CloudDescent", meta = (ClampMin = "0.0"))
-	float GlideSinkRate = 500.0f;
+	float GlideSinkRate = 250.0f;
 
 	/**
 	 * How quickly velocity converges on the glide target. This is a time constant:

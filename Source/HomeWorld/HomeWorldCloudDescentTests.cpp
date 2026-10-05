@@ -67,7 +67,8 @@ bool FCloudDescentSteeringAndWispTest::RunTest(const FString& Parameters)
 
 	// Developer decision 2026-10-05: uniform 5 m/s forward and sink across the descent.
 	TestEqual(TEXT("glide forward speed is 5 m/s"), Glide->GlideForwardSpeed, 500.0f);
-	TestEqual(TEXT("glide sink rate is 5 m/s"), Glide->GlideSinkRate, 500.0f);
+	// Developer decision 2026-10-05: 30 s descent over the recorded 75 m drop.
+	TestEqual(TEXT("glide sink rate is 2.5 m/s for a 30 s descent"), Glide->GlideSinkRate, 250.0f);
 
 	// A glide cannot hold altitude: no input grants vertical authority.
 	const FVector Target = Glide->ComputeGlideTargetVelocity();
@@ -247,6 +248,12 @@ bool FCloudDescentDurationMeasurementTest::RunTest(const FString& Parameters)
 	// rather than assert a duration: duration is the developer's to measure.
 	TestTrue(TEXT("glide consumes the 75 m drop in a plausible time"), Elapsed > 1.0 && Elapsed < 120.0);
 	TestTrue(TEXT("glide reaches ground (does not hang)"), Altitude <= 0.0);
+
+	// The developer's 30 s decision, over the recorded 75 m drop. Asserted as a band
+	// rather than an equality: velocity convergence adds a fixed startup offset that
+	// is real behaviour, not error.
+	TestTrue(TEXT("measured descent matches the developer's 30 s decision"),
+		Elapsed > 29.0 && Elapsed < 32.0);
 
 	// Sanity on the partition, which is pure arithmetic on recorded figures.
 	TestTrue(TEXT("cloud layer accounts for most of the drop"), TimeToCloudBase > 0.0);
