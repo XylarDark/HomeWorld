@@ -76,7 +76,7 @@ Each verb: trigger, player action, success, fail/idle, approx duration (seconds)
 | Player action | Freely steer the glider through the cloud descent toward the open-field landing, without rail, corridor, or artificial steering limits. The existing scripted `FALLBACK` remains a separate route implementation. |
 | Success | Touch down in the open field; control restored to walk |
 | Fail / idle | Leave the perch volume without confirm → idle. Mid-route abort and recovery are unresolved for the current route. Night: verb unavailable. |
-| Duration | Current route duration is not set; route facts and placeholders are in [`HOMEWORLD_ROUTE.md`](context/HOMEWORLD_ROUTE.md). |
+| Duration | 30 s from launch to landing (developer decision 2026-10-05). Route facts and placeholders are in [`HOMEWORLD_ROUTE.md`](context/HOMEWORLD_ROUTE.md). |
 
 ### V3 — Gather 6 resources
 
@@ -211,7 +211,7 @@ Both complete = V7 done. Day: targets visible but nurture blocked.
 2. Confirm → freely steer through the cloud descent. Steering has no rail, corridor, or artificial bounds.
 3. Collect a cloud wisp; it stays with the player through landing.
 4. Exit below the cloud layer and land in the existing field. Walk control returns on landing.
-5. The route remains a glider descent; do not add a general flight HUD or energy meter. Duration is not set.
+5. The route remains a glider descent; do not add a general flight HUD or energy meter. Duration is 30 s from launch to landing.
 
 ### Existing scripted `FALLBACK`
 

@@ -14,7 +14,7 @@ Warm, readable, handmade, hopeful. Routes feel like paths, not sims. Channels sh
 | Cabin → lookout walk | ~15–25 s | V1 |
 | Island circuit | ~45–90 s | V1 |
 | Scripted FALLBACK duration | Default 32 s, clamped to 25–40 s | `09_FALLBACK_GLIDE.md` |
-| Active cloud descent duration | Not set | The 15 s homestead-field window in `HOMEWORLD_ROUTE.md` is not a glide duration |
+| Active cloud descent duration | 30 s | Developer decision 2026-10-05, from lookout launch to landing in the field. Sink 250 cm/s over the 75 m drop. The 15 s homestead-field window in `HOMEWORLD_ROUTE.md` is not a glide duration and was not used |
 | Gather channel | ~1.5–3 s | V3 |
 | Portal channel+transit | ~3–6 s | V5 |
 | Heal channel | ~2–4 s | V6 |
