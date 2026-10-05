@@ -111,8 +111,15 @@ FVector UHomeWorldShrinePortalComponent::GetArriveLocation(AActor* Destination) 
 	{
 		return FVector::ZeroVector;
 	}
-	// Offset slightly forward from shrine center for safe spawn.
-	return Destination->GetActorLocation() + Destination->GetActorForwardVector() * 80.0f;
+	// Land outside the destination's own portal trigger, or the arrival overlap fires it straight back.
+	float ForwardOffset = 80.0f;
+	if (const UHomeWorldShrinePortalComponent* DestPortal = Destination->FindComponentByClass<UHomeWorldShrinePortalComponent>())
+	{
+		const FVector Extent = DestPortal->GetScaledBoxExtent();
+		const float Clearance = FMath::Max(Extent.X, Extent.Y) + 60.0f; // + pawn capsule radius margin
+		ForwardOffset = FMath::Max(ForwardOffset, Clearance);
+	}
+	return Destination->GetActorLocation() + Destination->GetActorForwardVector() * ForwardOffset;
 }
 
 bool UHomeWorldShrinePortalComponent::TryPortalTransit(AActor* InstigatorActor)
@@ -154,11 +161,18 @@ bool UHomeWorldShrinePortalComponent::TryPortalTransit(AActor* InstigatorActor)
 		return false;
 	}
 
+	// Stamp cooldown on both ends BEFORE moving: the teleport fires overlap events synchronously,
+	// and stamping after let the destination trigger send the pawn back (recursive ping-pong crash).
+	LastTeleportTime = Now;
+	if (UHomeWorldShrinePortalComponent* DestPortal = Destination->FindComponentByClass<UHomeWorldShrinePortalComponent>())
+	{
+		DestPortal->LastTeleportTime = Now;
+	}
+
 	const FVector ArriveLoc = GetArriveLocation(Destination);
 	const FRotator ArriveRot(0.0f, Destination->GetActorRotation().Yaw + 180.0f, 0.0f);
 	Pawn->SetActorLocationAndRotation(ArriveLoc, ArriveRot, false, nullptr, ETeleportType::TeleportPhysics);
 
-	LastTeleportTime = Now;
 	LOG_PORTAL_FALLBACK(TEXT("transit %s -> %s @ %s"),
 		*GetOwner()->GetName(), *Destination->GetName(), *ArriveLoc.ToString());
 	return true;
