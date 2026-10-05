@@ -1,6 +1,9 @@
 # Discovery start (provider agnostic)
 
 Point a session at this file to start discovery. It is not the route start.
+
+Open this file when the developer does not yet know what the work is, and no bite is named. If they do know, open `ROUTE_START` instead.
+
 This protocol applies in any IDE, chat surface, CLI, or agent runner. It does
 not depend on a named provider, model, plugin, or editor feature. Follow the
 sequence using the tools available in the current environment; if a capability

@@ -2,6 +2,8 @@
 
 Point a session at this file to hand over the route. This file is the start. It is not the facts, and it is not a state.
 
+Open this file when the developer already knows what the work is. If they do not, and no bite is named, open `DISCOVERY_START` instead.
+
 Read these two files, in this order, before any other work:
 
 1. UserHarness/docs/human-use/route-context.md
