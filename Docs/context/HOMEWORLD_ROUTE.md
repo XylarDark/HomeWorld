@@ -20,7 +20,7 @@ state is not that writer.
 
 ## Recorded
 
-- The gap under the lowest cloud, down to the ground, is 5 seconds of straight glide at the standard speed, with no slowdown in that gap. That height is 25 m, from the 75 m drop over the 15 second window. It is a placeholder until human testing.
+- The gap under the lowest cloud, down to the ground, is 25 m, which is 10 seconds of straight glide at the 2.5 m/s sink that keeps the 75 m drop at 30 seconds to ground, with no slowdown in that gap. It is a placeholder until human testing.
 - Clouds are 6-24 m across. It is a placeholder until human testing.
 - Cloud spacing is top 3-4 times the diameter, middle 1.5-2.5, and bottom 4-6. It is a placeholder until human testing.
 - The cloud layer above the 25 m gap is 50 m tall, the 75 m drop minus that gap. It is a placeholder until human testing.
