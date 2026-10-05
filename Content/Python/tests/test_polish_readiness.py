@@ -1713,7 +1713,7 @@ class TheRealShippingLevelSaysSo(unittest.TestCase):
             self.assertNotIn(name, blob,
                              f"the row names {name}, which is not the shipping level")
 
-    def test_real_shipping_level_still_reads_87(self):
+    def test_real_shipping_level_still_reads_62(self):
         """Pin the number against the hand-measured count.
 
         docs/KNOWN_ERRORS.md recorded 78 StaticMeshActor + 5 CameraActor +
@@ -1724,7 +1724,7 @@ class TheRealShippingLevelSaysSo(unittest.TestCase):
         """
         umap = pr._level_umap(pr.SHIPPING_LEVEL)
         self.assertIsNotNone(umap)
-        self.assertEqual(pr._inline_actor_floor(umap), 87)
+        self.assertEqual(pr._inline_actor_floor(umap), 62)  # 33bb37f: prototype import cleanup removed 29 DRESS actors and added 4 PROTO actors
 
 
     def test_real_shipping_level_is_not_world_partition(self):
