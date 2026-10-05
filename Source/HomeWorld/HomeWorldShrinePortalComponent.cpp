@@ -111,15 +111,50 @@ FVector UHomeWorldShrinePortalComponent::GetArriveLocation(AActor* Destination) 
 	{
 		return FVector::ZeroVector;
 	}
-	// Land outside the destination's own portal trigger, or the arrival overlap fires it straight back.
-	float ForwardOffset = 80.0f;
-	if (const UHomeWorldShrinePortalComponent* DestPortal = Destination->FindComponentByClass<UHomeWorldShrinePortalComponent>())
+	// Destinations are usually TargetPoints, not portal actors, so check every portal trigger in the
+	// world: if the arrival point is inside one (plus pawn capsule margin), step forward until clear.
+	const FVector Base = Destination->GetActorLocation();
+	const FVector Forward = Destination->GetActorForwardVector();
+	constexpr float CapsuleMargin = 60.0f;
+	constexpr float StepCm = 50.0f;
+	constexpr int32 MaxSteps = 40;
+
+	TArray<const UHomeWorldShrinePortalComponent*> Portals;
+	if (UWorld* World = GetWorld())
 	{
-		const FVector Extent = DestPortal->GetScaledBoxExtent();
-		const float Clearance = FMath::Max(Extent.X, Extent.Y) + 60.0f; // + pawn capsule radius margin
-		ForwardOffset = FMath::Max(ForwardOffset, Clearance);
+		for (TActorIterator<AActor> It(World); It; ++It)
+		{
+			TInlineComponentArray<UHomeWorldShrinePortalComponent*> Comps(*It);
+			for (const UHomeWorldShrinePortalComponent* Comp : Comps)
+			{
+				Portals.Add(Comp);
+			}
+		}
 	}
-	return Destination->GetActorLocation() + Destination->GetActorForwardVector() * ForwardOffset;
+
+	auto IsInsideAnyPortal = [&Portals, CapsuleMargin](const FVector& Point)
+	{
+		for (const UHomeWorldShrinePortalComponent* Comp : Portals)
+		{
+			const FTransform Unscaled(Comp->GetComponentQuat(), Comp->GetComponentLocation());
+			const FVector Local = Unscaled.InverseTransformPosition(Point);
+			const FVector Extent = Comp->GetScaledBoxExtent() + FVector(CapsuleMargin);
+			if (FMath::Abs(Local.X) <= Extent.X && FMath::Abs(Local.Y) <= Extent.Y && FMath::Abs(Local.Z) <= Extent.Z)
+			{
+				return true;
+			}
+		}
+		return false;
+	};
+
+	float Offset = 80.0f;
+	FVector ArriveLoc = Base + Forward * Offset;
+	for (int32 Step = 0; Step < MaxSteps && IsInsideAnyPortal(ArriveLoc); ++Step)
+	{
+		Offset += StepCm;
+		ArriveLoc = Base + Forward * Offset;
+	}
+	return ArriveLoc;
 }
 
 bool UHomeWorldShrinePortalComponent::TryPortalTransit(AActor* InstigatorActor)
@@ -161,12 +196,16 @@ bool UHomeWorldShrinePortalComponent::TryPortalTransit(AActor* InstigatorActor)
 		return false;
 	}
 
-	// Stamp cooldown on both ends BEFORE moving: the teleport fires overlap events synchronously,
+	// Stamp cooldown on all portals BEFORE moving: the teleport fires overlap events synchronously,
 	// and stamping after let the destination trigger send the pawn back (recursive ping-pong crash).
-	LastTeleportTime = Now;
-	if (UHomeWorldShrinePortalComponent* DestPortal = Destination->FindComponentByClass<UHomeWorldShrinePortalComponent>())
+	// Destinations are TargetPoints, so stamp every portal in the world, not just a component on Destination.
+	for (TActorIterator<AActor> It(World); It; ++It)
 	{
-		DestPortal->LastTeleportTime = Now;
+		TInlineComponentArray<UHomeWorldShrinePortalComponent*> Comps(*It);
+		for (UHomeWorldShrinePortalComponent* Comp : Comps)
+		{
+			Comp->LastTeleportTime = Now;
+		}
 	}
 
 	const FVector ArriveLoc = GetArriveLocation(Destination);
