@@ -1,10 +1,12 @@
 {
   "//": "Copy to .cursor/mcp.json and edit. That path is gitignored (live config may hold machine paths).",
   "//1": "Never write a secret literally in this file. Prefer ${env:NAME} for credentials.",
-  "//2": "After changing mcp.json, fully quit and relaunch Cursor (or toggle the server in Settings → Tools & MCP).",
-  "//3": "Blender: use the OFFICIAL Blender Lab MCP package + Lab addon (Blender 5.1+). Do NOT use `uvx blender-mcp` from PyPI (ahujasid) — it talks a different protocol and Cursor will stick on Connecting.",
-  "//4": "Install Lab MCP once: uv tool install \"git+https://projects.blender.org/lab/blender_mcp.git#subdirectory=mcp\"",
-  "//5": "In Blender: Extensions → MCP (lab_blender_org) enabled; Preferences → Add-ons → MCP → Start MCP Bridge Server (port 9876).",
+  "//2": "After changing mcp.json, fully quit and relaunch Cursor (or toggle the server in Settings -> Tools & MCP).",
+  "//3": "Mixar is the default 3D tool (developer decision 2026-10-05). It is a Blender 4.2.2 fork from mixar.app, so bpy and the FBX/GLTF exporters work unchanged. Identify it by binary_path (C:\\Program Files\\Mixar\\mixar.exe) or `mixar.exe --version`; bpy.app.version returns a spoofed (5, 2, 0) and will mislead you.",
+  "//4": "Use the OFFICIAL Blender Lab MCP package + add-on. Do NOT use `uvx blender-mcp` from PyPI (ahujasid) - it speaks a different protocol and the client sticks on Connecting.",
+  "//5": "Install the Lab MCP client once: uv tool install \"git+https://projects.blender.org/lab/blender_mcp.git#subdirectory=mcp\"",
+  "//6": "Start the server with .\\Tools\\Start-MixarMcp.ps1 (headless, blocks until localhost:9876 is reachable). Do NOT use the blender_*.cmd files shipped in the Mixar install; they are broken stock Blender launchers.",
+  "//7": "Do NOT use a bare `blender` command: it silently runs vanilla Blender 4.4. Use the mixar-mcp.cmd wrapper, which pins BLENDER_PATH.",
 
   "mcpServers": {
     "unrealMCP": {
@@ -16,9 +18,9 @@
         "unreal_mcp_server.py"
       ]
     },
-    "blender": {
-      "command": "C:\\Users\\User\\.local\\bin\\blender-mcp.exe",
-      "args": []
+    "mixar": {
+      "command": "cmd",
+      "args": ["/c", "C:\\dev\\HomeWorld\\Tools\\mixar-mcp.cmd"]
     }
   }
 }

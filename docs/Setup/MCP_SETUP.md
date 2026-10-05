@@ -37,9 +37,9 @@ Use this when onboarding a machine or after changing install paths. Full matrix:
 
 | Check | Expected |
 |--------|----------|
-| **`.cursor/mcp.json`** | Live config (gitignored). Copy from [`.cursor/mcp.json.example`](../../.cursor/mcp.json.example). Servers: **`unrealMCP`** (`uv` + `--directory` → folder with `unreal_mcp_server.py`, default `C:\tools\unreal-mcp\Python`) and **`blender`** (`cmd /c uvx blender-mcp` on Windows). |
+| **`.cursor/mcp.json`** | Live config (gitignored). Copy from [`.cursor/mcp.json.example`](../../.cursor/mcp.json.example). Servers: **`unrealMCP`** (`uv` + `--directory` → folder with `unreal_mcp_server.py`, default `C:\tools\unreal-mcp\Python`) and **`mixar`** (`cmd /c Tools\mixar-mcp.cmd` on Windows). |
 | **Editor** | HomeWorld opens with **UnrealMCP** enabled; Output Log shows the plugin listening on **55557**. |
-| **Blender** (optional) | Blender 3.0+ with BlenderMCP addon; N-panel **Start MCP Server** (default `localhost:9876`). See [Blender MCP](#blender-mcp-ahujasid) below. |
+| **Mixar** (optional) | Mixar at `C:\Program Files\Mixar\mixar.exe` (Blender 4.2.2 fork) with the Lab MCP add-on enabled and online access permitted. Start it with `.\Tools\Start-MixarMcp.ps1` (default `localhost:9876`). See [Mixar MCP](#mixar-mcp-official-blender-lab-add-on-served-by-mixar) below. |
 | **Cursor** | After edits to `mcp.json`, fully quit and relaunch Cursor; **Settings → Tools & MCP** shows healthy connections. |
 | **Cursor Agent CLI** (automation loop) | `agent --version` works; `agent login` or **`CURSOR_API_KEY`** set. See [AUTOMATION_READINESS.md](../Automation/AUTOMATION_READINESS.md). |
 
@@ -117,9 +117,9 @@ Example shape (see [`.cursor/mcp.json.example`](../../.cursor/mcp.json.example))
         "unreal_mcp_server.py"
       ]
     },
-    "blender": {
+    "mixar": {
       "command": "cmd",
-      "args": ["/c", "uvx", "blender-mcp"]
+      "args": ["/c", "C:\\dev\\HomeWorld\\Tools\\mixar-mcp.cmd"]
     }
   }
 }
@@ -135,14 +135,31 @@ After creating or modifying this file, **fully quit and relaunch Cursor**. Hygie
 
 ---
 
-## Blender MCP (official Blender Lab — Blender 5.1+)
+## Mixar MCP (official Blender Lab add-on, served by Mixar)
 
-HomeWorld targets the **official** Blender Lab MCP stack ([blender.org/lab/mcp-server](https://www.blender.org/lab/mcp-server/)), not the community PyPI package `uvx blender-mcp` (ahujasid). Both default to port **9876**, but the wire protocols differ. Pointing Cursor at the PyPI package while Blender runs the Lab addon causes Cursor to stay on **Connecting** forever (TCP connects; handshake never completes).
+**Mixar is the default 3D tool** (developer decision 2026-10-05). Mixar is a **Blender 4.2.2 fork** from mixar.app, so existing `bpy` scripts, the FBX/GLTF exporters, and the official Blender Lab MCP add-on all work unchanged. Vanilla Blender 4.4 remains installed but is no longer the default.
+
+**Mixar misreports its version, so confirm which app you are talking to before trusting anything:**
+
+| Signal | Value |
+|--------|-------|
+| `mixar.exe --version` | **`Blender 4.2.2`** — the real base version |
+| `bpy.app.binary_path` | `C:\Program Files\Mixar\mixar.exe` — the reliable identifier |
+| `bpy.app.version` | `(5, 2, 0)` — **a compatibility spoof**, not the real version |
+| `bpy.app.version_string` | `4.2.2` — the Mixar app version |
+| Executable name | `mixar.exe`, **not** `blender.exe` |
+
+The `(5, 2, 0)` tuple exists so extensions that require Blender ≥5.1 install and run; do not reason "Mixar is a 5.2 fork" from it. See [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) for the full list.
+
+> **`.blend` caveat:** Mixar writes a 4.2-era file. Opening a `.blend` authored by Blender 5.x logs `WARNING File written by newer Blender binary, expect loss of data!`. Treat `.blend` as write-once from its authoring app and export FBX/GLB from Mixar rather than open-and-resaving.
+
+HomeWorld targets the **official** Blender Lab MCP stack ([blender.org/lab/mcp-server](https://www.blender.org/lab/mcp-server/)), not the community PyPI package `uvx blender-mcp` (ahujasid). Both default to port **9876**, but the wire protocols differ. Pointing the client at the PyPI package while the Lab add-on serves the socket leaves the client on **Connecting** forever (TCP connects; handshake never completes).
 
 ### Prerequisites
 
-- Blender **5.1+** (this machine: Steam Blender 5.2)
-- Lab **MCP** extension enabled (`lab_blender_org/mcp`) — Preferences → Extensions
+- Mixar at `C:\Program Files\Mixar\mixar.exe`
+- Lab **MCP** extension installed and enabled. It lives in Mixar's own config namespace — note the **doubled** `Mixar`: `%APPDATA%\Mixar\Mixar\5.2\extensions\user_default\mcp`
+- **Online access** enabled in Mixar (Preferences → System). The add-on refuses to start without network permission. Already set on this machine.
 - Official MCP client binary installed once:
 
 ```powershell
@@ -150,28 +167,53 @@ uv tool install "git+https://projects.blender.org/lab/blender_mcp.git#subdirecto
 # resolves to: %USERPROFILE%\.local\bin\blender-mcp.exe
 ```
 
+### Start the server
+
+**Two ways to serve MCP, and they share port 9876.** Because the Lab add-on is enabled persistently, **any Mixar you launch — including the GUI — auto-starts its MCP socket.** So if Mixar is already open, there is nothing to start.
+
+| Mode | How | Notes |
+|------|-----|-------|
+| GUI | Just open Mixar | Serves automatically on launch. What a human drives while generating assets. |
+| Headless | `.\Tools\Start-MixarMcp.ps1` | No window. What an agent should use, so work does not depend on a human session. |
+
+```powershell
+.\Tools\Start-MixarMcp.ps1            # launch, block until the port is reachable
+.\Tools\Start-MixarMcp.ps1 -Status    # who is serving? GUI or headless, and which pid
+.\Tools\Start-MixarMcp.ps1 -Stop      # stop the headless server only
+```
+
+Under the hood the headless path is `mixar.exe --background --command blender_mcp --host 127.0.0.1 --port 9876`.
+
+- `-Stop` **will not kill a GUI Mixar**, even one holding unsaved work. It selects by command line (`blender_mcp`), never by socket ownership alone, because the GUI holds the same port. If only a GUI is serving, it says so and leaves it alone — close Mixar yourself.
+- The add-on registers a headless CLI command named **`blender_mcp`**. Passing its module id `bl_ext.user_default.mcp` fails with `Unrecognized command`.
+- **Do not use the `blender_*.cmd` files shipped in the Mixar install.** They are stock Blender launchers that invoke `"%~dp0\blender"`, and no such file exists in a Mixar install, so every one of them fails. Use `Tools\Start-MixarMcp.ps1`.
+- `Start-MixarMcp.ps1` decides liveness by opening a TCP connection, not by `Get-NetTCPConnection`, which was observed flapping between two different owning pids while a stale server was present.
+
 ### Connect
 
-1. In Blender: **Edit → Preferences → Add-ons → MCP** → **Start MCP Bridge Server** (leave running; default `localhost:9876`). Enable **Online Access** if Blender prompts for it.
-2. Cursor `.cursor/mcp.json` `blender` entry must launch the Lab binary, e.g. `"command": "C:\\Users\\<user>\\.local\\bin\\blender-mcp.exe"` (see `.cursor/mcp.json.example`).
-3. Toggle **blender** off/on in **Settings → Tools & MCP** (or fully quit Cursor from the tray) after config changes.
-4. Confirm green; only one MCP client should talk to Blender at a time.
+1. Start the server (above).
+2. The client is `Tools/mixar-mcp.cmd`, a thin wrapper that sets `BLENDER_PATH=C:\Program Files\Mixar\mixar.exe` then runs `blender-mcp.exe`. `blender-mcp` resolves the app executable from `BLENDER_PATH` and otherwise falls back to `blender` on `PATH`, which would quietly open vanilla Blender. `.cursor/mcp.json` and `opencode.json` both point at this wrapper under the server name **`mixar`** (renamed from `blender` on 2026-10-05, so the tool namespace is `mixar.*`).
+3. Toggle **mixar** off/on in **Settings → Tools & MCP** (or fully quit the host from the tray) after config changes.
+4. Confirm green; only one MCP client should talk to Mixar at a time.
 
 ### Asset pipeline with both MCPs
 
-1. **Blender MCP** — clean mesh, apply transforms, export FBX/GLB with the HomeWorld preset to `AssetCreation/Exports/<Category>/` (helper: `AssetCreation/Blender/export_to_asset_creation.py`).
+1. **Mixar MCP** — clean mesh, apply transforms, export FBX/GLB with the HomeWorld preset to `AssetCreation/Exports/<Category>/` (helper: `AssetCreation/Blender/export_to_asset_creation.py`, still valid: it is a plain `bpy` script).
 2. **unrealMCP** — `execute_python_script("batch_import_asset_creation.py")` to import into `/Game/HomeWorld/...`.
 
 Full preset and style: [AssetCreation/STYLE_GUIDE.md](../../AssetCreation/STYLE_GUIDE.md). Workflow overview: [AssetCreation/README.md](../../AssetCreation/README.md).
 
-### Troubleshooting (Blender)
+### Troubleshooting (Mixar)
 
 | Issue | Fix |
 |-------|-----|
-| Cursor stuck **Connecting** | You are almost certainly running **PyPI `uvx blender-mcp`** against the **Lab addon**. Switch `command` to `blender-mcp.exe` from `uv tool install …#subdirectory=mcp`. Kill leftover `blender-mcp` / `python …blender-mcp` processes, Stop/Start the bridge in Blender, toggle the Cursor server. |
-| Lab addon “Online access must be enabled” | Enable online access in Blender system preferences (required for the Lab socket server). |
-| TCP 9876 listens but tools hang | Confirm you are on Lab protocol (null-byte JSON). A quick probe that returns scene objects means the addon is healthy; the Cursor-side binary was wrong. |
-| `spawn … ENOENT` | Use the full path to `blender-mcp.exe` under `%USERPROFILE%\.local\bin\`. |
+| Cursor stuck **Connecting** | You are almost certainly running **PyPI `uvx blender-mcp`** against the **Lab add-on**. Use `Tools/mixar-mcp.cmd`, which launches the Lab binary. Kill leftover `blender-mcp` processes, `.\Tools\Start-MixarMcp.ps1 -Stop`, toggle the client server. |
+| `Unrecognized command: "bl_ext.user_default.mcp"` | The `--command` name is **`blender_mcp`**, not the extension module id. |
+| `Error: Online access must be enabled in the system preferences` | Set **Preferences → System → Online access** in Mixar, or pass `--online-mode`. `bpy.app.online_access_override` is **not writable** from Python; use the preference or the flag. |
+| A `blender_*.cmd` launcher exits immediately | Expected — the shipped launchers are broken stock Blender scripts. Use `Tools\Start-MixarMcp.ps1`. |
+| Port 9876 reachable but reports the wrong pid | `Get-NetTCPConnection` is unreliable here. Use `Tools/Start-MixarMcp.ps1 -Status`, which probes with a real TCP connect. |
+| TCP 9876 listens but tools hang | Confirm you are on Lab protocol (null-byte JSON). A quick probe that returns scene objects means the add-on is healthy; the client-side binary was wrong. |
+| `spawn … ENOENT` | Use `Tools/mixar-mcp.cmd` (full paths to both Mixar and `blender-mcp.exe`). |
 | Two clients fighting | Quit the other MCP host; only one client to port 9876 |
 
 ---
@@ -241,4 +283,4 @@ External LLMs can generate Python that is then run via MCP (`execute_python_scri
 | Python version error | Requires Python 3.10+; check with `python --version` |
 | Plugin compilation failure on UE 5.7 | Switch to UnrealMCPBridge fallback (see above) |
 | `uv` not found | Run the install script or add `C:\Users\<user>\.local\bin` to PATH |
-| Blender MCP missing / ENOENT / stuck Connecting | See [Blender MCP](#blender-mcp-official-blender-lab--blender-51); use Lab `blender-mcp.exe`, not PyPI `uvx blender-mcp` |
+| Mixar MCP missing / ENOENT / stuck Connecting | See [Mixar MCP](#mixar-mcp-official-blender-lab-add-on-served-by-mixar); start the server with `.\Tools\Start-MixarMcp.ps1` and use the Lab `blender-mcp.exe` via `Tools/mixar-mcp.cmd`, not PyPI `uvx blender-mcp` |
