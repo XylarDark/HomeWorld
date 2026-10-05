@@ -33,8 +33,10 @@ public:
 	UHomeWorldGlideMovementComponent();
 
 	/**
-	 * Forward airspeed target while gliding. Not yet tuned by the developer; still 5 m/s
-	 * from the initial uniform-rate decision.
+	 * Forward airspeed target while gliding. Developer decision 2026-10-05: keep 500 cm/s
+	 * against a 250 cm/s sink, a deliberate 2:1 shallow glide. This is NOT a leftover from
+	 * the earlier 1:1 uniform rate - the shallower angle is the point, so steering has real
+	 * consequence over the 30 s descent. Do not "correct" it back to matching the sink.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Transit|CloudDescent", meta = (ClampMin = "0.0"))
 	float GlideForwardSpeed = 500.0f;

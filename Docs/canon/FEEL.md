@@ -15,6 +15,7 @@ Warm, readable, handmade, hopeful. Routes feel like paths, not sims. Channels sh
 | Island circuit | ~45–90 s | V1 |
 | Scripted FALLBACK duration | Default 32 s, clamped to 25–40 s | `09_FALLBACK_GLIDE.md` |
 | Active cloud descent duration | 30 s | Developer decision 2026-10-05, from lookout launch to landing in the field. Sink 250 cm/s over the 75 m drop. The 15 s homestead-field window in `HOMEWORLD_ROUTE.md` is not a glide duration and was not used |
+| Cloud descent forward airspeed | 500 cm/s | Developer decision 2026-10-05: a deliberate 2:1 glide against the 250 cm/s sink, not an untuned leftover. Shallower than the earlier 1:1 so steering has consequence across the 30 s |
 | Gather channel | ~1.5–3 s | V3 |
 | Portal channel+transit | ~3–6 s | V5 |
 | Heal channel | ~2–4 s | V6 |
