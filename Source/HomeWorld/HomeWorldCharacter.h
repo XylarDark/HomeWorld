@@ -347,9 +347,11 @@ public:
 
 	virtual void Jump() override;
 
+	/** Public so automation can assert the cloud-descent landing handoff. Engine declares this public. */
+	virtual void Landed(const FHitResult& Hit) override;
+
 protected:
 	virtual void PossessedBy(AController* NewController) override;
-	virtual void Landed(const FHitResult& Hit) override;
 
 	/** FALLBACK scripted glide along CRUMB_* (no free-flight). */
 	UPROPERTY(VisibleAnywhere, Category = "Transit|FALLBACK")

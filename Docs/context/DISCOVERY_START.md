@@ -20,6 +20,22 @@ One file per step. Start the next read only after the previous read has returned
 Then ask one question at a time, in the current conversation. Do not require a
 new chat or a particular UI.
 
+## Session close
+
+Do not stop the moment the current question is answered. Close in this order,
+and do not reach a later step while an earlier one still has work in it.
+
+1. Finish every piece of work the agent can perform itself.
+2. Ask, with the question tool, any question whose answer would let the agent
+   continue. Carry on from the answer rather than closing.
+3. Only when no agent work is left and the next step needs the developer's
+   hands, ask whether a tutorial is wanted. Never offer one for agent-owned
+   work.
+
+The tutorial on offer is `Docs/qa/HUMAN_TUTORIAL.md`. This section is the
+HomeWorld copy of the agnostic rule in `route-context.md`; where the two
+differ, this one wins.
+
 ## Context handoff
 
 Discovery may offer `ROUTE_START` only when evidence from the discovery makes

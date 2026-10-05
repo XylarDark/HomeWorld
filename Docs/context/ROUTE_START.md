@@ -9,6 +9,22 @@ Read these two files, in this order, before any other work:
 1. UserHarness/docs/human-use/route-context.md
 2. Docs/context/HOMEWORLD_ROUTE.md
 
+## Session close
+
+Do not stop the moment the current task is done. Close in this order, and do
+not reach a later step while an earlier one still has work in it.
+
+1. Finish every piece of work the agent can perform itself.
+2. Ask, with the question tool, any question whose answer would let the agent
+   continue. Carry on from the answer rather than closing.
+3. Only when no agent work is left and the next step needs the developer's
+   hands, ask whether a tutorial is wanted. Never offer one for agent-owned
+   work.
+
+The tutorial on offer is `Docs/qa/HUMAN_TUTORIAL.md`. This section is the
+HomeWorld copy of the agnostic rule in `route-context.md`; where the two
+differ, this one wins.
+
 The first file is the three states and how to detect them. The second file is the HomeWorld facts. Write a fact only into the second file, and only after a yes. Do not write HomeWorld facts into the first file.
 
 Nothing else is part of this handover.

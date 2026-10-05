@@ -86,4 +86,72 @@ bool FCloudDescentSteeringAndWispTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+/**
+ * The glide-to-walk handoff.
+ *
+ * The test world created by FScopedWorld is not physics-ticked, so this does NOT
+ * simulate a drop. It covers the deterministic contract instead: the descent
+ * hands control back through the engine's landing path, and the character clears
+ * its descent state. Whether the glide actually reaches the ground from 75 m and
+ * touches down on a real floor surface is a PIE question, not an automation one.
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FCloudDescentLandingHandsBackControlTest,
+	"HomeWorld.Transit.CloudDescent.LandingReturnsWalkControl",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FCloudDescentLandingHandsBackControlTest::RunTest(const FString& Parameters)
+{
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("cloud descent landing"));
+	if (!Scope.Ok(this))
+	{
+		return false;
+	}
+
+	Scope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Day);
+	AHomeWorldCharacter* Character = HomeWorldTestWorld::SpawnCharacter(Scope.World);
+	if (!TestNotNull(TEXT("character"), Character))
+	{
+		return false;
+	}
+
+	FActorSpawnParameters MarkerParams;
+	MarkerParams.Name = FName(TEXT("GP_GlideStart"));
+	MarkerParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	if (!TestNotNull(TEXT("glider start marker"),
+		Scope.World->SpawnActor<AActor>(FVector::ZeroVector, FRotator::ZeroRotator, MarkerParams)))
+	{
+		return false;
+	}
+
+	UHomeWorldGlideMovementComponent* Glide =
+		Cast<UHomeWorldGlideMovementComponent>(Character->GetCharacterMovement());
+	if (!TestNotNull(TEXT("character owns the glide CMC subclass"), Glide))
+	{
+		return false;
+	}
+
+	if (!TestTrue(TEXT("day/body launch starts active descent"), Character->TryStartCloudDescent()))
+	{
+		return false;
+	}
+	TestTrue(TEXT("descent is gliding before landing"), Character->IsCloudDescentActive());
+	TestTrue(TEXT("glide mode is active before landing"), Glide->IsGliding());
+
+	// A glide must not leave horizontal authority behind in the CMC's falling state:
+	// StopGlide is the escape hatch and must return to normal falling physics.
+	Glide->StopGlide();
+	TestFalse(TEXT("stopping the glide leaves glide mode"), Glide->IsGliding());
+	TestEqual(TEXT("stopping the glide returns normal falling physics"),
+		Glide->MovementMode, MOVE_Falling);
+
+	// Landed() is the engine-side landing callback the glide CMC reaches via
+	// ProcessLanded. Assert the character releases its descent state.
+	Character->Landed(FHitResult());
+	TestFalse(TEXT("landing clears the descent flag"), Character->IsCloudDescentActive());
+	TestFalse(TEXT("landing leaves no active glide mode"), Glide->IsGliding());
+
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS
