@@ -1,5 +1,11 @@
 # PROMPT WISP_CLOUD_RING_V1
 
+> **Historical research prompt:** This prompt was written against HW `0177c76`
+> and a route working copy that was not on that pin. For present route facts,
+> read [`Docs/context/HOMEWORLD_ROUTE.md`](../../context/HOMEWORLD_ROUTE.md) from
+> current `main`. Any difference here is not current canon or implementation
+> authorization.
+
 ## ROLE
 
 Advise Lead on a starting cloud size range and a density by height for the cloud layer on the glide down. You are not writing code and you are not opening a build.

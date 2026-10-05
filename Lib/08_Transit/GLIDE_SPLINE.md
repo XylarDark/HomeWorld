@@ -5,11 +5,14 @@
 **Role:** WLD  
 **Inputs:** `Docs/00_CANON.md`, `Docs/00_SHOTLIST.md`
 
+**Scope:** Existing fixed-crumb scripted `FALLBACK` route. The active steered
+cloud descent is specified in [`Docs/context/HOMEWORLD_ROUTE.md`](../../Docs/context/HOMEWORLD_ROUTE.md).
+
 ---
 
 ## Rule
 
-**Glide is a spline / crumb path — NOT free flight.**
+**This fallback is a spline / crumb path.** It does not define the active steered route.
 
 Canon hard reject: free-flight sim. Shot 3 reject: free-flight sim framing.
 

@@ -17,6 +17,14 @@ One file per step. Start the next read only after the previous read has returned
 Then ask one question at a time, in the current conversation. Do not require a
 new chat or a particular UI.
 
+## Context handoff
+
+Discovery may offer `ROUTE_START` only when evidence from the discovery makes
+route context necessary. State the evidence and ask whether to switch. Wait for
+the developer's answer; read the route-start sequence only after they confirm.
+If they decline, continue discovery or stop at its boundary. Do not trigger a
+handoff from topic keywords alone.
+
 The developer names any extra files. Only those get read.
 
 The agent does not pick the files.
@@ -25,4 +33,6 @@ The agent does not name a bite.
 
 The agent does not open a new chat.
 
-If a second task appears, alert and stop.
+If an unrelated second task appears, alert and stop. If it makes the other
+context necessary, use the evidence-based handoff question above; do not switch
+without confirmation.

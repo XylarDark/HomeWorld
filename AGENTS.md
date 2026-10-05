@@ -6,7 +6,7 @@ Always loaded. Detail lives in [docs/AGENTS_REFERENCE.md](docs/AGENTS_REFERENCE.
 
 | Path | Role |
 |------|------|
-| [Docs/VISION_BOARD.md](Docs/VISION_BOARD.md) | Product canon. Lone Wanderer; night is a form you become. Read before scoping. |
+| [Docs/VISION_BOARD.md](Docs/VISION_BOARD.md) | Product canon. Family is present from the start; the prototype includes the camp rescue; night is a form you become. Read before scoping. |
 | [Docs/CANON_MAP.md](Docs/CANON_MAP.md) | Topic index. Start here to find an answer. |
 | [START_HERE.md](START_HERE.md) | Swarm entry only. Default coding chats are not swarm. |
 

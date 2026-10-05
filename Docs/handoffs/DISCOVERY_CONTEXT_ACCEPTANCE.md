@@ -17,13 +17,23 @@ waiting for each read to finish before beginning the next:
 
 Only after all three reads, ask one concise discovery question. It must not ask
 the developer to name a bite or invite the agent to choose one. The developer
-names any additional files. If a second task appears, alert and stop. Do not open
-`Docs/context/ROUTE_START.md` as part of discovery.
+names any additional files. If an unrelated second task appears, alert and stop.
+If evidence shows route context is needed, use the transition question below;
+do not open `Docs/context/ROUTE_START.md` before the developer confirms.
 
 The state file and route facts may be inspected through the current environment's
 normal file-reading interface. Do not claim a read happened if it did not. If
 that interface cannot enforce sequential reads, issue separate read operations
 and wait for each result before the next.
+
+## Context transition acceptance
+
+Either start protocol may offer the other only after identifying evidence that
+the other context is needed. The offer must state that evidence, ask whether to
+switch, and wait. No files from the other sequence are read before a yes. A no
+keeps the session in the current context or ends it at that boundary. Topic
+keywords alone are not a trigger. Test both directions separately. An unrelated
+second task still triggers an alert and stop.
 
 ## Result record
 
@@ -42,3 +52,13 @@ after the state rules and before the menu. No fourth state or new route fact was
 invented. Discovery did not open the route start. Result: **pass** for the
 procedural acceptance check. The provider is test metadata only; this does not
 validate other interfaces or implementation readiness.
+
+## Codex trial — 2026-10-05
+
+Interface: Codex conversation with repository shell access. The discovery
+sequence and route-start reads were each completed one file at a time. The
+developer directly named the current steered cloud descent before the route
+handoff rule was added, so the evidence-question transition was not exercised.
+Result: discovery and route sequences observed; bidirectional offer-and-wait
+criterion **not yet tested**. This does not validate the cloud/glider
+implementation.

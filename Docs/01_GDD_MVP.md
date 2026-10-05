@@ -13,7 +13,7 @@ This file is the executable design contract for WAVE 1 Track A. GP/SYS implement
 
 ## 2. Player fantasy + tone (from canon)
 
-**Fantasy:** You keep a warm floating homestead above a readable pine world. **By day (body)** you leave the lookout, take a constrained route down, **reap** — gather materials, collect from plants and recruited beings, claim helpers — and come home. **By night (spirit)** you sow and influence: shrine portals both ways, nurture homestead targets, and enter the **dreams** of animals, spirits, and humanoids in **placeholder astral combat** to **heal and recruit** them (convert, do not kill). Items and bonuses from each half make you perform better on the other.
+**Fantasy:** You live with your loved ones at a warm floating homestead above a readable pine world. **By day (body)** you gather and explore, then descend through clouds on the steered glide route. **By night**, sleep and the rune let you become spirit. You tend the world, ease suffering, and reach the loved one taken at the camp. Spirit encounters heal, calm, or convert; you do not kill. Items and bonuses from each half make you perform better on the other.
 
 **Tone:** Warm, readable, handmade, hopeful. Not cutesy-infantile. Not grim. Not photoreal. Not sci-fi. (Canon §9.)
 
@@ -23,16 +23,16 @@ This file is the executable design contract for WAVE 1 Track A. GP/SYS implement
 
 | Mode | Form | Where | Core verbs | Transit |
 |---|---|---|---|---|
-| Day | Body | Homestead walk + planet slice | Walk, Glide, **Reap** (Gather / Collect / Claim), Encounter/Tame, Return/dawn | Constrained glide island → planet (preferred); FALLBACK scripted spline |
-| Night | Spirit | Homestead first, then planet via shrine | Portal both ways, **Sow** (Nurture / Influence), **Dream combat** (heal/recruit), Heal ×3, Return/dawn | Shrine portal homestead ↔ planet only. No night flight. |
+| Day | Body | Homestead walk + planet slice | Walk, steered cloud descent, **Reap** (Gather / Collect / Claim), Encounter/Tame, Return/dawn | Active steered descent to open field; scripted `FALLBACK` is separate |
+| Night | Spirit, after both sleep and rune gates | Homestead and planetside via shrine | Portal both ways, **Sow** (Nurture / Influence), tend, heal/recruit, return/dawn | Shrine portal homestead ↔ planet. No night glide. |
 
 **Cycle rules (implementable):**
 
 1. **Dawn → Day/Body:** Player is body form on homestead. Spirit layer off / NightMix → 0. Gather nodes, material sites, den/camp day interacts, and beast pad active.
-2. **Day departure:** From lookout / glider perch, start Verb 2 (glide or FALLBACK). Land at planet landing circle.
-3. **Day slice:** Walk path 2–4 min; **reap** at material / living sites; encounter/tame; optional return via Verb 8 (portal if night-armed) or hold until dusk.
-4. **Dusk → Night/Spirit:** At homestead shrine (or on return), form swaps to spirit. NightMix → 1; spirit layer visible; day reap interacts idle or blocked.
-5. **Night loop:** Portal homestead ↔ planet (Verb 5); **sow** (nurture / influence); dream-heal spirits and recruit at den/camp (placeholder); nurture homestead targets; return / sleep → dawn (Verb 8).
+2. **Day departure:** From lookout / glider perch, start the steered cloud descent. Land in the open field. The scripted `FALLBACK` is a separate implementation path.
+3. **Day slice:** Walk the field and forest path; **reap** at material / living sites; encounter/tame. The player remains in body form until both sleep and rune gates are met.
+4. **Sleep + rune → Night/Spirit:** Both gates are required to become spirit. Without either gate, the player remains body. NightMix → 1 only after the form change; day reap interacts idle or blocked.
+5. **Night loop:** Portal homestead ↔ planet (Verb 5); **sow** (nurture / influence); tend the camp and rescue the loved one; heal or recruit other dream encounters according to their current specification; return / sleep → dawn (Verb 8).
 6. **Homestead is hub.** Planet is the same world slice visible from lookout — not a second game.
 
 **Lookout test (WLD gate, design requirement):** From lookout, player can point at landing, portal exit, first harvest, and way home.
@@ -50,7 +50,7 @@ Same dual pattern for materials and living sites. Special site cross-buffs the o
 | **Humanoid camp** | Visit / collect from recruited | Dream-battle → heal → recruit |
 | **Special site** | Bonus A (feeds **night**) | Bonus B (feeds **day**) — same landmark |
 
-**Astral / dream combat (product):** Night combat battles the **dreams** of animals, spirits, and humanoids. Win condition = **heal and recruit** (strip sin → loved / allied). **Do not kill.** Deep combat systems remain out of scope until a Lead-gated combat vision pass; RS track uses **placeholder** dream encounters only. Track: [21_REAP_SOW.md](21_REAP_SOW.md).
+**Astral / dream encounters (product):** Spirit encounters heal, calm, or convert; the player does not kill. Encounter-specific mechanics are defined by their current system specifications; the Vision Board does not define a broader combat system. Track: [21_REAP_SOW.md](21_REAP_SOW.md).
 
 ---
 
@@ -73,10 +73,10 @@ Each verb: trigger, player action, success, fail/idle, approx duration (seconds)
 | Field | Spec |
 |---|---|
 | Trigger | Day/body only. Player enters lookout / glider perch interact volume + confirm |
-| Player action | **Preferred:** constrained glide on air-current along visible islets toward landing circle (limited steering on rail/corridor; not free-flight). **FALLBACK:** scripted spline down (Conductor may arm without meeting) |
-| Success | Touchdown on planet landing circle; control restored to walk |
-| Fail / idle | Leave volume without confirm → idle. Abort mid-glide (if allowed) → soft reset to perch or last safe crumb. Night: verb unavailable |
-| Duration | Preferred constrained ~20–40 s; FALLBACK scripted ~12–25 s |
+| Player action | Steer the cloud descent from the homestead toward the open-field landing. The existing scripted `FALLBACK` remains a separate route implementation. |
+| Success | Touch down in the open field; control restored to walk |
+| Fail / idle | Leave the perch volume without confirm → idle. Mid-route abort and recovery are unresolved for the current route. Night: verb unavailable. |
+| Duration | Current route duration is not set; route facts and placeholders are in [`HOMEWORLD_ROUTE.md`](context/HOMEWORLD_ROUTE.md). |
 
 ### V3 — Gather 6 resources
 

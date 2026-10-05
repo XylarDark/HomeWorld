@@ -1,5 +1,13 @@
 # EXIT WISP_CLOUD_LOOK_V1
 
+> **Historical research exit, not an accepted look decision.** Its short/scenic
+> sky reading and Astroneer comparison are recommendations for a human taste
+> decision, not approved product direction. It also repeats the unqualified
+> 33.75 s claim from an older route snapshot; current route facts are in
+> [`Docs/context/HOMEWORLD_ROUTE.md`](../../context/HOMEWORLD_ROUTE.md), which
+> does not record that as a settled duration. Do not use this EXIT to set look,
+> height, or current descent acceptance.
+
 **Kind:** RESEARCH EXIT — WISP_CLOUD_LOOK_V1
 
 **File protocol:** Lead / Conductor paste. Canonical intended path: `Docs/handoffs/research/EXIT_WISP_CLOUD_LOOK_V1.md`<br>

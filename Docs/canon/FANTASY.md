@@ -1,26 +1,31 @@
-# FANTASY.md
+# FANTASY
 
-**Status:** LOCKED (pointer)  
-**Sources:** `Docs/01_GDD_MVP.md` §2; `Docs/21_REAP_SOW.md`; **[`Docs/VISION_BOARD.md`](../VISION_BOARD.md)** §1, V1b/V2b (Lead 2026-10-02)
+**Status:** Current product pointer
 
-> **The `Player` row below was the one load-bearing error this file carried.** It read
-> *"Family co-op caretaker"* from the September cut, which contradicted
-> `VISION_BOARD.md` §1 — *"You are **alone** and you have **lost something**"* with **one**
-> companion taken and rescued — and contradicted its own sibling `DO_NOT.md:30`, which drops
-> co-op for "NPC family". Corrected by Lead decision 2026-10-02; see
-> [DEC-0029](../decisions/AGENT_DECISIONS.md#dec-0029). It is the only line here that names who
-> you are, so it is the one line that cannot be left describing a different game.
+**Sources:** [`Docs/VISION_BOARD.md`](../VISION_BOARD.md), [`Docs/01_GDD_MVP.md`](../01_GDD_MVP.md), [`Docs/21_REAP_SOW.md`](../21_REAP_SOW.md)
 
 ## One-sentence player fantasy
 
-You keep a warm floating homestead above a readable pine world: by day (body) you glide down to **reap** (gather, collect, claim, tame); by night (spirit) you **sow** (nurture, influence) and enter dreams to **heal and recruit** — never kill — then return home for dawn.
+You live with your loved ones above a readable pine world. By day you gather
+and explore. When a loved one is taken at the camp, you return at night in
+spirit form, use stealth and care to reach them, and bring them home.
 
 ## Core loop
 
-| Field | Spec |
+| Field | Current direction |
 |---|---|
-| Player | **Lone Wanderer** — alone, holding a homestead, with **one** companion taken by the camp (**not** co-op; not a family to protect; not a family you keep safe at night) |
-| Action | Leave island → gather on planet slice → dusk spirit → **tend** the camp: spirit-stealth, ease the actors, free the loved one → return home for dawn |
-| End condition (session) | Dawn on homestead in body form; NightMix → 0; day interacts available again |
+| **Player** | A family member and caretaker. Family is present from the start; the prototype includes the camp rescue. |
+| **Day** | Explore and gather in body form. The current descent from the homestead is a steered glide through clouds. |
+| **Night** | Sleep and the rune are both required to become spirit. Use spirit form to tend, ease suffering, and reach the captive. |
+| **Care** | Encounters heal, calm, or convert. The player does not kill. |
+| **Return** | Free the loved one and bring them home; continue the gather-by-day, tend-by-night rhythm. |
 
-Tone: warm, readable, handmade, hopeful. Not cutesy-infantile, grim, photoreal, or sci-fi (`Docs/00_CANON.md` §9).
+The active route's geometry, current facts, and unresolved values are in
+[`Docs/context/HOMEWORLD_ROUTE.md`](../context/HOMEWORLD_ROUTE.md). The existing
+fixed-crumb `FALLBACK` is a separate scripted implementation and does not define
+the active route.
+
+## Tone
+
+Warm, readable, handmade, hopeful. Cartoon fantasy: not cutesy-infantile or
+high fantasy, and never grimdark, photoreal, or science fiction.

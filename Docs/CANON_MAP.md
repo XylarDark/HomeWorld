@@ -1,31 +1,18 @@
 # CANON MAP — one lookup, so nobody reads 441 files to find one answer
 
-**Written 2026-10-02, after a consolidation failure that was caught in the act.**
+**Updated 2026-10-05.**
 
 ## 0. Which document is the vision
 
-Three documents declare themselves authoritative over the same question, and the newest never
-names the ones it replaces. So, explicitly:
+[`Docs/VISION_BOARD.md`](VISION_BOARD.md) is the current product vision and prototype scope.
+Family is present from the start; the prototype includes the camp rescue; day is for gathering,
+and night is for tending in spirit form. [`VisionBoard/Core/VISION.md`](../VisionBoard/Core/VISION.md)
+holds the theme and long-horizon direction. Neither document preserves superseded product
+decisions as active guidance.
 
-> **For prototype scope the vision is [`Docs/VISION_BOARD.md`](VISION_BOARD.md) — V2b,
-> "gather by day, tend by night".** `Docs/00_CANON.md` (LOCKED P0) and `Docs/canon/*.md`
-> (12 LOCKED files, last touched 2026-09-21) describe an **earlier cut** and are superseded
-> *for prototype scope only*. `Docs/01_GDD_MVP.md` likewise. All three remain valid as
-> **Act 2+ background** — VISION_BOARD §2 defers that text there deliberately.
->
-> Recorded as [DEC-0029](decisions/AGENT_DECISIONS.md#dec-0029). It takes no new product decision;
-> it writes down the Lead's 2026-10-02 one.
-
-The vision axis is **not** in conflict — old and new both put gathering in the day, tending in
-the night, forbid kill-combat, and require convert-not-kill. What differs is *who you are*, and
-there is exactly one stale line, escalated and not edited (it is Lead-LOCKED and it is product
-framing):
-
-> `Docs/canon/FANTASY.md:14` — `| Player | Family co-op caretaker (body by day, spirit by night) |`
-> vs VISION_BOARD §1 — *"You are **alone** and you have **lost something**"*, plus **one**
-> companion who is rescued (Q16/Q18/Q19/Q20).
-
-**The vision was never ambiguous. It was invisible from two of its three doors.**
+Other locked bibles remain authoritative for their specific systems where they do not conflict
+with current product direction. The Vision Board controls prototype scope when an older MVP
+document or spec describes a different cut. See [DEC-0029](decisions/AGENT_DECISIONS.md#dec-0029).
 
 ## Why this file exists
 
@@ -89,7 +76,7 @@ README is left intact as history.
 | You need | Authoritative file | Status |
 |---|---|---|
 | Pillars, verbs, do-nots, feel | `Docs/canon/` — 12 small files, start at `README.md` | canon |
-| **Theme, the game, T0 scope** | `Docs/VISION_BOARD.md` | canon, newest (V1 **SUPERSEDED**, V1b rescue, V2 spirit, **V2b gather-by-day tend-by-night**) |
+| **Theme, the game, prototype scope** | `Docs/VISION_BOARD.md` | current product canon |
 | GDD slice | `Docs/01_GDD_MVP.md` | canon |
 | Art direction | `Docs/02_ART_BIBLE.md` | canon |
 | Ten master materials | `Docs/02_MATERIAL_SHEET.md` | **LOCKED** |
@@ -192,7 +179,7 @@ visible in the log rather than hidden in a return value.
 
 | Path | Why |
 |---|---|
-| `VisionBoard/MVP/**` | **Superseded for prototype scope** by `Docs/VISION_BOARD.md`. Holds theme + long-horizon campaign. |
+| `VisionBoard/MVP/**` | Outside prototype guidance. Theme and long-horizon direction are in `VisionBoard/Core/VISION.md`. |
 | `Docs/Automation/AGENT_COMPANY.md` | Pre-swarm agent loop, **removed WAVE F**. Stub only. |
 | `docs/TaskLists/DAILY_STATE.md`, `docs/SESSION_LOG.md` | Legacy task lists. Continuity is now handoffs + `SESSION_SUMMARY` + `swarm/PHASE_BOARD.md`. |
 | `Docs/00_CANON.md` | **LOCKED P0 but pre-T0 topology** — its map tree predates the planet slice. Flagged, not quarantined; the Lead owns that call. |

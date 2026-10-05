@@ -42,25 +42,24 @@ Demo: place player at `GP_PlayerStart`; walk toward lookout / shrine for Shot 1�
 
 ---
 
-## 4. Form swap — dusk / shrine (body ↔ spirit)
+## 4. Spirit form — sleep and rune gates
 
 | Trigger | Result |
 |---|---|
-| Dusk at homestead (or return to shrine when cycle arms night) | Body → spirit; `NightMix` → 1; spirit layer visible; gather/beast idle |
+| Sleep gate and rune gate are both met | Body → spirit; `NightMix` → 1; spirit layer visible; gather/beast idle |
 | Dawn / Rest complete (V8) | Spirit → body; `NightMix` → 0; spirit layer off; day gather/beast available |
 
 Mid-day shrine is **landmark only** (portal locked). No night flight.
 
 ---
 
-## 5. Scripted glide along CRUMB_* / GLIDE_SPLINE (V2) — NOT free flight
+## 5. Existing scripted FALLBACK along CRUMB_* / GLIDE_SPLINE (V2)
 
-**Rule:** Glide is a spline / crumb path. Canon hard reject: free-flight sim.
+This section describes the existing fixed-crumb `FALLBACK` implementation. It does not implement the active steered cloud descent recorded in [`HOMEWORLD_ROUTE.md`](context/HOMEWORLD_ROUTE.md).
 
 | Mode | Spec |
 |---|---|
-| Preferred | Constrained follow of crumbs in order; limited lateral influence only; day/body |
-| FALLBACK | Scripted cinematic / locked traverse of the **same** crumb sequence; no steering beyond camera follow |
+| FALLBACK | Scripted cinematic / locked traverse of the crumb sequence; no steering beyond camera follow; day/body |
 
 **Route:** `SM_Lookout_Pad` / `SM_Glider_Perch` → islets → `SM_Landing_Circle`
 
@@ -84,8 +83,8 @@ Helper curve name in blend (visual only): `CRUMB_GlideSpline`. Follow **EMPTY cr
 |---|---|
 | Trigger | Day/body; enter lookout / glider perch interact + confirm (`GP_GlideStart`) |
 | Success | Touchdown on landing circle; restore walk |
-| Fail | Leave without confirm → idle; night → unavailable |
-| Duration | Preferred ~20–40 s; FALLBACK ~12–25 s (WLD arc ~25–40 s readable) |
+| Fail | Leave perch without confirm → idle; night → unavailable |
+| Duration | FALLBACK default 32 s, clamped to 25–40 s; see [`09_FALLBACK_GLIDE.md`](09_FALLBACK_GLIDE.md) |
 | Forbidden | Free-flight model, flight HUD/energy meter, night glide |
 
 Cameras for demo: `CAM_GlideDepart`, `CAM_LandingDay` (WLD P4).

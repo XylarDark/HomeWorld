@@ -13,7 +13,8 @@ Warm, readable, handmade, hopeful. Routes feel like paths, not sims. Channels sh
 |---|---|---|
 | Cabin → lookout walk | ~15–25 s | V1 |
 | Island circuit | ~45–90 s | V1 |
-| FALLBACK glide duration | ~12–25 s (preferred constrained was 20–40; FALLBACK armed) | V2 |
+| Scripted FALLBACK duration | Default 32 s, clamped to 25–40 s | `09_FALLBACK_GLIDE.md` |
+| Active cloud descent duration | Not set | The 15 s homestead-field window in `HOMEWORLD_ROUTE.md` is not a glide duration |
 | Gather channel | ~1.5–3 s | V3 |
 | Portal channel+transit | ~3–6 s | V5 |
 | Heal channel | ~2–4 s | V6 |
@@ -27,7 +28,7 @@ Warm, readable, handmade, hopeful. Routes feel like paths, not sims. Channels sh
 | Tunable | Proposed range | Rationale |
 |---|---|---|
 | Glide gravity scale / fall speed | 0.35–0.55× default gravity while on FALLBACK spline | Readable arc; not floaty moon-hop |
-| Glide lateral influence | 0 if FALLBACK cinematic; else ≤15% corridor width | Canon: FALLBACK = no free steer |
+| Cloud descent steering authority | Not set | Follow the current route packet and approved test contract |
 | Camera arm length (3P) | 350–500 UU | Readable character + path |
 | Camera pitch bias | −8° to −15° | Slight down for path/landing |
 

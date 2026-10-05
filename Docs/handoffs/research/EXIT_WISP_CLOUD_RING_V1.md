@@ -1,5 +1,13 @@
 # EXIT WISP_CLOUD_RING_V1
 
+> **Historical research exit, not a current task packet.** This EXIT cites HW
+> `0177c76` and asserts that 33.75 s is settled. Current
+> [`Docs/context/HOMEWORLD_ROUTE.md`](../../context/HOMEWORLD_ROUTE.md) records
+> a 15 s current window and conditional ratios; it does not record 33.75 s as a
+> settled value. Use only cloud values independently recorded in that route
+> file. Per-band diameters, jitter, band cuts, and the reachability floor below
+> are research proposals, not accepted route facts or generator requirements.
+
 **Kind:** RESEARCH EXIT — WISP_CLOUD_RING_V1
 
 **File protocol:** Lead / Conductor paste. Canonical intended path: `Docs/handoffs/research/EXIT_WISP_CLOUD_RING_V1.md`<br>

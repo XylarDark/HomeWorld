@@ -4,6 +4,10 @@
 **Date:** 2026-09-17  
 **Owner:** SYS/GPL  
 **Canon:** [03_GAMEPLAY_MVP.md](03_GAMEPLAY_MVP.md) §5–§6, [Lib/08_Transit/GLIDE_SPLINE.md](../Lib/08_Transit/GLIDE_SPLINE.md)
+**Scope:** Scripted `FALLBACK` only. The active steered cloud descent and its
+current route facts are in [`context/HOMEWORLD_ROUTE.md`](context/HOMEWORLD_ROUTE.md).
+The fixed crumbs and 25–40 s duration here do not define the active route's
+acceptance criteria.
 
 ---
 
