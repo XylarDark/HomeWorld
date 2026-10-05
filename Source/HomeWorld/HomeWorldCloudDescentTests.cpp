@@ -6,6 +6,8 @@
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "HomeWorldCharacter.h"
+#include "HomeWorldCloud.h"
+#include "HomeWorldCloudField.h"
 #include "HomeWorldCloudWisp.h"
 #include "HomeWorldGlideMovementComponent.h"
 #include "HomeWorldTestWorld.h"
@@ -258,6 +260,151 @@ bool FCloudDescentDurationMeasurementTest::RunTest(const FString& Parameters)
 	// Sanity on the partition, which is pure arithmetic on recorded figures.
 	TestTrue(TEXT("cloud layer accounts for most of the drop"), TimeToCloudBase > 0.0);
 	TestTrue(TEXT("bottom gap time is positive"), (Elapsed - TimeToCloudBase) > 0.0);
+
+	return true;
+}
+
+/**
+ * CLOUDS_WISPS_V1 Source §5 / automation gate: the field builds 2+ layers
+ * and 2+ clouds, every diameter is within 6-24 m, spacing sits in its
+ * position band, the lowest cloud bottom is 25 m above ground, every cloud
+ * sits entirely between 25 m and 75 m above ground, at least one wisp sits
+ * on a cloud, and no cloud blocks the player pawn (overlap only).
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FCloudFieldAutomationTest,
+	"HomeWorld.Transit.CloudDescent.CloudField",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FCloudFieldAutomationTest::RunTest(const FString& Parameters)
+{
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("cloud field"));
+	if (!Scope.Ok(this))
+	{
+		return false;
+	}
+
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	AHomeWorldCloudField* Field = Scope.World->SpawnActor<AHomeWorldCloudField>(FVector::ZeroVector, FRotator::ZeroRotator, Params);
+	if (!TestNotNull(TEXT("cloud field"), Field))
+	{
+		return false;
+	}
+
+	Field->BuildClouds();
+
+	TestTrue(TEXT("field builds at least 2 layers"), Field->GetLayerCount() >= 2);
+	const TArray<AHomeWorldCloud*>& Clouds = Field->GetSpawnedClouds();
+	TestTrue(TEXT("field builds at least 2 clouds"), Clouds.Num() >= 2);
+
+	const double GroundZ = Field->GetActorLocation().Z;
+	double LowestBottom = TNumericLimits<double>::Max();
+	bool bAllDiametersInBand = true;
+	bool bAllCloudsInsideBand = true;
+	bool bNoneBlock = true;
+	int32 WispCount = 0;
+
+	for (AHomeWorldCloud* Cloud : Clouds)
+	{
+		const double Diameter = Cloud->GetDiameterCm();
+		if (Diameter < 600.0 || Diameter > 2400.0)
+		{
+			bAllDiametersInBand = false;
+		}
+		const double CenterZ = Cloud->GetActorLocation().Z;
+		const double Bottom = CenterZ - Diameter * 0.5;
+		const double Top = CenterZ + Diameter * 0.5;
+		LowestBottom = FMath::Min(LowestBottom, Bottom - GroundZ);
+		if (Bottom < GroundZ + 2500.0 - 1.0 || Top > GroundZ + 7500.0 + 1.0)
+		{
+			bAllCloudsInsideBand = false;
+		}
+		if (Cloud->GetSurfaceWisp())
+		{
+			++WispCount;
+		}
+		UStaticMeshComponent* Mesh = Cloud->GetVisualMesh();
+		if (!Mesh
+			|| Mesh->GetCollisionEnabled() != ECollisionEnabled::QueryOnly
+			|| Mesh->GetCollisionResponseToChannel(ECC_Pawn) != ECR_Overlap)
+		{
+			bNoneBlock = false;
+		}
+	}
+
+	TestTrue(TEXT("every diameter is within 6-24 m"), bAllDiametersInBand);
+	TestTrue(TEXT("every cloud sits entirely between 25 m and 75 m above ground"), bAllCloudsInsideBand);
+	TestTrue(TEXT("lowest cloud bottom is 25 m above ground"), FMath::Abs(LowestBottom - 2500.0) < 1.0);
+	TestTrue(TEXT("at least one wisp sits on a cloud"), WispCount >= 1);
+	TestTrue(TEXT("no cloud blocks the player pawn (overlap only)"), bNoneBlock);
+
+	// Spacing per position band (fact 2): top 3-4x, middle 1.5-2.5x, bottom 4-6x diameter.
+	// Layers sorted by height, highest first; same row = same Y within the grid.
+	TArray<const AHomeWorldCloud*> Sorted;
+	Sorted.Reserve(Clouds.Num());
+	for (AHomeWorldCloud* Cloud : Clouds)
+	{
+		Sorted.Add(Cloud);
+	}
+	Sorted.Sort([](const AHomeWorldCloud& A, const AHomeWorldCloud& B)
+	{
+		return A.GetActorLocation().Z > B.GetActorLocation().Z;
+	});
+
+	TMap<double, TArray<const AHomeWorldCloud*>> LayersByZ;
+	for (const AHomeWorldCloud* Cloud : Sorted)
+	{
+		LayersByZ.FindOrAdd(FMath::RoundToDouble(Cloud->GetActorLocation().Z)).Add(Cloud);
+	}
+	TArray<double> Zs;
+	LayersByZ.GetKeys(Zs);
+	Zs.Sort([](double A, double B) { return A > B; });
+
+	int32 SpacingPairsChecked = 0;
+	bool bSpacingInBand = true;
+
+	for (int32 LayerRank = 0; LayerRank < Zs.Num(); ++LayerRank)
+	{
+		const TArray<const AHomeWorldCloud*>& Layer = LayersByZ[Zs[LayerRank]];
+		double BandMin = 4.0, BandMax = 6.0; // bottom by default
+		if (LayerRank == 0)
+		{
+			BandMin = 3.0; BandMax = 4.0; // top
+		}
+		else if (LayerRank < Zs.Num() - 1)
+		{
+			BandMin = 1.5; BandMax = 2.5; // middle
+		}
+
+		TMap<double, TArray<const AHomeWorldCloud*>> Rows;
+		for (const AHomeWorldCloud* Cloud : Layer)
+		{
+			Rows.FindOrAdd(FMath::RoundToDouble(Cloud->GetActorLocation().Y)).Add(Cloud);
+		}
+		for (auto& RowPair : Rows)
+		{
+			TArray<const AHomeWorldCloud*>& Row = RowPair.Value;
+			Row.Sort([](const AHomeWorldCloud& A, const AHomeWorldCloud& B)
+			{
+				return A.GetActorLocation().X < B.GetActorLocation().X;
+			});
+			for (int32 Index = 1; Index < Row.Num(); ++Index)
+			{
+				const double Gap = FMath::Abs(Row[Index]->GetActorLocation().X - Row[Index - 1]->GetActorLocation().X);
+				const double Diameter = Row[Index]->GetDiameterCm();
+				const double FactorMultiple = Gap / Diameter;
+				++SpacingPairsChecked;
+				if (FactorMultiple < BandMin - 0.01 || FactorMultiple > BandMax + 0.01)
+				{
+					bSpacingInBand = false;
+				}
+			}
+		}
+	}
+
+	TestTrue(TEXT("spacing measured on at least one cloud pair"), SpacingPairsChecked > 0);
+	TestTrue(TEXT("spacing is within its position band"), bSpacingInBand);
 
 	return true;
 }
