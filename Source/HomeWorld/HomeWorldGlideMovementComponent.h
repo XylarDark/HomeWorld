@@ -40,7 +40,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Transit|CloudDescent", meta = (ClampMin = "0.0"))
 	float GlideSinkRate = 500.0f;
 
-	/** How quickly velocity converges on the glide target. Higher = more immediate steering. */
+	/**
+	 * How quickly velocity converges on the glide target. This is a time constant:
+	 * the target is reached in roughly 1/GlideSteeringResponsiveness seconds.
+	 * Higher = more immediate steering. 8.0 settles in about 0.125 s.
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Transit|CloudDescent", meta = (ClampMin = "0.0"))
 	float GlideSteeringResponsiveness = 8.0f;
 

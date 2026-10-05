@@ -66,7 +66,10 @@ void UHomeWorldGlideMovementComponent::PhysCustom(float DeltaTime, int32 Iterati
 
 	// Converge on the glide target rather than snapping to it, so steering reads as
 	// responsive but never teleports.
-	Velocity = FMath::VInterpConstantTo(Velocity, Target, DeltaTime, GlideSteeringResponsiveness);
+	// VInterpTo, not VInterpConstantTo: this rate is a time constant (target reached in
+	// 1/GlideSteeringResponsiveness seconds). A constant-rate interp would read 8.0 as
+	// 8 cm/s and take ~62 s to reach full sink, which stretched a 75 m drop to 43 s.
+	Velocity = FMath::VInterpTo(Velocity, Target, DeltaTime, GlideSteeringResponsiveness);
 
 	// Gravity is expressed only through GlideSinkRate; do not accumulate it separately
 	// or the two would compound into an accelerating dive.
