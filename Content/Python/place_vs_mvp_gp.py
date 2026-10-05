@@ -73,13 +73,14 @@ def compute_spawn_location(data):
     cabin_loc = cabin.get("location")
     if cabin_loc:
         cabin_ue = blender_to_ue_cm(cabin_loc)
-        # Offset toward path center (+X from cabin per graybox)
-        return unreal.Vector(cabin_ue.x + 200.0, cabin_ue.y - 50.0, cabin_ue.z + 100.0)
+        # Offset toward path center (+X from cabin). 360/-20 (was 200/-50) clears the
+        # PROTO_SM_Cabin_* hulls centred on the anchor (prototype_import_parity.py).
+        return unreal.Vector(cabin_ue.x + 360.0, cabin_ue.y - 20.0, cabin_ue.z + 100.0)
 
     anchor_actor = find_actor_by_label("ANCHOR_SM_Cabin")
     if anchor_actor:
         loc = anchor_actor.get_actor_location()
-        return unreal.Vector(loc.x + 200.0, loc.y - 50.0, loc.z + 100.0)
+        return unreal.Vector(loc.x + 360.0, loc.y - 20.0, loc.z + 100.0)
 
     _log("Fallback spawn at island hub default (-400, -50, 100)")
     return unreal.Vector(-400.0, -50.0, 100.0)

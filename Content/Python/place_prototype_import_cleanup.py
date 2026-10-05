@@ -142,6 +142,9 @@ def _copy_parity(src_actor, dst_actor):
         if tags:
             dst_actor.tags = tags
             notes.append("tags:" + ",".join(str(t) for t in tags))
+        else:
+            # DRESS_* sources are bare StaticMeshActors (place_vs_mvp_dress.py) - nothing to copy.
+            notes.append("tags:none_on_source")
     except Exception as exc:
         notes.append("tags_fail:" + str(exc))
 
@@ -364,6 +367,23 @@ def main():
     _remove_actors(old_flowers, report["removed"], report["remove_skipped"])
     if not old_flowers:
         report["notes"].append("No flower/bush old actors; used garden-centre fallback")
+
+    # Functional parity beyond tags/collision copy: PROTO pivots are centred on the anchors
+    # (old DRESS meshes were world-baked), so clear gameplay actors the new hulls encroach.
+    try:
+        import importlib
+        import prototype_import_parity
+
+        importlib.reload(prototype_import_parity)
+        parity = prototype_import_parity.apply(save=False)
+        report["parity_fix"] = {
+            "portal_pawn_clearance": parity.get("portal_pawn_clearance"),
+            "player_start": parity.get("player_start"),
+            "gameplay_encroached_after": parity.get("audit_after", {}).get("gameplay_encroached_by_proto"),
+        }
+    except Exception as exc:
+        report["notes"].append("prototype_import_parity failed: " + str(exc))
+        _log("Parity fix failed", {"err": str(exc)})
 
     try:
         ok = unreal.EditorLevelLibrary.save_current_level()
