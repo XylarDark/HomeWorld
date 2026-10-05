@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| Status | DRAFT. Design files-only. Design does not self-approve. |
+| Status | DRAFT, HOLD. Not handed to Implement until Lead answers both Open questions. Design does not self-approve. |
 | Lead lock | Interview #2, answer 1A (Oct 5 2026): clouds plus wisps get the first route packet. Fertilizer loop stays out of scope. |
 | Base | `main` @ `d704b0e` |
 | Map | `L_VS_MVP_Markers` (placement is level work: OpenCode on the desktop, not Implement) |
@@ -44,8 +44,8 @@ No cloud actor exists, and no wisp is placed in any map.
    - spacing band per position, top 3-4x, middle 1.5-2.5x, bottom 4-6x diameter (fact 2);
    - the lowest cloud's bottom sits 25 m above the field ground, and nothing is placed in that gap (fact 4);
    - horizontal extent is a setting, covering the descent path out from `GP_GlideStart`. No bounds, rails, or corridors are added (fact 10).
-4. **Collision**: clouds do not block the player pawn (overlap only), so the glide never lands on a cloud top and landing stays in the field (fact 7). This is derived from fact 7 plus the glide's walkable-hit landing, not a recorded fact.
-5. **Automation** `HomeWorld.Transit.CloudDescent.CloudField`: field builds 2+ layers and 2+ clouds; every diameter is within 6-24 m; spacing is within its band; the lowest cloud bottom is 25 m above ground; at least one wisp sits on a cloud; a cloud does not block the pawn.
+4. **Collision**: open, not decided by this packet. Lead answers Open question 2 before handoff. Implement does not build this item until then.
+5. **Automation** `HomeWorld.Transit.CloudDescent.CloudField`: field builds 2+ layers and 2+ clouds; every diameter is within 6-24 m; spacing is within its band; the lowest cloud bottom is 25 m above ground; at least one wisp sits on a cloud. A collision assert is added only after Lead answers Open question 2.
 
 ## Level (OpenCode on desktop, after the Source PR merges)
 
@@ -57,18 +57,18 @@ Place one `AHomeWorldCloudField` in `L_VS_MVP_Markers` above the descent from `G
 |---|-------|
 | 1 | Build succeeds; `CloudField` automation reports Success, 0 errors. |
 | 2 | Existing `UnrestrictedSteeringAndWispCarry` test still passes unchanged. |
-| 3 | PIE: launch from `GP_GlideStart`, glide through visible spirit-blue clouds in 2+ layers, collect a wisp. |
+| 3 | PIE: launch from `GP_GlideStart`, glide among visible spirit-blue clouds in 2+ layers, collect a wisp. |
 | 4 | PIE: land in the existing field; log shows `CLOUD_DESCENT: landed ... carried wisps=` 1 or more. |
 | 5 | Diff touches no glide speed, sink, or carry code. |
 
 ## Anti
 
-Glide speed, sink, or carry changes. Fixed cloud, wisp, or layer counts. Layer heights written as numbers. Clouds you can land on. Rails, corridors, or bounds. Fertilizer, barn, bull. New material master. `.uasset`/`.umap` from Implement. Design self-approve.
+Glide speed, sink, or carry changes. Fixed cloud, wisp, or layer counts. Layer heights written as numbers. Rails, corridors, or bounds. Fertilizer, barn, bull. New material master. `.uasset`/`.umap` from Implement. Design self-approve.
 
 ## Open for Lead (through Conductor's next interview)
 
 1. Fact 6 says more than one layer "is not a split of the 50 m layer." Do the extra layers sit inside the 50 m, or stack elsewhere? Until answered, layer heights stay settings and the packet does not choose.
-2. Collision item 4 is derived. Lead may want to confirm clouds are pass-through.
+2. Can the player land on a cloud, or do they pass through it? Route fact 7 says the landing stays in the existing field; the glide lands on any walkable surface it hits. Options: pass-through (overlap only), solid but not walkable, solid and walkable, or hold.
 
 ## Doc note (not edited here)
 
