@@ -32,7 +32,7 @@ convert. The world teaches through its shape, materials, and light.
 
 1. Wake at an intact, welcoming homestead with family present.
 2. Gather and prepare during the day; learn the sleep and rune gates.
-3. Glide from the homestead to the open field and gather there.
+3. Freely steer the glider through the cloud descent from the homestead to the open field, then gather there.
 4. Discover the camp during the day. The loved one is taken and the player is sent home.
 5. At night, become spirit, use spirit-stealth to reach the guards, ease their suffering until they sleep, and free the loved one.
 6. Return home with the loved one. Continue the day-gather/night-tend loop.

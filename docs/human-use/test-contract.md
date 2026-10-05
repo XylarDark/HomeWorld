@@ -8,7 +8,7 @@ See [OWNERSHIP.md](OWNERSHIP.md).
 ## Options the agent must offer
 
 When no scenario is decided **for this task** (still stubs, and not a one-line skip).
-Put any draft in the alert; do not write this file until I confirm.
+Current accepted contract. Change this contract when the Lead replaces the behavior decision.
 
 1. **Accept or edit the agent’s restatement** (recommended for a new behavior) —
    Given/When/Then taken from *my* request, not invented product goals.
@@ -21,58 +21,39 @@ Put any draft in the alert; do not write this file until I confirm.
 
 ## Task type
 
-Examples: new panel, new module, API change, bug fix.
-
-```
-(fill in)
-```
+Gameplay traversal behavior: active steered cloud descent and cloud-wisp collection.
 
 ## Skill or human reference
 
-Which skill applies, and which file under [references/](references/README.md) the
-agent should copy from. If there is no reference yet, add one before implementation.
-
-```
-(fill in)
-```
+Use [`Docs/context/HOMEWORLD_ROUTE.md`](../../Docs/context/HOMEWORLD_ROUTE.md) for
+current route facts and [`Docs/VISION_BOARD.md`](../../Docs/VISION_BOARD.md) for
+product direction. The scripted `FALLBACK` documents are not references for active
+steering behavior. No human-written snippet in `references/` applies to this task.
 
 ## Granularity and coverage
 
-What must be tested, at which layer, and what is deliberately out of scope.
-
-```
-(fill in)
-```
+End-to-end in-game traversal: day/body launch, unrestricted steering through the
+cloud descent, cloud-wisp collection and retention, lower cloud exit, landing in
+the existing field, and return of walk control. Do not add a travel-time target,
+steering envelope, or new flight mode.
 
 ## Behavior scenarios
 
-User-flow statements the agent will turn into tests. One scenario per block.
+Accepted by the Lead on 2026-10-05, with unrestricted glider steering.
 
-```
-Given
-When
-Then
-```
-
-```
-Given
-When
-Then
-```
+**Given** the player is at the glider perch in body form during day, **when**
+they launch, freely steer through the cloud descent, collect a cloud wisp, and
+continue to the lower cloud exit, **then** steering is not constrained by a
+rail, corridor, or artificial bound, the wisp stays with the player, they land
+in the existing field, and walk control returns.
 
 ## Bug-fix guard (if this cycle is a fix)
 
-Write the failing behavior test first. After the fix, the same test must fail when
-the regression is reintroduced.
-
-```
-(fill in the behavior that broke)
-```
+Not a bug-fix task.
 
 ## Acceptance
 
-What the human will check besides the automated suite.
-
-```
-(fill in)
-```
+Human play check: confirm steering remains unrestricted throughout the cloud
+descent, the collected wisp stays with the player, landing occurs in the existing
+field, and walk control returns. Route duration and steering limits are not
+acceptance criteria.

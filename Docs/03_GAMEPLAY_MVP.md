@@ -7,7 +7,7 @@ Owner: GP
 Inputs (read-only): `Docs/00_CANON.md`, `Docs/01_GDD_MVP.md`, `Docs/03_SYSTEMS_MVP.md`, `Lib/08_Transit/GLIDE_SPLINE.md`  
 Consumers: WLD (volumes/crumbs already placed), LIT (NightMix drive), SYS (form flag for spends), CHA/PROP (demo markers owned elsewhere)
 
-Movement and transit contract only. **No free-flight.** **No combat.** **No inventory rules** (SYS). No UE C++ this slice — docs + named demo markers. CHA/PROP own Blender this wave; GP documents empties here instead of editing the `.blend`.
+Movement and transit reference. The active V2 behavior is the freely steered cloud descent described in `Docs/01_GDD_MVP.md` §9 and `Docs/context/HOMEWORLD_ROUTE.md`. The fixed-crumb sequence below is a separate scripted fallback. **No general-purpose flight model.** **No combat.** **No inventory rules** (SYS).
 
 ---
 
@@ -16,7 +16,7 @@ Movement and transit contract only. **No free-flight.** **No combat.** **No inve
 | Verb | GP owns | SYS owns |
 |---|---|---|
 | V1 Walk homestead | Nav / walk volumes, camera-readable move | — |
-| V2 Glide island → planet | Spline follow along `CRUMB_*` / FALLBACK scripted | — |
+| V2 Glide island → planet | Freely steered cloud descent; fixed-crumb `FALLBACK` remains separate | — |
 | V3 Gather ×6 | Interact prompt timing / day gate | Inventory + RES_* counts |
 | V4 Encounter / tame | Proximity enter + day gate | Beast SM + food spend |
 | V5 Portal night A ↔ B | Shrine link transit | — |
@@ -85,7 +85,8 @@ Helper curve name in blend (visual only): `CRUMB_GlideSpline`. Follow **EMPTY cr
 | Success | Touchdown on landing circle; restore walk |
 | Fail | Leave perch without confirm → idle; night → unavailable |
 | Duration | FALLBACK default 32 s, clamped to 25–40 s; see [`09_FALLBACK_GLIDE.md`](09_FALLBACK_GLIDE.md) |
-| Forbidden | Free-flight model, flight HUD/energy meter, night glide |
+| Fallback-only | Fixed-crumb scripted route; does not define active cloud descent steering |
+| Forbidden | General-purpose flight model, flight HUD/energy meter, night glide |
 
 Cameras for demo: `CAM_GlideDepart`, `CAM_LandingDay` (WLD P4).
 
@@ -134,14 +135,14 @@ GP does **not** open or save the `.blend` this wave. The following empties are t
 | Empty name | Role | Suggested parent / near | Custom props (document on empty) |
 |---|---|---|---|
 | `GP_PlayerStart` | V1 walk spawn / dawn body start | Cabin path / homestead hub | `verb=V1`; `form=body`; `demo_order=1` |
-| `GP_GlideStart` | V2 confirm volume / perch start | `SM_Glider_Perch` / `CRUMB_Depart_Lookout` | `verb=V2`; `path=CRUMB_*`; `free_flight=0`; `demo_order=2` |
+| `GP_GlideStart` | V2 launch / perch start | `SM_Glider_Perch` / lookout | `verb=V2`; `path=CLOUD_DESCENT`; `steering=UNRESTRICTED`; `demo_order=2` |
 | `GP_PortalA` | V5 homestead portal interact | `SM_Shrine_Homestead` | `verb=V5`; `link=GP_PortalB`; `mesh=SM_Shrine_Homestead`; `demo_order=5` |
 | `GP_PortalB` | V5 planet portal interact | `SM_Shrine_Return` | `verb=V5`; `link=GP_PortalA`; `mesh=SM_Shrine_Return`; `demo_order=5` |
 
 **Suggested camera-demo path (first-run order):**
 
 1. `GP_PlayerStart` → walk lookout (V1) — `CAM_Hero`
-2. `GP_GlideStart` → follow `CRUMB_*` to landing (V2) — `CAM_GlideDepart` → `CAM_LandingDay`
+2. `GP_GlideStart` → freely steer through the cloud descent and land in the field (V2) — `CAM_GlideDepart` → `CAM_LandingDay`
 3. Landing / path — gather + beast pads camera-readable (V3/V4; SYS data)
 4. Dusk form swap at homestead shrine (time float → NightMix)
 5. `GP_PortalA` ↔ `GP_PortalB` (V5) — `CAM_PortalNight`
@@ -151,13 +152,12 @@ GP does **not** open or save the `.blend` this wave. The following empties are t
 
 ## 9. Explicit out-of-scope
 
-- Free-flight controller / flight HUD
+- General-purpose free-flight controller / flight HUD (the active cloud descent remains freely steered)
 - Combat
 - Inventory / RES tables (SYS — see `Docs/03_SYSTEMS_MVP.md`)
 - Extra maps, extra biomes, night flight
 - Editing `.blend` this wave (CHA/PROP owns Blender)
-- UE C++ this wave
-- Editing `PHASE_BOARD` or starting WAVE 5
+- Editing `.blend` without the owning art task
 
 ---
 
@@ -165,15 +165,34 @@ GP does **not** open or save the `.blend` this wave. The following empties are t
 
 | System | Owner | Source |
 |---|---|---|
-| Walk, form swap, glide/FALLBACK, portal A↔B, time→NightMix + spirit vis | GP | This file |
+| Walk, form swap, active cloud descent + separate FALLBACK, portal A↔B, time→NightMix + spirit vis | GP | This file |
 | Inventory, tame SM, heal, nurture spends | SYS | `Docs/03_SYSTEMS_MVP.md` |
-| CRUMB_* positions, islets, landing | WLD | `Lib/08_Transit/GLIDE_SPLINE.md` |
+| Cloud/wisp placements, field landing; fallback CRUMB_* placements | WLD | `Docs/context/HOMEWORLD_ROUTE.md`; `Lib/08_Transit/GLIDE_SPLINE.md` |
 | Shrine / gather meshes | PROP / ENV | Lib kits |
 
 End of GAMEPLAY MVP (P5).
 
 ---
 
-## Transit cut — FALLBACK FLIGHT ARMED (2026-09-16)
+## Current transit direction
 
-Lead typed `FALLBACK FLIGHT`. Body/day transit is **scripted glide only** along `CRUMB_*` / `Lib/08_Transit/GLIDE_SPLINE.md`. Do **not** implement interactive constrained free-steer flight. Spirit/night transit remains **portal both ways** (`SM_Shrine_Homestead` ↔ `SM_Shrine_Return`). Conductor may apply this cut without a design meeting (canon).
+Body/day V2 is the freely steered cloud descent. The fixed-crumb implementation is retained only as a separate `FALLBACK`; its steering lock and timing do not apply to V2. Night/spirit transit remains the shrine portal route.
+
+## Implementation status — cloud descent (2026-10-05)
+
+The direction above is the target. The code does not yet deliver all of it. Read this before assuming a capability exists.
+
+| Route requirement | State |
+|---|---|
+| Launch at `GP_GlideStart`, day/body only, within 450 cm | Implemented — `AHomeWorldCharacter::TryStartCloudDescent` |
+| Steering unrestricted (no rail, corridor, or artificial bound) | Implemented — full air control, no steering clamp |
+| Island soft bounds suppressed during descent, restored after | Implemented — `Landed` restores movement state |
+| Collect a cloud wisp and keep it while descending | Implemented — `AHomeWorldCloudWisp` + carried count on the character |
+| **A glider descent** (standard glide speed, descent-rate feel) | **Not implemented.** The descent currently sets `MOVE_Falling` with full air control. There is no glide-speed or sink-rate model in the codebase. Route wording requires it remain a glider descent rather than a new flight mode, so the fall is not yet the accepted behavior. |
+| **Clouds to descend through** | **Not implemented.** No cloud actor, generator, or placement exists under `Source/` or `Content/`. Cloud size, spacing, and layer counts are recorded placeholders pending human testing. |
+| Landing in the existing field, walk control returns | Implemented in `Landed`, but **not covered by automation** — only reachable in PIE. |
+
+Two further facts an agent should not have to rediscover:
+
+- `AHomeWorldCloudWisp` exists as C++ only. No Blueprint derives from it and none is placed in any map or asset, so the pickup cannot be exercised until WLD places one.
+- `TryStartFallbackGlide` currently has **no caller**. `UHomeWorldInteractAbility` now enters the cloud descent first, so the scripted fallback is reachable only by an explicit Blueprint call. Whether the fallback keeps a player-facing trigger is an open Steer question.

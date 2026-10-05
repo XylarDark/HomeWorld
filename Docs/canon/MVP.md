@@ -10,7 +10,7 @@
 - **Eight MVP verbs** (see `VERBS.md`) + Docs/21 site kit (trees/rocks/flowers/den/camp/special) as reap/sow/dream stubs
 - Six `RES_*` resources; 6-slot inventory; stack max 9
 - One beast pad; three spirits; two nurture targets
-- Day transit: FALLBACK scripted glide along `CRUMB_*` (no free-flight)
+- Day transit: freely steered glider descent through clouds to the existing field; `FALLBACK` scripted `CRUMB_*` glide is separate
 - Night transit: shrine portal homestead ↔ planet only
 - Placeholder night dream-convert at den/camp (convert, not kill)
 
@@ -18,7 +18,7 @@
 
 - Homestead combat / weapons / aggro
 - Kill combat or deep combat systems
-- Free-flight sim / flight HUD
+- General-purpose free-flight sim / flight HUD outside the active glider descent
 - Extra biomes, second beast, fourth spirit, seventh resource, third nurture target
 - Crafting trees / recipe webs
 - Multiplayer netcode

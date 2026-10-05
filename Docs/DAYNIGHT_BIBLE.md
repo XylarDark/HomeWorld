@@ -50,7 +50,7 @@ Homestead bed is always valid. Exact pitch costs / clear criteria → implement 
 
 | Mode | Direction | Form / phase | Notes |
 |---|---|---|---|
-| **Glide** | Island → planet **only** (down) | Body; **not** during dusk; day (and pre-dusk) | FALLBACK scripted / constrained per canon. No free-flight. No dusk **start** |
+| **Glide** | Island → field **only** (down) | Body; **not** during dusk; day (and pre-dusk) | Active cloud descent has unrestricted steering; fixed-crumb scripted `FALLBACK` is separate. No dusk **start** |
 | **Portal** | Between linked places **and up** to HomeWorld island | Body **or** spirit | Portals **come alive in moonlight** (night). Day: portals dormant / unusable |
 
 Mid-glide if dusk would begin: **finish or land under day rules**; do not start a new glide after dusk starts. (Queue: dusk does not cancel an in-flight glide mid-air without Lead revisit — default **complete current glide**, then dusk buffer applies on ground.)

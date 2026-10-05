@@ -268,7 +268,7 @@ void AHomeWorldCharacter::Tick(float DeltaTime)
 
 	if (SoftBoundsComponent)
 	{
-		SoftBoundsComponent->bBoundsEnabled = !IsFallbackGliding();
+		SoftBoundsComponent->bBoundsEnabled = !IsFallbackGliding() && !IsCloudDescentActive();
 	}
 
 	if (IsFallbackGliding())
@@ -765,6 +765,70 @@ bool AHomeWorldCharacter::ConsumeMealRestore(EMealType MealType)
 bool AHomeWorldCharacter::IsFallbackGliding() const
 {
 	return FallbackGlideComponent && FallbackGlideComponent->IsGliding();
+}
+
+static AActor* FindGlideStartMarker(UWorld* World);
+
+bool AHomeWorldCharacter::TryStartCloudDescent()
+{
+	if (bCloudDescentActive || IsFallbackGliding() || bIsSpiritForm || !AreDayBodyAbilitiesAllowed())
+	{
+		return false;
+	}
+
+	UWorld* World = GetWorld();
+	UCharacterMovementComponent* Movement = GetCharacterMovement();
+	AActor* GlideStart = FindGlideStartMarker(World);
+	if (!World || !Movement || !GlideStart)
+	{
+		return false;
+	}
+
+	if (FVector::DistSquared(GetActorLocation(), GlideStart->GetActorLocation()) > FMath::Square(GlideStartProximityCm))
+	{
+		return false;
+	}
+
+	PreCloudDescentGravityScale = Movement->GravityScale;
+	PreCloudDescentAirControl = Movement->AirControl;
+	Movement->AirControl = 1.0f;
+	Movement->SetMovementMode(MOVE_Falling);
+	bCloudDescentActive = true;
+	CarriedCloudWisps = 0;
+	if (SoftBoundsComponent)
+	{
+		SoftBoundsComponent->bBoundsEnabled = false;
+	}
+	UE_LOG(LogTemp, Log, TEXT("CLOUD_DESCENT: active; unrestricted air steering"));
+	return true;
+}
+
+bool AHomeWorldCharacter::CollectCloudWisp(AHomeWorldCloudWisp* Wisp)
+{
+	if (!bCloudDescentActive || !Wisp)
+	{
+		return false;
+	}
+
+	++CarriedCloudWisps;
+	return true;
+}
+
+void AHomeWorldCharacter::Landed(const FHitResult& Hit)
+{
+	Super::Landed(Hit);
+	if (!bCloudDescentActive)
+	{
+		return;
+	}
+
+	if (UCharacterMovementComponent* Movement = GetCharacterMovement())
+	{
+		Movement->GravityScale = PreCloudDescentGravityScale;
+		Movement->AirControl = PreCloudDescentAirControl;
+	}
+	bCloudDescentActive = false;
+	UE_LOG(LogTemp, Log, TEXT("CLOUD_DESCENT: landed; walk control restored; carried wisps=%d"), CarriedCloudWisps);
 }
 
 void AHomeWorldCharacter::CancelFallbackGlide()

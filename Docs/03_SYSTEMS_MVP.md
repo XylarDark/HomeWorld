@@ -75,7 +75,7 @@ Wrong item for tame = soft reject, no damage, no state advance.
 | `wild` | Spawn / dawn reset if never offered | Idle on pad; no follow | Approach into caution ring → `cautious` |
 | `cautious` | Enter pad radius / approach | Idle anim; wait for offer | Offer food → bond wait; leave before offer → may return `wild` if Step 1 never done |
 | `tamed` | Offer succeeded + calm Wait ~3–5 s | Tame-mark readable; stays near pad | Optional Call → `helper` |
-| `helper` | Player Call / Befriend while `tamed` (day) | May follow planet path or enable constrained glide assist if mesh ready | Dawn may persist; never combat |
+| `helper` | Player Call / Befriend while `tamed` (day) | May follow planet path; does not limit active glider steering | Dawn may persist; never combat |
 
 **State machine steps (GDD §6):**
 

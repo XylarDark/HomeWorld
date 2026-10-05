@@ -73,7 +73,7 @@ Each verb: trigger, player action, success, fail/idle, approx duration (seconds)
 | Field | Spec |
 |---|---|
 | Trigger | Day/body only. Player enters lookout / glider perch interact volume + confirm |
-| Player action | Steer the cloud descent from the homestead toward the open-field landing. The existing scripted `FALLBACK` remains a separate route implementation. |
+| Player action | Freely steer the glider through the cloud descent toward the open-field landing, without rail, corridor, or artificial steering limits. The existing scripted `FALLBACK` remains a separate route implementation. |
 | Success | Touch down in the open field; control restored to walk |
 | Fail / idle | Leave the perch volume without confirm → idle. Mid-route abort and recovery are unresolved for the current route. Night: verb unavailable. |
 | Duration | Current route duration is not set; route facts and placeholders are in [`HOMEWORLD_ROUTE.md`](context/HOMEWORLD_ROUTE.md). |
@@ -93,7 +93,7 @@ Each verb: trigger, player action, success, fail/idle, approx duration (seconds)
 | Field | Spec |
 |---|---|
 | Trigger | Day/body; player enters beast pad proximity (one pad on planet slice) |
-| Player action | Approach → offer food from inventory (prefer RES_BERRY or RES_HERB) → hold calm / Wait until state advances. Optional later: mount/helper for constrained glide assist if CHA provides saddle/glider socket — still not free-flight |
+| Player action | Approach → offer food from inventory (prefer RES_BERRY or RES_HERB) → hold calm / Wait until state advances. A mount/helper may support field traversal; it does not restrict glider steering. |
 | Success | State reaches **tamed** (then optional **helper**). See §6 |
 | Fail / idle | No food offered → stays wild/cautious and idles. Wrong item → soft reject, no damage. Combat inputs do not exist |
 | Duration | Encounter read ~5–10 s; full tame chain ~20–45 s |
@@ -205,16 +205,17 @@ Both complete = V7 done. Day: targets visible but nurture blocked.
 
 ## 9. Transit
 
-### Preferred — constrained glide (day/body)
+### Active cloud descent (day/body)
 
-1. Player at lookout / glider perch (Shot 3 departure).
-2. Confirm → enter air-current corridor along 3–5 visible islet crumbs.
-3. Limited lateral influence only; forward progress on route; no open sky free-flight, no flight HUD implying sim.
-4. Exit: landing circle (Shot 4).
+1. Player begins at the lookout / glider perch.
+2. Confirm → freely steer through the cloud descent. Steering has no rail, corridor, or artificial bounds.
+3. Collect a cloud wisp; it stays with the player through landing.
+4. Exit below the cloud layer and land in the existing field. Walk control returns on landing.
+5. The route remains a glider descent; do not add a general flight HUD or energy meter. Duration is not set.
 
-### FALLBACK — scripted spline
+### Existing scripted `FALLBACK`
 
-If preferred slips: Conductor arms **Flight fallback**. One-way scripted glide lookout → landing circle. No steering beyond camera follow. Still day-only.
+The fixed-crumb scripted glide remains a separate fallback implementation. Its route and timing do not define the active cloud descent.
 
 ### Portal (night/spirit) — both ways
 
@@ -240,17 +241,17 @@ Spend (tame / heal / nurture) decrements stack; at 0 clear slot.
 
 ## 11. Teaching beats tied to shots 1–5
 
-Design teaches by framing + first successful verb — not tutorials with combat or free-flight.
+Design teaches by framing + first successful verb — not tutorials with combat or a general-purpose flight model.
 
 | Shot | Teach | Verb / system | Pass criteria |
 |---|---|---|---|
 | **1** Homestead night lookout | Hub fantasy: home above world; warm cabin vs cool moon; where planet / path / rooftops are | Orientation for V1, V5, V8 | Player (or camera) can point landing, portal exit, harvest zone, way home |
 | **2** Cabin + garden close | Homestead care surfaces: warm windows, planters, path = nurture + store stage | Pre-teach V7 (N1 crop) + store props | Planters and path readable; windows glowing |
-| **3** Glide departure | Leaving home is a **route**, not a flight sim | V2 preferred or FALLBACK | Trajectory + islets readable; no free-flight HUD |
+| **3** Glide departure | Freely steer the cloud descent; steering is never constrained | V2 active route | Cloud descent, wisp carry, field landing, and return to walk control |
 | **4** Planet landing day | Arrival clearing; pine path continues; gather/beast space | V2 success → V3 / V4 setup | Open landing; no combat staging; same pine language |
 | **5** Spirit portal arrival night | Night spirit transit = shrine portal; heal/nurture world | V5 → V6 (and return for V7) | Portal arrival soft spirit cue; handmade hopeful; no sci-fi gear |
 
-**Suggested first-run order:** Shot1 read → dawn body → Shot3 V2 → Shot4 gather+tame → dusk spirit → Shot5 portal → heal×3 → portal home → nurture×2 → dawn (V8).
+**Suggested first-run order:** Shot1 read → dawn body → Shot3 V2 → Shot4 gather+tame → sleep + rune → spirit → camp rescue → portal home → tend → dawn.
 
 ---
 
@@ -267,7 +268,7 @@ Do **not** design, implement, or schedule any of the following in MVP:
 - Extra biomes (desert, jungle canopy kits, alien flora, etc.)
 - Extra beasts (only `SK_Beast_Small` / one pad)
 - Combat (no HP combat, weapons, aggro loops)
-- Free-flight sim / open flight model / flight HUD implying sim
+- General-purpose free-flight model / flight HUD outside the steered cloud descent
 - Crafting trees / recipe webs beyond gather→store→spend sinks above
 - Multiplayer netcode
 - Worker self-approving a phase
@@ -283,16 +284,16 @@ Do **not** design, implement, or schedule any of the following in MVP:
 
 | System | Owner | Source section |
 |---|---|---|
-| Walk, form swap body↔spirit, glide/FALLBACK spline follow, portal A↔B, day/night time float → NightMix + spirit visibility | GP | §§3, 4 V1 V2 V5 V8, §9 |
+| Walk, form swap body↔spirit, steered cloud descent, separate scripted FALLBACK, portal A↔B, day/night time float → NightMix + spirit visibility | GP | §§3, 4 V1 V2 V5 V8, §9 |
 | 6-slot inventory, gather/store counts, tame state machine, heal hurt→healed, nurture flags → `M_Nurtured` | SYS | §§4 V3 V4 V6 V7, §§5–8, §10 |
-| Volumes, spline crumbs, pads, shrine links | WLD (not this file’s art) | Canon topology; this GDD only for verb timing |
+| Cloud descent start, cloud/wisp placements, field landing, fallback crumbs, shrine links | WLD (not this file’s art) | Canon topology; this GDD defines the accepted traversal behavior |
 
 ## Appendix B — Duration budget (slice)
 
 | Loop | Target play time |
 |---|---|
 | Homestead walk circuit | 45–90 s |
-| Glide / FALLBACK down | 12–40 s |
+| Active cloud descent | No duration target set |
 | Gather all six once | 90–180 s |
 | Tame one beast | 20–45 s |
 | Night portal round trip | 6–12 s |

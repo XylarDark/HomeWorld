@@ -25,6 +25,7 @@ class UHomeWorldFallbackGlideComponent;
 class UHomeWorldSoftBoundsComponent;
 class UHomeWorldTraversalComponent;
 class UHomeWorldSpiritStealthComponent;
+class UHomeWorldCloudWisp;
 
 UCLASS(Blueprintable)
 /**
@@ -76,6 +77,20 @@ public:
 	/** FALLBACK V2: start scripted CRUMB glide when near GP_GlideStart / glider perch. Day/body only. */
 	UFUNCTION(BlueprintCallable, Category = "Transit|FALLBACK", meta = (DisplayName = "Try Start Fallback Glide"))
 	bool TryStartFallbackGlide();
+
+	/** Active V2: launch the freely steered cloud descent from GP_GlideStart during day/body. */
+	UFUNCTION(BlueprintCallable, Category = "Transit|Cloud Descent", meta = (DisplayName = "Try Start Cloud Descent"))
+	bool TryStartCloudDescent();
+
+	UFUNCTION(BlueprintCallable, Category = "Transit|Cloud Descent", meta = (DisplayName = "Is Cloud Descent Active"))
+	bool IsCloudDescentActive() const { return bCloudDescentActive; }
+
+	/** Add one carried route wisp. Only succeeds during the active descent. */
+	UFUNCTION(BlueprintCallable, Category = "Transit|Cloud Descent", meta = (DisplayName = "Collect Cloud Wisp"))
+	bool CollectCloudWisp(AHomeWorldCloudWisp* Wisp);
+
+	UFUNCTION(BlueprintCallable, Category = "Transit|Cloud Descent", meta = (DisplayName = "Get Carried Cloud Wisps"))
+	int32 GetCarriedCloudWisps() const { return CarriedCloudWisps; }
 
 	UFUNCTION(BlueprintCallable, Category = "Transit|FALLBACK", meta = (DisplayName = "Cancel Fallback Glide"))
 	void CancelFallbackGlide();
@@ -334,6 +349,7 @@ public:
 
 protected:
 	virtual void PossessedBy(AController* NewController) override;
+	virtual void Landed(const FHitResult& Hit) override;
 
 	/** FALLBACK scripted glide along CRUMB_* (no free-flight). */
 	UPROPERTY(VisibleAnywhere, Category = "Transit|FALLBACK")
@@ -350,6 +366,17 @@ protected:
 	/** SS-A: spirit lit / alert stub (spirit form only). */
 	UPROPERTY(VisibleAnywhere, Category = "Stealth|SS-A")
 	TObjectPtr<UHomeWorldSpiritStealthComponent> SpiritStealthComponent;
+
+	/** True only between active V2 launch and landing. Steering is unrestricted. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Transit|Cloud Descent")
+	bool bCloudDescentActive = false;
+
+	/** Route wisps carried this descent; intentionally separate from the six-resource inventory. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Transit|Cloud Descent")
+	int32 CarriedCloudWisps = 0;
+
+	float PreCloudDescentGravityScale = 1.0f;
+	float PreCloudDescentAirControl = 0.05f;
 
 	/** T0 #9: spirit form flag — granted only via named gates (sleep + rune), not phase alone. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Form")

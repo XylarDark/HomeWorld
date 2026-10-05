@@ -31,7 +31,7 @@ void UHomeWorldInteractAbility::ActivateAbility(const FGameplayAbilitySpecHandle
 		return;
 	}
 
-	bool bHandled = Character->TryStartFallbackGlide();
+	bool bHandled = Character->TryStartCloudDescent();
 	if (!bHandled)
 	{
 		bHandled = Character->TryShrinePortalInteract();

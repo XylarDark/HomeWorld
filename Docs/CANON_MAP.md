@@ -78,6 +78,7 @@ README is left intact as history.
 | Pillars, verbs, do-nots, feel | `Docs/canon/` — 12 small files, start at `README.md` | canon |
 | **Theme, the game, prototype scope** | `Docs/VISION_BOARD.md` | current product canon |
 | GDD slice | `Docs/01_GDD_MVP.md` | canon |
+| **Cloud descent facts and carried wisp** | `Docs/context/HOMEWORLD_ROUTE.md` + accepted `docs/human-use/test-contract.md` | current route / accepted behavior |
 | Art direction | `Docs/02_ART_BIBLE.md` | canon |
 | Ten master materials | `Docs/02_MATERIAL_SHEET.md` | **LOCKED** |
 | Per-domain locked bibles | `Docs/DAYNIGHT_BIBLE.md` · `Docs/MOVEMENT_BIBLE.md` · `Docs/HOMESTEAD_BIBLE.md` · `Docs/COMBAT_DREAM_BIBLE.md` · `Docs/GATHER_CRAFT_BIBLE.md` · `Docs/SPIRIT_STEALTH_BIBLE.md` · `Docs/CAMERA_BIBLE.md` | **LOCKED** — all seven |

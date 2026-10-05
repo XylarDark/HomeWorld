@@ -28,7 +28,7 @@ Warm, readable, handmade, hopeful. Routes feel like paths, not sims. Channels sh
 | Tunable | Proposed range | Rationale |
 |---|---|---|
 | Glide gravity scale / fall speed | 0.35–0.55× default gravity while on FALLBACK spline | Readable arc; not floaty moon-hop |
-| Cloud descent steering authority | Not set | Follow the current route packet and approved test contract |
+| Cloud descent steering | Unrestricted by rails, corridors, or artificial bounds | Full steering throughout the descent; it remains a glider descent, not a different flight mode |
 | Camera arm length (3P) | 350–500 UU | Readable character + path |
 | Camera pitch bias | −8° to −15° | Slight down for path/landing |
 

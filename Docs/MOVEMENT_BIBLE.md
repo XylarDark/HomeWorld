@@ -9,7 +9,7 @@ HOMEWORLD MOVEMENT BIBLE — TRAVERSAL IS THE ACTION
 
 ## One-line lock
 
-Movement is the action layer on an immersive-scale fantasy planet: by day, efficient parkour-tinged routing and early mount/companion travel to hit interactions; by night, spirit mobility (blink/teleport now, flight later). Island→planet transit stays FALLBACK glide down. Never free-flight as the default body model, never invisible walls, never a second movement component.
+Movement is the action layer on an immersive-scale fantasy planet: by day, efficient parkour-tinged routing and early mount/companion travel to hit interactions; by night, spirit mobility (blink/teleport now, flight later). Island-to-field transit is a freely steered glider descent through clouds. Keep the existing scripted `FALLBACK` separate. Never add a general-purpose free-flight model as the default body movement, invisible walls, or a second movement component.
 
 ## Taste
 
@@ -54,10 +54,10 @@ Movement is the action layer on an immersive-scale fantasy planet: by day, effic
 
 | Piece | Spec |
 |---|---|
-| Glide down | **FALLBACK** scripted/corridor down only (`DAYNIGHT` / `09_FALLBACK_GLIDE`) |
-| Edge start | Any homestead edge path can commit glide when phase allows; must hit planet map |
+| Cloud descent | Freely steered glider descent from the island to the existing field landing |
+| Edge start | Launch at the lookout glider perch (`GP_GlideStart`) when phase allows |
 | Dusk | No **new** glide start |
-| Steer in air | FALLBACK = no free-flight; mild lateral on corridor **optional** only if already present — do not upgrade to flight sim |
+| Steer in air | Unrestricted throughout the descent; no rail, corridor, or artificial steering bounds |
 | Abort | Prefer ride-to-land; abort → soft reset perch/crumb if needed |
 
 ### Spirit — NOW
@@ -87,13 +87,13 @@ First planet is the **tutorial planet**: authored layout that eases players into
 - Rich **spirit flight** + deep **possession** gameplay  
 - Multiple mount species / air mounts (still avoid duplicate CMC)  
 - Swim / water traversal  
-- Steerable island→planet flight replacing FALLBACK (only if Lead retires FALLBACK)
+- General-purpose body flight outside the island-to-field glider descent
 
 ---
 
 ## Explicit do-not
 
-- Free-flight body sim / flight HUD as default  
+- General-purpose free-flight body sim / flight HUD outside the glider descent  
 - Second CharacterMovement / parallel controllers  
 - Invisible walls as primary bounds  
 - Spirit full flight in NOW without Lead amend  
@@ -103,8 +103,8 @@ First planet is the **tutorial planet**: authored layout that eases players into
 
 ## Engine note (UE5)
 
-One CMC. Modes: Walk, Sprint, Mantle/Vault (lite), MountBoost, FALLBACK Glide, SpiritWalk, SpiritBlink. Phase-gate glide starts. Edge volumes → glide. Soft land recovery. Read existing `HomeWorldCharacter` + `HomeWorldFallbackGlideComponent` before extending.
+One CMC. Modes: Walk, Sprint, Mantle/Vault (lite), MountBoost, freely steered cloud descent, scripted `FALLBACK`, SpiritWalk, SpiritBlink. Day/body gates the descent start. Soft land recovery. Read existing `HomeWorldCharacter` + `HomeWorldFallbackGlideComponent` before extending.
 
 ## Done-when (playable test)
 
-Walk tutorial path with sprint + one mantle/vault; edge glide down (day); spirit blink once after sleep; mount/companion speed mode once after tame. No second CMC. No invisible rim walls.
+Walk tutorial path with sprint + one mantle/vault; freely steer the cloud descent from the glider perch, collect and retain a cloud wisp, land in the existing field, and regain walk control; spirit blink once after sleep; mount/companion speed mode once after tame. No second CMC. No invisible rim walls.

@@ -7,7 +7,7 @@ Sacred systems and forbidden tropes. Prefer this over improvising mid-code.
 ## Sacred (do not break / replace silently)
 
 - Homestead as **safe hub** (no combat there)
-- FALLBACK glide along `CRUMB_*` (no free-flight controller)
+- Keep the fixed-crumb `FALLBACK` separate from active V2 cloud descent
 - Day/body vs night/spirit **split verb sets** (`VERBS.md`)
 - Six `RES_*` + 6-slot inventory (`SCHEMA.md`)
 - One beast pad / three spirits / two nurture targets (MVP counts)
@@ -23,7 +23,7 @@ Sacred systems and forbidden tropes. Prefer this over improvising mid-code.
 | Kill/HP/weapons/aggro combat (general encounters) | Forbidden for **non-boss** planet content — minigames only (heal/nurture/grow/possess). No trash packs, no weapon-first UX |
 | Kill win-condition (including bosses) | Boss win = **seal / banish / end evil** only — no murder fantasy payoff |
 | Generic skill trees | Pillars beat systems |
-| Free-flight sim / flight energy HUD | Canon + FALLBACK armed |
+| General-purpose flight sim / flight energy HUD | MVP scope; the active cloud descent has unrestricted steering but no flight HUD |
 | Second CharacterMovement / parallel PlayerController | Harness |
 | Crafting recipe webs | Gather → store → spend; homestead **named recipes only** at **campfire then cottage** — costs in `SCHEMA.md` / [GATHER_CRAFT_BIBLE.md](../GATHER_CRAFT_BIBLE.md) (demo: campfire/tent→cottage) |
 | Invisible walls as primary bounds | HOMESTEAD_BIBLE — edge glide commit; rare immersive mid-map blockers only |

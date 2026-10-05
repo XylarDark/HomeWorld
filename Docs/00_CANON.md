@@ -10,7 +10,8 @@ MOON / SKY
 HERO ISLAND (hub)
     cabin, garden, path, pines, lookout, shrine, glider perch
 TRANSIT
-    Body/day: lookout → air current / islets / glider → landing circle
+    Body/day: freely steered glider descent through clouds → existing field
+    FALLBACK: separate scripted glide along CRUMB_* (if used)
     Spirit/night: homestead shrine ↔ planet shrine
 PLANET SLICE (must be visible from lookout)
     forest path 2–4 min walk, gather nodes, 1 beast pad,
@@ -23,7 +24,7 @@ Lookout test: player can point at landing, portal exit, first harvest, and way h
 ## 3. Eight MVP verbs only
 
 1. Walk homestead
-2. Glide/fly island → planet (or scripted stand-in)
+2. Freely steer glider descent island → field (fixed-crumb scripted FALLBACK remains separate)
 3. Gather 6 resources
 4. Encounter / tame 1 beast
 5. Portal night island ↔ planet
@@ -75,15 +76,15 @@ Each exposes: BaseColor, Roughness, Variation, NightMix 0–1, optional Emissive
 - extra biomes
 - extra beasts
 - combat
-- free-flight sim
+- general-purpose free-flight sim (active descent steering is unrestricted)
 - crafting trees
 - multiplayer netcode
 - worker self-approving a phase
 - two agents writing the same file
 
-## 8. Flight fallback note
+## 8. Transit
 
-Scripted glide down + portal both ways (Conductor may arm without meeting).
+Active body/day transit is the freely steered glider descent to the field. The scripted `CRUMB_*` glide is a separate fallback implementation. Night/spirit transit uses the shrine route.
 
 ## 9. Tone
 

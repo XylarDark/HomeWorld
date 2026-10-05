@@ -29,7 +29,7 @@ state is not that writer.
 - The wisp is a bit of the signature spirit blue on a cloud, not one of the three wisps at the spirit wound.
 - You collect the wisp on the way down, it stays with you, and you hold one per dung you will mix.
 - There is more than one cloud layer, and there is no fixed count of layers. That is not a split of the 50 m layer.
-- The descent is a steered glide, not a new flight mode.
+- Steering is unrestricted by rails, corridors, or artificial bounds throughout the descent. It remains a glider descent, not a new flight mode.
 - Polish gate rows are red only. A row is not allowed to pass as a warning.
 - Farming lives on the homestead.
 - In the zones, day and night, you collect and nurture so the place provides the plants and animals the homestead needs.
