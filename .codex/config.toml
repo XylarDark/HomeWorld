@@ -1,0 +1,11 @@
+[mcp_servers.blender]
+command = 'C:\Users\User\.local\bin\blender-mcp.exe'
+
+[mcp_servers.unrealMCP]
+command = "uv"
+args = [
+    "--directory",
+    'C:\tools\unreal-mcp\Python',
+    "run",
+    "unreal_mcp_server.py",
+]

@@ -2,7 +2,9 @@
 
 Point a session at this file to start discovery. It is not the route start.
 
-Read, in this order, before asking:
+Read, in this order, before asking. The state file is first.
+
+One file per step. Start the next read only after the previous read has returned. Do not batch the reads into one step.
 
 1. UserHarness/docs/human-use/route-context.md
 2. Docs/context/HOMEWORLD_ROUTE.md
