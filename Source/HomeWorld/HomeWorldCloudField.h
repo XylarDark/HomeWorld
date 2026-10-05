@@ -36,7 +36,7 @@ public:
 
 	/** Per-layer cloud centre heights above the field ground, in cm. Size is the layer count (min 2). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CloudField")
-	TArray<double> LayerHeightsCm = { 6800.0, 3100.0 };
+	TArray<double> LayerHeightsCm = { 6800.0, 3100.0 }; // Lead taste-pass placeholder, not a route fact; the lowest entry is ignored for placement because the 25 m pin owns that layer's Z.
 
 	/** Diameter applied to the field's clouds, in cm; clamped to 6-24 m. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CloudField")

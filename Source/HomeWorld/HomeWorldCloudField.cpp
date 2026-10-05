@@ -54,17 +54,24 @@ void AHomeWorldCloudField::BuildClouds()
 		return LayerHeightsCm[A] > LayerHeightsCm[B];
 	});
 
+	const double ClampedTopFactor = FMath::Clamp(TopSpacingFactor, 3.0, 4.0);
+	const double ClampedMiddleFactor = FMath::Clamp(MiddleSpacingFactor, 1.5, 2.5);
+	const double ClampedBottomFactor = FMath::Clamp(BottomSpacingFactor, 4.0, 6.0);
+
 	const int32 WispBudget = FMath::Max(0, WispCloudCount);
 	int32 WispsPlaced = 0;
 
 	for (int32 Rank = 0; Rank < Order.Num(); ++Rank)
 	{
 		const double Height = LayerHeightsCm[Order[Rank]];
-		const double CenterZ = FMath::Clamp(GroundZ + Height, BandMinCenterZ, BandMaxCenterZ);
+		// The 25 m pin owns the lowest layer's Z; its LayerHeightsCm entry is ignored.
+		const double CenterZ = (Rank == Order.Num() - 1)
+			? BandMinCenterZ
+			: FMath::Clamp(GroundZ + Height, BandMinCenterZ, BandMaxCenterZ);
 
 		const double Factor = (Order.Num() == 1)
-			? BottomSpacingFactor
-			: (Rank == 0 ? TopSpacingFactor : (Rank == Order.Num() - 1 ? BottomSpacingFactor : MiddleSpacingFactor));
+			? ClampedBottomFactor
+			: (Rank == 0 ? ClampedTopFactor : (Rank == Order.Num() - 1 ? ClampedBottomFactor : ClampedMiddleFactor));
 		const double Spacing = Factor * Diameter;
 
 		int32 CountPerAxis = FMath::Max(1, FMath::RoundToInt(HorizontalExtentCm / Spacing));
