@@ -375,9 +375,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Transit|Cloud Descent")
 	int32 CarriedCloudWisps = 0;
 
-	float PreCloudDescentGravityScale = 1.0f;
-	float PreCloudDescentAirControl = 0.05f;
-
 	/** T0 #9: spirit form flag — granted only via named gates (sleep + rune), not phase alone. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Form")
 	bool bIsSpiritForm = false;

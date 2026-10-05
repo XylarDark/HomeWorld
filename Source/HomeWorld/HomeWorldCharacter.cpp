@@ -1,6 +1,8 @@
 // Copyright HomeWorld. All Rights Reserved.
 
 #include "HomeWorldCharacter.h"
+#include "GameFramework/Character.h"
+#include "HomeWorldGlideMovementComponent.h"
 #include "HomeWorldFallbackGlideComponent.h"
 #include "HomeWorldSoftBoundsComponent.h"
 #include "HomeWorldTraversalComponent.h"
@@ -171,7 +173,10 @@ namespace HomeWorldT0BeatNodes
 }
 
 AHomeWorldCharacter::AHomeWorldCharacter(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+	// The cloud descent needs a custom movement mode, so the character must own a CMC
+	// subclass. This REPLACES the engine default CMC on the SAME subobject name rather
+	// than adding a second one (MOVEMENT_BIBLE: one CMC).
+	: Super(ObjectInitializer.SetDefaultSubobjectClass<UHomeWorldGlideMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	AbilitySystemComponent->SetIsReplicated(true);
@@ -789,11 +794,20 @@ bool AHomeWorldCharacter::TryStartCloudDescent()
 		return false;
 	}
 
-	PreCloudDescentGravityScale = Movement->GravityScale;
-	PreCloudDescentAirControl = Movement->AirControl;
-	Movement->AirControl = 1.0f;
-	Movement->SetMovementMode(MOVE_Falling);
+	UHomeWorldGlideMovementComponent* Glide = Cast<UHomeWorldGlideMovementComponent>(Movement);
+	if (!Glide)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("CLOUD_DESCENT: refused; movement component is %s, expected UHomeWorldGlideMovementComponent."),
+			*GetNameSafe(Movement->GetClass()));
+		return false;
+	}
+
 	bCloudDescentActive = true;
+	if (!Glide->StartGlide())
+	{
+		bCloudDescentActive = false;
+		return false;
+	}
 	CarriedCloudWisps = 0;
 	if (SoftBoundsComponent)
 	{
@@ -822,11 +836,8 @@ void AHomeWorldCharacter::Landed(const FHitResult& Hit)
 		return;
 	}
 
-	if (UCharacterMovementComponent* Movement = GetCharacterMovement())
-	{
-		Movement->GravityScale = PreCloudDescentGravityScale;
-		Movement->AirControl = PreCloudDescentAirControl;
-	}
+	// The glide CMC's ProcessLanded hands control back through SetPostLandedPhysics,
+	// so no manual restore of AirControl or GravityScale is needed here.
 	bCloudDescentActive = false;
 	UE_LOG(LogTemp, Log, TEXT("CLOUD_DESCENT: landed; walk control restored; carried wisps=%d"), CarriedCloudWisps);
 }
