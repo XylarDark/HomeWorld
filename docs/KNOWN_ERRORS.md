@@ -8,6 +8,11 @@ One-line **Cause→Avoid** rows; narratives → [DEFECT_PA_E](../Docs/qa/DEFECT_
 
 **Before adding a row here, check the root-cause rules.** Most of the PA-E / PS-C rows below are the *same* bug seen from different angles: `execute_python_script` returns before async Editor work finishes, and the caller then scores state that has not settled. The invariant, the correct arm → yield → verify shape, and the `UnrealEditor-Cmd` cutoff live in [.cursor/rules/09-mcp-workflow.mdc](../.cursor/rules/09-mcp-workflow.mdc) § **The game-thread rule** (added 2026-09-30; 22 rows, 8 acronyms, one cause). The dated rows stay as the evidence trail — add a new row only when it is a genuinely new cause.
 
+### Portals and level data (2026-10-05)
+
+- **Cause:** When the player is moved into the destination portal's box, a new overlap fires in the same frame and sends them straight back. **Avoid:** Start the cooldown on every portal before the move, and place the player at least 60 uu outside every portal box. This is the #281 fix at `2369a12`.
+- **Cause:** I assumed the portal destinations were portal components, but they were TargetPoints, so the lookup came back empty. That cost one PIE round on `bdd7b4d`. **Avoid:** Read the level manifest from bite 3 before writing any Fix SHA that depends on level data. Until the manifest exists, wait for Conductor's actor scan.
+
 ### Mixar / 3D MCP (2026-10-05, Mixar became the default 3D tool)
 
 - **GUI Mixar shares port 9876 with the headless server → `-Stop` killed unsaved GUI work:** enabling the add-on persistently means **every** Mixar launch, GUI included, auto-serves MCP on 9876, so socket ownership alone cannot tell them apart (two `Listen` rows). A stop keyed on the socket owner killed a GUI instance titled `* (Unsaved) - Mixar 4.2.2`. **Avoid:** discriminate by **command line** (`blender_mcp` present = headless; empty = GUI), as `Tools\Start-MixarMcp.ps1` now does; never kill a Mixar merely because it owns the port.
