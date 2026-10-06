@@ -293,7 +293,7 @@ Do **not** design, implement, or schedule any of the following in MVP:
 | Loop | Target play time |
 |---|---|
 | Homestead walk circuit | 45–90 s |
-| Active cloud descent | No duration target set |
+| Active cloud descent | 30 s from launch to landing (§9) |
 | Gather all six once | 90–180 s |
 | Tame one beast | 20–45 s |
 | Night portal round trip | 6–12 s |
