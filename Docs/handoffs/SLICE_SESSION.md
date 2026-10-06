@@ -1,8 +1,6 @@
 # Slice session (model-agnostic)
 
-Any agent that reads `AGENTS.md` follows this. Do not depend on Cursor rules or `CLAUDE.md`.
-
-Sessions start at `Docs/context/SESSION_START.md`. Use this file only once Luke names a slice job (steer, taste, or test).
+Named door, not a start. The door opens this file when Luke names a slice job (steer, taste, or test). Do not depend on Cursor rules or `CLAUDE.md`.
 
 ## Start
 

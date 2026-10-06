@@ -95,6 +95,9 @@ def main() -> int:
         problems.append("CONTEXT_PACK still gives the old manifest wait as current")
     if "skip a path not on main" in pack:
         problems.append("CONTEXT_PACK still describes the old skip-if-missing read")
+    index = (ROOT / "Docs/context/ROUTE_INDEX.md").read_text(encoding="utf-8") if (ROOT / "Docs/context/ROUTE_INDEX.md").is_file() else ""
+    if re.search(r"\d+\s*m\b", index) or re.search(r"\d+\s*s\b", index):
+        problems.append("ROUTE_INDEX.md copies a number; the sheet owns numbers")
     if problems:
         for p in problems:
             print(f"FAIL  {p}")

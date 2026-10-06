@@ -12,7 +12,7 @@ Lead interview #12, 12A (2026-10-05).
 2. A message that starts with `HANDOFF from HomeWorld Co`, or says `mode: co`, switches the session to Co mode. This works at any point, including in a session that started solo.
 3. The session goes back to solo only when Lead says `mode: solo`.
 4. Each time the mode is set or changes, say so in one line, for example `mode: solo (default)` or `mode: co (handoff header)`.
-5. Only the wording changes between modes. The rules below, the read order, and the checks before any fix (search `docs/KNOWN_ERRORS.md` for the symptom first; the manifest or an actor scan before any change that depends on level data) are the same in both.
+5. Only the wording changes between modes. The rules below, the read order, and the checks before any fix (search `docs/KNOWN_ERRORS.md` for the symptom first; open the manifest named below before any change that depends on level data) are the same in both.
 6. In both modes, name the state (`agent`, `decide`, or `do`) before acting, as `route-context.md` says. These are not Co words.
 
 In solo mode, the wording rule covers what the agent writes, not what it reads. Pack files may use Co words. Read them as written, and use the solo wording below when talking to Luke. Don't write room-style handoffs.
@@ -21,7 +21,7 @@ In solo mode, the wording rule covers what the agent writes, not what it reads. 
 |------------|--------------|
 | Lead's yes | Ask Luke directly for a yes |
 | Test PASS or a Test score | Luke reviews the PR |
-| Conductor's actor scan | Scan the level actors in this session first |
+| Conductor's actor scan | Open the manifest named below. It is the actor scan |
 | Report back to HomeWorld Co | Report to Luke in this chat |
 
 ## Read order
