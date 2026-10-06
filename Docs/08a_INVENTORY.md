@@ -1,5 +1,8 @@
 # Docs/08a_INVENTORY.md — WAVE A Inventory
 
+> Historical inventory. The start door is `Docs/context/SESSION_START.md`. Rows below that say privilege `START_HERE` are the old recommendation.
+
+
 | Field | Value |
 |-------|-------|
 | **Board status** | WAVE A — INVENTORY COMPLETE (awaiting Lead gate) |

@@ -1,3 +1,7 @@
+> Historical. This file does not start a session. Start at `Docs/context/SESSION_START.md`.
+>
+> This 10-task list is the March packaged-build list. Do not pick its first pending task.
+
 # Current task list (10-task)
 
 **Last updated:** 2026-03-02 (seventy-third list — **Assets + Steam Demo Phase 3: Packaged build and smoke test**). **Context:** [ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md](ASSETS_AND_STEAM_DEMO_PHASED_APPROACH.md) Phase 3 — run packaged build, document outcome; smoke test if exe exists.

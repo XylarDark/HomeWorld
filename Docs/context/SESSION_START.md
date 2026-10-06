@@ -48,7 +48,15 @@ Beyond the reads above, the agent opens only files the developer names, the pack
 
 If the opening message already names the task, start it. Otherwise ask one question, in the current conversation, and carry on from the answer.
 
-Other doors are not start reads. Open one only when the developer names it, or when the question turns up evidence it is needed: `Docs/handoffs/DISCOVERY_CONTEXT_ACCEPTANCE.md` for the acceptance check, `Docs/handoffs/CLOUD_GLIDER_ROUTE_CONTINUE.md` for the cloud and glider handoff. Do not open a second context before that yes.
+Other doors are not start reads. Open one only when the developer names it, or when the question turns up evidence it is needed. Do not open a second context before that yes.
+
+| Need | Door |
+|------|------|
+| Swarm command (`APPROVE`, `FALLBACK FLIGHT`, `FIX`) | `START_HERE.md` |
+| Steer, taste, or test | `Docs/handoffs/SLICE_SESSION.md` |
+| Conductor session | `swarm/SWARM_OPS.md` |
+| Acceptance check | `Docs/handoffs/DISCOVERY_CONTEXT_ACCEPTANCE.md` |
+| Cloud and glider handoff | `Docs/handoffs/CLOUD_GLIDER_ROUTE_CONTINUE.md` |
 
 ## Shared development and token rules
 

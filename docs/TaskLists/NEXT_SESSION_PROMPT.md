@@ -1,3 +1,7 @@
+> Historical. This file does not start a session. Start at `Docs/context/SESSION_START.md`.
+>
+> The March automation loop in this prompt is not current work.
+
 # Next session prompt
 
 **Twenty-ninth task list is active (rapid prototyping).** Work on the first **pending** task (T1) from [CURRENT_TASK_LIST.md](CURRENT_TASK_LIST.md). Run 3 of 4 toward polished MVP per [MVP_GAP_ANALYSIS.md](MVP_GAP_ANALYSIS.md).

@@ -1,3 +1,5 @@
+> Lookup index only. The generated list the door names is `Docs/COMMANDS_AND_LOG_TAGS.md`. This file does not start a session.
+
 # HomeWorld – Console commands reference
 
 Reference for all `hw.*` console commands used in PIE testing and automation. Commands need a **play world** (PIE or packaged game) and are cheat commands (`ECVF_Cheat`).

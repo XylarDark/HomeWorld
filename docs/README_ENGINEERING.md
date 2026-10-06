@@ -2,10 +2,7 @@
 
 Setup, conventions, content layout, automation, and operational guides live here. **Vision and task-list content** are in dedicated directories.
 
-**New here?**  
-1. **Get running** — Follow [SETUP.md](SETUP.md) to install the engine, open the project, and set up the MCP bridge.  
-2. **See what to work on** — Open [workflow/README.md](workflow/README.md) and [workflow/30_DAY_SCHEDULE.md](workflow/30_DAY_SCHEDULE.md) (or [TaskLists/CURRENT_TASK_LIST.md](TaskLists/CURRENT_TASK_LIST.md)).  
-3. **Find a guide** — Use the table below to jump to setup, PCG, maps, automation, or Editor steps.
+**New here?** Start at [../Docs/context/SESSION_START.md](../Docs/context/SESSION_START.md). Setup is [SETUP.md](SETUP.md). The 30-day list and `TaskLists/CURRENT_TASK_LIST.md` are historical, not a session start. Use the table below to find a guide.
 
 **Directory structure:** All docs are organized into subdirectories. **Canonical layout:** [DOCS_LAYOUT.md](DOCS_LAYOUT.md). When adding or generating docs, place them in the correct subdirectory per DOCS_LAYOUT. See `.cursor/rules/19-docs-directory-structure.mdc`.
 

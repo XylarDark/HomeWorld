@@ -1,3 +1,7 @@
+> Historical. This file does not start a session. Start at `Docs/context/SESSION_START.md`.
+>
+> WAVE 0 in this prompt is not a start. Swarm commands live in `START_HERE.md`, opened only when the door names that job.
+
 # HOMEWORLD — SINGLE MASTER PROMPT
 ## Entire chat distilled. Attach this file + the project folder. Begin at WAVE 0.
 

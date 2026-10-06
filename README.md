@@ -4,11 +4,11 @@
 
 ---
 
-## Start here (MVP canon)
+Agents start at [Docs/context/SESSION_START.md](Docs/context/SESSION_START.md). The table below is research, not a second start.
 
 | Path | Role |
 |------|------|
-| **[START_HERE.md](START_HERE.md)** | Boot the MVP lookdev swarm (Conductor, phase gates) |
+| **[START_HERE.md](START_HERE.md)** | Swarm commands only, after the door names that job |
 | **[Docs/](Docs/README.md)** | **Signed MVP product canon** — GDD, art bible, export/UE handoff, audit WAVEs |
 | **[swarm/SWARM_OPS.md](swarm/SWARM_OPS.md)** | Swarm process — Human Use, evidence gates |
 | **[AGENTS.md](AGENTS.md)** | Agent / Cursor context (UE 5.7, MCP, build policy) |
