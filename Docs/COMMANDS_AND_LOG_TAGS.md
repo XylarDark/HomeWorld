@@ -8,10 +8,10 @@ Every `hw.*` console command, every runtime log prefix, and every input action, 
 
 | Field | Value |
 |---|---|
-| Extracted from | `Source/` (182 tracked files) and `Config/DefaultInput.ini`, at `e9105e4e9f187575401b455a5c891dfc29fcb8a4` |
+| Extracted from | `Source/` (182 tracked files) and `Config/DefaultInput.ini`, re-greped on this branch after Lead interview #11 3A removed the dawn refill. Base main is `eb22326`; `Source/` is as this PR leaves it. |
 | Pack | `Docs/handoffs/CONTEXT_PACK_V1.md`, bite 4 |
 | Regenerate | re-grep Source after any `hw.*`, log-prefix, or input change and edit this file in the same commit. There is no generator script. |
-| Known pending regeneration | `Source/HomeWorld/HomeWorldResourcePile.cpp:57` (`GATHER: node '%s' replenished at dawn`) and `:111` (`GATHER: node '%s' depleted until dawn`) are queued for removal by Lead interview #11 3A. Both are listed here today because this PR reflects Source as it is now. When that Source change lands, re-grep and drop them from the `GATHER` row's sub-tags, plus `HarvestCooldown` if it appears. Do not hand-edit ahead of it. |
+| Last regeneration | Two passes, both re-greps. Pass 1 (interview #11 3A) dropped `GATHER: node '%s' replenished at dawn` (was `HomeWorldResourcePile.cpp:57`) and reworded `GATHER: node '%s' depleted until dawn` to `GATHER: node '%s' depleted`. Pass 2 made depletion unconditional in `TryHarvest`, retiring the `bDepleteUntilDawn` and `HarvestCooldownSeconds` switches; that edit is below every `GATHER` literal in this file, so no row here moved and no log tag changed. No `HarvestCooldown` tag was ever emitted, so none had to be dropped. |
 | Scope | docs only. No `.uasset`, no `.umap`, no PIE. |
 
 Two things this file cannot know, both stated rather than guessed:
@@ -185,7 +185,7 @@ Four prefixes are produced by a macro rather than written inline. Those are mark
 | `EJECT_HOME` | direct | `HomeWorldFallbackGlideComponent.cpp:225` | `StartGlideHome` skip/fail/`launch→glider→home`, `reached home` | 1 file |
 | `FALLBACK` | macro + direct | `HomeWorldCharacter.cpp:906` | `TryStartFallbackGlide`, plus the `FALLBACK: Portal ` compound from `LOG_PORTAL_FALLBACK` | 3 files |
 | `FORM` | direct | `HomeWorldCharacter.cpp:587` | day verb rejected (sprint/mantle), form switch, `rune gate`, `sleep gate` | 1 file |
-| `GATHER` | direct | `HomeWorld.cpp:184` | grant, blocked, harvest, treasure, pile/yield-node, inventory full/stack full; pile sub-tags `replenished at dawn`, `depleted until dawn` from `HomeWorldResourcePile.cpp:57` and `:111`; `YieldNode '%s' produced` from `HomeWorldYieldNode.cpp:80` | 5 files |
+| `GATHER` | direct | `HomeWorld.cpp:184` | grant, blocked, harvest, treasure, pile/yield-node, inventory full/stack full; pile sub-tags `depleted` and `has no valid site→RES mapping` from `HomeWorldResourcePile.cpp:90` and `:98`; `YieldNode '%s' produced` from `HomeWorldYieldNode.cpp:80` | 5 files |
 | `HEAL` | direct | `HomeWorldCharacter.cpp:1013` | component ready, ability, soft fail/success, night-only guard | 3 files |
 | `HomeWorld:` | direct | `HomeWorld.cpp:39` | the generic prefix. Every `hw.*` command echoes its own name this way, plus subsystem and widget chatter. Cheapest possible smoke grep. | 21 files |
 | `INTERACT` | direct | `HomeWorldCharacter.cpp:2719` | single verb-result line | 1 file |

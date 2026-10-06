@@ -4,7 +4,6 @@
 #include "HomeWorldGatherSiteTypes.h"
 #include "HomeWorldInventorySubsystem.h"
 #include "HomeWorldInventoryTypes.h"
-#include "HomeWorldTimeOfDaySubsystem.h"
 #include "Components/BoxComponent.h"
 #include "Engine/World.h"
 
@@ -26,19 +25,8 @@ void AHomeWorldResourcePile::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 	TickCooldown(DeltaSeconds);
 
-	if (bDepletedUntilDawn)
-	{
-		if (UWorld* World = GetWorld())
-		{
-			if (UHomeWorldTimeOfDaySubsystem* TOD = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>())
-			{
-				if (TOD->GetCurrentPhase() == EHomeWorldTimeOfDayPhase::Day && !TOD->GetIsNight())
-				{
-					OnDawnReset();
-				}
-			}
-		}
-	}
+	// No dawn reset: a depleted node stays depleted for the rest of the session
+	// (interview #11, 3A). Tick still runs because TickCooldown owns the countdown.
 }
 
 void AHomeWorldResourcePile::TickCooldown(float DeltaTime)
@@ -46,15 +34,6 @@ void AHomeWorldResourcePile::TickCooldown(float DeltaTime)
 	if (CooldownRemaining > 0.f)
 	{
 		CooldownRemaining = FMath::Max(0.f, CooldownRemaining - DeltaTime);
-	}
-}
-
-void AHomeWorldResourcePile::OnDawnReset()
-{
-	if (bDepletedUntilDawn)
-	{
-		bDepletedUntilDawn = false;
-		UE_LOG(LogTemp, Verbose, TEXT("GATHER: node '%s' replenished at dawn"), *GetName());
 	}
 }
 
@@ -108,7 +87,7 @@ bool AHomeWorldResourcePile::TryHarvest(UHomeWorldInventorySubsystem* Inventory)
 	{
 		if (bDepletedUntilDawn)
 		{
-			UE_LOG(LogTemp, Log, TEXT("GATHER: node '%s' depleted until dawn"), *GetName());
+			UE_LOG(LogTemp, Log, TEXT("GATHER: node '%s' depleted"), *GetName());
 		}
 		return false;
 	}
@@ -130,14 +109,10 @@ bool AHomeWorldResourcePile::TryHarvest(UHomeWorldInventorySubsystem* Inventory)
 		UE_LOG(LogTemp, Log, TEXT("GATHER: %s (%s)"), *Normalized.ToString(), Flavor);
 	}
 
-	if (bDepleteUntilDawn)
-	{
-		bDepletedUntilDawn = true;
-	}
-	else if (HarvestCooldownSeconds > 0.f)
-	{
-		CooldownRemaining = HarvestCooldownSeconds;
-	}
+	// A successful harvest empties the node for good (interview #11, 3A). Nothing
+	// in Source clears bDepletedUntilDawn, and both deprecated switches
+	// (bDepleteUntilDawn, HarvestCooldownSeconds) are no longer read at all.
+	bDepletedUntilDawn = true;
 
 	return true;
 }

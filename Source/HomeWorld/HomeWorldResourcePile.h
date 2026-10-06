@@ -12,7 +12,7 @@ class UHomeWorldInventorySubsystem;
 
 /**
  * Base actor for gather nodes (world harvest). Blueprint BP_WoodPile etc. inherit.
- * NP-D: +1 gather via TryHarvest; optional cooldown or deplete-until-dawn.
+ * NP-D: +1 gather via TryHarvest. A node emptied once stays empty; nothing refills it.
  */
 // D19-A: non-Abstract so Editor Python can spawn VS_MVP gather markers (BP subclasses still optional for art).
 UCLASS(Blueprintable)
@@ -35,12 +35,19 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Resource", meta = (ClampMin = "1"))
 	int32 AmountPerHarvest = 1;
 
-	/** When true, node cannot be harvested again until dawn (TimeOfDay phase Day). */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Resource")
+	/**
+	 * DEPRECATED (interview #11, 3A). No longer read by any code path. A successful
+	 * harvest always empties the node for the rest of the session, whatever this is
+	 * set to. Kept only so saved levels and Blueprints holding a value still load.
+	 */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Resource", meta = (DeprecatedProperty, DeprecationMessage = "No longer read. A harvested pile always stays empty for the rest of the session. Kept only so existing values still load."))
 	bool bDepleteUntilDawn = true;
 
-	/** When > 0 and bDepleteUntilDawn false, seconds before node can be harvested again. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Resource", meta = (ClampMin = "0.0"))
+	/**
+	 * DEPRECATED (interview #11, 3A). No longer read by any code path. Kept only so
+	 * saved levels and Blueprints holding a value for it still load.
+	 */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Resource", meta = (ClampMin = "0.0", DeprecatedProperty, DeprecationMessage = "No longer read. Harvesting applies no cooldown. Kept only so existing values still load."))
 	float HarvestCooldownSeconds = 0.f;
 
 	/** Try harvest into inventory; returns false when depleted, on cooldown, or inventory full. */
@@ -55,6 +62,7 @@ protected:
 	TObjectPtr<UBoxComponent> OverlapVolume;
 
 private:
+	/** Runtime depletion. Despite the name nothing clears this any more; it means "emptied". */
 	bool bDepletedUntilDawn = false;
 	float CooldownRemaining = 0.f;
 	/** Flowers site: next harvest yields RES_HERB when true (alternate with RES_FIBER / grass). */
@@ -64,5 +72,4 @@ private:
 
 	void TickCooldown(float DeltaTime);
 	virtual void Tick(float DeltaSeconds) override;
-	void OnDawnReset();
 };

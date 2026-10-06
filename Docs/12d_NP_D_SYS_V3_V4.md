@@ -34,7 +34,8 @@
 | Gather +1 | `AmountPerHarvest` default 1 on `AHomeWorldResourcePile` |
 | Fail if full | `TryAddResource` → `GATHER:` log |
 | Day/body only | `TryHarvestInFront` checks night + spirit form |
-| Node deplete until dawn | `bDepleteUntilDawn` on resource pile (default true) |
+| Pile empties and stays empty | always after a successful harvest, whatever any switch says; no dawn refill — GDD:156 |
+| No harvest cooldown | none; `bDepleteUntilDawn` and `HarvestCooldownSeconds` both deprecated and no longer read — GDD:156 |
 | Legacy names | Wood→RES_WOOD, Ore→RES_STONE, Flowers→RES_HERB |
 
 **Console (PIE):**
