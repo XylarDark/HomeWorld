@@ -7,8 +7,9 @@ the agnostic route file handed over with this one, and are not restated here.
 
 ## Tutorial offer
 
-In the do state, the tutorial on offer is the generated one at
-Docs/qa/HUMAN_TUTORIAL.md, kept current by research plus ongoing guidance.
+In the do state, the generated tutorial at Docs/qa/HUMAN_TUTORIAL.md is offered
+only once it is committed and its check passes; until then, name the next
+manual step in one line.
 Not filled further.
 
 ## Update rule

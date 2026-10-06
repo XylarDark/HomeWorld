@@ -2,6 +2,8 @@
 
 Any agent that reads `AGENTS.md` follows this. Do not depend on Cursor rules or `CLAUDE.md`.
 
+Sessions start at `Docs/context/SESSION_START.md`. Use this file only once Luke names a slice job (steer, taste, or test).
+
 ## Start
 
 1. Read the latest `Docs/handoffs/SESSION_HANDOFF_*.md` if one exists for this slice. Do not read the full session log.
