@@ -6,11 +6,12 @@ Sessions start at `Docs/context/SESSION_START.md`. Use this file only once Luke 
 
 ## Start
 
+The door has already been read. Do not read it again, and do not reopen ownership or cycle from here.
+
 1. Read the latest `Docs/handoffs/SESSION_HANDOFF_*.md` if one exists for this slice. Do not read the full session log.
 2. Canon for product scope: `Docs/VISION_BOARD.md`, then `Docs/01_GDD_MVP.md` and `Docs/02_ART_BIBLE.md`.
-3. Follow `docs/human-use/OWNERSHIP.md` and `docs/human-use/CYCLE.md`.
-4. Name the job (steer, taste, or test). Draft the contract from the human's words. Ask with numbered options, then stop. Do not edit until the scenarios are confirmed.
-5. Build with `Tools/Safe-Build.ps1`. A clean log is not done. The human plays the slice and explains it in one minute. Disclose what you wrote and what you did not verify.
+3. Name the job (steer, taste, or test). Draft the contract from the human's words. Ask with numbered options, then stop. Do not edit until the scenarios are confirmed.
+4. Build with `Tools/Safe-Build.ps1`. A clean log is not done. The human plays the slice and explains it in one minute. Disclose what you wrote and what you did not verify.
 
 Shaping does not waive Steer or Test.
 

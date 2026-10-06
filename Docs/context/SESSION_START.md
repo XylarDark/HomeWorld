@@ -28,8 +28,8 @@ In solo mode, the wording rule covers what the agent writes, not what it reads. 
 
 Read one file per step. Start the next read only after the previous one returns.
 
-1. UserHarness/docs/human-use/route-context.md
-2. Docs/context/HOMEWORLD_ROUTE.md
+1. UserHarness/docs/human-use/route-context.md through `## How to detect the state` only. Stop before `## Session close`. The close order lives in this file.
+2. Docs/context/ROUTE_INDEX.md
 3. Docs/WORLD_METRICS.md
 
 These pack files are named here, not read at start. Open one only when the task needs it: `Docs/level/L_VS_MVP_Markers_manifest.json` when the task touches level data (read `counts.actors` and `completeness.verdict` from the file; do not copy them here), and `Docs/COMMANDS_AND_LOG_TAGS.md` (generated, do not hand-edit) when it touches a console command or log tag.
@@ -39,6 +39,7 @@ Extra reads by task, after the pack:
 | Task | Also read |
 |------|-----------|
 | Fix work | Search `docs/KNOWN_ERRORS.md` for the symptom and read only the matching entries, before any other work. To add a new entry (cause, then how to avoid it), open only the format header and the matching `###` section. Never load the whole file to read or to write. If the fix depends on level data, the manifest named above is the actor scan. Open it. If that file is missing, scan the level actors in this session first. |
+| Descent, gather, or fertilizer | Open `Docs/context/HOMEWORLD_ROUTE.md`. The index is the start read. |
 | Route, placeable, merge, or level | Open `Docs/context/LEVEL_RULES.md`. Do not load it at start. |
 | Hand back | Open `Docs/context/HANDBACK.md` only when Lead says `mode: co — hand back`. |
 

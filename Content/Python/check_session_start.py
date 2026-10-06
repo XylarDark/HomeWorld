@@ -16,7 +16,7 @@ PACK = ROOT / "Docs" / "handoffs" / "CONTEXT_PACK_V1.md"
 
 READS = (
     "UserHarness/docs/human-use/route-context.md",
-    "Docs/context/HOMEWORLD_ROUTE.md",
+    "Docs/context/ROUTE_INDEX.md",
     "Docs/WORLD_METRICS.md",
 )
 NAMED = (
@@ -58,8 +58,12 @@ def main() -> int:
     for rel in READS + NAMED:
         if not (ROOT / rel).is_file():
             problems.append(f"named path missing: {rel}")
-        elif rel in READS and rel not in text:
+        elif rel in READS and Path(rel).name not in text and rel not in text:
             problems.append(f"read path not named in the door: {rel}")
+    if "HOMEWORLD_ROUTE.md" not in text:
+        problems.append("door does not name the full route for descent, gather, or fertilizer")
+    if "Stop before `## Session close`" not in text:
+        problems.append("door does not stop the state read before the close section")
     for phrase in MUST_SAY:
         if phrase not in text:
             problems.append(f"door missing required phrase: {phrase}")
