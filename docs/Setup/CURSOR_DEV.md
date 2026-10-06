@@ -24,8 +24,8 @@ Pinned checkout: [UserHarness/](../../UserHarness/) **gitlink** — bumped HR-B2
 
 | Field | Value |
 |-------|-------|
-| **Pinned SHA** | `f7a7346a14b0900442b53b724a138344c82c08a7` |
-| **Pinned SHA (short)** | `f7a7346` — this pin matches the UserHarness gitlink already on main |
+| **Pinned SHA** | `afdcb0fb69ad235b15c7baa32fdf74acf0e12ac0` |
+| **Pinned SHA (short)** | `afdcb0f` — this pin matches the UserHarness gitlink already on main |
 | **Canonical registry** | [Config/userharness-pin.json](../../Config/userharness-pin.json) — CI reads this; update with CURSOR_DEV when bumping pin |
 | **Pin sync policy** | [Docs/handoffs/PIN_SYNC_POLICY.md](../../Docs/handoffs/PIN_SYNC_POLICY.md) — classes D/S/C; bump only from DET `master`; NEVER point gitlink at `main` |
 | **Remote** | `https://github.com/XylarDark/UserHarness.git` |
