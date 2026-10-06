@@ -39,6 +39,8 @@ Extra reads by task, after the pack:
 | Task | Also read |
 |------|-----------|
 | Fix work | Search `docs/KNOWN_ERRORS.md` for the symptom and read only the matching entries, before any other work. To add a new entry (cause, then how to avoid it), open only the format header and the matching `###` section. Never load the whole file to read or to write. If the fix depends on level data, the manifest named above is the actor scan. Open it. If that file is missing, scan the level actors in this session first. |
+| Route, placeable, merge, or level | Open `Docs/context/LEVEL_RULES.md`. Do not load it at start. |
+| Hand back | Open `Docs/context/HANDBACK.md` only when Lead says `mode: co — hand back`. |
 
 Beyond the reads above, the agent opens only files the developer names, the pack file the task needs (named above), or a file `AGENTS.md` requires before an edit (steer-gate before setting feel, scope, or done). It does not open a new chat.
 
@@ -48,30 +50,17 @@ If the opening message already names the task, start it. Otherwise ask one quest
 
 ## Shared development and token rules
 
-These hold for every agent, desktop or room. They live only here. `AGENTS.md` § Session (the ~60k handoff, one significant write at a time, stop on changes you did not make) still applies and is not repeated.
+These hold for every agent, desktop or room. Rules 1–5 live only here. Rules that used to be 6–9 live in `Docs/context/LEVEL_RULES.md` and are not a start read. `AGENTS.md` § Session (the ~60k handoff, one significant write at a time, stop on changes you did not make) still applies and is not repeated.
 
 1. One unknown at a time: one named contract, one change, one run, one score, then stop.
 2. Handoffs are 5 to 10 lines plus paths: goal, paths, pass bar, what blocks it. No transcripts or full gate JSON in chat. Name only the active task (Co: the active bite).
 3. Second fail on the same writer parks for Lead. Do not open another retry.
 4. Build working mechanics first, managers and architecture after.
 5. Before any level option, packet, or fix that touches the level, open the manifest named above. That file is the actor scan. If it is missing, scan the level actors in this session first. Never work from assumed positions.
-6. A route line about movement or space names the axis, the distance, and what is past the edge, and matches the GDD.
-7. A placeable actor needs a scene root and a keep-transform check.
-8. Docs-only work merges after the review passes (Co: Test PASS; solo: Luke reviews the PR). Source or level work (`.umap`, `.uasset`) waits for Lead's yes (solo: Luke's yes) after that.
-9. A route or GDD sentence changes only after Lead says yes to that exact sentence.
 
 ## Handing work back to the room
 
-Lead interview #14, 1A (2026-10-05). To bring work from a desktop session back to HomeWorld Co, Lead says `mode: co — hand back`. The session switches to Co mode (if it isn't already), says `mode: co (hand back)`, and writes one message that starts with `HANDBACK to HomeWorld Co`. Lead pastes that message into the room. It holds, in this order:
-
-1. Main SHA the session last pulled.
-2. Each PR: number, head SHA, merged or open, and what it waits for (Test score or Lead's yes).
-3. Each item from the handoff: expected vs found, one line each. An item not started says `not started`.
-4. Desk checks, only if Lead ran them: expected vs found.
-5. Open questions for Lead, one per line, with no answer guessed.
-6. Anything left uncommitted or unpushed, by path.
-
-No transcripts, full logs, or gate JSON. Paths and SHAs only.
+Lead interview #14, 1A (2026-10-05). To bring work from a desktop session back to HomeWorld Co, Lead says `mode: co — hand back`. The session switches to Co mode (if it isn't already), says `mode: co (hand back)`, and writes one message that starts with `HANDBACK to HomeWorld Co`. Open `Docs/context/HANDBACK.md` for the six fields. Do not inline them here.
 
 ## Session close
 

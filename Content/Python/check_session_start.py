@@ -37,6 +37,12 @@ MUST_NOT = (
     "5caf7be",
     "does not name a bite",
     "Name only the active bite.",
+    "Main SHA the session last pulled",
+    "A placeable actor needs a scene root",
+)
+NAMED_ON_DEMAND = (
+    "Docs/context/HANDBACK.md",
+    "Docs/context/LEVEL_RULES.md",
 )
 
 
@@ -60,6 +66,16 @@ def main() -> int:
     for phrase in MUST_NOT:
         if phrase in text:
             problems.append(f"door still copies a stale phrase: {phrase}")
+    for rel in NAMED_ON_DEMAND:
+        if rel not in text:
+            problems.append(f"door does not name on-demand file: {rel}")
+        path = ROOT / rel
+        if not path.is_file():
+            problems.append(f"on-demand file missing: {rel}")
+        elif rel.endswith("HANDBACK.md") and "Main SHA the session last pulled" not in path.read_text(encoding="utf-8"):
+            problems.append("HANDBACK.md lost the field list")
+        elif rel.endswith("LEVEL_RULES.md") and "A placeable actor needs a scene root" not in path.read_text(encoding="utf-8"):
+            problems.append("LEVEL_RULES.md lost the placeable rule")
     if re.search(r"\(\d+ actors", text):
         problems.append("door copies an actor count")
     for stub in ("Docs/context/DISCOVERY_START.md", "Docs/context/ROUTE_START.md"):
