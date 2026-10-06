@@ -22,6 +22,8 @@ You cannot take responsibility for a change you cannot explain, you cannot see t
 
 ## Session
 
+Start every session from [Docs/context/SESSION_START.md](Docs/context/SESSION_START.md).
+
 Past ~60k tokens, write `Docs/handoffs/SESSION_HANDOFF_<slice>.md` and start a fresh chat from that file plus [docs/SESSION_SUMMARY.md](docs/SESSION_SUMMARY.md). Do not carry the transcript. One significant write at a time. Uncommitted changes you did not make: stop and report.
 
 ## Build

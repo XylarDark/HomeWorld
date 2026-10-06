@@ -22,7 +22,7 @@
 | Sources | Every row has a source cite that matches the file at the merged SHA, or reads `unsourced` | `closed_fail` |
 | Taste placeholders | Every taste value reads `taste placeholder, no lock`; none appears as a plain value | `closed_fail` |
 | `KNOWN_ERRORS` | Fix's two lines are present word for word in `docs/KNOWN_ERRORS.md` | `closed_fail` |
-| Hook | `AGENTS.md` has exactly one new row, pointing to `Docs/WORLD_METRICS.md` | `soft_fail` |
+| Hook | `Docs/WORLD_METRICS.md` exists at the exact path the `SESSION_START.md` task table names | `soft_fail` |
 - Merge: docs only, auto-merge on Test PASS.
 
 ## Bite 2 — Runbook additions (Conductor) — DONE
@@ -43,7 +43,7 @@
 | Stale test, fresh | The automation test passes on a fresh dump | `closed_fail` |
 | Stale test, edited | The automation test fails when one JSON row is hand-edited | `closed_fail` |
 | No traces | The script uses bounds only, with no line traces | `soft_fail` |
-| Hook | The `AGENTS.md` row now also names the manifest path | `soft_fail` |
+| Hook | The manifest exists at the exact path the `SESSION_START.md` task table names | `soft_fail` |
 - Merge: touches Source, needs Lead's yes.
 
 ## Bite 4 — Commands and log-tags index (Implement)
@@ -56,17 +56,17 @@
 |---|---|---|
 | Coverage | A grep of Source for `hw.*` commands and log prefixes finds nothing missing from the file | `closed_fail` |
 | Header | The file starts with "generated — do not hand-edit" | `soft_fail` |
-| Hook | The `AGENTS.md` row now also names `Docs/COMMANDS_AND_LOG_TAGS.md` | `soft_fail` |
+| Hook | `Docs/COMMANDS_AND_LOG_TAGS.md` exists at the exact path the `SESSION_START.md` task table names | `soft_fail` |
 - Merge: touches Source, needs Lead's yes.
 
 ## Deployment — how the pack reaches every session
 
-Lead, Oct 5 2026: avoid double loading, and every desktop IDE agent needs the context.
+Lead, Oct 5 2026 (interview #9, 1A 2A): one start file and one rule set for desktop agents and room seats.
 
-- **One hook for desktop IDE agents.** `AGENTS.md` is the single always-on file for Cursor, OpenCode, and any other desktop IDE agent (no rule is `alwaysApply`). It gets **one** row in its Canon table that lists the pack's files by path: "World numbers, level actors, commands and log tags. Read the one your task needs." Paths only, no content, so nothing is loaded until a task needs it.
-- **The row grows as bites merge.** Bite 1 adds the row with `Docs/WORLD_METRICS.md`. Bites 3 and 4 add their path to the same row. No row points at a file that doesn't exist yet.
-- **No second hook in the start files.** `Docs/context/DISCOVERY_START.md` and `Docs/context/ROUTE_START.md` already run inside a session that loaded `AGENTS.md`, so they get no read line. Their read orders stay unchanged, and discovery still asks one question while route start still stops after the facts.
-- **Box lanes.** HomeWorld Co lanes don't load `AGENTS.md`, so `homeworld-co-ops` gets one line pointing to the same `AGENTS.md` row, not a copy of the paths. Conductor makes that skill edit.
+- **One start door.** `Docs/context/SESSION_START.md` reads discovery, then the route, then the pack path the task needs, from its task table. It ends by asking one question unless the opening message already names the task. `DISCOVERY_START.md` and `ROUTE_START.md` only point to it.
+- **One hook for desktop IDE agents.** `AGENTS.md` gets one line pointing to `Docs/context/SESSION_START.md`, and nothing more. The pack paths are not listed in `AGENTS.md`.
+- **Pack paths live in the task table only.** It names `Docs/WORLD_METRICS.md`, `Docs/level/L_VS_MVP_Markers_manifest.json` and `Docs/COMMANDS_AND_LOG_TAGS.md`, and says to skip a path not on main yet. Bites add no read lines anywhere.
+- **Box lanes.** `homeworld-co-ops` gets one line pointing to `SESSION_START.md` and drops its copies of the shared rules once this PR merges. Conductor makes that skill edit.
 - **OpenCode bite prompts.** Conductor's paste-ready prompts for bites 3 and 4 name the paths up front, because those files don't exist on main yet when the bite starts.
 
 ## Out of scope
