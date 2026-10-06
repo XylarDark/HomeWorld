@@ -27,8 +27,8 @@ One proven cold-clone path: empty `UserHarness/` → submodule init → `doctor:
 | Field | Value |
 |-------|-------|
 | **Registry** | [Config/userharness-pin.json](../Config/userharness-pin.json) |
-| **Full SHA** | `f7a7346a14b0900442b53b724a138344c82c08a7` |
-| **Short SHA** | `f7a7346` |
+| **Full SHA** | `afdcb0fb69ad235b15c7baa32fdf74acf0e12ac0` |
+| **Short SHA** | `afdcb0f` |
 | **Remote** | `https://github.com/XylarDark/UserHarness.git` |
 | **Branch** | `master` |
 
