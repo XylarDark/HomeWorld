@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-04T08:55:00+00:00",
+  "generated": "2026-10-06T14:33:40+00:00",
   "process_doc": "Docs/37_POLISH_PASS_PROCESS.md",
   "verdict": "NOT_READY",
   "gates": {
@@ -18,7 +18,7 @@
           "gate": "G-ENV",
           "requirement": "A placed world exists to size",
           "source": "Content/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.umap",
-          "measured": "87 placed actors in L_VS_MVP_Markers, inline (not World Partition)",
+          "measured": "62 placed actors in L_VS_MVP_Markers, inline (not World Partition)",
           "target": ">=1 placed actor in L_VS_MVP_Markers",
           "state": "PASS",
           "note": "Counted in L_VS_MVP_Markers itself, inline (not World Partition). A World Partition level keeps its actors in Content/__ExternalActors__; a non-World-Partition level keeps them inline, so an external-actor count alone reports 0 for this one.",
@@ -54,10 +54,10 @@
           "gate": "G-ENV",
           "requirement": "Every exported FBX matches the size the manifest recorded",
           "source": "AssetCreation/Exports/MVP_EXPORT_MANIFEST.md",
-          "measured": "0 stale of 23",
-          "target": "0 stale of 23",
+          "measured": "0 stale of 26",
+          "target": "0 stale of 26",
           "state": "PASS",
-          "note": "hint: 23 of 23 FBX predate the .blend save, which is normal and is not counted - one object's edit touches the whole file",
+          "note": "hint: 23 of 26 FBX predate the .blend save, which is normal and is not counted - one object's edit touches the whole file",
           "next_action": "",
           "action_kind": ""
         },
@@ -234,10 +234,10 @@
           "gate": "G-FEEL",
           "requirement": "Every TODO tunable has a measured pre-tune value",
           "source": "Docs/qa/POLISH_BASELINE.json",
-          "measured": "6/6 measured (4 numeric, 2 recorded as absent)",
+          "measured": "6/6 measured (3 numeric, 3 recorded as absent)",
           "target": ">=1 per tunable",
           "state": "PASS",
-          "note": "4 numeric, 2 recorded as absent. Each carries a source. Values are BEFORE state read from source on 2026-10-04, not proposals - no FEEL.md tunable has been chosen, and none of these numbers endorses one.",
+          "note": "3 numeric, 3 recorded as absent. Each carries a source. Values are BEFORE state read from source on 2026-10-04, not proposals - no FEEL.md tunable has been chosen, and none of these numbers endorses one.",
           "next_action": "",
           "action_kind": ""
         },
@@ -258,10 +258,10 @@
           "gate": "G-FEEL",
           "requirement": "Last automation run executed tests against a fresh binary",
           "source": "Saved/automation_run_result.json",
-          "measured": "20 ran, 0 failed",
+          "measured": "4 ran, 0 failed",
           "target": "0 failed",
           "state": "PASS",
-          "note": "dll_stale=False; report counters disagree with report entries (19 vs 20), unexplained",
+          "note": "dll_stale=False; report counters disagree with report entries (3 vs 4), unexplained",
           "next_action": "",
           "action_kind": ""
         }

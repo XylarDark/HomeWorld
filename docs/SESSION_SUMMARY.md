@@ -2047,3 +2047,11 @@ with `git diff --cached --name-status`.
 **Fresh-chat entry point for this slice: `Docs/handoffs/SESSION_HANDOFF_POLISH_GATES.md`.**
 It carries the six editor steps that close the engine gap, the two G-ENV rows that stay RED on
 purpose, the four open Lead decisions, and the repo traps.
+
+
+### 2026-10-06: Cloud descent verification and SESSION_START optimization
+
+Cloud descent C++ automation verified (4/4 PASS); level actors aligned (CloudField at -7500, GP_GlideStart at 150).
+SESSION_START door optimized: WORLD_METRICS moved to on-demand pack reads, question before discovery enforced.
+Prototype FBX meshes registered in MVP_EXPORT_MANIFEST (test_polish_readiness 219/219 PASS).
+Handoff: Docs/handoffs/SESSION_HANDOFF_DESCENT_AND_DOOR.md
