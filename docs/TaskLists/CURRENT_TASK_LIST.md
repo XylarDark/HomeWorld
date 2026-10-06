@@ -1,4 +1,6 @@
-﻿> This is the active task list. Start every session at `Docs/context/SESSION_START.md`.
+> This is the active task list. Start every session at `Docs/context/SESSION_START.md`.
+>
+> This list runs only when the session names it. A chat task wins.
 
 # Current task list (seventy-fourth 10-task list — Polish readiness automation)
 

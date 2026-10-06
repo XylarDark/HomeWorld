@@ -1,5 +1,7 @@
 # Known Errors
 
+Search for the symptom. Do not load this file whole. Read only the matching entry.
+
 Record errors and their fixes here so they are not repeated. See `.cursor/rules/07-ai-agent-behavior.mdc` (Error recurrence prevention) and `05-error-handling.mdc` (Learning from errors).
 
 ## Format — TOKEN-LEAN (Lead, 2026-09-22)

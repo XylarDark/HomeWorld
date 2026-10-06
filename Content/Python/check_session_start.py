@@ -119,6 +119,21 @@ def main() -> int:
         if cited.startswith("Docs/") or cited.startswith("docs/") or cited.startswith("swarm/") or cited == "START_HERE.md":
             if not (ROOT / cited).is_file():
                 problems.append(f"door names a missing file: {cited}")
+    readme = (ROOT / "README.md").read_text(encoding="utf-8") if (ROOT / "README.md").is_file() else ""
+    if "UE 5.7" in readme:
+        problems.append("README.md still says UE 5.7")
+    vision = (ROOT / "VisionBoard/README.md").read_text(encoding="utf-8") if (ROOT / "VisionBoard/README.md").is_file() else ""
+    if "not product canon" not in vision.lower():
+        problems.append("VisionBoard/README.md does not say it is not product canon")
+    console = (ROOT / "docs/CONSOLE_COMMANDS.md").read_text(encoding="utf-8") if (ROOT / "docs/CONSOLE_COMMANDS.md").is_file() else ""
+    if "COMMANDS_AND_LOG_TAGS.md" not in console:
+        problems.append("console index does not point at the generated list")
+    known = (ROOT / "docs/KNOWN_ERRORS.md").read_text(encoding="utf-8") if (ROOT / "docs/KNOWN_ERRORS.md").is_file() else ""
+    if "Do not load this file whole" not in known:
+        problems.append("KNOWN_ERRORS.md does not forbid a full read")
+    tasks = (ROOT / "docs/TaskLists/CURRENT_TASK_LIST.md").read_text(encoding="utf-8") if (ROOT / "docs/TaskLists/CURRENT_TASK_LIST.md").is_file() else ""
+    if "chat task wins" not in tasks:
+        problems.append("task list does not say a chat task wins")
     if problems:
         for p in problems:
             print(f"FAIL  {p}")

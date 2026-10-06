@@ -11,17 +11,17 @@ Agents start at [Docs/context/SESSION_START.md](Docs/context/SESSION_START.md). 
 | **[START_HERE.md](START_HERE.md)** | Swarm commands only, after the door names that job |
 | **[Docs/](Docs/README.md)** | **Signed MVP product canon** — GDD, art bible, export/UE handoff, audit WAVEs |
 | **[swarm/SWARM_OPS.md](swarm/SWARM_OPS.md)** | Swarm process — Human Use, evidence gates |
-| **[AGENTS.md](AGENTS.md)** | Agent / Cursor context (UE 5.7, MCP, build policy) |
+| **[AGENTS.md](AGENTS.md)** | Agent / Cursor context (UE 5.8, MCP, build policy) |
 | **[docs/](docs/README_ENGINEERING.md)** | UE engineering docs — setup, PCG, automation, known errors |
 
 **Quarantine (history only):** [VisionBoard/MVP/](VisionBoard/MVP/README.md) · [docs/Automation/AGENT_COMPANY.md](docs/Automation/AGENT_COMPANY.md)
 
 ---
 
-## Getting started (UE 5.7)
+## Getting started (UE 5.8)
 
 - **Project layout:** Repository root contains `HomeWorld.uproject`, `Source/`, `Config/`, and `Content/`.
-- **Engine:** Unreal Engine 5.7 (recommended).
+- **Engine:** Unreal Engine 5.8.
 - **Clone** this repo, then open `HomeWorld.uproject` in the Editor (first load may compile).
 - **MCP setup:** Run `Setup-MCP.bat` to enable Cursor control of the Editor. Then **`.\Tools\Safe-Build.ps1`**, open the Editor, restart Cursor. See [docs/Setup/MCP_SETUP.md](docs/Setup/MCP_SETUP.md).
 - **Build policy:** Agents use [Safe-Build](docs/Setup/BUILD_POLICY.md) (wraps `Build-HomeWorld.bat`).

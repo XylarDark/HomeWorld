@@ -1,3 +1,5 @@
+> Not product canon. Start at `Docs/context/SESSION_START.md`. Canon is `Docs/01_GDD_MVP.md` and `Docs/02_ART_BIBLE.md`.
+
 # Vision Board
 
 This directory holds **vision, MVP, and world design** for HomeWorld, plus **prompt files** and **encoded key art**. Look law is not restated here.
