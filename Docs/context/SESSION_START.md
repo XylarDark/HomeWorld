@@ -11,14 +11,16 @@ Read one file per step. Start the next read only after the previous one returns.
 1. UserHarness/docs/human-use/route-context.md
 2. Docs/context/HOMEWORLD_ROUTE.md
 3. UserHarness/docs/context/menu.md
-4. The pack path your task needs, from the table below. Skip a path that does not exist on main yet.
+4. Every pack path below that exists on main, in this order. Skip one that is not on main yet.
+   1. `Docs/WORLD_METRICS.md`
+   2. `Docs/level/L_VS_MVP_Markers_manifest.json`
+   3. `Docs/COMMANDS_AND_LOG_TAGS.md`
 
-| Task | Read |
-|------|------|
-| Level work (actors, positions, bounds) | `Docs/level/L_VS_MVP_Markers_manifest.json` |
-| Test or prove work (commands, log tags) | `Docs/COMMANDS_AND_LOG_TAGS.md` |
-| Anything with a number in it | `Docs/WORLD_METRICS.md` |
-| Fix work | `docs/KNOWN_ERRORS.md` first. If the fix depends on level data, also `Docs/level/L_VS_MVP_Markers_manifest.json`; if that is not on main yet, wait for Conductor's actor scan. |
+Extra reads by task, after the pack:
+
+| Task | Also read |
+|------|-----------|
+| Fix work | `docs/KNOWN_ERRORS.md`, before any other work. If the fix depends on level data and the manifest is not on main yet, wait for Conductor's actor scan. |
 
 The developer names any extra files. Only those get read. The agent does not pick files, name a bite, or open a new chat.
 
