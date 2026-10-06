@@ -20,7 +20,7 @@ Advise Lead on a starting cloud size range and a density by height for the cloud
 - Clouds are generated around the homestead, so any jump has more than one spirit-blue cloud to aim for.
 - The name ring means a glide through clouds, in the manner of a WoW ring glide, as an example only. It is not a circle around the island.
 - On the way down you pass through more than one layer. Clouds differ in spacing, size, and height off the ground. You collect as many wisps as you can in that layer, then the field is below.
-- The homestead-to-field window is 15 seconds now. Height is one and a half times the current drop. Neutral glide speed is two thirds. The target window is 33.75 seconds, the 15 second window times those two ratios, if the glide keeps the same shape. Do not write a meter height. A later boost can add a short burst of speed. That boost is not this bite.
+- Stale, do not use: this prompt's 15 second homestead-to-field window and 33.75 second target are not in `Docs/context/HOMEWORLD_ROUTE.md` or `Docs/WORLD_METRICS.md`. The current descent duration is the sheet's 30 s row. The night-flight ratios (one and a half times the drop, two thirds speed) remain route facts. Do not write a meter height.
 - A spirit-blue cloud gives one wisp. The generator sets the share of wisp clouds to clouds that are not wisps. Later mechanics may change that share. They are not this bite.
 - The wisp stays with you until it is mixed with dung at the homestead. You can hold as many wisps as you collect, one per dung.
 - The night spread is a separate flight.
