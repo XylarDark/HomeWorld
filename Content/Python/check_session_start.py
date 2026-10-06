@@ -64,9 +64,20 @@ def main() -> int:
         problems.append("door does not name the full route for descent, gather, or fertilizer")
     if "Stop before `## Session close`" not in text:
         problems.append("door does not stop the state read before the close section")
+    rules = (ROOT / "Docs/context/DOOR_RULES.md").read_text(encoding="utf-8") if (ROOT / "Docs/context/DOOR_RULES.md").is_file() else ""
+    if "DOOR_RULES.md" not in text:
+        problems.append("door does not name DOOR_RULES.md")
+    held = text + "\n" + rules
     for phrase in MUST_SAY:
-        if phrase not in text:
+        if phrase not in held:
             problems.append(f"door missing required phrase: {phrase}")
+    if len(text.splitlines()) > 100:
+        problems.append(f"door is over 100 lines ({len(text.splitlines())})")
+    if re.search(r"^\d+\. .*WORLD_METRICS\.md", text, re.M):
+        problems.append("metrics sheet is in the start read")
+    claude = (ROOT / "CLAUDE.md").read_text(encoding="utf-8") if (ROOT / "CLAUDE.md").is_file() else ""
+    if "@AGENTS.md" not in claude:
+        problems.append("CLAUDE.md does not import AGENTS.md")
     for phrase in MUST_NOT:
         if phrase in text:
             problems.append(f"door still copies a stale phrase: {phrase}")
