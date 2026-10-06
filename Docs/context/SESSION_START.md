@@ -38,7 +38,7 @@ Extra reads by task, after the pack:
 
 | Task | Also read |
 |------|-----------|
-| Fix work | Search `docs/KNOWN_ERRORS.md` for the symptom and read only the matching entries, before any other work. To add a new entry (cause, then how to avoid it), open only the format header and the matching `###` section. Never load the whole file to read or to write. If the fix depends on level data and the manifest is not on main yet, wait for Conductor's actor scan. |
+| Fix work | Search `docs/KNOWN_ERRORS.md` for the symptom and read only the matching entries, before any other work. To add a new entry (cause, then how to avoid it), open only the format header and the matching `###` section. Never load the whole file to read or to write. If the fix depends on level data, open the manifest named above. If that file is missing, scan the level actors in this session first. |
 
 Beyond the reads above, the agent opens only files the developer names, the pack file the task needs (named above), or a file `AGENTS.md` requires before an edit (steer-gate before setting feel, scope, or done). It does not name a bite or open a new chat.
 
@@ -68,7 +68,7 @@ Lead interview #14, 1A (2026-10-05). To bring work from a desktop session back t
 2. Each PR: number, head SHA, merged or open, and what it waits for (Test score or Lead's yes).
 3. Each item from the handoff: expected vs found, one line each. An item not started says `not started`.
 4. Desk checks, only if Lead ran them: expected vs found.
-5. Open questions for Lead, one per line, with no answer guessed.
+5. Open questions for Lead, one line each, with no answer guessed.
 6. Anything left uncommitted or unpushed, by path.
 
 No transcripts, full logs, or gate JSON. Paths and SHAs only.
@@ -83,8 +83,6 @@ Do not stop the moment the current task is done. Close in this order, and do not
 
 No tutorial is on offer yet. Offer `Docs/qa/HUMAN_TUTORIAL.md` only once it is committed and `Content/Python/human_tutorial.py --check` exits 0. Until then, step 3 names the next manual step in one line.
 
-This file is the HomeWorld copy of the start and close rules in `route-context.md`. There is one start door now; where the two differ, this one wins.
-
-Until the UserHarness pin includes UH `main` at or after `5caf7be`, which carries the close-rule paragraph, the Session close section here is the only close contract; the pinned `route-context.md` may not have it.
+This file is the HomeWorld copy of the start and close rules in `route-context.md`. There is one start door now; where the two differ, this one wins. The pinned `route-context.md` (`afdcb0f`) already has the close section. Do not wait on another UserHarness SHA for it.
 
 If an unrelated second task appears, alert and stop.

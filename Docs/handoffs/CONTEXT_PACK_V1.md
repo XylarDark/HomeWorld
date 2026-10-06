@@ -65,7 +65,7 @@ Lead, Oct 5 2026 (interview #9, 1A 2A): one start file and one rule set for desk
 
 - **One start door.** `Docs/context/SESSION_START.md` reads route-context, then the route, then `Docs/WORLD_METRICS.md`, and names the other pack files to open only when the task needs them (Lead interview #18, 18A). It ends by asking one question unless the opening message already names the task. `DISCOVERY_START.md` and `ROUTE_START.md` only point to it.
 - **One hook for desktop IDE agents.** `AGENTS.md` gets one line pointing to `Docs/context/SESSION_START.md`, and nothing more. The pack paths are not listed in `AGENTS.md`.
-- **Pack paths live in the read list only.** It names `Docs/WORLD_METRICS.md`, `Docs/level/L_VS_MVP_Markers_manifest.json` and `Docs/COMMANDS_AND_LOG_TAGS.md`, and says to skip a path not on main yet. A task table adds extras only (Fix reads `docs/KNOWN_ERRORS.md`). Bites add no read lines anywhere.
+- **Pack paths.** The door reads `Docs/WORLD_METRICS.md`. It names `Docs/level/L_VS_MVP_Markers_manifest.json` and `Docs/COMMANDS_AND_LOG_TAGS.md` and opens each only when the task needs it. Fix work searches `docs/KNOWN_ERRORS.md` for the symptom and reads the matching entries. Bites add no read lines anywhere.
 - **Box lanes.** `homeworld-co-ops` gets one line pointing to `SESSION_START.md` and drops its copies of the shared rules once this PR merges. Conductor makes that skill edit.
 - **OpenCode bite prompts.** Conductor's paste-ready prompts for bites 3 and 4 name the paths up front, because those files don't exist on main yet when the bite starts.
 
