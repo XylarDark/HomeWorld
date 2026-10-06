@@ -36,7 +36,7 @@ state is not that writer.
 - Taming for now is one small barn that holds one big bull, and the fur is what that bull sheds.
 - Gathering a pile takes one from a pool of piles. There is no cooldown.
 - The stage name stays polish.
-- An agent decision is never settled by what the developer seems to want: name the limitation, give the real options without pre-marking a default, say plainly when the evidence points against the choice in front of you, and ask a decision with the question tool rather than as prose.
+- An agent decision is never settled by what the developer seems to want: name the limitation, give the real options with one recommended pick marked, say plainly when the evidence points against the choice in front of you, and ask a decision with the question tool rather than as prose.
 - One dung and one wisp make one spirit fertilizer.
 - It is mixed at the homestead, the spirit spreads it at night, and in the morning one herb pile appears per dung, at random in the field.
 - Dawn alone does not bring a pile back.
