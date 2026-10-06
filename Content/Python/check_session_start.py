@@ -113,6 +113,12 @@ def main() -> int:
     index = (ROOT / "Docs/context/ROUTE_INDEX.md").read_text(encoding="utf-8") if (ROOT / "Docs/context/ROUTE_INDEX.md").is_file() else ""
     if re.search(r"\d+\s*m\b", index) or re.search(r"\d+\s*s\b", index):
         problems.append("ROUTE_INDEX.md copies a number; the sheet owns numbers")
+    for cited in re.findall(r"`([^`]+\.md)`", text):
+        if cited in ("route-context.md", "Docs/qa/HUMAN_TUTORIAL.md"):
+            continue
+        if cited.startswith("Docs/") or cited.startswith("docs/") or cited.startswith("swarm/") or cited == "START_HERE.md":
+            if not (ROOT / cited).is_file():
+                problems.append(f"door names a missing file: {cited}")
     if problems:
         for p in problems:
             print(f"FAIL  {p}")
