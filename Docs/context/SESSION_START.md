@@ -61,6 +61,19 @@ These hold for every agent, desktop or room. They live only here. `AGENTS.md` §
 8. Docs-only work merges after Test PASS. Source or level work (`.umap`, `.uasset`) waits for a Lead yes after Test PASS.
 9. A route or GDD sentence changes only after Lead says yes to that exact sentence.
 
+## Handing work back to the room
+
+Lead interview #14, 1A (2026-10-05). To bring work from a desktop session back to HomeWorld Co, Lead says `mode: co — hand back`. The session switches to Co mode (if it isn't already), says `mode: co (hand back)`, and writes one message that starts with `HANDBACK to HomeWorld Co`. Lead pastes that message into the room. It holds, in this order:
+
+1. Main SHA the session last pulled.
+2. Each PR: number, head SHA, merged or open, and what it waits for (Test score or Lead's yes).
+3. Each item from the handoff: expected vs found, one line each. An item not started says `not started`.
+4. Desk checks, only if Lead ran them: expected vs found.
+5. Open questions for Lead, one per line, with no answer guessed.
+6. Anything left uncommitted or unpushed, by path.
+
+No transcripts, full logs, or gate JSON. Paths and SHAs only.
+
 ## Session close
 
 Do not stop the moment the current task is done. Close in this order, and do not reach a later step while an earlier one still has work in it.
