@@ -42,7 +42,7 @@ Other doors are not start reads. Open one only when the developer names it, or w
 | Conductor session | `swarm/SWARM_OPS.md` |
 | Acceptance check | `Docs/handoffs/DISCOVERY_CONTEXT_ACCEPTANCE.md` |
 | Cloud and glider handoff | `Docs/handoffs/CLOUD_GLIDER_ROUTE_CONTINUE.md` |
-| Polish asset board | `docs/qa/POLISH_ASSET_BOARD_HOW_TO.md` |
+| Polish asset board | `Docs/qa/POLISH_ASSET_BOARD_HOW_TO.md` |
 
 ## Session close
 
