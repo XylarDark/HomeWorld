@@ -284,9 +284,10 @@ bool FCloudFieldAutomationTest::RunTest(const FString& Parameters)
 		return false;
 	}
 
+	const FVector SpawnLocation(750.0, 450.0, -7350.0);
 	FActorSpawnParameters Params;
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	AHomeWorldCloudField* Field = Scope.World->SpawnActor<AHomeWorldCloudField>(FVector::ZeroVector, FRotator::ZeroRotator, Params);
+	AHomeWorldCloudField* Field = Scope.World->SpawnActor<AHomeWorldCloudField>(SpawnLocation, FRotator::ZeroRotator, Params);
 	if (!TestNotNull(TEXT("cloud field"), Field))
 	{
 		return false;
@@ -294,6 +295,7 @@ bool FCloudFieldAutomationTest::RunTest(const FString& Parameters)
 
 	Field->BuildClouds();
 
+	TestTrue(TEXT("field keeps placed transform"), Field->GetActorLocation().Equals(SpawnLocation, 1.0));
 	TestTrue(TEXT("field builds at least 2 layers"), Field->GetLayerCount() >= 2);
 	const TArray<AHomeWorldCloud*>& Clouds = Field->GetSpawnedClouds();
 	TestTrue(TEXT("field builds at least 2 clouds"), Clouds.Num() >= 2);
@@ -336,6 +338,8 @@ bool FCloudFieldAutomationTest::RunTest(const FString& Parameters)
 	TestTrue(TEXT("every diameter is within 6-24 m"), bAllDiametersInBand);
 	TestTrue(TEXT("every cloud sits entirely between 25 m and 75 m above ground"), bAllCloudsInsideBand);
 	TestTrue(TEXT("lowest cloud bottom is 25 m above ground"), FMath::Abs(LowestBottom - 2500.0) < 1.0);
+	TestTrue(TEXT("lowest cloud bottom sits 2500 cm above the field's placed Z"),
+		FMath::Abs((Field->GetActorLocation().Z + LowestBottom) - (SpawnLocation.Z + 2500.0)) < 1.0);
 	TestTrue(TEXT("at least one wisp sits on a cloud"), WispCount >= 1);
 	TestTrue(TEXT("no cloud blocks the player pawn (overlap only)"), bNoneBlock);
 

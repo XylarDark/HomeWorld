@@ -2,12 +2,17 @@
 
 #include "HomeWorldCloudField.h"
 
+#include "Components/SceneComponent.h"
 #include "HomeWorldCloud.h"
 #include "HomeWorldCloudWisp.h"
 
 AHomeWorldCloudField::AHomeWorldCloudField()
 {
 	PrimaryActorTick.bCanEverTick = false;
+
+	USceneComponent* Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	Root->SetMobility(EComponentMobility::Movable);
+	SetRootComponent(Root);
 }
 
 void AHomeWorldCloudField::BeginPlay()
