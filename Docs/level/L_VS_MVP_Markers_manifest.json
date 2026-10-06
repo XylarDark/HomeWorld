@@ -1,0 +1,3910 @@
+{
+  "schema": "homeworld.level_manifest.v1",
+  "generator": "Content/Python/level_manifest.py",
+  "level": {
+    "name": "L_VS_MVP_Markers",
+    "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers",
+    "units": "centimetres",
+    "rounding_decimals": 1,
+    "world_partition": "unknown",
+    "world_partition_bounds": null,
+    "world_partition_probe": [
+      "get_editor_world_bounds(world): signature mismatch (get_editor_world_bounds() takes no arguments (1 given))",
+      "get_editor_world_bounds(): zero-extent box, no loaded WP data",
+      "get_runtime_world_bounds(world): signature mismatch (get_runtime_world_bounds() takes no arguments (1 given))"
+    ],
+    "external_actor_files": 0,
+    "external_actor_dir_exists": false
+  },
+  "completeness": {
+    "actors_enumerated": 103,
+    "external_actor_files": 0,
+    "verdict": "complete: the level has no external actor files, so every actor is inline in the .umap and an inline enumeration cannot have missed a cell"
+  },
+  "rules": {
+    "bounds_source": "Actor.get_actor_bounds(False) - actor bounds, not traces",
+    "under": "labels whose bounds box contains this actor's location point on all three axes",
+    "spanning_containers_excluded": "a container whose XY footprint holds 80% or more of the positioned actors is level-spanning (ground plate, landscape) rather than 'under it'; every such label is named in spanning_containers_excluded so nothing is hidden",
+    "zero_extent_actors": "recorded with null bounds and excluded from containment",
+    "container_coverage": "fraction of positioned actors whose XY position falls inside this actor's footprint"
+  },
+  "level_bounds": {
+    "min": {
+      "x": -59250.0,
+      "y": -59550.0,
+      "z": -17000.0
+    },
+    "max": {
+      "x": 60750.0,
+      "y": 26450.0,
+      "z": 807.5
+    }
+  },
+  "counts": {
+    "actors": 103,
+    "actors_with_bounds": 85,
+    "actors_without_bounds": 18,
+    "classes": 11,
+    "positioned": 103
+  },
+  "spanning_containers_excluded": [
+    "DRESS_SM_Planet_GroundPlate"
+  ],
+  "class_counts": [
+    {
+      "class": "CameraActor",
+      "count": 5
+    },
+    {
+      "class": "HomeWorldBeastPad",
+      "count": 1
+    },
+    {
+      "class": "HomeWorldCampActor",
+      "count": 4
+    },
+    {
+      "class": "HomeWorldCloudField",
+      "count": 1
+    },
+    {
+      "class": "HomeWorldNurtureTarget",
+      "count": 2
+    },
+    {
+      "class": "HomeWorldShrinePortalTrigger",
+      "count": 2
+    },
+    {
+      "class": "HomeWorldSpiritWisp",
+      "count": 3
+    },
+    {
+      "class": "HomeWorldStoreProp",
+      "count": 6
+    },
+    {
+      "class": "PlayerStart",
+      "count": 1
+    },
+    {
+      "class": "StaticMeshActor",
+      "count": 53
+    },
+    {
+      "class": "TargetPoint",
+      "count": 25
+    }
+  ],
+  "actors": [
+    {
+      "label": "CAM_CabinClose",
+      "name": "CameraActor_5",
+      "class": "CameraActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": -50.0,
+        "y": 750.0,
+        "z": 280.0
+      },
+      "bounds": null,
+      "container_coverage": 0.0,
+      "under": []
+    },
+    {
+      "label": "CAM_GlideDepart",
+      "name": "CameraActor_6",
+      "class": "CameraActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 850.0,
+        "y": 650.0,
+        "z": 350.0
+      },
+      "bounds": null,
+      "container_coverage": 0.0,
+      "under": []
+    },
+    {
+      "label": "CAM_Hero",
+      "name": "CameraActor_7",
+      "class": "CameraActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": -900.0,
+        "y": 400.0,
+        "z": 580.0
+      },
+      "bounds": null,
+      "container_coverage": 0.0,
+      "under": []
+    },
+    {
+      "label": "CAM_LandingDay",
+      "name": "CameraActor_8",
+      "class": "CameraActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": -600.0,
+        "y": 6200.0,
+        "z": -7000.0
+      },
+      "bounds": null,
+      "container_coverage": 0.0,
+      "under": []
+    },
+    {
+      "label": "CAM_PortalNight",
+      "name": "CameraActor_9",
+      "class": "CameraActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": -200.0,
+        "y": -20.0,
+        "z": 170.0
+      },
+      "bounds": null,
+      "container_coverage": 0.0,
+      "under": []
+    },
+    {
+      "label": "GP_BeastPad",
+      "name": "HomeWorldBeastPad_0",
+      "class": "HomeWorldBeastPad",
+      "blueprint": "/Script/HomeWorld",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [
+        "BeastPad",
+        "SM_BeastPad_01"
+      ],
+      "location": {
+        "x": 200.0,
+        "y": 7150.0,
+        "z": -7450.0
+      },
+      "bounds": null,
+      "container_coverage": 0.0,
+      "under": []
+    },
+    {
+      "label": "NODE_CAPTIVE",
+      "name": "HomeWorldCampActor_3",
+      "class": "HomeWorldCampActor",
+      "blueprint": "/Script/HomeWorld",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [
+        "NODE_CAPTIVE",
+        "NODE_SLEEPER"
+      ],
+      "location": {
+        "x": 20.0,
+        "y": -76.0,
+        "z": -95.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 123.0,
+          "y": -76.0,
+          "z": -69.0
+        },
+        "extent": {
+          "x": 137.0,
+          "y": 150.0,
+          "z": 114.0
+        },
+        "min": {
+          "x": -14.0,
+          "y": -226.0,
+          "z": -183.0
+        },
+        "max": {
+          "x": 260.0,
+          "y": 74.0,
+          "z": 45.0
+        },
+        "volume": 18741600.0
+      },
+      "container_coverage": 0.068,
+      "under": [
+        "NODE_GUARD",
+        "NODE_SLEEPER_A",
+        "NODE_SLEEPER_B"
+      ]
+    },
+    {
+      "label": "NODE_GUARD",
+      "name": "HomeWorldCampActor_0",
+      "class": "HomeWorldCampActor",
+      "blueprint": "/Script/HomeWorld",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [
+        "NODE_GUARD",
+        "NODE_SLEEPER"
+      ],
+      "location": {
+        "x": 23.0,
+        "y": -82.0,
+        "z": -93.2
+      },
+      "bounds": {
+        "origin": {
+          "x": 126.0,
+          "y": -82.0,
+          "z": -67.2
+        },
+        "extent": {
+          "x": 137.0,
+          "y": 83.1,
+          "z": 114.0
+        },
+        "min": {
+          "x": -11.0,
+          "y": -165.1,
+          "z": -181.2
+        },
+        "max": {
+          "x": 263.0,
+          "y": 1.1,
+          "z": 46.8
+        },
+        "volume": 10382846.399999999
+      },
+      "container_coverage": 0.068,
+      "under": [
+        "NODE_CAPTIVE",
+        "NODE_SLEEPER_A",
+        "NODE_SLEEPER_B"
+      ]
+    },
+    {
+      "label": "NODE_SLEEPER_A",
+      "name": "HomeWorldCampActor_1",
+      "class": "HomeWorldCampActor",
+      "blueprint": "/Script/HomeWorld",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [
+        "NODE_SLEEPER"
+      ],
+      "location": {
+        "x": 17.5,
+        "y": -78.0,
+        "z": -95.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 120.5,
+          "y": -78.0,
+          "z": -69.0
+        },
+        "extent": {
+          "x": 137.0,
+          "y": 103.8,
+          "z": 114.0
+        },
+        "min": {
+          "x": -16.5,
+          "y": -181.8,
+          "z": -183.0
+        },
+        "max": {
+          "x": 257.5,
+          "y": 25.8,
+          "z": 45.0
+        },
+        "volume": 12969187.200000001
+      },
+      "container_coverage": 0.068,
+      "under": [
+        "NODE_CAPTIVE",
+        "NODE_GUARD",
+        "NODE_SLEEPER_B"
+      ]
+    },
+    {
+      "label": "NODE_SLEEPER_B",
+      "name": "HomeWorldCampActor_2",
+      "class": "HomeWorldCampActor",
+      "blueprint": "/Script/HomeWorld",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [
+        "NODE_SLEEPER"
+      ],
+      "location": {
+        "x": 17.5,
+        "y": -76.8,
+        "z": -95.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 120.5,
+          "y": -76.8,
+          "z": -69.0
+        },
+        "extent": {
+          "x": 137.0,
+          "y": 103.8,
+          "z": 114.0
+        },
+        "min": {
+          "x": -16.5,
+          "y": -180.6,
+          "z": -183.0
+        },
+        "max": {
+          "x": 257.5,
+          "y": 27.0,
+          "z": 45.0
+        },
+        "volume": 12969187.200000001
+      },
+      "container_coverage": 0.068,
+      "under": [
+        "NODE_CAPTIVE",
+        "NODE_GUARD",
+        "NODE_SLEEPER_A"
+      ]
+    },
+    {
+      "label": "CloudField_Descent",
+      "name": "HomeWorldCloudField_0",
+      "class": "HomeWorldCloudField",
+      "blueprint": "/Script/HomeWorld",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 750.0,
+        "y": 450.0,
+        "z": -7500.0
+      },
+      "bounds": null,
+      "container_coverage": 0.0,
+      "under": []
+    },
+    {
+      "label": "GP_N1_Crop",
+      "name": "HomeWorldNurtureTarget_0",
+      "class": "HomeWorldNurtureTarget",
+      "blueprint": "/Script/HomeWorld",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [
+        "NurtureTarget"
+      ],
+      "location": {
+        "x": -200.0,
+        "y": -350.0,
+        "z": 100.0
+      },
+      "bounds": null,
+      "container_coverage": 0.0,
+      "under": [
+        "GP_PortalA",
+        "PROTO_SM_Portal_Prototype",
+        "VS_MARKER_PortalHome"
+      ]
+    },
+    {
+      "label": "GP_N2_Stored",
+      "name": "HomeWorldNurtureTarget_1",
+      "class": "HomeWorldNurtureTarget",
+      "blueprint": "/Script/HomeWorld",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [
+        "NurtureTarget"
+      ],
+      "location": {
+        "x": -650.0,
+        "y": 150.0,
+        "z": 100.0
+      },
+      "bounds": null,
+      "container_coverage": 0.0,
+      "under": [
+        "PROTO_SM_Cabin_Prototype"
+      ]
+    },
+    {
+      "label": "GP_PortalA",
+      "name": "HomeWorldShrinePortalTrigger_0",
+      "class": "HomeWorldShrinePortalTrigger",
+      "blueprint": "/Script/HomeWorld",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": -200.0,
+        "y": -350.0,
+        "z": 0.0
+      },
+      "bounds": {
+        "origin": {
+          "x": -200.0,
+          "y": -350.0,
+          "z": 0.0
+        },
+        "extent": {
+          "x": 120.0,
+          "y": 120.0,
+          "z": 150.0
+        },
+        "min": {
+          "x": -320.0,
+          "y": -470.0,
+          "z": -150.0
+        },
+        "max": {
+          "x": -80.0,
+          "y": -230.0,
+          "z": 150.0
+        },
+        "volume": 17280000.0
+      },
+      "container_coverage": 0.0485,
+      "under": [
+        "ANCHOR_SM_Shrine_Homestead",
+        "DRESS_SM_IslandTop",
+        "PROTO_SM_Portal_Prototype"
+      ]
+    },
+    {
+      "label": "GP_PortalB",
+      "name": "HomeWorldShrinePortalTrigger_1",
+      "class": "HomeWorldShrinePortalTrigger",
+      "blueprint": "/Script/HomeWorld",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 600.0,
+        "y": 7500.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 600.0,
+          "y": 7500.0,
+          "z": -7500.0
+        },
+        "extent": {
+          "x": 120.0,
+          "y": 120.0,
+          "z": 150.0
+        },
+        "min": {
+          "x": 480.0,
+          "y": 7380.0,
+          "z": -7650.0
+        },
+        "max": {
+          "x": 720.0,
+          "y": 7620.0,
+          "z": -7350.0
+        },
+        "volume": 17280000.0
+      },
+      "container_coverage": 0.1068,
+      "under": [
+        "ANCHOR_SM_Shrine_Return"
+      ]
+    },
+    {
+      "label": "GP_SpiritWisp_A",
+      "name": "HomeWorldSpiritWisp_0",
+      "class": "HomeWorldSpiritWisp",
+      "blueprint": "/Script/HomeWorld",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [
+        "SM_SpiritWound_01",
+        "SpiritWound"
+      ],
+      "location": {
+        "x": -400.0,
+        "y": 11500.0,
+        "z": -7500.0
+      },
+      "bounds": null,
+      "container_coverage": 0.0,
+      "under": []
+    },
+    {
+      "label": "GP_SpiritWisp_B",
+      "name": "HomeWorldSpiritWisp_1",
+      "class": "HomeWorldSpiritWisp",
+      "blueprint": "/Script/HomeWorld",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [
+        "SM_SpiritWound_01",
+        "SpiritWound"
+      ],
+      "location": {
+        "x": -300.0,
+        "y": 11550.0,
+        "z": -7500.0
+      },
+      "bounds": null,
+      "container_coverage": 0.0,
+      "under": []
+    },
+    {
+      "label": "GP_SpiritWisp_C",
+      "name": "HomeWorldSpiritWisp_2",
+      "class": "HomeWorldSpiritWisp",
+      "blueprint": "/Script/HomeWorld",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [
+        "SM_SpiritWound_01",
+        "SpiritWound"
+      ],
+      "location": {
+        "x": -500.0,
+        "y": 11580.0,
+        "z": -7500.0
+      },
+      "bounds": null,
+      "container_coverage": 0.0,
+      "under": []
+    },
+    {
+      "label": "GP_Store_BERRY",
+      "name": "HomeWorldStoreProp_3",
+      "class": "HomeWorldStoreProp",
+      "blueprint": "/Script/HomeWorld",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [
+        "StoreProp"
+      ],
+      "location": {
+        "x": -750.0,
+        "y": 200.0,
+        "z": 100.0
+      },
+      "bounds": null,
+      "container_coverage": 0.0,
+      "under": [
+        "PROTO_SM_Cabin_Prototype"
+      ]
+    },
+    {
+      "label": "GP_Store_FIBER",
+      "name": "HomeWorldStoreProp_1",
+      "class": "HomeWorldStoreProp",
+      "blueprint": "/Script/HomeWorld",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [
+        "StoreProp"
+      ],
+      "location": {
+        "x": -800.0,
+        "y": 50.0,
+        "z": 100.0
+      },
+      "bounds": null,
+      "container_coverage": 0.0,
+      "under": [
+        "PROTO_SM_Cabin_CornerPosts",
+        "PROTO_SM_Cabin_Prototype"
+      ]
+    },
+    {
+      "label": "GP_Store_HERB",
+      "name": "HomeWorldStoreProp_4",
+      "class": "HomeWorldStoreProp",
+      "blueprint": "/Script/HomeWorld",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [
+        "StoreProp"
+      ],
+      "location": {
+        "x": -800.0,
+        "y": 250.0,
+        "z": 100.0
+      },
+      "bounds": null,
+      "container_coverage": 0.0,
+      "under": [
+        "PROTO_SM_Cabin_Prototype"
+      ]
+    },
+    {
+      "label": "GP_Store_SEED",
+      "name": "HomeWorldStoreProp_5",
+      "class": "HomeWorldStoreProp",
+      "blueprint": "/Script/HomeWorld",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [
+        "StoreProp"
+      ],
+      "location": {
+        "x": -850.0,
+        "y": 300.0,
+        "z": 100.0
+      },
+      "bounds": null,
+      "container_coverage": 0.0,
+      "under": []
+    },
+    {
+      "label": "GP_Store_STONE",
+      "name": "HomeWorldStoreProp_2",
+      "class": "HomeWorldStoreProp",
+      "blueprint": "/Script/HomeWorld",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [
+        "StoreProp"
+      ],
+      "location": {
+        "x": -850.0,
+        "y": 0.0,
+        "z": 100.0
+      },
+      "bounds": null,
+      "container_coverage": 0.0,
+      "under": [
+        "PROTO_SM_Cabin_CornerPosts"
+      ]
+    },
+    {
+      "label": "GP_Store_WOOD",
+      "name": "HomeWorldStoreProp_0",
+      "class": "HomeWorldStoreProp",
+      "blueprint": "/Script/HomeWorld",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [
+        "StoreProp"
+      ],
+      "location": {
+        "x": -750.0,
+        "y": 100.0,
+        "z": 100.0
+      },
+      "bounds": null,
+      "container_coverage": 0.0,
+      "under": [
+        "PROTO_SM_Cabin_CornerPosts",
+        "PROTO_SM_Cabin_Prototype"
+      ]
+    },
+    {
+      "label": "PlayerStart_VS_MVP",
+      "name": "PlayerStart_0",
+      "class": "PlayerStart",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": -240.0,
+        "y": -120.0,
+        "z": 100.0
+      },
+      "bounds": {
+        "origin": {
+          "x": -240.0,
+          "y": -120.0,
+          "z": 200.0
+        },
+        "extent": {
+          "x": 92.0,
+          "y": 80.0,
+          "z": 140.0
+        },
+        "min": {
+          "x": -332.0,
+          "y": -200.0,
+          "z": 60.0
+        },
+        "max": {
+          "x": -148.0,
+          "y": -40.0,
+          "z": 340.0
+        },
+        "volume": 8243200.0
+      },
+      "container_coverage": 0.0194,
+      "under": [
+        "GP_PlayerStart"
+      ]
+    },
+    {
+      "label": "DRESS_SM_Glider_Perch",
+      "name": "StaticMeshActor_96",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 750.0,
+        "y": 450.0,
+        "z": 0.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 1500.0,
+          "y": 900.0,
+          "z": 25.0
+        },
+        "extent": {
+          "x": 100.0,
+          "y": 75.0,
+          "z": 25.0
+        },
+        "min": {
+          "x": 1400.0,
+          "y": 825.0,
+          "z": 0.0
+        },
+        "max": {
+          "x": 1600.0,
+          "y": 975.0,
+          "z": 50.0
+        },
+        "volume": 1500000.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "ANCHOR_SM_Glider_Perch",
+        "DRESS_SM_IslandTop",
+        "VS_MARKER_LeaveIsland_FALLBACK"
+      ]
+    },
+    {
+      "label": "DRESS_SM_IslandTop",
+      "name": "StaticMeshActor_74",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "bounds": {
+        "origin": {
+          "x": -15.0,
+          "y": 15.0,
+          "z": -22.5
+        },
+        "extent": {
+          "x": 965.0,
+          "y": 535.0,
+          "z": 22.5
+        },
+        "min": {
+          "x": -980.0,
+          "y": -520.0,
+          "z": -45.0
+        },
+        "max": {
+          "x": 950.0,
+          "y": 550.0,
+          "z": 0.0
+        },
+        "volume": 92929500.0
+      },
+      "container_coverage": 0.3981,
+      "under": [
+        "ANCHOR_SM_IslandTop",
+        "CRUMB_GlideSpline",
+        "NODE_CAPTIVE",
+        "NODE_GUARD",
+        "NODE_SLEEPER_A",
+        "NODE_SLEEPER_B"
+      ]
+    },
+    {
+      "label": "DRESS_SM_Islet_01_Body",
+      "name": "StaticMeshActor_124",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 600.0,
+        "y": 1800.0,
+        "z": -2300.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 1200.0,
+          "y": 3600.0,
+          "z": -4777.5
+        },
+        "extent": {
+          "x": 150.0,
+          "y": 125.0,
+          "z": 75.0
+        },
+        "min": {
+          "x": 1050.0,
+          "y": 3475.0,
+          "z": -4852.5
+        },
+        "max": {
+          "x": 1350.0,
+          "y": 3725.0,
+          "z": -4702.5
+        },
+        "volume": 11250000.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "CRUMB_Islet_01"
+      ]
+    },
+    {
+      "label": "DRESS_SM_Islet_01_Top",
+      "name": "StaticMeshActor_125",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 600.0,
+        "y": 1800.0,
+        "z": -2300.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 1200.0,
+          "y": 3600.0,
+          "z": -4711.5
+        },
+        "extent": {
+          "x": 127.5,
+          "y": 100.0,
+          "z": 6.0
+        },
+        "min": {
+          "x": 1072.5,
+          "y": 3500.0,
+          "z": -4717.5
+        },
+        "max": {
+          "x": 1327.5,
+          "y": 3700.0,
+          "z": -4705.5
+        },
+        "volume": 612000.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "CRUMB_Islet_01"
+      ]
+    },
+    {
+      "label": "DRESS_SM_Islet_01_Torn",
+      "name": "StaticMeshActor_126",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 600.0,
+        "y": 1800.0,
+        "z": -2300.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 1245.0,
+          "y": 3625.0,
+          "z": -4837.5
+        },
+        "extent": {
+          "x": 82.5,
+          "y": 62.5,
+          "z": 52.5
+        },
+        "min": {
+          "x": 1162.5,
+          "y": 3562.5,
+          "z": -4890.0
+        },
+        "max": {
+          "x": 1327.5,
+          "y": 3687.5,
+          "z": -4785.0
+        },
+        "volume": 2165625.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "CRUMB_Islet_01"
+      ]
+    },
+    {
+      "label": "DRESS_SM_Islet_02_Body",
+      "name": "StaticMeshActor_127",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 300.0,
+        "y": 3200.0,
+        "z": -4600.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 600.0,
+          "y": 6400.0,
+          "z": -9382.0
+        },
+        "extent": {
+          "x": 125.0,
+          "y": 100.0,
+          "z": 60.0
+        },
+        "min": {
+          "x": 475.0,
+          "y": 6300.0,
+          "z": -9442.0
+        },
+        "max": {
+          "x": 725.0,
+          "y": 6500.0,
+          "z": -9322.0
+        },
+        "volume": 6000000.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "CRUMB_Islet_02"
+      ]
+    },
+    {
+      "label": "DRESS_SM_Islet_02_Top",
+      "name": "StaticMeshActor_128",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 300.0,
+        "y": 3200.0,
+        "z": -4600.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 600.0,
+          "y": 6400.0,
+          "z": -9328.0
+        },
+        "extent": {
+          "x": 106.3,
+          "y": 80.0,
+          "z": 6.0
+        },
+        "min": {
+          "x": 493.7,
+          "y": 6320.0,
+          "z": -9334.0
+        },
+        "max": {
+          "x": 706.2,
+          "y": 6480.0,
+          "z": -9322.0
+        },
+        "volume": 408000.0000000001
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "CRUMB_Islet_02"
+      ]
+    },
+    {
+      "label": "DRESS_SM_Islet_02_Torn",
+      "name": "StaticMeshActor_129",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 300.0,
+        "y": 3200.0,
+        "z": -4600.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 637.5,
+          "y": 6420.0,
+          "z": -9430.0
+        },
+        "extent": {
+          "x": 68.8,
+          "y": 50.0,
+          "z": 42.0
+        },
+        "min": {
+          "x": 568.8,
+          "y": 6370.0,
+          "z": -9472.0
+        },
+        "max": {
+          "x": 706.2,
+          "y": 6470.0,
+          "z": -9388.0
+        },
+        "volume": 1154160.0000000007
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "CRUMB_Islet_02"
+      ]
+    },
+    {
+      "label": "DRESS_SM_Islet_03_Body",
+      "name": "StaticMeshActor_130",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 100.0,
+        "y": 4800.0,
+        "z": -7000.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 200.0,
+          "y": 9600.0,
+          "z": -14185.0
+        },
+        "extent": {
+          "x": 100.0,
+          "y": 100.0,
+          "z": 50.0
+        },
+        "min": {
+          "x": 100.0,
+          "y": 9500.0,
+          "z": -14235.0
+        },
+        "max": {
+          "x": 300.0,
+          "y": 9700.0,
+          "z": -14135.0
+        },
+        "volume": 4000000.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "CRUMB_Islet_03"
+      ]
+    },
+    {
+      "label": "DRESS_SM_Islet_03_Top",
+      "name": "StaticMeshActor_131",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 100.0,
+        "y": 4800.0,
+        "z": -7000.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 200.0,
+          "y": 9600.0,
+          "z": -14139.0
+        },
+        "extent": {
+          "x": 85.0,
+          "y": 80.0,
+          "z": 6.0
+        },
+        "min": {
+          "x": 115.0,
+          "y": 9520.0,
+          "z": -14145.0
+        },
+        "max": {
+          "x": 285.0,
+          "y": 9680.0,
+          "z": -14133.0
+        },
+        "volume": 326400.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "CRUMB_Islet_03"
+      ]
+    },
+    {
+      "label": "DRESS_SM_Islet_03_Torn",
+      "name": "StaticMeshActor_132",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 100.0,
+        "y": 4800.0,
+        "z": -7000.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 230.0,
+          "y": 9620.0,
+          "z": -14225.0
+        },
+        "extent": {
+          "x": 55.0,
+          "y": 50.0,
+          "z": 35.0
+        },
+        "min": {
+          "x": 175.0,
+          "y": 9570.0,
+          "z": -14260.0
+        },
+        "max": {
+          "x": 285.0,
+          "y": 9670.0,
+          "z": -14190.0
+        },
+        "volume": 770000.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "CRUMB_Islet_03"
+      ]
+    },
+    {
+      "label": "DRESS_SM_LandingCircle_Center",
+      "name": "StaticMeshActor_102",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 0.0,
+        "y": 7000.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 0.0,
+          "y": 14000.0,
+          "z": -16996.0
+        },
+        "extent": {
+          "x": 275.0,
+          "y": 275.0,
+          "z": 4.0
+        },
+        "min": {
+          "x": -275.0,
+          "y": 13725.0,
+          "z": -17000.0
+        },
+        "max": {
+          "x": 275.0,
+          "y": 14275.0,
+          "z": -16992.0
+        },
+        "volume": 2420000.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "ANCHOR_SM_LandingCircle",
+        "CRUMB_Landing",
+        "VS_MARKER_LandPlanet"
+      ]
+    },
+    {
+      "label": "DRESS_SM_LandingCircle_Stone_0",
+      "name": "StaticMeshActor_103",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 0.0,
+        "y": 7000.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 0.0,
+          "y": 14000.0,
+          "z": -16992.5
+        },
+        "extent": {
+          "x": 35.0,
+          "y": 22.5,
+          "z": 7.5
+        },
+        "min": {
+          "x": -35.0,
+          "y": 13977.5,
+          "z": -17000.0
+        },
+        "max": {
+          "x": 35.0,
+          "y": 14022.5,
+          "z": -16985.0
+        },
+        "volume": 47250.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "ANCHOR_SM_LandingCircle",
+        "CRUMB_Landing",
+        "VS_MARKER_LandPlanet"
+      ]
+    },
+    {
+      "label": "DRESS_SM_LandingCircle_Stone_1",
+      "name": "StaticMeshActor_104",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 0.0,
+        "y": 7000.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 0.0,
+          "y": 14000.0,
+          "z": -16992.5
+        },
+        "extent": {
+          "x": 35.0,
+          "y": 22.5,
+          "z": 7.5
+        },
+        "min": {
+          "x": -35.0,
+          "y": 13977.5,
+          "z": -17000.0
+        },
+        "max": {
+          "x": 35.0,
+          "y": 14022.5,
+          "z": -16985.0
+        },
+        "volume": 47250.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "ANCHOR_SM_LandingCircle",
+        "CRUMB_Landing",
+        "VS_MARKER_LandPlanet"
+      ]
+    },
+    {
+      "label": "DRESS_SM_LandingCircle_Stone_10",
+      "name": "StaticMeshActor_105",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 0.0,
+        "y": 7000.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 0.0,
+          "y": 14000.0,
+          "z": -16992.5
+        },
+        "extent": {
+          "x": 35.0,
+          "y": 22.5,
+          "z": 7.5
+        },
+        "min": {
+          "x": -35.0,
+          "y": 13977.5,
+          "z": -17000.0
+        },
+        "max": {
+          "x": 35.0,
+          "y": 14022.5,
+          "z": -16985.0
+        },
+        "volume": 47250.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "ANCHOR_SM_LandingCircle",
+        "CRUMB_Landing",
+        "VS_MARKER_LandPlanet"
+      ]
+    },
+    {
+      "label": "DRESS_SM_LandingCircle_Stone_11",
+      "name": "StaticMeshActor_106",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 0.0,
+        "y": 7000.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 0.0,
+          "y": 14000.0,
+          "z": -16992.5
+        },
+        "extent": {
+          "x": 35.0,
+          "y": 22.5,
+          "z": 7.5
+        },
+        "min": {
+          "x": -35.0,
+          "y": 13977.5,
+          "z": -17000.0
+        },
+        "max": {
+          "x": 35.0,
+          "y": 14022.5,
+          "z": -16985.0
+        },
+        "volume": 47250.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "ANCHOR_SM_LandingCircle",
+        "CRUMB_Landing",
+        "VS_MARKER_LandPlanet"
+      ]
+    },
+    {
+      "label": "DRESS_SM_LandingCircle_Stone_12",
+      "name": "StaticMeshActor_107",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 0.0,
+        "y": 7000.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 0.0,
+          "y": 14000.0,
+          "z": -16992.5
+        },
+        "extent": {
+          "x": 35.0,
+          "y": 22.5,
+          "z": 7.5
+        },
+        "min": {
+          "x": -35.0,
+          "y": 13977.5,
+          "z": -17000.0
+        },
+        "max": {
+          "x": 35.0,
+          "y": 14022.5,
+          "z": -16985.0
+        },
+        "volume": 47250.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "ANCHOR_SM_LandingCircle",
+        "CRUMB_Landing",
+        "VS_MARKER_LandPlanet"
+      ]
+    },
+    {
+      "label": "DRESS_SM_LandingCircle_Stone_13",
+      "name": "StaticMeshActor_108",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 0.0,
+        "y": 7000.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 0.0,
+          "y": 14000.0,
+          "z": -16992.5
+        },
+        "extent": {
+          "x": 35.0,
+          "y": 22.5,
+          "z": 7.5
+        },
+        "min": {
+          "x": -35.0,
+          "y": 13977.5,
+          "z": -17000.0
+        },
+        "max": {
+          "x": 35.0,
+          "y": 14022.5,
+          "z": -16985.0
+        },
+        "volume": 47250.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "ANCHOR_SM_LandingCircle",
+        "CRUMB_Landing",
+        "VS_MARKER_LandPlanet"
+      ]
+    },
+    {
+      "label": "DRESS_SM_LandingCircle_Stone_14",
+      "name": "StaticMeshActor_109",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 0.0,
+        "y": 7000.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 0.0,
+          "y": 14000.0,
+          "z": -16992.5
+        },
+        "extent": {
+          "x": 35.0,
+          "y": 22.5,
+          "z": 7.5
+        },
+        "min": {
+          "x": -35.0,
+          "y": 13977.5,
+          "z": -17000.0
+        },
+        "max": {
+          "x": 35.0,
+          "y": 14022.5,
+          "z": -16985.0
+        },
+        "volume": 47250.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "ANCHOR_SM_LandingCircle",
+        "CRUMB_Landing",
+        "VS_MARKER_LandPlanet"
+      ]
+    },
+    {
+      "label": "DRESS_SM_LandingCircle_Stone_15",
+      "name": "StaticMeshActor_110",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 0.0,
+        "y": 7000.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 0.0,
+          "y": 14000.0,
+          "z": -16992.5
+        },
+        "extent": {
+          "x": 35.0,
+          "y": 22.5,
+          "z": 7.5
+        },
+        "min": {
+          "x": -35.0,
+          "y": 13977.5,
+          "z": -17000.0
+        },
+        "max": {
+          "x": 35.0,
+          "y": 14022.5,
+          "z": -16985.0
+        },
+        "volume": 47250.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "ANCHOR_SM_LandingCircle",
+        "CRUMB_Landing",
+        "VS_MARKER_LandPlanet"
+      ]
+    },
+    {
+      "label": "DRESS_SM_LandingCircle_Stone_2",
+      "name": "StaticMeshActor_111",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 0.0,
+        "y": 7000.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 0.0,
+          "y": 14000.0,
+          "z": -16992.5
+        },
+        "extent": {
+          "x": 35.0,
+          "y": 22.5,
+          "z": 7.5
+        },
+        "min": {
+          "x": -35.0,
+          "y": 13977.5,
+          "z": -17000.0
+        },
+        "max": {
+          "x": 35.0,
+          "y": 14022.5,
+          "z": -16985.0
+        },
+        "volume": 47250.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "ANCHOR_SM_LandingCircle",
+        "CRUMB_Landing",
+        "VS_MARKER_LandPlanet"
+      ]
+    },
+    {
+      "label": "DRESS_SM_LandingCircle_Stone_3",
+      "name": "StaticMeshActor_112",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 0.0,
+        "y": 7000.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 0.0,
+          "y": 14000.0,
+          "z": -16992.5
+        },
+        "extent": {
+          "x": 35.0,
+          "y": 22.5,
+          "z": 7.5
+        },
+        "min": {
+          "x": -35.0,
+          "y": 13977.5,
+          "z": -17000.0
+        },
+        "max": {
+          "x": 35.0,
+          "y": 14022.5,
+          "z": -16985.0
+        },
+        "volume": 47250.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "ANCHOR_SM_LandingCircle",
+        "CRUMB_Landing",
+        "VS_MARKER_LandPlanet"
+      ]
+    },
+    {
+      "label": "DRESS_SM_LandingCircle_Stone_4",
+      "name": "StaticMeshActor_113",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 0.0,
+        "y": 7000.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 0.0,
+          "y": 14000.0,
+          "z": -16992.5
+        },
+        "extent": {
+          "x": 35.0,
+          "y": 22.5,
+          "z": 7.5
+        },
+        "min": {
+          "x": -35.0,
+          "y": 13977.5,
+          "z": -17000.0
+        },
+        "max": {
+          "x": 35.0,
+          "y": 14022.5,
+          "z": -16985.0
+        },
+        "volume": 47250.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "ANCHOR_SM_LandingCircle",
+        "CRUMB_Landing",
+        "VS_MARKER_LandPlanet"
+      ]
+    },
+    {
+      "label": "DRESS_SM_LandingCircle_Stone_5",
+      "name": "StaticMeshActor_114",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 0.0,
+        "y": 7000.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 0.0,
+          "y": 14000.0,
+          "z": -16992.5
+        },
+        "extent": {
+          "x": 35.0,
+          "y": 22.5,
+          "z": 7.5
+        },
+        "min": {
+          "x": -35.0,
+          "y": 13977.5,
+          "z": -17000.0
+        },
+        "max": {
+          "x": 35.0,
+          "y": 14022.5,
+          "z": -16985.0
+        },
+        "volume": 47250.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "ANCHOR_SM_LandingCircle",
+        "CRUMB_Landing",
+        "VS_MARKER_LandPlanet"
+      ]
+    },
+    {
+      "label": "DRESS_SM_LandingCircle_Stone_6",
+      "name": "StaticMeshActor_115",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 0.0,
+        "y": 7000.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 0.0,
+          "y": 14000.0,
+          "z": -16992.5
+        },
+        "extent": {
+          "x": 35.0,
+          "y": 22.5,
+          "z": 7.5
+        },
+        "min": {
+          "x": -35.0,
+          "y": 13977.5,
+          "z": -17000.0
+        },
+        "max": {
+          "x": 35.0,
+          "y": 14022.5,
+          "z": -16985.0
+        },
+        "volume": 47250.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "ANCHOR_SM_LandingCircle",
+        "CRUMB_Landing",
+        "VS_MARKER_LandPlanet"
+      ]
+    },
+    {
+      "label": "DRESS_SM_LandingCircle_Stone_7",
+      "name": "StaticMeshActor_116",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 0.0,
+        "y": 7000.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 0.0,
+          "y": 14000.0,
+          "z": -16992.5
+        },
+        "extent": {
+          "x": 35.0,
+          "y": 22.5,
+          "z": 7.5
+        },
+        "min": {
+          "x": -35.0,
+          "y": 13977.5,
+          "z": -17000.0
+        },
+        "max": {
+          "x": 35.0,
+          "y": 14022.5,
+          "z": -16985.0
+        },
+        "volume": 47250.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "ANCHOR_SM_LandingCircle",
+        "CRUMB_Landing",
+        "VS_MARKER_LandPlanet"
+      ]
+    },
+    {
+      "label": "DRESS_SM_LandingCircle_Stone_8",
+      "name": "StaticMeshActor_117",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 0.0,
+        "y": 7000.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 0.0,
+          "y": 14000.0,
+          "z": -16992.5
+        },
+        "extent": {
+          "x": 35.0,
+          "y": 22.5,
+          "z": 7.5
+        },
+        "min": {
+          "x": -35.0,
+          "y": 13977.5,
+          "z": -17000.0
+        },
+        "max": {
+          "x": 35.0,
+          "y": 14022.5,
+          "z": -16985.0
+        },
+        "volume": 47250.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "ANCHOR_SM_LandingCircle",
+        "CRUMB_Landing",
+        "VS_MARKER_LandPlanet"
+      ]
+    },
+    {
+      "label": "DRESS_SM_LandingCircle_Stone_9",
+      "name": "StaticMeshActor_118",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 0.0,
+        "y": 7000.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 0.0,
+          "y": 14000.0,
+          "z": -16992.5
+        },
+        "extent": {
+          "x": 35.0,
+          "y": 22.5,
+          "z": 7.5
+        },
+        "min": {
+          "x": -35.0,
+          "y": 13977.5,
+          "z": -17000.0
+        },
+        "max": {
+          "x": 35.0,
+          "y": 14022.5,
+          "z": -16985.0
+        },
+        "volume": 47250.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "ANCHOR_SM_LandingCircle",
+        "CRUMB_Landing",
+        "VS_MARKER_LandPlanet"
+      ]
+    },
+    {
+      "label": "DRESS_SM_Lookout_Pad",
+      "name": "StaticMeshActor_95",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 700.0,
+        "y": 350.0,
+        "z": 0.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 1400.0,
+          "y": 700.0,
+          "z": 10.0
+        },
+        "extent": {
+          "x": 150.0,
+          "y": 125.0,
+          "z": 10.0
+        },
+        "min": {
+          "x": 1250.0,
+          "y": 575.0,
+          "z": -0.0
+        },
+        "max": {
+          "x": 1550.0,
+          "y": 825.0,
+          "z": 20.0
+        },
+        "volume": 1500000.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "ANCHOR_SM_Lookout_Pad",
+        "DRESS_SM_IslandTop"
+      ]
+    },
+    {
+      "label": "DRESS_SM_Pine_Homestead_M_Foliage_0",
+      "name": "StaticMeshActor_147",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": -600.0,
+        "y": -400.0,
+        "z": 0.0
+      },
+      "bounds": {
+        "origin": {
+          "x": -300.0,
+          "y": -700.0,
+          "z": 107.1
+        },
+        "extent": {
+          "x": 160.0,
+          "y": 160.0,
+          "z": 107.1
+        },
+        "min": {
+          "x": -460.0,
+          "y": -860.0,
+          "z": 0.0
+        },
+        "max": {
+          "x": -140.0,
+          "y": -540.0,
+          "z": 214.2
+        },
+        "volume": 21934080.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "DRESS_SM_IslandTop"
+      ]
+    },
+    {
+      "label": "DRESS_SM_Pine_Homestead_M_Foliage_1",
+      "name": "StaticMeshActor_148",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": -600.0,
+        "y": -400.0,
+        "z": 0.0
+      },
+      "bounds": {
+        "origin": {
+          "x": -300.0,
+          "y": -700.0,
+          "z": 103.8
+        },
+        "extent": {
+          "x": 130.7,
+          "y": 130.7,
+          "z": 103.8
+        },
+        "min": {
+          "x": -430.7,
+          "y": -830.7,
+          "z": -0.0
+        },
+        "max": {
+          "x": -169.3,
+          "y": -569.3,
+          "z": 207.7
+        },
+        "volume": 14192132.692000004
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "DRESS_SM_IslandTop"
+      ]
+    },
+    {
+      "label": "DRESS_SM_Pine_Homestead_M_Foliage_2",
+      "name": "StaticMeshActor_149",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": -600.0,
+        "y": -400.0,
+        "z": 0.0
+      },
+      "bounds": {
+        "origin": {
+          "x": -300.0,
+          "y": -700.0,
+          "z": 100.6
+        },
+        "extent": {
+          "x": 101.3,
+          "y": 101.3,
+          "z": 100.6
+        },
+        "min": {
+          "x": -401.3,
+          "y": -801.3,
+          "z": -0.0
+        },
+        "max": {
+          "x": -198.7,
+          "y": -598.7,
+          "z": 201.1
+        },
+        "volume": 8254503.435999997
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "DRESS_SM_IslandTop"
+      ]
+    },
+    {
+      "label": "DRESS_SM_Pine_Homestead_M_Foliage_3",
+      "name": "StaticMeshActor_150",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": -600.0,
+        "y": -400.0,
+        "z": 0.0
+      },
+      "bounds": {
+        "origin": {
+          "x": -300.0,
+          "y": -700.0,
+          "z": 97.3
+        },
+        "extent": {
+          "x": 72.0,
+          "y": 72.0,
+          "z": 97.3
+        },
+        "min": {
+          "x": -372.0,
+          "y": -772.0,
+          "z": 0.0
+        },
+        "max": {
+          "x": -228.0,
+          "y": -628.0,
+          "z": 194.6
+        },
+        "volume": 4035225.6
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "DRESS_SM_IslandTop"
+      ]
+    },
+    {
+      "label": "DRESS_SM_Pine_Homestead_M_Trunk",
+      "name": "StaticMeshActor_151",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": -600.0,
+        "y": -400.0,
+        "z": 0.0
+      },
+      "bounds": {
+        "origin": {
+          "x": -300.0,
+          "y": -700.0,
+          "z": 403.8
+        },
+        "extent": {
+          "x": 29.2,
+          "y": 30.8,
+          "z": 403.7
+        },
+        "min": {
+          "x": -329.2,
+          "y": -730.8,
+          "z": 0.0
+        },
+        "max": {
+          "x": -270.8,
+          "y": -669.2,
+          "z": 807.5
+        },
+        "volume": 2904932.7999999947
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "DRESS_SM_IslandTop"
+      ]
+    },
+    {
+      "label": "DRESS_SM_Planet_GroundPlate",
+      "name": "StaticMeshActor_133",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 750.0,
+        "y": -139407.1,
+        "z": 1980.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 750.0,
+          "y": -16550.0,
+          "z": -7520.0
+        },
+        "extent": {
+          "x": 60000.0,
+          "y": 43000.0,
+          "z": 20.0
+        },
+        "min": {
+          "x": -59250.0,
+          "y": -59550.0,
+          "z": -7540.0
+        },
+        "max": {
+          "x": 60750.0,
+          "y": 26450.0,
+          "z": -7500.0
+        },
+        "volume": 412800000000.0
+      },
+      "container_coverage": 0.9903,
+      "under": []
+    },
+    {
+      "label": "DRESS_SM_Roof_Hamlet_01_Body",
+      "name": "StaticMeshActor_138",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 600.0,
+        "y": 7500.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": -600.0,
+          "y": 16500.0,
+          "z": -16932.5
+        },
+        "extent": {
+          "x": 190.0,
+          "y": 157.5,
+          "z": 67.5
+        },
+        "min": {
+          "x": -790.0,
+          "y": 16342.5,
+          "z": -17000.0
+        },
+        "max": {
+          "x": -410.0,
+          "y": 16657.5,
+          "z": -16865.0
+        },
+        "volume": 16159500.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "ANCHOR_SM_Shrine_Return",
+        "GP_PortalB"
+      ]
+    },
+    {
+      "label": "DRESS_SM_Roof_Hamlet_01_PitchA",
+      "name": "StaticMeshActor_139",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 600.0,
+        "y": 7500.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": -600.0,
+          "y": 16558.4,
+          "z": -16869.0
+        },
+        "extent": {
+          "x": 210.0,
+          "y": 90.9,
+          "z": 56.2
+        },
+        "min": {
+          "x": -810.0,
+          "y": 16467.5,
+          "z": -16925.2
+        },
+        "max": {
+          "x": -390.0,
+          "y": 16649.2,
+          "z": -16812.7
+        },
+        "volume": 8585325.000000034
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "ANCHOR_SM_Shrine_Return",
+        "GP_PortalB"
+      ]
+    },
+    {
+      "label": "DRESS_SM_Roof_Hamlet_01_PitchB",
+      "name": "StaticMeshActor_140",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 600.0,
+        "y": 7500.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": -600.0,
+          "y": 16441.6,
+          "z": -16869.0
+        },
+        "extent": {
+          "x": 210.0,
+          "y": 90.9,
+          "z": 56.2
+        },
+        "min": {
+          "x": -810.0,
+          "y": 16350.8,
+          "z": -16925.2
+        },
+        "max": {
+          "x": -390.0,
+          "y": 16532.5,
+          "z": -16812.7
+        },
+        "volume": 8585325.000000034
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "ANCHOR_SM_Shrine_Return",
+        "GP_PortalB"
+      ]
+    },
+    {
+      "label": "DRESS_SM_Roof_Hamlet_02_Body",
+      "name": "StaticMeshActor_141",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 800.0,
+        "y": 7500.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 0.0,
+          "y": 18000.0,
+          "z": -16937.0
+        },
+        "extent": {
+          "x": 166.2,
+          "y": 135.0,
+          "z": 63.0
+        },
+        "min": {
+          "x": -166.2,
+          "y": 17865.0,
+          "z": -17000.0
+        },
+        "max": {
+          "x": 166.2,
+          "y": 18135.0,
+          "z": -16874.0
+        },
+        "volume": 11308248.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "ANCHOR_SM_Shrine_Return"
+      ]
+    },
+    {
+      "label": "DRESS_SM_Roof_Hamlet_02_PitchA",
+      "name": "StaticMeshActor_142",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 800.0,
+        "y": 7500.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 0.0,
+          "y": 18050.9,
+          "z": -16877.0
+        },
+        "extent": {
+          "x": 183.8,
+          "y": 78.7,
+          "z": 49.8
+        },
+        "min": {
+          "x": -183.8,
+          "y": 17972.2,
+          "z": -16926.7
+        },
+        "max": {
+          "x": 183.8,
+          "y": 18129.6,
+          "z": -16827.2
+        },
+        "volume": 5757093.87999992
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "ANCHOR_SM_Shrine_Return"
+      ]
+    },
+    {
+      "label": "DRESS_SM_Roof_Hamlet_02_PitchB",
+      "name": "StaticMeshActor_143",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 800.0,
+        "y": 7500.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 0.0,
+          "y": 17949.1,
+          "z": -16877.0
+        },
+        "extent": {
+          "x": 183.8,
+          "y": 78.7,
+          "z": 49.8
+        },
+        "min": {
+          "x": -183.8,
+          "y": 17870.4,
+          "z": -16926.7
+        },
+        "max": {
+          "x": 183.8,
+          "y": 18027.8,
+          "z": -16827.2
+        },
+        "volume": 5757093.87999992
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "ANCHOR_SM_Shrine_Return"
+      ]
+    },
+    {
+      "label": "DRESS_SM_Roof_Hamlet_03_Body",
+      "name": "StaticMeshActor_144",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 400.0,
+        "y": 7500.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": -1000.0,
+          "y": 18700.0,
+          "z": -16943.8
+        },
+        "extent": {
+          "x": 142.5,
+          "y": 112.5,
+          "z": 56.2
+        },
+        "min": {
+          "x": -1142.5,
+          "y": 18587.5,
+          "z": -17000.0
+        },
+        "max": {
+          "x": -857.5,
+          "y": 18812.5,
+          "z": -16887.5
+        },
+        "volume": 7214062.5
+      },
+      "container_coverage": 0.0,
+      "under": []
+    },
+    {
+      "label": "DRESS_SM_Roof_Hamlet_03_PitchA",
+      "name": "StaticMeshActor_145",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 400.0,
+        "y": 7500.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": -1000.0,
+          "y": 18743.4,
+          "z": -16889.0
+        },
+        "extent": {
+          "x": 157.5,
+          "y": 66.6,
+          "z": 43.3
+        },
+        "min": {
+          "x": -1157.5,
+          "y": 18676.8,
+          "z": -16932.3
+        },
+        "max": {
+          "x": -842.5,
+          "y": 18809.9,
+          "z": -16845.7
+        },
+        "volume": 3630834.899999998
+      },
+      "container_coverage": 0.0,
+      "under": []
+    },
+    {
+      "label": "DRESS_SM_Roof_Hamlet_03_PitchB",
+      "name": "StaticMeshActor_146",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 400.0,
+        "y": 7500.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": -1000.0,
+          "y": 18656.6,
+          "z": -16889.0
+        },
+        "extent": {
+          "x": 157.5,
+          "y": 66.6,
+          "z": 43.3
+        },
+        "min": {
+          "x": -1157.5,
+          "y": 18590.1,
+          "z": -16932.3
+        },
+        "max": {
+          "x": -842.5,
+          "y": 18723.2,
+          "z": -16845.7
+        },
+        "volume": 3630834.899999998
+      },
+      "container_coverage": 0.0,
+      "under": []
+    },
+    {
+      "label": "DRESS_SM_Shrine_Return_Base",
+      "name": "StaticMeshActor_119",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 600.0,
+        "y": 7500.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 1200.0,
+          "y": 15000.0,
+          "z": -16987.5
+        },
+        "extent": {
+          "x": 70.0,
+          "y": 70.0,
+          "z": 12.5
+        },
+        "min": {
+          "x": 1130.0,
+          "y": 14930.0,
+          "z": -17000.0
+        },
+        "max": {
+          "x": 1270.0,
+          "y": 15070.0,
+          "z": -16975.0
+        },
+        "volume": 490000.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "ANCHOR_SM_Shrine_Return",
+        "GP_PortalB"
+      ]
+    },
+    {
+      "label": "DRESS_SM_Shrine_Return_Glow",
+      "name": "StaticMeshActor_120",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 600.0,
+        "y": 7500.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 1200.0,
+          "y": 15000.0,
+          "z": -16895.0
+        },
+        "extent": {
+          "x": 35.0,
+          "y": 7.5,
+          "z": 55.0
+        },
+        "min": {
+          "x": 1165.0,
+          "y": 14992.5,
+          "z": -16950.0
+        },
+        "max": {
+          "x": 1235.0,
+          "y": 15007.5,
+          "z": -16840.0
+        },
+        "volume": 115500.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "ANCHOR_SM_Shrine_Return",
+        "GP_PortalB"
+      ]
+    },
+    {
+      "label": "DRESS_SM_Shrine_Return_Lintel",
+      "name": "StaticMeshActor_121",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 600.0,
+        "y": 7500.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 1200.0,
+          "y": 15000.0,
+          "z": -16816.0
+        },
+        "extent": {
+          "x": 60.0,
+          "y": 10.0,
+          "z": 9.0
+        },
+        "min": {
+          "x": 1140.0,
+          "y": 14990.0,
+          "z": -16825.0
+        },
+        "max": {
+          "x": 1260.0,
+          "y": 15010.0,
+          "z": -16807.0
+        },
+        "volume": 43200.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "ANCHOR_SM_Shrine_Return",
+        "GP_PortalB"
+      ]
+    },
+    {
+      "label": "DRESS_SM_Shrine_Return_Post_L",
+      "name": "StaticMeshActor_122",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 600.0,
+        "y": 7500.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 1155.0,
+          "y": 15000.0,
+          "z": -16895.0
+        },
+        "extent": {
+          "x": 9.0,
+          "y": 9.0,
+          "z": 80.0
+        },
+        "min": {
+          "x": 1146.0,
+          "y": 14991.0,
+          "z": -16975.0
+        },
+        "max": {
+          "x": 1164.0,
+          "y": 15009.0,
+          "z": -16815.0
+        },
+        "volume": 51840.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "ANCHOR_SM_Shrine_Return",
+        "GP_PortalB"
+      ]
+    },
+    {
+      "label": "DRESS_SM_Shrine_Return_Post_R",
+      "name": "StaticMeshActor_123",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 600.0,
+        "y": 7500.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 1245.0,
+          "y": 15000.0,
+          "z": -16895.0
+        },
+        "extent": {
+          "x": 9.0,
+          "y": 9.0,
+          "z": 80.0
+        },
+        "min": {
+          "x": 1236.0,
+          "y": 14991.0,
+          "z": -16975.0
+        },
+        "max": {
+          "x": 1254.0,
+          "y": 15009.0,
+          "z": -16815.0
+        },
+        "volume": 51840.0
+      },
+      "container_coverage": 0.0,
+      "under": [
+        "ANCHOR_SM_Shrine_Return",
+        "GP_PortalB"
+      ]
+    },
+    {
+      "label": "PROTO_SM_Cabin_CornerPosts",
+      "name": "StaticMeshActor_1",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": -600.0,
+        "y": -100.0,
+        "z": 0.0
+      },
+      "bounds": {
+        "origin": {
+          "x": -600.0,
+          "y": -100.0,
+          "z": 180.0
+        },
+        "extent": {
+          "x": 291.0,
+          "y": 238.9,
+          "z": 145.0
+        },
+        "min": {
+          "x": -891.0,
+          "y": -338.9,
+          "z": 35.0
+        },
+        "max": {
+          "x": -309.0,
+          "y": 138.9,
+          "z": 325.0
+        },
+        "volume": 80643084.0
+      },
+      "container_coverage": 0.0583,
+      "under": [
+        "ANCHOR_SM_Cabin",
+        "DRESS_SM_IslandTop",
+        "PROTO_SM_Cabin_Prototype"
+      ]
+    },
+    {
+      "label": "PROTO_SM_Cabin_Prototype",
+      "name": "StaticMeshActor_0",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": -600.0,
+        "y": -100.0,
+        "z": 0.0
+      },
+      "bounds": {
+        "origin": {
+          "x": -603.4,
+          "y": -18.7,
+          "z": 203.7
+        },
+        "extent": {
+          "x": 232.2,
+          "y": 271.1,
+          "z": 218.9
+        },
+        "min": {
+          "x": -835.7,
+          "y": -289.7,
+          "z": -15.2
+        },
+        "max": {
+          "x": -371.2,
+          "y": 252.4,
+          "z": 422.5
+        },
+        "volume": 110215245.46500002
+      },
+      "container_coverage": 0.0874,
+      "under": [
+        "ANCHOR_SM_Cabin",
+        "DRESS_SM_IslandTop"
+      ]
+    },
+    {
+      "label": "PROTO_SM_Flowers_Prototype",
+      "name": "StaticMeshActor_3",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 200.0,
+        "y": 7000.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 200.0,
+          "y": 7000.0,
+          "z": -7455.4
+        },
+        "extent": {
+          "x": 32.5,
+          "y": 28.0,
+          "z": 45.4
+        },
+        "min": {
+          "x": 167.5,
+          "y": 6972.0,
+          "z": -7500.8
+        },
+        "max": {
+          "x": 232.5,
+          "y": 7028.0,
+          "z": -7410.0
+        },
+        "volume": 330512.00000000064
+      },
+      "container_coverage": 0.0097,
+      "under": [
+        "ANCHOR_SM_LandingCircle",
+        "CRUMB_Landing",
+        "VS_MARKER_LandPlanet"
+      ]
+    },
+    {
+      "label": "PROTO_SM_Portal_Prototype",
+      "name": "StaticMeshActor_2",
+      "class": "StaticMeshActor",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": -200.0,
+        "y": -350.0,
+        "z": 0.0
+      },
+      "bounds": {
+        "origin": {
+          "x": -200.0,
+          "y": -350.0,
+          "z": 150.0
+        },
+        "extent": {
+          "x": 100.0,
+          "y": 60.0,
+          "z": 150.0
+        },
+        "min": {
+          "x": -300.0,
+          "y": -410.0,
+          "z": 0.0
+        },
+        "max": {
+          "x": -100.0,
+          "y": -290.0,
+          "z": 300.0
+        },
+        "volume": 7200000.0
+      },
+      "container_coverage": 0.0485,
+      "under": [
+        "ANCHOR_SM_Shrine_Homestead",
+        "DRESS_SM_IslandTop",
+        "GP_PortalA"
+      ]
+    },
+    {
+      "label": "ANCHOR_SM_Cabin",
+      "name": "TargetPoint_46",
+      "class": "TargetPoint",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": -600.0,
+        "y": -100.0,
+        "z": 0.0
+      },
+      "bounds": {
+        "origin": {
+          "x": -480.0,
+          "y": -100.0,
+          "z": 0.0
+        },
+        "extent": {
+          "x": 120.0,
+          "y": 80.0,
+          "z": 80.0
+        },
+        "min": {
+          "x": -600.0,
+          "y": -180.0,
+          "z": -80.0
+        },
+        "max": {
+          "x": -360.0,
+          "y": -20.0,
+          "z": 80.0
+        },
+        "volume": 6144000.0
+      },
+      "container_coverage": 0.0291,
+      "under": [
+        "DRESS_SM_IslandTop",
+        "PROTO_SM_Cabin_Prototype"
+      ]
+    },
+    {
+      "label": "ANCHOR_SM_Glider_Perch",
+      "name": "TargetPoint_45",
+      "class": "TargetPoint",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 750.0,
+        "y": 450.0,
+        "z": 0.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 870.0,
+          "y": 450.0,
+          "z": 0.0
+        },
+        "extent": {
+          "x": 120.0,
+          "y": 80.0,
+          "z": 80.0
+        },
+        "min": {
+          "x": 750.0,
+          "y": 370.0,
+          "z": -80.0
+        },
+        "max": {
+          "x": 990.0,
+          "y": 530.0,
+          "z": 80.0
+        },
+        "volume": 6144000.0
+      },
+      "container_coverage": 0.0583,
+      "under": [
+        "DRESS_SM_IslandTop",
+        "VS_MARKER_LeaveIsland_FALLBACK"
+      ]
+    },
+    {
+      "label": "ANCHOR_SM_IslandTop",
+      "name": "TargetPoint_47",
+      "class": "TargetPoint",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 120.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "extent": {
+          "x": 120.0,
+          "y": 80.0,
+          "z": 80.0
+        },
+        "min": {
+          "x": 0.0,
+          "y": -80.0,
+          "z": -80.0
+        },
+        "max": {
+          "x": 240.0,
+          "y": 80.0,
+          "z": 80.0
+        },
+        "volume": 6144000.0
+      },
+      "container_coverage": 0.0583,
+      "under": [
+        "CRUMB_GlideSpline",
+        "DRESS_SM_IslandTop",
+        "NODE_CAPTIVE",
+        "NODE_GUARD",
+        "NODE_SLEEPER_A",
+        "NODE_SLEEPER_B"
+      ]
+    },
+    {
+      "label": "ANCHOR_SM_LandingCircle",
+      "name": "TargetPoint_43",
+      "class": "TargetPoint",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 0.0,
+        "y": 7000.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 120.0,
+          "y": 7000.0,
+          "z": -7500.0
+        },
+        "extent": {
+          "x": 120.0,
+          "y": 80.0,
+          "z": 80.0
+        },
+        "min": {
+          "x": 0.0,
+          "y": 6920.0,
+          "z": -7580.0
+        },
+        "max": {
+          "x": 240.0,
+          "y": 7080.0,
+          "z": -7420.0
+        },
+        "volume": 6144000.0
+      },
+      "container_coverage": 0.2039,
+      "under": [
+        "CRUMB_Landing",
+        "VS_MARKER_LandPlanet"
+      ]
+    },
+    {
+      "label": "ANCHOR_SM_Lookout_Pad",
+      "name": "TargetPoint_44",
+      "class": "TargetPoint",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 700.0,
+        "y": 350.0,
+        "z": 0.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 820.0,
+          "y": 350.0,
+          "z": 0.0
+        },
+        "extent": {
+          "x": 120.0,
+          "y": 80.0,
+          "z": 80.0
+        },
+        "min": {
+          "x": 700.0,
+          "y": 270.0,
+          "z": -80.0
+        },
+        "max": {
+          "x": 940.0,
+          "y": 430.0,
+          "z": 80.0
+        },
+        "volume": 6144000.0
+      },
+      "container_coverage": 0.0194,
+      "under": [
+        "DRESS_SM_IslandTop"
+      ]
+    },
+    {
+      "label": "ANCHOR_SM_Shrine_Homestead",
+      "name": "TargetPoint_41",
+      "class": "TargetPoint",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": -200.0,
+        "y": -350.0,
+        "z": 0.0
+      },
+      "bounds": {
+        "origin": {
+          "x": -80.0,
+          "y": -350.0,
+          "z": 0.0
+        },
+        "extent": {
+          "x": 120.0,
+          "y": 80.0,
+          "z": 80.0
+        },
+        "min": {
+          "x": -200.0,
+          "y": -430.0,
+          "z": -80.0
+        },
+        "max": {
+          "x": 40.0,
+          "y": -270.0,
+          "z": 80.0
+        },
+        "volume": 6144000.0
+      },
+      "container_coverage": 0.0485,
+      "under": [
+        "DRESS_SM_IslandTop",
+        "GP_PortalA",
+        "PROTO_SM_Portal_Prototype"
+      ]
+    },
+    {
+      "label": "ANCHOR_SM_Shrine_Return",
+      "name": "TargetPoint_42",
+      "class": "TargetPoint",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 600.0,
+        "y": 7500.0,
+        "z": -7500.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 720.0,
+          "y": 7500.0,
+          "z": -7500.0
+        },
+        "extent": {
+          "x": 120.0,
+          "y": 80.0,
+          "z": 80.0
+        },
+        "min": {
+          "x": 600.0,
+          "y": 7420.0,
+          "z": -7580.0
+        },
+        "max": {
+          "x": 840.0,
+          "y": 7580.0,
+          "z": -7420.0
+        },
+        "volume": 6144000.0
+      },
+      "container_coverage": 0.1359,
+      "under": [
+        "GP_PortalB"
+      ]
+    },
+    {
+      "label": "CRUMB_Air_01",
+      "name": "TargetPoint_24",
+      "class": "TargetPoint",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 700.0,
+        "y": 1000.0,
+        "z": -800.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 820.0,
+          "y": 1000.0,
+          "z": -800.0
+        },
+        "extent": {
+          "x": 120.0,
+          "y": 80.0,
+          "z": 80.0
+        },
+        "min": {
+          "x": 700.0,
+          "y": 920.0,
+          "z": -880.0
+        },
+        "max": {
+          "x": 940.0,
+          "y": 1080.0,
+          "z": -720.0
+        },
+        "volume": 6144000.0
+      },
+      "container_coverage": 0.0097,
+      "under": []
+    },
+    {
+      "label": "CRUMB_Air_02",
+      "name": "TargetPoint_26",
+      "class": "TargetPoint",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 450.0,
+        "y": 2500.0,
+        "z": -3600.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 570.0,
+          "y": 2500.0,
+          "z": -3600.0
+        },
+        "extent": {
+          "x": 120.0,
+          "y": 80.0,
+          "z": 80.0
+        },
+        "min": {
+          "x": 450.0,
+          "y": 2420.0,
+          "z": -3680.0
+        },
+        "max": {
+          "x": 690.0,
+          "y": 2580.0,
+          "z": -3520.0
+        },
+        "volume": 6144000.0
+      },
+      "container_coverage": 0.0097,
+      "under": []
+    },
+    {
+      "label": "CRUMB_Air_03",
+      "name": "TargetPoint_27",
+      "class": "TargetPoint",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 200.0,
+        "y": 4000.0,
+        "z": -6000.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 320.0,
+          "y": 4000.0,
+          "z": -6000.0
+        },
+        "extent": {
+          "x": 120.0,
+          "y": 80.0,
+          "z": 80.0
+        },
+        "min": {
+          "x": 200.0,
+          "y": 3920.0,
+          "z": -6080.0
+        },
+        "max": {
+          "x": 440.0,
+          "y": 4080.0,
+          "z": -5920.0
+        },
+        "volume": 6144000.0
+      },
+      "container_coverage": 0.0097,
+      "under": []
+    },
+    {
+      "label": "CRUMB_Approach",
+      "name": "TargetPoint_28",
+      "class": "TargetPoint",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 50.0,
+        "y": 6000.0,
+        "z": -6800.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 170.0,
+          "y": 6000.0,
+          "z": -6800.0
+        },
+        "extent": {
+          "x": 120.0,
+          "y": 80.0,
+          "z": 80.0
+        },
+        "min": {
+          "x": 50.0,
+          "y": 5920.0,
+          "z": -6880.0
+        },
+        "max": {
+          "x": 290.0,
+          "y": 6080.0,
+          "z": -6720.0
+        },
+        "volume": 6144000.0
+      },
+      "container_coverage": 0.0097,
+      "under": []
+    },
+    {
+      "label": "CRUMB_Depart_Lookout",
+      "name": "TargetPoint_29",
+      "class": "TargetPoint",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 750.0,
+        "y": 450.0,
+        "z": 150.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 870.0,
+          "y": 450.0,
+          "z": 150.0
+        },
+        "extent": {
+          "x": 120.0,
+          "y": 80.0,
+          "z": 80.0
+        },
+        "min": {
+          "x": 750.0,
+          "y": 370.0,
+          "z": 70.0
+        },
+        "max": {
+          "x": 990.0,
+          "y": 530.0,
+          "z": 230.0
+        },
+        "volume": 6144000.0
+      },
+      "container_coverage": 0.0583,
+      "under": [
+        "GP_GlideStart"
+      ]
+    },
+    {
+      "label": "CRUMB_GlideSpline",
+      "name": "TargetPoint_30",
+      "class": "TargetPoint",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 120.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "extent": {
+          "x": 120.0,
+          "y": 80.0,
+          "z": 80.0
+        },
+        "min": {
+          "x": 0.0,
+          "y": -80.0,
+          "z": -80.0
+        },
+        "max": {
+          "x": 240.0,
+          "y": 80.0,
+          "z": 80.0
+        },
+        "volume": 6144000.0
+      },
+      "container_coverage": 0.0583,
+      "under": [
+        "ANCHOR_SM_IslandTop",
+        "DRESS_SM_IslandTop",
+        "NODE_CAPTIVE",
+        "NODE_GUARD",
+        "NODE_SLEEPER_A",
+        "NODE_SLEEPER_B"
+      ]
+    },
+    {
+      "label": "CRUMB_Islet_01",
+      "name": "TargetPoint_31",
+      "class": "TargetPoint",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 600.0,
+        "y": 1800.0,
+        "z": -2300.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 720.0,
+          "y": 1800.0,
+          "z": -2300.0
+        },
+        "extent": {
+          "x": 120.0,
+          "y": 80.0,
+          "z": 80.0
+        },
+        "min": {
+          "x": 600.0,
+          "y": 1720.0,
+          "z": -2380.0
+        },
+        "max": {
+          "x": 840.0,
+          "y": 1880.0,
+          "z": -2220.0
+        },
+        "volume": 6144000.0
+      },
+      "container_coverage": 0.0388,
+      "under": []
+    },
+    {
+      "label": "CRUMB_Islet_02",
+      "name": "TargetPoint_32",
+      "class": "TargetPoint",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 300.0,
+        "y": 3200.0,
+        "z": -4600.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 420.0,
+          "y": 3200.0,
+          "z": -4600.0
+        },
+        "extent": {
+          "x": 120.0,
+          "y": 80.0,
+          "z": 80.0
+        },
+        "min": {
+          "x": 300.0,
+          "y": 3120.0,
+          "z": -4680.0
+        },
+        "max": {
+          "x": 540.0,
+          "y": 3280.0,
+          "z": -4520.0
+        },
+        "volume": 6144000.0
+      },
+      "container_coverage": 0.0388,
+      "under": []
+    },
+    {
+      "label": "CRUMB_Islet_03",
+      "name": "TargetPoint_33",
+      "class": "TargetPoint",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 100.0,
+        "y": 4800.0,
+        "z": -7000.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 220.0,
+          "y": 4800.0,
+          "z": -7000.0
+        },
+        "extent": {
+          "x": 120.0,
+          "y": 80.0,
+          "z": 80.0
+        },
+        "min": {
+          "x": 100.0,
+          "y": 4720.0,
+          "z": -7080.0
+        },
+        "max": {
+          "x": 340.0,
+          "y": 4880.0,
+          "z": -6920.0
+        },
+        "volume": 6144000.0
+      },
+      "container_coverage": 0.0388,
+      "under": []
+    },
+    {
+      "label": "CRUMB_Landing",
+      "name": "TargetPoint_34",
+      "class": "TargetPoint",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 0.0,
+        "y": 7000.0,
+        "z": -7450.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 120.0,
+          "y": 7000.0,
+          "z": -7450.0
+        },
+        "extent": {
+          "x": 120.0,
+          "y": 80.0,
+          "z": 80.0
+        },
+        "min": {
+          "x": 0.0,
+          "y": 6920.0,
+          "z": -7530.0
+        },
+        "max": {
+          "x": 240.0,
+          "y": 7080.0,
+          "z": -7370.0
+        },
+        "volume": 6144000.0
+      },
+      "container_coverage": 0.2039,
+      "under": [
+        "ANCHOR_SM_LandingCircle",
+        "VS_MARKER_LandPlanet"
+      ]
+    },
+    {
+      "label": "GP_GlideStart",
+      "name": "TargetPoint_1",
+      "class": "TargetPoint",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 750.0,
+        "y": 450.0,
+        "z": 150.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 870.0,
+          "y": 450.0,
+          "z": 150.0
+        },
+        "extent": {
+          "x": 120.0,
+          "y": 80.0,
+          "z": 80.0
+        },
+        "min": {
+          "x": 750.0,
+          "y": 370.0,
+          "z": 70.0
+        },
+        "max": {
+          "x": 990.0,
+          "y": 530.0,
+          "z": 230.0
+        },
+        "volume": 6144000.0
+      },
+      "container_coverage": 0.0583,
+      "under": [
+        "CRUMB_Depart_Lookout"
+      ]
+    },
+    {
+      "label": "GP_PlayerStart",
+      "name": "TargetPoint_0",
+      "class": "TargetPoint",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [
+        "PlayerStart",
+        "form=body",
+        "verb=V1"
+      ],
+      "location": {
+        "x": -240.0,
+        "y": -120.0,
+        "z": 100.0
+      },
+      "bounds": {
+        "origin": {
+          "x": -240.0,
+          "y": -120.0,
+          "z": 220.0
+        },
+        "extent": {
+          "x": 80.0,
+          "y": 80.0,
+          "z": 120.0
+        },
+        "min": {
+          "x": -320.0,
+          "y": -200.0,
+          "z": 100.0
+        },
+        "max": {
+          "x": -160.0,
+          "y": -40.0,
+          "z": 340.0
+        },
+        "volume": 6144000.0
+      },
+      "container_coverage": 0.0194,
+      "under": [
+        "PlayerStart_VS_MVP"
+      ]
+    },
+    {
+      "label": "VS_MARKER_LandPlanet",
+      "name": "TargetPoint_35",
+      "class": "TargetPoint",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 0.0,
+        "y": 7000.0,
+        "z": -7450.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 120.0,
+          "y": 7000.0,
+          "z": -7450.0
+        },
+        "extent": {
+          "x": 120.0,
+          "y": 80.0,
+          "z": 80.0
+        },
+        "min": {
+          "x": 0.0,
+          "y": 6920.0,
+          "z": -7530.0
+        },
+        "max": {
+          "x": 240.0,
+          "y": 7080.0,
+          "z": -7370.0
+        },
+        "volume": 6144000.0
+      },
+      "container_coverage": 0.2039,
+      "under": [
+        "ANCHOR_SM_LandingCircle",
+        "CRUMB_Landing"
+      ]
+    },
+    {
+      "label": "VS_MARKER_LeaveIsland_FALLBACK",
+      "name": "TargetPoint_36",
+      "class": "TargetPoint",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 750.0,
+        "y": 450.0,
+        "z": 50.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 870.0,
+          "y": 450.0,
+          "z": 50.0
+        },
+        "extent": {
+          "x": 120.0,
+          "y": 80.0,
+          "z": 80.0
+        },
+        "min": {
+          "x": 750.0,
+          "y": 370.0,
+          "z": -30.0
+        },
+        "max": {
+          "x": 990.0,
+          "y": 530.0,
+          "z": 130.0
+        },
+        "volume": 6144000.0
+      },
+      "container_coverage": 0.0583,
+      "under": [
+        "ANCHOR_SM_Glider_Perch"
+      ]
+    },
+    {
+      "label": "VS_MARKER_PortalHome",
+      "name": "TargetPoint_37",
+      "class": "TargetPoint",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": -200.0,
+        "y": -350.0,
+        "z": 100.0
+      },
+      "bounds": {
+        "origin": {
+          "x": -80.0,
+          "y": -350.0,
+          "z": 100.0
+        },
+        "extent": {
+          "x": 120.0,
+          "y": 80.0,
+          "z": 80.0
+        },
+        "min": {
+          "x": -200.0,
+          "y": -430.0,
+          "z": 20.0
+        },
+        "max": {
+          "x": 40.0,
+          "y": -270.0,
+          "z": 180.0
+        },
+        "volume": 6144000.0
+      },
+      "container_coverage": 0.0485,
+      "under": [
+        "GP_PortalA",
+        "PROTO_SM_Portal_Prototype"
+      ]
+    },
+    {
+      "label": "VS_MARKER_PortalPlanet",
+      "name": "TargetPoint_38",
+      "class": "TargetPoint",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 600.0,
+        "y": 7500.0,
+        "z": -7400.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 720.0,
+          "y": 7500.0,
+          "z": -7400.0
+        },
+        "extent": {
+          "x": 120.0,
+          "y": 80.0,
+          "z": 80.0
+        },
+        "min": {
+          "x": 600.0,
+          "y": 7420.0,
+          "z": -7480.0
+        },
+        "max": {
+          "x": 840.0,
+          "y": 7580.0,
+          "z": -7320.0
+        },
+        "volume": 6144000.0
+      },
+      "container_coverage": 0.1359,
+      "under": [
+        "GP_PortalB"
+      ]
+    },
+    {
+      "label": "VS_MARKER_Shot1_Lookout",
+      "name": "TargetPoint_39",
+      "class": "TargetPoint",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": -400.0,
+        "y": -450.0,
+        "z": 320.0
+      },
+      "bounds": {
+        "origin": {
+          "x": -280.0,
+          "y": -450.0,
+          "z": 320.0
+        },
+        "extent": {
+          "x": 120.0,
+          "y": 80.0,
+          "z": 80.0
+        },
+        "min": {
+          "x": -400.0,
+          "y": -530.0,
+          "z": 240.0
+        },
+        "max": {
+          "x": -160.0,
+          "y": -370.0,
+          "z": 400.0
+        },
+        "volume": 6144000.0
+      },
+      "container_coverage": 0.0097,
+      "under": []
+    },
+    {
+      "label": "VS_MARKER_Shot2_Cabin",
+      "name": "TargetPoint_40",
+      "class": "TargetPoint",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": -400.0,
+        "y": 250.0,
+        "z": 160.0
+      },
+      "bounds": {
+        "origin": {
+          "x": -280.0,
+          "y": 250.0,
+          "z": 160.0
+        },
+        "extent": {
+          "x": 120.0,
+          "y": 80.0,
+          "z": 80.0
+        },
+        "min": {
+          "x": -400.0,
+          "y": 170.0,
+          "z": 80.0
+        },
+        "max": {
+          "x": -160.0,
+          "y": 330.0,
+          "z": 240.0
+        },
+        "volume": 6144000.0
+      },
+      "container_coverage": 0.0097,
+      "under": [
+        "PROTO_SM_Cabin_Prototype"
+      ]
+    }
+  ]
+}
