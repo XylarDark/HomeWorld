@@ -56,6 +56,9 @@ jobs:
             echo "  OK: $doc"
           done
 
+      - name: Session door contract
+        run: python3 Content/Python/check_session_start.py
+
       - name: Check quarantine pointer stubs still exist (compat only)
         run: |
           for stub in docs/workflow/30_DAY_SCHEDULE.md docs/workflow/MVP_AND_ROADMAP_STRATEGY.md; do

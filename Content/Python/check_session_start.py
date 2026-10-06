@@ -1,0 +1,86 @@
+#!/usr/bin/env python3
+"""Fail if the session door drifts from the contract it is supposed to be.
+
+Does not load the pack. Does not start a session. A broken door exits 1.
+"""
+
+from __future__ import annotations
+
+import re
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+DOOR = ROOT / "Docs" / "context" / "SESSION_START.md"
+PACK = ROOT / "Docs" / "handoffs" / "CONTEXT_PACK_V1.md"
+
+READS = (
+    "UserHarness/docs/human-use/route-context.md",
+    "Docs/context/HOMEWORLD_ROUTE.md",
+    "Docs/WORLD_METRICS.md",
+)
+NAMED = (
+    "Docs/level/L_VS_MVP_Markers_manifest.json",
+    "Docs/COMMANDS_AND_LOG_TAGS.md",
+)
+MUST_SAY = (
+    "counts.actors",
+    "completeness.verdict",
+    "That file is the actor scan",
+    "Name only the active task (Co: the active bite)",
+    "Do not wait on a UserHarness SHA",
+    "do not copy them here",
+)
+MUST_NOT = (
+    "103 actors",
+    "afdcb0f",
+    "5caf7be",
+    "does not name a bite",
+    "Name only the active bite.",
+)
+
+
+def main() -> int:
+    problems: list[str] = []
+    if not DOOR.is_file():
+        problems.append(f"missing {DOOR.relative_to(ROOT)}")
+        text = ""
+    else:
+        text = DOOR.read_text(encoding="utf-8")
+        if not text.strip():
+            problems.append("SESSION_START.md is empty")
+    for rel in READS + NAMED:
+        if not (ROOT / rel).is_file():
+            problems.append(f"named path missing: {rel}")
+        elif rel in READS and rel not in text:
+            problems.append(f"read path not named in the door: {rel}")
+    for phrase in MUST_SAY:
+        if phrase not in text:
+            problems.append(f"door missing required phrase: {phrase}")
+    for phrase in MUST_NOT:
+        if phrase in text:
+            problems.append(f"door still copies a stale phrase: {phrase}")
+    if re.search(r"\(\d+ actors", text):
+        problems.append("door copies an actor count")
+    for stub in ("Docs/context/DISCOVERY_START.md", "Docs/context/ROUTE_START.md"):
+        body = (ROOT / stub).read_text(encoding="utf-8") if (ROOT / stub).is_file() else ""
+        if "SESSION_START.md" not in body:
+            problems.append(f"{stub} does not point at the door")
+    agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8") if (ROOT / "AGENTS.md").is_file() else ""
+    if "Docs/context/SESSION_START.md" not in agents:
+        problems.append("AGENTS.md does not point at the door")
+    pack = PACK.read_text(encoding="utf-8") if PACK.is_file() else ""
+    if "Until the manifest exists, wait" in pack and "old instruction" not in pack:
+        problems.append("CONTEXT_PACK still gives the old manifest wait as current")
+    if "skip a path not on main" in pack:
+        problems.append("CONTEXT_PACK still describes the old skip-if-missing read")
+    if problems:
+        for p in problems:
+            print(f"FAIL  {p}")
+        return 1
+    print("SESSION_START door check: pass")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

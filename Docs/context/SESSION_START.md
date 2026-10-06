@@ -32,15 +32,15 @@ Read one file per step. Start the next read only after the previous one returns.
 2. Docs/context/HOMEWORLD_ROUTE.md
 3. Docs/WORLD_METRICS.md
 
-These pack files are named here, not read at start. Open one only when the task needs it: `Docs/level/L_VS_MVP_Markers_manifest.json` (103 actors, verdict complete) when the task touches level data, and `Docs/COMMANDS_AND_LOG_TAGS.md` (generated, do not hand-edit) when it touches a console command or log tag.
+These pack files are named here, not read at start. Open one only when the task needs it: `Docs/level/L_VS_MVP_Markers_manifest.json` when the task touches level data (read `counts.actors` and `completeness.verdict` from the file; do not copy them here), and `Docs/COMMANDS_AND_LOG_TAGS.md` (generated, do not hand-edit) when it touches a console command or log tag.
 
 Extra reads by task, after the pack:
 
 | Task | Also read |
 |------|-----------|
-| Fix work | Search `docs/KNOWN_ERRORS.md` for the symptom and read only the matching entries, before any other work. To add a new entry (cause, then how to avoid it), open only the format header and the matching `###` section. Never load the whole file to read or to write. If the fix depends on level data, open the manifest named above. If that file is missing, scan the level actors in this session first. |
+| Fix work | Search `docs/KNOWN_ERRORS.md` for the symptom and read only the matching entries, before any other work. To add a new entry (cause, then how to avoid it), open only the format header and the matching `###` section. Never load the whole file to read or to write. If the fix depends on level data, the manifest named above is the actor scan. Open it. If that file is missing, scan the level actors in this session first. |
 
-Beyond the reads above, the agent opens only files the developer names, the pack file the task needs (named above), or a file `AGENTS.md` requires before an edit (steer-gate before setting feel, scope, or done). It does not name a bite or open a new chat.
+Beyond the reads above, the agent opens only files the developer names, the pack file the task needs (named above), or a file `AGENTS.md` requires before an edit (steer-gate before setting feel, scope, or done). It does not open a new chat.
 
 ## Ending the reads
 
@@ -51,10 +51,10 @@ If the opening message already names the task, start it. Otherwise ask one quest
 These hold for every agent, desktop or room. They live only here. `AGENTS.md` § Session (the ~60k handoff, one significant write at a time, stop on changes you did not make) still applies and is not repeated.
 
 1. One unknown at a time: one named contract, one change, one run, one score, then stop.
-2. Handoffs are 5 to 10 lines plus paths: goal, paths, pass bar, what blocks it. No transcripts or full gate JSON in chat. Name only the active bite.
+2. Handoffs are 5 to 10 lines plus paths: goal, paths, pass bar, what blocks it. No transcripts or full gate JSON in chat. Name only the active task (Co: the active bite).
 3. Second fail on the same writer parks for Lead. Do not open another retry.
 4. Build working mechanics first, managers and architecture after.
-5. Before any level option, packet, or fix that touches the level, scan the level actors first. Never work from assumed positions.
+5. Before any level option, packet, or fix that touches the level, open the manifest named above. That file is the actor scan. If it is missing, scan the level actors in this session first. Never work from assumed positions.
 6. A route line about movement or space names the axis, the distance, and what is past the edge, and matches the GDD.
 7. A placeable actor needs a scene root and a keep-transform check.
 8. Docs-only work merges after the review passes (Co: Test PASS; solo: Luke reviews the PR). Source or level work (`.umap`, `.uasset`) waits for Lead's yes (solo: Luke's yes) after that.
@@ -81,8 +81,8 @@ Do not stop the moment the current task is done. Close in this order, and do not
 2. Ask, with the question tool, any question whose answer would let the agent continue. Carry on from the answer rather than closing.
 3. Only when no agent work is left and the next step needs the developer's hands, ask whether a tutorial is wanted. Never offer one for agent-owned work.
 
-No tutorial is on offer yet. Offer `Docs/qa/HUMAN_TUTORIAL.md` only once it is committed and `Content/Python/human_tutorial.py --check` exits 0. Until then, step 3 names the next manual step in one line.
+No tutorial is on offer yet. Offer `Docs/qa/HUMAN_TUTORIAL.md` only once it is committed and `Content/Python/human_tutorial.py --check` exits 0. Until then, step 3 names the next manual step in one line. Do not add a recipe for a row that is PASS when the shipping level is present: the check then fails the other way.
 
-This file is the HomeWorld copy of the start and close rules in `route-context.md`. There is one start door now; where the two differ, this one wins. The pinned `route-context.md` (`afdcb0f`) already has the close section. Do not wait on another UserHarness SHA for it.
+This file is the HomeWorld copy of the start and close rules in `route-context.md`. There is one start door now; where the two differ, this one wins. The pinned `route-context.md` already has the close section. Do not wait on a UserHarness SHA for it.
 
 If an unrelated second task appears, alert and stop.

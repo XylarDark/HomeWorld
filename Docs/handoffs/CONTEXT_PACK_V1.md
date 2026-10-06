@@ -12,7 +12,7 @@
 - The GDD, the route, and packets link to rows instead of copying numbers. Existing copies are left in place in this bite; a mismatch is reported, not silently edited.
 - Same PR adds Fix's two lines to `docs/KNOWN_ERRORS.md`, verbatim:
   1. **Cause:** When the player is moved into the destination portal's box, a new overlap fires in the same frame and sends them straight back. **Avoid:** Start the cooldown on every portal before the move, and place the player at least 60 uu outside every portal box. This is the #281 fix at `2369a12`.
-  2. **Cause:** I assumed the portal destinations were portal components, but they were TargetPoints, so the lookup came back empty. That cost one PIE round on `bdd7b4d`. **Avoid:** Read the level manifest from bite 3 before writing any Fix SHA that depends on level data. Until the manifest exists, wait for Conductor's actor scan.
+  2. **Cause:** I assumed the portal destinations were portal components, but they were TargetPoints, so the lookup came back empty. That cost one PIE round on `bdd7b4d`. **Avoid:** Read the level manifest from bite 3 before writing any Fix SHA that depends on level data. The manifest is on main; if it is missing, scan the level actors in this session first. (The old instruction waited for Conductor's actor scan until the manifest existed.)
 - **Cross-check scope:** only `Docs/01_GDD_MVP.md`, `Docs/context/HOMEWORLD_ROUTE.md`, and `Docs/handoffs/CLOUDS_WISPS_V1.md`. Wider scope needs a Lead yes.
 - **Done (Test):**
 
@@ -66,7 +66,7 @@ Lead, Oct 5 2026 (interview #9, 1A 2A): one start file and one rule set for desk
 - **One start door.** `Docs/context/SESSION_START.md` reads route-context, then the route, then `Docs/WORLD_METRICS.md`, and names the other pack files to open only when the task needs them (Lead interview #18, 18A). It ends by asking one question unless the opening message already names the task. `DISCOVERY_START.md` and `ROUTE_START.md` only point to it.
 - **One hook for desktop IDE agents.** `AGENTS.md` gets one line pointing to `Docs/context/SESSION_START.md`, and nothing more. The pack paths are not listed in `AGENTS.md`.
 - **Pack paths.** The door reads `Docs/WORLD_METRICS.md`. It names `Docs/level/L_VS_MVP_Markers_manifest.json` and `Docs/COMMANDS_AND_LOG_TAGS.md` and opens each only when the task needs it. Fix work searches `docs/KNOWN_ERRORS.md` for the symptom and reads the matching entries. Bites add no read lines anywhere.
-- **Box lanes.** `homeworld-co-ops` gets one line pointing to `SESSION_START.md` and drops its copies of the shared rules once this PR merges. Conductor makes that skill edit.
+- **Box lanes.** `homeworld-co-ops` is a sand-workflow skill, not a file in this repo. The edit that points it at `SESSION_START.md` and drops its copy of the shared rules is unverified. Do not treat it as done.
 - **OpenCode bite prompts.** Conductor's paste-ready prompts for bites 3 and 4 name the paths up front, because those files don't exist on main yet when the bite starts.
 
 ## Out of scope
