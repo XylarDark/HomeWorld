@@ -70,6 +70,6 @@ Glide speed, sink, or carry changes. Fixed cloud, wisp, or layer counts. Layer h
 1. **1A**: extra cloud layers sit inside the 50 m band with the 25 m gap kept clear, so the 75 m drop and 30 s descent stay unchanged.
 2. **2A**: clouds are pass-through and only register an overlap.
 
-## Doc note (not edited here)
+## Doc note
 
-`Docs/01_GDD_MVP.md` §9 says the descent is 30 s, but Appendix B still says "No duration target set."
+Resolved: `Docs/01_GDD_MVP.md` Appendix B reads 30 s, matching §9 (#286, interview #8, 8A).

@@ -45,9 +45,9 @@ state is not that writer.
 - The 260 m line is the plains edge on that straight glide only.
 - Other directions have no edge.
 - A cloud ring does not draw that line around the island.
-- Height is one and a half times the current drop.
-- Neutral glide speed is two thirds.
-- No meter height is written for the drop.
+- Height is one and a half times the first jump's 75 m drop. It is a placeholder until human testing.
+- Neutral glide speed is two thirds of the first jump's neutral glide speed. It is a placeholder until human testing.
+- No meter height is written for the night flight.
 
 ## Left empty on purpose
 
