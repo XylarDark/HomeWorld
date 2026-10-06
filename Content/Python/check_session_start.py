@@ -79,9 +79,10 @@ def main() -> int:
     if re.search(r"\(\d+ actors", text):
         problems.append("door copies an actor count")
     for stub in ("Docs/context/DISCOVERY_START.md", "Docs/context/ROUTE_START.md"):
-        body = (ROOT / stub).read_text(encoding="utf-8") if (ROOT / stub).is_file() else ""
-        if "SESSION_START.md" not in body:
-            problems.append(f"{stub} does not point at the door")
+        if (ROOT / stub).exists():
+            problems.append(f"retired door still exists: {stub}")
+    if "DISCOVERY_START.md" in text or "ROUTE_START.md" in text:
+        problems.append("door still names a retired start file")
     agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8") if (ROOT / "AGENTS.md").is_file() else ""
     if "Docs/context/SESSION_START.md" not in agents:
         problems.append("AGENTS.md does not point at the door")

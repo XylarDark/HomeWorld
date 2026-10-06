@@ -63,7 +63,7 @@
 
 Lead, Oct 5 2026 (interview #9, 1A 2A): one start file and one rule set for desktop agents and room seats.
 
-- **One start door.** `Docs/context/SESSION_START.md` reads route-context, then the route, then `Docs/WORLD_METRICS.md`, and names the other pack files to open only when the task needs them (Lead interview #18, 18A). It ends by asking one question unless the opening message already names the task. `DISCOVERY_START.md` and `ROUTE_START.md` only point to it.
+- **One start door.** `Docs/context/SESSION_START.md` reads route-context, then the route, then `Docs/WORLD_METRICS.md`, and names the other pack files to open only when the task needs them (Lead interview #18, 18A). It ends by asking one question unless the opening message already names the task. `DISCOVERY_START.md` and `ROUTE_START.md` are removed.
 - **One hook for desktop IDE agents.** `AGENTS.md` gets one line pointing to `Docs/context/SESSION_START.md`, and nothing more. The pack paths are not listed in `AGENTS.md`.
 - **Pack paths.** The door reads `Docs/WORLD_METRICS.md`. It names `Docs/level/L_VS_MVP_Markers_manifest.json` and `Docs/COMMANDS_AND_LOG_TAGS.md` and opens each only when the task needs it. Fix work searches `docs/KNOWN_ERRORS.md` for the symptom and reads the matching entries. Bites add no read lines anywhere.
 - **Box lanes.** `homeworld-co-ops` is a sand-workflow skill, not a file in this repo. The edit that points it at `SESSION_START.md` and drops its copy of the shared rules is unverified. Do not treat it as done.

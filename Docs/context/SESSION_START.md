@@ -1,6 +1,6 @@
 # Session start
 
-The one start door for HomeWorld, for desktop IDE agents and for the room seats alike (Lead interview #9, 1A 2A, 2026-10-05). `DISCOVERY_START.md` and `ROUTE_START.md` now only point here.
+The one start door for HomeWorld, for desktop IDE agents and for the room seats alike (Lead interview #9, 1A 2A, 2026-10-05). The old discovery and route start files are removed. This file is the only start.
 
 This works in any IDE, chat surface, CLI, or agent runner. If a capability is missing, say so instead of inventing an equivalent.
 
@@ -47,6 +47,8 @@ Beyond the reads above, the agent opens only files the developer names, the pack
 ## Ending the reads
 
 If the opening message already names the task, start it. Otherwise ask one question, in the current conversation, and carry on from the answer.
+
+Other doors are not start reads. Open one only when the developer names it, or when the question turns up evidence it is needed: `Docs/handoffs/DISCOVERY_CONTEXT_ACCEPTANCE.md` for the acceptance check, `Docs/handoffs/CLOUD_GLIDER_ROUTE_CONTINUE.md` for the cloud and glider handoff. Do not open a second context before that yes.
 
 ## Shared development and token rules
 

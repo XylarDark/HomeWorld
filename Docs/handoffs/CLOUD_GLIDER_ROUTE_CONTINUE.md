@@ -1,9 +1,8 @@
 # Cloud and glider route handoff
 
 Provider-, model-, IDE-, and runner-agnostic handoff for a development session
-that has been explicitly started by the developer. Use `Docs/context/ROUTE_START.md`
-for the route handoff; this file is supporting status, not a replacement start
-protocol. During discovery, do not open this handoff unless the developer names
+that has been explicitly started by the developer. Start from `Docs/context/SESSION_START.md`.
+This file is supporting status, not a start protocol. During discovery, do not open this handoff unless the developer names
 it as an extra file.
 
 ## Current route state
@@ -11,9 +10,8 @@ it as an extra file.
 Read `Docs/context/HOMEWORLD_ROUTE.md` from the current `main` commit before
 using any route facts. If the checkout may be on another branch or have local
 edits, inspect `git show main:Docs/context/HOMEWORLD_ROUTE.md` (or the host's
-equivalent read of the named `main` revision), not the working copy. The current
-route facts include a steered glide, a 15-second homestead-to-field window,
-placeholders for cloud dimensions and spacing, and the existing field landing.
+equivalent read of the named `main` revision), not the working copy. Do not use a 15-second window from this handoff. Duration and placeholders
+come from the route and `Docs/WORLD_METRICS.md`.
 Treat each fact's qualification as part of the fact. Do not promote a
 placeholder or conditional target to a settled value.
 

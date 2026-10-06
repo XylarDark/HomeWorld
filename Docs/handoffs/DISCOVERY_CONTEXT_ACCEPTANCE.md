@@ -7,7 +7,7 @@ is not part of the contract.
 
 ## Acceptance sequence
 
-Start from `Docs/context/DISCOVERY_START.md`. Read exactly one file per step,
+Start from `Docs/context/SESSION_START.md`. Read exactly one file per step,
 waiting for each read to finish before beginning the next:
 
 1. `UserHarness/docs/human-use/route-context.md` — identify the state and its
@@ -19,7 +19,7 @@ Only after all three reads, ask one concise discovery question. It must not ask
 the developer to name a bite or invite the agent to choose one. The developer
 names any additional files. If an unrelated second task appears, alert and stop.
 If evidence shows route context is needed, use the transition question below;
-do not open `Docs/context/ROUTE_START.md` before the developer confirms.
+do not open a second context before the developer confirms.
 
 The state file and route facts may be inspected through the current environment's
 normal file-reading interface. Do not claim a read happened if it did not. If
@@ -28,8 +28,8 @@ and wait for each result before the next.
 
 ## Context transition acceptance
 
-Either start protocol may offer the other only after identifying evidence that
-the other context is needed. The offer must state that evidence, ask whether to
+The one start door may offer another context only after identifying evidence that
+it is needed. The offer must state that evidence, ask whether to
 switch, and wait. No files from the other sequence are read before a yes. A no
 keeps the session in the current context or ends it at that boundary. Topic
 keywords alone are not a trigger. Test both directions separately. An unrelated
