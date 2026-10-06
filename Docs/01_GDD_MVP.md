@@ -153,7 +153,7 @@ World = gather on planet (day). Stored = place / convert at homestead storage pr
 | RES_HERB | Herb | Day Use on herb cluster → +1 Herb | Poultice bundle shelf → Stored | **Heal** (V6); alternate **tame offer** |
 | RES_SEED | Spirit seed | Day Use on faint day plant (rare node) → +1 Seed | Night crop planter receives seed for nurture | **Nurture crop** (V7); optional **heal** alternate if SYS prefers seed over herb for one spirit |
 
-**Gather rules:** One interact = one unit. Node cooldown or deplete until dawn. Prompt shows RES_ID. Fail if no free inventory handling (§10).
+**Gather rules:** One interact = one unit. Gathering a pile takes one from a pool of piles. There is no cooldown, and dawn alone does not bring a pile back; new piles come from spirit fertilizer (see [`HOMEWORLD_ROUTE.md`](context/HOMEWORLD_ROUTE.md)). Prompt shows RES_ID. Fail if no free inventory handling (§10).
 
 **Store rules:** Homestead-only. Transfer 1 unit inventory → Stored count. Does not create new RES types.
 

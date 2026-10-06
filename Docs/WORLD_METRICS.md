@@ -2,7 +2,7 @@
 
 One row per number. Bite 1 of `Docs/handoffs/CONTEXT_PACK_V1.md`. Docs only.
 
-**Cite base:** every "file:line" below is checked against main `2c786ac`. "Kept by #N" names the Lead interview that kept or changed the number. A number with no findable source reads `unsourced`. Route numbers marked "placeholder" stay placeholders until human testing, as the route says.
+**Cite base:** every "file:line" below is checked against the three files as this PR leaves them (base main `2c786ac`; the #11 edits change no line numbers). "Kept by #N" names the Lead interview that kept or changed the number. A number with no findable source reads `unsourced`. Route numbers marked "placeholder" stay placeholders until human testing, as the route says.
 
 **Scope:** numbers written in `Docs/01_GDD_MVP.md`, `Docs/context/HOMEWORLD_ROUTE.md` and `Docs/handoffs/CLOUDS_WISPS_V1.md`. Level actor positions and sizes are not here; they come from `Docs/level/L_VS_MVP_Markers_manifest.json` (bite 3) or Conductor's actor scan (gate #14).
 
@@ -27,8 +27,8 @@ One row per number. Bite 1 of `Docs/handoffs/CONTEXT_PACK_V1.md`. Docs only.
 | D13 | Cloud spacing, bottom layer | 4–6 | × diameter | horizontal | `HOMEWORLD_ROUTE.md:25`, placeholder |
 | D14 | Cloud layers, minimum | 2 | count | — | `CLOUDS_WISPS_V1.md:42` ("at least 2, no fixed number"); route `:31` sets no fixed count |
 | D15 | Plains edge on the straight glide | 260 | m | straight-glide heading; +X or +Y open (Lead desk check). Past the edge: not written. Other directions: no edge (`:46`) | `HOMEWORLD_ROUTE.md:45` |
-| D16 | Height, relative | 1.5 | × current drop | +Z | `HOMEWORLD_ROUTE.md:48`; no meters written (`:50`) |
-| D17 | Neutral glide speed, relative | 2/3 | ratio | — | `HOMEWORLD_ROUTE.md:49`; reference speed not named |
+| D16 | Night flight height | 1.5 × D1 (112.5 m derived), placeholder | × first-jump drop | +Z | `HOMEWORLD_ROUTE.md:48`, changed by #11 (2A); the route writes no meters for it (`:50`, #11 1A) |
+| D17 | Night flight neutral glide speed | 2/3 × first-jump neutral glide speed, placeholder | ratio | along glide heading | `HOMEWORLD_ROUTE.md:49`, changed by #11 (2A) |
 
 ## Loop durations (GDD)
 
@@ -65,12 +65,16 @@ One row per number. Bite 1 of `Docs/handoffs/CONTEXT_PACK_V1.md`. Docs only.
 | S6 | Heals in the slice | 3 | count | `01_GDD_MVP.md:119`, `:300` |
 | S7 | Nurture targets in the slice | 2 | count | `01_GDD_MVP.md:129`, `:301` |
 
-## Mismatches found (reported, not edited)
+## Mismatches found
 
-| # | Where | Found | Against |
+All three found in this bite are resolved here.
+
+| # | Where | Was | Now |
 |---|---|---|---|
-| M1 | `CLOUDS_WISPS_V1.md:75` | "Appendix B still says 'No duration target set.'" | `01_GDD_MVP.md:296` now reads 30 s (#286, interview #8 8A). The note is stale. |
-| M2 | `HOMEWORLD_ROUTE.md:50` | "No meter height is written for the drop." | The same file writes the drop as 75 m at `:23`, `:26` and `:44`. Needs Lead to say which one stands. |
-| M3 | `HOMEWORLD_ROUTE.md:48`, `:49` | "one and a half times", "two thirds" | Neither line names what it scales against beyond "current drop", so D16 and D17 can't be turned into meters or m/s. Not converted here. |
+| M1 | `CLOUDS_WISPS_V1.md:75` | Stale note that Appendix B had no duration | Marked resolved (#286, #8 8A) |
+| M2 | `HOMEWORLD_ROUTE.md:50` | "No meter height is written for the drop," against 75 m at `:23`, `:26`, `:44` | Reads "for the night flight" (#11 1A) |
+| M3 | `HOMEWORLD_ROUTE.md:48`, `:49` | Ratios with no reference | Measured against the first jump (#11 2A) |
+
+Also fixed under #11 (3A), not a number: `01_GDD_MVP.md:156` said "Node cooldown or deplete until dawn"; it now matches the route (no cooldown, dawn alone brings no pile back). The Source change to `HomeWorldResourcePile` is queued for the desktop session and needs Lead's yes to merge.
 
 No other number in the three files disagrees with a row above.
