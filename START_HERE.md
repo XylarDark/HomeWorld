@@ -1,8 +1,10 @@
 # START HERE
 
+> Agents start at [Docs/context/SESSION_START.md](Docs/context/SESSION_START.md). This file covers the Lead's swarm commands.
+
 > **Repo layout:** This tree lives inside the **HomeWorld UE 5.8** repo. MVP swarm canon is under
 > **`Docs/`**, Unreal project docs under **`docs/`** — see [Docs/README.md](Docs/README.md).
-> **These are ONE directory on Windows, not two trees** (both spellings enumerate the same 441
+> **These are ONE directory on Windows, not two trees** (both spellings resolve to the same
 > files); the split is an editorial convention carried by subdirectory prefixes. There is nothing
 > to merge and nothing to sync.
 
