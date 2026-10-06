@@ -8,23 +8,20 @@
 
 ## Yesterday (last session)
 
-- List 73 complete: Phase 3 Steam Demo packaged build + smoke test (T1–T10 all done).
-- This session: validate_task_list.py path fix (TaskLists/ fallback); question-gate enforcement confirmed; check_session_start.py PASS; npm verify:fast 139/139 PASS; test_polish_readiness.py 219/219 PASS.
-- List 74 generated: Polish readiness automation (T1–T10); T1, T5, T6 completed at generation.
+- This session: List 74 complete (T1–T10 all done) — polish readiness automation. T2 check_session_start.py QUESTION_GATE; T3 POLISH_ASSET_BOARD _source verified + HOW_TO written + SESSION_START polish door row; T4 read-order audit clean (git diff 994c2c9..HEAD empty); T7 human-gated items cross-linked in SESSION_LOG; T8 VERTICAL_SLICE_CHECKLIST §4 + AUTOMATION_GAPS cycle note; T9 verify green (validate_task_list.py exit 0, check_session_start.py PASS, verify:fast 139/139 PASS); T10 ACCOMPLISHMENTS/PROJECT_STATE §4 updated.
+- Prior session: List 73 complete; validate_task_list.py path fix; List 74 generated with T1, T5, T6.
 
 ---
 
 ## Today
 
-- T2: Harden `check_session_start.py` to cover the question-before-discovery gate.
-- T3: Cross-link POLISH_ASSET_BOARD to 37_POLISH_PASS_PROCESS; write POLISH_ASSET_BOARD_HOW_TO.md.
+- Awaiting Luke's hands (human-gated, from list 74): (a) PIE cloud descent — open L_VS_MVP_Markers, locate GP_GlideStart, press E, verify landing on plains; (b) run `Content/Python/measure_ue_island.py` in Editor on L_VS_MVP_Markers; (c) POLISH_ASSET_BOARD triage — open `docs/qa/POLISH_ASSET_BOARD.json`, fill stage (S0–S5) + priority (1–10) per `docs/qa/POLISH_ASSET_BOARD_HOW_TO.md`.
 
 ---
 
 ## Tomorrow
 
-- T4: SESSION_START read-order audit (no silent bloat since commit 994c2c9).
-- T7: Cross-link and document the three human-gated items in SESSION_LOG for Luke.
+- Generate list 75 per HOW_TO_GENERATE_TASK_LIST.md once Luke returns the human-gated results.
 
 ---
 

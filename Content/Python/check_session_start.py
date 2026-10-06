@@ -40,6 +40,7 @@ MUST_NOT = (
     "Main SHA the session last pulled",
     "A placeable actor needs a scene root",
 )
+QUESTION_GATE = ("ask one question",)
 NAMED_ON_DEMAND = (
     "Docs/context/HANDBACK.md",
     "Docs/context/LEVEL_RULES.md",
@@ -78,6 +79,9 @@ def main() -> int:
     claude = (ROOT / "CLAUDE.md").read_text(encoding="utf-8") if (ROOT / "CLAUDE.md").is_file() else ""
     if "@AGENTS.md" not in claude:
         problems.append("CLAUDE.md does not import AGENTS.md")
+    for phrase in QUESTION_GATE:
+        if phrase not in text:
+            problems.append(f"door lost the question-before-discovery gate: {phrase}")
     for phrase in MUST_NOT:
         if phrase in text:
             problems.append(f"door still copies a stale phrase: {phrase}")

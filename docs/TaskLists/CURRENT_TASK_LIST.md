@@ -28,7 +28,7 @@
 - **success criteria:** ``check_session_start.py`` exits 0 and covers the question-before-discovery gate; ``python Content/Python/check_session_start.py`` shows ``SESSION_START door check: pass``; T2 status set to completed.
 - **research_notes:** SESSION_START.md line 49: "Always ask one question, in the current conversation, to align on the task before using any discovery tool, and carry on from the answer." Stable token: ``ask one question`` or ``before using any discovery tool``. Extend the ``REQUIRED`` list or add a ``QUESTION_GATE_PATTERN``.
 - **steps_or_doc:** ``Content/Python/check_session_start.py``; ``Docs/context/SESSION_START.md`` section "Ending the reads".
-- **status:** pending
+- **status:** completed
 
 ---
 
@@ -38,7 +38,7 @@
 - **success criteria:** ``_source`` verified or corrected; ``POLISH_ASSET_BOARD_HOW_TO.md`` committed (10–15 lines, no taste calls); SESSION_START door table optionally updated; T3 status set to completed.
 - **research_notes:** ``docs/qa/POLISH_ASSET_BOARD.json`` ``_source`` = "Docs/37_POLISH_PASS_PROCESS.md section 3". Open ``Docs/37_POLISH_PASS_PROCESS.md`` to verify §3 contains stage ladder. Do NOT fill in stages or priorities. SESSION_START door table is lines 53–59.
 - **steps_or_doc:** ``docs/qa/POLISH_ASSET_BOARD.json``; ``Docs/37_POLISH_PASS_PROCESS.md`` §3; ``Docs/context/SESSION_START.md`` (door table); ``docs/qa/POLISH_ASSET_BOARD_HOW_TO.md`` (create).
-- **status:** pending
+- **status:** completed
 
 ---
 
@@ -48,7 +48,7 @@
 - **success criteria:** SESSION_START.md confirmed to have no new unconditional reads beyond the two defined start reads; any new unconditional reads moved to named-pack or logged; T4 status set to completed.
 - **research_notes:** Two unconditional reads: (1) route-context.md through ``## How to detect the state``, (2) ROUTE_INDEX.md. All other files are in the named-pack or extra-reads-by-task tables. Commit ``994c2c9`` is the baseline for optimization.
 - **steps_or_doc:** ``Docs/context/SESSION_START.md`` section "Read order"; ``git diff 994c2c9..HEAD -- Docs/context/SESSION_START.md``; ``docs/Automation/AUTOMATION_GAPS.md``.
-- **status:** pending
+- **status:** completed
 
 ---
 
@@ -78,7 +78,7 @@
 - **success criteria:** SESSION_LOG.md has Human-gated items section with 3 items and doc pointers; handoff file confirmed accurate or updated if stale; T7 status set to completed.
 - **research_notes:** Handoff "Next action" items 1–3 match the three human-gated items above. Check that "Evidence" in the handoff still matches commit ``d6c9c3d``. If the handoff is stale (wrong commit or wrong paths), update "Changed paths" and "Evidence" to current HEAD.
 - **steps_or_doc:** ``Docs/handoffs/SESSION_HANDOFF_DESCENT_AND_DOOR.md``; ``docs/SESSION_LOG.md``.
-- **status:** pending
+- **status:** completed
 
 ---
 
@@ -88,7 +88,7 @@
 - **success criteria:** VERTICAL_SLICE_CHECKLIST §4 has seventy-fourth-list row; AUTOMATION_GAPS cycle note; CONSOLE_COMMANDS confirmed no change; T8 status set to completed.
 - **research_notes:** VERTICAL_SLICE_CHECKLIST — search in ``docs/workflow/`` and ``docs/TaskLists/``. AUTOMATION_GAPS at ``docs/Automation/AUTOMATION_GAPS.md``. CONSOLE_COMMANDS at ``docs/CONSOLE_COMMANDS.md``. No new console commands in T1–T7.
 - **steps_or_doc:** VERTICAL_SLICE_CHECKLIST (check both paths); ``docs/Automation/AUTOMATION_GAPS.md``; ``docs/CONSOLE_COMMANDS.md``.
-- **status:** pending
+- **status:** completed
 
 ---
 
@@ -98,7 +98,7 @@
 - **success criteria:** validate_task_list.py exit 0; check_session_start.py PASS; npm run verify:fast PASS; doc review done; DAILY_STATE current; T9 status set to completed.
 - **research_notes:** validate_task_list.py path fix (T1) makes it exit 0 on TaskLists path. check_session_start.py question-gate check (T2) should be in place. npm run verify:fast was 139/139 PASS at session start. No C++/Build.cs changes in list 74.
 - **steps_or_doc:** ``Content/Python/validate_task_list.py``; ``Content/Python/check_session_start.py``; ``npm run verify:fast``; VERTICAL_SLICE_CHECKLIST §3–§4; ``docs/TaskLists/DAILY_STATE.md``.
-- **status:** pending
+- **status:** completed
 
 ---
 
@@ -108,7 +108,7 @@
 - **success criteria:** ACCOMPLISHMENTS_OVERVIEW §4 has seventy-fourth-cycle row; PROJECT_STATE §4 says list 74 complete; T10 status set to completed.
 - **research_notes:** ACCOMPLISHMENTS_OVERVIEW at ``docs/TaskLists/ACCOMPLISHMENTS_OVERVIEW.md``. PROJECT_STATE at ``docs/TaskLists/PROJECT_STATE_AND_TASK_LIST.md``. Update §4 only.
 - **steps_or_doc:** ``docs/TaskLists/ACCOMPLISHMENTS_OVERVIEW.md`` §4; ``docs/TaskLists/PROJECT_STATE_AND_TASK_LIST.md`` §4.
-- **status:** pending
+- **status:** completed
 
 ---
 

@@ -106,10 +106,10 @@ Use this list as the source of "what to do next." Each item has a **goal**, **su
 
 ---
 
-## 4. Current list (seventy-third 10-task list — Phase 3 Steam Demo packaged build + smoke test)
+## 4. Current list (seventy-fourth 10-task list — Polish readiness automation)
 
-- The **seventy-third 10-task list** is **complete**. Phase 3 (Steam Demo packaged build + smoke test): T1–T10 in [CURRENT_TASK_LIST.md](CURRENT_TASK_LIST.md) all completed (packaged build run, smoke test or deferred, Phase 3 gate, vertical slice §4, docs and cycle, verification, buffer).
-- **Next (after list 73):** Phase 4 (Steam Demo store draft) **skipped**. Generate next list per [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md); next focus per [NEXT_30_DAY_WINDOW.md](NEXT_30_DAY_WINDOW.md) (assets, polish, deferred, etc.). Run `.\Tools\Start-AllAgents-InNewWindow.ps1` when ready.
+- The **seventy-fourth 10-task list** is **complete**. Polish readiness automation: T1–T10 all completed (validate_task_list.py path fix, check_session_start.py QUESTION_GATE, POLISH_ASSET_BOARD HOW_TO + verified _source, SESSION_START read-order audit, DAILY_STATE/SESSION_LOG hygiene, human-gated items documented, VERTICAL_SLICE_CHECKLIST §4 + AUTOMATION_GAPS cycle note, verification green: validate_task_list.py exit 0, check_session_start.py PASS, verify:fast 139/139 PASS).
+- **Next (after list 74):** Human-gated items with Luke — PIE cloud descent from GP_GlideStart, measure_ue_island.py on L_VS_MVP_Markers, POLISH_ASSET_BOARD triage per POLISH_ASSET_BOARD_HOW_TO.md. Then generate the next list per [HOW_TO_GENERATE_TASK_LIST.md](HOW_TO_GENERATE_TASK_LIST.md); next focus per [NEXT_30_DAY_WINDOW.md](NEXT_30_DAY_WINDOW.md). Run `.\Tools\Start-AllAgents-InNewWindow.ps1` when ready.
 - **Cycle doc freshness and next priority:** See [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) (top) and [ACCOMPLISHMENTS_OVERVIEW.md](ACCOMPLISHMENTS_OVERVIEW.md) §4.
 
 ---

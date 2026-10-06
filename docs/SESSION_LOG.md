@@ -9484,14 +9484,15 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 ### List 74 (2026-10-06) — Polish readiness automation
 
 - validate_task_list.py path fix: hardcoded `docs/workflow/` → two-path fallback (`docs/TaskLists/` primary, `docs/workflow/` legacy); exit 0 confirmed.
-- check_session_start.py: PASS (question-before-discovery gate coverage pending T2).
+- check_session_start.py: PASS (question-before-discovery gate now covered via QUESTION_GATE).
 - npm run verify:fast: 139/139 PASS.
 - pytest test_polish_readiness.py: 219/219 PASS (90 subtests, 3.62s).
 - List 74 generated (T1–T10). T1, T5, T6 completed at generation. T2–T4, T7–T10 pending.
+- List 74 closed 2026-10-06 (same session): T2 QUESTION_GATE, T3 HOW_TO + _source verified + polish door row, T4 read-order audit clean (git diff 994c2c9..HEAD empty), T7 human-gated items cross-linked, T8 checklist §4 + AUTOMATION_GAPS, T9 green (validate_task_list.py exit 0, check_session_start.py PASS, verify:fast 139/139 PASS), T10 ACCOMPLISHMENTS/PROJECT_STATE §4. DAILY_STATE updated: Today = Luke's three human-gated items.
 
 #### Human-gated items (list 74)
 
 Three items await Luke in Editor — no agent work possible until these are done:
 1. **PIE cloud descent** — open L_VS_MVP_Markers, locate GP_GlideStart, press E to launch glide; verify landing on plains. Ref: `Docs/handoffs/SESSION_HANDOFF_DESCENT_AND_DOOR.md` Next action 1.
 2. **measure_ue_island.py** — with Editor open and L_VS_MVP_Markers loaded, run `Content/Python/measure_ue_island.py` to close `env.ue_island_measured`. Ref: handoff Next action 2.
-3. **POLISH_ASSET_BOARD triage** — open `docs/qa/POLISH_ASSET_BOARD.json`; for each asset, look at it in Editor and set `stage` (S0–S5) + `priority` (1–10). See `docs/qa/POLISH_ASSET_BOARD_HOW_TO.md` (to be written in T3). Ref: handoff Next action 3 + `Docs/37_POLISH_PASS_PROCESS.md` §3.
+3. **POLISH_ASSET_BOARD triage** — open `docs/qa/POLISH_ASSET_BOARD.json`; for each asset, look at it in Editor and set `stage` (S0–S5) + `priority` (1–10). See `docs/qa/POLISH_ASSET_BOARD_HOW_TO.md`. Ref: handoff Next action 3 + `Docs/37_POLISH_PASS_PROCESS.md` §3.

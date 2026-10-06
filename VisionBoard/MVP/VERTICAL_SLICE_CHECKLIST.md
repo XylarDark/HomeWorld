@@ -1061,6 +1061,19 @@ The **MVP tutorial loop** is the target for the **tutorial gate** (one day: wake
 
 ---
 
+### Seventy-fourth-list deliverables (Polish readiness automation)
+
+**Context:** Seventy-fourth list is agent-owned polish readiness checks: check_session_start.py question-gate hardening, POLISH_ASSET_BOARD cross-link + HOW_TO, SESSION_START read-order audit, DAILY_STATE/SESSION_LOG hygiene. Human-gated items (PIE cloud descent, measure_ue_island.py, POLISH_ASSET_BOARD triage) documented for Luke.
+
+| Deliverable | Outcome (seventy-fourth list) |
+|-------------|-------------------------------|
+| **Polish readiness — session door gate** | T2: QUESTION_GATE check added to check_session_start.py; PASS. |
+| **Polish readiness — asset board** | T3: _source verified against 37_POLISH_PASS_PROCESS §3; POLISH_ASSET_BOARD_HOW_TO.md written; polish door row added to SESSION_START. |
+| **Polish readiness — read-order audit** | T4: git diff 994c2c9..HEAD shows no new unconditional reads in SESSION_START. |
+| **Vertical slice §4 seventy-fourth deliverables** | This subsection; polish readiness automation (agent-owned checks, human-gated items documented). |
+
+---
+
 ## 5. After buffer (Days 26–30)
 
 - Lock **Chosen moment** and **Chosen corner** in [PROTOTYPE_SCOPE.md](PROTOTYPE_SCOPE.md).
