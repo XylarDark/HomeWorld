@@ -14,7 +14,9 @@ from pathlib import Path
 # Resolve project root (parent of Content/)
 SCRIPT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SCRIPT_DIR.parent.parent
-TASK_LIST_PATH = PROJECT_ROOT / "docs" / "workflow" / "CURRENT_TASK_LIST.md"
+_TASK_LIST_PRIMARY = PROJECT_ROOT / "docs" / "TaskLists" / "CURRENT_TASK_LIST.md"
+_TASK_LIST_LEGACY  = PROJECT_ROOT / "docs" / "workflow"   / "CURRENT_TASK_LIST.md"
+TASK_LIST_PATH = _TASK_LIST_PRIMARY if _TASK_LIST_PRIMARY.exists() else _TASK_LIST_LEGACY
 
 VALID_STATUSES = frozenset({"pending", "in_progress", "completed", "blocked"})
 # Field names as they appear in the doc (success criteria has a space)

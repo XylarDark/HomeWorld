@@ -9480,3 +9480,18 @@ Added `Docs/08_AUDIT_UPGRADE_STRATEGY.md` (WAVE A–F plan) and pointer in `Docs
 **Pending:** DESKTOP re-prove § in PR #198.
 
 **Errors:** None (py_compile OK).
+
+### List 74 (2026-10-06) — Polish readiness automation
+
+- validate_task_list.py path fix: hardcoded `docs/workflow/` → two-path fallback (`docs/TaskLists/` primary, `docs/workflow/` legacy); exit 0 confirmed.
+- check_session_start.py: PASS (question-before-discovery gate coverage pending T2).
+- npm run verify:fast: 139/139 PASS.
+- pytest test_polish_readiness.py: 219/219 PASS (90 subtests, 3.62s).
+- List 74 generated (T1–T10). T1, T5, T6 completed at generation. T2–T4, T7–T10 pending.
+
+#### Human-gated items (list 74)
+
+Three items await Luke in Editor — no agent work possible until these are done:
+1. **PIE cloud descent** — open L_VS_MVP_Markers, locate GP_GlideStart, press E to launch glide; verify landing on plains. Ref: `Docs/handoffs/SESSION_HANDOFF_DESCENT_AND_DOOR.md` Next action 1.
+2. **measure_ue_island.py** — with Editor open and L_VS_MVP_Markers loaded, run `Content/Python/measure_ue_island.py` to close `env.ue_island_measured`. Ref: handoff Next action 2.
+3. **POLISH_ASSET_BOARD triage** — open `docs/qa/POLISH_ASSET_BOARD.json`; for each asset, look at it in Editor and set `stage` (S0–S5) + `priority` (1–10). See `docs/qa/POLISH_ASSET_BOARD_HOW_TO.md` (to be written in T3). Ref: handoff Next action 3 + `Docs/37_POLISH_PASS_PROCESS.md` §3.

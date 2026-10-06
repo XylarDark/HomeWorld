@@ -8,21 +8,23 @@
 
 ## Yesterday (last session)
 
-- WAVE F archive: removed 492 quarantined paths (DemoMap/Homestead, PCG/Mass, sample packs, agent-loop scripts/Tools).
-- Added `Docs/08_AUDIT_SIGN_OFF.md`; stubs for dual-canon docs; MainMenu startup map; bootstrap VS_MVP-only.
+- List 73 complete: Phase 3 Steam Demo packaged build + smoke test (T1–T10 all done).
+- This session: validate_task_list.py path fix (TaskLists/ fallback); question-gate enforcement confirmed; check_session_start.py PASS; npm verify:fast 139/139 PASS; test_polish_readiness.py 219/219 PASS.
+- List 74 generated: Polish readiness automation (T1–T10); T1, T5, T6 completed at generation.
 
 ---
 
 ## Today
 
-- Lead review WAVE F PR; run Safe-Build + Editor boot on DESKTOP-21CT3H0.
-- Lead comment **`SIGN OFF AUDIT`** to close audit.
+- T2: Harden `check_session_start.py` to cover the question-before-discovery gate.
+- T3: Cross-link POLISH_ASSET_BOARD to 37_POLISH_PASS_PROCESS; write POLISH_ASSET_BOARD_HOW_TO.md.
 
 ---
 
 ## Tomorrow
 
-- Post-audit work per Lead priority: VS_MVP dress, FALLBACK glide BP, master material graphs.
+- T4: SESSION_START read-order audit (no silent bloat since commit 994c2c9).
+- T7: Cross-link and document the three human-gated items in SESSION_LOG for Luke.
 
 ---
 
