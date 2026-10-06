@@ -69,10 +69,10 @@
       "note": "A console variable, so it is runtime-overridable and this is the compiled default, not a guarantee about a play session. No .ini sets it. Inside the proposed 90-180 s window."
     },
     "gather_cooldown_s": {
-      "value": 0,
-      "source": "Source/HomeWorld/HomeWorldResourcePile.h:43 - UPROPERTY(EditDefaultsOnly, ClampMin 0.0) float HarvestCooldownSeconds = 0.f; line 39 - bool bDepleteUntilDawn = true",
+      "value": "not applied - no cooldown exists in the harvest path",
+      "source": "Source/HomeWorld/HomeWorldResourcePile.h - UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = 0.0, DeprecatedProperty, ...)) float HarvestCooldownSeconds = 0.f, deprecated. TryHarvest in HomeWorldResourcePile.cpp sets the private bDepletedUntilDawn = true unconditionally after a successful harvest and reads neither property; git grep over Source finds bDepleteUntilDawn and HarvestCooldownSeconds only at their own declarations. Both are kept as deprecated properties so saved levels and Blueprints holding a value still load.",
       "confidence": "high",
-      "note": "Records which branch FEEL.md asked for: the implemented policy is deplete-until-dawn with a zero-second cooldown, not a 60-120 s timer. So half of that proposal is already decided in code and the open question is only whether dawn-depletion stays. 'HarvestCooldownSeconds' appears in 0 .uasset name tables. This is NOT a recommendation to keep it."
+      "note": "FEEL.md offered two branches: deplete-until-dawn, or a 60-120 s cooldown. Neither is now implemented. Interview #11 3A removed the dawn refill and stopped applying the cooldown, which is what GDD:156 already specified: 'There is no cooldown, and dawn alone does not bring a pile back'. The prior note said the open question was only whether dawn-depletion stays; that question is now closed - it does not stay, depletion is permanent, and new piles come from spirit fertilizer, which does not exist yet and needs a Design packet. 'HarvestCooldownSeconds' still appears in 0 .uasset name tables."
     }
   },
 
@@ -94,7 +94,7 @@
     "camera_arm_length_uu": "FEEL.md proposes 350-500 UU. Read from the SpringArm on BP_HomeWorldCharacter.",
     "camera_pitch_bias_deg": "FEEL.md proposes -8 to -15 degrees. Read from the controller or the SpringArm relative rotation.",
     "night_length_s": "FEEL.md proposes 90-180 s real time before the rest prompt. See Docs/DAYNIGHT_BIBLE.md.",
-    "gather_cooldown_s": "FEEL.md proposes until dawn OR 60-120 s, matching the SYS 'deplete until dawn' preference. Record which branch is actually implemented."
+    "gather_cooldown_s": "FEEL.md proposed until dawn OR 60-120 s. Neither branch is implemented: interview #11 3A removed the dawn refill and stopped applying the cooldown, matching GDD:156. Recorded as not applied rather than as a number, because there is no interval left to tune."
   },
 
   "_waiver_policy": "Do not write a number here to make a gate go green. A null that is honestly null is worth more than a plausible value, because a plausible value cannot be told apart from a real one later."
