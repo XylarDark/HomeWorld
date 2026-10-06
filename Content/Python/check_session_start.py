@@ -17,9 +17,9 @@ PACK = ROOT / "Docs" / "handoffs" / "CONTEXT_PACK_V1.md"
 READS = (
     "UserHarness/docs/human-use/route-context.md",
     "Docs/context/ROUTE_INDEX.md",
-    "Docs/WORLD_METRICS.md",
 )
 NAMED = (
+    "Docs/WORLD_METRICS.md",
     "Docs/level/L_VS_MVP_Markers_manifest.json",
     "Docs/COMMANDS_AND_LOG_TAGS.md",
 )
