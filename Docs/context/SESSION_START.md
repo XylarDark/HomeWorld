@@ -68,7 +68,7 @@ Lead interview #14, 1A (2026-10-05). To bring work from a desktop session back t
 2. Each PR: number, head SHA, merged or open, and what it waits for (Test score or Lead's yes).
 3. Each item from the handoff: expected vs found, one line each. An item not started says `not started`.
 4. Desk checks, only if Lead ran them: expected vs found.
-5. Open questions for Lead, one line each, with no answer guessed.
+5. Open questions for Lead, one per line, with no answer guessed.
 6. Anything left uncommitted or unpushed, by path.
 
 No transcripts, full logs, or gate JSON. Paths and SHAs only.
