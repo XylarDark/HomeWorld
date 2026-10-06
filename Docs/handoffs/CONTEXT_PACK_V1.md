@@ -13,7 +13,16 @@
 - Same PR adds Fix's two lines to `docs/KNOWN_ERRORS.md`, verbatim:
   1. **Cause:** When the player is moved into the destination portal's box, a new overlap fires in the same frame and sends them straight back. **Avoid:** Start the cooldown on every portal before the move, and place the player at least 60 uu outside every portal box. This is the #281 fix at `2369a12`.
   2. **Cause:** I assumed the portal destinations were portal components, but they were TargetPoints, so the lookup came back empty. That cost one PIE round on `bdd7b4d`. **Avoid:** Read the level manifest from bite 3 before writing any Fix SHA that depends on level data. Until the manifest exists, wait for Conductor's actor scan.
-- **Done (Test):** no copied number elsewhere in `Docs/` disagrees with a row; every row has a source or `unsourced`; no taste placeholder reads as a lock.
+- **Cross-check scope:** only `Docs/01_GDD_MVP.md`, `Docs/context/HOMEWORLD_ROUTE.md`, and `Docs/handoffs/CLOUDS_WISPS_V1.md`. Wider scope needs a Lead yes.
+- **Done (Test):**
+
+| Check | Expected | Fail label |
+|---|---|---|
+| Copied numbers | No number in the three cross-check files disagrees with a sheet row | `closed_fail` |
+| Sources | Every row has a source cite that matches the file at the merged SHA, or reads `unsourced` | `closed_fail` |
+| Taste placeholders | Every taste value reads `taste placeholder, no lock`; none appears as a plain value | `closed_fail` |
+| `KNOWN_ERRORS` | Fix's two lines are present word for word in `docs/KNOWN_ERRORS.md` | `closed_fail` |
+| Hook | `AGENTS.md` has exactly one new row, pointing to `Docs/WORLD_METRICS.md` | `soft_fail` |
 - Merge: docs only, auto-merge on Test PASS.
 
 ## Bite 2 — Runbook additions (Conductor) — DONE
@@ -26,15 +35,39 @@
 - Python script under the repo. Writes `Docs/level/L_VS_MVP_Markers_manifest.json`: each actor's label, class, location, bounds, and what sits under it. Bounds only, no line traces.
 - Conductor reruns it after every level merge. Gate #14 scans and Fix SHAs read it first; Test quotes positions from it.
 - **Stale** means an automation test regenerates the dump from the loaded map and fails on any label, class, location, or bounds mismatch against the committed JSON. Not `.umap` mtime (LFS).
-- **Done (Test):** the stale test passes on a fresh dump and fails on a hand-edited JSON row.
+- **Done (Test):**
+
+| Check | Expected | Fail label |
+|---|---|---|
+| Manifest file | `Docs/level/L_VS_MVP_Markers_manifest.json` exists with label, class, location, bounds, and what's under it for every actor | `closed_fail` |
+| Stale test, fresh | The automation test passes on a fresh dump | `closed_fail` |
+| Stale test, edited | The automation test fails when one JSON row is hand-edited | `closed_fail` |
+| No traces | The script uses bounds only, with no line traces | `soft_fail` |
+| Hook | The `AGENTS.md` row now also names the manifest path | `soft_fail` |
 - Merge: touches Source, needs Lead's yes.
 
 ## Bite 4 — Commands and log-tags index (Implement)
 
 - Generated from Source: `Docs/COMMANDS_AND_LOG_TAGS.md` lists every `hw.*` console command, every log prefix (e.g. `CLOUD_DESCENT`, `FALLBACK: Portal`), and input bindings. Header: "generated — do not hand-edit".
 - Test packets name the expected log tag from this file.
-- **Done (Test):** a grep of Source for `hw.` commands and log prefixes finds nothing missing from the file.
+- **Done (Test):**
+
+| Check | Expected | Fail label |
+|---|---|---|
+| Coverage | A grep of Source for `hw.*` commands and log prefixes finds nothing missing from the file | `closed_fail` |
+| Header | The file starts with "generated — do not hand-edit" | `soft_fail` |
+| Hook | The `AGENTS.md` row now also names `Docs/COMMANDS_AND_LOG_TAGS.md` | `soft_fail` |
 - Merge: touches Source, needs Lead's yes.
+
+## Deployment — how the pack reaches every session
+
+Lead, Oct 5 2026: avoid double loading, and every desktop IDE agent needs the context.
+
+- **One hook for desktop IDE agents.** `AGENTS.md` is the single always-on file for Cursor, OpenCode, and any other desktop IDE agent (no rule is `alwaysApply`). It gets **one** row in its Canon table that lists the pack's files by path: "World numbers, level actors, commands and log tags. Read the one your task needs." Paths only, no content, so nothing is loaded until a task needs it.
+- **The row grows as bites merge.** Bite 1 adds the row with `Docs/WORLD_METRICS.md`. Bites 3 and 4 add their path to the same row. No row points at a file that doesn't exist yet.
+- **No second hook in the start files.** `Docs/context/DISCOVERY_START.md` and `Docs/context/ROUTE_START.md` already run inside a session that loaded `AGENTS.md`, so they get no read line. Their read orders stay unchanged, and discovery still asks one question while route start still stops after the facts.
+- **Box lanes.** HomeWorld Co lanes don't load `AGENTS.md`, so `homeworld-co-ops` gets one line pointing to the same `AGENTS.md` row, not a copy of the paths. Conductor makes that skill edit.
+- **OpenCode bite prompts.** Conductor's paste-ready prompts for bites 3 and 4 name the paths up front, because those files don't exist on main yet when the bite starts.
 
 ## Out of scope
 
