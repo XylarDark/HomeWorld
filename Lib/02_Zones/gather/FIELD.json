@@ -100,6 +100,7 @@
   "camp_placement": {
     "rule": "The player chooses. Entering EITHER forest edge commits to that one, and the camp generates there.",
     "discovery": "Lead 2026-10-07: the field generates first, with each edge's neighbor kind decided and the edge assets placed. The bounds of those assets are the discovery boundary. Reaching a pine_forest boundary places the camp from FOREST.json. The meadow centre does not.",
+    "streaming": "Lead 2026-10-07: while on the homestead, the field streams in. While on the field, adjacent zones stream only if they can be walked into from the ground (the two pine forests). The cliff waits for the upgraded glider. The river waits for the boat. Night spirit traversal of these edges is not locked yet.",
     "the_unchosen_forest": "becomes a future path, leading eventually to another area like the river. Not a dead end and not a punishment - a road they did not take.",
     "cliff_is_never_a_camp_edge": "The cliff is a boundary. It cannot be chosen, because there is no forest on it.",
     "THE_HARD_CONSTRAINT": "BOTH forest edges must look IDENTICAL from inside the field - same density, same height, same opacity, same silhouette. If one looks better, fuller, darker or more inviting, the choice stops being a choice and becomes a puzzle with a correct answer, and the player will optimise instead of choosing.",

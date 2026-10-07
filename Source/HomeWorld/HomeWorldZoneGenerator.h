@@ -98,7 +98,8 @@ class FHomeWorldZoneGenerator
 public:
 	static bool LoadSpec(const FString& AbsolutePath, FHomeWorldZoneSpec& OutSpec, FString& OutError);
 
-	static FHomeWorldGeneratedZone Generate(const FHomeWorldZoneSpec& Spec, int32 Seed);
+	/** bPinSlots false builds the biome skeleton only. The camp pins on discovery. */
+	static FHomeWorldGeneratedZone Generate(const FHomeWorldZoneSpec& Spec, int32 Seed, bool bPinSlots = true);
 
 	/** hash(field seed, edge id). Same pair always returns the same forest seed. */
 	static int32 SeedForEdge(int32 FieldSeed, const FString& EdgeId);
@@ -146,7 +147,25 @@ enum class EHomeWorldEdgeCrossResult : uint8
 	Reactivated,
 	LeftDormant,
 	/** The point is not inside any edge-asset boundary. */
-	Outside
+	Outside,
+	/** Glider or boat traversal was started without the upgrade. */
+	Locked
+};
+
+/** How a field edge is entered. Ground edges stream with the field. The others wait for their upgrade. */
+enum class EHomeWorldEdgeTraversal : uint8
+{
+	None,
+	Ground,
+	Glider,
+	Boat
+};
+
+/** Where the player is. This chooses what streams, without a loading screen. */
+enum class EHomeWorldStreamPresence : uint8
+{
+	Homestead,
+	Field
 };
 
 class FHomeWorldZoneCrossing
@@ -174,6 +193,25 @@ public:
 
 	bool HasForest() const { return bHasForest; }
 	bool HasCamp() const;
+
+	/**
+	 * Homestead streams the field and nothing beyond it.
+	 * The field streams ground-traversable edges (the forests). Cliff and river wait.
+	 */
+	void SetPresence(
+		const FHomeWorldZoneSpec& FieldSpec,
+		const FHomeWorldZoneSpec& ForestSpec,
+		EHomeWorldStreamPresence Presence);
+
+	void SetTraversalUnlocks(bool bGliderUnlocked, bool bBoatUnlocked);
+
+	/** Start the cliff glider or the river boat. Ground edges are not started this way. */
+	EHomeWorldEdgeCrossResult BeginTraversal(const FHomeWorldZoneSpec& FieldSpec, const FString& EdgeId);
+
+	bool IsFieldStreaming() const { return bFieldStreaming; }
+	bool IsZoneStreaming(const FString& EdgeId) const;
+	const FHomeWorldGeneratedZone* GetStreamedZone(const FString& EdgeId) const;
+	static EHomeWorldEdgeTraversal TraversalForType(const FString& Type);
 	const FString& GetActiveEdgeId() const { return ActiveEdgeId; }
 	const FHomeWorldGeneratedZone& GetForest() const { return Forest; }
 	const FHomeWorldGeneratedZone& GetField() const { return Field; }
@@ -190,8 +228,16 @@ private:
 	FString ActiveEdgeId;
 	bool bHasForest = false;
 	bool bFieldReady = false;
+	bool bFieldStreaming = false;
+	bool bGliderUnlocked = false;
+	bool bBoatUnlocked = false;
+	EHomeWorldStreamPresence Presence = EHomeWorldStreamPresence::Homestead;
+	FString ChosenEdgeId;
+	FString SpecialEdgeId;
 	FHomeWorldGeneratedZone Field;
 	FHomeWorldGeneratedZone Forest;
 	TArray<FHomeWorldPlacedEdgeAsset> EdgeAssets;
 	TArray<FHomeWorldDiscoveryBoundary> Boundaries;
+	TArray<FString> StreamingEdgeIds;
+	TMap<FString, FHomeWorldGeneratedZone> StreamedZones;
 };

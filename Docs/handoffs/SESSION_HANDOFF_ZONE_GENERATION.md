@@ -14,8 +14,8 @@ zone-generation research and the "straight to generation" decision.
   and FOREST.json. Q2 and Q3 are still open.
 - Earlier commits: `517c988`, `b6a98c7`, `5ce9468`, `6c5c7fb`, `598ae73`
   (`Lib/02_Zones/combat/FOREST.json` — not `forest/FOREST.json`).
-- **Tests:** this session ran `HomeWorld.T0.ZoneGenerator` only — 11 passed / 0
-  failed, editor exit 0. The earlier full `HomeWorld.T0` run was 24 passed / 0
+- **Tests:** `HomeWorld.T0.ZoneGenerator` — 12 passed / 0 failed, editor exit 0.
+  The earlier full `HomeWorld.T0` run was 24 passed / 0
   failed (report lists 25 — known UE counter quirk). `HomeWorld.Transit` was
   3/3 earlier today.
 - **Blend:** `blender/floating_island_homestead_LIB.blend` open in **Mixar**
@@ -68,11 +68,10 @@ template/slot source pieces, not world placements.
    authored offsets, and only after the player reaches a forest edge's placed
    assets. Fire, lashings, and the guard stake stay unplaced. The 108 m
    clearing is subtracted from the pine budget.
-5. **Discovery boundary** — done locally. `DiscoverAt` is the trigger. The
-   meadow centre returns Outside. A cliff boundary does not place the camp.
-   Loading: skeleton until discovery; do not convert `L_VS_MVP_Markers` to
-   World Partition; one runtime Data Layer per discovered zone when meshes
-   stream. See docs/39_ZONE_GENERATION_RESEARCH.md.
+5. **In-world streaming** — homestead streams the field; the field streams the
+   two walkable forests without the camp. Cliff streams on the upgraded glider.
+   River streams on the boat. Camp still pins only at the forest asset boundary.
+   Night spirit traversal of those edges is open. See docs/39.
 6. Blend: reposition `02_Forest`/`06_Camp` as kit/template source — Lead call.
 7. Then: camp art image→blockout pass (deferred), prove scripts M8/M10–M14
    against generated geometry (GATE 3), six `NO_VERDICT` prove runs.

@@ -80,24 +80,35 @@ the field. The bounds of those assets are the discovery boundary. Reaching a
 
 Cost, in this order:
 
-1. **Skeleton only until discovery.** The field (meadow scatter, edge assets,
-   one seed per edge) stays resident. The forest is not built, and the camp is
-   not pinned, until a point lands inside that edge's asset bounds. The
-   unchosen forest is never built. A save keeps the seed and the deltas.
-2. **Do not convert `L_VS_MVP_Markers` to World Partition for this.** That map
+1. **Stream from where the player is standing.** While they are on the
+   homestead, the field streams in and nothing past it does. While they are on
+   the field, a neighbor streams only if it can be walked into from the ground
+   — the two pine forests. Those forests generate from their seeds without the
+   camp. The camp pins when the player reaches that edge's placed assets. The
+   other forest stays streamed and camp-free. Going back to the homestead
+   unloads the zones; returning restores the chosen camp from the same seed.
+2. **Special traversal is not ground streaming.** The cliff edge is the
+   upgraded glider. The river edge is the boat. Neither streams from merely
+   standing on the field. Each starts streaming when that traversal begins and
+   the upgrade is unlocked. Locked, the edge stays unloaded.
+3. **Night spirit is not a traversal rule yet.** Day is the lock above. Canon
+   already has spirit-stealth in the camp at night, a day eject home from the
+   camp, and a night flight buff for spreading over the field. Whether spirit
+   form can enter a forest, take the glider, or take the boat is still open.
+4. **Do not convert `L_VS_MVP_Markers` to World Partition for this.** That map
    stores actors inline. Conversion creates a second map, and unloaded cells
    hide the ground. See `docs/KNOWN_ERRORS.md`.
-3. **When a discovered forest has to stream as meshes,** put that zone on one
+5. **When a discovered forest has to stream as meshes,** put that zone on one
    runtime Data Layer and activate it at the boundary. Runtime Data Layers load
    and unload at runtime from Blueprints or C++
    ([Data Layers, UE 5.8](https://dev.epicgames.com/documentation/unreal-engine/world-partition---data-layers-in-unreal-engine)).
    Assets assigned to too many runtime data layers degrade streaming, so the
    layer is the zone, not each prop.
-4. **Level Instances do not stream by themselves** outside a World Partition
+6. **Level Instances do not stream by themselves** outside a World Partition
    world. Level Streaming mode adds a level per instance and is a poor fit for
    a dense set of biomes
    ([Level Instancing, UE 5.8](https://dev.epicgames.com/documentation/unreal-engine/level-instancing-in-unreal-engine)).
-5. **Dressing stays later.** PCG runtime generation, scoped to a source at the
+7. **Dressing stays later.** PCG runtime generation, scoped to a source at the
    discovered forest, is still the density pass. It is not the loader for the
    camp.
 

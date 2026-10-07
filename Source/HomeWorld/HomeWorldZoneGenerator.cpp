@@ -311,7 +311,7 @@ bool FHomeWorldZoneGenerator::LoadSpec(const FString& AbsolutePath, FHomeWorldZo
 	return true;
 }
 
-FHomeWorldGeneratedZone FHomeWorldZoneGenerator::Generate(const FHomeWorldZoneSpec& Spec, int32 Seed)
+FHomeWorldGeneratedZone FHomeWorldZoneGenerator::Generate(const FHomeWorldZoneSpec& Spec, int32 Seed, bool bPinSlots)
 {
 	FHomeWorldGeneratedZone Out;
 	Out.Seed = Seed;
@@ -371,7 +371,10 @@ FHomeWorldGeneratedZone FHomeWorldZoneGenerator::Generate(const FHomeWorldZoneSp
 	}
 
 	float ReservedAreaM2 = 0.f;
-	PinSlots(Spec, Out, ReservedAreaM2);
+	if (bPinSlots)
+	{
+		PinSlots(Spec, Out, ReservedAreaM2);
+	}
 	Out.PineInstanceCount = EstimatePineCount(Out.WidthM, Out.DepthM, Spec, ReservedAreaM2);
 	return Out;
 }
@@ -464,12 +467,20 @@ void FHomeWorldZoneCrossing::Reset(int32 InFieldSeed)
 {
 	FieldSeed = InFieldSeed;
 	ActiveEdgeId.Reset();
+	ChosenEdgeId.Reset();
+	SpecialEdgeId.Reset();
 	bHasForest = false;
 	bFieldReady = false;
+	bFieldStreaming = false;
+	bGliderUnlocked = false;
+	bBoatUnlocked = false;
+	Presence = EHomeWorldStreamPresence::Homestead;
 	Field = FHomeWorldGeneratedZone();
 	Forest = FHomeWorldGeneratedZone();
 	EdgeAssets.Reset();
 	Boundaries.Reset();
+	StreamingEdgeIds.Reset();
+	StreamedZones.Reset();
 }
 
 void FHomeWorldZoneCrossing::EnsureField(const FHomeWorldZoneSpec& FieldSpec)
@@ -537,9 +548,12 @@ EHomeWorldEdgeCrossResult FHomeWorldZoneCrossing::DiscoverAt(
 			: EHomeWorldEdgeCrossResult::LeftDormant;
 	}
 
-	Forest = FHomeWorldZoneGenerator::Generate(
-		ForestSpec, FHomeWorldZoneGenerator::SeedForEdge(FieldSeed, Hit->EdgeId));
+	const int32 ZoneSeed = FHomeWorldZoneGenerator::SeedForEdge(FieldSeed, Hit->EdgeId);
+	Forest = FHomeWorldZoneGenerator::Generate(ForestSpec, ZoneSeed, true);
+	StreamedZones.Add(Hit->EdgeId, Forest);
+	StreamingEdgeIds.AddUnique(Hit->EdgeId);
 	ActiveEdgeId = Hit->EdgeId;
+	ChosenEdgeId = Hit->EdgeId;
 	bHasForest = true;
 	return EHomeWorldEdgeCrossResult::Instantiated;
 }
@@ -576,6 +590,119 @@ bool FHomeWorldZoneCrossing::HasCamp() const
 	FHomeWorldZoneSpec Placed;
 	Placed.Slots = Forest.PlacedSlots;
 	return FHomeWorldZoneGenerator::HasCampContent(Placed);
+}
+
+EHomeWorldEdgeTraversal FHomeWorldZoneCrossing::TraversalForType(const FString& Type)
+{
+	if (Type.Equals(TEXT("pine_forest"), ESearchCase::IgnoreCase))
+	{
+		return EHomeWorldEdgeTraversal::Ground;
+	}
+	if (Type.Equals(TEXT("cliff"), ESearchCase::IgnoreCase))
+	{
+		return EHomeWorldEdgeTraversal::Glider;
+	}
+	if (Type.Equals(TEXT("river"), ESearchCase::IgnoreCase))
+	{
+		return EHomeWorldEdgeTraversal::Boat;
+	}
+	return EHomeWorldEdgeTraversal::None;
+}
+
+void FHomeWorldZoneCrossing::SetTraversalUnlocks(bool bInGliderUnlocked, bool bInBoatUnlocked)
+{
+	bGliderUnlocked = bInGliderUnlocked;
+	bBoatUnlocked = bInBoatUnlocked;
+}
+
+bool FHomeWorldZoneCrossing::IsZoneStreaming(const FString& EdgeId) const
+{
+	return StreamingEdgeIds.Contains(EdgeId);
+}
+
+const FHomeWorldGeneratedZone* FHomeWorldZoneCrossing::GetStreamedZone(const FString& EdgeId) const
+{
+	return StreamedZones.Find(EdgeId);
+}
+
+void FHomeWorldZoneCrossing::SetPresence(
+	const FHomeWorldZoneSpec& FieldSpec,
+	const FHomeWorldZoneSpec& ForestSpec,
+	EHomeWorldStreamPresence InPresence)
+{
+	Presence = InPresence;
+	bFieldStreaming = true;
+	StreamingEdgeIds.Reset();
+	StreamedZones.Reset();
+	bHasForest = false;
+	Forest = FHomeWorldGeneratedZone();
+	if (Presence != EHomeWorldStreamPresence::Field)
+	{
+		SpecialEdgeId.Reset();
+		return;
+	}
+
+	EnsureField(FieldSpec);
+	for (const FHomeWorldZoneEdgeSpec& Edge : FieldSpec.Edges)
+	{
+		if (TraversalForType(Edge.Type) != EHomeWorldEdgeTraversal::Ground)
+		{
+			continue;
+		}
+		const bool bPinsCamp = Edge.Id == ChosenEdgeId;
+		const FHomeWorldGeneratedZone Zone = FHomeWorldZoneGenerator::Generate(
+			ForestSpec, FHomeWorldZoneGenerator::SeedForEdge(FieldSeed, Edge.Id), bPinsCamp);
+		StreamedZones.Add(Edge.Id, Zone);
+		StreamingEdgeIds.Add(Edge.Id);
+		if (bPinsCamp)
+		{
+			Forest = Zone;
+			ActiveEdgeId = Edge.Id;
+			bHasForest = true;
+		}
+	}
+	if (!SpecialEdgeId.IsEmpty())
+	{
+		StreamingEdgeIds.AddUnique(SpecialEdgeId);
+	}
+}
+
+EHomeWorldEdgeCrossResult FHomeWorldZoneCrossing::BeginTraversal(
+	const FHomeWorldZoneSpec& FieldSpec,
+	const FString& EdgeId)
+{
+	EnsureField(FieldSpec);
+	const FHomeWorldZoneEdgeSpec* Edge = nullptr;
+	for (const FHomeWorldZoneEdgeSpec& Candidate : FieldSpec.Edges)
+	{
+		if (Candidate.Id == EdgeId)
+		{
+			Edge = &Candidate;
+			break;
+		}
+	}
+	if (Edge == nullptr)
+	{
+		return EHomeWorldEdgeCrossResult::UnknownEdge;
+	}
+	const EHomeWorldEdgeTraversal Traversal = TraversalForType(Edge->Type);
+	if (Traversal == EHomeWorldEdgeTraversal::Ground || Traversal == EHomeWorldEdgeTraversal::None)
+	{
+		return EHomeWorldEdgeCrossResult::NoNeighbor;
+	}
+	if (Presence != EHomeWorldStreamPresence::Field)
+	{
+		return EHomeWorldEdgeCrossResult::NoNeighbor;
+	}
+	const bool bUnlocked = Traversal == EHomeWorldEdgeTraversal::Glider ? bGliderUnlocked : bBoatUnlocked;
+	if (!bUnlocked)
+	{
+		return EHomeWorldEdgeCrossResult::Locked;
+	}
+	const bool bAlready = StreamingEdgeIds.Contains(EdgeId);
+	SpecialEdgeId = EdgeId;
+	StreamingEdgeIds.AddUnique(EdgeId);
+	return bAlready ? EHomeWorldEdgeCrossResult::Reactivated : EHomeWorldEdgeCrossResult::Instantiated;
 }
 
 bool FHomeWorldZoneCrossing::IsForestEdgeDormant(const FHomeWorldZoneSpec& FieldSpec, const FString& EdgeId) const

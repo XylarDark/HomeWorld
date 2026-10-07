@@ -577,4 +577,93 @@ bool FZoneGeneratorDiscoveryBoundaryPlacesCampTest::RunTest(const FString& Param
 	return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FZoneGeneratorStreamsFromPresenceTest,
+	"HomeWorld.T0.ZoneGenerator.StreamsFromPresence",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FZoneGeneratorStreamsFromPresenceTest::RunTest(const FString& Parameters)
+{
+	const FHomeWorldZoneSpec Field = MeadowSpec();
+	const FHomeWorldZoneSpec ForestSpec = ForestTemplate();
+	FHomeWorldZoneCrossing Crossing;
+	Crossing.Reset(42);
+
+	TestTrue(TEXT("a cliff is a glider edge"),
+		FHomeWorldZoneCrossing::TraversalForType(TEXT("cliff")) == EHomeWorldEdgeTraversal::Glider);
+	TestTrue(TEXT("a river is a boat edge"),
+		FHomeWorldZoneCrossing::TraversalForType(TEXT("river")) == EHomeWorldEdgeTraversal::Boat);
+	TestTrue(TEXT("a forest is a ground edge"),
+		FHomeWorldZoneCrossing::TraversalForType(TEXT("pine_forest")) == EHomeWorldEdgeTraversal::Ground);
+
+	Crossing.SetPresence(Field, ForestSpec, EHomeWorldStreamPresence::Homestead);
+	TestTrue(TEXT("the homestead streams the field"), Crossing.IsFieldStreaming());
+	TestFalse(TEXT("the homestead does not stream a forest"), Crossing.IsZoneStreaming(TEXT("EDGE_FOREST_A")));
+	TestFalse(TEXT("the homestead does not stream the cliff"), Crossing.IsZoneStreaming(TEXT("EDGE_CLIFF")));
+	TestFalse(TEXT("no camp while still on the homestead"), Crossing.HasCamp());
+
+	Crossing.SetPresence(Field, ForestSpec, EHomeWorldStreamPresence::Field);
+	TestTrue(TEXT("forest A streams from the field"), Crossing.IsZoneStreaming(TEXT("EDGE_FOREST_A")));
+	TestTrue(TEXT("forest B streams from the field"), Crossing.IsZoneStreaming(TEXT("EDGE_FOREST_B")));
+	TestFalse(TEXT("the cliff does not stream from standing on the field"), Crossing.IsZoneStreaming(TEXT("EDGE_CLIFF")));
+	TestFalse(TEXT("the river does not stream from standing on the field"), Crossing.IsZoneStreaming(TEXT("EDGE_RIVER")));
+	const FHomeWorldGeneratedZone* StreamedA = Crossing.GetStreamedZone(TEXT("EDGE_FOREST_A"));
+	if (!TestNotNull(TEXT("forest A has a skeleton"), StreamedA))
+	{
+		return false;
+	}
+	TestEqual(TEXT("a streamed forest has no camp yet"), StreamedA->PlacedSlots.Num(), 0);
+	TestFalse(TEXT("streaming the forests does not place the camp"), Crossing.HasCamp());
+
+	TestTrue(TEXT("the glider stays locked"),
+		Crossing.BeginTraversal(Field, TEXT("EDGE_CLIFF")) == EHomeWorldEdgeCrossResult::Locked);
+	TestFalse(TEXT("a locked cliff does not stream"), Crossing.IsZoneStreaming(TEXT("EDGE_CLIFF")));
+	Crossing.SetTraversalUnlocks(true, false);
+	TestTrue(TEXT("the upgraded glider streams the cliff"),
+		Crossing.BeginTraversal(Field, TEXT("EDGE_CLIFF")) == EHomeWorldEdgeCrossResult::Instantiated);
+	TestTrue(TEXT("the cliff zone is streaming"), Crossing.IsZoneStreaming(TEXT("EDGE_CLIFF")));
+	TestTrue(TEXT("the boat stays locked"),
+		Crossing.BeginTraversal(Field, TEXT("EDGE_RIVER")) == EHomeWorldEdgeCrossResult::Locked);
+	Crossing.SetTraversalUnlocks(true, true);
+	TestTrue(TEXT("the boat streams the river"),
+		Crossing.BeginTraversal(Field, TEXT("EDGE_RIVER")) == EHomeWorldEdgeCrossResult::Instantiated);
+	TestTrue(TEXT("the river zone is streaming"), Crossing.IsZoneStreaming(TEXT("EDGE_RIVER")));
+
+	const FHomeWorldDiscoveryBoundary* ForestA = nullptr;
+	for (const FHomeWorldDiscoveryBoundary& Boundary : Crossing.GetBoundaries())
+	{
+		if (Boundary.EdgeId == TEXT("EDGE_FOREST_A"))
+		{
+			ForestA = &Boundary;
+		}
+	}
+	if (!TestNotNull(TEXT("forest A boundary"), ForestA))
+	{
+		return false;
+	}
+	TestTrue(TEXT("reaching the forest assets places the camp"),
+		Crossing.DiscoverAt(Field, ForestSpec, ForestA->Center()) == EHomeWorldEdgeCrossResult::Instantiated);
+	TestTrue(TEXT("the camp is in the discovered forest"), Crossing.HasCamp());
+	const FHomeWorldGeneratedZone* Other = Crossing.GetStreamedZone(TEXT("EDGE_FOREST_B"));
+	if (!TestNotNull(TEXT("the other forest stayed streamed"), Other))
+	{
+		return false;
+	}
+	TestEqual(TEXT("the other forest still has no camp"), Other->PlacedSlots.Num(), 0);
+
+	Crossing.SetPresence(Field, ForestSpec, EHomeWorldStreamPresence::Homestead);
+	TestFalse(TEXT("leaving for the homestead unloads the zones"), Crossing.IsZoneStreaming(TEXT("EDGE_FOREST_A")));
+	TestFalse(TEXT("the cliff unloads with the field"), Crossing.IsZoneStreaming(TEXT("EDGE_CLIFF")));
+	Crossing.SetPresence(Field, ForestSpec, EHomeWorldStreamPresence::Field);
+	TestTrue(TEXT("returning to the field restores the camp forest"), Crossing.HasCamp());
+	TestTrue(TEXT("the other forest streams again without a camp"), Crossing.IsZoneStreaming(TEXT("EDGE_FOREST_B")));
+	const FHomeWorldGeneratedZone* RestoredB = Crossing.GetStreamedZone(TEXT("EDGE_FOREST_B"));
+	if (!TestNotNull(TEXT("forest B restored"), RestoredB))
+	{
+		return false;
+	}
+	TestEqual(TEXT("the restored other forest still has no camp"), RestoredB->PlacedSlots.Num(), 0);
+	return true;
+}
+
 #endif
