@@ -63,7 +63,7 @@ Place one `AHomeWorldCloudField` in `L_VS_MVP_Markers` above the descent from `G
 
 ## Anti
 
-Glide speed, sink, or carry changes. Fixed cloud, wisp, or layer counts. Layer heights written as numbers. Layers above the 50 m band. Clouds that block the player or can be stood on. Rails, corridors, or bounds. Fertilizer, barn, bull. New material master. `.uasset`/`.umap` from Implement. Design self-approve.
+Glide speed, sink, or carry changes. Fixed cloud, wisp, or layer counts. Layer heights written as numbers. Layers above the 300 m band. Clouds that block the player or can be stood on. Rails, corridors, or bounds. Fertilizer, barn, bull. New material master. `.uasset`/`.umap` from Implement. Design self-approve.
 
 ## Locked by Lead (interview #3, Oct 5 2026)
 

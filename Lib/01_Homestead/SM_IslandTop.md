@@ -34,12 +34,12 @@ One straight glide. Not the walkable datum, and not a mesh edit.
 | Property | Value |
 |---|---|
 | Slope | 30 degrees |
-| Path along the slope | 150 m |
+| Path along the slope | 900 m (was 150; ×6 world-scale pass 2026-10-07 — pending homestead review) |
 | Speed along the slope | 10 m/s |
-| Air time | 15 s |
-| Drop | 75 m, the island above the plains |
-| Forward travel | 130 m |
-| Plains edge | 260 m past the launch, this glide only |
+| Air time | 15 s (pending re-derivation against the ×6 drop) |
+| Drop | 450 m, the island above the plains (×6 pass) |
+| Forward travel | 780 m (was 130; ×6 pass) |
+| Plains edge | 1560 m past the launch, this glide only (×6 pass) |
 
 Other directions have no edge. Camp, hills, and a slower walk are not in this spec.
 
@@ -51,8 +51,8 @@ The oval is the walk, not the rim. The graybox box stays ±9.5 by ±5.0 until th
 |---|---|
 | Shape | Oval |
 | Speed | 6.0 m/s, walk only |
-| Far edge | 90 m from the center, 15 s |
-| Near edge | 50 m from the center, 8.3 s |
+| Far edge | ~540 m from the center, 90 s (was 90 m / 15 s; ×6 world-scale pass 2026-10-07 — pending review of whether the homestead oval itself should stay human-scale) |
+| Near edge | ~300 m from the center, 50 s (was 50 m / 8.3 s; same pending review) |
 | Mantle | Stays in the game. Not a homestead movement. |
 | Glide start | Only by walking off the edge |
 

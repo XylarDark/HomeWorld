@@ -26,7 +26,7 @@ One fact proposed at a time, one yes from Luke, one write into this file only �
 - The bottom of the cloud layer is the exit, and the landing stays in the existing field.
 - The wisp is a bit of the signature spirit blue on a cloud, not one of the three wisps at the spirit wound.
 - You collect the wisp on the way down, it stays with you, and you hold one per dung you will mix.
-- There is more than one cloud layer, and there is no fixed count of layers. That is not a split of the 50 m layer.
+- There is more than one cloud layer, and there is no fixed count of layers. That is not a split of the 300 m layer. (×6 world-scale pass 2026-10-07.)
 - Steering is unrestricted by rails, corridors, or artificial bounds throughout the descent. It remains a glider descent, not a new flight mode.
 - Lead 2026-10-07 scale change: the WORLD grows by about **6×** — island, field,
   camp, descent space. Props, characters, and trigger radii stay human-scale.
@@ -42,12 +42,16 @@ One fact proposed at a time, one yes from Luke, one write into this file only �
   carrying an herb suppresses the boot; sudden movement builds threat, standing
   still lets it approach, eat the herb, and it is tamed. Tamed, the bull is
   rideable, and the rune stone transports you and the bull to the homestead as a
-  pet. Homestead herbs are few (morning tea, tending wounded spirits); the same
+  pet. Bull turning is like a real animal (Lead 2026-10-07): turn rate is
+  inversely related to travel speed — near-zero turn authority at 3× sprint,
+  full turn authority at walking or stopped speed. The player steers by managing
+  momentum, not by steering at speed. Homestead herbs are few (morning tea, tending wounded spirits); the same
   plant/nurture/collect mechanic runs uncapped in the field for other uses later
   (e.g. feeding collected bulls).
 - Gathering a pile takes one from a pool of piles. There is no cooldown.
 - The stage name stays polish.
 - An agent decision is never settled by what the developer seems to want: name the limitation, give the real options with one recommended pick marked, say plainly when the evidence points against the choice in front of you, and ask a decision with the question tool rather than as prose.
+- Lead 2026-10-07 field-scatter rule (×6 pass): no clustering, no grid; a common herb node is ~30 m from its nearest kind; 25% of that density is dual herbs (2 nodes, 1 m apart); 5% of that density is triple herbs (3 nodes, 1 m apart between them). Clump counts grow with the 420×420 field (was 70×70); the 5 m min-separation and same-type-adjacent bans are superseded.
 - One dung and one wisp make one spirit fertilizer.
 - Lead 2026-10-07 (revises the line above's spread agent): the herbs have their
   own use — the kettle, tea, and the day sprint buff. Dung + wisp is what the

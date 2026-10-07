@@ -121,7 +121,7 @@ Outside the island spec. Not a mesh edit. Sized by what has to fit, not by a wal
 
 ## Lead lock 2026-10-03, field hills
 
-Not a mesh edit. Not the 75 m drop. A hill height does not move the plains edge. The 260 m line stays past the launch only. Sized by what has to fit.
+Not a mesh edit. Not the 450 m drop (×6 world-scale pass 2026-10-07). A hill height does not move the plains edge. The 1560 m line stays past the launch only. Sized by what has to fit.
 
 - A field hill is only the ground you walk. Nothing else sits on it.
 - The walk climbs 4 m. That is the hill's height.

@@ -8,7 +8,7 @@
 
 - New file `Docs/WORLD_METRICS.md`. One row per number: value, unit, axis, source.
 - **Source column** names where the number was first written (file + line, or interview) and, if any, the Lead interview that kept or changed it, e.g. "route line N, kept by #3". Every cite is checked against the file at the merged SHA. A number with no findable source is marked `unsourced`, never guessed.
-- **Taste placeholders** (layer heights, the layer split inside the 50 m band) appear only as `taste placeholder, no lock`, never as plain values. They wait for Lead's taste pass.
+- **Taste placeholders** (layer heights, the layer split inside the 300 m band; ×6 world-scale pass 2026-10-07) appear only as `taste placeholder, no lock`, never as plain values. They wait for Lead's taste pass.
 - The GDD, the route, and packets link to rows instead of copying numbers. Existing copies are left in place in this bite; a mismatch is reported, not silently edited.
 - Same PR adds Fix's two lines to `docs/KNOWN_ERRORS.md`, verbatim:
   1. **Cause:** When the player is moved into the destination portal's box, a new overlap fires in the same frame and sends them straight back. **Avoid:** Start the cooldown on every portal before the move, and place the player at least 60 uu outside every portal box. This is the #281 fix at `2369a12`.

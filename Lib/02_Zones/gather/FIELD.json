@@ -201,7 +201,7 @@
       "measured_from": "authored, not built"
     }
   ],
-  "scatter_rule": "Herbs, berries and dung are scattered with NO clustering and no grid. They must not read as placed. Minimum separation 5 m, no two of the same type adjacent, so the player has to cover ground rather than follow a line.",
+  "scatter_rule": "Variable spacing (Lead 2026-10-07, ×6 world-scale pass): common herb nodes are single, ~30 m apart; 25% of that density is dual herbs (2 nodes next to each other, 1 m apart); 5% density is triple nodes (3 next to each other, 1 m apart). No grid, no clustering beyond the paired/triple adjacency — the same-type-adjacency ban is relaxed for those paired/triple locks. Player has to cover ground, not follow a line.",
   "existing_systems_reused": [
     {
       "thing": "Taming",

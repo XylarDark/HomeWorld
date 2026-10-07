@@ -80,7 +80,7 @@ grid across each, a labelled 0-10 m scale bar bottom-left of each, and leader
 lines to label boxes giving every object's name and size in metres.
 
 --- ZONE 1: THE OPEN FIELD ---
-Open, low, long sightlines, sparse. Roughly 60 x 40 m of walkable ground.
+Open, low, long sightlines, sparse. Roughly 420 x 420 m of walkable ground (×6 world-scale pass 2026-10-07).
 
   SM_LandingCircle     8.0 x 8.0 m        at (0, -70)     clearing with a ring of stones
   SM_Gather_Bushes     ~1 m tall each     4 of them      at (5, -88), spread over 3 m
@@ -228,7 +228,7 @@ orthographic from DIRECTLY ABOVE, no perspective, no tilt. A 1-metre cyan grid
 across the whole drawing, a labelled 0-20 m scale bar bottom-left, and leader
 lines to label boxes giving every object's name and size in metres.
 
-The clearing is roughly 18 x 18 m of walkable ground. Soft irregular treeline
+The clearing is roughly 100 x 100 m of walkable ground (×6 world-scale pass 2026-10-07). Soft irregular treeline
 all around the edge - tall pines forming a closed boundary. The ground inside
 is bare dirt, trampled flat, trodden paths radiating from the fire.
 
@@ -374,7 +374,7 @@ DIRECTLY ABOVE, no perspective, no tilt. A 1-metre cyan grid across the whole
 drawing, a labelled 0-80 m scale bar bottom-left, and leader lines to label
 boxes giving every object's name and size in metres.
 
-The meadow is roughly 70 x 70 m of open ground with NO PATH ANYWHERE and no
+The meadow is roughly 420 x 420 m of open ground (×6 world-scale pass 2026-10-07) with NO PATH ANYWHERE and no
 man-made structure of any kind inside it - no ring of stones, no pad, no
 cleared ground, no trail. Long flowing grass across all of it, flattened only
 where animals have walked.
