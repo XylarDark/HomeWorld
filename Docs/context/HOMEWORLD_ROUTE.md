@@ -14,10 +14,7 @@ Not filled further.
 
 ## Update rule
 
-During a development session the agent may propose one fact the three states
-need. It writes that fact only into this file, and only after the developer
-says yes. It does not write into the agnostic route file, and the decide
-state is not that writer.
+One fact proposed at a time, one yes from Luke, one write into this file only — the rule itself lives in route-context `## Updating facts`, not restated here.
 
 ## Recorded
 
