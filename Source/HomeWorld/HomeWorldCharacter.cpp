@@ -2154,6 +2154,52 @@ bool AHomeWorldCharacter::TryBootPlanetsideNightHome()
 	return true;
 }
 
+bool AHomeWorldCharacter::TryBootBeastChargeHome()
+{
+	// Bull charge-and-boot (Lead 2026-10-07): threat full / too close without an
+	// offering -> charge -> EJECT_HOME. Architecture Trade-Offs A-E: prefer
+	// existing FallbackGlideComponent::StartGlideHome -- no parallel eject service
+	// (Arch B). Distinct from MUST #8 TryEjectNodeDayCamp (day camp) and
+	// #10 TryBootPlanetsideNightHome (night glider) -- this is the beast's own
+	// day-field boot. StartGlideHome(false) keeps the day-only phase law; night
+	// blocking is its gate, not a new one. Cite only: does not touch #9 TOD /
+	// spirit grant -- FORM_BODY stays as it is.
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+	if (bIsSpiritForm)
+	{
+		UE_LOG(LogTemp, Log, TEXT("BEAST_CHARGE: boot skipped - need FORM_BODY"));
+		ShowInteractFeedback(TEXT("BEAST_CHARGE: body form only"), FColor::Yellow);
+		return false;
+	}
+
+	bool bGlideStarted = false;
+	if (FallbackGlideComponent)
+	{
+		bGlideStarted = FallbackGlideComponent->StartGlideHome(/*bAllowNightPhase=*/false);
+	}
+
+	if (bGlideStarted)
+	{
+		UE_LOG(LogTemp, Log,
+			TEXT("BEAST_CHARGE: EJECT_HOME FORM_BODY (StartGlideHome charge boot home; reverse CRUMB home; not day-camp #8; not planetside #10; not FALLBACK down; not soft-kidnap)"));
+		ShowInteractFeedback(TEXT("BEAST_CHARGE: booted home"), FColor::Green);
+	}
+	else
+	{
+		// StartGlideHome already logged its own blocked reason (night phase /
+		// dusk buffer / no crumbs). No latch: the charge is repeatable and the
+		// encounter component spaces refires with a meter refill.
+		UE_LOG(LogTemp, Log,
+			TEXT("BEAST_CHARGE: boot requested but StartGlideHome did not start (blocked; see EJECT_HOME log; not day-camp #8; not planetside #10)"));
+		ShowInteractFeedback(TEXT("BEAST_CHARGE: boot blocked"), FColor::Yellow);
+	}
+	return bGlideStarted;
+}
+
 bool AHomeWorldCharacter::TryBedSleepSpirit()
 {
 	// T0_M11 NODE_BED / TOD_NIGHT_SPIRIT / FORM_SPIRIT / CAM_T0_BED / NODE_RUNE

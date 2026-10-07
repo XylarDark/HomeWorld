@@ -299,6 +299,17 @@ public:
 	bool IsPlanetsideNightBootTriggered() const { return bPlanetsideNightBootTriggered; }
 
 	/**
+	 * Bull charge-and-boot (Lead 2026-10-07, Docs/context/HOMEWORLD_ROUTE.md):
+	 * threat meter full or too close without an offering -> charge -> EJECT_HOME.
+	 * Prefer existing UHomeWorldFallbackGlideComponent::StartGlideHome -- no parallel
+	 * eject service (Arch B). Distinct from MUST #8 TryEjectNodeDayCamp (day camp)
+	 * and #10 TryBootPlanetsideNightHome (night glider). Repeatable by design: the
+	 * encounter component resets its meter on delivery instead of a session latch.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Beast|T0", meta = (DisplayName = "Try Boot Beast Charge Home"))
+	bool TryBootBeastChargeHome();
+
+	/**
 	 * T0 #11 NODE_BED: bed sleep-gate -> spirit (after NODE_RUNE).
 	 * Prefer existing GrantSpiritSleepGate / CanEnterSpiritForm / ApplyFormForPhase -- no parallel form service (Arch B).
 	 * Requires IsRuneGateUnlocked (#7). Phase-alone / spirit w/o bed+rune / soft-kidnap = closed_fail. #9 w/o bed stay FORM_BODY.
