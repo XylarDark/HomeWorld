@@ -87,16 +87,16 @@
         "kind": "static",
         "what": "a tinge of spirit blue in the CENTRE of the campfire",
         "behaviour": "a fixed radius where you are visible",
-        "radius_m": null,
-        "radius_note": "DELIBERATELY unset. The Lead specified that it exists and that it is dangerous, not how big. Guessing a number here would be authoring gameplay as art."
+        "radius_m": 4.0,
+        "radius_note": "Settled by Lead via agent proposal, 2026-10-07: 4 m. The bedrolls sit ~3.2-4.1 m from the fire origin, so a 4 m pool leaves the two sleepers just outside the fire's visibility while making the fire itself the thing you route around. The guard's torch is the moving read; the fire is the static one."
       },
       {
         "id": "SM_Camp_Torch",
         "kind": "MOVING",
         "what": "the patrolling guard's blue-tinged torch",
         "behaviour": "an area around the guard that travels with them, so the safe pocket changes as they walk",
-        "radius_m": null,
-        "radius_note": "Same - unset by choice. The moving radius is what makes this non-trivial: a static one is a lookup, a travelling one means reading a moving safe zone."
+        "radius_m": 6.0,
+        "radius_note": "Settled by Lead via agent proposal, 2026-10-07: 6 m, and it travels with the guard. It must be readable enough to plan around but not so wide that the two sleeper easings are impossible — 6 m around a guard at the post leaves the (0,4) captive and the (-2.5,2.0/3.2) bedrolls reachable when the guard is at the far end of its walk."
       }
     ],
     "why_one_colour_is_right": "Both sources are spirit-blue, so the player learns ONE rule - blue means you can be seen here - in a single glance, from the art alone, with no tutorial. That is VISION_BOARD's 'the world announces what it wants by its shape alone' applied to a stealth system: one colour, two forms, static and moving."

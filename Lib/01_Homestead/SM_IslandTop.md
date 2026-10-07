@@ -51,8 +51,8 @@ The oval is the walk, not the rim. The graybox box stays ±9.5 by ±5.0 until th
 |---|---|
 | Shape | Oval |
 | Speed | 6.0 m/s, walk only |
-| Far edge | ~540 m from the center, 90 s (was 90 m / 15 s; ×6 world-scale pass 2026-10-07 — pending review of whether the homestead oval itself should stay human-scale) |
-| Near edge | ~300 m from the center, 50 s (was 50 m / 8.3 s; same pending review) |
+| Far edge | 90 m from the center, 15 s (unchanged — homestead stays human-scale, Lead 2026-10-07) |
+| Near edge | 50 m from the center, 8.3 s (unchanged — same ruling) |
 | Mantle | Stays in the game. Not a homestead movement. |
 | Glide start | Only by walking off the edge |
 
