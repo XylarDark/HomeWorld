@@ -21,7 +21,7 @@
   "units": "meters",
   "apply_scale": true,
   "origin": "assembly_origin",
-  "size_m": { "x": 18.0, "y": 18.0, "z": 1.8 },
+  "size_m": { "x": 108.0, "y": 108.0, "z": 1.8 },
   "world_origin": [20.0, -80.0, -95.0],
   "why_this_origin": [
     "Round 2 (Q6) settled the second zone as PINE FOREST WITH CAMP, so the camp is in the forest. Layout inside the forest is still the Lead's.",
@@ -155,7 +155,7 @@
     "NODE_CAPTIVE - RESOLVED as must #16. The actor and the freedom gate are specified AND the logic is implemented (UHomeWorldSpiritStealthComponent::TryFreeCaptive). What does not exist yet is the actor in a .umap, so every count is still a soft latch."
   ],
   "open_questions": [
-    "Q15, still parked: is the clearing ~84 m across as the old measurement suggested, or a smaller one? The ZONE is settled (pine forest with camp); its SIZE is not. The 18 x 18 m above is a placeholder chosen so all four beat nodes and a guard patrol fit with room to walk around them - it is not a recommendation.",
+    "Q15, resolved 2026-10-07 (Lead 6× scale pass): the clearing is ~100 m across — the old 18 m placeholder grown to the new world scale (~108 m, stated as ~100 m). The ZONE was always settled (pine forest with camp); its SIZE is now settled too. Layout inside the clearing remains the Lead's.",
     "Layout inside the clearing - where the fire sits relative to the bedrolls, which side the lashings are on, where the portal opens - is the Lead's. It decides whether the player can see the captive from the portal, which decides whether the rescue reads as a choice or a scripted walk.",
     "Does the lashings read as a cage? A cage invites killing the guard to open it, which inverts the beat. The whole point is that the only way through is to calm them."
   ],

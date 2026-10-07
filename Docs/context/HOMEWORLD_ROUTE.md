@@ -18,17 +18,22 @@ One fact proposed at a time, one yes from Luke, one write into this file only �
 
 ## Recorded
 
-- The gap under the lowest cloud, down to the ground, is 25 m, which is 10 seconds of straight glide at the 2.5 m/s sink that keeps the 75 m drop at 30 seconds to ground, with no slowdown in that gap. It is a placeholder until human testing.
-- Clouds are 6-24 m across. It is a placeholder until human testing.
-- Cloud spacing is top 3-4 times the diameter, middle 1.5-2.5, and bottom 4-6. It is a placeholder until human testing.
-- The cloud layer above the 25 m gap is 50 m tall, the 75 m drop minus that gap. It is a placeholder until human testing.
+- The gap under the lowest cloud, down to the ground, is 150 m, which is 10 seconds of straight glide at the 15 m/s sink that keeps the 450 m drop at 30 seconds to ground, with no slowdown in that gap. It is a placeholder until human testing. (6× world-scale pass, Lead 2026-10-07.)
+- Clouds are 36-144 m across. It is a placeholder until human testing. (6× pass 2026-10-07.)
+- Cloud spacing is top 3-4 times the diameter, middle 1.5-2.5, and bottom 4-6. It is a placeholder until human testing. (Ratios unchanged by the 6× pass.)
+- The cloud layer above the 150 m gap is 300 m tall, the 450 m drop minus that gap. It is a placeholder until human testing. (6× pass 2026-10-07.)
 - Any jump has more than one spirit-blue cloud, and there is no fixed count.
 - The bottom of the cloud layer is the exit, and the landing stays in the existing field.
 - The wisp is a bit of the signature spirit blue on a cloud, not one of the three wisps at the spirit wound.
 - You collect the wisp on the way down, it stays with you, and you hold one per dung you will mix.
 - There is more than one cloud layer, and there is no fixed count of layers. That is not a split of the 50 m layer.
 - Steering is unrestricted by rails, corridors, or artificial bounds throughout the descent. It remains a glider descent, not a new flight mode.
-- Polish gate rows are red only. A row is not allowed to pass as a warning.
+- Lead 2026-10-07 scale change: the WORLD grows by about **6×** — island, field,
+  camp, descent space. Props, characters, and trigger radii stay human-scale.
+  bulls rideable: bull max speed = **3× player sprint**, fast in a single
+  direction, hard to turn at max speed, must slow down for better turning.
+  (All size rows in `WORLD_METRICS.md` carry the old scale; they need a
+  re-derivation pass before use.)
 - Farming lives on the homestead.
 - In the zones, day and night, you collect and nurture so the place provides the plants and animals the homestead needs.
 - Taming for now is one small barn that holds one big bull, and the fur is what that bull sheds.
@@ -55,11 +60,11 @@ One fact proposed at a time, one yes from Luke, one write into this file only �
 - It is mixed at the homestead, the spirit spreads it at night, and in the morning one herb pile appears per dung, at random in the field.
 - Dawn alone does not bring a pile back.
 - That night flight is not the locked first flight.
-- The 75 m drop is how high the island sits above the plains, so every jump off the homestead drops that.
-- The 260 m line is the plains edge on that straight glide only.
+- The 450 m drop is how high the island sits above the plains, so every jump off the homestead drops that. (6× pass 2026-10-07.)
+- The 1560 m line is the plains edge on that straight glide only. (6× pass.)
 - Other directions have no edge.
 - A cloud ring does not draw that line around the island.
-- Height is one and a half times the first jump's 75 m drop. It is a placeholder until human testing.
+- Height is one and a half times the first jump's 450 m drop. It is a placeholder until human testing.
 - Neutral glide speed is two thirds of the first jump's neutral glide speed. It is a placeholder until human testing.
 - No meter height is written for the night flight.
 

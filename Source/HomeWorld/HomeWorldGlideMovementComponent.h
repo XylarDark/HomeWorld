@@ -34,19 +34,22 @@ public:
 
 	/**
 	 * Forward airspeed target while gliding. Developer decision 2026-10-05: keep 500 cm/s
-	 * against a 250 cm/s sink, a deliberate 2:1 shallow glide. This is NOT a leftover from
-	 * the earlier 1:1 uniform rate - the shallower angle is the point, so steering has real
-	 * consequence over the 30 s descent. Do not "correct" it back to matching the sink.
+	 * against a 250 cm/s sink, a deliberate 2:1 shallow glide. ×6 world-scale pass
+	 * (Lead 2026-10-07): 3000 cm/s forward against a 1500 cm/s sink — same 2:1 angle.
+	 * This is NOT a leftover from the earlier 1:1 uniform rate - the shallower angle
+	 * is the point, so steering has real consequence over the 30 s descent. Do not
+	 * "correct" it back to matching the sink.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Transit|CloudDescent", meta = (ClampMin = "0.0"))
-	float GlideForwardSpeed = 500.0f;
+	float GlideForwardSpeed = 3000.0f;
 
 	/**
 	 * Descent sink rate. Developer decision 2026-10-05: 30 second descent over the
-	 * recorded 75 m drop, which is 250 cm/s. Forward speed was not part of that call.
+	 * recorded 450 m drop (×6 pass), which is 1500 cm/s. Forward speed was not part
+	 * of that call.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Transit|CloudDescent", meta = (ClampMin = "0.0"))
-	float GlideSinkRate = 250.0f;
+	float GlideSinkRate = 1500.0f;
 
 	/**
 	 * How quickly velocity converges on the glide target. This is a time constant:

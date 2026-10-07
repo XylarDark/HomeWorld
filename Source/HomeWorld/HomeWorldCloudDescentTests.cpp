@@ -67,10 +67,11 @@ bool FCloudDescentSteeringAndWispTest::RunTest(const FString& Parameters)
 	}
 	TestEqual(TEXT("still exactly one movement component"), MovementComponentCount, 1);
 
-	// Developer decision 2026-10-05: uniform 5 m/s forward and sink across the descent.
-	TestEqual(TEXT("glide forward speed is 5 m/s"), Glide->GlideForwardSpeed, 500.0f);
-	// Developer decision 2026-10-05: 30 s descent over the recorded 75 m drop.
-	TestEqual(TEXT("glide sink rate is 2.5 m/s for a 30 s descent"), Glide->GlideSinkRate, 250.0f);
+	// Developer decision 2026-10-05: uniform forward and sink across the descent;
+	// 6× world-scale pass (Lead 2026-10-07) scales both speeds by ×6.
+	TestEqual(TEXT("glide forward speed is 30 m/s"), Glide->GlideForwardSpeed, 3000.0f);
+	// 30 s descent over the recorded 450 m drop.
+	TestEqual(TEXT("glide sink rate is 15 m/s for a 30 s descent"), Glide->GlideSinkRate, 1500.0f);
 
 	// A glide cannot hold altitude: no input grants vertical authority.
 	const FVector Target = Glide->ComputeGlideTargetVelocity();
@@ -95,7 +96,7 @@ bool FCloudDescentSteeringAndWispTest::RunTest(const FString& Parameters)
  * The test world created by FScopedWorld is not physics-ticked, so this does NOT
  * simulate a drop. It covers the deterministic contract instead: the descent
  * hands control back through the engine's landing path, and the character clears
- * its descent state. Whether the glide actually reaches the ground from 75 m and
+ * its descent state. Whether the glide actually reaches the ground from 450 m and
  * touches down on a real floor surface is a PIE question, not an automation one.
  */
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(
@@ -160,8 +161,9 @@ bool FCloudDescentLandingHandsBackControlTest::RunTest(const FString& Parameters
 /**
  * Descent duration measured from the glide law, deterministically.
  *
- * HOMEWORLD_ROUTE.md records a 75 m drop and a 25 m bottom gap "that is a
- * placeholder until human testing". This advances the glide in fixed steps and
+ * HOMEWORLD_ROUTE.md records a 450 m drop and a 150 m bottom gap "that is a
+ * placeholder until human testing" (6× world-scale pass, Lead 2026-10-07).
+ * This advances the glide in fixed steps and
  * reports the time to reach ground so the developer has a number to compare a
  * playtest against.
  *
@@ -211,9 +213,10 @@ bool FCloudDescentDurationMeasurementTest::RunTest(const FString& Parameters)
 		return false;
 	}
 
-	// Recorded route geometry: 75 m drop, of which 50 m is cloud layer and 25 m gap.
-	const double DropCm = 7500.0;
-	const double CloudLayerCm = 5000.0;
+	// Recorded route geometry: 450 m drop, of which 300 m is cloud layer and 150 m gap
+	// (×6 world-scale pass, Lead 2026-10-07).
+	const double DropCm = 45000.0;
+	const double CloudLayerCm = 30000.0;
 	const double GapCm = DropCm - CloudLayerCm;
 
 	const float StepSeconds = 1.0f / 60.0f;
@@ -243,15 +246,15 @@ bool FCloudDescentDurationMeasurementTest::RunTest(const FString& Parameters)
 
 	AddInfo(FString::Printf(
 		TEXT("CLOUD_DESCENT duration: total=%.2f s, cloud layer=%.2f s, bottom gap=%.2f s")
-		TEXT(" (75 m drop, %.0f cm/s sink, %.0f cm/s forward)"),
+		TEXT(" (450 m drop, %.0f cm/s sink, %.0f cm/s forward)"),
 		Elapsed, TimeToCloudBase, Elapsed - TimeToCloudBase, SinkCmPerSecond, Glide->GlideForwardSpeed));
 
 	// The glide must consume the drop rather than hang or climb. Guard the loop
 	// rather than assert a duration: duration is the developer's to measure.
-	TestTrue(TEXT("glide consumes the 75 m drop in a plausible time"), Elapsed > 1.0 && Elapsed < 120.0);
+	TestTrue(TEXT("glide consumes the 450 m drop in a plausible time"), Elapsed > 1.0 && Elapsed < 120.0);
 	TestTrue(TEXT("glide reaches ground (does not hang)"), Altitude <= 0.0);
 
-	// The developer's 30 s decision, over the recorded 75 m drop. Asserted as a band
+	// The developer's 30 s decision, over the recorded 450 m drop. Asserted as a band
 	// rather than an equality: velocity convergence adds a fixed startup offset that
 	// is real behaviour, not error.
 	TestTrue(TEXT("measured descent matches the developer's 30 s decision"),
@@ -266,9 +269,9 @@ bool FCloudDescentDurationMeasurementTest::RunTest(const FString& Parameters)
 
 /**
  * CLOUDS_WISPS_V1 Source §5 / automation gate: the field builds 2+ layers
- * and 2+ clouds, every diameter is within 6-24 m, spacing sits in its
- * position band, the lowest cloud bottom is 25 m above ground, every cloud
- * sits entirely between 25 m and 75 m above ground, at least one wisp sits
+ * and 2+ clouds, every diameter is within 36-144 m, spacing sits in its
+ * position band, the lowest cloud bottom is 150 m above ground, every cloud
+ * sits entirely between 150 m and 450 m above ground, at least one wisp sits
  * on a cloud, and no cloud blocks the player pawn (overlap only).
  */
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(
@@ -310,7 +313,7 @@ bool FCloudFieldAutomationTest::RunTest(const FString& Parameters)
 	for (AHomeWorldCloud* Cloud : Clouds)
 	{
 		const double Diameter = Cloud->GetDiameterCm();
-		if (Diameter < 600.0 || Diameter > 2400.0)
+		if (Diameter < 3600.0 || Diameter > 14400.0)
 		{
 			bAllDiametersInBand = false;
 		}
@@ -318,7 +321,7 @@ bool FCloudFieldAutomationTest::RunTest(const FString& Parameters)
 		const double Bottom = CenterZ - Diameter * 0.5;
 		const double Top = CenterZ + Diameter * 0.5;
 		LowestBottom = FMath::Min(LowestBottom, Bottom - GroundZ);
-		if (Bottom < GroundZ + 2500.0 - 1.0 || Top > GroundZ + 7500.0 + 1.0)
+		if (Bottom < GroundZ + 15000.0 - 1.0 || Top > GroundZ + 45000.0 + 1.0)
 		{
 			bAllCloudsInsideBand = false;
 		}
@@ -335,11 +338,11 @@ bool FCloudFieldAutomationTest::RunTest(const FString& Parameters)
 		}
 	}
 
-	TestTrue(TEXT("every diameter is within 6-24 m"), bAllDiametersInBand);
-	TestTrue(TEXT("every cloud sits entirely between 25 m and 75 m above ground"), bAllCloudsInsideBand);
-	TestTrue(TEXT("lowest cloud bottom is 25 m above ground"), FMath::Abs(LowestBottom - 2500.0) < 1.0);
-	TestTrue(TEXT("lowest cloud bottom sits 2500 cm above the field's placed Z"),
-		FMath::Abs((Field->GetActorLocation().Z + LowestBottom) - (SpawnLocation.Z + 2500.0)) < 1.0);
+	TestTrue(TEXT("every diameter is within 36-144 m"), bAllDiametersInBand);
+	TestTrue(TEXT("every cloud sits entirely between 150 m and 450 m above ground"), bAllCloudsInsideBand);
+	TestTrue(TEXT("lowest cloud bottom is 150 m above ground"), FMath::Abs(LowestBottom - 15000.0) < 1.0);
+	TestTrue(TEXT("lowest cloud bottom sits 15000 cm above the field's placed Z"),
+		FMath::Abs((Field->GetActorLocation().Z + LowestBottom) - (SpawnLocation.Z + 15000.0)) < 1.0);
 	TestTrue(TEXT("at least one wisp sits on a cloud"), WispCount >= 1);
 	TestTrue(TEXT("no cloud blocks the player pawn (overlap only)"), bNoneBlock);
 

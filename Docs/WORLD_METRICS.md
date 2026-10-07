@@ -12,22 +12,22 @@ One row per number. Bite 1 of `Docs/handoffs/CONTEXT_PACK_V1.md`. Docs only.
 
 | # | Metric | Value | Unit | Axis | Source |
 |---|---|---|---|---|---|
-| D1 | Drop from island to plains | 75 | m | −Z | `HOMEWORLD_ROUTE.md:45` (also `:24`, `:27`); kept by #3 (1A) and #4 (1B, 75 m launch ledge) |
-| D2 | Descent duration, launch to landing | 30 | s | — | `01_GDD_MVP.md:79` (§4 V2, developer decision 2026-10-05), `:214` (§9), `:296` (Appendix B, changed by #8 8A) |
-| D3 | Sink rate | 2.5 | m/s | −Z | `HOMEWORLD_ROUTE.md:24`; `CLOUDS_WISPS_V1.md:15` (250 cm/s); kept by #1 (1A) |
-| D4 | Forward glide speed | 5 | m/s | along glide heading | `CLOUDS_WISPS_V1.md:15` (500 cm/s, `UHomeWorldGlideMovementComponent`) |
-| D5 | Clear gap under the lowest cloud, down to the ground | 25 | m | −Z | `HOMEWORLD_ROUTE.md:24`, placeholder; kept by #1 (1A) and #3 (1A) |
-| D6 | Straight-glide time through that gap | 10 | s | −Z | `HOMEWORLD_ROUTE.md:24` (25 m ÷ 2.5 m/s, no slowdown) |
-| D7 | Cloud band height above the gap | 50 | m | +Z | `HOMEWORLD_ROUTE.md:27`, placeholder; `CLOUDS_WISPS_V1.md:43` (band from 25 m to 75 m above field ground); kept by #3 (1A) |
+| D1 | Drop from island to plains | 450 | m | −Z | `HOMEWORLD_ROUTE.md:45` (also `:24`, `:27`); kept by #3 (1A) and #4 (1B); ×6 world scale Lead 2026-10-07 |
+| D2 | Descent duration, launch to landing | 30 | s | — | `01_GDD_MVP.md:79` (§4 V2, developer decision 2026-10-05), `:214` (§9), `:296` (Appendix B, changed by #8 8A); time unchanged by the ×6 pass (speeds scale with space) |
+| D3 | Sink rate | 15 | m/s | −Z | `HOMEWORLD_ROUTE.md:24`; `CLOUDS_WISPS_V1.md` (250 cm/s pre-×6); kept by #1 (1A); ×6 Lead 2026-10-07 |
+| D4 | Forward glide speed | 30 | m/s | along glide heading | `CLOUDS_WISPS_V1.md:15` (500 cm/s pre-×6); ×6 Lead 2026-10-07 |
+| D5 | Clear gap under the lowest cloud, down to the ground | 150 | m | −Z | `HOMEWORLD_ROUTE.md:24`, placeholder; ×6 Lead 2026-10-07 |
+| D6 | Straight-glide time through that gap | 10 | s | −Z | `HOMEWORLD_ROUTE.md:24` (150 m ÷ 15 m/s, no slowdown) |
+| D7 | Cloud band height above the gap | 300 | m | +Z | `HOMEWORLD_ROUTE.md:27`; `CLOUDS_WISPS_V1.md:43` (band ×6); ×6 Lead 2026-10-07 |
 | D8 | Cloud layer heights inside the band | taste placeholder, no lock | — | +Z | `CLOUDS_WISPS_V1.md:43` ("the packet writes no layer heights"); #3 (1A) |
 | D9 | Layer split inside the 50 m band | taste placeholder, no lock | — | +Z | `HOMEWORLD_ROUTE.md:32`; `CLOUDS_WISPS_V1.md:43` |
-| D10 | Cloud diameter | 6–24 | m | horizontal | `HOMEWORLD_ROUTE.md:25`, placeholder |
+| D10 | Cloud diameter | 36–144 | m | horizontal | `HOMEWORLD_ROUTE.md:25`, placeholder; ×6 Lead 2026-10-07 |
 | D11 | Cloud spacing, top layer | 3–4 | × diameter | horizontal | `HOMEWORLD_ROUTE.md:26`, placeholder |
 | D12 | Cloud spacing, middle layer | 1.5–2.5 | × diameter | horizontal | `HOMEWORLD_ROUTE.md:26`, placeholder |
 | D13 | Cloud spacing, bottom layer | 4–6 | × diameter | horizontal | `HOMEWORLD_ROUTE.md:26`, placeholder |
 | D14 | Cloud layers, minimum | 2 | count | — | `CLOUDS_WISPS_V1.md:42` ("at least 2, no fixed number"); route `:32` sets no fixed count |
-| D15 | Plains edge on the straight glide | 260 | m | straight-glide heading; +X or +Y open (Lead desk check). Past the edge: not written. Other directions: no edge (`:47`) | `HOMEWORLD_ROUTE.md:46` |
-| D16 | Night flight height | 1.5 × D1 (112.5 m derived), placeholder | × first-jump drop | +Z | `HOMEWORLD_ROUTE.md:49`, changed by #11 (2A); the route writes no meters for it (`:51`, #11 1A) |
+| D15 | Plains edge on the straight glide | 1560 | m | straight-glide heading; +X or +Y open (Lead desk check). Past the edge: not written. Other directions: no edge (`:47`); ×6 Lead 2026-10-07 |
+| D16 | Night flight height | 1.5 × D1 (675 m derived), placeholder | × first-jump drop | +Z | `HOMEWORLD_ROUTE.md:49`, changed by #11 (2A); route writes no meters for it (`:51`, #11 1A); ratio unchanged by ×6 |
 | D17 | Night flight neutral glide speed | 2/3 × first-jump neutral glide speed, placeholder | ratio | along glide heading | `HOMEWORLD_ROUTE.md:50`, changed by #11 (2A) |
 
 ## Loop durations (GDD)
@@ -69,12 +69,12 @@ One row per number. Bite 1 of `Docs/handoffs/CONTEXT_PACK_V1.md`. Docs only.
 
 | # | Metric | Value | Unit | Source |
 |---|---|---|---|---|
-| I1 | Island bounding footprint | ~110 × 75 | m | Lead 2026-10-07: half-circle one side, half-oval the other, uneven |
-| I2 | Buildable center square | 75 × 75 | m | Lead 2026-10-07 |
-| I3 | Underside depth | ~50, jagged, tapering to a point (iceberg look) | m | Lead 2026-10-07; reserved for future underground dig/dwellings |
+| I1 | Island bounding footprint | ~660 × 450 | m | Lead 2026-10-07: half-circle one side, half-oval the other, uneven; ×6 world-scale pass |
+| I2 | Buildable center square | 450 × 450 | m | Lead 2026-10-07; ×6 pass |
+| I3 | Underside depth | ~300, jagged, tapering to a point (iceberg look) | m | Lead 2026-10-07; reserved for future underground dig/dwellings; ×6 pass |
 | I6 | Visual reference: floating-island city with jagged rock underside, à la **Dalaran (WoW)** | — | — | Lead 2026-10-07 |
-| I4 | Island top height above plains | 75 | m | `HOMEWORLD_ROUTE.md:45` (D1) |
-| I5 | Derived: rock point to plains clearance | ~25 | m | D1 − I3 = 75 − 50. Not player-jumpable. |
+| I4 | Island top height above plains | 450 | m | `HOMEWORLD_ROUTE.md:45` (D1); ×6 pass |
+| I5 | Derived: rock point to plains clearance | ~150 | m | D1 − I3 = 450 − 300. Not player-jumpable. |
 
 ## Mismatches found
 

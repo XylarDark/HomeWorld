@@ -22,11 +22,11 @@
     -95.0
   ],
   "world_bounds_m": {
-    "x": 70.0,
-    "y": 70.0,
+    "x": 420.0,
+    "y": 420.0,
     "z": 0.0
   },
-  "bounds_note": "Was 60 x 40 in the first pass. Now roughly square, because four distinct edges need four distinct sides and a rectangle makes two of them feel like leftovers.",
+  "bounds_note": "World scale ×6 (Lead 2026-10-07): was 70×70, now 420×420. Props, characters, trigger radii stay human-scale; the plant/gather/dung separation rule of 5 m now reads dense and is queued for re-tune.",
   "arrival": {
     "position": "centre of the field, (0, 0)",
     "marker": "NONE - no ring of stones, no pad, no cleared ground",
@@ -36,7 +36,7 @@
   "edges": [
     {
       "id": "EDGE_CLIFF",
-      "at": "north, y = +35.0",
+      "at": "north, y = +210.0",
       "type": "cliff",
       "status": "BOUNDARY - dead end, no exit, and that is deliberate",
       "role": "The only edge that reveals scope. Everything else in this zone is local; the cliff is where the player learns the planet is larger than the field.",
@@ -46,7 +46,7 @@
     },
     {
       "id": "EDGE_RIVER",
-      "at": "east, x = +35.0",
+      "at": "east, x = +210.0",
       "type": "river",
       "status": "FUTURE PATH - not traversable in T0",
       "width_m": 7.0,
@@ -55,14 +55,14 @@
     },
     {
       "id": "EDGE_FOREST_A",
-      "at": "south, y = -35.0",
+      "at": "south, y = -210.0",
       "type": "pine_forest",
       "status": "ONE OF THE TWO - may become the camp forest",
       "role": "Candidate. Entering it is the commitment."
     },
     {
       "id": "EDGE_FOREST_B",
-      "at": "west, x = -35.0",
+      "at": "west, x = -210.0",
       "type": "pine_forest",
       "status": "ONE OF THE TWO - may become the camp forest",
       "role": "Candidate. Entering it is the commitment."

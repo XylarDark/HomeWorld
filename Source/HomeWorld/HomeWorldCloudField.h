@@ -36,11 +36,11 @@ public:
 
 	/** Per-layer cloud centre heights above the field ground, in cm. Size is the layer count (min 2). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CloudField")
-	TArray<double> LayerHeightsCm = { 6800.0, 3100.0 }; // Lead taste-pass placeholder, not a route fact; the lowest entry is ignored for placement because the 25 m pin owns that layer's Z.
+	TArray<double> LayerHeightsCm = { 40800.0, 18600.0 }; // Lead taste-pass placeholder, not a route fact; the lowest entry is ignored for placement because the 150 m pin owns that layer's Z. (×6 world-scale pass 2026-10-07.)
 
-	/** Diameter applied to the field's clouds, in cm; clamped to 6-24 m. */
+	/** Diameter applied to the field's clouds, in cm; clamped to 36-144 m (×6 pass). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CloudField")
-	double DiameterCm = 1200.0;
+	double DiameterCm = 7200.0;
 
 	/** Half-extent (cm) covered, out from GP_GlideStart along the descent path. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CloudField")

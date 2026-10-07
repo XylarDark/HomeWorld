@@ -40,11 +40,11 @@ void AHomeWorldCloudField::BuildClouds()
 		return;
 	}
 
-	const double Diameter = FMath::Clamp(DiameterCm, 600.0, 2400.0);
+	const double Diameter = FMath::Clamp(DiameterCm, 3600.0, 14400.0); // ×6 world-scale pass 2026-10-07
 	const double Radius = Diameter * 0.5;
 	const double GroundZ = GetActorLocation().Z;
-	const double BandMinCenterZ = GroundZ + 2500.0 + Radius; // lowest cloud bottom sits on the 25 m line
-	const double BandMaxCenterZ = GroundZ + 7500.0 - Radius; // top of highest cloud inside the 75 m line
+	const double BandMinCenterZ = GroundZ + 15000.0 + Radius; // lowest cloud bottom sits on the 150 m line
+	const double BandMaxCenterZ = GroundZ + 45000.0 - Radius; // top of highest cloud inside the 450 m line
 
 	// Layer indices ordered high to low: highest is top, lowest is bottom,
 	// everything between is middle (route fact 2 spacing bands).
@@ -69,7 +69,7 @@ void AHomeWorldCloudField::BuildClouds()
 	for (int32 Rank = 0; Rank < Order.Num(); ++Rank)
 	{
 		const double Height = LayerHeightsCm[Order[Rank]];
-		// The 25 m pin owns the lowest layer's Z; its LayerHeightsCm entry is ignored.
+		// The 150 m pin owns the lowest layer's Z; its LayerHeightsCm entry is ignored.
 		const double CenterZ = (Rank == Order.Num() - 1)
 			? BandMinCenterZ
 			: FMath::Clamp(GroundZ + Height, BandMinCenterZ, BandMaxCenterZ);

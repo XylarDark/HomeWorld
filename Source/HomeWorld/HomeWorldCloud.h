@@ -14,7 +14,7 @@ class UStaticMeshComponent;
  *
  * Clouds are pass-through (CLOUDS_WISPS_V1 interview #3, 2A): the visual
  * mesh only registers an overlap with the pawn and can never block or be
- * stood on. Diameter is a setting clamped to the recorded 6-24 m band
+ * stood on. Diameter is a setting clamped to the recorded 36-144 m band (×6 world-scale pass 2026-10-07)
  * (route fact 1) and the look is a runtime dynamic instance of the
  * existing M_SpiritUnlit master; no new master, no .uasset.
  */
@@ -28,7 +28,7 @@ public:
 
 	/** Cloud diameter in cm. Setting; clamped to 6-24 m (route fact 1). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Cloud")
-	double DiameterCm = 1200.0;
+	double DiameterCm = 7200.0;
 
 	/** Whether this cloud carries one surface wisp (route fact 8). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Cloud")
@@ -52,8 +52,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	static constexpr double MinDiameterCm = 600.0;
-	static constexpr double MaxDiameterCm = 2400.0;
+	static constexpr double MinDiameterCm = 3600.0;
+	static constexpr double MaxDiameterCm = 14400.0;
 
 	UPROPERTY(VisibleAnywhere, Category = "Cloud")
 	TObjectPtr<UStaticMeshComponent> VisualMesh;
