@@ -47,9 +47,10 @@ zone-generation research and the "straight to generation" decision.
 
 CAMP.json `world_origin` `(20,-80,-95)` is still inside FIELD bounds.
 The blend is not: `02_Forest` / `06_Camp` kit meshes are on the +10000 m X
-shelf (Lead interview #17). `LIT_Planet_Sun` and `LIT_LandingDay` stayed at
-the origin. Recorded in `FIELD.json.zone_contract`, `CAMP.json.zone_contract`,
-and docs/39 §5.
+shelf (Lead interview #17). Interview #19: `LIT_Planet_Fill` is back at
+(-13.948, -60, -85). The three Planet_Day lights are in `09_Planet_Day`.
+Sun and LandingDay transforms are unchanged. Recorded in
+`FIELD.json.zone_contract`, `FOREST.json`, and docs/39 §5.
 
 ## Next steps (in order)
 

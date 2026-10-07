@@ -22,6 +22,8 @@
 | LIT_LandingDay | AREA clearing | — | 02_Forest |
 | Scene props `LIT_PRESET_Planet_Day`, `Planet_Night_Spirit_note` | meta | — | Scene |
 
+Current collection, Lead interview #19 (2026-10-07): `09_Planet_Day`. `LIT_Planet_Fill` is at (-13.948, -60, -85). Sun and LandingDay transforms are unchanged. The table above is the 2026-09-16 build record.
+
 ## Phase exit boxes I claim
 
 - [x] **Planet_Day** preset for Shot 4: warm sun key + cool fill + landing area

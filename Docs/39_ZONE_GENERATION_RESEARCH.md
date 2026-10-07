@@ -179,7 +179,12 @@ Checked against the specs and the blend today:
   x 10015.496..10021.790, y -82.2..-75.7, z -95..-93.5. Neither box meets
   the field rectangle. Homestead mesh bounds were unchanged.
   `LIT_Planet_Sun` and `LIT_LandingDay` stayed at the origin (island day rig,
-  not slot templates). `LIT_Planet_Fill` moved with the forest kit.
+  not slot templates). `LIT_Planet_Fill` was moved with the kit by mistake.
+  **Interview #19 (2026-10-07):** `LIT_Planet_Fill` is back at
+  (-13.948, -60, -85). `LIT_Planet_Sun`, `LIT_LandingDay`, and
+  `LIT_Planet_Fill` now live in collection `09_Planet_Day`, not `02_Forest`.
+  Sun and LandingDay transforms are unchanged. Forest and camp mesh bounds
+  are unchanged.
 
 The fix as a contract (Lead 2026-10-07: "the field and the forest are two
 different zones and the camp work is not going in the field"):

@@ -35,7 +35,8 @@ Do **not** invent kits or features. This table makes the existing library portab
 |---|---|---|
 | `00_Core` | `/Game/HomeWorld/Maps/VS_MVP/Cameras/` (cams as actors / cine cams) | Export cameras as named cine camera actors or CameraActors — not SM_ |
 | `01_Homestead` | `/Game/HomeWorld/Meshes/Homestead/` | Island, cliff, cabin kit, pines, garden, lookout, perch |
-| `02_Forest` | `/Game/HomeWorld/Meshes/Forest/` | Planet slice dress, return shrine assembly, planet pines, ground |
+| `02_Forest` | `/Game/HomeWorld/Meshes/Forest/` | Planet slice dress, return shrine assembly, planet pines, ground. Day lights are not in this collection. |
+| `09_Planet_Day` | `/Game/HomeWorld/Lighting/Planet_Day/` | `LIT_Planet_Sun`, `LIT_Planet_Fill`, `LIT_LandingDay`. Recreate as UE lights. Not a mesh FBX. |
 | `03_Gatherables` | `/Game/HomeWorld/Meshes/Gatherables/` | Landing circle, homestead shrine, planters/path tiles, RES_* |
 | `04_Beasts` | `/Game/HomeWorld/Meshes/Beasts/` | Pad proxies only this slice |
 | `05_Spirits` | `/Game/HomeWorld/Meshes/Spirits/` | Spirit / wound proxies |

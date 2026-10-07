@@ -24,7 +24,7 @@
 | `SM_Pine_Planet_{L,M,S}_*` | SM_ instances | M_WoodWild + M_FoliageCard | Stylized pines only (copied homestead pine language) |
 | `SM_PineValley_Block_A/B` | SM_ mounds | M_StylizedGrass | Soft undergrowth massing (replaces solid foliage cubes) |
 | `SM_Peak_Distant` | SM_ | M_CliffRock | Distant snow-peak silhouette (sky read) |
-| `LIT_Planet_Sun` / `LIT_Planet_Fill` / `LIT_LandingDay` | LIT_ | — | Planet_Day stack (see LIT handoff) |
+| `LIT_Planet_Sun` / `LIT_Planet_Fill` / `LIT_LandingDay` | LIT_ | — | Planet_Day stack, collection `09_Planet_Day` (interview #19). Fill at (-13.948, -60, -85). Sun and LandingDay stay at the origin. |
 
 **Shared (not duplicated asset):** `SM_LandingCircle` remains in `03_Gatherables` @ graybox landing. Second instance `SM_LandingCircle_B` on islet-03 crumb pad (same masters).
 
