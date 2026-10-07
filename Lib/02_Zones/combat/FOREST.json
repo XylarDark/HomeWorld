@@ -1,0 +1,111 @@
+{
+  "id": "FOREST",
+  "type": "SM_ zone",
+  "status": "SEQUENCE_DEFINED_GENERATION_PENDING",
+  "date": "2026-10-07",
+  "phase": "T0_R6",
+  "owner": "agent",
+  "family": "combat",
+  "role": "Zone 2, the pine forest. Settled as PINE FOREST WITH CAMP (Q6, 2026-10-02) and re-scoped 2026-10-07: the forest is a GENERATED map (Lead: Path-of-Exile-style, vague preset shape + seeded variables, and when asked for a static T0 placement the Lead chose 'straight to generation'). The player commits to one forest by crossing ONE of FIELD's two identical forest edges; that crossing instantiates this zone. The camp, the spirit wound and the return shrine are AUTHORED slots inserted into the generated forest - the camp is structurally incapable of landing in the field.",
+  "parent": "docs/39_ZONE_GENERATION_RESEARCH.md",
+  "units": "meters",
+  "apply_scale": true,
+  "origin": "entry_band",
+  "world_origin": null,
+  "origin_note": "NO FIXED WORLD ORIGIN (Lead 2026-10-07, 'straight to generation'). The instance origin is the midpoint of whichever FIELD forest edge was crossed. Zone-local frame: (0,0,0) = entry band centre on the edge line, +y = deeper into the forest (away from the field), x = lateral along the edge, z = ground at the FIELD datum (z = -95 world). Entering EDGE_FOREST_A (south) vs EDGE_FOREST_B (west) only rotates this frame; every slot below is identical, which is what keeps the two forests indistinguishable from inside the field.",
+  "generation": {
+    "model": "Path-of-Exile-style: a preset skeleton (vague shape, edge contracts, content budget, authored slots) plus seeded variables (shape jitter, scatter placement). See docs/39_ZONE_GENERATION_RESEARCH.md.",
+    "trigger": "player crosses EDGE_FOREST_A or EDGE_FOREST_B of the FIELD instance (direction of travel decides which neighbor instantiates - Lead 2026-10-07)",
+    "seed": "hash(FIELD instance seed, edge id) - deterministic: the same forest is the same map on revisit, and a save stores seed + deltas (healed wisps, freed companion, tamed beasts) rather than geometry",
+    "dormancy": "the UNCHOSEN forest edge keeps its neighbor dormant - 'a road they did not take' (FIELD.camp_placement) costs nothing under this model: no instance exists until crossed",
+    "shape": {
+      "kind": "blob with a depth band, treeline on the entry side",
+      "width_m": 420.0,
+      "depth_m": 300.0,
+      "width_note": "matches the 420 m field edge span so the forest reads as a band beyond the meadow, not a corridor",
+      "jitter": "+/-15% on extent, edge band drift +/-25 m - silhouette-level variation only; the entry-side treeline read NEVER varies (hard constraint below)",
+      "numbers_status": "agent-proposed, flagged for the Lead (docs/39 section 7 Q2)"
+    },
+    "entry": {
+      "band_width_m": 60.0,
+      "band_read": "a gap-framed opening in an identical treeline on both candidate edges - same density, same height, same opacity, same silhouette (FIELD.THE_HARD_CONSTRAINT, restated below)",
+      "stitch": "the entry band maps 1:1 onto the crossed field edge midpoint; the field-side silhouette of the treeline must be byte-for-byte the same read whichever edge was crossed"
+    },
+    "depth_reading": {
+      "0_to_40_m": "entry light - treeline behind you, camp clearing ahead (the shrine sits close enough that the portal reads as a door, not a teleport: CAMP.why_this_origin)",
+      "40_to_150_m": "working forest - pines, herb scatter (FIELD.scatter_rule applies zone-wide), beast roam",
+      "150_to_220_m": "deep forest - the spirit wound sits here; denser pines, the destination of the dive",
+      "why_zones_need_a_read_at_all": "VISION_BOARD: the world announces what it wants by its shape alone. Depth bands give the generated blob a legible progression without authored paths."
+    }
+  },
+  "budget": {
+    "pine_clumps": "clumps of 3-8 pines, mean spacing ~18 m, density ramping with depth (sparse at entry, dense at the wound band)",
+    "pine_instance_cap": 3500,
+    "herb_scatter": "FIELD.scatter_rule verbatim - common nodes ~30 m apart, 25% duals, 5% triples, no grid (Lead 2026-10-07, x6 pass)",
+    "camp_clearing": "the camp's own 108 m clearing envelope (CAMP.size_m) is a SLOT, not scatter - it is punched out of the pine budget around the camp origin so the modules never intersect trunks",
+    "beasts": "not authored here - roam budget belongs to the beast spec; the generator only reserves open ground (clearing + wound band) from trunk collision",
+    "numbers_status": "agent-proposed, flagged for the Lead - counts are budgets the generator must stay UNDER, not targets it must hit"
+  },
+  "slots": [
+    {
+      "id": "SLOT_SHRINE_RETURN",
+      "piece": "SM_Shrine_Return",
+      "at": [6.0, 25.0, 0.0],
+      "note": "entry-relative. The spirit node you come down through. Sits ~15 m before the camp so arrival reads as walking up to the camp through a door (CAMP.why_this_origin)."
+    },
+    {
+      "id": "SLOT_CAMP",
+      "piece": "CAMP assembly - 5 SM_Camp_* modules + NODE_GUARD, 2x NODE_SLEEPER, NODE_CAPTIVE + 3 triggers + 2 light sources",
+      "at": [20.0, 30.0, 0.0],
+      "at_note": "camp origin relative to entry band; delta from SLOT_SHRINE_RETURN is (14, 5) = ~14.9 m, preserving the shrine-to-CAMP spacing CAMP.json was authored with",
+      "template": "Lib/02_Zones/combat/CAMP.json - all internal at_offsets (bedrolls -2.5/2.0 and -2.5/3.2, captive 0/4, guard post 3/-2, portal 0/0) stay relative to THIS slot origin",
+      "placement_rule": "inserted after the pine scatter so the clearing envelope is respected; never generated into FIELD - the field template has zero camp slots (structural, asserted by test)",
+      "visibility_note": "camp sits ~240 m from FIELD's centre behind at least one treeline band, which is what FIELD's reject camp_visible_from_the_field_centre demands"
+    },
+    {
+      "id": "SLOT_SPIRIT_WOUND",
+      "piece": "SPIRIT_WOUND_MARKER (standing marker, Lead decision)",
+      "at": [-10.0, 180.0, 0.0],
+      "note": "deep band, off the entry axis so reaching it means committing into the forest rather than walking a line. Wounded wisps scatter around it per the wound spec."
+    },
+    {
+      "id": "SLOT_FUTURE",
+      "piece": "reserved - rune, tending soil, further authored set pieces",
+      "at": null,
+      "note": "PoE unique-room pattern: authored pieces live in slots, not in the scatter. New musts that belong to the forest get a slot here instead of a world coordinate."
+    }
+  ],
+  "identity_rules": [
+    "THE_HARD_CONSTRAINT (restated from FIELD): both forest instances - whichever edge - must present IDENTICAL silhouettes from inside the field: same density, same height, same opacity, same entry read. Enforced structurally: both edges point at THIS template with the same shape parameters; only the seed (and therefore the interior) differs, and only after the player has entered.",
+    "The camp/wound/shrine slots are the zone's anchors - guaranteed present every instance, like PoE's boss room. This is the 'feel less generative' mechanism: layout varies, landmarks do not.",
+    "No man-made anything in FIELD (its own reject list); no forest identity markers in the entry band beyond the treeline gap - the forest announces itself with trees, not signage."
+  ],
+  "rejects": [
+    "camp_in_the_field (STRUCTURAL: FIELD's template has no camp slot - asserted by automation, not by review)",
+    "the_two_forests_looking_different_from_inside_the_field",
+    "the_wound_visible_from_the_entry_band",
+    "fixed_world_origin_for_this_zone (Lead 2026-10-07: straight to generation)",
+    "regenerating_a_visited_zone_with_a_new_seed",
+    "claiming_measurements_for_unbuilt_geometry"
+  ],
+  "state_and_saves": {
+    "source_of_truth": "seed, plus deltas",
+    "deltas": "which camp actors are calm, whether the companion is freed, which wisps are healed/freed/tamed, tended soil, gathered nodes",
+    "rule": "reload regenerates from seed then applies deltas - a zone is never serialized whole"
+  },
+  "build_order": [
+    "1. Seeded zone generator (C++): shape jitter + edge contracts + scatter from FIELD/FOREST rules, FRandomStream; tests assert determinism (same seed -> same output), budgets (under pine cap, spacing rules), and FIELD-has-zero-camp-slots permanently.",
+    "2. Edge-crossing instantiation: crossing a field forest edge instantiates (or re-activates) this zone; unchosen edge stays dormant.",
+    "3. Slot insertion pass: camp assembly, shrine, wound pinned after scatter; then the prove scripts M8/M10-M14 run against generated geometry (GATE 3 evidence).",
+    "4. Only then: density dressing (grass/trees via PCG or HISM) under the locked art-bible reads."
+  ],
+  "open_questions": [
+    "docs/39 section 7 Q2: confirm the shape-variance amounts (+/-15% extent, +/-25 m edge drift) and the budget numbers above - all agent-proposed.",
+    "docs/39 section 7 Q3: confirm SM_Shrine_Return and the spirit wound follow the FOREST zone (this spec assumes yes - both are slots here).",
+    "Blend 02_Forest / 06_Camp in floating_island_homestead_LIB.blend: under straight-to-generation they are template/source pieces, not placements inside FIELD. Keep as authored reference geometry, or remove once the generator owns placement? Lead call.",
+    "Layout INSIDE the camp clearing remains the Lead's (CAMP.open_questions) - this spec only pins the clearing's origin within the zone."
+  ],
+  "measured": null,
+  "measured_note": "DELIBERATELY NULL - nothing is built. Same contract as CAMP: a reader run reports this assembly MISSING until the generator emits it, and that report is correct.",
+  "rejects_note": "camp_in_the_field is the first reject in this project's history that is enforced by a unit test rather than a review checklist. That is the point of the generation architecture: some rules should be structurally impossible instead of merely discouraged."
+}
