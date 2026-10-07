@@ -142,9 +142,11 @@ different zones and the camp work is not going in the field"):
 - **FOREST** becomes its own zone spec with its own origin outside the field
   bounds (beyond one of the two forest edges), carrying camp, spirit wound,
   shrine-return and pine density. The camp origin moves with it.
-- **T0 static placeholder:** one forest instance attached to one field edge
-  while generation is being built. Which edge is the one open question (see
-  §7) — after that, entry-triggered generation replaces the static choice.
+- **No static placeholder** (Lead 2026-10-07, Q1 answered: *"straight to
+  generation"*): skip the throwaway layout and build entry-triggered
+  generation directly — whichever forest edge the player crosses instantiates
+  the forest zone. The spec for it is `Lib/02_Zones/combat/FOREST.json`
+  (entry-relative slots, no fixed world origin).
 
 ## 6. Build order (proposal)
 
@@ -165,9 +167,9 @@ different zones and the camp work is not going in the field"):
 
 ## 7. Open questions for the Lead
 
-1. **T0 forest edge:** which field edge hosts the first static forest+camp
-   instance — south (EDGE_FOREST_A) or west (EDGE_FOREST_B)? (Player-choice
-   generation comes later; T0 needs one concrete placement.)
+1. **T0 forest edge:** — **answered 2026-10-07: "straight to generation."**
+   No static forest placement; entry-triggered generation is the first
+   implementation. (Questions 2–3 below remain open.)
 2. **Shape variance:** how vague is "vague"? Proposal: ±15 % on zone extent,
    edge bands drift ±25 m, interior scatter fully seeded — silhouette-level
    variation only, edge types never change.
