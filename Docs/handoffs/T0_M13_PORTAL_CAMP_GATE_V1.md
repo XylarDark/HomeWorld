@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **DRAFT** — Design files-only; Design does **not** self-APPROVE |
+| **Status** | **APPROVED (Lead stamp 2026-10-07)** - Design frozen; camp-portal half + PROP JSON labels are the tracked impl gaps |
 | **Bite id** | `T0_M13_PORTAL_CAMP_GATE_V1` |
 | **MUST** | #13 — Home portal → camp portal (spirit) |
 | **Present?** | **Partial** (Design SoT = ACCEPTED gap walk `T0_GAP_INVENTORY_WALK_V1` row #13 — home↔planet shrine present; camp portal missing; labels ∉ PROP JSON) |

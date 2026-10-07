@@ -21,6 +21,12 @@ Ranked by payoff. Each item is a small, one-file change to
   intake question, ask instead: "what's the one thing the player does in
   minute one?"
 
+- [x] **Spirit-wound wisp payoff** — resolved 2026-10-07 by Lead: herbs
+  collected + a cloud wisp given to the spirit wisps ⇒ spirit flight buff at
+  night, which the player uses to disperse dung + wisp over herb sites. The
+  wound's healed wisps now carry that meaning. See `HOMEWORLD_ROUTE.md`
+  Recorded.
+
 Done:
 
 - [x] Edit-don't-originate in Dream intake — the agent drafts a concept

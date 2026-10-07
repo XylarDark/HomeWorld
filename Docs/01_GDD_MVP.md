@@ -92,11 +92,11 @@ Each verb: trigger, player action, success, fail/idle, approx duration (seconds)
 
 | Field | Spec |
 |---|---|
-| Trigger | Day/body; player enters beast pad proximity (one pad on planet slice) |
-| Player action | Approach → offer food from inventory (prefer RES_BERRY or RES_HERB) → hold calm / Wait until state advances. A mount/helper may support field traversal; it does not restrict glider steering. |
-| Success | State reaches **tamed** (then optional **helper**). See §6 |
-| Fail / idle | No food offered → stays wild/cautious and idles. Wrong item → soft reject, no damage. Combat inputs do not exist |
-| Duration | Encounter read ~5–10 s; full tame chain ~20–45 s |
+| Trigger | Day/body; player enters beast territory |
+| Player action | Untamed bull enforces a threat meter: approach with an herb in hand to suppress the boot charge; sudden movement builds threat, standing still lets it walk to you, eat the herb, and become tamed. Too close or threat meter full → quick charge that boots you back to the homestead. |
+| Success | State reaches **tamed** (then a tamed bull is rideable; the rune stone transports you and the bull to the homestead as a pet). See §6 |
+| Fail / idle | Charging bull boots you home — not damage. No herb → no approach. Combat inputs do not exist |
+| Duration | Read ~5–10 s; full tame (approach + stand-still + eat) ~20–45 s |
 
 ### V5 — Portal night island ↔ planet
 
@@ -153,7 +153,7 @@ World = gather on planet (day). Stored = place / convert at homestead storage pr
 | RES_HERB | Herb | Day Use on herb cluster → +1 Herb | Poultice bundle shelf → Stored | **Heal** (V6); alternate **tame offer** |
 | RES_SEED | Spirit seed | Day Use on faint day plant (rare node) → +1 Seed | Night crop planter receives seed for nurture | **Nurture crop** (V7); optional **heal** alternate if SYS prefers seed over herb for one spirit |
 
-**Gather rules:** One interact = one unit. Gathering a pile takes one from a pool of piles. There is no cooldown, and dawn alone does not bring a pile back; new piles come from spirit fertilizer (see [`HOMEWORLD_ROUTE.md`](context/HOMEWORLD_ROUTE.md)). Prompt shows RES_ID. Fail if no free inventory handling (§10).
+**Gather rules:** One interact = one unit. Gathering a pile takes one from a pool of piles. There is no cooldown, and dawn alone does not bring a pile back; new piles come from spirit fertilizer — dung + a cloud wisp dispersed by the player in night spirit flight over the herb sites (see [`HOMEWORLD_ROUTE.md`](context/HOMEWORLD_ROUTE.md)). Prompt shows RES_ID. Fail if no free inventory handling (§10).
 
 **Store rules:** Homestead-only. Transfer 1 unit inventory → Stored count. Does not create new RES types.
 
@@ -167,12 +167,12 @@ World = gather on planet (day). Stored = place / convert at homestead storage pr
 
 | Step | Condition | Player action | Result | Time |
 |---|---|---|---|---|
-| 0 Encounter | Enter pad radius | Approach slowly (move into caution ring) | Enter `cautious`; idle anim; no flee-to-combat | ~3–5 s |
-| 1 Offer | Has RES_BERRY or RES_HERB in inventory | Use Offer on beast | Consume 1 food; progress meter or second beat | ~2–3 s |
-| 2 Bond | Offer succeeded | Hold Wait / stay in calm radius ~3–5 s | → `tamed`; tame-mark slot readable | ~3–5 s |
-| 3 Helper (optional) | Already `tamed`; day | Use Befriend / Call once | → `helper`; may follow on planet path or enable preferred glide assist if mesh ready | ~2 s |
+| 0 Encounter | Enter bull's area | Read its threat posture; it watches, does not charge while you are calm and far enough | `cautious`; no charge while herb in hand | ~3–5 s |
+| 1 Herb approach | Herb in hand (RES_HERB) | Walk toward the bull; no sudden movement | Threat stays low; bull walks slowly to you | ~2–3 s |
+| 2 Bond | Herb approach succeeded | Stand still until it eats | → `tamed`; tame-mark slot readable; bull rideable | ~3–5 s |
+| 3 Transport (optional) | Already `tamed`; bull with you | Use a rune stone | You and the bull arrive at the homestead; the bull stays as a pet | ~2 s |
 
-**Hard rules:** No HP, no weapons, no aggro combat. Wrong item = reject VFX + stay state. Leaving pad mid-bond resets to `cautious` not `wild` if Step 1 done.
+**Hard rules:** No HP, no weapons, no aggro combat. Threat meter full or too close without the herb-in-hand approach → quick charge that boots the player back to the homestead. Sudden movement during Bond builds threat and can reset toward the charge.
 
 ---
 

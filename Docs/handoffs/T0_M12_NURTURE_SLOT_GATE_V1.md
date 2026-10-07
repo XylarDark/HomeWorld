@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **DRAFT** — Design files-only; Design does **not** self-APPROVE |
+| **Status** | **APPROVED (Lead stamp 2026-10-07, design updated for spirit-flight dispersal loop)** - Design frozen for Test files-only scoring; same-slot identity wire to #3 is the tracked impl gap |
 | **Bite id** | `T0_M12_NURTURE_SLOT_GATE_V1` |
 | **MUST** | #12 — Nurture planted herb (spirit) |
 | **Present?** | **Partial** (Design SoT = ACCEPTED gap walk `T0_GAP_INVENTORY_WALK_V1` row #12) |
@@ -51,7 +51,7 @@ Labels ⊆ `PROTOTYPE_FEATURE_LIST_V1` ∩ gap #12. PROP: same-row `NODE_PLANT_S
 
 | Field | Value |
 |-------|-------|
-| **Expected (T0)** | Spirit · night · nurture the **planted** herb on the **same** `NODE_PLANT_SLOT` marked by day plant (#3). |
+| **Expected (T0)** | Spirit · night · nurture the **planted** herb on the **same** `NODE_PLANT_SLOT` marked by day plant (#3). The night's larger loop (Lead 2026-10-07): herbs collected + a cloud wisp are given to the spirit wisps → spirit flight buff at night → the player uses night flight to disperse dung + wisp over the herb sites in the field. #12 nurture remains the same-slot, spirit-form, night-only verb that carries that loop. |
 | **Found (gap SoT = Partial)** | Umap: `GP_N1_Crop`, `GP_N2_Stored` · `HomeWorldNurtureTarget` / `HomeWorldNurtureComponent` · Interact `TryNurtureInFront`. Spirit nurture on N1 **present**. Link to day plant-given-herb (#3) still open (same-slot identity not Design-frozen until this + M3). Present?=**Partial**. |
 | **Arrange** | Spirit · `FORM_SPIRIT` · `TOD_NIGHT_SPIRIT` · `NODE_PLANT_SLOT` = same slot as #3 plant · nurture interact · CAP **PARKED** |
 | **DONE-WHEN** | § below — Test files-only; **no DESKTOP Act** from Design |

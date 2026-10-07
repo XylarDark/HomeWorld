@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **DRAFT** — Design files-only; Design does **not** self-APPROVE |
+| **Status** | **APPROVED (Lead stamp 2026-10-07)** - Design frozen for Test files-only scoring; missing `NODE_RUNE` prop is the tracked impl gap |
 | **Bite id** | `T0_M7_RUNE_UNLOCK_V1` |
 | **MUST** | #7 — Rune unlock before bed→spirit |
 | **Present?** | **Partial** (Design SoT = ACCEPTED gap walk `T0_GAP_INVENTORY_WALK_V1` row #7 — **not** Conductor Present?=N routing; honesty pattern same as T0_M9 Present?=Y vs stale Partial) |

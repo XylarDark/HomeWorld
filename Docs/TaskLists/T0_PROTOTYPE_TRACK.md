@@ -161,7 +161,7 @@ a different door.
 |---|---|---|
 | Clear the 7 blocking graybox findings | report reads FAIL today | not started |
 | Spirit proportion — `SM_Shrine_Homestead` / `_Return` read `mid`, must read `tall` | serves bites 3, 12, 13 | authorised, not started |
-| **`SM_SpiritWound_01` — crater or standing marker** | — | **BLOCKED ON LEAD** |
+| **`SM_SpiritWound_01` — crater or standing marker** | — | ✅ Q2 answered 2026-10-02: **standing marker**, cracked standing stone/broken arch, same see-through gap family as shrines; SM becomes vertical. Q10 (field vs forest) still open; wisp payoff mechanic open 2026-10-07. |
 | `heal` family volume | serves bite 8 | needs a lead decision first |
 
 ⚠️ **`SM_SpiritWound_01` is the one open taste fork, and it is inside MUST work.** It is a

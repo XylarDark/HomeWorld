@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **DRAFT** — Design files-only; Design does **not** self-APPROVE |
+| **Status** | **APPROVED (Lead stamp 2026-10-07)** - Design frozen; unwired `GrantSpiritSleepGate` in the bed interact and missing `BP_Bed` placement are the tracked impl gaps |
 | **Bite id** | `T0_M11_BED_SPIRIT_GATE_V1` |
 | **MUST** | #11 — Bed → spirit (after rune) |
 | **Present?** | **Partial** (Design SoT = ACCEPTED gap walk `T0_GAP_INVENTORY_WALK_V1` row #11 — **Present?=Partial**; honesty pattern same as T0_M7 Present?=Partial / T0_M9 Present?=Y vs stale routing) |

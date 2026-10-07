@@ -65,6 +65,17 @@ One row per number. Bite 1 of `Docs/handoffs/CONTEXT_PACK_V1.md`. Docs only.
 | S6 | Heals in the slice | 3 | count | `01_GDD_MVP.md:119`, `:300` |
 | S7 | Nurture targets in the slice | 2 | count | `01_GDD_MVP.md:129`, `:301` |
 
+## Homestead island
+
+| # | Metric | Value | Unit | Source |
+|---|---|---|---|---|
+| I1 | Island bounding footprint | ~110 × 75 | m | Lead 2026-10-07: half-circle one side, half-oval the other, uneven |
+| I2 | Buildable center square | 75 × 75 | m | Lead 2026-10-07 |
+| I3 | Underside depth | ~50, jagged, tapering to a point (iceberg look) | m | Lead 2026-10-07; reserved for future underground dig/dwellings |
+| I6 | Visual reference: floating-island city with jagged rock underside, à la **Dalaran (WoW)** | — | — | Lead 2026-10-07 |
+| I4 | Island top height above plains | 75 | m | `HOMEWORLD_ROUTE.md:45` (D1) |
+| I5 | Derived: rock point to plains clearance | ~25 | m | D1 − I3 = 75 − 50. Not player-jumpable. |
+
 ## Mismatches found
 
 All three found in this bite are resolved here.

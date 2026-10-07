@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **DRAFT** — Design files-only; Design does **not** self-APPROVE |
+| **Status** | **APPROVED (Lead stamp 2026-10-07, design updated to guard-falls-asleep → key → friend → portal home)** - Design frozen; camp geometry + guard-key-friend actors are the tracked impl gaps |
 | **Bite id** | `T0_M14_CAMP_NIGHT_GATE_V1` |
 | **MUST** | #14 — Camp night: avoid 1 guard; soothe 2 sleepers |
 | **Present?** | **N** (Design SoT = ACCEPTED gap walk `T0_GAP_INVENTORY_WALK_V1` row #14 — scripts/stealth component; not in umap; labels ∉ PROP JSON) |
@@ -53,7 +53,7 @@ Labels ⊆ `PROTOTYPE_FEATURE_LIST_V1` ∩ gap #14. **Honesty:** `NODE_GUARD` / 
 
 | Field | Value |
 |-------|-------|
-| **Expected (T0)** | Spirit · camp night · avoid **1** guard · soothe **2** sleepers · cam `CAM_T0_CAMP_NIGHT`. |
+| **Expected (T0)** | Spirit · camp night · the guard sits at their post · sneak past to the two sleepers and soothe them → the guard pauses, then falls asleep at their post, spirit detection off → soothe the guard → take the key from the guard's pocket → free your friend → you both take the portal home (#13). Cam `CAM_T0_CAMP_NIGHT`. (Lead 2026-10-07; supersedes the older "avoid 1 + soothe 2 and stop" reading.) |
 | **Found (gap SoT = N)** | Scripts: `GP_SS_Lit_*` (`place_vs_mvp_ss_stealth.py`) + `UHomeWorldSpiritStealthComponent` — **not** in DESKTOP umap scrape. **0** soothe/guard/sleeper actors. Labels ∉ PROP JSON. Convert ≠ soothe. Present?=**N**. |
 | **Arrange** | Spirit · `FORM_SPIRIT` · `TOD_NIGHT_SPIRIT` · camp · avoid 1× `NODE_GUARD` · soothe 2× `NODE_SLEEPER` · cam `CAM_T0_CAMP_NIGHT` · CAP **PARKED** |
 | **DONE-WHEN** | § below — Test files-only; **no DESKTOP Act** from Design |

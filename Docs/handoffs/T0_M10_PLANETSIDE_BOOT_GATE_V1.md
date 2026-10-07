@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | **DRAFT** — Design files-only; Design does **not** self-APPROVE |
+| **Status** | **APPROVED (Lead stamp 2026-10-07)** - Design frozen; Present?=N stands as the tracked impl gap |
 | **Bite id** | `T0_M10_PLANETSIDE_BOOT_GATE_V1` |
 | **MUST** | #10 — Planetside night w/o bed → glider boot home |
 | **Present?** | **N** (Design SoT = ACCEPTED gap walk `T0_GAP_INVENTORY_WALK_V1` row #10) |

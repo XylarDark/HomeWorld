@@ -107,12 +107,12 @@ Automation writes **`Saved/ps_placement_metrics.json`** (schema fixed in PS-A). 
 
 | Metric ID | Description | Suggested assert |
 |-----------|-------------|------------------|
-| `ground_z_delta_uu` | Lowest mesh contact vs landscape (or island top proxy) Z at XY sample | \|delta\| ≤ **TBD** (start **8 UU** prototype) |
-| `float_gap_uu` | Air gap under support point vs ground | ≤ **TBD** (start **4 UU** for kit props; **12 UU** cliff underside check) |
+| `ground_z_delta_uu` | Lowest mesh contact vs landscape (or island top proxy) Z at XY sample | \|delta\| ≤ **8 UU** (Lead 2026-10-07) |
+| `float_gap_uu` | Air gap under support point vs ground | ≤ **4 UU** for kit props; **12 UU** cliff underside check (Lead 2026-10-07) |
 | `anchor_height_delta_uu` | Actor origin Z vs expected anchor Z from dress table | Per-actor band from PS-A inventory |
 | `contact_overlap` | Static overlap with landscape / `SM_IslandTop` collision | Required for grounded props; forbidden for “floating” except approved islets |
-| `dress_aabb_inside` | Actor bounds ⊆ homestead dress AABB (+ margin) | Fail if extent exits dress volume (margin **TBD**, start 50 UU) |
-| `pair_overlap_uu` | AABB overlap between unrelated kit actors | Flag penetrations > **TBD** (start 2 UU) |
+| `dress_aabb_inside` | Actor bounds ⊆ homestead dress AABB (+ margin) | Fail if extent exits dress volume (margin **50 UU**, Lead 2026-10-07) |
+| `pair_overlap_uu` | AABB overlap between unrelated kit actors | Flag penetrations > **2 UU** (Lead 2026-10-07) |
 | `facing_dot_look_at` | Optional: forward vs vector to look-at target (shrine, path, cliff edge) | \|dot\| ≥ **TBD** when spec’d in sidecar |
 
 **Sampling:** Use UE Python `get_actor_bounds(False)` tuple API ([docs/KNOWN_ERRORS.md](../docs/KNOWN_ERRORS.md)). Landscape Z via line trace down from bounds center (PS-C implementation).

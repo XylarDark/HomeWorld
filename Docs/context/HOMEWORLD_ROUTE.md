@@ -32,10 +32,26 @@ One fact proposed at a time, one yes from Luke, one write into this file only â€
 - Farming lives on the homestead.
 - In the zones, day and night, you collect and nurture so the place provides the plants and animals the homestead needs.
 - Taming for now is one small barn that holds one big bull, and the fur is what that bull sheds.
+- Lead 2026-10-07: a bull boots you back to the homestead on a charge if you get
+  too close or fill its threat meter without leaving its area. Walking toward it
+  carrying an herb suppresses the boot; sudden movement builds threat, standing
+  still lets it approach, eat the herb, and it is tamed. Tamed, the bull is
+  rideable, and the rune stone transports you and the bull to the homestead as a
+  pet. Homestead herbs are few (morning tea, tending wounded spirits); the same
+  plant/nurture/collect mechanic runs uncapped in the field for other uses later
+  (e.g. feeding collected bulls).
 - Gathering a pile takes one from a pool of piles. There is no cooldown.
 - The stage name stays polish.
 - An agent decision is never settled by what the developer seems to want: name the limitation, give the real options with one recommended pick marked, say plainly when the evidence points against the choice in front of you, and ask a decision with the question tool rather than as prose.
 - One dung and one wisp make one spirit fertilizer.
+- Lead 2026-10-07 (revises the line above's spread agent): the herbs have their
+  own use â€” the kettle, tea, and the day sprint buff. Dung + wisp is what the
+  spirit carries. Herbs collected, combined with a wisp from a cloud, are *given
+  to the spirit wisps*; the payoff for those given wisps is the spirit flight
+  buff at night. The player uses that night flight buff to disperse dung + wisp
+  over the herb sites in the field. The homestead-fertilizer morning-pile line
+  above is superseded: spreading is a spirit-flight verb of the player, not an
+  automatic homestead morning spawn.
 - It is mixed at the homestead, the spirit spreads it at night, and in the morning one herb pile appears per dung, at random in the field.
 - Dawn alone does not bring a pile back.
 - That night flight is not the locked first flight.

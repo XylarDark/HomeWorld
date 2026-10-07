@@ -6,15 +6,12 @@ SESSION_START track sizing. In order. Owner column: who must act.
 ## A. Agent-owned, unblocked now
 
 1. **`T0_M9` hardening** — ✅ DONE (already merged): `HomeWorldFormGateTests.cpp` carries the four M9 behaviour tests, added in `790bbd5` ("the P0 form law is executable, and proven able to fail"). Queue doc row was stale; no further work.
-2. **Phase 5.3 — Tending** — dung by day, soil at night (V2b). Done-when:
-   garden bed state changes on a spirit-form night.
-   ⚠️ Parked pending Lead design: V2b is a vision statement, not a design
-   packet. No garden-bed state machine, dung/soil actors, or slot marks exist
-   in Source. Inventing one is a Lead call, not an agent task.
-3. **Phase 5.1 — Companion NPC hint** — one-line contextual hint (Q19).
-   Done-when: state-appropriate line, no dialogue tree.
-   ⚠️ Same shape: no design packet or actor exists. Lower priority than the
-   mechanical beats above.
+2. **Phase 5.3 — Tending** — ✅ resolved 2026-10-07: V2b "tending" is the same
+   plant/nurture/collect mechanic as #3/#12 in two volumes: homestead plots (few,
+   for morning tea + tending wounded spirits) and field herb sites (uncapped,
+   materials-gated, for later uses like feeding bulls). No separate bed state
+   machine. Route updated.
+3. **Phase 5.1 — Companion NPC hint** — Parked: no design packet or actor exists.
 4. **`T0_M7` rune unlock gap** — ✅ DONE 2026-10-07: dedicated
    `HomeWorld.T0.M7.RuneUnlockGrantsNoSpiritAlone` added to
    `HomeWorldDayGateTests.cpp` — day+body unlock sets the latch, unlock alone
