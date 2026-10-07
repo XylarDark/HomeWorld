@@ -474,6 +474,7 @@ void FHomeWorldZoneCrossing::Reset(int32 InFieldSeed)
 	bFieldStreaming = false;
 	bGliderUnlocked = false;
 	bBoatUnlocked = false;
+	bNightSpirit = false;
 	Presence = EHomeWorldStreamPresence::Homestead;
 	Field = FHomeWorldGeneratedZone();
 	Forest = FHomeWorldGeneratedZone();
@@ -615,6 +616,17 @@ void FHomeWorldZoneCrossing::SetTraversalUnlocks(bool bInGliderUnlocked, bool bI
 	bBoatUnlocked = bInBoatUnlocked;
 }
 
+void FHomeWorldZoneCrossing::SetNightSpirit(bool bInNightSpirit)
+{
+	bNightSpirit = bInNightSpirit;
+	if (!bNightSpirit || SpecialEdgeId.IsEmpty())
+	{
+		return;
+	}
+	StreamingEdgeIds.Remove(SpecialEdgeId);
+	SpecialEdgeId.Reset();
+}
+
 bool FHomeWorldZoneCrossing::IsZoneStreaming(const FString& EdgeId) const
 {
 	return StreamingEdgeIds.Contains(EdgeId);
@@ -661,7 +673,7 @@ void FHomeWorldZoneCrossing::SetPresence(
 			bHasForest = true;
 		}
 	}
-	if (!SpecialEdgeId.IsEmpty())
+	if (!bNightSpirit && !SpecialEdgeId.IsEmpty())
 	{
 		StreamingEdgeIds.AddUnique(SpecialEdgeId);
 	}
@@ -693,6 +705,10 @@ EHomeWorldEdgeCrossResult FHomeWorldZoneCrossing::BeginTraversal(
 	if (Presence != EHomeWorldStreamPresence::Field)
 	{
 		return EHomeWorldEdgeCrossResult::NoNeighbor;
+	}
+	if (bNightSpirit)
+	{
+		return EHomeWorldEdgeCrossResult::ClosedAtNight;
 	}
 	const bool bUnlocked = Traversal == EHomeWorldEdgeTraversal::Glider ? bGliderUnlocked : bBoatUnlocked;
 	if (!bUnlocked)

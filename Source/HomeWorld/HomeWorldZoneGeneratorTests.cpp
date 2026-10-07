@@ -666,4 +666,57 @@ bool FZoneGeneratorStreamsFromPresenceTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FZoneGeneratorNightSpiritEdgesTest,
+	"HomeWorld.T0.ZoneGenerator.NightSpiritEdges",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FZoneGeneratorNightSpiritEdgesTest::RunTest(const FString& Parameters)
+{
+	const FHomeWorldZoneSpec Field = MeadowSpec();
+	const FHomeWorldZoneSpec ForestSpec = ForestTemplate();
+	FHomeWorldZoneCrossing Crossing;
+	Crossing.Reset(42);
+	Crossing.SetPresence(Field, ForestSpec, EHomeWorldStreamPresence::Field);
+	Crossing.SetTraversalUnlocks(true, true);
+	Crossing.SetNightSpirit(true);
+
+	TestTrue(TEXT("night spirit is on"), Crossing.IsNightSpirit());
+	TestTrue(TEXT("night spirit still streams forest A"), Crossing.IsZoneStreaming(TEXT("EDGE_FOREST_A")));
+	TestTrue(TEXT("night spirit still streams forest B"), Crossing.IsZoneStreaming(TEXT("EDGE_FOREST_B")));
+	TestTrue(TEXT("the cliff stays closed at night"),
+		Crossing.BeginTraversal(Field, TEXT("EDGE_CLIFF")) == EHomeWorldEdgeCrossResult::ClosedAtNight);
+	TestFalse(TEXT("a closed cliff does not stream"), Crossing.IsZoneStreaming(TEXT("EDGE_CLIFF")));
+	TestTrue(TEXT("the river stays closed at night"),
+		Crossing.BeginTraversal(Field, TEXT("EDGE_RIVER")) == EHomeWorldEdgeCrossResult::ClosedAtNight);
+	TestFalse(TEXT("a closed river does not stream"), Crossing.IsZoneStreaming(TEXT("EDGE_RIVER")));
+
+	const FHomeWorldDiscoveryBoundary* ForestA = nullptr;
+	for (const FHomeWorldDiscoveryBoundary& Boundary : Crossing.GetBoundaries())
+	{
+		if (Boundary.EdgeId == TEXT("EDGE_FOREST_A"))
+		{
+			ForestA = &Boundary;
+		}
+	}
+	if (!TestNotNull(TEXT("forest A boundary at night"), ForestA))
+	{
+		return false;
+	}
+	TestTrue(TEXT("spirit form still crosses the forest edge"),
+		Crossing.DiscoverAt(Field, ForestSpec, ForestA->Center()) == EHomeWorldEdgeCrossResult::Instantiated);
+	TestTrue(TEXT("the camp pins in the night forest"), Crossing.HasCamp());
+
+	Crossing.SetNightSpirit(false);
+	TestTrue(TEXT("day opens the unlocked cliff again"),
+		Crossing.BeginTraversal(Field, TEXT("EDGE_CLIFF")) == EHomeWorldEdgeCrossResult::Instantiated);
+	TestTrue(TEXT("the cliff streams after night ends"), Crossing.IsZoneStreaming(TEXT("EDGE_CLIFF")));
+	Crossing.SetNightSpirit(true);
+	TestFalse(TEXT("night closes a cliff that was already streaming"), Crossing.IsZoneStreaming(TEXT("EDGE_CLIFF")));
+	TestTrue(TEXT("night leaves the forest streaming"), Crossing.IsZoneStreaming(TEXT("EDGE_FOREST_A")));
+	TestTrue(TEXT("the river stays closed after the cliff was shut"),
+		Crossing.BeginTraversal(Field, TEXT("EDGE_RIVER")) == EHomeWorldEdgeCrossResult::ClosedAtNight);
+	return true;
+}
+
 #endif

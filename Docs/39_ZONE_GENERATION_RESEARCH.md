@@ -91,10 +91,12 @@ Cost, in this order:
    upgraded glider. The river edge is the boat. Neither streams from merely
    standing on the field. Each starts streaming when that traversal begins and
    the upgrade is unlocked. Locked, the edge stays unloaded.
-3. **Night spirit is not a traversal rule yet.** Day is the lock above. Canon
-   already has spirit-stealth in the camp at night, a day eject home from the
-   camp, and a night flight buff for spreading over the field. Whether spirit
-   form can enter a forest, take the glider, or take the boat is still open.
+3. **Night spirit crosses forest edges only.** Lead interview #17 (3A), coded
+   interview #20 in `FHomeWorldZoneCrossing::SetNightSpirit`. On the field, the
+   two pine forests still stream and the camp still pins at a forest asset
+   boundary. The cliff and the river stay closed, including when the glider and
+   the boat are already unlocked. Day traversal is unchanged when night spirit
+   is off.
 4. **Do not convert `L_VS_MVP_Markers` to World Partition for this.** That map
    stores actors inline. Conversion creates a second map, and unloaded cells
    hide the ground. See `docs/KNOWN_ERRORS.md`.

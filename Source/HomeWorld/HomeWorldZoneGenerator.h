@@ -149,7 +149,9 @@ enum class EHomeWorldEdgeCrossResult : uint8
 	/** The point is not inside any edge-asset boundary. */
 	Outside,
 	/** Glider or boat traversal was started without the upgrade. */
-	Locked
+	Locked,
+	/** Cliff or river was asked for while night spirit is the traversal. */
+	ClosedAtNight
 };
 
 /** How a field edge is entered. Ground edges stream with the field. The others wait for their upgrade. */
@@ -197,6 +199,7 @@ public:
 	/**
 	 * Homestead streams the field and nothing beyond it.
 	 * The field streams ground-traversable edges (the forests). Cliff and river wait.
+	 * Night spirit keeps the forests and closes the cliff and the river.
 	 */
 	void SetPresence(
 		const FHomeWorldZoneSpec& FieldSpec,
@@ -204,6 +207,13 @@ public:
 		EHomeWorldStreamPresence Presence);
 
 	void SetTraversalUnlocks(bool bGliderUnlocked, bool bBoatUnlocked);
+
+	/**
+	 * Interview #17 3A, coded interview #20. Night spirit crosses pine_forest
+	 * edges only. Cliff and river stay closed even when the glider and boat are unlocked.
+	 */
+	void SetNightSpirit(bool bInNightSpirit);
+	bool IsNightSpirit() const { return bNightSpirit; }
 
 	/** Start the cliff glider or the river boat. Ground edges are not started this way. */
 	EHomeWorldEdgeCrossResult BeginTraversal(const FHomeWorldZoneSpec& FieldSpec, const FString& EdgeId);
@@ -231,6 +241,7 @@ private:
 	bool bFieldStreaming = false;
 	bool bGliderUnlocked = false;
 	bool bBoatUnlocked = false;
+	bool bNightSpirit = false;
 	EHomeWorldStreamPresence Presence = EHomeWorldStreamPresence::Homestead;
 	FString ChosenEdgeId;
 	FString SpecialEdgeId;

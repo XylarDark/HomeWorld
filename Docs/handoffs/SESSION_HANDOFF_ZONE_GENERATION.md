@@ -82,7 +82,8 @@ Sun and LandingDay transforms are unchanged. Recorded in
 - Research doc §7: **Q1** straight to generation. **Q2** and **Q3** answered
   in interview #17: use ±15% extent and ±25 m edge drift; shrine-return and the
   spirit wound pin into forest slots, like the camp. Night: spirit form crosses
-  forest edges only; cliff and river stay closed. Not yet in code.
+  forest edges only; cliff and river stay closed. Coded in
+  `FHomeWorldZoneCrossing::SetNightSpirit` (interview #20).
 - Moon disc distance/size = taste call, still unswept.
 - Homestead slope air-time re-derivation; field clump counts for 420 m field.
 - Six `NO_VERDICT` prove scripts (M2/M3/M4/M6/M7/skybox) still blocked by the
