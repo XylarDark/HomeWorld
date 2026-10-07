@@ -216,12 +216,12 @@ different zones and the camp work is not going in the field"):
 
 1. **T0 forest edge:** — **answered 2026-10-07: "straight to generation."**
    No static forest placement; entry-triggered generation is the first
-   implementation. (Questions 2–3 below remain open.)
-2. **Shape variance:** how vague is "vague"? Proposal: ±15 % on zone extent,
-   edge bands drift ±25 m, interior scatter fully seeded — silhouette-level
-   variation only, edge types never change.
-3. **Old forest/camp datum:** the move clears the field but re-positions
-   shrine-return and the wound marker too — confirm they follow the forest.
+   implementation.
+2. **Shape variance:** — **answered 2026-10-07, interview #17:** ±15 % on zone
+   extent, edge bands drift ±25 m. Interior scatter stays seeded. Edge types
+   do not change.
+3. **Old forest/camp datum:** — **answered 2026-10-07, interview #17:** the
+   shrine-return and the spirit wound both pin into forest slots, like the camp.
 
 ## References
 
