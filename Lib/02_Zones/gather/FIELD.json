@@ -27,6 +27,24 @@
     "z": 0.0
   },
   "bounds_note": "World scale ×6 (Lead 2026-10-07): was 70×70, now 420×420. Props, characters, trigger radii stay human-scale; the plant/gather/dung separation rule of 5 m now reads dense and is queued for re-tune.",
+  "generation": {
+    "model": "Path-of-Exile-style seeded map. Same driver as FOREST. See docs/39_ZONE_GENERATION_RESEARCH.md.",
+    "shape": {
+      "kind": "ellipse-ish meadow",
+      "width_m": 420.0,
+      "depth_m": 420.0,
+      "extent_jitter_fraction": 0.15,
+      "edge_band_drift_m": 25.0,
+      "numbers_status": "agent-proposed, flagged for the Lead (docs/39 section 7 Q2). Edge types never change. Both pine_forest edges share one drift so they stay identical from inside the field."
+    }
+  },
+  "budget": {
+    "herb_min_spacing_m": 30.0,
+    "pine_instance_cap": 0,
+    "pine_cap_note": "Meadow interior only. The two forest edge bands are a shared silhouette on the edge contract, not pine instances inside the field."
+  },
+  "slots": [],
+  "slots_note": "STRUCTURAL. The field template has zero custom-content slots. Camp, wound, and shrine belong to FOREST.json. HomeWorld.T0.ZoneGenerator.FieldHasZeroCampSlots reads this array.",
   "zone_contract": {
     "settled": "Lead 2026-10-07 - the field and the forest are TWO SEPARATE ZONES, and the camp is never in the field.",
     "field_contains": "meadow, four typed edges, beasts, scatter, and the two identical forest EDGE BANDS only.",
@@ -81,6 +99,7 @@
   ],
   "camp_placement": {
     "rule": "The player chooses. Entering EITHER forest edge commits to that one, and the camp generates there.",
+    "discovery": "Lead 2026-10-07: the field generates first, with each edge's neighbor kind decided and the edge assets placed. The bounds of those assets are the discovery boundary. Reaching a pine_forest boundary places the camp from FOREST.json. The meadow centre does not.",
     "the_unchosen_forest": "becomes a future path, leading eventually to another area like the river. Not a dead end and not a punishment - a road they did not take.",
     "cliff_is_never_a_camp_edge": "The cliff is a boundary. It cannot be chosen, because there is no forest on it.",
     "THE_HARD_CONSTRAINT": "BOTH forest edges must look IDENTICAL from inside the field - same density, same height, same opacity, same silhouette. If one looks better, fuller, darker or more inviting, the choice stops being a choice and becomes a puzzle with a correct answer, and the player will optimise instead of choosing.",

@@ -70,10 +70,39 @@ Key properties worth stealing:
 | **C++ seeded generator** | `FRandomStream` skeleton + scatter + slot insertion, fully unit-testable (budgets, connectivity, "camp never in field" as automation) | No precedent yet, but every placement rule already lives in our `Lib/**/*.json` specs, which the tests already read |
 | **Hybrid (recommended)** | C++ owns the zone skeleton, edge contracts and custom-content slots; PCG or HISM scatter owns grass/trees/decor density | Matches Arch B: existing specs and systems, no parallel canon |
 
-Streaming note: the playable level is a single map (`L_VS_MVP_Markers`), no
-World Partition. "Unload a zone" for now means returning its actors to a pool —
-fine at the 420 m scale; revisit only if the world grows past a handful of
-live zones.
+### Loading — decide the edges, generate the biome on discovery
+
+Lead 2026-10-07: biomes generate from their seeds, and the camp is placed from
+the forest spec only when the player discovers that forest. The field generates
+first. Each edge's neighbor kind is decided and the edge assets are placed in
+the field. The bounds of those assets are the discovery boundary. Reaching a
+`pine_forest` boundary places the camp. Standing in the meadow does not.
+
+Cost, in this order:
+
+1. **Skeleton only until discovery.** The field (meadow scatter, edge assets,
+   one seed per edge) stays resident. The forest is not built, and the camp is
+   not pinned, until a point lands inside that edge's asset bounds. The
+   unchosen forest is never built. A save keeps the seed and the deltas.
+2. **Do not convert `L_VS_MVP_Markers` to World Partition for this.** That map
+   stores actors inline. Conversion creates a second map, and unloaded cells
+   hide the ground. See `docs/KNOWN_ERRORS.md`.
+3. **When a discovered forest has to stream as meshes,** put that zone on one
+   runtime Data Layer and activate it at the boundary. Runtime Data Layers load
+   and unload at runtime from Blueprints or C++
+   ([Data Layers, UE 5.8](https://dev.epicgames.com/documentation/unreal-engine/world-partition---data-layers-in-unreal-engine)).
+   Assets assigned to too many runtime data layers degrade streaming, so the
+   layer is the zone, not each prop.
+4. **Level Instances do not stream by themselves** outside a World Partition
+   world. Level Streaming mode adds a level per instance and is a poor fit for
+   a dense set of biomes
+   ([Level Instancing, UE 5.8](https://dev.epicgames.com/documentation/unreal-engine/level-instancing-in-unreal-engine)).
+5. **Dressing stays later.** PCG runtime generation, scoped to a source at the
+   discovered forest, is still the density pass. It is not the loader for the
+   camp.
+
+The World Partition overview on Epic's site is still titled as the 5.7
+documentation. The two 5.8 pages above are the ones this note uses.
 
 ## 4. Proposed architecture — zone = seeded map instance
 
@@ -93,9 +122,10 @@ rejects (no paths, no markers, ...)     -->   generator assertions + tests
   soil).
 - **Edge contracts.** Every zone edge declares the neighbor kind it opens onto
   (field south/west edge → forest, east → river/future, north → cliff/dead).
-  Crossing an edge instantiates (or re-activates) the neighbor from its
-  template — this is the "generates based on the direction we travel" part.
-  Unchosen edges keep their neighbor dormant, which preserves FIELD's
+  Reaching the placed edge-asset boundary instantiates (or re-activates) the
+  neighbor from its template, and a forest boundary is what places the camp.
+  Until that discovery the neighbor is a seed. Unchosen edges keep their
+  neighbor dormant, which preserves FIELD's
   "the unchosen forest is a road they did not take" rule with no extra work.
 - **Identical-forest constraint stays structural.** FIELD's hard constraint
   (both forest edges must look identical from inside the field) is enforced by

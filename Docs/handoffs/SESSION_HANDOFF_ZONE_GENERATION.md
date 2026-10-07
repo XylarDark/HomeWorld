@@ -5,12 +5,19 @@ zone-generation research and the "straight to generation" decision.
 
 ## Where things stand
 
-- **All pushed.** Last commits: `517c988` (art-bible Appendix A + T0
-  implementation pass + style forks), `b6a98c7` (camp module blockout in blend),
-  `5ce9468` (beast charge-and-boot C++ + 4 tests), `6c5c7fb` (zone-generation
-  research + field/forest zone contracts). Tree clean.
-- **Tests:** `HomeWorld.T0` 24 passed / 0 failed (report lists 25 — known UE
-  counter quirk, KNOWN_ERRORS). `HomeWorld.Transit` was 3/3 earlier today.
+- **Pushed through** `92fcc5a` (Q1 recorded). After that, local and uncommitted:
+  `FHomeWorldZoneGenerator` and `FHomeWorldZoneCrossing`, plus
+  `HomeWorld.T0.ZoneGenerator`. The field now decides its edges, places the
+  edge assets, and places the camp only when the player reaches a pine_forest
+  asset boundary. Loading note is in docs/39_ZONE_GENERATION_RESEARCH.md.
+  Spec numbers for jitter and pine clumps are machine-readable on FIELD.json
+  and FOREST.json. Q2 and Q3 are still open.
+- Earlier commits: `517c988`, `b6a98c7`, `5ce9468`, `6c5c7fb`, `598ae73`
+  (`Lib/02_Zones/combat/FOREST.json` — not `forest/FOREST.json`).
+- **Tests:** this session ran `HomeWorld.T0.ZoneGenerator` only — 11 passed / 0
+  failed, editor exit 0. The earlier full `HomeWorld.T0` run was 24 passed / 0
+  failed (report lists 25 — known UE counter quirk). `HomeWorld.Transit` was
+  3/3 earlier today.
 - **Blend:** `blender/floating_island_homestead_LIB.blend` open in **Mixar**
   (MCP add-on already ported; Mixar `version_string` says 4.2.2 but the engine
   is 5.2.0 — misleading string only). Five `SM_Camp_*` modules built from boxes
@@ -46,20 +53,28 @@ template/slot source pieces, not world placements.
 
 ## Next steps (in order)
 
-1. **`Lib/02_Zones/forest/FOREST.json`** — new zone spec, FIELD structure:
-   blob template + depth band, entry bands matching both field forest edges,
-   seed = hash(FIELD seed, edge id), slots: camp (5 modules + 4 actors),
-   spirit wound, return shrine; pine density budget; identical-silhouette rule
-   (both edges → same template); rejects (no camp slots in FIELD — structural).
-   Research doc §4/§6 = the contract: `docs/39_ZONE_GENERATION_RESEARCH.md`.
-2. **Seeded zone generator (C++)** — skeleton jitter + scatter from spec rules,
-   `FRandomStream`, tests: determinism (same seed → same output), budgets,
-   **field-has-zero-camp-slots** as permanent automation.
-3. **Edge-crossing instantiation** — crossing a field forest edge instantiates
-   (or re-activates) the forest neighbor; unchosen edge stays dormant.
-4. Blend: reposition `02_Forest`/`06_Camp` as kit/template source (not inside
-   field placement), or leave until the generator owns placement — Lead call.
-5. Then: camp art image→blockout pass (deferred), prove scripts M8/M10–M14
+1. **FOREST.json** — done. `Lib/02_Zones/combat/FOREST.json` (commit `598ae73`).
+2. **Seeded zone generator** — done locally, not committed.
+   `Source/HomeWorld/HomeWorldZoneGenerator.h/.cpp` and
+   `HomeWorldZoneGeneratorTests.cpp`. Same seed matches; jitter stays inside
+   the spec; herb spacing and pine cap hold; both `pine_forest` edges share
+   one drift; entry band width ignores the seed; FIELD.json has zero camp
+   slots and FOREST.json keeps `SLOT_CAMP`.
+3. **Edge-crossing instantiation** — done locally, not committed.
+   `FHomeWorldZoneCrossing`: first `pine_forest` edge instantiates FOREST from
+   `SeedForEdge`; the same edge reactivates that instance; the other pine edge
+   stays dormant; cliff and river open no T0 neighbor.
+4. **Slot insertion** — done locally. Shrine, camp, and wound pin at their
+   authored offsets, and only after the player reaches a forest edge's placed
+   assets. Fire, lashings, and the guard stake stay unplaced. The 108 m
+   clearing is subtracted from the pine budget.
+5. **Discovery boundary** — done locally. `DiscoverAt` is the trigger. The
+   meadow centre returns Outside. A cliff boundary does not place the camp.
+   Loading: skeleton until discovery; do not convert `L_VS_MVP_Markers` to
+   World Partition; one runtime Data Layer per discovered zone when meshes
+   stream. See docs/39_ZONE_GENERATION_RESEARCH.md.
+6. Blend: reposition `02_Forest`/`06_Camp` as kit/template source — Lead call.
+7. Then: camp art image→blockout pass (deferred), prove scripts M8/M10–M14
    against generated geometry (GATE 3), six `NO_VERDICT` prove runs.
 
 ## Open questions carried
