@@ -27,6 +27,11 @@
     "Round 2 (Q6) settled the second zone as PINE FOREST WITH CAMP, so the camp is in the forest. Layout inside the forest is still the Lead's.",
     "Placed ~14 m from SM_Shrine_Return at (6, -75, -95). The return shrine is the spirit node you come down through; the camp is what you come down FOR. Proximity makes the portal read as a door rather than a teleport."
   ],
+  "zone_contract": {
+    "settled": "Lead 2026-10-07 - the camp belongs to the FOREST zone and must never sit inside FIELD's bounds. Field and forest are two separate zones.",
+    "defect": "This world_origin (20,-80,-95) is ~20 m from FIELD's centre - inside the field. The forest zone needs its own origin beyond a field forest edge, and this camp, SM_Shrine_Return and the spirit wound move with it. Tracked in docs/39_ZONE_GENERATION_RESEARCH.md section 5.",
+    "target_architecture": "Lead 2026-10-07: forest is a Path-of-Exile-style generated map; the camp is authored custom content inserted into it via a slot (never generated into the field, structurally). See docs/39_ZONE_GENERATION_RESEARCH.md."
+  },
   "materials": [
     { "slot": "fire_and_wedges", "master": "M_CliffRock" },
     { "slot": "canvas_and_bedroll", "master": "M_WoodCabin" },

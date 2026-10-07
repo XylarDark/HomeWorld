@@ -27,6 +27,17 @@
     "z": 0.0
   },
   "bounds_note": "World scale ×6 (Lead 2026-10-07): was 70×70, now 420×420. Props, characters, trigger radii stay human-scale; the plant/gather/dung separation rule of 5 m now reads dense and is queued for re-tune.",
+  "zone_contract": {
+    "settled": "Lead 2026-10-07 - the field and the forest are TWO SEPARATE ZONES, and the camp is never in the field.",
+    "field_contains": "meadow, four typed edges, beasts, scatter, and the two identical forest EDGE BANDS only.",
+    "field_excludes": [
+      "forest interior (the forest is its own zone with its own origin)",
+      "the camp and all five SM_Camp_* modules",
+      "spirit wound / shrine-return - forest-zone content"
+    ],
+    "known_defect": "CAMP.json world_origin (20,-80,-95) is ~20 m from this zone's centre, i.e. INSIDE these bounds, and so is the blend's 02_Forest blob - both violate this contract and this zone's own reject camp_visible_from_the_field_centre. The forest-zone move is tracked in docs/39_ZONE_GENERATION_RESEARCH.md §5.",
+    "target_architecture": "Lead 2026-10-07: each zone is a Path-of-Exile-style generated map - vague preset shape + seeded generative variables; plains and forest are the first two use cases; neighbors generate from the direction the player travels. See docs/39_ZONE_GENERATION_RESEARCH.md."
+  },
   "arrival": {
     "position": "centre of the field, (0, 0)",
     "marker": "NONE - no ring of stones, no pad, no cleared ground",
