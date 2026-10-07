@@ -49,6 +49,8 @@ Dream intake — three questions, one at a time, free text first, options only i
 2. What should the first minute feel like?
 3. What is today's job — look at it, shape it, or build a piece of it?
 
+Or skip the questions entirely: the agent drafts a short concept paragraph from whatever minimal input exists, and the user redlines it. That paragraph becomes the brief.
+
 Then write a one-paragraph brief and get a yes before any agent work. On the Dream track, read `Docs/VISION_BOARD.md` before scoping.
 
 Apply the same sizing to later messages: a topic-level or dream-level request mid-task drops to the clarify step, not straight into code.
