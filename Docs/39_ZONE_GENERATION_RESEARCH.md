@@ -172,8 +172,14 @@ Checked against the specs and the blend today:
   inside the field**, which also violates FIELD's own reject
   `camp_visible_from_the_field_centre`.
 - The blend's `02_Forest` blob (x -37..47, y -166..-65) and my new `06_Camp`
-  modules sit inside the field bounds too. Everything currently clusters on
-  one datum.
+  modules sat inside the field bounds too. Everything clustered on one datum.
+  **Moved 2026-10-07 (Lead interview #17):** kit meshes in `02_Forest` and
+  `06_Camp` translated +10000 m on X. Reopened bounds: forest meshes
+  x 9962.672..10046.841, y -166..-65, z -95.2..-10; camp meshes
+  x 10015.496..10021.790, y -82.2..-75.7, z -95..-93.5. Neither box meets
+  the field rectangle. Homestead mesh bounds were unchanged.
+  `LIT_Planet_Sun` and `LIT_LandingDay` stayed at the origin (island day rig,
+  not slot templates). `LIT_Planet_Fill` moved with the forest kit.
 
 The fix as a contract (Lead 2026-10-07: "the field and the forest are two
 different zones and the camp work is not going in the field"):

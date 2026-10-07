@@ -109,7 +109,7 @@
   "open_questions": [
     "docs/39 section 7 Q2: confirm the shape-variance amounts (+/-15% extent, +/-25 m edge drift) and the budget numbers above - all agent-proposed.",
     "docs/39 section 7 Q3: confirm SM_Shrine_Return and the spirit wound follow the FOREST zone (this spec assumes yes - both are slots here).",
-    "Blend 02_Forest / 06_Camp in floating_island_homestead_LIB.blend: under straight-to-generation they are template/source pieces, not placements inside FIELD. Keep as authored reference geometry, or remove once the generator owns placement? Lead call.",
+    "ANSWERED Lead 2026-10-07 interview #17: 02_Forest and 06_Camp stay in floating_island_homestead_LIB.blend as kit and template source, parked +10000 m on X. They are not a placement inside FIELD. LIT_Planet_Sun and LIT_LandingDay stayed at the origin.",
     "Layout INSIDE the camp clearing remains the Lead's (CAMP.open_questions) - this spec only pins the clearing's origin within the zone."
   ],
   "measured": null,
