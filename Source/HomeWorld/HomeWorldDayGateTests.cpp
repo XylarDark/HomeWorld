@@ -249,4 +249,66 @@ bool FPlantAndNurtureAreDistinctMarksTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+/**
+ * #7 MUST: the rune unlock is a day+body verdict, it latches, and it never grants spirit alone.
+ *
+ * Queue A status note: #2/#3/#4 have their positive halves blocked on a GameInstance
+ * fixture the world-only test world cannot supply, and #6 likewise. #7 is the one beat
+ * whose positive half runs in this fixture, so it is the one that proves the day-gate
+ * table's "refused at Dusk/Night" rows are not passing for the wrong reason - i.e. that
+ * a correctly placed unlock really does set the latch, and that the latch really is
+ * load-bearing for the bed path, rather than the bed path being open by another route.
+ *
+ * Anti rows: "spirit on phase alone != beat"; "bed->spirit without unlock = closed_fail".
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FRuneUnlockGrantsNoSpiritAloneTest,
+	"HomeWorld.T0.M7.RuneUnlockGrantsNoSpiritAlone",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FRuneUnlockGrantsNoSpiritAloneTest::RunTest(const FString& Parameters)
+{
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("M7 rune"));
+	if (!Scope.Ok(this))
+	{
+		return false;
+	}
+
+	Scope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Day);
+	AHomeWorldCharacter* Character = HomeWorldTestWorld::SpawnCharacter(Scope.World);
+	if (!TestNotNull(TEXT("character"), Character))
+	{
+		return false;
+	}
+	Character->SyncFormWithTimeOfDay();
+
+	TestFalse(TEXT("rune locked at session start"), Character->IsRuneGateUnlocked());
+
+	// The positive half this table cannot cover: day + body really unlocks.
+	TestTrue(TEXT("#7: day + body unlock succeeds"), Character->TryUnlockNodeRune());
+	TestTrue(TEXT("#7: unlock sets the latch"), Character->IsRuneGateUnlocked());
+	TestFalse(TEXT("unlock is a body verdict - never spirit"), Character->GetIsSpiritForm());
+
+	// Idempotent: the same unlock reads as already unlocked, not a second latch.
+	TestTrue(TEXT("#7: re-unlock at day is open success, not a failure"),
+		Character->TryUnlockNodeRune());
+	TestTrue(TEXT("#7: latch survives the re-read"), Character->IsRuneGateUnlocked());
+
+	// The Anti row: unlock alone must not grant spirit, at night or anywhere else.
+	Scope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Night);
+	Character->SyncFormWithTimeOfDay();
+	TestTrue(TEXT("rune latch survives the phase change"), Character->IsRuneGateUnlocked());
+	TestFalse(TEXT("M7 Anti: unlock alone is not spirit, at night"),
+		Character->GetIsSpiritForm());
+
+	// And the load-bearing proof: unlock is what lets the bed path reach spirit. If the
+	// latch silently did not persist, this last step fails while everything above passes.
+	Character->GrantSpiritSleepGate();
+	Character->SyncFormWithTimeOfDay();
+	TestTrue(TEXT("M7 + M11: rune unlock + bed sleep gate at night grants spirit"),
+		Character->GetIsSpiritForm());
+
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS
