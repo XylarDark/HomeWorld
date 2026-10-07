@@ -45,11 +45,12 @@ zone-generation research and the "straight to generation" decision.
 
 ## Known defect (must fix as part of generation work)
 
-CAMP origin `(20,-80,-95)` and the blend's `02_Forest` blob + `06_Camp` sit
-**inside FIELD bounds** (~20 m from field centre) — violates FIELD's own reject
-`camp_visible_from_the_field_centre`. Recorded in `FIELD.json.zone_contract`
-and `CAMP.json.zone_contract`. Under straight-to-generation these become
-template/slot source pieces, not world placements.
+CAMP.json `world_origin` `(20,-80,-95)` is still inside FIELD bounds.
+The blend is not: `02_Forest` / `06_Camp` kit meshes are on the +10000 m X
+shelf (Lead interview #17). Interview #19: `LIT_Planet_Fill` is back at
+(-13.948, -60, -85). The three Planet_Day lights are in `09_Planet_Day`.
+Sun and LandingDay transforms are unchanged. Recorded in
+`FIELD.json.zone_contract`, `FOREST.json`, and docs/39 §5.
 
 ## Next steps (in order)
 
@@ -72,15 +73,16 @@ template/slot source pieces, not world placements.
    two walkable forests without the camp. Cliff streams on the upgraded glider.
    River streams on the boat. Camp still pins only at the forest asset boundary.
    Night spirit traversal of those edges is open. See docs/39.
-6. Blend: reposition `02_Forest`/`06_Camp` as kit/template source — Lead call.
+6. Blend: `02_Forest`/`06_Camp` kit meshes parked +10000 m on X (interview #17). PR pending.
 7. Then: camp art image→blockout pass (deferred), prove scripts M8/M10–M14
    against generated geometry (GATE 3), six `NO_VERDICT` prove runs.
 
 ## Open questions carried
 
-- Research doc §7: **Q2** shape-variance amounts (proposal: ±15% extent, edge
-  bands ±25 m) and **Q3** confirm shrine-return + spirit wound follow the forest
-  zone. Q1 answered: straight to generation.
+- Research doc §7: **Q1** straight to generation. **Q2** and **Q3** answered
+  in interview #17: use ±15% extent and ±25 m edge drift; shrine-return and the
+  spirit wound pin into forest slots, like the camp. Night: spirit form crosses
+  forest edges only; cliff and river stay closed. Not yet in code.
 - Moon disc distance/size = taste call, still unswept.
 - Homestead slope air-time re-derivation; field clump counts for 420 m field.
 - Six `NO_VERDICT` prove scripts (M2/M3/M4/M6/M7/skybox) still blocked by the

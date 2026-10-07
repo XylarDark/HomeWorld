@@ -53,7 +53,7 @@
       "the camp and all five SM_Camp_* modules",
       "spirit wound / shrine-return - forest-zone content"
     ],
-    "known_defect": "CAMP.json world_origin (20,-80,-95) is ~20 m from this zone's centre, i.e. INSIDE these bounds, and so is the blend's 02_Forest blob - both violate this contract and this zone's own reject camp_visible_from_the_field_centre. The forest-zone move is tracked in docs/39_ZONE_GENERATION_RESEARCH.md §5.",
+    "known_defect": "CAMP.json world_origin (20,-80,-95) is still ~20 m from this zone's centre, inside these bounds. The blend is not: Lead interview #17 (2026-10-07) parked 02_Forest and 06_Camp kit meshes +10000 m on X, outside this box, as slot template source. Interview #19 put LIT_Planet_Fill back at (-13.948, -60, -85) and moved LIT_Planet_Sun, LIT_LandingDay, and LIT_Planet_Fill into collection 09_Planet_Day. Sun and LandingDay transforms are unchanged. See docs/39_ZONE_GENERATION_RESEARCH.md §5.",
     "target_architecture": "Lead 2026-10-07: each zone is a Path-of-Exile-style generated map - vague preset shape + seeded generative variables; plains and forest are the first two use cases; neighbors generate from the direction the player travels. See docs/39_ZONE_GENERATION_RESEARCH.md."
   },
   "arrival": {

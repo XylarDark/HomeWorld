@@ -29,7 +29,7 @@
   ],
   "zone_contract": {
     "settled": "Lead 2026-10-07 - the camp belongs to the FOREST zone and must never sit inside FIELD's bounds. Field and forest are two separate zones.",
-    "defect": "This world_origin (20,-80,-95) is ~20 m from FIELD's centre - inside the field. The forest zone needs its own origin beyond a field forest edge, and this camp, SM_Shrine_Return and the spirit wound move with it. Tracked in docs/39_ZONE_GENERATION_RESEARCH.md section 5.",
+    "defect": "This world_origin (20,-80,-95) is ~20 m from FIELD's centre - inside the field. The forest zone needs its own origin beyond a field forest edge, and this camp, SM_Shrine_Return and the spirit wound move with it. The five SM_Camp_* meshes in the blend are no longer at this origin: Lead interview #17 (2026-10-07) parked them on the +10000 m X kit shelf with 02_Forest. Tracked in docs/39_ZONE_GENERATION_RESEARCH.md section 5.",
     "target_architecture": "Lead 2026-10-07: forest is a Path-of-Exile-style generated map; the camp is authored custom content inserted into it via a slot (never generated into the field, structurally). See docs/39_ZONE_GENERATION_RESEARCH.md."
   },
   "materials": [

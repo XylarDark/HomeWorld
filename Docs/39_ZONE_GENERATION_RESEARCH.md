@@ -172,8 +172,19 @@ Checked against the specs and the blend today:
   inside the field**, which also violates FIELD's own reject
   `camp_visible_from_the_field_centre`.
 - The blend's `02_Forest` blob (x -37..47, y -166..-65) and my new `06_Camp`
-  modules sit inside the field bounds too. Everything currently clusters on
-  one datum.
+  modules sat inside the field bounds too. Everything clustered on one datum.
+  **Moved 2026-10-07 (Lead interview #17):** kit meshes in `02_Forest` and
+  `06_Camp` translated +10000 m on X. Reopened bounds: forest meshes
+  x 9962.672..10046.841, y -166..-65, z -95.2..-10; camp meshes
+  x 10015.496..10021.790, y -82.2..-75.7, z -95..-93.5. Neither box meets
+  the field rectangle. Homestead mesh bounds were unchanged.
+  `LIT_Planet_Sun` and `LIT_LandingDay` stayed at the origin (island day rig,
+  not slot templates). `LIT_Planet_Fill` was moved with the kit by mistake.
+  **Interview #19 (2026-10-07):** `LIT_Planet_Fill` is back at
+  (-13.948, -60, -85). `LIT_Planet_Sun`, `LIT_LandingDay`, and
+  `LIT_Planet_Fill` now live in collection `09_Planet_Day`, not `02_Forest`.
+  Sun and LandingDay transforms are unchanged. Forest and camp mesh bounds
+  are unchanged.
 
 The fix as a contract (Lead 2026-10-07: "the field and the forest are two
 different zones and the camp work is not going in the field"):
@@ -210,12 +221,12 @@ different zones and the camp work is not going in the field"):
 
 1. **T0 forest edge:** — **answered 2026-10-07: "straight to generation."**
    No static forest placement; entry-triggered generation is the first
-   implementation. (Questions 2–3 below remain open.)
-2. **Shape variance:** how vague is "vague"? Proposal: ±15 % on zone extent,
-   edge bands drift ±25 m, interior scatter fully seeded — silhouette-level
-   variation only, edge types never change.
-3. **Old forest/camp datum:** the move clears the field but re-positions
-   shrine-return and the wound marker too — confirm they follow the forest.
+   implementation.
+2. **Shape variance:** — **answered 2026-10-07, interview #17:** ±15 % on zone
+   extent, edge bands drift ±25 m. Interior scatter stays seeded. Edge types
+   do not change.
+3. **Old forest/camp datum:** — **answered 2026-10-07, interview #17:** the
+   shrine-return and the spirit wound both pin into forest slots, like the camp.
 
 ## References
 
