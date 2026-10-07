@@ -32,7 +32,7 @@ SESSION_START track sizing. In order. Owner column: who must act.
 
 6. **`SM_Camp_*` five modules to `CAMP.json`** (4.2) — unblocks the
    M8/M10/M11/M12/M13/M14 proves; one location, four beats.
-7. **FIELD geometry** (4.1) — 70×70, four edges, 2 beast pads, 15 items.
+7. **FIELD geometry** (4.1) — 420×420 (×6 pass), four edges, 2 beast pads, 15 items.
 8. **Treeline opacity check** (4.3) — zero forest interior from landing and
    (+20,−15), or revisit DEC-0028.
 9. **Spec-coverage audit** (1.3) — every mesh volume the blend has that no

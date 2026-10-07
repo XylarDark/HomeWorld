@@ -51,6 +51,9 @@ One fact proposed at a time, one yes from Luke, one write into this file only �
 - Gathering a pile takes one from a pool of piles. There is no cooldown.
 - The stage name stays polish.
 - An agent decision is never settled by what the developer seems to want: name the limitation, give the real options with one recommended pick marked, say plainly when the evidence points against the choice in front of you, and ask a decision with the question tool rather than as prose.
+- Lead 2026-10-07: the three wound wisps, once healed, each become a spirit
+  companion that follows the player (Ni No Kuni style) rather than staying a
+  soft-emissive prop in place. The heal verb's result is a following wisp.
 - Lead 2026-10-07 field-scatter rule (×6 pass): no clustering, no grid; a common herb node is ~30 m from its nearest kind; 25% of that density is dual herbs (2 nodes, 1 m apart); 5% of that density is triple herbs (3 nodes, 1 m apart between them). Clump counts grow with the 420×420 field (was 70×70); the 5 m min-separation and same-type-adjacent bans are superseded.
 - One dung and one wisp make one spirit fertilizer.
 - Lead 2026-10-07 (revises the line above's spread agent): the herbs have their

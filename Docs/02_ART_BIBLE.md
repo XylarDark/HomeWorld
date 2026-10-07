@@ -64,6 +64,36 @@ If a new biome cannot produce a shot this clear, the biome is not ready.
 
 ---
 
+## Appendix A. Outstanding placeholders - a "photo -> simple placeholder" note (2026-10-07)
+
+Every item below is greybox or an `authored, not built` stub today. The note for
+each says which photograph to use as the look target when shaping its simple
+placeholder version. The placeholder's job is family-read at 20 m from the locked
+signature rows (§2, seven families), not finish. Materials stay on the ten
+masters. If a placeholder can't carry its family by silhouette alone, the note is
+wrong and the placeholder fails the 20 m read test until it does.
+
+| Slot | What it must read as | Photo to shape the simple placeholder from |
+|---|---|---|
+| `SM_Camp_Fire` | The tallest thing among its neighbours, warm light, a spirit-blue centre | A small campfire at dusk, seen from the path where the captive's lashings sit |
+| `SM_Camp_GuardStake` | "a post a guard stands at", one stick not a sentry box | A watch-post stake by a forest trail |
+| `SM_Camp_Bedroll_A/B` | Sleeping person's bedrolls, allies made by someone kind | Two neat bedrolls beside a campfire |
+| `SM_Camp_Lashings` | Rope/lashings holding something that should be free | Rope binds on a post |
+| Field treeline (two identical edges) | Indistinguishable pine forest walls — the choice must be preference | Standing at the edge of a pine stand, looking straight into it |
+| `SM_Herb_Clump_01` | Low wild herb you walk past, waist-high, M_GatherHerb | A clump of wild herbs in a meadow |
+| `SM_Beast_Pad_A/B` | A worn stamping ground, where great beasts bed down | A deer bed / wild boar wallow |
+| `SM_Dung_Pile_01` | Dung, small (0.15 m), hidden by the 0.9–1.2 m grass | Stock photo of a small dung pile, used for scale |
+| `SM_SpiritWound_01` | Vertical, tall, see-through gap, cracked or broken arch — a thing you approach | A cracked standing stone or broken arch, low angle, against sky |
+| `NODE_RUNE` | Small field stone that reads "a threshold", not a tombstone | A stone marker by a trail, weathered |
+| The rune plane / homestead portal pair | The portal you step through at night, not sci-fi, not a doorframe | A gate/portal seen straight on at night, lit side warm |
+| Companion NPC | Held by the guard; readable at 20 m as someone missing you | A bundled figure tied somewhere they should not be |
+| Great bull | Big, planted, heavy head, rideable; threat readable by stance | A big cow/bull standing in a field |
+| Clouds | Soft spirit-blue cotton, no clipping through the pawn's head | Round low cumulus, backlit |
+
+Reject for placeholders: anything photoreal, featureless hooded figures, anything that breaks the 2D cartoon line-weight, and any item that reads as the same silhouette as a different family. The §2 homestead/planetside contracts still win where they conflict.
+
+---
+
 ## 3. Player
 
 Unique but non-descript. A person, not a logo.
