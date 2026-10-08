@@ -10,7 +10,7 @@ One body, many times the player. An Atlas-like sleeper, trapped in a cliffside c
 
 He kneels on both knees. The back-to-head slope is about 30 degrees, so the bull can ride and the player can mostly walk.
 
-Three body coils, then the head bind. Coil one comes off a full-speed ram on a loose scale. Coil two comes off a tickle. The guards push only coil three, and only at night. The head bind is what he rips off. The snake falls to the pool below.
+Three body coils, then the head bind. Coil one comes off a full-speed ram on a loose scale. Coil two comes off a tickle. The guards push only coil three, and only at night, and only after their wounds are healed. The head bind is what he rips off. The snake falls to the pool below.
 
 A coil comes off first. The wrap under it is healed at night, not when it comes off.
 
@@ -44,7 +44,7 @@ Existing shrine portal, or the same glide if you are already spirit. No new flig
 
 Heal the wraps where coil one and coil two were. Between coil two and coil three, a side room. The three guards fell into that cave and were injured. You can walk in. That is where you heal one wound on each, the same heal, a different woe from the camp sleep-ease. They accept it. Not a new zone.
 
-They push coil three. They do not kill the snake. After it comes off, heal the wrap under it.
+They cannot push coil three until those wounds are closed. Then they push it. No loose scale on coil three. They do not kill the snake. After it comes off, heal the wrap under it.
 
 Spirit stealth, the same stealth you already use, takes you past the snake's eye. Not a new minigame. Soothe is the same heal, on the head, after the eye. Then you ask him to awaken. He takes the snake off. It falls to the pool below.
 
@@ -68,8 +68,8 @@ Not lair verbs. A thick fog marks the second forest. A tree boots you back to th
 |---|---|
 | Bed, sleep | Spirit form. Night entry and the pass by the eye are spirit. The fog reveal is seen on return to bed. |
 | Camp night ease | The three guards already know you. The lair help is a second, different woe. |
-| Side room | The cave they fell from. You heal them there. Not a zone. |
-| Three guards | Night: heal a wound on each in the side room, then they push coil three. |
+| Side room | The cave they fell from. You heal them there. Not a zone. The heal opens their push. |
+| Three guards | Night: heal a wound on each, then they push coil three. No scale on that coil. |
 | Giant wrap | Night heal, after the coil is already off. |
 | Bull, tamed | Coil one only. Full-speed ram on the loose scale. A miss stuns it 3 seconds. |
 | Tickle | Coil two. Approach the underside. The tickle drops the coil. |
@@ -83,4 +83,4 @@ Not lair verbs. A thick fog marks the second forest. A tree boots you back to th
 
 ## Not in this lock
 
-New combat, a snake health bar, a snake death, a second mount, a new flight mode, a stealth minigame, a new zone, fertilizer as a gate, the homestead wound as a gate, a boot home from a missed scale, a new soothe verb, day heals, the giant speaking the title, a second ram on coil two.
+New combat, a snake health bar, a snake death, a second mount, a new flight mode, a stealth minigame, a new zone, a scale puzzle on coil three, fertilizer as a gate, the homestead wound as a gate, a boot home from a missed scale, a new soothe verb, day heals, the giant speaking the title, a second ram on coil two.
