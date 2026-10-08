@@ -38,6 +38,8 @@ A named task (verb + game thing + outcome) gets a one-line plan, then work. A re
 
 An interview is one lock. Competing choices for that lock, then stop. Not a menu of different paths. Scribe the pick before the next lock. If the card fails, take a numbered reply in chat. Do not invent a substitute card.
 
+After the clarifier names the work, name one room and open that card. Art is `Docs/context/FORK_ART.md`. Asset is `Docs/context/FORK_ASSET.md`. Gameplay is `Docs/context/FORK_GAMEPLAY.md`. Testing is `Docs/context/FORK_TESTING.md`. You can correct the room. No pick stays in the clarifier. No fifth fork. A card points at a settled lock. It does not reopen it. Shape is `Docs/context/SESSION_FORK_LOCK.md`.
+
 Other doors are not start reads. Open one only when it is named, or when the question shows it is needed.
 
 Before the first edit, run `git status --short` once. No checkout: say so. A remote write names the branch. Stop and report uncommitted changes you did not make.
