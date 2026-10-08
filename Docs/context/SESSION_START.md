@@ -28,11 +28,12 @@ Open only when the task needs it: `Docs/WORLD_METRICS.md` for a number; `Docs/le
 | Descent, gather, fertilizer, or homestead | `Docs/context/HOMEWORLD_ROUTE.md` |
 | Route, placeable, merge, or level | `Docs/context/LEVEL_RULES.md` |
 | T0 scope | `Docs/context/T0_INTERVIEW_LOCK.md` |
+| First loop, or implement from the lock | `Docs/context/T0_INTERVIEW_LOCK.md`, `Docs/context/T0_SHAPE_PLAN.md`, and the active queue named in `Docs/CANON_MAP.md`. A later lock line wins over an older queue. |
 | Hand back | `Docs/context/HANDBACK.md` when the session is Co and the message says hand back |
 
 ## Ending the reads
 
-A named task (verb + game thing + outcome) gets a one-line plan, then work. A topic (no verb or no outcome) gets one typed clarifier, then proceeds as named. A dream (no system, or a pure idea) asks, one at a time: what it is; what the first minute should feel like; whether today is look, shape, or build. Or draft a short concept paragraph for a redline — that paragraph is the brief. Dream work reads `Docs/VISION_BOARD.md` and waits for a yes. A topic or dream mid-task drops back to the clarifier.
+A named task (verb + game thing + outcome) gets a one-line plan, then work. A recorded queue of agent-owned items runs until a decide, a do, or a second fail on the same writer. One change, one run, then stop applies to a task that is still unknown. A topic (no verb or no outcome) gets one typed clarifier, then proceeds as named. A dream (no system, or a pure idea) asks, one at a time: what it is; what the first minute should feel like; whether today is look, shape, or build. Or draft a short concept paragraph for a redline — that paragraph is the brief. Dream work reads `Docs/VISION_BOARD.md` and waits for a yes. A topic or dream mid-task drops back to the clarifier.
 
 Other doors are not start reads. Open one only when it is named, or when the question shows it is needed.
 
