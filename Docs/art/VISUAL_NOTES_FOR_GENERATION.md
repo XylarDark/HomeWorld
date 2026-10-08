@@ -46,9 +46,9 @@ One dominant temperature per place. Do not mix them in one image.
 | Camp | Night, fire as the only warm | The fire | Approaching from outside the sightline |
 | Lair | Cool cave, one warm wound or window-scale light | The loose scale, then the head | Small on the 30 degree back |
 
-## Drift to ignore when generating
+## Cleaned 2026-10-08
 
-The art bible still has a planetside still of three armed brutes, and an appendix row for a rune. Product direction wins for this sitting. Guards are tired people with the player's face planes, not a new species and not a weapon render. The rune is removed. Night is the same meshes.
+The art bible matches. Camp is three tired guards with the player face planes. The rune is gone. The shrine is the night portal. Do not generate the old armed-brute still.
 
 ## Paste block
 
