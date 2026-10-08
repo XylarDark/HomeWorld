@@ -87,6 +87,14 @@ README is left intact as history.
 | Zone/asset placement specs | `Lib/02_Zones/**/*.json` | **the machine-readable truth** |
 | Image prompts (Grok) | `Docs/art/GROK_IMAGINE_PROMPTS.md` | in flight |
 | **Prototype sitting briefs** | `Docs/art/PROTOTYPE_ASSET_BRIEFS.md` | home kit 2026-10-08. Paste, then mesh. |
+| **Sitting track** | `Docs/art/PROTOTYPE_ASSET_TRACK.md` | play order and pass bars |
+| **Generation notes** | `Docs/art/VISUAL_NOTES_FOR_GENERATION.md` | paste block and place scripts |
+| **Art room** | `Docs/context/FORK_ART.md` | look and stills |
+| **Asset room** | `Docs/context/FORK_ASSET.md` | sitting |
+| **Gameplay room** | `Docs/context/FORK_GAMEPLAY.md` | locks. Dream combat stays closed. |
+| **Testing room** | `Docs/context/FORK_TESTING.md` | prove |
+| **Fork lock** | `Docs/context/SESSION_FORK_LOCK.md` | four cards, one pointer |
+| **Sitting gap** | `Docs/art/GAP_2026-10-08.md` | studio gap, 2026-10-08 |
 | **The 13+4 T0 MUSTs** | `Docs/handoffs/T0_MECHANIC_INVENTORIES_V1.md` | **canonical for T0** |
 | The work queue | `Docs/TaskLists/T0_NEXT_QUEUE.md` | active — 2026-10-08. `T0_FIRST_LOOP_NOW.md` is the finished code queue |
 | Prototype boss lair | `Docs/context/BOSS_LAIR_LOCK.md` | shape lock 2026-10-08. Fight stays later |
@@ -107,6 +115,9 @@ README is left intact as history.
 | Map layout | `Maps/VS_MVP/README.md` | primary slice |
 
 ---
+
+
+Sitting rule, 2026-10-08: do not author a rune. Product direction removed it. Must #7 stays logic-done in code. Removing the gate is a gameplay interview, not a sitting.
 
 ## 3. ⭐ The table that would have prevented the #17 error
 
