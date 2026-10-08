@@ -14,4 +14,4 @@ Lead answers, 2026-10-07. Not a start read. Open when the task touches T0 scope.
 - Camp clearing is 40 m across.
 - Shrine is twice player height, a standing stone.
 - First desktop prove is Wake.
-- The rune is not a portal. Each zone has a shrine waypoint home. The night shrine and the zone shrine are the same kind of thing. The rune stays a form gate, with sleep.
+- Each zone has a shrine waypoint home. The night shrine and the zone shrine are the same kind of thing. The rune is not a portal. With sleep, it enables the shrine waypoint.

@@ -78,7 +78,7 @@ One fact proposed at a time, one yes from Luke, one write into this file only â€
 - Lead 2026-10-07: the art bible owns how the island top looks. This file owns the meters. A look change does not move the drop. A route change does not pick the materials.
 - Lead 2026-10-07: T0 riding is the barn bull. It is not a separate mount.
 
-- Lead 2026-10-07: the rune is not a portal. Each zone has a shrine, and that shrine is the waypoint home. The night shrine and the zone shrine are the same kind of thing. The rune remains a form gate only, with sleep.
+- Lead 2026-10-07: each zone has a shrine, and that shrine is the waypoint home. The night shrine and the zone shrine are the same kind of thing. The rune is not a portal. With sleep, it enables the shrine waypoint.
 
 ## Left empty on purpose
 
