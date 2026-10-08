@@ -75,7 +75,7 @@ The Round 7 questions are answered. Do not ask them again.
 | What does the one-minute slow touch? | Movement only. Walk and glide are 15 percent slower. Gather, ease, and the bed stay full speed. 2026-10-08. |
 | How hard is the drag while stacks are up? | The same 15 percent. One stack or five, it does not add. Movement only. 2026-10-08. |
 | How does the scarf read the stacks? | Five steps colder, one per stack. The slow stays a flat 15 percent. You can count without a number. 2026-10-08. |
-| Can the fifth stack interrupt? | Yes. It starts the glide at once, even mid-ease. The beat is lost. 2026-10-08. |
+| Can the fifth stack interrupt? | Yes. It starts the glide at once, even mid-ease. The beat stays. You return and finish. The interrupt costs time, not progress. 2026-10-08. |
 
 ## Reading boundary
 
