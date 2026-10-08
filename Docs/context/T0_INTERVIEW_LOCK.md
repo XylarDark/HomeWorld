@@ -15,3 +15,4 @@ Lead answers, 2026-10-07. Not a start read. Open when the task touches T0 scope.
 - Shrine is twice player height, a standing stone.
 - First desktop prove is Wake.
 - Each zone has a shrine waypoint home. The night shrine and the zone shrine are the same kind of thing. The rune is not a portal. With sleep, it enables the shrine waypoint.
+- Shape sheet: `Docs/context/T0_SHAPE_PLAN.md`.
