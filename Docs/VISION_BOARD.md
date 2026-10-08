@@ -73,6 +73,7 @@ The Round 7 questions are answered. Do not ask them again.
 | Who teaches the dawn rule? | The child, once, in one line, before the first night out. The bed and the dawn. Then the body is the reminder. 2026-10-08. |
 | Does a late wake change the homestead? | No. The place stays warm. The slow is the body alone. 2026-10-08. |
 | What does the one-minute slow touch? | Movement only. Walk and glide are 15 percent slower. Gather, ease, and the bed stay full speed. 2026-10-08. |
+| How hard is the drag while stacks are up? | The same 15 percent. One stack or five, it does not add. Movement only. 2026-10-08. |
 
 ## Reading boundary
 
