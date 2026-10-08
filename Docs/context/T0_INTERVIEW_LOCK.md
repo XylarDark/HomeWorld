@@ -16,3 +16,4 @@ Lead answers, 2026-10-07. Not a start read. Open when the task touches T0 scope.
 - First desktop prove is Wake.
 - Each zone has a shrine waypoint home. The shrine is its own activator. The night shrine and the zone shrine are the same kind of thing. The rune is removed.
 - Shape sheet: `Docs/context/T0_SHAPE_PLAN.md`.
+- Sleep is the form change. It is what lets the player become spirit. At night the shrine can be traversed only in spirit form.

@@ -80,6 +80,8 @@ One fact proposed at a time, one yes from Luke, one write into this file only â€
 
 - Lead 2026-10-07: the rune is removed. Each zone has a shrine, and that shrine is the waypoint home and its own activator. The night shrine and the zone shrine are the same kind of thing.
 
+- Lead 2026-10-07: sleep is the form change. It is what lets the player become spirit. At night the shrine can be traversed only in spirit form.
+
 ## Left empty on purpose
 
 - Polish-gate ids and gate-chain order: (empty)

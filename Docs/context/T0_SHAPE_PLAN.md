@@ -22,7 +22,7 @@ First minute: cabin, partner and child present, safe.
 | 5 | `NODE_WOUND` | Spirit wound. On the homestead. |
 | 6 | `NODE_SHRINE` | Waypoint and its own activator. The rune is removed. |
 
-The shrine does not wait on a rune.
+The shrine does not wait on a rune. Sleep is the form change. At night the shrine can be traversed only in spirit form.
 
 ## Shrine
 
