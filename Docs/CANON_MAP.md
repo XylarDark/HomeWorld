@@ -1,6 +1,6 @@
 # CANON MAP — one lookup, so nobody reads 441 files to find one answer
 
-**Updated 2026-10-07.**
+**Updated 2026-10-08.**
 
 ## 0. Which document is the vision
 
@@ -86,6 +86,7 @@ README is left intact as history.
 | Never promote art to `Content/` | `Docs/20_UASSET_AI_POLICY.md` | policy (DEC-0019) |
 | Zone/asset placement specs | `Lib/02_Zones/**/*.json` | **the machine-readable truth** |
 | Image prompts (Grok) | `Docs/art/GROK_IMAGINE_PROMPTS.md` | in flight |
+| **Prototype sitting briefs** | `Docs/art/PROTOTYPE_ASSET_BRIEFS.md` | home kit 2026-10-08. Paste, then mesh. |
 | **The 13+4 T0 MUSTs** | `Docs/handoffs/T0_MECHANIC_INVENTORIES_V1.md` | **canonical for T0** |
 | The work queue | `Docs/TaskLists/T0_NEXT_QUEUE.md` | active — 2026-10-08. `T0_FIRST_LOOP_NOW.md` is the finished code queue |
 | Prototype boss lair | `Docs/context/BOSS_LAIR_LOCK.md` | shape lock 2026-10-08. Fight stays later |
