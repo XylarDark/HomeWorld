@@ -2,6 +2,8 @@
 
 Home session kit. 2026-10-08. Shape only. Not a prove.
 
+Follow [PROTOTYPE_ASSET_TRACK.md](PROTOTYPE_ASSET_TRACK.md). One step, pass bar, then the next. This file is the prompt list.
+
 Build in play order. Homestead first, lair last. Paste one image prompt. Reject it if the silhouette fails as a thumbnail. Then image-to-mesh. Tripo for a draft, Meshy for a budgeted stylized mesh, Rodin only for a close still. Do not promote a generated mesh into `Content/`. See `Docs/20_UASSET_AI_POLICY.md`.
 
 Style on every prompt: faceted semi-polygon, detail on the planes, cartoon fantasy, warm handmade, not photoreal, not a toy, not high fantasy, not grim. Small player in the corner for scale. Plain background. No text.
@@ -82,6 +84,8 @@ After the camp rescue. Scary cliff mouth. Day is coil one and coil two only. Nig
 The eye is a light cone in-engine, not a mesh. The title card is UI. The way home reuses `SM_Shrine_Homestead`.
 
 ## Sitting order
+
+Follow the track. Prompts are above.
 
 1. Cabin, bed, partner, child, herb bed, kettle, edge, perch, shrine.
 2. Cloud layer, wisp, landing, herb, wood, berry, bull.
