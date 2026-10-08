@@ -55,3 +55,10 @@ Night: sleep, wound, edge.
 Partner stands by the bed. Child stands in the garden.
 The day body may take the shrine home. The night spirit glide uses the same drop as the day glide.
 Ride the bull through the shrine, then walk with the bull to the barn.
+
+## Morning revision
+
+Day: wake, garden herbs, tea inside, day sprint, family, edge.
+Night glide collects cloud wisps. Day glide does not.
+The body may shrine home any time after leaving.
+After the partner is taken, the child waits by the bed.

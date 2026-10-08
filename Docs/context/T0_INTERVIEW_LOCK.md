@@ -27,3 +27,7 @@ Lead answers, 2026-10-07. Not a start read. Open when the task touches T0 scope.
 - the day body can use a shrine to return home.
 - you ride the bull through the shrine, then you and the bull walk to the barn.
 - day order is wake, kitchen, family, garden, edge. Night order is sleep, wound, edge.
+- day order is revised. Wake, pick herbs in the garden, walk inside, make tea, unlock the day sprint, then family, then edge. The kitchen-before-garden line is superseded.
+- cloud wisps are collected only at night. The day glide is only a glide. This revises the day wisp-on-the-way-down line.
+- the body may take a shrine home any time after leaving.
+- after the partner is taken, the child waits by the bed.

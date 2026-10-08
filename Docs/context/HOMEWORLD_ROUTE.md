@@ -94,6 +94,11 @@ One fact proposed at a time, one yes from Luke, one write into this file only â€
 - Lead 2026-10-07: you ride the bull through the shrine, then you and the bull walk to the barn.
 - Lead 2026-10-07: day order is wake, kitchen, family, garden, edge. Night order is sleep, wound, edge.
 
+- Lead 2026-10-07: day order is revised. Wake, pick herbs in the garden, walk inside, make tea, unlock the day sprint, then family, then edge. The kitchen-before-garden line is superseded.
+- Lead 2026-10-07: cloud wisps are collected only at night. The day glide is only a glide. This revises the day wisp-on-the-way-down line.
+- Lead 2026-10-07: the body may take a shrine home any time after leaving.
+- Lead 2026-10-07: after the partner is taken, the child waits by the bed.
+
 ## Left empty on purpose
 
 - Polish-gate ids and gate-chain order: (empty)
