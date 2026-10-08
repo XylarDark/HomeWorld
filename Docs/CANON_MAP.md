@@ -117,7 +117,7 @@ README is left intact as history.
 ---
 
 
-Sitting rule, 2026-10-08: do not author a rune. Product direction removed it. Must #7 stays logic-done in code. Removing the gate is a gameplay interview, not a sitting.
+Sitting rule, 2026-10-08: do not author a rune. The bed alone grants the form. Must #7 stays logic-done in code until an implement removes the gate. Do not delete it in a sitting.
 
 ## 3. ⭐ The table that would have prevented the #17 error
 
