@@ -10,7 +10,7 @@ Job: taste. Beats, locks, the loop that already exists.
 
 ## Leave closed
 
-Key art. The asset track. The GDD, unless the lock names it. A later lock wins over an older queue.
+Key art. The asset track. The GDD, unless the lock names it. `Docs/COMBAT_DREAM_BIBLE.md`. Care replaces killing. This prototype does not open dream combat. A later lock wins over an older queue.
 
 ## Track
 
