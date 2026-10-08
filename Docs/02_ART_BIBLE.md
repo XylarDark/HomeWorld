@@ -103,7 +103,7 @@ Unique but non-descript. A person, not a logo.
 - Young-adult adventurer, slightly androgynous.
 - Short geometric hair in a few faceted clumps.
 - Muted charcoal-brown coat. One warm scarf accent. No ornate armor.
-- Head slightly large. Eyes graphic and clear.
+- Adult head about one sixth of height. Child head larger, about four to five heads. Eyes graphic and clear.
 - Face built from planes that act: brows, eyelids, mouth corners.
 - Not a featureless hood. Not a realistic hoodie. Not a Disney princess. Not a high-fantasy chosen one.
 
@@ -288,7 +288,7 @@ Ten masters only (instance; do not invent families):
 10. `M_Nurtured`
 
 Each exposes BaseColor, Roughness, Variation, NightMix 0–1, optional Emissive.  
-Scale: meters. Adult about 1.7–1.8 m. Beasts much larger. Origins at ground contact. Apply scale.
+Scale: meters. Adult about 1.7–1.8 m. Head about one sixth of that height. Beasts much larger. Origins at ground contact. Apply scale.
 
 AD does not author the material sheet. TA owns parameter ranges.
 
