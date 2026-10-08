@@ -46,7 +46,9 @@ Heal the wraps where coil one and coil two were. Between coil two and coil three
 
 They cannot push coil three until those wounds are closed. Then they push it. No loose scale on coil three. They do not kill the snake. After it comes off, heal the wrap under it.
 
-Spirit stealth, the same stealth you already use, takes you past the snake's eye. Not a new minigame. Soothe is the same heal, on the head, after the eye. Then you ask him to awaken. He takes the snake off. It falls to the pool below.
+Spirit stealth, the same stealth you already use, takes you past the snake's eye. Not a new minigame. If the eye catches you, you are set just outside its light. No stun. No trip home. The eye keeps its watch.
+
+Soothe is the same heal, on the head, after the eye. Then you ask him to awaken. He takes the snake off. It falls to the pool below.
 
 ## End shot
 
@@ -75,7 +77,7 @@ Not lair verbs. A thick fog marks the second forest. A tree boots you back to th
 | Tickle | Coil two. Approach the underside. The tickle drops the coil. |
 | Day glide | The entry. One sign, no pickup, steer into the scary mouth. |
 | Night portal or glide | The return. Existing shrine, or the same glide. No new flight. |
-| Spirit stealth | The path past the snake's eye. Existing stealth. Not a minigame. |
+| Spirit stealth | Past the snake's eye. A catch sets you just outside the light. No stun. No trip home. |
 | Head heal | The soothe. Same heal, on the head, after the eye. Then the ask. |
 | Speak at the head | Ask him to awaken. He takes the snake off. It falls to the pool. |
 | End shot | Zoom out. Player on his shoulder. Title card reads HomeWorld. He does not speak it. |
@@ -83,4 +85,4 @@ Not lair verbs. A thick fog marks the second forest. A tree boots you back to th
 
 ## Not in this lock
 
-New combat, a snake health bar, a snake death, a second mount, a new flight mode, a stealth minigame, a new zone, a scale puzzle on coil three, fertilizer as a gate, the homestead wound as a gate, a boot home from a missed scale, a new soothe verb, day heals, the giant speaking the title, a second ram on coil two.
+New combat, a snake health bar, a snake death, a second mount, a new flight mode, a stealth minigame, a new zone, a scale puzzle on coil three, an eye stun, a trip home from the eye, fertilizer as a gate, the homestead wound as a gate, a boot home from a missed scale, a new soothe verb, day heals, the giant speaking the title, a second ram on coil two.
