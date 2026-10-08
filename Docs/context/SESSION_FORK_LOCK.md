@@ -10,6 +10,6 @@ Asset is a sitting inside art law, not a rival style. The asset card loads the a
 
 A card points at a settled lock. It follows it. A change to the lock is a new interview, not a sitting in the card.
 
-No fifth fork. No pick means stay in the clarifier.
+The clarifier picks the room. It maps the work to one card and names it. You can correct it. No pick means stay in the clarifier. No fifth fork.
 
-Not in this lock: the card text, the pointer paragraph in SESSION_START, how you name the room.
+Not in this lock: the card text, the pointer paragraph in SESSION_START.
