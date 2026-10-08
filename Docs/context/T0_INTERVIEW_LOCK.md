@@ -9,10 +9,10 @@ Lead answers, 2026-10-07. Not a start read. Open when the task touches T0 scope.
 - Today is shape, not look and not build.
 - The spirit wound sits on the homestead.
 - The plant slot reads as garden, not heal.
-- The rune reads homestead warm.
+- The rune is removed.
 - Island top is split: art bible owns the look, the route owns the meters.
 - Camp clearing is 40 m across.
 - Shrine is twice player height, a standing stone.
 - First desktop prove is Wake.
-- Each zone has a shrine waypoint home. The night shrine and the zone shrine are the same kind of thing. The rune is not a portal. With sleep, it enables the shrine waypoint.
+- Each zone has a shrine waypoint home. The shrine is its own activator. The night shrine and the zone shrine are the same kind of thing. The rune is removed.
 - Shape sheet: `Docs/context/T0_SHAPE_PLAN.md`.

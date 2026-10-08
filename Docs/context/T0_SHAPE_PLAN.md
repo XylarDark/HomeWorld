@@ -20,10 +20,9 @@ First minute: cabin, partner and child present, safe.
 | 3 | `NPC_CHILD` | Present at wake. Not a dialogue tree. |
 | 4 | `NODE_GARDEN` | Plant slot reads as garden, not heal. |
 | 5 | `NODE_WOUND` | Spirit wound. On the homestead. |
-| 6 | `NODE_RUNE` | Form gate. Homestead warm. Not a portal. |
-| 7 | `NODE_SHRINE` | Waypoint. Landmark until sleep and rune are both met. |
+| 6 | `NODE_SHRINE` | Waypoint and its own activator. The rune is removed. |
 
-The rune enables the shrine. Until both gates are met, the shrine does not move the player.
+The shrine does not wait on a rune.
 
 ## Shrine
 
@@ -35,7 +34,7 @@ Clearing is 40 m across. One shrine waypoint on that clearing. Guard sightline s
 
 ## Bull
 
-T0 riding is the barn bull. One barn, one bull. Not a separate mount. The shrine waypoint carries the player and the bull home. The rune does not.
+T0 riding is the barn bull. One barn, one bull. Not a separate mount. The shrine waypoint carries the player and the bull home.
 
 ## Not this chat
 
