@@ -52,7 +52,7 @@ The head heal is the ask. Same heal, on the head, after the eye. No line. No sec
 
 ## End shot
 
-The camera zooms out. You are on the giant's shoulder. The title card reads HomeWorld. He does not speak it.
+Live zoom. No cut. You stay in the shot, on the giant's shoulder. The title card reads HomeWorld on that shot. He does not speak it. The shoulder is not a path you walk.
 
 The rescue is not replayed. The seal sends the player home by the shrine, then they walk to the bed. The bull walks to the barn.
 
@@ -80,9 +80,9 @@ Not lair verbs. A thick fog marks the second forest. A tree boots you back to th
 | Spirit stealth | Past the snake's eye. A catch sets you just outside the light. No stun. No trip home. |
 | Head heal | The ask. Same heal, on the head, after the eye. No line. He takes the snake off. |
 | Pool | A read. The snake is gone. You do not go there. |
-| End shot | Zoom out. Player on his shoulder. Title card reads HomeWorld. He does not speak it. |
+| End shot | Live zoom. You stay on his shoulder. Title on that shot. No cut. Not a path. |
 | Partner, child | Stay home. Child shows the fog lift from the edge. |
 
 ## Not in this lock
 
-New combat, a snake health bar, a snake death, a second mount, a new flight mode, a stealth minigame, a new zone, a pool you can enter, a scale puzzle on coil three, an eye stun, a trip home from the eye, a spoken ask, fertilizer as a gate, the homestead wound as a gate, a boot home from a missed scale, a new soothe verb, day heals, the giant speaking the title, a second ram on coil two.
+New combat, a snake health bar, a snake death, a second mount, a new flight mode, a stealth minigame, a new zone, a pool you can enter, a cut to the title, a shoulder path, a scale puzzle on coil three, an eye stun, a trip home from the eye, a spoken ask, fertilizer as a gate, the homestead wound as a gate, a boot home from a missed scale, a new soothe verb, day heals, the giant speaking the title, a second ram on coil two.
