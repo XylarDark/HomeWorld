@@ -76,3 +76,9 @@ Day glide sign is camp smoke. No pickup.
 Night glide steers like the day glide.
 The wound is healed by giving a night wisp.
 Camp guards are eased until they sleep. No kill.
+
+## Night spends
+
+Two cloud wisps a night. One heals the wound. One makes fertilizer with a dung.
+The partner comes home by the shrine, then walks.
+Three guards. Ease each until they sleep.

@@ -12,7 +12,7 @@ fertilizer, or homestead task. Do not copy its numbers into chat.
 - Plains edge: straight glide only.
 - Homestead: farming, zones, one barn, one bull, fur. T0 riding is that bull.
 - Zone shrine: return home only. Way out is the day glide or the night spirit glide. The rune is removed. Sleep is the bed, and the form change.
-- Camp: the partner is taken. The child stays home. Wound is seen by day and healed at night. Bull ride is field only, then shrine, then walk to the barn.
+- Camp: the partner is taken. The child stays home. Three guards, eased to sleep. Partner returns by shrine, then walks. Two night wisps: one wound, one fertilizer.
 - Yard: day is wake, garden herbs, tea, sprint until dusk, one edge hint, edge. Night is sleep, wound, edge. Day glide reads camp smoke. Night glide steers the same. A night wisp heals the wound and can make fertilizer. Guards are eased to sleep.
 - After the loss, the child waits by the bed. Body may shrine home any time after leaving.
 - Island top: art bible owns the look, this route owns the meters.
