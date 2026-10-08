@@ -79,7 +79,7 @@ The Round 7 questions are answered. Do not ask them again.
 | When does the cave fog lift? | The next dawn after the rescue. The loved one is home. Late or clean, it does not matter. 2026-10-08. |
 | Who shows the fog has lifted? | The child. They are playing near the edge, and if you leave, they find you. The fog is not a secret. 2026-10-08. |
 | When can you enter the cave? | The same dawn the fog lifts. The child shows you. You can glide in that morning. 2026-10-08. |
-| What does the cave ask first? | A look, then the coil. A clue shows you must hit the loose scale with the bull. A shrine at the first coil lets you walk the bull through. The mouth is glider or spirit only, at first. The coil is gated by the bull. The bull works at night, and you need not be spirit. 2026-10-08. |
+| What does the cave ask first? | A look, then the coil. A worn track runs from the shrine at the first coil to the loose scale. No one speaks. The shrine lets you walk the bull through. The mouth is glider or spirit only, at first. The coil is gated by the bull. The bull works at night, and you need not be spirit. 2026-10-08. |
 
 ## Reading boundary
 
