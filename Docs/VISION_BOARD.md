@@ -69,6 +69,7 @@ The Round 7 questions are answered. Do not ask them again.
 | What ends the spirit form? | The bed, or max spirit-sickness. Dawn does not end it. Still out at dawn: stay spirit, gain a stack, move slower. Five stacks, ten seconds apart. The window is tuned so three-quarters of the furthest reach can still make the bed. Distance is not a wall. Only the fifth stack flies you to the bed and into the body. 2026-10-08. |
 | What clears spirit sickness? | Touching the bed. Stacks go to zero even if you do not sleep. Only a late wake carries the slow: if you had stacks, waking applies 15 percent for at most one minute. A clean night has none. 2026-10-08. |
 | How do stacks read? | The body tells them. A drag on the step, a colder scarf, a hitch in the glide. No number, no bar. 2026-10-08. |
+| What does the fifth-stack boot feel like? | A live glide home. You stay on the body. You land at the bed, then you are body. No cut. 2026-10-08. |
 
 ## Reading boundary
 
