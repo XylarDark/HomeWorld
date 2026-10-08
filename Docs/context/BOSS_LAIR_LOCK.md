@@ -38,7 +38,7 @@ Contact, not a fight. No health bar. No death.
 
 Existing shrine portal, or the same glide if you are already spirit. No new flight. The night cap stays two. None are spent on the lair.
 
-Heal the wraps where coil one and coil two were. Between coil two and coil three, the three guards. They fell into a nearby cave and were injured. Heal one wound on each, the same heal, a different woe from the camp sleep-ease. They accept it.
+Heal the wraps where coil one and coil two were. Between coil two and coil three, a side room. The three guards fell into that cave and were injured. You can walk in. That is where you heal one wound on each, the same heal, a different woe from the camp sleep-ease. They accept it. Not a new zone.
 
 They push coil three. They do not kill the snake. After it comes off, heal the wrap under it.
 
@@ -46,7 +46,7 @@ Spirit stealth, the same stealth you already use, takes you past the snake's eye
 
 ## End shot
 
-The camera zooms out. You are on the giant's shoulder. The title reads HomeWorld.
+The camera zooms out. You are on the giant's shoulder. The title card reads HomeWorld. He does not speak it.
 
 The rescue is not replayed. The seal sends the player home by the shrine, then they walk to the bed. The bull walks to the barn.
 
@@ -64,7 +64,8 @@ Not lair verbs. A thick fog marks the second forest. A tree boots you back to th
 |---|---|
 | Bed, sleep | Spirit form. Night entry and the pass by the eye are spirit. The fog reveal is seen on return to bed. |
 | Camp night ease | The three guards already know you. The lair help is a second, different woe. |
-| Three guards | Met between coil two and three. Night: heal a wound on each, then they push coil three. |
+| Side room | The cave they fell from. You heal them there. Not a zone. |
+| Three guards | Night: heal a wound on each in the side room, then they push coil three. |
 | Giant wrap | Night heal, after the coil is already off. |
 | Bull, tamed | Ridden on this lair only. Day: two rams loosen coil one and coil two. |
 | Day glide | The entry. One sign, no pickup, steer into the scary mouth. |
@@ -72,9 +73,9 @@ Not lair verbs. A thick fog marks the second forest. A tree boots you back to th
 | Spirit stealth | The path past the snake's eye. Existing stealth. Not a minigame. |
 | Head heal | The soothe. Same heal, on the head, after the eye. Then the ask. |
 | Speak at the head | Ask him to awaken. He takes the snake off. It falls to the pool. |
-| End shot | Zoom out. Player on his shoulder. Title reads HomeWorld. |
+| End shot | Zoom out. Player on his shoulder. Title card reads HomeWorld. He does not speak it. |
 | Partner, child | Stay home. Child shows the fog lift from the edge. |
 
 ## Not in this lock
 
-New combat, a snake health bar, a snake death, a second mount, a new flight mode, a stealth minigame, fertilizer as a gate, the homestead wound as a gate, a fail punish, a boot home from the forest or the river, a new soothe verb, day heals.
+New combat, a snake health bar, a snake death, a second mount, a new flight mode, a stealth minigame, a new zone, fertilizer as a gate, the homestead wound as a gate, a fail punish, a boot home from the forest or the river, a new soothe verb, day heals, the giant speaking the title.
