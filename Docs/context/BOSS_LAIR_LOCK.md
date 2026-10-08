@@ -10,7 +10,7 @@ One body, many times the player. An Atlas-like sleeper, trapped in a cliffside c
 
 He kneels on both knees. The back-to-head slope is about 30 degrees, so the bull can ride and the player can mostly walk.
 
-Three body coils, then the head bind. A ram loosens coil one. A second ram loosens coil two. The guards push only coil three, and only at night. The head bind is what he rips off. The snake falls to the pool below.
+Three body coils, then the head bind. Coil one comes off a full-speed ram on a loose scale. Coil two comes off a tickle. The guards push only coil three, and only at night. The head bind is what he rips off. The snake falls to the pool below.
 
 A coil comes off first. The wrap under it is healed at night, not when it comes off.
 
@@ -30,7 +30,11 @@ After the field and forest mechanics are done, heavy fog lifts off the cave. You
 
 ## Day
 
-Day is only the two coils. The tamed bull is ridden here only. Two rams loosen coil one and coil two. No heals by day. The ride is this lair only. Everywhere else the bull stays field-only.
+Day is only the two coils. No heals by day. The ride is this lair only. Everywhere else the bull stays field-only.
+
+Coil one. A loose scale is the tell. The snake slides back and forth. Back the bull up, reach full speed, and ram the scale. That moves the coil. A miss stuns the bull for 3 seconds. Then the same run-up. Not a boot home.
+
+Coil two. The loose scale is on the underside. Approach and tickle the sensitive skin. The tickle drops the coil. The ram stays on coil one.
 
 Contact, not a fight. No health bar. No death.
 
@@ -67,7 +71,8 @@ Not lair verbs. A thick fog marks the second forest. A tree boots you back to th
 | Side room | The cave they fell from. You heal them there. Not a zone. |
 | Three guards | Night: heal a wound on each in the side room, then they push coil three. |
 | Giant wrap | Night heal, after the coil is already off. |
-| Bull, tamed | Ridden on this lair only. Day: two rams loosen coil one and coil two. |
+| Bull, tamed | Coil one only. Full-speed ram on the loose scale. A miss stuns it 3 seconds. |
+| Tickle | Coil two. Approach the underside. The tickle drops the coil. |
 | Day glide | The entry. One sign, no pickup, steer into the scary mouth. |
 | Night portal or glide | The return. Existing shrine, or the same glide. No new flight. |
 | Spirit stealth | The path past the snake's eye. Existing stealth. Not a minigame. |
@@ -78,4 +83,4 @@ Not lair verbs. A thick fog marks the second forest. A tree boots you back to th
 
 ## Not in this lock
 
-New combat, a snake health bar, a snake death, a second mount, a new flight mode, a stealth minigame, a new zone, fertilizer as a gate, the homestead wound as a gate, a fail punish, a boot home from the forest or the river, a new soothe verb, day heals, the giant speaking the title.
+New combat, a snake health bar, a snake death, a second mount, a new flight mode, a stealth minigame, a new zone, fertilizer as a gate, the homestead wound as a gate, a boot home from a missed scale, a new soothe verb, day heals, the giant speaking the title, a second ram on coil two.
