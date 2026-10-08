@@ -88,6 +88,12 @@ One fact proposed at a time, one yes from Luke, one write into this file only â€
 - Lead 2026-10-07: the homestead wound is seen by day and healed at night.
 - Lead 2026-10-07: sleep is the bed only.
 
+- Lead 2026-10-07: at wake the partner is by the bed and the child is in the garden.
+- Lead 2026-10-07: the night spirit glide uses the same drop as the day glide.
+- Lead 2026-10-07: the day body can use a shrine to return home.
+- Lead 2026-10-07: you ride the bull through the shrine, then you and the bull walk to the barn.
+- Lead 2026-10-07: day order is wake, kitchen, family, garden, edge. Night order is sleep, wound, edge.
+
 ## Left empty on purpose
 
 - Polish-gate ids and gate-chain order: (empty)

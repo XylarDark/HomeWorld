@@ -22,3 +22,8 @@ Lead answers, 2026-10-07. Not a start read. Open when the task touches T0 scope.
 - The bull ride is field only.
 - The homestead wound is seen by day and healed at night.
 - Sleep is the bed only.
+- at wake the partner is by the bed and the child is in the garden.
+- the night spirit glide uses the same drop as the day glide.
+- the day body can use a shrine to return home.
+- you ride the bull through the shrine, then you and the bull walk to the barn.
+- day order is wake, kitchen, family, garden, edge. Night order is sleep, wound, edge.

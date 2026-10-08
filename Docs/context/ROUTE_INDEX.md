@@ -12,7 +12,8 @@ fertilizer, or homestead task. Do not copy its numbers into chat.
 - Plains edge: straight glide only.
 - Homestead: farming, zones, one barn, one bull, fur. T0 riding is that bull.
 - Zone shrine: return home only. Way out is the day glide or the night spirit glide. The rune is removed. Sleep is the bed, and the form change.
-- Camp: the partner is taken. The child stays home. Wound is seen by day and healed at night. Bull ride is field only.
+- Camp: the partner is taken. The child stays home. Wound is seen by day and healed at night. Bull ride is field only, then shrine, then walk to the barn.
+- Yard: day is wake, kitchen, family, garden, edge. Night is sleep, wound, edge. Same drop both glides.
 - Island top: art bible owns the look, this route owns the meters.
 - Gather: pool takes, no cooldown, dawn brings nothing back.
 - Polish: red rows only, stage name stays polish.

@@ -47,3 +47,11 @@ Desktop Wake prove. Placing actors in the level. Promoting art into `Content/`. 
 - Bull ride is field only.
 - `NODE_WOUND` is seen by day and healed at night.
 - Sleep is `NODE_BED` only.
+
+## Yard order
+
+Day: wake, kitchen, family, garden, edge.
+Night: sleep, wound, edge.
+Partner stands by the bed. Child stands in the garden.
+The day body may take the shrine home. The night spirit glide uses the same drop as the day glide.
+Ride the bull through the shrine, then walk with the bull to the barn.
