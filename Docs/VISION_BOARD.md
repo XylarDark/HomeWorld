@@ -67,7 +67,7 @@ The Round 7 questions are answered. Do not ask them again.
 | Shrine height and silhouette | Twice player height. A standing stone. |
 | What grants the spirit form? | The bed alone. Sleep is the form change. No rune, no second gate. Night does not grant it. 2026-10-08. |
 | What ends the spirit form? | The bed, or max spirit-sickness. Dawn does not end it. Still out at dawn: stay spirit, gain a stack, move slower. Five stacks, ten seconds apart. The window is tuned so three-quarters of the furthest reach can still make the bed. Distance is not a wall. Only the fifth stack flies you to the bed and into the body. 2026-10-08. |
-| What clears spirit sickness? | Touching the bed. Stacks go to zero even if you do not sleep. The 15 percent slow starts when you wake up, and it lasts at most one minute. 2026-10-08. |
+| What clears spirit sickness? | Touching the bed. Stacks go to zero even if you do not sleep. Only a late wake carries the slow: if you had stacks, waking applies 15 percent for at most one minute. A clean night has none. 2026-10-08. |
 
 ## Reading boundary
 
