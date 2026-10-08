@@ -1,6 +1,6 @@
 # Hand-back
 
-Open this file only when Lead says `mode: co — hand back`. The door keeps the trigger. This file is the payload.
+Open this file when the session is Co and the message says hand back. The door keeps the trigger. `mode: co — hand back` is that message. This file is the payload.
 
 The session switches to Co mode if it is not already, says `mode: co (hand back)`, and writes one message that starts with `HANDBACK to HomeWorld Co`. Lead pastes that message into the room. It holds, in this order:
 

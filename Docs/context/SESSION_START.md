@@ -5,19 +5,19 @@ The one start door. Any IDE, chat, CLI, or agent runner. If a capability is miss
 ## Mode
 
 1. Start in solo mode. `HANDOFF from HomeWorld Co` or `mode: co` switches to Co. `mode: solo` switches back.
-2. First message header, once: `Mode: solo · State: agent`. Restate only when mode or state changes.
+2. First message header, once: `Mode: <solo or co> · State: <agent, decide, or do>`. Name the real mode and the real state. Restate only when either changes.
 3. State is `agent`, `decide`, or `do`. Name it before acting.
 4. Open `Docs/context/DOOR_RULES.md` with the task.
 
 ## Context loss
 
-Re-read only this file, restate the header once, and do not re-run the start question.
+Re-read only this file, restate the header once, and do not re-run the clarifier.
 
 ## Read order
 
 One file per step. Wait for it before the next read.
 
-1. `UserHarness/docs/human-use/route-context.md` — whole file. It wins on the close order.
+1. `UserHarness/docs/human-use/route-context.md` — through `## How to detect the state` only. Stop before `## Session close`.
 2. `Docs/context/ROUTE_INDEX.md`
 
 Open only when the task needs it: `Docs/WORLD_METRICS.md` for a number; `Docs/level/L_VS_MVP_Markers_manifest.json` for level data (read `counts.actors` and `completeness.verdict` there; do not copy them here); `Docs/COMMANDS_AND_LOG_TAGS.md` for a console command or log tag.
@@ -27,7 +27,8 @@ Open only when the task needs it: `Docs/WORLD_METRICS.md` for a number; `Docs/le
 | Fix | Search `docs/KNOWN_ERRORS.md` for the symptom. Matching entries only, never the whole file. Level-data fixes use the manifest above as the actor scan. If it is missing, scan the level actors this session first. |
 | Descent, gather, fertilizer, or homestead | `Docs/context/HOMEWORLD_ROUTE.md` |
 | Route, placeable, merge, or level | `Docs/context/LEVEL_RULES.md` |
-| Hand back | `Docs/context/HANDBACK.md` only for `mode: co — hand back` |
+| T0 scope | `Docs/context/T0_INTERVIEW_LOCK.md` |
+| Hand back | `Docs/context/HANDBACK.md` when the session is Co and the message says hand back |
 
 ## Ending the reads
 
@@ -45,6 +46,6 @@ Before the first edit, run `git status --short` once. Stop and report uncommitte
 
 No tutorial is on offer yet. Offer `Docs/qa/HUMAN_TUTORIAL.md` only once it is committed and `Content/Python/human_tutorial.py --check` exits 0. Until then, step 3 names the next manual step in one line.
 
-The state file wins on the close order. This file wins on mode, the read list, and the clarifier. Do not wait on a UserHarness SHA.
+This file wins on the close order. It also wins on mode, the read list, and the clarifier. Do not wait on a UserHarness SHA.
 
 An unrelated second task: alert and stop.

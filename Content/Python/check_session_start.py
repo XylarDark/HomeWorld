@@ -44,6 +44,7 @@ QUESTION_GATE = ("one typed clarifier",)
 NAMED_ON_DEMAND = (
     "Docs/context/HANDBACK.md",
     "Docs/context/LEVEL_RULES.md",
+    "Docs/context/T0_INTERVIEW_LOCK.md",
 )
 
 
@@ -63,8 +64,10 @@ def main() -> int:
             problems.append(f"read path not named in the door: {rel}")
     if "HOMEWORLD_ROUTE.md" not in text:
         problems.append("door does not name the full route for descent, gather, or fertilizer")
-    if "whole file" not in text or "wins on the close order" not in text:
-        problems.append("door does not say the state file is read whole and wins on close")
+    if "How to detect the state" not in text or "Stop before" not in text:
+        problems.append("door does not stop the state-file read before its close section")
+    if "wins on the close order" not in text or "The state file wins" in text:
+        problems.append("door does not keep the close order")
     rules = (ROOT / "Docs/context/DOOR_RULES.md").read_text(encoding="utf-8") if (ROOT / "Docs/context/DOOR_RULES.md").is_file() else ""
     if "DOOR_RULES.md" not in text:
         problems.append("door does not name DOOR_RULES.md")
