@@ -77,7 +77,7 @@ The Round 7 questions are answered. Do not ask them again.
 | How does the scarf read the stacks? | Five steps colder, one per stack. The slow stays a flat 15 percent. You can count without a number. 2026-10-08. |
 | Can the fifth stack interrupt? | Yes. It starts the glide at once, even mid-ease. The beat stays. You return and finish. The interrupt costs time, not progress. 2026-10-08. |
 | When does the cave fog lift? | The next dawn after the rescue. The loved one is home. Late or clean, it does not matter. 2026-10-08. |
-| Who shows the fog has lifted? | The child, playing near the edge. You do not discover it alone. 2026-10-08. |
+| Who shows the fog has lifted? | The child. They are playing near the edge, and if you leave, they find you. The fog is not a secret. 2026-10-08. |
 
 ## Reading boundary
 
