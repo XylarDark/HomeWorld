@@ -78,6 +78,7 @@ The Round 7 questions are answered. Do not ask them again.
 | Can the fifth stack interrupt? | Yes. It starts the glide at once, even mid-ease. The beat stays. You return and finish. The interrupt costs time, not progress. 2026-10-08. |
 | When does the cave fog lift? | The next dawn after the rescue. The loved one is home. Late or clean, it does not matter. 2026-10-08. |
 | Who shows the fog has lifted? | The child. They are playing near the edge, and if you leave, they find you. The fog is not a secret. 2026-10-08. |
+| When can you enter the cave? | The same dawn the fog lifts. The child shows you. You can glide in that morning. 2026-10-08. |
 
 ## Reading boundary
 
