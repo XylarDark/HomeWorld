@@ -75,6 +75,9 @@ One fact proposed at a time, one yes from Luke, one write into this file only â€
 - Neutral glide speed is two thirds of the first jump's neutral glide speed. It is a placeholder until human testing.
 - No meter height is written for the night flight.
 
+- Lead 2026-10-07: the art bible owns how the island top looks. This file owns the meters. A look change does not move the drop. A route change does not pick the materials.
+- Lead 2026-10-07: T0 riding is the barn bull. It is not a separate mount.
+
 ## Left empty on purpose
 
 - Polish-gate ids and gate-chain order: (empty)
