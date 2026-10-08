@@ -5,6 +5,7 @@
 | Status | OPEN. Human sitting. No Lead stamp. |
 | Date | 2026-10-08 |
 | Briefs | [PROTOTYPE_ASSET_BRIEFS.md](PROTOTYPE_ASSET_BRIEFS.md) |
+| Notes | [VISUAL_NOTES_FOR_GENERATION.md](VISUAL_NOTES_FOR_GENERATION.md) |
 | Lair shape | [../context/BOSS_LAIR_LOCK.md](../context/BOSS_LAIR_LOCK.md) |
 | Policy | Do not promote a generated mesh into `Content/`. [../20_UASSET_AI_POLICY.md](../20_UASSET_AI_POLICY.md) |
 
@@ -12,8 +13,8 @@ Check a box only when that step's pass bar is true. Do not skip ahead. Stop the 
 
 ## How to run one step
 
-1. Paste the prompt from the briefs file. Add: faceted semi-polygon, detail on the planes, cartoon fantasy, warm handmade, not photoreal, not a toy, not grim, small player for scale, plain background, no text.
-2. Reject the image if the silhouette fails as a thumbnail. Generate again. Do not mesh a failed image.
+1. Paste the prompt from the briefs file. Append the paste block from the notes file. Every time.
+2. Reject the image if the silhouette fails as a thumbnail, or if a priority note fails (size, planetoid, calm, no text). Generate again. Do not mesh a failed image.
 3. Image to mesh. Tripo for a draft. Meshy if you want a budgeted stylized mesh. Rodin only for a close still.
 4. Blender hand pass: texture off, silhouette holds, facet planes, pivot at the contact, scale applied, no baked light, box collision, name from the briefs.
 5. Look at it close, and from about 20 feet. Same mesh. Do not rescale.
