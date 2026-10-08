@@ -8,6 +8,8 @@ A card is short. It names the job, the docs to open, the docs to leave closed, t
 
 Asset is a sitting inside art law, not a rival style. The asset card loads the art bible, then the track.
 
+A card points at a settled lock. It follows it. A change to the lock is a new interview, not a sitting in the card.
+
 No fifth fork. No pick means stay in the clarifier.
 
-Not in this lock: the card text, the pointer paragraph in SESSION_START, whether a card may reopen a settled lock.
+Not in this lock: the card text, the pointer paragraph in SESSION_START, how you name the room.
