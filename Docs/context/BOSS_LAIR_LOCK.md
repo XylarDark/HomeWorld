@@ -10,7 +10,7 @@ One body, many times the player. An Atlas-like sleeper, trapped in a cliffside c
 
 He kneels on both knees. The back-to-head slope is about 30 degrees, so the bull can ride and the player can mostly walk.
 
-Three body coils, then the head bind. A ram loosens coil one. A second ram loosens coil two. The guards help only coil three. The head bind is what he rips off.
+Three body coils, then the head bind. A ram loosens coil one. A second ram loosens coil two. The guards push only coil three, and only at night. The head bind is what he rips off.
 
 A coil comes off first. Then you heal the giant where that coil was wrapped.
 
@@ -32,7 +32,7 @@ After the field and forest mechanics are done, heavy fog lifts off the cave. You
 
 The tamed bull is ridden here only. Two rams loosen coil one and coil two. After each coil comes off, heal the wrap under it. The ride is this lair only. Everywhere else the bull stays field-only.
 
-Between coil two and coil three, the three guards. They fell into a nearby cave and were injured. Heal one wound on each, the same heal, a different woe from the camp sleep-ease. They accept it. They help only the third coil.
+Between coil two and coil three, the three guards. They fell into a nearby cave and were injured. Heal one wound on each, the same heal, a different woe from the camp sleep-ease. They accept it. They do not push coil three by day.
 
 Contact, not a fight. No health bar. No death.
 
@@ -40,9 +40,9 @@ Contact, not a fight. No health bar. No death.
 
 Existing shrine portal, or the same glide if you are already spirit. No new flight. The night cap stays two. None are spent on the lair.
 
-The same three guards recognize you. They help coil three. They do not kill the snake.
+The same three guards recognize you. They push coil three. They do not kill the snake. After it comes off, heal the wrap under it.
 
-You soothe the giant's mind. Spirit stealth takes you past the snake's eye, outside its light. At the head you tell him he can wake. He rips off the head bind. The snake is cast off.
+Spirit stealth takes you past the snake's eye, outside its light. Soothe is the same heal, on the head, after the eye. Then you tell him he can wake. He rips off the head bind. The snake is cast off.
 
 ## Family
 
@@ -58,12 +58,13 @@ Not lair verbs. A thick fog marks the second forest. A tree boots you back to th
 |---|---|
 | Bed, sleep | Spirit form. Night entry and the pass by the eye are spirit. The fog reveal is seen on return to bed. |
 | Camp night ease | The three guards already know you. The lair help is a second, different woe. |
-| Three guards | Met between coil two and three. Heal a wound on each. They help only coil three. |
+| Three guards | Met between coil two and three. Day: heal a wound on each. Night: they push coil three. |
 | Giant wrap | Heal where a coil was, after that coil comes off. |
 | Bull, tamed | Ridden on this lair only. Two rams loosen coil one and coil two. |
 | Day glide | The entry. One sign, no pickup, steer into the scary mouth. |
 | Night portal or glide | The return. Existing shrine, or the same glide. No new flight. |
 | Spirit stealth | The path past the snake's eye. |
+| Head heal | The soothe. Same heal, on the head, after the eye. Then the wake. |
 | Speak at the head | The wake. He rips off the head bind. |
 | Partner, child | Stay home. Child shows the fog lift from the edge. |
 
@@ -73,4 +74,4 @@ The win is a wake, not a kill. The snake is cast off. The rescue is not replayed
 
 ## Not in this lock
 
-New combat, a snake health bar, a snake death, a second mount, a new flight mode, fertilizer as a gate, the homestead wound as a gate, a fail punish, a boot home from the forest or the river.
+New combat, a snake health bar, a snake death, a second mount, a new flight mode, fertilizer as a gate, the homestead wound as a gate, a fail punish, a boot home from the forest or the river, a new soothe verb.
