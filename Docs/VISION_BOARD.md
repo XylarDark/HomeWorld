@@ -66,6 +66,7 @@ The Round 7 questions are answered. Do not ask them again.
 | Camp clearing size | The interview lock. |
 | Shrine height and silhouette | Twice player height. A standing stone. |
 | What grants the spirit form? | The bed alone. Sleep is the form change. No rune, no second gate. Night does not grant it. 2026-10-08. |
+| What ends the spirit form? | The bed, or max spirit-sickness. Dawn does not end it. Still out at dawn: stay spirit, gain a stack, move slower. Max stacks flies you to the bed and into the body. 2026-10-08. |
 
 ## Reading boundary
 
