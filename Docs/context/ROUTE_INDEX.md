@@ -11,6 +11,7 @@ fertilizer, or homestead task. Do not copy its numbers into chat.
 - Night flight: height and speed as ratios, not first flight.
 - Plains edge: straight glide only.
 - Homestead: farming, zones, one barn, one bull, fur. T0 riding is that bull.
+- Zone return: a rune portal in each zone, home only. Not the night shrine.
 - Island top: art bible owns the look, this route owns the meters.
 - Gather: pool takes, no cooldown, dawn brings nothing back.
 - Polish: red rows only, stage name stays polish.

@@ -78,6 +78,8 @@ One fact proposed at a time, one yes from Luke, one write into this file only â€
 - Lead 2026-10-07: the art bible owns how the island top looks. This file owns the meters. A look change does not move the drop. A route change does not pick the materials.
 - Lead 2026-10-07: T0 riding is the barn bull. It is not a separate mount.
 
+- Lead 2026-10-07: each zone has a return portal to the homestead. The rune is that return, for the player and for the tamed bull. It is not the night shrine link.
+
 ## Left empty on purpose
 
 - Polish-gate ids and gate-chain order: (empty)
