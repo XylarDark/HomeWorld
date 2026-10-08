@@ -71,6 +71,7 @@ The Round 7 questions are answered. Do not ask them again.
 | How do stacks read? | The body tells them. A drag on the step, a colder scarf, a hitch in the glide. No number, no bar. 2026-10-08. |
 | What does the fifth-stack boot feel like? | A live glide home. You stay on the body. You land at the bed, then you are body. No cut. 2026-10-08. |
 | Who teaches the dawn rule? | The child, in one line, before the first night out. The bed and the dawn. Then the rule is live. 2026-10-08. |
+| Does a late wake change the homestead? | No. The place stays warm. The slow is the body alone. 2026-10-08. |
 
 ## Reading boundary
 
