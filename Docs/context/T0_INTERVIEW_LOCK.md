@@ -39,3 +39,6 @@ Lead answers, 2026-10-07. Not a start read. Open when the task touches T0 scope.
 - the homestead wound is healed by giving a night wisp.
 - the night spirit glide uses the same steer as the day glide.
 - at the camp, ease the guards until they sleep. No kill.
+- two cloud wisps a night. One heals the homestead wound. One makes fertilizer with a dung.
+- the partner comes home by the shrine return, then walks. Same return as the bull.
+- the camp has three guards. Ease each until they sleep.

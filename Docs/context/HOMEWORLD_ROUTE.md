@@ -109,6 +109,10 @@ One fact proposed at a time, one yes from Luke, one write into this file only â€
 - Lead 2026-10-07: the night spirit glide uses the same steer as the day glide.
 - Lead 2026-10-07: at the camp, ease the guards until they sleep. No kill.
 
+- Lead 2026-10-07: two cloud wisps a night. One heals the homestead wound. One makes fertilizer with a dung.
+- Lead 2026-10-07: the partner comes home by the shrine return, then walks. Same return as the bull.
+- Lead 2026-10-07: the camp has three guards. Ease each until they sleep.
+
 ## Left empty on purpose
 
 - Polish-gate ids and gate-chain order: (empty)
