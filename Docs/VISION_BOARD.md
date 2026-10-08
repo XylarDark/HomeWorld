@@ -65,6 +65,7 @@ The Round 7 questions are answered. Do not ask them again.
 | Family silhouette and night valley materials | Remap both onto the ten masters. 2026-10-08. |
 | Camp clearing size | The interview lock. |
 | Shrine height and silhouette | Twice player height. A standing stone. |
+| What grants the spirit form? | The bed alone. Sleep is the form change. No rune, no second gate. Night does not grant it. 2026-10-08. |
 
 ## Reading boundary
 
