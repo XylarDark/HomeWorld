@@ -73,7 +73,7 @@ Sun and LandingDay transforms are unchanged. Recorded in
    two walkable forests without the camp. Cliff streams on the upgraded glider.
    River streams on the boat. Camp still pins only at the forest asset boundary.
    Night spirit traversal of those edges is open. See docs/39.
-6. Blend: `02_Forest`/`06_Camp` kit meshes parked +10000 m on X (interview #17). PR pending.
+6. Blend: `02_Forest`/`06_Camp` kit meshes parked +10000 m on X (interview #17). Merged as `a595235`.
 7. Then: camp art image→blockout pass (deferred), prove scripts M8/M10–M14
    against generated geometry (GATE 3), six `NO_VERDICT` prove runs.
 

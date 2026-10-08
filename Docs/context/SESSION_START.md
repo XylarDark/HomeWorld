@@ -45,6 +45,6 @@ Before the first edit, run `git status --short` once. Stop and report uncommitte
 
 No tutorial is on offer yet. Offer `Docs/qa/HUMAN_TUTORIAL.md` only once it is committed and `Content/Python/human_tutorial.py --check` exits 0. Until then, step 3 names the next manual step in one line.
 
-This file wins where it differs from `route-context.md`. Do not wait on a UserHarness SHA.
+The state file wins on the close order. This file wins on mode, the read list, and the clarifier. Do not wait on a UserHarness SHA.
 
 An unrelated second task: alert and stop.

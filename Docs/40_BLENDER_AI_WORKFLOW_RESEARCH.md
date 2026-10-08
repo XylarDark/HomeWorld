@@ -38,7 +38,7 @@ For a HomeWorld `SM_` prop, the origin stays on the ground-contact point in the 
 
 A readable kit name says which kit, which connection, which variant: `SM_KitWarehouse_WallStraight_01` is the pattern one pipeline writeup uses. [Modular Prop Kits for Games](https://nastyrodent.com/modular-prop-kits-for-games/). HomeWorld already uses `SM_`, `UCX_`, `M_`, `SOCKET_`, `CAM_`, `CRUMB_` with the same string in Blender and in UE (`docs/04_EXPORT_TABLE.md`).
 
-A collection is a bag of objects, not a single kind of object. `02_Forest` currently holds kit meshes and the planet day lights. The export table already sends `07_Night_SpiritLayer` to lighting, not to a mesh FBX. Mesh kits and light rigs should not share a collection if an agent is allowed to move "the collection."
+A collection is a bag of objects, not a single kind of object. The planet day lights (`LIT_Planet_Sun`, `LIT_Planet_Fill`, `LIT_LandingDay`) are in `09_Planet_Day`, not in `02_Forest` (interview #19). The export table already sends `07_Night_SpiritLayer` to lighting, not to a mesh FBX. Mesh kits and light rigs should not share a collection if an agent is allowed to move "the collection."
 
 ### LODs and collision
 

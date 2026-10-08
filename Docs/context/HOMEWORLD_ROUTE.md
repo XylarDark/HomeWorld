@@ -75,6 +75,40 @@ One fact proposed at a time, one yes from Luke, one write into this file only â€
 - Neutral glide speed is two thirds of the first jump's neutral glide speed. It is a placeholder until human testing.
 - No meter height is written for the night flight.
 
+- Lead 2026-10-07: the art bible owns how the island top looks. This file owns the meters. A look change does not move the drop. A route change does not pick the materials.
+- Lead 2026-10-07: T0 riding is the barn bull. It is not a separate mount.
+
+- Lead 2026-10-07: the rune is removed. Each zone has a shrine, and that shrine is the waypoint home and its own activator. The night shrine and the zone shrine are the same kind of thing.
+
+- Lead 2026-10-07: sleep is the form change. It is what lets the player become spirit. At night the shrine can be traversed only in spirit form.
+
+- Lead 2026-10-07: the partner is taken at the camp. The child stays at the homestead.
+- Lead 2026-10-07: the shrine is a return teleport home. The way out is the glide by day and the spirit glide by night. This revises the night-only traverse line: the shrine does not carry you to a zone.
+- Lead 2026-10-07: the bull ride is field only.
+- Lead 2026-10-07: the homestead wound is seen by day and healed at night.
+- Lead 2026-10-07: sleep is the bed only.
+
+- Lead 2026-10-07: at wake the partner is by the bed and the child is in the garden.
+- Lead 2026-10-07: the night spirit glide uses the same drop as the day glide.
+- Lead 2026-10-07: the day body can use a shrine to return home.
+- Lead 2026-10-07: you ride the bull through the shrine, then you and the bull walk to the barn.
+- Lead 2026-10-07: day order is wake, kitchen, family, garden, edge. Night order is sleep, wound, edge.
+
+- Lead 2026-10-07: day order is revised. Wake, pick herbs in the garden, walk inside, make tea, unlock the day sprint, then family, then edge. The kitchen-before-garden line is superseded.
+- Lead 2026-10-07: cloud wisps are collected only at night. The day glide is only a glide. This revises the day wisp-on-the-way-down line.
+- Lead 2026-10-07: the body may take a shrine home any time after leaving.
+- Lead 2026-10-07: after the partner is taken, the child waits by the bed.
+
+- Lead 2026-10-07: the day glide reads the camp heading. One sign on the way down. No pickup.
+- Lead 2026-10-07: tea unlocks a faster walk until dusk.
+- Lead 2026-10-07: the family beat is one hint toward the edge. Not a dialogue tree.
+- Lead 2026-10-07: night fertilizer is still one dung plus one cloud wisp. The wisp is collected only at night.
+
+- Lead 2026-10-07: the day glide sign is smoke from the camp. No pickup.
+- Lead 2026-10-07: the homestead wound is healed by giving a night wisp.
+- Lead 2026-10-07: the night spirit glide uses the same steer as the day glide.
+- Lead 2026-10-07: at the camp, ease the guards until they sleep. No kill.
+
 ## Left empty on purpose
 
 - Polish-gate ids and gate-chain order: (empty)
