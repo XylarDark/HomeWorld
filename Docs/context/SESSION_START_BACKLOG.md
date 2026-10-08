@@ -21,10 +21,10 @@ Ranked by payoff. Each item is a small, one-file change to
   intake question, ask instead: "what's the one thing the player does in
   minute one?"
 
-- [x] **Spirit-wound wisp payoff** — superseded by the later 2026-10-07 lock.
-  Two night wisps: one heals the homestead wound, one mixes fertilizer with a
-  dung. The night-flight spread is parked. See `Docs/TaskLists/T0_FIRST_LOOP_NOW.md`
-  Parked and `HOMEWORLD_ROUTE.md` Recorded.
+- [x] **Spirit-wound wisp payoff** — Lead 2026-10-08: the spread is the night
+  flight. Two cloud wisps stay the cap. One heals the wound and those wisps are
+  the flight. One mixes with a dung, and the player spreads that mix. No morning
+  pile. See `HOMEWORLD_ROUTE.md` Recorded.
 
 Done:
 

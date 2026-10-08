@@ -1579,10 +1579,6 @@ bool AHomeWorldCharacter::TryGiveNightWispToWound()
 
 bool AHomeWorldCharacter::TryAddCarriedDung()
 {
-	if (bIsSpiritForm)
-	{
-		return false;
-	}
 	++CarriedDung;
 	UE_LOG(LogTemp, Log, TEXT("FERTILIZER: carried dung +1"));
 	return true;
@@ -1598,7 +1594,26 @@ bool AHomeWorldCharacter::TryMixHomesteadFertilizer()
 	--CarriedDung;
 	--CarriedCloudWisps;
 	++CarriedFertilizer;
-	UE_LOG(LogTemp, Log, TEXT("FERTILIZER: mixed one (spread is not this verb)"));
+	UE_LOG(LogTemp, Log, TEXT("FERTILIZER: mixed one"));
+	return true;
+}
+
+bool AHomeWorldCharacter::TrySpreadFertilizerOnNightFlight()
+{
+	UWorld* World = GetWorld();
+	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World ? World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>() : nullptr;
+	if (!TimeOfDay || !TimeOfDay->GetIsNight() || !bIsSpiritForm)
+	{
+		UE_LOG(LogTemp, Log, TEXT("FERTILIZER: spread skipped - night spirit flight only"));
+		return false;
+	}
+	if (!bHomesteadWoundHealed || CarriedFertilizer < 1)
+	{
+		UE_LOG(LogTemp, Log, TEXT("FERTILIZER: spread skipped - need the healed wound flight and one mix"));
+		return false;
+	}
+	--CarriedFertilizer;
+	UE_LOG(LogTemp, Log, TEXT("FERTILIZER: spread over field herb sites (no morning pile, no third wisp)"));
 	return true;
 }
 

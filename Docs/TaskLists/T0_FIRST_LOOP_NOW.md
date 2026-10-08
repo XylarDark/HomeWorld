@@ -41,13 +41,13 @@ Items 1–6 and 8–9 are C++ plus automation tests. Item 7 is the same, on the 
 
 ## After this list
 
-When 1–9 are in and their tests have been run, place the named yard actors from `T0_SHAPE_PLAN.md` with the editor. Open `Docs/level/L_VS_MVP_Markers_manifest.json` first and use it as the actor scan. That pass is a separate session.
+Items 1–9 are done. The next queue is `Docs/TaskLists/T0_NEXT_QUEUE.md`.
 
 ## Parked
 
 These are real, and they are not items here.
 
-- Fertilizer after the mix. One recorded line spawns a morning herb pile per dung. A later line says the player spreads dung plus wisp over field herb sites on a night flight buff. The mix in item 6 is locked. The spread is not.
+- Fertilizer after the mix. Answered 2026-10-08: the player spreads it on the night flight. The work is in `Docs/TaskLists/T0_NEXT_QUEUE.md`.
 - The words of the family hint, past the lock’s “one hint toward the edge.”
 - Meshes, materials, shrine silhouette, and promoting art into `Content/`.
 - Desktop Wake prove. Luke plays that.

@@ -33,7 +33,7 @@ Open only when the task needs it: `Docs/WORLD_METRICS.md` for a number; `Docs/le
 
 ## Ending the reads
 
-A named task (verb + game thing + outcome) gets a one-line plan, then work. A recorded queue of agent-owned items runs until a decide, a do, or a second fail on the same writer. One change, one run, then stop applies to a task that is still unknown. A topic (no verb or no outcome) gets one typed clarifier, then proceeds as named. A dream (no system, or a pure idea) asks, one at a time: what it is; what the first minute should feel like; whether today is look, shape, or build. Or draft a short concept paragraph for a redline — that paragraph is the brief. Dream work reads `Docs/VISION_BOARD.md` and waits for a yes. A topic or dream mid-task drops back to the clarifier.
+A named task (verb + game thing + outcome) gets a one-line plan, then work. A recorded queue of agent-owned items runs until a decide, a do, or a second fail on the same writer. A missing tool blocks only that item: say so, do not invent a substitute, and continue the queue. When Luke has said to run that queue, that is the yes for the level items it names. One change, one run, then stop applies to a task that is still unknown. A topic (no verb or no outcome) gets one typed clarifier, then proceeds as named. A dream (no system, or a pure idea) asks, one at a time: what it is; what the first minute should feel like; whether today is look, shape, or build. Or draft a short concept paragraph for a redline — that paragraph is the brief. Dream work reads `Docs/VISION_BOARD.md` and waits for a yes. A topic or dream mid-task drops back to the clarifier.
 
 Other doors are not start reads. Open one only when it is named, or when the question shows it is needed.
 

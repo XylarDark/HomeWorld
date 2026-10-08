@@ -17,7 +17,7 @@
     "external_actor_dir_exists": false
   },
   "completeness": {
-    "actors_enumerated": 103,
+    "actors_enumerated": 110,
     "external_actor_files": 0,
     "verdict": "complete: the level has no external actor files, so every actor is inline in the .umap and an inline enumeration cannot have missed a cell"
   },
@@ -37,15 +37,15 @@
     "max": {
       "x": 60750.0,
       "y": 26450.0,
-      "z": 807.5
+      "z": 1590.0
     }
   },
   "counts": {
-    "actors": 103,
-    "actors_with_bounds": 85,
-    "actors_without_bounds": 18,
+    "actors": 110,
+    "actors_with_bounds": 97,
+    "actors_without_bounds": 13,
     "classes": 11,
-    "positioned": 103
+    "positioned": 110
   },
   "spanning_containers_excluded": [
     "DRESS_SM_Planet_GroundPlate"
@@ -93,7 +93,7 @@
     },
     {
       "class": "TargetPoint",
-      "count": 25
+      "count": 32
     }
   ],
   "actors": [
@@ -109,9 +109,35 @@
         "y": 750.0,
         "z": 280.0
       },
-      "bounds": null,
-      "container_coverage": 0.0,
-      "under": []
+      "bounds": {
+        "origin": {
+          "x": -50.0,
+          "y": 750.0,
+          "z": 280.0
+        },
+        "extent": {
+          "x": 1010.0,
+          "y": 1010.0,
+          "z": 1010.0
+        },
+        "min": {
+          "x": -1060.0,
+          "y": -260.0,
+          "z": -730.0
+        },
+        "max": {
+          "x": 960.0,
+          "y": 1760.0,
+          "z": 1290.0
+        },
+        "volume": 8242408000.0
+      },
+      "container_coverage": 0.3364,
+      "under": [
+        "CAM_GlideDepart",
+        "CAM_Hero",
+        "CAM_PortalNight"
+      ]
     },
     {
       "label": "CAM_GlideDepart",
@@ -125,9 +151,33 @@
         "y": 650.0,
         "z": 350.0
       },
-      "bounds": null,
-      "container_coverage": 0.0,
-      "under": []
+      "bounds": {
+        "origin": {
+          "x": 850.0,
+          "y": 650.0,
+          "z": 350.0
+        },
+        "extent": {
+          "x": 1010.0,
+          "y": 1010.0,
+          "z": 1010.0
+        },
+        "min": {
+          "x": -160.0,
+          "y": -360.0,
+          "z": -660.0
+        },
+        "max": {
+          "x": 1860.0,
+          "y": 1660.0,
+          "z": 1360.0
+        },
+        "volume": 8242408000.0
+      },
+      "container_coverage": 0.1818,
+      "under": [
+        "CAM_CabinClose"
+      ]
     },
     {
       "label": "CAM_Hero",
@@ -141,9 +191,34 @@
         "y": 400.0,
         "z": 580.0
       },
-      "bounds": null,
-      "container_coverage": 0.0,
-      "under": []
+      "bounds": {
+        "origin": {
+          "x": -900.0,
+          "y": 400.0,
+          "z": 580.0
+        },
+        "extent": {
+          "x": 1010.0,
+          "y": 1010.0,
+          "z": 1010.0
+        },
+        "min": {
+          "x": -1910.0,
+          "y": -610.0,
+          "z": -430.0
+        },
+        "max": {
+          "x": 110.0,
+          "y": 1410.0,
+          "z": 1590.0
+        },
+        "volume": 8242408000.0
+      },
+      "container_coverage": 0.3727,
+      "under": [
+        "CAM_CabinClose",
+        "CAM_PortalNight"
+      ]
     },
     {
       "label": "CAM_LandingDay",
@@ -157,8 +232,30 @@
         "y": 6200.0,
         "z": -7000.0
       },
-      "bounds": null,
-      "container_coverage": 0.0,
+      "bounds": {
+        "origin": {
+          "x": -600.0,
+          "y": 6200.0,
+          "z": -7000.0
+        },
+        "extent": {
+          "x": 1010.0,
+          "y": 1010.0,
+          "z": 1010.0
+        },
+        "min": {
+          "x": -1610.0,
+          "y": 5190.0,
+          "z": -8010.0
+        },
+        "max": {
+          "x": 410.0,
+          "y": 7210.0,
+          "z": -5990.0
+        },
+        "volume": 8242408000.0
+      },
+      "container_coverage": 0.2182,
       "under": []
     },
     {
@@ -173,9 +270,34 @@
         "y": -20.0,
         "z": 170.0
       },
-      "bounds": null,
-      "container_coverage": 0.0,
-      "under": []
+      "bounds": {
+        "origin": {
+          "x": -200.0,
+          "y": -20.0,
+          "z": 170.0
+        },
+        "extent": {
+          "x": 1010.0,
+          "y": 1010.0,
+          "z": 1010.0
+        },
+        "min": {
+          "x": -1210.0,
+          "y": -1030.0,
+          "z": -840.0
+        },
+        "max": {
+          "x": 810.0,
+          "y": 990.0,
+          "z": 1180.0
+        },
+        "volume": 8242408000.0
+      },
+      "container_coverage": 0.4455,
+      "under": [
+        "CAM_CabinClose",
+        "CAM_Hero"
+      ]
     },
     {
       "label": "GP_BeastPad",
@@ -194,7 +316,9 @@
       },
       "bounds": null,
       "container_coverage": 0.0,
-      "under": []
+      "under": [
+        "CAM_LandingDay"
+      ]
     },
     {
       "label": "NODE_CAPTIVE",
@@ -234,11 +358,16 @@
         },
         "volume": 18741600.0
       },
-      "container_coverage": 0.068,
+      "container_coverage": 0.0727,
       "under": [
+        "CAM_CabinClose",
+        "CAM_GlideDepart",
+        "CAM_Hero",
+        "CAM_PortalNight",
         "NODE_GUARD",
-        "NODE_SLEEPER_A",
-        "NODE_SLEEPER_B"
+        "NODE_GUARD_1",
+        "NODE_GUARD_2",
+        "NODE_SHRINE_CAMP"
       ]
     },
     {
@@ -279,20 +408,26 @@
         },
         "volume": 10382846.399999999
       },
-      "container_coverage": 0.068,
+      "container_coverage": 0.0727,
       "under": [
+        "CAM_CabinClose",
+        "CAM_GlideDepart",
+        "CAM_Hero",
+        "CAM_PortalNight",
         "NODE_CAPTIVE",
-        "NODE_SLEEPER_A",
-        "NODE_SLEEPER_B"
+        "NODE_GUARD_1",
+        "NODE_GUARD_2",
+        "NODE_SHRINE_CAMP"
       ]
     },
     {
-      "label": "NODE_SLEEPER_A",
+      "label": "NODE_GUARD_1",
       "name": "HomeWorldCampActor_1",
       "class": "HomeWorldCampActor",
       "blueprint": "/Script/HomeWorld",
       "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
       "tags": [
+        "NODE_GUARD",
         "NODE_SLEEPER"
       ],
       "location": {
@@ -308,35 +443,40 @@
         },
         "extent": {
           "x": 137.0,
-          "y": 103.8,
+          "y": 83.1,
           "z": 114.0
         },
         "min": {
           "x": -16.5,
-          "y": -181.8,
+          "y": -161.1,
           "z": -183.0
         },
         "max": {
           "x": 257.5,
-          "y": 25.8,
+          "y": 5.1,
           "z": 45.0
         },
-        "volume": 12969187.200000001
+        "volume": 10382846.399999999
       },
-      "container_coverage": 0.068,
+      "container_coverage": 0.0727,
       "under": [
+        "CAM_CabinClose",
+        "CAM_GlideDepart",
+        "CAM_Hero",
+        "CAM_PortalNight",
         "NODE_CAPTIVE",
         "NODE_GUARD",
-        "NODE_SLEEPER_B"
+        "NODE_GUARD_2"
       ]
     },
     {
-      "label": "NODE_SLEEPER_B",
+      "label": "NODE_GUARD_2",
       "name": "HomeWorldCampActor_2",
       "class": "HomeWorldCampActor",
       "blueprint": "/Script/HomeWorld",
       "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
       "tags": [
+        "NODE_GUARD",
         "NODE_SLEEPER"
       ],
       "location": {
@@ -352,26 +492,30 @@
         },
         "extent": {
           "x": 137.0,
-          "y": 103.8,
+          "y": 83.1,
           "z": 114.0
         },
         "min": {
           "x": -16.5,
-          "y": -180.6,
+          "y": -159.9,
           "z": -183.0
         },
         "max": {
           "x": 257.5,
-          "y": 27.0,
+          "y": 6.3,
           "z": 45.0
         },
-        "volume": 12969187.200000001
+        "volume": 10382846.4
       },
-      "container_coverage": 0.068,
+      "container_coverage": 0.0727,
       "under": [
+        "CAM_CabinClose",
+        "CAM_GlideDepart",
+        "CAM_Hero",
+        "CAM_PortalNight",
         "NODE_CAPTIVE",
         "NODE_GUARD",
-        "NODE_SLEEPER_A"
+        "NODE_GUARD_1"
       ]
     },
     {
@@ -407,7 +551,11 @@
       "bounds": null,
       "container_coverage": 0.0,
       "under": [
+        "CAM_Hero",
+        "CAM_PortalNight",
         "GP_PortalA",
+        "NODE_GARDEN",
+        "NPC_CHILD",
         "PROTO_SM_Portal_Prototype",
         "VS_MARKER_PortalHome"
       ]
@@ -429,6 +577,9 @@
       "bounds": null,
       "container_coverage": 0.0,
       "under": [
+        "CAM_CabinClose",
+        "CAM_Hero",
+        "CAM_PortalNight",
         "PROTO_SM_Cabin_Prototype"
       ]
     },
@@ -467,10 +618,13 @@
         },
         "volume": 17280000.0
       },
-      "container_coverage": 0.0485,
+      "container_coverage": 0.0727,
       "under": [
         "ANCHOR_SM_Shrine_Homestead",
+        "CAM_Hero",
+        "CAM_PortalNight",
         "DRESS_SM_IslandTop",
+        "NODE_SHRINE",
         "PROTO_SM_Portal_Prototype"
       ]
     },
@@ -509,7 +663,7 @@
         },
         "volume": 17280000.0
       },
-      "container_coverage": 0.1068,
+      "container_coverage": 0.1,
       "under": [
         "ANCHOR_SM_Shrine_Return"
       ]
@@ -588,6 +742,9 @@
       "bounds": null,
       "container_coverage": 0.0,
       "under": [
+        "CAM_CabinClose",
+        "CAM_Hero",
+        "CAM_PortalNight",
         "PROTO_SM_Cabin_Prototype"
       ]
     },
@@ -608,6 +765,9 @@
       "bounds": null,
       "container_coverage": 0.0,
       "under": [
+        "CAM_CabinClose",
+        "CAM_Hero",
+        "CAM_PortalNight",
         "PROTO_SM_Cabin_CornerPosts",
         "PROTO_SM_Cabin_Prototype"
       ]
@@ -629,6 +789,9 @@
       "bounds": null,
       "container_coverage": 0.0,
       "under": [
+        "CAM_CabinClose",
+        "CAM_Hero",
+        "CAM_PortalNight",
         "PROTO_SM_Cabin_Prototype"
       ]
     },
@@ -648,7 +811,11 @@
       },
       "bounds": null,
       "container_coverage": 0.0,
-      "under": []
+      "under": [
+        "CAM_CabinClose",
+        "CAM_Hero",
+        "CAM_PortalNight"
+      ]
     },
     {
       "label": "GP_Store_STONE",
@@ -667,6 +834,9 @@
       "bounds": null,
       "container_coverage": 0.0,
       "under": [
+        "CAM_CabinClose",
+        "CAM_Hero",
+        "CAM_PortalNight",
         "PROTO_SM_Cabin_CornerPosts"
       ]
     },
@@ -687,6 +857,9 @@
       "bounds": null,
       "container_coverage": 0.0,
       "under": [
+        "CAM_CabinClose",
+        "CAM_Hero",
+        "CAM_PortalNight",
         "PROTO_SM_Cabin_CornerPosts",
         "PROTO_SM_Cabin_Prototype"
       ]
@@ -726,9 +899,13 @@
         },
         "volume": 8243200.0
       },
-      "container_coverage": 0.0194,
+      "container_coverage": 0.0364,
       "under": [
-        "GP_PlayerStart"
+        "CAM_CabinClose",
+        "CAM_Hero",
+        "CAM_PortalNight",
+        "GP_PlayerStart",
+        "NODE_BED"
       ]
     },
     {
@@ -769,6 +946,9 @@
       "container_coverage": 0.0,
       "under": [
         "ANCHOR_SM_Glider_Perch",
+        "CAM_CabinClose",
+        "CAM_GlideDepart",
+        "CAM_PortalNight",
         "DRESS_SM_IslandTop",
         "VS_MARKER_LeaveIsland_FALLBACK"
       ]
@@ -808,14 +988,18 @@
         },
         "volume": 92929500.0
       },
-      "container_coverage": 0.3981,
+      "container_coverage": 0.4364,
       "under": [
         "ANCHOR_SM_IslandTop",
+        "CAM_CabinClose",
+        "CAM_GlideDepart",
+        "CAM_Hero",
+        "CAM_PortalNight",
         "CRUMB_GlideSpline",
         "NODE_CAPTIVE",
         "NODE_GUARD",
-        "NODE_SLEEPER_A",
-        "NODE_SLEEPER_B"
+        "NODE_GUARD_1",
+        "NODE_GUARD_2"
       ]
     },
     {
@@ -1216,6 +1400,7 @@
       "container_coverage": 0.0,
       "under": [
         "ANCHOR_SM_LandingCircle",
+        "CAM_LandingDay",
         "CRUMB_Landing",
         "VS_MARKER_LandPlanet"
       ]
@@ -1258,6 +1443,7 @@
       "container_coverage": 0.0,
       "under": [
         "ANCHOR_SM_LandingCircle",
+        "CAM_LandingDay",
         "CRUMB_Landing",
         "VS_MARKER_LandPlanet"
       ]
@@ -1300,6 +1486,7 @@
       "container_coverage": 0.0,
       "under": [
         "ANCHOR_SM_LandingCircle",
+        "CAM_LandingDay",
         "CRUMB_Landing",
         "VS_MARKER_LandPlanet"
       ]
@@ -1342,6 +1529,7 @@
       "container_coverage": 0.0,
       "under": [
         "ANCHOR_SM_LandingCircle",
+        "CAM_LandingDay",
         "CRUMB_Landing",
         "VS_MARKER_LandPlanet"
       ]
@@ -1384,6 +1572,7 @@
       "container_coverage": 0.0,
       "under": [
         "ANCHOR_SM_LandingCircle",
+        "CAM_LandingDay",
         "CRUMB_Landing",
         "VS_MARKER_LandPlanet"
       ]
@@ -1426,6 +1615,7 @@
       "container_coverage": 0.0,
       "under": [
         "ANCHOR_SM_LandingCircle",
+        "CAM_LandingDay",
         "CRUMB_Landing",
         "VS_MARKER_LandPlanet"
       ]
@@ -1468,6 +1658,7 @@
       "container_coverage": 0.0,
       "under": [
         "ANCHOR_SM_LandingCircle",
+        "CAM_LandingDay",
         "CRUMB_Landing",
         "VS_MARKER_LandPlanet"
       ]
@@ -1510,6 +1701,7 @@
       "container_coverage": 0.0,
       "under": [
         "ANCHOR_SM_LandingCircle",
+        "CAM_LandingDay",
         "CRUMB_Landing",
         "VS_MARKER_LandPlanet"
       ]
@@ -1552,6 +1744,7 @@
       "container_coverage": 0.0,
       "under": [
         "ANCHOR_SM_LandingCircle",
+        "CAM_LandingDay",
         "CRUMB_Landing",
         "VS_MARKER_LandPlanet"
       ]
@@ -1594,6 +1787,7 @@
       "container_coverage": 0.0,
       "under": [
         "ANCHOR_SM_LandingCircle",
+        "CAM_LandingDay",
         "CRUMB_Landing",
         "VS_MARKER_LandPlanet"
       ]
@@ -1636,6 +1830,7 @@
       "container_coverage": 0.0,
       "under": [
         "ANCHOR_SM_LandingCircle",
+        "CAM_LandingDay",
         "CRUMB_Landing",
         "VS_MARKER_LandPlanet"
       ]
@@ -1678,6 +1873,7 @@
       "container_coverage": 0.0,
       "under": [
         "ANCHOR_SM_LandingCircle",
+        "CAM_LandingDay",
         "CRUMB_Landing",
         "VS_MARKER_LandPlanet"
       ]
@@ -1720,6 +1916,7 @@
       "container_coverage": 0.0,
       "under": [
         "ANCHOR_SM_LandingCircle",
+        "CAM_LandingDay",
         "CRUMB_Landing",
         "VS_MARKER_LandPlanet"
       ]
@@ -1762,6 +1959,7 @@
       "container_coverage": 0.0,
       "under": [
         "ANCHOR_SM_LandingCircle",
+        "CAM_LandingDay",
         "CRUMB_Landing",
         "VS_MARKER_LandPlanet"
       ]
@@ -1804,6 +2002,7 @@
       "container_coverage": 0.0,
       "under": [
         "ANCHOR_SM_LandingCircle",
+        "CAM_LandingDay",
         "CRUMB_Landing",
         "VS_MARKER_LandPlanet"
       ]
@@ -1846,6 +2045,7 @@
       "container_coverage": 0.0,
       "under": [
         "ANCHOR_SM_LandingCircle",
+        "CAM_LandingDay",
         "CRUMB_Landing",
         "VS_MARKER_LandPlanet"
       ]
@@ -1888,6 +2088,7 @@
       "container_coverage": 0.0,
       "under": [
         "ANCHOR_SM_LandingCircle",
+        "CAM_LandingDay",
         "CRUMB_Landing",
         "VS_MARKER_LandPlanet"
       ]
@@ -1930,6 +2131,9 @@
       "container_coverage": 0.0,
       "under": [
         "ANCHOR_SM_Lookout_Pad",
+        "CAM_CabinClose",
+        "CAM_GlideDepart",
+        "CAM_PortalNight",
         "DRESS_SM_IslandTop"
       ]
     },
@@ -1970,6 +2174,8 @@
       },
       "container_coverage": 0.0,
       "under": [
+        "CAM_Hero",
+        "CAM_PortalNight",
         "DRESS_SM_IslandTop"
       ]
     },
@@ -2010,6 +2216,8 @@
       },
       "container_coverage": 0.0,
       "under": [
+        "CAM_Hero",
+        "CAM_PortalNight",
         "DRESS_SM_IslandTop"
       ]
     },
@@ -2050,6 +2258,8 @@
       },
       "container_coverage": 0.0,
       "under": [
+        "CAM_Hero",
+        "CAM_PortalNight",
         "DRESS_SM_IslandTop"
       ]
     },
@@ -2090,6 +2300,8 @@
       },
       "container_coverage": 0.0,
       "under": [
+        "CAM_Hero",
+        "CAM_PortalNight",
         "DRESS_SM_IslandTop"
       ]
     },
@@ -2130,6 +2342,8 @@
       },
       "container_coverage": 0.0,
       "under": [
+        "CAM_Hero",
+        "CAM_PortalNight",
         "DRESS_SM_IslandTop"
       ]
     },
@@ -2168,7 +2382,7 @@
         },
         "volume": 412800000000.0
       },
-      "container_coverage": 0.9903,
+      "container_coverage": 0.9909,
       "under": []
     },
     {
@@ -2330,9 +2544,7 @@
         "volume": 11308248.0
       },
       "container_coverage": 0.0,
-      "under": [
-        "ANCHOR_SM_Shrine_Return"
-      ]
+      "under": []
     },
     {
       "label": "DRESS_SM_Roof_Hamlet_02_PitchA",
@@ -2370,9 +2582,7 @@
         "volume": 5757093.87999992
       },
       "container_coverage": 0.0,
-      "under": [
-        "ANCHOR_SM_Shrine_Return"
-      ]
+      "under": []
     },
     {
       "label": "DRESS_SM_Roof_Hamlet_02_PitchB",
@@ -2410,9 +2620,7 @@
         "volume": 5757093.87999992
       },
       "container_coverage": 0.0,
-      "under": [
-        "ANCHOR_SM_Shrine_Return"
-      ]
+      "under": []
     },
     {
       "label": "DRESS_SM_Roof_Hamlet_03_Body",
@@ -2768,9 +2976,12 @@
         },
         "volume": 80643084.0
       },
-      "container_coverage": 0.0583,
+      "container_coverage": 0.0545,
       "under": [
         "ANCHOR_SM_Cabin",
+        "CAM_CabinClose",
+        "CAM_Hero",
+        "CAM_PortalNight",
         "DRESS_SM_IslandTop",
         "PROTO_SM_Cabin_Prototype"
       ]
@@ -2810,9 +3021,12 @@
         },
         "volume": 110215245.46500002
       },
-      "container_coverage": 0.0874,
+      "container_coverage": 0.0818,
       "under": [
         "ANCHOR_SM_Cabin",
+        "CAM_CabinClose",
+        "CAM_Hero",
+        "CAM_PortalNight",
         "DRESS_SM_IslandTop"
       ]
     },
@@ -2851,11 +3065,9 @@
         },
         "volume": 330512.00000000064
       },
-      "container_coverage": 0.0097,
+      "container_coverage": 0.0091,
       "under": [
-        "ANCHOR_SM_LandingCircle",
-        "CRUMB_Landing",
-        "VS_MARKER_LandPlanet"
+        "CAM_LandingDay"
       ]
     },
     {
@@ -2893,11 +3105,14 @@
         },
         "volume": 7200000.0
       },
-      "container_coverage": 0.0485,
+      "container_coverage": 0.0636,
       "under": [
         "ANCHOR_SM_Shrine_Homestead",
+        "CAM_Hero",
+        "CAM_PortalNight",
         "DRESS_SM_IslandTop",
-        "GP_PortalA"
+        "GP_PortalA",
+        "NODE_SHRINE"
       ]
     },
     {
@@ -2914,12 +3129,12 @@
       },
       "bounds": {
         "origin": {
-          "x": -480.0,
+          "x": -540.0,
           "y": -100.0,
           "z": 0.0
         },
         "extent": {
-          "x": 120.0,
+          "x": 60.0,
           "y": 80.0,
           "z": 80.0
         },
@@ -2929,14 +3144,17 @@
           "z": -80.0
         },
         "max": {
-          "x": -360.0,
+          "x": -480.0,
           "y": -20.0,
           "z": 80.0
         },
-        "volume": 6144000.0
+        "volume": 3072000.0
       },
-      "container_coverage": 0.0291,
+      "container_coverage": 0.0273,
       "under": [
+        "CAM_CabinClose",
+        "CAM_Hero",
+        "CAM_PortalNight",
         "DRESS_SM_IslandTop",
         "PROTO_SM_Cabin_Prototype"
       ]
@@ -2955,12 +3173,12 @@
       },
       "bounds": {
         "origin": {
-          "x": 870.0,
+          "x": 810.0,
           "y": 450.0,
           "z": 0.0
         },
         "extent": {
-          "x": 120.0,
+          "x": 60.0,
           "y": 80.0,
           "z": 80.0
         },
@@ -2970,14 +3188,17 @@
           "z": -80.0
         },
         "max": {
-          "x": 990.0,
+          "x": 870.0,
           "y": 530.0,
           "z": 80.0
         },
-        "volume": 6144000.0
+        "volume": 3072000.0
       },
-      "container_coverage": 0.0583,
+      "container_coverage": 0.0545,
       "under": [
+        "CAM_CabinClose",
+        "CAM_GlideDepart",
+        "CAM_PortalNight",
         "DRESS_SM_IslandTop",
         "VS_MARKER_LeaveIsland_FALLBACK"
       ]
@@ -2996,12 +3217,12 @@
       },
       "bounds": {
         "origin": {
-          "x": 120.0,
+          "x": 60.0,
           "y": 0.0,
           "z": 0.0
         },
         "extent": {
-          "x": 120.0,
+          "x": 60.0,
           "y": 80.0,
           "z": 80.0
         },
@@ -3011,20 +3232,24 @@
           "z": -80.0
         },
         "max": {
-          "x": 240.0,
+          "x": 120.0,
           "y": 80.0,
           "z": 80.0
         },
-        "volume": 6144000.0
+        "volume": 3072000.0
       },
-      "container_coverage": 0.0583,
+      "container_coverage": 0.0636,
       "under": [
+        "CAM_CabinClose",
+        "CAM_GlideDepart",
+        "CAM_Hero",
+        "CAM_PortalNight",
         "CRUMB_GlideSpline",
         "DRESS_SM_IslandTop",
         "NODE_CAPTIVE",
         "NODE_GUARD",
-        "NODE_SLEEPER_A",
-        "NODE_SLEEPER_B"
+        "NODE_GUARD_1",
+        "NODE_GUARD_2"
       ]
     },
     {
@@ -3041,12 +3266,12 @@
       },
       "bounds": {
         "origin": {
-          "x": 120.0,
+          "x": 60.0,
           "y": 7000.0,
           "z": -7500.0
         },
         "extent": {
-          "x": 120.0,
+          "x": 60.0,
           "y": 80.0,
           "z": 80.0
         },
@@ -3056,14 +3281,15 @@
           "z": -7580.0
         },
         "max": {
-          "x": 240.0,
+          "x": 120.0,
           "y": 7080.0,
           "z": -7420.0
         },
-        "volume": 6144000.0
+        "volume": 3072000.0
       },
-      "container_coverage": 0.2039,
+      "container_coverage": 0.1818,
       "under": [
+        "CAM_LandingDay",
         "CRUMB_Landing",
         "VS_MARKER_LandPlanet"
       ]
@@ -3082,12 +3308,12 @@
       },
       "bounds": {
         "origin": {
-          "x": 820.0,
+          "x": 760.0,
           "y": 350.0,
           "z": 0.0
         },
         "extent": {
-          "x": 120.0,
+          "x": 60.0,
           "y": 80.0,
           "z": 80.0
         },
@@ -3097,14 +3323,17 @@
           "z": -80.0
         },
         "max": {
-          "x": 940.0,
+          "x": 820.0,
           "y": 430.0,
           "z": 80.0
         },
-        "volume": 6144000.0
+        "volume": 3072000.0
       },
-      "container_coverage": 0.0194,
+      "container_coverage": 0.0182,
       "under": [
+        "CAM_CabinClose",
+        "CAM_GlideDepart",
+        "CAM_PortalNight",
         "DRESS_SM_IslandTop"
       ]
     },
@@ -3122,12 +3351,12 @@
       },
       "bounds": {
         "origin": {
-          "x": -80.0,
+          "x": -140.0,
           "y": -350.0,
           "z": 0.0
         },
         "extent": {
-          "x": 120.0,
+          "x": 60.0,
           "y": 80.0,
           "z": 80.0
         },
@@ -3137,16 +3366,19 @@
           "z": -80.0
         },
         "max": {
-          "x": 40.0,
+          "x": -80.0,
           "y": -270.0,
           "z": 80.0
         },
-        "volume": 6144000.0
+        "volume": 3072000.0
       },
-      "container_coverage": 0.0485,
+      "container_coverage": 0.0727,
       "under": [
+        "CAM_Hero",
+        "CAM_PortalNight",
         "DRESS_SM_IslandTop",
         "GP_PortalA",
+        "NODE_SHRINE",
         "PROTO_SM_Portal_Prototype"
       ]
     },
@@ -3164,12 +3396,12 @@
       },
       "bounds": {
         "origin": {
-          "x": 720.0,
+          "x": 660.0,
           "y": 7500.0,
           "z": -7500.0
         },
         "extent": {
-          "x": 120.0,
+          "x": 60.0,
           "y": 80.0,
           "z": 80.0
         },
@@ -3179,13 +3411,13 @@
           "z": -7580.0
         },
         "max": {
-          "x": 840.0,
+          "x": 720.0,
           "y": 7580.0,
           "z": -7420.0
         },
-        "volume": 6144000.0
+        "volume": 3072000.0
       },
-      "container_coverage": 0.1359,
+      "container_coverage": 0.1,
       "under": [
         "GP_PortalB"
       ]
@@ -3204,12 +3436,12 @@
       },
       "bounds": {
         "origin": {
-          "x": 820.0,
+          "x": 760.0,
           "y": 1000.0,
           "z": -800.0
         },
         "extent": {
-          "x": 120.0,
+          "x": 60.0,
           "y": 80.0,
           "z": 80.0
         },
@@ -3219,13 +3451,13 @@
           "z": -880.0
         },
         "max": {
-          "x": 940.0,
+          "x": 820.0,
           "y": 1080.0,
           "z": -720.0
         },
-        "volume": 6144000.0
+        "volume": 3072000.0
       },
-      "container_coverage": 0.0097,
+      "container_coverage": 0.0091,
       "under": []
     },
     {
@@ -3242,12 +3474,12 @@
       },
       "bounds": {
         "origin": {
-          "x": 570.0,
+          "x": 510.0,
           "y": 2500.0,
           "z": -3600.0
         },
         "extent": {
-          "x": 120.0,
+          "x": 60.0,
           "y": 80.0,
           "z": 80.0
         },
@@ -3257,13 +3489,13 @@
           "z": -3680.0
         },
         "max": {
-          "x": 690.0,
+          "x": 570.0,
           "y": 2580.0,
           "z": -3520.0
         },
-        "volume": 6144000.0
+        "volume": 3072000.0
       },
-      "container_coverage": 0.0097,
+      "container_coverage": 0.0091,
       "under": []
     },
     {
@@ -3280,12 +3512,12 @@
       },
       "bounds": {
         "origin": {
-          "x": 320.0,
+          "x": 260.0,
           "y": 4000.0,
           "z": -6000.0
         },
         "extent": {
-          "x": 120.0,
+          "x": 60.0,
           "y": 80.0,
           "z": 80.0
         },
@@ -3295,13 +3527,13 @@
           "z": -6080.0
         },
         "max": {
-          "x": 440.0,
+          "x": 320.0,
           "y": 4080.0,
           "z": -5920.0
         },
-        "volume": 6144000.0
+        "volume": 3072000.0
       },
-      "container_coverage": 0.0097,
+      "container_coverage": 0.0091,
       "under": []
     },
     {
@@ -3318,12 +3550,12 @@
       },
       "bounds": {
         "origin": {
-          "x": 170.0,
+          "x": 110.0,
           "y": 6000.0,
           "z": -6800.0
         },
         "extent": {
-          "x": 120.0,
+          "x": 60.0,
           "y": 80.0,
           "z": 80.0
         },
@@ -3333,14 +3565,16 @@
           "z": -6880.0
         },
         "max": {
-          "x": 290.0,
+          "x": 170.0,
           "y": 6080.0,
           "z": -6720.0
         },
-        "volume": 6144000.0
+        "volume": 3072000.0
       },
-      "container_coverage": 0.0097,
-      "under": []
+      "container_coverage": 0.0091,
+      "under": [
+        "CAM_LandingDay"
+      ]
     },
     {
       "label": "CRUMB_Depart_Lookout",
@@ -3356,12 +3590,12 @@
       },
       "bounds": {
         "origin": {
-          "x": 870.0,
+          "x": 810.0,
           "y": 450.0,
           "z": 150.0
         },
         "extent": {
-          "x": 120.0,
+          "x": 60.0,
           "y": 80.0,
           "z": 80.0
         },
@@ -3371,14 +3605,17 @@
           "z": 70.0
         },
         "max": {
-          "x": 990.0,
+          "x": 870.0,
           "y": 530.0,
           "z": 230.0
         },
-        "volume": 6144000.0
+        "volume": 3072000.0
       },
-      "container_coverage": 0.0583,
+      "container_coverage": 0.0545,
       "under": [
+        "CAM_CabinClose",
+        "CAM_GlideDepart",
+        "CAM_PortalNight",
         "GP_GlideStart"
       ]
     },
@@ -3396,12 +3633,12 @@
       },
       "bounds": {
         "origin": {
-          "x": 120.0,
+          "x": 60.0,
           "y": 0.0,
           "z": 0.0
         },
         "extent": {
-          "x": 120.0,
+          "x": 60.0,
           "y": 80.0,
           "z": 80.0
         },
@@ -3411,20 +3648,24 @@
           "z": -80.0
         },
         "max": {
-          "x": 240.0,
+          "x": 120.0,
           "y": 80.0,
           "z": 80.0
         },
-        "volume": 6144000.0
+        "volume": 3072000.0
       },
-      "container_coverage": 0.0583,
+      "container_coverage": 0.0636,
       "under": [
         "ANCHOR_SM_IslandTop",
+        "CAM_CabinClose",
+        "CAM_GlideDepart",
+        "CAM_Hero",
+        "CAM_PortalNight",
         "DRESS_SM_IslandTop",
         "NODE_CAPTIVE",
         "NODE_GUARD",
-        "NODE_SLEEPER_A",
-        "NODE_SLEEPER_B"
+        "NODE_GUARD_1",
+        "NODE_GUARD_2"
       ]
     },
     {
@@ -3441,12 +3682,12 @@
       },
       "bounds": {
         "origin": {
-          "x": 720.0,
+          "x": 660.0,
           "y": 1800.0,
           "z": -2300.0
         },
         "extent": {
-          "x": 120.0,
+          "x": 60.0,
           "y": 80.0,
           "z": 80.0
         },
@@ -3456,13 +3697,13 @@
           "z": -2380.0
         },
         "max": {
-          "x": 840.0,
+          "x": 720.0,
           "y": 1880.0,
           "z": -2220.0
         },
-        "volume": 6144000.0
+        "volume": 3072000.0
       },
-      "container_coverage": 0.0388,
+      "container_coverage": 0.0364,
       "under": []
     },
     {
@@ -3479,12 +3720,12 @@
       },
       "bounds": {
         "origin": {
-          "x": 420.0,
+          "x": 360.0,
           "y": 3200.0,
           "z": -4600.0
         },
         "extent": {
-          "x": 120.0,
+          "x": 60.0,
           "y": 80.0,
           "z": 80.0
         },
@@ -3494,13 +3735,13 @@
           "z": -4680.0
         },
         "max": {
-          "x": 540.0,
+          "x": 420.0,
           "y": 3280.0,
           "z": -4520.0
         },
-        "volume": 6144000.0
+        "volume": 3072000.0
       },
-      "container_coverage": 0.0388,
+      "container_coverage": 0.0364,
       "under": []
     },
     {
@@ -3517,12 +3758,12 @@
       },
       "bounds": {
         "origin": {
-          "x": 220.0,
+          "x": 160.0,
           "y": 4800.0,
           "z": -7000.0
         },
         "extent": {
-          "x": 120.0,
+          "x": 60.0,
           "y": 80.0,
           "z": 80.0
         },
@@ -3532,13 +3773,13 @@
           "z": -7080.0
         },
         "max": {
-          "x": 340.0,
+          "x": 220.0,
           "y": 4880.0,
           "z": -6920.0
         },
-        "volume": 6144000.0
+        "volume": 3072000.0
       },
-      "container_coverage": 0.0388,
+      "container_coverage": 0.0364,
       "under": []
     },
     {
@@ -3555,12 +3796,12 @@
       },
       "bounds": {
         "origin": {
-          "x": 120.0,
+          "x": 60.0,
           "y": 7000.0,
           "z": -7450.0
         },
         "extent": {
-          "x": 120.0,
+          "x": 60.0,
           "y": 80.0,
           "z": 80.0
         },
@@ -3570,15 +3811,16 @@
           "z": -7530.0
         },
         "max": {
-          "x": 240.0,
+          "x": 120.0,
           "y": 7080.0,
           "z": -7370.0
         },
-        "volume": 6144000.0
+        "volume": 3072000.0
       },
-      "container_coverage": 0.2039,
+      "container_coverage": 0.1818,
       "under": [
         "ANCHOR_SM_LandingCircle",
+        "CAM_LandingDay",
         "VS_MARKER_LandPlanet"
       ]
     },
@@ -3596,12 +3838,12 @@
       },
       "bounds": {
         "origin": {
-          "x": 870.0,
+          "x": 810.0,
           "y": 450.0,
           "z": 150.0
         },
         "extent": {
-          "x": 120.0,
+          "x": 60.0,
           "y": 80.0,
           "z": 80.0
         },
@@ -3611,14 +3853,17 @@
           "z": 70.0
         },
         "max": {
-          "x": 990.0,
+          "x": 870.0,
           "y": 530.0,
           "z": 230.0
         },
-        "volume": 6144000.0
+        "volume": 3072000.0
       },
-      "container_coverage": 0.0583,
+      "container_coverage": 0.0545,
       "under": [
+        "CAM_CabinClose",
+        "CAM_GlideDepart",
+        "CAM_PortalNight",
         "CRUMB_Depart_Lookout"
       ]
     },
@@ -3642,12 +3887,12 @@
         "origin": {
           "x": -240.0,
           "y": -120.0,
-          "z": 220.0
+          "z": 160.0
         },
         "extent": {
           "x": 80.0,
           "y": 80.0,
-          "z": 120.0
+          "z": 60.0
         },
         "min": {
           "x": -320.0,
@@ -3657,12 +3902,329 @@
         "max": {
           "x": -160.0,
           "y": -40.0,
-          "z": 340.0
+          "z": 220.0
         },
-        "volume": 6144000.0
+        "volume": 3072000.0
       },
-      "container_coverage": 0.0194,
+      "container_coverage": 0.0364,
       "under": [
+        "CAM_CabinClose",
+        "CAM_Hero",
+        "CAM_PortalNight",
+        "NODE_BED",
+        "PlayerStart_VS_MVP"
+      ]
+    },
+    {
+      "label": "NODE_BED",
+      "name": "TargetPoint_2",
+      "class": "TargetPoint",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": -240.0,
+        "y": -120.0,
+        "z": 100.0
+      },
+      "bounds": {
+        "origin": {
+          "x": -180.0,
+          "y": -120.0,
+          "z": 100.0
+        },
+        "extent": {
+          "x": 60.0,
+          "y": 80.0,
+          "z": 80.0
+        },
+        "min": {
+          "x": -240.0,
+          "y": -200.0,
+          "z": 20.0
+        },
+        "max": {
+          "x": -120.0,
+          "y": -40.0,
+          "z": 180.0
+        },
+        "volume": 3072000.0
+      },
+      "container_coverage": 0.0364,
+      "under": [
+        "CAM_CabinClose",
+        "CAM_Hero",
+        "CAM_PortalNight",
+        "GP_PlayerStart",
+        "PlayerStart_VS_MVP"
+      ]
+    },
+    {
+      "label": "NODE_GARDEN",
+      "name": "TargetPoint_4",
+      "class": "TargetPoint",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": -200.0,
+        "y": -350.0,
+        "z": 100.0
+      },
+      "bounds": {
+        "origin": {
+          "x": -140.0,
+          "y": -350.0,
+          "z": 100.0
+        },
+        "extent": {
+          "x": 60.0,
+          "y": 80.0,
+          "z": 80.0
+        },
+        "min": {
+          "x": -200.0,
+          "y": -430.0,
+          "z": 20.0
+        },
+        "max": {
+          "x": -80.0,
+          "y": -270.0,
+          "z": 180.0
+        },
+        "volume": 3072000.0
+      },
+      "container_coverage": 0.0727,
+      "under": [
+        "CAM_Hero",
+        "CAM_PortalNight",
+        "GP_PortalA",
+        "NPC_CHILD",
+        "PROTO_SM_Portal_Prototype",
+        "VS_MARKER_PortalHome"
+      ]
+    },
+    {
+      "label": "NODE_SHRINE",
+      "name": "TargetPoint_7",
+      "class": "TargetPoint",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": -200.0,
+        "y": -350.0,
+        "z": 0.0
+      },
+      "bounds": {
+        "origin": {
+          "x": -140.0,
+          "y": -350.0,
+          "z": 0.0
+        },
+        "extent": {
+          "x": 60.0,
+          "y": 80.0,
+          "z": 80.0
+        },
+        "min": {
+          "x": -200.0,
+          "y": -430.0,
+          "z": -80.0
+        },
+        "max": {
+          "x": -80.0,
+          "y": -270.0,
+          "z": 80.0
+        },
+        "volume": 3072000.0
+      },
+      "container_coverage": 0.0727,
+      "under": [
+        "ANCHOR_SM_Shrine_Homestead",
+        "CAM_Hero",
+        "CAM_PortalNight",
+        "DRESS_SM_IslandTop",
+        "GP_PortalA",
+        "PROTO_SM_Portal_Prototype"
+      ]
+    },
+    {
+      "label": "NODE_SHRINE_CAMP",
+      "name": "TargetPoint_8",
+      "class": "TargetPoint",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": 20.0,
+        "y": -80.0,
+        "z": -95.0
+      },
+      "bounds": {
+        "origin": {
+          "x": 80.0,
+          "y": -80.0,
+          "z": -95.0
+        },
+        "extent": {
+          "x": 60.0,
+          "y": 80.0,
+          "z": 80.0
+        },
+        "min": {
+          "x": 20.0,
+          "y": -160.0,
+          "z": -175.0
+        },
+        "max": {
+          "x": 140.0,
+          "y": 0.0,
+          "z": -15.0
+        },
+        "volume": 3072000.0
+      },
+      "container_coverage": 0.0273,
+      "under": [
+        "CAM_CabinClose",
+        "CAM_GlideDepart",
+        "CAM_Hero",
+        "CAM_PortalNight",
+        "NODE_CAPTIVE",
+        "NODE_GUARD",
+        "NODE_GUARD_1",
+        "NODE_GUARD_2"
+      ]
+    },
+    {
+      "label": "NODE_WOUND",
+      "name": "TargetPoint_6",
+      "class": "TargetPoint",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": -200.0,
+        "y": 400.0,
+        "z": 100.0
+      },
+      "bounds": {
+        "origin": {
+          "x": -140.0,
+          "y": 400.0,
+          "z": 100.0
+        },
+        "extent": {
+          "x": 60.0,
+          "y": 80.0,
+          "z": 80.0
+        },
+        "min": {
+          "x": -200.0,
+          "y": 320.0,
+          "z": 20.0
+        },
+        "max": {
+          "x": -80.0,
+          "y": 480.0,
+          "z": 180.0
+        },
+        "volume": 3072000.0
+      },
+      "container_coverage": 0.0091,
+      "under": [
+        "CAM_CabinClose",
+        "CAM_Hero",
+        "CAM_PortalNight"
+      ]
+    },
+    {
+      "label": "NPC_CHILD",
+      "name": "TargetPoint_5",
+      "class": "TargetPoint",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": -200.0,
+        "y": -270.0,
+        "z": 100.0
+      },
+      "bounds": {
+        "origin": {
+          "x": -140.0,
+          "y": -270.0,
+          "z": 100.0
+        },
+        "extent": {
+          "x": 60.0,
+          "y": 80.0,
+          "z": 80.0
+        },
+        "min": {
+          "x": -200.0,
+          "y": -350.0,
+          "z": 20.0
+        },
+        "max": {
+          "x": -80.0,
+          "y": -190.0,
+          "z": 180.0
+        },
+        "volume": 3072000.0
+      },
+      "container_coverage": 0.0727,
+      "under": [
+        "CAM_Hero",
+        "CAM_PortalNight",
+        "GP_PortalA",
+        "NODE_GARDEN",
+        "VS_MARKER_PortalHome"
+      ]
+    },
+    {
+      "label": "NPC_PARTNER",
+      "name": "TargetPoint_3",
+      "class": "TargetPoint",
+      "blueprint": "/Script/Engine",
+      "path": "/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.L_VS_MVP_Markers:PersistentLevel",
+      "tags": [],
+      "location": {
+        "x": -160.0,
+        "y": -120.0,
+        "z": 100.0
+      },
+      "bounds": {
+        "origin": {
+          "x": -100.0,
+          "y": -120.0,
+          "z": 100.0
+        },
+        "extent": {
+          "x": 60.0,
+          "y": 80.0,
+          "z": 80.0
+        },
+        "min": {
+          "x": -160.0,
+          "y": -200.0,
+          "z": 20.0
+        },
+        "max": {
+          "x": -40.0,
+          "y": -40.0,
+          "z": 180.0
+        },
+        "volume": 3072000.0
+      },
+      "container_coverage": 0.0091,
+      "under": [
+        "CAM_CabinClose",
+        "CAM_GlideDepart",
+        "CAM_Hero",
+        "CAM_PortalNight",
+        "GP_PlayerStart",
+        "NODE_BED",
         "PlayerStart_VS_MVP"
       ]
     },
@@ -3680,12 +4242,12 @@
       },
       "bounds": {
         "origin": {
-          "x": 120.0,
+          "x": 60.0,
           "y": 7000.0,
           "z": -7450.0
         },
         "extent": {
-          "x": 120.0,
+          "x": 60.0,
           "y": 80.0,
           "z": 80.0
         },
@@ -3695,15 +4257,16 @@
           "z": -7530.0
         },
         "max": {
-          "x": 240.0,
+          "x": 120.0,
           "y": 7080.0,
           "z": -7370.0
         },
-        "volume": 6144000.0
+        "volume": 3072000.0
       },
-      "container_coverage": 0.2039,
+      "container_coverage": 0.1818,
       "under": [
         "ANCHOR_SM_LandingCircle",
+        "CAM_LandingDay",
         "CRUMB_Landing"
       ]
     },
@@ -3721,12 +4284,12 @@
       },
       "bounds": {
         "origin": {
-          "x": 870.0,
+          "x": 810.0,
           "y": 450.0,
           "z": 50.0
         },
         "extent": {
-          "x": 120.0,
+          "x": 60.0,
           "y": 80.0,
           "z": 80.0
         },
@@ -3736,15 +4299,18 @@
           "z": -30.0
         },
         "max": {
-          "x": 990.0,
+          "x": 870.0,
           "y": 530.0,
           "z": 130.0
         },
-        "volume": 6144000.0
+        "volume": 3072000.0
       },
-      "container_coverage": 0.0583,
+      "container_coverage": 0.0545,
       "under": [
-        "ANCHOR_SM_Glider_Perch"
+        "ANCHOR_SM_Glider_Perch",
+        "CAM_CabinClose",
+        "CAM_GlideDepart",
+        "CAM_PortalNight"
       ]
     },
     {
@@ -3761,12 +4327,12 @@
       },
       "bounds": {
         "origin": {
-          "x": -80.0,
+          "x": -140.0,
           "y": -350.0,
           "z": 100.0
         },
         "extent": {
-          "x": 120.0,
+          "x": 60.0,
           "y": 80.0,
           "z": 80.0
         },
@@ -3776,15 +4342,19 @@
           "z": 20.0
         },
         "max": {
-          "x": 40.0,
+          "x": -80.0,
           "y": -270.0,
           "z": 180.0
         },
-        "volume": 6144000.0
+        "volume": 3072000.0
       },
-      "container_coverage": 0.0485,
+      "container_coverage": 0.0727,
       "under": [
+        "CAM_Hero",
+        "CAM_PortalNight",
         "GP_PortalA",
+        "NODE_GARDEN",
+        "NPC_CHILD",
         "PROTO_SM_Portal_Prototype"
       ]
     },
@@ -3802,12 +4372,12 @@
       },
       "bounds": {
         "origin": {
-          "x": 720.0,
+          "x": 660.0,
           "y": 7500.0,
           "z": -7400.0
         },
         "extent": {
-          "x": 120.0,
+          "x": 60.0,
           "y": 80.0,
           "z": 80.0
         },
@@ -3817,13 +4387,13 @@
           "z": -7480.0
         },
         "max": {
-          "x": 840.0,
+          "x": 720.0,
           "y": 7580.0,
           "z": -7320.0
         },
-        "volume": 6144000.0
+        "volume": 3072000.0
       },
-      "container_coverage": 0.1359,
+      "container_coverage": 0.1,
       "under": [
         "GP_PortalB"
       ]
@@ -3842,12 +4412,12 @@
       },
       "bounds": {
         "origin": {
-          "x": -280.0,
+          "x": -340.0,
           "y": -450.0,
           "z": 320.0
         },
         "extent": {
-          "x": 120.0,
+          "x": 60.0,
           "y": 80.0,
           "z": 80.0
         },
@@ -3857,14 +4427,17 @@
           "z": 240.0
         },
         "max": {
-          "x": -160.0,
+          "x": -280.0,
           "y": -370.0,
           "z": 400.0
         },
-        "volume": 6144000.0
+        "volume": 3072000.0
       },
-      "container_coverage": 0.0097,
-      "under": []
+      "container_coverage": 0.0091,
+      "under": [
+        "CAM_Hero",
+        "CAM_PortalNight"
+      ]
     },
     {
       "label": "VS_MARKER_Shot2_Cabin",
@@ -3880,12 +4453,12 @@
       },
       "bounds": {
         "origin": {
-          "x": -280.0,
+          "x": -340.0,
           "y": 250.0,
           "z": 160.0
         },
         "extent": {
-          "x": 120.0,
+          "x": 60.0,
           "y": 80.0,
           "z": 80.0
         },
@@ -3895,14 +4468,17 @@
           "z": 80.0
         },
         "max": {
-          "x": -160.0,
+          "x": -280.0,
           "y": 330.0,
           "z": 240.0
         },
-        "volume": 6144000.0
+        "volume": 3072000.0
       },
-      "container_coverage": 0.0097,
+      "container_coverage": 0.0091,
       "under": [
+        "CAM_CabinClose",
+        "CAM_Hero",
+        "CAM_PortalNight",
         "PROTO_SM_Cabin_Prototype"
       ]
     }

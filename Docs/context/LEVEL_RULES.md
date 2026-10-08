@@ -4,5 +4,5 @@ Open this file when the task touches a route sentence, a placeable, a merge, or 
 
 1. A route line about movement or space names the axis, the distance, and what is past the edge, and matches the GDD.
 2. A placeable actor needs a scene root and a keep-transform check.
-3. Docs-only work merges after the review passes (Co: Test PASS; solo: Luke reviews the PR). Source or level work (`.umap`, `.uasset`) waits for Lead's yes (solo: Luke's yes) after that.
+3. Docs-only work merges after the review passes (Co: Test PASS; solo: Luke reviews the PR). Source or level work (`.umap`, `.uasset`) waits for Lead's yes (solo: Luke's yes) after that. When Luke has said to run a recorded queue, that is the yes for the level items it names (`Docs/context/SESSION_START.md`).
 4. A route or GDD sentence changes only after Lead says yes to that exact sentence.

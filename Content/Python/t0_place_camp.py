@@ -129,10 +129,10 @@ def _plan(spec):
         # label, role, class, location, and why that location
         ("NODE_GUARD", "Guard", "CampActor", world(eject["at_offset"]),
          "EJECT_TRIGGER_GUARD_WAKES.at_offset - the trigger that fires on 'guard aware'"),
-        ("NODE_SLEEPER_A", "Sleeper", "CampActor", world(bed_a["at_offset"]),
-         "SM_Camp_Bedroll_A.at_offset"),
-        ("NODE_SLEEPER_B", "Sleeper", "CampActor", world(bed_b["at_offset"]),
-         "SM_Camp_Bedroll_B.at_offset"),
+        ("NODE_GUARD_1", "Guard", "CampActor", world(bed_a["at_offset"]),
+         "SM_Camp_Bedroll_A.at_offset - second guard, was the first sleeper post"),
+        ("NODE_GUARD_2", "Guard", "CampActor", world(bed_b["at_offset"]),
+         "SM_Camp_Bedroll_B.at_offset - third guard, was the second sleeper post"),
         ("NODE_CAPTIVE", "Captive", "CampActor", world(freedom["at_offset"]),
          "FREEDOM_GATED_ON_ALL_THREE_CALM.at_offset - its on_interact is 'free the companion'"),
     ]
@@ -155,13 +155,14 @@ def _find_existing():
     silently keeps only the first, so the second run would reuse one bedroll and spawn a
     third person. A pool is consumed one entry per placement instead.
     """
-    pool = {"NODE_GUARD": [], "NODE_SLEEPER": [], "NODE_CAPTIVE": []}
+    pool = {"NODE_GUARD": [], "NODE_SLEEPER": [], "NODE_CAPTIVE": [],
+            "NODE_GUARD_1": [], "NODE_GUARD_2": []}
     for actor in _actor_subsystem().get_all_level_actors():
         try:
             label = actor.get_actor_label()
         except Exception:
             continue
-        for token in pool:
+        for token in sorted(pool, key=len, reverse=True):
             if token in label:
                 pool[token].append(actor)
                 break
@@ -193,21 +194,26 @@ def main():
               "placed": [], "reused": [], "not_placed": []}
 
     for label, role, _tag, location, why in plan:
-        token = label.rsplit("_", 1)[0] if label.endswith(("_A", "_B")) else label
+        reuse_label = {
+            "NODE_GUARD_1": "NODE_SLEEPER_A",
+            "NODE_GUARD_2": "NODE_SLEEPER_B",
+        }.get(label)
 
-        # Prefer an exact label match, then consume one from the token pool. Without the exact
-        # match, a re-run could swap the _A and _B bedrolls every time, because the outliner
-        # order is not the placement order.
+        # Exact label, then the sleeper post this guard replaces. Never pop an
+        # unrelated actor: two guards must not trade places on a re-run.
         actor = None
-        for candidate in pool.get(token, []):
-            try:
-                if candidate.get_actor_label() == label:
+        for group in pool.values():
+            for candidate in list(group):
+                try:
+                    current = candidate.get_actor_label()
+                except Exception:
+                    continue
+                if current == label or current == reuse_label:
                     actor = candidate
+                    group.remove(candidate)
                     break
-            except Exception:
-                continue
-        if actor is None and pool.get(token):
-            actor = pool[token].pop(0)
+            if actor is not None:
+                break
 
         if actor is None:
             actor = _actor_subsystem().spawn_actor_from_class(
@@ -233,10 +239,10 @@ def main():
     # Namespaced variant check: C++ discovery accepts NODE_SLEEPER, and our labels are
     # NODE_SLEEPER_A / _B. GetName() contains the token, so both resolve. Assert it rather than
     # assume, because if it ever stops resolving every sleeper count silently goes soft again.
-    placed_sleepers = [n for n in report["placed"] + report["reused"] if "NODE_SLEEPER" in n]
-    report["sleeper_count"] = len(placed_sleepers)
-    if len(placed_sleepers) != 2:
-        _log("FATAL: expected 2 sleepers, have %d" % len(placed_sleepers))
+    placed_guards = [n for n in report["placed"] + report["reused"] if n.startswith("NODE_GUARD")]
+    report["guard_count"] = len(placed_guards)
+    if len(placed_guards) != 3:
+        _log("FATAL: expected 3 guards, have %d" % len(placed_guards))
         return 1
 
     for label, role, _tag, _loc, why in plan:
@@ -248,6 +254,30 @@ def main():
         "measured_from='authored, not built', camp image paused",
     ]
 
+    shrine_label = "NODE_SHRINE_CAMP"
+    origin = spec["world_origin"]
+    shrine_location = unreal.Vector(origin[0], origin[1], origin[2])
+    shrine = None
+    for actor in _actor_subsystem().get_all_level_actors():
+        try:
+            if actor.get_actor_label() == shrine_label:
+                shrine = actor
+                break
+        except Exception:
+            continue
+    if shrine is None:
+        shrine = _actor_subsystem().spawn_actor_from_class(
+            unreal.TargetPoint, shrine_location, unreal.Rotator()
+        )
+        report["placed"].append(shrine_label)
+    else:
+        shrine.set_actor_location(shrine_location, False, None)
+        report["reused"].append(shrine_label)
+    if shrine is None:
+        _log("FATAL: could not place %s" % shrine_label)
+        return 1
+    shrine.set_actor_label(shrine_label)
+
     if not _level_subsystem().save_current_level():
         _log("FATAL: save_current_level failed")
         return 1
@@ -257,8 +287,8 @@ def main():
         json.dump(report, handle, indent=2)
     _log("report -> %s" % REPORT_PATH)
 
-    _log("DONE placed=%d reused=%d sleepers=%d"
-         % (len(report["placed"]), len(report["reused"]), report["sleeper_count"]))
+    _log("DONE placed=%d reused=%d guards=%d"
+         % (len(report["placed"]), len(report["reused"]), report["guard_count"]))
     return 0
 
 

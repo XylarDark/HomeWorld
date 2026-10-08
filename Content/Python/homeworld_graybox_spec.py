@@ -85,6 +85,11 @@ ALLOWED_MATERIAL_INSTANCES: frozenset[str] = frozenset(
         "M_WoodCabin_Window",
         "M_MoonDisc",
         "M_VOLUME_Haze",
+        # 2026-10-08 remap. Instances, not new masters.
+        # M_BeastStylized_Family cites M_BeastStylized (the stylized figure master).
+        "M_BeastStylized_Family",
+        # M_StylizedGrass_ValleyNight cites M_StylizedGrass (valley ground, NightMix).
+        "M_StylizedGrass_ValleyNight",
     }
 )
 

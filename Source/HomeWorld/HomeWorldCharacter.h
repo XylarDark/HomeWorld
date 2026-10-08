@@ -130,6 +130,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Fertilizer|T0")
 	int32 GetCarriedFertilizer() const { return CarriedFertilizer; }
 
+	/** Night flight. Healed wound wisps are the flight. The mixed fertilizer is the load. */
+	UFUNCTION(BlueprintCallable, Category = "Fertilizer|T0")
+	bool TrySpreadFertilizerOnNightFlight();
+
+	UFUNCTION(BlueprintCallable, Category = "Fertilizer|T0")
+	int32 GetMorningHerbPiles() const { return MorningHerbPiles; }
+
 	UFUNCTION(BlueprintCallable, Category = "Shrine|T0")
 	void NotifyLeftHomestead();
 
@@ -475,6 +482,10 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Fertilizer|T0")
 	int32 CarriedFertilizer = 0;
+
+	/** Stays zero. Dawn does not spawn a pile. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Fertilizer|T0")
+	int32 MorningHerbPiles = 0;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Wound|T0")
 	bool bHomesteadWoundHealed = false;

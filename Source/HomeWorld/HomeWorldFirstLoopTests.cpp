@@ -358,4 +358,44 @@ bool FFamilyPlacesAndHintTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FNightFlightSpreadTest,
+	"HomeWorld.T0.FL10.NightFlightSpreadsFertilizer",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FNightFlightSpreadTest::RunTest(const FString& Parameters)
+{
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("FL10 flight"));
+	if (!Scope.Ok(this))
+	{
+		return false;
+	}
+	Scope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Night);
+	AHomeWorldCharacter* Character = HomeWorldTestWorld::SpawnCharacter(Scope.World);
+	if (!TestNotNull(TEXT("character"), Character) ||
+		!TestTrue(TEXT("night spirit glide"), HomeWorldFirstLoopTest::StartDescent(Scope.World, Character)))
+	{
+		return false;
+	}
+
+	TestTrue(TEXT("first wisp"), Character->CollectCloudWisp(Scope.World->SpawnActor<AHomeWorldCloudWisp>()));
+	TestTrue(TEXT("second wisp"), Character->CollectCloudWisp(Scope.World->SpawnActor<AHomeWorldCloudWisp>()));
+	TestFalse(TEXT("a third wisp is refused"),
+		Character->CollectCloudWisp(Scope.World->SpawnActor<AHomeWorldCloudWisp>()));
+	TestEqual(TEXT("cap stays two"), Character->GetCarriedCloudWisps(), 2);
+
+	TestTrue(TEXT("one wisp heals the wound"), Character->TryGiveNightWispToWound());
+	TestTrue(TEXT("dung"), Character->TryAddCarriedDung());
+	TestTrue(TEXT("the other wisp mixes"), Character->TryMixHomesteadFertilizer());
+	TestEqual(TEXT("one fertilizer"), Character->GetCarriedFertilizer(), 1);
+
+	TestTrue(TEXT("the night flight spreads that mix"), Character->TrySpreadFertilizerOnNightFlight());
+	TestEqual(TEXT("the fertilizer is consumed"), Character->GetCarriedFertilizer(), 0);
+
+	Scope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Dawn);
+	Character->SyncFormWithTimeOfDay();
+	TestEqual(TEXT("dawn adds no herb pile"), Character->GetMorningHerbPiles(), 0);
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS

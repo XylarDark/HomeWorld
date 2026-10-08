@@ -87,7 +87,7 @@ README is left intact as history.
 | Zone/asset placement specs | `Lib/02_Zones/**/*.json` | **the machine-readable truth** |
 | Image prompts (Grok) | `Docs/art/GROK_IMAGINE_PROMPTS.md` | in flight |
 | **The 13+4 T0 MUSTs** | `Docs/handoffs/T0_MECHANIC_INVENTORIES_V1.md` | **canonical for T0** |
-| The work queue | `Docs/TaskLists/T0_FIRST_LOOP_NOW.md` | active — 2026-10-07 lock. `T0_EXECUTION_PHASES.md` is the pre-lock record |
+| The work queue | `Docs/TaskLists/T0_NEXT_QUEUE.md` | active — 2026-10-08. `T0_FIRST_LOOP_NOW.md` is the finished code queue |
 | Taste decisions Rounds 1–7 | `Docs/handoffs/TASTE_GATE_T0_ASSETS.md` | R1–6 RESOLVED, R7+ parked |
 | Agent-owned decisions | `Docs/decisions/AGENT_DECISIONS.md` | DEC-0001…**0035** — all 35 ids present; file *order* is 0001-0026, 0033-0035, 0027-0031, so search by id not by position |
 | UE 5.8 engineering | `Docs/SETUP.md`, `KNOWN_ERRORS.md`, `CONVENTIONS.md` | canon |
@@ -184,7 +184,7 @@ visible in the log rather than hidden in a return value.
 | `Docs/Automation/AGENT_COMPANY.md` | Pre-swarm agent loop, **removed WAVE F**. Stub only. |
 | `docs/TaskLists/DAILY_STATE.md`, `docs/SESSION_LOG.md` | Legacy task lists. Continuity is now handoffs + `SESSION_SUMMARY` + `swarm/PHASE_BOARD.md`. |
 | `Docs/00_CANON.md` | **LOCKED P0 but pre-T0 topology** — its map tree predates the planet slice. Flagged, not quarantined; the Lead owns that call. |
-| `Docs/TaskLists/**` (legacy, non-T0) | Wave-era lists. The active queue is `T0_FIRST_LOOP_NOW.md`. `T0_EXECUTION_PHASES.md` and `T0_EXECUTION_QUEUE.md` are the pre-lock record. |
+| `Docs/TaskLists/**` (legacy, non-T0) | Wave-era lists. The active queue is `T0_NEXT_QUEUE.md`. `T0_FIRST_LOOP_NOW.md` is the finished code queue. `T0_EXECUTION_PHASES.md` and `T0_EXECUTION_QUEUE.md` are the pre-lock record. |
 | `Docs/handoffs/**` (legacy, non-T0) | 158 files. Authority is the newest `SESSION_HANDOFF_*.md` only. |
 
 ---
