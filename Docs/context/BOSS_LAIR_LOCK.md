@@ -54,7 +54,7 @@ The head heal is the ask. Same heal, on the head, after the eye. No line. No sec
 
 Live zoom. No cut. You stay in the shot, on the giant's shoulder. The title card reads HomeWorld on that shot. He does not speak it. The shoulder is not a path you walk.
 
-The rescue is not replayed. The seal sends the player home by the shrine, then they walk to the bed. The bull walks to the barn.
+The title does not send you home. You stay until you choose the shrine. Then you walk to the bed. The bull walks to the barn. The rescue is not replayed.
 
 ## Family
 
@@ -81,8 +81,9 @@ Not lair verbs. A thick fog marks the second forest. A tree boots you back to th
 | Head heal | The ask. Same heal, on the head, after the eye. No line. He takes the snake off. |
 | Pool | A read. The snake is gone. You do not go there. |
 | End shot | Live zoom. You stay on his shoulder. Title on that shot. No cut. Not a path. |
+| Shrine | The way home, when you choose it. Then walk to the bed. The bull walks to the barn. |
 | Partner, child | Stay home. Child shows the fog lift from the edge. |
 
 ## Not in this lock
 
-New combat, a snake health bar, a snake death, a second mount, a new flight mode, a stealth minigame, a new zone, a pool you can enter, a cut to the title, a shoulder path, a scale puzzle on coil three, an eye stun, a trip home from the eye, a spoken ask, fertilizer as a gate, the homestead wound as a gate, a boot home from a missed scale, a new soothe verb, day heals, the giant speaking the title, a second ram on coil two.
+New combat, a snake health bar, a snake death, a second mount, a new flight mode, a stealth minigame, a new zone, a pool you can enter, a cut to the title, a shoulder path, a forced trip home after the title, a scale puzzle on coil three, an eye stun, a trip home from the eye, a spoken ask, fertilizer as a gate, the homestead wound as a gate, a boot home from a missed scale, a new soothe verb, day heals, the giant speaking the title, a second ram on coil two.
