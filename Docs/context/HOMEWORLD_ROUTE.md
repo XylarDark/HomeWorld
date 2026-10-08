@@ -104,6 +104,11 @@ One fact proposed at a time, one yes from Luke, one write into this file only â€
 - Lead 2026-10-07: the family beat is one hint toward the edge. Not a dialogue tree.
 - Lead 2026-10-07: night fertilizer is still one dung plus one cloud wisp. The wisp is collected only at night.
 
+- Lead 2026-10-07: the day glide sign is smoke from the camp. No pickup.
+- Lead 2026-10-07: the homestead wound is healed by giving a night wisp.
+- Lead 2026-10-07: the night spirit glide uses the same steer as the day glide.
+- Lead 2026-10-07: at the camp, ease the guards until they sleep. No kill.
+
 ## Left empty on purpose
 
 - Polish-gate ids and gate-chain order: (empty)

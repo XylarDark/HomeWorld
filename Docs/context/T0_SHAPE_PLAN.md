@@ -69,3 +69,10 @@ Day glide reads the camp heading. One sign. No pickup.
 Tea is a faster walk until dusk.
 Family beat is one hint toward the edge.
 Night fertilizer is one dung plus one night wisp.
+
+## Camp and wound
+
+Day glide sign is camp smoke. No pickup.
+Night glide steers like the day glide.
+The wound is healed by giving a night wisp.
+Camp guards are eased until they sleep. No kill.

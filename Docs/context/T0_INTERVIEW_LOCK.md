@@ -35,3 +35,7 @@ Lead answers, 2026-10-07. Not a start read. Open when the task touches T0 scope.
 - tea unlocks a faster walk until dusk.
 - the family beat is one hint toward the edge. Not a dialogue tree.
 - night fertilizer is still one dung plus one cloud wisp. The wisp is collected only at night.
+- the day glide sign is smoke from the camp. No pickup.
+- the homestead wound is healed by giving a night wisp.
+- the night spirit glide uses the same steer as the day glide.
+- at the camp, ease the guards until they sleep. No kill.
