@@ -10,7 +10,7 @@ One body, many times the player. An Atlas-like sleeper, trapped in a cliffside c
 
 He kneels on both knees. The back-to-head slope is about 30 degrees, so the bull can ride and the player can mostly walk.
 
-Three body coils, then the head bind. Coil one comes off a full-speed ram on a loose scale. Coil two comes off a tickle. The guards push only coil three, and only at night, and only after their wounds are healed. The head bind is what he rips off. The snake falls to the pool below.
+Three body coils, then the head bind. Coil one comes off a full-speed ram on a loose scale. Coil two comes off a tickle. The guards push only coil three, and only at night, and only after their wounds are healed. The head bind is what he rips off. The snake falls to the pool below. The pool is a read, not a place. You do not go there.
 
 A coil comes off first. The wrap under it is healed at night, not when it comes off.
 
@@ -48,7 +48,7 @@ They cannot push coil three until those wounds are closed. Then they push it. No
 
 Spirit stealth, the same stealth you already use, takes you past the snake's eye. Not a new minigame. If the eye catches you, you are set just outside its light. No stun. No trip home. The eye keeps its watch.
 
-The head heal is the ask. Same heal, on the head, after the eye. No line. No second beat. He takes the snake off. It falls to the pool below.
+The head heal is the ask. Same heal, on the head, after the eye. No line. No second beat. He takes the snake off. It falls to the pool. The snake is gone. The shoulder shot follows.
 
 ## End shot
 
@@ -79,9 +79,10 @@ Not lair verbs. A thick fog marks the second forest. A tree boots you back to th
 | Night portal or glide | The return. Existing shrine, or the same glide. No new flight. |
 | Spirit stealth | Past the snake's eye. A catch sets you just outside the light. No stun. No trip home. |
 | Head heal | The ask. Same heal, on the head, after the eye. No line. He takes the snake off. |
+| Pool | A read. The snake is gone. You do not go there. |
 | End shot | Zoom out. Player on his shoulder. Title card reads HomeWorld. He does not speak it. |
 | Partner, child | Stay home. Child shows the fog lift from the edge. |
 
 ## Not in this lock
 
-New combat, a snake health bar, a snake death, a second mount, a new flight mode, a stealth minigame, a new zone, a scale puzzle on coil three, an eye stun, a trip home from the eye, a spoken ask, fertilizer as a gate, the homestead wound as a gate, a boot home from a missed scale, a new soothe verb, day heals, the giant speaking the title, a second ram on coil two.
+New combat, a snake health bar, a snake death, a second mount, a new flight mode, a stealth minigame, a new zone, a pool you can enter, a scale puzzle on coil three, an eye stun, a trip home from the eye, a spoken ask, fertilizer as a gate, the homestead wound as a gate, a boot home from a missed scale, a new soothe verb, day heals, the giant speaking the title, a second ram on coil two.
