@@ -88,6 +88,7 @@ README is left intact as history.
 | Image prompts (Grok) | `Docs/art/GROK_IMAGINE_PROMPTS.md` | in flight |
 | **The 13+4 T0 MUSTs** | `Docs/handoffs/T0_MECHANIC_INVENTORIES_V1.md` | **canonical for T0** |
 | The work queue | `Docs/TaskLists/T0_NEXT_QUEUE.md` | active — 2026-10-08. `T0_FIRST_LOOP_NOW.md` is the finished code queue |
+| Prototype boss lair | `Docs/context/BOSS_LAIR_LOCK.md` | shape lock 2026-10-08. Fight stays later |
 | Taste decisions Rounds 1–7 | `Docs/handoffs/TASTE_GATE_T0_ASSETS.md` | R1–6 RESOLVED, R7+ parked |
 | Agent-owned decisions | `Docs/decisions/AGENT_DECISIONS.md` | DEC-0001…**0035** — all 35 ids present; file *order* is 0001-0026, 0033-0035, 0027-0031, so search by id not by position |
 | UE 5.8 engineering | `Docs/SETUP.md`, `KNOWN_ERRORS.md`, `CONVENTIONS.md` | canon |

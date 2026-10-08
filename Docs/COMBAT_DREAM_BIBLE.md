@@ -59,6 +59,7 @@ Combat is **rare boss-only** vs great/terrible evil (**win = seal / banish / end
 | Day phase (B) | **Traversal / parkour** + **weak-point interacts** + **siege objects** on the world (reuse MOVEMENT mantle/vault + interact volumes) |
 | Night phase (B) | **Spirit blink**, **possess**, **heal-strip** on the **dream** of the evil — not DPS |
 | Win (A1) | **`BOSS:SEAL`** (or equivalent) — **seal / banish / end evil** — **not** kill / murder win |
+| Prototype lair | Shape only, 2026-10-08. `Docs/context/BOSS_LAIR_LOCK.md`. The fight stays LATER. |
 
 ### Placeholder boss volume (NOW implementation target)
 

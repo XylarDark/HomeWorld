@@ -36,6 +36,7 @@ convert. The world teaches through its shape, materials, and light.
 4. Discover the camp during the day. The loved one is taken and the player is sent home.
 5. At night, become spirit, use spirit-stealth to reach the guards, ease their suffering until they sleep, and free the loved one.
 6. Return home with the loved one. Continue the day-gather/night-tend loop.
+7. When that loop is complete, the same cliff glide can enter the sleeper's lair. The shape is `Docs/context/BOSS_LAIR_LOCK.md`.
 
 The homestead, open field, and pine-forest camp form the prototype's three
 places. The glide connects them; it is traversal, not a separate mechanic

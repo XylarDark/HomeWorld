@@ -115,6 +115,8 @@ One fact proposed at a time, one yes from Luke, one write into this file only â€
 
 - Lead 2026-10-08: the spread is the night flight. The player spreads the mixed fertilizer over the field herb sites. The healed wound wisps are that flight. The night cap stays two cloud wisps: one heals the wound, one is mixed with a dung. There is no morning pile and no third cloud wisp.
 
+- Lead 2026-10-08: in the sleeper's lair the tamed bull may be ridden along the body. The ride stays field-only everywhere else. `Docs/context/BOSS_LAIR_LOCK.md`.
+
 ## Left empty on purpose
 
 - Polish-gate ids and gate-chain order: (empty)
