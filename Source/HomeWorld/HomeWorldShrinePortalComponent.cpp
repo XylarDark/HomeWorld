@@ -1,6 +1,7 @@
 // Copyright HomeWorld. All Rights Reserved.
 
 #include "HomeWorldShrinePortalComponent.h"
+#include "HomeWorldCharacter.h"
 #include "HomeWorldTimeOfDaySubsystem.h"
 #include "GameFramework/Pawn.h"
 #include "Engine/World.h"
@@ -18,6 +19,12 @@ namespace
 }
 
 #define LOG_PORTAL_FALLBACK(Format, ...) UE_LOG(LogTemp, Log, TEXT("FALLBACK: Portal " Format), ##__VA_ARGS__)
+
+static bool IsCampDestinationLabel(FName Label)
+{
+	const FString Text = Label.ToString();
+	return Text.Contains(TEXT("CAMP"), ESearchCase::IgnoreCase);
+}
 
 UHomeWorldShrinePortalComponent::UHomeWorldShrinePortalComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -189,6 +196,32 @@ bool UHomeWorldShrinePortalComponent::TryPortalTransit(AActor* InstigatorActor)
 		return false;
 	}
 
+	if (IsCampDestinationLabel(DestinationLabel))
+	{
+		LOG_PORTAL_FALLBACK(TEXT("refused — shrine returns home and does not set a camp destination"));
+		return false;
+	}
+
+	AHomeWorldCharacter* Character = Cast<AHomeWorldCharacter>(Pawn);
+	if (Character)
+	{
+		UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
+		const bool bNight = TimeOfDay && TimeOfDay->GetIsNight();
+		if (bNight)
+		{
+			if (!Character->GetIsSpiritForm())
+			{
+				LOG_PORTAL_FALLBACK(TEXT("refused — night return is spirit form only"));
+				return false;
+			}
+		}
+		else if (!Character->HasLeftHomestead() || Character->GetIsSpiritForm())
+		{
+			LOG_PORTAL_FALLBACK(TEXT("refused — day return is the body, after leaving"));
+			return false;
+		}
+	}
+
 	AActor* Destination = FindDestinationActor(World);
 	if (!Destination)
 	{
@@ -214,6 +247,10 @@ bool UHomeWorldShrinePortalComponent::TryPortalTransit(AActor* InstigatorActor)
 
 	LOG_PORTAL_FALLBACK(TEXT("transit %s -> %s @ %s"),
 		*GetOwner()->GetName(), *Destination->GetName(), *ArriveLoc.ToString());
+	if (Character)
+	{
+		Character->CompleteShrineReturn();
+	}
 	return true;
 }
 
@@ -221,9 +258,9 @@ bool UHomeWorldShrinePortalComponent::TryPortalTransitToDestination(AActor* Inst
 {
 	// T0 #13 home->camp: reuse TryPortalTransit with temporary DestinationLabel override.
 	// Architecture Trade-Offs B: no parallel portal service. Restore label so home<->planet pair stays intact.
-	if (OverrideDestinationLabel.IsNone())
+	if (OverrideDestinationLabel.IsNone() || IsCampDestinationLabel(OverrideDestinationLabel))
 	{
-		LOG_PORTAL_FALLBACK(TEXT("failed -- OverrideDestinationLabel none (NODE_PORTAL_CAMP required for #13)"));
+		LOG_PORTAL_FALLBACK(TEXT("refused — shrine does not transit to camp"));
 		return false;
 	}
 	const FName SavedLabel = DestinationLabel;

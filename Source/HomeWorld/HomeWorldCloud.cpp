@@ -5,6 +5,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Engine/StaticMesh.h"
 #include "HomeWorldCloudWisp.h"
+#include "HomeWorldTimeOfDaySubsystem.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInterface.h"
 
@@ -68,6 +69,13 @@ AHomeWorldCloudWisp* AHomeWorldCloud::EnsureSurfaceWisp()
 	if (!bCarriesWisp || SurfaceWisp || !GetWorld())
 	{
 		return SurfaceWisp;
+	}
+	if (UHomeWorldTimeOfDaySubsystem* TimeOfDay = GetWorld()->GetSubsystem<UHomeWorldTimeOfDaySubsystem>())
+	{
+		if (!TimeOfDay->GetIsNight())
+		{
+			return nullptr;
+		}
 	}
 
 	const double Radius = GetDiameterCm() * 0.5;

@@ -19,17 +19,12 @@ UHomeWorldSpiritStealthComponent::UHomeWorldSpiritStealthComponent()
 	// precisely the fail-open that the bSoftLatch field exists to contain.
 	CampActors.Reserve(HomeWorldCampNight::GetGatedActorCount());
 
-	FHomeWorldCampActorCalm Guard;
-	Guard.Role = EHomeWorldCampRole::Guard;
-	Guard.bAsleep = HomeWorldCampNight::StartsAsleep(EHomeWorldCampRole::Guard);
-	CampActors.Add(Guard);
-
-	for (int32 Index = 0; Index < 2; ++Index)
+	for (int32 Index = 0; Index < HomeWorldCampNight::GetGatedActorCount(); ++Index)
 	{
-		FHomeWorldCampActorCalm Sleeper;
-		Sleeper.Role = EHomeWorldCampRole::Sleeper;
-		Sleeper.bAsleep = HomeWorldCampNight::StartsAsleep(EHomeWorldCampRole::Sleeper);
-		CampActors.Add(Sleeper);
+		FHomeWorldCampActorCalm Guard;
+		Guard.Role = EHomeWorldCampRole::Guard;
+		Guard.bAsleep = HomeWorldCampNight::StartsAsleep(EHomeWorldCampRole::Guard);
+		CampActors.Add(Guard);
 	}
 }
 

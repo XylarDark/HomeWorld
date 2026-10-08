@@ -1,6 +1,10 @@
 # T0 execution phases — work the agent can do without the Lead
 
-Written 2026-10-02. The image work is paused at the Lead's request. This is the queue that
+Written 2026-10-02. Pre-lock record. The first-loop queue is
+`Docs/TaskLists/T0_FIRST_LOOP_NOW.md`. Do not implement the rune gate or the
+home-to-camp portal from this file.
+
+The image work is paused at the Lead's request. This is the queue that
 closes the gap between "the design is written down" and "a reviewer can play it".
 
 **How to read the blocked column.** `NO` means I can do it now with no input from anyone.

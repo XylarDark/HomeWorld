@@ -229,6 +229,8 @@ bool FBeatNodeTagsAreInteractableTest::RunTest(const FString& Parameters)
 		{ TEXT("#8  DayCamp alias"),    TEXT("DayCamp") },
 		{ TEXT("#11 NODE_BED"),         TEXT("NODE_BED") },
 		{ TEXT("#11 Bed alias"),        TEXT("Bed") },
+		{ TEXT("NODE_GARDEN"),          TEXT("NODE_GARDEN") },
+		{ TEXT("Garden alias"),         TEXT("Garden") },
 	};
 
 	const int32 TagCount = UE_ARRAY_COUNT(BeatTags);
@@ -249,7 +251,7 @@ bool FBeatNodeTagsAreInteractableTest::RunTest(const FString& Parameters)
 	}
 
 	// A table that silently matched nothing would report zero rows and look like a pass.
-	TestEqual(TEXT("every declared beat-node tag was checked"), TagCount, 14);
+	TestEqual(TEXT("every declared beat-node tag was checked"), TagCount, 16);
 
 	return true;
 }

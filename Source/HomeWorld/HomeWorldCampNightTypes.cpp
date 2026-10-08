@@ -6,7 +6,7 @@ namespace HomeWorldCampNight
 {
 	int32 GetGatedActorCount()
 	{
-		// One guard plus two sleepers. Kept as a function rather than a constant so a
+		// Three guards. Kept as a function rather than a constant so a
 		// test can assert the gate's width instead of trusting a number typed in prose.
 		return 3;
 	}

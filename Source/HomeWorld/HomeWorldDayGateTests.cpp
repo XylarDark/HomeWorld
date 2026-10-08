@@ -82,7 +82,7 @@ bool FDayGatesRefuseAtDuskAndNightTest::RunTest(const FString& Parameters)
 		TEXT("#4 NODE_BACKPACK"), TEXT("#6 NODE_FIELD_GATHER") };
 
 	// Body form throughout - this test is about the phase gate, and DayVerbsOffAtNight plus
-	// BothGatesGrantSpirit in HomeWorldFormGateTests already cover the form half.
+	// BedAtNightGrantsSpiritWithRuneLocked in HomeWorldFormGateTests already cover the form half.
 	for (int32 Pass = 0; Pass < 2; ++Pass)
 	{
 		const EHomeWorldTimeOfDayPhase Phase =
@@ -256,10 +256,10 @@ bool FPlantAndNurtureAreDistinctMarksTest::RunTest(const FString& Parameters)
  * fixture the world-only test world cannot supply, and #6 likewise. #7 is the one beat
  * whose positive half runs in this fixture, so it is the one that proves the day-gate
  * table's "refused at Dusk/Night" rows are not passing for the wrong reason - i.e. that
- * a correctly placed unlock really does set the latch, and that the latch really is
- * load-bearing for the bed path, rather than the bed path being open by another route.
+ * a correctly placed unlock really does set the latch, and that the latch alone is
+ * not the form change.
  *
- * Anti rows: "spirit on phase alone != beat"; "bed->spirit without unlock = closed_fail".
+ * Anti row: unlock alone is not spirit. The bed does not wait on this latch.
  */
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 	FRuneUnlockGrantsNoSpiritAloneTest,
@@ -301,11 +301,10 @@ bool FRuneUnlockGrantsNoSpiritAloneTest::RunTest(const FString& Parameters)
 	TestFalse(TEXT("M7 Anti: unlock alone is not spirit, at night"),
 		Character->GetIsSpiritForm());
 
-	// And the load-bearing proof: unlock is what lets the bed path reach spirit. If the
-	// latch silently did not persist, this last step fails while everything above passes.
+	// Sleep at night grants spirit. This latch being set is not what opens the bed.
 	Character->GrantSpiritSleepGate();
 	Character->SyncFormWithTimeOfDay();
-	TestTrue(TEXT("M7 + M11: rune unlock + bed sleep gate at night grants spirit"),
+	TestTrue(TEXT("M11: bed sleep gate at night grants spirit"),
 		Character->GetIsSpiritForm());
 
 	return true;

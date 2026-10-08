@@ -84,8 +84,9 @@ bool FCloudDescentSteeringAndWispTest::RunTest(const FString& Parameters)
 	{
 		return false;
 	}
-	TestTrue(TEXT("wisp collected during active descent"), Character->CollectCloudWisp(Wisp));
-	TestEqual(TEXT("wisp remains in carried route state"), Character->GetCarriedCloudWisps(), 1);
+	TestFalse(TEXT("day descent collects nothing"), Character->CollectCloudWisp(Wisp));
+	TestEqual(TEXT("day descent carries no wisp"), Character->GetCarriedCloudWisps(), 0);
+	TestTrue(TEXT("day descent sign is camp smoke"), Character->HasDayGlideSmokeSign());
 
 	return true;
 }
@@ -287,6 +288,7 @@ bool FCloudFieldAutomationTest::RunTest(const FString& Parameters)
 		return false;
 	}
 
+	Scope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Night);
 	const FVector SpawnLocation(750.0, 450.0, -7350.0);
 	FActorSpawnParameters Params;
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;

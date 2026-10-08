@@ -26,12 +26,12 @@
  *
  * WHY THIS IS THE FIRST TEST IN THE TRACK
  *
- * The implementation is already correct:
+ * The implementation is:
  *
  *     bool bSpirit = bSpiritCapablePhase && CanEnterSpiritForm();
- *     bool CanEnterSpiritForm() const { return bSpiritSleepGateGranted && bRuneGateUnlocked; }
+ *     bool CanEnterSpiritForm() const { return bSpiritSleepGateGranted; }
  *
- * Phase alone can never grant spirit. That is the T0 law, expressed in one line - and it is
+ * Phase alone can never grant spirit. The rune latch is not the form change. That is the T0 law, expressed in one line - and it is
  * exactly the kind of line that gets "simplified" by a later pass, at which point the theme
  * quietly changes and nothing fails. So the law is pinned here in the project's own
  * vocabulary: FORM_BODY, FORM_SPIRIT, closed_fail.
@@ -200,20 +200,19 @@ bool FDayVerbsOffAtNightTest::RunTest(const FString& Parameters)
 }
 
 /**
- * BOTH gates grant spirit at night - and both are required.
+ * The bed at night grants spirit while the rune latch stays locked.
  *
- * This is the positive half of #9, and it is the half that proves the negative half means
- * something. A build where spirit was impossible would satisfy "night without gates stays
- * body" perfectly while shipping no game.
+ * This is the positive half of #9. A build where spirit was impossible would satisfy
+ * "night without the sleep gate stays body" while shipping no night.
  */
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(
-	FBothGatesGrantSpiritTest,
-	"HomeWorld.T0.M9.BothGatesGrantSpirit",
+	FBedAtNightGrantsSpiritWithRuneLockedTest,
+	"HomeWorld.T0.M11.BedAtNightGrantsSpiritWithRuneLocked",
 	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 
-bool FBothGatesGrantSpiritTest::RunTest(const FString& Parameters)
+bool FBedAtNightGrantsSpiritWithRuneLockedTest::RunTest(const FString& Parameters)
 {
-	HomeWorldFormTest::FScopedWorld Scope(TEXT("M9 both-gates"));
+	HomeWorldFormTest::FScopedWorld Scope(TEXT("M11 night bed"));
 	if (!Scope.Ok(this))
 	{
 		return false;
@@ -226,22 +225,47 @@ bool FBothGatesGrantSpiritTest::RunTest(const FString& Parameters)
 		return false;
 	}
 
-	// Sleep only - rune still missing. This is the #11 dependency and must NOT grant spirit.
-	Character->GrantSpiritSleepGate();
-	TestTrue(TEXT("sleep gate granted by the bed path"), Character->IsSpiritSleepGateGranted());
-	TestFalse(TEXT("sleep alone is not enough - rune still required"),
-		Character->CanEnterSpiritForm());
-	Character->SyncFormWithTimeOfDay();
-	TestFalse(TEXT("closed_fail guard: sleep without rune must not become FORM_SPIRIT"),
+	TestFalse(TEXT("rune latch stays locked before sleep"), Character->IsRuneGateUnlocked());
+	TestTrue(TEXT("night bed grants spirit"), Character->TryBedSleepSpirit());
+	TestFalse(TEXT("rune latch stays locked after sleep"), Character->IsRuneGateUnlocked());
+	TestTrue(TEXT("sleep gate is on"), Character->IsSpiritSleepGateGranted());
+	TestTrue(TEXT("can enter spirit from the bed alone"), Character->CanEnterSpiritForm());
+	TestTrue(TEXT("M11: night bed is FORM_SPIRIT with the rune latch locked"),
 		Character->GetIsSpiritForm());
 
-	// Now the second gate. This is the only route to FORM_SPIRIT.
-	Character->SetRuneGateUnlocked(true);
-	TestTrue(TEXT("rune gate unlocked by #7"), Character->IsRuneGateUnlocked());
-	TestTrue(TEXT("sleep AND rune grants spirit form"), Character->CanEnterSpiritForm());
+	return true;
+}
+
+/**
+ * The day bed stays body. Sleep does not grant spirit and does not move the clock.
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FDayBedStaysBodyTest,
+	"HomeWorld.T0.M11.DayBedStaysBody",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FDayBedStaysBodyTest::RunTest(const FString& Parameters)
+{
+	HomeWorldFormTest::FScopedWorld Scope(TEXT("M11 day bed"));
+	if (!Scope.Ok(this))
+	{
+		return false;
+	}
+
+	Scope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Day);
+	AHomeWorldCharacter* Character = HomeWorldFormTest::SpawnCharacter(Scope.World);
+	if (!TestNotNull(TEXT("character"), Character))
+	{
+		return false;
+	}
 	Character->SyncFormWithTimeOfDay();
-	TestTrue(TEXT("M9 + #7 + #11: both gates at night gives FORM_SPIRIT"),
-		Character->GetIsSpiritForm());
+
+	TestFalse(TEXT("rune latch stays locked"), Character->IsRuneGateUnlocked());
+	TestFalse(TEXT("day bed refuses the spirit grant"), Character->TryBedSleepSpirit());
+	TestEqual(TEXT("day bed does not move the clock"), Scope.TimeOfDay->GetCurrentPhase(),
+		EHomeWorldTimeOfDayPhase::Day);
+	TestFalse(TEXT("M11: day bed stays FORM_BODY"), Character->GetIsSpiritForm());
+	TestFalse(TEXT("day bed does not leave the sleep gate on"), Character->IsSpiritSleepGateGranted());
 
 	return true;
 }

@@ -45,31 +45,26 @@ void UHomeWorldGoToBedTriggerComponent::OnOverlapBegin(UPrimitiveComponent* Over
 		return;
 	}
 
-	// List 56 T3: At night, overlap = wake (AdvanceToDawn); otherwise go to bed.
-	// T0 #11: go-to-bed grants sleep gate; spirit only with NODE_RUNE via CanEnterSpiritForm.
-	if (TimeOfDay->GetIsNight())
+	// Night or dusk, still body: sleep grants spirit. Already spirit: wake to dawn.
+	// Day: advance the clock to night and stay FORM_BODY.
+	AHomeWorldCharacter* HWChar = Cast<AHomeWorldCharacter>(Pawn);
+	if (TimeOfDay->GetIsSpiritPhase())
 	{
-		TimeOfDay->AdvanceToDawn();
-		UE_LOG(LogTemp, Log, TEXT("HomeWorld: Wake (overlap at bed) -- phase set to Dawn. MVP List 56 T3."));
-	}
-	else if (AHomeWorldCharacter* HWChar = Cast<AHomeWorldCharacter>(Pawn))
-	{
-		if (HWChar->IsRuneGateUnlocked())
+		if (HWChar && !HWChar->GetIsSpiritForm())
 		{
 			HWChar->TryBedSleepSpirit();
 		}
 		else
 		{
-			TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Night);
-			HWChar->GrantSpiritSleepGate();
-			UE_LOG(LogTemp, Log,
-				TEXT("NODE_BED: sleep gate Night FORM_BODY (overlap; need NODE_RUNE for FORM_SPIRIT TOD_NIGHT_SPIRIT CAM_T0_BED; not phase-alone spirit; #9 w/o bed stay FORM_BODY)"));
+			TimeOfDay->AdvanceToDawn();
+			UE_LOG(LogTemp, Log, TEXT("HomeWorld: Wake (overlap at bed) -- phase set to Dawn. MVP List 56 T3."));
 		}
 	}
 	else
 	{
 		TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Night);
-		UE_LOG(LogTemp, Log, TEXT("HomeWorld: Go to bed (overlap) -- phase set to Night (no AHomeWorldCharacter; sleep gate not granted)."));
+		UE_LOG(LogTemp, Log,
+			TEXT("NODE_BED: day bed stays FORM_BODY (overlap; clock to Night; spirit is the night bed; rune latch stays locked)"));
 	}
 
 }

@@ -1,5 +1,10 @@
 # T0 ordered execution queue — 2026-10-07 re-pass
 
+Pre-lock record. The first-loop queue is `Docs/TaskLists/T0_FIRST_LOOP_NOW.md`.
+Item 4 below (rune unlock as the route into spirit) is superseded: sleep at the
+bed is the form change. Item 3 (companion hint) is no longer parked for lack of
+a design; the lock is one hint toward the edge.
+
 Built from `T0_EXECUTION_PHASES.md` + `T0_PROTOTYPE_TRACK.md` under the
 SESSION_START track sizing. In order. Owner column: who must act.
 

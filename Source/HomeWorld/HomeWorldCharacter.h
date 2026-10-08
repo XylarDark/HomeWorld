@@ -8,6 +8,16 @@
 #include "InputActionValue.h"
 #include "HomeWorldMealTypes.h"
 #include "HomeWorldTimeOfDaySubsystem.h"
+
+/** Where a family member stands. One place, not a dialogue tree. */
+UENUM(BlueprintType)
+enum class EHomeWorldFamilyPlace : uint8
+{
+	ByBed,
+	InGarden,
+	Away
+};
+
 #include "HomeWorldCharacter.generated.h"
 
 struct FOnAttributeChangeData;
@@ -85,12 +95,81 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Transit|Cloud Descent", meta = (DisplayName = "Is Cloud Descent Active"))
 	bool IsCloudDescentActive() const { return bCloudDescentActive; }
 
-	/** Add one carried route wisp. Only succeeds during the active descent. */
+	/** Add one carried route wisp. Night descent only, and only up to the night cap. */
 	UFUNCTION(BlueprintCallable, Category = "Transit|Cloud Descent", meta = (DisplayName = "Collect Cloud Wisp"))
 	bool CollectCloudWisp(AHomeWorldCloudWisp* Wisp);
 
 	UFUNCTION(BlueprintCallable, Category = "Transit|Cloud Descent", meta = (DisplayName = "Get Carried Cloud Wisps"))
 	int32 GetCarriedCloudWisps() const { return CarriedCloudWisps; }
+
+	/** True while a day descent is showing camp smoke as its one sign. */
+	UFUNCTION(BlueprintCallable, Category = "Transit|Cloud Descent")
+	bool HasDayGlideSmokeSign() const { return bDayGlideSmokeSign; }
+
+	UFUNCTION(BlueprintCallable, Category = "Garden|T0")
+	bool TryPickGardenHerb();
+
+	UFUNCTION(BlueprintCallable, Category = "Wound|T0")
+	bool TryGiveNightWispToWound();
+
+	UFUNCTION(BlueprintCallable, Category = "Wound|T0")
+	bool IsHomesteadWoundHealed() const { return bHomesteadWoundHealed; }
+
+	UFUNCTION(BlueprintCallable, Category = "Wound|T0")
+	int32 GetFollowingWoundWispCount() const { return FollowingWoundWispCount; }
+
+	UFUNCTION(BlueprintCallable, Category = "Fertilizer|T0")
+	bool TryAddCarriedDung();
+
+	UFUNCTION(BlueprintCallable, Category = "Fertilizer|T0")
+	bool TryMixHomesteadFertilizer();
+
+	UFUNCTION(BlueprintCallable, Category = "Fertilizer|T0")
+	int32 GetCarriedDung() const { return CarriedDung; }
+
+	UFUNCTION(BlueprintCallable, Category = "Fertilizer|T0")
+	int32 GetCarriedFertilizer() const { return CarriedFertilizer; }
+
+	UFUNCTION(BlueprintCallable, Category = "Shrine|T0")
+	void NotifyLeftHomestead();
+
+	UFUNCTION(BlueprintCallable, Category = "Shrine|T0")
+	bool HasLeftHomestead() const { return bHasLeftHomestead; }
+
+	UFUNCTION(BlueprintCallable, Category = "Shrine|T0")
+	void SetRidingBull(bool bRiding);
+
+	UFUNCTION(BlueprintCallable, Category = "Shrine|T0")
+	bool IsRidingBull() const { return bRidingBull; }
+
+	UFUNCTION(BlueprintCallable, Category = "Shrine|T0")
+	bool IsWalkToBarn() const { return bWalkToBarn; }
+
+	UFUNCTION(BlueprintCallable, Category = "Family|T0")
+	void NotifyPartnerTaken();
+
+	UFUNCTION(BlueprintCallable, Category = "Family|T0")
+	void NotifyPartnerReadyToReturn();
+
+	UFUNCTION(BlueprintCallable, Category = "Family|T0")
+	bool IsPartnerReadyToReturn() const { return bPartnerReadyToReturn; }
+
+	UFUNCTION(BlueprintCallable, Category = "Family|T0")
+	bool IsPartnerWalkingHome() const { return bPartnerWalkingHome; }
+
+	UFUNCTION(BlueprintCallable, Category = "Family|T0")
+	EHomeWorldFamilyPlace GetPartnerPlace() const { return PartnerPlace; }
+
+	UFUNCTION(BlueprintCallable, Category = "Family|T0")
+	EHomeWorldFamilyPlace GetChildPlace() const { return ChildPlace; }
+
+	UFUNCTION(BlueprintCallable, Category = "Family|T0")
+	bool HasFamilyHintFired() const { return bFamilyHintFired; }
+
+	UFUNCTION(BlueprintCallable, Category = "Family|T0")
+	FString GetFamilyHint() const { return FamilyHint; }
+
+	void CompleteShrineReturn();
 
 	UFUNCTION(BlueprintCallable, Category = "Transit|FALLBACK", meta = (DisplayName = "Cancel Fallback Glide"))
 	void CancelFallbackGlide();
@@ -140,7 +219,7 @@ public:
 
 	/**
 	 * T0 #11 hook: grant sleep gate then sync form.
-	 * Spirit still requires rune gate (#7). Does not invent a second form service.
+	 * The bed is the form change. The rune latch is not required.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Form|Gates", meta = (DisplayName = "Grant Spirit Sleep Gate"))
 	void GrantSpiritSleepGate();
@@ -149,7 +228,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Form|Gates", meta = (DisplayName = "Clear Spirit Sleep Gate"))
 	void ClearSpiritSleepGate();
 
-	/** Named gates: sleep + rune. Phase alone never grants spirit (T0 TOD_NIGHT_HOME). */
+	/** Sleep gate at night. Phase alone never grants spirit (T0 TOD_NIGHT_HOME). The rune latch is not required. */
 	UFUNCTION(BlueprintCallable, Category = "Form|Gates", meta = (DisplayName = "Can Enter Spirit Form"))
 	bool CanEnterSpiritForm() const;
 
@@ -259,7 +338,7 @@ public:
 	/**
 	 * T0 #7 NODE_RUNE: day field-path rune unlock interact -> SetRuneGateUnlocked.
 	 * Prefer existing gate hooks (bRuneGateUnlocked / CanEnterSpiritForm) -- no parallel form service (Arch B).
-	 * Not PROXY SM_ProxyRune alone; not spirit on phase alone; bed->spirit without unlock = closed_fail.
+	 * Not PROXY SM_ProxyRune alone; not spirit on phase alone. Unlock stays FORM_BODY. The bed does not wait on this latch.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Rune|T0", meta = (DisplayName = "Try Unlock NODE_RUNE"))
 	bool TryUnlockNodeRune();
@@ -310,14 +389,14 @@ public:
 	bool TryBootBeastChargeHome();
 
 	/**
-	 * T0 #11 NODE_BED: bed sleep-gate -> spirit (after NODE_RUNE).
+	 * T0 #11 NODE_BED: bed sleep at night -> spirit. The rune latch stays locked.
 	 * Prefer existing GrantSpiritSleepGate / CanEnterSpiritForm / ApplyFormForPhase -- no parallel form service (Arch B).
-	 * Requires IsRuneGateUnlocked (#7). Phase-alone / spirit w/o bed+rune / soft-kidnap = closed_fail. #9 w/o bed stay FORM_BODY.
+	 * Day and dawn stay FORM_BODY. Phase-alone / soft-kidnap = closed_fail. #9 w/o bed stay FORM_BODY.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Bed|T0", meta = (DisplayName = "Try Bed Sleep Spirit"))
 	bool TryBedSleepSpirit();
 
-	/** True after NODE_BED bed->spirit latch this session (sleep+rune). */
+	/** True after NODE_BED bed->spirit latch this session (night sleep). */
 	UFUNCTION(BlueprintCallable, Category = "Bed|T0", meta = (DisplayName = "Is Bed Spirit Granted"))
 	bool IsBedSpiritGranted() const { return bBedSpiritGranted; }
 
@@ -384,11 +463,56 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Transit|Cloud Descent")
 	bool bCloudDescentActive = false;
 
-	/** Route wisps carried this descent; intentionally separate from the six-resource inventory. */
+	/** Route wisps carried this night; intentionally separate from the six-resource inventory. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Transit|Cloud Descent")
 	int32 CarriedCloudWisps = 0;
 
-	/** T0 #9: spirit form flag — granted only via named gates (sleep + rune), not phase alone. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Transit|Cloud Descent")
+	bool bDayGlideSmokeSign = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Fertilizer|T0")
+	int32 CarriedDung = 0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Fertilizer|T0")
+	int32 CarriedFertilizer = 0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Wound|T0")
+	bool bHomesteadWoundHealed = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Wound|T0")
+	int32 FollowingWoundWispCount = 0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Shrine|T0")
+	bool bHasLeftHomestead = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Shrine|T0")
+	bool bRidingBull = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Shrine|T0")
+	bool bWalkToBarn = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Family|T0")
+	EHomeWorldFamilyPlace PartnerPlace = EHomeWorldFamilyPlace::ByBed;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Family|T0")
+	EHomeWorldFamilyPlace ChildPlace = EHomeWorldFamilyPlace::InGarden;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Family|T0")
+	bool bPartnerTaken = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Family|T0")
+	bool bPartnerReadyToReturn = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Family|T0")
+	bool bPartnerWalkingHome = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Family|T0")
+	bool bFamilyHintFired = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Family|T0")
+	FString FamilyHint;
+
+	/** T0 #9: spirit form flag — granted by the bed at night, not by phase alone and not by the rune latch. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Form")
 	bool bIsSpiritForm = false;
 
@@ -609,7 +733,7 @@ protected:
 	/** T0 #10: planetside night glider boot home latch (NODE_GLIDER EJECT_HOME this session). */
 	bool bPlanetsideNightBootTriggered = false;
 
-	/** T0 #11: bed->spirit latch after GrantSpiritSleepGate + rune (NODE_BED this session). */
+	/** T0 #11: bed->spirit latch after GrantSpiritSleepGate at night (NODE_BED this session). */
 	bool bBedSpiritGranted = false;
 
 	/** T0 #13: spirit home->camp portal latch (NODE_PORTAL_HOME -> NODE_PORTAL_CAMP this session). */

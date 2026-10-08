@@ -107,12 +107,12 @@ namespace HomeWorldCampNightTest
 		return Fixture;
 	}
 
-	/** Ease all three the way the beat intends: the guard once, each sleeper once. */
+	/** Ease all three guards until each is asleep. */
 	static void EaseAllThree(UHomeWorldSpiritStealthComponent* Stealth)
 	{
 		Stealth->TryEaseCampActor(EHomeWorldCampRole::Guard, 0);
-		Stealth->TryEaseCampActor(EHomeWorldCampRole::Sleeper, 0);
-		Stealth->TryEaseCampActor(EHomeWorldCampRole::Sleeper, 1);
+		Stealth->TryEaseCampActor(EHomeWorldCampRole::Guard, 1);
+		Stealth->TryEaseCampActor(EHomeWorldCampRole::Guard, 2);
 	}
 
 	/**
@@ -135,7 +135,7 @@ namespace HomeWorldCampNightTest
 	static void MakeCamp(FAutomationTestBase* Test, UWorld* World)
 	{
 		static const TCHAR* const Tags[] = {
-			TEXT("NODE_GUARD"), TEXT("NODE_SLEEPER"), TEXT("NODE_SLEEPER"), TEXT("NODE_CAPTIVE")
+			TEXT("NODE_GUARD"), TEXT("NODE_GUARD"), TEXT("NODE_GUARD"), TEXT("NODE_CAPTIVE")
 		};
 
 		for (const TCHAR* Tag : Tags)
@@ -174,8 +174,8 @@ namespace HomeWorldCampNightTest
 
 		const FEntry Entries[] = {
 			{EHomeWorldCampRole::Guard, 0},
-			{EHomeWorldCampRole::Sleeper, 0},
-			{EHomeWorldCampRole::Sleeper, 1},
+			{EHomeWorldCampRole::Guard, 1},
+			{EHomeWorldCampRole::Guard, 2},
 			{EHomeWorldCampRole::Captive, 0},
 		};
 
@@ -407,14 +407,14 @@ bool FEaseDirectionTest::RunTest(const FString& Parameters)
 	TestTrue(TEXT("guard is eased"), bEased);
 	TestTrue(TEXT("easing the guard is the act that puts them to sleep"), bAsleep);
 
-	// A sleeper: already asleep, and easing them keeps them that way.
-	Stealth->GetCampActorState(EHomeWorldCampRole::Sleeper, 0, bEased, bAsleep);
-	TestTrue(TEXT("sleeper starts asleep"), bAsleep);
+	// The second guard starts awake too. Easing puts them to sleep.
+	Stealth->GetCampActorState(EHomeWorldCampRole::Guard, 1, bEased, bAsleep);
+	TestFalse(TEXT("second guard starts awake"), bAsleep);
 
-	TestTrue(TEXT("easing a sleeper succeeds"), Stealth->TryEaseCampActor(EHomeWorldCampRole::Sleeper, 0));
-	Stealth->GetCampActorState(EHomeWorldCampRole::Sleeper, 0, bEased, bAsleep);
-	TestTrue(TEXT("sleeper is eased"), bEased);
-	TestTrue(TEXT("easing keeps a sleeper asleep - it does not wake them"), bAsleep);
+	TestTrue(TEXT("easing the second guard succeeds"), Stealth->TryEaseCampActor(EHomeWorldCampRole::Guard, 1));
+	Stealth->GetCampActorState(EHomeWorldCampRole::Guard, 1, bEased, bAsleep);
+	TestTrue(TEXT("second guard is eased"), bEased);
+	TestTrue(TEXT("easing the second guard puts them to sleep"), bAsleep);
 
 	// The captives cannot be eased; they are untied, and only through the gate.
 	TestFalse(TEXT("the captive cannot be eased - they are freed, not eased"),
@@ -470,7 +470,7 @@ bool FFreedomGateTest::RunTest(const FString& Parameters)
 
 	// Two of three is the trap the widening was written for.
 	Stealth->TryEaseCampActor(EHomeWorldCampRole::Guard, 0);
-	Stealth->TryEaseCampActor(EHomeWorldCampRole::Sleeper, 0);
+	Stealth->TryEaseCampActor(EHomeWorldCampRole::Guard, 1);
 	TestEqual(TEXT("two of three calm"), Stealth->GetCalmedActorCount(), 2);
 	TestFalse(TEXT("two of three does NOT open the gate"), Stealth->IsFreedomUnlocked());
 	TestFalse(TEXT("freeing is refused at two of three"), Stealth->TryFreeCaptive());
@@ -490,12 +490,12 @@ bool FFreedomGateTest::RunTest(const FString& Parameters)
 	TestTrue(TEXT("the captive is freed"), Stealth->IsCaptiveFreed());
 
 	// "Keep them sleeping" has to be able to fail, or "keep" means nothing.
-	Stealth->NotifyCampActorWoke(EHomeWorldCampRole::Sleeper, 1);
-	TestFalse(TEXT("a woken sleeper closes the gate"), Stealth->IsFreedomUnlocked());
+	Stealth->NotifyCampActorWoke(EHomeWorldCampRole::Guard, 1);
+	TestFalse(TEXT("a woken guard closes the gate"), Stealth->IsFreedomUnlocked());
 
 	// Both anti-cases.
-	Stealth->NotifyCampActorWoke(EHomeWorldCampRole::Sleeper, 0);
-	TestFalse(TEXT("the gate stays shut while a sleeper is awake"), Stealth->IsFreedomUnlocked());
+	Stealth->NotifyCampActorWoke(EHomeWorldCampRole::Guard, 2);
+	TestFalse(TEXT("the gate stays shut while a guard is awake"), Stealth->IsFreedomUnlocked());
 	Stealth->TryEaseCampActor(EHomeWorldCampRole::Guard, 0);
 	TestFalse(TEXT("re-easing a woken sleeper does NOT put them back to sleep"),
 		Stealth->IsFreedomUnlocked());
@@ -511,7 +511,7 @@ bool FFreedomGateTest::RunTest(const FString& Parameters)
 	}
 	EaseAllThree(Second.Stealth);
 	TestTrue(TEXT("sanity: all three eased opens the gate"), Second.Stealth->IsFreedomUnlocked());
-	Second.Stealth->NotifyCampActorConverted(EHomeWorldCampRole::Sleeper, 0);
+	Second.Stealth->NotifyCampActorConverted(EHomeWorldCampRole::Guard, 1);
 	TestFalse(TEXT("converting an actor does NOT substitute for calming them"),
 		Second.Stealth->IsFreedomUnlocked());
 
@@ -598,10 +598,10 @@ bool FRosterNotEmptyTest::RunTest(const FString& Parameters)
 	TestTrue(TEXT("the guard is tracked"), Stealth->GetCampActorState(EHomeWorldCampRole::Guard, 0, bEased, bAsleep));
 	TestFalse(TEXT("a fresh guard is not eased"), bEased);
 
-	TestTrue(TEXT("sleeper A is tracked"), Stealth->GetCampActorState(EHomeWorldCampRole::Sleeper, 0, bEased, bAsleep));
-	TestTrue(TEXT("a fresh sleeper is asleep"), bAsleep);
+	TestTrue(TEXT("guard 1 is tracked"), Stealth->GetCampActorState(EHomeWorldCampRole::Guard, 1, bEased, bAsleep));
+	TestFalse(TEXT("a fresh guard starts awake"), bAsleep);
 
-	TestTrue(TEXT("sleeper B is tracked"), Stealth->GetCampActorState(EHomeWorldCampRole::Sleeper, 1, bEased, bAsleep));
+	TestTrue(TEXT("guard 2 is tracked"), Stealth->GetCampActorState(EHomeWorldCampRole::Guard, 2, bEased, bAsleep));
 
 	bEased = false;
 	TestFalse(TEXT("the captive is not a gated actor and is not tracked as one"),
@@ -687,13 +687,13 @@ bool FCampNightCompletionRedirectTest::RunTest(const FString& Parameters)
 	// Easing only the two sleepers satisfies the OLD formula (soothe>=2) but not the new gate,
 	// because the guard is one of the three who must be calmed. This is the exact divergence
 	// the redirect exists to close.
-	Stealth->TryEaseCampActor(EHomeWorldCampRole::Sleeper, 0);
-	Stealth->TryEaseCampActor(EHomeWorldCampRole::Sleeper, 1);
-	TestEqual(TEXT("two sleepers eased"), Stealth->GetCalmedActorCount(), 2);
-	TestFalse(TEXT("two sleepers alone do NOT complete #14 - the guard must be calmed too"),
+	Stealth->TryEaseCampActor(EHomeWorldCampRole::Guard, 0);
+	Stealth->TryEaseCampActor(EHomeWorldCampRole::Guard, 1);
+	TestEqual(TEXT("two guards eased"), Stealth->GetCalmedActorCount(), 2);
+	TestFalse(TEXT("two guards asleep do NOT open the gate"),
 		Stealth->IsCampNightBeatComplete());
 
-	Stealth->TryEaseCampActor(EHomeWorldCampRole::Guard, 0);
+	Stealth->TryEaseCampActor(EHomeWorldCampRole::Guard, 2);
 	TestTrue(TEXT("all three calmed completes #14"), Stealth->IsCampNightBeatComplete());
 
 	return true;
@@ -769,14 +769,14 @@ bool FCampActorsAreDiscoveredTest::RunTest(const FString& Parameters)
 	// while only two people existed, and the scene would be lying.
 	bool bEased = false;
 	bool bAsleep = false;
-	TestTrue(TEXT("sleeper 0 state is readable"),
-		Stealth->GetCampActorState(EHomeWorldCampRole::Sleeper, 0, bEased, bAsleep));
-	TestTrue(TEXT("sleeper 0 was eased"), bEased);
-	TestTrue(TEXT("sleeper 1 state is readable"),
-		Stealth->GetCampActorState(EHomeWorldCampRole::Sleeper, 1, bEased, bAsleep));
-	TestTrue(TEXT("sleeper 1 was eased"), bEased);
-	TestTrue(TEXT("the guard was eased too"),
-		Stealth->GetCampActorState(EHomeWorldCampRole::Guard, 0, bEased, bAsleep) && bEased);
+	TestTrue(TEXT("guard 0 state is readable"),
+		Stealth->GetCampActorState(EHomeWorldCampRole::Guard, 0, bEased, bAsleep));
+	TestTrue(TEXT("guard 0 was eased"), bEased);
+	TestTrue(TEXT("guard 1 state is readable"),
+		Stealth->GetCampActorState(EHomeWorldCampRole::Guard, 1, bEased, bAsleep));
+	TestTrue(TEXT("guard 1 was eased"), bEased);
+	TestTrue(TEXT("guard 2 was eased too"),
+		Stealth->GetCampActorState(EHomeWorldCampRole::Guard, 2, bEased, bAsleep) && bEased);
 
 	return true;
 }
