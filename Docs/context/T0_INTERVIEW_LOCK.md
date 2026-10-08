@@ -31,3 +31,7 @@ Lead answers, 2026-10-07. Not a start read. Open when the task touches T0 scope.
 - cloud wisps are collected only at night. The day glide is only a glide. This revises the day wisp-on-the-way-down line.
 - the body may take a shrine home any time after leaving.
 - after the partner is taken, the child waits by the bed.
+- the day glide reads the camp heading. One sign on the way down. No pickup.
+- tea unlocks a faster walk until dusk.
+- the family beat is one hint toward the edge. Not a dialogue tree.
+- night fertilizer is still one dung plus one cloud wisp. The wisp is collected only at night.

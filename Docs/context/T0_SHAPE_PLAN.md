@@ -62,3 +62,10 @@ Day: wake, garden herbs, tea inside, day sprint, family, edge.
 Night glide collects cloud wisps. Day glide does not.
 The body may shrine home any time after leaving.
 After the partner is taken, the child waits by the bed.
+
+## Glide and tea
+
+Day glide reads the camp heading. One sign. No pickup.
+Tea is a faster walk until dusk.
+Family beat is one hint toward the edge.
+Night fertilizer is one dung plus one night wisp.

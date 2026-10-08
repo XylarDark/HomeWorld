@@ -99,6 +99,11 @@ One fact proposed at a time, one yes from Luke, one write into this file only â€
 - Lead 2026-10-07: the body may take a shrine home any time after leaving.
 - Lead 2026-10-07: after the partner is taken, the child waits by the bed.
 
+- Lead 2026-10-07: the day glide reads the camp heading. One sign on the way down. No pickup.
+- Lead 2026-10-07: tea unlocks a faster walk until dusk.
+- Lead 2026-10-07: the family beat is one hint toward the edge. Not a dialogue tree.
+- Lead 2026-10-07: night fertilizer is still one dung plus one cloud wisp. The wisp is collected only at night.
+
 ## Left empty on purpose
 
 - Polish-gate ids and gate-chain order: (empty)
