@@ -82,6 +82,12 @@ One fact proposed at a time, one yes from Luke, one write into this file only â€
 
 - Lead 2026-10-07: sleep is the form change. It is what lets the player become spirit. At night the shrine can be traversed only in spirit form.
 
+- Lead 2026-10-07: the partner is taken at the camp. The child stays at the homestead.
+- Lead 2026-10-07: the shrine is a return teleport home. The way out is the glide by day and the spirit glide by night. This revises the night-only traverse line: the shrine does not carry you to a zone.
+- Lead 2026-10-07: the bull ride is field only.
+- Lead 2026-10-07: the homestead wound is seen by day and healed at night.
+- Lead 2026-10-07: sleep is the bed only.
+
 ## Left empty on purpose
 
 - Polish-gate ids and gate-chain order: (empty)

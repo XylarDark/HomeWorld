@@ -39,3 +39,11 @@ T0 riding is the barn bull. One barn, one bull. Not a separate mount. The shrine
 ## Not this chat
 
 Desktop Wake prove. Placing actors in the level. Promoting art into `Content/`. A meter for the shrine. A second portal system.
+
+## Later locks
+
+- `NPC_PARTNER` is taken at the camp. `NPC_CHILD` stays home.
+- `NODE_SHRINE` returns home. It does not carry you to a zone. Day out is the glide. Night out is the spirit glide.
+- Bull ride is field only.
+- `NODE_WOUND` is seen by day and healed at night.
+- Sleep is `NODE_BED` only.
