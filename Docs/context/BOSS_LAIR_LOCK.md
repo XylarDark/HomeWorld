@@ -26,6 +26,8 @@ The bull ram needs the tamed barn bull. Fertilizer and the homestead wound are n
 
 The wrap heal does not open the ram. The coil comes off first. No boot. No knockback.
 
+After the field and forest mechanics are done, heavy fog lifts off the cave. You notice it when you return to bed from the night journey. The child is playing at the homestead edge and shows you. That is a reveal, not a gate. The child does not enter the lair.
+
 ## Day
 
 The tamed bull is ridden here only. Two rams loosen coil one and coil two. After each coil comes off, heal the wrap under it. The ride is this lair only. Everywhere else the bull stays field-only.
@@ -44,13 +46,17 @@ You soothe the giant's mind. Spirit stealth takes you past the snake's eye, outs
 
 ## Family
 
-Partner and child stay home. The lair is the player, the three guards, and the giant. No ledge beat. The child is at the bed the seal returns you to.
+Partner and child stay home. The lair is the player, the three guards, and the giant. No ledge beat. The child is at the bed the seal returns you to, and at the homestead edge for the fog reveal.
+
+## Zone barriers
+
+Not lair verbs. A thick fog marks the second forest. A tree boots you back to the forest edge. A fish boots you back to the river bank. Local eject only. Not a trip home.
 
 ## What each thing does
 
 | Already done | Job in the lair |
 |---|---|
-| Bed, sleep | Spirit form. Night entry and the pass by the eye are spirit. |
+| Bed, sleep | Spirit form. Night entry and the pass by the eye are spirit. The fog reveal is seen on return to bed. |
 | Camp night ease | The three guards already know you. The lair help is a second, different woe. |
 | Three guards | Met between coil two and three. Heal a wound on each. They help only coil three. |
 | Giant wrap | Heal where a coil was, after that coil comes off. |
@@ -59,16 +65,12 @@ Partner and child stay home. The lair is the player, the three guards, and the g
 | Night portal or glide | The return. Existing shrine, or the same glide. No new flight. |
 | Spirit stealth | The path past the snake's eye. |
 | Speak at the head | The wake. He rips off the head bind. |
-| Partner, child | Stay home. No lair placement. |
+| Partner, child | Stay home. Child shows the fog lift from the edge. |
 
 ## End
 
 The win is a wake, not a kill. The snake is cast off. The rescue is not replayed. The seal sends the player home by the shrine, then they walk to the bed. The bull walks to the barn.
 
-## Not locked
-
-Fog lifting over the cave, the child at the homestead edge showing it, the tree boot in the second forest, the fish boot at the river.
-
 ## Not in this lock
 
-New combat, a snake health bar, a snake death, a second mount, a new flight mode, fertilizer as a gate, the homestead wound as a gate, a fail punish.
+New combat, a snake health bar, a snake death, a second mount, a new flight mode, fertilizer as a gate, the homestead wound as a gate, a fail punish, a boot home from the forest or the river.
