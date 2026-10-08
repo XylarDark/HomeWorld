@@ -72,6 +72,7 @@ The Round 7 questions are answered. Do not ask them again.
 | What does the fifth-stack boot feel like? | A live glide home. You stay on the body. You land at the bed, then you are body. No cut. 2026-10-08. |
 | Who teaches the dawn rule? | The child, once, in one line, before the first night out. The bed and the dawn. Then the body is the reminder. 2026-10-08. |
 | Does a late wake change the homestead? | No. The place stays warm. The slow is the body alone. 2026-10-08. |
+| What does the one-minute slow touch? | Movement only. Walk and glide are 15 percent slower. Gather, ease, and the bed stay full speed. 2026-10-08. |
 
 ## Reading boundary
 
