@@ -19,4 +19,4 @@ Gameplay locks, unless the track names one. The route. Prove scripts. Do not inv
 
 ## Pass
 
-One step. Thumbnail holds. Hand pass done. Pass bar on that step is true. Then the next. Do not skip ahead. Do not promote a mesh into `Content/`.
+One step. Thumbnail holds. Hand pass done. Two screenshots before the box: close, and about 20 feet. Same mesh. Do not rescale. Pass bar on that step is true. Then the next. Do not skip ahead. Do not promote a mesh into `Content/`.
