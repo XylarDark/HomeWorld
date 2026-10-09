@@ -83,6 +83,7 @@ The Round 7 questions are answered. Do not ask them again.
 | Where does the cave shrine pair? | The homestead standing stone. Sleep is still the form change. The stone is travel. After the first coil, it works day and night, either form. 2026-10-08. |
 | Where is the bull when you leave? | It follows you home through the stone. It waits in a small barn by the cabin. The barn is there from the first wake, empty, one warm eye, hay. It reads as waiting. Faceted, the bull fits. Not a second house. 2026-10-08. |
 | Does the second coil need a new door? | No. Same bull, same shrine. The worn track continues to the second scale. 2026-10-08. |
+| How does the second coil go? | On foot, then the bull. You walk the track, tickle the low scale, the snake shifts, then the bull hits it. The bull does not tickle. 2026-10-08. |
 
 ## Reading boundary
 
