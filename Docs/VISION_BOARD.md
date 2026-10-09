@@ -84,6 +84,7 @@ The Round 7 questions are answered. Do not ask them again.
 | Where is the bull when you leave? | It follows you home through the stone. It waits in a small barn by the cabin. The barn is there from the first wake, empty, one warm eye, hay. It reads as waiting. Faceted, the bull fits. Not a second house. 2026-10-08. |
 | Does the second coil need a new door? | No. Same bull, same shrine. The worn track continues to the second scale. 2026-10-08. |
 | How does the second coil go? | On foot, then the bull. You walk the track, tickle the low scale, the snake shifts, then the bull hits it. The bull does not tickle. 2026-10-08. |
+| Must both day coils be done before the night? | Yes. First and second by day. Then the night: heals, guards, third coil, eye, ask. No skipping. 2026-10-08. |
 | What if the tickle misses? | The snake shifts the scale away. A full breath, about six seconds, and it settles. A tickle during the shift does nothing. No stun. The bull stun is only for a missed ram. 2026-10-08. |
 
 ## Reading boundary
