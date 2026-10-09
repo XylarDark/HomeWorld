@@ -81,7 +81,7 @@ The Round 7 questions are answered. Do not ask them again.
 | When can you enter the cave? | The same dawn the fog lifts. The child shows you. You can glide in that morning. 2026-10-08. |
 | What does the cave ask first? | A look, then the coil. A worn track runs from the shrine at the first coil to the loose scale. No one speaks. The shrine brings the field bull through, after you have ridden it once. Before that, the track is there and the shrine is dark. No second bull. The mouth is glider or spirit only, the first time. After the first coil, that shrine is your return. The coil is gated by the bull. The bull works at night, and you need not be spirit. 2026-10-08. |
 | Where does the cave shrine pair? | The homestead standing stone. Sleep is still the form change. The stone is travel. After the first coil, it works day and night, either form. 2026-10-08. |
-| Where is the bull when you leave? | It follows you home through the stone. It waits in the barn. 2026-10-08. |
+| Where is the bull when you leave? | It follows you home through the stone. It waits in a small barn by the cabin. Faceted, one warm eye, the bull fits. Not a second house. 2026-10-08. |
 
 ## Reading boundary
 
