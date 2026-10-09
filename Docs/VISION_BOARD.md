@@ -94,7 +94,7 @@ The Round 7 questions are answered. Do not ask them again.
 | Can the loved one return to the camp? | No. They stay home. The camp is yours to visit. 2026-10-08. |
 | Can the child enter the cave? | No. They stay home. They showed you the fog. They do not enter. 2026-10-08. |
 | Does the bull return to the cave? | No. After the rise the shrine will not bring it. You can still ride it anywhere else, field and home. 2026-10-08. |
-| Do the tree and fish ejects stay? | Yes. Body: a local bounce, a few steps back. The tree creaks, or the fish jumps. No words. Spirit: flown to the bed. The rise does not open them. 2026-10-08. |
+| Do the tree and fish ejects stay? | Yes. Body: a local bounce, a few steps back. The tree creaks, or the fish jumps. No words. Spirit: a live glide to the bed, same as the boot. No cut. The rise does not open them. 2026-10-08. |
 | What if the tickle misses? | The snake shifts the scale away. A full breath, about six seconds, and it settles. A tickle during the shift does nothing. No stun. The bull stun is only for a missed ram. 2026-10-08. |
 
 ## Reading boundary
