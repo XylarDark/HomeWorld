@@ -89,7 +89,7 @@ The Round 7 questions are answered. Do not ask them again.
 | What form after the rise? | Still spirit, on the shoulder. The zoom happens and you can move. It is not a lock. The card reads HomeWorld, holds one breath, about six seconds, and fades on its own. The homestead stone is there the whole time. You land at home, still spirit. You can wander. The bed ends it when you choose. Dawn still stacks if you leave again. 2026-10-08. |
 | Is the family awake when you land? | No. It is still night. They are asleep. No greeting until you sleep and wake. 2026-10-08. |
 | What is the morning after the rise? | A still morning. The family is up, quiet. No line. You can leave when you want. The cave mouth is just there. 2026-10-08. |
-| Is the giant still risen the next day? | Yes, and quiet. It is seated. The cave reads as a room. The snake in the pool says: I have a task for you soon. Not a fight. The giant stays silent. No second ask. 2026-10-08. |
+| Is the giant still risen the next day? | Yes, and quiet. It is seated. The cave reads as a room. Each visit, the snake in the pool says: I have a task for you soon. A reminder, not a new task. Not a fight. The giant stays silent. No second ask. 2026-10-08. |
 | What if the tickle misses? | The snake shifts the scale away. A full breath, about six seconds, and it settles. A tickle during the shift does nothing. No stun. The bull stun is only for a missed ram. 2026-10-08. |
 
 ## Reading boundary
