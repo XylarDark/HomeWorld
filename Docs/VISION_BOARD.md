@@ -86,7 +86,7 @@ The Round 7 questions are answered. Do not ask them again.
 | How does the second coil go? | On foot, then the bull. You walk the track, tickle the low scale, the snake shifts, then the bull hits it. The bull does not tickle. 2026-10-08. |
 | Must both day coils be done before the night? | Yes. First and second by day. One dawn can do both. The night opens that same dusk. No skipping. 2026-10-08. |
 | Is the night order fixed? | Only the ask is last. Heals, guards, the third coil, and the eye can be any order. All of them must be done before the ask. An early ask: it stirs, then sleeps. No punish, no hint. The unfinished beat is visible. 2026-10-08. |
-| What form after the rise? | Still spirit, on the shoulder. The zoom happens and you can move. It is not a lock. The card reads HomeWorld. Then you choose the homestead stone. You land at home, still spirit. The bed ends it. 2026-10-08. |
+| What form after the rise? | Still spirit, on the shoulder. The zoom happens and you can move. It is not a lock. The card reads HomeWorld, holds a few seconds, and fades on its own. The homestead stone is there the whole time. You land at home, still spirit. The bed ends it. 2026-10-08. |
 | What if the tickle misses? | The snake shifts the scale away. A full breath, about six seconds, and it settles. A tickle during the shift does nothing. No stun. The bull stun is only for a missed ram. 2026-10-08. |
 
 ## Reading boundary
