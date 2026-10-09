@@ -92,6 +92,7 @@ The Round 7 questions are answered. Do not ask them again.
 | Is the giant still risen the next day? | Yes, and quiet. It is seated. The cave reads as a room. Each visit, the snake in the pool says: I have a task for you soon. You can walk to the edge. Look, not touch. A reminder, not a new task. Not a fight. The giant stays silent. No second ask. 2026-10-08. |
 | Where are the guards the next day? | At the camp. The side room is empty. After the rise, the camp is friendly day and night. No eject. 2026-10-08. |
 | Can the loved one return to the camp? | No. They stay home. The camp is yours to visit. 2026-10-08. |
+| Can the child enter the cave? | No. They stay home. They showed you the fog. They do not enter. 2026-10-08. |
 | What if the tickle misses? | The snake shifts the scale away. A full breath, about six seconds, and it settles. A tickle during the shift does nothing. No stun. The bull stun is only for a missed ram. 2026-10-08. |
 
 ## Reading boundary
