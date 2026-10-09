@@ -92,19 +92,18 @@ Flags come from `RegisterConsoleCommand`. `ECVF_Cheat` commands need `~` and are
 | `hw.SinVirtue.Greed` | `ECVF_Cheat` | `CmdSinVirtueGreed` | 1642 | Log current Greed axis stub value (e.g. 0). Design only; see SIN_VIRTUE_SPECTRUM.md §2, CONSOLE_COMMANDS.md. |
 | `hw.SinVirtue.Wrath` | `ECVF_Cheat` | `CmdSinVirtueWrath` | 1647 | Log current Wrath axis stub value (e.g. 0). Design only; see SIN_VIRTUE_SPECTRUM.md §2, CONSOLE_COMMANDS.md. |
 | `hw.SinVirtue.Envy` | `ECVF_Cheat` | `CmdSinVirtueEnvy` | 1652 | Log current Envy axis stub value (e.g. 0). Design only; see SIN_VIRTUE_SPECTRUM.md §2, CONSOLE_COMMANDS.md. |
-| `hw.GoToBed` | `ECVF_Cheat` | `CmdGoToBed` | 1657 | Go to bed: Night + GrantSpiritSleepGate. Spirit only if NODE_RUNE unlocked (#7+#11). Phase-alone (hw.TimeOfDay.Phase 2) stays body (#9). Full prove: hw.Bed.SleepSpirit after hw.Rune.Unlock. |
+| `hw.GoToBed` | `ECVF_Cheat` | `CmdGoToBed` | 1657 | Go to bed: Night + GrantSpiritSleepGate. The bed is the form change. Phase-alone (hw.TimeOfDay.Phase 2) stays body (#9). |
 | `hw.Sleep` | `ECVF_Cheat` | `CmdGoToBed` | 1662 | Alias for hw.GoToBed: set time-of-day to Night (Phase 2). MVP tutorial List 8 step 8. |
 | `hw.Wake` | `ECVF_Cheat` | `CmdWake` | 1667 | Wake: advance time-of-day to Dawn (Phase 3). Only has effect when current phase is Night. Use in PIE for List 56 T3 verification. In-world: interact or overlap bed at night. |
 | `hw.Sky.EnsureDefaultDay` | `ECVF_Default` | `CmdSkyEnsureDefaultDay` | 1672 | T0_DEFAULT_SKYBOX_DAY: force Day + ensure Engine stock bright day sky (SKY_DEFAULT_DAY / TOD_DAY / ENV_T0_HOME). Not NF2_B night lookdev. |
 | `hw.FieldGather.Collect` | `ECVF_Cheat` | `CmdFieldGatherCollect` | 1677 | T0 #6 NODE_FIELD_GATHER: field herb/seed collect (CAM_T0_FIELD). Not dress/GP_Store/PROXY/plant; not ungated Gather.Flowers. |
-| `hw.Rune.Unlock` | `ECVF_Cheat` | `CmdRuneUnlock` | 1682 | T0 #7 NODE_RUNE: day field-path rune unlock -> SetRuneGateUnlocked (TOD_DAY FORM_BODY). Not PROXY/spirit-on-phase. Bed->spirit without unlock = closed_fail. |
 | `hw.DayCamp.Eject` | `ECVF_Cheat` | `CmdDayCampEject` | 1687 | T0 #8 NODE_DAY_CAMP: cartoon EJECT_HOME launch->glider->home (TOD_DAY FORM_BODY CAM_T0_CAMP_DAY). StartGlideHome reverse CRUMB; not FALLBACK/PROXY/script-camp/convert. |
 | `hw.Planetside.BootHome` | `ECVF_Cheat` | `CmdPlanetsideBootHome` | 1692 | T0 #10 planetside night glider boot home: Night w/o bed FORM_BODY -> EJECT_HOME via StartGlideHome (TOD_NIGHT_HOME NODE_GLIDER). Not day-camp #8; not FALLBACK down; not soft-kidnap. |
-| `hw.Bed.SleepSpirit` | `ECVF_Cheat` | `CmdBedSleepSpirit` | 1697 | T0 #11 NODE_BED: after hw.Rune.Unlock, grant GrantSpiritSleepGate -> FORM_SPIRIT (TOD_NIGHT_SPIRIT CAM_T0_BED NODE_RUNE). Not phase-alone; not soft-kidnap; #9 w/o bed stay FORM_BODY. |
+| `hw.Bed.SleepSpirit` | `ECVF_Cheat` | `CmdBedSleepSpirit` | 1697 | T0 #11 NODE_BED: the bed grants FORM_SPIRIT (TOD_NIGHT_SPIRIT CAM_T0_BED). Not phase-alone; not soft-kidnap; #9 w/o bed stay FORM_BODY. |
 | `hw.Plant.Slot` | `ECVF_Cheat` | `CmdPlantSlot` | 1702 | T0 #3 NODE_PLANT_SLOT: spend RES_HERB -> day plant given herb on N1 slot (TOD_DAY FORM_BODY). Not nurture/PROXY. Same slot identity for #12. |
-| `hw.Nurture.Slot` | `ECVF_Cheat` | `CmdNurtureSlot` | 1707 | T0 #12 NODE_PLANT_SLOT: spirit nurture same N1 slot as #3 day plant (TOD_NIGHT_SPIRIT FORM_SPIRIT). Prereq hw.Plant.Slot + hw.Rune.Unlock + hw.Bed.SleepSpirit; RES_SEED via hw.Gather.Seed. Not N2/body/day-plant-alone. |
-| `hw.Portal.Camp` | `ECVF_Cheat` | `CmdPortalCamp` | 1712 | T0 #13 NODE_PORTAL_HOME->NODE_PORTAL_CAMP: spirit home->camp portal (TOD_NIGHT_SPIRIT FORM_SPIRIT). Prereq hw.Rune.Unlock + hw.Bed.SleepSpirit. Via HomeWorldShrinePortal*; not home<->planet alone; not body; not dress-as-camp. |
-| `hw.CampNight` | `ECVF_Cheat` | `CmdCampNight` | 1717 | T0 #14 camp night: avoid 1 NODE_GUARD + soothe 2 NODE_SLEEPER (TOD_NIGHT_SPIRIT FORM_SPIRIT CAM_T0_CAMP_NIGHT). Prereq hw.Rune.Unlock + hw.Bed.SleepSpirit. Via UHomeWorldSpiritStealthComponent; soothe != convert; not GP_SS_Lit alone; not stealth-alone. |
+| `hw.Nurture.Slot` | `ECVF_Cheat` | `CmdNurtureSlot` | 1707 | T0 #12 NODE_PLANT_SLOT: spirit nurture same N1 slot as #3 day plant (TOD_NIGHT_SPIRIT FORM_SPIRIT). Prereq hw.Plant.Slot + hw.Bed.SleepSpirit; RES_SEED via hw.Gather.Seed. Not N2/body/day-plant-alone. |
+| `hw.Portal.Camp` | `ECVF_Cheat` | `CmdPortalCamp` | 1712 | T0 #13 NODE_PORTAL_HOME->NODE_PORTAL_CAMP: spirit home->camp portal (TOD_NIGHT_SPIRIT FORM_SPIRIT). Prereq hw.Bed.SleepSpirit. Via HomeWorldShrinePortal*; not home<->planet alone; not body; not dress-as-camp. |
+| `hw.CampNight` | `ECVF_Cheat` | `CmdCampNight` | 1717 | T0 #14 camp night: avoid 1 NODE_GUARD + soothe 2 NODE_SLEEPER (TOD_NIGHT_SPIRIT FORM_SPIRIT CAM_T0_CAMP_NIGHT). Prereq hw.Bed.SleepSpirit. Via UHomeWorldSpiritStealthComponent; soothe != convert; not GP_SS_Lit alone; not stealth-alone. |
 | `hw.Kettle.Brew` | `ECVF_Cheat` | `CmdKettleBrew` | 1722 | T0 #2 NODE_KETTLE: spend RES_HERB -> tea; tea-gates sprint ~half day (TOD_DAY FORM_BODY). Not PROXY/meal/ungated alone. |
 | `hw.Backpack.Equip` | `ECVF_Cheat` | `CmdBackpackEquip` | 1727 | T0 #4 NODE_BACKPACK: equip latch -> inventory open gated (TOD_DAY FORM_BODY). Not inventory-lite alone / not PROXY. |
 | `hw.Inventory.Open` | `ECVF_Cheat` | `CmdInventoryOpen` | 1732 | T0 #4 NODE_BACKPACK: inventory open/use requires backpack equip latch. Ungated inventory-lite = closed_fail. |
@@ -203,7 +202,6 @@ Four prefixes are produced by a macro rather than written inline. Those are mark
 | `NODE_KETTLE` | direct | `HomeWorldCharacter.cpp:594` | sprint rejected without tea, `tea-gated sprint`, brew skipped/failed/ok, gate cleared | 1 file |
 | `NODE_PLANT_SLOT` | direct | `HomeWorldCharacter.cpp:1068` | plant skip/fail/ok, nurture skip/fail/ok, slot day-planted marker | 2 files |
 | `NODE_PORTAL_HOME` | direct | `HomeWorldCharacter.cpp:2230` | portal-camp skipped, `NODE_PORTAL_CAMP` transit, soft-arrive | 1 file |
-| `NODE_RUNE` | direct | `HomeWorldCharacter.cpp:1968` | unlock skipped, unlock ok | 1 file |
 | `NODE_SLEEPER` | direct | `HomeWorldCharacter.cpp:2475` | `ease failed (soothe != convert)` | 1 file |
 | `NODE_WAKE` | direct | `HomeWorldCharacter.cpp:1438` | start-day beat | 1 file |
 | `NURTURE` | direct | `HomeWorldCharacter.cpp:1048` | night-only guard, need/spend failures, success, visual applied | 2 files |

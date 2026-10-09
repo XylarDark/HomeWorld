@@ -117,7 +117,7 @@ README is left intact as history.
 ---
 
 
-Sitting rule, 2026-10-08: do not author a rune. The bed alone grants the form. Must #7 stays logic-done in code until an implement removes the gate. Do not delete it in a sitting.
+Sitting rule, 2026-10-09: the rune is removed. The bed alone grants the form. Do not author one.
 
 ## 3. ⭐ The table that would have prevented the #17 error
 
@@ -136,7 +136,7 @@ doc claims the mechanic. This table is that cross-link, and §6 makes it machine
 | #4 | Backpack → inventory | Partial | `HomeWorldInventorySubsystem` |
 | #5 | *(full Y — excluded from bite order)* | **Y** | — |
 | #6 | Collect herb seeds in field | Partial | `RES_HERB`, 55 refs |
-| #7 | Rune unlock before bed→spirit | **Logic done** | `SetRuneGateUnlocked`; two-gate form in `HomeWorldFormGateTests.cpp`. **Level unbuilt** — no `NODE_RUNE` actor |
+| #7 | Rune unlock before bed→spirit | **Superseded 2026-10-09** | The rune is removed. The bed alone grants the form. Do not author `NODE_RUNE`. |
 | #8 | Day camp eject | **Logic done** | `TryCampDayEject` emits `NODE_DAY_CAMP`/`EJECT_HOME`/`TOD_DAY`/`FORM_BODY`/`CAM_T0_CAMP_DAY` (`HomeWorldCharacter.cpp:1915`). **Level unbuilt** — no `NODE_DAY_CAMP` actor, no M8 test |
 | #9 | Night w/o bed stays body | Partial | `bSpiritFormGate` + `bSpiritSleepGate`; `HomeWorldFormGateTests.cpp`, 4 tests |
 | #10 | Planetside night boot home | **Logic done** | `StartGlideHome(bAllowNightPhase)` reusing the FALLBACK glide component — `NODE_GLIDER`/`EJECT_HOME`/`TOD_NIGHT_HOME`/`FORM_BODY` (`HomeWorldCharacter.cpp:2010`). **Level unbuilt** — no M10 test |

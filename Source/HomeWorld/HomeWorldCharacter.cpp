@@ -61,8 +61,8 @@
  * WHAT THIS IS FOR
  *
  * Each T0 beat verb finds its prop by tag: `TryNodeKettleInteractInFront` accepts
- * `NODE_KETTLE` or `Kettle`, `TryNodeRuneInteractInFront` accepts `NODE_RUNE` or `Rune`, and
- * so on for the backpack, the field gather node, the plant slot, the day camp and the bed.
+ * `NODE_KETTLE` or `Kettle`, and so on for the backpack, the field gather node, the plant
+ * slot, the day camp and the bed. The rune is not a beat.
  * Each also accepts a short alias, because a level artist tagging a prop by hand will reach
  * for one or the other.
  *
@@ -92,7 +92,6 @@ namespace HomeWorldT0BeatNodes
 		PlantSlot,
 		Backpack,
 		FieldGather,
-		Rune,
 		DayCamp,
 		Bed,
 		Garden,
@@ -106,7 +105,6 @@ namespace HomeWorldT0BeatNodes
 			{ FName(TEXT("NODE_PLANT_SLOT")),   FName(TEXT("PlantSlot")) },
 			{ FName(TEXT("NODE_BACKPACK")),     FName(TEXT("Backpack")) },
 			{ FName(TEXT("NODE_FIELD_GATHER")), FName(TEXT("FieldGather")) },
-			{ FName(TEXT("NODE_RUNE")),         FName(TEXT("Rune")) },
 			{ FName(TEXT("NODE_DAY_CAMP")),     FName(TEXT("DayCamp")) },
 			{ FName(TEXT("NODE_BED")),          FName(TEXT("Bed")) },
 			{ FName(TEXT("NODE_GARDEN")),       FName(TEXT("Garden")) },
@@ -267,11 +265,16 @@ void AHomeWorldCharacter::BeginPlay()
 	{
 		TraversalComponent->ApplyFormMovementTuning(GetIsSpiritForm());
 	}
+	if (FallbackGlideComponent)
+	{
+		FallbackGlideComponent->OnGlideCompleted.AddDynamic(this, &AHomeWorldCharacter::OnSpiritSicknessGlideCompleted);
+	}
 }
 
 void AHomeWorldCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	TickSpiritSickness(DeltaTime);
 
 	if (SoftBoundsComponent)
 	{
@@ -1344,31 +1347,37 @@ bool AHomeWorldCharacter::TryHarvestInFront()
 	}
 
 	// List 56 / T2 + T3 + T0 #11: Bed / NODE_BED.
-	// Night or dusk, still body: sleep grants spirit. The rune latch stays locked.
-	// Night or dusk, already spirit: wake to dawn, body.
-	// Day: advance the clock to night and stay FORM_BODY. Spirit is the night bed.
+	// Night or dusk, still body: sleep grants spirit.
+	// Already spirit, stacks up: the touch clears them and stays spirit.
+	// Already spirit, stacks clear: the bed ends spirit, then the clock goes to dawn.
+	// Day, still body: advance the clock to night and stay FORM_BODY.
 	// Phase-alone SetPhase(Night) without the sleep gate = closed_fail for FORM_SPIRIT.
 	if (HitActor && HomeWorldT0BeatNodes::ActorCarriesTagFor(HitActor, HomeWorldT0BeatNodes::ENode::Bed))
 	{
 		if (UHomeWorldTimeOfDaySubsystem* Tod = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>())
 		{
-			if (Tod->GetIsSpiritPhase())
+			if (bIsSpiritForm)
 			{
-				if (!bIsSpiritForm)
+				if (SpiritSicknessStacks > 0)
 				{
-					TryBedSleepSpirit();
+					TouchSpiritBed();
 				}
 				else
 				{
+					WakeFromSpiritAtBed();
 					Tod->AdvanceToDawn();
 					UE_LOG(LogTemp, Log, TEXT("HomeWorld: Wake (interact at bed) -- phase set to Dawn. MVP List 56 T3."));
 				}
+			}
+			else if (Tod->GetIsSpiritPhase())
+			{
+				TryBedSleepSpirit();
 			}
 			else
 			{
 				Tod->SetPhase(EHomeWorldTimeOfDayPhase::Night);
 				UE_LOG(LogTemp, Log,
-					TEXT("NODE_BED: day bed stays FORM_BODY (clock to Night; spirit is the night bed; rune latch stays locked; #9 w/o sleep gate stay FORM_BODY)"));
+					TEXT("NODE_BED: day bed stays FORM_BODY (clock to Night; spirit is the night bed; #9 w/o sleep gate stay FORM_BODY)"));
 			}
 			return true;
 		}
@@ -1387,8 +1396,10 @@ bool AHomeWorldCharacter::TryHarvestInFront()
 	}
 
 	// List 59 T1/T3: Child (tag Child) — in-world game-with-child. Interact (E) completes one game with child (AddLovePoints + GamesWithChildToday).
-	if (HitActor && HitActor->ActorHasTag(FName("Child")))
+	// The dawn rule is one line, once, before the first night out.
+	if (HitActor && (HitActor->ActorHasTag(FName("Child")) || HitActor->ActorHasTag(FName("NPC_CHILD"))))
 	{
+		TryTellChildDawnRule();
 		AHomeWorldPlayerState* PS = GetPlayerState<AHomeWorldPlayerState>();
 		if (PS)
 		{
@@ -1396,6 +1407,7 @@ bool AHomeWorldCharacter::TryHarvestInFront()
 			UE_LOG(LogTemp, Log, TEXT("HomeWorld: Game with child (interact with child) — one game with child done. MVP List 59."));
 			return true;
 		}
+		return bChildDawnRuleTold;
 	}
 
 	return false;
@@ -1840,7 +1852,7 @@ bool AHomeWorldCharacter::TryNurtureNodePlantSlot()
 	// T0_M12 NODE_PLANT_SLOT / TOD_NIGHT_SPIRIT / FORM_SPIRIT
 	// Architecture Trade-Offs A-E: prefer existing TryNurture / HomeWorldNurtureComponent / N1 slot
 	// -- no parallel nurture service, no new schema, no invent nurture/WP APIs.
-	// Prereq: #3 day plant same NODE_PLANT_SLOT + #11 spirit path (rune+bed).
+	// Prereq: #3 day plant same NODE_PLANT_SLOT + #11 spirit path (the bed).
 	// Anti closed_fail: different-slot N2; body-form nurture as #12; day-plant-alone as spirit nurture.
 	UWorld* World = GetWorld();
 	if (!World)
@@ -2106,69 +2118,6 @@ bool AHomeWorldCharacter::TryNodeFieldGatherInteractInFront()
 	return TryCollectNodeFieldGather();
 }
 
-bool AHomeWorldCharacter::TryUnlockNodeRune()
-{
-	// T0_M7 NODE_RUNE / TOD_DAY / FORM_BODY
-	// Architecture Trade-Offs A-E: prefer existing SetRuneGateUnlocked / bRuneGateUnlocked /
-	// CanEnterSpiritForm -- no parallel form service, no invent WP/form APIs (Arch B).
-	// Anti closed_fail: PROXY SM_ProxyRune alone != world unlock; spirit on phase alone != beat;
-	// Unlock alone stays FORM_BODY. The bed does not wait on this latch.
-	UWorld* World = GetWorld();
-	if (!World)
-	{
-		return false;
-	}
-	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
-	if (!TimeOfDay || TimeOfDay->GetCurrentPhase() != EHomeWorldTimeOfDayPhase::Day)
-	{
-		UE_LOG(LogTemp, Log, TEXT("NODE_RUNE: unlock skipped - need TOD_DAY"));
-		ShowInteractFeedback(TEXT("NODE_RUNE: day only"), FColor::Yellow);
-		return false;
-	}
-	if (bIsSpiritForm)
-	{
-		UE_LOG(LogTemp, Log, TEXT("NODE_RUNE: unlock skipped - need FORM_BODY"));
-		ShowInteractFeedback(TEXT("NODE_RUNE: body form only"), FColor::Yellow);
-		return false;
-	}
-
-	if (bRuneGateUnlocked)
-	{
-		UE_LOG(LogTemp, Log,
-			TEXT("NODE_RUNE: unlock TOD_DAY FORM_BODY (already unlocked; SetRuneGateUnlocked latch; not PROXY SM_ProxyRune; not spirit on phase alone; unlock stays FORM_BODY)"));
-		ShowInteractFeedback(TEXT("NODE_RUNE: already unlocked"), FColor::Green);
-		return true;
-	}
-
-	SetRuneGateUnlocked(true);
-	UE_LOG(LogTemp, Log,
-		TEXT("NODE_RUNE: unlock TOD_DAY FORM_BODY (SetRuneGateUnlocked; not PROXY SM_ProxyRune alone; not spirit on phase alone; unlock stays FORM_BODY)"));
-	ShowInteractFeedback(TEXT("NODE_RUNE: unlocked"), FColor::Green);
-	return true;
-}
-
-bool AHomeWorldCharacter::TryNodeRuneInteractInFront()
-{
-	FHitResult Hit;
-	if (!TraceInteractHit(Hit))
-	{
-		return false;
-	}
-	AActor* HitActor = GetInteractTargetActor(Hit);
-	if (!HitActor)
-	{
-		return false;
-	}
-
-	if (!HomeWorldT0BeatNodes::ActorCarriesTagFor(HitActor, HomeWorldT0BeatNodes::ENode::Rune))
-	{
-		return false;
-	}
-
-	// World interact beat -- PROXY SM_ProxyRune alone without unlock latch = closed_fail.
-	return TryUnlockNodeRune();
-}
-
 bool AHomeWorldCharacter::TryEjectNodeDayCamp()
 {
 	// T0_M8 NODE_DAY_CAMP / EJECT_HOME / TOD_DAY / FORM_BODY / CAM_T0_CAMP_DAY
@@ -2359,7 +2308,7 @@ bool AHomeWorldCharacter::TryBootBeastChargeHome()
 bool AHomeWorldCharacter::TryBedSleepSpirit()
 {
 	// T0_M11 NODE_BED / night / FORM_SPIRIT / CAM_T0_BED
-	// The bed is the form change. The rune latch stays locked.
+	// The bed is the form change.
 	// Day and dawn stay FORM_BODY and do not move the clock.
 	// #9 Night without this grant stays FORM_BODY.
 	UWorld* World = GetWorld();
@@ -2377,7 +2326,7 @@ bool AHomeWorldCharacter::TryBedSleepSpirit()
 	if (!TimeOfDay->GetIsSpiritPhase())
 	{
 		UE_LOG(LogTemp, Log,
-			TEXT("NODE_BED: day bed stays FORM_BODY (sleep grants spirit only at night or dusk; rune latch stays locked)"));
+			TEXT("NODE_BED: day bed stays FORM_BODY (sleep grants spirit only at night or dusk)"));
 		ShowInteractFeedback(TEXT("NODE_BED: day stays body"), FColor::Yellow);
 		return false;
 	}
@@ -2385,7 +2334,7 @@ bool AHomeWorldCharacter::TryBedSleepSpirit()
 	if (bBedSpiritGranted && bIsSpiritForm && bSpiritSleepGateGranted)
 	{
 		UE_LOG(LogTemp, Log,
-			TEXT("NODE_BED: TOD_NIGHT_SPIRIT FORM_SPIRIT CAM_T0_BED (already granted; rune latch not required; #9 w/o bed stay FORM_BODY)"));
+			TEXT("NODE_BED: TOD_NIGHT_SPIRIT FORM_SPIRIT CAM_T0_BED (already granted; #9 w/o bed stay FORM_BODY)"));
 		ShowInteractFeedback(TEXT("NODE_BED: already spirit"), FColor::Green);
 		return true;
 	}
@@ -2396,7 +2345,7 @@ bool AHomeWorldCharacter::TryBedSleepSpirit()
 	if (bIsSpiritForm)
 	{
 		UE_LOG(LogTemp, Log,
-			TEXT("NODE_BED: TOD_NIGHT_SPIRIT FORM_SPIRIT CAM_T0_BED (GrantSpiritSleepGate; rune latch stays locked; not phase-alone; #9 w/o bed stay FORM_BODY)"));
+			TEXT("NODE_BED: TOD_NIGHT_SPIRIT FORM_SPIRIT CAM_T0_BED (GrantSpiritSleepGate; not phase-alone; #9 w/o bed stay FORM_BODY)"));
 		ShowInteractFeedback(TEXT("NODE_BED: FORM_SPIRIT"), FColor::Green);
 		return true;
 	}
@@ -2412,7 +2361,7 @@ bool AHomeWorldCharacter::TryPortalHomeToCamp()
 	// T0_M13 NODE_PORTAL_HOME / NODE_PORTAL_CAMP / TOD_NIGHT_SPIRIT / FORM_SPIRIT
 	// Architecture Trade-Offs A-E: prefer existing HomeWorldShrinePortal* TryPortalTransit /
 	// TryPortalTransitToDestination -- no parallel portal service, no invent portal/WP APIs, no PROP schema.
-	// Prereq: #11 spirit path (hw.Rune.Unlock + hw.Bed.SleepSpirit).
+	// Prereq: #11 spirit path (the bed).
 	// Anti closed_fail: home<->planet return alone (GP_PortalA<->B / Shrine_Return) as #13;
 	// body portal as #13; shrine-dress-as-camp as #13.
 	UWorld* World = GetWorld();
@@ -2607,7 +2556,7 @@ bool AHomeWorldCharacter::TryCampNight()
 	// T0_M14 NODE_GUARD / NODE_SLEEPER / TOD_NIGHT_SPIRIT / FORM_SPIRIT / CAM_T0_CAMP_NIGHT
 	// Architecture Trade-Offs A-E: prefer existing UHomeWorldSpiritStealthComponent --
 	// no parallel stealth service, no invent PROP schema, no .uasset/.umap.
-	// Prereq: #11 spirit path (hw.Rune.Unlock + hw.Bed.SleepSpirit).
+	// Prereq: #11 spirit path (the bed).
 	// Anti closed_fail: script-only GP_SS_Lit_*; stealth-alone without soothe;
 	// convert-as-soothe (ReportFoeConverted); PROP invent.
 	UWorld* World = GetWorld();
@@ -2729,7 +2678,7 @@ void AHomeWorldCharacter::OnTimeOfDayPhaseChanged(EHomeWorldTimeOfDayPhase NewPh
 
 bool AHomeWorldCharacter::CanEnterSpiritForm() const
 {
-	// Sleep gate only. Phase alone never grants spirit. The rune latch is not required.
+	// Sleep gate only. Phase alone never grants spirit.
 	return bSpiritSleepGateGranted;
 }
 
@@ -2750,21 +2699,10 @@ bool AHomeWorldCharacter::AreDayBodyAbilitiesAllowed() const
 	return Phase == EHomeWorldTimeOfDayPhase::Day || Phase == EHomeWorldTimeOfDayPhase::Dawn;
 }
 
-void AHomeWorldCharacter::SetRuneGateUnlocked(bool bUnlocked)
-{
-	if (bRuneGateUnlocked == bUnlocked)
-	{
-		return;
-	}
-	bRuneGateUnlocked = bUnlocked;
-	UE_LOG(LogTemp, Log, TEXT("FORM: rune gate %s"), bUnlocked ? TEXT("unlocked") : TEXT("locked"));
-	SyncFormWithTimeOfDay();
-}
-
 void AHomeWorldCharacter::GrantSpiritSleepGate()
 {
 	bSpiritSleepGateGranted = true;
-	UE_LOG(LogTemp, Log, TEXT("FORM: sleep gate granted (NODE_BED path; rune latch not required)"));
+	UE_LOG(LogTemp, Log, TEXT("FORM: sleep gate granted (NODE_BED path)"));
 	SyncFormWithTimeOfDay();
 }
 
@@ -2778,43 +2716,215 @@ void AHomeWorldCharacter::ClearSpiritSleepGate()
 	UE_LOG(LogTemp, Log, TEXT("FORM: sleep gate cleared"));
 }
 
+namespace HomeWorldSpiritSickness
+{
+	static constexpr int32 MaxStacks = 5;
+	static constexpr float IntervalSeconds = 10.f;
+	static constexpr float MoveScale = 0.85f;
+	static constexpr float LateWakeSeconds = 60.f;
+}
+
+float AHomeWorldCharacter::GetSpiritSicknessMoveScale() const
+{
+	const bool bSlow = SpiritSicknessStacks > 0 || LateWakeSlowSecondsRemaining > 0.f;
+	return bSlow ? HomeWorldSpiritSickness::MoveScale : 1.f;
+}
+
+void AHomeWorldCharacter::RefreshSpiritSicknessMovement()
+{
+	const float Scale = GetSpiritSicknessMoveScale();
+	if (TraversalComponent)
+	{
+		TraversalComponent->SetMovementSlowScale(Scale);
+	}
+	if (FallbackGlideComponent)
+	{
+		FallbackGlideComponent->SetGlideSpeedScale(Scale);
+	}
+}
+
+void AHomeWorldCharacter::AddSpiritSicknessStack()
+{
+	if (bSpiritSicknessBooting || SpiritSicknessStacks >= HomeWorldSpiritSickness::MaxStacks)
+	{
+		return;
+	}
+	++SpiritSicknessStacks;
+	bHadSpiritSicknessThisOuting = true;
+	UE_LOG(LogTemp, Log, TEXT("SICKNESS: stack %d scarf step %d (flat 15 percent; no bar)"),
+		SpiritSicknessStacks, SpiritSicknessStacks);
+	RefreshSpiritSicknessMovement();
+	if (SpiritSicknessStacks >= HomeWorldSpiritSickness::MaxStacks)
+	{
+		BeginSpiritSicknessBoot();
+	}
+}
+
+void AHomeWorldCharacter::BeginSpiritSicknessBoot()
+{
+	bSpiritSicknessBooting = true;
+	SpiritSicknessSecondsUntilNext = -1.f;
+	RefreshSpiritSicknessMovement();
+	bool bStarted = false;
+	if (FallbackGlideComponent)
+	{
+		// Same live glide as the other boots. Stay spirit until it lands. No cut.
+		bStarted = FallbackGlideComponent->StartGlideHome(/*bAllowNightPhase=*/true);
+	}
+	UE_LOG(LogTemp, Log, TEXT("SICKNESS: fifth stack live glide %s (stay spirit until the bed; ease beat stays)"),
+		bStarted ? TEXT("started") : TEXT("pending"));
+}
+
+void AHomeWorldCharacter::NoteStillOutPastDawn(EHomeWorldTimeOfDayPhase Phase)
+{
+	const bool bPastNight = Phase == EHomeWorldTimeOfDayPhase::Dawn || Phase == EHomeWorldTimeOfDayPhase::Day;
+	if (!bPastNight || !bIsSpiritForm || bSpiritSicknessBooting || bSpiritSicknessPausedAtBed)
+	{
+		return;
+	}
+	if (SpiritSicknessSecondsUntilNext >= 0.f || SpiritSicknessStacks >= HomeWorldSpiritSickness::MaxStacks)
+	{
+		return;
+	}
+	if (SpiritSicknessStacks == 0)
+	{
+		AddSpiritSicknessStack();
+	}
+	if (!bSpiritSicknessBooting && SpiritSicknessStacks < HomeWorldSpiritSickness::MaxStacks)
+	{
+		SpiritSicknessSecondsUntilNext = HomeWorldSpiritSickness::IntervalSeconds;
+	}
+}
+
+void AHomeWorldCharacter::TickSpiritSickness(float DeltaTime)
+{
+	if (DeltaTime < 0.f)
+	{
+		return;
+	}
+	if (LateWakeSlowSecondsRemaining > 0.f)
+	{
+		LateWakeSlowSecondsRemaining = FMath::Max(0.f, LateWakeSlowSecondsRemaining - DeltaTime);
+		RefreshSpiritSicknessMovement();
+	}
+	if (SpiritSicknessSecondsUntilNext < 0.f || bSpiritSicknessBooting || bSpiritSicknessPausedAtBed || !bIsSpiritForm)
+	{
+		return;
+	}
+	SpiritSicknessSecondsUntilNext -= DeltaTime;
+	while (SpiritSicknessSecondsUntilNext <= 0.f
+		&& !bSpiritSicknessBooting
+		&& SpiritSicknessStacks < HomeWorldSpiritSickness::MaxStacks
+		&& bIsSpiritForm
+		&& !bSpiritSicknessPausedAtBed)
+	{
+		SpiritSicknessSecondsUntilNext += HomeWorldSpiritSickness::IntervalSeconds;
+		AddSpiritSicknessStack();
+	}
+}
+
+void AHomeWorldCharacter::TouchSpiritBed()
+{
+	if (SpiritSicknessStacks > 0)
+	{
+		bHadSpiritSicknessThisOuting = true;
+	}
+	SpiritSicknessStacks = 0;
+	SpiritSicknessSecondsUntilNext = -1.f;
+	bSpiritSicknessPausedAtBed = true;
+	RefreshSpiritSicknessMovement();
+	UE_LOG(LogTemp, Log, TEXT("SICKNESS: bed touch clears stacks (stay spirit; scarf step 0)"));
+	ShowInteractFeedback(TEXT("SICKNESS: stacks cleared"), FColor::Green);
+}
+
+void AHomeWorldCharacter::WakeFromSpiritAtBed()
+{
+	const bool bLate = bHadSpiritSicknessThisOuting;
+	SpiritSicknessStacks = 0;
+	SpiritSicknessSecondsUntilNext = -1.f;
+	bSpiritSicknessPausedAtBed = false;
+	bSpiritSicknessBooting = false;
+	bHadSpiritSicknessThisOuting = false;
+	ClearSpiritSleepGate();
+	SyncFormWithTimeOfDay();
+	if (bLate)
+	{
+		LateWakeSlowSecondsRemaining = HomeWorldSpiritSickness::LateWakeSeconds;
+	}
+	RefreshSpiritSicknessMovement();
+	UE_LOG(LogTemp, Log, TEXT("SICKNESS: bed ends spirit (late wake slow %s)"),
+		bLate ? TEXT("60s") : TEXT("none"));
+}
+
+void AHomeWorldCharacter::NotifySpiritSicknessLanded()
+{
+	if (!bSpiritSicknessBooting)
+	{
+		return;
+	}
+	bSpiritSicknessBooting = false;
+	SpiritSicknessStacks = 0;
+	SpiritSicknessSecondsUntilNext = -1.f;
+	bSpiritSicknessPausedAtBed = false;
+	bHadSpiritSicknessThisOuting = false;
+	LateWakeSlowSecondsRemaining = 0.f;
+	ClearSpiritSleepGate();
+	SyncFormWithTimeOfDay();
+	RefreshSpiritSicknessMovement();
+	UE_LOG(LogTemp, Log, TEXT("SICKNESS: landed at the bed, then body (no cut)"));
+}
+
+void AHomeWorldCharacter::OnSpiritSicknessGlideCompleted()
+{
+	NotifySpiritSicknessLanded();
+}
+
+bool AHomeWorldCharacter::TryTellChildDawnRule()
+{
+	if (bChildDawnRuleTold || bBedSpiritGranted || bIsSpiritForm)
+	{
+		return false;
+	}
+	bChildDawnRuleTold = true;
+	UE_LOG(LogTemp, Log, TEXT("CHILD: the bed and the dawn"));
+	ShowInteractFeedback(TEXT("The bed and the dawn."), FColor::White);
+	return true;
+}
+
 void AHomeWorldCharacter::ApplyFormForPhase(EHomeWorldTimeOfDayPhase Phase)
 {
 	const bool bSpiritCapablePhase =
 		(Phase == EHomeWorldTimeOfDayPhase::Night || Phase == EHomeWorldTimeOfDayPhase::Dusk);
 
-	if (!bSpiritCapablePhase)
-	{
-		ClearSpiritSleepGate();
-	}
-
-	// T0 #9 TOD_NIGHT_HOME: Night/Dusk without named gates → FORM_BODY (no auto-spirit).
-	const bool bSpirit = bSpiritCapablePhase && CanEnterSpiritForm();
+	// Bed or the fifth stack ends spirit. Dawn does not. Night without the sleep gate stays body.
+	const bool bSpirit = bSpiritSleepGateGranted && (bSpiritCapablePhase || bIsSpiritForm);
 
 	if (Phase == LastAppliedFormPhase && bIsSpiritForm == bSpirit)
 	{
+		NoteStillOutPastDawn(Phase);
 		return;
 	}
 	LastAppliedFormPhase = Phase;
 
-	if (bIsSpiritForm == bSpirit)
+	if (bIsSpiritForm != bSpirit)
 	{
-		return;
+		bIsSpiritForm = bSpirit;
+
+		static const TCHAR* PhaseNames[] = { TEXT("Day"), TEXT("Dusk"), TEXT("Night"), TEXT("Dawn") };
+		const int32 PhaseIdx = FMath::Clamp(static_cast<int32>(Phase), 0, 3);
+		const TCHAR* FormLabel = bSpirit ? TEXT("spirit") : TEXT("body");
+	UE_LOG(LogTemp, Log, TEXT("FORM: %s form (phase=%s; gates sleep=%d; NightMix driven by TimeOfDaySubsystem)"),
+		FormLabel, PhaseNames[PhaseIdx], bSpiritSleepGateGranted ? 1 : 0);
+
+		if (TraversalComponent)
+		{
+			TraversalComponent->ApplyFormMovementTuning(bSpirit);
+		}
+
+		PlaySoftFormSwapFeedback(Phase, bSpirit);
 	}
-	bIsSpiritForm = bSpirit;
 
-	static const TCHAR* PhaseNames[] = { TEXT("Day"), TEXT("Dusk"), TEXT("Night"), TEXT("Dawn") };
-	const int32 PhaseIdx = FMath::Clamp(static_cast<int32>(Phase), 0, 3);
-	const TCHAR* FormLabel = bSpirit ? TEXT("spirit") : TEXT("body");
-	UE_LOG(LogTemp, Log, TEXT("FORM: %s form (phase=%s; gates sleep=%d rune=%d; NightMix driven by TimeOfDaySubsystem)"),
-		FormLabel, PhaseNames[PhaseIdx], bSpiritSleepGateGranted ? 1 : 0, bRuneGateUnlocked ? 1 : 0);
-
-	if (TraversalComponent)
-	{
-		TraversalComponent->ApplyFormMovementTuning(bSpirit);
-	}
-
-	PlaySoftFormSwapFeedback(Phase, bSpirit);
+	NoteStillOutPastDawn(Phase);
 }
 
 void AHomeWorldCharacter::PlaySoftFormSwapFeedback(EHomeWorldTimeOfDayPhase Phase, bool bSpirit)

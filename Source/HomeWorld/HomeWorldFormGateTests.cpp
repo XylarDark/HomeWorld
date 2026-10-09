@@ -31,7 +31,7 @@
  *     bool bSpirit = bSpiritCapablePhase && CanEnterSpiritForm();
  *     bool CanEnterSpiritForm() const { return bSpiritSleepGateGranted; }
  *
- * Phase alone can never grant spirit. The rune latch is not the form change. That is the T0 law, expressed in one line - and it is
+ * Phase alone can never grant spirit. The bed is the form change. That is the T0 law, expressed in one line - and it is
  * exactly the kind of line that gets "simplified" by a later pass, at which point the theme
  * quietly changes and nothing fails. So the law is pinned here in the project's own
  * vocabulary: FORM_BODY, FORM_SPIRIT, closed_fail.
@@ -130,7 +130,6 @@ bool FNightWithoutGatesStaysBodyTest::RunTest(const FString& Parameters)
 	// A fresh character has neither gate. Night is the strongest case: if phase alone could
 	// grant spirit, this is where it would show.
 	TestFalse(TEXT("no sleep gate before a bed"), Character->IsSpiritSleepGateGranted());
-	TestFalse(TEXT("no rune gate before #7 unlock"), Character->IsRuneGateUnlocked());
 	TestFalse(TEXT("can-enter-spirit is false with no gates"), Character->CanEnterSpiritForm());
 
 	Character->SyncFormWithTimeOfDay();
@@ -200,17 +199,17 @@ bool FDayVerbsOffAtNightTest::RunTest(const FString& Parameters)
 }
 
 /**
- * The bed at night grants spirit while the rune latch stays locked.
+ * The bed at night grants spirit.
  *
  * This is the positive half of #9. A build where spirit was impossible would satisfy
  * "night without the sleep gate stays body" while shipping no night.
  */
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(
-	FBedAtNightGrantsSpiritWithRuneLockedTest,
-	"HomeWorld.T0.M11.BedAtNightGrantsSpiritWithRuneLocked",
+	FBedAtNightGrantsSpiritTest,
+	"HomeWorld.T0.M11.BedAtNightGrantsSpirit",
 	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 
-bool FBedAtNightGrantsSpiritWithRuneLockedTest::RunTest(const FString& Parameters)
+bool FBedAtNightGrantsSpiritTest::RunTest(const FString& Parameters)
 {
 	HomeWorldFormTest::FScopedWorld Scope(TEXT("M11 night bed"));
 	if (!Scope.Ok(this))
@@ -225,13 +224,10 @@ bool FBedAtNightGrantsSpiritWithRuneLockedTest::RunTest(const FString& Parameter
 		return false;
 	}
 
-	TestFalse(TEXT("rune latch stays locked before sleep"), Character->IsRuneGateUnlocked());
 	TestTrue(TEXT("night bed grants spirit"), Character->TryBedSleepSpirit());
-	TestFalse(TEXT("rune latch stays locked after sleep"), Character->IsRuneGateUnlocked());
 	TestTrue(TEXT("sleep gate is on"), Character->IsSpiritSleepGateGranted());
 	TestTrue(TEXT("can enter spirit from the bed alone"), Character->CanEnterSpiritForm());
-	TestTrue(TEXT("M11: night bed is FORM_SPIRIT with the rune latch locked"),
-		Character->GetIsSpiritForm());
+	TestTrue(TEXT("M11: night bed is FORM_SPIRIT"), Character->GetIsSpiritForm());
 
 	return true;
 }
@@ -260,7 +256,6 @@ bool FDayBedStaysBodyTest::RunTest(const FString& Parameters)
 	}
 	Character->SyncFormWithTimeOfDay();
 
-	TestFalse(TEXT("rune latch stays locked"), Character->IsRuneGateUnlocked());
 	TestFalse(TEXT("day bed refuses the spirit grant"), Character->TryBedSleepSpirit());
 	TestEqual(TEXT("day bed does not move the clock"), Scope.TimeOfDay->GetCurrentPhase(),
 		EHomeWorldTimeOfDayPhase::Day);
@@ -271,20 +266,17 @@ bool FDayBedStaysBodyTest::RunTest(const FString& Parameters)
 }
 
 /**
- * Day and dawn clear the sleep gate, so a new day starts in the body.
- *
- * ApplyFormForPhase calls ClearSpiritSleepGate on any non-spirit-capable phase. If that were
- * removed, a player who slept would stay spirit-formed all day - a soft-lock on the wrong
- * half of the transformation, and one that only shows up after a full day/night cycle.
+ * Dawn does not end spirit. Still out, the first sickness stack starts.
+ * Vision board, 2026-10-08. Replaces the 2026-10-02 law that dawn cleared the sleep gate.
  */
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(
-	FDayClearsSleepGateTest,
-	"HomeWorld.T0.M9.DayClearsSleepGate",
+	FDawnKeepsSpiritAndStartsSicknessTest,
+	"HomeWorld.T0.M9.DawnKeepsSpiritAndStartsSickness",
 	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 
-bool FDayClearsSleepGateTest::RunTest(const FString& Parameters)
+bool FDawnKeepsSpiritAndStartsSicknessTest::RunTest(const FString& Parameters)
 {
-	HomeWorldFormTest::FScopedWorld Scope(TEXT("M9 day-clears"));
+	HomeWorldFormTest::FScopedWorld Scope(TEXT("M9 dawn-keeps-spirit"));
 	if (!Scope.Ok(this))
 	{
 		return false;
@@ -298,18 +290,135 @@ bool FDayClearsSleepGateTest::RunTest(const FString& Parameters)
 	}
 
 	Character->GrantSpiritSleepGate();
-	Character->SetRuneGateUnlocked(true);
 	Character->SyncFormWithTimeOfDay();
-	TestTrue(TEXT("spirit at night with both gates"), Character->GetIsSpiritForm());
+	TestTrue(TEXT("spirit at night with the bed"), Character->GetIsSpiritForm());
+	TestEqual(TEXT("night has no sickness stack yet"), Character->GetSpiritSicknessStacks(), 0);
+	TestTrue(TEXT("night move scale is full"),
+		FMath::IsNearlyEqual(Character->GetSpiritSicknessMoveScale(), 1.f));
 
-	// Dawn. The phase itself is not spirit-capable, so the gate must clear.
 	Scope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Dawn);
 	Character->SyncFormWithTimeOfDay();
 
-	TestFalse(TEXT("Dawn returns the player to FORM_BODY"), Character->GetIsSpiritForm());
-	TestFalse(TEXT("Dawn clears the sleep gate"), Character->IsSpiritSleepGateGranted());
-	TestTrue(TEXT("Dawn leaves the rune latch alone - it is a day unlock, not a bed grant"),
-		Character->IsRuneGateUnlocked());
+	TestTrue(TEXT("Dawn keeps FORM_SPIRIT"), Character->GetIsSpiritForm());
+	TestTrue(TEXT("Dawn keeps the sleep gate"), Character->IsSpiritSleepGateGranted());
+	TestEqual(TEXT("Dawn out of bed starts one stack"), Character->GetSpiritSicknessStacks(), 1);
+	TestEqual(TEXT("scarf takes one colder step"), Character->GetSpiritSicknessScarfStep(), 1);
+	TestTrue(TEXT("one stack slows movement 15 percent"),
+		FMath::IsNearlyEqual(Character->GetSpiritSicknessMoveScale(), 0.85f));
+
+	Scope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Day);
+	Character->SyncFormWithTimeOfDay();
+	TestTrue(TEXT("Day still out stays FORM_SPIRIT"), Character->GetIsSpiritForm());
+	TestEqual(TEXT("Day does not add a second immediate stack"), Character->GetSpiritSicknessStacks(), 1);
+
+	return true;
+}
+
+/**
+ * Touch clears stacks and stays spirit. Wake ends spirit and, if the outing was late, slows for one minute.
+ * Forty seconds later the fifth stack starts the live glide and does not cut to body.
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FSpiritSicknessBedAndFifthStackTest,
+	"HomeWorld.T0.Sickness.BedTouchWakeAndFifthStack",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FSpiritSicknessBedAndFifthStackTest::RunTest(const FString& Parameters)
+{
+	HomeWorldFormTest::FScopedWorld Scope(TEXT("sickness bed and fifth"));
+	if (!Scope.Ok(this))
+	{
+		return false;
+	}
+
+	Scope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Night);
+	AHomeWorldCharacter* Character = HomeWorldFormTest::SpawnCharacter(Scope.World);
+	if (!TestNotNull(TEXT("character"), Character))
+	{
+		return false;
+	}
+	Character->GrantSpiritSleepGate();
+
+	Scope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Dawn);
+	Character->SyncFormWithTimeOfDay();
+	TestEqual(TEXT("first stack at dawn"), Character->GetSpiritSicknessStacks(), 1);
+
+	Character->TouchSpiritBed();
+	TestEqual(TEXT("touch clears stacks"), Character->GetSpiritSicknessStacks(), 0);
+	TestEqual(TEXT("touch clears the scarf"), Character->GetSpiritSicknessScarfStep(), 0);
+	TestTrue(TEXT("touch stays spirit"), Character->GetIsSpiritForm());
+	TestTrue(TEXT("touch restores move scale before the wake"),
+		FMath::IsNearlyEqual(Character->GetSpiritSicknessMoveScale(), 1.f));
+	Character->TickSpiritSickness(10.f);
+	TestEqual(TEXT("paused at the bed, no new stack"), Character->GetSpiritSicknessStacks(), 0);
+
+	Character->WakeFromSpiritAtBed();
+	TestFalse(TEXT("the bed ends spirit"), Character->GetIsSpiritForm());
+	TestFalse(TEXT("the bed clears the sleep gate"), Character->IsSpiritSleepGateGranted());
+	TestTrue(TEXT("a late wake slows movement"),
+		FMath::IsNearlyEqual(Character->GetSpiritSicknessMoveScale(), 0.85f));
+	Character->TickSpiritSickness(60.f);
+	TestTrue(TEXT("the late-wake minute ends"),
+		FMath::IsNearlyEqual(Character->GetSpiritSicknessMoveScale(), 1.f));
+
+	AHomeWorldCharacter* StillOut = HomeWorldFormTest::SpawnCharacter(Scope.World);
+	if (!TestNotNull(TEXT("still out"), StillOut))
+	{
+		return false;
+	}
+	Scope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Night);
+	StillOut->GrantSpiritSleepGate();
+	Scope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Dawn);
+	StillOut->SyncFormWithTimeOfDay();
+	StillOut->TickSpiritSickness(40.f);
+	TestEqual(TEXT("fifth stack at forty seconds"), StillOut->GetSpiritSicknessStacks(), 5);
+	TestEqual(TEXT("scarf is five steps colder"), StillOut->GetSpiritSicknessScarfStep(), 5);
+	TestTrue(TEXT("fifth stack stays spirit until the landing"), StillOut->GetIsSpiritForm());
+	TestTrue(TEXT("fifth stack arms the live glide"), StillOut->IsSpiritSicknessBootPending());
+
+	StillOut->NotifySpiritSicknessLanded();
+	TestFalse(TEXT("landing is body"), StillOut->GetIsSpiritForm());
+	TestFalse(TEXT("landing clears the sleep gate"), StillOut->IsSpiritSleepGateGranted());
+	TestEqual(TEXT("landing clears stacks"), StillOut->GetSpiritSicknessStacks(), 0);
+	TestFalse(TEXT("landing is not still booting"), StillOut->IsSpiritSicknessBootPending());
+	TestTrue(TEXT("the boot is not the late-wake minute"),
+		FMath::IsNearlyEqual(StillOut->GetSpiritSicknessMoveScale(), 1.f));
+
+	return true;
+}
+
+/** The child says the dawn rule once, and only before the first night out. */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FChildDawnRuleOnceTest,
+	"HomeWorld.T0.Sickness.ChildSaysDawnRuleOnce",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FChildDawnRuleOnceTest::RunTest(const FString& Parameters)
+{
+	HomeWorldFormTest::FScopedWorld Scope(TEXT("child dawn rule"));
+	if (!Scope.Ok(this))
+	{
+		return false;
+	}
+
+	Scope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Day);
+	AHomeWorldCharacter* Character = HomeWorldFormTest::SpawnCharacter(Scope.World);
+	if (!TestNotNull(TEXT("character"), Character))
+	{
+		return false;
+	}
+
+	TestTrue(TEXT("the child says it once"), Character->TryTellChildDawnRule());
+	TestFalse(TEXT("the child does not repeat it"), Character->TryTellChildDawnRule());
+
+	AHomeWorldCharacter* AlreadyOut = HomeWorldFormTest::SpawnCharacter(Scope.World);
+	if (!TestNotNull(TEXT("already out"), AlreadyOut))
+	{
+		return false;
+	}
+	Scope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Night);
+	AlreadyOut->GrantSpiritSleepGate();
+	TestFalse(TEXT("no lesson after the first night out"), AlreadyOut->TryTellChildDawnRule());
 
 	return true;
 }

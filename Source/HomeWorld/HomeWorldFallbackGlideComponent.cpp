@@ -308,6 +308,11 @@ bool UHomeWorldFallbackGlideComponent::StartGlideHome(bool bAllowNightPhase)
 	return true;
 }
 
+void UHomeWorldFallbackGlideComponent::SetGlideSpeedScale(float Scale)
+{
+	GlideSpeedScale = FMath::Clamp(Scale, 0.1f, 1.f);
+}
+
 void UHomeWorldFallbackGlideComponent::CancelGlide()
 {
 	if (!bIsGliding)
@@ -334,7 +339,8 @@ void UHomeWorldFallbackGlideComponent::AdvanceGlide(float DeltaTime)
 		return;
 	}
 
-	SegmentAlpha += (SegmentDuration > KINDA_SMALL_NUMBER) ? (DeltaTime / SegmentDuration) : 1.0f;
+	const float ScaledDelta = DeltaTime * FMath::Clamp(GlideSpeedScale, 0.1f, 1.f);
+	SegmentAlpha += (SegmentDuration > KINDA_SMALL_NUMBER) ? (ScaledDelta / SegmentDuration) : 1.0f;
 	SegmentAlpha = FMath::Clamp(SegmentAlpha, 0.0f, 1.0f);
 
 	const FVector StartLoc = CrumbLocations[StartIndex];

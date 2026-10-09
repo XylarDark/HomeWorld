@@ -119,7 +119,21 @@ void UHomeWorldTraversalComponent::UpdateSprintSpeed()
 	{
 		Target = SprintWalkSpeed;
 	}
-	CachedMovement->MaxWalkSpeed = Target;
+	CachedMovement->MaxWalkSpeed = Target * MovementSlowScale;
+}
+
+void UHomeWorldTraversalComponent::SetMovementSlowScale(float Scale)
+{
+	MovementSlowScale = FMath::Clamp(Scale, 0.1f, 1.f);
+	if (!CachedMovement)
+	{
+		CachedCharacter = Cast<ACharacter>(GetOwner());
+		if (CachedCharacter)
+		{
+			CachedMovement = CachedCharacter->GetCharacterMovement();
+		}
+	}
+	UpdateSprintSpeed();
 }
 
 void UHomeWorldTraversalComponent::UpdateFallSoftReset(float DeltaTime)

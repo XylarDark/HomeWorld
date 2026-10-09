@@ -76,13 +76,13 @@ bool FDayGatesRefuseAtDuskAndNightTest::RunTest(const FString& Parameters)
 		return false;
 	}
 
-	// The five gated actions, named so a failure points at the beat, not at a table row.
+	// The gated day actions, named so a failure points at the beat, not at a table row.
 	const TCHAR* BeatNames[] = {
-		TEXT("#7 NODE_RUNE"), TEXT("#2 NODE_KETTLE"), TEXT("#3 NODE_PLANT_SLOT"),
+		TEXT("#2 NODE_KETTLE"), TEXT("#3 NODE_PLANT_SLOT"),
 		TEXT("#4 NODE_BACKPACK"), TEXT("#6 NODE_FIELD_GATHER") };
 
 	// Body form throughout - this test is about the phase gate, and DayVerbsOffAtNight plus
-	// BedAtNightGrantsSpiritWithRuneLocked in HomeWorldFormGateTests already cover the form half.
+	// BedAtNightGrantsSpirit in HomeWorldFormGateTests already cover the form half.
 	for (int32 Pass = 0; Pass < 2; ++Pass)
 	{
 		const EHomeWorldTimeOfDayPhase Phase =
@@ -101,26 +101,22 @@ bool FDayGatesRefuseAtDuskAndNightTest::RunTest(const FString& Parameters)
 			Character->GetIsSpiritForm());
 
 		TestFalse(FString::Printf(TEXT("%s refused at %s"), BeatNames[0], PhaseName),
-			Character->TryUnlockNodeRune());
-		TestFalse(FString::Printf(TEXT("%s refused at %s"), BeatNames[1], PhaseName),
 			Character->TryBrewNodeKettleTea());
-		TestFalse(FString::Printf(TEXT("%s refused at %s"), BeatNames[2], PhaseName),
+		TestFalse(FString::Printf(TEXT("%s refused at %s"), BeatNames[1], PhaseName),
 			Character->TryPlantNodePlantSlotHerb());
-		TestFalse(FString::Printf(TEXT("%s refused at %s"), BeatNames[3], PhaseName),
+		TestFalse(FString::Printf(TEXT("%s refused at %s"), BeatNames[2], PhaseName),
 			Character->TryOpenInventoryGated());
-		TestFalse(FString::Printf(TEXT("%s refused at %s"), BeatNames[4], PhaseName),
+		TestFalse(FString::Printf(TEXT("%s refused at %s"), BeatNames[3], PhaseName),
 			Character->TryCollectNodeFieldGather());
 
 		// A refused action must leave no latch behind. A gate that returns false but still
 		// sets its flag would pass every assertion above and then behave as unlocked.
-		TestFalse(FString::Printf(TEXT("%s: no rune latch from a refused unlock at %s"),
-			BeatNames[0], PhaseName), Character->IsRuneGateUnlocked());
 		TestFalse(FString::Printf(TEXT("%s: no backpack latch from a refused open at %s"),
-			BeatNames[3], PhaseName), Character->IsBackpackEquipped());
+			BeatNames[2], PhaseName), Character->IsBackpackEquipped());
 		TestFalse(FString::Printf(TEXT("%s: no gather latch from a refused collect at %s"),
-			BeatNames[4], PhaseName), Character->IsFieldGatherCollected());
+			BeatNames[3], PhaseName), Character->IsFieldGatherCollected());
 		TestFalse(FString::Printf(TEXT("%s: no tea gate from a refused brew at %s"),
-			BeatNames[1], PhaseName), Character->IsTeaSprintGateActive());
+			BeatNames[0], PhaseName), Character->IsTeaSprintGateActive());
 	}
 
 	return true;
@@ -245,67 +241,6 @@ bool FPlantAndNurtureAreDistinctMarksTest::RunTest(const FString& Parameters)
 		Character->IsNodePlantSlotSpiritNurtured());
 	TestFalse(TEXT("#3: nurturing does not imply the slot was day-planted"),
 		Character->IsNodePlantSlotDayPlanted());
-
-	return true;
-}
-
-/**
- * #7 MUST: the rune unlock is a day+body verdict, it latches, and it never grants spirit alone.
- *
- * Queue A status note: #2/#3/#4 have their positive halves blocked on a GameInstance
- * fixture the world-only test world cannot supply, and #6 likewise. #7 is the one beat
- * whose positive half runs in this fixture, so it is the one that proves the day-gate
- * table's "refused at Dusk/Night" rows are not passing for the wrong reason - i.e. that
- * a correctly placed unlock really does set the latch, and that the latch alone is
- * not the form change.
- *
- * Anti row: unlock alone is not spirit. The bed does not wait on this latch.
- */
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(
-	FRuneUnlockGrantsNoSpiritAloneTest,
-	"HomeWorld.T0.M7.RuneUnlockGrantsNoSpiritAlone",
-	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
-
-bool FRuneUnlockGrantsNoSpiritAloneTest::RunTest(const FString& Parameters)
-{
-	HomeWorldTestWorld::FScopedWorld Scope(TEXT("M7 rune"));
-	if (!Scope.Ok(this))
-	{
-		return false;
-	}
-
-	Scope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Day);
-	AHomeWorldCharacter* Character = HomeWorldTestWorld::SpawnCharacter(Scope.World);
-	if (!TestNotNull(TEXT("character"), Character))
-	{
-		return false;
-	}
-	Character->SyncFormWithTimeOfDay();
-
-	TestFalse(TEXT("rune locked at session start"), Character->IsRuneGateUnlocked());
-
-	// The positive half this table cannot cover: day + body really unlocks.
-	TestTrue(TEXT("#7: day + body unlock succeeds"), Character->TryUnlockNodeRune());
-	TestTrue(TEXT("#7: unlock sets the latch"), Character->IsRuneGateUnlocked());
-	TestFalse(TEXT("unlock is a body verdict - never spirit"), Character->GetIsSpiritForm());
-
-	// Idempotent: the same unlock reads as already unlocked, not a second latch.
-	TestTrue(TEXT("#7: re-unlock at day is open success, not a failure"),
-		Character->TryUnlockNodeRune());
-	TestTrue(TEXT("#7: latch survives the re-read"), Character->IsRuneGateUnlocked());
-
-	// The Anti row: unlock alone must not grant spirit, at night or anywhere else.
-	Scope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Night);
-	Character->SyncFormWithTimeOfDay();
-	TestTrue(TEXT("rune latch survives the phase change"), Character->IsRuneGateUnlocked());
-	TestFalse(TEXT("M7 Anti: unlock alone is not spirit, at night"),
-		Character->GetIsSpiritForm());
-
-	// Sleep at night grants spirit. This latch being set is not what opens the bed.
-	Character->GrantSpiritSleepGate();
-	Character->SyncFormWithTimeOfDay();
-	TestTrue(TEXT("M11: bed sleep gate at night grants spirit"),
-		Character->GetIsSpiritForm());
 
 	return true;
 }

@@ -27,8 +27,8 @@
  *     AHomeWorldCharacter::ActorHasInteractableComponent()
  *
  * The beat verbs each declare the tags that identify their prop - `NODE_KETTLE`,
- * `NODE_RUNE`, `NODE_BACKPACK`, `NODE_FIELD_GATHER`, `NODE_DAY_CAMP`, `NODE_BED` and
- * `NODE_PLANT_SLOT`, plus a short alias for each. Those declarations are the beat-node tag
+ * `NODE_BACKPACK`, `NODE_FIELD_GATHER`, `NODE_DAY_CAMP`, `NODE_BED` and
+ * `NODE_PLANT_SLOT`, plus a short alias for each. The rune is not a beat. Those declarations are the beat-node tag
  * contract. But the gate that decides whether an actor is interactable at all knew about
  * none of them. It recognised only `AHomeWorldResourcePile`, `AHomeWorldCraftStation`, and
  * six named components.
@@ -76,7 +76,7 @@
  *
  * But a table can pass vacuously - it would pass just as happily if the gate admitted
  * everything, or if the probe itself were broken. So
- * `RuneAndBackpackBeatsFireFromTaggedProps` goes the whole way: a real prop, a real trace,
+ * `BackpackBeatFiresFromTaggedProp` goes the whole way: a real prop, a real trace,
  * the real public verb, and the latch the beat is supposed to set. If the gate admits tags
  * for a reason that has nothing to do with the beat working, that test says so.
  *
@@ -223,8 +223,6 @@ bool FBeatNodeTagsAreInteractableTest::RunTest(const FString& Parameters)
 		{ TEXT("#4  Backpack alias"),   TEXT("Backpack") },
 		{ TEXT("#6  NODE_FIELD_GATHER"),TEXT("NODE_FIELD_GATHER") },
 		{ TEXT("#6  FieldGather alias"),TEXT("FieldGather") },
-		{ TEXT("#7  NODE_RUNE"),        TEXT("NODE_RUNE") },
-		{ TEXT("#7  Rune alias"),       TEXT("Rune") },
 		{ TEXT("#8  NODE_DAY_CAMP"),    TEXT("NODE_DAY_CAMP") },
 		{ TEXT("#8  DayCamp alias"),    TEXT("DayCamp") },
 		{ TEXT("#11 NODE_BED"),         TEXT("NODE_BED") },
@@ -251,7 +249,7 @@ bool FBeatNodeTagsAreInteractableTest::RunTest(const FString& Parameters)
 	}
 
 	// A table that silently matched nothing would report zero rows and look like a pass.
-	TestEqual(TEXT("every declared beat-node tag was checked"), TagCount, 16);
+	TestEqual(TEXT("every declared beat-node tag was checked"), TagCount, 14);
 
 	return true;
 }
@@ -259,7 +257,7 @@ bool FBeatNodeTagsAreInteractableTest::RunTest(const FString& Parameters)
 /**
  * The whole way through: placed prop, real trace, real verb, real latch.
  *
- * #7 rune and #4 backpack are used because both are complete on Day in body form with no
+ * #4 backpack is used because it is complete on Day in body form with no
  * resource in hand, so a `false` here can only mean the gate never handed the verb its
  * target. #2 kettle and #6 field gather are absent on purpose - both consume inventory, so
  * a refusal downstream of the gate would be indistinguishable from the gate refusing, which
@@ -272,7 +270,7 @@ bool FBeatNodeTagsAreInteractableTest::RunTest(const FString& Parameters)
  */
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 	FBeatNodeVerbsReachPlacedPropsTest,
-	"HomeWorld.T0.NodeGate.RuneAndBackpackBeatsFireFromTaggedProps",
+	"HomeWorld.T0.NodeGate.BackpackBeatFiresFromTaggedProp",
 	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 
 bool FBeatNodeVerbsReachPlacedPropsTest::RunTest(const FString& Parameters)
@@ -297,27 +295,15 @@ bool FBeatNodeVerbsReachPlacedPropsTest::RunTest(const FString& Parameters)
 	TestFalse(TEXT("body form on Day with no gates granted"), Character->GetIsSpiritForm());
 
 	/**
-	 * Sanity, so the two beat assertions below cannot pass for the wrong reason.
+	 * Sanity, so the beat assertion below cannot pass for the wrong reason.
 	 *
-	 * Nothing has been placed and nothing has been used, so both latches must read off. If
-	 * either reads on here, it is self-arming and the positive assertion that follows would
+	 * Nothing has been placed and nothing has been used, so the latch must read off. If
+	 * it reads on here, it is self-arming and the positive assertion that follows would
 	 * be measuring nothing at all.
 	 */
-	TestFalse(TEXT("#7: rune is not unlocked before the beat runs"), Character->IsRuneGateUnlocked());
 	TestFalse(TEXT("#4: backpack is not equipped before the beat runs"), Character->IsBackpackEquipped());
 
-	// #7: a rune stone on the forward axis, then the public verb.
-	AActor* Rune = SpawnTaggedProp(Scope.World, PropOnForwardAxis(), { FName(TEXT("NODE_RUNE")) });
-	if (TestNotNull(TEXT("#7: rune prop"), Rune))
-	{
-		TestTrue(TEXT("#7: TryNodeRuneInteractInFront completes from a placed NODE_RUNE prop"),
-			Character->TryNodeRuneInteractInFront());
-		TestTrue(TEXT("#7: the rune latch is set - the beat fired, not just the trace"),
-			Character->IsRuneGateUnlocked());
-	}
-
-	// #4: a backpack on the forward axis. The rune already fired, so this is a second
-	// independent beat rather than a second reading of the first.
+	// #4: a backpack on the forward axis, then the public verb.
 	AActor* Backpack = SpawnTaggedProp(Scope.World, PropOnForwardAxis(), { FName(TEXT("NODE_BACKPACK")) });
 	if (TestNotNull(TEXT("#4: backpack prop"), Backpack))
 	{

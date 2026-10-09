@@ -305,6 +305,9 @@ bool FShrineReturnsHomeTest::RunTest(const FString& Parameters)
 	UHomeWorldShrinePortalComponent* NightSpirit = HomeWorldFirstLoopTest::MakeShrine(Scope.World, HomeLabel);
 	TestTrue(TEXT("night spirit returns home"), NightSpirit && NightSpirit->TryPortalTransit(Character));
 
+	// Dawn and day do not end spirit. The bed does. Company return is the day body.
+	Character->WakeFromSpiritAtBed();
+	TestFalse(TEXT("the bed returns the body before the day company"), Character->GetIsSpiritForm());
 	Scope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Day);
 	Character->SyncFormWithTimeOfDay();
 	Character->SetRidingBull(true);

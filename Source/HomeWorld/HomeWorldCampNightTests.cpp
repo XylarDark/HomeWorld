@@ -89,7 +89,6 @@ namespace HomeWorldCampNightTest
 		}
 
 		Fixture.Character->GrantSpiritSleepGate();
-		Fixture.Character->SetRuneGateUnlocked(true);
 		Fixture.Character->SyncFormWithTimeOfDay();
 
 		if (!Test->TestTrue(TEXT("fixture is in FORM_SPIRIT"), Fixture.Character->GetIsSpiritForm()))

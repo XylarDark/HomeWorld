@@ -132,9 +132,7 @@ def act_nurture_slot():
         except Exception as e:
             notes.append("day_planted_err %s" % e)
 
-    # Arrange #11: rune + bed spirit
-    unreal.SystemLibrary.execute_console_command(world, "hw.Rune.Unlock")
-    notes.append("console_hw.Rune.Unlock")
+    # Arrange #11: the bed grants spirit. The rune is removed.
     unreal.SystemLibrary.execute_console_command(world, "hw.Bed.SleepSpirit")
     notes.append("console_hw.Bed.SleepSpirit")
 

@@ -45,7 +45,7 @@ def act_bed_spirit():
         _write("t0_m11_bed_spirit_py_act.json", {"ok": False, "notes": notes + ["no world"]})
         return
 
-    # Arrange: Day + body; rune unlock first; then bed sleep spirit
+    # Arrange: Day + body, then the bed. The rune is removed.
     unreal.SystemLibrary.execute_console_command(world, "hw.TimeOfDay.SetPhase 0")
     notes.append("tod_setphase_0_day")
     notes.append("form_default_body_assumed")
@@ -54,18 +54,6 @@ def act_bed_spirit():
     pc = unreal.GameplayStatics.get_player_controller(world, 0)
     pawn = pc.get_controlled_pawn() if pc else None
     notes.append("pawn=%s" % (pawn.get_class().get_name() if pawn else None))
-
-    # Prereq #7
-    unreal.SystemLibrary.execute_console_command(world, "hw.Rune.Unlock")
-    notes.append("console_hw.Rune.Unlock")
-
-    rune_ok = False
-    if pawn and hasattr(pawn, "is_rune_gate_unlocked"):
-        try:
-            rune_ok = bool(pawn.is_rune_gate_unlocked())
-            notes.append("rune_unlocked=%s" % rune_ok)
-        except Exception as e:
-            notes.append("rune_check_err %s" % e)
 
     bed_ok = False
     method = None
@@ -112,12 +100,11 @@ def act_bed_spirit():
             "method": method,
             "bed_ok": bed_ok,
             "latched": latched,
-            "rune_ok": rune_ok,
             "sleep_gate": sleep_gate,
             "spirit": spirit,
             "notes": notes,
-            "labels": ["NODE_BED", "TOD_NIGHT_SPIRIT", "FORM_SPIRIT", "CAM_T0_BED", "NODE_RUNE"],
-            "anti": ["phase-alone", "soft-kidnap", "spirit-w/o-bed+rune", "SetPhase-alone-spirit"],
+            "labels": ["NODE_BED", "TOD_NIGHT_SPIRIT", "FORM_SPIRIT", "CAM_T0_BED"],
+            "anti": ["phase-alone", "soft-kidnap", "spirit-w/o-bed", "SetPhase-alone-spirit"],
             "ts_utc": datetime.now(timezone.utc).isoformat(),
         },
     )

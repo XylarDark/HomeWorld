@@ -38,6 +38,9 @@ public:
 	/** Called from character form sync (body vs spirit walk tuning). */
 	void ApplyFormMovementTuning(bool bSpiritForm);
 
+	/** 1 = full walk. Spirit sickness and the late-wake minute pass 0.85. Gather and ease do not call this. */
+	void SetMovementSlowScale(float Scale);
+
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 protected:
@@ -57,6 +60,9 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<UCharacterMovementComponent> CachedMovement;
+
+	/** Multiplies walk, sprint, spirit, and mount speed. Default 1. */
+	float MovementSlowScale = 1.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Movement|Walk", meta = (ClampMin = "100.0"))
 	float BodyWalkSpeed = 450.f;

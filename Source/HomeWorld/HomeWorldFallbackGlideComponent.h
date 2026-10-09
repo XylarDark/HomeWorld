@@ -46,6 +46,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Transit|FALLBACK")
 	bool IsGliding() const { return bIsGliding; }
 
+	/** 1 = the authored glide. Spirit sickness passes 0.85 so the glide hitches with the step. */
+	void SetGlideSpeedScale(float Scale);
+
 	/** Fired when CRUMB_Landing is reached and walk is restored. */
 	UPROPERTY(BlueprintAssignable, Category = "Transit|FALLBACK")
 	FOnFallbackGlideCompleted OnGlideCompleted;
@@ -83,6 +86,7 @@ protected:
 	float SegmentAlpha = 0.0f;
 	float SegmentDuration = 0.0f;
 	bool bIsGliding = false;
+	float GlideSpeedScale = 1.f;
 	/** True while traversing reverse crumbs toward home (EJECT_HOME), not FALLBACK down. */
 	bool bHomeboundGlide = false;
 	bool bSavedOrientRotationToMovement = true;

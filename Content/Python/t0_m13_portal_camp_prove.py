@@ -49,9 +49,7 @@ def act_portal_camp():
     pawn = pc.get_controlled_pawn() if pc else None
     notes.append("pawn=%s" % (pawn.get_class().get_name() if pawn else None))
 
-    # Arrange #11: rune + bed spirit
-    unreal.SystemLibrary.execute_console_command(world, "hw.Rune.Unlock")
-    notes.append("console_hw.Rune.Unlock")
+    # Arrange #11: the bed grants spirit. The rune is removed.
     unreal.SystemLibrary.execute_console_command(world, "hw.Bed.SleepSpirit")
     notes.append("console_hw.Bed.SleepSpirit")
 

@@ -1,12 +1,12 @@
 {
   "id": "NODE_RUNE",
   "type": "SM_ prop",
-  "status": "SPEC_READY_WITH_OPEN_QUESTIONS",
+  "status": "REMOVED",
   "date": "2026-10-02",
   "phase": "T0_M7",
   "owner": "agent",
   "family": "stealth",
-  "role": "Day field-path rune. MUST #7 - gates bed to spirit. Anti row: PROXY SM_ProxyRune alone is not the beat; spirit on phase alone is not the beat.",
+  "role": "Removed 2026-10-09. The bed alone grants the form. Do not author this prop.",
   "units": "meters",
   "apply_scale": true,
   "origin": "ground_contact",
@@ -37,5 +37,5 @@
     "band": "low",
     "conforms_to_locked_signature": true
   },
-  "note": "Kept CONFORMING rather than reshaped twice. The alternative - an ailing monolith that violates the signature - would have been a worse answer, because 'low broken' is what the family means. Whether the rune BELONGS to stealth at all is a taste question queued for the interview, not something the spec should decide by geometry."
+  "note": "Removed. The vision board says the rune is gone. Do not place it."
 }

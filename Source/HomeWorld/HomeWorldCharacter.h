@@ -216,24 +216,55 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Form|Gates", meta = (DisplayName = "Is Spirit Sleep Gate Granted"))
 	bool IsSpiritSleepGateGranted() const { return bSpiritSleepGateGranted; }
 
-	/** T0 #7 hook: rune unlock before bed→spirit. Default false until #7. */
-	UFUNCTION(BlueprintCallable, Category = "Form|Gates", meta = (DisplayName = "Is Rune Gate Unlocked"))
-	bool IsRuneGateUnlocked() const { return bRuneGateUnlocked; }
-
-	/** T0 #7: unlock/clear rune gate (no spirit until sleep gate also granted). */
-	UFUNCTION(BlueprintCallable, Category = "Form|Gates", meta = (DisplayName = "Set Rune Gate Unlocked"))
-	void SetRuneGateUnlocked(bool bUnlocked);
-
 	/**
 	 * T0 #11 hook: grant sleep gate then sync form.
-	 * The bed is the form change. The rune latch is not required.
+	 * The bed is the form change.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Form|Gates", meta = (DisplayName = "Grant Spirit Sleep Gate"))
 	void GrantSpiritSleepGate();
 
-	/** Clear sleep gate (Day/Dawn / wake). */
+	/** Clear sleep gate (bed wake, or the fifth-stack landing). Dawn does not clear it. */
 	UFUNCTION(BlueprintCallable, Category = "Form|Gates", meta = (DisplayName = "Clear Spirit Sleep Gate"))
 	void ClearSpiritSleepGate();
+
+	/**
+	 * Dawn does not end spirit. Still out: one stack immediately, then one every ten seconds, five max.
+	 * Touching the bed clears stacks and stays spirit. Waking at the bed ends spirit.
+	 * A late wake slows walk and glide by 15 percent for one minute. The fifth stack is a live glide home.
+	 * Vision board, 2026-10-08.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Form|Sickness", meta = (DisplayName = "Get Spirit Sickness Stacks"))
+	int32 GetSpiritSicknessStacks() const { return SpiritSicknessStacks; }
+
+	/** Scarf read: one colder step per stack. No number, no bar. */
+	UFUNCTION(BlueprintCallable, Category = "Form|Sickness", meta = (DisplayName = "Get Spirit Sickness Scarf Step"))
+	int32 GetSpiritSicknessScarfStep() const { return SpiritSicknessStacks; }
+
+	/** 0.85 while stacks are up or the late-wake minute is running. Otherwise 1. */
+	UFUNCTION(BlueprintCallable, Category = "Form|Sickness", meta = (DisplayName = "Get Spirit Sickness Move Scale"))
+	float GetSpiritSicknessMoveScale() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Form|Sickness", meta = (DisplayName = "Is Spirit Sickness Boot Pending"))
+	bool IsSpiritSicknessBootPending() const { return bSpiritSicknessBooting; }
+
+	UFUNCTION(BlueprintCallable, Category = "Form|Sickness", meta = (DisplayName = "Tick Spirit Sickness"))
+	void TickSpiritSickness(float DeltaTime);
+
+	/** Clears stacks. Stays spirit. Does not sleep. */
+	UFUNCTION(BlueprintCallable, Category = "Form|Sickness", meta = (DisplayName = "Touch Spirit Bed"))
+	void TouchSpiritBed();
+
+	/** The bed ends spirit. A late outing then slows movement for one minute. */
+	UFUNCTION(BlueprintCallable, Category = "Form|Sickness", meta = (DisplayName = "Wake From Spirit At Bed"))
+	void WakeFromSpiritAtBed();
+
+	/** Live-glide landing: at the bed, then body. No cut. */
+	UFUNCTION(BlueprintCallable, Category = "Form|Sickness", meta = (DisplayName = "Notify Spirit Sickness Landed"))
+	void NotifySpiritSicknessLanded();
+
+	/** Once, before the first night out. The line is the bed and the dawn. */
+	UFUNCTION(BlueprintCallable, Category = "Family|T0", meta = (DisplayName = "Try Tell Child Dawn Rule"))
+	bool TryTellChildDawnRule();
 
 	/** Sleep gate at night. Phase alone never grants spirit (T0 TOD_NIGHT_HOME). The rune latch is not required. */
 	UFUNCTION(BlueprintCallable, Category = "Form|Gates", meta = (DisplayName = "Can Enter Spirit Form"))
@@ -343,18 +374,6 @@ public:
 	bool IsFieldGatherCollected() const { return bFieldGatherCollected; }
 
 	/**
-	 * T0 #7 NODE_RUNE: day field-path rune unlock interact -> SetRuneGateUnlocked.
-	 * Prefer existing gate hooks (bRuneGateUnlocked / CanEnterSpiritForm) -- no parallel form service (Arch B).
-	 * Not PROXY SM_ProxyRune alone; not spirit on phase alone. Unlock stays FORM_BODY. The bed does not wait on this latch.
-	 */
-	UFUNCTION(BlueprintCallable, Category = "Rune|T0", meta = (DisplayName = "Try Unlock NODE_RUNE"))
-	bool TryUnlockNodeRune();
-
-	/** Trace/tag NODE_RUNE / Rune interact -> TryUnlockNodeRune (world beat, not PROXY alone). */
-	UFUNCTION(BlueprintCallable, Category = "Rune|T0", meta = (DisplayName = "Try NODE_RUNE Interact In Front"))
-	bool TryNodeRuneInteractInFront();
-
-	/**
 	 * T0 #8 NODE_DAY_CAMP: day camp cartoon eject -> EJECT_HOME (launch->glider->home).
 	 * Prefer existing UHomeWorldFallbackGlideComponent::StartGlideHome -- no parallel eject service (Arch B).
 	 * Not FALLBACK island->planet StartGlide alone; not PROXY SM_ProxyDayCamp; not convert stub;
@@ -410,7 +429,7 @@ public:
 	/**
 	 * T0 #13 NODE_PORTAL_HOME -> NODE_PORTAL_CAMP: spirit home portal to camp.
 	 * Prefer existing HomeWorldShrinePortal* TryPortalTransitToDestination -- no parallel portal service (Arch B).
-	 * Prereq: #11 spirit path (FORM_SPIRIT / TOD_NIGHT_SPIRIT via hw.Rune.Unlock + hw.Bed.SleepSpirit).
+	 * Prereq: #11 spirit path (FORM_SPIRIT / TOD_NIGHT_SPIRIT via the bed).
 	 * Not home<->planet return alone (GP_PortalA<->B); not body portal; not shrine-dress-as-camp (those = closed_fail).
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Portal|T0", meta = (DisplayName = "Try Portal Home To Camp"))
@@ -424,7 +443,7 @@ public:
 	/**
 	 * T0 #14 camp night: avoid 1 NODE_GUARD + soothe 2 NODE_SLEEPER (CAM_T0_CAMP_NIGHT).
 	 * Prefer UHomeWorldSpiritStealthComponent -- no parallel stealth service (Arch B).
-	 * Prereq: #11 spirit path (FORM_SPIRIT / TOD_NIGHT_SPIRIT via hw.Rune.Unlock + hw.Bed.SleepSpirit).
+	 * Prereq: #11 spirit path (FORM_SPIRIT / TOD_NIGHT_SPIRIT via the bed).
 	 * convert != soothe (never ReportFoeConverted); stealth-alone / GP_SS_Lit alone / convert-as-soothe = closed_fail.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "CampNight|T0", meta = (DisplayName = "Try Camp Night Avoid Soothe"))
@@ -523,17 +542,13 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Family|T0")
 	FString FamilyHint;
 
-	/** T0 #9: spirit form flag — granted by the bed at night, not by phase alone and not by the rune latch. */
+	/** T0 #9: spirit form flag — granted by the bed at night, not by phase alone. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Form")
 	bool bIsSpiritForm = false;
 
-	/** T0 #11: bed/sleep gate. Cleared on Day/Dawn. */
+	/** T0 #11: bed/sleep gate. Cleared by the bed wake or the fifth-stack landing. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Form|Gates")
 	bool bSpiritSleepGateGranted = false;
-
-	/** T0 #7: rune unlock gate. Set via TryUnlockNodeRune / hw.Rune.Unlock (NODE_RUNE). */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Form|Gates")
-	bool bRuneGateUnlocked = false;
 
 	/**
 	 * Docs/27 NF2-A: optional soft handmade sting on body↔spirit form swap.
@@ -713,10 +728,16 @@ protected:
 	void OnSprintCompleted(const FInputActionValue& Value);
 
 	void ApplyFormForPhase(EHomeWorldTimeOfDayPhase Phase);
+	void NoteStillOutPastDawn(EHomeWorldTimeOfDayPhase Phase);
+	void AddSpiritSicknessStack();
+	void BeginSpiritSicknessBoot();
+	void RefreshSpiritSicknessMovement();
 	/** Docs/27 NF2-A: soft glow + optional sound/particle when form actually changes. */
 	void PlaySoftFormSwapFeedback(EHomeWorldTimeOfDayPhase Phase, bool bSpirit);
 	UFUNCTION()
 	void OnTimeOfDayPhaseChanged(EHomeWorldTimeOfDayPhase NewPhase);
+	UFUNCTION()
+	void OnSpiritSicknessGlideCompleted();
 
 	/** Net forward/right axis from the four directional keys. Used when using MoveForward/MoveBack/StrafeLeft/StrafeRight. */
 	float MovementForwardAxis = 0.f;
@@ -746,6 +767,15 @@ protected:
 
 	/** T0 #11: bed->spirit latch after GrantSpiritSleepGate at night (NODE_BED this session). */
 	bool bBedSpiritGranted = false;
+
+	/** Vision 2026-10-08. Dawn out of bed. Five stacks, ten seconds apart. The fifth flies home. */
+	int32 SpiritSicknessStacks = 0;
+	float SpiritSicknessSecondsUntilNext = -1.f;
+	float LateWakeSlowSecondsRemaining = 0.f;
+	bool bHadSpiritSicknessThisOuting = false;
+	bool bSpiritSicknessPausedAtBed = false;
+	bool bSpiritSicknessBooting = false;
+	bool bChildDawnRuleTold = false;
 
 	/** T0 #13: spirit home->camp portal latch (NODE_PORTAL_HOME -> NODE_PORTAL_CAMP this session). */
 	bool bPortalHomeToCampGranted = false;

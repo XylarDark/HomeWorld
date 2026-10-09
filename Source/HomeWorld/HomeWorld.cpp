@@ -1083,7 +1083,7 @@ namespace
 			Char->GrantSpiritSleepGate();
 			if (Char->GetIsSpiritForm())
 			{
-				UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.GoToBed -- Night + GrantSpiritSleepGate -> FORM_SPIRIT (NODE_BED path; rune latch stays locked)."));
+				UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.GoToBed -- Night + GrantSpiritSleepGate -> FORM_SPIRIT (NODE_BED path)."));
 			}
 			else
 			{
@@ -1168,26 +1168,6 @@ namespace
 			bOk ? TEXT("ok") : TEXT("failed"));
 	}
 
-	void CmdRuneUnlock(const TArray<FString>& Args)
-	{
-		UWorld* World = HomeWorldPlayWorld::Resolve();
-		if (!World)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Rune.Unlock requires a play world (PIE or game)."));
-			return;
-		}
-		APlayerController* PC = World->GetFirstPlayerController();
-		AHomeWorldCharacter* Char = PC ? Cast<AHomeWorldCharacter>(PC->GetPawn()) : nullptr;
-		if (!Char)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Rune.Unlock - no AHomeWorldCharacter pawn."));
-			return;
-		}
-		const bool bOk = Char->TryUnlockNodeRune();
-		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Rune.Unlock %s (NODE_RUNE day field-path unlock; SetRuneGateUnlocked; not PROXY SM_ProxyRune; not spirit on phase alone)."),
-			bOk ? TEXT("ok") : TEXT("failed"));
-	}
-
 		void CmdDayCampEject(const TArray<FString>& Args)
 	{
 		UWorld* World = HomeWorldPlayWorld::Resolve();
@@ -1249,7 +1229,7 @@ void CmdBedSleepSpirit(const TArray<FString>& Args)
 			TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Night);
 		}
 		const bool bOk = Char->TryBedSleepSpirit();
-		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Bed.SleepSpirit %s (NODE_BED night FORM_SPIRIT CAM_T0_BED; GrantSpiritSleepGate; rune latch stays locked; not phase-alone; #9 w/o bed stay FORM_BODY)."),
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Bed.SleepSpirit %s (NODE_BED night FORM_SPIRIT CAM_T0_BED; GrantSpiritSleepGate; not phase-alone; #9 w/o bed stay FORM_BODY)."),
 			bOk ? TEXT("ok") : TEXT("failed"));
 	}
 
@@ -1288,7 +1268,7 @@ void CmdPlantSlot(const TArray<FString>& Args)
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Nurture.Slot - no AHomeWorldCharacter pawn."));
 			return;
 		}
-		// Arrange prereqs documented: hw.Plant.Slot (day) then spirit via hw.Rune.Unlock + hw.Bed.SleepSpirit; RES_SEED via hw.Gather.Seed.
+		// Arrange prereqs documented: hw.Plant.Slot (day) then spirit via hw.Bed.SleepSpirit; RES_SEED via hw.Gather.Seed.
 		if (!Char->IsNodePlantSlotDayPlanted())
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Nurture.Slot - plant slot not day-planted; run hw.Plant.Slot in Day/body first (#3 same-slot prereq). unplanted = closed_fail."));
@@ -1317,7 +1297,7 @@ void CmdPlantSlot(const TArray<FString>& Args)
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Portal.Camp - no AHomeWorldCharacter pawn."));
 			return;
 		}
-		// Arrange prereqs: hw.Rune.Unlock then hw.Bed.SleepSpirit (#11) -> FORM_SPIRIT / TOD_NIGHT_SPIRIT.
+		// Arrange prereqs: hw.Bed.SleepSpirit (#11) -> FORM_SPIRIT / TOD_NIGHT_SPIRIT.
 		if (!Char->GetIsSpiritForm())
 		{
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Portal.Camp - need FORM_SPIRIT; run hw.Bed.SleepSpirit (#11 path). body portal = closed_fail."));
@@ -1343,7 +1323,7 @@ void CmdPlantSlot(const TArray<FString>& Args)
 			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.CampNight - no AHomeWorldCharacter pawn."));
 			return;
 		}
-		// Arrange prereqs: hw.Rune.Unlock then hw.Bed.SleepSpirit (#11) -> FORM_SPIRIT / TOD_NIGHT_SPIRIT.
+		// Arrange prereqs: hw.Bed.SleepSpirit (#11) -> FORM_SPIRIT / TOD_NIGHT_SPIRIT.
 		// Optional: hw.Portal.Camp (#13) to arrive camp � not required for Source emit soft latch.
 		if (!Char->GetIsSpiritForm())
 		{
@@ -1656,7 +1636,7 @@ void FHomeWorldModule::StartupModule()
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.GoToBed"),
-		TEXT("Go to bed: Night + GrantSpiritSleepGate -> FORM_SPIRIT. The rune latch is not required. Phase-alone (hw.TimeOfDay.Phase 2) stays body (#9)."),
+		TEXT("Go to bed: Night + GrantSpiritSleepGate -> FORM_SPIRIT. The bed is the form change. Phase-alone (hw.TimeOfDay.Phase 2) stays body (#9)."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdGoToBed),
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
@@ -1680,11 +1660,6 @@ void FHomeWorldModule::StartupModule()
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdFieldGatherCollect),
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
-		TEXT("hw.Rune.Unlock"),
-		TEXT("T0 #7 NODE_RUNE: day field-path rune unlock -> SetRuneGateUnlocked (TOD_DAY FORM_BODY). Not PROXY/spirit-on-phase. Unlock stays FORM_BODY. The bed does not wait on this latch."),
-		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdRuneUnlock),
-		ECVF_Cheat);
-	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.DayCamp.Eject"),
 		TEXT("T0 #8 NODE_DAY_CAMP: cartoon EJECT_HOME launch->glider->home (TOD_DAY FORM_BODY CAM_T0_CAMP_DAY). StartGlideHome reverse CRUMB; not FALLBACK/PROXY/script-camp/convert."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdDayCampEject),
@@ -1696,7 +1671,7 @@ void FHomeWorldModule::StartupModule()
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.Bed.SleepSpirit"),
-		TEXT("T0 #11 NODE_BED: night bed grants FORM_SPIRIT (CAM_T0_BED). The rune latch stays locked. Day bed stays FORM_BODY. Not phase-alone; #9 w/o bed stay FORM_BODY."),
+		TEXT("T0 #11 NODE_BED: night bed grants FORM_SPIRIT (CAM_T0_BED). Day bed stays FORM_BODY. Not phase-alone; #9 w/o bed stay FORM_BODY."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdBedSleepSpirit),
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
@@ -1706,17 +1681,17 @@ void FHomeWorldModule::StartupModule()
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.Nurture.Slot"),
-		TEXT("T0 #12 NODE_PLANT_SLOT: spirit nurture same N1 slot as #3 day plant (TOD_NIGHT_SPIRIT FORM_SPIRIT). Prereq hw.Plant.Slot + hw.Rune.Unlock + hw.Bed.SleepSpirit; RES_SEED via hw.Gather.Seed. Not N2/body/day-plant-alone."),
+		TEXT("T0 #12 NODE_PLANT_SLOT: spirit nurture same N1 slot as #3 day plant (TOD_NIGHT_SPIRIT FORM_SPIRIT). Prereq hw.Plant.Slot + hw.Bed.SleepSpirit; RES_SEED via hw.Gather.Seed. Not N2/body/day-plant-alone."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdNurtureSlot),
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.Portal.Camp"),
-		TEXT("T0 #13 NODE_PORTAL_HOME->NODE_PORTAL_CAMP: spirit home->camp portal (TOD_NIGHT_SPIRIT FORM_SPIRIT). Prereq hw.Rune.Unlock + hw.Bed.SleepSpirit. Via HomeWorldShrinePortal*; not home<->planet alone; not body; not dress-as-camp."),
+		TEXT("T0 #13 NODE_PORTAL_HOME->NODE_PORTAL_CAMP: spirit home->camp portal (TOD_NIGHT_SPIRIT FORM_SPIRIT). Prereq hw.Bed.SleepSpirit. Via HomeWorldShrinePortal*; not home<->planet alone; not body; not dress-as-camp."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdPortalCamp),
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.CampNight"),
-		TEXT("T0 #14 camp night: avoid 1 NODE_GUARD + soothe 2 NODE_SLEEPER (TOD_NIGHT_SPIRIT FORM_SPIRIT CAM_T0_CAMP_NIGHT). Prereq hw.Rune.Unlock + hw.Bed.SleepSpirit. Via UHomeWorldSpiritStealthComponent; soothe != convert; not GP_SS_Lit alone; not stealth-alone."),
+		TEXT("T0 #14 camp night: avoid 1 NODE_GUARD + soothe 2 NODE_SLEEPER (TOD_NIGHT_SPIRIT FORM_SPIRIT CAM_T0_CAMP_NIGHT). Prereq hw.Bed.SleepSpirit. Via UHomeWorldSpiritStealthComponent; soothe != convert; not GP_SS_Lit alone; not stealth-alone."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdCampNight),
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(

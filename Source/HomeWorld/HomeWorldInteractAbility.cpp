@@ -53,11 +53,6 @@ void UHomeWorldInteractAbility::ActivateAbility(const FGameplayAbilitySpecHandle
 	}
 	if (!bHandled)
 	{
-		// T0 #7 NODE_RUNE: day field-path rune unlock -> SetRuneGateUnlocked (not PROXY / not spirit-on-phase).
-		bHandled = Character->TryNodeRuneInteractInFront();
-	}
-	if (!bHandled)
-	{
 		// T0 #8 NODE_DAY_CAMP: cartoon EJECT_HOME via StartGlideHome (not FALLBACK/PROXY/script-camp/convert).
 		bHandled = Character->TryNodeDayCampInteractInFront();
 	}
