@@ -4,6 +4,7 @@ Job: taste, a sitting. Art law first, then the checklist.
 
 ## Open
 
+- `Docs/art/PROTOTYPE_PIPELINE.md` — the walk. One step, then stop for a yes.
 - `Docs/02_ART_BIBLE.md` — the law
 - `Docs/art/VISUAL_NOTES_FOR_GENERATION.md` — paste the block on every prompt
 - `Docs/art/PROTOTYPE_ASSET_TRACK.md` — the sitting
@@ -15,7 +16,7 @@ Gameplay locks, unless the track names one. The route. Prove scripts. Do not inv
 
 ## Track
 
-`Docs/art/PROTOTYPE_ASSET_TRACK.md`. Start at the first unchecked step. Homestead, then descent and field, then camp, then barriers, then the lair.
+Walk `Docs/art/PROTOTYPE_PIPELINE.md` on the first unchecked step of `Docs/art/PROTOTYPE_ASSET_TRACK.md`. Homestead, then descent and field, then camp, then barriers, then the lair.
 
 ## Pass
 
