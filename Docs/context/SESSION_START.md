@@ -4,14 +4,10 @@ The one start door. Any IDE, chat, CLI, or agent runner. If a capability is miss
 
 ## Mode
 
-1. Start in solo mode. `HANDOFF from HomeWorld Co` or `mode: co` switches to Co. `mode: solo` switches back.
-2. First message header, once: `Mode: <solo or co> · State: <agent, decide, or do>`. Name the real mode and the real state. Restate only when either changes.
-3. State is `agent`, `decide`, or `do`. Name it before acting.
-4. Open `Docs/context/DOOR_RULES.md` with the task.
-
-## Context loss
-
-Re-read only this file, restate the header once, and do not re-run the clarifier.
+1. Start in solo. `HANDOFF from HomeWorld Co` or `mode: co` switches to Co. `mode: solo` switches back.
+2. First message, once: `Mode: <solo or co> · State: <agent, decide, or do>`. Name the real mode and the real state before acting. Restate only when either changes.
+3. Open `Docs/context/DOOR_RULES.md` with the task.
+4. Context loss: re-read only this file, restate the header once, and do not re-run the clarifier.
 
 ## Read order
 
@@ -32,17 +28,23 @@ Open only when the task needs it: `Docs/WORLD_METRICS.md` for a number; `Docs/le
 | Interview, lock, or boss | `Docs/context/BOSS_LAIR_LOCK.md` and the vision-board line that points at it. A later lock wins. Do not open the GDD unless the lock names it. |
 | Hand back | `Docs/context/HANDBACK.md` when the session is Co and the message says hand back |
 
-## Ending the reads
+## After the reads
 
-A named task (verb + game thing + outcome) gets a one-line plan, then work. A recorded queue of agent-owned items runs until a decide, a do, or a second fail on the same writer. A missing tool blocks only that item: say so, do not invent a substitute, and continue the queue. When Luke has said to run that queue, that is the yes for the level items it names. One change, one run, then stop applies to a task that is still unknown. A topic (no verb or no outcome) gets one typed clarifier, then proceeds as named. A dream (no system, or a pure idea) asks, one at a time: what it is; what the first minute should feel like; whether today is look, shape, or build. Or draft a short concept paragraph for a redline — that paragraph is the brief. Dream work reads `Docs/VISION_BOARD.md` and waits for a yes. A topic or dream mid-task drops back to the clarifier.
-
-An interview is one lock. Competing choices for that lock, then stop. Not a menu of different paths. Scribe the pick before the next lock. If the card fails, take a numbered reply in chat. Do not invent a substitute card.
-
-After the clarifier names the work, name one room and open that card. Art is `Docs/context/FORK_ART.md`. Asset is `Docs/context/FORK_ASSET.md`. Gameplay is `Docs/context/FORK_GAMEPLAY.md`. Testing is `Docs/context/FORK_TESTING.md`. You can correct the room. No pick stays in the clarifier. No fifth fork. A card points at a settled lock. It does not reopen it. Shape is `Docs/context/SESSION_FORK_LOCK.md`.
+- **Named task** (verb + game thing + outcome): one-line plan, then work.
+- **Queue:** run until a decide, a do, or a second fail on the same writer. A missing tool blocks only that item: say so, do not invent a substitute, and continue the queue. When Luke has said to run that queue, that is the yes for the level items it names.
+- **Unknown:** one change, one run, then stop.
+- **Topic** (no verb or no outcome): one typed clarifier, then proceed as named. A topic or dream mid-task drops back to the clarifier.
+- **Dream** (no system, or a pure idea): ask, one at a time, what it is; what the first minute should feel like; whether today is look, shape, or build. Or draft a short concept paragraph for a redline. That paragraph is the brief. Read `Docs/VISION_BOARD.md` and wait for a yes.
 
 Other doors are not start reads. Open one only when it is named, or when the question shows it is needed.
 
 Before the first edit, run `git status --short` once. No checkout: say so. A remote write names the branch. Stop and report uncommitted changes you did not make.
+
+## Interview
+
+One lock. Competing choices, then stop. Not a menu of paths. Scribe the pick before the next lock. If the card fails, take a numbered reply in chat. Do not invent a substitute card.
+
+After the clarifier names the work, name one room and open that card. Art is `Docs/context/FORK_ART.md`. Asset is `Docs/context/FORK_ASSET.md`. Gameplay is `Docs/context/FORK_GAMEPLAY.md`. Testing is `Docs/context/FORK_TESTING.md`. You can correct the room. No pick stays in the clarifier. No fifth fork. A card points at a settled lock. It does not reopen it. Shape is `Docs/context/SESSION_FORK_LOCK.md`.
 
 ## Session close
 
