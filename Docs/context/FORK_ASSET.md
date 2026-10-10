@@ -6,6 +6,7 @@ Job: taste, a sitting. Art law first, then the checklist.
 
 - `Docs/art/PROTOTYPE_PIPELINE.md` — the walk. One step, then stop for a yes.
 - `Docs/02_ART_BIBLE.md` — the law
+- `Docs/context/ART_BIBLE_CONTEXT.md` — the working packet for stills, the cabin, and interiors. Write a changed fact here and in the bible.
 - `Docs/art/VISUAL_NOTES_FOR_GENERATION.md` — paste the block on every prompt
 - `Docs/art/PROTOTYPE_ASSET_TRACK.md` — the sitting
 - `Docs/art/PROTOTYPE_ASSET_BRIEFS.md` — the prompts

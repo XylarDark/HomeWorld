@@ -24,6 +24,7 @@ convert. The world teaches through its shape, materials, and light.
 | **Love is the stakes** | Family is present from the start. A loved one is taken at the camp, and the prototype includes the rescue and return home. |
 | **Day and night have different work** | By day, gather and explore. By night, become spirit and tend: ease suffering, help things rest, and nurture the home. |
 | **Night is a form** | The player becomes spirit by sleeping at the bed. Night does not automatically grant the form. |
+| **Two kinds of spirit** | Some creatures are spirit by day and by night. They have no sleeping body. Animals and humanoids have a day body and a spirit form, and they enter the spirit realm only while asleep. Dogs, cats, other animals, and other humanoids will follow that pair. 2026-10-10. |
 | **Care replaces killing** | Combat does not kill. Spirit encounters heal, calm, or convert their targets according to the encounter. |
 | **The world communicates** | Terrain, material, silhouette, and light teach a place's purpose before UI. UI may name an action after the player acts. |
 | **Guidance stays in the world** | Family guides are present from the start. Guidance is a short contextual hint, not a dialogue tree. |
@@ -52,6 +53,18 @@ its form and environment. The camp must
 make the guard's sightline legible from outside so the player can understand
 the approach without a HUD marker.
 
+The player’s far signifier is a small spirit, not a scarf. These stills are the picture.
+
+![Player, texture off](art/player/SM_Player_body_texture_off.jpg)
+
+![Player at the homestead](art/player/SM_Player_homestead_lookback.jpg)
+
+![Player in the field](art/player/SM_Player_field_stand.jpg)
+
+![Player approaching camp](art/player/SM_Player_camp_approach.jpg)
+
+![Player spirit form](art/player/SM_Player_spirit_form.jpg)
+
 ## Open direction questions
 
 The Round 7 questions are answered. Do not ask them again.
@@ -68,13 +81,13 @@ The Round 7 questions are answered. Do not ask them again.
 | What grants the spirit form? | The bed alone. Sleep is the form change. No rune, no second gate. Night does not grant it. 2026-10-08. |
 | What ends the spirit form? | The bed, or max spirit-sickness. Dawn does not end it. Still out at dawn: stay spirit, gain a stack, move slower. Five stacks, ten seconds apart. The window is tuned so three-quarters of the furthest reach can still make the bed. Distance is not a wall. Only the fifth stack flies you to the bed and into the body. 2026-10-08. |
 | What clears spirit sickness? | Touching the bed. Stacks go to zero even if you do not sleep. Only a late wake carries the slow: if you had stacks, waking applies 15 percent for at most one minute. A clean night has none. 2026-10-08. |
-| How do stacks read? | The body tells them. A drag on the step, a colder scarf, a hitch in the glide. No number, no bar. 2026-10-08. |
+| How do stacks read? | The body tells them. A drag on the step, the shoulder spirit’s light, a hitch in the glide. No number, no bar. 2026-10-10. The scarf no longer carries this. |
 | What does the fifth-stack boot feel like? | A live glide home. You stay on the body. You land at the bed, then you are body. No cut. 2026-10-08. |
 | Who teaches the dawn rule? | The child, once, in one line, before the first night out. The bed and the dawn. Then the body is the reminder. 2026-10-08. |
 | Does a late wake change the homestead? | No. The place stays warm. The slow is the body alone. 2026-10-08. |
 | What does the one-minute slow touch? | Movement only. Walk and glide are 15 percent slower. Gather, ease, and the bed stay full speed. 2026-10-08. |
 | How hard is the drag while stacks are up? | The same 15 percent. One stack or five, it does not add. Movement only. 2026-10-08. |
-| How does the scarf read the stacks? | Five steps colder, one per stack. The slow stays a flat 15 percent. You can count without a number. 2026-10-08. |
+| How does the shoulder spirit read the stacks? | Five steps of light, one per stack. The slow stays a flat 15 percent. You can count without a number. 2026-10-10. Replaces the colder-scarf read. |
 | Can the fifth stack interrupt? | Yes. It starts the glide at once, even mid-ease. The beat stays. You return and finish. The interrupt costs time, not progress. 2026-10-08. |
 | When does the cave fog lift? | The next dawn after the rescue. The loved one is home. Late or clean, it does not matter. 2026-10-08. |
 | Who shows the fog has lifted? | The child. They are playing near the edge, and if you leave, they find you. The fog is not a secret. 2026-10-08. |

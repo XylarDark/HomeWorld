@@ -5,6 +5,7 @@ Job: taste. Look, stills, the notes a generator must not drift from.
 ## Open
 
 - `Docs/02_ART_BIBLE.md` — the law
+- `Docs/context/ART_BIBLE_CONTEXT.md` — the working packet. Read it before a still, the cabin, or an interior. Write a changed fact here and in the bible.
 - `Docs/art/VISUAL_NOTES_FOR_GENERATION.md` — the paste block and the place scripts
 - `Docs/VISION_BOARD.md` — product direction, not a second style
 

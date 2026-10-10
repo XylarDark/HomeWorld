@@ -8,7 +8,7 @@ Paste the block at the bottom of every image prompt. Reject the image if any not
 
 They do not generate volume and then look for the vision. They lock shape, proportion, color logic, lighting intent, and the out-of-style list on a few hero shots, then write those as rules. A mood board alone is not a brief. Out-of-style examples matter as much as the in-style ones. A color script is a production document: one palette frame per place, not one palette for the whole game.
 
-For this sitting, the hero shots already exist in the art bible. Generate against the lines below, not against a new style. The `.b64` files are the contract. These sentences are the sitting copy.
+For this sitting, the hero shots are the three pictures in the art bible. Generate against those pictures and the lines below, not against a new style. The contract files are `VisionBoard/KeyArt/homestead_dusk_baseline.jpg`, `player_expression_sheet.jpg`, and `homestead_close_assets.jpg`. These sentences are the sitting copy.
 
 ## North stars, in words
 

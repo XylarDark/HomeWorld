@@ -1,20 +1,25 @@
 # Docs/02_ART_BIBLE.md
 
-## Status: LOCKED — supersedes P2_AD_bible (2026-09-16) — updated 2026-10-08
+## Status: LOCKED — supersedes P2_AD_bible (2026-09-16) — pictures added 2026-10-09
 
 **Owner:** AD (art half of Track C).  
-**Single source of truth:** this file. `AssetCreation/STYLE_GUIDE.md` keeps the Blender export preset only and must not restate look law. `VisionBoard/` holds prompts and encoded key art; it does not override this bible.
+**Single source of truth:** this file. Working packet for stills, the cabin, and interiors: `Docs/context/ART_BIBLE_CONTEXT.md`. Write a changed cabin fact in both. `AssetCreation/STYLE_GUIDE.md` keeps the Blender export preset only and must not restate look law. `VisionBoard/` holds prompts and encoded key art; it does not override this bible.
 
-**North stars (2026-09-30, camp and rune corrected 2026-10-08):**
+**North stars (pictures, 2026-10-09):**
 
-- `VisionBoard/KeyArt/homestead_dusk_baseline.jpg.b64` — dusk homestead contract. Expressive player looking back, warm cabin, lupine bee, crystal moth, cropped moss-bear with readable eyes.
-- `VisionBoard/KeyArt/player_expression_sheet.jpg.b64` — face lock (calm, smile, worry, awe, determination, startle).
-- `VisionBoard/KeyArt/homestead_dusk_face_pass.jpg.b64` — earlier face-pass of the same homestead, before living micro-details.
-- Planetside camp is a locked location test: the player approaching three tired guards at a fire, starry pine-mountain backdrop. The 2026-09-30 armed-brute still is superseded. Encode the guard still when it is exported. Do not treat the 2026-09-16 split greybox as the current planetside contract.
+These three files are the pictures. New stills and meshes are based on them. The `.b64` names were never files in the repo.
 
-Older refs `refs/keyart_homestead_night.jpg` and `refs/keyart_homestead_planetside_split.jpg` remain historical. They are not the current contract.
+- `VisionBoard/KeyArt/homestead_dusk_baseline.jpg` — dusk homestead. Player looking back, warm cabin, lupines, crystal shrine, cropped moss-bear.
+- `Docs/art/homestead/HS_Wide.jpg` — homestead place pack, wide. Materials, night, and texture-off massing sit beside it in `Docs/art/STILLS_LIBRARY.md`.
+- `VisionBoard/KeyArt/player_expression_sheet.jpg` — face lock. Calm, smile, worry, awe, determination, startle. The scarf in that sheet is not the signifier. A small spirit on the shoulder is.
+- `VisionBoard/KeyArt/homestead_close_assets.jpg` — close assets. Lupine and bee, porch with herbs and cup, shrine crystal and moth.
+
+Planetside camp is a locked location test: the player approaching three tired guards at a fire, starry pine-mountain backdrop. The 2026-09-30 armed-brute still is superseded. Encode the guard still when it is exported. Do not treat the 2026-09-16 split greybox as the current planetside contract.
+
+Older refs `refs/keyart_homestead_night.jpg` and `refs/keyart_homestead_planetside_split.jpg` remain historical. They are not these pictures.
 
 **Canon inputs:** `Docs/VISION_BOARD.md`, `Docs/00_SHOTLIST.md`  
+**Stills library:** `Docs/art/STILLS_LIBRARY.md`  
 **Out of scope for this file:** material parameter sheets (TA → `Docs/02_MATERIAL_SHEET.md`).
 
 Tone lock: warm, readable, handmade, hopeful. Fantasy, not high fantasy. Cartoon, not Disney. Closest cousins: Breath of the Wild + Pixar sincerity. Not cutesy-infantile. Not grim. Not photoreal. Not sci-fi.
@@ -41,14 +46,44 @@ Rejected: flat shade, posterized color bands, chunky-toy restyle, photoreal scan
 
 ### Homestead (primary contract)
 
-Dusk on the floating-island hub.
+Dusk on the floating-island hub. This picture is the basis.
 
-- Faceted Zelda/Pixar adventurer looking back, readable face.
+![Homestead dusk](../VisionBoard/KeyArt/homestead_dusk_baseline.jpg)
+
+- Faceted Zelda/Pixar adventurer looking back, readable face. Dark coat, a small spirit on the shoulder, the face from the expression sheet.
 - Log cabin with warm uneven windows, porch lamp, hanging herbs.
 - Lupine beds with one living visitor (bee).
 - Shrine crystal with a moth.
 - Giant cropped moss-bear with brow shelves and eyes that look.
 - Warm sun left, cool forest right, thin air, planetoid moon.
+- The cabin is one lived-in house. Exterior body 30 ft wide by 36 ft deep (9.14 m by 10.97 m). Covered porch 30 ft by 8 ft on the front. Log walls 6 in. Interior 29 ft wide by 35 ft deep. Wall height 10 ft, so a third-person camera can sit above a 1.8 m player. Each bedroom is its own room: at least 70 sq ft and 7 ft on every side.
+
+Doors. Every leaf is a 4 ft clear opening. It swings into its own room and lies flat against the nearest side wall. The swing arc is empty. No leaf swings into the hall.
+
+![Cabin door swings](art/cabin/SM_Home_Cabin_doors.png)
+
+Plan, front (south) to back (north):
+
+- Porch across the front.
+- Living room, front left, 17 ft wide by 14 ft deep. Entry door in the southeast corner. Hinge on that corner. A 90 degree swing parks the leaf against the wall shared with the kitchen. Chimney and wood stove on the west wall, outside the swing. Seat and table sit north of the swing.
+- A 5 ft cased opening, no leaf, centered on the living room’s north wall, into the hall.
+- Kitchen, front right, 12 ft wide by 14 ft deep. A 5 ft cased opening into the living room, near the front. No leaf. One wood counter, 24 in deep, on the east wall, clear of that opening: a simple iron cookstove, a kettle on the stove, and one sink. No refrigerator.
+- Hall, full 29 ft width by 8 ft deep. No door leaves in the hall. The living room opens into it. The kitchen does not.
+- Child’s room, back left, 10 ft by 13 ft. Door on the south wall, at the east side. Hinge on the east. The leaf parks on the east wall. Twin bed on the west wall, outside the swing.
+- Bathroom, back center, 8 ft by 9 ft, with an 8 ft by 4 ft closet behind it. Door on the south wall. Hinge on the west. The leaf parks on the west wall. Tub on the north wall. Toilet and basin on the east wall, north of the swing.
+- Couple’s room, back right, 11 ft by 13 ft. Door on the south wall, at the west side. Hinge on the west. The leaf parks on the west wall. Queen bed, 5 ft by 6 ft 8 in, on the north wall, shifted east so the west side is the door pocket. The open doorway shows the bed from the hall.
+
+### Close assets
+
+The same homestead, close. Bee, porch, crystal.
+
+![Homestead close assets](../VisionBoard/KeyArt/homestead_close_assets.jpg)
+
+### Face
+
+Same person. Brow, lid, and mouth are planes. Order: calm, smile, worry, awe, determination, startle.
+
+![Player expression sheet](../VisionBoard/KeyArt/player_expression_sheet.jpg)
 
 ### Planetside (second location test)
 
@@ -102,7 +137,7 @@ Unique but non-descript. A person, not a logo.
 
 - Young-adult adventurer, slightly androgynous.
 - Short geometric hair in a few faceted clumps.
-- Muted charcoal-brown coat. One warm scarf accent. No ornate armor.
+- Muted charcoal-brown coat. A small spirit rides the shoulder. That spirit is the far signifier and the five-step stack read. No scarf. No ornate armor.
 - Adult head about one sixth of height. Child head larger, about four to five heads. Eyes graphic and clear.
 - Face built from planes that act: brows, eyelids, mouth corners.
 - Not a featureless hood. Not a realistic hoodie. Not a Disney princess. Not a high-fantasy chosen one.
@@ -112,6 +147,18 @@ Spend triangles on the face. The coat stays cheap.
 Emotion kit to author: calm, smile, worry, awe, determination, startle.
 
 The player is a scale ruler and an actor in close shots. The world still carries the wide frame. Partner, child, and the three camp guards share this face kit. Hair and accent differ.
+
+Some creatures are spirit by day and by night. Animals and humanoids, including the player, have a day body and a spirit form. They enter the spirit realm only while asleep. The shoulder spirit is the always-spirit kind.
+
+![Player, texture off](art/player/SM_Player_body_texture_off.jpg)
+
+![Player at the homestead](art/player/SM_Player_homestead_lookback.jpg)
+
+![Player in the field](art/player/SM_Player_field_stand.jpg)
+
+![Player approaching camp](art/player/SM_Player_camp_approach.jpg)
+
+![Player spirit form](art/player/SM_Player_spirit_form.jpg)
 
 ---
 
