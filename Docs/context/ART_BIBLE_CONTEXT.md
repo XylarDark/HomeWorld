@@ -117,7 +117,7 @@ A sleeper (player, partner, child, guards, bull, later dogs and cats): face or h
 
 An always-spirit creature (the shoulder spirit, the cloud wisp, and later kin): one form for day and night, readable at 20 feet, no second body.
 
-Each accepted still has one job. Paste the block whole. Attach only the pictures that job needs.
+Each accepted still has one job. Paste the block whole. Attach only the pictures that job needs. Model sheets follow `Docs/art/STILL_GENERATION_STANDARD.md`.
 
 ## Homestead sitting
 

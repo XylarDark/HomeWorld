@@ -14,7 +14,7 @@ Key art. The asset track. The GDD, unless the lock names it. `Docs/COMBAT_DREAM_
 
 ## Track
 
-The named lock. An interview is one lock, competing choices, then stop. Scribe the pick before the next lock.
+`Docs/context/PLAY_TASKS.md`. Walk critical path only. An interview is one lock, competing choices, then stop. Scribe the pick before the next lock. A Look or Prove blocker is not this room’s work.
 
 ## Pass
 

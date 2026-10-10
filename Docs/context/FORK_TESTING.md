@@ -14,7 +14,7 @@ New art. New locks. The asset track. Do not treat a clean log as done.
 
 ## Track
 
-The named prove. One change, one run, then stop, when the task is still unknown.
+`Docs/context/PROVE_TASKS.md`. One named prove. One change, one run, then stop, when the task is still unknown. Do not tick sign-off.
 
 ## Pass
 

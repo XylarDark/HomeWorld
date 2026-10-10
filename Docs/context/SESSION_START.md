@@ -27,6 +27,16 @@ Open only when the task needs it: `Docs/WORLD_METRICS.md` for a number; `Docs/le
 | First loop, or implement from the lock | `Docs/context/T0_INTERVIEW_LOCK.md`, `Docs/context/T0_SHAPE_PLAN.md`, and the active queue named in `Docs/CANON_MAP.md`. A later lock line wins over an older queue. |
 | Interview, lock, or boss | `Docs/context/BOSS_LAIR_LOCK.md` and the vision-board line that points at it. A later lock wins. Do not open the GDD unless the lock names it. |
 | Hand back | `Docs/context/HANDBACK.md` when the session is Co and the message says hand back |
+| What next, the project picture, the critical path, prototype assets, stills, Tripo, Meshy, Mixar, or art asset | `Docs/context/ART_ASSET_DOOR.md`. The room is Look. Do not offer rooms. |
+
+## Pick the task
+
+This is the production step. Vision says how the thing is shaped. The lists say what is next. The room says which files to open.
+
+1. Read `Docs/VISION_BOARD.md` through `## Shape` only. Stop before the principles table.
+2. Read the status line in `Docs/art/ASSET_CONTEXT_TASKS.md` (the sitting queue, through the lock lines). Read `## Critical path` in `Docs/context/PLAY_TASKS.md` and in `Docs/context/PROVE_TASKS.md`. Do not read the cards.
+3. Start the first critical-path item that is not kept and whose co-fork blockers are done. Look’s status line wins while Play’s critical path says none.
+4. Open that room and only the resources it names for that item. Look opens `Docs/context/ART_ASSET_DOOR.md`. Play opens the named lock. Prove opens the named prove.
 
 ## After the reads
 
@@ -44,7 +54,9 @@ Before the first edit, run `git status --short` once. No checkout: say so. A rem
 
 One lock. Competing choices, then stop. Not a menu of paths. Scribe the pick before the next lock. If the card fails, take a numbered reply in chat. Do not invent a substitute card.
 
-After the clarifier names the work, name one room and open that card. Art is `Docs/context/FORK_ART.md`. Asset is `Docs/context/FORK_ASSET.md`. Gameplay is `Docs/context/FORK_GAMEPLAY.md`. Testing is `Docs/context/FORK_TESTING.md`. You can correct the room. No pick stays in the clarifier. No fifth fork. A card points at a settled lock. It does not reopen it. Shape is `Docs/context/SESSION_FORK_LOCK.md`.
+After the clarifier names the work, name one room and open that card. Look is `Docs/context/FORK_LOOK.md`. Play is `Docs/context/FORK_GAMEPLAY.md`. Prove is `Docs/context/FORK_TESTING.md`. Art and asset both open Look. You can correct the room. No pick stays in the clarifier. No fourth craft room. The art bible is the law inside Look. It is not a room. A card points at a settled lock. It does not reopen it. Shape is `Docs/context/SESSION_FORK_LOCK.md`.
+
+Prototype assets, stills, and “what next” skip this choice. The task rows above already name the room.
 
 ## Session close
 

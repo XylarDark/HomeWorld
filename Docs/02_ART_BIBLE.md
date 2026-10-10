@@ -3,7 +3,7 @@
 ## Status: LOCKED — supersedes P2_AD_bible (2026-09-16) — pictures added 2026-10-09
 
 **Owner:** AD (art half of Track C).  
-**Single source of truth:** this file. Working packet for stills, the cabin, and interiors: `Docs/context/ART_BIBLE_CONTEXT.md`. Write a changed cabin fact in both. `AssetCreation/STYLE_GUIDE.md` keeps the Blender export preset only and must not restate look law. `VisionBoard/` holds prompts and encoded key art; it does not override this bible.
+**Single source of truth:** this file. Asset work from stills to mesh opens `Docs/context/ART_ASSET_DOOR.md`. Working packet: `Docs/context/ART_BIBLE_CONTEXT.md`. Write a changed cabin fact in both. `AssetCreation/STYLE_GUIDE.md` keeps the Blender export preset only and must not restate look law. `VisionBoard/` holds prompts and encoded key art; it does not override this bible.
 
 **North stars (pictures, 2026-10-09):**
 

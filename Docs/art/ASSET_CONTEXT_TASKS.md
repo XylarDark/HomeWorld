@@ -2,6 +2,24 @@
 
 One card per name in [PROTOTYPE_ASSET_BRIEFS.md](PROTOTYPE_ASSET_BRIEFS.md), plus the player. Order is homestead, descent and field, camp, barriers, lair last. One card’s stills per sitting. The next card waits until those pictures are kept or rejected.
 
+## Sitting queue
+
+Work these together, one at a time. A sitting ends when the stills are kept or rejected. Tripo and Meshy run only after that keep, from the front and the back of the same design. Mixar is the cleanup and the FBX export after the mesh exists. It does not invent the design.
+
+Critical path:
+
+1. Player turnaround. Kept 2026-10-10. Identity sheet.
+2. Homestead wide, materials, night, and massing. Kept 2026-10-10. Wide and night are closer than 20 feet.
+3. Cabin turnaround. Regenerated from the kept wide, night, and materials stills. Filed for audit. `Docs/art/homestead/HS_Turnaround.jpg`. Front, side, and back at one height.
+4. Partner still pack, then the child. The partner keeps one warm scarf. The player does not. Blocked until the cabin turnaround is kept or rejected.
+5. Field and camp on the rescue loop. Clouds, wisp, landing, gathers, bull, clearing, three guards.
+
+Later: bed, herb bed, kettle, edge, perch, shrine, barriers, and the lair after the mouth.
+
+Future: dogs, cats, other animals and humanoids, and any second night mesh. Night stays NightMix on the same mesh.
+
+Status line: ask keep or reject on the cabin turnaround. Do not start the partner until that answer.
+
 Do not generate a mesh from text. Image-to-3D runs only after the stills on that card are kept. Do not check a box in [PROTOTYPE_ASSET_TRACK.md](PROTOTYPE_ASSET_TRACK.md) from this file. Do not copy a file into `Content/`.
 
 Night is NightMix on the same mesh. A spirit still is a look, not a second model.
@@ -48,7 +66,7 @@ Stills filed, no mesh. Status: stills for audit.
 - [x] Field, standing. [SM_Player_field_stand.jpg](player/SM_Player_field_stand.jpg)
 - [x] Camp approach. [SM_Player_camp_approach.jpg](player/SM_Player_camp_approach.jpg)
 - [x] Spirit form. [SM_Player_spirit_form.jpg](player/SM_Player_spirit_form.jpg)
-- [ ] Front, side, back, three-quarter at one height
+- [x] Front, side, back, three-quarter at one height. [SM_Player_turnaround.jpg](player/SM_Player_turnaround.jpg)
 
 ## Homestead
 
@@ -65,7 +83,7 @@ Status: stills for audit. Wide and night are closer than 20 feet.
 - [x] Close materials. [HS_Materials.jpg](homestead/HS_Materials.jpg)
 - [x] Night. [HS_Night.jpg](homestead/HS_Night.jpg)
 - [x] Texture-off massing. [HS_Massing.jpg](homestead/HS_Massing.jpg)
-- [ ] Front, side, back at one height
+- [x] Front, side, back at one height. Filed for audit. [HS_Turnaround.jpg](homestead/HS_Turnaround.jpg)
 - [ ] Tool: Tripo, under 4,000, only after the views are kept
 
 ### SM_Home_Bed

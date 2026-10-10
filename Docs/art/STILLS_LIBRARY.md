@@ -15,6 +15,7 @@ Kept 2026-10-10. Coat and shoulder spirit. The expression sheet locks the face. 
 | [SM_Player_field_stand.jpg](player/SM_Player_field_stand.jpg) | Standing, field |
 | [SM_Player_camp_approach.jpg](player/SM_Player_camp_approach.jpg) | Approaching camp |
 | [SM_Player_spirit_form.jpg](player/SM_Player_spirit_form.jpg) | Spirit form, asleep into spirit |
+| [SM_Player_turnaround.jpg](player/SM_Player_turnaround.jpg) | Front, side, back, three-quarter, one height. Kept 2026-10-10. |
 
 ## Homestead
 
@@ -28,6 +29,7 @@ Door plan, already drawn: [SM_Home_Cabin_doors.png](cabin/SM_Home_Cabin_doors.pn
 | [HS_Materials.jpg](homestead/HS_Materials.jpg) | Close wood, stone, herb, kettle, and iron stove |
 | [HS_Night.jpg](homestead/HS_Night.jpg) | Same place at night. Warm windows. Body, not spirit. |
 | [HS_Massing.jpg](homestead/HS_Massing.jpg) | Texture-off cabin massing, player for scale |
+| [HS_Turnaround.jpg](homestead/HS_Turnaround.jpg) | Front, side, back, one height. Filed for audit. |
 
 ![Homestead wide](homestead/HS_Wide.jpg)
 
@@ -36,6 +38,8 @@ Door plan, already drawn: [SM_Home_Cabin_doors.png](cabin/SM_Home_Cabin_doors.pn
 ![Homestead night](homestead/HS_Night.jpg)
 
 ![Homestead massing](homestead/HS_Massing.jpg)
+
+![Cabin turnaround](homestead/HS_Turnaround.jpg)
 
 ## Later
 

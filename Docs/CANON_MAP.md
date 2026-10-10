@@ -81,6 +81,7 @@ README is left intact as history.
 | **Cloud descent facts and carried wisp** | `Docs/context/HOMEWORLD_ROUTE.md` + accepted `docs/human-use/test-contract.md` | current route / accepted behavior |
 | Art direction | `Docs/02_ART_BIBLE.md` | canon |
 | **Art bible working packet** | `Docs/context/ART_BIBLE_CONTEXT.md` | stills, cabin, doors. Open with the art or asset room. |
+| **Art asset door** | `Docs/context/ART_ASSET_DOOR.md` | stills to mesh. Not the session start. |
 | Ten master materials | `Docs/02_MATERIAL_SHEET.md` | **LOCKED** |
 | Per-domain locked bibles | `Docs/DAYNIGHT_BIBLE.md` · `Docs/MOVEMENT_BIBLE.md` · `Docs/HOMESTEAD_BIBLE.md` · `Docs/COMBAT_DREAM_BIBLE.md` · `Docs/GATHER_CRAFT_BIBLE.md` · `Docs/SPIRIT_STEALTH_BIBLE.md` · `Docs/CAMERA_BIBLE.md` | **LOCKED** — all seven |
 | Blender→UE export contract | `Docs/04_EXPORT_TABLE.md` | **LOCKED** contract |
@@ -90,11 +91,10 @@ README is left intact as history.
 | **Prototype sitting briefs** | `Docs/art/PROTOTYPE_ASSET_BRIEFS.md` | home kit 2026-10-08. Paste, then mesh. |
 | **Sitting track** | `Docs/art/PROTOTYPE_ASSET_TRACK.md` | play order and pass bars |
 | **Generation notes** | `Docs/art/VISUAL_NOTES_FOR_GENERATION.md` | paste block and place scripts |
-| **Art room** | `Docs/context/FORK_ART.md` | look and stills |
-| **Asset room** | `Docs/context/FORK_ASSET.md` | sitting |
-| **Gameplay room** | `Docs/context/FORK_GAMEPLAY.md` | locks. Dream combat stays closed. |
-| **Testing room** | `Docs/context/FORK_TESTING.md` | prove |
-| **Fork lock** | `Docs/context/SESSION_FORK_LOCK.md` | four cards, one pointer |
+| **Look room** | `Docs/context/FORK_LOOK.md` | stills and meshes. Art and asset. |
+| **Play room** | `Docs/context/FORK_GAMEPLAY.md` | locks. List: `Docs/context/PLAY_TASKS.md`. |
+| **Prove room** | `Docs/context/FORK_TESTING.md` | proves. List: `Docs/context/PROVE_TASKS.md`. |
+| **Fork lock** | `Docs/context/SESSION_FORK_LOCK.md` | three rooms, 2026-10-10 |
 | **Sitting gap** | `Docs/art/GAP_2026-10-08.md` | studio gap, 2026-10-08 |
 | **The 13+4 T0 MUSTs** | `Docs/handoffs/T0_MECHANIC_INVENTORIES_V1.md` | **canonical for T0** |
 | The work queue | `Docs/TaskLists/T0_NEXT_QUEUE.md` | active — 2026-10-08. `T0_FIRST_LOOP_NOW.md` is the finished code queue |

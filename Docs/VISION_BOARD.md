@@ -2,7 +2,7 @@
 
 | Field | Current direction |
 |---|---|
-| **Status** | Product canon, updated 2026-10-08 |
+| **Status** | Product canon, updated 2026-10-10 |
 | **Theme and long-horizon campaign** | [`VisionBoard/Core/VISION.md`](../VisionBoard/Core/VISION.md) |
 | **Gameplay slice** | [`Docs/01_GDD_MVP.md`](01_GDD_MVP.md) |
 
@@ -16,6 +16,16 @@ night, sleep at the bed lets you become spirit. You travel back unseen, ease
 the guards' suffering until they sleep, free your loved one, and bring them
 home. You tend what depends on you. You do not kill: spirit encounters heal and
 convert. The world teaches through its shape, materials, and light.
+
+## Shape
+
+Read this before a task. The answered table below is the lock. Do not ask those questions again.
+
+- Three places: homestead, open field, pine camp. The glide connects them. The lair is after that loop.
+- Three lines: the place teaches itself. Safe home above a living world. One warm eye against the cool.
+- The player wears a dark coat and a small shoulder spirit. No scarf. Head about one sixth of height. The partner keeps one warm scarf.
+- Some creatures are always spirit. Animals and humanoids enter the spirit realm only while asleep.
+- Asset work that blocks play: cabin turnaround, then partner, then child, then the field and camp on the rescue. Edge, perch, shrine, barriers, and the lair after the mouth are later.
 
 ## Current product principles
 
