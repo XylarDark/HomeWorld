@@ -21,7 +21,7 @@ Three modules. Block them in meters.
 
 | Module | Size | Kept picture |
 |---|---|---|
-| Player | 2 m. The door gap is 2 m. | `Docs/art/homestead/HS_Cabin_gap.jpg` |
+| Player | 2 m. The door is 1 m wide and 3 m high. | `Docs/art/homestead/HS_Cabin_gap.jpg` |
 | Wild | Bear and bull shoulder 5 m. Pines 5 m, 7 m, and 9 m. | `Docs/art/field/Field_bull_scale_v2.jpg` for the bull. The bear’s height target is the cottage wall, not the vista. |
 | Giant | Many times the wild module. Bull and rider stay small on the back. Snake wraps the chest and neck. | `Docs/art/lair/Lair_back_ride_v5.jpg` |
 
@@ -39,6 +39,7 @@ Words that drifted, and the word to use instead:
 |---|---|
 | Human door, round hut, moss dome | Gabled log shell, stone chimney, one player-sized door. |
 | Cute green bear, smooth black bear, giant that turns into a bear | The dusk moss-bear. Hard facets. Moss on the upper planes. Amber eyes. |
+| Smooth blob, or a crystal-cut outline | The dusk hero's facet size. Rugged and chunky. The silhouette stays the subject. |
 | Bull prompt that is given the vista | Bull, horns, heavy head. Do not attach the bear picture. |
 | Snake laid in an S on the hill | Snake wrapped around the torso. Head by the giant’s head. |
 | Player as tall as the door of a cottage | Player is one log tall. The bear and the shell match. |
@@ -49,6 +50,6 @@ Changing tree height in the same prompt as the bear or the cabin drops the facet
 
 ## This sitting
 
-`HS_Shell_greybox.jpg` is a scene. It does not match the generation card in `Docs/art/SCALE.md`. The size-test order is `Docs/art/SIZE_TEST_TASKS.md`. The player block is `Tools/Build-PlayerGreybox.py`. The next picture is still the cottage sheet alone.
+The cottage front is kept: `Docs/art/homestead/HS_Cottage_sheet_rail2.png`. The pine front is kept: `Docs/art/field/SM_Pine_sheet_front.jpg`. The bear front is kept: `Docs/art/homestead/SM_Bear_sheet_front.jpg`. The bull front is kept: `Docs/art/field/SM_Bull_sheet_front.jpg`. Shoulders are the 5 m cottage wall. The guard front is kept: `Docs/art/camp/SK_Guard_sheet_front.jpg`. Weight on the hips. Large sword leaning on one shoulder. Characters and large assets the player acts on come next. Path stone, moss, fence, windows, and porch dressing wait.
 
 Partner, child, and camp stay closed. They do not change these meters.

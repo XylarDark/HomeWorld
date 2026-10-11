@@ -36,11 +36,11 @@ Audit stills, 2026-10-10:
 
 ## Pictures
 
-These three files are the basis. The old `.b64` names were never files in the repo. `refs/keyart_homestead_night.jpg` and `refs/keyart_homestead_planetside_split.jpg` stay historical.
+The measure is `VisionBoard/KeyArt/homestead_dusk_baseline.jpg`. It is a fit check, not a design source. A new character or asset waits for a design the developer has written into context. Generate that design from scratch. Do not attach the measure, and do not invent the subject from an older asset. After the design is in context, score the result against the measure. Size is `Docs/art/SCALE.md`. The old `.b64` names were never files in the repo. `refs/keyart_homestead_night.jpg` and `refs/keyart_homestead_planetside_split.jpg` stay historical.
 
 | File | Role |
 |---|---|
-| `VisionBoard/KeyArt/homestead_dusk_baseline.jpg` | Light and materials. The cabin in this picture matches the player. It does not lock size. |
+| `VisionBoard/KeyArt/homestead_dusk_baseline.jpg` | Fit check only, after a developer design is in context. Not the design source. It does not lock meters. |
 | `VisionBoard/KeyArt/player_expression_sheet.jpg` | Face lock. Calm, smile, worry, awe, determination, startle. Dark coat. Shoulder spirit, not the scarf in the sheet. |
 | `VisionBoard/KeyArt/homestead_close_assets.jpg` | Lupine and bee, porch, shrine crystal and moth. |
 
@@ -62,7 +62,7 @@ Paste the block whole. Change only the subject. Each attached picture has one jo
 
 | Picture | Job |
 |---|---|
-| `homestead_dusk_baseline.jpg` | Place, light, and materials. |
+| `homestead_dusk_baseline.jpg` | Fit check only, after the developer has written the design. Do not attach it as the source. |
 | `player_expression_sheet.jpg` | The person. |
 | `homestead_close_assets.jpg` | Close wood, flower, and crystal. |
 | `Docs/art/cabin/SM_Home_Cabin_doors.png` | The plan and the door swings. |

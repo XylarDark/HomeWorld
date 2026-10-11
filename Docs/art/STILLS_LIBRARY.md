@@ -18,6 +18,8 @@ Kept 2026-10-10. Coat and shoulder spirit. The expression sheet locks the face. 
 | [SM_Player_turnaround.jpg](player/SM_Player_turnaround.jpg) | Prototype | Front, side, back, three-quarter, one height. Kept 2026-10-10. |
 | [SM_Player_front.jpg](player/SM_Player_front.jpg) | Concept | Front, A-pose. Shoulder gem. Not the mesh input. |
 | [SM_Player_front_v2.jpg](player/SM_Player_front_v2.jpg) | Concept | TripoSR input. Same front, no shoulder spirit. For audit. |
+| [SK_Player_Female_sheet_front.jpg](player/SK_Player_Female_sheet_front.jpg) | Greybox | Kept 2026-10-11. Female player. Same coat and facet quality. No scarf. |
+| [SM_Bear_sheet_front.jpg](homestead/SM_Bear_sheet_front.jpg) | Greybox | Kept 2026-10-11. One moss-bear, straight front. Facet size from the dusk homestead hero. Shoulder 5 m. |
 
 ## Homestead
 
@@ -33,6 +35,20 @@ Door plan, Greybox, already drawn: [SM_Home_Cabin_doors.png](cabin/SM_Home_Cabin
 | [HS_Massing.jpg](homestead/HS_Massing.jpg) | Greybox | Earlier texture-off mass. Human-sized cabin. Not the shell. |
 | [HS_Shell_greybox.jpg](homestead/HS_Shell_greybox.jpg) | Greybox | Shell for audit. Texture off. Bear beside the gabled mass. Small figure. |
 | [HS_Cabin_front.jpg](homestead/HS_Cabin_front.jpg) | Prototype | Front elevation in audit. Side and back wait on a keep. |
+| [HS_Cottage_sheet_front.jpg](homestead/HS_Cottage_sheet_front.jpg) | Greybox | Cottage sheet, front, texture off. For audit. Not a keep. |
+| [HS_Cottage_sheet_porch.png](homestead/HS_Cottage_sheet_porch.png) | Greybox | Kontext edit of that front. Covered porch added. Door still centered. For audit. Not a keep. |
+| [HS_Cottage_sheet_door2.png](homestead/HS_Cottage_sheet_door2.png) | Greybox | Door edit did not move the door. Same front and porch. Not a keep. |
+| [HS_Cottage_sheet_front_v3.jpg](homestead/HS_Cottage_sheet_front_v3.jpg) | Greybox | New front. Porch and door right of center. Rail stops at the door. For audit. Not a keep. |
+| [HS_Cottage_sheet_rail.png](homestead/HS_Cottage_sheet_rail.png) | Greybox | Rail edit. Right rail is still a short stub. Not a keep. |
+| [HS_Cottage_sheet_rail2.png](homestead/HS_Cottage_sheet_rail2.png) | Greybox | Kept 2026-10-11. Front. Chimney on the right, door right of center, porch and rail. |
+| [SM_Home_Bed_sheet_front.jpg](homestead/SM_Home_Bed_sheet_front.jpg) | Greybox | Kept 2026-10-11. Bed front. Texture off. |
+| [SM_Home_Kettle_sheet_front.jpg](homestead/SM_Home_Kettle_sheet_front.jpg) | Greybox | Kept 2026-10-11. One kettle. Texture off. |
+| [SM_Home_HerbBed_sheet_front.jpg](homestead/SM_Home_HerbBed_sheet_front.jpg) | Greybox | Kept 2026-10-11. Raised bed and faceted herbs. |
+| [SM_Home_Edge_sheet_front.jpg](homestead/SM_Home_Edge_sheet_front.jpg) | Greybox | Kept 2026-10-11. Walkable lip and torn drop. |
+| [SM_Glider_Perch_sheet_front.jpg](homestead/SM_Glider_Perch_sheet_front.jpg) | Greybox | Kept 2026-10-11. Timber pad, rail on three sides, open front. |
+| [SM_Shrine_sheet_front.jpg](homestead/SM_Shrine_sheet_front.jpg) | Greybox | Kept 2026-10-11. One standing stone. No rune. |
+| [SK_Partner_sheet_front.jpg](homestead/SK_Partner_sheet_front.jpg) | Greybox | Kept 2026-10-11. Adult A-pose. One warm scarf. |
+| [SK_Child_sheet_front.jpg](homestead/SK_Child_sheet_front.jpg) | Greybox | Kept 2026-10-11. Child A-pose. No scarf. 1 m stand-in. |
 | [HS_Turnaround.jpg](homestead/HS_Turnaround.jpg) | Prototype | Earlier front, side, and back. Not the current front. |
 
 ![Homestead wide](homestead/HS_Wide.jpg)
@@ -75,6 +91,12 @@ Mood stills for `SCALE.md`. For audit. The close-assets north star is the dense 
 
 | Still | Phase | Job |
 |---|---|---|
+| [SM_Pine_sheet_front.jpg](field/SM_Pine_sheet_front.jpg) | Greybox | Kept 2026-10-11. One faceted cone. Front. No person. |
+| [SM_Cloud_Wisp_sheet.jpg](field/SM_Cloud_Wisp_sheet.jpg) | Greybox | Kept 2026-10-11. Fluffy cloud with a gap and a bright wisp inside. Not the rugged look. |
+| [SM_Herb_sheet_front.jpg](field/SM_Herb_sheet_front.jpg) | Greybox | Kept 2026-10-11. Faceted herb. Lupine facet style. 1 m stand-in. |
+| [SM_Wood_sheet_front.jpg](field/SM_Wood_sheet_front.jpg) | Greybox | Kept 2026-10-11. Faceted fallen branch. 2 m long. |
+| [SM_Berry_sheet_front.jpg](field/SM_Berry_sheet_front.jpg) | Greybox | Kept 2026-10-11. Faceted berry cluster. 1 m stand-in. |
+| [SM_BerryBush_sheet_front.jpg](field/SM_BerryBush_sheet_front.jpg) | Greybox | Kept 2026-10-11. Low bush. The berries grow on it. 2 m stand-in. |
 | [Field_bull_scale_v2.jpg](field/Field_bull_scale_v2.jpg) | Concept | Earlier bull keep. Shoulder reads larger than a 5 m wall. |
 | [Field_bull_dim.jpg](field/Field_bull_dim.jpg) | Concept | Dimension pass. Bull beside the player. Shoulder still high for a 5 m wall. For audit. |
 

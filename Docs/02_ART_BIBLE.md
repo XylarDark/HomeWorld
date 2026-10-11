@@ -5,11 +5,9 @@
 **Owner:** AD (art half of Track C).  
 **Single source of truth:** this file. Asset work from stills to mesh opens `Docs/context/ART_ASSET_DOOR.md`. Working packet: `Docs/context/ART_BIBLE_CONTEXT.md`. Write a changed cabin fact in both. `AssetCreation/STYLE_GUIDE.md` keeps the Blender export preset only and must not restate look law. `VisionBoard/` holds prompts and encoded key art; it does not override this bible.
 
-**North stars (pictures, 2026-10-09):**
+**Measure (2026-10-11):** `VisionBoard/KeyArt/homestead_dusk_baseline.jpg` is a fit check, not a design source. A new character or asset is designed by the developer and written into context first. Generate that design from scratch. Do not invent it from this picture or from an older asset. After that design is in context, score the result against this picture so it fits the hero vision. It does not lock meters. Size is `Docs/art/SCALE.md`. The `.b64` names were never files in the repo.
 
-These three files lock face, light, and materials. Size is `Docs/art/homestead/HS_Vista_bear_module_v9.jpg`, kept 2026-10-10. The `.b64` names were never files in the repo.
-
-- `VisionBoard/KeyArt/homestead_dusk_baseline.jpg` — dusk homestead. Player looking back, warm cabin, lupines, crystal shrine, cropped moss-bear.
+- `VisionBoard/KeyArt/homestead_dusk_baseline.jpg` — the measure. Dusk homestead. Player looking back, warm cabin, lupines, crystal shrine, cropped moss-bear. Fit check only, after a developer design is in context.
 - `Docs/art/homestead/HS_Wide.jpg` — homestead place pack, wide. Materials, night, and texture-off massing sit beside it in `Docs/art/STILLS_LIBRARY.md`.
 - `VisionBoard/KeyArt/player_expression_sheet.jpg` — face lock. Calm, smile, worry, awe, determination, startle. The scarf in that sheet is not the signifier. A small spirit on the shoulder is.
 - `VisionBoard/KeyArt/homestead_close_assets.jpg` — close assets. Lupine and bee, porch with herbs and cup, shrine crystal and moth.
@@ -33,6 +31,7 @@ Tone lock: warm, readable, handmade, hopeful. Fantasy, not high fantasy. Cartoon
 HomeWorld is **semi-polygon with detail on top**.
 
 - Big forms are faceted low-poly masses. Not flat untextured low poly. Not photoreal. Not Mario-Galaxy soft clay.
+- The fit check is `VisionBoard/KeyArt/homestead_dusk_baseline.jpg`. Locked 2026-10-11. Use it only after the developer has written the design. Masses are rugged and chunky. Facets are the size in that picture. A smooth blob fails. A crystal-cut outline fails. It is not the source of a new design.
 - Surface life sits on those facets: wood grain, moss clumps, flower clusters, crystal faces, leather straps.
 - Most of the frame is scenery ahead of the player.
 - The player is 2 m and is not from this planet. The cottage is the drawn home, 9 m by 11 m, walls 5 m. The bear and the bull match that wall, 5 m at the shoulder. Pines are 5 m, 7 m, and 9 m. The giant is many times the cottage. Camp guards stay people. The meters are `Docs/art/SCALE.md`.
@@ -314,7 +313,7 @@ Approve against `Docs/00_SHOTLIST.md` plus the north stars.
 | Planet camp | Three tired guards, same face planes, fire as the warm eye, stars + mountain + pines, sightline from outside | Armed brutes, a cage, gore, Disney animals, grim void |
 | Spirit shrine night | Crystal cyan answering cabin gold, same masters, standing stone | Neon tech portal, a rune, rebuilt geometry for night |
 
-**Still rejected:** photoreal scans, grimdark, sci-fi kits, pancake islands, tiny white moon, dead night windows, extra tree species, smoothing facets away, rescaling per camera, legendary outfits, a rune.
+**Still rejected:** photoreal scans, grimdark, sci-fi kits, pancake islands, tiny white moon, dead night windows, extra tree species, smoothing facets away, a rounded silhouette, rescaling per camera, legendary outfits, a rune.
 
 ---
 

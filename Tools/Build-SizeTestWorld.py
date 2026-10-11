@@ -200,12 +200,12 @@ def build_cottage():
     parts.append(box("WallW", 0, 1, 0, 1, 10, 5))
     parts.append(box("WallE", 8, 1, 0, 9, 10, 5))
     parts.append(box("WallN", 0, 10, 0, 9, 11, 5))
-    parts.append(box("WallS_L", 0, 0, 0, 4, 1, 5))
-    parts.append(box("WallS_R", 5, 0, 0, 9, 1, 5))
-    parts.append(box("DoorHead", 4, 0, 2, 5, 1, 5))
-    parts.append(box("Hall_L", 1, 3, 0, 4, 4, 5))
-    parts.append(box("Hall_R", 5, 3, 0, 8, 4, 5))
-    parts.append(box("HallHead", 4, 3, 2, 5, 4, 5))
+    parts.append(box("WallS_L", 0, 0, 0, 5, 1, 5))
+    parts.append(box("WallS_R", 6, 0, 0, 9, 1, 5))
+    parts.append(box("DoorHead", 5, 0, 3, 6, 1, 5))
+    parts.append(box("Hall_L", 1, 3, 0, 5, 4, 5))
+    parts.append(box("Hall_R", 6, 3, 0, 8, 4, 5))
+    parts.append(box("HallHead", 5, 3, 3, 6, 4, 5))
     parts.append(box("Roof", 0, 0, 5, 9, 11, 6))
     parts.append(box("Ridge", 0, 5, 6, 9, 6, 8))
     parts.append(box("PorchRoof", 0, -2, 3, 9, 0, 4))
@@ -391,4 +391,12 @@ def build():
 
 
 if __name__ == "__main__":
-    build()
+    if os.environ.get("HOMEWORLD_SIZE_ONLY") == "cottage":
+        if os.path.exists(LOG):
+            os.remove(LOG)
+        os.makedirs(OUT, exist_ok=True)
+        clear_scene()
+        build_cottage()
+        log("cottage block complete")
+    else:
+        build()

@@ -37,7 +37,7 @@ def height_axis(vertices: np.ndarray) -> tuple[int, float]:
     return best_axis, head_sign
 
 
-def stand(mesh: trimesh.Trimesh) -> trimesh.Trimesh:
+def stand(mesh: trimesh.Trimesh, target_height: float = PLAYER_HEIGHT_M) -> trimesh.Trimesh:
     vertices = mesh.vertices.copy()
     axis, head_sign = height_axis(vertices)
     if head_sign < 0:
@@ -49,7 +49,7 @@ def stand(mesh: trimesh.Trimesh) -> trimesh.Trimesh:
     height = float(stood[:, 2].max())
     if height <= 0:
         raise RuntimeError("Mesh has no height.")
-    stood *= PLAYER_HEIGHT_M / height
+    stood *= target_height / height
     mesh.vertices = stood
     return mesh
 
@@ -58,7 +58,8 @@ def main() -> None:
     source = sys.argv[1]
     dest = sys.argv[2]
     mesh = trimesh.load(source, force="mesh")
-    stand(mesh)
+    target = float(sys.argv[3]) if len(sys.argv) > 3 else PLAYER_HEIGHT_M
+    stand(mesh, target)
     mesh.export(dest)
     size = mesh.vertices.max(axis=0) - mesh.vertices.min(axis=0)
     print(f"wrote {dest} height {size[2]:.3f} m")

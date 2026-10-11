@@ -15,10 +15,15 @@ State the transition before the work, in the session header: `Transition: <the N
 
 While the Now line is Concept → Greybox, open `Docs/art/transitions/CONCEPT_TO_GREYBOX.md` and `Docs/art/SCALE.md`, and do that sitting. Leave the other files in `Docs/art/transitions/` closed. Scale applies from Concept on.
 
+When the job is a new subject for world size, movement, or mechanics, open `Docs/art/GREYBOX_T0_CATALOG.md` and run its four steps. That file is this crossing. A keep or reject still stops the sitting.
+
+The look measure is `VisionBoard/KeyArt/homestead_dusk_baseline.jpg`. It is a fit check, used only after the developer has written the design into context. Do not attach it as the source of a new character or asset. Do not invent that design from an older asset. Meters stay in `Docs/art/SCALE.md`.
+
 Open these only when the open transition’s job includes them:
 
 - `Docs/02_ART_BIBLE.md` — through the north-star picture list only.
 - `Docs/context/ART_BIBLE_CONTEXT.md` — slogans and the test figure.
+- `Docs/art/GREYBOX_T0_CATALOG.md` — generate, Kontext edit, TripoSR mesh, character walk. Interviews that block an asset.
 - `Docs/art/STILL_GENERATION_STANDARD.md` — catalog order. Sheet before another scene. Front first. Side is 90 degrees. Back is 180.
 - `Docs/art/COMFY.md` — the player ComfyUI test. One front. No mesh.
 - `Docs/art/VISUAL_NOTES_FOR_GENERATION.md` — paste the block on every prompt.
@@ -29,7 +34,7 @@ Open these only when the open transition’s job includes them:
 
 ## One sitting
 
-1. Generate only the stills the open transition asks for. Front and back at the same height belong to Greybox → Prototype, and a mesh belongs to Polish → Final.
+1. Generate only the stills the open transition asks for. Front and back at the same height belong to Greybox → Prototype. While the Now line is Concept → Greybox, the mesh is the TripoSR step in `Docs/art/GREYBOX_T0_CATALOG.md`. Polish → Final stays closed.
 2. Stop for a keep or a reject. A keep files the still. A reject generates again. Do not mesh a rejected still.
 3. After the stills are kept, name the tool. Tripo for a rigid prop. Meshy when the set must match. A face or a bending limb is a hand mesh. Mixar cleans and exports. It does not invent the design.
 4. Do not copy a file into `Content/`. Do not check a track box until the pass bar is called true.

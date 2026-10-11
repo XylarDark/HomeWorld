@@ -18,7 +18,9 @@ Five kinds. The index is `Docs/art/STILLS_LIBRARY.md`. Every new file gets a row
 
 The open greybox sheets, in order, are the cottage, the pine, the bear, and the bull. The lair is already a scale keep and is not in this set. Meters are pasted from `Docs/art/SCALE.md`. The picture does not invent the meter.
 
-An image model copies the attached picture and ignores a typed size. Do not attach a scene whose scale is wrong. One change per pass. The ComfyUI test for the player is `Docs/art/COMFY.md`. An edit model can hold a face across views. It does not measure 5 m. The Dev weight is a test only. A Steam sheet does not come from a non-commercial weight. Hosted free tiers are for a first mood, not for a sheet.
+An image model copies the attached picture and ignores a typed size. Do not attach a scene whose scale is wrong. One change per pass.
+
+The first mood or the first front may come from a text image generator. Score that picture with the rating in `Docs/art/GREYBOX_T0_CATALOG.md` before the next file. A job-gate miss is regenerated. One or two local drifts are a Flux Kontext edit in ComfyUI of that one picture. The steps are `Docs/art/COMFY.md`. Kontext holds the face and the coat across a view. It does not measure 5 m. The local weight is Kontext Dev, and a Dev output stays out of `Content/`. A Steam sheet does not come from that weight. Hosted free tiers are for a first mood, not for a sheet.
 
 ## Rules
 
@@ -68,6 +70,8 @@ Orthographic. Camera at mid-height. 0 degrees for front, 90 for side, 180 for ba
 - A chimney, pouch, or spirit that flipped sides.
 - A new prop, a new color, or a scarf on the player.
 - Text, a HUD, or a rune.
+- A new subject generated with no developer design in context.
+- After a design is in context, a result that does not fit `VisionBoard/KeyArt/homestead_dusk_baseline.jpg`. A smooth blob fails. A crystal-cut outline fails.
 - An unseen side that was not in the kept picture.
 
 ## Cabin, as a test

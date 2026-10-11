@@ -28,7 +28,7 @@ The homestead pad. Stop this wave when the player can leave the porch, pass the 
 | Row | Asset | How | Locked size | Done when |
 |---|---|---|---|---|
 | 1 | Player | Done. The rig above. | 2 m. Head one sixth of that height. | Walk plays. |
-| 2 | Cottage | Measured block. Gabled log shell, chimney on the right, one player door. Rooms from the cabin plan. Not TripoSR. | 9 m wide, 11 m deep, walls 5 m. Porch 9 m by 2 m. Door clear width 1 m. Hall 2 m deep. | The player fits the door and the hall. A bear does not. |
+| 2 | Cottage | Measured block. Gabled log shell, chimney on the right, one player door. Rooms from the cabin plan. Not TripoSR. | 9 m wide, 11 m deep, walls 5 m. Porch 9 m by 2 m. Door 1 m wide and 3 m high. Hall 2 m deep. | The player fits the door and the hall. A bear does not. |
 | 3 | Island pad | Measured block. Torn cliff edge, not a disc. Not the full island, and not TripoSR. | Pad fits the cottage, porch, three pines, and a path between them. World footprint stays 660 m by 450 m, top 450 m above the plains, underside about 300 m. | The player walks from the porch to a pine without leaving the pad. |
 | 4 | Pine | One sheet, one mesh, three copies. | 5 m, 7 m, and 9 m. | The player stands beside the small cone. The three are the same mesh. |
 | 5 | Lupine sprig | One sheet, one mesh, copies. | Taller than the player. The player can stand under one bloom. No finer meter is locked. | One sprig reads larger than the body. Do not invent a height. |

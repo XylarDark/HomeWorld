@@ -37,11 +37,11 @@ A Concept keep needs three things for that asset:
 - The meters, written where that asset has them.
 - One mood still that answers silhouette, proportion, and material intent.
 
-These filed pictures count for material, light, and the face. They do not count for size. Size is `Docs/art/homestead/HS_Vista_bear_module_v9.jpg`, kept 2026-10-10. The bear, the gabled cabin, and the pines are that module. The player is small in front of them.
+These filed pictures count for material, light, and the face. They do not count for size. Size is `Docs/art/SCALE.md`. `VisionBoard/KeyArt/homestead_dusk_baseline.jpg` is a fit check after the developer has written the design. It is not the source of a new still.
 
 | Picture | Job |
 |---|---|
-| `VisionBoard/KeyArt/homestead_dusk_baseline.jpg` | Light and materials. Not the cabin’s size. |
+| `VisionBoard/KeyArt/homestead_dusk_baseline.jpg` | Fit check only, after a developer design is in context. Not the design source. It does not lock meters. |
 | `VisionBoard/KeyArt/player_expression_sheet.jpg` | The face. The scarf in the sheet is not the signifier. |
 | `VisionBoard/KeyArt/homestead_close_assets.jpg` | Close wood, flower, crystal. Not the flower’s size. |
 | `Docs/art/player/SM_Player_homestead_lookback.jpg` | Coat and facets in the place. Not the shell’s size. |

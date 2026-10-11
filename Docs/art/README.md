@@ -16,6 +16,7 @@ Pictures stay with their place. Process docs stay in this folder. The five state
 | `ASSET_CONTEXT_TASKS.md` | The running list. Critical path, then one card. |
 | `STILLS_LIBRARY.md` | Filed pictures and the job of each. |
 | `STILL_GENERATION_STANDARD.md` | Model sheets. Front first. Side is 90 degrees. Back is 180. |
+| `GREYBOX_T0_CATALOG.md` | Concept into Greybox. Generate, edit, TripoSR, character walk. Interviews that block an asset. |
 | `VISUAL_NOTES_FOR_GENERATION.md` | Paste block and place scripts. |
 | `PROTOTYPE_ASSET_BRIEFS.md` | The prompt for one asset. |
 | `PROTOTYPE_PIPELINE.md` | Still, then mesh, then Blender, then two looks. |

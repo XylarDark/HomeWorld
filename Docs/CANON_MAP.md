@@ -79,7 +79,7 @@ README is left intact as history.
 | **Theme, the game, prototype scope** | `Docs/VISION_BOARD.md` | current product canon |
 | GDD slice | `Docs/01_GDD_MVP.md` | canon |
 | **Cloud descent facts and carried wisp** | `Docs/context/HOMEWORLD_ROUTE.md` + accepted `docs/human-use/test-contract.md` | current route / accepted behavior |
-| Art direction | `Docs/02_ART_BIBLE.md` | canon |
+| Art direction | `Docs/02_ART_BIBLE.md` | canon. `VisionBoard/KeyArt/homestead_dusk_baseline.jpg` is a fit check after a developer design, not a design source. |
 | **Art bible working packet** | `Docs/context/ART_BIBLE_CONTEXT.md` | stills, cabin, doors. Open with the art or asset room. |
 | **Art asset door** | `Docs/context/ART_ASSET_DOOR.md` | stills to mesh. Not the session start. |
 | **Art phases** | `Docs/art/PHASES.md` | Now line, five states, five transitions. |
@@ -91,6 +91,7 @@ README is left intact as history.
 | **Still generation standard** | `Docs/art/STILL_GENERATION_STANDARD.md` | Catalog. Sheet before scene. Front first. |
 | **ComfyUI player test** | `Docs/art/COMFY.md` | One front sheet. Dev weight is a test, not a Steam mesh. |
 | **Size test tasks** | `Docs/art/SIZE_TEST_TASKS.md` | Player block, cottage, pines, bear, bull, then a free walk clip. |
+| **Greybox T0 catalog** | `Docs/art/GREYBOX_T0_CATALOG.md` | Generate, Kontext edit, TripoSR mesh, character walk. Interviews that block an asset. |
 | Ten master materials | `Docs/02_MATERIAL_SHEET.md` | **LOCKED** |
 | Per-domain locked bibles | `Docs/DAYNIGHT_BIBLE.md` · `Docs/MOVEMENT_BIBLE.md` · `Docs/HOMESTEAD_BIBLE.md` · `Docs/COMBAT_DREAM_BIBLE.md` · `Docs/GATHER_CRAFT_BIBLE.md` · `Docs/SPIRIT_STEALTH_BIBLE.md` · `Docs/CAMERA_BIBLE.md` | **LOCKED** — all seven |
 | Blender→UE export contract | `Docs/04_EXPORT_TABLE.md` | **LOCKED** contract |

@@ -11,9 +11,10 @@ import traceback
 import bpy
 from mathutils import Vector
 
-OBJ = r"C:\dev\TripoSR\output\player\0\mesh_greybox.obj"
-BLEND = r"C:\dev\TripoSR\output\player\0\SM_Player_Rig.blend"
-LOG = r"C:\dev\TripoSR\output\player\0\rig_log.txt"
+OBJ = os.environ.get("HOMEWORLD_RIG_OBJ", r"C:\dev\TripoSR\output\player\0\mesh_greybox.obj")
+BLEND = os.environ.get("HOMEWORLD_RIG_BLEND", r"C:\dev\TripoSR\output\player\0\SM_Player_Rig.blend")
+LOG = os.environ.get("HOMEWORLD_RIG_LOG", r"C:\dev\TripoSR\output\player\0\rig_log.txt")
+FBX = os.environ.get("HOMEWORLD_RIG_FBX", "")
 WALK_FRAMES = 32
 
 
@@ -385,6 +386,22 @@ def build():
     bpy.context.view_layer.objects.active = armature
     bpy.ops.wm.save_as_mainfile(filepath=BLEND)
     log(f"wrote {BLEND}")
+    if FBX:
+        bpy.ops.object.select_all(action="SELECT")
+        bpy.ops.export_scene.fbx(
+            filepath=FBX,
+            use_selection=True,
+            object_types={"ARMATURE", "MESH"},
+            add_leaf_bones=False,
+            bake_anim=True,
+            bake_anim_use_all_actions=False,
+            bake_anim_use_nla_strips=False,
+            axis_forward="-Z",
+            axis_up="Y",
+            apply_scale_options="FBX_SCALE_ALL",
+            mesh_smooth_type="FACE",
+        )
+        log(f"wrote {FBX}")
 
 
 if __name__ == "__main__":

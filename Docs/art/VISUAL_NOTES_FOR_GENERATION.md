@@ -8,7 +8,7 @@ Paste the block at the bottom of every image prompt. Reject the image if any not
 
 They do not generate volume and then look for the vision. They lock shape, proportion, color logic, lighting intent, and the out-of-style list on a few hero shots, then write those as rules. A mood board alone is not a brief. Out-of-style examples matter as much as the in-style ones. A color script is a production document: one palette frame per place, not one palette for the whole game.
 
-For this sitting, the hero shots are the three pictures in the art bible. Generate against those pictures and the lines below, not against a new style. The contract files are `VisionBoard/KeyArt/homestead_dusk_baseline.jpg`, `player_expression_sheet.jpg`, and `homestead_close_assets.jpg`. These sentences are the sitting copy.
+A new character or asset is designed by the developer and written into context before any picture. Generate that design from scratch. Do not attach `VisionBoard/KeyArt/homestead_dusk_baseline.jpg`, and do not invent the subject from an older asset. After the design is in context, score the result against that picture so it fits the hero vision. `player_expression_sheet.jpg` locks the face. `homestead_close_assets.jpg` locks the close kit. Neither one is a source for a new subject.
 
 ## North stars, in words
 
@@ -22,7 +22,7 @@ For this sitting, the hero shots are the three pictures in the art bible. Genera
 |---|---|---|
 | Immersion | The place teaches itself. Path, fire, window, and the loose scale are the only signs. No HUD, no text, no markers. | A label, a quest arrow, a UI frame. |
 | Size | The player is 2 m. Pines, lupines, rocks, the bull, and the cabin shell match the bear, about 14 m at the shoulder. The player stands under a lupine and fits a gap the bear cannot. The lair mouth fits a bull’s charge. Adult head about one sixth of height. | A human-sized cabin shell, an ant-sized player, a giant the size of a horse, assets rescaled per camera, a 5-head toy or a 7-head blank face. |
-| Beauty | Faceted masses with life on the planes: grain, moss, petals, crystal faces. Warm handmade. | Photoreal, smoothed clay, poster bands, scan wood. |
+| Beauty | Faceted masses with life on the planes: grain, moss, petals, crystal faces. Warm handmade. Rugged, chunky bodies. Facet size from the dusk homestead hero. | Photoreal, smoothed clay, a smooth blob, a crystal-cut outline, poster bands, scan wood. |
 | Healing | Care is the verb. A wound is a thing you approach. A healed place is the same shape, warmer. | Gore, a kill pose, a boss health bar, a rebuilt mesh for night. |
 | Calm | Quiet ground, one warm eye (window or fire), no clutter. Emotion is climate around the same silhouette. | Grimdark, mud gray, pitch black, a second tree species. |
 | Planetoid | Close horizon, ground bending away, thin air, deep zenith, readable stars, a moon that is not a white speck. | A pancake island, a flat skybox, a sci-fi planet render. |
@@ -60,5 +60,5 @@ The art bible matches. Camp is three tired guards with the player face planes. T
 ## Paste block
 
 ```
-HomeWorld. Faceted semi-polygon, detail on the planes, not flat low poly, not photoreal, not a toy. Cartoon fantasy, warm handmade, Zelda readability, Pixar sincerity, not Disney, not high fantasy, not grim. Player 2 m. Pines, lupines, rocks, the bull, and the cabin shell match the bear. The player fits a gap that body cannot. Adult head about one sixth of height, close horizon, thin air, deep zenith. One warm eye against cool. No text, no HUD, no rune, no gore, no tech portal. Plain background.
+HomeWorld. Faceted semi-polygon, detail on the planes, not flat low poly, not photoreal, not a toy. Rugged chunky masses, facets large enough to read, silhouette still the subject. Not a smooth blob. Not crystal-cut. Cartoon fantasy, warm handmade, Zelda readability, Pixar sincerity, not Disney, not high fantasy, not grim. Player 2 m. Pines, lupines, rocks, the bull, and the cabin shell match the bear. The player fits a gap that body cannot. Adult head about one sixth of height, close horizon, thin air, deep zenith. One warm eye against cool. No text, no HUD, no rune, no gore, no tech portal. Plain background.
 ```
