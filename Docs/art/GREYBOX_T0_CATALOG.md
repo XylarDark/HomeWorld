@@ -42,19 +42,19 @@ Block stand-ins already sit on `L_SizeTest`. They are not keeps.
 
 Meters are locked. The only stop is the keep or reject after the picture.
 
-Priority, 2026-10-11. Characters first, then large assets the player acts on. Aesthetic garnish waits. Garnish is the path stone, moss, fence, windows, and the porch dressing. A new subject in the priority still needs a design written by the developer before a picture.
+Priority, 2026-10-11. Characters first, then large assets the player acts on. Aesthetic garnish waits. Garnish is the path stone, moss, fence, and the porch dressing. The warm eye is the brightest cottage window, kept 2026-10-11. The crystal stays a yard prop. A new subject in the priority still needs a design written by the developer before a picture.
 
-Clouds, developer design 2026-10-11. Context: `Docs/art/CLOUD_CONTEXT.md`. They do not use the rugged facet look. Ambient clouds are not kept. The wisp cloud picture is kept: `Docs/art/field/SM_Cloud_Wisp_sheet.jpg`. The playtest mesh is 72 m across, the cloud field’s default.
+Clouds, developer design 2026-10-11. Context: `Docs/art/CLOUD_CONTEXT.md`. They do not use the rugged facet look. Ambient picture kept: `Docs/art/field/SM_Cloud_Ambient_sheet.jpg`. No collect. The wisp cloud picture is kept: `Docs/art/field/SM_Cloud_Wisp_sheet.jpg`. The playtest mesh is the wisp cloud at 72 m across, the cloud field’s default.
 
 - Player. Volume and walk exist. No new sheet for this greybox.
 - Player, female. Front kept 2026-10-11. Same coat and facet quality. 2 m. No scarf. Walk stored with automatic weights.
 - Pine. Front kept 2026-10-11, `Docs/art/field/SM_Pine_sheet_front.jpg`. The 5 m mesh is the prototype. The 7 m copy shows 2 m of trunk. The 9 m copy shows 3 m of trunk.
-- Lupine. Developer design 2026-10-11. Front kept, `Docs/art/homestead/SM_Lupine_sheet_front.jpg`. The dusk and close-up flower. 3 m map stand-in. Whole meter still open. Herb, wood, berry, and the berry bush take their facet style from this plant.
+- Lupine. Developer design 2026-10-11. Front kept, `Docs/art/homestead/SM_Lupine_sheet_front.jpg`. The dusk and close-up flower. 3 m. Herb, wood, berry, and the berry bush take their facet style from this plant.
 - Bear. Front kept 2026-10-11, `Docs/art/homestead/SM_Bear_sheet_front.jpg`. Facet size from the dusk homestead hero. One body. Shoulder 5 m. No walk. The round sheet and the crystal-cut sheet are not the shape.
 - Bull. Front kept 2026-10-11, `Docs/art/field/SM_Bull_sheet_front.jpg`. Shoulder 5 m. Horns carry the crown to about 7.1 m. No walk. This mesh is the only bull.
 - Partner. Front kept 2026-10-11. 2 m. One warm scarf. Walk stored. Automatic weights failed, so the rig uses envelopes.
-- Child. Front kept 2026-10-11. 1 m stand-in. No scarf. Walk stored. Height is still an open interview.
-- Guards. Developer design 2026-10-11. Front kept, `Docs/art/camp/SK_Guard_sheet_front.jpg`. Weight on the hips. Large sword leaning on one shoulder. At ease and ready to strike. Quite taller and larger than the 2 m player. 3 m stand-in. Whole-meter height is still open. Three stances stay a later sheet.
+- Child. Front kept 2026-10-11. 1 m. No scarf. Walk stored.
+- Guards. Developer design 2026-10-11. Front kept, `Docs/art/camp/SK_Guard_sheet_front.jpg`. Weight on the hips. Large sword leaning on one shoulder. At ease and ready to strike. 4 m. Quite taller and larger than the 2 m player. Three stances stay a later sheet.
 - Herb, wood, berry, and the berry bush. Developer design 2026-10-11. Lupine facet style. Approved. Herb 1 m, berry cluster 1 m, wood 2 m long, bush 2 m. Stand-ins. Sheets in `Docs/art/field/`.
 - Island pad, field landing, camp ground. Measured. The camp clearing is 40 m.
 - Bed, perch, shrine, cliff edge. Fronts kept 2026-10-11. Measured. The shrine is 4 m. No rune.
@@ -74,15 +74,11 @@ Whole meters stay the card so a prompt and a block share one number. They do not
 
 ### Lupine
 
-Developer design 2026-10-11. The purple flower spikes in `VisionBoard/KeyArt/homestead_dusk_baseline.jpg` and the close sheet `VisionBoard/KeyArt/homestead_close_assets.jpg`. One plant. Taller than the player, tall enough to stand under a bloom. 3 m is the map stand-in. The whole meter is still open.
+Kept 2026-10-11. The purple flower spikes in `VisionBoard/KeyArt/homestead_dusk_baseline.jpg` and the close sheet `VisionBoard/KeyArt/homestead_close_assets.jpg`. One plant. 3 m. A 2 m player reaches the lower florets.
 
 ### Rock
 
-Smaller than the bear. The map used a 2 m mass.
-
-1. Keep 2 m.
-2. 1 m.
-3. Dictate another whole meter under 5 m.
+Kept 2026-10-11. The faceted boulders in `VisionBoard/KeyArt/homestead_dusk_baseline.jpg`. One rock. 2 m. Smaller than the bear.
 
 ### Fence
 
@@ -94,10 +90,7 @@ About chest height. The map used 1 m.
 
 ### Child
 
-The herb bed waits on this height. The map used a 1 m child.
-
-1. Keep 1 m.
-2. Dictate another whole meter under 2 m.
+Kept 2026-10-11. 1 m. Smaller than the 2 m player. The herb bed can sit with that height.
 
 ### Porch prop
 
@@ -109,10 +102,7 @@ One object. The door swing stays empty. The map used a stump.
 
 ### Warm eye
 
-One eye, not two heroes.
-
-1. The brightest window. The crystal stays a yard prop.
-2. The crystal. The windows stay dark glass.
+Kept 2026-10-11. The brightest window. The crystal stays a yard prop. The windows stay on the cottage. One window is the eye.
 
 ### Cabin turnaround
 

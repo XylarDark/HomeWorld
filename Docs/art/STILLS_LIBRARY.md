@@ -29,7 +29,7 @@ Door plan, Greybox, already drawn: [SM_Home_Cabin_doors.png](cabin/SM_Home_Cabin
 
 | Still | Phase | Job |
 |---|---|---|
-| [HS_Wide.jpg](homestead/HS_Wide.jpg) | Concept | Light. Kept 2026-10-10. Not the cabin’s size. |
+| [SM_Rock_sheet_front.jpg](homestead/SM_Rock_sheet_front.jpg) | Greybox | Kept 2026-10-11. One low-poly boulder from the dusk picture. 2 m. |
 | [HS_Materials.jpg](homestead/HS_Materials.jpg) | Concept | Close wood, stone, herb, kettle, and iron stove. Not size. |
 | [HS_Night.jpg](homestead/HS_Night.jpg) | Concept | Same light at night. Body, not spirit. Not size. |
 | [HS_Massing.jpg](homestead/HS_Massing.jpg) | Greybox | Earlier texture-off mass. Human-sized cabin. Not the shell. |
@@ -93,6 +93,7 @@ Mood stills for `SCALE.md`. For audit. The close-assets north star is the dense 
 |---|---|---|
 | [SM_Pine_sheet_front.jpg](field/SM_Pine_sheet_front.jpg) | Greybox | Kept 2026-10-11. One faceted cone. Front. No person. |
 | [SM_Cloud_Wisp_sheet.jpg](field/SM_Cloud_Wisp_sheet.jpg) | Greybox | Kept 2026-10-11. Fluffy cloud with a gap and a bright wisp inside. Not the rugged look. |
+| [SM_Cloud_Ambient_sheet.jpg](field/SM_Cloud_Ambient_sheet.jpg) | Greybox | Kept 2026-10-11. Fluffy cloud, no wisp. Soft lower edge for fog. Not collected. |
 | [SM_Herb_sheet_front.jpg](field/SM_Herb_sheet_front.jpg) | Greybox | Kept 2026-10-11. Faceted herb. Lupine facet style. 1 m stand-in. |
 | [SM_Wood_sheet_front.jpg](field/SM_Wood_sheet_front.jpg) | Greybox | Kept 2026-10-11. Faceted fallen branch. 2 m long. |
 | [SM_Berry_sheet_front.jpg](field/SM_Berry_sheet_front.jpg) | Greybox | Kept 2026-10-11. Faceted berry cluster. 1 m stand-in. |

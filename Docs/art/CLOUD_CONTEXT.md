@@ -1,12 +1,12 @@
 # Cloud context
 
-Playtest context for the descent clouds. Meters and spacing stay in `Docs/context/HOMEWORLD_ROUTE.md`. The kept wisp-cloud picture is `Docs/art/field/SM_Cloud_Wisp_sheet.jpg`.
+Playtest context for the descent clouds. Meters and spacing stay in `Docs/context/HOMEWORLD_ROUTE.md`. The kept pictures are `Docs/art/field/SM_Cloud_Ambient_sheet.jpg` and `Docs/art/field/SM_Cloud_Wisp_sheet.jpg`.
 
 ## Two clouds
 
 Developer design, 2026-10-11. Clouds are not the rugged facet look.
 
-- Ambient. Not collected. Well-defined and fluffy, with fog. No kept picture yet.
+- Ambient. Not collected. Well-defined and fluffy, with fog. Kept: `Docs/art/field/SM_Cloud_Ambient_sheet.jpg`.
 - Wisp cloud. Larger and easier to read. A gap shows a bright wisp inside. The kept picture uses cyan. The cloud can take a wisp color.
 
 The wisp on a cloud is the descent collect. It is not one of the three wisps at the spirit wound.
