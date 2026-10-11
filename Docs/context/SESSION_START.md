@@ -5,7 +5,7 @@ The one start door. Any IDE, chat, CLI, or agent runner. If a capability is miss
 ## Mode
 
 1. Start in solo. `HANDOFF from HomeWorld Co` or `mode: co` switches to Co. `mode: solo` switches back.
-2. First message, once: `Mode: <solo or co> · State: <agent, decide, or do>`. Name the real mode and the real state before acting. Restate only when either changes.
+2. First message, once: `Mode: <solo or co> · State: <agent, decide, or do> · Transition: <the Now line in Docs/art/PHASES.md>`. Read that line before the message. Name the real mode, the real state, and the open transition before acting. Restate when mode, state, or that line changes.
 3. Open `Docs/context/DOOR_RULES.md` with the task.
 4. Context loss: re-read only this file, restate the header once, and do not re-run the clarifier.
 

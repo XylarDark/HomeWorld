@@ -10,7 +10,7 @@ Style on every prompt: faceted semi-polygon, detail on the planes, cartoon fanta
 
 Hand pass on every mesh: silhouette with texture off, facet planes, pivot at the contact, scale applied, no baked light, simple collision, name from this file.
 
-Two cameras, same mesh. Close for plants and faces. About 20 feet for travel. Do not rescale per camera.
+Two cameras, same mesh. The play camera stays near the 1.8 m body. The scenic camera shows the bear module. Do not rescale a mesh per camera. Modules: `Docs/art/SCALE.md`.
 
 Poly caps: prop under 4,000 triangles, bull or guard under 8,000, giant under 15,000 after decimate.
 
@@ -20,7 +20,7 @@ Wake, family, herb, tea, edge. Sleep at the bed is the form change. The child sh
 
 | Name | Verb | Prompt |
 |---|---|---|
-| `SM_Home_Cabin` | Wake read | Small handmade cabin, warm windows, faceted wood, moss on the planes, night-safe glow in the glass, three-quarter, player for scale. Exterior 30 by 36 ft, porch 30 by 8, walls 10 ft. Living 17 by 14, kitchen 12 by 14 with stove, kettle, sink only. Hall 8 ft deep, no door leaf in it. Child 10 by 13, bath 8 by 9, couple 11 by 13. Every leaf door is 4 ft, swings into its own room, and parks flat on the nearest side wall. |
+| `SM_Home_Cabin` | Wake read | Small handmade cabin, warm windows, faceted wood, moss on the planes, night-safe glow in the glass, three-quarter, player for scale. Exterior 30 by 36 ft, porch 30 by 8, walls 15 ft. Living 17 by 14, kitchen 12 by 14 with stove, kettle, sink only. Hall 8 ft deep, no door leaf in it. Child 10 by 13, bath 8 by 9, couple 11 by 13. Every leaf door is 4 ft, swings into its own room, and parks flat on the nearest side wall. |
 | `SM_Home_Bed` | Sleep is the form change | Low wooden bed, one quilt, faceted posts, readable from the door, no rune. |
 | `SK_Partner` | Stands by the bed | Faceted young adult, muted clothes, one warm scarf, brow lid and mouth planes, neutral, three-quarter, not a portrait render. |
 | `SK_Child` | Garden, then the edge | Small faceted child, same face planes, playing stance, points with the whole body, no text. |

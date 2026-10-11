@@ -1,6 +1,6 @@
 # Prototype pipeline
 
-One asset. The agent names the tool and the reject list. You accept or reject. Nobody checks a track box until you say that step's pass bar is true.
+One asset, inside Polish → Final, after its stills are kept. The transitions are in `PHASES.md`. This file stays closed until Polish → Final. Image work before that follows `Docs/art/STILL_GENERATION_STANDARD.md`: sheet, then turnaround, then a scene. The agent names the tool and the reject list. You accept or reject. Nobody checks a track box until you say that step's pass bar is true.
 
 Law stays in `Docs/02_ART_BIBLE.md`. Prompts stay in `Docs/art/PROTOTYPE_ASSET_BRIEFS.md`. Order and pass bars stay in `Docs/art/PROTOTYPE_ASSET_TRACK.md`. Paste block stays in `Docs/art/VISUAL_NOTES_FOR_GENERATION.md`. Export rules stay in `Docs/04_EXPORT_TABLE.md`.
 
@@ -43,7 +43,7 @@ A rigid prop may be decimated. Partner, child, guards, and the bull are a shape 
 |---|---|
 | Tool | The same mesh, two distances. |
 | Agent | Ask for the two shots. Do not grade them. |
-| You | Look close, and from about 20 feet. |
+| You | Look from the play camera, near the 1.8 m body, and from the scenic camera. Wild size is `Docs/art/SCALE.md`. |
 | Reject | It only reads at one distance, or the mesh was rescaled to cheat the lens. |
 
 ## 5. Shelf

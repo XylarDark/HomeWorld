@@ -82,6 +82,13 @@ README is left intact as history.
 | Art direction | `Docs/02_ART_BIBLE.md` | canon |
 | **Art bible working packet** | `Docs/context/ART_BIBLE_CONTEXT.md` | stills, cabin, doors. Open with the art or asset room. |
 | **Art asset door** | `Docs/context/ART_ASSET_DOOR.md` | stills to mesh. Not the session start. |
+| **Art phases** | `Docs/art/PHASES.md` | Now line, five states, five transitions. |
+| **Concept transition** | `Docs/art/transitions/CONCEPT.md` | Open context. Industry gate, then HomeWorld. |
+| **Scale** | `Docs/art/SCALE.md` | Vista kit, pocket detail, one giant. From Concept on. |
+| **Art folder index** | `Docs/art/README.md` | which art file does which job. |
+| **Look task list** | `Docs/art/ASSET_CONTEXT_TASKS.md` | critical path, then one card. |
+| **Stills library** | `Docs/art/STILLS_LIBRARY.md` | filed pictures. |
+| **Still generation standard** | `Docs/art/STILL_GENERATION_STANDARD.md` | Catalog. Sheet before scene. Front first. |
 | Ten master materials | `Docs/02_MATERIAL_SHEET.md` | **LOCKED** |
 | Per-domain locked bibles | `Docs/DAYNIGHT_BIBLE.md` · `Docs/MOVEMENT_BIBLE.md` · `Docs/HOMESTEAD_BIBLE.md` · `Docs/COMBAT_DREAM_BIBLE.md` · `Docs/GATHER_CRAFT_BIBLE.md` · `Docs/SPIRIT_STEALTH_BIBLE.md` · `Docs/CAMERA_BIBLE.md` | **LOCKED** — all seven |
 | Blender→UE export contract | `Docs/04_EXPORT_TABLE.md` | **LOCKED** contract |
@@ -95,7 +102,7 @@ README is left intact as history.
 | **Play room** | `Docs/context/FORK_GAMEPLAY.md` | locks. List: `Docs/context/PLAY_TASKS.md`. |
 | **Prove room** | `Docs/context/FORK_TESTING.md` | proves. List: `Docs/context/PROVE_TASKS.md`. |
 | **Fork lock** | `Docs/context/SESSION_FORK_LOCK.md` | three rooms, 2026-10-10 |
-| **Sitting gap** | `Docs/art/GAP_2026-10-08.md` | studio gap, 2026-10-08 |
+| **Sitting gap** | `Docs/art/archive/GAP_2026-10-08.md` | snapshot, 2026-10-08. Four-room language is stale. |
 | **The 13+4 T0 MUSTs** | `Docs/handoffs/T0_MECHANIC_INVENTORIES_V1.md` | **canonical for T0** |
 | The work queue | `Docs/TaskLists/T0_NEXT_QUEUE.md` | active — 2026-10-08. `T0_FIRST_LOOP_NOW.md` is the finished code queue |
 | Prototype boss lair | `Docs/context/BOSS_LAIR_LOCK.md` | shape lock 2026-10-08. Fight stays later |

@@ -24,6 +24,7 @@ Read this before a task. The answered table below is the lock. Do not ask those 
 - Three places: homestead, open field, pine camp. The glide connects them. The lair is after that loop.
 - Three lines: the place teaches itself. Safe home above a living world. One warm eye against the cool.
 - The player wears a dark coat and a small shoulder spirit. No scarf. Head about one sixth of height. The partner keeps one warm scarf.
+- The cottage is the drawn 30 by 36 ft home, walls 15 ft. The player is 1.8 m and is not from this planet. The bear and the bull match the cottage wall. Pines are one, one and a half, and two times that wall. The lair giant is many times the cottage. The player rides the bull on the giant’s back. Meters: `Docs/art/SCALE.md`.
 - Some creatures are always spirit. Animals and humanoids enter the spirit realm only while asleep.
 - Asset work that blocks play: cabin turnaround, then partner, then child, then the field and camp on the rescue. Edge, perch, shrine, barriers, and the lair after the mouth are later.
 

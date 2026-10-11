@@ -7,7 +7,7 @@
 
 **North stars (pictures, 2026-10-09):**
 
-These three files are the pictures. New stills and meshes are based on them. The `.b64` names were never files in the repo.
+These three files lock face, light, and materials. Size is `Docs/art/homestead/HS_Vista_bear_module_v9.jpg`, kept 2026-10-10. The `.b64` names were never files in the repo.
 
 - `VisionBoard/KeyArt/homestead_dusk_baseline.jpg` — dusk homestead. Player looking back, warm cabin, lupines, crystal shrine, cropped moss-bear.
 - `Docs/art/homestead/HS_Wide.jpg` — homestead place pack, wide. Materials, night, and texture-off massing sit beside it in `Docs/art/STILLS_LIBRARY.md`.
@@ -20,6 +20,8 @@ Older refs `refs/keyart_homestead_night.jpg` and `refs/keyart_homestead_planetsi
 
 **Canon inputs:** `Docs/VISION_BOARD.md`, `Docs/00_SHOTLIST.md`  
 **Stills library:** `Docs/art/STILLS_LIBRARY.md`  
+**Phase words:** `Docs/art/PHASES.md` — five states, five transitions. The work is the open transition. Look law stays in this file.  
+**Scale:** `Docs/art/SCALE.md` — one look, a repeated vista kit, a denser pocket, one giant. From Concept on.  
 **Out of scope for this file:** material parameter sheets (TA → `Docs/02_MATERIAL_SHEET.md`).
 
 Tone lock: warm, readable, handmade, hopeful. Fantasy, not high fantasy. Cartoon, not Disney. Closest cousins: Breath of the Wild + Pixar sincerity. Not cutesy-infantile. Not grim. Not photoreal. Not sci-fi.
@@ -33,7 +35,7 @@ HomeWorld is **semi-polygon with detail on top**.
 - Big forms are faceted low-poly masses. Not flat untextured low poly. Not photoreal. Not Mario-Galaxy soft clay.
 - Surface life sits on those facets: wood grain, moss clumps, flower clusters, crystal faces, leather straps.
 - Most of the frame is scenery ahead of the player.
-- The world is large. The player is small. Beasts are huge and often cropped. Camp guards are people, not giants.
+- The player is 1.8 m and is not from this planet. The cottage is the drawn 30 by 36 ft home, walls 15 ft. The bear and the bull match that wall, 4.57 m at the shoulder. Pines are 4.57 m, 6.86 m, and 9.14 m. The giant is many times the cottage. Camp guards stay people. The meters are `Docs/art/SCALE.md`.
 - Planetoid read: close horizon, ground can feel like it bends away, thin air, deep zenith, readable constellations at night.
 
 If a change makes the facets disappear, it is the wrong kind of beauty.
@@ -56,7 +58,7 @@ Dusk on the floating-island hub. This picture is the basis.
 - Shrine crystal with a moth.
 - Giant cropped moss-bear with brow shelves and eyes that look.
 - Warm sun left, cool forest right, thin air, planetoid moon.
-- The cabin is one lived-in house. Exterior body 30 ft wide by 36 ft deep (9.14 m by 10.97 m). Covered porch 30 ft by 8 ft on the front. Log walls 6 in. Interior 29 ft wide by 35 ft deep. Wall height 10 ft, so a third-person camera can sit above a 1.8 m player. Each bedroom is its own room: at least 70 sq ft and 7 ft on every side.
+- The cottage is the home. Room plan 30 ft wide by 36 ft deep (9.14 m by 10.97 m). Covered porch 30 ft by 8 ft. Log walls 6 in. Interior 29 ft wide by 35 ft deep. Wall height 15 ft (4.57 m), so a third-person camera can sit above a 1.8 m player. Each bedroom is its own room: at least 70 sq ft and 7 ft on every side. This layout is the first cottage. Later kits may be modular. The bear’s shoulder matches this wall height. Modules: `Docs/art/SCALE.md`.
 
 Doors. Every leaf is a 4 ft clear opening. It swings into its own room and lies flat against the nearest side wall. The swing arc is empty. No leaf swings into the hall.
 
@@ -172,7 +174,7 @@ Same face law as the player.
 - Scale for beasts: much larger than the player. Tallest members may crop the frame.
 - A group must vary in stance or height.
 
-Homestead guardian: giant moss-bear, often cropped, threat or quiet watcher depending on pose and light.
+Homestead guardian: the moss-bear is the wild module, often cropped, threat or quiet watcher depending on pose and light. The field bull matches that module. The player rides the bull. A pine and a lupine are that size too. A lupine is tall enough to stand under.
 
 Planetside camp: three tired guards around a fire. Same face planes. Not a new species. Not gore. Not cute Disney animals. Not armed brutes.
 
@@ -209,14 +211,14 @@ A second eye on the same object usually adds noise, not life.
 
 ## 6. Camera
 
-Two distances. Same assets. Never rescale to cheat a lens.
+Two distances. Same assets. Never rescale a mesh to cheat a lens. The play camera stays near the body and looks up, or the wild module stops feeling large. A scenic frame may lose the face.
 
 | Mode | Distance | What must read | What may simplify |
 |---|---|---|---|
-| Intimate | Low, over-shoulder or first-person among beds / fire | Faces, grain, moss, petals, dew, moth, window leak | Far forest already impostors |
-| Default / vista | About 20 ft+, orbit allowed | Silhouettes: cabin, arch, beast crop, horizon, guard group | Sprig LOD2, no interior |
+| Play | Low, near the 1.8 m body, among the secret rooms, under a bloom, or on the bull | Face, the gap, grain, the door the player fits | The far forest |
+| Scenic | Pulled back | The bear, the cabin shell, the pine repeat, the giant’s back | Interior rooms, the face |
 
-Default travel camera stays far so the world stays large.
+About 20 feet is the play distance beside the body. It is not the size of a pine.
 
 ---
 
@@ -248,8 +250,8 @@ One main key at a time: dusk sun, campfire, or shrine cyan, plus a cooler fill. 
 | Element | Rule |
 |---|---|
 | Cliff / island | Layered torn earth. Never a pancake disc or cylinder plug. |
-| Pines | Stylized conical pines. No second tree species in MVP. |
-| Cabin | Simple rustic log, gabled, stone chimney ok. Cozy, not Victorian, not sci-fi. |
+| Pines | One conical pine. Small 4.57 m, medium 6.86 m, largest 9.14 m. No second tree species. |
+| Cabin | A wild-scale log shell, gabled, stone chimney ok. The rooms inside are the player plan. Cozy, not Victorian, not sci-fi. |
 | Shrine / portal | Handmade spirit cue. Standing stone. Not a tech gate or neon ring. No rune. |
 | Planet below | Pine valley, path, mountain ridge, camp clearing. |
 
@@ -335,7 +337,7 @@ Ten masters only (instance; do not invent families):
 10. `M_Nurtured`
 
 Each exposes BaseColor, Roughness, Variation, NightMix 0–1, optional Emissive.  
-Scale: meters. Adult about 1.7–1.8 m. Head about one sixth of that height. Beasts much larger. Origins at ground contact. Apply scale.
+Scale: meters. Adult about 1.7–1.8 m. Head about one sixth of that height. Cottage walls 4.57 m. Bear and bull shoulder 4.57 m. Pines 4.57 m, 6.86 m, and 9.14 m. The lair giant is many times the cottage. The bull rides the giant’s back. Origins at ground contact. Apply scale. Do not scale the player up to the cottage.
 
 AD does not author the material sheet. TA owns parameter ranges.
 

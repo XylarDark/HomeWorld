@@ -1,16 +1,21 @@
 # Asset context tasks
 
+Now: Concept → Greybox
+Previous: Concept, kept 2026-10-10
+
+The open transition is the work. The other four stay closed. Each transition is defined in [PHASES.md](PHASES.md). The open context is [transitions/CONCEPT.md](transitions/CONCEPT.md). Do not start the next one because a picture for it already exists.
+
 One card per name in [PROTOTYPE_ASSET_BRIEFS.md](PROTOTYPE_ASSET_BRIEFS.md), plus the player. Order is homestead, descent and field, camp, barriers, lair last. One card’s stills per sitting. The next card waits until those pictures are kept or rejected.
 
 ## Sitting queue
 
 Work these together, one at a time. A sitting ends when the stills are kept or rejected. Tripo and Meshy run only after that keep, from the front and the back of the same design. Mixar is the cleanup and the FBX export after the mesh exists. It does not invent the design.
 
-Critical path:
+Critical path, inside the open transition only. Items that belong to a later transition stay closed.
 
-1. Player turnaround. Kept 2026-10-10. Identity sheet.
+1. Player turnaround. Kept 2026-10-10. Identity sheet. It belongs to Greybox → Prototype. Closed while Concept is open.
 2. Homestead wide, materials, night, and massing. Kept 2026-10-10. Wide and night are closer than 20 feet.
-3. Cabin turnaround. Regenerated from the kept wide, night, and materials stills. Filed for audit. `Docs/art/homestead/HS_Turnaround.jpg`. Front, side, and back at one height.
+3. Cabin turnaround. Filed. Front, side, and back belong to Greybox → Prototype. Closed while Concept is open.
 4. Partner still pack, then the child. The partner keeps one warm scarf. The player does not. Blocked until the cabin turnaround is kept or rejected.
 5. Field and camp on the rescue loop. Clouds, wisp, landing, gathers, bull, clearing, three guards.
 
@@ -18,7 +23,17 @@ Later: bed, herb bed, kettle, edge, perch, shrine, barriers, and the lair after 
 
 Future: dogs, cats, other animals and humanoids, and any second night mesh. Night stays NightMix on the same mesh.
 
-Status line: ask keep or reject on the cabin turnaround. Do not start the partner until that answer.
+## Stages
+
+The five phases are states. The five transitions are the work. They are defined in `Docs/art/PHASES.md`.
+
+| Asset | Pictures on file | Open transition |
+|---|---|---|
+| Player | Mood stills and a turnaround are filed. | Concept. The turnaround belongs to Greybox → Prototype. It stays closed. |
+| Cabin | Mood stills, massing, the door plan, and a front elevation are filed. | Concept. Massing and the plan belong to Concept → Greybox. The front belongs to Greybox → Prototype. They stay closed. |
+| Every other card | The card is written. | Concept. |
+
+Status line: Transition is Concept → Greybox. The next file is the cottage asset sheet, alone, texture off. Open `Docs/art/transitions/CONCEPT_TO_GREYBOX.md` and `Docs/art/STILL_GENERATION_STANDARD.md`. Do not make another scene first.
 
 Do not generate a mesh from text. Image-to-3D runs only after the stills on that card are kept. Do not check a box in [PROTOTYPE_ASSET_TRACK.md](PROTOTYPE_ASSET_TRACK.md) from this file. Do not copy a file into `Content/`.
 
@@ -38,7 +53,7 @@ Check only what that card needs.
 
 - Front, side, back, three-quarter. Same height. Plain background. Same light.
 - Close material callout.
-- About 20 feet, player for scale when the brief asks.
+- Play camera near the body, about 20 feet, when the brief asks. Wild size is `Docs/art/SCALE.md`, not this distance.
 - Texture off.
 - Plan, only if the place has rooms.
 - Spirit-form still, only if the subject is a sleeper. Same mesh later.
@@ -59,7 +74,7 @@ Sleeper. Identity line, verbatim: dark coat, small spirit on the shoulder, facet
 
 Reject: a scarf as the signifier, a weapon, a second body for night, text, a rune.
 
-Stills filed, no mesh. Status: stills for audit.
+Stills filed, no mesh. Status: concept mood kept 2026-10-10. The turnaround stays closed until Greybox → Prototype.
 
 - [x] Texture off, full body. [SM_Player_body_texture_off.jpg](player/SM_Player_body_texture_off.jpg)
 - [x] Homestead, looking back. [SM_Player_homestead_lookback.jpg](player/SM_Player_homestead_lookback.jpg)
@@ -72,7 +87,7 @@ Stills filed, no mesh. Status: stills for audit.
 
 ### SM_Home_Cabin
 
-Wake read. Place with rooms. Exterior 30 ft by 36 ft, porch 30 by 8, walls 10 ft. Living 17 by 14, kitchen 12 by 14, hall 8 ft with no door leaf, child 10 by 13, bath 8 by 9, couple 11 by 13. Leaf doors are 4 ft and park inside the room. Kitchen is an iron stove, a kettle, and one sink.
+Wake read. A bear-sized shell with player-sized rooms inside. The shell matches the moss-bear. The rooms are 30 ft by 36 ft, porch 30 by 8, walls 15 ft. Living 17 by 14, kitchen 12 by 14, hall 8 ft with no door leaf, child 10 by 13, bath 8 by 9, couple 11 by 13. Leaf doors are 4 ft and park inside the room. A bear does not fit that door. Kitchen is an iron stove, a kettle, and one sink.
 
 Reject: a modern appliance, a door leaf in the hall, a rune, text.
 
@@ -106,7 +121,7 @@ Stands by the bed. Sleeper. Same face planes as the player. Muted clothes. One w
 
 Reject: a different face, a cage, a weapon.
 
-Status: not started. Next sitting after the homestead place, with the child.
+Status: mood still for audit. [SK_Partner_homestead_mood.jpg](player/SK_Partner_homestead_mood.jpg). Built from the kept north stars and the player mood set. One warm scarf. The child waits.
 
 - [ ] Face planes
 - [ ] Front, side, back, three-quarter, day

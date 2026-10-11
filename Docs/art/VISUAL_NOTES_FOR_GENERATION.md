@@ -21,7 +21,7 @@ For this sitting, the hero shots are the three pictures in the art bible. Genera
 | Note | It looks like | It fails if |
 |---|---|---|
 | Immersion | The place teaches itself. Path, fire, window, and the loose scale are the only signs. No HUD, no text, no markers. | A label, a quest arrow, a UI frame. |
-| Size | The player is a ruler. The world is large. Beasts and the giant crop the frame. Default camera is about 20 feet. Adult head about one sixth of height. | A toy scale, a giant the size of a horse, assets rescaled per camera, a 5-head toy or a 7-head blank face. |
+| Size | The player is 1.8 m. Pines, lupines, rocks, the bull, and the cabin shell match the bear, about 14 m at the shoulder. The player stands under a lupine and fits a gap the bear cannot. The lair mouth fits a bull’s charge. Adult head about one sixth of height. | A human-sized cabin shell, an ant-sized player, a giant the size of a horse, assets rescaled per camera, a 5-head toy or a 7-head blank face. |
 | Beauty | Faceted masses with life on the planes: grain, moss, petals, crystal faces. Warm handmade. | Photoreal, smoothed clay, poster bands, scan wood. |
 | Healing | Care is the verb. A wound is a thing you approach. A healed place is the same shape, warmer. | Gore, a kill pose, a boss health bar, a rebuilt mesh for night. |
 | Calm | Quiet ground, one warm eye (window or fire), no clutter. Emotion is climate around the same silhouette. | Grimdark, mud gray, pitch black, a second tree species. |
@@ -34,7 +34,8 @@ For this sitting, the hero shots are the three pictures in the art bible. Genera
 
 | Game | Take | Leave |
 |---|---|---|
-| Breath of the Wild | Silhouette teaches the place. Warm vs cool. The world is large and the player is small. | The UI density. The combat. |
+| Breath of the Wild | Silhouette teaches the place. Warm vs cool. Materials suggest use. | Human-sized houses as the whole world. The UI density. The combat. |
+| Pikmin | The wild world is the large module. A low camera. A gap only the small body can use. | Ant-scale. A photoreal garden. A top-down view that forgets the body. |
 | Journey / Abzu | Scale makes wonder without making you powerless. One warm color against a cool field. Quiet. | The desert or the ocean as a biome. The anonymous hood. |
 | Outer Wilds | Camping on a small world. Close horizon. Rustic, not NASA chrome. The look serves the place. | The time loop. The hard sci-fi instruments. |
 | Spiritfarer | Care is the axis. A place should make you want to be there. Healing is comfort, not a spell effect. | The 2D boat. The death ferry. The animal cast. |
@@ -50,7 +51,7 @@ One dominant temperature per place. Do not mix them in one image. No hex until a
 | Descent | Warm above, cool below. Thin air. | One wisp | Small against the shelves |
 | Field | Open day, quiet green, one warm accent on the bull. | The bull, planted | Beside the bull, not on it yet |
 | Camp | Cool night, fire amber as the only warm. | The fire | Approaching from outside the sightline |
-| Lair | Cool cave stone, one warm wound. | The loose scale, then the head | Small on the 30 degree back |
+| Lair | Cool cave stone, one warm wound. | The loose scale, then the head | On the bull, in a run the bull can charge. The giant’s back is the 30 degree hill |
 
 ## Cleaned 2026-10-08
 
@@ -59,5 +60,5 @@ The art bible matches. Camp is three tired guards with the player face planes. T
 ## Paste block
 
 ```
-HomeWorld. Faceted semi-polygon, detail on the planes, not flat low poly, not photoreal, not a toy. Cartoon fantasy, warm handmade, Zelda readability, Pixar sincerity, not Disney, not high fantasy, not grim. Player small, world large, adult head about one sixth of height, close horizon, thin air, deep zenith. One warm eye against cool. No text, no HUD, no rune, no gore, no tech portal. Plain background.
+HomeWorld. Faceted semi-polygon, detail on the planes, not flat low poly, not photoreal, not a toy. Cartoon fantasy, warm handmade, Zelda readability, Pixar sincerity, not Disney, not high fantasy, not grim. Player 1.8 m. Pines, lupines, rocks, the bull, and the cabin shell match the bear. The player fits a gap that body cannot. Adult head about one sixth of height, close horizon, thin air, deep zenith. One warm eye against cool. No text, no HUD, no rune, no gore, no tech portal. Plain background.
 ```

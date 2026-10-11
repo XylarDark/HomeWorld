@@ -4,9 +4,21 @@ Kept 2026-10-10. Wired from `Docs/context/ART_ASSET_DOOR.md`.
 
 A model sheet is a contract. Image tools are stateless. A new prompt without the kept picture invents a new design. Dimensions belong in the prompt. Numerals in the picture become garbage text, and the art bible already bans text.
 
-## Two kinds of still
+## Catalog
 
-A mood still is a place: dusk, one warm window, the player small. A model sheet is a build view. Do not use a mood still as the mesh input. Do not put a hero lens on a model sheet.
+Five kinds. The index is `Docs/art/STILLS_LIBRARY.md`. Every new file gets a row and a job before the next file is made. A scene does not replace a missing sheet.
+
+| Kind | Job | Order |
+|---|---|---|
+| Mood scene | Light, place, and how the pieces sit. Not a meter. | A few. Already started. |
+| Asset sheet | One subject. Flat light. Plain ground. The 1.8 m figure stands beside a prop. | Before another scene of that subject. |
+| Turnaround | Front, then 90, 180, and 45 degrees. Each file attaches the kept front. | After that front is kept. |
+| Callout | One hidden detail: door, face, horns, bark. | Only when the sheet hides it. |
+| Scene again | Kept sheets placed together. | After the sheets. |
+
+The open greybox sheets, in order, are the cottage, the pine, the bear, and the bull. The lair is already a scale keep and is not in this set. Meters are pasted from `Docs/art/SCALE.md`. The picture does not invent the meter.
+
+An image model copies the attached picture and ignores a typed size. Do not attach a scene whose scale is wrong. One change per pass. Free local generation, when a card can hold a reference, is ComfyUI with an edit model such as FLUX.1 Kontext. That holds a face or a prop across views. It does not measure 4.57 m. Hosted free tiers are for a first mood, not for a sheet.
 
 ## Rules
 
@@ -60,4 +72,4 @@ Orthographic. Camera at mid-height. 0 degrees for front, 90 for side, 180 for ba
 
 ## Cabin, as a test
 
-Meters on the card: exterior 30 ft by 36 ft, porch 30 by 8, walls 10 ft. Chimney on the cabin’s right. The kept design is `Docs/art/homestead/HS_Wide.jpg`. The front is kept first. Side and back attach that front and use the prop block. They do not describe a new house.
+The cabin shell matches the bear. The room plan inside it is 30 ft by 36 ft, porch 30 by 8, walls 15 ft. Chimney on the cabin’s right. Modules: `Docs/art/SCALE.md`. A front elevation of the rooms is not a picture of the shell. Side and back attach the kept front of that same subject. They do not describe a new house.

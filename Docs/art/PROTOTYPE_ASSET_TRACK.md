@@ -17,7 +17,7 @@ Check a box only when that step's pass bar is true. Do not skip ahead. Stop the 
 2. Reject the image if the silhouette fails as a thumbnail, or if a priority note fails (size, planetoid, calm, no text). Generate again. Do not mesh a failed image.
 3. Image to mesh. Tripo for a draft. Meshy if you want a budgeted stylized mesh. Rodin only for a close still.
 4. Blender hand pass: texture off, silhouette holds, facet planes, pivot at the contact, scale applied, no baked light, box collision, name from the briefs.
-5. Look at it close, and from about 20 feet. Same mesh. Do not rescale.
+5. Look from the play camera near the body, and from the scenic camera. Same mesh. Do not rescale. Wild size is `Docs/art/SCALE.md`.
 6. Check the box. Next step.
 
 Poly caps: prop under 4,000 triangles, bull or guard under 8,000, giant under 15,000 after decimate.
