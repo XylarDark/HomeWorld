@@ -1589,6 +1589,197 @@ bool AHomeWorldCharacter::TryGiveNightWispToWound()
 	return true;
 }
 
+namespace
+{
+	bool HitCarriesTag(const AActor* Actor, const TCHAR* Tag)
+	{
+		return Actor && Actor->ActorHasTag(FName(Tag));
+	}
+}
+
+bool AHomeWorldCharacter::TryGardenInteractInFront()
+{
+	FHitResult Hit;
+	if (!TraceInteractHit(Hit))
+	{
+		return false;
+	}
+	AActor* HitActor = GetInteractTargetActor(Hit);
+	if (!HitActor || !HomeWorldT0BeatNodes::ActorCarriesTagFor(HitActor, HomeWorldT0BeatNodes::ENode::Garden))
+	{
+		return false;
+	}
+	const bool bPicked = TryPickGardenHerb();
+	ShowInteractFeedback(bPicked ? TEXT("NODE_GARDEN: herb") : TEXT("NODE_GARDEN: day body only"), bPicked ? FColor::Green : FColor::Yellow);
+	return bPicked;
+}
+
+bool AHomeWorldCharacter::TryWoundInteractInFront()
+{
+	FHitResult Hit;
+	if (!TraceInteractHit(Hit))
+	{
+		return false;
+	}
+	AActor* HitActor = GetInteractTargetActor(Hit);
+	if (!HitCarriesTag(HitActor, TEXT("NODE_WOUND")))
+	{
+		return false;
+	}
+	if (UWorld* World = GetWorld())
+	{
+		if (UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>())
+		{
+			if (!TimeOfDay->GetIsNight())
+			{
+				ShowInteractFeedback(TEXT("NODE_WOUND: seen by day"), FColor::Yellow);
+				return true;
+			}
+		}
+	}
+	const bool bHealed = TryGiveNightWispToWound();
+	ShowInteractFeedback(bHealed ? TEXT("NODE_WOUND: healed") : TEXT("NODE_WOUND: need a night wisp"), bHealed ? FColor::Green : FColor::Yellow);
+	return bHealed;
+}
+
+bool AHomeWorldCharacter::TryDungInteractInFront()
+{
+	FHitResult Hit;
+	if (!TraceInteractHit(Hit))
+	{
+		return false;
+	}
+	if (!HitCarriesTag(GetInteractTargetActor(Hit), TEXT("NODE_DUNG")))
+	{
+		return false;
+	}
+	const bool bCarried = TryAddCarriedDung();
+	ShowInteractFeedback(bCarried ? TEXT("NODE_DUNG: carried") : TEXT("NODE_DUNG: full"), FColor::Green);
+	return bCarried;
+}
+
+bool AHomeWorldCharacter::TryMixFertilizerInteractInFront()
+{
+	FHitResult Hit;
+	if (!TraceInteractHit(Hit))
+	{
+		return false;
+	}
+	if (!HitCarriesTag(GetInteractTargetActor(Hit), TEXT("NODE_MIX")))
+	{
+		return false;
+	}
+	const bool bMixed = TryMixHomesteadFertilizer();
+	ShowInteractFeedback(bMixed ? TEXT("NODE_MIX: fertilizer") : TEXT("NODE_MIX: need dung and a night wisp"), bMixed ? FColor::Green : FColor::Yellow);
+	return bMixed;
+}
+
+bool AHomeWorldCharacter::TryBullInteractInFront()
+{
+	FHitResult Hit;
+	if (!TraceInteractHit(Hit))
+	{
+		return false;
+	}
+	if (!HitCarriesTag(GetInteractTargetActor(Hit), TEXT("NODE_BULL")))
+	{
+		return false;
+	}
+	if (!bHasLeftHomestead)
+	{
+		ShowInteractFeedback(TEXT("NODE_BULL: field only"), FColor::Yellow);
+		return false;
+	}
+	SetRidingBull(true);
+	ShowInteractFeedback(TEXT("NODE_BULL: riding"), FColor::Green);
+	return true;
+}
+
+bool AHomeWorldCharacter::TryBarnInteractInFront()
+{
+	FHitResult Hit;
+	if (!TraceInteractHit(Hit))
+	{
+		return false;
+	}
+	if (!HitCarriesTag(GetInteractTargetActor(Hit), TEXT("NODE_BARN")))
+	{
+		return false;
+	}
+	if (!bWalkToBarn)
+	{
+		return false;
+	}
+	bWalkToBarn = false;
+	ShowInteractFeedback(TEXT("NODE_BARN: bull home"), FColor::Green);
+	UE_LOG(LogTemp, Log, TEXT("SHRINE: walked the bull to the barn"));
+	return true;
+}
+
+bool AHomeWorldCharacter::TryEaseGuardInFront()
+{
+	FHitResult Hit;
+	if (!TraceInteractHit(Hit))
+	{
+		return false;
+	}
+	AActor* HitActor = GetInteractTargetActor(Hit);
+	if (!HitCarriesTag(HitActor, TEXT("NODE_GUARD")))
+	{
+		return false;
+	}
+	UHomeWorldSpiritStealthComponent* Stealth = SpiritStealthComponent.Get();
+	if (!Stealth)
+	{
+		Stealth = FindComponentByClass<UHomeWorldSpiritStealthComponent>();
+	}
+	if (!Stealth || !GetWorld())
+	{
+		return false;
+	}
+	int32 Ordinal = 0;
+	for (TActorIterator<AActor> It(GetWorld()); It; ++It)
+	{
+		if (*It == HitActor)
+		{
+			break;
+		}
+		if (HitCarriesTag(*It, TEXT("NODE_GUARD")))
+		{
+			++Ordinal;
+		}
+	}
+	const bool bEased = Stealth->TryEaseCampActor(EHomeWorldCampRole::Guard, Ordinal);
+	ShowInteractFeedback(bEased ? TEXT("NODE_GUARD: eased") : TEXT("NODE_GUARD: spirit at night"), bEased ? FColor::Green : FColor::Yellow);
+	return bEased;
+}
+
+bool AHomeWorldCharacter::TryFreeCaptiveInFront()
+{
+	FHitResult Hit;
+	if (!TraceInteractHit(Hit))
+	{
+		return false;
+	}
+	if (!HitCarriesTag(GetInteractTargetActor(Hit), TEXT("NODE_CAPTIVE")))
+	{
+		return false;
+	}
+	UHomeWorldSpiritStealthComponent* Stealth = SpiritStealthComponent.Get();
+	if (!Stealth)
+	{
+		Stealth = FindComponentByClass<UHomeWorldSpiritStealthComponent>();
+	}
+	if (!Stealth || !Stealth->TryFreeCaptive())
+	{
+		ShowInteractFeedback(TEXT("NODE_CAPTIVE: ease the guards first"), FColor::Yellow);
+		return false;
+	}
+	NotifyPartnerReadyToReturn();
+	ShowInteractFeedback(TEXT("NODE_CAPTIVE: free, shrine home"), FColor::Green);
+	return true;
+}
+
 bool AHomeWorldCharacter::TryAddCarriedDung()
 {
 	++CarriedDung;
@@ -1637,6 +1828,10 @@ void AHomeWorldCharacter::NotifyLeftHomestead()
 void AHomeWorldCharacter::SetRidingBull(bool bRiding)
 {
 	bRidingBull = bRiding;
+	if (TraversalComponent)
+	{
+		TraversalComponent->SetMountBoostActive(bRiding);
+	}
 	if (bRiding)
 	{
 		bWalkToBarn = false;
@@ -2159,6 +2354,10 @@ bool AHomeWorldCharacter::TryEjectNodeDayCamp()
 	}
 
 	bDayCampEjectTriggered = true;
+	if (!bPartnerTaken)
+	{
+		NotifyPartnerTaken();
+	}
 	if (bGlideStarted)
 	{
 		UE_LOG(LogTemp, Log,

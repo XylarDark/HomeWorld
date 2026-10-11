@@ -20,6 +20,7 @@ Open these only when the open transition’s job includes them:
 - `Docs/02_ART_BIBLE.md` — through the north-star picture list only.
 - `Docs/context/ART_BIBLE_CONTEXT.md` — slogans and the test figure.
 - `Docs/art/STILL_GENERATION_STANDARD.md` — catalog order. Sheet before another scene. Front first. Side is 90 degrees. Back is 180.
+- `Docs/art/COMFY.md` — the player ComfyUI test. One front. No mesh.
 - `Docs/art/VISUAL_NOTES_FOR_GENERATION.md` — paste the block on every prompt.
 - `Docs/art/PROTOTYPE_PIPELINE.md` — when a kept still is ready for a mesh.
 - `Docs/art/STILLS_LIBRARY.md` — when you need a filed picture.

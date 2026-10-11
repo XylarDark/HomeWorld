@@ -35,7 +35,7 @@ HomeWorld is **semi-polygon with detail on top**.
 - Big forms are faceted low-poly masses. Not flat untextured low poly. Not photoreal. Not Mario-Galaxy soft clay.
 - Surface life sits on those facets: wood grain, moss clumps, flower clusters, crystal faces, leather straps.
 - Most of the frame is scenery ahead of the player.
-- The player is 1.8 m and is not from this planet. The cottage is the drawn 30 by 36 ft home, walls 15 ft. The bear and the bull match that wall, 4.57 m at the shoulder. Pines are 4.57 m, 6.86 m, and 9.14 m. The giant is many times the cottage. Camp guards stay people. The meters are `Docs/art/SCALE.md`.
+- The player is 2 m and is not from this planet. The cottage is the drawn home, 9 m by 11 m, walls 5 m. The bear and the bull match that wall, 5 m at the shoulder. Pines are 5 m, 7 m, and 9 m. The giant is many times the cottage. Camp guards stay people. The meters are `Docs/art/SCALE.md`.
 - Planetoid read: close horizon, ground can feel like it bends away, thin air, deep zenith, readable constellations at night.
 
 If a change makes the facets disappear, it is the wrong kind of beauty.
@@ -58,7 +58,7 @@ Dusk on the floating-island hub. This picture is the basis.
 - Shrine crystal with a moth.
 - Giant cropped moss-bear with brow shelves and eyes that look.
 - Warm sun left, cool forest right, thin air, planetoid moon.
-- The cottage is the home. Room plan 30 ft wide by 36 ft deep (9.14 m by 10.97 m). Covered porch 30 ft by 8 ft. Log walls 6 in. Interior 29 ft wide by 35 ft deep. Wall height 15 ft (4.57 m), so a third-person camera can sit above a 1.8 m player. Each bedroom is its own room: at least 70 sq ft and 7 ft on every side. This layout is the first cottage. Later kits may be modular. The bear’s shoulder matches this wall height. Modules: `Docs/art/SCALE.md`.
+- The cottage is the home. Room plan 9 m wide by 11 m deep. Covered porch 9 m by 2 m. Interior follows the drawn rooms. Wall height 5 m, so a third-person camera can sit above a 2 m player. Each bedroom is its own room: at least 70 sq ft and 7 ft on every side. This layout is the first cottage. Later kits may be modular. The bear’s shoulder matches this wall height. Modules: `Docs/art/SCALE.md`.
 
 Doors. Every leaf is a 4 ft clear opening. It swings into its own room and lies flat against the nearest side wall. The swing arc is empty. No leaf swings into the hall.
 
@@ -215,7 +215,7 @@ Two distances. Same assets. Never rescale a mesh to cheat a lens. The play camer
 
 | Mode | Distance | What must read | What may simplify |
 |---|---|---|---|
-| Play | Low, near the 1.8 m body, among the secret rooms, under a bloom, or on the bull | Face, the gap, grain, the door the player fits | The far forest |
+| Play | Low, near the 2 m body, among the secret rooms, under a bloom, or on the bull | Face, the gap, grain, the door the player fits | The far forest |
 | Scenic | Pulled back | The bear, the cabin shell, the pine repeat, the giant’s back | Interior rooms, the face |
 
 About 20 feet is the play distance beside the body. It is not the size of a pine.
@@ -250,7 +250,7 @@ One main key at a time: dusk sun, campfire, or shrine cyan, plus a cooler fill. 
 | Element | Rule |
 |---|---|
 | Cliff / island | Layered torn earth. Never a pancake disc or cylinder plug. |
-| Pines | One conical pine. Small 4.57 m, medium 6.86 m, largest 9.14 m. No second tree species. |
+| Pines | One conical pine. Small 5 m, medium 7 m, largest 9 m. No second tree species. |
 | Cabin | A wild-scale log shell, gabled, stone chimney ok. The rooms inside are the player plan. Cozy, not Victorian, not sci-fi. |
 | Shrine / portal | Handmade spirit cue. Standing stone. Not a tech gate or neon ring. No rune. |
 | Planet below | Pine valley, path, mountain ridge, camp clearing. |
@@ -337,7 +337,7 @@ Ten masters only (instance; do not invent families):
 10. `M_Nurtured`
 
 Each exposes BaseColor, Roughness, Variation, NightMix 0–1, optional Emissive.  
-Scale: meters. Adult about 1.7–1.8 m. Head about one sixth of that height. Cottage walls 4.57 m. Bear and bull shoulder 4.57 m. Pines 4.57 m, 6.86 m, and 9.14 m. The lair giant is many times the cottage. The bull rides the giant’s back. Origins at ground contact. Apply scale. Do not scale the player up to the cottage.
+Scale: whole meters. Adult 2 m. Head one sixth of that height. Cottage walls 5 m. Bear and bull shoulder 5 m. Pines 5 m, 7 m, and 9 m. The lair giant is many times the cottage. The bull rides the giant’s back. Origins at ground contact. Apply scale. Do not scale the player up to the cottage.
 
 AD does not author the material sheet. TA owns parameter ranges.
 

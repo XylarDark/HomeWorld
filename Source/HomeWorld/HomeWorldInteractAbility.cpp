@@ -38,8 +38,40 @@ void UHomeWorldInteractAbility::ActivateAbility(const FGameplayAbilitySpecHandle
 	}
 	if (!bHandled)
 	{
+		bHandled = Character->TryGardenInteractInFront();
+	}
+	if (!bHandled)
+	{
 		// T0 #2 NODE_KETTLE: herbs->tea before other day interacts (not meal-BP-as-tea).
 		bHandled = Character->TryNodeKettleInteractInFront();
+	}
+	if (!bHandled)
+	{
+		bHandled = Character->TryDungInteractInFront();
+	}
+	if (!bHandled)
+	{
+		bHandled = Character->TryMixFertilizerInteractInFront();
+	}
+	if (!bHandled)
+	{
+		bHandled = Character->TryWoundInteractInFront();
+	}
+	if (!bHandled)
+	{
+		bHandled = Character->TryBullInteractInFront();
+	}
+	if (!bHandled)
+	{
+		bHandled = Character->TryBarnInteractInFront();
+	}
+	if (!bHandled)
+	{
+		bHandled = Character->TryEaseGuardInFront();
+	}
+	if (!bHandled)
+	{
+		bHandled = Character->TryFreeCaptiveInFront();
 	}
 	if (!bHandled)
 	{

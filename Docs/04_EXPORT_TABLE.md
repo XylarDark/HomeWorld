@@ -15,7 +15,7 @@ Do **not** invent kits or features. This table makes the existing library portab
 
 | Rule | Value |
 |---|---|
-| Units | **Meters** (adult 1.8 m) |
+| Units | **Meters** (adult 2 m) |
 | Apply scale | **Yes** — Ctrl-A Scale before export; no non-1.0 object scale on SM_ |
 | Origins | **Ground contact** (feet / underside resting plane) |
 | Axis (FBX → UE) | **-Y Forward, Z Up** (UE FBX import preset) |

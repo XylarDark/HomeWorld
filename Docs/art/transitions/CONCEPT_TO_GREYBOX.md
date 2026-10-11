@@ -21,11 +21,11 @@ Three modules. Block them in meters.
 
 | Module | Size | Kept picture |
 |---|---|---|
-| Player | 1.8 m. The door gap is about 2.4 m. | `Docs/art/homestead/HS_Cabin_gap.jpg` |
-| Wild | Bear and bull shoulder 4.57 m. Pines 4.57 m, 6.86 m, and 9.14 m. | `Docs/art/field/Field_bull_scale_v2.jpg` for the bull. The bear’s height target is the cottage wall, not the vista. |
+| Player | 2 m. The door gap is 2 m. | `Docs/art/homestead/HS_Cabin_gap.jpg` |
+| Wild | Bear and bull shoulder 5 m. Pines 5 m, 7 m, and 9 m. | `Docs/art/field/Field_bull_scale_v2.jpg` for the bull. The bear’s height target is the cottage wall, not the vista. |
 | Giant | Many times the wild module. Bull and rider stay small on the back. Snake wraps the chest and neck. | `Docs/art/lair/Lair_back_ride_v5.jpg` |
 
-The cabin shell is the bear. The 30 by 36 ft rooms sit inside that shell. Greybox draws both. A bear does not fit the door.
+The cabin shell is the bear. The 9 by 11 m rooms sit inside that shell. Greybox draws both. A bear does not fit the door.
 
 One pine mesh. Copies at the heights in the vista. One bull mesh at the field scale. The giant is one mass. The back is the ride, from the hip toward the head.
 
@@ -49,6 +49,6 @@ Changing tree height in the same prompt as the bear or the cabin drops the facet
 
 ## This sitting
 
-`HS_Shell_greybox.jpg` is a scene. It does not match the generation card in `Docs/art/SCALE.md`. The next file is an asset sheet, not a scene. The cottage alone, texture off, plain ground, the 1.8 m figure beside it, walls 4.57 m, plan 9.14 m by 10.97 m, door 1.2 m wide. No bear. No pines. No warm light. Catalog order is in `Docs/art/STILL_GENERATION_STANDARD.md`. After that sheet is kept: the pine at 4.57, 6.86, and 9.14 m, then the bear, then the bull.
+`HS_Shell_greybox.jpg` is a scene. It does not match the generation card in `Docs/art/SCALE.md`. The size-test order is `Docs/art/SIZE_TEST_TASKS.md`. The player block is `Tools/Build-PlayerGreybox.py`. The next picture is still the cottage sheet alone.
 
 Partner, child, and camp stay closed. They do not change these meters.

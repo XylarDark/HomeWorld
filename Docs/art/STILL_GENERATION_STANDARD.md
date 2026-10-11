@@ -11,18 +11,18 @@ Five kinds. The index is `Docs/art/STILLS_LIBRARY.md`. Every new file gets a row
 | Kind | Job | Order |
 |---|---|---|
 | Mood scene | Light, place, and how the pieces sit. Not a meter. | A few. Already started. |
-| Asset sheet | One subject. Flat light. Plain ground. The 1.8 m figure stands beside a prop. | Before another scene of that subject. |
+| Asset sheet | One subject. Flat light. Plain ground. The 2 m figure stands beside a prop. | Before another scene of that subject. |
 | Turnaround | Front, then 90, 180, and 45 degrees. Each file attaches the kept front. | After that front is kept. |
 | Callout | One hidden detail: door, face, horns, bark. | Only when the sheet hides it. |
 | Scene again | Kept sheets placed together. | After the sheets. |
 
 The open greybox sheets, in order, are the cottage, the pine, the bear, and the bull. The lair is already a scale keep and is not in this set. Meters are pasted from `Docs/art/SCALE.md`. The picture does not invent the meter.
 
-An image model copies the attached picture and ignores a typed size. Do not attach a scene whose scale is wrong. One change per pass. Free local generation, when a card can hold a reference, is ComfyUI with an edit model such as FLUX.1 Kontext. That holds a face or a prop across views. It does not measure 4.57 m. Hosted free tiers are for a first mood, not for a sheet.
+An image model copies the attached picture and ignores a typed size. Do not attach a scene whose scale is wrong. One change per pass. The ComfyUI test for the player is `Docs/art/COMFY.md`. An edit model can hold a face across views. It does not measure 5 m. The Dev weight is a test only. A Steam sheet does not come from a non-commercial weight. Hosted free tiers are for a first mood, not for a sheet.
 
 ## Rules
 
-1. Name the meters in the prompt. Player is 1.8 m. Head is one sixth of that height. A place uses the meters on its card. Do not print those numbers in the picture.
+1. Name the meters in the prompt. Player is 2 m. Head is one sixth of that height. A place uses the whole meters on its card. Do not print those numbers in the picture.
 2. One kept picture is the design. Every later view attaches that picture. Do not attach a picture whose job is different.
 3. Keep one front first. Camera at the subject’s mid-height. Orthographic. 0 degrees. Subject fills about 80 percent of the frame height. Equal margin. Flat light. No cast shadow. Plain light-gray background.
 4. Side is 90 degrees. Back is 180 degrees. Three-quarter is 45 degrees. Each is its own file, attached to the kept front. Same frame fraction, same light, same ground line. A side that is another front is a failed side.
@@ -72,4 +72,4 @@ Orthographic. Camera at mid-height. 0 degrees for front, 90 for side, 180 for ba
 
 ## Cabin, as a test
 
-The cabin shell matches the bear. The room plan inside it is 30 ft by 36 ft, porch 30 by 8, walls 15 ft. Chimney on the cabin’s right. Modules: `Docs/art/SCALE.md`. A front elevation of the rooms is not a picture of the shell. Side and back attach the kept front of that same subject. They do not describe a new house.
+The cabin shell matches the bear. The room plan inside it is 9 m by 11 m, porch 9 by 2, walls 5 m. Chimney on the cabin’s right. Modules: `Docs/art/SCALE.md`. A front elevation of the rooms is not a picture of the shell. Side and back attach the kept front of that same subject. They do not describe a new house.

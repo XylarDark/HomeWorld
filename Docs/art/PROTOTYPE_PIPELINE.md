@@ -43,7 +43,7 @@ A rigid prop may be decimated. Partner, child, guards, and the bull are a shape 
 |---|---|
 | Tool | The same mesh, two distances. |
 | Agent | Ask for the two shots. Do not grade them. |
-| You | Look from the play camera, near the 1.8 m body, and from the scenic camera. Wild size is `Docs/art/SCALE.md`. |
+| You | Look from the play camera, near the 2 m body, and from the scenic camera. Wild size is `Docs/art/SCALE.md`. |
 | Reject | It only reads at one distance, or the mesh was rescaled to cheat the lens. |
 
 ## 5. Shelf

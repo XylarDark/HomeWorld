@@ -6,37 +6,37 @@ Play can change. The pictures cannot. A glide, a ram, a heal, and a night walk a
 
 ## Three sizes
 
-The player is 1.8 m and is not from this planet. The cottage is a normal home at the drawn plan. Ordinary creatures and plants are larger than the player. The bear and the bull match the cottage wall. The pines step up from that wall. The giant is the exception, many times the cottage. Locked 2026-10-10.
+The player is 2 m and is not from this planet. The cottage is a normal home at the drawn plan. Ordinary creatures and plants are larger than the player. The bear and the bull match the cottage wall. The pines step up from that wall. The giant is the exception, many times the cottage. Locked 2026-10-10. Build sizes are whole meters.
 
 | Module | What uses it | Locked size |
 |---|---|---|
-| Player | The body and the camera | 1.8 m tall. Head about 0.3 m. |
-| Cottage | The first home. Later building kits can be modular. This layout is the start. | 30 ft by 36 ft, walls 15 ft (4.57 m). Porch 30 ft by 8 ft. Living, kitchen, hall, child, bath, couple, as drawn. Door leaf 4 ft wide. Hall 8 ft deep. |
-| Wild | Bear, bull, ordinary creatures, rocks | Bear shoulder and bull shoulder equal the cottage wall, 4.57 m. Other creatures may be smaller or larger than the cottage. Special animals and spirits may be otherwise. |
-| Pines | One cone, three heights | Small 4.57 m. Medium 6.86 m. Largest 9.14 m. |
+| Player | The body and the camera | 2 m tall. Head one sixth of that height. |
+| Cottage | The first home. Later building kits can be modular. This layout is the start. | 9 m by 11 m, walls 5 m. Porch 9 m by 2 m. Living, kitchen, hall, child, bath, couple, as drawn. Door 1 m wide. Hall 2 m deep. |
+| Wild | Bear, bull, ordinary creatures, rocks | Bear shoulder and bull shoulder equal the cottage wall, 5 m. Other creatures may be smaller or larger than the cottage. Special animals and spirits may be otherwise. |
+| Pines | One cone, three heights | Small 5 m. Medium 7 m. Largest 9 m. |
 | Giant | The kneeling sleeper | Many times the cottage. The bull and the rider stay small on the back. The snake wraps the torso. |
 
 These meters are the generation card. They were not measured off the pictures. A still can be kept for the relationship and still miss a number. When a prompt needs a size, paste the card. Do not ask the model to invent the meter from a scene. The file order is in `Docs/art/STILL_GENERATION_STANDARD.md`.
 
 ## Generation card
 
-Paste the row you need. The figure in an asset shot is the 1.8 m player, standing next to the asset, not inside a scenic frame.
+Paste the row you need. The figure in an asset shot is the 2 m player, standing next to the asset, not inside a scenic frame.
 
 | Asset | Target | Picture that locks the look, not the meter |
 |---|---|---|
-| Player | 1.8 m tall. Head about 0.3 m. | The player mood stills. |
-| Cottage | 9.14 m wide, 10.97 m deep, walls 4.57 m. Porch 9.14 m by 2.44 m. The drawn rooms. | `SM_Home_Cabin_doors.png` for the plan. The scenic stills do not lock the plan. |
-| Door | 1.2 m clear width. Height is not locked. Hall behind it is 2.4 m deep. | The door plan. |
-| Bear | Shoulder 4.57 m, the cottage wall. | The bear’s face and facets from the dusk picture. Not its height in that picture. |
-| Bull | Shoulder 4.57 m. Player stands beside it. | `Field_bull_scale_v2.jpg` for the animal. The shoulder target is the cottage wall. |
-| Pine, small | 4.57 m. | No kept sheet yet. |
-| Pine, medium | 6.86 m. Same cone. | |
-| Pine, largest | 9.14 m. Twice the cottage wall. | |
+| Player | 2 m tall. Head one sixth of that height. | The player mood stills. |
+| Cottage | 9 m wide, 11 m deep, walls 5 m. Porch 9 m by 2 m. The drawn rooms. | `SM_Home_Cabin_doors.png` for the plan. The scenic stills do not lock the plan. |
+| Door | 1 m clear width. Height is not locked. Hall behind it is 2 m deep. | The door plan. |
+| Bear | Shoulder 5 m, the cottage wall. | The bear’s face and facets from the dusk picture. Not its height in that picture. |
+| Bull | Shoulder 5 m. Player stands beside it. | `Field_bull_scale_v2.jpg` for the animal. The shoulder target is the cottage wall. |
+| Pine, small | 5 m. | No kept sheet yet. |
+| Pine, medium | 7 m. Same cone. | |
+| Pine, largest | 9 m. | |
 | Giant | Many times the cottage. No meter read off the picture. | `Lair_back_ride_v5.jpg` for the relationship only. |
 
 The 14 m shell is retired. `HS_Shell_greybox.jpg` and `HS_Vista_bear_module_v9.jpg` show a cabin and a bear that do not match this card. They are not the greybox keep.
 
-The 30 by 36 ft plan is the cottage, not a secret inside a larger shell. Door swings stay as drawn.
+The 9 by 11 m plan is the cottage, not a secret inside a larger shell. Door swings stay as drawn.
 
 A scenic camera may lose the face. The play camera stays near the body, low, looking up, the way a small person sees a pallet they can walk under. The shoulder spirit is how that body stays readable up close.
 

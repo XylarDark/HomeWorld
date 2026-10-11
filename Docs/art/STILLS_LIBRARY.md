@@ -16,6 +16,8 @@ Kept 2026-10-10. Coat and shoulder spirit. The expression sheet locks the face. 
 | [SM_Player_camp_approach.jpg](player/SM_Player_camp_approach.jpg) | Prototype | Approaching camp |
 | [SM_Player_spirit_form.jpg](player/SM_Player_spirit_form.jpg) | Prototype | Spirit form, asleep into spirit |
 | [SM_Player_turnaround.jpg](player/SM_Player_turnaround.jpg) | Prototype | Front, side, back, three-quarter, one height. Kept 2026-10-10. |
+| [SM_Player_front.jpg](player/SM_Player_front.jpg) | Concept | Front, A-pose. Shoulder gem. Not the mesh input. |
+| [SM_Player_front_v2.jpg](player/SM_Player_front_v2.jpg) | Concept | TripoSR input. Same front, no shoulder spirit. For audit. |
 
 ## Homestead
 
@@ -58,7 +60,7 @@ Mood stills for `SCALE.md`. For audit. The close-assets north star is the dense 
 | [HS_Vista_bear_module_v5.jpg](homestead/HS_Vista_bear_module_v5.jpg) | Concept | Harder bear facets, gabled cabin, player small. Pines still one height. |
 | [HS_Vista_bear_module_v6.jpg](homestead/HS_Vista_bear_module_v6.jpg) | Concept | Pines at short, cabin-height, and above the roof. Bear and ground left the dusk look. |
 | [HS_Vista_bear_module_v7.jpg](homestead/HS_Vista_bear_module_v7.jpg) | Concept | v5 cabin and player, original moss-bear. Pines are one height. |
-| [HS_Vista_bear_module_v9.jpg](homestead/HS_Vista_bear_module_v9.jpg) | Concept | Earlier size keep. Bear towers over the cabin. Superseded by the 15 ft wall lock. |
+| [HS_Vista_bear_module_v9.jpg](homestead/HS_Vista_bear_module_v9.jpg) | Concept | Earlier size keep. Bear towers over the cabin. Superseded by the 5 m wall lock. |
 | [HS_Vista_dim.jpg](homestead/HS_Vista_dim.jpg) | Concept | Dimension pass. Bear still taller than the wall. For audit. |
 | [HS_Cabin_gap.jpg](homestead/HS_Cabin_gap.jpg) | Concept | Earlier gap keep. Bear towers over the cottage. |
 | [HS_Cabin_gap_dim.jpg](homestead/HS_Cabin_gap_dim.jpg) | Concept | Dimension pass. Player at the door. Bear still taller than the wall. For audit. |
@@ -73,8 +75,8 @@ Mood stills for `SCALE.md`. For audit. The close-assets north star is the dense 
 
 | Still | Phase | Job |
 |---|---|---|
-| [Field_bull_scale_v2.jpg](field/Field_bull_scale_v2.jpg) | Concept | Earlier bull keep. Shoulder reads larger than a 15 ft wall. |
-| [Field_bull_dim.jpg](field/Field_bull_dim.jpg) | Concept | Dimension pass. Bull beside the player. Shoulder still high for a 15 ft wall. For audit. |
+| [Field_bull_scale_v2.jpg](field/Field_bull_scale_v2.jpg) | Concept | Earlier bull keep. Shoulder reads larger than a 5 m wall. |
+| [Field_bull_dim.jpg](field/Field_bull_dim.jpg) | Concept | Dimension pass. Bull beside the player. Shoulder still high for a 5 m wall. For audit. |
 
 ## Later
 

@@ -87,7 +87,7 @@ Stills filed, no mesh. Status: concept mood kept 2026-10-10. The turnaround stay
 
 ### SM_Home_Cabin
 
-Wake read. A bear-sized shell with player-sized rooms inside. The shell matches the moss-bear. The rooms are 30 ft by 36 ft, porch 30 by 8, walls 15 ft. Living 17 by 14, kitchen 12 by 14, hall 8 ft with no door leaf, child 10 by 13, bath 8 by 9, couple 11 by 13. Leaf doors are 4 ft and park inside the room. A bear does not fit that door. Kitchen is an iron stove, a kettle, and one sink.
+Wake read. A bear-sized shell with player-sized rooms inside. The shell matches the moss-bear. The rooms are 9 m by 11 m, porch 9 by 2, walls 5 m. Living, kitchen, hall, child, bath, and couple stay as drawn. The hall is 2 m deep with no door leaf. Leaf doors are 1 m wide and park inside the room. A bear does not fit that door. Kitchen is an iron stove, a kettle, and one sink.
 
 Reject: a modern appliance, a door leaf in the hall, a rune, text.
 

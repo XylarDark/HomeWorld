@@ -112,6 +112,30 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Wound|T0")
 	bool TryGiveNightWispToWound();
 
+	/** Look at NODE_GARDEN and pick one herb. Day body only. */
+	bool TryGardenInteractInFront();
+
+	/** Look at NODE_WOUND. Day sees it. Night spends one carried wisp. */
+	bool TryWoundInteractInFront();
+
+	/** Look at NODE_DUNG and carry one. */
+	bool TryDungInteractInFront();
+
+	/** Look at NODE_MIX at the homestead. One dung plus one night wisp. */
+	bool TryMixFertilizerInteractInFront();
+
+	/** Look at NODE_BULL in the field. Uses the existing mount speed. */
+	bool TryBullInteractInFront();
+
+	/** Look at NODE_BARN after a shrine return with the bull. */
+	bool TryBarnInteractInFront();
+
+	/** Look at one NODE_GUARD and ease that guard. Spirit at night. */
+	bool TryEaseGuardInFront();
+
+	/** Look at NODE_CAPTIVE after the three guards are eased. */
+	bool TryFreeCaptiveInFront();
+
 	UFUNCTION(BlueprintCallable, Category = "Wound|T0")
 	bool IsHomesteadWoundHealed() const { return bHomesteadWoundHealed; }
 

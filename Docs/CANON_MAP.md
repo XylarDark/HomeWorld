@@ -89,6 +89,8 @@ README is left intact as history.
 | **Look task list** | `Docs/art/ASSET_CONTEXT_TASKS.md` | critical path, then one card. |
 | **Stills library** | `Docs/art/STILLS_LIBRARY.md` | filed pictures. |
 | **Still generation standard** | `Docs/art/STILL_GENERATION_STANDARD.md` | Catalog. Sheet before scene. Front first. |
+| **ComfyUI player test** | `Docs/art/COMFY.md` | One front sheet. Dev weight is a test, not a Steam mesh. |
+| **Size test tasks** | `Docs/art/SIZE_TEST_TASKS.md` | Player block, cottage, pines, bear, bull, then a free walk clip. |
 | Ten master materials | `Docs/02_MATERIAL_SHEET.md` | **LOCKED** |
 | Per-domain locked bibles | `Docs/DAYNIGHT_BIBLE.md` · `Docs/MOVEMENT_BIBLE.md` · `Docs/HOMESTEAD_BIBLE.md` · `Docs/COMBAT_DREAM_BIBLE.md` · `Docs/GATHER_CRAFT_BIBLE.md` · `Docs/SPIRIT_STEALTH_BIBLE.md` · `Docs/CAMERA_BIBLE.md` | **LOCKED** — all seven |
 | Blender→UE export contract | `Docs/04_EXPORT_TABLE.md` | **LOCKED** contract |
