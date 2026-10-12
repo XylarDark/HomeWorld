@@ -1,0 +1,18 @@
+{
+  "//": "The MCP tool surface, captured from a live session. instruction-budget.js reads this.",
+  "//1": "WHY A SNAPSHOT. An MCP config declares a COMMAND, not a tool list: servers publish their tools at tools/list after they start. Reading `server.tools` out of the config is a structural zero - it reports 0 tool schemas for a session that is actually injecting 114. A gate that reports zero for the largest always-on surface is worse than no gate, because it manufactures the impression the surface is free.",
+  "//2": "WHY NOT BYTES. schemaBytes stays null until someone records a real tools/list payload. Tool counts are the honest, cheaply-reproducible number; byte counts measured from a guess are a false number with a decimal point. Do not fill this in from an estimate.",
+  "//3": "HOW TO RECAPTURE. Start the Editor with UnrealMCP on 55557 and Mixar MCP up, connect OpenCode, then count the tools visible in the session catalog (or run tools/list against each server). Update `capturedAt` and the counts together - a count without a date is a rumour.",
+  "//4": "`source: repo` means the server is declared in opencode.json and this repo controls it. `source: host` means the host's global config injects it; the repo cannot remove it but still pays for it every request, so it is counted here.",
+  "//5": "SCOPE: this snapshot is the surface injected by the host that captured it. Servers named only in the Cursor template (.cursor/mcp.json.example) are reported by the budget as `template-only` and are NOT counted here - unrealEditorUi (the Slate inspector on :8000) is the current one. It is not injected in the OpenCode session these counts came from, and a server that is not running costs nothing. If the GSD host becomes the only host, recapture from there and move it into `servers`.",
+
+  "capturedAt": "2026-10-12",
+  "schemaBytes": null,
+  "servers": {
+    "browser": { "tools": 45, "source": "host" },
+    "gsd": { "tools": 3, "source": "host" },
+    "mixar": { "tools": 26, "source": "repo" },
+    "opencode": { "tools": 8, "source": "host" },
+    "unrealMCP": { "tools": 32, "source": "repo" }
+  }
+}

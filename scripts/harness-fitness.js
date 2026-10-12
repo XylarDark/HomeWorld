@@ -191,15 +191,31 @@ function premiseBounds() {
  * Premise 3 - PURPOSEFULNESS. The anti-sycophancy log and the disagreement log
  * are the record of the harness noticing something. Both must be non-empty for
  * the harness to be doing the thing it was built for.
+ *
+ * A line count is not a signal, though: a file with 28 lines and a newest entry
+ * from three months ago is a log nobody has written to. This reports the newest
+ * date so the reader can see the difference. It still does not FAIL on staleness,
+ * because the file itself says requiring a disagreement per commit "would just
+ * produce fake ones" - and it is right.
  */
 function premisePurposeful() {
-  const disagreement = fs.existsSync(path.join(PROJECT_ROOT, 'Docs/decisions/DISAGREEMENTS.md'))
-    ? countLines('Docs/decisions/DISAGREEMENTS.md')
-    : 0;
+  const rel = 'Docs/decisions/DISAGREEMENTS.md';
+  if (!fs.existsSync(path.join(PROJECT_ROOT, rel))) {
+    return { ok: false, detail: 'no disagreements recorded - either nothing was questioned, or nothing was written down' };
+  }
+  const text = fs.readFileSync(path.join(PROJECT_ROOT, rel), 'utf8');
+  const disagreement = countLines(rel);
+  const dates = [...text.matchAll(/20\d{2}-\d{2}-\d{2}/g)].map((m) => m[0]).sort();
+  const newest = dates.length ? dates[dates.length - 1] : null;
+  let age = '';
+  if (newest) {
+    const days = Math.round((Date.now() - new Date(`${newest}T00:00:00Z`).getTime()) / 86400000);
+    age = `, newest ${newest} (${days}d ago)`;
+  }
   return {
     ok: disagreement > 0,
     detail: disagreement
-      ? `${disagreement} lines in DISAGREEMENTS.md; a non-empty file does not prove a recent disagreement`
+      ? `${disagreement} lines in DISAGREEMENTS.md${age}; a non-empty file does not prove a recent disagreement`
       : 'no disagreements recorded - either nothing was questioned, or nothing was written down',
   };
 }
@@ -210,8 +226,13 @@ function premisePurposeful() {
  * contract's success condition is that this ratio has INVERTED from 24:8.
  *
  * Classification is by paths, not by a `(harness)` subject. A subject with no
- * scope still counts when the files are the harness. A commit that touches both
- * sides is mixed and is left out of both counts. The window stays 60 commits.
+ * scope still counts when the files are the harness. The window stays 60 commits.
+ *
+ * A commit touching both sides counts as HARNESS, not as neither. Excluding it
+ * was the permissive reading and it hid the exact case this premise exists to
+ * catch: harness work riding along inside a product commit. Counting mixed
+ * against the harness can only ever make the ratio worse, so the check errs
+ * toward noticing.
  */
 const HARNESS_FILES = new Set([
   'scripts/harness-fitness.js',
@@ -254,9 +275,12 @@ function premiseProduct(commits) {
   for (const commit of commits) {
     const files = commit && Array.isArray(commit.files) ? commit.files : [];
     const kind = classifyCommit(files);
-    if (kind === 'harness') harnessCommits += 1;
-    else if (kind === 'product') productCommits += 1;
-    else if (kind === 'mixed') mixed += 1;
+    if (kind === 'harness' || kind === 'mixed') {
+      harnessCommits += 1;
+      if (kind === 'mixed') mixed += 1;
+    } else if (kind === 'product') {
+      productCommits += 1;
+    }
   }
   const total = harnessCommits + productCommits;
   if (total < 10) {
@@ -267,9 +291,10 @@ function premiseProduct(commits) {
     };
   }
   const pct = Math.round((harnessCommits / total) * 100);
+  const mixedNote = mixed ? `; ${mixed} of them touched both sides and count as harness` : '';
   return {
     ok: harnessCommits <= productCommits,
-    detail: `${harnessCommits} harness / ${productCommits} product over ${total} commits (${pct}% harness); ${mixed} mixed excluded`,
+    detail: `${harnessCommits} harness / ${productCommits} product over ${total} commits (${pct}% harness)${mixedNote}`,
   };
 }
 

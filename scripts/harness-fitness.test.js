@@ -106,13 +106,24 @@ test('product premise: the Slate pointer commit is harness work without a (harne
   assert.strictEqual(r.ok, true, r.detail);
 });
 
-test('product premise: a commit that touches harness and product paths is excluded', () => {
+test('product premise: a commit that touches both sides counts as harness', () => {
+  // Mixed used to be dropped from both counts. That was the permissive reading,
+  // and it hid exactly the case this premise exists to catch: harness work
+  // riding along inside a product commit. Counting it against the harness can
+  // only ever make the ratio worse, so the check errs toward noticing.
   const mixed = { files: ['AGENTS.md', 'Source/HomeWorld/X.cpp'] };
   const product = files(Array.from({ length: 10 }, (_, i) => `Source/HomeWorld/P${i}.cpp`));
   const r = premiseProduct([mixed, ...product]);
-  assert.match(r.detail, /0 harness \/ 10 product/);
-  assert.match(r.detail, /1 mixed excluded/);
+  assert.match(r.detail, /1 harness \/ 10 product/);
+  assert.match(r.detail, /1 of them touched both sides and count as harness/);
   assert.strictEqual(r.ok, true, r.detail);
+
+  // It must also be able to go red. The old contract could not: a commit that
+  // touched both sides left the ratio untouched no matter how many there were.
+  const allMixed = Array.from({ length: 11 }, () => ({ files: ['AGENTS.md', 'Source/HomeWorld/X.cpp'] }));
+  const red = premiseProduct([...allMixed, ...product]);
+  assert.strictEqual(red.ok, false, red.detail);
+  assert.match(red.detail, /11 harness \/ 10 product/);
 });
 
 /* --------------------------------------------------------------- premise 1 */
