@@ -24,10 +24,9 @@ user can or will perform manual work during or between sessions. There is no
    Editor or CLI actions. The automation loop runs without human intervention.
 
 2. **Automation order.** For any Editor or engine task, use in order:
-   - **MCP** — when the Editor is running and connected
+   - **MCP** — when the Editor is running and connected, port 55557
    - **Python Editor scripts** — `Content/Python/`, via MCP or commandlet
-   - **GUI automation** — Editor-driven (PyAutoGUI, screenshots, reference
-     images, click/key sequences). See `docs/Automation/FULL_AUTOMATION_RESEARCH.md` §10
+   - **Slate inspector** — only after a script logs `editor_ui: NEED_SLATE`. Open `.cursor/skills/ue-editor-ui/SKILL.md`. Do not open a new gap for `portal-level`, `state-tree`, or `pcg-details`
    - **C++ commandlets** — where they can set the required state
 
    If none can accomplish the task, **do not** fall back to "document the manual
@@ -53,7 +52,7 @@ Autonomy is **not** a licence to run Editor/MCP/GUI on the wrong host. Follow
 [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md) §14 host-tool table and §16
 DESKTOP parent-only:
 
-- DESKTOP Shell / MCP 55557 / PIE / Editor Python / PyAutoGUI → Conductor
+- DESKTOP Shell / MCP 55557 / PIE / Editor Python / editor_ui: NEED_SLATE → Conductor
   **parent** on **DESKTOP-21CT3H0** only.
 - Cloud / task executor → do **not** invent DESKTOP trials. Log the gap or hand
   off to the Conductor parent. Contents API is file+PR degrade only.
@@ -76,7 +75,7 @@ Per entry include:
 | **Feature / task** | "PCG — assign graph in Details panel" |
 | **What is needed** | one sentence: what must happen for the feature to be complete |
 | **Why automation didn't cover it** | "No MCP/Python API for adding Mass Spawner to level"; "selector in UI not scriptable" |
-| **Suggested approach** | "GUI automation: capture ref image for Modes panel, then PyAutoGUI"; "Research UE 5.8 Mass Spawner Python API" |
+| **Suggested approach** | "Log `editor_ui: NEED_SLATE` and open `.cursor/skills/ue-editor-ui/SKILL.md`"; "Research UE 5.8 Mass Spawner Python API" |
 
 **When a gap is addressed** (solution implemented and verified), note it in the
 same file — Research log or Addressed subsection: date, gap id, how it was

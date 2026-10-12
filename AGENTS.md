@@ -34,6 +34,8 @@ Legacy files in `Docs/handoffs/` are not a read list. Open a handoff only when t
 
 Agents run `.\Tools\Safe-Build.ps1` only, from repo root. Never `Build-HomeWorld.bat` directly. Chain and MCP port: [docs/Setup/BUILD_POLICY.md](docs/Setup/BUILD_POLICY.md). Cloud agents have no UE.
 
+Editor work uses UnrealMCP on port 55557. A log line `editor_ui: NEED_SLATE` opens [.cursor/skills/ue-editor-ui/SKILL.md](.cursor/skills/ue-editor-ui/SKILL.md).
+
 ## Do not re-litigate
 
 - Always-on context is this file. No `alwaysApply: true` rule.

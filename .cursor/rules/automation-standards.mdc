@@ -20,12 +20,9 @@ what order, and what needs Lead approval. Two things moved out:
 ## Editor UI automation is the default
 
 When we can drive the Unreal Editor UI automatically, that is the **default
-method** — not a fallback. Prefer running the GUI automation script; treat
-manual Editor steps as fallback only when GUI automation is unavailable (ref
-images not captured, script not runnable here) or has failed.
-
-Maintain ref images and scripts so the default path stays available. Patterns:
-`docs/Automation/FULL_AUTOMATION_RESEARCH.md` §10.
+method** — not a fallback. A log line `editor_ui: NEED_SLATE` opens
+[.cursor/skills/ue-editor-ui/SKILL.md](../skills/ue-editor-ui/SKILL.md). Treat
+manual Editor steps as fallback only when the inspector is unavailable or has failed.
 
 ## KNOWN_ERROR_LOG (Lead hard rule)
 
