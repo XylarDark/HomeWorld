@@ -23,42 +23,39 @@ const path = require('path');
 const {
   premiseShape,
   premiseBounds,
+  premisePurposeful,
   premiseProduct,
   recordOutOfBounds,
 } = require('./harness-fitness');
+const budget = require('./instruction-budget');
+
+function files(list) {
+  return list.map((f) => ({ files: Array.isArray(f) ? f : [f] }));
+}
 
 /* --------------------------------------------------------------- premise 4
  *
  * This is the premise most able to lie, because it reads a commit log and
- * classifies with a regex. A classifier that is too broad marks product work as
+ * classifies the files. A classifier that is too broad marks product work as
  * harness work and reports a false crisis; too narrow hides a real one.
+ * A subject line is not evidence. The paths are.
  */
 
 test('product premise: harness work counts toward the numerator', () => {
   const commits = [
-    'feat(harness): add a thing',
-    'fix(harness): repair a thing',
-    'test(harness): cover a thing',
-    'docs(harness): describe a thing',
-    'feat: inventory round trip',
-    'feat: tame transitions',
+    ...files(['AGENTS.md', '.cursor/rules/a.mdc', '.agents/skills/x/SKILL.md', 'scripts/instruction-budget.js']),
+    ...files(Array.from({ length: 10 }, (_, i) => `Source/HomeWorld/P${i}.cpp`)),
   ];
   const r = premiseProduct(commits);
-  assert.strictEqual(r.ok, true, '4 harness / 2 product is still product-dominant');
+  assert.strictEqual(r.skipped, undefined);
+  assert.match(r.detail, /4 harness \/ 10 product/);
+  assert.strictEqual(r.ok, true, r.detail);
 });
 
 test('product premise: a harness-heavy window is reported as broken, not excused', () => {
   const commits = [
-    'feat(harness): a',
-    'feat(harness): b',
-    'feat(harness): c',
-    'feat(harness): d',
-    'feat(harness): e',
-    'feat(harness): f',
-    'feat(harness): g',
-    'feat(harness): h',
-    'feat: one product commit',
-    'feat: another product commit',
+    ...files(Array.from({ length: 8 }, (_, i) => `.cursor/rules/${i}.mdc`)),
+    ...files(['Source/HomeWorld/A.cpp', 'Source/HomeWorld/B.cpp']),
   ];
   const r = premiseProduct(commits);
   assert.strictEqual(r.ok, false, 'the old 24:8 shape must read as broken');
@@ -68,13 +65,13 @@ test('product premise: too few commits is a skip, never a pass and never a break
   // THE failure mode this guards: a 3-commit window has no ratio in it. Reading
   // it as "fine" because harnessCommits(2) < productCommits(1) is false by
   // ordering, and reading it as broken is noise. It is neither - it is skipped.
-  const r = premiseProduct(['feat(harness): a', 'feat(harness): b', 'feat: c']);
+  const r = premiseProduct(files(['AGENTS.md', '.cursor/rules/a.mdc', 'Source/HomeWorld/A.cpp']));
   assert.strictEqual(r.skipped, true, 'small windows must be skipped');
   assert.strictEqual(r.ok, true, 'skipped is not broken');
 });
 
 test('product premise: an all-product window is unambiguously fine', () => {
-  const commits = Array.from({ length: 12 }, (_, i) => `feat: product work ${i}`);
+  const commits = files(Array.from({ length: 12 }, (_, i) => `Source/HomeWorld/P${i}.cpp`));
   const r = premiseProduct(commits);
   assert.strictEqual(r.ok, true);
   assert.strictEqual(r.skipped, undefined);
@@ -82,11 +79,40 @@ test('product premise: an all-product window is unambiguously fine', () => {
 
 test('product premise: an exactly-balanced window passes (tied is not over budget)', () => {
   const commits = [
-    ...Array.from({ length: 5 }, (_, i) => `feat(harness): h${i}`),
-    ...Array.from({ length: 5 }, (_, i) => `feat: p${i}`),
+    ...files(Array.from({ length: 5 }, () => 'scripts/harness-fitness.js')),
+    ...files(Array.from({ length: 5 }, (_, i) => `Content/Maps/P${i}.umap`)),
   ];
   const r = premiseProduct(commits);
   assert.strictEqual(r.ok, true, '5/5 is product-dominant enough; the bar is not "> product"');
+});
+
+test('product premise: the Slate pointer commit is harness work without a (harness) subject', () => {
+  const slate = {
+    subject: 'Point a failed editor write at the Slate skill instead of the deleted clicker scripts.',
+    files: [
+      'AGENTS.md',
+      '.agents/skills/automation-gap-solutions/SKILL.md',
+      '.agents/skills/pcg-validate/SKILL.md',
+      '.cursor/rules/18-game-development-principles.mdc',
+      '.cursor/rules/19-automation-gaps.mdc',
+      '.cursor/rules/20-full-automation-no-manual-steps.mdc',
+      '.cursor/rules/automation-standards.mdc',
+    ],
+  };
+  const product = files(Array.from({ length: 12 }, (_, i) => `Source/HomeWorld/File${i}.cpp`));
+  const r = premiseProduct([slate, ...product]);
+  assert.strictEqual(r.skipped, undefined);
+  assert.match(r.detail, /1 harness \/ 12 product/);
+  assert.strictEqual(r.ok, true, r.detail);
+});
+
+test('product premise: a commit that touches harness and product paths is excluded', () => {
+  const mixed = { files: ['AGENTS.md', 'Source/HomeWorld/X.cpp'] };
+  const product = files(Array.from({ length: 10 }, (_, i) => `Source/HomeWorld/P${i}.cpp`));
+  const r = premiseProduct([mixed, ...product]);
+  assert.match(r.detail, /0 harness \/ 10 product/);
+  assert.match(r.detail, /1 mixed excluded/);
+  assert.strictEqual(r.ok, true, r.detail);
 });
 
 /* --------------------------------------------------------------- premise 1 */
@@ -96,15 +122,15 @@ test('product premise: a commit that only edits Docs is not harness work', () =>
   // classifier called them harness, the fitness check would keep reporting a
   // harness crisis while the team shipped the sprint - a false alarm, which is
   // the failure mode that makes a gate get ignored.
-  const commits = [
-    'docs(taste): round 2 resolved',
-    'docs(art): pipeline research',
-    'feat: conversion behaviour test',
-    'feat: tame transitions test',
-    'docs: sprint 01 plan',
-    'fix: shrine proportion',
-  ];
+  const commits = files([
+    'Docs/28_TASTE_GATES.md',
+    'docs/art/pipeline.md',
+    'Docs/context/SESSION_START.md',
+    ...Array.from({ length: 9 }, (_, i) => `Docs/sprint/P${i}.md`),
+  ]);
   const r = premiseProduct(commits);
+  assert.strictEqual(r.skipped, undefined);
+  assert.match(r.detail, /0 harness \/ 12 product/);
   assert.strictEqual(r.ok, true, `docs commits are product work: ${r.detail}`);
 });
 
@@ -114,16 +140,19 @@ test('shape premise: reads the real package.json', () => {
   assert.ok(!/missing/.test(r.detail), 'no command may be reported missing');
 });
 
-test('bounds premise: a missing budget record skips rather than breaks', () => {
-  // The bounds number belongs to instruction-budget.js. This script must not
-  // recompute it and then disagree with the gate it is reporting on, so with
-  // no stored record it abstains instead of guessing.
+test('bounds premise: a missing budget record is not a pass', () => {
+  // Docs/qa/instruction_budget.json is not in the tree. The old premise skipped
+  // and still returned ok, which is "could not measure" reported as a pass.
   const r = premiseBounds();
-  if (r.skipped) {
-    assert.strictEqual(r.ok, true, 'skipped is not broken');
-  } else {
-    assert.strictEqual(typeof r.detail, 'string');
-  }
+  const measured = budget.measure();
+  assert.ok(!r.skipped, 'a missing JSON record must not skip');
+  assert.match(r.detail, new RegExp(`${measured.total} instruction lines`));
+  assert.strictEqual(r.ok, measured.total <= budget.TOTAL_HIGH_WATER);
+});
+
+test('purposefulness: a non-empty file does not claim a recent disagreement', () => {
+  const r = premisePurposeful();
+  if (r.ok) assert.match(r.detail, /does not prove a recent disagreement/);
 });
 
 /* --------------------------------------------------- out-of-bounds ledger */

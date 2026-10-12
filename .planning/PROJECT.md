@@ -2,9 +2,9 @@
 
 ## What This Is
 
-HomeWorld is an Unreal Engine **5.8** open-world / World Partition game client (theme: "Love as Epic Quest"). Act 1 centers a lone wanderer (explore → fight → build). The repo is a **brownfield** UE project plus Conductor/swarm ops and DevHarness tooling.
+HomeWorld is an Unreal Engine **5.8** game. Product vision is `Docs/VISION_BOARD.md`. `Docs/` and `docs/` are one directory. The repo is a **brownfield** UE project plus Conductor/swarm ops and DevHarness tooling.
 
-GSD on this host provides **planning scaffolding only**. Live product phase authority remains the Co outer loop: `swarm/PHASE_BOARD.md` and Lead-named bites.
+GSD on this host provides **planning scaffolding only**. Live product phase authority remains `swarm/PHASE_BOARD.md` and Lead-named bites. Cursor is the GSD host as of 2026-10-12. The OpenCode install stays in `.opencode` until that host is no longer needed.
 
 ## Core Value
 
@@ -33,18 +33,18 @@ Ship a playable, evidence-gated vertical slice on UE 5.8 without inventing produ
 
 ## Context
 
-- Entry: `START_HERE.md`, `AGENTS.md`, `HOMEWORLD_MASTER_PROMPT.md`
-- Product canon: `Docs/` (capital D)
-- Engineering: `docs/` (lowercase)
-- Live ball: Conductor — harness idle until Lead names next bite (`swarm/PHASE_BOARD.md`)
-- Code: `Source/HomeWorld/` C++ programmatic-by-default; Blueprint content-only
+- Entry: `START_HERE.md`, `AGENTS.md`
+- Product vision: `Docs/VISION_BOARD.md`
+- `Docs/` and `docs/` are one directory
+- Live ball: `swarm/PHASE_BOARD.md` — no product phase until a bite is named
+- Code: `Source/HomeWorld/` C++ for gameplay; Blueprint for content
 
 ## Constraints
 
 - **Engine**: UE 5.8 only
 - **Platform**: PC + Steam Early Access
 - **Host**: DESKTOP-21CT3H0 Conductor parent for Shell/MCP/PIE
-- **GSD**: `.opencode/` stays untracked; `planning.commit_docs: false`
+- **GSD**: Cursor host (`~/.cursor`, core 1.16.0). `.opencode/` stays untracked. `planning.commit_docs: false`
 - **Co-outer**: Product Acts only from PHASE_BOARD / Lead-named bites
 
 ## Key Decisions
@@ -57,4 +57,4 @@ Ship a playable, evidence-gated vertical slice on UE 5.8 without inventing produ
 | CAP/EA DROPPED | Lead 2026-09-27 | Locked on PHASE_BOARD |
 
 ---
-*Last updated: 2026-09-28 after GSD onboard (manual fallback — opencode hung)*
+*Last updated: 2026-10-12 — Cursor is the GSD host. GSD-3 stays idle.*

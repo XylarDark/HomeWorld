@@ -13,17 +13,17 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-09-28)
+See: .planning/PROJECT.md (updated 2026-10-12)
 
-**Core value:** Playable UE 5.8 slice; product scope only from Co PHASE_BOARD / Lead
-**Current focus:** GSD-3 Idle await Lead — onboard health complete; ball Conductor
+**Core value:** Playable UE 5.8 slice. Product scope comes from `Docs/VISION_BOARD.md` and `swarm/PHASE_BOARD.md`.
+**Current focus:** GSD-3 Idle — Cursor host installed; no product phase
 
 ## Current Position
 
-Phase: GSD-3 of GSD-3 (Idle await Lead)
+Phase: GSD-3 of GSD-3 (Idle)
 Plan: none (intentionally empty product queue)
-Status: Onboard healthy — ready for Conductor; **not** ready to execute invent product Acts
-Last activity: 2026-09-28 — GSD `/gsd-onboard` brownfield (manual artifact path after opencode hang)
+Status: Cursor GSD 1.16.0 is installed. Do not execute a product phase.
+Last activity: 2026-10-12 — Cursor host install. OpenCode tree left in place.
 
 Progress: [##########------] ~75% of host scaffolding (product queue empty by design)
 
@@ -50,7 +50,8 @@ Progress: [##########------] ~75% of host scaffolding (product queue empty by de
 - Map codebase first → ingest useful docs by reference → new-project with Co-outer constraint
 - `docs/SPEC_AND_PLAN.md` is process guidance (plan-first), not a product ADR — cited in CONTEXT, not turned into invent MUSTs
 - opencode `mimo-v2.6-flash-free` hung with no `.planning/` output — fallback: sequential map + templates
-- `planning.commit_docs: false` — do not auto-commit; `.opencode/` remains `??` untracked
+- `planning.commit_docs: false` — do not auto-commit
+- 2026-10-12: Cursor is the GSD host (`~/.cursor`, core 1.16.0). OpenCode `.opencode/` left in place.
 
 ### Pending Todos
 
@@ -67,4 +68,4 @@ None from onboard. Next product work: **only** if Lead names a bite on PHASE_BOA
 - Pin tip noted on board: `0a27306` (DET)
 
 ---
-*State updated: 2026-09-28 after GSD onboard*
+*State updated: 2026-10-12 — Cursor host. GSD-3 idle.*

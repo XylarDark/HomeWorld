@@ -172,23 +172,17 @@ function premiseShape() {
 }
 
 /**
- * Premise 2 - BOUNDS. Reuses the instruction-budget number rather than
- * recomputing it, so this script cannot disagree with the gate it reports on.
+ * Premise 2 - BOUNDS. Calls instruction-budget.measure() so a missing
+ * Docs/qa/instruction_budget.json cannot skip this premise into a pass.
+ * The total is the same number the budget gate uses, so the two cannot disagree.
  */
 function premiseBounds() {
-  const budget = readJson('Docs/qa/instruction_budget.json');
-  if (!budget) {
-    return {
-      ok: true,
-      skipped: true,
-      detail: 'no stored budget record; the instruction-budget gate owns this number',
-    };
-  }
-  const total = budget.total ?? budget.lines ?? null;
-  const ceiling = budget.ceiling ?? 3000;
-  if (total === null) return { ok: true, detail: 'budget record has no total', skipped: true };
+  const budget = require('./instruction-budget');
+  const measured = budget.measure();
+  const total = measured.total;
+  const ceiling = budget.TOTAL_HIGH_WATER;
   return {
-    ok: total <= ceiling,
+    ok: typeof total === 'number' && total <= ceiling,
     detail: `${total} instruction lines against a ${ceiling} ceiling`,
   };
 }
@@ -205,7 +199,7 @@ function premisePurposeful() {
   return {
     ok: disagreement > 0,
     detail: disagreement
-      ? `${disagreement} lines in DISAGREEMENTS.md`
+      ? `${disagreement} lines in DISAGREEMENTS.md; a non-empty file does not prove a recent disagreement`
       : 'no disagreements recorded - either nothing was questioned, or nothing was written down',
   };
 }
@@ -214,14 +208,55 @@ function premisePurposeful() {
  * Premise 4 - PRODUCT. Docs/36 §5 writes the escape hatch down so it can be
  * believed. Harness commits vs product commits over a recent window. The
  * contract's success condition is that this ratio has INVERTED from 24:8.
+ *
+ * Classification is by paths, not by a `(harness)` subject. A subject with no
+ * scope still counts when the files are the harness. A commit that touches both
+ * sides is mixed and is left out of both counts. The window stays 60 commits.
  */
+const HARNESS_FILES = new Set([
+  'scripts/harness-fitness.js',
+  'scripts/instruction-budget.js',
+  'Content/Python/check_session_start.py',
+]);
+
+function normalizePath(file) {
+  return String(file).replace(/\\/g, '/');
+}
+
+function isHarnessPath(file) {
+  const n = normalizePath(file);
+  if (n === 'AGENTS.md' || n.endsWith('/AGENTS.md')) return true;
+  if (n.startsWith('.cursor/') || n.includes('/.cursor/')) return true;
+  if (n.startsWith('.agents/') || n.includes('/.agents/')) return true;
+  return HARNESS_FILES.has(n);
+}
+
+function isProductPath(file) {
+  const n = normalizePath(file);
+  if (n === 'Content/Python/check_session_start.py') return false;
+  return n.startsWith('Source/') || n.includes('/Source/') || n.startsWith('Content/') || n.includes('/Content/');
+}
+
+function classifyCommit(files) {
+  const list = Array.isArray(files) ? files : [];
+  if (list.length === 0) return 'empty';
+  const harness = list.some(isHarnessPath);
+  const product = list.some(isProductPath);
+  if (harness && product) return 'mixed';
+  if (harness) return 'harness';
+  return 'product';
+}
+
 function premiseProduct(commits) {
-  const harness = /^(feat|fix|test|chore|refactor|docs|ci)\(harness\)|^docs\(harness\)/;
   let harnessCommits = 0;
   let productCommits = 0;
-  for (const subject of commits) {
-    if (harness.test(subject)) harnessCommits += 1;
-    else productCommits += 1;
+  let mixed = 0;
+  for (const commit of commits) {
+    const files = commit && Array.isArray(commit.files) ? commit.files : [];
+    const kind = classifyCommit(files);
+    if (kind === 'harness') harnessCommits += 1;
+    else if (kind === 'product') productCommits += 1;
+    else if (kind === 'mixed') mixed += 1;
   }
   const total = harnessCommits + productCommits;
   if (total < 10) {
@@ -232,11 +267,26 @@ function premiseProduct(commits) {
     };
   }
   const pct = Math.round((harnessCommits / total) * 100);
-  // 20% is the midpoint between the old 24:8 (75% harness) and an inverted ratio.
   return {
     ok: harnessCommits <= productCommits,
-    detail: `${harnessCommits} harness / ${productCommits} product over ${total} commits (${pct}% harness)`,
+    detail: `${harnessCommits} harness / ${productCommits} product over ${total} commits (${pct}% harness); ${mixed} mixed excluded`,
   };
+}
+
+function recentCommits(n = 60) {
+  const lines = gitLines(['log', '-n', String(n), '--name-only', '--pretty=format:COMMIT %s']);
+  const commits = [];
+  let current = null;
+  for (const line of lines) {
+    if (line.startsWith('COMMIT ')) {
+      if (current) commits.push(current);
+      current = { subject: line.slice('COMMIT '.length), files: [] };
+    } else if (current) {
+      current.files.push(line);
+    }
+  }
+  if (current) commits.push(current);
+  return commits;
 }
 
 /* -------------------------------------------------------------------- main */
@@ -261,7 +311,7 @@ function main() {
     process.exit(0);
   }
 
-  const commits = gitLines(['log', '--oneline', '-n', '60', '--format=%s']);
+  const commits = recentCommits(60);
   const premises = [
     ['shape', premiseShape()],
     ['bounds', premiseBounds()],
@@ -315,6 +365,8 @@ module.exports = {
   premiseBounds,
   premisePurposeful,
   premiseProduct,
+  classifyCommit,
+  recentCommits,
   recordOutOfBounds,
   readJson,
 };
