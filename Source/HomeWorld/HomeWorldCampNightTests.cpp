@@ -53,7 +53,7 @@ namespace HomeWorldCampNightTest
 	 * A spirit-formed character with a stealth component.
 	 *
 	 * Spirit form is not set directly. It is earned the way a player earns it - night, plus
-	 * the bed gate, plus the rune - so these tests exercise the real path into the camp verb
+	 * the bed gate - so these tests exercise the real path into the camp verb
 	 * rather than a state that gameplay could never reach.
 	 */
 	struct FScopedSpirit

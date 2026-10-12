@@ -189,7 +189,7 @@ def test_parse_report_reports_which_tests_ran():
             "tests": [
                 {"fullTestPath": "HomeWorld.T0.NodeGate.AllBeatNodeTagsAreInteractable",
                  "state": "Success"},
-                {"fullTestPath": "HomeWorld.T0.M9.BothGatesGrantSpirit", "state": "Success"},
+                {"fullTestPath": "HomeWorld.T0.M11.BedAtNightGrantsSpirit", "state": "Success"},
             ],
         }
         with open(os.path.join(tmp, "index.json"), "w", encoding="utf-8") as handle:

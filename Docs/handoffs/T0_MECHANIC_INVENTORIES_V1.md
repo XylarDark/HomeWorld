@@ -45,7 +45,7 @@ Lead can stamp `APPROVE-T0-MECHANIC-INV` from **§ Priority + § Inventories + �
 |------|---|------|-----|-----------|
 | **P0** | 9 | Homeworld night w/o bed: no spirit; day abilities off | **Partial** | Critical: `ApplyFormForPhase` auto-spirit violates T0 `TOD_NIGHT_HOME`; gates #11 law |
 | **P1** | 2 | Kettle + herbs → tea → sprint | **N** | Zero path |
-| **P1** | 7 | Rune unlock before bed→spirit | **N** | Zero path; unlocks #11 |
+| **P1** | 7 | Rune unlock before bed→spirit | **Superseded 2026-10-09** | Rune removed; unlocks nothing. Do not author `NODE_RUNE` |
 | **P1** | 8 | Day camp cartoon eject | **N** | Zero path; defines `EJECT_HOME` |
 | **P1** | 10 | Planetside night boot home | **N** | Reuses `EJECT_HOME` after #8 |
 | **P1** | 14 | Camp night: avoid 1 guard; soothe 2 sleepers | **N** | Zero soothe/guard/sleeper |
@@ -53,7 +53,7 @@ Lead can stamp `APPROVE-T0-MECHANIC-INV` from **§ Priority + § Inventories + �
 | **P2** | 3 | Plant given herb | Partial | Link to #12 |
 | **P2** | 4 | Equip backpack → inventory | Partial | Equip gate |
 | **P2** | 6 | Collect herb seeds in field | Partial | Field nodes |
-| **P2** | 11 | Bed → spirit (night planetside gate) | Partial | Depends P0+#7 |
+| **P2** | 11 | Bed → spirit (night planetside gate) | Partial | Depends P0 (bed alone; rune removed) |
 | **P2** | 12 | Nurture planted herb (spirit) | Partial | Depends #3 |
 | **P2** | 13 | Home portal → camp portal (spirit) | Partial | Camp portal missing |
 | — | 5 | Glider → field | **Y** | **Out of scope** this packet |
@@ -64,7 +64,7 @@ Lead can stamp `APPROVE-T0-MECHANIC-INV` from **§ Priority + § Inventories + �
 
 | Topic | Layer | Decision (inventory, not API invent) |
 |-------|-------|--------------------------------------|
-| Form / sleep / rune gate (#9, #7, #11) | **B** (+ **A** contract) | Deep module: callers see `FORM_BODY` / `FORM_SPIRIT` via **named gates** (bed + rune + location policy). Hide phase auto-spirit. Do not add a second form service. |
+| Form / sleep gate (#9, #11; #7 superseded 2026-10-09) | **B** (+ **A** contract) | Deep module: callers see `FORM_BODY` / `FORM_SPIRIT` via **named gates** (bed + location policy; rune removed). Hide phase auto-spirit. Do not add a second form service. |
 | Day eject + planetside night boot (#8, #10) | **A** + **B** | One **eject-to-home** quantum reusing FALLBACK glide homeward — not soft-kidnap, not convert stub, not a second transit stack. |
 | Camp portal (#13) | **B** | Extend shrine-portal pair pattern (`GP_Portal*`) with `NODE_PORTAL_CAMP` — do not invent a parallel portal subsystem. |
 | Bigger planetsides | **A/C/E** | Keep transit/load stream/WP-ready; no WP contract invent in these bites. Failed load → degrade via eject/home, not hang. |
@@ -111,12 +111,12 @@ Each row: **Expected (T0)** · **Found (gap)** · **Arrange** · **DONE-WHEN** �
 
 | Field | Value |
 |-------|-------|
-| **Labels** | `NODE_RUNE` · `TOD_DAY` · `FORM_BODY` |
-| **Expected** | Day rune unlock **before** bed→spirit works |
-| **Found** | **CORRECTED 2026-10-02 — this row previously read `Found: rune = 0 hits`, which was false.** `SetRuneGateUnlocked` ("T0 #7: unlock/clear rune gate (no spirit until sleep gate also granted)") is declared on `AHomeWorldCharacter`, and spirit form is now two-gated, so rune is load-bearing rather than absent. Exercised by `HomeWorld.T0.M9.BothGatesGrantSpirit` (both gates) and `.M9.NightWithoutGatesStaysBody` (neither). **Still unbuilt:** no dedicated `NODE_RUNE` actor in any `.umap`.  **Gate fixed and on main (`031e711`, verified 2026-10-02):** `ActorHasInteractableComponent` now admits the fourteen `NODE_*` beat-node tags. Verified red-to-green against a build rather than asserted: before the fix, a fresh build reported `NodeGate.AllBeatNodeTagsAreInteractable` **Fail** with 14 tag-row errors and `RuneAndBackpackBeatsFireFromTaggedProps` **Fail** with 4; after it, the full `HomeWorld.T0` group runs **19/19 Success, 0 errors, exit 0** against a DLL proven newer than every source under test. An earlier version of this sentence said the fix was parked on `keep/interact-gate` and that neither fix nor tests were verified; both halves were true when written and are now superseded. **What that does and does not close:** the gate no longer blocks this beat, so a placed prop is now reachable and placing it is worth doing. It does not close the beat - the remaining blockers listed above still stand, and a passing gate test is not a playtest. |
-| **Arrange** | Day field path · `NODE_RUNE` · unlock flag persisted |
-| **DONE-WHEN** | Without unlock: bed cannot grant spirit planetside night; with unlock: #11 may proceed. Prove `NODE_RUNE` |
-| **Depends** | Required by #11 |
+| **Labels** | `NODE_RUNE` (removed — do not author) · `TOD_DAY` · `FORM_BODY` |
+| **Expected** | **SUPERSEDED 2026-10-09 — the rune is removed. The bed alone grants the form. Do not author `NODE_RUNE`.** |
+| **Found** | **SUPERSEDED 2026-10-09 — the rune is removed (sitting rule; `Docs/CANON_MAP.md` §3 #7). The bed alone grants the form; the two-gate law below is historic. Code already lives this: `HomeWorldCharacter.h:331` ("The rune latch is not required").** **CORRECTED 2026-10-02 — this row previously read `Found: rune = 0 hits`, which was false.** `SetRuneGateUnlocked` ("T0 #7: unlock/clear rune gate (no spirit until sleep gate also granted)") is declared on `AHomeWorldCharacter`, and spirit form is now two-gated, so rune is load-bearing rather than absent. Exercised by `HomeWorld.T0.M9.BothGatesGrantSpirit` (both gates) and `.M9.NightWithoutGatesStaysBody` (neither). **Still unbuilt:** no dedicated `NODE_RUNE` actor in any `.umap`.  **Gate fixed and on main (`031e711`, verified 2026-10-02):** `ActorHasInteractableComponent` now admits the fourteen `NODE_*` beat-node tags. Verified red-to-green against a build rather than asserted: before the fix, a fresh build reported `NodeGate.AllBeatNodeTagsAreInteractable` **Fail** with 14 tag-row errors and `RuneAndBackpackBeatsFireFromTaggedProps` **Fail** with 4; after it, the full `HomeWorld.T0` group runs **19/19 Success, 0 errors, exit 0** against a DLL proven newer than every source under test. An earlier version of this sentence said the fix was parked on `keep/interact-gate` and that neither fix nor tests were verified; both halves were true when written and are now superseded. **What that does and does not close:** the gate no longer blocks this beat, so a placed prop is now reachable and placing it is worth doing. It does not close the beat - the remaining blockers listed above still stand, and a passing gate test is not a playtest. |
+| **Arrange** | — (superseded; no rune path, no flag) |
+| **DONE-WHEN** | Superseded. No `NODE_RUNE` prove. #11 proceeds on bed alone. |
+| **Depends** | None (was: required by #11) |
 | **Anti** | Do not grant spirit on phase alone |
 
 ### P1 — #8 Day camp cartoon eject — **Partial (logic), unbuilt (level)**
@@ -222,7 +222,7 @@ was a must with nothing behind it — you could skip it and the night still reso
 | | |
 |---|---|
 | **Day** | Stumble on the camp in daylight → companion taken → ejected home. **This is what #8 was for.** It had no cause until now |
-| **Night** | Spirit form (bed **and** rune) → travel down → **spirit-stealth** to the guards → ease their suffering so they go to **bed** → free the companion |
+| **Night** | Spirit form (bed alone; rune removed 2026-10-09) → travel down → **spirit-stealth** to the guards → ease their suffering so they go to **bed** → free the companion |
 | **The lock** | Freeing the companion requires **both sleepers ASLEEP**. Not "converted" — asleep, in bed |
 | **Anti** | Freeing them with either sleeper awake is a **fail**, exactly as killing a sleeper is. No force option |
 
@@ -418,12 +418,12 @@ reading a **moving** safe zone rather than a fixed one.
 
 | Field | Value |
 |-------|-------|
-| **Labels** | `NODE_BED` · `TOD_NIGHT_SPIRIT` · `FORM_SPIRIT` · `CAM_T0_BED` · `NODE_RUNE` |
-| **Expected** | After rune: bed → spirit as **night planetside** gate |
-| **Found** | **CORRECTED 2026-10-02 — this row previously read `Found: Bed→Night→spirit works; not rune-gated; spirit also on Dusk/Night w/o bed`, which was stale on both counts.** Both named gates are now declared on `AHomeWorldCharacter` — `bSpiritFormGate`, `bSpiritSleepGate` (`T0 #11: bed/sleep gate. Cleared on Day/Dawn`) — written only by `TryGrantSpiritSleepGate`, and form no longer follows phase alone. `HomeWorld.T0.M9.BothGatesGrantSpirit` (rune + bed → spirit) and `.M9.DayClearsSleepGate` (Day clears it) hold it; `.M9.NightWithoutGatesStaysBody` is this row's Anti ("phase-only spirit ≠ pass") and passes. **Still unbuilt:** no `NODE_BED` in any `.umap`, so the bed half has never run for real.  **Gate fixed and on main (`031e711`, verified 2026-10-02):** `ActorHasInteractableComponent` now admits the fourteen `NODE_*` beat-node tags. Verified red-to-green against a build rather than asserted: before the fix, a fresh build reported `NodeGate.AllBeatNodeTagsAreInteractable` **Fail** with 14 tag-row errors and `RuneAndBackpackBeatsFireFromTaggedProps` **Fail** with 4; after it, the full `HomeWorld.T0` group runs **19/19 Success, 0 errors, exit 0** against a DLL proven newer than every source under test. An earlier version of this sentence said the fix was parked on `keep/interact-gate` and that neither fix nor tests were verified; both halves were true when written and are now superseded. **What that does and does not close:** the gate no longer blocks this beat, so a placed prop is now reachable and placing it is worth doing. It does not close the beat - the remaining blockers listed above still stand, and a passing gate test is not a playtest. |
-| **Arrange** | Homestead bed · rune unlocked · prove blocked without rune / without bed |
-| **DONE-WHEN** | Spirit planetside night **only** via bed after rune; #9 still holds w/o bed. Cam `CAM_T0_BED` |
-| **Depends** | **#9 + #7** |
+| **Labels** | `NODE_BED` · `TOD_NIGHT_SPIRIT` · `FORM_SPIRIT` · `CAM_T0_BED` (rune removed 2026-10-09 — no `NODE_RUNE`) |
+| **Expected** | Bed alone: sleep at the bed → spirit as **night planetside** gate. No rune, no second gate. |
+| **Found** | **AMENDED 2026-10-12 — bed alone grants the form (rune removed 2026-10-09). The two-gate law below is historic; `HomeWorld.T0.M9.BothGatesGrantSpirit` is renamed/replaced by a bed-only grants-spirit test on re-run (see DONE-WHEN).** **CORRECTED 2026-10-02 — this row previously read `Found: Bed→Night→spirit works; not rune-gated; spirit also on Dusk/Night w/o bed`, which was stale on both counts.** Both named gates are now declared on `AHomeWorldCharacter` — `bSpiritFormGate`, `bSpiritSleepGate` (`T0 #11: bed/sleep gate. Cleared on Day/Dawn`) — written only by `TryGrantSpiritSleepGate`, and form no longer follows phase alone. `HomeWorld.T0.M9.BothGatesGrantSpirit` (rune + bed → spirit) and `.M9.DayClearsSleepGate` (Day clears it) hold it; `.M9.NightWithoutGatesStaysBody` is this row's Anti ("phase-only spirit ≠ pass") and passes. **Still unbuilt:** no `NODE_BED` in any `.umap`, so the bed half has never run for real.  **Gate fixed and on main (`031e711`, verified 2026-10-02):** `ActorHasInteractableComponent` now admits the fourteen `NODE_*` beat-node tags. Verified red-to-green against a build rather than asserted: before the fix, a fresh build reported `NodeGate.AllBeatNodeTagsAreInteractable` **Fail** with 14 tag-row errors and `RuneAndBackpackBeatsFireFromTaggedProps` **Fail** with 4; after it, the full `HomeWorld.T0` group runs **19/19 Success, 0 errors, exit 0** against a DLL proven newer than every source under test. An earlier version of this sentence said the fix was parked on `keep/interact-gate` and that neither fix nor tests were verified; both halves were true when written and are now superseded. **What that does and does not close:** the gate no longer blocks this beat, so a placed prop is now reachable and placing it is worth doing. It does not close the beat - the remaining blockers listed above still stand, and a passing gate test is not a playtest. |
+| **Arrange** | Homestead bed · prove blocked without bed (no rune gate) |
+| **DONE-WHEN** | Spirit planetside night **only** via bed alone; #9 still holds w/o bed. Re-run M9 as bed-alone (BothGates→bed-only grants-spirit). Cam `CAM_T0_BED` |
+| **Depends** | **#9** |
 | **Anti** | Phase-only spirit ≠ pass |
 
 ### P2 — #12 Nurture planted herb (spirit) — Partial
@@ -472,7 +472,7 @@ One unknown per bite. Host: OpenCode ≡ Cursor until tokens restored.
 | 12 | `T0_M13_PORTAL_CAMP` | 13 | Home→camp spirit portal |
 | 13 | `T0_M14_GUARD_SOOTHE` | 14 | Avoid 1 + soothe 2 |
 
-Conductor may reorder within P0→P1→P2 for DESKTOP risk; do **not** open #11 before #9+#7, or #10 before #8, or #12 before #3, or #14 before spirit reach (#11, prefer #13).
+Conductor may reorder within P0→P1→P2 for DESKTOP risk; do **not** open #11 before #9, or #10 before #8, or #12 before #3, or #14 before spirit reach (#11, prefer #13).
 
 ---
 
@@ -506,7 +506,7 @@ Cheats: existing only when a bite DONE-WHEN names them (`Docs/30`).
 
 - [ ] Covers all N (5) + Partial (8); excludes full Y #5
 - [ ] P0 = #9 sleep/form gate called out
-- [ ] Bite order respects deps (#9+#7→#11 · #8→#10 · #3→#12 · spirit→#14)
+- [ ] Bite order respects deps (#9→#11 · #8→#10 · #3→#12 · spirit→#14)
 - [ ] No WP API invent; A–E cite only
 - [ ] Stamp: `APPROVE-T0-MECHANIC-INV`
 

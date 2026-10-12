@@ -117,6 +117,18 @@ One fact proposed at a time, one yes from Luke, one write into this file only �
 
 - Lead 2026-10-08: in the sleeper's lair the tamed bull may be ridden along the body. The ride stays field-only everywhere else. `Docs/context/BOSS_LAIR_LOCK.md`.
 
+## Transit table (Lead 2026-10-12; pre/post first coil)
+
+One table for night transit. The GDD portal-both-ways line is superseded by the 2026-10-07 shrine lines below it; the post-coil column adds the Vision-board stone upgrade. Sleep still grants the form; the stone is travel only.
+
+| Leg | Pre-first-coil | Post-first-coil |
+|---|---|---|
+| Day down (homestead → field) | Steered glide only | Same |
+| Night out (homestead → camp/field) | Spirit glide, same steering as day; shrine is home-only | Same, plus the homestead stone works either form, day and night |
+| Night back (camp/field → home) | Shrine portal, spirit only | Homestead stone, either form |
+| Cave mouth, first entry | Glider or spirit only | Shrine return unlocked after the first coil |
+| Bull | Ridden through the shrine, then walked to the barn | Same; shrine will not bring it back to the cave after the rise |
+
 ## Left empty on purpose
 
 - Polish-gate ids and gate-chain order: (empty)

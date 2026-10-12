@@ -12,12 +12,12 @@
 #include "HomeWorldTimeOfDaySubsystem.h"
 
 /**
- * Behaviour tests for the day-gated T0 beats: #7 rune, #2 kettle, #3 plant, #4 backpack,
+ * Behaviour tests for the day-gated T0 beats: #2 kettle, #3 plant, #4 backpack,
  * #6 field gather.
  *
  * WHAT THIS FILE IS, AND WHAT IT DELIBERATELY IS NOT
  *
- * Each of these five beats has a two-sided law in T0_MECHANIC_INVENTORIES_V1. The positive
+ * Each of these four beats has a two-sided law in T0_MECHANIC_INVENTORIES_V1. The positive
  * side - "with the prop placed and the right resource in hand, the beat completes" - needs
  * a placed actor in a world and a real interact trace. The negative side needs nothing: each
  * gate REFUSES under a wrong phase or the wrong form, and the refusal is the law. That is
@@ -55,11 +55,11 @@
 // night and beat node gate tests. See that header for why teardown must have one home.
 
 /**
- * The shared day-gate law, checked on all five beats at once.
+ * The shared day-gate law, checked on all four beats at once.
  *
  * Every one of these props is a DAY prop. Using one at Dusk or Night, or while in spirit
- * form, must be refused. Testing them as one table rather than five near-identical tests is
- * deliberate: the repetition across five call sites is exactly the thing a refactor would
+ * form, must be refused. Testing them as one table rather than four near-identical tests is
+ * deliberate: the repetition across four call sites is exactly the thing a refactor would
  * break in one place and not the others, and a table cannot silently lose a row.
  */
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(
