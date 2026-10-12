@@ -9,3 +9,10 @@ args = [
     "run",
     "unreal_mcp_server.py",
 ]
+
+[mcp_servers.mixar]
+command = "cmd"
+args = [
+    "/c",
+    'C:\dev\HomeWorld\Tools\mixar-mcp.cmd',
+]
