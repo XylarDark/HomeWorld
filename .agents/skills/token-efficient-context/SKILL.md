@@ -1,64 +1,10 @@
 ---
 name: token-efficient-context
-description: Use when planning a multi-file change, starting an agent or Composer run, or when the user asks about tokens, credits, context, @codebase, MCP bloat, or editing rules, skills, AGENTS.md, or .cursorignore.
+description: Use when the user asks about tokens, credits, context cost, MCP bloat, or editing rules, skills, AGENTS.md, or .cursorignore.
 ---
 
 # Token-efficient context
 
-## Context hygiene
+Past about 60k tokens, write a handoff and start a fresh chat. Do not carry the thread.
 
-- New chat per distinct task. Do not carry a debug thread into a feature build.
-- Prefer `@file` / `@symbol` over `@codebase`. Broad retrieval is for "where is X".
-- Close files that are not part of the task.
-- Do not paste full folders or whole-repo dumps.
-- Trim tool output: failures and the relevant slice, not full passing logs. No
-  opaque dumps. Prefer stable identifiers and counts over pasted blobs.
-
-## Stay in the smart zone
-
-Quality falls off as the window fills. Treat roughly 60k tokens as the ceiling for
-implementation work.
-
-- Split work across agents or chats instead of growing one thread.
-- Start a new chat with a short written summary; do not drag a debug thread into a
-  feature build.
-- Use the IDE's HANDOFF skill (`ce-handoff`) when the next session needs a focused
-  packet. Do not duplicate that skill here.
-- Compact or compress markdown you are about to re-feed, rather than pasting it whole.
-- A 1M-class window is for the initial research pass on a large tree; write the
-  findings to a file and leave the window. A 200k-class window is for implementation
-  and needs a tight harness (this skill, `AGENTS.md`, the files in play).
-
-## Model routing
-
-Advice to the human and agent, not a hard pin.
-
-**First** classify mode + model class per
-[swarm-mode-routing](../swarm-mode-routing/SKILL.md) /
-[SWARM_MODE_ROUTING.md](../../../docs/human-use/SWARM_MODE_ROUTING.md)
-(`Mode:` then `ModelClass:` lines). Research backing:
-[SWARM_ROUTING_RESEARCH.md](../../../docs/Automation/SWARM_ROUTING_RESEARCH.md).
-
-- Default: Auto / Composer-class for routine edits, tests, boilerplate, Tab.
-- Mid: Sonnet-class for most planning and mid-hard work.
-- Frontier (Opus / GPT-5-class): architecture, subtle bugs, dense multi-file reasoning, AD taste only. Switch back after that turn.
-- Explore: fast/cheap subagents for parallel search (isolated context).
-- Plan with a stronger model, implement with a cheaper coding model, verify separately. Do not leave a frontier model selected for a rename.
-
-## Rules and skills budget
-
-- Never add `alwaysApply: true` rules. If a fact is always true, put one or two lines in the host AGENTS.md instead.
-- Keep skill descriptions one or two sentences. The body is free until matched.
-- Do not duplicate this skill's content into language rules.
-
-## MCP / tools
-
-- Only enable MCP servers this project actually uses. Every connected server re-sends its manifest each turn.
-- Do not add MCP servers in this template by default.
-- Do not add a new MCP server or an ad-hoc helper script to “have a tool.”
-  Consolidate into an existing tool, or ask — a new shared util is a human decision.
-
-## When to skip this skill
-
-- Single-file typo, comment, or rename.
-- User said "just do it".
+Model class is in [docs/human-use/SWARM_MODE_ROUTING.md](../../../docs/human-use/SWARM_MODE_ROUTING.md). Plan with a stronger model, implement with a cheaper one, and verify separately.

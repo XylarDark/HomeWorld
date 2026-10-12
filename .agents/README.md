@@ -15,9 +15,9 @@ Default DET adopters copy the **six** core skills. HomeWorld also keeps small HW
 | ----- | ------- |
 | [agent-workflow](skills/agent-workflow/SKILL.md) | Any end-to-end coding task in the repo |
 | [multi-agent-collaboration](skills/multi-agent-collaboration/SKILL.md) | More than one agent or person in the same tree |
-| [plan-first](skills/plan-first/SKILL.md) | Multi-file or architectural work |
+| [plan-first](skills/plan-first/SKILL.md) | The user asked to save a plan |
 | [secure-coding](skills/secure-coding/SKILL.md) | Input, secrets, auth, or dependencies |
-| [token-efficient-context](skills/token-efficient-context/SKILL.md) | Planning multi-file work, agent runs, tokens, MCP, or editing rules/skills/AGENTS.md |
+| [token-efficient-context](skills/token-efficient-context/SKILL.md) | Tokens, credits, context cost, MCP, or editing rules/skills/AGENTS.md |
 | [verification-evidence](skills/verification-evidence/SKILL.md) | Audits, health checks, guard tests, CI gates |
 | [swarm-mode-routing](skills/swarm-mode-routing/SKILL.md) | HW-local: first-hop swarm / NON-SWARM mode detect |
 | [taste-gate](skills/taste-gate/SKILL.md) | HW-local: lookdev / “does this feel right” (single discoverable home) |
@@ -29,7 +29,7 @@ Default DET adopters copy the **six** core skills. HomeWorld also keeps small HW
 
 Only these project skills stay on the cursor scan path after the budget Do:
 
-- Live: `pcg-validate`, `ue58-api-check`, `automation-gap-solutions`
+- Live: `pcg-validate`, `automation-gap-solutions`. `ue58-api-check` is a pointer to `.agents/skills/ue58-api-check`
 - Tombstone: `ue57-api-check` (prefer ue58)
 - Retired WAVE F: `demo-map-setup`, `homestead-setup` deleted
 

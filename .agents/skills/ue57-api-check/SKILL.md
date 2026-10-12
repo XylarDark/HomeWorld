@@ -1,6 +1,7 @@
 ---
 name: ue57-api-check
-description: Tombstone — use ue58-api-check for live Unreal work; UE 5.7 docs only under docs/UE/UE57_*.
+description: Tombstone. Use ue58-api-check for live Unreal work. UE 5.7 docs only under docs/UE/UE57_*.
+disable-model-invocation: true
 ---
 
 # UE 5.7 API check (tombstone)
