@@ -17,6 +17,7 @@
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerState.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "Math/RotationMatrix.h"
 #include "HomeWorldAttributeSet.h"
 #include "HomeWorldGameMode.h"
@@ -54,6 +55,10 @@
 #include "Sound/SoundBase.h"
 #include "TimerManager.h"
 #include "EngineUtils.h"
+#include "HAL/FileManager.h"
+#include "Misc/Paths.h"
+#include "Animation/AnimSingleNodeInstance.h"
+#include "Animation/AnimSequence.h"
 
 /**
  * The T0 beat-node tag contract, declared once.
@@ -227,6 +232,18 @@ void AHomeWorldCharacter::BeginPlay()
 		Movement->RotationRate = FRotator(0.0f, RotationRateYaw, 0.0f);
 	}
 	// Place character on ground if we hit something below (avoids floating when Player Start is slightly high).
+	const bool bSizeTest = UGameplayStatics::GetCurrentLevelName(this).Contains(TEXT("SizeTest"));
+	if (bSizeTest)
+	{
+		if (UCapsuleComponent* SizeCapsule = GetCapsuleComponent())
+		{
+			SizeCapsule->SetCapsuleSize(42.0f, 100.0f);
+		}
+		if (SoftBoundsComponent)
+		{
+			SoftBoundsComponent->bBoundsEnabled = false;
+		}
+	}
 	if (UWorld* World = GetWorld())
 	{
 		UCapsuleComponent* Capsule = GetCapsuleComponent();
@@ -243,10 +260,49 @@ void AHomeWorldCharacter::BeginPlay()
 			}
 		}
 	}
+	if (bSizeTest)
+	{
+		// Rest pose: right arm is +X and the walk strides on Y, so the face is mesh -Y.
+		// +90 turns that face onto actor +X. -90 and 0 both walk sideways to the face.
+		MeshForwardYawOffset = 90.0f;
+		if (USkeletalMesh* Coat = LoadObject<USkeletalMesh>(nullptr, TEXT("/Game/HomeWorld/Meshes/SizeTest/SK_Size_Player.SK_Size_Player")))
+		{
+			if (USkeletalMeshComponent* CoatMesh = GetMesh())
+			{
+				CoatMesh->SetAnimInstanceClass(nullptr);
+				CoatMesh->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+				CoatMesh->SetSkeletalMeshAsset(Coat);
+				CoatMesh->SetRelativeLocation(FVector(0.0f, 0.0f, -100.0f));
+				CoatMesh->SetEnableAnimation(true);
+				CoatMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			}
+		}
+		if (AController* Controlled = GetController())
+		{
+			Controlled->SetControlRotation(FRotator(0.0f, GetActorRotation().Yaw, 0.0f));
+		}
+		if (!SizeTestWisp)
+		{
+			SizeTestWisp = NewObject<UStaticMeshComponent>(this, TEXT("SizeTestShoulderWisp"));
+			if (UStaticMesh* Sphere = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Sphere.Sphere")))
+			{
+				SizeTestWisp->SetStaticMesh(Sphere);
+			}
+			SizeTestWisp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			SizeTestWisp->SetRelativeScale3D(FVector(0.25f));
+			SizeTestWisp->SetupAttachment(GetRootComponent());
+			SizeTestWisp->RegisterComponent();
+			SizeTestWisp->SetRelativeLocation(FVector(10.0f, 45.0f, 55.0f));
+		}
+	}
 	USkeletalMeshComponent* MeshComp = GetMesh();
 	if (MeshComp)
 	{
 		MeshComp->SetRelativeRotation(FRotator(0.0f, MeshForwardYawOffset, 0.0f));
+		if (bSizeTest)
+		{
+			MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		}
 	}
 
 	if (UWorld* World = GetWorld())
@@ -276,7 +332,7 @@ void AHomeWorldCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	TickSpiritSickness(DeltaTime);
 
-	if (SoftBoundsComponent)
+	if (SoftBoundsComponent && !UGameplayStatics::GetCurrentLevelName(this).Contains(TEXT("SizeTest")))
 	{
 		SoftBoundsComponent->bBoundsEnabled = !IsFallbackGliding() && !IsCloudDescentActive();
 	}
@@ -304,11 +360,69 @@ void AHomeWorldCharacter::Tick(float DeltaTime)
 			AddMovementInput(Direction, 1.0f);
 		}
 	}
+	if (UGameplayStatics::GetCurrentLevelName(this).Contains(TEXT("SizeTest")))
+	{
+		UpdateSizeTestWalk();
+		UpdateSizeTestWisp(DeltaTime);
+	}
+}
+
+void AHomeWorldCharacter::UpdateSizeTestWisp(float DeltaTime)
+{
+	if (!SizeTestWisp)
+	{
+		return;
+	}
+	const FVector Want = GetActorLocation()
+		+ GetActorForwardVector() * 10.0f
+		+ GetActorRightVector() * 45.0f
+		+ FVector(0.0f, 0.0f, 55.0f);
+	SizeTestWisp->SetWorldLocation(FMath::VInterpTo(SizeTestWisp->GetComponentLocation(), Want, DeltaTime, 6.0f));
+}
+
+void AHomeWorldCharacter::UpdateSizeTestWalk()
+{
+	USkeletalMeshComponent* CoatBody = GetMesh();
+	if (!CoatBody)
+	{
+		return;
+	}
+	const bool bMoving = GetVelocity().SizeSquared2D() > 100.0f;
+	if (bMoving == bSizeTestWalkPlaying)
+	{
+		return;
+	}
+	bSizeTestWalkPlaying = bMoving;
+	CoatBody->SetEnableAnimation(true);
+	CoatBody->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+	if (!bMoving)
+	{
+		CoatBody->Stop();
+		if (UAnimSingleNodeInstance* Node = CoatBody->GetSingleNodeInstance())
+		{
+			Node->SetAnimationAsset(nullptr);
+			Node->SetRootMotionMode(ERootMotionMode::IgnoreRootMotion);
+		}
+		return;
+	}
+	if (UAnimSequence* Walk = LoadObject<UAnimSequence>(nullptr, TEXT("/Game/HomeWorld/Meshes/SizeTest/SK_Size_Player_Anim.SK_Size_Player_Anim")))
+	{
+		Walk->bEnableRootMotion = false;
+		CoatBody->PlayAnimation(Walk, true);
+		if (UAnimSingleNodeInstance* Node = CoatBody->GetSingleNodeInstance())
+		{
+			Node->SetRootMotionMode(ERootMotionMode::IgnoreRootMotion);
+		}
+	}
 }
 
 void AHomeWorldCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
+	if (UGameplayStatics::GetCurrentLevelName(this).Contains(TEXT("SizeTest")))
+	{
+		NewController->SetControlRotation(FRotator(0.0f, GetActorRotation().Yaw, 0.0f));
+	}
 	if (AbilitySystemComponent)
 	{
 		// Server and owning client: owner = this. Simulated proxy: owner = PlayerState for replication.
@@ -385,6 +499,10 @@ void AHomeWorldCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	{
 		PlaceAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/HomeWorld/Input/IA_Place.IA_Place"));
 	}
+	if (!JumpAction)
+	{
+		JumpAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/HomeWorld/Input/IA_Jump.IA_Jump"));
+	}
 	if (!AstralDeathAction)
 	{
 		AstralDeathAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/HomeWorld/Input/IA_AstralDeath.IA_AstralDeath"));
@@ -428,6 +546,12 @@ void AHomeWorldCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	}
 
 	EnhancedInput->BindAction(LookAction, ETriggerEvent::Triggered, this, &AHomeWorldCharacter::Look);
+
+	if (JumpAction)
+	{
+		EnhancedInput->BindAction(JumpAction, ETriggerEvent::Started, this, &AHomeWorldCharacter::OnJumpStarted);
+		EnhancedInput->BindAction(JumpAction, ETriggerEvent::Completed, this, &AHomeWorldCharacter::OnJumpCompleted);
+	}
 
 	if (PrimaryAttackAction && PrimaryAttackAbilityClass)
 	{
@@ -613,6 +737,16 @@ void AHomeWorldCharacter::OnSprintCompleted(const FInputActionValue& Value)
 	{
 		TraversalComponent->SetSprintHeld(false);
 	}
+}
+
+void AHomeWorldCharacter::OnJumpStarted(const FInputActionValue& Value)
+{
+	Jump();
+}
+
+void AHomeWorldCharacter::OnJumpCompleted(const FInputActionValue& Value)
+{
+	StopJumping();
 }
 
 void AHomeWorldCharacter::Jump()

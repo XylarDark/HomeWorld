@@ -7,7 +7,7 @@ Reviewed, versioned summary of Lead/process taste and locked decisions.
 **Updates:** Stage in `Saved/taste_profile_session.json`; promote only after Lead/AD confirm or `APPROVE *`.  
 **Precedence:** latest Lead chat / `APPROVE *` > this file > never invent.
 
-**Last promoted:** 2026-10-11 (shape lock — sharper than round)
+**Last promoted:** 2026-10-11 (size-test sittings, in order, with a verify between them)
 
 ---
 
@@ -46,6 +46,7 @@ Reviewed, versioned summary of Lead/process taste and locked decisions.
 
 | Date | Phrase / source | Outcome |
 |------|-----------------|--------|
+| 2026-10-11 | Size-test next, chat | **Sittings in order.** Facing and the garden sheet, then a walkable greybox interior, then Space on the existing jump and a greybox shoulder sphere. A verify script between sittings. The cottage sheet, texture off, stays the next art file. |
 | 2026-10-11 | Lead, chat | **Authorship.** A new character or asset is designed by the developer and written into context before a picture. Generate that design from scratch. `VisionBoard/KeyArt/homestead_dusk_baseline.jpg` is a fit check after that design exists. It is not the design source, and an older asset is not either. A smooth blob fails. A crystal-cut outline fails. Meters stay in `Docs/art/SCALE.md`. |
 | 2026-10-01 | `TG-ZONE-VOCABULARY` 4/4 (2 rounds) | **Env-art prototype: `spirit` is first**, and the greybox **authors the see-through gap** in real topology (four posts + lintel, ~200 tris) — a proportion metric cannot satisfy spirit's signature, which was the reason to ask. Correct the existing `SM_Shrine_Homestead` / `SM_Shrine_Return` assemblies **in place**; do not author rival shrines beside them. **No `Content/` promote** — drafts only per Docs/20. |
 | 2026-10-01 | `TG-ZONE-VOCABULARY` 2/2 | **Env-art lock LIFTED**, scoped to one greybox prototype. `PHASE_BOARD` Current phase = "harness idle; env-art prototype is the live ball"; the 2026-09-27 lock is superseded, not deleted. **The 7 mechanic families ARE the zone-type vocabulary.** `EBiomeType` (Desert/Forest/Marsh/Canyon) drops to terrain dressing + weather and leaves the art vocabulary; `EPlanetoidAlignment` is not a zone type. Neither C++ enum is deleted. Art bible §8 keys off family. |

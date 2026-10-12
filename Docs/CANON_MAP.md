@@ -91,6 +91,8 @@ README is left intact as history.
 | **Still generation standard** | `Docs/art/STILL_GENERATION_STANDARD.md` | Catalog. Sheet before scene. Front first. |
 | **ComfyUI player test** | `Docs/art/COMFY.md` | One front sheet. Dev weight is a test, not a Steam mesh. |
 | **Size test tasks** | `Docs/art/SIZE_TEST_TASKS.md` | Player block, cottage, pines, bear, bull, then a free walk clip. |
+| **Scene setup** | `Docs/context/SCENE_SETUP.md` | Practices before a test scene is placed. Each map adds `Docs/level/<Map>_CONTEXT.md`. |
+| **Size-test scene** | `Docs/level/L_SizeTest_CONTEXT.md` | Floor top, who is on the island, play setup. Coordinates in `Docs/level/L_SizeTest_METRICS.md`. |
 | **Greybox T0 catalog** | `Docs/art/GREYBOX_T0_CATALOG.md` | Generate, Kontext edit, TripoSR mesh, character walk. Interviews that block an asset. |
 | Ten master materials | `Docs/02_MATERIAL_SHEET.md` | **LOCKED** |
 | Per-domain locked bibles | `Docs/DAYNIGHT_BIBLE.md` · `Docs/MOVEMENT_BIBLE.md` · `Docs/HOMESTEAD_BIBLE.md` · `Docs/COMBAT_DREAM_BIBLE.md` · `Docs/GATHER_CRAFT_BIBLE.md` · `Docs/SPIRIT_STEALTH_BIBLE.md` · `Docs/CAMERA_BIBLE.md` | **LOCKED** — all seven |

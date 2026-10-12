@@ -673,6 +673,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Input|Abilities")
 	TObjectPtr<UInputAction> SpiritShieldAction;
 
+	/** Ground hop. Uses the existing jump speed on the traversal component. */
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UInputAction> JumpAction;
+
 	/** Called when Health attribute changes (GAS). When Health <= 0 at night, invokes RequestAstralDeath so lethal astral damage triggers dawn + respawn. */
 	void OnHealthChanged(const struct FOnAttributeChangeData& Data);
 
@@ -712,6 +716,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Mesh", meta = (ClampMin = "-180.0", ClampMax = "180.0"))
 	float MeshForwardYawOffset = -90.0f;
 
+	void UpdateSizeTestWalk();
+	void UpdateSizeTestWisp(float DeltaTime);
+	bool bSizeTestWalkPlaying = false;
+
+	/** Greybox shoulder follower on SizeTest only. */
+	UPROPERTY(Transient)
+	TObjectPtr<UStaticMeshComponent> SizeTestWisp;
+
 	/** Capsule radius (cm). Human-sized default; override in Blueprint for different characters. */
 	UPROPERTY(EditDefaultsOnly, Category = "Movement", meta = (ClampMin = "1.0", ClampMax = "200.0"))
 	float CapsuleRadius = 42.0f;
@@ -750,6 +762,8 @@ protected:
 	void OnSpiritShieldTriggered(const FInputActionValue& Value);
 	void OnSprintStarted(const FInputActionValue& Value);
 	void OnSprintCompleted(const FInputActionValue& Value);
+	void OnJumpStarted(const FInputActionValue& Value);
+	void OnJumpCompleted(const FInputActionValue& Value);
 
 	void ApplyFormForPhase(EHomeWorldTimeOfDayPhase Phase);
 	void NoteStillOutPastDawn(EHomeWorldTimeOfDayPhase Phase);
