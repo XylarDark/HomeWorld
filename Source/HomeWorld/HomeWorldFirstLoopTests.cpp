@@ -161,6 +161,9 @@ bool FWoundTakesOneNightWispTest::RunTest(const FString& Parameters)
 	TestEqual(TEXT("the wisp is spent"), Character->GetCarriedCloudWisps(), 0);
 	TestTrue(TEXT("wound reads healed"), Character->IsHomesteadWoundHealed());
 	TestTrue(TEXT("healed wound wisps follow"), Character->GetFollowingWoundWispCount() > 0);
+	TestTrue(TEXT("the heal leaves a pull star"), Character->HasPullStar());
+	TestTrue(TEXT("the pull star spends on one crossing"), Character->TrySpendPullStar());
+	TestFalse(TEXT("the pull star is spent"), Character->HasPullStar());
 
 	Scope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Day);
 	Character->SyncFormWithTimeOfDay();
@@ -358,6 +361,45 @@ bool FFamilyPlacesAndHintTest::RunTest(const FString& Parameters)
 	TestTrue(TEXT("second pick"), Character->TryPickGardenHerb());
 	TestTrue(TEXT("second tea"), Character->TryBrewNodeKettleTea());
 	TestEqual(TEXT("the hint does not become a second line"), Character->GetFamilyHint(), FString(TEXT("toward the edge")));
+
+	AHomeWorldCharacter* East = HomeWorldTestWorld::SpawnCharacter(Scope.World);
+	if (!TestNotNull(TEXT("east character"), East))
+	{
+		return false;
+	}
+	East->SyncFormWithTimeOfDay();
+	TestTrue(TEXT("east pick"), East->TryPickGardenHerbFromEast(true));
+	TestTrue(TEXT("east tea"), East->TryBrewNodeKettleTea());
+	TestFalse(TEXT("east tea leaves the hint asleep"), East->HasFamilyHintFired());
+	TestTrue(TEXT("east tea opens the porch crawl"), East->IsPorchCrawlOpen());
+	TestTrue(TEXT("east tea still gates the sprint"), East->IsTeaSprintGateActive());
+	Scope.World->BeginPlay();
+	Scope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Night);
+	East->NotifyPocketNight();
+	TestTrue(TEXT("night wakes the hint the day left asleep"), East->HasFamilyHintFired());
+
+	TestTrue(TEXT("the player fits the porch gap"), Character->DoesBodyFitPorchGap(42.f));
+	TestFalse(TEXT("a guard does not fit the porch gap"), Character->DoesBodyFitPorchGap(80.f));
+
+	TestTrue(TEXT("wind landing"), Character->ChooseFieldLanding(true));
+	TestTrue(TEXT("wind is awake"), Character->IsWindColumnAwake());
+	TestFalse(TEXT("the bull path sleeps"), Character->IsBullPathAwake());
+	TestFalse(TEXT("a second landing does not replace the first"), Character->ChooseFieldLanding(false));
+	Scope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Day);
+	Scope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Night);
+	Character->NotifyPocketNight();
+	TestTrue(TEXT("night wakes the bull path"), Character->IsBullPathAwake());
+
+	Character->ArriveAtCamp();
+	const int32 Pacing = Character->GetPacingGuard();
+	TestTrue(TEXT("one guard is pacing"), Pacing >= 0 && Pacing <= 2);
+	Character->ArriveAtCamp();
+	TestEqual(TEXT("the pacing guard stays"), Character->GetPacingGuard(), Pacing);
+	const int32 Other = (Pacing + 1) % 3;
+	TestTrue(TEXT("easing the pacing guard opens that gap"), Character->RecordGuardEased(Pacing));
+	TestTrue(TEXT("easing the next guard opens a different gap"), Character->RecordGuardEased(Other));
+	TestTrue(TEXT("the first gap stays open"), Character->IsGuardGapOpen(Pacing));
+	TestTrue(TEXT("the second gap is open"), Character->IsGuardGapOpen(Other));
 	return true;
 }
 

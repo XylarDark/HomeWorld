@@ -48,6 +48,10 @@ This is the production step. Vision says how the thing is shaped. The lists say 
 
 Other doors are not start reads. Open one only when it is named, or when the question shows it is needed.
 
+## Write a fact once
+
+Vision stays in `Docs/VISION_BOARD.md`. A shared scene practice stays in `Docs/context/SCENE_SETUP.md`. A fact about one map stays in that map's context file under Docs/level. Coordinates stay in that map's metrics file. A room layout stays in that map's room plan. Another file points at the owner. It does not restate the fact.
+
 Before the first edit, run `git status --short` once. No checkout: say so. A remote write names the branch. Stop and report uncommitted changes you did not make.
 
 ## Interview

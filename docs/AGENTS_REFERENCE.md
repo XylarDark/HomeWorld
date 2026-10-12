@@ -5,17 +5,14 @@
 | Path | Role |
 |------|------|
 | **[START_HERE.md](START_HERE.md)** | Swarm entry — Human Lead gates, Conductor boot |
-| **[Docs/VISION_BOARD.md](Docs/VISION_BOARD.md)** | **Current product canon — read before scoping.** Family is present from the start; the prototype includes the camp rescue; day is for gathering, and night is for tending in spirit form. `VisionBoard/Core/VISION.md` keeps theme and long-horizon direction. The March docs under `VisionBoard/MVP/` are outside prototype scope. |
+| **[Docs/VISION_BOARD.md](Docs/VISION_BOARD.md)** | **Product canon. Read before scoping. Do not restate it.** Theme and the long horizon stay in `VisionBoard/Core/VISION.md`. `VisionBoard/MVP/` is outside prototype scope. |
 | **[Docs/CANON_MAP.md](Docs/CANON_MAP.md)** | **Start here when you need to find the answer to something.** A topic-keyed index over this tree, machine-checked so it cannot go stale |
-| **`Docs/`** | **Product canon** — GDD, art bible, vision board, `canon/` pillars, LOCKED bibles, WAVE handoffs ([Docs/README.md](Docs/README.md)) |
-| **`docs/`** | **UE 5.8 engineering** — setup, PCG, automation, known errors ([docs/README_ENGINEERING.md](docs/README_ENGINEERING.md)) |
+| **`Docs/` and `docs/`** | **One directory.** Product files and engineering files are separated by the canon map and by subdirectory, not by spelling. Index: [Docs/README.md](Docs/README.md). Engineering index: [docs/README_ENGINEERING.md](docs/README_ENGINEERING.md). |
 
 > **`Docs/` and `docs/` are ONE directory on this machine, not two trees.** Windows is
-> case-insensitive: both spellings enumerate the same 441 files. The product/engineering split
-> above is an **editorial convention carried by subdirectory prefixes** (`docs/Setup/`,
-> `docs/Automation/`, `docs/UE/`, `docs/PCG/` for engineering; `Docs/canon/`, `Docs/0*`, the
-> LOCKED bibles for product), **not** by the top-level folder name. Either casing resolves in
-> any cross-reference. Do not try to sync between them — there is nothing to sync. Settled by
+> case-insensitive: both spellings enumerate the same files. Subdirectories separate topics.
+> Prototype vision is only `Docs/VISION_BOARD.md`. Either casing resolves in a cross-reference.
+> Do not sync the two spellings. There is nothing to sync. Settled by
 > Lead 2026-10-02; [DEC-0029](Docs/decisions/AGENT_DECISIONS.md#dec-0029).
 
 **Do not treat** [VisionBoard/MVP/](VisionBoard/MVP/README.md) or [docs/Automation/AGENT_COMPANY.md](docs/Automation/AGENT_COMPANY.md) as MVP product canon — see quarantine pointers there. Long-horizon theme/stack: [VisionBoard/Core/VISION.md](VisionBoard/Core/VISION.md).
@@ -156,7 +153,7 @@ Exact invocations the agent should use (see [docs/SETUP.md](docs/SETUP.md) and [
 - **Never:** Commit secrets, API keys, or `.env`; edit `Plugins/UnrealMCP/` or `Saved/` (they are not project code); change engine version (UE 5.8 only) or target platform (PC + Steam Early Access) without a team decision.
 - **Agent-owned, decide then log** (was "Ask first" before 2026-10-01): CI/schema changes (`.github/workflows/`, JSON schema files), adding or upgrading dependencies, and broad refactors that touch many modules. Record each in [Docs/decisions/AGENT_DECISIONS.md](Docs/decisions/AGENT_DECISIONS.md) with the alternative you rejected. See [OWNERSHIP.md](docs/human-use/OWNERSHIP.md#ownership-map).
 - **Game content:** Automation preserves existing content; create-if-missing, update-in-place. See [.cursor/rules/18-game-development-principles.mdc](.cursor/rules/18-game-development-principles.mdc).
-- **Combat and night encounters:** Current product direction is in [Docs/VISION_BOARD.md](Docs/VISION_BOARD.md): spirit encounters heal, calm, or convert; they do not kill. Encounter mechanics and broader long-horizon combat systems require their own current specification. Theme and future-facing campaign direction are in [VisionBoard/Core/VISION.md](VisionBoard/Core/VISION.md).
+- **Combat and night encounters:** Read [Docs/VISION_BOARD.md](Docs/VISION_BOARD.md). Do not restate it. Theme and the long horizon are in [VisionBoard/Core/VISION.md](VisionBoard/Core/VISION.md).
 
 ## Testing
 

@@ -9,8 +9,12 @@ any bottom is more than 2 cm off. See Docs/context/SCENE_SETUP.md practices
 import json
 import math
 import os
+import sys
 
 import unreal
+
+sys.path.insert(0, os.path.dirname(__file__))
+import cabin_shell
 
 ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", ".."))
 METRICS = os.path.join(ROOT, "Docs", "level", "L_SizeTest_METRICS.md")
@@ -99,11 +103,26 @@ def set_collision(actor):
     component = actor.get_component_by_class(unreal.StaticMeshComponent)
     if component is None:
         return
-    if passable(actor.get_actor_label()):
+    label = actor.get_actor_label()
+    if label.startswith("SM_Size_HerbBed") or label == "SM_Size_Kettle":
+        component.set_collision_enabled(unreal.CollisionEnabled.QUERY_ONLY)
+        component.set_collision_response_to_all_channels(unreal.CollisionResponseType.ECR_IGNORE)
+        component.set_collision_response_to_channel(
+            unreal.CollisionChannel.ECC_VISIBILITY, unreal.CollisionResponseType.ECR_BLOCK
+        )
+        return
+    if passable(label):
         component.set_collision_enabled(unreal.CollisionEnabled.NO_COLLISION)
         return
     component.set_collision_profile_name("BlockAll")
     component.set_collision_enabled(unreal.CollisionEnabled.QUERY_AND_PHYSICS)
+
+
+def tag_actor(actor, tag, extra=None):
+    tags = [unreal.Name(tag)]
+    if extra:
+        tags.append(unreal.Name(extra))
+    actor.set_editor_property("tags", tags)
 
 
 def set_slab_collision():
@@ -149,43 +168,56 @@ def box_elem(cx, cy, cz, sx, sy, sz):
     return elem
 
 
-def set_cottage_collision():
-    """Walls and a south door. The porch stays open. The pad is the floor."""
-    mesh = unreal.EditorAssetLibrary.load_asset(MESH_DIR + "/SM_Size_Cottage")
-    if mesh is None:
-        unreal.log("scene_placement: FAIL no cottage mesh")
+def spawn_cabin_walls():
+    """The hollow cabin is one cube mesh per wall. The old solid cottage does not block."""
+    cottage = by_label().get("SM_Size_Cottage")
+    if cottage is None:
+        unreal.log("scene_placement: FAIL no cottage actor")
         return False
-    body = mesh.get_editor_property("body_setup")
-    if body is None:
-        unreal.log("scene_placement: FAIL cottage has no body setup")
+    component = cottage.get_component_by_class(unreal.StaticMeshComponent)
+    if component is not None:
+        component.set_visibility(False)
+        component.set_collision_enabled(unreal.CollisionEnabled.NO_COLLISION)
+    cottage.set_is_temporarily_hidden_in_editor(True)
+    cube = unreal.EditorAssetLibrary.load_asset("/Engine/BasicShapes/Cube")
+    if cube is None:
+        unreal.log("scene_placement: FAIL no engine cube")
         return False
-    body.set_editor_property("collision_trace_flag", unreal.CollisionTraceFlag.CTF_USE_SIMPLE_AS_COMPLEX)
-    # House front is 2 m north of the porch lip. Door gap is 1.4 m so the 84 cm capsule fits.
-    door_half = 70.0
-    wall_y = -395.0
-    boxes = [
-        box_elem(-280.0, wall_y, 250.0, 420.0, 40.0, 500.0),
-        box_elem(280.0, wall_y, 250.0, 420.0, 40.0, 500.0),
-        box_elem(0.0, wall_y, 400.0, door_half * 2.0, 40.0, 200.0),
-        box_elem(0.0, 550.0, 250.0, 980.0, 40.0, 500.0),
-        box_elem(-470.0, 87.5, 250.0, 40.0, 965.0, 500.0),
-        box_elem(470.0, 87.5, 250.0, 40.0, 965.0, 500.0),
-    ]
-    agg = body.get_editor_property("agg_geom")
-    agg.set_editor_property("box_elems", boxes)
-    agg.set_editor_property("sphere_elems", [])
-    agg.set_editor_property("sphyl_elems", [])
-    agg.set_editor_property("convex_elems", [])
-    body.set_editor_property("agg_geom", agg)
-    unreal.EditorAssetLibrary.save_loaded_asset(mesh)
-    actor = by_label().get("SM_Size_Cottage")
-    if actor is not None:
-        component = actor.get_component_by_class(unreal.StaticMeshComponent)
-        if component is not None:
-            component.set_static_mesh(None)
-            component.set_static_mesh(mesh)
-            set_collision(actor)
-    unreal.log("scene_placement: cottage wall collision, south door open")
+    for actor in list(actors()):
+        if actor.get_actor_label().startswith("CabinWall_") or actor.get_actor_label().startswith("PorchCrawl_"):
+            destroy(actor)
+    origin = cottage.get_actor_location()
+    boxes = list(cabin_shell.BOXES) + list(cabin_shell.CRAWL_WALLS)
+    labels = ["CabinWall_%02d" % index for index in range(len(cabin_shell.BOXES))]
+    labels.append("PorchCrawl_West")
+    labels.append("PorchCrawl_East")
+    for index, box in enumerate(boxes):
+        cx, cy, cz, sx, sy, sz = box
+        actor = unreal.EditorLevelLibrary.spawn_actor_from_class(
+            unreal.StaticMeshActor,
+            unreal.Vector(origin.x + cx, origin.y + cy, origin.z + cz),
+            yaw_rotator(0),
+        )
+        actor.set_actor_label(labels[index])
+        actor.set_actor_scale3d(unreal.Vector(sx / 100.0, sy / 100.0, sz / 100.0))
+        wall = actor.get_component_by_class(unreal.StaticMeshComponent)
+        wall.set_static_mesh(cube)
+        wall.set_collision_profile_name("BlockAll")
+        wall.set_collision_enabled(unreal.CollisionEnabled.QUERY_AND_PHYSICS)
+    fx, fy, fz, fsx, fsy, fsz = cabin_shell.FILLER
+    filler = unreal.EditorLevelLibrary.spawn_actor_from_class(
+        unreal.StaticMeshActor,
+        unreal.Vector(origin.x + fx, origin.y + fy, origin.z + fz),
+        yaw_rotator(0),
+    )
+    filler.set_actor_label("PorchCrawl_Fill")
+    filler.set_actor_scale3d(unreal.Vector(fsx / 100.0, fsy / 100.0, fsz / 100.0))
+    fill_mesh = filler.get_component_by_class(unreal.StaticMeshComponent)
+    fill_mesh.set_static_mesh(cube)
+    fill_mesh.set_collision_profile_name("BlockAll")
+    fill_mesh.set_collision_enabled(unreal.CollisionEnabled.QUERY_AND_PHYSICS)
+    tag_actor(filler, "NODE_PORCH_CRAWL")
+    unreal.log("scene_placement: cabin shell %d walls" % len(boxes))
     return True
 
 
@@ -347,7 +379,7 @@ def validate(player_actor, top):
         label = actor.get_actor_label()
         if not label.startswith("SM_Size_") or label == "SM_Size_Field" or passable(label):
             continue
-        if label == "SM_Size_Island":
+        if label == "SM_Size_Island" or label in ("SM_Size_Kettle", "SM_Size_Bed"):
             continue
         origin, extent = actor.get_actor_bounds(False)
         solids[label] = (
@@ -424,24 +456,112 @@ def garden_and_door(top):
             errors.append("%s yaw %.0f does not face the cottage" % (label, yaw))
     loc = cottage.get_actor_location()
     world = unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem).get_editor_world()
-    ignore = [other for other in actors() if other.get_actor_label() != "SM_Size_Cottage"]
+    ignore = [other for other in actors() if not other.get_actor_label().startswith("CabinWall_")]
     chest = top + 150.0
     door = trace_hit(
         world,
-        unreal.Vector(loc.x, loc.y - 700.0, chest),
-        unreal.Vector(loc.x, loc.y - 100.0, chest),
+        unreal.Vector(loc.x - 150.0, loc.y - 900.0, chest),
+        unreal.Vector(loc.x - 150.0, loc.y - 50.0, chest),
         ignore,
     )
-    if door is not None and door["label"] == "SM_Size_Cottage":
+    if door is not None and is_cabin(door["label"]):
         errors.append("south door is blocked")
     wall = trace_hit(
         world,
-        unreal.Vector(loc.x - 800.0, loc.y - 300.0, chest),
-        unreal.Vector(loc.x - 200.0, loc.y - 300.0, chest),
+        unreal.Vector(loc.x - 800.0, loc.y, chest),
+        unreal.Vector(loc.x - 200.0, loc.y, chest),
         ignore,
     )
-    if wall is None or wall["label"] != "SM_Size_Cottage":
+    if wall is None or not is_cabin(wall["label"]):
         errors.append("cottage wall does not block")
+    errors.extend(room_path(top, loc, world))
+    errors.extend(porch_gap_errors())
+    errors.extend(sheet_errors())
+    errors.extend(walk_cabin(top, loc))
+    return errors
+
+
+def is_cabin(label):
+    return label == "SM_Size_Cottage" or (label or "").startswith("CabinWall_") or (label or "").startswith("PorchCrawl_")
+
+
+def porch_gap_errors():
+    """The porch gap fits an 84 cm body and refuses a 160 cm body."""
+    west = by_label().get("PorchCrawl_West")
+    east = by_label().get("PorchCrawl_East")
+    fill = by_label().get("PorchCrawl_Fill")
+    if west is None or east is None or fill is None:
+        return ["porch crawl is missing"]
+    west_face = west.get_actor_location().x + west.get_actor_scale3d().x * 50.0
+    east_face = east.get_actor_location().x - east.get_actor_scale3d().x * 50.0
+    gap = east_face - west_face
+    if gap < 120.0 or gap > 140.0:
+        return ["porch gap %.0f cm is not a fit" % gap]
+    fill_x = fill.get_actor_location().x
+    if not (west_face < fill_x < east_face):
+        return ["porch filler is outside the gap"]
+    return []
+
+
+def sheet_errors():
+    """Every placed actor must match the metrics sheet in X, Y, and yaw."""
+    errors = []
+    for item in load_metrics()["homestead"]:
+        actor = by_label().get(item["label"])
+        if actor is None:
+            errors.append(item["label"] + " missing from the sheet")
+            continue
+        loc = actor.get_actor_location()
+        yaw = actor.get_actor_rotation().yaw
+        if abs(loc.x - item["x"] * M) > 2.0 or abs(loc.y - item["y"] * M) > 2.0:
+            errors.append("%s is off the sheet" % item["label"])
+        delta = ((yaw - float(item["yaw"]) + 180.0) % 360.0) - 180.0
+        if abs(delta) > 1.0:
+            errors.append("%s yaw %.0f is not %s" % (item["label"], yaw, item["yaw"]))
+    return errors
+
+
+def room_path(top, loc, world):
+    """The kettle stays in the kitchen, the bed in the couple room, and the capsule fits both doors."""
+    errors = []
+    kettle = by_label().get("SM_Size_Kettle")
+    bed = by_label().get("SM_Size_Bed")
+    if kettle is None:
+        return ["no kettle"]
+    if bed is None:
+        return ["no bed"]
+    spot = kettle.get_actor_location()
+    if not (loc.x + 900.0 < spot.x < loc.x + 1060.0 and loc.y - 120.0 < spot.y < loc.y + 120.0):
+        errors.append("kettle is outside the kitchen")
+    bed_loc = bed.get_actor_location()
+    if not (loc.x - 280.0 < bed_loc.x < loc.x + 40.0 and loc.y + 750.0 < bed_loc.y < loc.y + 990.0):
+        errors.append("bed is outside the couple room")
+    chest = top + 150.0
+    ignore = [other for other in actors() if not other.get_actor_label().startswith("CabinWall_")]
+    gap = trace_hit(
+        world,
+        unreal.Vector(loc.x - 150.0, loc.y - 110.0, chest),
+        unreal.Vector(loc.x + 600.0, loc.y - 110.0, chest),
+        ignore,
+    )
+    if gap is not None and is_cabin(gap["label"]):
+        errors.append("kitchen door is blocked")
+    center = top + CAPSULE_HALF
+    for name, x, y in (
+        ("south door", loc.x - 150.0, loc.y - 110.0),
+        ("kitchen door", loc.x + 600.0, loc.y - 110.0),
+    ):
+        overlapped = unreal.SystemLibrary.sphere_overlap_actors(
+            world,
+            unreal.Vector(x, y, center),
+            CAPSULE_RADIUS,
+            [unreal.ObjectTypeQuery.OBJECT_TYPE_QUERY1],
+            None,
+            [],
+        )
+        for actor in overlapped or []:
+            if is_cabin(actor.get_actor_label()):
+                errors.append(name + " traps the capsule")
     return errors
 
 
@@ -464,6 +584,74 @@ def capsule_clearance(loc, top):
             continue
         errors.append("capsule hits " + label)
     return errors
+
+
+def walk_cabin(top, loc):
+    """Sweep a 42 cm body in, through the rooms, and back out. A hit fails the save."""
+    world = unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem).get_editor_world()
+    z = top + CAPSULE_HALF
+    points = [(loc.x + x, loc.y + y, z) for x, y in cabin_shell.WALK]
+    errors = []
+    for index in range(len(points) - 1):
+        ax, ay, az = points[index]
+        bx, by, bz = points[index + 1]
+        label = body_hit(
+            world,
+            unreal.Vector(ax, ay, az),
+            unreal.Vector(bx, by, bz),
+        )
+        if label is None or label in ("SM_Size_Island", "SM_Size_Field") or label.startswith("SM_Size_Herb") or label.startswith("SM_Size_Lupine"):
+            continue
+        errors.append(
+            "walk blocked by %s from (%.0f, %.0f) to (%.0f, %.0f)"
+            % (label, ax, ay, bx, by)
+        )
+        break
+    if not errors:
+        unreal.log("scene_placement: cabin walk enter cross exit clear")
+    return errors
+
+
+def body_hit(world, start, end):
+    """A 42 cm sphere along the segment. None means the body fits."""
+    hit = None
+    try:
+        hit = unreal.SystemLibrary.sphere_trace_single(
+            world, start, end, CAPSULE_RADIUS,
+            unreal.TraceTypeQuery.TRACE_TYPE_QUERY1,
+            False, [], unreal.DrawDebugTrace.NONE, True,
+        )
+    except TypeError:
+        hit = unreal.SystemLibrary.sphere_trace_single(
+            world, start, end, CAPSULE_RADIUS,
+            unreal.TraceTypeQuery.TRACE_TYPE_QUERY1,
+            False, [], unreal.DrawDebugTrace.NONE, True,
+            unreal.LinearColor(0, 0, 0, 0),
+            unreal.LinearColor(0, 0, 0, 0),
+            0.0,
+        )
+    if hit is None or not hasattr(hit, "to_dict"):
+        return None
+    data = hit.to_dict()
+    if not data.get("blocking_hit"):
+        return None
+    actor = data.get("hit_actor")
+    return actor.get_actor_label() if actor is not None else "unknown"
+
+
+def import_cabin_shell():
+    filename = cabin_shell.write_obj(
+        os.path.join(ROOT, "AssetCreation", "SizeTest", "SM_Size_CabinShell.obj")
+    )
+    task = unreal.AssetImportTask()
+    task.filename = filename
+    task.destination_path = MESH_DIR
+    task.destination_name = "SM_Size_CabinShell"
+    task.automated = True
+    task.save = True
+    task.replace_existing = True
+    unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([task])
+    unreal.log("scene_placement: imported cabin shell")
 
 
 def import_island():
@@ -498,7 +686,13 @@ def run(import_mesh=True):
         actor = by_label().get(label)
         if actor is not None:
             set_collision(actor)
-    if not set_slab_collision() or not set_cottage_collision():
+            if label == "SM_Size_HerbBed":
+                tag_actor(actor, "NODE_GARDEN", "NODE_GARDEN_WEST")
+            elif label.startswith("SM_Size_HerbBed"):
+                tag_actor(actor, "NODE_GARDEN", "NODE_GARDEN_EAST")
+            elif label == "SM_Size_Kettle":
+                tag_actor(actor, "NODE_KETTLE")
+    if not set_slab_collision():
         return 1
     top, floor_errors = measure_floor()
     if top is None:
@@ -507,6 +701,9 @@ def run(import_mesh=True):
         unreal.log("scene_placement: not saved")
         return 1
     snap_contacts(labels, top)
+    if not spawn_cabin_walls():
+        unreal.log("scene_placement: not saved")
+        return 1
     plains = metrics["plains"]
     field = place_static(
         plains["label"], plains["mesh"], plains["x"], plains["y"], plains["z"], plains["yaw"], plains["scale"]
@@ -551,10 +748,82 @@ def check():
             player = candidate
             break
     errors.extend(validate(player, top))
+    errors.extend(space_mapping_errors())
     for error in errors:
         unreal.log("scene_placement: FAIL " + error)
     if errors:
         unreal.log("scene_placement: CHECK FAIL")
         return 1
     unreal.log("scene_placement: CHECK PASS top %.1f" % top)
+    watch_jump()
     return 0
+
+
+_jump_watch = {"phase": "idle", "handle": None, "z0": 0.0, "peak": 0.0, "elapsed": 0.0}
+
+
+def _jump_finish(message):
+    unreal.log(message)
+    handle = _jump_watch.get("handle")
+    if handle is not None:
+        unreal.unregister_slate_post_tick_callback(handle)
+        _jump_watch["handle"] = None
+    try:
+        unreal.get_editor_subsystem(unreal.LevelEditorSubsystem).editor_request_end_play()
+    except Exception:
+        pass
+    _jump_watch["phase"] = "idle"
+
+
+def _jump_tick(delta):
+    if _jump_watch["phase"] == "idle":
+        return
+    try:
+        world = unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem).get_game_world()
+        if world is None:
+            return
+        pawn = unreal.GameplayStatics.get_player_pawn(world, 0)
+        if pawn is None:
+            return
+        if _jump_watch["phase"] == "wait":
+            z0 = pawn.get_actor_location().z
+            _jump_watch["z0"] = z0
+            _jump_watch["peak"] = z0
+            pawn.jump()
+            _jump_watch["phase"] = "watch"
+            return
+        z = pawn.get_actor_location().z
+        if z > _jump_watch["peak"]:
+            _jump_watch["peak"] = z
+        _jump_watch["elapsed"] += float(delta)
+        if _jump_watch["elapsed"] < 1.0:
+            return
+        rise = _jump_watch["peak"] - _jump_watch["z0"]
+        if rise < 30.0:
+            _jump_finish("scene_placement: FAIL jump rose %.1f cm" % rise)
+        else:
+            _jump_finish("scene_placement: jump rise %.1f cm within one second" % rise)
+    except Exception as exc:
+        _jump_finish("scene_placement: FAIL jump %s" % exc)
+
+
+def space_mapping_errors():
+    """UE 5.8 reads default_key_mappings. The deprecated mappings list does not count."""
+    context = unreal.EditorAssetLibrary.load_asset("/Game/HomeWorld/Input/IMC_Default")
+    if context is None:
+        return ["no input mapping context"]
+    text = context.get_editor_property("default_key_mappings").export_text()
+    if "IA_Jump" not in text or "SpaceBar" not in text:
+        return ["Space is not in default_key_mappings"]
+    return []
+
+
+def watch_jump():
+    """Start play and require the jump Space calls to leave the ground within one second."""
+    if _jump_watch["phase"] != "idle":
+        return
+    _jump_watch["phase"] = "wait"
+    _jump_watch["elapsed"] = 0.0
+    unreal.get_editor_subsystem(unreal.LevelEditorSubsystem).editor_request_begin_play()
+    _jump_watch["handle"] = unreal.register_slate_post_tick_callback(_jump_tick)
+    unreal.log("scene_placement: jump watch started")

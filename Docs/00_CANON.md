@@ -1,5 +1,7 @@
 # Docs/00_CANON.md
 
+Prototype scope is [`Docs/VISION_BOARD.md`](VISION_BOARD.md) ([DEC-0029](decisions/AGENT_DECISIONS.md#dec-0029)). This file is the earlier MVP cut. It is not a second vision. Where they differ, the vision board wins.
+
 ## 1. Status: LOCKED (P0)
 
 ## 2. Map topology

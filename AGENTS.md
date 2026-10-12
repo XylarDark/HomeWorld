@@ -6,11 +6,11 @@ Always loaded. Detail lives in [docs/AGENTS_REFERENCE.md](docs/AGENTS_REFERENCE.
 
 | Path | Role |
 |------|------|
-| [Docs/VISION_BOARD.md](Docs/VISION_BOARD.md) | Product canon. Family is present from the start; the prototype includes the camp rescue; night is a form you become. Read before scoping. |
+| [Docs/VISION_BOARD.md](Docs/VISION_BOARD.md) | Product canon. Read it before scoping. Do not restate it. |
 | [Docs/CANON_MAP.md](Docs/CANON_MAP.md) | Topic index. Start here to find an answer. |
 | [START_HERE.md](START_HERE.md) | Swarm entry only. Default coding chats are not swarm. |
 
-`Docs/` and `docs/` are one directory on Windows (DEC-0029). Do not sync them. Do not treat `VisionBoard/MVP/` or `docs/Automation/AGENT_COMPANY.md` as product canon.
+`Docs/` and `docs/` are one directory (DEC-0029). There is no second tree. Do not sync the two spellings, and do not describe them as a split. Do not treat `VisionBoard/MVP/` or `docs/Automation/AGENT_COMPANY.md` as product canon.
 
 ## Lock
 
@@ -25,6 +25,10 @@ You cannot take responsibility for a change you cannot explain, you cannot see t
 Start every session from [Docs/context/SESSION_START.md](Docs/context/SESSION_START.md).
 
 Past ~60k tokens, write `Docs/handoffs/SESSION_HANDOFF_<slice>.md` and start a fresh chat from that file plus [docs/SESSION_SUMMARY.md](docs/SESSION_SUMMARY.md). Do not carry the transcript. One significant write at a time. Uncommitted changes you did not make: stop and report.
+
+Do not report a scene done until its verify script has logged the pass in the open editor. The rule is in [Docs/context/SCENE_SETUP.md](Docs/context/SCENE_SETUP.md).
+
+Legacy files in `Docs/handoffs/` are not a read list. Open a handoff only when this task names that file, or open the newest `SESSION_HANDOFF_*.md` when starting from a handoff. Do not search that folder for canon.
 
 ## Build
 

@@ -1,6 +1,6 @@
 # Session start flow
 
-The door as written in `Docs/context/SESSION_START.md`. This picture is not a second door. Production is `## Pick the task`: vision Shape, then the three critical-path status lines, then one room.
+The door as written in `Docs/context/SESSION_START.md`. This picture is not a second door. A fact is written once; the door names the owner. Production is `## Pick the task`: vision Shape, then the three critical-path status lines, then one room.
 
 ```mermaid
 flowchart TD

@@ -17,16 +17,15 @@ Consequences that are easy to trip over:
 
 - **Any cross-reference using the other casing still resolves.** Nothing is broken by writing
   `docs/KNOWN_ERRORS.md` in a doc that lives at `Docs/`.
-- **There is no "signed canon vs engineering" boundary on disk.** The distinction is real as an
-  *editorial convention* — product canon lives in `VisionBoard/`, `Docs/VISION_BOARD.md`,
-  `Docs/canon/`, the LOCKED bibles and `Docs/0*`; engineering lives in `docs/Setup/`,
-  `docs/Automation/`, `docs/UE/`, `docs/PCG/` — but it is enforced by naming discipline and the
-  subdirectory prefixes, **not** by the top-level folder.
+- **There is no "signed canon vs engineering" boundary on disk.** Subdirectories separate
+  topics. Prototype vision is only `Docs/VISION_BOARD.md`. `Docs/canon/` and `Docs/00_CANON.md`
+  are the earlier cut and do not restate that vision. Engineering notes live in `docs/Setup/`,
+  `docs/Automation/`, `docs/UE/`, and `docs/PCG/`. The canon map is the index.
 - **Do not try to sync between the two spellings.** There is nothing to sync.
 
 If the split is ever wanted for real, it needs a case-sensitive volume and a genuine move, plus
-a fix to every cross-reference. Recorded as an open item in `Docs/CANON_MAP.md` §7 and
-[DEC-0029](decisions/AGENT_DECISIONS.md#dec-0029).
+a fix to every cross-reference. That split is closed: this file and `AGENTS.md` both say there
+is one directory. See [DEC-0029](decisions/AGENT_DECISIONS.md#dec-0029).
 
 ## Entry points
 

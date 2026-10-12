@@ -2,7 +2,8 @@
 # Use this instead of Build-HomeWorld.bat when running autonomously so build never stalls on "Editor is open."
 #
 # Usage: From project root, .\Tools\Safe-Build.ps1 [optional: -LaunchEditorAfter]
-#   -LaunchEditorAfter: After a successful build, if Editor was closed by this script, launch it and wait for MCP port 55557 (requires UE_EDITOR set).
+#   -LaunchEditorAfter: After a successful build, if Editor was closed by this script, launch UE 5.8 and wait for MCP port 55557.
+#     A UE_EDITOR value that is not UE 5.8 is ignored. The 5.7 editor skips the 5.8 module.
 #
 # Exit code: 0 = build succeeded; non-zero = build failed (see Build-HomeWorld.log).
 
@@ -136,10 +137,16 @@ try {
         Assert-HomeWorldEditorDll -Root $ProjectRoot
         Write-SafeLog "Build succeeded."
         if ($LaunchEditorAfter -and $editorWasRunning) {
-            $ueEditor = $env:UE_EDITOR
+            $ue58 = "C:\Program Files\Epic Games\UE_5.8\Engine\Binaries\Win64\UnrealEditor.exe"
+            $ueEditor = $ue58
+            if ($env:UE_EDITOR -and ($env:UE_EDITOR -like "*UE_5.8*") -and (Test-Path -LiteralPath $env:UE_EDITOR)) {
+                $ueEditor = $env:UE_EDITOR
+            } elseif ($env:UE_EDITOR) {
+                Write-SafeLog "UE_EDITOR is not UE 5.8 ($env:UE_EDITOR). Launching $ue58."
+            }
             $uproject = Join-Path $ProjectRoot "HomeWorld.uproject"
-            if (-not $ueEditor -or -not (Test-Path -LiteralPath $ueEditor)) {
-                Write-SafeLog "Skipping LaunchEditorAfter: UE_EDITOR is not set or does not exist."
+            if (-not (Test-Path -LiteralPath $ueEditor)) {
+                Write-SafeLog "Skipping LaunchEditorAfter: UE 5.8 editor not found at $ueEditor."
             } elseif (-not (Test-Path -LiteralPath $uproject)) {
                 Write-SafeLog "Skipping LaunchEditorAfter: $uproject not found."
             } else {

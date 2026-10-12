@@ -987,3 +987,15 @@ decision, and no taste call was touched. `env.traversal_measured` remains deferr
 polish pass by the Lead, and the traversal instrument research says should be telemetry
 rather than a stopwatch is recorded in `Docs/38_AI_AGENT_PRACTICE.md` §11.5 for when that
 unblocks.
+
+---
+
+## DEC-0036 - A fact is written once
+
+**Decision:** Prototype vision stays in `Docs/VISION_BOARD.md`. A shared scene practice stays in `Docs/context/SCENE_SETUP.md`. A fact about one map stays in `Docs/level/<Map>_CONTEXT.md`. Coordinates stay in that map's metrics file. A room layout stays in that map's room plan. Other files point at the owner. They do not restate the fact.
+
+This carries out DEC-0029. `Docs/canon/FANTASY.md` had become a second loop, including a rune gate the vision board had already removed. It is now a pointer. `Docs/00_CANON.md` keeps the earlier MVP cut and says the vision board wins where they differ. `Docs/CANON_MAP.md` §7 item 3 is closed on that basis.
+
+**Rejected:** Deleting `00_CANON.md`, `Docs/canon/`, or `VisionBoard/Core/VISION.md`. The first two are the earlier cut. The third is theme and the long horizon, and it already refuses prototype scope.
+
+**Does not decide:** The words of the vision, the kept cabin plan, or which older verb still applies inside a lock. Those stay where they were.

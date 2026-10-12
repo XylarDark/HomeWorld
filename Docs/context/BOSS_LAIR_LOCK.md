@@ -6,7 +6,7 @@ Replaces the same-day sleeper-body lock. Vision board still owns the seal, the d
 
 ## The bound giant
 
-One body, many times the player. An Atlas-like sleeper, trapped in a cliffside cave. A snake wraps him and locks him in. The body is the place. The snake is the binding, not a second beast to kill.
+One body, many times the player. An Atlas-like sleeper, trapped in a cliffside cave. A snake wraps him and locks him in. The body is the place. The snake is the binding, not a second beast to kill. This is the boss pocket. The slice does not add a second boss toy.
 
 He kneels on both knees. The back-to-head slope is about 30 degrees, so the bull can ride and the player can mostly walk.
 

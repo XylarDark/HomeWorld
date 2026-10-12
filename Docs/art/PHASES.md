@@ -7,6 +7,8 @@ Say the Now line at the start of agent work, in the session header, before actin
 
 The open context is `Docs/art/transitions/CONCEPT_TO_GREYBOX.md`. Open that file and `Docs/art/SCALE.md`. Leave the other transition files closed. Scale applies from Concept on.
 
+`L_SizeTest` is the measurement scene. It is not a kept greybox. The cottage sheet, texture off, including the room plan, is still the greybox keep. LODs, Nanite, texel density, and audio stay closed until that sheet and the wake minute are kept.
+
 ## The five states
 
 | State | What is true when it is kept |

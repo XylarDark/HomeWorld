@@ -1,11 +1,11 @@
 # Docs/canon/
 
-Short normative pointer files for coding sessions. **Long sources of truth stay** in `Docs/00_CANON.md`, `Docs/01_GDD_MVP.md`, `Docs/03_*`, `Docs/21_REAP_SOW.md`.
+Pointer files for coding sessions. Prototype vision is only [`Docs/VISION_BOARD.md`](../VISION_BOARD.md). These files do not restate it. Where one of them disagrees with the vision board, the board wins ([DEC-0029](../decisions/AGENT_DECISIONS.md#dec-0029)). [`Docs/00_CANON.md`](../00_CANON.md) and [`Docs/01_GDD_MVP.md`](../01_GDD_MVP.md) are the earlier cut.
 
 | File | Role |
 |---|---|
 | [PILLARS.md](PILLARS.md) | 3–5 normative rules |
-| [FANTASY.md](FANTASY.md) | One-sentence fantasy + core loop |
+| [FANTASY.md](FANTASY.md) | Pointer to the vision board. Not a second loop. |
 | [MVP.md](MVP.md) | In / out of scope |
 | [LOOPS.md](LOOPS.md) | Moment / session / long-term |
 | [VERBS.md](VERBS.md) | Allowed actions only |

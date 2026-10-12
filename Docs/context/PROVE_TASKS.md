@@ -8,7 +8,7 @@ Lanes: critical path, later, future. One named prove at a time.
 
 | Item | Owner | Co-fork | State |
 |---|---|---|---|
-| Desktop Wake prove | Prove | Play, for the wake yard. Look, for the cabin and family stills. Luke plays it. | Waiting on Luke |
+| Wake minute on `L_SizeTest` | Prove | Play walks it. Look keeps the cottage sheet. Luke plays it. | Now |
 
 ## Later
 

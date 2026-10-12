@@ -37,6 +37,8 @@ Authoritative paths for automation: [docs/CONTENT_LAYOUT.md](../docs/CONTENT_LAY
 | `Content/HomeWorld/Abilities/GA_Dodge.uasset` | Dodge verb (placeholder GA) |
 | `Content/HomeWorld/Abilities/GA_PrimaryAttack.uasset` | Primary attack verb (placeholder GA) |
 | `Content/HomeWorld/Meshes/**` | VS_MVP dress meshes (homestead / gatherables / forest / transit) |
+| `Content/HomeWorld/Maps/SizeTest/**` | Measurement scene only. Not a promote of final art. |
+| `Content/HomeWorld/Meshes/SizeTest/**` | Measurement meshes for that scene. Not a promote of final art. |
 | `Content/HomeWorld/Materials/**` | Master materials + MPC for VS_MVP |
 | `Content/HomeWorld/Biomes/**` | Biome probe / import targets |
 | `Content/HomeWorld/Harvestables/**` | Harvestable import targets |

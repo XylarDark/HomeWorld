@@ -994,6 +994,13 @@ void AHomeWorldCharacter::Landed(const FHitResult& Hit)
 
 	// The glide CMC's ProcessLanded hands control back through SetPostLandedPhysics,
 	// so no manual restore of AirControl or GravityScale is needed here.
+	if (!bFieldLandingChosen)
+	{
+		UWorld* World = GetWorld();
+		AActor* GlideStart = FindGlideStartMarker(World);
+		const bool bWind = GlideStart && GetActorLocation().X >= GlideStart->GetActorLocation().X;
+		ChooseFieldLanding(bWind);
+	}
 	bCloudDescentActive = false;
 	bDayGlideSmokeSign = false;
 	UE_LOG(LogTemp, Log, TEXT("CLOUD_DESCENT: landed; walk control restored; carried wisps=%d"), CarriedCloudWisps);
@@ -1670,16 +1677,147 @@ bool AHomeWorldCharacter::TryBrewNodeKettleTea()
 		TEXT("NODE_KETTLE: tea brew TOD_DAY FORM_BODY (herbs->tea; gates sprint ~half day=%.0fs; not PROXY SM_ProxyKettle; not meal-BP-as-tea)"),
 		Duration);
 	ShowInteractFeedback(TEXT("NODE_KETTLE: tea ready - sprint gated ~half day"), FColor::Green);
-	if (!bFamilyHintFired)
+	const bool bEast = bHasSidedHerb && bCarriedHerbIsEast;
+	bHasSidedHerb = false;
+	if (bEast)
 	{
-		FamilyHint = TEXT("toward the edge");
-		bFamilyHintFired = true;
-		UE_LOG(LogTemp, Log, TEXT("FAMILY: hint %s"), *FamilyHint);
+		bPorchCrawlOpen = true;
+		OpenPorchCrawlActors();
+		UE_LOG(LogTemp, Log, TEXT("PORCH_CRAWL: east tea opens the gap; the edge hint waits"));
+	}
+	else
+	{
+		bEdgeFaceAwake = true;
+		if (!bFamilyHintFired)
+		{
+			FamilyHint = TEXT("toward the edge");
+			bFamilyHintFired = true;
+			UE_LOG(LogTemp, Log, TEXT("FAMILY: hint %s"), *FamilyHint);
+		}
 	}
 	return true;
 }
 
 bool AHomeWorldCharacter::TryPickGardenHerb()
+{
+	return TryPickGardenHerbFromEast(false);
+}
+
+bool AHomeWorldCharacter::DoesBodyFitPorchGap(float RadiusCm) const
+{
+	return RadiusCm > 0.f && RadiusCm * 2.f <= 130.f;
+}
+
+bool AHomeWorldCharacter::ChooseFieldLanding(bool bWind)
+{
+	if (bFieldLandingChosen)
+	{
+		return false;
+	}
+	bFieldLandingChosen = true;
+	if (bWind)
+	{
+		bWindColumnAwake = true;
+		UE_LOG(LogTemp, Log, TEXT("FIELD_LANDING: wind column awake; the bull path sleeps"));
+	}
+	else
+	{
+		bBullPathAwake = true;
+		UE_LOG(LogTemp, Log, TEXT("FIELD_LANDING: bull path awake; the wind column sleeps"));
+	}
+	return true;
+}
+
+void AHomeWorldCharacter::ArriveAtCamp()
+{
+	if (bCampArrived)
+	{
+		return;
+	}
+	bCampArrived = true;
+	PacingGuard = FMath::RandHelper(3);
+	UE_LOG(LogTemp, Log, TEXT("CAMP: guard %d is pacing"), PacingGuard);
+}
+
+bool AHomeWorldCharacter::RecordGuardEased(int32 Ordinal)
+{
+	if (Ordinal < 0 || Ordinal > 2 || bGuardGapOpen[Ordinal])
+	{
+		return false;
+	}
+	bGuardGapOpen[Ordinal] = true;
+	UE_LOG(LogTemp, Log, TEXT("CAMP: guard %d gap open"), Ordinal);
+	return true;
+}
+
+bool AHomeWorldCharacter::IsGuardGapOpen(int32 Ordinal) const
+{
+	return Ordinal >= 0 && Ordinal <= 2 && bGuardGapOpen[Ordinal];
+}
+
+bool AHomeWorldCharacter::TrySpendPullStar()
+{
+	if (!bPullStarHeld)
+	{
+		return false;
+	}
+	bPullStarHeld = false;
+	LaunchCharacter(GetActorForwardVector() * 600.f + FVector(0.f, 0.f, 200.f), true, true);
+	UE_LOG(LogTemp, Log, TEXT("PULL_STAR: spent on one crossing"));
+	return true;
+}
+
+void AHomeWorldCharacter::OpenPorchCrawlActors()
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+	for (TActorIterator<AActor> It(World); It; ++It)
+	{
+		if (!It->ActorHasTag(FName(TEXT("NODE_PORCH_CRAWL"))))
+		{
+			continue;
+		}
+		It->SetActorHiddenInGame(true);
+		It->SetActorEnableCollision(false);
+	}
+}
+
+void AHomeWorldCharacter::NotifyPocketNight()
+{
+	WakeUnpickedPocketFace();
+}
+
+void AHomeWorldCharacter::WakeUnpickedPocketFace()
+{
+	if (bEdgeFaceAwake && !bPorchCrawlOpen)
+	{
+		bPorchCrawlOpen = true;
+		OpenPorchCrawlActors();
+		UE_LOG(LogTemp, Log, TEXT("PORCH_CRAWL: night opens the gap the day left asleep"));
+	}
+	else if (bPorchCrawlOpen && !bFamilyHintFired)
+	{
+		FamilyHint = TEXT("toward the edge");
+		bFamilyHintFired = true;
+		bEdgeFaceAwake = true;
+		UE_LOG(LogTemp, Log, TEXT("FAMILY: night hint %s"), *FamilyHint);
+	}
+	if (bWindColumnAwake && !bBullPathAwake)
+	{
+		bBullPathAwake = true;
+		UE_LOG(LogTemp, Log, TEXT("FIELD_LANDING: night wakes the bull path"));
+	}
+	else if (bBullPathAwake && !bWindColumnAwake)
+	{
+		bWindColumnAwake = true;
+		UE_LOG(LogTemp, Log, TEXT("FIELD_LANDING: night wakes the wind column"));
+	}
+}
+
+bool AHomeWorldCharacter::TryPickGardenHerbFromEast(bool bEast)
 {
 	UWorld* World = GetWorld();
 	if (!World)
@@ -1699,7 +1837,9 @@ bool AHomeWorldCharacter::TryPickGardenHerb()
 		UE_LOG(LogTemp, Log, TEXT("NODE_GARDEN: pick failed - inventory"));
 		return false;
 	}
-	UE_LOG(LogTemp, Log, TEXT("NODE_GARDEN: pick RES_HERB +1 (garden yields; does not spend; not heal)"));
+	bCarriedHerbIsEast = bEast;
+	bHasSidedHerb = true;
+	UE_LOG(LogTemp, Log, TEXT("NODE_GARDEN: pick RES_HERB +1 from the %s bed"), bEast ? TEXT("east") : TEXT("west"));
 	return true;
 }
 
@@ -1719,7 +1859,8 @@ bool AHomeWorldCharacter::TryGiveNightWispToWound()
 	--CarriedCloudWisps;
 	bHomesteadWoundHealed = true;
 	FollowingWoundWispCount = 3;
-	UE_LOG(LogTemp, Log, TEXT("NODE_WOUND: healed by one night wisp; wound wisps follow"));
+	bPullStarHeld = true;
+	UE_LOG(LogTemp, Log, TEXT("NODE_WOUND: healed by one night wisp; a pull star is left on the wound"));
 	return true;
 }
 
@@ -1743,7 +1884,7 @@ bool AHomeWorldCharacter::TryGardenInteractInFront()
 	{
 		return false;
 	}
-	const bool bPicked = TryPickGardenHerb();
+	const bool bPicked = TryPickGardenHerbFromEast(HitActor->ActorHasTag(FName(TEXT("NODE_GARDEN_EAST"))));
 	ShowInteractFeedback(bPicked ? TEXT("NODE_GARDEN: herb") : TEXT("NODE_GARDEN: day body only"), bPicked ? FColor::Green : FColor::Yellow);
 	return bPicked;
 }
@@ -1883,7 +2024,12 @@ bool AHomeWorldCharacter::TryEaseGuardInFront()
 			++Ordinal;
 		}
 	}
+	ArriveAtCamp();
 	const bool bEased = Stealth->TryEaseCampActor(EHomeWorldCampRole::Guard, Ordinal);
+	if (bEased)
+	{
+		RecordGuardEased(Ordinal);
+	}
 	ShowInteractFeedback(bEased ? TEXT("NODE_GUARD: eased") : TEXT("NODE_GUARD: spirit at night"), bEased ? FColor::Green : FColor::Yellow);
 	return bEased;
 }
@@ -2935,6 +3081,7 @@ bool AHomeWorldCharacter::TryCampNight()
 	}
 
 	// Three guards. Ease each until asleep. Two asleep does not open the gate.
+	ArriveAtCamp();
 	for (int32 GuardIndex = 0; GuardIndex < HomeWorldCampNight::GetGatedActorCount(); ++GuardIndex)
 	{
 		bool bEased = false;
@@ -2946,6 +3093,7 @@ bool AHomeWorldCharacter::TryCampNight()
 				UE_LOG(LogTemp, Log, TEXT("NODE_GUARD: ease failed - they must be reached unseen, then put to sleep"));
 				return false;
 			}
+			RecordGuardEased(GuardIndex);
 		}
 	}
 
@@ -3005,6 +3153,10 @@ void AHomeWorldCharacter::OnTimeOfDayPhaseChanged(EHomeWorldTimeOfDayPhase NewPh
 			TraversalComponent->SetSprintHeld(false);
 		}
 		UE_LOG(LogTemp, Log, TEXT("NODE_KETTLE: tea sprint gate cleared (left TOD_DAY)"));
+	}
+	if (NewPhase == EHomeWorldTimeOfDayPhase::Night)
+	{
+		NotifyPocketNight();
 	}
 }
 

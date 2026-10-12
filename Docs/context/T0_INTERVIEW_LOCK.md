@@ -33,7 +33,7 @@ Lead answers, 2026-10-07. Not a start read. Open when the task touches T0 scope.
 - after the partner is taken, the child waits by the bed.
 - the day glide reads the camp heading. One sign on the way down. No pickup.
 - tea unlocks a faster walk until dusk.
-- the family beat is one hint toward the edge. Not a dialogue tree.
+- the family beat is one hint toward the edge. Not a dialogue tree. Tea from the west bed wakes that hint. Tea from the east bed leaves it asleep until night and opens the porch crawl. The other bed stays.
 - night fertilizer is still one dung plus one cloud wisp. The wisp is collected only at night.
 - the day glide sign is smoke from the camp. No pickup.
 - the homestead wound is healed by giving a night wisp.

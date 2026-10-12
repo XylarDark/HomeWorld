@@ -6,7 +6,11 @@ Lanes: critical path, later, future. Session start walks critical path only. A t
 
 ## Critical path
 
-None that this room can start. The next critical-path item is Look: the cabin turnaround in `Docs/art/ASSET_CONTEXT_TASKS.md`.
+The only backlog is the wake minute on `L_SizeTest`: herbs on the south apron, the south door, the interior from the cottage sheet, tea, and one family read. Look owns the cottage sheet. Cave, the bull, and the camp stay parked until that minute is kept.
+
+| Item | Owner | Co-fork | State |
+|---|---|---|---|
+| Wake minute on `L_SizeTest` | Play | Look, for the cottage sheet and room plan | Now |
 
 ## Later
 

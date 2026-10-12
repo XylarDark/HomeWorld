@@ -1,4 +1,4 @@
-> Not product canon. Start at `Docs/context/SESSION_START.md`. Canon is `Docs/01_GDD_MVP.md` and `Docs/02_ART_BIBLE.md`.
+> Not product canon. Start at `Docs/context/SESSION_START.md`. Prototype vision is `Docs/VISION_BOARD.md`. This folder does not restate it.
 
 # Vision Board
 

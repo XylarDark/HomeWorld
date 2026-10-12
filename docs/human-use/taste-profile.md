@@ -7,7 +7,7 @@ Reviewed, versioned summary of Lead/process taste and locked decisions.
 **Updates:** Stage in `Saved/taste_profile_session.json`; promote only after Lead/AD confirm or `APPROVE *`.  
 **Precedence:** latest Lead chat / `APPROVE *` > this file > never invent.
 
-**Last promoted:** 2026-10-11 (size-test sittings, in order, with a verify between them)
+**Last promoted:** 2026-10-11 (size-test cabin greybox, open plan)
 
 ---
 
@@ -46,6 +46,7 @@ Reviewed, versioned summary of Lead/process taste and locked decisions.
 
 | Date | Phrase / source | Outcome |
 |------|-----------------|--------|
+| 2026-10-11 | Lead, chat, after walking `L_SizeTest` | **Open cabin greybox.** The size-test home stays the block plan in `Docs/level/L_SizeTest_ROOM_PLAN.md`: 17.5 by 17 m, a 4 m porch, the great room open to the kitchen, bedrooms on the north. Preferred over the equal-box cottage. Block meshes stay the layout test. The 9 by 11 m card in `Docs/art/SCALE.md` stays the art lock until a cottage sheet is kept. |
 | 2026-10-11 | Size-test next, chat | **Sittings in order.** Facing and the garden sheet, then a walkable greybox interior, then Space on the existing jump and a greybox shoulder sphere. A verify script between sittings. The cottage sheet, texture off, stays the next art file. |
 | 2026-10-11 | Lead, chat | **Authorship.** A new character or asset is designed by the developer and written into context before a picture. Generate that design from scratch. `VisionBoard/KeyArt/homestead_dusk_baseline.jpg` is a fit check after that design exists. It is not the design source, and an older asset is not either. A smooth blob fails. A crystal-cut outline fails. Meters stay in `Docs/art/SCALE.md`. |
 | 2026-10-01 | `TG-ZONE-VOCABULARY` 4/4 (2 rounds) | **Env-art prototype: `spirit` is first**, and the greybox **authors the see-through gap** in real topology (four posts + lintel, ~200 tris) — a proportion metric cannot satisfy spirit's signature, which was the reason to ask. Correct the existing `SM_Shrine_Homestead` / `SM_Shrine_Return` assemblies **in place**; do not author rival shrines beside them. **No `Content/` promote** — drafts only per Docs/20. |
@@ -79,6 +80,7 @@ The next **harness** Docs track is not a gap. The agent picks it.
 
 - Photoreal; grimdark; sci-fi; cutesy-infantile (art bible)
 - Smooth blobs and crystal-cut outlines, scored only after a developer design exists (2026-10-11)
+- Replacing the size-test cabin with the equal-box 9 by 11 m or 13 by 16 m plans (2026-10-11)
 - Designing a new character or asset from the measure or from a previous asset
 - Sixth shot / expand shot list without Lead
 - Deep combat systems (placeholder only)

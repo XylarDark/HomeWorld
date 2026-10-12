@@ -1,14 +1,10 @@
 # CANON MAP — one lookup, so nobody reads 441 files to find one answer
 
-**Updated 2026-10-08.**
+**Updated 2026-10-11.**
 
 ## 0. Which document is the vision
 
-[`Docs/VISION_BOARD.md`](VISION_BOARD.md) is the current product vision and prototype scope.
-Family is present from the start; the prototype includes the camp rescue; day is for gathering,
-and night is for tending in spirit form. [`VisionBoard/Core/VISION.md`](../VisionBoard/Core/VISION.md)
-holds the theme and long-horizon direction. Neither document preserves superseded product
-decisions as active guidance.
+[`Docs/VISION_BOARD.md`](VISION_BOARD.md) is the only prototype vision. Read it. Do not copy it into this map, into `Docs/canon/`, or into `Docs/00_CANON.md`. [`VisionBoard/Core/VISION.md`](../VisionBoard/Core/VISION.md) holds theme and long-horizon direction, and it does not set prototype scope. Neither file keeps a superseded decision as active guidance.
 
 Other locked bibles remain authoritative for their specific systems where they do not conflict
 with current product direction. The Vision Board controls prototype scope when an older MVP
@@ -41,11 +37,9 @@ did.
 
 ### 1.1 `Docs/` and `docs/` are the SAME DIRECTORY on this machine
 
-`AGENTS.md` and `Docs/README.md` both assert a canon split:
+`AGENTS.md` and `Docs/README.md` both say this. There is no second tree. Do not describe the two spellings as a split, and do not sync them.
 
-> "`Docs/` (capital D) = signed MVP product canon · `docs/` (lowercase) = UE 5.8 engineering"
-
-**On disk that split does not exist.** Verified this session:
+On disk, verified when the map was written:
 
 ```
 (Get-FileHash Docs\VISION_BOARD.md).Hash -eq (Get-FileHash docs\VISION_BOARD.md).Hash  →  True
@@ -53,14 +47,7 @@ Docs  →  441 md, 3999 KB
 docs  →  441 md, 3999 KB   (identical listing, identical count)
 ```
 
-Windows is case-insensitive, so `Docs` and `docs` are one tree of **441 markdown files, ~4 MB**.
-Everything named in this map lives in that single directory tree.
-
-`Docs/README.md` even anticipates the collision ("Git may only check out one of the two names
-locally — clone on Linux CI or use a case-sensitive volume"). It is right about the hazard and
-then treats the separation as real. **Consequence for CI:** on a case-sensitive checkout the two
-trees would genuinely diverge and any doc I filed under `docs/Setup/` would be invisible to the
-canon side. **Decision needed from the Lead** — see §7.
+Windows is case-insensitive, so `Docs` and `docs` are one tree. Everything named in this map lives in that single directory tree. A case-sensitive checkout must not be given two copies. Product canon and engineering notes are separated by subdirectory and by the canon map, not by the spelling of this folder.
 
 ### 1.2 `Docs/README.md` is a wave log, not a topic index
 
@@ -91,7 +78,7 @@ README is left intact as history.
 | **Still generation standard** | `Docs/art/STILL_GENERATION_STANDARD.md` | Catalog. Sheet before scene. Front first. |
 | **ComfyUI player test** | `Docs/art/COMFY.md` | One front sheet. Dev weight is a test, not a Steam mesh. |
 | **Size test tasks** | `Docs/art/SIZE_TEST_TASKS.md` | Player block, cottage, pines, bear, bull, then a free walk clip. |
-| **Scene setup** | `Docs/context/SCENE_SETUP.md` | Practices before a test scene is placed. Each map adds `Docs/level/<Map>_CONTEXT.md`. |
+| **Scene setup** | `Docs/context/SCENE_SETUP.md` | Practices before a test scene is placed. Do not report the scene done until its verify script logs PASS in the open editor. Each map adds `Docs/level/<Map>_CONTEXT.md`. |
 | **Size-test scene** | `Docs/level/L_SizeTest_CONTEXT.md` | Floor top, who is on the island, play setup. Coordinates in `Docs/level/L_SizeTest_METRICS.md`. |
 | **Greybox T0 catalog** | `Docs/art/GREYBOX_T0_CATALOG.md` | Generate, Kontext edit, TripoSR mesh, character walk. Interviews that block an asset. |
 | Ten master materials | `Docs/02_MATERIAL_SHEET.md` | **LOCKED** |
@@ -112,7 +99,7 @@ README is left intact as history.
 | The work queue | `Docs/TaskLists/T0_NEXT_QUEUE.md` | active — 2026-10-08. `T0_FIRST_LOOP_NOW.md` is the finished code queue |
 | Prototype boss lair | `Docs/context/BOSS_LAIR_LOCK.md` | shape lock 2026-10-08. Fight stays later |
 | Taste decisions Rounds 1–7 | `Docs/handoffs/TASTE_GATE_T0_ASSETS.md` | R1–6 RESOLVED, R7+ parked |
-| Agent-owned decisions | `Docs/decisions/AGENT_DECISIONS.md` | DEC-0001…**0035** — all 35 ids present; file *order* is 0001-0026, 0033-0035, 0027-0031, so search by id not by position |
+| Agent-owned decisions | `Docs/decisions/AGENT_DECISIONS.md` | DEC-0001…**0036** — search by id, not by position in the file |
 | UE 5.8 engineering | `Docs/SETUP.md`, `KNOWN_ERRORS.md`, `CONVENTIONS.md` | canon |
 | Greybox measurement report | `docs/qa/GRAYBOX_SPEC_REPORT.md` | 4 blocking (regenerated 2026-10-03) |
 | **Polish pass entry gates** | `Docs/37_POLISH_PASS_PROCESS.md` | active — enforces via `Content/Python/polish_readiness.py` |
@@ -120,7 +107,7 @@ README is left intact as history.
 | **What is waiting on whom?** | same file, "Where everything is waiting" | generated; every blocked row declares agent / decide / do / env |
 | **Decisions the Lead owes that no gate row can express** | `Docs/qa/POLISH_QUEUE.json` | 3 open, 1 deferred (Early Access paused 2026-10-04) |
 | **Ending a session: what to ask next** | `Content/Python/session_close.py` | read-only; derives the critical path from the gate dependency chain |
-| **Where the world actually lives** | `Content/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers.umap` | the homestead, crumbs and field. NOT `MainMenu` — see KNOWN_ERRORS 2026-10-03 |
+| **Where the played world lives** | `Content/HomeWorld/Maps/SizeTest/L_SizeTest.umap` | measurement scene for the wake minute. The cottage sheet is still the greybox keep. `L_VS_MVP_Markers` is not this walk. |
 | **AI-agent practice, researched** | `Docs/38_AI_AGENT_PRACTICE.md` | research; read-only, gates no code |
 | **What the human owns, and when to ask** | `docs/human-use/OWNERSHIP.md` | canon - Steer / Taste / Test |
 | **Is the island really 180x100 in the engine?** | `Content/Python/measure_ue_island.py` -> `Docs/qa/UE_ISLAND_MEASUREMENT.json` | in-editor, read-only; gate row `env.ue_island_measured` |
@@ -140,6 +127,8 @@ them, so the must list's `Found` column goes stale silently.
 
 **The rule this establishes: the `Found` column may only say `N` if no `APPROVE`-stamped track
 doc claims the mechanic. This table is that cross-link, and §6 makes it machine-checked.**
+
+`Logic done` means the hook exists. It is not a beat a player can fail until that beat's actor is in the measurement scene. The words in the Found column stay as written so the canon-map test can compare them to the must list.
 
 | # | Must | Found — verified against `Source/` | Evidence |
 |---|---|---|---|
@@ -209,7 +198,7 @@ visible in the log rather than hidden in a return value.
 | `VisionBoard/MVP/**` | Outside prototype guidance. Theme and long-horizon direction are in `VisionBoard/Core/VISION.md`. |
 | `Docs/Automation/AGENT_COMPANY.md` | Pre-swarm agent loop, **removed WAVE F**. Stub only. |
 | `docs/TaskLists/DAILY_STATE.md`, `docs/SESSION_LOG.md` | Legacy task lists. Continuity is now handoffs + `SESSION_SUMMARY` + `swarm/PHASE_BOARD.md`. |
-| `Docs/00_CANON.md` | **LOCKED P0 but pre-T0 topology** — its map tree predates the planet slice. Flagged, not quarantined; the Lead owns that call. |
+| `Docs/00_CANON.md` | Earlier MVP cut. Prototype scope is `Docs/VISION_BOARD.md` (DEC-0029). Not a second vision. |
 | `Docs/TaskLists/**` (legacy, non-T0) | Wave-era lists. The active queue is `T0_NEXT_QUEUE.md`. `T0_FIRST_LOOP_NOW.md` is the finished code queue. `T0_EXECUTION_PHASES.md` and `T0_EXECUTION_QUEUE.md` are the pre-lock record. |
 | `Docs/handoffs/**` (legacy, non-T0) | 158 files. Authority is the newest `SESSION_HANDOFF_*.md` only. |
 
@@ -240,11 +229,6 @@ than a doc that is quietly wrong.
 
 ## 7. Open for the Lead
 
-1. **`Docs` vs `docs`.** Keep one tree and delete the fiction from `AGENTS.md` + `Docs/README.md`,
-   or genuinely split on a case-sensitive volume and keep the split. Today the instruction file
-   describes a structure the working tree does not have — that is six lines of the most-read
-   instructions in the repo being wrong. *(agent-recommended: one tree; the split costs more than
-   it returns, and every cross-reference already ignores it)*
-2. **Quarantine the 158 legacy handoffs and 55 legacy task lists**, or mark them read-only in
-   place. They are the reason "look everywhere" is expensive today.
-3. **`Docs/00_CANON.md`** — LOCKED P0 but pre-T0. Confirm supersession by `VISION_BOARD`.
+1. **`Docs` vs `docs`.** Closed. They are one directory. `AGENTS.md` and `Docs/README.md` say so. Do not reopen a split.
+2. **Legacy handoffs.** Closed for agent reads. `AGENTS.md` names the only handoff files an agent may open. The old wave files stay on disk and are not a search path.
+3. **`Docs/00_CANON.md`.** Closed. Prototype scope is `Docs/VISION_BOARD.md` (DEC-0029). The older file stays on disk as the earlier cut.

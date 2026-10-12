@@ -109,6 +109,44 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Garden|T0")
 	bool TryPickGardenHerb();
 
+	/** West bed is the edge hint. East bed is the porch crawl. A pick with no bed is west. */
+	UFUNCTION(BlueprintCallable, Category = "Garden|T0")
+	bool TryPickGardenHerbFromEast(bool bEast);
+
+	bool IsPorchCrawlOpen() const { return bPorchCrawlOpen; }
+
+	/** True when a body of this radius fits the porch gap. The player is 42. A guard is wider. */
+	UFUNCTION(BlueprintCallable, Category = "Garden|T0")
+	bool DoesBodyFitPorchGap(float RadiusCm) const;
+
+	/** First landing wins. Wind and the bull path are the two faces. Night wakes the one left asleep. */
+	UFUNCTION(BlueprintCallable, Category = "Field|T0")
+	bool ChooseFieldLanding(bool bWind);
+
+	bool IsWindColumnAwake() const { return bWindColumnAwake; }
+	bool IsBullPathAwake() const { return bBullPathAwake; }
+
+	/** One guard is already pacing. A second call keeps that guard. */
+	UFUNCTION(BlueprintCallable, Category = "Camp|T0")
+	void ArriveAtCamp();
+
+	int32 GetPacingGuard() const { return PacingGuard; }
+
+	/** Opens that guard's gap. The gaps already open stay open. */
+	UFUNCTION(BlueprintCallable, Category = "Camp|T0")
+	bool RecordGuardEased(int32 Ordinal);
+
+	bool IsGuardGapOpen(int32 Ordinal) const;
+
+	bool HasPullStar() const { return bPullStarHeld; }
+
+	/** One crossing. The star is spent. */
+	UFUNCTION(BlueprintCallable, Category = "Wound|T0")
+	bool TrySpendPullStar();
+
+	/** Night wakes the face the day left asleep. The phase change calls this. */
+	void NotifyPocketNight();
+
 	UFUNCTION(BlueprintCallable, Category = "Wound|T0")
 	bool TryGiveNightWispToWound();
 
@@ -565,6 +603,21 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Family|T0")
 	FString FamilyHint;
+
+	bool bHasSidedHerb = false;
+	bool bCarriedHerbIsEast = false;
+	bool bEdgeFaceAwake = false;
+	bool bPorchCrawlOpen = false;
+	bool bFieldLandingChosen = false;
+	bool bWindColumnAwake = false;
+	bool bBullPathAwake = false;
+	bool bCampArrived = false;
+	int32 PacingGuard = 0;
+	bool bGuardGapOpen[3] = { false, false, false };
+	bool bPullStarHeld = false;
+
+	void WakeUnpickedPocketFace();
+	void OpenPorchCrawlActors();
 
 	/** T0 #9: spirit form flag — granted by the bed at night, not by phase alone. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Form")

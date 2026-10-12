@@ -33,7 +33,7 @@ The five phases are states. The five transitions are the work. They are defined 
 | Cabin | Mood stills, massing, the door plan, and a front elevation are filed. | Concept. Massing and the plan belong to Concept → Greybox. The front belongs to Greybox → Prototype. They stay closed. |
 | Every other card | The card is written. | Concept. |
 
-Status line: Transition is Concept → Greybox. The next file is the cottage asset sheet, alone, texture off. Open `Docs/art/transitions/CONCEPT_TO_GREYBOX.md` and `Docs/art/STILL_GENERATION_STANDARD.md`. Do not make another scene first.
+Status line: Transition is Concept → Greybox. `L_SizeTest` is the measurement scene, not a kept greybox. The next file is the cottage asset sheet, alone, texture off, including the room plan. Open `Docs/art/transitions/CONCEPT_TO_GREYBOX.md` and `Docs/art/STILL_GENERATION_STANDARD.md`. Do not make another scene first. Cave, bull, and camp stay parked until the wake minute on that sheet is kept.
 
 Do not generate a mesh from text. Image-to-3D runs only after the stills on that card are kept. Do not check a box in [PROTOTYPE_ASSET_TRACK.md](PROTOTYPE_ASSET_TRACK.md) from this file. Do not copy a file into `Content/`.
 
