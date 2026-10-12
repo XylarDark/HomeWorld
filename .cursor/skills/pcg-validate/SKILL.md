@@ -7,7 +7,7 @@ description: Validate or troubleshoot PCG setup (ForestIsland_PCG, volume, lands
 
 Check that the PCG graph, volume, and landscape are correctly configured so Generate produces instances.
 
-**Short path:** For a one-page, tutorial-aligned setup (manual-only or script + 3 steps) and **volume sizing for DemoMap**, use [docs/PCG_QUICK_SETUP.md](../../docs/PCG/PCG_QUICK_SETUP.md).
+**Short path:** For a one-page, tutorial-aligned setup (manual-only or script + 3 steps) and **volume sizing for DemoMap**, use [docs/PCG_QUICK_SETUP.md](../../../docs/PCG/PCG_QUICK_SETUP.md).
 
 ## When to use
 
@@ -39,7 +39,7 @@ Input → **Get Landscape Data** → **Surface Sampler** (Surface + Bounding) �
 
 ## When Python cannot write the panel
 
-Before changing the graph, try the script. If By Tag or the Static Mesh Spawner mesh list cannot be set, the log contains `editor_ui: NEED_SLATE panel=pcg-details`. Open the editor-UI skill and snapshot that Details field. Do not ask the user to click it. Graph assignment, the landscape tag, and World Partition load stay on the script when it can set them. See [docs/PCG/PCG_BEST_PRACTICES.md](../../docs/PCG/PCG_BEST_PRACTICES.md).
+Before changing the graph, try the script. If By Tag or the Static Mesh Spawner mesh list cannot be set, the log contains `editor_ui: NEED_SLATE panel=pcg-details`. Open the editor-UI skill and snapshot that Details field. Do not ask the user to click it. Graph assignment, the landscape tag, and World Partition load stay on the script when it can set them. See [docs/PCG/PCG_BEST_PRACTICES.md](../../../docs/PCG/PCG_BEST_PRACTICES.md).
 
 ## General validation (when to use)
 
@@ -53,7 +53,7 @@ Before changing the graph, try the script. If By Tag or the Static Mesh Spawner 
 
 5. **Generate from level:** Generate must be triggered from the **level**: select PCG_Forest in Outliner → Details → PCG section → **Generate**. Not from inside the graph editor. If nothing appears, try Ctrl+Click on Generate.
 
-6. **Placement (below ground / tilted):** Check [docs/PCG/PCG_SETUP.md](../../docs/PCG/PCG_SETUP.md) "Trees at weird angles" and "Poking out the bottom": mesh pivot (base vs center), `transform_offset_z` in pcg_forest_config.json (0 for base-pivot; negative for center-pivot). Transform Points node should have **Absolute Rotation** and **Yaw-only** rotation so trees stay upright; script sets these when creating/updating the graph.
+6. **Placement (below ground / tilted):** Check [docs/PCG/PCG_SETUP.md](../../../docs/PCG/PCG_SETUP.md) "Trees at weird angles" and "Poking out the bottom": mesh pivot (base vs center), `transform_offset_z` in pcg_forest_config.json (0 for base-pivot; negative for center-pivot). Transform Points node should have **Absolute Rotation** and **Yaw-only** rotation so trees stay upright; script sets these when creating/updating the graph.
 
 ## From decoration to collectible resources
 
@@ -63,11 +63,11 @@ When the user wants **resources in set locations for the player to collect**, re
 - **Actor Spawner:** Use **Actor Spawner** in the graph to spawn Blueprint actors (e.g. BP_Resource_Tree) with collision and interaction; PCG defines where, Blueprint defines how they are collected. Heavier; document class assignment and partition/streaming.
 - **Hybrid:** PCG generates points; a runtime system reads them and spawns/registers collectible actors. Option for large-scale or when collectibles are a separate layer.
 
-See [docs/PCG/PCG_BEST_PRACTICES.md](../../docs/PCG/PCG_BEST_PRACTICES.md) section "From decoration to collectible resources" for details.
+See [docs/PCG/PCG_BEST_PRACTICES.md](../../../docs/PCG/PCG_BEST_PRACTICES.md) section "From decoration to collectible resources" for details.
 
 ## References
 
-- [docs/PCG/PCG_SETUP.md](../../docs/PCG/PCG_SETUP.md) — full steps, what script can/cannot do
-- [docs/PCG/PCG_BEST_PRACTICES.md](../../docs/PCG/PCG_BEST_PRACTICES.md) — minimal graph, manual steps, Partitioned/Hierarchical, decoration vs collectibles
-- [docs/PCG/PCG_VARIABLES_NO_ACCESS.md](../../docs/PCG/PCG_VARIABLES_NO_ACCESS.md) — settings that require manual Editor steps
-- [docs/KNOWN_ERRORS.md](../../docs/KNOWN_ERRORS.md) — PCG and MCP pitfalls
+- [docs/PCG/PCG_SETUP.md](../../../docs/PCG/PCG_SETUP.md) — full steps, what script can/cannot do
+- [docs/PCG/PCG_BEST_PRACTICES.md](../../../docs/PCG/PCG_BEST_PRACTICES.md) — minimal graph, manual steps, Partitioned/Hierarchical, decoration vs collectibles
+- [docs/PCG/PCG_VARIABLES_NO_ACCESS.md](../../../docs/PCG/PCG_VARIABLES_NO_ACCESS.md) — settings that require manual Editor steps
+- [docs/KNOWN_ERRORS.md](../../../docs/KNOWN_ERRORS.md) — PCG and MCP pitfalls

@@ -1,6 +1,6 @@
 ---
 name: ue57-api-check
-description: Tombstone. Use ue58-api-check for live Unreal work. UE 5.7 docs only under docs/UE/UE57_*.
+description: Retired. The engine lock is UE 5.8 - use ue58-api-check.
 disable-model-invocation: true
 ---
 

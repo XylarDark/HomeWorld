@@ -15,15 +15,15 @@ Use when adding or modifying code that touches APIs that changed across UE 5.7�
 
 ## Instructions
 
-1. **Check the pitfalls table** — Open [.cursor/rules/unreal-cpp.mdc](../../.cursor/rules/unreal-cpp.mdc) and read the API pitfalls table (5.7 rows remain relevant; add 5.8 notes from KNOWN_ERRORS).
-2. **Check KNOWN_ERRORS** — Open [docs/KNOWN_ERRORS.md](../../docs/KNOWN_ERRORS.md) and search for the API or “UE 5.8”.
+1. **Check the pitfalls table** — Open [.cursor/rules/unreal-cpp.mdc](../../../.cursor/rules/unreal-cpp.mdc) and read the API pitfalls table (5.7 rows remain relevant; add 5.8 notes from KNOWN_ERRORS).
+2. **Check KNOWN_ERRORS** — Open [docs/KNOWN_ERRORS.md](../../../docs/KNOWN_ERRORS.md) and search for the API or “UE 5.8”.
 3. **Apply replacements** — Same 5.7 replacements unless a 5.8 entry says otherwise.
 4. **Build and verify** — Run `.\Tools\Safe-Build.ps1` (engine default `UE_5.8`). For Python, run via MCP `execute_python_script` and confirm no TypeError.
 
 ## References
 
-- [docs/UE/UE58_TECH.md](../../docs/UE/UE58_TECH.md) — UE 5.8 tech entry point
-- [Docs/22_UE58_UPGRADE.md](../../Docs/22_UE58_UPGRADE.md) — upgrade track
-- [.cursor/rules/unreal-cpp.mdc](../../.cursor/rules/unreal-cpp.mdc)
-- [docs/KNOWN_ERRORS.md](../../docs/KNOWN_ERRORS.md)
+- [docs/UE/UE58_TECH.md](../../../docs/UE/UE58_TECH.md) — UE 5.8 tech entry point
+- [Docs/22_UE58_UPGRADE.md](../../../Docs/22_UE58_UPGRADE.md) — upgrade track
+- [.cursor/rules/unreal-cpp.mdc](../../../.cursor/rules/unreal-cpp.mdc)
+- [docs/KNOWN_ERRORS.md](../../../docs/KNOWN_ERRORS.md)
 - Legacy skill: [ue57-api-check](../ue57-api-check/SKILL.md)

@@ -17,6 +17,7 @@ import sys
 sys.path.insert(0, os.path.normpath(os.path.join(os.path.dirname(__file__), "..")))
 
 import homeworld_graybox_silhouette as silhouette  # noqa: E402
+import pytest  # noqa: E402
 from homeworld_graybox_spec import (  # noqa: E402
     ALLOWED_MATERIAL_INSTANCES,
     FAMILY_BUILD_PLACE,
@@ -34,6 +35,7 @@ from homeworld_graybox_spec import (  # noqa: E402
     family_for,
     load_all_specs,
     load_zone_spec,
+    parse_spec,
     resolve_alias,
     volume_family_status,
     zone_dirs,
@@ -372,3 +374,42 @@ def test_out_of_canon_materials_are_not_allowed():
     for name in ("M_FamilySilhouette", "M_ValleyNight"):
         assert name not in MASTER_NAMES
         assert name not in ALLOWED_MATERIAL_INSTANCES
+
+
+# --- dynamic-origin zones ----------------------------------------------------
+
+
+def test_a_null_world_origin_is_a_decision_not_a_parse_error():
+    """`world_origin: null` means "this zone has no fixed origin".
+
+    FOREST is generated: its instance origin is the midpoint of whichever field
+    edge was crossed, and its own `rejects` list bans a fixed world origin
+    outright (Lead 2026-10-07, "straight to generation"). The reader used to
+    push an explicit null through `_as_vec3`, which raised "world_origin must
+    be a 3-element list" - so a correct spec was reported as malformed, and it
+    took the whole alias-table suite down with it.
+
+    Absent and null must read the same. A present-but-malformed value must
+    still fail: that is the line between a decision and a typo.
+    """
+    raw = load_zone_spec("combat", "FOREST")
+    assert raw["world_origin"] is None, (
+        "FOREST's null IS the decision - if this fails, the data was 'fixed' "
+        "instead of the reader"
+    )
+
+    spec = parse_spec(raw)
+    assert spec.id == "FOREST"
+    assert not spec.volumes, (
+        "FOREST is SEQUENCE_DEFINED_GENERATION_PENDING with `measured: null` - "
+        "its own note says nothing is built, so an empty volume set is the "
+        "correct read, not a symptom"
+    )
+
+    # Absent and explicit-null are the same statement.
+    without = {k: v for k, v in raw.items() if k != "world_origin"}
+    assert [v.name for v in parse_spec(without).volumes] == [v.name for v in spec.volumes]
+
+    # A malformed value is still a hard error, not a silent default.
+    with pytest.raises(ValueError, match="world_origin"):
+        parse_spec({**raw, "world_origin": [1.0, 2.0]})

@@ -1,13 +1,9 @@
 ---
 name: ue57-api-check
-description: Tombstone. Use ue58-api-check for live Unreal work. UE 5.7 docs only under docs/UE/UE57_*.
+description: Pointer to .agents/skills/ue57-api-check. Retired tombstone.
 disable-model-invocation: true
 ---
 
-# UE 5.7 API check (tombstone)
+# UE 5.7 API check
 
-**Engine lock is 5.8.** Use [ue58-api-check](../ue58-api-check/SKILL.md) for API/UI/doc sourcing.
-
-Historical UE57 write-ups remain under `docs/UE/UE57_*` (rules `ue57-sources` / `ue57-editor-ui` glob those docs only).
-
-Do not resurrect full 5.7 procedure as a peer of ue58.
+The tombstone is [.agents/skills/ue57-api-check/SKILL.md](../../../.agents/skills/ue57-api-check/SKILL.md). Read that file. Do not keep a second copy here.

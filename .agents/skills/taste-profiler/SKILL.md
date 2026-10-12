@@ -28,7 +28,7 @@ Maintain the durable taste profile and session candidates. Bootstrap → stage �
 ### Bootstrap (max 2 Q/turn)
 
 1. Read [taste-profile.md](../../../docs/human-use/taste-profile.md).
-2. Ask at most **2** questions (Docs/26-style A/B/Skip).
+2. Ask at most **2** questions (Docs/26_TASTE_NEXT.md A/B/Skip).
 3. Put drafts in the OWNERSHIP alert; scribe only after confirm.
 4. Seed canon pointers and do-not from existing Docs/00–02 / Docs/26 — do not invent new product targets.
 

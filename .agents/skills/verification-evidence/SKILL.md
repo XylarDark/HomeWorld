@@ -49,7 +49,7 @@ are grouped by how the failure hides, because that determines what you assert.
   one. A malformed request that is still _syntactically valid_ will be obeyed all
   the way to a clean, wrong answer.
 
-This repository implements the pattern in `scripts/tools/verify.js`: a stage passes
+This repository implements the pattern in `scripts/verify.js`: a stage passes
 only when it exits zero **and** the expected number could be extracted from its
 output; a stage that exits zero without producing evidence is reported as
 `inconclusive`; stages after a failure are reported as `NOT RUN` rather than left

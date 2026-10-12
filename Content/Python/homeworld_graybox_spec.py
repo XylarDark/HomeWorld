@@ -548,7 +548,15 @@ def _parse_volumes(spec_id: str, raw: dict[str, Any]) -> tuple[Volume, ...]:
     assembly_name: str | None = None
     if isinstance(raw.get("graybox_map"), list) and raw["graybox_map"]:
         assembly_name = str(raw["graybox_map"][0])
-    if "world_origin" in raw:
+    # An explicit `world_origin: null` is a DECISION, not a missing value: a
+    # generated zone has no fixed origin because it places itself at whichever
+    # field edge was crossed (FOREST.json, "NO FIXED WORLD ORIGIN", Lead
+    # 2026-10-07; its `rejects` list even bans a fixed world origin). Reading
+    # null as fatal turned that decision into a parse error and took the whole
+    # alias-table suite down with it. Absent and null both mean "no fixed
+    # origin"; a present-but-malformed value still fails, because that is the
+    # difference between a decision and a typo.
+    if raw.get("world_origin") is not None:
         assembly_origin = _as_vec3(raw["world_origin"], "world_origin")
 
     def _add(

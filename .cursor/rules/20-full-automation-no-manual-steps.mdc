@@ -42,7 +42,7 @@ user can or will perform manual work during or between sessions. There is no
    entry, mark the task/day **blocked** (or skip with a reason), and state in the
    session summary that the gap was logged for a future automation pass.
 
-Note: the `Content/Python/gui_automation/` directory cited by earlier revisions
+Note: the `Content/Python/gui_automation/` directory cited by earlier revisions <!-- path-exception: this line names a directory deleted in WAVE F on purpose, to warn against citing it -->
 of this rule was **removed WAVE F** and does not exist. Do not cite it. Live
 GUI-automation and introspection scripts live directly in `Content/Python/`.
 

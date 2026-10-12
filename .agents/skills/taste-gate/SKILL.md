@@ -65,7 +65,7 @@ Need from you: <numbered options; recommended first; skip last>
 After you pick: <what I do next; next human fork if any>
 ```
 
-**Question budget:** max **2** questions per turn (Docs/26-style). Prefer A/B choices over open essays.
+**Question budget:** max **2** questions per turn (Docs/26_TASTE_NEXT.md). Prefer A/B choices over open essays.
 
 ### 3. Queue
 
@@ -98,7 +98,7 @@ When Lead/AD answers (chat pick, `APPROVE *`, or dictate):
 3. **Promote or reject** the staged profile candidate ([taste-profiler](../taste-profiler/SKILL.md)) — do not leave durable profile stale.
 4. Resume only **agent-owned** work named in `After you pick`.
 
-## Gate template (Docs/26-style)
+## Gate template (Docs/26_TASTE_NEXT.md)
 
 Round N (max 2 Q):
 
