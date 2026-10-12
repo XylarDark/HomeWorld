@@ -78,7 +78,7 @@ README is left intact as history.
 | **Still generation standard** | `Docs/art/STILL_GENERATION_STANDARD.md` | Catalog. Sheet before scene. Front first. |
 | **ComfyUI player test** | `Docs/art/COMFY.md` | One front sheet. Dev weight is a test, not a Steam mesh. |
 | **Size test tasks** | `Docs/art/SIZE_TEST_TASKS.md` | Player block, cottage, pines, bear, bull, then a free walk clip. |
-| **Scene setup** | `Docs/context/SCENE_SETUP.md` | Practices before a test scene is placed. Do not report the scene done until its verify script logs PASS in the open editor. Each map adds `Docs/level/<Map>_CONTEXT.md`. |
+| **Scene setup** | `Docs/context/SCENE_SETUP.md` | Practices before a test scene is placed. Do not report the scene done until its verify script logs PASS in the open editor. The size-test file is `Docs/level/L_SizeTest_CONTEXT.md`. Each later map gets its own context file in that folder. |
 | **Size-test scene** | `Docs/level/L_SizeTest_CONTEXT.md` | Floor top, who is on the island, play setup. Coordinates in `Docs/level/L_SizeTest_METRICS.md`. |
 | **Greybox T0 catalog** | `Docs/art/GREYBOX_T0_CATALOG.md` | Generate, Kontext edit, TripoSR mesh, character walk. Interviews that block an asset. |
 | Ten master materials | `Docs/02_MATERIAL_SHEET.md` | **LOCKED** |

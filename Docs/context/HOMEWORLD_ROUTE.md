@@ -117,17 +117,17 @@ One fact proposed at a time, one yes from Luke, one write into this file only �
 
 - Lead 2026-10-08: in the sleeper's lair the tamed bull may be ridden along the body. The ride stays field-only everywhere else. `Docs/context/BOSS_LAIR_LOCK.md`.
 
-## Transit table (Lead 2026-10-12; pre/post first coil)
+## Transit table
 
-One table for night transit. The GDD portal-both-ways line is superseded by the 2026-10-07 shrine lines below it; the post-coil column adds the Vision-board stone upgrade. Sleep still grants the form; the stone is travel only.
+This restates the 2026-10-07 shrine lines above and the cave answers in `Docs/VISION_BOARD.md` from 2026-10-08. Sleep grants the form. The stone is travel.
 
-| Leg | Pre-first-coil | Post-first-coil |
+| Leg | Before the first coil | After the first coil |
 |---|---|---|
-| Day down (homestead → field) | Steered glide only | Same |
-| Night out (homestead → camp/field) | Spirit glide, same steering as day; shrine is home-only | Same, plus the homestead stone works either form, day and night |
-| Night back (camp/field → home) | Shrine portal, spirit only | Homestead stone, either form |
-| Cave mouth, first entry | Glider or spirit only | Shrine return unlocked after the first coil |
-| Bull | Ridden through the shrine, then walked to the barn | Same; shrine will not bring it back to the cave after the rise |
+| Day down (homestead to field) | Steered glide only | Same |
+| Way out | Day glide, or the night spirit glide with the same steering | Same. The homestead stone also works day and night, either form |
+| Way home | The body may take a shrine home any time after leaving. The partner and the bull use that return, then walk | The homestead stone, day and night, either form. The bull follows you home through the stone and waits in the barn |
+| Cave mouth | Glider or spirit only, the first time. The shrine there stays dark until the bull has been ridden once | That shrine is the return. It brings the field bull through |
+| Bull | Ridden through the shrine, then walked to the barn. Field only, except the lair ride on the sleeper | Follows you home through the stone |
 
 ## Left empty on purpose
 

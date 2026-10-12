@@ -149,6 +149,7 @@ def test_must_numbering_agrees_between_map_and_canonical_must_list():
 #: state in two vocabularies cannot be compared, so the comparison is what forces the
 #: vocabulary to be one. Order matters: first match wins, so put the specific first.
 _STATE_PATTERNS = (
+    (re.compile(r"Superseded", re.IGNORECASE), "SUPERSEDED"),
     (re.compile(r"CLOSED", re.IGNORECASE), "CLOSED"),
     (re.compile(r"Logic done"), "LOGIC_DONE"),
     (re.compile(r"Implemented\s*\(\s*logic\s*\)"), "LOGIC_DONE"),

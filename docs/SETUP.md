@@ -184,7 +184,7 @@ If you add or remove C++ files, regenerate project files so the solution stays i
 
 ## Packaging (shipping build)
 
-For Steam Early Access or distribution you need a **packaged** (cooked + staged) build. Use either the Editor or command line. **Source:** [Sharing and Releasing Projects (UE 5.8)](https://dev.epicgames.com/documentation/en-us/unreal-engine/sharing-and-releasing-projects-for-unreal-engine); [Packaging Projects for Windows](https://dev.epicgames.com/documentation/en-us/unreal-engine/packaging-unreal-engine-projects-for-windows) (verify menu paths in Epic 5.7 docs if your Editor differs).
+For Steam Early Access or distribution you need a **packaged** (cooked + staged) build. Use either the Editor or command line. **Source:** [Sharing and Releasing Projects (UE 5.8)](https://dev.epicgames.com/documentation/en-us/unreal-engine/sharing-and-releasing-projects-for-unreal-engine); [Packaging Projects for Windows](https://dev.epicgames.com/documentation/en-us/unreal-engine/packaging-unreal-engine-projects-for-windows). Verify menu paths in the UE 5.8 docs.
 
 **Prerequisites:** Close the Editor before command-line packaging. Ensure the project builds (run **`Build-HomeWorld.bat`** or **`.\Tools\Safe-Build.ps1`**).
 
