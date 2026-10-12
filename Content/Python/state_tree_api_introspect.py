@@ -8,6 +8,11 @@ import json
 import os
 import sys
 
+_py_dir = os.path.dirname(os.path.abspath(__file__))
+if _py_dir not in sys.path:
+    sys.path.insert(0, _py_dir)
+import editor_ui_need
+
 try:
     import unreal
 except ImportError:
@@ -93,6 +98,8 @@ def main() -> int:
             "add" in " ".join(result["asset_attrs"]).lower()
             or "set_editor_property" in result["asset_attrs"]
         )
+        if not result["can_edit_graph"]:
+            _log(editor_ui_need.report("state-tree", "State Tree graph editing has no Python API"))
 
         # unreal module: StateTree, StateTreeState, etc.
         for name in ("StateTree", "StateTreeState", "StateTreeComponent", "StateTreeFactory"):

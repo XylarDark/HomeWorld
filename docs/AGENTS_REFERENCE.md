@@ -65,10 +65,12 @@ Two orchestration systems coexist. They are **nested, not alternatives**:
 
 | Tool | Layer | Role |
 | ---- | ----- | ---- |
-| **GSD** | Architecture, top-down | discuss → plan → execute → verify → ship, behind 8 human gates. Plans a phase. |
+| **GSD** | Architecture, top-down | Cursor commands: `/gsd-discuss-phase`, `/gsd-plan-phase`, `/gsd-execute-phase`, `/gsd-verify-work`. Plans a phase behind human gates. |
 | **loop-engineer** | Implementation, bottom-up | Executes **one** goal to a machine-checkable stop condition. Never plans, never gates. |
 
 **Run `/loop-engineer` only inside one already-gated GSD plan**, where the human decisions were taken at the gate and the loop has no new decision to make. Its own contract is "fully autonomous, never pause for user input, no plan-approval gate" — that is safe only while the decisions it could have made were already made.
+
+Execute may use UnrealMCP on port 55557. Open `.cursor/skills/ue-editor-ui/SKILL.md` only after a script logs `editor_ui: NEED_SLATE`. Verify for this repo is the existing editor check or pytest, not a GSD browser pass. Taste, test, and a new product phase stay human. GSD-3 stays idle until `swarm/PHASE_BOARD.md` names a bite.
 
 **Non-goals — do not violate:**
 

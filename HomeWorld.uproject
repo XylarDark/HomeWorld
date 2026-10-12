@@ -60,6 +60,18 @@
                         "Enabled":  true
                     },
                     {
+                        "Name":  "ModelContextProtocol",
+                        "Enabled":  true
+                    },
+                    {
+                        "Name":  "ToolsetRegistry",
+                        "Enabled":  true
+                    },
+                    {
+                        "Name":  "SlateInspectorToolset",
+                        "Enabled":  true
+                    },
+                    {
                         "Name":  "PythonAutomationTest",
                         "Enabled":  true
                     },

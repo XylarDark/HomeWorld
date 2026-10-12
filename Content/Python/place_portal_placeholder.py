@@ -19,6 +19,11 @@ except ImportError:
 PORTAL_TAG = "Portal_To_Planetoid"
 CUBE_MESH_PATH = "/Engine/BasicShapes/Cube"
 
+_py_dir = os.path.dirname(os.path.abspath(__file__))
+if _py_dir not in sys.path:
+    sys.path.insert(0, _py_dir)
+import editor_ui_need
+
 
 def _log(msg):
     unreal.log("Portal placeholder: " + str(msg))
@@ -116,7 +121,8 @@ def _set_level_to_open(actor, level_to_open):
                 return True
         except Exception:
             continue
-    _log("LevelToOpen could not be set from Python (tried set_editor_property and setattr). Set in Editor Details or use gui_automation/set_portal_level_to_open.py.")
+    line = editor_ui_need.report("portal-level", "LevelToOpen could not be set from Python")
+    _log(line)
     return False
 
 

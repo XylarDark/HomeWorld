@@ -999,3 +999,16 @@ This carries out DEC-0029. `Docs/canon/FANTASY.md` had become a second loop, inc
 **Rejected:** Deleting `00_CANON.md`, `Docs/canon/`, or `VisionBoard/Core/VISION.md`. The first two are the earlier cut. The third is theme and the long horizon, and it already refuses prototype scope.
 
 **Does not decide:** The words of the vision, the kept cabin plan, or which older verb still applies inside a lock. Those stay where they were.
+
+---
+
+## DEC-0037 - Slate inspector on port 8000, UnrealMCP stays
+
+**Decision:** Enable Epic's experimental `ModelContextProtocol`, `ToolsetRegistry`, and `SlateInspectorToolset` only. The editor UI server listens on `http://127.0.0.1:8000/mcp`. Project `UnrealMCP` stays the actor and Python server on port 55557. Cursor lists both.
+
+U58F-F still stands: do not replace UnrealMCP, and do not enable the rest of Epic's toolsets. The revisit rule in that file is met because UnrealMCP cannot click Slate, and UE 5.8 ships `SlateInspectorToolset`. The ports do not overlap.
+
+**Rejected:** A desktop clicker (Windows-MCP, PyAutoGUI, OCR). Those steal the mouse, and the old reference-image clickers were removed because DPI and theme changes break them. Landscape sculpt and taste placement stay outside this tool.
+
+**Use:** Editor Python or UnrealMCP first. Slate snapshot and click only when the panel has no Python API. One Epic tool call at a time. Stop on a password, purchase, or delete confirmation.
+

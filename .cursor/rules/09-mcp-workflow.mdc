@@ -25,6 +25,9 @@ When the Editor is running and `unrealMCP` is connected:
    MCP usage, so the same work can be re-run without MCP.
 3. **Verify** by querying Editor state after each MCP action (list actors, get
    property values) rather than assuming success.
+4. A result that contains `editor_ui: NEED_SLATE` opens
+   `.cursor/skills/ue-editor-ui/SKILL.md`. Do not open a new gap entry for
+   `portal-level`, `state-tree`, or `pcg-details`.
 
 ## When MCP is unavailable
 

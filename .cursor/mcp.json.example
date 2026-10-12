@@ -7,6 +7,7 @@
   "//5": "Install the Lab MCP client once: uv tool install \"git+https://projects.blender.org/lab/blender_mcp.git#subdirectory=mcp\"",
   "//6": "Start the server with .\\Tools\\Start-MixarMcp.ps1 (headless, blocks until localhost:9876 is reachable). Do NOT use the blender_*.cmd files shipped in the Mixar install; they are broken stock Blender launchers.",
   "//7": "Do NOT use a bare `blender` command: it silently runs vanilla Blender 4.4. Use the mixar-mcp.cmd wrapper, which pins BLENDER_PATH.",
+  "//8": "unrealEditorUi is Epic's Slate inspector at http://127.0.0.1:8000/mcp. It starts with the editor. unrealMCP on 55557 stays the Python and actor server.",
 
   "mcpServers": {
     "unrealMCP": {
@@ -21,6 +22,9 @@
     "mixar": {
       "command": "cmd",
       "args": ["/c", "C:\\dev\\HomeWorld\\Tools\\mixar-mcp.cmd"]
+    },
+    "unrealEditorUi": {
+      "url": "http://127.0.0.1:8000/mcp"
     }
   }
 }

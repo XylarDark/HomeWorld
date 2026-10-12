@@ -6,12 +6,18 @@
 # Config: Content/Python/planetoid_map_config.json portal_level_to_open. Idempotent.
 
 import sys
+import os
 
 try:
     import unreal
 except ImportError:
     print("ERROR: Run this script inside Unreal Editor.")
     sys.exit(1)
+
+_py_dir = os.path.dirname(os.path.abspath(__file__))
+if _py_dir not in sys.path:
+    sys.path.insert(0, _py_dir)
+import editor_ui_need
 
 BP_NAME = "BP_PortalToPlanetoid"
 BP_PATH = "/Game/HomeWorld"
@@ -48,10 +54,10 @@ def _set_level_to_open_default(bp, level_name):
                 return True
             except Exception:
                 continue
-        _log("Could not set LevelToOpen on CDO (tried %s)." % level_name)
+        _log(editor_ui_need.report("portal-level", "Could not set LevelToOpen on CDO"))
         return False
     except Exception as e:
-        _log("Could not set LevelToOpen on CDO: " + str(e))
+        _log(editor_ui_need.report("portal-level", "Could not set LevelToOpen on CDO: " + str(e)))
         return False
 
 

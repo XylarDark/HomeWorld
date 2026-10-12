@@ -4,7 +4,7 @@ When the agent cannot automate a step (MCP, Python, GUI automation, commandlets)
 
 **Tutorial for all manual work:** For a single step-by-step guide to everything you must do in the Editor by hand (PCG, portal, main menu, State Tree, planetoid terrain, etc.), see [MANUAL_EDITOR_TUTORIAL.md](MANUAL_EDITOR_TUTORIAL.md).
 
-**Policy — Editor UI automation as default:** When we have the ability to interact with the Editor UI automatically (GUI scripts in `Content/Python/gui_automation/`), that is the **default method**. Use the clicker script first; manual is fallback when GUI is unavailable or fails. See [GUI_AUTOMATION_WHY_AND_WHEN.md](GUI_AUTOMATION_WHY_AND_WHEN.md) and [.cursor/rules/automation-standards.mdc](.cursor/rules/automation-standards.mdc). To add ref images to the repo so clickers work for everyone without per-machine capture, see [REF_IMAGES_SETUP_TUTORIAL.md](REF_IMAGES_SETUP_TUTORIAL.md).
+**Policy — Editor UI when Python cannot write:** A failed write on the portal `LevelToOpen` field, a State Tree graph, or a PCG Details field listed as no-access logs `editor_ui: NEED_SLATE`. That token opens `.cursor/skills/ue-editor-ui/SKILL.md`. Do not open a new gap entry for those three panels. Other gaps stay logged here.
 
 **Format per entry:** Date | Feature/task | What is needed | Why automation didn't cover it | Suggested approach for future automation
 

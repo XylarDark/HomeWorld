@@ -25,7 +25,7 @@ When the user reports that **Generate produces no instances**, follow this order
 4. **Landscape:** Tag **PCG_Landscape**; **Component Subsection = 1x1**.
 5. **World Partition:** If the level uses WP (e.g. DemoMap), use **Window → World Partition → Load All** (or load the region) before Generate so Get Landscape Data can find the Landscape.
 
-**Output Log:** Instruct the user to open **Window → Developer Tools → Output Log**, click Generate (or **Ctrl+Click**), then search for **LogPCG** and **"No surfaces found"** and capture that for diagnosis.
+**Output Log:** After Generate, read `Saved/Logs/HomeWorld.log` for **LogPCG** and **"No surfaces found"**. Do not ask the user to open the Output Log.
 
 **Surface Sampler Debug:** In the graph, **Surface Sampler** → Details → **Debug** → enable **Debug**, set **Point Mesh** to a small mesh (e.g. PCG_Cube). Generate again: if debug cubes appear, the problem is **downstream** (spawner/mesh list); if no cubes, the problem is **Get Landscape Data or bounds**.
 
@@ -35,19 +35,19 @@ When the user reports that **Generate produces no instances**, follow this order
 
 ## Minimal working graph
 
-Input → **Get Landscape Data** → **Surface Sampler** (Surface + Bounding) → [optional Transform Points] → **Static Mesh Spawner** → Output. Get Landscape Data **Out** → Surface Sampler **Surface**; graph **Input** → Surface Sampler **Bounding Shape**. Mesh list and Get Landscape Data (By Tag + Component) are **mandatory manual steps** in UE 5.7; see [docs/PCG/PCG_BEST_PRACTICES.md](../../docs/PCG/PCG_BEST_PRACTICES.md) and [docs/PCG/PCG_VARIABLES_NO_ACCESS.md](../../docs/PCG/PCG_VARIABLES_NO_ACCESS.md).
+Input → **Get Landscape Data** → **Surface Sampler** (Surface + Bounding) → [optional Transform Points] → **Static Mesh Spawner** → Output. Get Landscape Data **Out** → Surface Sampler **Surface**; graph **Input** → Surface Sampler **Bounding Shape**. When Python cannot set By Tag or the mesh list, the script logs `editor_ui: NEED_SLATE panel=pcg-details`. Open [.cursor/skills/ue-editor-ui/SKILL.md](../ue-editor-ui/SKILL.md).
 
-## Mandatory manual steps
+## When Python cannot write the panel
 
-Before changing the graph or adding nodes, ensure these are documented and (where applicable) done in the Editor: (1) Get Landscape Data: By Tag `PCG_Landscape`, Component By Class → Landscape Component; (2) Mesh list on each Static Mesh Spawner; (3) Graph assigned to volume; (4) Landscape tag and Component Subsection 1x1; (5) World Partition Load All before Generate if the level uses WP. See [docs/PCG/PCG_BEST_PRACTICES.md](../../docs/PCG/PCG_BEST_PRACTICES.md).
+Before changing the graph, try the script. If By Tag or the Static Mesh Spawner mesh list cannot be set, the log contains `editor_ui: NEED_SLATE panel=pcg-details`. Open the editor-UI skill and snapshot that Details field. Do not ask the user to click it. Graph assignment, the landscape tag, and World Partition load stay on the script when it can set them. See [docs/PCG/PCG_BEST_PRACTICES.md](../../docs/PCG/PCG_BEST_PRACTICES.md).
 
 ## General validation (when to use)
 
 1. **Landscape tag:** The Landscape in the level must have the tag **PCG_Landscape**. The script `create_demo_from_scratch.py` calls `ensure_landscape_has_pcg_tag()`. If unsure, select the Landscape in the Outliner → Details → Actor → Tags → add PCG_Landscape. Landscape Component Subsection should be **1x1** (Details) for PCG in UE 5.x.
 
-2. **Get Landscape Data (in graph):** Open ForestIsland_PCG → select **Get Landscape Data** node → Details: **Actor** → **By Tag**, tag **PCG_Landscape**; **Component** → **By Class** → **Landscape Component** if available. Script cannot set this in UE 5.7; it must be done in the Editor. See [docs/PCG/PCG_SETUP.md](../../docs/PCG/PCG_SETUP.md) and [docs/PCG/PCG_VARIABLES_NO_ACCESS.md](../../docs/PCG/PCG_VARIABLES_NO_ACCESS.md).
+2. **Get Landscape Data (in graph):** Open ForestIsland_PCG → select **Get Landscape Data** node → Details: **Actor** → **By Tag**, tag **PCG_Landscape**; **Component** → **By Class** → **Landscape Component** if available. When the script cannot set this, it logs `editor_ui: NEED_SLATE panel=pcg-details`. Open the editor-UI skill.
 
-3. **Mesh lists on spawners:** Tree and rocks Static Mesh Spawner nodes need meshes assigned in Details (Mesh Selector / mesh list). Script cannot set these. Use paths from `Content/Python/pcg_forest_config.json` (static_mesh_spawner_meshes, static_mesh_spawner_meshes_rocks) or assign in the graph. Without meshes, Generate produces no instances.
+3. **Mesh lists on spawners:** Tree and rocks Static Mesh Spawner nodes need meshes assigned in Details (Mesh Selector / mesh list). When the script cannot set these, it logs the same `pcg-details` token. Paths live in `Content/Python/pcg_forest_config.json`.
 
 4. **Graph assigned to volume:** In the level, select **PCG_Forest** (or the PCG Volume) → Details → **Graph** → ForestIsland_PCG. If the script could not assign it (protected in UE 5.7), assign manually.
 

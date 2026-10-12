@@ -14,6 +14,11 @@ import os
 import sys
 import time
 
+_py_dir = os.path.dirname(os.path.abspath(__file__))
+if _py_dir not in sys.path:
+    sys.path.insert(0, _py_dir)
+import editor_ui_need
+
 try:
     import unreal
 except ImportError:
@@ -947,7 +952,8 @@ def try_set_get_landscape_selector(graph_asset):
                             continue
                 except Exception:
                     continue
-    _log("try_set_get_landscape_selector: Could not set tag from script. Set Get Landscape Data to By Tag + PCG_Landscape in the graph Details.")
+    line = editor_ui_need.report("pcg-details", "Could not set Get Landscape Data By Tag")
+    _log(line)
     return False
 
 
@@ -973,7 +979,7 @@ def try_set_spawner_mesh_lists(graph_asset):
         _log("try_set_spawner_mesh_lists: PCGStaticMeshSpawnerSettings not found.")
         return 0
     if not entry_cls:
-        _log("try_set_spawner_mesh_lists: PCGStaticMeshSpawnerEntry not in unreal; set mesh lists in Editor (Details on each Static Mesh Spawner node).")
+        _log(editor_ui_need.report("pcg-details", "Static Mesh Spawner mesh list is not settable from Python"))
         return 0
     spawner_settings_list = []
     for node in nodes:
@@ -1010,7 +1016,7 @@ def try_set_spawner_mesh_lists(graph_asset):
         except Exception as e:
             _log("try_set_spawner_mesh_lists: spawner %d failed: %s" % (i + 1, e))
     if updated == 0 and spawner_settings_list:
-        _log("try_set_spawner_mesh_lists: Could not set mesh_entries on any spawner; set mesh list in Editor on each Static Mesh Spawner node.")
+        _log(editor_ui_need.report("pcg-details", "Could not set the Static Mesh Spawner mesh list"))
     return updated
 
 
