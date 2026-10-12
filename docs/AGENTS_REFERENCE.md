@@ -25,7 +25,7 @@
 
 **Code:** C++ lives in `Source/HomeWorld/`. Default pawn: `AHomeWorldCharacter`; default game mode: `AHomeWorldGameMode`. Both use Enhanced Input for movement and look.
 
-**Stack (enabled plugins):** Enhanced Input, PCG, Gameplay Abilities, Steam Sockets, Day Sequence. For Week 2 family agents, enable UE 5.8 recommended Mass Entity + Mass AI, StateTree, ZoneGraph, SmartObjects (see [docs/SETUP.md](docs/SETUP.md)). Config in `Config/`; project layout and rules in `.cursor/rules/` (Unreal C++, Blueprint, project).
+**Stack (enabled plugins):** Enhanced Input, PCG, Gameplay Abilities, Steam Sockets, Day Sequence. For Week 2 family agents, enable UE 5.8 recommended MassGameplay + MassAI, StateTree, ZoneGraph, SmartObjects (see [docs/SETUP.md](docs/SETUP.md)). Config in `Config/`; project layout and rules in `.cursor/rules/` (Unreal C++, Blueprint, project).
 
 **Context discipline:** past ~60k tokens of conversation you are in what the Agentic Engineering material calls the **dumb zone** - instruction-following and recall both degrade. Above it: write state to a .md file, summarise open threads and next actions there, and start a fresh session from that file. Do not carry the context forward and hope. Split research across agents rather than deepening one thread.
 

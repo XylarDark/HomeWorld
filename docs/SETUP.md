@@ -7,7 +7,7 @@ This guide walks you through setting up the project so you can open the Editor, 
 ## What you need before starting
 
 - **Windows** (project is developed on Windows).
-- **Unreal Engine 5.8** (or 5.4+; 5.7 recommended). Install from Epic Games Launcher.
+- **Unreal Engine 5.8** (5.8-only per lock; do not add engine variants without team decision). Install from Epic Games Launcher.
 - **HomeWorld repo** cloned locally (e.g. `git clone` and open the folder).
 
 For a **pinned toolchain matrix** (Visual Studio workloads, Git LFS, Python, `UE_EDITOR`, C++ IntelliSense options, and Cursor plugin decisions), see [Setup/DEV_ENV_MATRIX.md](Setup/DEV_ENV_MATRIX.md).
@@ -18,7 +18,7 @@ For a **pinned toolchain matrix** (Visual Studio workloads, Git LFS, Python, `UE
 
 ### Step 1: Install the engine and open the project
 
-1. Install **Unreal Engine 5.8** from the Epic Games Launcher. The project targets UE 5.8 and is compatible with 5.7.x (including 5.7.3). The project is developed code-first; see [CONVENTIONS.md](CONVENTIONS.md) for conventions.
+1. Install **Unreal Engine 5.8** from the Epic Games Launcher. The project targets UE 5.8 only. The project is developed code-first; see [CONVENTIONS.md](CONVENTIONS.md) for conventions.
 2. Open **`HomeWorld.uproject`** (double-click or from the Launcher). Allow first-time load and compile.
 
 ### Step 2: Confirm plugins are enabled
@@ -72,7 +72,7 @@ All required plugins are enabled in `HomeWorld.uproject`. No Marketplace install
 | Enhanced Input | `EnhancedInput` | Better controls |
 | Day Night Sequencer (UE5.5+) | `DaySequence` | Day/night cycles |
 
-**Week 2 plugins (Mass + State Trees):** For autonomous family agents (Week 2+), enable UE 5.8 recommended: **MassEntity**, **MassGameplay**, **MassAI**, **MassNavigation**, **MassRepresentation**, **StateTree**, **ZoneGraph**, **SmartObjects**. Restart the Editor after enabling. Validation: Plugins tab shows Mass / StateTree / ZoneGraph / SmartObjects enabled. See [FAMILY_AGENTS_MASS_STATETREE.md](tasks/FAMILY_AGENTS_MASS_STATETREE.md).
+**Week 2 plugins (Mass + State Trees):** For autonomous family agents (Week 2+), enable UE 5.8 recommended: **MassGameplay**, **MassAI**, **StateTree**, **ZoneGraph**, **SmartObjects** (MassEntity removed in 5.8 — see [UE58_TECH.md](UE/UE58_TECH.md)). Restart the Editor after enabling. Validation: Plugins tab shows Mass / StateTree / ZoneGraph / SmartObjects enabled. See [FAMILY_AGENTS_MASS_STATETREE.md](tasks/FAMILY_AGENTS_MASS_STATETREE.md).
 
 **Python/PCG scripts:** For the demo map and PCG forest scripts, **PythonScriptPlugin** and **PCGPythonInterop** must also be enabled. Restart the Editor after first enable.
 
@@ -112,7 +112,7 @@ Use this checklist to confirm first-phase setup before starting tasks. Work thro
 
 **Developer (Editor):**
 
-- [ ] UE 5.4+ (or 5.7) installed; project opens without plugin errors. **Edit > Plugins** shows PCG, Gameplay Abilities, Enhanced Input, Steam Sockets, Day Night Sequencer enabled.
+- [ ] UE 5.8 installed; project opens without plugin errors. **Edit > Plugins** shows PCG, Gameplay Abilities, Enhanced Input, Steam Sockets, Day Night Sequencer enabled.
 - [ ] FAB/Quixel assets (or equivalents) acquired if needed.
 - [ ] Team has run through the [workflow Pre–Day 1 checklist](workflow/README.md) if applicable.
 
