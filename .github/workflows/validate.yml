@@ -24,9 +24,16 @@ jobs:
       # The submodule repo is public, so no token is needed. The other two jobs are
       # left alone: python-lint reads Content/Python and rules-score reads .cursor,
       # and neither lives in the submodule.
+      #
+      # `lfs` is required for the same reason. Git stores LFS-tracked binaries as
+      # ~130-byte pointer stubs, and Content/HomeWorld/Maps/VS_MVP/** is LFS-tracked.
+      # Without this input the polish-readiness suite parsed a pointer as a .umap,
+      # counted 0 actors and failed a test that is correct about the real level.
+      # ci.yml already fetches LFS; this job simply never did.
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+          lfs: true
 
       - name: Check HomeWorld.uproject exists and is valid JSON
         run: |
