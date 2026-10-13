@@ -31,7 +31,7 @@ This file is the executable design contract for WAVE 1 Track A. GP/SYS implement
 1. **Dawn → Day/Body:** Player is body form on homestead. Spirit layer off / NightMix → 0. Gather nodes, material sites, den/camp day interacts, and beast pad active.
 2. **Day departure:** From lookout / glider perch, start the steered cloud descent. Land in the open field. The scripted `FALLBACK` is a separate implementation path.
 3. **Day slice:** Walk the field and forest path; **reap** at material / living sites; encounter/tame. The player remains in body form until both sleep and rune gates are met.
-4. **Sleep + rune → Night/Spirit:** Both gates are required to become spirit. Without either gate, the player remains body. NightMix → 1 only after the form change; day reap interacts idle or blocked.
+4. Sleep in the bed is the only form change. There is no rune, and each zone's shrine is its waypoint home and its own activator.
 5. **Night loop:** Portal homestead ↔ planet (Verb 5); **sow** (nurture / influence); tend the camp and rescue the loved one; heal or recruit other dream encounters according to their current specification; return / sleep → dawn (Verb 8).
 6. **Homestead is hub.** Planet is the same world slice visible from lookout — not a second game.
 
@@ -73,7 +73,7 @@ Each verb: trigger, player action, success, fail/idle, approx duration (seconds)
 | Field | Spec |
 |---|---|
 | Trigger | Day/body only. Player enters lookout / glider perch interact volume + confirm |
-| Player action | Freely steer the glider through the cloud descent toward the open-field landing, without rail, corridor, or artificial steering limits. The existing scripted `FALLBACK` remains a separate route implementation. |
+| Player action | At night the spirit glides off the homestead with the same 450 m drop and the same steering as the day glide. In the zones, spirit form crosses forest edges only, and the cliff and river stay closed. No meter height is written for it. |
 | Success | Touch down in the open field; control restored to walk |
 | Fail / idle | Leave the perch volume without confirm → idle. Mid-route abort and recovery are unresolved for the current route. Night: verb unavailable. |
 | Duration | 30 s from launch to landing (developer decision 2026-10-05). Route facts and placeholders are in [`HOMEWORLD_ROUTE.md`](context/HOMEWORLD_ROUTE.md). |
@@ -153,7 +153,7 @@ World = gather on planet (day). Stored = place / convert at homestead storage pr
 | RES_HERB | Herb | Day Use on herb cluster → +1 Herb | Poultice bundle shelf → Stored | **Heal** (V6); alternate **tame offer** |
 | RES_SEED | Spirit seed | Day Use on faint day plant (rare node) → +1 Seed | Night crop planter receives seed for nurture | **Nurture crop** (V7); optional **heal** alternate if SYS prefers seed over herb for one spirit |
 
-**Gather rules:** One interact = one unit. Gathering a pile takes one from a pool of piles. There is no cooldown, and dawn alone does not bring a pile back; new piles come from spirit fertilizer — dung + a cloud wisp dispersed by the player in night spirit flight over the herb sites (see [`HOMEWORLD_ROUTE.md`](context/HOMEWORLD_ROUTE.md)). Prompt shows RES_ID. Fail if no free inventory handling (§10).
+**Gather rules:** One interact = one unit. Gathering a pile takes one from a pool of piles. There is no cooldown, and dawn alone does not bring a pile back. There is no morning pile. The night flight spreads the mixed fertilizer over the field herb sites, and the night's cap is two cloud wisps, one for the wound and one mixed with a dung. Prompt shows RES_ID. Fail if no free inventory handling (§10).
 
 **Store rules:** Homestead-only. Transfer 1 unit inventory → Stored count. Does not create new RES types.
 
@@ -207,7 +207,7 @@ Both complete = V7 done. Day: targets visible but nurture blocked.
 
 ### Active cloud descent (day/body)
 
-1. Player begins at the lookout / glider perch.
+1. At night the spirit glides off the homestead with the same 450 m drop and the same steering as the day glide. In the zones, spirit form crosses forest edges only, and the cliff and river stay closed. No meter height is written for it.
 2. Confirm → freely steer through the cloud descent. Steering has no rail, corridor, or artificial bounds.
 3. Collect a cloud wisp; it stays with the player through landing.
 4. Exit below the cloud layer and land in the existing field. Walk control returns on landing.
@@ -221,7 +221,7 @@ The fixed-crumb scripted glide remains a separate fallback implementation. Its r
 
 - Homestead shrine ↔ planet return shrine only.
 - Both directions required in MVP (even under FALLBACK).
-- No third map. No night flight.
+- At night the spirit glides off the homestead with the same 450 m drop and the same steering as the day glide. In the zones, spirit form crosses forest edges only, and the cliff and river stay closed. No meter height is written for it.
 
 ---
 
