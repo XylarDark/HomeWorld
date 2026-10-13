@@ -5,17 +5,21 @@
 #include "HomeWorldInventorySubsystem.h"
 #include "HomeWorldInventoryTypes.h"
 #include "Components/BoxComponent.h"
+#include "Components/SceneComponent.h"
 #include "Engine/World.h"
 
 AHomeWorldResourcePile::AHomeWorldResourcePile()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	SceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("SceneRoot"));
+	RootComponent = SceneRoot;
+
 	OverlapVolume = CreateDefaultSubobject<UBoxComponent>(TEXT("OverlapVolume"));
 	OverlapVolume->SetBoxExtent(FVector(50.0f, 50.0f, 50.0f));
 	OverlapVolume->SetCollisionProfileName(FName("BlockAllDynamic"));
 	OverlapVolume->SetGenerateOverlapEvents(false);
-	RootComponent = OverlapVolume;
+	OverlapVolume->SetupAttachment(SceneRoot);
 
 	Tags.Add(FName("ResourcePile"));
 }
