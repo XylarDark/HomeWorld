@@ -11,7 +11,22 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
+      # `submodules` is REQUIRED here, not a nicety.
+      #
+      # Content/Python/check_session_start.py asserts that
+      # UserHarness/docs/human-use/route-context.md exists. Without this input,
+      # actions/checkout leaves UserHarness/ as an empty gitlink, so the door check
+      # failed on every run from 428c772a (2026-10-06) onward - and because that step
+      # sits early, every step after it never executed: the uproject check, the doc
+      # checks, preflight, verify:fast, the node suites and the lint. A red step that
+      # is always red tells nobody when it gets redder.
+      #
+      # The submodule repo is public, so no token is needed. The other two jobs are
+      # left alone: python-lint reads Content/Python and rules-score reads .cursor,
+      # and neither lives in the submodule.
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Check HomeWorld.uproject exists and is valid JSON
         run: |
