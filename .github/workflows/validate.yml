@@ -10,6 +10,20 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    # No bytecode on this runner.
+    #
+    # The Git hygiene step runs `find` over the working tree rather than
+    # `git ls-files`, and it is right to: a committed __pycache__ is exactly
+    # what it exists to catch. But Python writes one by default, so the door
+    # check near the top and verify:fast's python suite in the middle both
+    # leave directories behind for it to find - the gate failing on litter the
+    # run produced itself, which is the same mistake as a red step nobody
+    # watched, pointed the other way.
+    #
+    # Stopping the litter at the source leaves the check exactly as strict as
+    # it was. Bytecode is a cache; no assertion in the suite depends on it.
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
     steps:
       # `submodules` is REQUIRED here, not a nicety.
       #
