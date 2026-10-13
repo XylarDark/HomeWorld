@@ -1,8 +1,9 @@
 # Start automatic development cycle — QUARANTINED (WAVE F removed)
 
 > **Do not run.** The pre-swarm agent company and its cycle loop were **removed in WAVE F**.
-> `Content/Python/run_automation_cycle.py`, `Tools/Start-AllAgents*.ps1`, `Tools/Start-AutomationSession.ps1`,
-> `docs/workflow/CYCLE_TASKLIST.md`, and `docs/workflow/CYCLE_STATE.md` **no longer exist**.
+> `Content/Python/run_automation_cycle.py`, `Tools/Start-AllAgents*.ps1` and `Tools/Start-AutomationSession.ps1` <!-- path-exception: all three were deleted in WAVE F and are named only to warn against citing them -->
+> no longer exist.
+> The cycle documents were not deleted - they moved to `docs/TaskLists/CYCLE_TASKLIST.md` and `docs/TaskLists/CYCLE_STATE.md`.
 
 **Active driver:** [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md) + **Conductor** — [START_HERE.md](../../START_HERE.md).
 Cloud-agent packets: [swarm/CLOUD_AGENT_PACKET.md](../../swarm/CLOUD_AGENT_PACKET.md).

@@ -51,6 +51,7 @@ const SCAN_ROOTS = [
   'AGENTS.md',
   'docs/AGENTS_REFERENCE.md',
   '.cursor/rules',
+  '.cursor/commands',
   '.agents/skills',
   '.cursor/skills',
 ];
@@ -153,9 +154,13 @@ function deadReferences() {
       }
 
       // A deliberate citation of a deleted path must still carry its reason.
+      // Excuse every ref on that line, not just the first: a quarantine note
+      // lists a whole deleted stack in one sentence, and excusing only the
+      // first would force the author to shatter the sentence to pass the gate.
       if (EXCEPTION_RE.test(line)) {
-        const idx = dead.findIndex((d) => d.file === rel && d.line === i + 1);
-        if (idx >= 0) dead.splice(idx, 1);
+        for (let k = dead.length - 1; k >= 0; k--) {
+          if (dead[k].file === rel && dead[k].line === i + 1) dead.splice(k, 1);
+        }
       }
     });
   }

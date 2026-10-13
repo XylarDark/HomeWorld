@@ -19,5 +19,5 @@ From those, update as needed: `docs/KNOWN_ERRORS.md`, `.cursor/rules/`, `AGENTS.
 [.cursor/skills/automation-gap-solutions/SKILL.md](../../.cursor/skills/automation-gap-solutions/SKILL.md) ·
 [docs/Automation/AGENT_COMPANY.md](../../docs/Automation/AGENT_COMPANY.md) (history — the Refiner *role* this replaced).
 
-> **Quarantine:** the pre-swarm agent company and `Tools/Run-RefinerAgent.ps1` were **removed in WAVE F**.
+> **Quarantine:** the pre-swarm agent company and `Tools/Run-RefinerAgent.ps1` were **removed in WAVE F** <!-- path-exception: Run-RefinerAgent.ps1 was deleted in WAVE F and is named here to warn against citing it -->.
 > Active driver: [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md) + Conductor — [START_HERE.md](../../START_HERE.md).
