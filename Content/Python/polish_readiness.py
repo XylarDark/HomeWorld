@@ -1588,7 +1588,9 @@ def check_asset_masters() -> Check:
         return Check("asset.master_count", "G-ASSET",
                      "Exactly ten master materials exist",
                      _rel(MASTERS_DIR), "directory absent",
-                     str(EXPECTED_MASTER_COUNT), MISSING, "")
+                     str(EXPECTED_MASTER_COUNT), MISSING,
+                     "Content/HomeWorld/Materials/Masters is absent, so nothing can "
+                     "be counted. Restore the master materials before reading this row.")
     names = sorted(p.stem for p in MASTERS_DIR.glob("*.uasset"))
     n = len(names)
     state = PASS if n == EXPECTED_MASTER_COUNT else FAIL
@@ -1717,7 +1719,10 @@ def check_asset_poly_budgets() -> Check:
             "asset.poly_budgets", "G-ASSET",
             "Export manifest declares a poly budget per mesh",
             _rel(EXPORT_MANIFEST), "absent", "budget per mesh",
-            MISSING, "")
+            MISSING,
+            "AssetCreation/Exports/MVP_EXPORT_MANIFEST.md is absent, so no poly "
+            "budget can be checked. Regenerate the export manifest before reading "
+            "this row.")
     text = EXPORT_MANIFEST.read_text(encoding="utf-8-sig", errors="replace")
     has_budget = bool(re.search(r"(?i)(poly|tris?|budget)", text))
     return Check(
@@ -1852,7 +1857,9 @@ def check_feel_tunable_baselines() -> Check:
             "feel.tunable_baselines", "G-FEEL",
             "Every TODO tunable has a measured pre-tune value",
             _rel(FEEL_CANON), "absent", "one value per tunable",
-            MISSING, "")
+            MISSING,
+            "Docs/canon/FEEL.md is absent, so no tunable baseline can be checked. "
+            "Restore the feel canon before reading this row.")
     data = _read_json(BASELINE_FILE)
     baselines = (data or {}).get("tunables") or {}
     if not baselines:
@@ -2057,7 +2064,10 @@ def check_feel_binary_fresh() -> Check:
             "feel.binary_fresh", "G-FEEL",
             "Last automation run executed tests against a fresh binary",
             _rel(AUTOMATION_RESULT), "no artifact",
-            "failures == 0 and dll_stale false", MISSING, "")
+            "failures == 0 and dll_stale false", MISSING,
+            "Saved/automation_run_result.json is a local artifact, so it does not "
+            "exist on a fresh checkout. Run `npm run verify:ue` to produce one; a "
+            "missing artifact is not a passing run.")
     if data.get("dll_stale"):
         return Check(
             "feel.binary_fresh", "G-FEEL",
