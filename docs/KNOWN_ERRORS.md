@@ -291,7 +291,7 @@ For each entry use:
 ### Check-AutomationPrereqs.ps1 fails: CURRENT_TASK_LIST / NEXT_SESSION_PROMPT missing
 - **Error:** `.\Tools\Check-AutomationPrereqs.ps1` exits non-zero with `CURRENT_TASK_LIST.md not found` or `NEXT_SESSION_PROMPT.md not found` under `docs/workflow/`.
 - **Cause:** Those files are only required when running the **30-day / multi-round automation loop**. They are created from templates when you generate a new task list (see [HOW_TO_GENERATE_TASK_LIST.md](workflow/HOW_TO_GENERATE_TASK_LIST.md)).
-- **Fix:** If you are **not** using the loop, treat CLI/agent and `UE_EDITOR` checks as the useful parts of the script output; ignore the task-list failures or generate the missing files per HOW_TO_GENERATE_TASK_LIST. If you **are** using the loop, create `docs/workflow/CURRENT_TASK_LIST.md` and `docs/workflow/NEXT_SESSION_PROMPT.md` from the template.
+- **Fix:** If you are **not** using the loop, treat CLI/agent and `UE_EDITOR` checks as the useful parts of the script output; ignore the task-list failures or generate the missing files per HOW_TO_GENERATE_TASK_LIST. If you **are** using the loop, create `docs/TaskLists/CURRENT_TASK_LIST.md` and `docs/TaskLists/NEXT_SESSION_PROMPT.md` from the template.
 - **Context:** 2026-04-08, dev environment verification; [DEV_ENV_MATRIX.md](Setup/DEV_ENV_MATRIX.md).
 
 ### C4456: declaration hides previous local (MSVC)

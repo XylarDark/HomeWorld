@@ -56,7 +56,7 @@
 
 | Measure | What it does |
 |--------|----------------|
-| **Prompt: must update CURRENT_TASK_LIST** | RunAutomationLoop default prompt and NEXT_SESSION_PROMPT tell the agent: when you complete a task, you MUST update `docs/workflow/CURRENT_TASK_LIST.md` and set only that task’s `- **status:**` to `completed`. Reduces (A). |
+| **Prompt: must update CURRENT_TASK_LIST** | RunAutomationLoop default prompt and NEXT_SESSION_PROMPT tell the agent: when you complete a task, you MUST update `docs/TaskLists/CURRENT_TASK_LIST.md` and set only that task’s `- **status:**` to `completed`. Reduces (A). |
 | **Max 10 rounds per run** | RunAutomationLoop exits after 10 rounds even if the file still shows pending. Prevents infinite re-run of the same 10 tasks when status isn’t persisted. Reduces (A). |
 | **Parser fix** | Task list parser uses `\z` (end of string) so it correctly counts pending in T1–T10. Avoids mis-counts that could cause early exit or wrong "next" task. |
 | **ACCOMPLISHMENTS_OVERVIEW §4** | Each cycle’s outcome is summarized (e.g. "T1–T10 completed" or "T1 completed; T2–T10 pending"). When generating the *next* list, the generator should read this and avoid duplicating completed work unless re-verification is intended. Reduces (C). |

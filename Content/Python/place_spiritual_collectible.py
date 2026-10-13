@@ -2,7 +2,7 @@
 # Run from Unreal Editor with target level open (e.g. DemoMap): Tools -> Execute Python Script or via MCP.
 # Idempotent: places one AHomeWorldSpiritualCollectible (power) and one AHomeWorldSpiritualArtefact if none present.
 # In PIE: set hw.TimeOfDay.Phase 2 (night), walk into each actor to collect; run hw.SpiritualPower or hw.Goods to see both counters.
-# See docs/workflow/VISION.md (spiritual artefacts at night); T2 second type + power counter.
+# See VisionBoard/Core/VISION.md (spiritual artefacts at night); T2 second type + power counter.
 
 import sys
 

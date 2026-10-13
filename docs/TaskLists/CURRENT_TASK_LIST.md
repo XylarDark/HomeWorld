@@ -16,7 +16,7 @@
 
 ## T1. Log validate_task_list.py path fix in KNOWN_ERRORS
 
-- **goal:** The validator was hardcoded to ``docs/workflow/CURRENT_TASK_LIST.md`` but the file lives at ``docs/TaskLists/CURRENT_TASK_LIST.md``. The fix was applied in this session. Log the root cause and fix in ``docs/KNOWN_ERRORS.md`` — add a ``### validate_task_list.py path`` entry with symptom, cause, and fix. Also check ``.github/workflows/validate.yml`` for the legacy path reference.
+- **goal:** The validator was hardcoded to ``docs/TaskLists/CURRENT_TASK_LIST.md`` but the file lives at ``docs/TaskLists/CURRENT_TASK_LIST.md``. The fix was applied in this session. Log the root cause and fix in ``docs/KNOWN_ERRORS.md`` — add a ``### validate_task_list.py path`` entry with symptom, cause, and fix. Also check ``.github/workflows/validate.yml`` for the legacy path reference.
 - **success criteria:** ``docs/KNOWN_ERRORS.md`` has a ``### validate_task_list.py path`` entry; T1 status set to completed.
 - **research_notes:** Fix applied in ``Content/Python/validate_task_list.py`` line 17 (two-path fallback: TaskLists/ primary, workflow/ legacy). CI validate.yml may reference legacy path — check and note. Open only the format header and matching ``###`` section of KNOWN_ERRORS; never load the whole file.
 - **steps_or_doc:** ``docs/KNOWN_ERRORS.md``; ``Content/Python/validate_task_list.py``; ``.github/workflows/validate.yml``.

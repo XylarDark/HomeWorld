@@ -4,7 +4,7 @@
 
 **Convention:** `done` = implementation-complete. `pending` = not done (spec may exist). `blocked` = needs manual step or external fix.
 
-**Current mode:** Full verification pass complete (2026-03-03). All days 1–30 marked **done**; verify_30day_implementation.py artifact checks passed. Optional next: PIE spot-check, CYCLE_TASKLIST, or buffer/polish. See docs/workflow/NEXT_SESSION_PROMPT.md.
+**Current mode:** Full verification pass complete (2026-03-03). All days 1–30 marked **done**; verify_30day_implementation.py artifact checks passed. Optional next: PIE spot-check, CYCLE_TASKLIST, or buffer/polish. See docs/TaskLists/NEXT_SESSION_PROMPT.md.
 
 | Day | Focus | Status | Notes |
 |-----|--------|--------|--------|
@@ -39,4 +39,4 @@
 | 29 | Buffer | done | Catch-up per schedule. |
 | 30 | Buffer | done | Catch-up per schedule. |
 
-**Next session:** No pending verification days. See docs/workflow/NEXT_SESSION_PROMPT.md (optional PIE spot-check, CYCLE_TASKLIST, or buffer/polish). Update DAILY_STATE and SESSION_LOG at session end.
+**Next session:** No pending verification days. See docs/TaskLists/NEXT_SESSION_PROMPT.md (optional PIE spot-check, CYCLE_TASKLIST, or buffer/polish). Update DAILY_STATE and SESSION_LOG at session end.

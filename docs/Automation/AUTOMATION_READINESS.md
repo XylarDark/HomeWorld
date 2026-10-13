@@ -31,7 +31,7 @@ After that, the loop uses the task list and runs sessions until the 30-day windo
 | **Programming inside Editor** | Ready | MCP execute_python_script, init_unreal.py on load, Content/Python scripts; manual steps documented where API has no access. |
 | **Testing outside Editor** | Ready | run_ue_automation.py (Smoke group; Editor launches and exits); CI validate.yml (lint, JSON, docs, C++ pairing). Optional ci.yml for full build on self-hosted runner. |
 | **Testing inside Editor** | Ready | PythonAutomationTest (test_*.py), pie_test_runner.py, validate_assets.py; run via MCP or Tools > Execute Python Script when Editor is open. |
-| **Fully automated loop** | Ready | RunAutomationLoop.ps1 + NEXT_SESSION_PROMPT.md + CURRENT_TASK_LIST.md (10-task list). Requires Cursor Agent CLI. The loop auto-launches the Editor before the first round when UE_EDITOR is set; use `-NoLaunchEditor` to skip. See docs/workflow/HOW_TO_GENERATE_TASK_LIST.md. |
+| **Fully automated loop** | Ready | RunAutomationLoop.ps1 + NEXT_SESSION_PROMPT.md + CURRENT_TASK_LIST.md (10-task list). Requires Cursor Agent CLI. The loop auto-launches the Editor before the first round when UE_EDITOR is set; use `-NoLaunchEditor` to skip. See docs/TaskLists/HOW_TO_GENERATE_TASK_LIST.md. |
 
 ---
 

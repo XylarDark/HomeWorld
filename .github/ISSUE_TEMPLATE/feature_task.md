@@ -12,7 +12,7 @@ assignees: ''
 
 ## Roadmap / doc link
 
-(Which phase or doc does this relate to? e.g. docs/workflow/VISION.md, docs/workflow/30_DAY_SCHEDULE.md, docs/STACK_PLAN.md.)
+(Which phase or doc does this relate to? e.g. VisionBoard/Core/VISION.md, docs/workflow/30_DAY_SCHEDULE.md, docs/STACK_PLAN.md.)
 
 ## Acceptance criteria
 

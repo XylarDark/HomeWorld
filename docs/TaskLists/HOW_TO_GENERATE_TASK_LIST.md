@@ -1,6 +1,6 @@
 # How to generate the current task list
 
-The automation loop is driven by **one task list**: `docs/workflow/CURRENT_TASK_LIST.md`. It must contain exactly **10 tasks** (T1–T10) with a consistent schema. The loop counts only T1–T10; do not add T11 or new task sections—document new work in SESSION_LOG or AUTOMATION_GAPS.md for the next list. This doc describes how to create or replace that list so agents have the best chance of one-shot success.
+The automation loop is driven by **one task list**: `docs/TaskLists/CURRENT_TASK_LIST.md`. It must contain exactly **10 tasks** (T1–T10) with a consistent schema. The loop counts only T1–T10; do not add T11 or new task sections—document new work in SESSION_LOG or AUTOMATION_GAPS.md for the next list. This doc describes how to create or replace that list so agents have the best chance of one-shot success.
 
 ## Task list composition: dynamic by development phase (policy)
 
@@ -79,10 +79,10 @@ To derive a new 10-task list from the current 30-day implementation status and s
 
 1. Run: `python Content/Python/migrate_30day_to_task_list.py`
 2. The script writes a draft to `Saved/Logs/current_task_list_draft.md` (it does not overwrite `CURRENT_TASK_LIST.md`).
-3. Copy the draft to `docs/workflow/CURRENT_TASK_LIST.md` and add **research_notes** (and tune goal/success_criteria) as needed.
+3. Copy the draft to `docs/TaskLists/CURRENT_TASK_LIST.md` and add **research_notes** (and tune goal/success_criteria) as needed.
 4. Run `python Content/Python/validate_task_list.py` to confirm the list is valid.
 
-The mapping of day ranges to T1–T10 is in `docs/workflow/30DAY_TO_10TASK_MAPPING.json`. Use `--write` only if you intend to overwrite `CURRENT_TASK_LIST.md` from the script (not recommended for normal iteration).
+The mapping of day ranges to T1–T10 is in `docs/TaskLists/30DAY_TO_10TASK_MAPPING.json`. Use `--write` only if you intend to overwrite `CURRENT_TASK_LIST.md` from the script (not recommended for normal iteration).
 
 ## Replacing the list
 

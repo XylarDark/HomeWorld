@@ -1,5 +1,5 @@
 """
-Validate docs/workflow/CURRENT_TASK_LIST.md for automation loop.
+Validate docs/TaskLists/CURRENT_TASK_LIST.md for automation loop.
 Checks: T1-T10 sections exist; each has goal, success_criteria, research_notes (or implementation_notes),
 steps_or_doc, status; status in (pending, in_progress, completed, blocked).
 Exit 0 if valid, 1 otherwise; print which task or field is missing.
