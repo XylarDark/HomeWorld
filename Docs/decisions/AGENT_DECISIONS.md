@@ -1012,3 +1012,15 @@ U58F-F still stands: do not replace UnrealMCP, and do not enable the rest of Epi
 
 **Use:** Editor Python or UnrealMCP first. Slate snapshot and click only when the panel has no Python API. One Epic tool call at a time. Stop on a password, purchase, or delete confirmation.
 
+---
+
+## DEC-0038 - Advertised surface 3943 to 4026, for the editor-UI skill
+
+**Decision:** Raise `ADVERTISED_MAX` in `scripts/instruction-budget.js` from 3943 to 4026. The `ue-editor-ui` skill is new always-on surface: its `.agents` description is 336 chars, and every description is in context on every request whether or not the Slate inspector is ever used.
+
+The number is not the cost of that skill as it was first written. Two identical 29-line copies were staged, one in each tree, which billed 672 for one skill and tripped the ratchet at 4279. The `.cursor` copy is now an 83-char pointer to the `.agents` body - the same shape as `ue58-api-check` and the `ue57-api-check` tombstone. That removed 253 chars and took the overage from 336 down to 83.
+
+**Rejected:** Raising straight to 4279. That would have recorded the duplicate as the baseline, so the ratchet would never have caught it again. A second copy of a corpus that is loaded twice is exactly the thing this number exists to notice.
+
+**Does not decide:** Whether any given skill is worth its description. That stays a per-skill judgement at the time it is written, by whoever writes it. This records only what the surface became, and why.
+
