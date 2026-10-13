@@ -9,6 +9,7 @@
 
 class UBoxComponent;
 class UHomeWorldInventorySubsystem;
+class USceneComponent;
 
 /**
  * Base actor for gather nodes (world harvest). Blueprint BP_WoodPile etc. inherit.
@@ -58,6 +59,10 @@ public:
 	bool IsHarvestAvailable() const;
 
 protected:
+	/** Plain scene root (interview #21, 1A). OverlapVolume hangs under it instead of being the root itself. */
+	UPROPERTY(VisibleAnywhere, Category = "Resource")
+	TObjectPtr<USceneComponent> SceneRoot;
+
 	UPROPERTY(VisibleAnywhere, Category = "Resource")
 	TObjectPtr<UBoxComponent> OverlapVolume;
 
