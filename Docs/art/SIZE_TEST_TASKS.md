@@ -58,7 +58,7 @@ Snapped onto the cottage and the pad. One mesh each. Reuse on three props or cut
 | 15 | Crystal shard | One sheet. The warm eye can be this, or a window. | Readable beside the player. Not a lawn-wide glow. | One shard. Night is a material later, not a second mesh. |
 | 16 | Bed | Measured block. | Readable from the bedroom door. No rune. | The player can stand at it. The form change is not this test. |
 | 17 | Kettle | Sheet, then TripoSR. | Sits on the stove. | One kettle. |
-| 18 | Glider perch | Measured timber pad and a simple rail. | Player-sized pad on the cliff side of the island. | The player can stand on it and face the drop. |
+| 18 | Glider perch | Cut by Lead 2026-10-13. Measured timber pad and a simple rail. | Player-sized pad on the cliff side of the island. | The player can stand on it and face the drop. |
 | 19 | Shrine stone | Measured standing stone. | 4 m. No tech, no rune. | It reads from the yard. |
 
 ## Wave 4 — family, as size dummies
