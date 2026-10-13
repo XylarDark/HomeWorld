@@ -2103,6 +2103,27 @@ class NotificationCarriesTheQuestion(unittest.TestCase):
     drops the only part that matters.
     """
 
+    def _force_platform(self, name: str) -> None:
+        """Run this test as if the host were `name`.
+
+        `notify_toast` guards on `sys.platform`, and everything under test -
+        truncation before the limit, delivery through the environment rather
+        than the command line, and reporting an OSError instead of raising it -
+        sits behind that guard. Skipping on Linux instead would hand the CI run
+        three fewer tests and gain nothing, because everything past the guard is
+        pure Python and each of these tests already replaces `subprocess.run`,
+        so no PowerShell is ever spawned.
+
+        Forcing the platform is only honest because the guard has its own test
+        pointing the other way: `test_toast_refuses_off_windows` deletes the
+        branch by observation rather than by assertion, so if the guard were
+        removed that one fails instead of these three passing quietly on any
+        host that likes.
+        """
+        real = nt.sys.platform
+        nt.sys.platform = name
+        self.addCleanup(setattr, nt.sys, "platform", real)
+
     def test_the_route_table_is_the_measured_one(self):
         """Asserted as literals, not against the module's own dict.
 
@@ -2277,6 +2298,7 @@ class NotificationCarriesTheQuestion(unittest.TestCase):
         A notification that refuses to appear because the message was slightly
         too long is the worst of both.
         """
+        self._force_platform("win32")
         captured = {}
         real = nt.subprocess.run
 
@@ -2300,6 +2322,7 @@ class NotificationCarriesTheQuestion(unittest.TestCase):
         Building a PowerShell literal out of them is how a notification
         silently disappears.
         """
+        self._force_platform("win32")
         captured = {}
 
         def fake_run(cmd, **kw):
@@ -2319,6 +2342,14 @@ class NotificationCarriesTheQuestion(unittest.TestCase):
         self.assertNotIn("quoted", " ".join(captured["cmd"]))
 
     def test_a_failing_toast_reports_rather_than_raises(self):
+        """A missing PowerShell is a reported failure, not an exception.
+
+        Off Windows the guard returns first, so the platform is forced: the
+        point is the `except` clause at the subprocess call, which exists so a
+        broken notification cannot end a session close.
+        """
+        self._force_platform("win32")
+
         def boom(cmd, **kw):
             raise OSError("no powershell")
 
@@ -2328,6 +2359,20 @@ class NotificationCarriesTheQuestion(unittest.TestCase):
         ok, detail = nt.notify_toast("t", "b")
         self.assertFalse(ok)
         self.assertIn("OSError", detail)
+
+    def test_toast_refuses_off_windows(self):
+        """The guard, forced in the direction CI actually runs.
+
+        A toast needs Windows, so a host that cannot raise one has to say so
+        instead of attempting it. This is the test that makes the three above
+        readable as evidence: they force the platform forward to reach the code
+        under test, and this one forces it back, so deleting the guard fails
+        here rather than leaving them passing on any host that likes.
+        """
+        self._force_platform("linux")
+        ok, detail = nt.notify_toast("t", "b")
+        self.assertFalse(ok, "a host with no toast channel reported success")
+        self.assertIn("not Windows", detail)
 
     def test_the_notification_never_raises_out_of_notify(self):
         """One broken channel must not take the session close down with it."""
