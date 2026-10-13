@@ -71,6 +71,8 @@ Reports are partial for Unreal (C++/Blueprint) but useful for repo hygiene, secr
 
 Sync copies **only allowlisted paths**; dry-run is the default. It never overwrites root `AGENTS.md`, never copies MCP configs, and never injects retired always-on rules.
 
+**It can still re-add retired rules.** `npm run sync` reports it would copy in `11-javascript.mdc` and `13-markdown.mdc`, both listed under "Retired — stay deleted" in [.cursor/rules/README.md](../../.cursor/rules/README.md), plus `14-json-yaml`, `15-shell-scripts` and `22-unreal-editor-ui`. Read the dry run before passing `--apply`.
+
 ```bash
 # Preview (agent-context + operational-memory)
 npm run sync

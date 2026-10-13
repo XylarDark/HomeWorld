@@ -17,32 +17,43 @@ for one by description. Adding an always-apply rule is a regression — see
 
 History: HR-B2 cut 15 → 3, and P4 cut 3 → 0 by retiring `07-ai-agent-behavior`
 and `08-project-context` (both were near-duplicates of `AGENTS.md`) and
-glob-scoping `20-full-automation-no-manual-steps` (whose invariant is already
-stated in `AGENTS.md`). 
+glob-scoping `20-full-automation-no-manual-steps`. Its invariant rides on those
+globs — it is **not** in `AGENTS.md`, so the globs are what make it reachable.
 
 | Was always-apply | Now | Why |
 |---|---|---|
  `08-project-context.mdc` | tombstone, `alwaysApply: false` | A stale fork of `AGENTS.md`, with 3 references to files that do not exist |
-| `20-full-automation-no-manual-steps.mdc` | `alwaysApply: false`, globs `Content/Python`, `Tools`, `.github/workflows`, `docs/Automation`, `.cursor/skills` | Invariant is in `AGENTS.md`; this file keeps the gap-log format and the host gate |
+| `20-full-automation-no-manual-steps.mdc` | `alwaysApply: false`, globs `Content/Python`, `Tools`, `.github/workflows`, `docs/Automation`, `.cursor/skills` | Invariant rides the globs (not `AGENTS.md`); this file keeps the gap-log format and the host gate |
 
 ### Opt-in by glob
 
 | Group | Files |
 |---|---|
-| Code | `00-core-principles`, `05-error-handling`, `16-feature-debug-instrumentation` |
 | Tests | `03-testing` |
-| Python | `12-python` |
-| Shell | `15-shell-scripts` |
-| JSON/YAML | `14-json-yaml` |
 | MCP | `09-mcp-workflow` (transport, capability, crash rules); `09b-mcp-utility-scripts` (harness scripts + envelope) |
 | Automation policy | `automation-standards` (tooling ladder, Lead gates); `19-automation-gaps` (gap procedure + log format pointer) |
 | Lookdev evidence | `lookdev-evidence-standards` (PA-E, MRQ, capture preconditions) |
 | Automation invariant | `20-full-automation-no-manual-steps` |
 | Game content | `18-game-development-principles` (`.uasset`/`.umap`/`Maps/`/`Lib/`) |
-| UE live | `21-unreal-engine`, `22-unreal-editor-ui`, `unreal-*`, `ue58-sources`, `ue58-editor-ui` |
+| UE live | `21-unreal-engine`, `unreal-cpp`, `unreal-gas`, `unreal-blueprint`, `unreal-project`, `ue58-sources`, `ue58-editor-ui` |
 | Docs layout | `19-docs-directory-structure` (`docs/**`, `Docs/**`) |
-| Plugins | `10-compound-engineering`, `11-parallel-plugin` (`.cursor/**`) |
 | PCG | `pcg-best-practices` |
+
+Seventeen files, and that is all of them. This table used to also offer
+`00-core-principles`, `05-error-handling`, `10-compound-engineering`,
+`11-parallel-plugin`, `12-python`, `14-json-yaml`, `15-shell-scripts`,
+`16-feature-debug-instrumentation` and `22-unreal-editor-ui`. P2
+(`9f9a0a36`, 25 rules to 17) deleted them and did not update this table.
+P2 was -551 lines against 13 insertions, so their content was removed rather
+than folded into what stayed - do not go looking for a survivor.
+
+**`npm run sync` still offers five of them.** They live in the UserHarness
+pin, and `sync:apply` copies missing files in: measured dry run adds
+`11-javascript`, `13-markdown`, `14-json-yaml`, `15-shell-scripts` and
+`22-unreal-editor-ui`. Two of those are on the retired list below, so that
+command re-adds rules this project deliberately removed. Run the dry run
+first, and read [the sync note](../../docs/Setup/CURSOR_DEV.md).
+
 
 ### Description-only (agent-requested)
 
@@ -73,9 +84,10 @@ Rules point to canonical examples in the repo rather than inlining long code.
 
 - **C++:** `unreal-cpp.mdc` → pawn `HomeWorldCharacter.h/.cpp`; GAS:
   `HomeWorldGameplayAbility.h`, `HomeWorldAttributeSet.h`.
-- **Python:** `12-python.mdc` → level/landscape `level_loader.py`; PCG
-  automation `create_pcg_forest.py` (limits in
+- **Python:** level/landscape `Content/Python/level_loader.py`; PCG automation
+  `Content/Python/create_pcg_forest.py` (limits in
   [`docs/PCG/PCG_VARIABLES_NO_ACCESS.md`](../../docs/PCG/PCG_VARIABLES_NO_ACCESS.md)).
+  There is no dedicated Python rule since P2 deleted `12-python.mdc`.
 
 ## Maintenance
 

@@ -9,8 +9,8 @@ Light review of current diffs for style, project patterns, and known pitfalls.
    - Focus on the files the user cares about (or all if small).
 
 2. **Check against project rules**
-   - **Style:** C++ (unreal-cpp.mdc), Python (12-python.mdc), commits (AGENTS.md → Code style).
-   - **Boundaries:** No secrets, no edits to `Saved/` or `Plugins/UnrealMCP/`, no engine/platform change without team decision (AGENTS.md Boundaries).
+   - **Style:** C++ (unreal-cpp.mdc), Python and commits ([AGENTS_REFERENCE.md](../../docs/AGENTS_REFERENCE.md) → Code style).
+   - **Boundaries:** No secrets, no edits to `Saved/` or `Plugins/UnrealMCP/`, no engine/platform change without team decision ([AGENTS_REFERENCE.md](../../docs/AGENTS_REFERENCE.md) → Boundaries).
    - **Known errors:** If touching areas mentioned in `docs/KNOWN_ERRORS.md`, ensure the fix or change doesn’t repeat a documented pitfall (e.g. MCP `blueprint_name` short name only, Python `get_actor_bounds` signature change).
 
 3. **Summarize**

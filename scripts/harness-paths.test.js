@@ -49,6 +49,12 @@ const ROOT = path.resolve(__dirname, '..');
 /** Directories whose contents are the always-on or on-demand instruction surface. */
 const SCAN_ROOTS = [
   'AGENTS.md',
+  // Nested AGENTS.md files auto-load for every session opened in their
+  // directory, so they are every bit as always-on as the root file. They were
+  // absent here, which is how a pointer to `.cursor/rules/12-python.mdc` -
+  // deleted in 9f9a0a36 - kept loading in front of every Python session.
+  'Content/Python/AGENTS.md',
+  'Source/HomeWorld/AGENTS.md',
   'docs/AGENTS_REFERENCE.md',
   '.cursor/rules',
   '.cursor/commands',

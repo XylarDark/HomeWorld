@@ -9,9 +9,12 @@ version: 2.0
 
 # Full automation — no manual steps
 
-**This rule was `alwaysApply: true` until P4.** The invariant it carries is
-stated in `AGENTS.md` (Full automation), which remains the always-on surface.
-This file is the detail: *how* to log a gap, and which host may run what.
+**This rule was `alwaysApply: true` until P4**, when it was glob-scoped so
+that `AGENTS.md` stayed the only always-on surface. The invariant is therefore
+**on-demand, not always-on**: it attaches when the globs below match, and
+`09-mcp-workflow`, `18-game-development-principles` and `19-automation-gaps`
+each carry it where they apply. This file is the detail: *how* to log a gap,
+and which host may run what.
 
 The project is set up for **fully autonomous** automation. Do not assume the
 user can or will perform manual work during or between sessions. There is no
@@ -90,4 +93,5 @@ addressed, and a link. That keeps one record of both open and closed gaps.
 - GUI automation patterns: `docs/Automation/FULL_AUTOMATION_RESEARCH.md` §10
 - Tooling ladder and Lead gates: [`automation-standards.mdc`](automation-standards.mdc)
 - Host legality: [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md) §14 / §16
-- WAVE F cycle quarantine: see the "Quarantine" bullet in `AGENTS.md`.
+- WAVE F cycle quarantine: see the "Quarantine" bullet in
+  [`AGENTS_REFERENCE.md`](../../docs/AGENTS_REFERENCE.md).

@@ -14,10 +14,10 @@ HomeWorld is a **Unreal Engine 5.8 game host** (C++, Python Editor automation, m
 
 | Doctor critical | Why it does not apply to HomeWorld | Where policy lives |
 |-----------------|-------------------------------------|-------------------|
-| **TypeScript Not Configured** | Game logic is **C++** (`Source/HomeWorld/`). Root `package.json` exists only for UserHarness CLI wrappers, not a TS product surface. | [AGENTS.md](../../AGENTS.md) UserHarness table |
+| **TypeScript Not Configured** | Game logic is **C++** (`Source/HomeWorld/`). Root `package.json` exists only for UserHarness CLI wrappers, not a TS product surface. | [AGENTS_REFERENCE.md](../../docs/AGENTS_REFERENCE.md) DevHarness |
 | **ESLint Not Configured** | No JS/TS product codebase. Python lint runs in CI (`validate.yml` python-lint). Adding ESLint would be template cosplay, not game quality. | [AGENTS.md](../../AGENTS.md), `.github/workflows/validate.yml` |
-| **No JS Unit Tests Detected** | Tests: **Python** (`Content/Python/tests/`), **UE Test Automation**, **PIE** (`pie_test_runner.py`). Doctor does not detect UE/Python test harness as “JS unit tests.” | [AGENTS.md](../../AGENTS.md) Testing section |
-| **Secrets Handling Not Detected** | Secrets policy: no `.env` in repo; `.env.example` templates; OWASP rules in the [secure-coding](../../.agents/skills/secure-coding/SKILL.md) skill; gitignore for `Saved/`, plugins. Doctor looks for Node-specific secret scanners. | [secure-coding](../../.agents/skills/secure-coding/SKILL.md), [AGENTS.md](../../AGENTS.md) Security |
+| **No JS Unit Tests Detected** | Tests: **Python** (`Content/Python/tests/`), **UE Test Automation**, **PIE** (`pie_test_runner.py`). Doctor does not detect UE/Python test harness as “JS unit tests.” | [AGENTS_REFERENCE.md](../../docs/AGENTS_REFERENCE.md) Testing |
+| **Secrets Handling Not Detected** | Secrets policy: no `.env` in repo; `.env.example` templates; OWASP rules in the [secure-coding](../../.agents/skills/secure-coding/SKILL.md) skill; gitignore for `Saved/`, plugins. Doctor looks for Node-specific secret scanners. | [secure-coding](../../.agents/skills/secure-coding/SKILL.md), [AGENTS_REFERENCE.md](../../docs/AGENTS_REFERENCE.md) Security |
 | **Always-Applied Rule Budget Exceeded** | HomeWorld **keeps** session-wide rules (`07`, `08`, `20`) until dedicated AGENTS.md + skills migration. HR-B2 reduced always-on count **15 → 3** (307 lines; threshold 200). Remaining budget gap is **accepted** until incremental migration or Lead approves retiring `07`/`08` content to skills. | [Docs/11e_HR_B2_HANDOFF.md](../../Docs/11e_HR_B2_HANDOFF.md), [CURSOR_DEV.md](CURSOR_DEV.md) |
 
 ---
