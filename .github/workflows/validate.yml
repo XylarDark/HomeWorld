@@ -98,10 +98,28 @@ jobs:
       - name: UE preflight unit tests (HR3-B)
         run: npm run preflight:ue:test
 
-      # The one command that proves the game is real. On CI the JS tier only: the
-      # C++ build runs in the ci.yml workflow's own build step, and Safe-Build needs
-      # a Windows host with the Editor toolchain. See Docs/35_HARNESS_REFACTOR_STRATEGY.md.
-      - name: Verify (JS tier - see ci.yml for the C++ build)
+      # Content/Python needs pytest before verify:fast, which now runs the host
+      # suite as one of its own steps. It is installed here rather than in a
+      # separate pytest step so the suite is gated by exactly one thing: a second
+      # step would either duplicate it or drift from it. setup-python is used
+      # (not the system interpreter) because Ubuntu 24.04 marks system Python as
+      # externally managed and pip refuses to install into it.
+      - name: Set up Python (verify:fast runs the host suite)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install pytest
+        run: python3 -m pip install --quiet pytest
+
+      # The one command that proves the game is real. On CI the JS + Python tiers
+      # only: the C++ build runs in the ci.yml workflow's own build step, and
+      # Safe-Build needs a Windows host with the Editor toolchain. See
+      # Docs/35_HARNESS_REFACTOR_STRATEGY.md.
+      #
+      # Both tiers are blocking on purpose. A suite that runs on a runner but
+      # cannot fail it is not a harness - it is a report, and reports are ignored.
+      - name: Verify (JS + Python tiers - see ci.yml for the C++ build)
         run: npm run verify:fast
 
       # These suites were previously only run locally. Tests that gate nothing are

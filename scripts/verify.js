@@ -14,7 +14,7 @@
  *
  * IT IS TIERED, BECAUSE THE EXPENSIVE CHECKS ARE EXPENSIVE
  *
- *   fast    JS suite only. Seconds. Safe on every save.
+ *   fast    JS suite + Python suite. Seconds. Safe on every save.
  *   build   + compile the C++. Minutes, and needs the Editor closed.
  *   ue      + run UE automation tests. Minutes, and needs the Editor closed and
  *           $env:UE_EDITOR set.
@@ -60,6 +60,14 @@ function step(name, fn) {
   try {
     const r = fn();
     const secs = ((Date.now() - t0) / 1000).toFixed(1);
+    // A step may report that it could not run. That is recorded as SKIPPED, never
+    // as a pass: a step that cannot fail is not a gate, and printing "ok" for a
+    // check that never executed is how a suite starts lying about coverage.
+    if (r === 'skip') {
+      steps.push({ name, ok: true, secs: '0.0', skipped: true });
+      process.stdout.write(`--- ${name} SKIPPED after ${secs}s\n`);
+      return true;
+    }
     steps.push({ name, ok: r === 0, secs });
     if (r !== 0) {
       failed = name;
@@ -115,6 +123,34 @@ function runUECmd(execCmds) {
   return r.status === null ? 1 : r.status;
 }
 
+/**
+ * Find a usable Python for the host suite.
+ *
+ * `py -3` is tried first on Windows, because `python` on PATH there is often the
+ * Microsoft Store alias - a stub that opens the Store rather than running
+ * anything. Then python3, then python, so the same call works on the Linux CI
+ * runner without a branch for it.
+ *
+ * Returns null when none is usable. The caller must treat that as a SKIPPED gate
+ * and say so, not as a pass.
+ */
+function pythonCommand() {
+  const candidates = [
+    ['py', ['-3']],
+    ['python3', []],
+    ['python', []],
+  ];
+  for (const [cmd, extra] of candidates) {
+    try {
+      const probe = spawnSync(cmd, [...extra, '--version'], { encoding: 'utf8', shell: false });
+      if (probe.status === 0) return { cmd, args: extra };
+    } catch (e) {
+      // Not found, or not executable. Try the next candidate.
+    }
+  }
+  return null;
+}
+
 /** UE-only steps, wrapped in the editor lock so two agents cannot collide. */
 function withEditorLock(label, fn) {
   const owner = `verify:${process.pid}`;
@@ -139,6 +175,28 @@ if (results[results.length - 1]) {
   results.push(step('harness fitness', () => run('node', ['scripts/harness-fitness.js'])));
   results.push(step('cyclomatic complexity', () => run('node', ['scripts/complexity-check.js'])));
   results.push(step('anti-sycophancy', () => run('node', ['scripts/anti-sycophancy.js'])));
+  // Content/Python is the largest codebase in the repo (238 files, ~45k lines) and
+  // it drove nothing until this step existed. `npm run verify` was the documented
+  // "one command that proves the game is real", and it never ran these tests: they
+  // ran only on whichever machine somebody happened to remember to run them on.
+  // The graybox `world_origin: null` bug is what that cost - caught by pytest, in
+  // green CI, on a day when verify was also green.
+  //
+  // It sits inside the gate that guards the C++ build on purpose. If the host
+  // suite is red there is no point paying two minutes for a compile that cannot
+  // tell anyone anything new.
+  results.push(step('python suite', () => {
+    const py = pythonCommand();
+    if (!py) {
+      process.stdout.write(
+        'verify: no python interpreter found (tried py -3, python3, python).\n' +
+          'verify: SKIPPED, not passed. Content/Python was NOT checked by this run.\n' +
+          'verify: CI installs pytest before this step, so a runner that skips here is misconfigured.\n'
+      );
+      return 'skip';
+    }
+    return run(py.cmd, [...py.args, '-m', 'pytest', 'Content/Python/tests', '-q']);
+  }));
 }
 
 if (process.argv.includes('--strict-tree')) {

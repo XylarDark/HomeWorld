@@ -2156,6 +2156,8 @@ class NotificationCarriesTheQuestion(unittest.TestCase):
         self.assertFalse(ok)
         self.assertIn("REFUSED" if False else "no parameters", detail)
 
+    @unittest.skipUnless(sys.platform == "win32",
+                         "patches the real winreg, which only exists on Windows")
     def test_the_scheme_check_reads_the_registry(self):
         """Detection is a registry read, not an install-path guess.
 
@@ -2194,6 +2196,8 @@ class NotificationCarriesTheQuestion(unittest.TestCase):
         self.addCleanup(setattr, winreg, "QueryValueEx", real_qve)
         self.assertTrue(nt.grokbot_installed())
 
+    @unittest.skipUnless(sys.platform == "win32",
+                         "patches the real winreg, which only exists on Windows")
     def test_an_inspection_failure_is_not_reported_as_absent(self):
         """"Key not found" and "the check broke" are different answers.
 
