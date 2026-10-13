@@ -1,6 +1,6 @@
 """
 Derive a 10-task list draft from 30_DAY_IMPLEMENTATION_STATUS and 30_DAY_SCHEDULE.
-Uses docs/workflow/30DAY_TO_10TASK_MAPPING.json for bucket (T1-T10) to day ranges.
+Uses docs/TaskLists/30DAY_TO_10TASK_MAPPING.json for bucket (T1-T10) to day ranges.
 Output: draft to stdout or Saved/Logs/current_task_list_draft.md; does not overwrite
 CURRENT_TASK_LIST.md unless --write is passed.
 Run from project root: python Content/Python/migrate_30day_to_task_list.py [--write]
@@ -16,10 +16,16 @@ from pathlib import Path
 SCRIPT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SCRIPT_DIR.parent.parent
 DOCS_WORKFLOW = PROJECT_ROOT / "docs" / "workflow"
-STATUS_PATH = DOCS_WORKFLOW / "30_DAY_IMPLEMENTATION_STATUS.md"
+# The task-list family moved out of docs/workflow/ into docs/TaskLists/; only
+# 30_DAY_SCHEDULE.md is still where this script originally found it. Reading the
+# moved files from the old directory returns {} and a "mapping missing" error for
+# files that exist, and --write would have created a second CURRENT_TASK_LIST.md
+# beside the real one rather than updating it.
+DOCS_TASKLISTS = PROJECT_ROOT / "docs" / "TaskLists"
+STATUS_PATH = DOCS_TASKLISTS / "30_DAY_IMPLEMENTATION_STATUS.md"
 SCHEDULE_PATH = DOCS_WORKFLOW / "30_DAY_SCHEDULE.md"
-MAPPING_PATH = DOCS_WORKFLOW / "30DAY_TO_10TASK_MAPPING.json"
-TASK_LIST_PATH = DOCS_WORKFLOW / "CURRENT_TASK_LIST.md"
+MAPPING_PATH = DOCS_TASKLISTS / "30DAY_TO_10TASK_MAPPING.json"
+TASK_LIST_PATH = DOCS_TASKLISTS / "CURRENT_TASK_LIST.md"
 DRAFT_PATH = PROJECT_ROOT / "Saved" / "Logs" / "current_task_list_draft.md"
 
 TASK_IDS = [f"T{i}" for i in range(1, 11)]
@@ -145,7 +151,7 @@ def main() -> int:
     DRAFT_PATH.parent.mkdir(parents=True, exist_ok=True)
     DRAFT_PATH.write_text(draft, encoding="utf-8")
     print(f"Draft written to {DRAFT_PATH}", file=sys.stderr)
-    print("Copy to docs/workflow/CURRENT_TASK_LIST.md and add research_notes as needed.", file=sys.stderr)
+    print("Copy to docs/TaskLists/CURRENT_TASK_LIST.md and add research_notes as needed.", file=sys.stderr)
     return 0
 
 
