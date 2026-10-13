@@ -1589,8 +1589,10 @@ def check_asset_masters() -> Check:
                      "Exactly ten master materials exist",
                      _rel(MASTERS_DIR), "directory absent",
                      str(EXPECTED_MASTER_COUNT), MISSING,
-                     "Content/HomeWorld/Materials/Masters is absent, so nothing can "
-                     "be counted. Restore the master materials before reading this row.")
+                     next_action="Content/HomeWorld/Materials/Masters is absent, so "
+                                 "nothing can be counted. Restore the master materials "
+                                 "before reading this row.",
+                     action_kind=AGENT)
     names = sorted(p.stem for p in MASTERS_DIR.glob("*.uasset"))
     n = len(names)
     state = PASS if n == EXPECTED_MASTER_COUNT else FAIL
@@ -1720,9 +1722,10 @@ def check_asset_poly_budgets() -> Check:
             "Export manifest declares a poly budget per mesh",
             _rel(EXPORT_MANIFEST), "absent", "budget per mesh",
             MISSING,
-            "AssetCreation/Exports/MVP_EXPORT_MANIFEST.md is absent, so no poly "
-            "budget can be checked. Regenerate the export manifest before reading "
-            "this row.")
+            next_action="AssetCreation/Exports/MVP_EXPORT_MANIFEST.md is absent, so "
+                        "no poly budget can be checked. Regenerate the export "
+                        "manifest before reading this row.",
+            action_kind=AGENT)
     text = EXPORT_MANIFEST.read_text(encoding="utf-8-sig", errors="replace")
     has_budget = bool(re.search(r"(?i)(poly|tris?|budget)", text))
     return Check(
@@ -1858,8 +1861,9 @@ def check_feel_tunable_baselines() -> Check:
             "Every TODO tunable has a measured pre-tune value",
             _rel(FEEL_CANON), "absent", "one value per tunable",
             MISSING,
-            "Docs/canon/FEEL.md is absent, so no tunable baseline can be checked. "
-            "Restore the feel canon before reading this row.")
+            next_action="Docs/canon/FEEL.md is absent, so no tunable baseline can "
+                        "be checked. Restore the feel canon before reading this row.",
+            action_kind=AGENT)
     data = _read_json(BASELINE_FILE)
     baselines = (data or {}).get("tunables") or {}
     if not baselines:
@@ -2065,9 +2069,12 @@ def check_feel_binary_fresh() -> Check:
             "Last automation run executed tests against a fresh binary",
             _rel(AUTOMATION_RESULT), "no artifact",
             "failures == 0 and dll_stale false", MISSING,
-            "Saved/automation_run_result.json is a local artifact, so it does not "
-            "exist on a fresh checkout. Run `npm run verify:ue` to produce one; a "
-            "missing artifact is not a passing run.")
+            next_action="Saved/automation_run_result.json is a local artifact, so it "
+                         "is absent on a fresh checkout. Produce one with "
+                         "`py Content/Python/run_ue_automation.py --filter HomeWorld.T0` "
+                         "on a machine with UE_EDITOR set; a missing artifact is not a "
+                         "passing run.",
+            action_kind=DO)
     if data.get("dll_stale"):
         return Check(
             "feel.binary_fresh", "G-FEEL",
