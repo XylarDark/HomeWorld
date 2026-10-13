@@ -16,3 +16,6 @@ args = [
     "/c",
     'C:\dev\HomeWorld\Tools\mixar-mcp.cmd',
 ]
+
+[mcp_servers.unrealEditorUi]
+url = "http://127.0.0.1:8000/mcp"

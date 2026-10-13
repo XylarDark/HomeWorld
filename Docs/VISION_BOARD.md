@@ -2,7 +2,7 @@
 
 | Field | Current direction |
 |---|---|
-| **Status** | Product canon, updated 2026-10-10 |
+| **Status** | Product canon, updated 2026-10-12 |
 | **Theme and long-horizon campaign** | [`VisionBoard/Core/VISION.md`](../VisionBoard/Core/VISION.md) |
 | **Gameplay slice** | [`Docs/01_GDD_MVP.md`](01_GDD_MVP.md) |
 
@@ -22,6 +22,8 @@ convert. The world teaches through its shape, materials, and light.
 Read this before a task. The answered table below is the lock. Do not ask those questions again.
 
 - Three places: homestead, open field, pine camp. The glide connects them. The lair is after that loop.
+- On the ground of a zone, about 80 percent is mechanics and assets and about 20 percent is open.
+- A vertical climb is not part of that split. The field roost is that climb. It is not a fourth place.
 - Three lines: the place teaches itself. Safe home above a living world. One warm eye against the cool.
 - The player wears a dark coat and a small shoulder spirit. No scarf. Head about one sixth of height. The partner keeps one warm scarf.
 - The cottage is the drawn home, 9 m by 11 m, walls 5 m. The player is 2 m and is not from this planet. The bear and the bull match the cottage wall. Pines are 5 m, 7 m, and 9 m. The lair giant is many times the cottage. The player rides the bull on the giant’s back. Meters: `Docs/art/SCALE.md`.
@@ -35,7 +37,7 @@ Read this before a task. The answered table below is the lock. Do not ask those 
 | **Love is the stakes** | Family is present from the start. A loved one is taken at the camp, and the prototype includes the rescue and return home. |
 | **Day and night have different work** | By day, gather and explore. By night, become spirit and tend: ease suffering, help things rest, and nurture the home. |
 | **Night is a form** | The player becomes spirit by sleeping at the bed. Night does not automatically grant the form. |
-| **Two kinds of spirit** | Some creatures are spirit by day and by night. They have no sleeping body. Animals and humanoids have a day body and a spirit form, and they enter the spirit realm only while asleep. Dogs, cats, other animals, and other humanoids will follow that pair. 2026-10-10. |
+| **Two kinds of spirit** | The default is a day body and a night spirit form. Creatures that are always spirit have no sleeping body. Animals and humanoids enter the spirit realm only while asleep. Guards have no spirit form until their spirits are soothed. After that, they have one. 2026-10-12. |
 | **Care replaces killing** | Combat does not kill. Spirit encounters heal, calm, or convert their targets according to the encounter. |
 | **The world communicates** | Terrain, material, silhouette, and light teach a place's purpose before UI. UI may name an action after the player acts. |
 | **Guidance stays in the world** | Family guides are present from the start. Guidance is a short contextual hint, not a dialogue tree. |
@@ -120,6 +122,12 @@ The Round 7 questions are answered. Do not ask them again.
 | Does the bull return to the cave? | No. After the rise the shrine will not bring it. You can still ride it anywhere else, field and home. 2026-10-08. |
 | Do the tree and fish ejects stay? | Yes. Body: a local bounce, a few steps back. The tree creaks, or the fish jumps. No words. Spirit: a live glide to the bed, same as the boot. No cut. The rise does not open them. 2026-10-08. |
 | What if the tickle misses? | The snake shifts the scale away. A full breath, about six seconds, and it settles. A tickle during the shift does nothing. No stun. The bull stun is only for a missed ram. 2026-10-08. |
+| What fills the ground of a zone? | About 80 percent is mechanics and assets. About 20 percent is open. A vertical climb is not part of that split. 2026-10-12. |
+| What is the field roost? | A climb in the open field. One great eagle. One unique nest. Not a fourth place. 2026-10-12. |
+| What does communing with the bull unlock? | After the bull is tamed, communing with its spirit at night unlocks an ability. The ability is not named. 2026-10-12. |
+| How does the roost climb start? | The bull knocks out a blocker in the field. The lair ride stays the only ride. Everywhere else the bull stays field-only. 2026-10-12. |
+| What clears the higher roost obstacle? | A skill learned in the pine forest. The skill is not named. 2026-10-12. |
+| Can one zone wait on another? | Yes. The field climb waits on the bull. The higher obstacle waits on the forest. 2026-10-12. |
 
 ## Reading boundary
 
