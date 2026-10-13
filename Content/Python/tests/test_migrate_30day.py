@@ -138,3 +138,96 @@ def test_json_mapping_file_is_valid_json():
     with open(mig.MAPPING_PATH, encoding="utf-8") as fh:
         data = json.load(fh)
     assert isinstance(data, dict), "mapping is not a JSON object"
+
+
+# --------------------------------------------------------------------------
+# The refusal. Written 2026-10-13, after the schedule had been fully done
+# since 2026-03-03 and the generator had been quietly turning that into a
+# ten-task list in which every task was already completed.
+#
+# The hazard was --write, not the draft. The loop's exit rule is "no task
+# pending or in_progress", so a list of ten completed tasks reads as an empty
+# backlog - and a reader sees a task list that asks for nothing, with no
+# indication that the source of work ran out rather than the work being done.
+# Seven months of that produced lists whose tasks were bookkeeping about
+# lists.
+#
+# These tests pin the guard against a synthetic exhausted draft rather than
+# against the real schedule, so they still hold if the schedule legitimately
+# gains pending days again. The property is "refuse when nothing is pending",
+# not "be exhausted today".
+# --------------------------------------------------------------------------
+
+#: Ten tasks, all done - what the generator renders from a finished schedule.
+EXHAUSTED_DRAFT = "\n".join(f"## {t}.\n- **status:** completed" for t in mig.TASK_IDS)
+
+
+def test_count_pending_reads_the_marker_it_actually_writes():
+    """The whole guard hangs off this one string."""
+    assert mig._count_pending(EXHAUSTED_DRAFT) == 0
+    assert mig._count_pending("- **status:** pending") == 1
+    # Completed must not be mistaken for pending, or nothing ever triggers.
+    assert mig._count_pending("- **status:** completed") == 0
+
+
+def test_write_refuses_when_the_generated_list_has_nothing_pending(
+    tmp_path, monkeypatch, capsys
+):
+    """--write must not replace the live list with ten completed tasks."""
+    # Safety net. TASK_LIST_PATH points into tmp_path, so if the guard were
+    # deleted this test would still write to a scratch file instead of
+    # damaging the real one. A test must not be able to destroy what it
+    # protects in order to prove it can detect the destruction.
+    live = tmp_path / "CURRENT_TASK_LIST.md"
+    live.write_text("ORIGINAL\n", encoding="utf-8")
+
+    monkeypatch.setattr(mig, "TASK_LIST_PATH", live)
+    monkeypatch.setattr(mig, "_render_task_list", lambda *a, **k: EXHAUSTED_DRAFT)
+    monkeypatch.setattr(mig, "DRAFT_PATH", tmp_path / "draft.md")
+    monkeypatch.setattr(sys, "argv", ["migrate_30day_to_task_list.py", "--write"])
+
+    assert mig.main() == 1, "--write returned success on a list with nothing pending"
+
+    err = capsys.readouterr().err
+    assert "Refusing --write" in err, "the refusal was silent"
+    assert "vision board" in err, (
+        "the refusal must say where new work comes from, or the next reader "
+        "just tries a different command"
+    )
+    assert live.read_text(encoding="utf-8") == "ORIGINAL\n", (
+        "the live task list was overwritten before the refusal could fire"
+    )
+
+
+def test_a_write_with_real_pending_work_still_writes(tmp_path, monkeypatch):
+    """The guard must not become a hard stop - it refuses the hollow write only."""
+    live = tmp_path / "CURRENT_TASK_LIST.md"
+    live.write_text("ORIGINAL\n", encoding="utf-8")
+    pending_draft = "- **status:** pending\n".join(["T1\n", "\nT2\n"])
+
+    monkeypatch.setattr(mig, "TASK_LIST_PATH", live)
+    monkeypatch.setattr(mig, "_render_task_list", lambda *a, **k: pending_draft)
+    monkeypatch.setattr(sys, "argv", ["migrate_30day_to_task_list.py", "--write"])
+
+    assert mig.main() == 0, (
+        "--write refused work that actually had something pending; the guard "
+        "has become a lock"
+    )
+    assert live.read_text(encoding="utf-8") == pending_draft
+
+
+def test_the_exhaustion_is_announced_even_without_write(tmp_path, monkeypatch, capsys):
+    """A quiet draft is how this stayed invisible for seven months."""
+    monkeypatch.setattr(mig, "_render_task_list", lambda *a, **k: EXHAUSTED_DRAFT)
+    monkeypatch.setattr(mig, "DRAFT_PATH", tmp_path / "draft.md")
+    monkeypatch.setattr(sys, "argv", ["migrate_30day_to_task_list.py"])
+
+    assert mig.main() == 0, "the draft is still useful as evidence of the state"
+
+    err = capsys.readouterr().err
+    assert "no pending days left" in err, "the empty result was emitted silently"
+    assert "30_DAY_IMPLEMENTATION_STATUS.md" in err, (
+        "the warning must name the input that ran out, or the reader has no "
+        "idea which document to replace"
+    )
+    assert (tmp_path / "draft.md").is_file(), "no draft was emitted for inspection"

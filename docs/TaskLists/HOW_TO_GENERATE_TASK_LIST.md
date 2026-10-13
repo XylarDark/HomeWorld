@@ -82,6 +82,8 @@ To derive a new 10-task list from the current 30-day implementation status and s
 3. Copy the draft to `docs/TaskLists/CURRENT_TASK_LIST.md` and add **research_notes** (and tune goal/success_criteria) as needed.
 4. Run `python Content/Python/validate_task_list.py` to confirm the list is valid.
 
+> **If every task in the draft already says `completed`, do not copy it over `CURRENT_TASK_LIST.md`.** That means the 30-day schedule is exhausted — it has read "All days 1–30 marked **done**" since 2026-03-03 — so there is nothing left to derive and the script will say so on stderr. A list with no `pending` task makes `Test-HasPendingTasks` false, so the loop exits 0 on its first read: everything looks finished when the truth is that the source of work ran out. Take the next window from the vision board (`Docs/VISION_BOARD.md`) rather than from this schedule.
+
 The mapping of day ranges to T1–T10 is in `docs/TaskLists/30DAY_TO_10TASK_MAPPING.json`. Use `--write` only if you intend to overwrite `CURRENT_TASK_LIST.md` from the script (not recommended for normal iteration).
 
 ## Replacing the list

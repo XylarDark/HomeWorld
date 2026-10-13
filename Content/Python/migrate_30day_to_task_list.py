@@ -127,6 +127,11 @@ def _render_task_list(
     return "\n".join(lines).strip() + "\n"
 
 
+def _count_pending(draft: str) -> int:
+    """How many tasks the draft actually asks somebody to do."""
+    return draft.count("- **status:** pending")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Migrate 30-day status to 10-task list draft.")
     parser.add_argument("--write", action="store_true", help="Overwrite CURRENT_TASK_LIST.md (default: emit draft only)")
@@ -140,8 +145,32 @@ def main() -> int:
         return 1
 
     draft = _render_task_list(day_status, schedule, mapping)
+    pending = _count_pending(draft)
+
+    if pending == 0:
+        # The schedule is the only input, and a finished one yields a list in
+        # which every task is already done. That is a real result, not a
+        # successful migration, so it is said out loud rather than emitted as
+        # if it were work.
+        print(
+            "Migration: the 30-day schedule has no pending days left, so this "
+            f"draft holds {len(TASK_IDS)} completed tasks and nothing to act on. "
+            "It is derived from "
+            f"{STATUS_PATH.relative_to(PROJECT_ROOT).as_posix()}, whose status "
+            "table has no day left to migrate.",
+            file=sys.stderr,
+        )
 
     if args.write:
+        if pending == 0:
+            print(
+                "Refusing --write: it would replace the live task list with a "
+                "document of nothing but completed tasks, and the loop would "
+                "then exit on the first read. New work has to come from the "
+                "vision board, not from a finished schedule.",
+                file=sys.stderr,
+            )
+            return 1
         TASK_LIST_PATH.parent.mkdir(parents=True, exist_ok=True)
         TASK_LIST_PATH.write_text(draft, encoding="utf-8")
         print(f"Wrote {TASK_LIST_PATH}", file=sys.stderr)
