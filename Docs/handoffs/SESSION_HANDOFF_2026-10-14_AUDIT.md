@@ -2,10 +2,10 @@
 artifact_contract: "ce-handoff/v1"
 created_at: "2026-10-14T19:09:42Z"
 title: "HomeWorld 2026-10-14 commit audit - T1-T7 audited, T7 fixed; 21169765 audited"
-summary: "Audited the six 2026-10-14 commits as concern-based tasks (T1-T7). T1, T2, T3, T4, T5, T6 and T7 are repaired; T2 found the recorded field pass is REAL (editor log 2026-10-14 16:53Z) but predates befdc171, so the scene is not done until a desktop re-run. T3 had no code defect. T4 fixed the T1-3 soft-bounds gate in HomeWorldCharacter.cpp (DEC-0045). T7's edits were correct where made, but two files it touched still contradicted the bed rule; fixed here (DEC-0046). The unassigned 21169765 stands alone as the size-test pocket-kit sheet; audited, its numbers match the checker and it needs no fix (DEC-0047, DEC-0048)."
+summary: "Audited the six 2026-10-14 commits as concern-based tasks (T1-T7). T1, T2, T3, T4, T5, T6 and T7 are repaired; T2 found the recorded field pass is REAL (editor log 2026-10-14 16:53Z) but predates befdc171, so the scene is not done until a desktop re-run. T3 had no code defect. T4 fixed the T1-3 soft-bounds gate in HomeWorldCharacter.cpp (DEC-0045). T7's edits were correct where made, but two files it touched still contradicted the bed rule; fixed here (DEC-0046). The unassigned 21169765 stands alone as the size-test pocket-kit sheet; audited, its numbers match the checker and it needs no fix (DEC-0047, DEC-0048). The rune/dusk sweep realigned three hand-owned stale copies and stopped at two human-owned ones (DEC-0049)."
 keywords: ["HomeWorld", "commit-audit", "field-greybox", "soft-bounds", "skill-catalog", "doc-links", "handoff"]
 cwd: "C:\\dev\\HomeWorld"
-resume_focus: "T1-T7 are audited and T7's residual contradictions are fixed (DEC-0046). Next real work is the desktop sitting that re-runs the field placer and verifier and walks L_Field (T2, T4). Open follow-ups: the size-test room-plan table does not match check_pocket_kit's read shape (DEC-0047), and the dated rune/dusk copies named under T7."
+resume_focus: "T1-T7 are audited and their residual contradictions are fixed (DEC-0046, DEC-0049). Next real work is the desktop sitting that re-runs the field placer and verifier and walks L_Field (T2, T4), which also owes the two pad-relative route-gap lines (DEC-0048). Open for the Lead: DAYNIGHT_BIBLE.md 'bed or campsite' and the stamped fourteen-MUST list (DEC-0049); open for an agent: a re-grep pass for COMMANDS_AND_LOG_TAGS.md's drifted HomeWorldCharacter.cpp line column."
 repository: "XylarDark/HomeWorld"
 branch: "main"
 head: "c0a201f1b45d57b6ecd3d3446d2c484cdceb0c26"
@@ -19,10 +19,12 @@ T1-T7 are audited and the defects this audit found are fixed. The field scene is
 ## Resume focus
 
 T1-T7 are audited. Do not re-audit T1/T2/T3/T4/T5/T6 - they are committed and pushed - or T7, which
-is fixed in DEC-0046. Do not touch the four foreign working-tree files listed at the bottom. The next
+is fixed in DEC-0046. Do not touch the foreign working-tree files listed at the bottom. The next
 real work is the desktop sitting that re-runs the field placer and verifier and walks `L_Field` (see T2
 and T4 below), which also owes the two pad-relative route-gap lines for the size-test sheet
-(DEC-0048). Open follow-up: the dated rune/dusk copies named under T7 are still open.
+(DEC-0048). Open for the Lead: the `DAYNIGHT_BIBLE.md` "bed or campsite" call and the stamped
+fourteen-MUST list that still carries the rune (see the T7 sweep, DEC-0049). Open for an agent: a
+re-grep pass for `COMMANDS_AND_LOG_TAGS.md`'s drifted line column.
 
 ## Commit map (verified with `git show --stat --name-status`)
 
@@ -152,12 +154,23 @@ Docs-only. Files: `Docs/01_GDD_MVP.md`, `Docs/03_GAMEPLAY_MVP.md`, `Docs/VISION_
   now says the bed ends the form rather than rest / dawn.
 - **T7-3 (Low, left):** `01_GDD_MVP.md` §3 rule 1 and V8 still read dawn -> body; the file's new header
   disclaims it ("the board wins"), so it is a labelled earlier cut. Left as-is.
-- **Left, same defect outside T7's files:** `Docs/context/HOMEWORLD_ROUTE.md:44` keeps the identical
-  "rune stone transports you and the bull" sentence T7 fixed in the GDD (the file says the rune is
-  removed at line 81); `Docs/08d_CONTENT_CANON.md:278`; `Docs/COMMANDS_AND_LOG_TAGS.md:186`;
-  `Docs/guides/T0_HUMAN_DESKTOP_PIPELINE.md:86`; legacy `TaskLists/`; and `Docs/DAYNIGHT_BIBLE.md:14`
-  ("sleep (bed **or campsite**)") which also claims to win the day/night form rules while canon/README
-  says the board wins (DEC-0029). Owner chose to keep the fix on T7's own files.
+- **Swept (DEC-0049):** the three stale copies an agent owns now read the settled rules.
+  `HOMEWORLD_ROUTE.md:44` "the rune stone transports you and the bull" -> "the shrine brings you and the
+  bull"; `08d_CONTENT_CANON.md:278` "spirit/body swap at dusk" -> "at the bed";
+  `COMMANDS_AND_LOG_TAGS.md:186` dropped the `rune gate` token, which no Source file emits.
+  - **Held, not committed here:** `COMMANDS_AND_LOG_TAGS.md` and `CANON_MAP.md` are being edited by the
+    live virtue workstream at the same time (a `hw.Virtue.Read` regeneration, a virtue row). This
+    session's one-line edits in both are in the working tree and land with that session's commit, not
+    this one.
+- **Left for the Lead (not alignment):** `Docs/DAYNIGHT_BIBLE.md:14` "sleep (bed **or campsite**)" is
+  LOCKED and its campsite entry is a *mechanics* difference from the board's "the bed alone", so removing
+  it changes gameplay; `Docs/guides/T0_HUMAN_DESKTOP_PIPELINE.md:82/86` is a Lead-stamped fourteen-MUST
+  list whose items 7/11 carry the superseded M7 rune milestone, so rewriting them re-stamps beats. Both
+  stopped on and named, not edited.
+- **Left as history:** legacy `TaskLists/` already carries "pre-lock, do not implement" disclaimers.
+- **New finding, not the sweep:** `COMMANDS_AND_LOG_TAGS.md`'s `HomeWorldCharacter.cpp:NNN` column
+  drifted after its last regeneration (`54718be9`). Only that file changed in `Source/` since
+  (`dadc5cf7`, `eff7fe09`), so ~22 handler-line refs are stale. It needs one re-grep pass.
 - **Verified:** `py -3 -m pytest Content/Python/tests -q` 366 passed; `npm run verify:fast` 6/6 PASSED;
   `npm run docs:links` still `gone ... (46)`, unchanged.
 
@@ -193,13 +206,32 @@ that editor sitting.
 
 ## Foreign working-tree files - do not touch or stage
 
-Four files were written by another session (2:25-2:30 PM), all Rider MCP scouting or the size-test
-plan. Leave them alone; never `git add -A`:
+Never `git add -A`; stage by explicit path. Another session has been writing in this tree all day, and by
+mid-afternoon it was adding a whole virtue workstream. Anything not authored by this session is foreign.
+
+Four files first seen at 2:25-2:30 PM (Rider MCP scouting, the size-test plan):
 
 - `.cursor/mcp.json.example`
 - `.cursor/rules/unreal-cpp.mdc`
 - `Docs/handoffs/MARKETPLACE_POLICY_V1.md`
 - `Docs/level/L_SizeTest_ROOM_PLAN.md`
+
+The sin/virtue move, seen later:
+
+- `VisionBoard/Core/VISION.md` (a new "Virtue attributes" section holding the seven pairs)
+- `docs/TaskLists/TaskSpecs/SIN_VIRTUE_SPECTRUM.md` (its copy of the table deleted; now a pointer)
+
+Then a live virtue-system workstream, still landing. It also co-edits two files this session touched:
+
+- new `Source/HomeWorld/HomeWorldVirtue*.{cpp,h}` (component, spawn table, types, tests)
+- `docs/VIRTUE_ATTRIBUTE_BIBLE.md`
+- edits to `Source/HomeWorld/HomeWorld.cpp`, `HomeWorldHUD.cpp`, `HomeWorldInventorySubsystem.{cpp,h}`,
+  `docs/CONSOLE_COMMANDS.md`, `Docs/VISION_BOARD.md`
+- **co-edited with this session:** `Docs/CANON_MAP.md` (its virtue row; this session's DEC-range line is
+  held in the tree) and `Docs/COMMANDS_AND_LOG_TAGS.md` (its `hw.Virtue.Read` regeneration; this
+  session's `FORM` row line is held)
+
+This list is a snapshot - the rule at the top is the durable one.
 
 ## Gates and tooling
 

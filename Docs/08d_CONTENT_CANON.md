@@ -275,7 +275,7 @@ WAVE E may **upgrade** (not quarantine-delete) these paths after Lead **`APPROVE
 | Target | Upgrade intent |
 |--------|----------------|
 | **`Source/HomeWorld/`** character, GameMode, interact/heal, TOD/NightMix wiring | Wire V1–V8 to VS_MVP markers + MPC |
-| **`BP_HomeWorldCharacter`** + **`ABP_HomeWorldCharacter`** | Glide along CRUMB_* (FALLBACK spline follow); spirit/body swap at dusk |
+| **`BP_HomeWorldCharacter`** + **`ABP_HomeWorldCharacter`** | Glide along CRUMB_* (FALLBACK spline follow); spirit/body swap at the bed |
 | **`GA_Interact`**, **`GA_Heal`**, **`GA_Place`** | Reparent to C++ ability classes per project convention |
 | **`BP_GameMode`** | Drive NightMix from GameState; portal/shrine triggers on Docs/04 meshes |
 | **`/Game/HomeWorld/Materials/Masters/M_*`** + **`MI_*`** | Import/create ten masters; instance on kit meshes |

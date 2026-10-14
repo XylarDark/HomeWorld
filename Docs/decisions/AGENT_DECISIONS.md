@@ -1127,3 +1127,12 @@ The number is not the cost of that skill as it was first written. Two identical 
 - **Reverses if:** a desktop run measures the pad and the two route-gap lines are added to the plan, or the checker is pointed at the table and stops needing the pad.
 - **Supersedes:** none.
 
+## DEC-0049 - The rune/dusk sweep realigns three hand-owned copies and stops at two human-owned ones (2026-10-14)
+
+- **Area:** code design
+- **Decision:** Realign the three stale copies an agent owns: `Docs/context/HOMEWORLD_ROUTE.md` (the tamed bull "the rune stone transports you and the bull" -> "the shrine brings you and the bull"), `Docs/08d_CONTENT_CANON.md` ("spirit/body swap at dusk" -> "at the bed"), and the `FORM` row of `Docs/COMMANDS_AND_LOG_TAGS.md` (drop the `rune gate` token). Leave `Docs/DAYNIGHT_BIBLE.md` and `Docs/guides/T0_HUMAN_DESKTOP_PIPELINE.md` for the Lead.
+- **Rationale:** The rune removal (Lead 2026-10-07) and "the bed alone grants the form" (vision board, 2026-10-08) are settled, so text that still treats the rune as live or swaps form on the clock is stale, and correcting it is alignment, not a new choice - the same call as DEC-0046. The two files left are not alignment. `DAYNIGHT_BIBLE.md` is LOCKED and its "sleep (bed or campsite)" is a *mechanics* difference from the board's "the bed alone": it keeps a campsite spirit entry, so deleting it removes a gameplay route. `T0_HUMAN_DESKTOP_PIPELINE.md`'s fourteen-MUST walk order is a Lead-stamped backlog whose items 7 and 11 still carry the superseded M7 rune milestone, so rewriting them re-stamps beats. Mechanics canon and beats are human-owned, so the sweep stopped and named them rather than editing.
+- **Evidence:** No Source file emits `rune gate`: `git show 54718be9:Source/HomeWorld/HomeWorldCharacter.cpp` (the doc's last regeneration) already had no `rune gate` or `RuneGate`, and `grep -i rune Source/` returns comments only. `HOMEWORLD_ROUTE.md:81` and `:89` carry the settled rule in the same file; `VISION_BOARD.md:94` and `CANON_MAP.md:122` carry "the bed alone". `DAYNIGHT_BIBLE.md:3` is `Status: LOCKED`, `:5` claims to win the form rules, and `:34-35` grant spirit from both the homestead bed and the campsite.
+- **Reverses if:** the Lead rules the campsite grants spirit too (then the bible stands and the board needs an amend), or the Lead re-stamps the fourteen-MUST list with the rune removed.
+- **Supersedes:** none.
+

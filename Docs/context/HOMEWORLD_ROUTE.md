@@ -41,7 +41,7 @@ One fact proposed at a time, one yes from Luke, one write into this file only �
   too close or fill its threat meter without leaving its area. Walking toward it
   carrying an herb suppresses the boot; sudden movement builds threat, standing
   still lets it approach, eat the herb, and it is tamed. Tamed, the bull is
-  rideable, and the rune stone transports you and the bull to the homestead as a
+  rideable, and the shrine brings you and the bull to the homestead as a
   pet. Bull turning is like a real animal (Lead 2026-10-07): turn rate is
   inversely related to travel speed — near-zero turn authority at 3× sprint,
   full turn authority at walking or stopped speed. The player steers by managing
