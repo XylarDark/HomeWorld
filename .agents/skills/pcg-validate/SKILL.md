@@ -1,6 +1,6 @@
 ---
 name: pcg-validate
-description: Validate or troubleshoot PCG setup (ForestIsland_PCG, volume, landscape tag, spawner meshes). Use when the user reports no trees/rocks, wrong placement, or "what do I set in the graph?"
+description: Pointer. Read .cursor/skills/pcg-validate/SKILL.md. Do not keep a second copy here.
 ---
 
 # PCG validate

@@ -1,6 +1,13 @@
 ---
 name: ue58-api-check
 description: Before adding or changing C++ or Python that uses UE 5.8–sensitive APIs (FindObject, FPaths, image utils, collision profiles, get_actor_bounds, AnimBP factory, AssetRegistry, Mass plugins). Check pitfalls table and KNOWN_ERRORS, use replacements, then Safe-Build/test.
+paths:
+  - "Source/**/*.h"
+  - "Source/**/*.cpp"
+  - "Content/Python/**/*.py"
+  - "docs/KNOWN_ERRORS.md"
+  - "docs/UE/**/*.md"
+  - ".cursor/rules/unreal-cpp.mdc"
 ---
 
 # UE 5.8 API check

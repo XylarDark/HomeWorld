@@ -1,5 +1,5 @@
 ---
-name: Taste Profiler
+name: taste-profiler
 description: >-
   Use to maintain the durable taste profile and session candidates:
   bootstrap, stage, promote (Lead-gated). Triggers: taste profile upkeep,

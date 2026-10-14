@@ -13,7 +13,7 @@ Default DET adopters copy the **six** core skills. HomeWorld also keeps small HW
 
 | Skill | Trigger |
 | ----- | ------- |
-| [agent-workflow](skills/agent-workflow/SKILL.md) | Any end-to-end coding task in the repo |
+| [agent-workflow](skills/agent-workflow/SKILL.md) | PowerShell or npm pattern, research-before-implement, KNOWN_ERRORS, or temp-file cleanup |
 | [multi-agent-collaboration](skills/multi-agent-collaboration/SKILL.md) | More than one agent or person in the same tree |
 | [plan-first](skills/plan-first/SKILL.md) | The user asked to save a plan |
 | [secure-coding](skills/secure-coding/SKILL.md) | Input, secrets, auth, or dependencies |
@@ -30,7 +30,7 @@ Default DET adopters copy the **six** core skills. HomeWorld also keeps small HW
 Only these project skills stay on the cursor scan path after the budget Do:
 
 - Live: `pcg-validate`, `automation-gap-solutions`. `ue58-api-check` is a pointer to `.agents/skills/ue58-api-check`
-- Tombstone: `ue57-api-check` (prefer ue58)
+- Tombstone: `.agents/skills/ue57-api-check` only (prefer ue58). Not on the `.cursor/skills` scan path.
 - Retired WAVE F: `demo-map-setup`, `homestead-setup` deleted
 
 Lean A/B and taste twins are **not** duplicated under `.cursor/skills/` (retired).

@@ -1,6 +1,6 @@
 ---
 name: automation-gap-solutions
-description: Close automation gaps (Level Streaming/portal, State Tree graph, PCG no-access). Use when the user or task asks to implement solutions for AUTOMATION_GAPS.
+description: Pointer. Read .cursor/skills/automation-gap-solutions/SKILL.md. Do not keep a second copy here.
 ---
 
 # Automation gap solutions

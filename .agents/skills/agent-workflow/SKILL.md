@@ -1,6 +1,6 @@
 ---
 name: agent-workflow
-description: Use when a coding task needs PowerShell or npm command patterns, research-before-implement, KNOWN_ERRORS recording, or temp-file cleanup. Not for a one-file typo or a path already named.
+description: Use for a PowerShell or npm command pattern, a research-before-implement check, a KNOWN_ERRORS entry, or temp-file cleanup. Skip a one-file typo or a path already named.
 ---
 
 # Agent workflow

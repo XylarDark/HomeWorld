@@ -1,6 +1,10 @@
 ---
 name: ue-editor-ui
 description: Drive Unreal Editor panels that have no Python API. Use when a log or result contains editor_ui: NEED_SLATE, when LevelToOpen could not be set, when a State Tree graph must be edited, or when a PCG Details field (Get Landscape Data By Tag, or a Static Mesh Spawner mesh list) cannot be written. Prefer UnrealMCP and Editor Python first.
+paths:
+  - "Content/Python/**/*.py"
+  - "Saved/Logs/**/*.log"
+  - "docs/Automation/**/*.md"
 ---
 
 # Unreal editor UI

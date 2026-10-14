@@ -76,16 +76,17 @@ const ALWAYS_ON_MAX = 150;
  * same shape as the MCP bug this file was rewritten to fix - the expensive thing
  * is printed and nothing watches it.
  *
- * 4026 is the measured surface, not a target. It carries no headroom on
+ * 3788 is the measured surface, not a target. It carries no headroom on
  * purpose: growing it should be a deliberate act, exactly like raising
  * TOTAL_HIGH_WATER. It has already moved in both directions - down from 4007
- * when the ue57 tombstone stopped advertising the retired engine, and up to
- * 4026 for the ue-editor-ui skill, and only after that skill's duplicate copy
- * was collapsed into a pointer (DEC-0038). Every change is a recorded
- * decision, which is the point of a ratchet that only moves when someone
- * says so.
+ * when the ue57 tombstone stopped advertising the retired engine, up to
+ * 4026 for the ue-editor-ui skill after that skill's duplicate copy was
+ * collapsed into a pointer (DEC-0038), then down to 3788 when the cursor
+ * UE 5.7 tombstone stopped advertising a retired skill (DEC-0040). Every
+ * change is a recorded decision, which is the point of a ratchet that only
+ * moves when someone says so.
  */
-const ADVERTISED_MAX = 4026;
+const ADVERTISED_MAX = 3788;
 
 /** Current measured total. Only ever lowers; raises are deliberate and reviewed. */
 const TOTAL_HIGH_WATER = 3240;

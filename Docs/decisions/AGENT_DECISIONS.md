@@ -1024,3 +1024,25 @@ The number is not the cost of that skill as it was first written. Two identical 
 
 **Does not decide:** Whether any given skill is worth its description. That stays a per-skill judgement at the time it is written, by whoever writes it. This records only what the surface became, and why.
 
+---
+
+## DEC-0039 - Git is the GDD; Notion is a pointer board (2026-10-14)
+
+- **Area:** architecture
+- **Decision:** Git markdown stays the only HomeWorld GDD. Notion holds a pointer board. Mr. Mak is not a design store and is not installed.
+- **Rationale:** A second wiki, or a second agent knowledge tree, is the missing-pointer failure the canon map exists to stop. The alternative was moving the living GDD into Notion, or adopting Mr. Mak as the agent host. Cursor already has the session doors, the skills, and Unreal MCP. Notion's useful job is a human board of file pointers.
+- **Evidence:** Lead accepted that rule on 2026-10-14. The private page is [HomeWorld pointers](https://app.notion.com/p/3f999371b71b813fb542fa246e66e7ff). Sitting rows point at the three task files. The locked Open decisions row points here. This carries out DEC-0036.
+- **Reverses if:** Lead asks for a second canon, or asks for a Mr. Mak window on this same repo. A side window still does not get its own knowledge tree.
+- **Supersedes:** none.
+
+---
+
+## DEC-0040 - Description ceiling drops to 3788 (2026-10-14)
+
+- **Area:** harness refactor
+- **Decision:** The skill-description ceiling drops from 4026 to 3788. The cursor UE 5.7 tombstone is removed because both trees were advertising a retired skill. The `.agents` tombstone remains.
+- **Rationale:** A ceiling above the measured count lets descriptions grow back without a decision. The alternative was leaving 4026 in place after the shortenings. The cursor copy was a second advertisement of `ue57-api-check`. One tombstone is enough to point at `ue58-api-check`.
+- **Evidence:** `node scripts/instruction-budget.js` reports 3788 description characters in 19 skills after the cursor tombstone is gone. Broad descriptions are none. The reachable total stays under 3240.
+- **Reverses if:** A new skill description is accepted and the ceiling is raised in the same decision.
+- **Supersedes:** none. DEC-0038 stays the record of the earlier rise to 4026.
+

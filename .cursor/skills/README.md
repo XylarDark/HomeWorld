@@ -12,9 +12,7 @@ Cursor discovers `description` on every turn for each `SKILL.md` here. Keep this
 
 ## Tombstones
 
-| Skill | Role |
-|-------|------|
-| `ue57-api-check` | Prefer `ue58-api-check`; UE57 docs only under `docs/UE/UE57_*` |
+The retired name `ue57-api-check` lives only in `.agents/skills/ue57-api-check`. Prefer `ue58-api-check`. UE57 docs stay under `docs/UE/UE57_*`.
 
 **Retired (WAVE F):** `demo-map-setup`, `homestead-setup` — deleted; use VS_MVP + `Docs/04*`.
 
