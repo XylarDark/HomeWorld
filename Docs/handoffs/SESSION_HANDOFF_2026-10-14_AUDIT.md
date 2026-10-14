@@ -1,14 +1,14 @@
 ---
 artifact_contract: "ce-handoff/v1"
-created_at: "2026-10-14T18:35:21Z"
-title: "HomeWorld 2026-10-14 commit audit - T1/T5/T6 fixed and pushed; T2/T3/T4/T7 open"
-summary: "Audited the six 2026-10-14 commits as concern-based tasks (T1-T7). T1, T5 and T6 are repaired and pushed as befdc171, 22b87116, b8ae30e4 (origin/main). T2, T3, T4, T7 and the unassigned 21169765 are still to audit. The L_Field scene is NOT done: no editor was connected, so no CHECK PASS was ever logged."
+created_at: "2026-10-14T19:09:42Z"
+title: "HomeWorld 2026-10-14 commit audit - T1/T2/T5/T6 fixed; T3/T4/T7 open"
+summary: "Audited the six 2026-10-14 commits as concern-based tasks (T1-T7). T1, T2, T5 and T6 are repaired; T2 found the recorded field pass is REAL (editor log 2026-10-14 16:53Z) but predates befdc171, so the scene is not done until a desktop re-run. T3, T4, T7 and the unassigned 21169765 are still to audit."
 keywords: ["HomeWorld", "commit-audit", "field-greybox", "soft-bounds", "skill-catalog", "doc-links", "handoff"]
 cwd: "C:\\dev\\HomeWorld"
-resume_focus: "Audit T2 (the two field scripts and the recorded field_greybox CHECK PASS), then T3, T4, T7, and place 21169765"
+resume_focus: "Audit T3 (the cottage sheet strip and the field metrics sheet), then T4, T7, and place 21169765. The field lighting re-run is owed to a desktop session."
 repository: "XylarDark/HomeWorld"
 branch: "main"
-head: "b8ae30e415f5cf268478dd5b6ecbe8bb91c1cff9"
+head: "748216e6ed32c51f4f6a2d8a994d57099a602e67"
 ---
 
 # SESSION_HANDOFF 2026-10-14 - commit audit
@@ -18,9 +18,9 @@ Three tasks are fixed and pushed. Three are open. The field scene is not done.
 
 ## Resume focus
 
-Audit **T2** next, then **T3**, **T4**, **T7**, and decide where **21169765** belongs. Do not
-re-audit T1/T5/T6 - they are committed and pushed. Do not touch the four foreign working-tree
-files listed at the bottom.
+Audit **T3** next, then **T4**, **T7**, and decide where **21169765** belongs. Do not re-audit
+T1/T2/T5/T6 - they are committed and pushed. Do not touch the four foreign working-tree files listed
+at the bottom. The field lighting re-run is owed to a desktop session (see T2 below).
 
 ## Commit map (verified with `git show --stat --name-status`)
 
@@ -37,7 +37,7 @@ files listed at the bottom.
 
 ## Done and pushed (do not re-open)
 
-Pushed as `34500e3c..b8ae30e4`. `git rev-list --left-right --count origin/main...HEAD` is `0 0`.
+Pushed as `34500e3c..748216e6`. `git rev-list --left-right --count origin/main...HEAD` is `0 0`.
 
 **T1 - `befdc171`** `place_field_greybox.py`, `verify_field_greybox.py`, new
 `Content/Python/tests/test_place_field_greybox.py`.
@@ -62,17 +62,30 @@ Pushed as `34500e3c..b8ae30e4`. `git rev-list --left-right --count origin/main..
 catalogs, removed the empty `ue57-api-check` dir. Recorded as **DEC-0041**. T6-4 and T6-6 were
 withdrawn (a `paths:` field is real; counting disabled descriptions is deliberate and asserted).
 
-## Open - T2 (next)
+**T2 - `748216e6`** `verify_field_greybox.py`, new `Content/Python/tests/test_verify_field_greybox.py`,
+`Docs/context/PLAY_TASKS.md`, `Docs/level/L_Field_CONTEXT.md`, `AGENT_DECISIONS.md`.
+- **Correction to this handoff's first version:** it claimed the recorded `field_greybox: CHECK PASS`
+  had no open-editor evidence. That was wrong. `Saved/Logs/HomeWorld.log` holds two passes on
+  2026-10-14, and the 16:51:35-16:53:53Z run matches `dadc5cf7`'s script text exactly, two minutes
+  before that commit at 16:56:01Z. The claim was honestly evidenced for `dadc5cf7`.
+- But the evidence is **stale against main**: `befdc171` (18:31:52Z) changed both scripts after the
+  log ends (17:49:18Z), and the saved map still has one `Field_Sun` (posed `Rotator(-45,30,0)`, so it
+  lights upward) and zero `SkyLight`/`SkyAtmosphere`. So the current scripts have never run.
+- **Fixed:** `sheet_spots()` states where every sheet-pinned mass belongs; `check()` compares each
+  built actor to it within 10 cm. The verifier previously compared the sheet only with itself.
+- The two docs that quote the pass now say which revision it covers and that a re-run is owed;
+  **the scene is not read as done**. Test ownership of "done" is human (`docs/human-use/OWNERSHIP.md`
+  line 28), so this was put to the owner as a numbered choice before any edit.
+- Still open, not fixed here: `Saved/` is gitignored, so the proof is not re-checkable from the repo;
+  the MCP response for a passing run is `success: true` regardless of the script's exit code, so the
+  verdict lives only in log text; neither field script is wired to a gate; `FIELD.json`'s `measured`
+  stays null. Decisions **DEC-0042**, **DEC-0043**.
 
-`verify_field_greybox.py` + the recorded `field_greybox: CHECK PASS` claim.
+## T2 - owed to a desktop session
 
-- The claim is written in `Docs/context/PLAY_TASKS.md:14` and `Docs/level/L_Field_CONTEXT.md:15`.
-  There is **no open-editor log evidence** behind it. "A clean log is not evidence."
-- Neither field script is wired to any gate (not pytest, not `verify:fast`).
-- The verifier measures X/Y, river width, forest sequence, herb XY spacing (plus T1's new checks).
-  It never wrote `FIELD.json`'s `measured`, which stays null.
-- Verifier docstring: "Measure the field greybox. Do not move actors and do not save." It flags
-  `banned = ("Path", "Landing", "Camp", "Shrine")`.
+Re-run the placer, then the verifier, in the open editor on `L_Field`, and re-log the pass. Only
+then is the field greybox done for the current revision. A clean log is not evidence by itself; the
+run has to be in the open editor on this tree.
 
 ## Open - T3
 
@@ -114,10 +127,11 @@ that the pocket-kit check already measures." No task assigned yet. Decide whethe
 
 ## Scene status - NOT done
 
-The field scene cannot be called done. No editor was connected, so `verify_field_greybox.py` never
-logged `CHECK PASS`. The committed `L_Field.umap` still needs a placer re-run in the open editor
-(that is also how it gains the SkyLight, SkyAtmosphere and the corrected sun) followed by the
-verifier. The walk stays blocked on T1-3.
+The field scene cannot be called done for the current revision. The pass on record is real but dated:
+the editor log holds it at 2026-10-14 16:53Z, before `befdc171`. The committed `L_Field.umap` still
+carries the old upward sun and no sky light or atmosphere, so a desktop session must re-run the
+placer (which re-poses the sun and adds the lighting set) and then the verifier, in the open editor,
+and re-log the pass. The walk also stays blocked on T1-3.
 
 ## Foreign working-tree files - do not touch or stage
 
@@ -131,10 +145,13 @@ plan. Leave them alone; never `git add -A`:
 
 ## Gates and tooling
 
-- `python -m pytest Content/Python/tests -q` (currently 358 passed)
+- `py -3 -m pytest Content/Python/tests -q` (currently 366 passed)
 - `npm run verify:fast` (6 stages, currently PASSED)
-- No live editor: `unrealMCP.get_actors_in_level` returns `null`.
-- `.umap` files are Git LFS pointers; working-tree copies are materialized and greppable.
+- No live editor: `unrealMCP.get_actors_in_level` returns `null`. The proof of a field run is the log
+  at `Saved/Logs/HomeWorld.log`, which is gitignored - grep it for `field_greybox:`.
+- `.umap` files are Git LFS pointers; working-tree copies are materialized and greppable. In
+  PowerShell 5.1 read them with `[System.IO.File]::ReadAllBytes` + `[Text.Encoding]::ASCII`
+  (`-Encoding Latin1` does not exist).
 - Commit style: Conventional Commits (573 of 906 commits). Stage by explicit path.
 - The `post-commit` / `pre-push` hooks are `git-lfs` only (no gate, no commit-msg check).
 - PowerShell mangles `$`, quotes and backticks in inline `python -c` / `node -e` - write a script to
