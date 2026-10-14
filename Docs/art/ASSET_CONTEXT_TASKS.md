@@ -30,10 +30,10 @@ The five phases are states. The five transitions are the work. They are defined 
 | Asset | Pictures on file | Open transition |
 |---|---|---|
 | Player | Mood stills and a turnaround are filed. | Concept. The turnaround belongs to Greybox → Prototype. It stays closed. |
-| Cabin | Mood stills, massing, the door plan, and a front elevation are filed. | Concept. Massing and the plan belong to Concept → Greybox. The front belongs to Greybox → Prototype. They stay closed. |
+| Cabin | Mood stills, massing, the door plan, a front elevation, and the texture-off sheet with the room plan are filed. | Concept. The plan sheet is kept. The front belongs to Greybox → Prototype. It stays closed. |
 | Every other card | The card is written. | Concept. |
 
-Status line: Transition is Concept → Greybox. `L_SizeTest` is the measurement scene, not a kept greybox. The next file is the cottage asset sheet, alone, texture off, including the room plan. Open `Docs/art/transitions/CONCEPT_TO_GREYBOX.md` and `Docs/art/STILL_GENERATION_STANDARD.md`. Do not make another scene first. Cave, bull, and camp stay parked until the wake minute on that sheet is kept.
+Status line: Transition is Concept → Greybox. `L_SizeTest` is the measurement scene, not a kept greybox. The cottage asset sheet is kept: `Docs/art/homestead/HS_Cottage_sheet_plan.png`. The wake minute is kept. The field greybox is `Docs/level/L_Field_CONTEXT.md`. Cave and camp stills stay later.
 
 Do not generate a mesh from text. Image-to-3D runs only after the stills on that card are kept. Do not check a box in [PROTOTYPE_ASSET_TRACK.md](PROTOTYPE_ASSET_TRACK.md) from this file. Do not copy a file into `Content/`.
 
@@ -91,7 +91,7 @@ Wake read. A bear-sized shell with player-sized rooms inside. The shell matches 
 
 Reject: a modern appliance, a door leaf in the hall, a rune, text.
 
-Status: stills for audit. Wide and night are closer than 20 feet.
+Status: stills for audit. Wide and night are closer than 20 feet. The texture-off sheet with the room plan is kept: [HS_Cottage_sheet_plan.png](homestead/HS_Cottage_sheet_plan.png).
 
 - [x] Plan. [SM_Home_Cabin_doors.png](cabin/SM_Home_Cabin_doors.png)
 - [x] Wide dusk. [HS_Wide.jpg](homestead/HS_Wide.jpg)

@@ -12,7 +12,7 @@ Measured on `L_SizeTest`, 2026-10-11.
 
 2. One placement sheet per map. `Content/Python/scene_placement.py` reads `Docs/level/L_SizeTest_METRICS.md` and is the placer for that map. `Content/Python/place_size_test.py` builds a new level. Do not run it to update a map that already exists.
 
-3. The sheet names who is in the scene. On the size-test homestead that is the cottage, rocks, pines, and flowerbeds. The bear and the guards are not on that island. Path stones, fence, moss, the stump, and the crystal stay off until the sheet adds them.
+3. The sheet names who is in the scene. On the size-test homestead that is the cottage, rocks, pines, flowerbeds, the partner by the bed, and the child in the garden. The bear and the guards are not on that island. Path stones, fence, moss, the stump, and the crystal stay off until the sheet adds them.
 
 4. One directional light. A second one leaves the view black because forward shading uses a single sun. `L_SizeTest` keeps `SizeTest_Sun`, a sky light, a sky atmosphere, and an unbound exposure of 1.
 
@@ -68,7 +68,7 @@ For this map the pass is `scene_placement: CHECK PASS` and `scene_placement: cab
 
 One change, then `Content/Python/verify_homestead_scene.py` in the open editor. That script measures and does not move or save. `apply_homestead_scene.py` is the writer: it places from the sheet and saves only when the same checks pass.
 
-Do not start the next sitting on a failed check. The order for this homestead is the floor, then the face and the walk, then the placement sheet, then the door, then the hop and the shoulder sphere. The cottage sheet, texture off, stays the next art file. This test does not replace it.
+Do not start the next sitting on a failed check. The order for this homestead is the floor, then the face and the walk, then the placement sheet, then the door, then the hop and the shoulder sphere. The cottage sheet is kept. The wake minute on this map is the open play. This test does not replace the sheet.
 
 ## A new scene
 

@@ -70,6 +70,36 @@ def destroy(actor):
     unreal.get_editor_subsystem(unreal.EditorActorSubsystem).destroy_actor(actor)
 
 
+def place_skeletal(label, mesh_name, x_m, y_m, z_m, yaw):
+    mesh = unreal.EditorAssetLibrary.load_asset(MESH_DIR + "/" + mesh_name)
+    if mesh is None:
+        unreal.log("scene_placement: missing mesh " + mesh_name)
+        return None
+    location = vec(x_m, y_m, z_m)
+    rotation = yaw_rotator(yaw)
+    actor = by_label().get(label)
+    if actor is not None and actor.get_component_by_class(unreal.SkeletalMeshComponent) is None:
+        destroy(actor)
+        actor = None
+    if actor is None:
+        actor = unreal.EditorLevelLibrary.spawn_actor_from_class(
+            unreal.SkeletalMeshActor, location, rotation
+        )
+        actor.set_actor_label(label)
+    actor.set_actor_location(location, False, False)
+    actor.set_actor_rotation(rotation, False)
+    component = actor.get_component_by_class(unreal.SkeletalMeshComponent)
+    if component is None:
+        unreal.log("scene_placement: no skeletal component " + label)
+        return actor
+    if hasattr(component, "set_skinned_asset_and_update"):
+        component.set_skinned_asset_and_update(mesh)
+    else:
+        component.set_skeletal_mesh(mesh)
+    component.set_collision_enabled(unreal.CollisionEnabled.NO_COLLISION)
+    return actor
+
+
 def place_static(label, mesh_name, x_m, y_m, z_m, yaw, scale=1.0):
     mesh = unreal.EditorAssetLibrary.load_asset(MESH_DIR + "/" + mesh_name)
     if mesh is None:
@@ -100,6 +130,10 @@ def passable(label):
 
 
 def set_collision(actor):
+    skeletal = actor.get_component_by_class(unreal.SkeletalMeshComponent)
+    if skeletal is not None and actor.get_component_by_class(unreal.StaticMeshComponent) is None:
+        skeletal.set_collision_enabled(unreal.CollisionEnabled.NO_COLLISION)
+        return
     component = actor.get_component_by_class(unreal.StaticMeshComponent)
     if component is None:
         return
@@ -580,7 +614,7 @@ def capsule_clearance(loc, top):
     errors = []
     for actor in overlapped or []:
         label = actor.get_actor_label()
-        if label == "SM_Size_Island" or passable(label) or label == "SM_Size_Field":
+        if label == "SM_Size_Island" or passable(label) or label == "SM_Size_Field" or label in ("SK_Size_Partner", "SK_Size_Child"):
             continue
         errors.append("capsule hits " + label)
     return errors
@@ -600,7 +634,7 @@ def walk_cabin(top, loc):
             unreal.Vector(ax, ay, az),
             unreal.Vector(bx, by, bz),
         )
-        if label is None or label in ("SM_Size_Island", "SM_Size_Field") or label.startswith("SM_Size_Herb") or label.startswith("SM_Size_Lupine"):
+        if label is None or label in ("SM_Size_Island", "SM_Size_Field", "SK_Size_Partner", "SK_Size_Child") or label.startswith("SM_Size_Herb") or label.startswith("SM_Size_Lupine"):
             continue
         errors.append(
             "walk blocked by %s from (%.0f, %.0f) to (%.0f, %.0f)"
@@ -680,7 +714,10 @@ def run(import_mesh=True):
     unreal.get_editor_subsystem(unreal.LevelEditorSubsystem).load_level(MAP_PATH)
     labels = []
     for item in metrics["homestead"]:
-        place_static(item["label"], item["mesh"], item["x"], item["y"], item["z"], item["yaw"])
+        if str(item["mesh"]).startswith("SK_"):
+            place_skeletal(item["label"], item["mesh"], item["x"], item["y"], item["z"], item["yaw"])
+        else:
+            place_static(item["label"], item["mesh"], item["x"], item["y"], item["z"], item["yaw"])
         labels.append(item["label"])
     for label in labels:
         actor = by_label().get(label)
@@ -692,6 +729,10 @@ def run(import_mesh=True):
                 tag_actor(actor, "NODE_GARDEN", "NODE_GARDEN_EAST")
             elif label == "SM_Size_Kettle":
                 tag_actor(actor, "NODE_KETTLE")
+            elif label == "SK_Size_Partner":
+                tag_actor(actor, "NPC_PARTNER")
+            elif label == "SK_Size_Child":
+                tag_actor(actor, "NPC_CHILD")
     if not set_slab_collision():
         return 1
     top, floor_errors = measure_floor()

@@ -1,7 +1,12 @@
 {
   "id": "FIELD",
   "type": "SM_ zone",
-  "status": "SEQUENCE_DEFINED_GEOMETRY_NOT_BUILT",
+  "status": "GREYBOX_MASSED",
+  "greybox": {
+    "map": "/Game/HomeWorld/Maps/Field/L_Field",
+    "metrics": "Docs/level/L_Field_METRICS.md",
+    "note": "Texture-off mass. No path. No landing ring. The two forest edges share one pine sequence. Herb centres follow the scatter rule. Authored module offsets are not placed. measured stays null until a reader measures the built actors."
+  },
   "date": "2026-10-02",
   "phase": "T0_R6",
   "owner": "agent",

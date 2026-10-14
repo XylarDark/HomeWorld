@@ -232,8 +232,10 @@ void AHomeWorldCharacter::BeginPlay()
 		Movement->RotationRate = FRotator(0.0f, RotationRateYaw, 0.0f);
 	}
 	// Place character on ground if we hit something below (avoids floating when Player Start is slightly high).
-	const bool bSizeTest = UGameplayStatics::GetCurrentLevelName(this).Contains(TEXT("SizeTest"));
-	if (bSizeTest)
+	const FString LevelName = UGameplayStatics::GetCurrentLevelName(this);
+	const bool bSizeTest = LevelName.Contains(TEXT("SizeTest"));
+	const bool bGreyboxBody = bSizeTest || LevelName.Contains(TEXT("L_Field"));
+	if (bGreyboxBody)
 	{
 		if (UCapsuleComponent* SizeCapsule = GetCapsuleComponent())
 		{
@@ -250,29 +252,33 @@ void AHomeWorldCharacter::BeginPlay()
 		if (Capsule)
 		{
 			const float HalfHeight = Capsule->GetUnscaledCapsuleHalfHeight();
+			// The homestead sheet leaves 10 cm under the capsule. Snapping onto the hit puts the feet in the floor.
+			const float GroundGap = bGreyboxBody ? 10.0f : 0.0f;
 			const FVector Start = GetActorLocation();
 			const FVector End = Start - FVector(0.0f, 0.0f, HalfHeight + 500.0f);
 			FHitResult Hit;
 			FCollisionQueryParams Params(NAME_None, false, this);
 			if (World->LineTraceSingleByChannel(Hit, Start, End, ECC_WorldStatic, Params))
 			{
-				SetActorLocation(FVector(Start.X, Start.Y, Hit.ImpactPoint.Z + HalfHeight));
+				SetActorLocation(FVector(Start.X, Start.Y, Hit.ImpactPoint.Z + HalfHeight + GroundGap));
 			}
 		}
 	}
-	if (bSizeTest)
+	if (bGreyboxBody)
 	{
 		// Rest pose: right arm is +X and the walk strides on Y, so the face is mesh -Y.
 		// +90 turns that face onto actor +X. -90 and 0 both walk sideways to the face.
+		// The kept player and the size-test coat share that axis. Feet are at local 0, so the mesh sits one half-height down.
 		MeshForwardYawOffset = 90.0f;
-		if (USkeletalMesh* Coat = LoadObject<USkeletalMesh>(nullptr, TEXT("/Game/HomeWorld/Meshes/SizeTest/SK_Size_Player.SK_Size_Player")))
+		if (USkeletalMesh* Coat = LoadObject<USkeletalMesh>(nullptr, TEXT("/Game/HomeWorld/Meshes/SizeTest/SK_Player_Female.SK_Player_Female")))
 		{
 			if (USkeletalMeshComponent* CoatMesh = GetMesh())
 			{
 				CoatMesh->SetAnimInstanceClass(nullptr);
 				CoatMesh->SetAnimationMode(EAnimationMode::AnimationSingleNode);
 				CoatMesh->SetSkeletalMeshAsset(Coat);
-				CoatMesh->SetRelativeLocation(FVector(0.0f, 0.0f, -100.0f));
+				const float HalfHeight = GetCapsuleComponent() ? GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight() : 100.0f;
+				CoatMesh->SetRelativeLocation(FVector(0.0f, 0.0f, -HalfHeight));
 				CoatMesh->SetEnableAnimation(true);
 				CoatMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			}
@@ -281,7 +287,7 @@ void AHomeWorldCharacter::BeginPlay()
 		{
 			Controlled->SetControlRotation(FRotator(0.0f, GetActorRotation().Yaw, 0.0f));
 		}
-		if (!SizeTestWisp)
+		if (bSizeTest && !SizeTestWisp)
 		{
 			SizeTestWisp = NewObject<UStaticMeshComponent>(this, TEXT("SizeTestShoulderWisp"));
 			if (UStaticMesh* Sphere = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Sphere.Sphere")))
@@ -299,7 +305,7 @@ void AHomeWorldCharacter::BeginPlay()
 	if (MeshComp)
 	{
 		MeshComp->SetRelativeRotation(FRotator(0.0f, MeshForwardYawOffset, 0.0f));
-		if (bSizeTest)
+		if (bGreyboxBody)
 		{
 			MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
@@ -365,6 +371,10 @@ void AHomeWorldCharacter::Tick(float DeltaTime)
 		UpdateSizeTestWalk();
 		UpdateSizeTestWisp(DeltaTime);
 	}
+	else if (UGameplayStatics::GetCurrentLevelName(this).Contains(TEXT("L_Field")))
+	{
+		UpdateSizeTestWalk();
+	}
 }
 
 void AHomeWorldCharacter::UpdateSizeTestWisp(float DeltaTime)
@@ -405,7 +415,7 @@ void AHomeWorldCharacter::UpdateSizeTestWalk()
 		}
 		return;
 	}
-	if (UAnimSequence* Walk = LoadObject<UAnimSequence>(nullptr, TEXT("/Game/HomeWorld/Meshes/SizeTest/SK_Size_Player_Anim.SK_Size_Player_Anim")))
+	if (UAnimSequence* Walk = LoadObject<UAnimSequence>(nullptr, TEXT("/Game/HomeWorld/Meshes/SizeTest/SK_Player_Female_Anim.SK_Player_Female_Anim")))
 	{
 		Walk->bEnableRootMotion = false;
 		CoatBody->PlayAnimation(Walk, true);

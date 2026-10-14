@@ -50,6 +50,6 @@ Changing tree height in the same prompt as the bear or the cabin drops the facet
 
 ## This sitting
 
-The cottage front is kept: `Docs/art/homestead/HS_Cottage_sheet_rail2.png`. The pine front is kept: `Docs/art/field/SM_Pine_sheet_front.jpg`. The bear front is kept: `Docs/art/homestead/SM_Bear_sheet_front.jpg`. The bull front is kept: `Docs/art/field/SM_Bull_sheet_front.jpg`. Shoulders are the 5 m cottage wall. The guard front is kept: `Docs/art/camp/SK_Guard_sheet_front.jpg`. Weight on the hips. Large sword leaning on one shoulder. Characters and large assets the player acts on come next. Path stone, moss, fence, windows, and porch dressing wait.
+The cottage front is kept: `Docs/art/homestead/HS_Cottage_sheet_rail2.png`. The texture-off sheet with the drawn room plan is kept: `Docs/art/homestead/HS_Cottage_sheet_plan.png`. The pine front is kept: `Docs/art/field/SM_Pine_sheet_front.jpg`. The bear front is kept: `Docs/art/homestead/SM_Bear_sheet_front.jpg`. The bull front is kept: `Docs/art/field/SM_Bull_sheet_front.jpg`. Shoulders are the 5 m cottage wall. The guard front is kept: `Docs/art/camp/SK_Guard_sheet_front.jpg`. Weight on the hips. Large sword leaning on one shoulder. Characters and large assets the player acts on come next. Path stone, moss, fence, windows, and porch dressing wait.
 
 Partner, child, and camp stay closed. They do not change these meters.

@@ -4,7 +4,7 @@ Master placement for the size-test map. The room layout is `Docs/level/L_SizeTes
 
 Units are meters. Unreal Z is up. Yaw 0 faces +X. Yaw 90 faces +Y. Setup practices are in `Docs/context/SCENE_SETUP.md`.
 
-The homestead list is the cottage, rocks, trees, and flowerbeds. The bed row is not the sleep bed. Path stones, fence, moss, and the porch stump stay off this scene.
+The homestead list is the cottage, rocks, trees, flowerbeds, the partner by the bed, and the child in the garden. The bed row is not the sleep bed. Path stones, fence, moss, and the porch stump stay off this scene.
 
 ```json
 {
@@ -24,14 +24,14 @@ The homestead list is the cottage, rocks, trees, and flowerbeds. The bed row is 
     {"label": "SM_Size_Lupine", "mesh": "SM_Size_Lupine", "x": -12.2, "y": -8.3, "z": 453, "yaw": 0},
     {"label": "SM_Size_Lupine_B", "mesh": "SM_Size_Lupine", "x": -6.8, "y": -8.3, "z": 453, "yaw": 0},
     {"label": "SM_Size_Kettle", "mesh": "SM_Size_Kettle", "x": 1.8, "y": 0.0, "z": 453, "yaw": 180},
-    {"label": "SM_Size_Bed", "mesh": "SM_Size_Bed", "x": -9.5, "y": 9.0, "z": 453, "yaw": 0}
+    {"label": "SM_Size_Bed", "mesh": "SM_Size_Bed", "x": -9.5, "y": 9.0, "z": 453, "yaw": 0},
+    {"label": "SK_Size_Partner", "mesh": "SK_Size_Partner", "x": -8.8, "y": 8.6, "z": 453, "yaw": 180},
+    {"label": "SK_Size_Child", "mesh": "SK_Size_Child", "x": -13.8, "y": -7.6, "z": 453, "yaw": 0}
   ],
   "plains": {"label": "SM_Size_Field", "mesh": "SM_Size_Field", "x": 0, "y": 0, "z": 0, "yaw": 0, "scale": 20},
   "removeLabels": [
     "SM_Size_Bear",
     "SK_Size_Bear",
-    "SK_Size_Partner",
-    "SK_Size_Child",
     "SM_Size_Stump",
     "SM_Size_Shrine",
     "SM_Size_Perch",

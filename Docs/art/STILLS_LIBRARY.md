@@ -41,6 +41,7 @@ Door plan, Greybox, already drawn: [SM_Home_Cabin_doors.png](cabin/SM_Home_Cabin
 | [HS_Cottage_sheet_front_v3.jpg](homestead/HS_Cottage_sheet_front_v3.jpg) | Greybox | New front. Porch and door right of center. Rail stops at the door. For audit. Not a keep. |
 | [HS_Cottage_sheet_rail.png](homestead/HS_Cottage_sheet_rail.png) | Greybox | Rail edit. Right rail is still a short stub. Not a keep. |
 | [HS_Cottage_sheet_rail2.png](homestead/HS_Cottage_sheet_rail2.png) | Greybox | Kept 2026-10-11. Front. Chimney on the right, door right of center, porch and rail. |
+| [HS_Cottage_sheet_plan.png](homestead/HS_Cottage_sheet_plan.png) | Greybox | Kept 2026-10-14. Texture-off kept front plus the drawn room plan. |
 | [SM_Home_Bed_sheet_front.jpg](homestead/SM_Home_Bed_sheet_front.jpg) | Greybox | Kept 2026-10-11. Bed front. Texture off. |
 | [SM_Home_Kettle_sheet_front.jpg](homestead/SM_Home_Kettle_sheet_front.jpg) | Greybox | Kept 2026-10-11. One kettle. Texture off. |
 | [SM_Home_HerbBed_sheet_front.jpg](homestead/SM_Home_HerbBed_sheet_front.jpg) | Greybox | Kept 2026-10-11. Raised bed and faceted herbs. |

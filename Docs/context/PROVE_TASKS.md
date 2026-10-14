@@ -8,7 +8,7 @@ Lanes: critical path, later, future. One named prove at a time.
 
 | Item | Owner | Co-fork | State |
 |---|---|---|---|
-| Wake minute on `L_SizeTest` | Prove | Play walks it. Look keeps the cottage sheet. Luke plays it. | Now |
+| Wake minute on `L_SizeTest` | Prove | Luke played it. Kept 2026-10-14. | Kept |
 
 ## Later
 

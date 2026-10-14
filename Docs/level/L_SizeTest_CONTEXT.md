@@ -10,7 +10,7 @@ Map: `/Game/HomeWorld/Maps/SizeTest/L_SizeTest`.
 
 ## Who is here
 
-Homestead: cottage, rocks, pines, herb beds, lupines. The player start is on the south path, aimed at the entry. Plants do not block the capsule. The field mesh is scaled under the island so the pad reads as floating above the plain.
+Homestead: cottage, rocks, pines, herb beds, lupines, the partner by the bed, and the child in the garden. The player start is on the south path, aimed at the entry. Plants do not block the capsule. The partner and the child do not block it either. The field mesh is scaled under the island so the pad reads as floating above the plain.
 
 Not in this test: bear, guards, camp, clouds, bull, and the gatherables. The placer removes them and will not save if a solid shares the player’s clearance on the 1 m grid.
 

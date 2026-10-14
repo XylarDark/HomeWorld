@@ -6,11 +6,12 @@ Lanes: critical path, later, future. Session start walks critical path only. A t
 
 ## Critical path
 
-The only backlog is the wake minute on `L_SizeTest`: herbs on the south apron, the south door, the interior from the cottage sheet, tea, and one family read. Look owns the cottage sheet. Cave, the bull, and the camp stay parked until that minute is kept.
+The wake minute on `L_SizeTest` is kept. The cottage sheet is kept. The field greybox is the open level.
 
 | Item | Owner | Co-fork | State |
 |---|---|---|---|
-| Wake minute on `L_SizeTest` | Play | Look, for the cottage sheet and room plan | Now |
+| Wake minute on `L_SizeTest` | Play | Look, for the cottage sheet and room plan | Kept 2026-10-14 |
+| Field greybox on `L_Field` | Play | The zone contract in `Lib/02_Zones/gather/FIELD.json` | Placed 2026-10-14. `field_greybox: CHECK PASS` |
 
 ## Later
 
