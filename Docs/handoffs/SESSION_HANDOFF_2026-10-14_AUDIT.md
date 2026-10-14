@@ -1,8 +1,8 @@
 ---
 artifact_contract: "ce-handoff/v1"
 created_at: "2026-10-14T19:09:42Z"
-title: "HomeWorld 2026-10-14 commit audit - T1-T7 audited, T7 fixed; 21169765 placed"
-summary: "Audited the six 2026-10-14 commits as concern-based tasks (T1-T7). T1, T2, T3, T4, T5, T6 and T7 are repaired; T2 found the recorded field pass is REAL (editor log 2026-10-14 16:53Z) but predates befdc171, so the scene is not done until a desktop re-run. T3 had no code defect. T4 fixed the T1-3 soft-bounds gate in HomeWorldCharacter.cpp (DEC-0045). T7's edits were correct where made, but two files it touched still contradicted the bed rule; fixed here (DEC-0046). The unassigned 21169765 stands alone as the size-test pocket-kit sheet (DEC-0047)."
+title: "HomeWorld 2026-10-14 commit audit - T1-T7 audited, T7 fixed; 21169765 audited"
+summary: "Audited the six 2026-10-14 commits as concern-based tasks (T1-T7). T1, T2, T3, T4, T5, T6 and T7 are repaired; T2 found the recorded field pass is REAL (editor log 2026-10-14 16:53Z) but predates befdc171, so the scene is not done until a desktop re-run. T3 had no code defect. T4 fixed the T1-3 soft-bounds gate in HomeWorldCharacter.cpp (DEC-0045). T7's edits were correct where made, but two files it touched still contradicted the bed rule; fixed here (DEC-0046). The unassigned 21169765 stands alone as the size-test pocket-kit sheet; audited, its numbers match the checker and it needs no fix (DEC-0047, DEC-0048)."
 keywords: ["HomeWorld", "commit-audit", "field-greybox", "soft-bounds", "skill-catalog", "doc-links", "handoff"]
 cwd: "C:\\dev\\HomeWorld"
 resume_focus: "T1-T7 are audited and T7's residual contradictions are fixed (DEC-0046). Next real work is the desktop sitting that re-runs the field placer and verifier and walks L_Field (T2, T4). Open follow-ups: the size-test room-plan table does not match check_pocket_kit's read shape (DEC-0047), and the dated rune/dusk copies named under T7."
@@ -21,8 +21,8 @@ T1-T7 are audited and the defects this audit found are fixed. The field scene is
 T1-T7 are audited. Do not re-audit T1/T2/T3/T4/T5/T6 - they are committed and pushed - or T7, which
 is fixed in DEC-0046. Do not touch the four foreign working-tree files listed at the bottom. The next
 real work is the desktop sitting that re-runs the field placer and verifier and walks `L_Field` (see T2
-and T4 below). Open follow-ups: the size-test room-plan table does not match `check_pocket_kit`'s read
-shape (see 21169765 below); the dated rune/dusk copies named under T7 are still open.
+and T4 below), which also owes the two pad-relative route-gap lines for the size-test sheet
+(DEC-0048). Open follow-up: the dated rune/dusk copies named under T7 are still open.
 
 ## Commit map (verified with `git show --stat --name-status`)
 
@@ -31,7 +31,7 @@ shape (see 21169765 below); the dated rune/dusk copies named under T7 are still 
 | `34500e3c` | T3 | cottage sheet PNG + `L_Field_CONTEXT.md` + `L_Field_METRICS.md` (1398 lines) |
 | `dadc5cf7` | T1 + T2 + T4 | 16 files: `L_Field.umap` (new) + `L_SizeTest.umap` + `place_field_greybox.py` (new) + `verify_field_greybox.py` (new) + `scene_placement.py` + `HomeWorldCharacter.cpp` + 10 docs (`FIELD.json`, `SCENE_SETUP.md`, `PLAY_TASKS.md`, `PROVE_TASKS.md`, 3 art docs, both `L_SizeTest` sheets) |
 | `8bc982c8` | T6 | skill files + catalogs + `instruction-budget` ceiling |
-| `21169765` | unassigned | `Docs/level/L_SizeTest_ROOM_PLAN.md` (+11) only |
+| `21169765` | audited | `Docs/level/L_SizeTest_ROOM_PLAN.md` (+11) only; numbers match `check_pocket_kit`, no fix needed |
 | `4e9cb4b8` | T5 | `check_doc_links.py` + `start_editor.py` + tests + `docs/KNOWN_ERRORS.md` |
 | `54858b1b` | T7 | docs-only: `01_GDD_MVP.md`, `03_GAMEPLAY_MVP.md`, `VISION_BOARD.md`, `canon/LOOPS.md` |
 
@@ -161,18 +161,24 @@ Docs-only. Files: `Docs/01_GDD_MVP.md`, `Docs/03_GAMEPLAY_MVP.md`, `Docs/VISION_
 - **Verified:** `py -3 -m pytest Content/Python/tests -q` 366 passed; `npm run verify:fast` 6/6 PASSED;
   `npm run docs:links` still `gone ... (46)`, unchanged.
 
-## Placed - 21169765
+## Audited - 21169765
 
-**Stands alone** (DEC-0047). `Docs/level/L_SizeTest_ROOM_PLAN.md` (+11) records the size-test pocket
-kit: path stones and a fence run. It is the `L_SizeTest` sheet, tied to
+**Stands alone and needs no fix** (DEC-0047, DEC-0048). `Docs/level/L_SizeTest_ROOM_PLAN.md` (+11)
+records the size-test pocket kit: path stones and a fence run. It is the `L_SizeTest` sheet, tied to
 `Content/Python/check_pocket_kit.py`; T3 is the `L_Field` sheet. Different map, different checker -
 do not fold.
 
-- **Flag for its own audit:** `check_pocket_kit.stated_route_gaps()` keeps a value only from a line
-  containing the literal "pad edge" or "route gap". The plan holds neither phrase anywhere, including
-  the new "Pocket kit outside the porch" section, yet the last path stone and every fence piece carry
-  the `path_pos_x` / `fence_neg_y` gap keys, so those rows soft_fail. The added table is not in the
-  shape the checker reads.
+- **Audit result (no defect):** the section's numbers match the checker's constants exactly - path
+  `(-9.5,-6.8)` to `(14.0,-6.0)`, one stone every 1.5 m (16 stones), fence `Y -11.5` across
+  `X -15.0..-4.0` (6 pieces), shrine `(-16.2,-8.3)` at 4 m. `check_pocket_kit.run_host_checks()`
+  passes (points=16, fences=6).
+- **The one gap, deferred not broken:** `stated_route_gaps()` keeps a value only from a line naming a
+  "pad edge" or a "route gap"; the plan states its run as a table, so `path_pos_x` / `fence_neg_y`
+  soft_fail with "room plan states no route gap". Confirmed `stated_route_gaps(plan) == {}`. Soft_fail
+  is the checker's by-design nudge and does not fail the run (only `closed_fail` sets a non-zero exit).
+  Both gaps are measured against the `SM_Size_Island` pad, which is read in-editor and is larger than
+  the cottage shell the plan describes, so the plan cannot state them from its own text - adding guessed
+  numbers would be worse. Owed to the same desktop sitting as T2/T4.
 - Its working tree also carries an EOL-only change from another session; leave it (one of the four
   foreign files).
 

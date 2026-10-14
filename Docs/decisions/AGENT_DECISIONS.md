@@ -1118,3 +1118,12 @@ The number is not the cost of that skill as it was first written. Two identical 
 - **Reverses if:** a follow-on task shows the plan and the checker already agree, or the sheet is merged with the size-test verification work.
 - **Supersedes:** none.
 
+## DEC-0048 - 21169765's numbers match the pocket-kit check; the route-gap lines are owed to the editor (2026-10-14)
+
+- **Area:** code design
+- **Decision:** `21169765` needs no code or doc fix. Its added table records the size-test path and fence run, and every number in it matches `Content/Python/check_pocket_kit.py`'s constants.
+- **Rationale:** DEC-0047's reversal condition fired: the follow-on audit shows the plan and the checker already agree on the run. The only piece the checker cannot cross-check is the two pad-relative route gaps (`path_pos_x`, `fence_neg_y`), and that is deferred, not defective. `stated_route_gaps()` keeps a value only from a line naming a "pad edge" or a "route gap"; the plan states its run as a table, so those rows soft_fail with "room plan states no route gap". Soft_fail is the checker's by-design nudge and never sets a non-zero exit (only `closed_fail` does). Both gaps are measured against the `SM_Size_Island` pad, which is read in-editor and is larger than the cottage shell the plan describes, so the plan cannot state them from its own text; guessed numbers would be worse than the current soft_fail. The alternative - teach the checker to read the table - was rejected because the gap is still pad-relative, so it would not remove the editor dependency.
+- **Evidence:** `stated_route_gaps(plan)` returns `{}` on the committed plan (`Docs/level/L_SizeTest_ROOM_PLAN.md`), and `check_pocket_kit.run_host_checks()` passes (points=16, fences=6). The plan's path `(-9.5,-6.8)` to `(14.0,-6.0)`, one stone every 1.5 m, fence `Y -11.5` across `X -15.0..-4.0` (6 pieces), and shrine `(-16.2,-8.3)` at 4 m match `PATH_START`/`PATH_END`, `PATH_SPACING_CM`, `FENCE_Y`/`FENCE_X0`/`FENCE_X1`, and `SHRINE_XY`/`SHRINE_HEIGHT_CM`.
+- **Reverses if:** a desktop run measures the pad and the two route-gap lines are added to the plan, or the checker is pointed at the table and stops needing the pad.
+- **Supersedes:** none.
+
