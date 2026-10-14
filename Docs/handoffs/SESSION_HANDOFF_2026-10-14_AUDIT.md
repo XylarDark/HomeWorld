@@ -1,11 +1,11 @@
 ---
 artifact_contract: "ce-handoff/v1"
 created_at: "2026-10-14T19:09:42Z"
-title: "HomeWorld 2026-10-14 commit audit - T1/T2/T3/T4/T5/T6 fixed; T7 open"
-summary: "Audited the six 2026-10-14 commits as concern-based tasks (T1-T7). T1, T2, T3, T4, T5 and T6 are repaired; T2 found the recorded field pass is REAL (editor log 2026-10-14 16:53Z) but predates befdc171, so the scene is not done until a desktop re-run. T3 had no code defect. T4 fixed the T1-3 soft-bounds gate in HomeWorldCharacter.cpp (DEC-0045). T7 and the unassigned 21169765 are still to audit."
+title: "HomeWorld 2026-10-14 commit audit - T1-T7 audited, T7 fixed; 21169765 placed"
+summary: "Audited the six 2026-10-14 commits as concern-based tasks (T1-T7). T1, T2, T3, T4, T5, T6 and T7 are repaired; T2 found the recorded field pass is REAL (editor log 2026-10-14 16:53Z) but predates befdc171, so the scene is not done until a desktop re-run. T3 had no code defect. T4 fixed the T1-3 soft-bounds gate in HomeWorldCharacter.cpp (DEC-0045). T7's edits were correct where made, but two files it touched still contradicted the bed rule; fixed here (DEC-0046). The unassigned 21169765 stands alone as the size-test pocket-kit sheet (DEC-0047)."
 keywords: ["HomeWorld", "commit-audit", "field-greybox", "soft-bounds", "skill-catalog", "doc-links", "handoff"]
 cwd: "C:\\dev\\HomeWorld"
-resume_focus: "Audit T7 next (docs-only: bed as the form change), and place the unassigned 21169765. The field lighting re-run and the field walk both are owed to a desktop session (T2, T4)."
+resume_focus: "T1-T7 are audited and T7's residual contradictions are fixed (DEC-0046). Next real work is the desktop sitting that re-runs the field placer and verifier and walks L_Field (T2, T4). Open follow-ups: the size-test room-plan table does not match check_pocket_kit's read shape (DEC-0047), and the dated rune/dusk copies named under T7."
 repository: "XylarDark/HomeWorld"
 branch: "main"
 head: "c0a201f1b45d57b6ecd3d3446d2c484cdceb0c26"
@@ -14,13 +14,15 @@ head: "c0a201f1b45d57b6ecd3d3446d2c484cdceb0c26"
 # SESSION_HANDOFF 2026-10-14 - commit audit
 
 Audit of the six commits authored on 2026-10-14. Work is grouped by concern (T1-T7), not per commit.
-Three tasks are fixed and pushed. Three are open. The field scene is not done.
+T1-T7 are audited and the defects this audit found are fixed. The field scene is not done.
 
 ## Resume focus
 
-Audit **T7** next, and decide where **21169765** belongs. Do not re-audit T1/T2/T3/T4/T5/T6 - they are
-committed and pushed. Do not touch the four foreign working-tree files listed at the bottom. The field
-lighting re-run and the field walk both are owed to a desktop session (see T2 and T4 below).
+T1-T7 are audited. Do not re-audit T1/T2/T3/T4/T5/T6 - they are committed and pushed - or T7, which
+is fixed in DEC-0046. Do not touch the four foreign working-tree files listed at the bottom. The next
+real work is the desktop sitting that re-runs the field placer and verifier and walks `L_Field` (see T2
+and T4 below). Open follow-ups: the size-test room-plan table does not match `check_pocket_kit`'s read
+shape (see 21169765 below); the dated rune/dusk copies named under T7 are still open.
 
 ## Commit map (verified with `git show --stat --name-status`)
 
@@ -131,18 +133,48 @@ linked from 4 art docs. `npm run docs:links` flags no field path.
 - `scene_placement.py` (+47 in `dadc5cf7`) refuses to save on a failed check; that is the model T1-4
   followed.
 
-## Open - T7
+## Fixed - T7 (`54858b1b`)
 
-`54858b1b`. Docs-only: "Make the bed the form change in the older design files, and match the shape
-line to the spirit pair." Files: `Docs/01_GDD_MVP.md`, `Docs/03_GAMEPLAY_MVP.md`,
-`Docs/VISION_BOARD.md`, `Docs/canon/LOOPS.md`. Check the edits against `VISION_BOARD.md` canon
-(bed = the form change) and cross-file consistency. Docs only - no product code.
+Docs-only. Files: `Docs/01_GDD_MVP.md`, `Docs/03_GAMEPLAY_MVP.md`, `Docs/VISION_BOARD.md`,
+`Docs/canon/LOOPS.md`. **DEC-0046.**
 
-## Open - 21169765
+- **Correct where edited.** The rune model is gone from `01_GDD_MVP.md` (fantasy, mode table, cycle
+  rules 3-4, tame transport "rune stone" -> "the shrine", first-run order) and from
+  `03_GAMEPLAY_MVP.md` §4; `VISION_BOARD.md` line 30 now matches the "two kinds of spirit" principle
+  (line 40), dropping the old "Some creatures are always spirit" contradiction; `canon/LOOPS.md` step 4
+  and the Meet row are right. All agree with the board (39, 89, 94, 95, 108-110).
+- **T7-1 (Med, fixed):** `03_GAMEPLAY_MVP.md` contradicted itself. T7 rewrote §4's end-rule to "Dawn
+  does not end the form", but §7 still drove `Dawn (V8 success) ... body form on homestead` with a phase
+  table that swapped form at dusk and dawn, and §8 walked the demo through a "dusk form swap". §7 and
+  §8 line 4 now read the bed rule. `DAYNIGHT_BIBLE.md` forbids a timer form swap, so this is alignment.
+- **T7-2 (Med, fixed):** `canon/LOOPS.md` line 4 said the list below "still names a dusk form change",
+  but T7's own edit to step 4 removed the only dusk line - the sentence was false. Reworded, and step 6
+  now says the bed ends the form rather than rest / dawn.
+- **T7-3 (Low, left):** `01_GDD_MVP.md` §3 rule 1 and V8 still read dawn -> body; the file's new header
+  disclaims it ("the board wins"), so it is a labelled earlier cut. Left as-is.
+- **Left, same defect outside T7's files:** `Docs/context/HOMEWORLD_ROUTE.md:44` keeps the identical
+  "rune stone transports you and the bull" sentence T7 fixed in the GDD (the file says the rune is
+  removed at line 81); `Docs/08d_CONTENT_CANON.md:278`; `Docs/COMMANDS_AND_LOG_TAGS.md:186`;
+  `Docs/guides/T0_HUMAN_DESKTOP_PIPELINE.md:86`; legacy `TaskLists/`; and `Docs/DAYNIGHT_BIBLE.md:14`
+  ("sleep (bed **or campsite**)") which also claims to win the day/night form rules while canon/README
+  says the board wins (DEC-0029). Owner chose to keep the fix on T7's own files.
+- **Verified:** `py -3 -m pytest Content/Python/tests -q` 366 passed; `npm run verify:fast` 6/6 PASSED;
+  `npm run docs:links` still `gone ... (46)`, unchanged.
 
-`Docs/level/L_SizeTest_ROOM_PLAN.md` (+11) only. Subject: "Record the size-test path and fence run
-that the pocket-kit check already measures." No task assigned yet. Decide whether it folds into T3
-(the other docs/level sheet) or stands alone.
+## Placed - 21169765
+
+**Stands alone** (DEC-0047). `Docs/level/L_SizeTest_ROOM_PLAN.md` (+11) records the size-test pocket
+kit: path stones and a fence run. It is the `L_SizeTest` sheet, tied to
+`Content/Python/check_pocket_kit.py`; T3 is the `L_Field` sheet. Different map, different checker -
+do not fold.
+
+- **Flag for its own audit:** `check_pocket_kit.stated_route_gaps()` keeps a value only from a line
+  containing the literal "pad edge" or "route gap". The plan holds neither phrase anywhere, including
+  the new "Pocket kit outside the porch" section, yet the last path stone and every fence piece carry
+  the `path_pos_x` / `fence_neg_y` gap keys, so those rows soft_fail. The added table is not in the
+  shape the checker reads.
+- Its working tree also carries an EOL-only change from another session; leave it (one of the four
+  foreign files).
 
 ## Scene status - NOT done
 

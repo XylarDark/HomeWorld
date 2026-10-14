@@ -113,20 +113,22 @@ Sockets expected on shrine kits (PROP/ENV): `SOCKET_Portal` / Interact / Arrive 
 
 ## 7. Time float → NightMix + spirit visibility (V8 support)
 
+The form is set by the bed, not the clock (§4, and [`Docs/VISION_BOARD.md`](VISION_BOARD.md); the board wins). The float drives the light. **Dawn does not change the form.**
+
 | Driver | Targets |
 |---|---|
 | GameState (or demo) **time float** / cycle phase | All ten masters' `NightMix` 0–1 |
-| Same float / phase | Spirit layer visibility on; day gather/beast interact off when night |
-| Dawn (V8 success) | `NightMix` → 0; spirit layer off; body form on homestead |
+| Sleep at the bed (form change) | Spirit layer visibility on; gather/beast idle when night |
+| The bed, or the fifth stack (form change) | Spirit layer off; day gather/beast available. Dawn does not end it |
 
 | Phase | time / NightMix intent | Spirit layer | Form |
 |---|---|---|---|
 | Day | ~0.0 | Off | Body |
-| Dusk transition | 0 → 1 over ~4–8 s | Fading on | Swap to spirit |
-| Night | ~0.85–1.0 (LIT Homestead_Night uses 0.85) | On | Spirit |
-| Dawn transition | 1 → 0 over ~4–8 s | Fading off | Swap to body |
+| Dusk transition | 0 → 1 over ~4–8 s | Off until the bed grants the form | No clock swap — set at the bed |
+| Night | ~0.85–1.0 (LIT Homestead_Night uses 0.85) | On after the bed | Spirit after the bed |
+| Dawn transition | 1 → 0 over ~4–8 s | Kept if still out (spirit-sickness stacks) | No clock swap — the bed ends it |
 
-**Rules:** One float flips lights + NightMix + spirit visibility. Never author `_Night` texture sets. Windows stay warm emissive (LIT).
+**Rules:** The float flips lights + `NightMix`; the bed alone sets the form and spirit visibility (§4). Never author `_Night` texture sets. Windows stay warm emissive (LIT).
 
 ---
 
@@ -146,7 +148,7 @@ GP does **not** open or save the `.blend` this wave. The following empties are t
 1. `GP_PlayerStart` → walk lookout (V1) — `CAM_Hero`
 2. `GP_GlideStart` → freely steer through the cloud descent and land in the field (V2) — `CAM_GlideDepart` → `CAM_LandingDay`
 3. Landing / path — gather + beast pads camera-readable (V3/V4; SYS data)
-4. Dusk form swap at homestead shrine (time float → NightMix)
+4. Sleep at the bed (form change); time float → NightMix (§4, §7)
 5. `GP_PortalA` ↔ `GP_PortalB` (V5) — `CAM_PortalNight`
 6. Spirit wound site heal ×3 (V6); portal home; nurture ×2 (V7); dawn (V8)
 

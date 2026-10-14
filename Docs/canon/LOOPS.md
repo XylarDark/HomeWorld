@@ -1,7 +1,7 @@
 # LOOPS.md
 
 **Status:** Pointer. The current loop is the prototype journey in [`Docs/VISION_BOARD.md`](../VISION_BOARD.md).  
-**Source:** the board. The list below is the earlier cut where it still names a dusk form change.
+**Source:** the board. The list below is the earlier cut; where it disagrees with the board, the board wins.
 
 ## Moment-to-moment
 
@@ -14,7 +14,7 @@ Walk / interact / short channel (gather ~1.5–3 s, heal/nurture ~2–4 s, porta
 3. **Reap** on planet path (materials, living sites, tame).
 4. **Sleep at the bed** grants the spirit form. Night does not. The rune is removed. NightMix → 1 only after that sleep.
 5. **Sow / dream** — portal ↔ planet; nurture; placeholder dream-heal/recruit; heal ×3.
-6. **Rest / dawn** → body on homestead; NightMix → 0.
+6. **The bed ends the form** — spirit → body, `NightMix` → 0. Dawn does not; still out at dawn stays spirit, gains a stack.
 
 ## Long-term (MVP)
 

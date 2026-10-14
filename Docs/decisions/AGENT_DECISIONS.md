@@ -1100,3 +1100,21 @@ The number is not the cost of that skill as it was first written. Two identical 
 - **Reverses if:** the greybox maps gain a per-map bounds config, or `L_Field` stops being a greybox body and gets its own bounds.
 - **Supersedes:** none.
 
+## DEC-0046 - The bed form rule reaches §7 of the gameplay MVP and the LOOPS pointer (2026-10-14)
+
+- **Area:** code design
+- **Decision:** Two doc fixes after the T7 audit (`54858b1b`). (1) `Docs/03_GAMEPLAY_MVP.md` §7 (the time-float / `NightMix` tables) and §8's demo path no longer say the clock swaps the form: the bed grants it, the bed or the fifth stack ends it, and dawn does not. (2) `Docs/canon/LOOPS.md` no longer claims the list below "still names a dusk form change" (T7's own edit removed that line) and its step 6 says the bed ends the form, not rest / dawn.
+- **Rationale:** T7 fixed the rune gate and the grant rule but left two files contradicting themselves. In `03_GAMEPLAY_MVP.md`, §4 now reads "Dawn does not end the form", while §7 still drove `Dawn (V8 success) ... body form on homestead` with a phase table that swapped form at dusk and dawn, and §8 still walked the demo through a "dusk form swap". Canon settles it, so this is alignment, not a new choice: the bed alone grants the form, the bed or max spirit-sickness ends it, and dawn does not (vision board 2026-10-08); `DAYNIGHT_BIBLE.md` forbids a timer form swap. LOOPS.md's header sentence was false the moment T7 rewrote its only dusk line. Scope stayed on T7's own files; the identical stale copies in `Docs/context/HOMEWORLD_ROUTE.md`, `08d_CONTENT_CANON.md`, and `COMMANDS_AND_LOG_TAGS.md`, and the `DAYNIGHT_BIBLE.md` "bed or campsite" wording, are left and listed in the handoff.
+- **Evidence:** `Docs/03_GAMEPLAY_MVP.md` §4 / §7 / §8 and `Docs/canon/LOOPS.md`; `py -3 -m pytest Content/Python/tests -q` 366 passed; `npm run verify:fast` 6/6 PASSED; `npm run docs:links` still reports `gone - no file by that name anywhere (46)`, unchanged, so no new dead link.
+- **Reverses if:** the board reinstates a clock form swap, or a campsite sleep spot joins the locked form rule.
+- **Supersedes:** none.
+
+## DEC-0047 - The unassigned 21169765 stands alone, and its table is not in the checker's read shape (2026-10-14)
+
+- **Area:** code design
+- **Decision:** `21169765` (`Docs/level/L_SizeTest_ROOM_PLAN.md`, +11) is not folded into T3. It is the size-test (`L_SizeTest`) pocket-kit sheet and stands on its own; T3 is the field (`L_Field`) sheet.
+- **Rationale:** The two commits touch different maps and different checkers. `21169765` records the pocket-kit path stones and fence run, and that actor set is measured by `Content/Python/check_pocket_kit.py`, not by the field placer or verifier. Folding a size-test doc into the field-sheet task would mix two concerns.
+- **Evidence:** `git show 21169765` is one file, the room plan. `check_pocket_kit.py` reads that file at `ROOM_PLAN`, and `stated_route_gaps()` keeps a value only from a line that contains the literal "pad edge" or "route gap". The plan holds neither phrase anywhere, including the added "Pocket kit outside the porch" section, while the last path stone and every fence piece carry the `path_pos_x` / `fence_neg_y` gap keys, so the recorded gaps are not read and those rows soft_fail. That is a flag for `21169765`'s own audit, not a fix here. Its working tree also carries an EOL-only change from another session, left alone.
+- **Reverses if:** a follow-on task shows the plan and the checker already agree, or the sheet is merged with the size-test verification work.
+- **Supersedes:** none.
+
