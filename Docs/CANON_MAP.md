@@ -80,6 +80,7 @@ README is left intact as history.
 | **Size test tasks** | `Docs/art/SIZE_TEST_TASKS.md` | Player block, cottage, pines, bear, bull, then a free walk clip. |
 | **Scene setup** | `Docs/context/SCENE_SETUP.md` | Practices before a test scene is placed. Do not report the scene done until its verify script logs PASS in the open editor. The size-test file is `Docs/level/L_SizeTest_CONTEXT.md`. Each later map gets its own context file in that folder. |
 | **Size-test scene** | `Docs/level/L_SizeTest_CONTEXT.md` | Floor top, who is on the island, play setup. Coordinates in `Docs/level/L_SizeTest_METRICS.md`. |
+| **Field scene (open level)** | `Docs/level/L_Field_CONTEXT.md` | Greybox mass of the field zone. Coordinates in `Docs/level/L_Field_METRICS.md`, which `Content/Python/place_field_greybox.py` reads. Pass is not re-logged after `befdc171` - see the file. |
 | **Greybox T0 catalog** | `Docs/art/GREYBOX_T0_CATALOG.md` | Generate, Kontext edit, TripoSR mesh, character walk. Interviews that block an asset. |
 | Ten master materials | `Docs/02_MATERIAL_SHEET.md` | **LOCKED** |
 | Per-domain locked bibles | `Docs/DAYNIGHT_BIBLE.md` · `Docs/MOVEMENT_BIBLE.md` · `Docs/HOMESTEAD_BIBLE.md` · `Docs/COMBAT_DREAM_BIBLE.md` · `Docs/GATHER_CRAFT_BIBLE.md` · `Docs/SPIRIT_STEALTH_BIBLE.md` · `Docs/CAMERA_BIBLE.md` | **LOCKED** — all seven |
@@ -99,7 +100,7 @@ README is left intact as history.
 | The work queue | `Docs/TaskLists/T0_NEXT_QUEUE.md` | active — 2026-10-08. `T0_FIRST_LOOP_NOW.md` is the finished code queue |
 | Prototype boss lair | `Docs/context/BOSS_LAIR_LOCK.md` | shape lock 2026-10-08. Fight stays later |
 | Taste decisions Rounds 1–7 | `Docs/handoffs/TASTE_GATE_T0_ASSETS.md` | R1–6 RESOLVED, R7+ parked |
-| Agent-owned decisions | `Docs/decisions/AGENT_DECISIONS.md` | DEC-0001…**0036** — search by id, not by position in the file |
+| Agent-owned decisions | `Docs/decisions/AGENT_DECISIONS.md` | DEC-0001…**0044** — search by id, not by position in the file |
 | UE 5.8 engineering | `docs/SETUP.md`, `KNOWN_ERRORS.md`, `CONVENTIONS.md` | canon |
 | Greybox measurement report | `Docs/qa/GRAYBOX_SPEC_REPORT.md` | 4 blocking (regenerated 2026-10-03) |
 | **Polish pass entry gates** | `Docs/37_POLISH_PASS_PROCESS.md` | active — enforces via `Content/Python/polish_readiness.py` |

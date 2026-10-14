@@ -1080,3 +1080,12 @@ The number is not the cost of that skill as it was first written. Two identical 
 - **Reverses if:** A desktop session re-runs the placer and verifier in the open editor and re-logs the pass, after which the dated note is removed.
 - **Supersedes:** none.
 
+## DEC-0044 - The field sheet says its scatter is not reproducible, and the field scene is indexed (2026-10-14)
+
+- **Area:** code design
+- **Decision:** Two doc fixes after the T3 audit (`34500e3c`). (1) `Docs/level/L_Field_METRICS.md` no longer implies the herb centres can be regenerated: they are frozen in the file, the scatter was seeded 20261014, and no generator ships with the repo. (2) `Docs/CANON_MAP.md` gains a row for `Docs/level/L_Field_CONTEXT.md`, and its agent-decision row moves from DEC-0001…0036 to …0044.
+- **Rationale:** The seed line read as reproducibility that does not exist - `git log --all -S 20261014` finds the string only in `34500e3c` and the audit handoff, so nothing derives the centres from it. Separately, `CANON_MAP` row 81 says each later map gets a context file in `Docs/level/`, yet nothing indexed the field docs, even though `PLAY_TASKS.md` calls the field the open level. The decision-row range had been stale since DEC-0037 (last touched 2026-10-04).
+- **Evidence:** T3 audit found no code defect: the committed `L_Field.umap` holds 230 `SM_Field_` labels - 7 mass cubes/cliffs + 71 pines (`S_*` 35, `W_*` 35, `Corner` 1) + 8 trees + 144 herb nodes - each sheet label present exactly once; the sheet's prose is internally consistent (104 centres = 70 single + 28 dual + 6 triple = 144 nodes, min centre spacing 30.03 m, 52 bulls at exactly 2.50 m and 52 with min 8.03 m, 36 stations, 8 meadow pines >= 42.9 m apart). `npm run docs:links` flags no field path. `git show --name-status dadc5cf7` is 16 files (my earlier note said 5 doc files; it is 10 docs plus 6 code/binary).
+- **Reverses if:** A generator for the herb scatter is committed, at which point the seed becomes reproducible and the caveat is dropped.
+- **Supersedes:** none.
+

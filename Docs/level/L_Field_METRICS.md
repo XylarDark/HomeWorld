@@ -2,7 +2,7 @@
 
 Greybox mass for the field zone. The contract is Lib/02_Zones/gather/FIELD.json. This file is the coordinate list. Content/Python/place_field_greybox.py reads the JSON block and does not invent a spot.
 
-Units are meters. The meadow centre is the arrival. There is no path and no landing ring. Herb centres are seed 20261014, at least 30 m apart, inside the meadow and off the edge bands. A dual adds one node 1 m east. A triple adds that node and one node 1 m north.
+Units are meters. The meadow centre is the arrival. There is no path and no landing ring. Herb centres are frozen in this file: at least 30 m apart, inside the meadow and off the edge bands. The scatter was seeded 20261014, but no generator ships with the repo, so edit a centre here rather than re-seeding. A dual adds one node 1 m east. A triple adds that node and one node 1 m north.
 
 The two forest edges use one pine sequence and one 12 m step. The south-west corner pine is shared. Cliff faces are three masses on the north lip. The river is the 7 m channel on the east. Authored beast-pad offsets from the old field are not placed. A few pines stand in the meadow, far apart. Bulls match the herb-centre count. Half stand 2.5 m from a herb. The other half stay at least 8 m from every herb.
 
