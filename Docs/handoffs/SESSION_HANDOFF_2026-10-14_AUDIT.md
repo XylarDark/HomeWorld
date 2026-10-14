@@ -2,13 +2,13 @@
 artifact_contract: "ce-handoff/v1"
 created_at: "2026-10-14T19:09:42Z"
 title: "HomeWorld 2026-10-14 commit audit - T1/T2/T5/T6 fixed; T3/T4/T7 open"
-summary: "Audited the six 2026-10-14 commits as concern-based tasks (T1-T7). T1, T2, T5 and T6 are repaired; T2 found the recorded field pass is REAL (editor log 2026-10-14 16:53Z) but predates befdc171, so the scene is not done until a desktop re-run. T3, T4, T7 and the unassigned 21169765 are still to audit."
+summary: "Audited the six 2026-10-14 commits as concern-based tasks (T1-T7). T1, T2, T3, T5 and T6 are repaired; T2 found the recorded field pass is REAL (editor log 2026-10-14 16:53Z) but predates befdc171, so the scene is not done until a desktop re-run. T3 had no code defect. T4, T7 and the unassigned 21169765 are still to audit."
 keywords: ["HomeWorld", "commit-audit", "field-greybox", "soft-bounds", "skill-catalog", "doc-links", "handoff"]
 cwd: "C:\\dev\\HomeWorld"
-resume_focus: "Audit T3 (the cottage sheet strip and the field metrics sheet), then T4, T7, and place 21169765. The field lighting re-run is owed to a desktop session."
+resume_focus: "Audit T4 (HomeWorldCharacter.cpp, which owns the T1-3 soft-bounds blocker), then T7, and place 21169765. The field lighting re-run is owed to a desktop session."
 repository: "XylarDark/HomeWorld"
 branch: "main"
-head: "748216e6ed32c51f4f6a2d8a994d57099a602e67"
+head: "c0a201f1b45d57b6ecd3d3446d2c484cdceb0c26"
 ---
 
 # SESSION_HANDOFF 2026-10-14 - commit audit
@@ -18,8 +18,8 @@ Three tasks are fixed and pushed. Three are open. The field scene is not done.
 
 ## Resume focus
 
-Audit **T3** next, then **T4**, **T7**, and decide where **21169765** belongs. Do not re-audit
-T1/T2/T5/T6 - they are committed and pushed. Do not touch the four foreign working-tree files listed
+Audit **T4** next, then **T7**, and decide where **21169765** belongs. Do not re-audit
+T1/T2/T3/T5/T6 - they are committed and pushed. Do not touch the four foreign working-tree files listed
 at the bottom. The field lighting re-run is owed to a desktop session (see T2 below).
 
 ## Commit map (verified with `git show --stat --name-status`)
@@ -27,7 +27,7 @@ at the bottom. The field lighting re-run is owed to a desktop session (see T2 be
 | SHA | Task | Concern |
 |-----|------|---------|
 | `34500e3c` | T3 | cottage sheet PNG + `L_Field_CONTEXT.md` + `L_Field_METRICS.md` (1398 lines) |
-| `dadc5cf7` | T1 + T2 + T4 | `L_Field.umap` (new) + `L_SizeTest.umap` + `place_field_greybox.py` + `verify_field_greybox.py` + `scene_placement.py` (+47) + 5 doc files |
+| `dadc5cf7` | T1 + T2 + T4 | 16 files: `L_Field.umap` (new) + `L_SizeTest.umap` + `place_field_greybox.py` (new) + `verify_field_greybox.py` (new) + `scene_placement.py` + `HomeWorldCharacter.cpp` + 10 docs (`FIELD.json`, `SCENE_SETUP.md`, `PLAY_TASKS.md`, `PROVE_TASKS.md`, 3 art docs, both `L_SizeTest` sheets) |
 | `8bc982c8` | T6 | skill files + catalogs + `instruction-budget` ceiling |
 | `21169765` | unassigned | `Docs/level/L_SizeTest_ROOM_PLAN.md` (+11) only |
 | `4e9cb4b8` | T5 | `check_doc_links.py` + `start_editor.py` + tests + `docs/KNOWN_ERRORS.md` |
@@ -37,7 +37,7 @@ at the bottom. The field lighting re-run is owed to a desktop session (see T2 be
 
 ## Done and pushed (do not re-open)
 
-Pushed as `34500e3c..748216e6`. `git rev-list --left-right --count origin/main...HEAD` is `0 0`.
+Pushed as `34500e3c..c0a201f1`. `git rev-list --left-right --count origin/main...HEAD` is `0 0`.
 
 **T1 - `befdc171`** `place_field_greybox.py`, `verify_field_greybox.py`, new
 `Content/Python/tests/test_place_field_greybox.py`.
@@ -87,14 +87,27 @@ Re-run the placer, then the verifier, in the open editor on `L_Field`, and re-lo
 then is the field greybox done for the current revision. A clean log is not evidence by itself; the
 run has to be in the open editor on this tree.
 
-## Open - T3
+## T3 - audited, no code defect (`c0a201f1`)
 
-`34500e3c`. Check `L_Field_METRICS.md` against `place_field_greybox.py` and the committed map:
-seed 20261014; 104 herbs / 104 bulls / 8 trees; forest `start/end -210/210, step 12` -> 36 stations
-(1 corner + 35 S + 35 W = 71 pines); herb nodes 144 (70 single / 28 dual / 6 triple); 52 bulls <= 4 m
-from a herb, 0 in the 4-8 m gap; `floor` `SM_Field_Floor` at z -0.5, s 420/420/1 (top z = 0);
-3 cliffs on the north lip; river `sx: 7` at x in [210, 217]; bank [217, 219]; drop 28 m. Also the
-PNG `Docs/art/homestead/HS_Cottage_sheet_plan.png` and whether the sheet belongs in this commit.
+`34500e3c`. **No High or Med defect.** The committed map was built from exactly the committed sheet:
+`L_Field.umap` holds 230 `SM_Field_` labels - 7 mass cubes/cliffs + 71 pines (`S_*` 35, `W_*` 35,
+`Corner` 1) + 8 trees + 144 herb nodes - every sheet label present exactly once, no duplicate labels.
+The prose is internally consistent: 104 centres = 70 single + 28 dual + 6 triple = 144 nodes, min
+centre spacing 30.03 m, 52 bulls at exactly 2.50 m and 52 with min 8.03 m, 36 stations, 8 meadow
+pines >= 42.9 m apart, river `sx` 7. The PNG is a real image (IHDR + 17 IDAT, ~1.03 MB payload),
+linked from 4 art docs. `npm run docs:links` flags no field path.
+- **Withdrawn, my error:** I first measured bull-to-herb distance to the nearest herb *node* and read
+  a 7.77 m "violation" of the sheet's ">= 8 m" rule. Measured to the nearest herb **centre** - which
+  is what "beside a herb" means - it is 8.03 m, and the prose is exactly right.
+- **Fixed:** the seed line; a CANON_MAP row for the field scene; CANON_MAP's decision range
+  (0036 -> 0044, stale since DEC-0037). DEC-0044.
+- **T3-3, history-only, nothing to fix:** `dadc5cf7` referenced T3's files before they existed - its
+  placer reads `L_Field_METRICS.md` (absent) and its art docs link `HS_Cottage_sheet_plan.png`
+  (absent). `34500e3c` added both 27 s later.
+- **Not done:** coordinates were not re-measured against the map - that needs the editor. Only the
+  label set and the counts were checked.
+- **Nit, not fixed:** the sheet's per-bull `beside` field is read by nothing, and the verifier
+  recomputes "beside" with a 4 m cutoff against the sheet's stated 2.5 m rule.
 
 ## Open - T4 (owns the T1-3 blocker)
 
