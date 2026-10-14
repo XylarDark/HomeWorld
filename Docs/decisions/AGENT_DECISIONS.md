@@ -1060,3 +1060,23 @@ The number is not the cost of that skill as it was first written. Two identical 
 - **Reverses if:** A host stops preferring `.cursor/skills/` for a twinned name, or the two trees are consolidated into one.
 - **Supersedes:** none.
 
+---
+
+## DEC-0042 - The field verifier measures the built actors, not the sheet against itself (2026-10-14)
+
+- **Area:** code design
+- **Decision:** `Content/Python/verify_field_greybox.py` gains `sheet_spots(metrics)`, a pure map from every sheet-pinned label to its `(x_cm, y_cm)`, and `check()` compares each built actor to it within 10 cm - the sheet's own 0.1 m precision. Bulls keep their existing block, which also carries the beside rule.
+- **Rationale:** The verifier read the sheet only to compare it with itself. It re-checked the herb spacing rule and the forest *sequence*, but never re-measured where the built actors sat, so a map whose pines had all left their stations still logged `CHECK PASS`. Presence and sequence are not placement. The alternative was to leave the gap and trust the placer, which is the one thing the verifier exists not to do.
+- **Evidence:** `Content/Python/tests/test_verify_field_greybox.py` builds a stub level from the sheet, asserts `check() == 0`, then mutates one thing per test and requires the matching failure - a pine 5 m off its station, a pine with an off-sequence mesh, a herb 40 cm off the floor, a second directional light, a missing sun, a wrong sun pose. 8 tests. `py -3 -m pytest Content/Python/tests -q` is 366 passed (was 358); `npm run verify:fast` passes all six stages.
+- **Reverses if:** The verifier is replaced by a reader that measures the built map directly, making the in-editor actor walk redundant.
+- **Supersedes:** none.
+
+## DEC-0043 - The recorded field pass is dated, and the two docs say which revision it covers (2026-10-14)
+
+- **Area:** code design
+- **Decision:** `Docs/context/PLAY_TASKS.md` and `Docs/level/L_Field_CONTEXT.md` state that the `field_greybox: CHECK PASS` on record is the 2026-10-14 16:53Z editor run, which predates `befdc171`, and that a re-run is still owed. The scene is not called done.
+- **Rationale:** `Saved/` is gitignored, so the only evidence for the claim is a local log that the repo cannot re-check, and `befdc171` then changed both scripts - the sun pose and the sky light and atmosphere - after the run. Leaving a bare `CHECK PASS` would let a stale pass stand in for the current revision. Whether the scene counts as done is Test (human); this row only records that the claim is dated, not that it was re-scored.
+- **Evidence:** `git log` dates `dadc5cf7` at 16:56:01Z and `befdc171` at 18:31:52Z; `Saved/Logs/HomeWorld.log` holds the matching pass at 16:53:53Z and stops at 17:49:18Z, before the fix. The working-tree `L_Field.umap` still holds one `Field_Sun` and zero `SkyLight`/`SkyAtmosphere` strings.
+- **Reverses if:** A desktop session re-runs the placer and verifier in the open editor and re-logs the pass, after which the dated note is removed.
+- **Supersedes:** none.
+

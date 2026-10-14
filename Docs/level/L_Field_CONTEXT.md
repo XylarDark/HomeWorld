@@ -13,3 +13,5 @@ A few pines stand in the meadow, far apart. Bulls match the herb-centre count. H
 ## Pass
 
 `field_greybox: CHECK PASS` and `field_greybox: forests identical` from `Content/Python/verify_field_greybox.py`, in the open editor, after the save.
+
+The pass on record is 2026-10-14 16:53Z, in the editor log `Saved/Logs/HomeWorld.log` (gitignored). That run is before `befdc171` fixed the sun pose and added the sky light and the sky atmosphere, and the saved map still carries the old sun and no sky. So the scene is not done: re-run the placer and then the verifier in the open editor and re-log the pass. The verifier now also re-measures every placed actor against the sheet and checks the mesh bottoms, so a re-run reports on the lighting set as well.

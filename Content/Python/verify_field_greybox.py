@@ -13,6 +13,9 @@ MAP_PATH = place_field_greybox.MAP_PATH
 M = place_field_greybox.M
 FLOOR_TOP_CM = 0.0
 BOTTOM_TOLERANCE_CM = 2.0
+#: The sheet carries metres to 0.1 m, so a placed actor should land on its
+#: sheet spot to within that 10 cm. The first version never re-measured this.
+POSITION_TOLERANCE_CM = 10.0
 BOTTOM_PREFIXES = (
     "SM_Field_Pine_",
     "SM_Field_Tree_",
@@ -37,6 +40,41 @@ def mesh_name(actor):
 def actor_bottom_z(actor):
     origin, extent = actor.get_actor_bounds(False)
     return origin.z - extent.z
+
+
+def sheet_spots(metrics):
+    """label -> (x_cm, y_cm) for every mass the sheet pins, in sheet order.
+
+    The first version read the sheet only to compare it with itself: a map whose
+    pines had all wandered off their stations still passed, because nothing
+    re-measured where the built actors actually sat. This walks the same sheet
+    the placer reads, so check() can compare the built actor to the sheet. Bulls
+    are pinned by the bull block instead, which also carries the beside rule.
+    """
+    spots = {}
+    for key in ("floor", "drop", "river", "river_bank"):
+        item = metrics[key]
+        spots[item["label"]] = (item["x"] * M, item["y"] * M)
+    for cliff in metrics["cliffs"]:
+        spots[cliff["label"]] = (cliff["x"] * M, cliff["y"] * M)
+    forest = metrics["forest"]
+    for index, along in enumerate(place_field_greybox.forest_stations(forest)):
+        if index == 0:
+            spots["SM_Field_Pine_Corner"] = (
+                forest["x_west"] * M,
+                forest["y_south"] * M,
+            )
+            continue
+        spots["SM_Field_Pine_S_%02d" % index] = (along * M, forest["y_south"] * M)
+        spots["SM_Field_Pine_W_%02d" % index] = (forest["x_west"] * M, along * M)
+    for tree in metrics.get("trees", []):
+        spots[tree["label"]] = (tree["x"] * M, tree["y"] * M)
+    index = 0
+    for herb in metrics["herbs"]:
+        for x, y in place_field_greybox.herb_points(herb):
+            spots["SM_Field_Herb_%03d" % index] = (x * M, y * M)
+            index += 1
+    return spots
 
 
 def check():
@@ -128,6 +166,27 @@ def check():
         errors.append("bulls beside a herb %d is not half" % beside)
     else:
         unreal.log("field_greybox: bulls %d beside %d" % (len(bulls), beside))
+
+    off_sheet = []
+    for label, (x, y) in sorted(sheet_spots(metrics).items()):
+        actor = found.get(label)
+        if actor is None:
+            continue  # the missing-label check above already reports it
+        loc = actor.get_actor_location()
+        if (
+            abs(loc.x - x) > POSITION_TOLERANCE_CM
+            or abs(loc.y - y) > POSITION_TOLERANCE_CM
+        ):
+            off_sheet.append(
+                "%s at %.0f,%.0f wants %.0f,%.0f" % (label, loc.x, loc.y, x, y)
+            )
+    if off_sheet:
+        errors.append(
+            "%d actor(s) off the sheet: %s"
+            % (len(off_sheet), ", ".join(off_sheet[:4]))
+        )
+    else:
+        unreal.log("field_greybox: placed actors on the sheet")
 
     directional = [
         actor
