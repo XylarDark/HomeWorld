@@ -7,13 +7,13 @@ Owner: DES · Conductor (RS-A)
 Inputs (read-only): `Docs/00_CANON.md`, `Docs/00_SHOTLIST.md`, [21_REAP_SOW.md](21_REAP_SOW.md)  
 Consumers: GP (verbs / transit / day-night), SYS (gather / inventory / tame / heal / nurture / recruit)
 
-This file is the executable design contract for WAVE 1 Track A. GP/SYS implement from tables below; do not open design questions mid-slice. **Product day/night spine** for post-slice work is **Reap & Sow** ([21_REAP_SOW.md](21_REAP_SOW.md)) — day = reap, night = sow, astral = dream combat → heal/recruit.
+This file is the earlier WAVE 1 cut. Where it disagrees with [`Docs/VISION_BOARD.md`](VISION_BOARD.md), the board wins. The rune gate below is not current. The bed alone grants the form. Night does not. GP/SYS implement from the board for form, creatures, and the field roost. **Product day/night spine** for post-slice work is **Reap & Sow** ([21_REAP_SOW.md](21_REAP_SOW.md)) — day = reap, night = sow, astral = dream combat → heal/recruit.
 
 ---
 
 ## 2. Player fantasy + tone (from canon)
 
-**Fantasy:** You live with your loved ones at a warm floating homestead above a readable pine world. **By day (body)** you gather and explore, then descend through clouds on the steered glide route. **By night**, sleep and the rune let you become spirit. You tend the world, ease suffering, and reach the loved one taken at the camp. Spirit encounters heal, calm, or convert; you do not kill. Items and bonuses from each half make you perform better on the other.
+**Fantasy:** You live with your loved ones at a warm floating homestead above a readable pine world. **By day (body)** you gather and explore, then descend through clouds on the steered glide route. **By night**, sleep at the bed lets you become spirit. The rune is removed. You tend the world, ease suffering, and reach the loved one taken at the camp. Spirit encounters heal, calm, or convert; you do not kill. Items and bonuses from each half make you perform better on the other.
 
 **Tone:** Warm, readable, handmade, hopeful. Not cutesy-infantile. Not grim. Not photoreal. Not sci-fi. (Canon §9.)
 
@@ -24,14 +24,14 @@ This file is the executable design contract for WAVE 1 Track A. GP/SYS implement
 | Mode | Form | Where | Core verbs | Transit |
 |---|---|---|---|---|
 | Day | Body | Homestead walk + planet slice | Walk, steered cloud descent, **Reap** (Gather / Collect / Claim), Encounter/Tame, Return/dawn | Active steered descent to open field; scripted `FALLBACK` is separate |
-| Night | Spirit, after both sleep and rune gates | Homestead and planetside via shrine | Portal both ways, **Sow** (Nurture / Influence), tend, heal/recruit, return/dawn | Shrine portal homestead ↔ planet. No night glide. |
+| Night | Spirit, after sleep at the bed. The rune is removed. Night does not grant the form. | Homestead and planetside via shrine | Portal both ways, **Sow** (Nurture / Influence), tend, heal/recruit, return/dawn | Shrine portal homestead ↔ planet. No night glide. |
 
 **Cycle rules (implementable):**
 
 1. **Dawn → Day/Body:** Player is body form on homestead. Spirit layer off / NightMix → 0. Gather nodes, material sites, den/camp day interacts, and beast pad active.
 2. **Day departure:** From lookout / glider perch, start the steered cloud descent. Land in the open field. The scripted `FALLBACK` is a separate implementation path.
-3. **Day slice:** Walk the field and forest path; **reap** at material / living sites; encounter/tame. The player remains in body form until both sleep and rune gates are met.
-4. **Sleep + rune → Night/Spirit:** Both gates are required to become spirit. Without either gate, the player remains body. NightMix → 1 only after the form change; day reap interacts idle or blocked.
+3. **Day slice:** Walk the field and forest path; **reap** at material / living sites; encounter/tame. The player remains in body form until sleep at the bed.
+4. **Sleep at the bed → Night/Spirit:** The bed alone grants the form. The rune is removed. Night does not grant it. NightMix → 1 only after the form change; day reap interacts idle or blocked.
 5. **Night loop:** Portal homestead ↔ planet (Verb 5); **sow** (nurture / influence); tend the camp and rescue the loved one; heal or recruit other dream encounters according to their current specification; return / sleep → dawn (Verb 8).
 6. **Homestead is hub.** Planet is the same world slice visible from lookout — not a second game.
 
@@ -94,7 +94,7 @@ Each verb: trigger, player action, success, fail/idle, approx duration (seconds)
 |---|---|
 | Trigger | Day/body; player enters beast territory |
 | Player action | Untamed bull enforces a threat meter: approach with an herb in hand to suppress the boot charge; sudden movement builds threat, standing still lets it walk to you, eat the herb, and become tamed. Too close or threat meter full → quick charge that boots you back to the homestead. |
-| Success | State reaches **tamed** (then a tamed bull is rideable; the rune stone transports you and the bull to the homestead as a pet). See §6 |
+| Success | State reaches **tamed** (then a tamed bull is rideable; the shrine brings you and the bull to the homestead). See §6. The rune is removed. |
 | Fail / idle | Charging bull boots you home — not damage. No herb → no approach. Combat inputs do not exist |
 | Duration | Read ~5–10 s; full tame (approach + stand-still + eat) ~20–45 s |
 
@@ -170,7 +170,7 @@ World = gather on planet (day). Stored = place / convert at homestead storage pr
 | 0 Encounter | Enter bull's area | Read its threat posture; it watches, does not charge while you are calm and far enough | `cautious`; no charge while herb in hand | ~3–5 s |
 | 1 Herb approach | Herb in hand (RES_HERB) | Walk toward the bull; no sudden movement | Threat stays low; bull walks slowly to you | ~2–3 s |
 | 2 Bond | Herb approach succeeded | Stand still until it eats | → `tamed`; tame-mark slot readable; bull rideable | ~3–5 s |
-| 3 Transport (optional) | Already `tamed`; bull with you | Use a rune stone | You and the bull arrive at the homestead; the bull stays as a pet | ~2 s |
+| 3 Transport (optional) | Already `tamed`; bull with you | Use the shrine | You and the bull arrive at the homestead; the bull stays as a pet | ~2 s |
 
 **Hard rules:** No HP, no weapons, no aggro combat. Threat meter full or too close without the herb-in-hand approach → quick charge that boots the player back to the homestead. Sudden movement during Bond builds threat and can reset toward the charge.
 
@@ -251,7 +251,7 @@ Design teaches by framing + first successful verb — not tutorials with combat 
 | **4** Planet landing day | Arrival clearing; pine path continues; gather/beast space | V2 success → V3 / V4 setup | Open landing; no combat staging; same pine language |
 | **5** Spirit portal arrival night | Night spirit transit = shrine portal; heal/nurture world | V5 → V6 (and return for V7) | Portal arrival soft spirit cue; handmade hopeful; no sci-fi gear |
 
-**Suggested first-run order:** Shot1 read → dawn body → Shot3 V2 → Shot4 gather+tame → sleep + rune → spirit → camp rescue → portal home → tend → dawn.
+**Suggested first-run order:** Shot1 read → dawn body → Shot3 V2 → Shot4 gather+tame → sleep at the bed → spirit → camp rescue → portal home → tend → dawn. The rune is removed.
 
 ---
 

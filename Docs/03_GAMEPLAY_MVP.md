@@ -42,12 +42,14 @@ Demo: place player at `GP_PlayerStart`; walk toward lookout / shrine for Shot 1�
 
 ---
 
-## 4. Spirit form — sleep and rune gates
+## 4. Spirit form — the bed
+
+The rune gate is the earlier cut. [`Docs/VISION_BOARD.md`](VISION_BOARD.md) wins. The bed alone grants the form. Night does not. Dawn does not end it.
 
 | Trigger | Result |
 |---|---|
-| Sleep gate and rune gate are both met | Body → spirit; `NightMix` → 1; spirit layer visible; gather/beast idle |
-| Dawn / Rest complete (V8) | Spirit → body; `NightMix` → 0; spirit layer off; day gather/beast available |
+| Sleep at the bed | Body → spirit; `NightMix` → 1; spirit layer visible; gather/beast idle |
+| The bed, or max spirit-sickness | Spirit → body. Dawn does not end the form. |
 
 Mid-day shrine is **landmark only** (portal locked). No night flight.
 
