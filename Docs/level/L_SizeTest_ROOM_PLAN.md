@@ -46,3 +46,14 @@ The kettle is on the kitchen’s east wall, world (1.8 m, 0.0 m), yaw 180, facin
 The bed is in the couple bedroom against the north wall, world (−9.5 m, 9.0 m), yaw 0. It is not the sleep bed.
 
 Herb beds sit south of the porch, off the entry, yaw 0. The player stands on that path at (−9.5 m, −9.5 m), yaw 90, aimed at the opening.
+
+## Pocket kit outside the porch
+
+Added 2026-10-13. All positions are world, in meters. Z comes from each piece's bounds bottom, not from this page.
+
+| Piece | Axis | From | To | Spacing | What's past the edge |
+|---|---|---|---|---|---|
+| Path stones (16 or 17) | +X, on the −Y side of the porch | (−9.5, −6.8) | (14.0, −6.0), at `SM_Size_Pine_S_B` | one every 1.5 m over about 23.5 m | the pine at +X; the porch lip at +Y |
+| Fence run (6 pieces) | +X at Y −11.5 | X −15.0 | X −4.0 | evenly split over 11 m | open ground at −Y; the herb beds and path at +Y |
+
+The last path stone (stone 16, or 17 if the run needs it) stops short of the pine's trunk. The shrine height (4 m at world (−16.2, −8.3)) is Lead's taste number and is not set here.
