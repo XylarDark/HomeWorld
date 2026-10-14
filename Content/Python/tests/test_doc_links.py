@@ -133,3 +133,52 @@ def test_case_only_difference_is_not_a_break(tmp_path):
     broken = cdl.check_file(os.path.join(root, "docs", "a.md"), root, index)
     if os.path.exists(os.path.join(root, "docs", "A.md")) and os.path.exists(os.path.join(root, "docs", "a.md")):
         assert broken == [], "case-insensitive filesystems must not report a false break"
+
+
+def test_directory_link_off_its_base_resolves_not_gone(tmp_path):
+    """A folder name lives in the index, so a moved folder link is repairable.
+
+    Regression: ``_basename`` split on "/" and returned "" for "handoffs/", so a
+    directory link could never match the index and always read as gone - and gone
+    is a blocking failure, so the report cried wolf on a folder that exists.
+    """
+    root = _tree(tmp_path, {
+        "docs/a.md": "[h](moved/handoffs/)\n",
+        "docs/handoffs/x.md": "# x\n",
+    })
+    index = cdl.build_index(root)
+    path = os.path.join(root, "docs", "a.md")
+
+    broken = cdl.check_file(path, root, index)
+    assert len(broken) == 1
+    assert broken[0].status == "resolvable", "the folder name is unique, so it is repairable"
+
+    assert cdl.fix_file(path, root, index) == 1
+    with open(path, encoding="utf-8") as handle:
+        assert "[h](handoffs)" in handle.read(), "repair points back at the folder"
+
+
+def test_percent_encoded_target_resolves_to_its_file(tmp_path):
+    """A %20 link to a real space-named file is not broken.
+
+    Regression: targets were never percent-decoded, so
+    ``07_VERTICAL_SLICE_SIGN%20OFF.md`` read as gone while the real
+    ``docs/07_VERTICAL_SLICE_SIGN OFF.md`` sat right there.
+    """
+    root = _tree(tmp_path, {
+        "docs/a.md": "[s](SIGN%20OFF.md)\n",
+        "docs/SIGN OFF.md": "# hi\n",
+    })
+    index = cdl.build_index(root)
+    broken = cdl.check_file(os.path.join(root, "docs", "a.md"), root, index)
+    assert broken == [], "a percent-encoded link to an existing file must not be reported"
+
+
+def test_percent_encoded_name_off_its_base_is_resolvable(tmp_path):
+    root = _tree(tmp_path, {
+        "docs/a.md": "[s](moved/SIGN%20OFF.md)\n",
+        "docs/SIGN OFF.md": "# hi\n",
+    })
+    index = cdl.build_index(root)
+    broken = cdl.check_file(os.path.join(root, "docs", "a.md"), root, index)
+    assert len(broken) == 1 and broken[0].status == "resolvable"

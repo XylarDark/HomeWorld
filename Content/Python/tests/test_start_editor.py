@@ -192,3 +192,46 @@ def test_already_ready_short_circuits_without_launching(monkeypatch):
     # argv=[] rather than None: under pytest, None would make argparse read the
     # runner's own argv and exit 2 before any of this logic ran.
     assert start_editor.main(argv=[]) == 0
+
+
+def test_launch_tracks_the_process_handle_not_tasklist(tmp_path, monkeypatch):
+    """After launching, liveness must come from the handle we opened.
+
+    editor_running() shells out to tasklist. On the first poll the just-started
+    process may not be listed yet, so using it would report "MCP did not open"
+    for an Editor that is starting normally. The handle knows better, so main
+    must judge liveness from the Popen object it just got.
+    """
+    editor = _fake_editor(str(tmp_path), LOCKED)
+    monkeypatch.setattr(start_editor, "canonical_editor_path", lambda _v: editor)
+    monkeypatch.delenv("UE_EDITOR", raising=False)
+    monkeypatch.setattr(start_editor, "mcp_listening", lambda *a, **k: False)
+    monkeypatch.setattr(start_editor, "editor_running", lambda: False)
+
+    class _Process:
+        alive = True
+
+        def poll(self):
+            return None if self.alive else 1
+
+    process = _Process()
+
+    class _Subprocess:
+        @staticmethod
+        def Popen(*args, **kwargs):
+            return process
+
+    monkeypatch.setattr(start_editor, "subprocess", _Subprocess)
+
+    seen = {}
+
+    def _wait(timeout, port=start_editor.MCP_PORT, poll=3.0, alive=None):
+        seen["alive"] = alive
+        return alive()
+
+    monkeypatch.setattr(start_editor, "wait_for_mcp", _wait)
+
+    assert start_editor.main(argv=["--uproject", _uproject(str(tmp_path))]) == 0
+    assert seen["alive"]() is True, "a live handle must read as alive"
+    process.alive = False
+    assert seen["alive"]() is False, "an exited handle must read as dead"

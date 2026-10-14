@@ -41,6 +41,8 @@
     "verify:fast": "node scripts/verify.js --tier fast",
     "verify:ue": "node scripts/verify.js --tier ue",
     "editor:lock": "node scripts/editor-lock.js",
+    "editor:start": "py -3 Content/Python/start_editor.py",
+    "docs:links": "py -3 Content/Python/check_doc_links.py",
     "budget:instructions": "node scripts/instruction-budget.js",
     "tree:check": "node scripts/write-serialisation.js",
     "sycophancy": "node scripts/anti-sycophancy.js",

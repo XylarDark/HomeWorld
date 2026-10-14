@@ -40,6 +40,7 @@ import os
 import re
 import sys
 from typing import Dict, List, NamedTuple, Optional, Tuple
+from urllib.parse import unquote
 
 # Targets that are not file paths and must never be judged as broken.
 _EXTERNAL = re.compile(r"^[a-zA-Z][a-zA-Z0-9+.-]*:")
@@ -54,6 +55,17 @@ class Broken(NamedTuple):
     target: str      # the link as written
     status: str      # gone | ambiguous
     candidates: Tuple[str, ...]
+
+
+def _path_part(target: str) -> str:
+    """The path portion of a link: backslashes normalised, percent-decoded, no anchor.
+
+    Decoding matters because a space in a filename is written ``%20`` in a link.
+    Without it a link to ``07_VERTICAL_SLICE_SIGN%20OFF.md`` never matches the
+    real ``docs/07_VERTICAL_SLICE_SIGN OFF.md`` and reads as gone when the file
+    is right there - a fabricated break in the one report meant to be trusted.
+    """
+    return unquote(target.replace("\\", "/").split("#")[0])
 
 
 def classify(target: str) -> Optional[str]:
@@ -95,8 +107,15 @@ def _links(text: str) -> List[Tuple[int, str]]:
 
 
 def _basename(target: str) -> str:
-    """The file name portion, with any #anchor and directory removed."""
-    return target.replace("\\", "/").split("#")[0].split("/")[-1]
+    """The final name in the path, with any #anchor, directory, and trailing slash removed.
+
+    The trailing slash is the load-bearing part: a link to a folder is written
+    ``handoffs/``, and the old ``split("/")[-1]`` returned ``""`` for it. An
+    empty key never matches the directory the index stores under ``handoffs``,
+    so every folder link was reported gone - and gone is blocking.
+    """
+    trimmed = _path_part(target).rstrip("/")
+    return trimmed.split("/")[-1] if trimmed else ""
 
 
 def resolve(target: str, index: Dict[str, List[str]]) -> Optional[str]:
@@ -118,7 +137,7 @@ def check_file(path: str, root: str, index: Dict[str, List[str]]) -> List[Broken
     for line, target in _links(text):
         if classify(target):
             continue
-        if os.path.exists(os.path.normpath(os.path.join(base, target.split("#")[0]))):
+        if os.path.exists(os.path.normpath(os.path.join(base, _path_part(target)))):
             continue
         hits = tuple(sorted(index.get(_basename(target), [])))
         broken.append(Broken(
@@ -148,7 +167,7 @@ def fix_file(path: str, root: str, index: Dict[str, List[str]]) -> int:
     def replace(match: "re.Match[str]") -> str:
         nonlocal changed
         target = match.group(1)
-        if classify(target) or os.path.exists(os.path.normpath(os.path.join(base, target.split("#")[0]))):
+        if classify(target) or os.path.exists(os.path.normpath(os.path.join(base, _path_part(target)))):
             return match.group(0)
         suggestion = resolve(target, index)
         if suggestion is None:

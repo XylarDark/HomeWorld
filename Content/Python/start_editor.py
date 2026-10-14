@@ -179,12 +179,16 @@ def main(argv: Optional[list] = None) -> int:
 
     print(f"launching {editor}")
     try:
-        subprocess.Popen([editor, uproject], cwd=os.path.dirname(uproject))
+        process = subprocess.Popen([editor, uproject], cwd=os.path.dirname(uproject))
     except OSError as exc:
         print(f"launch failed: {exc}")
         return 1
 
-    if wait_for_mcp(args.timeout):
+    # Track the handle we just opened, not tasklist. On the first poll the new
+    # process may not be listed yet, and editor_running() would then read a
+    # starting Editor as one that had died - the slow, misattributed failure this
+    # tool exists to remove.
+    if wait_for_mcp(args.timeout, alive=lambda: process.poll() is None):
         print(f"MCP listening on {MCP_PORT}")
         return 0
     print(f"MCP did not open within {args.timeout}s ({detail})")
