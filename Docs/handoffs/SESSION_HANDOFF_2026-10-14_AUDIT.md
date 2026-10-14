@@ -1,0 +1,141 @@
+---
+artifact_contract: "ce-handoff/v1"
+created_at: "2026-10-14T18:35:21Z"
+title: "HomeWorld 2026-10-14 commit audit - T1/T5/T6 fixed and pushed; T2/T3/T4/T7 open"
+summary: "Audited the six 2026-10-14 commits as concern-based tasks (T1-T7). T1, T5 and T6 are repaired and pushed as befdc171, 22b87116, b8ae30e4 (origin/main). T2, T3, T4, T7 and the unassigned 21169765 are still to audit. The L_Field scene is NOT done: no editor was connected, so no CHECK PASS was ever logged."
+keywords: ["HomeWorld", "commit-audit", "field-greybox", "soft-bounds", "skill-catalog", "doc-links", "handoff"]
+cwd: "C:\\dev\\HomeWorld"
+resume_focus: "Audit T2 (the two field scripts and the recorded field_greybox CHECK PASS), then T3, T4, T7, and place 21169765"
+repository: "XylarDark/HomeWorld"
+branch: "main"
+head: "b8ae30e415f5cf268478dd5b6ecbe8bb91c1cff9"
+---
+
+# SESSION_HANDOFF 2026-10-14 - commit audit
+
+Audit of the six commits authored on 2026-10-14. Work is grouped by concern (T1-T7), not per commit.
+Three tasks are fixed and pushed. Three are open. The field scene is not done.
+
+## Resume focus
+
+Audit **T2** next, then **T3**, **T4**, **T7**, and decide where **21169765** belongs. Do not
+re-audit T1/T5/T6 - they are committed and pushed. Do not touch the four foreign working-tree
+files listed at the bottom.
+
+## Commit map (verified with `git show --stat --name-status`)
+
+| SHA | Task | Concern |
+|-----|------|---------|
+| `34500e3c` | T3 | cottage sheet PNG + `L_Field_CONTEXT.md` + `L_Field_METRICS.md` (1398 lines) |
+| `dadc5cf7` | T1 + T2 + T4 | `L_Field.umap` (new) + `L_SizeTest.umap` + `place_field_greybox.py` + `verify_field_greybox.py` + `scene_placement.py` (+47) + 5 doc files |
+| `8bc982c8` | T6 | skill files + catalogs + `instruction-budget` ceiling |
+| `21169765` | unassigned | `Docs/level/L_SizeTest_ROOM_PLAN.md` (+11) only |
+| `4e9cb4b8` | T5 | `check_doc_links.py` + `start_editor.py` + tests + `docs/KNOWN_ERRORS.md` |
+| `54858b1b` | T7 | docs-only: `01_GDD_MVP.md`, `03_GAMEPLAY_MVP.md`, `VISION_BOARD.md`, `canon/LOOPS.md` |
+
+`dadc5cf7`'s subject undersells it: it also changes `L_SizeTest.umap` and `scene_placement.py`.
+
+## Done and pushed (do not re-open)
+
+Pushed as `34500e3c..b8ae30e4`. `git rev-list --left-right --count origin/main...HEAD` is `0 0`.
+
+**T1 - `befdc171`** `place_field_greybox.py`, `verify_field_greybox.py`, new
+`Content/Python/tests/test_place_field_greybox.py`.
+- Sun was `Rotator(-45.0, 30.0, 0.0)` positionally. Positional order is `(roll, pitch, yaw)`, so
+  the elevation landed in the inert roll slot and the sun lit upward. Now keyword args, re-posed
+  every run, plus SkyLight and SkyAtmosphere (matching `place_size_test.py:185-194`).
+- A missing mesh used to save the map and exit 0. Now fails closed: records the failure, does not
+  save, exits non-zero.
+- Verifier now checks one directional light, the sun's pitch/yaw, and mesh bottoms against z = 0
+  (+/- 2 cm) for pine/tree/herb/bull. Mass cubes intentionally sit below zero and are excluded.
+
+**T5 - `22b87116`** `check_doc_links.py`, `start_editor.py`, both test files,
+`docs/KNOWN_ERRORS.md`, `package.json`.
+- Directory links and `%20` links were reported dead; `start_editor` read a time-of-check result
+  instead of `process.poll() is None`; two dead shared-path rows in `KNOWN_ERRORS.md` fixed; added
+  non-gating `npm run editor:start` and `npm run docs:links`. Checker `gone` count 55 -> 46.
+- **Deliberately not done, per agreed scope:** the remaining dead links are not repaired and no CI
+  gate was added.
+
+**T6 - `b8ae30e4`** swapped `ue-editor-ui` trees (body + `paths:` in `.cursor/skills`, pointer in
+`.agents/skills`), rewrote the `instruction-budget.js` comment with gate-exact numbers, fixed both
+catalogs, removed the empty `ue57-api-check` dir. Recorded as **DEC-0041**. T6-4 and T6-6 were
+withdrawn (a `paths:` field is real; counting disabled descriptions is deliberate and asserted).
+
+## Open - T2 (next)
+
+`verify_field_greybox.py` + the recorded `field_greybox: CHECK PASS` claim.
+
+- The claim is written in `Docs/context/PLAY_TASKS.md:14` and `Docs/level/L_Field_CONTEXT.md:15`.
+  There is **no open-editor log evidence** behind it. "A clean log is not evidence."
+- Neither field script is wired to any gate (not pytest, not `verify:fast`).
+- The verifier measures X/Y, river width, forest sequence, herb XY spacing (plus T1's new checks).
+  It never wrote `FIELD.json`'s `measured`, which stays null.
+- Verifier docstring: "Measure the field greybox. Do not move actors and do not save." It flags
+  `banned = ("Path", "Landing", "Camp", "Shrine")`.
+
+## Open - T3
+
+`34500e3c`. Check `L_Field_METRICS.md` against `place_field_greybox.py` and the committed map:
+seed 20261014; 104 herbs / 104 bulls / 8 trees; forest `start/end -210/210, step 12` -> 36 stations
+(1 corner + 35 S + 35 W = 71 pines); herb nodes 144 (70 single / 28 dual / 6 triple); 52 bulls <= 4 m
+from a herb, 0 in the 4-8 m gap; `floor` `SM_Field_Floor` at z -0.5, s 420/420/1 (top z = 0);
+3 cliffs on the north lip; river `sx: 7` at x in [210, 217]; bank [217, 219]; drop 28 m. Also the
+PNG `Docs/art/homestead/HS_Cottage_sheet_plan.png` and whether the sheet belongs in this commit.
+
+## Open - T4 (owns the T1-3 blocker)
+
+`Source/HomeWorld/HomeWorldCharacter.cpp`.
+
+- **T1-3 (High, unfixed):** line 341 forces `bBoundsEnabled = true` every Tick on any level name
+  lacking "SizeTest". `dadc5cf7` treated `L_Field` as a greybox body for mesh/walk (lines 237, 374)
+  but left this gate alone. Defaults in `HomeWorldSoftBoundsComponent.h`: centre (-400, -50, 100) cm,
+  `BoundsRadiusXY` 1050 cm (clamp max 10000), MinZ -400, MaxZ 600. The player is pushed back beyond
+  ~10.5 m (strength 1.2 > input 1.0), so the meadow is a ~21 m playpen; it also fights the cliff tops
+  (+8 m > MaxZ) and the shelf (-2850 cm < MinZ). `SCENE_SETUP.md` rule 5 requires the new scene to
+  turn bounds off or match centre/radius/Z; the 29700 cm half-diagonal is not expressible, so bounds
+  must be turned off. Cannot be fixed from the map or a BP - the Tick assignment overrides every
+  frame. Suggested fix: branch on the greybox-body flag rather than the level name.
+- `scene_placement.py` (+47 in `dadc5cf7`) refuses to save on a failed check; that is the model T1-4
+  followed.
+
+## Open - T7
+
+`54858b1b`. Docs-only: "Make the bed the form change in the older design files, and match the shape
+line to the spirit pair." Files: `Docs/01_GDD_MVP.md`, `Docs/03_GAMEPLAY_MVP.md`,
+`Docs/VISION_BOARD.md`, `Docs/canon/LOOPS.md`. Check the edits against `VISION_BOARD.md` canon
+(bed = the form change) and cross-file consistency. Docs only - no product code.
+
+## Open - 21169765
+
+`Docs/level/L_SizeTest_ROOM_PLAN.md` (+11) only. Subject: "Record the size-test path and fence run
+that the pocket-kit check already measures." No task assigned yet. Decide whether it folds into T3
+(the other docs/level sheet) or stands alone.
+
+## Scene status - NOT done
+
+The field scene cannot be called done. No editor was connected, so `verify_field_greybox.py` never
+logged `CHECK PASS`. The committed `L_Field.umap` still needs a placer re-run in the open editor
+(that is also how it gains the SkyLight, SkyAtmosphere and the corrected sun) followed by the
+verifier. The walk stays blocked on T1-3.
+
+## Foreign working-tree files - do not touch or stage
+
+Four files were written by another session (2:25-2:30 PM), all Rider MCP scouting or the size-test
+plan. Leave them alone; never `git add -A`:
+
+- `.cursor/mcp.json.example`
+- `.cursor/rules/unreal-cpp.mdc`
+- `Docs/handoffs/MARKETPLACE_POLICY_V1.md`
+- `Docs/level/L_SizeTest_ROOM_PLAN.md`
+
+## Gates and tooling
+
+- `python -m pytest Content/Python/tests -q` (currently 358 passed)
+- `npm run verify:fast` (6 stages, currently PASSED)
+- No live editor: `unrealMCP.get_actors_in_level` returns `null`.
+- `.umap` files are Git LFS pointers; working-tree copies are materialized and greppable.
+- Commit style: Conventional Commits (573 of 906 commits). Stage by explicit path.
+- The `post-commit` / `pre-push` hooks are `git-lfs` only (no gate, no commit-msg check).
+- PowerShell mangles `$`, quotes and backticks in inline `python -c` / `node -e` - write a script to
+  `C:\Users\User\AppData\Local\Temp\opencode\` instead. Long reads truncate - re-read with offset.
