@@ -1,11 +1,11 @@
 ---
 artifact_contract: "ce-handoff/v1"
 created_at: "2026-10-14T19:09:42Z"
-title: "HomeWorld 2026-10-14 commit audit - T1/T2/T5/T6 fixed; T3/T4/T7 open"
-summary: "Audited the six 2026-10-14 commits as concern-based tasks (T1-T7). T1, T2, T3, T5 and T6 are repaired; T2 found the recorded field pass is REAL (editor log 2026-10-14 16:53Z) but predates befdc171, so the scene is not done until a desktop re-run. T3 had no code defect. T4, T7 and the unassigned 21169765 are still to audit."
+title: "HomeWorld 2026-10-14 commit audit - T1/T2/T3/T4/T5/T6 fixed; T7 open"
+summary: "Audited the six 2026-10-14 commits as concern-based tasks (T1-T7). T1, T2, T3, T4, T5 and T6 are repaired; T2 found the recorded field pass is REAL (editor log 2026-10-14 16:53Z) but predates befdc171, so the scene is not done until a desktop re-run. T3 had no code defect. T4 fixed the T1-3 soft-bounds gate in HomeWorldCharacter.cpp (DEC-0045). T7 and the unassigned 21169765 are still to audit."
 keywords: ["HomeWorld", "commit-audit", "field-greybox", "soft-bounds", "skill-catalog", "doc-links", "handoff"]
 cwd: "C:\\dev\\HomeWorld"
-resume_focus: "Audit T4 (HomeWorldCharacter.cpp, which owns the T1-3 soft-bounds blocker), then T7, and place 21169765. The field lighting re-run is owed to a desktop session."
+resume_focus: "Audit T7 next (docs-only: bed as the form change), and place the unassigned 21169765. The field lighting re-run and the field walk both are owed to a desktop session (T2, T4)."
 repository: "XylarDark/HomeWorld"
 branch: "main"
 head: "c0a201f1b45d57b6ecd3d3446d2c484cdceb0c26"
@@ -18,9 +18,9 @@ Three tasks are fixed and pushed. Three are open. The field scene is not done.
 
 ## Resume focus
 
-Audit **T4** next, then **T7**, and decide where **21169765** belongs. Do not re-audit
-T1/T2/T3/T5/T6 - they are committed and pushed. Do not touch the four foreign working-tree files listed
-at the bottom. The field lighting re-run is owed to a desktop session (see T2 below).
+Audit **T7** next, and decide where **21169765** belongs. Do not re-audit T1/T2/T3/T4/T5/T6 - they are
+committed and pushed. Do not touch the four foreign working-tree files listed at the bottom. The field
+lighting re-run and the field walk both are owed to a desktop session (see T2 and T4 below).
 
 ## Commit map (verified with `git show --stat --name-status`)
 
@@ -109,19 +109,25 @@ linked from 4 art docs. `npm run docs:links` flags no field path.
 - **Nit, not fixed:** the sheet's per-bull `beside` field is read by nothing, and the verifier
   recomputes "beside" with a 4 m cutoff against the sheet's stated 2.5 m rule.
 
-## Open - T4 (owns the T1-3 blocker)
+## Fixed - T4 (the T1-3 blocker)
 
-`Source/HomeWorld/HomeWorldCharacter.cpp`.
+`Source/HomeWorld/HomeWorldCharacter.{h,cpp}`. **DEC-0045.**
 
-- **T1-3 (High, unfixed):** line 341 forces `bBoundsEnabled = true` every Tick on any level name
-  lacking "SizeTest". `dadc5cf7` treated `L_Field` as a greybox body for mesh/walk (lines 237, 374)
-  but left this gate alone. Defaults in `HomeWorldSoftBoundsComponent.h`: centre (-400, -50, 100) cm,
-  `BoundsRadiusXY` 1050 cm (clamp max 10000), MinZ -400, MaxZ 600. The player is pushed back beyond
-  ~10.5 m (strength 1.2 > input 1.0), so the meadow is a ~21 m playpen; it also fights the cliff tops
-  (+8 m > MaxZ) and the shelf (-2850 cm < MinZ). `SCENE_SETUP.md` rule 5 requires the new scene to
-  turn bounds off or match centre/radius/Z; the 29700 cm half-diagonal is not expressible, so bounds
-  must be turned off. Cannot be fixed from the map or a BP - the Tick assignment overrides every
-  frame. Suggested fix: branch on the greybox-body flag rather than the level name.
+- **T1-3 (High, fixed):** the Tick soft-bounds gate keyed on the level name and recognised only
+  "SizeTest", so on `L_Field` it forced `bBoundsEnabled = true` every frame and overrode the `false`
+  `BeginPlay` had just set. The hero-island cylinder then applied - centre (-400, -50, 100) cm,
+  `BoundsRadiusXY` 1050 cm (clamp max 10000), MinZ -400, MaxZ 600, push strength 1.2 - so the meadow
+  was a ~21 m playpen, and it also fought the cliff tops (+8 m > MaxZ) and the shelf (-2850 cm <
+  MinZ). `SCENE_SETUP.md` rule 5 says the new scene turns bounds off or matches centre/radius/Z; the
+  29700 cm half-diagonal is not expressible, so off is the only option.
+  - **Fix:** `BeginPlay` now sets a member `bGreyboxBodyLevel` (SizeTest or L_Field), and `Tick`
+    branches on it - `if (SoftBoundsComponent && !bGreyboxBodyLevel)` - instead of re-testing the
+    level name. It is the same flag the rest of `BeginPlay` already used, so there is no third copy
+    of the greybox-body test.
+  - **Verified:** `.\Tools\Safe-Build.ps1` exit 0 (`HomeWorldCharacter.cpp` compiled);
+    `py -3 -m pytest Content/Python/tests -q` 366 passed; `npm run verify:fast` 6/6 PASSED.
+  - **Not verified:** the walk itself - no live editor. A desktop session on `L_Field` is owed; the
+    T2 lighting re-run is the same sitting.
 - `scene_placement.py` (+47 in `dadc5cf7`) refuses to save on a failed check; that is the model T1-4
   followed.
 
@@ -144,7 +150,8 @@ The field scene cannot be called done for the current revision. The pass on reco
 the editor log holds it at 2026-10-14 16:53Z, before `befdc171`. The committed `L_Field.umap` still
 carries the old upward sun and no sky light or atmosphere, so a desktop session must re-run the
 placer (which re-poses the sun and adds the lighting set) and then the verifier, in the open editor,
-and re-log the pass. The walk also stays blocked on T1-3.
+and re-log the pass. The code walk blocker (T1-3) is now fixed (T4); the walk is still unverified until
+that editor sitting.
 
 ## Foreign working-tree files - do not touch or stage
 

@@ -234,8 +234,10 @@ void AHomeWorldCharacter::BeginPlay()
 	// Place character on ground if we hit something below (avoids floating when Player Start is slightly high).
 	const FString LevelName = UGameplayStatics::GetCurrentLevelName(this);
 	const bool bSizeTest = LevelName.Contains(TEXT("SizeTest"));
-	const bool bGreyboxBody = bSizeTest || LevelName.Contains(TEXT("L_Field"));
-	if (bGreyboxBody)
+	// SizeTest and L_Field are greybox bodies. The hero-island walk bounds do not fit them
+	// (SCENE_SETUP practice 5), so they start off here; Tick reads this same flag and leaves them off (T1-3).
+	bGreyboxBodyLevel = bSizeTest || LevelName.Contains(TEXT("L_Field"));
+	if (bGreyboxBodyLevel)
 	{
 		if (UCapsuleComponent* SizeCapsule = GetCapsuleComponent())
 		{
@@ -253,7 +255,7 @@ void AHomeWorldCharacter::BeginPlay()
 		{
 			const float HalfHeight = Capsule->GetUnscaledCapsuleHalfHeight();
 			// The homestead sheet leaves 10 cm under the capsule. Snapping onto the hit puts the feet in the floor.
-			const float GroundGap = bGreyboxBody ? 10.0f : 0.0f;
+			const float GroundGap = bGreyboxBodyLevel ? 10.0f : 0.0f;
 			const FVector Start = GetActorLocation();
 			const FVector End = Start - FVector(0.0f, 0.0f, HalfHeight + 500.0f);
 			FHitResult Hit;
@@ -264,7 +266,7 @@ void AHomeWorldCharacter::BeginPlay()
 			}
 		}
 	}
-	if (bGreyboxBody)
+	if (bGreyboxBodyLevel)
 	{
 		// Rest pose: right arm is +X and the walk strides on Y, so the face is mesh -Y.
 		// +90 turns that face onto actor +X. -90 and 0 both walk sideways to the face.
@@ -305,7 +307,7 @@ void AHomeWorldCharacter::BeginPlay()
 	if (MeshComp)
 	{
 		MeshComp->SetRelativeRotation(FRotator(0.0f, MeshForwardYawOffset, 0.0f));
-		if (bGreyboxBody)
+		if (bGreyboxBodyLevel)
 		{
 			MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
@@ -338,7 +340,9 @@ void AHomeWorldCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	TickSpiritSickness(DeltaTime);
 
-	if (SoftBoundsComponent && !UGameplayStatics::GetCurrentLevelName(this).Contains(TEXT("SizeTest")))
+	// On the greybox body maps the hero-island bounds stay off (SCENE_SETUP practice 5); elsewhere they follow
+	// the glide state. Branch on the BeginPlay flag, not the level name, or L_Field is re-trapped (T1-3).
+	if (SoftBoundsComponent && !bGreyboxBodyLevel)
 	{
 		SoftBoundsComponent->bBoundsEnabled = !IsFallbackGliding() && !IsCloudDescentActive();
 	}

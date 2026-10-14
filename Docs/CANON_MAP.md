@@ -100,7 +100,7 @@ README is left intact as history.
 | The work queue | `Docs/TaskLists/T0_NEXT_QUEUE.md` | active — 2026-10-08. `T0_FIRST_LOOP_NOW.md` is the finished code queue |
 | Prototype boss lair | `Docs/context/BOSS_LAIR_LOCK.md` | shape lock 2026-10-08. Fight stays later |
 | Taste decisions Rounds 1–7 | `Docs/handoffs/TASTE_GATE_T0_ASSETS.md` | R1–6 RESOLVED, R7+ parked |
-| Agent-owned decisions | `Docs/decisions/AGENT_DECISIONS.md` | DEC-0001…**0044** — search by id, not by position in the file |
+| Agent-owned decisions | `Docs/decisions/AGENT_DECISIONS.md` | DEC-0001…**0045** — search by id, not by position in the file |
 | UE 5.8 engineering | `docs/SETUP.md`, `KNOWN_ERRORS.md`, `CONVENTIONS.md` | canon |
 | Greybox measurement report | `Docs/qa/GRAYBOX_SPEC_REPORT.md` | 4 blocking (regenerated 2026-10-03) |
 | **Polish pass entry gates** | `Docs/37_POLISH_PASS_PROCESS.md` | active — enforces via `Content/Python/polish_readiness.py` |

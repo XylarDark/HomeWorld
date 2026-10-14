@@ -789,6 +789,13 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Transit|FALLBACK", meta = (ClampMin = "50.0", ClampMax = "2000.0"))
 	float GlideStartProximityCm = 450.0f;
 
+	/**
+	 * True on the greybox body maps (SizeTest, L_Field). Set once in BeginPlay.
+	 * The hero-island walk bounds do not fit these maps (SCENE_SETUP practice 5), so Tick
+	 * must not re-enable them there.
+	 */
+	bool bGreyboxBodyLevel = false;
+
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 

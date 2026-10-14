@@ -1089,3 +1089,14 @@ The number is not the cost of that skill as it was first written. Two identical 
 - **Reverses if:** A generator for the herb scatter is committed, at which point the seed becomes reproducible and the caveat is dropped.
 - **Supersedes:** none.
 
+---
+
+## DEC-0045 - The soft-bounds gate branches on the greybox-body flag, not the level name (2026-10-14)
+
+- **Area:** code design
+- **Decision:** `AHomeWorldCharacter::BeginPlay` sets one member, `bGreyboxBodyLevel` (SizeTest or L_Field), and `Tick` reads it for the soft-bounds gate: `if (SoftBoundsComponent && !bGreyboxBodyLevel)`. The level-name string test leaves `Tick`.
+- **Rationale:** `Tick` tested only `"SizeTest"`, so on `L_Field` it forced `bBoundsEnabled = true` every frame and overrode the `false` that `BeginPlay` had just set. The field then carried the hero-island cylinder - centre (-400, -50, 100) cm, radius 1050 cm, MaxZ 600, MinZ -400 - so the meadow became a ~21 m playpen that also fought the cliff tops and the shelf. `SCENE_SETUP` practice 5 already settles the intent: a new scene turns those bounds off, and the field's ~297 m half-diagonal cannot be written instead (`BoundsRadiusXY` clamps at 10000 cm). The alternative - a second `"L_Field"` test inline in `Tick` - was rejected: two copies of the greybox-body definition is the drift that caused this, because `BeginPlay` already knew L_Field and `Tick` did not.
+- **Evidence:** `Source/HomeWorld/HomeWorldCharacter.{h,cpp}`; `.\Tools\Safe-Build.ps1` exit 0 with `HomeWorldCharacter.cpp` compiled (`[1/7] Compile`); `py -3 -m pytest Content/Python/tests -q` 366 passed; `npm run verify:fast` 6/6 PASSED. No live editor, so the walk on `L_Field` is not yet shown; the desktop re-run in the T2 note covers it.
+- **Reverses if:** the greybox maps gain a per-map bounds config, or `L_Field` stops being a greybox body and gets its own bounds.
+- **Supersedes:** none.
+
