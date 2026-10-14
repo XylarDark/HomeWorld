@@ -1,7 +1,11 @@
 """Place the field greybox from Docs/level/L_Field_METRICS.md.
 
 Texture-off mass only. No path, no landing ring, no camp. The two forest
-edges share one pine sequence. Herb centres come from the sheet.
+edges share one pine sequence. Herb centres come from the sheet. The map is
+built from an empty level, so this file also places the lighting set the kept
+size test keeps: one sun, one sky light, one sky atmosphere
+(Docs/context/SCENE_SETUP.md practice 4). A run with a missing mesh saves
+nothing and exits non-zero.
 """
 
 import json
@@ -16,6 +20,29 @@ MAP_PATH = "/Game/HomeWorld/Maps/Field/L_Field"
 MESH_DIR = "/Game/HomeWorld/Meshes/SizeTest"
 CUBE = "/Engine/BasicShapes/Cube"
 M = 100.0
+
+# The lighting set, named so a re-run finds its own actors and a stray sun is
+# caught. Values match the kept size test (place_size_test.py) and the
+# moonlight pose in vnp_night_tune_and_evidence.py: 45 degrees up, 30 azimuth.
+SUN_LABEL = "Field_Sun"
+SKY_LIGHT_LABEL = "Field_SkyLight"
+SKY_ATMOSPHERE_LABEL = "Field_SkyAtmosphere"
+SUN_PITCH = -45.0
+SUN_YAW = 30.0
+
+#: Labels cleared and rebuilt on every run. The lighting actors are kept and
+#: re-posed instead, so a re-run repairs the map rather than stacking a second sun.
+CLEARED_PREFIXES = ("SM_Field_", "SK_Field_")
+
+#: Placements that did not happen. run() refuses to save with any entry here:
+#: a miss is not a save (Docs/context/SCENE_SETUP.md practice 13).
+FAILED = []
+
+
+def fail(message):
+    """Record a placement that did not happen and say so in the log."""
+    FAILED.append(message)
+    unreal.log("field_greybox: FAIL " + message)
 
 
 def load_metrics():
@@ -53,7 +80,7 @@ def yaw_rotator(yaw):
 def clear_field_actors():
     for actor in list(actors()):
         label = actor.get_actor_label()
-        if label.startswith("SM_Field_") or label.startswith("SK_Field_"):
+        if label.startswith(CLEARED_PREFIXES):
             destroy(actor)
 
 
@@ -72,7 +99,7 @@ def spawn_static(label, location, rotation):
 def place_cube(label, x, y, z, sx, sy, sz, block):
     cube = unreal.EditorAssetLibrary.load_asset(CUBE)
     if cube is None:
-        unreal.log("field_greybox: FAIL no engine cube")
+        fail("no engine cube")
         return None
     actor = spawn_static(label, vec(x, y, z), yaw_rotator(0))
     actor.set_actor_scale3d(unreal.Vector(sx, sy, sz))
@@ -89,7 +116,7 @@ def place_cube(label, x, y, z, sx, sy, sz, block):
 def place_pine(label, mesh_name, x, y):
     mesh = unreal.EditorAssetLibrary.load_asset(MESH_DIR + "/" + mesh_name)
     if mesh is None:
-        unreal.log("field_greybox: FAIL missing " + mesh_name)
+        fail("missing " + mesh_name)
         return None
     actor = spawn_static(label, vec(x, y, 0), yaw_rotator(0))
     component = actor.get_component_by_class(unreal.StaticMeshComponent)
@@ -170,7 +197,7 @@ def place_trees(trees):
 def place_bull(label, x, y, yaw):
     mesh = unreal.EditorAssetLibrary.load_asset(MESH_DIR + "/SK_Size_Bull")
     if mesh is None:
-        unreal.log("field_greybox: FAIL missing SK_Size_Bull")
+        fail("missing SK_Size_Bull")
         return None
     location = vec(x, y, 0)
     rotation = yaw_rotator(yaw)
@@ -221,18 +248,53 @@ def place_player(player):
     return actor
 
 
-def place_sun():
-    for actor in actors():
-        if actor.get_actor_label() == "Field_Sun":
-            return
-    sun = unreal.EditorLevelLibrary.spawn_actor_from_class(
-        unreal.DirectionalLight, vec(0, 0, 50), unreal.Rotator(-45.0, 30.0, 0.0)
-    )
-    sun.set_actor_label("Field_Sun")
+def sun_rotator():
+    """The one sun's pose, written with keyword args on purpose.
+
+    A positional unreal.Rotator is (roll, pitch, yaw), not (pitch, yaw, roll), so
+    Rotator(-45.0, 30.0, 0.0) puts the elevation in the inert roll slot and the
+    azimuth into pitch - a sun that lights upward. See docs/KNOWN_ERRORS.md
+    ("UE Python Rotator positional args").
+    """
+    return unreal.Rotator(roll=0.0, pitch=SUN_PITCH, yaw=SUN_YAW)
+
+
+def spawn_light(label, actor_class, location, rotation):
+    actor = by_label().get(label)
+    if actor is None:
+        actor = unreal.EditorLevelLibrary.spawn_actor_from_class(
+            actor_class, location, rotation
+        )
+        actor.set_actor_label(label)
+    actor.set_actor_location(location, False, False)
+    actor.set_actor_rotation(rotation, False)
+    return actor
+
+
+def place_lights():
+    """One sun, one sky light, one sky atmosphere, matching the kept size test.
+
+    Two directional lights leave the view black (SCENE_SETUP practice 4), so a
+    directional light that is not Field_Sun is removed. The sun is re-posed even
+    when its label already exists: a label guard alone would keep a wrong
+    rotation from an earlier save.
+    """
+    zero = yaw_rotator(0)
+    for actor in list(actors()):
+        if "DirectionalLight" not in (actor.get_class().get_name() or ""):
+            continue
+        if actor.get_actor_label() == SUN_LABEL:
+            continue
+        unreal.log("field_greybox: removed extra sun " + actor.get_actor_label())
+        destroy(actor)
+    spawn_light(SUN_LABEL, unreal.DirectionalLight, vec(0, 0, 500), sun_rotator())
+    spawn_light(SKY_LIGHT_LABEL, unreal.SkyLight, vec(0, 0, 500), zero)
+    spawn_light(SKY_ATMOSPHERE_LABEL, unreal.SkyAtmosphere, vec(0, 0, 0), zero)
 
 
 def run():
     metrics = load_metrics()
+    del FAILED[:]
     level = unreal.get_editor_subsystem(unreal.LevelEditorSubsystem)
     if unreal.EditorAssetLibrary.does_asset_exist(MAP_PATH):
         level.load_level(MAP_PATH)
@@ -252,11 +314,20 @@ def run():
     place_forests(metrics["forest"])
     place_trees(metrics.get("trees", []))
     herb_count = place_herbs(metrics["herbs"])
-    place_bulls(metrics.get("bulls", []))
+    bulls = metrics.get("bulls", [])
+    place_bulls(bulls)
     place_player(metrics["player"])
-    place_sun()
+    place_lights()
+    if FAILED:
+        unreal.log(
+            "field_greybox: NOT SAVED, %d placement(s) failed" % len(FAILED)
+        )
+        return 1
     level.save_current_level()
-    unreal.log("field_greybox: saved herbs %d bulls %d" % (herb_count, len(metrics.get("bulls", []))))
+    unreal.log(
+        "field_greybox: saved herb nodes %d from %d centres, bulls %d"
+        % (herb_count, len(metrics["herbs"]), len(bulls))
+    )
     return 0
 
 

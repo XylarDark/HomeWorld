@@ -11,6 +11,19 @@ importlib.reload(place_field_greybox)
 
 MAP_PATH = place_field_greybox.MAP_PATH
 M = place_field_greybox.M
+FLOOR_TOP_CM = 0.0
+BOTTOM_TOLERANCE_CM = 2.0
+BOTTOM_PREFIXES = (
+    "SM_Field_Pine_",
+    "SM_Field_Tree_",
+    "SM_Field_Herb_",
+    "SK_Field_Bull_",
+)
+LIGHT_LABELS = (
+    place_field_greybox.SUN_LABEL,
+    place_field_greybox.SKY_LIGHT_LABEL,
+    place_field_greybox.SKY_ATMOSPHERE_LABEL,
+)
 
 
 def mesh_name(actor):
@@ -19,6 +32,11 @@ def mesh_name(actor):
         return ""
     mesh = component.get_editor_property("static_mesh")
     return mesh.get_name() if mesh is not None else ""
+
+
+def actor_bottom_z(actor):
+    origin, extent = actor.get_actor_bounds(False)
+    return origin.z - extent.z
 
 
 def check():
@@ -43,6 +61,7 @@ def check():
         "PlayerStart",
     ]
     required.extend(cliff["label"] for cliff in metrics["cliffs"])
+    required.extend(LIGHT_LABELS)
     for label in required:
         if label not in found:
             errors.append("missing " + label)
@@ -109,6 +128,46 @@ def check():
         errors.append("bulls beside a herb %d is not half" % beside)
     else:
         unreal.log("field_greybox: bulls %d beside %d" % (len(bulls), beside))
+
+    directional = [
+        actor
+        for actor in place_field_greybox.actors()
+        if "DirectionalLight" in (actor.get_class().get_name() or "")
+    ]
+    if len(directional) != 1:
+        errors.append("%d directional lights, want 1" % len(directional))
+
+    sun = found.get(place_field_greybox.SUN_LABEL)
+    if sun is not None:
+        rotation = sun.get_actor_rotation()
+        if (
+            abs(rotation.pitch - place_field_greybox.SUN_PITCH) > 1.0
+            or abs(rotation.yaw - place_field_greybox.SUN_YAW) > 1.0
+        ):
+            errors.append(
+                "sun pitch/yaw is %.1f/%.1f, want %.1f/%.1f"
+                % (
+                    rotation.pitch,
+                    rotation.yaw,
+                    place_field_greybox.SUN_PITCH,
+                    place_field_greybox.SUN_YAW,
+                )
+            )
+
+    off_floor = []
+    for label, actor in found.items():
+        if not label.startswith(BOTTOM_PREFIXES):
+            continue
+        bottom = actor_bottom_z(actor)
+        if abs(bottom - FLOOR_TOP_CM) > BOTTOM_TOLERANCE_CM:
+            off_floor.append("%s %.1f" % (label, bottom))
+    if off_floor:
+        errors.append(
+            "mesh bottom off the floor on %d actor(s): %s"
+            % (len(off_floor), ", ".join(sorted(off_floor)[:5]))
+        )
+    else:
+        unreal.log("field_greybox: mesh bottoms on the floor")
 
     player = found.get("PlayerStart")
     if player is not None:
