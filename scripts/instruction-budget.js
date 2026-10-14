@@ -81,10 +81,13 @@ const ALWAYS_ON_MAX = 150;
  * TOTAL_HIGH_WATER. It has already moved in both directions - down from 4007
  * when the ue57 tombstone stopped advertising the retired engine, up to
  * 4026 for the ue-editor-ui skill after that skill's duplicate copy was
- * collapsed into a pointer (DEC-0038), then down to 3788 when the cursor
- * UE 5.7 tombstone stopped advertising a retired skill (DEC-0040). Every
- * change is a recorded decision, which is the point of a ratchet that only
- * moves when someone says so.
+ * collapsed into a pointer (DEC-0038), then down to 3788 (DEC-0040). Of that
+ * last 238-char drop, only 60 is the cursor ue57 tombstone ceasing to
+ * advertise a retired skill; 178 is description rewrites - pcg-validate
+ * 184 -> 83 (-101), automation-gap-solutions 155 -> 95 (-60), agent-workflow
+ * 186 -> 169 (-17). The tombstone is the smaller part; the rewrites are what
+ * moved the number. Every change is a recorded decision, which is the point
+ * of a ratchet that only moves when someone says so.
  */
 const ADVERTISED_MAX = 3788;
 

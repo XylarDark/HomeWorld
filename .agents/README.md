@@ -19,6 +19,7 @@ Default DET adopters copy the **six** core skills. HomeWorld also keeps small HW
 | [secure-coding](skills/secure-coding/SKILL.md) | Input, secrets, auth, or dependencies |
 | [token-efficient-context](skills/token-efficient-context/SKILL.md) | Tokens, credits, context cost, MCP, or editing rules/skills/AGENTS.md |
 | [verification-evidence](skills/verification-evidence/SKILL.md) | Audits, health checks, guard tests, CI gates |
+| [steer-gate](skills/steer-gate/SKILL.md) | HW-local: a steer, taste, or test call is missing before an edit that sets feel/scope/done |
 | [swarm-mode-routing](skills/swarm-mode-routing/SKILL.md) | HW-local: first-hop swarm / NON-SWARM mode detect |
 | [taste-gate](skills/taste-gate/SKILL.md) | HW-local: lookdev / “does this feel right” (single discoverable home) |
 | [taste-profiler](skills/taste-profiler/SKILL.md) | HW-local: twin of taste-gate |
@@ -27,9 +28,10 @@ Default DET adopters copy the **six** core skills. HomeWorld also keeps small HW
 
 ### Live `.cursor/skills/` (see also that README)
 
-Only these project skills stay on the cursor scan path after the budget Do:
+Only these project skills stay on the cursor scan path after the budget Do. A name in both trees is advertised from `.cursor/skills/`, so the trigger `description` lives there and the `.agents` copy is a pointer (DEC-0041):
 
-- Live: `pcg-validate`, `automation-gap-solutions`. `ue58-api-check` is a pointer to `.agents/skills/ue58-api-check`
+- Live: `pcg-validate`, `automation-gap-solutions`, `ue-editor-ui`. Their `.agents` copies are pointers.
+- Not advertised: `ue58-api-check` — a disabled pointer (`disable-model-invocation: true`) to the body at `.agents/skills/ue58-api-check`.
 - Tombstone: `.agents/skills/ue57-api-check` only (prefer ue58). Not on the `.cursor/skills` scan path.
 - Retired WAVE F: `demo-map-setup`, `homestead-setup` deleted
 
@@ -54,9 +56,8 @@ Optional skills for hosts that want deeper coverage. They are **not** copied by 
 | [defensive-programming](skills-extras/defensive-programming/SKILL.md) | External input, I/O, network, async concurrency |
 | [documentation](skills-extras/documentation/SKILL.md) | Comments, README, or anything under `docs/` |
 | [exclusive-resource-access](skills-extras/exclusive-resource-access/SKILL.md) | Browsers, ports, devices, or other single-user resources |
+| [scope-refinement](skills-extras/scope-refinement/SKILL.md) | Ask (2 questions max) before guessing a product, scope, or architecture call |
 | [testing-standards](skills-extras/testing-standards/SKILL.md) | Adding or updating tests or test frameworks |
-| [taste-gate](skills-extras/taste-gate/SKILL.md) | Pointer → `.agents/skills/taste-gate` (no second body) |
-| [taste-profiler](skills-extras/taste-profiler/SKILL.md) | Pointer → `.agents/skills/taste-profiler` |
 
 ### Opt in to extras
 

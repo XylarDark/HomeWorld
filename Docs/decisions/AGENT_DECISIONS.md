@@ -1046,3 +1046,17 @@ The number is not the cost of that skill as it was first written. Two identical 
 - **Reverses if:** A new skill description is accepted and the ceiling is raised in the same decision.
 - **Supersedes:** none. DEC-0038 stays the record of the earlier rise to 4026.
 
+---
+
+## DEC-0041 - The advertised description lives in the tree a host reads (2026-10-14)
+
+- **Area:** harness refactor
+- **Decision:** Store `ue-editor-ui` once, with its trigger `description` and body in `.cursor/skills/ue-editor-ui/SKILL.md`, and a short pointer in `.agents/skills/ue-editor-ui/SKILL.md` - the same shape as `pcg-validate` and `automation-gap-solutions`. The three `paths:` globs move with the body. The description surface is unchanged (`ADVERTISED_MAX` stays 3788) and the move is line-neutral: the body and its description simply switch tree.
+- **Rationale:** A name present in both trees is advertised from `.cursor/skills/`, so the description in that tree is the one the model reads. `ue-editor-ui` had it backwards: `.cursor` held an 83-char pointer ("Pointer. Read .agents/... ") while the 336-char trigger sat in the shadowed `.agents` copy, so the model saw a description naming no capability and no trigger. DEC-0038 said the `.cursor` copy was "the same shape as `ue58-api-check`", but ue58's pointer carries `disable-model-invocation: true` and this one did not, so it was advertised rather than hidden. Every door already points at `.cursor/skills/ue-editor-ui/SKILL.md` (`AGENTS.md`, five `.mdc` rules, `AGENTS_REFERENCE.md`, `AUTOMATION_GAPS.md`), so putting the body there also removes a hop.
+- **Rejected:** (a) Adding `disable-model-invocation: true` to make it literally the same shape as `ue58-api-check` - that hides a description whose triggers are real natural-language situations ("a State Tree graph must be edited", "a PCG Details field cannot be written"), and it would lower a ceiling to hide a capability. (b) Copying the trigger into both trees - that bills the surface twice, which is the shape DEC-0038 already rejected.
+- **Catalog corrections:** The same pass fixed two skill catalogs that agreed with neither tree. `.agents/README.md` omitted `steer-gate` and `ue-editor-ui` and its extras table listed `skills-extras/taste-gate` and `skills-extras/taste-profiler`, which do not exist, while omitting `scope-refinement`. `.cursor/skills/README.md` omitted `ue-editor-ui` and called the disabled `ue58-api-check` pointer "Live". Both tables now match the trees; that adds 3 lines to the reachable corpus (2955 -> 2958).
+- **Correction:** DEC-0040's 4026 -> 3788 drop is 238 chars, and only 60 is the cursor `ue57-api-check` tombstone. 178 is description rewrites: `pcg-validate` 184 -> 83 (-101), `automation-gap-solutions` 155 -> 95 (-60), `agent-workflow` 186 -> 169 (-17). DEC-0040's own sentences are true; the `instruction-budget.js` comment had credited the whole move to the tombstone, and that comment is corrected.
+- **Evidence:** `node scripts/instruction-budget.js` reports 3788 description characters in 19 skills, `duplicate bodies none`, exit 0 - the same description count as before the move. The refreshed skill list shows `ue-editor-ui` advertising the trigger ("Drive Unreal Editor panels that have no Python API. Use when ... `editor_ui: NEED_SLATE` ...") instead of the pointer stub. `npm run verify:fast` passes all six stages; the Python suite is 352 passed.
+- **Reverses if:** A host stops preferring `.cursor/skills/` for a twinned name, or the two trees are consolidated into one.
+- **Supersedes:** none.
+

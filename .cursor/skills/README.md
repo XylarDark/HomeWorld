@@ -4,13 +4,17 @@ Cursor discovers `description` on every turn for each `SKILL.md` here. Keep this
 
 ## Live (discoverable)
 
+A skill stored in both trees is advertised from **this** tree, so the trigger `description` lives here and the `.agents` copy is a short pointer (DEC-0041).
+
 | Skill | Role |
 |-------|------|
 | `pcg-validate` | PCG validation / forest workflows |
-| `ue58-api-check` | Live Unreal **5.8** API / doc sourcing |
-| `automation-gap-solutions` | Pointer into `docs/Automation/AUTOMATION_GAPS.md` |
+| `automation-gap-solutions` | Automation-gap solutions; cite `docs/Automation/AUTOMATION_GAPS.md` |
+| `ue-editor-ui` | Slate inspector for panels Python cannot write — fires on `editor_ui: NEED_SLATE` |
 
-## Tombstones
+## Pointers and tombstones
+
+`ue58-api-check` is **not** advertised from this tree: the file here is a short pointer with `disable-model-invocation: true`, and the body lives in `.agents/skills/ue58-api-check`.
 
 The retired name `ue57-api-check` lives only in `.agents/skills/ue57-api-check`. Prefer `ue58-api-check`. UE57 docs stay under `docs/UE/UE57_*`.
 
