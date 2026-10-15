@@ -161,16 +161,17 @@ Docs-only. Files: `Docs/01_GDD_MVP.md`, `Docs/03_GAMEPLAY_MVP.md`, `Docs/VISION_
   - **Held, not committed here:** `COMMANDS_AND_LOG_TAGS.md` and `CANON_MAP.md` are being edited by the
     live virtue workstream at the same time (a `hw.Virtue.Read` regeneration, a virtue row). This
     session's one-line edits in both are in the working tree and land with that session's commit, not
-    this one.
+    this one. Lead call 2026-10-14: leave them to that session.
 - **Left for the Lead (not alignment):** `Docs/DAYNIGHT_BIBLE.md:14` "sleep (bed **or campsite**)" is
   LOCKED and its campsite entry is a *mechanics* difference from the board's "the bed alone", so removing
   it changes gameplay; `Docs/guides/T0_HUMAN_DESKTOP_PIPELINE.md:82/86` is a Lead-stamped fourteen-MUST
   list whose items 7/11 carry the superseded M7 rune milestone, so rewriting them re-stamps beats. Both
-  stopped on and named, not edited.
+  stopped on and named, not edited. Lead call 2026-10-14: leave both.
 - **Left as history:** legacy `TaskLists/` already carries "pre-lock, do not implement" disclaimers.
 - **New finding, not the sweep:** `COMMANDS_AND_LOG_TAGS.md`'s `HomeWorldCharacter.cpp:NNN` column
   drifted after its last regeneration (`54718be9`). Only that file changed in `Source/` since
-  (`dadc5cf7`, `eff7fe09`), so ~22 handler-line refs are stale. It needs one re-grep pass.
+  (`dadc5cf7`, `eff7fe09`), so ~22 handler-line refs are stale. It needs one re-grep pass. Lead call
+  2026-10-14: queue it, after the virtue commit settles.
 - **Verified:** `py -3 -m pytest Content/Python/tests -q` 366 passed; `npm run verify:fast` 6/6 PASSED;
   `npm run docs:links` still `gone ... (46)`, unchanged.
 
