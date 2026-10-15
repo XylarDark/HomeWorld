@@ -28,6 +28,10 @@ Content/DerivedDataCache/
 UpgradeLog.htm
 *.vcxproj.user
 *.sublime-*
+# Rider writes these per machine. .idea is the local project model; *.DotSettings.user
+# is a user session store. Neither is shared project content.
+.idea/
+*.DotSettings.user
 
 # External plugins (installed via tools, not project code)
 Plugins/UnrealMCP/
