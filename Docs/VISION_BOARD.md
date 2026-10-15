@@ -2,7 +2,7 @@
 
 | Field | Current direction |
 |---|---|
-| **Status** | Product canon, updated 2026-10-12 |
+| **Status** | Product canon, updated 2026-10-15 |
 | **Theme and long-horizon campaign** | [`VisionBoard/Core/VISION.md`](../VisionBoard/Core/VISION.md) |
 | **Gameplay slice** | [`Docs/01_GDD_MVP.md`](01_GDD_MVP.md) |
 | **Virtue attributes** | [`Docs/VIRTUE_ATTRIBUTE_BIBLE.md`](VIRTUE_ATTRIBUTE_BIBLE.md). Pair names stay in [`VisionBoard/Core/VISION.md`](../VisionBoard/Core/VISION.md). |
@@ -22,7 +22,7 @@ convert. The world teaches through its shape, materials, and light.
 
 Read this before a task. The answered table below is the lock. Do not ask those questions again.
 
-- Three places: homestead, open field, pine camp. The glide connects them. The lair is after that loop.
+- The first loop is three places: homestead, open field, and the pine camp in the first forest. The glide connects them. When that camp is complete, the other forest opens, then a river, then a marsh. Mountains around the marsh end exploration. The lair is after the rescue loop. Attribute and zone rules: [`Docs/VIRTUE_ATTRIBUTE_BIBLE.md`](VIRTUE_ATTRIBUTE_BIBLE.md). 2026-10-15.
 - On the ground of a zone, about 80 percent is mechanics and assets and about 20 percent is open.
 - A vertical climb is not part of that split. The field roost is that climb. It is not a fourth place.
 - Three lines: the place teaches itself. Safe home above a living world. One warm eye against the cool.
@@ -40,6 +40,8 @@ Read this before a task. The answered table below is the lock. Do not ask those 
 | **Night is a form** | The player becomes spirit by sleeping at the bed. Night does not automatically grant the form. |
 | **Two kinds of spirit** | The default is a day body and a night spirit form. Creatures that are always spirit have no sleeping body. Animals and humanoids enter the spirit realm only while asleep. Guards have no spirit form until their spirits are soothed. After that, they have one. 2026-10-12. |
 | **Care replaces killing** | Combat does not kill. Spirit encounters heal, calm, or convert their targets according to the encounter. |
+| **Attributes are the modifiers** | Poles, runes, and paradox marks change encounters, yields, consumables, and armor. The rules are the virtue bible. 2026-10-15. |
+| **Author the hard form first** | Build the full challenge, then the scaled-down steps progression uses. 2026-10-15. |
 | **The world communicates** | Terrain, material, silhouette, and light teach a place's purpose before UI. UI may name an action after the player acts. |
 | **Guidance stays in the world** | Family guides are present from the start. Guidance is a short contextual hint, not a dialogue tree. |
 
@@ -52,9 +54,11 @@ Read this before a task. The answered table below is the lock. Do not ask those 
 5. At night, become spirit, use spirit-stealth to reach the guards, ease their suffering until they sleep, and free the loved one.
 6. Return home with the loved one. Continue the day-gather/night-tend loop.
 7. When that loop is complete, the same cliff glide can enter the cave mouth. An Atlas sleeper is bound there by a snake. The shape is `Docs/context/BOSS_LAIR_LOCK.md`.
+8. Completing the camp also opens the other forest, then the river, then the marsh. The attribute rules are the virtue bible.
 
-The homestead, open field, and pine-forest camp form the prototype's three
-places. The glide connects them; it is traversal, not a separate mechanic
+The first loop is the homestead, the open field, and the pine camp. After that
+camp is complete, the other forest, the river, and the marsh are in the slice.
+The glide connects the first loop. It is traversal, not a separate mechanic
 family. Current route geometry and unresolved route values live in
 [`Docs/context/HOMEWORLD_ROUTE.md`](context/HOMEWORLD_ROUTE.md).
 
@@ -129,6 +133,10 @@ The Round 7 questions are answered. Do not ask them again.
 | How does the roost climb start? | The bull knocks out a blocker in the field. The lair ride stays the only ride. Everywhere else the bull stays field-only. 2026-10-12. |
 | What clears the higher roost obstacle? | A skill learned in the pine forest. The skill is not named. 2026-10-12. |
 | Can one zone wait on another? | Yes. The field climb waits on the bull. The higher obstacle waits on the forest. 2026-10-12. |
+| What is a paradox mark? | The two poles of one axis as one symbol. It occupies that axis. 2026-10-15. |
+| What does armor do? | It changes movement, access, bonk tries, and spirit play. A hit still launches you. 2026-10-15. |
+| What opens the second forest? | Completing the camp in the first forest. Its mechanic is not named. 2026-10-15. |
+| How do you cross the river after that forest? | Stones and a jump. Spirit form can cross once the second forest is complete. The far bank is marsh, closed by mountains. 2026-10-15. |
 
 ## Reading boundary
 

@@ -42,3 +42,4 @@ Lead answers, 2026-10-07. Not a start read. Open when the task touches T0 scope.
 - two cloud wisps a night. One heals the homestead wound. One makes fertilizer with a dung.
 - the partner comes home by the shrine return, then walks. Same return as the bull.
 - the camp has three guards. Ease each until they sleep.
+- 2026-10-15. Attribute marks, paradox encounters, interaction armor, and the four zones (first forest, second forest, river, marsh) are in the T0 slice. The rescue loop stays the first loop. Rules: `Docs/VIRTUE_ATTRIBUTE_BIBLE.md`. The bed rune stays removed.

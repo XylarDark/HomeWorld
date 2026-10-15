@@ -233,7 +233,7 @@ The fixed-crumb scripted glide remains a separate fallback implementation. Its r
 | Contents | At most one stack per RES_ID (six resources ⇒ one slot each when full set carried) |
 | Stack size | MVP default stack max **9** per RES_ID (SYS may tune; do not add 7th resource) |
 | Pickup | Gather fails if that RES_ID stack is at max **or** if empty slots = 0 and RES_ID not already held |
-| No | Equipment grid, weapons, armor, crafting output slots, currency, multiplayer trade |
+| No | Equipment grid, weapons, damage-number armor, crafting output slots, currency, multiplayer trade. Interaction armor is [`Docs/VIRTUE_ATTRIBUTE_BIBLE.md`](VIRTUE_ATTRIBUTE_BIBLE.md). |
 
 Spend (tame / heal / nurture) decrements stack; at 0 clear slot.
 

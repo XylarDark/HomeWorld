@@ -28,7 +28,7 @@ Sacred systems and forbidden tropes. Prefer this over improvising mid-code.
 | Crafting recipe webs | Gather → store → spend; homestead **named recipes only** at **campfire then cottage** — costs in `SCHEMA.md` / [GATHER_CRAFT_BIBLE.md](../GATHER_CRAFT_BIBLE.md) (demo: campfire/tent→cottage) |
 | Invisible walls as primary bounds | HOMESTEAD_BIBLE — edge glide commit; rare immersive mid-map blockers only |
 | Co-op drop-in on hub (MVP) | HOMESTEAD_BIBLE — NPC family instead |
-| Extra biome / second beast / 7th resource | MVP lock |
+| Extra biome / second beast / 7th resource | A biome the Lead has not named stays out. The second forest, the river, and the marsh are named in [`VIRTUE_ATTRIBUTE_BIBLE.md`](../VIRTUE_ATTRIBUTE_BIBLE.md) (2026-10-15). |
 | Night flight | Canon |
 | Crouch / stance stealth | [SPIRIT_STEALTH_BIBLE.md](../SPIRIT_STEALTH_BIBLE.md) — torch-light reveal + A2 alert only |
 | Spirit kill-on-detect / homestead spirit detection combat | Spirit found-out = pressure meter, not combat loop |
@@ -43,3 +43,4 @@ Sacred systems and forbidden tropes. Prefer this over improvising mid-code.
 - Night **placeholder dream-convert** at den/camp (Docs/21): heal/recruit; convert, not kill. **Never on homestead.**
 - **Rare boss** vs great/terrible evil (tutorial planet / VS path): **day + night** phase model per [COMBAT_DREAM_BIBLE.md](../COMBAT_DREAM_BIBLE.md) — traversal/interacts by day, spirit blink/possess/heal-strip by night; win = **seal/banish**, not kill. NOW = placeholder volume + phase logs only.
 - **Non-boss** planet encounters: four minigame stub families (`MinigameHeal` / `Nurture` / `Grow` / `Possess`) extending the Docs/21 convert path — not DPS combat.
+- Interaction armor, paradox marks, and the river crossing in spirit form are [`VIRTUE_ATTRIBUTE_BIBLE.md`](../VIRTUE_ATTRIBUTE_BIBLE.md). Armor does not add a damage number. The river crossing uses the spirit form you already have.

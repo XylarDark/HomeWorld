@@ -7,7 +7,7 @@ Reviewed, versioned summary of Lead/process taste and locked decisions.
 **Updates:** Stage in `Saved/taste_profile_session.json`; promote only after Lead/AD confirm or `APPROVE *`.  
 **Precedence:** latest Lead chat / `APPROVE *` > this file > never invent.
 
-**Last promoted:** 2026-10-11 (size-test cabin greybox, open plan)
+**Last promoted:** 2026-10-15 (attribute and zone lock)
 
 ---
 
@@ -46,6 +46,7 @@ Reviewed, versioned summary of Lead/process taste and locked decisions.
 
 | Date | Phrase / source | Outcome |
 |------|-----------------|--------|
+| 2026-10-15 | Lead, chat, scribe | **Attribute and zone lock.** Rules in [`Docs/VIRTUE_ATTRIBUTE_BIBLE.md`](../../Docs/VIRTUE_ATTRIBUTE_BIBLE.md). Poles have runes. A paradox mark occupies one axis. Armor is interaction. The second forest opens after the camp, then the river, then the marsh. Unnamed beats stay unnamed. The bed rune stays removed. |
 | 2026-10-11 | Lead, chat, after walking `L_SizeTest` | **Open cabin greybox.** The size-test home stays the block plan in `Docs/level/L_SizeTest_ROOM_PLAN.md`: 17.5 by 17 m, a 4 m porch, the great room open to the kitchen, bedrooms on the north. Preferred over the equal-box cottage. Block meshes stay the layout test. The 9 by 11 m card in `Docs/art/SCALE.md` stays the art lock until a cottage sheet is kept. |
 | 2026-10-11 | Size-test next, chat | **Sittings in order.** Facing and the garden sheet, then a walkable greybox interior, then Space on the existing jump and a greybox shoulder sphere. A verify script between sittings. The cottage sheet, texture off, stays the next art file. |
 | 2026-10-11 | Lead, chat | **Authorship.** A new character or asset is designed by the developer and written into context before a picture. Generate that design from scratch. `VisionBoard/KeyArt/homestead_dusk_baseline.jpg` is a fit check after that design exists. It is not the design source, and an older asset is not either. A smooth blob fails. A crystal-cut outline fails. Meters stay in `Docs/art/SCALE.md`. |

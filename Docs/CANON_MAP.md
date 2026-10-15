@@ -1,6 +1,6 @@
 # CANON MAP — one lookup, so nobody reads 441 files to find one answer
 
-**Updated 2026-10-11.**
+**Updated 2026-10-15.**
 
 ## 0. Which document is the vision
 
@@ -64,7 +64,7 @@ README is left intact as history.
 |---|---|---|
 | Pillars, verbs, do-nots, feel | `Docs/canon/` — 12 small files, start at `README.md` | canon |
 | **Theme, the game, prototype scope** | `Docs/VISION_BOARD.md` | current product canon |
-| **Seven virtue attributes** | `Docs/VIRTUE_ATTRIBUTE_BIBLE.md` | prototype. Pair names: `VisionBoard/Core/VISION.md`. |
+| **Seven virtue attributes, runes, paradox marks, and the four zones** | `Docs/VIRTUE_ATTRIBUTE_BIBLE.md` | prototype, Lead 2026-10-15. Pair names: `VisionBoard/Core/VISION.md`. |
 | GDD slice | `Docs/01_GDD_MVP.md` | canon |
 | **Cloud descent facts and carried wisp** | `Docs/context/HOMEWORLD_ROUTE.md` + accepted `docs/human-use/test-contract.md` | current route / accepted behavior |
 | Art direction | `Docs/02_ART_BIBLE.md` | canon. `VisionBoard/KeyArt/homestead_dusk_baseline.jpg` is a fit check after a developer design, not a design source. |

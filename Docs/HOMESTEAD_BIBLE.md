@@ -51,7 +51,7 @@ Homestead crafting may create **only** these MVP outputs unless Lead appends `DE
 | **Healing consumables** | Spendables for heal (beyond raw RES if needed) |
 | **Fishing consumables / gear** | Enable hub fishing loop |
 
-**Forbidden:** Generic crafting web, weapon/armor smithing, infinite recipe pages, combat gear on hub.
+**Forbidden:** Generic crafting web, weapon smithing, damage-number armor, infinite recipe pages, combat gear on hub. Changing, removing, or altering marks on armor and consumables is [`Docs/VIRTUE_ATTRIBUTE_BIBLE.md`](VIRTUE_ATTRIBUTE_BIBLE.md), not a smithing tree.
 
 Recipe costs in `Docs/canon/SCHEMA.md` + demo spine (**campfire first**, then cottage kitchen) in `Docs/GATHER_CRAFT_BIBLE.md`.
 

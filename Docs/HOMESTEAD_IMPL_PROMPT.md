@@ -11,7 +11,7 @@ LOCKED
 - Leave island: edge paths → glide DOWN to planet (must land on map); OR moonlight portals (DAYNIGHT). No void-fall death. No invisible walls (rare immersive blockers only mid-map if ever).
 - Dusk: no new glide start (DAYNIGHT).
 - Limited placeables — not freebuild.
-- Crafting outputs ONLY if implementing craft now: tent, torch, taming consumables, healing consumables, fishing consumables/gear. No weapon/armor tree. Schema costs before data.
+- Crafting outputs ONLY if implementing craft now: tent, torch, taming consumables, healing consumables, fishing consumables/gear. No weapon tree and no damage-number armor. Mark changes on armor are Docs/VIRTUE_ATTRIBUTE_BIBLE.md. Schema costs before data.
 - Keep bed sleep, store, nurture×2, shrine. Sacred props — don’t delete.
 - Camera: Galaxy orbit on hub; iso when build/place (CAMERA_BIBLE).
 

@@ -60,9 +60,15 @@ The title does not send you home. You stay until you choose the shrine. Then you
 
 Partner and child stay home. The lair is the player, the three guards, and the giant. No ledge beat. The child is at the bed the seal returns you to, and at the homestead edge for the fog reveal.
 
+## Attribute layer
+
+Each of the seven pairs has an interaction in this lair. The interactions are not named. One paradox item, gathered from travels in the field and the forests, is required. What it does is not named. The coils, the tickle, the ram, the heals, and the eye stay. Rules: `Docs/VIRTUE_ATTRIBUTE_BIBLE.md`. 2026-10-15.
+
 ## Zone barriers
 
-Not lair verbs. A thick fog marks the second forest. A tree boots you back to the forest edge. A fish boots you back to the river bank. Local eject only. Not a trip home.
+Not lair verbs. Until the camp is complete, fog and a tree keep the second forest closed. The tree is a local bounce to the forest edge. After the camp, that forest opens. Its mechanic is named in the virtue bible as not yet named.
+
+The river after that forest is crossed on stones. A miss is the fish: a local bounce to the bank. After the second forest is complete, spirit form can cross. The far bank is marsh. Mountains end exploration. These are places. This lock does not layout them. Local eject only. Not a trip home.
 
 ## What each thing does
 
@@ -86,4 +92,4 @@ Not lair verbs. A thick fog marks the second forest. A tree boots you back to th
 
 ## Not in this lock
 
-New combat, a snake health bar, a snake death, a second mount, a new flight mode, a stealth minigame, a new zone, a pool you can enter, a cut to the title, a shoulder path, a forced trip home after the title, a scale puzzle on coil three, an eye stun, a trip home from the eye, a spoken ask, fertilizer as a gate, the homestead wound as a gate, a boot home from a missed scale, a new soothe verb, day heals, the giant speaking the title, a second ram on coil two.
+New combat, a snake health bar, a snake death, a second mount, a new flight mode, a stealth minigame, a pool you can enter, a cut to the title, a shoulder path, a forced trip home after the title, a scale puzzle on coil three, an eye stun, a trip home from the eye, a spoken ask, fertilizer as a gate, the homestead wound as a gate, a boot home from a missed scale, a new soothe verb, day heals, the giant speaking the title, a second ram on coil two.

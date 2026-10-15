@@ -110,7 +110,7 @@ Main home/buildings · research · magic/spells · spirit · body · combat · c
 - Full cottage room gameplay (buffs, spells, potions, cooking minigames)  
 - Per-track investment buildings with RES sinks beyond named demo list  
 - Generic crafting skill tree or recipe discovery web  
-- Weapon / armor smithing  
+- Weapon smithing and damage-number armor. Mark changes on armor are [`Docs/VIRTUE_ATTRIBUTE_BIBLE.md`](VIRTUE_ATTRIBUTE_BIBLE.md).  
 - Seventh resource or equipment slots  
 
 ---
@@ -119,7 +119,7 @@ Main home/buildings · research · magic/spells · spirit · body · combat · c
 
 - Crafting skill-tree web or infinite recipe pages  
 - 7th `RES_*` or equipment grid  
-- Weapon smithing / combat gear craft on hub  
+- Weapon smithing / damage-number armor / combat gear craft on hub. Mark changes point at `Docs/VIRTUE_ATTRIBUTE_BIBLE.md`.  
 - Functional shop craft spending RES in NOW (placeholders only)  
 - Replacing Docs/21 den/camp/special with primary ore-miner fantasy  
 - Inventing recipe costs outside `SCHEMA.md` / this bible / Lead `DECISIONS.md` append  
