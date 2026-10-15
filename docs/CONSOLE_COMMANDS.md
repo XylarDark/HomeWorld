@@ -218,10 +218,7 @@ Reference for all `hw.*` console commands used in PIE testing and automation. Co
 | **hw.Planetoid.Complete** | Set planetoid-complete flag on GameMode (bPlanetoidComplete). Use in PIE to test "complete planetoid → travel to next" flow. Logs "planetoid complete"; pie_test_runner can verify flag. See [PLANETOID_HOMESTEAD.md](tasks/PLANETOID_HOMESTEAD.md) §5. |
 | **hw.Planetoid.ZoneAlignment** [*Corrupted* \| *Neutral* \| *Positive*] | Get or set current zone alignment (fight / harvest / empower). No arg = log current; with arg = set. Read at runtime via GameMode GetCurrentZoneAlignment. See [PLANETOID_BIOMES.md](PLANETOID_BIOMES.md) §3. |
 | **hw.Planetoid.ZoneInfo** | Log current zone alignment and biome from GameMode. Use in PIE to verify alignment/biome read at runtime (fight/harvest/empower branching). See [PLANETOID_BIOMES.md](PLANETOID_BIOMES.md) §3. |
-| **hw.SinVirtue.Pride** | Log current Pride axis stub value (e.g. 0). Design only; no gameplay implementation. Use in PIE to read one sin/virtue axis. See [SIN_VIRTUE_SPECTRUM.md](tasks/SIN_VIRTUE_SPECTRUM.md) §2. |
-| **hw.SinVirtue.Greed** | Log current Greed axis stub value (e.g. 0). Design only; no gameplay implementation. Use in PIE to read one sin/virtue axis. See [SIN_VIRTUE_SPECTRUM.md](tasks/SIN_VIRTUE_SPECTRUM.md) §2. |
-| **hw.SinVirtue.Wrath** | Log current Wrath axis stub value (e.g. 0). Design only; no gameplay implementation. Use in PIE to read one sin/virtue axis. See [SIN_VIRTUE_SPECTRUM.md](tasks/SIN_VIRTUE_SPECTRUM.md) §2. |
-| **hw.SinVirtue.Envy** | Log current Envy axis stub value (e.g. 0). Design only; no gameplay implementation. Use in PIE to read one sin/virtue axis. See [SIN_VIRTUE_SPECTRUM.md](tasks/SIN_VIRTUE_SPECTRUM.md) §2. |
+| **hw.Virtue.Read** [*actor name*] | Log virtue poles on the named actor, or the actor under the crosshair. Does not grant poles. See [VIRTUE_ATTRIBUTE_BIBLE.md](../Docs/VIRTUE_ATTRIBUTE_BIBLE.md). |
 | **hw.TutorialEnd** | MVP tutorial List 10: mark "family taken" / tutorial end. Sets bTutorialComplete on PlayerState; logs "Family taken — tutorial complete; inciting incident." Use in PIE to verify step 13 (tutorial end). See CONSOLE_COMMANDS § Tutorial (List 10) verification. |
 | **hw.FamilyTaken** | Alias for hw.TutorialEnd: mark family taken / tutorial complete (inciting incident). MVP tutorial List 10 step 13. |
 | **hw.Act1.Start** | *(Future; not yet implemented.)* Load Act 1 map / start lone-wanderer phase. Doc only; when implemented, use after **hw.TutorialEnd** to transition to Act 1. See § After tutorial (Act 1 handoff). |
@@ -260,7 +257,7 @@ Reference for all `hw.*` console commands used in PIE testing and automation. Co
 - **Planetoid complete:** In PIE, run **`hw.Planetoid.Complete`** to set the GameMode's planetoid-complete flag. Output Log shows "planetoid complete (bPlanetoidComplete set)". Use to test the "complete → travel to next" flow; optional pie_test_runner check can verify the flag. See [PLANETOID_HOMESTEAD.md](tasks/PLANETOID_HOMESTEAD.md) §5.
 - **Agentic building (List 60):** **`hw.PlaceWall`** (place build order at cursor), **`hw.CompleteBuildOrder`** (complete nearest incomplete build order), **`hw.SimulateBuildOrderActivation`** (simulate SO_WallBuilder activation). Use to verify "family agent completes one build order" in PIE (observe agent or use commands); see § Agentic building (List 60) verification.
 - **Planetoid zone alignment (fight/harvest/empower):** In PIE, run **`hw.Planetoid.ZoneInfo`** to log current zone alignment and biome. Run **`hw.Planetoid.ZoneAlignment Corrupted`** (or **Neutral**, **Positive**) to set alignment. GameMode exposes GetCurrentZoneAlignment / GetCurrentZoneBiome for runtime branching. See [PLANETOID_BIOMES.md](PLANETOID_BIOMES.md) §3. To validate biome/alignment configs without PIE, run `test_biome_alignment_config.py` (see PLANETOID_BIOMES §3.3).
-- **Sin/virtue (stub):** In PIE, run **`hw.SinVirtue.Pride`**, **`hw.SinVirtue.Greed`**, **`hw.SinVirtue.Wrath`**, or **`hw.SinVirtue.Envy`** to log the current axis stub value (e.g. `Pride: 0`, `Greed: 0`, `Wrath: 0`, `Envy: 0`) to the Output Log. Design only; see [SIN_VIRTUE_SPECTRUM.md](tasks/SIN_VIRTUE_SPECTRUM.md) §2.
+- **Virtue poles:** In PIE, run **`hw.Virtue.Read`** to log the poles on the actor under the crosshair, or **`hw.Virtue.Read <actor name>`**. It does not grant poles. See [VIRTUE_ATTRIBUTE_BIBLE.md](../Docs/VIRTUE_ATTRIBUTE_BIBLE.md).
 
 **Running checks:** With Editor open and PIE running, execute `pie_test_runner.py` via MCP (`execute_python_script("pie_test_runner.py")`) or Tools → Execute Python Script; read `Saved/pie_test_results.json` for pass/fail and detail. See [VERTICAL_SLICE_CHECKLIST](../VisionBoard/MVP/VERTICAL_SLICE_CHECKLIST.md) §3 for pre-demo checklist.
 
@@ -293,7 +290,7 @@ Use this sequence to validate zone alignment (fight / harvest / empower) and Gam
 
 Short guide so testers and agents can validate the sin/virtue system in PIE without re-researching. Ties to [VISION.md](workflow/VISION.md) § Moral system and [SIN_VIRTUE_SPECTRUM.md](tasks/SIN_VIRTUE_SPECTRUM.md).
 
-**How to run:** Start PIE (DemoMap or any playable level). Open the console (~ or `) and type **`hw.SinVirtue.Pride`**, **`hw.SinVirtue.Greed`**, **`hw.SinVirtue.Wrath`**, or **`hw.SinVirtue.Envy`** then Enter. No arguments. All four commands are cheat-only (require a play world).
+**How to run:** Start PIE. Open the console and type **`hw.Virtue.Read`** then Enter. An optional actor-name argument reads that actor instead of the crosshair. The command is cheat-only and does not grant poles.
 
 **What output to expect:** In the Editor **Output Log**, you should see one line per command, for example:
 

@@ -35,6 +35,24 @@ This is a thematic direction, not a locked act structure or content checklist.
 Specific campaign length, level count, bosses, succession, multiplayer scope,
 and future systems require current product decisions before they guide work.
 
+## Virtue attributes
+
+Each pair is one axis. **-1** is the sin, **0** is neutral, **+1** is the virtue.
+Neutral is shared (Trade, on the Greed axis). -1 and +1 are a commitment.
+These attributes are in the prototype. The rules are in
+[`Docs/VIRTUE_ATTRIBUTE_BIBLE.md`](../../Docs/VIRTUE_ATTRIBUTE_BIBLE.md).
+The display stubs in the old task spec are retired.
+
+| Sin (-1) | Virtue (+1) |
+| --- | --- |
+| Greed | Generosity |
+| Gluttony | Abstinence |
+| Sloth | Productivity |
+| Wrath | Grace |
+| Pride | Humility |
+| Envy | Fulfillment |
+| Lust | Love |
+
 ## Authority
 
 - Prototype product direction: [`Docs/VISION_BOARD.md`](../../Docs/VISION_BOARD.md)

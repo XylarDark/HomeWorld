@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "HomeWorldInventoryTypes.h"
+#include "HomeWorldVirtueComponent.h"
 #include "HomeWorldInventorySubsystem.generated.h"
 
 /**
@@ -71,9 +72,32 @@ public:
 	void SetLastBossRewardDisplay(int32 Amount, float DisplayUntilTime);
 	bool GetLastBossRewardForHUD(int32& OutAmount, float& OutDisplayUntil) const;
 
+	/** A herb instance with at least one pole. Unmarked herbs stay in the RES_HERB count. */
+	UFUNCTION(BlueprintCallable, Category = "Inventory|Virtue")
+	bool AddMarkedHerb(const TArray<EHomeWorldVirtuePole>& Poles);
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory|Virtue")
+	int32 GetMarkedHerbCount() const { return MarkedHerbs.Num(); }
+
+	/** Spends one marked herb only when the target changes. */
+	UFUNCTION(BlueprintCallable, Category = "Inventory|Virtue")
+	bool TryVirtueNullify(UHomeWorldVirtueComponent* Target);
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory|Virtue")
+	bool TryVirtueSwap(UHomeWorldVirtueComponent* Target);
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory|Virtue")
+	bool TryVirtueGive(UHomeWorldVirtueComponent* Target);
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory|Virtue")
+	bool TryVirtueTake(UHomeWorldVirtueComponent* Target);
+
 private:
 	UPROPERTY()
 	TArray<FHomeWorldInventorySlot> Slots;
+
+	UPROPERTY()
+	TArray<FHomeWorldMarkedHerb> MarkedHerbs;
 
 	int32 LastBossRewardAmount = 0;
 	float LastBossRewardDisplayUntil = 0.f;

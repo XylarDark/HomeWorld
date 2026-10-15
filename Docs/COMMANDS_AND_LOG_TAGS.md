@@ -88,10 +88,7 @@ Flags come from `RegisterConsoleCommand`. `ECVF_Cheat` commands need `~` and are
 | `hw.Planetoid.Complete` | `ECVF_Cheat` | `CmdPlanetoidComplete` | 1622 | Set planetoid-complete flag on GameMode for PIE testing of complete → travel-to-next flow. See PLANETOID_HOMESTEAD.md §5, CONSOLE_COMMANDS.md. |
 | `hw.Planetoid.ZoneAlignment` | `ECVF_Cheat` | `CmdPlanetoidZoneAlignment` | 1627 | Get or set current zone alignment (Corrupted \| Neutral \| Positive). No arg = log current; with arg = set. Fight/harvest/empower read at runtime. See PLANETOID_BIOMES.md §3, CONSOLE_COMMANDS.md. |
 | `hw.Planetoid.ZoneInfo` | `ECVF_Cheat` | `CmdPlanetoidZoneInfo` | 1632 | Log current zone alignment and biome (GameMode). Use in PIE to verify alignment/biome read at runtime. See PLANETOID_BIOMES.md §3, CONSOLE_COMMANDS.md. |
-| `hw.SinVirtue.Pride` | `ECVF_Cheat` | `CmdSinVirtuePride` | 1637 | Log current Pride axis stub value (e.g. 0). Design only; see SIN_VIRTUE_SPECTRUM.md §2, CONSOLE_COMMANDS.md. |
-| `hw.SinVirtue.Greed` | `ECVF_Cheat` | `CmdSinVirtueGreed` | 1642 | Log current Greed axis stub value (e.g. 0). Design only; see SIN_VIRTUE_SPECTRUM.md §2, CONSOLE_COMMANDS.md. |
-| `hw.SinVirtue.Wrath` | `ECVF_Cheat` | `CmdSinVirtueWrath` | 1647 | Log current Wrath axis stub value (e.g. 0). Design only; see SIN_VIRTUE_SPECTRUM.md §2, CONSOLE_COMMANDS.md. |
-| `hw.SinVirtue.Envy` | `ECVF_Cheat` | `CmdSinVirtueEnvy` | 1652 | Log current Envy axis stub value (e.g. 0). Design only; see SIN_VIRTUE_SPECTRUM.md §2, CONSOLE_COMMANDS.md. |
+| `hw.Virtue.Read` | `ECVF_Cheat` | `CmdVirtueRead` | — | Log virtue poles on the named actor, or the actor under the crosshair. Does not grant poles. See Docs/VIRTUE_ATTRIBUTE_BIBLE.md, CONSOLE_COMMANDS.md. |
 | `hw.GoToBed` | `ECVF_Cheat` | `CmdGoToBed` | 1657 | Go to bed: Night + GrantSpiritSleepGate. The bed is the form change. Phase-alone (hw.TimeOfDay.Phase 2) stays body (#9). |
 | `hw.Sleep` | `ECVF_Cheat` | `CmdGoToBed` | 1662 | Alias for hw.GoToBed: set time-of-day to Night (Phase 2). MVP tutorial List 8 step 8. |
 | `hw.Wake` | `ECVF_Cheat` | `CmdWake` | 1667 | Wake: advance time-of-day to Dawn (Phase 3). Only has effect when current phase is Night. Use in PIE for List 56 T3 verification. In-world: interact or overlap bed at night. |
@@ -183,7 +180,7 @@ Four prefixes are produced by a macro rather than written inline. Those are mark
 | `DS-A` | direct | `HomeWorldCraftSubsystem.cpp:279` | cottage revealed, spawn failed, runtime blockout spawned | 1 file |
 | `EJECT_HOME` | direct | `HomeWorldFallbackGlideComponent.cpp:225` | `StartGlideHome` skip/fail/`launch→glider→home`, `reached home` | 1 file |
 | `FALLBACK` | macro + direct | `HomeWorldCharacter.cpp:906` | `TryStartFallbackGlide`, plus the `FALLBACK: Portal ` compound from `LOG_PORTAL_FALLBACK` | 3 files |
-| `FORM` | direct | `HomeWorldCharacter.cpp:587` | day verb rejected (sprint/mantle), form switch, `rune gate`, `sleep gate` | 1 file |
+| `FORM` | direct | `HomeWorldCharacter.cpp:587` | day verb rejected (sprint/mantle), form switch, `sleep gate` | 1 file |
 | `GATHER` | direct | `HomeWorld.cpp:184` | grant, blocked, harvest, treasure, pile/yield-node, inventory full/stack full; pile sub-tags `depleted` and `has no valid site→RES mapping` from `HomeWorldResourcePile.cpp:90` and `:98`; `YieldNode '%s' produced` from `HomeWorldYieldNode.cpp:80` | 5 files |
 | `HEAL` | direct | `HomeWorldCharacter.cpp:1013` | component ready, ability, soft fail/success, night-only guard | 3 files |
 | `HomeWorld:` | direct | `HomeWorld.cpp:39` | the generic prefix. Every `hw.*` command echoes its own name this way, plus subsystem and widget chatter. Cheapest possible smoke grep. | 21 files |
@@ -270,7 +267,7 @@ The other **62** commands have no grep target in their registered help text. Nea
 
 `hw.TimeOfDay.SetPhase` is not one of them — it logs only `HomeWorld:` lines. The `Wake:` and `T0_DEFAULT_SKYBOX_DAY:` strings near it are help text for `hw.Wake` and `hw.Sky.EnsureDefaultDay`, not output from this handler.
 
-The `hw.Craft.*` run commands (`hw.Craft.Campfire`, `.Tent`, `.Torch`, `.TameBait`, `.HealSalve`, `.FishGear`) all delegate to one shared `CmdCraftRun` helper and emit no tag of their own; only `hw.Craft.Status` logs `CRAFT:`. The `hw.SinVirtue.*` commands do name their axis, in the form `HomeWorld: Pride: %g (stub; sin/virtue axis -1..0..+1)`, so grep the axis word rather than `hw.`.
+The `hw.Craft.*` run commands (`hw.Craft.Campfire`, `.Tent`, `.Torch`, `.TameBait`, `.HealSalve`, `.FishGear`) all delegate to one shared `CmdCraftRun` helper and emit no tag of their own; only `hw.Craft.Status` logs `CRAFT:`. `hw.Virtue.Read` logs `HomeWorld: Virtue on <actor>: <poles>`.
 
 ## 5. Input
 
@@ -335,7 +332,7 @@ Two categories that are worth naming but that the section 1 grep does **not** re
 
 ## 7. Relationship to `docs/CONSOLE_COMMANDS.md`
 
-Not a dangling reference. Thirteen registered help strings name `CONSOLE_COMMANDS.md`, and that doc does exist on `main` at `docs/CONSOLE_COMMANDS.md` (373 lines). The referencing commands are `hw.Roles`, `hw.EnterAstral`, `hw.LoveTask.Complete`, `hw.GameWithChild.Complete`, `hw.TutorialEnd`, `hw.Planetoid.Complete`, `hw.Planetoid.ZoneAlignment`, `hw.Planetoid.ZoneInfo`, `hw.SinVirtue.Pride`, `hw.SinVirtue.Greed`, `hw.SinVirtue.Wrath`, `hw.SinVirtue.Envy`, and `hw.Defend.Status`, all in `Source/HomeWorld/HomeWorld.cpp`.
+Not a dangling reference. Ten registered help strings name `CONSOLE_COMMANDS.md`, and that doc does exist on `main` at `docs/CONSOLE_COMMANDS.md`. The referencing commands are `hw.Roles`, `hw.EnterAstral`, `hw.LoveTask.Complete`, `hw.GameWithChild.Complete`, `hw.TutorialEnd`, `hw.Planetoid.Complete`, `hw.Planetoid.ZoneAlignment`, `hw.Planetoid.ZoneInfo`, `hw.Virtue.Read`, and `hw.Defend.Status`, all in `Source/HomeWorld/HomeWorld.cpp`.
 
 The two files do not overlap, which is why both are worth having:
 

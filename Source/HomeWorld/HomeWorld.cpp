@@ -25,7 +25,9 @@
 #include "HomeWorldCraftTypes.h"
 #include "HomeWorldCombatDreamTypes.h"
 #include "HomeWorldSpiritStealthComponent.h"
+#include "HomeWorldVirtueComponent.h"
 #include "AbilitySystemComponent.h"
+#include "EngineUtils.h"
 
 #define LOCTEXT_NAMESPACE "FHomeWorldModule"
 
@@ -1031,32 +1033,46 @@ namespace
 			AlignmentToStr(HWGM->GetCurrentZoneAlignment()), BiomeToStr(HWGM->GetCurrentZoneBiome()));
 	}
 
-	void CmdSinVirtuePride(const TArray<FString>& Args)
+	void CmdVirtueRead(const TArray<FString>& Args)
 	{
-		// Stub: design only per SIN_VIRTUE_SPECTRUM.md; no gameplay implementation yet.
-		constexpr float StubPride = 0.0f;
-		UE_LOG(LogTemp, Log, TEXT("HomeWorld: Pride: %g (stub; sin/virtue axis -1..0..+1). See SIN_VIRTUE_SPECTRUM.md, CONSOLE_COMMANDS.md."), StubPride);
-	}
-
-	void CmdSinVirtueGreed(const TArray<FString>& Args)
-	{
-		// Stub: design only per SIN_VIRTUE_SPECTRUM.md; no gameplay implementation yet.
-		constexpr float StubGreed = 0.0f;
-		UE_LOG(LogTemp, Log, TEXT("HomeWorld: Greed: %g (stub; sin/virtue axis -1..0..+1). See SIN_VIRTUE_SPECTRUM.md, CONSOLE_COMMANDS.md."), StubGreed);
-	}
-
-	void CmdSinVirtueWrath(const TArray<FString>& Args)
-	{
-		// Stub: design only per SIN_VIRTUE_SPECTRUM.md; no gameplay implementation yet.
-		constexpr float StubWrath = 0.0f;
-		UE_LOG(LogTemp, Log, TEXT("HomeWorld: Wrath: %g (stub; sin/virtue axis -1..0..+1). See SIN_VIRTUE_SPECTRUM.md, CONSOLE_COMMANDS.md."), StubWrath);
-	}
-
-	void CmdSinVirtueEnvy(const TArray<FString>& Args)
-	{
-		// Stub: design only per SIN_VIRTUE_SPECTRUM.md; no gameplay implementation yet.
-		constexpr float StubEnvy = 0.0f;
-		UE_LOG(LogTemp, Log, TEXT("HomeWorld: Envy: %g (stub; sin/virtue axis -1..0..+1). See SIN_VIRTUE_SPECTRUM.md, CONSOLE_COMMANDS.md."), StubEnvy);
+		UWorld* World = HomeWorldPlayWorld::Resolve();
+		if (!World)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Virtue.Read requires a play world (PIE or game)."));
+			return;
+		}
+		AActor* Target = nullptr;
+		if (Args.Num() > 0 && !Args[0].IsEmpty())
+		{
+			for (TActorIterator<AActor> It(World); It; ++It)
+			{
+				if (It->GetName().Contains(Args[0]))
+				{
+					Target = *It;
+					break;
+				}
+			}
+		}
+		else if (APlayerController* PC = World->GetFirstPlayerController())
+		{
+			FVector Start;
+			FRotator View;
+			PC->GetPlayerViewPoint(Start, View);
+			FHitResult Hit;
+			FCollisionQueryParams Params(NAME_None, false, PC->GetPawn());
+			if (World->LineTraceSingleByChannel(Hit, Start, Start + View.Vector() * 5000.f, ECC_Visibility, Params))
+			{
+				Target = Hit.GetActor();
+			}
+		}
+		if (!Target)
+		{
+			UE_LOG(LogTemp, Log, TEXT("HomeWorld: Virtue: (no actor). See Docs/VIRTUE_ATTRIBUTE_BIBLE.md, CONSOLE_COMMANDS.md."));
+			return;
+		}
+		const UHomeWorldVirtueComponent* Virtue = Target->FindComponentByClass<UHomeWorldVirtueComponent>();
+		const FString Poles = Virtue ? HomeWorldVirtue::FormatPoles(Virtue->GetPoles()) : FString(TEXT("(none)"));
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: Virtue on %s: %s"), *Target->GetName(), *Poles);
 	}
 
 	void CmdGoToBed(const TArray<FString>& Args)
@@ -1615,24 +1631,9 @@ void FHomeWorldModule::StartupModule()
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdPlanetoidZoneInfo),
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
-		TEXT("hw.SinVirtue.Pride"),
-		TEXT("Log current Pride axis stub value (e.g. 0). Design only; see SIN_VIRTUE_SPECTRUM.md §2, CONSOLE_COMMANDS.md."),
-		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdSinVirtuePride),
-		ECVF_Cheat);
-	IConsoleManager::Get().RegisterConsoleCommand(
-		TEXT("hw.SinVirtue.Greed"),
-		TEXT("Log current Greed axis stub value (e.g. 0). Design only; see SIN_VIRTUE_SPECTRUM.md §2, CONSOLE_COMMANDS.md."),
-		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdSinVirtueGreed),
-		ECVF_Cheat);
-	IConsoleManager::Get().RegisterConsoleCommand(
-		TEXT("hw.SinVirtue.Wrath"),
-		TEXT("Log current Wrath axis stub value (e.g. 0). Design only; see SIN_VIRTUE_SPECTRUM.md §2, CONSOLE_COMMANDS.md."),
-		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdSinVirtueWrath),
-		ECVF_Cheat);
-	IConsoleManager::Get().RegisterConsoleCommand(
-		TEXT("hw.SinVirtue.Envy"),
-		TEXT("Log current Envy axis stub value (e.g. 0). Design only; see SIN_VIRTUE_SPECTRUM.md §2, CONSOLE_COMMANDS.md."),
-		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdSinVirtueEnvy),
+		TEXT("hw.Virtue.Read"),
+		TEXT("Log virtue poles on the named actor, or the actor under the crosshair. Does not grant poles. See Docs/VIRTUE_ATTRIBUTE_BIBLE.md, CONSOLE_COMMANDS.md."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdVirtueRead),
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.GoToBed"),

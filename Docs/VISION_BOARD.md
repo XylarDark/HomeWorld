@@ -5,6 +5,7 @@
 | **Status** | Product canon, updated 2026-10-12 |
 | **Theme and long-horizon campaign** | [`VisionBoard/Core/VISION.md`](../VisionBoard/Core/VISION.md) |
 | **Gameplay slice** | [`Docs/01_GDD_MVP.md`](01_GDD_MVP.md) |
+| **Virtue attributes** | [`Docs/VIRTUE_ATTRIBUTE_BIBLE.md`](VIRTUE_ATTRIBUTE_BIBLE.md). Pair names stay in [`VisionBoard/Core/VISION.md`](../VisionBoard/Core/VISION.md). |
 
 ---
 

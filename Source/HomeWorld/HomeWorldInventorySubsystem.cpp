@@ -1,6 +1,8 @@
 // Copyright HomeWorld. All Rights Reserved.
 
 #include "HomeWorldInventorySubsystem.h"
+#include "HomeWorldVirtueComponent.h"
+#include "HomeWorldVirtueTypes.h"
 
 void UHomeWorldInventorySubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -212,4 +214,79 @@ bool UHomeWorldInventorySubsystem::GetLastBossRewardForHUD(int32& OutAmount, flo
 	OutAmount = LastBossRewardAmount;
 	OutDisplayUntil = LastBossRewardDisplayUntil;
 	return LastBossRewardAmount > 0 && LastBossRewardDisplayUntil > 0.f;
+}
+
+bool UHomeWorldInventorySubsystem::AddMarkedHerb(const TArray<EHomeWorldVirtuePole>& Poles)
+{
+	if (Poles.Num() == 0)
+	{
+		return false;
+	}
+	FString Error;
+	TArray<EHomeWorldVirtuePole> Checked;
+	if (!HomeWorldVirtue::TrySetHandPoles(Checked, Poles, Error))
+	{
+		return false;
+	}
+	FHomeWorldMarkedHerb Herb;
+	Herb.Poles = Checked;
+	MarkedHerbs.Add(Herb);
+	return true;
+}
+
+namespace
+{
+	const FHomeWorldMarkedHerb* FirstMarkedHerb(const TArray<FHomeWorldMarkedHerb>& Herbs)
+	{
+		return Herbs.Num() > 0 ? &Herbs[0] : nullptr;
+	}
+
+	EHomeWorldVirtuePole FirstPole(const FHomeWorldMarkedHerb& Herb)
+	{
+		return Herb.Poles.Num() > 0 ? Herb.Poles[0] : EHomeWorldVirtuePole::Greed;
+	}
+}
+
+bool UHomeWorldInventorySubsystem::TryVirtueNullify(UHomeWorldVirtueComponent* Target)
+{
+	if (!Target || MarkedHerbs.Num() == 0 || Target->GetPoles().Num() == 0)
+	{
+		return false;
+	}
+	Target->ClearPoles();
+	MarkedHerbs.RemoveAt(0);
+	return true;
+}
+
+bool UHomeWorldInventorySubsystem::TryVirtueSwap(UHomeWorldVirtueComponent* Target)
+{
+	const FHomeWorldMarkedHerb* Herb = FirstMarkedHerb(MarkedHerbs);
+	if (!Target || !Herb || !Target->TrySwapAxis(FirstPole(*Herb)))
+	{
+		return false;
+	}
+	MarkedHerbs.RemoveAt(0);
+	return true;
+}
+
+bool UHomeWorldInventorySubsystem::TryVirtueGive(UHomeWorldVirtueComponent* Target)
+{
+	const FHomeWorldMarkedHerb* Herb = FirstMarkedHerb(MarkedHerbs);
+	if (!Target || !Herb || !Target->TryGivePole(FirstPole(*Herb)))
+	{
+		return false;
+	}
+	MarkedHerbs.RemoveAt(0);
+	return true;
+}
+
+bool UHomeWorldInventorySubsystem::TryVirtueTake(UHomeWorldVirtueComponent* Target)
+{
+	const FHomeWorldMarkedHerb* Herb = FirstMarkedHerb(MarkedHerbs);
+	if (!Target || !Herb || !Target->TryTakePole(FirstPole(*Herb)))
+	{
+		return false;
+	}
+	MarkedHerbs.RemoveAt(0);
+	return true;
 }
