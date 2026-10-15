@@ -62,11 +62,11 @@ Partner and child stay home. The lair is the player, the three guards, and the g
 
 ## Attribute layer
 
-Each of the seven pairs has an interaction in this lair. The interactions are not named. One paradox item, gathered from travels in the field and the forests, is required. What it does is not named. The coils, the tickle, the ram, the heals, and the eye stay. Rules: `Docs/VIRTUE_ATTRIBUTE_BIBLE.md`. 2026-10-15.
+Each of the seven pairs has an interaction in this lair. Some pairs use the coils, the tickle, the ram, the heals, and the eye. The pairs that do not fit those beats get a new station. Which pair uses which beat is not named. Interview round 11, 2026-10-15. One paradox item, gathered from travels in the field and the forests, is required. It is the key that lets the lair's last station happen. Interview round 12, 2026-10-15.
 
 ## Zone barriers
 
-Not lair verbs. Until the camp is complete, fog and a tree keep the second forest closed. The tree is a local bounce to the forest edge. After the camp, that forest opens. Its mechanic is named in the virtue bible as not yet named.
+Not lair verbs. Until the camp is complete, fog and a tree keep the second forest closed. The tree is a local bounce to the forest edge. After the camp, that forest opens. Its mechanic is the give in `Docs/VIRTUE_ATTRIBUTE_BIBLE.md`.
 
 The river after that forest is crossed on stones. A miss is the fish: a local bounce to the bank. After the second forest is complete, spirit form can cross. The far bank is marsh. Mountains end exploration. These are places. This lock does not layout them. Local eject only. Not a trip home.
 
