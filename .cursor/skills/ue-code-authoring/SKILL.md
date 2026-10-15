@@ -13,7 +13,7 @@ Rider is reached through a single MCP tool — `execute_tool(command="<tool> --f
 
 ## This project's Rider build (HomeWorld) — read before Invoke Rider
 
-Verified 2026-10-15 against Rider 2026.2.1 headless on the default whitelist (32 tools). Canonical write-up: `docs/tools/Rider_MCP_for_UE_Games.md`. Every call needs `rootFolder=C:/dev/HomeWorld`.
+Verified 2026-10-15 against Rider 2026.2.1 headless. The default whitelist is 17 tools (`docs/tools/Rider_MCP_for_UE_Games.md`). Every call needs `rootFolder=C:/dev/HomeWorld`.
 
 The generic sections below describe a normal Rider install. On this project the following are **not exposed**, and no argument makes them appear:
 
@@ -28,7 +28,7 @@ These are exposed and do not do the C++ job the generic text describes:
 - `find_usages` and `find_implementations` are absent from the entire 86-tool surface.
 - `move_type_to_namespace`, `extract_interface`, `extract_base_class`, and `change_api_signature` answered "not found" for `AHomeWorldCharacter` / `BeginPlay`.
 - `extract_method` rejected a statement block inside `BeginPlay`. Do not use it on C++ here.
-- `findTests` did not return within 90 s. It does not see UE automation tests.
+- `findTests` did not return within 90 s and is not on the whitelist. It does not see UE automation tests.
 - `get_asset_properties` returned `{"properties":[]}` with the editor down, including an absolute `.uasset` path.
 - `ue_health` / `ue_status` / `ue_get_logs` answer disconnected / empty unless the editor is running with RiderLink.
 - `post_edit_quality_check` returned an empty body after ~20 s. Use `get_file_problems`.

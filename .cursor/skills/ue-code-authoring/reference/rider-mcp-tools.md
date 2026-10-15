@@ -14,7 +14,7 @@ Rider disables the generic platform `search_symbol`, `lint_files`, `get_file_pro
 
 ## This project's Rider build (HomeWorld)
 
-The contracts below are the generic Rider surface. On HomeWorld's default whitelist (32 tools, 2026-10-15) several of them are absent or do not resolve C++, and calling them burns a round trip:
+The contracts below are the generic Rider surface. On HomeWorld's default whitelist (17 tools, 2026-10-15) several of them are absent or do not resolve C++, and calling them burns a round trip:
 
 - Absent, and not registerable by naming them: `rename_refactoring`, `read_file`, `reformat_file`, `build_solution_start`, `build_solution_state`, `xdebug_*`, `ue_play`, `ue_execute_python`. Compile is `.\Tools\Safe-Build.ps1`. Editor Python is UnrealMCP on port 55557.
 - `analyze_calls` and `get_symbol_info` return nothing for C++. Callers are `rg`.

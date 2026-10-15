@@ -9,6 +9,10 @@ metadata:
 
 Write Unreal Engine automated tests in the project's own style. Author the test with your own file tools, audit it against the behavior the user actually asked to be covered, and use Rider for what an IDE knows and grep does not: the resolved API under test, registration and include diagnostics, solution code style, and builds.
 
+## This project's Rider build (HomeWorld)
+
+`findTests` is not on the default whitelist. A call against `AHomeWorldCharacter` returned an empty body at 90 s and dropped the HTTP session, and it cannot see UE automation tests. Do not call it. `get_symbol_info` returns empty documentation for C++. `reformat_file` and `build_solution_*` are not exposed. Diagnostics are `get_file_problems` on the test file you changed. The build is `.\Tools\Safe-Build.ps1`. Every Rider call needs `rootFolder=C:/dev/HomeWorld`.
+
 ## Gate
 
 1. Confirm the workspace is a UE project: `Glob` for `*.uproject` at the root. If there is none, stop and say the task must run from the UE project root.

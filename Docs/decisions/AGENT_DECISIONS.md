@@ -1136,3 +1136,12 @@ The number is not the cost of that skill as it was first written. Two identical 
 - **Reverses if:** the Lead rules the campsite grants spirit too (then the bible stands and the board needs an amend), or the Lead re-stamps the fourteen-MUST list with the rune removed.
 - **Supersedes:** none.
 
+## DEC-0050 - The Rider whitelist keeps the tools that answer and drops the ones that stall (2026-10-15)
+
+- **Area:** harness refactor
+- **Decision:** `Tools\Start-RiderMcp.ps1` exposes 16 named tools plus `execute_tool`. `findTests`, `post_edit_quality_check`, `analyze_calls`, `get_symbol_info`, the six C++-blind refactors, the three inspection-script tools, `find_default_value_overrides`, and `get_asset_properties` are no longer in the default list. The startup poll waits 400 ms on a connect and 800 ms between tries, and the 180 s cap is wall-clock.
+- **Rationale:** The OpenCode launcher commits (`078d44ef`, `42023b3c`, `ef375574`) put every semantic name on the whitelist, including tools this C++ build does not answer. Leaving them on costs a schema on every turn, and two of them stall the MCP session (`findTests` at 90 s, `post_edit_quality_check` at 20 s). The alternative — keep them because a whitelist can name them — was rejected: a tool that returns nothing or hangs is slower than not registering it. `-AllowedTools '*'` stays off the daily server (the same day's decision). The poll bug was separate: `ConnectAsync` on a closed port does not complete, so `Wait(2000)` plus `Start-Sleep -Seconds 2` made the advertised 180 s budget about 360 s.
+- **Evidence:** `findTests` empty at the 90 s curl limit; `post_edit_quality_check` empty at 20.5 s; `analyze_calls` / `get_symbol_info` / the six refactors / the two asset reads as recorded in `docs/tools/Rider_MCP_for_UE_Games.md`. A connect to `127.0.0.1:1` with `Wait(2000)` returned at 2051 ms with the task still incomplete.
+- **Reverses if:** a later Rider build resolves those tools on HomeWorld C++ in under a second, or the Lead asks for one of them back by name.
+- **Supersedes:** none.
+

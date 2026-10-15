@@ -34,8 +34,8 @@
 #                  semantic set; '*' disables the whitelist and exposes everything.
 #   -InvocationMode: 'direct' (default) exposes each allowed tool as its own MCP tool with a
 #                  live input schema, which is what the vendored Rider skills call by name.
-#                  'via-router' hides them behind execute_tool. Both modes expose the same 32
-#                  tools (verified), and execute_tool is present in direct mode as well, so
+#                  'via-router' hides them behind execute_tool. Both modes expose the whitelist
+#                  plus execute_tool, and execute_tool is present in direct mode as well, so
 #                  either call style works without changing this default.
 #   -Project:      File to open. Defaults to HomeWorld.uproject - the source of truth, and the
 #                  model that works with no extra step. A .sln also works, but only after an
@@ -124,25 +124,36 @@ if (-not $AllowedTools) {
     # not a technical one, so the default stays the safe whitelist and knowingly gives up C++
     # rename and the live debugger. Rationale and the full evidence:
     # docs/tools/Rider_MCP_for_UE_Games.md.
+    # Dropped after timing them on HomeWorld C++ (2026-10-15). Each one is still in the 86-tool
+    # surface; none of them earns a schema on every turn, and two of them stall the server:
+    #   findTests                  empty body at 90s, then the HTTP session is gone. C# tests only.
+    #   post_edit_quality_check    empty body at 20s, then the session is gone.
+    #   analyze_calls              "No callable symbol found" for AHomeWorldCharacter::BeginPlay.
+    #   get_symbol_info            {"documentation":""}.
+    #   extract_method, extract_interface, extract_base_class, change_api_signature,
+    #   move_type_to_namespace, reorganize_namespaces
+    #                              "not found" or a rejected line range on this C++.
+    #   run_inspection_kts, generate_inspection_kts_examples, generate_inspection_kts_api
+    #                              inspection authoring, not a query.
+    #   find_default_value_overrides, get_asset_properties
+    #                              {"overrides":[]} / {"properties":[]} with the editor down.
     $AllowedTools = (@(
         # search
         "search_symbol", "search_file", "search_text", "search_regex"
-        # semantic analysis and navigation
-        "get_symbol_info", "analyze_calls", "get_class_hierarchy", "find_default_value_overrides", "findTests"
+        # navigation that returns HomeWorld results
+        "get_class_hierarchy"
         # project model
         "get_solution_projects", "get_project_dependencies"
-        # diagnostics (incl. UHT / C++ problems)
+        # diagnostics (incl. UHT / C++ problems). lint_files is real and slow (~14s per header).
         "get_file_problems", "get_project_problems", "lint_files"
-        # refactoring (rename_refactoring cannot be named in any whitelist; see the note above)
-        "safe_delete", "extract_method", "extract_interface", "extract_base_class",
-        "change_api_signature", "move_type_to_namespace", "reorganize_namespaces", "post_edit_quality_check"
-        # inspections
-        "run_inspection_kts", "generate_inspection_kts_examples", "generate_inspection_kts_api"
-        # UE asset / status reads
-        "ue_health", "ue_status", "ue_get_logs", "get_asset_properties", "search_assets", "search_tags"
+        # refactoring. safe_delete --preview true lists C++ references. rename_refactoring
+        # cannot be named in any whitelist; see the note above.
+        "safe_delete"
+        # UE asset / status reads. Empty and immediate when no editor has RiderLink.
+        "ue_health", "ue_status", "ue_get_logs", "search_assets", "search_tags"
         # intentionally not listed: rename_refactoring and the sixteen xdebug_* debugger tools
-        # (GUI-only), plus ue_play / execute_run_configuration / ue_execute_python (use
-        # UnrealMCP on port 55557 for editor and PIE work, and Safe-Build.ps1 for the build).
+        # (reachable only with -AllowedTools '*'), plus ue_play / execute_run_configuration /
+        # ue_execute_python (UnrealMCP on port 55557, and Safe-Build.ps1 for the build).
     ) -join ",")
 }
 
@@ -244,10 +255,15 @@ function Test-UnrealEnginePrerequisite {
 }
 
 function Test-McpPort {
+    param([int]$TimeoutMs = 400)
+    # A closed local port does not complete ConnectAsync: Wait burns the whole timeout
+    # (measured 2051 ms for a 2000 ms wait). The poll loop used to sleep 2s and then wait
+    # another 2s, so the "180s" budget was about 360s. An open port returns in milliseconds
+    # either way, so the short timeout only changes the down case.
     $client = New-Object System.Net.Sockets.TCPClient
     try {
         $connect = $client.ConnectAsync("127.0.0.1", $Port)
-        if (-not $connect.Wait(2000)) { return $false }
+        if (-not $connect.Wait($TimeoutMs)) { return $false }
         return $client.Connected
     } catch {
         return $false
@@ -387,12 +403,14 @@ if (-not (Test-McpPort)) {
 
     # Rider opens the port only after the project is loaded and indexes reach smart mode,
     # which took ~35-60s on a cold cache here. Poll the socket rather than trusting Start-Process.
-    for ($i = 0; $i -lt 90; $i++) {
-        Start-Sleep -Seconds 2
-        if (Test-McpPort) { break }
+    # 400 ms connect + 800 ms sleep, capped at 180 s of wall clock.
+    $deadline = [Diagnostics.Stopwatch]::StartNew()
+    while ($deadline.Elapsed.TotalSeconds -lt 180) {
+        if (Test-McpPort -TimeoutMs 400) { break }
+        Start-Sleep -Milliseconds 800
     }
 
-    if (-not (Test-McpPort)) {
+    if (-not (Test-McpPort -TimeoutMs 400)) {
         Write-Error "Rider MCP did not become reachable on 127.0.0.1:$Port within 180s. Check idea.log in $IdeaLogDir."
         exit 1
     }
