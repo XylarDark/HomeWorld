@@ -12,6 +12,20 @@ The result carries the exact namespaced name and its schema; reuse that prefix f
 
 Rider disables the generic platform `search_symbol`, `lint_files`, `get_file_problems`, `build_project`, and `reformat_file` and replaces them with Rider-specific implementations, so the contracts here are the Rider ones.
 
+## This project's Rider build (HomeWorld)
+
+The contracts below are the generic Rider surface. On HomeWorld's default whitelist (32 tools, 2026-10-15) several of them are absent or do not resolve C++, and calling them burns a round trip:
+
+- Absent, and not registerable by naming them: `rename_refactoring`, `read_file`, `reformat_file`, `build_solution_start`, `build_solution_state`, `xdebug_*`, `ue_play`, `ue_execute_python`. Compile is `.\Tools\Safe-Build.ps1`. Editor Python is UnrealMCP on port 55557.
+- `analyze_calls` and `get_symbol_info` return nothing for C++. Callers are `rg`.
+- `find_usages` and `find_implementations` do not exist in this build at all.
+- `change_api_signature`, `move_type_to_namespace`, `extract_interface`, `extract_base_class` answered "not found" for `AHomeWorldCharacter` / `BeginPlay`. `extract_method` rejected a range inside `BeginPlay`.
+- `safe_delete --preview true` does list C++ references and writes nothing when preview is set. Never omit preview.
+- `get_asset_properties` returned `{"properties":[]}` with the editor down. `findTests` did not return within 90 s.
+- Every call needs `rootFolder=C:/dev/HomeWorld`.
+
+Detail and the token-efficiency notes: `docs/tools/Rider_MCP_for_UE_Games.md`.
+
 ---
 
 ## Argument rules

@@ -39,10 +39,20 @@ router's own `Tool 'x' not found. Available tools: ...` reply):
   value - *including one that names it* - it never registers, at any point after startup. Where it
   is exposed it works on C++: a preview rename of `AHomeWorldCharacter` resolved 37 files and 327
   call sites. See `Tools/Start-RiderMcp.ps1` for the mode and its trade-off.
-- The other seven refactorings **are** exposed: `change_api_signature`, `move_type_to_namespace`,
-  `reorganize_namespaces`, `safe_delete`, `extract_interface`, `extract_base_class`,
-  `extract_method`. Exposed is not the same as working: none of them has been exercised on this
-  project's C++ yet, so read the first reply before trusting it. `extract_method` is C#-only.
+- The other seven refactorings **are** exposed. Exercised on HomeWorld C++ on 2026-10-15, all with
+  `--preview true` except where noted:
+  - `safe_delete` **does** resolve C++. `--preview true` on `bCloudDescentActive` returned
+    `applied: false`, `deleted: []`, and 7 `conflicts` naming the `.h` and `.cpp`. Use that preview
+    when you need the files that reference a member. **Never omit `--preview true`** — without it
+    the tool deletes.
+  - `change_api_signature`, `move_type_to_namespace`, `extract_interface`, and `extract_base_class`
+    answered "not found" for `AHomeWorldCharacter` / `BeginPlay`. They are not C++ refactors here.
+    Do not retry them on C++.
+  - `extract_method` accepted `HomeWorldCharacter.cpp` and then rejected a real statement block
+    inside `BeginPlay` (lines 228–233): "The line range does not cover a complete sequence of
+    statements inside one member." Do not use it to extract C++.
+  - `reorganize_namespaces` rejected a file path ("expected a project name or a folder path").
+    Not a file-scoped C++ edit.
 - `execute_tool` is exposed in the default (`direct`) mode as well, so the call style above works,
   and calling a tool by name reaches the same surface.
 - Every call needs `rootFolder=C:/dev/HomeWorld`, or the server answers *"Unable to determine the
@@ -58,7 +68,7 @@ Canonical reference for this build: `docs/tools/Rider_MCP_for_UE_Games.md`.
 
 ## Rules
 
-1. **Use the tool; never hand-edit or fall back before a real call has run.** `Missing required parameters: …` (add them from the table), `Tool '<x>' not found` (wrong name — copy from the table), and conflict/ambiguous responses are all **fixable input mistakes** — correct the argument and retry. Fall back to a text edit only if `execute_tool` isn't in your toolset, or a call actually ran and failed in a way no input change can fix. **In this project there is exactly one such case: `rename_refactoring` is not exposed at all by the default whitelist** — no argument change reaches it. Either hand-edit (`search_symbol` + `search_text` for the call sites), or ask the user whether to restart the server as `Tools\Start-RiderMcp.ps1 -AllowedTools '*'`, which exposes it (and also exposes shell/file-write tools, so it is the user's call).
+1. **Use the tool; never hand-edit or fall back before a real call has run.** `Missing required parameters: …` (add them from the table), `Tool '<x>' not found` (wrong name — copy from the table), and conflict/ambiguous responses are all **fixable input mistakes** — correct the argument and retry. Fall back to a text edit only if `execute_tool` isn't in your toolset, or a call actually ran and failed in a way no input change can fix. **In this project, do not retry these:** `rename_refactoring` is not exposed by the default whitelist — no argument change reaches it. Hand-edit (`search_symbol` + `search_text` for the call sites), use `safe_delete --preview true` when you only need the files that reference a C++ member, or ask the user whether to restart as `Tools\Start-RiderMcp.ps1 -AllowedTools '*'`, which exposes rename (and also shell and file-write tools, so it is the user's call). `change_api_signature`, `move_type_to_namespace`, `extract_interface`, `extract_base_class`, and `extract_method` are exposed and still fail on this C++ (type or method not found, or the line range rejected). Retrying them is not a fix.
 2. **Trust the success signal — never verify, never build.** On success the response's `touched`/`affects`/`files` counts **are** the confirmation. Do **not** re-read files, re-run `grep`/`rg`, diff the tree, or run the build/tests "to catch fallout" — a build never changes an already-applied refactor, it only burns tokens. Build or test **only** if the user explicitly asked. The one thing worth surfacing: a count of **1** for a type/method/property/field/namespace (declaration only, no callers).
 3. **Don't retry blindly** — change an argument between calls. Flags are camelCase; pass real values or omit optional ones (no `""`/`"/"`/fake-path placeholders), and copy paths and names verbatim from `search_*`. (`get_symbol_info` returns empty documentation for C++ here, so it is not a source of names.)
 4. **Library / external symbols can't be refactored** — surface to the user; the change must be made upstream.

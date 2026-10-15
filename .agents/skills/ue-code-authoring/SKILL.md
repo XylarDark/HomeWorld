@@ -1,6 +1,6 @@
 ---
 name: ue-code-authoring
-description: Use when writing or modifying Unreal Engine C++ — classes, actors, components, subsystems, interfaces, ability-system (GAS) code, module dependencies, reflected UPROPERTY/UFUNCTION API, native gameplay tags, and testable gameplay behavior — in a project open in JetBrains Rider. Source changes go through Read/Grep/Glob/Edit/Write; Rider supplies symbol search, code analysis, formatting, and builds through its MCP execute_tool. Do not use for Blueprint-only tasks or editor automation with no C++ authoring.
+description: Use when writing or modifying Unreal Engine C++ — classes, actors, components, subsystems, interfaces, ability-system (GAS) code, module dependencies, reflected UPROPERTY/UFUNCTION API, native gameplay tags, and testable gameplay behavior — in a project open in JetBrains Rider. Source changes go through Read/Grep/Glob/Edit/Write; Rider supplies symbol search and UHT diagnostics. On HomeWorld read the section "This project's Rider build" before calling a tool — formatting, Rider builds, and rename are not on the default whitelist. Do not use for Blueprint-only tasks or editor automation with no C++ authoring.
 metadata:
   author: JetBrains
 ---
@@ -10,6 +10,36 @@ metadata:
 Implement Unreal Engine C++ changes in the project's own style. Write the code with your own file tools, audit the result against what the user actually asked for, and use Rider only for what an IDE knows and grep does not: resolved symbols, reflection/UHT diagnostics, solution code style, and builds.
 
 Rider is reached through a single MCP tool — `execute_tool(command="<tool> --flag value ...")`.
+
+## This project's Rider build (HomeWorld) — read before Invoke Rider
+
+Verified 2026-10-15 against Rider 2026.2.1 headless on the default whitelist (32 tools). Canonical write-up: `docs/tools/Rider_MCP_for_UE_Games.md`. Every call needs `rootFolder=C:/dev/HomeWorld`.
+
+The generic sections below describe a normal Rider install. On this project the following are **not exposed**, and no argument makes them appear:
+
+- `rename_refactoring`, all sixteen `xdebug_*`, `read_file`, `reformat_file`, `build_solution_start`, `build_solution_state`, `execute_run_configuration`, `ue_play`, `ue_execute_python`.
+- Compile with `.\Tools\Safe-Build.ps1`. Editor Python and PIE stay on UnrealMCP port 55557.
+- `rename_refactoring` works on C++ only if the server was started with `-AllowedTools '*'`, which also exposes shell and file-write tools. That restart is the user's decision.
+
+These are exposed and do not do the C++ job the generic text describes:
+
+- `analyze_calls` resolves nothing in C++ (`No callable symbol found` for `AHomeWorldCharacter::BeginPlay`). Callers are `rg`.
+- `get_symbol_info` returns `{"documentation":""}`.
+- `find_usages` and `find_implementations` are absent from the entire 86-tool surface.
+- `move_type_to_namespace`, `extract_interface`, `extract_base_class`, and `change_api_signature` answered "not found" for `AHomeWorldCharacter` / `BeginPlay`.
+- `extract_method` rejected a statement block inside `BeginPlay`. Do not use it on C++ here.
+- `findTests` did not return within 90 s. It does not see UE automation tests.
+- `get_asset_properties` returned `{"properties":[]}` with the editor down, including an absolute `.uasset` path.
+- `ue_health` / `ue_status` / `ue_get_logs` answer disconnected / empty unless the editor is running with RiderLink.
+- `post_edit_quality_check` returned an empty body after ~20 s. Use `get_file_problems`.
+- `safe_delete --preview true` **does** list C++ references (`bCloudDescentActive` → 7 conflicts, `applied: false`). Never omit `--preview true`.
+
+Use these. They replace reading whole files:
+
+- `search_symbol`, with `include_external: true` for engine types. Then read a short window, not the header.
+- `get_file_problems` on the file you changed. `lint_files` costs ~14 s and kilobytes of weak warnings for one header — skip it for a small edit.
+- `get_class_hierarchy` / `search_assets --baseClass` for Blueprint children.
+- `rg` for project text and for callers. A failed `analyze_calls` costs more than the grep.
 
 ## Gate
 
@@ -92,8 +122,8 @@ Write for that environment — it is also what makes the feature testable at all
 | Read a file, or a range of it | `Read` (with `offset`/`limit`) |
 | Create or change source | `Write` / `Edit` |
 | Resolve a symbol the IDE index knows (engine headers, generated/reflected code, external modules) | Rider `search_symbol` |
-| Code analysis, solution formatting, build | Rider `get_file_problems`, `lint_files`, `reformat_file`, `build_solution_*` |
-| Refactor existing code (rename, move, change signature, safe delete, extract) | Rider refactoring tools |
+| Code analysis on a file you changed | Rider `get_file_problems`. On HomeWorld, `reformat_file` and `build_solution_*` are not exposed; the build is `.\Tools\Safe-Build.ps1` |
+| Refactor existing code | Hand-edit. `safe_delete --preview true` lists referencing files. Rename and the other semantic refactors do not run on this C++ under the default whitelist |
 
 Do not shell out through `Bash` for `rg`, `find`, `sed`, `cat`, `head`, or `tail` — the dedicated tools are cheaper and give clickable results. Keep `Bash` for git and for toolchain commands the task genuinely requires.
 
@@ -120,12 +150,11 @@ ToolSearch(query="+execute_tool", max_results=5)
 | IDE text search when generated/reflected code or compact results matter | `search_text --q <text>` |
 | Check one changed file | `get_file_problems --filePath <path>` |
 | Check several changed files | `lint_files --files '["Source/Module/Foo.h","Source/Module/Foo.cpp"]'` |
-| Rename, move, or re-sign an existing symbol | `rename_refactoring`, `move_type_to_namespace`, `change_api_signature` — `--preview true` first for public API |
-| Reformat changed files | `reformat_file --files '["Source/Module/Foo.h","Source/Module/Foo.cpp"]'` |
-| Build through Rider | `build_solution_start`, then poll `build_solution_state` on a ~60s cadence until `state` is not `Running` |
-| Build only the changed files | `build_solution_start --filesToRebuild '["Source/Module/Foo.cpp"]'`, then poll |
+| Rename, move, or re-sign an existing symbol | Not on this project. `rename_refactoring` is whitelist-off only. `move_type_to_namespace` and `change_api_signature` do not resolve HomeWorld C++. Hand-edit, or `safe_delete --preview true` to list referencing files. |
+| Reformat changed files | `reformat_file` is not exposed. Leave formatting to the editor save. |
+| Build | `.\Tools\Safe-Build.ps1`. `build_solution_start` is not exposed. |
 | Project-wide problems after a successful build | `get_project_problems` |
-| Read a file the shell cannot reach (engine, SDK, external module) | `read_file --file_path <path> --offset <line> --limit <n>` |
+| Read engine or SDK source | `search_symbol --include_external true`, then `Read` a short window of that path. `read_file` is not exposed. |
 
 Command syntax:
 
@@ -157,7 +186,7 @@ Independent `execute_tool` calls belong in one message — issue `get_file_probl
 
 After `Edit`/`Write` there is nothing to save: Rider refreshes each file from disk before it analyzes, formats, or refactors it. Two consequences worth remembering — `reformat_file` rewrites files on disk, so run it last and `Read` a file again before editing it further; and if this project installs Rider's PostToolUse quality-check hook, the hook output you already got after an edit *is* the analysis (it blocks on errors, reports warnings, and skips reformatting for C/C++ while still inspecting it) — fix what it reports instead of re-running the same check.
 
-Use the full quality path only when a local IDE build is the requested or necessary validation. If the build is owned elsewhere, stop after the source audit plus changed-file diagnostics.
+On HomeWorld the build is owned by `.\Tools\Safe-Build.ps1` and `reformat_file` is not exposed, so stop after the source audit plus changed-file diagnostics. The numbered path below is the generic Rider install; do not start it here.
 
 1. `get_file_problems` / `lint_files` on changed files → fix errors and relevant warnings.
 2. Start a build only once changed-file diagnostics are clean of *real* errors. Do not start or keep polling a build while real errors remain in changed files. On UE sources the C++ resolver reports macro-expansion false positives at `ERROR` severity (attribute-accessor macros, `check(...)` / `PLATFORM_BREAK`, generated-header symbols). Separate them with **one** comparison: run the same check on a single untouched neighbour file of the same kind. Identical diagnostic there → resolver noise for the whole project; note the signature once and ignore it for the rest of the session. Do not confirm it against a third and fourth file, and never edit working code to silence it. Anything that does *not* reproduce on an untouched file is yours to fix.

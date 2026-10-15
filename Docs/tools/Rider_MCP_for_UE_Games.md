@@ -13,7 +13,7 @@ Enable Rider MCP, but use it selectively rather than routing every operation thr
 
 ## Where Rider MCP helps (Unreal C++)
 - Semantic symbol search (declarations vs text matches)
-- Find usages / call hierarchy (traces dependencies) — **not for C++ in this build**: `find_usages` and `find_implementations` are absent, and `analyze_calls` resolves nothing. Use `rg`, or `rename_refactoring --preview` where a rename is admissible.
+- Find usages / call hierarchy (traces dependencies) — **not for C++ in this build**: `find_usages` and `find_implementations` are absent, and `analyze_calls` resolves nothing. Use `rg` for callers. For the files that reference a C++ member, `safe_delete --preview true` is on the default whitelist and writes nothing when preview is set. `rename_refactoring --preview` is the richer report and only exists with the whitelist disabled.
 - Code inspections (C++ and Unreal-aware warnings)
 - UHT diagnostics (reflection/metadata issues)
 - Refactoring (safer symbol-aware changes)
@@ -119,12 +119,18 @@ As verified on 2026-10-15, after the two prerequisites above: `search_symbol`, `
 |---|---|
 | `lint_files` | Real analysis, several files per call: one header -> 3.4 KB of warnings (`WEAK WARNING` items). **Slow: ~14 s for a single header**, so batch deliberately and expect a long call. |
 | `search_assets` | UE asset search. `{ baseClass: "AHomeWorldCharacter" }` -> `BP_HomeWorldCharacter.uasset` with its `assetPath`. `{ query: "BP_" }` -> `{"assets":[]}`, so `query` is not an asset-name substring search; prefer `baseClass` or `packagePath`. |
-| `search_tags` | `{ prefix, limit?, rootFolder }` -> GameplayTag definitions. `{ prefix: "Ability" }` -> `{"tags":[]}` here (the tags declared in `HomeWorldGameplayTags` are not exposed to it). |
-| `get_asset_properties` | `{ assetPath, rootFolder }` -> reads UPROPERTY values / the CDO of a `.uasset` without opening the editor. Not yet exercised: it needs a real `Content/**` path. |
-| `ue_status` | **`{"connected":false}`** — a one-stop editor + PIE + log read, but the bridge only answers when a UE editor with RiderLink is running. `ue_health` returns the same, and `ue_get_logs` then reads nothing. |
-| `findTests` | `{ className?, classNamespace?, filePath?, ... }` — C#/NUnit test discovery. It cannot see UE automation tests, so it is dead weight on this project. |
-| `post_edit_quality_check` | Built for the Claude Code hook loop: it takes a patch and reports the problems in the files it touched. Useful only when a patch exists; `lint_files` covers the same ground here. |
-| `rename_refactoring` | C++ rename, confirmed working with the whitelist disabled: `--preview true` on `AHomeWorldCharacter` -> `affects.files: 37`, `affects.callSites: 327`, `applied: false`. Because a rename must resolve every reference, **the preview doubles as the "find usages" substitute** for the one capability `find_usages` cannot provide here. |
+| `get_asset_properties` | `{ assetPath, rootFolder }`. Exercised with the editor down, both `/Game/HomeWorld/Characters/BP_HomeWorldCharacter` and the absolute `.uasset` path: `{"properties":[]}` in well under a second. It does not read UPROPERTY values headless. |
+| `find_default_value_overrides` | `{ className, fieldName, limit?, rootFolder }`. `AHomeWorldCharacter` / `CarriedCloudWisps` and `HomeWorldCharacter` / `bCloudDescentActive` both returned `{"overrides":[]}` immediately, editor down. Not evidence that it walked assets. |
+| `ue_status` | **`{"connected":false}`** — a one-stop editor + PIE + log read, but the bridge only answers when a UE editor with RiderLink is running. `ue_health` returns the same. `ue_get_logs` then returns `{"entries":[]}`. |
+| `findTests` | Requires `className`, `classNamespace`, and `filePath` together. A call against `AHomeWorldCharacter` returned an empty body at the 90 s curl limit and dropped the HTTP session. It does not see UE automation tests. Do not call it. |
+| `post_edit_quality_check` | Direct call with `reformat: false` and `min_severity: error` on `HomeWorldCharacter.h` returned an empty body after 20.5 s and the session dropped. Use `get_file_problems`. |
+| `safe_delete` | **Works on C++ when `--preview true`.** `bCloudDescentActive` -> `ok: false`, `applied: false`, `deleted: []`, 7 `conflicts` naming `HomeWorldCharacter.h` and `.cpp`, 0.9 s. The conflict text does not include line numbers. **Omitting preview deletes.** This is the usages substitute that the default whitelist actually exposes. |
+| `extract_method` | Accepts a `.cpp` path. A statement block inside `BeginPlay` (lines 228–233) was rejected: "The line range does not cover a complete sequence of statements inside one member." Not a C++ extract here. |
+| `change_api_signature`, `move_type_to_namespace`, `extract_interface`, `extract_base_class` | "not found" for `AHomeWorldCharacter` / `BeginPlay` in the header. `parameters` must be a JSON array; a string `"[]"` is a type error before the lookup. Not C++ refactors here. |
+| `reorganize_namespaces` | A file path is rejected: "expected a project name or a folder path." |
+| `run_inspection_kts` | The compiler runs. A stub `fun visit(e: UElement) {}` returned `compilationSuccess: false`. Not a token saving. |
+| `search_tags` | `{ prefix, limit?, rootFolder }`. `{ prefix: "Ability" }` -> `{"tags":[]}` — tags declared in `HomeWorldGameplayTags` are not exposed to it. An empty prefix returned engine tags from uassets (`Mover.IsFlying` in `MoverExamples`). |
+| `rename_refactoring` | C++ rename, confirmed working with the whitelist disabled: `--preview true` on `AHomeWorldCharacter` -> `affects.files: 37`, `affects.callSites: 327`, `applied: false`. Richer than `safe_delete` preview, and unreachable on the default whitelist. |
 
 ### Prerequisite: two environment fixes, or every semantic call answers empty
 An empty Unreal project model makes the MCP surface look broken while it is healthy: `search_symbol` -> `{"items":[],"more":true}`, `get_file_problems` -> `{"errors":[],"timedOut":true}`, `get_solution_projects` -> `Miscellaneous Files` and `&`. Both causes below had to be cleared.
@@ -176,11 +182,12 @@ Each skill folder carries `SKILL.md`, `metadata.json`, and a `reference/` direct
 
 1. Add `rootFolder: "C:/dev/HomeWorld"` to every call, or the server answers `Unable to determine the target project for the current MCP tool call`.
 2. `find_usages` and `find_implementations` **do not exist in this build** — absent from all 86 tools — so the whole `navigating-code` decision table was replaced. Use `search_text`/`search_regex` for references, or `rename_refactoring --preview` where a rename is admissible.
-3. `analyze_calls` and `get_symbol_info` resolve nothing in C++, and the `xdebug_*`, `build_solution_*`, `reformat_file`, `ue_play` and `ue_execute_python` steps are unreachable under the default whitelist. `ue-live-debugging` now says so inline, and `refactoring-code` no longer tells the model to retry `rename_refactoring`, which no argument can reach. Both skill roots are kept byte-identical.
+3. `analyze_calls` and `get_symbol_info` resolve nothing in C++, and the `xdebug_*`, `build_solution_*`, `reformat_file`, `ue_play` and `ue_execute_python` steps are unreachable under the default whitelist. `ue-live-debugging`, `ue-code-authoring`, and `refactoring-code` say so inline. `refactoring-code` no longer tells the model to retry `rename_refactoring` or the C++-blind refactors. Both skill roots are kept byte-identical.
+4. `safe_delete --preview true` is the C++ reference list that is actually on the default whitelist. `navigating-code` points at it, and says to never omit preview.
 
 ## Selective usage guidance (now in `AGENTS.md` and `.cursor/rules/unreal-cpp.mdc`)
 - Use native file/shell tools (read/edit/grep/git/shell) for routine reading, editing, searching, Git operations in Cursor/OpenCode.
-- Use Rider MCP selectively for semantic symbol search, Blueprint-inheritance lookup (`get_class_hierarchy --baseClass`), UE reflection/UHT diagnostics, and refactoring. It has **no usages search and no C++ call hierarchy**: `find_usages`/`find_implementations` do not exist in this build, and `analyze_calls` resolves nothing in C++. Use `rg` for callers.
+- Use Rider MCP selectively for semantic symbol search, Blueprint-inheritance lookup (`get_class_hierarchy --baseClass`), UE reflection/UHT diagnostics, and refactoring. It has **no usages tool and no C++ call hierarchy**: `find_usages`/`find_implementations` do not exist in this build, and `analyze_calls` resolves nothing in C++. Use `rg` for callers. `safe_delete --preview true` lists referencing files and writes nothing when preview is set.
 - Do not use Rider MCP for operations native tools can do equally well.
 - After C++ changes, check relevant Rider diagnostics. Run UBT when compilation validation is warranted.
 - Avoid repeated full builds, redundant validation, and excessive tool calls for small changes.
@@ -208,11 +215,51 @@ Each skill folder carries `SKILL.md`, `metadata.json`, and a `reference/` direct
 - `xdebug_get_debugger_status` (whitelist disabled) -> `{"sessions":[]}`.
 - `get_class_hierarchy { baseClass: "AHomeWorldCharacter" }` -> `{"classes":[{"name":"BP_HomeWorldCharacter_C","assetPath":"...\\BP_HomeWorldCharacter.uasset"}]}`.
 - `search_assets { baseClass: "AHomeWorldCharacter" }` -> the same asset; `search_assets { query: "BP_" }` -> `{"assets":[]}`.
-- `search_tags { prefix: "Ability" }` -> `{"tags":[]}`.
+- `search_tags { prefix: "Ability" }` -> `{"tags":[]}`. `search_tags` with no prefix -> engine uasset tags, first hit `Mover.IsFlying`.
+- `safe_delete { filePath: "Source/HomeWorld/HomeWorldCharacter.h", symbolName: "bCloudDescentActive", preview: true }` -> `applied: false`, `deleted: []`, 7 conflicts in the `.h` and `.cpp`, 0.9 s. Source files were unchanged afterwards.
+- `get_asset_properties` on `/Game/HomeWorld/Characters/BP_HomeWorldCharacter` and on the absolute `.uasset` path -> `{"properties":[]}`.
+- `find_default_value_overrides` for `CarriedCloudWisps` and `bCloudDescentActive` -> `{"overrides":[]}`.
+- `extract_method` on `HomeWorldCharacter.cpp` lines 228–233 -> "not a complete sequence of statements inside one member."
+- `change_api_signature` / `move_type_to_namespace` / `extract_interface` / `extract_base_class` on `AHomeWorldCharacter` -> "not found."
+- `findTests` on `AHomeWorldCharacter` -> empty body at 90 s.
+- `ue_get_logs` -> `{"entries":[]}`.
+- `post_edit_quality_check` on `HomeWorldCharacter.h` with `reformat: false` -> empty body at 20.5 s.
 - `lint_files { files: ["Source/HomeWorld/HomeWorldCharacter.h"] }` -> 3.4 KB of warnings in ~14 s.
 - `ue_status` / `ue_health` -> `{"connected":false}` — no editor is running, so there is no RiderLink session to read.
 - Control run with the whitelist cut to `search_symbol,rename_refactoring,xdebug_get_debugger_status`: only `search_symbol` + `execute_tool` live, unchanged at t+5 s, t+125 s and t+245 s. The absence is a mask artefact, not startup timing.
 - `Tools/Start-RiderMcp.ps1` preflight, 4/4 cases: registered project -> `C:\Program Files\Epic Games\UE_5.8`; bogus `9.9-nope` -> warns with the elevated fix command; non-`.uproject` -> skipped; registry read confirmed.
+
+## Token efficiency
+
+Rider pays for itself only when one call replaces reading files. A failed call costs a full round trip, which is more than `rg`.
+
+**Leave the default whitelist on.** 32 tool schemas versus 86. The extra 54 are shell, file write, SQL, Unity, dotTrace, and viewport tools. They duplicate Cursor/OpenCode and UnrealMCP, and they are attached to every turn that loads the server. `rename_refactoring` and `xdebug_*` are the only tools in that set worth having, and only in a chat that is actually renaming or debugging. Start that chat with `-AllowedTools '*'` and do not leave it as the daily server. A prior OpenCode session counted about 146 tool schemas on one loaded turn (browser 45, mixar 26, rider 32, unrealMCP 32, opencode 8, gsd 3). This session did not re-list those servers. Root `opencode.json` declares three: unrealMCP, mixar, rider. Parking `.opencode/hooks` and `gsd-core.js` removed the GSD skill-description block from new sessions; that only applies after an OpenCode restart, which this session did not do.
+
+**Calls that replace reading:**
+
+- `search_symbol` with `include_external: true` for an engine type, then read a short window of the path it returns. Do not pull an engine header into context to find a declaration.
+- `get_file_problems` with errors only, on the file just edited. `lint_files` is the wrong default: one header took ~14 s and returned 3.4 KB of weak warnings.
+- `get_class_hierarchy` / `search_assets --baseClass` for Blueprint children. That avoids opening the editor and the uasset.
+- `safe_delete --preview true` when the question is "which files reference this C++ member." 0.9 s, no line numbers. `rg` is still the right tool for a line, and for callers.
+- `search_tags` to see which uasset carries a tag the asset scan knows. An empty prefix returned engine `Mover.*` tags. A prefix of `Ability` returned nothing, so native C++ tags in this project still want `rg`.
+
+**Calls that waste the turn, on this build:**
+
+- `analyze_calls`, `get_symbol_info`, `findTests` (empty at 90 s), `get_asset_properties` and `find_default_value_overrides` while the editor is down, `post_edit_quality_check` (empty at 20 s), `run_inspection_kts`, and the four C++-blind refactors (`change_api_signature`, `move_type_to_namespace`, `extract_interface`, `extract_base_class`, plus `extract_method`).
+- `ue_health` / `ue_status` / `ue_get_logs` while the editor has no RiderLink. They answer disconnected. UnrealMCP on 55557 stays the editor server. Do not poll both.
+- Text search of project source. `rg` is local. Use Rider `search_text` when the hit is in generated or reflected code.
+
+**Memory is part of the token budget.** A dead session throws away the context. Headless Rider is about 3.7 GB (`rider64` plus `Rider.Backend`) on this 16 GB machine, which had about 1.6 GB free while this was measured. Do not start a second Rider.
+
+### Session death, not isolated (2026-10-15)
+
+Two candidates were live the morning the OpenCode sessions died, and both changed before anyone could separate them.
+
+- Windows Error Reporting recorded `RADAR_PRE_LEAK_64` for `rider64.exe` at 08:22 and for `Rider.Backend.exe` at 09:27. Those are type-5 leak telemetry events, not a recorded process kill. The System log has no `Microsoft-Windows-Resource-Exhaustion-Detector` event across the following two days.
+- At 13:15 the machine was still in that band: 16,310 MB total, about 1,600 MB free, Rider still about 3.7 GB.
+- GSD's hook directory was parked at 11:10 (`.opencode/hooks` is absent; the tree is in `.opencode/_gsd-disabled/`). A search of `%USERPROFILE%\.local\share\opencode` and `%USERPROFILE%\.config\opencode` found no `ENOTDIR` line, so this session did not reconfirm the spawn-storm log. Moving the directory removes the `chdir` into `.opencode\hooks\gsd-...` until the hooks are restored. GSD itself was not patched.
+
+Which of the two stopped the deaths is not determined.
 
 ## Verdict (qualitative)
 - Unreal-specific code intelligence: High value

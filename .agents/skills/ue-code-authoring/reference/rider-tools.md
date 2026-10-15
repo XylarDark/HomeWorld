@@ -46,7 +46,7 @@ Only when a local IDE build is the requested or necessary validation.
 `search_symbol --q <BaseName>`, then `Read` the header. For a contract detail (nullable return, editor-only, threading), `Read` the file to get the line/column and pass them to `get_symbol_info` — that tool is position-based, not name-based.
 
 **"Who calls this?"**
-`analyze_calls --symbolFqn <FullyQualifiedName> --analysisKind INCOMING_CALLS`. Locate the symbol with `search_symbol` first and pass the fully qualified callable name. If it answers "No call hierarchy provider found", fall back to `Grep`.
+On HomeWorld, `rg`. `analyze_calls` resolves no C++ symbol in this build (`No callable symbol found` for `AHomeWorldCharacter::BeginPlay`). `safe_delete --preview true` lists the files that reference a member and writes nothing when preview is set; it does not return lines, and omitting preview deletes.
 
 ## Anti-patterns
 
