@@ -19,3 +19,6 @@ args = [
 
 [mcp_servers.unrealEditorUi]
 url = "http://127.0.0.1:8000/mcp"
+
+[mcp_servers.rider]
+url = "http://127.0.0.1:64342/stream"

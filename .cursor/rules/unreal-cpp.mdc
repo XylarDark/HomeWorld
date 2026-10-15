@@ -35,3 +35,7 @@ These APIs changed or were removed in UE 5.7 and remain relevant on **5.8**. Che
 | **`MassEntity` plugin** (UE **5.8**) | Removed from Launcher installs; enable **MassGameplay** / **MassAI** only — do not list MassEntity in `.uproject` |
 
 When writing or reviewing C++ that uses `FindObject`, image compression, or global constants, verify against this table first.
+
+## Rider MCP
+
+Use Rider MCP for symbol search, call hierarchy, and Unreal Header Tool diagnostics when that server is connected. File edits, text search, and the shell stay on Cursor. UnrealMCP on port 55557 stays the level and Python server. Compiles stay `.\Tools\Safe-Build.ps1`. Do not send Rider a file read or a terminal command that Cursor already runs. The server is Rider's built-in one, reached at `http://127.0.0.1:64342/stream`; start it with `.\Tools\Start-RiderMcp.ps1`. Do not use `@jetbrains/mcp-proxy` and do not set a port in Rider's settings UI — the proxy's discovery route does not exist in Rider 2026.2. Leave file-edit and shell tools off.

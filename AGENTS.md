@@ -43,3 +43,17 @@ Editor work uses UnrealMCP on port 55557. A log line `editor_ui: NEED_SLATE` ope
 - Do not point `/loop-engineer` at a product decision or a continuity task.
 - Index skips `Content/__ExternalActors__/` and `Content/__ExternalObjects__/`.
 - Commands, swarm ops, testing, and style: [docs/AGENTS_REFERENCE.md](docs/AGENTS_REFERENCE.md).
+
+## Rider MCP (selective use)
+- Use native file/shell tools (read/edit/grep/git/shell) for routine reading, editing, searching, and Git operations in Cursor/OpenCode.
+- Use Rider MCP selectively for semantic symbol navigation, actual usages, call hierarchy, UE reflection/UHT diagnostics, and complex refactoring.
+- Do not use Rider MCP for operations native tools can do equally well.
+- After C++ changes, check relevant Rider diagnostics. Run UBT when compilation validation is warranted (Safe-Build stays the compile).
+- Avoid repeated full builds, redundant validation, and excessive tool calls for small changes.
+- For substantial gameplay changes, verify observable behavior via focused tests or Unreal Editor execution.
+- Rider MCP is Rider's own built-in server, reached at `http://127.0.0.1:64342/stream` (streamable) or `/sse` (legacy SSE). Start it with `.\Tools\Start-RiderMcp.ps1`; stop it with `-Stop`. Do **not** use `@jetbrains/mcp-proxy` — it probes `/api/mcp/list_tools`, which no Rider 2026.2 install contains. Every tool call needs `rootFolder=C:/dev/HomeWorld`; MCP roots do not substitute. File edits and shell stay on Cursor/OpenCode; UnrealMCP stays on 55557.
+- Two environment prerequisites, or the server connects and every symbol query answers empty: UE 5.8 registered at `HKLM\SOFTWARE\EpicGames\Unreal Engine\5.8\InstalledDirectory`, and a .NET 10 runtime under `%USERPROFILE%\.dotnet` — UE 5.8's UnrealBuildTool is net10.0, and the machine-wide dotnet already having 10.x is *not* enough, because Rider prefers the user-local host. `Start-RiderMcp.ps1` preflights the .NET half and prints the install command.
+- Trust the tools, not the connection: `search_symbol`/`search_text`/`search_file`/`get_file_problems` are the ones verified on HomeWorld C++. `search_file`'s `q` is a glob. `get_symbol_info` and `analyze_calls` resolve nothing in C++ yet, whatever the argument shape.
+- Reference: [docs/tools/Rider_MCP_for_UE_Games.md](docs/tools/Rider_MCP_for_UE_Games.md), [docs/handoffs/MARKETPLACE_POLICY_V1.md](docs/handoffs/MARKETPLACE_POLICY_V1.md).
+
+Today's date: Thu Oct 15 2026
