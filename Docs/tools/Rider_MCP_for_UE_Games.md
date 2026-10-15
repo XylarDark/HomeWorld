@@ -94,7 +94,7 @@ They are simply **not addressable by name**, because `--allowed-tools` is compil
 
 `+*.search_symbol` matches; `+*.rename_refactoring` never does — not at +5s, +125s or +245s after the port opened, and not with a three-name list either (that run exposed only `search_symbol` and `execute_tool`). Raw mask syntax cannot help because the starter rewraps it: `-*,+*rename_refactoring` becomes `+*.+*rename_refactoring`. **No `--allowed-tools` value admits them.**
 
-The only route is `-AllowedTools '*'`, which together with them exposes `execute_terminal_command`, `apply_patch`, `read_file`, `create_new_file`, `ue_execute_python` and `git_status` — exactly the shell and file-write surface this project keeps on Cursor/OpenCode. The default whitelist therefore knowingly gives up C++ rename and the live debugger; that trade-off is a policy call, not a technical limit.
+The only route is `-AllowedTools '*'`, which together with them exposes `execute_terminal_command`, `apply_patch`, `read_file`, `create_new_file`, `ue_execute_python` and `git_status` — exactly the shell and file-write surface this project keeps on Cursor/OpenCode. **Decided 2026-10-15: the daily server stays the default whitelist.** That knowingly gives up C++ rename and the live debugger. Callers stay on `rg`. Coarse C++ references stay on `safe_delete --preview true`.
 
 
 ### Parameter names and call shapes (discovered, not documented)
@@ -233,7 +233,7 @@ Each skill folder carries `SKILL.md`, `metadata.json`, and a `reference/` direct
 
 Rider pays for itself only when one call replaces reading files. A failed call costs a full round trip, which is more than `rg`.
 
-**Leave the default whitelist on.** 32 tool schemas versus 86. The extra 54 are shell, file write, SQL, Unity, dotTrace, and viewport tools. They duplicate Cursor/OpenCode and UnrealMCP, and they are attached to every turn that loads the server. `rename_refactoring` and `xdebug_*` are the only tools in that set worth having, and only in a chat that is actually renaming or debugging. Start that chat with `-AllowedTools '*'` and do not leave it as the daily server. A prior OpenCode session counted about 146 tool schemas on one loaded turn (browser 45, mixar 26, rider 32, unrealMCP 32, opencode 8, gsd 3). This session did not re-list those servers. Root `opencode.json` declares three: unrealMCP, mixar, rider. Parking `.opencode/hooks` and `gsd-core.js` removed the GSD skill-description block from new sessions; that only applies after an OpenCode restart, which this session did not do.
+**The daily server stays the default whitelist** (decided 2026-10-15). 32 tool schemas versus 86. The extra 54 are shell, file write, SQL, Unity, dotTrace, and viewport tools. They duplicate Cursor/OpenCode and UnrealMCP, and they are attached to every turn that loads the server. `rename_refactoring` and `xdebug_*` are the only tools in that set that do work this project cannot get another way, and they stay off with the rest. A prior OpenCode session counted about 146 tool schemas on one loaded turn (browser 45, mixar 26, rider 32, unrealMCP 32, opencode 8, gsd 3). This session did not re-list those servers. Root `opencode.json` declares three: unrealMCP, mixar, rider. Parking `.opencode/hooks` and `gsd-core.js` removed the GSD skill-description block from new sessions; that only applies after an OpenCode restart, which this session did not do.
 
 **Calls that replace reading:**
 
