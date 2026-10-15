@@ -29,6 +29,31 @@ execute_tool(command="find_implementations --filePath Domain/IPaymentGateway.cs 
 
 If your client lists the Rider tools directly, call `find_usages` and `find_implementations` by name with the same arguments.
 
+## This build (HomeWorld) — read before using the table
+
+**`find_usages` and `find_implementations` do not exist in this build.** Verified 2026-10-15 by
+listing every tool the server can expose with its tool whitelist disabled: the maximum surface is
+86 tools and neither name is among them. Waiting, retrying, or re-reading this file will not make
+them appear.
+
+Use instead:
+
+| You want | Use here |
+|---|---|
+| Where is a symbol declared? | `search_symbol --q <Name>` (works; returns the file paths) |
+| Where is a symbol used? | `search_symbol` for the declaration, then `search_text`/`search_regex` for the identifier. The IDE reference index is not reachable, so this is a text answer - say so. |
+| Every reference to a symbol, resolving aliases/macros (C++) | `rename_refactoring --preview true` with the symbol's file and name. A rename must resolve every reference, so its reply reports `affects.files` / `affects.callSites` and lists `files[]`. It writes nothing in preview mode. **Only exposed when the server was launched with the tool whitelist disabled** (`-AllowedTools '*'`); see `Tools/Start-RiderMcp.ps1`. |
+| Which Blueprints inherit a C++ class? | `get_class_hierarchy --baseClass <CppClass>`. Verified: `AHomeWorldCharacter` returned `BP_HomeWorldCharacter_C`. Or `search_assets --baseClass <CppClass>`. **Asset inheritance, not a C++ subclass tree** - for C++ subclasses, grep `: public <Type>`. |
+
+Verified working on this project: `search_symbol`, `search_file` (its `q` is a **glob**),
+`search_text`, `search_regex`, `get_class_hierarchy`, `search_assets`, `get_file_problems`,
+`get_project_problems`, `lint_files` (~14s for one header, so batch deliberately). `search_assets
+--query BP_` matched nothing while `--baseClass` worked, so prefer `--baseClass`. The Unreal Editor
+bridge tools (`ue_status`, `ue_health`, `ue_get_logs`) answer `{"connected":false}` unless the
+editor is running with RiderLink. Every call needs `rootFolder=C:/dev/HomeWorld`.
+
+Canonical reference for this build: `docs/tools/Rider_MCP_for_UE_Games.md`.
+
 ## Identify the symbol
 
 - **You know the declaring file:** pass `--filePath` and `--symbolName` as `Name` or `Type.Member`.

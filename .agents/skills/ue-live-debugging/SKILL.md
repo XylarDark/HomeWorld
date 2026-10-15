@@ -1,6 +1,6 @@
 ---
 name: ue-live-debugging
-description: "Use when debugging UE C++ crashes, runtime bugs, or unexpected behavior with Rider MCP available. Value over bash/grep: analyze_calls traces C++ call hierarchies (ReSharper backend); get_file_problems surfaces IDE-detected issues; get_symbol_info confirms API contracts; xdebug_set_breakpoints sets live breakpoints; ue_execute_python queries live PIE state. DO NOT TRIGGER for: pure build errors with no runtime component, net-new feature work, Blueprint-only work. When Rider MCP is unavailable, runs in reduced mode — Bash/Grep only, IDE diagnostics skipped."
+description: "Use when debugging UE C++ crashes, runtime bugs, or unexpected behavior with Rider MCP available. Value over bash/grep: get_file_problems surfaces IDE-detected issues, and search_symbol/search_text find the suspect code in the indexed project. DO NOT TRIGGER for: pure build errors with no runtime component, net-new feature work, Blueprint-only work. On HomeWorld read the section \"This project's Rider build\" before running the workflow - several steps (analyze_calls, get_symbol_info, xdebug_*, build_solution_*, reformat_file) do not work here. When Rider MCP is unavailable, runs in reduced mode - Bash/Grep only, IDE diagnostics skipped."
 allowed-tools: Read Glob Grep Bash Write Edit ToolSearch
 metadata:
   argument-hint: "[bug description, suspect function/class, or crash context]"
@@ -79,9 +79,35 @@ Use the agent's native planning/todo mechanism when available. For simple one-fi
 
 ---
 
+## This project's Rider build (HomeWorld) — read before running the workflow
+
+Verified 2026-10-15 against the live headless server (`Tools\Start-RiderMcp.ps1`). Several steps
+below do not work here. Substitute as noted rather than retrying:
+
+| Step below | Claim in this skill | Reality on HomeWorld |
+|---|---|---|
+| Step 2 | `analyze_calls` traces C++ call hierarchies | **Not wired for C++.** On `AHomeWorldCharacter::BeginPlay` it answers `No callable symbol found`, and its own error text asks for a Java-style FQN (`com.example.Service.run`). Verified with and without the whitelist. Trace callers with `rg`/Grep. |
+| Step 3 | `get_symbol_info` confirms API contracts | Returns `{"documentation":""}` for C++ positions. Read the header. |
+| Step 5, 5b–5d | `xdebug_*` sets breakpoints and reads frames | The sixteen `xdebug_*` tools exist and respond (`xdebug_get_debugger_status` → `{"sessions":[]}`), but **only when the server runs with its whitelist disabled** (`-AllowedTools '*'`); no `--allowed-tools` value admits them. Under the default whitelist skip Step 5 and go to Step 6 (instrumentation). |
+| Step 5, Live PIE | `ue_execute_python` | Does not exist in this build. Use UnrealMCP on port 55557. |
+| Step 5a | `ue_status`, `ue_play`, `get_run_configurations`, `execute_run_configuration` | `ue_status`/`ue_health`/`ue_get_logs` exist and work, but report the editor bridge as `{"connected":false}` unless the editor is running with RiderLink. `ue_play`, `execute_run_configuration` and `get_run_configurations` do not exist in this build at all. |
+| Step 8 | `build_solution_start` + `build_solution_state` | Not exposed. The build is `.\Tools\Safe-Build.ps1` (see AGENTS.md). |
+| Step 8 | `reformat_file` | Not exposed. |
+| GATE 4, Step 5 | `ToolSearch(query: "select:mcp__<prefix>__...")` | Cursor and OpenCode here list the Rider tools directly: there is no `ToolSearch` and no `mcp__` prefix. Call the tool by name, or through `execute_tool` with a command string. |
+
+**Verified working here:** `search_symbol`, `search_text`, `search_regex`, `search_file` (its `q`
+is a **glob**), `get_file_problems`, `get_project_problems`, `lint_files`, `get_class_hierarchy`.
+`find_usages` and `find_implementations` do not exist in this build. Every call needs
+`rootFolder=C:/dev/HomeWorld`, or the server answers `Unable to determine the target project for
+the current MCP tool call`.
+
+Canonical reference: `docs/tools/Rider_MCP_for_UE_Games.md`.
+
+---
+
 ## Workflow
 
-**Search routing:** use rg/Grep for portable text discovery; use Rider `search_text`/`search_file` when IDE index, generated/reflected UE code, or unsaved editor state helps. Use Rider semantic tools (`search_symbol`, `analyze_calls`, `get_symbol_info`, `get_file_problems`, build) for code intelligence. `analyze_calls` supports C++ (ReSharper backend) — if it returns "No call hierarchy provider found", fall back to Grep.
+**Search routing:** use rg/Grep for portable text discovery; use Rider `search_text`/`search_file` when IDE index, generated/reflected UE code, or unsaved editor state helps. Use Rider semantic tools (`search_symbol`, `analyze_calls`, `get_symbol_info`, `get_file_problems`, build) for code intelligence. `analyze_calls` does **not** resolve C++ in this build (see "This project's Rider build" above) — use rg/Grep for callers.
 
 ### Step 0 — Triage: Classify the Entry Point
 

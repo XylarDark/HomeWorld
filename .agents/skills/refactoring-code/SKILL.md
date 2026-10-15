@@ -29,6 +29,27 @@ execute_tool(command="rename_refactoring --filePath API/Services/OrderService.cs
 | Extract a base class | `extract_base_class` | `--filePath --typeName --baseClassName --members` |
 | Extract a method (C# only) | `extract_method` | `--filePath --startLine --endLine --methodName` |
 
+## This project's Rider build (HomeWorld)
+
+Verified 2026-10-15 by reading the live tool surface two independent ways (`tools/list`, and the
+router's own `Tool 'x' not found. Available tools: ...` reply):
+
+- **`rename_refactoring` is not exposed by default.** It registers only when the MCP server was
+  started with its tool whitelist **disabled** (`-AllowedTools '*'`). Under a `--allowed-tools`
+  value - *including one that names it* - it never registers, at any point after startup. Where it
+  is exposed it works on C++: a preview rename of `AHomeWorldCharacter` resolved 37 files and 327
+  call sites. See `Tools/Start-RiderMcp.ps1` for the mode and its trade-off.
+- The other seven refactorings **are** exposed: `change_api_signature`, `move_type_to_namespace`,
+  `reorganize_namespaces`, `safe_delete`, `extract_interface`, `extract_base_class`,
+  `extract_method`. Exposed is not the same as working: none of them has been exercised on this
+  project's C++ yet, so read the first reply before trusting it. `extract_method` is C#-only.
+- `execute_tool` is exposed in the default (`direct`) mode as well, so the call style above works,
+  and calling a tool by name reaches the same surface.
+- Every call needs `rootFolder=C:/dev/HomeWorld`, or the server answers *"Unable to determine the
+  target project for the current MCP tool call."*
+
+Canonical reference for this build: `docs/tools/Rider_MCP_for_UE_Games.md`.
+
 - `--symbolName`/`--typeName` accept `Name` or `Type.Member`. Every tool also takes `--preview true` (analysis only, no writes) — add it first for public-API or many-call-site changes, then re-issue without it to apply.
 - `change_api_signature`: **always** pass a **bare** `--methodName` (a qualified `Type.Member` can report "not found") **and** `--declaringType <FullyQualifiedType>` on the very first call — don't wait for an `ambiguous_method` error; the method is usually on an interface/impl pair, and `--declaringType` is harmless when it isn't. `--parameters` is a single-quoted JSON array = the **complete** new parameter list in order: an existing name is kept/moved, an omitted one is removed, a new name needs `type` (and optional `defaultValue` inserted at call sites). Disambiguate remaining overloads with `--currentSignature '["int","string"]'` (the CURRENT parameter types).
 - `extract_interface`/`extract_base_class` `--members` is a single-quoted JSON array of member names, e.g. `'["IsMatch","Merge"]'` — not a comma-separated list.
@@ -37,9 +58,9 @@ execute_tool(command="rename_refactoring --filePath API/Services/OrderService.cs
 
 ## Rules
 
-1. **Use the tool; never hand-edit or fall back before a real call has run.** `Missing required parameters: …` (add them from the table), `Tool '<x>' not found` (wrong name — copy from the table), and conflict/ambiguous responses are all **fixable input mistakes** — correct the argument and retry. Fall back to a text edit only if `execute_tool` isn't in your toolset, or a call actually ran and failed in a way no input change can fix.
+1. **Use the tool; never hand-edit or fall back before a real call has run.** `Missing required parameters: …` (add them from the table), `Tool '<x>' not found` (wrong name — copy from the table), and conflict/ambiguous responses are all **fixable input mistakes** — correct the argument and retry. Fall back to a text edit only if `execute_tool` isn't in your toolset, or a call actually ran and failed in a way no input change can fix. **In this project there is exactly one such case: `rename_refactoring` is not exposed at all by the default whitelist** — no argument change reaches it. Either hand-edit (`search_symbol` + `search_text` for the call sites), or ask the user whether to restart the server as `Tools\Start-RiderMcp.ps1 -AllowedTools '*'`, which exposes it (and also exposes shell/file-write tools, so it is the user's call).
 2. **Trust the success signal — never verify, never build.** On success the response's `touched`/`affects`/`files` counts **are** the confirmation. Do **not** re-read files, re-run `grep`/`rg`, diff the tree, or run the build/tests "to catch fallout" — a build never changes an already-applied refactor, it only burns tokens. Build or test **only** if the user explicitly asked. The one thing worth surfacing: a count of **1** for a type/method/property/field/namespace (declaration only, no callers).
-3. **Don't retry blindly** — change an argument between calls. Flags are camelCase; pass real values or omit optional ones (no `""`/`"/"`/fake-path placeholders), and copy paths and names verbatim from `search_*` / `get_symbol_info`.
+3. **Don't retry blindly** — change an argument between calls. Flags are camelCase; pass real values or omit optional ones (no `""`/`"/"`/fake-path placeholders), and copy paths and names verbatim from `search_*`. (`get_symbol_info` returns empty documentation for C++ here, so it is not a source of names.)
 4. **Library / external symbols can't be refactored** — surface to the user; the change must be made upstream.
 
 ## Conflicts, ambiguity, limits

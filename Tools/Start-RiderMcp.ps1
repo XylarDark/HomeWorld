@@ -34,11 +34,13 @@
 #                  semantic set; '*' disables the whitelist and exposes everything.
 #   -InvocationMode: 'direct' (default) exposes each allowed tool as its own MCP tool with a
 #                  live input schema, which is what the vendored Rider skills call by name.
-#                  'via-router' hides them behind the single execute_tool, and in this build
-#                  silently drops rename_refactoring and every xdebug_* tool from the
-#                  routable set (observed: 32 of 48 named tools reached the router).
-#   -Project:      File to open. Defaults to HomeWorld.sln when present, else HomeWorld.uproject.
-#                  See the $ProjectDefault comment above for why .sln is the working default.
+#                  'via-router' hides them behind execute_tool. Both modes expose the same 32
+#                  tools (verified), and execute_tool is present in direct mode as well, so
+#                  either call style works without changing this default.
+#   -Project:      File to open. Defaults to HomeWorld.uproject - the source of truth, and the
+#                  model that works with no extra step. A .sln also works, but only after an
+#                  explicit Build.bat -projectfiles run, and it drags ~2500 engine .Build.cs
+#                  modules into the model. See the $ProjectDefault comment above.
 #   -Stop:         Stop the headless server only; leave any GUI Rider running.
 #   -Status:       Report whether the port is reachable and echo the last whitelist/SSE lines
 #                  Rider logged, then exit.
@@ -61,7 +63,9 @@ $RiderExe = "C:\Program Files\JetBrains\JetBrains Rider 2026.2.1\bin\rider64.exe
 $McpStarter = "mcpServer"
 $IdeaLogDir = "$env:LOCALAPPDATA\JetBrains\Rider2026.2\log"
 
-# The prerequisite that decides whether any of this returns real C++ symbols.
+# The two prerequisites that decide whether any of this returns real C++ symbols. Both fail the
+# same way - the server connects and answers everything with an empty result - so both are
+# preflighted below rather than left to look like a broken MCP surface.
 #
 # Root cause, read off a frozen failure (idea.log + backend.<ts>.log):
 #   For an Unreal project, Rider does not start a compiler. It runs
@@ -93,13 +97,33 @@ $ProjectDefault = (Resolve-Path (Join-Path $PSScriptRoot "..\HomeWorld.uproject"
 if (-not $Project) { $Project = $ProjectDefault }
 
 if (-not $AllowedTools) {
-    # Semantic navigation, call hierarchy and UHT/C++ diagnostics, refactoring, UE asset reads and
-    # the xdebug_* debugger surface the ue-live-debugging skill needs. Deliberately absent:
+    # Semantic navigation, C++/UHT diagnostics, refactoring, UE asset reads. Deliberately absent:
     # execute_terminal_command, execute_run_configuration, build_solution_start/state,
     # create_new_file, apply_patch, read_file, list_directory_tree, open_file_in_editor,
     # reformat_file, git_status, get_repositories, ue_execute_python, ue_play, spawn_actor,
     # viewport_camera, take_screenshot, ue_import/export_blueprint_nodes, plus the SQL/Unity
     # tools this project does not use.
+    #
+    # `rename_refactoring` and the sixteen `xdebug_*` tools are deliberately NOT named below, and
+    # the reason is NOT that this build lacks them - they are present and they work (a preview
+    # rename of AHomeWorldCharacter resolved 37 files / 327 call sites; xdebug answered
+    # {"sessions":[]}). The reason is that naming them cannot work.
+    #
+    # `--allowed-tools` is compiled into a glob mask, one `+*.<name>` per CSV entry:
+    #     search_symbol,rename_refactoring  ->  -*,+*.search_symbol,+*.rename_refactoring
+    # `+*.search_symbol` matches; `+*.rename_refactoring` never matches, at any point after
+    # startup, whatever else is in the list. Verified 2026-10-15 with the whitelist cut down to
+    # exactly `search_symbol,rename_refactoring,xdebug_get_debugger_status`: only search_symbol
+    # registered, still absent 4 minutes later. Passing raw mask syntax does not help either -
+    # the launcher rewraps every entry, so `-*,+*rename_refactoring` becomes `+*.+*rename_refactoring`.
+    #
+    # Those 17 tools are therefore reachable ONLY by disabling the whitelist outright
+    # (`-AllowedTools '*'`), which exposes all 86 - including execute_terminal_command,
+    # apply_patch, read_file, create_new_file, ue_execute_python and git_status, i.e. exactly the
+    # shell and file-write surface this project keeps on Cursor/OpenCode. That is a policy call,
+    # not a technical one, so the default stays the safe whitelist and knowingly gives up C++
+    # rename and the live debugger. Rationale and the full evidence:
+    # docs/tools/Rider_MCP_for_UE_Games.md.
     $AllowedTools = (@(
         # search
         "search_symbol", "search_file", "search_text", "search_regex"
@@ -109,19 +133,16 @@ if (-not $AllowedTools) {
         "get_solution_projects", "get_project_dependencies"
         # diagnostics (incl. UHT / C++ problems)
         "get_file_problems", "get_project_problems", "lint_files"
-        # refactoring
-        "rename_refactoring", "safe_delete", "extract_method", "extract_interface", "extract_base_class",
+        # refactoring (rename_refactoring cannot be named in any whitelist; see the note above)
+        "safe_delete", "extract_method", "extract_interface", "extract_base_class",
         "change_api_signature", "move_type_to_namespace", "reorganize_namespaces", "post_edit_quality_check"
         # inspections
         "run_inspection_kts", "generate_inspection_kts_examples", "generate_inspection_kts_api"
         # UE asset / status reads
         "ue_health", "ue_status", "ue_get_logs", "get_asset_properties", "search_assets", "search_tags"
-        # debugger (ue-live-debugging skill)
-        "xdebug_start_debugger_session", "xdebug_attach_to_process", "xdebug_control_session",
-        "xdebug_get_stack", "xdebug_get_threads", "xdebug_get_frame_values", "xdebug_get_value_by_path",
-        "xdebug_evaluate_expression", "xdebug_set_breakpoint", "xdebug_list_breakpoints",
-        "xdebug_remove_breakpoint", "xdebug_run_to_line", "xdebug_set_variable",
-        "xdebug_get_debugger_status", "xdebug_memory_dump", "xdebug_start_mixed_mode_debug"
+        # intentionally not listed: rename_refactoring and the sixteen xdebug_* debugger tools
+        # (GUI-only), plus ue_play / execute_run_configuration / ue_execute_python (use
+        # UnrealMCP on port 55557 for editor and PIE work, and Safe-Build.ps1 for the build).
     ) -join ",")
 }
 
@@ -152,6 +173,73 @@ function Test-DotNetPrerequisite {
     Write-Warning "empty while the MCP server still looks connected. Install it user-locally:"
     Write-Warning '  Invoke-WebRequest https://dot.net/v1/dotnet-install.ps1 -OutFile "$env:TEMP\dotnet-install.ps1" -UseBasicParsing'
     Write-Warning '  & "$env:TEMP\dotnet-install.ps1" -Channel 10.0 -Runtime dotnet -InstallDir "$env:USERPROFILE\.dotnet"'
+    return $null
+}
+
+function Test-UnrealEnginePrerequisite {
+    # The other half of the same failure mode, and the half easiest to miss because it lives
+    # outside the repo: where the engine version is not registered, Rider produces the exact
+    # same empty model as a missing .NET runtime, and the two are indistinguishable from the
+    # client (empty symbol results, healthy-looking server).
+    #
+    # HomeWorld.uproject sets "EngineAssociation": "5.8". Rider resolves a version to a real
+    # install via LauncherInstalled.dat and
+    #     HKLM\SOFTWARE\EpicGames\Unreal Engine\<version>\InstalledDirectory
+    # On this machine the key was absent even though C:\Program Files\Epic Games\UE_5.8 exists,
+    # because Build-HomeWorld.bat reaches the engine by hard-coded path and so never needed it.
+    param([string]$UProjectPath)
+
+    if (-not $UProjectPath -or $UProjectPath -notlike "*.uproject") { return $null }
+    if (-not (Test-Path -LiteralPath $UProjectPath)) { return $null }
+
+    $assoc = $null
+    try {
+        $assoc = (Get-Content -LiteralPath $UProjectPath -Raw | ConvertFrom-Json).EngineAssociation
+    } catch {
+        Write-Warning "Could not read EngineAssociation from $UProjectPath; skipping the engine check."
+        return $null
+    }
+    if (-not $assoc) {
+        Write-Warning "No EngineAssociation in $UProjectPath; Rider needs one to resolve the engine."
+        return $null
+    }
+
+    $key = "HKLM\SOFTWARE\EpicGames\Unreal Engine\$assoc"
+    $installed = $null
+    if (Test-Path "HKLM:\SOFTWARE\EpicGames\Unreal Engine\$assoc") {
+        $installed = (Get-ItemProperty -Path "HKLM:\SOFTWARE\EpicGames\Unreal Engine\$assoc" `
+            -Name InstalledDirectory -ErrorAction SilentlyContinue).InstalledDirectory
+    }
+
+    if (-not $installed) {
+        # The registry provider reads the same view as the shell's bitness, so a 32-bit shell can
+        # miss a real key. reg.exe does not have that problem; fall back before warning loudly.
+        # Native stderr becomes a terminating error under $ErrorActionPreference='Stop', which
+        # this script sets, so relax it for this one call and always restore it.
+        $prevEap = $ErrorActionPreference
+        $ErrorActionPreference = "Continue"
+        try {
+            $out = @(& reg.exe query $key /v InstalledDirectory 2>$null)
+        } finally {
+            $ErrorActionPreference = $prevEap
+        }
+        $line = @($out | Where-Object { $_ -match 'InstalledDirectory' })
+        if ($line.Count -gt 0 -and ($line[0] -match 'REG_SZ\s+(.+?)\s*$')) { $installed = $Matches[1] }
+    }
+
+    if ($installed -and (Test-Path -LiteralPath $installed)) { return $installed }
+
+    Write-Warning "Unreal Engine $assoc is not registered where Rider looks for it."
+    if ($installed) {
+        Write-Warning "  $key names '$installed', but that path does not exist."
+    } else {
+        Write-Warning "  $key has no InstalledDirectory value (or the key is missing)."
+    }
+    Write-Warning "Rider resolves the project's EngineAssociation through that key. Without it the"
+    Write-Warning "C++ model is empty: the MCP server connects, then every symbol query answers"
+    Write-Warning "empty. Register it from an ELEVATED shell, then relaunch:"
+    Write-Warning "  New-ItemProperty 'HKLM:\SOFTWARE\EpicGames\Unreal Engine\$assoc' ``"
+    Write-Warning "      -Name InstalledDirectory -Value '<path to UE $assoc>' -PropertyType String -Force"
     return $null
 }
 
@@ -286,6 +374,9 @@ if (-not (Test-McpPort)) {
 
     $dotNetRoot = Test-DotNetPrerequisite
     if ($dotNetRoot) { Write-Host "dotnet with .NET 10: $dotNetRoot" }
+
+    $engineRoot = Test-UnrealEnginePrerequisite -UProjectPath $Project
+    if ($engineRoot) { Write-Host "Unreal Engine: $engineRoot" }
 
     $riderArgs = @($McpStarter, "--project=$Project", "--port=$Port",
         "--allowed-tools=$AllowedTools")

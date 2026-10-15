@@ -13,11 +13,11 @@ Enable Rider MCP, but use it selectively rather than routing every operation thr
 
 ## Where Rider MCP helps (Unreal C++)
 - Semantic symbol search (declarations vs text matches)
-- Find usages / call hierarchy (traces dependencies)
+- Find usages / call hierarchy (traces dependencies) — **not for C++ in this build**: `find_usages` and `find_implementations` are absent, and `analyze_calls` resolves nothing. Use `rg`, or `rename_refactoring --preview` where a rename is admissible.
 - Code inspections (C++ and Unreal-aware warnings)
 - UHT diagnostics (reflection/metadata issues)
 - Refactoring (safer symbol-aware changes)
-- Build/run configurations (uses existing Rider configs)
+- Build/run configurations (uses existing Rider configs) — **not exposed here**; the build stays `.\Tools\Safe-Build.ps1`.
 - File read/edit/terminal mostly duplicate native Cursor/OpenCode tools (use native when possible)
 
 ## JetBrains rider-skills (reference)
@@ -73,14 +73,29 @@ A GUI Rider with `mcpServer.xml` enabled serves the same port, so GUI and headle
 The server refuses with *"Unable to determine the target project for the current MCP tool call"* unless the call carries `rootFolder=C:/dev/HomeWorld`. Declaring MCP **roots** does not help — the server asks for `roots/list`, then still demands the parameter (verified). The vendored skills do not mention this; agents must add it.
 
 ### Tool exposure (whitelist is real, and enforced)
-`--allowed-tools` absent means a silent read-only default: `search_file, search_text, search_regex, search_symbol` only (logged as `MCP tools whitelist (default): ...`). `--allowed-tools=*` means *whitelist disabled* (all 86 tools registered by the plugins).
+`--allowed-tools` absent means a silent read-only default: `search_file, search_text, search_regex, search_symbol` only (logged as `MCP tools whitelist (default): ...`). `--allowed-tools=*` means *whitelist disabled* — **86** tools register.
 
-`Start-RiderMcp.ps1` passes an explicit 48-name whitelist. **32** of them are actually exposed; the whitelist removes the shell, build, run-config, raw file-write and DB/profiler tools, confirmed by asking the server for an unknown tool and reading its `Available tools:` reply.
+`Start-RiderMcp.ps1` passes an explicit **31-name** whitelist, which exposes **32** tools: those 31 plus `execute_tool`, which is always present and *is* present in `direct` mode (correcting an earlier claim here). The whitelist removes the shell, build, run-config, raw file-write and DB/profiler/Unity families, confirmed by asking the server for an unknown tool and reading its `Available tools:` reply.
 
-- Exposed (32): the four `search_*` tools, `get_symbol_info`, `analyze_calls`, `get_class_hierarchy`, `find_default_value_overrides`, `findTests`, `get_solution_projects`, `get_project_dependencies`, `get_file_problems`, `get_project_problems`, `lint_files`, `safe_delete`, `extract_method`, `extract_interface`, `extract_base_class`, `change_api_signature`, `move_type_to_namespace`, `reorganize_namespaces`, `post_edit_quality_check`, `run_inspection_kts`, `generate_inspection_kts_examples`, `generate_inspection_kts_api`, `ue_health`, `ue_status`, `ue_get_logs`, `get_asset_properties`, `search_assets`, `search_tags`.
-- Blocked and confirmed absent: `execute_terminal_command`, `execute_run_configuration`, `build_solution_start`, `build_solution_state`, `create_new_file`, `apply_patch`, `read_file`, `list_directory_tree`, `open_file_in_editor`, `reformat_file`, `ue_execute_python`, plus the SQL/Unity/dotTrace families.
-- **Not available in this build, for any whitelist or invocation mode:** `rename_refactoring` and all sixteen `xdebug_*` tools. They appear in the all-tools list but never register as usable in a headless session. Rename has no `McpRenameHost` (the other refactorings have hosts); the debugger tools are likewise not hosted. Expose them via a GUI session if they are ever needed.
-- `--invocation-mode=direct` is the default here: each tool is listed with its schema. Router mode lists only `execute_tool` and would break the vendored skills, which call tools by name. In router mode `rename_refactoring`/`xdebug_*` are additionally dropped from the routable set.
+- Exposed (32): `search_symbol`, `search_file`, `search_text`, `search_regex`, `get_symbol_info`, `analyze_calls`, `get_class_hierarchy`, `find_default_value_overrides`, `findTests`, `get_solution_projects`, `get_project_dependencies`, `get_file_problems`, `get_project_problems`, `lint_files`, `safe_delete`, `extract_method`, `extract_interface`, `extract_base_class`, `change_api_signature`, `move_type_to_namespace`, `reorganize_namespaces`, `post_edit_quality_check`, `run_inspection_kts`, `generate_inspection_kts_examples`, `generate_inspection_kts_api`, `ue_health`, `ue_status`, `ue_get_logs`, `get_asset_properties`, `search_assets`, `search_tags`, `execute_tool`.
+- **Absent in *both* modes — this build does not contain them at all.** The disabled-whitelist surface is 86 tools and neither `find_usages` nor `find_implementations` is among them. The vendored `navigating-code` skill is built on those two, so it cannot work as written; use `search_text`/`search_regex` for references and `get_class_hierarchy` for Blueprint inheritance.
+- Blocked by the whitelist (in the build, deliberately kept out): `execute_terminal_command`, `execute_run_configuration`, `build_solution_start`, `build_solution_state`, `create_new_file`, `apply_patch`, `read_file`, `list_directory_tree`, `open_file_in_editor`, `reformat_file`, `git_status`, `get_repositories`, `ue_execute_python`, `spawn_actor`, `viewport_camera`, `take_screenshot`, `ue_import_blueprint_nodes`, `ue_export_blueprint_nodes`, plus the SQL/Unity/dotTrace families.
+
+#### `rename_refactoring` and `xdebug_*`: reachable, but not by any whitelist
+These seventeen tools **do work headless**. A preview `rename_refactoring` on `AHomeWorldCharacter` returned `{"ok":true,"applied":false,"touched":0,"affects":{"files":37,"callSites":327}}`, and `xdebug_get_debugger_status` returned `{"sessions":[]}`. An earlier revision of this document called them "not available in this build, for any whitelist or invocation mode" and blamed a missing `McpRenameHost`. That was wrong; the error came from reading only whitelisted sessions.
+
+They are simply **not addressable by name**, because `--allowed-tools` is compiled into a glob mask with every CSV entry wrapped as `+*.<name>`:
+
+```
+--allowed-tools=search_symbol,rename_refactoring
+  -> MCP tools whitelist: search_symbol, rename_refactoring
+     (mask: -*,+*.search_symbol,+*.rename_refactoring)
+```
+
+`+*.search_symbol` matches; `+*.rename_refactoring` never does — not at +5s, +125s or +245s after the port opened, and not with a three-name list either (that run exposed only `search_symbol` and `execute_tool`). Raw mask syntax cannot help because the starter rewraps it: `-*,+*rename_refactoring` becomes `+*.+*rename_refactoring`. **No `--allowed-tools` value admits them.**
+
+The only route is `-AllowedTools '*'`, which together with them exposes `execute_terminal_command`, `apply_patch`, `read_file`, `create_new_file`, `ue_execute_python` and `git_status` — exactly the shell and file-write surface this project keeps on Cursor/OpenCode. The default whitelist therefore knowingly gives up C++ rename and the live debugger; that trade-off is a policy call, not a technical limit.
+
 
 ### Parameter names and call shapes (discovered, not documented)
 Rider's own error messages carry the contract, so probe with a deliberately wrong call (e.g. `analyze_calls` without `analysisKind`) and read the reply. A call with no arguments answers with `Missing required parameters: <names>`.
@@ -91,12 +106,25 @@ Rider's own error messages carry the contract, so probe with a deliberately wron
 | `search_text` / `search_regex` | `{ q, paths?, limit?, rootFolder }` |
 | `search_file` | `{ q, ... }` where **`q` is a glob**, not a substring: `**/HomeWorldCharacter.h` -> 1 hit, a bare `HomeWorldCharacter` -> 0 hits |
 | `get_file_problems` | `{ filePath (relative to solution root), errorsOnly?, timeout?, rootFolder }` |
-| `get_class_hierarchy` | `{ baseClass, limit?, rootFolder }`, e.g. `ACharacter` |
+| `get_class_hierarchy` | `{ baseClass, limit?, rootFolder }` — returns **Blueprint assets that inherit the C++ class**, walking the whole chain; it is *not* a C++ subclass tree. `AHomeWorldCharacter` -> `BP_HomeWorldCharacter_C` at `Content/HomeWorld/Characters/BP_HomeWorldCharacter.uasset`. `search_assets { baseClass }` returns the same fact. |
 | `get_symbol_info` | `{ filePath, line, column, rootFolder }` — 1-based |
 | `analyze_calls` | `{ symbolFqn, analysisKind: "INCOMING_CALLS" \| "OUTGOING_CALLS", depth?, rootFolder }` |
 | `get_project_dependencies` | `{ projectName, rootFolder }` — the name must match `get_solution_projects` exactly |
 
 As verified on 2026-10-15, after the two prerequisites above: `search_symbol`, `search_text`, `search_regex`, `search_file`, `get_file_problems`, `get_project_problems` and `get_class_hierarchy` all returned real HomeWorld results. `get_symbol_info` and `analyze_calls` accepted well-formed calls but resolved **nothing in C++** — `get_symbol_info` -> `{"documentation":""}`, and `analyze_calls` -> `No callable symbol found` for `AHomeWorldCharacter`, `AHomeWorldCharacter::BeginPlay` and a class-declaration position alike. Treat those two as .NET/Java-shaped until an engine symbol proves otherwise.
+
+### Verified behaviour of the rest of the exposed surface (2026-10-15)
+
+| Tool | Verified behaviour on HomeWorld |
+|---|---|
+| `lint_files` | Real analysis, several files per call: one header -> 3.4 KB of warnings (`WEAK WARNING` items). **Slow: ~14 s for a single header**, so batch deliberately and expect a long call. |
+| `search_assets` | UE asset search. `{ baseClass: "AHomeWorldCharacter" }` -> `BP_HomeWorldCharacter.uasset` with its `assetPath`. `{ query: "BP_" }` -> `{"assets":[]}`, so `query` is not an asset-name substring search; prefer `baseClass` or `packagePath`. |
+| `search_tags` | `{ prefix, limit?, rootFolder }` -> GameplayTag definitions. `{ prefix: "Ability" }` -> `{"tags":[]}` here (the tags declared in `HomeWorldGameplayTags` are not exposed to it). |
+| `get_asset_properties` | `{ assetPath, rootFolder }` -> reads UPROPERTY values / the CDO of a `.uasset` without opening the editor. Not yet exercised: it needs a real `Content/**` path. |
+| `ue_status` | **`{"connected":false}`** — a one-stop editor + PIE + log read, but the bridge only answers when a UE editor with RiderLink is running. `ue_health` returns the same, and `ue_get_logs` then reads nothing. |
+| `findTests` | `{ className?, classNamespace?, filePath?, ... }` — C#/NUnit test discovery. It cannot see UE automation tests, so it is dead weight on this project. |
+| `post_edit_quality_check` | Built for the Claude Code hook loop: it takes a patch and reports the problems in the files it touched. Useful only when a patch exists; `lint_files` covers the same ground here. |
+| `rename_refactoring` | C++ rename, confirmed working with the whitelist disabled: `--preview true` on `AHomeWorldCharacter` -> `affects.files: 37`, `affects.callSites: 327`, `applied: false`. Because a rename must resolve every reference, **the preview doubles as the "find usages" substitute** for the one capability `find_usages` cannot provide here. |
 
 ### Prerequisite: two environment fixes, or every semantic call answers empty
 An empty Unreal project model makes the MCP surface look broken while it is healthy: `search_symbol` -> `{"items":[],"more":true}`, `get_file_problems` -> `{"errors":[],"timedOut":true}`, `get_solution_projects` -> `Miscellaneous Files` and `&`. Both causes below had to be cleared.
@@ -132,6 +160,8 @@ Keep semantic and diagnostic tools. Turn off the ones that duplicate native Curs
 
 **Keep enabled:** `search_symbol`, `analyze_calls`, `get_symbol_info`, `get_file_problems`, `lint_files`, `search_file`, `search_regex`, `search_text`, `get_project_dependencies`, `get_solution_projects`, `get_class_hierarchy`, `find_default_value_overrides`, `findTests`, `safe_delete`, `extract_method`, `extract_interface`, `extract_base_class`, `change_api_signature`, `move_type_to_namespace`, `reorganize_namespaces`, `post_edit_quality_check`, `run_inspection_kts`, `ue_health`, `ue_status`, `ue_get_logs`, `get_asset_properties`, `search_assets`, `search_tags`
 
+"Keep enabled" is a policy statement, not a claim that each one works: `analyze_calls` and `get_symbol_info` stay on only because turning them off buys nothing — both resolve **nothing in C++** here. `findTests` is C#-only, and `rename_refactoring` cannot be whitelisted at all (see above).
+
 **Disable:** `execute_terminal_command` (shell stays on Cursor/OpenCode), `create_new_file`, `apply_patch`, `read_file`, `list_directory_tree` and `open_file_in_editor` (file reads/writes stay on Cursor/OpenCode), `build_solution_start` / `build_solution_state` and `execute_run_configuration` (compile stays on `Tools\Safe-Build.ps1`), `ue_execute_python`, `git_status`, `get_repositories`, `reformat_file`
 
 All of this is applied by `Tools\Start-RiderMcp.ps1`; the GUI equivalent is Settings -> Tools -> MCP Server -> Exposed Tools.
@@ -142,15 +172,18 @@ JetBrains' `rider-skills` ships Claude Code and Codex plugin manifests only. Cur
 - `.agents/skills/<skill>/` — read by OpenCode and other SKILL.md-aware agents
 - `.cursor/skills/<skill>/` — referenced by `AGENTS.md` and listed in `opencode.json` (`skills: [".cursor/skills"]`)
 
-Each skill folder carries `SKILL.md`, `metadata.json`, and a `reference/` directory with the tool contracts. Two gaps to remember when following them: add `rootFolder` to every call, and do not rely on `rename_refactoring` or `xdebug_*` until a GUI session provides them.
+Each skill folder carries `SKILL.md`, `metadata.json`, and a `reference/` directory with the tool contracts. Three corrections were applied to the vendored copies on 2026-10-15 — each was true of a normal IntelliJ-platform install and false here:
 
-## Selective usage guidance (to add to AGENTS.md)
+1. Add `rootFolder: "C:/dev/HomeWorld"` to every call, or the server answers `Unable to determine the target project for the current MCP tool call`.
+2. `find_usages` and `find_implementations` **do not exist in this build** — absent from all 86 tools — so the whole `navigating-code` decision table was replaced. Use `search_text`/`search_regex` for references, or `rename_refactoring --preview` where a rename is admissible.
+3. `analyze_calls` and `get_symbol_info` resolve nothing in C++, and the `xdebug_*`, `build_solution_*`, `reformat_file`, `ue_play` and `ue_execute_python` steps are unreachable under the default whitelist. `ue-live-debugging` now says so inline, and `refactoring-code` no longer tells the model to retry `rename_refactoring`, which no argument can reach. Both skill roots are kept byte-identical.
+
+## Selective usage guidance (now in `AGENTS.md` and `.cursor/rules/unreal-cpp.mdc`)
 - Use native file/shell tools (read/edit/grep/git/shell) for routine reading, editing, searching, Git operations in Cursor/OpenCode.
-- Use Rider MCP selectively for semantic symbol navigation, actual usages, call hierarchy, UE reflection/UHT diagnostics, and complex refactoring.
+- Use Rider MCP selectively for semantic symbol search, Blueprint-inheritance lookup (`get_class_hierarchy --baseClass`), UE reflection/UHT diagnostics, and refactoring. It has **no usages search and no C++ call hierarchy**: `find_usages`/`find_implementations` do not exist in this build, and `analyze_calls` resolves nothing in C++. Use `rg` for callers.
 - Do not use Rider MCP for operations native tools can do equally well.
 - After C++ changes, check relevant Rider diagnostics. Run UBT when compilation validation is warranted.
 - Avoid repeated full builds, redundant validation, and excessive tool calls for small changes.
-- For substantial gameplay changes, verify observable behavior via focused tests or Unreal Editor execution.
 
 ## Verification evidence (2026-10-15)
 - `opencode mcp list` -> `✗ rider failed: No working IDE endpoint available.` (proxy), then after switching to the URL -> `✓ rider connected`.
@@ -169,6 +202,17 @@ Each skill folder carries `SKILL.md`, `metadata.json`, and a `reference/` direct
   - `get_project_problems` -> `{"totalCount":0}`
   - `get_class_hierarchy { baseClass: "ACharacter" }` -> real entries
   - `get_solution_projects` -> full Unreal tree (`Miscellaneous Files`, `&`, `Engine`, `Plugins`, `Paper2D`, `AISupport`, ... `HomeWorld`)
+- Whitelist mask, read from `idea.log` at launch: `MCP tools whitelist: search_symbol, rename_refactoring` followed by `(mask: -*,+*.search_symbol,+*.rename_refactoring)`. The CSV becomes a `+*.<name>` glob mask, which is why `rename_refactoring` never binds.
+- `tools/list` with the whitelist disabled (`-AllowedTools '*'`) -> **86** tools, including `rename_refactoring` and all 16 `xdebug_*`. With the default whitelist -> **32**. Neither `find_usages` nor `find_implementations` appears in either list.
+- `rename_refactoring { filePath: "Source/HomeWorld/HomeWorldCharacter.h", symbolName: "AHomeWorldCharacter", preview: true }` (whitelist disabled) -> `{"ok":true,"applied":false,"touched":0,"affects":{"files":37,"callSites":327},"files":[...]}` in 2.9 s.
+- `xdebug_get_debugger_status` (whitelist disabled) -> `{"sessions":[]}`.
+- `get_class_hierarchy { baseClass: "AHomeWorldCharacter" }` -> `{"classes":[{"name":"BP_HomeWorldCharacter_C","assetPath":"...\\BP_HomeWorldCharacter.uasset"}]}`.
+- `search_assets { baseClass: "AHomeWorldCharacter" }` -> the same asset; `search_assets { query: "BP_" }` -> `{"assets":[]}`.
+- `search_tags { prefix: "Ability" }` -> `{"tags":[]}`.
+- `lint_files { files: ["Source/HomeWorld/HomeWorldCharacter.h"] }` -> 3.4 KB of warnings in ~14 s.
+- `ue_status` / `ue_health` -> `{"connected":false}` — no editor is running, so there is no RiderLink session to read.
+- Control run with the whitelist cut to `search_symbol,rename_refactoring,xdebug_get_debugger_status`: only `search_symbol` + `execute_tool` live, unchanged at t+5 s, t+125 s and t+245 s. The absence is a mask artefact, not startup timing.
+- `Tools/Start-RiderMcp.ps1` preflight, 4/4 cases: registered project -> `C:\Program Files\Epic Games\UE_5.8`; bogus `9.9-nope` -> warns with the elevated fix command; non-`.uproject` -> skipped; registry read confirmed.
 
 ## Verdict (qualitative)
 - Unreal-specific code intelligence: High value
