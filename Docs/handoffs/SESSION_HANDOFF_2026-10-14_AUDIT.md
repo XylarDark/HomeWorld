@@ -158,10 +158,14 @@ Docs-only. Files: `Docs/01_GDD_MVP.md`, `Docs/03_GAMEPLAY_MVP.md`, `Docs/VISION_
   `HOMEWORLD_ROUTE.md:44` "the rune stone transports you and the bull" -> "the shrine brings you and the
   bull"; `08d_CONTENT_CANON.md:278` "spirit/body swap at dusk" -> "at the bed";
   `COMMANDS_AND_LOG_TAGS.md:186` dropped the `rune gate` token, which no Source file emits.
-  - **Held, not committed here:** `COMMANDS_AND_LOG_TAGS.md` and `CANON_MAP.md` are being edited by the
+  - **Held, not committed here:** `COMMANDS_AND_LOG_TAGS.md` and `CANON_MAP.md` were being edited by the
     live virtue workstream at the same time (a `hw.Virtue.Read` regeneration, a virtue row). This
-    session's one-line edits in both are in the working tree and land with that session's commit, not
-    this one. Lead call 2026-10-14: leave them to that session.
+    session's one-line edits in both went into the working tree. Lead call 2026-10-14: leave them to that
+    session.
+  - **How they landed:** the virtue commit `9db29222` carried the `COMMANDS_AND_LOG_TAGS.md` line (HEAD's
+    `FORM` row no longer lists `rune gate`). It committed `CANON_MAP.md` from a snapshot staged before the
+    DEC-range bump, so that bump was stranded; it is landed here (`0048` -> `0049`) so the map and the log
+    agree.
 - **Left for the Lead (not alignment):** `Docs/DAYNIGHT_BIBLE.md:14` "sleep (bed **or campsite**)" is
   LOCKED and its campsite entry is a *mechanics* difference from the board's "the bed alone", so removing
   it changes gameplay; `Docs/guides/T0_HUMAN_DESKTOP_PIPELINE.md:82/86` is a Lead-stamped fourteen-MUST
