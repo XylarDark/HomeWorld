@@ -58,7 +58,7 @@
 ### 2.3 Infrastructure and quality
 
 - **Session continuity:** SESSION_LOG.md, DAILY_STATE.md read at start and updated at end.
-- **Known errors:** KNOWN_ERRORS.md (UE 5.7, MCP, PCG, World Partition, etc.).
+- **Known errors:** KNOWN_ERRORS.md (UE 5.8, MCP, PCG, World Partition, etc.).
 - **Automation gaps:** AUTOMATION_GAPS.md for steps that could not be automated (log only).
 - **Tests:** PythonAutomationTest (Content/Python/tests/test_*.py); pie_test_runner.py → Saved/pie_test_results.json; level loader and PIE flow tests.
 - **CI:** validate.yml (lint, JSON, C++, doc freshness).

@@ -1,6 +1,6 @@
 # Task: Family agents (Mass + State Tree) — Week 2
 
-**Goal:** 5–10 autonomous family agents in the PCG forest: wander → gather → return → defend at night. No paid tools; agentic = needs/time/world-driven. Scales to 100s with UE 5.7 recommended Mass Entity + Mass AI.
+**Goal:** 5–10 autonomous family agents in the PCG forest: wander → gather → return → defend at night. No paid tools; agentic = needs/time/world-driven. Scales to 100s with UE 5.8 recommended Mass Entity + Mass AI.
 
 **Status:** Not started.
 
@@ -50,7 +50,7 @@ In the **Details** panel for the config:
 | MassStateTree | Decision brain (assign State Tree in next step) |
 | MassCrowdFX | Avoidance (optional) |
 
-If a trait name differs in your UE 5.7 build (e.g. **MassNavigation** instead of **MassZoneGraphLaneNavigation**), use the one listed in the **Add** dropdown and document it in [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) if relevant.
+If a trait name differs in your UE 5.8 build (e.g. **MassNavigation** instead of **MassZoneGraphLaneNavigation**), use the one listed in the **Add** dropdown and document it in [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) if relevant.
 
 ### 2.3 Assign visual mesh
 

@@ -100,7 +100,7 @@ HomeWorld provides a **commandlet** that creates or updates the **MEC_FamilyGath
 **How to run (Editor must not be running):**
 
 ```bat
-"C:\Program Files\Epic Games\UE_5.7\Engine\Binaries\Win64\UnrealEditor.exe" "C:\dev\HomeWorld\HomeWorld.uproject" -run=HomeWorldEditor.CreateMEC
+"C:\Program Files\Epic Games\UE_5.8\Engine\Binaries\Win64\UnrealEditor.exe" "C:\dev\HomeWorld\HomeWorld.uproject" -run=HomeWorldEditor.CreateMEC
 ```
 
 Or from the project root, using the engine’s RunUAT or the engine executable with `-run=HomeWorldEditor.CreateMEC`. The commandlet creates `/Game/HomeWorld/Mass/MEC_FamilyGatherer` (or the path you pass) and adds the standard traits; you still need to assign the State Tree asset and mesh in the Editor or by extending the commandlet.

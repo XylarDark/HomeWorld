@@ -5,7 +5,7 @@
 
 ## Engine / platform
 
-- Unreal Engine **5.7** target for product; Blender library first for art.
+- Unreal Engine **5.8** target for product; Blender library first for art.
 - Phaser only for cheap loop prototypes — not product path.
 - Primary prove host: DESKTOP-21CT3H0 (Conductor parent for MCP/PIE).
 - No extra backend / multiplayer netcode unless Lead specifies.

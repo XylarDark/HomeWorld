@@ -49,7 +49,7 @@ Do this once with DemoMap open:
 **Run in this order:**
 
 1. **ensure_demo_map.py** (optional) — Ensures DemoMap exists; if you set `template_level_path`, the script can create DemoMap from that template. Run from **Tools → Execute Python Script** or via MCP.
-2. **create_demo_from_scratch.py** — Opens DemoMap, tags the landscape, creates/reuses the PCG volume and ForestIsland_PCG graph. Run with DemoMap open (or let the script open it). The script cannot set some PCG options in UE 5.7; you’ll finish those in Tutorial 4.
+2. **create_demo_from_scratch.py** — Opens DemoMap, tags the landscape, creates/reuses the PCG volume and ForestIsland_PCG graph. Run with DemoMap open (or let the script open it). The script cannot set some PCG options in UE 5.8; you’ll finish those in Tutorial 4.
 3. **setup_level.py** — Adds **PlayerStart**, **Directional Light**, and **Sky Light** so you can press Play and see the level. Run with DemoMap open, then save and press Play to test.
 
 **Homestead spawn:** On DemoMap, `setup_level.py` places PlayerStart at the first exclusion zone (homestead compound). After running it, start PIE and confirm the character spawns at the compound.

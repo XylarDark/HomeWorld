@@ -1,4 +1,4 @@
-# PCG Manual Setup (Square One) — UE 5.7
+# PCG Manual Setup (Square One) — UE 5.8
 
 Build the PCG graph **from zero in the Editor without using the script**. For script-based setup (ForestIsland_PCG + volume created by script), see [PCG_SETUP.md](../PCG_SETUP.md).
 

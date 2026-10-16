@@ -1,9 +1,9 @@
 @echo off
-rem Set DOTNET_ROOT and PATH to UE 5.7 bundled .NET 8 SDK so MSBuild can find Microsoft.NET.Sdk.
+rem Set DOTNET_ROOT and PATH to UE 5.8 bundled .NET SDK so MSBuild can find Microsoft.NET.Sdk.
 rem Source this from project root before building the solution (e.g. "call SetEnv-BundledDotNet.bat").
-rem Engine path; change if UE 5.7 is installed elsewhere.
-set "UE_ENGINE=C:\Program Files\Epic Games\UE_5.7"
-set "UE_DOTNET=%UE_ENGINE%\Engine\Binaries\ThirdParty\DotNet\8.0.412\win-x64"
+rem Engine path; change if UE 5.8 is installed elsewhere.
+set "UE_ENGINE=C:\Program Files\Epic Games\UE_5.8"
+set "UE_DOTNET=%UE_ENGINE%\Engine\Binaries\ThirdParty\DotNet\10.0\win-x64"
 if not exist "%UE_DOTNET%\dotnet.exe" (
     echo ERROR: Bundled dotnet not found at %UE_DOTNET%
     exit /B 1

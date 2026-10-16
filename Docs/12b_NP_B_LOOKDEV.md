@@ -38,7 +38,7 @@ See [12a_NP_A_INVENTORY.md](12a_NP_A_INVENTORY.md) for host inventory at prior H
 
 ## 1. Run material assign
 
-1. Open Unreal Editor 5.7 from repo root (`HomeWorld.uproject`).
+1. Open Unreal Editor 5.8 from repo root (`HomeWorld.uproject`).
 2. **Tools → Execute Python Script** → `Content/Python/assign_vs_mvp_materials.py`  
    Or via MCP: `execute_python_script("assign_vs_mvp_materials.py")`
 3. Output Log prefix: `assign_vs_mvp_materials:`

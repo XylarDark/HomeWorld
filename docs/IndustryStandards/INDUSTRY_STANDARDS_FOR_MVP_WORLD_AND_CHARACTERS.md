@@ -116,7 +116,7 @@ Each pillar ends with **"For MVP we commit to:"** so the team has a single refer
 
 ## 5. References and citations
 
-- **Epic / Unreal:** UE 5.7 documentation (World Partition, PCG, Animation Rigging, retargeting). Prefer official Epic docs and project docs ([PCG/PCG_SETUP.md](../PCG/PCG_SETUP.md), [PCG/PCG_BEST_PRACTICES.md](../PCG/PCG_BEST_PRACTICES.md), [UE/UE57_TECH.md](../UE/UE57_TECH.md)).
+- **Epic / Unreal:** UE 5.8 documentation (World Partition, PCG, Animation Rigging, retargeting). Prefer official Epic docs and project docs ([PCG/PCG_SETUP.md](../PCG/PCG_SETUP.md), [PCG/PCG_BEST_PRACTICES.md](../PCG/PCG_BEST_PRACTICES.md), [UE/UE58_TECH.md](../UE/UE58_TECH.md)).
 - **Project docs:** [VISION.md](../../VisionBoard/Core/VISION.md), [MVP_TUTORIAL_PLAN.md](../../VisionBoard/MVP/MVP_TUTORIAL_PLAN.md), [VERTICAL_SLICE_CHECKLIST.md](../../VisionBoard/MVP/VERTICAL_SLICE_CHECKLIST.md), [MVP/MVP_GAP_ANALYSIS_VISION.md](../MVP/MVP_GAP_ANALYSIS_VISION.md), [PLANETOID_DESIGN.md](../../VisionBoard/Planetoid/PLANETOID_DESIGN.md), [MILADY_IMPORT_ROADMAP.md](../TaskLists/TaskSpecs/MILADY_IMPORT_ROADMAP.md), [Assets/ASSET_WORKFLOW_AND_STEAM_DEMO.md](../Assets/ASSET_WORKFLOW_AND_STEAM_DEMO.md), [STYLE_GUIDE.md](../../AssetCreation/STYLE_GUIDE.md).
 - **External research:** When industry-standard research is added from Parallel or other sources, add a short "Parallel research (user-provided)" or citation note here with date and topic.
 

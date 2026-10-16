@@ -2,7 +2,7 @@
 
 **Purpose:** One place to implement **outstanding work in the Editor** so the vertical slice reaches a **polished MVP** state: pre-demo verification green, optional one-time manual steps done, and visual/UX polish applied. Use this after the automation runs (e.g. after the twenty-ninth list, run 3 of 4) or when you are ready to focus on in-Editor work.
 
-**Prerequisites:** Project builds (run `Build-HomeWorld.bat` if needed). Unreal Editor 5.7, DemoMap or Homestead as primary level.
+**Prerequisites:** Project builds (run `Build-HomeWorld.bat` if needed). Unreal Editor 5.8, DemoMap or Homestead as primary level.
 
 ---
 

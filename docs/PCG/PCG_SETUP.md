@@ -1,4 +1,4 @@
-# PCG Setup — HomeWorld (UE 5.7)
+# PCG Setup — HomeWorld (UE 5.8)
 
 > **Historical / quarantine (WAVE D–E):** ForestIsland PCG on DemoMap/Homestead is **legacy harness** content. The signed MVP slice uses kit meshes + VS_MVP markers ([Docs/08d_CONTENT_CANON.md](../../Docs/08d_CONTENT_CANON.md)); PCG graphs are WAVE F delete candidates. Keep this doc for quarantined map work only.
 
@@ -29,13 +29,13 @@ The **primary demo** script **create_demo_from_scratch.py** ensures DemoMap exis
 5. **Tags the Landscape** with **`PCG_Landscape`** if missing (`ensure_landscape_has_pcg_tag()`).
 6. **PCG Volume:** **Default is reuse** — the existing volume is reused and resized from config. Set **`recreate_volume_and_graph`** to **true** in config only to destroy and create a new volume (escape hatch). Volume **bounds** (center and half-extents) come from **config** (`volume_center_*`, `volume_extent_*` in **demo_map_config.json**); if **`use_landscape_bounds`** is true, landscape bounds override when available, else World Partition bounds when available, else config. See **PCG volume size** below. Volume is labeled **PCG_Forest** in the Outliner. **One volume is enough** for the playable region. For World Partition levels, enable **Is Partitioned** on the PCG component and set **Partition Grid Size** on the **PCG World Actor** (see same section).
 7. Saves the level.
-8. **Attempts automation:** When the graph is created/loaded, the script tries to **assign the graph to the volume** (`try_assign_graph_to_volume`), **set Get Landscape Data to By Tag + PCG_Landscape** (`try_set_get_landscape_selector`), and **trigger Generate** (`trigger_pcg_generate`). In UE 5.7 many of these properties are protected or not exposed in Python, so these attempts often fail; the script logs what worked and what did not.
+8. **Attempts automation:** When the graph is created/loaded, the script tries to **assign the graph to the volume** (`try_assign_graph_to_volume`), **set Get Landscape Data to By Tag + PCG_Landscape** (`try_set_get_landscape_selector`), and **trigger Generate** (`trigger_pcg_generate`). In UE 5.8 many of these properties are protected or not exposed in Python, so these attempts often fail; the script logs what worked and what did not.
 
 The script **cannot** (engine/Python limits):
 
 - Reliably **assign the graph** to the PCG Volume — the graph property is often protected; if assignment fails, assign ForestIsland_PCG in Details.
 - Reliably **set Get Landscape Data** (Actor By Tag, tag name, Component By Class) — you may need to set **By Tag** + **`PCG_Landscape`** and **Component → By Class → Landscape Component** in Details.
-- Set **meshes on the Static Mesh Spawner nodes** — UE 5.7 Python does not expose `PCGStaticMeshSpawnerEntry` or `PCGMeshSelectorSingleMesh`, so you must assign the mesh list in the graph Details (see step 2b below).
+- Set **meshes on the Static Mesh Spawner nodes** — UE 5.8 Python does not expose `PCGStaticMeshSpawnerEntry` or `PCGMeshSelectorSingleMesh`, so you must assign the mesh list in the graph Details (see step 2b below).
 
 So **after running the script**, if PCG did not generate, do the remaining steps: set Get Landscape Data (and Component), **set the mesh list on each Static Mesh Spawner**, assign the graph to the volume if needed, and click **Generate**.
 
@@ -50,7 +50,7 @@ So **after running the script**, if PCG did not generate, do the remaining steps
 3. **Assign the graph** to the **PCG Volume** (Outliner → select PCG_Forest → Details → **Graph** → ForestIsland_PCG).
 4. **Generate from the level:** Close or minimize the graph editor. In the **level** (e.g. Main), select **PCG_Forest** in the Outliner. In the **Details** panel (right side), scroll to the **PCG** section and click the **Generate** button there. Use this Details-panel button only — not the green Play button or Simulate on the main toolbar, and not a Generate/Run button inside the graph asset editor. **If nothing appears after a normal click, try Ctrl+Click on Generate** to force a full regeneration. **For World Partition:** If you enabled **Is Partitioned** or changed **Partition Grid Size**, run **Cleanup** on the volume first, then **Generate** (or Ctrl+Click). After clicking Generate, **Output Log** (Window → Developer Tools → Output Log) should show lines containing `LogPCG`. If there are no LogPCG lines, the correct Generate was not used or the PCG log category may be filtered out.
 
-If the script’s automation could not assign the graph or set Get Landscape Data (common in UE 5.7), you still need to set Get Landscape Data (and Component), **set the mesh list on each Static Mesh Spawner**, assign the graph to the volume if needed, and Generate from the level as above.
+If the script’s automation could not assign the graph or set Get Landscape Data (common in UE 5.8), you still need to set Get Landscape Data (and Component), **set the mesh list on each Static Mesh Spawner**, assign the graph to the volume if needed, and Generate from the level as above.
 
 **Elegant approach (one-time setup):** Do the steps above **once** on ForestIsland_PCG, then save the graph. The **default is reuse**; on future runs the script reuses that graph, assigns it via `set_graph()`, and triggers Generate. Set `recreate_volume_and_graph: true` in config only to force full recreation. You then avoid re-entering Get Landscape Data and mesh lists every time. See [PCG_ELEGANT_SOLUTIONS.md](PCG_ELEGANT_SOLUTIONS.md) for the full flow and checklist.
 
@@ -117,7 +117,7 @@ If you prefer to build the graph from zero in the Editor, see **[docs/tasks/PCG_
 - **Elegant solutions (one-time setup, introspection):** [docs/PCG_ELEGANT_SOLUTIONS.md](PCG_ELEGANT_SOLUTIONS.md) — Research-backed approaches so you do manual steps once and reuse the graph; optional introspection to discover settable properties.
 - **Required settings automation cannot set:** See [docs/PCG_VARIABLES_NO_ACCESS.md](PCG_VARIABLES_NO_ACCESS.md) for a list of variables/settings that are necessary but not (reliably) settable from Python/MCP.
 - **[freetimecoder/unreal-pcg-examples](https://github.com/freetimecoder/unreal-pcg-examples)** — Full project with PCG graphs and maps; works in UE 5.7. Open a level with a PCG Volume + graph, hit Generate, then inspect the graph (Get Landscape Data settings, node order).
-- **[PacktPublishing/Procedural-Content-Generation-with-Unreal-Engine-5](https://github.com/PacktPublishing/Procedural-Content-Generation-with-Unreal-Engine-5)** — Book repo, UE 5.4+; **Chapter_2** is “Craft your first lush, procedurally generated forest.” Open the Chapter_2 project in 5.7 and mirror its graph layout and Details settings in HomeWorld.
+- **[PacktPublishing/Procedural-Content-Generation-with-Unreal-Engine-5](https://github.com/PacktPublishing/Procedural-Content-Generation-with-Unreal-Engine-5)** — Book repo, UE 5.4+; **Chapter_2** is “Craft your first lush, procedurally generated forest.” Open the Chapter_2 project in 5.8 and mirror its graph layout and Details settings in HomeWorld.
 - **Epic docs:** [PCG Framework Node Reference (UE 5.7)](https://dev.epicgames.com/documentation/en-us/unreal-engine/procedural-content-generation-framework-node-reference-in-unreal-engine), [Get Landscape Data (UE 5.7)](https://dev.epicgames.com/documentation/en-us/unreal-engine/API/Plugins/PCG/UPCGGetLandscapeSettings). In 5.4+, landscape is provided only via **Get Landscape Data**; the graph Input provides bounds.
 
 ---
@@ -151,7 +151,7 @@ For more detail, see **If nothing generates** below.
 
 0. **Force full regeneration:** Try **Ctrl+Click** on the Generate button in the PCG Volume’s Details panel; a normal click may not run a full generate in some cases.
 1. **Landscape:** Component Subsection = **1x1**; actor has tag **`PCG_Landscape`**.
-2. **Get Landscape Data (critical in UE 5.7):** Select the node → Details:
+2. **Get Landscape Data (critical in UE 5.8):** Select the node → Details:
    - **Actor** → **By Tag**, tag **`PCG_Landscape`**.
    - **Component** → **By Class** → **Landscape Component**. (If you only set Actor and leave Component default, the node often outputs nothing. Set both.)
 3. **Wiring:** Get Landscape Data **Out** → Surface Sampler **Surface**; Input → Surface Sampler **Bounding Shape**; chain to spawner → Output.
@@ -160,7 +160,7 @@ For more detail, see **If nothing generates** below.
 6. **Volume bounds:** The script uses **config** (`volume_center_*`, `volume_extent_*` in **`demo_map_config.json`**) as the source of truth. If **`use_landscape_bounds`** is true, it tries landscape bounds first, then World Partition bounds (so the volume can be sized to the level without Load All), then config. Set the config values to match your playable region. Optional: run **check_level_bounds.py** (Tools -> Execute Python Script) to see if landscape bounds are available.
 **Trees at weird angles or poking out of the volume:**
 
-- **Weird angles / trees lying down:** The graph’s **Transform Points** node is set to **Yaw only** (0–359°); pitch and roll are 0 so trees stay upright. In UE 5.7 the **Static Mesh Spawner** has **no align-to-surface option** in Details. If trees still lie down, the rotation may be coming from the **Surface Sampler** (points inherit surface normals). Try in the graph: ensure **Transform Points** runs after the Surface Sampler and that its **Absolute Rotation** is checked so it overwrites point rotation. Tree meshes should have their pivot at the base.
+- **Weird angles / trees lying down:** The graph’s **Transform Points** node is set to **Yaw only** (0–359°); pitch and roll are 0 so trees stay upright. In UE 5.8 the **Static Mesh Spawner** has **no align-to-surface option** in Details. If trees still lie down, the rotation may be coming from the **Surface Sampler** (points inherit surface normals). Try in the graph: ensure **Transform Points** runs after the Surface Sampler and that its **Absolute Rotation** is checked so it overwrites point rotation. Tree meshes should have their pivot at the base.
 - **Poking out the bottom:** Spawn Z is controlled by **transform_offset_z** in `pcg_forest_config.json` and mesh pivot, not by volume size. **volume_extent_z_padding** only enlarges the PCG Volume’s Z extent (bounds for sampling); it does not move spawn points. If meshes poke out the bottom, fix pivot and offset (see Debug below).
 
 **Debug: trees tilted or meshes out of the bottom**

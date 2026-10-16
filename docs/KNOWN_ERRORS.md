@@ -407,13 +407,13 @@ For each entry use:
 ### Package-HomeWorld: Stage fails with MissingExecutable (exit code 103)
 - **Error:** RunUAT BuildCookRun completes **Cook** successfully but **Stage** fails: `Stage Failed. Missing receipt '...\HomeWorld-Win64-Shipping.target'. Check that this target has been built.` AutomationTool exits with ExitCode=103 (Error_MissingExecutable).
 - **Cause:** RunUAT BuildCookRun (as used in Package-HomeWorld.bat) does not build the game target; it expects the **HomeWorld Win64 Shipping** executable (and .target receipt) to already exist. Build-HomeWorld.bat builds **HomeWorldEditor Win64 Development**, not the Shipping game.
-- **Fix:** Before running `Package-HomeWorld.bat`, build the game in Shipping config: e.g. `"C:\Program Files\Epic Games\UE_5.7\Engine\Build\BatchFiles\Build.bat" HomeWorld Win64 Shipping -Project="<path-to>\HomeWorld.uproject"`. Then run Package-HomeWorld.bat. See [STEAM_EA_STORE_CHECKLIST.md](workflow/STEAM_EA_STORE_CHECKLIST.md) § Current status (T3 twelfth list) and § How to run packaged build.
+- **Fix:** Before running `Package-HomeWorld.bat`, build the game in Shipping config: e.g. `"C:\Program Files\Epic Games\UE_5.8\Engine\Build\BatchFiles\Build.bat" HomeWorld Win64 Shipping -Project="<path-to>\HomeWorld.uproject"`. Then run Package-HomeWorld.bat. See [STEAM_EA_STORE_CHECKLIST.md](workflow/STEAM_EA_STORE_CHECKLIST.md) § Current status (T3 twelfth list) and § How to run packaged build.
 - **Context:** 2026-03-05, T3 twelfth list; packaging for Steam EA.
 
 ### Package-HomeWorld: Stage fails with SafeCopyFile (xaudio2_9redist / onnxruntime in use)
 - **Error:** During RunUAT BuildCookRun **Stage**, SafeCopyFile fails: `xaudio2_9redist.dll` "doesn't exist" (skip copy); `onnxruntime.dll` "The process cannot access the file ... because it is being used by another process." Staged build is incomplete; packaged exe may be missing.
 - **Cause:** Editor or another process (e.g. previous Unreal process, antivirus) has Engine/plugin DLLs open. RunUAT stages from Engine binaries; if those files are locked, copy fails.
-- **Fix:** Close Unreal Editor and any Unreal processes before running `Package-HomeWorld.bat`. Ensure no other process is using `C:\Program Files\Epic Games\UE_5.7\Engine\...` or project `Saved\StagedBuilds`. Then re-run: (1) Build HomeWorld Win64 Shipping; (2) Package-HomeWorld.bat. See [STEAM_EA_STORE_CHECKLIST.md](workflow/STEAM_EA_STORE_CHECKLIST.md) § How to run packaged build.
+- **Fix:** Close Unreal Editor and any Unreal processes before running `Package-HomeWorld.bat`. Ensure no other process is using `C:\Program Files\Epic Games\UE_5.8\Engine\...` or project `Saved\StagedBuilds`. Then re-run: (1) Build HomeWorld Win64 Shipping; (2) Package-HomeWorld.bat. See [STEAM_EA_STORE_CHECKLIST.md](workflow/STEAM_EA_STORE_CHECKLIST.md) § How to run packaged build.
 - **Context:** 2026-03-05, T5 sixteenth list; packaging after Shipping build succeeded.
 
 ### Package-HomeWorld: Stage SafeCopyFile — files in use (HomeWorld.exe, engine DLLs)
@@ -550,10 +550,10 @@ For each entry use:
 - **Fix:** Unknown — the MCP plugin's asset search is limited. Use Python Editor scripts or manual Editor steps to configure GameMode properties.
 - **Context:** 2026-02, MCP runtime, BP_GameMode.
 
-### Family/swarm agents: use UE 5.7 recommended Mass Entity + Mass AI
+### Family/swarm agents: use UE 5.8 recommended Mass Entity + Mass AI
 - **Error:** N/A (policy).
 - **Cause:** Project previously avoided Mass; Epic's current (non-deprecated) stack for crowds and lightweight AI is Mass Entity + Mass AI.
-- **Fix:** Use UE 5.7 recommended Mass Entity + Mass AI for family/swarm agents. Enable: MassEntity, MassGameplay, MassAI, StateTree, ZoneGraph, SmartObjects (and MassNavigation, MassRepresentation as required). See STACK_PLAN Layer 5 and docs/tasks/FAMILY_AGENTS_MASS_STATETREE.md.
+- **Fix:** Use UE 5.8 recommended Mass Entity + Mass AI for family/swarm agents. Enable: MassEntity, MassGameplay, MassAI, StateTree, ZoneGraph, SmartObjects (and MassNavigation, MassRepresentation as required). See STACK_PLAN Layer 5 and docs/tasks/FAMILY_AGENTS_MASS_STATETREE.md.
 - **Context:** 2026-02, stack plan, Week 2 family agents.
 
 ### Build HomeWorldEditor (CreateMEC commandlet) fails: Live Coding active
@@ -619,7 +619,7 @@ For each entry use:
 ### MEC (Mass Entity Config): no trait in dropdown exposes Static Mesh
 - **Error:** The MEC Traits **Add** dropdown does not show a trait that has **Static Mesh** or **Mesh**; family agents spawn with no visible mesh.
 - **Cause:** The representation trait lives in the **MassRepresentation** module (part of MassGameplay). The HomeWorldEditor module did not depend on MassRepresentation, so `StaticLoadClass` for `MassRepresentationFragmentTrait` failed and the commandlet could not add the trait. The Editor MEC trait picker may also not list it if the module was not loaded.
-- **Fix:** Add **MassRepresentation** to `PrivateDependencyModuleNames` in [Source/HomeWorldEditor/HomeWorldEditor.Build.cs](Source/HomeWorldEditor/HomeWorldEditor.Build.cs). Rebuild with `Build-HomeWorld.bat` (Editor closed). Run the CreateMEC commandlet: `UnrealEditor.exe HomeWorld.uproject -run=HomeWorldEditor.CreateMEC [Path=/Game/HomeWorld/Mass/MEC_FamilyGatherer]`. Open **MEC_FamilyGatherer** in the Editor; the representation trait should now be present. Set **Static Mesh** and **Scale** (1.0) in Details. For finding a cube/placeholder mesh in UE 5.7, use **only** Epic 5.7–sourced steps: see [UE57_EDITOR_UI.md](UE57_EDITOR_UI.md) (Show Engine Content, then browse or search). Save. See [DAY11_FAMILY_SPAWN.md](tasks/DAY11_FAMILY_SPAWN.md) Step 2.
+- **Fix:** Add **MassRepresentation** to `PrivateDependencyModuleNames` in [Source/HomeWorldEditor/HomeWorldEditor.Build.cs](Source/HomeWorldEditor/HomeWorldEditor.Build.cs). Rebuild with `Build-HomeWorld.bat` (Editor closed). Run the CreateMEC commandlet: `UnrealEditor.exe HomeWorld.uproject -run=HomeWorldEditor.CreateMEC [Path=/Game/HomeWorld/Mass/MEC_FamilyGatherer]`. Open **MEC_FamilyGatherer** in the Editor; the representation trait should now be present. Set **Static Mesh** and **Scale** (1.0) in Details. For finding a cube/placeholder mesh in UE 5.8, use **only** Epic 5.8-sourced steps: see [UE58_EDITOR_UI.md](UE/UE58_EDITOR_UI.md) (Show Engine Content, then browse or search). Save. See [DAY11_FAMILY_SPAWN.md](tasks/DAY11_FAMILY_SPAWN.md) Step 2.
 - **Context:** 2026-03, MEC_FamilyGatherer, family agent visualization.
 
 ### pie_test_runner.py: Save/Load and Phase 2 checks require PIE running

@@ -138,7 +138,7 @@ Host-side scripts run from the project root (no Editor required for the automati
 - **Run:** From project root: `py Content/Python/run_ue_automation.py`. Requires **UE_EDITOR** env set to the UnrealEditor.exe path. Optional: **HOMEWORLD_PROJECT** for the project directory (defaults to current working directory).
 - **Outputs:** `Saved/automation_run_result.json` with `success`, `passed`, `failed`, `report_path`, `error`; exit code 0 when all tests pass, 1 otherwise.
 - **Report format:** UE writes reports to the directory passed as `-ReportExportPath`; the script looks for `index.json` (or any `.json`) and reads `succeeded` / `failed` counts. See Epic UE 5.7 [Run Automation Tests](https://dev.epicgames.com/documentation/en-us/unreal-engine/run-automation-tests-in-unreal-engine) and [Review Test Results](https://dev.epicgames.com/documentation/en-us/unreal-engine/review-test-results-in-unreal-engine) for report layout.
-- **CLI:** `--group Smoke` (default) to choose test group; override for other groups.
+- **CLI:** `--filter HomeWorld` (test-name prefix; what this project's tests are named for) or `--group <name>` (UE group — matches no group in this project, kept only for existing callers). `--exclude <substring>` drops tests from the verdict while they still run. `.\Tools\RunTests.ps1` wraps this and defaults `-Filter HomeWorld`, excluding `Editor.Python` unless `-IncludePythonTests`.
 
 ### 6.2 capture_editor_screenshot.py (optional)
 

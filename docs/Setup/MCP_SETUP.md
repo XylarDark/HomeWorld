@@ -220,7 +220,7 @@ Full preset and style: [AssetCreation/STYLE_GUIDE.md](../../AssetCreation/STYLE_
 
 ## Fallback: UnrealMCPBridge
 
-If UnrealMCP fails to compile against UE 5.7, use `appleweed/UnrealMCPBridge` instead. It proxies to UE's built-in Python API via a socket bridge with no C++ plugin compilation required.
+If UnrealMCP fails to compile against UE 5.8, use `appleweed/UnrealMCPBridge` instead. It proxies to UE's built-in Python API via a socket bridge with no C++ plugin compilation required.
 
 ### Install
 
@@ -281,6 +281,6 @@ External LLMs can generate Python that is then run via MCP (`execute_python_scri
 | MCP tools don't appear in Cursor | Restart Cursor after adding/changing `.cursor/mcp.json`; ensure `uv` is on PATH; copy from `.cursor/mcp.json.example` if the live file is missing |
 | "Connection refused" | Ensure the Editor is open with the UnrealMCP plugin enabled; check Output Log for errors |
 | Python version error | Requires Python 3.10+; check with `python --version` |
-| Plugin compilation failure on UE 5.7 | Switch to UnrealMCPBridge fallback (see above) |
+| Plugin compilation failure on UE 5.8 | Switch to UnrealMCPBridge fallback (see above) |
 | `uv` not found | Run the install script or add `C:\Users\<user>\.local\bin` to PATH |
 | Mixar MCP missing / ENOENT / stuck Connecting | See [Mixar MCP](#mixar-mcp-official-blender-lab-add-on-served-by-mixar); start the server with `.\Tools\Start-MixarMcp.ps1` and use the Lab `blender-mcp.exe` via `Tools/mixar-mcp.cmd`, not PyPI `uvx blender-mcp` |

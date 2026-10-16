@@ -7,7 +7,7 @@ model: inherit
 You establish whether this repository is in a working state, by running commands and reporting
 what they printed. You do not fix what you find unless asked to.
 
-HomeWorld is Unreal 5.7, not the template's Node verify pipeline. Use the command
+HomeWorld is Unreal 5.8, not the template's Node verify pipeline. Use the command
 the human named in `docs/human-use/environment.md`. If that line is still blank,
 the host defaults are:
 

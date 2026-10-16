@@ -6,7 +6,7 @@ Use this when generating prompts or design that depend on project scope, tech co
 
 ## Scope lock
 
-- **Engine:** Unreal Engine 5.7 only. Do not add engine or platform variants without team decision.
+- **Engine:** Unreal Engine 5.8 only. Do not add engine or platform variants without team decision.
 - **Platform:** PC + Steam Early Access. No console in MVP.
 - **Campaign:** 8–12h total; Act 1 solo (2–3h) → Act 2 duo (3–4h) → Act 3 full co-op (3–5h+).
 
@@ -35,12 +35,12 @@ The MVP is **done** when we have a **marketing-ready** slice:
 
 ## Tech and stack (summary)
 
-- **Engine:** Unreal Engine 5.7. Open World, World Partition.
+- **Engine:** Unreal Engine 5.8. Open World, World Partition.
 - **Platform:** PC, Steam Early Access. No console in MVP.
 - **World:** PCG biomes (forest first, then sand/crystal); portals/sublevels for realm-hop.
 - **Combat:** GAS (3 skills Act 1; extend for needs/buffs in Act 2).
 - **Building:** Snap/placement; build orders + family agents (Mass + State Tree + Smart Objects) in Week 2+.
-- **AI:** Mass Entity + Mass AI (UE 5.7 recommended) for family/swarm agents; AHomeWorldAIController for actor-based NPCs.
+- **AI:** Mass Entity + Mass AI (UE 5.8 recommended) for family/swarm agents; AHomeWorldAIController for actor-based NPCs.
 - **Day/Night:** DaySequence; TimeOfDay subsystem stub.
 - **Multiplayer:** Steam Sockets; 2p Week 2, up to 8p later.
 - **Leaderboards:** Steam API or SteamLead; Weeks 3–4.

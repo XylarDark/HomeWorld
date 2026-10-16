@@ -20,7 +20,7 @@ The minimal graph that produces instances on the landscape is:
 
 - **Get Landscape Data** provides landscape spatial data; its **Out** goes to the Surface Sampler **Surface** pin; the graph **Input** provides bounds to the Surface Sampler **Bounding Shape** pin.
 - **Surface Sampler** generates points on the landscape; configure **Points per square meter** (and optionally **Point extents**) for density.
-- **Static Mesh Spawner** places meshes at those points. You must assign the **mesh list** in Details (Mesh Selector); automation cannot set it in UE 5.7.
+- **Static Mesh Spawner** places meshes at those points. You must assign the **mesh list** in Details (Mesh Selector); automation cannot set it in UE 5.8.
 
 Enhancements used in HomeWorld: **Density Filter** (density bounds), **Transform Points** (yaw-only rotation so trees stay upright, Z offset from config), optional **Difference** for exclusion zones. Optional: **Density Noise**, **Slope Filter**, **Randomize Transform** for variety.
 
@@ -34,7 +34,7 @@ Epic’s tutorials use this minimal flow; our script and graph extend it without
 - **Graph Input** → **Surface Sampler** (**Bounding Shape** pin). If no bounds are connected, the PCG Volume actor bounds limit the sampling domain.
 - **Surface Sampler** → [optional filters] → **Static Mesh Spawner** → **Output**.
 
-**Landscape:** Component Subsection **1x1** (UE 5.x); actor tag **`PCG_Landscape`**. In UE 5.7 landscape is provided **only** via Get Landscape Data; the graph Input provides bounds.
+**Landscape:** Component Subsection **1x1** (UE 5.x); actor tag **`PCG_Landscape`**. In UE 5.8 landscape is provided **only** via Get Landscape Data; the graph Input provides bounds.
 
 **Our graph** ([create_pcg_forest.py](Content/Python/create_pcg_forest.py)) builds this **tutorial-minimal flow plus**: Density Filter, Transform Points (yaw-only, Z offset), optional Difference (exclusion zones), and optional rocks branch + Merge. No structural change to the core wiring (Input→Bounding, Get Landscape Data→Surface, Surface Sampler→…→Spawner→Output).
 
@@ -42,7 +42,7 @@ Epic’s tutorials use this minimal flow; our script and graph extend it without
 
 ---
 
-## Mandatory manual steps (UE 5.7)
+## Mandatory manual steps (UE 5.8)
 
 These cannot be set reliably from Python/MCP; they must be done in the Editor:
 

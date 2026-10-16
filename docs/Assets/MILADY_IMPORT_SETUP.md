@@ -10,7 +10,7 @@ One-time setup for the Milady chibi protagonist import pipeline. For the full ta
    - Clone or download release into `Plugins/VRM4U` (project root).  
    - Enable in Editor: **Edit > Plugins** → search VRM4U → Enable.  
    - Add to `HomeWorld.uproject` under `Plugins` if not auto-added.  
-   - Verify UE 5.7 compatibility (check plugin’s supported engine version).  
+   - Verify UE 5.8 compatibility (check plugin’s supported engine version).  
    - Restart Editor after enable.
 
 2. **Meshy-for-Unreal** – Marketplace or Meshy.ai docs  
@@ -19,7 +19,7 @@ One-time setup for the Milady chibi protagonist import pipeline. For the full ta
 
 3. **Web3 / Wallet** – e.g. Web3.UE or MetaMask Embedded Wallets SDK  
    - Install and enable; add to `.uproject`.  
-   - Verify UE 5.7 and support for Ethereum mainnet and `eth_call` (for `balanceOf`, `tokenURI`).
+   - Verify UE 5.8 and support for Ethereum mainnet and `eth_call` (for `balanceOf`, `tokenURI`).
 
 ---
 
@@ -50,7 +50,7 @@ Generated imports (e.g. from Meshy) can go under `Milady/Generated` or `Milady/M
 
 ## Known issues and plugin order
 
-- **VRM4U:** If import fails on a given GLB/VRM, check plugin’s issue tracker for UE 5.7-specific fixes. Document any “variables with no access” (import options automation cannot set) in `docs/MILADY_VARIABLES_NO_ACCESS.md` or [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) per [automation-standards.mdc](.cursor/rules/automation-standards.mdc).
+- **VRM4U:** If import fails on a given GLB/VRM, check plugin's issue tracker for UE 5.8-specific fixes. Document any “variables with no access” (import options automation cannot set) in `docs/MILADY_VARIABLES_NO_ACCESS.md` or [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) per [automation-standards.mdc](.cursor/rules/automation-standards.mdc).
 - **Meshy:** Confirm plugin supports “image to 3D” with GLB/VRM output. Async job completion and download path may require project-specific wiring.
 - **Web3:** Read-only contract calls (`balanceOf`, `tokenURI`) do not require a private key; wallet connect is for address only.
 

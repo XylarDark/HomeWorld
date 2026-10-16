@@ -49,7 +49,7 @@ Before changing the graph, try the script. If By Tag or the Static Mesh Spawner 
 
 3. **Mesh lists on spawners:** Tree and rocks Static Mesh Spawner nodes need meshes assigned in Details (Mesh Selector / mesh list). When the script cannot set these, it logs the same `pcg-details` token. Paths live in `Content/Python/pcg_forest_config.json`.
 
-4. **Graph assigned to volume:** In the level, select **PCG_Forest** (or the PCG Volume) → Details → **Graph** → ForestIsland_PCG. If the script could not assign it (protected in UE 5.7), assign manually.
+4. **Graph assigned to volume:** In the level, select **PCG_Forest** (or the PCG Volume) → Details → **Graph** → ForestIsland_PCG. If the script could not assign it (protected in UE 5.8), assign manually.
 
 5. **Generate from level:** Generate must be triggered from the **level**: select PCG_Forest in Outliner → Details → PCG section → **Generate**. Not from inside the graph editor. If nothing appears, try Ctrl+Click on Generate.
 

@@ -21,7 +21,7 @@ Setup, conventions, content layout, automation, and operational guides live here
 | **[Maps/](Maps/)** | DemoMap, Homestead. |
 | **[Automation/](Automation/)** | Agent company, automation gaps, loop, refinement, research. |
 | **[Editor/](Editor/)** | Build protocol, launch deep dive, polish, manual tutorial. |
-| **[UE/](UE/)** | UE 5.7 tech, Editor UI. |
+| **[UE/](UE/)** | UE 5.8 tech, Editor UI. |
 | **[Assets/](Assets/)** | Asset workflow, external asset manifest (sources + licenses), Milady import. |
 | **[Testing/](Testing/)** | Level testing, MVP PIE + tutorial verification, movement validation. |
 | **[MVP/](MVP/)** | MVP gap analysis, mobile feasibility. |

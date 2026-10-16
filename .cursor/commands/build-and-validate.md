@@ -1,4 +1,4 @@
-# Build and validate (UE 5.7)
+# Build and validate (UE 5.8)
 
 Compile the project and optionally run PIE validation. Use when verifying C++, plugin, or engine changes.
 

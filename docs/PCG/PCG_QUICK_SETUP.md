@@ -1,4 +1,4 @@
-# PCG Quick Setup – Tutorial (UE 5.7)
+# PCG Quick Setup – Tutorial (UE 5.8)
 
 > **Quarantine:** PCG on DemoMap is legacy. MVP slice primary: [Maps/VS_MVP/README.md](../../Maps/VS_MVP/README.md) + [Docs/08d_CONTENT_CANON.md](../../Docs/08d_CONTENT_CANON.md).
 
@@ -63,7 +63,7 @@ You can read the approximate center and size from the **World Partition** window
 
 - Open **DemoMap** in the Editor (or let the script open it).
 - Run **create_demo_from_scratch.py** (Tools → Execute Python Script or MCP).
-- The script creates/reuses the graph and volume, tags the Landscape, and tries to assign the graph and trigger Generate. Many of these steps **fail** in UE 5.7 from Python (protected properties); that’s expected.
+- The script creates/reuses the graph and volume, tags the Landscape, and tries to assign the graph and trigger Generate. Many of these steps **fail** in UE 5.8 from Python (protected properties); that’s expected.
 
 ### 3. Three manual steps (one-time)
 

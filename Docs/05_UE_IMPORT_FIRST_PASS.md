@@ -17,7 +17,7 @@
 
 ## 0. Preconditions
 
-- Unreal Engine **5.7** with HomeWorld project open from repo root: `HomeWorld.uproject`
+- Unreal Engine **5.8** with HomeWorld project open from repo root: `HomeWorld.uproject`
 - This Linux box may not have UE — run this runbook on the Windows/UE machine
 - FBX already staged under `AssetCreation/Exports/{Homestead,Forest,Gatherables,Transit}/` (minimum)
 - Batch importer: `Content/Python/batch_import_asset_creation.py` (Docs/04 mesh paths)
@@ -26,7 +26,7 @@
 
 ## 1. Open project — **DONE** (DESKTOP-21CT3H0)
 
-1. Launch **UE 5.7**
+1. Launch **UE 5.8**
 2. Open `HomeWorld.uproject` from the HomeWorld repo root
 3. Wait for shaders / content scan; ignore missing dress assets
 

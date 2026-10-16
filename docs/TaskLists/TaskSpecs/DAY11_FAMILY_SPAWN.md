@@ -51,7 +51,7 @@ Follow [FAMILY_AGENTS_MASS_STATETREE.md](FAMILY_AGENTS_MASS_STATETREE.md) in ord
 
 Day 15 (role assignment and persistence) needs a way to identify each family member.
 
-- **Option A (Mass):** If your UE 5.7 Mass setup supports per-entity data, add a **Mass tag** or **fragment** (e.g. FamilyMember tag + RoleID or Index fragment) to MEC_FamilyGatherer so each spawned entity has an identity. Document the trait/fragment names in this doc or [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) if the API differs.
+- **Option A (Mass):** If your UE 5.8 Mass setup supports per-entity data, add a **Mass tag** or **fragment** (e.g. FamilyMember tag + RoleID or Index fragment) to MEC_FamilyGatherer so each spawned entity has an identity. Document the trait/fragment names in this doc or [KNOWN_ERRORS.md](../KNOWN_ERRORS.md) if the API differs.
 - **Option B (fallback):** If the Mass spawner does not expose per-entity tag in this setup, document: “Day 11: spawn N agents; Day 15 will add role assignment (e.g. by spawn index or via a subsystem).” Ensure **spawn count** and **spawn location** are correct; identity can be added when implementing persistence.
 
 ---

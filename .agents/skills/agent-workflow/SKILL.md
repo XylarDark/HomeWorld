@@ -20,7 +20,7 @@ the detection protocol says SWARM or HYBRID.
 
 > **Localize on copy.** HomeWorld-specific facts (rewritten from UserHarness).
 
-- Unreal Engine **5.7** (C++ + Blueprint content); Python Editor automation under `Content/Python/`.
+- Unreal Engine **5.8** (C++ + Blueprint content); Python Editor automation under `Content/Python/`.
 - Nested [UserHarness/](../../../UserHarness/) provides `npm run doctor` / `npm run sync` (Node 20+ on host; template prefers 24+).
 - `AGENTS.md` at the repo root is the canonical always-loaded project context.
 - Documentation lives under `docs/` per `docs/DOCS_LAYOUT.md`. Topic docs belong in subdirs (`docs/Setup/`, `docs/PCG/`, `docs/Automation/`, `docs/operational/`, `docs/human-use/`, etc.) — not new top-level files under `docs/`.

@@ -15,7 +15,7 @@
 
 ## 0. Preconditions
 
-- Unreal Engine **5.7**, HomeWorld open from repo root
+- Unreal Engine **5.8**, HomeWorld open from repo root
 - FBX batch import complete → meshes under `/Game/HomeWorld/Meshes/{Homestead,Forest,Gatherables,Transit}/`
 - Markers level exists: `/Game/HomeWorld/Maps/VS_MVP/L_VS_MVP_Markers` (from `place_vs_mvp_markers.py`)
 - Run on the **Windows/UE machine** (Linux staging box ships scripts + docs only)

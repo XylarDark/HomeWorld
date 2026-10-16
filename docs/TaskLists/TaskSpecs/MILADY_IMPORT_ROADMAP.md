@@ -2,7 +2,7 @@
 
 **Scope:** HomeWorld tiny chibi Milady protagonists (from Milady Maker NFTs). Flow: Wallet connect → Verify NFT (Remilia Collective) → Fetch 2D PNG from IPFS → Auto-rig to 3D chibi VRM/GLB → Import to UE5 → Retarget animations → Spawn at 0.1x scale with bouncy movement.
 
-**Project alignment:** HomeWorld targets **UE 5.7** (not 5.4); programmatic-by-default (C++ for systems, Blueprint for content). Content paths per [CONTENT_LAYOUT.md](../CONTENT_LAYOUT.md); add `/Game/HomeWorld/Milady/` (or `/Game/HomeWorld/Characters/Milady/`) for imported VRM/GLB, materials, and Milady-specific Blueprints.
+**Project alignment:** HomeWorld targets **UE 5.8** (not 5.4); programmatic-by-default (C++ for systems, Blueprint for content). Content paths per [CONTENT_LAYOUT.md](../CONTENT_LAYOUT.md); add `/Game/HomeWorld/Milady/` (or `/Game/HomeWorld/Characters/Milady/`) for imported VRM/GLB, materials, and Milady-specific Blueprints.
 
 **Contract reference:** Remilia Collective (mainnet); `balanceOf(wallet)`, `tokenURI(tokenId)` → metadata → IPFS image URL.
 
@@ -14,9 +14,9 @@
 
 | # | Task | Type | Dependencies | Effort | Description | Perf |
 |---|------|------|--------------|--------|-------------|------|
-| 1.1 | Add VRM4U plugin | **Manual** | None | Medium (3–6h) | Install [VRM4U](https://github.com/ruyo/VRM4U) (GitHub, free): clone or download release into `Plugins/VRM4U`, enable in Editor (Edit > Plugins), add to `HomeWorld.uproject` under Plugins. Verify UE 5.7 compatibility (check plugin's supported engine version). Restart Editor. | Editor startup |
+| 1.1 | Add VRM4U plugin | **Manual** | None | Medium (3–6h) | Install [VRM4U](https://github.com/ruyo/VRM4U) (GitHub, free): clone or download release into `Plugins/VRM4U`, enable in Editor (Edit > Plugins), add to `HomeWorld.uproject` under Plugins. Verify UE 5.8 compatibility (check plugin's supported engine version). Restart Editor. | Editor startup |
 | 1.2 | Add Meshy-for-Unreal plugin | **Manual** | None | Low (1–2h) | Install official Meshy-for-Unreal plugin (Marketplace or Meshy.ai docs). Enable in project; configure Meshy API key in project settings or plugin UI. Document key storage in `.env.example` (no secrets in repo). | Editor/runtime (API calls) |
-| 1.3 | Add Web3 / Wallet plugin | **Manual** | None | Medium (3–6h) | Choose and install Web3/Wallet plugin: e.g. **Web3.UE** or **MetaMask Embedded Wallets SDK** (or equivalent). Enable in Editor; add to `.uproject`. Verify UE 5.7 and that it supports Ethereum mainnet, `eth_call` (for `balanceOf`, `tokenURI`). | Runtime (wallet + RPC) |
+| 1.3 | Add Web3 / Wallet plugin | **Manual** | None | Medium (3–6h) | Choose and install Web3/Wallet plugin: e.g. **Web3.UE** or **MetaMask Embedded Wallets SDK** (or equivalent). Enable in Editor; add to `.uproject`. Verify UE 5.8 and that it supports Ethereum mainnet, `eth_call` (for `balanceOf`, `tokenURI`). | Runtime (wallet + RPC) |
 | 1.4 | Document plugins and paths | **Programmatic** | 1.1–1.3 | Low (1–2h) | Update [SETUP.md](../SETUP.md) with Milady pipeline plugins (VRM4U, Meshy, Web3). Add `/Game/HomeWorld/Milady/` (or subfolder under Characters) to [CONTENT_LAYOUT.md](../CONTENT_LAYOUT.md). Add [MILADY_IMPORT_SETUP.md](../MILADY_IMPORT_SETUP.md) with one-time setup: API keys, plugin order, known issues. | — |
 | 1.5 | Create Milady content folders (Python) | **Programmatic** | 1.4 | Low (1–2h) | Idempotent script in `Content/Python/` (e.g. `ensure_milady_folders.py`): ensure `/Game/HomeWorld/Milady/Meshes`, `/Game/HomeWorld/Milady/Materials`, `/Game/HomeWorld/Milady/Animations`, `/Game/HomeWorld/Milady/Blueprints` exist via `unreal.EditorAssetLibrary.make_directory()`. Call from bootstrap or run via MCP. | Editor |
 
@@ -98,7 +98,7 @@
 
 ## References and Conventions
 
-- **Engine:** UE 5.7 ([AGENTS.md](../../AGENTS.md), [STACK_PLAN.md](../STACK_PLAN.md)). Verify VRM4U/Meshy/Web3 plugin compatibility with 5.7.
+- **Engine:** UE 5.8 ([AGENTS.md](../../AGENTS.md), [STACK_PLAN.md](../STACK_PLAN.md)). Verify VRM4U/Meshy/Web3 plugin compatibility with 5.8.
 - **Code:** C++ in `Source/HomeWorld/`; new subsystems (Wallet, NFT, Milady Import) in C++ with Blueprint-callable APIs where needed. Blueprint for UI and content wiring.
 - **Automation:** Follow automation-standards: document any "variables with no access" for VRM4U/Meshy (e.g. import options, retargeter settings) in `docs/MILADY_VARIABLES_NO_ACCESS.md` or [KNOWN_ERRORS.md](../KNOWN_ERRORS.md).
 - **Content:** Use [CONTENT_LAYOUT.md](../CONTENT_LAYOUT.md) paths; add Milady folders and reference from scripts/bootstrap.
@@ -123,7 +123,7 @@ Complete these in order. Check off as done.
 
 ### Phase 1 – Plugins and one-time setup
 
-- [ ] **1.1** Install VRM4U: clone or download from [GitHub ruyo/VRM4U](https://github.com/ruyo/VRM4U) into `Plugins/VRM4U`. Enable in Edit > Plugins, add to `HomeWorld.uproject`. Restart Editor. Verify UE 5.7 compatibility.
+- [ ] **1.1** Install VRM4U: clone or download from [GitHub ruyo/VRM4U](https://github.com/ruyo/VRM4U) into `Plugins/VRM4U`. Enable in Edit > Plugins, add to `HomeWorld.uproject`. Restart Editor. Verify UE 5.8 compatibility.
 - [ ] **1.2** Install Meshy-for-Unreal (Marketplace or Meshy.ai). Enable in project. Set Meshy API key in project settings or plugin UI (do not commit; use `.env.example`).
 - [ ] **1.3** Install Web3/Wallet plugin (e.g. Web3.UE or MetaMask Embedded Wallets SDK). Enable; verify Ethereum mainnet and `eth_call` support.
 - [ ] Run `Content/Python/ensure_milady_folders.py` in Editor (Tools > Execute Python Script or MCP). Optionally run `create_milady_pastel_material.py`; then open M_MiladyPastel and add Base Color / VectorParameter for bubblegum (#FFB3D1), lilac (#E0BBE4), mint (#A8E6CF) if desired.

@@ -178,12 +178,14 @@ Editor launch, build protocol, polish, manual steps.
 
 ## UE/
 
-Unreal Engine 5.7 tech and Editor UI.
+Unreal Engine 5.8 tech and Editor UI.
 
 | File | Purpose |
 |------|--------|
-| [UE/UE57_TECH.md](UE/UE57_TECH.md) | UE 5.7 tech entry point; API pitfalls. |
-| [UE/UE57_EDITOR_UI.md](UE/UE57_EDITOR_UI.md) | Editor UI reference. |
+| [UE/UE58_TECH.md](UE/UE58_TECH.md) | UE 5.8 tech entry point; API pitfalls. |
+| [UE/UE58_EDITOR_UI.md](UE/UE58_EDITOR_UI.md) | Editor UI reference. |
+| [UE/UE57_TECH.md](UE/UE57_TECH.md) | Historical 5.7 tech entry point; superseded by UE58_TECH.md. |
+| [UE/UE57_EDITOR_UI.md](UE/UE57_EDITOR_UI.md) | Historical 5.7 Editor UI reference. |
 
 ---
 

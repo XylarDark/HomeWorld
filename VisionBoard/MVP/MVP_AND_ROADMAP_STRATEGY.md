@@ -10,7 +10,7 @@ How HomeWorld balances **MVP execution** (validate the loop fast) with **long-te
 
 - **PCG volume sized to level (landscape → WP bounds → config):** Best practice for World Partition. Config is source of truth; we don't depend on landscape being loaded; WP bounds give "size to level" without Load All. Same approach works for MVP and release.
 - **Programmatic by default (C++ gameplay, Blueprint content):** Aligns with CONVENTIONS and scales to full game.
-- **Single codebase, UE 5.7, PC + Steam EA:** Locked in AGENTS.md and STACK_PLAN; no throwaway prototype engine or platform.
+- **Single codebase, UE 5.8, PC + Steam EA:** Locked in AGENTS.md and STACK_PLAN; no throwaway prototype engine or platform.
 - **World Partition + PCG from Day 1:** Chosen for large proc-gen realms and streaming; we're building on the stack we'll ship with.
 
 So: **orient execution toward MVP, but keep architecture and stack aligned with release.** We're not building a throwaway prototype.
@@ -43,7 +43,7 @@ See [VISION.md](VISION.md) (Demonstrable prototype and vertical slice) and [30_D
 | Goal | How we achieve it |
 |------|-------------------|
 | **MVP fast** | Strict gate: Days 1–5 only until playtest passes. No Homestead/Family/Planetoid work before explore → fight → build works. One playable loop, minimal scope. |
-| **Long-term ready** | Same engine, same stack (UE 5.7, WP, PCG, GAS, Mass, etc.). No "prototype branch" that gets discarded. Architecture (C++ game module, config-driven scripts, PCG best practices) is ship-ready. |
+| **Long-term ready** | Same engine, same stack (UE 5.8, WP, PCG, GAS, Mass, etc.). No "prototype branch" that gets discarded. Architecture (C++ game module, config-driven scripts, PCG best practices) is ship-ready. |
 | **Vertical slice (end of 30 days)** | One moment + one beautiful corner polished for demo/stakeholders; builds on the same codebase. |
 
 **Strategy in one line:** Execute toward MVP (finish the loop, playtest, sign off), but build on the stack and architecture we intend to ship with, so we don't redo work when moving from prototype to release.

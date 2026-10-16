@@ -22,7 +22,7 @@ This guide lists **every task you must do by hand in the Unreal Editor** when sc
 
 **When:** After running `create_demo_from_scratch.py` (or `create_pcg_forest.py`) and trees/rocks do not appear, or Generate produces nothing.
 
-**Why manual:** Python cannot set Get Landscape Data (By Tag + tag name), Actor Spawner Template, or Static Mesh Spawner mesh list in UE 5.7.
+**Why manual:** Python cannot set Get Landscape Data (By Tag + tag name), Actor Spawner Template, or Static Mesh Spawner mesh list in UE 5.8.
 
 ### Steps
 

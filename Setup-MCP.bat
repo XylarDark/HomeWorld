@@ -121,6 +121,6 @@ echo      (the UnrealMCP plugin compiles on first launch)
 echo   3. Restart Cursor so it picks up .cursor/mcp.json
 echo   4. Check Cursor: Settings ^> Tools ^& MCP for green dot
 echo.
-echo If the plugin fails to compile against UE 5.7,
+echo If the plugin fails to compile against UE 5.8,
 echo see docs/MCP_SETUP.md for the UnrealMCPBridge fallback.
 echo.

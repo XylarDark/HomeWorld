@@ -1,6 +1,6 @@
 # PCG Elegant Solutions — Research-Backed
 
-This doc summarizes the **recurring issues** with PCG setup in HomeWorld (UE 5.7) and **elegant, research-backed approaches** so you can follow the Day 1 steps once and then rely on automation or a one-time setup.
+This doc summarizes the **recurring issues** with PCG setup in HomeWorld (UE 5.8) and **elegant, research-backed approaches** so you can follow the Day 1 steps once and then rely on automation or a one-time setup.
 
 **Context:** [PCG_SETUP.md](PCG_SETUP.md), [PCG_VARIABLES_NO_ACCESS.md](PCG_VARIABLES_NO_ACCESS.md), [KNOWN_ERRORS.md](KNOWN_ERRORS.md) (PCG entries). The script creates the graph and volume and tags the landscape, but several settings cannot be set reliably from Python and have caused "no surfaces found", "nothing generated", wrong pin wiring, and tilted/misplaced instances.
 
@@ -10,9 +10,9 @@ This doc summarizes the **recurring issues** with PCG setup in HomeWorld (UE 5.7
 
 | Issue | Cause | Current workaround |
 |-------|--------|---------------------|
-| **Get Landscape Data** not targeting landscape | Actor (By Tag) and tag name not settable from Python; property names not exposed or differ in 5.7 | Manual: Details → By Tag, tag `PCG_Landscape`; Component → By Class → Landscape Component |
-| **Static Mesh Spawner** empty mesh list | `PCGStaticMeshSpawnerEntry` / mesh list not exposed in UE 5.7 Python (or differs from 5.3/5.4) | Manual: assign mesh list in graph Details from `pcg_forest_config.json` |
-| **Graph not assigned to volume** | `graph` property on PCGComponent is protected for get/set_editor_property; `set_graph()` exists and works in 5.7 Python | Script uses `comp.set_graph(graph_asset)`; if that fails, assign in Details |
+| **Get Landscape Data** not targeting landscape | Actor (By Tag) and tag name not settable from Python; property names not exposed or differ in 5.8 | Manual: Details → By Tag, tag `PCG_Landscape`; Component → By Class → Landscape Component |
+| **Static Mesh Spawner** empty mesh list | `PCGStaticMeshSpawnerEntry` / mesh list not exposed in UE 5.8 Python (or differs from 5.3/5.4) | Manual: assign mesh list in graph Details from `pcg_forest_config.json` |
+| **Graph not assigned to volume** | `graph` property on PCGComponent is protected for get/set_editor_property; `set_graph()` exists and works in 5.8 Python | Script uses `comp.set_graph(graph_asset)`; if that fails, assign in Details |
 | **Surface Sampler "No surfaces found"** | Surface pin must receive data from Get Landscape Data; Bounding from Input; pin labels version-dependent | Correct wiring: Get Landscape Data → Surface; Input → Bounding; use introspection for pin names |
 | **Execution Dependency pin** | Connecting data to execution pin causes "does not have the Execution Dependency label" | Wire only **data** pins for data edges; use `_first_data_input_pin_label()` etc. in script |
 | **Nothing generated after Generate** | Landscape 1x1 subsections; World Partition cells unloaded; mesh list empty; or normal click not full regenerate | Checklist: 1x1, tag, mesh list, Load All, Ctrl+Click Generate |
@@ -66,7 +66,7 @@ If you prefer to **avoid any manual step** and are willing to maintain engine-ve
 
 2. **Inspect the output** for:
    - **Get Landscape Data:** The real property path for “actor by tag” and “tag name” (e.g. `actor_selector.tag` or a nested struct). Update `try_set_get_landscape_selector()` in `create_pcg_forest.py` to use those names.
-   - **Static Mesh Spawner:** Whether `mesh_entries`, `mesh_selector_parameters`, or another property is writable and what type the entries use (e.g. `PCGStaticMeshSpawnerEntry` in 5.7 or a different struct). Update the mesh list code to use the discovered API.
+   - **Static Mesh Spawner:** Whether `mesh_entries`, `mesh_selector_parameters`, or another property is writable and what type the entries use (e.g. `PCGStaticMeshSpawnerEntry` in 5.8 or a different struct). Update the mesh list code to use the discovered API.
 
 3. **Re-run the script** after engine upgrades; Epic may expose or rename properties.
 

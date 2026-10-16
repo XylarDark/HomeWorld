@@ -52,7 +52,7 @@
 | Area | Accomplished |
 |------|----------------|
 | **Session** | SESSION_LOG.md, DAILY_STATE.md (yesterday/today/tomorrow); NEXT_SESSION_PROMPT.md; read at start and updated at end. |
-| **Errors** | KNOWN_ERRORS.md (UE 5.7, MCP, PCG, etc.); AUTOMATION_GAPS.md (manual-only steps); error recurrence prevention in rules. |
+| **Errors** | KNOWN_ERRORS.md (UE 5.8, MCP, PCG, etc.); AUTOMATION_GAPS.md (manual-only steps); error recurrence prevention in rules. |
 | **Tests** | PythonAutomationTest (Content/Python/tests/test_*.py); pie_test_runner.py → Saved/pie_test_results.json; PIE validation in loop; level loader and PIE flow tests. |
 | **CI** | validate.yml (lint, JSON schema, C++ header/source, doc freshness). |
 | **MCP** | UnrealMCP; execute_python_script, console commands; agent utility scripts (mcp_harness, pie_test_runner, blueprint_inspector, layout_blueprint_nodes, capture_viewport). |

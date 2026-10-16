@@ -54,7 +54,7 @@ Closed. Do not load.
 
 ## 4. How to run (Windows DESKTOP)
 
-1. Open project in **Unreal Editor 5.7** on Windows.
+1. Open project in **Unreal Editor 5.8** on Windows.
 2. Ensure MPC exists (once): run `place_vs_mvp_markers.py` or `wire_nightmix_mpc_note.py`.
 3. Build masters: **Tools → Execute Python Script** → `Content/Python/create_master_materials.py`  
    Or MCP: `execute_python_script("create_master_materials.py")`.

@@ -26,7 +26,7 @@ assignees: ''
 
 ## Environment
 
-- **UE version:** (e.g. 5.7)
+- **UE version:** (e.g. 5.8)
 - **OS:** (e.g. Windows 11)
 - **Branch/commit:** (if relevant)
 

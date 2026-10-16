@@ -30,11 +30,11 @@ Do these after the programmatic work is in place.
   - Set **Get Landscape Data**: Actor → **By Tag**, tag **`PCG_Landscape`**; Component → **By Class** → **Landscape Component**.
   - Connect: **Input** → Surface Sampler **Bounding Shape**; **Get Landscape Data** → Surface Sampler **Surface**; Surface Sampler → Static Mesh Spawner → **Output**.
   - Assign a mesh to the Static Mesh Spawner. Assign the graph to a PCG Volume. Click **Generate**.
-- **Record** (for your own reference or to add to this doc): exact node order, pin names that worked in 5.7, and any Surface Sampler settings you used. Confirm that **Input → Bounding** and **Get Landscape Data → Surface** is the required minimum.
+- **Record** (for your own reference or to add to this doc): exact node order, pin names that worked in 5.8, and any Surface Sampler settings you used. Confirm that **Input → Bounding** and **Get Landscape Data → Surface** is the required minimum.
 
 ### 2. Optional: Reference project verification
 
-- Open **freetimecoder/unreal-pcg-examples** or **Packt Chapter_2** (Procedural-Content-Generation-with-Unreal-Engine-5) in UE 5.7.
+- Open **freetimecoder/unreal-pcg-examples** or **Packt Chapter_2** (Procedural-Content-Generation-with-Unreal-Engine-5) in UE 5.8.
 - Open a level that has PCG trees/forest. Inspect the graph: Get Landscape Data settings, Surface Sampler, spawner mesh list, node order.
 - Mirror those settings in HomeWorld’s ForestIsland_PCG if anything differs from our script or docs.
 

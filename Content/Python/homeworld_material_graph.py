@@ -1,5 +1,5 @@
 # homeworld_material_graph.py
-# Build HomeWorld master material node graphs in Unreal Editor (UE 5.7).
+# Build HomeWorld master material node graphs in Unreal Editor (UE 5.8).
 
 from __future__ import annotations
 
