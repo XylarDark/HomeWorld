@@ -1,5 +1,7 @@
 # Milady Character Import Pipeline – Development Roadmap
 
+**Parked 2026-10-16.** The NFT, wallet, and leaderboard subsystems, and the Milady import subsystem, are removed from the game module. This roadmap is not a build list. `UHomeWorldChibiAnimInstance` stays.
+
 **Scope:** HomeWorld tiny chibi Milady protagonists (from Milady Maker NFTs). Flow: Wallet connect → Verify NFT (Remilia Collective) → Fetch 2D PNG from IPFS → Auto-rig to 3D chibi VRM/GLB → Import to UE5 → Retarget animations → Spawn at 0.1x scale with bouncy movement.
 
 **Project alignment:** HomeWorld targets **UE 5.8** (not 5.4); programmatic-by-default (C++ for systems, Blueprint for content). Content paths per [CONTENT_LAYOUT.md](../CONTENT_LAYOUT.md); add `/Game/HomeWorld/Milady/` (or `/Game/HomeWorld/Characters/Milady/`) for imported VRM/GLB, materials, and Milady-specific Blueprints.
@@ -108,12 +110,7 @@
 
 ## Programmatic work completed
 
-The following has been implemented and is ready to use (no plugins required for metadata/PNG path):
-
-- **C++:** `UHomeWorldWalletSubsystem` (store connected address), `UHomeWorldNFTSubsystem` (config, `FetchMetadataFromURL`, `DownloadMiladyPNG`, IPFS gateway, `VerifyMiladyOwnership` stub), `UHomeWorldMiladyImportSubsystem` (`ImportMiladyFromMetadataURL` runs metadata → PNG; Meshy/VRM4U stubbed), `FMiladyTokenMetadata` ([MiladyTypes.h](../../Source/HomeWorld/MiladyTypes.h)), `UHomeWorldChibiAnimInstance` (BouncePhase, BounceScale, BounceOffset for bouncy motion).
-- **Config:** [Config/DefaultGame.ini](../../Config/DefaultGame.ini) `[Milady]` RemiliaContractAddress, EthereumRPCURL, IPFSGateway.
-- **Python:** [ensure_milady_folders.py](../../Content/Python/ensure_milady_folders.py), [create_milady_pastel_material.py](../../Content/Python/create_milady_pastel_material.py) (creates M_MiladyPastel; add base color in Editor).
-- **Flow:** From Blueprint or C++, call `ImportMiladyFromMetadataURL(MetadataURL, TokenId)` with a known metadata URL (e.g. from Web3 `tokenURI` or test); PNG is saved to `Saved/MiladyCache/TokenId.png`. Web3 plugin still required for `tokenURI(tokenId)` and wallet connect.
+Removed from the module on 2026-10-16: `UHomeWorldWalletSubsystem`, `UHomeWorldNFTSubsystem`, `UHomeWorldLeaderboardSubsystem`, `UHomeWorldMiladyImportSubsystem`, `FMiladyTokenMetadata`, and the `[Milady]` block in `Config/DefaultGame.ini`. `UHomeWorldChibiAnimInstance` stays. Do not call the removed types.
 
 ---
 
@@ -130,9 +127,7 @@ Complete these in order. Check off as done.
 
 ### Phase 2 – Wallet and contract
 
-- [ ] **2.1** Wire wallet connect: call plugin’s ConnectWallet from UI or Blueprint; on success call `UHomeWorldWalletSubsystem::SetConnectedAddress(Address)`.
-- [ ] **2.2** Fill `Config/DefaultGame.ini` [Milady]: RemiliaContractAddress (full mainnet address), EthereumRPCURL (e.g. Infura/Alchemy). Implement `tokenURI(tokenId)` via Web3 plugin and pass result to `UHomeWorldNFTSubsystem::FetchMetadataFromURL` or `UHomeWorldMiladyImportSubsystem::ImportMiladyFromMetadataURL`.
-- [ ] **2.3–2.4** Implement `VerifyMiladyOwnership` and tokenId → tokenURI in C++ or Blueprint using Web3 plugin (eth_call). Stub in code returns false until then.
+- [ ] **2.1–2.4** Parked. The wallet, NFT, and Milady import subsystems are gone. Do not add them back in this prototype.
 
 ### Phase 4 – Meshy
 

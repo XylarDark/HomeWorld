@@ -122,7 +122,7 @@ If we **defer** full “scan Milady image → 3D in-game” this cycle:
 
 **What to implement:**
 
-- **Option A — Meshy from UE:** Follow [MILADY_IMPORT_ROADMAP.md](../TaskLists/TaskSpecs/MILADY_IMPORT_ROADMAP.md) Phase 4: 4.1 (API key and plugin config), 4.2 (Call Meshy image-to-3D from UE — upload PNG, poll/callback, download GLB/VRM), 4.3 (save output to project path). Wire `UHomeWorldMiladyImportSubsystem` (or equivalent) so that after PNG is fetched, the Meshy plugin is invoked; on completion, save to e.g. `Content/HomeWorld/Milady/Generated/<tokenId>.glb` and trigger VRM4U import.
+- **Option A — Meshy from UE:** The Milady import subsystem was removed on 2026-10-16. [MILADY_IMPORT_ROADMAP.md](../TaskLists/TaskSpecs/MILADY_IMPORT_ROADMAP.md) is parked and is not a build list.
 - **Option B — Tripo / TripoSR path:** Add Tripo or TripoSR integration (plugins exist for Unreal/Blender/ComfyUI): same flow — pass PNG → request 3D → poll or callback → download GLB → VRM4U import. Document chosen plugin and any API keys in [MILADY_IMPORT_SETUP.md](MILADY_IMPORT_SETUP.md).
 
 **Where to document "variables with no access":**

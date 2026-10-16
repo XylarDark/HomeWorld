@@ -14,7 +14,6 @@ public class HomeWorld : ModuleRules
 			"Core",
 			"CoreUObject",
 			"Engine",
-			"HTTP",
 			"InputCore",
 			"EnhancedInput",
 			"Json",
