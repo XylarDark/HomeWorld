@@ -76,6 +76,10 @@ public:
 
 	FVector GetLastWeakHitOffset() const { return LastWeakHitOffset; }
 
+	bool HasCarriedPoint() const { return bHasCarriedPoint; }
+
+	FVector2D GetCarriedPoint() const { return CarriedPoint; }
+
 protected:
 	void RecordDrawnPoles(EHomeWorldStrokeStep Step, UHomeWorldVirtueComponent* Virtue) const;
 
@@ -94,4 +98,10 @@ protected:
 	bool bWeakHitMoved = false;
 
 	FVector LastWeakHitOffset = FVector::ZeroVector;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stroke")
+	bool bHasCarriedPoint = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stroke")
+	FVector2D CarriedPoint = FVector2D::ZeroVector;
 };

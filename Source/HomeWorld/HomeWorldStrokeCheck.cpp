@@ -123,7 +123,7 @@ namespace HomeWorldStroke
 		return (Total / static_cast<float>(SampleCount)) <= MatchDistance;
 	}
 
-	static bool PassesThrough(const TArray<FHomeWorldStrokeSample>& Stroke, const FVector2D& Point)
+	bool PassesThroughPoint(const TArray<FHomeWorldStrokeSample>& Stroke, const FVector2D& Point)
 	{
 		for (const FHomeWorldStrokeSample& Sample : Stroke)
 		{
@@ -174,7 +174,7 @@ namespace HomeWorldStroke
 		{
 			return EHomeWorldStrokeResult::Miss;
 		}
-		if (bNeedsExtra && !PassesThrough(Stroke, ExtraPoint))
+		if (bNeedsExtra && !PassesThroughPoint(Stroke, ExtraPoint))
 		{
 			return EHomeWorldStrokeResult::Miss;
 		}

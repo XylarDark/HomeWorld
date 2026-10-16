@@ -48,6 +48,11 @@ namespace HomeWorldStroke
 		float WindowMax,
 		const FVector2D& ExtraPoint);
 
+	/** True when a sample sits on the point. */
+	HOMEWORLD_API bool PassesThroughPoint(
+		const TArray<FHomeWorldStrokeSample>& Stroke,
+		const FVector2D& Point);
+
 	/** A short step away from the focus. Z is unchanged. */
 	HOMEWORLD_API FVector WeakHitStep(const FVector& From, const FVector& Focus);
 }
