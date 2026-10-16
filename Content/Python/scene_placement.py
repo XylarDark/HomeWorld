@@ -15,6 +15,7 @@ import unreal
 
 sys.path.insert(0, os.path.dirname(__file__))
 import cabin_shell
+import size_test_guard
 
 ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", ".."))
 METRICS = os.path.join(ROOT, "Docs", "level", "L_SizeTest_METRICS.md")
@@ -382,6 +383,24 @@ def place_player(player, top):
     actor.set_actor_location(location, False, False)
     actor.set_actor_rotation(yaw_rotator(player["yaw"]), False)
     return actor
+
+
+def stroke_or_ease_errors():
+    """A stroke or an ease pad must not be saved into this map."""
+    entries = []
+    for actor in actors():
+        names = []
+        try:
+            names.append(actor.get_class().get_name())
+        except Exception:
+            pass
+        try:
+            for component in actor.get_components_by_class(unreal.ActorComponent):
+                names.append(component.get_class().get_name())
+        except Exception:
+            pass
+        entries.append((actor.get_actor_label(), names))
+    return size_test_guard.size_test_stroke_errors(entries)
 
 
 def remove_outside_homestead(keep):
@@ -759,6 +778,7 @@ def run(import_mesh=True):
     errors = pin_to_floor(labels, top)
     errors.extend(floor_errors)
     errors.extend(validate(player, top))
+    errors.extend(stroke_or_ease_errors())
     for error in errors:
         unreal.log("scene_placement: FAIL " + error)
     if errors:
@@ -790,6 +810,7 @@ def check():
             break
     errors.extend(validate(player, top))
     errors.extend(space_mapping_errors())
+    errors.extend(stroke_or_ease_errors())
     for error in errors:
         unreal.log("scene_placement: FAIL " + error)
     if errors:
