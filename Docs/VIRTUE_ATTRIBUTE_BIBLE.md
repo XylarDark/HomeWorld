@@ -49,7 +49,7 @@ A yielded item carries a pole, or a paradox mark of its own.
 
 Armor carries marks. It changes how you move, which places you can reach, how many bonk tries you have, and how spirit play goes. You equip the set for one encounter. The set changes how that encounter behaves so you can finish it. Interview round 2, 2026-10-15.
 
-A marked consumable alters the character, or the world you then meet. Armor is how you meet what that alteration puts in front of you. Herbs stay on the verbs above. At the homestead you change, remove, or alter a mark at a bench: place, turn, commit. A bad commit fails in the open. There is no menu. Interview round 4, 2026-10-15. The ease's yield has one recipe. Place the mark on a piece of armor, turn it until the rune matches a pole you have drawn, and commit. A mismatch fails in the open and returns the mark. Interview, next beats round 5. Herbs still spend by the verbs above. Other bench recipes are not named.
+A marked consumable alters the character, or the world you then meet. Armor is how you meet what that alteration puts in front of you. Herbs stay on the verbs above. At the homestead you change, remove, or alter a mark at a bench: place, turn, commit. A bad commit fails in the open. There is no menu. Interview round 4, 2026-10-15. The ease's yield has one recipe. Place the mark on a piece of armor, turn it until the rune matches a pole you have drawn, and commit. A mismatch fails in the open and returns the mark. Interview, next beats round 5. Remove is the same bench. Turn the rune until it is blank, and commit. The mark comes off in your hand. A commit on the wrong rune fails in the open and leaves the mark. Interview, slice defaults round 4, 2026-10-15. Alter is the same bench. Turn the rune to the other pole of that axis, and only if you have drawn that pole. Otherwise the commit fails and the mark stays. Interview, bench and lair round 1, 2026-10-15. Herbs still spend by the verbs above.
 
 ## Planetside
 
@@ -57,7 +57,7 @@ The ground changes with how you treat it. Using a paradox encounter retires that
 
 ## Zones
 
-Four zones carry the fourteen poles between them. Each zone has at least one paradox encounter. Which pole sits in which zone is not named. You meet the axes in a randomized order. The last encounter in that run is a paradox of the stroke. Every axis uses that stroke. The creature is the theme. A creature's normal mechanic stays the one already established for it. An axis or a paradox is a layer on that default. The default slightly changes the layer, and the encounter becomes unique and harder. Which axis appears can be random. Interview, creature themes round 1, 2026-10-15. The bull's tame waits on the paradox layer on that bull. On that layer you draw while standing still. A sudden move is the miss, and the bull charges. The herb approach stays the tame once that layer is done. Interview, creature themes round 2, 2026-10-15. These four are places. They do not replace the seven mechanic families as the zone-type vocabulary.
+Four zones carry the fourteen poles between them. Each zone has at least one paradox encounter. Which pole sits in which zone is not named. You meet the axes in a randomized order. The last encounter in that run is a paradox of the stroke. Every axis uses that stroke. The creature is the theme. A creature's normal mechanic stays the one already established for it. An axis or a paradox is a layer on that default. The default slightly changes the layer, and the encounter becomes unique and harder. Which axis appears can be random. Interview, creature themes round 1, 2026-10-15. The bull's tame waits on the paradox layer on that bull. On that layer you draw while standing still. A sudden move is the miss, and the bull charges. The herb approach stays the tame once that layer is done. Interview, creature themes round 2, 2026-10-15. The field roost is a climb in the open field, not a fourth place. The bull knocks out the lower blocker. The higher obstacle is the stroke, drawn while you climb. The nest is the rune. A miss drops you to the ledge below. It does not send you home. Interview, slice defaults rounds 1 and 2, 2026-10-15. A tree takes the same kind of layer. You draw a stroke on the trunk. The bark you can see is the rune. A miss is the creak and the few steps back. In spirit form that miss is still the glide to the bed. Interview, slice defaults round 3, 2026-10-15.
 
 The first forest is the camp forest, the edge you commit to from the field. Its axis is Wrath / Grace. The one action is the ease. Grace finishes it. Wrath shoves it off. Paradox runs both, and they interfere. The misses and the player order are in Hardest form. A success yields. Interview round 6, 2026-10-15. When that camp is complete, the other forest edge opens. Its axis is Greed / Generosity. The one action is a give. You draw the rune while you move, inside a visible wind-up. Generosity completes the stroke. Greed snatches it if you are late or the stroke is wrong. That miss is the same miss as the ease. Interview, next beats round 3. The encounter shape stays. A success yields. Interview round 7, 2026-10-15. That forest has a different mechanic from the ease. From inside the field the two edges stay identical until you commit.
 
@@ -117,9 +117,7 @@ Author the hardest form of a mechanic first. Then author the scaled-down steps t
 
 ## Not named
 
-- How a creature's default changes the stroke, for a creature that does not yet have one
-- Other homestead bench recipes, beyond the ease-yield recipe
-- Further lair beats, beyond the snake's stroke on the giant
+- Further lair beats, beyond the snake's stroke and the tickle's stroke
 
 ## Not in this pass
 

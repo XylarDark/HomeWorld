@@ -28,6 +28,36 @@ public:
 	bool HasAxis(EHomeWorldVirtuePole Pole) const;
 
 	UFUNCTION(BlueprintCallable, Category = "Virtue")
+	bool HasParadox(EHomeWorldVirtuePole PoleOnAxis) const;
+
+	const TArray<int32>& GetParadoxAxes() const { return ParadoxAxes; }
+
+	const TArray<EHomeWorldVirtuePole>& GetDrawnPoles() const { return DrawnPoles; }
+
+	UFUNCTION(BlueprintCallable, Category = "Virtue")
+	bool HasDrawnPole(EHomeWorldVirtuePole Pole) const;
+
+	/** Remember a pole the player has drawn. The spawn roll does not write this. */
+	UFUNCTION(BlueprintCallable, Category = "Virtue")
+	void RecordDrawnPole(EHomeWorldVirtuePole Pole);
+
+	/** Set the armor's axis to a pole the player has drawn. A failure leaves the armor unchanged. */
+	UFUNCTION(BlueprintCallable, Category = "Virtue")
+	bool TryBenchChange(UHomeWorldVirtueComponent* Armor, EHomeWorldVirtuePole Pole);
+
+	/** Blank a rune the armor holds. The wrong rune leaves the armor unchanged. */
+	UFUNCTION(BlueprintCallable, Category = "Virtue")
+	bool TryBenchRemove(UHomeWorldVirtueComponent* Armor, EHomeWorldVirtuePole Pole);
+
+	/** Flip to the other pole when that pole has been drawn. Otherwise the mark stays. */
+	UFUNCTION(BlueprintCallable, Category = "Virtue")
+	bool TryBenchAlter(UHomeWorldVirtueComponent* Armor, EHomeWorldVirtuePole Pole);
+
+	/** Occupies the pole's axis. Fails when that axis already has a pole or a paradox. */
+	UFUNCTION(BlueprintCallable, Category = "Virtue")
+	bool TrySetParadox(EHomeWorldVirtuePole PoleOnAxis);
+
+	UFUNCTION(BlueprintCallable, Category = "Virtue")
 	void ClearPoles();
 
 	/** Adds the pole when its axis is empty. */
@@ -47,6 +77,9 @@ public:
 
 	void Roll(const TArray<float>& Chances, FRandomStream& Stream);
 
+private:
+	bool TrySetAxisPole(EHomeWorldVirtuePole Pole);
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -64,4 +97,12 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Virtue")
 	TArray<EHomeWorldVirtuePole> Poles;
+
+	/** Axis indexes held as a paradox instead of a pole. The spawn roll never writes these. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Virtue")
+	TArray<int32> ParadoxAxes;
+
+	/** Poles the player has drawn. Not a spawn result. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Virtue")
+	TArray<EHomeWorldVirtuePole> DrawnPoles;
 };

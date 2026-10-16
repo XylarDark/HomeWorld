@@ -62,7 +62,7 @@ Partner and child stay home. The lair is the player, the three guards, and the g
 
 ## Attribute layer
 
-Each of the seven pairs has an interaction in this lair. The coils, the tickle, the ram, the heals, and the eye stay. Beside them, the snake keeps its default and you draw its rune on the giant, inside a wind-up. Interview, creature themes, 2026-10-15. Further beats beside those are not named. One paradox item, gathered from travels in the field and the forests, is required. It is the key that lets the lair's last station happen. Interview round 12, 2026-10-15.
+Each of the seven pairs has an interaction in this lair. The coils, the tickle, the ram, the heals, and the eye stay. Beside them, the snake keeps its default and you draw its rune on the giant, inside a wind-up. The tickle takes a stroke during the reach. A miss is the scale shifting away. A tickle during the shift still does nothing. Interview, bench and lair round 2, 2026-10-15. Further beats beside those are not named. One paradox item, gathered from travels in the field and the forests, is required. It is the key that lets the lair's last station happen. Interview round 12, 2026-10-15.
 
 ## Zone barriers
 
@@ -80,7 +80,7 @@ The river after that forest is crossed on stones. A miss is the fish: a local bo
 | Three guards | Night: heal a wound on each, then they push coil three. No scale on that coil. |
 | Giant wrap | Night heal, after the coil is already off. |
 | Bull, tamed | Coil one only. Full-speed ram on the loose scale. A miss stuns it 3 seconds. |
-| Tickle | Coil two. Approach the underside. The tickle drops the coil. |
+| Tickle | Coil two. You draw during the reach. The tickle drops the coil. A miss is the scale shifting away. |
 | Day glide | The entry. One sign, no pickup, steer into the scary mouth. |
 | Night portal or glide | The return. Existing shrine, or the same glide. No new flight. |
 | Spirit stealth | Past the snake's eye. A catch sets you just outside the light. No stun. No trip home. |

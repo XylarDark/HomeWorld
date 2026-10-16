@@ -11,6 +11,10 @@ bool UHomeWorldVirtueComponent::HasPole(EHomeWorldVirtuePole Pole) const
 bool UHomeWorldVirtueComponent::HasAxis(EHomeWorldVirtuePole Pole) const
 {
 	const int32 Axis = HomeWorldVirtue::AxisIndex(Pole);
+	if (HomeWorldVirtue::ParadoxOccupies(ParadoxAxes, Axis))
+	{
+		return true;
+	}
 	for (const EHomeWorldVirtuePole Held : Poles)
 	{
 		if (HomeWorldVirtue::AxisIndex(Held) == Axis)
@@ -19,6 +23,78 @@ bool UHomeWorldVirtueComponent::HasAxis(EHomeWorldVirtuePole Pole) const
 		}
 	}
 	return false;
+}
+
+bool UHomeWorldVirtueComponent::HasParadox(EHomeWorldVirtuePole PoleOnAxis) const
+{
+	return HomeWorldVirtue::ParadoxOccupies(ParadoxAxes, HomeWorldVirtue::AxisIndex(PoleOnAxis));
+}
+
+bool UHomeWorldVirtueComponent::TrySetParadox(EHomeWorldVirtuePole PoleOnAxis)
+{
+	FString Error;
+	return HomeWorldVirtue::TryAddParadoxAxis(ParadoxAxes, Poles, HomeWorldVirtue::AxisIndex(PoleOnAxis), Error);
+}
+
+bool UHomeWorldVirtueComponent::HasDrawnPole(EHomeWorldVirtuePole Pole) const
+{
+	return DrawnPoles.Contains(Pole);
+}
+
+void UHomeWorldVirtueComponent::RecordDrawnPole(EHomeWorldVirtuePole Pole)
+{
+	if (!DrawnPoles.Contains(Pole))
+	{
+		DrawnPoles.Add(Pole);
+	}
+}
+
+bool UHomeWorldVirtueComponent::TrySetAxisPole(EHomeWorldVirtuePole Pole)
+{
+	const int32 Axis = HomeWorldVirtue::AxisIndex(Pole);
+	const bool bOccupied = HasAxis(Pole);
+	if (!bOccupied && Poles.Num() + ParadoxAxes.Num() >= HomeWorldVirtue::AxisCount)
+	{
+		return false;
+	}
+	ParadoxAxes.Remove(Axis);
+	for (int32 Index = Poles.Num() - 1; Index >= 0; --Index)
+	{
+		if (HomeWorldVirtue::AxisIndex(Poles[Index]) == Axis)
+		{
+			Poles.RemoveAt(Index);
+		}
+	}
+	Poles.Add(Pole);
+	return true;
+}
+
+bool UHomeWorldVirtueComponent::TryBenchChange(UHomeWorldVirtueComponent* Armor, EHomeWorldVirtuePole Pole)
+{
+	if (!Armor || !HasDrawnPole(Pole))
+	{
+		return false;
+	}
+	return Armor->TrySetAxisPole(Pole);
+}
+
+bool UHomeWorldVirtueComponent::TryBenchRemove(UHomeWorldVirtueComponent* Armor, EHomeWorldVirtuePole Pole)
+{
+	if (!Armor || !Armor->HasPole(Pole))
+	{
+		return false;
+	}
+	return Armor->TryTakePole(Pole);
+}
+
+bool UHomeWorldVirtueComponent::TryBenchAlter(UHomeWorldVirtueComponent* Armor, EHomeWorldVirtuePole Pole)
+{
+	const EHomeWorldVirtuePole Other = HomeWorldVirtue::Opposite(Pole);
+	if (!Armor || !Armor->HasPole(Pole) || !HasDrawnPole(Other))
+	{
+		return false;
+	}
+	return Armor->TrySwapAxis(Pole);
 }
 
 void UHomeWorldVirtueComponent::ClearPoles()
@@ -66,11 +142,13 @@ bool UHomeWorldVirtueComponent::TrySetHandPoles(const TArray<EHomeWorldVirtuePol
 	bHandAuthored = true;
 	HandPoles = Next;
 	Poles = Next;
+	ParadoxAxes.Reset();
 	return true;
 }
 
 void UHomeWorldVirtueComponent::Roll(const TArray<float>& Chances, FRandomStream& Stream)
 {
+	ParadoxAxes.Reset();
 	HomeWorldVirtue::RollPoles(Poles, Chances, Stream);
 	bHandAuthored = false;
 }

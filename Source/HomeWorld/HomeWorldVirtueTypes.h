@@ -47,8 +47,17 @@ namespace HomeWorldVirtue
 	/** Rejects a second pole on an axis and a set larger than seven. */
 	HOMEWORLD_API bool TrySetHandPoles(TArray<EHomeWorldVirtuePole>& OutPoles, const TArray<EHomeWorldVirtuePole>& Hand, FString& OutError);
 
-	/** Stops on the first miss. Picks an unused axis, then one of its two poles. */
+	/** Stops on the first miss. Picks an unused axis, then one of its two poles. Never a paradox. */
 	HOMEWORLD_API void RollPoles(TArray<EHomeWorldVirtuePole>& OutPoles, const TArray<float>& Chances, FRandomStream& Stream);
+
+	/** One paradox occupies the axis. Fails if that axis already has a pole or a paradox, or the set is full. */
+	HOMEWORLD_API bool TryAddParadoxAxis(
+		TArray<int32>& ParadoxAxes,
+		const TArray<EHomeWorldVirtuePole>& Poles,
+		int32 Axis,
+		FString& OutError);
+
+	HOMEWORLD_API bool ParadoxOccupies(const TArray<int32>& ParadoxAxes, int32 Axis);
 
 	HOMEWORLD_API FString FormatPoles(const TArray<EHomeWorldVirtuePole>& Poles);
 

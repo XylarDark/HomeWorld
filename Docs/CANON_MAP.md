@@ -69,6 +69,8 @@ README is left intact as history.
 | **Challenge pillars interview** | `Docs/context/CHALLENGE_PILLARS_INTERVIEW.md` | rounds 1–6 picked, 2026-10-15. Rules live in the virtue bible. |
 | **Next beats interview** | `Docs/context/NEXT_BEATS_INTERVIEW.md` | picked, 2026-10-15. Every axis uses the stroke. Rules live in the virtue bible. |
 | **Creature themes interview** | `Docs/context/CREATURE_THEMES_INTERVIEW.md` | picked, 2026-10-15. A layer sits on the creature's default. Rules live in the virtue bible. |
+| **Slice defaults interview** | `Docs/context/SLICE_DEFAULTS_INTERVIEW.md` | picked, 2026-10-15. The roost skill is the stroke. Rules live in the virtue bible. |
+| **Bench and lair interview** | `Docs/context/BENCH_LAIR_INTERVIEW.md` | picked, 2026-10-15. Alter flips a drawn pole. The tickle takes a stroke. |
 | GDD slice | `Docs/01_GDD_MVP.md` | canon |
 | **Cloud descent facts and carried wisp** | `Docs/context/HOMEWORLD_ROUTE.md` + accepted `docs/human-use/test-contract.md` | current route / accepted behavior |
 | Art direction | `Docs/02_ART_BIBLE.md` | canon. `VisionBoard/KeyArt/homestead_dusk_baseline.jpg` is a fit check after a developer design, not a design source. |

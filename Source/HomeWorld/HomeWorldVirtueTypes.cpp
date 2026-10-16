@@ -72,6 +72,45 @@ namespace HomeWorldVirtue
 		}
 	}
 
+	bool ParadoxOccupies(const TArray<int32>& ParadoxAxes, int32 Axis)
+	{
+		return ParadoxAxes.Contains(Axis);
+	}
+
+	bool TryAddParadoxAxis(
+		TArray<int32>& ParadoxAxes,
+		const TArray<EHomeWorldVirtuePole>& Poles,
+		int32 Axis,
+		FString& OutError)
+	{
+		if (Axis < 0 || Axis >= AxisCount)
+		{
+			OutError = TEXT("axis out of range");
+			return false;
+		}
+		if (ParadoxAxes.Contains(Axis))
+		{
+			OutError = TEXT("axis already in paradox");
+			return false;
+		}
+		for (const EHomeWorldVirtuePole Pole : Poles)
+		{
+			if (AxisIndex(Pole) == Axis)
+			{
+				OutError = TEXT("axis already holds a pole");
+				return false;
+			}
+		}
+		if (Poles.Num() + ParadoxAxes.Num() >= AxisCount)
+		{
+			OutError = TEXT("more than seven marks");
+			return false;
+		}
+		ParadoxAxes.Add(Axis);
+		OutError.Reset();
+		return true;
+	}
+
 	const TCHAR* PoleName(EHomeWorldVirtuePole Pole)
 	{
 		switch (Pole)

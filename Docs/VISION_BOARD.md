@@ -131,7 +131,7 @@ The Round 7 questions are answered. Do not ask them again.
 | What is the field roost? | A climb in the open field. One great eagle. One unique nest. Not a fourth place. 2026-10-12. |
 | What does communing with the bull unlock? | After the bull is tamed, communing with its spirit at night unlocks an ability. The ability is not named. 2026-10-12. |
 | How does the roost climb start? | The bull knocks out a blocker in the field. The lair ride stays the only ride. Everywhere else the bull stays field-only. 2026-10-12. |
-| What clears the higher roost obstacle? | A skill learned in the pine forest. The skill is not named. 2026-10-12. |
+| What clears the higher roost obstacle? | The stroke, drawn while you climb. The nest is the rune. [`Docs/VIRTUE_ATTRIBUTE_BIBLE.md`](VIRTUE_ATTRIBUTE_BIBLE.md). 2026-10-15. |
 | Can one zone wait on another? | Yes. The field climb waits on the bull. The higher obstacle waits on the forest. 2026-10-12. |
 | What is a paradox mark? | The two poles of one axis as one symbol. It occupies that axis. 2026-10-15. |
 | What does armor do? | It changes movement, access, bonk tries, and spirit play. A hit still launches you. 2026-10-15. |
