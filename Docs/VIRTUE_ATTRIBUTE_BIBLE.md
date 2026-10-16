@@ -2,6 +2,16 @@
 
 Prototype rules for the seven pairs. Lead lock, 2026-10-15. The pair names stay in [VisionBoard/Core/VISION.md](../VisionBoard/Core/VISION.md). This file does not copy the table.
 
+## Parked 2026-10-16
+
+Do not build these. [`Docs/context/PRINCIPLE_FIT_LOCK.md`](context/PRINCIPLE_FIT_LOCK.md) wins.
+
+- The armor bench. The change, remove, and alter sentences below are the old interview. They are not a build list.
+- Pair toys other than the camp-forest ease stroke: a bite, a decoy, a shape that must be filled, a return to the start, and a grappling hook.
+- Lair coils.
+
+The zone-story, stroke-variety, and random-pair interviews do not authorize those toys. The ease stroke stays.
+
 ## Set
 
 A character, a collectible, or a piece of armor holds a set of poles. Each pair is one axis. The set never contains both poles of one axis. Seven is the maximum. Zero is allowed.
