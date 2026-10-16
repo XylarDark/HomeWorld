@@ -75,7 +75,7 @@ The server refuses with *"Unable to determine the target project for the current
 ### Tool exposure (whitelist is real, and enforced)
 `--allowed-tools` absent means a silent read-only default: `search_file, search_text, search_regex, search_symbol` only (logged as `MCP tools whitelist (default): ...`). `--allowed-tools=*` means *whitelist disabled* — **86** tools register.
 
-`Start-RiderMcp.ps1` passes an explicit **31-name** whitelist, which exposes **32** tools: those 31 plus `execute_tool`, which is always present and *is* present in `direct` mode (correcting an earlier claim here). The whitelist removes the shell, build, run-config, raw file-write and DB/profiler/Unity families, confirmed by asking the server for an unknown tool and reading its `Available tools:` reply.
+`Start-RiderMcp.ps1` passes an explicit **16-name** whitelist, which exposes **17** tools: those 16 plus `execute_tool`, which is always present and *is* present in `direct` mode (correcting an earlier claim here). It was 31 names / 32 tools until DEC-0050 (2026-10-15) dropped the tools that stalled or answered empty; the list below is the whole surface. The whitelist removes the shell, build, run-config, raw file-write and DB/profiler/Unity families, confirmed by asking the server for an unknown tool and reading its `Available tools:` reply.
 
 - Exposed (17): `search_symbol`, `search_file`, `search_text`, `search_regex`, `get_class_hierarchy`, `get_solution_projects`, `get_project_dependencies`, `get_file_problems`, `get_project_problems`, `lint_files`, `safe_delete`, `ue_health`, `ue_status`, `ue_get_logs`, `search_assets`, `search_tags`, `execute_tool`.
 - **Absent in *both* modes — this build does not contain them at all.** The disabled-whitelist surface is 86 tools and neither `find_usages` nor `find_implementations` is among them. The vendored `navigating-code` skill is built on those two, so it cannot work as written; use `search_text`/`search_regex` for references and `get_class_hierarchy` for Blueprint inheritance.
@@ -196,7 +196,7 @@ Each skill folder carries `SKILL.md`, `metadata.json`, and a `reference/` direct
 - `opencode mcp list` -> `✗ rider failed: No working IDE endpoint available.` (proxy), then after switching to the URL -> `✓ rider connected`.
 - `POST http://127.0.0.1:64342/stream` with `initialize` -> `200`, `serverInfo {"name":"JetBrains Rider MCP Server","version":"2026.2.1"}`.
 - Through OpenCode: `rider.get_solution_projects({rootFolder:"C:/dev/HomeWorld"})` -> `{"modules":[{"name":"Miscellaneous Files",...},{"name":"&",...}]}`; `rider.ue_health` -> `{"connected":false}`.
-- Unknown-tool probe -> `Available tools:` lists exactly the 32 exposed names above.
+- Unknown-tool probe -> `Available tools:` lists exactly the 17 exposed names above (16 whitelist names plus `execute_tool`). Before DEC-0050 it listed 32.
 - Failure signature before the .NET fix (`backend.*.log`): *"UnrealBuildTool: You must install or update .NET to run this application"*, exit `0x80008096`, *"Generating UE4 project model failed. Will return empty project model"*.
 - Fix signature after (`backend.*.log`): `UnrealBuildTool: Written <proj>\Intermediate\TargetInfo.HomeWorld.json`, exit `ERRORLEVEL 00000000h`, `Finished generating target info`.
 - Through OpenCode, headless, on this repo, after both prerequisites:

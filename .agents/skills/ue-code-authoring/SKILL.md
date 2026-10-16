@@ -21,7 +21,7 @@ The generic sections below describe a normal Rider install. On this project the 
 - Compile with `.\Tools\Safe-Build.ps1`. Editor Python and PIE stay on UnrealMCP port 55557.
 - `rename_refactoring` works on C++ only if the server was started with `-AllowedTools '*'`, which also exposes shell and file-write tools. That restart is the user's decision.
 
-These are exposed and do not do the C++ job the generic text describes:
+These do not do the C++ job the generic text describes. Most were dropped from the default whitelist on 2026-10-15 (DEC-0050), so a call now returns `Tool '<x>' not found`; each note below is the measured behaviour from when they were still exposed, and stands for `-AllowedTools '*'`:
 
 - `analyze_calls` resolves nothing in C++ (`No callable symbol found` for `AHomeWorldCharacter::BeginPlay`). Callers are `rg`.
 - `get_symbol_info` returns `{"documentation":""}`.

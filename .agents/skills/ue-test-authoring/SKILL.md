@@ -11,7 +11,7 @@ Write Unreal Engine automated tests in the project's own style. Author the test 
 
 ## This project's Rider build (HomeWorld)
 
-`findTests` is not on the default whitelist. A call against `AHomeWorldCharacter` returned an empty body at 90 s and dropped the HTTP session, and it cannot see UE automation tests. Do not call it. `get_symbol_info` returns empty documentation for C++. `reformat_file` and `build_solution_*` are not exposed. Diagnostics are `get_file_problems` on the test file you changed. The build is `.\Tools\Safe-Build.ps1`. Every Rider call needs `rootFolder=C:/dev/HomeWorld`.
+`findTests` is not on the default whitelist. A call against `AHomeWorldCharacter` returned an empty body at 90 s and dropped the HTTP session, and it cannot see UE automation tests. Do not call it. `get_symbol_info` returns empty documentation for C++ and is off the whitelist, as are `analyze_calls`, `reformat_file`, and `build_solution_*` (DEC-0050, 2026-10-15): each answers `Tool '<x>' not found`. Diagnostics are `get_file_problems` on the test file you changed. The build is `.\Tools\Safe-Build.ps1`. The tables below list only what is callable. Every Rider call needs `rootFolder=C:/dev/HomeWorld`.
 
 ## Gate
 
@@ -28,8 +28,8 @@ Write Unreal Engine automated tests in the project's own style. Author the test 
 | Read a file, or a range of it | `Read` (with `offset`/`limit`) |
 | Create or change test source | `Write` / `Edit` |
 | Resolve the API under test when the IDE index knows it (engine headers, generated/reflected code, other modules) | Rider `search_symbol` |
-| Confirm a contract at a known position (nullable return, editor-only, preconditions) | Rider `get_symbol_info` |
-| Registration, include, and reflection diagnostics; formatting; build | Rider `get_file_problems`, `lint_files`, `reformat_file`, `build_solution_*` |
+| Confirm a contract at a known position (nullable return, editor-only, preconditions) | Read the declaration — `get_symbol_info` is off the whitelist and returns empty docs for C++ |
+| Registration, include, and reflection diagnostics; build | Rider `get_file_problems`, `lint_files`; build with `.\Tools\Safe-Build.ps1` (`reformat_file` and `build_solution_*` are not exposed) |
 
 Do not shell out through `Bash` for `rg`, `find`, `sed`, `cat`, `head`, or `tail` — the dedicated tools are cheaper and give clickable results. Keep `Bash` for git and for toolchain commands the task genuinely requires.
 
@@ -54,13 +54,13 @@ Every Rider tool also takes `rootFolder`. Pass the solution root whenever it is 
 | Find existing tests for a framework or feature | `search_text --q IMPLEMENT_SIMPLE_AUTOMATION_TEST` (or `TEST_CLASS`, `DEFINE_SPEC`) |
 | Find test files | `search_file --q '*Tests*.cpp'` |
 | Find the API under test | `search_symbol --q <name>` |
-| Confirm a contract after reading the file | `get_symbol_info --filePath <path> --line <n> --column <n>` |
-| Trace what the method under test calls or needs | `analyze_calls --symbolFqn <FullyQualifiedCallable> --analysisKind OUTGOING_CALLS` |
+| Confirm a contract after reading the file | Read the declaration; `get_symbol_info` is off the whitelist |
+| Trace what the method under test calls or needs | `rg <MethodName>` — `analyze_calls` is off the whitelist |
 | Check one changed test file | `get_file_problems --filePath <path>` |
 | Check several changed files | `lint_files --files '["Source/FooTests/Private/FooTests.cpp"]'` |
-| Build through Rider, for broad changes only | `build_solution_start`, then poll `build_solution_state` until `state` is not `Running` |
+| Build for broad changes | `.\Tools\Safe-Build.ps1` — `build_solution_*` are not exposed |
 | Project-wide problems after a successful build | `get_project_problems` |
-| Reformat changed files | `reformat_file --files '["Source/FooTests/Private/FooTests.cpp"]'` |
+| Reformat changed files | Not exposed (`reformat_file`); match the file's existing style by hand |
 
 Command syntax:
 
@@ -68,7 +68,7 @@ Command syntax:
 - List parameters are JSON arrays, even for one element, wrapped in single quotes: `--files '["Source/FooTests/Private/FooTests.cpp"]'`.
 - Paths are relative to the solution root, with forward slashes.
 - `search_text`, `search_regex`, `search_file`, and `search_symbol` all take `--q` — not `--query`. `search_symbol` finds project symbols only; add `--include_external true` for an engine or SDK symbol, which is common when the API under test is engine-side.
-- `analyze_calls` is name-based: `--symbolFqn` plus `--analysisKind`, never a path/line/column. `get_symbol_info` is the position-based one.
+- Reference only — both are off this project's default whitelist, so a call returns `Tool '<x>' not found`. Where exposed (`-AllowedTools '*'`), `analyze_calls` is name-based: `--symbolFqn` plus `--analysisKind`, never a path/line/column, and `get_symbol_info` is the position-based one.
 - `get_file_problems` returns errors only by default; add `--errorsOnly false` when warnings or style suggestions matter.
 - `lint_files` defaults to `--min_severity warning` (includes suggestions and hints); `--min_severity error` is the strict gate.
 - `Missing required parameters: …` and `Tool '<x>' not found` are input mistakes, not tool failures — correct the flag or the name and retry once. Fall back to source-only work only if no router or tool is available at all, or a call actually ran and failed in a way no input change fixes.

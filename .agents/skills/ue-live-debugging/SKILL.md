@@ -167,19 +167,17 @@ Use `search_symbol` to find the suspect class or function. Read the source files
 
 If starting from a crash address or log string rather than a known symbol, use `search_text` restricted to `*.cpp`.
 
-### Step 2 — Trace the Call Hierarchy
+### Step 2 — Trace the Callers
 
-Use `analyze_calls` — it supports C++ via the ReSharper C++ backend.
+There is no call hierarchy in this build. `analyze_calls` is not on the default whitelist, and when it was exposed it answered *"No callable symbol found"* for `AHomeWorldCharacter::BeginPlay`, so it resolves no C++ caller in either state. Find callers with `Grep`/`rg` on the method name and read each call site; read the function body directly to find callees.
 
-If the tool returns "No call hierarchy provider found" (symbol not indexed), fall back to Grep to find callers. Read the function body directly to find callees.
+`reference/ue-debug-patterns.md — Call Hierarchy Analysis` documents the upstream tool and does not apply here.
 
-See `reference/ue-debug-patterns.md — Call Hierarchy Analysis` for what to look for in results.
+### Step 3 — Read the Contract from the Header
 
-### Step 3 — Get Symbol Info for Context
+`get_symbol_info` is off the default whitelist and returns empty documentation for C++ here, so read the declaration: `search_symbol` to find the file, then `Read` the comment block above the function.
 
-`get_symbol_info` is position-based — use the standard Read tool first to find the symbol's exact line and column.
-
-Use to confirm API contracts — whether a function is editor-only, can return nullptr, or has threading guarantees. Do not rely on training-data assumptions for version-specific UE APIs.
+Confirm the contract from it — whether a function is editor-only, can return nullptr, or has threading guarantees. Do not rely on training-data assumptions for version-specific UE APIs.
 
 ### Step 4 — Run IDE Diagnostics on Suspect Files
 
