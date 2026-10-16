@@ -46,7 +46,7 @@ Editor work uses UnrealMCP on port 55557. A log line `editor_ui: NEED_SLATE` ope
 
 ## Rider MCP (selective use)
 - Use native file/shell tools (read/edit/grep/git/shell) for routine reading, editing, searching, and Git operations in Cursor/OpenCode.
-- Use Rider MCP selectively for semantic symbol search, Blueprint-inheritance lookup (`get_class_hierarchy --baseClass`), UE reflection/UHT diagnostics, and refactoring. It has **no usages tool and no C++ call hierarchy**: `find_usages`/`find_implementations` do not exist in this build at all, and `analyze_calls` resolves nothing in C++. Use `rg` for callers. `safe_delete --preview true` lists the files that reference a C++ member and writes nothing when preview is set; never call it without `--preview true`.
+- Use Rider MCP selectively for semantic symbol search, Blueprint-inheritance lookup (`get_class_hierarchy --baseClass`), UE reflection/UHT diagnostics, and refactoring. It has **no usages tool and no C++ call hierarchy**: `find_usages`/`find_implementations` do not exist in this build at all, and `analyze_calls` resolves nothing in C++. Use `rg` for callers. For the files that reference a C++ member, run `.\Tools\Find-RiderUsages.ps1 -FilePath <header> -SymbolName <Member>`: it calls `safe_delete --preview true` for you and cannot delete. If you call `safe_delete` yourself instead, never omit `--preview true` — without it the tool deletes.
 - Do not use Rider MCP for operations native tools can do equally well.
 - After C++ changes, check relevant Rider diagnostics. Run UBT when compilation validation is warranted (Safe-Build stays the compile).
 - Avoid repeated full builds, redundant validation, and excessive tool calls for small changes.
