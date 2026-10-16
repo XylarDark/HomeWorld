@@ -262,12 +262,22 @@ def main() -> int:
         epilog=(
             "--filter takes a test-name prefix (e.g. HomeWorld.T0) and is what this "
             "project's tests are named for. --group takes a UE group name and matches "
-            "no group in this project; it is kept only for callers that already pass one."
+            "no group in this project; it is kept only for callers that already pass one. "
+            "--exclude drops tests whose full path contains the substring from this run's "
+            "verdict; they still execute in the editor."
         ),
     )
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--filter", dest="filter", help="Test name prefix, e.g. HomeWorld.T0")
     mode.add_argument("--group", dest="group", help="UE group name (matches nothing here)")
+    parser.add_argument(
+        "--exclude",
+        dest="exclude",
+        help="Substring to drop from the verdict, e.g. Editor.Python. UE discovers "
+             "Content/Python/**/test_*.py as Editor.Python.* tests and runs them in the "
+             "engine's bundled Python, which has no pytest; this project's pytest suite "
+             "is gated in validate.yml under host Python.",
+    )
     parser.add_argument("--timeout", type=int, default=1800, help="Seconds (default: 1800)")
     parser.add_argument(
         "--no-null-rhi",
@@ -356,6 +366,23 @@ def main() -> int:
     parse_ok, passed, failed, parse_err, tests = _await_report(report_dir_abs)
     ran_counted = passed + failed
 
+    # Recompute every counter from the surviving entries, before the counters-versus-entries
+    # check below, so an excluded test cannot show up as a phantom disagreement.
+    excluded = 0
+    if args.exclude:
+        kept = [t for t in tests if args.exclude not in t[0]]
+        excluded = len(tests) - len(kept)
+        if excluded:
+            tests = kept
+            passed = sum(1 for _name, state in kept if state == "Success")
+            failed = len(kept) - passed
+            ran_counted = passed + failed
+            _log("warning", {
+                "excluded": args.exclude,
+                "tests": excluded,
+                "message": "excluded from this run's verdict; they still execute in the editor",
+            })
+
     # UE's summary counters and its own list of tests can disagree. Observed on
     # 2026-10-02: the report listed 20 tests, all Success, while `succeeded` read
     # 19. Rather than silently prefer one, count what actually ran from the entries
@@ -375,6 +402,7 @@ def main() -> int:
         "passed": passed,
         "failed": failed,
         "ran": ran,
+        "excluded": excluded,
         "ran_from_report_counters": ran_counted,
         "ran_from_report_entries": ran_from_entries,
         "report_path": report_dir_abs,

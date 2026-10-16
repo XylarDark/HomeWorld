@@ -30,24 +30,12 @@ To run [.github/workflows/ci.yml](../.github/workflows/ci.yml) (build + tests), 
 
 ### 3. Set environment on the runner (optional but recommended)
 
-For the **Run automation tests** step in ci.yml to run (Smoke group), the runner needs **UE_EDITOR** set so that [Tools/RunTests.ps1](../Tools/RunTests.ps1) (and [Content/Python/run_ue_automation.py](../Content/Python/run_ue_automation.py)) can launch the Editor headless. Options:
+The **Run automation tests** step needs the UE 5.8 editor, and no env var is required when 5.8 is installed in the default location: `ci.yml` defaults `UE_ENGINE` to `C:\Program Files\Epic Games\UE_5.8`, derives `UE_EDITOR` from it, and [Tools/RunTests.ps1](../Tools/RunTests.ps1) then checks that editor against the project's engine lock. A set-but-wrong `UE_EDITOR` (a desktop with it pointing at 5.7 hit exactly this) is replaced with the locked engine and the substitution is logged, so the run cannot silently launch the wrong engine.
 
-- **System or user env:** Set `UE_EDITOR` to the full path to `UnrealEditor.exe`, e.g. `C:\Program Files\Epic Games\UE_5.8\Engine\Binaries\Win64\UnrealEditor.exe`. Restart the runner service after changing env vars.
-- **CI workflow:** You can set env in the workflow (e.g. from a secret or hardcoded path) and pass it to the step; the current ci.yml uses `${{ env.UE_EDITOR }}`, so define `env.UE_EDITOR` at job or workflow level if not set on the runner.
+- **Engine somewhere else:** set **`UE_EDITOR`** as a system or user env var on the runner and restart the runner service after changing it. Point it at **5.8**: [Content/Python/run_ue_automation.py](../Content/Python/run_ue_automation.py) refuses an editor from another engine version.
+- **Not installed at all:** the test step fails with that message rather than skipping, so a missing test gate is never mistaken for a green one.
 
-If `UE_EDITOR` is not set, the workflow still runs the build; the "Run automation tests" step will skip and log that tests were skipped.
-
-**`UE_EDITOR` inside GitHub Actions:** [.github/workflows/ci.yml](../../.github/workflows/ci.yml) passes `UE_EDITOR: ${{ env.UE_EDITOR }}` into the test step. That value is only non-empty if you define **`env`** at the **workflow** or **job** level in `ci.yml`, or if your runner exposes it in a way Actions injects into `env` (varies by runner setup). If tests always skip, either set **`UE_EDITOR`** as a persistent **user or system** environment variable on the runner (restart the runner service after changes) or add a job-level default, for example:
-
-```yaml
-jobs:
-  build-win64:
-    runs-on: [self-hosted, windows, ue58]
-    env:
-      UE_EDITOR: 'C:\Program Files\Epic Games\UE_5.8\Engine\Binaries\Win64\UnrealEditor.exe'
-```
-
-Use your real engine path, or a repository variable / secret if paths differ per machine.
+**The `Editor.Python` tests are excluded from the UE run.** UE executes `Content/Python/tests/*.py` as `Editor.Python.*` tests with `__name__ == "__main__"`, so their `unittest.main()` guard runs, discovers nothing, raises `SystemExit`, and UE reports Fail for a suite that is really gated in [validate.yml](../../.github/workflows/validate.yml) under host Python. [Tools/RunTests.ps1](../Tools/RunTests.ps1) passes `--exclude Editor.Python` by default; `-IncludePythonTests` opts in and needs pytest in the engine Python (`& "<UE>\Engine\Binaries\ThirdParty\Python3\Win64\python.exe" -m pip install pytest`).
 
 ### Runner maintenance
 
@@ -59,7 +47,7 @@ Use your real engine path, or a repository variable / secret if paths differ per
 
 1. Checkout with LFS.
 2. Build Win64 Development (RunFullBuild.ps1 or Build-HomeWorld.bat).
-3. Optionally run automation tests (RunTests.ps1 with Smoke group) if UE_EDITOR is set.
+3. Run automation tests (RunTests.ps1 over the whole `HomeWorld` suite, with pytest installed so the `Editor.Python` tests run too). A failure fails the job.
 4. On failure, upload Build-HomeWorld.log as an artifact.
 
 ---

@@ -51,16 +51,14 @@ jobs:
           }
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-      - name: Run automation tests (optional)
+      - name: Run automation tests
         shell: pwsh
-        env:
-          UE_EDITOR: ${{ env.UE_EDITOR }}
         run: |
-          if ($env:UE_EDITOR -and (Test-Path ".\Tools\RunTests.ps1")) {
-            .\Tools\RunTests.ps1 -Group Smoke
-          } else {
-            Write-Host "Skipping tests (UE_EDITOR not set or RunTests.ps1 missing)"
-          }
+          if (-not (Test-Path ".\Tools\RunTests.ps1")) { Write-Host "RunTests.ps1 missing; nothing to run"; exit 0 }
+          $env:UE_ENGINE = $env:UE_ENGINE ?? "C:\Program Files\Epic Games\UE_5.8"
+          if (-not $env:UE_EDITOR) { $env:UE_EDITOR = Join-Path $env:UE_ENGINE "Engine\Binaries\Win64\UnrealEditor.exe" }
+          .\Tools\RunTests.ps1
+          exit $LASTEXITCODE
 
       - name: Archive build log on failure
         if: failure()
