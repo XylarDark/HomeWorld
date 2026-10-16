@@ -15,8 +15,10 @@ What broke this session: launching UE **5.7** → BuildId skip of `UnrealEditor-
 
 Evidence: `Saved/canon_playtest_evidence.json` (local DESKTOP); log lines `GATHER: RES_WOOD +1`, `GATHER: harvest ok`, `GATHER: RES_SEED +1`.
 
-## Next 2-minute test (LOCKED)
+## Next test (LOCKED, 2026-10-16)
 
-**On DESKTOP (UE 5.8), PIE `L_VS_MVP_Markers` in day/body: if no `GP_Gather_*`, run `place_vs_mvp_resource_piles.py` (KEEP-LOCAL), then interact once at `GP_Gather_WOOD` and confirm `GATHER: RES_WOOD` success-path. Then `hw.Gather.Seed 1` and confirm seed grant. Stop.**
+Replaces the gather-and-seed test on `L_VS_MVP_Markers`. That gather passed on 2026-09-20 and stays in the log above. The rule is [`Docs/context/PRINCIPLE_FIT_LOCK.md`](../context/PRINCIPLE_FIT_LOCK.md) pick 9.
 
-Pass = wood gather + seed grant in log. Fail = no grant, BuildId DLL skip, or editor hang — file note here, do not start a second system.
+**One session on DESKTOP (UE 5.8), then stop.** PIE `L_SizeTest` with no objective: walk, stop, and hop for about five seconds. Then, on a pad that is not `L_SizeTest`, play one ease that can match, weak-hit, and bonk. Luke says what felt wrong. Write that note here. Do not add a system in that session. The stroke stays off `L_SizeTest` until the walk and hop have been played.
+
+Pass = both checks were played, and the note of what felt wrong is in this file. Fail = a system was added in the session, or the stroke was placed on `L_SizeTest` before the walk and hop.

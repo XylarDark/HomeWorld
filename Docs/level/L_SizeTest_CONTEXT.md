@@ -18,4 +18,8 @@ Not in this test: bear, guards, camp, clouds, bull, and the gatherables. The pla
 
 One directional light, `SizeTest_Sun`. Walk bounds are off on this map. Facing, the walk clip, the jump, and the shoulder sphere are practices 10, 11, and 16 in `Docs/context/SCENE_SETUP.md`. The cottage blocks, and the south opening is the way in. The layout is `Docs/level/L_SizeTest_ROOM_PLAN.md`.
 
+## First five seconds
+
+2026-10-16. With no objective: walk, stop, and a small hop, until the body feels weighty and the hop reads. The stroke stays off this map until that pass. The lock is [`Docs/context/PRINCIPLE_FIT_LOCK.md`](../context/PRINCIPLE_FIT_LOCK.md).
+
 Do not run `Content/Python/place_size_test.py` against this map. It builds a new level.

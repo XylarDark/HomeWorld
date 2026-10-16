@@ -4,7 +4,7 @@ Pointer files for coding sessions. Prototype vision is only [`Docs/VISION_BOARD.
 
 | File | Role |
 |---|---|
-| [PILLARS.md](PILLARS.md) | 3–5 normative rules |
+| [PILLARS.md](PILLARS.md) | Five feature gates, 2026-10-16. Lock: [PRINCIPLE_FIT_LOCK.md](../context/PRINCIPLE_FIT_LOCK.md) |
 | [FANTASY.md](FANTASY.md) | Pointer to the vision board. Not a second loop. |
 | [MVP.md](MVP.md) | In / out of scope |
 | [LOOPS.md](LOOPS.md) | Moment / session / long-term |

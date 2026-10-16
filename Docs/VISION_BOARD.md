@@ -33,6 +33,8 @@ Read this before a task. The answered table below is the lock. Do not ask those 
 
 ## Current product principles
 
+From 2026-10-16, a feature is judged by the five gates in [`Docs/canon/PILLARS.md`](canon/PILLARS.md). The lock is [`Docs/context/PRINCIPLE_FIT_LOCK.md`](context/PRINCIPLE_FIT_LOCK.md). The table below stays the world direction. Where a gate and a row disagree about what gets built next, the gate wins.
+
 | Principle | Direction |
 |---|---|
 | **Love is the stakes** | Family is present from the start. A loved one is taken at the camp, and the prototype includes the rescue and return home. |
