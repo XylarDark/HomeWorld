@@ -40,7 +40,7 @@ One fact proposed at a time, one yes from Luke, one write into this file only �
 - Lead 2026-10-07: a bull boots you back to the homestead on a charge if you get
   too close or fill its threat meter without leaving its area. Walking toward it
   carrying an herb suppresses the boot; sudden movement builds threat, standing
-  still lets it approach, eat the herb, and it is tamed. Tamed, the bull is
+  still lets it approach, eat the herb, and it is tamed. Lead 2026-10-15: that tame waits on a paradox layer on this bull. On that layer you draw the rune while standing still. A sudden move is the miss, and the bull charges. The herb approach stays the tame once the paradox is done. Tamed, the bull is
   rideable, and the shrine brings you and the bull to the homestead as a
   pet. Bull turning is like a real animal (Lead 2026-10-07): turn rate is
   inversely related to travel speed — near-zero turn authority at 3× sprint,

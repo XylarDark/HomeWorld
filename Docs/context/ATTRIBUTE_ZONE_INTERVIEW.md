@@ -160,3 +160,18 @@ Last. Each pole's rune, and the paradox symbol, as a read in the world. Ask only
 | 13 | **1** — at a glance a rune says which pole it is. A paradox symbol reads as both poles of that pair. The art bible owns the drawing. |
 
 Scripted rounds are complete. Picks above are scribed into the virtue bible, and the lair picks into `Docs/context/BOSS_LAIR_LOCK.md`.
+
+## Hardest form
+
+Follow-on, 2026-10-15. Scribed into the virtue bible. Not a new round.
+
+| Pick | Rule |
+|------|------|
+| Ceiling | The camp-forest ease. Grace finishes it. Wrath shoves it off. The paradox runs both, and they interfere. |
+| Weak hit | Knocks you away from the mechanic. You stay, and the action is still there. |
+| Bonk | Sends you home. The biggest punishment. This game's death. You do not die. |
+| Bonk try | One hit that stays the weak knock-away. With none left, the next hit bonks you home. |
+| Ceiling miss | A failed paradox ease bonks you home. A failed single-pole ease is only the weak hit. |
+| Armor | Lets the finish win through the Wrath shove, and carries the bonk tries. |
+| Yield | A marked thing whose job you could already see in the action. Not a hidden roll. |
+| Player order | Grace alone, Wrath alone, the paradox, then the same ease plus one visible rune. The edge does not open onto the paradox. |

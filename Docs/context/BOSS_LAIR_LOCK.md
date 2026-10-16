@@ -62,7 +62,7 @@ Partner and child stay home. The lair is the player, the three guards, and the g
 
 ## Attribute layer
 
-Each of the seven pairs has an interaction in this lair. Some pairs use the coils, the tickle, the ram, the heals, and the eye. The pairs that do not fit those beats get a new station. Which pair uses which beat is not named. Interview round 11, 2026-10-15. One paradox item, gathered from travels in the field and the forests, is required. It is the key that lets the lair's last station happen. Interview round 12, 2026-10-15.
+Each of the seven pairs has an interaction in this lair. The coils, the tickle, the ram, the heals, and the eye stay. Beside them, the snake keeps its default and you draw its rune on the giant, inside a wind-up. Interview, creature themes, 2026-10-15. Further beats beside those are not named. One paradox item, gathered from travels in the field and the forests, is required. It is the key that lets the lair's last station happen. Interview round 12, 2026-10-15.
 
 ## Zone barriers
 
