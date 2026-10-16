@@ -1145,3 +1145,12 @@ The number is not the cost of that skill as it was first written. Two identical 
 - **Reverses if:** a later Rider build resolves those tools on HomeWorld C++ in under a second, or the Lead asks for one of them back by name.
 - **Supersedes:** none.
 
+## DEC-0051 - .idea/ stays local, and the ignore is recorded here because a harness change owes a DEC (2026-10-16)
+
+- **Area:** harness refactor
+- **Decision:** `.gitignore` ignores `.idea/` and `*.DotSettings.user` (`9177fcb7`). Rider's per-machine project model stays out of git. Nothing an agent or teammate needs may live only in `.idea/`: run configurations, code style, and inspection profiles belong in `Tools/` or a doc.
+- **Rationale:** `docs/human-use/OWNERSHIP.md:35` requires every agent-owned harness change to carry a decision-log entry with its rationale and evidence. This one shipped without one, silently reversing the earlier call to keep `.idea/` visible. The change itself is right: `.idea/` churns per machine (path models, caches, shelf), and that noise was masking real worktree changes. The cost is that shared project content can no longer ride in `.idea/`, so this entry records where it belongs instead.
+- **Evidence:** `9177fcb7` added the two patterns; `git status` went from per-machine `.idea/` entries to clean. The directory reappears and changes without any source edit (Rider rewrites it on open), which is the churn. `AGENT_DECISIONS.md`, `Docs/handoffs/`, and `docs/human-use/` held no `.idea` entry in either direction, so nothing else had to be amended.
+- **Reverses if:** the team decides run configurations or inspection profiles should be shared, then the ignore comes off and that subset is committed deliberately.
+- **Supersedes:** none.
+
