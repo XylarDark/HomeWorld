@@ -7,10 +7,10 @@
 #include "HomeWorldStrokeCheck.h"
 #include "HomeWorldEasePad.generated.h"
 
-/**
- * One ease pad, off L_SizeTest. Offers Grace, then Wrath, then Paradox, then one extra point.
- * The map file itself is saved in the editor.
- */
+	/**
+	 * One ease pad, off L_SizeTest. Offers Grace, then Wrath, then Paradox, then one extra point.
+	 * The wind-up clock repeats. The open half is WindowMin to WindowMax. The closed half is as long.
+	 */
 UCLASS()
 class HOMEWORLD_API AHomeWorldEasePad : public AActor
 {
@@ -33,6 +33,9 @@ public:
 	float GetWindowMin() const { return WindowMin; }
 
 	float GetWindowMax() const { return WindowMax; }
+
+	/** Seconds on the repeating wind-up. A start inside the window is on time. */
+	float WindUpTimeAt(float WorldSeconds) const;
 
 	FVector2D GetExtraPoint() const { return ExtraPoint; }
 

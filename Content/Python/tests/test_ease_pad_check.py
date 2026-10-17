@@ -17,6 +17,15 @@ def test_check_reports_the_pad_the_focus_and_the_size_test_absence():
     assert report["map"] == "/Game/HomeWorld/Maps/EasePad/L_EasePad"
 
 
+def test_sheet_floor_contains_the_weak_hit_step():
+    metrics = place_ease_pad.load_metrics()
+    floor = metrics["floor"]
+    assert floor["sx"] >= 6
+    assert floor["sy"] >= 6
+    assert metrics["pad"]["label"] == "EasePad"
+    assert metrics["player"]["z"] == 1.1
+
+
 def test_a_pad_on_the_size_test_map_is_not_absent():
     report = place_ease_pad.ease_pad_report(
         place_ease_pad.INTENDED_PAD,

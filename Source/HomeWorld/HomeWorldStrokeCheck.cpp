@@ -192,4 +192,33 @@ namespace HomeWorldStroke
 		}
 		return Away.GetSafeNormal() * StepCm;
 	}
+
+	static constexpr float ScreenRectOriginX = 0.08f;
+	static constexpr float ScreenRectOriginY = 0.15f;
+	static constexpr float ScreenRectSize = 0.28f;
+
+	static float RectSide(const FVector2D& ViewportPx)
+	{
+		return FMath::Min(ViewportPx.X, ViewportPx.Y) * ScreenRectSize;
+	}
+
+	static FVector2D RectOrigin(const FVector2D& ViewportPx)
+	{
+		return FVector2D(ViewportPx.X * ScreenRectOriginX, ViewportPx.Y * ScreenRectOriginY);
+	}
+
+	FVector2D MapMouseToStrokeUnit(const FVector2D& MousePx, const FVector2D& ViewportPx)
+	{
+		const float Side = RectSide(ViewportPx);
+		if (Side < KINDA_SMALL_NUMBER)
+		{
+			return FVector2D::ZeroVector;
+		}
+		return (MousePx - RectOrigin(ViewportPx)) / Side;
+	}
+
+	FVector2D StrokeUnitToScreen(const FVector2D& Unit, const FVector2D& ViewportPx)
+	{
+		return RectOrigin(ViewportPx) + Unit * RectSide(ViewportPx);
+	}
 }

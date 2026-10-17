@@ -57,4 +57,11 @@ namespace HomeWorldStroke
 
 	/** A short step away from the focus. Z is unchanged. */
 	HOMEWORLD_API FVector WeakHitStep(const FVector& From, const FVector& Focus);
+
+	/**
+	 * The greybox drawing rect, as a fraction of the viewport.
+	 * Mouse samples and the HUD use this same rect, in the 0–1 space of the shapes.
+	 */
+	HOMEWORLD_API FVector2D MapMouseToStrokeUnit(const FVector2D& MousePx, const FVector2D& ViewportPx);
+	HOMEWORLD_API FVector2D StrokeUnitToScreen(const FVector2D& Unit, const FVector2D& ViewportPx);
 }

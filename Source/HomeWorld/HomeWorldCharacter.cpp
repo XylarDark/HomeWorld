@@ -238,9 +238,9 @@ void AHomeWorldCharacter::BeginPlay()
 	// Place character on ground if we hit something below (avoids floating when Player Start is slightly high).
 	const FString LevelName = UGameplayStatics::GetCurrentLevelName(this);
 	const bool bSizeTest = LevelName.Contains(TEXT("SizeTest"));
-	// SizeTest and L_Field are greybox bodies. The hero-island walk bounds do not fit them
+	// SizeTest, L_Field, and L_EasePad are greybox bodies. The hero-island walk bounds do not fit them
 	// (SCENE_SETUP practice 5), so they start off here; Tick reads this same flag and leaves them off (T1-3).
-	bGreyboxBodyLevel = bSizeTest || LevelName.Contains(TEXT("L_Field"));
+	bGreyboxBodyLevel = bSizeTest || LevelName.Contains(TEXT("L_Field")) || LevelName.Contains(TEXT("L_EasePad"));
 	if (bGreyboxBodyLevel)
 	{
 		if (UCapsuleComponent* SizeCapsule = GetCapsuleComponent())
@@ -795,12 +795,60 @@ void AHomeWorldCharacter::SetParadoxToy(AHomeWorldParadoxToy* Toy)
 	ParadoxToy = Toy;
 }
 
+void AHomeWorldCharacter::DiscoverStrokePad()
+{
+	if (StrokePad)
+	{
+		return;
+	}
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+	for (TActorIterator<AHomeWorldEasePad> It(World); It; ++It)
+	{
+		StrokePad = *It;
+		return;
+	}
+}
+
+void AHomeWorldCharacter::SetStrokeCursorHeld(bool bHeld)
+{
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	if (!PC || !PC->IsLocalController())
+	{
+		bStrokeCursorHeld = false;
+		return;
+	}
+	if (bHeld)
+	{
+		FInputModeGameAndUI InputMode;
+		InputMode.SetHideCursorDuringCapture(false);
+		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+		PC->SetInputMode(InputMode);
+		PC->SetShowMouseCursor(true);
+		bStrokeCursorHeld = true;
+		return;
+	}
+	if (!bStrokeCursorHeld)
+	{
+		return;
+	}
+	FInputModeGameOnly InputMode;
+	PC->SetInputMode(InputMode);
+	PC->SetShowMouseCursor(false);
+	bStrokeCursorHeld = false;
+}
+
 void AHomeWorldCharacter::BeginStrokeFromInput()
 {
 	if (IsSizeTestLevel() || !StrokeReport)
 	{
 		return;
 	}
+	DiscoverStrokePad();
+	SetStrokeCursorHeld(true);
 	StrokeReport->BeginStrokeHold();
 }
 
@@ -864,6 +912,7 @@ EHomeWorldStrokeReport AHomeWorldCharacter::EndStrokeFromInput()
 	}
 	const EHomeWorldStrokeReport Report = StrokeReport->EndStrokeHold(
 		Step, WindowMin, WindowMax, ExtraPoint, nullptr, FallbackGlideComponent, bHasFocus, FocusPoint);
+	SetStrokeCursorHeld(false);
 	if (Report != EHomeWorldStrokeReport::Matched)
 	{
 		return Report;
@@ -887,12 +936,30 @@ void AHomeWorldCharacter::OnStrokeInputStarted(const FInputActionValue& Value)
 
 void AHomeWorldCharacter::OnStrokeInputSampled(const FInputActionValue& Value)
 {
-	if (!StrokeReport || !StrokeReport->IsStrokeHeld())
+	if (IsSizeTestLevel() || !StrokeReport || !StrokeReport->IsStrokeHeld())
 	{
 		return;
 	}
-	const float Time = GetWorld() ? GetWorld()->GetTimeSeconds() : 0.f;
-	StrokeReport->SampleCursor(Time);
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	if (!PC)
+	{
+		return;
+	}
+	float MouseX = 0.f;
+	float MouseY = 0.f;
+	if (!PC->GetMousePosition(MouseX, MouseY))
+	{
+		return;
+	}
+	int32 SizeX = 0;
+	int32 SizeY = 0;
+	PC->GetViewportSize(SizeX, SizeY);
+	const FVector2D Unit = HomeWorldStroke::MapMouseToStrokeUnit(
+		FVector2D(MouseX, MouseY),
+		FVector2D(static_cast<float>(SizeX), static_cast<float>(SizeY)));
+	const float WorldSeconds = GetWorld() ? GetWorld()->GetTimeSeconds() : 0.f;
+	const float Time = StrokePad ? StrokePad->WindUpTimeAt(WorldSeconds) : 0.f;
+	StrokeReport->AppendCursorSample(Unit, Time);
 }
 
 void AHomeWorldCharacter::OnStrokeInputReleased(const FInputActionValue& Value)
@@ -3627,6 +3694,10 @@ void AHomeWorldCharacter::PlaySoftFormSwapFeedback(EHomeWorldTimeOfDayPhase Phas
 
 void AHomeWorldCharacter::Look(const FInputActionValue& Value)
 {
+	if (StrokeReport && StrokeReport->IsStrokeHeld())
+	{
+		return;
+	}
 	const FVector2D Axis = Value.Get<FVector2D>();
 	APlayerController* PC = Cast<APlayerController>(GetController());
 	if (!PC)

@@ -239,4 +239,130 @@ bool FStrokeDawnRetiresParadoxToy::RunTest(const FString& Parameters)
 	return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FStrokePixelDragMatchesGrace,
+	"HomeWorld.Systems.Stroke.PixelDragMatchesGrace",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FStrokePixelDragMatchesGrace::RunTest(const FString& Parameters)
+{
+	const FVector2D Viewport(1000.f, 1000.f);
+	const FVector2D Top = HomeWorldStroke::StrokeUnitToScreen(FVector2D(0.f, 0.f), Viewport);
+	const FVector2D Bottom = HomeWorldStroke::StrokeUnitToScreen(FVector2D(0.f, 1.f), Viewport);
+	const FVector2D UnitTop = HomeWorldStroke::MapMouseToStrokeUnit(Top, Viewport);
+	const FVector2D UnitBottom = HomeWorldStroke::MapMouseToStrokeUnit(Bottom, Viewport);
+	TestTrue(TEXT("the top of the rect is unit 0,0"), UnitTop.Equals(FVector2D(0.f, 0.f), 0.001f));
+	TestTrue(TEXT("the bottom of the rect is unit 0,1"), UnitBottom.Equals(FVector2D(0.f, 1.f), 0.001f));
+
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("pixel grace"));
+	if (!Scope.Ok(this))
+	{
+		return false;
+	}
+	AHomeWorldCharacter* Character = HomeWorldTestWorld::SpawnCharacter(Scope.World);
+	if (!TestNotNull(TEXT("pawn"), Character))
+	{
+		return false;
+	}
+	const TArray<FHomeWorldStrokeSample> Drag = {
+		HomeWorldStrokePawnTest::Sample(UnitTop.X, UnitTop.Y, 0.f),
+		HomeWorldStrokePawnTest::Sample(UnitBottom.X, UnitBottom.Y, 0.f)
+	};
+	TestEqual(TEXT("a pixel-scale vertical drag matches Grace"),
+		HomeWorldStrokePawnTest::Play(Character, Drag),
+		EHomeWorldStrokeReport::Matched);
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FStrokePadClockWindow,
+	"HomeWorld.Systems.Stroke.PadClockWindow",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FStrokePadClockWindow::RunTest(const FString& Parameters)
+{
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("pad clock"));
+	if (!Scope.Ok(this))
+	{
+		return false;
+	}
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	AHomeWorldEasePad* Pad = Scope.World->SpawnActor<AHomeWorldEasePad>(Params);
+	AHomeWorldCharacter* Character = HomeWorldTestWorld::SpawnCharacter(Scope.World);
+	if (!TestNotNull(TEXT("pad"), Pad) || !TestNotNull(TEXT("pawn"), Character))
+	{
+		return false;
+	}
+
+	const float Inside = Pad->WindUpTimeAt(0.4f);
+	const float Closed = Pad->WindUpTimeAt(1.5f);
+	const float Wrapped = Pad->WindUpTimeAt(2.4f);
+	TestTrue(TEXT("0.4s is inside the open half"), Inside >= Pad->GetWindowMin() && Inside <= Pad->GetWindowMax());
+	TestTrue(TEXT("1.5s is in the closed half"), Closed > Pad->GetWindowMax());
+	TestTrue(TEXT("the clock repeats into the open half"), Wrapped >= Pad->GetWindowMin() && Wrapped <= Pad->GetWindowMax());
+
+	Character->SetStrokePad(Pad);
+	TestTrue(TEXT("Grace is offered first"), Pad->NoteMatch(EHomeWorldStrokeStep::Grace));
+	TestEqual(TEXT("a start inside the pad clock matches Wrath"),
+		HomeWorldStrokePawnTest::Play(Character, { HomeWorldStrokePawnTest::Sample(0.f, 0.f, Inside) }),
+		EHomeWorldStrokeReport::Matched);
+
+	AHomeWorldEasePad* LatePad = Scope.World->SpawnActor<AHomeWorldEasePad>(Params);
+	AHomeWorldCharacter* LateCharacter = HomeWorldTestWorld::SpawnCharacter(Scope.World);
+	if (!TestNotNull(TEXT("late pad"), LatePad) || !TestNotNull(TEXT("late pawn"), LateCharacter))
+	{
+		return false;
+	}
+	LateCharacter->SetStrokePad(LatePad);
+	TestTrue(TEXT("the late pad reaches Wrath"), LatePad->NoteMatch(EHomeWorldStrokeStep::Grace));
+	TestEqual(TEXT("a start in the closed half is a weak hit on Wrath"),
+		HomeWorldStrokePawnTest::Play(LateCharacter, { HomeWorldStrokePawnTest::Sample(0.f, 0.f, Closed) }),
+		EHomeWorldStrokeReport::WeakHit);
+
+	TestTrue(TEXT("the late pad reaches the paradox"), LatePad->NoteMatch(EHomeWorldStrokeStep::Wrath));
+	TestEqual(TEXT("a start in the closed half bonks on the paradox"),
+		HomeWorldStrokePawnTest::Play(LateCharacter, HomeWorldStrokePawnTest::FromShape(HomeWorldStroke::ParadoxShape(), Closed)),
+		EHomeWorldStrokeReport::Bonk);
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FStrokeCarriedPointInUnitRect,
+	"HomeWorld.Systems.Stroke.CarriedPointInUnitRect",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FStrokeCarriedPointInUnitRect::RunTest(const FString& Parameters)
+{
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("carried point"));
+	if (!Scope.Ok(this))
+	{
+		return false;
+	}
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	AHomeWorldEasePad* Pad = Scope.World->SpawnActor<AHomeWorldEasePad>(Params);
+	AHomeWorldCharacter* Character = HomeWorldTestWorld::SpawnCharacter(Scope.World);
+	if (!TestNotNull(TEXT("pad"), Pad) || !TestNotNull(TEXT("pawn"), Character))
+	{
+		return false;
+	}
+	Character->SetStrokePad(Pad);
+	TestEqual(TEXT("Grace matches"),
+		HomeWorldStrokePawnTest::Play(Character, HomeWorldStrokePawnTest::FromShape(HomeWorldStroke::GraceShape(), 0.f)),
+		EHomeWorldStrokeReport::Matched);
+	const FVector2D Carried = Character->GetStrokeReport()->GetCarriedPoint();
+	TestTrue(TEXT("the match leaves the extra point in hand"), Character->GetStrokeReport()->HasCarriedPoint());
+	TestEqual(TEXT("the carried point is the pad's unit point"), Carried, Pad->GetExtraPoint());
+
+	TestEqual(TEXT("a stroke that misses the point does not match"),
+		HomeWorldStrokePawnTest::Play(Character, { HomeWorldStrokePawnTest::Sample(0.f, 0.f, 0.4f) }),
+		EHomeWorldStrokeReport::WeakHit);
+	TestEqual(TEXT("the miss keeps the point"), Character->GetStrokeReport()->GetCarriedPoint(), Carried);
+	TestEqual(TEXT("a stroke through the point matches"),
+		HomeWorldStrokePawnTest::Play(Character, { HomeWorldStrokePawnTest::Sample(Carried.X, Carried.Y, 0.4f) }),
+		EHomeWorldStrokeReport::Matched);
+	return true;
+}
+
 #endif

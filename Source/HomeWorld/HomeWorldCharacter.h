@@ -579,6 +579,10 @@ protected:
 
 	bool IsSizeTestLevel() const;
 	void ApplyMarkedHerbOnMatch();
+	void DiscoverStrokePad();
+	void SetStrokeCursorHeld(bool bHeld);
+
+	bool bStrokeCursorHeld = false;
 
 	/** True only between active V2 launch and landing. Steering is unrestricted. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Transit|Cloud Descent")

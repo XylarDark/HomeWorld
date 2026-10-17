@@ -44,3 +44,10 @@ FVector AHomeWorldEasePad::GetFocusPoint() const
 {
 	return Focus ? Focus->GetComponentLocation() : GetActorLocation();
 }
+
+float AHomeWorldEasePad::WindUpTimeAt(float WorldSeconds) const
+{
+	const float Open = FMath::Max(0.f, WindowMax - WindowMin);
+	const float Cycle = FMath::Max(Open * 2.f, KINDA_SMALL_NUMBER);
+	return WindowMin + FMath::Fmod(FMath::Max(0.f, WorldSeconds), Cycle);
+}

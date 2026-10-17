@@ -11,12 +11,84 @@
 #include "HomeWorldSpiritShieldAbility.h"
 #include "HomeWorldSpiritStealthComponent.h"
 #include "HomeWorldCharacter.h"
+#include "HomeWorldEasePad.h"
+#include "HomeWorldStrokeCheck.h"
 #include "HomeWorldTimeOfDaySubsystem.h"
+#include "EngineUtils.h"
 #include "AbilitySystemInterface.h"
 #include "Engine/Canvas.h"
 #include "Engine/Engine.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/Pawn.h"
+
+namespace
+{
+	AHomeWorldEasePad* FindEasePad(UWorld* World)
+	{
+		if (!World || World->GetMapName().Contains(TEXT("L_SizeTest")))
+		{
+			return nullptr;
+		}
+		for (TActorIterator<AHomeWorldEasePad> It(World); It; ++It)
+		{
+			return *It;
+		}
+		return nullptr;
+	}
+
+	void DrawStrokeLine(AHUD* HUD, const FVector2D& Viewport, const FVector2D& From, const FVector2D& To, const FLinearColor& Color)
+	{
+		const FVector2D A = HomeWorldStroke::StrokeUnitToScreen(From, Viewport);
+		const FVector2D B = HomeWorldStroke::StrokeUnitToScreen(To, Viewport);
+		HUD->DrawLine(A.X, A.Y, B.X, B.Y, Color, 3.f);
+	}
+
+	void DrawEasePadGreybox(AHUD* HUD, UCanvas* Canvas, UWorld* World)
+	{
+		AHomeWorldEasePad* Pad = FindEasePad(World);
+		if (!HUD || !Canvas || !Pad || !World)
+		{
+			return;
+		}
+		const FVector2D Viewport(Canvas->SizeX, Canvas->SizeY);
+		const FVector2D Origin = HomeWorldStroke::StrokeUnitToScreen(FVector2D::ZeroVector, Viewport);
+		const FVector2D Far = HomeWorldStroke::StrokeUnitToScreen(FVector2D(1.f, 1.f), Viewport);
+		const float Side = Far.X - Origin.X;
+		const FLinearColor Frame(0.75f, 0.75f, 0.75f, 1.f);
+		HUD->DrawLine(Origin.X, Origin.Y, Far.X, Origin.Y, Frame, 1.f);
+		HUD->DrawLine(Far.X, Origin.Y, Far.X, Far.Y, Frame, 1.f);
+		HUD->DrawLine(Far.X, Far.Y, Origin.X, Far.Y, Frame, 1.f);
+		HUD->DrawLine(Origin.X, Far.Y, Origin.X, Origin.Y, Frame, 1.f);
+
+		const EHomeWorldStrokeStep Step = Pad->GetOfferedStep();
+		const FLinearColor Ink(0.93f, 0.86f, 0.55f, 1.f);
+		if (Step == EHomeWorldStrokeStep::Grace)
+		{
+			DrawStrokeLine(HUD, Viewport, FVector2D(0.f, 0.f), FVector2D(0.f, 1.f), Ink);
+			return;
+		}
+
+		const float Clock = Pad->WindUpTimeAt(World->GetTimeSeconds());
+		const bool bOpen = Clock >= Pad->GetWindowMin() && Clock <= Pad->GetWindowMax();
+		HUD->DrawRect(
+			bOpen ? FLinearColor(0.45f, 0.82f, 0.45f, 1.f) : FLinearColor(0.55f, 0.16f, 0.16f, 1.f),
+			Origin.X,
+			Far.Y + 8.f,
+			Side,
+			14.f);
+		if (Step == EHomeWorldStrokeStep::Wrath)
+		{
+			return;
+		}
+
+		DrawStrokeLine(HUD, Viewport, FVector2D(0.f, 0.f), FVector2D(1.f, 1.f), Ink);
+		if (Step == EHomeWorldStrokeStep::ParadoxExtraPoint)
+		{
+			const FVector2D Point = HomeWorldStroke::StrokeUnitToScreen(FVector2D(0.5f, 0.5f), Viewport);
+			HUD->DrawRect(FLinearColor(0.95f, 0.85f, 0.2f, 1.f), Point.X - 5.f, Point.Y - 5.f, 10.f, 10.f);
+		}
+	}
+}
 
 void AHomeWorldHUD::DrawHUD()
 {
@@ -26,6 +98,8 @@ void AHomeWorldHUD::DrawHUD()
 
 	APlayerController* PC = Cast<APlayerController>(GetOwner());
 	if (!PC) return;
+
+	DrawEasePadGreybox(this, Canvas, PC->GetWorld());
 
 	int32 Physical = 0;
 	int32 Spiritual = 0;
