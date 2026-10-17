@@ -15,7 +15,7 @@ Setup, conventions, content layout, automation, and operational guides live here
 | **[VisionBoard/](../VisionBoard/)** | **MVP and vision:** Theme (VISION.md), campaign, moral system, scope, planetoid design, STACK_PLAN, MVP and tutorial plans, vertical slice, character generation. Plus vision-board prompt files (Aesthetics, Gameplay Mechanics, World Lore, etc.). |
 | **[TaskLists/](TaskLists/)** | **Task generation and lists:** Current task list (T1–T10), how to generate lists, 30-day schedule, daily state, accomplishments, project state. **TaskSpecs/** = per-task specs (DAY3_, DAY7_, AGENTIC_BUILDING, CONVERSION_NOT_KILL, etc.). |
 | **[workflow/](workflow/)** | **Workflow index** — entry point; points to VisionBoard and TaskLists. Daily flow, automation loop, key links. |
-| **[audit/](audit/)** | **Repo-structure audits:** measured redundancy — casing drift, duplicate trees, competing task surfaces. Audit-only; proposals until signed off. Start at [audit/REDUNDANCY_REGISTER.md](audit/REDUNDANCY_REGISTER.md). |
+| **[Docs/audit/](../Docs/audit/)** | **Repo-structure audits:** measured redundancy — casing drift, duplicate trees, competing task surfaces. Audit-only; proposals until signed off. Start at [Docs/audit/REDUNDANCY_REGISTER.md](../Docs/audit/REDUNDANCY_REGISTER.md). |
 | **docs/ root** | Entry points only: README, DOCS_LAYOUT, CONVENTIONS, CONTENT_LAYOUT, CONSOLE_COMMANDS, KNOWN_ERRORS, SETUP, SPEC_AND_PLAN, SESSION_LOG. |
 | **[Setup/](Setup/)** | MCP, CI, Horde, ref images, Cursor dev. |
 | **[PCG/](PCG/)** | PCG setup, quick setup, best practices, variables no access. |

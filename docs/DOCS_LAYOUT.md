@@ -38,7 +38,7 @@ The two directories differ only in case, so on a case-insensitive filesystem (Wi
 
 - **Never give two files in this directory the same basename.** `Docs/` and `docs/` are one directory on Windows, so a shared basename is a collision: only one exists on disk, links silently resolve to the wrong file, and `git checkout` on one can overwrite the other. This happened twice (both `README.md`, and `Config/` vs `config/`) and was fixed 2026-09-30.
 - `Config/` is UE's directory and the single source of truth for both `.ini` and tooling `.json`. All tooling JSON lives there, capital C. There is no lowercase `config/`.
-- Check with `git ls-files` after any add in this directory. On Windows, `git add docs/foo.md` records the path with the **on-disk** casing, so it can silently land under `Docs/`. When a case-only change is needed, use `git update-index --cacheinfo` rather than `git add`.
+- Check with `git ls-files` after any add in this directory. On Windows, `git add docs/foo.md` records the path with the **on-disk** casing, so it can silently land under `Docs/`. When a case-only change is needed, remove the old index path and add the new spelling without changing the blob: `git rm --cached <old>` then `git update-index --add --cacheinfo <mode>,<hash>,<new>`. `git update-index --cacheinfo` alone fails with `missing --add option?`. Adding the new spelling without removing the old leaves both spellings in the index.
 - The check that proves it: `git clone` must print no `colliding group` warning.
 - Link to the path as git records it. A link written with the other casing resolves on Windows and 404s on a case-sensitive clone or CI checkout.
 
@@ -249,13 +249,13 @@ Workflow index; daily flow. Do not move; already structured.
 
 ---
 
-## audit/
+## Docs/audit/
 
-Repo-structure audits: measured redundancy with evidence and a proposed fix per entry.
+Repo-structure audits: measured redundancy with evidence and a proposed fix per entry. Git records this folder as `Docs/audit/`.
 
 | File | Purpose |
 |------|---------|
-| [audit/REDUNDANCY_REGISTER.md](audit/REDUNDANCY_REGISTER.md) | Measured duplication, casing drift, and competing task surfaces. Audit-only; entries are proposals until signed off. |
+| [Docs/audit/REDUNDANCY_REGISTER.md](../Docs/audit/REDUNDANCY_REGISTER.md) | Measured duplication, casing drift, and competing task surfaces. Audit-only; entries are proposals until signed off. |
 
 ---
 
@@ -265,6 +265,6 @@ Repo-structure audits: measured redundancy with evidence and a proposed fix per 
 - **Automation:** [Automation/AUTOMATION_GAPS.md](Automation/AUTOMATION_GAPS.md) is the single place to log gaps; other automation docs link to it.
 - **Setup:** [SETUP.md](SETUP.md) is the main onboarding entry; Setup/ holds detailed subs (MCP, CI, etc.).
 - **Errors:** [KNOWN_ERRORS.md](KNOWN_ERRORS.md) is the single place for recorded errors; check before similar work.
-- **Current work:** [context/PLAY_TASKS.md](context/PLAY_TASKS.md) is the pointer of record for what is being worked on now. Several other docs read like current state — `TaskLists/CURRENT_TASK_LIST.md`, `TaskLists/NEXT_SESSION_PROMPT.md`, `11_NEXT_PHASE_STRATEGY.md`, `26_TASTE_NEXT.md`, `qa/POLISH_READINESS.md` among them — but none of them is authoritative. Audit detail: [audit/REDUNDANCY_REGISTER.md](audit/REDUNDANCY_REGISTER.md) § R3.
+- **Current work:** [Docs/context/PLAY_TASKS.md](../Docs/context/PLAY_TASKS.md) is the pointer of record for what is being worked on now. Several other docs read like current state — `TaskLists/CURRENT_TASK_LIST.md`, `TaskLists/NEXT_SESSION_PROMPT.md`, `11_NEXT_PHASE_STRATEGY.md`, `26_TASTE_NEXT.md`, `qa/POLISH_READINESS.md` among them — but none of them is authoritative. Audit detail: [Docs/audit/REDUNDANCY_REGISTER.md](../Docs/audit/REDUNDANCY_REGISTER.md) § R3.
 
 When adding a new doc, place it in the subdirectory above that matches its topic. If the topic is new, add a new subdirectory and update this file and docs/README_ENGINEERING.md.

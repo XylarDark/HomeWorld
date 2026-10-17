@@ -7,7 +7,7 @@
 #
 # WHY: the same 15 role cards are kept in three places:
 #   .cursor/agents/<name>.md   <- SOURCE OF TRUTH
-#   swarm/agents/<name>.md     <- derived, must be byte-identical to the source
+#   swarm/agents/<name>.md     <- derived; normalized content must match the source
 #   .codex/agents/<name>.toml  <- derived, same content in Codex's TOML shape
 #
 # These were hand-maintained with no generator, and they had already drifted:
@@ -18,8 +18,8 @@
 # source. -Sync rewrites them from the source; it never edits the source.
 #
 # Exit codes: 0 = in sync (or -Sync completed); 1 = drift found (check only);
-#             2 = bad input (unreadable source, or a body containing """ which
-#             cannot be represented in the TOML triple-quoted form).
+#             2 = bad input (unreadable source, or a body containing ''' which
+#             cannot be represented in the TOML literal multiline form).
 
 param(
     [switch]$Check,
@@ -64,19 +64,24 @@ function Read-RoleCard {
 
 function ConvertTo-CodexToml {
     param($Card, [string]$Path)
-    if ($Card.Body.Contains('"""')) {
-        throw "body contains a triple quote and cannot be emitted as TOML: $Path"
+    # Literal multiline strings (''') keep backslashes as characters. Basic
+    # strings (""") treat \b as backspace and reject \P, which corrupts a
+    # Windows path such as C:\Program Files\... or .\Tools\Safe-Build.ps1.
+    if ($Card.Body.Contains("'''")) {
+        throw "body contains a triple single-quote and cannot be emitted as a TOML literal: $Path"
     }
     $desc = if ($Card.Desc) { $Card.Desc } else { '' }
-    if ($desc.Contains('"')) { $desc = $desc.Replace('"', '\"') }
-    $q = '"'   # a single double-quote character; $q * 3 is the TOML triple quote
+    $desc = $desc.Replace('\', '\\').Replace('"', '\"')
+    $name = $Card.Name.Replace('\', '\\').Replace('"', '\"')
+    $q = '"'
+    $lit = "'"
     $out = New-Object System.Text.StringBuilder
-    # LF only, with a trailing newline: matches the committed .toml files byte for byte.
-    [void]$out.Append('name = ' + $q + $Card.Name + $q + "`n")
+    # LF only, no BOM, with a trailing newline.
+    [void]$out.Append('name = ' + $q + $name + $q + "`n")
     [void]$out.Append('description = ' + $q + $desc + $q + "`n")
-    [void]$out.Append('developer_instructions = ' + ($q * 3) + "`n")
+    [void]$out.Append('developer_instructions = ' + ($lit * 3) + "`n")
     [void]$out.Append($Card.Body)
-    [void]$out.Append(($q * 3) + "`n")
+    [void]$out.Append(($lit * 3) + "`n")
     $out.ToString()
 }
 
@@ -109,7 +114,7 @@ foreach ($card in $Cards) {
 
     $base = [System.IO.Path]::GetFileNameWithoutExtension($card.Name)
 
-    # 1. swarm must be a byte-identical copy
+    # 1. swarm must match the source once line endings and trailing spaces are folded
     $swarmPath = Join-Path $SwarmDir "$base.md"
     if (-not (Test-Path $swarmPath)) {
         [void]$Drift.Add("swarm/agents/$base.md  MISSING")

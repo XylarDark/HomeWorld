@@ -29,14 +29,11 @@ Agents start at [Docs/context/SESSION_START.md](Docs/context/SESSION_START.md). 
 
 ---
 
-## Docs split
+## Docs casing
 
-| Tree | Purpose |
-|------|---------|
-| **`Docs/`** (capital) | MVP swarm canon — do not merge with lowercase tree |
-| **`docs/`** (lowercase) | Unreal project documentation — session ops, PCG, setup |
+`Docs/` and `docs/` are one directory. Git records both spellings. Link to the spelling git records. UE project docs are addressed as `docs/…`. MVP swarm docs are addressed as `Docs/…`.
 
-Session task boards live under `docs/TaskLists/` and `docs/workflow/` — they are **not** the signed MVP GDD (see **`Docs/`**).
+Session task boards live under `docs/TaskLists/` and `docs/workflow/`. They are not the signed MVP GDD.
 
 ---
 
