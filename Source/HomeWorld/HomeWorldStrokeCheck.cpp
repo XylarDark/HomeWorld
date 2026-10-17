@@ -166,13 +166,13 @@ namespace HomeWorldStroke
 		const bool bNeedsShape = Step != EHomeWorldStrokeStep::Wrath;
 		const bool bNeedsWindow = Step != EHomeWorldStrokeStep::Grace;
 		const bool bNeedsExtra = Step == EHomeWorldStrokeStep::ParadoxExtraPoint;
-		if (bNeedsWindow && !StartsInside(Stroke, WindowMin, WindowMax))
-		{
-			return EHomeWorldStrokeResult::Miss;
-		}
 		if (bNeedsShape && !ShapeMatches(PointsOf(Stroke), Step == EHomeWorldStrokeStep::Grace ? GraceShape() : ParadoxShape()))
 		{
 			return EHomeWorldStrokeResult::Miss;
+		}
+		if (bNeedsWindow && !StartsInside(Stroke, WindowMin, WindowMax))
+		{
+			return EHomeWorldStrokeResult::Late;
 		}
 		if (bNeedsExtra && !PassesThroughPoint(Stroke, ExtraPoint))
 		{

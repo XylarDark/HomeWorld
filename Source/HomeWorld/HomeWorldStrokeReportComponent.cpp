@@ -64,6 +64,11 @@ void UHomeWorldStrokeReportComponent::RecordDrawnPoles(EHomeWorldStrokeStep Step
 	}
 }
 
+void UHomeWorldStrokeReportComponent::SetBonkTries(int32 Tries)
+{
+	BonkTries = FMath::Max(0, Tries);
+}
+
 void UHomeWorldStrokeReportComponent::ApplyWeakHit(const FVector& FocusPoint)
 {
 	const FVector From = GetOwner() ? GetOwner()->GetActorLocation() : FVector::ZeroVector;
@@ -83,12 +88,15 @@ EHomeWorldStrokeReport UHomeWorldStrokeReportComponent::EndStrokeHold(
 	UHomeWorldVirtueComponent* VirtueOverride,
 	UHomeWorldFallbackGlideComponent* GlideOverride,
 	bool bHasFocus,
-	FVector FocusPoint)
+	FVector FocusPoint,
+	EHomeWorldEaseCommit Commit,
+	bool bSpendBonkTry)
 {
 	const TArray<FHomeWorldStrokeSample> Stroke = HeldStroke;
 	bStrokeHeld = false;
 	HeldStroke.Reset();
-	return ReportStroke(Step, Stroke, WindowMin, WindowMax, ExtraPoint, VirtueOverride, GlideOverride, bHasFocus, FocusPoint);
+	return ReportStroke(
+		Step, Stroke, WindowMin, WindowMax, ExtraPoint, VirtueOverride, GlideOverride, bHasFocus, FocusPoint, Commit, bSpendBonkTry);
 }
 
 EHomeWorldStrokeReport UHomeWorldStrokeReportComponent::ReportStroke(
@@ -100,7 +108,9 @@ EHomeWorldStrokeReport UHomeWorldStrokeReportComponent::ReportStroke(
 	UHomeWorldVirtueComponent* VirtueOverride,
 	UHomeWorldFallbackGlideComponent* GlideOverride,
 	bool bHasFocus,
-	FVector FocusPoint)
+	FVector FocusPoint,
+	EHomeWorldEaseCommit Commit,
+	bool bSpendBonkTry)
 {
 	bGlideHomeInvoked = false;
 	bWeakHitMoved = false;
@@ -116,6 +126,15 @@ EHomeWorldStrokeReport UHomeWorldStrokeReportComponent::ReportStroke(
 	}
 	const bool bParadox = Step == EHomeWorldStrokeStep::Paradox || Step == EHomeWorldStrokeStep::ParadoxExtraPoint;
 	if (Result == EHomeWorldStrokeResult::Miss)
+	{
+		LastReport = EHomeWorldStrokeReport::WeakHit;
+		if (bHasFocus)
+		{
+			ApplyWeakHit(FocusPoint);
+		}
+		return LastReport;
+	}
+	if (Result == EHomeWorldStrokeResult::Late)
 	{
 		if (bParadox)
 		{
@@ -140,6 +159,17 @@ EHomeWorldStrokeReport UHomeWorldStrokeReportComponent::ReportStroke(
 			ApplyWeakHit(FocusPoint);
 		}
 		return LastReport;
+	}
+
+	if (Commit == EHomeWorldEaseCommit::Wait)
+	{
+		LastReport = EHomeWorldStrokeReport::None;
+		return LastReport;
+	}
+
+	if (bSpendBonkTry && BonkTries > 0)
+	{
+		--BonkTries;
 	}
 
 	LastReport = EHomeWorldStrokeReport::Matched;
