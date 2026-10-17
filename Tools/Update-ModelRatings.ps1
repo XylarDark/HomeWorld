@@ -348,7 +348,7 @@ foreach ($r in $records) {
 }
 $md.Add('- **Game design**: no public benchmark tests it (AA GDPval axes: finance, strategy, legal, healthcare, engineering, economics; Vals: finance, coding, legal, tax). It rides the Architecture bucket as the closest measurable proxy.')
 $md.Add('- **Vals dissent**: on covered models Vals v2.1 ranks MiMo 53.23 (#20/49) > DeepSeek 51.32 (#26/49) > GLM-5.3-Flash 44.58 (#41/49). The chosen basis is AA.')
-$md.Add('- **Picker order**: the /models order comes from artificial `releaseDate` keys in `%USERPROFILE%\.config\opencode\opencode.json` (releaseDate is the pickers sort key and is never displayed). This script does not edit that file; re-key by hand or ask the agent after material rating shifts.')
+$md.Add('- **Picker order**: the /models order comes from artificial `releaseDate` keys in `%USERPROFILE%\.config\opencode\opencode.json`; the key is never displayed. Verified 2026-10-17 against opencode v2.0.22: the picker parses each key into a numeric `time.released` (epoch ms - a bare `YYYY-MM-DD` becomes that day 00:00Z) and sorts each provider group by it **descending**, with the display `name` alphabetical as the tie-break. So keep every date inside a bucket **distinct** and descending in the intended cross-reference order; a duplicated date silently reorders that pair by name. This script does not edit that config; re-key by hand or ask the agent after material rating shifts.')
 $md.Add('')
 if ($unmappedVisible.Count) {
   $md.Add('## Unmapped visible models (free-ish ids not in this routing)')

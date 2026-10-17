@@ -1,10 +1,10 @@
 {
-    "generatedAt":  "2026-10-17T18:09:33Z",
+    "generatedAt":  "2026-10-17T20:13:12Z",
     "generatedBy":  "Tools/Update-ModelRatings.ps1 - do not hand-edit; re-run instead",
     "ratingBasis":  "Artificial Analysis Intelligence Index (AA); models without an AA page rank n/r and sit last in their bucket",
     "staleness":  {
                       "warnAfterDays":  7,
-                      "warnIfOlderThan":  "2026-10-10T18:09:33Z"
+                      "warnIfOlderThan":  "2026-10-10T20:13:12Z"
                   },
     "protocol":  "First task of a feature starts on the bucket first-wave pick; later passes cross-reference the remaining models in listed order. Switch models via /models only; agents suggest, never switch.",
     "sources":  {
