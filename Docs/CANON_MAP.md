@@ -118,6 +118,8 @@ README is left intact as history.
 | **Ending a session: what to ask next** | `Content/Python/session_close.py` | read-only; derives the critical path from the gate dependency chain |
 | **Where the played world lives** | `Content/HomeWorld/Maps/SizeTest/L_SizeTest.umap` | measurement scene for the wake minute. The cottage sheet is still the greybox keep. `L_VS_MVP_Markers` is not this walk. |
 | **AI-agent practice, researched** | `Docs/38_AI_AGENT_PRACTICE.md` | research; read-only, gates no code |
+| **Design and studio research** | `Docs/handoffs/research/README.md` | One file per body of knowledge. Open it only while that research is the task. Law: `Docs/handoffs/RESEARCH_PROMPT_CONTRACT.md` |
+| **Design ethos** | `Docs/canon/DESIGN_ETHOS.md` | Borrowed, ours, and disputed. Open only while auditing a mechanic, an environment, or a progression step. |
 | **What the human owns, and when to ask** | `docs/human-use/OWNERSHIP.md` | canon - Steer / Taste / Test |
 | **Is the island really 180x100 in the engine?** | `Content/Python/measure_ue_island.py` -> `Docs/qa/UE_ISLAND_MEASUREMENT.json` | in-editor, read-only; gate row `env.ue_island_measured` |
 | **Can we ship AI-assisted work on Steam?** | `Docs/20_UASSET_AI_POLICY.md` §4A | policy - Valve Jan 2026 disclosure rule |

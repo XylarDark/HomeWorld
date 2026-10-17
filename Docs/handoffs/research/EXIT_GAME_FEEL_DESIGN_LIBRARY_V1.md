@@ -266,3 +266,23 @@ grep -nEi 'implement now|open DESKTOP Act|run the prove|CAP product Do|APPROVE T
 - In-repo: `Docs/handoffs/READING_CANON_V1.md` · `Docs/handoffs/GAME_DESIGN_MOVEMENT_ENV_CANON_V1.md` (draft #237) · `Docs/handoffs/research/EXIT_GAME_DESIGN_MOVEMENT_ENV_V1.md`
 
 *End EXIT GAME_FEEL_DESIGN_LIBRARY_V1. CAP PARKED. A–E untouched. Pointer-only.*
+
+## Lookup log
+
+**Date:** 2026-10-17  
+**Ask:** What the cultivate-game candidates already name, and what sits next to that juice so a later audit does not take the rest of the game.
+
+**Already in this file:** Stardew Valley crop-stage juice and Animal Crossing care confirm are CANDIDATE labels for nurture and soothe. BotW and TotK multiplicative verbs are the same row. Gabler and MDA already KEEP confirmation of a care state. Those labels were not fetched again.
+
+**New sources**
+
+- Stardew Valley Wiki, “Modding:Crop data.” ConcernedApe / Stardew Valley. https://wiki.stardewvalley.net/Modding:Crop_data — retrieved 2026-10-17. `DaysInPhase` is the number of days in each visual step, and each step is a sprite in that crop’s row.
+- Play Nintendo, “How to Level up Your Island Game in Animal Crossing: New Horizons.” Nintendo. https://play.nintendo.com/news-tips/tips-tricks/animal-crossing-new-horizons-discover-tips/ — retrieved 2026-10-17. Watering flowers is described as raising the chance of hybrids. Pulling weeds and planting flowers are described as ways to improve the island rating.
+
+**Reuse**
+
+| Status | What is new |
+|--------|-------------|
+| **CANDIDATE** | Stardew’s stage sprite is the crop-stage juice already named. The same crop record also carries seasons, watering, and harvest quality. Those fields are not this candidate. |
+| **CANDIDATE** | Animal Crossing “care confirm” stays a label only. The Nintendo tip does not describe a confirm beat. |
+| **PARK** | Animal Crossing hybrid breeding and island rating, for this body. |

@@ -12,6 +12,25 @@
 
 Cite: Co skill `homeworld-co-ops` · EXIT `CO_BOTS_PROCESS_REFINE_V1`.
 
+## Design and studio lookups (Lead lock 2026-10-17)
+
+One file per distinct body of knowledge. The index is `Docs/handoffs/research/README.md`. Chat is not the copy.
+
+Open a research file only when the task is explicitly research on that body. Do not open it for any other task. Do not open a second topic file in the same lookup. Do not paste these files into `AGENTS.md`, skills, or seat prompts.
+
+Before any new source, read that one file. If the point is already recorded, do not look it up again. Append only what is new.
+
+A second file is allowed only for a different body of knowledge. Do not split one body across files. Do not put two bodies in one file.
+
+This section is not a Conductor Research cycle. The seven-field paste block and fitness greps A–D stay on Conductor prompts only. A Conductor cycle still writes its own `PROMPT_<ID>.md` and `EXIT_<ID>.md`. A design or studio lookup appends to the topic file named in the index.
+
+Append this shape to the topic file:
+
+- Date and the ask, one line each
+- What this file already covered, so it was not fetched again
+- New sources only: title, who, URL or book, retrieved date
+- New reuse for HomeWorld as KEEP / CANDIDATE / PARK
+
 ## Required paste block (seven fields)
 
 Every Conductor Research prompt MUST include these headings (names exact):

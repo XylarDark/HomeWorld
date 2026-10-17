@@ -28,7 +28,7 @@ Past ~60k tokens, write `Docs/handoffs/SESSION_HANDOFF_<slice>.md` and start a f
 
 Do not report a scene done until its verify script has logged the pass in the open editor. The rule is in [Docs/context/SCENE_SETUP.md](Docs/context/SCENE_SETUP.md).
 
-Legacy files in `Docs/handoffs/` are not a read list. Open a handoff only when this task names that file, or open the newest `SESSION_HANDOFF_*.md` when starting from a handoff. Do not search that folder for canon.
+Legacy files in `Docs/handoffs/` are not a read list. Open a handoff only when this task names that file, or open the newest `SESSION_HANDOFF_*.md` when starting from a handoff. Do not search that folder for canon. Open a design or studio research file only when the task is explicitly that research, and then only the one topic file named in [Docs/handoffs/RESEARCH_PROMPT_CONTRACT.md](Docs/handoffs/RESEARCH_PROMPT_CONTRACT.md). Open [Docs/canon/DESIGN_ETHOS.md](Docs/canon/DESIGN_ETHOS.md) only when auditing a mechanic, an environment, or a progression step.
 
 ## Build
 
