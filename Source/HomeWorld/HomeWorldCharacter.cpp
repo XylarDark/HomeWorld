@@ -7,6 +7,9 @@
 #include "HomeWorldSoftBoundsComponent.h"
 #include "HomeWorldTraversalComponent.h"
 #include "HomeWorldSpiritStealthComponent.h"
+#include "HomeWorldEasePad.h"
+#include "HomeWorldParadoxToy.h"
+#include "HomeWorldVirtueComponent.h"
 #include "HomeWorldShrinePortalComponent.h"
 #include "BuildPlacementSupport.h"
 #include "AbilitySystemComponent.h"
@@ -216,6 +219,7 @@ AHomeWorldCharacter::AHomeWorldCharacter(const FObjectInitializer& ObjectInitial
 	SoftBoundsComponent = CreateDefaultSubobject<UHomeWorldSoftBoundsComponent>(TEXT("SoftBoundsComponent"));
 	TraversalComponent = CreateDefaultSubobject<UHomeWorldTraversalComponent>(TEXT("TraversalComponent"));
 	SpiritStealthComponent = CreateDefaultSubobject<UHomeWorldSpiritStealthComponent>(TEXT("SpiritStealthComponent"));
+	StrokeReport = CreateDefaultSubobject<UHomeWorldStrokeReportComponent>(TEXT("StrokeReport"));
 }
 
 UAbilitySystemComponent* AHomeWorldCharacter::GetAbilitySystemComponent() const
@@ -566,6 +570,12 @@ void AHomeWorldCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 		EnhancedInput->BindAction(JumpAction, ETriggerEvent::Started, this, &AHomeWorldCharacter::OnJumpStarted);
 		EnhancedInput->BindAction(JumpAction, ETriggerEvent::Completed, this, &AHomeWorldCharacter::OnJumpCompleted);
 	}
+	if (PrimaryAttackAction)
+	{
+		EnhancedInput->BindAction(PrimaryAttackAction, ETriggerEvent::Started, this, &AHomeWorldCharacter::OnStrokeInputStarted);
+		EnhancedInput->BindAction(PrimaryAttackAction, ETriggerEvent::Triggered, this, &AHomeWorldCharacter::OnStrokeInputSampled);
+		EnhancedInput->BindAction(PrimaryAttackAction, ETriggerEvent::Completed, this, &AHomeWorldCharacter::OnStrokeInputReleased);
+	}
 
 	if (PrimaryAttackAction && PrimaryAttackAbilityClass)
 	{
@@ -761,6 +771,133 @@ void AHomeWorldCharacter::OnJumpStarted(const FInputActionValue& Value)
 void AHomeWorldCharacter::OnJumpCompleted(const FInputActionValue& Value)
 {
 	StopJumping();
+}
+
+bool AHomeWorldCharacter::IsSizeTestLevel() const
+{
+	const UWorld* World = GetWorld();
+	return World && World->GetMapName().Contains(TEXT("L_SizeTest"));
+}
+
+void AHomeWorldCharacter::SetStrokePad(AHomeWorldEasePad* Pad)
+{
+	StrokePad = Pad;
+}
+
+void AHomeWorldCharacter::SetStrokeHerb(EHomeWorldHerbVerb Verb, UHomeWorldVirtueComponent* Target)
+{
+	HerbVerb = Verb;
+	HerbTarget = Target;
+}
+
+void AHomeWorldCharacter::SetParadoxToy(AHomeWorldParadoxToy* Toy)
+{
+	ParadoxToy = Toy;
+}
+
+void AHomeWorldCharacter::BeginStrokeFromInput()
+{
+	if (IsSizeTestLevel() || !StrokeReport)
+	{
+		return;
+	}
+	StrokeReport->BeginStrokeHold();
+}
+
+void AHomeWorldCharacter::SampleStrokeFromInput(FVector2D ScreenPoint, float Time)
+{
+	if (IsSizeTestLevel() || !StrokeReport)
+	{
+		return;
+	}
+	StrokeReport->AppendCursorSample(ScreenPoint, Time);
+}
+
+void AHomeWorldCharacter::ApplyMarkedHerbOnMatch()
+{
+	if (HerbVerb == EHomeWorldHerbVerb::None || !HerbTarget)
+	{
+		return;
+	}
+	UGameInstance* GameInstance = GetWorld() ? GetWorld()->GetGameInstance() : nullptr;
+	UHomeWorldInventorySubsystem* Inventory = GameInstance ? GameInstance->GetSubsystem<UHomeWorldInventorySubsystem>() : nullptr;
+	if (!Inventory)
+	{
+		return;
+	}
+	switch (HerbVerb)
+	{
+	case EHomeWorldHerbVerb::Give:
+		Inventory->TryVirtueGive(HerbTarget);
+		break;
+	case EHomeWorldHerbVerb::Take:
+		Inventory->TryVirtueTake(HerbTarget);
+		break;
+	case EHomeWorldHerbVerb::Swap:
+		Inventory->TryVirtueSwap(HerbTarget);
+		break;
+	default:
+		break;
+	}
+}
+
+EHomeWorldStrokeReport AHomeWorldCharacter::EndStrokeFromInput()
+{
+	if (IsSizeTestLevel() || !StrokeReport)
+	{
+		return EHomeWorldStrokeReport::None;
+	}
+	EHomeWorldStrokeStep Step = EHomeWorldStrokeStep::Grace;
+	float WindowMin = 0.f;
+	float WindowMax = 1.f;
+	FVector2D ExtraPoint = FVector2D::ZeroVector;
+	bool bHasFocus = false;
+	FVector FocusPoint = FVector::ZeroVector;
+	if (StrokePad)
+	{
+		Step = StrokePad->GetOfferedStep();
+		WindowMin = StrokePad->GetWindowMin();
+		WindowMax = StrokePad->GetWindowMax();
+		ExtraPoint = StrokePad->GetExtraPoint();
+		bHasFocus = true;
+		FocusPoint = StrokePad->GetFocusPoint();
+	}
+	const EHomeWorldStrokeReport Report = StrokeReport->EndStrokeHold(
+		Step, WindowMin, WindowMax, ExtraPoint, nullptr, FallbackGlideComponent, bHasFocus, FocusPoint);
+	if (Report != EHomeWorldStrokeReport::Matched)
+	{
+		return Report;
+	}
+	if (StrokePad)
+	{
+		StrokePad->NoteMatch(Step);
+	}
+	ApplyMarkedHerbOnMatch();
+	if (ParadoxToy && (Step == EHomeWorldStrokeStep::Paradox || Step == EHomeWorldStrokeStep::ParadoxExtraPoint))
+	{
+		ParadoxToy->ArmForDawn();
+	}
+	return Report;
+}
+
+void AHomeWorldCharacter::OnStrokeInputStarted(const FInputActionValue& Value)
+{
+	BeginStrokeFromInput();
+}
+
+void AHomeWorldCharacter::OnStrokeInputSampled(const FInputActionValue& Value)
+{
+	if (!StrokeReport || !StrokeReport->IsStrokeHeld())
+	{
+		return;
+	}
+	const float Time = GetWorld() ? GetWorld()->GetTimeSeconds() : 0.f;
+	StrokeReport->SampleCursor(Time);
+}
+
+void AHomeWorldCharacter::OnStrokeInputReleased(const FInputActionValue& Value)
+{
+	EndStrokeFromInput();
 }
 
 void AHomeWorldCharacter::Jump()

@@ -19,6 +19,6 @@ Evidence: `Saved/canon_playtest_evidence.json` (local DESKTOP); log lines `GATHE
 
 Replaces the gather-and-seed test on `L_VS_MVP_Markers`. That gather passed on 2026-09-20 and stays in the log above. The rule is [`Docs/context/PRINCIPLE_FIT_LOCK.md`](../context/PRINCIPLE_FIT_LOCK.md) pick 9.
 
-**One session on DESKTOP (UE 5.8), then stop.** PIE `L_SizeTest` with no objective: walk, stop, and hop for about five seconds. Then, on a pad that is not `L_SizeTest`, play one ease that can match, weak-hit, and bonk. Luke says what felt wrong. Write that note here. Do not add a system in that session. The stroke stays off `L_SizeTest` until the walk and hop have been played.
+**One session on DESKTOP (UE 5.8), then stop.** Luke has not played this session. PIE `L_SizeTest` with no objective: walk, stop, and hop for about five seconds. Then, on `L_EasePad` (`/Game/HomeWorld/Maps/EasePad/L_EasePad`, [`Docs/level/L_EasePad_CONTEXT.md`](../level/L_EasePad_CONTEXT.md)), play one ease that can match, weak-hit, and bonk. Luke says what felt wrong. Write that note here. Do not add a system in that session. The stroke stays off `L_SizeTest` until the walk and hop have been played. The pad map file itself is not saved yet.
 
 Pass = both checks were played, and the note of what felt wrong is in this file. Fail = a system was added in the session, or the stroke was placed on `L_SizeTest` before the walk and hop.

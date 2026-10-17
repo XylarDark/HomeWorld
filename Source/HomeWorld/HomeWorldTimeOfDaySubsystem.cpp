@@ -1,6 +1,7 @@
 // Copyright HomeWorld. All Rights Reserved.
 
 #include "HomeWorldTimeOfDaySubsystem.h"
+#include "HomeWorldParadoxToy.h"
 #include "HomeWorldPlayWorld.h"
 #include "HomeWorldSaveGameSubsystem.h"
 #include "HAL/IConsoleManager.h"
@@ -181,6 +182,18 @@ void UHomeWorldTimeOfDaySubsystem::SetPhase(EHomeWorldTimeOfDayPhase Phase)
 			{
 				Save->PersistDawnSnapshot();
 			}
+		}
+		TArray<AHomeWorldParadoxToy*> Armed;
+		for (TActorIterator<AHomeWorldParadoxToy> It(GetWorld()); It; ++It)
+		{
+			if (It->IsArmedForDawn())
+			{
+				Armed.Add(*It);
+			}
+		}
+		for (AHomeWorldParadoxToy* Toy : Armed)
+		{
+			Toy->Destroy();
 		}
 	}
 
