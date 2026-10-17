@@ -1,0 +1,288 @@
+{
+    "generatedAt":  "2026-10-17T18:09:33Z",
+    "generatedBy":  "Tools/Update-ModelRatings.ps1 - do not hand-edit; re-run instead",
+    "ratingBasis":  "Artificial Analysis Intelligence Index (AA); models without an AA page rank n/r and sit last in their bucket",
+    "staleness":  {
+                      "warnAfterDays":  7,
+                      "warnIfOlderThan":  "2026-10-10T18:09:33Z"
+                  },
+    "protocol":  "First task of a feature starts on the bucket first-wave pick; later passes cross-reference the remaining models in listed order. Switch models via /models only; agents suggest, never switch.",
+    "sources":  {
+                    "aa":  "https://artificialanalysis.ai/models/\u003cslug\u003e (slug-anchored: intelligenceIndex, terminalBench40, scicode, contextWindowTokens)",
+                    "gatewayFacts":  "https://models.dev/api.json, opencode provider (context coverage + input modalities the gateway actually serves)",
+                    "availability":  "opencode models, minus ids the user disabled in the picker config",
+                    "staticSnapshots":  "Vals Index v2.1; SWE-Atlas (big-pickle 50.8%); Recruitly (Space Bunny 73/100)"
+                },
+    "buckets":  {
+                    "code":  {
+                                 "note":  "Proxied by Terminal-Bench 4.0 (agentic terminal coding) and SciCode.",
+                                 "label":  "Code dev (UE C++)"
+                             },
+                    "plan":  {
+                                 "note":  "No public benchmark tests game design; this group is long-context systems reasoning as the closest measurable proxy.",
+                                 "label":  "Architecture \u0026 game design"
+                             },
+                    "art":  {
+                                "note":  "Image-input models only; ranked by AA.",
+                                "label":  "Art design \u0026 assets"
+                            },
+                    "bulk":  {
+                                 "note":  "High-throughput drafting; last resort for code or vision work.",
+                                 "label":  "Fast / bulk"
+                             },
+                    "fallback":  {
+                                     "note":  "Separate provider, kept outside the use-case buckets.",
+                                     "label":  "Cloudflare bulk (fallback)"
+                                 }
+                },
+    "recommended":  {
+                        "code":  {
+                                     "firstWave":  "code/glm-5.3-flash-free",
+                                     "crossReference":  [
+                                                            "code/deepseek-v4.1-flash-free",
+                                                            "code/big-pickle"
+                                                        ]
+                                 },
+                        "plan":  {
+                                     "firstWave":  "plan/beam-free",
+                                     "crossReference":  [
+                                                            "plan/nemotron-3-ultra-free",
+                                                            "plan/longcat-2.5-preview-free"
+                                                        ]
+                                 },
+                        "art":  {
+                                    "firstWave":  "art/mimo-v2.6-flash-free",
+                                    "crossReference":  [
+                                                           "art/nemotron-3.5-super-vl-free",
+                                                           "art/space-bunny-free"
+                                                       ]
+                                },
+                        "bulk":  {
+                                     "firstWave":  "bulk/nemotron-3.5-lightning-free",
+                                     "crossReference":  [
+
+                                                        ]
+                                 },
+                        "fallback":  {
+                                         "firstWave":  "cloudflare/glm-4.7-flash",
+                                         "crossReference":  [
+
+                                                            ]
+                                     }
+                    },
+    "models":  [
+                   {
+                       "id":  "art/mimo-v2.6-flash-free",
+                       "bucket":  "art",
+                       "name":  "MiMo-V2.6-Flash",
+                       "aa":  37.9,
+                       "tb40Pct":  22.7,
+                       "scicodePct":  51.3,
+                       "vals":  53.23,
+                       "aaProvenance":  "AA model page (slug-anchored)",
+                       "contextSpec":  1000000,
+                       "contextGateway":  200000,
+                       "modalities":  "image+audio+video",
+                       "toolCall":  true,
+                       "available":  true,
+                       "probe":  null,
+                       "notes":  [
+                                     "Vals v2.1 snapshot 53.23% = #20/49; AA is the basis."
+                                 ]
+                   },
+                   {
+                       "id":  "art/nemotron-3.5-super-vl-free",
+                       "bucket":  "art",
+                       "name":  "Nemotron 3.5 Super VL",
+                       "aa":  26.5,
+                       "tb40Pct":  0,
+                       "scicodePct":  47.8,
+                       "vals":  null,
+                       "aaProvenance":  "AA model page (slug-anchored)",
+                       "contextSpec":  1000000,
+                       "contextGateway":  1048576,
+                       "modalities":  "image",
+                       "toolCall":  true,
+                       "available":  true,
+                       "probe":  null,
+                       "notes":  [
+
+                                 ]
+                   },
+                   {
+                       "id":  "art/space-bunny-free",
+                       "bucket":  "art",
+                       "name":  "Space Bunny",
+                       "aa":  null,
+                       "tb40Pct":  null,
+                       "scicodePct":  null,
+                       "vals":  null,
+                       "aaProvenance":  null,
+                       "contextSpec":  null,
+                       "contextGateway":  1048576,
+                       "modalities":  "image+video",
+                       "toolCall":  true,
+                       "available":  true,
+                       "probe":  null,
+                       "notes":  [
+                                     "No AA page. Recruitly 73/100 (static); #1 usage on the OpenRouter free tier."
+                                 ]
+                   },
+                   {
+                       "id":  "bulk/nemotron-3.5-lightning-free",
+                       "bucket":  "bulk",
+                       "name":  "Nemotron 3.5 Lightning",
+                       "aa":  12.9,
+                       "tb40Pct":  0.5,
+                       "scicodePct":  32.1,
+                       "vals":  null,
+                       "aaProvenance":  "AA model page (slug-anchored)",
+                       "contextSpec":  1000000,
+                       "contextGateway":  262144,
+                       "modalities":  "text",
+                       "toolCall":  true,
+                       "available":  true,
+                       "probe":  null,
+                       "notes":  [
+                                     "Cheapest throughput pick; TB4.0 0.5%."
+                                 ]
+                   },
+                   {
+                       "id":  "code/glm-5.3-flash-free",
+                       "bucket":  "code",
+                       "name":  "GLM-5.3-Flash",
+                       "aa":  41.8,
+                       "tb40Pct":  32.8,
+                       "scicodePct":  51.6,
+                       "vals":  44.58,
+                       "aaProvenance":  "AA model page (slug-anchored)",
+                       "contextSpec":  1000000,
+                       "contextGateway":  200000,
+                       "modalities":  "image+video+pdf",
+                       "toolCall":  true,
+                       "available":  true,
+                       "probe":  null,
+                       "notes":  [
+                                     "Vals v2.1 snapshot 44.58% = #41/49; AA is the basis."
+                                 ]
+                   },
+                   {
+                       "id":  "code/deepseek-v4.1-flash-free",
+                       "bucket":  "code",
+                       "name":  "DeepSeek V4.1 Flash",
+                       "aa":  39.5,
+                       "tb40Pct":  26.8,
+                       "scicodePct":  51.9,
+                       "vals":  51.32,
+                       "aaProvenance":  "AA model page (slug-anchored)",
+                       "contextSpec":  1000000,
+                       "contextGateway":  200000,
+                       "modalities":  "image",
+                       "toolCall":  true,
+                       "available":  true,
+                       "probe":  null,
+                       "notes":  [
+                                     "Vals v2.1 snapshot 51.32% = #26/49; AA is the basis."
+                                 ]
+                   },
+                   {
+                       "id":  "code/big-pickle",
+                       "bucket":  "code",
+                       "name":  "Big Pickle",
+                       "aa":  null,
+                       "tb40Pct":  null,
+                       "scicodePct":  null,
+                       "vals":  null,
+                       "aaProvenance":  null,
+                       "contextSpec":  null,
+                       "contextGateway":  200000,
+                       "modalities":  "text",
+                       "toolCall":  true,
+                       "available":  true,
+                       "probe":  null,
+                       "notes":  [
+                                     "No AA page. SWE-Atlas Codebase QnA 50.8% (63/124) is the only code-specific number; static snapshot."
+                                 ]
+                   },
+                   {
+                       "id":  "cloudflare/glm-4.7-flash",
+                       "bucket":  "fallback",
+                       "name":  "GLM-4.7-Flash",
+                       "aa":  14.9,
+                       "tb40Pct":  null,
+                       "scicodePct":  null,
+                       "vals":  null,
+                       "aaProvenance":  "AA model page (slug-anchored)",
+                       "contextSpec":  200000,
+                       "contextGateway":  null,
+                       "modalities":  null,
+                       "toolCall":  null,
+                       "available":  true,
+                       "probe":  null,
+                       "notes":  [
+                                     "AA page is the (Reasoning) variant. Cloudflare is its own provider; it cannot ride the opencode canonical groups."
+                                 ]
+                   },
+                   {
+                       "id":  "plan/beam-free",
+                       "bucket":  "plan",
+                       "name":  "Beam 1.0",
+                       "aa":  30.3,
+                       "tb40Pct":  3,
+                       "scicodePct":  48.5,
+                       "vals":  null,
+                       "aaProvenance":  "AA model page (slug-anchored)",
+                       "contextSpec":  1048576,
+                       "contextGateway":  1048576,
+                       "modalities":  "text",
+                       "toolCall":  true,
+                       "available":  true,
+                       "probe":  null,
+                       "notes":  [
+                                     "TB4.0 3%, so not a terminal coder; long-context reasoning role."
+                                 ]
+                   },
+                   {
+                       "id":  "plan/nemotron-3-ultra-free",
+                       "bucket":  "plan",
+                       "name":  "Nemotron 3 Ultra",
+                       "aa":  null,
+                       "tb40Pct":  null,
+                       "scicodePct":  null,
+                       "vals":  null,
+                       "aaProvenance":  "AA model page 404s on every slug variant tried. AA 23 comes from AAs own X post; ranked n/r until a page exists.",
+                       "contextSpec":  null,
+                       "contextGateway":  1000000,
+                       "modalities":  "text",
+                       "toolCall":  true,
+                       "available":  true,
+                       "probe":  null,
+                       "notes":  [
+                                     "AA model page 404s on every slug variant tried. AA 23 comes from AAs own X post; ranked n/r until a page exists."
+                                 ]
+                   },
+                   {
+                       "id":  "plan/longcat-2.5-preview-free",
+                       "bucket":  "plan",
+                       "name":  "LongCat 2.5 Preview",
+                       "aa":  null,
+                       "tb40Pct":  null,
+                       "scicodePct":  null,
+                       "vals":  null,
+                       "aaProvenance":  null,
+                       "contextSpec":  null,
+                       "contextGateway":  1000000,
+                       "modalities":  "image",
+                       "toolCall":  true,
+                       "available":  true,
+                       "probe":  null,
+                       "notes":  [
+                                     "No AA page. Meituan preview; image input per provider docs."
+                                 ]
+                   }
+               ],
+    "unmappedVisibleModels":  [
+
+                              ],
+    "probes":  "not run this pass (-Probe to enable)"
+}
