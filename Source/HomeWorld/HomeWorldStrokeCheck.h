@@ -19,7 +19,9 @@ UENUM(BlueprintType)
 enum class EHomeWorldStrokeResult : uint8
 {
 	Match,
-	Miss
+	Miss,
+	/** Started outside the wind-up. A wrong shape stays Miss. */
+	Late
 };
 
 USTRUCT(BlueprintType)
@@ -40,7 +42,7 @@ namespace HomeWorldStroke
 
 	HOMEWORLD_API const TArray<FVector2D>& ParadoxShape();
 
-	/** Wrong shape and a late start are both a miss. Grace ignores the window. Wrath ignores the shape. */
+	/** A wrong shape is a miss. A start outside the wind-up is late. Grace ignores the window. Wrath ignores the shape. */
 	HOMEWORLD_API EHomeWorldStrokeResult Evaluate(
 		EHomeWorldStrokeStep Step,
 		const TArray<FHomeWorldStrokeSample>& Stroke,

@@ -20,9 +20,18 @@ enum class EHomeWorldStrokeReport : uint8
 	Matched
 };
 
+/** The two ease commits. Spend finishes inside the wind-up. Wait keeps what you are holding. */
+UENUM(BlueprintType)
+enum class EHomeWorldEaseCommit : uint8
+{
+	SpendInside,
+	Wait
+};
+
 /**
  * Reports a stroke. A quiet miss steps away from a focus when one is given.
- * A paradox miss may call the existing glide home. It does not ease the camp.
+ * A late paradox calls the existing glide home. A wrong shape does not.
+ * It does not ease the camp.
  */
 UCLASS(ClassGroup = (HomeWorld), meta = (BlueprintSpawnableComponent))
 class HOMEWORLD_API UHomeWorldStrokeReportComponent : public UActorComponent
@@ -49,7 +58,9 @@ public:
 		UHomeWorldVirtueComponent* VirtueOverride = nullptr,
 		UHomeWorldFallbackGlideComponent* GlideOverride = nullptr,
 		bool bHasFocus = false,
-		FVector FocusPoint = FVector::ZeroVector);
+		FVector FocusPoint = FVector::ZeroVector,
+		EHomeWorldEaseCommit Commit = EHomeWorldEaseCommit::SpendInside,
+		bool bSpendBonkTry = false);
 
 	UFUNCTION(BlueprintCallable, Category = "Stroke")
 	EHomeWorldStrokeReport ReportStroke(
@@ -61,7 +72,9 @@ public:
 		UHomeWorldVirtueComponent* VirtueOverride = nullptr,
 		UHomeWorldFallbackGlideComponent* GlideOverride = nullptr,
 		bool bHasFocus = false,
-		FVector FocusPoint = FVector::ZeroVector);
+		FVector FocusPoint = FVector::ZeroVector,
+		EHomeWorldEaseCommit Commit = EHomeWorldEaseCommit::SpendInside,
+		bool bSpendBonkTry = false);
 
 	UFUNCTION(BlueprintCallable, Category = "Stroke")
 	EHomeWorldStrokeReport GetLastReport() const { return LastReport; }
@@ -79,6 +92,11 @@ public:
 	bool HasCarriedPoint() const { return bHasCarriedPoint; }
 
 	FVector2D GetCarriedPoint() const { return CarriedPoint; }
+
+	UFUNCTION(BlueprintCallable, Category = "Stroke")
+	void SetBonkTries(int32 Tries);
+
+	int32 GetBonkTries() const { return BonkTries; }
 
 protected:
 	void RecordDrawnPoles(EHomeWorldStrokeStep Step, UHomeWorldVirtueComponent* Virtue) const;
@@ -104,4 +122,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stroke")
 	FVector2D CarriedPoint = FVector2D::ZeroVector;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stroke")
+	int32 BonkTries = 0;
 };

@@ -79,12 +79,12 @@ bool FStrokeLateStartMisses::RunTest(const FString& Parameters)
 		EHomeWorldStrokeResult::Match);
 
 	const TArray<FHomeWorldStrokeSample> Late = HomeWorldStrokeTest::FromShape(HomeWorldStroke::ParadoxShape(), 5.f);
-	TestEqual(TEXT("a late paradox start is a miss"),
+	TestEqual(TEXT("a late paradox start is late"),
 		HomeWorldStroke::Evaluate(EHomeWorldStrokeStep::Paradox, Late, 0.f, 1.f, FVector2D::ZeroVector),
-		EHomeWorldStrokeResult::Miss);
-	TestEqual(TEXT("a late wrath start is the same miss"),
+		EHomeWorldStrokeResult::Late);
+	TestEqual(TEXT("a late wrath start is late"),
 		HomeWorldStroke::Evaluate(EHomeWorldStrokeStep::Wrath, { HomeWorldStrokeTest::Sample(0.f, 0.f, 5.f) }, 0.f, 1.f, FVector2D::ZeroVector),
-		EHomeWorldStrokeResult::Miss);
+		EHomeWorldStrokeResult::Late);
 	return true;
 }
 
@@ -240,6 +240,119 @@ bool FStrokeCarriedPointPersists::RunTest(const FString& Parameters)
 		0.f, 1.f, FVector2D::ZeroVector);
 	TestEqual(TEXT("a paradox miss is a bonk"), Bonk, EHomeWorldStrokeReport::Bonk);
 	TestFalse(TEXT("a bonk drops the point"), Report->HasCarriedPoint());
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FStrokeEaseTradeoff,
+	"HomeWorld.Systems.Stroke.EaseTradeoff",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FStrokeEaseTradeoff::RunTest(const FString& Parameters)
+{
+	const TArray<FHomeWorldStrokeSample> Late = HomeWorldStrokeTest::FromShape(HomeWorldStroke::ParadoxShape(), 5.f);
+	TestEqual(TEXT("a late paradox is not the wrong-shape miss"),
+		HomeWorldStroke::Evaluate(EHomeWorldStrokeStep::Paradox, Late, 0.f, 1.f, FVector2D::ZeroVector),
+		EHomeWorldStrokeResult::Late);
+
+	const TArray<FHomeWorldStrokeSample> Wrong = {
+		HomeWorldStrokeTest::Sample(0.f, 0.f, 0.4f),
+		HomeWorldStrokeTest::Sample(1.f, 0.f, 0.4f)
+	};
+	TestEqual(TEXT("a wrong shape inside the window misses"),
+		HomeWorldStroke::Evaluate(EHomeWorldStrokeStep::Paradox, Wrong, 0.f, 1.f, FVector2D::ZeroVector),
+		EHomeWorldStrokeResult::Miss);
+	const TArray<FHomeWorldStrokeSample> WrongLate = {
+		HomeWorldStrokeTest::Sample(0.f, 0.f, 5.f),
+		HomeWorldStrokeTest::Sample(1.f, 0.f, 5.f)
+	};
+	TestEqual(TEXT("a wrong shape stays a miss when it is also late"),
+		HomeWorldStroke::Evaluate(EHomeWorldStrokeStep::Paradox, WrongLate, 0.f, 1.f, FVector2D::ZeroVector),
+		EHomeWorldStrokeResult::Miss);
+
+	UHomeWorldStrokeReportComponent* Report = NewObject<UHomeWorldStrokeReportComponent>();
+	UHomeWorldFallbackGlideComponent* Glide = NewObject<UHomeWorldFallbackGlideComponent>();
+	if (!TestNotNull(TEXT("report"), Report) || !TestNotNull(TEXT("glide"), Glide))
+	{
+		return false;
+	}
+
+	const TArray<FHomeWorldStrokeSample> Paradox = HomeWorldStrokeTest::FromShape(HomeWorldStroke::ParadoxShape(), 0.4f);
+	Report->SetBonkTries(1);
+	const EHomeWorldStrokeReport SpentTry = Report->ReportStroke(
+		EHomeWorldStrokeStep::Paradox,
+		Paradox,
+		0.f,
+		1.f,
+		FVector2D(2.f, 2.f),
+		nullptr,
+		Glide,
+		false,
+		FVector::ZeroVector,
+		EHomeWorldEaseCommit::SpendInside,
+		true);
+	TestEqual(TEXT("an in-window bonk-try spend matches"), SpentTry, EHomeWorldStrokeReport::Matched);
+	TestEqual(TEXT("the bonk try is spent"), Report->GetBonkTries(), 0);
+	TestFalse(TEXT("the in-window spend does not glide home"), Report->WasGlideHomeInvoked());
+
+	const FVector2D Kept = Report->GetCarriedPoint();
+	TestEqual(TEXT("the match stored the extra point"), Kept, FVector2D(2.f, 2.f));
+	TArray<FHomeWorldStrokeSample> Through = {
+		HomeWorldStrokeTest::Sample(0.f, 1.f, 0.5f),
+		HomeWorldStrokeTest::Sample(Kept.X, Kept.Y, 0.5f)
+	};
+	const FVector2D Next(9.f, 1.f);
+	const EHomeWorldStrokeReport SpentPoint = Report->ReportStroke(
+		EHomeWorldStrokeStep::Wrath, Through, 0.f, 1.f, Next, nullptr, Glide);
+	TestEqual(TEXT("an in-window carried-point spend matches"), SpentPoint, EHomeWorldStrokeReport::Matched);
+	TestEqual(TEXT("the spent point is replaced"), Report->GetCarriedPoint(), Next);
+	TestEqual(TEXT("the point spend leaves the try count"), Report->GetBonkTries(), 0);
+
+	Report->SetBonkTries(1);
+	const TArray<FHomeWorldStrokeSample> WouldMatch = {
+		HomeWorldStrokeTest::Sample(0.f, 0.f, 0.5f),
+		HomeWorldStrokeTest::Sample(Next.X, Next.Y, 0.5f)
+	};
+	const EHomeWorldStrokeReport Waited = Report->ReportStroke(
+		EHomeWorldStrokeStep::Wrath,
+		WouldMatch,
+		0.f,
+		1.f,
+		FVector2D(3.f, 3.f),
+		nullptr,
+		Glide,
+		false,
+		FVector::ZeroVector,
+		EHomeWorldEaseCommit::Wait,
+		true);
+	TestEqual(TEXT("a wait is not a match"), Waited, EHomeWorldStrokeReport::None);
+	TestTrue(TEXT("a wait keeps the point"), Report->HasCarriedPoint());
+	TestEqual(TEXT("a wait does not replace the point"), Report->GetCarriedPoint(), Next);
+	TestEqual(TEXT("a wait keeps the bonk try"), Report->GetBonkTries(), 1);
+	TestFalse(TEXT("a wait does not glide home"), Report->WasGlideHomeInvoked());
+
+	const EHomeWorldStrokeReport Bonk = Report->ReportStroke(
+		EHomeWorldStrokeStep::Paradox, Late, 0.f, 1.f, FVector2D::ZeroVector, nullptr, Glide);
+	TestEqual(TEXT("a late paradox bonks"), Bonk, EHomeWorldStrokeReport::Bonk);
+	TestFalse(TEXT("a late paradox clears the point"), Report->HasCarriedPoint());
+	TestEqual(TEXT("a late paradox does not spend the try"), Report->GetBonkTries(), 1);
+	TestTrue(TEXT("a late paradox glides home"), Report->WasGlideHomeInvoked());
+
+	const FVector2D Restored(4.f, 4.f);
+	const EHomeWorldStrokeReport RestoredMatch = Report->ReportStroke(
+		EHomeWorldStrokeStep::Grace,
+		HomeWorldStrokeTest::FromShape(HomeWorldStroke::GraceShape(), 0.f),
+		0.f,
+		1.f,
+		Restored);
+	TestEqual(TEXT("a grace match restores a point"), RestoredMatch, EHomeWorldStrokeReport::Matched);
+	const EHomeWorldStrokeReport WrongReport = Report->ReportStroke(
+		EHomeWorldStrokeStep::Paradox, Wrong, 0.f, 1.f, FVector2D::ZeroVector, nullptr, Glide);
+	TestEqual(TEXT("a wrong shape misses"), WrongReport, EHomeWorldStrokeReport::WeakHit);
+	TestTrue(TEXT("a wrong shape keeps the point"), Report->HasCarriedPoint());
+	TestEqual(TEXT("a wrong shape does not replace the point"), Report->GetCarriedPoint(), Restored);
+	TestEqual(TEXT("a wrong shape does not spend the try"), Report->GetBonkTries(), 1);
+	TestFalse(TEXT("a wrong shape does not glide home"), Report->WasGlideHomeInvoked());
 	return true;
 }
 #endif
