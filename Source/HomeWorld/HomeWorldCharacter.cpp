@@ -813,6 +813,24 @@ void AHomeWorldCharacter::DiscoverStrokePad()
 	}
 }
 
+void AHomeWorldCharacter::DiscoverParadoxToy()
+{
+	if (ParadoxToy)
+	{
+		return;
+	}
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+	for (TActorIterator<AHomeWorldParadoxToy> It(World); It; ++It)
+	{
+		ParadoxToy = *It;
+		return;
+	}
+}
+
 void AHomeWorldCharacter::SetStrokeCursorHeld(bool bHeld)
 {
 	APlayerController* PC = Cast<APlayerController>(GetController());
@@ -848,6 +866,7 @@ void AHomeWorldCharacter::BeginStrokeFromInput()
 		return;
 	}
 	DiscoverStrokePad();
+	DiscoverParadoxToy();
 	SetStrokeCursorHeld(true);
 	StrokeReport->BeginStrokeHold();
 }

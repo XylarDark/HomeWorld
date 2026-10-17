@@ -580,6 +580,7 @@ protected:
 	bool IsSizeTestLevel() const;
 	void ApplyMarkedHerbOnMatch();
 	void DiscoverStrokePad();
+	void DiscoverParadoxToy();
 	void SetStrokeCursorHeld(bool bHeld);
 
 	bool bStrokeCursorHeld = false;

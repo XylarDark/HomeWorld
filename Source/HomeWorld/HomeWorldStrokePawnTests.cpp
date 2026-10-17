@@ -365,4 +365,40 @@ bool FStrokeCarriedPointInUnitRect::RunTest(const FString& Parameters)
 	return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FStrokeParadoxToyDiscovered,
+	"HomeWorld.Systems.Stroke.ParadoxToyDiscovered",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FStrokeParadoxToyDiscovered::RunTest(const FString& Parameters)
+{
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("discovered toy"));
+	if (!Scope.Ok(this))
+	{
+		return false;
+	}
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	AHomeWorldEasePad* Pad = Scope.World->SpawnActor<AHomeWorldEasePad>(Params);
+	AHomeWorldCharacter* Character = HomeWorldTestWorld::SpawnCharacter(Scope.World);
+	AHomeWorldParadoxToy* Toy = Scope.World->SpawnActor<AHomeWorldParadoxToy>(Params);
+	if (!TestNotNull(TEXT("pad"), Pad) || !TestNotNull(TEXT("pawn"), Character) || !TestNotNull(TEXT("toy"), Toy))
+	{
+		return false;
+	}
+	Character->SetStrokePad(Pad);
+	// Intentionally NOT calling SetParadoxToy: the pawn must discover it from the world.
+
+	const FVector2D Through = Pad->GetExtraPoint();
+	HomeWorldStrokePawnTest::Play(Character, HomeWorldStrokePawnTest::FromShape(HomeWorldStroke::GraceShape(), 0.f));
+	HomeWorldStrokePawnTest::Play(Character, { HomeWorldStrokePawnTest::Sample(Through.X, Through.Y, 0.5f) });
+	const TArray<FHomeWorldStrokeSample> Paradox = {
+		HomeWorldStrokePawnTest::Sample(0.f, 0.f, 0.4f),
+		HomeWorldStrokePawnTest::Sample(Through.X, Through.Y, 0.4f),
+		HomeWorldStrokePawnTest::Sample(1.f, 1.f, 0.4f)
+	};
+	TestEqual(TEXT("paradox matches"), HomeWorldStrokePawnTest::Play(Character, Paradox), EHomeWorldStrokeReport::Matched);
+	TestTrue(TEXT("discovery armed the toy"), Toy->IsArmedForDawn());
+	return true;
+}
 #endif
