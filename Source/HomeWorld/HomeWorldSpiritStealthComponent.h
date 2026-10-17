@@ -103,7 +103,7 @@ public:
 	// actors each of whom must be BOTH eased AND asleep.
 	//
 	// IsCampNightBeatComplete() above is retained for compatibility but is redirected to
-	// IsFreedomUnlocked(). Do not add new callers of the counter fields; they are the old
+	// IsFreedomUnlockedStrict(). A soft latch cannot complete the rescue. Do not add new callers of the counter fields; they are the old
 	// shape and they cannot express the three-actor law.
 	// ---------------------------------------------------------------------------------
 
@@ -141,7 +141,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Stealth|T0|CampNight")
 	bool IsFreedomUnlockedStrict() const;
 
-	/** MUST #16. Frees the companion only when IsFreedomUnlocked() passes. */
+	/** MUST #16. Frees the companion only when IsFreedomUnlockedStrict() passes. */
 	UFUNCTION(BlueprintCallable, Category = "Stealth|T0|CampNight")
 	bool TryFreeCaptive();
 

@@ -778,10 +778,10 @@ bool UHomeWorldSpiritStealthComponent::TryFreeCaptive()
 		return false;
 	}
 
-	if (!IsFreedomUnlocked())
+	if (!IsFreedomUnlockedStrict())
 	{
 		UE_LOG(LogHomeWorld, Log,
-			TEXT("CAMP: free REFUSED - %d/%d calm, strict=%d (a killed or converted actor does not count)"),
+			TEXT("CAMP: free REFUSED - %d/%d calm, strict=%d (a soft latch or a killed or converted actor does not count)"),
 			GetCalmedActorCount(), HomeWorldCampNight::GetGatedActorCount(),
 			IsFreedomUnlockedStrict() ? 1 : 0);
 		return false;
@@ -830,5 +830,5 @@ bool UHomeWorldSpiritStealthComponent::GetCampActorState(
 
 bool UHomeWorldSpiritStealthComponent::IsCampNightBeatComplete() const
 {
-	return IsFreedomUnlocked();
+	return IsFreedomUnlockedStrict();
 }

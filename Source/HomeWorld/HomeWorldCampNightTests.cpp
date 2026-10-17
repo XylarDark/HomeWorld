@@ -528,7 +528,8 @@ bool FFreedomGateTest::RunTest(const FString& Parameters)
  * zero actors in the world, which is how a beat with no level came to look finished.
  *
  * No camp exists in the .umap yet, so this test runs against exactly the situation the soft
- * latch was written for. The gameplay gate opens; the strict gate must not.
+ * latch was written for. The gameplay gate may open. The strict gate, the free, and the
+ * camp-night complete must not.
  */
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 	FSoftLatchContainmentTest,
@@ -568,6 +569,8 @@ bool FSoftLatchContainmentTest::RunTest(const FString& Parameters)
 		Stealth->IsFreedomUnlocked());
 	TestFalse(TEXT("the STRICT gate refuses soft latches - this is the evidence, and it says no"),
 		Stealth->IsFreedomUnlockedStrict());
+	TestFalse(TEXT("a soft latch cannot free the captive"), Stealth->TryFreeCaptive());
+	TestFalse(TEXT("a soft latch cannot complete the camp night"), Stealth->IsCampNightBeatComplete());
 	TestEqual(TEXT("the strict calmed count is zero"), Stealth->GetCalmedActorCount(), 0);
 
 	return true;
