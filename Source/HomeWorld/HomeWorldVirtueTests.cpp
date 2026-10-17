@@ -183,42 +183,4 @@ bool FVirtueHerbVerbs::RunTest(const FString& Parameters)
 	TestEqual(TEXT("RES_HERB count still one"), Inventory->GetResource(HomeWorldInventory::RES_HERB), 1);
 	return true;
 }
-
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(
-	FVirtueBenchEdits,
-	"HomeWorld.Systems.Virtue.BenchEdits",
-	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
-
-bool FVirtueBenchEdits::RunTest(const FString& Parameters)
-{
-	UHomeWorldVirtueComponent* Player = HomeWorldVirtueTest::MakeVirtue();
-	UHomeWorldVirtueComponent* Armor = HomeWorldVirtueTest::MakeVirtue();
-	if (!TestNotNull(TEXT("player"), Player) || !TestNotNull(TEXT("armor"), Armor))
-	{
-		return false;
-	}
-
-	FString Error;
-	TestTrue(TEXT("armor starts with Wrath"), Armor->TrySetHandPoles({ EHomeWorldVirtuePole::Wrath }, Error));
-	TestFalse(TEXT("change refuses a pole that has not been drawn"), Player->TryBenchChange(Armor, EHomeWorldVirtuePole::Grace));
-	TestTrue(TEXT("the armor still has Wrath"), Armor->HasPole(EHomeWorldVirtuePole::Wrath));
-
-	Player->RecordDrawnPole(EHomeWorldVirtuePole::Grace);
-	TestTrue(TEXT("change sets the drawn pole"), Player->TryBenchChange(Armor, EHomeWorldVirtuePole::Grace));
-	TestTrue(TEXT("armor now holds Grace"), Armor->HasPole(EHomeWorldVirtuePole::Grace));
-	TestFalse(TEXT("Wrath was replaced"), Armor->HasPole(EHomeWorldVirtuePole::Wrath));
-
-	TestFalse(TEXT("alter refuses an opposite that has not been drawn"), Player->TryBenchAlter(Armor, EHomeWorldVirtuePole::Grace));
-	TestTrue(TEXT("Grace stays when alter fails"), Armor->HasPole(EHomeWorldVirtuePole::Grace));
-
-	Player->RecordDrawnPole(EHomeWorldVirtuePole::Wrath);
-	TestTrue(TEXT("alter flips to the drawn opposite"), Player->TryBenchAlter(Armor, EHomeWorldVirtuePole::Grace));
-	TestTrue(TEXT("armor now holds Wrath"), Armor->HasPole(EHomeWorldVirtuePole::Wrath));
-
-	TestFalse(TEXT("remove refuses a rune the armor does not hold"), Player->TryBenchRemove(Armor, EHomeWorldVirtuePole::Grace));
-	TestTrue(TEXT("Wrath stays after the wrong remove"), Armor->HasPole(EHomeWorldVirtuePole::Wrath));
-	TestTrue(TEXT("remove blanks the held rune"), Player->TryBenchRemove(Armor, EHomeWorldVirtuePole::Wrath));
-	TestEqual(TEXT("the armor is blank"), Armor->GetPoles().Num(), 0);
-	return true;
-}
 #endif

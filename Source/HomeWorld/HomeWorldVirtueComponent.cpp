@@ -49,54 +49,6 @@ void UHomeWorldVirtueComponent::RecordDrawnPole(EHomeWorldVirtuePole Pole)
 	}
 }
 
-bool UHomeWorldVirtueComponent::TrySetAxisPole(EHomeWorldVirtuePole Pole)
-{
-	const int32 Axis = HomeWorldVirtue::AxisIndex(Pole);
-	const bool bOccupied = HasAxis(Pole);
-	if (!bOccupied && Poles.Num() + ParadoxAxes.Num() >= HomeWorldVirtue::AxisCount)
-	{
-		return false;
-	}
-	ParadoxAxes.Remove(Axis);
-	for (int32 Index = Poles.Num() - 1; Index >= 0; --Index)
-	{
-		if (HomeWorldVirtue::AxisIndex(Poles[Index]) == Axis)
-		{
-			Poles.RemoveAt(Index);
-		}
-	}
-	Poles.Add(Pole);
-	return true;
-}
-
-bool UHomeWorldVirtueComponent::TryBenchChange(UHomeWorldVirtueComponent* Armor, EHomeWorldVirtuePole Pole)
-{
-	if (!Armor || !HasDrawnPole(Pole))
-	{
-		return false;
-	}
-	return Armor->TrySetAxisPole(Pole);
-}
-
-bool UHomeWorldVirtueComponent::TryBenchRemove(UHomeWorldVirtueComponent* Armor, EHomeWorldVirtuePole Pole)
-{
-	if (!Armor || !Armor->HasPole(Pole))
-	{
-		return false;
-	}
-	return Armor->TryTakePole(Pole);
-}
-
-bool UHomeWorldVirtueComponent::TryBenchAlter(UHomeWorldVirtueComponent* Armor, EHomeWorldVirtuePole Pole)
-{
-	const EHomeWorldVirtuePole Other = HomeWorldVirtue::Opposite(Pole);
-	if (!Armor || !Armor->HasPole(Pole) || !HasDrawnPole(Other))
-	{
-		return false;
-	}
-	return Armor->TrySwapAxis(Pole);
-}
-
 void UHomeWorldVirtueComponent::ClearPoles()
 {
 	Poles.Reset();
