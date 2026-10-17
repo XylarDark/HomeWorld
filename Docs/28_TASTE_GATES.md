@@ -105,9 +105,10 @@ environment design. Conflating the two would have stripped a Steer gate.
 
 ### Spike paths (TG-C)
 
-- Skill: [.cursor/skills/taste-gate/SKILL.md](../.cursor/skills/taste-gate/SKILL.md)
+- Skill: [taste-gate skill](../.agents/skills/taste-gate/SKILL.md)
 - Human-use: [docs/human-use/taste-gates.md](../docs/human-use/taste-gates.md)
-- Rule pointer: [.cursor/rules/07-ai-agent-behavior.mdc](../.cursor/rules/07-ai-agent-behavior.mdc) (Taste Gates checklist item)
+- Rule pointer: retired — `07-ai-agent-behavior.mdc` was deleted (`4d46ecef`); the
+  live pointer is the [taste-gate skill](../.agents/skills/taste-gate/SKILL.md) above.
 - Prove handoff: [Docs/handoffs/TG_D_PROVE.md](handoffs/TG_D_PROVE.md)
 
 ---
@@ -124,4 +125,4 @@ Auto-approve taste; invent feel; resurrect Start-AllAgents; dual MCP; UE lookdev
 | **`APPROVE TG-D`** | Accept prove evidence — **DONE** 2026-09-19 ET |
 | **`APPROVE TG-E`** | Close Docs/28 — **DONE** 2026-09-19 ET |
 
-Harness remains in force after close: skill `taste-gate` (`.cursor/skills/` + `.agents/skills/`) + [taste-gates.md](../docs/human-use/taste-gates.md). Upstream: DevHarness (DevEnvTemplate) `.agents/skills-extras/taste-gate`. Next product Docs track is Lead-named or a fresh Taste Gate — do not invent.
+Harness remains in force after close: skill `taste-gate` (`.agents/skills/`) + [taste-gates.md](../docs/human-use/taste-gates.md). Upstream: DevHarness (DevEnvTemplate) `.agents/skills-extras/taste-gate`. Next product Docs track is Lead-named or a fresh Taste Gate — do not invent.

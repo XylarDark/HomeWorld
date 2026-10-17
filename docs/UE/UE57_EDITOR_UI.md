@@ -1,8 +1,10 @@
 # UE 5.7 Editor UI — Epic-sourced procedures
 
+> **Superseded for active development:** HomeWorld targets **UE 5.8**. Use [UE58_EDITOR_UI.md](UE58_EDITOR_UI.md) and [.cursor/rules/ue58-editor-ui.mdc](../../.cursor/rules/ue58-editor-ui.mdc). This file is retained as **5.7 historical** context.
+
 All steps below are taken from **Epic's Unreal Engine 5.7 documentation**. If your Editor does not show the same menus, options, or locations, open the cited doc and compare; UI can differ by build or setup.
 
-**Policy:** For any Editor UI instructions, agents and docs must use only Epic UE 5.7 docs and cite them. See [.cursor/rules/ue57-editor-ui.mdc](.cursor/rules/ue57-editor-ui.mdc).
+**Policy:** For any Editor UI instructions, agents and docs must use only Epic UE 5.7 docs and cite them. The `ue57-editor-ui.mdc` rule this once pointed at was retired (`4d46ecef`); its successor is [.cursor/rules/ue58-editor-ui.mdc](../../.cursor/rules/ue58-editor-ui.mdc).
 
 ---
 

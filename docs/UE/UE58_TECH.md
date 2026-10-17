@@ -21,7 +21,7 @@ Single entry point for Unreal Engine **5.8** development in HomeWorld: when to p
 | PCG settings automation cannot set | [PCG/PCG_VARIABLES_NO_ACCESS.md](../PCG/PCG_VARIABLES_NO_ACCESS.md) |
 | C++ vs Blueprint, code-first checklist | [CONVENTIONS.md](../CONVENTIONS.md) |
 | Plugins, layers, stack | [VisionBoard/Core/STACK_PLAN.md](../../VisionBoard/Core/STACK_PLAN.md) |
-| Plan before code (complex work) | [SPEC_AND_PLAN.md](../SPEC_AND_PLAN.md), [.cursor/rules/17-plan-first.mdc](../../.cursor/rules/17-plan-first.mdc) |
+| Plan before code (complex work) | [SPEC_AND_PLAN.md](../SPEC_AND_PLAN.md), [plan-first skill](../../.agents/skills/plan-first/SKILL.md) |
 | Automation “no access” procedure | [.cursor/rules/automation-standards.mdc](../../.cursor/rules/automation-standards.mdc) |
 | Editor UI (menus, panels, options) | [UE58_EDITOR_UI.md](UE58_EDITOR_UI.md) (stub → Epic 5.8); legacy [UE57_EDITOR_UI.md](UE57_EDITOR_UI.md) |
 | Full automation stack | [FULL_AUTOMATION_RESEARCH.md](../Automation/FULL_AUTOMATION_RESEARCH.md) |
@@ -83,7 +83,7 @@ Hero lookdev cameras: keep `sg.GlobalIlluminationQuality` at 2 (High) or 3 (Epic
 
 ## Plan first for UE work
 
-For **multi-file or multi-system** UE work, follow [17-plan-first.mdc](../../.cursor/rules/17-plan-first.mdc).
+For **multi-file or multi-system** UE work, follow the [plan-first skill](../../.agents/skills/plan-first/SKILL.md).
 
 ---
 

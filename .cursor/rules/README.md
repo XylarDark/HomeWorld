@@ -22,7 +22,7 @@ globs — it is **not** in `AGENTS.md`, so the globs are what make it reachable.
 
 | Was always-apply | Now | Why |
 |---|---|---|
- `08-project-context.mdc` | tombstone, `alwaysApply: false` | A stale fork of `AGENTS.md`, with 3 references to files that do not exist |
+| `08-project-context.mdc` | deleted (`4d46ecef`) | A stale fork of `AGENTS.md`, with 3 references to files that do not exist |
 | `20-full-automation-no-manual-steps.mdc` | `alwaysApply: false`, globs `Content/Python`, `Tools`, `.github/workflows`, `docs/Automation`, `.cursor/skills` | Invariant rides the globs (not `AGENTS.md`); this file keeps the gap-log format and the host gate |
 
 ### Opt-in by glob
@@ -55,17 +55,14 @@ command re-adds rules this project deliberately removed. Run the dry run
 first, and read [the sync note](../../docs/Setup/CURSOR_DEV.md).
 
 
-### Description-only (agent-requested)
+### Deleted by P4 (`4d46ecef`) — do not restore
 
-- `07-ai-agent-behavior.mdc`, `08-project-context.mdc` — **tombstones.** Say
-  retired; do not restore.
-- `19-automation-cycle.mdc` — WAVE F quarantine pointer; do **not** resurrect
-  cycle bodies.
-
-### Historical (narrow glob)
-
-- `ue57-sources.mdc`, `ue57-editor-ui.mdc` — glob `docs/UE/UE57_*.md` only.
-  Prefer `ue58-*` for active work. Both are marked HISTORICAL.
+`07-ai-agent-behavior.mdc`, `08-project-context.mdc`, `19-automation-cycle.mdc`,
+`ue57-sources.mdc` and `ue57-editor-ui.mdc` were tombstones; P4 deleted the
+files themselves. A reference to one of them in an older doc is a **dead link,
+not a missing checkout.** Successors: `ue58-sources.mdc` / `ue58-editor-ui.mdc`
+for engine sourcing, `AGENTS.md` for the agent-behaviour and project-context
+notes.
 
 ### Retired — stay deleted
 
@@ -93,8 +90,8 @@ Rules point to canonical examples in the repo rather than inlining long code.
 
 - Refresh from the UserHarness pin by copying
   `UserHarness/.cursor/rules/*.mdc` → `.cursor/rules/`, **preserving** the
-  HomeWorld `unreal-*` / `ue58-*` rules, the tombstones, and the zero
-  `alwaysApply` count.
+  HomeWorld `unreal-*` / `ue58-*` rules and the zero `alwaysApply` count. Do
+  **not** re-add retired rules the pin still ships (see the sync note above).
 - Never introduce a reference to a retired rule. The retirement map is
   `UserHarness/scripts/tools/cursor-rules-adapter.ts`:
   `02-security.mdc` → `.agents/skills/secure-coding`;
