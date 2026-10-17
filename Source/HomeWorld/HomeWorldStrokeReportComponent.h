@@ -28,6 +28,16 @@ enum class EHomeWorldEaseCommit : uint8
 	Wait
 };
 
+/** Which marked-herb verb a stroke match may spend. A miss spends none. */
+UENUM(BlueprintType)
+enum class EHomeWorldHerbVerb : uint8
+{
+	None,
+	Give,
+	Take,
+	Swap
+};
+
 /**
  * Reports a stroke. A quiet miss steps away from a focus when one is given.
  * A late paradox calls the existing glide home. A wrong shape does not.

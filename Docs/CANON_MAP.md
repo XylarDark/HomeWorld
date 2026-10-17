@@ -156,7 +156,7 @@ doc claims the mechanic. This table is that cross-link, and §6 makes it machine
 | #13 | Home portal → camp portal | Partial | `HomeWorldShrinePortalComponent` |
 | **#14** | **Camp night: 3 calmed** | **Logic done + tested; level unbuilt** | `TryEaseCampActor` / `IsFreedomUnlocked` / `…Strict`; 6 tests in `HomeWorldCampNightTests.cpp`. **Soft-latches** — no camp actors in any `.umap`, see §4 |
 | #15 | What a spirit may touch | **Logic done + tested** | `HomeWorldCampNight::GetSpiritTouchVerdict`; `EvaluateSpiritTouch` logs every verdict; 2 tests |
-| #16 | Free the captive, gated | **Logic done + tested; level unbuilt** | `FHomeWorldCampActorCalm::SatisfiesFreedomGate(Strict)`; `TryFreeCaptive`; 2 tests |
+| #16 | Free the captive, gated | **Logic done + tested; level unbuilt** | A played rescue uses the strict gate: `TryFreeCaptive` calls `IsFreedomUnlockedStrict()`. `SatisfiesFreedomGate` can still pass with no camp actors. That path is not a played rescue. |
 | **#17** | **Spirit-stealth** | **CLOSED — `APPROVE SS-A` 2026-09-21** ✅ | `Docs/25_SPIRIT_STEALTH_IMPL.md`; `HomeWorldSpiritStealthComponent.{h,cpp}`; `HomeWorldSpiritLitVolume.h`; `Docs/31_SPIRIT_STEALTH_FEEL.md` |
 
 **A second false negative was found and fixed the same day.** #14's row read *"Lit stealth
@@ -194,9 +194,9 @@ as evidence** — #14 could report itself complete with **zero actors in the wor
 
 Resolution: keep both behaviours, keep them **distinguishable**. New
 `FHomeWorldCampActorCalm::bSoftLatch` marks counts granted without a real actor;
-`SatisfiesFreedomGateStrict()` excludes them and is what tests and prove scripts read;
-`SatisfiesFreedomGate()` stays the gameplay path and logs `SOFT_LATCH_ONLY` so the difference is
-visible in the log rather than hidden in a return value.
+`SatisfiesFreedomGateStrict()` excludes them and is what tests and prove scripts read.
+A played rescue uses that strict gate (`TryFreeCaptive`). `SatisfiesFreedomGate()` can still
+pass with no camp actors and logs `SOFT_LATCH_ONLY`. That path is not a played rescue.
 
 ---
 

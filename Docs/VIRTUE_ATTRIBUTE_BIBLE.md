@@ -81,7 +81,7 @@ The paradox item the lair requires is gathered on travels in the field and the f
 
 A hit has two punishments. The weak hit knocks you away from the mechanic. You stay, and the action is still there. The bonk sends you home. That is the biggest punishment, and it is this game's death. You do not die.
 
-A bonk try is one hit that stays the weak knock-away. When no tries remain, the next hit bonks you home.
+A bonk try is one hit that stays the weak knock-away. When no tries remain, the next hit bonks you home. A match leaves the extra point in hand, and the next stroke must pass through it. A weak hit keeps that point. A bonk drops it.
 
 ## Hardest form
 
@@ -110,13 +110,13 @@ The ease starts from four pillars: reaction time, preparedness, drawing a rune w
 
 Preparedness is before every commit. You choose the armor set at home. In the clearing you get one read of the rune, then the shove can start.
 
-On a commit you draw the pole's rune with the cursor while you move. The stroke has to match the rune you can see. The shove has a visible wind-up. You start the stroke inside it. Late is the miss. A wrong stroke is the same miss. The step chooses the punishment. Interview, next beats round 2.
+On a commit you draw the pole's rune with the cursor while you move. The stroke has to match the rune you can see. The shove has a visible wind-up. Finish inside it and spend the carried point or a bonk try, and that commit can match. Wait, and you keep the point and the try, while a shove after the window can bonk. A wrong shape still misses, and it does not spend either. Interview, next beats round 2. The lock is [`Docs/context/PRINCIPLE_FIT_LOCK.md`](context/PRINCIPLE_FIT_LOCK.md).
 
 The steps:
 
 1. Grace. Drawing only. No wind-up. A miss is the weak hit.
 2. Wrath. The wind-up only. No drawing. A miss is the weak hit.
-3. The paradox. One stroke that is both poles, started inside the wind-up. A miss bonks you home.
+3. The paradox. One stroke that is both poles, started inside the wind-up. A late start bonks you home. A wrong shape misses and does not spend.
 4. The same ease plus one visible rune. That rune is one more point the stroke must pass through. You can see the point before you start. Interview, next beats round 1.
 
 The rounds are [`Docs/context/CHALLENGE_PILLARS_INTERVIEW.md`](context/CHALLENGE_PILLARS_INTERVIEW.md).

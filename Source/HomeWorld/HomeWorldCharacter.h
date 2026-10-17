@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
 #include "HomeWorldMealTypes.h"
+#include "HomeWorldStrokeReportComponent.h"
 #include "HomeWorldTimeOfDaySubsystem.h"
 
 /** Where a family member stands. One place, not a dialogue tree. */
@@ -36,6 +37,9 @@ class UHomeWorldSoftBoundsComponent;
 class UHomeWorldTraversalComponent;
 class UHomeWorldSpiritStealthComponent;
 class UHomeWorldCloudWisp;
+class UHomeWorldVirtueComponent;
+class AHomeWorldEasePad;
+class AHomeWorldParadoxToy;
 
 UCLASS(Blueprintable)
 /**
@@ -523,6 +527,17 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Movement|MV-A", meta = (DisplayName = "Try Spirit Blink"))
 	bool TrySpiritBlink();
 
+	/** Hold, cursor sample, and release. These are the stroke input path. A size-test map does not run them. */
+	void BeginStrokeFromInput();
+	void SampleStrokeFromInput(FVector2D ScreenPoint, float Time);
+	EHomeWorldStrokeReport EndStrokeFromInput();
+
+	void SetStrokePad(AHomeWorldEasePad* Pad);
+	void SetStrokeHerb(EHomeWorldHerbVerb Verb, UHomeWorldVirtueComponent* Target);
+	void SetParadoxToy(AHomeWorldParadoxToy* Toy);
+
+	UHomeWorldStrokeReportComponent* GetStrokeReport() const { return StrokeReport; }
+
 	virtual void Jump() override;
 
 	/** Public so automation can assert the cloud-descent landing handoff. Engine declares this public. */
@@ -546,6 +561,24 @@ protected:
 	/** SS-A: spirit lit / alert stub (spirit form only). */
 	UPROPERTY(VisibleAnywhere, Category = "Stealth|SS-A")
 	TObjectPtr<UHomeWorldSpiritStealthComponent> SpiritStealthComponent;
+
+	/** Ease stroke. Present on the pawn. Input does not run it on L_SizeTest. */
+	UPROPERTY(VisibleAnywhere, Category = "Stroke")
+	TObjectPtr<UHomeWorldStrokeReportComponent> StrokeReport;
+
+	UPROPERTY()
+	TObjectPtr<AHomeWorldEasePad> StrokePad;
+
+	UPROPERTY()
+	TObjectPtr<UHomeWorldVirtueComponent> HerbTarget;
+
+	EHomeWorldHerbVerb HerbVerb = EHomeWorldHerbVerb::None;
+
+	UPROPERTY()
+	TObjectPtr<AHomeWorldParadoxToy> ParadoxToy;
+
+	bool IsSizeTestLevel() const;
+	void ApplyMarkedHerbOnMatch();
 
 	/** True only between active V2 launch and landing. Steering is unrestricted. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Transit|Cloud Descent")
@@ -824,6 +857,9 @@ protected:
 	void OnSprintCompleted(const FInputActionValue& Value);
 	void OnJumpStarted(const FInputActionValue& Value);
 	void OnJumpCompleted(const FInputActionValue& Value);
+	void OnStrokeInputStarted(const FInputActionValue& Value);
+	void OnStrokeInputSampled(const FInputActionValue& Value);
+	void OnStrokeInputReleased(const FInputActionValue& Value);
 
 	void ApplyFormForPhase(EHomeWorldTimeOfDayPhase Phase);
 	void NoteStillOutPastDawn(EHomeWorldTimeOfDayPhase Phase);
