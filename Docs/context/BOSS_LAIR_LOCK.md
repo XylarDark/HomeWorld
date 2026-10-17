@@ -4,6 +4,10 @@ Lead interview, 2026-10-08. Shape only. No meshes. No prove. Not a start read.
 
 Replaces the same-day sleeper-body lock. Vision board still owns the seal, the day-and-night split, and the ban on a new flight mode. This file says how the prototype's last beat uses the loop that already exists.
 
+## Parked 2026-10-16
+
+The coils, the ram, the tickle, and the guard push are parked. Do not build them. [`Docs/context/PRINCIPLE_FIT_LOCK.md`](PRINCIPLE_FIT_LOCK.md) wins. The shape below stays as the record. It is not a build list. The old seal stub is not these coils, and this park does not extend it.
+
 ## The bound giant
 
 One body, many times the player. An Atlas-like sleeper, trapped in a cliffside cave. A snake wraps him and locks him in. The body is the place. The snake is the binding, not a second beast to kill. This is the boss pocket. The slice does not add a second boss toy.
