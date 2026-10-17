@@ -41,18 +41,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Virtue")
 	void RecordDrawnPole(EHomeWorldVirtuePole Pole);
 
-	/** Set the armor's axis to a pole the player has drawn. A failure leaves the armor unchanged. */
-	UFUNCTION(BlueprintCallable, Category = "Virtue")
-	bool TryBenchChange(UHomeWorldVirtueComponent* Armor, EHomeWorldVirtuePole Pole);
-
-	/** Blank a rune the armor holds. The wrong rune leaves the armor unchanged. */
-	UFUNCTION(BlueprintCallable, Category = "Virtue")
-	bool TryBenchRemove(UHomeWorldVirtueComponent* Armor, EHomeWorldVirtuePole Pole);
-
-	/** Flip to the other pole when that pole has been drawn. Otherwise the mark stays. */
-	UFUNCTION(BlueprintCallable, Category = "Virtue")
-	bool TryBenchAlter(UHomeWorldVirtueComponent* Armor, EHomeWorldVirtuePole Pole);
-
 	/** Occupies the pole's axis. Fails when that axis already has a pole or a paradox. */
 	UFUNCTION(BlueprintCallable, Category = "Virtue")
 	bool TrySetParadox(EHomeWorldVirtuePole PoleOnAxis);
@@ -76,9 +64,6 @@ public:
 	bool TrySetHandPoles(const TArray<EHomeWorldVirtuePole>& Hand, FString& OutError);
 
 	void Roll(const TArray<float>& Chances, FRandomStream& Stream);
-
-private:
-	bool TrySetAxisPole(EHomeWorldVirtuePole Pole);
 
 protected:
 	virtual void BeginPlay() override;
