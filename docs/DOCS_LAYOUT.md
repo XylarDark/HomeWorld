@@ -10,20 +10,22 @@
 
 ## Repo roots outside `docs/` (MVP swarm vs UE)
 
-These paths are **intentionally outside** lowercase `docs/`. Do not merge `Docs/` into `docs/` or move swarm kit files into UE subdirs without updating this table.
+`Docs/` and `docs/` are **one physical directory** (DEC-0029). On a case-insensitive filesystem they resolve to the same folder, and only one file per basename can exist. What separates UE docs from MVP swarm canon is **ownership convention inside that one directory**, not the filesystem. Git records both spellings, so the casing of each path is deliberate — see Case collisions below.
+
+The other paths in this table are genuinely separate directories.
 
 | Path | Purpose |
 |------|---------|
-| **`Docs/`** (capital D) | MVP swarm canon — GDD slices, art bible, material sheet, WAVE handoffs (`Docs/handoffs/`), QA placeholders. See [Docs/README.md](../Docs/README.md). |
+| **`Docs/`** (capital D) | Same directory as `docs/`, different recorded casing. MVP swarm canon — GDD slices, art bible, material sheet, WAVE handoffs (`Docs/handoffs/`), QA placeholders. See [Docs/README.md](../Docs/README.md). |
 | **`swarm/`** | Conductor runtime — [SWARM_OPS.md](../swarm/SWARM_OPS.md), [PHASE_BOARD.md](../swarm/PHASE_BOARD.md), wave packets, role cards (source for `.cursor/agents/`). |
 | **`Lib/`** | Kit specs and master-material JSON for Blender-first pipeline (homestead, gatherables, night layer, transit). |
 | **`Maps/`** (repo root) | Preview map READMEs for swarm lookdev (`Preview_Homestead_Night`, etc.) — not UE `/Game/` maps under `Content/`. |
 | **`START_HERE.md`** | Human Lead entry for MVP lookdev swarm; gates and on-demand specialist spawn. |
 | **`HOMEWORLD_MVP_SWARM_BRIEF.md`** | Game canon brief for the swarm (Human Lead owns changes after P0). |
 
-**UE project docs** stay in **`docs/`** (this tree). **MVP swarm docs** stay in **`Docs/`**.
+**Ownership convention:** UE project docs are addressed as `docs/…`; MVP swarm docs as `Docs/…`. This is a naming convention inside a single directory — do not describe the two as separate trees, and do not attempt to merge or split them, because the filesystem already merged them. A folder whose recorded casing disagrees with its owner (for example `Docs/TaskLists/` against `docs/TaskLists/`) is casing drift, not a second location.
 
-### Case collisions between the two trees — resolved 2026-09-30
+### Case collisions in this directory — resolved 2026-09-30
 
 The two directories differ only in case, so on a case-insensitive filesystem (Windows) they are **one** directory. Git can still track both, but only one file per basename can exist on disk. This bit twice and is now fixed:
 
@@ -34,10 +36,11 @@ The two directories differ only in case, so on a case-insensitive filesystem (Wi
 
 **Rules that follow:**
 
-- **Never give a file in `Docs/` the same basename as a file in `docs/`.** The directories are intentionally separate; the *basenames* must be too.
+- **Never give two files in this directory the same basename.** `Docs/` and `docs/` are one directory on Windows, so a shared basename is a collision: only one exists on disk, links silently resolve to the wrong file, and `git checkout` on one can overwrite the other. This happened twice (both `README.md`, and `Config/` vs `config/`) and was fixed 2026-09-30.
 - `Config/` is UE's directory and the single source of truth for both `.ini` and tooling `.json`. All tooling JSON lives there, capital C. There is no lowercase `config/`.
-- Check with `git ls-files` after any add in these trees. On Windows, `git add docs/foo.md` records the path with the **on-disk** casing, so it can silently land in `Docs/`. When a case-only change is needed, use `git update-index --cacheinfo` rather than `git add`.
+- Check with `git ls-files` after any add in this directory. On Windows, `git add docs/foo.md` records the path with the **on-disk** casing, so it can silently land under `Docs/`. When a case-only change is needed, use `git update-index --cacheinfo` rather than `git add`.
 - The check that proves it: `git clone` must print no `colliding group` warning.
+- Link to the path as git records it. A link written with the other casing resolves on Windows and 404s on a case-sensitive clone or CI checkout.
 
 See [README_ENGINEERING.md](README_ENGINEERING.md) for the engineering index and [Docs/README.md](../Docs/README.md) for the canon index.
 
@@ -246,11 +249,22 @@ Workflow index; daily flow. Do not move; already structured.
 
 ---
 
+## audit/
+
+Repo-structure audits: measured redundancy with evidence and a proposed fix per entry.
+
+| File | Purpose |
+|------|---------|
+| [audit/REDUNDANCY_REGISTER.md](audit/REDUNDANCY_REGISTER.md) | Measured duplication, casing drift, and competing task surfaces. Audit-only; entries are proposals until signed off. |
+
+---
+
 ## Redundancy and single source of truth
 
 - **PCG:** Use [PCG/PCG_SETUP.md](PCG/PCG_SETUP.md) as the full reference; [PCG/PCG_QUICK_SETUP.md](PCG/PCG_QUICK_SETUP.md) for the short path. Both link to each other.
 - **Automation:** [Automation/AUTOMATION_GAPS.md](Automation/AUTOMATION_GAPS.md) is the single place to log gaps; other automation docs link to it.
 - **Setup:** [SETUP.md](SETUP.md) is the main onboarding entry; Setup/ holds detailed subs (MCP, CI, etc.).
 - **Errors:** [KNOWN_ERRORS.md](KNOWN_ERRORS.md) is the single place for recorded errors; check before similar work.
+- **Current work:** [context/PLAY_TASKS.md](context/PLAY_TASKS.md) is the pointer of record for what is being worked on now. Several other docs read like current state — `TaskLists/CURRENT_TASK_LIST.md`, `TaskLists/NEXT_SESSION_PROMPT.md`, `11_NEXT_PHASE_STRATEGY.md`, `26_TASTE_NEXT.md`, `qa/POLISH_READINESS.md` among them — but none of them is authoritative. Audit detail: [audit/REDUNDANCY_REGISTER.md](audit/REDUNDANCY_REGISTER.md) § R3.
 
 When adding a new doc, place it in the subdirectory above that matches its topic. If the topic is new, add a new subdirectory and update this file and docs/README_ENGINEERING.md.
