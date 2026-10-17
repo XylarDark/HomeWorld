@@ -194,4 +194,52 @@ bool FStrokeCursorFeedsTheCheck::RunTest(const FString& Parameters)
 	TestTrue(TEXT("a paradox match records Wrath as well"), Virtue->HasDrawnPole(EHomeWorldVirtuePole::Wrath));
 	return true;
 }
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FStrokeCarriedPointPersists,
+	"HomeWorld.Systems.Stroke.CarriedPointPersists",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FStrokeCarriedPointPersists::RunTest(const FString& Parameters)
+{
+	UHomeWorldStrokeReportComponent* Report = NewObject<UHomeWorldStrokeReportComponent>();
+	if (!TestNotNull(TEXT("report"), Report))
+	{
+		return false;
+	}
+
+	const FVector2D Kept(4.f, 4.f);
+	const EHomeWorldStrokeReport Matched = Report->ReportStroke(
+		EHomeWorldStrokeStep::Grace,
+		HomeWorldStrokeTest::FromShape(HomeWorldStroke::GraceShape(), 0.f),
+		0.f, 1.f, Kept);
+	TestEqual(TEXT("a match stores the extra point"), Matched, EHomeWorldStrokeReport::Matched);
+	TestTrue(TEXT("the point is in hand"), Report->HasCarriedPoint());
+	TestEqual(TEXT("the stored point is the extra point"), Report->GetCarriedPoint(), Kept);
+
+	const TArray<FHomeWorldStrokeSample> Aside = {
+		HomeWorldStrokeTest::Sample(1.f, 0.f, 0.5f),
+		HomeWorldStrokeTest::Sample(2.f, 0.f, 0.6f)
+	};
+	const EHomeWorldStrokeReport Weak = Report->ReportStroke(
+		EHomeWorldStrokeStep::Wrath, Aside, 0.f, 1.f, FVector2D::ZeroVector);
+	TestEqual(TEXT("a stroke that misses the carried point is a weak hit"), Weak, EHomeWorldStrokeReport::WeakHit);
+	TestTrue(TEXT("a weak hit keeps the point"), Report->HasCarriedPoint());
+	TestEqual(TEXT("the kept point is unchanged"), Report->GetCarriedPoint(), Kept);
+
+	TArray<FHomeWorldStrokeSample> Through = Aside;
+	Through.Add(HomeWorldStrokeTest::Sample(Kept.X, Kept.Y, 0.7f));
+	const EHomeWorldStrokeReport Again = Report->ReportStroke(
+		EHomeWorldStrokeStep::Wrath, Through, 0.f, 1.f, FVector2D(9.f, 1.f));
+	TestEqual(TEXT("a stroke through the carried point can match"), Again, EHomeWorldStrokeReport::Matched);
+	TestEqual(TEXT("the match stores the new extra point"), Report->GetCarriedPoint(), FVector2D(9.f, 1.f));
+
+	const EHomeWorldStrokeReport Bonk = Report->ReportStroke(
+		EHomeWorldStrokeStep::Paradox,
+		HomeWorldStrokeTest::FromShape(HomeWorldStroke::ParadoxShape(), 5.f),
+		0.f, 1.f, FVector2D::ZeroVector);
+	TestEqual(TEXT("a paradox miss is a bonk"), Bonk, EHomeWorldStrokeReport::Bonk);
+	TestFalse(TEXT("a bonk drops the point"), Report->HasCarriedPoint());
+	return true;
+}
 #endif

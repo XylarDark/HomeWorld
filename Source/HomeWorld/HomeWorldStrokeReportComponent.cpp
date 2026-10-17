@@ -106,13 +106,22 @@ EHomeWorldStrokeReport UHomeWorldStrokeReportComponent::ReportStroke(
 	bWeakHitMoved = false;
 	LastWeakHitOffset = FVector::ZeroVector;
 
-	const EHomeWorldStrokeResult Result = HomeWorldStroke::Evaluate(Step, Stroke, WindowMin, WindowMax, ExtraPoint);
+	const bool bHadCarriedPoint = bHasCarriedPoint;
+	const FVector2D HeldPoint = CarriedPoint;
+	EHomeWorldStrokeResult Result = HomeWorldStroke::Evaluate(Step, Stroke, WindowMin, WindowMax, ExtraPoint);
+	if (Result == EHomeWorldStrokeResult::Match && bHadCarriedPoint
+		&& !HomeWorldStroke::PassesThroughPoint(Stroke, HeldPoint))
+	{
+		Result = EHomeWorldStrokeResult::Miss;
+	}
 	const bool bParadox = Step == EHomeWorldStrokeStep::Paradox || Step == EHomeWorldStrokeStep::ParadoxExtraPoint;
 	if (Result == EHomeWorldStrokeResult::Miss)
 	{
 		if (bParadox)
 		{
 			LastReport = EHomeWorldStrokeReport::Bonk;
+			bHasCarriedPoint = false;
+			CarriedPoint = FVector2D::ZeroVector;
 			UHomeWorldFallbackGlideComponent* Glide = GlideOverride;
 			if (!Glide && GetOwner())
 			{
@@ -134,6 +143,8 @@ EHomeWorldStrokeReport UHomeWorldStrokeReportComponent::ReportStroke(
 	}
 
 	LastReport = EHomeWorldStrokeReport::Matched;
+	CarriedPoint = ExtraPoint;
+	bHasCarriedPoint = true;
 	UHomeWorldVirtueComponent* Virtue = VirtueOverride;
 	if (!Virtue && GetOwner())
 	{
