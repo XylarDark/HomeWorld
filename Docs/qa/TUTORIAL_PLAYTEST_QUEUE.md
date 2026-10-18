@@ -4,109 +4,75 @@ Play one pass. Fill its result. Stop. Bring the result back before the next pass
 
 Map for every pass that uses the opening: `/Game/HomeWorld/Maps/SizeTest/L_SizeTest`. Stand on the walk pad. The field under the island is not the floor. Do not sprint. The opening wheel is fine. Judge the walk at the top step, 450 cm/s.
 
-`Docs/canon/PLAYTEST.md` has other uncommitted edits. Write results in this file.
+Write results in this file. The tutorial is one day on the island. The field is the first wild place, after the dawn glide. It is not a pass here.
 
-**Now:** Pass 2b. Passes 3–8 stay blocked until those beats exist in the build.
+**Now:** Crafting stations. The dog pass stays blocked until its interview has a pick.
 
----
-
-## Pass 1 — The approach
-
-**Ready.** Detail: `Docs/qa/TUTORIAL_ISLAND_PLAYTEST.md`.
-
-Walk from the south start, through the trees and rocks, to the partner at the south door, at the top wheel step only (450 cm/s). Do not time the slower steps.
-
-Pass when the cottage stays hidden until you are through the copse, the partner is standing outside the door facing you, and the pad still feels like one short approach.
-
-Do not play the herb, the heal, the kettle, the mist, or the glide.
-
-| Field | Result |
-|---|---|
-| Date | 2026-10-17 |
-| Commit | |
-| Speeds | Fine. Judge the top step only. |
-| Cottage hidden by the copse | Yes. The copse needs more of the same trees and rocks. |
-| Pad size | Good enough for this pass. |
-| Partner | Fixed after the first look. Same model as the player, facing you. |
-| Child and spirit | Child runs to the spirit, stays visible, and follows you back after the interact. Shoulder spirit starts off and appears on that interact. |
-| Dialogue | Child and partner say nothing. Accepted for this pass. |
-| Pass or fail | Pass. 2026-10-17. |
+The midday slice below is passed. 2026-10-18.
 
 ---
 
-## Pass 2 — What this build already teaches
+## Passed — Midday on the island
 
-**Ready.** One walk at 450 cm/s. Dialogue is not part of this pass. Do not force a beat that is not there. Write what happens.
+**Passed.** 2026-10-18. One walk at 450 cm/s. This is the start of the day. Do not replay it as the next pass.
 
-| Check | What happened |
-|---|---|
-| Does the yard come into view while you are still walking? | Not reported. |
-| Does the child move toward a spirit? | Yes. The child followed you after the interact. |
-| Spirit interact | Pass. The sphere disappeared and the shoulder spirit appeared. It was off at the start. |
-| Can you pick a herb? | Pass. |
-| Can you use the kettle? | Pass. Clicking it worked. |
-| Shift to speed up | Pass. |
-| If you jump off the pad, do you come back? | Not tried. |
-| One sentence | Herb, kettle, and shift pass. 2026-10-17. |
-
-A missing beat is a note, not a failure. Stop there.
-
----
-
-## Pass 2b — Cursor, indicator, partner inside
-
-**Ready.** Same map. Top step, 450 cm/s. Dialogue is still not this pass.
-
-1. E confirms the object the wisp is marking. Hold the right mouse button for the rune cursor. Walking still works. Let go and the cursor leaves. A left click does not use the herb or the kettle.
-2. Take the spirit. The shoulder wisp appears. Look at the kettle, a herb, or the partner. The wisp should float around the one you are locked onto.
-3. Interact with the partner at the door. They should walk inside and stop beside the kettle. The child can follow you. That is not a fail if the child is still outside.
-
-Pass when the cursor does not stop your walking, the wisp marks the locked target after the spirit is taken, and the partner ends beside the kettle.
+- The approach, the copse, and the pad. The copse can take more of the same trees and rocks. That note is polish, not an open pass.
+- The spirit claim and the shoulder wisp. The wisp starts off and appears when the spirit is claimed.
+- The child runs to the spirit, follows, then goes to their room.
+- Both herb hearts, the chunk bank, and the kettle. One brew spends at most 10. The partner line switches to the kettle once any chunks are banked.
+- The partner walks inside and waits by the kettle. Tea sprint works.
+- The counter and where the partner stands beside it are light polish, not a pass.
 
 | Check | Result |
 |---|---|
-| Hold E shows a cursor, and walking still works | Not reported. |
-| Let go and the cursor leaves | Not reported. |
-| After the spirit, the wisp floats around the locked target | Pass. Floated around the herbs and the partner. Kettle not checked; expected to work. |
-| Partner walks inside to the kettle | Fail. Clipped through the wall. Collision-off is rejected. Real path is scheduled, not this pass. |
-| Pass or fail | Indicator pass. Door path fail. 2026-10-17. |
-| What felt wrong | Partner blocked at the door, stuttering. |
+| Approach, copse, pad | Pass. 2026-10-17. Copse can take more of the same trees and rocks. |
+| Spirit and shoulder wisp | Pass. 2026-10-17. |
+| Herb hearts and kettle | Pass. 2026-10-18. Chunks bank with no cap. One brew spends at most 10. |
+| Partner inside, child to their room | Pass. 2026-10-18. |
+| Tea sprint | Pass. 2026-10-17. |
+| One sentence | The played opening is the midday start. 2026-10-18. |
 
 ---
 
-## Pass 3 — The heart on the wisp
+## Crafting stations
 
-**Blocked.** The wisp does not yet show Love as a heart.
+**Now.** Not in the build yet. Same map. Top step, 450 cm/s.
 
-When it does: one walk at 300 cm/s through the offer. Pass if you notice the heart without being told its name, and you are not asked to choose an axis.
+The herb and the wisp open the consumable station. A greybox table is enough. The partner's armor gift opens the armor table. Ask the armor-number choice before that gift changes a number. Speed and bonk tries stay as they are until that choice is picked.
+
+Pass when both stations open from what you already did on the island, and you are not given a second recipe.
 
 | Field | Result |
 |---|---|
 | Date | |
-| Noticed the heart without a name? | |
+| Consumable station opened? | |
+| Armor table opened? | |
 | One sentence | |
 
 ---
 
-## Pass 4 — The bench, once
+## The dog
 
-**Blocked.** The one commit is not built.
+**Blocked.** The interview has no pick yet. [`Docs/context/OPENING_TUTORIAL_INTERVIEW.md`](../context/OPENING_TUTORIAL_INTERVIEW.md).
 
-When it is: the partner says “Place it, turn it, commit.” Do that once. No second mark. Pass if the motion is clear and you are not choosing among axes.
+When it has a pick: one tame fight on the island. That fight is the first tame and the sin/virtue sample. The bull stays the later field and cave tame. Do not build this pass before the pick.
+
+Pass when the fight teaches the tame and the sample together, and you are not sent to the field to learn either one.
 
 | Field | Result |
 |---|---|
 | Date | |
-| Finished the one commit? | |
+| Tamed the dog? | |
+| Saw the sin/virtue sample in that fight? | |
 | One sentence | |
 
 ---
 
-## Pass 5 — The bonk
+## The bonk
 
-**Blocked.** Beat 5 is not the playable opening.
+**Blocked.** The mist is not in this build. It stays up through this pass and clears at dawn.
 
-When it is playable: jump off while the mist is up. You come back onto the island. The first bonk does not slow the step and does not dim the shoulder light. Pass if you come back at once, you understand “not yet,” and you can continue the beat.
+When it is playable: jump off while the mist is up. You come back onto the island. The first bonk does not slow the step and does not dim the shoulder light. Pass if you come back at once, you understand "not yet," and you can continue the day.
 
 | Field | Result |
 |---|---|
@@ -118,42 +84,43 @@ When it is playable: jump off while the mist is up. You come back onto the islan
 
 ---
 
-## Pass 6 — The marked herb
+## Night on the island
 
-**Blocked.** The field herb is not placed.
+**Blocked.** Sleep is not this build's tutorial yet.
 
-When it is: after the glide, find the herb, pick it if you want, and bring it home to the bench. There is no second unused hook. Pass if the herb reads as the same kind of mark as the heart, and you can ignore it without getting stuck.
-
-| Field | Result |
-|---|---|
-| Date | |
-| Found it? | |
-| Picked it? | |
-| Connected it to the heart and the bench? | |
-| One sentence | |
-
----
-
-## Pass 7 — The whole opening
-
-**Blocked.** Passes 3–6 have to exist in the build.
-
-Play from the south start through the glide and the herb. Time the whole thing. Pass if you could say what the game is asking, the opening does not feel longer than a short visit, and you want to keep going. Do not look for a second unused object.
+The child says the bed-and-dawn line once. You sleep in the bed and become spirit. Night does not grant that form. You stay on the island. Pass if the night happens at home, and you are not sent off the island to learn it.
 
 | Field | Result |
 |---|---|
 | Date | |
-| Total time | |
-| Could say what you were supposed to do? | |
-| Wanted to continue? | |
+| Heard the one line? | |
+| Slept and became spirit? | |
+| Stayed on the island? | |
 | One sentence | |
 
 ---
 
-## Pass 8 — Five new players
+## Dawn glide
 
-**Blocked.** Needs the opening those five people will actually play, and five people who have not played HomeWorld. Protocol: `.planning/research/ONBOARDING_PLAYTEST_PROTOCOL.md`.
+**Blocked.** Last mechanic of the tutorial. The mist clears at this dawn.
 
-Skip any beat in that protocol that is not in the build. Do not score a second unused hook. The bench is one commit. The herb is the hook.
+You wake on the island. The bed returns you to the body. Dawn does not. The mist clears, and you glide down to the field. The glide is the day glide toward camp smoke, with no pickup. Pass if the glide is the last new mechanic, and the field reads as the first place past the tutorial.
 
-Write a ranked list of the beats that failed, with a quote or a timestamp for each.
+| Field | Result |
+|---|---|
+| Date | |
+| Woke on the island? | |
+| Glided down to the field? | |
+| One sentence | |
+
+---
+
+## Retired
+
+Not this queue. The herb heart is the rune already passed above. The field is not a tutorial beat.
+
+- The heart drawn on the wisp.
+- The bench commit, and the line "Place it, turn it, commit."
+- The marked herb after the glide.
+- One timed play of that old opening.
+- Five new players. That waits until this day exists in the build.
