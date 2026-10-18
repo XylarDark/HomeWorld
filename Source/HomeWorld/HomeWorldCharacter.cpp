@@ -581,46 +581,6 @@ void AHomeWorldCharacter::UpdateSizeTestInteractCursor()
 	}
 }
 
-namespace
-{
-	FVector OrbitOutsideActor(const AActor* Target, const FVector& PlayerLoc, float TimeSeconds)
-	{
-		FVector Origin = FVector::ZeroVector;
-		FVector Extent = FVector::ZeroVector;
-		Target->GetActorBounds(false, Origin, Extent);
-		const float Clearance = 28.f;
-		const float Angle = TimeSeconds * 2.5f;
-		const float MaxHalf = FMath::Max(Extent.X, FMath::Max(Extent.Y, Extent.Z));
-		if (MaxHalf > 120.f)
-		{
-			const FVector ToPlayer = PlayerLoc - Origin;
-			int32 Axis = 0;
-			if (FMath::Abs(ToPlayer.Y) > FMath::Abs(ToPlayer.X))
-			{
-				Axis = 1;
-			}
-			if (FMath::Abs(ToPlayer.Z) > FMath::Abs(ToPlayer[Axis]))
-			{
-				Axis = 2;
-			}
-			const float Sign = ToPlayer[Axis] >= 0.f ? 1.f : -1.f;
-			const int32 Across = (Axis + 1) % 3;
-			const int32 Along = (Axis + 2) % 3;
-			const float Radius = 40.f;
-			FVector Face = Origin;
-			Face[Axis] = Origin[Axis] + Sign * (Extent[Axis] + Clearance);
-			Face[Across] = FMath::Clamp(PlayerLoc[Across], Origin[Across] - Extent[Across] + Radius, Origin[Across] + Extent[Across] - Radius);
-			Face[Along] = FMath::Clamp(PlayerLoc[Along], Origin[Along] - Extent[Along] + Radius, Origin[Along] + Extent[Along] - Radius);
-			FVector Spin = FVector::ZeroVector;
-			Spin[Across] = FMath::Cos(Angle) * Radius;
-			Spin[Along] = FMath::Sin(Angle) * Radius;
-			return Face + Spin;
-		}
-		const float Radius = FMath::Sqrt(Extent.X * Extent.X + Extent.Y * Extent.Y) + Clearance;
-		return Origin + FVector(FMath::Cos(Angle) * Radius, FMath::Sin(Angle) * Radius, 0.f);
-	}
-}
-
 AActor* AHomeWorldCharacter::FindOpeningProximityTarget() const
 {
 	UWorld* World = GetWorld();
@@ -804,9 +764,7 @@ void AHomeWorldCharacter::UpdateOpeningHerbRune(float DeltaTime)
 	}
 	if (!OpeningRuneBed || FVector::Dist2D(GetActorLocation(), OpeningRuneBed->GetActorLocation()) > 450.f)
 	{
-		const int32 Kept = OpeningRuneShape->GetScore();
-		const int32 Payout = OpeningRuneShape->IsPointsMode() ? Kept : FMath::Max(1, Kept);
-		FinishOpeningHerbRune(Payout);
+		FinishOpeningHerbRune(OpeningRuneShape->GetScore());
 		return;
 	}
 	APlayerController* PC = Cast<APlayerController>(GetController());
@@ -850,7 +808,7 @@ void AHomeWorldCharacter::UpdateOpeningHerbRune(float DeltaTime)
 	{
 		if (PC && PC->WasInputKeyJustPressed(EKeys::LeftMouseButton))
 		{
-			FinishOpeningHerbRune(FMath::Max(1, OpeningRuneShape->GetScore()));
+			FinishOpeningHerbRune(OpeningRuneShape->GetScore());
 			return;
 		}
 		OpeningRuneShape->AdvanceTrace();
@@ -946,7 +904,6 @@ void AHomeWorldCharacter::RestoreOpeningHerb()
 
 void AHomeWorldCharacter::UpdateSizeTestWisp(float DeltaTime)
 {
-	(void)DeltaTime;
 	RestoreOpeningHerb();
 	ShowOpeningProximityLine();
 	if (bOpeningRuneActive)
@@ -989,7 +946,6 @@ void AHomeWorldCharacter::UpdateSizeTestWalk()
 	}
 	if (UAnimSequence* Walk = LoadObject<UAnimSequence>(nullptr, TEXT("/Game/HomeWorld/Meshes/SizeTest/SK_Player_Female_Anim.SK_Player_Female_Anim")))
 	{
-		Walk->bEnableRootMotion = false;
 		CoatBody->PlayAnimation(Walk, true);
 		if (UAnimSingleNodeInstance* Node = CoatBody->GetSingleNodeInstance())
 		{
@@ -1287,11 +1243,6 @@ void AHomeWorldCharacter::OnInteractTriggered(const FInputActionValue& Value)
 	if (!bTutorial)
 	{
 		UE_LOG(LogTemp, Log, TEXT("HomeWorld: Interact ability %s"), bActivated ? TEXT("activated") : TEXT("failed to activate"));
-	}
-	if (bSizeTestInteractHandled)
-	{
-		bSizeTestFocus = false;
-		SizeTestFocusActor = nullptr;
 	}
 }
 

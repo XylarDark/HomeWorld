@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "HomeWorldRuneShapeComponent.generated.h"
 
+class APlayerController;
 class USplineMeshComponent;
 class UStaticMeshComponent;
 

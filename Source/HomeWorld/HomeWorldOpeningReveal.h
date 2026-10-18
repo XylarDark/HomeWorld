@@ -54,6 +54,10 @@ protected:
 		bool bFromSweep,
 		const FHitResult& SweepResult);
 
+	/** Separate visibility blocker for the spirit. Disclaimed once the sphere is taken. */
+	UPROPERTY()
+	TObjectPtr<UBoxComponent> SpiritHit;
+
 	UPROPERTY(VisibleAnywhere, Category = "Opening")
 	TObjectPtr<UStaticMeshComponent> Spirit;
 
@@ -73,6 +77,7 @@ protected:
 	bool bClaimed = false;
 	bool bFollowing = false;
 	bool bPartnerLeading = false;
+	bool bPartnerWaiting = false;
 	bool bPartnerBlockLogged = false;
 	bool bHomecoming = false;
 	bool bChildLeading = false;

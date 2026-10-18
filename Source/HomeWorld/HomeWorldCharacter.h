@@ -834,10 +834,7 @@ protected:
 	TObjectPtr<UStaticMeshComponent> SizeTestCursorWisp;
 
 	bool bSizeTestInteractCursor = false;
-	bool bSizeTestFocus = false;
 	bool bSizeTestInteractHandled = false;
-	/** Nearest opening interactable. Q shows the wisp on it. E uses it. */
-	TObjectPtr<AActor> SizeTestFocusActor;
 	bool bOpeningRuneActive = false;
 	FVector OpeningRuneCursor = FVector::ZeroVector;
 	TObjectPtr<AActor> OpeningRuneBed;

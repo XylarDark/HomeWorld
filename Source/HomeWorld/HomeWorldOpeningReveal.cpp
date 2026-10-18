@@ -7,14 +7,11 @@
 #include "Components/StaticMeshComponent.h"
 #include "Engine/StaticMeshActor.h"
 #include "Engine/StaticMesh.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include "Materials/MaterialInterface.h"
 #include "EngineUtils.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Pawn.h"
 #include "Kismet/GameplayStatics.h"
-#include "NavigationSystem.h"
-#include "NavigationPath.h"
-#include "NavFilters/NavigationQueryFilter.h"
+#include "Materials/MaterialInterface.h"
 #include "UObject/ConstructorHelpers.h"
 
 namespace
@@ -22,11 +19,19 @@ namespace
 	constexpr float StandOffCm = 180.f;
 	constexpr float FollowGapCm = 160.f;
 	constexpr float PartnerMeetCm = 280.f;
-	/** Cottage origin (-800, 0). South entry is local x -150, opening through y -280. */
+	/** Cottage origin (-800, 0). East wall inner face is world x 285. */
+	constexpr float CounterCenterX = 215.f;
+	constexpr float CounterCenterY = 0.f;
+	constexpr float CounterDepthCm = 140.f;
+	constexpr float CounterLengthCm = 320.f;
+	constexpr float CounterHeightCm = 180.f;
+	/** Floor spot at the north end of the counter, clear of the box and the east wall. */
+	const FVector PartnerStandCm(CounterCenterX, 240.f, 0.f);
 	const FVector PartnerRouteCm[] = {
 		FVector(-950.f, -500.f, 0.f),
 		FVector(-950.f, -180.f, 0.f),
-		FVector(60.f, -40.f, 0.f),
+		FVector(40.f, 240.f, 0.f),
+		PartnerStandCm,
 	};
 	AActor* PromoteWalker(UWorld* World, AActor* Source)
 	{
@@ -46,7 +51,8 @@ namespace
 		}
 		Walker->CopyAppearance(Source);
 		UGameplayStatics::FinishSpawningActor(Walker, Spawn);
-		Source->Tags.Empty();
+		Source->Tags.Remove(FName(TEXT("NPC_CHILD")));
+		Source->Tags.Remove(FName(TEXT("NPC_PARTNER")));
 		Source->SetActorHiddenInGame(true);
 		Source->SetActorEnableCollision(false);
 		return Walker;
@@ -130,6 +136,11 @@ bool AHomeWorldOpeningReveal::TryClaim(APawn* Player)
 	Spirit->SetVisibility(false);
 	Spirit->SetHiddenInGame(true);
 	Spirit->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	if (SpiritHit)
+	{
+		SpiritHit->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		SpiritHit->SetCollisionResponseToAllChannels(ECR_Ignore);
+	}
 	UE_LOG(LogTemp, Log, TEXT("opening_reveal: spirit claimed"));
 	return true;
 }
@@ -158,7 +169,7 @@ AActor* AHomeWorldOpeningReveal::FindTagged(const TCHAR* Tag) const
 
 bool AHomeWorldOpeningReveal::TryLeadPartner()
 {
-	if (bPartnerLeading)
+	if (bPartnerLeading || bPartnerWaiting)
 	{
 		return false;
 	}
@@ -171,26 +182,10 @@ bool AHomeWorldOpeningReveal::TryLeadPartner()
 		return false;
 	}
 	const FVector From = Partner->GetActorLocation();
-	const FVector Kettle(60.f, -40.f, From.Z);
 	PartnerPoints.Reset();
-	if (UNavigationSystemV1* Nav = UNavigationSystemV1::GetCurrent(GetWorld()))
+	for (const FVector& Spot : PartnerRouteCm)
 	{
-		if (UNavigationPath* Path = UNavigationSystemV1::FindPathToLocationSynchronously(
-			this, From, Kettle, Partner, UNavigationQueryFilter::StaticClass()))
-		{
-			if (Path->PathPoints.Num() > 1)
-			{
-				PartnerPoints = Path->PathPoints;
-			}
-		}
-	}
-	if (PartnerPoints.Num() < 2)
-	{
-		PartnerPoints.Reset();
-		for (const FVector& Spot : PartnerRouteCm)
-		{
-			PartnerPoints.Add(FVector(Spot.X, Spot.Y, From.Z));
-		}
+		PartnerPoints.Add(FVector(Spot.X, Spot.Y, From.Z));
 	}
 	bPartnerLeading = true;
 	bPartnerBlockLogged = false;
@@ -276,7 +271,7 @@ void AHomeWorldOpeningReveal::BeginPlay()
 			FitInteractBounds(Prop);
 		}
 	}
-	UBoxComponent* SpiritHit = NewObject<UBoxComponent>(this, TEXT("SpiritInteract"));
+	SpiritHit = NewObject<UBoxComponent>(this, TEXT("SpiritInteract"));
 	if (SpiritHit && Spirit)
 	{
 		SpiritHit->SetupAttachment(Spirit);
@@ -436,12 +431,14 @@ void AHomeWorldOpeningReveal::LeadPartner(float DeltaSeconds)
 		if (PartnerLeg >= PartnerPoints.Num())
 		{
 			bPartnerLeading = false;
+			bPartnerWaiting = true;
 			Walker->SetActorRotation(FRotator(0.f, 180.f, 0.f));
 			if (UCharacterMovementComponent* Move = Walker->GetCharacterMovement())
 			{
 				Move->StopMovementImmediately();
+				Move->DisableMovement();
 			}
-			UE_LOG(LogTemp, Log, TEXT("opening_reveal: partner waiting by the kettle"));
+			UE_LOG(LogTemp, Log, TEXT("opening_reveal: partner waiting beside the counter"));
 		}
 	}
 }
@@ -535,9 +532,19 @@ void AHomeWorldOpeningReveal::PlaceKettleCounter()
 	{
 		Mesh->SetMaterial(0, Grey);
 	}
-	Counter->SetActorScale3D(FVector(1.6f, 0.7f, 0.9f));
-	Counter->SetActorLocation(FVector(KettleLocation.X, KettleLocation.Y - 20.f, KettleLocation.Z + 45.f));
-	Kettle->SetActorLocation(KettleLocation + FVector(0.f, 0.f, 90.f));
+	FVector BoundsOrigin = FVector::ZeroVector;
+	FVector BoundsExtent = FVector::ZeroVector;
+	Kettle->GetActorBounds(false, BoundsOrigin, BoundsExtent);
+	const float FloorZ = BoundsOrigin.Z - BoundsExtent.Z;
+	const float KettleLift = KettleLocation.Z - FloorZ;
+	Mesh->SetMobility(EComponentMobility::Movable);
+	Mesh->SetCollisionProfileName(FName(TEXT("BlockAll")));
+	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	Counter->SetActorScale3D(FVector(CounterDepthCm / 100.f, CounterLengthCm / 100.f, CounterHeightCm / 100.f));
+	const float CenterZ = FloorZ + CounterHeightCm * 0.5f;
+	Counter->SetActorLocation(FVector(CounterCenterX, CounterCenterY, CenterZ));
+	Kettle->SetActorLocation(FVector(CounterCenterX, CounterCenterY, FloorZ + CounterHeightCm + KettleLift));
 	Counter->Tags.Add(FName(TEXT("KettleCounter")));
-	UE_LOG(LogTemp, Log, TEXT("opening_reveal: kettle counter placed"));
+	UE_LOG(LogTemp, Log, TEXT("opening_reveal: kettle on the counter, %.0f x %.0f x %.0f against the east wall"),
+		CounterDepthCm, CounterLengthCm, CounterHeightCm);
 }

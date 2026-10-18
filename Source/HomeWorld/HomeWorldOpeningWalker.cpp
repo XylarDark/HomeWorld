@@ -105,7 +105,6 @@ void AHomeWorldOpeningWalker::Tick(float DeltaSeconds)
 	}
 	if (UAnimSequence* Walk = LoadObject<UAnimSequence>(nullptr, TEXT("/Game/HomeWorld/Meshes/SizeTest/SK_Player_Female_Anim.SK_Player_Female_Anim")))
 	{
-		Walk->bEnableRootMotion = false;
 		Body->PlayAnimation(Walk, true);
 		if (UAnimSingleNodeInstance* Node = Body->GetSingleNodeInstance())
 		{
