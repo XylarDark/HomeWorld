@@ -6,11 +6,12 @@ Lanes: critical path, later, future. Session start walks critical path only. A t
 
 ## Critical path
 
-The wake minute on `L_SizeTest` is kept. The cottage sheet is kept. The field greybox is the open level.
+The wake minute on `L_SizeTest` is kept. The cottage sheet is kept. The open play is the opening tutorial. The field greybox re-run is behind that queue.
 
 | Item | Owner | Co-fork | State |
 |---|---|---|---|
 | Wake minute on `L_SizeTest` | Play | Look, for the cottage sheet and room plan | Kept 2026-10-14 |
+| Opening tutorial on `L_SizeTest` | Play | Round 1 in `Docs/context/OPENING_TUTORIAL_INTERVIEW.md` | Open. Queue: `Docs/context/OPENING_TUTORIAL_TASKS.md`. The sequence is the Opening tutorial in `Docs/VISION_BOARD.md`. |
 | Field greybox on `L_Field` | Play | The zone contract in `Lib/02_Zones/gather/FIELD.json` | Mass placed and verified 2026-10-14 (`field_greybox: CHECK PASS`, editor log 16:53Z). The sun pose and sky light fix landed after that run (`befdc171`), so a re-run of the placer and verifier in the editor is still owed before this is done. |
 
 ## Later

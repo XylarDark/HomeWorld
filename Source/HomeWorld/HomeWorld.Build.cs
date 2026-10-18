@@ -11,6 +11,7 @@ public class HomeWorld : ModuleRules
 		PublicDependencyModuleNames.AddRange(new string[]
 		{
 			"AIModule",
+			"NavigationSystem",
 			"Core",
 			"CoreUObject",
 			"Engine",

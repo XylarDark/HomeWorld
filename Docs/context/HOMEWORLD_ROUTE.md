@@ -25,6 +25,7 @@ One fact proposed at a time, one yes from Luke, one write into this file only â€
 - Any jump has more than one spirit-blue cloud, and there is no fixed count.
 - The bottom of the cloud layer is the exit, and the landing stays in the existing field.
 - The wisp is a bit of the signature spirit blue on a cloud, not one of the three wisps at the spirit wound.
+- Lead 2026-10-17: what a cloud wisp is, including the random sin/virtue pair and the healing pair the child offers, is the Opening tutorial in `Docs/VISION_BOARD.md`. The night cap below is unchanged.
 - You collect the wisp on the way down, it stays with you, and you hold one per dung you will mix.
 - There is more than one cloud layer, and there is no fixed count of layers. That is not a split of the 300 m layer. (Ã—6 world-scale pass 2026-10-07.)
 - Steering is unrestricted by rails, corridors, or artificial bounds throughout the descent. It remains a glider descent, not a new flight mode.

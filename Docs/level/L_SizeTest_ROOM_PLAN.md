@@ -43,9 +43,9 @@ Clear width after the 30 cm wall:
 
 The kettle is on the kitchen’s east wall, world (1.8 m, 0.0 m), yaw 180, facing into the room.
 
-The bed is in the couple bedroom against the north wall, world (−9.5 m, 9.0 m), yaw 0. It is not the sleep bed. The partner stands beside it at world (−8.8 m, 8.6 m), yaw 180, facing the bed.
+The player starts on the south of the pad at (−6 m, −58 m), yaw 90, facing the cottage. That is twice the earlier walk to the reveal. Trees and rocks stand between that start and the south door. The partner stands at the south door, world (−9.5 m, −8.2 m), on the player mesh, yaw 0, facing the player. Walking them inside is scheduled: stop, open the door the way the player does, then path to the kettle with collision on. They do not clip through the wall. The child starts beside the partner at world (−8.0 m, −8.6 m), on that same mesh at 0.6 scale, yaw 270, and runs to the spirit. The spirit is halfway between the player start and the cottage, at world (−7 m, −29 m).
 
-Herb beds sit south of the porch, off the entry, yaw 0. The child stands in that garden at world (−13.8 m, −7.6 m), yaw 0, facing the west bed. The player stands on that path at (−9.5 m, −9.5 m), yaw 90, aimed at the opening.
+Herb beds sit south of the porch, off the entry, yaw 0.
 
 ## Pocket kit outside the porch
 

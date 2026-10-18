@@ -66,7 +66,7 @@ Each verb: trigger, player action, success, fail/idle, approx duration (seconds)
 | Player action | Move body or spirit on cabin / garden / path / pines / lookout / shrine / glider perch |
 | Success | Reach named POI without leaving island bounds; camera readable per Shot 1–2 framing |
 | Fail / idle | Off-nav → soft pushback or stop; no fall-to-void death loop in MVP |
-| Duration | Continuous; cabin→lookout ~15–25 s; full island circuit ~45–90 s |
+| Duration | Continuous; cabin→lookout ~15–25 s; island circuit ~12–20 s (tutorial inner loop; `Docs/canon/FEEL.md`) |
 
 ### V2 — Glide / fly island → planet (or scripted stand-in)
 
@@ -292,7 +292,7 @@ Do **not** design, implement, or schedule any of the following in MVP:
 
 | Loop | Target play time |
 |---|---|
-| Homestead walk circuit | 45–90 s |
+| Homestead walk circuit | 12–20 s (`Docs/canon/FEEL.md`) |
 | Active cloud descent | 30 s from launch to landing (§9) |
 | Gather all six once | 90–180 s |
 | Tame one beast | 20–45 s |

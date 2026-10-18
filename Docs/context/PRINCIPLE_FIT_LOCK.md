@@ -18,9 +18,9 @@ These had uncommitted edits or were untracked. They were not opened for this loc
 
 ## 1. One decision until it is playable
 
-The next build is the camp-forest ease stroke. The rescue stays the reason that ease exists.
+2026-10-17. The next build is the opening tutorial in [`Docs/VISION_BOARD.md`](../VISION_BOARD.md). The camp-forest ease stays the encounter that tutorial is teaching. The rescue stays the reason that ease exists.
 
-Parked until that stroke can be failed in a level: the grappling hook, the other six pair mechanics, the armor bench, the lair coils, and the NFT, wallet, and leaderboard subsystems.
+Parked until that opening can be played: the grappling hook, the other six pair mechanics, the lair coils, and the NFT, wallet, and leaderboard subsystems. The armor table is in the opening tutorial. It is not in this parked list.
 
 The virtue bible still names the ease as the first atom. The canon map still shows that ease as logic without camp actors in a map. This pick does not place those actors.
 
@@ -42,7 +42,7 @@ A feature is judged by the five gates in [`Docs/canon/PILLARS.md`](../canon/PILL
 
 ## 5. First five seconds
 
-On `L_SizeTest`, with no objective: walk, stop, and a small hop, until the body feels weighty and the hop reads. The stroke stays off that map until that pass. The map note is [`Docs/level/L_SizeTest_CONTEXT.md`](../level/L_SizeTest_CONTEXT.md).
+2026-10-17. Luke kept the walk, stop, and hop on `L_SizeTest`. The body passes that initial pass. The opening that follows is the tutorial in [`Docs/VISION_BOARD.md`](../VISION_BOARD.md). The map note is [`Docs/level/L_SizeTest_CONTEXT.md`](../level/L_SizeTest_CONTEXT.md).
 
 ## 6. First played session
 
@@ -62,7 +62,7 @@ A match leaves the extra point in hand, and the next stroke must pass through it
 
 ## 9. Next playtest
 
-The next played session is the one in [`Docs/canon/PLAYTEST.md`](../canon/PLAYTEST.md). One session, then stop. The September gather test on `L_VS_MVP_Markers` is no longer the next test.
+2026-10-17. The next played session is the opening tutorial in [`Docs/VISION_BOARD.md`](../VISION_BOARD.md), once a piece of it is in the level. The log is [`Docs/canon/PLAYTEST.md`](../canon/PLAYTEST.md). The September gather test on `L_VS_MVP_Markers` is no longer the next test. The ease on `L_EasePad` was not this session.
 
 ## 10. When a rescue counts
 

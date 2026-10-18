@@ -88,6 +88,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Interaction", meta = (DisplayName = "Try Harvest In Front"))
 	bool TryHarvestInFront();
 
+	/** Size-test spirit: hide the sphere, show the shoulder wisp, and send the child after the player. */
+	bool TryOpeningSpiritInFront();
+
+	/** Size-test partner: interact sends them inside, to the kettle. */
+	bool TryPartnerLeadInside();
+
+	/** Size-test: the interact ability reports whether E actually did something. */
+	void NoteSizeTestInteract(bool bHandled);
+
 	/** FALLBACK V2: start scripted CRUMB glide when near GP_GlideStart / glider perch. Day/body only. */
 	UFUNCTION(BlueprintCallable, Category = "Transit|FALLBACK", meta = (DisplayName = "Try Start Fallback Glide"))
 	bool TryStartFallbackGlide();
@@ -807,13 +816,40 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Mesh", meta = (ClampMin = "-180.0", ClampMax = "180.0"))
 	float MeshForwardYawOffset = -90.0f;
 
+	AActor* ResolveOpeningAim(FHitResult& Hit);
+	bool TraceEyeInteract(FHitResult& OutHit) const;
 	void UpdateSizeTestWalk();
 	void UpdateSizeTestWisp(float DeltaTime);
+	void ApplyOpeningWalkSpeed();
+	void UpdateOpeningWalkScroll();
+	int32 OpeningSpeedStep = 0;
 	bool bSizeTestWalkPlaying = false;
 
-	/** Greybox shoulder follower on SizeTest only. */
+	/** Greybox shoulder follower on SizeTest only. After the spirit is claimed, it marks the interact target. */
 	UPROPERTY(Transient)
 	TObjectPtr<UStaticMeshComponent> SizeTestWisp;
+
+	/** Wisp cursor while E is held. Movement stays on. */
+	UPROPERTY(Transient)
+	TObjectPtr<UStaticMeshComponent> SizeTestCursorWisp;
+
+	bool bSizeTestInteractCursor = false;
+	bool bSizeTestFocus = false;
+	bool bSizeTestInteractHandled = false;
+	/** Nearest opening interactable. Q shows the wisp on it. E uses it. */
+	TObjectPtr<AActor> SizeTestFocusActor;
+	bool bOpeningRuneActive = false;
+	int32 OpeningRuneMark = 0;
+	FVector OpeningRuneCursor = FVector::ZeroVector;
+	TArray<FVector> OpeningRunePoints;
+	TArray<TObjectPtr<UStaticMeshComponent>> OpeningRuneMarks;
+	TObjectPtr<AActor> OpeningRuneBed;
+	AActor* FindOpeningProximityTarget() const;
+	void ShowOpeningProximityLine();
+	void StartOpeningHerbRune(AActor* Bed);
+	void UpdateOpeningHerbRune(float DeltaTime);
+	void FinishOpeningHerbRune(bool bCollected);
+	void UpdateSizeTestInteractCursor();
 
 	/** Capsule radius (cm). Human-sized default; override in Blueprint for different characters. */
 	UPROPERTY(EditDefaultsOnly, Category = "Movement", meta = (ClampMin = "1.0", ClampMax = "200.0"))

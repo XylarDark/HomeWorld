@@ -27,7 +27,7 @@
   },
   "island_circuit_s": {
     "measured_s": null,
-    "window_s": [45.0, 90.0],
+    "window_s": [12.0, 20.0],
     "source_window": "Docs/canon/FEEL.md",
     "runs": [],
     "note": "Full circuit. Empty until a human times it. Deferred to the polish pass by Lead decision 2026-10-04 - see _deferrals."

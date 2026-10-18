@@ -2,7 +2,7 @@
 
 | Field | Current direction |
 |---|---|
-| **Status** | Product canon, updated 2026-10-15 |
+| **Status** | Product canon, updated 2026-10-17 |
 | **Theme and long-horizon campaign** | [`VisionBoard/Core/VISION.md`](../VisionBoard/Core/VISION.md) |
 | **Gameplay slice** | [`Docs/01_GDD_MVP.md`](01_GDD_MVP.md) |
 | **Virtue attributes** | [`Docs/VIRTUE_ATTRIBUTE_BIBLE.md`](VIRTUE_ATTRIBUTE_BIBLE.md). Pair names stay in [`VisionBoard/Core/VISION.md`](../VisionBoard/Core/VISION.md). |
@@ -49,9 +49,9 @@ From 2026-10-16, a feature is judged by the five gates in [`Docs/canon/PILLARS.m
 
 ## Prototype journey
 
-1. Wake at an intact, welcoming homestead with family present.
-2. Gather and prepare during the day. Sleep at the bed is the form change.
-3. Freely steer the glider through the cloud descent from the homestead to the open field, then gather there.
+1. The opening five minutes are the tutorial below. Family is at the door. The player walks to them.
+2. After that opening, gather and prepare during the day. Sleep at the bed is the form change.
+3. After the opening mist clears, freely steer the glider through the cloud descent from the homestead to the open field, then gather there.
 4. Discover the camp during the day. The loved one is taken and the player is sent home.
 5. At night, become spirit, use spirit-stealth to reach the guards, ease their suffering until they sleep, and free the loved one.
 6. Return home with the loved one. Continue the day-gather/night-tend loop.
@@ -60,9 +60,21 @@ From 2026-10-16, a feature is judged by the five gates in [`Docs/canon/PILLARS.m
 
 The first loop is the homestead, the open field, and the pine camp. After that
 camp is complete, the other forest, the river, and the marsh are in the slice.
-The glide connects the first loop. It is traversal, not a separate mechanic
+The glide connects the first loop once the opening mist has cleared. It is traversal, not a separate mechanic
 family. Current route geometry and unresolved route values live in
 [`Docs/context/HOMEWORLD_ROUTE.md`](context/HOMEWORLD_ROUTE.md).
+
+## Opening tutorial
+
+Luke, 2026-10-17. This is the opening five minutes of tutorial play. The movement pass that came before it is in [`Docs/canon/PLAYTEST.md`](canon/PLAYTEST.md).
+
+On load, a copse of pines and large stones hides the cottage. The player walks there first, at the kept speed, and that walk tests movement. The partner, the child, and the wounded spirit are not in view. Hills and valleys are not this opening. That later work is [`Docs/handoffs/research/TERRAIN_HEIGHT_LATER.md`](handoffs/research/TERRAIN_HEIGHT_LATER.md). As the player keeps moving, the homestead yard, the partner, the child, and the wounded spirit come into view, and the child runs toward the spirit. The gap is long enough that the child reaches the spirit at the same time as the player, or sooner, even at full speed.
+
+After the reveal, the player picks the herb beside the spirit. The child offers a cloud spirit with a cloud wisp. A cloud wisp is a random sin/virtue pair. The pair the child offers is the one that helps with healing. The player combines that wisp with the herb and gives it to the spirit. The spirit is healed and lands on the player's shoulder. The same pines and stones later become nodes a spirit can be set on, to gather over time. That gather is not this opening.
+
+The player walks home with the partner. The partner welcomes them home and asks for the homestead chores: pick herbs, and put on the kettle. These minutes teach the first mechanics on the homestead. Combining the herb and the wisp unlocks the crafting station for consumables. The partner gives armor, and that gift unlocks the armor attribute table.
+
+When everything on the homestead is done, the mist around the homestead disappears, the world below opens, and the glide starts. Jumping off the homestead while that mist is still there teaches the bonk. The bonk launches the player back onto the island.
 
 ## Feel and presentation
 

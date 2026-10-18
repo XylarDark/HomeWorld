@@ -71,7 +71,17 @@ def destroy(actor):
     unreal.get_editor_subsystem(unreal.EditorActorSubsystem).destroy_actor(actor)
 
 
-def place_skeletal(label, mesh_name, x_m, y_m, z_m, yaw):
+def stand_like_player(actor):
+    """SK_Player_Female faces mesh -Y. A +90 component yaw turns that face onto actor +X."""
+    mesh = actor.get_component_by_class(unreal.SkeletalMeshComponent)
+    if mesh is None:
+        return
+    mesh.set_relative_rotation(yaw_rotator(90.0), False, False)
+    mesh.set_animation_mode(unreal.AnimationMode.ANIMATION_SINGLE_NODE)
+    mesh.stop()
+
+
+def place_skeletal(label, mesh_name, x_m, y_m, z_m, yaw, scale=1.0):
     mesh = unreal.EditorAssetLibrary.load_asset(MESH_DIR + "/" + mesh_name)
     if mesh is None:
         unreal.log("scene_placement: missing mesh " + mesh_name)
@@ -89,6 +99,7 @@ def place_skeletal(label, mesh_name, x_m, y_m, z_m, yaw):
         actor.set_actor_label(label)
     actor.set_actor_location(location, False, False)
     actor.set_actor_rotation(rotation, False)
+    actor.set_actor_scale3d(unreal.Vector(float(scale), float(scale), float(scale)))
     component = actor.get_component_by_class(unreal.SkeletalMeshComponent)
     if component is None:
         unreal.log("scene_placement: no skeletal component " + label)
@@ -101,7 +112,7 @@ def place_skeletal(label, mesh_name, x_m, y_m, z_m, yaw):
     return actor
 
 
-def place_static(label, mesh_name, x_m, y_m, z_m, yaw, scale=1.0):
+def place_static(label, mesh_name, x_m, y_m, z_m, yaw, scale=1.0, scale_z=1.0):
     mesh = unreal.EditorAssetLibrary.load_asset(MESH_DIR + "/" + mesh_name)
     if mesh is None:
         unreal.log("scene_placement: missing mesh " + mesh_name)
@@ -119,7 +130,7 @@ def place_static(label, mesh_name, x_m, y_m, z_m, yaw, scale=1.0):
         actor.set_actor_label(label)
     actor.set_actor_location(location, False, False)
     actor.set_actor_rotation(rotation, False)
-    actor.set_actor_scale3d(unreal.Vector(scale, scale, 1.0 if scale != 1.0 else 1.0))
+    actor.set_actor_scale3d(unreal.Vector(scale, scale, scale_z))
     component = actor.get_component_by_class(unreal.StaticMeshComponent)
     if component is not None:
         component.set_static_mesh(mesh)
@@ -161,7 +172,7 @@ def tag_actor(actor, tag, extra=None):
 
 
 def set_slab_collision():
-    """One box for the 40 m by 30 m by 1 m pad. The cone does not block."""
+    """One box for the pad in the metrics sheet. The cone does not block."""
     mesh = unreal.EditorAssetLibrary.load_asset(MESH_DIR + "/SM_Size_Island")
     if mesh is None:
         unreal.log("scene_placement: FAIL no island mesh")
@@ -170,12 +181,13 @@ def set_slab_collision():
     if body is None:
         unreal.log("scene_placement: FAIL island has no body setup")
         return False
+    pad = load_metrics().get("pad", {"x": 40, "y": 30, "z": 1})
     body.set_editor_property("collision_trace_flag", unreal.CollisionTraceFlag.CTF_USE_SIMPLE_AS_COMPLEX)
     elem = unreal.KBoxElem()
     elem.set_editor_property("center", unreal.Vector(0.0, 0.0, -50.0))
-    elem.set_editor_property("x", 4000.0)
-    elem.set_editor_property("y", 3000.0)
-    elem.set_editor_property("z", 100.0)
+    elem.set_editor_property("x", float(pad["x"]) * M)
+    elem.set_editor_property("y", float(pad["y"]) * M)
+    elem.set_editor_property("z", float(pad["z"]) * M)
     agg = body.get_editor_property("agg_geom")
     agg.set_editor_property("box_elems", [elem])
     agg.set_editor_property("sphere_elems", [])
@@ -190,7 +202,7 @@ def set_slab_collision():
             component.set_static_mesh(None)
             component.set_static_mesh(mesh)
             set_collision(actor)
-    unreal.log("scene_placement: island slab box collision")
+    unreal.log("scene_placement: island slab %.0f by %.0f m" % (float(pad["x"]), float(pad["y"])))
     return True
 
 
@@ -237,6 +249,9 @@ def spawn_cabin_walls():
         actor.set_actor_scale3d(unreal.Vector(sx / 100.0, sy / 100.0, sz / 100.0))
         wall = actor.get_component_by_class(unreal.StaticMeshComponent)
         wall.set_static_mesh(cube)
+        wall_material = cube.get_material(0)
+        if wall_material is not None:
+            wall.set_material(0, wall_material)
         wall.set_collision_profile_name("BlockAll")
         wall.set_collision_enabled(unreal.CollisionEnabled.QUERY_AND_PHYSICS)
     fx, fy, fz, fsx, fsy, fsz = cabin_shell.FILLER
@@ -260,7 +275,7 @@ def trace_floor_z(world, x, y, z_high, z_low, ignore):
     data = trace_hit(world, unreal.Vector(x, y, z_high), unreal.Vector(x, y, z_low), ignore)
     if data is None:
         return None
-    if data.get("label") != "SM_Size_Island":
+    if data.get("label") not in ("SM_Size_Island", "SM_Size_WalkPad"):
         unreal.log("scene_placement: floor hit %s" % data.get("label"))
         return None
     return data["z"]
@@ -298,25 +313,20 @@ def trace_hit(world, start, end, ignore):
 
 
 def measure_floor():
-    """Downward traces on the pad. Never use the mesh's highest point."""
-    actor = by_label().get("SM_Size_Island")
-    if actor is None:
-        return None, ["no island"]
+    """Downward traces on the walk pad. Never use the mesh's highest point."""
+    pad = load_metrics().get("pad", {"x": 70, "y": 90})
+    half_x = float(pad["x"]) * M * 0.25
+    half_y = float(pad["y"]) * M * 0.25
     world = unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem).get_editor_world()
-    origin, extent = actor.get_actor_bounds(False)
-    ignore = [other for other in actors() if other.get_actor_label() != "SM_Size_Island"]
-    z_high = origin.z + extent.z + 300.0
-    z_low = origin.z - extent.z - 300.0
+    ignore = [
+        other for other in actors()
+        if other.get_actor_label() not in ("SM_Size_Island", "SM_Size_WalkPad")
+    ]
+    z_high = 46000.0
+    z_low = 44000.0
     samples = []
-    for sx, sy in ((0.0, 0.0), (0.75, 0.0), (-0.75, 0.0), (0.0, 0.75), (0.0, -0.75)):
-        z = trace_floor_z(
-            world,
-            origin.x + extent.x * sx,
-            origin.y + extent.y * sy,
-            z_high,
-            z_low,
-            ignore,
-        )
+    for sx, sy in ((0.0, 0.0), (half_x, 0.0), (-half_x, 0.0), (0.0, half_y), (0.0, -half_y)):
+        z = trace_floor_z(world, sx, sy, z_high, z_low, ignore)
         if z is not None:
             samples.append(z)
     if len(samples) < 5:
@@ -335,7 +345,7 @@ def measure_floor():
 
 def snap_contacts(labels, top):
     for label in labels:
-        if label == "SM_Size_Island":
+        if label == "SM_Size_Island" or label == "SM_Size_WalkPad":
             continue
         actor = by_label().get(label)
         if actor is None:
@@ -350,7 +360,7 @@ def pin_to_floor(labels, top):
     """Move any mesh still off the floor, then fail if it is still more than 2 cm off."""
     errors = []
     for label in labels:
-        if label == "SM_Size_Island":
+        if label == "SM_Size_Island" or label == "SM_Size_WalkPad":
             continue
         actor = by_label().get(label)
         if actor is None:
@@ -432,7 +442,7 @@ def validate(player_actor, top):
         label = actor.get_actor_label()
         if not label.startswith("SM_Size_") or label == "SM_Size_Field" or passable(label):
             continue
-        if label == "SM_Size_Island" or label in ("SM_Size_Kettle", "SM_Size_Bed"):
+        if label == "SM_Size_Island" or label == "SM_Size_WalkPad" or label in ("SM_Size_Kettle", "SM_Size_Bed"):
             continue
         origin, extent = actor.get_actor_bounds(False)
         solids[label] = (
@@ -456,12 +466,20 @@ def validate(player_actor, top):
         return errors
     loc = player_actor.get_actor_location()
     yaw = player_actor.get_actor_rotation().yaw
-    if abs(((yaw - 90.0 + 180.0) % 360.0) - 180.0) > 1.0:
+    expected_yaw = float(load_metrics()["player"]["yaw"])
+    yaw_delta = ((yaw - expected_yaw + 180.0) % 360.0) - 180.0
+    if abs(yaw_delta) > 1.0:
         errors.append("player yaw is %.1f" % yaw)
     island = by_label().get("SM_Size_Island")
-    origin, extent = island.get_actor_bounds(False)
+    pad = load_metrics().get("pad", {"x": 40, "y": 30})
+    half_x = float(pad["x"]) * M * 0.5
+    half_y = float(pad["y"]) * M * 0.5
+    island_loc = island.get_actor_location()
     inset = 500.0
-    if not (origin.x - extent.x + inset < loc.x < origin.x + extent.x - inset and origin.y - extent.y + inset < loc.y < origin.y + extent.y - inset):
+    if not (
+        island_loc.x - half_x + inset < loc.x < island_loc.x + half_x - inset
+        and island_loc.y - half_y + inset < loc.y < island_loc.y + half_y - inset
+    ):
         errors.append("player start is inside the island edge margin")
     occupied = set()
     for label, box in solids.items():
@@ -477,7 +495,7 @@ def validate(player_actor, top):
         errors.append("player clearance shares %d grid cells with a solid" % len(shared))
     errors.extend(capsule_clearance(loc, top))
     world = unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem).get_editor_world()
-    ignore = [other for other in actors() if other.get_actor_label() != "SM_Size_Island"]
+    ignore = [other for other in actors() if other.get_actor_label() not in ("SM_Size_Island", "SM_Size_WalkPad")]
     hit_z = trace_floor_z(world, loc.x, loc.y, loc.z + 50.0, top - 500.0, ignore)
     if hit_z is None:
         errors.append("player start missed the island")
@@ -633,7 +651,7 @@ def capsule_clearance(loc, top):
     errors = []
     for actor in overlapped or []:
         label = actor.get_actor_label()
-        if label == "SM_Size_Island" or passable(label) or label == "SM_Size_Field" or label in ("SK_Size_Partner", "SK_Size_Child"):
+        if label == "SM_Size_Island" or label == "SM_Size_WalkPad" or passable(label) or label == "SM_Size_Field" or label in ("SK_Size_Partner", "SK_Size_Child"):
             continue
         errors.append("capsule hits " + label)
     return errors
@@ -653,7 +671,7 @@ def walk_cabin(top, loc):
             unreal.Vector(ax, ay, az),
             unreal.Vector(bx, by, bz),
         )
-        if label is None or label in ("SM_Size_Island", "SM_Size_Field", "SK_Size_Partner", "SK_Size_Child") or label.startswith("SM_Size_Herb") or label.startswith("SM_Size_Lupine"):
+        if label is None or label in ("SM_Size_Island", "SM_Size_WalkPad", "SM_Size_Field", "SK_Size_Partner", "SK_Size_Child") or label.startswith("SM_Size_Herb") or label.startswith("SM_Size_Lupine"):
             continue
         errors.append(
             "walk blocked by %s from (%.0f, %.0f) to (%.0f, %.0f)"
@@ -726,6 +744,68 @@ def import_island():
     unreal.log("scene_placement: imported island")
 
 
+def place_walk_pad():
+    """A flat cube the pawn stands on. The island mesh is the cone under it."""
+    pad = load_metrics().get("pad", {"x": 70, "y": 90, "z": 1})
+    cube = unreal.EditorAssetLibrary.load_asset("/Engine/BasicShapes/Cube")
+    if cube is None:
+        unreal.log("scene_placement: FAIL no engine cube for the walk pad")
+        return False
+    actor = by_label().get("SM_Size_WalkPad")
+    if actor is None:
+        actor = unreal.EditorLevelLibrary.spawn_actor_from_class(
+            unreal.StaticMeshActor, unreal.Vector(0.0, 0.0, 0.0), yaw_rotator(0)
+        )
+        if actor is None:
+            unreal.log("scene_placement: FAIL walk pad did not spawn")
+            return False
+        actor.set_actor_label("SM_Size_WalkPad")
+    component = actor.get_component_by_class(unreal.StaticMeshComponent)
+    component.set_static_mesh(cube)
+    material = cube.get_material(0)
+    if material is not None:
+        component.set_material(0, material)
+        unreal.log("scene_placement: walk pad material " + material.get_path_name())
+    actor.set_actor_scale3d(unreal.Vector(float(pad["x"]), float(pad["y"]), float(pad.get("z", 1))))
+    thickness = float(pad.get("z", 1)) * M
+    actor.set_actor_location(unreal.Vector(0.0, 0.0, 45000.0 - thickness * 0.5), False, False)
+    set_collision(actor)
+    unreal.log("scene_placement: walk pad %.0f by %.0f m" % (float(pad["x"]), float(pad["y"])))
+    return True
+
+
+def place_opening_reveal(top):
+    """Spirit halfway to the cottage. The crest is far enough south that the child, starting at the door, still arrives first at 585 cm/s."""
+    for actor in list(actors()):
+        if actor.get_actor_label() == "OpeningReveal":
+            destroy(actor)
+    reveal_class = unreal.load_class(None, "/Script/HomeWorld.HomeWorldOpeningReveal")
+    if reveal_class is None:
+        unreal.log("scene_placement: FAIL no opening reveal class")
+        return False
+    spirit_x = -7.0
+    spirit_y = -29.0
+    crest_x = -6.0
+    crest_y = -53.0
+    actor = unreal.EditorLevelLibrary.spawn_actor_from_class(
+        reveal_class,
+        unreal.Vector(spirit_x * M, spirit_y * M, top + 75.0),
+        yaw_rotator(0),
+    )
+    if actor is None:
+        unreal.log("scene_placement: FAIL opening reveal did not spawn")
+        return False
+    actor.set_actor_label("OpeningReveal")
+    for component in actor.get_components_by_class(unreal.BoxComponent):
+        component.set_relative_location(
+            unreal.Vector((crest_x - spirit_x) * M, (crest_y - spirit_y) * M, 150.0),
+            False,
+            False,
+        )
+    unreal.log("scene_placement: opening reveal placed")
+    return True
+
+
 def run(import_mesh=True):
     metrics = load_metrics()
     if import_mesh:
@@ -734,9 +814,26 @@ def run(import_mesh=True):
     labels = []
     for item in metrics["homestead"]:
         if str(item["mesh"]).startswith("SK_"):
-            place_skeletal(item["label"], item["mesh"], item["x"], item["y"], item["z"], item["yaw"])
+            place_skeletal(
+                item["label"],
+                item["mesh"],
+                item["x"],
+                item["y"],
+                item["z"],
+                item["yaw"],
+                float(item.get("scale", 1.0)),
+            )
         else:
-            place_static(item["label"], item["mesh"], item["x"], item["y"], item["z"], item["yaw"])
+            place_static(
+                item["label"],
+                item["mesh"],
+                item["x"],
+                item["y"],
+                item["z"],
+                item["yaw"],
+                float(item.get("scale", 1.0)),
+                float(item.get("scale_z", 1.0)),
+            )
         labels.append(item["label"])
     for label in labels:
         actor = by_label().get(label)
@@ -750,9 +847,13 @@ def run(import_mesh=True):
                 tag_actor(actor, "NODE_KETTLE")
             elif label == "SK_Size_Partner":
                 tag_actor(actor, "NPC_PARTNER")
+                stand_like_player(actor)
             elif label == "SK_Size_Child":
                 tag_actor(actor, "NPC_CHILD")
+                stand_like_player(actor)
     if not set_slab_collision():
+        return 1
+    if not place_walk_pad():
         return 1
     top, floor_errors = measure_floor()
     if top is None:
@@ -773,15 +874,20 @@ def run(import_mesh=True):
         set_collision(field)
     keep = set(labels)
     keep.add(plains["label"])
+    keep.add("SM_Size_WalkPad")
     remove_outside_homestead(keep)
     player = place_player(metrics["player"], top)
     errors = pin_to_floor(labels, top)
     errors.extend(floor_errors)
     errors.extend(validate(player, top))
+    errors.extend(opening_sightline(top))
     errors.extend(stroke_or_ease_errors())
     for error in errors:
         unreal.log("scene_placement: FAIL " + error)
     if errors:
+        unreal.log("scene_placement: not saved")
+        return 1
+    if not place_opening_reveal(top):
         unreal.log("scene_placement: not saved")
         return 1
     unreal.get_editor_subsystem(unreal.LevelEditorSubsystem).save_current_level()
@@ -792,6 +898,43 @@ def run(import_mesh=True):
         % (top, loc.x, loc.y, loc.z, yaw)
     )
     return 0
+
+
+def _is_copse(label):
+    return (
+        label.startswith("SM_Size_Copse")
+        or label.startswith("SM_Size_Pine")
+        or label.startswith("SM_Size_Rock")
+    )
+
+
+def opening_sightline(top):
+    """Trees and rocks hide the cottage. The start stands on the walk pad."""
+    player = None
+    for candidate in actors():
+        if candidate.get_class().get_name() == "PlayerStart":
+            player = candidate
+            break
+    if player is None:
+        return ["no player start for the sightline"]
+    world = unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem).get_editor_world()
+    loc = player.get_actor_location()
+    ground = trace_floor_z(world, loc.x, loc.y, loc.z + 200.0, loc.z - 500.0, [player])
+    errors = []
+    if ground is None:
+        errors.append("player start has no walk pad under it")
+    eye = unreal.Vector(loc.x, loc.y, top + 160.0)
+    cottage = by_label().get("SM_Size_Cottage")
+    if cottage is None:
+        return errors + ["no cottage"]
+    door = cottage.get_actor_location()
+    body_hit = trace_hit(world, eye, unreal.Vector(door.x, door.y - 280.0, top + 160.0), [])
+    if body_hit is None or not _is_copse(str(body_hit.get("label", ""))):
+        seen = "nothing" if body_hit is None else str(body_hit.get("label", ""))
+        errors.append("cottage is already in sight, hit " + seen)
+    if not errors:
+        unreal.log("scene_placement: opening cottage hidden by trees and rocks")
+    return errors
 
 
 def check():
@@ -809,6 +952,7 @@ def check():
             player = candidate
             break
     errors.extend(validate(player, top))
+    errors.extend(opening_sightline(top))
     errors.extend(space_mapping_errors())
     errors.extend(stroke_or_ease_errors())
     for error in errors:

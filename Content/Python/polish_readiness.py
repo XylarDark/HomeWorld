@@ -470,7 +470,7 @@ def find_key(f: dict[str, Any]) -> tuple[str, str, str]:
 #: promised would be impossible.
 TRAVERSAL_TARGETS: dict[str, tuple[float, float]] = {
     "cabin_to_lookout_s": (15.0, 25.0),
-    "island_circuit_s": (45.0, 90.0),
+    "island_circuit_s": (12.0, 20.0),
 }
 
 #: Which FEEL.md table row supplies which window. Matched on ASCII substrings that
@@ -721,7 +721,7 @@ def check_env_traversal_measured() -> Check:
     """Can the walk be timed in-engine against the canon window?
 
     This is the single most important missing instrument in the project. FEEL.md
-    declares cabin->lookout 15-25s and island circuit 45-90s, and nothing anywhere
+    declares cabin->lookout 15-25s and island circuit 12-20s, and nothing anywhere
     measures either. Until a number exists, 'the island feels too big' is an
     opinion, and opinions are what produce a second art pass nobody budgeted for.
     """
@@ -1522,11 +1522,11 @@ def check_env_traversal_reachable() -> Check:
     arithmetically reachable given the island that exists, which needs only the
     walk speed and the authored extents - both readable headlessly.
 
-    It is the check that earns the whole measurement layer. `island circuit 45-90 s`
-    implies 270-540 m of walking at 6.0 m/s, against a 48 m perimeter. Nobody
-    could have seen that without dividing the window by the speed and comparing
-    it to the island, and the island was authored at 19.3 m a long time before
-    anyone asked.
+    It is the check that earns the whole measurement layer. The 2026-10 finding
+    was that island circuit 45-90 s implied 270-540 m of walking at 6.0 m/s,
+    against a 48 m perimeter. Q1 on 2026-10-17 tightened that window to 12-20 s.
+    Nobody could have seen the old contradiction without dividing the window by
+    the speed and comparing it to the island.
     """
     data = _read_json(TRAVERSAL_BUDGET)
     src = _rel(TRAVERSAL_BUDGET)

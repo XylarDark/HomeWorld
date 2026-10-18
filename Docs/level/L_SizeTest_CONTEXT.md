@@ -6,11 +6,11 @@ Map: `/Game/HomeWorld/Maps/SizeTest/L_SizeTest`.
 
 ## Measured floor
 
-2026-10-11. The island actor is at z = 450 m. Five downward traces hit the pad at 45,000 cm. The cone hangs below that pad. The player start is on the path between the beds, yaw 90, facing the south opening. The snap rule is practice 12.
+2026-10-17. The island actor is at z = 450 m. The walk pad is a flat engine cube on that height, 70 m by 140 m. The player start is on the south of that pad, yaw 90, facing the cottage. Trees and rocks stand between the start and the door. The snap rule is practice 12.
 
 ## Who is here
 
-Homestead: cottage, rocks, pines, herb beds, lupines, the partner by the bed, and the child in the garden. The player start is on the south path, aimed at the entry. Plants do not block the capsule. The partner and the child do not block it either. The field mesh is scaled under the island so the pad reads as floating above the plain.
+Homestead: cottage, trees and rocks south of the door, herb beds, lupines, the partner at the south door, and the child beside them. The player start is on the walk pad, south of those props, facing the cottage. Plants do not block the capsule. The partner and the child do not block it either. The field mesh stays under the island and is not the floor you walk. The pad stays flat.
 
 Not in this test: bear, guards, camp, clouds, bull, and the gatherables. The placer removes them and will not save if a solid shares the player’s clearance on the 1 m grid.
 
@@ -20,6 +20,6 @@ One directional light, `SizeTest_Sun`. Walk bounds are off on this map. Facing, 
 
 ## First five seconds
 
-2026-10-16. With no objective: walk, stop, and a small hop, until the body feels weighty and the hop reads. The stroke stays off this map until that pass. The lock is [`Docs/context/PRINCIPLE_FIT_LOCK.md`](../context/PRINCIPLE_FIT_LOCK.md).
+2026-10-17. Luke kept the walk, stop, and hop. The body passes that initial pass. The opening to build on this homestead is the tutorial in [`Docs/VISION_BOARD.md`](../VISION_BOARD.md). The lock is [`Docs/context/PRINCIPLE_FIT_LOCK.md`](../context/PRINCIPLE_FIT_LOCK.md).
 
 Do not run `Content/Python/place_size_test.py` against this map. It builds a new level.

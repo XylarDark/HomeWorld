@@ -1,6 +1,7 @@
 // Copyright HomeWorld. All Rights Reserved.
 
 #include "HomeWorldCharacter.h"
+#include "HomeWorldOpeningReveal.h"
 #include "GameFramework/Character.h"
 #include "HomeWorldGlideMovementComponent.h"
 #include "HomeWorldFallbackGlideComponent.h"
@@ -293,6 +294,12 @@ void AHomeWorldCharacter::BeginPlay()
 		{
 			Controlled->SetControlRotation(FRotator(0.0f, GetActorRotation().Yaw, 0.0f));
 		}
+		if (bSizeTest)
+		{
+			OpeningSpeedStep = 0;
+			ApplyOpeningWalkSpeed();
+			UE_LOG(LogTemp, Log, TEXT("start at higher speed, scroll up to higher speed"));
+		}
 		if (bSizeTest && !SizeTestWisp)
 		{
 			SizeTestWisp = NewObject<UStaticMeshComponent>(this, TEXT("SizeTestShoulderWisp"));
@@ -303,8 +310,24 @@ void AHomeWorldCharacter::BeginPlay()
 			SizeTestWisp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			SizeTestWisp->SetRelativeScale3D(FVector(0.25f));
 			SizeTestWisp->SetupAttachment(GetRootComponent());
+			SizeTestWisp->SetHiddenInGame(true);
+			SizeTestWisp->SetVisibility(false);
 			SizeTestWisp->RegisterComponent();
 			SizeTestWisp->SetRelativeLocation(FVector(10.0f, 45.0f, 55.0f));
+		}
+		if (bSizeTest && !SizeTestCursorWisp)
+		{
+			SizeTestCursorWisp = NewObject<UStaticMeshComponent>(this, TEXT("SizeTestCursorWisp"));
+			if (UStaticMesh* Sphere = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Sphere.Sphere")))
+			{
+				SizeTestCursorWisp->SetStaticMesh(Sphere);
+			}
+			SizeTestCursorWisp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			SizeTestCursorWisp->SetRelativeScale3D(FVector(0.15f));
+			SizeTestCursorWisp->SetupAttachment(GetRootComponent());
+			SizeTestCursorWisp->SetHiddenInGame(true);
+			SizeTestCursorWisp->SetVisibility(false);
+			SizeTestCursorWisp->RegisterComponent();
 		}
 	}
 	USkeletalMeshComponent* MeshComp = GetMesh();
@@ -376,7 +399,9 @@ void AHomeWorldCharacter::Tick(float DeltaTime)
 	}
 	if (UGameplayStatics::GetCurrentLevelName(this).Contains(TEXT("SizeTest")))
 	{
+		UpdateOpeningWalkScroll();
 		UpdateSizeTestWalk();
+		UpdateSizeTestInteractCursor();
 		UpdateSizeTestWisp(DeltaTime);
 	}
 	else if (UGameplayStatics::GetCurrentLevelName(this).Contains(TEXT("L_Field")))
@@ -385,17 +410,501 @@ void AHomeWorldCharacter::Tick(float DeltaTime)
 	}
 }
 
-void AHomeWorldCharacter::UpdateSizeTestWisp(float DeltaTime)
+void AHomeWorldCharacter::ApplyOpeningWalkSpeed()
 {
-	if (!SizeTestWisp)
+	static const float Speeds[] = {150.f, 300.f, 450.f};
+	if (!TraversalComponent)
 	{
 		return;
 	}
-	const FVector Want = GetActorLocation()
-		+ GetActorForwardVector() * 10.0f
-		+ GetActorRightVector() * 45.0f
-		+ FVector(0.0f, 0.0f, 55.0f);
-	SizeTestWisp->SetWorldLocation(FMath::VInterpTo(SizeTestWisp->GetComponentLocation(), Want, DeltaTime, 6.0f));
+	const int32 Step = FMath::Clamp(OpeningSpeedStep, 0, 2);
+	TraversalComponent->SetMovementSlowScale(Speeds[Step] / 450.f);
+}
+
+void AHomeWorldCharacter::UpdateOpeningWalkScroll()
+{
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	if (!PC)
+	{
+		return;
+	}
+	int32 Step = OpeningSpeedStep;
+	if (PC->WasInputKeyJustPressed(EKeys::MouseScrollUp))
+	{
+		Step = FMath::Min(2, Step + 1);
+	}
+	if (PC->WasInputKeyJustPressed(EKeys::MouseScrollDown))
+	{
+		Step = FMath::Max(0, Step - 1);
+	}
+	if (Step == OpeningSpeedStep)
+	{
+		return;
+	}
+	OpeningSpeedStep = Step;
+	ApplyOpeningWalkSpeed();
+}
+
+AActor* AHomeWorldCharacter::ResolveOpeningAim(FHitResult& Hit)
+{
+	(void)Hit;
+	return FindOpeningProximityTarget();
+}
+
+bool AHomeWorldCharacter::TraceEyeInteract(FHitResult& OutHit) const
+{
+	UWorld* World = GetWorld();
+	if (!World || !FollowCamera)
+	{
+		return false;
+	}
+	const FVector Start = FollowCamera->GetComponentLocation();
+	const FVector End = Start + FollowCamera->GetForwardVector() * 2000.f;
+	FCollisionQueryParams Params(NAME_None, false, this);
+	TArray<FHitResult> Hits;
+	if (!World->LineTraceMultiByChannel(Hits, Start, End, ECC_Visibility, Params))
+	{
+		return false;
+	}
+	for (const FHitResult& Hit : Hits)
+	{
+		AActor* HitActor = GetInteractTargetActor(Hit);
+		if (!HitActor || HitActor == this)
+		{
+			continue;
+		}
+		if (ActorHasInteractableComponent(HitActor)
+			|| HitActor->GetActorNameOrLabel().Contains(TEXT("Lupine")))
+		{
+			OutHit = Hit;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool AHomeWorldCharacter::TryOpeningSpiritInFront()
+{
+	FHitResult Hit;
+	AHomeWorldOpeningReveal* Reveal = Cast<AHomeWorldOpeningReveal>(ResolveOpeningAim(Hit));
+	if (!Reveal || !Reveal->TryClaim(this))
+	{
+		return false;
+	}
+	if (SizeTestWisp)
+	{
+		SizeTestWisp->SetHiddenInGame(false);
+		SizeTestWisp->SetVisibility(true);
+	}
+	UE_LOG(LogTemp, Log, TEXT("opening_reveal: shoulder spirit on"));
+	return true;
+}
+
+bool AHomeWorldCharacter::TryPartnerLeadInside()
+{
+	FHitResult Hit;
+	AActor* HitActor = ResolveOpeningAim(Hit);
+	if (!HitActor || !HitActor->ActorHasTag(FName(TEXT("NPC_PARTNER"))))
+	{
+		return false;
+	}
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+	for (TActorIterator<AActor> It(World); It; ++It)
+	{
+		if (AHomeWorldOpeningReveal* Reveal = Cast<AHomeWorldOpeningReveal>(*It))
+		{
+			return Reveal->TryLeadPartner();
+		}
+	}
+	return false;
+}
+
+void AHomeWorldCharacter::UpdateSizeTestInteractCursor()
+{
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	if (!PC || !SizeTestCursorWisp)
+	{
+		return;
+	}
+	const bool bDraw = PC->IsInputKeyDown(EKeys::RightMouseButton);
+	if (bDraw == bSizeTestInteractCursor)
+	{
+		if (!bDraw)
+		{
+			return;
+		}
+	}
+	else if (bDraw)
+	{
+		bSizeTestInteractCursor = true;
+		FInputModeGameAndUI Mode;
+		Mode.SetHideCursorDuringCapture(false);
+		Mode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+		PC->SetInputMode(Mode);
+		PC->bShowMouseCursor = true;
+		SizeTestCursorWisp->SetHiddenInGame(false);
+		SizeTestCursorWisp->SetVisibility(true);
+	}
+	else
+	{
+		bSizeTestInteractCursor = false;
+		PC->bShowMouseCursor = false;
+		FInputModeGameOnly GameOnly;
+		PC->SetInputMode(GameOnly);
+		SizeTestCursorWisp->SetHiddenInGame(true);
+		SizeTestCursorWisp->SetVisibility(false);
+		return;
+	}
+
+	float MouseX = 0.f;
+	float MouseY = 0.f;
+	FVector Origin = FVector::ZeroVector;
+	FVector Dir = FVector::ZeroVector;
+	if (!PC->GetMousePosition(MouseX, MouseY) || !PC->DeprojectScreenPositionToWorld(MouseX, MouseY, Origin, Dir))
+	{
+		return;
+	}
+	const float PlaneZ = GetActorLocation().Z + 40.f;
+	if (FMath::Abs(Dir.Z) < KINDA_SMALL_NUMBER)
+	{
+		return;
+	}
+	const float T = (PlaneZ - Origin.Z) / Dir.Z;
+	if (T > 0.f)
+	{
+		SizeTestCursorWisp->SetWorldLocation(Origin + Dir * T);
+	}
+}
+
+namespace
+{
+	FVector OrbitOutsideActor(const AActor* Target, const FVector& PlayerLoc, float TimeSeconds)
+	{
+		FVector Origin = FVector::ZeroVector;
+		FVector Extent = FVector::ZeroVector;
+		Target->GetActorBounds(false, Origin, Extent);
+		const float Clearance = 28.f;
+		const float Angle = TimeSeconds * 2.5f;
+		const float MaxHalf = FMath::Max(Extent.X, FMath::Max(Extent.Y, Extent.Z));
+		if (MaxHalf > 120.f)
+		{
+			const FVector ToPlayer = PlayerLoc - Origin;
+			int32 Axis = 0;
+			if (FMath::Abs(ToPlayer.Y) > FMath::Abs(ToPlayer.X))
+			{
+				Axis = 1;
+			}
+			if (FMath::Abs(ToPlayer.Z) > FMath::Abs(ToPlayer[Axis]))
+			{
+				Axis = 2;
+			}
+			const float Sign = ToPlayer[Axis] >= 0.f ? 1.f : -1.f;
+			const int32 Across = (Axis + 1) % 3;
+			const int32 Along = (Axis + 2) % 3;
+			const float Radius = 40.f;
+			FVector Face = Origin;
+			Face[Axis] = Origin[Axis] + Sign * (Extent[Axis] + Clearance);
+			Face[Across] = FMath::Clamp(PlayerLoc[Across], Origin[Across] - Extent[Across] + Radius, Origin[Across] + Extent[Across] - Radius);
+			Face[Along] = FMath::Clamp(PlayerLoc[Along], Origin[Along] - Extent[Along] + Radius, Origin[Along] + Extent[Along] - Radius);
+			FVector Spin = FVector::ZeroVector;
+			Spin[Across] = FMath::Cos(Angle) * Radius;
+			Spin[Along] = FMath::Sin(Angle) * Radius;
+			return Face + Spin;
+		}
+		const float Radius = FMath::Sqrt(Extent.X * Extent.X + Extent.Y * Extent.Y) + Clearance;
+		return Origin + FVector(FMath::Cos(Angle) * Radius, FMath::Sin(Angle) * Radius, 0.f);
+	}
+}
+
+AActor* AHomeWorldCharacter::FindOpeningProximityTarget() const
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return nullptr;
+	}
+	const FVector From = GetActorLocation();
+	AActor* Best = nullptr;
+	float BestDist = 280.f * 280.f;
+	for (TActorIterator<AActor> It(World); It; ++It)
+	{
+		AActor* Actor = *It;
+		if (!Actor || Actor == this || Actor->ActorHasTag(FName(TEXT("NPC_CHILD"))))
+		{
+			continue;
+		}
+		const bool bHerb = Actor->GetActorNameOrLabel().Contains(TEXT("Lupine")) && !Actor->IsHidden();
+		if (!bHerb && !ActorHasInteractableComponent(Actor))
+		{
+			continue;
+		}
+		const float Dist = FVector::DistSquared2D(From, Actor->GetActorLocation());
+		if (Dist < BestDist)
+		{
+			BestDist = Dist;
+			Best = Actor;
+		}
+	}
+	return Best;
+}
+
+void AHomeWorldCharacter::ShowOpeningProximityLine()
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+	const FVector From = GetActorLocation();
+	float PartnerDist = TNumericLimits<float>::Max();
+	float SpiritDist = TNumericLimits<float>::Max();
+	for (TActorIterator<AActor> It(World); It; ++It)
+	{
+		if (It->ActorHasTag(FName(TEXT("NPC_PARTNER"))))
+		{
+			PartnerDist = FVector::Dist2D(From, It->GetActorLocation());
+		}
+		else if (const AHomeWorldOpeningReveal* Reveal = Cast<AHomeWorldOpeningReveal>(*It))
+		{
+			if (Reveal->IsSpiritVisible())
+			{
+				SpiritDist = FVector::Dist2D(From, It->GetActorLocation());
+			}
+		}
+	}
+	FString Line;
+	if (PartnerDist < 400.f && PartnerDist <= SpiritDist)
+	{
+		Line = TEXT("Pick up the herb.");
+	}
+	else if (SpiritDist < 400.f)
+	{
+		Line = TEXT("Pick up the spirit.");
+	}
+	static FString ShownLine;
+	if (Line == ShownLine)
+	{
+		if (!Line.IsEmpty() && GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(9001, 0.2f, FColor::White, Line);
+		}
+		return;
+	}
+	ShownLine = Line;
+	if (!Line.IsEmpty())
+	{
+		UE_LOG(LogTemp, Log, TEXT("opening_dialogue: %s"), *Line);
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(9001, 0.2f, FColor::White, Line);
+		}
+	}
+}
+
+void AHomeWorldCharacter::StartOpeningHerbRune(AActor* Bed)
+{
+	if (!Bed || bOpeningRuneActive)
+	{
+		return;
+	}
+	OpeningRuneBed = Bed;
+	OpeningRunePoints.Reset();
+	const FVector Center = Bed->GetActorLocation() + FVector(0.f, 0.f, 50.f);
+	const FVector TowardPlayer = (GetActorLocation() - Center).GetSafeNormal2D();
+	const FVector HeartRight = FVector(-TowardPlayer.Y, TowardPlayer.X, 0.f);
+	constexpr int32 Count = 16;
+	constexpr float HeartScale = 3.2f;
+	for (int32 Index = 0; Index < Count; ++Index)
+	{
+		const float Turn = PI + (TWO_PI * Index) / Count;
+		const float HeartX = 16.f * FMath::Pow(FMath::Sin(Turn), 3.f);
+		const float HeartY = -(13.f * FMath::Cos(Turn) - 5.f * FMath::Cos(2.f * Turn) - 2.f * FMath::Cos(3.f * Turn) - FMath::Cos(4.f * Turn));
+		OpeningRunePoints.Add(Center + (HeartRight * HeartX - TowardPlayer * HeartY) * HeartScale);
+	}
+	if (OpeningRuneMarks.Num() < Count)
+	{
+		UStaticMesh* Sphere = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Sphere.Sphere"));
+		for (int32 Index = OpeningRuneMarks.Num(); Index < Count; ++Index)
+		{
+			UStaticMeshComponent* Mark = NewObject<UStaticMeshComponent>(this);
+			if (!Mark)
+			{
+				continue;
+			}
+			if (Sphere)
+			{
+				Mark->SetStaticMesh(Sphere);
+			}
+			Mark->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			Mark->SetRelativeScale3D(FVector(0.08f));
+			Mark->RegisterComponent();
+			OpeningRuneMarks.Add(Mark);
+		}
+	}
+	for (int32 Index = 0; Index < OpeningRuneMarks.Num() && Index < OpeningRunePoints.Num(); ++Index)
+	{
+		OpeningRuneMarks[Index]->SetWorldLocation(OpeningRunePoints[Index]);
+		OpeningRuneMarks[Index]->SetHiddenInGame(false);
+		OpeningRuneMarks[Index]->SetVisibility(true);
+	}
+	OpeningRuneMark = 0;
+	OpeningRuneCursor = OpeningRunePoints[0];
+	bOpeningRuneActive = true;
+	if (SizeTestWisp)
+	{
+		SizeTestWisp->SetHiddenInGame(false);
+		SizeTestWisp->SetVisibility(true);
+		SizeTestWisp->SetUsingAbsoluteLocation(true);
+		SizeTestWisp->SetWorldLocation(OpeningRuneCursor);
+	}
+	UE_LOG(LogTemp, Log, TEXT("opening_rune: trace the heart"));
+}
+
+void AHomeWorldCharacter::FinishOpeningHerbRune(bool bCollected)
+{
+	bOpeningRuneActive = false;
+	OpeningRuneMark = 0;
+	for (UStaticMeshComponent* Mark : OpeningRuneMarks)
+	{
+		if (Mark)
+		{
+			Mark->SetHiddenInGame(true);
+			Mark->SetVisibility(false);
+		}
+	}
+	if (!bCollected || !OpeningRuneBed)
+	{
+		UE_LOG(LogTemp, Log, TEXT("opening_rune: left the herb"));
+		OpeningRuneBed = nullptr;
+		return;
+	}
+	const bool bEast = OpeningRuneBed->ActorHasTag(FName(TEXT("NODE_GARDEN_EAST")));
+	const bool bPicked = TryPickGardenHerbFromEast(bEast);
+	if (bPicked)
+	{
+		UWorld* World = GetWorld();
+		AActor* Plant = nullptr;
+		float Best = 80.f * 80.f;
+		for (TActorIterator<AActor> It(World); It; ++It)
+		{
+			if (!It->GetActorNameOrLabel().Contains(TEXT("Lupine")))
+			{
+				continue;
+			}
+			const float Dist = FVector::DistSquared2D(It->GetActorLocation(), OpeningRuneBed->GetActorLocation());
+			if (Dist < Best)
+			{
+				Best = Dist;
+				Plant = *It;
+			}
+		}
+		if (Plant)
+		{
+			Plant->SetActorHiddenInGame(true);
+			Plant->SetActorEnableCollision(false);
+		}
+		OpeningRuneBed->SetActorEnableCollision(false);
+		OpeningRuneBed->Tags.Remove(FName(TEXT("NODE_GARDEN")));
+		OpeningRuneBed->Tags.Remove(FName(TEXT("NODE_GARDEN_EAST")));
+		OpeningRuneBed->Tags.Remove(FName(TEXT("NODE_GARDEN_WEST")));
+	}
+	OpeningRuneBed = nullptr;
+	UE_LOG(LogTemp, Log, TEXT("opening_rune: collected"));
+}
+
+void AHomeWorldCharacter::UpdateOpeningHerbRune(float DeltaTime)
+{
+	(void)DeltaTime;
+	if (!bOpeningRuneActive || OpeningRunePoints.Num() == 0)
+	{
+		return;
+	}
+	if (!OpeningRuneBed || FVector::Dist2D(GetActorLocation(), OpeningRuneBed->GetActorLocation()) > 400.f)
+	{
+		FinishOpeningHerbRune(false);
+		return;
+	}
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	if (PC && FollowCamera)
+	{
+		float DeltaX = 0.f;
+		float DeltaY = 0.f;
+		PC->GetInputMouseDelta(DeltaX, DeltaY);
+		FVector Right = FollowCamera->GetRightVector();
+		FVector Forward = FollowCamera->GetForwardVector();
+		Right.Z = 0.f;
+		Forward.Z = 0.f;
+		Right = Right.GetSafeNormal();
+		Forward = Forward.GetSafeNormal();
+		OpeningRuneCursor += (Right * DeltaX - Forward * DeltaY) * 1.2f;
+	}
+	if (SizeTestWisp)
+	{
+		SizeTestWisp->SetUsingAbsoluteLocation(true);
+		SizeTestWisp->SetWorldLocation(OpeningRuneCursor);
+	}
+	if (OpeningRuneMark < OpeningRunePoints.Num()
+		&& FVector::Dist(OpeningRuneCursor, OpeningRunePoints[OpeningRuneMark]) < 22.f)
+	{
+		if (OpeningRuneMarks.IsValidIndex(OpeningRuneMark) && OpeningRuneMarks[OpeningRuneMark])
+		{
+			OpeningRuneMarks[OpeningRuneMark]->SetHiddenInGame(true);
+		}
+		++OpeningRuneMark;
+		UE_LOG(LogTemp, Log, TEXT("opening_rune: mark %d"), OpeningRuneMark);
+		if (OpeningRuneMark >= OpeningRunePoints.Num())
+		{
+			FinishOpeningHerbRune(true);
+		}
+	}
+}
+
+void AHomeWorldCharacter::UpdateSizeTestWisp(float DeltaTime)
+{
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+		if (PC->WasInputKeyJustPressed(EKeys::Q))
+		{
+			bSizeTestFocus = !bSizeTestFocus;
+			SizeTestFocusActor = nullptr;
+			UE_LOG(LogTemp, Log, TEXT("opening_focus: %s"), bSizeTestFocus ? TEXT("on") : TEXT("off"));
+		}
+	}
+	if (bOpeningRuneActive)
+	{
+		UpdateOpeningHerbRune(DeltaTime);
+		return;
+	}
+	SizeTestFocusActor = FindOpeningProximityTarget();
+	ShowOpeningProximityLine();
+	if (!bSizeTestFocus)
+	{
+		if (SizeTestWisp && SizeTestWisp->IsVisible())
+		{
+			SizeTestWisp->SetUsingAbsoluteLocation(false);
+			SizeTestWisp->SetRelativeLocation(FVector(10.0f, 45.0f, 55.0f));
+		}
+		return;
+	}
+	if (!SizeTestWisp || !SizeTestWisp->IsVisible())
+	{
+		return;
+	}
+	if (!SizeTestFocusActor)
+	{
+		SizeTestWisp->SetUsingAbsoluteLocation(false);
+		SizeTestWisp->SetRelativeLocation(FVector(10.0f, 45.0f, 55.0f));
+		return;
+	}
+	const AActor* Target = SizeTestFocusActor;
+	const float TimeSeconds = GetWorld() ? GetWorld()->GetTimeSeconds() : 0.f;
+	const FVector Want = OrbitOutsideActor(Target, GetActorLocation(), TimeSeconds);
+	SizeTestWisp->SetUsingAbsoluteLocation(true);
+	SizeTestWisp->SetWorldLocation(FMath::VInterpTo(SizeTestWisp->GetComponentLocation(), Want, DeltaTime, 8.0f));
 }
 
 void AHomeWorldCharacter::UpdateSizeTestWalk()
@@ -661,6 +1170,10 @@ void AHomeWorldCharacter::OnStrafeRightReleased(const FInputActionValue& Value)
 
 void AHomeWorldCharacter::OnPrimaryAttackTriggered(const FInputActionValue& Value)
 {
+	if (bSizeTestInteractCursor)
+	{
+		return;
+	}
 	UE_LOG(LogTemp, Log, TEXT("HomeWorld: PrimaryAttack input triggered"));
 	if (!AbilitySystemComponent)
 	{
@@ -696,6 +1209,10 @@ void AHomeWorldCharacter::OnDodgeTriggered(const FInputActionValue& Value)
 void AHomeWorldCharacter::OnInteractTriggered(const FInputActionValue& Value)
 {
 	UE_LOG(LogTemp, Log, TEXT("HomeWorld: Interact input triggered"));
+	if (bOpeningRuneActive)
+	{
+		return;
+	}
 	if (!AbilitySystemComponent)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("HomeWorld: Interact skipped - no AbilitySystemComponent"));
@@ -706,8 +1223,20 @@ void AHomeWorldCharacter::OnInteractTriggered(const FInputActionValue& Value)
 		UE_LOG(LogTemp, Warning, TEXT("HomeWorld: Interact skipped - InteractAbilityClass not set on Blueprint"));
 		return;
 	}
+	bSizeTestInteractHandled = false;
 	const bool bActivated = AbilitySystemComponent->TryActivateAbilityByClass(InteractAbilityClass);
 	UE_LOG(LogTemp, Log, TEXT("HomeWorld: Interact ability %s"), bActivated ? TEXT("activated") : TEXT("failed to activate"));
+	if (bSizeTestInteractHandled)
+	{
+		bSizeTestFocus = false;
+		SizeTestFocusActor = nullptr;
+		UE_LOG(LogTemp, Log, TEXT("opening_focus: off"));
+	}
+}
+
+void AHomeWorldCharacter::NoteSizeTestInteract(bool bHandled)
+{
+	bSizeTestInteractHandled = bHandled;
 }
 
 void AHomeWorldCharacter::OnPlaceTriggered(const FInputActionValue& Value)
@@ -1900,11 +2429,17 @@ bool AHomeWorldCharacter::TryBrewNodeKettleTea()
 		UE_LOG(LogTemp, Warning, TEXT("NODE_KETTLE: brew failed - no InventorySubsystem"));
 		return false;
 	}
-	if (!Inv->SpendResource(HomeWorldInventory::RES_HERB, 1))
+	const bool bSpent = Inv->SpendResource(HomeWorldInventory::RES_HERB, 1);
+	if (!bSpent && !bHasSidedHerb)
 	{
-		UE_LOG(LogTemp, Log, TEXT("NODE_KETTLE: brew failed - need RES_HERB (herbs->tea)"));
+		UE_LOG(LogTemp, Log, TEXT("NODE_KETTLE: brew failed - need RES_HERB (inventory %d)"),
+			Inv->GetResource(HomeWorldInventory::RES_HERB));
 		ShowInteractFeedback(TEXT("NODE_KETTLE: need RES_HERB"), FColor::Yellow);
 		return false;
+	}
+	if (!bSpent)
+	{
+		UE_LOG(LogTemp, Log, TEXT("NODE_KETTLE: brew from the herb just picked"));
 	}
 
 	const float Duration = FMath::Max(1.f, TeaSprintHalfDaySeconds);
@@ -2062,21 +2597,27 @@ bool AHomeWorldCharacter::TryPickGardenHerbFromEast(bool bEast)
 		return false;
 	}
 	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
-	if (!TimeOfDay || TimeOfDay->GetCurrentPhase() != EHomeWorldTimeOfDayPhase::Day || bIsSpiritForm)
+	const bool bOpening = UGameplayStatics::GetCurrentLevelName(World).Contains(TEXT("SizeTest"));
+	if (!bOpening && (!TimeOfDay || TimeOfDay->GetCurrentPhase() != EHomeWorldTimeOfDayPhase::Day || bIsSpiritForm))
 	{
 		UE_LOG(LogTemp, Log, TEXT("NODE_GARDEN: pick skipped - need TOD_DAY FORM_BODY"));
 		return false;
 	}
+	if (bIsSpiritForm)
+	{
+		return false;
+	}
 	UGameInstance* GI = World->GetGameInstance();
 	UHomeWorldInventorySubsystem* Inv = GI ? GI->GetSubsystem<UHomeWorldInventorySubsystem>() : nullptr;
-	if (!Inv || !Inv->TryAddResource(HomeWorldInventory::RES_HERB, 1))
+	const bool bAdded = Inv && Inv->TryAddResource(HomeWorldInventory::RES_HERB, 1);
+	if (!bAdded && !bOpening)
 	{
 		UE_LOG(LogTemp, Log, TEXT("NODE_GARDEN: pick failed - inventory"));
 		return false;
 	}
 	bCarriedHerbIsEast = bEast;
 	bHasSidedHerb = true;
-	UE_LOG(LogTemp, Log, TEXT("NODE_GARDEN: pick RES_HERB +1 from the %s bed"), bEast ? TEXT("east") : TEXT("west"));
+	UE_LOG(LogTemp, Log, TEXT("NODE_GARDEN: RES_HERB now %d"), Inv ? Inv->GetResource(HomeWorldInventory::RES_HERB) : 0);
 	return true;
 }
 
@@ -2107,21 +2648,88 @@ namespace
 	{
 		return Actor && Actor->ActorHasTag(FName(Tag));
 	}
+
+	bool IsHerbPlant(const AActor* Actor)
+	{
+		return Actor && Actor->GetActorNameOrLabel().Contains(TEXT("Lupine"));
+	}
+
+	AActor* GardenBedFor(UWorld* World, AActor* Actor)
+	{
+		if (!World || !Actor)
+		{
+			return nullptr;
+		}
+		if (HomeWorldT0BeatNodes::ActorCarriesTagFor(Actor, HomeWorldT0BeatNodes::ENode::Garden))
+		{
+			return Actor;
+		}
+		if (!IsHerbPlant(Actor))
+		{
+			return nullptr;
+		}
+		AActor* Best = nullptr;
+		float BestDist = 150.f * 150.f;
+		for (TActorIterator<AActor> It(World); It; ++It)
+		{
+			if (!HomeWorldT0BeatNodes::ActorCarriesTagFor(*It, HomeWorldT0BeatNodes::ENode::Garden))
+			{
+				continue;
+			}
+			const float Dist = FVector::DistSquared2D(It->GetActorLocation(), Actor->GetActorLocation());
+			if (Dist < BestDist)
+			{
+				BestDist = Dist;
+				Best = *It;
+			}
+		}
+		return Best;
+	}
 }
 
 bool AHomeWorldCharacter::TryGardenInteractInFront()
 {
 	FHitResult Hit;
-	if (!TraceInteractHit(Hit))
+	AActor* Aimed = ResolveOpeningAim(Hit);
+	UWorld* World = GetWorld();
+	AActor* HitActor = GardenBedFor(World, Aimed);
+	if (!HitActor)
 	{
 		return false;
 	}
-	AActor* HitActor = GetInteractTargetActor(Hit);
-	if (!HitActor || !HomeWorldT0BeatNodes::ActorCarriesTagFor(HitActor, HomeWorldT0BeatNodes::ENode::Garden))
+	if (UGameplayStatics::GetCurrentLevelName(this).Contains(TEXT("SizeTest")))
 	{
-		return false;
+		StartOpeningHerbRune(HitActor);
+		return true;
 	}
 	const bool bPicked = TryPickGardenHerbFromEast(HitActor->ActorHasTag(FName(TEXT("NODE_GARDEN_EAST"))));
+	if (bPicked)
+	{
+		AActor* Plant = IsHerbPlant(Aimed) ? Aimed : nullptr;
+		float Best = 80.f * 80.f;
+		for (TActorIterator<AActor> It(World); It; ++It)
+		{
+			if (!It->GetActorNameOrLabel().Contains(TEXT("Lupine")))
+			{
+				continue;
+			}
+			const float Dist = FVector::DistSquared2D(It->GetActorLocation(), HitActor->GetActorLocation());
+			if (Dist < Best)
+			{
+				Best = Dist;
+				Plant = *It;
+			}
+		}
+		if (Plant)
+		{
+			Plant->SetActorHiddenInGame(true);
+			Plant->SetActorEnableCollision(false);
+		}
+		HitActor->SetActorEnableCollision(false);
+		HitActor->Tags.Remove(FName(TEXT("NODE_GARDEN")));
+		HitActor->Tags.Remove(FName(TEXT("NODE_GARDEN_EAST")));
+		HitActor->Tags.Remove(FName(TEXT("NODE_GARDEN_WEST")));
+	}
 	ShowInteractFeedback(bPicked ? TEXT("NODE_GARDEN: herb") : TEXT("NODE_GARDEN: day body only"), bPicked ? FColor::Green : FColor::Yellow);
 	return bPicked;
 }
@@ -2390,11 +2998,7 @@ void AHomeWorldCharacter::CompleteShrineReturn()
 bool AHomeWorldCharacter::TryNodeKettleInteractInFront()
 {
 	FHitResult Hit;
-	if (!TraceInteractHit(Hit))
-	{
-		return false;
-	}
-	AActor* HitActor = GetInteractTargetActor(Hit);
+	AActor* HitActor = ResolveOpeningAim(Hit);
 	if (!HitActor)
 	{
 		return false;
@@ -3713,7 +4317,7 @@ void AHomeWorldCharacter::PlaySoftFormSwapFeedback(EHomeWorldTimeOfDayPhase Phas
 
 void AHomeWorldCharacter::Look(const FInputActionValue& Value)
 {
-	if (StrokeReport && StrokeReport->IsStrokeHeld())
+	if (bOpeningRuneActive || bSizeTestInteractCursor || (StrokeReport && StrokeReport->IsStrokeHeld()))
 	{
 		return;
 	}
@@ -3734,6 +4338,10 @@ void AHomeWorldCharacter::Look(const FInputActionValue& Value)
 void AHomeWorldCharacter::ShowInteractFeedback(const FString& Message, FColor Color) const
 {
 	UE_LOG(LogTemp, Log, TEXT("INTERACT: %s"), *Message);
+	if (UGameplayStatics::GetCurrentLevelName(this).Contains(TEXT("SizeTest")))
+	{
+		return;
+	}
 	if (GEngine)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 2.5f, Color, Message);
@@ -3747,6 +4355,15 @@ bool AHomeWorldCharacter::ActorHasInteractableComponent(const AActor* Actor)
 		return false;
 	}
 	if (Cast<AHomeWorldResourcePile>(Actor))
+	{
+		return true;
+	}
+	if (const AHomeWorldOpeningReveal* Opening = Cast<AHomeWorldOpeningReveal>(Actor))
+	{
+		return Opening->IsSpiritVisible();
+	}
+	if (Actor->ActorHasTag(FName(TEXT("NPC_PARTNER")))
+		|| Actor->ActorHasTag(FName(TEXT("NPC_CHILD"))))
 	{
 		return true;
 	}
@@ -3796,6 +4413,9 @@ bool AHomeWorldCharacter::FindInteractTargetInCone(FHitResult& OutHit) const
 		FName(TEXT("CraftStation")),
 		FName(TEXT("MinigameStub")),
 		FName(TEXT("BossSealStub")),
+		FName(TEXT("NPC_PARTNER")),
+		FName(TEXT("NODE_GARDEN")),
+		FName(TEXT("NODE_KETTLE")),
 	};
 
 	AActor* BestActor = nullptr;
@@ -3872,13 +4492,14 @@ bool AHomeWorldCharacter::TraceInteractHit(FHitResult& OutHit) const
 	{
 		return false;
 	}
-	const float HalfHeight = GetCapsuleComponent() ? GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight() * 0.5f : 50.0f;
-	const FVector Start = GetActorLocation() + FVector(0.0f, 0.0f, HalfHeight);
+	const FVector Start = GetActorLocation() + FVector(0.0f, 0.0f, GetCapsuleComponent() ? GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight() * 0.5f : 50.0f);
 	const FVector End = Start + GetControlRotation().Vector() * InteractTraceLengthCm;
 	FCollisionQueryParams Params(NAME_None, false, this);
 	if (World->LineTraceSingleByChannel(OutHit, Start, End, ECC_Visibility, Params))
 	{
-		if (ActorHasInteractableComponent(GetInteractTargetActor(OutHit)))
+		AActor* HitActor = GetInteractTargetActor(OutHit);
+		if (ActorHasInteractableComponent(HitActor)
+			|| (HitActor && HitActor->GetActorNameOrLabel().Contains(TEXT("Lupine"))))
 		{
 			return true;
 		}

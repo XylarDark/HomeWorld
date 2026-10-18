@@ -15,10 +15,10 @@ What broke this session: launching UE **5.7** → BuildId skip of `UnrealEditor-
 
 Evidence: `Saved/canon_playtest_evidence.json` (local DESKTOP); log lines `GATHER: RES_WOOD +1`, `GATHER: harvest ok`, `GATHER: RES_SEED +1`.
 
-## Next test (LOCKED, 2026-10-16)
+## Played (2026-10-17)
 
-Replaces the gather-and-seed test on `L_VS_MVP_Markers`. That gather passed on 2026-09-20 and stays in the log above. The rule is [`Docs/context/PRINCIPLE_FIT_LOCK.md`](../context/PRINCIPLE_FIT_LOCK.md) pick 9.
+Luke, desktop, UE 5.8, PIE `L_SizeTest`. Walk, stop, and hop. The movement felt good. It passes the initial pass. The ease on `L_EasePad` was not played in this session.
 
-**One session on DESKTOP (UE 5.8), then stop.** Luke has not played this session. PIE `L_SizeTest` with no objective: walk, stop, and hop for about five seconds. Then, on `L_EasePad` (`/Game/HomeWorld/Maps/EasePad/L_EasePad`, [`Docs/level/L_EasePad_CONTEXT.md`](../level/L_EasePad_CONTEXT.md)), play one ease that can match, weak-hit, and bonk. Luke says what felt wrong. Write that note here. Do not add a system in that session. The stroke stays off `L_SizeTest` until the walk and hop have been played. The placer has saved the pad map. This session has not been played.
+The opening to build and test is the five-minute tutorial in [`Docs/VISION_BOARD.md`](../VISION_BOARD.md) under Opening tutorial. That section is the canon. This file does not restate it.
 
-Pass = both checks were played, and the note of what felt wrong is in this file. Fail = a system was added in the session, or the stroke was placed on `L_SizeTest` before the walk and hop.
+Next played session: that opening, once a piece of it is in the level. One piece, then the note of what felt wrong.

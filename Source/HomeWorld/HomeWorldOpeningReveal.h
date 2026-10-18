@@ -1,0 +1,84 @@
+// Copyright HomeWorld. All Rights Reserved.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include "HomeWorldOpeningReveal.generated.h"
+
+class UBoxComponent;
+class UStaticMeshComponent;
+
+/** The yard comes into view while the player is still moving. The child runs to the spirit. */
+UCLASS()
+class HOMEWORLD_API AHomeWorldOpeningReveal : public AActor
+{
+	GENERATED_BODY()
+
+public:
+	AHomeWorldOpeningReveal();
+
+	/** Fastest the pawn can move. Sprint is 585. Tea gates it, so the opening walk is 450. The race uses 585. */
+	static constexpr float PlayerMaxSpeed = 585.f;
+
+	/** The child runs at the kept homestead walk. The shorter path is what makes them earlier. */
+	static constexpr float ChildRunSpeed = 450.f;
+
+	/** One step along the ground. Stops on the goal. */
+	static FVector StepToward(const FVector& From, const FVector& Goal, float MaxStep);
+
+	/** True when the child reaches the spirit at the same time as the player, or sooner, at PlayerMaxSpeed. */
+	static bool ChildArrivesFirst(float PlayerDistance, float ChildDistance);
+
+	/** A point beside the spirit, on the side the child came from. The child stops here and stays visible. */
+	static FVector StandNear(const FVector& From, const FVector& SpiritPoint, float StandOffCm);
+
+	/** Hide the sphere and send the child after the player. False once it has already been claimed. */
+	bool TryClaim(APawn* Player);
+
+	bool IsSpiritVisible() const;
+
+	/** Walk the partner through the south door to a spot beside the kettle. False if they are already going. */
+	bool TryLeadPartner();
+
+protected:
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
+
+	UFUNCTION()
+	void OnCrestOverlap(
+		UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult& SweepResult);
+
+	UPROPERTY(VisibleAnywhere, Category = "Opening")
+	TObjectPtr<UStaticMeshComponent> Spirit;
+
+	UPROPERTY(VisibleAnywhere, Category = "Opening")
+	TObjectPtr<UBoxComponent> Crest;
+
+	UPROPERTY()
+	TObjectPtr<AActor> Child;
+
+	UPROPERTY()
+	TObjectPtr<AActor> Partner;
+
+	UPROPERTY()
+	TObjectPtr<APawn> FollowTarget;
+
+	bool bRunning = false;
+	bool bClaimed = false;
+	bool bFollowing = false;
+	bool bPartnerLeading = false;
+	bool bPartnerBlockLogged = false;
+	int32 PartnerLeg = 0;
+	TArray<FVector> PartnerPoints;
+
+	void FollowChild(float DeltaSeconds);
+	void LeadPartner(float DeltaSeconds);
+	AActor* FindTagged(const TCHAR* Tag) const;
+	void FitInteractBounds(AActor* Actor) const;
+};

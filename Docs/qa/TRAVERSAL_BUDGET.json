@@ -1,25 +1,27 @@
 {
-  "generated": "2026-10-04T02:34:12+00:00",
+  "generated": "2026-10-17T19:06:11+00:00",
   "inputs": {
     "movement_probe_errors": [],
-    "walk_speed_cm_s": 600.0,
-    "walk_speed_ms": 6.0
+    "walk_speed_cm_s": 300.0,
+    "walk_speed_ms": 3.0,
+    "walk_speed_source": "L_SizeTest opening wheel, middle step (`ApplyOpeningWalkSpeed`)"
   },
   "island": {
-    "volume": "SM_IslandTop",
+    "volume": "L_SizeTest walk pad",
     "authored_extents_m": [
-      180.0,
-      100.0
+      70.0,
+      140.0
     ],
     "pivot_is_ground_contact": false,
     "lowest_vert_z_world": -0.45,
+    "extents_source": "`pad` in `Docs/level/L_SizeTest_METRICS.md`",
     "spec_volume": "SM_Island_Hero",
     "spec_extents_m": [
       180.0,
       100.0
     ],
-    "ellipse_perimeter_m": 448.8,
-    "seconds_per_lap_walked": 74.8
+    "ellipse_perimeter_m": 339.1,
+    "seconds_per_lap_walked": 113.0
   },
   "windows": {
     "cabin_to_lookout_s": {
@@ -29,34 +31,55 @@
       ],
       "shape": "POINT_TO_POINT",
       "implied_path_length_m": [
-        90.0,
-        150.0
+        45.0,
+        75.0
       ],
-      "lap_walk_time_s": 74.8,
-      "crossings_of_long_axis_floor": 0.5,
+      "lap_walk_time_s": 113.0,
+      "crossings_of_long_axis_floor": 0.3,
       "state": "REACHABLE",
-      "note": "needs 90-150 m of path, roughly 0-1 crossings of the island's 180 m long axis. A winding route can satisfy this; island size does not contradict it"
+      "note": "needs 45-75 m of path, roughly 0-1 crossings of the island's 140 m long axis. A winding route can satisfy this; island size does not contradict it"
     },
     "island_circuit_s": {
       "window_s": [
-        45.0,
-        90.0
+        12.0,
+        20.0
       ],
       "shape": "CLOSED_LOOP",
       "implied_path_length_m": [
-        270.0,
-        540.0
+        36.0,
+        60.0
       ],
-      "lap_walk_time_s": 74.8,
-      "crossings_of_long_axis_floor": 1.5,
-      "laps_needed_for_window_floor": 0.6,
+      "lap_walk_time_s": 113.0,
+      "crossings_of_long_axis_floor": 0.3,
+      "laps_needed_for_window_floor": 0.1,
       "state": "REACHABLE",
-      "note": "one lap is 449 m / 74.8 s walked, so the 45-90 s window needs about 0.6-1.2 laps"
+      "note": "one lap is 339 m / 113.0 s walked, so the 12-20 s window needs about 0.1-0.2 laps"
     }
   },
   "verdict": "REACHABLE",
   "notes": [
     "Necessary-condition check on a straight-line lower bound. A NOT_REACHABLE is real and needs a human ruling on which number is wrong. Every REACHABLE here is unfalsified by design - it means size does not contradict the window, not that the walk fits it."
   ],
+  "tutorial": {
+    "approach_m": 49.9,
+    "approach_to": "SK_Size_Partner",
+    "opening_speeds": [
+      {
+        "cm_s": 150.0,
+        "m_s": 1.5,
+        "approach_s": 33.3
+      },
+      {
+        "cm_s": 300.0,
+        "m_s": 3.0,
+        "approach_s": 16.6
+      },
+      {
+        "cm_s": 450.0,
+        "m_s": 4.5,
+        "approach_s": 11.1
+      }
+    ]
+  },
   "windows_failing": []
 }

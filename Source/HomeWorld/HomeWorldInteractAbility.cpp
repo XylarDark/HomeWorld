@@ -31,7 +31,15 @@ void UHomeWorldInteractAbility::ActivateAbility(const FGameplayAbilitySpecHandle
 		return;
 	}
 
-	bool bHandled = Character->TryStartCloudDescent();
+	bool bHandled = Character->TryOpeningSpiritInFront();
+	if (!bHandled)
+	{
+		bHandled = Character->TryPartnerLeadInside();
+	}
+	if (!bHandled)
+	{
+		bHandled = Character->TryStartCloudDescent();
+	}
 	if (!bHandled)
 	{
 		bHandled = Character->TryShrinePortalInteract();
@@ -125,5 +133,6 @@ void UHomeWorldInteractAbility::ActivateAbility(const FGameplayAbilitySpecHandle
 	{
 		bHandled = Character->TryHarvestInFront();
 	}
+	Character->NoteSizeTestInteract(bHandled);
 	EndAbility(Handle, ActorInfo, ActivationInfo, false, !bHandled);
 }

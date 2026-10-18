@@ -70,8 +70,14 @@ sys.path.insert(0, str(ROOT / "Content" / "Python"))
 MOVEMENT_PROBE = ROOT / "Saved" / "movement_probe.json"
 GRAYBOX_REPORT = ROOT / "Docs" / "qa" / "graybox_spec_report.json"
 FEEL_CANON = ROOT / "Docs" / "canon" / "FEEL.md"
+TUTORIAL_METRICS = ROOT / "Docs" / "level" / "L_SizeTest_METRICS.md"
 OUT_JSON = ROOT / "Docs" / "qa" / "TRAVERSAL_BUDGET.json"
 OUT_MD = ROOT / "Docs" / "qa" / "TRAVERSAL_BUDGET.md"
+
+#: L_SizeTest opening wheel. ApplyOpeningWalkSpeed stores 150, 300, 450 and
+#: divides by BodyWalkSpeed (450). SetMovementSlowScale multiplies BodyWalkSpeed
+#: by that fraction, so the pawn walks at these cm/s while the tutorial teaches.
+OPENING_WALK_CM_S = (150.0, 300.0, 450.0)
 
 #: Which authored volume is the walkable island top. Read by name from the
 #: greybox report's own measurements, not assumed - the report is the instrument
@@ -160,7 +166,38 @@ def ellipse_perimeter_m(a_m: float, b_m: float) -> float:
     return math.pi * (3.0 * (a + b) - math.sqrt((3.0 * a + b) * (a + 3.0 * b)))
 
 
-def build() -> dict[str, Any]:
+def parse_tutorial_metrics(text: str) -> dict[str, Any] | None:
+    """The JSON block in L_SizeTest_METRICS.md. That file owns the pad."""
+    match = re.search(r"```json\s*(\{.*?\})\s*```", text, re.S)
+    if not match:
+        return None
+    try:
+        data = json.loads(match.group(1))
+    except ValueError:
+        return None
+    return data if isinstance(data, dict) else None
+
+
+def tutorial_approach_m(data: dict[str, Any]) -> float | None:
+    """Straight line from the player start to the partner at the south door."""
+    player = data.get("player") or {}
+    door = next(
+        (row for row in data.get("homestead") or []
+         if isinstance(row, dict) and row.get("label") == "SK_Size_Partner"),
+        None,
+    )
+    if not isinstance(door, dict):
+        return None
+    try:
+        return math.hypot(
+            float(player["x"]) - float(door["x"]),
+            float(player["y"]) - float(door["y"]),
+        )
+    except (KeyError, TypeError, ValueError):
+        return None
+
+
+def build(use_tutorial_pad: bool = False) -> dict[str, Any]:
     out: dict[str, Any] = {
         "generated": None,
         "inputs": {},
@@ -209,6 +246,47 @@ def build() -> dict[str, Any]:
             out["island"]["pivot_is_ground_contact"] = m.get(
                 "pivot_is_ground_contact")
             out["island"]["lowest_vert_z_world"] = m.get("lowest_vert_z_world")
+            out["island"]["extents_source"] = f"`{ISLAND_VOLUME}` in the greybox report"
+
+    if use_tutorial_pad:
+        raw = ""
+        if TUTORIAL_METRICS.is_file():
+            raw = TUTORIAL_METRICS.read_text(encoding="utf-8-sig")
+        tutorial = parse_tutorial_metrics(raw) if raw else None
+        pad = (tutorial or {}).get("pad") if isinstance(tutorial, dict) else None
+        if not isinstance(pad, dict) or "x" not in pad or "y" not in pad:
+            out["notes"].append(
+                f"{TUTORIAL_METRICS.name} has no walk pad, so the feel island "
+                "could not be read")
+        else:
+            extents = (float(pad["x"]), float(pad["y"]))
+            out["island"]["volume"] = "L_SizeTest walk pad"
+            out["island"]["authored_extents_m"] = [extents[0], extents[1]]
+            out["island"]["extents_source"] = (
+                "`pad` in `Docs/level/L_SizeTest_METRICS.md`")
+            approach = tutorial_approach_m(tutorial)
+            speeds = []
+            for cm in OPENING_WALK_CM_S:
+                row: dict[str, Any] = {
+                    "cm_s": cm,
+                    "m_s": round(cm / CM_PER_M, 1),
+                }
+                if approach is not None:
+                    row["approach_s"] = round(approach / (cm / CM_PER_M), 1)
+                speeds.append(row)
+            out["tutorial"] = {
+                "approach_m": round(approach, 1) if approach is not None else None,
+                "approach_to": "SK_Size_Partner",
+                "opening_speeds": speeds,
+            }
+            # The lap check uses the middle wheel step. The 6 m/s probe is the
+            # general body speed, not the speed this map teaches.
+            walk_cm_s = OPENING_WALK_CM_S[1]
+            out["inputs"]["walk_speed_cm_s"] = walk_cm_s
+            out["inputs"]["walk_speed_ms"] = round(walk_cm_s / CM_PER_M, 3)
+            out["inputs"]["walk_speed_source"] = (
+                "L_SizeTest opening wheel, middle step "
+                "(`ApplyOpeningWalkSpeed`)")
 
     # --- spec size, from the same module the greybox gate uses -------------
     spec: tuple[float, float] | None = None
@@ -268,7 +346,7 @@ def build() -> dict[str, Any]:
         "island_circuit_s": "CLOSED_LOOP",
     }
 
-    long_axis_m = extents[0] if extents else None
+    long_axis_m = max(extents) if extents else None
     perim = out["island"].get("ellipse_perimeter_m")
     worst: list[str] = []
     verdict = REACHABLE
@@ -365,11 +443,14 @@ def render_md(data: dict[str, Any], generated: str) -> str:
     A("| Quantity | Value | Source |")
     A("|---|---|---|")
     ws = data["inputs"].get("walk_speed_ms")
+    speed_src = data["inputs"].get("walk_speed_source") or (
+        "character CDO, via `probe_movement_budget.py`")
     A(f"| Walk speed | {ws if ws is not None else '**unmeasured**'} m/s "
-      f"({data['inputs'].get('walk_speed_cm_s')} cm/s) | character CDO, via "
-      f"`probe_movement_budget.py` |")
+      f"({data['inputs'].get('walk_speed_cm_s')} cm/s) | {speed_src} |")
     ext = data["island"].get("authored_extents_m")
-    A(f"| Island extents, authored | {ext} m | `{ISLAND_VOLUME}` in the greybox report |")
+    extents_src = data["island"].get("extents_source") or (
+        f"`{ISLAND_VOLUME}` in the greybox report")
+    A(f"| Island extents, authored | {ext} m | {extents_src} |")
     spec = data["island"].get("spec_extents_m")
     spec_txt = f"{spec} m" if spec else "**unknown**"
     A(f"| Island extents, spec | {spec_txt} | `{data['island'].get('spec_volume')}` "
@@ -409,6 +490,25 @@ def render_md(data: dict[str, Any], generated: str) -> str:
         for n in data["notes"]:
             A(f"- {n}")
         A("")
+    tutorial = data.get("tutorial")
+    if tutorial:
+        A("## Tutorial approach")
+        A("")
+        A("The feel island is the L_SizeTest walk pad, the floor where mechanics")
+        A("are introduced. The approach is a straight line from the player start")
+        A("to the partner at the south door. Times use the opening wheel.")
+        A("")
+        A(f"Approach: {tutorial.get('approach_m')} m to "
+          f"`{tutorial.get('approach_to')}`.")
+        A("")
+        A("| Opening speed | Time for that approach |")
+        A("|---|---|")
+        for row in tutorial.get("opening_speeds") or []:
+            A(f"| {row['cm_s']:g} cm/s | {row.get('approach_s', '—')} s |")
+        A("")
+        A("One distance cannot sit inside the 12–20 s circuit window at every")
+        A("wheel step. The middle step is the one the window is checked against.")
+        A("")
     A("## What this does not establish")
     A("")
     A("- It uses a **straight-line lower bound**. Real routes are longer, so every")
@@ -433,7 +533,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.selftest:
         return selftest()
 
-    data = build()
+    data = build(use_tutorial_pad=True)
     from datetime import datetime, timezone
     generated = datetime.now(timezone.utc).isoformat(timespec="seconds")
     data["generated"] = generated
@@ -552,6 +652,27 @@ def selftest() -> int:
         problems.append(
             "spec volume and walkable volume are the same key; the greybox report "
             "files size findings against the assembly root, not the surface mesh")
+
+    sample_metrics = (
+        "```json\n"
+        '{"player": {"x": -6, "y": -58}, "pad": {"x": 70, "y": 140},\n'
+        ' "homestead": [{"label": "SK_Size_Partner", "x": -9.5, "y": -8.2}]}\n'
+        "```\n"
+    )
+    parsed = parse_tutorial_metrics(sample_metrics)
+    if not parsed or (parsed.get("pad") or {}).get("x") != 70:
+        problems.append(f"tutorial pad parsed as {parsed}")
+    got_approach = tutorial_approach_m(parsed or {})
+    if got_approach is None or abs(got_approach - 49.9) > 0.1:
+        problems.append(f"tutorial approach parsed as {got_approach}")
+    character = ROOT / "Source" / "HomeWorld" / "HomeWorldCharacter.cpp"
+    traversal = ROOT / "Source" / "HomeWorld" / "HomeWorldTraversalComponent.h"
+    if character.is_file() and "Speeds[] = {150.f, 300.f, 450.f}" not in character.read_text(
+            encoding="utf-8"):
+        problems.append("opening wheel speeds drifted from ApplyOpeningWalkSpeed")
+    if traversal.is_file() and "BodyWalkSpeed = 450.f" not in traversal.read_text(
+            encoding="utf-8"):
+        problems.append("BodyWalkSpeed drifted; the opening wheel scale would change")
 
     if problems:
         for p in problems:

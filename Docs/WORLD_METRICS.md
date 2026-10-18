@@ -35,7 +35,7 @@ One row per number. Bite 1 of `Docs/handoffs/CONTEXT_PACK_V1.md`. Docs only.
 | # | Metric | Value | Unit | Source |
 |---|---|---|---|---|
 | L1 | Cabin to lookout walk | ~15–25 | s | `01_GDD_MVP.md:69` (§4 V1) |
-| L2 | Homestead walk circuit | 45–90 | s | `01_GDD_MVP.md:295` (Appendix B); `:69` |
+| L2 | Homestead walk circuit | 12–20 | s | `Docs/canon/FEEL.md`. Timed on the L_SizeTest walk pad, not the greybox island |
 | L3 | Gather, per node | ~1.5–3 | s | `01_GDD_MVP.md:89` (§4 V3) |
 | L4 | Gather all six once | 90–180 | s | `01_GDD_MVP.md:297`; `:89` |
 | L5 | Tame encounter read | ~5–10 | s | `01_GDD_MVP.md:99` (§4 V4) |

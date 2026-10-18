@@ -304,7 +304,7 @@ class TraversalWindowsAreReadFromCanon(unittest.TestCase):
 
     def test_targets_match_canon(self):
         self.assertEqual(pr.TRAVERSAL_TARGETS["cabin_to_lookout_s"], (15.0, 25.0))
-        self.assertEqual(pr.TRAVERSAL_TARGETS["island_circuit_s"], (45.0, 90.0))
+        self.assertEqual(pr.TRAVERSAL_TARGETS["island_circuit_s"], (12.0, 20.0))
 
     def test_window_bounds_are_inclusive(self):
         # Boundary values that hide off-by-one errors: exactly at the limit must
@@ -315,7 +315,7 @@ class TraversalWindowsAreReadFromCanon(unittest.TestCase):
             p = Path(td) / "baseline.json"
             p.write_text(json.dumps({
                 "cabin_to_lookout_s": {"measured_s": 25.0},
-                "island_circuit_s": {"measured_s": 45.0},
+                "island_circuit_s": {"measured_s": 12.0},
             }), encoding="utf-8")
             saved = pr.BASELINE_FILE
             pr.BASELINE_FILE = p
@@ -323,7 +323,7 @@ class TraversalWindowsAreReadFromCanon(unittest.TestCase):
                 self.assertEqual(pr.check_env_traversal_measured().state, pr.PASS)
                 p.write_text(json.dumps({
                     "cabin_to_lookout_s": {"measured_s": 25.1},
-                    "island_circuit_s": {"measured_s": 45.0},
+                    "island_circuit_s": {"measured_s": 12.0},
                 }), encoding="utf-8")
                 self.assertEqual(pr.check_env_traversal_measured().state, pr.FAIL)
             finally:
@@ -635,7 +635,7 @@ class CanonWindowSync(unittest.TestCase):
         self.assertEqual(problems, [], f"shipped FEEL.md failed to parse: {problems}")
         self.assertEqual(
             canon,
-            {"cabin_to_lookout_s": (15.0, 25.0), "island_circuit_s": (45.0, 90.0)},
+            {"cabin_to_lookout_s": (15.0, 25.0), "island_circuit_s": (12.0, 20.0)},
         )
 
     def test_shipped_literals_agree_with_shipped_canon(self):
@@ -654,7 +654,7 @@ class CanonWindowSync(unittest.TestCase):
         c = pr.check_env_canon_windows_in_sync()
         self.assertEqual(c.state, pr.FAIL)
         self.assertIn("island_circuit_s", c.measured)
-        self.assertIn("45-90", c.measured)
+        self.assertIn("12-20", c.measured)
         self.assertIn("30-60", c.measured)
 
     def test_updating_the_literal_clears_the_failure(self):

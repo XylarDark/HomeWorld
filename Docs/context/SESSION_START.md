@@ -28,6 +28,7 @@ Open only when the task needs it: `Docs/WORLD_METRICS.md` for a number; `Docs/le
 | Interview, lock, or boss | `Docs/context/BOSS_LAIR_LOCK.md` and the vision-board line that points at it. A later lock wins. Do not open the GDD unless the lock names it. |
 | Hand back | `Docs/context/HANDBACK.md` when the session is Co and the message says hand back |
 | What next, the project picture, the critical path, prototype assets, stills, Tripo, Meshy, Mixar, or art asset | `Docs/context/ART_ASSET_DOOR.md`. The room is Look. Do not offer rooms. |
+| Movement test, greybox floor, blockout, sightline, or a prototype walk | `Docs/handoffs/research/UE_BLOCKOUT_PROTOCOL.md`. Engine cube and the material already on it. Player Start on that floor. Play In Editor, on foot. |
 
 ## Pick the task
 

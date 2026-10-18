@@ -53,7 +53,7 @@ Solids block the pawn: island, cottage, pines, rocks. Plants do not: herb beds a
 
 A save is not a pass unless all six are true. A line that says the traces missed and then saved is not a pass. Run the check in the open editor. A headless `-nullrhi` run does not hit meshes.
 
-1. `SM_Size_Island` has one box collision, 40 m by 30 m by 1 m, on the pad. The cone does not block.
+1. `SM_Size_Island` has one box collision from the `pad` entry in `Docs/level/L_SizeTest_METRICS.md`, on the pad. The cone does not block. A hill is not this pad.
 2. Five rays cast down onto that box all hit. Fewer than five hits fails the save. There is no fallback to the actor origin or the bounds max.
 3. The highest hit is within 50 cm of the lowest. A larger gap is a hill.
 4. The floor is the middle hit. Every homestead mesh bottom is within 2 cm of it.

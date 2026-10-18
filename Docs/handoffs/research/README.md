@@ -14,5 +14,10 @@ Canonical **PROMPT_*** and **EXIT_*** markdown files live here. Law: `Docs/hando
 | `EXIT_WISP_CLOUD_LOOK_V1.md` | How the sky reads on the wisp descent |
 | `EXIT_WISP_CLOUD_RING_V1.md` | Cloud spawn size and density by height |
 | `EXIT_CAP_SWARM_CAPTURE_AND_AI_PROP_SETUP_V1.md` | Capture stills versus math-first prop checks |
+| `TERRAIN_HEIGHT_LATER.md` | Hills and valleys as a later sightline. Not the opening tutorial. |
+| `UE_BLOCKOUT_PROTOCOL.md` | How a prototype walk and a greybox floor are tested in UE. |
+| `UE_PATHING.md` | NPC paths, nav mesh, and the doorway. Not collision rules. |
+| `UE_COLLISION.md` | Collision skeleton. Query, block, floors, doors, capsules. |
+| `UE_GAMEPLAY_SYSTEMS.md` | How a new mechanic is added. Interaction interface and one movement component. Not paths. Not collision. |
 
 `EXIT_INTERVIEW_SCOPE_PROTOTYPE_FEEL_V1.md` is a product-scope record. It is not a lookup file.

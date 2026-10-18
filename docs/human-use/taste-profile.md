@@ -7,7 +7,7 @@ Reviewed, versioned summary of Lead/process taste and locked decisions.
 **Updates:** Stage in `Saved/taste_profile_session.json`; promote only after Lead/AD confirm or `APPROVE *`.  
 **Precedence:** latest Lead chat / `APPROVE *` > this file > never invent.
 
-**Last promoted:** 2026-10-15 (attribute and zone lock)
+**Last promoted:** 2026-10-17 (opening tutorial)
 
 ---
 
@@ -46,6 +46,7 @@ Reviewed, versioned summary of Lead/process taste and locked decisions.
 
 | Date | Phrase / source | Outcome |
 |------|-----------------|--------|
+| 2026-10-17 | Lead, chat, after the `L_SizeTest` walk | **Opening tutorial.** The first five minutes are in [`Docs/VISION_BOARD.md`](../../Docs/VISION_BOARD.md). The walk passes the initial movement pass. |
 | 2026-10-15 | Lead, attribute interview rounds 1–13 | **Interview complete.** Picks are in [`Docs/context/ATTRIBUTE_ZONE_INTERVIEW.md`](../../Docs/context/ATTRIBUTE_ZONE_INTERVIEW.md) and scribed into the virtue bible. A mark is a visible interaction. Armor is for one encounter. A paradox runs both poles at once. |
 | 2026-10-15 | Lead, chat, scribe | **Attribute and zone lock.** Rules in [`Docs/VIRTUE_ATTRIBUTE_BIBLE.md`](../../Docs/VIRTUE_ATTRIBUTE_BIBLE.md). Poles have runes. A paradox mark occupies one axis. Armor is interaction. The second forest opens after the camp, then the river, then the marsh. Unnamed beats stay unnamed. The bed rune stays removed. |
 | 2026-10-11 | Lead, chat, after walking `L_SizeTest` | **Open cabin greybox.** The size-test home stays the block plan in `Docs/level/L_SizeTest_ROOM_PLAN.md`: 17.5 by 17 m, a 4 m porch, the great room open to the kitchen, bedrooms on the north. Preferred over the equal-box cottage. Block meshes stay the layout test. The 9 by 11 m card in `Docs/art/SCALE.md` stays the art lock until a cottage sheet is kept. |

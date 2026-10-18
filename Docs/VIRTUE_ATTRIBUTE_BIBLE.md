@@ -6,11 +6,12 @@ Prototype rules for the seven pairs. Lead lock, 2026-10-15. The pair names stay 
 
 Do not build these. [`Docs/context/PRINCIPLE_FIT_LOCK.md`](context/PRINCIPLE_FIT_LOCK.md) wins.
 
-- The armor bench. The change, remove, and alter sentences below are the old interview. They are not a build list.
 - Pair toys other than the camp-forest ease stroke: a bite, a decoy, a shape that must be filled, a return to the start, and a grappling hook.
 - Lair coils.
 
 The zone-story, stroke-variety, and random-pair interviews do not authorize those toys. The ease stroke stays.
+
+The armor table is in the opening tutorial on [`Docs/VISION_BOARD.md`](VISION_BOARD.md), Luke 2026-10-17. The change, remove, and alter sentences below stay the old interview. They are not a second build list.
 
 ## Set
 
@@ -51,7 +52,7 @@ A mark changes a visible interaction with a place or a creature. The yield follo
 
 ## Encounters
 
-On a creature, difficulty is the count of sin and virtue runes. A paradox mark runs both poles of its axis at once, and those two toys interfere. That interference is the wild behaviour, and it changes the drop. The encounter is one readable action. A success yields. Interview rounds 3 and 5, 2026-10-15. More runes means more yield. The yield comes from the encounter. A hit uses the two punishments in Hits. There is no health bar and no kill.
+On a creature, difficulty is the count of sin and virtue runes. Luke, 2026-10-17: more sin and virtue pairs on a monster make those symbols bigger, and the player has to draw more of them. The rune’s difficulty scales with the size of the rune that has to be drawn. An encounter can also throw its own mechanics at the player. New ways to scale difficulty stay open. A paradox mark runs both poles of its axis at once, and those two toys interfere. That interference is the wild behaviour, and it changes the drop. The encounter is one readable action. A success yields. Interview rounds 3 and 5, 2026-10-15. More runes means more yield. The yield comes from the encounter. A hit uses the two punishments in Hits. There is no health bar and no kill.
 
 A yielded item carries a pole, or a paradox mark of its own.
 
