@@ -12,7 +12,7 @@ Warm, readable, handmade, hopeful. Routes feel like paths, not sims. Channels sh
 | Tunable | Value | Notes |
 |---|---|---|
 | Cabin → lookout walk | ~15–25 s | V1 |
-| Island circuit | ~45–90 s | V1 |
+| Island circuit | ~12–20 s (tightened from ~45–90 s) | V1 — Q1, 2026-10-17, Reading 2. The island this window is timed on is the L_SizeTest walk pad (`Docs/level/L_SizeTest_METRICS.md`), the floor where mechanics are introduced. It is a short inner loop on that pad, not a rim lap of the greybox island. DECISIONS.md entry still owed. |
 | Scripted FALLBACK duration | Default 32 s, clamped to 25–40 s | `09_FALLBACK_GLIDE.md` |
 | Active cloud descent duration | 30 s | Developer decision 2026-10-05, from lookout launch to landing in the field. Sink 1500 cm/s over the 450 m drop (×6 world-scale pass 2026-10-07). The 15 s homestead-field window in `HOMEWORLD_ROUTE.md` is not a glide duration and was not used |
 | Cloud descent forward airspeed | 3000 cm/s | Developer decision 2026-10-05: a deliberate 2:1 glide against the 250 cm/s sink, not an untuned leftover. Shallower than the earlier 1:1 so steering has consequence across the 30 s; both speeds ×6 for the world-scale pass |
