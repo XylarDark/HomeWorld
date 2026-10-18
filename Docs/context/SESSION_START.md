@@ -9,6 +9,20 @@ The one start door. Any IDE, chat, CLI, or agent runner. If a capability is miss
 3. Open `Docs/context/DOOR_RULES.md` with the task.
 4. Context loss: re-read only this file, restate the header once, and do not re-run the clarifier.
 
+## Playtest reply
+
+Use this door before the production reads when the message names a log line, a screenshot, or a lock to scribe. The mode line stays one sentence and does not block this door.
+
+- The task is that line. Do not read vision, the asset queue, or either critical path.
+- Read only the active queue's Now line and the one owner file it points at.
+- The same on-screen fail twice stops the reply. Say what was not in the binary. Do not start a neighboring polish.
+- One `.\Tools\Safe-Build.ps1 -LaunchEditorAfter` from the repo root per reply. Batch every named fix into that compile. A reply that already compiled does not compile again.
+- A fix is not done until the log line you named has changed. Name the DLL time in the reply.
+- A new lock is scribed, then a handoff, then stop. Do not implement it in the same session when code goes to another agent.
+- Do not invent interview choices for a beat that has no picked action. Ask what the player does.
+
+The production reads stay for "what next" and for an unnamed queue.
+
 ## Read order
 
 One file per step. Wait for it before the next read.
@@ -51,13 +65,13 @@ Other doors are not start reads. Open one only when it is named, or when the que
 
 ## Write a fact once
 
-Vision stays in `Docs/VISION_BOARD.md`. A shared scene practice stays in `Docs/context/SCENE_SETUP.md`. A fact about one map stays in that map's context file under Docs/level. Coordinates stay in that map's metrics file. A room layout stays in that map's room plan. Another file points at the owner. It does not restate the fact.
+Vision stays in `Docs/VISION_BOARD.md`. A shared scene practice stays in `Docs/context/SCENE_SETUP.md`. A fact about one map stays in that map's context file under Docs/level. Coordinates stay in that map's metrics file. A room layout stays in that map's room plan. An opening-tutorial pick stays in `Docs/context/OPENING_TUTORIAL_INTERVIEW.md`. The playtest queue owns Now and the pass table. The task list owns build order. Another file points at the owner. It does not restate the fact.
 
-Before the first edit, run `git status --short` once. No checkout: say so. A remote write names the branch. Stop and report uncommitted changes you did not make.
+Before the first edit, run `git status --short` once. `git add` uses the path that status prints. Do not retype `Docs/` when status shows `docs/`. No checkout: say so. A remote write names the branch. Stop and report uncommitted changes you did not make.
 
 ## Interview
 
-One lock. Competing choices, then stop. Not a menu of paths. Scribe the pick before the next lock. If the card fails, take a numbered reply in chat. Do not invent a substitute card.
+One lock. Competing choices, then stop. Not a menu of paths. Scribe the pick before the next lock. If the card fails, take a numbered reply in chat. Do not invent a substitute card. A beat with no picked action gets one question: what the player does. Do not offer passes you invented.
 
 After the clarifier names the work, name one room and open that card. Look is `Docs/context/FORK_LOOK.md`. Play is `Docs/context/FORK_GAMEPLAY.md`. Prove is `Docs/context/FORK_TESTING.md`. Art and asset both open Look. You can correct the room. No pick stays in the clarifier. No fourth craft room. The art bible is the law inside Look. It is not a room. A card points at a settled lock. It does not reopen it. Shape is `Docs/context/SESSION_FORK_LOCK.md`.
 

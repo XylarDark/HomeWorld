@@ -6,7 +6,7 @@ Map for every pass that uses the opening: `/Game/HomeWorld/Maps/SizeTest/L_SizeT
 
 Write results in this file. The tutorial is one day on the island. The field is the first wild place, after the dawn glide. It is not a pass here.
 
-**Now:** Crafting stations. The dog pass stays blocked until its interview has a pick.
+**Now:** The dog is in the build (verified 2026-10-18, pass below) — play it on the east lawn. The stations pass closed 2026-10-18. Coding for the unbuilt beats is [`Docs/handoffs/SESSION_HANDOFF_TUTORIAL_DAY.md`](../handoffs/SESSION_HANDOFF_TUTORIAL_DAY.md).
 
 The midday slice below is passed. 2026-10-18.
 
@@ -36,34 +36,29 @@ The midday slice below is passed. 2026-10-18.
 
 ## Crafting stations
 
-**Now.** Not in the build yet. Same map. Top step, 450 cm/s.
-
-The herb and the wisp open the consumable station. A greybox table is enough. The partner's armor gift opens the armor table. Ask the armor-number choice before that gift changes a number. Speed and bonk tries stay as they are until that choice is picked.
-
-Pass when both stations open from what you already did on the island, and you are not given a second recipe.
+**Passed.** 2026-10-18. Replayed the unlocks, top step, 450 cm/s. Pass with the replay changes, now in the build: the kettle sits on the kitchen counter, the counter is the consumable station, and the armory slid in front of the cottage onto the courtyard.
 
 | Field | Result |
 |---|---|
-| Date | |
-| Consumable station opened? | |
-| Armor table opened? | |
-| One sentence | |
+| Date | 2026-10-18 |
+| Consumable station opened? | Yes. The kitchen counter, opened with the herb and the claimed spirit. |
+| Armor table opened? | Yes. "The partner gave the armor and when I went to the armory it was open." |
+| One sentence | Pass with the replay changes: kettle on the counter, the counter is the station, the armory on the front courtyard. |
 
 ---
 
 ## The dog
 
-**Blocked.** The interview has no pick yet. [`Docs/context/OPENING_TUTORIAL_INTERVIEW.md`](../context/OPENING_TUTORIAL_INTERVIEW.md).
+**Built.** In the map and verified 2026-10-18; waiting on the replay. On the east lawn at world (10.5 m, 1.5 m). The Grace draw is the outline of a dove. The pick is round 4 in [`Docs/context/OPENING_TUTORIAL_INTERVIEW.md`](../context/OPENING_TUTORIAL_INTERVIEW.md).
 
-When it has a pick: one tame fight on the island. That fight is the first tame and the sin/virtue sample. The bull stays the later field and cave tame. Do not build this pass before the pick.
-
-Pass when the fight teaches the tame and the sample together, and you are not sent to the field to learn either one.
+Pass when that round is what you play, on the island, and you are not sent to the field to learn it.
 
 | Field | Result |
 |---|---|
 | Date | |
-| Tamed the dog? | |
-| Saw the sin/virtue sample in that fight? | |
+| Knocked away when too close or too fast? | |
+| Grace eased the Wrath? | |
+| Mixed herb tamed the dog? | |
 | One sentence | |
 
 ---

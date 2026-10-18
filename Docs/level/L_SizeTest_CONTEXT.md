@@ -10,11 +10,13 @@ Map: `/Game/HomeWorld/Maps/SizeTest/L_SizeTest`.
 
 ## Who is here
 
-Homestead: cottage, trees and rocks south of the door, herb beds, lupines, the partner at the south door, and the child beside them. The player start is on the walk pad, south of those props, facing the cottage. Plants do not block the capsule. The partner and the child do not block it either. The field mesh stays under the island and is not the floor you walk. The pad stays flat.
+Homestead: cottage, trees and rocks south of the door, herb beds, lupines, the partner at the south door, the child beside them, the two crafting stations — the kitchen counter is the consumable station with the kettle standing on it, and the armor table sits in the greybox armory in front of the cottage — and the opening dog on the east lawn at world (10.5 m, 1.5 m), a greybox body until a mesh exists. The player start is on the walk pad, south of those props, facing the cottage. Plants do not block the capsule. The partner and the child do not block it either. The dog does not block it either. The field mesh stays under the island and is not the floor you walk. The pad stays flat.
 
 Not in this test: bear, guards, camp, clouds, bull, and the gatherables. The placer removes them and will not save if a solid shares the player’s clearance on the 1 m grid.
 
 ## Play
+
+E on this map reaches the spirit, the partner, the garden, and the kettle, then returns. Anything else, including the bed and the dawn glide, has to be added to that chain in `UHomeWorldInteractAbility` or E will not reach it. Herb chunks live on `OpeningHerbTenths` on `AHomeWorldCharacter`. Wall meters stay in `Content/Python/cabin_shell.py` and `Docs/level/L_SizeTest_ROOM_PLAN.md`. Do not invent them.
 
 One directional light, `SizeTest_Sun`. Walk bounds are off on this map. Facing, the walk clip, the jump, and the shoulder sphere are practices 10, 11, and 16 in `Docs/context/SCENE_SETUP.md`. The cottage blocks, and the south opening is the way in. The layout is `Docs/level/L_SizeTest_ROOM_PLAN.md`.
 

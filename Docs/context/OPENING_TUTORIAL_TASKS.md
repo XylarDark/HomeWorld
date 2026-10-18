@@ -6,7 +6,7 @@ Play is `L_SizeTest`. One beat at a time. A beat is done when its check has pass
 
 The uncommitted edit already on [`Docs/level/L_SizeTest_ROOM_PLAN.md`](../level/L_SizeTest_ROOM_PLAN.md) stays. A beat that moves the player, the partner, or the child updates [`Docs/level/L_SizeTest_METRICS.md`](../level/L_SizeTest_METRICS.md) and only the position sentences in the room plan.
 
-The playtest queue is [`Docs/qa/TUTORIAL_PLAYTEST_QUEUE.md`](../qa/TUTORIAL_PLAYTEST_QUEUE.md).
+The playtest queue is [`Docs/qa/TUTORIAL_PLAYTEST_QUEUE.md`](../qa/TUTORIAL_PLAYTEST_QUEUE.md). The coding handoff for the unbuilt beats is [`Docs/handoffs/SESSION_HANDOFF_TUTORIAL_DAY.md`](../handoffs/SESSION_HANDOFF_TUTORIAL_DAY.md).
 
 ## Beat 1 — the copse, then the walk
 
@@ -24,11 +24,11 @@ The heart on the wisp, the bench commit, and a field herb are not this beat. The
 
 ## Beat 3 — crafting stations
 
-Next. Not in the build yet.
+Done. Luke replayed the unlocks: pass, 2026-10-18, with changes now in the build — the kettle sits on the kitchen counter, the counter is the consumable station, and the armory slid in front of the cottage.
 
-The herb and the wisp open the consumable station. A greybox table is enough. No recipe beyond that unlock. The partner's armor gift opens the armor table.
+The herb and the wisp open the consumable station: the kitchen counter, with the kettle on top. No second recipe; its one output is the herb mixed with a spirit, and after that the counter brews at the kettle. The partner's armor gift opens the armor table.
 
-Before that gift changes a number, ask the choice. It is not the open interview round. The open round is the dog.
+Before that gift changes a number, ask the choice. The dog pick is already round 4. It is not this question.
 
 | Id | Choice |
 |----|--------|
@@ -38,13 +38,9 @@ Before that gift changes a number, ask the choice. It is not the open interview 
 
 The change, remove, and alter sentences in [`Docs/VIRTUE_ATTRIBUTE_BIBLE.md`](../VIRTUE_ATTRIBUTE_BIBLE.md) stay off this build list.
 
-Luke replays the unlocks only.
-
 ## Beat 4 — the dog
 
-Blocked. [`OPENING_TUTORIAL_INTERVIEW.md`](OPENING_TUTORIAL_INTERVIEW.md) has no pick for how the fight is passed. Do not build it before that pick.
-
-One tame fight on the island is the first tame and the sin/virtue sample. The bull stays the later field and cave tame.
+**Built.** In the map and verified 2026-10-18; waiting on Luke's replay. The Grace draw is the outline of a dove (Luke, 2026-10-18). The pick is round 4 in [`OPENING_TUTORIAL_INTERVIEW.md`](OPENING_TUTORIAL_INTERVIEW.md). Do not restate it here.
 
 Luke replays only that fight.
 
