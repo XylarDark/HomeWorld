@@ -124,7 +124,7 @@ public:
 
 	/** West bed is the edge hint. East bed is the porch crawl. A pick with no bed is west. */
 	UFUNCTION(BlueprintCallable, Category = "Garden|T0")
-	bool TryPickGardenHerbFromEast(bool bEast);
+	bool TryPickGardenHerbFromEast(bool bEast, int32 Amount = 1);
 
 	bool IsPorchCrawlOpen() const { return bPorchCrawlOpen; }
 
@@ -839,16 +839,22 @@ protected:
 	/** Nearest opening interactable. Q shows the wisp on it. E uses it. */
 	TObjectPtr<AActor> SizeTestFocusActor;
 	bool bOpeningRuneActive = false;
-	int32 OpeningRuneMark = 0;
 	FVector OpeningRuneCursor = FVector::ZeroVector;
-	TArray<FVector> OpeningRunePoints;
-	TArray<TObjectPtr<UStaticMeshComponent>> OpeningRuneMarks;
 	TObjectPtr<AActor> OpeningRuneBed;
+	TObjectPtr<AActor> OpeningHerbBed;
+	TObjectPtr<AActor> OpeningHerbPlant;
+	TObjectPtr<class UHomeWorldRuneShapeComponent> OpeningRuneShape;
+	int32 OpeningHerbTenths = 0;
+	float OpeningHerbRespawnTime = -1.f;
+	float OpeningPointTime = -1.f;
+	bool bOpeningHerbEast = false;
 	AActor* FindOpeningProximityTarget() const;
 	void ShowOpeningProximityLine();
 	void StartOpeningHerbRune(AActor* Bed);
 	void UpdateOpeningHerbRune(float DeltaTime);
-	void FinishOpeningHerbRune(bool bCollected);
+	void FinishOpeningHerbRune(int32 Tenths);
+	void UpdateOpeningHerbPreview();
+	void RestoreOpeningHerb();
 	void UpdateSizeTestInteractCursor();
 
 	/** Capsule radius (cm). Human-sized default; override in Blueprint for different characters. */

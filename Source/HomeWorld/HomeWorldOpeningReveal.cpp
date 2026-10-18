@@ -5,7 +5,10 @@
 #include "HomeWorldOpeningWalker.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Engine/StaticMeshActor.h"
 #include "Engine/StaticMesh.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Materials/MaterialInterface.h"
 #include "EngineUtils.h"
 #include "GameFramework/Pawn.h"
 #include "Kismet/GameplayStatics.h"
@@ -22,8 +25,8 @@ namespace
 	/** Cottage origin (-800, 0). South entry is local x -150, opening through y -280. */
 	const FVector PartnerRouteCm[] = {
 		FVector(-950.f, -500.f, 0.f),
-		FVector(-950.f, -150.f, 0.f),
-		FVector(180.f, -120.f, 0.f),
+		FVector(-950.f, -180.f, 0.f),
+		FVector(60.f, -40.f, 0.f),
 	};
 	AActor* PromoteWalker(UWorld* World, AActor* Source)
 	{
@@ -168,7 +171,7 @@ bool AHomeWorldOpeningReveal::TryLeadPartner()
 		return false;
 	}
 	const FVector From = Partner->GetActorLocation();
-	const FVector Kettle(180.f, -120.f, From.Z);
+	const FVector Kettle(60.f, -40.f, From.Z);
 	PartnerPoints.Reset();
 	if (UNavigationSystemV1* Nav = UNavigationSystemV1::GetCurrent(GetWorld()))
 	{
@@ -283,6 +286,7 @@ void AHomeWorldOpeningReveal::BeginPlay()
 		SpiritHit->SetCollisionResponseToAllChannels(ECR_Ignore);
 		SpiritHit->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 	}
+	PlaceKettleCounter();
 }
 
 void AHomeWorldOpeningReveal::OnCrestOverlap(
@@ -336,6 +340,16 @@ void AHomeWorldOpeningReveal::Tick(float DeltaSeconds)
 	if (bPartnerLeading)
 	{
 		LeadPartner(DeltaSeconds);
+	}
+	if (!bHomecoming && bClaimed && Partner && FollowTarget && Child
+		&& FVector::Dist2D(FollowTarget->GetActorLocation(), Partner->GetActorLocation()) <= PartnerMeetCm)
+	{
+		BeginHomecoming();
+	}
+	if (bChildLeading)
+	{
+		LeadChild(DeltaSeconds);
+		return;
 	}
 	if (!Child)
 	{
@@ -422,7 +436,108 @@ void AHomeWorldOpeningReveal::LeadPartner(float DeltaSeconds)
 		if (PartnerLeg >= PartnerPoints.Num())
 		{
 			bPartnerLeading = false;
-			UE_LOG(LogTemp, Log, TEXT("opening_reveal: partner beside the kettle"));
+			Walker->SetActorRotation(FRotator(0.f, 180.f, 0.f));
+			if (UCharacterMovementComponent* Move = Walker->GetCharacterMovement())
+			{
+				Move->StopMovementImmediately();
+			}
+			UE_LOG(LogTemp, Log, TEXT("opening_reveal: partner waiting by the kettle"));
 		}
 	}
+}
+
+void AHomeWorldOpeningReveal::BeginHomecoming()
+{
+	if (bHomecoming)
+	{
+		return;
+	}
+	bHomecoming = true;
+	bFollowing = false;
+	bRunning = false;
+	if (!Partner)
+	{
+		Partner = FindTagged(TEXT("NPC_PARTNER"));
+	}
+	if (!bPartnerLeading)
+	{
+		TryLeadPartner();
+	}
+	const float FloorZ = Child ? Child->GetActorLocation().Z : 0.f;
+	ChildPoints.Reset();
+	ChildPoints.Add(FVector(-950.f, -520.f, FloorZ));
+	ChildPoints.Add(FVector(-950.f, -180.f, FloorZ));
+	ChildPoints.Add(FVector(-360.f, 400.f, FloorZ));
+	ChildPoints.Add(FVector(-360.f, 680.f, FloorZ));
+	ChildPoints.Add(FVector(-400.f, 800.f, FloorZ));
+	bChildLeading = Child != nullptr;
+	ChildLeg = 0;
+	if (AHomeWorldOpeningWalker* Walker = Cast<AHomeWorldOpeningWalker>(Child))
+	{
+		Walker->SetMoveSpeed(ChildRunSpeed);
+	}
+	UE_LOG(LogTemp, Log, TEXT("opening_reveal: child follows the partner in, then to their room"));
+}
+
+void AHomeWorldOpeningReveal::LeadChild(float DeltaSeconds)
+{
+	(void)DeltaSeconds;
+	if (!Child)
+	{
+		bChildLeading = false;
+		return;
+	}
+	if (ChildLeg < 0 || ChildLeg >= ChildPoints.Num())
+	{
+		bChildLeading = false;
+		UE_LOG(LogTemp, Log, TEXT("opening_reveal: child in their room"));
+		return;
+	}
+	AHomeWorldOpeningWalker* Walker = Cast<AHomeWorldOpeningWalker>(Child);
+	if (!Walker)
+	{
+		bChildLeading = false;
+		return;
+	}
+	Walker->SetMoveSpeed(ChildRunSpeed);
+	if (Walker->WalkToward(ChildPoints[ChildLeg], 60.f))
+	{
+		++ChildLeg;
+		if (ChildLeg >= ChildPoints.Num())
+		{
+			bChildLeading = false;
+			UE_LOG(LogTemp, Log, TEXT("opening_reveal: child in their room"));
+		}
+	}
+}
+
+void AHomeWorldOpeningReveal::PlaceKettleCounter()
+{
+	AActor* Kettle = FindTagged(TEXT("NODE_KETTLE"));
+	UWorld* World = GetWorld();
+	UStaticMesh* Cube = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Cube.Cube"));
+	if (!Kettle || !World || !Cube)
+	{
+		return;
+	}
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	const FVector KettleLocation = Kettle->GetActorLocation();
+	AStaticMeshActor* Counter = World->SpawnActor<AStaticMeshActor>(KettleLocation, FRotator::ZeroRotator, Params);
+	if (!Counter || !Counter->GetStaticMeshComponent())
+	{
+		return;
+	}
+	UStaticMeshComponent* Mesh = Counter->GetStaticMeshComponent();
+	Mesh->SetStaticMesh(Cube);
+	if (UMaterialInterface* Grey = LoadObject<UMaterialInterface>(nullptr,
+		TEXT("/Game/HomeWorld/Materials/Instances/MI_Cabin_StoneGray.MI_Cabin_StoneGray")))
+	{
+		Mesh->SetMaterial(0, Grey);
+	}
+	Counter->SetActorScale3D(FVector(1.6f, 0.7f, 0.9f));
+	Counter->SetActorLocation(FVector(KettleLocation.X, KettleLocation.Y - 20.f, KettleLocation.Z + 45.f));
+	Kettle->SetActorLocation(KettleLocation + FVector(0.f, 0.f, 90.f));
+	Counter->Tags.Add(FName(TEXT("KettleCounter")));
+	UE_LOG(LogTemp, Log, TEXT("opening_reveal: kettle counter placed"));
 }

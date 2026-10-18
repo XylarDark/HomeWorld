@@ -2,6 +2,7 @@
 
 #include "HomeWorldCharacter.h"
 #include "HomeWorldOpeningReveal.h"
+#include "HomeWorldRuneShapeComponent.h"
 #include "GameFramework/Character.h"
 #include "HomeWorldGlideMovementComponent.h"
 #include "HomeWorldFallbackGlideComponent.h"
@@ -679,7 +680,7 @@ void AHomeWorldCharacter::ShowOpeningProximityLine()
 	FString Line;
 	if (PartnerDist < 400.f && PartnerDist <= SpiritDist)
 	{
-		Line = TEXT("Pick up the herb.");
+		Line = OpeningHerbTenths > 0 ? TEXT("Brew the kettle.") : TEXT("Pick up the herb.");
 	}
 	else if (SpiritDist < 400.f)
 	{
@@ -711,49 +712,27 @@ void AHomeWorldCharacter::StartOpeningHerbRune(AActor* Bed)
 	{
 		return;
 	}
-	OpeningRuneBed = Bed;
-	OpeningRunePoints.Reset();
-	const FVector Center = Bed->GetActorLocation() + FVector(0.f, 0.f, 50.f);
-	const FVector TowardPlayer = (GetActorLocation() - Center).GetSafeNormal2D();
-	const FVector HeartRight = FVector(-TowardPlayer.Y, TowardPlayer.X, 0.f);
-	constexpr int32 Count = 16;
-	constexpr float HeartScale = 3.2f;
-	for (int32 Index = 0; Index < Count; ++Index)
+	UHomeWorldRuneShapeComponent* Shape = Bed->FindComponentByClass<UHomeWorldRuneShapeComponent>();
+	if (!Shape)
 	{
-		const float Turn = PI + (TWO_PI * Index) / Count;
-		const float HeartX = 16.f * FMath::Pow(FMath::Sin(Turn), 3.f);
-		const float HeartY = -(13.f * FMath::Cos(Turn) - 5.f * FMath::Cos(2.f * Turn) - 2.f * FMath::Cos(3.f * Turn) - FMath::Cos(4.f * Turn));
-		OpeningRunePoints.Add(Center + (HeartRight * HeartX - TowardPlayer * HeartY) * HeartScale);
-	}
-	if (OpeningRuneMarks.Num() < Count)
-	{
-		UStaticMesh* Sphere = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Sphere.Sphere"));
-		for (int32 Index = OpeningRuneMarks.Num(); Index < Count; ++Index)
+		Shape = NewObject<UHomeWorldRuneShapeComponent>(Bed);
+		if (!Shape)
 		{
-			UStaticMeshComponent* Mark = NewObject<UStaticMeshComponent>(this);
-			if (!Mark)
-			{
-				continue;
-			}
-			if (Sphere)
-			{
-				Mark->SetStaticMesh(Sphere);
-			}
-			Mark->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-			Mark->SetRelativeScale3D(FVector(0.08f));
-			Mark->RegisterComponent();
-			OpeningRuneMarks.Add(Mark);
+			return;
 		}
+		Shape->RegisterComponent();
 	}
-	for (int32 Index = 0; Index < OpeningRuneMarks.Num() && Index < OpeningRunePoints.Num(); ++Index)
-	{
-		OpeningRuneMarks[Index]->SetWorldLocation(OpeningRunePoints[Index]);
-		OpeningRuneMarks[Index]->SetHiddenInGame(false);
-		OpeningRuneMarks[Index]->SetVisibility(true);
-	}
-	OpeningRuneMark = 0;
-	OpeningRuneCursor = OpeningRunePoints[0];
+	const bool bTrace = Bed->ActorHasTag(FName(TEXT("NODE_GARDEN_EAST")));
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	Shape->ShowHeart(
+		bTrace ? EHomeWorldRuneDrawMode::Trace : EHomeWorldRuneDrawMode::Points,
+		EHomeWorldRuneOrientation::CameraParallel,
+		PC);
+	OpeningRuneShape = Shape;
+	OpeningRuneBed = Bed;
+	OpeningRuneCursor = Shape->GetStartPoint();
 	bOpeningRuneActive = true;
+	OpeningPointTime = Shape->IsPointsMode() ? 3.f : -1.f;
 	if (SizeTestWisp)
 	{
 		SizeTestWisp->SetHiddenInGame(false);
@@ -761,32 +740,28 @@ void AHomeWorldCharacter::StartOpeningHerbRune(AActor* Bed)
 		SizeTestWisp->SetUsingAbsoluteLocation(true);
 		SizeTestWisp->SetWorldLocation(OpeningRuneCursor);
 	}
-	UE_LOG(LogTemp, Log, TEXT("opening_rune: trace the heart"));
 }
 
-void AHomeWorldCharacter::FinishOpeningHerbRune(bool bCollected)
+void AHomeWorldCharacter::FinishOpeningHerbRune(int32 Tenths)
 {
 	bOpeningRuneActive = false;
-	OpeningRuneMark = 0;
-	for (UStaticMeshComponent* Mark : OpeningRuneMarks)
+	if (OpeningRuneShape)
 	{
-		if (Mark)
-		{
-			Mark->SetHiddenInGame(true);
-			Mark->SetVisibility(false);
-		}
+		OpeningRuneShape->HideShape();
+		OpeningRuneShape = nullptr;
 	}
-	if (!bCollected || !OpeningRuneBed)
+	const int32 Score = FMath::Clamp(Tenths, 0, 10);
+	if (Score <= 0)
 	{
-		UE_LOG(LogTemp, Log, TEXT("opening_rune: left the herb"));
+		UE_LOG(LogTemp, Log, TEXT("opening_herb: missed, nothing collected"));
 		OpeningRuneBed = nullptr;
 		return;
 	}
-	const bool bEast = OpeningRuneBed->ActorHasTag(FName(TEXT("NODE_GARDEN_EAST")));
-	const bool bPicked = TryPickGardenHerbFromEast(bEast);
-	if (bPicked)
+	OpeningHerbTenths += Score;
+	UE_LOG(LogTemp, Log, TEXT("opening_herb: collected %d chunks, bank %d"), Score, OpeningHerbTenths);
+	UWorld* World = GetWorld();
+	if (OpeningRuneBed && World)
 	{
-		UWorld* World = GetWorld();
 		AActor* Plant = nullptr;
 		float Best = 80.f * 80.f;
 		for (TActorIterator<AActor> It(World); It; ++It)
@@ -806,105 +781,185 @@ void AHomeWorldCharacter::FinishOpeningHerbRune(bool bCollected)
 		{
 			Plant->SetActorHiddenInGame(true);
 			Plant->SetActorEnableCollision(false);
+			OpeningHerbPlant = Plant;
 		}
+		const bool bEast = OpeningRuneBed->ActorHasTag(FName(TEXT("NODE_GARDEN_EAST")));
+		bOpeningHerbEast = bEast;
 		OpeningRuneBed->SetActorEnableCollision(false);
 		OpeningRuneBed->Tags.Remove(FName(TEXT("NODE_GARDEN")));
 		OpeningRuneBed->Tags.Remove(FName(TEXT("NODE_GARDEN_EAST")));
 		OpeningRuneBed->Tags.Remove(FName(TEXT("NODE_GARDEN_WEST")));
+		OpeningHerbBed = OpeningRuneBed;
+		OpeningHerbRespawnTime = World->GetTimeSeconds() + 20.f;
 	}
 	OpeningRuneBed = nullptr;
-	UE_LOG(LogTemp, Log, TEXT("opening_rune: collected"));
+	UE_LOG(LogTemp, Log, TEXT("opening_rune: herb returns in 20s"));
 }
 
 void AHomeWorldCharacter::UpdateOpeningHerbRune(float DeltaTime)
 {
-	(void)DeltaTime;
-	if (!bOpeningRuneActive || OpeningRunePoints.Num() == 0)
+	if (!bOpeningRuneActive || !OpeningRuneShape)
 	{
 		return;
 	}
-	if (!OpeningRuneBed || FVector::Dist2D(GetActorLocation(), OpeningRuneBed->GetActorLocation()) > 400.f)
+	if (!OpeningRuneBed || FVector::Dist2D(GetActorLocation(), OpeningRuneBed->GetActorLocation()) > 450.f)
 	{
-		FinishOpeningHerbRune(false);
+		const int32 Kept = OpeningRuneShape->GetScore();
+		const int32 Payout = OpeningRuneShape->IsPointsMode() ? Kept : FMath::Max(1, Kept);
+		FinishOpeningHerbRune(Payout);
 		return;
 	}
 	APlayerController* PC = Cast<APlayerController>(GetController());
-	if (PC && FollowCamera)
+	OpeningRuneShape->AlignToViewer(PC);
+	if (PC)
 	{
 		float DeltaX = 0.f;
 		float DeltaY = 0.f;
 		PC->GetInputMouseDelta(DeltaX, DeltaY);
-		FVector Right = FollowCamera->GetRightVector();
-		FVector Forward = FollowCamera->GetForwardVector();
-		Right.Z = 0.f;
-		Forward.Z = 0.f;
-		Right = Right.GetSafeNormal();
-		Forward = Forward.GetSafeNormal();
-		OpeningRuneCursor += (Right * DeltaX - Forward * DeltaY) * 1.2f;
+		FVector Origin = FVector::ZeroVector;
+		FVector Right = FVector::RightVector;
+		FVector Up = FVector::UpVector;
+		OpeningRuneShape->GetPlane(Origin, Right, Up);
+		OpeningRuneCursor += (Right * DeltaX + Up * DeltaY) * 3.2f;
 	}
+	OpeningRuneShape->SetCursor(OpeningRuneCursor);
 	if (SizeTestWisp)
 	{
+		SizeTestWisp->SetHiddenInGame(false);
+		SizeTestWisp->SetVisibility(true);
 		SizeTestWisp->SetUsingAbsoluteLocation(true);
 		SizeTestWisp->SetWorldLocation(OpeningRuneCursor);
 	}
-	if (OpeningRuneMark < OpeningRunePoints.Num()
-		&& FVector::Dist(OpeningRuneCursor, OpeningRunePoints[OpeningRuneMark]) < 22.f)
+	if (OpeningRuneShape->IsPointsMode())
 	{
-		if (OpeningRuneMarks.IsValidIndex(OpeningRuneMark) && OpeningRuneMarks[OpeningRuneMark])
+		OpeningPointTime -= DeltaTime;
+		if (OpeningPointTime <= 0.f)
 		{
-			OpeningRuneMarks[OpeningRuneMark]->SetHiddenInGame(true);
+			UE_LOG(LogTemp, Log, TEXT("opening_herb: point time ran out"));
+			FinishOpeningHerbRune(OpeningRuneShape->GetScore());
+			return;
 		}
-		++OpeningRuneMark;
-		UE_LOG(LogTemp, Log, TEXT("opening_rune: mark %d"), OpeningRuneMark);
-		if (OpeningRuneMark >= OpeningRunePoints.Num())
+		if (PC && PC->WasInputKeyJustPressed(EKeys::LeftMouseButton) && !OpeningRuneShape->TryClick())
 		{
-			FinishOpeningHerbRune(true);
+			UE_LOG(LogTemp, Log, TEXT("opening_herb: missed click"));
+			FinishOpeningHerbRune(OpeningRuneShape->GetScore());
+			return;
 		}
 	}
+	else
+	{
+		if (PC && PC->WasInputKeyJustPressed(EKeys::LeftMouseButton))
+		{
+			FinishOpeningHerbRune(FMath::Max(1, OpeningRuneShape->GetScore()));
+			return;
+		}
+		OpeningRuneShape->AdvanceTrace();
+	}
+	if (OpeningRuneShape->IsComplete())
+	{
+		FinishOpeningHerbRune(OpeningRuneShape->GetScore());
+	}
+}
+
+void AHomeWorldCharacter::UpdateOpeningHerbPreview()
+{
+	if (bOpeningRuneActive)
+	{
+		return;
+	}
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+	const FVector From = GetActorLocation();
+	AActor* Nearest = nullptr;
+	float Best = 320.f * 320.f;
+	for (TActorIterator<AActor> It(World); It; ++It)
+	{
+		if (!It->ActorHasTag(FName(TEXT("NODE_GARDEN"))))
+		{
+			continue;
+		}
+		const float Dist = FVector::DistSquared2D(From, It->GetActorLocation());
+		if (Dist < Best)
+		{
+			Best = Dist;
+			Nearest = *It;
+		}
+	}
+	if (Nearest == OpeningRuneBed && OpeningRuneShape)
+	{
+		OpeningRuneShape->AlignToViewer(Cast<APlayerController>(GetController()));
+		return;
+	}
+	if (OpeningRuneShape)
+	{
+		OpeningRuneShape->HideShape();
+		OpeningRuneShape = nullptr;
+	}
+	OpeningRuneBed = Nearest;
+	if (!Nearest)
+	{
+		return;
+	}
+	UHomeWorldRuneShapeComponent* Shape = Nearest->FindComponentByClass<UHomeWorldRuneShapeComponent>();
+	if (!Shape)
+	{
+		Shape = NewObject<UHomeWorldRuneShapeComponent>(Nearest);
+		if (!Shape)
+		{
+			return;
+		}
+		Shape->RegisterComponent();
+	}
+	Shape->ShowHeart(
+		EHomeWorldRuneDrawMode::Trace,
+		EHomeWorldRuneOrientation::CameraParallel,
+		Cast<APlayerController>(GetController()));
+	OpeningRuneShape = Shape;
+}
+
+void AHomeWorldCharacter::RestoreOpeningHerb()
+{
+	UWorld* World = GetWorld();
+	if (!World || OpeningHerbRespawnTime < 0.f || World->GetTimeSeconds() < OpeningHerbRespawnTime)
+	{
+		return;
+	}
+	if (OpeningHerbBed)
+	{
+		OpeningHerbBed->Tags.AddUnique(FName(TEXT("NODE_GARDEN")));
+		OpeningHerbBed->Tags.AddUnique(bOpeningHerbEast ? FName(TEXT("NODE_GARDEN_EAST")) : FName(TEXT("NODE_GARDEN_WEST")));
+		OpeningHerbBed->SetActorEnableCollision(true);
+	}
+	if (OpeningHerbPlant)
+	{
+		OpeningHerbPlant->SetActorHiddenInGame(false);
+		OpeningHerbPlant->SetActorEnableCollision(true);
+	}
+	UE_LOG(LogTemp, Log, TEXT("opening_rune: herb returned"));
+	OpeningHerbBed = nullptr;
+	OpeningHerbPlant = nullptr;
+	OpeningHerbRespawnTime = -1.f;
 }
 
 void AHomeWorldCharacter::UpdateSizeTestWisp(float DeltaTime)
 {
-	if (APlayerController* PC = Cast<APlayerController>(GetController()))
-	{
-		if (PC->WasInputKeyJustPressed(EKeys::Q))
-		{
-			bSizeTestFocus = !bSizeTestFocus;
-			SizeTestFocusActor = nullptr;
-			UE_LOG(LogTemp, Log, TEXT("opening_focus: %s"), bSizeTestFocus ? TEXT("on") : TEXT("off"));
-		}
-	}
+	(void)DeltaTime;
+	RestoreOpeningHerb();
+	ShowOpeningProximityLine();
 	if (bOpeningRuneActive)
 	{
 		UpdateOpeningHerbRune(DeltaTime);
 		return;
 	}
-	SizeTestFocusActor = FindOpeningProximityTarget();
-	ShowOpeningProximityLine();
-	if (!bSizeTestFocus)
-	{
-		if (SizeTestWisp && SizeTestWisp->IsVisible())
-		{
-			SizeTestWisp->SetUsingAbsoluteLocation(false);
-			SizeTestWisp->SetRelativeLocation(FVector(10.0f, 45.0f, 55.0f));
-		}
-		return;
-	}
-	if (!SizeTestWisp || !SizeTestWisp->IsVisible())
-	{
-		return;
-	}
-	if (!SizeTestFocusActor)
+	UpdateOpeningHerbPreview();
+	if (SizeTestWisp && SizeTestWisp->IsVisible())
 	{
 		SizeTestWisp->SetUsingAbsoluteLocation(false);
 		SizeTestWisp->SetRelativeLocation(FVector(10.0f, 45.0f, 55.0f));
-		return;
 	}
-	const AActor* Target = SizeTestFocusActor;
-	const float TimeSeconds = GetWorld() ? GetWorld()->GetTimeSeconds() : 0.f;
-	const FVector Want = OrbitOutsideActor(Target, GetActorLocation(), TimeSeconds);
-	SizeTestWisp->SetUsingAbsoluteLocation(true);
-	SizeTestWisp->SetWorldLocation(FMath::VInterpTo(SizeTestWisp->GetComponentLocation(), Want, DeltaTime, 8.0f));
 }
 
 void AHomeWorldCharacter::UpdateSizeTestWalk()
@@ -1170,7 +1225,7 @@ void AHomeWorldCharacter::OnStrafeRightReleased(const FInputActionValue& Value)
 
 void AHomeWorldCharacter::OnPrimaryAttackTriggered(const FInputActionValue& Value)
 {
-	if (bSizeTestInteractCursor)
+	if (bSizeTestInteractCursor || IsSizeTestLevel() || bOpeningRuneActive)
 	{
 		return;
 	}
@@ -1208,7 +1263,11 @@ void AHomeWorldCharacter::OnDodgeTriggered(const FInputActionValue& Value)
 
 void AHomeWorldCharacter::OnInteractTriggered(const FInputActionValue& Value)
 {
-	UE_LOG(LogTemp, Log, TEXT("HomeWorld: Interact input triggered"));
+	const bool bTutorial = IsSizeTestLevel();
+	if (!bTutorial)
+	{
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: Interact input triggered"));
+	}
 	if (bOpeningRuneActive)
 	{
 		return;
@@ -1225,12 +1284,14 @@ void AHomeWorldCharacter::OnInteractTriggered(const FInputActionValue& Value)
 	}
 	bSizeTestInteractHandled = false;
 	const bool bActivated = AbilitySystemComponent->TryActivateAbilityByClass(InteractAbilityClass);
-	UE_LOG(LogTemp, Log, TEXT("HomeWorld: Interact ability %s"), bActivated ? TEXT("activated") : TEXT("failed to activate"));
+	if (!bTutorial)
+	{
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: Interact ability %s"), bActivated ? TEXT("activated") : TEXT("failed to activate"));
+	}
 	if (bSizeTestInteractHandled)
 	{
 		bSizeTestFocus = false;
 		SizeTestFocusActor = nullptr;
-		UE_LOG(LogTemp, Log, TEXT("opening_focus: off"));
 	}
 }
 
@@ -2429,11 +2490,28 @@ bool AHomeWorldCharacter::TryBrewNodeKettleTea()
 		UE_LOG(LogTemp, Warning, TEXT("NODE_KETTLE: brew failed - no InventorySubsystem"));
 		return false;
 	}
+	if (OpeningHerbTenths > 0)
+	{
+		const int32 Chunks = FMath::Min(OpeningHerbTenths, 10);
+		OpeningHerbTenths -= Chunks;
+		const float FullDaySeconds = FMath::Max(1.f, TeaSprintHalfDaySeconds) * 2.f;
+		const float GrantSeconds = FullDaySeconds * (static_cast<float>(Chunks) / 10.f);
+		const float Now = World->GetTimeSeconds();
+		if (TeaSprintEndWorldTime < Now)
+		{
+			TeaSprintEndWorldTime = Now;
+		}
+		TeaSprintEndWorldTime += GrantSeconds;
+		UE_LOG(LogTemp, Log, TEXT("NODE_KETTLE: brewed %d herb chunks into %.0fs of sprint, %d left"),
+			Chunks, GrantSeconds, OpeningHerbTenths);
+		ShowInteractFeedback(TEXT("NODE_KETTLE: tea from herb chunks"), FColor::Green);
+		bHasSidedHerb = false;
+		return true;
+	}
 	const bool bSpent = Inv->SpendResource(HomeWorldInventory::RES_HERB, 1);
 	if (!bSpent && !bHasSidedHerb)
 	{
-		UE_LOG(LogTemp, Log, TEXT("NODE_KETTLE: brew failed - need RES_HERB (inventory %d)"),
-			Inv->GetResource(HomeWorldInventory::RES_HERB));
+		UE_LOG(LogTemp, Log, TEXT("NODE_KETTLE: brew failed - need herb chunks (banked %d)"), OpeningHerbTenths);
 		ShowInteractFeedback(TEXT("NODE_KETTLE: need RES_HERB"), FColor::Yellow);
 		return false;
 	}
@@ -2589,7 +2667,7 @@ void AHomeWorldCharacter::WakeUnpickedPocketFace()
 	}
 }
 
-bool AHomeWorldCharacter::TryPickGardenHerbFromEast(bool bEast)
+bool AHomeWorldCharacter::TryPickGardenHerbFromEast(bool bEast, int32 Amount)
 {
 	UWorld* World = GetWorld();
 	if (!World)
@@ -2609,7 +2687,7 @@ bool AHomeWorldCharacter::TryPickGardenHerbFromEast(bool bEast)
 	}
 	UGameInstance* GI = World->GetGameInstance();
 	UHomeWorldInventorySubsystem* Inv = GI ? GI->GetSubsystem<UHomeWorldInventorySubsystem>() : nullptr;
-	const bool bAdded = Inv && Inv->TryAddResource(HomeWorldInventory::RES_HERB, 1);
+	const bool bAdded = Inv && Inv->TryAddResource(HomeWorldInventory::RES_HERB, FMath::Max(1, Amount));
 	if (!bAdded && !bOpening)
 	{
 		UE_LOG(LogTemp, Log, TEXT("NODE_GARDEN: pick failed - inventory"));
@@ -4337,11 +4415,11 @@ void AHomeWorldCharacter::Look(const FInputActionValue& Value)
 
 void AHomeWorldCharacter::ShowInteractFeedback(const FString& Message, FColor Color) const
 {
-	UE_LOG(LogTemp, Log, TEXT("INTERACT: %s"), *Message);
 	if (UGameplayStatics::GetCurrentLevelName(this).Contains(TEXT("SizeTest")))
 	{
 		return;
 	}
+	UE_LOG(LogTemp, Log, TEXT("INTERACT: %s"), *Message);
 	if (GEngine)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 2.5f, Color, Message);

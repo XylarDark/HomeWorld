@@ -74,11 +74,18 @@ protected:
 	bool bFollowing = false;
 	bool bPartnerLeading = false;
 	bool bPartnerBlockLogged = false;
+	bool bHomecoming = false;
+	bool bChildLeading = false;
 	int32 PartnerLeg = 0;
+	int32 ChildLeg = 0;
 	TArray<FVector> PartnerPoints;
+	TArray<FVector> ChildPoints;
 
 	void FollowChild(float DeltaSeconds);
 	void LeadPartner(float DeltaSeconds);
+	void LeadChild(float DeltaSeconds);
+	void BeginHomecoming();
+	void PlaceKettleCounter();
 	AActor* FindTagged(const TCHAR* Tag) const;
 	void FitInteractBounds(AActor* Actor) const;
 };

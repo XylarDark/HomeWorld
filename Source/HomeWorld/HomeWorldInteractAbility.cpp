@@ -3,6 +3,7 @@
 #include "HomeWorldInteractAbility.h"
 #include "HomeWorldCharacter.h"
 #include "AbilitySystemComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 UHomeWorldInteractAbility::UHomeWorldInteractAbility()
 {
@@ -28,6 +29,26 @@ void UHomeWorldInteractAbility::ActivateAbility(const FGameplayAbilitySpecHandle
 	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
 	{
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
+		return;
+	}
+
+	if (UGameplayStatics::GetCurrentLevelName(Character).Contains(TEXT("SizeTest")))
+	{
+		bool bHandled = Character->TryOpeningSpiritInFront();
+		if (!bHandled)
+		{
+			bHandled = Character->TryPartnerLeadInside();
+		}
+		if (!bHandled)
+		{
+			bHandled = Character->TryGardenInteractInFront();
+		}
+		if (!bHandled)
+		{
+			bHandled = Character->TryNodeKettleInteractInFront();
+		}
+		Character->NoteSizeTestInteract(bHandled);
+		EndAbility(Handle, ActorInfo, ActivationInfo, false, !bHandled);
 		return;
 	}
 

@@ -19,5 +19,6 @@ Canonical **PROMPT_*** and **EXIT_*** markdown files live here. Law: `Docs/hando
 | `UE_PATHING.md` | NPC paths, nav mesh, and the doorway. Not collision rules. |
 | `UE_COLLISION.md` | Collision skeleton. Query, block, floors, doors, capsules. |
 | `UE_GAMEPLAY_SYSTEMS.md` | How a new mechanic is added. Interaction interface and one movement component. Not paths. Not collision. |
+| `RUNE_DRAW.md` | How a shown rune is drawn. Ten drag segments or three clicks. Not paths. Not collision. |
 
 `EXIT_INTERVIEW_SCOPE_PROTOTYPE_FEEL_V1.md` is a product-scope record. It is not a lookup file.

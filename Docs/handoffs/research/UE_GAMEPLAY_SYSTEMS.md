@@ -47,6 +47,7 @@ KEEP
 - One character movement component. Custom modes only for movement that is not walking.
 - Gameplay tags for new verbs.
 - Gameplay abilities keep `CanActivateAbility`, `ActivateAbility`, `CommitAbility`, and `EndAbility`.
+- A rune is a component on the collectible, drawn with a spline mesh. Static placement stays fixed, like a mark on a wall. Camera-parallel placement keeps the ribbon facing the camera. Do not add a second outline builder on the player.
 
 CANDIDATE
 
