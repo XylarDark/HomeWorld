@@ -127,12 +127,32 @@ The midday slice below is passed. 2026-10-18.
 
 Press E at the bed. The coat hides and you are a wisp. The companion you claimed stays, and it hovers on the bed and on the other wisps the same way it hovers on everything else. Night does not start an encounter or spiritual power regen. The child says the bed-and-dawn line once. Purple wisps stand beside the south copse, at the pond, and at the hot springs. Press E on one and play the click heart. A kept heart collects it. You do not need the other quests first.
 
+Developer shortcut for this replay: in a fresh PIE run `hw.Playtest.FastForward`. It plays the day beats in order (spirit, both herb beds, backpack, kettle, station mix, dog, fish, bed) and leaves you at the bed at night with every earlier step really executed.
+
 | Field | Result |
 |---|---|
 | Date | |
 | Slept and became spirit? | |
 | Stayed on the island? | |
-| Wisp on a pine, then home at 10? | |
+| Companion hovered, and a click heart collected a wisp? | |
+| One sentence | |
+
+---
+
+## Wisp loop
+
+**Built.** Waiting on this replay. Round 8 in [`Docs/context/OPENING_TUTORIAL_INTERVIEW.md`](../context/OPENING_TUTORIAL_INTERVIEW.md).
+
+Night. Three damaged wisps stand at the copse, the pond, and the hot springs. Collect one with the click heart and it goes into the backpack. Carry it to the hot springs and press E: one herb chunk starts a 20 second heal. When the heal ends the wisp follows at the legs, not the shoulder. The claimed companion stays on the shoulder.
+
+Placeholder tuning to judge: 20 second heal, one herb chunk per wisp, 600 cm spring range, three small purple followers in an arc at the feet.
+
+| Field | Result |
+|---|---|
+| Date | |
+| Three damaged wisps collected into the backpack? | |
+| E at the hot springs started the heal and spent one herb chunk? | |
+| Healed wisps follow at the legs, not the shoulder? | |
 | One sentence | |
 
 ---

@@ -67,6 +67,11 @@ void UHomeWorldInteractAbility::ActivateAbility(const FGameplayAbilitySpecHandle
 		}
 		if (!bHandled)
 		{
+			// Night wisps: a damaged wisp in the backpack can be left in the hot springs with one mixed herb.
+			bHandled = Character->TryOpeningHotSpringHealInFront();
+		}
+		if (!bHandled)
+		{
 			bHandled = Character->TryOpeningBedInFront();
 		}
 		if (!bHandled)

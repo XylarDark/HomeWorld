@@ -73,3 +73,15 @@ Picked 2026-10-18.
 - The hot springs show wisps and have no harvest pile yet.
 - Fishing stays a game the player plays. It is not a wisp pile. The pond's yield is otherwise unnamed.
 - The glider craft spends wood, silk, and metal from the armory chest.
+
+#### 2026-10-19 — the wisp loop, restated
+
+Luke restated the wisp loop on 2026-10-19. These lines supersede round 8 where they differ.
+
+- You find a damaged wisp in the wild. It goes into the backpack as a special item; it does not follow you yet.
+- Take it to the hot springs, deposit it there, and give it herb. Over time it heals and revives.
+- A healed wisp follows you near your legs, not at your shoulder.
+- Any wisp you carry can be assigned to tasks or delivery routes.
+- Collection goes to a central warehouse. From there a wisp takes resources to the chests the player chooses. A delivery route is set with click start and click end.
+- The armory-wood test was named and scratched.
+- Open: the herb and how much, the heal time, where damaged wisps are found beyond the three night wisps, the warehouse spot, and where the glider's materials come from now that collection lands in the warehouse.

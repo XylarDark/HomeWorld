@@ -1249,6 +1249,66 @@ void CmdBedSleepSpirit(const TArray<FString>& Args)
 			bOk ? TEXT("ok") : TEXT("failed"));
 	}
 
+void CmdNightWisp(const TArray<FString>& Args)
+{
+	UWorld* World = HomeWorldPlayWorld::Resolve();
+	if (!World)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Night.Wisp requires a play world (PIE or game)."));
+		return;
+	}
+	APlayerController* PC = World->GetFirstPlayerController();
+	AHomeWorldCharacter* Char = PC ? Cast<AHomeWorldCharacter>(PC->GetPawn()) : nullptr;
+	if (!Char)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Night.Wisp - no AHomeWorldCharacter pawn."));
+		return;
+	}
+	if (Args.Num() > 0)
+	{
+		const int32 Carried = FCString::Atoi(*Args[0]);
+		const int32 Herbs = Args.Num() > 1 ? FCString::Atoi(*Args[1]) : 0;
+		Char->DebugSeedOpeningWispLoop(Carried, Herbs);
+	}
+	UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Night.Wisp tracker: %s"), *Char->GetOpeningTrackerText());
+}
+
+void CmdPlaytestFastForward(const TArray<FString>& Args)
+{
+	UWorld* World = HomeWorldPlayWorld::Resolve();
+	if (!World)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Playtest.FastForward requires a play world (PIE or game)."));
+		return;
+	}
+	APlayerController* PC = World->GetFirstPlayerController();
+	AHomeWorldCharacter* Char = PC ? Cast<AHomeWorldCharacter>(PC->GetPawn()) : nullptr;
+	if (!Char)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Playtest.FastForward - no AHomeWorldCharacter pawn."));
+		return;
+	}
+	Char->DebugFastForwardOpening(Args.Num() > 0 ? FString::Join(Args, TEXT(" ")) : FString());
+}
+
+void CmdNightHeal(const TArray<FString>& Args)
+{
+	UWorld* World = HomeWorldPlayWorld::Resolve();
+	if (!World)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Night.Heal requires a play world (PIE or game)."));
+		return;
+	}
+	APlayerController* PC = World->GetFirstPlayerController();
+	AHomeWorldCharacter* Char = PC ? Cast<AHomeWorldCharacter>(PC->GetPawn()) : nullptr;
+	if (!Char)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Night.Heal - no AHomeWorldCharacter pawn."));
+		return;
+	}
+	Char->DebugHealOpeningWispAtSpring();
+}
+
 void CmdPlantSlot(const TArray<FString>& Args)
 	{
 		UWorld* World = HomeWorldPlayWorld::Resolve();
@@ -1674,6 +1734,21 @@ void FHomeWorldModule::StartupModule()
 		TEXT("hw.Bed.SleepSpirit"),
 		TEXT("T0 #11 NODE_BED: night bed grants FORM_SPIRIT (CAM_T0_BED). Day bed stays FORM_BODY. Not phase-alone; #9 w/o bed stay FORM_BODY."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdBedSleepSpirit),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Night.Wisp"),
+		TEXT("Wisp loop test hook: hw.Night.Wisp <carried> <herbs> seeds damaged wisps and herb chunks; no args prints the live tracker text."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdNightWisp),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Night.Heal"),
+		TEXT("Wisp loop test hook: deposit one carried wisp at the hot springs, spending one herb chunk."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdNightHeal),
+		ECVF_Cheat);
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Playtest.FastForward"),
+		TEXT("Playtest: run the opening beats for real, then stop ready to test one. <beat>: spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect, heal; no beat = night, list = the names. Fresh PIE."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdPlaytestFastForward),
 		ECVF_Cheat);
 	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.Plant.Slot"),

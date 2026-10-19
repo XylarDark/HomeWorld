@@ -2,6 +2,8 @@
 
 #include "HomeWorldRuneShapeComponent.h"
 
+#include "HomeWorldWispPlacement.h"
+
 #include "Components/SplineMeshComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Engine/StaticMesh.h"
@@ -81,7 +83,8 @@ void UHomeWorldRuneShapeComponent::EnsureRibbon(int32 SegmentCount)
 	AActor* Owner = GetOwner();
 	while (Segments.Num() < SegmentCount && Owner)
 	{
-		USplineMeshComponent* Segment = NewObject<USplineMeshComponent>(Owner);
+		// Outer is this component, so bounds measurement can tell rune ribbons from the prop.
+		USplineMeshComponent* Segment = NewObject<USplineMeshComponent>(this);
 		if (!Segment)
 		{
 			break;
@@ -289,7 +292,8 @@ void UHomeWorldRuneShapeComponent::ApplyRibbon()
 	AActor* Owner = GetOwner();
 	while (ClickMarks.Num() < 3 && Owner)
 	{
-		UStaticMeshComponent* Mark = NewObject<UStaticMeshComponent>(Owner);
+		// Outer is this component, so bounds measurement can tell rune marks from the prop.
+		UStaticMeshComponent* Mark = NewObject<UStaticMeshComponent>(this);
 		if (!Mark)
 		{
 			break;
@@ -360,10 +364,20 @@ void UHomeWorldRuneShapeComponent::ShowHeart(EHomeWorldRuneDrawMode Draw, EHomeW
 	ClickOrder.Reset();
 	AlignToViewer(InViewer);
 	SetComponentTickEnabled(true);
-	UE_LOG(LogTemp, Log, TEXT("opening_rune: %s heart, %s, reward %d"),
+	FVector MeshCenter = FVector::ZeroVector;
+	FVector MeshExtent = FVector::ZeroVector;
+	if (GetOwner())
+	{
+		HomeWorldWisp::MeasureBounds(GetOwner(), MeshCenter, MeshExtent);
+	}
+	UE_LOG(LogTemp, Log, TEXT("opening_rune: %s heart, %s, reward %d, center %s, owner %s mesh %s + %s"),
 		Draw == EHomeWorldRuneDrawMode::Points ? TEXT("points") : TEXT("trace"),
 		InOrientation == EHomeWorldRuneOrientation::Static ? TEXT("static") : TEXT("camera"),
-		GetReward());
+		GetReward(),
+		*PlaneOrigin.ToString(),
+		GetOwner() ? *GetOwner()->GetActorNameOrLabel() : TEXT("none"),
+		*MeshCenter.ToString(),
+		*MeshExtent.ToString());
 }
 
 void UHomeWorldRuneShapeComponent::ShowShape(const TArray<FVector2D>& UnitPoints, float SizeCm, bool bCloseLoop,
@@ -440,9 +454,9 @@ void UHomeWorldRuneShapeComponent::AlignToViewer(APlayerController* InViewer)
 	}
 	FVector TowardView(0.f, -1.f, 0.f);
 	FVector PlayerLocation = OwnerLocation;
+	FVector CameraLocation = OwnerLocation;
 	if (APlayerController* PC = Viewer.Get())
 	{
-		FVector CameraLocation = FVector::ZeroVector;
 		FRotator CameraRotation = FRotator::ZeroRotator;
 		PC->GetPlayerViewPoint(CameraLocation, CameraRotation);
 		(void)CameraRotation;
@@ -457,7 +471,13 @@ void UHomeWorldRuneShapeComponent::AlignToViewer(APlayerController* InViewer)
 		}
 	}
 	const FVector Side(-TowardView.Y, TowardView.X, 0.f);
-	FVector Center = OwnerLocation + Side * 180.f + FVector(0.f, 0.f, 160.f);
+	// Beside the object, not on top of it: the same bounds rule as the shoulder wisp.
+	// The fixed offset stays as the fallback when the object has no mesh to measure.
+	FVector Center = FVector::ZeroVector;
+	if (!HomeWorldWisp::HeartPoint(GetOwner(), CameraLocation, OwnerLocation.Z + 160.f, Center))
+	{
+		Center = OwnerLocation + Side * 180.f + FVector(0.f, 0.f, 160.f);
+	}
 	const float HeartReach = 110.f;
 	const float BodyClear = 90.f;
 	const float Have = FVector::Dist2D(Center, PlayerLocation);
@@ -472,12 +492,8 @@ void UHomeWorldRuneShapeComponent::AlignToViewer(APlayerController* InViewer)
 		Center += Push * (Need - Have);
 	}
 	FVector Face = TowardView;
-	if (APlayerController* PC = Viewer.Get())
+	if (Viewer.Get())
 	{
-		FVector CameraLocation = FVector::ZeroVector;
-		FRotator CameraRotation = FRotator::ZeroRotator;
-		PC->GetPlayerViewPoint(CameraLocation, CameraRotation);
-		(void)CameraRotation;
 		const FVector ToCamera = CameraLocation - Center;
 		if (ToCamera.SizeSquared2D() > 1.f)
 		{

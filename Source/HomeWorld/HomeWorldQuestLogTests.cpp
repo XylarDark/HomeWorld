@@ -15,15 +15,17 @@ bool FOpeningQuestGrowsInOrder::RunTest(const FString& Parameters)
 {
 	FHomeWorldOpeningQuestFacts Facts;
 	TArray<FHomeWorldQuestStep> Steps = UHomeWorldQuestLog::BuildOpeningSteps(Facts);
-	TestEqual(TEXT("the first line is the spirit"), Steps.Num(), 1);
+	TestEqual(TEXT("the spirit and the bed"), Steps.Num(), 2);
 	TestEqual(TEXT("the spirit line"), Steps[0].Text, FString(TEXT("Pick up the spirit.")));
 	TestFalse(TEXT("the spirit is still to do"), Steps[0].bDone);
+	TestEqual(TEXT("the bed is always last"), Steps.Last().Text, FString(TEXT("Sleep in the bed.")));
+	TestFalse(TEXT("the bed waits before sleep"), Steps.Last().bDone);
 
 	Facts.bSpiritClaimed = true;
 	Facts.HerbsGathered = 10;
 	Facts.bHerbFromWest = true;
 	Steps = UHomeWorldQuestLog::BuildOpeningSteps(Facts);
-	TestEqual(TEXT("herbs follow the spirit"), Steps.Num(), 2);
+	TestEqual(TEXT("herbs follow the spirit"), Steps.Num(), 3);
 	TestTrue(TEXT("the spirit stays checked"), Steps[0].bDone);
 	TestFalse(TEXT("one bed is not both"), Steps[1].bDone);
 
@@ -34,49 +36,53 @@ bool FOpeningQuestGrowsInOrder::RunTest(const FString& Parameters)
 	Facts.bHerbFromEast = true;
 	Facts.bKettleBrewed = false;
 	Steps = UHomeWorldQuestLog::BuildOpeningSteps(Facts);
-	TestEqual(TEXT("the backpack is next"), Steps.Num(), 3);
+	TestEqual(TEXT("the backpack is next"), Steps.Num(), 4);
 	TestEqual(TEXT("the backpack line"), Steps[2].Text, FString(TEXT("Take the backpack.")));
 
 	Facts.bBackpack = true;
 	Steps = UHomeWorldQuestLog::BuildOpeningSteps(Facts);
-	TestEqual(TEXT("the kettle follows the backpack"), Steps.Num(), 4);
+	TestEqual(TEXT("the kettle follows the backpack"), Steps.Num(), 5);
 	TestEqual(TEXT("brew is the current line"), Steps[3].Text, FString(TEXT("Brew the kettle.")));
 
 	Facts.bKettleBrewed = true;
 	Steps = UHomeWorldQuestLog::BuildOpeningSteps(Facts);
-	TestEqual(TEXT("the dog line starts slow"), Steps.Last().Text, FString(TEXT("Approach the dog slowly.")));
+	TestEqual(TEXT("the dog line starts slow"), Steps[Steps.Num() - 2].Text, FString(TEXT("Approach the dog slowly.")));
 
 	Facts.bDogSlow = true;
 	Steps = UHomeWorldQuestLog::BuildOpeningSteps(Facts);
-	TestEqual(TEXT("a slow walk changes the line"), Steps.Last().Text, FString(TEXT("Approach the dog.")));
+	TestEqual(TEXT("a slow walk changes the line"), Steps[Steps.Num() - 2].Text, FString(TEXT("Approach the dog.")));
 
 	Facts.bDogInSootheRange = true;
 	Steps = UHomeWorldQuestLog::BuildOpeningSteps(Facts);
-	TestEqual(TEXT("in range the line asks for E"), Steps.Last().Text, FString(TEXT("Press E to soothe.")));
+	TestEqual(TEXT("in range the line asks for E"), Steps[Steps.Num() - 2].Text, FString(TEXT("Press E to soothe.")));
 
 	Facts.bTracingDove = true;
 	Steps = UHomeWorldQuestLog::BuildOpeningSteps(Facts);
-	TestEqual(TEXT("the trace is its own line"), Steps.Last().Text, FString(TEXT("Trace the dove.")));
+	TestEqual(TEXT("the trace is its own line"), Steps[Steps.Num() - 2].Text, FString(TEXT("Trace the dove.")));
 
 	Facts.bTracingDove = false;
 	Facts.bWrathEased = true;
 	Facts.bHasMixedHerb = false;
 	Steps = UHomeWorldQuestLog::BuildOpeningSteps(Facts);
-	TestEqual(TEXT("a finished dove asks for the herb"), Steps.Last().Text, FString(TEXT("Feed the dog the mixed herb.")));
+	TestEqual(TEXT("a finished dove asks for the herb"), Steps[Steps.Num() - 2].Text, FString(TEXT("Feed the dog the mixed herb.")));
 
 	Facts.bHasMixedHerb = true;
 	Steps = UHomeWorldQuestLog::BuildOpeningSteps(Facts);
-	TestEqual(TEXT("the herb in hand asks for E"), Steps.Last().Text, FString(TEXT("Press E to feed the dog.")));
+	TestEqual(TEXT("the herb in hand asks for E"), Steps[Steps.Num() - 2].Text, FString(TEXT("Press E to feed the dog.")));
 
 	Facts.bDogTamed = true;
 	Steps = UHomeWorldQuestLog::BuildOpeningSteps(Facts);
-	TestTrue(TEXT("the dog step checks off"), Steps[Steps.Num() - 2].bDone);
-	TestEqual(TEXT("the pond is next"), Steps.Last().Text, FString(TEXT("Press E at the pond.")));
-	TestFalse(TEXT("the fish is still to catch"), Steps.Last().bDone);
+	TestTrue(TEXT("the dog step checks off"), Steps[Steps.Num() - 3].bDone);
+	TestEqual(TEXT("the pond is next"), Steps[Steps.Num() - 2].Text, FString(TEXT("Press E at the pond.")));
+	TestFalse(TEXT("the fish is still to catch"), Steps[Steps.Num() - 2].bDone);
 
 	Facts.bFishCaught = true;
 	Steps = UHomeWorldQuestLog::BuildOpeningSteps(Facts);
-	TestTrue(TEXT("the fish step checks off"), Steps.Last().bDone);
+	TestTrue(TEXT("the fish step checks off"), Steps[Steps.Num() - 2].bDone);
+
+	Facts.bSlept = true;
+	Steps = UHomeWorldQuestLog::BuildOpeningSteps(Facts);
+	TestTrue(TEXT("the bed checks off after sleep"), Steps.Last().bDone);
 
 	UHomeWorldQuestLog* Log = NewObject<UHomeWorldQuestLog>();
 	TArray<FHomeWorldQuestStep> Older;

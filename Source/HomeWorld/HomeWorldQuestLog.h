@@ -38,6 +38,7 @@ struct FHomeWorldOpeningQuestFacts
 	bool bDogTamed = false;
 	bool bBackpack = false;
 	bool bFishCaught = false;
+	bool bSlept = false;
 };
 
 /** Both beds, and twenty chunks between them. A miss adds nothing. */

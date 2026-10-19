@@ -112,6 +112,21 @@ public:
 	/** Size-test night: the click heart on a world wisp collects it. */
 	bool TryOpeningNightSetInFront();
 
+	/** Size-test night: deposit a damaged wisp in the hot springs with one mixed herb. */
+	bool TryOpeningHotSpringHealInFront();
+
+	/** Test hooks: seed the wisp loop and print the tracker the HUD is showing. */
+	void DebugSeedOpeningWispLoop(int32 Carried, int32 Herbs);
+	FString GetOpeningTrackerText() const;
+
+	/** Test hook: play the opening beats in order, for real, and stop ready to test one beat.
+	 *  Beat text: spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect,
+	 *  heal. Empty = night; "list" prints the names. Start a fresh PIE for every run. */
+	void DebugFastForwardOpening(const FString& Beat);
+
+	/** Test hook: call the hot-spring deposit the E chain calls. */
+	void DebugHealOpeningWispAtSpring();
+
 	/** E at the second-floor perch rides the line down to the fishing pond. */
 	UFUNCTION(BlueprintCallable, Category = "Opening|T0", meta = (DisplayName = "Try Opening Zipline In Front"))
 	bool TryOpeningZiplineInFront();
@@ -856,11 +871,31 @@ protected:
 	void UpdateSizeTestWisp(float DeltaTime);
 	void UpdateOpeningBonk();
 	void UpdateOpeningNight(float DeltaTime);
+	void UpdateOpeningWispLegs();
 	void EnsureOpeningNightProps();
 	void ApplyOpeningWalkSpeed();
 	void UpdateOpeningWalkScroll();
 	int32 OpeningSpeedStep = 0;
 	bool bSizeTestWalkPlaying = false;
+
+	/** The kitchen consumable table's open, mix, and brew branches. Shared by E and the playtest fast-forward. */
+	void UseOpeningConsumableStation();
+
+	/** The bed's night transition once the bed is resolved. Shared by E and the playtest fast-forward. */
+	bool BeginOpeningNight();
+
+	/** Playtest fast-forward: 0 idle, 1..9 the beat being played. */
+	void TickDebugFastForward(float DeltaTime);
+	int32 DebugFastForwardStep = 0;
+	float DebugFastForwardStepClock = 0.f;
+
+	/** The beat the run stops at: 1..8 leave that step for the player, 9..11 run every step
+	 *  and then carry the player to the beat - night, the copse wisp, or the hot springs. */
+	int32 DebugFastForwardStop = 9;
+	void ReadyForOpeningPlaytest();
+	void PlaceForOpeningPlaytest(AActor* Target, float Distance);
+	void PlaceForOpeningPlaytestAtPond(AActor* Pond);
+	void CollectNightWispsForPlaytest();
 
 	/** Greybox shoulder follower on SizeTest only. After the spirit is claimed, it marks the interact target. */
 	UPROPERTY(Transient)
@@ -880,12 +915,29 @@ protected:
 	bool bOpeningBonkSafe = false;
 	bool bOpeningNightSpirit = false;
 	bool bOpeningWispCollect = false;
+	UPROPERTY(Transient)
 	int32 OpeningWispsCollected = 0;
 	FVector OpeningNightChestPoint = FVector::ZeroVector;
 	TObjectPtr<UStaticMeshComponent> OpeningSpiritBody;
 	TObjectPtr<AActor> OpeningCopseWisp;
 	TObjectPtr<AActor> OpeningPondWisp;
 	TObjectPtr<AActor> OpeningSpringWisp;
+
+	/** Damaged wisps in the backpack, waiting for the hot springs. */
+	UPROPERTY(Transient)
+	int32 OpeningWispsCarried = 0;
+
+	/** One entry per wisp healing in the hot springs; seconds left. */
+	UPROPERTY(Transient)
+	TArray<float> OpeningWispHealTimers;
+
+	/** Healed wisps that follow near the legs. */
+	UPROPERTY(Transient)
+	int32 OpeningWispsHealed = 0;
+
+	/** One purple sphere per healed wisp at the player's legs. */
+	UPROPERTY(Transient)
+	TArray<TObjectPtr<UStaticMeshComponent>> OpeningWispLegMeshes;
 	void SnapSizeTestWispHome(AActor* Finished);
 	bool bOpeningRuneActive = false;
 	FVector OpeningRuneCursor = FVector::ZeroVector;
@@ -910,6 +962,7 @@ protected:
 	/** Opening stations: the shoulder spirit claim, the consumable table, and its mixed herb output. */
 	bool bOpeningSpiritClaimed = false;
 	bool bOpeningConsumableOpen = false;
+	UPROPERTY(Transient)
 	int32 OpeningMixedHerbs = 0;
 
 	/** The partner gave the armor piece. The armory table opens; walk speed and bonk tries stay as they are. */
@@ -938,6 +991,7 @@ protected:
 	void FailOpeningDogTrace();
 	void SucceedOpeningDogTrace(class AHomeWorldOpeningDog* Dog);
 	TObjectPtr<class AHomeWorldOpeningDog> OpeningDog;
+	UPROPERTY(Transient)
 	TObjectPtr<UHomeWorldQuestLog> QuestLog;
 	bool bOpeningDogDrawActive = false;
 	bool bOpeningDogSlowLatched = false;

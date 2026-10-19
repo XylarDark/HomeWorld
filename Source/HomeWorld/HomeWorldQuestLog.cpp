@@ -83,7 +83,7 @@ const TArray<FHomeWorldQuestStep>& UHomeWorldQuestLog::GetDisplayedSteps() const
 	return Best->Steps;
 }
 
-TArray<FHomeWorldQuestStep> UHomeWorldQuestLog::BuildOpeningSteps(const FHomeWorldOpeningQuestFacts& Facts)
+static TArray<FHomeWorldQuestStep> BuildOpeningStepsThroughFish(const FHomeWorldOpeningQuestFacts& Facts)
 {
 	TArray<FHomeWorldQuestStep> Steps;
 	auto Add = [&Steps](const TCHAR* Id, const FString& Text, bool bDone)
@@ -156,5 +156,18 @@ TArray<FHomeWorldQuestStep> UHomeWorldQuestLog::BuildOpeningSteps(const FHomeWor
 	}
 
 	Add(TEXT("Fish"), TEXT("Press E at the pond."), Facts.bFishCaught);
+	return Steps;
+}
+
+TArray<FHomeWorldQuestStep> UHomeWorldQuestLog::BuildOpeningSteps(const FHomeWorldOpeningQuestFacts& Facts)
+{
+	// The bed opens the night pass. Keep it on the tracker at all times so a tester
+	// is reminded to walk straight to it, even while the opening steps are unfinished.
+	TArray<FHomeWorldQuestStep> Steps = BuildOpeningStepsThroughFish(Facts);
+	FHomeWorldQuestStep Sleep;
+	Sleep.Id = FName(TEXT("Sleep"));
+	Sleep.Text = TEXT("Sleep in the bed.");
+	Sleep.bDone = Facts.bSlept;
+	Steps.Add(Sleep);
 	return Steps;
 }

@@ -544,6 +544,8 @@ void AHomeWorldCharacter::EnsureOpeningNightProps()
 			return nullptr;
 		}
 		UStaticMeshComponent* WispMesh = Wisp->GetStaticMeshComponent();
+		// A spawned AStaticMeshActor is Static. SetStaticMesh refuses that after play begins.
+		WispMesh->SetMobility(EComponentMobility::Movable);
 		if (UStaticMesh* Sphere = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Sphere.Sphere")))
 		{
 			WispMesh->SetStaticMesh(Sphere);
@@ -615,6 +617,7 @@ void AHomeWorldCharacter::EnsureOpeningNightProps()
 		{
 			if (UStaticMeshComponent* ChestMesh = Chest->GetStaticMeshComponent())
 			{
+				ChestMesh->SetMobility(EComponentMobility::Movable);
 				if (UStaticMesh* Cube = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Cube.Cube")))
 				{
 					ChestMesh->SetStaticMesh(Cube);
@@ -634,12 +637,24 @@ void AHomeWorldCharacter::EnsureOpeningNightProps()
 
 void AHomeWorldCharacter::UpdateOpeningNight(float DeltaTime)
 {
-	(void)DeltaTime;
 	if (!bOpeningNightSpirit)
 	{
 		return;
 	}
 	EnsureOpeningNightProps();
+	for (int32 Index = OpeningWispHealTimers.Num() - 1; Index >= 0; --Index)
+	{
+		OpeningWispHealTimers[Index] -= DeltaTime;
+		if (OpeningWispHealTimers[Index] > 0.f)
+		{
+			continue;
+		}
+		OpeningWispHealTimers.RemoveAt(Index);
+		++OpeningWispsHealed;
+		UE_LOG(LogTemp, Log, TEXT("opening_night: wisp healed, it follows near the legs (healed %d, carried %d)"),
+			OpeningWispsHealed, OpeningWispsCarried);
+	}
+	UpdateOpeningWispLegs();
 	if (!QuestLog)
 	{
 		return;
@@ -654,7 +669,62 @@ void AHomeWorldCharacter::UpdateOpeningNight(float DeltaTime)
 	};
 	Add(TEXT("Sleep in the bed"), true);
 	Add(*FString::Printf(TEXT("Collect the wisps %d/3"), OpeningWispsCollected), OpeningWispsCollected >= 3);
+	if (OpeningWispsCarried > 0 || OpeningWispHealTimers.Num() > 0 || OpeningWispsHealed > 0)
+	{
+		FString HealText;
+		if (OpeningWispHealTimers.Num() > 0)
+		{
+			HealText = FString::Printf(TEXT("Wait for the wisps in the hot springs (%d)."), OpeningWispHealTimers.Num());
+		}
+		else if (OpeningWispsCarried > 0)
+		{
+			HealText = FString::Printf(TEXT("Give a wisp herb at the hot springs (carrying %d)."), OpeningWispsCarried);
+		}
+		else
+		{
+			HealText = FString::Printf(TEXT("Heal the wisps at the hot springs (%d/3)."), OpeningWispsHealed);
+		}
+		Add(*HealText, OpeningWispsHealed >= 3);
+	}
 	QuestLog->SetChain(FName(TEXT("Night")), Steps);
+}
+
+void AHomeWorldCharacter::UpdateOpeningWispLegs()
+{
+	if (OpeningWispsHealed <= 0)
+	{
+		return;
+	}
+	while (OpeningWispLegMeshes.Num() < OpeningWispsHealed)
+	{
+		const FString Name = FString::Printf(TEXT("OpeningWispLeg%d"), OpeningWispLegMeshes.Num() + 1);
+		UStaticMeshComponent* Wisp = MakeOpeningNightWisp(this, *Name);
+		if (!Wisp)
+		{
+			return;
+		}
+		Wisp->SetRelativeScale3D(FVector(0.25f));
+		OpeningWispLegMeshes.Add(Wisp);
+		UE_LOG(LogTemp, Log, TEXT("opening_night: follower %d at the legs"), OpeningWispLegMeshes.Num());
+	}
+	const UWorld* World = GetWorld();
+	const float Time = World ? World->GetTimeSeconds() : 0.f;
+	const FVector Base = GetActorLocation();
+	const FVector Forward = GetActorForwardVector();
+	const FVector Right = GetActorRightVector();
+	// Three places around the feet. Past three, the slots repeat.
+	static const FVector2D Slots[] = {
+		FVector2D(34.f, -20.f),
+		FVector2D(-34.f, -20.f),
+		FVector2D(0.f, -52.f),
+	};
+	for (int32 Index = 0; Index < OpeningWispLegMeshes.Num(); ++Index)
+	{
+		const FVector2D& Slot = Slots[Index % 3];
+		const float Bob = FMath::Sin(Time * 3.f + Index * 1.7f) * 4.f;
+		const FVector Point = Base + Right * Slot.X + Forward * Slot.Y + FVector(0.f, 0.f, -52.f + Bob);
+		OpeningWispLegMeshes[Index]->SetWorldLocation(Point);
+	}
 }
 
 bool AHomeWorldCharacter::TryOpeningBedInFront()
@@ -684,6 +754,16 @@ bool AHomeWorldCharacter::TryOpeningBedInFront()
 	if (bOpeningNightSpirit)
 	{
 		return true;
+	}
+	return BeginOpeningNight();
+}
+
+bool AHomeWorldCharacter::BeginOpeningNight()
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
 	}
 	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
 	if (!TimeOfDay)
@@ -747,6 +827,747 @@ bool AHomeWorldCharacter::TryOpeningNightSetInFront()
 	}
 	UE_LOG(LogTemp, Log, TEXT("opening_night: collect the wisp"));
 	return true;
+}
+
+namespace
+{
+	/** First pass. Luke tunes the heal time and the herb cost after the playtest. */
+	constexpr float OpeningWispHealSeconds = 20.f;
+	constexpr float OpeningHotSpringRangeCm = 600.f;
+}
+
+bool AHomeWorldCharacter::TryOpeningHotSpringHealInFront()
+{
+	if (!bOpeningNightSpirit)
+	{
+		return false;
+	}
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+	AActor* Spring = FindOpeningNamed(World, TEXT("Water_HotSpring"), true);
+	if (!Spring)
+	{
+		Spring = FindOpeningNamed(World, TEXT("Water_HotSpring"), false);
+	}
+	if (!Spring || FVector::Dist2D(GetActorLocation(), Spring->GetActorLocation()) > OpeningHotSpringRangeCm)
+	{
+		return false;
+	}
+	if (OpeningWispsCarried <= 0)
+	{
+		UE_LOG(LogTemp, Log, TEXT("opening_night: the hot springs need a damaged wisp (carried 0)"));
+		return true;
+	}
+	if (OpeningHerbTenths <= 0)
+	{
+		UE_LOG(LogTemp, Log, TEXT("opening_night: the hot springs need one herb (carried wisps %d, banked %d)"),
+			OpeningWispsCarried, OpeningHerbTenths);
+		return true;
+	}
+	--OpeningWispsCarried;
+	--OpeningHerbTenths;
+	OpeningWispHealTimers.Add(OpeningWispHealSeconds);
+	UE_LOG(LogTemp, Log, TEXT("opening_night: wisp in the hot springs with one herb (carried %d, healing %d, herbs %d)"),
+		OpeningWispsCarried, OpeningWispHealTimers.Num(), OpeningHerbTenths);
+	return true;
+}
+
+void AHomeWorldCharacter::DebugHealOpeningWispAtSpring()
+{
+	const bool bOk = TryOpeningHotSpringHealInFront();
+	UE_LOG(LogTemp, Log, TEXT("HomeWorld: hw.Night.Heal %s (carried %d, healing %d, herbs %d)"),
+		bOk ? TEXT("ok") : TEXT("not at the hot springs"),
+		OpeningWispsCarried, OpeningWispHealTimers.Num(), OpeningHerbTenths);
+}
+
+void AHomeWorldCharacter::DebugSeedOpeningWispLoop(int32 Carried, int32 Herbs)
+{
+	const int32 Seeded = FMath::Clamp(Carried, 0, 3);
+	OpeningWispsCollected = FMath::Max(OpeningWispsCollected, Seeded);
+	OpeningWispsCarried = Seeded;
+	OpeningHerbTenths = FMath::Max(OpeningHerbTenths, FMath::Clamp(Herbs, 0, 9));
+	UE_LOG(LogTemp, Log, TEXT("opening_night: test seed - collected %d, carried %d, herbs %d"),
+		OpeningWispsCollected, OpeningWispsCarried, OpeningHerbTenths);
+}
+
+namespace
+{
+	/** hw.Playtest.FastForward stops: the beat the player wants to test in person. */
+	constexpr int32 PlaytestBeatSpirit = 1;
+	constexpr int32 PlaytestBeatHerbs = 2;
+	constexpr int32 PlaytestBeatBackpack = 3;
+	constexpr int32 PlaytestBeatKettle = 4;
+	constexpr int32 PlaytestBeatStation = 5;
+	constexpr int32 PlaytestBeatDog = 6;
+	constexpr int32 PlaytestBeatFish = 7;
+	constexpr int32 PlaytestBeatSleep = 8;
+	constexpr int32 PlaytestBeatNight = 9;
+	constexpr int32 PlaytestBeatCollect = 10;
+	constexpr int32 PlaytestBeatHeal = 11;
+
+	/** The one runner step the player takes himself. 0 = every step runs (night and the loop). */
+	int32 PlaytestSkipStep(int32 Beat)
+	{
+		switch (Beat)
+		{
+		case PlaytestBeatSpirit: return 1;
+		case PlaytestBeatHerbs: return 2;
+		case PlaytestBeatBackpack: return 3;
+		case PlaytestBeatKettle: return 5;
+		case PlaytestBeatStation: return 6;
+		case PlaytestBeatDog: return 7;
+		case PlaytestBeatFish: return 8;
+		case PlaytestBeatSleep: return 9;
+		default: return 0;
+		}
+	}
+
+	const TCHAR* PlaytestBeatName(int32 Beat)
+	{
+		switch (Beat)
+		{
+		case PlaytestBeatSpirit: return TEXT("spirit");
+		case PlaytestBeatHerbs: return TEXT("herbs");
+		case PlaytestBeatBackpack: return TEXT("backpack");
+		case PlaytestBeatKettle: return TEXT("kettle");
+		case PlaytestBeatStation: return TEXT("station");
+		case PlaytestBeatDog: return TEXT("dog");
+		case PlaytestBeatFish: return TEXT("fish");
+		case PlaytestBeatSleep: return TEXT("sleep");
+		case PlaytestBeatNight: return TEXT("night");
+		case PlaytestBeatCollect: return TEXT("collect");
+		case PlaytestBeatHeal: return TEXT("heal");
+		default: return TEXT("night");
+		}
+	}
+
+	/** Beat words (lowercased, spaces folded out) to a stop. 0 = unknown. */
+	int32 PlaytestBeatFromText(const FString& Text)
+	{
+		FString Key = Text.ToLower();
+		Key.ReplaceInline(TEXT("_"), TEXT(""));
+		Key.ReplaceInline(TEXT(" "), TEXT(""));
+		if (Key.IsEmpty())
+		{
+			return PlaytestBeatNight;
+		}
+		// Order matters here: "herb collection" carries both herb and collect.
+		if (Key.Contains(TEXT("heal")) || Key.Contains(TEXT("spring"))) return PlaytestBeatHeal;
+		if (Key.Contains(TEXT("herb")) || Key.Contains(TEXT("garden"))) return PlaytestBeatHerbs;
+		if (Key.Contains(TEXT("spirit"))) return PlaytestBeatSpirit;
+		if (Key.Contains(TEXT("backpack")) || Key.Contains(TEXT("partner")) || Key.Contains(TEXT("gift"))) return PlaytestBeatBackpack;
+		if (Key.Contains(TEXT("kettle")) || Key.Contains(TEXT("tea"))) return PlaytestBeatKettle;
+		if (Key.Contains(TEXT("station")) || Key.Contains(TEXT("counter")) || Key.Contains(TEXT("mix"))) return PlaytestBeatStation;
+		if (Key.Contains(TEXT("dog")) || Key.Contains(TEXT("grace"))) return PlaytestBeatDog;
+		if (Key.Contains(TEXT("fish")) || Key.Contains(TEXT("pond"))) return PlaytestBeatFish;
+		if (Key.Contains(TEXT("sleep")) || Key.Contains(TEXT("bed"))) return PlaytestBeatSleep;
+		if (Key.Contains(TEXT("wisp")) || Key.Contains(TEXT("collect"))) return PlaytestBeatCollect;
+		if (Key.Contains(TEXT("night"))) return PlaytestBeatNight;
+		return 0;
+	}
+
+	AActor* FindOpeningTaggedActor(UWorld* World, const TCHAR* Tag, const TCHAR* AltTag = nullptr)
+	{
+		for (TActorIterator<AActor> It(World); It; ++It)
+		{
+			if (It->ActorHasTag(FName(Tag)) || (AltTag && It->ActorHasTag(FName(AltTag))))
+			{
+				return *It;
+			}
+		}
+		return nullptr;
+	}
+}
+
+void AHomeWorldCharacter::DebugFastForwardOpening(const FString& Beat)
+{
+	if (Beat.Equals(TEXT("list"), ESearchCase::IgnoreCase))
+	{
+		UE_LOG(LogTemp, Log, TEXT("playtest_ff: beats: spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect, heal"));
+		return;
+	}
+	if (DebugFastForwardStep > 0)
+	{
+		UE_LOG(LogTemp, Log, TEXT("playtest_ff: already running (step %d)"), DebugFastForwardStep);
+		return;
+	}
+	const int32 Stop = PlaytestBeatFromText(Beat);
+	if (Stop == 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("playtest_ff: beat '%s' unknown - spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect, heal"), *Beat);
+		return;
+	}
+	if (bOpeningNightSpirit)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("playtest_ff: already night - start a fresh PIE"));
+		return;
+	}
+	DebugFastForwardStop = Stop;
+	DebugFastForwardStep = 1;
+	DebugFastForwardStepClock = 0.f;
+	UE_LOG(LogTemp, Log, TEXT("playtest_ff: start -> %s. The beats before it run for real, then it is yours."), PlaytestBeatName(Stop));
+}
+
+void AHomeWorldCharacter::TickDebugFastForward(float DeltaTime)
+{
+	if (DebugFastForwardStep <= 0)
+	{
+		return;
+	}
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		DebugFastForwardStep = 0;
+		return;
+	}
+	DebugFastForwardStepClock += DeltaTime;
+	auto Next = [this](int32 Step)
+	{
+		DebugFastForwardStep = Step;
+		DebugFastForwardStepClock = 0.f;
+	};
+	switch (DebugFastForwardStep)
+	{
+	case 1:
+	{
+		if (PlaytestSkipStep(DebugFastForwardStop) == 1)
+		{
+			ReadyForOpeningPlaytest();
+			Next(0);
+			return;
+		}
+		bool bClaimed = false;
+		for (TActorIterator<AHomeWorldOpeningReveal> It(World); It; ++It)
+		{
+			bClaimed = It->TryClaim(this);
+			break;
+		}
+		if (!bClaimed)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("playtest_ff: 1 spirit claim failed - is this L_SizeTest?"));
+			Next(0);
+			return;
+		}
+		bOpeningSpiritClaimed = true;
+		if (SizeTestWisp)
+		{
+			SizeTestWisp->SetHiddenInGame(false);
+			SizeTestWisp->SetVisibility(true);
+		}
+		UE_LOG(LogTemp, Log, TEXT("playtest_ff: 1 spirit claimed"));
+		Next(2);
+		break;
+	}
+	case 2:
+	{
+		if (PlaytestSkipStep(DebugFastForwardStop) == 2)
+		{
+			ReadyForOpeningPlaytest();
+			Next(0);
+			return;
+		}
+		AActor* West = nullptr;
+		AActor* East = nullptr;
+		for (TActorIterator<AActor> It(World); It; ++It)
+		{
+			if (!West && It->ActorHasTag(FName(TEXT("NODE_GARDEN_WEST"))))
+			{
+				West = *It;
+			}
+			else if (!East && It->ActorHasTag(FName(TEXT("NODE_GARDEN_EAST"))))
+			{
+				East = *It;
+			}
+		}
+		if (!West || !East)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("playtest_ff: 2 herb beds missing (west %d, east %d)"),
+				West ? 1 : 0, East ? 1 : 0);
+			Next(0);
+			return;
+		}
+		StartOpeningHerbRune(West);
+		FinishOpeningHerbRune(10);
+		StartOpeningHerbRune(East);
+		FinishOpeningHerbRune(10);
+		UE_LOG(LogTemp, Log, TEXT("playtest_ff: 2 herbs gathered %d (east %d, west %d), banked %d"),
+			OpeningHerbsGathered, bOpeningHerbFromEast ? 1 : 0, bOpeningHerbFromWest ? 1 : 0, OpeningHerbTenths);
+		Next(3);
+		break;
+	}
+	case 3:
+	{
+		if (PlaytestSkipStep(DebugFastForwardStop) == 3)
+		{
+			ReadyForOpeningPlaytest();
+			Next(0);
+			return;
+		}
+		AHomeWorldOpeningReveal* Reveal = nullptr;
+		for (TActorIterator<AHomeWorldOpeningReveal> It(World); It; ++It)
+		{
+			Reveal = *It;
+			break;
+		}
+		if (!Reveal)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("playtest_ff: 3 no opening reveal"));
+			Next(0);
+			return;
+		}
+		if (!Reveal->IsPartnerWaiting())
+		{
+			Reveal->TryLeadPartner();
+			if (DebugFastForwardStepClock > 20.f)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("playtest_ff: 3 partner walk timed out"));
+				Next(0);
+			}
+			break;
+		}
+		UE_LOG(LogTemp, Log, TEXT("playtest_ff: 3 partner waiting (%.1fs)"), DebugFastForwardStepClock);
+		Next(4);
+		break;
+	}
+	case 4:
+		if (PlaytestSkipStep(DebugFastForwardStop) == 4)
+		{
+			ReadyForOpeningPlaytest();
+			Next(0);
+			return;
+		}
+		if (!TryOpeningArmorGift())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("playtest_ff: 4 backpack failed"));
+			Next(0);
+			return;
+		}
+		UE_LOG(LogTemp, Log, TEXT("playtest_ff: 4 backpack"));
+		Next(5);
+		break;
+	case 5:
+		if (PlaytestSkipStep(DebugFastForwardStop) == 5)
+		{
+			ReadyForOpeningPlaytest();
+			Next(0);
+			return;
+		}
+		if (!TryBrewNodeKettleTea())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("playtest_ff: 5 kettle failed (day body only)"));
+			Next(0);
+			return;
+		}
+		UE_LOG(LogTemp, Log, TEXT("playtest_ff: 5 kettle brewed, banked %d"), OpeningHerbTenths);
+		Next(6);
+		break;
+	case 6:
+		if (PlaytestSkipStep(DebugFastForwardStop) == 6)
+		{
+			ReadyForOpeningPlaytest();
+			Next(0);
+			return;
+		}
+		UseOpeningConsumableStation();
+		UseOpeningConsumableStation();
+		if (OpeningMixedHerbs <= 0)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("playtest_ff: 6 station mix failed"));
+			Next(0);
+			return;
+		}
+		UE_LOG(LogTemp, Log, TEXT("playtest_ff: 6 station open, mixed herb %d, banked %d"), OpeningMixedHerbs, OpeningHerbTenths);
+		Next(7);
+		break;
+	case 7:
+	{
+		if (PlaytestSkipStep(DebugFastForwardStop) == 7)
+		{
+			ReadyForOpeningPlaytest();
+			Next(0);
+			return;
+		}
+		AHomeWorldOpeningDog* Dog = nullptr;
+		for (TActorIterator<AHomeWorldOpeningDog> It(World); It; ++It)
+		{
+			Dog = *It;
+			break;
+		}
+		if (!Dog)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("playtest_ff: 7 no dog"));
+			Next(0);
+			return;
+		}
+		OpeningDog = Dog;
+		if (!Dog->IsWrathEased())
+		{
+			StartOpeningDogDraw(Dog);
+			SucceedOpeningDogTrace(Dog);
+		}
+		if (!Dog->TryTameWithMixedHerb(this))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("playtest_ff: 7 dog refused the offering (tamed %d, eased %d)"),
+				Dog->IsDogTamed() ? 1 : 0, Dog->IsWrathEased() ? 1 : 0);
+			Next(0);
+			return;
+		}
+		--OpeningMixedHerbs;
+		for (TActorIterator<AHomeWorldOpeningReveal> It(World); It; ++It)
+		{
+			It->BeginChildReturnHome();
+			break;
+		}
+		UE_LOG(LogTemp, Log, TEXT("playtest_ff: 7 dog tamed, mixed herb %d"), OpeningMixedHerbs);
+		Next(8);
+		break;
+	}
+	case 8:
+	{
+		if (PlaytestSkipStep(DebugFastForwardStop) == 8)
+		{
+			ReadyForOpeningPlaytest();
+			Next(0);
+			return;
+		}
+		AActor* Pond = FindOpeningNamed(World, TEXT("Water_Pond"), true);
+		if (!Pond)
+		{
+			Pond = FindOpeningNamed(World, TEXT("Water_Pond"), false);
+		}
+		if (Pond)
+		{
+			FVector Origin = FVector::ZeroVector;
+			FVector Extent = FVector::ZeroVector;
+			Pond->GetActorBounds(false, Origin, Extent);
+			FVector Loc = GetActorLocation();
+			Loc.X = Origin.X + Extent.X + 100.f;
+			Loc.Y = Origin.Y;
+			SetActorLocation(Loc, false, nullptr, ETeleportType::TeleportPhysics);
+		}
+		if (!TryOpeningFish())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("playtest_ff: 8 fish failed (pond %d, tamed %d)"),
+				Pond ? 1 : 0, (OpeningDog && OpeningDog->IsDogTamed()) ? 1 : 0);
+			Next(0);
+			return;
+		}
+		UE_LOG(LogTemp, Log, TEXT("playtest_ff: 8 fish"));
+		Next(9);
+		break;
+	}
+	case 9:
+	{
+		if (PlaytestSkipStep(DebugFastForwardStop) == 9)
+		{
+			ReadyForOpeningPlaytest();
+			Next(0);
+			return;
+		}
+		AActor* Bed = FindOpeningNamed(World, TEXT("SM_Size_Bed"), true);
+		if (Bed)
+		{
+			FVector Loc = Bed->GetActorLocation();
+			Loc.Y -= 180.f;
+			Loc.Z = GetActorLocation().Z;
+			SetActorLocation(Loc, false, nullptr, ETeleportType::TeleportPhysics);
+		}
+		if (!BeginOpeningNight())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("playtest_ff: 9 night failed"));
+			Next(0);
+			return;
+		}
+		UE_LOG(LogTemp, Log, TEXT("playtest_ff: 9 night ready at the bed - %s"), *GetOpeningTrackerText());
+		ReadyForOpeningPlaytest();
+		Next(0);
+		break;
+	}
+	default:
+		Next(0);
+		break;
+	}
+}
+
+void AHomeWorldCharacter::ReadyForOpeningPlaytest()
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+	AActor* Target = nullptr;
+	float Distance = 260.f;
+	bool bPondEdge = false;
+	FString Note;
+	switch (DebugFastForwardStop)
+	{
+	case PlaytestBeatSpirit:
+	{
+		for (TActorIterator<AHomeWorldOpeningReveal> It(World); It; ++It)
+		{
+			Target = *It;
+			break;
+		}
+		Note = TEXT("E at the spirit");
+		break;
+	}
+	case PlaytestBeatHerbs:
+		Target = FindOpeningTaggedActor(World, TEXT("NODE_GARDEN_EAST"));
+		Note = TEXT("E at the east bed, draw the trace heart");
+		break;
+	case PlaytestBeatBackpack:
+		Target = FindOpeningTaggedActor(World, TEXT("NPC_PARTNER"));
+		Note = TEXT("E at the partner: the backpack");
+		break;
+	case PlaytestBeatKettle:
+		Target = FindOpeningTaggedActor(World, TEXT("KettleCounter"), TEXT("NODE_CONSUMABLE_STATION"));
+		Distance = 220.f;
+		Note = TEXT("E at the counter: open, mix, then brew");
+		break;
+	case PlaytestBeatStation:
+		Target = FindOpeningTaggedActor(World, TEXT("NODE_CONSUMABLE_STATION"));
+		Distance = 220.f;
+		Note = TEXT("E at the counter: open, then mix");
+		break;
+	case PlaytestBeatDog:
+	{
+		for (TActorIterator<AHomeWorldOpeningDog> It(World); It; ++It)
+		{
+			Target = *It;
+			break;
+		}
+		Distance = 650.f;
+		Note = TEXT("walk up slowly, draw the Grace trace, then E");
+		break;
+	}
+	case PlaytestBeatFish:
+		Target = FindOpeningNamed(World, TEXT("Water_Pond"), true);
+		bPondEdge = true;
+		Note = TEXT("E at the pond bank, one fish");
+		break;
+	case PlaytestBeatSleep:
+		Target = FindOpeningNamed(World, TEXT("SM_Size_Bed"), true);
+		Distance = 180.f;
+		Note = TEXT("E at the bed: sleep");
+		break;
+	case PlaytestBeatNight:
+		Note = TEXT("night is on, the bed is behind you");
+		break;
+	case PlaytestBeatCollect:
+		EnsureOpeningNightProps();
+		Target = OpeningCopseWisp;
+		Distance = 350.f;
+		Note = TEXT("E at the wisp, click the heart");
+		break;
+	case PlaytestBeatHeal:
+		EnsureOpeningNightProps();
+		CollectNightWispsForPlaytest();
+		Target = FindOpeningNamed(World, TEXT("Water_HotSpring"), true);
+		Distance = 470.f;
+		Note = TEXT("E at the hot springs, the heal takes 20s");
+		break;
+	default:
+		break;
+	}
+	if (Target)
+	{
+		if (bPondEdge)
+		{
+			PlaceForOpeningPlaytestAtPond(Target);
+		}
+		else
+		{
+			PlaceForOpeningPlaytest(Target, Distance);
+		}
+	}
+	UE_LOG(LogTemp, Log, TEXT("playtest_ff: ready for %s - %s"), PlaytestBeatName(DebugFastForwardStop), *Note);
+	UE_LOG(LogTemp, Log, TEXT("playtest_ff: you are at %s, target %s"),
+		*GetActorLocation().ToCompactString(),
+		Target ? *Target->GetActorNameOrLabel() : TEXT("(none)"));
+}
+
+void AHomeWorldCharacter::PlaceForOpeningPlaytest(AActor* Target, float Distance)
+{
+	UWorld* World = GetWorld();
+	if (!World || !Target)
+	{
+		return;
+	}
+	const FVector TargetLoc = Target->GetActorLocation();
+	const FVector From = GetActorLocation();
+	FVector Approach = TargetLoc - From;
+	Approach.Z = 0.f;
+	if (!Approach.Normalize())
+	{
+		Approach = FVector(1.f, 0.f, 0.f);
+	}
+	FVector Forward = Target->GetActorForwardVector();
+	Forward.Z = 0.f;
+	if (!Forward.Normalize())
+	{
+		Forward = Approach;
+	}
+	const FVector Side = FVector::CrossProduct(FVector::UpVector, Forward);
+	// Try the side the player comes from first, then the prop's own facing: a counter inside
+	// the house blocks the outside approach and the next direction is the one that works.
+	const FVector Candidates[] = { Approach, Forward, -Forward, Side, -Side, -Approach };
+	const float GroundZ = FMath::Max(From.Z, TargetLoc.Z);
+	FVector AimTarget = TargetLoc;
+	FVector AimExtent = FVector::ZeroVector;
+	Target->GetActorBounds(false, AimTarget, AimExtent);
+	if (AimTarget.IsNearlyZero() && !TargetLoc.IsNearlyZero())
+	{
+		AimTarget = TargetLoc;
+	}
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	// Moving NPCs and the invisible interaction boxes must not pick the side: a child walking
+	// through the kitchen would otherwise veto every spot around the counter.
+	TArray<AActor*> Guests;
+	TArray<UPrimitiveComponent*> HelperBoxes;
+	for (TActorIterator<AActor> It(World); It; ++It)
+	{
+		if (It->ActorHasTag(TEXT("NPC_PARTNER")) || It->ActorHasTag(TEXT("NPC_CHILD")))
+		{
+			Guests.Add(*It);
+		}
+		TArray<UPrimitiveComponent*> Comps;
+		It->GetComponents<UPrimitiveComponent>(Comps);
+		for (UPrimitiveComponent* Comp : Comps)
+		{
+			if (Comp && Comp->GetName().StartsWith(TEXT("InteractBounds")))
+			{
+				HelperBoxes.Add(Comp);
+			}
+		}
+	}
+	Params.AddIgnoredActors(Guests);
+	for (UPrimitiveComponent* Box : HelperBoxes)
+	{
+		Params.AddIgnoredComponent(Box);
+	}
+	// A candidate is good when a flat line at the prop's own height reaches it: that clears the
+	// counter top and the kettle spout, while a cabin wall (500 cm tall) still blocks it. Among
+	// those, prefer the most room behind the player: the camera boom needs it, and the same
+	// counter is boxed in from the outside and open from inside the kitchen.
+	FVector Chosen = TargetLoc - Approach * Distance;
+	bool bAimClear = false;
+	float BestRoom = -1.f;
+	for (const FVector& Dir : Candidates)
+	{
+		const FVector Candidate = TargetLoc - Dir * Distance;
+		const FVector FlatFrom(Candidate.X, Candidate.Y, AimTarget.Z);
+		const FVector FlatTo(AimTarget.X, AimTarget.Y, AimTarget.Z);
+		FHitResult AimHit;
+		if (World->LineTraceSingleByChannel(AimHit, FlatFrom, FlatTo, ECC_Visibility, Params)
+			&& AimHit.GetActor() != Target)
+		{
+			continue;
+		}
+		if (!bAimClear)
+		{
+			Chosen = Candidate;
+			bAimClear = true;
+		}
+		FHitResult BoomHit;
+		const FVector Eye(Candidate.X, Candidate.Y, GroundZ + 90.f);
+		const FVector Behind(Candidate.X - Dir.X * 330.f, Candidate.Y - Dir.Y * 330.f, GroundZ + 150.f);
+		const bool bBoomHit = World->LineTraceSingleByChannel(BoomHit, Eye, Behind, ECC_Camera, Params);
+		const float Room = bBoomHit ? BoomHit.Distance : 330.f;
+		if (Room > BestRoom)
+		{
+			BestRoom = Room;
+			Chosen = Candidate;
+		}
+	}
+	const FVector Loc(Chosen.X, Chosen.Y, GroundZ + 10.f);
+	SetActorLocation(Loc, false, nullptr, ETeleportType::TeleportPhysics);
+	if (UCharacterMovementComponent* Move = GetCharacterMovement())
+	{
+		Move->StopMovementImmediately();
+	}
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+		// Keep the first look near level: aiming at a counter's centre would pitch the view
+		// 30 degrees down and fill the screen with the character's back.
+		const float EyeZ = GroundZ + 90.f;
+		const FVector LookAt(TargetLoc.X, TargetLoc.Y, FMath::Clamp(TargetLoc.Z + 30.f, EyeZ - 60.f, EyeZ + 60.f));
+		PC->SetControlRotation((LookAt - FVector(Loc.X, Loc.Y, EyeZ)).Rotation());
+	}
+	if (!bAimClear)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("playtest_ff: no clear side at %s - dropped on the approach line"), *Target->GetActorNameOrLabel());
+	}
+	else if (BestRoom < 330.f)
+	{
+		UE_LOG(LogTemp, Log, TEXT("playtest_ff: tight spot at %s - %.0f cm behind, the camera settles once you step"),
+			*Target->GetActorNameOrLabel(), BestRoom);
+	}
+}
+
+void AHomeWorldCharacter::PlaceForOpeningPlaytestAtPond(AActor* Pond)
+{
+	if (!Pond)
+	{
+		return;
+	}
+	FVector Origin = FVector::ZeroVector;
+	FVector Extent = FVector::ZeroVector;
+	Pond->GetActorBounds(false, Origin, Extent);
+	FVector Loc = GetActorLocation();
+	Loc.X = Origin.X + Extent.X + 100.f;
+	Loc.Y = Origin.Y;
+	SetActorLocation(Loc, false, nullptr, ETeleportType::TeleportPhysics);
+	if (UCharacterMovementComponent* Move = GetCharacterMovement())
+	{
+		Move->StopMovementImmediately();
+	}
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+		PC->SetControlRotation((Origin + FVector(0.f, 0.f, 40.f) - Loc).Rotation());
+	}
+}
+
+void AHomeWorldCharacter::CollectNightWispsForPlaytest()
+{
+	AActor* Wisps[] = { OpeningCopseWisp, OpeningPondWisp, OpeningSpringWisp };
+	int32 Collected = 0;
+	for (AActor* Wisp : Wisps)
+	{
+		if (!Wisp || Wisp->IsHidden() || bOpeningRuneActive)
+		{
+			continue;
+		}
+		bOpeningWispCollect = true;
+		StartOpeningHerbRune(Wisp);
+		if (!bOpeningRuneActive)
+		{
+			bOpeningWispCollect = false;
+			continue;
+		}
+		FinishOpeningHerbRune(10);
+		++Collected;
+	}
+	UE_LOG(LogTemp, Log, TEXT("playtest_ff: %d night wisps in the backpack (carried %d)"), Collected, OpeningWispsCarried);
+}
+
+FString AHomeWorldCharacter::GetOpeningTrackerText() const
+{
+	if (!QuestLog)
+	{
+		return TEXT("(no quest log)");
+	}
+	const TArray<FHomeWorldQuestStep>& Steps = QuestLog->GetDisplayedSteps();
+	TArray<FString> Lines;
+	for (const FHomeWorldQuestStep& Step : Steps)
+	{
+		Lines.Add(FString::Printf(TEXT("%s%s"), Step.bDone ? TEXT("[x] ") : TEXT("[ ] "), *Step.Text));
+	}
+	return FString::Join(Lines, TEXT(" | "));
 }
 
 void AHomeWorldCharacter::ApplyOpeningWalkSpeed()
@@ -1010,6 +1831,41 @@ bool AHomeWorldCharacter::TryOpeningZiplineInFront()
 	return Line->TryRide(this);
 }
 
+void AHomeWorldCharacter::UseOpeningConsumableStation()
+{
+	if (!bOpeningConsumableOpen)
+	{
+		if (!bOpeningSpiritClaimed || OpeningHerbTenths <= 0)
+		{
+			LogOpening(FString::Printf(TEXT("opening_station: consumable locked - need the herb and the spirit (spirit %d, banked %d)"),
+				bOpeningSpiritClaimed ? 1 : 0, OpeningHerbTenths));
+			ShowInteractFeedback(TEXT("The station needs the herb and the spirit."), FColor::Yellow);
+			return;
+		}
+		bOpeningConsumableOpen = true;
+		UE_LOG(LogTemp, Log, TEXT("opening_station: consumable open"));
+		ShowInteractFeedback(TEXT("CONSUMABLE: the station is open"), FColor::Green);
+		return;
+	}
+	// Open. Its one output is the mixed herb the dog beat spends. Once the herb is
+	// carried, the same press brews at the kettle that stands on this counter.
+	if (OpeningMixedHerbs <= 0)
+	{
+		if (OpeningHerbTenths <= 0)
+		{
+			LogOpening(FString::Printf(TEXT("opening_station: mixed herb failed - need herb chunks (banked %d)"), OpeningHerbTenths));
+			ShowInteractFeedback(TEXT("The station needs the herb."), FColor::Yellow);
+			return;
+		}
+		--OpeningHerbTenths;
+		++OpeningMixedHerbs;
+		UE_LOG(LogTemp, Log, TEXT("opening_station: mixed herb made (carried %d, banked %d)"), OpeningMixedHerbs, OpeningHerbTenths);
+		ShowInteractFeedback(TEXT("CONSUMABLE: herb mixed with a spirit"), FColor::Green);
+		return;
+	}
+	TryBrewNodeKettleTea();
+}
+
 bool AHomeWorldCharacter::TryOpeningStationInFront()
 {
 	FHitResult Hit;
@@ -1020,37 +1876,7 @@ bool AHomeWorldCharacter::TryOpeningStationInFront()
 	}
 	if (HomeWorldT0BeatNodes::ActorCarriesTagFor(HitActor, HomeWorldT0BeatNodes::ENode::ConsumableStation))
 	{
-		if (!bOpeningConsumableOpen)
-		{
-			if (!bOpeningSpiritClaimed || OpeningHerbTenths <= 0)
-			{
-				LogOpening(FString::Printf(TEXT("opening_station: consumable locked - need the herb and the spirit (spirit %d, banked %d)"),
-					bOpeningSpiritClaimed ? 1 : 0, OpeningHerbTenths));
-				ShowInteractFeedback(TEXT("The station needs the herb and the spirit."), FColor::Yellow);
-				return true;
-			}
-			bOpeningConsumableOpen = true;
-			UE_LOG(LogTemp, Log, TEXT("opening_station: consumable open"));
-			ShowInteractFeedback(TEXT("CONSUMABLE: the station is open"), FColor::Green);
-			return true;
-		}
-		// Open. Its one output is the mixed herb the dog beat spends. Once the herb is
-		// carried, the same press brews at the kettle that stands on this counter.
-		if (OpeningMixedHerbs <= 0)
-		{
-			if (OpeningHerbTenths <= 0)
-			{
-				LogOpening(FString::Printf(TEXT("opening_station: mixed herb failed - need herb chunks (banked %d)"), OpeningHerbTenths));
-				ShowInteractFeedback(TEXT("The station needs the herb."), FColor::Yellow);
-				return true;
-			}
-			--OpeningHerbTenths;
-			++OpeningMixedHerbs;
-			UE_LOG(LogTemp, Log, TEXT("opening_station: mixed herb made (carried %d, banked %d)"), OpeningMixedHerbs, OpeningHerbTenths);
-			ShowInteractFeedback(TEXT("CONSUMABLE: herb mixed with a spirit"), FColor::Green);
-			return true;
-		}
-		TryBrewNodeKettleTea();
+		UseOpeningConsumableStation();
 		return true;
 	}
 	if (!HomeWorldT0BeatNodes::ActorCarriesTagFor(HitActor, HomeWorldT0BeatNodes::ENode::ArmorTable))
@@ -1580,6 +2406,7 @@ void AHomeWorldCharacter::RefreshOpeningQuest()
 	Facts.bHasMixedHerb = OpeningMixedHerbs > 0;
 	Facts.bBackpack = bOpeningArmorGiftGiven;
 	Facts.bFishCaught = bOpeningFishCaught;
+	Facts.bSlept = bOpeningNightSpirit;
 	if (OpeningDog)
 	{
 		const float Dist = FVector::Dist2D(GetActorLocation(), OpeningDog->GetActorLocation());
@@ -1700,7 +2527,9 @@ void AHomeWorldCharacter::FinishOpeningHerbRune(int32 Tenths)
 			Collected->SetActorHiddenInGame(true);
 			Collected->SetActorEnableCollision(false);
 			++OpeningWispsCollected;
-			UE_LOG(LogTemp, Log, TEXT("opening_night: wisp collected %d/3"), OpeningWispsCollected);
+			++OpeningWispsCarried;
+			UE_LOG(LogTemp, Log, TEXT("opening_night: wisp collected %d/3, in the backpack (carried %d)"),
+				OpeningWispsCollected, OpeningWispsCarried);
 		}
 		return;
 	}
@@ -1963,6 +2792,7 @@ static void PaintGreyboxMesh(AActor* Actor, const TCHAR* MaterialPath)
 
 void AHomeWorldCharacter::UpdateSizeTestWisp(float DeltaTime)
 {
+	TickDebugFastForward(DeltaTime);
 	if (UWorld* StationWorld = GetWorld())
 	{
 		const TCHAR* OpenPath = TEXT("/Game/HomeWorld/Materials/Instances/MI_Greybox_Olive.MI_Greybox_Olive");

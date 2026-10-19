@@ -21,6 +21,19 @@ namespace HomeWorldWisp
 	/** Gap above a short prop, cm. The wisp floats above it, not beside it. */
 	inline constexpr float HoverAboveCm = 40.f;
 
+	/** Drawn heart half-width, cm. The rune's near edge must clear the object by this much. */
+	inline constexpr float HeartHalfWidthCm = 83.f;
+
+	/** Air between the heart's near edge and the object's face, cm. */
+	inline constexpr float HeartGapCm = 35.f;
+
+	/** Floor and cap on the side offset, cm from the object's center. */
+	inline constexpr float HeartSideMinCm = 140.f;
+	inline constexpr float HeartSideMaxCm = 360.f;
+
+	/** The heart center never sits closer than this above the object's top, cm. */
+	inline constexpr float HeartAboveCm = 30.f;
+
 	/**
 	 * Rune ribbons are ignored.
 	 * If the mesh top reaches head height, the wisp stays at head height, 40 cm to the viewer's right of center.
@@ -31,5 +44,19 @@ namespace HomeWorldWisp
 		const FVector& ViewerWorld,
 		float HeadZ,
 		float TimeSeconds,
+		FVector& OutWorld);
+
+	/** The mesh bounds the hover and heart rules measure, rune ribbons excluded. */
+	bool MeasureBounds(const AActor* Target, FVector& OutCenter, FVector& OutExtent);
+
+	/**
+	 * The trace heart sits beside the object, not on top of it: the same mesh bounds and viewer
+	 * side rule as the hover wisp, widened by the heart's half-width so the rune clears the mesh.
+	 * The center is never lower than BaseZ, and never inside the object's top.
+	 */
+	bool HeartPoint(
+		const AActor* Target,
+		const FVector& ViewerWorld,
+		float BaseZ,
 		FVector& OutWorld);
 }
