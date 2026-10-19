@@ -292,6 +292,24 @@ For each entry use:
 
 ## Entries
 
+### SizeTest quest list is not AHomeWorldHUD::DrawHUD
+- **Error:** Quest text drawn in `AHomeWorldHUD::DrawHUD` does not appear on `L_SizeTest`.
+- **Cause:** `AHomeWorldPlayerController::BeginPlay` does not call `SpawnDefaultHUD`. The HUD the player sees is not that draw.
+- **Fix:** `GEngine->AddOnScreenDebugMessage`, keys `9100` plus the line index, duration `0.5` seconds, refreshed every tick from `RefreshOpeningQuest`. Gate it with `GetCurrentLevelName` containing `SizeTest`, the same check as the SizeTest tick.
+- **Context:** 2026-10-18, opening tutorial. Do not put the quest list back on `DrawHUD`.
+
+### SizeTest herb beds share one respawn slot
+- **Error:** Only one herb bed returns. Gathering the second bed cancels the first.
+- **Cause:** One bed pointer and one time. The second gather overwrites them.
+- **Fix:** One `FOpeningHerbReturn` row per bed in `OpeningHerbReturns`. Each row waits 20 seconds.
+- **Context:** 2026-10-18, opening tutorial.
+
+### Interact ability cannot call a protected character method
+- **Error:** C2248 when `UHomeWorldInteractAbility` calls `TryOpeningFish`.
+- **Cause:** The method was protected. The ability is not a subclass of the character, so it cannot call it.
+- **Fix:** A `TryOpening*` method the ability calls is public.
+- **Context:** 2026-10-18, SizeTest fish interact.
+
 ### Check-AutomationPrereqs.ps1 fails: CURRENT_TASK_LIST / NEXT_SESSION_PROMPT missing
 - **Error:** `.\Tools\Check-AutomationPrereqs.ps1` exits non-zero with `CURRENT_TASK_LIST.md not found` or `NEXT_SESSION_PROMPT.md not found` under `docs/workflow/`.
 - **Cause:** Those files are only required when running the **30-day / multi-round automation loop**. They are created from templates when you generate a new task list (see [HOW_TO_GENERATE_TASK_LIST.md](workflow/HOW_TO_GENERATE_TASK_LIST.md)).

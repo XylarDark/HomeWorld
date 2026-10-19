@@ -205,6 +205,10 @@ void UHomeWorldSpiritStealthComponent::ApplyMeshFeelTint(bool bRevealed, float A
 	const int32 SlotCount = Mesh->GetNumMaterials();
 	for (int32 Slot = 0; Slot < SlotCount; ++Slot)
 	{
+		if (!Mesh->GetMaterial(Slot))
+		{
+			continue;
+		}
 		UMaterialInstanceDynamic* MID = Mesh->CreateAndSetMaterialInstanceDynamic(Slot);
 		if (!MID)
 		{

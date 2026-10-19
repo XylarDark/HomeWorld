@@ -16,8 +16,14 @@ Use this door before the production reads when the message names a log line, a s
 - The task is that line. Do not read vision, the asset queue, or either critical path.
 - Read only the active queue's Now line and the one owner file it points at.
 - The same on-screen fail twice stops the reply. Say what was not in the binary. Do not start a neighboring polish.
-- One `.\Tools\Safe-Build.ps1 -LaunchEditorAfter` from the repo root per reply. Batch every named fix into that compile. A reply that already compiled does not compile again.
+- One `.\Tools\Safe-Build.ps1 -LaunchEditorAfter` from the repo root per reply. Batch every named fix into that compile. A reply that already compiled does not compile again. Search `docs/KNOWN_ERRORS.md` for that symptom before the compile.
 - A fix is not done until the log line you named has changed. Name the DLL time in the reply.
+- When Luke names a pass, scribe that sentence into the queue result before the next edit.
+- A color, a marker, or a HUD line is done when the open editor logs it on the actor he named, or he sees it. A compile, and a neighboring actor, do not count.
+- A placement correction covers the props he named. A behavior he already called good stays. The wisp, the herb return, and the E chain stay in `Docs/level/L_SizeTest_CONTEXT.md`. Update that file in the same reply that changes them.
+- After a level load, run the sightline check once more before moving anything. The map context names the loading miss.
+- A tutorial flag stays unset unless the interview round names it.
+- Delete any `Content/Python/tmp_*.py` this reply created.
 - A new lock is scribed, then a handoff, then stop. Do not implement it in the same session when code goes to another agent.
 - Do not invent interview choices for a beat that has no picked action. Ask what the player does.
 

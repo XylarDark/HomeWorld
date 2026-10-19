@@ -65,7 +65,6 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	virtual void Tick(float DeltaTime) override;
 
 	/** Called when TimeOfDaySubsystem broadcasts OnNightStarted. Sets up night-specific timers and state. */
 	UFUNCTION()

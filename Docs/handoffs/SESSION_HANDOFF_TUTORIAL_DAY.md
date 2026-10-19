@@ -38,6 +38,8 @@ The knock is a shove back out of reach. It is not the mist bonk, and it does not
 
 The Grace draw is the outline of a dove (Luke, 2026-10-18), in `AHomeWorldOpeningDog::GraceUnitShape()`. Do not draw the herb heart and call it Grace.
 
+The lead-in: when the brew grants the tea sprint while the child is in their room, they run the homecoming route reversed and stop on the lawn beside the dog's lane (1.5 m east of the lane line, 6.1 m short of the dog), facing the dog. Logs: `opening_reveal: the child races to the dog yard (N points)` and `opening_reveal: child waits at the dog yard`.
+
 ### 3. The bonk
 
 A mist volume stays up around the homestead. Jumping off while it is up launches the player back onto the island. The launch does not slow the step and does not dim the shoulder light. `BeginStrokeFromInput` stays off on `L_SizeTest`. The mist does not clear after the kettle.

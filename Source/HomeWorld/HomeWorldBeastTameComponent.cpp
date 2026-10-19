@@ -112,7 +112,8 @@ void UHomeWorldBeastTameComponent::SetTameState(EHomeWorldBeastTameState NewStat
 		BeastStateLabel(Old), BeastStateLabel(NewState),
 		GetOwner() ? *GetOwner()->GetName() : TEXT("(none)"));
 
-	if (NewState == EHomeWorldBeastTameState::Tamed || NewState == EHomeWorldBeastTameState::Helper)
+	if (bGrantMountBoostOnTame
+		&& (NewState == EHomeWorldBeastTameState::Tamed || NewState == EHomeWorldBeastTameState::Helper))
 	{
 		UWorld* World = GetWorld();
 		if (World && GetOwner())
@@ -236,6 +237,27 @@ void UHomeWorldBeastTameComponent::ApplyPersistedState(EHomeWorldBeastTameState 
 	{
 		SetTameState(NewState);
 	}
+}
+
+bool UHomeWorldBeastTameComponent::NoteCraftedOffering(AHomeWorldCharacter* Character)
+{
+	if (!Character || !GetOwner())
+	{
+		return false;
+	}
+	if (TameState == EHomeWorldBeastTameState::Tamed || TameState == EHomeWorldBeastTameState::Helper)
+	{
+		return false;
+	}
+	if (!IsDayBodyInteractionAllowed(Character))
+	{
+		UE_LOG(LogTemp, Log, TEXT("TAME: crafted offering blocked - night or spirit form"));
+		return false;
+	}
+	ResetBondProgress();
+	SetTameState(EHomeWorldBeastTameState::Tamed);
+	UE_LOG(LogTemp, Log, TEXT("TAME: crafted offering accepted on '%s'"), *GetOwner()->GetName());
+	return true;
 }
 
 bool UHomeWorldBeastTameComponent::TryPromoteToHelper(AHomeWorldCharacter* Character)

@@ -1,6 +1,7 @@
 // Copyright HomeWorld. All Rights Reserved.
 
 #include "HomeWorldCharacter.h"
+#include "HomeWorldWispPlacement.h"
 #include "HomeWorldOpeningReveal.h"
 #include "HomeWorldRuneShapeComponent.h"
 #include "GameFramework/Character.h"
@@ -23,6 +24,7 @@
 #include "GameFramework/PlayerState.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Materials/MaterialInterface.h"
 #include "Math/RotationMatrix.h"
 #include "HomeWorldAttributeSet.h"
 #include "HomeWorldGameMode.h"
@@ -60,10 +62,13 @@
 #include "Sound/SoundBase.h"
 #include "TimerManager.h"
 #include "EngineUtils.h"
+#include "Engine/StaticMeshActor.h"
 #include "HAL/FileManager.h"
 #include "Misc/Paths.h"
 #include "Animation/AnimSingleNodeInstance.h"
 #include "Animation/AnimSequence.h"
+#include "HomeWorldOpeningDog.h"
+#include "HomeWorldOpeningZipline.h"
 
 /**
  * The T0 beat-node tag contract, declared once.
@@ -95,7 +100,7 @@
  */
 namespace HomeWorldT0BeatNodes
 {
-	/** The seven T0 beat props, each identified by a canonical tag and a short alias. */
+	/** The T0 beat props, each identified by a canonical tag and a short alias. The opening stations read this table too. */
 	enum class ENode : uint8
 	{
 		Kettle,
@@ -105,6 +110,8 @@ namespace HomeWorldT0BeatNodes
 		DayCamp,
 		Bed,
 		Garden,
+		ConsumableStation,
+		ArmorTable,
 	};
 
 	/** The tags that identify one specific beat prop, canonical name first. */
@@ -118,6 +125,8 @@ namespace HomeWorldT0BeatNodes
 			{ FName(TEXT("NODE_DAY_CAMP")),     FName(TEXT("DayCamp")) },
 			{ FName(TEXT("NODE_BED")),          FName(TEXT("Bed")) },
 			{ FName(TEXT("NODE_GARDEN")),       FName(TEXT("Garden")) },
+			{ FName(TEXT("NODE_CONSUMABLE_STATION")), FName(TEXT("ConsumableStation")) },
+			{ FName(TEXT("NODE_ARMOR_TABLE")),  FName(TEXT("ArmorTable")) },
 		};
 		return PerNode;
 	}
@@ -222,6 +231,7 @@ AHomeWorldCharacter::AHomeWorldCharacter(const FObjectInitializer& ObjectInitial
 	TraversalComponent = CreateDefaultSubobject<UHomeWorldTraversalComponent>(TEXT("TraversalComponent"));
 	SpiritStealthComponent = CreateDefaultSubobject<UHomeWorldSpiritStealthComponent>(TEXT("SpiritStealthComponent"));
 	StrokeReport = CreateDefaultSubobject<UHomeWorldStrokeReportComponent>(TEXT("StrokeReport"));
+	QuestLog = CreateDefaultSubobject<UHomeWorldQuestLog>(TEXT("QuestLog"));
 }
 
 UAbilitySystemComponent* AHomeWorldCharacter::GetAbilitySystemComponent() const
@@ -315,6 +325,11 @@ void AHomeWorldCharacter::BeginPlay()
 			SizeTestWisp->SetVisibility(false);
 			SizeTestWisp->RegisterComponent();
 			SizeTestWisp->SetRelativeLocation(FVector(10.0f, 45.0f, 55.0f));
+			if (UMaterialInterface* Purple = LoadObject<UMaterialInterface>(nullptr,
+				TEXT("/Game/HomeWorld/Materials/Instances/MI_Greybox_Purple.MI_Greybox_Purple")))
+			{
+				SizeTestWisp->SetMaterial(0, Purple);
+			}
 		}
 		if (bSizeTest && !SizeTestCursorWisp)
 		{
@@ -404,11 +419,334 @@ void AHomeWorldCharacter::Tick(float DeltaTime)
 		UpdateSizeTestWalk();
 		UpdateSizeTestInteractCursor();
 		UpdateSizeTestWisp(DeltaTime);
+		UpdateOpeningBonk();
+		UpdateOpeningNight(DeltaTime);
 	}
 	else if (UGameplayStatics::GetCurrentLevelName(this).Contains(TEXT("L_Field")))
 	{
 		UpdateSizeTestWalk();
 	}
+}
+
+void AHomeWorldCharacter::UpdateOpeningBonk()
+{
+	UWorld* World = GetWorld();
+	UCapsuleComponent* Capsule = GetCapsuleComponent();
+	if (!World || !Capsule)
+	{
+		return;
+	}
+	AActor* Pad = nullptr;
+	for (TActorIterator<AActor> It(World); It; ++It)
+	{
+		if (It->GetActorNameOrLabel() == TEXT("SM_Size_WalkPad"))
+		{
+			Pad = *It;
+			break;
+		}
+	}
+	if (!Pad)
+	{
+		return;
+	}
+	FVector Origin = FVector::ZeroVector;
+	FVector Extent = FVector::ZeroVector;
+	Pad->GetActorBounds(false, Origin, Extent);
+	const float PadTop = Origin.Z + Extent.Z;
+	const float Half = Capsule->GetScaledCapsuleHalfHeight();
+	const FVector Loc = GetActorLocation();
+	const float FeetZ = Loc.Z - Half;
+	const bool bOverPad = FMath::Abs(Loc.X - Origin.X) <= Extent.X
+		&& FMath::Abs(Loc.Y - Origin.Y) <= Extent.Y;
+	if (FeetZ >= PadTop - 40.f)
+	{
+		if (bOverPad)
+		{
+			OpeningBonkSafe = Loc;
+			bOpeningBonkSafe = true;
+		}
+		return;
+	}
+	// Fall far enough to read, then a higher toss so the landing has some weight.
+	if (FeetZ > PadTop - 320.f || !bOpeningBonkSafe)
+	{
+		return;
+	}
+	FVector Back = OpeningBonkSafe;
+	FVector Inward = Origin - Back;
+	Inward.Z = 0.f;
+	if (!Inward.Normalize())
+	{
+		Inward = FVector(0.f, 1.f, 0.f);
+	}
+	Back += Inward * 1500.f;
+	const float Margin = 400.f;
+	Back.X = FMath::Clamp(Back.X, Origin.X - Extent.X + Margin, Origin.X + Extent.X - Margin);
+	Back.Y = FMath::Clamp(Back.Y, Origin.Y - Extent.Y + Margin, Origin.Y + Extent.Y - Margin);
+	Back.Z = FMath::Max(Back.Z, PadTop + Half);
+	SetActorLocation(Back, false, nullptr, ETeleportType::TeleportPhysics);
+	if (UCharacterMovementComponent* Move = GetCharacterMovement())
+	{
+		Move->StopMovementImmediately();
+	}
+	LaunchCharacter(FVector(Inward.X * 250.f, Inward.Y * 250.f, 760.f), true, true);
+	OpeningBonkSafe = Back;
+	UE_LOG(LogTemp, Log, TEXT("opening_bonk: back on the island"));
+}
+
+static AActor* FindOpeningNamed(UWorld* World, const TCHAR* Name, bool bExact)
+{
+	for (TActorIterator<AActor> It(World); It; ++It)
+	{
+		const FString Label = It->GetActorNameOrLabel();
+		if (bExact ? Label.Equals(Name) : Label.Contains(Name))
+		{
+			return *It;
+		}
+	}
+	return nullptr;
+}
+
+static UStaticMeshComponent* MakeOpeningNightWisp(AHomeWorldCharacter* Owner, const TCHAR* Name)
+{
+	UStaticMeshComponent* Wisp = NewObject<UStaticMeshComponent>(Owner, Name);
+	if (UStaticMesh* Sphere = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Sphere.Sphere")))
+	{
+		Wisp->SetStaticMesh(Sphere);
+	}
+	Wisp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Wisp->SetRelativeScale3D(FVector(0.35f));
+	Wisp->SetupAttachment(Owner->GetRootComponent());
+	Wisp->SetUsingAbsoluteLocation(true);
+	Wisp->RegisterComponent();
+	if (UMaterialInterface* Purple = LoadObject<UMaterialInterface>(nullptr,
+		TEXT("/Game/HomeWorld/Materials/Instances/MI_Greybox_Purple.MI_Greybox_Purple")))
+	{
+		Wisp->SetMaterial(0, Purple);
+	}
+	return Wisp;
+}
+
+void AHomeWorldCharacter::EnsureOpeningNightProps()
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+	auto SpawnWisp = [World](const FVector& Point) -> AActor*
+	{
+		FActorSpawnParameters Params;
+		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		AStaticMeshActor* Wisp = World->SpawnActor<AStaticMeshActor>(Point, FRotator::ZeroRotator, Params);
+		if (!Wisp || !Wisp->GetStaticMeshComponent())
+		{
+			return nullptr;
+		}
+		UStaticMeshComponent* WispMesh = Wisp->GetStaticMeshComponent();
+		if (UStaticMesh* Sphere = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Sphere.Sphere")))
+		{
+			WispMesh->SetStaticMesh(Sphere);
+		}
+		WispMesh->SetWorldScale3D(FVector(0.45f));
+		WispMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		WispMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
+		WispMesh->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+		if (UMaterialInterface* Purple = LoadObject<UMaterialInterface>(nullptr,
+			TEXT("/Game/HomeWorld/Materials/Instances/MI_Greybox_Purple.MI_Greybox_Purple")))
+		{
+			WispMesh->SetMaterial(0, Purple);
+		}
+		Wisp->Tags.Add(FName(TEXT("NODE_OPENING_WISP")));
+		return Wisp;
+	};
+	if (!OpeningCopseWisp)
+	{
+		const AActor* CopsePine = nullptr;
+		float South = TNumericLimits<float>::Max();
+		for (TActorIterator<AActor> It(World); It; ++It)
+		{
+			if (!It->GetActorNameOrLabel().Contains(TEXT("Pine")))
+			{
+				continue;
+			}
+			const float Y = It->GetActorLocation().Y;
+			if (Y < 0.f && Y < South)
+			{
+				South = Y;
+				CopsePine = *It;
+			}
+		}
+		FVector Beside = GetActorLocation() + FVector(0.f, -400.f, 80.f);
+		if (CopsePine)
+		{
+			FVector PineOrigin = FVector::ZeroVector;
+			FVector PineExtent = FVector::ZeroVector;
+			CopsePine->GetActorBounds(false, PineOrigin, PineExtent);
+			Beside = FVector(PineOrigin.X + PineExtent.X + 120.f, PineOrigin.Y, PineOrigin.Z - PineExtent.Z + 180.f);
+		}
+		OpeningCopseWisp = SpawnWisp(Beside);
+	}
+	if (!OpeningPondWisp)
+	{
+		FVector Point = GetActorLocation();
+		if (const AActor* Pond = FindOpeningNamed(World, TEXT("Water_Pond"), true))
+		{
+			Point = Pond->GetActorLocation() + FVector(0.f, 0.f, 140.f);
+		}
+		OpeningPondWisp = SpawnWisp(Point);
+	}
+	if (!OpeningSpringWisp)
+	{
+		FVector Point = GetActorLocation();
+		if (const AActor* Spring = FindOpeningNamed(World, TEXT("Water_HotSpring"), true))
+		{
+			Point = Spring->GetActorLocation() + FVector(0.f, 0.f, 140.f);
+		}
+		OpeningSpringWisp = SpawnWisp(Point);
+	}
+	if (OpeningNightChestPoint.IsNearlyZero())
+	{
+		// Armory door faces west. Metrics origin (-0.5 m, -13 m), door local x -335 cm.
+		OpeningNightChestPoint = FVector(-475.f, -1300.f, 45040.f);
+		FActorSpawnParameters Params;
+		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		if (AStaticMeshActor* Chest = World->SpawnActor<AStaticMeshActor>(OpeningNightChestPoint, FRotator::ZeroRotator, Params))
+		{
+			if (UStaticMeshComponent* ChestMesh = Chest->GetStaticMeshComponent())
+			{
+				if (UStaticMesh* Cube = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Cube.Cube")))
+				{
+					ChestMesh->SetStaticMesh(Cube);
+				}
+				ChestMesh->SetWorldScale3D(FVector(0.9f, 0.7f, 0.8f));
+				if (UMaterialInterface* Tan = LoadObject<UMaterialInterface>(nullptr,
+					TEXT("/Game/HomeWorld/Materials/Instances/MI_Greybox_Tan.MI_Greybox_Tan")))
+				{
+					ChestMesh->SetMaterial(0, Tan);
+				}
+			}
+			Chest->Tags.Add(FName(TEXT("NODE_ARMORY_CHEST")));
+			OpeningNightChestPoint.Z += 80.f;
+		}
+	}
+}
+
+void AHomeWorldCharacter::UpdateOpeningNight(float DeltaTime)
+{
+	(void)DeltaTime;
+	if (!bOpeningNightSpirit)
+	{
+		return;
+	}
+	EnsureOpeningNightProps();
+	if (!QuestLog)
+	{
+		return;
+	}
+	TArray<FHomeWorldQuestStep> Steps;
+	auto Add = [&Steps](const TCHAR* Text, bool bDone)
+	{
+		FHomeWorldQuestStep Step;
+		Step.Text = Text;
+		Step.bDone = bDone;
+		Steps.Add(Step);
+	};
+	Add(TEXT("Sleep in the bed"), true);
+	Add(*FString::Printf(TEXT("Collect the wisps %d/3"), OpeningWispsCollected), OpeningWispsCollected >= 3);
+	QuestLog->SetChain(FName(TEXT("Night")), Steps);
+}
+
+bool AHomeWorldCharacter::TryOpeningBedInFront()
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+	FHitResult Hit;
+	AActor* Aimed = ResolveOpeningAim(Hit);
+	AActor* Bed = (Aimed && Aimed->GetActorNameOrLabel().Contains(TEXT("Bed"))) ? Aimed : nullptr;
+	if (!Bed && !Aimed)
+	{
+		if (AActor* Named = FindOpeningNamed(World, TEXT("SM_Size_Bed"), true))
+		{
+			if (FVector::Dist2D(GetActorLocation(), Named->GetActorLocation()) <= 280.f)
+			{
+				Bed = Named;
+			}
+		}
+	}
+	if (!Bed)
+	{
+		return false;
+	}
+	if (bOpeningNightSpirit)
+	{
+		return true;
+	}
+	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
+	if (!TimeOfDay)
+	{
+		return false;
+	}
+	GrantSpiritSleepGate();
+	TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Night);
+	SyncFormWithTimeOfDay();
+	bOpeningNightSpirit = GetIsSpiritForm();
+	if (USkeletalMeshComponent* Coat = GetMesh())
+	{
+		Coat->SetVisibility(false, true);
+	}
+	if (SizeTestWisp)
+	{
+		SizeTestWisp->SetHiddenInGame(false);
+		SizeTestWisp->SetVisibility(true);
+	}
+	if (!OpeningSpiritBody)
+	{
+		OpeningSpiritBody = MakeOpeningNightWisp(this, TEXT("OpeningSpiritBody"));
+		if (OpeningSpiritBody)
+		{
+			OpeningSpiritBody->SetUsingAbsoluteLocation(false);
+			OpeningSpiritBody->SetRelativeLocation(FVector(0.f, 0.f, 10.f));
+			OpeningSpiritBody->SetRelativeScale3D(FVector(1.1f));
+		}
+	}
+	else
+	{
+		OpeningSpiritBody->SetVisibility(true);
+	}
+	TryTellChildDawnRule();
+	UE_LOG(LogTemp, Log, TEXT("opening_bed: spirit, stayed on the island"));
+	return bOpeningNightSpirit;
+}
+
+bool AHomeWorldCharacter::TryOpeningNightSetInFront()
+{
+	if (!bOpeningNightSpirit || bOpeningRuneActive)
+	{
+		return false;
+	}
+	FHitResult Hit;
+	AActor* Aimed = ResolveOpeningAim(Hit);
+	if (!Aimed || Aimed->IsHidden() || !Aimed->ActorHasTag(FName(TEXT("NODE_OPENING_WISP"))))
+	{
+		return false;
+	}
+	if (FVector::Dist2D(GetActorLocation(), Aimed->GetActorLocation()) > 400.f)
+	{
+		return false;
+	}
+	bOpeningWispCollect = true;
+	StartOpeningHerbRune(Aimed);
+	if (!bOpeningRuneActive)
+	{
+		bOpeningWispCollect = false;
+		return false;
+	}
+	UE_LOG(LogTemp, Log, TEXT("opening_night: collect the wisp"));
+	return true;
 }
 
 void AHomeWorldCharacter::ApplyOpeningWalkSpeed()
@@ -497,6 +835,7 @@ bool AHomeWorldCharacter::TryOpeningSpiritInFront()
 		SizeTestWisp->SetHiddenInGame(false);
 		SizeTestWisp->SetVisibility(true);
 	}
+	bOpeningSpiritClaimed = true;
 	UE_LOG(LogTemp, Log, TEXT("opening_reveal: shoulder spirit on"));
 	return true;
 }
@@ -518,10 +857,216 @@ bool AHomeWorldCharacter::TryPartnerLeadInside()
 	{
 		if (AHomeWorldOpeningReveal* Reveal = Cast<AHomeWorldOpeningReveal>(*It))
 		{
-			return Reveal->TryLeadPartner();
+			if (!HasOpeningHerbQuota())
+			{
+				return true;
+			}
+			if (Reveal->TryLeadPartner())
+			{
+				return true;
+			}
+			// They already walked inside: the same press takes the armor piece.
+			return TryOpeningArmorGift();
 		}
 	}
 	return false;
+}
+
+bool AHomeWorldCharacter::TryOpeningArmorGift()
+{
+	if (bOpeningArmorGiftGiven)
+	{
+		return false;
+	}
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+	for (TActorIterator<AActor> It(World); It; ++It)
+	{
+		const AHomeWorldOpeningReveal* Reveal = Cast<AHomeWorldOpeningReveal>(*It);
+		if (Reveal && Reveal->IsPartnerWaiting())
+		{
+			// The gift is the backpack. It is not the material inventory. The table opens. Walk speed and bonk tries stay.
+			bOpeningArmorGiftGiven = true;
+			UE_LOG(LogTemp, Log, TEXT("opening_reveal: partner gives the backpack"));
+			return true;
+		}
+	}
+	return false;
+}
+
+static void LogOpening(const FString& Message)
+{
+	static FString Last;
+	static double At = -10.0;
+	const double Now = FPlatformTime::Seconds();
+	if (Message == Last && Now - At < 1.5)
+	{
+		return;
+	}
+	Last = Message;
+	At = Now;
+	UE_LOG(LogTemp, Log, TEXT("%s"), *Message);
+}
+
+bool AHomeWorldCharacter::TryOpeningDogInFront()
+{
+	FHitResult Hit;
+	AHomeWorldOpeningDog* Dog = Cast<AHomeWorldOpeningDog>(ResolveOpeningAim(Hit));
+	if (!Dog)
+	{
+		return false;
+	}
+	if (Dog->IsDogTamed())
+	{
+		return true;
+	}
+	if (!Dog->IsWrathEased())
+	{
+		const float Dist = FVector::Dist2D(GetActorLocation(), Dog->GetActorLocation());
+		if (!bOpeningDogDrawActive && bOpeningDogSlowLatched && Dist <= 280.f)
+		{
+			StartOpeningDogDraw(Dog);
+		}
+		return true;
+	}
+	if (OpeningMixedHerbs <= 0)
+	{
+		LogOpening(TEXT("opening_dog: needs the mixed herb"));
+		ShowInteractFeedback(TEXT("The dog wants the herb mixed with a spirit."), FColor::Yellow);
+		return true;
+	}
+	if (!Dog->TryTameWithMixedHerb(this))
+	{
+		LogOpening(TEXT("opening_dog: not ready for the offering"));
+		return true;
+	}
+	--OpeningMixedHerbs;
+	if (UWorld* World = GetWorld())
+	{
+		for (TActorIterator<AHomeWorldOpeningReveal> It(World); It; ++It)
+		{
+			It->BeginChildReturnHome();
+			break;
+		}
+	}
+	UE_LOG(LogTemp, Log, TEXT("opening_dog: tamed with the mixed herb (carried %d)"), OpeningMixedHerbs);
+	return true;
+}
+
+bool AHomeWorldCharacter::TryOpeningFish()
+{
+	if (!OpeningDog || !OpeningDog->IsDogTamed())
+	{
+		return false;
+	}
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+	AActor* Pond = nullptr;
+	for (TActorIterator<AActor> It(World); It; ++It)
+	{
+		if (It->GetActorNameOrLabel() == TEXT("Water_Pond"))
+		{
+			Pond = *It;
+			break;
+		}
+	}
+	if (!Pond)
+	{
+		return false;
+	}
+	FVector Origin = FVector::ZeroVector;
+	FVector Extent = FVector::ZeroVector;
+	Pond->GetActorBounds(false, Origin, Extent);
+	const FVector From = GetActorLocation();
+	const bool bAtPond = FMath::Abs(From.X - Origin.X) <= Extent.X + 200.f
+		&& FMath::Abs(From.Y - Origin.Y) <= Extent.Y + 200.f;
+	if (!bAtPond)
+	{
+		return false;
+	}
+	if (bOpeningFishCaught)
+	{
+		return false;
+	}
+	bOpeningFishCaught = true;
+	LogOpening(TEXT("opening_fish: one fish"));
+	return true;
+}
+
+bool AHomeWorldCharacter::TryOpeningZiplineInFront()
+{
+	FHitResult Hit;
+	AHomeWorldOpeningZipline* Line = Cast<AHomeWorldOpeningZipline>(ResolveOpeningAim(Hit));
+	if (!Line)
+	{
+		return false;
+	}
+	return Line->TryRide(this);
+}
+
+bool AHomeWorldCharacter::TryOpeningStationInFront()
+{
+	FHitResult Hit;
+	AActor* HitActor = ResolveOpeningAim(Hit);
+	if (!HitActor)
+	{
+		return false;
+	}
+	if (HomeWorldT0BeatNodes::ActorCarriesTagFor(HitActor, HomeWorldT0BeatNodes::ENode::ConsumableStation))
+	{
+		if (!bOpeningConsumableOpen)
+		{
+			if (!bOpeningSpiritClaimed || OpeningHerbTenths <= 0)
+			{
+				LogOpening(FString::Printf(TEXT("opening_station: consumable locked - need the herb and the spirit (spirit %d, banked %d)"),
+					bOpeningSpiritClaimed ? 1 : 0, OpeningHerbTenths));
+				ShowInteractFeedback(TEXT("The station needs the herb and the spirit."), FColor::Yellow);
+				return true;
+			}
+			bOpeningConsumableOpen = true;
+			UE_LOG(LogTemp, Log, TEXT("opening_station: consumable open"));
+			ShowInteractFeedback(TEXT("CONSUMABLE: the station is open"), FColor::Green);
+			return true;
+		}
+		// Open. Its one output is the mixed herb the dog beat spends. Once the herb is
+		// carried, the same press brews at the kettle that stands on this counter.
+		if (OpeningMixedHerbs <= 0)
+		{
+			if (OpeningHerbTenths <= 0)
+			{
+				LogOpening(FString::Printf(TEXT("opening_station: mixed herb failed - need herb chunks (banked %d)"), OpeningHerbTenths));
+				ShowInteractFeedback(TEXT("The station needs the herb."), FColor::Yellow);
+				return true;
+			}
+			--OpeningHerbTenths;
+			++OpeningMixedHerbs;
+			UE_LOG(LogTemp, Log, TEXT("opening_station: mixed herb made (carried %d, banked %d)"), OpeningMixedHerbs, OpeningHerbTenths);
+			ShowInteractFeedback(TEXT("CONSUMABLE: herb mixed with a spirit"), FColor::Green);
+			return true;
+		}
+		TryBrewNodeKettleTea();
+		return true;
+	}
+	if (!HomeWorldT0BeatNodes::ActorCarriesTagFor(HitActor, HomeWorldT0BeatNodes::ENode::ArmorTable))
+	{
+		return false;
+	}
+	if (!bOpeningArmorGiftGiven)
+	{
+		LogOpening(TEXT("opening_station: armor table locked - the partner's gift opens it"));
+		ShowInteractFeedback(TEXT("The partner's gift opens this."), FColor::Yellow);
+		return true;
+	}
+	// The gift opens the table. No second recipe in this beat.
+	LogOpening(TEXT("opening_station: armor table open"));
+	ShowInteractFeedback(TEXT("ARMOR: the table is open"), FColor::Green);
+	return true;
 }
 
 void AHomeWorldCharacter::UpdateSizeTestInteractCursor()
@@ -598,8 +1143,11 @@ AActor* AHomeWorldCharacter::FindOpeningProximityTarget() const
 		{
 			continue;
 		}
-		const bool bHerb = Actor->GetActorNameOrLabel().Contains(TEXT("Lupine")) && !Actor->IsHidden();
-		if (!bHerb && !ActorHasInteractableComponent(Actor))
+		const FString Label = Actor->GetActorNameOrLabel();
+		const bool bHerb = Label.Contains(TEXT("Lupine")) && !Actor->IsHidden();
+		const bool bBed = Label.Contains(TEXT("Bed"));
+		const bool bNightWisp = Actor->ActorHasTag(FName(TEXT("NODE_OPENING_WISP"))) && !Actor->IsHidden();
+		if (!bHerb && !bBed && !bNightWisp && !ActorHasInteractableComponent(Actor))
 		{
 			continue;
 		}
@@ -623,6 +1171,11 @@ void AHomeWorldCharacter::ShowOpeningProximityLine()
 	const FVector From = GetActorLocation();
 	float PartnerDist = TNumericLimits<float>::Max();
 	float SpiritDist = TNumericLimits<float>::Max();
+	float StationDist = TNumericLimits<float>::Max();
+	float ArmorDist = TNumericLimits<float>::Max();
+	float DogDist = TNumericLimits<float>::Max();
+	const AHomeWorldOpeningDog* DogActor = nullptr;
+	bool bPartnerWaiting = false;
 	for (TActorIterator<AActor> It(World); It; ++It)
 	{
 		if (It->ActorHasTag(FName(TEXT("NPC_PARTNER"))))
@@ -635,34 +1188,454 @@ void AHomeWorldCharacter::ShowOpeningProximityLine()
 			{
 				SpiritDist = FVector::Dist2D(From, It->GetActorLocation());
 			}
+			bPartnerWaiting = Reveal->IsPartnerWaiting();
+		}
+		else if (It->ActorHasTag(FName(TEXT("NODE_CONSUMABLE_STATION"))))
+		{
+			StationDist = FVector::Dist2D(From, It->GetActorLocation());
+		}
+		else if (It->ActorHasTag(FName(TEXT("NODE_ARMOR_TABLE"))))
+		{
+			ArmorDist = FVector::Dist2D(From, It->GetActorLocation());
+		}
+		else if (const AHomeWorldOpeningDog* Dog = Cast<AHomeWorldOpeningDog>(*It))
+		{
+			DogDist = FVector::Dist2D(From, It->GetActorLocation());
+			DogActor = Dog;
 		}
 	}
 	FString Line;
-	if (PartnerDist < 400.f && PartnerDist <= SpiritDist)
+	const bool bNodeNear = PartnerDist < 400.f || StationDist < 400.f || ArmorDist < 400.f || SpiritDist < 400.f;
+	if (!bNodeNear && DogActor && DogActor->IsDogTamed() && DogDist < 400.f)
 	{
-		Line = OpeningHerbTenths > 0 ? TEXT("Brew the kettle.") : TEXT("Pick up the herb.");
+		Line = TEXT("The dog is calm.");
+	}
+	else if (!bNodeNear && DogActor && DogDist < DogActor->NoticeRadiusCm)
+	{
+		FVector DogVel = GetVelocity();
+		DogVel.Z = 0.f;
+		FVector ToDog = DogActor->GetActorLocation() - From;
+		ToDog.Z = 0.f;
+		const bool bClosing = DogVel.SizeSquared() > 1.f && ToDog.SizeSquared() > 1.f
+			&& FVector::DotProduct(DogVel.GetSafeNormal(), ToDog.GetSafeNormal()) > 0.2f;
+		if (DogActor->IsWrathEased())
+		{
+			Line = TEXT("Offer the herb.");
+		}
+		else if (DogVel.Size() > DogActor->SlowStepCmS && bClosing)
+		{
+			Line = TEXT("Step slower.");
+		}
+		else if (DogDist <= DogActor->DrawRadiusCm)
+		{
+			Line = TEXT("Draw the Grace symbol.");
+		}
+		else
+		{
+			Line = TEXT("The dog bristles with Wrath.");
+		}
+	}
+	else if (PartnerDist < 400.f && PartnerDist <= SpiritDist && PartnerDist <= StationDist)
+	{
+		if (bPartnerWaiting && !bOpeningArmorGiftGiven)
+		{
+			Line = TEXT("Take the armor.");
+		}
+		else
+		{
+			Line = OpeningHerbTenths > 0 ? TEXT("Brew the kettle.") : TEXT("Pick up the herb.");
+		}
+	}
+	else if (StationDist < 400.f && StationDist <= SpiritDist)
+	{
+		if (!bOpeningConsumableOpen)
+		{
+			if (!bOpeningSpiritClaimed && OpeningHerbTenths <= 0)
+			{
+				Line = TEXT("The station wants the herb and the spirit.");
+			}
+			else if (!bOpeningSpiritClaimed)
+			{
+				Line = TEXT("The station wants the spirit.");
+			}
+			else if (OpeningHerbTenths <= 0)
+			{
+				Line = TEXT("The station wants the herb.");
+			}
+			else
+			{
+				Line = TEXT("Open the station.");
+			}
+		}
+		else if (OpeningMixedHerbs <= 0)
+		{
+			Line = OpeningHerbTenths > 0 ? TEXT("Mix the herb.") : TEXT("The station wants the herb.");
+		}
+		else
+		{
+			Line = TEXT("Brew the kettle.");
+		}
+	}
+	else if (ArmorDist < 400.f && ArmorDist <= SpiritDist)
+	{
+		Line = bOpeningArmorGiftGiven ? TEXT("The table is open.") : TEXT("The partner's gift opens the table.");
 	}
 	else if (SpiritDist < 400.f)
 	{
 		Line = TEXT("Pick up the spirit.");
 	}
-	static FString ShownLine;
-	if (Line == ShownLine)
+	if (bOpeningArmorGiftGiven)
 	{
-		if (!Line.IsEmpty() && GEngine)
+		Line.Reset();
+	}
+	if (DogActor && !DogActor->IsDogTamed() && !DogActor->IsWrathEased() && DogDist < DogActor->NoticeRadiusCm)
+	{
+		FVector WarnVel = GetVelocity();
+		WarnVel.Z = 0.f;
+		FVector WarnToDog = DogActor->GetActorLocation() - From;
+		WarnToDog.Z = 0.f;
+		const bool bWarnClosing = WarnVel.SizeSquared() > 1.f && WarnToDog.SizeSquared() > 1.f
+			&& FVector::DotProduct(WarnVel.GetSafeNormal(), WarnToDog.GetSafeNormal()) > 0.2f;
+		if (WarnVel.Size() > DogActor->SlowStepCmS && bWarnClosing)
 		{
-			GEngine->AddOnScreenDebugMessage(9001, 0.2f, FColor::White, Line);
+			Line = TEXT("Approach slowly.");
+		}
+	}
+	// The too-fast knock waits 1.25s after the quest line is the slow approach. The tracker draws the words.
+	if (Line == TEXT("Approach slowly.") && OpeningDogSlowWarnAt < 0.f)
+	{
+		OpeningDogSlowWarnAt = World->GetTimeSeconds();
+	}
+}
+
+void AHomeWorldCharacter::UpdateOpeningDog(float DeltaTime)
+{
+	if (OpeningDogKnockCooldown > 0.f)
+	{
+		OpeningDogKnockCooldown -= DeltaTime;
+	}
+	if (!OpeningDog)
+	{
+		UWorld* World = GetWorld();
+		if (World)
+		{
+			for (TActorIterator<AHomeWorldOpeningDog> It(World); It; ++It)
+			{
+				OpeningDog = *It;
+				break;
+			}
+		}
+	}
+	AHomeWorldOpeningDog* Dog = OpeningDog;
+	if (!Dog || Dog->IsDogTamed() || Dog->IsWrathEased())
+	{
+		if (Dog)
+		{
+			Dog->ApplyGreyboxColor(false);
+		}
+		OpeningDogSlowWarnAt = -1.f;
+		return;
+	}
+	const FVector ToDog = Dog->GetActorLocation() - GetActorLocation();
+	const FVector Flat = FVector(ToDog.X, ToDog.Y, 0.f);
+	const float Dist = Flat.Size();
+	FVector Vel = GetVelocity();
+	Vel.Z = 0.f;
+	const float Speed = Vel.Size();
+	bool bClosing = false;
+	if (Speed > 1.f && Dist > 1.f)
+	{
+		bClosing = FVector::DotProduct(Vel.GetSafeNormal(), Flat.GetSafeNormal()) > 0.2f;
+	}
+	const bool bDrawReady = Dist <= Dog->DrawRadiusCm && Speed <= Dog->SlowStepCmS;
+	Dog->ApplyGreyboxColor(bDrawReady);
+	if (OpeningDogKnockCooldown <= 0.f)
+	{
+		if (Dist < Dog->KnockRadiusCm)
+		{
+			KnockFromOpeningDog(Dog, TEXT("too close"), Dist, Speed);
+			return;
+		}
+		if (Speed > Dog->SlowStepCmS && Dist < Dog->NoticeRadiusCm && bClosing)
+		{
+			const float Now = GetWorld() ? GetWorld()->GetTimeSeconds() : 0.f;
+			// Armed by "Approach slowly." Showing the line and knocking on the same frame is the bug.
+			if (OpeningDogSlowWarnAt < 0.f || Now - OpeningDogSlowWarnAt < 1.25f)
+			{
+				return;
+			}
+			KnockFromOpeningDog(Dog, TEXT("too fast"), Dist, Speed);
+			return;
+		}
+		OpeningDogSlowWarnAt = -1.f;
+	}
+	if (!bOpeningDogSlowLatched && Dist < Dog->NoticeRadiusCm && Speed <= Dog->SlowStepCmS && Speed > 10.f)
+	{
+		bOpeningDogSlowLatched = true;
+	}
+}
+
+void AHomeWorldCharacter::StartOpeningDogDraw(AHomeWorldOpeningDog* Dog)
+{
+	if (!Dog || bOpeningDogDrawActive || !Dog->GetRuneShape())
+	{
+		return;
+	}
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	Dog->ShowGraceRune(PC);
+	UHomeWorldRuneShapeComponent* Shape = Dog->GetRuneShape();
+	OpeningDogCursor = Shape->GetStartPoint();
+	Shape->SetCursor(OpeningDogCursor);
+	bOpeningDogDrawActive = true;
+	if (SizeTestWisp)
+	{
+		SizeTestWisp->SetHiddenInGame(false);
+		SizeTestWisp->SetVisibility(true);
+		SizeTestWisp->SetUsingAbsoluteLocation(true);
+		SizeTestWisp->SetWorldLocation(OpeningDogCursor);
+	}
+}
+
+void AHomeWorldCharacter::UpdateOpeningDogDraw(float DeltaTime)
+{
+	AHomeWorldOpeningDog* Dog = OpeningDog;
+	if (!Dog || !Dog->GetRuneShape() || Dog->IsWrathEased() || Dog->IsDogTamed())
+	{
+		FinishOpeningDogDraw();
+		return;
+	}
+	UHomeWorldRuneShapeComponent* Shape = Dog->GetRuneShape();
+	if (OpeningDogKnockCooldown > 0.f)
+	{
+		OpeningDogKnockCooldown -= DeltaTime;
+	}
+	const FVector ToDog = Dog->GetActorLocation() - GetActorLocation();
+	const FVector Flat = FVector(ToDog.X, ToDog.Y, 0.f);
+	const float Dist = Flat.Size();
+	FVector Vel = GetVelocity();
+	Vel.Z = 0.f;
+	const float Speed = Vel.Size();
+	bool bClosing = false;
+	if (Speed > 1.f && Dist > 1.f)
+	{
+		bClosing = FVector::DotProduct(Vel.GetSafeNormal(), Flat.GetSafeNormal()) > 0.2f;
+	}
+	const bool bDrawReady = Dist <= Dog->DrawRadiusCm && Speed <= Dog->SlowStepCmS;
+	Dog->ApplyGreyboxColor(bDrawReady);
+	// The two punishments hold while the symbol is up: too close, or any step over the slow step.
+	if (OpeningDogKnockCooldown <= 0.f && Dist < Dog->KnockRadiusCm)
+	{
+		FailOpeningDogTrace();
+		return;
+	}
+	if (OpeningDogKnockCooldown <= 0.f && Speed > Dog->SlowStepCmS && Dist < Dog->NoticeRadiusCm && bClosing)
+	{
+		const float Now = GetWorld() ? GetWorld()->GetTimeSeconds() : 0.f;
+		if (OpeningDogSlowWarnAt < 0.f || Now - OpeningDogSlowWarnAt < 1.25f)
+		{
+			return;
+		}
+		FailOpeningDogTrace();
+		return;
+	}
+	if (Dist > Dog->DrawRadiusCm + 150.f)
+	{
+		FailOpeningDogTrace();
+		return;
+	}
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	Shape->AlignToViewer(PC);
+	if (PC)
+	{
+		float DeltaX = 0.f;
+		float DeltaY = 0.f;
+		PC->GetInputMouseDelta(DeltaX, DeltaY);
+		FVector Origin = FVector::ZeroVector;
+		FVector Right = FVector::RightVector;
+		FVector Up = FVector::UpVector;
+		Shape->GetPlane(Origin, Right, Up);
+		OpeningDogCursor += (Right * DeltaX + Up * DeltaY) * 4.8f;
+	}
+	Shape->SetCursor(OpeningDogCursor);
+	if (SizeTestWisp)
+	{
+		SizeTestWisp->SetHiddenInGame(false);
+		SizeTestWisp->SetVisibility(true);
+		SizeTestWisp->SetUsingAbsoluteLocation(true);
+		SizeTestWisp->SetWorldLocation(OpeningDogCursor);
+	}
+	if (PC && PC->WasInputKeyJustPressed(EKeys::LeftMouseButton))
+	{
+		if (Shape->GetScore() >= 10)
+		{
+			SucceedOpeningDogTrace(Dog);
+		}
+		else
+		{
+			FailOpeningDogTrace();
 		}
 		return;
 	}
-	ShownLine = Line;
-	if (!Line.IsEmpty())
+	Shape->AdvanceTrace();
+	if (Shape->IsComplete())
 	{
-		UE_LOG(LogTemp, Log, TEXT("opening_dialogue: %s"), *Line);
-		if (GEngine)
+		if (Shape->GetScore() >= 10)
 		{
-			GEngine->AddOnScreenDebugMessage(9001, 0.2f, FColor::White, Line);
+			SucceedOpeningDogTrace(Dog);
 		}
+		else
+		{
+			FailOpeningDogTrace();
+		}
+	}
+}
+
+void AHomeWorldCharacter::SnapSizeTestWispHome(AActor* Finished)
+{
+	OpeningWispReleased = Finished;
+	if (!SizeTestWisp || !SizeTestWisp->IsVisible())
+	{
+		bOpeningWispReturning = false;
+		return;
+	}
+	OpeningWispReturnFrom = SizeTestWisp->GetComponentLocation();
+	OpeningWispReturnLeft = 0.35f;
+	bOpeningWispReturning = true;
+	SizeTestWisp->SetUsingAbsoluteLocation(true);
+}
+
+void AHomeWorldCharacter::FinishOpeningDogDraw()
+{
+	bOpeningDogDrawActive = false;
+	SnapSizeTestWispHome(OpeningDog);
+	if (OpeningDog && OpeningDog->GetRuneShape())
+	{
+		OpeningDog->GetRuneShape()->HideShape();
+	}
+}
+
+void AHomeWorldCharacter::SucceedOpeningDogTrace(AHomeWorldOpeningDog* Dog)
+{
+	if (Dog)
+	{
+		Dog->NoteGraceDrawn();
+	}
+	FinishOpeningDogDraw();
+}
+
+void AHomeWorldCharacter::FailOpeningDogTrace()
+{
+	FinishOpeningDogDraw();
+	bOpeningDogSlowLatched = false;
+	OpeningDogSlowWarnAt = -1.f;
+	FVector Loc = GetActorLocation();
+	Loc.X = -950.f;
+	Loc.Y = -180.f;
+	SetActorLocation(Loc, false, nullptr, ETeleportType::TeleportPhysics);
+	if (UCharacterMovementComponent* Move = GetCharacterMovement())
+	{
+		Move->StopMovementImmediately();
+	}
+	LaunchCharacter(FVector(0.f, 0.f, 220.f), true, true);
+	LogOpening(TEXT("opening_dog: the dove failed"));
+}
+
+bool AHomeWorldCharacter::HasOpeningHerbQuota() const
+{
+	return OpeningHerbsGathered >= HomeWorldOpeningHerbQuota && bOpeningHerbFromWest && bOpeningHerbFromEast;
+}
+
+void AHomeWorldCharacter::MaybeLeadPartnerAfterHerbs()
+{
+	if (!HasOpeningHerbQuota())
+	{
+		return;
+	}
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+	for (TActorIterator<AHomeWorldOpeningReveal> It(World); It; ++It)
+	{
+		It->TryLeadPartner();
+		return;
+	}
+}
+
+void AHomeWorldCharacter::RefreshOpeningQuest()
+{
+	if (!QuestLog || !GetWorld() || !UGameplayStatics::GetCurrentLevelName(this).Contains(TEXT("SizeTest")))
+	{
+		return;
+	}
+	FHomeWorldOpeningQuestFacts Facts;
+	Facts.bSpiritClaimed = bOpeningSpiritClaimed;
+	Facts.HerbsGathered = OpeningHerbsGathered;
+	Facts.bHerbFromWest = bOpeningHerbFromWest;
+	Facts.bHerbFromEast = bOpeningHerbFromEast;
+	Facts.bKettleBrewed = bOpeningKettleBrewed;
+	Facts.bDogSlow = bOpeningDogSlowLatched;
+	Facts.bTracingDove = bOpeningDogDrawActive;
+	Facts.bHasMixedHerb = OpeningMixedHerbs > 0;
+	Facts.bBackpack = bOpeningArmorGiftGiven;
+	Facts.bFishCaught = bOpeningFishCaught;
+	if (OpeningDog)
+	{
+		const float Dist = FVector::Dist2D(GetActorLocation(), OpeningDog->GetActorLocation());
+		Facts.bDogInSootheRange = Dist <= 280.f;
+		Facts.bWrathEased = OpeningDog->IsWrathEased();
+		Facts.bDogTamed = OpeningDog->IsDogTamed();
+	}
+	QuestLog->SetChain(TEXT("Opening"), UHomeWorldQuestLog::BuildOpeningSteps(Facts));
+	if (!GEngine)
+	{
+		return;
+	}
+	const TArray<FHomeWorldQuestStep>& Shown = QuestLog->GetDisplayedSteps();
+	for (int32 Index = 0; Index < Shown.Num(); ++Index)
+	{
+		const FString Line = Shown[Index].bDone
+			? FString::Printf(TEXT("[x] %s"), *Shown[Index].Text)
+			: FString::Printf(TEXT("[ ] %s"), *Shown[Index].Text);
+		GEngine->AddOnScreenDebugMessage(
+			9100 + Index, 0.5f, Shown[Index].bDone ? FColor(170, 170, 170) : FColor::White, Line);
+	}
+}
+
+void AHomeWorldCharacter::KnockFromOpeningDog(AHomeWorldOpeningDog* Dog, const FString& Why, float Dist, float Speed)
+{
+	if (!Dog)
+	{
+		return;
+	}
+	if (bOpeningDogDrawActive)
+	{
+		FinishOpeningDogDraw();
+	}
+	FVector Away = GetActorLocation() - Dog->GetActorLocation();
+	Away.Z = 0.f;
+	if (Away.IsNearlyZero())
+	{
+		Away = Dog->GetActorForwardVector();
+		Away.Z = 0.f;
+		if (Away.IsNearlyZero())
+		{
+			Away = FVector(-1.f, 0.f, 0.f);
+		}
+	}
+	Away.Normalize();
+	LaunchCharacter(Away * Dog->KnockSpeedCmS + FVector(0.f, 0.f, Dog->KnockLiftCmS), true, false);
+	OpeningDogKnockCooldown = Dog->KnockCooldownSeconds;
+	OpeningDogSlowWarnAt = -1.f;
+	static FString LastKnock;
+	static double LastKnockAt = -10.0;
+	const double KnockNow = FPlatformTime::Seconds();
+	if (Why != LastKnock || KnockNow - LastKnockAt >= 1.5)
+	{
+		LastKnock = Why;
+		LastKnockAt = KnockNow;
+		UE_LOG(LogTemp, Log, TEXT("opening_dog: knocked back (%s, %.0f cm, %.0f cm/s)"), *Why, Dist, Speed);
 	}
 }
 
@@ -690,7 +1663,11 @@ void AHomeWorldCharacter::StartOpeningHerbRune(AActor* Bed)
 		PC);
 	OpeningRuneShape = Shape;
 	OpeningRuneBed = Bed;
-	OpeningRuneCursor = Shape->GetStartPoint();
+	FVector RuneOrigin = FVector::ZeroVector;
+	FVector RuneRight = FVector::RightVector;
+	FVector RuneUp = FVector::UpVector;
+	Shape->GetPlane(RuneOrigin, RuneRight, RuneUp);
+	OpeningRuneCursor = Shape->IsPointsMode() ? RuneOrigin : Shape->GetStartPoint();
 	bOpeningRuneActive = true;
 	OpeningPointTime = Shape->IsPointsMode() ? 3.f : -1.f;
 	if (SizeTestWisp)
@@ -702,9 +1679,33 @@ void AHomeWorldCharacter::StartOpeningHerbRune(AActor* Bed)
 	}
 }
 
+static void PaintGreyboxMesh(AActor* Actor, const TCHAR* MaterialPath);
+
 void AHomeWorldCharacter::FinishOpeningHerbRune(int32 Tenths)
 {
+	if (bOpeningWispCollect)
+	{
+		bOpeningWispCollect = false;
+		bOpeningRuneActive = false;
+		AActor* Collected = OpeningRuneBed;
+		SnapSizeTestWispHome(Collected);
+		if (OpeningRuneShape)
+		{
+			OpeningRuneShape->HideShape();
+			OpeningRuneShape = nullptr;
+		}
+		OpeningRuneBed = nullptr;
+		if (Tenths > 0 && Collected && !Collected->IsHidden())
+		{
+			Collected->SetActorHiddenInGame(true);
+			Collected->SetActorEnableCollision(false);
+			++OpeningWispsCollected;
+			UE_LOG(LogTemp, Log, TEXT("opening_night: wisp collected %d/3"), OpeningWispsCollected);
+		}
+		return;
+	}
 	bOpeningRuneActive = false;
+	SnapSizeTestWispHome(OpeningRuneBed);
 	if (OpeningRuneShape)
 	{
 		OpeningRuneShape->HideShape();
@@ -713,12 +1714,21 @@ void AHomeWorldCharacter::FinishOpeningHerbRune(int32 Tenths)
 	const int32 Score = FMath::Clamp(Tenths, 0, 10);
 	if (Score <= 0)
 	{
-		UE_LOG(LogTemp, Log, TEXT("opening_herb: missed, nothing collected"));
+		LogOpening(TEXT("opening_herb: missed, nothing collected"));
 		OpeningRuneBed = nullptr;
 		return;
 	}
 	OpeningHerbTenths += Score;
-	UE_LOG(LogTemp, Log, TEXT("opening_herb: collected %d chunks, bank %d"), Score, OpeningHerbTenths);
+	OpeningHerbsGathered += Score;
+	if (OpeningRuneBed && OpeningRuneBed->ActorHasTag(FName(TEXT("NODE_GARDEN_EAST"))))
+	{
+		bOpeningHerbFromEast = true;
+	}
+	else
+	{
+		bOpeningHerbFromWest = true;
+	}
+	LogOpening(FString::Printf(TEXT("opening_herb: collected %d, gathered %d"), Score, OpeningHerbsGathered));
 	UWorld* World = GetWorld();
 	if (OpeningRuneBed && World)
 	{
@@ -741,19 +1751,36 @@ void AHomeWorldCharacter::FinishOpeningHerbRune(int32 Tenths)
 		{
 			Plant->SetActorHiddenInGame(true);
 			Plant->SetActorEnableCollision(false);
-			OpeningHerbPlant = Plant;
 		}
 		const bool bEast = OpeningRuneBed->ActorHasTag(FName(TEXT("NODE_GARDEN_EAST")));
-		bOpeningHerbEast = bEast;
 		OpeningRuneBed->SetActorEnableCollision(false);
 		OpeningRuneBed->Tags.Remove(FName(TEXT("NODE_GARDEN")));
 		OpeningRuneBed->Tags.Remove(FName(TEXT("NODE_GARDEN_EAST")));
 		OpeningRuneBed->Tags.Remove(FName(TEXT("NODE_GARDEN_WEST")));
-		OpeningHerbBed = OpeningRuneBed;
-		OpeningHerbRespawnTime = World->GetTimeSeconds() + 20.f;
+		const float When = World->GetTimeSeconds() + 20.f;
+		FOpeningHerbReturn* Row = nullptr;
+		for (FOpeningHerbReturn& Existing : OpeningHerbReturns)
+		{
+			if (Existing.Bed == OpeningRuneBed)
+			{
+				Row = &Existing;
+				break;
+			}
+		}
+		if (!Row)
+		{
+			Row = &OpeningHerbReturns.AddDefaulted_GetRef();
+			Row->Bed = OpeningRuneBed;
+		}
+		Row->Plant = Plant;
+		Row->bEast = bEast;
+		Row->Time = When;
+		PaintGreyboxMesh(
+			OpeningRuneBed,
+			TEXT("/Game/HomeWorld/Materials/Instances/MI_Greybox_Olive.MI_Greybox_Olive"));
+		UE_LOG(LogTemp, Log, TEXT("opening_rune: %s herb returns in 20s"), bEast ? TEXT("east") : TEXT("west"));
 	}
 	OpeningRuneBed = nullptr;
-	UE_LOG(LogTemp, Log, TEXT("opening_rune: herb returns in 20s"));
 }
 
 void AHomeWorldCharacter::UpdateOpeningHerbRune(float DeltaTime)
@@ -778,7 +1805,7 @@ void AHomeWorldCharacter::UpdateOpeningHerbRune(float DeltaTime)
 		FVector Right = FVector::RightVector;
 		FVector Up = FVector::UpVector;
 		OpeningRuneShape->GetPlane(Origin, Right, Up);
-		OpeningRuneCursor += (Right * DeltaX + Up * DeltaY) * 3.2f;
+		OpeningRuneCursor += (Right * DeltaX + Up * DeltaY) * 4.8f;
 	}
 	OpeningRuneShape->SetCursor(OpeningRuneCursor);
 	if (SizeTestWisp)
@@ -881,41 +1908,145 @@ void AHomeWorldCharacter::UpdateOpeningHerbPreview()
 void AHomeWorldCharacter::RestoreOpeningHerb()
 {
 	UWorld* World = GetWorld();
-	if (!World || OpeningHerbRespawnTime < 0.f || World->GetTimeSeconds() < OpeningHerbRespawnTime)
+	if (!World)
 	{
 		return;
 	}
-	if (OpeningHerbBed)
+	const float Now = World->GetTimeSeconds();
+	for (int32 Index = OpeningHerbReturns.Num() - 1; Index >= 0; --Index)
 	{
-		OpeningHerbBed->Tags.AddUnique(FName(TEXT("NODE_GARDEN")));
-		OpeningHerbBed->Tags.AddUnique(bOpeningHerbEast ? FName(TEXT("NODE_GARDEN_EAST")) : FName(TEXT("NODE_GARDEN_WEST")));
-		OpeningHerbBed->SetActorEnableCollision(true);
+		FOpeningHerbReturn& Row = OpeningHerbReturns[Index];
+		if (Row.Time < 0.f || Now < Row.Time)
+		{
+			continue;
+		}
+		if (Row.Bed)
+		{
+			Row.Bed->Tags.AddUnique(FName(TEXT("NODE_GARDEN")));
+			Row.Bed->Tags.AddUnique(Row.bEast ? FName(TEXT("NODE_GARDEN_EAST")) : FName(TEXT("NODE_GARDEN_WEST")));
+			Row.Bed->SetActorEnableCollision(true);
+			PaintGreyboxMesh(
+				Row.Bed,
+				TEXT("/Game/HomeWorld/Materials/Instances/MI_Greybox_Tan.MI_Greybox_Tan"));
+		}
+		if (Row.Plant)
+		{
+			Row.Plant->SetActorHiddenInGame(false);
+			Row.Plant->SetActorEnableCollision(true);
+		}
+		UE_LOG(LogTemp, Log, TEXT("opening_rune: %s herb returned"), Row.bEast ? TEXT("east") : TEXT("west"));
+		OpeningHerbReturns.RemoveAt(Index);
 	}
-	if (OpeningHerbPlant)
+}
+
+static void PaintGreyboxMesh(AActor* Actor, const TCHAR* MaterialPath)
+{
+	if (!Actor)
 	{
-		OpeningHerbPlant->SetActorHiddenInGame(false);
-		OpeningHerbPlant->SetActorEnableCollision(true);
+		return;
 	}
-	UE_LOG(LogTemp, Log, TEXT("opening_rune: herb returned"));
-	OpeningHerbBed = nullptr;
-	OpeningHerbPlant = nullptr;
-	OpeningHerbRespawnTime = -1.f;
+	UMaterialInterface* Material = LoadObject<UMaterialInterface>(nullptr, MaterialPath);
+	if (!Material)
+	{
+		return;
+	}
+	TArray<UStaticMeshComponent*> Meshes;
+	Actor->GetComponents<UStaticMeshComponent>(Meshes);
+	for (UStaticMeshComponent* Mesh : Meshes)
+	{
+		if (Mesh && Mesh->GetMaterial(0) != Material)
+		{
+			Mesh->SetMaterial(0, Material);
+		}
+	}
 }
 
 void AHomeWorldCharacter::UpdateSizeTestWisp(float DeltaTime)
 {
+	if (UWorld* StationWorld = GetWorld())
+	{
+		const TCHAR* OpenPath = TEXT("/Game/HomeWorld/Materials/Instances/MI_Greybox_Olive.MI_Greybox_Olive");
+		const TCHAR* WaitPath = TEXT("/Game/HomeWorld/Materials/Instances/MI_Greybox_Tan.MI_Greybox_Tan");
+		for (TActorIterator<AActor> It(StationWorld); It; ++It)
+		{
+			if (It->ActorHasTag(FName(TEXT("NODE_CONSUMABLE_STATION")))
+				|| It->ActorHasTag(FName(TEXT("KettleProp"))))
+			{
+				PaintGreyboxMesh(*It, bOpeningConsumableOpen ? OpenPath : WaitPath);
+			}
+			else if (It->ActorHasTag(FName(TEXT("NODE_ARMOR_TABLE"))))
+			{
+				PaintGreyboxMesh(*It, bOpeningArmorGiftGiven ? OpenPath : WaitPath);
+			}
+		}
+	}
 	RestoreOpeningHerb();
 	ShowOpeningProximityLine();
+	MaybeLeadPartnerAfterHerbs();
+	RefreshOpeningQuest();
 	if (bOpeningRuneActive)
 	{
+		bOpeningWispReturning = false;
 		UpdateOpeningHerbRune(DeltaTime);
 		return;
 	}
+	if (bOpeningDogDrawActive)
+	{
+		bOpeningWispReturning = false;
+		UpdateOpeningDogDraw(DeltaTime);
+		return;
+	}
+	UpdateOpeningDog(DeltaTime);
 	UpdateOpeningHerbPreview();
 	if (SizeTestWisp && SizeTestWisp->IsVisible())
 	{
-		SizeTestWisp->SetUsingAbsoluteLocation(false);
-		SizeTestWisp->SetRelativeLocation(FVector(10.0f, 45.0f, 55.0f));
+		const AActor* Mark = FindOpeningProximityTarget();
+		if (bOpeningWispReturning && Mark && Mark != OpeningWispReleased)
+		{
+			bOpeningWispReturning = false;
+			OpeningWispReleased = nullptr;
+		}
+		if (bOpeningWispReturning)
+		{
+			OpeningWispReturnLeft -= DeltaTime;
+			const FVector Home = GetActorTransform().TransformPosition(FVector(10.f, 45.f, 55.f));
+			const float Alpha = 1.f - FMath::Clamp(OpeningWispReturnLeft / 0.35f, 0.f, 1.f);
+			SizeTestWisp->SetUsingAbsoluteLocation(true);
+			SizeTestWisp->SetWorldLocation(FMath::Lerp(OpeningWispReturnFrom, Home, Alpha));
+			if (OpeningWispReturnLeft <= 0.f)
+			{
+				bOpeningWispReturning = false;
+				SizeTestWisp->SetUsingAbsoluteLocation(false);
+				SizeTestWisp->SetRelativeLocation(FVector(10.f, 45.f, 55.f));
+			}
+			return;
+		}
+		if (Mark)
+		{
+			if (Mark == OpeningWispReleased)
+			{
+				SizeTestWisp->SetUsingAbsoluteLocation(false);
+				SizeTestWisp->SetRelativeLocation(FVector(10.f, 45.f, 55.f));
+			}
+			else
+			{
+				FVector Hover = FVector::ZeroVector;
+				const float HoverTime = GetWorld() ? GetWorld()->GetTimeSeconds() : 0.f;
+				const FVector Viewer = FollowCamera ? FollowCamera->GetComponentLocation() : GetActorLocation();
+				const float HeadZ = GetActorLocation().Z + CapsuleHalfHeight;
+				if (HomeWorldWisp::HoverPoint(Mark, Viewer, HeadZ, HoverTime, Hover))
+				{
+					SizeTestWisp->SetUsingAbsoluteLocation(true);
+					SizeTestWisp->SetWorldLocation(Hover);
+				}
+			}
+		}
+		else
+		{
+			OpeningWispReleased = nullptr;
+			SizeTestWisp->SetUsingAbsoluteLocation(false);
+			SizeTestWisp->SetRelativeLocation(FVector(10.0f, 45.0f, 55.0f));
+		}
 	}
 }
 
@@ -1224,7 +2355,7 @@ void AHomeWorldCharacter::OnInteractTriggered(const FInputActionValue& Value)
 	{
 		UE_LOG(LogTemp, Log, TEXT("HomeWorld: Interact input triggered"));
 	}
-	if (bOpeningRuneActive)
+	if (bOpeningRuneActive || bOpeningDogDrawActive)
 	{
 		return;
 	}
@@ -1249,6 +2380,10 @@ void AHomeWorldCharacter::OnInteractTriggered(const FInputActionValue& Value)
 void AHomeWorldCharacter::NoteSizeTestInteract(bool bHandled)
 {
 	bSizeTestInteractHandled = bHandled;
+	if (bHandled && !bOpeningRuneActive && !bOpeningDogDrawActive)
+	{
+		SnapSizeTestWispHome(FindOpeningProximityTarget());
+	}
 }
 
 void AHomeWorldCharacter::OnPlaceTriggered(const FInputActionValue& Value)
@@ -2453,8 +3588,8 @@ bool AHomeWorldCharacter::TryBrewNodeKettleTea()
 			TeaSprintEndWorldTime = Now;
 		}
 		TeaSprintEndWorldTime += GrantSeconds;
-		UE_LOG(LogTemp, Log, TEXT("NODE_KETTLE: brewed %d herb chunks into %.0fs of sprint, %d left"),
-			Chunks, GrantSeconds, OpeningHerbTenths);
+		bOpeningKettleBrewed = true;
+		LogOpening(TEXT("opening_kettle: brewed"));
 		ShowInteractFeedback(TEXT("NODE_KETTLE: tea from herb chunks"), FColor::Green);
 		bHasSidedHerb = false;
 		return true;
@@ -2462,7 +3597,7 @@ bool AHomeWorldCharacter::TryBrewNodeKettleTea()
 	const bool bSpent = Inv->SpendResource(HomeWorldInventory::RES_HERB, 1);
 	if (!bSpent && !bHasSidedHerb)
 	{
-		UE_LOG(LogTemp, Log, TEXT("NODE_KETTLE: brew failed - need herb chunks (banked %d)"), OpeningHerbTenths);
+		LogOpening(TEXT("opening_kettle: need herb chunks"));
 		ShowInteractFeedback(TEXT("NODE_KETTLE: need RES_HERB"), FColor::Yellow);
 		return false;
 	}
@@ -4346,7 +5481,7 @@ void AHomeWorldCharacter::PlaySoftFormSwapFeedback(EHomeWorldTimeOfDayPhase Phas
 
 void AHomeWorldCharacter::Look(const FInputActionValue& Value)
 {
-	if (bOpeningRuneActive || bSizeTestInteractCursor || (StrokeReport && StrokeReport->IsStrokeHeld()))
+	if (bOpeningRuneActive || bOpeningDogDrawActive || bSizeTestInteractCursor || (StrokeReport && StrokeReport->IsStrokeHeld()))
 	{
 		return;
 	}
@@ -4392,7 +5527,8 @@ bool AHomeWorldCharacter::ActorHasInteractableComponent(const AActor* Actor)
 		return Opening->IsSpiritVisible();
 	}
 	if (Actor->ActorHasTag(FName(TEXT("NPC_PARTNER")))
-		|| Actor->ActorHasTag(FName(TEXT("NPC_CHILD"))))
+		|| Actor->ActorHasTag(FName(TEXT("NPC_CHILD")))
+		|| Actor->ActorHasTag(FName(TEXT("NODE_ZIPLINE"))))
 	{
 		return true;
 	}

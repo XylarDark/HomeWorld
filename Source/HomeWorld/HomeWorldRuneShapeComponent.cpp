@@ -48,10 +48,11 @@ namespace
 		return Indices[Stream.RandRange(Begin, Last)];
 	}
 
-	float DistanceToOutline(const FVector& Point, const TArray<FVector>& Outline)
+	float DistanceToOutline(const FVector& Point, const TArray<FVector>& Outline, bool bClosed)
 	{
 		float Best = TNumericLimits<float>::Max();
-		for (int32 Index = 0; Index < Outline.Num(); ++Index)
+		const int32 Segments = bClosed ? Outline.Num() : FMath::Max(0, Outline.Num() - 1);
+		for (int32 Index = 0; Index < Segments; ++Index)
 		{
 			const FVector& A = Outline[Index];
 			const FVector& B = Outline[(Index + 1) % Outline.Num()];
@@ -106,6 +107,18 @@ void UHomeWorldRuneShapeComponent::EnsureRibbon(int32 SegmentCount)
 void UHomeWorldRuneShapeComponent::PickClickPoints()
 {
 	ClickOrder.Reset();
+	if (bCustomShape)
+	{
+		// A custom outline has no heart regions: mark the first, middle, and last points.
+		const int32 Count = HeartLocalPoints.Num();
+		if (Count >= 3)
+		{
+			ClickOrder.Add(0);
+			ClickOrder.Add(Count / 2);
+			ClickOrder.Add(Count - 1);
+		}
+		return;
+	}
 	float MinY = TNumericLimits<float>::Max();
 	float MaxY = TNumericLimits<float>::Lowest();
 	for (const FVector2D& Point : HeartLocalPoints)
@@ -158,7 +171,18 @@ void UHomeWorldRuneShapeComponent::PickClickPoints()
 
 void UHomeWorldRuneShapeComponent::Rebuild(const FVector& Right, const FVector& Up, const FVector& Center)
 {
-	if (HeartLocalPoints.Num() != HeartOutlineCount)
+	if (bCustomShape)
+	{
+		if (HeartLocalPoints.Num() != UnitShapePoints.Num())
+		{
+			HeartLocalPoints.Reset();
+			for (const FVector2D& Unit : UnitShapePoints)
+			{
+				HeartLocalPoints.Add(FVector2D((Unit.X - 0.5f) * CustomSizeCm, (Unit.Y - 0.5f) * CustomSizeCm));
+			}
+		}
+	}
+	else if (HeartLocalPoints.Num() != HeartOutlineCount)
 	{
 		HeartLocalPoints.Reset();
 		for (int32 Index = 0; Index < HeartOutlineCount; ++Index)
@@ -175,7 +199,8 @@ void UHomeWorldRuneShapeComponent::Rebuild(const FVector& Right, const FVector& 
 	float Length = 0.f;
 	for (int32 Index = 0; Index < HeartLocalPoints.Num(); ++Index)
 	{
-		const FVector Point = Center + Right * HeartLocalPoints[Index].X * HeartScaleCm + Up * HeartLocalPoints[Index].Y * HeartScaleCm;
+		const float LocalScale = bCustomShape ? 1.f : HeartScaleCm;
+		const FVector Point = Center + Right * HeartLocalPoints[Index].X * LocalScale + Up * HeartLocalPoints[Index].Y * LocalScale;
 		if (Index > 0)
 		{
 			Length += FVector::Dist(Outline.Last(), Point);
@@ -183,7 +208,7 @@ void UHomeWorldRuneShapeComponent::Rebuild(const FVector& Right, const FVector& 
 		Outline.Add(Point);
 		Arc.Add(Length);
 	}
-	if (Outline.Num() > 1)
+	if (Outline.Num() > 1 && bOutlineClosed)
 	{
 		Length += FVector::Dist(Outline.Last(), Outline[0]);
 	}
@@ -203,6 +228,14 @@ void UHomeWorldRuneShapeComponent::Rebuild(const FVector& Right, const FVector& 
 			}
 		}
 	}
+	else if (bCustomShape)
+	{
+		// The trace starts at the outline's first point and walks it in order.
+		for (const FVector& Point : Outline)
+		{
+			Goals.Add(Point);
+		}
+	}
 	else
 	{
 		const int32 Bottom = HeartOutlineCount / 2;
@@ -218,6 +251,7 @@ void UHomeWorldRuneShapeComponent::Rebuild(const FVector& Right, const FVector& 
 void UHomeWorldRuneShapeComponent::ApplyRibbon()
 {
 	EnsureRibbon(Outline.Num());
+	const int32 Surface = bOutlineClosed ? Outline.Num() : FMath::Max(0, Outline.Num() - 1);
 	for (int32 Index = 0; Index < Segments.Num(); ++Index)
 	{
 		USplineMeshComponent* Segment = Segments[Index];
@@ -225,7 +259,7 @@ void UHomeWorldRuneShapeComponent::ApplyRibbon()
 		{
 			continue;
 		}
-		if (Index < Outline.Num())
+		if (Index < Surface)
 		{
 			const FVector Origin = GetOwner() ? GetOwner()->GetActorLocation() : FVector::ZeroVector;
 			const FVector Start = Outline[Index] - Origin;
@@ -234,10 +268,12 @@ void UHomeWorldRuneShapeComponent::ApplyRibbon()
 			Segment->SetWorldLocation(Origin);
 			Segment->SetWorldRotation(FRotator::ZeroRotator);
 			Segment->SetStartAndEnd(Start, Tangent, End, Tangent, true);
-			if (UMaterialInterface* Ribbon = LoadObject<UMaterialInterface>(nullptr,
-				DrawMode == EHomeWorldRuneDrawMode::Points
-					? TEXT("/Game/HomeWorld/Materials/Instances/MI_Cabin_DarkSlate.MI_Cabin_DarkSlate")
-					: TEXT("/Game/HomeWorld/Materials/Instances/MI_Portal_Stone_Lightgray.MI_Portal_Stone_Lightgray")))
+			const TCHAR* RibbonPath = bCustomShape
+				? TEXT("/Game/HomeWorld/Materials/Instances/MI_Greybox_Purple.MI_Greybox_Purple")
+				: (DrawMode == EHomeWorldRuneDrawMode::Points
+					? TEXT("/Game/HomeWorld/Materials/Instances/MI_Greybox_Slate.MI_Greybox_Slate")
+					: TEXT("/Game/HomeWorld/Materials/Instances/MI_Greybox_Stone.MI_Greybox_Stone"));
+			if (UMaterialInterface* Ribbon = LoadObject<UMaterialInterface>(nullptr, RibbonPath))
 			{
 				Segment->SetMaterial(0, Ribbon);
 			}
@@ -283,7 +319,7 @@ void UHomeWorldRuneShapeComponent::ApplyRibbon()
 		{
 			ClickMarks[Index]->SetWorldLocation(Goals[Index]);
 			if (UMaterialInterface* MarkGrey = LoadObject<UMaterialInterface>(nullptr,
-				TEXT("/Game/HomeWorld/Materials/Instances/MI_Portal_Stone_Lightgray.MI_Portal_Stone_Lightgray")))
+				TEXT("/Game/HomeWorld/Materials/Instances/MI_Greybox_Stone.MI_Greybox_Stone")))
 			{
 				ClickMarks[Index]->SetMaterial(0, MarkGrey);
 			}
@@ -310,6 +346,9 @@ void UHomeWorldRuneShapeComponent::ApplyProgress()
 
 void UHomeWorldRuneShapeComponent::ShowHeart(EHomeWorldRuneDrawMode Draw, EHomeWorldRuneOrientation InOrientation, APlayerController* InViewer)
 {
+	bCustomShape = false;
+	bOutlineClosed = true;
+	HeartLocalPoints.Reset();
 	DrawMode = Draw;
 	Orientation = InOrientation;
 	Viewer = InViewer;
@@ -325,6 +364,35 @@ void UHomeWorldRuneShapeComponent::ShowHeart(EHomeWorldRuneDrawMode Draw, EHomeW
 		Draw == EHomeWorldRuneDrawMode::Points ? TEXT("points") : TEXT("trace"),
 		InOrientation == EHomeWorldRuneOrientation::Static ? TEXT("static") : TEXT("camera"),
 		GetReward());
+}
+
+void UHomeWorldRuneShapeComponent::ShowShape(const TArray<FVector2D>& UnitPoints, float SizeCm, bool bCloseLoop,
+	EHomeWorldRuneDrawMode Draw, EHomeWorldRuneOrientation InOrientation, APlayerController* InViewer)
+{
+	if (UnitPoints.Num() < 2)
+	{
+		return;
+	}
+	bCustomShape = true;
+	bOutlineClosed = bCloseLoop;
+	UnitShapePoints = UnitPoints;
+	CustomSizeCm = FMath::Max(20.f, SizeCm);
+	HeartLocalPoints.Reset();
+	DrawMode = Draw;
+	Orientation = InOrientation;
+	Viewer = InViewer;
+	bShown = true;
+	bBasisLocked = false;
+	bInSection = false;
+	Progress = 0;
+	SectionsEarned = 0;
+	ClickOrder.Reset();
+	AlignToViewer(InViewer);
+	SetComponentTickEnabled(true);
+	UE_LOG(LogTemp, Log, TEXT("opening_rune: %s shape, %s, size %.0f, %d points"),
+		Draw == EHomeWorldRuneDrawMode::Points ? TEXT("points") : TEXT("trace"),
+		InOrientation == EHomeWorldRuneOrientation::Static ? TEXT("static") : TEXT("camera"),
+		CustomSizeCm, UnitPoints.Num());
 }
 
 void UHomeWorldRuneShapeComponent::HideShape()
@@ -458,7 +526,7 @@ bool UHomeWorldRuneShapeComponent::AdvanceTrace()
 	{
 		return false;
 	}
-	const bool bInside = DistanceToOutline(Cursor, Outline) <= TraceCorridorCm;
+	const bool bInside = DistanceToOutline(Cursor, Outline, bOutlineClosed) <= TraceCorridorCm;
 	const int32 SectionEnd = ((Progress + 1) * Goals.Num()) / RuneSectionCount;
 	const int32 EndIndex = FMath::Clamp(SectionEnd - 1, 0, Goals.Num() - 1);
 	if (!bInside)

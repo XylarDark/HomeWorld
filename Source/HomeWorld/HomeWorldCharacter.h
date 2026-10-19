@@ -8,6 +8,7 @@
 #include "InputActionValue.h"
 #include "HomeWorldMealTypes.h"
 #include "HomeWorldStrokeReportComponent.h"
+#include "HomeWorldQuestLog.h"
 #include "HomeWorldTimeOfDaySubsystem.h"
 
 /** Where a family member stands. One place, not a dialogue tree. */
@@ -91,11 +92,41 @@ public:
 	/** Size-test spirit: hide the sphere, show the shoulder wisp, and send the child after the player. */
 	bool TryOpeningSpiritInFront();
 
-	/** Size-test partner: interact sends them inside, to the kettle. */
+	/** Size-test partner: interact sends them inside, to the kettle. A second press takes the armor gift. */
 	bool TryPartnerLeadInside();
+
+	/** Size-test stations: the kitchen consumable table (one output) and the armory table. */
+	bool TryOpeningStationInFront();
+
+	/** Beat 4 dog: eased Wrath takes the mixed herb. Too close or too fast knocks you back. */
+	UFUNCTION(BlueprintCallable, Category = "Opening|T0", meta = (DisplayName = "Try Opening Dog In Front"))
+	bool TryOpeningDogInFront();
+	bool TryOpeningFish();
+
+	/** Size-test bed: sleep grants spirit and stays on the island. Night alone does not. */
+	bool TryOpeningBedInFront();
+
+	/** Size-test night: the click heart on a world wisp collects it. */
+	bool TryOpeningNightSetInFront();
+
+	/** E at the second-floor perch rides the line down to the fishing pond. */
+	UFUNCTION(BlueprintCallable, Category = "Opening|T0", meta = (DisplayName = "Try Opening Zipline In Front"))
+	bool TryOpeningZiplineInFront();
 
 	/** Size-test: the interact ability reports whether E actually did something. */
 	void NoteSizeTestInteract(bool bHandled);
+
+	/** Stations: true once the consumable table is open. */
+	UFUNCTION(BlueprintCallable, Category = "Opening|T0", meta = (DisplayName = "Is Opening Consumable Station Open"))
+	bool IsOpeningConsumableStationOpen() const { return bOpeningConsumableOpen; }
+
+	/** Stations: the herb mixed with a spirit, carried. The dog beat spends one. */
+	UFUNCTION(BlueprintCallable, Category = "Opening|T0", meta = (DisplayName = "Get Opening Mixed Herbs"))
+	int32 GetOpeningMixedHerbs() const { return OpeningMixedHerbs; }
+
+	/** Stations: true once the partner has given the armor piece. No numbers change. */
+	UFUNCTION(BlueprintCallable, Category = "Opening|T0", meta = (DisplayName = "Has Opening Armor Gift"))
+	bool HasOpeningArmorGift() const { return bOpeningArmorGiftGiven; }
 
 	/** FALLBACK V2: start scripted CRUMB glide when near GP_GlideStart / glider perch. Day/body only. */
 	UFUNCTION(BlueprintCallable, Category = "Transit|FALLBACK", meta = (DisplayName = "Try Start Fallback Glide"))
@@ -820,6 +851,9 @@ protected:
 	bool TraceEyeInteract(FHitResult& OutHit) const;
 	void UpdateSizeTestWalk();
 	void UpdateSizeTestWisp(float DeltaTime);
+	void UpdateOpeningBonk();
+	void UpdateOpeningNight(float DeltaTime);
+	void EnsureOpeningNightProps();
 	void ApplyOpeningWalkSpeed();
 	void UpdateOpeningWalkScroll();
 	int32 OpeningSpeedStep = 0;
@@ -835,24 +869,78 @@ protected:
 
 	bool bSizeTestInteractCursor = false;
 	bool bSizeTestInteractHandled = false;
+	TObjectPtr<AActor> OpeningWispReleased;
+	bool bOpeningWispReturning = false;
+	float OpeningWispReturnLeft = 0.f;
+	FVector OpeningWispReturnFrom = FVector::ZeroVector;
+	FVector OpeningBonkSafe = FVector::ZeroVector;
+	bool bOpeningBonkSafe = false;
+	bool bOpeningNightSpirit = false;
+	bool bOpeningWispCollect = false;
+	int32 OpeningWispsCollected = 0;
+	FVector OpeningNightChestPoint = FVector::ZeroVector;
+	TObjectPtr<UStaticMeshComponent> OpeningSpiritBody;
+	TObjectPtr<AActor> OpeningCopseWisp;
+	TObjectPtr<AActor> OpeningPondWisp;
+	TObjectPtr<AActor> OpeningSpringWisp;
+	void SnapSizeTestWispHome(AActor* Finished);
 	bool bOpeningRuneActive = false;
 	FVector OpeningRuneCursor = FVector::ZeroVector;
 	TObjectPtr<AActor> OpeningRuneBed;
-	TObjectPtr<AActor> OpeningHerbBed;
-	TObjectPtr<AActor> OpeningHerbPlant;
 	TObjectPtr<class UHomeWorldRuneShapeComponent> OpeningRuneShape;
+	struct FOpeningHerbReturn
+	{
+		TObjectPtr<AActor> Bed;
+		TObjectPtr<AActor> Plant;
+		bool bEast = false;
+		float Time = -1.f;
+	};
+	TArray<FOpeningHerbReturn> OpeningHerbReturns;
 	int32 OpeningHerbTenths = 0;
-	float OpeningHerbRespawnTime = -1.f;
+	/** Successful chunks from the two beds. Brewing does not lower this. A miss adds nothing. */
+	int32 OpeningHerbsGathered = 0;
+	bool bOpeningHerbFromWest = false;
+	bool bOpeningHerbFromEast = false;
+	bool bOpeningKettleBrewed = false;
 	float OpeningPointTime = -1.f;
-	bool bOpeningHerbEast = false;
+
+	/** Opening stations: the shoulder spirit claim, the consumable table, and its mixed herb output. */
+	bool bOpeningSpiritClaimed = false;
+	bool bOpeningConsumableOpen = false;
+	int32 OpeningMixedHerbs = 0;
+
+	/** The partner gave the armor piece. The armory table opens; walk speed and bonk tries stay as they are. */
+	bool bOpeningArmorGiftGiven = false;
+	bool TryOpeningArmorGift();
+	bool bOpeningFishCaught = false;
+
 	AActor* FindOpeningProximityTarget() const;
 	void ShowOpeningProximityLine();
+	void RefreshOpeningQuest();
+	void MaybeLeadPartnerAfterHerbs();
+	bool HasOpeningHerbQuota() const;
 	void StartOpeningHerbRune(AActor* Bed);
 	void UpdateOpeningHerbRune(float DeltaTime);
 	void FinishOpeningHerbRune(int32 Tenths);
 	void UpdateOpeningHerbPreview();
 	void RestoreOpeningHerb();
 	void UpdateSizeTestInteractCursor();
+
+	/** Beat 4: the injured dog. Knock on too close or too fast; trace Grace; then the mixed herb. */
+	void UpdateOpeningDog(float DeltaTime);
+	void UpdateOpeningDogDraw(float DeltaTime);
+	void StartOpeningDogDraw(class AHomeWorldOpeningDog* Dog);
+	void FinishOpeningDogDraw();
+	void KnockFromOpeningDog(class AHomeWorldOpeningDog* Dog, const FString& Why, float Dist, float Speed);
+	void FailOpeningDogTrace();
+	void SucceedOpeningDogTrace(class AHomeWorldOpeningDog* Dog);
+	TObjectPtr<class AHomeWorldOpeningDog> OpeningDog;
+	TObjectPtr<UHomeWorldQuestLog> QuestLog;
+	bool bOpeningDogDrawActive = false;
+	bool bOpeningDogSlowLatched = false;
+	FVector OpeningDogCursor = FVector::ZeroVector;
+	float OpeningDogKnockCooldown = 0.f;
+	float OpeningDogSlowWarnAt = -1.f;
 
 	/** Capsule radius (cm). Human-sized default; override in Blueprint for different characters. */
 	UPROPERTY(EditDefaultsOnly, Category = "Movement", meta = (ClampMin = "1.0", ClampMax = "200.0"))

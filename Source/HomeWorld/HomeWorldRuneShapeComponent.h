@@ -36,6 +36,14 @@ public:
 	UHomeWorldRuneShapeComponent();
 
 	void ShowHeart(EHomeWorldRuneDrawMode Draw, EHomeWorldRuneOrientation Orientation, APlayerController* Viewer);
+
+	/**
+	 * A rune from unit-space points (0..1, +Y up), centered and scaled to SizeCm.
+	 * The opening dog's Grace draw uses this; the heart keeps ShowHeart.
+	 */
+	void ShowShape(const TArray<FVector2D>& UnitPoints, float SizeCm, bool bCloseLoop,
+		EHomeWorldRuneDrawMode Draw, EHomeWorldRuneOrientation Orientation, APlayerController* Viewer);
+
 	void HideShape();
 	void AlignToViewer(APlayerController* Viewer);
 	void SetCursor(const FVector& WorldCursor);
@@ -81,6 +89,10 @@ private:
 	TArray<FVector> Outline;
 	TArray<float> Arc;
 	TArray<FVector> Goals;
+	bool bCustomShape = false;
+	bool bOutlineClosed = true;
+	TArray<FVector2D> UnitShapePoints;
+	float CustomSizeCm = 200.f;
 
 	UPROPERTY()
 	TArray<TObjectPtr<USplineMeshComponent>> Segments;

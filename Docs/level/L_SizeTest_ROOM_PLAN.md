@@ -41,11 +41,47 @@ Clear width after the 30 cm wall:
 
 ## Where the minute stands
 
-The kettle is on the kitchen’s east wall, world (1.8 m, 0.0 m), yaw 180, facing into the room.
+The kettle is on the kitchen’s east wall, world (1.8 m, 0.0 m), yaw 180, facing into the room. At play the reveal grows the counter under it and it stands on top; the counter is the consumable station.
 
 The player starts on the south of the pad at (−6 m, −58 m), yaw 90, facing the cottage. That is twice the earlier walk to the reveal. Trees and rocks stand between that start and the south door. The partner stands at the south door, world (−9.5 m, −8.2 m), on the player mesh, yaw 0, facing the player. Walking them inside is scheduled: stop, open the door the way the player does, then path to the kettle with collision on. They do not clip through the wall. The child starts beside the partner at world (−8.0 m, −8.6 m), on that same mesh at 0.6 scale, yaw 270, and runs to the spirit. The spirit is halfway between the player start and the cottage, at world (−7 m, −29 m).
 
 Herb beds sit south of the porch, off the entry, yaw 0.
+
+## The stations and the armory
+
+Added 2026-10-18. Changed the same day after Luke's replay: the armory slid in front of the cottage, and the kitchen counter became the consumable station.
+
+- The consumable station is the kitchen counter, against the east wall at world (2.15 m, 0). At play the reveal grows it 1.4 by 3.2 m, waist high at 0.9 m after the halving, and stands the kettle on top. Presses: the herb and the claimed spirit open it; the next press is its one output, the herb mixed with a spirit; after that the same counter brews at the kettle, one brew spending at most 10 chunks.
+- The armory is the second building, in front of the cottage at world (−0.5 m, −13 m), south of the east wing across the courtyard. Seven by six metres outside, 4 m walls, 30 cm thick, one 2.4 m door on the west wall facing the courtyard. `Content/Python/armory_shell.py` grows the walls; the placer checks the door, a wall, the floor, and a 42 cm walk in and back out.
+- The armor table stands against the armory's inside east wall: world (2.25 m, −13 m), 0.9 by 1.4 m, 0.9 m tall. The partner's gift opens it. No walk-speed or bonk-try change.
+
+The cottage is the home: cooking and consumables. Four yards sit around it. Crafting is the front yard, south. Taming is the backyard, north. Research is the east hill. Fishing is the west pond. The numbers are in `Docs/level/L_SizeTest_METRICS.md`.
+
+## The opening dog
+
+Added 2026-10-18. Beat 4 of the tutorial day, after the armory.
+
+- The north wall has a back door, 2.4 m wide, centered on the child room. It opens onto the backyard. The south door stays the front door.
+- The dog stands in that backyard, north of the back door, facing the door. A dog house sits beside it, off the approach lane. The dog is a greybox body until a mesh exists. It is not a solid.
+- The approach lane runs south from the dog to the back door. The placer still wants nine metres of clear pad back to the knock ring, and 2.8 m of clearance from every solid.
+- Any press closer than 4 m knocks you back at once. A closing step faster than the slowest opening-wheel step (150 cm/s), inside 10 m, gets "Approach slowly." from the child, then the same shove about 1.25 s after that line is up. The armor gift clears the other proximity lines and leaves this one. Both knocks are a shove with a 250 cm/s lift and no damage. At the slow step, inside 9 m, the Grace symbol — the outline of a dove — appears; tracing it eases the Wrath. One mixed herb then tames the dog. The kept walk speed does not change.
+- After the kettle brew grants the tea sprint, the child races from their room out the back door and waits beside the lane, 1.5 m east of it and 6.1 m short of the dog, facing the dog. The stop is outside the 4 m knock ring and inside the 9 m Grace ring.
+
+## The zipline
+
+One perch is the cottage's northwest corner, 4 m up, with a walkable slope down the west wall and another down the north wall. The cable hangs 2.3 m above that perch and slopes to a perch on the pond's near bank. A second cable runs from the research hill down to the northeast corner, with a walkable slope on the north wall and another on the east wall. E on a high perch rides that line. Neither line is the day glide.
+
+## Frames and samples
+
+Added 2026-10-18. The numbers are in `Docs/level/L_SizeTest_METRICS.md`. This page does not copy them.
+
+The walk from the south start to the front door stays on the flat pad. South to north it is the copse gate, then the front yard.
+
+The east hill is the research side. A winding path climbs it to the observatory. The spring is built into that hill. Hot springs sit at its foot. From there a river stays north of the cottage, then turns south only once it is far west of the walls, and meets the pond. The pond sits on the cottage's west line, further toward the pad edge, still in sight from the dog. The terrain sculpt of these shapes is a later pass. This sheet is the flat greybox of where they go.
+
+The second pine grove stands beyond the hill. The farm plot stays east of the south path. A notch on the north face of the hill is the cave.
+
+Armor opens the gap onto the farm plot. It does not change speed or bonk tries. The top step of the overlook is listed and not placed until a glide has happened. The cave notch overlaps only, and only in spirit form after sleep. The first day does not climb the hill.
 
 ## Pocket kit outside the porch
 

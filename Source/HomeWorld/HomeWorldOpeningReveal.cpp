@@ -2,6 +2,7 @@
 
 #include "HomeWorldOpeningReveal.h"
 
+#include "HomeWorldCharacter.h"
 #include "HomeWorldOpeningWalker.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
@@ -24,7 +25,8 @@ namespace
 	constexpr float CounterCenterY = 0.f;
 	constexpr float CounterDepthCm = 140.f;
 	constexpr float CounterLengthCm = 320.f;
-	constexpr float CounterHeightCm = 180.f;
+	/** Waist height. The reveal grew 180 first; the kitchen replay halved it 2026-10-18. */
+	constexpr float CounterHeightCm = 90.f;
 	/** Floor spot at the north end of the counter, clear of the box and the east wall. */
 	const FVector PartnerStandCm(CounterCenterX, 240.f, 0.f);
 	const FVector PartnerRouteCm[] = {
@@ -33,6 +35,9 @@ namespace
 		FVector(40.f, 240.f, 0.f),
 		PartnerStandCm,
 	};
+	/** The dog-yard wait point: east of the lane line and short of the knock ring, so the follower can pass. */
+	constexpr float ChildYardOffsetX = 150.f;
+	constexpr float ChildYardOffsetY = -610.f;
 	AActor* PromoteWalker(UWorld* World, AActor* Source)
 	{
 		if (!World || !Source || Source->IsA<AHomeWorldOpeningWalker>())
@@ -76,6 +81,12 @@ AHomeWorldOpeningReveal::AHomeWorldOpeningReveal()
 	if (SphereMesh.Succeeded())
 	{
 		Spirit->SetStaticMesh(SphereMesh.Object);
+	}
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> SpiritPurple(
+		TEXT("/Game/HomeWorld/Materials/Instances/MI_Greybox_Purple.MI_Greybox_Purple"));
+	if (SpiritPurple.Succeeded())
+	{
+		Spirit->SetMaterial(0, SpiritPurple.Object);
 	}
 
 	Crest = CreateDefaultSubobject<UBoxComponent>(TEXT("Crest"));
@@ -121,6 +132,17 @@ FVector AHomeWorldOpeningReveal::StandNear(const FVector& From, const FVector& S
 	}
 	const FVector Stand = SpiritPoint + Away.GetSafeNormal() * InStandOffCm;
 	return FVector(Stand.X, Stand.Y, From.Z);
+}
+
+TArray<FVector> AHomeWorldOpeningReveal::ChildRaceRoute(const FVector& DogPoint, float FloorZ)
+{
+	// Through the north back door into the tame yard. The front door stays the way home.
+	TArray<FVector> Route;
+	Route.Add(FVector(-400.f, 800.f, FloorZ));
+	Route.Add(FVector(-390.f, 900.f, FloorZ));
+	Route.Add(FVector(-390.f, 1200.f, FloorZ));
+	Route.Add(FVector(DogPoint.X + ChildYardOffsetX, DogPoint.Y + ChildYardOffsetY, FloorZ));
+	return Route;
 }
 
 bool AHomeWorldOpeningReveal::TryClaim(APawn* Player)
@@ -341,6 +363,14 @@ void AHomeWorldOpeningReveal::Tick(float DeltaSeconds)
 	{
 		BeginHomecoming();
 	}
+	if (!bChildRacing && !bChildAtYard && bHomecoming && !bChildLeading && Child)
+	{
+		const AHomeWorldCharacter* PlayerChar = Cast<AHomeWorldCharacter>(FollowTarget);
+		if (PlayerChar && PlayerChar->IsTeaSprintGateActive())
+		{
+			BeginChildRace();
+		}
+	}
 	if (bChildLeading)
 	{
 		LeadChild(DeltaSeconds);
@@ -456,10 +486,6 @@ void AHomeWorldOpeningReveal::BeginHomecoming()
 	{
 		Partner = FindTagged(TEXT("NPC_PARTNER"));
 	}
-	if (!bPartnerLeading)
-	{
-		TryLeadPartner();
-	}
 	const float FloorZ = Child ? Child->GetActorLocation().Z : 0.f;
 	ChildPoints.Reset();
 	ChildPoints.Add(FVector(-950.f, -520.f, FloorZ));
@@ -474,6 +500,31 @@ void AHomeWorldOpeningReveal::BeginHomecoming()
 		Walker->SetMoveSpeed(ChildRunSpeed);
 	}
 	UE_LOG(LogTemp, Log, TEXT("opening_reveal: child follows the partner in, then to their room"));
+}
+
+void AHomeWorldOpeningReveal::BeginChildRace()
+{
+	if (bChildRacing || bChildAtYard || !Child)
+	{
+		return;
+	}
+	const float FloorZ = Child->GetActorLocation().Z;
+	// The sheet spot is the fallback; the dog actor wins when it is in the map.
+	FVector DogPoint(-390.f, 2000.f, FloorZ);
+	if (const AActor* Dog = FindTagged(TEXT("NODE_OPENING_DOG")))
+	{
+		DogPoint = Dog->GetActorLocation();
+	}
+	ChildPoints = ChildRaceRoute(DogPoint, FloorZ);
+	bChildRacing = true;
+	bChildLeading = true;
+	ChildLeg = 0;
+	if (AHomeWorldOpeningWalker* Walker = Cast<AHomeWorldOpeningWalker>(Child))
+	{
+		// The race uses the sprint the tea just granted; the walk falls behind on purpose.
+		Walker->SetMoveSpeed(PlayerMaxSpeed);
+	}
+	UE_LOG(LogTemp, Log, TEXT("opening_reveal: the child races to the dog yard (%d points)"), ChildPoints.Num());
 }
 
 void AHomeWorldOpeningReveal::LeadChild(float DeltaSeconds)
@@ -496,16 +547,67 @@ void AHomeWorldOpeningReveal::LeadChild(float DeltaSeconds)
 		bChildLeading = false;
 		return;
 	}
-	Walker->SetMoveSpeed(ChildRunSpeed);
+	Walker->SetMoveSpeed(bChildRacing ? PlayerMaxSpeed : ChildRunSpeed);
 	if (Walker->WalkToward(ChildPoints[ChildLeg], 60.f))
 	{
 		++ChildLeg;
 		if (ChildLeg >= ChildPoints.Num())
 		{
 			bChildLeading = false;
-			UE_LOG(LogTemp, Log, TEXT("opening_reveal: child in their room"));
+			if (bChildRacing)
+			{
+				bChildRacing = false;
+				bChildAtYard = true;
+				if (bChildGoHomeAfterTame)
+				{
+					BeginChildReturnHome();
+					return;
+				}
+				if (const AActor* Dog = FindTagged(TEXT("NODE_OPENING_DOG")))
+				{
+					FVector ToDog = Dog->GetActorLocation() - Child->GetActorLocation();
+					ToDog.Z = 0.f;
+					if (!ToDog.IsNearlyZero())
+					{
+						Child->SetActorRotation(ToDog.Rotation());
+					}
+				}
+				UE_LOG(LogTemp, Log, TEXT("opening_reveal: child waits at the dog yard"));
+			}
+			else
+			{
+				UE_LOG(LogTemp, Log, TEXT("opening_reveal: child in their room"));
+			}
 		}
 	}
+}
+
+void AHomeWorldOpeningReveal::BeginChildReturnHome()
+{
+	if (!Child)
+	{
+		return;
+	}
+	if (!bChildAtYard)
+	{
+		bChildGoHomeAfterTame = true;
+		return;
+	}
+	const float FloorZ = Child->GetActorLocation().Z;
+	ChildPoints.Reset();
+	ChildPoints.Add(FVector(-390.f, 1200.f, FloorZ));
+	ChildPoints.Add(FVector(-390.f, 900.f, FloorZ));
+	ChildPoints.Add(FVector(-400.f, 800.f, FloorZ));
+	bChildGoHomeAfterTame = false;
+	bChildAtYard = false;
+	bChildRacing = false;
+	bChildLeading = true;
+	ChildLeg = 0;
+	if (AHomeWorldOpeningWalker* Walker = Cast<AHomeWorldOpeningWalker>(Child))
+	{
+		Walker->SetMoveSpeed(ChildRunSpeed);
+	}
+	UE_LOG(LogTemp, Log, TEXT("opening_reveal: child walks back to their room"));
 }
 
 void AHomeWorldOpeningReveal::PlaceKettleCounter()
@@ -528,7 +630,7 @@ void AHomeWorldOpeningReveal::PlaceKettleCounter()
 	UStaticMeshComponent* Mesh = Counter->GetStaticMeshComponent();
 	Mesh->SetStaticMesh(Cube);
 	if (UMaterialInterface* Grey = LoadObject<UMaterialInterface>(nullptr,
-		TEXT("/Game/HomeWorld/Materials/Instances/MI_Cabin_StoneGray.MI_Cabin_StoneGray")))
+		TEXT("/Game/HomeWorld/Materials/Instances/MI_Greybox_Stone.MI_Greybox_Stone")))
 	{
 		Mesh->SetMaterial(0, Grey);
 	}
@@ -543,8 +645,26 @@ void AHomeWorldOpeningReveal::PlaceKettleCounter()
 	Counter->SetActorScale3D(FVector(CounterDepthCm / 100.f, CounterLengthCm / 100.f, CounterHeightCm / 100.f));
 	const float CenterZ = FloorZ + CounterHeightCm * 0.5f;
 	Counter->SetActorLocation(FVector(CounterCenterX, CounterCenterY, CenterZ));
+	// The kettle comes from the map as a static prop. It has to be movable to lift it.
+	if (UStaticMeshComponent* KettleComp = Kettle->FindComponentByClass<UStaticMeshComponent>())
+	{
+		KettleComp->SetMobility(EComponentMobility::Movable);
+	}
 	Kettle->SetActorLocation(FVector(CounterCenterX, CounterCenterY, FloorZ + CounterHeightCm + KettleLift));
+	Kettle->Tags.Add(FName(TEXT("KettleProp")));
+	if (UMaterialInterface* Tan = LoadObject<UMaterialInterface>(nullptr,
+		TEXT("/Game/HomeWorld/Materials/Instances/MI_Greybox_Tan.MI_Greybox_Tan")))
+	{
+		if (UStaticMeshComponent* KettleMesh = Kettle->FindComponentByClass<UStaticMeshComponent>())
+		{
+			KettleMesh->SetMaterial(0, Tan);
+		}
+	}
 	Counter->Tags.Add(FName(TEXT("KettleCounter")));
-	UE_LOG(LogTemp, Log, TEXT("opening_reveal: kettle on the counter, %.0f x %.0f x %.0f against the east wall"),
+	// The counter is the kitchen consumable station. The kettle on top is a prop: the station
+	// press opens, mixes, then brews on it, so the kettle itself is not a target.
+	Counter->Tags.Add(FName(TEXT("NODE_CONSUMABLE_STATION")));
+	Kettle->Tags.Remove(FName(TEXT("NODE_KETTLE")));
+	UE_LOG(LogTemp, Log, TEXT("opening_reveal: kettle on the counter station, %.0f x %.0f x %.0f at the east wall"),
 		CounterDepthCm, CounterLengthCm, CounterHeightCm);
 }

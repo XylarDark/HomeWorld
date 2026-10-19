@@ -34,4 +34,43 @@ bool FOpeningRevealChildArrivesFirst::RunTest(const FString& Parameters)
 	return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FOpeningRevealChildRaceRoute,
+	"HomeWorld.Systems.Opening.ChildRaceRoute",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FOpeningRevealChildRaceRoute::RunTest(const FString& Parameters)
+{
+	const FVector Dog(-390.f, 2000.f, 45000.f);
+	const TArray<FVector> Route = AHomeWorldOpeningReveal::ChildRaceRoute(Dog, 45000.f);
+	TestEqual(TEXT("four legs out the back door"), Route.Num(), 4);
+	if (Route.Num() != 4)
+	{
+		return false;
+	}
+	const FVector Room(-400.f, 800.f, 45000.f);
+	TestTrue(TEXT("the race starts at the room, no jump"), FVector::Dist2D(Route[0], Room) <= 200.f);
+	TestTrue(TEXT("the race leaves by the back door inside point"),
+		FVector::Dist2D(Route[1], FVector(-390.f, 900.f, 45000.f)) <= 1.f);
+	TestTrue(TEXT("the race leaves by the back door outside point"),
+		FVector::Dist2D(Route[2], FVector(-390.f, 1200.f, 45000.f)) <= 1.f);
+	const FVector Yard = Route.Last();
+	TestTrue(TEXT("the yard is the dog offset"), FVector::Dist2D(Yard, Dog + FVector(150.f, -610.f, 0.f)) <= 1.f);
+	const float YardToDog = FVector::Dist2D(Yard, Dog);
+	TestTrue(TEXT("the child waits outside the knock ring"), YardToDog > 400.f);
+	TestTrue(TEXT("the child waits inside the Grace ring"), YardToDog < 900.f);
+	TestTrue(TEXT("the yard leaves the lane room to pass"), FMath::Abs(Yard.X - Dog.X) >= 100.f);
+	for (int32 Leg = 0; Leg < Route.Num(); ++Leg)
+	{
+		TestEqual(TEXT("the race stays on the floor"), Route[Leg].Z, 45000.0);
+		if (Leg > 0)
+		{
+			const float Gap = FVector::Dist2D(Route[Leg - 1], Route[Leg]);
+			TestTrue(TEXT("no teleport between legs"), Gap <= 900.f);
+			TestTrue(TEXT("no stalled leg"), Gap >= 50.f);
+		}
+	}
+	return true;
+}
+
 #endif

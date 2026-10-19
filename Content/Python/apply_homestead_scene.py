@@ -5,9 +5,11 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
+import armory_shell
 import cabin_shell
 import scene_placement
 
+importlib.reload(armory_shell)
 importlib.reload(cabin_shell)
 importlib.reload(scene_placement)
 

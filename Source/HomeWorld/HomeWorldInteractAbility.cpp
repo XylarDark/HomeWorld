@@ -47,6 +47,32 @@ void UHomeWorldInteractAbility::ActivateAbility(const FGameplayAbilitySpecHandle
 		{
 			bHandled = Character->TryNodeKettleInteractInFront();
 		}
+		if (!bHandled)
+		{
+			// Opening stations: the kitchen consumable table and the armory table.
+			bHandled = Character->TryOpeningStationInFront();
+		}
+		if (!bHandled)
+		{
+			// Beat 4: the opening dog. Eased Wrath takes one mixed herb; otherwise it refuses.
+			bHandled = Character->TryOpeningDogInFront();
+		}
+		if (!bHandled)
+		{
+			bHandled = Character->TryOpeningFish();
+		}
+		if (!bHandled)
+		{
+			bHandled = Character->TryOpeningNightSetInFront();
+		}
+		if (!bHandled)
+		{
+			bHandled = Character->TryOpeningBedInFront();
+		}
+		if (!bHandled)
+		{
+			bHandled = Character->TryOpeningZiplineInFront();
+		}
 		Character->NoteSizeTestInteract(bHandled);
 		EndAbility(Handle, ActorInfo, ActivationInfo, false, !bHandled);
 		return;

@@ -6,7 +6,7 @@ Map for every pass that uses the opening: `/Game/HomeWorld/Maps/SizeTest/L_SizeT
 
 Write results in this file. The tutorial is one day on the island. The field is the first wild place, after the dawn glide. It is not a pass here.
 
-**Now:** The dog is in the build (verified 2026-10-18, pass below) — play it on the east lawn. The stations pass closed 2026-10-18. Coding for the unbuilt beats is [`Docs/handoffs/SESSION_HANDOFF_TUTORIAL_DAY.md`](../handoffs/SESSION_HANDOFF_TUTORIAL_DAY.md).
+**Now:** Night on the island, below. The bonk passed 2026-10-18. The glider is round 8 in [`Docs/context/OPENING_TUTORIAL_INTERVIEW.md`](../context/OPENING_TUTORIAL_INTERVIEW.md). It is not built.
 
 The midday slice below is passed. 2026-10-18.
 
@@ -49,55 +49,110 @@ The midday slice below is passed. 2026-10-18.
 
 ## The dog
 
-**Built.** In the map and verified 2026-10-18; waiting on the replay. On the east lawn at world (10.5 m, 1.5 m). The Grace draw is the outline of a dove. The pick is round 4 in [`Docs/context/OPENING_TUTORIAL_INTERVIEW.md`](../context/OPENING_TUTORIAL_INTERVIEW.md).
-
-Pass when that round is what you play, on the island, and you are not sent to the field to learn it.
+**Passed.** 2026-10-18. Played on the island. The procedure stays in [`Docs/context/OPENING_TUTORIAL_INTERVIEW.md`](../context/OPENING_TUTORIAL_INTERVIEW.md).
 
 | Field | Result |
 |---|---|
-| Date | |
-| Knocked away when too close or too fast? | |
-| Grace eased the Wrath? | |
-| Mixed herb tamed the dog? | |
-| One sentence | |
+| Date | 2026-10-18 |
+| The child raced to the yard after the brew? | Pass. |
+| Knocked away when too close or too fast? | Pass. |
+| Grace eased the Wrath? | Pass. |
+| Mixed herb tamed the dog? | Pass. |
+| One sentence | Everything passed. Tweaks are left and not named. |
+
+---
+
+## The backpack
+
+**Passed.** 2026-10-18. Round 6 in [`Docs/context/OPENING_TUTORIAL_INTERVIEW.md`](../context/OPENING_TUTORIAL_INTERVIEW.md). The kept walk stays 450 cm/s.
+
+| Field | Result |
+|---|---|
+| Date | 2026-10-18 |
+| The gift is a backpack you can see? | Pass, with the rest of this play. |
+| Materials stay out of it? | Pass, with the rest of this play. |
+| The armory table opens? | Pass, with the rest of this play. |
+| Walk speed and bonk tries unchanged? | Pass, with the rest of this play. |
+| One sentence | Playtest successful. Everything worked. |
+
+---
+
+## Fishing
+
+**Passed.** 2026-10-18. After the dog. Round 5 in [`Docs/context/OPENING_TUTORIAL_INTERVIEW.md`](../context/OPENING_TUTORIAL_INTERVIEW.md). One fish. No minigame.
+
+| Field | Result |
+|---|---|
+| Date | 2026-10-18 |
+| At the pond, press E? | Pass, with the rest of this play. |
+| One fish? | Pass, with the rest of this play. |
+| No minigame? | Pass, with the rest of this play. |
+| One sentence | Playtest successful. Everything worked. |
+
+---
+
+## The wisp
+
+**Passed.** 2026-10-18. The placement for a short prop is in [`Docs/level/L_SizeTest_CONTEXT.md`](../level/L_SizeTest_CONTEXT.md).
+
+| Field | Result |
+|---|---|
+| Date | 2026-10-18 |
+| Tall prop at head height, on your right? | Pass. |
+| Kettle and dog just above and to the right? | Pass. The kettle sat beside it. Short props now float above the top and past the right face. |
+| Cursor during the heart and the dove, then home? | Pass. |
+| Both beds back after 20 seconds? | Pass. The herb-bed wisp can sit a little further out. That gap is the same short-prop change. |
+| One sentence | Everything passed. The short-prop spot was the only tweak. |
 
 ---
 
 ## The bonk
 
-**Blocked.** The mist is not in this build. It stays up through this pass and clears at dawn.
-
-When it is playable: jump off while the mist is up. You come back onto the island. The first bonk does not slow the step and does not dim the shoulder light. Pass if you come back at once, you understand "not yet," and you can continue the day.
+**Passed.** 2026-10-18. The mist is not part of it. The return lands further inland than the lip.
 
 | Field | Result |
 |---|---|
-| Date | |
-| Came back at once? | |
-| Understood not yet? | |
-| Tried again? | |
-| One sentence | |
+| Date | 2026-10-18 |
+| Came back at once? | Pass. |
+| Step stayed the same? | Pass. |
+| Shoulder light stayed the same? | Pass. |
+| Could continue? | Pass. |
+| One sentence | It works. Send the landing further into the island. |
 
 ---
 
 ## Night on the island
 
-**Blocked.** Sleep is not this build's tutorial yet.
+**Built.** Waiting on this replay. Rounds 7 and 8 in [`Docs/context/OPENING_TUTORIAL_INTERVIEW.md`](../context/OPENING_TUTORIAL_INTERVIEW.md).
 
-The child says the bed-and-dawn line once. You sleep in the bed and become spirit. Night does not grant that form. You stay on the island. Pass if the night happens at home, and you are not sent off the island to learn it.
+Press E at the bed. The coat hides and you are a wisp. The companion you claimed stays, and it hovers on the bed and on the other wisps the same way it hovers on everything else. Night does not start an encounter or spiritual power regen. The child says the bed-and-dawn line once. Purple wisps stand beside the south copse, at the pond, and at the hot springs. Press E on one and play the click heart. A kept heart collects it. You do not need the other quests first.
 
 | Field | Result |
 |---|---|
 | Date | |
-| Heard the one line? | |
 | Slept and became spirit? | |
 | Stayed on the island? | |
+| Wisp on a pine, then home at 10? | |
+| One sentence | |
+
+---
+
+## The glider
+
+**Not built.** At dawn, before the descent. Round 8 in [`Docs/context/OPENING_TUTORIAL_INTERVIEW.md`](../context/OPENING_TUTORIAL_INTERVIEW.md). It spends wood, silk, and metal from the armory chest. Those chests are not built. The day glide does not start before the craft.
+
+| Field | Result |
+|---|---|
+| Date | |
+| Crafted at the armory table? | |
+| The descent does not start before the craft? | |
 | One sentence | |
 
 ---
 
 ## Dawn glide
 
-**Blocked.** Last mechanic of the tutorial. The mist clears at this dawn.
+**Blocked.** Last mechanic of the tutorial. The mist clears at this dawn. The descent waits on the glider craft above.
 
 You wake on the island. The bed returns you to the body. Dawn does not. The mist clears, and you glide down to the field. The glide is the day glide toward camp smoke, with no pickup. Pass if the glide is the last new mechanic, and the field reads as the first place past the tutorial.
 

@@ -62,7 +62,7 @@ A save is not a pass unless all six are true. A line that says the traces missed
 
 ## Before you report
 
-Do not tell the player a scene is done until the open editor has logged the pass. A description of the change is not that log. Headless `-nullrhi` does not hit meshes. A line through the middle of a gap is not a body: sweep the capsule radius. A hit read as an attribute is a miss. A position measured long after a one-second action is not that action.
+Do not tell the player a scene is done until the open editor has logged the pass. A description of the change is not that log. A material change is logged on the actors the player named. An imported mesh left on `WorldGridMaterial` is not painted, even when the cubes the placer spawned already wear the key. Headless `-nullrhi` does not hit meshes. A line through the middle of a gap is not a body: sweep the capsule radius. A hit read as an attribute is a miss. A position measured long after a one-second action is not that action.
 
 For this map the pass is `scene_placement: CHECK PASS` and `scene_placement: cabin walk enter cross exit clear` from `Content/Python/verify_homestead_scene.py`, in the open editor, after the save. If either line is absent, the scene is not done. Fix it and run the script again before the reply. The same rule applies to the next map: name its verify script in `Docs/level/<Map>_CONTEXT.md` and do not report until that script logs its pass.
 

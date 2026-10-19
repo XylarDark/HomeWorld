@@ -14,6 +14,7 @@ import sys
 import unreal
 
 sys.path.insert(0, os.path.dirname(__file__))
+import armory_shell
 import cabin_shell
 import size_test_guard
 
@@ -72,11 +73,11 @@ def destroy(actor):
 
 
 def stand_like_player(actor):
-    """SK_Player_Female faces mesh -Y. A +90 component yaw turns that face onto actor +X."""
+    """Hold the wake pose. The mesh is the actor root, so the sheet yaw is the whole facing:
+    SK_Player_Female faces mesh -Y, and the sheet turns that face where the beat wants it."""
     mesh = actor.get_component_by_class(unreal.SkeletalMeshComponent)
     if mesh is None:
         return
-    mesh.set_relative_rotation(yaw_rotator(90.0), False, False)
     mesh.set_animation_mode(unreal.AnimationMode.ANIMATION_SINGLE_NODE)
     mesh.stop()
 
@@ -134,6 +135,35 @@ def place_static(label, mesh_name, x_m, y_m, z_m, yaw, scale=1.0, scale_z=1.0):
     component = actor.get_component_by_class(unreal.StaticMeshComponent)
     if component is not None:
         component.set_static_mesh(mesh)
+    return actor
+
+
+def place_cube(label, x_m, y_m, z_m, yaw, size):
+    """An engine cube, size in meters. The armor table uses this, like the walk pad."""
+    cube = unreal.EditorAssetLibrary.load_asset("/Engine/BasicShapes/Cube")
+    if cube is None:
+        unreal.log("scene_placement: FAIL no engine cube for " + label)
+        return None
+    location = vec(x_m, y_m, z_m)
+    rotation = yaw_rotator(yaw)
+    actor = by_label().get(label)
+    if actor is not None and actor.get_component_by_class(unreal.StaticMeshComponent) is None:
+        destroy(actor)
+        actor = None
+    if actor is None:
+        actor = unreal.EditorLevelLibrary.spawn_actor_from_class(
+            unreal.StaticMeshActor, location, rotation
+        )
+        if actor is None:
+            unreal.log("scene_placement: FAIL cube did not spawn " + label)
+            return None
+        actor.set_actor_label(label)
+    component = actor.get_component_by_class(unreal.StaticMeshComponent)
+    if component is not None:
+        component.set_static_mesh(cube)
+    actor.set_actor_location(location, False, False)
+    actor.set_actor_rotation(rotation, False)
+    actor.set_actor_scale3d(unreal.Vector(float(size[0]), float(size[1]), float(size[2])))
     return actor
 
 
@@ -249,9 +279,7 @@ def spawn_cabin_walls():
         actor.set_actor_scale3d(unreal.Vector(sx / 100.0, sy / 100.0, sz / 100.0))
         wall = actor.get_component_by_class(unreal.StaticMeshComponent)
         wall.set_static_mesh(cube)
-        wall_material = cube.get_material(0)
-        if wall_material is not None:
-            wall.set_material(0, wall_material)
+        paint(actor, "MI_Greybox_Stone")
         wall.set_collision_profile_name("BlockAll")
         wall.set_collision_enabled(unreal.CollisionEnabled.QUERY_AND_PHYSICS)
     fx, fy, fz, fsx, fsy, fsz = cabin_shell.FILLER
@@ -264,10 +292,44 @@ def spawn_cabin_walls():
     filler.set_actor_scale3d(unreal.Vector(fsx / 100.0, fsy / 100.0, fsz / 100.0))
     fill_mesh = filler.get_component_by_class(unreal.StaticMeshComponent)
     fill_mesh.set_static_mesh(cube)
+    paint(filler, "MI_Greybox_Stone")
     fill_mesh.set_collision_profile_name("BlockAll")
     fill_mesh.set_collision_enabled(unreal.CollisionEnabled.QUERY_AND_PHYSICS)
     tag_actor(filler, "NODE_PORCH_CRAWL")
     unreal.log("scene_placement: cabin shell %d walls" % len(boxes))
+    return True
+
+
+def spawn_armory_walls(top):
+    """Greybox armory in front of the cottage. The door faces the courtyard, from the sheet."""
+    armory = load_metrics().get("armory")
+    if not armory:
+        unreal.log("scene_placement: FAIL no armory in the sheet")
+        return False
+    cube = unreal.EditorAssetLibrary.load_asset("/Engine/BasicShapes/Cube")
+    if cube is None:
+        unreal.log("scene_placement: FAIL no engine cube for the armory")
+        return False
+    for actor in list(actors()):
+        if actor.get_actor_label().startswith("ArmoryWall_"):
+            destroy(actor)
+    ox = float(armory["x"]) * M
+    oy = float(armory["y"]) * M
+    for index, box in enumerate(armory_shell.BOXES):
+        cx, cy, cz, sx, sy, sz = box
+        actor = unreal.EditorLevelLibrary.spawn_actor_from_class(
+            unreal.StaticMeshActor,
+            unreal.Vector(ox + cx, oy + cy, top + cz),
+            yaw_rotator(0),
+        )
+        actor.set_actor_label("ArmoryWall_%02d" % index)
+        actor.set_actor_scale3d(unreal.Vector(sx / 100.0, sy / 100.0, sz / 100.0))
+        wall = actor.get_component_by_class(unreal.StaticMeshComponent)
+        wall.set_static_mesh(cube)
+        paint(actor, "MI_Greybox_Stone")
+        wall.set_collision_profile_name("BlockAll")
+        wall.set_collision_enabled(unreal.CollisionEnabled.QUERY_AND_PHYSICS)
+    unreal.log("scene_placement: armory shell %d walls" % len(armory_shell.BOXES))
     return True
 
 
@@ -313,7 +375,7 @@ def trace_hit(world, start, end, ignore):
 
 
 def measure_floor():
-    """Downward traces on the walk pad. Never use the mesh's highest point."""
+    """Downward traces on the walk pad. Water and hill steps are not the floor."""
     pad = load_metrics().get("pad", {"x": 70, "y": 90})
     half_x = float(pad["x"]) * M * 0.25
     half_y = float(pad["y"]) * M * 0.25
@@ -502,6 +564,7 @@ def validate(player_actor, top):
     elif abs(hit_z - top) > 20.0:
         errors.append("player start hit %.0f cm from the floor" % (hit_z - top))
     errors.extend(garden_and_door(top))
+    errors.extend(armory_errors(top))
     return errors
 
 
@@ -710,6 +773,72 @@ def body_hit(world, start, end):
     return actor.get_actor_label() if actor is not None else "unknown"
 
 
+def armory_walk(ox, oy, top):
+    """Sweep a 42 cm body through the armory door, past the table, and back out."""
+    world = unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem).get_editor_world()
+    z = top + CAPSULE_HALF
+    points = [(ox + x, oy + y, z) for x, y in armory_shell.WALK]
+    errors = []
+    for index in range(len(points) - 1):
+        ax, ay, az = points[index]
+        bx, by, bz = points[index + 1]
+        label = body_hit(
+            world,
+            unreal.Vector(ax, ay, az),
+            unreal.Vector(bx, by, bz),
+        )
+        if label is None or label in ("SM_Size_Island", "SM_Size_WalkPad", "SM_Size_Field", "SK_Size_Partner", "SK_Size_Child"):
+            continue
+        errors.append(
+            "armory walk blocked by %s from (%.0f, %.0f) to (%.0f, %.0f)"
+            % (label, ax, ay, bx, by)
+        )
+        break
+    if not errors:
+        unreal.log("scene_placement: armory walk enter cross exit clear")
+    return errors
+
+
+def armory_errors(top):
+    """The armory door opens, its walls block, it stands on the pad, and the armor table is placed."""
+    armory = load_metrics().get("armory")
+    if not armory:
+        return ["no armory in the sheet"]
+    if not [a for a in actors() if a.get_actor_label().startswith("ArmoryWall_")]:
+        return ["armory walls are missing"]
+    ox = float(armory["x"]) * M
+    oy = float(armory["y"]) * M
+    errors = []
+    world = unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem).get_editor_world()
+    only_walls = [other for other in actors() if not other.get_actor_label().startswith("ArmoryWall_")]
+    chest = top + 150.0
+    door = trace_hit(
+        world,
+        unreal.Vector(ox - 550.0, oy, chest),
+        unreal.Vector(ox + 150.0, oy, chest),
+        only_walls,
+    )
+    if door is not None:
+        errors.append("armory door is blocked by " + str(door["label"]))
+    wall = trace_hit(
+        world,
+        unreal.Vector(ox, oy + 500.0, chest),
+        unreal.Vector(ox, oy + 100.0, chest),
+        only_walls,
+    )
+    if wall is None or not str(wall["label"]).startswith("ArmoryWall_"):
+        errors.append("armory wall does not block")
+    only_floor = [other for other in actors() if other.get_actor_label() not in ("SM_Size_Island", "SM_Size_WalkPad")]
+    z = trace_floor_z(world, ox, oy, top + 200.0, top - 500.0, only_floor)
+    if z is None or abs(z - top) > 20.0:
+        errors.append("armory floor is not the pad")
+    errors.extend(armory_walk(ox, oy, top))
+    for label in ("SM_Size_ArmorTable",):
+        if by_label().get(label) is None:
+            errors.append(label + " is not placed")
+    return errors
+
+
 def import_cabin_shell():
     filename = cabin_shell.write_obj(
         os.path.join(ROOT, "AssetCreation", "SizeTest", "SM_Size_CabinShell.obj")
@@ -762,10 +891,11 @@ def place_walk_pad():
         actor.set_actor_label("SM_Size_WalkPad")
     component = actor.get_component_by_class(unreal.StaticMeshComponent)
     component.set_static_mesh(cube)
-    material = cube.get_material(0)
-    if material is not None:
-        component.set_material(0, material)
-        unreal.log("scene_placement: walk pad material " + material.get_path_name())
+    if not paint(actor, "MI_Greybox_Stone"):
+        material = cube.get_material(0)
+        if material is not None:
+            component.set_material(0, material)
+            unreal.log("scene_placement: walk pad material " + material.get_path_name())
     actor.set_actor_scale3d(unreal.Vector(float(pad["x"]), float(pad["y"]), float(pad.get("z", 1))))
     thickness = float(pad.get("z", 1)) * M
     actor.set_actor_location(unreal.Vector(0.0, 0.0, 45000.0 - thickness * 0.5), False, False)
@@ -806,8 +936,694 @@ def place_opening_reveal(top):
     return True
 
 
+INSTANCES = "/Game/HomeWorld/Materials/Instances/"
+_INSTANCE_CACHE = {}
+
+
+def load_instance(name):
+    if name in _INSTANCE_CACHE:
+        return _INSTANCE_CACHE[name]
+    asset = unreal.EditorAssetLibrary.load_asset(INSTANCES + name)
+    if asset is None:
+        unreal.log("scene_placement: missing material " + name)
+    _INSTANCE_CACHE[name] = asset
+    return asset
+
+
+def paint(actor, name):
+    """Greybox read. A missing instance is logged and the mesh is left as it is."""
+    if actor is None or not name:
+        return False
+    material = load_instance(name)
+    if material is None:
+        return False
+    painted = False
+    for component in actor.get_components_by_class(unreal.StaticMeshComponent):
+        count = component.get_num_materials()
+        if count < 1:
+            count = 1
+        for index in range(count):
+            component.set_material(index, material)
+        painted = True
+    return painted
+
+
+def homestead_color(label):
+    """Starting read for sheet props. Stations and the dog swap again at play."""
+    if (
+        label.startswith("SM_Size_HerbBed")
+        or label.startswith("SM_Size_Lupine")
+        or label == "SM_Size_Kettle"
+        or label == "SM_Size_ArmorTable"
+    ):
+        return "MI_Greybox_Tan"
+    if label == "SM_Size_Bed" or label.startswith("SM_Size_Pine") or label.startswith("SM_Size_Rock"):
+        return "MI_Greybox_Stone"
+    return None
+
+
+def marker_instance(item):
+    """Color key in Docs/level/L_SizeTest_CONTEXT.md. None leaves the mesh alone."""
+    label = item["label"]
+    tag = item.get("tag") or ""
+    if label.startswith("Water_"):
+        return "MI_Greybox_Cyan"
+    if tag == "ObservatoryPath":
+        return "MI_Greybox_Olive"
+    if label.startswith("Hill_"):
+        return "MI_Greybox_Purple" if item.get("gated") else "MI_Greybox_Olive"
+    if label == "FarmPlot":
+        return "MI_Greybox_Tan"
+    if tag == "DogHouse" or label == "Observatory":
+        return "MI_Greybox_Stone"
+    if tag in ("CaveNotch", "FarmGate"):
+        return "MI_Greybox_Purple"
+    return None
+
+
+GREYBOX_COLORS = (
+    ("MI_Greybox_Stone", (0.62, 0.62, 0.66)),
+    ("MI_Greybox_Slate", (0.16, 0.17, 0.20)),
+    ("MI_Greybox_Olive", (0.22, 0.62, 0.18)),
+    ("MI_Greybox_Tan", (0.92, 0.68, 0.12)),
+    ("MI_Greybox_DangerRed", (0.75, 0.07, 0.05)),
+    ("MI_Greybox_Cyan", (0.12, 0.72, 0.95)),
+    ("MI_Greybox_Purple", (0.55, 0.22, 0.90)),
+)
+
+
+def _greybox_expr(material, expression_cls, x, y):
+    return unreal.MaterialEditingLibrary.create_material_expression(material, expression_cls, x, y)
+
+
+def _greybox_mask(material, x, y, channel):
+    node = _greybox_expr(material, unreal.MaterialExpressionComponentMask, x, y)
+    node.set_editor_property("r", channel == "r")
+    node.set_editor_property("g", channel == "g")
+    node.set_editor_property("b", channel == "b")
+    node.set_editor_property("a", False)
+    return node
+
+
+def _greybox_has_param(material, name):
+    try:
+        expressions = unreal.MaterialEditingLibrary.get_material_expressions(material)
+    except Exception:
+        return False
+    for expr in expressions:
+        try:
+            if str(expr.get_editor_property("parameter_name")) == name:
+                return True
+        except Exception:
+            continue
+    return False
+
+
+def _greybox_checker2d(material, axis_a, axis_b, x, y):
+    """0 or 1 from two axes. The face's own axis is left out, so a flat surface does not strobe."""
+    floor_a = _greybox_expr(material, unreal.MaterialExpressionFloor, x, y)
+    floor_b = _greybox_expr(material, unreal.MaterialExpressionFloor, x, y + 70)
+    unreal.MaterialEditingLibrary.connect_material_expressions(axis_a, "", floor_a, "")
+    unreal.MaterialEditingLibrary.connect_material_expressions(axis_b, "", floor_b, "")
+    added = _greybox_expr(material, unreal.MaterialExpressionAdd, x + 160, y + 20)
+    unreal.MaterialEditingLibrary.connect_material_expressions(floor_a, "", added, "A")
+    unreal.MaterialEditingLibrary.connect_material_expressions(floor_b, "", added, "B")
+    half = _greybox_expr(material, unreal.MaterialExpressionConstant, x + 160, y + 100)
+    half.set_editor_property("r", 0.5)
+    halved = _greybox_expr(material, unreal.MaterialExpressionMultiply, x + 320, y + 40)
+    unreal.MaterialEditingLibrary.connect_material_expressions(added, "", halved, "A")
+    unreal.MaterialEditingLibrary.connect_material_expressions(half, "", halved, "B")
+    frac = _greybox_expr(material, unreal.MaterialExpressionFrac, x + 480, y + 40)
+    unreal.MaterialEditingLibrary.connect_material_expressions(halved, "", frac, "")
+    two = _greybox_expr(material, unreal.MaterialExpressionConstant, x + 480, y + 120)
+    two.set_editor_property("r", 2.0)
+    bit = _greybox_expr(material, unreal.MaterialExpressionMultiply, x + 640, y + 40)
+    unreal.MaterialEditingLibrary.connect_material_expressions(frac, "", bit, "A")
+    unreal.MaterialEditingLibrary.connect_material_expressions(two, "", bit, "B")
+    return bit
+
+
+def _build_greybox_read(material):
+    """Lit grey mixed with the key color, then a 1 m checker across each face."""
+    material.set_editor_property("shading_model", unreal.MaterialShadingModel.MSM_DEFAULT_LIT)
+    unreal.MaterialEditingLibrary.delete_all_material_expressions(material)
+    tint = _greybox_expr(material, unreal.MaterialExpressionVectorParameter, -980, 0)
+    tint.set_editor_property("parameter_name", unreal.Name("BaseColor"))
+    tint.set_editor_property("default_value", unreal.LinearColor(0.5, 0.5, 0.5, 1.0))
+    grey = _greybox_expr(material, unreal.MaterialExpressionConstant3Vector, -980, 180)
+    grey.set_editor_property("constant", unreal.LinearColor(0.22, 0.22, 0.22, 1.0))
+    mix = _greybox_expr(material, unreal.MaterialExpressionLinearInterpolate, -620, 40)
+    mix_amount = _greybox_expr(material, unreal.MaterialExpressionConstant, -820, 220)
+    mix_amount.set_editor_property("r", 0.55)
+    unreal.MaterialEditingLibrary.connect_material_expressions(grey, "", mix, "A")
+    unreal.MaterialEditingLibrary.connect_material_expressions(tint, "", mix, "B")
+    unreal.MaterialEditingLibrary.connect_material_expressions(mix_amount, "", mix, "Alpha")
+
+    world = _greybox_expr(material, unreal.MaterialExpressionWorldPosition, -980, 420)
+    grid = _greybox_expr(material, unreal.MaterialExpressionScalarParameter, -980, 560)
+    grid.set_editor_property("parameter_name", unreal.Name("GreyboxGridSize"))
+    grid.set_editor_property("default_value", 100.0)
+    cell = _greybox_expr(material, unreal.MaterialExpressionDivide, -760, 460)
+    unreal.MaterialEditingLibrary.connect_material_expressions(world, "", cell, "A")
+    unreal.MaterialEditingLibrary.connect_material_expressions(grid, "", cell, "B")
+    cell_x = _greybox_mask(material, -560, 400, "r")
+    cell_y = _greybox_mask(material, -560, 470, "g")
+    cell_z = _greybox_mask(material, -560, 540, "b")
+    unreal.MaterialEditingLibrary.connect_material_expressions(cell, "", cell_x, "")
+    unreal.MaterialEditingLibrary.connect_material_expressions(cell, "", cell_y, "")
+    unreal.MaterialEditingLibrary.connect_material_expressions(cell, "", cell_z, "")
+    check_yz = _greybox_checker2d(material, cell_y, cell_z, -360, 700)
+    check_xz = _greybox_checker2d(material, cell_x, cell_z, -360, 900)
+    check_xy = _greybox_checker2d(material, cell_x, cell_y, -360, 1100)
+    normal = _greybox_expr(material, unreal.MaterialExpressionPixelNormalWS, -980, 760)
+    normal_abs = _greybox_expr(material, unreal.MaterialExpressionAbs, -780, 760)
+    unreal.MaterialEditingLibrary.connect_material_expressions(normal, "", normal_abs, "")
+    weight_x = _greybox_mask(material, -600, 720, "r")
+    weight_y = _greybox_mask(material, -600, 790, "g")
+    weight_z = _greybox_mask(material, -600, 860, "b")
+    unreal.MaterialEditingLibrary.connect_material_expressions(normal_abs, "", weight_x, "")
+    unreal.MaterialEditingLibrary.connect_material_expressions(normal_abs, "", weight_y, "")
+    unreal.MaterialEditingLibrary.connect_material_expressions(normal_abs, "", weight_z, "")
+    weight_sum_xy = _greybox_expr(material, unreal.MaterialExpressionAdd, -420, 760)
+    weight_sum = _greybox_expr(material, unreal.MaterialExpressionAdd, -250, 800)
+    unreal.MaterialEditingLibrary.connect_material_expressions(weight_x, "", weight_sum_xy, "A")
+    unreal.MaterialEditingLibrary.connect_material_expressions(weight_y, "", weight_sum_xy, "B")
+    unreal.MaterialEditingLibrary.connect_material_expressions(weight_sum_xy, "", weight_sum, "A")
+    unreal.MaterialEditingLibrary.connect_material_expressions(weight_z, "", weight_sum, "B")
+    share_x = _greybox_expr(material, unreal.MaterialExpressionDivide, -60, 720)
+    share_y = _greybox_expr(material, unreal.MaterialExpressionDivide, -60, 800)
+    share_z = _greybox_expr(material, unreal.MaterialExpressionDivide, -60, 880)
+    unreal.MaterialEditingLibrary.connect_material_expressions(weight_x, "", share_x, "A")
+    unreal.MaterialEditingLibrary.connect_material_expressions(weight_sum, "", share_x, "B")
+    unreal.MaterialEditingLibrary.connect_material_expressions(weight_y, "", share_y, "A")
+    unreal.MaterialEditingLibrary.connect_material_expressions(weight_sum, "", share_y, "B")
+    unreal.MaterialEditingLibrary.connect_material_expressions(weight_z, "", share_z, "A")
+    unreal.MaterialEditingLibrary.connect_material_expressions(weight_sum, "", share_z, "B")
+    part_x = _greybox_expr(material, unreal.MaterialExpressionMultiply, 140, 720)
+    part_y = _greybox_expr(material, unreal.MaterialExpressionMultiply, 140, 800)
+    part_z = _greybox_expr(material, unreal.MaterialExpressionMultiply, 140, 880)
+    unreal.MaterialEditingLibrary.connect_material_expressions(check_yz, "", part_x, "A")
+    unreal.MaterialEditingLibrary.connect_material_expressions(share_x, "", part_x, "B")
+    unreal.MaterialEditingLibrary.connect_material_expressions(check_xz, "", part_y, "A")
+    unreal.MaterialEditingLibrary.connect_material_expressions(share_y, "", part_y, "B")
+    unreal.MaterialEditingLibrary.connect_material_expressions(check_xy, "", part_z, "A")
+    unreal.MaterialEditingLibrary.connect_material_expressions(share_z, "", part_z, "B")
+    part_xy = _greybox_expr(material, unreal.MaterialExpressionAdd, 320, 760)
+    checker = _greybox_expr(material, unreal.MaterialExpressionAdd, 480, 800)
+    unreal.MaterialEditingLibrary.connect_material_expressions(part_x, "", part_xy, "A")
+    unreal.MaterialEditingLibrary.connect_material_expressions(part_y, "", part_xy, "B")
+    unreal.MaterialEditingLibrary.connect_material_expressions(part_xy, "", checker, "A")
+    unreal.MaterialEditingLibrary.connect_material_expressions(part_z, "", checker, "B")
+    sentinel = _greybox_expr(material, unreal.MaterialExpressionScalarParameter, -980, 980)
+    sentinel.set_editor_property("parameter_name", unreal.Name("GreyboxTriplanar"))
+    sentinel.set_editor_property("default_value", 1.0)
+    dark_amount = _greybox_expr(material, unreal.MaterialExpressionConstant, -620, 300)
+    dark_amount.set_editor_property("r", 0.55)
+    dark = _greybox_expr(material, unreal.MaterialExpressionMultiply, -400, 240)
+    unreal.MaterialEditingLibrary.connect_material_expressions(mix, "", dark, "A")
+    unreal.MaterialEditingLibrary.connect_material_expressions(dark_amount, "", dark, "B")
+    checked = _greybox_expr(material, unreal.MaterialExpressionLinearInterpolate, 700, 80)
+    unreal.MaterialEditingLibrary.connect_material_expressions(dark, "", checked, "A")
+    unreal.MaterialEditingLibrary.connect_material_expressions(mix, "", checked, "B")
+    unreal.MaterialEditingLibrary.connect_material_expressions(checker, "", checked, "Alpha")
+    unreal.MaterialEditingLibrary.connect_material_property(
+        checked, "", unreal.MaterialProperty.MP_BASE_COLOR
+    )
+    rough = _greybox_expr(material, unreal.MaterialExpressionConstant, 700, 260)
+    rough.set_editor_property("r", 0.85)
+    unreal.MaterialEditingLibrary.connect_material_property(
+        rough, "", unreal.MaterialProperty.MP_ROUGHNESS
+    )
+    metal = _greybox_expr(material, unreal.MaterialExpressionConstant, 700, 380)
+    metal.set_editor_property("r", 0.0)
+    unreal.MaterialEditingLibrary.connect_material_property(
+        metal, "", unreal.MaterialProperty.MP_METALLIC
+    )
+    unreal.MaterialEditingLibrary.recompile_material(material)
+    unreal.EditorAssetLibrary.save_asset("/Game/HomeWorld/Materials/Masters/M_GreyboxRead")
+
+
+def ensure_greybox_read_master():
+    """One lit master. The key color is mixed into a grey base so the sun still models the mesh."""
+    path = "/Game/HomeWorld/Materials/Masters/M_GreyboxRead"
+    material = None
+    if unreal.EditorAssetLibrary.does_asset_exist(path):
+        material = unreal.EditorAssetLibrary.load_asset(path)
+    else:
+        material = unreal.AssetToolsHelpers.get_asset_tools().create_asset(
+            "M_GreyboxRead",
+            "/Game/HomeWorld/Materials/Masters",
+            unreal.Material,
+            unreal.MaterialFactoryNew(),
+        )
+    if material is None:
+        unreal.log("scene_placement: greybox read master was not created")
+        return None
+    if not _greybox_has_param(material, "GreyboxTriplanar"):
+        _build_greybox_read(material)
+        unreal.log("scene_placement: greybox checker uses the face, not the axis it sits on")
+    return material
+
+
+def ensure_greybox_palette():
+    """Flat unlit reads. The lit cabin instances and the spirit master do not show a hue here."""
+    master = ensure_greybox_read_master()
+    if master is None:
+        unreal.log("scene_placement: greybox palette skipped, no read master")
+        return False
+    for name, rgb in GREYBOX_COLORS:
+        path = INSTANCES + name
+        mi = None
+        if unreal.EditorAssetLibrary.does_asset_exist(path):
+            mi = unreal.EditorAssetLibrary.load_asset(path)
+        else:
+            factory = unreal.MaterialInstanceConstantFactoryNew()
+            try:
+                factory.set_editor_property("initial_parent", master)
+            except Exception:
+                pass
+            mi = unreal.AssetToolsHelpers.get_asset_tools().create_asset(
+                name, "/Game/HomeWorld/Materials/Instances", unreal.MaterialInstanceConstant, factory
+            )
+        if mi is None:
+            unreal.log("scene_placement: greybox palette missing " + name)
+            continue
+        color = unreal.LinearColor(rgb[0], rgb[1], rgb[2], 1.0)
+        try:
+            unreal.MaterialEditingLibrary.set_material_instance_parent(mi, master)
+        except Exception as exc:
+            unreal.log("scene_placement: greybox palette parent " + str(exc))
+        for param in ("BaseColor", "Emissive"):
+            try:
+                unreal.MaterialEditingLibrary.set_material_instance_vector_parameter_value(mi, param, color)
+            except Exception as exc:
+                unreal.log("scene_placement: greybox palette %s %s" % (param, exc))
+        try:
+            unreal.MaterialEditingLibrary.set_material_instance_scalar_parameter_value(mi, "NightMix", 0.0)
+        except Exception:
+            pass
+        try:
+            unreal.MaterialEditingLibrary.update_material_instance(mi)
+        except Exception:
+            pass
+        unreal.EditorAssetLibrary.save_asset(path)
+        _INSTANCE_CACHE[name] = mi
+    unreal.log("scene_placement: greybox palette ready")
+    return True
+
+
+def ensure_greybox_red():
+    """One unlit red instance of M_SpiritUnlit. No new master. Runtime tint covers a failed create."""
+    name = "MI_Greybox_DangerRed"
+    path = INSTANCES + name
+    master = unreal.EditorAssetLibrary.load_asset("/Game/HomeWorld/Materials/Masters/M_SpiritUnlit")
+    if master is None:
+        unreal.log("scene_placement: greybox red not created, no M_SpiritUnlit")
+        return None
+    mi = None
+    if unreal.EditorAssetLibrary.does_asset_exist(path):
+        mi = unreal.EditorAssetLibrary.load_asset(path)
+    else:
+        factory = unreal.MaterialInstanceConstantFactoryNew()
+        try:
+            factory.set_editor_property("initial_parent", master)
+        except Exception:
+            pass
+        mi = unreal.AssetToolsHelpers.get_asset_tools().create_asset(
+            name, "/Game/HomeWorld/Materials/Instances", unreal.MaterialInstanceConstant, factory
+        )
+    if mi is None:
+        unreal.log("scene_placement: greybox red not created, runtime tint will cover it")
+        return None
+    red = unreal.LinearColor(0.75, 0.07, 0.05, 1.0)
+    try:
+        unreal.MaterialEditingLibrary.set_material_instance_parent(mi, master)
+    except Exception as exc:
+        unreal.log("scene_placement: greybox red parent " + str(exc))
+    for param in ("BaseColor", "Emissive"):
+        try:
+            unreal.MaterialEditingLibrary.set_material_instance_vector_parameter_value(mi, param, red)
+        except Exception as exc:
+            unreal.log("scene_placement: greybox red %s %s" % (param, exc))
+    try:
+        unreal.MaterialEditingLibrary.set_material_instance_scalar_parameter_value(mi, "NightMix", 0.0)
+    except Exception as exc:
+        unreal.log("scene_placement: greybox red NightMix " + str(exc))
+    try:
+        unreal.MaterialEditingLibrary.update_material_instance(mi)
+    except Exception:
+        pass
+    unreal.EditorAssetLibrary.save_asset(path)
+    unreal.log("scene_placement: greybox red " + mi.get_path_name())
+    return mi
+
+
+def sheet_collision(actor, mode):
+    component = actor.get_component_by_class(unreal.StaticMeshComponent)
+    if component is None:
+        return
+    if mode == "block":
+        component.set_collision_profile_name("BlockAll")
+        component.set_collision_enabled(unreal.CollisionEnabled.QUERY_AND_PHYSICS)
+        return
+    if mode == "overlap":
+        component.set_collision_enabled(unreal.CollisionEnabled.QUERY_ONLY)
+        component.set_collision_response_to_all_channels(unreal.CollisionResponseType.ECR_OVERLAP)
+        return
+    component.set_collision_enabled(unreal.CollisionEnabled.NO_COLLISION)
+
+
+GRAPH_KINDS = ("peak", "spring", "hot_spring", "pond", "path_sample")
+GRAPH_EDGES = ("river", "ridge", "walk")
+
+
+def sheet_rows(metrics):
+    rows = {}
+    for key in ("water", "steps", "samples"):
+        for item in metrics.get(key, []):
+            rows[item["label"]] = (key, item)
+    return rows
+
+
+def graph_tag_names(metrics, label):
+    graph = metrics.get("graph") or {}
+    names = []
+    for node in graph.get("nodes", []):
+        if node.get("label") == label:
+            names.append("GRAPH_" + str(node.get("kind")))
+    for edge in graph.get("edges", []):
+        if label in edge.get("labels", []):
+            names.append("GRAPH_" + str(edge.get("id")))
+    return names
+
+
+def set_tags(actor, names):
+    actor.set_editor_property("tags", [unreal.Name(name) for name in names])
+
+
+def actor_tag_names(actor):
+    return [str(tag) for tag in actor.get_editor_property("tags")]
+
+
+def graph_errors(metrics):
+    """Name the cubes the sheet already has. Do not add a height or a heightfield."""
+    errors = []
+    graph = metrics.get("graph")
+    if not isinstance(graph, dict):
+        return ["graph is missing"]
+    rows = sheet_rows(metrics)
+    nodes = graph.get("nodes")
+    edges = graph.get("edges")
+    if not isinstance(nodes, list) or not isinstance(edges, list):
+        return ["graph has no nodes and edges"]
+    kinds = {}
+    for node in nodes:
+        kind = node.get("kind")
+        label = node.get("label")
+        if kind not in GRAPH_KINDS:
+            errors.append("graph node %s is not a kept kind" % node.get("id"))
+            continue
+        if label not in rows:
+            errors.append("graph node %s has no sheet row" % label)
+            continue
+        kinds.setdefault(kind, []).append(label)
+    for kind in GRAPH_KINDS:
+        if kind not in kinds:
+            errors.append("graph is missing " + kind)
+    edge_ids = []
+    edge_labels = {}
+    for edge in edges:
+        edge_id = edge.get("id")
+        if edge_id in edge_labels:
+            errors.append("graph edge %s is listed twice" % edge_id)
+            continue
+        edge_ids.append(edge_id)
+        labels = edge.get("labels") or []
+        edge_labels[edge_id] = labels
+        if edge_id not in GRAPH_EDGES:
+            errors.append("graph edge %s is not a kept edge" % edge_id)
+            continue
+        for label in labels:
+            if label not in rows:
+                errors.append("graph edge %s names %s, which is not on the sheet" % (edge_id, label))
+                continue
+            group, item = rows[label]
+            if edge_id == "river" and group != "water":
+                errors.append(label + " is on the river and is not water")
+            if edge_id == "ridge" and group != "steps":
+                errors.append(label + " is on the ridge and is not a hill step")
+            if edge_id == "walk":
+                if group != "samples" or float(item.get("bottom", 0)) != 0.0:
+                    errors.append(label + " is on the walk and is not at pad height")
+        if edge_id == "walk" and edge.get("flat") is not True:
+            errors.append("walk edge is not flat")
+    for edge_id in GRAPH_EDGES:
+        if edge_id not in edge_ids:
+            errors.append("graph is missing the " + edge_id)
+    for label in kinds.get("path_sample", []):
+        if label not in edge_labels.get("walk", []):
+            errors.append(label + " is a path sample off the walk")
+    for kind, edge_id in (("spring", "river"), ("hot_spring", "river"), ("pond", "river")):
+        for label in kinds.get(kind, []):
+            if label not in edge_labels.get(edge_id, []):
+                errors.append(label + " is off the " + edge_id)
+    found = by_label()
+    if not errors:
+        for label, (group, item) in rows.items():
+            expected = graph_tag_names(metrics, label)
+            if not expected and not (group == "steps" and item.get("gated")):
+                continue
+            actor = found.get(label)
+            if group == "steps" and item.get("gated"):
+                if actor is not None:
+                    errors.append(label + " is gated and still placed")
+                continue
+            if not expected:
+                continue
+            if actor is None:
+                errors.append(label + " is on the graph and not placed")
+                continue
+            present = actor_tag_names(actor)
+            for name in expected:
+                if name not in present:
+                    errors.append(label + " is missing tag " + name)
+    if not errors:
+        for edge_id in GRAPH_EDGES:
+            count = len(edge_labels.get(edge_id, []))
+            unreal.log("scene_placement: graph edge %s %d" % (edge_id, count))
+        unreal.log("scene_placement: graph heightfield skipped")
+    return errors
+
+
+def place_island_frames(metrics, top_cm):
+    """Water, hill steps, and samples from the sheet. The top step stays unspawned until a glide."""
+    labels = []
+    floor_m = float(top_cm) / M
+    wanted = {item["label"] for item in metrics.get("water", [])}
+    for actor in list(actors()):
+        label = actor.get_actor_label()
+        if label.startswith("Water_") and label not in wanted:
+            destroy(actor)
+    for item in metrics.get("water", []):
+        size = item["size"]
+        bottom = float(item.get("bottom", 0))
+        actor = place_cube(
+            item["label"],
+            item["x"],
+            item["y"],
+            floor_m + bottom + float(size[2]) * 0.5,
+            0,
+            size,
+        )
+        if actor is None:
+            continue
+        sheet_collision(actor, "none")
+        set_tags(actor, ["WaterSheet"] + graph_tag_names(metrics, item["label"]))
+        paint(actor, marker_instance(item))
+        labels.append(item["label"])
+    for item in metrics.get("steps", []):
+        if item.get("gated"):
+            existing = by_label().get(item["label"])
+            if existing is not None:
+                destroy(existing)
+            continue
+        size = item["size"]
+        bottom = float(item.get("bottom", 0))
+        actor = place_cube(
+            item["label"],
+            item["x"],
+            item["y"],
+            floor_m + bottom + float(size[2]) * 0.5,
+            0,
+            size,
+        )
+        if actor is None:
+            continue
+        sheet_collision(actor, "block")
+        set_tags(actor, ["HillStep"] + graph_tag_names(metrics, item["label"]))
+        paint(actor, marker_instance(item))
+        labels.append(item["label"])
+    for item in metrics.get("samples", []):
+        size = item["size"]
+        bottom = float(item.get("bottom", 0))
+        actor = place_cube(
+            item["label"],
+            item["x"],
+            item["y"],
+            floor_m + bottom + float(size[2]) * 0.5,
+            0,
+            size,
+        )
+        if actor is None:
+            continue
+        sheet_collision(actor, item.get("collision", "none"))
+        names = []
+        if item.get("tag"):
+            names.append(item["tag"])
+        names.extend(graph_tag_names(metrics, item["label"]))
+        if names:
+            set_tags(actor, names)
+        paint(actor, marker_instance(item))
+        labels.append(item["label"])
+    unreal.log("scene_placement: island frames %d" % len(labels))
+    return labels
+
+
+def _spawn_zipline(label, perch, landing, stair_a, stair_b, stairs_at_perch):
+    for actor in list(actors()):
+        if actor.get_actor_label() == label:
+            destroy(actor)
+    zipline_class = unreal.load_class(None, "/Script/HomeWorld.HomeWorldOpeningZipline")
+    if zipline_class is None:
+        unreal.log("scene_placement: FAIL no zipline class")
+        return False
+    actor = unreal.EditorLevelLibrary.spawn_actor_from_class(zipline_class, perch, yaw_rotator(0))
+    if actor is None:
+        unreal.log("scene_placement: FAIL zipline did not spawn")
+        return False
+    actor.set_actor_label(label)
+    actor.set_line(perch, landing)
+    actor.set_stairs(stair_a, stair_b, stairs_at_perch)
+    tag_actor(actor, "NODE_ZIPLINE")
+    return True
+
+
+def place_opening_zipline(top):
+    """Northwest corner down to the pond, and the research hill down to the northeast corner."""
+    floor_m = float(top) / M
+    pond = _spawn_zipline(
+        "OpeningZipline",
+        vec(-15.5, 11.2, floor_m + 4.0),
+        vec(-40.5, 2.0, floor_m + 1.5),
+        unreal.Vector(0.0, -1.0, 0.0),
+        unreal.Vector(1.0, 0.0, 0.0),
+        True,
+    )
+    hill = _spawn_zipline(
+        "OpeningZiplineHill",
+        vec(32.0, 22.0, floor_m + 6.0),
+        vec(4.2, 11.4, floor_m + 1.5),
+        unreal.Vector(-1.0, 0.0, 0.0),
+        unreal.Vector(0.0, -1.0, 0.0),
+        False,
+    )
+    if pond and hill:
+        unreal.log("scene_placement: ziplines from the northwest corner and the research hill")
+    return pond and hill
+
+
+def place_opening_dog(top):
+    """Beat 4: the injured dog in the north backyard, from the sheet. Destroy and re-spawn, like the reveal."""
+    dog = load_metrics().get("dog")
+    if dog is None:
+        unreal.log("scene_placement: no dog row, nothing to place")
+        return True
+    for actor in list(actors()):
+        if actor.get_actor_label() == "OpeningDog":
+            destroy(actor)
+    dog_class = unreal.load_class(None, "/Script/HomeWorld.HomeWorldOpeningDog")
+    if dog_class is None:
+        unreal.log("scene_placement: FAIL no opening dog class")
+        return False
+    actor = unreal.EditorLevelLibrary.spawn_actor_from_class(
+        dog_class,
+        unreal.Vector(float(dog["x"]) * M, float(dog["y"]) * M, top),
+        yaw_rotator(float(dog["yaw"])),
+    )
+    if actor is None:
+        unreal.log("scene_placement: FAIL opening dog did not spawn")
+        return False
+    actor.set_actor_label("OpeningDog")
+    unreal.log(
+        "scene_placement: opening dog placed (%.1f, %.1f) yaw %.0f"
+        % (float(dog["x"]), float(dog["y"]), float(dog["yaw"]))
+    )
+    return True
+
+
+DOG_LANE_CM = 900.0
+DOG_KNOCK_CM = 400.0
+
+
+def dog_errors(top):
+    """The dog stands on the pad with a clear nine-metre approach lane and 2.8 m of clearance."""
+    dog = load_metrics().get("dog")
+    if dog is None:
+        return []
+    actor = by_label().get("OpeningDog")
+    if actor is None:
+        return ["no OpeningDog at the sheet spot"]
+    errors = []
+    loc = actor.get_actor_location()
+    if abs(loc.x - float(dog["x"]) * M) > 5.0 or abs(loc.y - float(dog["y"]) * M) > 5.0:
+        errors.append("OpeningDog is off the sheet spot")
+    if "OpeningDog" not in actor.get_class().get_name():
+        errors.append("OpeningDog is not the dog class")
+    world = unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem).get_editor_world()
+    walkables = ("SM_Size_Island", "SM_Size_WalkPad")
+    ignore = [other for other in actors() if other.get_actor_label() not in walkables]
+    ground = trace_floor_z(world, loc.x, loc.y, loc.z + 100.0, top - 300.0, ignore)
+    if ground is None or abs(ground - top) > 20.0:
+        errors.append("OpeningDog is not standing on the walk pad")
+    probe = unreal.Vector(loc.x, loc.y - DOG_LANE_CM, top + 160.0)
+    body = unreal.Vector(loc.x, loc.y - DOG_KNOCK_CM, top + 160.0)
+    blocked = trace_hit(world, probe, body, [])
+    if blocked is not None:
+        errors.append("dog approach lane is blocked by %s" % blocked.get("label"))
+    for step in range(10):
+        t = step / 9.0
+        y = probe.y + (DOG_LANE_CM - DOG_KNOCK_CM) * t
+        z = trace_floor_z(world, probe.x, y, top + 100.0, top - 300.0, ignore)
+        if z is None or abs(z - top) > 20.0:
+            errors.append("dog approach lane leaves the pad")
+            break
+    for other in actors():
+        label = other.get_actor_label() or ""
+        if not label or label in walkables or label == "SM_Size_Field":
+            continue
+        if label.startswith("Water_") or label.startswith("Hill_") or label in ("FarmPlot", "CaveNotch"):
+            continue
+        if not (
+            label.startswith("SM_Size_")
+            or label.startswith("SK_Size_")
+            or label.startswith("CabinWall")
+            or label.startswith("ArmoryWall")
+        ):
+            continue
+        origin, extent = other.get_actor_bounds(False)
+        dx = max(origin.x - extent.x - loc.x, 0.0, loc.x - (origin.x + extent.x))
+        dy = max(origin.y - extent.y - loc.y, 0.0, loc.y - (origin.y + extent.y))
+        if (dx * dx + dy * dy) ** 0.5 < 280.0:
+            errors.append("OpeningDog shares 2.8 m with " + label)
+            break
+    if not errors:
+        unreal.log("scene_placement: opening dog staged with a clear approach lane")
+    return errors
+
+
 def run(import_mesh=True):
     metrics = load_metrics()
+    ensure_greybox_palette()
     if import_mesh:
         import_island()
     unreal.get_editor_subsystem(unreal.LevelEditorSubsystem).load_level(MAP_PATH)
@@ -822,6 +1638,15 @@ def run(import_mesh=True):
                 item["z"],
                 item["yaw"],
                 float(item.get("scale", 1.0)),
+            )
+        elif str(item["mesh"]) == "Cube":
+            place_cube(
+                item["label"],
+                item["x"],
+                item["y"],
+                item["z"],
+                item["yaw"],
+                item.get("size", [1.0, 1.0, 1.0]),
             )
         else:
             place_static(
@@ -843,8 +1668,15 @@ def run(import_mesh=True):
                 tag_actor(actor, "NODE_GARDEN", "NODE_GARDEN_WEST")
             elif label.startswith("SM_Size_HerbBed"):
                 tag_actor(actor, "NODE_GARDEN", "NODE_GARDEN_EAST")
+            elif label == "SM_Size_Bed":
+                tag_actor(actor, "NODE_BED")
             elif label == "SM_Size_Kettle":
                 tag_actor(actor, "NODE_KETTLE")
+            elif label == "SM_Size_ArmorTable":
+                tag_actor(actor, "NODE_ARMOR_TABLE")
+            color = homestead_color(label)
+            if color:
+                paint(actor, color)
             elif label == "SK_Size_Partner":
                 tag_actor(actor, "NPC_PARTNER")
                 stand_like_player(actor)
@@ -862,7 +1694,11 @@ def run(import_mesh=True):
         unreal.log("scene_placement: not saved")
         return 1
     snap_contacts(labels, top)
+    frame_labels = place_island_frames(metrics, top)
     if not spawn_cabin_walls():
+        unreal.log("scene_placement: not saved")
+        return 1
+    if not spawn_armory_walls(top):
         unreal.log("scene_placement: not saved")
         return 1
     plains = metrics["plains"]
@@ -875,13 +1711,22 @@ def run(import_mesh=True):
     keep = set(labels)
     keep.add(plains["label"])
     keep.add("SM_Size_WalkPad")
+    keep.update(frame_labels)
     remove_outside_homestead(keep)
     player = place_player(metrics["player"], top)
+    if not place_opening_dog(top):
+        unreal.log("scene_placement: not saved")
+        return 1
+    if not place_opening_zipline(top):
+        unreal.log("scene_placement: not saved")
+        return 1
     errors = pin_to_floor(labels, top)
     errors.extend(floor_errors)
     errors.extend(validate(player, top))
     errors.extend(opening_sightline(top))
+    errors.extend(dog_errors(top))
     errors.extend(stroke_or_ease_errors())
+    errors.extend(graph_errors(metrics))
     for error in errors:
         unreal.log("scene_placement: FAIL " + error)
     if errors:
@@ -953,8 +1798,10 @@ def check():
             break
     errors.extend(validate(player, top))
     errors.extend(opening_sightline(top))
+    errors.extend(dog_errors(top))
     errors.extend(space_mapping_errors())
     errors.extend(stroke_or_ease_errors())
+    errors.extend(graph_errors(load_metrics()))
     for error in errors:
         unreal.log("scene_placement: FAIL " + error)
     if errors:

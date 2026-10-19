@@ -26,7 +26,7 @@ AHomeWorldGameMode::AHomeWorldGameMode()
 	DefaultPawnClass = AHomeWorldCharacter::StaticClass();
 	PlayerControllerClass = AHomeWorldPlayerController::StaticClass();
 	PlayerStateClass = AHomeWorldPlayerState::StaticClass();
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 }
 
 void AHomeWorldGameMode::OnAstralDeath(APlayerController* PlayerController)
@@ -122,33 +122,6 @@ void AHomeWorldGameMode::EnterAstralByDay()
 	bAstralByDay = true;
 	TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Night);
 	UE_LOG(LogTemp, Log, TEXT("HomeWorld: Enter astral during day — phase set to Night. Return with hw.AstralDeath or F8 to restore Day."));
-}
-
-void AHomeWorldGameMode::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	// T3: Defend phase end — when transitioning from Night to Dawn, log, return family to gather, and let Try* clear Defend state.
-	UWorld* World = GetWorld();
-	if (UHomeWorldTimeOfDaySubsystem* TimeOfDay = World ? World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>() : nullptr)
-	{
-		const bool bIsNight = TimeOfDay->GetIsNight();
-		if (bIsNight && !bWasDefendPhaseActiveLastTick)
-		{
-			bFamilyReturnedThisDawn = false; // entering night so next dawn we can run return again
-		}
-		if (bWasDefendPhaseActiveLastTick && !bIsNight)
-		{
-			UE_LOG(LogTemp, Log, TEXT("HomeWorld: Defend phase end (dawn)."));
-			TryReturnFamilyFromDefendAtDawn();
-		}
-		bWasDefendPhaseActiveLastTick = bIsNight;
-	}
-
-	TryTriggerNightEncounter();
-	TryLogDefendPhaseActive();
-	TryLogDefendPositions();
-	TryMoveFamilyToDefendPositions();
 }
 
 void AHomeWorldGameMode::PerformSpiritualPowerRegen()

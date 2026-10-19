@@ -33,6 +33,9 @@ public:
 	/** A point beside the spirit, on the side the child came from. The child stops here and stays visible. */
 	static FVector StandNear(const FVector& From, const FVector& SpiritPoint, float StandOffCm);
 
+	/** The child's race to the dog yard: out of their room, out the south door, onto the lawn, beside the lane. */
+	static TArray<FVector> ChildRaceRoute(const FVector& DogPoint, float FloorZ);
+
 	/** Hide the sphere and send the child after the player. False once it has already been claimed. */
 	bool TryClaim(APawn* Player);
 
@@ -40,6 +43,12 @@ public:
 
 	/** Walk the partner through the south door to a spot beside the kettle. False if they are already going. */
 	bool TryLeadPartner();
+
+	/** After the tame, the child walks back through the north door into their room. */
+	void BeginChildReturnHome();
+
+	/** True once the partner has walked inside and stands waiting beside the counter. */
+	bool IsPartnerWaiting() const { return bPartnerWaiting; }
 
 protected:
 	virtual void BeginPlay() override;
@@ -81,6 +90,9 @@ protected:
 	bool bPartnerBlockLogged = false;
 	bool bHomecoming = false;
 	bool bChildLeading = false;
+	bool bChildRacing = false;
+	bool bChildAtYard = false;
+	bool bChildGoHomeAfterTame = false;
 	int32 PartnerLeg = 0;
 	int32 ChildLeg = 0;
 	TArray<FVector> PartnerPoints;
@@ -90,6 +102,7 @@ protected:
 	void LeadPartner(float DeltaSeconds);
 	void LeadChild(float DeltaSeconds);
 	void BeginHomecoming();
+	void BeginChildRace();
 	void PlaceKettleCounter();
 	AActor* FindTagged(const TCHAR* Tag) const;
 	void FitInteractBounds(AActor* Actor) const;

@@ -42,6 +42,17 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Tame")
 	bool TryPromoteToHelper(AHomeWorldCharacter* Character);
 
+	/**
+	 * The opening dog's crafted offering. The caller spends the mixed herb; day/body only.
+	 * Records on this same state machine — no second tame schema.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Tame")
+	bool NoteCraftedOffering(AHomeWorldCharacter* Character);
+
+	/** Off on the opening dog: the kept walk speed stays as it is after this tame. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tame")
+	bool bGrantMountBoostOnTame = true;
+
 	/** V8 dawn persist — restore tame state without transition log spam. */
 	void ApplyPersistedState(EHomeWorldBeastTameState NewState);
 
