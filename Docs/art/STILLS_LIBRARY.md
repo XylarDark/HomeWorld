@@ -99,6 +99,9 @@ Mood stills for `SCALE.md`. For audit. The close-assets north star is the dense 
 | [SM_Wood_sheet_front.jpg](field/SM_Wood_sheet_front.jpg) | Greybox | Kept 2026-10-11. Faceted fallen branch. 2 m long. |
 | [SM_Berry_sheet_front.jpg](field/SM_Berry_sheet_front.jpg) | Greybox | Kept 2026-10-11. Faceted berry cluster. 1 m stand-in. |
 | [SM_BerryBush_sheet_front.jpg](field/SM_BerryBush_sheet_front.jpg) | Greybox | Kept 2026-10-11. Low bush. The berries grow on it. 2 m stand-in. |
+| [Field_hills_wide.jpg](field/Field_hills_wide.jpg) | Concept | Kept 2026-10-18. Field biome. Rolling faceted hills. Not homestead height. |
+| [Field_hills_pond.jpg](field/Field_hills_pond.jpg) | Concept | Kept 2026-10-18. Field biome. Scattered ponds. Not homestead height. |
+| [Field_hills_crest.jpg](field/Field_hills_crest.jpg) | Concept | Kept 2026-10-18. Field biome. A crest. Not homestead height. |
 | [Field_bull_scale_v2.jpg](field/Field_bull_scale_v2.jpg) | Concept | Earlier bull keep. Shoulder reads larger than a 5 m wall. |
 | [Field_bull_dim.jpg](field/Field_bull_dim.jpg) | Concept | Dimension pass. Bull beside the player. Shoulder still high for a 5 m wall. For audit. |
 

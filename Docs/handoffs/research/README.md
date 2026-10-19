@@ -15,10 +15,12 @@ Canonical **PROMPT_*** and **EXIT_*** markdown files live here. Law: `Docs/hando
 | `EXIT_WISP_CLOUD_RING_V1.md` | Cloud spawn size and density by height |
 | `EXIT_CAP_SWARM_CAPTURE_AND_AI_PROP_SETUP_V1.md` | Capture stills versus math-first prop checks |
 | `TERRAIN_HEIGHT_LATER.md` | Hills and valleys as a later sightline. Not the opening tutorial. |
+| `TERRAIN_TOPOLOGY.md` | Topology graph for later elevation. Ridges, valleys, springs, outlets, and the flat walk. |
 | `UE_BLOCKOUT_PROTOCOL.md` | How a prototype walk and a greybox floor are tested in UE. |
 | `UE_PATHING.md` | NPC paths, nav mesh, and the doorway. Not collision rules. |
 | `UE_COLLISION.md` | Collision skeleton. Query, block, floors, doors, capsules. |
 | `UE_GAMEPLAY_SYSTEMS.md` | How a new mechanic is added. Interaction interface and one movement component. Not paths. Not collision. |
 | `RUNE_DRAW.md` | How a shown rune is drawn. Ten drag segments or three clicks. Not paths. Not collision. |
+| `QUEST_TRACKER.md` | The top-left quest list used until dialogue bubbles and audio carry the steps. |
 
 `EXIT_INTERVIEW_SCOPE_PROTOTYPE_FEEL_V1.md` is a product-scope record. It is not a lookup file.

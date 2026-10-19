@@ -19,7 +19,7 @@ Not fetched again.
 
 Do this after the opening tutorial has been played. Do not do it on `L_SizeTest` while that tutorial is the queue.
 
-1. Choose the ground. A sculpt on the existing Landscape, or a few greybox ramps. Mesh Terrain stays in the sandbox until that approve.
+1. The ground is chosen. One Landscape heightfield, recorded in [SESSION_HANDOFF_TERRAIN.md](../SESSION_HANDOFF_TERRAIN.md). Greybox is the blockout until that heightfield is allowed. Do not sculpt it on `L_SizeTest` while the opening tutorial is the queue. Mesh Terrain stays in the sandbox until that approve.
 2. Change the size-test floor check only for a map that is allowed to have relief. A hill there is a failed save until that check is rewritten on purpose.
 3. Use the relief as a second way to hide a place, after the copse. The copse is the tutorial obscurer. The same pines and stones later become nodes a spirit can be set on, to gather over time. That gather is its own later system. It is not this file.
 4. Replay the walk on a slope before any speed change. The kept walk is 450 cm/s on the flat pad.
@@ -28,4 +28,4 @@ Do this after the opening tutorial has been played. Do not do it on `L_SizeTest`
 
 - No Landscape sculpt on `L_SizeTest`.
 - No Mesh Terrain on the homestead.
-- No change to the 50 cm floor rule until a later map asks for it.
+- No change to the 50 cm floor rule on the opening walk. Named hill steps off that walk are the homestead samples. They are not this floor.
