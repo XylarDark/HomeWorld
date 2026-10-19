@@ -18,7 +18,7 @@ Use this door before the production reads when the message names a log line, a s
 - The task is that line. Do not read vision, the asset queue, or either critical path.
 - Read only the active queue's Now line and the one owner file it points at.
 - The same on-screen fail twice stops the reply. Say what was not in the binary. Do not start a neighboring polish.
-- One `.\Tools\Safe-Build.ps1 -LaunchEditorAfter` from the repo root per reply. Batch every named fix into that compile. A reply that already compiled does not compile again. Search `docs/KNOWN_ERRORS.md` for that symptom before the compile.
+- One `.\Tools\Safe-Build.ps1 -LaunchEditorAfter` from the repo root per reply. Batch every named fix into that compile. A reply that already compiled does not compile again. Search `docs/KNOWN_ERRORS.md` for that symptom before the compile. A compile that closes the editor and does not relaunch it has not shown the player the change. Name that in the reply.
 - A fix is not done until the log line you named has changed. Name the DLL time in the reply.
 - When Luke names a pass, scribe that sentence into the queue result before the next edit.
 - A color, a marker, or a HUD line is done when the open editor logs it on the actor he named, or he sees it. A compile, and a neighboring actor, do not count.

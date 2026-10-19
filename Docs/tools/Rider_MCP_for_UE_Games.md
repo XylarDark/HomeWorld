@@ -37,7 +37,7 @@ Use native tools for routine editing; use Rider MCP for semantic questions, diag
 
 | Item | State |
 |------|-------|
-| Rider IDE | Installed via winget — **JetBrains Rider 2026.2.1** (spec needs >= 2025.2) |
+| Rider IDE | **2026.2.3.1** (`RD-262.10968.170`) under `%LOCALAPPDATA%\Programs\Rider 2`. `Start-RiderMcp.ps1` resolves `rider64.exe` there, then `%LOCALAPPDATA%\Programs\Rider`, then `Program Files\JetBrains\JetBrains Rider*`. The 2026.2.1 Program Files install is gone. Spec needs >= 2025.2. |
 | Transport | Rider's **own** MCP server, reached directly over HTTP. **Streamable: `http://127.0.0.1:64342/stream`** (POST, verified `initialize` -> 200). Legacy SSE also live at `/sse` (GET only; POST returns 405). |
 | Proxy package | `@jetbrains/mcp-proxy@1.8.0` is **abandoned — it does not work with Rider 2026.2.** See "Why not the proxy" below. |
 | Cursor wiring | `.cursor/mcp.json` -> `rider` entry `{ "url": "http://127.0.0.1:64342/stream" }` (live config is gitignored) |
@@ -45,7 +45,7 @@ Use native tools for routine editing; use Rider MCP for semantic questions, diag
 | Codex | Not used by this team; `.codex/config.toml` carries the same URL only so the file is not misleading |
 | Skills | `ue-code-authoring`, `navigating-code`, `refactoring-code`, `ue-live-debugging`, `ue-test-authoring` vendored to `.agents/skills/` and `.cursor/skills/` |
 | Launcher | `Tools\Start-RiderMcp.ps1` — starts the headless server, applies the tool whitelist, waits for the port, and supports `-Stop` / `-Status` |
-| Rider MCP Server (GUI) | Enabled in `%APPDATA%\JetBrains\Rider2026.2\options\mcpServer.xml` (`enableMcpServer=true`, `mcpServerPort=64342`, `enableBraveMode=false`) |
+| Rider MCP Server (GUI) | After the 2026.2.3 update, `%APPDATA%\JetBrains\Rider2026.2\options\mcpServer.xml` is not present. Turn MCP Server back on in the GUI (port 64342) or start the headless server. The 2026-10-15 file had `enableMcpServer=true`, `mcpServerPort=64342`, `enableBraveMode=false`. |
 | Confirmations | Command execution confirmation stays enabled (brave mode off) |
 | Tool exposure | Whitelist enforced: **17 tools** exposed (16 that returned a useful or immediate answer on HomeWorld C++, plus the router). Hang and no-result tools were removed 2026-10-15. Shell, build, and file-write tools stay off. |
 

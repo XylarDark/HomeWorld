@@ -5,7 +5,7 @@ description: Use when the user asks about tokens, credits, context cost, MCP blo
 
 # Token-efficient context
 
-Use this when the task is context cost, a handoff, a playtest lock, or a long implementation chat. A one-line fix in a path already named does not use it.
+Use this when the task is context cost, a handoff, a playtest lock, or a long implementation chat. A one-line fix in a path already named does not use it. A request to check, update, or optimize the harness opens [harness-check](../harness-check/SKILL.md), not this skill.
 
 Past about 60k tokens, write a handoff and start a fresh chat. Do not carry the thread.
 

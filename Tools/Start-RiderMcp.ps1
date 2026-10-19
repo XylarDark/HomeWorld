@@ -59,7 +59,44 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$RiderExe = "C:\Program Files\JetBrains\JetBrains Rider 2026.2.1\bin\rider64.exe"
+function Resolve-RiderExe {
+    # A Rider update replaces the install folder. Prefer the newest rider64.exe we can
+    # actually see: the per-user installs first (the 2026-10-19 update landed in
+    # Local\Programs\Rider 2), then any JetBrains Rider* under Program Files.
+    $candidates = @(
+        "$env:LOCALAPPDATA\Programs\Rider 2\bin\rider64.exe",
+        "$env:LOCALAPPDATA\Programs\Rider\bin\rider64.exe"
+    )
+    $programFiles = "C:\Program Files\JetBrains"
+    if (Test-Path -LiteralPath $programFiles) {
+        $candidates += @(Get-ChildItem -LiteralPath $programFiles -Directory -Filter "JetBrains Rider*" -ErrorAction SilentlyContinue |
+            ForEach-Object { Join-Path $_.FullName "bin\rider64.exe" })
+    }
+    $found = @()
+    foreach ($path in $candidates) {
+        if (-not (Test-Path -LiteralPath $path)) { continue }
+        $infoPath = Join-Path (Split-Path (Split-Path $path -Parent) -Parent) "product-info.json"
+        $version = [version]"0.0"
+        if (Test-Path -LiteralPath $infoPath) {
+            try {
+                $info = Get-Content -LiteralPath $infoPath -Raw | ConvertFrom-Json
+                if ($info.version) { $version = [version]$info.version }
+            } catch { }
+        }
+        $found += [pscustomobject]@{ Path = $path; Version = $version }
+    }
+    if ($found.Count -eq 0) { return $null }
+    $best = $found | Sort-Object -Property `
+        @{ Expression = "Version"; Descending = $true }, `
+        @{ Expression = { if ($_.Path -like "*\Rider 2\*") { 1 } else { 0 } }; Descending = $true } |
+        Select-Object -First 1
+    return $best.Path
+}
+
+$RiderExe = Resolve-RiderExe
+if (-not $RiderExe) {
+    $RiderExe = "$env:LOCALAPPDATA\Programs\Rider 2\bin\rider64.exe"
+}
 $McpStarter = "mcpServer"
 $IdeaLogDir = "$env:LOCALAPPDATA\JetBrains\Rider2026.2\log"
 
@@ -330,6 +367,7 @@ function Show-StartupBanner {
 }
 
 if ($Status) {
+    Write-Host "Rider exe: $RiderExe"
     $listeners = @(Get-McpListeners)
     if (Test-McpPort) {
         if ($listeners.Count -eq 0) {

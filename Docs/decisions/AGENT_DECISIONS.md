@@ -1059,6 +1059,7 @@ The number is not the cost of that skill as it was first written. Two identical 
 - **Evidence:** `node scripts/instruction-budget.js` reports 3788 description characters in 19 skills, `duplicate bodies none`, exit 0 - the same description count as before the move. The refreshed skill list shows `ue-editor-ui` advertising the trigger ("Drive Unreal Editor panels that have no Python API. Use when ... `editor_ui: NEED_SLATE` ...") instead of the pointer stub. `npm run verify:fast` passes all six stages; the Python suite is 352 passed.
 - **Reverses if:** A host stops preferring `.cursor/skills/` for a twinned name, or the two trees are consolidated into one.
 - **Supersedes:** none.
+- **Reversed 2026-10-19:** This Cursor build injected both `.cursor/skills/` and `.agents/skills/`, so a twin billed the description twice. The trees are one catalog now. Bodies live only in `.agents/skills/`. `.cursor/skills/README.md` has no `SKILL.md`. A second copy is a standing-catalog regression. The Uncle Bob name map stays in `docs/AGENTS_REFERENCE.md` and is not restated here. The 2026-10-14 paragraphs above stay as the record of what was decided that day.
 
 ---
 

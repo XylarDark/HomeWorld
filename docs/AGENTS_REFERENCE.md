@@ -46,7 +46,7 @@
 
 **Feature development (policy):** When developing a **new feature**, research Epic/UE docs and best practices first; **follow tutorials first**, then expand.
 
-**Research:** when a task needs current external facts, use the available research tooling and cite a primary source. Details in [docs/Automation/FULL_AUTOMATION_RESEARCH.md](Automation/FULL_AUTOMATION_RESEARCH.md).
+**Research:** when a task needs current external facts, use the available research tooling and cite a primary source. Details in [docs/Automation/FULL_AUTOMATION_RESEARCH.md](Automation/FULL_AUTOMATION_RESEARCH.md). A request to check or optimize the harness opens `harness-check`.
 
 ## DevHarness (adopted layers)
 

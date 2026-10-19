@@ -41,6 +41,8 @@ finds out when their work is already in history.
 Stage the paths you changed. If you cannot list them, you do not yet know what you
 changed.
 
+`HomeWorldCharacter.h` was dirty with another agent's playtest fast-forward. `git add` of that file would have shipped their work. A one-line addition had to be a patch against `HEAD`. Do not `git add` the whole dirty file.
+
 ## Do not commit changes you did not make
 
 A shared working tree makes authorship ambiguous: file timestamps only prove _when_

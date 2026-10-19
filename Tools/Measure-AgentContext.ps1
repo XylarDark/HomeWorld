@@ -2,6 +2,7 @@
 # Prints skill and agent counts, description bytes / 4, continuity-file bytes,
 # and rule bytes whose globs hit Tools, Content/Python, or docs.
 # Does not read the Cursor context inspector. Record that separately on an empty chat.
+# Run this after a rule glob or a skill description changes.
 # Baseline snapshot is the comment block below, taken before the 2026-10-19 cuts.
 #
 # Inspector: not readable from this session. standingTok is the baseline.
@@ -28,6 +29,9 @@
 #   Cpp bucket 14719 -> 3804 (unreal-cpp.mdc only)
 #   user .cursor/skills 0 (parked at ~/.cursor/skills-parked-2026-10-19)
 #   standingTok 4614 -> 3238
+# After harness-check (2026-10-19):
+#   project .agents/skills 27 -> 28 (1013 tok)
+#   standingTok 3248 -> 3275
 param(
     [string]$RepoRoot = ""
 )
@@ -55,6 +59,24 @@ function Get-FrontmatterDescription {
     return $desc.Groups[1].Value.Trim().Trim('"')
 }
 
+$script:EmptyFolds = @()
+
+function Test-EmptyFold {
+    param([string]$Path)
+    $lines = Get-Content -LiteralPath $Path -TotalCount 40 -ErrorAction SilentlyContinue
+    if (-not $lines) { return }
+    $text = ($lines -join "`n")
+    $match = [regex]::Match($text, '(?s)^---\s*\r?\n(.*?)\r?\n---')
+    if (-not $match.Success) { return }
+    $block = $match.Groups[1].Value
+    $isFold = [regex]::IsMatch($block, '(?m)^description:\s*[>|]')
+    if (-not $isFold) { return }
+    $desc = Get-FrontmatterDescription -Path $Path
+    if ([string]::IsNullOrWhiteSpace($desc)) {
+        $script:EmptyFolds += $Path
+    }
+}
+
 function Measure-SkillTree {
     param([string]$Path)
     $result = [ordered]@{
@@ -68,6 +90,7 @@ function Measure-SkillTree {
     $result.Skills = $files.Count
     $bytes = 0
     foreach ($file in $files) {
+        Test-EmptyFold -Path $file.FullName
         $desc = Get-FrontmatterDescription -Path $file.FullName
         $bytes += [System.Text.Encoding]::UTF8.GetByteCount($desc)
     }
@@ -190,3 +213,16 @@ Get-ChildItem -LiteralPath $rulesDir -Filter *.mdc -File | ForEach-Object {
 Write-Host "STANDING"
 $standing = $skillTokens + $agentTokens
 "skills={0} skillTok={1} agents={2} agentTok={3} standingTok={4}" -f $skillCount, $skillTokens, $agentCount, $agentTokens, $standing
+
+$failed = $false
+if ($script:EmptyFolds.Count -gt 0) {
+    Write-Host "FAIL empty folded description:"
+    $script:EmptyFolds | ForEach-Object { Write-Host "  $_" }
+    $failed = $true
+}
+$nowPath = Join-Path $RepoRoot "docs\SESSION_NOW.md"
+if ((Test-Path -LiteralPath $nowPath) -and ((Get-Item -LiteralPath $nowPath).Length -gt 4000)) {
+    Write-Host "FAIL docs/SESSION_NOW.md is over 4000 bytes"
+    $failed = $true
+}
+if ($failed) { exit 1 }

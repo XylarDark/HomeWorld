@@ -10,6 +10,12 @@ One-line **Cause→Avoid** rows; narratives → [DEFECT_PA_E](../Docs/qa/DEFECT_
 
 **Before adding a row here, check the root-cause rules.** Most of the PA-E / PS-C rows below are the *same* bug seen from different angles: `execute_python_script` returns before async Editor work finishes, and the caller then scores state that has not settled. The invariant, the correct arm → yield → verify shape, and the `UnrealEditor-Cmd` cutoff live in [.cursor/rules/09-mcp-workflow.mdc](../.cursor/rules/09-mcp-workflow.mdc) § **The game-thread rule** (added 2026-09-30; 22 rows, 8 acronyms, one cause). The dated rows stay as the evidence trail — add a new row only when it is a genuinely new cause.
 
+### Agent shell and tool checks (2026-10-19)
+
+- **Cause:** `Saved/mcp_request.json` written by PowerShell `Set-Content -Encoding utf8` carries a BOM. `Content/Python/mcp_harness.py` reads it as `utf-8` and rejects the JSON. **Avoid:** write that file with `[System.IO.File]::WriteAllText` and no BOM.
+- **Cause:** A bash heredoc passed from this PowerShell does not reach `git commit` (`EDITOR unset`). The commit does not happen. **Avoid:** `git commit -F` with a BOM-free file, then `git log -1`. The here-string note further down still covers a message that becomes file paths.
+- **Cause:** Reading `rider64.exe` answers "cannot read binary" whether or not the file exists. A scan of `cursorDiskKV` for a Cursor setting hung and had to be killed. **Avoid:** existence is `product-info.json` beside the install, which `Tools/Start-RiderMcp.ps1` already resolves. Stop after `ItemTable`. Do not scan `cursorDiskKV`.
+
 ### Portals and level data (2026-10-05)
 
 - **Cause:** When the player is moved into the destination portal's box, a new overlap fires in the same frame and sends them straight back. **Avoid:** Start the cooldown on every portal before the move, and place the player at least 60 uu outside every portal box. This is the #281 fix at `2369a12`.
