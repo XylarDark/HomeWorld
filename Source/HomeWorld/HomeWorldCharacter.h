@@ -106,6 +106,9 @@ public:
 	/** Size-test bed: sleep grants spirit and stays on the island. Night alone does not. */
 	bool TryOpeningBedInFront();
 
+	/** Opening island night. The encounter HUD stays off until a later night. */
+	bool IsOpeningNightSpirit() const { return bOpeningNightSpirit; }
+
 	/** Size-test night: the click heart on a world wisp collects it. */
 	bool TryOpeningNightSetInFront();
 

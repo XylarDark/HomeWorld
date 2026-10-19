@@ -29,13 +29,13 @@ globs — it is **not** in `AGENTS.md`, so the globs are what make it reachable.
 
 | Group | Files |
 |---|---|
-| Tests | `03-testing` |
+| Tests | `03-testing` on test files only. Not `Source/**`. |
 | MCP | `09-mcp-workflow` (transport, capability, crash rules); `09b-mcp-utility-scripts` (harness scripts + envelope) |
 | Automation policy | `automation-standards` (tooling ladder, Lead gates); `19-automation-gaps` (gap procedure + log format pointer) |
 | Lookdev evidence | `lookdev-evidence-standards` (PA-E, MRQ, capture preconditions) |
 | Automation invariant | `20-full-automation-no-manual-steps` |
 | Game content | `18-game-development-principles` (`.uasset`/`.umap`/`Maps/`/`Lib/`) |
-| UE live | `21-unreal-engine`, `unreal-cpp`, `unreal-gas`, `unreal-blueprint`, `unreal-project`, `ue58-sources`, `ue58-editor-ui` |
+| UE live | `unreal-cpp` on `**/*.cpp` and `**/*.h` only. `21-unreal-engine` on uproject, uplugin, and Build.cs. `ue58-sources`, `ue58-editor-ui`, and `unreal-blueprint` are description-only. Do not put `Source/**` back on `03-testing`, `21-unreal-engine`, `ue58-sources`, or `ue58-editor-ui`. |
 | Docs layout | `19-docs-directory-structure` (`docs/DOCS_LAYOUT.md` only; description covers new docs) |
 | PCG | `pcg-best-practices` |
 

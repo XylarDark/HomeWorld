@@ -2,7 +2,7 @@
 name: "Unreal Engine (general)"
 description: "Applies when working in Unreal Engine projects: version-specific sources, LFS, build hygiene, C++ vs content split"
 alwaysApply: false
-globs: "**/*.uproject, **/*.uplugin, **/*Build.cs, **/Source/**/*.cpp, **/Source/**/*.h"
+globs: "**/*.uproject, **/*.uplugin, **/*Build.cs"
 priority: 21
 version: 1.0
 ---

@@ -2,7 +2,7 @@
 name: "Testing Standards"
 description: "Use when writing or updating a test in this repo: the Python unittest suite, the PIE runner, or a C++ automation test. Covers what each layer is for and how to keep Editor tests from being flaky."
 alwaysApply: false
-globs: "**/tests/**, **/test_*.py, Content/Python/tests/**, Source/**/*.cpp, Source/**/*.h"
+globs: "**/tests/**, **/test_*.py, Content/Python/tests/**"
 priority: 4
 version: 2.0
 ---

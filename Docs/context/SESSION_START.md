@@ -8,7 +8,7 @@ Continuity is [docs/SESSION_NOW.md](../SESSION_NOW.md). Do not open `docs/histor
 
 1. Start in solo. `HANDOFF from HomeWorld Co` or `mode: co` switches to Co. `mode: solo` switches back.
 2. First message, once: `Mode: <solo or co> · State: <agent, decide, or do> · Transition: <the Now line in Docs/art/PHASES.md>`. Read that line before the message. Name the real mode, the real state, and the open transition before acting. Restate when mode, state, or that line changes.
-3. Open `Docs/context/DOOR_RULES.md` with the task.
+3. Open `Docs/context/DOOR_RULES.md` only when the task is a level option, a packet, or a level fix.
 4. Context loss: re-read only this file, restate the header once, and do not re-run the clarifier.
 
 ## Playtest reply
@@ -30,6 +30,10 @@ Use this door before the production reads when the message names a log line, a s
 - Do not invent interview choices for a beat that has no picked action. Ask what the player does.
 
 The production reads stay for "what next" and for an unnamed queue.
+
+## Named task
+
+If the message names a handoff, a queue section, or a file, read that owner and stop. Do not open `UserHarness/docs/human-use/route-context.md`, `Docs/context/ROUTE_INDEX.md`, `Docs/VISION_BOARD.md`, `Docs/art/ASSET_CONTEXT_TASKS.md`, `Docs/context/PLAY_TASKS.md`, or `Docs/context/PROVE_TASKS.md`. The mode line reads only the `Now:` line in `Docs/art/PHASES.md`. `Docs/context/DOOR_RULES.md` opens only when the task is a level option, a packet, or a level fix.
 
 ## Read order
 

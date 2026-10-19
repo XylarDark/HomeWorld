@@ -39,6 +39,7 @@ Plugins/UnrealMCP/
 # Python
 __pycache__/
 *.pyc
+Content/Python/tmp_*.py
 
 # Secrets and debug logs
 .env

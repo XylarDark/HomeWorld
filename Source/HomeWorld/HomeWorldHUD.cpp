@@ -126,6 +126,8 @@ void AHomeWorldHUD::DrawHUD()
 
 	// T5: TimeOfDay phase label (Day/Night) so player sees current phase without console.
 	UWorld* World = PC->GetWorld();
+	const AHomeWorldCharacter* OpeningChar = Cast<AHomeWorldCharacter>(PC->GetPawn());
+	const bool bOpeningIslandNight = OpeningChar && OpeningChar->IsOpeningNightSpirit();
 	FString PhaseLabel = TEXT("Phase: —");
 	if (World)
 	{
@@ -266,7 +268,7 @@ void AHomeWorldHUD::DrawHUD()
 		{
 			// T4: When at night, show "time until dawn" countdown (stub: fixed duration or decreasing from SetPhase(Night)).
 			static bool bLoggedDawnCountdownOnce = false;
-			if (TimeOfDay->GetIsNight())
+			if (TimeOfDay->GetIsNight() && !bOpeningIslandNight)
 			{
 				// T5: Night encounter wave counter on HUD (Wave 1 / Wave 2 when encounter has triggered).
 				static int32 LastLoggedWave = 0;
@@ -326,7 +328,7 @@ void AHomeWorldHUD::DrawHUD()
 			{
 				bLoggedDawnCountdownOnce = false;
 			}
-			if (TimeOfDay->GetIsNight())
+			if (TimeOfDay->GetIsNight() && !bOpeningIslandNight)
 			{
 				float Health = 0.f;
 				float MaxHealth = 100.f;

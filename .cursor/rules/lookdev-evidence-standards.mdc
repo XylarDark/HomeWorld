@@ -2,7 +2,7 @@
 name: "Lookdev evidence standards"
 description: "Use when writing or running an Editor prove/capture/evidence script (PA-E, MRQ, night shots): preflight calls, shotlist gating, three-state capture_outcome, and the testing preconditions before any PASS/FAIL claim."
 alwaysApply: false
-globs: "**/Content/Python/**/*capture*.py, **/Content/Python/**/*mrq*.py, **/Content/Python/**/*prove*.py, Lib/**, swarm/**, Maps/Preview_*/**"
+globs: "**/Content/Python/**/*capture*.py, **/Content/Python/**/*mrq*.py, **/Content/Python/**/*prove*.py, Lib/**, Maps/Preview_*/**"
 priority: 9
 version: 1.0
 ---

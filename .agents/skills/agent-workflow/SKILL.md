@@ -1,6 +1,6 @@
 ---
 name: agent-workflow
-description: Use for a PowerShell or npm command pattern, a research-before-implement check, a KNOWN_ERRORS entry, or temp-file cleanup. Skip a one-file typo or a path already named.
+description: Use for a new command pattern, a KNOWN_ERRORS entry, passing a flag through an npm script, or deleting Content/Python/tmp_*.py. A path already named does not use it.
 ---
 
 # Agent workflow

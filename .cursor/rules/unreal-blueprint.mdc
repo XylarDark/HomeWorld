@@ -1,7 +1,6 @@
 ---
 name: "Unreal Blueprint Standards"
-description: "Apply Blueprint naming and MCP safety rules when creating or editing Blueprint assets to prevent Editor crashes"
-globs: "**/*.uasset"
+description: "When creating or editing a Blueprint, or calling MCP on one: pass blueprint_name as the short name, never a full /Game path. That full path crashes the Editor."
 alwaysApply: false
 priority: 17
 version: 1.0

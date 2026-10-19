@@ -24,6 +24,10 @@
 #   rule buckets Tools=0 Docs=0
 #   user .agents/skills and .cursor/agents parked beside those folders
 #   cursor/thirdPartyExtensibilityEnabled=false in state.vscdb (restart Cursor)
+# After next-context cuts:
+#   Cpp bucket 14719 -> 3804 (unreal-cpp.mdc only)
+#   user .cursor/skills 0 (parked at ~/.cursor/skills-parked-2026-10-19)
+#   standingTok 4614 -> 3238
 param(
     [string]$RepoRoot = ""
 )
@@ -157,20 +161,31 @@ foreach ($rel in $continuity) {
     }
 }
 
+function Test-CppSourceGlob {
+    param([string]$Globs)
+    foreach ($part in ($Globs -split ',')) {
+        $g = $part.Trim().Trim('"').Trim("'")
+        if ($g -eq '**/*.cpp') { return $true }
+        if ($g -match 'Source/\*\*') { return $true }
+    }
+    return $false
+}
+
 Write-Host "RULES"
 $rulesDir = Join-Path $RepoRoot ".cursor\rules"
-$buckets = [ordered]@{ Tools = 0; Python = 0; Docs = 0 }
+$buckets = [ordered]@{ Tools = 0; Python = 0; Docs = 0; Cpp = 0 }
 Get-ChildItem -LiteralPath $rulesDir -Filter *.mdc -File | ForEach-Object {
     $globs = Get-RuleGlobs -Path $_.FullName
     $hit = @()
     if ($globs -match 'Tools') { $buckets.Tools += $_.Length; $hit += "Tools" }
     if ($globs -match 'Content/Python') { $buckets.Python += $_.Length; $hit += "Python" }
     if ($globs -match 'docs/\*\*|Docs/\*\*') { $buckets.Docs += $_.Length; $hit += "Docs" }
+    if (Test-CppSourceGlob -Globs $globs) { $buckets.Cpp += $_.Length; $hit += "Cpp" }
     if ($hit.Count -gt 0) {
         "{0,7} bytes  {1,-28} {2}" -f $_.Length, ($hit -join ","), $_.Name
     }
 }
-"bucket Tools={0} Python={1} Docs={2}" -f $buckets.Tools, $buckets.Python, $buckets.Docs
+"bucket Tools={0} Python={1} Docs={2} Cpp={3}" -f $buckets.Tools, $buckets.Python, $buckets.Docs, $buckets.Cpp
 
 Write-Host "STANDING"
 $standing = $skillTokens + $agentTokens
