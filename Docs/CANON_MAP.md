@@ -119,6 +119,7 @@ README is left intact as history.
 | **Ending a session: what to ask next** | `Content/Python/session_close.py` | read-only; derives the critical path from the gate dependency chain |
 | **Where the played world lives** | `Content/HomeWorld/Maps/SizeTest/L_SizeTest.umap` | measurement scene for the wake minute. The cottage sheet is still the greybox keep. `L_VS_MVP_Markers` is not this walk. |
 | **AI-agent practice, researched** | `Docs/38_AI_AGENT_PRACTICE.md` | research; read-only, gates no code |
+| **New editor tool, Python placer, or import script** | `Docs/tools/GAME_TOOL_CATALOG.md` | First read before a new tool. Use, Candidate, or Hold. |
 | **Design and studio research** | `Docs/handoffs/research/README.md` | One file per body of knowledge. Open it only while that research is the task. Law: `Docs/handoffs/RESEARCH_PROMPT_CONTRACT.md` |
 | **Design ethos** | `Docs/canon/DESIGN_ETHOS.md` | Borrowed, ours, and disputed. Open only while auditing a mechanic, an environment, or a progression step. |
 | **What the human owns, and when to ask** | `docs/human-use/OWNERSHIP.md` | canon - Steer / Taste / Test |

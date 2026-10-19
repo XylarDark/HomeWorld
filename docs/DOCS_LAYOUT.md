@@ -87,6 +87,7 @@ Setup and environment: MCP, CI, local tools, ref images, Cursor dev.
 | [Setup/REF_IMAGES_SETUP_TUTORIAL.md](Setup/REF_IMAGES_SETUP_TUTORIAL.md) | Reference images for GUI automation. |
 | [Setup/CURSOR_DEV.md](Setup/CURSOR_DEV.md) | Cursor and dev environment; UserHarness init runbook. |
 | [../Docs/tools/HARNESS_SOURCES.md](../Docs/tools/HARNESS_SOURCES.md) | Sources to check when asked to update the agent harness. Not a start read. |
+| [../Docs/tools/GAME_TOOL_CATALOG.md](../Docs/tools/GAME_TOOL_CATALOG.md) | First read before a new editor tool, Python placer, or import script. Not a start read. |
 | [Setup/DOCTOR_POLICY.md](Setup/DOCTOR_POLICY.md) | UserHarness doctor accepted declines for UE game host (HR-B2). |
 | [Setup/CI_POLICY.md](Setup/CI_POLICY.md) | When validate.yml vs ci.yml; docs-only PRs; `[skip ci]`. |
 | [Setup/WINDOWS_BRIDGE.md](Setup/WINDOWS_BRIDGE.md) | Cloud agent → self-hosted CI → DESKTOP Editor/MCP. |

@@ -127,7 +127,7 @@ The midday slice below is passed. 2026-10-18.
 
 Press E at the bed. The coat hides and you are a wisp. The companion you claimed stays, and it hovers on the bed and on the other wisps the same way it hovers on everything else. Night does not start an encounter or spiritual power regen. The child says the bed-and-dawn line once. Purple wisps stand beside the south copse, at the pond, and at the hot springs. Press E on one and play the click heart. A kept heart collects it. You do not need the other quests first.
 
-Developer shortcut for this replay: in a fresh PIE run `hw.Playtest.FastForward`. It plays the day beats in order (spirit, both herb beds, backpack, kettle, station mix, dog, fish, bed) and leaves you at the bed at night with every earlier step really executed.
+Developer shortcut for this replay: in a fresh PIE run `hw.Playtest.FastForward`. No argument plays the day beats in order (spirit, both herb beds, backpack, kettle, station mix, dog, fish, bed) and leaves you at the bed at night with every earlier step really executed. `test herb collection` claims the spirit, then places you at the east bed to draw the heart. `list` prints the other stops: spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect, heal.
 
 | Field | Result |
 |---|---|

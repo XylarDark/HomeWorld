@@ -24,6 +24,8 @@ You cannot take responsibility for a change you cannot explain, you cannot see t
 
 Start every session from [Docs/context/SESSION_START.md](Docs/context/SESSION_START.md).
 
+A request to test, reach, or fast-forward to a beat is `hw.Playtest.FastForward` plus the words used. The procedure is the playtest reply in that file.
+
 Past ~60k tokens, write `Docs/handoffs/SESSION_HANDOFF_<slice>.md` and start a fresh chat from that file plus [docs/SESSION_NOW.md](docs/SESSION_NOW.md). Do not carry the transcript. Do not open `docs/history/SESSION_LOG.md` to start. One significant write at a time. Uncommitted changes you did not make: stop and report.
 
 Do not report a scene done until its verify script has logged the pass in the open editor. The rule is in [Docs/context/SCENE_SETUP.md](Docs/context/SCENE_SETUP.md).

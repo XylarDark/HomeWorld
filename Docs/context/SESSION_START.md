@@ -13,8 +13,9 @@ Continuity is [docs/SESSION_NOW.md](../SESSION_NOW.md). Do not open `docs/histor
 
 ## Playtest reply
 
-Use this door before the production reads when the message names a log line, a screenshot, or a lock to scribe. The mode line stays one sentence and does not block this door.
+Use this door before the production reads when the message names a log line, a screenshot, a lock to scribe, or a beat to test, reach, or fast-forward to. The mode line stays one sentence and does not block this door.
 
+- A beat test reads only the `hw.Playtest.FastForward` row in `Docs/COMMANDS_AND_LOG_TAGS.md` and the one section of `Docs/qa/TUTORIAL_PLAYTEST_QUEUE.md` that names that beat. Do not read vision, the asset queue, or either critical path. Fresh PIE on `L_SizeTest`, then `hw.Playtest.FastForward` plus the words used. Pass is `playtest_ff: ready for <name>`, the actor named in that line, and the skipped beat's success line absent. End PIE. Leave the editor on `L_SizeTest`. A beat word that `list` does not print is not a new command. Say so and stop.
 - The task is that line. Do not read vision, the asset queue, or either critical path.
 - Read only the active queue's Now line and the one owner file it points at.
 - The same on-screen fail twice stops the reply. Say what was not in the binary. Do not start a neighboring polish.
@@ -55,6 +56,8 @@ Open only when the task needs it: `Docs/WORLD_METRICS.md` for a number; `Docs/le
 | Hand back | `Docs/context/HANDBACK.md` when the session is Co and the message says hand back |
 | What next, the project picture, the critical path, prototype assets, stills, Tripo, Meshy, Mixar, or art asset | `Docs/context/ART_ASSET_DOOR.md`. The room is Look. Do not offer rooms. |
 | Movement test, greybox floor, blockout, sightline, or a prototype walk | `Docs/handoffs/research/UE_BLOCKOUT_PROTOCOL.md`. Engine cube and the material already on it. Player Start on that floor. Play In Editor, on foot. |
+| New editor tool, Python placer, or import script | `Docs/tools/GAME_TOOL_CATALOG.md` before any new script. |
+| Test, reach, or fast-forward to a beat | The `hw.Playtest.FastForward` row in `Docs/COMMANDS_AND_LOG_TAGS.md` and the one section of `Docs/qa/TUTORIAL_PLAYTEST_QUEUE.md` that names that beat. |
 
 ## Pick the task
 

@@ -9,24 +9,17 @@ except ImportError:
     print("reimport_size_bull: run inside Unreal Editor")
     sys.exit(1)
 
-ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", ".."))
+sys.path.insert(0, os.path.dirname(__file__))
+import reimport_size_test
+
 MAP_PATH = "/Game/HomeWorld/Maps/SizeTest/L_SizeTest"
+MESH = "/Game/HomeWorld/Meshes/SizeTest/SM_Size_Bull"
 
 
 def main():
-    task = unreal.AssetImportTask()
-    task.filename = os.path.join(ROOT, "AssetCreation", "SizeTest", "SM_Size_Bull.obj")
-    task.destination_path = "/Game/HomeWorld/Meshes/SizeTest"
-    task.destination_name = "SM_Size_Bull"
-    task.automated = True
-    task.save = True
-    task.replace_existing = True
-    unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([task])
-    landed = list(task.imported_object_paths)
-    unreal.log("reimport_size_bull: " + ", ".join(landed))
-    if not landed:
+    if reimport_size_test.import_names(["SM_Size_Bull"]) != 0:
         return 1
-    mesh = unreal.EditorAssetLibrary.load_asset(landed[0])
+    mesh = unreal.EditorAssetLibrary.load_asset(MESH)
     size = mesh.get_bounds().box_extent * 2.0
     unreal.log("bounds bull extent_cm %.1f %.1f %.1f" % (size.x, size.y, size.z))
     level_editor = unreal.get_editor_subsystem(unreal.LevelEditorSubsystem)

@@ -125,7 +125,7 @@ Flags come from `RegisterConsoleCommand`. `ECVF_Cheat` commands need `~` and are
 | `hw.Defend.Status` | `ECVF_Cheat` | `CmdDefendStatus` | 1827 | Act 2 prep: log Defend phase status (phase, DefendActive, DefendPosition count, Family count, family-moved-this-night). Use in PIE after hw.TimeOfDay.Phase 2. See DAY12_ROLE_PROTECTOR.md, CONSOLE_COMMANDS.md. |
 | `hw.Night.Wisp` | `ECVF_Cheat` | `CmdNightWisp` | 1739 | Wisp loop test hook: hw.Night.Wisp <carried> <herbs> seeds damaged wisps and herb chunks; no args prints the live tracker text. |
 | `hw.Night.Heal` | `ECVF_Cheat` | `CmdNightHeal` | 1744 | Wisp loop test hook: deposit one carried wisp at the hot springs, spending one herb chunk. |
-| `hw.Playtest.FastForward` | `ECVF_Cheat` | `CmdPlaytestFastForward` | 1749 | Playtest: play the opening beats in order (spirit, herbs, partner, backpack, kettle, station, dog, fish, bed) and stop at the first night. Run in a fresh PIE. |
+| `hw.Playtest.FastForward` | `ECVF_Cheat` | `CmdPlaytestFastForward` | 1749 | Playtest: run the opening beats for real, then stop ready to test one. No argument stops at night. `test herb collection` claims the spirit, then places you at the east bed to draw the heart. `list` prints the names: spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect, heal. Fresh PIE. |
 
 Count: 80 commands.
 

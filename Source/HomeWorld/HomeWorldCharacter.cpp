@@ -889,7 +889,7 @@ void AHomeWorldCharacter::DebugSeedOpeningWispLoop(int32 Carried, int32 Herbs)
 	OpeningWispsCollected = FMath::Max(OpeningWispsCollected, Seeded);
 	OpeningWispsCarried = Seeded;
 	OpeningHerbTenths = FMath::Max(OpeningHerbTenths, FMath::Clamp(Herbs, 0, 9));
-	UE_LOG(LogTemp, Log, TEXT("opening_night: test seed - collected %d, carried %d, herbs %d"),
+	UE_LOG(LogTemp, Log, TEXT("opening_night: test seed - collected %d, carried %d, herbs %d. This is a seed. The playtest arrival is hw.Playtest.FastForward."),
 		OpeningWispsCollected, OpeningWispsCarried, OpeningHerbTenths);
 }
 
@@ -1385,9 +1385,20 @@ void AHomeWorldCharacter::ReadyForOpeningPlaytest()
 		}
 	}
 	UE_LOG(LogTemp, Log, TEXT("playtest_ff: ready for %s - %s"), PlaytestBeatName(DebugFastForwardStop), *Note);
-	UE_LOG(LogTemp, Log, TEXT("playtest_ff: you are at %s, target %s"),
-		*GetActorLocation().ToCompactString(),
-		Target ? *Target->GetActorNameOrLabel() : TEXT("(none)"));
+	if (Target)
+	{
+		const float DistCm = FVector::Dist2D(GetActorLocation(), Target->GetActorLocation());
+		UE_LOG(LogTemp, Log, TEXT("playtest_ff: you are at %s, target %s, dist %.0f"),
+			*GetActorLocation().ToCompactString(),
+			*Target->GetActorNameOrLabel(),
+			DistCm);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("playtest_ff: you are at %s, target none, dist none"),
+			*GetActorLocation().ToCompactString());
+	}
+	UE_LOG(LogTemp, Log, TEXT("playtest_ff: tracker %s"), *GetOpeningTrackerText());
 }
 
 void AHomeWorldCharacter::PlaceForOpeningPlaytest(AActor* Target, float Distance)
@@ -1453,18 +1464,19 @@ void AHomeWorldCharacter::PlaceForOpeningPlaytest(AActor* Target, float Distance
 	// test drops them: the partner and the child move, and their back is not a wall.
 	FCollisionQueryParams RoomParams = Params;
 	RoomParams.AddIgnoredActors(Guests);
-	// A candidate is good when a flat line at the prop's own height reaches it: that clears the
-	// counter top and the kettle spout, while a cabin wall (500 cm tall) still blocks it. Among
-	// those, prefer the most room behind the player: the camera boom needs it, and the same
-	// counter is boxed in from the outside and open from inside the kitchen.
+	// A candidate is good when a flat line reaches the prop without crossing a wall. Among those,
+	// prefer the most room behind the player: the camera boom needs it, and the same counter is
+	// boxed in from the outside and open from inside the kitchen.
 	FVector Chosen = TargetLoc - Approach * Distance;
 	bool bAimClear = false;
 	float BestRoom = -1.f;
 	for (const FVector& Dir : Candidates)
 	{
 		const FVector Candidate = TargetLoc - Dir * Distance;
-		const FVector FlatFrom(Candidate.X, Candidate.Y, AimTarget.Z);
-		const FVector FlatTo(AimTarget.X, AimTarget.Y, AimTarget.Z);
+		// Waist height: above beds, dogs and pond water, but below the top of any wall.
+		const float FlatZ = GroundZ - 40.f;
+		const FVector FlatFrom(Candidate.X, Candidate.Y, FlatZ);
+		const FVector FlatTo(AimTarget.X, AimTarget.Y, FlatZ);
 		FHitResult AimHit;
 		if (World->LineTraceSingleByChannel(AimHit, FlatFrom, FlatTo, ECC_Visibility, Params)
 			&& AimHit.GetActor() != Target)

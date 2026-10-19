@@ -1,1 +1,3 @@
+A beat test is `hw.Playtest.FastForward`, not a new script. A new script reads `Docs/tools/GAME_TOOL_CATALOG.md` first. A size-test mesh reimport goes through `reimport_size_test.py`. A probe uses `start_editor.py`, an `hw.*` cheat, or `verify_homestead_scene.py`, not a new `tmp_*.py`.
+
 Editor scripts: idempotent, check-before-create. **UE 5.8** Python API (e.g. `get_actor_bounds` returns tuple). See `.cursor/rules/09-mcp-workflow.mdc`, `.cursor/rules/09b-mcp-utility-scripts.mdc`, and Python style in `docs/AGENTS_REFERENCE.md` (Code style). For API or plugin work, check `docs/KNOWN_ERRORS.md` and `docs/UE/UE58_TECH.md`.
