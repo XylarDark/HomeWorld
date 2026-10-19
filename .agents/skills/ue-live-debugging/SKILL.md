@@ -81,6 +81,8 @@ Use the agent's native planning/todo mechanism when available. For simple one-fi
 
 ## This project's Rider build (HomeWorld) — read before running the workflow
 
+Before the first Rider call, follow the AGENTS.md sentence: start Rider once only when a C++ symbol, diagnostic, or refactor needs it and port 64342 is down.
+
 Verified 2026-10-15 against the live headless server (`Tools\Start-RiderMcp.ps1`). Several steps
 below do not work here. Substitute as noted rather than retrying:
 

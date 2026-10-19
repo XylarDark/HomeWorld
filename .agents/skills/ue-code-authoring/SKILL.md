@@ -13,6 +13,8 @@ Rider is reached through a single MCP tool — `execute_tool(command="<tool> --f
 
 ## This project's Rider build (HomeWorld) — read before Invoke Rider
 
+Before the first Rider call, follow the AGENTS.md sentence: start Rider once only when a C++ symbol, diagnostic, or refactor needs it and port 64342 is down.
+
 Verified 2026-10-15 against Rider 2026.2.1 headless. The default whitelist is 17 tools (`docs/tools/Rider_MCP_for_UE_Games.md`). Every call needs `rootFolder=C:/dev/HomeWorld`.
 
 The generic sections below describe a normal Rider install. On this project the following are **not exposed**, and no argument makes them appear:

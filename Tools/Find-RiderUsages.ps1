@@ -28,9 +28,17 @@ if ($Path -notmatch '^[A-Za-z]:' -and $Path -notmatch '^/') {
     $Path = "$Root/".Replace('\', '/') + $Path
 }
 
-if (-not (Test-NetConnection -ComputerName 127.0.0.1 -Port $Port -InformationLevel Quiet -WarningAction SilentlyContinue)) {
-    Write-Error "No Rider MCP server on 127.0.0.1:$Port. Start it with .\Tools\Start-RiderMcp.ps1, then re-run."
-    exit 1
+function Test-RiderPort {
+    return [bool](Test-NetConnection -ComputerName 127.0.0.1 -Port $Port -InformationLevel Quiet -WarningAction SilentlyContinue)
+}
+
+if (-not (Test-RiderPort)) {
+    $starter = Join-Path $PSScriptRoot 'Start-RiderMcp.ps1'
+    & $starter
+    if ($LASTEXITCODE -ne 0 -or -not (Test-RiderPort)) {
+        Write-Error "No Rider MCP server on 127.0.0.1:$Port. Start it with .\Tools\Start-RiderMcp.ps1, then re-run."
+        exit 1
+    }
 }
 
 function Invoke-McpPost {

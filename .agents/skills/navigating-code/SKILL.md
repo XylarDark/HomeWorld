@@ -31,6 +31,8 @@ If your client lists the Rider tools directly, call `find_usages` and `find_impl
 
 ## This build (HomeWorld) — read before using the table
 
+Before the first Rider call, follow the AGENTS.md sentence: start Rider once only when a C++ symbol, diagnostic, or refactor needs it and port 64342 is down.
+
 **`find_usages` and `find_implementations` do not exist in this build.** Verified 2026-10-15 by
 listing every tool the server can expose with its tool whitelist disabled: the maximum surface is
 86 tools and neither name is among them. Waiting, retrying, or re-reading this file will not make

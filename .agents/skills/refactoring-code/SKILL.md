@@ -33,6 +33,8 @@ execute_tool(command="rename_refactoring --filePath API/Services/OrderService.cs
 
 ## This project's Rider build (HomeWorld)
 
+Before the first Rider call, follow the AGENTS.md sentence: start Rider once only when a C++ symbol, diagnostic, or refactor needs it and port 64342 is down.
+
 Verified 2026-10-15 by reading the live tool surface two independent ways (`tools/list`, and the
 router's own `Tool 'x' not found. Available tools: ...` reply):
 
