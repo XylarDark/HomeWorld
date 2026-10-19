@@ -1445,11 +1445,14 @@ void AHomeWorldCharacter::PlaceForOpeningPlaytest(AActor* Target, float Distance
 			}
 		}
 	}
-	Params.AddIgnoredActors(Guests);
 	for (UPrimitiveComponent* Box : HelperBoxes)
 	{
 		Params.AddIgnoredComponent(Box);
 	}
+	// The reach test keeps NPCs: nobody should be spawned inside the partner. The camera room
+	// test drops them: the partner and the child move, and their back is not a wall.
+	FCollisionQueryParams RoomParams = Params;
+	RoomParams.AddIgnoredActors(Guests);
 	// A candidate is good when a flat line at the prop's own height reaches it: that clears the
 	// counter top and the kettle spout, while a cabin wall (500 cm tall) still blocks it. Among
 	// those, prefer the most room behind the player: the camera boom needs it, and the same
@@ -1476,7 +1479,7 @@ void AHomeWorldCharacter::PlaceForOpeningPlaytest(AActor* Target, float Distance
 		FHitResult BoomHit;
 		const FVector Eye(Candidate.X, Candidate.Y, GroundZ + 90.f);
 		const FVector Behind(Candidate.X - Dir.X * 330.f, Candidate.Y - Dir.Y * 330.f, GroundZ + 150.f);
-		const bool bBoomHit = World->LineTraceSingleByChannel(BoomHit, Eye, Behind, ECC_Camera, Params);
+		const bool bBoomHit = World->LineTraceSingleByChannel(BoomHit, Eye, Behind, ECC_Camera, RoomParams);
 		const float Room = bBoomHit ? BoomHit.Distance : 330.f;
 		if (Room > BestRoom)
 		{
