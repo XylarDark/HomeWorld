@@ -1,6 +1,6 @@
 ---
 name: navigating-code
-description: Use when you must know where a symbol is used or implemented in a solution open in Rider — .NET/C#, F#, VB, C++, Unity, Unreal Engine, XAML, Razor, or mixed-language projects. Trigger before changing a method, property, field, type or interface, when you trace callers, when you look for the classes that implement an interface or the overrides of a virtual member, and whenever you would otherwise grep for an identifier. Do not use for plain text (strings, comments, config keys, log messages) or to find a file by name.
+description: Use when finding callers or implementations of a C++ symbol in Rider. Do not use for plain text or file names.
 allowed-tools: execute_tool
 metadata:
   author: JetBrains

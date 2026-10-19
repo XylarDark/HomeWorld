@@ -41,7 +41,7 @@ Some settings are the designer's, not the script's.
 
 ## Where the engine does not expose a setting
 
-A log line `editor_ui: NEED_SLATE` opens [.cursor/skills/ue-editor-ui/SKILL.md](../skills/ue-editor-ui/SKILL.md) and sets it. Do not assume "recreate from scratch" and do not assume "the user will do a one-time setup" — automate it, or log the gap to `docs/Automation/AUTOMATION_GAPS.md` and move on. See [20-full-automation-no-manual-steps.mdc](20-full-automation-no-manual-steps.mdc).
+A log line `editor_ui: NEED_SLATE` opens [.agents/skills/ue-editor-ui/SKILL.md](../../.agents/skills/ue-editor-ui/SKILL.md) and sets it. Do not assume "recreate from scratch" and do not assume "the user will do a one-time setup" — automate it, or log the gap to `docs/Automation/AUTOMATION_GAPS.md` and move on. See [20-full-automation-no-manual-steps.mdc](20-full-automation-no-manual-steps.mdc).
 
 ## Checklist
 

@@ -66,7 +66,7 @@ Any of (and none of §1):
 - Single-owner edits: `Config/`, `Source/`, `Content/Python/`, lowercase `docs/`, `.github/`.
 - Bugfix, lint, PR merge ops, schema validation.
 
-**Action:** Stay in this chat. Read `SESSION_SUMMARY` + `PHASE_BOARD` **headers only** for continuity — do not load all `.cursor/agents/*` or `HOMEWORLD_MVP_SWARM_BRIEF.md`.
+**Action:** Stay in this chat. Read `docs/SESSION_NOW.md` + `PHASE_BOARD` for continuity — do not load all `.cursor/agents/*` or `HOMEWORLD_MVP_SWARM_BRIEF.md`.
 
 ### 3 → HYBRID
 

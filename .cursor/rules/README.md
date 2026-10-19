@@ -23,7 +23,7 @@ globs — it is **not** in `AGENTS.md`, so the globs are what make it reachable.
 | Was always-apply | Now | Why |
 |---|---|---|
 | `08-project-context.mdc` | deleted (`4d46ecef`) | A stale fork of `AGENTS.md`, with 3 references to files that do not exist |
-| `20-full-automation-no-manual-steps.mdc` | `alwaysApply: false`, globs `Content/Python`, `Tools`, `.github/workflows`, `docs/Automation`, `.cursor/skills` | Invariant rides the globs (not `AGENTS.md`); this file keeps the gap-log format and the host gate |
+| `20-full-automation-no-manual-steps.mdc` | `alwaysApply: false`, globs `.github/workflows` and `docs/Automation` | Invariant rides those globs, not every Python or Tools file |
 
 ### Opt-in by glob
 
@@ -36,7 +36,7 @@ globs — it is **not** in `AGENTS.md`, so the globs are what make it reachable.
 | Automation invariant | `20-full-automation-no-manual-steps` |
 | Game content | `18-game-development-principles` (`.uasset`/`.umap`/`Maps/`/`Lib/`) |
 | UE live | `21-unreal-engine`, `unreal-cpp`, `unreal-gas`, `unreal-blueprint`, `unreal-project`, `ue58-sources`, `ue58-editor-ui` |
-| Docs layout | `19-docs-directory-structure` (`docs/**`, `Docs/**`) |
+| Docs layout | `19-docs-directory-structure` (`docs/DOCS_LAYOUT.md` only; description covers new docs) |
 | PCG | `pcg-best-practices` |
 
 Seventeen files, and that is all of them. This table used to also offer

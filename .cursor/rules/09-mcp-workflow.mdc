@@ -2,7 +2,7 @@
 name: "MCP-First Workflow"
 description: "Use when driving the Unreal Editor via MCP: prefer MCP over scripting, execute_python_script semantics, and the crash-prevention rules for blueprint_name and inherited properties."
 alwaysApply: false
-globs: "**/*.uproject, **/Tools/**, .cursor/mcp.json"
+globs: "**/*.uproject, .cursor/mcp.json, **/Content/Python/mcp_*.py"
 priority: 10
 version: 2.0
 ---
@@ -26,7 +26,7 @@ When the Editor is running and `unrealMCP` is connected:
 3. **Verify** by querying Editor state after each MCP action (list actors, get
    property values) rather than assuming success.
 4. A result that contains `editor_ui: NEED_SLATE` opens
-   `.cursor/skills/ue-editor-ui/SKILL.md`. Do not open a new gap entry for
+   `.agents/skills/ue-editor-ui/SKILL.md`. Do not open a new gap entry for
    `portal-level`, `state-tree`, or `pcg-details`.
 
 ## When MCP is unavailable

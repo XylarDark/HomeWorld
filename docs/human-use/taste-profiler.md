@@ -4,7 +4,7 @@ Durable Lead/process taste that **Taste Gates read first**, then stage and promo
 
 **Track:** [Docs/29_TASTE_PROFILER.md](../../Docs/29_TASTE_PROFILER.md)  
 **Durable store:** [taste-profile.md](taste-profile.md)  
-**Skill:** [.cursor/skills/taste-profiler/SKILL.md](../../.cursor/skills/taste-profiler/SKILL.md)  
+**Skill:** [.agents/skills/taste-profiler/SKILL.md](../../.agents/skills/taste-profiler/SKILL.md)  
 **Gates:** [taste-gates.md](taste-gates.md) · [OWNERSHIP.md](OWNERSHIP.md)
 
 ## How it fits

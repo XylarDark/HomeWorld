@@ -26,16 +26,9 @@ Default DET adopters copy the **six** core skills. HomeWorld also keeps small HW
 
 `integrateCursorRules` copies core skills into a host's `.agents/skills/` automatically.
 
-### Live `.cursor/skills/` (see also that README)
+### One catalog
 
-Only these project skills stay on the cursor scan path after the budget Do. A name in both trees is advertised from `.cursor/skills/`, so the trigger `description` lives there and the `.agents` copy is a pointer (DEC-0041):
-
-- Live: `pcg-validate`, `automation-gap-solutions`, `ue-editor-ui`. Their `.agents` copies are pointers.
-- Not advertised: `ue58-api-check` — a disabled pointer (`disable-model-invocation: true`) to the body at `.agents/skills/ue58-api-check`.
-- Tombstone: `.agents/skills/ue57-api-check` only (prefer ue58). Not on the `.cursor/skills` scan path.
-- Retired WAVE F: `demo-map-setup`, `homestead-setup` deleted
-
-Lean A/B and taste twins are **not** duplicated under `.cursor/skills/` (retired).
+Skill bodies live in `.agents/skills/` only. `.cursor/skills/` keeps a README and no `SKILL.md`, so Cursor does not advertise the same name twice. `disable-model-invocation: true` hides the seven `source-command-*` skills and `ue57-api-check` from automatic selection. `ue58-api-check` stays callable. Do not add a second copy under `.cursor/skills/`.
 
 ## Extras (`.agents/skills-extras/`)
 

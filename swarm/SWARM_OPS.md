@@ -257,7 +257,7 @@ Chat transcripts lag and refresh. **Durable continuity is files**, not chat.
 **On every Conductor / swarm session start (required):**
 
 1. Latest durable handoff: `Docs/handoffs/SESSION_HANDOFF_*.md` (pick newest by date in filename)
-2. Rolling summary: [docs/SESSION_SUMMARY.md](../docs/SESSION_SUMMARY.md) — **append only**; do **not** rewrite all history
+2. Live block: [docs/SESSION_NOW.md](../docs/SESSION_NOW.md) — **append only**. Do not open [docs/history/SESSION_LOG.md](../docs/history/SESSION_LOG.md) to start.
 3. Live board: [PHASE_BOARD.md](PHASE_BOARD.md)
 
 Resume from the handoff **resume_focus** / unfinished list. Do not reconstruct the day from chat alone.

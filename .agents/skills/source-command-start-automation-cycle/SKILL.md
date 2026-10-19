@@ -1,6 +1,7 @@
 ---
 name: "source-command-start-automation-cycle"
 description: "Migrated source command `start-automation-cycle`"
+disable-model-invocation: true
 ---
 
 # source-command-start-automation-cycle

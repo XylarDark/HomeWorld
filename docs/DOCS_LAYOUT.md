@@ -59,7 +59,18 @@ See [README_ENGINEERING.md](README_ENGINEERING.md) for the engineering index and
 | [SETUP.md](SETUP.md) | Developer onboarding; install, build, MCP, first run. |
 | [SPEC_AND_PLAN.md](SPEC_AND_PLAN.md) | Plan-first discipline; when to save plans to `.cursor/plans/`. |
 | [SESSION_LOG.md](SESSION_LOG.md) | Full session history (large); append at end for legacy UE track. |
-| [SESSION_SUMMARY.md](SESSION_SUMMARY.md) | Rolling last-30-days summary; **default read at start** for swarm/Conductor. |
+| [SESSION_NOW.md](SESSION_NOW.md) | Live continuity block. The start read. Append the next block here. |
+| [SESSION_SUMMARY.md](SESSION_SUMMARY.md) | Pointer only. Not a start read. |
+
+---
+
+## history/
+
+Archived continuity. Not a start read.
+
+| File | Purpose |
+|------|--------|
+| [history/SESSION_LOG.md](history/SESSION_LOG.md) | Former rolling summary. Open only when a past block is named. |
 
 ---
 

@@ -24,7 +24,7 @@ You cannot take responsibility for a change you cannot explain, you cannot see t
 
 Start every session from [Docs/context/SESSION_START.md](Docs/context/SESSION_START.md).
 
-Past ~60k tokens, write `Docs/handoffs/SESSION_HANDOFF_<slice>.md` and start a fresh chat from that file plus [docs/SESSION_SUMMARY.md](docs/SESSION_SUMMARY.md). Do not carry the transcript. One significant write at a time. Uncommitted changes you did not make: stop and report.
+Past ~60k tokens, write `Docs/handoffs/SESSION_HANDOFF_<slice>.md` and start a fresh chat from that file plus [docs/SESSION_NOW.md](docs/SESSION_NOW.md). Do not carry the transcript. Do not open `docs/history/SESSION_LOG.md` to start. One significant write at a time. Uncommitted changes you did not make: stop and report.
 
 Do not report a scene done until its verify script has logged the pass in the open editor. The rule is in [Docs/context/SCENE_SETUP.md](Docs/context/SCENE_SETUP.md).
 
@@ -34,7 +34,7 @@ Legacy files in `Docs/handoffs/` are not a read list. Open a handoff only when t
 
 Agents run `.\Tools\Safe-Build.ps1` only, from repo root. Never `Build-HomeWorld.bat` directly. Chain and MCP port: [docs/Setup/BUILD_POLICY.md](docs/Setup/BUILD_POLICY.md). Cloud agents have no UE.
 
-Editor work uses UnrealMCP on port 55557. A log line `editor_ui: NEED_SLATE` opens [.cursor/skills/ue-editor-ui/SKILL.md](.cursor/skills/ue-editor-ui/SKILL.md).
+Editor work uses UnrealMCP on port 55557. A log line `editor_ui: NEED_SLATE` opens [.agents/skills/ue-editor-ui/SKILL.md](.agents/skills/ue-editor-ui/SKILL.md).
 
 ## Do not re-litigate
 

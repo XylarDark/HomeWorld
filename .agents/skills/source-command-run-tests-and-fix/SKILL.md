@@ -1,6 +1,7 @@
 ---
 name: "source-command-run-tests-and-fix"
 description: "Migrated source command `run-tests-and-fix`"
+disable-model-invocation: true
 ---
 
 # source-command-run-tests-and-fix

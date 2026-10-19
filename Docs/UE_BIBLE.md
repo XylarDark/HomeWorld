@@ -186,7 +186,7 @@ Aligned with [HOST_PULSE.md](handoffs/HOST_PULSE.md) (5m pulse, 300s floor) and 
 | [../.cursor/rules/09-mcp-workflow.mdc](../.cursor/rules/09-mcp-workflow.mdc) | `importlib.reload` idempotency |
 | [18_VERIFY_PROVE.md](18_VERIFY_PROVE.md) | VP2 DESKTOP grep prove (closed; pattern reference) |
 | [../Content/Python/ps_placement_prove.py](../Content/Python/ps_placement_prove.py) | PS-C Act (read-only for operators) |
-| [../.cursor/skills/pcg-validate/SKILL.md](../.cursor/skills/pcg-validate/SKILL.md) | PCG validate when prove touches PCG |
+| [../.agents/skills/pcg-validate/SKILL.md](../.agents/skills/pcg-validate/SKILL.md) | PCG validate when prove touches PCG |
 
 ---
 

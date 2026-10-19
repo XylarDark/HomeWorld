@@ -1,6 +1,6 @@
 ---
 name: ue-live-debugging
-description: "Use when debugging UE C++ crashes, runtime bugs, or unexpected behavior with Rider MCP available. Value over bash/grep: get_file_problems surfaces IDE-detected issues, and search_symbol/search_text find the suspect code in the indexed project. DO NOT TRIGGER for: pure build errors with no runtime component, net-new feature work, Blueprint-only work. On HomeWorld read the section \"This project's Rider build\" before running the workflow - several steps (analyze_calls, get_symbol_info, xdebug_*, build_solution_*, reformat_file) do not work here. When Rider MCP is unavailable, runs in reduced mode - Bash/Grep only, IDE diagnostics skipped."
+description: Use when debugging a UE C++ crash or runtime bug with Rider. Skip pure build errors and Blueprint-only work.
 allowed-tools: Read Glob Grep Bash Write Edit ToolSearch
 metadata:
   argument-hint: "[bug description, suspect function/class, or crash context]"

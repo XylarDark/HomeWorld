@@ -80,8 +80,8 @@ Taste Gates stop invention ([Docs/28](28_TASTE_GATES.md)) but agents lack a **du
 ### Spike paths (TP-C)
 
 - Profile: [docs/human-use/taste-profile.md](../docs/human-use/taste-profile.md)
-- Skill: [.cursor/skills/taste-profiler/SKILL.md](../.cursor/skills/taste-profiler/SKILL.md)
-- Gate patch: [.cursor/skills/taste-gate/SKILL.md](../.cursor/skills/taste-gate/SKILL.md)
+- Skill: [.agents/skills/taste-profiler/SKILL.md](../.agents/skills/taste-profiler/SKILL.md)
+- Gate patch: [.agents/skills/taste-gate/SKILL.md](../.agents/skills/taste-gate/SKILL.md)
 - Human-use: [docs/human-use/taste-profiler.md](../docs/human-use/taste-profiler.md)
 - Prove: [Docs/handoffs/TP_D_PROVE.md](handoffs/TP_D_PROVE.md)
 

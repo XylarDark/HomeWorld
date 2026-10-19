@@ -37,9 +37,9 @@ Swarm role cards live in [`.cursor/agents/`](.cursor/agents/) (copied from [swar
 
 ## Session continuity (swarm)
 
-At **session start:** read [docs/SESSION_SUMMARY.md](docs/SESSION_SUMMARY.md) and [swarm/PHASE_BOARD.md](swarm/PHASE_BOARD.md) — not the full [docs/SESSION_LOG.md](docs/SESSION_LOG.md) unless debugging a past incident.
+At **session start:** read [docs/SESSION_NOW.md](docs/SESSION_NOW.md) and [swarm/PHASE_BOARD.md](swarm/PHASE_BOARD.md) — not [docs/history/SESSION_LOG.md](docs/history/SESSION_LOG.md) unless a past block is named.
 
-At **session end:** Conductor appends SESSION_SUMMARY and updates PHASE_BOARD when status changes.
+At **session end:** Conductor appends `docs/SESSION_NOW.md` and updates PHASE_BOARD when status changes.
 
 **Cloud agents:** [swarm/CLOUD_AGENT_PACKET.md](swarm/CLOUD_AGENT_PACKET.md) — no MCP / no Safe-Build on cloud VM; Windows handoff via [docs/Setup/WINDOWS_BRIDGE.md](docs/Setup/WINDOWS_BRIDGE.md).
 
@@ -51,6 +51,6 @@ At **session end:** Conductor appends SESSION_SUMMARY and updates PHASE_BOARD wh
 | [HOMEWORLD_MVP_SWARM_BRIEF.md](HOMEWORLD_MVP_SWARM_BRIEF.md) | Game canon |
 | [swarm/SWARM_OPS.md](swarm/SWARM_OPS.md) | Process — Human Use, evidence gates, git safety, KNOWN_ERRORS |
 | [swarm/PHASE_BOARD.md](swarm/PHASE_BOARD.md) | Live status (Conductor writes) |
-| [docs/SESSION_SUMMARY.md](docs/SESSION_SUMMARY.md) | Rolling last-30-days swarm memory |
+| [docs/SESSION_NOW.md](docs/SESSION_NOW.md) | Live continuity. Not the archived diary. |
 | [docs/KNOWN_ERRORS.md](docs/KNOWN_ERRORS.md) | Record real failures |
 | [docs/Automation/AUTOMATION_GAPS.md](docs/Automation/AUTOMATION_GAPS.md) | Log automation impossibilities |

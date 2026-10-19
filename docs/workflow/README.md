@@ -24,7 +24,7 @@ This folder is the **entry point** for project workflow. Vision, MVP, and task-l
 
 ## Daily flow (yesterday / today / tomorrow)
 
-**Swarm / Conductor sessions:** Read [docs/SESSION_SUMMARY.md](../SESSION_SUMMARY.md) and [swarm/PHASE_BOARD.md](../../swarm/PHASE_BOARD.md) at start; append SESSION_SUMMARY at end. Full [SESSION_LOG.md](../SESSION_LOG.md) only when investigating a specific past incident.
+**Swarm / Conductor sessions:** Read [docs/SESSION_NOW.md](../SESSION_NOW.md) and [swarm/PHASE_BOARD.md](../../swarm/PHASE_BOARD.md) at start; append `SESSION_NOW.md` at end. [docs/history/SESSION_LOG.md](../history/SESSION_LOG.md) only when a past block is named.
 
 **Legacy task-list sessions:** Ask e.g. "What did we do yesterday and what do we need to do today?" — agent reads [TaskLists/DAILY_STATE.md](../TaskLists/DAILY_STATE.md) (quarantine/history). End of session: append SESSION_LOG if still using that track.
 

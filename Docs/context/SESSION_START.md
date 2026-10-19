@@ -2,6 +2,8 @@
 
 The one start door. Any IDE, chat, CLI, or agent runner. If a capability is missing, say so. Do not invent a substitute.
 
+Continuity is [docs/SESSION_NOW.md](../SESSION_NOW.md). Do not open `docs/history/SESSION_LOG.md` to start a chat.
+
 ## Mode
 
 1. Start in solo. `HANDOFF from HomeWorld Co` or `mode: co` switches to Co. `mode: solo` switches back.

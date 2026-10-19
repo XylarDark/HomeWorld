@@ -1,6 +1,7 @@
 ---
 name: "source-command-run-gap-solver"
 description: "Migrated source command `run-gap-solver`"
+disable-model-invocation: true
 ---
 
 # source-command-run-gap-solver
@@ -21,4 +22,4 @@ Run the **Gap-Solver** role: implement solutions for logged automation gaps so t
 
 Optionally with `-Model <name>`. The Gap-Solver reads docs/Automation/AUTOMATION_GAPS.md and docs/Automation/GAP_SOLUTIONS_RESEARCH.md, then for each gap without a solution implemented: implements programmatic solution first (e.g. portal via AHomeWorldDungeonEntrance), then GUI automation stub or docs, and updates AUTOMATION_GAPS and GAP_SOLUTIONS_RESEARCH.
 
-> **Quarantine:** `Run-GapSolverAgent.ps1` and Gap-Solver loop **removed WAVE F**. Use [.cursor/skills/automation-gap-solutions/SKILL.md](../../.cursor/skills/automation-gap-solutions/SKILL.md) on Windows Editor, or Conductor assigns via [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md). History: [docs/Automation/AGENT_COMPANY.md](../../docs/Automation/AGENT_COMPANY.md).
+> **Quarantine:** `Run-GapSolverAgent.ps1` and Gap-Solver loop **removed WAVE F**. Use [.agents/skills/automation-gap-solutions/SKILL.md](../automation-gap-solutions/SKILL.md) on Windows Editor, or Conductor assigns via [swarm/SWARM_OPS.md](../../swarm/SWARM_OPS.md). History: [docs/Automation/AGENT_COMPANY.md](../../docs/Automation/AGENT_COMPANY.md).

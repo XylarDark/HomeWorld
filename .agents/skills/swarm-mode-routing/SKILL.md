@@ -1,11 +1,8 @@
 ---
 name: swarm-mode-routing
 description: >-
-  At task start or ask pivot, choose SWARM vs NON-SWARM vs HYBRID and a ModelClass
-  (Auto/Mid/Frontier/Explore) before loading Conductor, role cards, or Blender waves.
-  Triggers: Conductor, wave packet, APPROVE P0-P7, FALLBACK FLIGHT, FIX owner id,
-  SOLO, Blender kit, Lib/, Maps/Preview_, Art Director shot, QA judge, Safe-Build, CI,
-  PR merge, C++/Python automation, Docs/NN engineering, token efficiency, swarm mode.
+  Choose SWARM, NON-SWARM, or HYBRID when the ask is Conductor, a wave,
+  APPROVE P0-P7, a Blender kit, or an art or QA shot gate.
 ---
 
 # Swarm mode routing

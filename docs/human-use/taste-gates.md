@@ -3,7 +3,7 @@
 Continuous development: the agent is always either doing **executable work** or holding a **structured taste ask**—never inventing feel, never idle with no next question.
 
 **Track:** [Docs/28_TASTE_GATES.md](../../Docs/28_TASTE_GATES.md)  
-**Skill:** [.cursor/skills/taste-gate/SKILL.md](../../.cursor/skills/taste-gate/SKILL.md)  
+**Skill:** [.agents/skills/taste-gate/SKILL.md](../../.agents/skills/taste-gate/SKILL.md)  
 **Profile (read first):** [taste-profile.md](taste-profile.md) · [taste-profiler.md](taste-profiler.md)  
 **Alert shape:** [OWNERSHIP.md](OWNERSHIP.md) · detectors: [CYCLE.md](CYCLE.md)
 

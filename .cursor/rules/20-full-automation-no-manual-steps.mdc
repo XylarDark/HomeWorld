@@ -2,7 +2,7 @@
 name: "Full automation — no manual steps"
 description: "Use when writing, running, or reviewing any automation: do not emit manual steps for the user, and log anything not automatable to docs/Automation/AUTOMATION_GAPS.md."
 alwaysApply: false
-globs: "**/Content/Python/**, **/Tools/**, **/.github/workflows/**, docs/Automation/**, .cursor/skills/**"
+globs: "**/.github/workflows/**, docs/Automation/**"
 priority: 1
 version: 2.0
 ---
@@ -29,7 +29,7 @@ user can or will perform manual work during or between sessions. There is no
 2. **Automation order.** For any Editor or engine task, use in order:
    - **MCP** — when the Editor is running and connected, port 55557
    - **Python Editor scripts** — `Content/Python/`, via MCP or commandlet
-   - **Slate inspector** — only after a script logs `editor_ui: NEED_SLATE`. Open `.cursor/skills/ue-editor-ui/SKILL.md`. Do not open a new gap for `portal-level`, `state-tree`, or `pcg-details`
+   - **Slate inspector** — only after a script logs `editor_ui: NEED_SLATE`. Open `.agents/skills/ue-editor-ui/SKILL.md`. Do not open a new gap for `portal-level`, `state-tree`, or `pcg-details`
    - **C++ commandlets** — where they can set the required state
 
    If none can accomplish the task, **do not** fall back to "document the manual
@@ -78,7 +78,7 @@ Per entry include:
 | **Feature / task** | "PCG — assign graph in Details panel" |
 | **What is needed** | one sentence: what must happen for the feature to be complete |
 | **Why automation didn't cover it** | "No MCP/Python API for adding Mass Spawner to level"; "selector in UI not scriptable" |
-| **Suggested approach** | "Log `editor_ui: NEED_SLATE` and open `.cursor/skills/ue-editor-ui/SKILL.md`"; "Research UE 5.8 Mass Spawner Python API" |
+| **Suggested approach** | "Log `editor_ui: NEED_SLATE` and open `.agents/skills/ue-editor-ui/SKILL.md`"; "Research UE 5.8 Mass Spawner Python API" |
 
 **When a gap is addressed** (solution implemented and verified), note it in the
 same file — Research log or Addressed subsection: date, gap id, how it was

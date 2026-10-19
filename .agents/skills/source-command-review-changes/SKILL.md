@@ -1,6 +1,7 @@
 ---
 name: "source-command-review-changes"
 description: "Migrated source command `review-changes`"
+disable-model-invocation: true
 ---
 
 # source-command-review-changes

@@ -173,10 +173,7 @@ Keep semantic and diagnostic tools. Turn off the ones that duplicate native Curs
 All of this is applied by `Tools\Start-RiderMcp.ps1`; the GUI equivalent is Settings -> Tools -> MCP Server -> Exposed Tools.
 
 ## JetBrains skills installation (Cursor/OpenCode)
-JetBrains' `rider-skills` ships Claude Code and Codex plugin manifests only. Cursor/OpenCode use the plain `SKILL.md` layout, so the five skills named in the spec were copied from a shallow clone of `https://github.com/JetBrains/rider-skills` into both skill roots this repo already uses:
-
-- `.agents/skills/<skill>/` — read by OpenCode and other SKILL.md-aware agents
-- `.cursor/skills/<skill>/` — referenced by `AGENTS.md` and listed in `opencode.json` (`skills: [".cursor/skills"]`)
+JetBrains' `rider-skills` ships Claude Code and Codex plugin manifests only. Cursor and OpenCode use the plain `SKILL.md` layout. The five skills live once, in `.agents/skills/`. Do not add a second copy under `.cursor/skills/`.
 
 Each skill folder carries `SKILL.md`, `metadata.json`, and a `reference/` directory with the tool contracts. Three corrections were applied to the vendored copies on 2026-10-15 — each was true of a normal IntelliJ-platform install and false here:
 

@@ -1,6 +1,6 @@
 ---
 name: refactoring-code
-description: Use when semantic refactoring is needed in Rider-supported solutions and projects, including .NET/C#, F#, VB, C++, Unity, Unreal Engine, XAML, Razor, and other GameDev or mixed-language projects. Trigger when edits must update declarations and usages across IDE-resolved references — rename symbols, move types or namespaces, safe-delete unused code, extract interface/base class/method, change signatures, or reorganize namespaces. Do not use for file-only moves, config keys, strings, comments, prose-only edits, generated output, or logic changes with unchanged names/signatures.
+description: Use when a Rider refactor must update declarations and usages, such as rename, move, extract, or a signature change.
 allowed-tools: execute_tool
 metadata:
   author: JetBrains

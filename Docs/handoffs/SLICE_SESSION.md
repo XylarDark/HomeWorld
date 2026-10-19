@@ -17,7 +17,7 @@ Shaping does not waive Steer or Test.
 
 Open a new chat when the slice changes, or when this chat is past the dumb zone (about 60k tokens — instruction-following degrades). Do not open a new chat for a one-line follow-up on the same slice.
 
-Before you leave, write `Docs/handoffs/SESSION_HANDOFF_<slice>.md` from the template below and append one line to `docs/SESSION_SUMMARY.md`. The next chat starts from that file, not from this transcript.
+Before you leave, write `Docs/handoffs/SESSION_HANDOFF_<slice>.md` from the template below and append one line to `docs/SESSION_NOW.md`. The next chat starts from that file, not from this transcript.
 
 ## Handoff template
 

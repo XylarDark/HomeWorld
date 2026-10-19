@@ -1,6 +1,6 @@
 ---
 name: ue-code-authoring
-description: Use when writing or modifying Unreal Engine C++ — classes, actors, components, subsystems, interfaces, ability-system (GAS) code, module dependencies, reflected UPROPERTY/UFUNCTION API, native gameplay tags, and testable gameplay behavior — in a project open in JetBrains Rider. Source changes go through Read/Grep/Glob/Edit/Write; Rider supplies symbol search and UHT diagnostics. On HomeWorld read the section "This project's Rider build" before calling a tool — formatting, Rider builds, and rename are not on the default whitelist. Do not use for Blueprint-only tasks or editor automation with no C++ authoring.
+description: Use when writing Unreal C++ gameplay in Rider. Read the HomeWorld Rider section before calling a tool.
 metadata:
   author: JetBrains
 ---

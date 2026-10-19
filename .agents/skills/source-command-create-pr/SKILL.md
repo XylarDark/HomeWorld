@@ -1,6 +1,7 @@
 ---
 name: "source-command-create-pr"
 description: "Migrated source command `create-pr`"
+disable-model-invocation: true
 ---
 
 # source-command-create-pr

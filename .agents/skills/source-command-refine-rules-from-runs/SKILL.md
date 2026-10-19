@@ -1,6 +1,7 @@
 ---
 name: "source-command-refine-rules-from-runs"
 description: "Migrated source command `refine-rules-from-runs`"
+disable-model-invocation: true
 ---
 
 # source-command-refine-rules-from-runs
@@ -27,7 +28,7 @@ From those, update as needed: `docs/KNOWN_ERRORS.md`, `.cursor/rules/`, `AGENTS.
 - When a run mentions an automation gap (Level Streaming, State Tree, PCG), add it to `docs/Automation/AUTOMATION_GAPS.md` (canonical) — do not invent a new doc.
 
 **Related:** [docs/Automation/AUTOMATION_REFINEMENT.md](../../docs/Automation/AUTOMATION_REFINEMENT.md) (how run history is used) ·
-[.cursor/skills/automation-gap-solutions/SKILL.md](../../.cursor/skills/automation-gap-solutions/SKILL.md) ·
+[.agents/skills/automation-gap-solutions/SKILL.md](../automation-gap-solutions/SKILL.md) ·
 [docs/Automation/AGENT_COMPANY.md](../../docs/Automation/AGENT_COMPANY.md) (history — the Refiner *role* this replaced).
 
 > **Quarantine:** the pre-swarm agent company and `Tools/Run-RefinerAgent.ps1` were **removed in WAVE F** <!-- path-exception: Run-RefinerAgent.ps1 was deleted in WAVE F and is named here to warn against citing it -->.

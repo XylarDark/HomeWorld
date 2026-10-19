@@ -1,6 +1,7 @@
 ---
 name: "source-command-build-and-validate"
 description: "Migrated source command `build-and-validate`"
+disable-model-invocation: true
 ---
 
 # source-command-build-and-validate

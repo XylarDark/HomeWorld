@@ -21,7 +21,7 @@ When a task corresponds to a **logged automation gap**:
 ## 2. Prefer programmatic, then GUI (default for Editor UI), then document
 
 1. **Programmatic first:** Existing C++/Blueprint reuse, Python API, or commandlet. Try before falling back.
-2. **Editor UI:** When Python cannot set a property, a log line `editor_ui: NEED_SLATE` opens [.cursor/skills/ue-editor-ui/SKILL.md](../skills/ue-editor-ui/SKILL.md). That skill is the default for Editor UI. Manual steps are the fallback only when the inspector is unavailable or has failed.
+2. **Editor UI:** When Python cannot set a property, a log line `editor_ui: NEED_SLATE` opens [.agents/skills/ue-editor-ui/SKILL.md](../../.agents/skills/ue-editor-ui/SKILL.md). That skill is the default for Editor UI. Manual steps are the fallback only when the inspector is unavailable or has failed.
 3. **Document only** if neither is viable; do not output "manual steps" for the user — log to AUTOMATION_GAPS with suggested approach.
 
 ## 3. Gap-specific guidance

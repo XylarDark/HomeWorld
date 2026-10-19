@@ -2,7 +2,7 @@
 name: "Automation standards"
 description: "Standards for choosing and escalating automation tooling: docs-first, proven results, the gated redundancy ladder, and the Lead approval tokens that unlock third-party tools."
 alwaysApply: false
-globs: "**/Content/Python/**, **/Tools/**, **/.github/workflows/**"
+globs: "**/.github/workflows/**, docs/Automation/**"
 priority: 9
 version: 2.0
 ---
@@ -21,7 +21,7 @@ what order, and what needs Lead approval. Two things moved out:
 
 When we can drive the Unreal Editor UI automatically, that is the **default
 method** — not a fallback. A log line `editor_ui: NEED_SLATE` opens
-[.cursor/skills/ue-editor-ui/SKILL.md](../skills/ue-editor-ui/SKILL.md). Treat
+[.agents/skills/ue-editor-ui/SKILL.md](../../.agents/skills/ue-editor-ui/SKILL.md). Treat
 manual Editor steps as fallback only when the inspector is unavailable or has failed.
 
 ## KNOWN_ERROR_LOG (Lead hard rule)
