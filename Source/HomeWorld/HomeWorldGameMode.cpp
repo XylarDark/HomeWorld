@@ -2,6 +2,8 @@
 
 #include "HomeWorldGameMode.h"
 #include "HomeWorldCharacter.h"
+#include "HomeWorldFamilySubsystem.h"
+#include "Engine/GameInstance.h"
 #include "HomeWorldNightEncounterPlaceholder.h"
 #include "HomeWorldPlayerController.h"
 #include "HomeWorldPlayerState.h"
@@ -648,6 +650,14 @@ void AHomeWorldGameMode::TryMoveFamilyToDefendPositions()
 	}
 	if (bFamilyMovedToDefendThisNight) return;
 
+	if (UGameInstance* GameInstance = World->GetGameInstance())
+	{
+		if (UHomeWorldFamilySubsystem* Family = GameInstance->GetSubsystem<UHomeWorldFamilySubsystem>())
+		{
+			Family->EndOuting(EHomeWorldPartyAbsence::Night, World);
+		}
+	}
+
 	static const FName DefendPositionTag(TEXT("DefendPosition"));
 	static const FName FamilyTag(TEXT("Family"));
 	TArray<AActor*> DefendPositions;
@@ -671,11 +681,23 @@ void AHomeWorldGameMode::TryMoveFamilyToDefendPositions()
 		return;
 	}
 
+	UHomeWorldFamilySubsystem* Party = nullptr;
+	if (UGameInstance* GameInstance = World->GetGameInstance())
+	{
+		Party = GameInstance->GetSubsystem<UHomeWorldFamilySubsystem>();
+	}
 	int32 Moved = 0;
+	int32 Skipped = 0;
 	for (int32 i = 0; i < NumFamily; i++)
 	{
 		AActor* FamilyActor = FamilyActors[i];
 		if (!FamilyActor) continue;
+		if (Party && Party->IsActorOut(FamilyActor))
+		{
+			++Skipped;
+			UE_LOG(LogTemp, Log, TEXT("party: defend teleport skipped %s"), *FamilyActor->GetName());
+			continue;
+		}
 		const int32 PosIndex = i % NumPositions;
 		AActor* Target = DefendPositions[PosIndex];
 		if (!Target) continue;
@@ -683,7 +705,14 @@ void AHomeWorldGameMode::TryMoveFamilyToDefendPositions()
 		Moved++;
 	}
 	bFamilyMovedToDefendThisNight = true;
-	UE_LOG(LogTemp, Log, TEXT("HomeWorld: T3 moved %d family actor(s) to DefendPosition (teleport)."), Moved);
+	if (Moved == 0 && Skipped > 0)
+	{
+		UE_LOG(LogTemp, Log, TEXT("party: defend teleport moved none (%d still out)"), Skipped);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: T3 moved %d family actor(s) to DefendPosition (teleport)."), Moved);
+	}
 }
 
 void AHomeWorldGameMode::TryReturnFamilyFromDefendAtDawn()
@@ -707,31 +736,63 @@ void AHomeWorldGameMode::TryReturnFamilyFromDefendAtDawn()
 		return;
 	}
 
+	UHomeWorldFamilySubsystem* Party = nullptr;
+	if (UGameInstance* GameInstance = World->GetGameInstance())
+	{
+		Party = GameInstance->GetSubsystem<UHomeWorldFamilySubsystem>();
+	}
 	const int32 NumGather = GatherPositions.Num();
 	int32 Returned = 0;
+	int32 Skipped = 0;
 	if (NumGather > 0)
 	{
 		for (int32 i = 0; i < NumFamily; i++)
 		{
 			AActor* FamilyActor = FamilyActors[i];
 			if (!FamilyActor) continue;
+			if (Party && Party->IsActorOut(FamilyActor))
+			{
+				++Skipped;
+				UE_LOG(LogTemp, Log, TEXT("party: dawn teleport skipped %s"), *FamilyActor->GetName());
+				continue;
+			}
 			const int32 PosIndex = i % NumGather;
 			AActor* Target = GatherPositions[PosIndex];
 			if (!Target) continue;
 			FamilyActor->SetActorLocation(Target->GetActorLocation());
 			Returned++;
 		}
-		UE_LOG(LogTemp, Log, TEXT("HomeWorld: T3 return from Defend at dawn — moved %d family actor(s) to GatherPosition (teleport)."), Returned);
+		if (Returned == 0 && Skipped > 0)
+		{
+			UE_LOG(LogTemp, Log, TEXT("party: dawn teleport moved none (%d still out)"), Skipped);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("HomeWorld: T3 return from Defend at dawn — moved %d family actor(s) to GatherPosition (teleport)."), Returned);
+		}
 	}
 	else
 	{
 		for (AActor* FamilyActor : FamilyActors)
 		{
 			if (!FamilyActor) continue;
+			if (Party && Party->IsActorOut(FamilyActor))
+			{
+				++Skipped;
+				UE_LOG(LogTemp, Log, TEXT("party: dawn teleport skipped %s"), *FamilyActor->GetName());
+				continue;
+			}
 			FamilyActor->SetActorLocation(GatherReturnOffset);
 			Returned++;
 		}
-		UE_LOG(LogTemp, Log, TEXT("HomeWorld: T3 return from Defend at dawn — moved %d family actor(s) to GatherReturnOffset %s (no GatherPosition actors; add tag GatherPosition for return spots)."), Returned, *GatherReturnOffset.ToString());
+		if (Returned == 0 && Skipped > 0)
+		{
+			UE_LOG(LogTemp, Log, TEXT("party: dawn teleport moved none (%d still out)"), Skipped);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("HomeWorld: T3 return from Defend at dawn — moved %d family actor(s) to GatherReturnOffset %s (no GatherPosition actors; add tag GatherPosition for return spots)."), Returned, *GatherReturnOffset.ToString());
+		}
 	}
 }
 

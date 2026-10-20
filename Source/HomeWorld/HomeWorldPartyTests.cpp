@@ -8,8 +8,10 @@
 #include "Engine/GameInstance.h"
 #include "Engine/World.h"
 #include "HomeWorldFamilySubsystem.h"
+#include "HomeWorldGameMode.h"
 #include "HomeWorldOpeningWalker.h"
 #include "HomeWorldSaveGame.h"
+#include "HomeWorldTimeOfDaySubsystem.h"
 
 /**
  * Docs/41_COMPANION_PARTY_DESIGN.md — the party record and the load forces.
@@ -243,6 +245,70 @@ bool FPartyOutingClearTest::RunTest(const FString& Parameters)
 	TestEqual(TEXT("a stroke sends the child home"), Child->GetActorLocation(), ChildHome);
 	Family->EndOuting(EHomeWorldPartyAbsence::Camp, Scope.World);
 	TestEqual(TEXT("a second clear stays solo"), Family->GetPartySetup(), EHomeWorldPartySetup::Solo);
+
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FPartyNightTeleportTest,
+	"HomeWorld.Party.NightTeleport",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FPartyNightTeleportTest::RunTest(const FString& Parameters)
+{
+	if (!TestNotNull(TEXT("engine"), GEngine))
+	{
+		return false;
+	}
+	HomeWorldPartyTest::FScopedWorld Scope;
+	UGameInstance* GameInstance = NewObject<UGameInstance>(GEngine);
+	if (!TestNotNull(TEXT("world"), Scope.World) || !TestNotNull(TEXT("game instance"), GameInstance))
+	{
+		return false;
+	}
+	GameInstance->Init();
+	Scope.World->SetGameInstance(GameInstance);
+
+	UHomeWorldFamilySubsystem* Family = GameInstance->GetSubsystem<UHomeWorldFamilySubsystem>();
+	UHomeWorldTimeOfDaySubsystem* TimeOfDay = Scope.World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
+	if (!TestNotNull(TEXT("family"), Family) || !TestNotNull(TEXT("time of day"), TimeOfDay))
+	{
+		return false;
+	}
+
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	AHomeWorldOpeningWalker* Partner = Scope.World->SpawnActor<AHomeWorldOpeningWalker>(Params);
+	AHomeWorldOpeningWalker* Defend = Scope.World->SpawnActor<AHomeWorldOpeningWalker>(Params);
+	AHomeWorldGameMode* GameMode = Scope.World->SpawnActor<AHomeWorldGameMode>(Params);
+	if (!TestNotNull(TEXT("partner"), Partner) || !TestNotNull(TEXT("defend point"), Defend) || !TestNotNull(TEXT("game mode"), GameMode))
+	{
+		return false;
+	}
+	Partner->Tags.Add(TEXT("NPC_PARTNER"));
+	Partner->Tags.Add(TEXT("Family"));
+	Defend->Tags.Add(TEXT("DefendPosition"));
+	const FVector Home(1.f, 2.f, 3.f);
+	const FVector Field(4000.f, 0.f, 3.f);
+	const FVector DefendAt(20.f, 30.f, 3.f);
+	Defend->SetActorLocation(DefendAt);
+	Family->RememberPartnerHome(Home);
+
+	TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Night);
+	UHomeWorldSaveGame* Save = NewObject<UHomeWorldSaveGame>();
+	Save->bSavedPartnerOut = true;
+	Family->DeserializeFromSaveGame(Save);
+	Partner->SetActorLocation(Field);
+	GameMode->TryMoveFamilyToDefendPositions();
+	TestFalse(TEXT("night clear sends the partner home before the teleport"), Family->IsPartnerOut());
+	TestEqual(TEXT("once home, the existing defend teleport still runs"), Partner->GetActorLocation(), DefendAt);
+
+	TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Day);
+	Family->DeserializeFromSaveGame(Save);
+	Partner->SetActorLocation(Field);
+	GameMode->TryReturnFamilyFromDefendAtDawn();
+	TestTrue(TEXT("a missed clear stays out"), Family->IsPartnerOut());
+	TestEqual(TEXT("the dawn teleport skips someone still out"), Partner->GetActorLocation(), Field);
 
 	return true;
 }
