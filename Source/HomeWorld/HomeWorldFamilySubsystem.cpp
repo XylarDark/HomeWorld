@@ -133,6 +133,28 @@ void UHomeWorldFamilySubsystem::ApplyLoadForces(bool bRescueDone, bool bNightOrS
 	}
 }
 
+void UHomeWorldFamilySubsystem::EndOuting(EHomeWorldPartyAbsence Reason, UWorld* World)
+{
+	if (!bPartnerOut && !bChildOut)
+	{
+		return;
+	}
+	const bool bWasPartner = bPartnerOut;
+	const bool bWasChild = bChildOut;
+	bPartnerOut = false;
+	bChildOut = false;
+	if (bWasPartner)
+	{
+		PlaceMemberHome(World, true);
+	}
+	if (bWasChild)
+	{
+		PlaceMemberHome(World, false);
+	}
+	UE_LOG(LogTemp, Log, TEXT("party: outing ended reason=%d partner=%d child=%d"),
+		static_cast<int32>(Reason), bWasPartner ? 1 : 0, bWasChild ? 1 : 0);
+}
+
 bool UHomeWorldFamilySubsystem::IsActorOut(const AActor* Actor) const
 {
 	if (!Actor)

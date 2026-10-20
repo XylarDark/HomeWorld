@@ -194,4 +194,57 @@ bool FPartyLoadSendsHomeTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FPartyOutingClearTest,
+	"HomeWorld.Party.OutingClear",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FPartyOutingClearTest::RunTest(const FString& Parameters)
+{
+	UHomeWorldFamilySubsystem* Family = HomeWorldPartyTest::MakeFamily();
+	HomeWorldPartyTest::FScopedWorld Scope;
+	if (!TestNotNull(TEXT("family subsystem"), Family) || !TestNotNull(TEXT("world"), Scope.World))
+	{
+		return false;
+	}
+
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	AHomeWorldOpeningWalker* Partner = Scope.World->SpawnActor<AHomeWorldOpeningWalker>(Params);
+	AHomeWorldOpeningWalker* Child = Scope.World->SpawnActor<AHomeWorldOpeningWalker>(Params);
+	if (!TestNotNull(TEXT("partner walker"), Partner) || !TestNotNull(TEXT("child walker"), Child))
+	{
+		return false;
+	}
+	Partner->Tags.Add(TEXT("NPC_PARTNER"));
+	Child->Tags.Add(TEXT("NPC_CHILD"));
+
+	const FVector PartnerHome(0.f, 0.f, 0.f);
+	const FVector ChildHome(0.f, 300.f, 0.f);
+	Family->RememberPartnerHome(PartnerHome);
+	Family->RememberChildHome(ChildHome);
+	Child->SetActorLocation(ChildHome);
+	Partner->SetActorLocation(FVector(5000.f, 0.f, 0.f));
+
+	Family->SetRescueComplete(true);
+	TestTrue(TEXT("only the partner is invited"), Family->TryInvitePartner(false, false, false));
+	Family->EndOuting(EHomeWorldPartyAbsence::Bonk, Scope.World);
+
+	TestEqual(TEXT("a bonk is solo"), Family->GetPartySetup(), EHomeWorldPartySetup::Solo);
+	TestEqual(TEXT("the partner is home"), Partner->GetActorLocation(), PartnerHome);
+	TestEqual(TEXT("the child who stayed home is unmoved"), Child->GetActorLocation(), ChildHome);
+
+	Family->SetRescueComplete(true);
+	TestTrue(TEXT("both may come"), Family->TryInvitePartner(false, false, false) && Family->TryInviteChild(false, false, false));
+	Partner->SetActorLocation(FVector(5000.f, 0.f, 0.f));
+	Child->SetActorLocation(FVector(5000.f, 300.f, 0.f));
+	Family->EndOuting(EHomeWorldPartyAbsence::Stroke, Scope.World);
+	TestEqual(TEXT("a stroke sends the partner home"), Partner->GetActorLocation(), PartnerHome);
+	TestEqual(TEXT("a stroke sends the child home"), Child->GetActorLocation(), ChildHome);
+	Family->EndOuting(EHomeWorldPartyAbsence::Camp, Scope.World);
+	TestEqual(TEXT("a second clear stays solo"), Family->GetPartySetup(), EHomeWorldPartySetup::Solo);
+
+	return true;
+}
+
 #endif

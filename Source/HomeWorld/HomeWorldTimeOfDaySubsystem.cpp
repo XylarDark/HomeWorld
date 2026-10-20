@@ -3,6 +3,7 @@
 #include "HomeWorldTimeOfDaySubsystem.h"
 #include "HomeWorldParadoxToy.h"
 #include "HomeWorldPlayWorld.h"
+#include "HomeWorldFamilySubsystem.h"
 #include "HomeWorldSaveGameSubsystem.h"
 #include "HAL/IConsoleManager.h"
 #include "Engine/GameInstance.h"
@@ -199,6 +200,19 @@ void UHomeWorldTimeOfDaySubsystem::SetPhase(EHomeWorldTimeOfDayPhase Phase)
 
 	if (Phase != Previous)
 	{
+		if (GetWorld() && (Phase == EHomeWorldTimeOfDayPhase::Dusk || Phase == EHomeWorldTimeOfDayPhase::Night))
+		{
+			if (UGameInstance* GameInstance = GetWorld()->GetGameInstance())
+			{
+				if (UHomeWorldFamilySubsystem* Family = GameInstance->GetSubsystem<UHomeWorldFamilySubsystem>())
+				{
+					const EHomeWorldPartyAbsence Reason = Phase == EHomeWorldTimeOfDayPhase::Dusk
+						? EHomeWorldPartyAbsence::Dusk
+						: EHomeWorldPartyAbsence::Night;
+					Family->EndOuting(Reason, GetWorld());
+				}
+			}
+		}
 		LastBroadcastPhase = Phase;
 		OnPhaseChanged.Broadcast(Phase);
 		if (Phase == EHomeWorldTimeOfDayPhase::Night)

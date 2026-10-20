@@ -32,6 +32,20 @@ enum class EHomeWorldPartySetup : uint8
 	AllThree
 };
 
+/** Why an outing ended. Each one clears both flags. Docs/41 section 5. */
+UENUM(BlueprintType)
+enum class EHomeWorldPartyAbsence : uint8
+{
+	Stroke,
+	Camp,
+	Cave,
+	Night,
+	Rescue,
+	Dusk,
+	Bed,
+	Bonk
+};
+
 /**
  * Game instance subsystem for family member role assignment and persistence (Day 15).
  * Maps spawn index (or stable ID) to role so State Tree and behavior can key off role.
@@ -104,6 +118,12 @@ public:
 
 	/** True when this actor is the partner or the child and that flag is still Out. */
 	bool IsActorOut(const AActor* Actor) const;
+
+	/**
+	 * End the trip. Both flags clear. Anyone who was out is placed on the remembered home anchor.
+	 * Already-solo is a no-op, so a stroke or a night tick can call it freely.
+	 */
+	void EndOuting(EHomeWorldPartyAbsence Reason, UWorld* World);
 
 private:
 	void PlaceMemberHome(UWorld* World, bool bPartner) const;

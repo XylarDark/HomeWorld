@@ -758,6 +758,16 @@ bool UHomeWorldSpiritStealthComponent::IsFreedomUnlocked() const
 
 bool UHomeWorldSpiritStealthComponent::TryFreeCaptive()
 {
+	if (UWorld* World = GetWorld())
+	{
+		if (UGameInstance* GameInstance = World->GetGameInstance())
+		{
+			if (UHomeWorldFamilySubsystem* Family = GameInstance->GetSubsystem<UHomeWorldFamilySubsystem>())
+			{
+				Family->EndOuting(EHomeWorldPartyAbsence::Rescue, World);
+			}
+		}
+	}
 	if (bCaptiveFreed)
 	{
 		UE_LOG(LogHomeWorld, Log, TEXT("CAMP: captive already freed"));
