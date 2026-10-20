@@ -33,9 +33,10 @@ REQUEST = os.path.join(SAVED, "quest_tests_request.json")
 
 sys.path.insert(0, CONTENT_PYTHON)
 try:
+    import quest_test_contract as contract
     import quest_test_manifest as manifest
 except Exception as exc:  # pragma: no cover - host setup failure
-    print("quest_tests: cannot import quest_test_manifest.py: %s" % exc)
+    print("quest_tests: cannot import the quest suite contract: %s" % exc)
     sys.exit(2)
 
 
@@ -98,11 +99,7 @@ def _first_problem(beat):
 def _report(data):
     beats = data.get("beats", [])
     selected = data.get("selected", [])
-    run_ok = (
-        bool(data.get("all_passed"))
-        and data.get("beats_run", 0) > 0
-        and data.get("beats_run") == len(selected)
-    )
+    run_ok = contract.all_passed(selected, beats)
 
     print("")
     print("quest_tests: %s" % ("PASS" if run_ok else "FAIL"))
@@ -140,6 +137,13 @@ def main():
     parser.add_argument("--no-load-level", action="store_true", help="refuse to load L_SizeTest")
     parser.add_argument("--timeout", type=int, default=1800, help="poll timeout in seconds (default 1800)")
     args = parser.parse_args()
+
+    contract_errors = contract.validate_manifest(manifest.QUESTS)
+    if contract_errors:
+        print("quest_tests: manifest contract failed:")
+        for error in contract_errors:
+            print("  " + error)
+        return 2
 
     if args.list:
         _print_manifest()

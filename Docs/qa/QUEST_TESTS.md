@@ -60,7 +60,7 @@ Green requires `beats_run == selected`, `beats_run > 0`, and zero failed or inco
 3. Add an entry to `Content/Python/quest_test_manifest.py` in chain order. Do not edit the runner for a data-only quest.
 4. Run `.\Tools\RunTests.ps1 -Quest -QuestOnly <id>` and check `Saved/quest_tests.json`.
 
-The manifest is `Content/Python/quest_test_manifest.py`; the engine is `Content/Python/quest_test_runner.py`. The split is deliberate: the manifest is the contract, the runner is generic.
+The manifest is `Content/Python/quest_test_manifest.py`; the engine is `Content/Python/quest_test_runner.py`; the executable check contract is `Content/Python/quest_test_contract.py`. The split is deliberate: the manifest is data, the runner drives PIE, and the contract module owns validation and check evaluation so host pytest can prove both without an Editor. A malformed manifest is refused before a sweep starts.
 
 ### Manifest shape
 
@@ -91,7 +91,7 @@ The manifest is `Content/Python/quest_test_manifest.py`; the engine is `Content/
 | `present(path)` | Path exists and is not null. |
 | `count_tag(tag, value)` | Actor tag count equals `value`. |
 
-Paths are dotted lookups into the snapshot. A missing path is `inconclusive`; a present value that is wrong is `failed`.
+Paths are dotted lookups into the snapshot and must start with `quest`, `beat`, `actors`, or `tag_counts`. A missing path in a value check is `inconclusive`; a present value that is wrong is `failed`. `present` is the exception: a missing path is `failed`, because absence is what that check measures.
 
 ## Stop semantics
 

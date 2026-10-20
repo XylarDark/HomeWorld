@@ -9,7 +9,8 @@
 # the result. Never block the game thread with sleep here.
 #
 # Results are preconditions, not the human pass. The queue tables in
-# Docs/qa/TUTORIAL_PLAYTEST_QUEUE.md stay human-owned.
+# Docs/qa/TUTORIAL_PLAYTEST_QUEUE.md stay human-owned. Check validation and
+# evaluation live in quest_test_contract.py so host pytest can run them.
 
 import importlib
 import json
@@ -19,6 +20,7 @@ import traceback
 
 import unreal
 
+import quest_test_contract as contract
 import quest_test_manifest as manifest
 
 LEVEL_PATH = "/Game/HomeWorld/Maps/SizeTest/L_SizeTest"
@@ -272,16 +274,18 @@ def _bounds(actor):
 def _all_passed():
     selected = _RUN.get("selected", [])
     results = _RUN.get("results", [])
-    return bool(selected) and len(results) == len(selected) and all(
-        result.get("status") == "passed" for result in results
+    return contract.all_passed(
+        [quest.get("id") for quest in selected],
+        results,
     )
 
 
 def _result_doc():
     results = _RUN.get("results", [])
-    passed = sum(1 for result in results if result.get("status") == "passed")
-    failed = sum(1 for result in results if result.get("status") == "failed")
-    inconclusive = sum(1 for result in results if result.get("status") == "inconclusive")
+    counted = contract.counts(results)
+    passed = counted["passed"]
+    failed = counted["failed"]
+    inconclusive = counted["inconclusive"]
     return {
         "suite": "opening quest sweep",
         "run_id": _RUN.get("run_id"),
@@ -336,134 +340,8 @@ def _write_status(force=False):
 # Assertions and snapshot
 # ---------------------------------------------------------------------------
 
-def _resolve(data, path):
-    current = data
-    for part in path.split("."):
-        if not isinstance(current, dict) or part not in current:
-            return False, None
-        current = current[part]
-    return True, current
-
-
-def _xy(point):
-    if isinstance(point, dict):
-        point = point.get("location")
-    if isinstance(point, (list, tuple)) and len(point) >= 2:
-        try:
-            return float(point[0]), float(point[1])
-        except (TypeError, ValueError):
-            return None
-    if hasattr(point, "x") and hasattr(point, "y"):
-        return float(point.x), float(point.y)
-    return None
-
-
-def _dist2d(a, b):
-    pa = _xy(a)
-    pb = _xy(b)
-    if pa is None or pb is None:
-        return None
-    return ((pa[0] - pb[0]) ** 2 + (pa[1] - pb[1]) ** 2) ** 0.5
-
-
-def _describe(check):
-    kind = check.get("kind")
-    if kind in ("eq", "ne", "le", "ge"):
-        symbols = {"eq": "==", "ne": "!=", "le": "<=", "ge": ">="}
-        return "%s %s %s" % (check.get("path"), symbols[kind], check.get("value"))
-    if kind == "between":
-        return "%s in [%s, %s]" % (check.get("path"), check.get("low"), check.get("high"))
-    if kind == "near":
-        return "2D(%s, %s) <= %s cm" % (check.get("a"), check.get("b"), check.get("cm"))
-    if kind == "present":
-        return "%s present" % check.get("path")
-    if kind == "count_tag":
-        return "tag %s count == %s" % (check.get("tag"), check.get("value"))
-    return str(check)
-
-
-def _inconclusive(description, detail):
-    return {
-        "check": description,
-        "status": "inconclusive",
-        "detail": detail,
-    }
-
-
-def _run_check(check, snapshot):
-    kind = check.get("kind")
-    description = _describe(check)
-
-    if kind in ("eq", "ne", "le", "ge", "between"):
-        found, value = _resolve(snapshot, check.get("path", ""))
-        if not found or value is None:
-            return _inconclusive(description, "path missing: " + check.get("path", ""))
-        expected = check.get("value", [check.get("low"), check.get("high")])
-        try:
-            if kind == "eq":
-                passed = value == check.get("value")
-            elif kind == "ne":
-                passed = value != check.get("value")
-            elif kind == "le":
-                passed = value <= check.get("value")
-            elif kind == "ge":
-                passed = value >= check.get("value")
-            else:
-                passed = check.get("low") <= value <= check.get("high")
-        except TypeError as exc:
-            return _inconclusive(description, "cannot compare: " + str(exc))
-        return {
-            "check": description,
-            "status": "passed" if passed else "failed",
-            "expected": expected,
-            "actual": value,
-        }
-
-    if kind == "present":
-        found, value = _resolve(snapshot, check.get("path", ""))
-        passed = found and value is not None
-        return {
-            "check": description,
-            "status": "passed" if passed else "failed",
-            "expected": "present",
-            "actual": value,
-        }
-
-    if kind == "near":
-        found_a, a = _resolve(snapshot, check.get("a", ""))
-        found_b, b = _resolve(snapshot, check.get("b", ""))
-        if not found_a or not found_b or a is None or b is None:
-            return _inconclusive(description, "one or both points missing")
-        distance = _dist2d(a, b)
-        if distance is None:
-            return _inconclusive(description, "points are not locations")
-        return {
-            "check": description,
-            "status": "passed" if distance <= check.get("cm", 0) else "failed",
-            "expected": "<= %s cm" % check.get("cm"),
-            "actual": round(distance, 1),
-        }
-
-    if kind == "count_tag":
-        count = snapshot.get("tag_counts", {}).get(check.get("tag"), 0)
-        return {
-            "check": description,
-            "status": "passed" if count == check.get("value") else "failed",
-            "expected": check.get("value"),
-            "actual": count,
-        }
-
-    return _inconclusive(description, "unknown check kind: " + str(kind))
-
-
 def _evaluate(beat, snapshot):
-    assertions = [_run_check(check, snapshot) for check in beat.get("checks", [])]
-    if any(item.get("status") == "failed" for item in assertions):
-        status = "failed"
-    elif any(item.get("status") == "inconclusive" for item in assertions):
-        status = "inconclusive"
-    else:
-        status = "passed"
+    assertions, status = contract.evaluate_checks(beat.get("checks", []), snapshot)
     return {
         "id": beat.get("id"),
         "stop": beat.get("stop"),
@@ -611,8 +489,17 @@ def start():
         time.strftime("%Y%m%d-%H%M%S", time.localtime()), os.getpid())))
     try:
         importlib.reload(manifest)
+        importlib.reload(contract)
     except Exception as exc:
-        _start_error("manifest reload failed: " + str(exc), run_id)
+        _start_error("manifest/contract reload failed: " + str(exc), run_id)
+        return
+
+    contract_errors = contract.validate_manifest(manifest.QUESTS)
+    if contract_errors:
+        _start_error(
+            "manifest contract failed: " + "; ".join(contract_errors),
+            run_id,
+        )
         return
 
     wanted = request.get("only") or []
