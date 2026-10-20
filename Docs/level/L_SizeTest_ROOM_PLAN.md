@@ -8,6 +8,44 @@ Golden Eagle’s Farmhouse log plan (about 3,100 sq ft) is an open kitchen, dini
 
 The shared comfort pattern is not a row of equal boxes. The public rooms are one volume. The porch is a room. The bedrooms are private, off that volume, each with a real door. A pantry closes the kitchen without walling the cook off from the room.
 
+## Blueprint — two full floors
+
+2026-10-20. `Content/Python/cabin_shell.py` builds this layout. The yard around it is [L_SizeTest_ISLAND_PLAN.md](L_SizeTest_ISLAND_PLAN.md). The footprint table below is the previous one-story walk, kept for comparison.
+
+The shell is **26 m east–west by 23 m north–south**, including a **5 m** porch on each floor. The cottage actor stays at world (−8 m, 0). Local +X is east and +Y is north. The shell runs from local (−8, −8) to (18, 15).
+
+The first floor is **5 m** to the upper floor. That line is still the bear and the bull. The upstairs ceiling is **8.2 m**. The upper floor covers the whole cottage, porch included. There is no bedroom on the ground.
+
+The stair is the west side of the great room, beside the hearth, local x −8 to −6.2, y 0.4 to 8. It is open to the room and arrives in the upstairs living room. From the kettle you still see the fire and the stair.
+
+The north door stays on the dog's line, local x 2.9 to 5.3. It is a door to the yard, not a bedroom door.
+
+### Ground
+
+| Room | Local X | Local Y | What fills it |
+|---|---|---|---|
+| Porch | −8 to 18 | −8 to −3 | Two benches, a boot shelf, an herb rail on the east |
+| Great room | −6.2 to 6 | −3 to 8 | Hearth on the west, a window seat each side of it |
+| Stair | −8 to −6.2 | 0.4 to 8 | Open toward the hearth and the table |
+| Kitchen | 6 to 18 | −3 to 5 | Table in the middle, kettle on the east wall, counter on the south |
+| Pantry | 14 to 18 | 5 to 8 | Shelves, a door back toward the table |
+
+The opening from the great room to the kitchen is about **5 m**. The cook faces the room. The front door stays **2.8 m** wide and **3.2 m** high.
+
+### Upstairs
+
+The floor is at **5 m** across the whole shell. The south **5 m** is the upper porch, open to the yard, with a rail at the lip.
+
+| Room | Local X | Local Y | What fills it |
+|---|---|---|---|
+| Upper porch | −8 to 18 | −8 to −3 | A bench and the rail at the south lip |
+| Living room | −6.2 to 14 | −3 to 8 | A seat looking toward the hearth below the stair. The stair arrives here |
+| Couple bedroom | −8 to 2 | 8 to 15 | Bed, a window place on the west wall |
+| Bathroom | 2 to 8 | 8 to 12 | One basin, between the bedrooms |
+| Child bedroom | 8 to 18 | 8 to 15 | Bed, a low ledge, a window seat toward the east yard |
+
+Bedroom doors open off the living room. There is no corridor.
+
 This body is 84 cm wide and 2 m tall, so a 91 cm door is the width of the body. Openings here are about twice the body. Rooms are larger than the human plans by roughly the same margin, which is what keeps a 2 m person from feeling shut inside a house rated for someone 1.7 m tall.
 
 ## Footprint

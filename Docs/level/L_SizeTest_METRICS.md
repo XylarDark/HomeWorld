@@ -29,15 +29,15 @@ The homestead list is the cottage, the trees and rocks between the south start a
     {"label": "SM_Size_Rock_C", "mesh": "SM_Size_Rock", "x": -24, "y": -48, "z": 453, "yaw": 60},
     {"label": "SM_Size_Rock_D", "mesh": "SM_Size_Rock", "x": 14, "y": -34, "z": 453, "yaw": 30},
     {"label": "SM_Size_Rock_E", "mesh": "SM_Size_Rock", "x": -22, "y": -32, "z": 453, "yaw": 80},
-    {"label": "SM_Size_HerbBed", "mesh": "SM_Size_HerbBed", "x": -12.2, "y": -8.3, "z": 453, "yaw": 0},
-    {"label": "SM_Size_HerbBed_B", "mesh": "SM_Size_HerbBed", "x": -6.8, "y": -8.3, "z": 453, "yaw": 0},
-    {"label": "SM_Size_Lupine", "mesh": "SM_Size_Lupine", "x": -12.2, "y": -8.3, "z": 453, "yaw": 0},
-    {"label": "SM_Size_Lupine_B", "mesh": "SM_Size_Lupine", "x": -6.8, "y": -8.3, "z": 453, "yaw": 0},
+    {"label": "SM_Size_HerbBed", "mesh": "SM_Size_HerbBed", "x": -12.2, "y": -9.2, "z": 453, "yaw": 0},
+    {"label": "SM_Size_HerbBed_B", "mesh": "SM_Size_HerbBed", "x": -6.8, "y": -9.2, "z": 453, "yaw": 0},
+    {"label": "SM_Size_Lupine", "mesh": "SM_Size_Lupine", "x": -12.2, "y": -9.2, "z": 453, "yaw": 0},
+    {"label": "SM_Size_Lupine_B", "mesh": "SM_Size_Lupine", "x": -6.8, "y": -9.2, "z": 453, "yaw": 0},
     {"label": "SM_Size_Kettle", "mesh": "SM_Size_Kettle", "x": 1.8, "y": 0.0, "z": 453, "yaw": 180},
     {"label": "SM_Size_Bed", "mesh": "SM_Size_Bed", "x": -9.5, "y": 9.0, "z": 453, "yaw": 0},
     {"label": "SM_Size_ArmorTable", "mesh": "Cube", "x": 2.25, "y": -13, "z": 453, "yaw": 0, "size": [0.9, 1.4, 0.9]},
-    {"label": "SK_Size_Partner", "mesh": "SK_Player_Female", "x": -9.5, "y": -8.2, "z": 453, "yaw": 0},
-    {"label": "SK_Size_Child", "mesh": "SK_Player_Female", "x": -8.0, "y": -8.6, "z": 453, "yaw": 270, "scale": 0.6}
+    {"label": "SK_Size_Partner", "mesh": "SK_Player_Female", "x": -9.5, "y": -10.5, "z": 453, "yaw": 0},
+    {"label": "SK_Size_Child", "mesh": "SK_Player_Female", "x": -8.0, "y": -11, "z": 453, "yaw": 270, "scale": 0.6}
   ],
   "water": [
     {"label": "Water_Spring", "x": 28, "y": 22, "size": [4, 3, 0.4], "bottom": 2.2},

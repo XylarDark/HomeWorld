@@ -1513,7 +1513,7 @@ def place_opening_zipline(top):
     floor_m = float(top) / M
     pond = _spawn_zipline(
         "OpeningZipline",
-        vec(-15.5, 11.2, floor_m + 4.0),
+        vec(-16.0, 15.0, floor_m + 4.0),
         vec(-40.5, 2.0, floor_m + 1.5),
         unreal.Vector(0.0, -1.0, 0.0),
         unreal.Vector(1.0, 0.0, 0.0),
@@ -1522,7 +1522,7 @@ def place_opening_zipline(top):
     hill = _spawn_zipline(
         "OpeningZiplineHill",
         vec(32.0, 22.0, floor_m + 6.0),
-        vec(4.2, 11.4, floor_m + 1.5),
+        vec(10.0, 15.0, floor_m + 1.5),
         unreal.Vector(-1.0, 0.0, 0.0),
         unreal.Vector(0.0, -1.0, 0.0),
         False,

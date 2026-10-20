@@ -27,7 +27,7 @@ Read this before a task. The answered table below is the lock. Do not ask those 
 - A vertical climb is not part of that split. The field roost is that climb. It is not a fourth place.
 - Three lines: the place teaches itself. Safe home above a living world. One warm eye against the cool.
 - The player wears a dark coat and a small shoulder spirit. No scarf. Head about one sixth of height. The partner keeps one warm scarf.
-- The cottage is the drawn home, 9 m by 11 m, walls 5 m. The player is 2 m and is not from this planet. The bear and the bull match the cottage wall. Pines are 5 m, 7 m, and 9 m. The lair giant is many times the cottage. The player rides the bull on the giant’s back. Meters: `Docs/art/SCALE.md`.
+- The cottage is the drawn home, 26 m by 23 m, with a porch on both floors. The upper floor covers the whole cottage. The 5 m line is the first floor. The player is 2 m and is not from this planet. The bear and the bull match that line. Pines are 5 m, 7 m, and 9 m. The lair giant is many times the cottage. The player rides the bull on the giant’s back. Meters: `Docs/art/SCALE.md`.
 - The default creature has a day body and a night spirit form. Creatures that are always spirit have no sleeping body. Animals and humanoids enter the spirit realm only while asleep. Guards have no spirit form until their spirits are soothed. After that, they have one.
 - Asset work that blocks play: cabin turnaround, then partner, then child, then the field and camp on the rescue. Edge, perch, shrine, barriers, and the lair after the mouth are later.
 

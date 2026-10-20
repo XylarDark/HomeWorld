@@ -11,7 +11,7 @@ The player is 2 m and is not from this planet. The cottage is a normal home at t
 | Module | What uses it | Locked size |
 |---|---|---|
 | Player | The body and the camera | 2 m tall. Head one sixth of that height. |
-| Cottage | The first home. Later building kits can be modular. This layout is the start. | 9 m by 11 m, walls 5 m. Porch 9 m by 2 m. Living, kitchen, hall, child, bath, couple, as drawn. Door 1 m wide and 3 m high. Hall 2 m deep. |
+| Cottage | The first home. Later building kits can be modular. This layout is the start. | 26 m by 23 m. A 5 m porch on each floor. The upper floor covers the whole cottage. Floor at 5 m, ceiling at 8.2 m. The bear and the bull still match the 5 m line. Rooms: `Docs/level/L_SizeTest_ROOM_PLAN.md`. |
 | Wild | Bear, bull, ordinary creatures, rocks | Bear shoulder and bull shoulder equal the cottage wall, 5 m. Other creatures may be smaller or larger than the cottage. Special animals and spirits may be otherwise. |
 | Pines | One cone, three heights | Small 5 m. Medium 7 m. Largest 9 m. |
 | Giant | The kneeling sleeper | Many times the cottage. The bull and the rider stay small on the back. The snake wraps the torso. |
@@ -25,7 +25,7 @@ Paste the row you need. The figure in an asset shot is the 2 m player, standing 
 | Asset | Target | Picture that locks the look, not the meter |
 |---|---|---|
 | Player | 2 m tall. Head one sixth of that height. | The player mood stills. |
-| Cottage | 9 m wide, 11 m deep, walls 5 m. Porch 9 m by 2 m. The drawn rooms. | `SM_Home_Cabin_doors.png` for the plan. The scenic stills do not lock the plan. |
+| Cottage | 26 m by 23 m. Porch on both floors. Upper floor covers the whole cottage, floor at 5 m, ceiling at 8.2 m. | `Docs/level/L_SizeTest_ROOM_PLAN.md`. The scenic stills do not lock the plan. |
 | Door | 1 m clear width. 3 m high. Hall behind it is 2 m deep. | The door plan. |
 | Bear | Shoulder 5 m, the cottage wall. | The bear’s face and facets from the dusk picture. Not its height in that picture. |
 | Bull | Shoulder 5 m. Player stands beside it. | `Field_bull_scale_v2.jpg` for the animal. The shoulder target is the cottage wall. |
@@ -36,7 +36,7 @@ Paste the row you need. The figure in an asset shot is the 2 m player, standing 
 
 The 14 m shell is retired. `HS_Shell_greybox.jpg` and `HS_Vista_bear_module_v9.jpg` show a cabin and a bear that do not match this card. They are not the greybox keep.
 
-The 9 by 11 m plan is the cottage, not a secret inside a larger shell. Door swings stay as drawn.
+The walked plan is the cottage. The 9 by 11 m card is the earlier art lock. Door swings stay as drawn.
 
 A scenic camera may lose the face. The play camera stays near the body, low, looking up, the way a small person sees a pallet they can walk under. The shoulder spirit is how that body stays readable up close.
 

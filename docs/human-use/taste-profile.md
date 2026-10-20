@@ -46,6 +46,8 @@ Reviewed, versioned summary of Lead/process taste and locked decisions.
 
 | Date | Phrase / source | Outcome |
 |------|-----------------|--------|
+| 2026-10-20 | Lead, chat | **Full upper floor.** The upper floor covers the whole 26 by 23 m cottage, porch included. Upstairs is a living room, two bedrooms, and one bathroom. The ground floor is the hearth, the kitchen, and the door to the dog. The 5 m line is the first floor. Island clearances: `Docs/level/L_SizeTest_ISLAND_PLAN.md`. |
+| 2026-10-19 | Lead, chat, after the cottage study | **Larger cottage.** The walked home is 26 m by 23 m, porch 5 m, great room and kitchen 5 m to the beams. The couple's rooms are a second story over the north band only. The child stays down, on the dog's door. The bear and the bull still match the 5 m wall. Plan: `Docs/level/L_SizeTest_ROOM_PLAN.md`. |
 | 2026-10-17 | Lead, chat, after the `L_SizeTest` walk | **Opening tutorial.** The first five minutes are in [`Docs/VISION_BOARD.md`](../../Docs/VISION_BOARD.md). The walk passes the initial movement pass. |
 | 2026-10-15 | Lead, attribute interview rounds 1–13 | **Interview complete.** Picks are in [`Docs/context/ATTRIBUTE_ZONE_INTERVIEW.md`](../../Docs/context/ATTRIBUTE_ZONE_INTERVIEW.md) and scribed into the virtue bible. A mark is a visible interaction. Armor is for one encounter. A paradox runs both poles at once. |
 | 2026-10-15 | Lead, chat, scribe | **Attribute and zone lock.** Rules in [`Docs/VIRTUE_ATTRIBUTE_BIBLE.md`](../../Docs/VIRTUE_ATTRIBUTE_BIBLE.md). Poles have runes. A paradox mark occupies one axis. Armor is interaction. The second forest opens after the camp, then the river, then the marsh. Unnamed beats stay unnamed. The bed rune stays removed. |
