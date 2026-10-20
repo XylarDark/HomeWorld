@@ -129,6 +129,8 @@ Press E at the bed. The coat hides and you are a wisp. The companion you claimed
 
 Developer shortcut for this replay: in a fresh PIE run `hw.Playtest.FastForward`. No argument plays the day beats in order (spirit, both herb beds, backpack, kettle, station mix, dog, fish, bed) and leaves you at the bed at night with every earlier step really executed. `test herb collection` claims the spirit, then places you at the east bed to draw the heart. `list` prints the other stops: spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect, heal.
 
+Developer check, not the pass: `.\Tools\RunTests.ps1 -Quest` runs all 11 stops in PIE and writes `Saved/quest_tests.json`. It loads `L_SizeTest`, ends PIE when done, and never fills the tables below. How to add a stop: [`QUEST_TESTS.md`](QUEST_TESTS.md).
+
 | Field | Result |
 |---|---|
 | Date | |

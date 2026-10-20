@@ -39,6 +39,7 @@ public:
 	/** Hide the sphere and send the child after the player. False once it has already been claimed. */
 	bool TryClaim(APawn* Player);
 
+	UFUNCTION(BlueprintPure, Category = "Opening")
 	bool IsSpiritVisible() const;
 
 	/** Walk the partner through the south door to a spot beside the kettle. False if they are already going. */
@@ -48,7 +49,12 @@ public:
 	void BeginChildReturnHome();
 
 	/** True once the partner has walked inside and stands waiting beside the counter. */
+	UFUNCTION(BlueprintPure, Category = "Opening")
 	bool IsPartnerWaiting() const { return bPartnerWaiting; }
+
+	/** The world point the partner stands on at the counter. Read-only, for the in-editor quest suite. */
+	UFUNCTION(BlueprintPure, Category = "Opening")
+	FVector GetPartnerStandCm() const;
 
 protected:
 	virtual void BeginPlay() override;

@@ -1,24 +1,50 @@
-# RunTests.ps1 - Run UE automation tests for this project.
+# RunTests.ps1 - Run UE automation tests, or the in-editor opening quest sweep.
 # Run from project root: .\Tools\RunTests.ps1 [-Filter HomeWorld] [-ValidateAssets] [-IncludePythonTests]
+# In-editor sweep: .\Tools\RunTests.ps1 -Quest [-QuestOnly night,heal] [-QuestList]
 # The filter is a test-name prefix; it defaults to HomeWorld, which is what this project's tests
 # are named. UE "groups" match nothing here - a Group: selector ran zero tests, and a run that
 # completes zero tests is an error - so the prefix is the selector, not the group. The Editor.Python
 # tests are excluded from the verdict by default because they fail in-editor by construction; they
 # are gated in validate.yml under host Python.
-# Requires UE 5.8: a set-but-wrong $env:UE_EDITOR (this machine had 5.7) is replaced with the
-# locked engine from the registry, and an unset one is resolved from it. Set it to point elsewhere
-# only on a project that is not engine-locked.
+# Requires UE 5.8 for automation: a set-but-wrong $env:UE_EDITOR (this machine had 5.7) is replaced
+# with the locked engine from the registry, and an unset one is resolved from it. Set it to point
+# elsewhere only on a project that is not engine-locked.
+# -Quest skips UE_EDITOR: it needs the open Editor on UnrealMCP port 55557, not a new process.
+# See Docs/qa/QUEST_TESTS.md.
 
 param(
     [string]$Filter = "HomeWorld",
     [switch]$ValidateAssets,
     # Opt in to the Editor.Python tests. They fail in-editor by construction (see below) and one of
     # them fails on its own assertions under host Python, so they are excluded by default.
-    [switch]$IncludePythonTests
+    [switch]$IncludePythonTests,
+    # The in-editor opening quest sweep. One fresh PIE per hw.Playtest.FastForward stop.
+    [switch]$Quest,
+    [string[]]$QuestOnly = @(),
+    [switch]$QuestList
 )
 
 $ErrorActionPreference = "Stop"
 $ProjectRoot = $PSScriptRoot + "\.."
+
+if ($Quest) {
+    $QuestScript = Join-Path $ProjectRoot "Content\Python\run_quest_tests_host.py"
+    if (-not (Test-Path $QuestScript)) {
+        Write-Error "run_quest_tests_host.py not found at $QuestScript"
+        exit 1
+    }
+    $QuestArgs = @($QuestScript)
+    if ($QuestList) { $QuestArgs += "--list" }
+    if ($QuestOnly.Count -gt 0) { $QuestArgs += @("--only", ($QuestOnly -join ",")) }
+    Push-Location $ProjectRoot
+    try {
+        & python @QuestArgs
+        exit $LASTEXITCODE
+    } finally {
+        Pop-Location
+    }
+}
+
 $PythonScript = Join-Path $ProjectRoot "Content\Python\run_ue_automation.py"
 
 if (-not (Test-Path $PythonScript)) {
