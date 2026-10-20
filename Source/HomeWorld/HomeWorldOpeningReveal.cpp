@@ -20,19 +20,19 @@ namespace
 	constexpr float StandOffCm = 180.f;
 	constexpr float FollowGapCm = 160.f;
 	constexpr float PartnerMeetCm = 280.f;
-	/** Cottage origin (-800, 0). East wall inner face is world x 285. */
-	constexpr float CounterCenterX = 215.f;
+	/** Cottage origin (-800, 0). East wall inner face is world x 985. */
+	constexpr float CounterCenterX = 915.f;
 	constexpr float CounterCenterY = 0.f;
 	constexpr float CounterDepthCm = 140.f;
 	constexpr float CounterLengthCm = 320.f;
 	/** Waist height. The reveal grew 180 first; the kitchen replay halved it 2026-10-18. */
 	constexpr float CounterHeightCm = 90.f;
-	/** Floor spot at the north end of the counter, clear of the box and the east wall. */
-	const FVector PartnerStandCm(CounterCenterX, 240.f, 0.f);
+	/** Floor spot west of the counter (local x 1560). The pail owns the north end. */
+	const FVector PartnerStandCm(760.f, 0.f, 0.f);
 	const FVector PartnerRouteCm[] = {
 		FVector(-950.f, -500.f, 0.f),
 		FVector(-950.f, -180.f, 0.f),
-		FVector(40.f, 240.f, 0.f),
+		FVector(-200.f, 0.f, 0.f),
 		PartnerStandCm,
 	};
 	/** The dog-yard wait point: east of the lane line and short of the knock ring, so the follower can pass. */
@@ -170,6 +170,11 @@ bool AHomeWorldOpeningReveal::TryClaim(APawn* Player)
 bool AHomeWorldOpeningReveal::IsSpiritVisible() const
 {
 	return Spirit && Spirit->IsVisible() && !bClaimed;
+}
+
+FVector AHomeWorldOpeningReveal::GetPartnerStandCm() const
+{
+	return PartnerStandCm;
 }
 
 AActor* AHomeWorldOpeningReveal::FindTagged(const TCHAR* Tag) const
@@ -462,7 +467,7 @@ void AHomeWorldOpeningReveal::LeadPartner(float DeltaSeconds)
 		{
 			bPartnerLeading = false;
 			bPartnerWaiting = true;
-			Walker->SetActorRotation(FRotator(0.f, 180.f, 0.f));
+			Walker->SetActorRotation(FRotator(0.f, 0.f, 0.f));
 			if (UCharacterMovementComponent* Move = Walker->GetCharacterMovement())
 			{
 				Move->StopMovementImmediately();

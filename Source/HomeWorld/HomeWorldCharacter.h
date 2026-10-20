@@ -119,6 +119,10 @@ public:
 	void DebugSeedOpeningWispLoop(int32 Carried, int32 Herbs);
 	FString GetOpeningTrackerText() const;
 
+	/** Read-only snapshot for the in-editor quest suite. No gameplay effect. */
+	UFUNCTION(BlueprintPure, Category = "Opening|Playtest")
+	FString GetPlaytestStateJson() const;
+
 	/** Test hook: play the opening beats in order, for real, and stop ready to test one beat.
 	 *  Beat text: spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect,
 	 *  heal. Empty = night; "list" prints the names. Start a fresh PIE for every run. */
@@ -892,6 +896,9 @@ protected:
 	/** The beat the run stops at: 1..8 leave that step for the player, 9..11 run every step
 	 *  and then carry the player to the beat - night, the copse wisp, or the hot springs. */
 	int32 DebugFastForwardStop = 9;
+	/** Set at the ready line: the beat name and the pawn's 2D distance to its target. */
+	FString PlaytestReadyFor;
+	float PlaytestReadyDistanceCm = -1.f;
 	void ReadyForOpeningPlaytest();
 	void PlaceForOpeningPlaytest(AActor* Target, float Distance);
 	void PlaceForOpeningPlaytestAtPond(AActor* Pond);

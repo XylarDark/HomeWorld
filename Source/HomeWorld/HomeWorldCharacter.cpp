@@ -1005,9 +1005,22 @@ void AHomeWorldCharacter::DebugFastForwardOpening(const FString& Beat)
 		UE_LOG(LogTemp, Warning, TEXT("playtest_ff: already night - start a fresh PIE"));
 		return;
 	}
+	// A fresh PIE copies the Editor world's time of day. A previous night beat can leave
+	// the next PIE at night, where the kettle brew is skipped. Every stop starts on the
+	// day body; night and the loop still set Night at step 9.
+	if (UWorld* World = GetWorld())
+	{
+		if (UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>())
+		{
+			TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Day);
+		}
+		SyncFormWithTimeOfDay();
+	}
 	DebugFastForwardStop = Stop;
 	DebugFastForwardStep = 1;
 	DebugFastForwardStepClock = 0.f;
+	PlaytestReadyFor.Empty();
+	PlaytestReadyDistanceCm = -1.f;
 	UE_LOG(LogTemp, Log, TEXT("playtest_ff: start -> %s. The beats before it run for real, then it is yours."), PlaytestBeatName(Stop));
 }
 
@@ -1272,7 +1285,6 @@ void AHomeWorldCharacter::TickDebugFastForward(float DeltaTime)
 		{
 			FVector Loc = Bed->GetActorLocation();
 			Loc.Y -= 180.f;
-			Loc.Z = GetActorLocation().Z;
 			SetActorLocation(Loc, false, nullptr, ETeleportType::TeleportPhysics);
 		}
 		if (!BeginOpeningNight())
@@ -1302,6 +1314,7 @@ void AHomeWorldCharacter::ReadyForOpeningPlaytest()
 	AActor* Target = nullptr;
 	float Distance = 260.f;
 	bool bPondEdge = false;
+	bool bPlaceTarget = true;
 	FString Note;
 	switch (DebugFastForwardStop)
 	{
@@ -1355,6 +1368,9 @@ void AHomeWorldCharacter::ReadyForOpeningPlaytest()
 		Note = TEXT("E at the bed: sleep");
 		break;
 	case PlaytestBeatNight:
+		Target = FindOpeningNamed(World, TEXT("SM_Size_Bed"), true);
+		Distance = 180.f;
+		bPlaceTarget = false;
 		Note = TEXT("night is on, the bed is behind you");
 		break;
 	case PlaytestBeatCollect:
@@ -1373,7 +1389,7 @@ void AHomeWorldCharacter::ReadyForOpeningPlaytest()
 	default:
 		break;
 	}
-	if (Target)
+	if (Target && bPlaceTarget)
 	{
 		if (bPondEdge)
 		{
@@ -1384,10 +1400,14 @@ void AHomeWorldCharacter::ReadyForOpeningPlaytest()
 			PlaceForOpeningPlaytest(Target, Distance);
 		}
 	}
+	PlaytestReadyFor = PlaytestBeatName(DebugFastForwardStop);
+	PlaytestReadyDistanceCm = Target
+		? FVector::Dist2D(GetActorLocation(), Target->GetActorLocation())
+		: -1.f;
 	UE_LOG(LogTemp, Log, TEXT("playtest_ff: ready for %s - %s"), PlaytestBeatName(DebugFastForwardStop), *Note);
 	if (Target)
 	{
-		const float DistCm = FVector::Dist2D(GetActorLocation(), Target->GetActorLocation());
+		const float DistCm = PlaytestReadyDistanceCm;
 		UE_LOG(LogTemp, Log, TEXT("playtest_ff: you are at %s, target %s, dist %.0f"),
 			*GetActorLocation().ToCompactString(),
 			*Target->GetActorNameOrLabel(),
@@ -1583,6 +1603,34 @@ FString AHomeWorldCharacter::GetOpeningTrackerText() const
 		Lines.Add(FString::Printf(TEXT("%s%s"), Step.bDone ? TEXT("[x] ") : TEXT("[ ] "), *Step.Text));
 	}
 	return FString::Join(Lines, TEXT(" | "));
+}
+
+FString AHomeWorldCharacter::GetPlaytestStateJson() const
+{
+	return FString::Printf(
+		TEXT("{\"ready_for\":\"%s\",\"ready_distance\":%.1f,\"fast_forward_step\":%d,")
+		TEXT("\"spirit_claimed\":%s,\"herbs_gathered\":%d,\"herb_tenths\":%d,")
+		TEXT("\"herb_west\":%s,\"herb_east\":%s,\"mixed_herbs\":%d,")
+		TEXT("\"kettle_brewed\":%s,\"station_open\":%s,\"armor_gift\":%s,")
+		TEXT("\"fish_caught\":%s,\"night_spirit\":%s,")
+		TEXT("\"wisps_collected\":%d,\"wisps_carried\":%d,\"wisps_healed\":%d}"),
+		*PlaytestReadyFor,
+		PlaytestReadyDistanceCm,
+		DebugFastForwardStep,
+		bOpeningSpiritClaimed ? TEXT("true") : TEXT("false"),
+		OpeningHerbsGathered,
+		OpeningHerbTenths,
+		bOpeningHerbFromWest ? TEXT("true") : TEXT("false"),
+		bOpeningHerbFromEast ? TEXT("true") : TEXT("false"),
+		OpeningMixedHerbs,
+		bOpeningKettleBrewed ? TEXT("true") : TEXT("false"),
+		bOpeningConsumableOpen ? TEXT("true") : TEXT("false"),
+		bOpeningArmorGiftGiven ? TEXT("true") : TEXT("false"),
+		bOpeningFishCaught ? TEXT("true") : TEXT("false"),
+		bOpeningNightSpirit ? TEXT("true") : TEXT("false"),
+		OpeningWispsCollected,
+		OpeningWispsCarried,
+		OpeningWispsHealed);
 }
 
 void AHomeWorldCharacter::ApplyOpeningWalkSpeed()
