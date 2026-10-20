@@ -119,6 +119,16 @@ public:
 	void DebugSeedOpeningWispLoop(int32 Carried, int32 Herbs);
 	FString GetOpeningTrackerText() const;
 
+	/** Test hook: advance the night timer without waiting on a PIE tick. */
+	void DebugAdvanceOpeningNight(float DeltaSeconds);
+
+	/** Read-only test view of the wisp loop. No gameplay effect. */
+	int32 GetOpeningWispsCarriedForTest() const { return OpeningWispsCarried; }
+	int32 GetOpeningHerbTenthsForTest() const { return OpeningHerbTenths; }
+	int32 GetOpeningWispHealTimerCountForTest() const { return OpeningWispHealTimers.Num(); }
+	int32 GetOpeningWispsHealedForTest() const { return OpeningWispsHealed; }
+	int32 GetOpeningWispFollowerCountForTest() const { return OpeningWispLegMeshes.Num(); }
+
 	/** Read-only snapshot for the in-editor quest suite. No gameplay effect. */
 	UFUNCTION(BlueprintPure, Category = "Opening|Playtest")
 	FString GetPlaytestStateJson() const;

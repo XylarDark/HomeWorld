@@ -893,6 +893,11 @@ void AHomeWorldCharacter::DebugSeedOpeningWispLoop(int32 Carried, int32 Herbs)
 		OpeningWispsCollected, OpeningWispsCarried, OpeningHerbTenths);
 }
 
+void AHomeWorldCharacter::DebugAdvanceOpeningNight(float DeltaSeconds)
+{
+	UpdateOpeningNight(DeltaSeconds);
+}
+
 namespace
 {
 	/** hw.Playtest.FastForward stops: the beat the player wants to test in person. */
