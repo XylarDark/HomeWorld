@@ -7,7 +7,8 @@
 #      Source/HomeWorld/HomeWorldCharacter.cpp (DebugFastForwardOpening).
 #   2. Add any new state it needs to GetPlaytestStateJson() in the same file.
 #   3. Add an entry below. Checks use the small vocabulary implemented in
-#      quest_test_runner.py: eq, ne, le, ge, between, near, present, count_tag.
+#      quest_test_contract.py: eq, ne, le, ge, between, near, present, count_tag.
+#      The host pytest suite validates every entry before a sweep starts.
 #   4. Run: .\Tools\RunTests.ps1 -Quest -QuestOnly <id>
 #
 # The stop is BEFORE the named action. These are preconditions, not completions.
