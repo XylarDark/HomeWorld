@@ -352,12 +352,18 @@ bool FPartyFollowLeashTest::RunTest(const FString& Parameters)
 	TestEqual(TEXT("the gap is the opening follow gap"), AHomeWorldAIController::FollowGapCm, 160.f);
 
 	Partner->Tags.Add(TEXT("NPC_PARTNER"));
+	const FVector Stood(12.f, 24.f, 36.f);
+	Partner->SetActorLocation(Stood);
 	AHomeWorldAIController::DriveUnpossessedFollow(Partner, Player);
 	TestFalse(TEXT("before the rescue the walker is not leashed"), Partner->ActorHasTag(TEXT("PartyLeash")));
 	TestNull(TEXT("the walker is not possessed"), Partner->GetController());
 
 	Family->SetRescueComplete(true);
-	TestTrue(TEXT("invite"), Family->TryInvitePartner(false, false, false));
+	TestTrue(TEXT("invite"), Family->TryInvitePartner(false, false, false, Scope.World));
+	Partner->SetActorLocation(FVector(900.f, 0.f, 36.f));
+	Family->EndOuting(EHomeWorldPartyAbsence::Bed, Scope.World);
+	TestEqual(TEXT("the invite remembered where they stood"), Partner->GetActorLocation(), Stood);
+	TestTrue(TEXT("invite again"), Family->TryInvitePartner(false, false, false, Scope.World));
 	AHomeWorldAIController::DriveUnpossessedFollow(Partner, Player);
 	TestTrue(TEXT("an outing walker takes the leash"), Partner->ActorHasTag(TEXT("PartyLeash")));
 	TestNull(TEXT("the leash does not possess"), Partner->GetController());

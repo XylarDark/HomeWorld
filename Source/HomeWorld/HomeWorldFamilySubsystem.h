@@ -100,10 +100,10 @@ public:
 	 * Night, dusk-into-defend, and spirit form refuse. Camp refuses the partner. Cave refuses the child.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Family|Party")
-	bool TryInvitePartner(bool bNightOrDefend, bool bSpiritForm, bool bAtCamp);
+	bool TryInvitePartner(bool bNightOrDefend, bool bSpiritForm, bool bAtCamp, UWorld* World = nullptr);
 
 	UFUNCTION(BlueprintCallable, Category = "Family|Party")
-	bool TryInviteChild(bool bNightOrDefend, bool bSpiritForm, bool bAtCave);
+	bool TryInviteChild(bool bNightOrDefend, bool bSpiritForm, bool bAtCave, UWorld* World = nullptr);
 
 	/** Where that person was standing when they were invited. Not saved. */
 	void RememberPartnerHome(const FVector& Location);
@@ -127,6 +127,7 @@ public:
 
 private:
 	void PlaceMemberHome(UWorld* World, bool bPartner) const;
+	void RememberTaggedHome(UWorld* World, FName Tag, FVector& OutHome, bool& bOutHasHome);
 
 	UPROPERTY()
 	TArray<EHomeWorldFamilyRole> RoleBySpawnIndex;

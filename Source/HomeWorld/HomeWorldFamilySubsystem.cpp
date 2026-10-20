@@ -1,6 +1,7 @@
 // Copyright HomeWorld. All Rights Reserved.
 
 #include "HomeWorldFamilySubsystem.h"
+#include "Engine/GameInstance.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
 #include "GameFramework/Actor.h"
@@ -81,22 +82,24 @@ void UHomeWorldFamilySubsystem::SetRescueComplete(bool bComplete)
 	}
 }
 
-bool UHomeWorldFamilySubsystem::TryInvitePartner(bool bNightOrDefend, bool bSpiritForm, bool bAtCamp)
+bool UHomeWorldFamilySubsystem::TryInvitePartner(bool bNightOrDefend, bool bSpiritForm, bool bAtCamp, UWorld* World)
 {
 	if (!bRescueComplete || bNightOrDefend || bSpiritForm || bAtCamp)
 	{
 		return false;
 	}
+	RememberTaggedHome(World, TEXT("NPC_PARTNER"), PartnerHome, bHasPartnerHome);
 	bPartnerOut = true;
 	return true;
 }
 
-bool UHomeWorldFamilySubsystem::TryInviteChild(bool bNightOrDefend, bool bSpiritForm, bool bAtCave)
+bool UHomeWorldFamilySubsystem::TryInviteChild(bool bNightOrDefend, bool bSpiritForm, bool bAtCave, UWorld* World)
 {
 	if (!bRescueComplete || bNightOrDefend || bSpiritForm || bAtCave)
 	{
 		return false;
 	}
+	RememberTaggedHome(World, TEXT("NPC_CHILD"), ChildHome, bHasChildHome);
 	bChildOut = true;
 	return true;
 }
@@ -170,6 +173,30 @@ bool UHomeWorldFamilySubsystem::IsActorOut(const AActor* Actor) const
 		return true;
 	}
 	return false;
+}
+
+void UHomeWorldFamilySubsystem::RememberTaggedHome(UWorld* World, FName Tag, FVector& OutHome, bool& bOutHasHome)
+{
+	if (!World)
+	{
+		if (UGameInstance* GameInstance = GetGameInstance())
+		{
+			World = GameInstance->GetWorld();
+		}
+	}
+	if (!World)
+	{
+		return;
+	}
+	for (TActorIterator<AActor> It(World); It; ++It)
+	{
+		if (It->ActorHasTag(Tag))
+		{
+			OutHome = It->GetActorLocation();
+			bOutHasHome = true;
+			return;
+		}
+	}
 }
 
 void UHomeWorldFamilySubsystem::PlaceMemberHome(UWorld* World, bool bPartner) const
