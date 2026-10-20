@@ -21,6 +21,13 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Save")
 	TArray<uint8> SavedRoleBySpawnIndex;
 
+	/** Docs/41. Who is out with the player. Default false is solo, including old saves. No positions. */
+	UPROPERTY(VisibleAnywhere, Category = "Save")
+	bool bSavedPartnerOut = false;
+
+	UPROPERTY(VisibleAnywhere, Category = "Save")
+	bool bSavedChildOut = false;
+
 	/** Saved spirit IDs in the roster. */
 	UPROPERTY(VisibleAnywhere, Category = "Save")
 	TArray<FName> SavedSpiritIds;

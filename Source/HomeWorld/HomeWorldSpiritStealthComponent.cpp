@@ -2,7 +2,9 @@
 
 #include "HomeWorldSpiritStealthComponent.h"
 #include "HomeWorldCharacter.h"
+#include "HomeWorldFamilySubsystem.h"
 #include "HomeWorldGameMode.h"
+#include "Engine/GameInstance.h"
 #include "HomeWorldSpiritLitVolume.h"
 #include "Components/PointLightComponent.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -792,6 +794,16 @@ bool UHomeWorldSpiritStealthComponent::TryFreeCaptive()
 	}
 
 	bCaptiveFreed = true;
+	if (UWorld* World = GetWorld())
+	{
+		if (UGameInstance* GameInstance = World->GetGameInstance())
+		{
+			if (UHomeWorldFamilySubsystem* Family = GameInstance->GetSubsystem<UHomeWorldFamilySubsystem>())
+			{
+				Family->SetRescueComplete(true);
+			}
+		}
+	}
 	UE_LOG(LogHomeWorld, Log,
 		TEXT("CAMP: CAPTIVE FREED (%d/%d calm, strict=%d; lashings untied by spirit; no force option)"),
 		GetCalmedActorCount(), HomeWorldCampNight::GetGatedActorCount(),

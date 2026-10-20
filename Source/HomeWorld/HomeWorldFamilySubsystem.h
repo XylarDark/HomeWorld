@@ -4,6 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+
+class AActor;
+class UWorld;
+
 #include "HomeWorldFamilySubsystem.generated.h"
 
 /** Role names for family members (Protector, Healer, Child, Gatherer, Partner). */
@@ -16,6 +20,16 @@ enum class EHomeWorldFamilyRole : uint8
 	Child,
 	/** MVP tutorial step 3: romantic partner for "complete one love task with partner". Identify by role (e.g. spawn index 0) or tag "Partner". */
 	Partner
+};
+
+/** Derived party. Not saved. Solo is both flags false. Docs/41_COMPANION_PARTY_DESIGN.md. */
+UENUM(BlueprintType)
+enum class EHomeWorldPartySetup : uint8
+{
+	Solo,
+	Partner,
+	Child,
+	AllThree
 };
 
 /**
@@ -47,7 +61,61 @@ public:
 	/** Restore role-by-index from SaveGame (replaces current in-memory state). */
 	void DeserializeFromSaveGame(const class UHomeWorldSaveGame* In);
 
+	/**
+	 * Party record from Docs/41_COMPANION_PARTY_DESIGN.md. Roles stay roles.
+	 * The four setups are derived from the two flags. Missing flags are solo.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Family|Party")
+	bool IsPartnerOut() const { return bPartnerOut; }
+
+	UFUNCTION(BlueprintPure, Category = "Family|Party")
+	bool IsChildOut() const { return bChildOut; }
+
+	UFUNCTION(BlueprintPure, Category = "Family|Party")
+	EHomeWorldPartySetup GetPartySetup() const;
+
+	UFUNCTION(BlueprintPure, Category = "Family|Party")
+	bool IsRescueComplete() const { return bRescueComplete; }
+
+	/** Until the rescue is done, both flags stay false. */
+	UFUNCTION(BlueprintCallable, Category = "Family|Party")
+	void SetRescueComplete(bool bComplete);
+
+	/**
+	 * Invite one person. A refusal leaves both flags as they were.
+	 * Night, dusk-into-defend, and spirit form refuse. Camp refuses the partner. Cave refuses the child.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Family|Party")
+	bool TryInvitePartner(bool bNightOrDefend, bool bSpiritForm, bool bAtCamp);
+
+	UFUNCTION(BlueprintCallable, Category = "Family|Party")
+	bool TryInviteChild(bool bNightOrDefend, bool bSpiritForm, bool bAtCave);
+
+	/** Where that person was standing when they were invited. Not saved. */
+	void RememberPartnerHome(const FVector& Location);
+	void RememberChildHome(const FVector& Location);
+
+	/**
+	 * Load rules, in order: an unfinished rescue forces solo; night or spirit form forces solo
+	 * and places anyone who was out on the remembered home anchor. Otherwise the restored flags stay.
+	 * A null world clears the flags and does not move anyone.
+	 */
+	void ApplyLoadForces(bool bRescueDone, bool bNightOrSpirit, UWorld* World);
+
+	/** True when this actor is the partner or the child and that flag is still Out. */
+	bool IsActorOut(const AActor* Actor) const;
+
 private:
+	void PlaceMemberHome(UWorld* World, bool bPartner) const;
+
 	UPROPERTY()
 	TArray<EHomeWorldFamilyRole> RoleBySpawnIndex;
+
+	bool bPartnerOut = false;
+	bool bChildOut = false;
+	bool bRescueComplete = false;
+	bool bHasPartnerHome = false;
+	bool bHasChildHome = false;
+	FVector PartnerHome = FVector::ZeroVector;
+	FVector ChildHome = FVector::ZeroVector;
 };
