@@ -14,9 +14,9 @@ The shared comfort pattern is not a row of equal boxes. The public rooms are one
 
 The shell is **26 m east–west by 23 m north–south**, including a **5 m** porch on each floor. The cottage actor stays at world (−8 m, 0). Local +X is east and +Y is north. The shell runs from local (−8, −8) to (18, 15).
 
-The first floor is **5 m** to the upper floor. That line is still the bear and the bull. The upstairs ceiling is **8.2 m**. The upper floor covers the whole cottage, porch included. There is no bedroom on the ground.
+Each floor's walls are **5 m**. The first 5 m is still the bear and the bull. The upstairs walls are another 5 m on the same lines, and a pitched roof sits on that plate. The upper porch stays open in front of the south wall. There is no bedroom on the ground.
 
-The stair is the west side of the great room, beside the hearth, local x −8 to −6.2, y 0.4 to 8. It is open to the room and arrives in the upstairs living room. From the kettle you still see the fire and the stair.
+The way up is one ramp on the west side of the great room, beside the hearth, from local y 0.4 to 8. It is open to the room and arrives in the upstairs living room.
 
 The north door stays on the dog's line, local x 2.9 to 5.3. It is a door to the yard, not a bedroom door.
 
@@ -24,17 +24,17 @@ The north door stays on the dog's line, local x 2.9 to 5.3. It is a door to the 
 
 | Room | Local X | Local Y | What fills it |
 |---|---|---|---|
-| Porch | −8 to 18 | −8 to −3 | Two benches, a boot shelf, an herb rail on the east |
-| Great room | −6.2 to 6 | −3 to 8 | Hearth on the west, a window seat each side of it |
-| Stair | −8 to −6.2 | 0.4 to 8 | Open toward the hearth and the table |
-| Kitchen | 6 to 18 | −3 to 5 | Table in the middle, kettle on the east wall, counter on the south |
+| Porch | −8 to 18 | −8 to −3 | Rail at the lip with a gap at the door, two benches, a boot shelf, an herb rail |
+| Great room | −6.2 to 6 | −3 to 8 | Hearth on the west, two couches facing it, a window on the south and the west |
+| Stair | −7.7 to −6.2 | 0.4 to 8 | One ramp up to the living room |
+| Kitchen | 6 to 18 | −3 to 5 | East counter: chopping board, kettle, stovetop, garbage pail at the north end. Table in the middle. Windows on the east |
 | Pantry | 14 to 18 | 5 to 8 | Shelves, a door back toward the table |
 
 The opening from the great room to the kitchen is about **5 m**. The cook faces the room. The front door stays **2.8 m** wide and **3.2 m** high.
 
 ### Upstairs
 
-The floor is at **5 m** across the whole shell. The south **5 m** is the upper porch, open to the yard, with a rail at the lip.
+The floor is at **5 m** across the whole shell, and the walls rise another **5 m** to the roof. The south **5 m** is the upper porch, open to the yard, with a rail at the lip. The opening in the south wall is the way onto that porch.
 
 | Room | Local X | Local Y | What fills it |
 |---|---|---|---|
@@ -42,7 +42,8 @@ The floor is at **5 m** across the whole shell. The south **5 m** is the upper p
 | Living room | −6.2 to 14 | −3 to 8 | A seat looking toward the hearth below the stair. The stair arrives here |
 | Couple bedroom | −8 to 2 | 8 to 15 | Bed, a window place on the west wall |
 | Bathroom | 2 to 8 | 8 to 12 | One basin, between the bedrooms |
-| Child bedroom | 8 to 18 | 8 to 15 | Bed, a low ledge, a window seat toward the east yard |
+| Play room | 8 to 13 | 8 to 15 | Outside the child bedroom. A low seat. The door from the living room opens here |
+| Child bedroom | 13 to 18 | 8 to 15 | Bed and a low ledge. The door is from the play room. A window on the east |
 
 Bedroom doors open off the living room. There is no corridor.
 

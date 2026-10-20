@@ -2,7 +2,8 @@
 
 The metrics file is the approved layout, in meters. This module snaps mesh
 bottoms onto the measured floor, measures them again, and refuses to save if
-any bottom is more than 2 cm off. See Docs/context/SCENE_SETUP.md practices
+any bottom is more than 2 cm off, or if two solids clip through each other.
+See Docs/context/SCENE_SETUP.md practices
 10-12: coat yaw offset 0, walk only while moving, pin before save.
 """
 
@@ -261,7 +262,7 @@ def spawn_cabin_walls():
         unreal.log("scene_placement: FAIL no engine cube")
         return False
     for actor in list(actors()):
-        if actor.get_actor_label().startswith("CabinWall_") or actor.get_actor_label().startswith("PorchCrawl_"):
+        if actor.get_actor_label().startswith("CabinWall_") or actor.get_actor_label().startswith("PorchCrawl_") or actor.get_actor_label().startswith("CabinRoof_") or actor.get_actor_label().startswith("CabinRamp_"):
             destroy(actor)
     origin = cottage.get_actor_location()
     boxes = list(cabin_shell.BOXES) + list(cabin_shell.CRAWL_WALLS)
@@ -296,8 +297,100 @@ def spawn_cabin_walls():
     fill_mesh.set_collision_profile_name("BlockAll")
     fill_mesh.set_collision_enabled(unreal.CollisionEnabled.QUERY_AND_PHYSICS)
     tag_actor(filler, "NODE_PORCH_CRAWL")
+    spawn_cabin_roof(origin, cube)
+    spawn_cabin_ramp(origin, cube)
     unreal.log("scene_placement: cabin shell %d walls" % len(boxes))
+    for actor in list(actors()):
+        if actor.get_actor_label().startswith("CabinLight_"):
+            destroy(actor)
+    for index, (lx, ly, lz) in enumerate(cabin_shell.LIGHTS):
+        light = unreal.EditorLevelLibrary.spawn_actor_from_class(
+            unreal.PointLight,
+            unreal.Vector(origin.x + lx, origin.y + ly, origin.z + lz),
+            yaw_rotator(0),
+        )
+        if light is None:
+            continue
+        light.set_actor_label("CabinLight_%02d" % index)
+        comp = light.get_component_by_class(unreal.PointLightComponent)
+        if comp is not None:
+            comp.set_editor_property("intensity", 4000.0)
+            comp.set_editor_property("attenuation_radius", 1400.0)
+            try:
+                comp.set_editor_property("light_color", unreal.Color(255, 198, 140, 255))
+            except Exception:
+                pass
+    unreal.log("scene_placement: cabin lights %d" % len(cabin_shell.LIGHTS))
     return True
+
+
+def _sloped_cube(origin, name, start, end, width, thickness, material):
+    """A cube whose length runs from start to end. start and end are local cm."""
+    cube = unreal.EditorAssetLibrary.load_asset("/Engine/BasicShapes/Cube")
+    if cube is None:
+        return None
+    sx = end[0] - start[0]
+    sy = end[1] - start[1]
+    sz = end[2] - start[2]
+    length = math.sqrt(sx * sx + sy * sy + sz * sz)
+    if length < 1.0:
+        return None
+    uphill = unreal.Vector(sx / length, sy / length, sz / length)
+    side = unreal.Vector(-sy, sx, 0.0)
+    side_len = math.hypot(side.x, side.y)
+    if side_len < 0.001:
+        side = unreal.Vector(1.0, 0.0, 0.0)
+    else:
+        side = unreal.Vector(side.x / side_len, side.y / side_len, 0.0)
+    normal = unreal.Vector(
+        side.y * uphill.z - side.z * uphill.y,
+        side.z * uphill.x - side.x * uphill.z,
+        side.x * uphill.y - side.y * uphill.x,
+    )
+    if normal.z < 0.0:
+        normal = unreal.Vector(-normal.x, -normal.y, -normal.z)
+    mid = unreal.Vector(
+        origin.x + (start[0] + end[0]) * 0.5 - normal.x * thickness * 0.5,
+        origin.y + (start[1] + end[1]) * 0.5 - normal.y * thickness * 0.5,
+        origin.z + (start[2] + end[2]) * 0.5 - normal.z * thickness * 0.5,
+    )
+    rot = unreal.MathLibrary.make_rot_from_xz(uphill, normal)
+    actor = unreal.EditorLevelLibrary.spawn_actor_from_class(unreal.StaticMeshActor, mid, rot)
+    if actor is None:
+        return None
+    actor.set_actor_label(name)
+    actor.set_actor_scale3d(unreal.Vector(length / 100.0, width / 100.0, thickness / 100.0))
+    mesh = actor.get_component_by_class(unreal.StaticMeshComponent)
+    mesh.set_static_mesh(cube)
+    paint(actor, material)
+    mesh.set_collision_profile_name("BlockAll")
+    mesh.set_collision_enabled(unreal.CollisionEnabled.QUERY_AND_PHYSICS)
+    return actor
+
+
+def spawn_cabin_roof(origin, cube):
+    """Gable roof on the upstairs wall plate. The ridge runs east-west."""
+    del cube
+    for actor in list(actors()):
+        if actor.get_actor_label().startswith("CabinRoof_"):
+            destroy(actor)
+    spawned = True
+    for name, start, end in cabin_shell.ROOF:
+        actor = _sloped_cube(
+            origin, name, start, end, cabin_shell.ROOF_WIDTH, 20.0, "MI_Greybox_Slate"
+        )
+        spawned = spawned and actor is not None
+    return spawned
+
+
+def spawn_cabin_ramp(origin, cube):
+    del cube
+    for actor in list(actors()):
+        if actor.get_actor_label().startswith("CabinRamp_"):
+            destroy(actor)
+    bottom, top, width = cabin_shell.RAMP
+    actor = _sloped_cube(origin, "CabinRamp_0", bottom, top, width, 30.0, "MI_Greybox_Stone")
+    return actor is not None
 
 
 def spawn_armory_walls(top):
@@ -407,7 +500,7 @@ def measure_floor():
 
 def snap_contacts(labels, top):
     for label in labels:
-        if label == "SM_Size_Island" or label == "SM_Size_WalkPad":
+        if label == "SM_Size_Island" or label == "SM_Size_WalkPad" or label in ("SM_Size_Kettle", "SM_Size_Bed"):
             continue
         actor = by_label().get(label)
         if actor is None:
@@ -422,7 +515,7 @@ def pin_to_floor(labels, top):
     """Move any mesh still off the floor, then fail if it is still more than 2 cm off."""
     errors = []
     for label in labels:
-        if label == "SM_Size_Island" or label == "SM_Size_WalkPad":
+        if label == "SM_Size_Island" or label == "SM_Size_WalkPad" or label in ("SM_Size_Kettle", "SM_Size_Bed"):
             continue
         actor = by_label().get(label)
         if actor is None:
@@ -440,6 +533,23 @@ def pin_to_floor(labels, top):
         if abs(gap) > 2.0:
             errors.append("%s bottom off by %.1f cm" % (label, gap))
     return errors
+
+
+def seat_props(top):
+    """The kettle sits on the counter. The bed sits on the upper floor."""
+    kettle = by_label().get("SM_Size_Kettle")
+    if kettle is not None:
+        _seat_bottom(kettle, top + 90.0)
+    bed = by_label().get("SM_Size_Bed")
+    if bed is not None:
+        _seat_bottom(bed, top + 500.0)
+
+
+def _seat_bottom(actor, bottom):
+    origin, extent = actor.get_actor_bounds(False)
+    delta = bottom - (origin.z - extent.z)
+    loc = actor.get_actor_location()
+    actor.set_actor_location(unreal.Vector(loc.x, loc.y, loc.z + delta), False, False)
 
 
 def place_player(player, top):
@@ -483,6 +593,92 @@ def remove_outside_homestead(keep):
         if label.startswith("SM_Size_") or label.startswith("SK_Size_") or label.startswith("NODE_") or label.startswith("CLOUD_") or label.startswith("PILE_"):
             destroy(actor)
             unreal.log("scene_placement: removed " + label)
+
+
+def _bounds_box(actor):
+    origin, extent = actor.get_actor_bounds(False)
+    return (origin.x, origin.y, origin.z, extent.x, extent.y, extent.z)
+
+
+def _boxes_overlap(a, b, pad=2.0):
+    return (
+        a[0] - a[3] < b[0] + b[3] - pad
+        and b[0] - b[3] < a[0] + a[3] - pad
+        and a[1] - a[4] < b[1] + b[4] - pad
+        and b[1] - b[4] < a[1] + a[4] - pad
+        and a[2] - a[5] < b[2] + b[5] - pad
+        and b[2] - b[5] < a[2] + a[5] - pad
+    )
+
+
+def _resting(a, b):
+    """True when one box only meets the top or bottom of the other."""
+    a_bottom = a[2] - a[5]
+    a_top = a[2] + a[5]
+    b_bottom = b[2] - b[5]
+    b_top = b[2] + b[5]
+    return abs(a_bottom - b_top) <= 6.0 or abs(b_bottom - a_top) <= 6.0
+
+
+def _is_structure(label):
+    return (
+        label.startswith("CabinWall_")
+        or label.startswith("ArmoryWall_")
+        or label.startswith("PorchCrawl_")
+        or label.startswith("CabinRoof_")
+        or label.startswith("CabinRamp_")
+    )
+
+
+def _grown_together(left, right):
+    pair = tuple(sorted((left, right)))
+    return pair in {
+        ("SM_Size_HerbBed", "SM_Size_Lupine"),
+        ("SM_Size_HerbBed_B", "SM_Size_Lupine_B"),
+    }
+
+
+def clip_errors():
+    """Solids must not occupy the same volume. Touching a floor or a counter is not a clip.
+
+    Cabin walls may meet each other. A lupine may occupy its herb bed. Everything else,
+    including a new placement, fails the save when its bounds cut through another solid.
+    """
+    boxes = {}
+    for actor in actors():
+        label = actor.get_actor_label() or ""
+        if not label or label in ("SM_Size_Island", "SM_Size_WalkPad", "SM_Size_Field", "SM_Size_Cottage"):
+            continue
+        if label.startswith("CabinLight_") or label.startswith("Water_") or label.startswith("Hill_") or label.startswith("CabinRoof_"):
+            continue
+        if not (
+            label.startswith("SM_Size_")
+            or label.startswith("SK_Size_")
+            or label.startswith("CabinWall_")
+            or label.startswith("ArmoryWall_")
+            or         label.startswith("PorchCrawl_")
+        or label.startswith("CabinRoof_")
+        or label.startswith("CabinRamp_")
+        or label == "OpeningDog"
+        ):
+            continue
+        boxes[label] = _bounds_box(actor)
+    errors = []
+    labels = list(boxes)
+    for i, left in enumerate(labels):
+        for right in labels[i + 1 :]:
+            if _is_structure(left) and _is_structure(right):
+                continue
+            if _grown_together(left, right):
+                continue
+            a = boxes[left]
+            b = boxes[right]
+            if not _boxes_overlap(a, b):
+                continue
+            if _resting(a, b):
+                continue
+            errors.append(left + " clips " + right)
+    return errors
 
 
 def cells_for(min_x, min_y, max_x, max_y):
@@ -565,6 +761,8 @@ def validate(player_actor, top):
         errors.append("player start hit %.0f cm from the floor" % (hit_z - top))
     errors.extend(garden_and_door(top))
     errors.extend(armory_errors(top))
+    errors.extend(clip_errors())
+    errors.extend(zipline_ramp_errors(top))
     return errors
 
 
@@ -665,10 +863,10 @@ def room_path(top, loc, world):
     if bed is None:
         return ["no bed"]
     spot = kettle.get_actor_location()
-    if not (loc.x + 900.0 < spot.x < loc.x + 1060.0 and loc.y - 120.0 < spot.y < loc.y + 120.0):
+    if not (loc.x + 1650.0 < spot.x < loc.x + 1780.0 and loc.y - 80.0 < spot.y < loc.y + 180.0):
         errors.append("kettle is outside the kitchen")
     bed_loc = bed.get_actor_location()
-    if not (loc.x - 280.0 < bed_loc.x < loc.x + 40.0 and loc.y + 750.0 < bed_loc.y < loc.y + 990.0):
+    if not (loc.x - 400.0 < bed_loc.x < loc.x - 100.0 and loc.y + 1000.0 < bed_loc.y < loc.y + 1300.0):
         errors.append("bed is outside the couple room")
     chest = top + 150.0
     ignore = [other for other in actors() if not other.get_actor_label().startswith("CabinWall_")]
@@ -1509,11 +1707,25 @@ def _spawn_zipline(label, perch, landing, stair_a, stair_b, stairs_at_perch):
 
 
 def place_opening_zipline(top):
-    """Northwest corner down to the pond, and the research hill down to the northeast corner."""
+    """Northwest corner down to the pond, and the research hill down to the northeast corner.
+
+    The ramp meshes are 180 cm wide and the perch pad is 300 by 240. A perch
+    sitting on the corner puts that width through the wall. The ride point is
+    moved outside the shell by the perch half-size so the ramp's inner edge
+    meets the wall instead of cutting it. Stair directions stay along the two
+    outside faces. Widths match HomeWorldOpeningZipline.cpp.
+    """
     floor_m = float(top) / M
+    cottage = by_label().get("SM_Size_Cottage")
+    if cottage is None:
+        unreal.log("scene_placement: FAIL no cottage for the zipline")
+        return False
+    origin = cottage.get_actor_location()
+    nw = _outside_corner(origin, "nw", 150.0, 120.0)
+    ne = _outside_corner(origin, "ne", 120.0, 120.0)
     pond = _spawn_zipline(
         "OpeningZipline",
-        vec(-16.0, 15.0, floor_m + 4.0),
+        unreal.Vector(nw[0], nw[1], top + 400.0),
         vec(-40.5, 2.0, floor_m + 1.5),
         unreal.Vector(0.0, -1.0, 0.0),
         unreal.Vector(1.0, 0.0, 0.0),
@@ -1522,14 +1734,105 @@ def place_opening_zipline(top):
     hill = _spawn_zipline(
         "OpeningZiplineHill",
         vec(32.0, 22.0, floor_m + 6.0),
-        vec(10.0, 15.0, floor_m + 1.5),
+        unreal.Vector(ne[0], ne[1], top + 150.0),
         unreal.Vector(-1.0, 0.0, 0.0),
         unreal.Vector(0.0, -1.0, 0.0),
         False,
     )
     if pond and hill:
-        unreal.log("scene_placement: ziplines from the northwest corner and the research hill")
+        unreal.log("scene_placement: ziplines outside the shell corners")
     return pond and hill
+
+
+# HomeWorldOpeningZipline.cpp: ramp width 180, perch 300 by 240, end perch 240.
+RAMP_HALF = 90.0
+RAMP_OFFSET = 160.0
+RAMP_SLOPE_DEG = 22.0
+
+
+def _outside_corner(origin, corner, half_x, half_y):
+    """A pad of half_x by half_y must sit outside the shell, just clear of the wall."""
+    wall = cabin_shell.WALL * 0.5 + 2.0
+    if corner == "nw":
+        x = origin.x + cabin_shell.SHELL_MIN_X - wall - half_x
+        y = origin.y + cabin_shell.SHELL_MAX_Y + wall + half_y
+    else:
+        x = origin.x + cabin_shell.SHELL_MAX_X + wall + half_x
+        y = origin.y + cabin_shell.SHELL_MAX_Y + wall + half_y
+    return (x, y)
+
+
+def _ramp_centerline(base, direction, pad_z):
+    rise = max(base.z - pad_z, 40.0)
+    run = rise / math.tan(math.radians(RAMP_SLOPE_DEG))
+    top = unreal.Vector(base.x + direction.x * RAMP_OFFSET, base.y + direction.y * RAMP_OFFSET, base.z)
+    bottom = unreal.Vector(top.x + direction.x * run, top.y + direction.y * run, pad_z)
+    return top, bottom
+
+
+def _dist_xy_to_box(px, py, box):
+    min_x = box[0] - box[3]
+    max_x = box[0] + box[3]
+    min_y = box[1] - box[4]
+    max_y = box[1] + box[4]
+    dx = max(min_x - px, 0.0, px - max_x)
+    dy = max(min_y - py, 0.0, py - max_y)
+    return math.hypot(dx, dy)
+
+
+def _z_hits_box(z, box):
+    return (box[2] - box[5]) - 2.0 < z < (box[2] + box[5]) + 2.0
+
+
+def zipline_ramp_errors(top):
+    """A ramp clips a wall when its 90 cm half-width reaches that wall.
+
+    The whole zipline actor is not tested: its cable span would overlap the
+    yard on purpose. Only the two ramp centerlines are tested, against the
+    cottage and armory shells.
+    """
+    cottage = by_label().get("SM_Size_Cottage")
+    if cottage is None:
+        return ["no cottage for the zipline ramps"]
+    origin = cottage.get_actor_location()
+    pad_z = top
+    boxes = []
+    for box in cabin_shell.BOXES:
+        boxes.append((origin.x + box[0], origin.y + box[1], origin.z + box[2], box[3] * 0.5, box[4] * 0.5, box[5] * 0.5))
+    armory = load_metrics().get("armory")
+    if armory:
+        ax = float(armory["x"]) * M
+        ay = float(armory["y"]) * M
+        for box in armory_shell.BOXES:
+            boxes.append((ax + box[0], ay + box[1], top + box[2], box[3] * 0.5, box[4] * 0.5, box[5] * 0.5))
+    nw = _outside_corner(origin, "nw", 150.0, 120.0)
+    ne = _outside_corner(origin, "ne", 120.0, 120.0)
+    lines = (
+        ("OpeningZipline", unreal.Vector(nw[0], nw[1], top + 400.0), (unreal.Vector(0.0, -1.0, 0.0), unreal.Vector(1.0, 0.0, 0.0))),
+        ("OpeningZiplineHill", unreal.Vector(ne[0], ne[1], top + 150.0), (unreal.Vector(-1.0, 0.0, 0.0), unreal.Vector(0.0, -1.0, 0.0))),
+    )
+    errors = []
+    for label, base, directions in lines:
+        segments = [_ramp_centerline(base, direction, pad_z) for direction in directions]
+        for index, (start, end) in enumerate(segments):
+            for step in range(9):
+                t = step / 8.0
+                px = start.x + (end.x - start.x) * t
+                py = start.y + (end.y - start.y) * t
+                pz = start.z + (end.z - start.z) * t
+                for box in boxes:
+                    if not _z_hits_box(pz, box):
+                        continue
+                    if _dist_xy_to_box(px, py, box) < RAMP_HALF - 2.0:
+                        errors.append("%s ramp %d clips a wall" % (label, index + 1))
+                        break
+                else:
+                    continue
+                break
+        gap = math.hypot(segments[0][0].x - segments[1][0].x, segments[0][0].y - segments[1][0].y)
+        if gap < RAMP_HALF * 2.0:
+            errors.append("%s ramps overlap each other (%.0f cm)" % (label, gap))
+    return errors
 
 
 def place_opening_dog(top):
@@ -1622,6 +1925,11 @@ def dog_errors(top):
 
 
 def run(import_mesh=True):
+    editor = unreal.get_editor_subsystem(unreal.LevelEditorSubsystem)
+    if editor.is_in_play_in_editor():
+        unreal.log("scene_placement: end play before applying")
+        editor.editor_request_end_play()
+        return 1
     metrics = load_metrics()
     ensure_greybox_palette()
     if import_mesh:
@@ -1721,6 +2029,7 @@ def run(import_mesh=True):
         unreal.log("scene_placement: not saved")
         return 1
     errors = pin_to_floor(labels, top)
+    seat_props(top)
     errors.extend(floor_errors)
     errors.extend(validate(player, top))
     errors.extend(opening_sightline(top))

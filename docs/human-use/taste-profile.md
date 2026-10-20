@@ -46,6 +46,7 @@ Reviewed, versioned summary of Lead/process taste and locked decisions.
 
 | Date | Phrase / source | Outcome |
 |------|-----------------|--------|
+| 2026-10-20 | Lead, chat | **Upper walls.** The top floor has 5 m walls, the same height as the ground floor. The roof sits on those walls. The bear and the bull still match the first 5 m. |
 | 2026-10-20 | Lead, chat | **Full upper floor.** The upper floor covers the whole 26 by 23 m cottage, porch included. Upstairs is a living room, two bedrooms, and one bathroom. The ground floor is the hearth, the kitchen, and the door to the dog. The 5 m line is the first floor. Island clearances: `Docs/level/L_SizeTest_ISLAND_PLAN.md`. |
 | 2026-10-19 | Lead, chat, after the cottage study | **Larger cottage.** The walked home is 26 m by 23 m, porch 5 m, great room and kitchen 5 m to the beams. The couple's rooms are a second story over the north band only. The child stays down, on the dog's door. The bear and the bull still match the 5 m wall. Plan: `Docs/level/L_SizeTest_ROOM_PLAN.md`. |
 | 2026-10-17 | Lead, chat, after the `L_SizeTest` walk | **Opening tutorial.** The first five minutes are in [`Docs/VISION_BOARD.md`](../../Docs/VISION_BOARD.md). The walk passes the initial movement pass. |

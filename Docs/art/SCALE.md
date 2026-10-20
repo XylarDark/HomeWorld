@@ -11,7 +11,7 @@ The player is 2 m and is not from this planet. The cottage is a normal home at t
 | Module | What uses it | Locked size |
 |---|---|---|
 | Player | The body and the camera | 2 m tall. Head one sixth of that height. |
-| Cottage | The first home. Later building kits can be modular. This layout is the start. | 26 m by 23 m. A 5 m porch on each floor. The upper floor covers the whole cottage. Floor at 5 m, ceiling at 8.2 m. The bear and the bull still match the 5 m line. Rooms: `Docs/level/L_SizeTest_ROOM_PLAN.md`. |
+| Cottage | The first home. Later building kits can be modular. This layout is the start. | 26 m by 23 m. A 5 m porch on each floor. The upper floor covers the whole cottage. Each floor's walls are 5 m, and the roof sits on the upper walls. The bear and the bull still match the first 5 m. Rooms: `Docs/level/L_SizeTest_ROOM_PLAN.md`. |
 | Wild | Bear, bull, ordinary creatures, rocks | Bear shoulder and bull shoulder equal the cottage wall, 5 m. Other creatures may be smaller or larger than the cottage. Special animals and spirits may be otherwise. |
 | Pines | One cone, three heights | Small 5 m. Medium 7 m. Largest 9 m. |
 | Giant | The kneeling sleeper | Many times the cottage. The bull and the rider stay small on the back. The snake wraps the torso. |
@@ -25,7 +25,7 @@ Paste the row you need. The figure in an asset shot is the 2 m player, standing 
 | Asset | Target | Picture that locks the look, not the meter |
 |---|---|---|
 | Player | 2 m tall. Head one sixth of that height. | The player mood stills. |
-| Cottage | 26 m by 23 m. Porch on both floors. Upper floor covers the whole cottage, floor at 5 m, ceiling at 8.2 m. | `Docs/level/L_SizeTest_ROOM_PLAN.md`. The scenic stills do not lock the plan. |
+| Cottage | 26 m by 23 m. Porch on both floors. Upper floor covers the whole cottage. Each floor's walls are 5 m. The roof sits on the upper walls. | `Docs/level/L_SizeTest_ROOM_PLAN.md`. The scenic stills do not lock the plan. |
 | Door | 1 m clear width. 3 m high. Hall behind it is 2 m deep. | The door plan. |
 | Bear | Shoulder 5 m, the cottage wall. | The bear’s face and facets from the dusk picture. Not its height in that picture. |
 | Bull | Shoulder 5 m. Player stands beside it. | `Field_bull_scale_v2.jpg` for the animal. The shoulder target is the cottage wall. |

@@ -20,10 +20,10 @@ The cottage actor is the homestead origin: world (−8 m, 0). Local +X is east a
 These survive a resize.
 
 - The dog stays at world (−3.9, 20). The north door stays on that x. Nine metres of pad stay north of the door, and the dog stays 2.8 m from any solid. Do not move the dog to make the house fit.
-- The armory stays fully south of the porch lip. Its north edge is world y −10. The porch lip is world y −8. The gap is 2 m.
-- Herb beds, lupines, the partner, and the child stand in the front yard, south of the porch lip. They do not stand on the porch.
-- Zipline ends sit on the shell corners: northwest world (−16, 15), northeast world (10, 15).
+- The armory stays fully south of the porch lip, with at least 6 m of yard between them. Its center is world (−0.5, −20). The north edge is y −17.
+- Herb beds and lupines stand at y −13, west of the armory. The partner stands at (−9.5, −12.5), the child at (−8, −13.2). None of them stand on the porch.
+- Zipline ride points sit outside the shell by the perch pad, not on the corner. The ramps are 180 cm wide; a point on the corner puts them through the wall. Northwest world is west and north of (−16, 15). Northeast world is east and north of (10, 15).
 
 ## This pass
 
-Herb beds and lupines stand at y −9.2, in the gap between the porch lip and the armory, west of the armory door. The partner is at (−9.5, −10.5) and the child at (−8, −11). The armory already clears the lip by 2 m, so it stays. The dog, the approach pines, and the player start stay.
+The armory and its table moved to y −20 so the front yard is a real gap. Herb beds and lupines are at y −13. The partner and child stand in that yard, south of the porch lip. The kettle sits on the east counter. The dog, the approach pines, and the player start stay.
