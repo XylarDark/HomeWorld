@@ -7,6 +7,8 @@
 #include "Engine/Engine.h"
 #include "Engine/GameInstance.h"
 #include "Engine/World.h"
+#include "HomeWorldAIController.h"
+#include "HomeWorldCharacter.h"
 #include "HomeWorldFamilySubsystem.h"
 #include "HomeWorldGameMode.h"
 #include "HomeWorldOpeningWalker.h"
@@ -309,6 +311,60 @@ bool FPartyNightTeleportTest::RunTest(const FString& Parameters)
 	GameMode->TryReturnFamilyFromDefendAtDawn();
 	TestTrue(TEXT("a missed clear stays out"), Family->IsPartnerOut());
 	TestEqual(TEXT("the dawn teleport skips someone still out"), Partner->GetActorLocation(), Field);
+
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FPartyFollowLeashTest,
+	"HomeWorld.Party.FollowLeash",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FPartyFollowLeashTest::RunTest(const FString& Parameters)
+{
+	UHomeWorldFamilySubsystem* Family = HomeWorldPartyTest::MakeFamily();
+	HomeWorldPartyTest::FScopedWorld Scope;
+	if (!TestNotNull(TEXT("family"), Family) || !TestNotNull(TEXT("world"), Scope.World))
+	{
+		return false;
+	}
+	UGameInstance* GameInstance = NewObject<UGameInstance>(GEngine);
+	if (!TestNotNull(TEXT("game instance"), GameInstance))
+	{
+		return false;
+	}
+	GameInstance->Init();
+	Scope.World->SetGameInstance(GameInstance);
+	Family = GameInstance->GetSubsystem<UHomeWorldFamilySubsystem>();
+
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	AHomeWorldCharacter* Player = Scope.World->SpawnActor<AHomeWorldCharacter>(Params);
+	AHomeWorldOpeningWalker* Partner = Scope.World->SpawnActor<AHomeWorldOpeningWalker>(Params);
+	if (!TestNotNull(TEXT("player"), Player) || !TestNotNull(TEXT("partner"), Partner) || !TestNotNull(TEXT("family on the world"), Family))
+	{
+		return false;
+	}
+	Player->SetActorLocation(FVector(0.f, 0.f, 100.f));
+	Player->SetActorRotation(FRotator(0.f, 0.f, 0.f));
+	const FVector Expected = Player->GetActorLocation() - Player->GetActorForwardVector() * AHomeWorldAIController::FollowGapCm;
+	TestEqual(TEXT("the leash goal is 160 cm behind the player"), AHomeWorldAIController::FollowGoal(Player), Expected);
+	TestEqual(TEXT("the gap is the opening follow gap"), AHomeWorldAIController::FollowGapCm, 160.f);
+
+	Partner->Tags.Add(TEXT("NPC_PARTNER"));
+	AHomeWorldAIController::DriveUnpossessedFollow(Partner, Player);
+	TestFalse(TEXT("before the rescue the walker is not leashed"), Partner->ActorHasTag(TEXT("PartyLeash")));
+	TestNull(TEXT("the walker is not possessed"), Partner->GetController());
+
+	Family->SetRescueComplete(true);
+	TestTrue(TEXT("invite"), Family->TryInvitePartner(false, false, false));
+	AHomeWorldAIController::DriveUnpossessedFollow(Partner, Player);
+	TestTrue(TEXT("an outing walker takes the leash"), Partner->ActorHasTag(TEXT("PartyLeash")));
+	TestNull(TEXT("the leash does not possess"), Partner->GetController());
+
+	Family->EndOuting(EHomeWorldPartyAbsence::Bonk, Scope.World);
+	AHomeWorldAIController::DriveUnpossessedFollow(Partner, Player);
+	TestFalse(TEXT("a cleared outing drops the leash"), Partner->ActorHasTag(TEXT("PartyLeash")));
 
 	return true;
 }

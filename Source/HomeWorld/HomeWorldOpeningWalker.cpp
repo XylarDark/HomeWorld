@@ -1,6 +1,7 @@
 // Copyright HomeWorld. All Rights Reserved.
 
 #include "HomeWorldOpeningWalker.h"
+#include "HomeWorldAIController.h"
 
 #include "Animation/AnimSequence.h"
 #include "Animation/AnimSingleNodeInstance.h"
@@ -85,6 +86,7 @@ void AHomeWorldOpeningWalker::BeginPlay()
 void AHomeWorldOpeningWalker::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+	AHomeWorldAIController::DriveUnpossessedFollow(this);
 	USkeletalMeshComponent* Body = GetMesh();
 	if (!Body)
 	{
