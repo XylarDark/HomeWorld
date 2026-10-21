@@ -884,6 +884,7 @@ protected:
 	void UpdateSizeTestWalk();
 	void UpdateSizeTestWisp(float DeltaTime);
 	void UpdateOpeningBonk();
+	void ClearPartyOnAbsenceVolumes();
 	void UpdateOpeningNight(float DeltaTime);
 	void UpdateOpeningWispLegs();
 	void EnsureOpeningNightProps();

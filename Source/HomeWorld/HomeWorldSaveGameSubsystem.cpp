@@ -3,7 +3,9 @@
 #include "HomeWorldSaveGameSubsystem.h"
 #include "HomeWorldPlayWorld.h"
 #include "HomeWorldBeastTameComponent.h"
+#include "HomeWorldCharacter.h"
 #include "HomeWorldFamilySubsystem.h"
+#include "HomeWorldSpiritStealthComponent.h"
 #include "HomeWorldInventorySubsystem.h"
 #include "HomeWorldNurtureComponent.h"
 #include "HomeWorldSaveGame.h"
@@ -216,6 +218,24 @@ bool UHomeWorldSaveGameSubsystem::LoadGameFromSlot(const FString& SlotName, int3
 	{
 		Family->DeserializeFromSaveGame(SaveGame);
 		RolesRestored = Family->GetMemberCount();
+		bool bRescueDone = false;
+		bool bSpirit = false;
+		if (UWorld* World = GI->GetWorld())
+		{
+			if (APlayerController* PC = World->GetFirstPlayerController())
+			{
+				if (AHomeWorldCharacter* Character = Cast<AHomeWorldCharacter>(PC->GetPawn()))
+				{
+					bSpirit = Character->GetIsSpiritForm();
+					if (const UHomeWorldSpiritStealthComponent* Stealth = Character->FindComponentByClass<UHomeWorldSpiritStealthComponent>())
+					{
+						bRescueDone = Stealth->IsCaptiveFreed();
+					}
+				}
+			}
+		}
+		const bool bNight = SaveGame->SavedTimeOfDayPhase == static_cast<uint8>(EHomeWorldTimeOfDayPhase::Night);
+		Family->ApplyLoadForces(bRescueDone, bNight || bSpirit, GI->GetWorld());
 	}
 	if (UHomeWorldSpiritRosterSubsystem* Spirits = GI->GetSubsystem<UHomeWorldSpiritRosterSubsystem>())
 	{

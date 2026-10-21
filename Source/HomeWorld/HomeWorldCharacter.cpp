@@ -1,6 +1,9 @@
 // Copyright HomeWorld. All Rights Reserved.
 
 #include "HomeWorldCharacter.h"
+#include "HomeWorldCampActor.h"
+#include "HomeWorldFamilySubsystem.h"
+#include "Engine/GameInstance.h"
 #include "HomeWorldWispPlacement.h"
 #include "HomeWorldOpeningReveal.h"
 #include "HomeWorldRuneShapeComponent.h"
@@ -378,9 +381,30 @@ void AHomeWorldCharacter::BeginPlay()
 	}
 }
 
+namespace
+{
+	void EndPartyOuting(UWorld* World, EHomeWorldPartyAbsence Reason)
+	{
+		if (!World)
+		{
+			return;
+		}
+		UGameInstance* GameInstance = World->GetGameInstance();
+		if (!GameInstance)
+		{
+			return;
+		}
+		if (UHomeWorldFamilySubsystem* Family = GameInstance->GetSubsystem<UHomeWorldFamilySubsystem>())
+		{
+			Family->EndOuting(Reason, World);
+		}
+	}
+}
+
 void AHomeWorldCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	ClearPartyOnAbsenceVolumes();
 	TickSpiritSickness(DeltaTime);
 
 	// On the greybox body maps the hero-island bounds stay off (SCENE_SETUP practice 5); elsewhere they follow
@@ -491,7 +515,61 @@ void AHomeWorldCharacter::UpdateOpeningBonk()
 	}
 	LaunchCharacter(FVector(Inward.X * 250.f, Inward.Y * 250.f, 760.f), true, true);
 	OpeningBonkSafe = Back;
+	EndPartyOuting(World, EHomeWorldPartyAbsence::Bonk);
 	UE_LOG(LogTemp, Log, TEXT("opening_bonk: back on the island"));
+}
+
+void AHomeWorldCharacter::ClearPartyOnAbsenceVolumes()
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+	UGameInstance* GameInstance = World->GetGameInstance();
+	if (!GameInstance)
+	{
+		return;
+	}
+	UHomeWorldFamilySubsystem* Family = GameInstance->GetSubsystem<UHomeWorldFamilySubsystem>();
+	if (!Family || Family->GetPartySetup() == EHomeWorldPartySetup::Solo)
+	{
+		return;
+	}
+	const FVector Here = GetActorLocation();
+	bool bCamp = false;
+	bool bCave = false;
+	for (TActorIterator<AActor> It(World); It; ++It)
+	{
+		const bool bCampActor = It->IsA<AHomeWorldCampActor>()
+			|| It->ActorHasTag(TEXT("NODE_CAMP"))
+			|| It->ActorHasTag(TEXT("NODE_GUARD"))
+			|| It->ActorHasTag(TEXT("NODE_SLEEPER"))
+			|| It->ActorHasTag(TEXT("NODE_CAPTIVE"));
+		const bool bCaveActor = It->ActorHasTag(TEXT("NODE_CAVE")) || It->ActorHasTag(TEXT("Cave"));
+		if (!bCampActor && !bCaveActor)
+		{
+			continue;
+		}
+		FVector Origin = FVector::ZeroVector;
+		FVector Extent = FVector::ZeroVector;
+		It->GetActorBounds(false, Origin, Extent);
+		const FBox Near(Origin - Extent - FVector(200.f), Origin + Extent + FVector(200.f));
+		if (!Near.IsInsideOrOn(Here))
+		{
+			continue;
+		}
+		bCamp |= bCampActor;
+		bCave |= bCaveActor;
+	}
+	if (bCamp)
+	{
+		Family->EndOuting(EHomeWorldPartyAbsence::Camp, World);
+	}
+	if (bCave)
+	{
+		Family->EndOuting(EHomeWorldPartyAbsence::Cave, World);
+	}
 }
 
 static AActor* FindOpeningNamed(UWorld* World, const TCHAR* Name, bool bExact)
@@ -3356,6 +3434,10 @@ bool AHomeWorldCharacter::IsSizeTestLevel() const
 void AHomeWorldCharacter::SetStrokePad(AHomeWorldEasePad* Pad)
 {
 	StrokePad = Pad;
+	if (Pad)
+	{
+		EndPartyOuting(GetWorld(), EHomeWorldPartyAbsence::Stroke);
+	}
 }
 
 void AHomeWorldCharacter::SetStrokeHerb(EHomeWorldHerbVerb Verb, UHomeWorldVirtueComponent* Target)
@@ -3382,7 +3464,7 @@ void AHomeWorldCharacter::DiscoverStrokePad()
 	}
 	for (TActorIterator<AHomeWorldEasePad> It(World); It; ++It)
 	{
-		StrokePad = *It;
+		SetStrokePad(*It);
 		return;
 	}
 }
@@ -3505,6 +3587,10 @@ EHomeWorldStrokeReport AHomeWorldCharacter::EndStrokeFromInput()
 	}
 	const EHomeWorldStrokeReport Report = StrokeReport->EndStrokeHold(
 		Step, WindowMin, WindowMax, ExtraPoint, nullptr, FallbackGlideComponent, bHasFocus, FocusPoint);
+	if (Report == EHomeWorldStrokeReport::Bonk)
+	{
+		EndPartyOuting(GetWorld(), EHomeWorldPartyAbsence::Bonk);
+	}
 	SetStrokeCursorHeld(false);
 	if (Report != EHomeWorldStrokeReport::Matched)
 	{
@@ -4943,6 +5029,7 @@ bool AHomeWorldCharacter::TryEaseGuardInFront()
 
 bool AHomeWorldCharacter::TryFreeCaptiveInFront()
 {
+	EndPartyOuting(GetWorld(), EHomeWorldPartyAbsence::Rescue);
 	FHitResult Hit;
 	if (!TraceInteractHit(Hit))
 	{
@@ -5712,6 +5799,7 @@ bool AHomeWorldCharacter::TryBedSleepSpirit()
 		ShowInteractFeedback(TEXT("NODE_BED: day stays body"), FColor::Yellow);
 		return false;
 	}
+	EndPartyOuting(World, EHomeWorldPartyAbsence::Bed);
 
 	if (bBedSpiritGranted && bIsSpiritForm && bSpiritSleepGateGranted)
 	{
