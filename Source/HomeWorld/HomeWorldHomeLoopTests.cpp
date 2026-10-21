@@ -187,7 +187,8 @@ bool FHomeLoopKettlePrepCookTest::RunTest(const FString& Parameters)
 	TestTrue(TEXT("one ingredient syncs full"), HomeWorldHomeLoopTest::Nearly(Loop->GetLastServe().SyncFactor, 1.f));
 	TestEqual(TEXT("spent the herb row"), Loop->GetLastServe().SpentItemIds.Num(), 1);
 	TestEqual(TEXT("spent ITEM_HERB"), Loop->GetLastServe().SpentItemIds[0], FName(TEXT("ITEM_HERB")));
-	TestTrue(TEXT("timers do not arm the slot yet"), Loop->IsArmedBuffSlotEmpty());
+	TestFalse(TEXT("a post-tutorial serve arms the slot"), Loop->IsArmedBuffSlotEmpty());
+	TestFalse(TEXT("the buff waits for the Day phase"), Loop->GetArmedBuff().bLive);
 	return true;
 }
 
@@ -358,6 +359,190 @@ bool FHomeLoopDiscardSpendsTest::RunTest(const FString& Parameters)
 	TestEqual(TEXT("one piece spent"), Loop->GetLastServe().SpentItemIds.Num(), 1);
 	TestEqual(TEXT("dust stays at zero"), Loop->GetDustTotal(), 0);
 	TestEqual(TEXT("no work remains"), Loop->GetActiveWorkCount(), 0);
+	return true;
+}
+
+namespace HomeWorldHomeLoopTest
+{
+	static void GoToPhase(UWorld* World, UHomeWorldHomeLoopSubsystem* Loop, EHomeWorldTimeOfDayPhase Phase)
+	{
+		if (UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>())
+		{
+			TimeOfDay->SetPhase(Phase);
+		}
+		Loop->Advance(0.f);
+	}
+
+	static bool CookKettle(UHomeWorldHomeLoopSubsystem* Loop)
+	{
+		if (!Loop->BeginPrep(FName(TEXT("RECIPE_KETTLE")), 0))
+		{
+			return false;
+		}
+		Loop->Advance(4.f);
+		Loop->Advance(10.f);
+		return Loop->GetLastServe().bServed && Nearly(Loop->GetLastServe().SyncFactor, 1.f);
+	}
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FHomeLoopArmedBuffDawnTest,
+	"HomeWorld.HomeLoop.ArmedBuffDawn",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FHomeLoopArmedBuffDawnTest::RunTest(const FString& Parameters)
+{
+	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
+		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
+	if (!TestNotNull(TEXT("home loop"), Loop))
+	{
+		return false;
+	}
+	Loop->SetOpeningDayEnded(true);
+	HomeWorldHomeLoopTest::OpenDawn(Scope.World, Loop);
+	TestTrue(TEXT("dawn kettle serves"), HomeWorldHomeLoopTest::CookKettle(Loop));
+	TestFalse(TEXT("the slot holds the meal"), Loop->IsArmedBuffSlotEmpty());
+	TestEqual(TEXT("dawn meal covers the coming day"), Loop->GetArmedBuff().CoveredDayId, 1);
+	TestTrue(TEXT("bonus waits until Day"), HomeWorldHomeLoopTest::Nearly(Loop->GetSprintBonusSeconds(), 0.f));
+
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Day);
+	TestTrue(TEXT("full clear-house stamina is 60s"), HomeWorldHomeLoopTest::Nearly(Loop->GetSprintBonusSeconds(), 60.f));
+
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Dusk);
+	TestTrue(TEXT("leaving Day clears the slot"), Loop->IsArmedBuffSlotEmpty());
+	TestTrue(TEXT("dusk has no leftover bonus"), HomeWorldHomeLoopTest::Nearly(Loop->GetSprintBonusSeconds(), 0.f));
+
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Night);
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Dawn);
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Day);
+	TestTrue(TEXT("the next day is unbuffed"), Loop->IsArmedBuffSlotEmpty());
+	TestTrue(TEXT("the next day has no sprint bonus"), HomeWorldHomeLoopTest::Nearly(Loop->GetSprintBonusSeconds(), 0.f));
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FHomeLoopArmedBuffDuskTest,
+	"HomeWorld.HomeLoop.ArmedBuffDusk",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FHomeLoopArmedBuffDuskTest::RunTest(const FString& Parameters)
+{
+	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
+		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
+	if (!TestNotNull(TEXT("home loop"), Loop))
+	{
+		return false;
+	}
+	Loop->SetOpeningDayEnded(true);
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Day);
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Dusk);
+	TestTrue(TEXT("dusk kettle serves"), HomeWorldHomeLoopTest::CookKettle(Loop));
+	TestEqual(TEXT("dusk meal covers the day after the next dawn"), Loop->GetArmedBuff().CoveredDayId, 2);
+	TestTrue(TEXT("dusk itself is not the covered day"), HomeWorldHomeLoopTest::Nearly(Loop->GetSprintBonusSeconds(), 0.f));
+
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Night);
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Dawn);
+	TestTrue(TEXT("the following dawn still waits"), HomeWorldHomeLoopTest::Nearly(Loop->GetSprintBonusSeconds(), 0.f));
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Day);
+	TestTrue(TEXT("the next day receives the dusk meal"), HomeWorldHomeLoopTest::Nearly(Loop->GetSprintBonusSeconds(), 60.f));
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FHomeLoopArmedBuffClearsTest,
+	"HomeWorld.HomeLoop.ArmedBuffClears",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FHomeLoopArmedBuffClearsTest::RunTest(const FString& Parameters)
+{
+	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
+		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
+	if (!TestNotNull(TEXT("home loop"), Loop))
+	{
+		return false;
+	}
+	Loop->SetOpeningDayEnded(true);
+	HomeWorldHomeLoopTest::OpenDawn(Scope.World, Loop);
+	TestTrue(TEXT("serve"), HomeWorldHomeLoopTest::CookKettle(Loop));
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Day);
+	TestTrue(TEXT("live on the covered day"), Loop->GetArmedBuff().bLive);
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Night);
+	TestTrue(TEXT("gone when the day ends"), Loop->IsArmedBuffSlotEmpty());
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Dawn);
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Day);
+	TestFalse(TEXT("absent the following day"), Loop->GetArmedBuff().bLive);
+	TestTrue(TEXT("no bonus the following day"), HomeWorldHomeLoopTest::Nearly(Loop->GetSprintBonusSeconds(), 0.f));
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FHomeLoopArmedBuffReplacesTest,
+	"HomeWorld.HomeLoop.ArmedBuffReplaces",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FHomeLoopArmedBuffReplacesTest::RunTest(const FString& Parameters)
+{
+	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
+		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
+	if (!TestNotNull(TEXT("home loop"), Loop))
+	{
+		return false;
+	}
+	Loop->SetOpeningDayEnded(true);
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Day);
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Dusk);
+	Loop->Advance(80.f);
+	TestTrue(TEXT("late wash"), Loop->BeginPrep(FName(TEXT("RECIPE_KETTLE")), 0));
+	Loop->Advance(4.f);
+	Loop->Advance(6.f);
+	TestTrue(TEXT("dusk mistime armed"), HomeWorldHomeLoopTest::Nearly(Loop->GetArmedBuff().SyncFactor, 0.5f));
+
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Night);
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Dawn);
+	TestTrue(TEXT("dawn meal replaces the dusk meal"), HomeWorldHomeLoopTest::CookKettle(Loop));
+	TestTrue(TEXT("the slot keeps the later sync"), HomeWorldHomeLoopTest::Nearly(Loop->GetArmedBuff().SyncFactor, 1.f));
+	TestEqual(TEXT("still the same coming day"), Loop->GetArmedBuff().CoveredDayId, 2);
+
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Day);
+	TestTrue(TEXT("the replacement is the one that pays"), HomeWorldHomeLoopTest::Nearly(Loop->GetSprintBonusSeconds(), 60.f));
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FHomeLoopOpeningBrewSkipsSlotTest,
+	"HomeWorld.HomeLoop.OpeningBrewSkipsSlot",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FHomeLoopOpeningBrewSkipsSlotTest::RunTest(const FString& Parameters)
+{
+	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
+		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
+	UHomeWorldTimeOfDaySubsystem* TimeOfDay = Scope.World
+		? Scope.World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>() : nullptr;
+	if (!TestNotNull(TEXT("home loop"), Loop) || !TestNotNull(TEXT("time of day"), TimeOfDay))
+	{
+		return false;
+	}
+	TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Day);
+	UGameInstance* GameInstance = NewObject<UGameInstance>(Scope.World);
+	GameInstance->Init();
+	Scope.World->SetGameInstance(GameInstance);
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	AHomeWorldCharacter* Character = Scope.World->SpawnActor<AHomeWorldCharacter>(Params);
+	if (!TestNotNull(TEXT("character"), Character))
+	{
+		return false;
+	}
+	Character->SyncFormWithTimeOfDay();
+	Character->DebugSeedOpeningWispLoop(0, 9);
+	TestTrue(TEXT("opening brew"), Loop->TryKettleFromWorld(Character));
+	TestTrue(TEXT("opening brew skips the slot"), Loop->IsArmedBuffSlotEmpty());
 	return true;
 }
 

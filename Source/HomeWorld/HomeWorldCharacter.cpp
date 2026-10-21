@@ -6189,6 +6189,26 @@ void AHomeWorldCharacter::SyncFormWithTimeOfDay()
 
 void AHomeWorldCharacter::OnTimeOfDayPhaseChanged(EHomeWorldTimeOfDayPhase NewPhase)
 {
+	if (UWorld* World = GetWorld())
+	{
+		if (UHomeWorldHomeLoopSubsystem* HomeLoop = World->GetSubsystem<UHomeWorldHomeLoopSubsystem>())
+		{
+			HomeLoop->Advance(0.f);
+			if (NewPhase == EHomeWorldTimeOfDayPhase::Day && !bIsSpiritForm)
+			{
+				const float Bonus = HomeLoop->GetSprintBonusSeconds();
+				if (Bonus > 0.f)
+				{
+					const float Now = World->GetTimeSeconds();
+					if (TeaSprintEndWorldTime < Now)
+					{
+						TeaSprintEndWorldTime = Now;
+					}
+					TeaSprintEndWorldTime += Bonus;
+				}
+			}
+		}
+	}
 	ApplyFormForPhase(NewPhase);
 	// T0 #1: Day entry (not Dawn/bed->AdvanceToDawn alone) can emit NODE_WAKE start-day beat.
 	TryEmitNodeWakeStartDayBeat();

@@ -40,7 +40,11 @@ public:
 	bool TryOpeningKettleBrew(AHomeWorldCharacter* Character);
 
 	/** True until a post-tutorial serve writes the slot. */
-	bool IsArmedBuffSlotEmpty() const { return !bArmedBuffOccupied; }
+	bool IsArmedBuffSlotEmpty() const { return !ArmedBuff.bOccupied; }
+	const FHomeWorldArmedBuff& GetArmedBuff() const { return ArmedBuff; }
+
+	/** Stamina seconds on the covered Day. 0 when the slot is empty or the Day is not active. */
+	float GetSprintBonusSeconds() const;
 
 	/** The first sleep that ends the opening day. Brews before that stay on the sprint path. */
 	void SetOpeningDayEnded(bool bEnded) { bOpeningDayEnded = bEnded; }
@@ -78,6 +82,11 @@ public:
 
 private:
 	void SyncPhase();
+	void ApplyPhase(EHomeWorldTimeOfDayPhase Phase, bool bFirst);
+	void EnterDay();
+	void LeaveDay();
+	void ArmFromServe(float SyncFactor);
+	float GetCleanFactor() const;
 	void OpenWindow();
 	void CloseWindow();
 	void ApplyStep(float Step);
@@ -100,15 +109,17 @@ private:
 	};
 
 	float HomeClockSeconds = 0.f;
-	bool bArmedBuffOccupied = false;
 	bool bOpeningDayEnded = false;
 	bool bBodyForm = true;
 	bool bWindowOpen = false;
 	bool bPhaseInitialized = false;
 	float WindowRemaining = 0.f;
 	int32 DustTotal = 0;
+	int32 UpcomingDayId = 1;
+	int32 ActiveDayId = 0;
 	EHomeWorldTimeOfDayPhase LastPhase = EHomeWorldTimeOfDayPhase::Day;
 	FName ActiveRecipeId = NAME_None;
 	TArray<FIngredientWork> Works;
 	FHomeWorldServeResult LastServe;
+	FHomeWorldArmedBuff ArmedBuff;
 };

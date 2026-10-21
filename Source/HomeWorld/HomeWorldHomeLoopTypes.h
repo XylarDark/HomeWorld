@@ -82,3 +82,14 @@ struct FHomeWorldServeResult
 	TArray<FName> SpentItemIds;
 	bool bDiscarded = false;
 };
+
+/** One meal armed for one Day phase. */
+struct FHomeWorldArmedBuff
+{
+	bool bOccupied = false;
+	bool bLive = false;
+	EHomeWorldHomeBuff BuffId = EHomeWorldHomeBuff::Stamina;
+	float SyncFactor = 1.f;
+	float CleanFactor = 1.f;
+	int32 CoveredDayId = 0;
+};

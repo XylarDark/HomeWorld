@@ -88,41 +88,6 @@ void UHomeWorldHomeLoopSubsystem::OpenWindow()
 	WindowRemaining = 90.f;
 }
 
-void UHomeWorldHomeLoopSubsystem::SyncPhase()
-{
-	UWorld* World = GetWorld();
-	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World ? World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>() : nullptr;
-	if (!TimeOfDay)
-	{
-		return;
-	}
-	const EHomeWorldTimeOfDayPhase Phase = TimeOfDay->GetCurrentPhase();
-	if (!bPhaseInitialized)
-	{
-		bPhaseInitialized = true;
-		LastPhase = Phase;
-		if (Phase == EHomeWorldTimeOfDayPhase::Dawn || Phase == EHomeWorldTimeOfDayPhase::Dusk)
-		{
-			OpenWindow();
-		}
-		return;
-	}
-	if (Phase == LastPhase)
-	{
-		return;
-	}
-	LastPhase = Phase;
-	const bool bHomeTime = Phase == EHomeWorldTimeOfDayPhase::Dawn || Phase == EHomeWorldTimeOfDayPhase::Dusk;
-	if (bHomeTime && !bWindowOpen)
-	{
-		OpenWindow();
-	}
-	else if (!bHomeTime && bWindowOpen)
-	{
-		CloseWindow();
-	}
-}
-
 void UHomeWorldHomeLoopSubsystem::EnsureWorks(const FHomeWorldRecipe& Recipe)
 {
 	if (Works.Num() != Recipe.Ingredients.Num())
@@ -292,6 +257,112 @@ void UHomeWorldHomeLoopSubsystem::ServeActive(float SyncFactor, bool bKeepUnfini
 	{
 		ActiveRecipeId = NAME_None;
 	}
+	ArmFromServe(SyncFactor);
+}
+
+void UHomeWorldHomeLoopSubsystem::ArmFromServe(float SyncFactor)
+{
+	if (!bOpeningDayEnded)
+	{
+		return;
+	}
+	if (LastPhase != EHomeWorldTimeOfDayPhase::Dawn && LastPhase != EHomeWorldTimeOfDayPhase::Dusk)
+	{
+		return;
+	}
+	FHomeWorldRecipe Recipe;
+	if (!GetRecipe(LastServe.RecipeId, Recipe))
+	{
+		return;
+	}
+	ArmedBuff.bOccupied = true;
+	ArmedBuff.bLive = false;
+	ArmedBuff.BuffId = Recipe.BuffId;
+	ArmedBuff.SyncFactor = SyncFactor;
+	ArmedBuff.CleanFactor = GetCleanFactor();
+	ArmedBuff.CoveredDayId = UpcomingDayId;
+}
+
+float UHomeWorldHomeLoopSubsystem::GetCleanFactor() const
+{
+	return 1.f;
+}
+
+float UHomeWorldHomeLoopSubsystem::GetSprintBonusSeconds() const
+{
+	if (!ArmedBuff.bLive || ArmedBuff.BuffId != EHomeWorldHomeBuff::Stamina)
+	{
+		return 0.f;
+	}
+	return 60.f * ArmedBuff.SyncFactor * ArmedBuff.CleanFactor;
+}
+
+void UHomeWorldHomeLoopSubsystem::EnterDay()
+{
+	ActiveDayId = UpcomingDayId;
+	++UpcomingDayId;
+	ArmedBuff.bLive = ArmedBuff.bOccupied && ArmedBuff.CoveredDayId == ActiveDayId;
+	if (ArmedBuff.bLive && ArmedBuff.BuffId != EHomeWorldHomeBuff::Stamina)
+	{
+		UE_LOG(LogTemp, Log, TEXT("home_loop: buff logs only"));
+	}
+}
+
+void UHomeWorldHomeLoopSubsystem::LeaveDay()
+{
+	if (ArmedBuff.bOccupied && ArmedBuff.CoveredDayId == ActiveDayId)
+	{
+		ArmedBuff = FHomeWorldArmedBuff();
+	}
+	ArmedBuff.bLive = false;
+	ActiveDayId = 0;
+}
+
+void UHomeWorldHomeLoopSubsystem::ApplyPhase(EHomeWorldTimeOfDayPhase Phase, bool bFirst)
+{
+	const bool bWasDay = !bFirst && LastPhase == EHomeWorldTimeOfDayPhase::Day;
+	const bool bIsDay = Phase == EHomeWorldTimeOfDayPhase::Day;
+	const bool bHome = Phase == EHomeWorldTimeOfDayPhase::Dawn || Phase == EHomeWorldTimeOfDayPhase::Dusk;
+
+	if (!bFirst && !bHome && bWindowOpen)
+	{
+		CloseWindow();
+	}
+	if (bWasDay && !bIsDay)
+	{
+		LeaveDay();
+	}
+	if (bIsDay && (bFirst || LastPhase != EHomeWorldTimeOfDayPhase::Day))
+	{
+		EnterDay();
+	}
+	if (bHome && !bWindowOpen)
+	{
+		OpenWindow();
+	}
+	LastPhase = Phase;
+	bPhaseInitialized = true;
+}
+
+void UHomeWorldHomeLoopSubsystem::SyncPhase()
+{
+	UWorld* World = GetWorld();
+	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World ? World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>() : nullptr;
+	if (!TimeOfDay)
+	{
+		return;
+	}
+	const EHomeWorldTimeOfDayPhase Phase = TimeOfDay->GetCurrentPhase();
+	if (!bPhaseInitialized)
+	{
+		ApplyPhase(Phase, true);
+		return;
+	}
+	if (Phase == LastPhase)
+	{
+		return;
+	}
+	ApplyPhase(Phase, false);
 }
 
 void UHomeWorldHomeLoopSubsystem::CloseWindow()
