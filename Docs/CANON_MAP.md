@@ -1,6 +1,6 @@
 # CANON MAP — one lookup, so nobody reads 441 files to find one answer
 
-**Updated 2026-10-15.**
+**Updated 2026-10-20.**
 
 ## 0. Which document is the vision
 
@@ -73,7 +73,8 @@ README is left intact as history.
 | **Slice defaults interview** | `Docs/context/SLICE_DEFAULTS_INTERVIEW.md` | picked, 2026-10-15. The roost skill is the stroke. Rules live in the virtue bible. |
 | **Bench and lair interview** | `Docs/context/BENCH_LAIR_INTERVIEW.md` | picked, 2026-10-15. The lair coils stay parked. The armor table is the opening tutorial, 2026-10-17. |
 | **Principle fit lock** | `Docs/context/PRINCIPLE_FIT_LOCK.md` | picks 1A–10A, 2026-10-16, amended 2026-10-17. The next build is the opening tutorial. Grappling hook, extra pair toys, and lair coils stay parked. |
-| **Companion party (partner and child day company)** | `Docs/41_COMPANION_PARTY_DESIGN.md` | APPROVED, Lead 2026-10-20. Picks 1A-8A. Build waits until the opening tutorial is playable. |
+| **Companion party (partner and child day company)** | `Docs/41_COMPANION_PARTY_DESIGN.md` | APPROVED, Lead 2026-10-20, picks 1A-8A; build hold lifted. Built in #319 (`1e9b0e00`): party flags, outing clears, night teleport skip, follow leash. Invite hookup in progress. Play-confirm pending. |
+| **Quest tests (opening sweep and preflight)** | `Docs/qa/QUEST_TESTS.md` | `.\Tools\RunTests.ps1 -QuestCheck` is the host-only preflight (#320); `-Quest` is the in-editor sweep (#315, #318). A developer check, not the playtest pass. |
 | GDD slice | `Docs/01_GDD_MVP.md` | canon |
 | **Cloud descent facts and carried wisp** | `Docs/context/HOMEWORLD_ROUTE.md` + accepted `docs/human-use/test-contract.md` | current route / accepted behavior |
 | Art direction | `Docs/02_ART_BIBLE.md` | canon. `VisionBoard/KeyArt/homestead_dusk_baseline.jpg` is a fit check after a developer design, not a design source. |
@@ -107,7 +108,7 @@ README is left intact as history.
 | **Fork lock** | `Docs/context/SESSION_FORK_LOCK.md` | three rooms, 2026-10-10 |
 | **Sitting gap** | `Docs/art/archive/GAP_2026-10-08.md` | snapshot, 2026-10-08. Four-room language is stale. |
 | **The 13+4 T0 MUSTs** | `Docs/handoffs/T0_MECHANIC_INVENTORIES_V1.md` | **canonical for T0** |
-| The work queue | `Docs/TaskLists/T0_NEXT_QUEUE.md` | active — 2026-10-08. `T0_FIRST_LOOP_NOW.md` is the finished code queue |
+| **The work queue (active)** | `Docs/qa/TUTORIAL_PLAYTEST_QUEUE.md` | active, 2026-10-20. Its Now line wins. Legacy: `docs/TaskLists/T0_NEXT_QUEUE.md` (2026-10-08) and `docs/TaskLists/T0_FIRST_LOOP_NOW.md` (the finished code queue). |
 | Prototype boss lair | `Docs/context/BOSS_LAIR_LOCK.md` | shape lock 2026-10-08. Fight stays later |
 | Taste decisions Rounds 1–7 | `Docs/handoffs/TASTE_GATE_T0_ASSETS.md` | R1–6 RESOLVED, R7+ parked |
 | Agent-owned decisions | `Docs/decisions/AGENT_DECISIONS.md` | DEC-0001…**0050** — search by id, not by position in the file |
@@ -211,9 +212,9 @@ pass with no camp actors and logs `SOFT_LATCH_ONLY`. That path is not a played r
 |---|---|
 | `VisionBoard/MVP/**` | Outside prototype guidance. Theme and long-horizon direction are in `VisionBoard/Core/VISION.md`. |
 | `Docs/Automation/AGENT_COMPANY.md` | Pre-swarm agent loop, **removed WAVE F**. Stub only. |
-| `docs/TaskLists/DAILY_STATE.md`, `docs/SESSION_LOG.md` | Legacy task lists. Continuity is now handoffs + `SESSION_SUMMARY` + `swarm/PHASE_BOARD.md`. |
+| `docs/TaskLists/DAILY_STATE.md`, `docs/SESSION_LOG.md` | Legacy task lists. Continuity is `docs/SESSION_NOW.md` plus the newest `Docs/handoffs/SESSION_HANDOFF_*.md`. |
 | `Docs/00_CANON.md` | Earlier MVP cut. Prototype scope is `Docs/VISION_BOARD.md` (DEC-0029). Not a second vision. |
-| `Docs/TaskLists/**` (legacy, non-T0) | Wave-era lists. The active queue is `T0_NEXT_QUEUE.md`. `T0_FIRST_LOOP_NOW.md` is the finished code queue. `T0_EXECUTION_PHASES.md` and `T0_EXECUTION_QUEUE.md` are the pre-lock record. |
+| `Docs/TaskLists/**` (legacy, non-T0) | Wave-era lists. The active queue is `Docs/qa/TUTORIAL_PLAYTEST_QUEUE.md`; `T0_NEXT_QUEUE.md` is legacy. `T0_FIRST_LOOP_NOW.md` is the finished code queue. `T0_EXECUTION_PHASES.md` and `T0_EXECUTION_QUEUE.md` are the pre-lock record. |
 | `Docs/handoffs/**` (legacy, non-T0) | 158 files. Authority is the newest `SESSION_HANDOFF_*.md` only. |
 
 ---

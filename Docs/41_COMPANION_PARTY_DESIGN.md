@@ -1,6 +1,6 @@
 # 41 - Companion party design
 
-**Status:** APPROVED by Lead (Luke Thompson), 2026-10-20 ET. Build deferred until the opening tutorial is playable, and until the Lead asks for the implementation.
+**Status:** APPROVED by Lead (Luke Thompson), 2026-10-20 ET; the build hold was lifted the same day. Built in #319 (`1e9b0e00`): party flags, outing clears, night teleport skip, follow leash. Invite hookup in progress. Play-confirm pending.
 **Origin:** Cursor plan `C:\Users\User\.cursor\plans\companion_party_research_589ba261.plan.md` ("Companion party design"), scribed here as the one owner.
 **Picks:** companion interview, 2026-10-20: `1A 2A 3A 4A 5A 6A 7A 8A` (all recommended).
 **When to use:** Before any work on partner or child company, the party flags, their save fields, or the night family teleports.
