@@ -2,7 +2,7 @@
 
 The one start door. Any IDE, chat, CLI, or agent runner. If a capability is missing, say so. Do not invent a substitute.
 
-Continuity is [docs/SESSION_NOW.md](../SESSION_NOW.md). Do not open `docs/history/SESSION_LOG.md` to start a chat.
+Continuity is [docs/SESSION_NOW.md](../../docs/SESSION_NOW.md). Do not open `docs/history/SESSION_LOG.md` to start a chat.
 
 ## Mode
 
@@ -13,13 +13,12 @@ Continuity is [docs/SESSION_NOW.md](../SESSION_NOW.md). Do not open `docs/histor
 
 ## Playtest reply
 
-Use this door before the production reads when the message names a log line, a screenshot, a lock to scribe, or a beat to test, reach, or fast-forward to. The mode line stays one sentence and does not block this door.
+Use this door before the production reads when the message names a log line, a screenshot, a lock to scribe, or a beat to test, reach, or fast-forward to. The mode line stays one sentence and does not block this door. The production reads stay for "what next" and for an unnamed queue.
 
-- A beat test reads only the `hw.Playtest.FastForward` row in `Docs/COMMANDS_AND_LOG_TAGS.md` and the one section of `Docs/qa/TUTORIAL_PLAYTEST_QUEUE.md` that names that beat. Do not read vision, the asset queue, or either critical path. Fresh PIE on `L_SizeTest`, then `hw.Playtest.FastForward` plus the words used. Pass is `playtest_ff: ready for <name>`, the actor named in that line, and the skipped beat's success line absent. End PIE. Leave the editor on `L_SizeTest`. A beat word that `list` does not print is not a new command. Say so and stop.
-- The task is that line. Do not read vision, the asset queue, or either critical path.
-- Read only the active queue's Now line and the one owner file it points at.
+- A beat test reads only the `hw.Playtest.FastForward` row in `Docs/COMMANDS_AND_LOG_TAGS.md` and the one section of `Docs/qa/TUTORIAL_PLAYTEST_QUEUE.md` that names that beat. First run `.\Tools\RunTests.ps1 -QuestCheck` (host only, no Editor; exit 2 names the file and symbol). `-Quest -QuestOnly <id>` is the developer check, not the pass ([QUEST_TESTS](../qa/QUEST_TESTS.md)). Fresh PIE on `L_SizeTest`, then `hw.Playtest.FastForward` plus the words used. Pass is `playtest_ff: ready for <name>`, the actor named in that line, and the skipped beat's success line absent. End PIE. Leave the editor on `L_SizeTest`. A beat word that `list` does not print is not a new command. Say so and stop.
+- The task is that line. Read only the active queue's Now line and the one owner file it points at. Do not read vision, the asset queue, or either critical path.
 - The same on-screen fail twice stops the reply. Say what was not in the binary. Do not start a neighboring polish.
-- One `.\Tools\Safe-Build.ps1 -LaunchEditorAfter` from the repo root per reply. Batch every named fix into that compile. A reply that already compiled does not compile again. Search `docs/KNOWN_ERRORS.md` for that symptom before the compile. A compile that closes the editor and does not relaunch it has not shown the player the change. Name that in the reply.
+- One `.\Tools\Safe-Build.ps1 -LaunchEditorAfter` from the repo root per reply, and only after Luke's yes to close the editor: it taskkills `UnrealEditor`. Batch every named fix into that compile. A reply that already compiled does not compile again. Search `docs/KNOWN_ERRORS.md` for that symptom before the compile. A compile that closes the editor and does not relaunch it has not shown the player the change. Name that in the reply.
 - A fix is not done until the log line you named has changed. Name the DLL time in the reply.
 - When Luke names a pass, scribe that sentence into the queue result before the next edit.
 - A color, a marker, or a HUD line is done when the open editor logs it on the actor he named, or he sees it. A compile, and a neighboring actor, do not count.
@@ -28,17 +27,10 @@ Use this door before the production reads when the message names a log line, a s
 - A tutorial flag stays unset unless the interview round names it.
 - Delete any `Content/Python/tmp_*.py` this reply created.
 - A new lock is scribed, then a handoff, then stop. Do not implement it in the same session when code goes to another agent.
-- Do not invent interview choices for a beat that has no picked action. Ask what the player does.
-
-The production reads stay for "what next" and for an unnamed queue.
-
-## Named task
-
-If the message names a handoff, a queue section, or a file, read that owner and stop. Do not open `UserHarness/docs/human-use/route-context.md`, `Docs/context/ROUTE_INDEX.md`, `Docs/VISION_BOARD.md`, `Docs/art/ASSET_CONTEXT_TASKS.md`, `Docs/context/PLAY_TASKS.md`, or `Docs/context/PROVE_TASKS.md`. The mode line reads only the `Now:` line in `Docs/art/PHASES.md`. `Docs/context/DOOR_RULES.md` opens only when the task is a level option, a packet, or a level fix.
 
 ## Read order
 
-One file per step. Wait for it before the next read.
+A named handoff, queue section, or file: read that owner and stop. Skip this order and `## Pick the task`. Otherwise one file per step. Wait for it before the next read.
 
 1. `UserHarness/docs/human-use/route-context.md` — through `## How to detect the state` only. Stop before `## Session close`.
 2. `Docs/context/ROUTE_INDEX.md`
@@ -57,7 +49,7 @@ Open only when the task needs it: `Docs/WORLD_METRICS.md` for a number; `Docs/le
 | What next, the project picture, the critical path, prototype assets, stills, Tripo, Meshy, Mixar, or art asset | `Docs/context/ART_ASSET_DOOR.md`. The room is Look. Do not offer rooms. |
 | Movement test, greybox floor, blockout, sightline, or a prototype walk | `Docs/handoffs/research/UE_BLOCKOUT_PROTOCOL.md`. Engine cube and the material already on it. Player Start on that floor. Play In Editor, on foot. |
 | New editor tool, Python placer, or import script | `Docs/tools/GAME_TOOL_CATALOG.md` before any new script. |
-| Test, reach, or fast-forward to a beat | The `hw.Playtest.FastForward` row in `Docs/COMMANDS_AND_LOG_TAGS.md` and the one section of `Docs/qa/TUTORIAL_PLAYTEST_QUEUE.md` that names that beat. |
+| Partner or child company, party flags, or night family teleports | `Docs/41_COMPANION_PARTY_DESIGN.md` |
 
 ## Pick the task
 
@@ -88,9 +80,7 @@ Before the first edit, run `git status --short` once. `git add` uses the path th
 
 One lock. Competing choices, then stop. Not a menu of paths. Scribe the pick before the next lock. If the card fails, take a numbered reply in chat. Do not invent a substitute card. A beat with no picked action gets one question: what the player does. Do not offer passes you invented.
 
-After the clarifier names the work, name one room and open that card. Look is `Docs/context/FORK_LOOK.md`. Play is `Docs/context/FORK_GAMEPLAY.md`. Prove is `Docs/context/FORK_TESTING.md`. Art and asset both open Look. You can correct the room. No pick stays in the clarifier. No fourth craft room. The art bible is the law inside Look. It is not a room. A card points at a settled lock. It does not reopen it. Shape is `Docs/context/SESSION_FORK_LOCK.md`.
-
-Prototype assets, stills, and “what next” skip this choice. The task rows above already name the room.
+After the clarifier names the work, name one room and open that card: Look `Docs/context/FORK_LOOK.md` (art and asset), Play `Docs/context/FORK_GAMEPLAY.md`, Prove `Docs/context/FORK_TESTING.md`. You can correct the room; no pick stays in the clarifier. No fourth room; the art bible is the law inside Look. A card points at a settled lock and does not reopen it. Shape is `Docs/context/SESSION_FORK_LOCK.md`. Prototype assets, stills, and “what next” skip this choice.
 
 ## Session close
 
@@ -100,6 +90,4 @@ Prototype assets, stills, and “what next” skip this choice. The task rows ab
 
 No tutorial is on offer yet. Offer `Docs/qa/HUMAN_TUTORIAL.md` only once it is committed and `Content/Python/human_tutorial.py --check` exits 0. Until then, step 3 names the next manual step in one line.
 
-This file wins on the close order. It also wins on mode, the read list, and the clarifier. Do not wait on a UserHarness SHA.
-
-An unrelated second task: alert and stop. A second task Luke names is the yes.
+This file wins on the close order. It also wins on mode, the read list, and the clarifier. Do not wait on a UserHarness SHA. An unrelated second task: alert and stop. A second task Luke names is the yes.

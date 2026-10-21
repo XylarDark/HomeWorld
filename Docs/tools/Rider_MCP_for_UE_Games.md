@@ -182,12 +182,20 @@ Each skill folder carries `SKILL.md`, `metadata.json`, and a `reference/` direct
 3. `analyze_calls` and `get_symbol_info` resolve nothing in C++, and the `xdebug_*`, `build_solution_*`, `reformat_file`, `ue_play` and `ue_execute_python` steps are unreachable under the default whitelist. `ue-live-debugging`, `ue-code-authoring`, and `refactoring-code` say so inline. `refactoring-code` no longer tells the model to retry `rename_refactoring` or the C++-blind refactors. Both skill roots are kept byte-identical.
 4. `safe_delete --preview true` is the C++ reference list that is actually on the default whitelist. `navigating-code` points at it, and says to never omit preview.
 
-## Selective usage guidance (now in `AGENTS.md` and `.cursor/rules/unreal-cpp.mdc`)
-- Use native file/shell tools (read/edit/grep/git/shell) for routine reading, editing, searching, Git operations in Cursor/OpenCode.
-- Use Rider MCP selectively for semantic symbol search, Blueprint-inheritance lookup (`get_class_hierarchy --baseClass`), UE reflection/UHT diagnostics, and refactoring. It has **no usages tool and no C++ call hierarchy**: `find_usages`/`find_implementations` do not exist in this build, and `analyze_calls` resolves nothing in C++. Use `rg` for callers. `safe_delete --preview true` lists referencing files and writes nothing when preview is set.
+## Selective usage guidance
+
+Moved here from `AGENTS.md` on 2026-10-20 so it loads only for C++ work. `.cursor/rules/unreal-cpp.mdc` keeps its glob-scoped copy.
+
+- Use native file/shell tools (read/edit/grep/git/shell) for routine reading, editing, searching, and Git operations in Cursor/OpenCode.
+- Use Rider MCP selectively for semantic symbol search, Blueprint-inheritance lookup (`get_class_hierarchy --baseClass`), UE reflection/UHT diagnostics, and refactoring. It has **no usages tool and no C++ call hierarchy**: `find_usages`/`find_implementations` do not exist in this build at all, and `analyze_calls` resolves nothing in C++. Use `rg` for callers. For the files that reference a C++ member, run `.\Tools\Find-RiderUsages.ps1 -FilePath <header> -SymbolName <Member>`: it calls `safe_delete --preview true` for you and cannot delete. If you call `safe_delete` yourself instead, never omit `--preview true` — without it the tool deletes.
 - Do not use Rider MCP for operations native tools can do equally well.
-- After C++ changes, check relevant Rider diagnostics. Run UBT when compilation validation is warranted.
+- After C++ changes, check relevant Rider diagnostics. Run UBT when compilation validation is warranted (Safe-Build stays the compile).
 - Avoid repeated full builds, redundant validation, and excessive tool calls for small changes.
+- For substantial gameplay changes, verify observable behavior via focused tests or Unreal Editor execution.
+- Rider MCP is Rider's own built-in server, reached at `http://127.0.0.1:64342/stream` (streamable) or `/sse` (legacy SSE). When a C++ symbol, diagnostic, or refactor needs Rider and port 64342 is down, run `.\Tools\Start-RiderMcp.ps1` once, then call the tool. Do not start it for a playtest, a doc, or a Python edit. Do not start a second Rider when the port is already open. Stop a headless session with `-Stop`. Do **not** use `@jetbrains/mcp-proxy` — it probes `/api/mcp/list_tools`, which no Rider 2026.2 install contains. Every tool call needs `rootFolder=C:/dev/HomeWorld`; MCP roots do not substitute. File edits and shell stay on Cursor/OpenCode; UnrealMCP stays on 55557.
+- Two environment prerequisites, or the server connects and every symbol query answers empty: UE 5.8 registered at `HKLM\SOFTWARE\EpicGames\Unreal Engine\5.8\InstalledDirectory`, and a .NET 10 runtime under `%USERPROFILE%\.dotnet` — UE 5.8's UnrealBuildTool is net10.0, and the machine-wide dotnet already having 10.x is *not* enough, because Rider prefers the user-local host. `Start-RiderMcp.ps1` preflights the .NET half and prints the install command.
+- Trust the tools, not the connection: `search_symbol`/`search_text`/`search_file`/`get_file_problems` are the ones verified on HomeWorld C++. `search_file`'s `q` is a glob. `get_symbol_info` and `analyze_calls` resolve nothing in C++ yet, whatever the argument shape. The default whitelist exposes 17 tools; `-AllowedTools '*'` exposes 86 (including `rename_refactoring` and the debugger) but also shell and file-write tools, so it is opt-in. `findTests` and `post_edit_quality_check` are not in the 17: both stall the server. Rationale: the rest of this file.
+- Reference: [Docs/handoffs/MARKETPLACE_POLICY_V1.md](../handoffs/MARKETPLACE_POLICY_V1.md).
 
 ## Verification evidence (2026-10-15)
 - `opencode mcp list` -> `✗ rider failed: No working IDE endpoint available.` (proxy), then after switching to the URL -> `✓ rider connected`.
