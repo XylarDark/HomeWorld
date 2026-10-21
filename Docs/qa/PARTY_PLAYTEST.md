@@ -2,6 +2,8 @@
 
 Desk sign-off for #319 (`1e9b0e00`) and #325 (`307b949c`). The rules stay in [`Docs/41_COMPANION_PARTY_DESIGN.md`](../41_COMPANION_PARTY_DESIGN.md). This file does not change them.
 
+Current entry: [`PLAYTEST_INDEX.md`](PLAYTEST_INDEX.md). This file owns the party pass only.
+
 Automation is `HomeWorld.Party` via `.\Tools\RunTests.ps1 -Filter HomeWorld.Party`. A green run is not the desk pass. Lead fills the result line after seeing the step.
 
 The invite exists only after the captive is freed this session. Before that, the press falls through to the opening partner beat. Home is any loaded map whose name does not contain `Field`. `L_SizeTest` is home. `L_Field` is away. The press is the existing interact. There is no new key and no widget.

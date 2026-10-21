@@ -33,6 +33,8 @@ A herb with no poles is a count of `RES_HERB`. Tea, planting, tame, and heal spe
 
 A herb with one or more poles is one instance. Two herbs with different poles are not one stack.
 
+A garden can grow a marked herb or greens from a signed home-pool wisp. The home loop owns that path in [42_HOME_LOOP_DESIGN.md](42_HOME_LOOP_DESIGN.md) section 10.1; the herb still spends by the verbs below.
+
 One marked herb is spent only when the verb changes the target:
 
 - Nullify clears every pole on the target.

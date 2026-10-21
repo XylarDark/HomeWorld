@@ -2,6 +2,8 @@
 
 One pass, on foot, in the desktop editor. The island this pass judges is the `L_SizeTest` walk pad, the floor where the opening teaches the walk. The greybox island (180 × 100 m) is a different floor and is not this pass.
 
+Current entry: [`PLAYTEST_INDEX.md`](PLAYTEST_INDEX.md). This file owns the movement pass only.
+
 Map: `/Game/HomeWorld/Maps/SizeTest/L_SizeTest`.
 
 The pad size and the start live in `Docs/level/L_SizeTest_METRICS.md`. Predicted times below come from `Docs/qa/TRAVERSAL_BUDGET.md` (generated 2026-10-17). A straight line is a lower bound. The trees and rocks make the real walk longer.

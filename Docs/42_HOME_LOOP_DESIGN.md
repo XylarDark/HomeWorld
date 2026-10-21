@@ -1,10 +1,11 @@
 # 42 - Home loop design
 
-**Status:** APPROVED by Lead (Luke Thompson), 2026-10-20 ET. Design only. Implementation waits until Lead asks. The companion party design and its first build are already on main; this loop comes after that work.
+**Status:** APPROVED by Lead (Luke Thompson), 2026-10-20 ET. Host tests exist for bites 1-8 and 10. Bite 9 (pan/oven) and bite 8A (water/signs) are design-only. The companion party design and its first build are on main; this loop follows that work.
 **Origin:** Cursor plan `home_loop_design_0a6799a6` ("Home loop design"), scribed here as the one owner.
 **Picks:** home loop interview, 2026-10-20: `1A 2A 3A 4A 5A 6A 7A 8A`.
 **Follow-up:** same day: `1A 2A 3A`.
-**When to use:** Before any work on cooking stations, meal buffs, house dust, or garden plots that grow food.
+**Water picks:** 2026-10-20: seven existing poles on the home-pool wisp; the plot wisp infuses the water; the cooked meal is a marked consumable.
+**When to use:** Before any work on cooking stations, meal buffs, house dust, garden plots that grow food, or the water/sign path.
 
 Mode: solo. State: decide. Transition: Concept -> Greybox.
 
@@ -23,7 +24,7 @@ At dawn and at dusk the player is home, in body form, and can cook, clean, and t
 - **5A.** Dust only shrinks a bonus. The buildup is capped. Stats do not fall below the unbuffed baseline.
 - **6A.** Ingredients come from gathered seeds grown with wisps.
 - **7A.** Kettle (MUST #2) is the first recipe, and it is the tutorial on the hearth pot.
-- **8A.** This file is the design. The build waits until after the companion party, and until Lead asks.
+- **8A.** This file is the design. The build follows the companion party and Lead's ask. Bites 1-8 and 10 are on main; bite 9 and 8A wait.
 
 ## 3. What the follow-up decides
 
@@ -33,6 +34,14 @@ These three picks close the interview that the plan left open. They use the same
 - **2A.** A serve arms a buff for the next Day phase. One slot. A later serve replaces the armed buff. The opening midday kettle stays today's sprint gate.
 - **3A.** Dust scales only the armed food buff. With no meal armed, dust changes no stat.
 
+### 2026-10-20 water follow-up
+
+Luke picked the water direction on 2026-10-20:
+
+- **Sign.** One of the seven existing poles on the healed home-pool wisp. Cloud wisps keep their jobs.
+- **Water.** The plot wisp infuses the plot water; there is no separate mixing or watering verb.
+- **Food.** The harvest and cooked meal carry the pole; the meal is a marked consumable under the virtue bible.
+
 ## 4. What stays in the other owners
 
 This design sits beside locks it does not rewrite.
@@ -40,6 +49,7 @@ This design sits beside locks it does not rewrite.
 - **Opening kettle.** `TryBrewNodeKettleTea` in [HomeWorldCharacter.cpp](../Source/HomeWorld/HomeWorldCharacter.cpp) requires Day and body form, spends opening herb chunks (at most 10) or `RES_HERB`, and sets the sprint gate for `TeaSprintHalfDaySeconds` (60). The gate clears when the phase leaves Day. The quest line stays `Brew the kettle.` via `bKettleBrewed`. Fast-forward stops `kettle` and `station` keep that success. Follow-up 2A keeps this path for the opening day. Section 2's 2A applies to serves after the tutorial day.
 - **One recipe on the tutorial island.** [OPENING_TUTORIAL_INTERVIEW.md](context/OPENING_TUTORIAL_INTERVIEW.md) round 5: cooking on that day is the kettle brew. Home time (section 2's 1A) is the repeating dawn and dusk loop. The opening brew stays at midday. Kettle is one ingredient, so its sync factor is full on its own. The sync lesson is the second recipe, and that recipe stays off the tutorial island.
 - **Cloud wisps.** Cap 2. One heals the homestead wound. One mixes fertilizer with a dung. [HOMEWORLD_ROUTE.md](context/HOMEWORLD_ROUTE.md) and `CarriedCloudWisps` keep those jobs. Follow-up 1A is the other population: the 2026-10-19 restatement in the opening interview, where a healed wisp can be assigned to a task.
+- **Virtue poles and marked consumables.** [VIRTUE_ATTRIBUTE_BIBLE.md](VIRTUE_ATTRIBUTE_BIBLE.md) owns the seven axes, the runes, and the Give, Swap, Nullify, and Take verbs. Section 10.1 uses those rules for water, plant, harvest, and meal. It adds no axis and no verb.
 - **Six resources and two nurture targets.** [DO_NOT.md](canon/DO_NOT.md) and [SCHEMA.md](canon/SCHEMA.md). Food outputs are kitchen-chest items. Plots are a home-loop list. `N1_Crop` and `N2_Stored` stay the night sow. Recipe costs enter the schema when a build bite is asked for. [GATHER_CRAFT_BIBLE.md](GATHER_CRAFT_BIBLE.md) already names cottage cooking as a later track; this file is that track's design. `RECIPE_CAMPFIRE`, `RECIPE_TENT`, `RECIPE_TORCH`, `RECIPE_TAME_BAIT`, `RECIPE_HEAL_SALVE`, and `RECIPE_FISH_GEAR` stay as they are.
 - **Care replaces killing.** [PILLARS.md](canon/PILLARS.md). The locked one-fish beat stays a fishing beat. `RECIPE_FISH_GEAR` stays gear. Tame bait stays berry or herb.
 - **Dawn and dusk.** The 4–8 s figures in the schema are the NightMix fade. [DAYNIGHT_BIBLE.md](DAYNIGHT_BIBLE.md): the bed grants spirit form. Home time is body form during Dawn and during Dusk. A glide still does not start at dusk.
@@ -102,6 +112,7 @@ Follow-up 1A. During home time the player assigns healed task wisps, one wisp to
 - A station wisp runs that station's current task during the home window, then waits.
 - A cleaning wisp clears one surface per home window. The player's own clean is the same action.
 - A plot wisp stays on that plant through the day trip and through the night. Taking the wisp off the plant pauses growth. The plant keeps what it has already grown.
+- The first pole on a plot wisp is the water sign in section 10.1. The assignment still counts as the one wisp on that plot.
 - Those assignments leave `CarriedCloudWisps`, the wound heal, and the fertilizer mix alone.
 - The night loop stays the night loop. Assignment is a home-time verb.
 
@@ -125,9 +136,23 @@ Until a kitchen chest exists, Kettle keeps spending `RES_HERB` or the opening he
 
 Nurture stays two targets. These plots are the home loop's garden, and the night sow stays N1 and N2.
 
+### 10.1 Water and wisp signs
+
+Lead pick, 2026-10-20. This path is post-tutorial and uses the home pool only.
+
+- **Sign.** A healed task wisp carries the seven-axis poles the virtue bible already gives a character. The pole comes from the existing character spawn row or a hand set on a placed wisp; this doc adds no new table. The water path reads the wisp's first pole. A paradox wisp is out of scope for this pass. The rune is visible on the wisp.
+- **Water.** The plot has water. The wisp on the plot is the mix: it infuses the plot water with its first pole as it grows the plant. The water is part of the plot, not a `RES_*` resource and not a carried item. There is no fill, container, carry, or watering verb. A virtue pole reads as purified water; a sin pole reads as tainted water; a wisp with no pole leaves the water neutral.
+- **Plant.** The plot seed is unmarked `RES_SEED` in this pass. The water is the only source of the plant's pole. The plant carries one pole and takes the water's pole. The plot, water, and plant show the same rune. If the wisp is removed, growth pauses and the plant keeps the pole it has. If the wisp is replaced, the plant takes the new wisp's first pole and keeps its growth. This is the plot's set, not the herb Swap verb.
+- **Harvest.** The harvest is the same kitchen-chest item, `ITEM_HERB` or `ITEM_GREENS`, with the pole. A marked item is one instance and does not stack with an unmarked item. The six `RES_*` ids do not change.
+- **Meal.** A recipe that spends a marked ingredient carries the pole into the meal. The meal is a marked consumable under the virtue bible. The serve still arms the normal home-loop buff for the Day; the armed slot also carries the meal's pole. The serve is the use; there is no separate eat verb. The mark follows Give: if the player's matching axis is empty, the player takes the pole for the Day. If the axis already holds a pole, the mark does nothing; the buff still arms. Swap, Nullify, and Take stay herb and bench verbs. An unmarked meal arms the buff with no pole.
+- **Duration.** The mark clears with the armed buff when the Day phase ends. A pole from another source stays. The one-Day duration is a taste-pass placeholder.
+- **Read.** The mark is visible as the same rune. It is not a hidden stat line. What a pole on the player changes in an encounter stays with the virtue bible and the later encounter pass. This section does not name a new encounter demand.
+- **Scope.** The first pass uses one marked ingredient per recipe. How two marked ingredients combine is not decided. A marked seed, a paradox wisp, and a second marked ingredient are out of scope until a later pick.
+- **Owners.** Cloud wisps keep their jobs. `CarriedCloudWisps`, the wound heal, and the fertilizer mix do not change. The opening kettle and the tutorial day do not change.
+
 ## 11. Kettle migration
 
-Until Lead asks for a build, `TryBrewNodeKettleTea` remains the success path.
+The opening path stays `TryBrewNodeKettleTea`.
 
 The migration bite keeps the log line `NODE_KETTLE: tea brew`, `bKettleBrewed`, the quest text `Brew the kettle.`, and the same-day sprint gate for the opening. After the tutorial day, the same recipe id serves into the armed-buff slot under follow-up 2A.
 
@@ -135,13 +160,15 @@ Kettle uses the sink and the hearth pot. The opening day still has one recipe.
 
 ## 12. Data shape
 
-The future owner is `UHomeWorldHomeLoopSubsystem`. Stations, dust, plots, and the armed buff live there, beside the character's tea gate rather than inside it. No subsystem is added by this doc.
+The owner is `UHomeWorldHomeLoopSubsystem`. Stations, dust, plots, and the armed buff live there, beside the character's tea gate rather than inside it. No new subsystem is added by this doc.
 
 - **FHomeWorldRecipe.** Id, vessel, buff id, ingredient rows.
 - **FHomeWorldRecipeIngredient.** Chest item id, prep station, prep seconds, cook seconds.
+- **FHomeWorldChestItem.** Kitchen-chest item instance. It keeps the `ITEM_*` id and gains a pole. A marked item does not stack with an unmarked one.
 - **FHomeWorldWispAssignment.** Wisp id, and one target: station, plot, or surface.
 - **FHomeWorldDustSurface.** Surface id, dust count.
-- **FHomeWorldArmedBuff.** Buff id, sync factor, clean factor, and the Day phase it covers.
+- **FHomeWorldPlot.** Index, growth, crop item id, and the plant's pole. The assigned wisp's first pole is the source.
+- **FHomeWorldArmedBuff.** Buff id, sync factor, clean factor, the meal's pole, and the Day phase it covers.
 
 `RECIPE_KETTLE` is the first food id. The second id is `RECIPE_GREENS_HERB` (placeholder name). Vessels are Pot, Pan, and Oven. Station ids are Sink, Board, Pot, Stove, Oven, and Garbage.
 
@@ -151,6 +178,7 @@ Chest item ids stay out of the six-resource enum. Schema gains a food cost row o
 
 **None.**
 
+- The water path adds no seventh resource, no watering-as-survival, no new morality axis, and no new verb. It uses the plot wisp, the existing virtue poles, and the serve action.
 - The resource list stays six. Chest items are a station chest, the same idea as the opening's crafting chests.
 - Nurture stays two targets.
 - Named recipes stay a list. Two food rows are the start of that list for meals. Campfire craft rows stay.
@@ -171,6 +199,10 @@ Lead has not locked a duration or a magnitude. Every number in this section is a
 - Dust +1 on the floor and on each tracked prop at dawn. Up to 6 props. Cap 3 per surface.
 - Clean factor 0.5 when every surface is at cap, and 1 when every surface is clear. Linear in between.
 - Garden cap 4 plots. A planted seed is ready after 2 home windows with a wisp on it.
+- The water path reads the wisp's first pole; a paradox wisp is out of scope for this pass.
+- The meal's mark lasts the Day the armed buff covers. This is a placeholder.
+- One marked ingredient per recipe; two marked ingredients are out of scope.
+- The rune display on water, plant, harvest, and meal is a look pass.
 - Stamina meal, full sync and a clear house: +60 s on the sprint window, or +20 MaxStamina once something reads it. Mistime uses half that magnitude before the clean factor.
 - Glide and gather meals: magnitude unset. They log, and the current glide and gather stay as they are.
 
@@ -178,7 +210,7 @@ Worked example, all placeholders: a mistimed stamina meal in a filthy house is `
 
 ## 15. Build order
 
-Each bite is one shot, after the companion party, and only when Lead asks. Tea, quest, cloud-wisp, fertilizer, and nurture tests stay green at every bite.
+Each bite is one shot, after the companion party, and only when Lead asks. Bites 1-8 and 10 are on main; bite 9 and bite 8A wait. Tea, quest, cloud-wisp, fertilizer, and nurture tests stay green at every bite.
 
 1. Tags and logs for the six stations. No timers.
 2. `RECIPE_KETTLE` data that still calls the current brew.
@@ -188,6 +220,7 @@ Each bite is one shot, after the companion party, and only when Lead asks. Tea, 
 6. Dust, the clean action, and the clean factor on the armed buff.
 7. One plot: seed in, wisp on it, chest item out, and a post-tutorial Kettle can spend it.
 8. `RECIPE_GREENS_HERB` on the pot. Off the opening fast-forward.
+8A. Water and wisp signs: the plot wisp's first pole marks the plot water and plant; the harvest and meal carry it; the armed buff carries it. No new resource and no new verb.
 9. Pan or oven as a second vessel, with one recipe.
 10. A second quest chain, id `home_loop`. `BuildOpeningSteps` gains no step.
 
@@ -202,13 +235,22 @@ For those bites. Host tests use the prefix `HomeWorld.HomeLoop`.
 - A plot harvest is a chest item. The six `RES_*` ids are unchanged. N1 and N2 tests stay as they are.
 - An armed buff clears when the phase leaves Day and is absent on the following day.
 - A later serve replaces the slot's previous buff.
+- A plot wisp with a pole marks the plot water and plant; the harvest chest item carries the pole; a meal carries it; the armed buff carries it.
+- A neutral wisp leaves the plant unmarked.
+- A marked chest item does not stack with an unmarked item.
+- A served marked meal still arms the buff; the mark follows Give and does nothing when the axis is occupied.
+- The water path leaves `CarriedCloudWisps`, the six `RES_*` ids, and the one-wisp-per-target rule unchanged.
 
-Quest-suite stops: `hw.Playtest.FastForward` stops `kettle` and `station` keep their current success. This doc adds no stop to that list. The opening chain still completes the kettle step on `bKettleBrewed`. The `home_loop` chain is stored beside it, so a home-loop update does not replace the opening tracker.
+Quest-suite stops: `hw.Playtest.FastForward` stops `kettle` and `station` keep their current success. This doc adds no stop to that list. The opening chain still completes the kettle step on `bKettleBrewed`. The `home_loop` chain is stored beside it, so a home-loop update does not replace the opening tracker. The water path adds no fast-forward stop.
 
 ## 17. Out of scope
 
 - No code, no schema edit, and no level edit in the scribe that added this file.
 - No flight energy meter, no seventh resource, no third nurture target, and no recipe web.
+- No water container, no `RES_WATER` id, no fill, carry, or watering verb, and no watering-as-survival.
+- No new sin/virtue axis. The water path uses the seven axes.
+- No marked seed, no paradox wisp, and no recipe with two different marked ingredients.
+- No named encounter demand and no new effect for a pole on the player.
 - No change to the one-fish beat, tame bait, or the campfire craft list.
 - The count of healed task wisps, where damaged wisps are found, and the warehouse spot stay the open lines in the 2026-10-19 restatement.
 - River, marsh, and lair travel stay where Doc 41 left them.

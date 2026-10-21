@@ -75,8 +75,9 @@ README is left intact as history.
 | **Principle fit lock** | `Docs/context/PRINCIPLE_FIT_LOCK.md` | picks 1A–10A, 2026-10-16, amended 2026-10-17. The next build is the opening tutorial. Grappling hook, extra pair toys, and lair coils stay parked. |
 | **Companion party (partner and child day company)** | `Docs/41_COMPANION_PARTY_DESIGN.md` | APPROVED, Lead 2026-10-20, picks 1A-8A; build hold lifted. Built in #319 (`1e9b0e00`): party flags, outing clears, night teleport skip, follow leash. Invite hookup in #325 (`307b949c`). Desk sign-off is the next row. |
 | **Companion party play-confirm** | `Docs/qa/PARTY_PLAYTEST.md` | Desk checklist for #319 and #325. The design stays `Docs/41_COMPANION_PARTY_DESIGN.md`. |
-| **Quest tests (opening sweep and preflight)** | `Docs/qa/QUEST_TESTS.md` | `.\Tools\RunTests.ps1 -QuestCheck` is the host-only preflight (#320); `-QuestCoverage` writes the matrix `Docs/qa/QUEST_COVERAGE.md` (#321); `-Quest` is the in-editor sweep (#315, #318). A developer check, not the playtest pass. |
-| **Home loop (cooking, cleaning, garden)** | `Docs/42_HOME_LOOP_DESIGN.md` | APPROVED, Lead 2026-10-20. Picks 1A-8A plus follow-up 1A-3A. Build waits until Lead asks, after the companion party. |
+| **Quest tests (opening sweep and preflight)** | `Docs/qa/QUEST_TESTS.md` | `.\Tools\RunTests.ps1 -QuestCheck` is the host-only preflight (#320); `-QuestCoverage` writes the matrix `Docs/qa/QUEST_COVERAGE.md` (#321); `-Quest` is the in-editor sweep (#315, #318). A developer check, not the playtest pass. The `home_loop` chain is not in the opening sweep; its host test is `HomeWorld.HomeLoop.QuestChainBesideOpening`. |
+| **Home loop (cooking, cleaning, garden, water signs)** | `Docs/42_HOME_LOOP_DESIGN.md` | APPROVED, Lead 2026-10-20. Picks 1A-8A, follow-up 1A-3A, water follow-up 2026-10-20. Host tests cover bites 1-8 and 10; bite 9 and the water/sign bite are design-only. Play-confirm: `Docs/qa/HOME_LOOP_PLAYTEST.md`. |
+| **Home-loop play-confirm** | `Docs/qa/HOME_LOOP_PLAYTEST.md` | Desk check for host bites 1-8 and 10. The in-editor pass waits on station and plot placement. The water/sign chain is design-only. |
 | **Clouds and wisps (descent route packet)** | `Docs/43_CLOUDS_WISPS_DESIGN.md` | APPROVED, Lead 2026-10-20. Interview #2 1A, interview #3 1A-2A, follow-up 1A-3A. Fertilizer loop stays out. |
 | GDD slice | `Docs/01_GDD_MVP.md` | canon |
 | **Cloud descent facts and carried wisp** | `Docs/context/HOMEWORLD_ROUTE.md` + accepted `docs/human-use/test-contract.md` | current route / accepted behavior |
@@ -111,7 +112,7 @@ README is left intact as history.
 | **Fork lock** | `Docs/context/SESSION_FORK_LOCK.md` | three rooms, 2026-10-10 |
 | **Sitting gap** | `Docs/art/archive/GAP_2026-10-08.md` | snapshot, 2026-10-08. Four-room language is stale. |
 | **The 13+4 T0 MUSTs** | `Docs/handoffs/T0_MECHANIC_INVENTORIES_V1.md` | **canonical for T0** |
-| **The work queue (active)** | `Docs/qa/TUTORIAL_PLAYTEST_QUEUE.md` | active, 2026-10-20. Its Now line wins. Legacy: `docs/TaskLists/T0_NEXT_QUEUE.md` (2026-10-08) and `docs/TaskLists/T0_FIRST_LOOP_NOW.md` (the finished code queue). |
+| **The playtest entry point (active)** | `Docs/qa/PLAYTEST_INDEX.md` | active, 2026-10-20. Routes the tutorial queue, party pass, home-loop pass, and the design-only water chain. The tutorial queue's Now line wins for the tutorial day. Legacy: `docs/TaskLists/T0_NEXT_QUEUE.md` (2026-10-08) and `docs/TaskLists/T0_FIRST_LOOP_NOW.md` (the finished code queue). |
 | Prototype boss lair | `Docs/context/BOSS_LAIR_LOCK.md` | shape lock 2026-10-08. Fight stays later |
 | Taste decisions Rounds 1–7 | `Docs/handoffs/TASTE_GATE_T0_ASSETS.md` | R1–6 RESOLVED, R7+ parked |
 | Agent-owned decisions | `Docs/decisions/AGENT_DECISIONS.md` | DEC-0001…**0050** — search by id, not by position in the file |
@@ -217,7 +218,7 @@ pass with no camp actors and logs `SOFT_LATCH_ONLY`. That path is not a played r
 | `Docs/Automation/AGENT_COMPANY.md` | Pre-swarm agent loop, **removed WAVE F**. Stub only. |
 | `docs/TaskLists/DAILY_STATE.md`, `docs/SESSION_LOG.md` | Legacy task lists. Continuity is `docs/SESSION_NOW.md` plus the newest `Docs/handoffs/SESSION_HANDOFF_*.md`. |
 | `Docs/00_CANON.md` | Earlier MVP cut. Prototype scope is `Docs/VISION_BOARD.md` (DEC-0029). Not a second vision. |
-| `Docs/TaskLists/**` (legacy, non-T0) | Wave-era lists. The active queue is `Docs/qa/TUTORIAL_PLAYTEST_QUEUE.md`; `T0_NEXT_QUEUE.md` is legacy. `T0_FIRST_LOOP_NOW.md` is the finished code queue. `T0_EXECUTION_PHASES.md` and `T0_EXECUTION_QUEUE.md` are the pre-lock record. |
+| `Docs/TaskLists/**` (legacy, non-T0) | Wave-era lists. The active playtest entry is `Docs/qa/PLAYTEST_INDEX.md`; the tutorial queue owns the tutorial day. `T0_NEXT_QUEUE.md` is legacy. `T0_FIRST_LOOP_NOW.md` is the finished code queue. `T0_EXECUTION_PHASES.md` and `T0_EXECUTION_QUEUE.md` are the pre-lock record. |
 | `Docs/handoffs/**` (legacy, non-T0) | 158 files. Authority is the newest `SESSION_HANDOFF_*.md` only. |
 
 ---

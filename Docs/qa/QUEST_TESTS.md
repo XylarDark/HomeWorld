@@ -2,6 +2,8 @@
 
 The opening sweep runs the real `hw.Playtest.FastForward` stops in PIE and checks the read-only state at each stop. It is the developer check. It does not fill, replace, or grade the human pass tables in [`TUTORIAL_PLAYTEST_QUEUE.md`](TUTORIAL_PLAYTEST_QUEUE.md).
 
+The sibling `home_loop` chain is not an opening stop. Its host test is `HomeWorld.HomeLoop.QuestChainBesideOpening`; its human check is step 9 of [`HOME_LOOP_PLAYTEST.md`](HOME_LOOP_PLAYTEST.md).
+
 ## Run
 
 With the Editor open and UnrealMCP listening on 55557:

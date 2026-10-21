@@ -6,7 +6,11 @@ Map for every pass that uses the opening: `/Game/HomeWorld/Maps/SizeTest/L_SizeT
 
 Write results in this file. The tutorial is one day on the island. The field is the first wild place, after the dawn glide. It is not a pass here.
 
-**Now:** Night on the island, below. The bonk passed 2026-10-18. The glider is round 8 in [`Docs/context/OPENING_TUTORIAL_INTERVIEW.md`](../context/OPENING_TUTORIAL_INTERVIEW.md). It is not built.
+Current pass entry: [`PLAYTEST_INDEX.md`](PLAYTEST_INDEX.md). This file owns the tutorial day only. The party and home-loop passes are separate.
+
+**Now:** Night on the island, below. The bonk passed 2026-10-18. The glider is round 8 in [`Docs/context/OPENING_TUTORIAL_INTERVIEW.md`](../context/OPENING_TUTORIAL_INTERVIEW.md). It is not built. The water/sign chain is design-only.
+
+**Built since the last pass:** the companion party (#319/#325) and the home-loop host bites 1-8/10. Neither is a tutorial beat. The `home_loop` quest chain is stored when the opening day ends.
 
 The midday slice below is passed. 2026-10-18.
 
@@ -127,6 +131,8 @@ The midday slice below is passed. 2026-10-18.
 
 Press E at the bed. The coat hides and you are a wisp. The companion you claimed stays, and it hovers on the bed and on the other wisps the same way it hovers on everything else. Night does not start an encounter or spiritual power regen. The child says the bed-and-dawn line once. Purple wisps stand beside the south copse, at the pond, and at the hot springs. Press E on one and play the click heart. A kept heart collects it. You do not need the other quests first.
 
+Quest log: sleeping ends the opening day, so the `Opening` chain and the `home_loop` chain are stored beside each other. The HUD draws only the most recently changed chain. Note which one you see; the storage test is `HomeWorld.HomeLoop.QuestChainBesideOpening`.
+
 Developer shortcut for this replay: in a fresh PIE run `hw.Playtest.FastForward`. No argument plays the day beats in order (spirit, both herb beds, backpack, kettle, station mix, dog, fish, bed) and leaves you at the bed at night with every earlier step really executed. `test herb collection` claims the spirit, then places you at the east bed to draw the heart. `list` prints the other stops: spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect, heal.
 
 Developer check, not the pass: `.\Tools\RunTests.ps1 -Quest` runs all 11 stops in PIE and writes `Saved/quest_tests.json`. It loads `L_SizeTest`, ends PIE when done, and never fills the tables below. How to add a stop: [`QUEST_TESTS.md`](QUEST_TESTS.md).
@@ -184,6 +190,16 @@ You wake on the island. The bed returns you to the body. Dawn does not. The mist
 | Woke on the island? | |
 | Glided down to the field? | |
 | One sentence | |
+
+---
+
+## Separate passes
+
+These are post-tutorial or separate systems. They are not steps in this tutorial day.
+
+- Companion party: [`PARTY_PLAYTEST.md`](PARTY_PLAYTEST.md). The design stays in [`Docs/41_COMPANION_PARTY_DESIGN.md`](../41_COMPANION_PARTY_DESIGN.md).
+- Home loop: [`HOME_LOOP_PLAYTEST.md`](HOME_LOOP_PLAYTEST.md). The design stays in [`Docs/42_HOME_LOOP_DESIGN.md`](../42_HOME_LOOP_DESIGN.md).
+- Water and wisp signs: design-only, [`Docs/42_HOME_LOOP_DESIGN.md`](../42_HOME_LOOP_DESIGN.md) section 10.1. Do not run it as a tutorial step.
 
 ---
 
