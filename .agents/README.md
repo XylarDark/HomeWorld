@@ -28,7 +28,7 @@ Default DET adopters copy the **six** core skills. HomeWorld also keeps small HW
 
 ### One catalog
 
-Skill bodies live in `.agents/skills/` only. `.cursor/skills/` keeps a README and no `SKILL.md`, so Cursor does not advertise the same name twice. `disable-model-invocation: true` hides the seven `source-command-*` skills and `ue57-api-check` from automatic selection. `ue58-api-check` stays callable. Do not add a second copy under `.cursor/skills/`.
+Skill bodies live in `.agents/skills/` only. `.cursor/skills/` keeps a README and no `SKILL.md`, so Cursor does not advertise the same name twice. The `source-command-*` migrated skills and the retired `ue57-api-check` were dropped on 2026-10-20: the six commands live in `.cursor/commands/` and the opencode.json command templates, and the engine lock is UE 5.8. `ue58-api-check` stays callable. Do not add a second copy under `.cursor/skills/`.
 
 ## Extras (`.agents/skills-extras/`)
 
