@@ -70,6 +70,15 @@ Demo progression flag (no separate shop RES spend in NOW): `PROGRESS:COTTAGE_UNL
 | `N1_Crop` | 1× `RES_SEED` (or planted waiting nurture) | `M_Nurtured` on |
 | `N2_Stored` | Matching RES or Stored ≥ 1 (default wood pile) | `M_Nurtured` on |
 
+## Kitchen chest (home loop)
+
+Chest items are not `RES_*` ids. The six-resource list stays six. Nurture stays `N1_Crop` and `N2_Stored`.
+
+| Item | Source | Spend |
+|---|---|---|
+| `ITEM_HERB` | One home plot. Costs 1× `RES_SEED`. Ready after 2 home windows with a wisp on the plot. | Post-tutorial `RECIPE_KETTLE` spends 1. `RECIPE_GREENS_HERB` spends 1. |
+| `ITEM_GREENS` | One home plot. Costs 1× `RES_SEED`. Ready after 2 home windows with a wisp on the plot. | `RECIPE_GREENS_HERB` spends 1. |
+
 ## Day / night clock
 
 | Phase | NightMix intent | Form |
