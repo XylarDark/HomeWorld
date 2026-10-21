@@ -8,7 +8,7 @@ Mode: solo. State: decide. This file records a future direction and cheap readin
 
 Do not copy this into the vision board, the GDD, or the canon map body. The canon map keeps one pointer row.
 
-When Lead answers section 7, update section 2 and section 5 in the same commit; do not scatter picks across other canon files until a stage gate opens.
+When Lead answers section 7, update section 2 and section 5 in the same commit; do not scatter picks across other canon files until a stage gate opens. Mark answered rows in the CANON_MAP status when picks land.
 
 ## 1. Status and slice boundary
 
