@@ -27,6 +27,24 @@ execute_python_script("quest_tests.py")
 
 That call arms the suite and returns. Poll the status file; do not call `time.sleep` in the suite.
 
+## Preflight
+
+Before anyone opens the Editor, the host-only preflight proves the manifest still matches the C++ fast-forward:
+
+```powershell
+.\Tools\RunTests.ps1 -QuestCheck   # python Content/Python/run_quest_tests_host.py --check
+```
+
+No Editor, no PIE, no map load, no build. It reuses `quest_test_contract.validate_manifest`, then checks:
+
+- beat ids against `PlaytestBeatName`, `PlaytestSkipStep`, and the documented `playtest_ff: beats:` line in `HomeWorldCharacter.cpp`;
+- every beat's `stop` word against the `PlaytestBeatFromText` keyword table, resolved the way C++ resolves it (first hit wins);
+- `quest.*` / `beat.*` paths against `GetPlaytestStateJson` keys and `_build_snapshot`'s `quest.pop`;
+- `actors.*` paths against what `_build_snapshot` actually writes, plus the documented allowlist `ACTOR_KEYS` in `Content/Python/quest_preflight.py`;
+- that the `L_SizeTest.umap` the sweep loads exists (existence only; an LFS pointer file counts).
+
+Exit `0` clean, `2` on a real mismatch, printed as `file :: symbol`. A parse the preflight cannot answer is a warning ("unsure"), never a failure; UnrealMCP reachability and a stale editor DLL are warnings too. `Content/Python/tests/test_quest_preflight.py` plants every mismatch class into a disposable copy of the tree and proves each one exits 2.
+
 ## What a beat checks
 
 Every beat starts from the manifest's `stop`, waits for `playtest_ff: ready for <id>`, then evaluates declarative checks against one snapshot:

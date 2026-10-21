@@ -1,6 +1,7 @@
-# RunTests.ps1 - Run UE automation tests, or the in-editor opening quest sweep.
+# RunTests.ps1 - Run UE automation tests, the host-only quest preflight, or the in-editor opening quest sweep.
 # Run from project root: .\Tools\RunTests.ps1 [-Filter HomeWorld] [-ValidateAssets] [-IncludePythonTests]
 # In-editor sweep: .\Tools\RunTests.ps1 -Quest [-QuestOnly night,heal] [-QuestList]
+# Quest preflight (host-only, no Editor, no PIE): .\Tools\RunTests.ps1 -QuestCheck
 # The filter is a test-name prefix; it defaults to HomeWorld, which is what this project's tests
 # are named. UE "groups" match nothing here - a Group: selector ran zero tests, and a run that
 # completes zero tests is an error - so the prefix is the selector, not the group. The Editor.Python
@@ -21,11 +22,29 @@ param(
     # The in-editor opening quest sweep. One fresh PIE per hw.Playtest.FastForward stop.
     [switch]$Quest,
     [string[]]$QuestOnly = @(),
-    [switch]$QuestList
+    [switch]$QuestList,
+    # Host-only quest preflight (run_quest_tests_host.py --check). Exit 0 clean,
+    # 2 a real manifest/C++ mismatch. No Editor, no PIE, no map load.
+    [switch]$QuestCheck
 )
 
 $ErrorActionPreference = "Stop"
 $ProjectRoot = $PSScriptRoot + "\.."
+
+if ($QuestCheck) {
+    $QuestScript = Join-Path $ProjectRoot "Content\Python\run_quest_tests_host.py"
+    if (-not (Test-Path $QuestScript)) {
+        Write-Error "run_quest_tests_host.py not found at $QuestScript"
+        exit 1
+    }
+    Push-Location $ProjectRoot
+    try {
+        & python @($QuestScript, "--check")
+        exit $LASTEXITCODE
+    } finally {
+        Pop-Location
+    }
+}
 
 if ($Quest) {
     $QuestScript = Join-Path $ProjectRoot "Content\Python\run_quest_tests_host.py"
