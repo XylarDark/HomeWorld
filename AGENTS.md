@@ -10,7 +10,7 @@ Always loaded. Detail lives in [docs/AGENTS_REFERENCE.md](docs/AGENTS_REFERENCE.
 | [Docs/CANON_MAP.md](Docs/CANON_MAP.md) | Topic index. Start here to find an answer. |
 | [START_HERE.md](START_HERE.md) | Swarm entry only. Default coding chats are not swarm. |
 
-`Docs/` and `docs/` are one directory (DEC-0029). There is no second tree. Do not sync the two spellings, and do not describe them as a split. Do not treat `VisionBoard/MVP/` or `docs/Automation/AGENT_COMPANY.md` as product canon.
+`Docs/` and `docs/` are one directory (DEC-0029). There is no second tree. Do not sync the two spellings, and do not describe them as a split. Paths must use git's case: write each path as `git ls-files` prints it, so a case-sensitive checkout (CI, cloud agents) finds it. Do not treat `VisionBoard/MVP/` or `docs/Automation/AGENT_COMPANY.md` as product canon.
 
 ## Lock
 

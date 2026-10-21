@@ -6,7 +6,9 @@ Does not load the pack. Does not start a session. A broken door exits 1.
 
 from __future__ import annotations
 
+import os
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -14,10 +16,21 @@ ROOT = Path(__file__).resolve().parents[2]
 DOOR = ROOT / "Docs" / "context" / "SESSION_START.md"
 PACK = ROOT / "Docs" / "handoffs" / "CONTEXT_PACK_V1.md"
 
-READS = (
-    "UserHarness/docs/human-use/route-context.md",
-    "Docs/context/ROUTE_INDEX.md",
+READS = ("Docs/context/ROUTE_INDEX.md",)
+# The full state rule. The door carries the short form inline; this file opens on demand.
+STATE_RULE = "UserHarness/docs/human-use/route-context.md"
+STATE_RULE_MUST_SAY = (
+    "first match wins",
+    "`decide`",
+    "`do`",
+    "`agent`",
+    "Never a fourth state",
 )
+# Files whose backtick and markdown-link paths must match the case git records.
+CASE_CHECKED = ("Docs/context/SESSION_START.md", "AGENTS.md")
+_LINK = re.compile(r"\]\(([^)\s]+)\)")
+_TICK = re.compile(r"`([^`\s]+)`")
+_NOT_A_PATH = set("<>*{}$|")
 NAMED = (
     "Docs/WORLD_METRICS.md",
     "Docs/level/L_VS_MVP_Markers_manifest.json",
@@ -48,6 +61,85 @@ NAMED_ON_DEMAND = (
 )
 
 
+def tracked_paths(root: Path) -> set[str] | None:
+    """Every path git tracks under root, plus each parent directory. None without git."""
+    try:
+        out = subprocess.run(
+            ["git", "-C", str(root), "ls-files", "-z"],
+            capture_output=True, check=True,
+        ).stdout.decode("utf-8", "replace")
+    except (OSError, subprocess.CalledProcessError):
+        return None
+    files = [f for f in out.split("\0") if f]
+    tracked = set(files)
+    for f in files:
+        parts = f.split("/")
+        for i in range(1, len(parts)):
+            tracked.add("/".join(parts[:i]))
+    return tracked
+
+
+def _candidates(text: str, rel_dir: str):
+    """(kind, path as written, repo-relative path) for each link and backtick path."""
+    for m in _LINK.finditer(text):
+        raw = m.group(1).split("#", 1)[0]
+        if not raw or re.match(r"^[a-z][a-z0-9+.-]*:", raw, re.I) or _NOT_A_PATH & set(raw):
+            continue
+        rel = os.path.normpath(os.path.join(rel_dir, raw)).replace(os.sep, "/")
+        if rel.startswith(".."):
+            continue
+        yield "link", m.group(1), rel
+    for m in _TICK.finditer(text):
+        raw = m.group(1).replace("\\", "/")
+        if raw.startswith("./"):
+            raw = raw[2:]
+        if "/" not in raw or _NOT_A_PATH & set(raw) or raw.startswith(("/", "http")):
+            continue
+        yield "path", m.group(1), raw.rstrip("/")
+
+
+def path_case_problems(name: str, text: str, tracked: set[str]) -> list[str]:
+    """A path that git records under another case, or a link to nothing, is a broken path."""
+    lower = {}
+    for p in tracked:
+        lower.setdefault(p.lower(), p)
+    problems = []
+    rel_dir = os.path.dirname(name)
+    for kind, written, rel in _candidates(text, rel_dir):
+        if rel in tracked:
+            continue
+        # A path inside a submodule (a tracked gitlink) is not in this index.
+        parts = rel.split("/")
+        prefixes = ("/".join(parts[:i]) for i in range(1, len(parts)))
+        if any(pre in tracked and _is_gitlink(pre, tracked) for pre in prefixes):
+            continue
+        if rel.lower() in lower:
+            problems.append(f"{name}: {kind} `{written}` is `{lower[rel.lower()]}` in git (case)")
+        elif kind == "link":
+            problems.append(f"{name}: link `{written}` resolves to `{rel}`, which git does not track")
+    return problems
+
+
+def _is_gitlink(prefix: str, tracked: set[str]) -> bool:
+    """A tracked entry with nothing tracked beneath it is a file or a submodule gitlink."""
+    return not any(p.startswith(prefix + "/") for p in tracked)
+
+
+def state_rule_problems(text: str) -> list[str]:
+    problems = []
+    for phrase in STATE_RULE_MUST_SAY:
+        if phrase not in text:
+            problems.append(f"door lost the inline state rule: {phrase}")
+    if STATE_RULE not in text:
+        problems.append(f"door does not name the full state rule: {STATE_RULE}")
+    if re.search(r"^\d+\. `?UserHarness/docs/human-use/route-context\.md", text, re.M):
+        problems.append("route-context is a numbered start read again; it opens on demand")
+    for line in text.splitlines():
+        if "Transition" in line and "PHASES.md" in line and "Look room" not in line:
+            problems.append("the Transition header reads PHASES.md outside the Look room")
+    return problems
+
+
 def main() -> int:
     problems: list[str] = []
     if not DOOR.is_file():
@@ -64,8 +156,9 @@ def main() -> int:
             problems.append(f"read path not named in the door: {rel}")
     if "HOMEWORLD_ROUTE.md" not in text:
         problems.append("door does not name the full route for descent, gather, or fertilizer")
-    if "How to detect the state" not in text or "Stop before" not in text:
-        problems.append("door does not stop the state-file read before its close section")
+    problems.extend(state_rule_problems(text))
+    if not (ROOT / STATE_RULE).is_file():
+        print(f"WARN  {STATE_RULE} is not on disk; run git submodule update --init UserHarness")
     if "wins on the close order" not in text or "The state file wins" in text:
         problems.append("door does not keep the close order")
     rules = (ROOT / "Docs/context/DOOR_RULES.md").read_text(encoding="utf-8") if (ROOT / "Docs/context/DOOR_RULES.md").is_file() else ""
@@ -137,6 +230,14 @@ def main() -> int:
     tasks = (ROOT / "docs/TaskLists/CURRENT_TASK_LIST.md").read_text(encoding="utf-8") if (ROOT / "docs/TaskLists/CURRENT_TASK_LIST.md").is_file() else ""
     if "chat task wins" not in tasks:
         problems.append("task list does not say a chat task wins")
+    tracked = tracked_paths(ROOT)
+    if tracked is None:
+        print("WARN  git is not available; the path-case check did not run")
+    else:
+        for rel in CASE_CHECKED:
+            path = ROOT / rel
+            if path.is_file():
+                problems.extend(path_case_problems(rel, path.read_text(encoding="utf-8"), tracked))
     if problems:
         for p in problems:
             print(f"FAIL  {p}")

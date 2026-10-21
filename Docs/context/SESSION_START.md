@@ -7,9 +7,11 @@ Continuity is [docs/SESSION_NOW.md](../../docs/SESSION_NOW.md). Do not open `doc
 ## Mode
 
 1. Start in solo. `HANDOFF from HomeWorld Co` or `mode: co` switches to Co. `mode: solo` switches back.
-2. First message, once: `Mode: <solo or co> · State: <agent, decide, or do> · Transition: <the Now line in Docs/art/PHASES.md>`. Read that line before the message. Name the real mode, the real state, and the open transition before acting. Restate when mode, state, or that line changes.
-3. Open `Docs/context/DOOR_RULES.md` only when the task is a level option, a packet, or a level fix.
-4. Context loss: re-read only this file, restate the header once, and do not re-run the clarifier.
+2. First message, once: `Mode: <solo or co> · State: <agent, decide, or do>`. In the Look room only, add `· Transition: <the Now line in Docs/art/PHASES.md>` and read that one line first. Name the real mode and state before acting. Restate when either changes.
+3. State, first match wins, for this task's next step: `decide` when it needs a judgment only Luke can make (vision, taste, priority, ship, which option) that is not recorded; ask with the real options, then stop. `do` when it needs hands the agent lacks (the editor, playing a build, hardware, an account); hand it over, then stop. Otherwise `agent`: say so in one owner sentence, then work.
+4. A new shared utility, a new tool, or an always-on edit re-runs the state. Never a fourth state. The full rule is `UserHarness/docs/human-use/route-context.md`; open it only when the state is unclear.
+5. Open `Docs/context/DOOR_RULES.md` only when the task is a level option, a packet, or a level fix.
+6. Context loss: re-read only this file, restate the header once, and do not re-run the clarifier.
 
 ## Playtest reply
 
@@ -30,10 +32,7 @@ Use this door before the production reads when the message names a log line, a s
 
 ## Read order
 
-A named handoff, queue section, or file: read that owner and stop. Skip this order and `## Pick the task`. Otherwise one file per step. Wait for it before the next read.
-
-1. `UserHarness/docs/human-use/route-context.md` — through `## How to detect the state` only. Stop before `## Session close`.
-2. `Docs/context/ROUTE_INDEX.md`
+A named handoff, queue section, or file: read that owner and stop. Skip this order and `## Pick the task`. Otherwise read `Docs/context/ROUTE_INDEX.md`, then wait for it before the next read.
 
 Open only when the task needs it: `Docs/WORLD_METRICS.md` for a number; `Docs/level/L_VS_MVP_Markers_manifest.json` for level data (read `counts.actors` and `completeness.verdict` there; do not copy them here); `Docs/COMMANDS_AND_LOG_TAGS.md` for a console command or log tag.
 
