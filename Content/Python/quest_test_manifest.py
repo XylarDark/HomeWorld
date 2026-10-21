@@ -252,6 +252,59 @@ QUESTS = [
             le("beat.ready_distance", 400),
         ],
     },
+    {
+        "id": "dawnglide",
+        "stop": "dawnglide",
+        "section": "Dawn glide",
+        "note": "the launch is yours",
+        "checks": [
+            eq("beat.ready_for", "dawnglide"),
+            eq("quest.glider_crafted", True),
+            eq("quest.night_spirit", False),
+            eq("quest.descent_active", False),
+            eq("quest.cloud_carried", 0),
+            le("beat.ready_distance", 450),
+        ],
+    },
+    {
+        "id": "nightglide",
+        "stop": "nightglide",
+        "section": "Night glide",
+        "note": "travel only, the launch is yours",
+        "checks": [
+            eq("beat.ready_for", "nightglide"),
+            eq("quest.night_spirit", True),
+            eq("quest.glider_crafted", True),
+            eq("quest.descent_active", False),
+            eq("quest.cloud_carried", 0),
+            le("beat.ready_distance", 450),
+        ],
+    },
+    {
+        "id": "stealth",
+        "stop": "stealth",
+        "section": "Stealth",
+        "note": "reach the guard",
+        "checks": [
+            eq("beat.ready_for", "stealth"),
+            eq("quest.night_spirit", True),
+            eq("quest.glider_crafted", True),
+            eq("quest.guards_calm", 0),
+            eq("quest.descent_active", False),
+        ],
+    },
+    {
+        "id": "ease",
+        "stop": "ease",
+        "section": "Ease",
+        "note": "the wind-up is yours",
+        "checks": [
+            eq("beat.ready_for", "ease"),
+            eq("quest.night_spirit", True),
+            eq("quest.guards_calm", 0),
+            count_tag("NODE_OPENING_EASE", 3),
+        ],
+    },
 ]
 
 

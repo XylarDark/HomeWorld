@@ -163,7 +163,7 @@ public:
 
 	/** Test hook: play the opening beats in order, for real, and stop ready to test one beat.
 	 *  Beat text: spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect,
-	 *  heal, glider, delivery, daycamp. Empty = night; "list" prints the names. Start a fresh PIE for every run. */
+	 *  heal, glider, delivery, daycamp, dawnglide, nightglide, stealth, ease. Empty = night; "list" prints the names. Start a fresh PIE for every run. */
 	void DebugFastForwardOpening(const FString& Beat);
 
 	/** Test hook: call the hot-spring deposit the E chain calls. */

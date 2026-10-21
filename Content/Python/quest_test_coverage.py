@@ -194,4 +194,36 @@ COVERAGE = {
             "the clearing read and the glide home",
         ],
     },
+    "dawnglide": {
+        "tests": [
+            # Day descent collects nothing and keeps the camp-smoke sign.
+            "HomeWorld.Transit.CloudDescent.UnrestrictedSteeringAndWispCarry",
+        ],
+        "human": [
+            "the launch and the field landing",
+        ],
+    },
+    "nightglide": {
+        "tests": [],
+        "human": [
+            "the spirit glide, travel only",
+        ],
+    },
+    "stealth": {
+        "tests": [
+            # A missing actor cannot open the strict gate.
+            "HomeWorld.T0.M14.SoftLatchContained",
+        ],
+        "human": [
+            "sightlines from outside the clearing",
+        ],
+    },
+    "ease": {
+        "tests": [
+            "HomeWorld.Systems.Stroke.EaseTradeoff",
+        ],
+        "human": [
+            "the wind-up, the spend, the wait, and a wrong shape",
+        ],
+    },
 }

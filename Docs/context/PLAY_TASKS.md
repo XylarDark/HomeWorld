@@ -14,11 +14,11 @@ Prep so a later critical-path row can be played. The handoff is [`Docs/handoffs/
 
 Start now means source and a host test, with the editor left open. Place means the editor, after that Night pass releases `L_SizeTest`.
 
-Tasks 1 and 2 passed their host tests on 2026-10-21 and are in Done. Task 3 added the `glider`, `delivery`, and `daycamp` stops. `.\Tools\RunTests.ps1 -QuestCheck` exited 0. Dawn glide, stealth, ease, and shrine are not stops. The heal stop still waits on the Night sentence. The day-camp arrival passed `HomeWorld.Opening.DayCamp`; the clearing is still a place task.
+Tasks 1 and 2 passed their host tests on 2026-10-21 and are in Done. Task 3 added `glider`, `delivery`, `daycamp`, `dawnglide`, `nightglide`, `stealth`, and `ease`. The shrine stop is not in: the three strokes stay the player's. `.\Tools\RunTests.ps1 -QuestCheck` is the host check. The heal stop still waits on the Night sentence. The day-camp arrival passed `HomeWorld.Opening.DayCamp`; the clearing is still a place task. Dawn glide stops before the launch. No meadow, mist actor, or smoke actor is added.
 
 | # | Task | Unblocks | Start | Done when |
 |---|---|---|---|---|
-| 3 | Quest stops | Oct 26 through Nov 10 | After the Night sentence for the heal stop | `DebugFastForwardOpening` and `Content/Python/quest_test_manifest.py` gain stops for the glider, the dawn glide, delivery, the day camp, the night glide, stealth, the ease, and the shrine. `glider`, `delivery`, and `daycamp` are in. The others wait until those verbs exist. `.\Tools\RunTests.ps1 -QuestCheck` exits 0. |
+| 3 | Quest stops | Oct 26 through Nov 10 | After the Night sentence for the heal stop | `glider`, `delivery`, `daycamp`, `dawnglide`, `nightglide`, `stealth`, and `ease` are in `DebugFastForwardOpening` and `Content/Python/quest_test_manifest.py`. The shrine stop waits on the player's three strokes. The heal stop waits on the Night sentence. `.\Tools\RunTests.ps1 -QuestCheck` exits 0. |
 | 4 | Heal formula | Oct 23 | After the Night table has a sentence | The click heart sets the heal: 20 seconds at 3 seconds or under, plus 10 seconds per second over. A partial second counts. The heart may run past 3 seconds. A host test proves 3.0, 3.1, and 4.1. |
 | 5 | Glide start and field landing | Oct 27 and Oct 29 | Place | `GP_GlideStart` is on the island. The landing is one authored meadow with a forest edge and three marked node sites. No path through the meadow. No seeded map. |
 | 6 | Three nodes and chests | Oct 30 and Nov 2 | Place, after 2 | One wood tree, one herb, one stone rock, on `M_WoodWild`, `M_GatherHerb`, and `M_CliffRock`. Three chests at home, one per material. |

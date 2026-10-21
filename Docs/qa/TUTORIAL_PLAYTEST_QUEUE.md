@@ -252,15 +252,51 @@ At dawn, before the descent. The first craft spends wood, silk, and metal alread
 
 ## Dawn glide
 
-**Blocked.** Last mechanic of the tutorial. The mist clears at this dawn. The descent waits on the glider craft above.
+**Stop built.** Waiting on the launch and the meadow. `hw.Playtest.FastForward dawnglide` crafts the glider and stops before the launch, at a marker spawned for that run. It does not add a meadow, a mist actor, or a smoke actor. The day descent already refuses a pickup and keeps the camp-smoke sign (`HomeWorld.Transit.CloudDescent.UnrestrictedSteeringAndWispCarry`). The landing is not placed.
 
-You wake on the island. The bed returns you to the body. Dawn does not. The mist clears, and you glide down to the field. The glide is the day glide toward camp smoke, with no pickup. Pass if the glide is the last new mechanic, and the field reads as the first place past the tutorial.
+You wake on the island. The bed returns you to the body. Dawn does not. The mist stays a sky read for the later dress row. You glide down to the field. The glide is the day glide toward camp smoke, with no pickup. Pass if the glide is the last new mechanic, and the field reads as the first place past the tutorial.
 
 | Field | Result |
 |---|---|
 | Date | |
 | Woke on the island? | |
 | Glided down to the field? | |
+| One sentence | |
+
+---
+
+## Night glide
+
+**Stop built.** Waiting on the launch. `hw.Playtest.FastForward nightglide` stops before the spirit launch. Travel only. No cloud wisp actors are spawned. The camp landing is not placed.
+
+| Field | Result |
+|---|---|
+| Date | |
+| Reached the camp, travel only? | |
+| One sentence | |
+
+---
+
+## Stealth
+
+**Stop built.** Waiting on the reach. `hw.Playtest.FastForward stealth` spawns three guards and the existing spirit-lit box for that run, and stops before the ease. Nothing is saved into the map. A missing guard still cannot open the strict gate.
+
+| Field | Result |
+|---|---|
+| Date | |
+| Sightlines read from outside the clearing? | |
+| One sentence | |
+
+---
+
+## Ease
+
+**Stop built.** Waiting on the stroke. `hw.Playtest.FastForward ease` spawns one pad on each of the three guards for that run, and stops before the wind-up. The spend, the wait, and a wrong shape stay the existing verb.
+
+| Field | Result |
+|---|---|
+| Date | |
+| Each guard played the wind-up? | |
 | One sentence | |
 
 ---

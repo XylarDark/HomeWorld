@@ -7,6 +7,8 @@
 #include "HomeWorldWispPlacement.h"
 #include "HomeWorldOpeningReveal.h"
 #include "HomeWorldOpeningDayCamp.h"
+#include "HomeWorldEasePad.h"
+#include "HomeWorldSpiritLitVolume.h"
 #include "HomeWorldRuneShapeComponent.h"
 #include "GameFramework/Character.h"
 #include "HomeWorldGlideMovementComponent.h"
@@ -1037,6 +1039,10 @@ namespace
 	constexpr int32 PlaytestBeatGlider = 12;
 	constexpr int32 PlaytestBeatDelivery = 13;
 	constexpr int32 PlaytestBeatDayCamp = 14;
+	constexpr int32 PlaytestBeatDawnGlide = 15;
+	constexpr int32 PlaytestBeatNightGlide = 16;
+	constexpr int32 PlaytestBeatStealth = 17;
+	constexpr int32 PlaytestBeatEase = 18;
 
 	/** The one runner step the player takes himself. 0 = every step runs (night and the loop). */
 	int32 PlaytestSkipStep(int32 Beat)
@@ -1073,6 +1079,10 @@ namespace
 		case PlaytestBeatGlider: return TEXT("glider");
 		case PlaytestBeatDelivery: return TEXT("delivery");
 		case PlaytestBeatDayCamp: return TEXT("daycamp");
+		case PlaytestBeatDawnGlide: return TEXT("dawnglide");
+		case PlaytestBeatNightGlide: return TEXT("nightglide");
+		case PlaytestBeatStealth: return TEXT("stealth");
+		case PlaytestBeatEase: return TEXT("ease");
 		default: return TEXT("night");
 		}
 	}
@@ -1090,6 +1100,7 @@ namespace
 		// Order matters here: "herb collection" carries both herb and collect.
 		if (Key.Contains(TEXT("heal")) || Key.Contains(TEXT("spring"))) return PlaytestBeatHeal;
 		if (Key.Contains(TEXT("herb")) || Key.Contains(TEXT("garden"))) return PlaytestBeatHerbs;
+		if (Key.Contains(TEXT("stealth"))) return PlaytestBeatStealth;
 		if (Key.Contains(TEXT("spirit"))) return PlaytestBeatSpirit;
 		if (Key.Contains(TEXT("backpack")) || Key.Contains(TEXT("partner")) || Key.Contains(TEXT("gift"))) return PlaytestBeatBackpack;
 		if (Key.Contains(TEXT("kettle")) || Key.Contains(TEXT("tea"))) return PlaytestBeatKettle;
@@ -1098,10 +1109,13 @@ namespace
 		if (Key.Contains(TEXT("fish")) || Key.Contains(TEXT("pond"))) return PlaytestBeatFish;
 		if (Key.Contains(TEXT("sleep")) || Key.Contains(TEXT("bed"))) return PlaytestBeatSleep;
 		if (Key.Contains(TEXT("wisp")) || Key.Contains(TEXT("collect"))) return PlaytestBeatCollect;
+		if (Key.Contains(TEXT("nightglide"))) return PlaytestBeatNightGlide;
 		if (Key.Contains(TEXT("night"))) return PlaytestBeatNight;
 		if (Key.Contains(TEXT("glider"))) return PlaytestBeatGlider;
 		if (Key.Contains(TEXT("delivery"))) return PlaytestBeatDelivery;
 		if (Key.Contains(TEXT("daycamp"))) return PlaytestBeatDayCamp;
+		if (Key.Contains(TEXT("dawnglide"))) return PlaytestBeatDawnGlide;
+		if (Key.Contains(TEXT("ease"))) return PlaytestBeatEase;
 		return 0;
 	}
 
@@ -1122,7 +1136,7 @@ void AHomeWorldCharacter::DebugFastForwardOpening(const FString& Beat)
 {
 	if (Beat.Equals(TEXT("list"), ESearchCase::IgnoreCase))
 	{
-		UE_LOG(LogTemp, Log, TEXT("playtest_ff: beats: spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect, heal, glider, delivery, daycamp"));
+		UE_LOG(LogTemp, Log, TEXT("playtest_ff: beats: spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect, heal, glider, delivery, daycamp, dawnglide, nightglide, stealth, ease"));
 		return;
 	}
 	if (DebugFastForwardStep > 0)
@@ -1133,7 +1147,7 @@ void AHomeWorldCharacter::DebugFastForwardOpening(const FString& Beat)
 	const int32 Stop = PlaytestBeatFromText(Beat);
 	if (Stop == 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("playtest_ff: beat '%s' unknown - spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect, heal, glider, delivery, daycamp"), *Beat);
+		UE_LOG(LogTemp, Warning, TEXT("playtest_ff: beat '%s' unknown - spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect, heal, glider, delivery, daycamp, dawnglide, nightglide, stealth, ease"), *Beat);
 		return;
 	}
 	if (bOpeningNightSpirit)
@@ -1431,7 +1445,9 @@ void AHomeWorldCharacter::TickDebugFastForward(float DeltaTime)
 		}
 		UE_LOG(LogTemp, Log, TEXT("playtest_ff: 9 night ready at the bed - %s"), *GetOpeningTrackerText());
 		if (DebugFastForwardStop == PlaytestBeatGlider || DebugFastForwardStop == PlaytestBeatDelivery
-			|| DebugFastForwardStop == PlaytestBeatDayCamp)
+			|| DebugFastForwardStop == PlaytestBeatDayCamp || DebugFastForwardStop == PlaytestBeatDawnGlide
+			|| DebugFastForwardStop == PlaytestBeatNightGlide || DebugFastForwardStop == PlaytestBeatStealth
+			|| DebugFastForwardStop == PlaytestBeatEase)
 		{
 			Next(10);
 			break;
@@ -1455,7 +1471,12 @@ void AHomeWorldCharacter::TickDebugFastForward(float DeltaTime)
 			Next(12);
 			break;
 		}
-		Next(11);
+		if (DebugFastForwardStop == PlaytestBeatDelivery)
+		{
+			Next(11);
+			break;
+		}
+		Next(13);
 		break;
 	}
 	case 11:
@@ -1473,6 +1494,84 @@ void AHomeWorldCharacter::TickDebugFastForward(float DeltaTime)
 		CampParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		World->SpawnActor<AHomeWorldOpeningDayCamp>(
 			GetActorLocation() + FVector(320.f, 0.f, 0.f), FRotator::ZeroRotator, CampParams);
+		ReadyForOpeningPlaytest();
+		Next(0);
+		break;
+	}
+	case 13:
+	{
+		TryCraftOpeningGlider();
+		FActorSpawnParameters MarkerParams;
+		MarkerParams.Name = FName(TEXT("GP_GlideStart"));
+		MarkerParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		if (AActor* Marker = World->SpawnActor<AActor>(GetActorLocation(), FRotator::ZeroRotator, MarkerParams))
+		{
+			Marker->Tags.Add(FName(TEXT("GlideStart")));
+		}
+		if (DebugFastForwardStop == PlaytestBeatDawnGlide)
+		{
+			ReadyForOpeningPlaytest();
+			Next(0);
+			return;
+		}
+		Next(14);
+		break;
+	}
+	case 14:
+	{
+		if (!BeginOpeningNight())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("playtest_ff: 14 night glide failed"));
+			Next(0);
+			return;
+		}
+		if (DebugFastForwardStop == PlaytestBeatNightGlide)
+		{
+			ReadyForOpeningPlaytest();
+			Next(0);
+			return;
+		}
+		Next(15);
+		break;
+	}
+	case 15:
+	{
+		for (int32 Index = 0; Index < 3; ++Index)
+		{
+			const FVector At = GetActorLocation() + FVector(400.f + Index * 160.f, 0.f, 0.f);
+			FActorSpawnParameters GuardParams;
+			GuardParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			if (AHomeWorldCampActor* Guard = World->SpawnActor<AHomeWorldCampActor>(At, FRotator::ZeroRotator, GuardParams))
+			{
+				Guard->CampRole = EHomeWorldCampRole::Guard;
+				Guard->Tags.Remove(FName(TEXT("NODE_SLEEPER")));
+				Guard->RefreshCampIdentity();
+			}
+			FActorSpawnParameters LightParams;
+			LightParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			World->SpawnActor<AHomeWorldSpiritLitVolume>(At, FRotator::ZeroRotator, LightParams);
+		}
+		if (DebugFastForwardStop == PlaytestBeatStealth)
+		{
+			ReadyForOpeningPlaytest();
+			Next(0);
+			return;
+		}
+		Next(16);
+		break;
+	}
+	case 16:
+	{
+		for (int32 Index = 0; Index < 3; ++Index)
+		{
+			const FVector At = GetActorLocation() + FVector(400.f + Index * 160.f, 80.f, 0.f);
+			FActorSpawnParameters PadParams;
+			PadParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			if (AHomeWorldEasePad* Pad = World->SpawnActor<AHomeWorldEasePad>(At, FRotator::ZeroRotator, PadParams))
+			{
+				Pad->Tags.Add(FName(TEXT("NODE_OPENING_EASE")));
+			}
+		}
 		ReadyForOpeningPlaytest();
 		Next(0);
 		break;
@@ -1579,6 +1678,26 @@ void AHomeWorldCharacter::ReadyForOpeningPlaytest()
 		Target = FindOpeningTaggedActor(World, TEXT("NODE_OPENING_DAY_CAMP"));
 		Distance = 320.f;
 		Note = TEXT("walk into the clearing");
+		break;
+	case PlaytestBeatDawnGlide:
+		Target = FindOpeningTaggedActor(World, TEXT("GlideStart"));
+		Distance = 180.f;
+		Note = TEXT("the launch is yours");
+		break;
+	case PlaytestBeatNightGlide:
+		Target = FindOpeningTaggedActor(World, TEXT("GlideStart"));
+		Distance = 180.f;
+		Note = TEXT("travel only, the launch is yours");
+		break;
+	case PlaytestBeatStealth:
+		Target = FindOpeningTaggedActor(World, TEXT("NODE_GUARD"));
+		Distance = 260.f;
+		Note = TEXT("reach the guard");
+		break;
+	case PlaytestBeatEase:
+		Target = FindOpeningTaggedActor(World, TEXT("NODE_OPENING_EASE"));
+		Distance = 180.f;
+		Note = TEXT("the wind-up is yours");
 		break;
 	default:
 		break;
@@ -1809,7 +1928,8 @@ FString AHomeWorldCharacter::GetPlaytestStateJson() const
 		TEXT("\"fish_caught\":%s,\"night_spirit\":%s,")
 		TEXT("\"wisps_collected\":%d,\"wisps_carried\":%d,\"wisps_healed\":%d,")
 		TEXT("\"dawn_wood\":%d,\"dawn_silk\":%d,\"dawn_metal\":%d,")
-		TEXT("\"glider_crafted\":%s,\"delivery_wood\":%d,\"partner_away\":%s,\"day_camp_eject\":%s}"),
+		TEXT("\"glider_crafted\":%s,\"delivery_wood\":%d,\"partner_away\":%s,\"day_camp_eject\":%s,")
+		TEXT("\"descent_active\":%s,\"cloud_carried\":%d,\"guards_calm\":%d}"),
 		*PlaytestReadyFor,
 		PlaytestReadyDistanceCm,
 		DebugFastForwardStep,
@@ -1833,7 +1953,10 @@ FString AHomeWorldCharacter::GetPlaytestStateJson() const
 		IsOpeningGliderCrafted() ? TEXT("true") : TEXT("false"),
 		GetOpeningDeliveryCountForTest(HomeWorldOpeningMaterials::Wood),
 		GetPartnerPlace() == EHomeWorldFamilyPlace::Away ? TEXT("true") : TEXT("false"),
-		IsDayCampEjectTriggered() ? TEXT("true") : TEXT("false"));
+		IsDayCampEjectTriggered() ? TEXT("true") : TEXT("false"),
+		IsCloudDescentActive() ? TEXT("true") : TEXT("false"),
+		GetCarriedCloudWisps(),
+		SpiritStealthComponent ? SpiritStealthComponent->GetCalmedActorCount() : 0);
 }
 
 void AHomeWorldCharacter::ApplyOpeningWalkSpeed()
