@@ -82,7 +82,12 @@ public:
 
 	/** One wisp, one target. A second target on the same wisp is refused. */
 	bool TryAssignWispToStation(FName WispId, EHomeWorldHomeStation Station);
+	bool TryAssignWispToSurface(FName WispId, FName SurfaceId);
 	const FHomeWorldWispAssignment* FindWisp(FName WispId) const;
+
+	bool RegisterDustProp(FName SurfaceId);
+	int32 GetSurfaceDust(FName SurfaceId) const;
+	bool BeginClean(FName SurfaceId);
 
 private:
 	void SyncPhase();
@@ -113,6 +118,13 @@ private:
 	};
 
 	void RunAssignedStations();
+	void AddDawnDust();
+	void SetSurfaceDust(FName SurfaceId, int32 Dust);
+	void ClearSurface(FName SurfaceId);
+	FHomeWorldDustSurface* FindSurface(FName SurfaceId);
+	const FHomeWorldDustSurface* FindSurface(FName SurfaceId) const;
+	void TickClean(float Step);
+	void RunCleaningWisps();
 
 	float HomeClockSeconds = 0.f;
 	bool bOpeningDayEnded = false;
@@ -129,4 +141,7 @@ private:
 	FHomeWorldServeResult LastServe;
 	FHomeWorldArmedBuff ArmedBuff;
 	TArray<FHomeWorldWispAssignment> WispAssignments;
+	TArray<FHomeWorldDustSurface> DustSurfaces;
+	FName CleanSurfaceId;
+	float CleanRemaining = 0.f;
 };

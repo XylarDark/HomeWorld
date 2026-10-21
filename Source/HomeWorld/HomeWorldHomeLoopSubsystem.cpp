@@ -285,7 +285,18 @@ void UHomeWorldHomeLoopSubsystem::ArmFromServe(float SyncFactor)
 
 float UHomeWorldHomeLoopSubsystem::GetCleanFactor() const
 {
-	return 1.f;
+	if (DustSurfaces.Num() == 0)
+	{
+		return 1.f;
+	}
+	int32 Sum = 0;
+	for (const FHomeWorldDustSurface& Surface : DustSurfaces)
+	{
+		Sum += Surface.Dust;
+	}
+	const float Cap = static_cast<float>(DustSurfaces.Num() * 3);
+	const float Filthy = Cap > 0.f ? static_cast<float>(Sum) / Cap : 0.f;
+	return 1.f - 0.5f * Filthy;
 }
 
 float UHomeWorldHomeLoopSubsystem::GetSprintBonusSeconds() const
@@ -340,6 +351,10 @@ void UHomeWorldHomeLoopSubsystem::ApplyPhase(EHomeWorldTimeOfDayPhase Phase, boo
 	{
 		OpenWindow();
 	}
+	if (Phase == EHomeWorldTimeOfDayPhase::Dawn && (bFirst || LastPhase != EHomeWorldTimeOfDayPhase::Dawn))
+	{
+		AddDawnDust();
+	}
 	LastPhase = Phase;
 	bPhaseInitialized = true;
 }
@@ -382,6 +397,7 @@ void UHomeWorldHomeLoopSubsystem::CloseWindow()
 	{
 		ServeActive(0.5f, true);
 	}
+	RunCleaningWisps();
 }
 
 void UHomeWorldHomeLoopSubsystem::ApplyStep(float Step)
@@ -425,6 +441,7 @@ void UHomeWorldHomeLoopSubsystem::ApplyStep(float Step)
 	{
 		ServeActive(SyncFactorFromFinishes(), false);
 	}
+	TickClean(Step);
 }
 
 void UHomeWorldHomeLoopSubsystem::Advance(float Seconds)
@@ -513,6 +530,156 @@ void UHomeWorldHomeLoopSubsystem::RunAssignedStations()
 			{
 				BeginPrep(RecipeId, Index);
 			}
+		}
+	}
+}
+
+bool UHomeWorldHomeLoopSubsystem::TryAssignWispToSurface(FName WispId, FName SurfaceId)
+{
+	if (WispId.IsNone() || SurfaceId.IsNone() || FindSurface(SurfaceId) == nullptr)
+	{
+		return false;
+	}
+	for (const FHomeWorldWispAssignment& Assignment : WispAssignments)
+	{
+		if (Assignment.WispId == WispId)
+		{
+			return false;
+		}
+	}
+	FHomeWorldWispAssignment Assignment;
+	Assignment.WispId = WispId;
+	Assignment.Target = EHomeWorldWispTarget::Surface;
+	Assignment.SurfaceId = SurfaceId;
+	WispAssignments.Add(Assignment);
+	return true;
+}
+
+bool UHomeWorldHomeLoopSubsystem::RegisterDustProp(FName SurfaceId)
+{
+	if (SurfaceId.IsNone() || SurfaceId == FName(TEXT("Floor")) || FindSurface(SurfaceId) != nullptr)
+	{
+		return false;
+	}
+	int32 Props = 0;
+	for (const FHomeWorldDustSurface& Surface : DustSurfaces)
+	{
+		if (Surface.SurfaceId != FName(TEXT("Floor")))
+		{
+			++Props;
+		}
+	}
+	if (Props >= 6)
+	{
+		return false;
+	}
+	FHomeWorldDustSurface Surface;
+	Surface.SurfaceId = SurfaceId;
+	DustSurfaces.Add(Surface);
+	return true;
+}
+
+FHomeWorldDustSurface* UHomeWorldHomeLoopSubsystem::FindSurface(FName SurfaceId)
+{
+	for (FHomeWorldDustSurface& Surface : DustSurfaces)
+	{
+		if (Surface.SurfaceId == SurfaceId)
+		{
+			return &Surface;
+		}
+	}
+	return nullptr;
+}
+
+const FHomeWorldDustSurface* UHomeWorldHomeLoopSubsystem::FindSurface(FName SurfaceId) const
+{
+	for (const FHomeWorldDustSurface& Surface : DustSurfaces)
+	{
+		if (Surface.SurfaceId == SurfaceId)
+		{
+			return &Surface;
+		}
+	}
+	return nullptr;
+}
+
+void UHomeWorldHomeLoopSubsystem::SetSurfaceDust(FName SurfaceId, int32 Dust)
+{
+	if (FHomeWorldDustSurface* Surface = FindSurface(SurfaceId))
+	{
+		Surface->Dust = FMath::Clamp(Dust, 0, 3);
+	}
+	DustTotal = 0;
+	for (const FHomeWorldDustSurface& Surface : DustSurfaces)
+	{
+		DustTotal += Surface.Dust;
+	}
+}
+
+void UHomeWorldHomeLoopSubsystem::ClearSurface(FName SurfaceId)
+{
+	SetSurfaceDust(SurfaceId, 0);
+}
+
+void UHomeWorldHomeLoopSubsystem::AddDawnDust()
+{
+	if (FindSurface(FName(TEXT("Floor"))) == nullptr)
+	{
+		FHomeWorldDustSurface Floor;
+		Floor.SurfaceId = FName(TEXT("Floor"));
+		DustSurfaces.Add(Floor);
+	}
+	for (FHomeWorldDustSurface& Surface : DustSurfaces)
+	{
+		Surface.Dust = FMath::Min(3, Surface.Dust + 1);
+	}
+	DustTotal = 0;
+	for (const FHomeWorldDustSurface& Surface : DustSurfaces)
+	{
+		DustTotal += Surface.Dust;
+	}
+}
+
+int32 UHomeWorldHomeLoopSubsystem::GetSurfaceDust(FName SurfaceId) const
+{
+	const FHomeWorldDustSurface* Surface = FindSurface(SurfaceId);
+	return Surface ? Surface->Dust : 0;
+}
+
+bool UHomeWorldHomeLoopSubsystem::BeginClean(FName SurfaceId)
+{
+	if (!bWindowOpen || !bBodyForm || FindSurface(SurfaceId) == nullptr || CleanRemaining > 0.f)
+	{
+		return false;
+	}
+	CleanSurfaceId = SurfaceId;
+	CleanRemaining = 3.f;
+	return true;
+}
+
+void UHomeWorldHomeLoopSubsystem::TickClean(float Step)
+{
+	if (CleanRemaining <= 0.f)
+	{
+		return;
+	}
+	CleanRemaining -= Step;
+	if (CleanRemaining <= 0.f)
+	{
+		CleanRemaining = 0.f;
+		ClearSurface(CleanSurfaceId);
+		CleanSurfaceId = NAME_None;
+	}
+}
+
+void UHomeWorldHomeLoopSubsystem::RunCleaningWisps()
+{
+	for (const FHomeWorldWispAssignment& Assignment : WispAssignments)
+	{
+		if (Assignment.Target == EHomeWorldWispTarget::Surface)
+		{
+			ClearSurface(Assignment.SurfaceId);
+			return;
 		}
 	}
 }

@@ -112,3 +112,10 @@ struct FHomeWorldWispAssignment
 	int32 PlotIndex = INDEX_NONE;
 	FName SurfaceId;
 };
+
+/** One dusty surface. Floor is always tracked. Props are capped at six. */
+struct FHomeWorldDustSurface
+{
+	FName SurfaceId;
+	int32 Dust = 0;
+};

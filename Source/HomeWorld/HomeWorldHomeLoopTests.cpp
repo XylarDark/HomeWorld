@@ -353,11 +353,12 @@ bool FHomeLoopDiscardSpendsTest::RunTest(const FString& Parameters)
 	HomeWorldHomeLoopTest::OpenDawn(Scope.World, Loop);
 	TestTrue(TEXT("wash starts"), Loop->BeginPrep(FName(TEXT("RECIPE_KETTLE")), 0));
 	Loop->Advance(4.f);
+	const int32 DustBefore = Loop->GetDustTotal();
 	TestTrue(TEXT("discard spends the washed herb"), Loop->DiscardPrepped(0));
 	TestTrue(TEXT("discard is not a serve"), Loop->GetLastServe().bDiscarded);
 	TestFalse(TEXT("a discarded piece is not a meal"), Loop->GetLastServe().bServed);
 	TestEqual(TEXT("one piece spent"), Loop->GetLastServe().SpentItemIds.Num(), 1);
-	TestEqual(TEXT("dust stays at zero"), Loop->GetDustTotal(), 0);
+	TestEqual(TEXT("discard adds no dust"), Loop->GetDustTotal(), DustBefore);
 	TestEqual(TEXT("no work remains"), Loop->GetActiveWorkCount(), 0);
 	return true;
 }
@@ -401,6 +402,8 @@ bool FHomeLoopArmedBuffDawnTest::RunTest(const FString& Parameters)
 	}
 	Loop->SetOpeningDayEnded(true);
 	HomeWorldHomeLoopTest::OpenDawn(Scope.World, Loop);
+	TestTrue(TEXT("clear the dawn dust"), Loop->BeginClean(FName(TEXT("Floor"))));
+	Loop->Advance(3.f);
 	TestTrue(TEXT("dawn kettle serves"), HomeWorldHomeLoopTest::CookKettle(Loop));
 	TestFalse(TEXT("the slot holds the meal"), Loop->IsArmedBuffSlotEmpty());
 	TestEqual(TEXT("dawn meal covers the coming day"), Loop->GetArmedBuff().CoveredDayId, 1);
@@ -503,6 +506,8 @@ bool FHomeLoopArmedBuffReplacesTest::RunTest(const FString& Parameters)
 
 	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Night);
 	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Dawn);
+	TestTrue(TEXT("clear the new dawn dust"), Loop->BeginClean(FName(TEXT("Floor"))));
+	Loop->Advance(3.f);
 	TestTrue(TEXT("dawn meal replaces the dusk meal"), HomeWorldHomeLoopTest::CookKettle(Loop));
 	TestTrue(TEXT("the slot keeps the later sync"), HomeWorldHomeLoopTest::Nearly(Loop->GetArmedBuff().SyncFactor, 1.f));
 	TestEqual(TEXT("still the same coming day"), Loop->GetArmedBuff().CoveredDayId, 2);
@@ -615,6 +620,118 @@ bool FHomeLoopWispLeavesCloudWispsTest::RunTest(const FString& Parameters)
 	TestFalse(TEXT("the mix still needs a cloud wisp"), Character->TryMixHomesteadFertilizer());
 	TestEqual(TEXT("a refused mix keeps the dung"), Character->GetCarriedDung(), DungBefore);
 	TestEqual(TEXT("a refused mix keeps the cloud count"), Character->GetCarriedCloudWisps(), CloudBefore);
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FHomeLoopDustCapBaselineTest,
+	"HomeWorld.HomeLoop.DustCapBaseline",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FHomeLoopDustCapBaselineTest::RunTest(const FString& Parameters)
+{
+	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
+		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
+	if (!TestNotNull(TEXT("home loop"), Loop))
+	{
+		return false;
+	}
+	for (int32 Index = 0; Index < 6; ++Index)
+	{
+		TestTrue(FString::Printf(TEXT("prop %d"), Index), Loop->RegisterDustProp(FName(*FString::Printf(TEXT("Prop%d"), Index))));
+	}
+	TestFalse(TEXT("the seventh prop is refused"), Loop->RegisterDustProp(FName(TEXT("Prop6"))));
+
+	for (int32 Dawn = 0; Dawn < 3; ++Dawn)
+	{
+		HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Dawn);
+		HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Day);
+	}
+	TestEqual(TEXT("floor is at the cap"), Loop->GetSurfaceDust(FName(TEXT("Floor"))), 3);
+	TestEqual(TEXT("a prop is at the cap"), Loop->GetSurfaceDust(FName(TEXT("Prop0"))), 3);
+	TestTrue(TEXT("a filthy house scales to half"), HomeWorldHomeLoopTest::Nearly(Loop->GetSprintBonusSeconds(), 0.f));
+	TestTrue(TEXT("no meal means no sprint bonus"), Loop->IsArmedBuffSlotEmpty());
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FHomeLoopCleanFactorScalesBuffTest,
+	"HomeWorld.HomeLoop.CleanFactorScalesBuff",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FHomeLoopCleanFactorScalesBuffTest::RunTest(const FString& Parameters)
+{
+	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
+		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
+	if (!TestNotNull(TEXT("home loop"), Loop))
+	{
+		return false;
+	}
+	Loop->SetOpeningDayEnded(true);
+	for (int32 Dawn = 0; Dawn < 3; ++Dawn)
+	{
+		HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Dawn);
+		HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Day);
+	}
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Dawn);
+	Loop->Advance(80.f);
+	TestTrue(TEXT("late wash"), Loop->BeginPrep(FName(TEXT("RECIPE_KETTLE")), 0));
+	Loop->Advance(4.f);
+	Loop->Advance(6.f);
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Day);
+	TestTrue(TEXT("mistime in a filthy house is 15s"), HomeWorldHomeLoopTest::Nearly(Loop->GetSprintBonusSeconds(), 15.f));
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FHomeLoopDustWithoutMealTest,
+	"HomeWorld.HomeLoop.DustWithoutMeal",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FHomeLoopDustWithoutMealTest::RunTest(const FString& Parameters)
+{
+	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
+		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
+	if (!TestNotNull(TEXT("home loop"), Loop))
+	{
+		return false;
+	}
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Dawn);
+	TestEqual(TEXT("dawn dusts the floor"), Loop->GetSurfaceDust(FName(TEXT("Floor"))), 1);
+	TestTrue(TEXT("dust with no meal leaves the bonus at zero"), HomeWorldHomeLoopTest::Nearly(Loop->GetSprintBonusSeconds(), 0.f));
+	TestEqual(TEXT("dust total is the floor"), Loop->GetDustTotal(), 1);
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FHomeLoopCleanClearsOneTest,
+	"HomeWorld.HomeLoop.CleanClearsOne",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FHomeLoopCleanClearsOneTest::RunTest(const FString& Parameters)
+{
+	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
+		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
+	if (!TestNotNull(TEXT("home loop"), Loop))
+	{
+		return false;
+	}
+	TestTrue(TEXT("one prop"), Loop->RegisterDustProp(FName(TEXT("Sill"))));
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Dawn);
+	TestEqual(TEXT("floor dusted"), Loop->GetSurfaceDust(FName(TEXT("Floor"))), 1);
+	TestEqual(TEXT("sill dusted"), Loop->GetSurfaceDust(FName(TEXT("Sill"))), 1);
+	TestTrue(TEXT("clean starts"), Loop->BeginClean(FName(TEXT("Floor"))));
+	Loop->Advance(3.f);
+	TestEqual(TEXT("the floor is clear"), Loop->GetSurfaceDust(FName(TEXT("Floor"))), 0);
+	TestEqual(TEXT("the sill is still dusty"), Loop->GetSurfaceDust(FName(TEXT("Sill"))), 1);
+
+	TestTrue(TEXT("a cleaning wisp takes the sill"), Loop->TryAssignWispToSurface(FName(TEXT("Sweeper")), FName(TEXT("Sill"))));
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Day);
+	TestEqual(TEXT("the wisp cleared one surface"), Loop->GetSurfaceDust(FName(TEXT("Sill"))), 0);
 	return true;
 }
 
