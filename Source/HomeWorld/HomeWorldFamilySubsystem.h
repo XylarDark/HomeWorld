@@ -46,6 +46,15 @@ enum class EHomeWorldPartyAbsence : uint8
 	Bonk
 };
 
+/** Result of the home interact. A refusal leaves the flags as they were. */
+UENUM(BlueprintType)
+enum class EHomeWorldPartyToggle : uint8
+{
+	Refused,
+	Invited,
+	SentHome
+};
+
 /**
  * Game instance subsystem for family member role assignment and persistence (Day 15).
  * Maps spawn index (or stable ID) to role so State Tree and behavior can key off role.
@@ -104,6 +113,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Family|Party")
 	bool TryInviteChild(bool bNightOrDefend, bool bSpiritForm, bool bAtCave, UWorld* World = nullptr);
+
+	/**
+	 * Home interact. At home, by day, in the body, after the rescue: invite, or send that person home
+	 * if they are already out. Anywhere else, at night, in spirit, or before the rescue: refuse.
+	 */
+	EHomeWorldPartyToggle ToggleMemberAtHome(AActor* Target, bool bAtHome, bool bNightOrDefend, bool bSpiritForm, UWorld* World);
 
 	/** Where that person was standing when they were invited. Not saved. */
 	void RememberPartnerHome(const FVector& Location);

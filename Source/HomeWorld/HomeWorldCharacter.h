@@ -95,6 +95,9 @@ public:
 	/** Size-test partner: interact sends them inside, to the kettle. A second press takes the armor gift. */
 	bool TryPartnerLeadInside();
 
+	/** Party invite. The existing interact, at home, after the rescue. A second press sends that person home. */
+	bool TryPartyInviteInFront();
+
 	/** Size-test stations: the kitchen consumable table (one output) and the armory table. */
 	bool TryOpeningStationInFront();
 

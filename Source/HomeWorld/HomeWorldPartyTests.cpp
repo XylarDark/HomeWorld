@@ -375,4 +375,74 @@ bool FPartyFollowLeashTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FPartyHomeInteractTest,
+	"HomeWorld.Party.HomeInteract",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FPartyHomeInteractTest::RunTest(const FString& Parameters)
+{
+	UHomeWorldFamilySubsystem* Family = HomeWorldPartyTest::MakeFamily();
+	HomeWorldPartyTest::FScopedWorld Scope;
+	if (!TestNotNull(TEXT("family"), Family) || !TestNotNull(TEXT("world"), Scope.World))
+	{
+		return false;
+	}
+
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	AHomeWorldOpeningWalker* Partner = Scope.World->SpawnActor<AHomeWorldOpeningWalker>(Params);
+	AHomeWorldOpeningWalker* Child = Scope.World->SpawnActor<AHomeWorldOpeningWalker>(Params);
+	if (!TestNotNull(TEXT("partner"), Partner) || !TestNotNull(TEXT("child"), Child))
+	{
+		return false;
+	}
+	Partner->Tags.Add(TEXT("NPC_PARTNER"));
+	Child->Tags.Add(TEXT("NPC_CHILD"));
+	const FVector PartnerHome(10.f, 0.f, 0.f);
+	const FVector ChildHome(0.f, 10.f, 0.f);
+	Partner->SetActorLocation(PartnerHome);
+	Child->SetActorLocation(ChildHome);
+
+	TestEqual(TEXT("before the rescue the interact refuses"),
+		Family->ToggleMemberAtHome(Partner, true, false, false, Scope.World), EHomeWorldPartyToggle::Refused);
+	TestEqual(TEXT("pre-rescue stays solo"), Family->GetPartySetup(), EHomeWorldPartySetup::Solo);
+
+	Family->SetRescueComplete(true);
+	TestEqual(TEXT("night refuses"),
+		Family->ToggleMemberAtHome(Partner, true, true, false, Scope.World), EHomeWorldPartyToggle::Refused);
+	TestEqual(TEXT("spirit refuses"),
+		Family->ToggleMemberAtHome(Partner, true, false, true, Scope.World), EHomeWorldPartyToggle::Refused);
+	TestEqual(TEXT("away from home refuses"),
+		Family->ToggleMemberAtHome(Partner, false, false, false, Scope.World), EHomeWorldPartyToggle::Refused);
+	TestFalse(TEXT("refusals leave the partner home"), Family->IsPartnerOut());
+
+	TestEqual(TEXT("at home by day they come"),
+		Family->ToggleMemberAtHome(Partner, true, false, false, Scope.World), EHomeWorldPartyToggle::Invited);
+	TestTrue(TEXT("the partner is out"), Family->IsPartnerOut());
+	TestEqual(TEXT("away does not send them home"),
+		Family->ToggleMemberAtHome(Partner, false, false, false, Scope.World), EHomeWorldPartyToggle::Refused);
+	TestTrue(TEXT("the partner stays out"), Family->IsPartnerOut());
+
+	Partner->SetActorLocation(FVector(4000.f, 0.f, 0.f));
+	TestEqual(TEXT("a second press at home sends them home"),
+		Family->ToggleMemberAtHome(Partner, true, false, false, Scope.World), EHomeWorldPartyToggle::SentHome);
+	TestFalse(TEXT("the partner is home"), Family->IsPartnerOut());
+	TestEqual(TEXT("they are back where they stood"), Partner->GetActorLocation(), PartnerHome);
+
+	TestEqual(TEXT("a third press invites again"),
+		Family->ToggleMemberAtHome(Partner, true, false, false, Scope.World), EHomeWorldPartyToggle::Invited);
+	TestEqual(TEXT("the child can come too"),
+		Family->ToggleMemberAtHome(Child, true, false, false, Scope.World), EHomeWorldPartyToggle::Invited);
+	TestEqual(TEXT("both are out"), Family->GetPartySetup(), EHomeWorldPartySetup::AllThree);
+	Child->SetActorLocation(FVector(4000.f, 10.f, 0.f));
+	TestEqual(TEXT("the child's second press sends only the child home"),
+		Family->ToggleMemberAtHome(Child, true, false, false, Scope.World), EHomeWorldPartyToggle::SentHome);
+	TestTrue(TEXT("the partner is still out"), Family->IsPartnerOut());
+	TestFalse(TEXT("the child is home"), Family->IsChildOut());
+	TestEqual(TEXT("the child is back where they stood"), Child->GetActorLocation(), ChildHome);
+
+	return true;
+}
+
 #endif

@@ -104,6 +104,40 @@ bool UHomeWorldFamilySubsystem::TryInviteChild(bool bNightOrDefend, bool bSpirit
 	return true;
 }
 
+EHomeWorldPartyToggle UHomeWorldFamilySubsystem::ToggleMemberAtHome(AActor* Target, bool bAtHome, bool bNightOrDefend, bool bSpiritForm, UWorld* World)
+{
+	if (!Target)
+	{
+		return EHomeWorldPartyToggle::Refused;
+	}
+	const bool bPartner = Target->ActorHasTag(TEXT("NPC_PARTNER"));
+	const bool bChild = Target->ActorHasTag(TEXT("NPC_CHILD"));
+	if (!bPartner && !bChild)
+	{
+		return EHomeWorldPartyToggle::Refused;
+	}
+	if (!bAtHome || !bRescueComplete || bNightOrDefend || bSpiritForm)
+	{
+		return EHomeWorldPartyToggle::Refused;
+	}
+	if (bPartner && bPartnerOut)
+	{
+		bPartnerOut = false;
+		PlaceMemberHome(World, true);
+		return EHomeWorldPartyToggle::SentHome;
+	}
+	if (bChild && bChildOut)
+	{
+		bChildOut = false;
+		PlaceMemberHome(World, false);
+		return EHomeWorldPartyToggle::SentHome;
+	}
+	const bool bInvited = bPartner
+		? TryInvitePartner(false, false, false, World)
+		: TryInviteChild(false, false, false, World);
+	return bInvited ? EHomeWorldPartyToggle::Invited : EHomeWorldPartyToggle::Refused;
+}
+
 void UHomeWorldFamilySubsystem::RememberPartnerHome(const FVector& Location)
 {
 	PartnerHome = Location;

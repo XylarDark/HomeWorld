@@ -1807,6 +1807,58 @@ bool AHomeWorldCharacter::TryOpeningSpiritInFront()
 	return true;
 }
 
+bool AHomeWorldCharacter::TryPartyInviteInFront()
+{
+	FHitResult Hit;
+	AActor* Target = nullptr;
+	if (UGameplayStatics::GetCurrentLevelName(this).Contains(TEXT("SizeTest")))
+	{
+		Target = ResolveOpeningAim(Hit);
+	}
+	else if (TraceInteractHit(Hit))
+	{
+		Target = GetInteractTargetActor(Hit);
+	}
+	if (!Target)
+	{
+		return false;
+	}
+	if (!Target->ActorHasTag(TEXT("NPC_PARTNER")) && !Target->ActorHasTag(TEXT("NPC_CHILD")))
+	{
+		return false;
+	}
+	UWorld* World = GetWorld();
+	UGameInstance* GameInstance = World ? World->GetGameInstance() : nullptr;
+	UHomeWorldFamilySubsystem* Family = GameInstance ? GameInstance->GetSubsystem<UHomeWorldFamilySubsystem>() : nullptr;
+	if (!Family)
+	{
+		return false;
+	}
+	bool bNightOrDefend = false;
+	if (const UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>())
+	{
+		bNightOrDefend = TimeOfDay->GetIsNight() || TimeOfDay->GetCurrentPhase() == EHomeWorldTimeOfDayPhase::Dusk;
+	}
+	const bool bAtHome = !UGameplayStatics::GetCurrentLevelName(this).Contains(TEXT("Field"), ESearchCase::IgnoreCase);
+	const EHomeWorldPartyToggle Result = Family->ToggleMemberAtHome(Target, bAtHome, bNightOrDefend, GetIsSpiritForm(), World);
+	if (Result == EHomeWorldPartyToggle::Refused)
+	{
+		if (!Family->IsRescueComplete())
+		{
+			return false;
+		}
+		ShowInteractFeedback(TEXT("party: stays home"), FColor::Yellow);
+		return true;
+	}
+	const bool bPartner = Target->ActorHasTag(TEXT("NPC_PARTNER"));
+	ShowInteractFeedback(
+		Result == EHomeWorldPartyToggle::SentHome
+			? (bPartner ? TEXT("party: partner stays") : TEXT("party: child stays"))
+			: (bPartner ? TEXT("party: partner comes") : TEXT("party: child comes")),
+		FColor::Green);
+	return true;
+}
+
 bool AHomeWorldCharacter::TryPartnerLeadInside()
 {
 	FHitResult Hit;

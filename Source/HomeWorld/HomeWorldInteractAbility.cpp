@@ -34,7 +34,11 @@ void UHomeWorldInteractAbility::ActivateAbility(const FGameplayAbilitySpecHandle
 
 	if (UGameplayStatics::GetCurrentLevelName(Character).Contains(TEXT("SizeTest")))
 	{
-		bool bHandled = Character->TryOpeningSpiritInFront();
+		bool bHandled = Character->TryPartyInviteInFront();
+		if (!bHandled)
+		{
+			bHandled = Character->TryOpeningSpiritInFront();
+		}
 		if (!bHandled)
 		{
 			bHandled = Character->TryPartnerLeadInside();
@@ -83,7 +87,11 @@ void UHomeWorldInteractAbility::ActivateAbility(const FGameplayAbilitySpecHandle
 		return;
 	}
 
-	bool bHandled = Character->TryOpeningSpiritInFront();
+	bool bHandled = Character->TryPartyInviteInFront();
+	if (!bHandled)
+	{
+		bHandled = Character->TryOpeningSpiritInFront();
+	}
 	if (!bHandled)
 	{
 		bHandled = Character->TryPartnerLeadInside();
