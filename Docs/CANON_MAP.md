@@ -74,7 +74,7 @@ README is left intact as history.
 | **Bench and lair interview** | `Docs/context/BENCH_LAIR_INTERVIEW.md` | picked, 2026-10-15. The lair coils stay parked. The armor table is the opening tutorial, 2026-10-17. |
 | **Principle fit lock** | `Docs/context/PRINCIPLE_FIT_LOCK.md` | picks 1A–10A, 2026-10-16, amended 2026-10-17. The next build is the opening tutorial. Grappling hook, extra pair toys, and lair coils stay parked. |
 | **Companion party (partner and child day company)** | `Docs/41_COMPANION_PARTY_DESIGN.md` | APPROVED, Lead 2026-10-20, picks 1A-8A; build hold lifted. Built in #319 (`1e9b0e00`): party flags, outing clears, night teleport skip, follow leash. Invite hookup in progress. Play-confirm pending. |
-| **Quest tests (opening sweep and preflight)** | `Docs/qa/QUEST_TESTS.md` | `.\Tools\RunTests.ps1 -QuestCheck` is the host-only preflight (#320); `-Quest` is the in-editor sweep (#315, #318). A developer check, not the playtest pass. |
+| **Quest tests (opening sweep and preflight)** | `Docs/qa/QUEST_TESTS.md` | `.\Tools\RunTests.ps1 -QuestCheck` is the host-only preflight (#320); `-QuestCoverage` writes the matrix `Docs/qa/QUEST_COVERAGE.md` (#321); `-Quest` is the in-editor sweep (#315, #318). A developer check, not the playtest pass. |
 | GDD slice | `Docs/01_GDD_MVP.md` | canon |
 | **Cloud descent facts and carried wisp** | `Docs/context/HOMEWORLD_ROUTE.md` + accepted `docs/human-use/test-contract.md` | current route / accepted behavior |
 | Art direction | `Docs/02_ART_BIBLE.md` | canon. `VisionBoard/KeyArt/homestead_dusk_baseline.jpg` is a fit check after a developer design, not a design source. |

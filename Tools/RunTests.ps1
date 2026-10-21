@@ -1,7 +1,8 @@
 # RunTests.ps1 - Run UE automation tests, the host-only quest preflight, or the in-editor opening quest sweep.
-# Run from project root: .\Tools\RunTests.ps1 [-Filter HomeWorld] [-ValidateAssets] [-IncludePythonTests] [-Quest] [-QuestCheck]
+# Run from project root: .\Tools\RunTests.ps1 [-Filter HomeWorld] [-ValidateAssets] [-IncludePythonTests] [-Quest] [-QuestCheck] [-QuestCoverage]
 # In-editor sweep: .\Tools\RunTests.ps1 -Quest [-QuestOnly night,heal] [-QuestList]
 # Quest preflight (host-only, no Editor, no PIE): .\Tools\RunTests.ps1 -QuestCheck
+# Quest coverage matrix (host-only): .\Tools\RunTests.ps1 -QuestCoverage
 # The filter is a test-name prefix; it defaults to HomeWorld, which is what this project's tests
 # are named. UE "groups" match nothing here - a Group: selector ran zero tests, and a run that
 # completes zero tests is an error - so the prefix is the selector, not the group. The Editor.Python
@@ -11,7 +12,7 @@
 # with the locked engine from the registry, and an unset one is resolved from it. Set it to point
 # elsewhere only on a project that is not engine-locked.
 # -Quest skips UE_EDITOR: it needs the open Editor on UnrealMCP port 55557, not a new process.
-# -QuestCheck skips UE_EDITOR too: it is host Python only and never starts or touches the Editor.
+# -QuestCheck and -QuestCoverage skip UE_EDITOR too: it is host Python only and never starts or touches the Editor.
 # See Docs/qa/QUEST_TESTS.md.
 
 param(
