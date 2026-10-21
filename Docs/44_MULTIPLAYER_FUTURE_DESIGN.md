@@ -8,6 +8,8 @@ Mode: solo. State: decide. This file records a future direction and cheap readin
 
 Do not copy this into the vision board, the GDD, or the canon map body. The canon map keeps one pointer row.
 
+When Lead answers section 7, update section 2 and section 5 in the same commit; do not scatter picks across other canon files until a stage gate opens.
+
 ## 1. Status and slice boundary
 
 The vertical slice and T0 queue stay solo. [Docs/canon/MVP.md](canon/MVP.md) lists **Multiplayer netcode** under explicit out of scope. [Docs/canon/CONSTRAINTS.md](canon/CONSTRAINTS.md) says **No extra backend / multiplayer netcode unless Lead specifies.** [Docs/canon/DO_NOT.md](canon/DO_NOT.md) forbids **Co-op drop-in on hub (MVP)** because the homestead bible uses an NPC family instead. [Docs/canon/DECISIONS.md](canon/DECISIONS.md) records the homestead bible as **safe hub + NPC family (no co-op MVP).** [docs/architecture/HOMEWORLD_TRADEOFFS.md](../docs/architecture/HOMEWORLD_TRADEOFFS.md) ranks **One playable client** and **Act 1 is a lone wanderer; co-op is later**, and skips inventing a consistency window for co-op until a real server quantum exists.
