@@ -43,23 +43,41 @@ FString UHomeWorldHomeLoopSubsystem::LogStation(EHomeWorldHomeStation Station) c
 
 bool UHomeWorldHomeLoopSubsystem::GetRecipe(FName RecipeId, FHomeWorldRecipe& OutRecipe) const
 {
-	if (RecipeId != FName(TEXT("RECIPE_KETTLE")))
-	{
-		return false;
-	}
-
 	OutRecipe = FHomeWorldRecipe();
 	OutRecipe.Id = RecipeId;
 	OutRecipe.Vessel = EHomeWorldHomeVessel::Pot;
 	OutRecipe.BuffId = EHomeWorldHomeBuff::Stamina;
 
-	FHomeWorldRecipeIngredient Herb;
-	Herb.ChestItemId = FName(TEXT("ITEM_HERB"));
-	Herb.PrepStation = EHomeWorldHomeStation::Sink;
-	Herb.PrepSeconds = 4.f;
-	Herb.CookSeconds = 10.f;
-	OutRecipe.Ingredients.Add(Herb);
-	return true;
+	if (RecipeId == FName(TEXT("RECIPE_KETTLE")))
+	{
+		FHomeWorldRecipeIngredient Herb;
+		Herb.ChestItemId = FName(TEXT("ITEM_HERB"));
+		Herb.PrepStation = EHomeWorldHomeStation::Sink;
+		Herb.PrepSeconds = 4.f;
+		Herb.CookSeconds = 10.f;
+		OutRecipe.Ingredients.Add(Herb);
+		return true;
+	}
+
+	if (RecipeId == FName(TEXT("RECIPE_GREENS_HERB")))
+	{
+		FHomeWorldRecipeIngredient Herb;
+		Herb.ChestItemId = FName(TEXT("ITEM_HERB"));
+		Herb.PrepStation = EHomeWorldHomeStation::Sink;
+		Herb.PrepSeconds = 4.f;
+		Herb.CookSeconds = 10.f;
+		OutRecipe.Ingredients.Add(Herb);
+
+		FHomeWorldRecipeIngredient Greens;
+		Greens.ChestItemId = FName(TEXT("ITEM_GREENS"));
+		Greens.PrepStation = EHomeWorldHomeStation::Board;
+		Greens.PrepSeconds = 6.f;
+		Greens.CookSeconds = 10.f;
+		OutRecipe.Ingredients.Add(Greens);
+		return true;
+	}
+
+	return false;
 }
 
 bool UHomeWorldHomeLoopSubsystem::TryOpeningKettleBrew(AHomeWorldCharacter* Character)
@@ -247,10 +265,9 @@ void UHomeWorldHomeLoopSubsystem::ServeActive(float SyncFactor, bool bKeepUnfini
 		if (bInVessel)
 		{
 		LastServe.SpentItemIds.Add(Work.ChestItemId);
-		if (Work.ChestItemId == FName(TEXT("ITEM_HERB")))
+		if (int32* Count = Chest.Find(Work.ChestItemId))
 		{
-			int32* Count = Chest.Find(Work.ChestItemId);
-			if (Count && *Count > 0)
+			if (*Count > 0)
 			{
 				--(*Count);
 			}

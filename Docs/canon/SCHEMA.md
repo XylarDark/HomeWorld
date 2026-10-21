@@ -76,7 +76,8 @@ Chest items are not `RES_*` ids. The six-resource list stays six. Nurture stays 
 
 | Item | Source | Spend |
 |---|---|---|
-| `ITEM_HERB` | One home plot. Costs 1× `RES_SEED`. Ready after 2 home windows with a wisp on the plot. | Post-tutorial `RECIPE_KETTLE` spends 1 |
+| `ITEM_HERB` | One home plot. Costs 1× `RES_SEED`. Ready after 2 home windows with a wisp on the plot. | Post-tutorial `RECIPE_KETTLE` spends 1. `RECIPE_GREENS_HERB` spends 1. |
+| `ITEM_GREENS` | One home plot. Costs 1× `RES_SEED`. Ready after 2 home windows with a wisp on the plot. | `RECIPE_GREENS_HERB` spends 1. |
 
 ## Day / night clock
 

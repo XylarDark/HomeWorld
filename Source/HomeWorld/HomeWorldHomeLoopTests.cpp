@@ -10,6 +10,7 @@
 #include "HomeWorldHomeLoopSubsystem.h"
 #include "HomeWorldInventorySubsystem.h"
 #include "HomeWorldInventoryTypes.h"
+#include "HomeWorldQuestLog.h"
 #include "HomeWorldTimeOfDaySubsystem.h"
 
 /**
@@ -108,7 +109,10 @@ bool FHomeLoopKettleStillBrewsTest::RunTest(const FString& Parameters)
 	TestEqual(TEXT("wash at the sink"), Recipe.Ingredients[0].PrepStation, EHomeWorldHomeStation::Sink);
 	TestEqual(TEXT("sink prep is 4s"), Recipe.Ingredients[0].PrepSeconds, 4.f);
 	TestEqual(TEXT("pot cook is 10s"), Recipe.Ingredients[0].CookSeconds, 10.f);
-	TestFalse(TEXT("greens recipe is not in this bite"), Loop->GetRecipe(FName(TEXT("RECIPE_GREENS_HERB")), Recipe));
+	FHomeWorldRecipe Greens;
+	TestTrue(TEXT("greens row exists beside kettle"), Loop->GetRecipe(FName(TEXT("RECIPE_GREENS_HERB")), Greens));
+	TestTrue(TEXT("kettle row is still the kettle"), Loop->GetRecipe(FName(TEXT("RECIPE_KETTLE")), Recipe));
+	TestEqual(TEXT("kettle id stays"), Recipe.Id, FName(TEXT("RECIPE_KETTLE")));
 
 	UHomeWorldTimeOfDaySubsystem* TimeOfDay = Scope.World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
 	if (!TestNotNull(TEXT("time of day"), TimeOfDay))
@@ -860,6 +864,89 @@ bool FHomeLoopResourcesStaySixTest::RunTest(const FString& Parameters)
 	TestTrue(TEXT("herb remains a resource"), Ids.Contains(HomeWorldInventory::RES_HERB));
 	TestFalse(TEXT("ITEM_HERB is not a RES id"), Ids.Contains(FName(TEXT("ITEM_HERB"))));
 	TestFalse(TEXT("ITEM_GREENS is not a RES id"), Ids.Contains(FName(TEXT("ITEM_GREENS"))));
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FHomeLoopGreensHerbSyncTest,
+	"HomeWorld.HomeLoop.GreensHerbSync",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FHomeLoopGreensHerbSyncTest::RunTest(const FString& Parameters)
+{
+	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
+		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
+	if (!TestNotNull(TEXT("home loop"), Loop))
+	{
+		return false;
+	}
+	Loop->SetOpeningDayEnded(true);
+	HomeWorldHomeLoopTest::OpenDawn(Scope.World, Loop);
+	const FName Greens(TEXT("RECIPE_GREENS_HERB"));
+
+	TestTrue(TEXT("greens start on the board"), Loop->BeginPrep(Greens, 1));
+	Loop->Advance(2.f);
+	TestTrue(TEXT("herb starts two seconds later"), Loop->BeginPrep(Greens, 0));
+	Loop->Advance(4.f);
+	Loop->Advance(10.f);
+	TestTrue(TEXT("matched finishes serve"), Loop->GetLastServe().bServed);
+	TestTrue(TEXT("matched finishes are full sync"), HomeWorldHomeLoopTest::Nearly(Loop->GetLastServe().SyncFactor, 1.f));
+	TestEqual(TEXT("greens arm stamina"), Loop->GetArmedBuff().BuffId, EHomeWorldHomeBuff::Stamina);
+
+	TestTrue(TEXT("herb wash"), Loop->BeginPrep(Greens, 0));
+	TestTrue(TEXT("greens chop"), Loop->BeginPrep(Greens, 1));
+	Loop->Advance(4.f);
+	Loop->Advance(2.f);
+	Loop->Advance(8.f);
+	Loop->Advance(2.f);
+	TestTrue(TEXT("a two second miss still serves"), Loop->GetLastServe().bServed);
+	TestTrue(TEXT("a two second miss is half sync"), HomeWorldHomeLoopTest::Nearly(Loop->GetLastServe().SyncFactor, 0.5f));
+	TestEqual(TEXT("the later serve replaces the slot"), Loop->GetArmedBuff().BuffId, EHomeWorldHomeBuff::Stamina);
+	TestTrue(TEXT("the slot keeps the later sync"), HomeWorldHomeLoopTest::Nearly(Loop->GetArmedBuff().SyncFactor, 0.5f));
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FHomeLoopGreensHerbOffOpeningTest,
+	"HomeWorld.HomeLoop.GreensHerbOffOpening",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FHomeLoopGreensHerbOffOpeningTest::RunTest(const FString& Parameters)
+{
+	FHomeWorldOpeningQuestFacts Facts;
+	Facts.bSpiritClaimed = true;
+	Facts.HerbsGathered = HomeWorldOpeningHerbQuota;
+	Facts.bHerbFromWest = true;
+	Facts.bHerbFromEast = true;
+	Facts.bBackpack = true;
+	const TArray<FHomeWorldQuestStep> Steps = UHomeWorldQuestLog::BuildOpeningSteps(Facts);
+	bool bKettle = false;
+	bool bGreens = false;
+	for (const FHomeWorldQuestStep& Step : Steps)
+	{
+		if (Step.Text == TEXT("Brew the kettle."))
+		{
+			bKettle = true;
+		}
+		if (Step.Text.Contains(TEXT("greens")) || Step.Id == FName(TEXT("RECIPE_GREENS_HERB")))
+		{
+			bGreens = true;
+		}
+	}
+	TestTrue(TEXT("the opening kettle step is unchanged"), bKettle);
+	TestFalse(TEXT("opening steps gained no greens step"), bGreens);
+
+	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
+		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
+	if (!TestNotNull(TEXT("home loop"), Loop))
+	{
+		return false;
+	}
+	HomeWorldHomeLoopTest::OpenDawn(Scope.World, Loop);
+	TestFalse(TEXT("the board stays inert on the tutorial day"), Loop->CanRunStation(EHomeWorldHomeStation::Board));
+	TestFalse(TEXT("greens cannot start before the first sleep"), Loop->BeginPrep(FName(TEXT("RECIPE_GREENS_HERB")), 1));
 	return true;
 }
 
