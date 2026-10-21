@@ -24,7 +24,7 @@ The player steers a glider down through spirit-blue clouds and lands in the exis
 
 ## 3. What the 2026-10-20 follow-up decides
 
-- **1A.** Collection is the night descent only. The carry cap is two: one cloud wisp for the homestead wound, one to mix with one dung as fertilizer. The day glide has no pickup. GDD §9 step 3 still says the day descent collects a cloud wisp. That sentence stays in the GDD until Lead yeses a replacement sentence. This doc does not edit the GDD.
+- **1A.** Collection is the night descent only. The carry cap is two: one cloud wisp for the homestead wound, one to mix with one dung as fertilizer. The day glide has no pickup. Lead yesed that GDD sentence on 2026-10-20. It is [01_GDD_MVP.md](01_GDD_MVP.md) §9 step 3.
 - **2A.** There is no fixed count of clouds that show a wisp, so a missed cloud can still leave another to find. The player still holds at most two, and only on the night glide.
 - **3A.** The field's horizontal spread stays a taste placeholder. The locked horizontal edge is the 1560 m plains edge on the straight-glide heading only. Past that edge the plains end on that heading. Other headings have no edge. Clouds do not draw a ring. The code default of 80 m (`HorizontalExtentCm` = 8000) is not the route.
 
@@ -59,7 +59,6 @@ A later placement, when Lead asks, is one `AHomeWorldCloudField` on the descent 
 
 ## 7. Sentences this doc leaves in place
 
-- **GDD §9 step 3** still says the day descent collects a cloud wisp and keeps it through landing. Follow-up 1A is the night-only rule. The GDD sentence waits for Lead's yes before anyone rewrites it. The code already follows the night-only rule.
 - **GDD §12** lists night flight as out of scope. The route's night spirit glide uses this same drop and the same steer, and follow-up 1A collects there. The fertilizer spread stays out of this packet on either reading.
 - **GDD §6** places three hurt wisps at a planet wound site. The route's homestead wound is a different sentence. This doc moves neither.
 - **The old packet** said to collect on the way down, one wisp per dung. The 2026-10-07 night cap replaced that line: two cloud wisps a night, and no third. Follow-up 1A keeps the cap.

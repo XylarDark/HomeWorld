@@ -205,11 +205,11 @@ Both complete = V7 done. Day: targets visible but nurture blocked.
 
 ## 9. Transit
 
-### Active cloud descent (day/body)
+### Active cloud descent (day glide and night spirit glide)
 
 1. Player begins at the lookout / glider perch.
 2. Confirm → freely steer through the cloud descent. Steering has no rail, corridor, or artificial bounds.
-3. Collect a cloud wisp; it stays with the player through landing.
+3. On the night descent only, collect up to two cloud wisps. One is for the homestead wound. One is for fertilizer. The day glide collects nothing.
 4. Exit below the cloud layer and land in the existing field. Walk control returns on landing.
 5. The route remains a glider descent; do not add a general flight HUD or energy meter. Duration is 30 s from launch to landing.
 
