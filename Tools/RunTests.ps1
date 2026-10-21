@@ -25,11 +25,31 @@ param(
     [switch]$QuestList,
     # Host-only quest preflight (run_quest_tests_host.py --check). Exit 0 clean,
     # 2 a real manifest/C++ mismatch. No Editor, no PIE, no map load.
-    [switch]$QuestCheck
+    [switch]$QuestCheck,
+    # Host-only quest coverage matrix (run_quest_tests_host.py --coverage).
+    # Writes Saved/quest_coverage.json + Docs/qa/QUEST_COVERAGE.md. Exit 0
+    # built, 2 when the manifest or the coverage sidecar cannot load.
+    [switch]$QuestCoverage
 )
 
 $ErrorActionPreference = "Stop"
 $ProjectRoot = $PSScriptRoot + "\.."
+
+# Quest coverage matrix (host-only quest_coverage.py --coverage, no Editor).
+if ($QuestCoverage) {
+    $QuestScript = Join-Path $ProjectRoot "Content\Python\run_quest_tests_host.py"
+    if (-not (Test-Path $QuestScript)) {
+        Write-Error "run_quest_tests_host.py not found at $QuestScript"
+        exit 1
+    }
+    Push-Location $ProjectRoot
+    try {
+        & python @($QuestScript, "--coverage")
+        exit $LASTEXITCODE
+    } finally {
+        Pop-Location
+    }
+}
 
 if ($QuestCheck) {
     $QuestScript = Join-Path $ProjectRoot "Content\Python\run_quest_tests_host.py"

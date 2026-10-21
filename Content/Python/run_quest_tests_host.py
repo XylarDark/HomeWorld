@@ -6,14 +6,23 @@
 #   python Content/Python/run_quest_tests_host.py --only night,collect,heal
 #   python Content/Python/run_quest_tests_host.py --list
 #   python Content/Python/run_quest_tests_host.py --check
+#   python Content/Python/run_quest_tests_host.py --coverage
 #   .\Tools\RunTests.ps1 -Quest
 #   .\Tools\RunTests.ps1 -QuestCheck
+#   .\Tools\RunTests.ps1 -QuestCoverage
 #
 # --check is the host-only quest preflight (quest_preflight.py): it proves the
 # manifest matches the C++ fast-forward - ids, stop words, skip steps, snapshot
 # paths, the documented beat list, and the L_SizeTest map - without an Editor,
 # PIE, or a map load. It exits 0 clean and 2 on a real mismatch (file + symbol).
 # Unreadable parses warn and never fail.
+#
+# --coverage is the host-only quest coverage matrix (quest_coverage.py): one
+# row per beat showing its manifest checks, the C++ automation tests declared
+# to cover it, the latest result from Saved/quest_tests.json (inconclusive if
+# absent - never a pass), and the checks that stay human-only. It writes
+# Saved/quest_coverage.json plus the static snapshot Docs/qa/QUEST_COVERAGE.md.
+# Exit 0 built, 2 when the manifest or the declared sidecar cannot load.
 #
 # The script sends execute_python_script("quest_tests.py") over the Editor's
 # raw TCP command port, then polls Saved/quest_tests.json. The suite runs on
@@ -22,7 +31,8 @@
 # Exit codes: 0 all selected beats passed; 1 a beat failed or was
 # inconclusive; 2 the Editor, request, or run could not be reached; 3 a run is
 # already active. With --check, 0 means clean and 2 means a real manifest/C++
-# mismatch.
+# mismatch. With --coverage, 0 means the matrix was built and 2 means the
+# manifest or the declared-coverage sidecar could not be loaded.
 
 import argparse
 import json
@@ -145,6 +155,8 @@ def main():
     parser.add_argument("--list", action="store_true", help="print the beats and exit")
     parser.add_argument("--check", action="store_true",
                         help="host-only preflight: no Editor, no PIE, no map load; exit 2 on a real mismatch")
+    parser.add_argument("--coverage", action="store_true",
+                        help="host-only quest coverage matrix; writes Saved/quest_coverage.json + Docs/qa/QUEST_COVERAGE.md")
     parser.add_argument("--no-load-level", action="store_true", help="refuse to load L_SizeTest")
     parser.add_argument("--timeout", type=int, default=1800, help="poll timeout in seconds (default 1800)")
     args = parser.parse_args()
@@ -152,6 +164,10 @@ def main():
     if args.check:
         import quest_preflight
         return quest_preflight.main()
+
+    if args.coverage:
+        import quest_coverage
+        return quest_coverage.main()
 
     contract_errors = contract.validate_manifest(manifest.QUESTS)
     if contract_errors:

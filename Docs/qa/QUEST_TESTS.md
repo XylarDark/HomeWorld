@@ -45,6 +45,14 @@ No Editor, no PIE, no map load, no build. It reuses `quest_test_contract.validat
 
 Exit `0` clean, `2` on a real mismatch, printed as `file :: symbol`. A parse the preflight cannot answer is a warning ("unsure"), never a failure; UnrealMCP reachability and a stale editor DLL are warnings too. `Content/Python/tests/test_quest_preflight.py` plants every mismatch class into a disposable copy of the tree and proves each one exits 2.
 
+## Coverage matrix
+
+```powershell
+.\Tools\RunTests.ps1 -QuestCoverage   # python Content/Python/run_quest_tests_host.py --coverage
+```
+
+Host-only, no Editor. Builds one row per opening beat: its manifest checks, the C++ automation tests **declared** to cover it (`Content/Python/quest_test_coverage.py` — never inferred from test names), the latest sweep result from `Saved/quest_tests.json` (absent means `inconclusive`, never a pass), and what stays human-only. Writes `Saved/quest_coverage.json` and regenerates the static snapshot [`QUEST_COVERAGE.md`](QUEST_COVERAGE.md) byte-stably, so a run never dirties a tracked file. An empty declared-tests cell is a real gap the tool leaves visible (`fish`, today). Exit `0` built, `2` when the manifest or the declared sidecar cannot load; a declared test name that no longer exists warns (the preflight warns too). See [`QUEST_COVERAGE.md`](QUEST_COVERAGE.md) for the current matrix.
+
 ## What a beat checks
 
 Every beat starts from the manifest's `stop`, waits for `playtest_ff: ready for <id>`, then evaluates declarative checks against one snapshot:
