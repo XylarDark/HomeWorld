@@ -179,4 +179,4 @@ Wrong versions → build failure. Read `.uproject` `EngineAssociation` first.
 | Function Library | `Source/<Module>/Public/<Name>.h` | `Source/<Module>/Private/<Name>.cpp` |
 | Plugin Module | `Plugins/<Plugin>/Source/<Module>/Public/` | `Plugins/<Plugin>/Source/<Module>/Private/` |
 
-If the project uses a flat structure (`Source/Module/*.h` and `*.cpp` together), follow that instead. `Glob` the module directory first to see which layout it uses.
+If the project uses a flat structure (`Source/<Module>/*.h` and `*.cpp` together), follow that instead. `Glob` the module directory first to see which layout it uses.

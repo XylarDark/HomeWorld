@@ -135,7 +135,7 @@ Use `TodoWrite` only when the change spans three or more files or has ordered de
 
 ```
 execute_tool(command="search_symbol --q UMyGameplayComponent")
-execute_tool(command="get_file_problems --filePath Source/MyModule/MyGameplayComponent.cpp")
+execute_tool(command="get_file_problems --filePath Source/<GameModule>/MyGameplayComponent.cpp")
 ```
 
 In Claude Code the tool name is namespaced by the MCP server key from the environment's config — `mcp__<key>__execute_tool`. The key is not knowable in advance: `rider` in a local IDE, `ide-headless-mcp` in a headless eval container, `jetbrains` or `ide` elsewhere, and it may contain hyphens. The same skill run therefore sees a different name in each environment. Never type a prefix from memory. Resolve it once, by bare name:
@@ -151,7 +151,7 @@ ToolSearch(query="+execute_tool", max_results=5)
 | Find a class, method, field, enum, or UE type | `search_symbol --q <name>` |
 | IDE text search when generated/reflected code or compact results matter | `search_text --q <text>` |
 | Check one changed file | `get_file_problems --filePath <path>` |
-| Check several changed files | `lint_files --files '["Source/Module/Foo.h","Source/Module/Foo.cpp"]'` |
+| Check several changed files | `lint_files --files '["Source/<GameModule>/Foo.h","Source/<GameModule>/Foo.cpp"]'` |
 | Rename, move, or re-sign an existing symbol | Not on this project. `rename_refactoring` is whitelist-off only. `move_type_to_namespace` and `change_api_signature` do not resolve HomeWorld C++. Hand-edit, or `safe_delete --preview true` to list referencing files. |
 | Reformat changed files | `reformat_file` is not exposed. Leave formatting to the editor save. |
 | Build | `.\Tools\Safe-Build.ps1`. `build_solution_start` is not exposed. |
@@ -161,7 +161,7 @@ ToolSearch(query="+execute_tool", max_results=5)
 Command syntax:
 
 - Every `--flag` takes a value — bare flags are not supported. Booleans need an explicit `true`/`false`.
-- List parameters are JSON arrays, even for one element, wrapped in single quotes: `--files '["Source/Module/Foo.cpp"]'`.
+- List parameters are JSON arrays, even for one element, wrapped in single quotes: `--files '["Source/<GameModule>/Foo.cpp"]'`.
 - Paths are relative to the solution root, with forward slashes; `../` reaches outside it, which is how you read engine sources.
 - `search_text`, `search_regex`, `search_file`, and `search_symbol` all take `--q` — not `--query`.
 - **Flag casing is per-tool.** Path flags are camelCase (`--filePath`) *except* `read_file`, which takes snake_case `--file_path`. Do not carry a flag name over from a neighbouring tool; that mistake costs a full round trip.

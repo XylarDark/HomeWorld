@@ -1,6 +1,6 @@
 ---
 name: agent-workflow
-description: Use for a new command pattern, a KNOWN_ERRORS entry, passing a flag through an npm script, deleting Content/Python/tmp_*.py, or a new editor tool. A new tool reads Docs/tools/GAME_TOOL_CATALOG.md first. A path already named does not use it.
+description: Use for a new command pattern, a KNOWN_ERRORS entry, passing a flag through an npm script, deleting transient Content/Python scratch files, or a new editor tool. A new tool reads Docs/tools/GAME_TOOL_CATALOG.md first. A path already named does not use it.
 ---
 
 # Agent workflow

@@ -57,7 +57,7 @@ Every Rider tool also takes `rootFolder`. Pass the solution root whenever it is 
 | Confirm a contract after reading the file | Read the declaration; `get_symbol_info` is off the whitelist |
 | Trace what the method under test calls or needs | `rg <MethodName>` — `analyze_calls` is off the whitelist |
 | Check one changed test file | `get_file_problems --filePath <path>` |
-| Check several changed files | `lint_files --files '["Source/FooTests/Private/FooTests.cpp"]'` |
+| Check several changed files | `lint_files --files '["Source/<TestsModule>/Private/FooTests.cpp"]'` |
 | Build for broad changes | `.\Tools\Safe-Build.ps1` — `build_solution_*` are not exposed |
 | Project-wide problems after a successful build | `get_project_problems` |
 | Reformat changed files | Not exposed (`reformat_file`); match the file's existing style by hand |
@@ -65,7 +65,7 @@ Every Rider tool also takes `rootFolder`. Pass the solution root whenever it is 
 Command syntax:
 
 - Every `--flag` takes a value — bare flags are not supported. Booleans need an explicit `true`/`false`.
-- List parameters are JSON arrays, even for one element, wrapped in single quotes: `--files '["Source/FooTests/Private/FooTests.cpp"]'`.
+- List parameters are JSON arrays, even for one element, wrapped in single quotes: `--files '["Source/<TestsModule>/Private/FooTests.cpp"]'`.
 - Paths are relative to the solution root, with forward slashes.
 - `search_text`, `search_regex`, `search_file`, and `search_symbol` all take `--q` — not `--query`. `search_symbol` finds project symbols only; add `--include_external true` for an engine or SDK symbol, which is common when the API under test is engine-side.
 - Reference only — both are off this project's default whitelist, so a call returns `Tool '<x>' not found`. Where exposed (`-AllowedTools '*'`), `analyze_calls` is name-based: `--symbolFqn` plus `--analysisKind`, never a path/line/column, and `get_symbol_info` is the position-based one.

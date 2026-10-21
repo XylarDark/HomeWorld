@@ -19,7 +19,7 @@ Rider disables the generic platform `search_symbol`, `lint_files`, `get_file_pro
 - Every `--flag` needs a value. Bare flags are rejected.
 - Booleans are explicit: `--errorsOnly false`, `--preview true`. Only the literal `true` (any case) is true.
 - Numbers pass through directly: `--limit 25`, `--timeout 60000`.
-- Objects and arrays are JSON, single-quoted, always an array even for one element: `--files '["Source/FooTests/Private/FooTests.cpp"]'`, `--paths '["Source/**"]'`.
+- Objects and arrays are JSON, single-quoted, always an array even for one element: `--files '["Source/<TestsModule>/Private/FooTests.cpp"]'`, `--paths '["Source/**"]'`.
 - Quote any value containing spaces.
 - Paths are relative to the solution/project root, with forward slashes.
 - Omit an optional parameter rather than passing an empty string.
@@ -29,10 +29,10 @@ Every tool — the router included — also accepts `rootFolder`, the absolute p
 
 ```
 execute_tool(command="search_symbol --q UExampleComponent")
-execute_tool(command="get_file_problems --filePath Source/ProjectTests/Private/ExampleTests.cpp --errorsOnly false")
-execute_tool(command="lint_files --files '[\"Source/ProjectTests/Private/ExampleTests.cpp\"]' --min_severity error")
-execute_tool(command="reformat_file --files '[\"Source/ProjectTests/Private/ExampleTests.cpp\"]'")
-execute_tool(command="build_solution_start --filesToRebuild '[\"Source/ProjectTests/Private/ExampleTests.cpp\"]'")
+execute_tool(command="get_file_problems --filePath Source/<TestsModule>/Private/ExampleTests.cpp --errorsOnly false")
+execute_tool(command="lint_files --files '[\"Source/<TestsModule>/Private/ExampleTests.cpp\"]' --min_severity error")
+execute_tool(command="reformat_file --files '[\"Source/<TestsModule>/Private/ExampleTests.cpp\"]'")
+execute_tool(command="build_solution_start --filesToRebuild '[\"Source/<TestsModule>/Private/ExampleTests.cpp\"]'")
 ```
 
 Rider refreshes each file from disk before analyzing, formatting, or refactoring it, so files written with `Edit`/`Write` need no save or sync step first.

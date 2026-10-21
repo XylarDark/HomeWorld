@@ -33,4 +33,3 @@ Use when adding or modifying code that touches APIs that changed across UE 5.7â†
 - [Docs/22_UE58_UPGRADE.md](../../../Docs/22_UE58_UPGRADE.md) â€” upgrade track
 - [.cursor/rules/unreal-cpp.mdc](../../../.cursor/rules/unreal-cpp.mdc)
 - [docs/KNOWN_ERRORS.md](../../../docs/KNOWN_ERRORS.md)
-- Legacy skill: [ue57-api-check](../ue57-api-check/SKILL.md)

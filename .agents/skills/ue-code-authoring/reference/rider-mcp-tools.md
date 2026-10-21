@@ -33,7 +33,7 @@ Detail and the token-efficiency notes: `docs/tools/Rider_MCP_for_UE_Games.md`.
 - Every `--flag` needs a value. Bare flags are rejected.
 - Booleans are explicit: `--errorsOnly false`, `--preview true`. Only the literal `true` (any case) is true.
 - Numbers pass through directly: `--limit 25`, `--timeout 60000`.
-- Objects and arrays are JSON, single-quoted, always an array even for one element: `--files '["Source/Module/Foo.cpp"]'`, `--paths '["Source/**"]'`.
+- Objects and arrays are JSON, single-quoted, always an array even for one element: `--files '["Source/<GameModule>/Foo.cpp"]'`, `--paths '["Source/**"]'`.
 - Quote any value containing spaces.
 - Paths are relative to the solution/project root, with forward slashes. A path outside the root is
   reachable with `../` (engine and SDK sources resolve this way).
@@ -47,10 +47,10 @@ calling; do not carry a flag name over from a neighbouring tool. Guessing here c
 
 ```
 execute_tool(command="search_symbol --q UMyGameplayComponent")
-execute_tool(command="get_file_problems --filePath Source/MyModule/MyGameplayComponent.cpp --errorsOnly false")
-execute_tool(command="lint_files --files '[\"Source/MyModule/Foo.h\",\"Source/MyModule/Foo.cpp\"]' --min_severity error")
-execute_tool(command="reformat_file --files '[\"Source/MyModule/Foo.h\",\"Source/MyModule/Foo.cpp\"]'")
-execute_tool(command="build_solution_start --filesToRebuild '[\"Source/MyModule/Foo.cpp\"]'")
+execute_tool(command="get_file_problems --filePath Source/<GameModule>/MyGameplayComponent.cpp --errorsOnly false")
+execute_tool(command="lint_files --files '[\"Source/<GameModule>/Foo.h\",\"Source/<GameModule>/Foo.cpp\"]' --min_severity error")
+execute_tool(command="reformat_file --files '[\"Source/<GameModule>/Foo.h\",\"Source/<GameModule>/Foo.cpp\"]'")
+execute_tool(command="build_solution_start --filesToRebuild '[\"Source/<GameModule>/Foo.cpp\"]'")
 execute_tool(command="read_file --file_path ../<engine>/Plugins/Runtime/SomeModule/Public/SomeHeader.h --offset 120 --limit 80")
 ```
 
