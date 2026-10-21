@@ -50,9 +50,9 @@ namespace HomeWorldWisp
 	bool MeasureBounds(const AActor* Target, FVector& OutCenter, FVector& OutExtent);
 
 	/**
-	 * The trace heart sits beside the object, not on top of it: the same mesh bounds and viewer
-	 * side rule as the hover wisp, widened by the heart's half-width so the rune clears the mesh.
-	 * The center is never lower than BaseZ, and never inside the object's top.
+	 * The trace heart sits beside the object and turns with the view.
+	 * BaseZ is the player's head. The caller raises the center so the drawn
+	 * shape stays above the floor and out of the object.
 	 */
 	bool HeartPoint(
 		const AActor* Target,

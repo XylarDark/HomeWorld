@@ -50,7 +50,7 @@ Each pole has a rune. At a glance the rune says which pole it is. A paradox mark
 
 These marks are attributes. Sleep at the bed is still the form change. The bed rune stays removed.
 
-A mark changes a visible interaction with a place or a creature. The yield follows from that interaction. A mark does not add a hidden stat line. Interview round 1, 2026-10-15.
+A mark changes a visible interaction with a place or a creature. The yield follows from that interaction. A mark does not add a hidden stat line. Interview round 1, 2026-10-15. Node modifiers on 2026-10-21 set that ban aside for spawned nodes. The shape stays in [`Docs/context/OPENING_TUTORIAL_INTERVIEW.md`](context/OPENING_TUTORIAL_INTERVIEW.md). This file does not copy it.
 
 ## Encounters
 

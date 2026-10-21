@@ -52,6 +52,8 @@ MUST_NOT = (
     "Name only the active bite.",
     "Main SHA the session last pulled",
     "A placeable actor needs a scene root",
+    "## Pick the task",
+    "Otherwise read `Docs/context/ROUTE_INDEX.md`",
 )
 QUESTION_GATE = ("one typed clarifier",)
 NAMED_ON_DEMAND = (

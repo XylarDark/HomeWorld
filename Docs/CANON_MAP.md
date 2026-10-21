@@ -115,7 +115,7 @@ README is left intact as history.
 | **The playtest entry point (active)** | `Docs/qa/PLAYTEST_INDEX.md` | active, 2026-10-20. Routes the tutorial queue, party pass, home-loop pass, and the design-only water chain. The tutorial queue's Now line wins for the tutorial day. Legacy: `docs/TaskLists/T0_NEXT_QUEUE.md` (2026-10-08) and `docs/TaskLists/T0_FIRST_LOOP_NOW.md` (the finished code queue). |
 | Prototype boss lair | `Docs/context/BOSS_LAIR_LOCK.md` | shape lock 2026-10-08. Fight stays later |
 | Taste decisions Rounds 1–7 | `Docs/handoffs/TASTE_GATE_T0_ASSETS.md` | R1–6 RESOLVED, R7+ parked |
-| Agent-owned decisions | `Docs/decisions/AGENT_DECISIONS.md` | DEC-0001…**0050** — search by id, not by position in the file |
+| Agent-owned decisions | `Docs/decisions/AGENT_DECISIONS.md` | DEC-0001…**0053** — search by id, not by position in the file |
 | UE 5.8 engineering | `docs/SETUP.md`, `KNOWN_ERRORS.md`, `CONVENTIONS.md` | canon |
 | Greybox measurement report | `Docs/qa/GRAYBOX_SPEC_REPORT.md` | 4 blocking (regenerated 2026-10-03) |
 | **Polish pass entry gates** | `Docs/37_POLISH_PASS_PROCESS.md` | active — enforces via `Content/Python/polish_readiness.py` |

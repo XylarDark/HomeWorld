@@ -2,7 +2,7 @@
 
 The one start door. Any IDE, chat, CLI, or agent runner. If a capability is missing, say so. Do not invent a substitute.
 
-Continuity is [docs/SESSION_NOW.md](../../docs/SESSION_NOW.md). Do not open `docs/history/SESSION_LOG.md` to start a chat.
+The newest block in [docs/SESSION_NOW.md](../../docs/SESSION_NOW.md) is the start. Read it, then the one file it names. Do not open `docs/history/SESSION_LOG.md` to start a chat.
 
 ## Mode
 
@@ -15,49 +15,35 @@ Continuity is [docs/SESSION_NOW.md](../../docs/SESSION_NOW.md). Do not open `doc
 
 ## Playtest reply
 
-Use this door before the production reads when the message names a log line, a screenshot, a lock to scribe, or a beat to test, reach, or fast-forward to. The mode line stays one sentence and does not block this door. The production reads stay for "what next" and for an unnamed queue.
+A log line, a screenshot, a lock to scribe, or a beat to test, reach, or fast-forward to uses this door and beats continuity. The mode line stays one sentence.
 
-- A beat test reads only the `hw.Playtest.FastForward` row in `Docs/COMMANDS_AND_LOG_TAGS.md` and the one section of `Docs/qa/TUTORIAL_PLAYTEST_QUEUE.md` that names that beat. First run `.\Tools\RunTests.ps1 -QuestCheck` (host only, no Editor; exit 2 names the file and symbol). `-Quest -QuestOnly <id>` is the developer check, not the pass ([QUEST_TESTS](../qa/QUEST_TESTS.md)). Fresh PIE on `L_SizeTest`, then `hw.Playtest.FastForward` plus the words used. Pass is `playtest_ff: ready for <name>`, the actor named in that line, and the skipped beat's success line absent. End PIE. Leave the editor on `L_SizeTest`. A beat word that `list` does not print is not a new command. Say so and stop.
-- The task is that line. Read only the active queue's Now line and the one owner file it points at. Do not read vision, the asset queue, or either critical path.
-- The same on-screen fail twice stops the reply. Say what was not in the binary. Do not start a neighboring polish.
-- One `.\Tools\Safe-Build.ps1 -LaunchEditorAfter` from the repo root per reply, and only after Luke's yes to close the editor: it taskkills `UnrealEditor`. Batch every named fix into that compile. A reply that already compiled does not compile again. Search `docs/KNOWN_ERRORS.md` for that symptom before the compile. A compile that closes the editor and does not relaunch it has not shown the player the change. Name that in the reply.
-- A fix is not done until the log line you named has changed. Name the DLL time in the reply.
-- When Luke names a pass, scribe that sentence into the queue result before the next edit.
-- A color, a marker, or a HUD line is done when the open editor logs it on the actor he named, or he sees it. A compile, and a neighboring actor, do not count.
-- A placement correction covers the props he named. A behavior he already called good stays. The wisp, the herb return, and the E chain stay in `Docs/level/L_SizeTest_CONTEXT.md`. Update that file in the same reply that changes them.
-- After a level load, run the sightline check once more before moving anything. The map context names the loading miss.
-- A tutorial flag stays unset unless the interview round names it.
-- Delete any `Content/Python/tmp_*.py` this reply created.
-- A new lock is scribed, then a handoff, then stop. Do not implement it in the same session when code goes to another agent.
+A beat reads the `hw.Playtest.FastForward` row in `Docs/COMMANDS_AND_LOG_TAGS.md` and the one section of `Docs/qa/TUTORIAL_PLAYTEST_QUEUE.md` that names that beat. The host preflight is `Docs/qa/QUEST_TESTS.md`. One compile after Luke's yes, and the handoff after a new lock, are `.agents/skills/token-efficient-context/SKILL.md`. Do not restate the pass line. A beat word that `list` does not print is not a new command. Say so and stop.
+
+The task is that line. Read only the active queue's Now line and the one owner file it points at. Do not read vision, the asset queue, or either critical path. The same on-screen fail twice stops the reply. Say what was not in the binary.
+
+A lock is scribed in its owner file, then a handoff, then stop. It does not start Play In Editor.
 
 ## Read order
 
-A named handoff, queue section, or file: read that owner and stop. Skip this order and `## Pick the task`. Otherwise read `Docs/context/ROUTE_INDEX.md`, then wait for it before the next read.
+A named handoff, queue section, or file: read that owner and stop. Skip the task table.
+
+What next, the project picture, or an unnamed queue: read the newest block in `docs/SESSION_NOW.md` and the one file it names. If that file is a playtest handoff, the queue Now line is the pass. Do not open vision, `Docs/context/ART_ASSET_DOOR.md`, or either critical path. If that block names no file, read the status line in `Docs/art/ASSET_CONTEXT_TASKS.md` and `## Critical path` in `Docs/context/PLAY_TASKS.md` and `Docs/context/PROVE_TASKS.md`. Start the one open critical-path item. One room. Do not read the cards.
 
 Open only when the task needs it: `Docs/WORLD_METRICS.md` for a number; `Docs/level/L_VS_MVP_Markers_manifest.json` for level data (read `counts.actors` and `completeness.verdict` there; do not copy them here); `Docs/COMMANDS_AND_LOG_TAGS.md` for a console command or log tag.
 
 | Task | Also read |
 |------|-----------|
 | Fix | Search `docs/KNOWN_ERRORS.md` for the symptom. Matching entries only, never the whole file. Level-data fixes use the manifest above as the actor scan. If it is missing, scan the level actors this session first. |
-| Descent, gather, fertilizer, or homestead | `Docs/context/HOMEWORLD_ROUTE.md` |
+| Descent, gather, fertilizer, or homestead | `Docs/context/ROUTE_INDEX.md`, then `Docs/context/HOMEWORLD_ROUTE.md` |
 | Route, placeable, merge, or level | `Docs/context/LEVEL_RULES.md` |
-| T0 scope | `Docs/context/T0_INTERVIEW_LOCK.md` |
-| First loop, or implement from the lock | `Docs/context/T0_INTERVIEW_LOCK.md`, `Docs/context/T0_SHAPE_PLAN.md`, and the active queue named in `Docs/CANON_MAP.md`. A later lock line wins over an older queue. |
-| Interview, lock, or boss | `Docs/context/BOSS_LAIR_LOCK.md` and the vision-board line that points at it. A later lock wins. Do not open the GDD unless the lock names it. |
+| T0 scope, or the named lock is T0 | `Docs/context/T0_INTERVIEW_LOCK.md` and `Docs/context/T0_SHAPE_PLAN.md`. A later lock line wins over an older queue. |
+| Interview or lock | The interview file the message or the newest `docs/SESSION_NOW.md` block names. |
+| Boss | `Docs/context/BOSS_LAIR_LOCK.md` and the vision-board line that points at it. Do not open the GDD unless the lock names it. |
 | Hand back | `Docs/context/HANDBACK.md` when the session is Co and the message says hand back |
-| What next, the project picture, the critical path, prototype assets, stills, Tripo, Meshy, Mixar, or art asset | `Docs/context/ART_ASSET_DOOR.md`. The room is Look. Do not offer rooms. |
+| Prototype assets, stills, Tripo, Meshy, Mixar, or art asset | `Docs/context/ART_ASSET_DOOR.md`. The room is Look. Do not offer rooms. |
 | Movement test, greybox floor, blockout, sightline, or a prototype walk | `Docs/handoffs/research/UE_BLOCKOUT_PROTOCOL.md`. Engine cube and the material already on it. Player Start on that floor. Play In Editor, on foot. |
-| New editor tool, Python placer, or import script | `Docs/tools/GAME_TOOL_CATALOG.md` before any new script. |
+| Unreal API, the skills server, a new editor tool, Python placer, or import script | `Docs/tools/GAME_TOOL_CATALOG.md` before a new script or an engine call. That file names the `search` call. |
 | Partner or child company, party flags, or night family teleports | `Docs/41_COMPANION_PARTY_DESIGN.md` |
-
-## Pick the task
-
-This is the production step. Vision says how the thing is shaped. The lists say what is next. The room says which files to open.
-
-1. Read `Docs/VISION_BOARD.md` through `## Shape` only. Stop before the principles table.
-2. Read the status line in `Docs/art/ASSET_CONTEXT_TASKS.md` (the sitting queue, through the lock lines). Read `## Critical path` in `Docs/context/PLAY_TASKS.md` and in `Docs/context/PROVE_TASKS.md`. Do not read the cards.
-3. Start the first critical-path item that is not kept and whose co-fork blockers are done. Look’s status line wins while Play’s critical path says none.
-4. Open that room and only the resources it names for that item. Look opens `Docs/context/ART_ASSET_DOOR.md`. Play opens the named lock. Prove opens the named prove.
 
 ## After the reads
 
@@ -77,16 +63,12 @@ Before the first edit, run `git status --short` once. `git add` uses the path th
 
 ## Interview
 
-One lock. Competing choices, then stop. Not a menu of paths. Scribe the pick before the next lock. If the card fails, take a numbered reply in chat. Do not invent a substitute card. A beat with no picked action gets one question: what the player does. Do not offer passes you invented.
+One lock. Scribe the pick in its owner file before the next lock, then stop. The ask shape is `.agents/skills/steer-gate/SKILL.md`. Do not add a second prompt. A beat with no picked action gets one question: what the player does. Do not offer passes you invented.
 
-After the clarifier names the work, name one room and open that card: Look `Docs/context/FORK_LOOK.md` (art and asset), Play `Docs/context/FORK_GAMEPLAY.md`, Prove `Docs/context/FORK_TESTING.md`. You can correct the room; no pick stays in the clarifier. No fourth room; the art bible is the law inside Look. A card points at a settled lock and does not reopen it. Shape is `Docs/context/SESSION_FORK_LOCK.md`. Prototype assets, stills, and “what next” skip this choice.
+After the clarifier names the work, name one room and open that card: Look `Docs/context/FORK_LOOK.md` (art and asset), Play `Docs/context/FORK_GAMEPLAY.md`, Prove `Docs/context/FORK_TESTING.md`. You can correct the room; no pick stays in the clarifier. No fourth room; the art bible is the law inside Look. A card points at a settled lock and does not reopen it. Shape is `Docs/context/SESSION_FORK_LOCK.md`. Prototype assets, stills, and what next skip this choice.
 
 ## Session close
 
-1. Finish every piece of work the agent can do itself.
-2. Ask any question whose answer would let the agent continue, then carry on.
-3. Only when the next step needs the developer's hands, ask whether a tutorial is wanted. Never offer one for agent-owned work.
+The close order is `UserHarness/docs/human-use/route-context.md`. This file wins on the close order. It also wins on mode, the read list, and the clarifier. No tutorial is on offer yet. Offer `Docs/qa/HUMAN_TUTORIAL.md` only once it is committed and `Content/Python/human_tutorial.py --check` exits 0. Until then, step 3 names the next manual step in one line.
 
-No tutorial is on offer yet. Offer `Docs/qa/HUMAN_TUTORIAL.md` only once it is committed and `Content/Python/human_tutorial.py --check` exits 0. Until then, step 3 names the next manual step in one line.
-
-This file wins on the close order. It also wins on mode, the read list, and the clarifier. Do not wait on a UserHarness SHA. An unrelated second task: alert and stop. A second task Luke names is the yes.
+Do not wait on a UserHarness SHA. An unrelated second task: alert and stop. A second task Luke names is the yes.

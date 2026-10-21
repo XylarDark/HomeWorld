@@ -144,6 +144,6 @@ bool HomeWorldWisp::HeartPoint(
 		HeartSideMinCm,
 		HeartSideMaxCm);
 	OutWorld = Center + Right * Side;
-	OutWorld.Z = FMath::Max(BaseZ, Center.Z + Extent.Z + HeartAboveCm);
+	OutWorld.Z = BaseZ;
 	return true;
 }

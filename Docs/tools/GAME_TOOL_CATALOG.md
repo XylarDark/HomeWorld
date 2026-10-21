@@ -1,6 +1,6 @@
 # Game tool catalog
 
-Read this before a new editor tool, Python placer, or import script.
+Read this before an Unreal API call, a new editor tool, a Python placer, or an import script. The sentence under the Use table names the `search` call.
 
 - **Use:** extend the tool named here. Do not add a second copy.
 - **Candidate:** stop for the interview. Scribe the pick in the file that already owns that beat, then change this row to Use and name the script. Do not open a second research body.
@@ -18,7 +18,9 @@ Tools already in the project.
 | `Tools/RunTests.ps1` | Automation tests. `-Quest` runs the in-editor opening sweep (`quest_test_runner.py` + manifest); results `Saved/quest_tests.json`. `-QuestCheck` is the host-only quest preflight (`quest_preflight.py`: manifest vs C++ beats/stop words, no Editor). `-QuestCoverage` is the host-only quest coverage matrix (`quest_coverage.py`): declared coverage per beat, no Editor. |
 | `Tools/Package-AfterClose.ps1` | Package after the editor is closed. |
 | `Content/Python/start_editor.py` | Open the editor and wait for UnrealMCP. |
-| UnrealMCP, port 55557 | Editor calls. Epic `ModelContextProtocol` stays off. |
+| UnrealMCP, port 55557 | Actors, Blueprints, and Python. |
+| Epic MCP, `http://127.0.0.1:8000/mcp` | Slate inspector only. DEC-0037. |
+| `unreal-engine-skills` | Cursor only. `https://www.unrealengineskills.com/api/mcp`. No API key. One tool, `unreal-engine-skills-manager` (`search`, `load`, `categories`). Call `search`, then `load`, for the domain named below. Epic 5.8 docs and the local engine win. A loaded skill is a hint. OpenCode does not connect. DEC-0053. |
 | `Content/Python/reimport_size_test.py` | Size-test mesh reimport. One row per mesh. |
 | `Content/Python/reimport_size_bull.py`, `reimport_size_bear.py` | Shared import, then load `L_SizeTest` and replace that actor. |
 | `place_size_test.py`, `apply_homestead_scene.py`, `verify_homestead_scene.py`, `apply_size_test_metrics.py`, `measure_size_bounds.py` | Opening island placement, metrics, and the pass log. |
@@ -33,6 +35,8 @@ Tools already in the project.
 | `hw.Playtest.FastForward` | The situation tool. Runs the earlier opening beats for real, then places the pawn and logs `playtest_ff: ready for <name>`. No argument stops at night. `hw.Night.Wisp` with numbers is a seed hook, not the arrival. |
 
 A new situation is a beat word, a skip, a place to stand, and one sentence in `Docs/qa/TUTORIAL_PLAYTEST_QUEUE.md`. It is not a new `hw.*` command, a save file, or a `tmp_*.py`. The command row is `Docs/COMMANDS_AND_LOG_TAGS.md`.
+
+For a domain in this list, call `unreal-engine-skills-manager` with `search`, then `load` the match, then confirm the signature in a UE 5.8 source: C++ fundamentals, coding standards, memory and GC, delegates, logging, subsystems, timers, gameplay framework, GAS, gameplay tags, Enhanced Input, character movement, editor Python, automation tests, materials, meshes, lighting and Lumen, import, sequencer, asset management, physics, modules, data-driven design, save/load, UMG. The hosted server is the list. Do not copy skill files into this repo.
 
 ## Candidate
 
@@ -66,5 +70,9 @@ The world teaches the approach. Outside notes for that rule, not a new tool: [In
 | A second probe library | Probes use the three doors in the Use table. |
 | A quest list as the teacher | Body: `Docs/handoffs/research/QUEST_TRACKER.md`. The world stays the teacher. |
 | Modeling Mode as a hero mesh | Beta blockout only. [Modeling Mode](https://dev.epicgames.com/documentation/unreal-engine/getting-started-with-modeling-mode). Hero meshes stay on the stills path. |
+| VibeUE plugin | Registers onto port 8000. Duplicates UnrealMCP. `VibeUE.GenerateAgentConfig` writes `AGENTS.md`. The 5.7 chat server and proxy on ports 8088 and 8089 stay out. Landscape, foliage, GPS heightmaps, FPS blockout, Fab import, and raw ini edits stay out. DEC-0053. |
+| VibeUE dashboard key | Authenticates `https://llm.vibeue.com` and hosted terrain. Do not write it into git, `mcp.json`, or `Config/DefaultEditorPerProjectUserSettings.ini`. Revoke a pasted key on the dashboard. |
+| Vendored `unreal-engine-skills` | Cloning the repo into `.agents/skills` bills every skill description on every turn. Use the hosted server in the Use table. |
+| Skills left unloaded | Ultra Dynamic Sky, Ultra Dynamic Weather, Mover, landscape / RVT / grass, flamethrower and mesh-disintegration Niagara, networking, and gameplay-architecture-planning. Day Sequence is the sky. |
 
 `VisionBoard/Core/VISION.md` adds no tool. The seven virtue pairs stay in the virtue bible and the Gameplay Ability System.

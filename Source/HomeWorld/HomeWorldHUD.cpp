@@ -15,6 +15,7 @@
 #include "HomeWorldStrokeCheck.h"
 #include "HomeWorldTimeOfDaySubsystem.h"
 #include "EngineUtils.h"
+#include "Kismet/GameplayStatics.h"
 #include "AbilitySystemInterface.h"
 #include "Engine/Canvas.h"
 #include "Engine/Engine.h"
@@ -100,6 +101,29 @@ void AHomeWorldHUD::DrawHUD()
 	if (!PC) return;
 
 	DrawEasePadGreybox(this, Canvas, PC->GetWorld());
+
+	// SizeTest indicators are the quest list. The aim frame is the detection shape, not another list.
+	if (UWorld* LevelWorld = PC->GetWorld())
+	{
+		if (UGameplayStatics::GetCurrentLevelName(LevelWorld).Contains(TEXT("SizeTest")))
+		{
+			if (AHomeWorldCharacter::bDrawOpeningAimBox)
+			{
+				const float Ndc = AHomeWorldCharacter::OpeningViewCenterNdc;
+				const float CenterY = -AHomeWorldCharacter::OpeningViewUpNdc;
+				const float Left = (1.f - Ndc) * 0.5f * Canvas->SizeX;
+				const float Right = (1.f + Ndc) * 0.5f * Canvas->SizeX;
+				const float Top = (CenterY - Ndc + 1.f) * 0.5f * Canvas->SizeY;
+				const float Bottom = (CenterY + Ndc + 1.f) * 0.5f * Canvas->SizeY;
+				const FLinearColor AimColor(1.f, 0.92f, 0.45f, 1.f);
+				DrawLine(Left, Top, Right, Top, AimColor, 2.f);
+				DrawLine(Right, Top, Right, Bottom, AimColor, 2.f);
+				DrawLine(Right, Bottom, Left, Bottom, AimColor, 2.f);
+				DrawLine(Left, Bottom, Left, Top, AimColor, 2.f);
+			}
+			return;
+		}
+	}
 
 	int32 Physical = 0;
 	int32 Spiritual = 0;

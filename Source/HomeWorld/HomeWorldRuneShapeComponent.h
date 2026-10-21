@@ -86,6 +86,8 @@ private:
 	FVector PlaneUp = FVector::UpVector;
 	TArray<FVector2D> HeartLocalPoints;
 	TArray<int32> ClickOrder;
+	/** Unit-to-cm scale actually drawn: the bed size, or bigger for bigger objects, never smaller. */
+	float DrawnHeartScaleCm = 5.2f;
 	TArray<FVector> Outline;
 	TArray<float> Arc;
 	TArray<FVector> Goals;

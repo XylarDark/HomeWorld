@@ -7,6 +7,8 @@ The sequence is the Opening tutorial in [`Docs/VISION_BOARD.md`](../VISION_BOARD
 ## Already locked — do not ask
 
 - The walk, stop, and hop on `L_SizeTest` pass the initial movement pass. 2026-10-17.
+- A heart sits beside the prop and turns with the view. Its height starts at the player's head and rises so the shape never clips the prop or the floor, including as the shape scales. 2026-10-21.
+- The shoulder wisp marks an object, and the opening interact reaches it, only when that object is within 280 cm and inside the passed aim box: half-extent 0.3, center 0.5 above the middle of the view. The development frame is off. 2026-10-21.
 - The fastest homestead walk already kept in play is 450 cm/s (`BodyWalkSpeed` in `Source/HomeWorld/HomeWorldTraversalComponent.h`).
 - The approach hides the cottage with a copse of pines and large stones. Hills and valleys are later. [`Docs/handoffs/research/TERRAIN_HEIGHT_LATER.md`](../handoffs/research/TERRAIN_HEIGHT_LATER.md).
 - The walk stays 450 cm/s until a replay says that single speed is wrong.
@@ -16,6 +18,16 @@ The sequence is the Opening tutorial in [`Docs/VISION_BOARD.md`](../VISION_BOARD
 - A bonk launches you back onto the island. It does not slow the step and does not dim the shoulder light. It does not wait on the mist.
 - The bull stays the later field and cave tame.
 - The armor gift is the backpack. The glider is crafted at the armory at dawn, and the descent waits on that craft. Speed and bonk tries stay. Round 6.
+- The first glider spends wood, silk, and metal already in the armory chest at dawn. This night does not gather them. Later crafts spend what a wisp delivers from the warehouse. 2026-10-21.
+- That spend is one wood, one silk, and one metal. Silk and metal stay out of the six-slot carry. An empty chest leaves the armory table's open reply. A press with that stock present crafts the glider, and the descent refuses until then. 2026-10-21.
+- A healed wisp is set with E on a wood, herb, or stone node. The node fills to 10 and that pile is credited to the matching chest. The player does not carry it. A second fill is refused. The wisp returns to the legs. Silk, fiber, and metal nodes are refused. 2026-10-21.
+- The dawn meadow's site waits until the Night pass releases `L_SizeTest`. No landmark is named, and nothing is placed for it. 2026-10-21.
+- One guard's sightline is the existing spirit-lit box: 180 by 180 by 120 cm. A missing guard does not count as an avoid. 2026-10-21.
+- Herb at the hot springs revives a damaged wisp so it follows at the legs and can take a task or a delivery route. The claimed companion stays on the shoulder. One revive spends one opening herb chunk. The click heart on that wisp, drawn when it is collected, sets the heal: 20 seconds when the heart is completed in 3 seconds or less, plus 10 seconds for each second over 3. A partial second counts, so 3.1 and 4.0 are both 30 seconds, and 4.1 is 40. The heart may run past 3 seconds. 2026-10-21.
+- This tutorial night finds damaged wisps only at the copse, the pond, and the hot springs. Wider sites stay later. 2026-10-21.
+- E at the hot springs starts the heal from 600 cm. 2026-10-21.
+- Healed wisps keep the built arc at the legs: the first two sit 34 cm to either side and 20 cm behind, the third sits 52 cm behind in the center, and a fourth reuses a slot. 2026-10-21.
+- The warehouse is not on the tutorial night. No warehouse building, and no new spoken line. The healed wisps at your legs are the hint. The planetoid teaches setting them on herbs, trees, and the other nodes. Spawned nodes have quality, and the player hunts the best. Quality increases time, durability before breaking, and lowers crafting time. Time means the crafted effect lasts longer. Durability is uses before it breaks. Crafting time is how long the station takes. Node modifiers are tagged mods. The wisp and the delivery route weight which mods can roll. Paradox corrupts. The rune stays visible. 2026-10-21. The tags are effect duration, durability, and crafting time. Other tags wait until you name one. Wrath / Grace is the first axis. Grace weights effect duration. Wrath weights durability. This axis does not weight crafting time. The second axis is Greed / Generosity. Generosity lowers crafting time. Greed snatches the craft when the stroke is late or wrong. This axis does not weight effect duration or durability. The other five axes wait until a new tag is named. 2026-10-21.
 
 ## Rounds
 
@@ -84,4 +96,48 @@ Luke restated the wisp loop on 2026-10-19. These lines supersede round 8 where t
 - Any wisp you carry can be assigned to tasks or delivery routes.
 - Collection goes to a central warehouse. From there a wisp takes resources to the chests the player chooses. A delivery route is set with click start and click end.
 - The armory-wood test was named and scratched.
-- Open: the herb and how much, the heal time, where damaged wisps are found beyond the three night wisps, the warehouse spot, and where the glider's materials come from now that collection lands in the warehouse.
+- Closed 2026-10-21. The other five axes wait until a new tag is named.
+
+#### 2026-10-21 — what the heal is for
+
+Picked 2026-10-21. Herb at the hot springs revives a damaged wisp. It then follows at the legs and can be assigned to a task or a delivery route. The companion already claimed stays on the shoulder. One revive spends one opening herb chunk.
+
+#### 2026-10-21 — heal time
+
+Picked 2026-10-21. The click heart on a damaged wisp, drawn when that wisp is collected, sets that wisp's heal. Completing the heart in 3 seconds or less sets 20 seconds. Each second over 3 seconds adds 10 seconds. A partial second counts: 3.1 and 4.0 are both one second over, so the heal is 30 seconds, and 4.1 is 40. The heart may run past 3 seconds. One opening herb chunk is still spent when the heal starts at the hot springs. The build still uses a flat 20 seconds and still ends this heart at 3 seconds.
+
+#### 2026-10-21 — hot-spring range
+
+Picked 2026-10-21. E at the hot springs starts the heal from 600 cm. That is the distance to the spring, not the heal time and not the follower distance.
+
+#### 2026-10-21 — leg followers
+
+Picked 2026-10-21. Healed wisps keep the built arc at the legs. The first two sit 34 cm to either side and 20 cm behind. The third sits 52 cm behind in the center. A fourth reuses a slot. They stay off the shoulder.
+
+#### 2026-10-21 — where the night wisps stand
+
+Picked 2026-10-21. This tutorial night finds damaged wisps only at the copse, the pond, and the hot springs. Wider sites stay later.
+
+#### 2026-10-21 — warehouse and node quality
+
+Picked 2026-10-21. The warehouse is not on the tutorial night. The night hints that, on the planetoid, wisps can be set on herbs, trees, and the other nodes. Spawned nodes have quality. The player hunts the best quality. Quality increases time, durability before breaking, and lowers crafting time. Time means the crafted effect lasts longer. Durability is uses before it breaks. Crafting time is how long the station takes. Other related stat buffs are not named. On 2026-10-21 Luke set aside the virtue bible's "no hidden stat line" for node modifiers. The picked shape is tagged mods on the node. The wisp you set, and the delivery route, weight which mods can roll. Paradox corrupts: both poles, stronger, and they interfere. The rune stays the thing you see. The tags are effect duration, durability, and crafting time. Other tags wait until you name one. The map starts now, one pole at a time. The first axis is Wrath / Grace. Grace weights effect duration. Wrath weights durability. This axis does not weight crafting time. The second axis is Greed / Generosity. Generosity lowers crafting time. Greed snatches the craft when the stroke is late or wrong. This axis does not weight effect duration or durability. The other five axes wait until a new tag is named. The night, the dog, and the zone order stay.
+
+#### 2026-10-21 — mod tags
+
+Picked 2026-10-21. The tags are effect duration, durability, and crafting time. Other tags wait until you name one. Pole weighting starts now, one pole at a time. The first axis is Wrath / Grace. Grace weights effect duration. Wrath weights durability. This axis does not weight crafting time. The second axis is Greed / Generosity. Generosity lowers crafting time. Greed snatches the craft when the stroke is late or wrong. This axis does not weight effect duration or durability. The other five axes wait until a new tag is named.
+
+#### 2026-10-21 — the glider's materials
+
+Picked 2026-10-21. The first glider spends wood, silk, and metal already in the armory chest at dawn. This night does not gather them. Later crafts spend what a wisp delivers from the warehouse.
+
+#### 2026-10-21 — the warehouse hint
+
+Picked 2026-10-21. No warehouse building on the tutorial night, and no new spoken line. The healed wisps at your legs are the hint. The planetoid teaches setting a wisp on a herb, a tree, or another node.
+
+### Round 9 — Where the dawn meadow sits
+
+Picked 2026-10-21. The site waits until the Night pass releases `L_SizeTest`. No landmark and no coordinate is named. Nothing is placed for it on that map.
+
+### Round 10 — How far a guard can see
+
+Picked 2026-10-21. One guard's sightline is the existing spirit-lit box: 180 by 180 by 120 cm. A missing guard does not count as an avoid. Nothing is placed for it while the Night pass owns `L_SizeTest`.

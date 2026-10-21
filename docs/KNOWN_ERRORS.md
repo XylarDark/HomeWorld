@@ -15,6 +15,7 @@ One-line **Cause→Avoid** rows; narratives → [DEFECT_PA_E](../Docs/qa/DEFECT_
 - **Cause:** `Saved/mcp_request.json` written by PowerShell `Set-Content -Encoding utf8` carries a BOM. `Content/Python/mcp_harness.py` reads it as `utf-8` and rejects the JSON. **Avoid:** write that file with `[System.IO.File]::WriteAllText` and no BOM.
 - **Cause:** A bash heredoc passed from this PowerShell does not reach `git commit` (`EDITOR unset`). The commit does not happen. **Avoid:** `git commit -F` with a BOM-free file, then `git log -1`. The here-string note further down still covers a message that becomes file paths.
 - **Cause:** Reading `rider64.exe` answers "cannot read binary" whether or not the file exists. A scan of `cursorDiskKV` for a Cursor setting hung and had to be killed. **Avoid:** existence is `product-info.json` beside the install, which `Tools/Start-RiderMcp.ps1` already resolves. Stop after `ItemTable`. Do not scan `cursorDiskKV`.
+- **Cause:** Cursor sends the workspace root as `c:\dev\HomeWorld`. Rider 2026.2.3 answers JSON-RPC `-32700` (`Root URI must start with 'file://'`) and the MCP log marks the stream failed. The port is open and a later tool call can still return data. **Avoid:** call with `rootFolder` `C:/dev/HomeWorld`. A module list means Rider is up. Quit Cursor only for `ECONNREFUSED` with no listening socket. Do not toggle the server for the file URI line.
 
 ### Portals and level data (2026-10-05)
 

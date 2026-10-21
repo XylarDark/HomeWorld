@@ -209,6 +209,49 @@ QUESTS = [
             near("actors.partner.location", "actors.reveal.partner_stand", 80),
         ],
     },
+    {
+        "id": "glider",
+        "stop": "glider",
+        "section": "The glider",
+        "note": "E at the armory: craft the glider",
+        "checks": [
+            eq("beat.ready_for", "glider"),
+            eq("quest.glider_crafted", False),
+            eq("quest.dawn_wood", 1),
+            eq("quest.dawn_silk", 1),
+            eq("quest.dawn_metal", 1),
+            eq("quest.night_spirit", False),
+            le("beat.ready_distance", 300),
+        ],
+    },
+    {
+        "id": "delivery",
+        "stop": "delivery",
+        "section": "Delivery",
+        "note": "E at the wood node: set the healed wisp",
+        "checks": [
+            eq("beat.ready_for", "delivery"),
+            eq("quest.glider_crafted", False),
+            eq("quest.delivery_wood", 0),
+            eq("quest.wisps_healed", 1),
+            eq("quest.night_spirit", False),
+            count_tag("NODE_OPENING_DELIVERY", 1),
+            le("beat.ready_distance", 300),
+        ],
+    },
+    {
+        "id": "daycamp",
+        "stop": "daycamp",
+        "section": "Day camp",
+        "note": "walk into the clearing",
+        "checks": [
+            eq("beat.ready_for", "daycamp"),
+            eq("quest.night_spirit", False),
+            eq("quest.partner_away", False),
+            eq("quest.day_camp_eject", False),
+            le("beat.ready_distance", 400),
+        ],
+    },
 ]
 
 

@@ -252,5 +252,5 @@ Quest-suite stops: `hw.Playtest.FastForward` stops `kettle` and `station` keep t
 - No marked seed, no paradox wisp, and no recipe with two different marked ingredients.
 - No named encounter demand and no new effect for a pole on the player.
 - No change to the one-fish beat, tame bait, or the campfire craft list.
-- The count of healed task wisps, where damaged wisps are found, and the warehouse spot stay the open lines in the 2026-10-19 restatement.
+- Where damaged wisps stand on the tutorial night is locked 2026-10-21: the copse, the pond, and the hot springs. The warehouse is not on that night. Node quality and its fit with the virtue marks stay open in the 2026-10-21 interview. The count of healed task wisps stays open.
 - River, marsh, and lair travel stay where Doc 41 left them.
