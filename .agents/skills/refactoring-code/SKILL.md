@@ -35,7 +35,7 @@ execute_tool(command="rename_refactoring --filePath API/Services/OrderService.cs
 
 Before the first Rider call, follow the AGENTS.md sentence: start Rider once only when a C++ symbol, diagnostic, or refactor needs it and port 64342 is down.
 
-Verified 2026-10-15 by reading the live tool surface two independent ways (`tools/list`, and the
+Verified 2026-10-15 by reading the live tool surface two independent ways (an MCP tools list, and the
 router's own `Tool 'x' not found. Available tools: ...` reply):
 
 - **`rename_refactoring` is not exposed by default.** It registers only when the MCP server was

@@ -57,7 +57,7 @@ Every Rider tool also takes `rootFolder`. Pass the solution root whenever it is 
 | Confirm a contract after reading the file | Read the declaration; `get_symbol_info` is off the whitelist |
 | Trace what the method under test calls or needs | `rg <MethodName>` — `analyze_calls` is off the whitelist |
 | Check one changed test file | `get_file_problems --filePath <path>` |
-| Check several changed files | `lint_files --files '["Source/FooTests/Private/FooTests.cpp"]'` |
+| Check several changed files | `lint_files --files '["Source/<TestsModule>/Private/FooTests.cpp"]'` |
 | Build for broad changes | `.\Tools\Safe-Build.ps1` — `build_solution_*` are not exposed |
 | Project-wide problems after a successful build | `get_project_problems` |
 | Reformat changed files | Not exposed (`reformat_file`); match the file's existing style by hand |
@@ -65,7 +65,7 @@ Every Rider tool also takes `rootFolder`. Pass the solution root whenever it is 
 Command syntax:
 
 - Every `--flag` takes a value — bare flags are not supported. Booleans need an explicit `true`/`false`.
-- List parameters are JSON arrays, even for one element, wrapped in single quotes: `--files '["Source/FooTests/Private/FooTests.cpp"]'`.
+- List parameters are JSON arrays, even for one element, wrapped in single quotes: `--files '["Source/<TestsModule>/Private/FooTests.cpp"]'`.
 - Paths are relative to the solution root, with forward slashes.
 - `search_text`, `search_regex`, `search_file`, and `search_symbol` all take `--q` — not `--query`. `search_symbol` finds project symbols only; add `--include_external true` for an engine or SDK symbol, which is common when the API under test is engine-side.
 - Reference only — both are off this project's default whitelist, so a call returns `Tool '<x>' not found`. Where exposed (`-AllowedTools '*'`), `analyze_calls` is name-based: `--symbolFqn` plus `--analysisKind`, never a path/line/column, and `get_symbol_info` is the position-based one.
@@ -78,7 +78,7 @@ Independent calls belong in one message — `get_file_problems` for two changed 
 
 ## Framework selection
 
-Pick the minimal framework that covers the requested test. Read [reference/ue-test-patterns.md](reference/ue-test-patterns.md) when choosing a framework or writing its boilerplate.
+Pick the minimal framework that covers the requested test. Read [docs/UE/UE58_TEST_PATTERNS.md](../../../docs/UE/UE58_TEST_PATTERNS.md) when choosing a framework or writing its boilerplate.
 
 | Need | Preferred framework |
 |---|---|
@@ -147,7 +147,7 @@ If an item is uncertain, `Read` the relevant declaration or a narrow range aroun
 
 ## References
 
-- [reference/ue-test-patterns.md](reference/ue-test-patterns.md) — read for framework selection, boilerplate, new test module setup, and framework pitfalls.
+- [docs/UE/UE58_TEST_PATTERNS.md](../../../docs/UE/UE58_TEST_PATTERNS.md) — read for framework selection, boilerplate, new test module setup, and framework pitfalls. (Moved out of this skill 2026-10-20.)
 - [reference/attribute-set-tests.md](reference/attribute-set-tests.md) — read only when testing an Unreal `UAttributeSet` or its attribute-change hooks.
 - [reference/rider-tools.md](reference/rider-tools.md) — read for the fix-loop and full quality-pass patterns.
-- [reference/rider-mcp-tools.md](reference/rider-mcp-tools.md) — read for a less common Rider tool or an argument you are unsure of.
+- [reference/rider-mcp-tools.md](../../skills/ue-code-authoring/reference/rider-mcp-tools.md) — read for a less common Rider tool or an argument you are unsure of. (The copy in this folder is a pointer to that single param reference.)

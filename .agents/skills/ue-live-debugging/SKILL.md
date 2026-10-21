@@ -42,7 +42,7 @@ Before placing any breakpoints in **game module** C++ code, verify the binary wa
 
 ### 4. Rider MCP Availability Check
 
-Check the `<system-reminder>` deferred-tool list for Rider MCP tools. Load live schemas with ToolSearch before calling any tool. Schemas are **authoritative for parameter names** — never guess. If `execute_tool` is the only tool returned, use CLI mode (see `reference/rider-mcp-tools.md — execute_tool mode`).
+Check the `<system-reminder>` deferred-tool list for Rider MCP tools. Load live schemas with ToolSearch before calling any tool. Schemas are **authoritative for parameter names** — never guess. On HomeWorld, ToolSearch does not exist and there is no `mcp__` prefix: call the tool by name, or through `execute_tool` with a command string (see the HomeWorld table below this gate).
 
 If **no Rider MCP tools appear in the deferred list**:
 
@@ -122,7 +122,7 @@ Canonical reference: `docs/tools/Rider_MCP_for_UE_Games.md`.
 
 #### Crash Dump Analysis
 
-Find crash artifacts in `Saved/Crashes/` (editor) or the platform crash folder — see `reference/crash-patterns.md` for locations and minidump instructions.
+Find crash artifacts in `Saved/Crashes/` (editor) or the platform crash folder — see `docs/UE/UE58_CRASH_PATTERNS.md` for locations and minidump instructions.
 
 **Read the crash log first:**
 ```bash
@@ -130,7 +130,7 @@ find Saved/Crashes -name "*.log" | sort -r | head -1 | xargs tail -100
 ```
 Look for `Fatal error`, `Assertion failed`, `Unhandled Exception`, or `call stack` near the end.
 
-**Identify the crash signature** from the callstack address pattern — see `reference/crash-patterns.md — Quick Diagnosis Table`.
+**Identify the crash signature** from the callstack address pattern — see `docs/UE/UE58_CRASH_PATTERNS.md — Quick Diagnosis Table`.
 
 **Map the callstack to source**: take the topmost non-engine frame and find it with `search_symbol`.
 
@@ -141,7 +141,7 @@ Continue from **Step 1** using that symbol.
 When PIE is running, use `ue_execute_python` to query live game state before reading source files — often resolves the question in one call.
 
 **Script must be a single line** — no `\n`, no indented blocks. Use `;` and comprehensions.  
-See `reference/ue-python-inspection.md` for ready-to-use query patterns and API pitfalls.
+See `docs/UE/UE58_PYTHON_INSPECTION.md` for ready-to-use query patterns and API pitfalls.
 
 Typical first queries (adapt to project-specific classes):
 - World + player valid: `import unreal; w=unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem).get_game_world(); pc=unreal.GameplayStatics.get_player_controller(w,0); print(w,pc)`
@@ -159,7 +159,7 @@ grep -n "Fatal\|Error\|Assertion failed\|ensure(" Saved/Logs/<Project>.log | tai
 grep -n "Warning" Saved/Logs/<Project>.log | grep -v "LogTemp\|LogSlate" | tail -30
 ```
 
-See `reference/crash-patterns.md — Log Patterns` for common entries and root causes. Continue from **Step 1**.
+See `docs/UE/UE58_CRASH_PATTERNS.md — Log Patterns` for common entries and root causes. Continue from **Step 1**.
 
 ---
 
@@ -173,7 +173,7 @@ If starting from a crash address or log string rather than a known symbol, use `
 
 There is no call hierarchy in this build. `analyze_calls` is not on the default whitelist, and when it was exposed it answered *"No callable symbol found"* for `AHomeWorldCharacter::BeginPlay`, so it resolves no C++ caller in either state. Find callers with `Grep`/`rg` on the method name and read each call site; read the function body directly to find callees.
 
-`reference/ue-debug-patterns.md — Call Hierarchy Analysis` documents the upstream tool and does not apply here.
+`docs/UE/UE58_LIVE_DEBUG_PATTERNS.md — Call Hierarchy Analysis` documents the upstream tool and does not apply here.
 
 ### Step 3 — Read the Contract from the Header
 
@@ -203,7 +203,7 @@ ToolSearch(query: "select:mcp__<prefix>__xdebug_set_breakpoints,mcp__<prefix>__x
 - If connected and PIE idle → proceed to 5b.
 - If PIE already running → proceed to 5b directly.
 
-**5b — Set breakpoints** using `xdebug_set_breakpoints`. Pass the locations in the `breakpoints` array. Set standard, conditional, or logpoint breakpoints as appropriate. See `reference/ue-debug-patterns.md — Breakpoint Placement Strategies` for placement rules.
+**5b — Set breakpoints** using `xdebug_set_breakpoints`. Pass the locations in the `breakpoints` array. Set standard, conditional, or logpoint breakpoints as appropriate. See `docs/UE/UE58_LIVE_DEBUG_PATTERNS.md — Breakpoint Placement Strategies` for placement rules.
 
 **5c — Start PIE** using `ue_play` if not already running.
 
@@ -213,13 +213,13 @@ ToolSearch(query: "select:mcp__<prefix>__xdebug_set_breakpoints,mcp__<prefix>__x
 
 If a live debugger session is not feasible, add `UE_LOG` statements using the standard Edit tool.
 
-See `reference/ue-debug-patterns.md — Instrumentation Rules`. After editing, run `get_file_problems` to confirm no new errors.
+See `docs/UE/UE58_LIVE_DEBUG_PATTERNS.md — Instrumentation Rules`. After editing, run `get_file_problems` to confirm no new errors.
 
 ### Step 7 — Fix
 
 Apply the fix using the standard Edit tool.
 
-After editing: run `get_file_problems` on the changed file (and `.h` if touched). Fix the root cause, not the symptom — see `reference/ue-debug-patterns.md — Fix: Root Cause vs Symptom`.
+After editing: run `get_file_problems` on the changed file (and `.h` if touched). Fix the root cause, not the symptom — see `docs/UE/UE58_LIVE_DEBUG_PATTERNS.md — Fix: Root Cause vs Symptom`.
 
 ### Step 8 — Build and Verify
 
@@ -233,8 +233,8 @@ After a successful build:
 
 ---
 
-see: reference/rider-mcp-tools.md — ALL Rider MCP tools: complete parameter reference, execute_tool mode table, UE editor/asset/debugger tools
+see: reference/rider-mcp-tools.md — parameter reference single copy at ../ue-code-authoring/reference/rider-mcp-tools.md (stub in this folder points there)
 see: reference/rider-debug-tools.md — Debugging workflow patterns: crash callstack, intermittent bugs, packaged build crashes, live PIE inspection, breakpoint sequences
-see: reference/ue-debug-patterns.md — UE debugging patterns: call hierarchy analysis, instrumentation rules, fix guidance, breakpoint placement, GC/threading patterns
-see: reference/crash-patterns.md — Crash patterns: address signatures, GC crashes, assertion failures, async loading, Slate null widgets, log patterns
-see: reference/ue-python-inspection.md — UE Python runtime inspection: single-line scripting rules, world/player/component access, GAS/stat-tag queries, GameplayTag API pitfalls, common errors
+see: ../../../docs/UE/UE58_LIVE_DEBUG_PATTERNS.md — UE debugging patterns: call hierarchy analysis, instrumentation rules, fix guidance, breakpoint placement, GC/threading patterns (moved out of this skill 2026-10-20)
+see: ../../../docs/UE/UE58_CRASH_PATTERNS.md — Crash patterns: address signatures, GC crashes, assertion failures, async loading, Slate null widgets, log patterns (moved 2026-10-20)
+see: ../../../docs/UE/UE58_PYTHON_INSPECTION.md — UE Python runtime inspection: single-line scripting rules, world/player/component access, GAS/stat-tag queries, GameplayTag API pitfalls, common errors (moved 2026-10-20)

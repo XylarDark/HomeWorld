@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-17T18:46:59+00:00",
+  "generated": "2026-10-21T02:11:33+00:00",
   "process_doc": "Docs/37_POLISH_PASS_PROCESS.md",
   "verdict": "NOT_READY",
   "gates": {
@@ -76,13 +76,13 @@
         {
           "id": "env.master_binding",
           "gate": "G-ENV",
-          "requirement": "Every material resolves to one of the ten masters (art bible S10)",
+          "requirement": "Every material resolves to one of the project masters (art bible S10)",
           "source": "Docs/qa/graybox_spec_report.json",
           "measured": "2 blocking",
           "target": "0 blocking",
           "state": "FAIL",
           "note": "M_FamilySilhouette: material in the blend is neither one of the ten masters nor an allowed instance (art bible S10); M_ValleyNight: material in the blend is neither one of the ten masters nor an allowed instance (art bible S10)",
-          "next_action": "Bind each material to one of the ten masters in Docs/06_VS_MVP_DRESS.md, or declare it an allowed instance of one. This is an art-bible decision (S10), so it is the Lead's call, not a script's. Lead ruled 2026-10-04 to leave it RED for the art pass - so the correct action right now is none, and G-ENV stays RED until the art pass lands.",
+          "next_action": "Bind each material to one of the project masters in Docs/06_VS_MVP_DRESS.md, or declare it an allowed instance of one. This is an art-bible decision (S10), so it is the Lead's call, not a script's. Lead ruled 2026-10-04 to leave it RED for the art pass - so the correct action right now is none, and G-ENV stays RED until the art pass lands.",
           "action_kind": "held"
         },
         {
@@ -160,24 +160,24 @@
         {
           "id": "asset.master_count",
           "gate": "G-ASSET",
-          "requirement": "Exactly ten master materials exist (art bible S10)",
+          "requirement": "Exactly 11 master materials exist (art bible S10 plus the size-test greybox read)",
           "source": "Content/HomeWorld/Materials/Masters",
-          "measured": "10 masters",
-          "target": "10",
+          "measured": "11 masters",
+          "target": "11",
           "state": "PASS",
-          "note": "M_BeastStylized, M_CliffRock, M_FoliageCard, M_GatherHerb, M_Nurtured, M_PathStone, M_SpiritUnlit, M_StylizedGrass, M_WoodCabin, M_WoodWild",
+          "note": "M_BeastStylized, M_CliffRock, M_FoliageCard, M_GatherHerb, M_GreyboxRead, M_Nurtured, M_PathStone, M_SpiritUnlit, M_StylizedGrass, M_WoodCabin, M_WoodWild",
           "next_action": "",
-          "action_kind": ""
+          "action_kind": null
         },
         {
           "id": "asset.board",
           "gate": "G-ASSET",
           "requirement": "Every master mesh has a declared stage and priority",
           "source": "Docs/qa/POLISH_ASSET_BOARD.json",
-          "measured": "0/10 declared",
-          "target": "10/10 declared",
+          "measured": "0/11 declared",
+          "target": "11/11 declared",
           "state": "MISSING",
-          "note": "Declared but not recorded yet: M_BeastStylized, M_CliffRock, M_FoliageCard, M_GatherHerb, M_Nurtured, M_PathStone. Each row needs a stage from the S0-S5 ladder and a priority, so a batch can be reviewed together at S2 rather than one at a time at S3.",
+          "note": "Declared but not recorded yet: M_BeastStylized, M_CliffRock, M_FoliageCard, M_GatherHerb, M_GreyboxRead, M_Nurtured. Each row needs a stage from the S0-S5 ladder and a priority, so a batch can be reviewed together at S2 rather than one at a time at S3.",
           "next_action": "Fill `stage` and `priority` for each row in Docs/qa/POLISH_ASSET_BOARD.json. The ladder is S0..S5 (or its full label); `priority` is 1..10. This is triage, which is the Lead's call - the agent cannot know which master needs work first.",
           "action_kind": "decide"
         },
@@ -201,8 +201,8 @@
       "max_stage": "S5 FEEL TUNE",
       "tally": {
         "FAIL": 1,
-        "MISSING": 2,
-        "PASS": 2
+        "MISSING": 3,
+        "PASS": 1
       },
       "checks": [
         {
@@ -258,12 +258,12 @@
           "gate": "G-FEEL",
           "requirement": "Last automation run executed tests against a fresh binary",
           "source": "Saved/automation_run_result.json",
-          "measured": "16 ran, 0 failed",
-          "target": "0 failed",
-          "state": "PASS",
-          "note": "dll_stale=False; report counters disagree with report entries (14 vs 16), unexplained",
-          "next_action": "",
-          "action_kind": ""
+          "measured": "no artifact",
+          "target": "failures == 0 and dll_stale false",
+          "state": "MISSING",
+          "note": "",
+          "next_action": "Saved/automation_run_result.json is a local artifact, so it is absent on a fresh checkout. Produce one with `py Content/Python/run_ue_automation.py --filter HomeWorld.T0` on a machine with UE_EDITOR set; a missing artifact is not a passing run.",
+          "action_kind": "do"
         }
       ]
     }

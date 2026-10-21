@@ -5,14 +5,16 @@
   "//3": "HOW TO RECAPTURE. Start the Editor with UnrealMCP on 55557 and Mixar MCP up, connect OpenCode, then count the tools visible in the session catalog (or run tools/list against each server). Update `capturedAt` and the counts together - a count without a date is a rumour.",
   "//4": "`source: repo` means the server is declared in opencode.json and this repo controls it. `source: host` means the host's global config injects it; the repo cannot remove it but still pays for it every request, so it is counted here.",
   "//5": "SCOPE: this snapshot is the surface injected by the host that captured it. Servers named only in the Cursor template (.cursor/mcp.json.example) are reported by the budget as `template-only` and are NOT counted here - unrealEditorUi (the Slate inspector on :8000) is the current one. It is not injected in the OpenCode session these counts came from, and a server that is not running costs nothing. If the GSD host becomes the only host, recapture from there and move it into `servers`.",
+  "//6": "POST-DISABLE COUNTS (2026-10-20, rider restored). `tools` is the honestly ENABLED count after the per-tool permission denies in opencode.json - not the declared tools/list total. `declared` records what the server exposes and `disabled` the number OpenCode denies; kept = tools. Keep the two numbers together with `capturedAt`, and log any keep/disable change in Docs/tools/Rider_MCP_for_UE_Games.md (rider) or Docs/handoffs/U58F_F_MCP_DECISION.md (unrealMCP). Reasoning per disabled tool is in the kept/disabled table in the Rider doc.",
 
-  "capturedAt": "2026-10-12",
+  "capturedAt": "2026-10-20",
   "schemaBytes": null,
   "servers": {
     "browser": { "tools": 45, "source": "host" },
     "gsd": { "tools": 3, "source": "host" },
-    "mixar": { "tools": 26, "source": "repo" },
+    "mixar": { "tools": 18, "source": "repo", "declared": 26, "disabled": 8 },
     "opencode": { "tools": 8, "source": "host" },
-    "unrealMCP": { "tools": 32, "source": "repo" }
+    "rider": { "tools": 11, "source": "repo", "declared": 17, "disabled": 6 },
+    "unrealMCP": { "tools": 13, "source": "repo", "declared": 32, "disabled": 19 }
   }
 }

@@ -1,6 +1,6 @@
 ---
 name: verification-evidence
-description: Use when writing, reviewing, or relying on anything meant to prove that something works - an audit, a readiness gate, a guard test, a health check, or a CI stage - covers proving a check measured its subject, fail-open helpers, boundary values that hide off-by-half errors, requested versus effective values, and mutation-testing a guard test.
+description: Use when writing, reviewing, or relying on anything meant to prove that something works - an audit, a readiness gate, a guard test, a health check, or a CI stage - must prove it measured its subject: fail-open helpers, requested-versus-effective values, and a guard test that fails when its regression returns.
 ---
 
 # Verification evidence
