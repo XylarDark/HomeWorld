@@ -32,6 +32,10 @@ Do not report a scene done until its verify script has logged the pass in the op
 
 Legacy files in `Docs/handoffs/` are not a read list. Open a handoff only when this task names that file, or open the newest `SESSION_HANDOFF_*.md` when starting from a handoff. Do not search that folder for canon. Open a design or studio research file only when the task is explicitly that research, and then only the one topic file named in [Docs/handoffs/RESEARCH_PROMPT_CONTRACT.md](Docs/handoffs/RESEARCH_PROMPT_CONTRACT.md). Open [Docs/canon/DESIGN_ETHOS.md](Docs/canon/DESIGN_ETHOS.md) only when auditing a mechanic, an environment, or a progression step.
 
+## Locks
+
+Lead's locks. Never `git reset --hard`. Never commit a `.uasset` or `.umap` without Lead's yes. Never close or kill `UnrealEditor` without Lead's yes (`Safe-Build.ps1` taskkills it). Lead grants standing merge permission, docs and Source, after the tests pass. Leave Lead's uncommitted desktop files alone.
+
 ## Build
 
 Agents run `.\Tools\Safe-Build.ps1` only, from repo root. Never `Build-HomeWorld.bat` directly. Chain and MCP port: [docs/Setup/BUILD_POLICY.md](docs/Setup/BUILD_POLICY.md). Cloud agents have no UE.
@@ -46,16 +50,6 @@ Editor work uses UnrealMCP on port 55557. A log line `editor_ui: NEED_SLATE` ope
 - Index skips `Content/__ExternalActors__/` and `Content/__ExternalObjects__/`.
 - Commands, swarm ops, testing, and style: [docs/AGENTS_REFERENCE.md](docs/AGENTS_REFERENCE.md).
 
-## Rider MCP (selective use)
-- Use native file/shell tools (read/edit/grep/git/shell) for routine reading, editing, searching, and Git operations in Cursor/OpenCode.
-- Use Rider MCP selectively for semantic symbol search, Blueprint-inheritance lookup (`get_class_hierarchy --baseClass`), UE reflection/UHT diagnostics, and refactoring. It has **no usages tool and no C++ call hierarchy**: `find_usages`/`find_implementations` do not exist in this build at all, and `analyze_calls` resolves nothing in C++. Use `rg` for callers. For the files that reference a C++ member, run `.\Tools\Find-RiderUsages.ps1 -FilePath <header> -SymbolName <Member>`: it calls `safe_delete --preview true` for you and cannot delete. If you call `safe_delete` yourself instead, never omit `--preview true` — without it the tool deletes.
-- Do not use Rider MCP for operations native tools can do equally well.
-- After C++ changes, check relevant Rider diagnostics. Run UBT when compilation validation is warranted (Safe-Build stays the compile).
-- Avoid repeated full builds, redundant validation, and excessive tool calls for small changes.
-- For substantial gameplay changes, verify observable behavior via focused tests or Unreal Editor execution.
-- Rider MCP is Rider's own built-in server, reached at `http://127.0.0.1:64342/stream` (streamable) or `/sse` (legacy SSE). When a C++ symbol, diagnostic, or refactor needs Rider and port 64342 is down, run `.\Tools\Start-RiderMcp.ps1` once, then call the tool. Do not start it for a playtest, a doc, or a Python edit. Do not start a second Rider when the port is already open. Stop a headless session with `-Stop`. Do **not** use `@jetbrains/mcp-proxy` — it probes `/api/mcp/list_tools`, which no Rider 2026.2 install contains. Every tool call needs `rootFolder=C:/dev/HomeWorld`; MCP roots do not substitute. File edits and shell stay on Cursor/OpenCode; UnrealMCP stays on 55557.
-- Two environment prerequisites, or the server connects and every symbol query answers empty: UE 5.8 registered at `HKLM\SOFTWARE\EpicGames\Unreal Engine\5.8\InstalledDirectory`, and a .NET 10 runtime under `%USERPROFILE%\.dotnet` — UE 5.8's UnrealBuildTool is net10.0, and the machine-wide dotnet already having 10.x is *not* enough, because Rider prefers the user-local host. `Start-RiderMcp.ps1` preflights the .NET half and prints the install command.
-- Trust the tools, not the connection: `search_symbol`/`search_text`/`search_file`/`get_file_problems` are the ones verified on HomeWorld C++. `search_file`'s `q` is a glob. `get_symbol_info` and `analyze_calls` resolve nothing in C++ yet, whatever the argument shape. The default whitelist exposes 17 tools; `-AllowedTools '*'` exposes 86 (including `rename_refactoring` and the debugger) but also shell and file-write tools, so it is opt-in. `findTests` and `post_edit_quality_check` are not in the 17: both stall the server. Rationale: [docs/tools/Rider_MCP_for_UE_Games.md](Docs/tools/Rider_MCP_for_UE_Games.md).
-- Reference: [docs/tools/Rider_MCP_for_UE_Games.md](Docs/tools/Rider_MCP_for_UE_Games.md), [docs/handoffs/MARKETPLACE_POLICY_V1.md](Docs/handoffs/MARKETPLACE_POLICY_V1.md).
+## Rider MCP
 
-Today's date: Thu Oct 15 2026
+Open only for a C++ symbol, diagnostic, or refactor: [Docs/tools/Rider_MCP_for_UE_Games.md](Docs/tools/Rider_MCP_for_UE_Games.md) § Selective usage guidance. Never call `safe_delete` without `--preview true`; without it the tool deletes.
