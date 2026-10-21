@@ -19,10 +19,6 @@
           "/c",
           "C:\\dev\\HomeWorld\\Tools\\mixar-mcp.cmd"
         ]
-      },
-      "rider": {
-        "type": "remote",
-        "url": "http://127.0.0.1:64342/stream"
       }
     }
   },
