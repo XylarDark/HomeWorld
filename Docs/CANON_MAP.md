@@ -47,7 +47,7 @@ Docs  →  441 md, 3999 KB
 docs  →  441 md, 3999 KB   (identical listing, identical count)
 ```
 
-Windows is case-insensitive, so `Docs` and `docs` are one tree. Everything named in this map lives in that single directory tree. A case-sensitive checkout must not be given two copies. Product canon and engineering notes are separated by subdirectory and by the canon map, not by the spelling of this folder.
+Windows is case-insensitive, so `Docs` and `docs` are one tree. Everything named in this map lives in that single directory tree. A case-sensitive checkout must not be given two copies. Product canon and engineering notes are separated by subdirectory and by the canon map, not by the spelling of this folder. Paths must use git's case: git records each file under one spelling, and a case-sensitive checkout (CI, cloud agents) finds only that one. `Content/Python/check_session_start.py` checks the door and `AGENTS.md`.
 
 ### 1.2 `Docs/README.md` is a wave log, not a topic index
 

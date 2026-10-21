@@ -4,7 +4,7 @@ The door as written in `Docs/context/SESSION_START.md`, redrawn 2026-10-20. This
 
 ```mermaid
 flowchart TD
-  msg[Message] --> mode["Mode line: solo or co, state, PHASES Now"]
+  msg[Message] --> mode["Mode line: solo or co, state (first match: decide, do, agent)"]
   mode --> kind0{What does it name}
 
   kind0 -->|Log line, screenshot, lock, or beat| playtest[Playtest reply]
@@ -16,8 +16,7 @@ flowchart TD
   kind0 -->|Handoff, queue section, or file| owner[Read that owner and stop]
   owner --> afterReads
 
-  kind0 -->|Otherwise| routeContext[route-context through detect state]
-  routeContext --> routeIndex[ROUTE_INDEX]
+  kind0 -->|Otherwise| routeIndex[ROUTE_INDEX]
   routeIndex --> taskRow{Task row}
   taskRow -->|What next or critical path| pick[Pick the task: vision Shape, three status lines, one room]
   taskRow -->|Fix| knownErrors[KNOWN_ERRORS symptom only]
@@ -26,7 +25,7 @@ flowchart TD
   taskRow -->|No row| afterReads
 
   pick --> room{Room}
-  room -->|Look| artDoor[ART_ASSET_DOOR]
+  room -->|Look| artDoor[PHASES Now line, then ART_ASSET_DOOR]
   room -->|Play| playLock[The named lock]
   room -->|Prove| prove[The named prove]
 
