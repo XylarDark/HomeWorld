@@ -33,6 +33,7 @@
 #include "HomeWorldGameMode.h"
 #include "HomeWorldPlayerState.h"
 #include "HomeWorldResourcePile.h"
+#include "HomeWorldHomeLoopSubsystem.h"
 #include "HomeWorldInventorySubsystem.h"
 #include "HomeWorldInventoryTypes.h"
 #include "HomeWorldCraftSubsystem.h"
@@ -2059,6 +2060,11 @@ void AHomeWorldCharacter::UseOpeningConsumableStation()
 		++OpeningMixedHerbs;
 		UE_LOG(LogTemp, Log, TEXT("opening_station: mixed herb made (carried %d, banked %d)"), OpeningMixedHerbs, OpeningHerbTenths);
 		ShowInteractFeedback(TEXT("CONSUMABLE: herb mixed with a spirit"), FColor::Green);
+		return;
+	}
+	if (UHomeWorldHomeLoopSubsystem* HomeLoop = GetWorld() ? GetWorld()->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr)
+	{
+		HomeLoop->TryKettleFromWorld(this);
 		return;
 	}
 	TryBrewNodeKettleTea();
@@ -5211,6 +5217,10 @@ bool AHomeWorldCharacter::TryNodeKettleInteractInFront()
 	}
 
 	// World interact beat -- PROXY mesh alone (SM_ProxyKettle without interact/brew) = closed_fail.
+	if (UHomeWorldHomeLoopSubsystem* HomeLoop = GetWorld() ? GetWorld()->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr)
+	{
+		return HomeLoop->TryKettleFromWorld(this);
+	}
 	return TryBrewNodeKettleTea();
 }
 
@@ -6231,6 +6241,13 @@ void AHomeWorldCharacter::GrantSpiritSleepGate()
 {
 	bSpiritSleepGateGranted = true;
 	UE_LOG(LogTemp, Log, TEXT("FORM: sleep gate granted (NODE_BED path)"));
+	if (UWorld* World = GetWorld())
+	{
+		if (UHomeWorldHomeLoopSubsystem* HomeLoop = World->GetSubsystem<UHomeWorldHomeLoopSubsystem>())
+		{
+			HomeLoop->SetOpeningDayEnded(true);
+		}
+	}
 	SyncFormWithTimeOfDay();
 }
 

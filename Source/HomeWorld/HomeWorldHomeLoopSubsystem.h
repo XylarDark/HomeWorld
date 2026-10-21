@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
 #include "HomeWorldHomeLoopTypes.h"
+#include "HomeWorldTimeOfDaySubsystem.h"
 
 class AHomeWorldCharacter;
 
@@ -41,7 +42,73 @@ public:
 	/** True until a post-tutorial serve writes the slot. */
 	bool IsArmedBuffSlotEmpty() const { return !bArmedBuffOccupied; }
 
+	/** The first sleep that ends the opening day. Brews before that stay on the sprint path. */
+	void SetOpeningDayEnded(bool bEnded) { bOpeningDayEnded = bEnded; }
+	bool HasOpeningDayEnded() const { return bOpeningDayEnded; }
+
+	/** Spirit form cannot run a station. Tests and the pawn set this before a run. */
+	void SetBodyForm(bool bInBodyForm) { bBodyForm = bInBodyForm; }
+
+	/** Dawn or dusk, 90 s. Advance is the test clock. */
+	void Advance(float Seconds);
+	bool IsHomeWindowOpen() const { return bWindowOpen; }
+	float GetWindowRemaining() const { return WindowRemaining; }
+
+	/** True when this station may run: home window, body form, and past the tutorial gate. */
+	bool CanRunStation(EHomeWorldHomeStation Station) const;
+
+	/** Start prep for one ingredient. Cook begins on a later Advance, once prep has finished. */
+	bool BeginPrep(FName RecipeId, int32 IngredientIndex);
+
+	/**
+	 * Before the opening day ends, this is TryOpeningKettleBrew.
+	 * After the first sleep, it starts kettle prep instead.
+	 */
+	bool TryKettleFromWorld(AHomeWorldCharacter* Character);
+
+	bool DiscardPrepped(int32 IngredientIndex);
+
+	int32 GetActiveWorkCount() const;
+	float GetPrepRemaining(int32 IngredientIndex) const;
+	bool IsIngredientPrepped(int32 IngredientIndex) const;
+	bool IsIngredientCooking(int32 IngredientIndex) const;
+
+	const FHomeWorldServeResult& GetLastServe() const { return LastServe; }
+	int32 GetDustTotal() const { return DustTotal; }
+
 private:
+	void SyncPhase();
+	void OpenWindow();
+	void CloseWindow();
+	void ApplyStep(float Step);
+	void ServeActive(float SyncFactor, bool bKeepUnfinishedPrep);
+	void EnsureWorks(const FHomeWorldRecipe& Recipe);
+	bool AllIngredientsCooked() const;
+	float SyncFactorFromFinishes() const;
+
+	struct FIngredientWork
+	{
+		bool bPrepStarted = false;
+		bool bPrepped = false;
+		bool bCooking = false;
+		bool bCooked = false;
+		float PrepRemaining = 0.f;
+		float CookRemaining = 0.f;
+		float CookDuration = 0.f;
+		float CookFinishedAt = -1.f;
+		FName ChestItemId;
+	};
+
 	float HomeClockSeconds = 0.f;
 	bool bArmedBuffOccupied = false;
+	bool bOpeningDayEnded = false;
+	bool bBodyForm = true;
+	bool bWindowOpen = false;
+	bool bPhaseInitialized = false;
+	float WindowRemaining = 0.f;
+	int32 DustTotal = 0;
+	EHomeWorldTimeOfDayPhase LastPhase = EHomeWorldTimeOfDayPhase::Day;
+	FName ActiveRecipeId = NAME_None;
+	TArray<FIngredientWork> Works;
+	FHomeWorldServeResult LastServe;
 };

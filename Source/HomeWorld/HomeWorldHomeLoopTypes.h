@@ -72,3 +72,13 @@ struct FHomeWorldRecipe
 	UPROPERTY()
 	TArray<FHomeWorldRecipeIngredient> Ingredients;
 };
+
+/** What the last serve or discard did. An empty result means nothing has finished. */
+struct FHomeWorldServeResult
+{
+	bool bServed = false;
+	float SyncFactor = 0.f;
+	FName RecipeId;
+	TArray<FName> SpentItemIds;
+	bool bDiscarded = false;
+};

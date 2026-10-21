@@ -73,6 +73,8 @@ COVERAGE = {
             "HomeWorld.T0.DayGates.RefuseAtDuskAndNight",
             "HomeWorld.Systems.Opening.QuestLog",
             "HomeWorld.HomeLoop.KettleStillBrews",
+            "HomeWorld.HomeLoop.OpeningSprintUntouched",
+            "HomeWorld.HomeLoop.MistimeServes",
         ],
         "human": [
             "counter hover and pour feel at the kettle",

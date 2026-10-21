@@ -140,4 +140,225 @@ bool FHomeLoopKettleStillBrewsTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+namespace HomeWorldHomeLoopTest
+{
+	static void OpenDawn(UWorld* World, UHomeWorldHomeLoopSubsystem* Loop)
+	{
+		if (UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>())
+		{
+			TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Dawn);
+		}
+		Loop->Advance(0.f);
+	}
+
+	static bool Nearly(float Actual, float Expected)
+	{
+		return FMath::IsNearlyEqual(Actual, Expected, 0.01f);
+	}
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FHomeLoopKettlePrepCookTest,
+	"HomeWorld.HomeLoop.KettlePrepCook",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FHomeLoopKettlePrepCookTest::RunTest(const FString& Parameters)
+{
+	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
+		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
+	if (!TestNotNull(TEXT("home loop"), Loop))
+	{
+		return false;
+	}
+	Loop->SetOpeningDayEnded(true);
+	HomeWorldHomeLoopTest::OpenDawn(Scope.World, Loop);
+	TestTrue(TEXT("dawn opens the 90s window"), Loop->IsHomeWindowOpen());
+	TestTrue(TEXT("window is 90s"), HomeWorldHomeLoopTest::Nearly(Loop->GetWindowRemaining(), 90.f));
+
+	TestTrue(TEXT("kettle wash starts"), Loop->BeginPrep(FName(TEXT("RECIPE_KETTLE")), 0));
+	Loop->Advance(4.f);
+	TestTrue(TEXT("herb is washed"), Loop->IsIngredientPrepped(0));
+	TestFalse(TEXT("cook waits until the next moment"), Loop->IsIngredientCooking(0));
+	TestFalse(TEXT("not served at prep"), Loop->GetLastServe().bServed);
+
+	Loop->Advance(10.f);
+	TestTrue(TEXT("kettle served"), Loop->GetLastServe().bServed);
+	TestTrue(TEXT("one ingredient syncs full"), HomeWorldHomeLoopTest::Nearly(Loop->GetLastServe().SyncFactor, 1.f));
+	TestEqual(TEXT("spent the herb row"), Loop->GetLastServe().SpentItemIds.Num(), 1);
+	TestEqual(TEXT("spent ITEM_HERB"), Loop->GetLastServe().SpentItemIds[0], FName(TEXT("ITEM_HERB")));
+	TestTrue(TEXT("timers do not arm the slot yet"), Loop->IsArmedBuffSlotEmpty());
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FHomeLoopMistimeServesTest,
+	"HomeWorld.HomeLoop.MistimeServes",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FHomeLoopMistimeServesTest::RunTest(const FString& Parameters)
+{
+	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
+		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
+	if (!TestNotNull(TEXT("home loop"), Loop))
+	{
+		return false;
+	}
+	Loop->SetOpeningDayEnded(true);
+	HomeWorldHomeLoopTest::OpenDawn(Scope.World, Loop);
+	Loop->Advance(80.f);
+	TestTrue(TEXT("late wash still starts"), Loop->BeginPrep(FName(TEXT("RECIPE_KETTLE")), 0));
+	Loop->Advance(4.f);
+	TestTrue(TEXT("washed with cook still waiting"), Loop->IsIngredientPrepped(0));
+	Loop->Advance(6.f);
+	TestTrue(TEXT("window-end cook still serves"), Loop->GetLastServe().bServed);
+	TestTrue(TEXT("mistime factor is half"), HomeWorldHomeLoopTest::Nearly(Loop->GetLastServe().SyncFactor, 0.5f));
+	TestEqual(TEXT("mistime still spends the herb"), Loop->GetLastServe().SpentItemIds.Num(), 1);
+	TestEqual(TEXT("spent item is ITEM_HERB"), Loop->GetLastServe().SpentItemIds[0], FName(TEXT("ITEM_HERB")));
+	TestFalse(TEXT("window is closed"), Loop->IsHomeWindowOpen());
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FHomeLoopPrepCarriesTest,
+	"HomeWorld.HomeLoop.PrepCarries",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FHomeLoopPrepCarriesTest::RunTest(const FString& Parameters)
+{
+	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
+		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
+	UHomeWorldTimeOfDaySubsystem* TimeOfDay = Scope.World
+		? Scope.World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>() : nullptr;
+	if (!TestNotNull(TEXT("home loop"), Loop) || !TestNotNull(TEXT("time of day"), TimeOfDay))
+	{
+		return false;
+	}
+	Loop->SetOpeningDayEnded(true);
+	HomeWorldHomeLoopTest::OpenDawn(Scope.World, Loop);
+	TestTrue(TEXT("prep starts"), Loop->BeginPrep(FName(TEXT("RECIPE_KETTLE")), 0));
+	Loop->Advance(2.f);
+	TestTrue(TEXT("two seconds of wash remain"), HomeWorldHomeLoopTest::Nearly(Loop->GetPrepRemaining(0), 2.f));
+
+	TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Day);
+	Loop->Advance(0.f);
+	TestFalse(TEXT("day closes the window"), Loop->IsHomeWindowOpen());
+	TestTrue(TEXT("unfinished wash carries"), HomeWorldHomeLoopTest::Nearly(Loop->GetPrepRemaining(0), 2.f));
+
+	HomeWorldHomeLoopTest::OpenDawn(Scope.World, Loop);
+	Loop->Advance(2.f);
+	TestTrue(TEXT("carried wash finishes"), Loop->IsIngredientPrepped(0));
+	TestFalse(TEXT("a carried wash is not a serve"), Loop->GetLastServe().bServed);
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FHomeLoopOpeningSprintUntouchedTest,
+	"HomeWorld.HomeLoop.OpeningSprintUntouched",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FHomeLoopOpeningSprintUntouchedTest::RunTest(const FString& Parameters)
+{
+	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
+		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
+	UHomeWorldTimeOfDaySubsystem* TimeOfDay = Scope.World
+		? Scope.World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>() : nullptr;
+	if (!TestNotNull(TEXT("home loop"), Loop) || !TestNotNull(TEXT("time of day"), TimeOfDay))
+	{
+		return false;
+	}
+	TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Day);
+	UGameInstance* GameInstance = NewObject<UGameInstance>(Scope.World);
+	if (!TestNotNull(TEXT("game instance"), GameInstance))
+	{
+		return false;
+	}
+	GameInstance->Init();
+	Scope.World->SetGameInstance(GameInstance);
+
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	AHomeWorldCharacter* Character = Scope.World->SpawnActor<AHomeWorldCharacter>(Params);
+	if (!TestNotNull(TEXT("character"), Character))
+	{
+		return false;
+	}
+	Character->SyncFormWithTimeOfDay();
+	Character->DebugSeedOpeningWispLoop(0, 9);
+
+	TestFalse(TEXT("the opening day has not ended"), Loop->HasOpeningDayEnded());
+	TestTrue(TEXT("the world kettle still brews"), Loop->TryKettleFromWorld(Character));
+	TestTrue(TEXT("sprint gate stays the opening gate"), Character->IsTeaSprintGateActive());
+	TestTrue(TEXT("kettle_brewed still sets"), Character->GetPlaytestStateJson().Contains(TEXT("\"kettle_brewed\":true")));
+	TestEqual(TEXT("opening brew starts no station timer"), Loop->GetActiveWorkCount(), 0);
+	TestTrue(TEXT("opening brew leaves the slot empty"), Loop->IsArmedBuffSlotEmpty());
+
+	Character->GrantSpiritSleepGate();
+	TestTrue(TEXT("the first sleep ends the opening day"), Loop->HasOpeningDayEnded());
+	TestTrue(TEXT("the sprint gate is still the tea gate"), Character->IsTeaSprintGateActive());
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FHomeLoopTutorialStationsInertTest,
+	"HomeWorld.HomeLoop.TutorialStationsInert",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FHomeLoopTutorialStationsInertTest::RunTest(const FString& Parameters)
+{
+	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
+		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
+	if (!TestNotNull(TEXT("home loop"), Loop))
+	{
+		return false;
+	}
+	HomeWorldHomeLoopTest::OpenDawn(Scope.World, Loop);
+	TestTrue(TEXT("sink runs on the tutorial island"), Loop->CanRunStation(EHomeWorldHomeStation::Sink));
+	TestTrue(TEXT("pot runs on the tutorial island"), Loop->CanRunStation(EHomeWorldHomeStation::Pot));
+	TestFalse(TEXT("board stays inert"), Loop->CanRunStation(EHomeWorldHomeStation::Board));
+	TestFalse(TEXT("stove stays inert"), Loop->CanRunStation(EHomeWorldHomeStation::Stove));
+	TestFalse(TEXT("oven stays inert"), Loop->CanRunStation(EHomeWorldHomeStation::Oven));
+	TestFalse(TEXT("garbage stays inert"), Loop->CanRunStation(EHomeWorldHomeStation::Garbage));
+
+	TestTrue(TEXT("sink can wash"), Loop->BeginPrep(FName(TEXT("RECIPE_KETTLE")), 0));
+	Loop->Advance(4.f);
+	TestFalse(TEXT("garbage refuses the washed herb"), Loop->DiscardPrepped(0));
+	TestTrue(TEXT("the herb is still prepped"), Loop->IsIngredientPrepped(0));
+
+	Loop->SetBodyForm(false);
+	TestFalse(TEXT("spirit form refuses the sink"), Loop->CanRunStation(EHomeWorldHomeStation::Sink));
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FHomeLoopDiscardSpendsTest,
+	"HomeWorld.HomeLoop.DiscardSpends",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FHomeLoopDiscardSpendsTest::RunTest(const FString& Parameters)
+{
+	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
+		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
+	if (!TestNotNull(TEXT("home loop"), Loop))
+	{
+		return false;
+	}
+	Loop->SetOpeningDayEnded(true);
+	HomeWorldHomeLoopTest::OpenDawn(Scope.World, Loop);
+	TestTrue(TEXT("wash starts"), Loop->BeginPrep(FName(TEXT("RECIPE_KETTLE")), 0));
+	Loop->Advance(4.f);
+	TestTrue(TEXT("discard spends the washed herb"), Loop->DiscardPrepped(0));
+	TestTrue(TEXT("discard is not a serve"), Loop->GetLastServe().bDiscarded);
+	TestFalse(TEXT("a discarded piece is not a meal"), Loop->GetLastServe().bServed);
+	TestEqual(TEXT("one piece spent"), Loop->GetLastServe().SpentItemIds.Num(), 1);
+	TestEqual(TEXT("dust stays at zero"), Loop->GetDustTotal(), 0);
+	TestEqual(TEXT("no work remains"), Loop->GetActiveWorkCount(), 0);
+	return true;
+}
+
 #endif
