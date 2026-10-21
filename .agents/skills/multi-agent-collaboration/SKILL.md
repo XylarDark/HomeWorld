@@ -1,6 +1,6 @@
 ---
 name: multi-agent-collaboration
-description: Use when more than one agent or person is working in the same repository or the same working tree at the same time - covers single ownership of a file, staging by explicit path, who may push or rebase, establishing your own baseline before starting, and not changing a shared tool while others are using it.
+description: Use when more than one agent or person is working in the same repository or the same working tree at the same time - covers single ownership of a file, staging by explicit path, who may push or rebase, and a per-agent baseline before edits.
 ---
 
 # Multi-agent collaboration

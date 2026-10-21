@@ -102,23 +102,7 @@ Still do not silently take human-owned decisions.
 
 ## Conversation and context
 
-- Prefer a new chat for each new unit of work so the agent stays focused. Bring in
-  only the prior context you need (a file reference, a short summary) rather than
-  dragging a very long thread forward.
-- If a thread becomes noisy or self-contradictory, summarize progress and start a
-  fresh chat with that summary as the first message.
-
-## Context window awareness
-
-- **Read targeted, not everything.** Read specific line ranges or search
-  semantically instead of dumping entire large files.
-- **Pick the right search tool.** Use `Grep` for an exact symbol or string, semantic
-  search for exploratory "how does X work" questions, and `Glob` to find files by
-  name pattern.
-- **Decompose.** Break large tasks into subtasks; complete and report each one
-  before starting the next.
-- **Avoid context pollution.** Do not read files you do not need, and do not re-read
-  files whose content you already have.
+Prefer a new chat per unit of work; when a thread becomes noisy, summarize and carry forward only the reference you need.
 
 ## Tool usage
 
