@@ -77,6 +77,7 @@ README is left intact as history.
 | **Companion party play-confirm** | `Docs/qa/PARTY_PLAYTEST.md` | Desk checklist for #319 and #325. The design stays `Docs/41_COMPANION_PARTY_DESIGN.md`. |
 | **Quest tests (opening sweep and preflight)** | `Docs/qa/QUEST_TESTS.md` | `.\Tools\RunTests.ps1 -QuestCheck` is the host-only preflight (#320); `-QuestCoverage` writes the matrix `Docs/qa/QUEST_COVERAGE.md` (#321); `-Quest` is the in-editor sweep (#315, #318). A developer check, not the playtest pass. |
 | **Home loop (cooking, cleaning, garden)** | `Docs/42_HOME_LOOP_DESIGN.md` | APPROVED, Lead 2026-10-20. Picks 1A-8A plus follow-up 1A-3A. Build waits until Lead asks, after the companion party. |
+| **Clouds and wisps (descent route packet)** | `Docs/43_CLOUDS_WISPS_DESIGN.md` | APPROVED, Lead 2026-10-20. Interview #2 1A, interview #3 1A-2A, follow-up 1A-3A. Fertilizer loop stays out. |
 | GDD slice | `Docs/01_GDD_MVP.md` | canon |
 | **Cloud descent facts and carried wisp** | `Docs/context/HOMEWORLD_ROUTE.md` + accepted `docs/human-use/test-contract.md` | current route / accepted behavior |
 | Art direction | `Docs/02_ART_BIBLE.md` | canon. `VisionBoard/KeyArt/homestead_dusk_baseline.jpg` is a fit check after a developer design, not a design source. |
