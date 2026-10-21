@@ -5,7 +5,15 @@
 #   python Content/Python/run_quest_tests_host.py
 #   python Content/Python/run_quest_tests_host.py --only night,collect,heal
 #   python Content/Python/run_quest_tests_host.py --list
+#   python Content/Python/run_quest_tests_host.py --check
 #   .\Tools\RunTests.ps1 -Quest
+#   .\Tools\RunTests.ps1 -QuestCheck
+#
+# --check is the host-only quest preflight (quest_preflight.py): it proves the
+# manifest matches the C++ fast-forward - ids, stop words, skip steps, snapshot
+# paths, the documented beat list, and the L_SizeTest map - without an Editor,
+# PIE, or a map load. It exits 0 clean and 2 on a real mismatch (file + symbol).
+# Unreadable parses warn and never fail.
 #
 # The script sends execute_python_script("quest_tests.py") over the Editor's
 # raw TCP command port, then polls Saved/quest_tests.json. The suite runs on
@@ -13,7 +21,8 @@
 #
 # Exit codes: 0 all selected beats passed; 1 a beat failed or was
 # inconclusive; 2 the Editor, request, or run could not be reached; 3 a run is
-# already active.
+# already active. With --check, 0 means clean and 2 means a real manifest/C++
+# mismatch.
 
 import argparse
 import json
@@ -134,9 +143,15 @@ def main():
     parser = argparse.ArgumentParser(description="Run the opening quest sweep in the open Unreal Editor.")
     parser.add_argument("--only", help="comma-separated beat ids (default: every beat)")
     parser.add_argument("--list", action="store_true", help="print the beats and exit")
+    parser.add_argument("--check", action="store_true",
+                        help="host-only preflight: no Editor, no PIE, no map load; exit 2 on a real mismatch")
     parser.add_argument("--no-load-level", action="store_true", help="refuse to load L_SizeTest")
     parser.add_argument("--timeout", type=int, default=1800, help="poll timeout in seconds (default 1800)")
     args = parser.parse_args()
+
+    if args.check:
+        import quest_preflight
+        return quest_preflight.main()
 
     contract_errors = contract.validate_manifest(manifest.QUESTS)
     if contract_errors:
