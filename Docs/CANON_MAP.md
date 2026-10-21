@@ -79,6 +79,7 @@ README is left intact as history.
 | **Home loop (cooking, cleaning, garden, water signs)** | `Docs/42_HOME_LOOP_DESIGN.md` | APPROVED, Lead 2026-10-20. Picks 1A-8A, follow-up 1A-3A, water follow-up 2026-10-20. Host tests cover bites 1-8 and 10; bite 9 and the water/sign bite are design-only. Play-confirm: `Docs/qa/HOME_LOOP_PLAYTEST.md`. |
 | **Home-loop play-confirm** | `Docs/qa/HOME_LOOP_PLAYTEST.md` | Desk check for host bites 1-8 and 10. The in-editor pass waits on station and plot placement. The water/sign chain is design-only. |
 | **Clouds and wisps (descent route packet)** | `Docs/43_CLOUDS_WISPS_DESIGN.md` | APPROVED, Lead 2026-10-20. Interview #2 1A, interview #3 1A-2A, follow-up 1A-3A. Fertilizer loop stays out. |
+| **Future 3-player multiplayer (visit maps, co-op zones, raid)** | `Docs/44_MULTIPLAYER_FUTURE_DESIGN.md` | FUTURE, Lead idea 2026-10-21, not in slice |
 | GDD slice | `Docs/01_GDD_MVP.md` | canon |
 | **Cloud descent facts and carried wisp** | `Docs/context/HOMEWORLD_ROUTE.md` + accepted `docs/human-use/test-contract.md` | current route / accepted behavior |
 | Art direction | `Docs/02_ART_BIBLE.md` | canon. `VisionBoard/KeyArt/homestead_dusk_baseline.jpg` is a fit check after a developer design, not a design source. |
