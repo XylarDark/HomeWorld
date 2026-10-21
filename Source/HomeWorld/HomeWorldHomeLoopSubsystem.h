@@ -8,6 +8,7 @@
 #include "HomeWorldTimeOfDaySubsystem.h"
 
 class AHomeWorldCharacter;
+class UHomeWorldInventorySubsystem;
 
 #include "HomeWorldHomeLoopSubsystem.generated.h"
 
@@ -89,6 +90,14 @@ public:
 	int32 GetSurfaceDust(FName SurfaceId) const;
 	bool BeginClean(FName SurfaceId);
 
+	bool PlantSeed(int32 PlotIndex, UHomeWorldInventorySubsystem* Inventory, FName CropItemId);
+	bool TryAssignWispToPlot(FName WispId, int32 PlotIndex);
+	bool ClearWisp(FName WispId);
+	bool HarvestPlot(int32 PlotIndex);
+	int32 GetChestCount(FName ItemId) const;
+	int32 GetPlotWindows(int32 PlotIndex) const;
+	bool IsPlotReady(int32 PlotIndex) const;
+
 private:
 	void SyncPhase();
 	void ApplyPhase(EHomeWorldTimeOfDayPhase Phase, bool bFirst);
@@ -125,6 +134,8 @@ private:
 	const FHomeWorldDustSurface* FindSurface(FName SurfaceId) const;
 	void TickClean(float Step);
 	void RunCleaningWisps();
+	void GrowPlots();
+	FHomeWorldPlot* FindPlot(int32 PlotIndex);
 
 	float HomeClockSeconds = 0.f;
 	bool bOpeningDayEnded = false;
@@ -144,4 +155,6 @@ private:
 	TArray<FHomeWorldDustSurface> DustSurfaces;
 	FName CleanSurfaceId;
 	float CleanRemaining = 0.f;
+	TArray<FHomeWorldPlot> Plots;
+	TMap<FName, int32> Chest;
 };

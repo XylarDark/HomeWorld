@@ -8,6 +8,8 @@
 #include "Engine/World.h"
 #include "HomeWorldCharacter.h"
 #include "HomeWorldHomeLoopSubsystem.h"
+#include "HomeWorldInventorySubsystem.h"
+#include "HomeWorldInventoryTypes.h"
 #include "HomeWorldTimeOfDaySubsystem.h"
 
 /**
@@ -732,6 +734,132 @@ bool FHomeLoopCleanClearsOneTest::RunTest(const FString& Parameters)
 	TestTrue(TEXT("a cleaning wisp takes the sill"), Loop->TryAssignWispToSurface(FName(TEXT("Sweeper")), FName(TEXT("Sill"))));
 	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Day);
 	TestEqual(TEXT("the wisp cleared one surface"), Loop->GetSurfaceDust(FName(TEXT("Sill"))), 0);
+	return true;
+}
+
+namespace HomeWorldHomeLoopTest
+{
+	static UHomeWorldInventorySubsystem* MakeInventory(UWorld* World)
+	{
+		UGameInstance* GameInstance = World->GetGameInstance();
+		if (!GameInstance)
+		{
+			GameInstance = NewObject<UGameInstance>(World);
+			GameInstance->Init();
+			World->SetGameInstance(GameInstance);
+		}
+		return GameInstance->GetSubsystem<UHomeWorldInventorySubsystem>();
+	}
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FHomeLoopPlotHarvestChestTest,
+	"HomeWorld.HomeLoop.PlotHarvestChest",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FHomeLoopPlotHarvestChestTest::RunTest(const FString& Parameters)
+{
+	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
+		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
+	UHomeWorldInventorySubsystem* Inventory = Scope.World
+		? HomeWorldHomeLoopTest::MakeInventory(Scope.World) : nullptr;
+	if (!TestNotNull(TEXT("home loop"), Loop) || !TestNotNull(TEXT("inventory"), Inventory))
+	{
+		return false;
+	}
+	TestTrue(TEXT("one seed"), Inventory->TryAddResource(HomeWorldInventory::RES_SEED, 1));
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Dawn);
+	TestTrue(TEXT("the seed goes into the plot"), Loop->PlantSeed(0, Inventory, FName(TEXT("ITEM_HERB"))));
+	TestEqual(TEXT("the seed is spent"), Inventory->GetResource(HomeWorldInventory::RES_SEED), 0);
+	TestFalse(TEXT("a fifth plot is outside the cap"), Loop->PlantSeed(4, Inventory, FName(TEXT("ITEM_HERB"))));
+	const FName Wisp(TEXT("Gardener"));
+	TestTrue(TEXT("a wisp takes the plot"), Loop->TryAssignWispToPlot(Wisp, 0));
+
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Day);
+	TestEqual(TEXT("one window grown"), Loop->GetPlotWindows(0), 1);
+	TestFalse(TEXT("one window is not a harvest"), Loop->IsPlotReady(0));
+
+	TestTrue(TEXT("taking the wisp off pauses"), Loop->ClearWisp(Wisp));
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Dawn);
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Day);
+	TestEqual(TEXT("a paused window does not grow"), Loop->GetPlotWindows(0), 1);
+
+	TestTrue(TEXT("the wisp returns"), Loop->TryAssignWispToPlot(Wisp, 0));
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Dawn);
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Day);
+	TestTrue(TEXT("two tended windows are ready"), Loop->IsPlotReady(0));
+	TestTrue(TEXT("harvest"), Loop->HarvestPlot(0));
+	TestEqual(TEXT("the harvest is ITEM_HERB"), Loop->GetChestCount(FName(TEXT("ITEM_HERB"))), 1);
+	TestEqual(TEXT("ITEM_HERB is not a resource"), Inventory->GetResource(FName(TEXT("ITEM_HERB"))), 0);
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FHomeLoopKettleSpendsChestHerbTest,
+	"HomeWorld.HomeLoop.KettleSpendsChestHerb",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FHomeLoopKettleSpendsChestHerbTest::RunTest(const FString& Parameters)
+{
+	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
+		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
+	UHomeWorldInventorySubsystem* Inventory = Scope.World
+		? HomeWorldHomeLoopTest::MakeInventory(Scope.World) : nullptr;
+	if (!TestNotNull(TEXT("home loop"), Loop) || !TestNotNull(TEXT("inventory"), Inventory))
+	{
+		return false;
+	}
+	TestTrue(TEXT("seed"), Inventory->TryAddResource(HomeWorldInventory::RES_SEED, 1));
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Dawn);
+	TestTrue(TEXT("plant"), Loop->PlantSeed(0, Inventory, FName(TEXT("ITEM_HERB"))));
+	const FName Wisp(TEXT("Gardener"));
+	TestTrue(TEXT("tend"), Loop->TryAssignWispToPlot(Wisp, 0));
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Day);
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Dawn);
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Day);
+	TestTrue(TEXT("harvest into the chest"), Loop->HarvestPlot(0));
+	TestEqual(TEXT("chest holds one herb"), Loop->GetChestCount(FName(TEXT("ITEM_HERB"))), 1);
+
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	AHomeWorldCharacter* Character = Scope.World->SpawnActor<AHomeWorldCharacter>(Params);
+	if (!TestNotNull(TEXT("character"), Character))
+	{
+		return false;
+	}
+	if (UHomeWorldTimeOfDaySubsystem* TimeOfDay = Scope.World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>())
+	{
+		TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Day);
+	}
+	Character->SyncFormWithTimeOfDay();
+	Character->DebugSeedOpeningWispLoop(0, 9);
+	TestTrue(TEXT("the opening brew still uses chunks"), Loop->TryKettleFromWorld(Character));
+	TestEqual(TEXT("the opening brew leaves the chest"), Loop->GetChestCount(FName(TEXT("ITEM_HERB"))), 1);
+
+	Loop->SetOpeningDayEnded(true);
+	HomeWorldHomeLoopTest::GoToPhase(Scope.World, Loop, EHomeWorldTimeOfDayPhase::Dawn);
+	TestTrue(TEXT("clear dawn dust"), Loop->BeginClean(FName(TEXT("Floor"))));
+	Loop->Advance(3.f);
+	TestTrue(TEXT("post-tutorial kettle"), HomeWorldHomeLoopTest::CookKettle(Loop));
+	TestEqual(TEXT("the kettle spent ITEM_HERB"), Loop->GetChestCount(FName(TEXT("ITEM_HERB"))), 0);
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FHomeLoopResourcesStaySixTest,
+	"HomeWorld.HomeLoop.ResourcesStaySix",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FHomeLoopResourcesStaySixTest::RunTest(const FString& Parameters)
+{
+	const TArray<FName>& Ids = HomeWorldInventory::GetAllResourceIds();
+	TestEqual(TEXT("six resources"), Ids.Num(), 6);
+	TestTrue(TEXT("seed remains a resource"), Ids.Contains(HomeWorldInventory::RES_SEED));
+	TestTrue(TEXT("herb remains a resource"), Ids.Contains(HomeWorldInventory::RES_HERB));
+	TestFalse(TEXT("ITEM_HERB is not a RES id"), Ids.Contains(FName(TEXT("ITEM_HERB"))));
+	TestFalse(TEXT("ITEM_GREENS is not a RES id"), Ids.Contains(FName(TEXT("ITEM_GREENS"))));
 	return true;
 }
 

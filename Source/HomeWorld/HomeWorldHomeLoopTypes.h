@@ -119,3 +119,13 @@ struct FHomeWorldDustSurface
 	FName SurfaceId;
 	int32 Dust = 0;
 };
+
+/** One garden plot. A seed is ready after two home windows with a wisp on it. */
+struct FHomeWorldPlot
+{
+	int32 Index = 0;
+	bool bPlanted = false;
+	bool bReady = false;
+	int32 WindowsGrown = 0;
+	FName CropItemId;
+};

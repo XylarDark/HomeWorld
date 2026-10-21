@@ -3,6 +3,8 @@
 #include "HomeWorldHomeLoopSubsystem.h"
 
 #include "HomeWorldCharacter.h"
+#include "HomeWorldInventorySubsystem.h"
+#include "HomeWorldInventoryTypes.h"
 
 namespace HomeWorldHomeLoop
 {
@@ -244,8 +246,16 @@ void UHomeWorldHomeLoopSubsystem::ServeActive(float SyncFactor, bool bKeepUnfini
 		const bool bInVessel = Work.bCooking || Work.bCooked;
 		if (bInVessel)
 		{
-			LastServe.SpentItemIds.Add(Work.ChestItemId);
-			continue;
+		LastServe.SpentItemIds.Add(Work.ChestItemId);
+		if (Work.ChestItemId == FName(TEXT("ITEM_HERB")))
+		{
+			int32* Count = Chest.Find(Work.ChestItemId);
+			if (Count && *Count > 0)
+			{
+				--(*Count);
+			}
+		}
+		continue;
 		}
 		if (bKeepUnfinishedPrep && Work.bPrepStarted && !Work.bPrepped)
 		{
@@ -398,6 +408,7 @@ void UHomeWorldHomeLoopSubsystem::CloseWindow()
 		ServeActive(0.5f, true);
 	}
 	RunCleaningWisps();
+	GrowPlots();
 }
 
 void UHomeWorldHomeLoopSubsystem::ApplyStep(float Step)
@@ -678,8 +689,129 @@ void UHomeWorldHomeLoopSubsystem::RunCleaningWisps()
 	{
 		if (Assignment.Target == EHomeWorldWispTarget::Surface)
 		{
-			ClearSurface(Assignment.SurfaceId);
-			return;
+		ClearSurface(Assignment.SurfaceId);
+		return;
 		}
 	}
+}
+
+bool UHomeWorldHomeLoopSubsystem::PlantSeed(int32 PlotIndex, UHomeWorldInventorySubsystem* Inventory, FName CropItemId)
+{
+	if (!bWindowOpen || !bBodyForm || !Inventory || PlotIndex < 0 || PlotIndex >= 4 || CropItemId.IsNone())
+	{
+		return false;
+	}
+	if (!Inventory->SpendResource(HomeWorldInventory::RES_SEED, 1))
+	{
+		return false;
+	}
+	if (Plots.Num() <= PlotIndex)
+	{
+		Plots.SetNum(PlotIndex + 1);
+	}
+	FHomeWorldPlot& Plot = Plots[PlotIndex];
+	if (Plot.bPlanted)
+	{
+		Inventory->TryAddResource(HomeWorldInventory::RES_SEED, 1);
+		return false;
+	}
+	Plot = FHomeWorldPlot();
+	Plot.Index = PlotIndex;
+	Plot.bPlanted = true;
+	Plot.CropItemId = CropItemId;
+	return true;
+}
+
+bool UHomeWorldHomeLoopSubsystem::TryAssignWispToPlot(FName WispId, int32 PlotIndex)
+{
+	if (WispId.IsNone() || !Plots.IsValidIndex(PlotIndex) || !Plots[PlotIndex].bPlanted)
+	{
+		return false;
+	}
+	for (const FHomeWorldWispAssignment& Assignment : WispAssignments)
+	{
+		if (Assignment.WispId == WispId)
+		{
+			return false;
+		}
+	}
+	FHomeWorldWispAssignment Assignment;
+	Assignment.WispId = WispId;
+	Assignment.Target = EHomeWorldWispTarget::Plot;
+	Assignment.PlotIndex = PlotIndex;
+	WispAssignments.Add(Assignment);
+	return true;
+}
+
+bool UHomeWorldHomeLoopSubsystem::ClearWisp(FName WispId)
+{
+	const int32 Removed = WispAssignments.RemoveAll([&WispId](const FHomeWorldWispAssignment& Assignment)
+	{
+		return Assignment.WispId == WispId;
+	});
+	return Removed > 0;
+}
+
+void UHomeWorldHomeLoopSubsystem::GrowPlots()
+{
+	for (FHomeWorldPlot& Plot : Plots)
+	{
+		if (!Plot.bPlanted || Plot.bReady)
+		{
+			continue;
+		}
+		bool bTended = false;
+		for (const FHomeWorldWispAssignment& Assignment : WispAssignments)
+		{
+			if (Assignment.Target == EHomeWorldWispTarget::Plot && Assignment.PlotIndex == Plot.Index)
+			{
+				bTended = true;
+				break;
+			}
+		}
+		if (!bTended)
+		{
+			continue;
+		}
+		++Plot.WindowsGrown;
+		if (Plot.WindowsGrown >= 2)
+		{
+			Plot.bReady = true;
+		}
+	}
+}
+
+bool UHomeWorldHomeLoopSubsystem::HarvestPlot(int32 PlotIndex)
+{
+	FHomeWorldPlot* Plot = FindPlot(PlotIndex);
+	if (!Plot || !Plot->bReady)
+	{
+		return false;
+	}
+	int32& Count = Chest.FindOrAdd(Plot->CropItemId);
+	++Count;
+	*Plot = FHomeWorldPlot();
+	Plot->Index = PlotIndex;
+	return true;
+}
+
+int32 UHomeWorldHomeLoopSubsystem::GetChestCount(FName ItemId) const
+{
+	const int32* Count = Chest.Find(ItemId);
+	return Count ? *Count : 0;
+}
+
+int32 UHomeWorldHomeLoopSubsystem::GetPlotWindows(int32 PlotIndex) const
+{
+	return Plots.IsValidIndex(PlotIndex) ? Plots[PlotIndex].WindowsGrown : 0;
+}
+
+bool UHomeWorldHomeLoopSubsystem::IsPlotReady(int32 PlotIndex) const
+{
+	return Plots.IsValidIndex(PlotIndex) && Plots[PlotIndex].bReady;
+}
+
+FHomeWorldPlot* UHomeWorldHomeLoopSubsystem::FindPlot(int32 PlotIndex)
+{
+	return Plots.IsValidIndex(PlotIndex) ? &Plots[PlotIndex] : nullptr;
 }
