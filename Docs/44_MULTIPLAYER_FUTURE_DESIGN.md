@@ -26,6 +26,8 @@ Up to **three human players**. Each player owns a **personal map instance**: the
 
 This doc does not invent player counts beyond three, drop rates, raid timers, or backend topology until Lead answers.
 
+**How the three layers fit together:** Layer one is **my map** (homestead plus seeded field and forest, solo boss at the end of my run). Layer two is **visiting your map** (I help you; your boss and quest flags stay yours unless Lead picks otherwise). Layer three is **multiplayer zones** (we enter a purpose-built instance for co-op verbs and a raid boss). Trading and half-share collections can span layers two and four once economy picks land.
+
 ## 3. What exists today that this builds on
 
 ### Canon and architecture
@@ -57,6 +59,8 @@ Future **visit another player's homestead** can extend the **moonlight portal pa
 [Docs/41_COMPANION_PARTY_DESIGN.md](41_COMPANION_PARTY_DESIGN.md): **one possessed pawn**; partner and child are **NPC followers** on day gather and travel only; **no second controller**; **co-op drop-in on hub stays forbidden**. Party state lives on [Source/HomeWorld/HomeWorldFamilySubsystem.h](../Source/HomeWorld/HomeWorldFamilySubsystem.h) (`bPartnerOut`, `bChildOut`, invite rules, save flags). [Source/HomeWorld/HomeWorldCharacter.cpp](../Source/HomeWorld/HomeWorldCharacter.cpp) **`TryPartyInviteInFront`** traces interact targets tagged `NPC_PARTNER` or `NPC_CHILD` and calls `ToggleMemberAtHome`.
 
 **Mapping to future human co-op:** The same **GameInstance subsystem** pattern can hold **session party metadata** (who is visiting whom) without possessing NPC walkers. **Human visitors are not** the companion party flags; those flags stay NPC-only unless Lead merges the designs.
+
+Invite flow today is **home-only, day, body form, after rescue** (`ToggleMemberAtHome` refuses night, spirit, and field invites). A future **friend visit invite** should reuse the same **refusal-first** pattern: failed rules leave state unchanged, and feedback uses the existing interact channel on `AHomeWorldCharacter`.
 
 ### Home loop and wisps (solo economies)
 
@@ -129,7 +133,13 @@ Fold answers into section 2 and section 5 when Lead replies.
 8. **Where multiplayer zones live:** **A (Recommended).** Attached to the **host's map** via a gate or shrine invite (instance spins from the owner). **B.** A **shared hub** everyone meets in first. **C.** Menu-only raid finder with no map tie.
 9. **Raid size:** **A (Recommended).** Scales **1–3** players with mechanics that stay fair alone and richer at three. **B.** Exactly three players required; solo uses separate content.
 
-## 8. Out of scope for this document
+## 8. Related canon pointers (do not duplicate here)
+
+- Opening tutorial and play queue: [Docs/context/PRINCIPLE_FIT_LOCK.md](context/PRINCIPLE_FIT_LOCK.md), [Docs/qa/TUTORIAL_PLAYTEST_QUEUE.md](qa/TUTORIAL_PLAYTEST_QUEUE.md).
+- Zone machine-readable specs: `Lib/02_Zones/**/*.json` (CANON_MAP row).
+- Spirit and night solo rules: [SPIRIT_STEALTH_BIBLE.md](SPIRIT_STEALTH_BIBLE.md), [DAYNIGHT_BIBLE.md](DAYNIGHT_BIBLE.md).
+
+## 9. Out of scope for this document
 
 - Engine plugin choice, Steam lobby API, or dedicated server hosting.
 - Changing companion party to mean human players on the slice.
