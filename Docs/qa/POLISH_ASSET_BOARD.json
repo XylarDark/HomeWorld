@@ -21,13 +21,14 @@
     "4. Nothing else in this file is read by the gate."
   ],
 
-  "_note_on_the_two_failing_materials": "M_FamilySilhouette and M_ValleyNight are NOT on this list. They are not one of the ten masters, they fail env.master_binding, and the Lead has ruled they stay RED for the art pass. They do not belong on the master board until they are either remapped onto a master or added to the allowlist by an art decision.",
+  "_note_on_the_two_failing_materials": "M_FamilySilhouette and M_ValleyNight are NOT on this list. They are not one of the project masters, they fail env.master_binding, and the Lead has ruled they stay RED for the art pass. They do not belong on the master board until they are either remapped onto a master or added to the allowlist by an art decision.",
 
   "assets": [
     { "name": "M_BeastStylized", "stage": null, "priority": null, "notes": "Beast bodies. Four-state tame read depends on this staying readable at distance." },
     { "name": "M_CliffRock",       "stage": null, "priority": null, "notes": "Cliff assemblies and the planet valley lips. 39 users - the most-used material in the blend." },
     { "name": "M_FoliageCard",     "stage": null, "priority": null, "notes": "83 users. Card-based foliage. The count is why this one probably wants an early decision." },
     { "name": "M_GatherHerb",      "stage": null, "priority": null, "notes": "Gather nodes, the V3 verb's read." },
+    { "name": "M_GreyboxRead",     "stage": null, "priority": null, "notes": "Size-test read: lit grey, roughness 0.85, 1 m checker per face. Added by the Lead 2026-10-19 (520fbda5) - one row per master, so it is on the board like the rest." },
     { "name": "M_Nurtured",        "stage": null, "priority": null, "notes": "N1 crop / N2 stored outcome, the V7 verb's read." },
     { "name": "M_PathStone",       "stage": null, "priority": null, "notes": "40 users. Landing circle stones and path tiles - the CRUMB_* path the glide lands on." },
     { "name": "M_SpiritUnlit",     "stage": null, "priority": null, "notes": "Spirit base. Unlit by design, so this one is a silhouette problem, not a lighting one." },

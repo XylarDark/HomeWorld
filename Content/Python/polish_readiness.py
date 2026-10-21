@@ -117,8 +117,11 @@ SHIPPING_LEVEL = "L_VS_MVP_Markers"
 OUT_JSON = ROOT / "Docs" / "qa" / "POLISH_READINESS.json"
 OUT_MD = ROOT / "Docs" / "qa" / "POLISH_READINESS.md"
 
-#: Art bible S10 / AGENTS.md lock: exactly ten master materials. Not a preference.
-EXPECTED_MASTER_COUNT = 10
+#: Master materials, per art bible S10 (ten) plus the size-test greybox read that
+#: the Lead committed on 2026-10-19 (520fbda5; Docs/level/L_SizeTest_CONTEXT.md
+#: describes the material). Not a preference: the count is the Lead's call, and the
+#: Lead commit is the record of it - this constant tracks, it does not decide.
+EXPECTED_MASTER_COUNT = 11
 
 #: If this changes, a check was dropped or renamed. Fail loudly rather than
 #: reporting a green run over a smaller set of questions. See WHY #0.
@@ -940,9 +943,9 @@ def check_env_pivot() -> Check:
 def check_env_master_binding() -> Check:
     return _criterion_check(
         "env.master_binding", "master_binding",
-        "Every material resolves to one of the ten masters (art bible S10)",
+        "Every material resolves to one of the project masters (art bible S10)",
         load_waivers(),
-        action="Bind each material to one of the ten masters in "
+        action="Bind each material to one of the project masters in "
                "Docs/06_VS_MVP_DRESS.md, or declare it an allowed instance of one. "
                "This is an art-bible decision (S10), so it is the Lead's call, not "
                "a script's. Lead ruled 2026-10-04 to leave it RED for the art pass "
@@ -1586,7 +1589,7 @@ def check_env_traversal_reachable() -> Check:
 def check_asset_masters() -> Check:
     if not MASTERS_DIR.is_dir():
         return Check("asset.master_count", "G-ASSET",
-                     "Exactly ten master materials exist",
+                     "Exactly eleven master materials exist",
                      _rel(MASTERS_DIR), "directory absent",
                      str(EXPECTED_MASTER_COUNT), MISSING,
                      next_action="Content/HomeWorld/Materials/Masters is absent, so "
@@ -1598,9 +1601,17 @@ def check_asset_masters() -> Check:
     state = PASS if n == EXPECTED_MASTER_COUNT else FAIL
     return Check(
         "asset.master_count", "G-ASSET",
-        "Exactly ten master materials exist (art bible S10)",
+        f"Exactly {EXPECTED_MASTER_COUNT} master materials exist "
+        "(art bible S10 plus the size-test greybox read)",
         _rel(MASTERS_DIR), f"{n} masters", str(EXPECTED_MASTER_COUNT),
         state, ", ".join(names),
+        next_action="" if state == PASS else (
+            "Reconcile the master count with the Lead: either the master set "
+            "changed and this recorded ceiling follows it (art-bible call, "
+            "recorded by a Masters commit), or the extra file does not belong "
+            "in Masters and the Lead rules on removing it. State the ruling, then "
+            "this row and Docs/qa/POLISH_ASSET_BOARD.json follow it."),
+        action_kind=DECIDE if state == FAIL else None,
     )
 
 
