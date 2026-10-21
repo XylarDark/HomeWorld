@@ -78,7 +78,7 @@ Independent calls belong in one message — `get_file_problems` for two changed 
 
 ## Framework selection
 
-Pick the minimal framework that covers the requested test. Read [reference/ue-test-patterns.md](reference/ue-test-patterns.md) when choosing a framework or writing its boilerplate.
+Pick the minimal framework that covers the requested test. Read [docs/UE/UE58_TEST_PATTERNS.md](../../../docs/UE/UE58_TEST_PATTERNS.md) when choosing a framework or writing its boilerplate.
 
 | Need | Preferred framework |
 |---|---|
@@ -147,7 +147,7 @@ If an item is uncertain, `Read` the relevant declaration or a narrow range aroun
 
 ## References
 
-- [reference/ue-test-patterns.md](reference/ue-test-patterns.md) — read for framework selection, boilerplate, new test module setup, and framework pitfalls.
+- [docs/UE/UE58_TEST_PATTERNS.md](../../../docs/UE/UE58_TEST_PATTERNS.md) — read for framework selection, boilerplate, new test module setup, and framework pitfalls. (Moved out of this skill 2026-10-20.)
 - [reference/attribute-set-tests.md](reference/attribute-set-tests.md) — read only when testing an Unreal `UAttributeSet` or its attribute-change hooks.
 - [reference/rider-tools.md](reference/rider-tools.md) — read for the fix-loop and full quality-pass patterns.
-- [reference/rider-mcp-tools.md](reference/rider-mcp-tools.md) — read for a less common Rider tool or an argument you are unsure of.
+- [reference/rider-mcp-tools.md](../../skills/ue-code-authoring/reference/rider-mcp-tools.md) — read for a less common Rider tool or an argument you are unsure of. (The copy in this folder is a pointer to that single param reference.)

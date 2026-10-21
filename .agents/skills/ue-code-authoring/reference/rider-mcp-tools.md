@@ -74,7 +74,10 @@ Same contract as `search_text`, with `--q` as the regex.
 ### `search_file`
 Find files by glob. `--q '<glob>'`, optional `--paths`, optional `--includeExcluded true`, optional `--limit`. A pattern without `/` is treated as `**/pattern`.
 
-Note: all four take `--q`. There is no `--query`.
+### `skill_search`
+Unified search with an explicit mode: file (glob), text (literal), or regex.
+
+Note: all four `search_*` tools take `--q`. There is no `--query`.
 
 ---
 
@@ -127,7 +130,7 @@ and ignore that signature for the rest of the session. Do not sweep further file
 and do not edit working code to satisfy it.
 
 ### `lint_files`
-`--files '["path", ...]'`, optional `--min_severity warning|error` (default `warning`, which also includes code-style suggestions and hints), optional `--timeout <ms>`. Per-file results; a file entry may carry `timedOut: true` with empty problems, or a `notAnalyzedReason` (unsupported type, or not part of any project). Top-level `more: true` means the batch is incomplete.
+`--files '["path", ...]'`, optional `--min_severity warning|error` (default `warning`, which also includes code-style suggestions and hints), optional `--timeout <ms>`. Per-file results; a file entry may carry `timedOut: true` with empty problems, or a `notAnalyzedReason` (unsupported type, or not part of any project). A test file reported as not part of any project usually means its module is missing from the `.uproject`/`.uplugin`. Top-level `more: true` means the batch is incomplete.
 
 ### `get_project_problems`
 Reads the IDE Problems View — it does not trigger new analysis. Optional `--severity Error|Warning|Info|All` (default `All`), optional `--subsystem <id>` (e.g. `Solution`, `Roslyn`, `NuGet`). Run a build first if you need current build diagnostics.
@@ -195,6 +198,6 @@ Only useful with the UE editor running and RiderLink loaded.
 
 - `simulate_input` — simulate player input; each mode has its own named params.
 - `take_screenshot`, `viewport_camera`, `spawn_actor` — editor/game viewport control.
-- `get_run_configurations`, `execute_run_configuration` — list and launch run configurations.
+- `get_run_configurations`, `execute_run_configuration` — list and launch run configurations. Use only when running a test or target locally is the requested validation; where a verifier owns the authoritative automation run, leave the run to it.
 - `get_solution_projects`, `get_project_dependencies` — solution structure; `--projectName` must be exactly as `get_solution_projects` returned it.
 - `xdebug_*` — debugger session control (breakpoints, stack, frame values, expression evaluation, stepping). For runtime investigation rather than authoring; see the `ue-live-debugging` skill.
