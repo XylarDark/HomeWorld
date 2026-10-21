@@ -16,3 +16,59 @@ enum class EHomeWorldHomeStation : uint8
 	Oven,
 	Garbage
 };
+
+/** Vessels. Pan and Oven stay unused until a later recipe names one. */
+UENUM()
+enum class EHomeWorldHomeVessel : uint8
+{
+	Pot,
+	Pan,
+	Oven
+};
+
+/** Meal buffs. Glide and Gather log only; Stamina lengthens the sprint window. */
+UENUM()
+enum class EHomeWorldHomeBuff : uint8
+{
+	Stamina,
+	Glide,
+	Gather
+};
+
+/** One ingredient row. Chest item ids are not RES_* ids. */
+USTRUCT()
+struct FHomeWorldRecipeIngredient
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FName ChestItemId;
+
+	UPROPERTY()
+	EHomeWorldHomeStation PrepStation = EHomeWorldHomeStation::Sink;
+
+	UPROPERTY()
+	float PrepSeconds = 0.f;
+
+	UPROPERTY()
+	float CookSeconds = 0.f;
+};
+
+/** One food recipe. RECIPE_KETTLE is the first row. */
+USTRUCT()
+struct FHomeWorldRecipe
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FName Id;
+
+	UPROPERTY()
+	EHomeWorldHomeVessel Vessel = EHomeWorldHomeVessel::Pot;
+
+	UPROPERTY()
+	EHomeWorldHomeBuff BuffId = EHomeWorldHomeBuff::Stamina;
+
+	UPROPERTY()
+	TArray<FHomeWorldRecipeIngredient> Ingredients;
+};

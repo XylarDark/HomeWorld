@@ -2,6 +2,8 @@
 
 #include "HomeWorldHomeLoopSubsystem.h"
 
+#include "HomeWorldCharacter.h"
+
 namespace HomeWorldHomeLoop
 {
 	static const TCHAR* StationName(EHomeWorldHomeStation Station)
@@ -35,4 +37,34 @@ FString UHomeWorldHomeLoopSubsystem::LogStation(EHomeWorldHomeStation Station) c
 	const FString Line = FString::Printf(TEXT("home_loop: station %s"), HomeWorldHomeLoop::StationName(Station));
 	UE_LOG(LogTemp, Log, TEXT("%s"), *Line);
 	return Line;
+}
+
+bool UHomeWorldHomeLoopSubsystem::GetRecipe(FName RecipeId, FHomeWorldRecipe& OutRecipe) const
+{
+	if (RecipeId != FName(TEXT("RECIPE_KETTLE")))
+	{
+		return false;
+	}
+
+	OutRecipe = FHomeWorldRecipe();
+	OutRecipe.Id = RecipeId;
+	OutRecipe.Vessel = EHomeWorldHomeVessel::Pot;
+	OutRecipe.BuffId = EHomeWorldHomeBuff::Stamina;
+
+	FHomeWorldRecipeIngredient Herb;
+	Herb.ChestItemId = FName(TEXT("ITEM_HERB"));
+	Herb.PrepStation = EHomeWorldHomeStation::Sink;
+	Herb.PrepSeconds = 4.f;
+	Herb.CookSeconds = 10.f;
+	OutRecipe.Ingredients.Add(Herb);
+	return true;
+}
+
+bool UHomeWorldHomeLoopSubsystem::TryOpeningKettleBrew(AHomeWorldCharacter* Character)
+{
+	if (!Character)
+	{
+		return false;
+	}
+	return Character->TryBrewNodeKettleTea();
 }

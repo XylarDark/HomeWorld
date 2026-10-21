@@ -72,6 +72,7 @@ COVERAGE = {
             "HomeWorld.T0.FL2.GardenPickThenTea",
             "HomeWorld.T0.DayGates.RefuseAtDuskAndNight",
             "HomeWorld.Systems.Opening.QuestLog",
+            "HomeWorld.HomeLoop.KettleStillBrews",
         ],
         "human": [
             "counter hover and pour feel at the kettle",
