@@ -150,7 +150,24 @@ public:
 	/** Test hook: advance the night timer without waiting on a PIE tick. */
 	void DebugAdvanceOpeningNight(float DeltaSeconds);
 
-	/** Read-only test view of the wisp loop. No gameplay effect. */
+	/** Click-heart seconds to hot-spring heal seconds. 3.0 is 20, 3.1 and 4.0 are 30, 4.1 is 40. */
+	static float OpeningHealSecondsForHeart(float HeartSeconds);
+
+	/** Test hook: queue one wisp's heal from a finished heart, without drawing it. */
+	void DebugQueueOpeningWispHeart(float HeartSeconds);
+
+	/** Test hook: start the collect heart on a wisp actor. */
+	bool DebugBeginOpeningWispHeart(AActor* Wisp);
+
+	/** Test hook: advance the open heart. A wisp collect heart does not end at 3 seconds. */
+	void DebugAdvanceOpeningWispHeart(float DeltaSeconds);
+
+	bool IsOpeningWispHeartActiveForTest() const { return bOpeningWispCollect && bOpeningRuneActive; }
+
+	float GetOpeningWispHealTimerForTest(int32 Index) const
+	{
+		return OpeningWispHealTimers.IsValidIndex(Index) ? OpeningWispHealTimers[Index] : -1.f;
+	}
 	int32 GetOpeningWispsCarriedForTest() const { return OpeningWispsCarried; }
 	int32 GetOpeningHerbTenthsForTest() const { return OpeningHerbTenths; }
 	int32 GetOpeningWispHealTimerCountForTest() const { return OpeningWispHealTimers.Num(); }
@@ -979,6 +996,12 @@ protected:
 	/** One entry per wisp healing in the hot springs; seconds left. */
 	UPROPERTY(Transient)
 	TArray<float> OpeningWispHealTimers;
+
+	/** Heal length for each collected wisp, in collect order. Empty means the fast heart, 20 seconds. */
+	TArray<float> OpeningWispHealDurations;
+
+	/** Seconds the open wisp collect heart has been running. */
+	float OpeningWispHeartElapsed = 0.f;
 
 	/** Healed wisps that follow near the legs. */
 	UPROPERTY(Transient)

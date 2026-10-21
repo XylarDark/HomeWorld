@@ -14,13 +14,12 @@ Prep so a later critical-path row can be played. The handoff is [`Docs/handoffs/
 
 Start now means source and a host test, with the editor left open. Place means the editor, after that Night pass releases `L_SizeTest`.
 
-Tasks 1 and 2 passed their host tests on 2026-10-21 and are in Done. Task 3 added `glider`, `delivery`, `daycamp`, `dawnglide`, `nightglide`, `stealth`, and `ease`. The shrine stop is not in: the three strokes stay the player's. `.\Tools\RunTests.ps1 -QuestCheck` is the host check. The heal stop still waits on the Night sentence. The day-camp arrival passed `HomeWorld.Opening.DayCamp`; the clearing is still a place task. Dawn glide stops before the launch. No meadow, mist actor, or smoke actor is added.
+Tasks 1 and 2 passed their host tests on 2026-10-21 and are in Done. Task 3 added `glider`, `delivery`, `daycamp`, `dawnglide`, `nightglide`, `stealth`, and `ease`. The shrine stop is not in: the three strokes stay the player's. The heal formula is in the binary (`HomeWorld.Opening.HealTime`). The Night sentence still waits on the bed press. The day-camp arrival passed `HomeWorld.Opening.DayCamp`; the clearing is still a place task. Dawn glide stops before the launch. No meadow, mist actor, or smoke actor is added.
 
 | # | Task | Unblocks | Start | Done when |
 |---|---|---|---|---|
-| 3 | Quest stops | Oct 26 through Nov 10 | After the Night sentence for the heal stop | `glider`, `delivery`, `daycamp`, `dawnglide`, `nightglide`, `stealth`, and `ease` are in `DebugFastForwardOpening` and `Content/Python/quest_test_manifest.py`. The shrine stop waits on the player's three strokes. The heal stop waits on the Night sentence. `.\Tools\RunTests.ps1 -QuestCheck` exits 0. |
-| 4 | Heal formula | Oct 23 | After the Night table has a sentence | The click heart sets the heal: 20 seconds at 3 seconds or under, plus 10 seconds per second over. A partial second counts. The heart may run past 3 seconds. A host test proves 3.0, 3.1, and 4.1. |
-| 5 | Glide start and field landing | Oct 27 and Oct 29 | Place | `GP_GlideStart` is on the island. The landing is one authored meadow with a forest edge and three marked node sites. No path through the meadow. No seeded map. |
+| 3 | Quest stops | Oct 26 through Nov 10 | After the Night sentence for the heal stop | `glider`, `delivery`, `daycamp`, `dawnglide`, `nightglide`, `stealth`, and `ease` are in `DebugFastForwardOpening` and `Content/Python/quest_test_manifest.py`. The shrine stop waits on the player's three strokes. The heal formula is in the binary. The Night sentence still waits on the bed press. `.\Tools\RunTests.ps1 -QuestCheck` exits 0. |
+| 5 | Glide start and field landing | Oct 27 and Oct 29 | Place | `GP_GlideStart` is on the island. The landing is one authored meadow with a forest edge and three marked node sites. No path through the meadow. No seeded map. The site is chosen at the desk on `L_SizeTest` after the Night pass. No coordinate is written. |
 | 6 | Three nodes and chests | Oct 30 and Nov 2 | Place, after 2 | One wood tree, one herb, one stone rock, on `M_WoodWild`, `M_GatherHerb`, and `M_CliffRock`. Three chests at home, one per material. |
 | 7 | Day camp | Nov 4 | Place | The arrival passed `HomeWorld.Opening.DayCamp`. Still to place: a clearing and a `NODE_DAY_CAMP` actor on `L_SizeTest`. |
 | 8 | Night glide markers | Nov 5 | Place, after 1 | A home glide start and a camp landing. No cloud wisp actors. |
@@ -47,5 +46,6 @@ Tasks 1 and 2 passed their host tests on 2026-10-21 and are in Done. Task 3 adde
 - Glider craft. `HomeWorld.Opening.GliderCraft` passed, 2026-10-21.
 - Delivery verb. `HomeWorld.Opening.Delivery` passed, 2026-10-21.
 - Day-camp arrival. `HomeWorld.Opening.DayCamp` passed, 2026-10-21. The clearing is not placed.
+- Heal formula. `HomeWorld.Opening.HealTime` covers 3.0, 3.1, 4.0, and 4.1. The Night table stays empty until the bed press. 2026-10-21.
 - Wake-yard actors placed, 2026-10-08. No meshes. The rune is not placed.
 - Night flight spreads the mixed fertilizer. `HomeWorld.T0.FL10.NightFlightSpreadsFertilizer` passed, 2026-10-08.

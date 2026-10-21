@@ -171,9 +171,9 @@ Press E at the bed. The coat hides and you are a wisp. The companion you claimed
 
 Quest log: sleeping ends the opening day, so the `Opening` chain and the `home_loop` chain are stored beside each other. The HUD draws only the most recently changed chain. Note which one you see; the storage test is `HomeWorld.HomeLoop.QuestChainBesideOpening`.
 
-Developer shortcut for this replay: in a fresh PIE run `hw.Playtest.FastForward`. No argument plays the day beats in order (spirit, both herb beds, backpack, kettle, station mix, dog, fish, bed) and leaves you at the bed at night with every earlier step really executed. `test herb collection` claims the spirit, then places you at the east bed to draw the heart. `list` prints the other stops: spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect, heal.
+Developer shortcut for this replay: in a fresh PIE run `hw.Playtest.FastForward`. No argument plays the day beats in order and leaves you at the bed at night with every earlier step really executed. The Night sentence uses `hw.Playtest.FastForward sleep`, then E at the bed. Lead confirmed that on 2026-10-21. The table stays empty until that play. `list` prints the stops.
 
-Developer check, not the pass: `.\Tools\RunTests.ps1 -Quest` runs all 11 stops in PIE and writes `Saved/quest_tests.json`. It loads `L_SizeTest`, ends PIE when done, and never fills the tables below. How to add a stop: [`QUEST_TESTS.md`](QUEST_TESTS.md).
+Developer check, not the pass: `.\Tools\RunTests.ps1 -Quest` runs the opening stops in PIE and writes `Saved/quest_tests.json`. It loads `L_SizeTest`, ends PIE when done, and never fills the tables below. How to add a stop: [`QUEST_TESTS.md`](QUEST_TESTS.md).
 
 **Replay 2026-10-21, found before the table was filled.** Luke: "i spawned as a spirit, did not sleep. clicked on the spirit at the copse, the heart game appeared out of screen, needs to appear next to the spirit, similar rules to the wisp interaction work, head level spawn next to the object always".
 
@@ -197,7 +197,7 @@ Developer check, not the pass: `.\Tools\RunTests.ps1 -Quest` runs all 11 stops i
 
 Night. Three damaged wisps stand at the copse, the pond, and the hot springs. Collect one with the click heart and it goes into the backpack. Carry it to the hot springs and press E: one herb chunk starts a 20 second heal. When the heal ends the wisp follows at the legs, not the shoulder. The claimed companion stays on the shoulder.
 
-One opening herb chunk per wisp is locked in [`Docs/context/OPENING_TUTORIAL_INTERVIEW.md`](../context/OPENING_TUTORIAL_INTERVIEW.md). The heal time is locked there too: the click heart on that wisp sets it. The build still uses a flat 20 seconds and still ends that heart at 3 seconds. The hot-spring heal starts from 600 cm, locked in that interview. The leg arc is locked there too.
+One opening herb chunk per wisp is locked in [`Docs/context/OPENING_TUTORIAL_INTERVIEW.md`](../context/OPENING_TUTORIAL_INTERVIEW.md). The heal time is locked there too, and the binary uses it: 20 seconds at 3 seconds or under, plus 10 seconds per second over. A partial second counts. The collect heart may run past 3 seconds. The table stays empty until the Night sentence. The hot-spring heal starts from 600 cm, locked in that interview. The leg arc is locked there too.
 
 | Field | Result |
 |---|---|

@@ -955,9 +955,44 @@ bool AHomeWorldCharacter::TryOpeningNightSetInFront()
 
 namespace
 {
-	/** First pass. Luke tunes the heal time and the herb cost after the playtest. */
+	/** Fast heart, and the fallback when a seeded wisp has no recorded heart. */
 	constexpr float OpeningWispHealSeconds = 20.f;
 	constexpr float OpeningHotSpringRangeCm = 600.f;
+}
+
+float AHomeWorldCharacter::OpeningHealSecondsForHeart(float HeartSeconds)
+{
+	constexpr float FastSeconds = 3.f;
+	constexpr float ExtraPerSecond = 10.f;
+	if (HeartSeconds <= FastSeconds)
+	{
+		return OpeningWispHealSeconds;
+	}
+	const int32 SecondsOver = FMath::CeilToInt(HeartSeconds - FastSeconds);
+	return OpeningWispHealSeconds + ExtraPerSecond * static_cast<float>(SecondsOver);
+}
+
+void AHomeWorldCharacter::DebugQueueOpeningWispHeart(float HeartSeconds)
+{
+	OpeningWispHealDurations.Add(OpeningHealSecondsForHeart(HeartSeconds));
+}
+
+bool AHomeWorldCharacter::DebugBeginOpeningWispHeart(AActor* Wisp)
+{
+	bOpeningWispCollect = true;
+	StartOpeningHerbRune(Wisp);
+	if (!bOpeningRuneActive)
+	{
+		bOpeningWispCollect = false;
+		return false;
+	}
+	OpeningWispHeartElapsed = 0.f;
+	return true;
+}
+
+void AHomeWorldCharacter::DebugAdvanceOpeningWispHeart(float DeltaSeconds)
+{
+	UpdateOpeningHerbRune(DeltaSeconds);
 }
 
 bool AHomeWorldCharacter::TryOpeningHotSpringHealInFront()
@@ -993,9 +1028,16 @@ bool AHomeWorldCharacter::TryOpeningHotSpringHealInFront()
 	}
 	--OpeningWispsCarried;
 	--OpeningHerbTenths;
-	OpeningWispHealTimers.Add(OpeningWispHealSeconds);
-	UE_LOG(LogTemp, Log, TEXT("opening_night: wisp in the hot springs with one herb (carried %d, healing %d, herbs %d)"),
-		OpeningWispsCarried, OpeningWispHealTimers.Num(), OpeningHerbTenths);
+	const float HealSeconds = OpeningWispHealDurations.Num() > 0
+		? OpeningWispHealDurations[0]
+		: OpeningWispHealSeconds;
+	if (OpeningWispHealDurations.Num() > 0)
+	{
+		OpeningWispHealDurations.RemoveAt(0);
+	}
+	OpeningWispHealTimers.Add(HealSeconds);
+	UE_LOG(LogTemp, Log, TEXT("opening_night: wisp in the hot springs with one herb (carried %d, healing %d, herbs %d, heal %.0fs)"),
+		OpeningWispsCarried, OpeningWispHealTimers.Num(), OpeningHerbTenths, HealSeconds);
 	return true;
 }
 
@@ -3129,6 +3171,10 @@ void AHomeWorldCharacter::StartOpeningHerbRune(AActor* Bed)
 	OpeningRuneCursor = Shape->IsPointsMode() ? RuneOrigin : Shape->GetStartPoint();
 	bOpeningRuneActive = true;
 	OpeningPointTime = Shape->IsPointsMode() ? 3.f : -1.f;
+	if (bOpeningWispCollect)
+	{
+		OpeningWispHeartElapsed = 0.f;
+	}
 	if (SizeTestWisp)
 	{
 		SizeTestWisp->SetHiddenInGame(false);
@@ -3160,9 +3206,11 @@ void AHomeWorldCharacter::FinishOpeningHerbRune(int32 Tenths)
 			Collected->SetActorEnableCollision(false);
 			++OpeningWispsCollected;
 			++OpeningWispsCarried;
-			UE_LOG(LogTemp, Log, TEXT("opening_night: wisp collected %d/3, in the backpack (carried %d)"),
-				OpeningWispsCollected, OpeningWispsCarried);
+			OpeningWispHealDurations.Add(OpeningHealSecondsForHeart(OpeningWispHeartElapsed));
+			UE_LOG(LogTemp, Log, TEXT("opening_night: wisp collected %d/3, in the backpack (carried %d, heal %.0fs)"),
+				OpeningWispsCollected, OpeningWispsCarried, OpeningWispHealDurations.Last());
 		}
+		OpeningWispHeartElapsed = 0.f;
 		return;
 	}
 	bOpeningRuneActive = false;
@@ -3280,12 +3328,19 @@ void AHomeWorldCharacter::UpdateOpeningHerbRune(float DeltaTime)
 	}
 	if (OpeningRuneShape->IsPointsMode())
 	{
-		OpeningPointTime -= DeltaTime;
-		if (OpeningPointTime <= 0.f)
+		if (bOpeningWispCollect)
 		{
-			UE_LOG(LogTemp, Log, TEXT("opening_herb: point time ran out"));
-			FinishOpeningHerbRune(OpeningRuneShape->GetScore());
-			return;
+			OpeningWispHeartElapsed += DeltaTime;
+		}
+		else
+		{
+			OpeningPointTime -= DeltaTime;
+			if (OpeningPointTime <= 0.f)
+			{
+				UE_LOG(LogTemp, Log, TEXT("opening_herb: point time ran out"));
+				FinishOpeningHerbRune(OpeningRuneShape->GetScore());
+				return;
+			}
 		}
 		if (PC && PC->WasInputKeyJustPressed(EKeys::LeftMouseButton) && !OpeningRuneShape->TryClick())
 		{
