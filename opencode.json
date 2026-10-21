@@ -19,9 +19,180 @@
           "/c",
           "C:\\dev\\HomeWorld\\Tools\\mixar-mcp.cmd"
         ]
+      },
+      "rider": {
+        "type": "remote",
+        "url": "http://127.0.0.1:64342/stream"
       }
     }
   },
+  "permissions": [
+    {
+      "action": "unrealMCP_add_blueprint_event_node",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "unrealMCP_add_blueprint_function_node",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "unrealMCP_add_blueprint_get_self_component_reference",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "unrealMCP_add_blueprint_input_action_node",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "unrealMCP_add_blueprint_self_reference",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "unrealMCP_add_blueprint_variable",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "unrealMCP_add_button_to_widget",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "unrealMCP_add_text_block_to_widget",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "unrealMCP_bind_widget_event",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "unrealMCP_set_text_block_binding",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "unrealMCP_add_widget_to_viewport",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "unrealMCP_create_umg_widget_blueprint",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "unrealMCP_connect_blueprint_nodes",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "unrealMCP_find_blueprint_nodes",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "unrealMCP_add_component_to_blueprint",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "unrealMCP_create_input_mapping",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "unrealMCP_set_physics_properties",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "unrealMCP_set_static_mesh_properties",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "unrealMCP_set_component_property",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "mixar_execute_blender_code_for_cli",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "mixar_get_blendfile_summary_datablocks_for_cli",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "mixar_get_blendfile_summary_missing_files_for_cli",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "mixar_get_blendfile_summary_of_linked_libraries_for_cli",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "mixar_get_blendfile_summary_path_info_for_cli",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "mixar_get_blendfile_summary_usage_guess_for_cli",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "mixar_get_screenshot_of_area_as_image",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "mixar_get_screenshot_of_window_as_json",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "rider_search_file",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "rider_execute_tool",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "rider_ue_health",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "rider_ue_status",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "rider_ue_get_logs",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "rider_search_tags",
+      "resource": "*",
+      "effect": "deny"
+    }
+  ],
   "skills": [
     ".agents/skills"
   ],
