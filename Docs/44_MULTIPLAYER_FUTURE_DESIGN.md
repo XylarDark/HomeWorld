@@ -147,3 +147,4 @@ Fold answers into section 2 and section 5 when Lead replies.
 - Changing companion party to mean human players on the slice.
 - Committing `.uasset` / `.umap` or Source for networking.
 - Replacing the NPC family with online avatars on the homestead hub during MVP.
+
