@@ -30,46 +30,40 @@ Default DET adopters copy the **six** core skills. HomeWorld also keeps small HW
 
 Skill bodies live in `.agents/skills/` only. `.cursor/skills/` keeps a README and no `SKILL.md`, so Cursor does not advertise the same name twice. The `source-command-*` migrated skills and the retired `ue57-api-check` were dropped on 2026-10-20: the six commands live in `.cursor/commands/` and the opencode.json command templates, and the engine lock is UE 5.8. `ue58-api-check` stays callable. Do not add a second copy under `.cursor/skills/`.
 
-## Extras (`.agents/skills-extras/`)
+## Extras live in the UserHarness template
 
 > Lean extras `architecture-tradeoffs` and `design-complexity` are **subsets of** `architecture-trade-offs-design-depth` (A–E). Do not load a lean skill together with full A–E.
 
-Optional skills for hosts that want deeper coverage. They are **not** copied by default and are
-**not** loaded until you opt in — keeping the dormant-skill surface small. Path is `skills-extras` (not an official Cursor skills scan dir).
+Optional skills for hosts that want deeper coverage have **one** copy, in the
+template of record: `UserHarness/.agents/skills-extras/` (writer: `architecture-trade-offs-design-depth`,
+see its `SYNC.md`). The project tree does not carry a second vendored copy —
+`AGENTS.md` names `UserHarness/` as the doctor root and forbids vendoring a
+second one. They are **not** copied by default and are **not** loaded until you opt
+in, keeping the dormant-skill surface small. Path is `skills-extras` (not an official
+Cursor skills scan dir).
 
 | Skill | Trigger |
 | ----- | ------- |
-| [architecture-trade-offs-design-depth](skills-extras/architecture-trade-offs-design-depth/SKILL.md) | Boundaries, module APIs, data/replication, team ownership, integration (Layers A–E; sync [SYNC.md](skills-extras/architecture-trade-offs-design-depth/SYNC.md)). **Cite-only in seats. Never discoverable.** |
-| [architecture-tradeoffs](skills-extras/architecture-tradeoffs/SKILL.md) | Lean A-only subset of A–E — do not load with full A–E |
-| [design-complexity](skills-extras/design-complexity/SKILL.md) | Lean B-only subset of A–E — do not load with full A–E |
-| [automation-standards](skills-extras/automation-standards/SKILL.md) | Automation driving external tools, APIs, or CI |
-| [code-structure](skills-extras/code-structure/SKILL.md) | Modules, naming, file layout, performance budgets |
-| [data-pipeline-safety](skills-extras/data-pipeline-safety/SKILL.md) | Author-owned databases, CMS, infra state, binaries |
-| [debug-instrumentation](skills-extras/debug-instrumentation/SKILL.md) | New features, scripts, or APIs needing trace logs |
-| [defensive-programming](skills-extras/defensive-programming/SKILL.md) | External input, I/O, network, async concurrency |
-| [documentation](skills-extras/documentation/SKILL.md) | Comments, README, or anything under `docs/` |
-| [exclusive-resource-access](skills-extras/exclusive-resource-access/SKILL.md) | Browsers, ports, devices, or other single-user resources |
-| [scope-refinement](skills-extras/scope-refinement/SKILL.md) | Ask (2 questions max) before guessing a product, scope, or architecture call |
-| [testing-standards](skills-extras/testing-standards/SKILL.md) | Adding or updating tests or test frameworks |
+| [architecture-trade-offs-design-depth](../UserHarness/.agents/skills-extras/architecture-trade-offs-design-depth/SKILL.md) | Boundaries, module APIs, data/replication, team ownership, integration (Layers A–E). **Cite-only in seats. Never discoverable.** |
+| [architecture-tradeoffs](../UserHarness/.agents/skills-extras/architecture-tradeoffs/SKILL.md) | Lean A-only subset of A–E — do not load with full A–E |
+| [design-complexity](../UserHarness/.agents/skills-extras/design-complexity/SKILL.md) | Lean B-only subset of A–E — do not load with full A–E |
+| [automation-standards](../UserHarness/.agents/skills-extras/automation-standards/SKILL.md) | Automation driving external tools, APIs, or CI |
+| [code-structure](../UserHarness/.agents/skills-extras/code-structure/SKILL.md) | Modules, naming, file layout, performance budgets |
+| [data-pipeline-safety](../UserHarness/.agents/skills-extras/data-pipeline-safety/SKILL.md) | Author-owned databases, CMS, infra state, binaries |
+| [debug-instrumentation](../UserHarness/.agents/skills-extras/debug-instrumentation/SKILL.md) | New features, scripts, or APIs needing trace logs |
+| [defensive-programming](../UserHarness/.agents/skills-extras/defensive-programming/SKILL.md) | External input, I/O, network, async concurrency |
+| [documentation](../UserHarness/.agents/skills-extras/documentation/SKILL.md) | Comments, README, or anything under `docs/` |
+| [exclusive-resource-access](../UserHarness/.agents/skills-extras/exclusive-resource-access/SKILL.md) | Browsers, ports, devices, or other single-user resources |
+| [scope-refinement](../UserHarness/.agents/skills-extras/scope-refinement/SKILL.md) | Ask (2 questions max) before guessing a product, scope, or architecture call |
+| [testing-standards](../UserHarness/.agents/skills-extras/testing-standards/SKILL.md) | Adding or updating tests or test frameworks |
 
 ### Opt in to extras
 
-Copy the skills you need into the host's active skills directory:
+Copy the skills you need from the template into the host's active skills directory:
 
 ```bash
-# From the template root (or `.devenv/` when vendored)
-cp -r .agents/skills-extras/testing-standards .agents/skills/
-```
-
-**Never** copy `architecture-trade-offs-design-depth` into `.agents/skills/` or `.cursor/skills/` on HomeWorld — seats cite; dual-source writer stays DET extras.
-
-Or copy selected extras (avoid wholesale `cp -r .agents/skills-extras/*` on HomeWorld — that would put A–E on a scan path).
-
-When running the doctor's agent-layer integration with extras:
-
-```bash
-npm run doctor:fix
-# The integration API accepts includeSkillExtras: true when called programmatically.
+# From the repo root (UserHarness is the template of record)
+cp -r UserHarness/.agents/skills-extras/testing-standards .agents/skills/
 ```
 
 ## Authoring

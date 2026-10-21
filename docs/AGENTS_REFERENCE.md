@@ -54,8 +54,8 @@ HomeWorld vendors [UserHarness/](../UserHarness) as a **gitlink** to **DevHarnes
 
 | Layer | Status |
 | ----- | ------ |
-| **Agent context** | `.agents/skills/` (core), `.agents/skills-extras/` (opt-in catalog), stack rules `21-unreal-engine.mdc` / `ue58-editor-ui.mdc` |
-| **Architecture A–E** | `.agents/skills-extras/architecture-trade-offs-design-depth/` — opt-in copy of DET extras writer (blob `107a5118c95c1bf0b1b3d1755796632bff41b535`; [SYNC.md](../.agents/skills-extras/architecture-trade-offs-design-depth/SYNC.md)). Load before inventing boundaries/APIs; cite only, no fork |
+| **Agent context** | `.agents/skills/` (core), `UserHarness/.agents/skills-extras/` (opt-in catalog, single copy), stack rules `21-unreal-engine.mdc` / `ue58-editor-ui.mdc` |
+| **Architecture A–E** | `UserHarness/.agents/skills-extras/architecture-trade-offs-design-depth/` — opt-in DET extras (writer; blob `107a5118c95c1bf0b1b3d1755796632bff41b535`; [SYNC.md](../UserHarness/.agents/skills-extras/architecture-trade-offs-design-depth/SYNC.md)). Load before inventing boundaries/APIs; cite only, no fork |
 | **Skill load** | Discoverable catalog is `.agents/skills/` only. `.cursor/skills/` is not a second catalog. Extras and A–E full are cite/copy-in only — never paste skill bodies here. |
 | **Research prompts** | [Docs/handoffs/RESEARCH_PROMPT_CONTRACT.md](handoffs/RESEARCH_PROMPT_CONTRACT.md) — Conductor paste-ready ROLE/CONTEXT/CANON/ASK/NON-GOALS/DONE-WHEN/child Research. Design and studio lookups: one file per body, opened only while that research is the task. |
 | **Operational memory** | `docs/KNOWN_ERRORS.md`, `docs/Automation/AUTOMATION_GAPS.md` (canonical), `docs/operational/automation-gaps.md` (pointer), `docs/DOCS_LAYOUT.md`, `docs/human-use/` (steer / taste / test; [cursor-cannot](human-use/cursor-cannot/README.md)) |

@@ -70,6 +70,5 @@ its scope.
 
 This rule is **HomeWorld-canonical** for UE Editor automation. Stack-agnostic
 prove/capture habits: [`docs/guides/automation-harness.md`](../../docs/guides/automation-harness.md).
-Opt-in mirror:
-[`.agents/skills-extras/automation-standards/SKILL.md`](../../.agents/skills-extras/automation-standards/SKILL.md)
-(synced from the UserHarness pin).
+Opt-in mirror (single copy, in the template of record):
+[`UserHarness/.agents/skills-extras/automation-standards/SKILL.md`](../../UserHarness/.agents/skills-extras/automation-standards/SKILL.md).
