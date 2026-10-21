@@ -1,6 +1,6 @@
 # 44 - Future multiplayer design
 
-**Status:** FUTURE — Lead picks 2026-10-21, `1A 2A 3A 4A 5A 6A 7A 8A 9A 10A 11A 12A`. Not in the vertical slice. Does not change current build order, MVP scope, or any other canon file until a stage in section 5 opens.
+**Status:** FUTURE — Lead picks 2026-10-21, `1A 2A 3A 4A 5A 6A 7A 8A 9A 10A 11A 12A`, plus `MP-family A`. Not in the vertical slice. Does not change current build order, MVP scope, or any other canon file until a stage in section 5 opens.
 **Origin:** Lead chat, 2026-10-21 (ideas below). Picks scribed the same day from the interview at `C:\dev\mp-interview.md`.
 **When to use:** Before any netcode, Steam session, cross-map visit, multiplayer zone, raid boss, trading, or leaderboard work. Read this file and the bridge rules in section 4 before proposing slice changes "for multiplayer later."
 
@@ -44,6 +44,7 @@ Drop rates, raid timers, and backend topology stay undesigned. The player cap is
 10. **Async help (10A).** You may leave structures and signs on a friend's map, and they can answer with a like. Those traces never advance a boss or a quest. If a structure would finish a collection, the half-share pays out only when the owner accepts it.
 11. **Leaderboards (11A).** Friends only, reset weekly. Two rows: raid clear time, and collections helped.
 12. **Canon edits (12A).** This round is Doc 44 only. The other canon files listed above change when the matching stage opens.
+13. **Visitor assist roles (MP-family A).** Visiting players reuse the single-player partner and child assist roles: station help, holding a wave, and night spirit work. The NPC family goes to its home anchors per 4A. There are no separate multi-family mechanics.
 
 ## 3. What exists today that this builds on
 
@@ -75,7 +76,7 @@ The locked visit (6A) extends that pattern: a shrine portal from your homestead 
 
 [Docs/41_COMPANION_PARTY_DESIGN.md](41_COMPANION_PARTY_DESIGN.md): **one possessed pawn**; partner and child are **NPC followers** on day gather and travel only; **no second controller**; **co-op drop-in on hub stays forbidden**. Party state lives on [Source/HomeWorld/HomeWorldFamilySubsystem.h](../Source/HomeWorld/HomeWorldFamilySubsystem.h) (`bPartnerOut`, `bChildOut`, invite rules, save flags). [Source/HomeWorld/HomeWorldCharacter.cpp](../Source/HomeWorld/HomeWorldCharacter.cpp) **`TryPartyInviteInFront`** traces interact targets tagged `NPC_PARTNER` or `NPC_CHILD` and calls `ToggleMemberAtHome`.
 
-**Mapping to future human co-op:** The same **GameInstance subsystem** pattern can hold **session party metadata** (who is visiting whom) without possessing NPC walkers. Human visitors are not the companion party flags. Those flags stay NPC-only (4A). On a visit the owner's partner and child go to their home anchors and stay visible. They do not join the leash, and a visitor's family stays on the visitor's own map.
+**Mapping to future human co-op:** The same **GameInstance subsystem** pattern can hold **session party metadata** (who is visiting whom) without possessing NPC walkers. Human visitors are not the companion party flags. Those flags stay NPC-only (4A). On a visit the owner's partner and child go to their home anchors and stay visible. They do not join the leash, and a visitor's family stays on the visitor's own map. The visitors themselves fill the partner and child assist roles (MP-family A): station help, holding a wave, and night spirit work. Doc 41 still owns the NPC family on the slice.
 
 Invite flow today is **home-only, day, body form, after rescue** (`ToggleMemberAtHome` refuses night, spirit, and field invites). A future **friend visit invite** reuses the same **refusal-first** pattern: failed rules leave state unchanged, and feedback uses the existing interact channel on `AHomeWorldCharacter`. In-person trades use that same confirm (9A).
 
@@ -101,7 +102,7 @@ Each rule is cheap documentation or naming discipline unless marked defer.
 | Treat **field seed, edge discoveries, and camp pin** as **per-save (per-owner) data**, not global level state. Visitors read the **owner id** when simulating that map. | **Adopt now (cheap)** | `FHomeWorldZoneCrossing`, `SeedForEdge`, save serialization path. |
 | When adding new persistent state, **avoid static singletons** that assume one player in the universe; prefer subsystems keyed to save slot or future **PlayerId / MapOwnerId**. | **Adopt now (cheap)** | [docs/architecture/HOMEWORLD_TRADEOFFS.md](../docs/architecture/HOMEWORLD_TRADEOFFS.md) single-writer C++ rule. |
 | **Do not** wire Steam, EOS, or listen-server in slice tasks. | **Adopt now (cheap)** | MVP out of scope + CONSTRAINTS. |
-| **NPC party flags stay NPC-only.** Human visitors use a separate session record at stage 1. A visit clears the owner's leash to home anchors. | **Adopt now (cheap)** | 4A; Docs/41 section 8; FamilySubsystem API. |
+| **NPC party flags stay NPC-only.** Human visitors use a separate session record at stage 1 and fill the existing partner and child assist roles. A visit clears the owner's leash to home anchors. | **Adopt now (cheap)** | 4A and MP-family A; Docs/41 section 8; FamilySubsystem API. |
 | Reuse **interact trace + feedback** from `TryPartyInviteInFront` for a future **invite / trade confirm** at range. Trades are in person. There is no market UI. | **Adopt now (cheap)** | 9A; HomeWorldCharacter interact path. |
 | **Multiplayer zones** as **separate level or streaming volumes** with their own spec id in `Lib/02_Zones`, entered from a gate on the host's map, not mixed into the solo field template. | **Adopt now (cheap)** | 7A; zone spec + `HasCampContent` separation discipline. |
 | **Owner-only boss progression** on the solo map. Helpers get loot, a thank-you mark, and a half-share copy. They do not gain campaign credit. | **Adopt now (cheap)** | 5A and 8A. |
@@ -117,7 +118,7 @@ No calendar dates. Each stage needs the prior stage's shippable proof plus a Lea
 | Stage | Goal | Must exist first |
 |---|---|---|
 | **0 — Slice (solo)** | Shipped vertical slice: solo homestead, field, forest discovery, solo boss placeholder, NPC party optional. | Current queue; MVP canon unchanged. |
-| **1 — Visit another player's map** | Shrine portal from your homestead to theirs, then their cloud descent into their field. Owner's clock. Owner's quests and solo boss only. Helper gets loot and a thank-you mark. The visit sends partner and child to home anchors; they stay visible and off the leash. Visitors bring no family. | Stage 0; online identity; map owner id on save; no hub drop-in (DO_NOT). |
+| **1 — Visit another player's map** | Shrine portal from your homestead to theirs, then their cloud descent into their field. Owner's clock. Owner's quests and solo boss only. Helper gets loot and a thank-you mark. The visit sends partner and child to home anchors; they stay visible and off the leash. Visitors bring no family. Visitors fill the partner and child assists: station help, holding a wave, and night spirit work. | Stage 0; online identity; map owner id on save; no hub drop-in (DO_NOT). |
 | **2 — Multiplayer zones** | An instance opened from a gate or shrine on the host's map. Separate zone spec. The party shares the owner's phase. | Stage 1 networking; a zone spec that is not the solo field template. |
 | **3 — Raid boss** | One boss: day siege, then night spirit work, then a shared seal. Scales from one to three. The instance moves the whole party between those phases. A fail is a bonk to the entrance. The owner's solo boss does not move. The raid can be run again. | Stage 2; [COMBAT_DREAM_BIBLE.md](COMBAT_DREAM_BIBLE.md) phase model. |
 | **4 — Social extras** | Placed home-set collections with a half-share copy. In-person trades and gifts. Sinks are a named recipe, a collection setup, or a raid seal. Async structures and signs with likes; collection half-share pays when the owner accepts; bosses and quests do not. Friends-only weekly boards for raid clear time and collections helped. | Stage 3 rewards; no currency slot. |
@@ -152,6 +153,7 @@ Answered 2026-10-21. All recommended. Folded into section 2 and section 5 in thi
 10. **10A.** Structures and signs, with likes. A collection half-share waits for the owner to accept it.
 11. **11A.** Friends-only weekly boards: raid clear time, and collections helped.
 12. **12A.** Doc 44 only until a stage gate opens.
+13. **MP-family A.** Visitors reuse the partner and child assists: station help, holding a wave, and night spirit work. The NPC family stays at its home anchors. No separate multi-family mechanics.
 
 ## 8. Related canon pointers (do not duplicate here)
 
@@ -165,4 +167,5 @@ Answered 2026-10-21. All recommended. Folded into section 2 and section 5 in thi
 - Changing companion party to mean human players on the slice.
 - Committing `.uasset` / `.umap` or Source for networking.
 - Replacing the NPC family with online avatars on the homestead hub during MVP.
+- A separate multi-family system. Visitors reuse the partner and child assist roles (MP-family A).
 - Drop rates, raid timers, and backend topology.
