@@ -80,6 +80,10 @@ public:
 	const FHomeWorldServeResult& GetLastServe() const { return LastServe; }
 	int32 GetDustTotal() const { return DustTotal; }
 
+	/** One wisp, one target. A second target on the same wisp is refused. */
+	bool TryAssignWispToStation(FName WispId, EHomeWorldHomeStation Station);
+	const FHomeWorldWispAssignment* FindWisp(FName WispId) const;
+
 private:
 	void SyncPhase();
 	void ApplyPhase(EHomeWorldTimeOfDayPhase Phase, bool bFirst);
@@ -108,6 +112,8 @@ private:
 		FName ChestItemId;
 	};
 
+	void RunAssignedStations();
+
 	float HomeClockSeconds = 0.f;
 	bool bOpeningDayEnded = false;
 	bool bBodyForm = true;
@@ -122,4 +128,5 @@ private:
 	TArray<FIngredientWork> Works;
 	FHomeWorldServeResult LastServe;
 	FHomeWorldArmedBuff ArmedBuff;
+	TArray<FHomeWorldWispAssignment> WispAssignments;
 };

@@ -430,6 +430,7 @@ void UHomeWorldHomeLoopSubsystem::ApplyStep(float Step)
 void UHomeWorldHomeLoopSubsystem::Advance(float Seconds)
 {
 	SyncPhase();
+	RunAssignedStations();
 	float Left = FMath::Max(0.f, Seconds);
 	while (Left > KINDA_SMALL_NUMBER && bWindowOpen)
 	{
@@ -446,6 +447,72 @@ void UHomeWorldHomeLoopSubsystem::Advance(float Seconds)
 		if (WindowRemaining <= KINDA_SMALL_NUMBER)
 		{
 			CloseWindow();
+		}
+	}
+}
+
+bool UHomeWorldHomeLoopSubsystem::TryAssignWispToStation(FName WispId, EHomeWorldHomeStation Station)
+{
+	if (WispId.IsNone())
+	{
+		return false;
+	}
+	for (const FHomeWorldWispAssignment& Assignment : WispAssignments)
+	{
+		if (Assignment.WispId == WispId)
+		{
+			return false;
+		}
+	}
+	FHomeWorldWispAssignment Assignment;
+	Assignment.WispId = WispId;
+	Assignment.Target = EHomeWorldWispTarget::Station;
+	Assignment.Station = Station;
+	WispAssignments.Add(Assignment);
+	return true;
+}
+
+const FHomeWorldWispAssignment* UHomeWorldHomeLoopSubsystem::FindWisp(FName WispId) const
+{
+	for (const FHomeWorldWispAssignment& Assignment : WispAssignments)
+	{
+		if (Assignment.WispId == WispId)
+		{
+			return &Assignment;
+		}
+	}
+	return nullptr;
+}
+
+void UHomeWorldHomeLoopSubsystem::RunAssignedStations()
+{
+	if (!bWindowOpen)
+	{
+		return;
+	}
+	for (const FHomeWorldWispAssignment& Assignment : WispAssignments)
+	{
+		if (Assignment.Target != EHomeWorldWispTarget::Station)
+		{
+			continue;
+		}
+		FHomeWorldRecipe Recipe;
+		const FName RecipeId = ActiveRecipeId.IsNone() ? FName(TEXT("RECIPE_KETTLE")) : ActiveRecipeId;
+		if (!GetRecipe(RecipeId, Recipe))
+		{
+			continue;
+		}
+		for (int32 Index = 0; Index < Recipe.Ingredients.Num(); ++Index)
+		{
+			if (Recipe.Ingredients[Index].PrepStation != Assignment.Station)
+			{
+				continue;
+			}
+			const bool bStarted = Works.IsValidIndex(Index) && Works[Index].bPrepStarted;
+			if (!bStarted)
+			{
+				BeginPrep(RecipeId, Index);
+			}
 		}
 	}
 }

@@ -93,3 +93,22 @@ struct FHomeWorldArmedBuff
 	float CleanFactor = 1.f;
 	int32 CoveredDayId = 0;
 };
+
+/** One healed task wisp, one target. */
+UENUM()
+enum class EHomeWorldWispTarget : uint8
+{
+	None,
+	Station,
+	Plot,
+	Surface
+};
+
+struct FHomeWorldWispAssignment
+{
+	FName WispId;
+	EHomeWorldWispTarget Target = EHomeWorldWispTarget::None;
+	EHomeWorldHomeStation Station = EHomeWorldHomeStation::Sink;
+	int32 PlotIndex = INDEX_NONE;
+	FName SurfaceId;
+};

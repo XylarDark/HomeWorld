@@ -546,4 +546,76 @@ bool FHomeLoopOpeningBrewSkipsSlotTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FHomeLoopWispStationAssignTest,
+	"HomeWorld.HomeLoop.WispStationAssign",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FHomeLoopWispStationAssignTest::RunTest(const FString& Parameters)
+{
+	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
+		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
+	if (!TestNotNull(TEXT("home loop"), Loop))
+	{
+		return false;
+	}
+	Loop->SetOpeningDayEnded(true);
+	HomeWorldHomeLoopTest::OpenDawn(Scope.World, Loop);
+	const FName Wisp(TEXT("WispA"));
+	TestTrue(TEXT("the wisp takes the sink"), Loop->TryAssignWispToStation(Wisp, EHomeWorldHomeStation::Sink));
+	TestFalse(TEXT("a second target is refused"), Loop->TryAssignWispToStation(Wisp, EHomeWorldHomeStation::Pot));
+	const FHomeWorldWispAssignment* Assignment = Loop->FindWisp(Wisp);
+	if (!TestNotNull(TEXT("assignment"), Assignment))
+	{
+		return false;
+	}
+	TestEqual(TEXT("still the sink"), Assignment->Station, EHomeWorldHomeStation::Sink);
+
+	Loop->Advance(4.f);
+	TestTrue(TEXT("the wisp washes the herb"), Loop->IsIngredientPrepped(0));
+	Loop->Advance(10.f);
+	TestTrue(TEXT("the wisp finishes the kettle"), Loop->GetLastServe().bServed);
+
+	TestTrue(TEXT("the player can still run the sink"), Loop->BeginPrep(FName(TEXT("RECIPE_KETTLE")), 0));
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FHomeLoopWispLeavesCloudWispsTest,
+	"HomeWorld.HomeLoop.WispLeavesCloudWisps",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FHomeLoopWispLeavesCloudWispsTest::RunTest(const FString& Parameters)
+{
+	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
+		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
+	if (!TestNotNull(TEXT("home loop"), Loop))
+	{
+		return false;
+	}
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	AHomeWorldCharacter* Character = Scope.World->SpawnActor<AHomeWorldCharacter>(Params);
+	if (!TestNotNull(TEXT("character"), Character))
+	{
+		return false;
+	}
+	TestTrue(TEXT("one dung is waiting"), Character->TryAddCarriedDung());
+	const int32 CloudBefore = Character->GetCarriedCloudWisps();
+	const int32 DungBefore = Character->GetCarriedDung();
+	const int32 FertilizerBefore = Character->GetCarriedFertilizer();
+
+	TestTrue(TEXT("assign"), Loop->TryAssignWispToStation(FName(TEXT("TaskWisp")), EHomeWorldHomeStation::Sink));
+
+	TestEqual(TEXT("cloud wisps unchanged"), Character->GetCarriedCloudWisps(), CloudBefore);
+	TestEqual(TEXT("dung unchanged"), Character->GetCarriedDung(), DungBefore);
+	TestEqual(TEXT("fertilizer unchanged"), Character->GetCarriedFertilizer(), FertilizerBefore);
+	TestFalse(TEXT("the mix still needs a cloud wisp"), Character->TryMixHomesteadFertilizer());
+	TestEqual(TEXT("a refused mix keeps the dung"), Character->GetCarriedDung(), DungBefore);
+	TestEqual(TEXT("a refused mix keeps the cloud count"), Character->GetCarriedCloudWisps(), CloudBefore);
+	return true;
+}
+
 #endif
