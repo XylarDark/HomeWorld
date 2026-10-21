@@ -48,6 +48,9 @@ public:
 	/** After the tame, the child walks back through the north door into their room. */
 	void BeginChildReturnHome();
 
+	/** Opening night is solo. Drops the tutorial chase so the child does not follow. */
+	void StopForOpeningNight();
+
 	/** True once the partner has walked inside and stands waiting beside the counter. */
 	UFUNCTION(BlueprintPure, Category = "Opening")
 	bool IsPartnerWaiting() const { return bPartnerWaiting; }

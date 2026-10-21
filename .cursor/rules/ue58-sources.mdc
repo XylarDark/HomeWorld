@@ -22,6 +22,7 @@ This is the ONLY sourcing policy. The 5.7 rule was deleted as historical (DEC-00
 3. **When looking something up:** Use web search with **"Unreal Engine 5.8"** (or "UE 5.8") in the query, and cite the Epic doc URL.
 4. **When giving instructions:** Cite the Epic 5.8 doc URL when steps come from it. Use exact option/menu/API names from the 5.8 doc.
 5. **Tutorials:** Prefer guides that explicitly target **UE 5.8** (or 5.7 if 5.8 is scarce); cross-check with Epic 5.8 docs.
+6. Call `search` on `unreal-engine-skills-manager`, then confirm the signature in a 5.8 source from the list above. `Docs/tools/GAME_TOOL_CATALOG.md` names which skills stay unloaded. The skills server is not itself a 5.8 source.
 
 ## Applies to
 

@@ -6,6 +6,7 @@
 #include "Engine/GameInstance.h"
 #include "HomeWorldWispPlacement.h"
 #include "HomeWorldOpeningReveal.h"
+#include "HomeWorldOpeningDayCamp.h"
 #include "HomeWorldRuneShapeComponent.h"
 #include "GameFramework/Character.h"
 #include "HomeWorldGlideMovementComponent.h"
@@ -236,6 +237,7 @@ AHomeWorldCharacter::AHomeWorldCharacter(const FObjectInitializer& ObjectInitial
 	SpiritStealthComponent = CreateDefaultSubobject<UHomeWorldSpiritStealthComponent>(TEXT("SpiritStealthComponent"));
 	StrokeReport = CreateDefaultSubobject<UHomeWorldStrokeReportComponent>(TEXT("StrokeReport"));
 	QuestLog = CreateDefaultSubobject<UHomeWorldQuestLog>(TEXT("QuestLog"));
+	OpeningSupply = CreateDefaultSubobject<UHomeWorldOpeningSupply>(TEXT("OpeningSupply"));
 }
 
 UAbilitySystemComponent* AHomeWorldCharacter::GetAbilitySystemComponent() const
@@ -877,8 +879,49 @@ bool AHomeWorldCharacter::BeginOpeningNight()
 		OpeningSpiritBody->SetVisibility(true);
 	}
 	TryTellChildDawnRule();
-	UE_LOG(LogTemp, Log, TEXT("opening_bed: spirit, stayed on the island"));
+	// Spirit nights stay solo. The tutorial chase is a day beat.
+	if (UWorld* NightWorld = GetWorld())
+	{
+		for (TActorIterator<AHomeWorldOpeningReveal> It(NightWorld); It; ++It)
+		{
+			It->StopForOpeningNight();
+		}
+	}
+	// The wisp keeps the body camera: same boom, same arm, same FOV. No second rig.
+	if (CameraBoom)
+	{
+		CameraBoom->TargetArmLength = TargetArmLength;
+	}
+	if (FollowCamera)
+	{
+		FollowCamera->SetFieldOfView(CameraFOV);
+	}
+	UE_LOG(LogTemp, Log, TEXT("opening_bed: spirit, stayed on the island, camera arm %.0f fov %.0f"),
+		CameraBoom ? CameraBoom->TargetArmLength : -1.f,
+		FollowCamera ? FollowCamera->FieldOfView : -1.f);
 	return bOpeningNightSpirit;
+}
+
+void AHomeWorldCharacter::ReturnOpeningBodyForDawnPlaytest()
+{
+	WakeFromSpiritAtBed();
+	if (UWorld* World = GetWorld())
+	{
+		if (UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>())
+		{
+			TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Dawn);
+		}
+	}
+	bOpeningNightSpirit = false;
+	if (USkeletalMeshComponent* Coat = GetMesh())
+	{
+		Coat->SetVisibility(true, true);
+	}
+	if (OpeningSpiritBody)
+	{
+		OpeningSpiritBody->SetVisibility(false);
+	}
+	UE_LOG(LogTemp, Log, TEXT("opening_glider: body returned at dawn"));
 }
 
 bool AHomeWorldCharacter::TryOpeningNightSetInFront()
@@ -991,6 +1034,9 @@ namespace
 	constexpr int32 PlaytestBeatNight = 9;
 	constexpr int32 PlaytestBeatCollect = 10;
 	constexpr int32 PlaytestBeatHeal = 11;
+	constexpr int32 PlaytestBeatGlider = 12;
+	constexpr int32 PlaytestBeatDelivery = 13;
+	constexpr int32 PlaytestBeatDayCamp = 14;
 
 	/** The one runner step the player takes himself. 0 = every step runs (night and the loop). */
 	int32 PlaytestSkipStep(int32 Beat)
@@ -1024,6 +1070,9 @@ namespace
 		case PlaytestBeatNight: return TEXT("night");
 		case PlaytestBeatCollect: return TEXT("collect");
 		case PlaytestBeatHeal: return TEXT("heal");
+		case PlaytestBeatGlider: return TEXT("glider");
+		case PlaytestBeatDelivery: return TEXT("delivery");
+		case PlaytestBeatDayCamp: return TEXT("daycamp");
 		default: return TEXT("night");
 		}
 	}
@@ -1050,6 +1099,9 @@ namespace
 		if (Key.Contains(TEXT("sleep")) || Key.Contains(TEXT("bed"))) return PlaytestBeatSleep;
 		if (Key.Contains(TEXT("wisp")) || Key.Contains(TEXT("collect"))) return PlaytestBeatCollect;
 		if (Key.Contains(TEXT("night"))) return PlaytestBeatNight;
+		if (Key.Contains(TEXT("glider"))) return PlaytestBeatGlider;
+		if (Key.Contains(TEXT("delivery"))) return PlaytestBeatDelivery;
+		if (Key.Contains(TEXT("daycamp"))) return PlaytestBeatDayCamp;
 		return 0;
 	}
 
@@ -1070,7 +1122,7 @@ void AHomeWorldCharacter::DebugFastForwardOpening(const FString& Beat)
 {
 	if (Beat.Equals(TEXT("list"), ESearchCase::IgnoreCase))
 	{
-		UE_LOG(LogTemp, Log, TEXT("playtest_ff: beats: spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect, heal"));
+		UE_LOG(LogTemp, Log, TEXT("playtest_ff: beats: spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect, heal, glider, delivery, daycamp"));
 		return;
 	}
 	if (DebugFastForwardStep > 0)
@@ -1081,7 +1133,7 @@ void AHomeWorldCharacter::DebugFastForwardOpening(const FString& Beat)
 	const int32 Stop = PlaytestBeatFromText(Beat);
 	if (Stop == 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("playtest_ff: beat '%s' unknown - spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect, heal"), *Beat);
+		UE_LOG(LogTemp, Warning, TEXT("playtest_ff: beat '%s' unknown - spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect, heal, glider, delivery, daycamp"), *Beat);
 		return;
 	}
 	if (bOpeningNightSpirit)
@@ -1378,6 +1430,49 @@ void AHomeWorldCharacter::TickDebugFastForward(float DeltaTime)
 			return;
 		}
 		UE_LOG(LogTemp, Log, TEXT("playtest_ff: 9 night ready at the bed - %s"), *GetOpeningTrackerText());
+		if (DebugFastForwardStop == PlaytestBeatGlider || DebugFastForwardStop == PlaytestBeatDelivery
+			|| DebugFastForwardStop == PlaytestBeatDayCamp)
+		{
+			Next(10);
+			break;
+		}
+		ReadyForOpeningPlaytest();
+		Next(0);
+		break;
+	}
+	case 10:
+	{
+		ReturnOpeningBodyForDawnPlaytest();
+		StockOpeningDawnChest();
+		if (DebugFastForwardStop == PlaytestBeatGlider)
+		{
+			ReadyForOpeningPlaytest();
+			Next(0);
+			return;
+		}
+		if (DebugFastForwardStop == PlaytestBeatDayCamp)
+		{
+			Next(12);
+			break;
+		}
+		Next(11);
+		break;
+	}
+	case 11:
+	{
+		SeedOpeningHealedWisp();
+		UHomeWorldOpeningSupply::SpawnDeliveryNode(
+			World, HomeWorldOpeningMaterials::Wood, GetActorLocation() + FVector(200.f, 0.f, 0.f));
+		ReadyForOpeningPlaytest();
+		Next(0);
+		break;
+	}
+	case 12:
+	{
+		FActorSpawnParameters CampParams;
+		CampParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		World->SpawnActor<AHomeWorldOpeningDayCamp>(
+			GetActorLocation() + FVector(320.f, 0.f, 0.f), FRotator::ZeroRotator, CampParams);
 		ReadyForOpeningPlaytest();
 		Next(0);
 		break;
@@ -1469,6 +1564,21 @@ void AHomeWorldCharacter::ReadyForOpeningPlaytest()
 		Target = FindOpeningNamed(World, TEXT("Water_HotSpring"), true);
 		Distance = 470.f;
 		Note = TEXT("E at the hot springs, the heal takes 20s");
+		break;
+	case PlaytestBeatGlider:
+		Target = FindOpeningTaggedActor(World, TEXT("NODE_ARMOR_TABLE"), TEXT("ArmorTable"));
+		Distance = 220.f;
+		Note = TEXT("E at the armory: craft the glider");
+		break;
+	case PlaytestBeatDelivery:
+		Target = FindOpeningTaggedActor(World, TEXT("NODE_OPENING_DELIVERY"));
+		Distance = 200.f;
+		Note = TEXT("E at the wood node: set the healed wisp");
+		break;
+	case PlaytestBeatDayCamp:
+		Target = FindOpeningTaggedActor(World, TEXT("NODE_OPENING_DAY_CAMP"));
+		Distance = 320.f;
+		Note = TEXT("walk into the clearing");
 		break;
 	default:
 		break;
@@ -1697,7 +1807,9 @@ FString AHomeWorldCharacter::GetPlaytestStateJson() const
 		TEXT("\"herb_west\":%s,\"herb_east\":%s,\"mixed_herbs\":%d,")
 		TEXT("\"kettle_brewed\":%s,\"station_open\":%s,\"armor_gift\":%s,")
 		TEXT("\"fish_caught\":%s,\"night_spirit\":%s,")
-		TEXT("\"wisps_collected\":%d,\"wisps_carried\":%d,\"wisps_healed\":%d}"),
+		TEXT("\"wisps_collected\":%d,\"wisps_carried\":%d,\"wisps_healed\":%d,")
+		TEXT("\"dawn_wood\":%d,\"dawn_silk\":%d,\"dawn_metal\":%d,")
+		TEXT("\"glider_crafted\":%s,\"delivery_wood\":%d,\"partner_away\":%s,\"day_camp_eject\":%s}"),
 		*PlaytestReadyFor,
 		PlaytestReadyDistanceCm,
 		DebugFastForwardStep,
@@ -1714,7 +1826,14 @@ FString AHomeWorldCharacter::GetPlaytestStateJson() const
 		bOpeningNightSpirit ? TEXT("true") : TEXT("false"),
 		OpeningWispsCollected,
 		OpeningWispsCarried,
-		OpeningWispsHealed);
+		OpeningWispsHealed,
+		GetOpeningDawnCountForTest(HomeWorldOpeningMaterials::Wood),
+		GetOpeningDawnCountForTest(HomeWorldOpeningMaterials::Silk),
+		GetOpeningDawnCountForTest(HomeWorldOpeningMaterials::Metal),
+		IsOpeningGliderCrafted() ? TEXT("true") : TEXT("false"),
+		GetOpeningDeliveryCountForTest(HomeWorldOpeningMaterials::Wood),
+		GetPartnerPlace() == EHomeWorldFamilyPlace::Away ? TEXT("true") : TEXT("false"),
+		IsDayCampEjectTriggered() ? TEXT("true") : TEXT("false"));
 }
 
 void AHomeWorldCharacter::ApplyOpeningWalkSpeed()
@@ -2093,10 +2212,121 @@ bool AHomeWorldCharacter::TryOpeningStationInFront()
 		ShowInteractFeedback(TEXT("The partner's gift opens this."), FColor::Yellow);
 		return true;
 	}
-	// The gift opens the table. No second recipe in this beat.
+	if (OpeningSupply && OpeningSupply->HasDawnStock() && TryCraftOpeningGlider())
+	{
+		LogOpening(TEXT("opening_station: glider crafted"));
+		ShowInteractFeedback(TEXT("ARMOR: the glider is crafted"), FColor::Green);
+		return true;
+	}
 	LogOpening(TEXT("opening_station: armor table open"));
 	ShowInteractFeedback(TEXT("ARMOR: the table is open"), FColor::Green);
 	return true;
+}
+
+void AHomeWorldCharacter::StockOpeningDawnChest()
+{
+	if (OpeningSupply)
+	{
+		OpeningSupply->StockDawnChest();
+	}
+}
+
+bool AHomeWorldCharacter::TryCraftOpeningGlider()
+{
+	return OpeningSupply && OpeningSupply->TryCraftGlider();
+}
+
+bool AHomeWorldCharacter::IsOpeningGliderCrafted() const
+{
+	return OpeningSupply && OpeningSupply->IsGliderCrafted();
+}
+
+void AHomeWorldCharacter::GrantOpeningGliderForTest()
+{
+	if (OpeningSupply)
+	{
+		OpeningSupply->GrantCraftedForTest();
+	}
+}
+
+int32 AHomeWorldCharacter::GetOpeningDawnCountForTest(FName Material) const
+{
+	return OpeningSupply ? OpeningSupply->GetDawnCount(Material) : 0;
+}
+
+int32 AHomeWorldCharacter::GetOpeningDeliveryCountForTest(FName Material) const
+{
+	return OpeningSupply ? OpeningSupply->GetDeliveryCount(Material) : 0;
+}
+
+void AHomeWorldCharacter::SeedOpeningHealedWisp()
+{
+	if (OpeningWispsHealed >= 3)
+	{
+		return;
+	}
+	++OpeningWispsHealed;
+	UpdateOpeningWispLegs();
+	UE_LOG(LogTemp, Log, TEXT("opening_delivery: seed healed %d. This is a seed."), OpeningWispsHealed);
+}
+
+bool AHomeWorldCharacter::TryDeliverOpeningNode(AActor* NodeActor)
+{
+	if (!NodeActor || GetIsSpiritForm() || !AreDayBodyAbilitiesAllowed() || OpeningWispsHealed <= 0 || !OpeningSupply)
+	{
+		return false;
+	}
+	UHomeWorldOpeningDeliveryNode* Node = NodeActor->FindComponentByClass<UHomeWorldOpeningDeliveryNode>();
+	if (!Node)
+	{
+		return false;
+	}
+	if (!OpeningSupply->TryDeliver(Node))
+	{
+		return false;
+	}
+	UpdateOpeningWispLegs();
+	UE_LOG(LogTemp, Log, TEXT("opening_delivery: %s pile %d in the chest, follower back at the legs (%d)"),
+		*Node->GetMaterial().ToString(),
+		OpeningSupply->GetDeliveryCount(Node->GetMaterial()),
+		OpeningWispLegMeshes.Num());
+	ShowInteractFeedback(TEXT("The wisp flew the pile home."), FColor::Green);
+	return true;
+}
+
+bool AHomeWorldCharacter::TryOpeningDeliveryInFront()
+{
+	if (GetIsSpiritForm() || !AreDayBodyAbilitiesAllowed())
+	{
+		return false;
+	}
+	FHitResult Hit;
+	AActor* Aimed = ResolveOpeningAim(Hit);
+	if (!Aimed || !Aimed->ActorHasTag(FName(TEXT("NODE_OPENING_DELIVERY"))))
+	{
+		return false;
+	}
+	UHomeWorldOpeningDeliveryNode* Node = Aimed->FindComponentByClass<UHomeWorldOpeningDeliveryNode>();
+	if (!Node)
+	{
+		return false;
+	}
+	if (!UHomeWorldOpeningSupply::IsDeliveryMaterial(Node->GetMaterial()))
+	{
+		ShowInteractFeedback(TEXT("Silk, fiber, and metal stay off this field."), FColor::Yellow);
+		return true;
+	}
+	if (Node->IsDelivered())
+	{
+		ShowInteractFeedback(TEXT("That node has already delivered."), FColor::Yellow);
+		return true;
+	}
+	if (OpeningWispsHealed <= 0)
+	{
+		ShowInteractFeedback(TEXT("The node needs a healed wisp."), FColor::Yellow);
+		return true;
+	}
+	return TryDeliverOpeningNode(Aimed);
 }
 
 void AHomeWorldCharacter::UpdateSizeTestInteractCursor()
@@ -2177,18 +2407,50 @@ AActor* AHomeWorldCharacter::FindOpeningProximityTarget() const
 		const bool bHerb = Label.Contains(TEXT("Lupine")) && !Actor->IsHidden();
 		const bool bBed = Label.Contains(TEXT("Bed"));
 		const bool bNightWisp = Actor->ActorHasTag(FName(TEXT("NODE_OPENING_WISP"))) && !Actor->IsHidden();
-		if (!bHerb && !bBed && !bNightWisp && !ActorHasInteractableComponent(Actor))
+		const bool bDelivery = Actor->ActorHasTag(FName(TEXT("NODE_OPENING_DELIVERY"))) && !Actor->IsHidden();
+		if (!bHerb && !bBed && !bNightWisp && !bDelivery && !ActorHasInteractableComponent(Actor))
 		{
 			continue;
 		}
 		const float Dist = FVector::DistSquared2D(From, Actor->GetActorLocation());
-		if (Dist < BestDist)
+		if (Dist < BestDist && IsOpeningTargetInView(Actor))
 		{
 			BestDist = Dist;
 			Best = Actor;
 		}
 	}
 	return Best;
+}
+
+bool AHomeWorldCharacter::IsOpeningTargetInView(const AActor* Target) const
+{
+	const APlayerController* PC = Cast<APlayerController>(GetController());
+	if (!PC || !Target || !FollowCamera)
+	{
+		return false;
+	}
+	const FVector ToTarget = Target->GetActorLocation() - FollowCamera->GetComponentLocation();
+	if (FVector::DotProduct(FollowCamera->GetForwardVector(), ToTarget.GetSafeNormal()) <= 0.f)
+	{
+		return false;
+	}
+	FVector2D Screen = FVector2D::ZeroVector;
+	if (!PC->ProjectWorldLocationToScreen(Target->GetActorLocation(), Screen, true))
+	{
+		return false;
+	}
+	int32 SizeX = 0;
+	int32 SizeY = 0;
+	PC->GetViewportSize(SizeX, SizeY);
+	if (SizeX <= 0 || SizeY <= 0)
+	{
+		return false;
+	}
+	const float NdcX = (Screen.X / static_cast<float>(SizeX)) * 2.f - 1.f;
+	const float NdcY = (Screen.Y / static_cast<float>(SizeY)) * 2.f - 1.f;
+	// Screen Y grows downward, so a higher box is a smaller NDC Y.
+	const float AimNdcY = NdcY + OpeningViewUpNdc;
+	return FMath::Abs(NdcX) <= OpeningViewCenterNdc && FMath::Abs(AimNdcY) <= OpeningViewCenterNdc;
 }
 
 void AHomeWorldCharacter::ShowOpeningProximityLine()
@@ -2633,6 +2895,11 @@ void AHomeWorldCharacter::RefreshOpeningQuest()
 	{
 		return;
 	}
+	if (bOpeningNightSpirit)
+	{
+		GEngine->AddOnScreenDebugMessage(9000, 0.5f, FColor::White, TEXT("Night"));
+	}
+	GEngine->AddOnScreenDebugMessage(9050, 0.5f, FColor::White, TEXT("Quests"));
 	const TArray<FHomeWorldQuestStep>& Shown = QuestLog->GetDisplayedSteps();
 	for (int32 Index = 0; Index < Shown.Num(); ++Index)
 	{
@@ -2641,6 +2908,34 @@ void AHomeWorldCharacter::RefreshOpeningQuest()
 			: FString::Printf(TEXT("[ ] %s"), *Shown[Index].Text);
 		GEngine->AddOnScreenDebugMessage(
 			9100 + Index, 0.5f, Shown[Index].bDone ? FColor(170, 170, 170) : FColor::White, Line);
+	}
+	GEngine->AddOnScreenDebugMessage(9200, 0.5f, FColor::White, TEXT("Carrying"));
+	int32 CarryLine = 0;
+	auto Carry = [&](const FString& Text)
+	{
+		GEngine->AddOnScreenDebugMessage(9210 + CarryLine, 0.5f, FColor::White, Text);
+		++CarryLine;
+	};
+	Carry(FString::Printf(TEXT("Herbs %d"), OpeningHerbTenths));
+	Carry(FString::Printf(TEXT("Wisps %d"), OpeningWispsCarried));
+	if (OpeningMixedHerbs > 0)
+	{
+		Carry(FString::Printf(TEXT("Mixed herb %d"), OpeningMixedHerbs));
+	}
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UHomeWorldInventorySubsystem* Inv = GI->GetSubsystem<UHomeWorldInventorySubsystem>())
+		{
+			for (int32 SlotIndex = 0; SlotIndex < Inv->GetSlotCount(); ++SlotIndex)
+			{
+				const FHomeWorldInventorySlot Slot = Inv->GetSlot(SlotIndex);
+				if (Slot.IsEmpty())
+				{
+					continue;
+				}
+				Carry(FString::Printf(TEXT("%s %d"), *Slot.ResId.ToString(), Slot.Count));
+			}
+		}
 	}
 }
 
@@ -2848,7 +3143,9 @@ void AHomeWorldCharacter::UpdateOpeningHerbRune(float DeltaTime)
 		FVector Right = FVector::RightVector;
 		FVector Up = FVector::UpVector;
 		OpeningRuneShape->GetPlane(Origin, Right, Up);
-		OpeningRuneCursor += (Right * DeltaX + Up * DeltaY) * 4.8f;
+		// Trace hearts stay at 4.8. The click heart is 25% faster, from the 2026-10-21 copse replay.
+		const float CursorCm = OpeningRuneShape->IsPointsMode() ? 4.8f * 1.25f : 4.8f;
+		OpeningRuneCursor += (Right * DeltaX + Up * DeltaY) * CursorCm;
 	}
 	OpeningRuneShape->SetCursor(OpeningRuneCursor);
 	if (SizeTestWisp)
@@ -3884,6 +4181,11 @@ bool AHomeWorldCharacter::TryStartCloudDescent()
 	const bool bNightSpirit = bIsSpiritForm;
 	if (bCloudDescentActive || IsFallbackGliding() || !(bDayBody || bNightSpirit))
 	{
+		return false;
+	}
+	if (!IsOpeningGliderCrafted())
+	{
+		UE_LOG(LogTemp, Log, TEXT("CLOUD_DESCENT: refused; the glider is not crafted"));
 		return false;
 	}
 

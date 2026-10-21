@@ -76,6 +76,10 @@ void UHomeWorldInteractAbility::ActivateAbility(const FGameplayAbilitySpecHandle
 		}
 		if (!bHandled)
 		{
+			bHandled = Character->TryOpeningDeliveryInFront();
+		}
+		if (!bHandled)
+		{
 			bHandled = Character->TryOpeningBedInFront();
 		}
 		if (!bHandled)

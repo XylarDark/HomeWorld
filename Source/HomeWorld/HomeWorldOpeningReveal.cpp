@@ -325,6 +325,13 @@ void AHomeWorldOpeningReveal::OnCrestOverlap(
 	(void)bFromSweep;
 	(void)SweepResult;
 	APawn* Pawn = Cast<APawn>(OtherActor);
+	if (const AHomeWorldCharacter* NightPlayer = Cast<AHomeWorldCharacter>(Pawn))
+	{
+		if (NightPlayer->IsOpeningNightSpirit())
+		{
+			return;
+		}
+	}
 	if (bRunning || !Pawn || !Pawn->IsPlayerControlled())
 	{
 		return;
@@ -585,6 +592,20 @@ void AHomeWorldOpeningReveal::LeadChild(float DeltaSeconds)
 			}
 		}
 	}
+}
+
+void AHomeWorldOpeningReveal::StopForOpeningNight()
+{
+	bFollowing = false;
+	bRunning = false;
+	if (AHomeWorldOpeningWalker* Walker = Cast<AHomeWorldOpeningWalker>(Child))
+	{
+		if (UCharacterMovementComponent* Move = Walker->GetCharacterMovement())
+		{
+			Move->StopMovementImmediately();
+		}
+	}
+	UE_LOG(LogTemp, Log, TEXT("opening_reveal: night is solo, the child stays"));
 }
 
 void AHomeWorldOpeningReveal::BeginChildReturnHome()

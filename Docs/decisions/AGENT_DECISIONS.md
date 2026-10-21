@@ -1164,3 +1164,21 @@ The number is not the cost of that skill as it was first written. Two identical 
 - **Reverses if:** the Lead wants the `Editor.Python` suite inside the UE verdict - fix the two `__main__` scripts and the 5 polish-readiness assertions first - or the self-hosted runner cannot launch the editor headless, in which case the step fails loudly rather than skipping, which is the point.
 - **Supersedes:** none.
 
+## DEC-0053 - Cursor may call the skills server; VibeUE stays out (2026-10-21)
+
+- **Area:** steer, web reach
+- **Decision:** Cursor connects to `https://www.unrealengineskills.com/api/mcp` with no API key. OpenCode does not. A loaded skill is a hint. Epic 5.8 docs and the local engine win. VibeUE is not installed, and the dashboard key is not stored in git, `mcp.json`, or editor prefs. The hold list lives in `Docs/tools/GAME_TOOL_CATALOG.md`.
+- **Rationale:** Lead locked both calls on 2026-10-21. The skills host is public and read-only, and it is one tool. VibeUE would register onto the Slate server at port 8000 and duplicate UnrealMCP. The key authenticates `https://llm.vibeue.com` and hosted terrain, and terrain is on hold. The key was pasted in chat; revoking it on the dashboard is manual.
+- **Evidence:** Lock 1 was Cursor only. Lock 2 was hold both. `opencode.json` stays unchanged so the measured tool count is not guessed.
+- **Reverses if:** Lead asks for OpenCode on that server, for the VibeUE plugin, or for a terrain key.
+- **Supersedes:** none. DEC-0037 still limits Epic MCP on port 8000 to the Slate inspector.
+
+## DEC-0054 - Opening chest stock stays outside the six-slot carry (2026-10-21)
+
+- **Area:** code design
+- **Decision:** Dawn wood, silk, and metal, and the wood, herb, and stone delivery piles, live on `UHomeWorldOpeningSupply`. They are not `RES_*` slots.
+- **Rationale:** The six-slot carry is shelved, and the playtest index forbids a seventh resource. Silk and metal are not `RES_*` ids. Putting them on `UHomeWorldInventorySubsystem` would store tutorial chest stock in the player carry, which the lock says the player does not hold.
+- **Evidence:** `Source/HomeWorld/HomeWorldOpeningSupply.h`. `.\Tools\RunTests.ps1 -QuestCheck` exited 0. `HomeWorld.Opening.GliderCraft` and `HomeWorld.Opening.Delivery` both reported Success on 2026-10-21 (`Saved/automation_run_result.json`, ran 2, failed 0). Delivery is `succeededWithWarnings` because of the engine GameplayCue path log, and its test state is Success.
+- **Reverses if:** Lead puts silk or metal into the six-slot carry.
+- **Supersedes:** none.
+

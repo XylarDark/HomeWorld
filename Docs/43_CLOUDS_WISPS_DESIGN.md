@@ -43,7 +43,7 @@ The day glide and the night spirit glide share this drop and this steer. Compani
 
 - **Cloud wisp.** A bit of the signature spirit blue on a cloud. It is not one of the three wisps at the wound. `CollectCloudWisp` already requires an active descent and night, and it refuses a third carry. Follow-up 1A and 2A are that rule. The two jobs are named here and specified in the route file: one heals the homestead wound, one mixes with one dung. Mixing, spreading, and the morning pile are the fertilizer loop, and interview #2 left that loop out of this packet.
 - **Wound wisps.** The heal verb's three. The route says that once they are healed they follow, and that those followers are the night flight that spreads fertilizer. This doc does not place the wound. The GDD still sites those three at a planet wound. The route sites a homestead wound, seen by day and healed at night by one cloud wisp. Both sentences stay where they are.
-- **Home pool.** Healed task wisps, assigned to a station, a plot, or cleaning. [42_HOME_LOOP_DESIGN.md](42_HOME_LOOP_DESIGN.md) follow-up 1A. A cloud wisp is not a member of that pool.
+- **Home pool.** Healed task wisps, assigned to a station, a plot, or cleaning. [42_HOME_LOOP_DESIGN.md](42_HOME_LOOP_DESIGN.md) follow-up 1A. A cloud wisp is not a member of that pool. The home-pool sign and water path are [42_HOME_LOOP_DESIGN.md](42_HOME_LOOP_DESIGN.md) section 10.1; a cloud wisp does not enter that path.
 
 ## 6. Placeables
 

@@ -40,6 +40,15 @@ def _results_doc(run_id="r1", done=True, beats=()):
             "inconclusive": 0, "beats_run": len(beats), "beats": list(beats)}
 
 
+def _manifest_ids():
+    """The opening beats. The matrix count is this list, not a frozen number."""
+    import quest_test_manifest as manifest
+    ids = manifest.ids()
+    assert ids, "the manifest has no beats"
+    assert len(ids) == len(set(ids)), "the manifest repeats a beat id"
+    return ids
+
+
 @pytest.fixture()
 def double_root(tmp_path):
     """A disposable copy of what the coverage matrix reads."""
@@ -76,9 +85,8 @@ def test_real_matrix_has_all_beats_in_manifest_order():
     assert evaluation["errors"] == [], evaluation["errors"]
     assert evaluation["warnings"] == [], evaluation["warnings"]
 
-    import quest_test_manifest as manifest
     ids = [row["id"] for row in evaluation["beats"]]
-    assert ids == manifest.ids(), ids
+    assert ids == _manifest_ids(), ids
 
 
 def test_real_declared_tests_all_exist():
@@ -99,7 +107,8 @@ def test_missing_result_file_leaves_every_row_inconclusive(double_root):
         row["latest"]["status"] == "inconclusive" and "detail" in row["latest"]
         for row in evaluation["beats"])
     document = coverage.build(evaluation)
-    assert document["summary"]["latest_result_statuses"] == {"inconclusive": 11}
+    assert document["summary"]["latest_result_statuses"] == {
+        "inconclusive": len(_manifest_ids())}
     assert not any(
         row["latest"].get("status") == "passed" for row in evaluation["beats"])
 
@@ -216,12 +225,13 @@ def test_main_writes_both_outputs(double_root):
     assert coverage.main(root=str(double_root)) == 0
 
     document = json.loads((double_root / _JSON_OUT).read_text(encoding="utf-8"))
-    assert document["summary"]["beats"] == 11
-    assert len(document["beats"]) == 11
+    beat_ids = _manifest_ids()
+    assert document["summary"]["beats"] == len(beat_ids)
+    assert len(document["beats"]) == len(beat_ids)
+    assert [row["id"] for row in document["beats"]] == beat_ids
 
     markdown = (double_root / _DOC_OUT).read_text(encoding="utf-8")
-    import quest_test_manifest as manifest
-    for beat_id in manifest.ids():
+    for beat_id in beat_ids:
         assert "**%s**" % beat_id in markdown, beat_id
 
 
@@ -254,7 +264,7 @@ def test_cli_coverage_exits_zero_on_the_real_tree():
         capture_output=True, text=True, cwd=PROJECT_ROOT,
     )
     assert result.returncode == 0, result.stdout + result.stderr
-    assert "quest_coverage: 11 beat(s)" in result.stdout
+    assert "quest_coverage: %d beat(s)" % len(_manifest_ids()) in result.stdout
     assert os.path.isfile(os.path.join(PROJECT_ROOT, _JSON_OUT.replace("/", os.sep)))
 
 
@@ -274,7 +284,7 @@ def test_powershell_quest_coverage_exits_zero():
         capture_output=True, text=True, cwd=PROJECT_ROOT,
     )
     assert result.returncode == 0, result.stdout + result.stderr
-    assert "quest_coverage: 11 beat(s)" in result.stdout
+    assert "quest_coverage: %d beat(s)" % len(_manifest_ids()) in result.stdout
 
 
 def test_the_preflight_stays_clean_on_the_real_tree_after_the_coverage_hook():

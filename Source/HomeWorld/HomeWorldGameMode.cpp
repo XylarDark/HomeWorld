@@ -3,6 +3,7 @@
 #include "HomeWorldGameMode.h"
 #include "HomeWorldCharacter.h"
 #include "HomeWorldFamilySubsystem.h"
+#include "HomeWorldHUD.h"
 #include "Engine/GameInstance.h"
 #include "HomeWorldNightEncounterPlaceholder.h"
 #include "HomeWorldPlayerController.h"
@@ -28,6 +29,7 @@ AHomeWorldGameMode::AHomeWorldGameMode()
 	DefaultPawnClass = AHomeWorldCharacter::StaticClass();
 	PlayerControllerClass = AHomeWorldPlayerController::StaticClass();
 	PlayerStateClass = AHomeWorldPlayerState::StaticClass();
+	HUDClass = AHomeWorldHUD::StaticClass();
 	PrimaryActorTick.bCanEverTick = false;
 }
 

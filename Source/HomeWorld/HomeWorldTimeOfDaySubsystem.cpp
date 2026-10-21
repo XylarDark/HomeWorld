@@ -143,7 +143,9 @@ void UHomeWorldTimeOfDaySubsystem::SetNightMixScalar(float NightMix)
 
 void UHomeWorldTimeOfDaySubsystem::ApplyNightMixForPhase(EHomeWorldTimeOfDayPhase Phase)
 {
-	SetNightMixScalar(HomeWorldNightMix::NightMixForPhase(Phase));
+	// The phase table stays for when night lighting exists. The slice keeps day light.
+	(void)HomeWorldNightMix::NightMixForPhase(Phase);
+	SetNightMixScalar(0.f);
 }
 
 void UHomeWorldTimeOfDaySubsystem::SetPhase(EHomeWorldTimeOfDayPhase Phase)
@@ -165,15 +167,8 @@ void UHomeWorldTimeOfDaySubsystem::SetPhase(EHomeWorldTimeOfDayPhase Phase)
 	}
 	ApplyNightMixForPhase(Phase);
 
-	if (Phase != EHomeWorldTimeOfDayPhase::Day)
-	{
-		bSkyDefaultDayEmittedForCurrentDay = false;
-	}
-	else
-	{
-		// Freeze default bright day skybeat on Day (not folded into kettle / other T0).
-		EnsureDefaultBrightDaySky(true);
-	}
+	// Gameplay can be night. The sky and the sun stay on the day look.
+	EnsureDefaultBrightDaySky(Phase == EHomeWorldTimeOfDayPhase::Day);
 
 	if (Phase == EHomeWorldTimeOfDayPhase::Dawn && GetWorld())
 	{
@@ -254,15 +249,7 @@ bool UHomeWorldTimeOfDaySubsystem::EnsureDefaultBrightDaySky(bool bEmitBeatLog)
 		return false;
 	}
 
-	const EHomeWorldTimeOfDayPhase Phase = GetCurrentPhase();
-	if (Phase != EHomeWorldTimeOfDayPhase::Day)
-	{
-		UE_LOG(LogTemp, Log,
-			TEXT("SKY_DEFAULT_DAY: skipped - need TOD_DAY (not NF2_B night lookdev-as-day)"));
-		return false;
-	}
-
-	// NightMix=0 for Day (existing TOD path).
+	// Night lighting is not built. A night phase still gets the day sun.
 	ApplyNightMixForPhase(EHomeWorldTimeOfDayPhase::Day);
 
 	if (IConsoleVariable* SupportAtmo = IConsoleManager::Get().FindConsoleVariable(TEXT("r.SupportSkyAtmosphere")))

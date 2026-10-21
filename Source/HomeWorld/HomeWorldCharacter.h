@@ -10,6 +10,7 @@
 #include "HomeWorldStrokeReportComponent.h"
 #include "HomeWorldQuestLog.h"
 #include "HomeWorldTimeOfDaySubsystem.h"
+#include "HomeWorldOpeningSupply.h"
 
 /** Where a family member stands. One place, not a dialogue tree. */
 UENUM(BlueprintType)
@@ -53,6 +54,15 @@ class HOMEWORLD_API AHomeWorldCharacter : public ACharacter, public IAbilitySyst
 
 public:
 	AHomeWorldCharacter(const FObjectInitializer& ObjectInitializer);
+
+	/** Half-extent of the aim box, in normalized screen space. The drawn frame uses this. */
+	static constexpr float OpeningViewCenterNdc = 0.3f;
+
+	/** How far the aim box sits above the screen center, in normalized screen space. Positive is up. */
+	static constexpr float OpeningViewUpNdc = 0.5f;
+
+	/** The aim rectangle is a development view of that box. Off after the 2026-10-21 pass. */
+	static constexpr bool bDrawOpeningAimBox = false;
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -118,6 +128,21 @@ public:
 	/** Size-test night: deposit a damaged wisp in the hot springs with one mixed herb. */
 	bool TryOpeningHotSpringHealInFront();
 
+	/** Dawn chest: one wood, one silk, one metal. Not the six-slot carry. */
+	void StockOpeningDawnChest();
+	bool TryCraftOpeningGlider();
+	bool IsOpeningGliderCrafted() const;
+	void GrantOpeningGliderForTest();
+	int32 GetOpeningDawnCountForTest(FName Material) const;
+	int32 GetOpeningDeliveryCountForTest(FName Material) const;
+
+	/** E on a wood, herb, or stone node. One delivery, then that node refuses. */
+	bool TryOpeningDeliveryInFront();
+	bool TryDeliverOpeningNode(AActor* Node);
+
+	/** Fast-forward and test seed. One healed follower. Does not start a heal timer. */
+	void SeedOpeningHealedWisp();
+
 	/** Test hooks: seed the wisp loop and print the tracker the HUD is showing. */
 	void DebugSeedOpeningWispLoop(int32 Carried, int32 Herbs);
 	FString GetOpeningTrackerText() const;
@@ -138,7 +163,7 @@ public:
 
 	/** Test hook: play the opening beats in order, for real, and stop ready to test one beat.
 	 *  Beat text: spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect,
-	 *  heal. Empty = night; "list" prints the names. Start a fresh PIE for every run. */
+	 *  heal, glider, delivery, daycamp. Empty = night; "list" prints the names. Start a fresh PIE for every run. */
 	void DebugFastForwardOpening(const FString& Beat);
 
 	/** Test hook: call the hot-spring deposit the E chain calls. */
@@ -902,6 +927,9 @@ protected:
 	/** The bed's night transition once the bed is resolved. Shared by E and the playtest fast-forward. */
 	bool BeginOpeningNight();
 
+	/** Fast-forward only. Returns the body at dawn and does not stock the chest. */
+	void ReturnOpeningBodyForDawnPlaytest();
+
 	/** Playtest fast-forward: 0 idle, 1..9 the beat being played. */
 	void TickDebugFastForward(float DeltaTime);
 	int32 DebugFastForwardStep = 0;
@@ -992,6 +1020,9 @@ protected:
 	bool bOpeningFishCaught = false;
 
 	AActor* FindOpeningProximityTarget() const;
+
+	/** True when the target sits in the center of the view. */
+	bool IsOpeningTargetInView(const AActor* Target) const;
 	void ShowOpeningProximityLine();
 	void RefreshOpeningQuest();
 	void MaybeLeadPartnerAfterHerbs();
@@ -1014,6 +1045,9 @@ protected:
 	TObjectPtr<class AHomeWorldOpeningDog> OpeningDog;
 	UPROPERTY(Transient)
 	TObjectPtr<UHomeWorldQuestLog> QuestLog;
+
+	UPROPERTY()
+	TObjectPtr<UHomeWorldOpeningSupply> OpeningSupply;
 	bool bOpeningDogDrawActive = false;
 	bool bOpeningDogSlowLatched = false;
 	FVector OpeningDogCursor = FVector::ZeroVector;

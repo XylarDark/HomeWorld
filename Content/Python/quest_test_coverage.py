@@ -164,4 +164,34 @@ COVERAGE = {
             "the 20s heal wait feel and the healed wisp's follow arc",
         ],
     },
+    "glider": {
+        "tests": [
+            # Empty chest refuses the descent, the craft spends one wood,
+            # one silk, and one metal, and the crafted flag lets the launch.
+            "HomeWorld.Opening.GliderCraft",
+        ],
+        "human": [
+            "crafting at the armory table at dawn",
+        ],
+    },
+    "delivery": {
+        "tests": [
+            # One wood delivery credits 10, a second fill is refused,
+            # silk is refused, and the six-slot carry is unchanged.
+            "HomeWorld.Opening.Delivery",
+        ],
+        "human": [
+            "setting the healed wisp on the node and the flight home",
+        ],
+    },
+    "daycamp": {
+        "tests": [
+            # Walking inside 280 cm ejects with no delivery and after one.
+            # Outside that reach, and at night, nothing is taken.
+            "HomeWorld.Opening.DayCamp",
+        ],
+        "human": [
+            "the clearing read and the glide home",
+        ],
+    },
 }

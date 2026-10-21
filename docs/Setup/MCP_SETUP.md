@@ -284,3 +284,7 @@ External LLMs can generate Python that is then run via MCP (`execute_python_scri
 | Plugin compilation failure on UE 5.8 | Switch to UnrealMCPBridge fallback (see above) |
 | `uv` not found | Run the install script or add `C:\Users\<user>\.local\bin` to PATH |
 | Mixar MCP missing / ENOENT / stuck Connecting | See [Mixar MCP](#mixar-mcp-official-blender-lab-add-on-served-by-mixar); start the server with `.\Tools\Start-MixarMcp.ps1` and use the Lab `blender-mcp.exe` via `Tools/mixar-mcp.cmd`, not PyPI `uvx blender-mcp` |
+
+## Unreal Engine Skills
+
+Cursor template [`.cursor/mcp.json.example`](../../.cursor/mcp.json.example) names `unreal-engine-skills` at `https://www.unrealengineskills.com/api/mcp`. No API key. Copy that block into the gitignored `.cursor/mcp.json`, then toggle the server under **Settings → Tools & MCP**. What to load, and what stays unloaded, is the Use and Hold rows in [Docs/tools/GAME_TOOL_CATALOG.md](../../Docs/tools/GAME_TOOL_CATALOG.md). DEC-0053. OpenCode does not connect.

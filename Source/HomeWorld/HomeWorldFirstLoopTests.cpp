@@ -39,6 +39,7 @@ namespace HomeWorldFirstLoopTest
 			}
 		}
 		Character->SetActorLocation(FVector::ZeroVector);
+		Character->GrantOpeningGliderForTest();
 		if (UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>())
 		{
 			if (TimeOfDay->GetIsNight() && !Character->GetIsSpiritForm() && !Character->TryBedSleepSpirit())

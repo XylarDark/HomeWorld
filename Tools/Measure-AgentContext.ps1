@@ -32,6 +32,12 @@
 # After harness-check (2026-10-19):
 #   project .agents/skills 27 -> 28 (1013 tok)
 #   standingTok 3248 -> 3275
+# After harness-check (2026-10-21), no catalog cut:
+#   standingTok 4624  skillTok 4167  agentTok 457
+#   Cpp bucket 3804
+#   docs/SESSION_NOW.md 2612 bytes before the session-start handoff block
+#   user .agents/skills is loaded again: 26 skills / 1398 tok
+#   project .agents/skills 27 / 964 tok
 param(
     [string]$RepoRoot = ""
 )

@@ -33,6 +33,8 @@ A herb with no poles is a count of `RES_HERB`. Tea, planting, tame, and heal spe
 
 A herb with one or more poles is one instance. Two herbs with different poles are not one stack.
 
+A garden can grow a marked herb or greens from a signed home-pool wisp. The home loop owns that path in [42_HOME_LOOP_DESIGN.md](42_HOME_LOOP_DESIGN.md) section 10.1; the herb still spends by the verbs below.
+
 One marked herb is spent only when the verb changes the target:
 
 - Nullify clears every pole on the target.
@@ -48,7 +50,7 @@ Each pole has a rune. At a glance the rune says which pole it is. A paradox mark
 
 These marks are attributes. Sleep at the bed is still the form change. The bed rune stays removed.
 
-A mark changes a visible interaction with a place or a creature. The yield follows from that interaction. A mark does not add a hidden stat line. Interview round 1, 2026-10-15.
+A mark changes a visible interaction with a place or a creature. The yield follows from that interaction. A mark does not add a hidden stat line. Interview round 1, 2026-10-15. Node modifiers on 2026-10-21 set that ban aside for spawned nodes. The shape stays in [`Docs/context/OPENING_TUTORIAL_INTERVIEW.md`](context/OPENING_TUTORIAL_INTERVIEW.md). This file does not copy it.
 
 ## Encounters
 

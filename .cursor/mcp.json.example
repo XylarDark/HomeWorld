@@ -9,6 +9,7 @@
   "//7": "Do NOT use a bare `blender` command: it silently runs vanilla Blender 4.4. Use the mixar-mcp.cmd wrapper, which pins BLENDER_PATH.",
   "//8": "unrealEditorUi is Epic's Slate inspector at http://127.0.0.1:8000/mcp. It starts with the editor. unrealMCP on 55557 stays the Python and actor server.",
   "//9": "rider is Rider's own built-in MCP server, reached over HTTP at http://127.0.0.1:64342/stream (streamable) or /sse (legacy SSE). Do NOT use @jetbrains/mcp-proxy - it probes /api/mcp/list_tools, which no Rider 2026.2 install contains. Start it with .\\Tools\\Start-RiderMcp.ps1 (headless, blocks until the port answers). File-edit and shell tools stay off; symbols, usages, UHT and refactoring stay on. unrealMCP on 55557 stays the level server.",
+  "//10": "unreal-engine-skills is the public read-only skills server. No API key. Use rules are in Docs/tools/GAME_TOOL_CATALOG.md. Do not add it to opencode.json.",
 
   "mcpServers": {
     "unrealMCP": {
@@ -29,6 +30,9 @@
     },
     "rider": {
       "url": "http://127.0.0.1:64342/stream"
+    },
+    "unreal-engine-skills": {
+      "url": "https://www.unrealengineskills.com/api/mcp"
     }
   }
 }

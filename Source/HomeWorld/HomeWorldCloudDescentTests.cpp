@@ -42,6 +42,7 @@ bool FCloudDescentSteeringAndWispTest::RunTest(const FString& Parameters)
 		return false;
 	}
 
+	Character->GrantOpeningGliderForTest();
 	TestTrue(TEXT("day/body launch starts active descent"), Character->TryStartCloudDescent());
 	TestTrue(TEXT("descent is active"), Character->IsCloudDescentActive());
 
@@ -136,6 +137,7 @@ bool FCloudDescentLandingHandsBackControlTest::RunTest(const FString& Parameters
 		return false;
 	}
 
+	Character->GrantOpeningGliderForTest();
 	if (!TestTrue(TEXT("day/body launch starts active descent"), Character->TryStartCloudDescent()))
 	{
 		return false;
@@ -209,6 +211,7 @@ bool FCloudDescentDurationMeasurementTest::RunTest(const FString& Parameters)
 		return false;
 	}
 
+	Character->GrantOpeningGliderForTest();
 	if (!TestTrue(TEXT("day/body launch starts active descent"), Character->TryStartCloudDescent()))
 	{
 		return false;

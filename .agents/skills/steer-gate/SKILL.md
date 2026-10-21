@@ -11,7 +11,7 @@ Load [Docs/handoffs/SLICE_SESSION.md](../../../Docs/handoffs/SLICE_SESSION.md) a
 
 ## Prompt, then stop
 
-Use the environment's question tool when it has one. Otherwise emit this block and wait. Do not edit, commit, or declare done in the same turn.
+Use the environment's question tool when it has one. Otherwise emit this block and wait. Do not edit, commit, or declare done in the same turn. When the session door is in an interview, ask one lock, then stop. Do not add a second prompt.
 
 ```
 Owner: human — <decision>

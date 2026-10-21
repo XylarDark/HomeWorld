@@ -6,7 +6,10 @@
 
 #include "Components/SplineMeshComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Engine/StaticMesh.h"
+#include "Engine/World.h"
+#include "GameFramework/Character.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/PlayerController.h"
 #include "Materials/MaterialInterface.h"
@@ -14,6 +17,16 @@
 namespace
 {
 	constexpr float HeartScaleCm = 5.2f;
+	/** Width the heart was tuned against: the 206 cm herb bed. Smaller props keep this size. */
+	constexpr float HeartReferenceWidthCm = 206.f;
+	/** Ceiling on the object-driven growth, so a barn door does not draw a 20 m rune. */
+	constexpr float HeartObjectMaxScale = 2.5f;
+	/** Heart outline half-width in unit space. The drawn width is twice this times the scale. */
+	constexpr float HeartUnitHalfWidth = 16.f;
+	/** Lowest point of the heart curve, unit space. The bottom hangs this far below the center. */
+	constexpr float HeartLocalMinY = -17.f;
+	/** Ribbon radius at the 0.12 spline scale, cm. The centerline clearance is not enough. */
+	constexpr float HeartRibbonCm = 6.f;
 	constexpr int32 HeartOutlineCount = 48;
 	constexpr float PointMinArcCm = 34.f;
 	constexpr float TraceCorridorCm = 70.f;
@@ -202,7 +215,7 @@ void UHomeWorldRuneShapeComponent::Rebuild(const FVector& Right, const FVector& 
 	float Length = 0.f;
 	for (int32 Index = 0; Index < HeartLocalPoints.Num(); ++Index)
 	{
-		const float LocalScale = bCustomShape ? 1.f : HeartScaleCm;
+		const float LocalScale = bCustomShape ? 1.f : DrawnHeartScaleCm;
 		const FVector Point = Center + Right * HeartLocalPoints[Index].X * LocalScale + Up * HeartLocalPoints[Index].Y * LocalScale;
 		if (Index > 0)
 		{
@@ -362,22 +375,28 @@ void UHomeWorldRuneShapeComponent::ShowHeart(EHomeWorldRuneDrawMode Draw, EHomeW
 	Progress = 0;
 	SectionsEarned = 0;
 	ClickOrder.Reset();
-	AlignToViewer(InViewer);
-	SetComponentTickEnabled(true);
 	FVector MeshCenter = FVector::ZeroVector;
 	FVector MeshExtent = FVector::ZeroVector;
 	if (GetOwner())
 	{
 		HomeWorldWisp::MeasureBounds(GetOwner(), MeshCenter, MeshExtent);
 	}
-	UE_LOG(LogTemp, Log, TEXT("opening_rune: %s heart, %s, reward %d, center %s, owner %s mesh %s + %s"),
+	// The herb beds set the size. A bigger object draws a bigger rune; a smaller one keeps the
+	// bed size, because the click targets must stay easy to hit on a 45 cm wisp.
+	const float ObjectWidthCm = 2.f * FMath::Max(MeshExtent.X, MeshExtent.Y);
+	const float ObjectScale = FMath::Clamp(ObjectWidthCm / HeartReferenceWidthCm, 1.f, HeartObjectMaxScale);
+	DrawnHeartScaleCm = HeartScaleCm * ObjectScale;
+	AlignToViewer(InViewer);
+	SetComponentTickEnabled(true);
+	UE_LOG(LogTemp, Log, TEXT("opening_rune: %s heart, %s, reward %d, center %s, owner %s mesh %s + %s, width %.0f"),
 		Draw == EHomeWorldRuneDrawMode::Points ? TEXT("points") : TEXT("trace"),
 		InOrientation == EHomeWorldRuneOrientation::Static ? TEXT("static") : TEXT("camera"),
 		GetReward(),
 		*PlaneOrigin.ToString(),
 		GetOwner() ? *GetOwner()->GetActorNameOrLabel() : TEXT("none"),
 		*MeshCenter.ToString(),
-		*MeshExtent.ToString());
+		*MeshExtent.ToString(),
+		2.f * HeartUnitHalfWidth * DrawnHeartScaleCm);
 }
 
 void UHomeWorldRuneShapeComponent::ShowShape(const TArray<FVector2D>& UnitPoints, float SizeCm, bool bCloseLoop,
@@ -471,12 +490,12 @@ void UHomeWorldRuneShapeComponent::AlignToViewer(APlayerController* InViewer)
 		}
 	}
 	const FVector Side(-TowardView.Y, TowardView.X, 0.f);
-	// Beside the object, not on top of it: the same bounds rule as the shoulder wisp.
-	// The fixed offset stays as the fallback when the object has no mesh to measure.
+	// XY beside the prop. Height is chosen after the floor under that spot is known.
 	FVector Center = FVector::ZeroVector;
-	if (!HomeWorldWisp::HeartPoint(GetOwner(), CameraLocation, OwnerLocation.Z + 160.f, Center))
+	if (!HomeWorldWisp::HeartPoint(GetOwner(), CameraLocation, PlayerLocation.Z, Center))
 	{
-		Center = OwnerLocation + Side * 180.f + FVector(0.f, 0.f, 160.f);
+		Center = OwnerLocation + Side * 180.f;
+		Center.Z = PlayerLocation.Z;
 	}
 	const float HeartReach = 110.f;
 	const float BodyClear = 90.f;
@@ -491,8 +510,92 @@ void UHomeWorldRuneShapeComponent::AlignToViewer(APlayerController* InViewer)
 		}
 		Center += Push * (Need - Have);
 	}
+	// Head height first. A larger shape hangs lower, so the center rises until the
+	// bottom clears the floor and, when the shape reaches the prop, the prop's top.
+	float HangCm = HeartRibbonCm;
+	float HalfWidthCm = HeartRibbonCm;
+	if (bCustomShape)
+	{
+		float MinY = 0.f;
+		float MaxAbsX = 0.f;
+		for (const FVector2D& Unit : UnitShapePoints)
+		{
+			MinY = FMath::Min(MinY, (Unit.Y - 0.5f) * CustomSizeCm);
+			MaxAbsX = FMath::Max(MaxAbsX, FMath::Abs((Unit.X - 0.5f) * CustomSizeCm));
+		}
+		HangCm = -MinY + HeartRibbonCm;
+		HalfWidthCm = MaxAbsX + HeartRibbonCm;
+	}
+	else
+	{
+		HangCm = -HeartLocalMinY * DrawnHeartScaleCm + HeartRibbonCm;
+		HalfWidthCm = HeartUnitHalfWidth * DrawnHeartScaleCm + HeartRibbonCm;
+	}
+	float FloorZ = OwnerLocation.Z;
+	FVector MeshCenter = FVector::ZeroVector;
+	FVector MeshExtent = FVector::ZeroVector;
+	const bool bMesh = HomeWorldWisp::MeasureBounds(GetOwner(), MeshCenter, MeshExtent);
+	if (bMesh)
+	{
+		FloorZ = MeshCenter.Z - MeshExtent.Z;
+	}
+	if (UWorld* World = GetWorld())
+	{
+		FCollisionQueryParams FloorParams(NAME_None, false);
+		if (GetOwner())
+		{
+			FloorParams.AddIgnoredActor(GetOwner());
+		}
+		if (APawn* FloorPawn = Viewer.IsValid() ? Viewer->GetPawn() : nullptr)
+		{
+			FloorParams.AddIgnoredActor(FloorPawn);
+		}
+		const FVector FloorStart(Center.X, Center.Y, Center.Z + HangCm + 400.f);
+		const FVector FloorEnd(Center.X, Center.Y, Center.Z - 8000.f);
+		FHitResult FloorHit;
+		if (World->LineTraceSingleByChannel(FloorHit, FloorStart, FloorEnd, ECC_WorldStatic, FloorParams))
+		{
+			FloorZ = FloorHit.ImpactPoint.Z;
+		}
+	}
+	float StatureCm = 88.f;
+	if (const APlayerController* HeadPC = Viewer.Get())
+	{
+		if (const ACharacter* Body = Cast<ACharacter>(HeadPC->GetPawn()))
+		{
+			if (const UCapsuleComponent* Capsule = Body->GetCapsuleComponent())
+			{
+				StatureCm = Capsule->GetScaledCapsuleHalfHeight();
+			}
+		}
+	}
+	// Head level is one stature above the floor under the shape, not the player's
+	// altitude on a slope. Clearance only raises it.
+	Center.Z = FloorZ + StatureCm;
+	const float FloorClear = FloorZ + HomeWorldWisp::HeartAboveCm + HangCm;
+	if (Center.Z < FloorClear)
+	{
+		Center.Z = FloorClear;
+	}
+	if (bMesh)
+	{
+		const float SideDist = FVector::Dist2D(Center, MeshCenter);
+		const FVector ToHeart = (Center - MeshCenter).GetSafeNormal2D();
+		const float ObjectReach = FMath::Abs(MeshExtent.X * ToHeart.X) + FMath::Abs(MeshExtent.Y * ToHeart.Y);
+		if (SideDist < ObjectReach + HalfWidthCm)
+		{
+			const float ObjectClear = MeshCenter.Z + MeshExtent.Z + HomeWorldWisp::HeartAboveCm + HangCm;
+			if (Center.Z < ObjectClear)
+			{
+				Center.Z = ObjectClear;
+			}
+		}
+	}
+	// The heart stays beside the prop and turns with the view, so a walk
+	// around the object keeps the click in reach. The dog's Grace draw uses the same side.
+	APlayerController* ViewerPC = Viewer.Get();
 	FVector Face = TowardView;
-	if (Viewer.Get())
+	if (ViewerPC)
 	{
 		const FVector ToCamera = CameraLocation - Center;
 		if (ToCamera.SizeSquared2D() > 1.f)

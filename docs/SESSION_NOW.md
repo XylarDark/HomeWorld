@@ -2,6 +2,30 @@
 
 The live continuity block. A new chat reads this file, not the history. Append the next block here. When this file grows past a few screens, move the older blocks to `docs/history/SESSION_LOG.md`.
 
+## 2026-10-21 Day-camp arrival
+
+`HomeWorld.Opening.DayCamp` passed with the glider and delivery tests. The clearing is not on `L_SizeTest`. Now stays the October 22 Night row. Next chat for that pass starts from `Docs/handoffs/SESSION_HANDOFF_PLAYTEST.md`.
+
+## 2026-10-21 Glider and delivery host tests
+
+`HomeWorld.Opening.GliderCraft` and `HomeWorld.Opening.Delivery` passed. The queue sections are built and waiting on their plays. Now stays the October 22 Night row. Next chat for that pass starts from `Docs/handoffs/SESSION_HANDOFF_PLAYTEST.md`. Place tasks stay until that pass releases `L_SizeTest`.
+
+## 2026-10-21 Session-start tool check
+
+Next chat starts from `Docs/handoffs/SESSION_HANDOFF_SESSION_START.md`. Run that check. The playtest prep block below stays the game task after the check passes.
+
+## 2026-10-21 Playtest prep handoff
+
+A prep chat starts from `Docs/handoffs/SESSION_HANDOFF_PLAYTEST_PREP.md`. The task list is `## Ahead of the plays` in `Docs/context/PLAY_TASKS.md`. First task is the glider craft, host test only, editor left open. The Night pass stays `Docs/handoffs/SESSION_HANDOFF_PLAYTEST.md`.
+
+## 2026-10-21 Night replay handoff
+
+Next chat starts from `Docs/handoffs/SESSION_HANDOFF_PLAYTEST.md`. The master list is `## Critical path` in `Docs/qa/TUTORIAL_PLAYTEST_QUEUE.md`. Now is the October 22 Night row: the bed press, then one sentence in the Night table. The aim box passed and its frame is off in source. The heal formula is not in the binary. Night, the wisp loop, and the party are not play-confirmed.
+
+## 2026-10-21 Playtest handoff
+
+Next chat starts from `Docs/handoffs/SESSION_HANDOFF_PLAYTEST.md`. Now is Night, then the wisp loop, then the party desk. The 2026-10-21 locks are in `Docs/context/OPENING_TUTORIAL_INTERVIEW.md` and are not in the heal binary. Night, the wisp loop, and the party are not play-confirmed.
+
 ## 2026-10-20 Evening: quest tools and companion party merged
 
 Merged to `main`: #315 quest test suite (plus the cottage-era desktop work and the seven `MI_Greybox_*` resaves), #316 companion party design `Docs/41_COMPANION_PARTY_DESIGN.md`, #317 night wisp tests, #318 quest contract, #319 companion party build, #320 quest preflight (`.\Tools\RunTests.ps1 -QuestCheck`), #321 quest coverage matrix (`-QuestCoverage`, `Docs/qa/QUEST_COVERAGE.md`). The two-floor cottage and `L_SizeTest.umap` are committed (`4a910e48`, `ad33f549`). Lead picks today: companion 1A-8A, then the build hold lifted; quest tools 1A 2A 3A; home loop 1A-8A and 1A-3A; invite 4A 5A. Invite hookup is in progress. Night, the wisp loop, and the party are not play-confirmed. Next chat starts from `Docs/handoffs/SESSION_HANDOFF_PLAYTEST.md`.

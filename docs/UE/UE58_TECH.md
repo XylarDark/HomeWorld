@@ -56,7 +56,7 @@ Track: [Docs/23_UE58_FEATURE_ADOPTION.md](../../Docs/23_UE58_FEATURE_ADOPTION.md
 | MegaLights | **On** — `r.MegaLights.EnableForProject=True` in DefaultEngine.ini |
 | Fog Screen Space Scattering | **On** — `r.Fog.ScreenSpaceScattering=1`; enable on height fog actors |
 | Lumen Lite | **Low path** — Medium GI + Medium Reflections (`sg.GlobalIlluminationQuality 1`, `sg.ReflectionQuality 1`); hero stays High/Epic |
-| UnrealMCP | **Primary** — Epic `ModelContextProtocol` stays **disabled** ([U58F_F_MCP_DECISION.md](../../Docs/handoffs/U58F_F_MCP_DECISION.md)) |
+| UnrealMCP | **Primary** on port 55557. Epic MCP on port 8000 is the Slate inspector only ([DEC-0037](../../Docs/decisions/AGENT_DECISIONS.md)). The skills server is in [the tool catalog](../../Docs/tools/GAME_TOOL_CATALOG.md). |
 | Mesh Terrain | **Spike only** — sandbox; do not replace VS_MVP Landscape ([U58F_G_MESH_TERRAIN.md](../../Docs/handoffs/U58F_G_MESH_TERRAIN.md)) |
 | MetaHuman / MH Crowds | **Reject** for hero/family |
 | Mobile tooling | **Reject** (PC + Steam EA lock) |
@@ -103,7 +103,7 @@ Canonical chain: [EDITOR_BUILD_PROTOCOL.md](../Editor/EDITOR_BUILD_PROTOCOL.md) 
 
 1. `.\Tools\Safe-Build.ps1` (closes Editor if needed)
 2. Open `HomeWorld.uproject`
-3. Restart Cursor; MCP green on **55557** (UnrealMCP only — **no** Epic `ModelContextProtocol`)
+3. Restart Cursor; MCP green on **55557** (UnrealMCP). Epic MCP on port 8000 is the Slate inspector only (DEC-0037). Skills-server rules: [the tool catalog](../../Docs/tools/GAME_TOOL_CATALOG.md).
 4. MCP / `execute_python_script` for Editor work
 
 ### When to use Unreal Insights
