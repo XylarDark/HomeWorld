@@ -646,6 +646,10 @@ void UHomeWorldHomeLoopSubsystem::SetSurfaceDust(FName SurfaceId, int32 Dust)
 
 void UHomeWorldHomeLoopSubsystem::ClearSurface(FName SurfaceId)
 {
+	if (GetSurfaceDust(SurfaceId) > 0)
+	{
+		bClearedASurface = true;
+	}
 	SetSurfaceDust(SurfaceId, 0);
 }
 
@@ -736,7 +740,16 @@ bool UHomeWorldHomeLoopSubsystem::PlantSeed(int32 PlotIndex, UHomeWorldInventory
 	Plot.Index = PlotIndex;
 	Plot.bPlanted = true;
 	Plot.CropItemId = CropItemId;
+	bPlantedASeed = true;
 	return true;
+}
+
+void UHomeWorldHomeLoopSubsystem::GetHomeLoopQuestProgress(bool& bKettleCooked, bool& bWispAssigned, bool& bSurfaceCleared, bool& bSeedPlanted) const
+{
+	bKettleCooked = LastServe.bServed;
+	bWispAssigned = WispAssignments.Num() > 0;
+	bSurfaceCleared = bClearedASurface;
+	bSeedPlanted = bPlantedASeed;
 }
 
 bool UHomeWorldHomeLoopSubsystem::TryAssignWispToPlot(FName WispId, int32 PlotIndex)

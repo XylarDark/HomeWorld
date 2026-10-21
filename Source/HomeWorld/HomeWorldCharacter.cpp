@@ -2619,6 +2619,16 @@ void AHomeWorldCharacter::RefreshOpeningQuest()
 		Facts.bDogTamed = OpeningDog->IsDogTamed();
 	}
 	QuestLog->SetChain(TEXT("Opening"), UHomeWorldQuestLog::BuildOpeningSteps(Facts));
+	if (UHomeWorldHomeLoopSubsystem* HomeLoop = GetWorld()->GetSubsystem<UHomeWorldHomeLoopSubsystem>())
+	{
+		if (HomeLoop->HasOpeningDayEnded())
+		{
+			FHomeWorldHomeLoopQuestFacts HomeFacts;
+			HomeLoop->GetHomeLoopQuestProgress(
+				HomeFacts.bKettleCooked, HomeFacts.bWispAssigned, HomeFacts.bSurfaceCleared, HomeFacts.bSeedPlanted);
+			QuestLog->SetChain(TEXT("home_loop"), UHomeWorldQuestLog::BuildHomeLoopSteps(HomeFacts));
+		}
+	}
 	if (!GEngine)
 	{
 		return;

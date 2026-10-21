@@ -950,4 +950,69 @@ bool FHomeLoopGreensHerbOffOpeningTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FHomeLoopQuestChainBesideOpeningTest,
+	"HomeWorld.HomeLoop.QuestChainBesideOpening",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FHomeLoopQuestChainBesideOpeningTest::RunTest(const FString& Parameters)
+{
+	FHomeWorldOpeningQuestFacts OpeningFacts;
+	OpeningFacts.bSpiritClaimed = true;
+	OpeningFacts.HerbsGathered = HomeWorldOpeningHerbQuota;
+	OpeningFacts.bHerbFromWest = true;
+	OpeningFacts.bHerbFromEast = true;
+	OpeningFacts.bBackpack = true;
+	const TArray<FHomeWorldQuestStep> Opening = UHomeWorldQuestLog::BuildOpeningSteps(OpeningFacts);
+	bool bBrew = false;
+	for (const FHomeWorldQuestStep& Step : Opening)
+	{
+		if (Step.Id == FName(TEXT("Cook")) || Step.Id == FName(TEXT("Assign")) || Step.Id == FName(TEXT("Clean")) || Step.Id == FName(TEXT("Plant")))
+		{
+			AddError(TEXT("BuildOpeningSteps gained a home_loop step"));
+			return false;
+		}
+		if (Step.Text == TEXT("Brew the kettle."))
+		{
+			bBrew = true;
+		}
+	}
+	TestTrue(TEXT("the opening kettle line is unchanged"), bBrew);
+
+	FHomeWorldHomeLoopQuestFacts HomeFacts;
+	HomeFacts.bKettleCooked = true;
+	HomeFacts.bWispAssigned = true;
+	HomeFacts.bSurfaceCleared = true;
+	HomeFacts.bSeedPlanted = true;
+	const TArray<FHomeWorldQuestStep> HomeSteps = UHomeWorldQuestLog::BuildHomeLoopSteps(HomeFacts);
+	if (!TestEqual(TEXT("four home steps"), HomeSteps.Num(), 4))
+	{
+		return false;
+	}
+	TestEqual(TEXT("cook"), HomeSteps[0].Id, FName(TEXT("Cook")));
+	TestEqual(TEXT("cook line"), HomeSteps[0].Text, FString(TEXT("Cook the kettle.")));
+	TestEqual(TEXT("assign"), HomeSteps[1].Id, FName(TEXT("Assign")));
+	TestEqual(TEXT("assign line"), HomeSteps[1].Text, FString(TEXT("Assign a wisp.")));
+	TestEqual(TEXT("clean"), HomeSteps[2].Id, FName(TEXT("Clean")));
+	TestEqual(TEXT("clean line"), HomeSteps[2].Text, FString(TEXT("Clear one surface.")));
+	TestEqual(TEXT("plant"), HomeSteps[3].Id, FName(TEXT("Plant")));
+	TestEqual(TEXT("plant line"), HomeSteps[3].Text, FString(TEXT("Plant one seed.")));
+
+	UHomeWorldQuestLog* Log = NewObject<UHomeWorldQuestLog>();
+	if (!TestNotNull(TEXT("quest log"), Log))
+	{
+		return false;
+	}
+	Log->SetChain(TEXT("Opening"), Opening);
+	Log->SetChain(TEXT("home_loop"), HomeSteps);
+	TArray<FHomeWorldQuestStep> StoredOpening;
+	TArray<FHomeWorldQuestStep> StoredHome;
+	TestTrue(TEXT("opening chain is still stored"), Log->GetChainSteps(TEXT("Opening"), StoredOpening));
+	TestTrue(TEXT("home_loop chain is stored beside it"), Log->GetChainSteps(TEXT("home_loop"), StoredHome));
+	TestEqual(TEXT("opening chain length is unchanged"), StoredOpening.Num(), Opening.Num());
+	TestEqual(TEXT("stored home chain has four steps"), StoredHome.Num(), 4);
+	TestEqual(TEXT("the newer chain is the one on screen"), Log->GetDisplayedSteps()[0].Id, FName(TEXT("Cook")));
+	return true;
+}
+
 #endif

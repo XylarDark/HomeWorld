@@ -44,6 +44,15 @@ struct FHomeWorldOpeningQuestFacts
 /** Both beds, and twenty chunks between them. A miss adds nothing. */
 inline constexpr int32 HomeWorldOpeningHerbQuota = 20;
 
+/** Facts for the sibling home_loop chain. It does not replace Opening. */
+struct FHomeWorldHomeLoopQuestFacts
+{
+	bool bKettleCooked = false;
+	bool bWispAssigned = false;
+	bool bSurfaceCleared = false;
+	bool bSeedPlanted = false;
+};
+
 /** One chain. Several can be stored. The screen shows only the most recently changed one. */
 USTRUCT()
 struct FHomeWorldQuestChain
@@ -76,6 +85,11 @@ public:
 	const TArray<FHomeWorldQuestStep>& GetDisplayedSteps() const;
 
 	static TArray<FHomeWorldQuestStep> BuildOpeningSteps(const FHomeWorldOpeningQuestFacts& Facts);
+
+	/** Copy one stored chain. False when that id has not been set. */
+	bool GetChainSteps(FName Id, TArray<FHomeWorldQuestStep>& OutSteps) const;
+
+	static TArray<FHomeWorldQuestStep> BuildHomeLoopSteps(const FHomeWorldHomeLoopQuestFacts& Facts);
 
 private:
 	static bool SameSteps(const TArray<FHomeWorldQuestStep>& A, const TArray<FHomeWorldQuestStep>& B);

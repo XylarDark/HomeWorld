@@ -65,6 +65,20 @@ void UHomeWorldQuestLog::SetChain(FName Id, const TArray<FHomeWorldQuestStep>& I
 	}
 }
 
+bool UHomeWorldQuestLog::GetChainSteps(FName Id, TArray<FHomeWorldQuestStep>& OutSteps) const
+{
+	for (const FHomeWorldQuestChain& Chain : Chains)
+	{
+		if (Chain.Id == Id)
+		{
+			OutSteps = Chain.Steps;
+			return true;
+		}
+	}
+	OutSteps.Reset();
+	return false;
+}
+
 const TArray<FHomeWorldQuestStep>& UHomeWorldQuestLog::GetDisplayedSteps() const
 {
 	const FHomeWorldQuestChain* Best = nullptr;
@@ -169,5 +183,36 @@ TArray<FHomeWorldQuestStep> UHomeWorldQuestLog::BuildOpeningSteps(const FHomeWor
 	Sleep.Text = TEXT("Sleep in the bed.");
 	Sleep.bDone = Facts.bSlept;
 	Steps.Add(Sleep);
+	return Steps;
+}
+
+TArray<FHomeWorldQuestStep> UHomeWorldQuestLog::BuildHomeLoopSteps(const FHomeWorldHomeLoopQuestFacts& Facts)
+{
+	TArray<FHomeWorldQuestStep> Steps;
+	auto Add = [&Steps](const TCHAR* Id, const FString& Text, bool bDone)
+	{
+		FHomeWorldQuestStep Step;
+		Step.Id = FName(Id);
+		Step.Text = Text;
+		Step.bDone = bDone;
+		Steps.Add(Step);
+	};
+
+	Add(TEXT("Cook"), TEXT("Cook the kettle."), Facts.bKettleCooked);
+	if (!Facts.bKettleCooked)
+	{
+		return Steps;
+	}
+	Add(TEXT("Assign"), TEXT("Assign a wisp."), Facts.bWispAssigned);
+	if (!Facts.bWispAssigned)
+	{
+		return Steps;
+	}
+	Add(TEXT("Clean"), TEXT("Clear one surface."), Facts.bSurfaceCleared);
+	if (!Facts.bSurfaceCleared)
+	{
+		return Steps;
+	}
+	Add(TEXT("Plant"), TEXT("Plant one seed."), Facts.bSeedPlanted);
 	return Steps;
 }

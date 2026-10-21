@@ -98,6 +98,9 @@ public:
 	int32 GetPlotWindows(int32 PlotIndex) const;
 	bool IsPlotReady(int32 PlotIndex) const;
 
+	/** Progress for the home_loop quest chain. Does not write the quest log. */
+	void GetHomeLoopQuestProgress(bool& bKettleCooked, bool& bWispAssigned, bool& bSurfaceCleared, bool& bSeedPlanted) const;
+
 private:
 	void SyncPhase();
 	void ApplyPhase(EHomeWorldTimeOfDayPhase Phase, bool bFirst);
@@ -155,6 +158,8 @@ private:
 	TArray<FHomeWorldDustSurface> DustSurfaces;
 	FName CleanSurfaceId;
 	float CleanRemaining = 0.f;
+	bool bClearedASurface = false;
+	bool bPlantedASeed = false;
 	TArray<FHomeWorldPlot> Plots;
 	TMap<FName, int32> Chest;
 };
