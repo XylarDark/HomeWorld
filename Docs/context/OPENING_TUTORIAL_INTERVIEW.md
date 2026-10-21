@@ -14,7 +14,9 @@ The sequence is the Opening tutorial in [`Docs/VISION_BOARD.md`](../VISION_BOARD
 - The walk stays 450 cm/s until a replay says that single speed is wrong.
 - The played return stands. The partner walks inside and waits by the kettle. The child goes to their room. 2026-10-18.
 - Sleep in the bed grants spirit form. Night does not. The bed returns you to the body. Dawn does not.
-- The day glide is a body glide toward camp smoke, with no pickup.
+- The day glide is a body glide toward camp smoke, with no pickup. The smoke is the existing day-descent sign. No smoke actor until the camp clearing is placed. 2026-10-21.
+- The dawn mist is not an actor and not a new state. It stays a sky read for the later dress row. 2026-10-21.
+- A dawn-glide stop, when added, stops before the launch at a marker spawned for that run only. It does not add a meadow. 2026-10-21.
 - A bonk launches you back onto the island. It does not slow the step and does not dim the shoulder light. It does not wait on the mist.
 - The bull stays the later field and cave tame.
 - The armor gift is the backpack. The glider is crafted at the armory at dawn, and the descent waits on that craft. Speed and bonk tries stay. Round 6.
@@ -141,3 +143,15 @@ Picked 2026-10-21. The site waits until the Night pass releases `L_SizeTest`. No
 ### Round 10 — How far a guard can see
 
 Picked 2026-10-21. One guard's sightline is the existing spirit-lit box: 180 by 180 by 120 cm. A missing guard does not count as an avoid. Nothing is placed for it while the Night pass owns `L_SizeTest`.
+
+### Round 11 — The dawn mist
+
+Picked 2026-10-21. No mist actor and no new state. The line stays a sky read for the later dress row.
+
+### Round 12 — Camp smoke
+
+Picked 2026-10-21. The day glide keeps the existing smoke sign. No smoke actor until the camp clearing is placed.
+
+### Round 13 — The dawn-glide stop
+
+Picked 2026-10-21. The stop is before the launch, at a marker spawned for that run only. No meadow is added.
