@@ -15,7 +15,7 @@ Tools already in the project.
 | Tool | Job |
 |---|---|
 | `Tools/Safe-Build.ps1` | The only compile. |
-| `Tools/RunTests.ps1` | Automation tests. `-Quest` runs the in-editor opening sweep (`quest_test_runner.py` + manifest); results `Saved/quest_tests.json`. `-QuestCheck` is the host-only quest preflight (`quest_preflight.py`: manifest vs C++ beats/stop words, no Editor). |
+| `Tools/RunTests.ps1` | Automation tests. `-Quest` runs the in-editor opening sweep (`quest_test_runner.py` + manifest); results `Saved/quest_tests.json`. `-QuestCheck` is the host-only quest preflight (`quest_preflight.py`: manifest vs C++ beats/stop words, no Editor). `-QuestCoverage` is the host-only quest coverage matrix (`quest_coverage.py`): declared coverage per beat, no Editor. |
 | `Tools/Package-AfterClose.ps1` | Package after the editor is closed. |
 | `Content/Python/start_editor.py` | Open the editor and wait for UnrealMCP. |
 | UnrealMCP, port 55557 | Editor calls. Epic `ModelContextProtocol` stays off. |

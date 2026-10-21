@@ -36,6 +36,7 @@ PROJECT_ROOT = os.path.abspath(os.path.join(_HERE, "..", ".."))
 CHARACTER_REL = os.path.join("Source", "HomeWorld", "HomeWorldCharacter.cpp")
 MANIFEST_REL = os.path.join("Content", "Python", "quest_test_manifest.py")
 RUNNER_REL = os.path.join("Content", "Python", "quest_test_runner.py")
+COVERAGE_REL = os.path.join("Content", "Python", "quest_test_coverage.py")
 
 MCP_HOST, MCP_PORT = "127.0.0.1", 55557
 
@@ -171,6 +172,30 @@ def _parse_level_path(runner_text):
     if match is None:
         return None, "LEVEL_PATH not found"
     return match.group(1), ""
+
+
+def _parse_automation_test_names(source_dir):
+    """Every automation test name in Source/HomeWorld/*.cpp.
+
+    Handles both `IMPLEMENT_SIMPLE_AUTOMATION_TEST(FType, "Name", ...)` and
+    the Custom forms (`IMPLEMENT_CUSTOM_SIMPLE_AUTOMATION_TEST(FType, "Name", ...)`):
+    the name is the first string literal after the opening paren's optional
+    type argument. Returns the set or (None, reason).
+    """
+    if not os.path.isdir(source_dir):
+        return None, "%s does not exist" % source_dir
+    names = set()
+    for base, _dirs, files in os.walk(source_dir):
+        for name in files:
+            if not name.endswith(".cpp"):
+                continue
+            with open(os.path.join(base, name), "r", encoding="utf-8", errors="replace") as handle:
+                names.update(re.findall(
+                    r'IMPLEMENT_\w+_AUTOMATION_TEST\(\s*(?:\w+\s*,\s*)?"([^"]+)"',
+                    handle.read()))
+    if not names:
+        return None, "no IMPLEMENT_*_AUTOMATION_TEST names found under Source/HomeWorld"
+    return names, ""
 
 
 def _resolve_stop(stop, keyword_state):
@@ -445,6 +470,17 @@ def run_preflight(root=None):
     for warning in (_mcp_warning(), _stale_dll_warning(root)):
         if warning:
             warnings.append(warning)
+
+    # --- declared coverage: warn-only sidecar checks -----------------------
+    # Inverted too far to be a mismatch: the coverage matrix is documentation.
+    # But a declared test name that does not exist, or a row for a beat the
+    # manifest dropped, is drift someone must see early.
+    try:
+        import quest_coverage
+    except Exception as exc:  # pragma: no cover - a broken sibling warns loudly once
+        warnings.append("unsure: quest_coverage could not import (%s)" % exc)
+    else:
+        warnings.extend(quest_coverage.declared_warnings(root))
     return problems, warnings
 
 
