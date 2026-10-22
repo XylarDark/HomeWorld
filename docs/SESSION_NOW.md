@@ -2,6 +2,14 @@
 
 The live continuity block. A new chat reads this file, not the history. Append the next block here. When this file grows past a few screens, move the older blocks to `docs/history/SESSION_LOG.md`.
 
+## 2026-10-22 Collect
+
+`hw.Playtest.FastForward collect`. Lead: success. One wisp went into the backpack. Next is `heal` in `Docs/qa/TUTORIAL_PLAYTEST_QUEUE.md`.
+
+## 2026-10-22 Bed press
+
+`hw.Playtest.FastForward sleep`, then E at the bed. Lead: success. Spirit, stayed on the island, sky stayed day. Next is `collect` in `Docs/qa/TUTORIAL_PLAYTEST_QUEUE.md`.
+
 ## 2026-10-22 Playtest sitting
 
 Lead plays the open rows on October 23, in the order on the Now line of `Docs/qa/TUTORIAL_PLAYTEST_QUEUE.md`. The twelve developer stops passed. The meadow site is not chosen. Next chat for that sitting starts from `Docs/handoffs/SESSION_HANDOFF_PLAYTEST.md`.

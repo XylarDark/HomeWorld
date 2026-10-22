@@ -24,6 +24,8 @@ Current pass entry: [`PLAYTEST_INDEX.md`](PLAYTEST_INDEX.md). Now stays the firs
 | 10 | `ease` | The wind-up | Ease |
 | 11 | `shrine` | E on the shrine. The ladders have already run | Shrine |
 
+Rows 1 and 2 are in. 2026-10-22. Next is `heal`.
+
 The field shell, the three nodes, and the runs that need them wait on the meadow site. No coordinate is written.
 
 **Built since the last pass:** the companion party (#319/#325) and the home-loop host bites 1-8/10. Neither is a tutorial beat. The `home_loop` quest chain is stored when the opening day ends.
@@ -181,13 +183,13 @@ Shelved, and given no row: the cave and its coils, the second forest, the river,
 
 ## Night on the island
 
-**Built.** Waiting on this replay. Rounds 7 and 8 in [`Docs/context/OPENING_TUTORIAL_INTERVIEW.md`](../context/OPENING_TUTORIAL_INTERVIEW.md).
+**Passed.** 2026-10-22. The bed press and the click heart. Rounds 7 and 8 in [`Docs/context/OPENING_TUTORIAL_INTERVIEW.md`](../context/OPENING_TUTORIAL_INTERVIEW.md).
 
 Press E at the bed. The coat hides and you are a wisp. The companion you claimed stays, and it hovers on the bed and on the other wisps the same way it hovers on everything else. Night does not start an encounter or spiritual power regen. The child says the bed-and-dawn line once. Purple wisps stand beside the south copse, at the pond, and at the hot springs. Press E on one and play the click heart. A kept heart collects it. You do not need the other quests first.
 
 Quest log: sleeping ends the opening day, so the `Opening` chain and the `home_loop` chain are stored beside each other. The HUD draws only the most recently changed chain. Note which one you see; the storage test is `HomeWorld.HomeLoop.QuestChainBesideOpening`.
 
-Developer shortcut for this replay: in a fresh PIE run `hw.Playtest.FastForward`. No argument plays the day beats in order and leaves you at the bed at night with every earlier step really executed. The Night sentence uses `hw.Playtest.FastForward sleep`, then E at the bed. Lead confirmed that on 2026-10-21. The table stays empty until that play. `list` prints the stops.
+Developer shortcut for this replay: in a fresh PIE run `hw.Playtest.FastForward`. No argument plays the day beats in order and leaves you at the bed at night with every earlier step really executed. The Night sentence uses `hw.Playtest.FastForward sleep`, then E at the bed. Lead confirmed that on 2026-10-21. That press is in. The click heart is in. `list` prints the stops.
 
 Developer check, not the pass: `.\Tools\RunTests.ps1 -Quest` runs the opening stops in PIE and writes `Saved/quest_tests.json`. It loads `L_SizeTest`, ends PIE when done, and never fills the tables below. How to add a stop: [`QUEST_TESTS.md`](QUEST_TESTS.md).
 
@@ -199,11 +201,11 @@ Developer check, not the pass: `.\Tools\RunTests.ps1 -Quest` runs the opening st
 
 | Field | Result |
 |---|---|
-| Date | |
-| Slept and became spirit? | |
-| Stayed on the island? | |
-| Companion hovered, and a click heart collected a wisp? | |
-| One sentence | |
+| Date | 2026-10-22 |
+| Slept and became spirit? | Success. |
+| Stayed on the island? | Success. The sky stayed day. |
+| Companion hovered, and a click heart collected a wisp? | Success. One wisp went into the backpack. |
+| One sentence | Success. |
 
 ---
 
