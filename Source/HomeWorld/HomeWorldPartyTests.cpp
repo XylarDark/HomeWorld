@@ -51,6 +51,10 @@ namespace HomeWorldPartyTest
 		{
 			if (World)
 			{
+				if (UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>())
+				{
+					TimeOfDay->RestoreDefaultPhaseOverride();
+				}
 				World->DestroyWorld(false);
 				World = nullptr;
 			}
@@ -336,6 +340,13 @@ bool FPartyFollowLeashTest::RunTest(const FString& Parameters)
 	GameInstance->Init();
 	Scope.World->SetGameInstance(GameInstance);
 	Family = GameInstance->GetSubsystem<UHomeWorldFamilySubsystem>();
+	UHomeWorldTimeOfDaySubsystem* TimeOfDay = Scope.World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
+	if (!TestNotNull(TEXT("time of day"), TimeOfDay))
+	{
+		return false;
+	}
+	// Doc 41: the leash is day body only. The phase override is process-global.
+	TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Day);
 
 	FActorSpawnParameters Params;
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;

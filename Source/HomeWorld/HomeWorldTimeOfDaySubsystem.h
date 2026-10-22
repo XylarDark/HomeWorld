@@ -98,6 +98,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "TimeOfDay", meta = (DisplayName = "Get Is Spirit Phase"))
 	virtual bool GetIsSpiritPhase() const;
 
+	/**
+	 * Put hw.TimeOfDay.Phase back to Day without SetPhase's side effects.
+	 * The override is process-global, so a destroyed world must not leave the next one on Night.
+	 */
+	void RestoreDefaultPhaseOverride();
+
 private:
 	/** World time at which night phase ends (set when SetPhase(Night) is called). Stub countdown for HUD. */
 	float NightPhaseEndTime = 0.f;

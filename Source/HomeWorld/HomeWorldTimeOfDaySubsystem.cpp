@@ -148,6 +148,18 @@ void UHomeWorldTimeOfDaySubsystem::ApplyNightMixForPhase(EHomeWorldTimeOfDayPhas
 	SetNightMixScalar(0.f);
 }
 
+void UHomeWorldTimeOfDaySubsystem::RestoreDefaultPhaseOverride()
+{
+	IConsoleVariable* CVar = IConsoleManager::Get().FindConsoleVariable(TEXT("hw.TimeOfDay.Phase"));
+	if (!CVar)
+	{
+		return;
+	}
+	GHomeWorldApplyingPhaseFromSetPhase = true;
+	CVar->Set(static_cast<int32>(EHomeWorldTimeOfDayPhase::Day));
+	GHomeWorldApplyingPhaseFromSetPhase = false;
+}
+
 void UHomeWorldTimeOfDaySubsystem::SetPhase(EHomeWorldTimeOfDayPhase Phase)
 {
 	const EHomeWorldTimeOfDayPhase Previous = GetCurrentPhase();
