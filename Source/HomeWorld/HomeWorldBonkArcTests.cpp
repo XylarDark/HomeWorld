@@ -4,6 +4,11 @@
 
 #if WITH_DEV_AUTOMATION_TESTS
 
+#include "CollisionShape.h"
+#include "Components/StaticMeshComponent.h"
+#include "Engine/StaticMesh.h"
+#include "Engine/StaticMeshActor.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "HomeWorldBonkArc.h"
 #include "HomeWorldTestWorld.h"
 
@@ -14,6 +19,13 @@ namespace
 	const float GHalf = 90.f;
 	const float GRadius = 40.f;
 	const float GStandingZ = 45140.f;
+
+	float MeasureSpringArmCm(USpringArmComponent* Boom)
+	{
+		Boom->TickComponent(0.016f, LEVELTICK_All, nullptr);
+		const FVector ArmOrigin = Boom->GetComponentLocation() + Boom->TargetOffset;
+		return FVector::Dist(Boom->GetSocketLocation(USpringArmComponent::SocketName), ArmOrigin);
+	}
 
 	bool StaysAbovePad(const HomeWorldBonk::FArc& Arc)
 	{
@@ -165,6 +177,107 @@ bool FBonkReentryTest::RunTest(const FString& Parameters)
 		!Character->GetActorLocation().Equals(SecondExpected, 50.f));
 	TestTrue(TEXT("the return has finished"), !Character->IsBonkReturning());
 
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FBonkCameraTest,
+	"HomeWorld.Opening.BonkCamera",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FBonkCameraTest::RunTest(const FString& Parameters)
+{
+	(void)Parameters;
+	// The swoop teleports the body through the cabin. A camera probe that starts
+	// inside a blocker is a zero-length hit, and the stock arm then sits on the
+	// pawn. A hit in front of the same box still shortens.
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("bonk camera"));
+	if (!Scope.Ok(this))
+	{
+		return false;
+	}
+
+	AHomeWorldCharacter* Character = HomeWorldTestWorld::SpawnCharacter(Scope.World);
+	if (!TestNotNull(TEXT("character"), Character))
+	{
+		return false;
+	}
+	Character->SetActorLocation(FVector(1000.f, 200.f, 300.f));
+	Character->SetActorRotation(FRotator::ZeroRotator);
+
+	USpringArmComponent* Boom = Character->FindComponentByClass<USpringArmComponent>();
+	UStaticMesh* Cube = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Cube.Cube"));
+	if (!TestNotNull(TEXT("boom"), Boom) || !TestNotNull(TEXT("cube"), Cube))
+	{
+		return false;
+	}
+	TestTrue(TEXT("the probe is on"), Boom->bDoCollisionTest);
+
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	AStaticMeshActor* Wall = Scope.World->SpawnActor<AStaticMeshActor>(
+		Character->GetActorLocation(), FRotator::ZeroRotator, Params);
+	if (!TestNotNull(TEXT("cabin box"), Wall) || !Wall->GetStaticMeshComponent())
+	{
+		return false;
+	}
+	UStaticMeshComponent* Mesh = Wall->GetStaticMeshComponent();
+	Mesh->SetStaticMesh(Cube);
+	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	Mesh->SetCollisionObjectType(ECC_WorldStatic);
+	Mesh->SetCollisionResponseToAllChannels(ECR_Block);
+	Wall->SetActorScale3D(FVector(4.f));
+	Wall->SetActorLocation(Character->GetActorLocation());
+	Mesh->RecreatePhysicsState();
+
+	FCollisionQueryParams QueryParams(NAME_None, false, Character);
+	const float Probe = Boom->ProbeSize;
+	const FVector InsideStart = Boom->GetComponentLocation() + Boom->TargetOffset;
+	const FVector InsideEnd = InsideStart - Character->GetViewRotation().Vector() * Boom->TargetArmLength;
+	FHitResult InsideHit;
+	const bool bInside = Scope.World->SweepSingleByChannel(
+		InsideHit,
+		InsideStart,
+		InsideEnd,
+		FQuat::Identity,
+		Boom->ProbeChannel,
+		FCollisionShape::MakeSphere(Probe),
+		QueryParams);
+	if (!TestTrue(TEXT("the box blocks a probe that starts inside it"),
+		bInside && (InsideHit.bStartPenetrating || InsideHit.Distance <= 1.f)))
+	{
+		return false;
+	}
+
+	const float InsideArm = MeasureSpringArmCm(Boom);
+	TestTrue(TEXT("the arm stays at its flight length inside the box"),
+		FMath::IsNearlyEqual(InsideArm, Boom->TargetArmLength, 1.f));
+
+	// Engine cube is 100 cm. Scale 4 makes a 400 cm box, so the +X face is 200 cm out.
+	const float Gap = 80.f;
+	const float HalfExtent = 50.f * Wall->GetActorScale3D().X;
+	Character->SetActorLocation(Wall->GetActorLocation() + FVector(HalfExtent + Gap, 0.f, 0.f));
+	Character->SetActorRotation(FRotator::ZeroRotator);
+	const FVector OutsideStart = Boom->GetComponentLocation() + Boom->TargetOffset;
+	const FVector OutsideEnd = OutsideStart - Character->GetViewRotation().Vector() * Boom->TargetArmLength;
+	FHitResult OutsideHit;
+	const bool bOutside = Scope.World->SweepSingleByChannel(
+		OutsideHit,
+		OutsideStart,
+		OutsideEnd,
+		FQuat::Identity,
+		Boom->ProbeChannel,
+		FCollisionShape::MakeSphere(Probe),
+		QueryParams);
+	if (!TestTrue(TEXT("the wall still stops the probe"), bOutside && !OutsideHit.bStartPenetrating))
+	{
+		return false;
+	}
+
+	const float WalkArm = MeasureSpringArmCm(Boom);
+	TestTrue(TEXT("walking keeps the shortened arm"), FMath::IsNearlyEqual(WalkArm, OutsideHit.Distance, 3.f));
+	TestTrue(TEXT("walking does not sit on the body"), WalkArm > 20.f);
+	TestTrue(TEXT("walking does not keep the full arm through the wall"), WalkArm < Boom->TargetArmLength - 20.f);
 	return true;
 }
 

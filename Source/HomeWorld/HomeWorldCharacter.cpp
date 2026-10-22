@@ -18,6 +18,7 @@
 #include "HomeWorldGlideMovementComponent.h"
 #include "HomeWorldFallbackGlideComponent.h"
 #include "HomeWorldSoftBoundsComponent.h"
+#include "HomeWorldSpringArmComponent.h"
 #include "HomeWorldTraversalComponent.h"
 #include "HomeWorldSpiritStealthComponent.h"
 #include "HomeWorldStressComponent.h"
@@ -32,7 +33,6 @@
 #include "GameplayAbilitySpec.h"
 #include "Camera/CameraComponent.h"
 #include "Components/TextRenderComponent.h"
-#include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerState.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -136,7 +136,8 @@ AHomeWorldCharacter::AHomeWorldCharacter(const FObjectInitializer& ObjectInitial
 		Capsule->SetCollisionProfileName(FName("Pawn"));
 	}
 
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+	// Keeps a probe that starts inside the cabin from parking the camera on the body.
+	CameraBoom = CreateDefaultSubobject<UHomeWorldSpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->bUsePawnControlRotation = true;
 	CameraBoom->TargetArmLength = TargetArmLength;
