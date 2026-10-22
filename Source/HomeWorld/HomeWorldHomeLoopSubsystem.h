@@ -3,12 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Templates/Function.h"
 #include "Subsystems/WorldSubsystem.h"
 #include "HomeWorldHomeLoopTypes.h"
 #include "HomeWorldTimeOfDaySubsystem.h"
+#include "HomeWorldVirtueTypes.h"
 
 class AHomeWorldCharacter;
+class AHomeWorldMossTuft;
 class UHomeWorldInventorySubsystem;
+
+namespace HomeWorldKitchen
+{
+	inline const FName Moss(TEXT("ITEM_MOSS"));
+}
 
 #include "HomeWorldHomeLoopSubsystem.generated.h"
 
@@ -95,6 +103,11 @@ public:
 	bool ClearWisp(FName WispId);
 	bool HarvestPlot(int32 PlotIndex);
 	int32 GetChestCount(FName ItemId) const;
+	bool TryAddChestItem(FName ItemId, int32 Amount = 1);
+	bool TrySpendChestItem(FName ItemId, int32 Amount = 1);
+	bool TryGatherGraceMoss(AHomeWorldMossTuft* Tuft, EHomeWorldVirtuePole Gatherer);
+	bool ServeGraceMossMeal(AHomeWorldCharacter* Player);
+	void NoteHomeRest();
 	int32 GetPlotWindows(int32 PlotIndex) const;
 	bool IsPlotReady(int32 PlotIndex) const;
 
@@ -149,6 +162,9 @@ private:
 	int32 DustTotal = 0;
 	int32 UpcomingDayId = 1;
 	int32 ActiveDayId = 0;
+	bool bHomeTended = false;
+
+	void ApplyPlayerStress(TFunctionRef<void(class UHomeWorldStressComponent*)> Apply);
 	EHomeWorldTimeOfDayPhase LastPhase = EHomeWorldTimeOfDayPhase::Day;
 	FName ActiveRecipeId = NAME_None;
 	TArray<FIngredientWork> Works;

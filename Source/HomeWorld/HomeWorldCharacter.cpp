@@ -16,6 +16,8 @@
 #include "HomeWorldSoftBoundsComponent.h"
 #include "HomeWorldTraversalComponent.h"
 #include "HomeWorldSpiritStealthComponent.h"
+#include "HomeWorldStressComponent.h"
+#include "HomeWorldHomeLoopSubsystem.h"
 #include "HomeWorldEasePad.h"
 #include "HomeWorldParadoxToy.h"
 #include "HomeWorldVirtueComponent.h"
@@ -36,7 +38,6 @@
 #include "HomeWorldGameMode.h"
 #include "HomeWorldPlayerState.h"
 #include "HomeWorldResourcePile.h"
-#include "HomeWorldHomeLoopSubsystem.h"
 #include "HomeWorldInventorySubsystem.h"
 #include "HomeWorldInventoryTypes.h"
 #include "HomeWorldCraftSubsystem.h"
@@ -237,6 +238,7 @@ AHomeWorldCharacter::AHomeWorldCharacter(const FObjectInitializer& ObjectInitial
 	SoftBoundsComponent = CreateDefaultSubobject<UHomeWorldSoftBoundsComponent>(TEXT("SoftBoundsComponent"));
 	TraversalComponent = CreateDefaultSubobject<UHomeWorldTraversalComponent>(TEXT("TraversalComponent"));
 	SpiritStealthComponent = CreateDefaultSubobject<UHomeWorldSpiritStealthComponent>(TEXT("SpiritStealthComponent"));
+	StressComponent = CreateDefaultSubobject<UHomeWorldStressComponent>(TEXT("StressComponent"));
 	StrokeReport = CreateDefaultSubobject<UHomeWorldStrokeReportComponent>(TEXT("StrokeReport"));
 	QuestLog = CreateDefaultSubobject<UHomeWorldQuestLog>(TEXT("QuestLog"));
 	OpeningSupply = CreateDefaultSubobject<UHomeWorldOpeningSupply>(TEXT("OpeningSupply"));
@@ -854,6 +856,14 @@ bool AHomeWorldCharacter::BeginOpeningNight()
 		return false;
 	}
 	GrantSpiritSleepGate();
+	if (UHomeWorldHomeLoopSubsystem* Home = World->GetSubsystem<UHomeWorldHomeLoopSubsystem>())
+	{
+		Home->NoteHomeRest();
+	}
+	if (StressComponent)
+	{
+		StressComponent->NotifyBedSleep();
+	}
 	TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Night);
 	SyncFormWithTimeOfDay();
 	bOpeningNightSpirit = GetIsSpiritForm();
@@ -1086,6 +1096,7 @@ namespace
 	constexpr int32 PlaytestBeatStealth = 17;
 	constexpr int32 PlaytestBeatEase = 18;
 	constexpr int32 PlaytestBeatShrine = 19;
+	constexpr int32 PlaytestBeatStress = 20;
 
 	/** The one runner step the player takes himself. 0 = every step runs (night and the loop). */
 	int32 PlaytestSkipStep(int32 Beat)
@@ -1127,6 +1138,7 @@ namespace
 		case PlaytestBeatStealth: return TEXT("stealth");
 		case PlaytestBeatEase: return TEXT("ease");
 		case PlaytestBeatShrine: return TEXT("shrine");
+		case PlaytestBeatStress: return TEXT("stress");
 		default: return TEXT("night");
 		}
 	}
@@ -1160,6 +1172,7 @@ namespace
 		if (Key.Contains(TEXT("daycamp"))) return PlaytestBeatDayCamp;
 		if (Key.Contains(TEXT("dawnglide"))) return PlaytestBeatDawnGlide;
 		if (Key.Contains(TEXT("shrine"))) return PlaytestBeatShrine;
+		if (Key.Contains(TEXT("stress"))) return PlaytestBeatStress;
 		if (Key.Contains(TEXT("ease"))) return PlaytestBeatEase;
 		return 0;
 	}
@@ -1181,7 +1194,7 @@ void AHomeWorldCharacter::DebugFastForwardOpening(const FString& Beat)
 {
 	if (Beat.Equals(TEXT("list"), ESearchCase::IgnoreCase))
 	{
-		UE_LOG(LogTemp, Log, TEXT("playtest_ff: beats: spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect, heal, glider, delivery, daycamp, dawnglide, nightglide, stealth, ease, shrine"));
+		UE_LOG(LogTemp, Log, TEXT("playtest_ff: beats: spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect, heal, glider, delivery, daycamp, dawnglide, nightglide, stealth, ease, shrine, stress"));
 		return;
 	}
 	if (DebugFastForwardStep > 0)
@@ -1192,7 +1205,18 @@ void AHomeWorldCharacter::DebugFastForwardOpening(const FString& Beat)
 	const int32 Stop = PlaytestBeatFromText(Beat);
 	if (Stop == 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("playtest_ff: beat '%s' unknown - spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect, heal, glider, delivery, daycamp, dawnglide, nightglide, stealth, ease, shrine"), *Beat);
+		UE_LOG(LogTemp, Warning, TEXT("playtest_ff: beat '%s' unknown - spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect, heal, glider, delivery, daycamp, dawnglide, nightglide, stealth, ease, shrine, stress"), *Beat);
+		return;
+	}
+	if (Stop == PlaytestBeatStress)
+	{
+		if (StressComponent)
+		{
+			StressComponent->SetPoints(90);
+		}
+		DebugFastForwardStop = Stop;
+		PlaytestReadyFor = TEXT("stress");
+		UE_LOG(LogTemp, Log, TEXT("playtest_ff: ready for stress - stress 90, cap is 100"));
 		return;
 	}
 	if (bOpeningNightSpirit)
@@ -1992,7 +2016,7 @@ FString AHomeWorldCharacter::GetPlaytestStateJson() const
 		TEXT("\"wisps_collected\":%d,\"wisps_carried\":%d,\"wisps_healed\":%d,")
 		TEXT("\"dawn_wood\":%d,\"dawn_silk\":%d,\"dawn_metal\":%d,")
 		TEXT("\"glider_crafted\":%s,\"delivery_wood\":%d,\"partner_away\":%s,\"day_camp_eject\":%s,")
-		TEXT("\"descent_active\":%s,\"cloud_carried\":%d,\"guards_calm\":%d,\"partner_walking\":%s}"),
+		TEXT("\"descent_active\":%s,\"cloud_carried\":%d,\"guards_calm\":%d,\"partner_walking\":%s,\"stress\":%d}"),
 		*PlaytestReadyFor,
 		PlaytestReadyDistanceCm,
 		DebugFastForwardStep,
@@ -2020,7 +2044,13 @@ FString AHomeWorldCharacter::GetPlaytestStateJson() const
 		IsCloudDescentActive() ? TEXT("true") : TEXT("false"),
 		GetCarriedCloudWisps(),
 		SpiritStealthComponent ? SpiritStealthComponent->GetCalmedActorCount() : 0,
-		IsPartnerWalkingHome() ? TEXT("true") : TEXT("false"));
+		IsPartnerWalkingHome() ? TEXT("true") : TEXT("false"),
+		GetStressPoints());
+}
+
+int32 AHomeWorldCharacter::GetStressPoints() const
+{
+	return StressComponent ? StressComponent->GetPoints() : 0;
 }
 
 void AHomeWorldCharacter::ApplyOpeningWalkSpeed()
@@ -2524,6 +2554,13 @@ bool AHomeWorldCharacter::TryCommitOpeningGuardPad(AHomeWorldEasePad* Pad, EHome
 	}
 	if (Pad->IsLadderComplete())
 	{
+		if (UWorld* World = GetWorld())
+		{
+			if (UHomeWorldHomeLoopSubsystem* Home = World->GetSubsystem<UHomeWorldHomeLoopSubsystem>())
+			{
+				Home->TrySpendChestItem(HomeWorldKitchen::Moss, 1);
+			}
+		}
 		ApplyOpeningGuardSleep(Pad);
 	}
 	return true;
