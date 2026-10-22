@@ -3268,5 +3268,10 @@ class ShapeOfTheGate(unittest.TestCase):
             pr._COVERED_CRITERIA.update(saved)
 
 
-if __name__ == "__main__":
-    unittest.main()
+# No `if __name__ == "__main__": unittest.main()` here, deliberately. The editor's
+# automation runner IMPORTS each module under Content/Python/tests/ with __name__
+# set to "__main__", so that block executes during import: unittest discovers 0 tests
+# against the importing module, prints OK, then calls sys.exit() and raises
+# SystemExit out of the import - which the runner reports as a Fail. Measured on
+# 2026-10-03. Run these with pytest, or `python -m unittest`, both of which work
+# without the block.
