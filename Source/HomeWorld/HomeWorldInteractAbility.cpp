@@ -86,6 +86,10 @@ void UHomeWorldInteractAbility::ActivateAbility(const FGameplayAbilitySpecHandle
 		{
 			bHandled = Character->TryOpeningZiplineInFront();
 		}
+		if (!bHandled)
+		{
+			bHandled = Character->TryOpeningShrineInFront();
+		}
 		Character->NoteSizeTestInteract(bHandled);
 		EndAbility(Handle, ActorInfo, ActivationInfo, false, !bHandled);
 		return;

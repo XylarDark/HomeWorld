@@ -1085,6 +1085,7 @@ namespace
 	constexpr int32 PlaytestBeatNightGlide = 16;
 	constexpr int32 PlaytestBeatStealth = 17;
 	constexpr int32 PlaytestBeatEase = 18;
+	constexpr int32 PlaytestBeatShrine = 19;
 
 	/** The one runner step the player takes himself. 0 = every step runs (night and the loop). */
 	int32 PlaytestSkipStep(int32 Beat)
@@ -1125,6 +1126,7 @@ namespace
 		case PlaytestBeatNightGlide: return TEXT("nightglide");
 		case PlaytestBeatStealth: return TEXT("stealth");
 		case PlaytestBeatEase: return TEXT("ease");
+		case PlaytestBeatShrine: return TEXT("shrine");
 		default: return TEXT("night");
 		}
 	}
@@ -1157,6 +1159,7 @@ namespace
 		if (Key.Contains(TEXT("delivery"))) return PlaytestBeatDelivery;
 		if (Key.Contains(TEXT("daycamp"))) return PlaytestBeatDayCamp;
 		if (Key.Contains(TEXT("dawnglide"))) return PlaytestBeatDawnGlide;
+		if (Key.Contains(TEXT("shrine"))) return PlaytestBeatShrine;
 		if (Key.Contains(TEXT("ease"))) return PlaytestBeatEase;
 		return 0;
 	}
@@ -1178,7 +1181,7 @@ void AHomeWorldCharacter::DebugFastForwardOpening(const FString& Beat)
 {
 	if (Beat.Equals(TEXT("list"), ESearchCase::IgnoreCase))
 	{
-		UE_LOG(LogTemp, Log, TEXT("playtest_ff: beats: spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect, heal, glider, delivery, daycamp, dawnglide, nightglide, stealth, ease"));
+		UE_LOG(LogTemp, Log, TEXT("playtest_ff: beats: spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect, heal, glider, delivery, daycamp, dawnglide, nightglide, stealth, ease, shrine"));
 		return;
 	}
 	if (DebugFastForwardStep > 0)
@@ -1189,7 +1192,7 @@ void AHomeWorldCharacter::DebugFastForwardOpening(const FString& Beat)
 	const int32 Stop = PlaytestBeatFromText(Beat);
 	if (Stop == 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("playtest_ff: beat '%s' unknown - spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect, heal, glider, delivery, daycamp, dawnglide, nightglide, stealth, ease"), *Beat);
+		UE_LOG(LogTemp, Warning, TEXT("playtest_ff: beat '%s' unknown - spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect, heal, glider, delivery, daycamp, dawnglide, nightglide, stealth, ease, shrine"), *Beat);
 		return;
 	}
 	if (bOpeningNightSpirit)
@@ -1489,7 +1492,7 @@ void AHomeWorldCharacter::TickDebugFastForward(float DeltaTime)
 		if (DebugFastForwardStop == PlaytestBeatGlider || DebugFastForwardStop == PlaytestBeatDelivery
 			|| DebugFastForwardStop == PlaytestBeatDayCamp || DebugFastForwardStop == PlaytestBeatDawnGlide
 			|| DebugFastForwardStop == PlaytestBeatNightGlide || DebugFastForwardStop == PlaytestBeatStealth
-			|| DebugFastForwardStop == PlaytestBeatEase)
+			|| DebugFastForwardStop == PlaytestBeatEase || DebugFastForwardStop == PlaytestBeatShrine)
 		{
 			Next(10);
 			break;
@@ -1612,8 +1615,21 @@ void AHomeWorldCharacter::TickDebugFastForward(float DeltaTime)
 			if (AHomeWorldEasePad* Pad = World->SpawnActor<AHomeWorldEasePad>(At, FRotator::ZeroRotator, PadParams))
 			{
 				Pad->Tags.Add(FName(TEXT("NODE_OPENING_EASE")));
+				Pad->BindGuard(Index);
 			}
 		}
+		if (DebugFastForwardStop == PlaytestBeatEase)
+		{
+			ReadyForOpeningPlaytest();
+			Next(0);
+			return;
+		}
+		Next(17);
+		break;
+	}
+	case 17:
+	{
+		RunOpeningShrineStop();
 		ReadyForOpeningPlaytest();
 		Next(0);
 		break;
@@ -1740,6 +1756,11 @@ void AHomeWorldCharacter::ReadyForOpeningPlaytest()
 		Target = FindOpeningTaggedActor(World, TEXT("NODE_OPENING_EASE"));
 		Distance = 180.f;
 		Note = TEXT("the wind-up is yours");
+		break;
+	case PlaytestBeatShrine:
+		Target = FindOpeningTaggedActor(World, TEXT("NODE_OPENING_SHRINE"));
+		Distance = 180.f;
+		Note = TEXT("E at the shrine");
 		break;
 	default:
 		break;
@@ -1971,7 +1992,7 @@ FString AHomeWorldCharacter::GetPlaytestStateJson() const
 		TEXT("\"wisps_collected\":%d,\"wisps_carried\":%d,\"wisps_healed\":%d,")
 		TEXT("\"dawn_wood\":%d,\"dawn_silk\":%d,\"dawn_metal\":%d,")
 		TEXT("\"glider_crafted\":%s,\"delivery_wood\":%d,\"partner_away\":%s,\"day_camp_eject\":%s,")
-		TEXT("\"descent_active\":%s,\"cloud_carried\":%d,\"guards_calm\":%d}"),
+		TEXT("\"descent_active\":%s,\"cloud_carried\":%d,\"guards_calm\":%d,\"partner_walking\":%s}"),
 		*PlaytestReadyFor,
 		PlaytestReadyDistanceCm,
 		DebugFastForwardStep,
@@ -1998,7 +2019,8 @@ FString AHomeWorldCharacter::GetPlaytestStateJson() const
 		IsDayCampEjectTriggered() ? TEXT("true") : TEXT("false"),
 		IsCloudDescentActive() ? TEXT("true") : TEXT("false"),
 		GetCarriedCloudWisps(),
-		SpiritStealthComponent ? SpiritStealthComponent->GetCalmedActorCount() : 0);
+		SpiritStealthComponent ? SpiritStealthComponent->GetCalmedActorCount() : 0,
+		IsPartnerWalkingHome() ? TEXT("true") : TEXT("false"));
 }
 
 void AHomeWorldCharacter::ApplyOpeningWalkSpeed()
@@ -2492,6 +2514,224 @@ bool AHomeWorldCharacter::TryOpeningDeliveryInFront()
 		return true;
 	}
 	return TryDeliverOpeningNode(Aimed);
+}
+
+bool AHomeWorldCharacter::TryCommitOpeningGuardPad(AHomeWorldEasePad* Pad, EHomeWorldStrokeStep Played)
+{
+	if (!Pad || !Pad->NoteMatch(Played))
+	{
+		return false;
+	}
+	if (Pad->IsLadderComplete())
+	{
+		ApplyOpeningGuardSleep(Pad);
+	}
+	return true;
+}
+
+void AHomeWorldCharacter::ApplyOpeningGuardSleep(AHomeWorldEasePad* Pad)
+{
+	if (!Pad || !Pad->IsBoundToGuard() || Pad->HasSleptItsGuard() || !Pad->IsLadderComplete())
+	{
+		return;
+	}
+	UHomeWorldSpiritStealthComponent* Stealth = SpiritStealthComponent;
+	if (!Stealth)
+	{
+		Stealth = FindComponentByClass<UHomeWorldSpiritStealthComponent>();
+	}
+	if (!Stealth)
+	{
+		return;
+	}
+	if (Stealth->TryEaseCampActor(EHomeWorldCampRole::Guard, Pad->GetGuardOrdinal()))
+	{
+		Pad->MarkGuardSlept();
+		RecordGuardEased(Pad->GetGuardOrdinal());
+	}
+}
+
+bool AHomeWorldCharacter::TryWaitOpeningGuardPad(AHomeWorldEasePad* Pad)
+{
+	if (!Pad || !StrokeReport || Pad->GetOfferedStep() != EHomeWorldStrokeStep::Grace)
+	{
+		return false;
+	}
+	TArray<FHomeWorldStrokeSample> Stroke;
+	for (const FVector2D& Point : HomeWorldStroke::GraceShape())
+	{
+		FHomeWorldStrokeSample Sample;
+		Sample.Point = Point;
+		Sample.Time = 0.5f;
+		Stroke.Add(Sample);
+	}
+	const EHomeWorldStrokeReport Report = StrokeReport->ReportStroke(
+		Pad->GetOfferedStep(),
+		Stroke,
+		Pad->GetWindowMin(),
+		Pad->GetWindowMax(),
+		Pad->GetExtraPoint(),
+		nullptr,
+		FallbackGlideComponent,
+		false,
+		FVector::ZeroVector,
+		EHomeWorldEaseCommit::Wait,
+		false);
+	return Report == EHomeWorldStrokeReport::None && StrokeReport->WasGlideHomeInvoked();
+}
+
+bool AHomeWorldCharacter::TryReachOpeningGuard(AActor* Guard)
+{
+	if (!GetIsSpiritForm() || !Guard || !Guard->ActorHasTag(FName(TEXT("NODE_GUARD"))))
+	{
+		return false;
+	}
+	if (FVector::Dist2D(GetActorLocation(), Guard->GetActorLocation()) > InteractTraceLengthCm)
+	{
+		return false;
+	}
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+	int32 Ordinal = 0;
+	bool bFound = false;
+	for (TActorIterator<AActor> It(World); It; ++It)
+	{
+		if (*It == Guard)
+		{
+			bFound = true;
+			break;
+		}
+		if (It->ActorHasTag(FName(TEXT("NODE_GUARD"))))
+		{
+			++Ordinal;
+		}
+	}
+	if (!bFound)
+	{
+		return false;
+	}
+	UHomeWorldSpiritStealthComponent* Stealth = SpiritStealthComponent;
+	if (!Stealth)
+	{
+		Stealth = FindComponentByClass<UHomeWorldSpiritStealthComponent>();
+	}
+	bool bEased = false;
+	bool bAsleep = false;
+	if (Stealth && Stealth->GetCampActorState(EHomeWorldCampRole::Guard, Ordinal, bEased, bAsleep) && bAsleep)
+	{
+		return false;
+	}
+	return true;
+}
+
+bool AHomeWorldCharacter::TryOpeningShrineInFront()
+{
+	UWorld* World = GetWorld();
+	if (!World || !GetIsSpiritForm())
+	{
+		return false;
+	}
+	AActor* Shrine = nullptr;
+	float Best = InteractTraceLengthCm;
+	bool bCaptive = false;
+	for (TActorIterator<AActor> It(World); It; ++It)
+	{
+		if (It->ActorHasTag(FName(TEXT("NODE_CAPTIVE"))))
+		{
+			bCaptive = true;
+		}
+		if (!It->ActorHasTag(FName(TEXT("NODE_OPENING_SHRINE"))))
+		{
+			continue;
+		}
+		const float Dist = FVector::Dist2D(GetActorLocation(), It->GetActorLocation());
+		if (Dist <= Best)
+		{
+			Best = Dist;
+			Shrine = *It;
+		}
+	}
+	if (!Shrine || !bCaptive)
+	{
+		return false;
+	}
+	UHomeWorldSpiritStealthComponent* Stealth = SpiritStealthComponent;
+	if (!Stealth)
+	{
+		Stealth = FindComponentByClass<UHomeWorldSpiritStealthComponent>();
+	}
+	if (!Stealth || !Stealth->TryFreeCaptive())
+	{
+		return false;
+	}
+	NotifyPartnerReadyToReturn();
+	CompleteShrineReturn();
+	return IsPartnerWalkingHome();
+}
+
+void AHomeWorldCharacter::RunOpeningShrineStop()
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+	TArray<AHomeWorldEasePad*> Pads;
+	for (TActorIterator<AHomeWorldEasePad> It(World); It; ++It)
+	{
+		if (It->ActorHasTag(FName(TEXT("NODE_OPENING_EASE"))) && It->IsBoundToGuard())
+		{
+			Pads.Add(*It);
+		}
+	}
+	const EHomeWorldStrokeStep Steps[] = {
+		EHomeWorldStrokeStep::Grace,
+		EHomeWorldStrokeStep::Wrath,
+		EHomeWorldStrokeStep::Paradox,
+		EHomeWorldStrokeStep::ParadoxExtraPoint
+	};
+	for (AHomeWorldEasePad* Pad : Pads)
+	{
+		for (const EHomeWorldStrokeStep Step : Steps)
+		{
+			TryCommitOpeningGuardPad(Pad, Step);
+		}
+	}
+
+	bool bCaptive = false;
+	bool bShrine = false;
+	for (TActorIterator<AActor> It(World); It; ++It)
+	{
+		bCaptive = bCaptive || It->ActorHasTag(FName(TEXT("NODE_CAPTIVE")));
+		bShrine = bShrine || It->ActorHasTag(FName(TEXT("NODE_OPENING_SHRINE")));
+	}
+	const FVector Here = GetActorLocation();
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	if (!bCaptive)
+	{
+		const FVector At = Here + FVector(0.f, 240.f, 0.f);
+		if (AHomeWorldCampActor* Captive = World->SpawnActor<AHomeWorldCampActor>(At, FRotator::ZeroRotator, Params))
+		{
+			Captive->CampRole = EHomeWorldCampRole::Captive;
+			Captive->Tags.Remove(FName(TEXT("NODE_SLEEPER")));
+			Captive->Tags.Remove(FName(TEXT("NODE_GUARD")));
+			Captive->RefreshCampIdentity();
+			Captive->SetActorLocation(At);
+		}
+	}
+	if (!bShrine)
+	{
+		const FVector At = Here + FVector(0.f, 480.f, 0.f);
+		if (AActor* Shrine = World->SpawnActor<AActor>(At, FRotator::ZeroRotator, Params))
+		{
+			Shrine->Tags.Add(FName(TEXT("NODE_OPENING_SHRINE")));
+			Shrine->SetActorLocation(At);
+		}
+	}
 }
 
 void AHomeWorldCharacter::UpdateSizeTestInteractCursor()
@@ -4141,7 +4381,7 @@ EHomeWorldStrokeReport AHomeWorldCharacter::EndStrokeFromInput()
 	}
 	if (StrokePad)
 	{
-		StrokePad->NoteMatch(Step);
+		TryCommitOpeningGuardPad(StrokePad, Step);
 	}
 	ApplyMarkedHerbOnMatch();
 	if (ParadoxToy && (Step == EHomeWorldStrokeStep::Paradox || Step == EHomeWorldStrokeStep::ParadoxExtraPoint))

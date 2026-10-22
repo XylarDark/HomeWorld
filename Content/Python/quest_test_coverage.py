@@ -213,6 +213,8 @@ COVERAGE = {
         "tests": [
             # A missing actor cannot open the strict gate.
             "HomeWorld.T0.M14.SoftLatchContained",
+            # Spirit within 280 cm of a waking guard. The light box is the sightline.
+            "HomeWorld.Opening.GuardReach",
         ],
         "human": [
             "sightlines from outside the clearing",
@@ -221,9 +223,22 @@ COVERAGE = {
     "ease": {
         "tests": [
             "HomeWorld.Systems.Stroke.EaseTradeoff",
+            # A finished ladder sleeps that guard. A wrong step and a wait do not.
+            "HomeWorld.Opening.GuardPad",
         ],
         "human": [
             "the wind-up, the spend, the wait, and a wrong shape",
+        ],
+    },
+    "shrine": {
+        "tests": [
+            # The stop runs the three ladders and leaves the press.
+            "HomeWorld.Opening.ShrineStop",
+            # A missing guard still refuses the free.
+            "HomeWorld.Opening.ShrineMissing",
+        ],
+        "human": [
+            "the shrine press and the walk home",
         ],
     },
 }

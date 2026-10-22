@@ -29,6 +29,7 @@ The sequence is the Opening tutorial in [`Docs/VISION_BOARD.md`](../VISION_BOARD
 - This tutorial night finds damaged wisps only at the copse, the pond, and the hot springs. Wider sites stay later. 2026-10-21.
 - E at the hot springs starts the heal from 600 cm. 2026-10-21.
 - Healed wisps keep the built arc at the legs: the first two sit 34 cm to either side and 20 cm behind, the third sits 52 cm behind in the center, and a fourth reuses a slot. 2026-10-21.
+- A finished pad ladder sleeps that guard. Wait calls the glide home and does not sleep the guard. A reach is spirit within 280 cm of a waking guard. One E on the shrine, after the three sleeps, frees a separate captive and walks the partner. Moss is not a new carry id. `hw.Playtest.FastForward shrine` runs the ladders and stops before that E. Round 17. 2026-10-21.
 - The warehouse is not on the tutorial night. No warehouse building, and no new spoken line. The healed wisps at your legs are the hint. The planetoid teaches setting them on herbs, trees, and the other nodes. Spawned nodes have quality, and the player hunts the best. Quality increases time, durability before breaking, and lowers crafting time. Time means the crafted effect lasts longer. Durability is uses before it breaks. Crafting time is how long the station takes. Node modifiers are tagged mods. The wisp and the delivery route weight which mods can roll. Paradox corrupts. The rune stays visible. 2026-10-21. The tags are effect duration, durability, and crafting time. Other tags wait until you name one. Wrath / Grace is the first axis. Grace weights effect duration. Wrath weights durability. This axis does not weight crafting time. The second axis is Greed / Generosity. Generosity lowers crafting time. Greed snatches the craft when the stroke is late or wrong. This axis does not weight effect duration or durability. The other five axes wait until a new tag is named. 2026-10-21.
 
 ## Rounds
@@ -167,3 +168,15 @@ Picked 2026-10-21. The binary uses the heal lock: 20 seconds at 3 seconds or und
 ### Round 16 — The meadow site
 
 Picked 2026-10-21. The site is chosen at the desk on `L_SizeTest` after the Night pass. No coordinate is written.
+
+### Round 17 — The shrine unlocks
+
+Picked 2026-10-21. 1A, then 2A 3A 4A 5A 6A 7A. The moss addition was not taken: a new carry id conflicts with the six-slot set, so the sleep spends nothing.
+
+- A matched commit that finishes that guard's pad calls `TryEaseCampActor` for that guard. Wait does not. A wrong step does not.
+- Wait calls the same glide home a late paradox already calls. It does not mark the guard asleep.
+- A reach is spirit form, within 280 cm of that `NODE_GUARD`, while that guard is still awake. The 180 by 180 by 120 cm light box stays the sightline.
+- Three pads, one on each guard. Finishing that pad's ladder is the one sleep.
+- One E on the shrine, after the three sleeps, calls the free and then `CompleteShrineReturn`. A missing guard still refuses the free.
+- The captive is a separate `NODE_CAPTIVE` actor. Freeing it uses the ready-to-return flag. The kettle partner is not moved.
+- `hw.Playtest.FastForward shrine` runs the three ladders, spawns the captive and a shrine for that run, and stops before the E. Nothing is saved into `L_SizeTest`.

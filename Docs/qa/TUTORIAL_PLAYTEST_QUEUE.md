@@ -291,12 +291,24 @@ You wake on the island. The bed returns you to the body. Dawn does not. The mist
 
 ## Ease
 
-**Stop built.** Waiting on the stroke. `hw.Playtest.FastForward ease` spawns one pad on each of the three guards for that run, and stops before the wind-up. The spend, the wait, and a wrong shape stay the existing verb.
+**Stop built.** Waiting on the stroke. `hw.Playtest.FastForward ease` spawns one pad on each of the three guards for that run, and stops before the wind-up. A finished ladder sleeps that guard. Wait calls the glide home and does not. A wrong step does not.
 
 | Field | Result |
 |---|---|
 | Date | |
 | Each guard played the wind-up? | |
+| One sentence | |
+
+---
+
+## Shrine
+
+**Stop built.** Waiting on the press. `hw.Playtest.FastForward shrine` runs the three pad ladders, spawns the captive and a shrine for that run, and stops before the E. Nothing is saved into the map. A missing guard still refuses the free. Moss is not a carry item.
+
+| Field | Result |
+|---|---|
+| Date | |
+| The partner walked home? | |
 | One sentence | |
 
 ---

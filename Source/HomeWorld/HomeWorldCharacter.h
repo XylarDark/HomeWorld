@@ -138,6 +138,23 @@ public:
 
 	/** E on a wood, herb, or stone node. One delivery, then that node refuses. */
 	bool TryOpeningDeliveryInFront();
+
+	/** A matched step on a guard pad. The fourth step sleeps that guard. A wrong step does not. */
+	bool TryCommitOpeningGuardPad(AHomeWorldEasePad* Pad, EHomeWorldStrokeStep Played);
+
+	/** Wait while the pad still offers Grace. The glide home runs. The guard stays awake. */
+	bool TryWaitOpeningGuardPad(AHomeWorldEasePad* Pad);
+
+	/** Spirit, within the opening reach, and that guard is still awake. The light box is not the reach. */
+	bool TryReachOpeningGuard(AActor* Guard);
+
+	/** One E on the opening shrine after the three sleeps. A missing guard refuses. */
+	bool TryOpeningShrineInFront();
+
+	/** Finish the bound pads, spawn the captive and the shrine, and do not press E. */
+	void RunOpeningShrineStop();
+
+	void ApplyOpeningGuardSleep(AHomeWorldEasePad* Pad);
 	bool TryDeliverOpeningNode(AActor* Node);
 
 	/** Fast-forward and test seed. One healed follower. Does not start a heal timer. */

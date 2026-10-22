@@ -305,6 +305,21 @@ QUESTS = [
             count_tag("NODE_OPENING_EASE", 3),
         ],
     },
+    {
+        "id": "shrine",
+        "stop": "shrine",
+        "section": "Shrine",
+        "note": "E at the shrine",
+        "checks": [
+            eq("beat.ready_for", "shrine"),
+            eq("quest.night_spirit", True),
+            eq("quest.guards_calm", 3),
+            eq("quest.partner_walking", False),
+            count_tag("NODE_OPENING_EASE", 3),
+            count_tag("NODE_CAPTIVE", 1),
+            count_tag("NODE_OPENING_SHRINE", 1),
+        ],
+    },
 ]
 
 

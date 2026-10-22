@@ -329,7 +329,7 @@ bool FStrokeEaseTradeoff::RunTest(const FString& Parameters)
 	TestTrue(TEXT("a wait keeps the point"), Report->HasCarriedPoint());
 	TestEqual(TEXT("a wait does not replace the point"), Report->GetCarriedPoint(), Next);
 	TestEqual(TEXT("a wait keeps the bonk try"), Report->GetBonkTries(), 1);
-	TestFalse(TEXT("a wait does not glide home"), Report->WasGlideHomeInvoked());
+	TestTrue(TEXT("a wait calls the glide home"), Report->WasGlideHomeInvoked());
 
 	const EHomeWorldStrokeReport Bonk = Report->ReportStroke(
 		EHomeWorldStrokeStep::Paradox, Late, 0.f, 1.f, FVector2D::ZeroVector, nullptr, Glide);
