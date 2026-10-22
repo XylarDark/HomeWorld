@@ -1113,6 +1113,11 @@ protected:
 	void SetOpeningInteractPrompt(bool bShow, const FVector& At);
 	void ShowOpeningProximityLine();
 	void RefreshOpeningQuest();
+	void PublishOpeningFact(EHomeWorldOpeningFact Fact, bool bValue);
+	void PublishOpeningHerbsGathered();
+	void PublishOpeningMixedHerb();
+	/** Range, wrath, and tame. Live reads: each can clear, including when the dog is gone. */
+	void PublishOpeningDogFacts();
 	void MaybeLeadPartnerAfterHerbs();
 	bool HasOpeningHerbQuota() const;
 	void StartOpeningHerbRune(AActor* Bed);

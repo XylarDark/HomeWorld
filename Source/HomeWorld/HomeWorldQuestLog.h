@@ -22,7 +22,25 @@ struct FHomeWorldQuestStep
 	bool bDone = false;
 };
 
-/** Facts the opening tracker reads. The player still owns the verbs. */
+/** One opening fact a verb can publish. The log holds it. BuildOpeningSteps only formats it. */
+enum class EHomeWorldOpeningFact : uint8
+{
+	SpiritClaimed,
+	HerbFromWest,
+	HerbFromEast,
+	KettleBrewed,
+	DogSlow,
+	DogInSootheRange,
+	TracingDove,
+	WrathEased,
+	HasMixedHerb,
+	DogTamed,
+	Backpack,
+	FishCaught,
+	Slept,
+};
+
+/** Facts the opening tracker holds. Verbs publish them. The player still owns the verbs. */
 struct FHomeWorldOpeningQuestFacts
 {
 	bool bSpiritClaimed = false;
@@ -86,6 +104,14 @@ public:
 
 	static TArray<FHomeWorldQuestStep> BuildOpeningSteps(const FHomeWorldOpeningQuestFacts& Facts);
 
+	/** Record one opening fact. Does not format steps. */
+	void PublishOpeningFact(EHomeWorldOpeningFact Fact, bool bValue);
+
+	/** Record the gathered-herb count. Each bed is its own fact. */
+	void PublishOpeningHerbsGathered(int32 Count);
+
+	const FHomeWorldOpeningQuestFacts& GetOpeningFacts() const { return OpeningFacts; }
+
 	/** Copy one stored chain. False when that id has not been set. */
 	bool GetChainSteps(FName Id, TArray<FHomeWorldQuestStep>& OutSteps) const;
 
@@ -93,6 +119,9 @@ public:
 
 private:
 	static bool SameSteps(const TArray<FHomeWorldQuestStep>& A, const TArray<FHomeWorldQuestStep>& B);
+
+	/** Published by the verbs. The SizeTest tick formats these into the Opening chain. */
+	FHomeWorldOpeningQuestFacts OpeningFacts;
 
 	UPROPERTY()
 	TArray<FHomeWorldQuestChain> Chains;

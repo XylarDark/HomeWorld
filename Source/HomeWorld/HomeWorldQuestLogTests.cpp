@@ -4,7 +4,12 @@
 
 #if WITH_DEV_AUTOMATION_TESTS
 
+#include "Components/StaticMeshComponent.h"
+#include "Engine/StaticMesh.h"
+#include "Engine/StaticMeshActor.h"
+#include "Engine/World.h"
 #include "HomeWorldQuestLog.h"
+#include "HomeWorldTestWorld.h"
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 	FOpeningQuestGrowsInOrder,
@@ -98,6 +103,89 @@ bool FOpeningQuestGrowsInOrder::RunTest(const FString& Parameters)
 	Older[0].bDone = !Older[0].bDone;
 	Log->SetChain(TEXT("Opening"), Older);
 	TestEqual(TEXT("a changed chain becomes the one on screen"), Log->GetDisplayedSteps()[0].Text, Older[0].Text);
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FOpeningQuestFactFromBed,
+	"HomeWorld.Systems.Opening.QuestFactFromBed",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FOpeningQuestFactFromBed::RunTest(const FString& Parameters)
+{
+	(void)Parameters;
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("opening quest bed"));
+	if (!Scope.Ok(this))
+	{
+		return false;
+	}
+	AHomeWorldCharacter* Character = HomeWorldTestWorld::SpawnCharacter(Scope.World);
+	if (!TestNotNull(TEXT("character"), Character))
+	{
+		return false;
+	}
+	UHomeWorldQuestLog* Log = Character->FindComponentByClass<UHomeWorldQuestLog>();
+	if (!TestNotNull(TEXT("quest log"), Log))
+	{
+		return false;
+	}
+
+	// The SizeTest tick is what formats held facts. This world has no map name, so that tick does not run.
+	auto FormatOpening = [](UHomeWorldQuestLog* InLog)
+	{
+		InLog->SetChain(TEXT("Opening"), UHomeWorldQuestLog::BuildOpeningSteps(InLog->GetOpeningFacts()));
+	};
+	FormatOpening(Log);
+	TArray<FHomeWorldQuestStep> Steps;
+	if (!TestTrue(TEXT("opening chain before the bed"), Log->GetChainSteps(TEXT("Opening"), Steps))
+		|| !TestEqual(TEXT("the spirit and the bed"), Steps.Num(), 2))
+	{
+		return false;
+	}
+	TestFalse(TEXT("the bed is not slept yet"), Steps.Last().bDone);
+	TestFalse(TEXT("slept is not held yet"), Log->GetOpeningFacts().bSlept);
+
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	Params.Name = FName(TEXT("SM_Size_Bed"));
+	AStaticMeshActor* Bed = Scope.World->SpawnActor<AStaticMeshActor>(
+		FVector(160.f, 0.f, 0.f), FRotator::ZeroRotator, Params);
+	if (!TestNotNull(TEXT("bed"), Bed))
+	{
+		return false;
+	}
+	if (UStaticMeshComponent* Mesh = Bed->GetStaticMeshComponent())
+	{
+		if (UStaticMesh* Cube = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Cube.Cube")))
+		{
+			Mesh->SetStaticMesh(Cube);
+		}
+	}
+#if WITH_EDITOR
+	Bed->SetActorLabel(TEXT("SM_Size_Bed"), false);
+#endif
+
+	if (!TestTrue(TEXT("the bed verb"), Character->TryOpeningBedInFront()))
+	{
+		return false;
+	}
+	TestTrue(TEXT("the bed published slept"), Log->GetOpeningFacts().bSlept);
+	if (!TestTrue(TEXT("the chain waits for the format"), Log->GetChainSteps(TEXT("Opening"), Steps)))
+	{
+		return false;
+	}
+	TestFalse(TEXT("the step is not checked until the facts are formatted"), Steps.Last().bDone);
+
+	FormatOpening(Log);
+	if (!TestTrue(TEXT("opening chain after the bed"), Log->GetChainSteps(TEXT("Opening"), Steps)))
+	{
+		return false;
+	}
+	TestEqual(TEXT("the spirit line is still first"), Steps[0].Text, FString(TEXT("Pick up the spirit.")));
+	TestFalse(TEXT("the spirit is still to do"), Steps[0].bDone);
+	TestEqual(TEXT("the bed line"), Steps.Last().Text, FString(TEXT("Sleep in the bed.")));
+	TestTrue(TEXT("the bed verb checked the step"), Steps.Last().bDone);
+	TestEqual(TEXT("still the spirit and the bed"), Steps.Num(), 2);
 	return true;
 }
 

@@ -79,6 +79,59 @@ bool UHomeWorldQuestLog::GetChainSteps(FName Id, TArray<FHomeWorldQuestStep>& Ou
 	return false;
 }
 
+void UHomeWorldQuestLog::PublishOpeningFact(EHomeWorldOpeningFact Fact, bool bValue)
+{
+	switch (Fact)
+	{
+	case EHomeWorldOpeningFact::SpiritClaimed:
+		OpeningFacts.bSpiritClaimed = bValue;
+		break;
+	case EHomeWorldOpeningFact::HerbFromWest:
+		OpeningFacts.bHerbFromWest = bValue;
+		break;
+	case EHomeWorldOpeningFact::HerbFromEast:
+		OpeningFacts.bHerbFromEast = bValue;
+		break;
+	case EHomeWorldOpeningFact::KettleBrewed:
+		OpeningFacts.bKettleBrewed = bValue;
+		break;
+	case EHomeWorldOpeningFact::DogSlow:
+		OpeningFacts.bDogSlow = bValue;
+		break;
+	case EHomeWorldOpeningFact::DogInSootheRange:
+		OpeningFacts.bDogInSootheRange = bValue;
+		break;
+	case EHomeWorldOpeningFact::TracingDove:
+		OpeningFacts.bTracingDove = bValue;
+		break;
+	case EHomeWorldOpeningFact::WrathEased:
+		OpeningFacts.bWrathEased = bValue;
+		break;
+	case EHomeWorldOpeningFact::HasMixedHerb:
+		OpeningFacts.bHasMixedHerb = bValue;
+		break;
+	case EHomeWorldOpeningFact::DogTamed:
+		OpeningFacts.bDogTamed = bValue;
+		break;
+	case EHomeWorldOpeningFact::Backpack:
+		OpeningFacts.bBackpack = bValue;
+		break;
+	case EHomeWorldOpeningFact::FishCaught:
+		OpeningFacts.bFishCaught = bValue;
+		break;
+	case EHomeWorldOpeningFact::Slept:
+		OpeningFacts.bSlept = bValue;
+		break;
+	default:
+		break;
+	}
+}
+
+void UHomeWorldQuestLog::PublishOpeningHerbsGathered(int32 Count)
+{
+	OpeningFacts.HerbsGathered = Count;
+}
+
 const TArray<FHomeWorldQuestStep>& UHomeWorldQuestLog::GetDisplayedSteps() const
 {
 	const FHomeWorldQuestChain* Best = nullptr;

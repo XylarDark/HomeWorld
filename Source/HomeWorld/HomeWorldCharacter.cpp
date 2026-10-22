@@ -863,6 +863,7 @@ bool AHomeWorldCharacter::BeginOpeningNight()
 	TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Night);
 	SyncFormWithTimeOfDay();
 	bOpeningNightSpirit = GetIsSpiritForm();
+	PublishOpeningFact(EHomeWorldOpeningFact::Slept, bOpeningNightSpirit);
 	if (USkeletalMeshComponent* Coat = GetMesh())
 	{
 		Coat->SetVisibility(false, true);
@@ -921,6 +922,7 @@ void AHomeWorldCharacter::ReturnOpeningBodyForDawnPlaytest()
 		}
 	}
 	bOpeningNightSpirit = false;
+	PublishOpeningFact(EHomeWorldOpeningFact::Slept, false);
 	if (USkeletalMeshComponent* Coat = GetMesh())
 	{
 		Coat->SetVisibility(true, true);
@@ -1303,6 +1305,7 @@ void AHomeWorldCharacter::TickDebugFastForward(float DeltaTime)
 			return;
 		}
 		bOpeningSpiritClaimed = true;
+		PublishOpeningFact(EHomeWorldOpeningFact::SpiritClaimed, true);
 		if (SizeTestWisp)
 		{
 			SizeTestWisp->SetHiddenInGame(false);
@@ -1467,6 +1470,7 @@ void AHomeWorldCharacter::TickDebugFastForward(float DeltaTime)
 			return;
 		}
 		--OpeningMixedHerbs;
+		PublishOpeningMixedHerb();
 		for (TActorIterator<AHomeWorldOpeningReveal> It(World); It; ++It)
 		{
 			It->BeginChildReturnHome();
@@ -2212,6 +2216,7 @@ bool AHomeWorldCharacter::TryOpeningSpiritInFront()
 		SizeTestWisp->SetVisibility(true);
 	}
 	bOpeningSpiritClaimed = true;
+	PublishOpeningFact(EHomeWorldOpeningFact::SpiritClaimed, true);
 	UE_LOG(LogTemp, Log, TEXT("opening_reveal: shoulder spirit on"));
 	return true;
 }
@@ -2318,6 +2323,7 @@ bool AHomeWorldCharacter::TryOpeningArmorGift()
 		{
 			// The gift is the backpack. It is not the material inventory. The table opens. Walk speed and bonk tries stay.
 			bOpeningArmorGiftGiven = true;
+			PublishOpeningFact(EHomeWorldOpeningFact::Backpack, true);
 			UE_LOG(LogTemp, Log, TEXT("opening_reveal: partner gives the backpack"));
 			return true;
 		}
@@ -2372,6 +2378,7 @@ bool AHomeWorldCharacter::TryOpeningDogInFront()
 		return true;
 	}
 	--OpeningMixedHerbs;
+	PublishOpeningMixedHerb();
 	if (UWorld* World = GetWorld())
 	{
 		for (TActorIterator<AHomeWorldOpeningReveal> It(World); It; ++It)
@@ -2428,6 +2435,7 @@ bool AHomeWorldCharacter::TryOpeningFish()
 		return false;
 	}
 	bOpeningFishCaught = true;
+	PublishOpeningFact(EHomeWorldOpeningFact::FishCaught, true);
 	LogOpening(TEXT("opening_fish: one fish"));
 	return true;
 }
@@ -2471,6 +2479,7 @@ void AHomeWorldCharacter::UseOpeningConsumableStation()
 		}
 		--OpeningHerbTenths;
 		++OpeningMixedHerbs;
+		PublishOpeningMixedHerb();
 		UE_LOG(LogTemp, Log, TEXT("opening_station: mixed herb made (carried %d, banked %d)"), OpeningMixedHerbs, OpeningHerbTenths);
 		ShowInteractFeedback(TEXT("CONSUMABLE: herb mixed with a spirit"), FColor::Green);
 		return;
@@ -3325,6 +3334,7 @@ void AHomeWorldCharacter::UpdateOpeningDog(float DeltaTime)
 	if (!bOpeningDogSlowLatched && Dist < Dog->NoticeRadiusCm && Speed <= Dog->SlowStepCmS && Speed > 10.f)
 	{
 		bOpeningDogSlowLatched = true;
+		PublishOpeningFact(EHomeWorldOpeningFact::DogSlow, true);
 	}
 }
 
@@ -3340,6 +3350,7 @@ void AHomeWorldCharacter::StartOpeningDogDraw(AHomeWorldOpeningDog* Dog)
 	OpeningDogCursor = Shape->GetStartPoint();
 	Shape->SetCursor(OpeningDogCursor);
 	bOpeningDogDrawActive = true;
+	PublishOpeningFact(EHomeWorldOpeningFact::TracingDove, true);
 	if (SizeTestWisp)
 	{
 		SizeTestWisp->SetHiddenInGame(false);
@@ -3460,6 +3471,7 @@ void AHomeWorldCharacter::SnapSizeTestWispHome(AActor* Finished)
 void AHomeWorldCharacter::FinishOpeningDogDraw()
 {
 	bOpeningDogDrawActive = false;
+	PublishOpeningFact(EHomeWorldOpeningFact::TracingDove, false);
 	SnapSizeTestWispHome(OpeningDog);
 	if (OpeningDog && OpeningDog->GetRuneShape())
 	{
@@ -3480,6 +3492,7 @@ void AHomeWorldCharacter::FailOpeningDogTrace()
 {
 	FinishOpeningDogDraw();
 	bOpeningDogSlowLatched = false;
+	PublishOpeningFact(EHomeWorldOpeningFact::DogSlow, false);
 	OpeningDogSlowWarnAt = -1.f;
 	FVector Loc = GetActorLocation();
 	Loc.X = -950.f;
@@ -3516,32 +3529,55 @@ void AHomeWorldCharacter::MaybeLeadPartnerAfterHerbs()
 	}
 }
 
+void AHomeWorldCharacter::PublishOpeningFact(EHomeWorldOpeningFact Fact, bool bValue)
+{
+	if (QuestLog)
+	{
+		QuestLog->PublishOpeningFact(Fact, bValue);
+	}
+}
+
+void AHomeWorldCharacter::PublishOpeningHerbsGathered()
+{
+	if (!QuestLog)
+	{
+		return;
+	}
+	QuestLog->PublishOpeningHerbsGathered(OpeningHerbsGathered);
+	QuestLog->PublishOpeningFact(EHomeWorldOpeningFact::HerbFromWest, bOpeningHerbFromWest);
+	QuestLog->PublishOpeningFact(EHomeWorldOpeningFact::HerbFromEast, bOpeningHerbFromEast);
+}
+
+void AHomeWorldCharacter::PublishOpeningMixedHerb()
+{
+	PublishOpeningFact(EHomeWorldOpeningFact::HasMixedHerb, OpeningMixedHerbs > 0);
+}
+
+void AHomeWorldCharacter::PublishOpeningDogFacts()
+{
+	bool bInRange = false;
+	bool bWrathEased = false;
+	bool bTamed = false;
+	if (OpeningDog)
+	{
+		const float Dist = FVector::Dist2D(GetActorLocation(), OpeningDog->GetActorLocation());
+		bInRange = Dist <= 280.f;
+		bWrathEased = OpeningDog->IsWrathEased();
+		bTamed = OpeningDog->IsDogTamed();
+	}
+	PublishOpeningFact(EHomeWorldOpeningFact::DogInSootheRange, bInRange);
+	PublishOpeningFact(EHomeWorldOpeningFact::WrathEased, bWrathEased);
+	PublishOpeningFact(EHomeWorldOpeningFact::DogTamed, bTamed);
+}
+
 void AHomeWorldCharacter::RefreshOpeningQuest()
 {
 	if (!QuestLog || !GetWorld() || !UGameplayStatics::GetCurrentLevelName(this).Contains(TEXT("SizeTest")))
 	{
 		return;
 	}
-	FHomeWorldOpeningQuestFacts Facts;
-	Facts.bSpiritClaimed = bOpeningSpiritClaimed;
-	Facts.HerbsGathered = OpeningHerbsGathered;
-	Facts.bHerbFromWest = bOpeningHerbFromWest;
-	Facts.bHerbFromEast = bOpeningHerbFromEast;
-	Facts.bKettleBrewed = bOpeningKettleBrewed;
-	Facts.bDogSlow = bOpeningDogSlowLatched;
-	Facts.bTracingDove = bOpeningDogDrawActive;
-	Facts.bHasMixedHerb = OpeningMixedHerbs > 0;
-	Facts.bBackpack = bOpeningArmorGiftGiven;
-	Facts.bFishCaught = bOpeningFishCaught;
-	Facts.bSlept = bOpeningNightSpirit;
-	if (OpeningDog)
-	{
-		const float Dist = FVector::Dist2D(GetActorLocation(), OpeningDog->GetActorLocation());
-		Facts.bDogInSootheRange = Dist <= 280.f;
-		Facts.bWrathEased = OpeningDog->IsWrathEased();
-		Facts.bDogTamed = OpeningDog->IsDogTamed();
-	}
-	QuestLog->SetChain(TEXT("Opening"), UHomeWorldQuestLog::BuildOpeningSteps(Facts));
+	PublishOpeningDogFacts();
+	QuestLog->SetChain(TEXT("Opening"), UHomeWorldQuestLog::BuildOpeningSteps(QuestLog->GetOpeningFacts()));
 	if (UHomeWorldHomeLoopSubsystem* HomeLoop = GetWorld()->GetSubsystem<UHomeWorldHomeLoopSubsystem>())
 	{
 		if (HomeLoop->HasOpeningDayEnded())
@@ -3733,6 +3769,7 @@ void AHomeWorldCharacter::FinishOpeningHerbRune(int32 Tenths)
 	{
 		bOpeningHerbFromWest = true;
 	}
+	PublishOpeningHerbsGathered();
 	LogOpening(FString::Printf(TEXT("opening_herb: collected %d, gathered %d"), Score, OpeningHerbsGathered));
 	UWorld* World = GetWorld();
 	if (OpeningRuneBed && World)
@@ -5640,6 +5677,7 @@ bool AHomeWorldCharacter::TryBrewNodeKettleTea()
 		}
 		TeaSprintEndWorldTime += GrantSeconds;
 		bOpeningKettleBrewed = true;
+		PublishOpeningFact(EHomeWorldOpeningFact::KettleBrewed, true);
 		LogOpening(TEXT("opening_kettle: brewed"));
 		ShowInteractFeedback(TEXT("NODE_KETTLE: tea from herb chunks"), FColor::Green);
 		bHasSidedHerb = false;
