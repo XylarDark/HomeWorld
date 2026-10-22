@@ -320,6 +320,16 @@ QUESTS = [
             count_tag("NODE_OPENING_SHRINE", 1),
         ],
     },
+    {
+        "id": "stress",
+        "stop": "stress",
+        "section": "Stress",
+        "note": "stop at 90, under the cap",
+        "checks": [
+            eq("beat.ready_for", "stress"),
+            eq("quest.stress", 90),
+        ],
+    },
 ]
 
 

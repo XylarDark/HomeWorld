@@ -5,6 +5,8 @@
 #include "HomeWorldCharacter.h"
 #include "HomeWorldInventorySubsystem.h"
 #include "HomeWorldInventoryTypes.h"
+#include "HomeWorldMossTuft.h"
+#include "HomeWorldStressComponent.h"
 
 namespace HomeWorldHomeLoop
 {
@@ -284,6 +286,11 @@ void UHomeWorldHomeLoopSubsystem::ServeActive(float SyncFactor, bool bKeepUnfini
 	{
 		ActiveRecipeId = NAME_None;
 	}
+	bHomeTended = true;
+	if (LastServe.SpentItemIds.Contains(HomeWorldKitchen::Moss))
+	{
+		ApplyPlayerStress([](UHomeWorldStressComponent* Stress) { Stress->NotifyGraceMossMeal(); });
+	}
 	ArmFromServe(SyncFactor);
 }
 
@@ -348,12 +355,18 @@ void UHomeWorldHomeLoopSubsystem::EnterDay()
 
 void UHomeWorldHomeLoopSubsystem::LeaveDay()
 {
+	const bool bMissedTend = ActiveDayId != 0 && !bHomeTended;
 	if (ArmedBuff.bOccupied && ArmedBuff.CoveredDayId == ActiveDayId)
 	{
 		ArmedBuff = FHomeWorldArmedBuff();
 	}
 	ArmedBuff.bLive = false;
 	ActiveDayId = 0;
+	bHomeTended = false;
+	if (bMissedTend)
+	{
+		ApplyPlayerStress([](UHomeWorldStressComponent* Stress) { Stress->NotifyMissedHomeTend(); });
+	}
 }
 
 void UHomeWorldHomeLoopSubsystem::ApplyPhase(EHomeWorldTimeOfDayPhase Phase, bool bFirst)
@@ -829,6 +842,68 @@ int32 UHomeWorldHomeLoopSubsystem::GetChestCount(FName ItemId) const
 {
 	const int32* Count = Chest.Find(ItemId);
 	return Count ? *Count : 0;
+}
+
+bool UHomeWorldHomeLoopSubsystem::TryAddChestItem(FName ItemId, int32 Amount)
+{
+	if (ItemId.IsNone() || Amount < 1)
+	{
+		return false;
+	}
+	Chest.FindOrAdd(ItemId) += Amount;
+	return true;
+}
+
+bool UHomeWorldHomeLoopSubsystem::TrySpendChestItem(FName ItemId, int32 Amount)
+{
+	int32* Count = Chest.Find(ItemId);
+	if (!Count || Amount < 1 || *Count < Amount)
+	{
+		return false;
+	}
+	*Count -= Amount;
+	return true;
+}
+
+bool UHomeWorldHomeLoopSubsystem::TryGatherGraceMoss(AHomeWorldMossTuft* Tuft, EHomeWorldVirtuePole Gatherer)
+{
+	if (!Tuft || Gatherer != EHomeWorldVirtuePole::Grace || !Tuft->IsForestSource() || Tuft->WasGathered())
+	{
+		return false;
+	}
+	Tuft->MarkGathered();
+	return TryAddChestItem(HomeWorldKitchen::Moss, 1);
+}
+
+bool UHomeWorldHomeLoopSubsystem::ServeGraceMossMeal(AHomeWorldCharacter* Player)
+{
+	if (!Player || !TrySpendChestItem(HomeWorldKitchen::Moss, 1))
+	{
+		return false;
+	}
+	bHomeTended = true;
+	if (UHomeWorldStressComponent* Stress = Player->FindComponentByClass<UHomeWorldStressComponent>())
+	{
+		Stress->NotifyGraceMossMeal();
+	}
+	return true;
+}
+
+void UHomeWorldHomeLoopSubsystem::NoteHomeRest()
+{
+	bHomeTended = true;
+}
+
+void UHomeWorldHomeLoopSubsystem::ApplyPlayerStress(TFunctionRef<void(UHomeWorldStressComponent*)> Apply)
+{
+	UWorld* World = GetWorld();
+	APlayerController* Controller = World ? World->GetFirstPlayerController() : nullptr;
+	APawn* Pawn = Controller ? Controller->GetPawn() : nullptr;
+	UHomeWorldStressComponent* Stress = Pawn ? Pawn->FindComponentByClass<UHomeWorldStressComponent>() : nullptr;
+	if (Stress)
+	{
+		Apply(Stress);
+	}
 }
 
 int32 UHomeWorldHomeLoopSubsystem::GetPlotWindows(int32 PlotIndex) const

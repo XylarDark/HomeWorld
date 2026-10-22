@@ -241,4 +241,20 @@ COVERAGE = {
             "the shrine press and the walk home",
         ],
     },
+    "stress": {
+        "tests": [
+            "HomeWorld.Stress.Hit",
+            "HomeWorld.Stress.Bonk",
+            "HomeWorld.Stress.MissedTend",
+            "HomeWorld.Stress.GraceMeal",
+            "HomeWorld.Stress.BedSleep",
+            "HomeWorld.Stress.CapSwap",
+            "HomeWorld.Stress.MossGather",
+            "HomeWorld.Stress.PadSpend",
+            "HomeWorld.Stress.FastForward",
+        ],
+        "human": [
+            "the rune and the meal",
+        ],
+    },
 }

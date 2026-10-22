@@ -36,6 +36,7 @@ class UInputAction;
 class UInputMappingContext;
 class UHomeWorldFallbackGlideComponent;
 class UHomeWorldSoftBoundsComponent;
+class UHomeWorldStressComponent;
 class UHomeWorldTraversalComponent;
 class UHomeWorldSpiritStealthComponent;
 class UHomeWorldCloudWisp;
@@ -194,6 +195,8 @@ public:
 	/** Read-only snapshot for the in-editor quest suite. No gameplay effect. */
 	UFUNCTION(BlueprintPure, Category = "Opening|Playtest")
 	FString GetPlaytestStateJson() const;
+
+	int32 GetStressPoints() const;
 
 	/** Test hook: play the opening beats in order, for real, and stop ready to test one beat.
 	 *  Beat text: spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect,
@@ -687,6 +690,9 @@ protected:
 	/** V1 soft pushback when leaving hero island bounds (no navmesh). */
 	UPROPERTY(VisibleAnywhere, Category = "Walk|Bounds")
 	TObjectPtr<UHomeWorldSoftBoundsComponent> SoftBoundsComponent;
+
+	UPROPERTY(VisibleAnywhere, Category = "Stress")
+	TObjectPtr<UHomeWorldStressComponent> StressComponent;
 
 	/** MV-A: sprint / mantle / blink / mount boost on single CMC. */
 	UPROPERTY(VisibleAnywhere, Category = "Movement|MV-A")

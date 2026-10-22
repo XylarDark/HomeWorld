@@ -2,6 +2,8 @@
 
 #include "HomeWorldStrokeReportComponent.h"
 
+#include "HomeWorldStressComponent.h"
+
 #include "GameFramework/Pawn.h"
 #include "GameFramework/PlayerController.h"
 #include "HomeWorldFallbackGlideComponent.h"
@@ -139,6 +141,13 @@ EHomeWorldStrokeReport UHomeWorldStrokeReportComponent::ReportStroke(
 		if (bParadox)
 		{
 			LastReport = EHomeWorldStrokeReport::Bonk;
+			if (AActor* Owner = GetOwner())
+			{
+				if (UHomeWorldStressComponent* Stress = Owner->FindComponentByClass<UHomeWorldStressComponent>())
+				{
+					Stress->NotifyBonk();
+				}
+			}
 			bHasCarriedPoint = false;
 			CarriedPoint = FVector2D::ZeroVector;
 			UHomeWorldFallbackGlideComponent* Glide = GlideOverride;
