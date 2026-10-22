@@ -17,6 +17,7 @@ import unreal
 sys.path.insert(0, os.path.dirname(__file__))
 import armory_shell
 import cabin_shell
+import placement_constants
 import size_test_guard
 
 ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -318,16 +319,8 @@ def spawn_cabin_walls():
         light.set_actor_label("CabinLight_%02d" % index)
         comp = light.get_component_by_class(unreal.PointLightComponent)
         if comp is not None:
-            # Candlelight, Lead pick 2026-10-22: one even warm glow through the
-            # cottage, not pools. Dimmer per light, wide enough that the seven
-            # overlap into a wash. A full lighting pass comes later.
-            comp.set_editor_property("intensity", 900.0 if lz < 600.0 else 700.0)
-            comp.set_editor_property("attenuation_radius", 2000.0)
-            comp.set_editor_property("source_radius", 25.0)
-            comp.set_editor_property("use_temperature", True)
-            comp.set_editor_property("temperature", 1900.0)
-            comp.set_editor_property("cast_shadows", True)
-            comp.set_editor_property("mobility", unreal.ComponentMobility.MOVABLE)
+            # Candle preset. Lamplight and night live in the same table.
+            placement_constants.apply_light(comp, "candle", lz)
     unreal.log("scene_placement: cabin lights %d" % len(cabin_shell.LIGHTS))
     return True
 

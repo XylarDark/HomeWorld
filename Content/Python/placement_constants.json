@@ -1,0 +1,49 @@
+{
+  "counter": {
+    "height_cm": 100,
+    "depth_cm": 70,
+    "length_cm": 520,
+    "shell_x": 1710,
+    "shell_y": 80,
+    "reveal_x": 910,
+    "reveal_y": 80
+  },
+  "standoff_cm": {
+    "partner": 180,
+    "pond": 100
+  },
+  "tags": {
+    "kettle": "NODE_KETTLE",
+    "kettle_counter": "KettleCounter",
+    "consumable_station": "NODE_CONSUMABLE_STATION",
+    "armor_table": "NODE_ARMOR_TABLE",
+    "partner": "NPC_PARTNER",
+    "opening_dog": "NODE_OPENING_DOG"
+  },
+  "lights": {
+    "candle": {
+      "intensity_below": 900,
+      "intensity_above": 700,
+      "split_z": 600,
+      "attenuation_radius": 2000,
+      "source_radius": 25,
+      "temperature": 1900
+    },
+    "lamplight": {
+      "intensity_below": 900,
+      "intensity_above": 700,
+      "split_z": 600,
+      "attenuation_radius": 2000,
+      "source_radius": 25,
+      "temperature": 1900
+    },
+    "night": {
+      "intensity_below": 900,
+      "intensity_above": 700,
+      "split_z": 600,
+      "attenuation_radius": 2000,
+      "source_radius": 25,
+      "temperature": 1900
+    }
+  }
+}

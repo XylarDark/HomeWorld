@@ -12,6 +12,8 @@ See Docs/level/L_SizeTest_ROOM_PLAN.md.
 
 import os
 
+import placement_constants
+
 # Outer shell, centimeters, local to the cottage actor. Wall boxes are centered
 # on these lines, so the outside face is half a wall further out.
 SHELL_MIN_X = -800.0
@@ -121,6 +123,15 @@ RAMP = ((-695.0, 40.0, 0.0), (-695.0, 800.0, 500.0), 150.0)
 
 # The kitchen counter run is the consumable station. Half the 200 cm played body.
 COUNTER_BOX_INDEX = 63
+_counter = placement_constants.counter()
+BOXES[COUNTER_BOX_INDEX] = (
+    _counter["shell_x"],
+    _counter["shell_y"],
+    _counter["height_cm"] * 0.5,
+    _counter["depth_cm"],
+    _counter["length_cm"],
+    _counter["height_cm"],
+)
 
 # Gable on the upstairs wall plate (z = 1000). Ridge runs east-west at y = 600.
 # Eaves overhang the south and north walls by about 60 cm.
