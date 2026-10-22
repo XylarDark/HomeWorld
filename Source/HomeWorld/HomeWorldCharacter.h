@@ -981,6 +981,8 @@ protected:
 	 *  from the rim. The climb runs beside the pad until it can cross low.
 	 *  A new bonk calls this with its destination and the pad; it does not add a path. */
 	void BeginBonkReturn(const FVector& Target, const FVector& PadOrigin, const FVector& PadExtent);
+	// HomeWorld.Opening.BonkReentry calls the return and reads the arc mid-flight.
+	friend class FBonkReentryTest;
 	void TickBonkReturn(float DeltaSeconds);
 	bool IsBonkReturning() const { return bOpeningBonkReturning; }
 	void ClearPartyOnAbsenceVolumes();

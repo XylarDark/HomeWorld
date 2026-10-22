@@ -440,6 +440,11 @@ void AHomeWorldCharacter::UpdateOpeningBonk()
 
 void AHomeWorldCharacter::BeginBonkReturn(const FVector& Target, const FVector& PadOrigin, const FVector& PadExtent)
 {
+	// Already in flight. A second call would rebuild the arc and zero the clock.
+	if (bOpeningBonkReturning)
+	{
+		return;
+	}
 	UWorld* World = GetWorld();
 	UCharacterMovementComponent* Move = GetCharacterMovement();
 	UCapsuleComponent* Capsule = GetCapsuleComponent();

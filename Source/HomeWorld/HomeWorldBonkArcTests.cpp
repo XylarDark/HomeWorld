@@ -5,6 +5,7 @@
 #if WITH_DEV_AUTOMATION_TESTS
 
 #include "HomeWorldBonkArc.h"
+#include "HomeWorldTestWorld.h"
 
 namespace
 {
@@ -90,6 +91,79 @@ bool FBonkArcLandingTest::RunTest(const FString& Parameters)
 	TestTrue(TEXT("a deep fall does not tour the island"), Lead <= HomeWorldBonk::MaxLeadCm + HomeWorldBonk::MinOutsideGapCm + 1.f);
 	TestTrue(TEXT("a deep fall still crests at the cap"), FMath::IsNearlyEqual(Capped.Approach.Z, GStandingZ + HomeWorldBonk::CrestCm, 0.1f));
 	TestTrue(TEXT("a deep fall has a finite landing"), FMath::IsFinite(Capped.Land.X) && FMath::IsFinite(Capped.Land.Z));
+
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FBonkReentryTest,
+	"HomeWorld.Opening.BonkReentry",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FBonkReentryTest::RunTest(const FString& Parameters)
+{
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("bonk reentry"));
+	if (!Scope.Ok(this))
+	{
+		return false;
+	}
+
+	AHomeWorldCharacter* Character = HomeWorldTestWorld::SpawnCharacter(Scope.World);
+	if (!TestNotNull(TEXT("character"), Character) || !Character->GetCapsuleComponent())
+	{
+		return false;
+	}
+
+	const FVector PadOrigin(0.f, 0.f, 45000.f);
+	const FVector PadExtent(5000.f, 7000.f, 50.f);
+	const FVector From(-8000.f, 0.f, 44700.f);
+	const FVector FirstTarget(-5000.f, 0.f, 45140.f);
+	const FVector SecondTarget(5000.f, 1200.f, 45140.f);
+	const float Half = Character->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	const FVector SecondExpected = HomeWorldBonk::LandingOnPad(SecondTarget, PadOrigin, PadExtent, Half);
+
+	Character->SetActorLocation(From);
+	if (!TestEqual(TEXT("the body starts off the pad"), Character->GetActorLocation(), From, 1.f))
+	{
+		return false;
+	}
+	Character->BeginBonkReturn(FirstTarget, PadOrigin, PadExtent);
+	if (!TestTrue(TEXT("the return started"), Character->IsBonkReturning()))
+	{
+		return false;
+	}
+
+	const HomeWorldBonk::FArc Arc = Character->BonkArc;
+	TestEqual(TEXT("the arc starts at the body"), Arc.From, From, 1.f);
+	TestTrue(TEXT("the second target would land somewhere else"), !Arc.Land.Equals(SecondExpected, 1.f));
+
+	const float Partial = Arc.DurationSec * 0.4f;
+	Character->TickBonkReturn(Partial);
+	const float Elapsed = Character->BonkElapsed;
+	const FVector Mid = Character->GetActorLocation();
+	TestEqual(TEXT("the clock is part way"), Elapsed, Partial);
+	TestTrue(TEXT("the flight left the start"), !Mid.Equals(From, 1.f));
+	TestTrue(TEXT("the return is still in the air"), Character->IsBonkReturning());
+
+	Character->BeginBonkReturn(SecondTarget, PadOrigin, PadExtent);
+	TestEqual(TEXT("the landing stayed on the first target"), Character->BonkArc.Land, Arc.Land, 0.1f);
+	TestEqual(TEXT("the climb stayed on the first arc"), Character->BonkArc.Approach, Arc.Approach, 0.1f);
+	TestEqual(TEXT("the clock did not restart"), Character->BonkElapsed, Elapsed);
+	TestEqual(TEXT("the body stayed where the first flight left it"), Character->GetActorLocation(), Mid, 0.1f);
+	TestTrue(TEXT("the return is still in flight"), Character->IsBonkReturning());
+
+	const float More = 0.05f;
+	Character->TickBonkReturn(More);
+	const float T = FMath::Clamp((Elapsed + More) / FMath::Max(Arc.DurationSec, 0.05f), 0.f, 1.f);
+	TestEqual(TEXT("the flight stayed on the first arc"),
+		Character->GetActorLocation(), HomeWorldBonk::PointOnArc(Arc, T), 1.f);
+	TestTrue(TEXT("the clock kept going"), Character->BonkElapsed > Elapsed + 0.04f);
+
+	Character->TickBonkReturn(Arc.DurationSec);
+	TestEqual(TEXT("the flight lands on the first target"), Character->GetActorLocation(), Arc.Land, 1.f);
+	TestTrue(TEXT("the flight does not land on the second target"),
+		!Character->GetActorLocation().Equals(SecondExpected, 50.f));
+	TestTrue(TEXT("the return has finished"), !Character->IsBonkReturning());
 
 	return true;
 }
