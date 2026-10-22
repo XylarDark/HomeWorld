@@ -661,6 +661,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Movement|MV-A", meta = (DisplayName = "Try Spirit Blink"))
 	bool TrySpiritBlink();
 
+	/** Level the view. Pitch stays -12. Yaw follows the pawn. */
+	void ApplySpawnControlPitch();
+
 	/** Hold, cursor sample, and release. These are the stroke input path. A size-test map does not run them. */
 	void BeginStrokeFromInput();
 	void SampleStrokeFromInput(FVector2D ScreenPoint, float Time);

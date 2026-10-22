@@ -244,6 +244,10 @@ bool UHomeWorldShrinePortalComponent::TryPortalTransit(AActor* InstigatorActor)
 	const FVector ArriveLoc = GetArriveLocation(Destination);
 	const FRotator ArriveRot(0.0f, Destination->GetActorRotation().Yaw + 180.0f, 0.0f);
 	Pawn->SetActorLocationAndRotation(ArriveLoc, ArriveRot, false, nullptr, ETeleportType::TeleportPhysics);
+	if (AHomeWorldCharacter* HomeCharacter = Cast<AHomeWorldCharacter>(Pawn))
+	{
+		HomeCharacter->ApplySpawnControlPitch();
+	}
 
 	LOG_PORTAL_FALLBACK(TEXT("transit %s -> %s @ %s"),
 		*GetOwner()->GetName(), *Destination->GetName(), *ArriveLoc.ToString());

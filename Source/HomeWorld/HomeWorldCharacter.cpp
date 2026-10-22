@@ -311,7 +311,7 @@ void AHomeWorldCharacter::BeginPlay()
 		}
 		if (AController* Controlled = GetController())
 		{
-			Controlled->SetControlRotation(FRotator(0.0f, GetActorRotation().Yaw, 0.0f));
+			ApplySpawnControlPitch();
 		}
 		if (bSizeTest)
 		{
@@ -3844,13 +3844,18 @@ void AHomeWorldCharacter::UpdateSizeTestWalk()
 	}
 }
 
+void AHomeWorldCharacter::ApplySpawnControlPitch()
+{
+	if (AController* Controller = GetController())
+	{
+		Controller->SetControlRotation(FRotator(-12.f, GetActorRotation().Yaw, 0.f));
+	}
+}
+
 void AHomeWorldCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
-	if (UGameplayStatics::GetCurrentLevelName(this).Contains(TEXT("SizeTest")))
-	{
-		NewController->SetControlRotation(FRotator(0.0f, GetActorRotation().Yaw, 0.0f));
-	}
+	ApplySpawnControlPitch();
 	if (AbilitySystemComponent)
 	{
 		// Server and owning client: owner = this. Simulated proxy: owner = PlayerState for replication.
