@@ -11,6 +11,7 @@
 #include "HomeWorldQuestLog.h"
 #include "HomeWorldTimeOfDaySubsystem.h"
 #include "HomeWorldOpeningSupply.h"
+#include "HomeWorldBonkArc.h"
 
 /** Where a family member stands. One place, not a dialogue tree. */
 UENUM(BlueprintType)
@@ -64,20 +65,20 @@ class HOMEWORLD_API AHomeWorldCharacter : public ACharacter, public IAbilitySyst
 public:
 	AHomeWorldCharacter(const FObjectInitializer& ObjectInitializer);
 
-	/** Half-extent of the aim box, in normalized screen space. The drawn frame uses this. */
+	/** Half-extent of the aim box around screen center, in normalized screen space. The drawn frame uses this. */
 	static constexpr float OpeningViewCenterNdc = 0.3f;
 
-	/** How far the aim box sits above the screen center, in normalized screen space. Positive is up. */
-	static constexpr float OpeningViewUpNdc = 0.5f;
+	/** Resting camera pitch at spawn, in degrees. Positive is up. */
+	static constexpr float OpeningLookRestPitch = -12.f;
 
 	/** The aim rectangle is a development view of that box. Off after the 2026-10-21 pass. */
 	static constexpr bool bDrawOpeningAimBox = false;
 
-	/** A challenger takes the perch only when its look distance is at most this fraction of the perch's. */
-	static constexpr float OpeningLookStick = 0.75f;
-
 	static bool IsOpeningInteractInReach(float Dist2DCm);
+	static bool IsOpeningLookInside(float NdcX, float TargetNdcY, float LookNdcY);
+	static bool IsInFrontOfBody(const FVector& FlatForward, const FVector& FlatToTarget);
 	static AActor* PickOpeningLookTarget(AActor* Perch, const TArray<FOpeningLookCandidate>& Candidates);
+	float GetOpeningLookCenterNdcY() const;
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -969,6 +970,12 @@ protected:
 	void UpdateSizeTestWalk();
 	void UpdateSizeTestWisp(float DeltaTime);
 	void UpdateOpeningBonk();
+	/** Fly the body back onto the pad in one shallow swoop. The landing is inset
+	 *  from the rim. The climb runs beside the pad until it can cross low.
+	 *  A new bonk calls this with its destination and the pad; it does not add a path. */
+	void BeginBonkReturn(const FVector& Target, const FVector& PadOrigin, const FVector& PadExtent);
+	void TickBonkReturn(float DeltaSeconds);
+	bool IsBonkReturning() const { return bOpeningBonkReturning; }
 	void ClearPartyOnAbsenceVolumes();
 	void UpdateOpeningNight(float DeltaTime);
 	void UpdateOpeningWispLegs();
@@ -1023,6 +1030,10 @@ protected:
 	FVector OpeningWispReturnFrom = FVector::ZeroVector;
 	FVector OpeningBonkSafe = FVector::ZeroVector;
 	bool bOpeningBonkSafe = false;
+	// One return at a time. While this is set the fall cannot start another flight.
+	bool bOpeningBonkReturning = false;
+	HomeWorldBonk::FArc BonkArc;
+	float BonkElapsed = 0.f;
 	bool bOpeningNightSpirit = false;
 	bool bOpeningWispCollect = false;
 	UPROPERTY(Transient)
@@ -1234,6 +1245,8 @@ protected:
 	void ShowInteractFeedback(const FString& Message, FColor Color = FColor::Green) const;
 	bool TraceInteractHit(FHitResult& OutHit) const;
 	bool FindInteractTargetInCone(FHitResult& OutHit) const;
+	/** True when no world geometry blocks the chest-height sightline to the target. Walls stop E. */
+	bool HasOpeningLineOfSight(const AActor* Target) const;
 	static bool ActorHasInteractableComponent(const AActor* Actor);
 	AActor* GetInteractTargetActor(const FHitResult& Hit) const;
 	FString BuildInteractRangeHint(AActor* Target) const;

@@ -21,12 +21,12 @@ namespace
 	constexpr float FollowGapCm = 160.f;
 	constexpr float PartnerMeetCm = 280.f;
 	/** Cottage origin (-800, 0). East wall inner face is world x 985. */
-	constexpr float CounterCenterX = 915.f;
-	constexpr float CounterCenterY = 0.f;
-	constexpr float CounterDepthCm = 140.f;
-	constexpr float CounterLengthCm = 320.f;
-	/** Waist height. The reveal grew 180 first; the kitchen replay halved it 2026-10-18. */
-	constexpr float CounterHeightCm = 90.f;
+	constexpr float CounterCenterX = 910.f;
+	constexpr float CounterCenterY = 80.f;
+	constexpr float CounterDepthCm = 70.f;
+	constexpr float CounterLengthCm = 520.f;
+	/** Half the 200 cm played body. The shell counter and this grown fallback agree. */
+	constexpr float CounterHeightCm = 100.f;
 	/** Floor spot west of the counter (local x 1560). The pail owns the north end. */
 	const FVector PartnerStandCm(760.f, 0.f, 0.f);
 	const FVector PartnerRouteCm[] = {
@@ -639,58 +639,84 @@ void AHomeWorldOpeningReveal::BeginChildReturnHome()
 void AHomeWorldOpeningReveal::PlaceKettleCounter()
 {
 	AActor* Kettle = FindTagged(TEXT("NODE_KETTLE"));
+	if (!Kettle)
+	{
+		return;
+	}
+	// Make the kettle movable and tan once, whether it ends on the shell counter or on the fallback.
+	if (UStaticMeshComponent* KettleComp = Kettle->FindComponentByClass<UStaticMeshComponent>())
+	{
+		KettleComp->SetMobility(EComponentMobility::Movable);
+		if (UMaterialInterface* Tan = LoadObject<UMaterialInterface>(nullptr,
+			TEXT("/Game/HomeWorld/Materials/Instances/MI_Greybox_Tan.MI_Greybox_Tan")))
+		{
+			KettleComp->SetMaterial(0, Tan);
+		}
+	}
+	FVector KettleOrigin = FVector::ZeroVector;
+	FVector KettleExtent = FVector::ZeroVector;
+	Kettle->GetActorBounds(false, KettleOrigin, KettleExtent);
+	const float KettleBaseZ = KettleOrigin.Z - KettleExtent.Z;
+	const float KettleLift = Kettle->GetActorLocation().Z - KettleBaseZ;
+
+	// The cabin shell now owns the counter run. Use it as the station instead of growing a
+	// second box on top: 90 cm on top of 90 cm is what read chest-high in play.
+	AActor* Counter = FindTagged(TEXT("KettleCounter"));
+	if (!Counter)
+	{
+		Counter = FindTagged(TEXT("NODE_CONSUMABLE_STATION"));
+	}
+	if (Counter)
+	{
+		FVector CounterOrigin = FVector::ZeroVector;
+		FVector CounterExtent = FVector::ZeroVector;
+		Counter->GetActorBounds(false, CounterOrigin, CounterExtent);
+		Kettle->SetActorLocation(FVector(CounterOrigin.X, CounterOrigin.Y,
+			CounterOrigin.Z + CounterExtent.Z + KettleLift));
+		Kettle->Tags.Add(FName(TEXT("KettleProp")));
+		Kettle->Tags.Remove(FName(TEXT("NODE_KETTLE")));
+		Counter->Tags.AddUnique(FName(TEXT("KettleCounter")));
+		Counter->Tags.AddUnique(FName(TEXT("NODE_CONSUMABLE_STATION")));
+		UE_LOG(LogTemp, Log, TEXT("opening_reveal: kettle on the single kitchen counter, %.0f x %.0f x %.0f"),
+			CounterExtent.X * 2.f, CounterExtent.Y * 2.f, CounterExtent.Z * 2.f);
+		return;
+	}
+
 	UWorld* World = GetWorld();
 	UStaticMesh* Cube = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Cube.Cube"));
-	if (!Kettle || !World || !Cube)
+	if (!World || !Cube)
 	{
 		return;
 	}
 	FActorSpawnParameters Params;
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	const FVector KettleLocation = Kettle->GetActorLocation();
-	AStaticMeshActor* Counter = World->SpawnActor<AStaticMeshActor>(KettleLocation, FRotator::ZeroRotator, Params);
-	if (!Counter || !Counter->GetStaticMeshComponent())
+	AStaticMeshActor* GrownCounter = World->SpawnActor<AStaticMeshActor>(KettleLocation, FRotator::ZeroRotator, Params);
+	if (!GrownCounter || !GrownCounter->GetStaticMeshComponent())
 	{
 		return;
 	}
-	UStaticMeshComponent* Mesh = Counter->GetStaticMeshComponent();
+	UStaticMeshComponent* Mesh = GrownCounter->GetStaticMeshComponent();
 	Mesh->SetStaticMesh(Cube);
 	if (UMaterialInterface* Grey = LoadObject<UMaterialInterface>(nullptr,
 		TEXT("/Game/HomeWorld/Materials/Instances/MI_Greybox_Stone.MI_Greybox_Stone")))
 	{
 		Mesh->SetMaterial(0, Grey);
 	}
-	FVector BoundsOrigin = FVector::ZeroVector;
-	FVector BoundsExtent = FVector::ZeroVector;
-	Kettle->GetActorBounds(false, BoundsOrigin, BoundsExtent);
-	const float FloorZ = BoundsOrigin.Z - BoundsExtent.Z;
-	const float KettleLift = KettleLocation.Z - FloorZ;
+	const float FloorZ = KettleBaseZ;
 	Mesh->SetMobility(EComponentMobility::Movable);
 	Mesh->SetCollisionProfileName(FName(TEXT("BlockAll")));
 	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	Counter->SetActorScale3D(FVector(CounterDepthCm / 100.f, CounterLengthCm / 100.f, CounterHeightCm / 100.f));
+	GrownCounter->SetActorScale3D(FVector(CounterDepthCm / 100.f, CounterLengthCm / 100.f, CounterHeightCm / 100.f));
 	const float CenterZ = FloorZ + CounterHeightCm * 0.5f;
-	Counter->SetActorLocation(FVector(CounterCenterX, CounterCenterY, CenterZ));
-	// The kettle comes from the map as a static prop. It has to be movable to lift it.
-	if (UStaticMeshComponent* KettleComp = Kettle->FindComponentByClass<UStaticMeshComponent>())
-	{
-		KettleComp->SetMobility(EComponentMobility::Movable);
-	}
+	GrownCounter->SetActorLocation(FVector(CounterCenterX, CounterCenterY, CenterZ));
 	Kettle->SetActorLocation(FVector(CounterCenterX, CounterCenterY, FloorZ + CounterHeightCm + KettleLift));
 	Kettle->Tags.Add(FName(TEXT("KettleProp")));
-	if (UMaterialInterface* Tan = LoadObject<UMaterialInterface>(nullptr,
-		TEXT("/Game/HomeWorld/Materials/Instances/MI_Greybox_Tan.MI_Greybox_Tan")))
-	{
-		if (UStaticMeshComponent* KettleMesh = Kettle->FindComponentByClass<UStaticMeshComponent>())
-		{
-			KettleMesh->SetMaterial(0, Tan);
-		}
-	}
-	Counter->Tags.Add(FName(TEXT("KettleCounter")));
+	GrownCounter->Tags.Add(FName(TEXT("KettleCounter")));
 	// The counter is the kitchen consumable station. The kettle on top is a prop: the station
 	// press opens, mixes, then brews on it, so the kettle itself is not a target.
-	Counter->Tags.Add(FName(TEXT("NODE_CONSUMABLE_STATION")));
+	GrownCounter->Tags.Add(FName(TEXT("NODE_CONSUMABLE_STATION")));
 	Kettle->Tags.Remove(FName(TEXT("NODE_KETTLE")));
-	UE_LOG(LogTemp, Log, TEXT("opening_reveal: kettle on the counter station, %.0f x %.0f x %.0f at the east wall"),
+	UE_LOG(LogTemp, Log, TEXT("opening_reveal: grew the kettle counter, %.0f x %.0f x %.0f at the east wall"),
 		CounterDepthCm, CounterLengthCm, CounterHeightCm);
 }

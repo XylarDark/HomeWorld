@@ -97,7 +97,7 @@ BOXES = [
     (-480.0, 280.0, 80.0, 180.0, 220.0, 160.0),
     (-240.0, 160.0, 35.0, 90.0, 180.0, 70.0),
     (-240.0, 400.0, 35.0, 90.0, 180.0, 70.0),
-    (1710.0, 80.0, 45.0, 70.0, 520.0, 90.0),
+    (1710.0, 80.0, 50.0, 70.0, 520.0, 100.0),
     (1670.0, -120.0, 94.0, 40.0, 50.0, 8.0),
     (1685.0, 160.0, 70.0, 70.0, 70.0, 140.0),
     (1710.0, 380.0, 30.0, 40.0, 40.0, 60.0),
@@ -118,6 +118,9 @@ BOXES = [
 
 # One ramp in the stair opening. Local cm: bottom and top of the walking surface.
 RAMP = ((-695.0, 40.0, 0.0), (-695.0, 800.0, 500.0), 150.0)
+
+# The kitchen counter run is the consumable station. Half the 200 cm played body.
+COUNTER_BOX_INDEX = 63
 
 # Gable on the upstairs wall plate (z = 1000). Ridge runs east-west at y = 600.
 # Eaves overhang the south and north walls by about 60 cm.

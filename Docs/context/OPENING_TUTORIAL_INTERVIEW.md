@@ -10,6 +10,9 @@ The sequence is the Opening tutorial in [`Docs/VISION_BOARD.md`](../VISION_BOARD
 - A heart sits beside the prop and turns with the view. Its height starts at the player's head and rises so the shape never clips the prop or the floor, including as the shape scales. 2026-10-21.
 - The shoulder wisp marks an object, and the opening interact reaches it, only when that object is within 280 cm and inside the passed aim box: half-extent 0.3, center 0.5 above the middle of the view. The development frame is off. 2026-10-21.
 - That box stays the look point. The hard edge is gone. Within 280 cm and in front of the camera, the actor closest to that point takes the shoulder wisp. The perched actor keeps it until another is at most three quarters of that look distance. The wisp on the shoulder means there is no interact. The wisp perched beside the actor, with one world E, is the interact. No crosshair and no frame. Heart placement is unchanged. 2026-10-22.
+- The look point swings up and down the screen with the camera pitch, so a vertical look keeps the same target. At the rest pitch of -12 it stays where the box was passed. Yaw still changes the target. 2026-10-22.
+- The look is the passed box again: half-extent 0.3 around that swinging point. It does not stick. An actor behind the body cannot take it. 2026-10-22.
+- One E at the hot springs starts one carried wisp. The rest stay in the backpack until the next press. 2026-10-22.
 - The fastest homestead walk already kept in play is 450 cm/s (`BodyWalkSpeed` in `Source/HomeWorld/HomeWorldTraversalComponent.h`).
 - The approach hides the cottage with a copse of pines and large stones. Hills and valleys are later. [`Docs/handoffs/research/TERRAIN_HEIGHT_LATER.md`](../handoffs/research/TERRAIN_HEIGHT_LATER.md).
 - The walk stays 450 cm/s until a replay says that single speed is wrong.
@@ -181,3 +184,7 @@ Picked 2026-10-21. 1A, then 2A 3A 4A 5A 6A 7A. The moss addition was not taken: 
 - One E on the shrine, after the three sleeps, calls the free and then `CompleteShrineReturn`. A missing guard still refuses the free.
 - The captive is a separate `NODE_CAPTIVE` actor. Freeing it uses the ready-to-return flag. The kettle partner is not moved.
 - `hw.Playtest.FastForward shrine` runs the three ladders, spawns the captive and a shrine for that run, and stops before the E. Nothing is saved into `L_SizeTest`.
+
+### Round 18 - Where the aim frame sits
+
+Picked 2026-10-22. The interaction frame is the screen center: NDC 0, half-extent 0.3, no pitch compensation. Aiming at the prop is the pass; the stop derives its gaze from the target's bounds. The old "a quarter of the screen above the middle" frame and its pitch slide are superseded.

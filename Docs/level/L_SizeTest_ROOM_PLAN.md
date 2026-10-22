@@ -90,7 +90,7 @@ Herb beds sit south of the porch, off the entry, yaw 0.
 
 Added 2026-10-18. Changed the same day after Luke's replay: the armory slid in front of the cottage, and the kitchen counter became the consumable station.
 
-- The consumable station is the kitchen counter, against the east wall at world (2.15 m, 0). At play the reveal grows it 1.4 by 3.2 m, waist high at 0.9 m after the halving, and stands the kettle on top. Presses: the herb and the claimed spirit open it; the next press is its one output, the herb mixed with a spirit; after that the same counter brews at the kettle, one brew spending at most 10 chunks.
+- The consumable station is the kitchen counter, against the east wall at world (2.15 m, 0). The shell counter is 0.7 by 5.2 m and 1 m tall, half the player's 2 m height. At play the reveal looks for that counter, tagged `KettleCounter`, and stands the kettle on top; it grows a 0.7 by 5.2 m fallback counter only when no tagged one exists, so one counter is never doubled. Presses: the herb and the claimed spirit open it; the next press is its one output, the herb mixed with a spirit; after that the same counter brews at the kettle, one brew spending at most 10 chunks.
 - The armory is the second building, in front of the cottage at world (−0.5 m, −13 m), south of the east wing across the courtyard. Seven by six metres outside, 4 m walls, 30 cm thick, one 2.4 m door on the west wall facing the courtyard. `Content/Python/armory_shell.py` grows the walls; the placer checks the door, a wall, the floor, and a 42 cm walk in and back out.
 - The armor table stands against the armory's inside east wall: world (2.25 m, −13 m), 0.9 by 1.4 m, 0.9 m tall. The partner's gift opens it. No walk-speed or bonk-try change.
 

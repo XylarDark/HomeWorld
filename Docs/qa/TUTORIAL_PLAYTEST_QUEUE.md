@@ -8,23 +8,23 @@ Write results in this file. The critical path below is the master list for Novem
 
 Current pass entry: [`PLAYTEST_INDEX.md`](PLAYTEST_INDEX.md). Now stays the first open row. Party, home loop, and the water/sign chain stay in their own files and are off this path.
 
-**Now:** October 23, one sitting, in this order. Fresh PIE on `L_SizeTest` for each row. The twelve developer stops passed 2026-10-22. Each table stays empty until its sentence. The meadow, the nodes, and the clearing are not saved on the map. A fast-forward spawns that row's marker for the run only.
+**Now:** 22 Oct Night is in. 23 Oct Heal is in, including the one-press replay. The next dated row is 26 Oct, the glider. Fresh PIE on `L_SizeTest` for each open row. The meadow, the nodes, and the clearing are not saved on the map.
 
-| Order | Word | His action | Table |
-|---|---|---|---|
-| 1 | `sleep` | E at the bed | Night |
-| 2 | `collect` | The click heart on a wisp | Night |
-| 3 | `heal` | E at the hot springs | Wisp loop |
-| 4 | `glider` | E at the armory | The glider |
-| 5 | `delivery` | E on the wood node | Delivery |
-| 6 | `daycamp` | Walk into the reach | Day camp |
-| 7 | `dawnglide` | The launch | Dawn glide |
-| 8 | `nightglide` | The spirit launch | Night glide |
-| 9 | `stealth` | Reach a guard | Stealth |
-| 10 | `ease` | The wind-up | Ease |
-| 11 | `shrine` | E on the shrine. The ladders have already run | Shrine |
+| Order | Day | Word | His action | Table | Result |
+|---|---|---|---|---|---|
+| 1 | 22 Oct | `sleep` | E at the bed | Night | In. Success. |
+| 2 | 22 Oct | `collect` | The click heart on a wisp | Night | In. One wisp in the backpack. |
+| 3 | 23 Oct | `heal` | E at the hot springs, one wisp | Wisp loop | Pass. One press starts one wisp. |
+| 4 | 26 Oct | `glider` | E at the armory | The glider | Open. |
+| 5 | 2 Nov | `delivery` | E on the wood node | Delivery | Open. |
+| 6 | 4 Nov | `daycamp` | Walk into the reach | Day camp | Open. |
+| 7 | 27 Oct | `dawnglide` | The launch | Dawn glide | Open. |
+| 8 | 5 Nov | `nightglide` | The spirit launch | Night glide | Open. |
+| 9 | 6 Nov | `stealth` | Reach a guard | Stealth | Open. |
+| 10 | 9 Nov | `ease` | The wind-up | Ease | Open. |
+| 11 | 10 Nov | `shrine` | E on the shrine. The ladders have already run | Shrine | Open. |
 
-Rows 1 and 2 are in. 2026-10-22. Next is `heal`.
+Next command is the heal replay, then `glider`. Playing a later row today does not move its date.
 
 The field shell, the three nodes, and the runs that need them wait on the meadow site. No coordinate is written.
 
@@ -211,19 +211,19 @@ Developer check, not the pass: `.\Tools\RunTests.ps1 -Quest` runs the opening st
 
 ## Wisp loop
 
-**Built.** Waiting on this replay. Round 8 in [`Docs/context/OPENING_TUTORIAL_INTERVIEW.md`](../context/OPENING_TUTORIAL_INTERVIEW.md).
+**Passed.** 2026-10-22. Round 8 in [`Docs/context/OPENING_TUTORIAL_INTERVIEW.md`](../context/OPENING_TUTORIAL_INTERVIEW.md).
 
 Night. Three damaged wisps stand at the copse, the pond, and the hot springs. Collect one with the click heart and it goes into the backpack. Carry it to the hot springs and press E: one herb chunk starts a 20 second heal. When the heal ends the wisp follows at the legs, not the shoulder. The claimed companion stays on the shoulder.
 
-One opening herb chunk per wisp is locked in [`Docs/context/OPENING_TUTORIAL_INTERVIEW.md`](../context/OPENING_TUTORIAL_INTERVIEW.md). The heal time is locked there too, and the binary uses it: 20 seconds at 3 seconds or under, plus 10 seconds per second over. A partial second counts. The collect heart may run past 3 seconds. The table stays empty until the Night sentence. The hot-spring heal starts from 600 cm, locked in that interview. The leg arc is locked there too.
+One opening herb chunk per wisp is locked in [`Docs/context/OPENING_TUTORIAL_INTERVIEW.md`](../context/OPENING_TUTORIAL_INTERVIEW.md). The heal time is locked there too, and the binary uses it: 20 seconds at 3 seconds or under, plus 10 seconds per second over. A partial second counts. The collect heart may run past 3 seconds. The hot-spring heal starts from 600 cm, locked in that interview. The leg arc is locked there too. The 2026-10-22 play healed all three.
 
 | Field | Result |
 |---|---|
-| Date | |
-| Three damaged wisps collected into the backpack? | |
-| E at the hot springs started the heal and spent one herb chunk? | |
-| Healed wisps follow at the legs, not the shoulder? | |
-| One sentence | |
+| Date | 2026-10-22 |
+| Three damaged wisps collected into the backpack? | Pass. |
+| E at the hot springs started the heal and spent one herb chunk? | Pass. One herb each. |
+| Healed wisps follow at the legs, not the shoulder? | Pass. Three followers at the legs. |
+| One sentence | Pass. One press starts one wisp. Three presses healed three. |
 
 ---
 

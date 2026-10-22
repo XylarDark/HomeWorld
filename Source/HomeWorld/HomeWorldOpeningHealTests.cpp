@@ -71,6 +71,7 @@ bool FOpeningHealTimeTest::RunTest(const FString& Parameters)
 	Character->DebugQueueOpeningWispHeart(3.0f);
 	Character->DebugQueueOpeningWispHeart(4.1f);
 	TestTrue(TEXT("the first deposit starts"), Character->TryOpeningHotSpringHealInFront());
+	TestEqual(TEXT("one press leaves the other wisp carried"), Character->GetOpeningWispsCarriedForTest(), 1);
 	TestTrue(TEXT("the second deposit starts"), Character->TryOpeningHotSpringHealInFront());
 	TestEqual(TEXT("a 3.0 heart heals for 20 seconds"), Character->GetOpeningWispHealTimerForTest(0), 20.f);
 	TestEqual(TEXT("a 4.1 heart heals for 40 seconds"), Character->GetOpeningWispHealTimerForTest(1), 40.f);

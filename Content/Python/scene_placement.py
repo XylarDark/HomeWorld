@@ -283,6 +283,10 @@ def spawn_cabin_walls():
         paint(actor, "MI_Greybox_Stone")
         wall.set_collision_profile_name("BlockAll")
         wall.set_collision_enabled(unreal.CollisionEnabled.QUERY_AND_PHYSICS)
+        if index == cabin_shell.COUNTER_BOX_INDEX:
+            # The counter run is the consumable station; the reveal stands the kettle on it.
+            tag_actor(actor, "KettleCounter")
+            tag_actor(actor, "NODE_CONSUMABLE_STATION")
     fx, fy, fz, fsx, fsy, fsz = cabin_shell.FILLER
     filler = unreal.EditorLevelLibrary.spawn_actor_from_class(
         unreal.StaticMeshActor,
@@ -314,12 +318,16 @@ def spawn_cabin_walls():
         light.set_actor_label("CabinLight_%02d" % index)
         comp = light.get_component_by_class(unreal.PointLightComponent)
         if comp is not None:
-            comp.set_editor_property("intensity", 4000.0)
-            comp.set_editor_property("attenuation_radius", 1400.0)
-            try:
-                comp.set_editor_property("light_color", unreal.Color(255, 198, 140, 255))
-            except Exception:
-                pass
+            # Candlelight, Lead pick 2026-10-22: one even warm glow through the
+            # cottage, not pools. Dimmer per light, wide enough that the seven
+            # overlap into a wash. A full lighting pass comes later.
+            comp.set_editor_property("intensity", 900.0 if lz < 600.0 else 700.0)
+            comp.set_editor_property("attenuation_radius", 2000.0)
+            comp.set_editor_property("source_radius", 25.0)
+            comp.set_editor_property("use_temperature", True)
+            comp.set_editor_property("temperature", 1900.0)
+            comp.set_editor_property("cast_shadows", True)
+            comp.set_editor_property("mobility", unreal.ComponentMobility.MOVABLE)
     unreal.log("scene_placement: cabin lights %d" % len(cabin_shell.LIGHTS))
     return True
 
@@ -539,7 +547,10 @@ def seat_props(top):
     """The kettle sits on the counter. The bed sits on the upper floor."""
     kettle = by_label().get("SM_Size_Kettle")
     if kettle is not None:
-        _seat_bottom(kettle, top + 90.0)
+        # Read the counter's own height. A copied number here is how the kettle
+        # ended up sunk 10 cm into the counter when the counter was raised.
+        counter_height = cabin_shell.BOXES[cabin_shell.COUNTER_BOX_INDEX][5]
+        _seat_bottom(kettle, top + counter_height)
     bed = by_label().get("SM_Size_Bed")
     if bed is not None:
         _seat_bottom(bed, top + 500.0)

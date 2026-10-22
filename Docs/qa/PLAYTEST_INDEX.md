@@ -2,13 +2,13 @@
 
 One entry point. Play one pass, fill that pass's result, stop.
 
-**Now:** October 23, one sitting, in [`TUTORIAL_PLAYTEST_QUEUE.md`](TUTORIAL_PLAYTEST_QUEUE.md). Fresh PIE per row, from `sleep` through `shrine`. The November 20 critical path in that file is the master list. Party, home loop, and the water/sign chain stay separate and are off that path.
+**Now:** 22 Oct Night and 23 Oct Heal are in. One press starts one wisp. Next dated row is 26 Oct, the glider, in [`TUTORIAL_PLAYTEST_QUEUE.md`](TUTORIAL_PLAYTEST_QUEUE.md). The November 20 critical path in that file is the master list. Party, home loop, and the water/sign chain stay separate and are off that path.
 
 ## Passes
 
 | Pass | File | State | What it covers |
 |---|---|---|---|
-| November 20 critical path | [`TUTORIAL_PLAYTEST_QUEUE.md`](TUTORIAL_PLAYTEST_QUEUE.md#critical-path) | Master list. Now: Night. | Opening through the dawn glide, three field nodes, camp rescue, then dress, audio, and VFX. Passed tutorial results stay in that file. |
+| November 20 critical path | [`TUTORIAL_PLAYTEST_QUEUE.md`](TUTORIAL_PLAYTEST_QUEUE.md#critical-path) | Master list. Night and the one-press heal are in. Next dated row is the glider. | Opening through the dawn glide, three field nodes, camp rescue, then dress, audio, and VFX. Passed tutorial results stay in that file. |
 | Companion party | [`PARTY_PLAYTEST.md`](PARTY_PLAYTEST.md) | Built in #319 and #325. Desk sign-off waits on Lead. | Eight in-editor steps for the partner and child. Design stays in [`Docs/41_COMPANION_PARTY_DESIGN.md`](../41_COMPANION_PARTY_DESIGN.md). |
 | Home loop | [`HOME_LOOP_PLAYTEST.md`](HOME_LOOP_PLAYTEST.md) | Host tests for bites 1-8 and 10. In-editor pass blocked on station and plot placement. | Stations, kettle, prep and cook, armed buff, wisp assignment, dust, plot harvest, greens, and the `home_loop` quest chain. Design stays in [`Docs/42_HOME_LOOP_DESIGN.md`](../42_HOME_LOOP_DESIGN.md). |
 | Water and wisp signs | [`Docs/42_HOME_LOOP_DESIGN.md`](../42_HOME_LOOP_DESIGN.md) section 10.1 | Design only. No build and no pass. | Seven existing poles on the home-pool wisp, plot-water infusion, harvest, and marked meal. Cloud wisps stay out. |
@@ -19,7 +19,7 @@ One entry point. Play one pass, fill that pass's result, stop.
 
 | System | State | Evidence |
 |---|---|---|
-| Opening tutorial day | Passed through the bonk. Night and the wisp loop are built and waiting on replay. The glider, the delivery, and the day-camp arrival have host tests. The clearing is not placed. | [`TUTORIAL_PLAYTEST_QUEUE.md`](TUTORIAL_PLAYTEST_QUEUE.md) |
+| Opening tutorial day | Passed through the bonk, the bed press, the click heart, and the one-press heal. The glider is the next dated play. The clearing is not placed. | [`TUTORIAL_PLAYTEST_QUEUE.md`](TUTORIAL_PLAYTEST_QUEUE.md) |
 | Companion party | Built. | `HomeWorld.Party` |
 | Home loop | Bites 1-8 and 10 have host tests. Bite 9 (pan/oven) and the water/sign bite are not built. | `HomeWorld.HomeLoop` |
 | Quest log | The Opening chain and the `home_loop` chain are stored beside each other. The HUD draws the most recently changed chain. | `HomeWorld.HomeLoop.QuestChainBesideOpening`, `HomeWorld.Systems.Opening.QuestLog` |

@@ -2,6 +2,28 @@
 
 The live continuity block. A new chat reads this file, not the history. Append the next block here. When this file grows past a few screens, move the older blocks to `docs/history/SESSION_LOG.md`.
 
+## 2026-10-22 Playtest handoff
+
+Playtest continues in a new chat from [`SESSION_HANDOFF_PLAYTEST_GLIDER.md`](handoffs/SESSION_HANDOFF_PLAYTEST_GLIDER.md). `dawnglide` is set up: glider crafted from the dawn chest, player 180 cm from `GP_GlideStart`, launch not yet played. The 26 Oct glider row is open on the armory table (D2). The cottage light is still too bright (D1). Another agent owns the source and the placers, so a playtest chat edits neither.
+
+## 2026-10-22 Modularity handoff
+
+Next chat: the modularity pass for opening interactions and placement, in [`SESSION_HANDOFF_MODULARITY.md`](handoffs/SESSION_HANDOFF_MODULARITY.md). Rows S1-S7 are in `Docs/context/PLAY_TASKS.md` § Shared systems. Build green, nothing committed, map saved with candle lights and the reseated kettle.
+
+Playtest stays in the current chat. Two defects open: the cottage light is still too bright at 1900 K, 900/700 cd; the armory table has no hover and no press, and the beat stop runs at 220 cm.
+
+## 2026-10-22 Heal replay
+
+`hw.Playtest.FastForward heal`. Lead: pass. One press starts one wisp. Three presses healed three. Next dated row is 26 Oct, `glider`, in `Docs/qa/TUTORIAL_PLAYTEST_QUEUE.md`.
+
+## 2026-10-22 Playtest table
+
+22 Oct Night is in. 23 Oct Heal had a sentence for the three-at-once press. The next dated row is 26 Oct, the glider. The order is the Now table in `Docs/qa/TUTORIAL_PLAYTEST_QUEUE.md`.
+
+## 2026-10-22 Heal
+
+`hw.Playtest.FastForward heal`, then E at the hot springs. Lead: pass. Three wisps healed and follow at the legs. Next is `glider` in `Docs/qa/TUTORIAL_PLAYTEST_QUEUE.md`.
+
 ## 2026-10-22 Collect
 
 `hw.Playtest.FastForward collect`. Lead: success. One wisp went into the backpack. Next is `heal` in `Docs/qa/TUTORIAL_PLAYTEST_QUEUE.md`.

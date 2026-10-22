@@ -110,7 +110,11 @@ void AHomeWorldHUD::DrawHUD()
 			if (AHomeWorldCharacter::bDrawOpeningAimBox)
 			{
 				const float Ndc = AHomeWorldCharacter::OpeningViewCenterNdc;
-				const float CenterY = -AHomeWorldCharacter::OpeningViewUpNdc;
+				float CenterY = 0.f;
+				if (const AHomeWorldCharacter* Character = Cast<AHomeWorldCharacter>(PC->GetPawn()))
+				{
+					CenterY = Character->GetOpeningLookCenterNdcY();
+				}
 				const float Left = (1.f - Ndc) * 0.5f * Canvas->SizeX;
 				const float Right = (1.f + Ndc) * 0.5f * Canvas->SizeX;
 				const float Top = (CenterY - Ndc + 1.f) * 0.5f * Canvas->SizeY;

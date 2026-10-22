@@ -100,12 +100,10 @@
  *
  * Duplication is not a style complaint here. It is the mechanism: seven copies of a list
  * cannot drift from one gate that reads a different list, and this is what that drift
- * looked like. `ActorHasInteractableComponent` and the verbs now read the same table, so the
- * next tag added to a beat has exactly one place it can be forgotten.
+ * looked like. `ActorHasInteractableComponent` and the verbs now read the same table.
  *
- * `FindInteractTargetInCone` re-checks `ActorHasInteractableComponent` on every candidate it
- * finds, so admitting the tags at the gate also makes the cone fallback able to reach them.
- * Adding them to the cone's own search list as well would be redundant.
+ * The cone has no list of its own: it walks every actor and asks the gate, so a newly tagged
+ * prop is reachable without editing the cone.
  */
 namespace HomeWorldT0BeatNodes
 {
@@ -145,26 +143,6 @@ namespace HomeWorldT0BeatNodes
 		return TagsPerNode()[static_cast<uint8>(Node)];
 	}
 
-	/**
-	 * Every beat-node tag, flattened, so the gate can ask one question instead of seven.
-	 *
-	 * Derived from TagsPerNode rather than written out again. Spelling the list twice inside
-	 * the one namespace whose entire job is to stop the list being spelled twice would be
-	 * the same bug in a smaller room.
-	 */
-	static const TArray<FName>& AllTags()
-	{
-		static TArray<FName> Flat;
-		if (Flat.Num() == 0)
-		{
-			for (const TArray<FName>& NodeTags : TagsPerNode())
-			{
-				Flat.Append(NodeTags);
-			}
-		}
-		return Flat;
-	}
-
 	/** True when the actor carries one of the tags for this beat prop. */
 	static bool ActorCarriesTagFor(const AActor* Actor, ENode Node)
 	{
@@ -181,18 +159,42 @@ namespace HomeWorldT0BeatNodes
 		}
 		return false;
 	}
+}
 
-	/** True when the actor carries any beat-node tag at all. The gate's question. */
-	static bool ActorCarriesAnyBeatNodeTag(const AActor* Actor)
+/**
+ * One interaction contract per actor, derived from its tags and components.
+ *
+ * A prop is not a verb path. It carries attributes; the resolver reads them. This is the
+ * place to add reach, look, wall, or hover for a new kind of prop - not a branch in a verb.
+ */
+namespace HomeWorldInteract
+{
+	struct FSpec
+	{
+		HomeWorldT0BeatNodes::ENode Node = HomeWorldT0BeatNodes::ENode::Kettle;
+		bool bBeatNode = false;
+		float ReachCm = 280.f;
+		bool bLook = true;
+		bool bWall = true;
+		bool bHover = true;
+	};
+
+	/** Derive the spec from the actor's attributes. A beat prop needs its node tag, nothing else. */
+	static bool TrySpecFor(const AActor* Actor, FSpec& Out)
 	{
 		if (!Actor)
 		{
 			return false;
 		}
-		for (const FName& Tag : AllTags())
+		const TArray<TArray<FName>>& PerNode = HomeWorldT0BeatNodes::TagsPerNode();
+		for (int32 Index = 0; Index < PerNode.Num(); ++Index)
 		{
-			if (Actor->ActorHasTag(Tag))
+			if (HomeWorldT0BeatNodes::ActorCarriesTagFor(
+					Actor, static_cast<HomeWorldT0BeatNodes::ENode>(Index)))
 			{
+				Out = FSpec();
+				Out.Node = static_cast<HomeWorldT0BeatNodes::ENode>(Index);
+				Out.bBeatNode = true;
 				return true;
 			}
 		}
@@ -482,6 +484,11 @@ void AHomeWorldCharacter::UpdateOpeningBonk()
 	{
 		return;
 	}
+	if (bOpeningBonkReturning)
+	{
+		TickBonkReturn(World->GetDeltaSeconds());
+		return;
+	}
 	AActor* Pad = nullptr;
 	for (TActorIterator<AActor> It(World); It; ++It)
 	{
@@ -513,32 +520,98 @@ void AHomeWorldCharacter::UpdateOpeningBonk()
 		}
 		return;
 	}
-	// Fall far enough to read, then a higher toss so the landing has some weight.
+	// Fall far enough to read, then fly home.
 	if (FeetZ > PadTop - 320.f || !bOpeningBonkSafe)
 	{
 		return;
 	}
-	FVector Back = OpeningBonkSafe;
-	FVector Inward = Origin - Back;
-	Inward.Z = 0.f;
-	if (!Inward.Normalize())
+	BeginBonkReturn(OpeningBonkSafe, Origin, Extent);
+}
+
+void AHomeWorldCharacter::BeginBonkReturn(const FVector& Target, const FVector& PadOrigin, const FVector& PadExtent)
+{
+	UWorld* World = GetWorld();
+	UCharacterMovementComponent* Move = GetCharacterMovement();
+	UCapsuleComponent* Capsule = GetCapsuleComponent();
+	if (!World || !Move || !Capsule)
 	{
-		Inward = FVector(0.f, 1.f, 0.f);
+		return;
 	}
-	Back += Inward * 1500.f;
-	const float Margin = 400.f;
-	Back.X = FMath::Clamp(Back.X, Origin.X - Extent.X + Margin, Origin.X + Extent.X - Margin);
-	Back.Y = FMath::Clamp(Back.Y, Origin.Y - Extent.Y + Margin, Origin.Y + Extent.Y - Margin);
-	Back.Z = FMath::Max(Back.Z, PadTop + Half);
-	SetActorLocation(Back, false, nullptr, ETeleportType::TeleportPhysics);
-	if (UCharacterMovementComponent* Move = GetCharacterMovement())
+	const float Half = Capsule->GetScaledCapsuleHalfHeight();
+	const float Radius = Capsule->GetScaledCapsuleRadius();
+	FVector Land = HomeWorldBonk::LandingOnPad(Target, PadOrigin, PadExtent, Half);
+	FCollisionQueryParams Params(NAME_None, false, this);
+	for (int32 Try = 0; Try < 6; ++Try)
 	{
-		Move->StopMovementImmediately();
+		FHitResult Hit;
+		const bool bHit = World->LineTraceSingleByChannel(
+			Hit,
+			FVector(Land.X, Land.Y, Land.Z + 300.f),
+			FVector(Land.X, Land.Y, Land.Z - 400.f),
+			ECC_Visibility,
+			Params);
+		if (!bHit || Hit.ImpactPoint.Z <= Land.Z - Half + 80.f)
+		{
+			break;
+		}
+		const FVector Step = (PadOrigin - Land).GetSafeNormal2D() * 200.f;
+		if (Step.IsNearlyZero())
+		{
+			break;
+		}
+		Land.X += Step.X;
+		Land.Y += Step.Y;
+		Land = HomeWorldBonk::LandingOnPad(Land, PadOrigin, PadExtent, Half);
 	}
-	LaunchCharacter(FVector(Inward.X * 250.f, Inward.Y * 250.f, 760.f), true, true);
-	OpeningBonkSafe = Back;
+	BonkArc = HomeWorldBonk::MakeArc(GetActorLocation(), Land, PadOrigin, PadExtent, Half, Radius);
+	BonkElapsed = 0.f;
+	bOpeningBonkReturning = true;
+	Move->StopMovementImmediately();
+	Move->Velocity = FVector::ZeroVector;
+	Move->SetMovementMode(MOVE_Flying);
+	ConsumeMovementInputVector();
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+		PC->SetIgnoreMoveInput(true);
+	}
 	EndPartyOuting(World, EHomeWorldPartyAbsence::Bonk);
-	UE_LOG(LogTemp, Log, TEXT("opening_bonk: back on the island"));
+	UE_LOG(LogTemp, Log, TEXT("opening_bonk: return to (%.0f, %.0f, %.0f) arch %.0f"),
+		BonkArc.Land.X, BonkArc.Land.Y, BonkArc.Land.Z, BonkArc.Approach.Z - BonkArc.Land.Z);
+}
+
+void AHomeWorldCharacter::TickBonkReturn(float DeltaSeconds)
+{
+	UCharacterMovementComponent* Move = GetCharacterMovement();
+	if (!Move)
+	{
+		bOpeningBonkReturning = false;
+		if (APlayerController* PC = Cast<APlayerController>(GetController()))
+		{
+			PC->SetIgnoreMoveInput(false);
+		}
+		return;
+	}
+	BonkElapsed += FMath::Max(DeltaSeconds, 0.f);
+	const float Duration = FMath::Max(BonkArc.DurationSec, 0.05f);
+	const float T = FMath::Clamp(BonkElapsed / Duration, 0.f, 1.f);
+	SetActorLocation(HomeWorldBonk::PointOnArc(BonkArc, T), false, nullptr, ETeleportType::TeleportPhysics);
+	Move->Velocity = FVector::ZeroVector;
+	ConsumeMovementInputVector();
+	if (T < 1.f)
+	{
+		return;
+	}
+	SetActorLocation(BonkArc.Land, false, nullptr, ETeleportType::TeleportPhysics);
+	Move->StopMovementImmediately();
+	Move->SetMovementMode(MOVE_Walking);
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+		PC->SetIgnoreMoveInput(false);
+	}
+	OpeningBonkSafe = BonkArc.Land;
+	bOpeningBonkSafe = true;
+	bOpeningBonkReturning = false;
+	UE_LOG(LogTemp, Log, TEXT("opening_bonk: landed"));
 }
 
 void AHomeWorldCharacter::ClearPartyOnAbsenceVolumes()
@@ -841,7 +914,8 @@ bool AHomeWorldCharacter::TryOpeningBedInFront()
 	{
 		if (AActor* Named = FindOpeningNamed(World, TEXT("SM_Size_Bed"), true))
 		{
-			if (FVector::Dist2D(GetActorLocation(), Named->GetActorLocation()) <= 280.f)
+			if (FVector::Dist2D(GetActorLocation(), Named->GetActorLocation()) <= 280.f
+				&& HasOpeningLineOfSight(Named))
 			{
 				Bed = Named;
 			}
@@ -1036,7 +1110,8 @@ bool AHomeWorldCharacter::TryOpeningHotSpringHealInFront()
 	{
 		Spring = FindOpeningNamed(World, TEXT("Water_HotSpring"), false);
 	}
-	if (!Spring || FVector::Dist2D(GetActorLocation(), Spring->GetActorLocation()) > OpeningHotSpringRangeCm)
+	if (!Spring || FVector::Dist2D(GetActorLocation(), Spring->GetActorLocation()) > OpeningHotSpringRangeCm
+		|| !HasOpeningLineOfSight(Spring))
 	{
 		return false;
 	}
@@ -1487,13 +1562,7 @@ void AHomeWorldCharacter::TickDebugFastForward(float DeltaTime)
 		}
 		if (Pond)
 		{
-			FVector Origin = FVector::ZeroVector;
-			FVector Extent = FVector::ZeroVector;
-			Pond->GetActorBounds(false, Origin, Extent);
-			FVector Loc = GetActorLocation();
-			Loc.X = Origin.X + Extent.X + 100.f;
-			Loc.Y = Origin.Y;
-			SetActorLocation(Loc, false, nullptr, ETeleportType::TeleportPhysics);
+			PlaceForOpeningPlaytestAtPond(Pond);
 		}
 		if (!TryOpeningFish())
 		{
@@ -1934,19 +2003,40 @@ void AHomeWorldCharacter::PlaceForOpeningPlaytest(AActor* Target, float Distance
 			Chosen = Candidate;
 		}
 	}
-	const FVector Loc(Chosen.X, Chosen.Y, GroundZ + 10.f);
+	const float HalfHeight = GetCapsuleComponent() ? GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight() : 88.f;
+	FCollisionQueryParams FloorParams = Params;
+	FloorParams.AddIgnoredActor(Target);
+	const FVector FloorStart(Chosen.X, Chosen.Y, TargetLoc.Z + AimExtent.Z + 30.f);
+	const FVector FloorEnd(Chosen.X, Chosen.Y, TargetLoc.Z - AimExtent.Z - 200.f);
+	FHitResult FloorHit;
+	float FeetZ = TargetLoc.Z - AimExtent.Z;
+	if (World->LineTraceSingleByChannel(FloorHit, FloorStart, FloorEnd, ECC_Visibility, FloorParams))
+	{
+		FeetZ = FloorHit.ImpactPoint.Z;
+	}
+	const FVector Loc(Chosen.X, Chosen.Y, FeetZ + HalfHeight);
 	SetActorLocation(Loc, false, nullptr, ETeleportType::TeleportPhysics);
 	if (UCharacterMovementComponent* Move = GetCharacterMovement())
 	{
 		Move->StopMovementImmediately();
 	}
+	const FVector Face = (FVector(TargetLoc.X, TargetLoc.Y, Loc.Z) - Loc).GetSafeNormal2D();
+	if (!Face.IsNearlyZero())
+	{
+		SetActorRotation(Face.Rotation());
+	}
 	if (APlayerController* PC = Cast<APlayerController>(GetController()))
 	{
-		// Keep the first look near level: aiming at a counter's centre would pitch the view
-		// 30 degrees down and fill the screen with the character's back.
-		const float EyeZ = GroundZ + 90.f;
-		const FVector LookAt(TargetLoc.X, TargetLoc.Y, FMath::Clamp(TargetLoc.Z + 30.f, EyeZ - 60.f, EyeZ + 60.f));
-		PC->SetControlRotation((LookAt - FVector(Loc.X, Loc.Y, EyeZ)).Rotation());
+		FRotator Look = Face.IsNearlyZero() ? GetActorRotation() : Face.Rotation();
+		// One rule for every beat stop: look at the prop, never past it. A waist-high
+		// prop under a level gaze sits below the hover frame, which is how the armory
+		// table came up with no wisp. The authored distance still sets the standoff;
+		// only the gaze is derived. It never lifts the gaze above the resting pitch.
+		const FVector Eye(Loc.X, Loc.Y, Loc.Z + HalfHeight * 0.5f);
+		const FVector At(AimTarget.X, AimTarget.Y, AimTarget.Z + AimExtent.Z * 0.5f);
+		const float AimPitch = (At - Eye).Rotation().Pitch;
+		Look.Pitch = FMath::Clamp(FMath::Min(OpeningLookRestPitch, AimPitch), -35.f, 15.f);
+		PC->SetControlRotation(Look);
 	}
 	if (!bAimClear)
 	{
@@ -1965,12 +2055,45 @@ void AHomeWorldCharacter::PlaceForOpeningPlaytestAtPond(AActor* Pond)
 	{
 		return;
 	}
+	UWorld* World = GetWorld();
 	FVector Origin = FVector::ZeroVector;
 	FVector Extent = FVector::ZeroVector;
 	Pond->GetActorBounds(false, Origin, Extent);
-	FVector Loc = GetActorLocation();
-	Loc.X = Origin.X + Extent.X + 100.f;
-	Loc.Y = Origin.Y;
+	const UCapsuleComponent* Capsule = GetCapsuleComponent();
+	const float Radius = Capsule ? Capsule->GetScaledCapsuleRadius() : 34.f;
+	const float HalfHeight = Capsule ? Capsule->GetScaledCapsuleHalfHeight() : 100.f;
+	const FCollisionShape Body = FCollisionShape::MakeCapsule(Radius, HalfHeight);
+	const float Standoff = 100.f;
+	const FVector Here = GetActorLocation();
+	// The pond rim can hold a prop. A blind teleport drops the body inside it, and
+	// the fish press then has no clear line to the water. Try the east edge first,
+	// the approach this beat has always used, then walk the rim for a spot the
+	// body actually fits in.
+	FVector Loc = Here;
+	bool bClear = false;
+	if (World)
+	{
+		for (int32 Step = 0; Step < 8; ++Step)
+		{
+			const float Angle = FMath::DegreesToRadians(45.f * Step);
+			const FVector Dir(FMath::Cos(Angle), FMath::Sin(Angle), 0.f);
+			const FVector Edge = Origin + FVector(Dir.X * Extent.X, Dir.Y * Extent.Y, 0.f);
+			const FVector Candidate(Edge.X + Dir.X * Standoff, Edge.Y + Dir.Y * Standoff, Here.Z);
+			FCollisionQueryParams Params(NAME_None, false, this);
+			if (!World->OverlapBlockingTestByChannel(Candidate, FQuat::Identity, ECC_Pawn, Body, Params))
+			{
+				Loc = Candidate;
+				bClear = true;
+				break;
+			}
+		}
+	}
+	if (!bClear)
+	{
+		// No free spot on the rim. Keep the old east edge so the beat still runs.
+		Loc.X = Origin.X + Extent.X + Standoff;
+		Loc.Y = Origin.Y;
+	}
 	SetActorLocation(Loc, false, nullptr, ETeleportType::TeleportPhysics);
 	if (UCharacterMovementComponent* Move = GetCharacterMovement())
 	{
@@ -2358,6 +2481,10 @@ bool AHomeWorldCharacter::TryOpeningFish()
 	const bool bAtPond = FMath::Abs(From.X - Origin.X) <= Extent.X + 200.f
 		&& FMath::Abs(From.Y - Origin.Y) <= Extent.Y + 200.f;
 	if (!bAtPond)
+	{
+		return false;
+	}
+	if (!HasOpeningLineOfSight(Pond))
 	{
 		return false;
 	}
@@ -2848,22 +2975,34 @@ bool AHomeWorldCharacter::IsOpeningInteractInReach(float Dist2DCm)
 	return Dist2DCm <= 280.f;
 }
 
+bool AHomeWorldCharacter::IsOpeningLookInside(float NdcX, float TargetNdcY, float LookNdcY)
+{
+	return FMath::Abs(NdcX) <= OpeningViewCenterNdc
+		&& FMath::Abs(TargetNdcY - LookNdcY) <= OpeningViewCenterNdc;
+}
+
+bool AHomeWorldCharacter::IsInFrontOfBody(const FVector& FlatForward, const FVector& FlatToTarget)
+{
+	return FVector::DotProduct(FlatForward, FlatToTarget) > 0.f;
+}
+
+float AHomeWorldCharacter::GetOpeningLookCenterNdcY() const
+{
+	// One fixed shape: the aim box is the screen center, so the prop the camera is
+	// aimed at is the prop the frame sees. No pitch compensation, no per-prop offset.
+	return 0.f;
+}
+
 AActor* AHomeWorldCharacter::PickOpeningLookTarget(AActor* Perch, const TArray<FOpeningLookCandidate>& Candidates)
 {
+	(void)Perch;
 	AActor* Best = nullptr;
 	float BestSq = TNumericLimits<float>::Max();
-	bool bPerchValid = false;
-	float KeptSq = 0.f;
 	for (const FOpeningLookCandidate& Candidate : Candidates)
 	{
 		if (!Candidate.Actor)
 		{
 			continue;
-		}
-		if (Candidate.Actor == Perch)
-		{
-			bPerchValid = true;
-			KeptSq = Candidate.LookDistSq;
 		}
 		if (Candidate.LookDistSq < BestSq)
 		{
@@ -2871,16 +3010,7 @@ AActor* AHomeWorldCharacter::PickOpeningLookTarget(AActor* Perch, const TArray<F
 			Best = Candidate.Actor;
 		}
 	}
-	if (!bPerchValid)
-	{
-		return Best;
-	}
-	const float StickSq = OpeningLookStick * OpeningLookStick;
-	if (Best != Perch && BestSq <= KeptSq * StickSq)
-	{
-		return Best;
-	}
-	return Perch;
+	return Best;
 }
 
 AActor* AHomeWorldCharacter::FindOpeningProximityTarget()
@@ -2914,6 +3044,11 @@ AActor* AHomeWorldCharacter::FindOpeningProximityTarget()
 		{
 			continue;
 		}
+		// A wall between the body and the prop hides the prompt and refuses the press.
+		if (!HasOpeningLineOfSight(Actor))
+		{
+			continue;
+		}
 		float LookSq = 0.f;
 		if (!OpeningLookDistSq(Actor, LookSq))
 		{
@@ -2925,10 +3060,64 @@ AActor* AHomeWorldCharacter::FindOpeningProximityTarget()
 	return OpeningLookPerch;
 }
 
+bool AHomeWorldCharacter::HasOpeningLineOfSight(const AActor* Target) const
+{
+	UWorld* World = GetWorld();
+	if (!World || !Target)
+	{
+		return false;
+	}
+	FVector Origin = FVector::ZeroVector;
+	FVector Extent = FVector::ZeroVector;
+	Target->GetActorBounds(false, Origin, Extent);
+	const UCapsuleComponent* Capsule = GetCapsuleComponent();
+	const float ChestZ = Capsule ? Capsule->GetUnscaledCapsuleHalfHeight() * 0.5f : 50.f;
+	const FVector Start = GetActorLocation() + FVector(0.f, 0.f, ChestZ);
+	// Aim at the nearest point of the target, not its center, so a wide counter or a
+	// spring plane is not "blocked" by its own far side.
+	const FVector End(
+		FMath::Clamp(Start.X, Origin.X - Extent.X, Origin.X + Extent.X),
+		FMath::Clamp(Start.Y, Origin.Y - Extent.Y, Origin.Y + Extent.Y),
+		FMath::Clamp(Start.Z, Origin.Z - Extent.Z, Origin.Z + Extent.Z));
+	FCollisionQueryParams Params(NAME_None, false, this);
+	Params.AddIgnoredActor(Target);
+	FHitResult Hit;
+	if (!World->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params))
+	{
+		return true;
+	}
+	// Probe while the armory table is unexplained: name the blocker once per
+	// target, so a refused press can be told apart from a target that never
+	// entered the look. Remove once the press is settled.
+	static TSet<FName> LoggedBlocked;
+	const FName Key = Target->GetFName();
+	if (!LoggedBlocked.Contains(Key))
+	{
+		LoggedBlocked.Add(Key);
+		UE_LOG(LogTemp, Log, TEXT("opening_los: %s blocked by %s at %.0f cm"),
+			*Target->GetActorNameOrLabel(), *GetNameSafe(Hit.GetActor()), Hit.Distance);
+	}
+	return false;
+}
+
 bool AHomeWorldCharacter::OpeningLookDistSq(const AActor* Target, float& OutDistSq) const
 {
 	const APlayerController* PC = Cast<APlayerController>(GetController());
 	if (!PC || !Target || !FollowCamera)
+	{
+		return false;
+	}
+	FVector LookForward = GetControlRotation().Vector();
+	LookForward.Z = 0.f;
+	if (!LookForward.Normalize())
+	{
+		LookForward = GetActorForwardVector();
+		LookForward.Z = 0.f;
+		LookForward.Normalize();
+	}
+	FVector BodyToTarget = Target->GetActorLocation() - GetActorLocation();
+	BodyToTarget.Z = 0.f;
+	if (LookForward.IsNearlyZero() || !IsInFrontOfBody(LookForward, BodyToTarget))
 	{
 		return false;
 	}
@@ -2951,8 +3140,13 @@ bool AHomeWorldCharacter::OpeningLookDistSq(const AActor* Target, float& OutDist
 	}
 	const float NdcX = (Screen.X / static_cast<float>(SizeX)) * 2.f - 1.f;
 	const float NdcY = (Screen.Y / static_cast<float>(SizeY)) * 2.f - 1.f;
+	const float LookY = GetOpeningLookCenterNdcY();
 	const float Dx = NdcX;
-	const float Dy = NdcY + OpeningViewUpNdc;
+	const float Dy = NdcY - LookY;
+	if (!IsOpeningLookInside(Dx, NdcY, LookY))
+	{
+		return false;
+	}
 	OutDistSq = Dx * Dx + Dy * Dy;
 	return true;
 }
@@ -3989,7 +4183,7 @@ void AHomeWorldCharacter::ApplySpawnControlPitch()
 {
 	if (AController* Controlled = GetController())
 	{
-		Controlled->SetControlRotation(FRotator(-12.f, GetActorRotation().Yaw, 0.f));
+		Controlled->SetControlRotation(FRotator(OpeningLookRestPitch, GetActorRotation().Yaw, 0.f));
 	}
 }
 
@@ -4148,7 +4342,7 @@ void AHomeWorldCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	}
 	if (InteractAction && InteractAbilityClass)
 	{
-		EnhancedInput->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AHomeWorldCharacter::OnInteractTriggered);
+		EnhancedInput->BindAction(InteractAction, ETriggerEvent::Started, this, &AHomeWorldCharacter::OnInteractTriggered);
 	}
 	if (PlaceAction && PlaceAbilityClass)
 	{
@@ -4276,6 +4470,10 @@ void AHomeWorldCharacter::OnInteractTriggered(const FInputActionValue& Value)
 	}
 	bSizeTestInteractHandled = false;
 	const bool bActivated = AbilitySystemComponent->TryActivateAbilityByClass(InteractAbilityClass);
+	if (bTutorial && !bSizeTestInteractHandled)
+	{
+		UE_LOG(LogTemp, Log, TEXT("opening_interact: nothing in the look"));
+	}
 	if (!bTutorial)
 	{
 		UE_LOG(LogTemp, Log, TEXT("HomeWorld: Interact ability %s"), bActivated ? TEXT("activated") : TEXT("failed to activate"));
@@ -7496,11 +7694,11 @@ bool AHomeWorldCharacter::ActorHasInteractableComponent(const AActor* Actor)
 	{
 		return true;
 	}
-	// T0 beat props. These are ordinary greybox actors - a collider and a tag - so nothing
-	// above recognises them, and without this the seven beat verbs are unreachable in any
-	// world no matter what is placed in it. See HomeWorldT0BeatNodes at the top of this file
-	// for why this list and the verbs' lists are now the same list.
-	if (HomeWorldT0BeatNodes::ActorCarriesAnyBeatNodeTag(Actor))
+	// T0 beat props. These are ordinary greybox actors - a collider and a tag - so the
+	// spec table is the only place their attributes live. The gate asks it instead of
+	// carrying a list of its own.
+	HomeWorldInteract::FSpec Spec;
+	if (HomeWorldInteract::TrySpecFor(Actor, Spec))
 	{
 		return true;
 	}
@@ -7519,54 +7717,41 @@ bool AHomeWorldCharacter::FindInteractTargetInCone(FHitResult& OutHit) const
 	const FVector Start = GetActorLocation() + FVector(0.0f, 0.0f, HalfHeight);
 	const FVector Forward = GetControlRotation().Vector();
 
-	static const FName InteractTags[] = {
-		FName(TEXT("ResourcePile")),
-		FName(TEXT("StoreProp")),
-		FName(TEXT("SpiritHeal")),
-		FName(TEXT("SpiritWound")),
-		FName(TEXT("NurtureTarget")),
-		FName(TEXT("BeastPad")),
-		FName(TEXT("CraftStation")),
-		FName(TEXT("MinigameStub")),
-		FName(TEXT("BossSealStub")),
-		FName(TEXT("NPC_PARTNER")),
-		FName(TEXT("NODE_GARDEN")),
-		FName(TEXT("NODE_KETTLE")),
-	};
-
 	AActor* BestActor = nullptr;
 	float BestScore = -1.f;
 
-	for (const FName& Tag : InteractTags)
+	// One search list: every actor the admission accepts, whatever its tag or component.
+	// A newly placed prop with a beat tag is a candidate without editing this function.
+	for (TActorIterator<AActor> It(World); It; ++It)
 	{
-		TArray<AActor*> TaggedActors;
-		UGameplayStatics::GetAllActorsWithTag(World, Tag, TaggedActors);
-		for (AActor* Candidate : TaggedActors)
+		AActor* Candidate = *It;
+		if (!ActorHasInteractableComponent(Candidate))
 		{
-			if (!ActorHasInteractableComponent(Candidate))
-			{
-				continue;
-			}
+			continue;
+		}
 
-			const FVector ToTarget = Candidate->GetActorLocation() - Start;
-			const float Dist = ToTarget.Size();
-			if (Dist < KINDA_SMALL_NUMBER || Dist > InteractTraceLengthCm)
-			{
-				continue;
-			}
+		const FVector ToTarget = Candidate->GetActorLocation() - Start;
+		const float Dist = ToTarget.Size();
+		if (Dist < KINDA_SMALL_NUMBER || Dist > InteractTraceLengthCm)
+		{
+			continue;
+		}
 
-			const float Dot = FVector::DotProduct(Forward, ToTarget / Dist);
-			if (Dot < 0.35f)
-			{
-				continue;
-			}
+		const float Dot = FVector::DotProduct(Forward, ToTarget / Dist);
+		if (Dot < 0.35f)
+		{
+			continue;
+		}
+		if (!HasOpeningLineOfSight(Candidate))
+		{
+			continue;
+		}
 
-			const float Score = Dot / Dist;
-			if (Score > BestScore)
-			{
-				BestScore = Score;
-				BestActor = Candidate;
-			}
+		const float Score = Dot / Dist;
+		if (Score > BestScore)
+		{
+			BestScore = Score;
+			BestActor = Candidate;
 		}
 	}
 
