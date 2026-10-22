@@ -53,6 +53,11 @@ namespace HomeWorldTestWorld
 
 		~FScopedWorld()
 		{
+			// SetPhase writes a process-global override. Leave it on Day so the next world is not night.
+			if (TimeOfDay)
+			{
+				TimeOfDay->RestoreDefaultPhaseOverride();
+			}
 			if (World)
 			{
 				World->DestroyWorld(false);
