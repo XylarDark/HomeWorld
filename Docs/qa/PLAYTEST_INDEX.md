@@ -27,6 +27,7 @@ One entry point. Play one pass, fill that pass's result, stop.
 | Glider | Host test. The October 26 play has not started. | [`TUTORIAL_PLAYTEST_QUEUE.md`](TUTORIAL_PLAYTEST_QUEUE.md#the-glider) |
 | Delivery | Host test. The November 2 play has not started. | [`TUTORIAL_PLAYTEST_QUEUE.md`](TUTORIAL_PLAYTEST_QUEUE.md#delivery) |
 | Day camp | Host test. The clearing is not placed. | [`TUTORIAL_PLAYTEST_QUEUE.md`](TUTORIAL_PLAYTEST_QUEUE.md#day-camp) |
+| Dawn glide, night glide, stealth, ease, shrine | Fast-forward stops. Not human passes. The meadow, the clearing, the guards, and the shrine are not saved into the map. | [`TUTORIAL_PLAYTEST_QUEUE.md`](TUTORIAL_PLAYTEST_QUEUE.md#dawn-glide) |
 
 ## Do not
 

@@ -13,7 +13,7 @@ The sequence is the Opening tutorial in [`Docs/VISION_BOARD.md`](../VISION_BOARD
 - The approach hides the cottage with a copse of pines and large stones. Hills and valleys are later. [`Docs/handoffs/research/TERRAIN_HEIGHT_LATER.md`](../handoffs/research/TERRAIN_HEIGHT_LATER.md).
 - The walk stays 450 cm/s until a replay says that single speed is wrong.
 - The played return stands. The partner walks inside and waits by the kettle. The child goes to their room. 2026-10-18.
-- Sleep in the bed grants spirit form. Night does not. The bed returns you to the body. Dawn does not.
+- Sleep in the bed grants spirit form. Night does not. The bed returns you to the body. Dawn does not. The Night sentence is `hw.Playtest.FastForward sleep`, then E at the bed: into spirit or not, stayed on the island, and whether the sky stayed day. 2026-10-21.
 - The day glide is a body glide toward camp smoke, with no pickup. The smoke is the existing day-descent sign. No smoke actor until the camp clearing is placed. 2026-10-21.
 - The dawn mist is not an actor and not a new state. It stays a sky read for the later dress row. 2026-10-21.
 - A dawn-glide stop, when added, stops before the launch at a marker spawned for that run only. It does not add a meadow. 2026-10-21.
@@ -23,12 +23,13 @@ The sequence is the Opening tutorial in [`Docs/VISION_BOARD.md`](../VISION_BOARD
 - The first glider spends wood, silk, and metal already in the armory chest at dawn. This night does not gather them. Later crafts spend what a wisp delivers from the warehouse. 2026-10-21.
 - That spend is one wood, one silk, and one metal. Silk and metal stay out of the six-slot carry. An empty chest leaves the armory table's open reply. A press with that stock present crafts the glider, and the descent refuses until then. 2026-10-21.
 - A healed wisp is set with E on a wood, herb, or stone node. The node fills to 10 and that pile is credited to the matching chest. The player does not carry it. A second fill is refused. The wisp returns to the legs. Silk, fiber, and metal nodes are refused. 2026-10-21.
-- The dawn meadow's site waits until the Night pass releases `L_SizeTest`. No landmark is named, and nothing is placed for it. 2026-10-21.
+- The dawn meadow's site is chosen at the desk on `L_SizeTest` after the Night pass. No coordinate is written. 2026-10-21.
 - One guard's sightline is the existing spirit-lit box: 180 by 180 by 120 cm. A missing guard does not count as an avoid. 2026-10-21.
-- Herb at the hot springs revives a damaged wisp so it follows at the legs and can take a task or a delivery route. The claimed companion stays on the shoulder. One revive spends one opening herb chunk. The click heart on that wisp, drawn when it is collected, sets the heal: 20 seconds when the heart is completed in 3 seconds or less, plus 10 seconds for each second over 3. A partial second counts, so 3.1 and 4.0 are both 30 seconds, and 4.1 is 40. The heart may run past 3 seconds. 2026-10-21.
+- Herb at the hot springs revives a damaged wisp so it follows at the legs and can take a task or a delivery route. The claimed companion stays on the shoulder. One revive spends one opening herb chunk. The click heart on that wisp, drawn when it is collected, sets the heal: 20 seconds when the heart is completed in 3 seconds or less, plus 10 seconds for each second over 3. A partial second counts, so 3.1 and 4.0 are both 30 seconds, and 4.1 is 40. The heart may run past 3 seconds. Lead confirmed this for the binary on 2026-10-21. The Night table stays empty until the bed press.
 - This tutorial night finds damaged wisps only at the copse, the pond, and the hot springs. Wider sites stay later. 2026-10-21.
 - E at the hot springs starts the heal from 600 cm. 2026-10-21.
 - Healed wisps keep the built arc at the legs: the first two sit 34 cm to either side and 20 cm behind, the third sits 52 cm behind in the center, and a fourth reuses a slot. 2026-10-21.
+- A finished pad ladder sleeps that guard. Wait calls the glide home and does not sleep the guard. A reach is spirit within 280 cm of a waking guard. One E on the shrine, after the three sleeps, frees a separate captive and walks the partner. Moss is not a new carry id. `hw.Playtest.FastForward shrine` runs the ladders and stops before that E. Round 17. 2026-10-21.
 - The warehouse is not on the tutorial night. No warehouse building, and no new spoken line. The healed wisps at your legs are the hint. The planetoid teaches setting them on herbs, trees, and the other nodes. Spawned nodes have quality, and the player hunts the best. Quality increases time, durability before breaking, and lowers crafting time. Time means the crafted effect lasts longer. Durability is uses before it breaks. Crafting time is how long the station takes. Node modifiers are tagged mods. The wisp and the delivery route weight which mods can roll. Paradox corrupts. The rune stays visible. 2026-10-21. The tags are effect duration, durability, and crafting time. Other tags wait until you name one. Wrath / Grace is the first axis. Grace weights effect duration. Wrath weights durability. This axis does not weight crafting time. The second axis is Greed / Generosity. Generosity lowers crafting time. Greed snatches the craft when the stroke is late or wrong. This axis does not weight effect duration or durability. The other five axes wait until a new tag is named. 2026-10-21.
 
 ## Rounds
@@ -106,7 +107,7 @@ Picked 2026-10-21. Herb at the hot springs revives a damaged wisp. It then follo
 
 #### 2026-10-21 — heal time
 
-Picked 2026-10-21. The click heart on a damaged wisp, drawn when that wisp is collected, sets that wisp's heal. Completing the heart in 3 seconds or less sets 20 seconds. Each second over 3 seconds adds 10 seconds. A partial second counts: 3.1 and 4.0 are both one second over, so the heal is 30 seconds, and 4.1 is 40. The heart may run past 3 seconds. One opening herb chunk is still spent when the heal starts at the hot springs. The build still uses a flat 20 seconds and still ends this heart at 3 seconds.
+Picked 2026-10-21. The click heart on a damaged wisp, drawn when that wisp is collected, sets that wisp's heal. Completing the heart in 3 seconds or less sets 20 seconds. Each second over 3 seconds adds 10 seconds. A partial second counts: 3.1 and 4.0 are both one second over, so the heal is 30 seconds, and 4.1 is 40. The heart may run past 3 seconds. One opening herb chunk is still spent when the heal starts at the hot springs. Lead confirmed this for the binary on 2026-10-21. The Night table stays empty until the bed press.
 
 #### 2026-10-21 — hot-spring range
 
@@ -155,3 +156,27 @@ Picked 2026-10-21. The day glide keeps the existing smoke sign. No smoke actor u
 ### Round 13 — The dawn-glide stop
 
 Picked 2026-10-21. The stop is before the launch, at a marker spawned for that run only. No meadow is added.
+
+### Round 14 — The Night sentence
+
+Picked 2026-10-21. `hw.Playtest.FastForward sleep`, then E at the bed. The sentence says whether that press granted spirit, whether the player stayed on the island, and whether the sky stayed day. The table stays empty until that play.
+
+### Round 15 — The heal in the binary
+
+Picked 2026-10-21. The binary uses the heal lock: 20 seconds at 3 seconds or under, plus 10 seconds per second over. A partial second counts. The heart may run past 3 seconds.
+
+### Round 16 — The meadow site
+
+Picked 2026-10-21. The site is chosen at the desk on `L_SizeTest` after the Night pass. No coordinate is written.
+
+### Round 17 — The shrine unlocks
+
+Picked 2026-10-21. 1A, then 2A 3A 4A 5A 6A 7A. The moss addition was not taken: a new carry id conflicts with the six-slot set, so the sleep spends nothing.
+
+- A matched commit that finishes that guard's pad calls `TryEaseCampActor` for that guard. Wait does not. A wrong step does not.
+- Wait calls the same glide home a late paradox already calls. It does not mark the guard asleep.
+- A reach is spirit form, within 280 cm of that `NODE_GUARD`, while that guard is still awake. The 180 by 180 by 120 cm light box stays the sightline.
+- Three pads, one on each guard. Finishing that pad's ladder is the one sleep.
+- One E on the shrine, after the three sleeps, calls the free and then `CompleteShrineReturn`. A missing guard still refuses the free.
+- The captive is a separate `NODE_CAPTIVE` actor. Freeing it uses the ready-to-return flag. The kettle partner is not moved.
+- `hw.Playtest.FastForward shrine` runs the three ladders, spawns the captive and a shrine for that run, and stops before the E. Nothing is saved into `L_SizeTest`.

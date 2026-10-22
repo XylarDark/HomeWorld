@@ -14,10 +14,8 @@
  *
  * INVARIANTS, NOT TUNING
  *
- * The 20 second heal, the 600 cm spring range, and the one-herb cost are first-pass
- * placeholders in HomeWorldCharacter.cpp. Luke tunes them after the replay. A test
- * that pins those numbers would turn a pending playtest decision into a regression.
- * These cases pin only the shape:
+ * The 20 second fast heart, the 600 cm spring range, and the one-herb cost are locked.
+ * `HomeWorld.Opening.HealTime` pins the heart formula. These cases pin only the shape:
  *
  *   - a deposit needs a carried wisp and an herb;
  *   - a deposit spends one carried wisp and at least one herb;

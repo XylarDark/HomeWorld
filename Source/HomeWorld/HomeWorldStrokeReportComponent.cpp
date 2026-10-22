@@ -164,6 +164,16 @@ EHomeWorldStrokeReport UHomeWorldStrokeReportComponent::ReportStroke(
 	if (Commit == EHomeWorldEaseCommit::Wait)
 	{
 		LastReport = EHomeWorldStrokeReport::None;
+		UHomeWorldFallbackGlideComponent* Glide = GlideOverride;
+		if (!Glide && GetOwner())
+		{
+			Glide = GetOwner()->FindComponentByClass<UHomeWorldFallbackGlideComponent>();
+		}
+		if (Glide)
+		{
+			bGlideHomeInvoked = true;
+			Glide->StartGlideHome(false);
+		}
 		return LastReport;
 	}
 

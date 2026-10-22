@@ -7,6 +7,8 @@
 #include "HomeWorldWispPlacement.h"
 #include "HomeWorldOpeningReveal.h"
 #include "HomeWorldOpeningDayCamp.h"
+#include "HomeWorldEasePad.h"
+#include "HomeWorldSpiritLitVolume.h"
 #include "HomeWorldRuneShapeComponent.h"
 #include "GameFramework/Character.h"
 #include "HomeWorldGlideMovementComponent.h"
@@ -953,9 +955,44 @@ bool AHomeWorldCharacter::TryOpeningNightSetInFront()
 
 namespace
 {
-	/** First pass. Luke tunes the heal time and the herb cost after the playtest. */
+	/** Fast heart, and the fallback when a seeded wisp has no recorded heart. */
 	constexpr float OpeningWispHealSeconds = 20.f;
 	constexpr float OpeningHotSpringRangeCm = 600.f;
+}
+
+float AHomeWorldCharacter::OpeningHealSecondsForHeart(float HeartSeconds)
+{
+	constexpr float FastSeconds = 3.f;
+	constexpr float ExtraPerSecond = 10.f;
+	if (HeartSeconds <= FastSeconds)
+	{
+		return OpeningWispHealSeconds;
+	}
+	const int32 SecondsOver = FMath::CeilToInt(HeartSeconds - FastSeconds);
+	return OpeningWispHealSeconds + ExtraPerSecond * static_cast<float>(SecondsOver);
+}
+
+void AHomeWorldCharacter::DebugQueueOpeningWispHeart(float HeartSeconds)
+{
+	OpeningWispHealDurations.Add(OpeningHealSecondsForHeart(HeartSeconds));
+}
+
+bool AHomeWorldCharacter::DebugBeginOpeningWispHeart(AActor* Wisp)
+{
+	bOpeningWispCollect = true;
+	StartOpeningHerbRune(Wisp);
+	if (!bOpeningRuneActive)
+	{
+		bOpeningWispCollect = false;
+		return false;
+	}
+	OpeningWispHeartElapsed = 0.f;
+	return true;
+}
+
+void AHomeWorldCharacter::DebugAdvanceOpeningWispHeart(float DeltaSeconds)
+{
+	UpdateOpeningHerbRune(DeltaSeconds);
 }
 
 bool AHomeWorldCharacter::TryOpeningHotSpringHealInFront()
@@ -991,9 +1028,16 @@ bool AHomeWorldCharacter::TryOpeningHotSpringHealInFront()
 	}
 	--OpeningWispsCarried;
 	--OpeningHerbTenths;
-	OpeningWispHealTimers.Add(OpeningWispHealSeconds);
-	UE_LOG(LogTemp, Log, TEXT("opening_night: wisp in the hot springs with one herb (carried %d, healing %d, herbs %d)"),
-		OpeningWispsCarried, OpeningWispHealTimers.Num(), OpeningHerbTenths);
+	const float HealSeconds = OpeningWispHealDurations.Num() > 0
+		? OpeningWispHealDurations[0]
+		: OpeningWispHealSeconds;
+	if (OpeningWispHealDurations.Num() > 0)
+	{
+		OpeningWispHealDurations.RemoveAt(0);
+	}
+	OpeningWispHealTimers.Add(HealSeconds);
+	UE_LOG(LogTemp, Log, TEXT("opening_night: wisp in the hot springs with one herb (carried %d, healing %d, herbs %d, heal %.0fs)"),
+		OpeningWispsCarried, OpeningWispHealTimers.Num(), OpeningHerbTenths, HealSeconds);
 	return true;
 }
 
@@ -1037,6 +1081,11 @@ namespace
 	constexpr int32 PlaytestBeatGlider = 12;
 	constexpr int32 PlaytestBeatDelivery = 13;
 	constexpr int32 PlaytestBeatDayCamp = 14;
+	constexpr int32 PlaytestBeatDawnGlide = 15;
+	constexpr int32 PlaytestBeatNightGlide = 16;
+	constexpr int32 PlaytestBeatStealth = 17;
+	constexpr int32 PlaytestBeatEase = 18;
+	constexpr int32 PlaytestBeatShrine = 19;
 
 	/** The one runner step the player takes himself. 0 = every step runs (night and the loop). */
 	int32 PlaytestSkipStep(int32 Beat)
@@ -1073,6 +1122,11 @@ namespace
 		case PlaytestBeatGlider: return TEXT("glider");
 		case PlaytestBeatDelivery: return TEXT("delivery");
 		case PlaytestBeatDayCamp: return TEXT("daycamp");
+		case PlaytestBeatDawnGlide: return TEXT("dawnglide");
+		case PlaytestBeatNightGlide: return TEXT("nightglide");
+		case PlaytestBeatStealth: return TEXT("stealth");
+		case PlaytestBeatEase: return TEXT("ease");
+		case PlaytestBeatShrine: return TEXT("shrine");
 		default: return TEXT("night");
 		}
 	}
@@ -1090,6 +1144,7 @@ namespace
 		// Order matters here: "herb collection" carries both herb and collect.
 		if (Key.Contains(TEXT("heal")) || Key.Contains(TEXT("spring"))) return PlaytestBeatHeal;
 		if (Key.Contains(TEXT("herb")) || Key.Contains(TEXT("garden"))) return PlaytestBeatHerbs;
+		if (Key.Contains(TEXT("stealth"))) return PlaytestBeatStealth;
 		if (Key.Contains(TEXT("spirit"))) return PlaytestBeatSpirit;
 		if (Key.Contains(TEXT("backpack")) || Key.Contains(TEXT("partner")) || Key.Contains(TEXT("gift"))) return PlaytestBeatBackpack;
 		if (Key.Contains(TEXT("kettle")) || Key.Contains(TEXT("tea"))) return PlaytestBeatKettle;
@@ -1098,10 +1153,14 @@ namespace
 		if (Key.Contains(TEXT("fish")) || Key.Contains(TEXT("pond"))) return PlaytestBeatFish;
 		if (Key.Contains(TEXT("sleep")) || Key.Contains(TEXT("bed"))) return PlaytestBeatSleep;
 		if (Key.Contains(TEXT("wisp")) || Key.Contains(TEXT("collect"))) return PlaytestBeatCollect;
+		if (Key.Contains(TEXT("nightglide"))) return PlaytestBeatNightGlide;
 		if (Key.Contains(TEXT("night"))) return PlaytestBeatNight;
 		if (Key.Contains(TEXT("glider"))) return PlaytestBeatGlider;
 		if (Key.Contains(TEXT("delivery"))) return PlaytestBeatDelivery;
 		if (Key.Contains(TEXT("daycamp"))) return PlaytestBeatDayCamp;
+		if (Key.Contains(TEXT("dawnglide"))) return PlaytestBeatDawnGlide;
+		if (Key.Contains(TEXT("shrine"))) return PlaytestBeatShrine;
+		if (Key.Contains(TEXT("ease"))) return PlaytestBeatEase;
 		return 0;
 	}
 
@@ -1122,7 +1181,7 @@ void AHomeWorldCharacter::DebugFastForwardOpening(const FString& Beat)
 {
 	if (Beat.Equals(TEXT("list"), ESearchCase::IgnoreCase))
 	{
-		UE_LOG(LogTemp, Log, TEXT("playtest_ff: beats: spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect, heal, glider, delivery, daycamp"));
+		UE_LOG(LogTemp, Log, TEXT("playtest_ff: beats: spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect, heal, glider, delivery, daycamp, dawnglide, nightglide, stealth, ease, shrine"));
 		return;
 	}
 	if (DebugFastForwardStep > 0)
@@ -1133,7 +1192,7 @@ void AHomeWorldCharacter::DebugFastForwardOpening(const FString& Beat)
 	const int32 Stop = PlaytestBeatFromText(Beat);
 	if (Stop == 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("playtest_ff: beat '%s' unknown - spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect, heal, glider, delivery, daycamp"), *Beat);
+		UE_LOG(LogTemp, Warning, TEXT("playtest_ff: beat '%s' unknown - spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect, heal, glider, delivery, daycamp, dawnglide, nightglide, stealth, ease, shrine"), *Beat);
 		return;
 	}
 	if (bOpeningNightSpirit)
@@ -1431,7 +1490,9 @@ void AHomeWorldCharacter::TickDebugFastForward(float DeltaTime)
 		}
 		UE_LOG(LogTemp, Log, TEXT("playtest_ff: 9 night ready at the bed - %s"), *GetOpeningTrackerText());
 		if (DebugFastForwardStop == PlaytestBeatGlider || DebugFastForwardStop == PlaytestBeatDelivery
-			|| DebugFastForwardStop == PlaytestBeatDayCamp)
+			|| DebugFastForwardStop == PlaytestBeatDayCamp || DebugFastForwardStop == PlaytestBeatDawnGlide
+			|| DebugFastForwardStop == PlaytestBeatNightGlide || DebugFastForwardStop == PlaytestBeatStealth
+			|| DebugFastForwardStop == PlaytestBeatEase || DebugFastForwardStop == PlaytestBeatShrine)
 		{
 			Next(10);
 			break;
@@ -1455,7 +1516,12 @@ void AHomeWorldCharacter::TickDebugFastForward(float DeltaTime)
 			Next(12);
 			break;
 		}
-		Next(11);
+		if (DebugFastForwardStop == PlaytestBeatDelivery)
+		{
+			Next(11);
+			break;
+		}
+		Next(13);
 		break;
 	}
 	case 11:
@@ -1473,6 +1539,97 @@ void AHomeWorldCharacter::TickDebugFastForward(float DeltaTime)
 		CampParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		World->SpawnActor<AHomeWorldOpeningDayCamp>(
 			GetActorLocation() + FVector(320.f, 0.f, 0.f), FRotator::ZeroRotator, CampParams);
+		ReadyForOpeningPlaytest();
+		Next(0);
+		break;
+	}
+	case 13:
+	{
+		TryCraftOpeningGlider();
+		FActorSpawnParameters MarkerParams;
+		MarkerParams.Name = FName(TEXT("GP_GlideStart"));
+		MarkerParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		if (AActor* Marker = World->SpawnActor<AActor>(GetActorLocation(), FRotator::ZeroRotator, MarkerParams))
+		{
+			Marker->Tags.Add(FName(TEXT("GlideStart")));
+		}
+		if (DebugFastForwardStop == PlaytestBeatDawnGlide)
+		{
+			ReadyForOpeningPlaytest();
+			Next(0);
+			return;
+		}
+		Next(14);
+		break;
+	}
+	case 14:
+	{
+		if (!BeginOpeningNight())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("playtest_ff: 14 night glide failed"));
+			Next(0);
+			return;
+		}
+		if (DebugFastForwardStop == PlaytestBeatNightGlide)
+		{
+			ReadyForOpeningPlaytest();
+			Next(0);
+			return;
+		}
+		Next(15);
+		break;
+	}
+	case 15:
+	{
+		for (int32 Index = 0; Index < 3; ++Index)
+		{
+			const FVector At = GetActorLocation() + FVector(400.f + Index * 160.f, 0.f, 0.f);
+			FActorSpawnParameters GuardParams;
+			GuardParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			if (AHomeWorldCampActor* Guard = World->SpawnActor<AHomeWorldCampActor>(At, FRotator::ZeroRotator, GuardParams))
+			{
+				Guard->CampRole = EHomeWorldCampRole::Guard;
+				Guard->Tags.Remove(FName(TEXT("NODE_SLEEPER")));
+				Guard->RefreshCampIdentity();
+			}
+			FActorSpawnParameters LightParams;
+			LightParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			World->SpawnActor<AHomeWorldSpiritLitVolume>(At, FRotator::ZeroRotator, LightParams);
+		}
+		if (DebugFastForwardStop == PlaytestBeatStealth)
+		{
+			ReadyForOpeningPlaytest();
+			Next(0);
+			return;
+		}
+		Next(16);
+		break;
+	}
+	case 16:
+	{
+		for (int32 Index = 0; Index < 3; ++Index)
+		{
+			const FVector At = GetActorLocation() + FVector(400.f + Index * 160.f, 80.f, 0.f);
+			FActorSpawnParameters PadParams;
+			PadParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			if (AHomeWorldEasePad* Pad = World->SpawnActor<AHomeWorldEasePad>(At, FRotator::ZeroRotator, PadParams))
+			{
+				Pad->Tags.Add(FName(TEXT("NODE_OPENING_EASE")));
+				Pad->BindGuard(Index);
+			}
+		}
+		if (DebugFastForwardStop == PlaytestBeatEase)
+		{
+			ReadyForOpeningPlaytest();
+			Next(0);
+			return;
+		}
+		Next(17);
+		break;
+	}
+	case 17:
+	{
+		RunOpeningShrineStop();
 		ReadyForOpeningPlaytest();
 		Next(0);
 		break;
@@ -1579,6 +1736,31 @@ void AHomeWorldCharacter::ReadyForOpeningPlaytest()
 		Target = FindOpeningTaggedActor(World, TEXT("NODE_OPENING_DAY_CAMP"));
 		Distance = 320.f;
 		Note = TEXT("walk into the clearing");
+		break;
+	case PlaytestBeatDawnGlide:
+		Target = FindOpeningTaggedActor(World, TEXT("GlideStart"));
+		Distance = 180.f;
+		Note = TEXT("the launch is yours");
+		break;
+	case PlaytestBeatNightGlide:
+		Target = FindOpeningTaggedActor(World, TEXT("GlideStart"));
+		Distance = 180.f;
+		Note = TEXT("travel only, the launch is yours");
+		break;
+	case PlaytestBeatStealth:
+		Target = FindOpeningTaggedActor(World, TEXT("NODE_GUARD"));
+		Distance = 260.f;
+		Note = TEXT("reach the guard");
+		break;
+	case PlaytestBeatEase:
+		Target = FindOpeningTaggedActor(World, TEXT("NODE_OPENING_EASE"));
+		Distance = 180.f;
+		Note = TEXT("the wind-up is yours");
+		break;
+	case PlaytestBeatShrine:
+		Target = FindOpeningTaggedActor(World, TEXT("NODE_OPENING_SHRINE"));
+		Distance = 180.f;
+		Note = TEXT("E at the shrine");
 		break;
 	default:
 		break;
@@ -1809,7 +1991,8 @@ FString AHomeWorldCharacter::GetPlaytestStateJson() const
 		TEXT("\"fish_caught\":%s,\"night_spirit\":%s,")
 		TEXT("\"wisps_collected\":%d,\"wisps_carried\":%d,\"wisps_healed\":%d,")
 		TEXT("\"dawn_wood\":%d,\"dawn_silk\":%d,\"dawn_metal\":%d,")
-		TEXT("\"glider_crafted\":%s,\"delivery_wood\":%d,\"partner_away\":%s,\"day_camp_eject\":%s}"),
+		TEXT("\"glider_crafted\":%s,\"delivery_wood\":%d,\"partner_away\":%s,\"day_camp_eject\":%s,")
+		TEXT("\"descent_active\":%s,\"cloud_carried\":%d,\"guards_calm\":%d,\"partner_walking\":%s}"),
 		*PlaytestReadyFor,
 		PlaytestReadyDistanceCm,
 		DebugFastForwardStep,
@@ -1833,7 +2016,11 @@ FString AHomeWorldCharacter::GetPlaytestStateJson() const
 		IsOpeningGliderCrafted() ? TEXT("true") : TEXT("false"),
 		GetOpeningDeliveryCountForTest(HomeWorldOpeningMaterials::Wood),
 		GetPartnerPlace() == EHomeWorldFamilyPlace::Away ? TEXT("true") : TEXT("false"),
-		IsDayCampEjectTriggered() ? TEXT("true") : TEXT("false"));
+		IsDayCampEjectTriggered() ? TEXT("true") : TEXT("false"),
+		IsCloudDescentActive() ? TEXT("true") : TEXT("false"),
+		GetCarriedCloudWisps(),
+		SpiritStealthComponent ? SpiritStealthComponent->GetCalmedActorCount() : 0,
+		IsPartnerWalkingHome() ? TEXT("true") : TEXT("false"));
 }
 
 void AHomeWorldCharacter::ApplyOpeningWalkSpeed()
@@ -2327,6 +2514,224 @@ bool AHomeWorldCharacter::TryOpeningDeliveryInFront()
 		return true;
 	}
 	return TryDeliverOpeningNode(Aimed);
+}
+
+bool AHomeWorldCharacter::TryCommitOpeningGuardPad(AHomeWorldEasePad* Pad, EHomeWorldStrokeStep Played)
+{
+	if (!Pad || !Pad->NoteMatch(Played))
+	{
+		return false;
+	}
+	if (Pad->IsLadderComplete())
+	{
+		ApplyOpeningGuardSleep(Pad);
+	}
+	return true;
+}
+
+void AHomeWorldCharacter::ApplyOpeningGuardSleep(AHomeWorldEasePad* Pad)
+{
+	if (!Pad || !Pad->IsBoundToGuard() || Pad->HasSleptItsGuard() || !Pad->IsLadderComplete())
+	{
+		return;
+	}
+	UHomeWorldSpiritStealthComponent* Stealth = SpiritStealthComponent;
+	if (!Stealth)
+	{
+		Stealth = FindComponentByClass<UHomeWorldSpiritStealthComponent>();
+	}
+	if (!Stealth)
+	{
+		return;
+	}
+	if (Stealth->TryEaseCampActor(EHomeWorldCampRole::Guard, Pad->GetGuardOrdinal()))
+	{
+		Pad->MarkGuardSlept();
+		RecordGuardEased(Pad->GetGuardOrdinal());
+	}
+}
+
+bool AHomeWorldCharacter::TryWaitOpeningGuardPad(AHomeWorldEasePad* Pad)
+{
+	if (!Pad || !StrokeReport || Pad->GetOfferedStep() != EHomeWorldStrokeStep::Grace)
+	{
+		return false;
+	}
+	TArray<FHomeWorldStrokeSample> Stroke;
+	for (const FVector2D& Point : HomeWorldStroke::GraceShape())
+	{
+		FHomeWorldStrokeSample Sample;
+		Sample.Point = Point;
+		Sample.Time = 0.5f;
+		Stroke.Add(Sample);
+	}
+	const EHomeWorldStrokeReport Report = StrokeReport->ReportStroke(
+		Pad->GetOfferedStep(),
+		Stroke,
+		Pad->GetWindowMin(),
+		Pad->GetWindowMax(),
+		Pad->GetExtraPoint(),
+		nullptr,
+		FallbackGlideComponent,
+		false,
+		FVector::ZeroVector,
+		EHomeWorldEaseCommit::Wait,
+		false);
+	return Report == EHomeWorldStrokeReport::None && StrokeReport->WasGlideHomeInvoked();
+}
+
+bool AHomeWorldCharacter::TryReachOpeningGuard(AActor* Guard)
+{
+	if (!GetIsSpiritForm() || !Guard || !Guard->ActorHasTag(FName(TEXT("NODE_GUARD"))))
+	{
+		return false;
+	}
+	if (FVector::Dist2D(GetActorLocation(), Guard->GetActorLocation()) > InteractTraceLengthCm)
+	{
+		return false;
+	}
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+	int32 Ordinal = 0;
+	bool bFound = false;
+	for (TActorIterator<AActor> It(World); It; ++It)
+	{
+		if (*It == Guard)
+		{
+			bFound = true;
+			break;
+		}
+		if (It->ActorHasTag(FName(TEXT("NODE_GUARD"))))
+		{
+			++Ordinal;
+		}
+	}
+	if (!bFound)
+	{
+		return false;
+	}
+	UHomeWorldSpiritStealthComponent* Stealth = SpiritStealthComponent;
+	if (!Stealth)
+	{
+		Stealth = FindComponentByClass<UHomeWorldSpiritStealthComponent>();
+	}
+	bool bEased = false;
+	bool bAsleep = false;
+	if (Stealth && Stealth->GetCampActorState(EHomeWorldCampRole::Guard, Ordinal, bEased, bAsleep) && bAsleep)
+	{
+		return false;
+	}
+	return true;
+}
+
+bool AHomeWorldCharacter::TryOpeningShrineInFront()
+{
+	UWorld* World = GetWorld();
+	if (!World || !GetIsSpiritForm())
+	{
+		return false;
+	}
+	AActor* Shrine = nullptr;
+	float Best = InteractTraceLengthCm;
+	bool bCaptive = false;
+	for (TActorIterator<AActor> It(World); It; ++It)
+	{
+		if (It->ActorHasTag(FName(TEXT("NODE_CAPTIVE"))))
+		{
+			bCaptive = true;
+		}
+		if (!It->ActorHasTag(FName(TEXT("NODE_OPENING_SHRINE"))))
+		{
+			continue;
+		}
+		const float Dist = FVector::Dist2D(GetActorLocation(), It->GetActorLocation());
+		if (Dist <= Best)
+		{
+			Best = Dist;
+			Shrine = *It;
+		}
+	}
+	if (!Shrine || !bCaptive)
+	{
+		return false;
+	}
+	UHomeWorldSpiritStealthComponent* Stealth = SpiritStealthComponent;
+	if (!Stealth)
+	{
+		Stealth = FindComponentByClass<UHomeWorldSpiritStealthComponent>();
+	}
+	if (!Stealth || !Stealth->TryFreeCaptive())
+	{
+		return false;
+	}
+	NotifyPartnerReadyToReturn();
+	CompleteShrineReturn();
+	return IsPartnerWalkingHome();
+}
+
+void AHomeWorldCharacter::RunOpeningShrineStop()
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+	TArray<AHomeWorldEasePad*> Pads;
+	for (TActorIterator<AHomeWorldEasePad> It(World); It; ++It)
+	{
+		if (It->ActorHasTag(FName(TEXT("NODE_OPENING_EASE"))) && It->IsBoundToGuard())
+		{
+			Pads.Add(*It);
+		}
+	}
+	const EHomeWorldStrokeStep Steps[] = {
+		EHomeWorldStrokeStep::Grace,
+		EHomeWorldStrokeStep::Wrath,
+		EHomeWorldStrokeStep::Paradox,
+		EHomeWorldStrokeStep::ParadoxExtraPoint
+	};
+	for (AHomeWorldEasePad* Pad : Pads)
+	{
+		for (const EHomeWorldStrokeStep Step : Steps)
+		{
+			TryCommitOpeningGuardPad(Pad, Step);
+		}
+	}
+
+	bool bCaptive = false;
+	bool bShrine = false;
+	for (TActorIterator<AActor> It(World); It; ++It)
+	{
+		bCaptive = bCaptive || It->ActorHasTag(FName(TEXT("NODE_CAPTIVE")));
+		bShrine = bShrine || It->ActorHasTag(FName(TEXT("NODE_OPENING_SHRINE")));
+	}
+	const FVector Here = GetActorLocation();
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	if (!bCaptive)
+	{
+		const FVector At = Here + FVector(0.f, 240.f, 0.f);
+		if (AHomeWorldCampActor* Captive = World->SpawnActor<AHomeWorldCampActor>(At, FRotator::ZeroRotator, Params))
+		{
+			Captive->CampRole = EHomeWorldCampRole::Captive;
+			Captive->Tags.Remove(FName(TEXT("NODE_SLEEPER")));
+			Captive->Tags.Remove(FName(TEXT("NODE_GUARD")));
+			Captive->RefreshCampIdentity();
+			Captive->SetActorLocation(At);
+		}
+	}
+	if (!bShrine)
+	{
+		const FVector At = Here + FVector(0.f, 480.f, 0.f);
+		if (AActor* Shrine = World->SpawnActor<AActor>(At, FRotator::ZeroRotator, Params))
+		{
+			Shrine->Tags.Add(FName(TEXT("NODE_OPENING_SHRINE")));
+			Shrine->SetActorLocation(At);
+		}
+	}
 }
 
 void AHomeWorldCharacter::UpdateSizeTestInteractCursor()
@@ -3006,6 +3411,10 @@ void AHomeWorldCharacter::StartOpeningHerbRune(AActor* Bed)
 	OpeningRuneCursor = Shape->IsPointsMode() ? RuneOrigin : Shape->GetStartPoint();
 	bOpeningRuneActive = true;
 	OpeningPointTime = Shape->IsPointsMode() ? 3.f : -1.f;
+	if (bOpeningWispCollect)
+	{
+		OpeningWispHeartElapsed = 0.f;
+	}
 	if (SizeTestWisp)
 	{
 		SizeTestWisp->SetHiddenInGame(false);
@@ -3037,9 +3446,11 @@ void AHomeWorldCharacter::FinishOpeningHerbRune(int32 Tenths)
 			Collected->SetActorEnableCollision(false);
 			++OpeningWispsCollected;
 			++OpeningWispsCarried;
-			UE_LOG(LogTemp, Log, TEXT("opening_night: wisp collected %d/3, in the backpack (carried %d)"),
-				OpeningWispsCollected, OpeningWispsCarried);
+			OpeningWispHealDurations.Add(OpeningHealSecondsForHeart(OpeningWispHeartElapsed));
+			UE_LOG(LogTemp, Log, TEXT("opening_night: wisp collected %d/3, in the backpack (carried %d, heal %.0fs)"),
+				OpeningWispsCollected, OpeningWispsCarried, OpeningWispHealDurations.Last());
 		}
+		OpeningWispHeartElapsed = 0.f;
 		return;
 	}
 	bOpeningRuneActive = false;
@@ -3157,12 +3568,19 @@ void AHomeWorldCharacter::UpdateOpeningHerbRune(float DeltaTime)
 	}
 	if (OpeningRuneShape->IsPointsMode())
 	{
-		OpeningPointTime -= DeltaTime;
-		if (OpeningPointTime <= 0.f)
+		if (bOpeningWispCollect)
 		{
-			UE_LOG(LogTemp, Log, TEXT("opening_herb: point time ran out"));
-			FinishOpeningHerbRune(OpeningRuneShape->GetScore());
-			return;
+			OpeningWispHeartElapsed += DeltaTime;
+		}
+		else
+		{
+			OpeningPointTime -= DeltaTime;
+			if (OpeningPointTime <= 0.f)
+			{
+				UE_LOG(LogTemp, Log, TEXT("opening_herb: point time ran out"));
+				FinishOpeningHerbRune(OpeningRuneShape->GetScore());
+				return;
+			}
 		}
 		if (PC && PC->WasInputKeyJustPressed(EKeys::LeftMouseButton) && !OpeningRuneShape->TryClick())
 		{
@@ -3963,7 +4381,7 @@ EHomeWorldStrokeReport AHomeWorldCharacter::EndStrokeFromInput()
 	}
 	if (StrokePad)
 	{
-		StrokePad->NoteMatch(Step);
+		TryCommitOpeningGuardPad(StrokePad, Step);
 	}
 	ApplyMarkedHerbOnMatch();
 	if (ParadoxToy && (Step == EHomeWorldStrokeStep::Paradox || Step == EHomeWorldStrokeStep::ParadoxExtraPoint))

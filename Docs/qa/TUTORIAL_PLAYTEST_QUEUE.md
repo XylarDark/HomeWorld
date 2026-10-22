@@ -171,9 +171,9 @@ Press E at the bed. The coat hides and you are a wisp. The companion you claimed
 
 Quest log: sleeping ends the opening day, so the `Opening` chain and the `home_loop` chain are stored beside each other. The HUD draws only the most recently changed chain. Note which one you see; the storage test is `HomeWorld.HomeLoop.QuestChainBesideOpening`.
 
-Developer shortcut for this replay: in a fresh PIE run `hw.Playtest.FastForward`. No argument plays the day beats in order (spirit, both herb beds, backpack, kettle, station mix, dog, fish, bed) and leaves you at the bed at night with every earlier step really executed. `test herb collection` claims the spirit, then places you at the east bed to draw the heart. `list` prints the other stops: spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect, heal.
+Developer shortcut for this replay: in a fresh PIE run `hw.Playtest.FastForward`. No argument plays the day beats in order and leaves you at the bed at night with every earlier step really executed. The Night sentence uses `hw.Playtest.FastForward sleep`, then E at the bed. Lead confirmed that on 2026-10-21. The table stays empty until that play. `list` prints the stops.
 
-Developer check, not the pass: `.\Tools\RunTests.ps1 -Quest` runs all 11 stops in PIE and writes `Saved/quest_tests.json`. It loads `L_SizeTest`, ends PIE when done, and never fills the tables below. How to add a stop: [`QUEST_TESTS.md`](QUEST_TESTS.md).
+Developer check, not the pass: `.\Tools\RunTests.ps1 -Quest` runs the opening stops in PIE and writes `Saved/quest_tests.json`. It loads `L_SizeTest`, ends PIE when done, and never fills the tables below. How to add a stop: [`QUEST_TESTS.md`](QUEST_TESTS.md).
 
 **Replay 2026-10-21, found before the table was filled.** Luke: "i spawned as a spirit, did not sleep. clicked on the spirit at the copse, the heart game appeared out of screen, needs to appear next to the spirit, similar rules to the wisp interaction work, head level spawn next to the object always".
 
@@ -197,7 +197,7 @@ Developer check, not the pass: `.\Tools\RunTests.ps1 -Quest` runs all 11 stops i
 
 Night. Three damaged wisps stand at the copse, the pond, and the hot springs. Collect one with the click heart and it goes into the backpack. Carry it to the hot springs and press E: one herb chunk starts a 20 second heal. When the heal ends the wisp follows at the legs, not the shoulder. The claimed companion stays on the shoulder.
 
-One opening herb chunk per wisp is locked in [`Docs/context/OPENING_TUTORIAL_INTERVIEW.md`](../context/OPENING_TUTORIAL_INTERVIEW.md). The heal time is locked there too: the click heart on that wisp sets it. The build still uses a flat 20 seconds and still ends that heart at 3 seconds. The hot-spring heal starts from 600 cm, locked in that interview. The leg arc is locked there too.
+One opening herb chunk per wisp is locked in [`Docs/context/OPENING_TUTORIAL_INTERVIEW.md`](../context/OPENING_TUTORIAL_INTERVIEW.md). The heal time is locked there too, and the binary uses it: 20 seconds at 3 seconds or under, plus 10 seconds per second over. A partial second counts. The collect heart may run past 3 seconds. The table stays empty until the Night sentence. The hot-spring heal starts from 600 cm, locked in that interview. The leg arc is locked there too.
 
 | Field | Result |
 |---|---|
@@ -252,15 +252,63 @@ At dawn, before the descent. The first craft spends wood, silk, and metal alread
 
 ## Dawn glide
 
-**Blocked.** Last mechanic of the tutorial. The mist clears at this dawn. The descent waits on the glider craft above.
+**Stop built.** Waiting on the launch and the meadow. `hw.Playtest.FastForward dawnglide` crafts the glider and stops before the launch, at a marker spawned for that run. It does not add a meadow, a mist actor, or a smoke actor. The day descent already refuses a pickup and keeps the camp-smoke sign (`HomeWorld.Transit.CloudDescent.UnrestrictedSteeringAndWispCarry`). The landing is not placed.
 
-You wake on the island. The bed returns you to the body. Dawn does not. The mist clears, and you glide down to the field. The glide is the day glide toward camp smoke, with no pickup. Pass if the glide is the last new mechanic, and the field reads as the first place past the tutorial.
+You wake on the island. The bed returns you to the body. Dawn does not. The mist stays a sky read for the later dress row. You glide down to the field. The glide is the day glide toward camp smoke, with no pickup. Pass if the glide is the last new mechanic, and the field reads as the first place past the tutorial.
 
 | Field | Result |
 |---|---|
 | Date | |
 | Woke on the island? | |
 | Glided down to the field? | |
+| One sentence | |
+
+---
+
+## Night glide
+
+**Stop built.** Waiting on the launch. `hw.Playtest.FastForward nightglide` stops before the spirit launch. Travel only. No cloud wisp actors are spawned. The camp landing is not placed.
+
+| Field | Result |
+|---|---|
+| Date | |
+| Reached the camp, travel only? | |
+| One sentence | |
+
+---
+
+## Stealth
+
+**Stop built.** Waiting on the reach. `hw.Playtest.FastForward stealth` spawns three guards and the existing spirit-lit box for that run, and stops before the ease. Nothing is saved into the map. A missing guard still cannot open the strict gate.
+
+| Field | Result |
+|---|---|
+| Date | |
+| Sightlines read from outside the clearing? | |
+| One sentence | |
+
+---
+
+## Ease
+
+**Stop built.** Waiting on the stroke. `hw.Playtest.FastForward ease` spawns one pad on each of the three guards for that run, and stops before the wind-up. A finished ladder sleeps that guard. Wait calls the glide home and does not. A wrong step does not.
+
+| Field | Result |
+|---|---|
+| Date | |
+| Each guard played the wind-up? | |
+| One sentence | |
+
+---
+
+## Shrine
+
+**Stop built.** Waiting on the press. `hw.Playtest.FastForward shrine` runs the three pad ladders, spawns the captive and a shrine for that run, and stops before the E. Nothing is saved into the map. A missing guard still refuses the free. Moss is not a carry item.
+
+| Field | Result |
+|---|---|
+| Date | |
+| The partner walked home? | |
 | One sentence | |
 
 ---

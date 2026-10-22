@@ -138,6 +138,23 @@ public:
 
 	/** E on a wood, herb, or stone node. One delivery, then that node refuses. */
 	bool TryOpeningDeliveryInFront();
+
+	/** A matched step on a guard pad. The fourth step sleeps that guard. A wrong step does not. */
+	bool TryCommitOpeningGuardPad(AHomeWorldEasePad* Pad, EHomeWorldStrokeStep Played);
+
+	/** Wait while the pad still offers Grace. The glide home runs. The guard stays awake. */
+	bool TryWaitOpeningGuardPad(AHomeWorldEasePad* Pad);
+
+	/** Spirit, within the opening reach, and that guard is still awake. The light box is not the reach. */
+	bool TryReachOpeningGuard(AActor* Guard);
+
+	/** One E on the opening shrine after the three sleeps. A missing guard refuses. */
+	bool TryOpeningShrineInFront();
+
+	/** Finish the bound pads, spawn the captive and the shrine, and do not press E. */
+	void RunOpeningShrineStop();
+
+	void ApplyOpeningGuardSleep(AHomeWorldEasePad* Pad);
 	bool TryDeliverOpeningNode(AActor* Node);
 
 	/** Fast-forward and test seed. One healed follower. Does not start a heal timer. */
@@ -150,7 +167,24 @@ public:
 	/** Test hook: advance the night timer without waiting on a PIE tick. */
 	void DebugAdvanceOpeningNight(float DeltaSeconds);
 
-	/** Read-only test view of the wisp loop. No gameplay effect. */
+	/** Click-heart seconds to hot-spring heal seconds. 3.0 is 20, 3.1 and 4.0 are 30, 4.1 is 40. */
+	static float OpeningHealSecondsForHeart(float HeartSeconds);
+
+	/** Test hook: queue one wisp's heal from a finished heart, without drawing it. */
+	void DebugQueueOpeningWispHeart(float HeartSeconds);
+
+	/** Test hook: start the collect heart on a wisp actor. */
+	bool DebugBeginOpeningWispHeart(AActor* Wisp);
+
+	/** Test hook: advance the open heart. A wisp collect heart does not end at 3 seconds. */
+	void DebugAdvanceOpeningWispHeart(float DeltaSeconds);
+
+	bool IsOpeningWispHeartActiveForTest() const { return bOpeningWispCollect && bOpeningRuneActive; }
+
+	float GetOpeningWispHealTimerForTest(int32 Index) const
+	{
+		return OpeningWispHealTimers.IsValidIndex(Index) ? OpeningWispHealTimers[Index] : -1.f;
+	}
 	int32 GetOpeningWispsCarriedForTest() const { return OpeningWispsCarried; }
 	int32 GetOpeningHerbTenthsForTest() const { return OpeningHerbTenths; }
 	int32 GetOpeningWispHealTimerCountForTest() const { return OpeningWispHealTimers.Num(); }
@@ -163,7 +197,7 @@ public:
 
 	/** Test hook: play the opening beats in order, for real, and stop ready to test one beat.
 	 *  Beat text: spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect,
-	 *  heal, glider, delivery, daycamp. Empty = night; "list" prints the names. Start a fresh PIE for every run. */
+	 *  heal, glider, delivery, daycamp, dawnglide, nightglide, stealth, ease. Empty = night; "list" prints the names. Start a fresh PIE for every run. */
 	void DebugFastForwardOpening(const FString& Beat);
 
 	/** Test hook: call the hot-spring deposit the E chain calls. */
@@ -979,6 +1013,12 @@ protected:
 	/** One entry per wisp healing in the hot springs; seconds left. */
 	UPROPERTY(Transient)
 	TArray<float> OpeningWispHealTimers;
+
+	/** Heal length for each collected wisp, in collect order. Empty means the fast heart, 20 seconds. */
+	TArray<float> OpeningWispHealDurations;
+
+	/** Seconds the open wisp collect heart has been running. */
+	float OpeningWispHeartElapsed = 0.f;
 
 	/** Healed wisps that follow near the legs. */
 	UPROPERTY(Transient)

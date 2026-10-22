@@ -28,6 +28,17 @@ public:
 
 	bool IsLadderComplete() const { return CompletedSteps >= 4; }
 
+	/** One pad, one guard. A negative ordinal is unbound and cannot sleep anyone. */
+	void BindGuard(int32 Ordinal);
+
+	int32 GetGuardOrdinal() const { return GuardOrdinal; }
+
+	bool IsBoundToGuard() const { return GuardOrdinal >= 0; }
+
+	bool HasSleptItsGuard() const { return bGuardSlept; }
+
+	void MarkGuardSlept();
+
 	FVector GetFocusPoint() const;
 
 	float GetWindowMin() const { return WindowMin; }
@@ -45,6 +56,12 @@ public:
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Stroke")
 	int32 CompletedSteps = 0;
+
+	UPROPERTY(VisibleAnywhere, Category = "Stroke")
+	int32 GuardOrdinal = INDEX_NONE;
+
+	UPROPERTY(VisibleAnywhere, Category = "Stroke")
+	bool bGuardSlept = false;
 
 	UPROPERTY(EditAnywhere, Category = "Stroke")
 	float WindowMin = 0.f;

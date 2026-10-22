@@ -40,6 +40,16 @@ bool AHomeWorldEasePad::NoteMatch(EHomeWorldStrokeStep Played)
 	return true;
 }
 
+void AHomeWorldEasePad::BindGuard(int32 Ordinal)
+{
+	GuardOrdinal = Ordinal;
+}
+
+void AHomeWorldEasePad::MarkGuardSlept()
+{
+	bGuardSlept = true;
+}
+
 FVector AHomeWorldEasePad::GetFocusPoint() const
 {
 	return Focus ? Focus->GetComponentLocation() : GetActorLocation();

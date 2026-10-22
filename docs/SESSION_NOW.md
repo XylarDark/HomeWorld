@@ -2,6 +2,10 @@
 
 The live continuity block. A new chat reads this file, not the history. Append the next block here. When this file grows past a few screens, move the older blocks to `docs/history/SESSION_LOG.md`.
 
+## 2026-10-21 Shrine stop
+
+Lead's unlock picks are round 17 in `Docs/context/OPENING_TUTORIAL_INTERVIEW.md`. Moss stays out of the six-slot carry. Now stays the October 22 Night row. Next chat for that pass starts from `Docs/handoffs/SESSION_HANDOFF_PLAYTEST.md`.
+
 ## 2026-10-21 Day-camp arrival
 
 `HomeWorld.Opening.DayCamp` passed with the glider and delivery tests. The clearing is not on `L_SizeTest`. Now stays the October 22 Night row. Next chat for that pass starts from `Docs/handoffs/SESSION_HANDOFF_PLAYTEST.md`.
