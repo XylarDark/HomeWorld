@@ -3,6 +3,7 @@
 #include "HomeWorldOpeningReveal.h"
 
 #include "HomeWorldCharacter.h"
+#include "HomeWorldPlacementConstants.h"
 #include "HomeWorldOpeningWalker.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
@@ -17,16 +18,8 @@
 
 namespace
 {
-	constexpr float StandOffCm = 180.f;
 	constexpr float FollowGapCm = 160.f;
 	constexpr float PartnerMeetCm = 280.f;
-	/** Cottage origin (-800, 0). East wall inner face is world x 985. */
-	constexpr float CounterCenterX = 910.f;
-	constexpr float CounterCenterY = 80.f;
-	constexpr float CounterDepthCm = 70.f;
-	constexpr float CounterLengthCm = 520.f;
-	/** Half the 200 cm played body. The shell counter and this grown fallback agree. */
-	constexpr float CounterHeightCm = 100.f;
 	/** Floor spot west of the counter (local x 1560). The pail owns the north end. */
 	const FVector PartnerStandCm(760.f, 0.f, 0.f);
 	const FVector PartnerRouteCm[] = {
@@ -57,7 +50,7 @@ namespace
 		Walker->CopyAppearance(Source);
 		UGameplayStatics::FinishSpawningActor(Walker, Spawn);
 		Source->Tags.Remove(FName(TEXT("NPC_CHILD")));
-		Source->Tags.Remove(FName(TEXT("NPC_PARTNER")));
+		Source->Tags.Remove(FName(*HomeWorldPlacement::Get().TagPartner));
 		Source->SetActorHiddenInGame(true);
 		Source->SetActorEnableCollision(false);
 		return Walker;
@@ -202,7 +195,7 @@ bool AHomeWorldOpeningReveal::TryLeadPartner()
 	}
 	if (!Partner)
 	{
-		Partner = FindTagged(TEXT("NPC_PARTNER"));
+		Partner = FindTagged(*HomeWorldPlacement::Get().TagPartner);
 	}
 	if (!Partner)
 	{
@@ -273,11 +266,11 @@ void AHomeWorldOpeningReveal::BeginPlay()
 			{
 				FoundChild = *It;
 			}
-			else if (!FoundPartner && It->ActorHasTag(FName(TEXT("NPC_PARTNER"))))
+			else if (!FoundPartner && It->ActorHasTag(FName(*HomeWorldPlacement::Get().TagPartner)))
 			{
 				FoundPartner = *It;
 			}
-			if (It->ActorHasTag(FName(TEXT("NODE_KETTLE")))
+			if (It->ActorHasTag(FName(*HomeWorldPlacement::Get().TagKettle))
 				|| It->ActorHasTag(FName(TEXT("NODE_GARDEN"))))
 			{
 				Props.Add(*It);
@@ -408,6 +401,7 @@ void AHomeWorldOpeningReveal::Tick(float DeltaSeconds)
 	}
 	Walker->SetMoveSpeed(ChildRunSpeed);
 	const FVector From = Child->GetActorLocation();
+	const float StandOffCm = HomeWorldPlacement::Get().PartnerStandoffCm;
 	const FVector Stand = StandNear(From, GetActorLocation(), StandOffCm);
 	if (FVector::Dist2D(From, GetActorLocation()) <= StandOffCm || Walker->WalkToward(Stand, 40.f))
 	{
@@ -424,7 +418,7 @@ void AHomeWorldOpeningReveal::FollowChild(float DeltaSeconds)
 	}
 	if (!Partner)
 	{
-		Partner = FindTagged(TEXT("NPC_PARTNER"));
+		Partner = FindTagged(*HomeWorldPlacement::Get().TagPartner);
 	}
 	AHomeWorldOpeningWalker* Walker = Cast<AHomeWorldOpeningWalker>(Child);
 	if (!Walker)
@@ -496,7 +490,7 @@ void AHomeWorldOpeningReveal::BeginHomecoming()
 	bRunning = false;
 	if (!Partner)
 	{
-		Partner = FindTagged(TEXT("NPC_PARTNER"));
+		Partner = FindTagged(*HomeWorldPlacement::Get().TagPartner);
 	}
 	const float FloorZ = Child ? Child->GetActorLocation().Z : 0.f;
 	ChildPoints.Reset();
@@ -523,7 +517,7 @@ void AHomeWorldOpeningReveal::BeginChildRace()
 	const float FloorZ = Child->GetActorLocation().Z;
 	// The sheet spot is the fallback; the dog actor wins when it is in the map.
 	FVector DogPoint(-390.f, 2000.f, FloorZ);
-	if (const AActor* Dog = FindTagged(TEXT("NODE_OPENING_DOG")))
+	if (const AActor* Dog = FindTagged(*HomeWorldPlacement::Get().TagOpeningDog))
 	{
 		DogPoint = Dog->GetActorLocation();
 	}
@@ -575,7 +569,7 @@ void AHomeWorldOpeningReveal::LeadChild(float DeltaSeconds)
 					BeginChildReturnHome();
 					return;
 				}
-				if (const AActor* Dog = FindTagged(TEXT("NODE_OPENING_DOG")))
+				if (const AActor* Dog = FindTagged(*HomeWorldPlacement::Get().TagOpeningDog))
 				{
 					FVector ToDog = Dog->GetActorLocation() - Child->GetActorLocation();
 					ToDog.Z = 0.f;
@@ -638,7 +632,7 @@ void AHomeWorldOpeningReveal::BeginChildReturnHome()
 
 void AHomeWorldOpeningReveal::PlaceKettleCounter()
 {
-	AActor* Kettle = FindTagged(TEXT("NODE_KETTLE"));
+	AActor* Kettle = FindTagged(*HomeWorldPlacement::Get().TagKettle);
 	if (!Kettle)
 	{
 		return;
@@ -661,10 +655,11 @@ void AHomeWorldOpeningReveal::PlaceKettleCounter()
 
 	// The cabin shell now owns the counter run. Use it as the station instead of growing a
 	// second box on top: 90 cm on top of 90 cm is what read chest-high in play.
-	AActor* Counter = FindTagged(TEXT("KettleCounter"));
+	const HomeWorldPlacement::FConstants& Place = HomeWorldPlacement::Get();
+	AActor* Counter = FindTagged(*Place.TagKettleCounter);
 	if (!Counter)
 	{
-		Counter = FindTagged(TEXT("NODE_CONSUMABLE_STATION"));
+		Counter = FindTagged(*Place.TagConsumableStation);
 	}
 	if (Counter)
 	{
@@ -674,9 +669,9 @@ void AHomeWorldOpeningReveal::PlaceKettleCounter()
 		Kettle->SetActorLocation(FVector(CounterOrigin.X, CounterOrigin.Y,
 			CounterOrigin.Z + CounterExtent.Z + KettleLift));
 		Kettle->Tags.Add(FName(TEXT("KettleProp")));
-		Kettle->Tags.Remove(FName(TEXT("NODE_KETTLE")));
-		Counter->Tags.AddUnique(FName(TEXT("KettleCounter")));
-		Counter->Tags.AddUnique(FName(TEXT("NODE_CONSUMABLE_STATION")));
+		Kettle->Tags.Remove(FName(*Place.TagKettle));
+		Counter->Tags.AddUnique(FName(*Place.TagKettleCounter));
+		Counter->Tags.AddUnique(FName(*Place.TagConsumableStation));
 		UE_LOG(LogTemp, Log, TEXT("opening_reveal: kettle on the single kitchen counter, %.0f x %.0f x %.0f"),
 			CounterExtent.X * 2.f, CounterExtent.Y * 2.f, CounterExtent.Z * 2.f);
 		return;
@@ -707,16 +702,17 @@ void AHomeWorldOpeningReveal::PlaceKettleCounter()
 	Mesh->SetMobility(EComponentMobility::Movable);
 	Mesh->SetCollisionProfileName(FName(TEXT("BlockAll")));
 	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	GrownCounter->SetActorScale3D(FVector(CounterDepthCm / 100.f, CounterLengthCm / 100.f, CounterHeightCm / 100.f));
-	const float CenterZ = FloorZ + CounterHeightCm * 0.5f;
-	GrownCounter->SetActorLocation(FVector(CounterCenterX, CounterCenterY, CenterZ));
-	Kettle->SetActorLocation(FVector(CounterCenterX, CounterCenterY, FloorZ + CounterHeightCm + KettleLift));
+	const HomeWorldPlacement::FConstants& Grown = HomeWorldPlacement::Get();
+	GrownCounter->SetActorScale3D(FVector(Grown.CounterDepthCm / 100.f, Grown.CounterLengthCm / 100.f, Grown.CounterHeightCm / 100.f));
+	const float CenterZ = FloorZ + Grown.CounterHeightCm * 0.5f;
+	GrownCounter->SetActorLocation(FVector(Grown.RevealCounterX, Grown.RevealCounterY, CenterZ));
+	Kettle->SetActorLocation(FVector(Grown.RevealCounterX, Grown.RevealCounterY, FloorZ + Grown.CounterHeightCm + KettleLift));
 	Kettle->Tags.Add(FName(TEXT("KettleProp")));
-	GrownCounter->Tags.Add(FName(TEXT("KettleCounter")));
+	GrownCounter->Tags.Add(FName(*Grown.TagKettleCounter));
 	// The counter is the kitchen consumable station. The kettle on top is a prop: the station
 	// press opens, mixes, then brews on it, so the kettle itself is not a target.
-	GrownCounter->Tags.Add(FName(TEXT("NODE_CONSUMABLE_STATION")));
-	Kettle->Tags.Remove(FName(TEXT("NODE_KETTLE")));
+	GrownCounter->Tags.Add(FName(*Grown.TagConsumableStation));
+	Kettle->Tags.Remove(FName(*Grown.TagKettle));
 	UE_LOG(LogTemp, Log, TEXT("opening_reveal: grew the kettle counter, %.0f x %.0f x %.0f at the east wall"),
-		CounterDepthCm, CounterLengthCm, CounterHeightCm);
+		Grown.CounterDepthCm, Grown.CounterLengthCm, Grown.CounterHeightCm);
 }

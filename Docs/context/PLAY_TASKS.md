@@ -57,6 +57,8 @@ Audit 2026-10-22 of the opening/beat code, not the whole repo. Each row is a pat
 
 S1 to S3 are the same defect seen three ways: each verb and each stop re-decides what "visible", "in reach", and "looked at" mean. S1 owns the answer.
 
+Resolver pass, 2026-10-22: `ResolveOpeningTarget` walks one spec table (priority, chain, reach, look, wall, hover). Both press chains call it. Named and tagged finds use the actor registry. Beat-stop distances are intent in `OpeningStopIntentCm`; the gaze stays derived from the target bounds. `BeginBonkReturn` is the only bonk flight. Height, standoff, and the shared tag names are `Content/Python/placement_constants.json`, read by the shell, the placer, and the reveal. Cottage lights ask for the `candle` preset. `opening_los` logs only when `hw.Opening.LosLog` is set. The cottage light is still waiting on an eye check.
+
 ## Done
 
 - Glider craft. `HomeWorld.Opening.GliderCraft` passed, 2026-10-21.

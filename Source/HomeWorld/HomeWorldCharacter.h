@@ -80,6 +80,13 @@ public:
 	static AActor* PickOpeningLookTarget(AActor* Perch, const TArray<FOpeningLookCandidate>& Candidates);
 	float GetOpeningLookCenterNdcY() const;
 
+	/** Press E. Registered verbs run in spec priority for this level's chain. */
+	bool ResolveOpeningTarget();
+
+	/** A test world has no map name. Production leaves this unset and reads the level. */
+	void SetInteractChainForTest(bool bSizeTest);
+	bool UsesSizeTestInteractChain() const;
+
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -1259,4 +1266,7 @@ protected:
 	float InteractHintRefreshSeconds = 0.35f;
 
 	float InteractHintAccumulator = 0.f;
+
+	bool bInteractChainOverride = false;
+	bool bSizeTestInteractChain = false;
 };

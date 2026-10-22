@@ -1,6 +1,10 @@
 // Copyright HomeWorld. All Rights Reserved.
 
 #include "HomeWorldCharacter.h"
+#include "HomeWorldInteractResolver.h"
+#include "HomeWorldOpeningRegistry.h"
+#include "HomeWorldPlacementConstants.h"
+#include "HAL/IConsoleManager.h"
 #include "HomeWorldCampActor.h"
 #include "HomeWorldFamilySubsystem.h"
 #include "Engine/GameInstance.h"
@@ -105,102 +109,7 @@
  * The cone has no list of its own: it walks every actor and asks the gate, so a newly tagged
  * prop is reachable without editing the cone.
  */
-namespace HomeWorldT0BeatNodes
-{
-	/** The T0 beat props, each identified by a canonical tag and a short alias. The opening stations read this table too. */
-	enum class ENode : uint8
-	{
-		Kettle,
-		PlantSlot,
-		Backpack,
-		FieldGather,
-		DayCamp,
-		Bed,
-		Garden,
-		ConsumableStation,
-		ArmorTable,
-	};
-
-	/** The tags that identify one specific beat prop, canonical name first. */
-	static const TArray<TArray<FName>>& TagsPerNode()
-	{
-		static const TArray<TArray<FName>> PerNode = {
-			{ FName(TEXT("NODE_KETTLE")),        FName(TEXT("Kettle")) },
-			{ FName(TEXT("NODE_PLANT_SLOT")),   FName(TEXT("PlantSlot")) },
-			{ FName(TEXT("NODE_BACKPACK")),     FName(TEXT("Backpack")) },
-			{ FName(TEXT("NODE_FIELD_GATHER")), FName(TEXT("FieldGather")) },
-			{ FName(TEXT("NODE_DAY_CAMP")),     FName(TEXT("DayCamp")) },
-			{ FName(TEXT("NODE_BED")),          FName(TEXT("Bed")) },
-			{ FName(TEXT("NODE_GARDEN")),       FName(TEXT("Garden")) },
-			{ FName(TEXT("NODE_CONSUMABLE_STATION")), FName(TEXT("ConsumableStation")) },
-			{ FName(TEXT("NODE_ARMOR_TABLE")),  FName(TEXT("ArmorTable")) },
-		};
-		return PerNode;
-	}
-
-	static const TArray<FName>& TagsFor(ENode Node)
-	{
-		return TagsPerNode()[static_cast<uint8>(Node)];
-	}
-
-	/** True when the actor carries one of the tags for this beat prop. */
-	static bool ActorCarriesTagFor(const AActor* Actor, ENode Node)
-	{
-		if (!Actor)
-		{
-			return false;
-		}
-		for (const FName& Tag : TagsFor(Node))
-		{
-			if (Actor->ActorHasTag(Tag))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-}
-
-/**
- * One interaction contract per actor, derived from its tags and components.
- *
- * A prop is not a verb path. It carries attributes; the resolver reads them. This is the
- * place to add reach, look, wall, or hover for a new kind of prop - not a branch in a verb.
- */
-namespace HomeWorldInteract
-{
-	struct FSpec
-	{
-		HomeWorldT0BeatNodes::ENode Node = HomeWorldT0BeatNodes::ENode::Kettle;
-		bool bBeatNode = false;
-		float ReachCm = 280.f;
-		bool bLook = true;
-		bool bWall = true;
-		bool bHover = true;
-	};
-
-	/** Derive the spec from the actor's attributes. A beat prop needs its node tag, nothing else. */
-	static bool TrySpecFor(const AActor* Actor, FSpec& Out)
-	{
-		if (!Actor)
-		{
-			return false;
-		}
-		const TArray<TArray<FName>>& PerNode = HomeWorldT0BeatNodes::TagsPerNode();
-		for (int32 Index = 0; Index < PerNode.Num(); ++Index)
-		{
-			if (HomeWorldT0BeatNodes::ActorCarriesTagFor(
-					Actor, static_cast<HomeWorldT0BeatNodes::ENode>(Index)))
-			{
-				Out = FSpec();
-				Out.Node = static_cast<HomeWorldT0BeatNodes::ENode>(Index);
-				Out.bBeatNode = true;
-				return true;
-			}
-		}
-		return false;
-	}
-}
+// Beat-node tags and the verb spec live in HomeWorldInteractResolver.h.
 
 AHomeWorldCharacter::AHomeWorldCharacter(const FObjectInitializer& ObjectInitializer)
 	// The cloud descent needs a custom movement mode, so the character must own a CMC
@@ -279,6 +188,7 @@ void AHomeWorldCharacter::BeginPlay()
 	}
 	if (UWorld* World = GetWorld())
 	{
+		HomeWorldOpeningRegistry::Bind(World);
 		UCapsuleComponent* Capsule = GetCapsuleComponent();
 		if (Capsule)
 		{
@@ -669,15 +579,7 @@ void AHomeWorldCharacter::ClearPartyOnAbsenceVolumes()
 
 static AActor* FindOpeningNamed(UWorld* World, const TCHAR* Name, bool bExact)
 {
-	for (TActorIterator<AActor> It(World); It; ++It)
-	{
-		const FString Label = It->GetActorNameOrLabel();
-		if (bExact ? Label.Equals(Name) : Label.Contains(Name))
-		{
-			return *It;
-		}
-	}
-	return nullptr;
+	return HomeWorldOpeningRegistry::FindNamed(World, Name, bExact);
 }
 
 static UStaticMeshComponent* MakeOpeningNightWisp(AHomeWorldCharacter* Owner, const TCHAR* Name)
@@ -914,7 +816,7 @@ bool AHomeWorldCharacter::TryOpeningBedInFront()
 	{
 		if (AActor* Named = FindOpeningNamed(World, TEXT("SM_Size_Bed"), true))
 		{
-			if (FVector::Dist2D(GetActorLocation(), Named->GetActorLocation()) <= 280.f
+			if (FVector::Dist2D(GetActorLocation(), Named->GetActorLocation()) <= HomeWorldInteract::ReachCm(HomeWorldInteract::EVerb::OpeningBed)
 				&& HasOpeningLineOfSight(Named))
 			{
 				Bed = Named;
@@ -1037,7 +939,7 @@ bool AHomeWorldCharacter::TryOpeningNightSetInFront()
 	{
 		return false;
 	}
-	if (FVector::Dist2D(GetActorLocation(), Aimed->GetActorLocation()) > 400.f)
+	if (FVector::Dist2D(GetActorLocation(), Aimed->GetActorLocation()) > HomeWorldInteract::ReachCm(HomeWorldInteract::EVerb::OpeningNightSet))
 	{
 		return false;
 	}
@@ -1056,7 +958,6 @@ namespace
 {
 	/** Fast heart, and the fallback when a seeded wisp has no recorded heart. */
 	constexpr float OpeningWispHealSeconds = 20.f;
-	constexpr float OpeningHotSpringRangeCm = 600.f;
 }
 
 float AHomeWorldCharacter::OpeningHealSecondsForHeart(float HeartSeconds)
@@ -1110,7 +1011,7 @@ bool AHomeWorldCharacter::TryOpeningHotSpringHealInFront()
 	{
 		Spring = FindOpeningNamed(World, TEXT("Water_HotSpring"), false);
 	}
-	if (!Spring || FVector::Dist2D(GetActorLocation(), Spring->GetActorLocation()) > OpeningHotSpringRangeCm
+	if (!Spring || FVector::Dist2D(GetActorLocation(), Spring->GetActorLocation()) > HomeWorldInteract::ReachCm(HomeWorldInteract::EVerb::OpeningHotSpring)
 		|| !HasOpeningLineOfSight(Spring))
 	{
 		return false;
@@ -1267,16 +1168,39 @@ namespace
 		return 0;
 	}
 
+	float OpeningStopIntentCm(int32 Beat)
+	{
+		switch (Beat)
+		{
+		case PlaytestBeatKettle:
+		case PlaytestBeatStation:
+		case PlaytestBeatGlider:
+			return 220.f;
+		case PlaytestBeatDog:
+			return 650.f;
+		case PlaytestBeatSleep:
+		case PlaytestBeatNight:
+		case PlaytestBeatDawnGlide:
+		case PlaytestBeatNightGlide:
+		case PlaytestBeatEase:
+		case PlaytestBeatShrine:
+			return 180.f;
+		case PlaytestBeatCollect:
+			return 350.f;
+		case PlaytestBeatHeal:
+			return 470.f;
+		case PlaytestBeatDelivery:
+			return 200.f;
+		case PlaytestBeatDayCamp:
+			return 320.f;
+		default:
+			return 260.f;
+		}
+	}
+
 	AActor* FindOpeningTaggedActor(UWorld* World, const TCHAR* Tag, const TCHAR* AltTag = nullptr)
 	{
-		for (TActorIterator<AActor> It(World); It; ++It)
-		{
-			if (It->ActorHasTag(FName(Tag)) || (AltTag && It->ActorHasTag(FName(AltTag))))
-			{
-				return *It;
-			}
-		}
-		return nullptr;
+		return HomeWorldOpeningRegistry::FindTagged(World, Tag, AltTag);
 	}
 }
 
@@ -1756,7 +1680,7 @@ void AHomeWorldCharacter::ReadyForOpeningPlaytest()
 		return;
 	}
 	AActor* Target = nullptr;
-	float Distance = 260.f;
+	const float Distance = OpeningStopIntentCm(DebugFastForwardStop);
 	bool bPondEdge = false;
 	bool bPlaceTarget = true;
 	FString Note;
@@ -1782,12 +1706,10 @@ void AHomeWorldCharacter::ReadyForOpeningPlaytest()
 		break;
 	case PlaytestBeatKettle:
 		Target = FindOpeningTaggedActor(World, TEXT("KettleCounter"), TEXT("NODE_CONSUMABLE_STATION"));
-		Distance = 220.f;
 		Note = TEXT("E at the counter: open, mix, then brew");
 		break;
 	case PlaytestBeatStation:
 		Target = FindOpeningTaggedActor(World, TEXT("NODE_CONSUMABLE_STATION"));
-		Distance = 220.f;
 		Note = TEXT("E at the counter: open, then mix");
 		break;
 	case PlaytestBeatDog:
@@ -1797,7 +1719,6 @@ void AHomeWorldCharacter::ReadyForOpeningPlaytest()
 			Target = *It;
 			break;
 		}
-		Distance = 650.f;
 		Note = TEXT("walk up slowly, draw the Grace trace, then E");
 		break;
 	}
@@ -1808,66 +1729,54 @@ void AHomeWorldCharacter::ReadyForOpeningPlaytest()
 		break;
 	case PlaytestBeatSleep:
 		Target = FindOpeningNamed(World, TEXT("SM_Size_Bed"), true);
-		Distance = 180.f;
 		Note = TEXT("E at the bed: sleep");
 		break;
 	case PlaytestBeatNight:
 		Target = FindOpeningNamed(World, TEXT("SM_Size_Bed"), true);
-		Distance = 180.f;
 		bPlaceTarget = false;
 		Note = TEXT("night is on, the bed is behind you");
 		break;
 	case PlaytestBeatCollect:
 		EnsureOpeningNightProps();
 		Target = OpeningCopseWisp;
-		Distance = 350.f;
 		Note = TEXT("E at the wisp, click the heart");
 		break;
 	case PlaytestBeatHeal:
 		EnsureOpeningNightProps();
 		CollectNightWispsForPlaytest();
 		Target = FindOpeningNamed(World, TEXT("Water_HotSpring"), true);
-		Distance = 470.f;
 		Note = TEXT("E at the hot springs, the heal takes 20s");
 		break;
 	case PlaytestBeatGlider:
 		Target = FindOpeningTaggedActor(World, TEXT("NODE_ARMOR_TABLE"), TEXT("ArmorTable"));
-		Distance = 220.f;
 		Note = TEXT("E at the armory: craft the glider");
 		break;
 	case PlaytestBeatDelivery:
 		Target = FindOpeningTaggedActor(World, TEXT("NODE_OPENING_DELIVERY"));
-		Distance = 200.f;
 		Note = TEXT("E at the wood node: set the healed wisp");
 		break;
 	case PlaytestBeatDayCamp:
 		Target = FindOpeningTaggedActor(World, TEXT("NODE_OPENING_DAY_CAMP"));
-		Distance = 320.f;
 		Note = TEXT("walk into the clearing");
 		break;
 	case PlaytestBeatDawnGlide:
 		Target = FindOpeningTaggedActor(World, TEXT("GlideStart"));
-		Distance = 180.f;
 		Note = TEXT("the launch is yours");
 		break;
 	case PlaytestBeatNightGlide:
 		Target = FindOpeningTaggedActor(World, TEXT("GlideStart"));
-		Distance = 180.f;
 		Note = TEXT("travel only, the launch is yours");
 		break;
 	case PlaytestBeatStealth:
 		Target = FindOpeningTaggedActor(World, TEXT("NODE_GUARD"));
-		Distance = 260.f;
 		Note = TEXT("reach the guard");
 		break;
 	case PlaytestBeatEase:
 		Target = FindOpeningTaggedActor(World, TEXT("NODE_OPENING_EASE"));
-		Distance = 180.f;
 		Note = TEXT("the wind-up is yours");
 		break;
 	case PlaytestBeatShrine:
 		Target = FindOpeningTaggedActor(World, TEXT("NODE_OPENING_SHRINE"));
-		Distance = 180.f;
 		Note = TEXT("E at the shrine");
 		break;
 	default:
@@ -2063,7 +1972,7 @@ void AHomeWorldCharacter::PlaceForOpeningPlaytestAtPond(AActor* Pond)
 	const float Radius = Capsule ? Capsule->GetScaledCapsuleRadius() : 34.f;
 	const float HalfHeight = Capsule ? Capsule->GetScaledCapsuleHalfHeight() : 100.f;
 	const FCollisionShape Body = FCollisionShape::MakeCapsule(Radius, HalfHeight);
-	const float Standoff = 100.f;
+	const float Standoff = HomeWorldPlacement::Get().PondStandoffCm;
 	const FVector Here = GetActorLocation();
 	// The pond rim can hold a prop. A blind teleport drops the body inside it, and
 	// the fish press then has no clear line to the water. Try the east edge first,
@@ -2230,6 +2139,26 @@ AActor* AHomeWorldCharacter::ResolveOpeningAim(FHitResult& Hit)
 {
 	(void)Hit;
 	return FindOpeningProximityTarget();
+}
+
+void AHomeWorldCharacter::SetInteractChainForTest(bool bSizeTest)
+{
+	bInteractChainOverride = true;
+	bSizeTestInteractChain = bSizeTest;
+}
+
+bool AHomeWorldCharacter::UsesSizeTestInteractChain() const
+{
+	if (bInteractChainOverride)
+	{
+		return bSizeTestInteractChain;
+	}
+	return UGameplayStatics::GetCurrentLevelName(this).Contains(TEXT("SizeTest"));
+}
+
+bool AHomeWorldCharacter::ResolveOpeningTarget()
+{
+	return HomeWorldInteract::Resolve(this);
 }
 
 bool AHomeWorldCharacter::TraceEyeInteract(FHitResult& OutHit) const
@@ -2478,8 +2407,9 @@ bool AHomeWorldCharacter::TryOpeningFish()
 	FVector Extent = FVector::ZeroVector;
 	Pond->GetActorBounds(false, Origin, Extent);
 	const FVector From = GetActorLocation();
-	const bool bAtPond = FMath::Abs(From.X - Origin.X) <= Extent.X + 200.f
-		&& FMath::Abs(From.Y - Origin.Y) <= Extent.Y + 200.f;
+	const float PondMargin = HomeWorldInteract::ReachCm(HomeWorldInteract::EVerb::OpeningFish);
+	const bool bAtPond = FMath::Abs(From.X - Origin.X) <= Extent.X + PondMargin
+		&& FMath::Abs(From.Y - Origin.Y) <= Extent.Y + PondMargin;
 	if (!bAtPond)
 	{
 		return false;
@@ -3030,12 +2960,7 @@ AActor* AHomeWorldCharacter::FindOpeningProximityTarget()
 		{
 			continue;
 		}
-		const FString Label = Actor->GetActorNameOrLabel();
-		const bool bHerb = Label.Contains(TEXT("Lupine")) && !Actor->IsHidden();
-		const bool bBed = Label.Contains(TEXT("Bed"));
-		const bool bNightWisp = Actor->ActorHasTag(FName(TEXT("NODE_OPENING_WISP"))) && !Actor->IsHidden();
-		const bool bDelivery = Actor->ActorHasTag(FName(TEXT("NODE_OPENING_DELIVERY"))) && !Actor->IsHidden();
-		if (!bHerb && !bBed && !bNightWisp && !bDelivery && !ActorHasInteractableComponent(Actor))
+		if (!HomeWorldInteract::IsProximityExtra(Actor) && !ActorHasInteractableComponent(Actor))
 		{
 			continue;
 		}
@@ -3086,9 +3011,14 @@ bool AHomeWorldCharacter::HasOpeningLineOfSight(const AActor* Target) const
 	{
 		return true;
 	}
-	// Probe while the armory table is unexplained: name the blocker once per
-	// target, so a refused press can be told apart from a target that never
-	// entered the look. Remove once the press is settled.
+	static TAutoConsoleVariable<int32> CVarOpeningLosLog(
+		TEXT("hw.Opening.LosLog"),
+		0,
+		TEXT("Log opening_los when a wall blocks a prop. Off unless set."));
+	if (CVarOpeningLosLog.GetValueOnGameThread() == 0)
+	{
+		return false;
+	}
 	static TSet<FName> LoggedBlocked;
 	const FName Key = Target->GetFName();
 	if (!LoggedBlocked.Contains(Key))
