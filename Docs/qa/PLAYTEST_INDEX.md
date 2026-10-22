@@ -2,7 +2,7 @@
 
 One entry point. Play one pass, fill that pass's result, stop.
 
-**Now:** Night on the island in [`TUTORIAL_PLAYTEST_QUEUE.md`](TUTORIAL_PLAYTEST_QUEUE.md). The November 20 critical path in that file is the master list. Party, home loop, and the water/sign chain stay separate and are off that path.
+**Now:** October 23, one sitting, in [`TUTORIAL_PLAYTEST_QUEUE.md`](TUTORIAL_PLAYTEST_QUEUE.md). Fresh PIE per row, from `sleep` through `shrine`. The November 20 critical path in that file is the master list. Party, home loop, and the water/sign chain stay separate and are off that path.
 
 ## Passes
 

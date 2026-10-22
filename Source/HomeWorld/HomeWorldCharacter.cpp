@@ -27,6 +27,7 @@
 #include "Abilities/GameplayAbility.h"
 #include "GameplayAbilitySpec.h"
 #include "Camera/CameraComponent.h"
+#include "Components/TextRenderComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerState.h"
@@ -354,6 +355,20 @@ void AHomeWorldCharacter::BeginPlay()
 			SizeTestCursorWisp->SetHiddenInGame(true);
 			SizeTestCursorWisp->SetVisibility(false);
 			SizeTestCursorWisp->RegisterComponent();
+		}
+		if (bSizeTest && !OpeningInteractPrompt)
+		{
+			OpeningInteractPrompt = NewObject<UTextRenderComponent>(this, TEXT("OpeningInteractPrompt"));
+			OpeningInteractPrompt->SetupAttachment(GetRootComponent());
+			OpeningInteractPrompt->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			OpeningInteractPrompt->SetHorizontalAlignment(EHTA_Center);
+			OpeningInteractPrompt->SetVerticalAlignment(EVRTA_TextCenter);
+			OpeningInteractPrompt->SetWorldSize(32.f);
+			OpeningInteractPrompt->SetText(FText::FromString(TEXT("E")));
+			OpeningInteractPrompt->SetTextRenderColor(FColor::White);
+			OpeningInteractPrompt->SetHiddenInGame(true);
+			OpeningInteractPrompt->SetVisibility(false);
+			OpeningInteractPrompt->RegisterComponent();
 		}
 	}
 	USkeletalMeshComponent* MeshComp = GetMesh();
@@ -2828,16 +2843,56 @@ void AHomeWorldCharacter::UpdateSizeTestInteractCursor()
 	}
 }
 
-AActor* AHomeWorldCharacter::FindOpeningProximityTarget() const
+bool AHomeWorldCharacter::IsOpeningInteractInReach(float Dist2DCm)
+{
+	return Dist2DCm <= 280.f;
+}
+
+AActor* AHomeWorldCharacter::PickOpeningLookTarget(AActor* Perch, const TArray<FOpeningLookCandidate>& Candidates)
+{
+	AActor* Best = nullptr;
+	float BestSq = TNumericLimits<float>::Max();
+	bool bPerchValid = false;
+	float KeptSq = 0.f;
+	for (const FOpeningLookCandidate& Candidate : Candidates)
+	{
+		if (!Candidate.Actor)
+		{
+			continue;
+		}
+		if (Candidate.Actor == Perch)
+		{
+			bPerchValid = true;
+			KeptSq = Candidate.LookDistSq;
+		}
+		if (Candidate.LookDistSq < BestSq)
+		{
+			BestSq = Candidate.LookDistSq;
+			Best = Candidate.Actor;
+		}
+	}
+	if (!bPerchValid)
+	{
+		return Best;
+	}
+	const float StickSq = OpeningLookStick * OpeningLookStick;
+	if (Best != Perch && BestSq <= KeptSq * StickSq)
+	{
+		return Best;
+	}
+	return Perch;
+}
+
+AActor* AHomeWorldCharacter::FindOpeningProximityTarget()
 {
 	UWorld* World = GetWorld();
 	if (!World)
 	{
+		OpeningLookPerch = nullptr;
 		return nullptr;
 	}
 	const FVector From = GetActorLocation();
-	AActor* Best = nullptr;
-	float BestDist = 280.f * 280.f;
+	TArray<FOpeningLookCandidate> Candidates;
 	for (TActorIterator<AActor> It(World); It; ++It)
 	{
 		AActor* Actor = *It;
@@ -2854,17 +2909,23 @@ AActor* AHomeWorldCharacter::FindOpeningProximityTarget() const
 		{
 			continue;
 		}
-		const float Dist = FVector::DistSquared2D(From, Actor->GetActorLocation());
-		if (Dist < BestDist && IsOpeningTargetInView(Actor))
+		const float DistCm = FVector::Dist2D(From, Actor->GetActorLocation());
+		if (!IsOpeningInteractInReach(DistCm))
 		{
-			BestDist = Dist;
-			Best = Actor;
+			continue;
 		}
+		float LookSq = 0.f;
+		if (!OpeningLookDistSq(Actor, LookSq))
+		{
+			continue;
+		}
+		Candidates.Add({Actor, LookSq});
 	}
-	return Best;
+	OpeningLookPerch = PickOpeningLookTarget(OpeningLookPerch, Candidates);
+	return OpeningLookPerch;
 }
 
-bool AHomeWorldCharacter::IsOpeningTargetInView(const AActor* Target) const
+bool AHomeWorldCharacter::OpeningLookDistSq(const AActor* Target, float& OutDistSq) const
 {
 	const APlayerController* PC = Cast<APlayerController>(GetController());
 	if (!PC || !Target || !FollowCamera)
@@ -2890,9 +2951,38 @@ bool AHomeWorldCharacter::IsOpeningTargetInView(const AActor* Target) const
 	}
 	const float NdcX = (Screen.X / static_cast<float>(SizeX)) * 2.f - 1.f;
 	const float NdcY = (Screen.Y / static_cast<float>(SizeY)) * 2.f - 1.f;
-	// Screen Y grows downward, so a higher box is a smaller NDC Y.
-	const float AimNdcY = NdcY + OpeningViewUpNdc;
-	return FMath::Abs(NdcX) <= OpeningViewCenterNdc && FMath::Abs(AimNdcY) <= OpeningViewCenterNdc;
+	const float Dx = NdcX;
+	const float Dy = NdcY + OpeningViewUpNdc;
+	OutDistSq = Dx * Dx + Dy * Dy;
+	return true;
+}
+
+void AHomeWorldCharacter::SetOpeningInteractPrompt(bool bShow, const FVector& At)
+{
+	if (!OpeningInteractPrompt)
+	{
+		return;
+	}
+	if (!bShow)
+	{
+		OpeningInteractPrompt->SetHiddenInGame(true);
+		OpeningInteractPrompt->SetVisibility(false);
+		return;
+	}
+	const FVector PromptAt = At + FVector(0.f, 0.f, 24.f);
+	OpeningInteractPrompt->SetUsingAbsoluteLocation(true);
+	OpeningInteractPrompt->SetUsingAbsoluteRotation(true);
+	OpeningInteractPrompt->SetWorldLocation(PromptAt);
+	if (FollowCamera)
+	{
+		const FVector ToCamera = FollowCamera->GetComponentLocation() - PromptAt;
+		if (!ToCamera.IsNearlyZero())
+		{
+			OpeningInteractPrompt->SetWorldRotation(ToCamera.Rotation());
+		}
+	}
+	OpeningInteractPrompt->SetHiddenInGame(false);
+	OpeningInteractPrompt->SetVisibility(true);
 }
 
 void AHomeWorldCharacter::ShowOpeningProximityLine()
@@ -3783,12 +3873,14 @@ void AHomeWorldCharacter::UpdateSizeTestWisp(float DeltaTime)
 	if (bOpeningRuneActive)
 	{
 		bOpeningWispReturning = false;
+		SetOpeningInteractPrompt(false, FVector::ZeroVector);
 		UpdateOpeningHerbRune(DeltaTime);
 		return;
 	}
 	if (bOpeningDogDrawActive)
 	{
 		bOpeningWispReturning = false;
+		SetOpeningInteractPrompt(false, FVector::ZeroVector);
 		UpdateOpeningDogDraw(DeltaTime);
 		return;
 	}
@@ -3809,6 +3901,7 @@ void AHomeWorldCharacter::UpdateSizeTestWisp(float DeltaTime)
 			const float Alpha = 1.f - FMath::Clamp(OpeningWispReturnLeft / 0.35f, 0.f, 1.f);
 			SizeTestWisp->SetUsingAbsoluteLocation(true);
 			SizeTestWisp->SetWorldLocation(FMath::Lerp(OpeningWispReturnFrom, Home, Alpha));
+			SetOpeningInteractPrompt(false, FVector::ZeroVector);
 			if (OpeningWispReturnLeft <= 0.f)
 			{
 				bOpeningWispReturning = false;
@@ -3823,6 +3916,7 @@ void AHomeWorldCharacter::UpdateSizeTestWisp(float DeltaTime)
 			{
 				SizeTestWisp->SetUsingAbsoluteLocation(false);
 				SizeTestWisp->SetRelativeLocation(FVector(10.f, 45.f, 55.f));
+				SetOpeningInteractPrompt(false, FVector::ZeroVector);
 			}
 			else
 			{
@@ -3834,6 +3928,11 @@ void AHomeWorldCharacter::UpdateSizeTestWisp(float DeltaTime)
 				{
 					SizeTestWisp->SetUsingAbsoluteLocation(true);
 					SizeTestWisp->SetWorldLocation(Hover);
+					SetOpeningInteractPrompt(true, Hover);
+				}
+				else
+				{
+					SetOpeningInteractPrompt(false, FVector::ZeroVector);
 				}
 			}
 		}
@@ -3842,7 +3941,12 @@ void AHomeWorldCharacter::UpdateSizeTestWisp(float DeltaTime)
 			OpeningWispReleased = nullptr;
 			SizeTestWisp->SetUsingAbsoluteLocation(false);
 			SizeTestWisp->SetRelativeLocation(FVector(10.0f, 45.0f, 55.0f));
+			SetOpeningInteractPrompt(false, FVector::ZeroVector);
 		}
+	}
+	else
+	{
+		SetOpeningInteractPrompt(false, FVector::ZeroVector);
 	}
 }
 
@@ -3883,9 +3987,9 @@ void AHomeWorldCharacter::UpdateSizeTestWalk()
 
 void AHomeWorldCharacter::ApplySpawnControlPitch()
 {
-	if (AController* Controller = GetController())
+	if (AController* Controlled = GetController())
 	{
-		Controller->SetControlRotation(FRotator(-12.f, GetActorRotation().Yaw, 0.f));
+		Controlled->SetControlRotation(FRotator(-12.f, GetActorRotation().Yaw, 0.f));
 	}
 }
 

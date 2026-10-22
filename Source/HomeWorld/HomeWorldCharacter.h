@@ -43,6 +43,14 @@ class UHomeWorldCloudWisp;
 class UHomeWorldVirtueComponent;
 class AHomeWorldEasePad;
 class AHomeWorldParadoxToy;
+class UTextRenderComponent;
+
+/** One in-reach actor and how far its screen point sits from the look point, in NDC squared. */
+struct FOpeningLookCandidate
+{
+	AActor* Actor = nullptr;
+	float LookDistSq = 0.f;
+};
 
 UCLASS(Blueprintable)
 /**
@@ -64,6 +72,12 @@ public:
 
 	/** The aim rectangle is a development view of that box. Off after the 2026-10-21 pass. */
 	static constexpr bool bDrawOpeningAimBox = false;
+
+	/** A challenger takes the perch only when its look distance is at most this fraction of the perch's. */
+	static constexpr float OpeningLookStick = 0.75f;
+
+	static bool IsOpeningInteractInReach(float Dist2DCm);
+	static AActor* PickOpeningLookTarget(AActor* Perch, const TArray<FOpeningLookCandidate>& Candidates);
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -1000,6 +1014,10 @@ protected:
 	bool bSizeTestInteractCursor = false;
 	bool bSizeTestInteractHandled = false;
 	TObjectPtr<AActor> OpeningWispReleased;
+	UPROPERTY(Transient)
+	TObjectPtr<AActor> OpeningLookPerch;
+	UPROPERTY(Transient)
+	TObjectPtr<UTextRenderComponent> OpeningInteractPrompt;
 	bool bOpeningWispReturning = false;
 	float OpeningWispReturnLeft = 0.f;
 	FVector OpeningWispReturnFrom = FVector::ZeroVector;
@@ -1068,10 +1086,11 @@ protected:
 	bool TryOpeningArmorGift();
 	bool bOpeningFishCaught = false;
 
-	AActor* FindOpeningProximityTarget() const;
+	AActor* FindOpeningProximityTarget();
 
-	/** True when the target sits in the center of the view. */
-	bool IsOpeningTargetInView(const AActor* Target) const;
+	/** Look-point distance squared, in NDC. False when the target is behind the camera or off the viewport. */
+	bool OpeningLookDistSq(const AActor* Target, float& OutDistSq) const;
+	void SetOpeningInteractPrompt(bool bShow, const FVector& At);
 	void ShowOpeningProximityLine();
 	void RefreshOpeningQuest();
 	void MaybeLeadPartnerAfterHerbs();

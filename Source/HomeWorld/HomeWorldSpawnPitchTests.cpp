@@ -6,6 +6,7 @@
 
 #include "Engine/TargetPoint.h"
 #include "GameFramework/PlayerController.h"
+#include "HomeWorldShrinePortalComponent.h"
 #include "HomeWorldShrinePortalTrigger.h"
 #include "HomeWorldTestWorld.h"
 
@@ -29,7 +30,7 @@ bool FSpawnControlPitchTest::RunTest(const FString& Parameters)
 		return false;
 	}
 	Controller->Possess(Character);
-	TestEqual(TEXT("spawn pitch is -12"), Controller->GetControlRotation().Pitch, -12.f);
+	TestEqual(TEXT("spawn pitch is -12"), Controller->GetControlRotation().Pitch, -12.0);
 
 	FActorSpawnParameters Params;
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -38,7 +39,7 @@ bool FSpawnControlPitchTest::RunTest(const FString& Parameters)
 	AHomeWorldShrinePortalTrigger* Trigger = Scope.World->SpawnActor<AHomeWorldShrinePortalTrigger>(
 		FVector::ZeroVector, FRotator::ZeroRotator, Params);
 	if (!TestNotNull(TEXT("destination"), Destination) || !TestNotNull(TEXT("portal"), Trigger)
-		|| !TestNotNull(TEXT("portal component"), Trigger->PortalComponent))
+		|| !TestNotNull(TEXT("portal component"), Trigger->PortalComponent.Get()))
 	{
 		return false;
 	}
@@ -51,7 +52,7 @@ bool FSpawnControlPitchTest::RunTest(const FString& Parameters)
 	Controller->SetControlRotation(FRotator(89.9f, 0.f, 0.f));
 
 	TestTrue(TEXT("the portal teleports"), Trigger->PortalComponent->TryPortalTransit(Character));
-	TestEqual(TEXT("portal pitch is -12"), Controller->GetControlRotation().Pitch, -12.f);
+	TestEqual(TEXT("portal pitch is -12"), Controller->GetControlRotation().Pitch, -12.0);
 	return true;
 }
 

@@ -8,7 +8,23 @@ Write results in this file. The critical path below is the master list for Novem
 
 Current pass entry: [`PLAYTEST_INDEX.md`](PLAYTEST_INDEX.md). Now stays the first open row. Party, home loop, and the water/sign chain stay in their own files and are off this path.
 
-**Now:** October 22 on the critical path, Night. The aim box passed and its frame is off. Still open: press E at the bed, then one sentence in the Night table. The sky stays day.
+**Now:** October 23, one sitting, in this order. Fresh PIE on `L_SizeTest` for each row. The twelve developer stops passed 2026-10-22. Each table stays empty until its sentence. The meadow, the nodes, and the clearing are not saved on the map. A fast-forward spawns that row's marker for the run only.
+
+| Order | Word | His action | Table |
+|---|---|---|---|
+| 1 | `sleep` | E at the bed | Night |
+| 2 | `collect` | The click heart on a wisp | Night |
+| 3 | `heal` | E at the hot springs | Wisp loop |
+| 4 | `glider` | E at the armory | The glider |
+| 5 | `delivery` | E on the wood node | Delivery |
+| 6 | `daycamp` | Walk into the reach | Day camp |
+| 7 | `dawnglide` | The launch | Dawn glide |
+| 8 | `nightglide` | The spirit launch | Night glide |
+| 9 | `stealth` | Reach a guard | Stealth |
+| 10 | `ease` | The wind-up | Ease |
+| 11 | `shrine` | E on the shrine. The ladders have already run | Shrine |
+
+The field shell, the three nodes, and the runs that need them wait on the meadow site. No coordinate is written.
 
 **Built since the last pass:** the companion party (#319/#325) and the home-loop host bites 1-8/10. Neither is a tutorial beat. The `home_loop` quest chain is stored when the opening day ends.
 

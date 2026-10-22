@@ -9,6 +9,7 @@ The sequence is the Opening tutorial in [`Docs/VISION_BOARD.md`](../VISION_BOARD
 - The walk, stop, and hop on `L_SizeTest` pass the initial movement pass. 2026-10-17.
 - A heart sits beside the prop and turns with the view. Its height starts at the player's head and rises so the shape never clips the prop or the floor, including as the shape scales. 2026-10-21.
 - The shoulder wisp marks an object, and the opening interact reaches it, only when that object is within 280 cm and inside the passed aim box: half-extent 0.3, center 0.5 above the middle of the view. The development frame is off. 2026-10-21.
+- That box stays the look point. The hard edge is gone. Within 280 cm and in front of the camera, the actor closest to that point takes the shoulder wisp. The perched actor keeps it until another is at most three quarters of that look distance. The wisp on the shoulder means there is no interact. The wisp perched beside the actor, with one world E, is the interact. No crosshair and no frame. Heart placement is unchanged. 2026-10-22.
 - The fastest homestead walk already kept in play is 450 cm/s (`BodyWalkSpeed` in `Source/HomeWorld/HomeWorldTraversalComponent.h`).
 - The approach hides the cottage with a copse of pines and large stones. Hills and valleys are later. [`Docs/handoffs/research/TERRAIN_HEIGHT_LATER.md`](../handoffs/research/TERRAIN_HEIGHT_LATER.md).
 - The walk stays 450 cm/s until a replay says that single speed is wrong.
