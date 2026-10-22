@@ -3,6 +3,8 @@
 #include "HomeWorldShrinePortalComponent.h"
 #include "HomeWorldCharacter.h"
 #include "HomeWorldTimeOfDaySubsystem.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/Character.h"
 #include "GameFramework/Pawn.h"
 #include "Engine/World.h"
 #include "HAL/IConsoleManager.h"
@@ -241,7 +243,16 @@ bool UHomeWorldShrinePortalComponent::TryPortalTransit(AActor* InstigatorActor)
 		}
 	}
 
-	const FVector ArriveLoc = GetArriveLocation(Destination);
+	FVector ArriveLoc = GetArriveLocation(Destination);
+	// The marker sits on the floor. The pawn location is the capsule centre, so
+	// leaving Z at the marker plants the body in the ground and it pops up.
+	if (const ACharacter* Body = Cast<ACharacter>(Pawn))
+	{
+		if (const UCapsuleComponent* Capsule = Body->GetCapsuleComponent())
+		{
+			ArriveLoc.Z += Capsule->GetScaledCapsuleHalfHeight();
+		}
+	}
 	const FRotator ArriveRot(0.0f, Destination->GetActorRotation().Yaw + 180.0f, 0.0f);
 	Pawn->SetActorLocationAndRotation(ArriveLoc, ArriveRot, false, nullptr, ETeleportType::TeleportPhysics);
 	if (AHomeWorldCharacter* HomeCharacter = Cast<AHomeWorldCharacter>(Pawn))

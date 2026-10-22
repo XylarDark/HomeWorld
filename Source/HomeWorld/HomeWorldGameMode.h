@@ -66,6 +66,13 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	/**
+	 * PossessedBy sets the view to -12, then the engine copies the Player Start
+	 * rotation onto the controller. A start pitched at 89.9 aims the camera
+	 * under the pawn. Put the pitch back after that copy.
+	 */
+	virtual void FinishRestartPlayer(AController* NewPlayer, const FRotator& StartRotation) override;
+
 	/** Called when TimeOfDaySubsystem broadcasts OnNightStarted. Sets up night-specific timers and state. */
 	UFUNCTION()
 	void OnNightStarted();

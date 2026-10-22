@@ -24,6 +24,19 @@
 
 DEFINE_LOG_CATEGORY(LogHomeWorld);
 
+void AHomeWorldGameMode::FinishRestartPlayer(AController* NewPlayer, const FRotator& StartRotation)
+{
+	Super::FinishRestartPlayer(NewPlayer, StartRotation);
+	if (!NewPlayer)
+	{
+		return;
+	}
+	if (AHomeWorldCharacter* Character = Cast<AHomeWorldCharacter>(NewPlayer->GetPawn()))
+	{
+		Character->ApplySpawnControlPitch();
+	}
+}
+
 AHomeWorldGameMode::AHomeWorldGameMode()
 {
 	DefaultPawnClass = AHomeWorldCharacter::StaticClass();
