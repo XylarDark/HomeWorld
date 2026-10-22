@@ -2,6 +2,7 @@
 
 #include "HomeWorldHomeLoopSubsystem.h"
 
+#include "EngineUtils.h"
 #include "HomeWorldCharacter.h"
 #include "HomeWorldInventorySubsystem.h"
 #include "HomeWorldInventoryTypes.h"
@@ -897,12 +898,29 @@ void UHomeWorldHomeLoopSubsystem::NoteHomeRest()
 void UHomeWorldHomeLoopSubsystem::ApplyPlayerStress(TFunctionRef<void(UHomeWorldStressComponent*)> Apply)
 {
 	UWorld* World = GetWorld();
-	APlayerController* Controller = World ? World->GetFirstPlayerController() : nullptr;
-	APawn* Pawn = Controller ? Controller->GetPawn() : nullptr;
-	UHomeWorldStressComponent* Stress = Pawn ? Pawn->FindComponentByClass<UHomeWorldStressComponent>() : nullptr;
-	if (Stress)
+	if (!World)
 	{
-		Apply(Stress);
+		return;
+	}
+
+	// Play registers the controller in PostInitializeComponents. A world that has not
+	// initialized actors never does, so the possessed pawn is only in the actor list.
+	if (APlayerController* Controller = World->GetFirstPlayerController())
+	{
+		APawn* Pawn = Controller->GetPawn();
+		if (UHomeWorldStressComponent* Stress = Pawn ? Pawn->FindComponentByClass<UHomeWorldStressComponent>() : nullptr)
+		{
+			Apply(Stress);
+		}
+		return;
+	}
+
+	for (TActorIterator<AHomeWorldCharacter> It(World); It; ++It)
+	{
+		if (UHomeWorldStressComponent* Stress = It->FindComponentByClass<UHomeWorldStressComponent>())
+		{
+			Apply(Stress);
+		}
 	}
 }
 
