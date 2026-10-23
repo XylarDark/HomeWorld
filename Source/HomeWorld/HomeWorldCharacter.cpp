@@ -533,6 +533,16 @@ void AHomeWorldCharacter::TickBonkReturn(float DeltaSeconds)
 	OpeningBonkSafe = BonkArc.Land;
 	bOpeningBonkSafe = true;
 	bOpeningBonkReturning = false;
+	// The return lands by teleport and sets MOVE_Walking itself, so Landed() never runs.
+	// Clear the descent flags as Landed() does; a bonk return is not a field landing,
+	// so ChooseFieldLanding is not called here.
+	if (bCloudDescentActive || bDayGlideSmokeSign)
+	{
+		UE_LOG(LogTemp, Log, TEXT("opening_bonk: descent ended by the return (descent %d, smoke %d)"),
+			bCloudDescentActive ? 1 : 0, bDayGlideSmokeSign ? 1 : 0);
+	}
+	bCloudDescentActive = false;
+	bDayGlideSmokeSign = false;
 	UE_LOG(LogTemp, Log, TEXT("opening_bonk: landed"));
 }
 
