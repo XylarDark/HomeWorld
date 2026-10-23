@@ -4,8 +4,10 @@
 
 #if WITH_DEV_AUTOMATION_TESTS
 
+#include "Components/CapsuleComponent.h"
 #include "HomeWorldBonkArc.h"
 #include "HomeWorldTestWorld.h"
+#include "HomeWorldTimeOfDaySubsystem.h"
 
 namespace
 {
@@ -164,6 +166,56 @@ bool FBonkReentryTest::RunTest(const FString& Parameters)
 	TestTrue(TEXT("the flight does not land on the second target"),
 		!Character->GetActorLocation().Equals(SecondExpected, 50.f));
 	TestTrue(TEXT("the return has finished"), !Character->IsBonkReturning());
+
+	// A bonk out of a cloud descent. The return teleports and sets MOVE_Walking itself,
+	// so Landed() never runs: the return must clear the descent flags the way Landed()
+	// does, and must not choose a field landing.
+	{
+		HomeWorldTestWorld::FScopedWorld DescentScope(TEXT("bonk out of descent"));
+		if (!DescentScope.Ok(this))
+		{
+			return false;
+		}
+		DescentScope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Day);
+		AHomeWorldCharacter* Glider = HomeWorldTestWorld::SpawnCharacter(DescentScope.World);
+		if (!TestNotNull(TEXT("descent character"), Glider))
+		{
+			return false;
+		}
+		// The marker is a bare AActor with no root, so it reads as the origin; the body
+		// launches from the origin too, inside GlideStartProximityCm.
+		FActorSpawnParameters MarkerParams;
+		MarkerParams.Name = FName(TEXT("GP_GlideStart"));
+		MarkerParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		AActor* Marker = DescentScope.World->SpawnActor<AActor>(FVector::ZeroVector, FRotator::ZeroRotator, MarkerParams);
+		if (!TestNotNull(TEXT("glider start marker"), Marker))
+		{
+			return false;
+		}
+		Glider->GrantOpeningGliderForTest();
+		if (!TestTrue(TEXT("the day descent started"), Glider->TryStartCloudDescent()))
+		{
+			return false;
+		}
+		TestTrue(TEXT("descent is active before the bonk"), Glider->IsCloudDescentActive());
+		TestTrue(TEXT("day smoke sign is set before the bonk"), Glider->HasDayGlideSmokeSign());
+		const bool bChosenBefore = Glider->bFieldLandingChosen;
+		const bool bWindBefore = Glider->IsWindColumnAwake();
+		const bool bBullBefore = Glider->IsBullPathAwake();
+
+		Glider->BeginBonkReturn(FirstTarget, PadOrigin, PadExtent);
+		if (!TestTrue(TEXT("the descent bonk return started"), Glider->IsBonkReturning()))
+		{
+			return false;
+		}
+		Glider->TickBonkReturn(Glider->BonkArc.DurationSec + 0.1f);
+		TestTrue(TEXT("the descent bonk return has finished"), !Glider->IsBonkReturning());
+		TestFalse(TEXT("bonk return clears bCloudDescentActive"), Glider->IsCloudDescentActive());
+		TestFalse(TEXT("bonk return clears bDayGlideSmokeSign"), Glider->HasDayGlideSmokeSign());
+		TestTrue(TEXT("bonk return leaves bFieldLandingChosen unchanged"), Glider->bFieldLandingChosen == bChosenBefore);
+		TestTrue(TEXT("bonk return wakes no wind column"), Glider->IsWindColumnAwake() == bWindBefore);
+		TestTrue(TEXT("bonk return wakes no bull path"), Glider->IsBullPathAwake() == bBullBefore);
+	}
 
 	return true;
 }
