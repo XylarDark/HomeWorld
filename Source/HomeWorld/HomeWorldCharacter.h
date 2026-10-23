@@ -977,12 +977,15 @@ protected:
 	void UpdateSizeTestWalk();
 	void UpdateSizeTestWisp(float DeltaTime);
 	void UpdateOpeningBonk();
-	/** Fly the body back onto the pad in one shallow swoop. The landing is inset
-	 *  from the rim. The climb runs beside the pad until it can cross low.
-	 *  A new bonk calls this with its destination and the pad; it does not add a path. */
+	/** Fly the body back onto the pad. The landing is inset from the rim. A clear
+	 *  corridor crests CrestCm above the landing. A blocker lifts the cruise, then
+	 *  the path drops onto that same landing. A new bonk calls this; it does not
+	 *  add a path. */
 	void BeginBonkReturn(const FVector& Target, const FVector& PadOrigin, const FVector& PadExtent);
 	// HomeWorld.Opening.BonkReentry calls the return and reads the arc mid-flight.
 	friend class FBonkReentryTest;
+	// HomeWorld.Opening.BonkClearance reads the raised arc mid-flight.
+	friend class FBonkClearanceTest;
 	void TickBonkReturn(float DeltaSeconds);
 	bool IsBonkReturning() const { return bOpeningBonkReturning; }
 	void ClearPartyOnAbsenceVolumes();

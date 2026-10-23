@@ -4,16 +4,26 @@
 
 #include "CoreMinimal.h"
 
+class AActor;
+class UWorld;
+
 // The return flight shared by every bonk. Callers pass the last safe point and
-// the pad. The landing is inset from the rim. The climb runs beside the pad,
-// at a capped slope, and only crosses once it is above the standing height.
+// the pad. The landing is inset from the rim. A clear corridor climbs beside
+// the pad, at a capped slope, and crests CrestCm above the landing. A blocker
+// on the way home lifts the cruise so the capsule bottom clears its top, then
+// the path drops onto that same landing.
 namespace HomeWorldBonk
 {
 	// How far inside the pad the body is set down, in cm. A narrower pad uses
 	// half of its shorter half-extent so the landing stays on the pad.
 	inline constexpr float LandingInsetCm = 500.f;
-	// Highest the swoop crests above the standing height.
+	// Highest the clear-corridor swoop crests above the standing height.
+	// A blocker may force the cruise higher. It never forces it lower.
 	inline constexpr float CrestCm = 150.f;
+	// Capsule bottom stays this far above the tallest blocker, in cm.
+	inline constexpr float ClearanceMarginCm = 100.f;
+	// A surface this close to the landing feet is the pad, not something to fly over.
+	inline constexpr float ClearanceFloorSlackCm = 40.f;
 	// Climb budget: 45 cm of rise for each 100 cm of run. Steeper than this
 	// grows a lead beside the pad instead of a vertical launch.
 	inline constexpr float MaxRisePerRun = 0.45f;
@@ -28,8 +38,22 @@ namespace HomeWorldBonk
 		FVector From = FVector::ZeroVector;
 		FVector Approach = FVector::ZeroVector;
 		FVector Land = FVector::ZeroVector;
+		// Cruise end. The path drops from here to Land when bDrop is set.
+		FVector Drop = FVector::ZeroVector;
+		bool bDrop = false;
 		float Split = 0.5f;
+		float DropSplit = 1.f;
 		float DurationSec = 1.f;
+	};
+
+	// What the launch sweep found between From and Land. ApexZ is the actor
+	// center. ApproachT and DropT are 0-1 along that straight segment.
+	struct FClearance
+	{
+		bool bRaised = false;
+		float ApexZ = 0.f;
+		float ApproachT = 0.f;
+		float DropT = 1.f;
 	};
 
 	inline bool IsInsidePadXY(const FVector& Point, const FVector& PadOrigin, const FVector& PadExtent, float SlackCm = 0.f)
@@ -112,17 +136,64 @@ namespace HomeWorldBonk
 		return FMath::Lerp(From, Land, FMath::Clamp(T0, 0.f, 1.f));
 	}
 
+	// Capsule sweep from launch to landing. Ignores the pawn. A clear corridor
+	// leaves bRaised false so MakeArc keeps the crest-150 swoop.
+	FClearance MeasureClearance(
+		UWorld* World,
+		const FVector& From,
+		const FVector& Land,
+		float BodyHalfHeightCm,
+		float BodyRadiusCm,
+		const AActor* IgnoreActor);
+
 	inline FArc MakeArc(
 		const FVector& From,
 		const FVector& Target,
 		const FVector& PadOrigin,
 		const FVector& PadExtent,
 		float BodyHalfHeightCm,
-		float BodyRadiusCm)
+		float BodyRadiusCm,
+		const FClearance* Clearance = nullptr)
 	{
 		FArc Arc;
 		Arc.From = From;
+		Arc.bDrop = false;
 		Arc.Land = LandingOnPad(Target, PadOrigin, PadExtent, BodyHalfHeightCm);
+
+		// The sweep found a blocker. Cruise at the clearance height from before
+		// the first overlap until after the last, then drop onto the landing.
+		// The clear-corridor slope cap does not apply: the shape has to clear.
+		if (Clearance && Clearance->bRaised)
+		{
+			const float ApexZ = FMath::Max(Arc.Land.Z + CrestCm, Clearance->ApexZ);
+			const float T0 = FMath::Clamp(Clearance->ApproachT, 0.f, 1.f);
+			const float T1 = FMath::Clamp(FMath::Max(Clearance->DropT, T0), 0.f, 1.f);
+			Arc.Approach = FMath::Lerp(Arc.From, Arc.Land, T0);
+			Arc.Approach.Z = ApexZ;
+			Arc.Drop = FMath::Lerp(Arc.From, Arc.Land, T1);
+			Arc.Drop.Z = ApexZ;
+			Arc.bDrop = true;
+
+			const float LenA = FVector::Dist(Arc.From, Arc.Approach);
+			const float LenB = FVector::Dist(Arc.Approach, Arc.Drop);
+			const float LenC = FVector::Dist(Arc.Drop, Arc.Land);
+			const float Total = LenA + LenB + LenC;
+			if (Total > 1.f)
+			{
+				Arc.Split = FMath::Clamp(LenA / Total, 0.02f, 0.90f);
+				Arc.DropSplit = FMath::Clamp((LenA + LenB) / Total, Arc.Split, 0.98f);
+			}
+			else
+			{
+				Arc.Split = 0.34f;
+				Arc.DropSplit = 0.67f;
+			}
+			Arc.DurationSec = FMath::Clamp(
+				(Total > 1.f) ? (Total / SpeedCmPerSec) : MinDurationSec,
+				MinDurationSec,
+				MaxDurationSec);
+			return Arc;
+		}
 
 		const float HalfX = FMath::Max(FMath::Abs(PadExtent.X), 0.f);
 		const float HalfY = FMath::Max(FMath::Abs(PadExtent.Y), 0.f);
@@ -187,6 +258,24 @@ namespace HomeWorldBonk
 	inline FVector PointOnArc(const FArc& Arc, float T)
 	{
 		const float Clamped = FMath::Clamp(T, 0.f, 1.f);
+		if (Arc.bDrop)
+		{
+			const float Split = FMath::Clamp(Arc.Split, 0.02f, 0.90f);
+			const float DropSplit = FMath::Clamp(Arc.DropSplit, Split, 0.98f);
+			if (Clamped <= Split)
+			{
+				const float Denom = FMath::Max(Split, KINDA_SMALL_NUMBER);
+				return FMath::Lerp(Arc.From, Arc.Approach, FMath::Min(Clamped / Denom, 1.f));
+			}
+			if (Clamped <= DropSplit)
+			{
+				const float Denom = FMath::Max(DropSplit - Split, KINDA_SMALL_NUMBER);
+				return FMath::Lerp(Arc.Approach, Arc.Drop, (Clamped - Split) / Denom);
+			}
+			const float Denom = FMath::Max(1.f - DropSplit, KINDA_SMALL_NUMBER);
+			return FMath::Lerp(Arc.Drop, Arc.Land, (Clamped - DropSplit) / Denom);
+		}
+
 		const float Split = FMath::Clamp(Arc.Split, 0.05f, 0.95f);
 		if (Clamped <= Split)
 		{
