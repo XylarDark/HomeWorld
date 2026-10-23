@@ -3,6 +3,7 @@
 #include "HomeWorldCharacter.h"
 #include "HomeWorldInteractResolver.h"
 #include "HomeWorldOpeningRegistry.h"
+#include "HomeWorldPlaytestBeats.h"
 #include "HomeWorldPlacementConstants.h"
 #include "HAL/IConsoleManager.h"
 #include "HomeWorldCampActor.h"
@@ -1074,136 +1075,8 @@ void AHomeWorldCharacter::DebugAdvanceOpeningNight(float DeltaSeconds)
 
 namespace
 {
-	/** hw.Playtest.FastForward stops: the beat the player wants to test in person. */
-	constexpr int32 PlaytestBeatSpirit = 1;
-	constexpr int32 PlaytestBeatHerbs = 2;
-	constexpr int32 PlaytestBeatBackpack = 3;
-	constexpr int32 PlaytestBeatKettle = 4;
-	constexpr int32 PlaytestBeatStation = 5;
-	constexpr int32 PlaytestBeatDog = 6;
-	constexpr int32 PlaytestBeatFish = 7;
-	constexpr int32 PlaytestBeatSleep = 8;
-	constexpr int32 PlaytestBeatNight = 9;
-	constexpr int32 PlaytestBeatCollect = 10;
-	constexpr int32 PlaytestBeatHeal = 11;
-	constexpr int32 PlaytestBeatGlider = 12;
-	constexpr int32 PlaytestBeatDelivery = 13;
-	constexpr int32 PlaytestBeatDayCamp = 14;
-	constexpr int32 PlaytestBeatDawnGlide = 15;
-	constexpr int32 PlaytestBeatNightGlide = 16;
-	constexpr int32 PlaytestBeatStealth = 17;
-	constexpr int32 PlaytestBeatEase = 18;
-	constexpr int32 PlaytestBeatShrine = 19;
-	constexpr int32 PlaytestBeatStress = 20;
-
-	/** The one runner step the player takes himself. 0 = every step runs (night and the loop). */
-	int32 PlaytestSkipStep(int32 Beat)
-	{
-		switch (Beat)
-		{
-		case PlaytestBeatSpirit: return 1;
-		case PlaytestBeatHerbs: return 2;
-		case PlaytestBeatBackpack: return 3;
-		case PlaytestBeatKettle: return 5;
-		case PlaytestBeatStation: return 6;
-		case PlaytestBeatDog: return 7;
-		case PlaytestBeatFish: return 8;
-		case PlaytestBeatSleep: return 9;
-		default: return 0;
-		}
-	}
-
-	const TCHAR* PlaytestBeatName(int32 Beat)
-	{
-		switch (Beat)
-		{
-		case PlaytestBeatSpirit: return TEXT("spirit");
-		case PlaytestBeatHerbs: return TEXT("herbs");
-		case PlaytestBeatBackpack: return TEXT("backpack");
-		case PlaytestBeatKettle: return TEXT("kettle");
-		case PlaytestBeatStation: return TEXT("station");
-		case PlaytestBeatDog: return TEXT("dog");
-		case PlaytestBeatFish: return TEXT("fish");
-		case PlaytestBeatSleep: return TEXT("sleep");
-		case PlaytestBeatNight: return TEXT("night");
-		case PlaytestBeatCollect: return TEXT("collect");
-		case PlaytestBeatHeal: return TEXT("heal");
-		case PlaytestBeatGlider: return TEXT("glider");
-		case PlaytestBeatDelivery: return TEXT("delivery");
-		case PlaytestBeatDayCamp: return TEXT("daycamp");
-		case PlaytestBeatDawnGlide: return TEXT("dawnglide");
-		case PlaytestBeatNightGlide: return TEXT("nightglide");
-		case PlaytestBeatStealth: return TEXT("stealth");
-		case PlaytestBeatEase: return TEXT("ease");
-		case PlaytestBeatShrine: return TEXT("shrine");
-		case PlaytestBeatStress: return TEXT("stress");
-		default: return TEXT("night");
-		}
-	}
-
-	/** Beat words (lowercased, spaces folded out) to a stop. 0 = unknown. */
-	int32 PlaytestBeatFromText(const FString& Text)
-	{
-		FString Key = Text.ToLower();
-		Key.ReplaceInline(TEXT("_"), TEXT(""));
-		Key.ReplaceInline(TEXT(" "), TEXT(""));
-		if (Key.IsEmpty())
-		{
-			return PlaytestBeatNight;
-		}
-		// Order matters here: "herb collection" carries both herb and collect.
-		if (Key.Contains(TEXT("heal")) || Key.Contains(TEXT("spring"))) return PlaytestBeatHeal;
-		if (Key.Contains(TEXT("herb")) || Key.Contains(TEXT("garden"))) return PlaytestBeatHerbs;
-		if (Key.Contains(TEXT("stealth"))) return PlaytestBeatStealth;
-		if (Key.Contains(TEXT("spirit"))) return PlaytestBeatSpirit;
-		if (Key.Contains(TEXT("backpack")) || Key.Contains(TEXT("partner")) || Key.Contains(TEXT("gift"))) return PlaytestBeatBackpack;
-		if (Key.Contains(TEXT("kettle")) || Key.Contains(TEXT("tea"))) return PlaytestBeatKettle;
-		if (Key.Contains(TEXT("station")) || Key.Contains(TEXT("counter")) || Key.Contains(TEXT("mix"))) return PlaytestBeatStation;
-		if (Key.Contains(TEXT("dog")) || Key.Contains(TEXT("grace"))) return PlaytestBeatDog;
-		if (Key.Contains(TEXT("fish")) || Key.Contains(TEXT("pond"))) return PlaytestBeatFish;
-		if (Key.Contains(TEXT("sleep")) || Key.Contains(TEXT("bed"))) return PlaytestBeatSleep;
-		if (Key.Contains(TEXT("wisp")) || Key.Contains(TEXT("collect"))) return PlaytestBeatCollect;
-		if (Key.Contains(TEXT("nightglide"))) return PlaytestBeatNightGlide;
-		if (Key.Contains(TEXT("night"))) return PlaytestBeatNight;
-		if (Key.Contains(TEXT("glider"))) return PlaytestBeatGlider;
-		if (Key.Contains(TEXT("delivery"))) return PlaytestBeatDelivery;
-		if (Key.Contains(TEXT("daycamp"))) return PlaytestBeatDayCamp;
-		if (Key.Contains(TEXT("dawnglide"))) return PlaytestBeatDawnGlide;
-		if (Key.Contains(TEXT("shrine"))) return PlaytestBeatShrine;
-		if (Key.Contains(TEXT("stress"))) return PlaytestBeatStress;
-		if (Key.Contains(TEXT("ease"))) return PlaytestBeatEase;
-		return 0;
-	}
-
-	float OpeningStopIntentCm(int32 Beat)
-	{
-		switch (Beat)
-		{
-		case PlaytestBeatKettle:
-		case PlaytestBeatStation:
-		case PlaytestBeatGlider:
-			return 220.f;
-		case PlaytestBeatDog:
-			return 650.f;
-		case PlaytestBeatSleep:
-		case PlaytestBeatNight:
-		case PlaytestBeatDawnGlide:
-		case PlaytestBeatNightGlide:
-		case PlaytestBeatEase:
-		case PlaytestBeatShrine:
-			return 180.f;
-		case PlaytestBeatCollect:
-			return 350.f;
-		case PlaytestBeatHeal:
-			return 470.f;
-		case PlaytestBeatDelivery:
-			return 200.f;
-		case PlaytestBeatDayCamp:
-			return 320.f;
-		default:
-			return 260.f;
-		}
-	}
+	/** hw.Playtest.FastForward stops. The rows live in HomeWorldPlaytestBeats (the beat table). */
+	constexpr int32 PlaytestBeatStress = static_cast<int32>(HomeWorldPlaytestBeats::EBeat::Stress);
 
 	AActor* FindOpeningTaggedActor(UWorld* World, const TCHAR* Tag, const TCHAR* AltTag = nullptr)
 	{
@@ -1215,7 +1088,7 @@ void AHomeWorldCharacter::DebugFastForwardOpening(const FString& Beat)
 {
 	if (Beat.Equals(TEXT("list"), ESearchCase::IgnoreCase))
 	{
-		UE_LOG(LogTemp, Log, TEXT("playtest_ff: beats: spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect, heal, glider, delivery, daycamp, dawnglide, nightglide, stealth, ease, shrine, stress"));
+		UE_LOG(LogTemp, Log, TEXT("playtest_ff: beats: %s"), *HomeWorldPlaytestBeats::ListText());
 		return;
 	}
 	if (DebugFastForwardStep > 0)
@@ -1223,10 +1096,10 @@ void AHomeWorldCharacter::DebugFastForwardOpening(const FString& Beat)
 		UE_LOG(LogTemp, Log, TEXT("playtest_ff: already running (step %d)"), DebugFastForwardStep);
 		return;
 	}
-	const int32 Stop = PlaytestBeatFromText(Beat);
+	const int32 Stop = HomeWorldPlaytestBeats::FromText(Beat);
 	if (Stop == 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("playtest_ff: beat '%s' unknown - spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect, heal, glider, delivery, daycamp, dawnglide, nightglide, stealth, ease, shrine, stress"), *Beat);
+		UE_LOG(LogTemp, Warning, TEXT("playtest_ff: beat '%s' unknown - %s"), *Beat, *HomeWorldPlaytestBeats::ListText());
 		return;
 	}
 	if (Stop == PlaytestBeatStress)
@@ -1261,7 +1134,7 @@ void AHomeWorldCharacter::DebugFastForwardOpening(const FString& Beat)
 	DebugFastForwardStepClock = 0.f;
 	PlaytestReadyFor.Empty();
 	PlaytestReadyDistanceCm = -1.f;
-	UE_LOG(LogTemp, Log, TEXT("playtest_ff: start -> %s. The beats before it run for real, then it is yours."), PlaytestBeatName(Stop));
+	UE_LOG(LogTemp, Log, TEXT("playtest_ff: start -> %s. The beats before it run for real, then it is yours."), HomeWorldPlaytestBeats::WordFor(Stop));
 }
 
 void AHomeWorldCharacter::TickDebugFastForward(float DeltaTime)
@@ -1286,7 +1159,7 @@ void AHomeWorldCharacter::TickDebugFastForward(float DeltaTime)
 	{
 	case 1:
 	{
-		if (PlaytestSkipStep(DebugFastForwardStop) == 1)
+		if (HomeWorldPlaytestBeats::SkipStep(DebugFastForwardStop) == 1)
 		{
 			ReadyForOpeningPlaytest();
 			Next(0);
@@ -1317,7 +1190,7 @@ void AHomeWorldCharacter::TickDebugFastForward(float DeltaTime)
 	}
 	case 2:
 	{
-		if (PlaytestSkipStep(DebugFastForwardStop) == 2)
+		if (HomeWorldPlaytestBeats::SkipStep(DebugFastForwardStop) == 2)
 		{
 			ReadyForOpeningPlaytest();
 			Next(0);
@@ -1354,7 +1227,7 @@ void AHomeWorldCharacter::TickDebugFastForward(float DeltaTime)
 	}
 	case 3:
 	{
-		if (PlaytestSkipStep(DebugFastForwardStop) == 3)
+		if (HomeWorldPlaytestBeats::SkipStep(DebugFastForwardStop) == 3)
 		{
 			ReadyForOpeningPlaytest();
 			Next(0);
@@ -1387,7 +1260,7 @@ void AHomeWorldCharacter::TickDebugFastForward(float DeltaTime)
 		break;
 	}
 	case 4:
-		if (PlaytestSkipStep(DebugFastForwardStop) == 4)
+		if (HomeWorldPlaytestBeats::SkipStep(DebugFastForwardStop) == 4)
 		{
 			ReadyForOpeningPlaytest();
 			Next(0);
@@ -1403,7 +1276,7 @@ void AHomeWorldCharacter::TickDebugFastForward(float DeltaTime)
 		Next(5);
 		break;
 	case 5:
-		if (PlaytestSkipStep(DebugFastForwardStop) == 5)
+		if (HomeWorldPlaytestBeats::SkipStep(DebugFastForwardStop) == 5)
 		{
 			ReadyForOpeningPlaytest();
 			Next(0);
@@ -1419,7 +1292,7 @@ void AHomeWorldCharacter::TickDebugFastForward(float DeltaTime)
 		Next(6);
 		break;
 	case 6:
-		if (PlaytestSkipStep(DebugFastForwardStop) == 6)
+		if (HomeWorldPlaytestBeats::SkipStep(DebugFastForwardStop) == 6)
 		{
 			ReadyForOpeningPlaytest();
 			Next(0);
@@ -1438,7 +1311,7 @@ void AHomeWorldCharacter::TickDebugFastForward(float DeltaTime)
 		break;
 	case 7:
 	{
-		if (PlaytestSkipStep(DebugFastForwardStop) == 7)
+		if (HomeWorldPlaytestBeats::SkipStep(DebugFastForwardStop) == 7)
 		{
 			ReadyForOpeningPlaytest();
 			Next(0);
@@ -1482,7 +1355,7 @@ void AHomeWorldCharacter::TickDebugFastForward(float DeltaTime)
 	}
 	case 8:
 	{
-		if (PlaytestSkipStep(DebugFastForwardStop) == 8)
+		if (HomeWorldPlaytestBeats::SkipStep(DebugFastForwardStop) == 8)
 		{
 			ReadyForOpeningPlaytest();
 			Next(0);
@@ -1510,7 +1383,7 @@ void AHomeWorldCharacter::TickDebugFastForward(float DeltaTime)
 	}
 	case 9:
 	{
-		if (PlaytestSkipStep(DebugFastForwardStop) == 9)
+		if (HomeWorldPlaytestBeats::SkipStep(DebugFastForwardStop) == 9)
 		{
 			ReadyForOpeningPlaytest();
 			Next(0);
@@ -1530,10 +1403,7 @@ void AHomeWorldCharacter::TickDebugFastForward(float DeltaTime)
 			return;
 		}
 		UE_LOG(LogTemp, Log, TEXT("playtest_ff: 9 night ready at the bed - %s"), *GetOpeningTrackerText());
-		if (DebugFastForwardStop == PlaytestBeatGlider || DebugFastForwardStop == PlaytestBeatDelivery
-			|| DebugFastForwardStop == PlaytestBeatDayCamp || DebugFastForwardStop == PlaytestBeatDawnGlide
-			|| DebugFastForwardStop == PlaytestBeatNightGlide || DebugFastForwardStop == PlaytestBeatStealth
-			|| DebugFastForwardStop == PlaytestBeatEase || DebugFastForwardStop == PlaytestBeatShrine)
+		if (HomeWorldPlaytestBeats::ReadyAfterStep(DebugFastForwardStop) > 9)
 		{
 			Next(10);
 			break;
@@ -1546,18 +1416,19 @@ void AHomeWorldCharacter::TickDebugFastForward(float DeltaTime)
 	{
 		ReturnOpeningBodyForDawnPlaytest();
 		StockOpeningDawnChest();
-		if (DebugFastForwardStop == PlaytestBeatGlider)
+		const int32 ReadyAfter = HomeWorldPlaytestBeats::ReadyAfterStep(DebugFastForwardStop);
+		if (ReadyAfter == 10)
 		{
 			ReadyForOpeningPlaytest();
 			Next(0);
 			return;
 		}
-		if (DebugFastForwardStop == PlaytestBeatDayCamp)
+		if (ReadyAfter == 12)
 		{
 			Next(12);
 			break;
 		}
-		if (DebugFastForwardStop == PlaytestBeatDelivery)
+		if (ReadyAfter == 11)
 		{
 			Next(11);
 			break;
@@ -1594,7 +1465,7 @@ void AHomeWorldCharacter::TickDebugFastForward(float DeltaTime)
 		{
 			Marker->Tags.Add(FName(TEXT("GlideStart")));
 		}
-		if (DebugFastForwardStop == PlaytestBeatDawnGlide)
+		if (HomeWorldPlaytestBeats::ReadyAfterStep(DebugFastForwardStop) == 13)
 		{
 			ReadyForOpeningPlaytest();
 			Next(0);
@@ -1611,7 +1482,7 @@ void AHomeWorldCharacter::TickDebugFastForward(float DeltaTime)
 			Next(0);
 			return;
 		}
-		if (DebugFastForwardStop == PlaytestBeatNightGlide)
+		if (HomeWorldPlaytestBeats::ReadyAfterStep(DebugFastForwardStop) == 14)
 		{
 			ReadyForOpeningPlaytest();
 			Next(0);
@@ -1637,7 +1508,7 @@ void AHomeWorldCharacter::TickDebugFastForward(float DeltaTime)
 			LightParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 			World->SpawnActor<AHomeWorldSpiritLitVolume>(At, FRotator::ZeroRotator, LightParams);
 		}
-		if (DebugFastForwardStop == PlaytestBeatStealth)
+		if (HomeWorldPlaytestBeats::ReadyAfterStep(DebugFastForwardStop) == 15)
 		{
 			ReadyForOpeningPlaytest();
 			Next(0);
@@ -1659,7 +1530,7 @@ void AHomeWorldCharacter::TickDebugFastForward(float DeltaTime)
 				Pad->BindGuard(Index);
 			}
 		}
-		if (DebugFastForwardStop == PlaytestBeatEase)
+		if (HomeWorldPlaytestBeats::ReadyAfterStep(DebugFastForwardStop) == 16)
 		{
 			ReadyForOpeningPlaytest();
 			Next(0);
@@ -1689,124 +1560,66 @@ void AHomeWorldCharacter::ReadyForOpeningPlaytest()
 		return;
 	}
 	AActor* Target = nullptr;
-	const float Distance = OpeningStopIntentCm(DebugFastForwardStop);
-	bool bPondEdge = false;
-	bool bPlaceTarget = true;
+	const HomeWorldPlaytestBeats::FRow* Row = HomeWorldPlaytestBeats::RowFor(DebugFastForwardStop);
+	const float Distance = HomeWorldPlaytestBeats::StandoffCm(DebugFastForwardStop);
 	FString Note;
-	switch (DebugFastForwardStop)
+	if (Row)
 	{
-	case PlaytestBeatSpirit:
-	{
-		for (TActorIterator<AHomeWorldOpeningReveal> It(World); It; ++It)
+		if (Row->bNightProps)
 		{
-			Target = *It;
+			EnsureOpeningNightProps();
+		}
+		if (Row->bCarryWisps)
+		{
+			CollectNightWispsForPlaytest();
+		}
+		switch (Row->Target)
+		{
+		case HomeWorldPlaytestBeats::ETarget::Reveal:
+			for (TActorIterator<AHomeWorldOpeningReveal> It(World); It; ++It)
+			{
+				Target = *It;
+				break;
+			}
+			break;
+		case HomeWorldPlaytestBeats::ETarget::Dog:
+			for (TActorIterator<AHomeWorldOpeningDog> It(World); It; ++It)
+			{
+				Target = *It;
+				break;
+			}
+			break;
+		case HomeWorldPlaytestBeats::ETarget::Tagged:
+			Target = FindOpeningTaggedActor(World, Row->Tag, Row->AltTag);
+			break;
+		case HomeWorldPlaytestBeats::ETarget::Named:
+			Target = FindOpeningNamed(World, Row->Name, true);
+			break;
+		case HomeWorldPlaytestBeats::ETarget::CopseWisp:
+			Target = OpeningCopseWisp;
+			break;
+		default:
 			break;
 		}
-		Note = TEXT("E at the spirit");
-		break;
+		Note = Row->Note;
 	}
-	case PlaytestBeatHerbs:
-		Target = FindOpeningTaggedActor(World, TEXT("NODE_GARDEN_EAST"));
-		Note = TEXT("E at the east bed, draw the trace heart");
-		break;
-	case PlaytestBeatBackpack:
-		Target = FindOpeningTaggedActor(World, TEXT("NPC_PARTNER"));
-		Note = TEXT("E at the partner: the backpack");
-		break;
-	case PlaytestBeatKettle:
-		Target = FindOpeningTaggedActor(World, TEXT("KettleCounter"), TEXT("NODE_CONSUMABLE_STATION"));
-		Note = TEXT("E at the counter: open, mix, then brew");
-		break;
-	case PlaytestBeatStation:
-		Target = FindOpeningTaggedActor(World, TEXT("NODE_CONSUMABLE_STATION"));
-		Note = TEXT("E at the counter: open, then mix");
-		break;
-	case PlaytestBeatDog:
+	if (Target && Row)
 	{
-		for (TActorIterator<AHomeWorldOpeningDog> It(World); It; ++It)
-		{
-			Target = *It;
-			break;
-		}
-		Note = TEXT("walk up slowly, draw the Grace trace, then E");
-		break;
-	}
-	case PlaytestBeatFish:
-		Target = FindOpeningNamed(World, TEXT("Water_Pond"), true);
-		bPondEdge = true;
-		Note = TEXT("E at the pond bank, one fish");
-		break;
-	case PlaytestBeatSleep:
-		Target = FindOpeningNamed(World, TEXT("SM_Size_Bed"), true);
-		Note = TEXT("E at the bed: sleep");
-		break;
-	case PlaytestBeatNight:
-		Target = FindOpeningNamed(World, TEXT("SM_Size_Bed"), true);
-		bPlaceTarget = false;
-		Note = TEXT("night is on, the bed is behind you");
-		break;
-	case PlaytestBeatCollect:
-		EnsureOpeningNightProps();
-		Target = OpeningCopseWisp;
-		Note = TEXT("E at the wisp, click the heart");
-		break;
-	case PlaytestBeatHeal:
-		EnsureOpeningNightProps();
-		CollectNightWispsForPlaytest();
-		Target = FindOpeningNamed(World, TEXT("Water_HotSpring"), true);
-		Note = TEXT("E at the hot springs, the heal takes 20s");
-		break;
-	case PlaytestBeatGlider:
-		Target = FindOpeningTaggedActor(World, TEXT("NODE_ARMOR_TABLE"), TEXT("ArmorTable"));
-		Note = TEXT("E at the armory: craft the glider");
-		break;
-	case PlaytestBeatDelivery:
-		Target = FindOpeningTaggedActor(World, TEXT("NODE_OPENING_DELIVERY"));
-		Note = TEXT("E at the wood node: set the healed wisp");
-		break;
-	case PlaytestBeatDayCamp:
-		Target = FindOpeningTaggedActor(World, TEXT("NODE_OPENING_DAY_CAMP"));
-		Note = TEXT("walk into the clearing");
-		break;
-	case PlaytestBeatDawnGlide:
-		Target = FindOpeningTaggedActor(World, TEXT("GlideStart"));
-		Note = TEXT("the launch is yours");
-		break;
-	case PlaytestBeatNightGlide:
-		Target = FindOpeningTaggedActor(World, TEXT("GlideStart"));
-		Note = TEXT("travel only, the launch is yours");
-		break;
-	case PlaytestBeatStealth:
-		Target = FindOpeningTaggedActor(World, TEXT("NODE_GUARD"));
-		Note = TEXT("reach the guard");
-		break;
-	case PlaytestBeatEase:
-		Target = FindOpeningTaggedActor(World, TEXT("NODE_OPENING_EASE"));
-		Note = TEXT("the wind-up is yours");
-		break;
-	case PlaytestBeatShrine:
-		Target = FindOpeningTaggedActor(World, TEXT("NODE_OPENING_SHRINE"));
-		Note = TEXT("E at the shrine");
-		break;
-	default:
-		break;
-	}
-	if (Target && bPlaceTarget)
-	{
-		if (bPondEdge)
+		if (Row->Stand == HomeWorldPlaytestBeats::EStand::PondEdge)
 		{
 			PlaceForOpeningPlaytestAtPond(Target);
 		}
-		else
+		else if (Row->Stand == HomeWorldPlaytestBeats::EStand::Bounds)
 		{
+			// Bounds stand: the row's standoff intent, gaze derived from the target's bounds.
 			PlaceForOpeningPlaytest(Target, Distance);
 		}
 	}
-	PlaytestReadyFor = PlaytestBeatName(DebugFastForwardStop);
+	PlaytestReadyFor = HomeWorldPlaytestBeats::WordFor(DebugFastForwardStop);
 	PlaytestReadyDistanceCm = Target
 		? FVector::Dist2D(GetActorLocation(), Target->GetActorLocation())
 		: -1.f;
-	UE_LOG(LogTemp, Log, TEXT("playtest_ff: ready for %s - %s"), PlaytestBeatName(DebugFastForwardStop), *Note);
+	UE_LOG(LogTemp, Log, TEXT("playtest_ff: ready for %s - %s"), HomeWorldPlaytestBeats::WordFor(DebugFastForwardStop), *Note);
 	if (Target)
 	{
 		const float DistCm = PlaytestReadyDistanceCm;
