@@ -3,6 +3,16 @@
 #include "HomeWorldGlideMovementComponent.h"
 #include "GameFramework/Character.h"
 #include "Components/CapsuleComponent.h"
+#include "Misc/ScopeExit.h"
+
+// Same-tick re-entry probe. HomeWorld.Transit.CloudDescent.SameFrameLandingNoReentry reads it
+// to prove a landing does not recurse back into PhysCustom.
+namespace HomeWorldGlideProbe
+{
+	int32 GCalls = 0;
+	int32 GDepth = 0;
+	int32 GMaxDepth = 0;
+}
 
 UHomeWorldGlideMovementComponent::UHomeWorldGlideMovementComponent()
 {
@@ -57,6 +67,17 @@ FVector UHomeWorldGlideMovementComponent::ComputeGlideTargetVelocity() const
 
 void UHomeWorldGlideMovementComponent::PhysCustom(float DeltaTime, int32 Iterations)
 {
+	++HomeWorldGlideProbe::GCalls;
+	++HomeWorldGlideProbe::GDepth;
+	HomeWorldGlideProbe::GMaxDepth = FMath::Max(HomeWorldGlideProbe::GMaxDepth, HomeWorldGlideProbe::GDepth);
+	ON_SCOPE_EXIT { --HomeWorldGlideProbe::GDepth; };
+	// Same-tick re-entry guard. The landing hand-off below runs StartNewPhysics, which
+	// must never come back into the glide on the same stack (PIE STACK_OVERFLOW, 2026-10-22).
+	if (HomeWorldGlideProbe::GDepth > 1)
+	{
+		return;
+	}
+
 	if (!IsGliding() || DeltaTime < MIN_TICK_TIME || !CharacterOwner || !UpdatedComponent)
 	{
 		return;
@@ -73,8 +94,10 @@ void UHomeWorldGlideMovementComponent::PhysCustom(float DeltaTime, int32 Iterati
 
 	// Gravity is expressed only through GlideSinkRate; do not accumulate it separately
 	// or the two would compound into an accelerating dive.
+	// Velocity is cm/s; one tick moves Velocity * DeltaTime, not a full second of travel.
+	const FVector Delta = Velocity * DeltaTime;
 	FHitResult Hit;
-	MoveUpdatedComponent(Velocity, UpdatedComponent->GetComponentQuat(), true, &Hit);
+	MoveUpdatedComponent(Delta, UpdatedComponent->GetComponentQuat(), true, &Hit);
 
 	if (Hit.bBlockingHit)
 	{
@@ -83,19 +106,24 @@ void UHomeWorldGlideMovementComponent::PhysCustom(float DeltaTime, int32 Iterati
 			Hit.GetComponent()->GetCollisionObjectType() == ECC_Pawn)
 		{
 			// Pawn-vs-pawn: push out instead of stopping dead.
-			SlideAlongSurface(Velocity, 1.0f - Hit.Time, Hit.Normal, Hit, true);
+			SlideAlongSurface(Delta, 1.0f - Hit.Time, Hit.Normal, Hit, true);
 		}
 		else if (IsWalkable(Hit))
 		{
 			// Touched down. Hand off to the engine so walking resumes and
 			// ACharacter::Landed fires exactly as it does for a normal fall.
-			ProcessLanded(Hit, DeltaTime, Iterations);
+			// ProcessLanded only switches to walking from MOVE_Falling; from the glide
+			// mode it restarted PhysCustom with the whole tick, forever. Leave the glide
+			// first and hand over only the time this tick has left.
+			const float RemainingTime = DeltaTime * (1.0f - Hit.Time);
+			SetMovementMode(MOVE_Falling);
+			ProcessLanded(Hit, RemainingTime, Iterations);
 			return;
 		}
 		else
 		{
 			// Non-walkable surface: slide along it and keep gliding.
-			SlideAlongSurface(Velocity, 1.0f - Hit.Time, Hit.Normal, Hit, true);
+			SlideAlongSurface(Delta, 1.0f - Hit.Time, Hit.Normal, Hit, true);
 		}
 	}
 }

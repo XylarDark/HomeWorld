@@ -4,6 +4,11 @@
 
 #if WITH_DEV_AUTOMATION_TESTS
 
+#include "Components/CapsuleComponent.h"
+#include "Components/StaticMeshComponent.h"
+#include "Engine/CollisionProfile.h"
+#include "Engine/StaticMesh.h"
+#include "Engine/StaticMeshActor.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "HomeWorldCharacter.h"
 #include "HomeWorldCloud.h"
@@ -418,6 +423,127 @@ bool FCloudFieldAutomationTest::RunTest(const FString& Parameters)
 	TestTrue(TEXT("spacing measured on at least one cloud pair"), SpacingPairsChecked > 0);
 	TestTrue(TEXT("spacing is within its position band"), bSpacingInBand);
 
+	return true;
+}
+
+namespace HomeWorldGlideProbe
+{
+	extern int32 GCalls;
+	extern int32 GDepth;
+	extern int32 GMaxDepth;
+}
+
+/**
+ * A glide that touches walkable ground inside one tick.
+ *
+ * PIE 2026-10-22 crashed with STACK_OVERFLOW: PhysCustom -> ProcessLanded ->
+ * StartNewPhysics -> PhysCustom, forever (HomeWorldGlideMovementComponent.cpp:93).
+ * ProcessLanded only switches to walking from MOVE_Falling, so from the custom glide
+ * mode it restarted the glide with the whole tick. The move also passed Velocity
+ * (one second of travel) instead of Velocity * DeltaTime.
+ *
+ * Part 1 ticks the glide once in open air and checks the move is one tick long.
+ * Part 2 drops the body 10 cm above a floor and ticks once: it must land, walk,
+ * and PhysCustom must never be on the stack twice. Part 2 is only run when part 1
+ * passes, because the unscaled move overflows the stack and would take the editor
+ * down with it.
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FCloudDescentSameFrameLandingTest,
+	"HomeWorld.Transit.CloudDescent.SameFrameLandingNoReentry",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FCloudDescentSameFrameLandingTest::RunTest(const FString& Parameters)
+{
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("cloud descent same-frame landing"));
+	if (!Scope.Ok(this))
+	{
+		return false;
+	}
+
+	Scope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Day);
+	AHomeWorldCharacter* Character = HomeWorldTestWorld::SpawnCharacter(Scope.World);
+	if (!TestNotNull(TEXT("character"), Character))
+	{
+		return false;
+	}
+
+	FActorSpawnParameters MarkerParams;
+	MarkerParams.Name = FName(TEXT("GP_GlideStart"));
+	MarkerParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	if (!TestNotNull(TEXT("glider start marker"),
+		Scope.World->SpawnActor<AActor>(FVector(0.f, 0.f, -100000.f), FRotator::ZeroRotator, MarkerParams)))
+	{
+		return false;
+	}
+
+	UHomeWorldGlideMovementComponent* Glide =
+		Cast<UHomeWorldGlideMovementComponent>(Character->GetCharacterMovement());
+	if (!TestNotNull(TEXT("character owns the glide CMC subclass"), Glide))
+	{
+		return false;
+	}
+
+	Character->GrantOpeningGliderForTest();
+	if (!TestTrue(TEXT("launch starts the glide"), Character->TryStartCloudDescent())
+		|| !TestTrue(TEXT("glide mode is active"), Glide->IsGliding()))
+	{
+		return false;
+	}
+
+	const float Step = 1.f / 60.f;
+
+	// Part 1: one tick in open air.
+	Character->SetActorLocation(FVector(0.f, 0.f, 20000.f), false, nullptr, ETeleportType::TeleportPhysics);
+	Glide->Velocity = Glide->ComputeGlideTargetVelocity();
+	const FVector AirStart = Character->GetActorLocation();
+	HomeWorldGlideProbe::GCalls = 0;
+	HomeWorldGlideProbe::GMaxDepth = 0;
+	Glide->StartNewPhysics(Step, 0);
+	const double AirMoved = FVector::Dist(AirStart, Character->GetActorLocation());
+	const double OneTick = Glide->Velocity.Size() * Step;
+	AddInfo(FString::Printf(TEXT("GLIDE_AIR_TICK moved=%.1f cm one_tick=%.1f cm speed=%.0f cm/s dt=%.4f s calls=%d max_depth=%d"),
+		AirMoved, OneTick, Glide->Velocity.Size(), Step, HomeWorldGlideProbe::GCalls, HomeWorldGlideProbe::GMaxDepth));
+	const bool bScaled = TestTrue(TEXT("a glide tick moves velocity times delta time"), AirMoved <= OneTick * 1.5 + 1.0);
+	TestTrue(TEXT("the air tick keeps gliding"), Glide->IsGliding());
+	if (!bScaled)
+	{
+		AddError(TEXT("same-frame landing not run: an unscaled glide move re-enters PhysCustom through ProcessLanded until the stack overflows"));
+		return false;
+	}
+
+	// Part 2: walkable floor 10 cm under the capsule; one tick sinks 25 cm.
+	FActorSpawnParameters FloorParams;
+	FloorParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	AStaticMeshActor* Floor = Scope.World->SpawnActor<AStaticMeshActor>(FVector::ZeroVector, FRotator::ZeroRotator, FloorParams);
+	UStaticMesh* Cube = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Cube.Cube"));
+	if (!TestNotNull(TEXT("floor"), Floor) || !TestNotNull(TEXT("cube mesh"), Cube))
+	{
+		return false;
+	}
+	UStaticMeshComponent* FloorMesh = Floor->GetStaticMeshComponent();
+	FloorMesh->SetMobility(EComponentMobility::Movable);
+	FloorMesh->SetStaticMesh(Cube);
+	FloorMesh->SetCollisionProfileName(UCollisionProfile::BlockAll_ProfileName);
+	Floor->SetActorScale3D(FVector(40.f, 40.f, 1.f));
+	const float FloorTop = 50.f;
+	const float Half = Character->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	Character->SetActorLocation(FVector(0.f, 0.f, FloorTop + Half + 10.f), false, nullptr, ETeleportType::TeleportPhysics);
+	Glide->Velocity = Glide->ComputeGlideTargetVelocity();
+	HomeWorldGlideProbe::GCalls = 0;
+	HomeWorldGlideProbe::GMaxDepth = 0;
+	Glide->StartNewPhysics(Step, 0);
+	const FVector Landed = Character->GetActorLocation();
+	AddInfo(FString::Printf(TEXT("GLIDE_LAND_TICK calls=%d max_depth=%d mode=%d gliding=%d z=%.1f floor_stand_z=%.1f descent=%d"),
+		HomeWorldGlideProbe::GCalls, HomeWorldGlideProbe::GMaxDepth, static_cast<int32>(Glide->MovementMode.GetValue()),
+		Glide->IsGliding() ? 1 : 0, Landed.Z, FloorTop + Half, Character->IsCloudDescentActive() ? 1 : 0));
+	TestEqual(TEXT("PhysCustom is never on the stack twice"), HomeWorldGlideProbe::GMaxDepth, 1);
+	TestEqual(TEXT("PhysCustom runs once for the landing tick"), HomeWorldGlideProbe::GCalls, 1);
+	TestFalse(TEXT("the landing leaves glide mode"), Glide->IsGliding());
+	TestEqual(TEXT("the landing hands back walking"),
+		static_cast<int32>(Glide->MovementMode.GetValue()), static_cast<int32>(MOVE_Walking));
+	TestFalse(TEXT("the landing clears the descent"), Character->IsCloudDescentActive());
+	TestTrue(TEXT("the body ends standing on the floor"), FMath::Abs(Landed.Z - (FloorTop + Half)) < 5.0);
 	return true;
 }
 
