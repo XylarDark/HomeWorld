@@ -409,7 +409,7 @@ namespace HomeWorldBonkRoute
 		const FVector& PadExtent,
 		float BodyHalfHeightCm,
 		float BodyRadiusCm,
-		const HomeWorldBonk::FClearance* Clearance = nullptr);
+		const HomeWorldBonk::FClearance* Clearance);
 	FVector PointOnRoute(const HomeWorldBonk::FArc& Arc, float T);
 }
 
