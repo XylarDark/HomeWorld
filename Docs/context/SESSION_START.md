@@ -87,4 +87,4 @@ Levels: Low = the fast default model at its default effort and default context s
 11. A failed step stops the chain, as guardrail 4 already requires. If the failed step ran at low, Conductor reposts the list with that step rerun at high, in the same chat, as a new queued step. If it ran at high and fails twice, it stops for Lead.
 14. Keep the default context size. Long context and Fast mode cost about 2x and need a card.
 15. Every cloud agent launch names its model and effort explicitly.
-16. Keep effort the same for the whole of a cached chat; a level change means a new chat.
+16. Keep effort the same for the whole of a cached chat; a level change means a new chat, except rule 11's single rerun at high, which stays in the same chat.
