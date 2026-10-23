@@ -88,7 +88,7 @@ namespace HomeWorldPlaytestBeats
 	const TArray<FRow>& Rows();
 	const FRow* RowFor(int32 Beat);
 
-	/** Beat words (lowercased, '_' and ' ' folded out) to a stop id. Empty = night. 0 = unknown. */
+	/** Folded exact match against a printed beat word. Lowercase, '_' and ' ' removed. Empty = night. 0 = unknown. */
 	int32 FromText(const FString& Text);
 
 	/** The beat's word. Unknown ids read "night", as they always have. */

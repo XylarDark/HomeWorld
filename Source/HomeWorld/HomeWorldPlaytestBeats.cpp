@@ -48,46 +48,6 @@ namespace HomeWorldPlaytestBeats
 			return Row;
 		}
 
-		struct FKey
-		{
-			const TCHAR* Key;
-			EBeat Beat;
-		};
-
-		/** Order matters: "herb collection" carries both herb and collect; "nightglide" carries night. */
-		const FKey GKeys[] = {
-			{ TEXT("heal"), EBeat::Heal },
-			{ TEXT("spring"), EBeat::Heal },
-			{ TEXT("herb"), EBeat::Herbs },
-			{ TEXT("garden"), EBeat::Herbs },
-			{ TEXT("stealth"), EBeat::Stealth },
-			{ TEXT("spirit"), EBeat::Spirit },
-			{ TEXT("backpack"), EBeat::Backpack },
-			{ TEXT("partner"), EBeat::Backpack },
-			{ TEXT("gift"), EBeat::Backpack },
-			{ TEXT("kettle"), EBeat::Kettle },
-			{ TEXT("tea"), EBeat::Kettle },
-			{ TEXT("station"), EBeat::Station },
-			{ TEXT("counter"), EBeat::Station },
-			{ TEXT("mix"), EBeat::Station },
-			{ TEXT("dog"), EBeat::Dog },
-			{ TEXT("grace"), EBeat::Dog },
-			{ TEXT("fish"), EBeat::Fish },
-			{ TEXT("pond"), EBeat::Fish },
-			{ TEXT("sleep"), EBeat::Sleep },
-			{ TEXT("bed"), EBeat::Sleep },
-			{ TEXT("wisp"), EBeat::Collect },
-			{ TEXT("collect"), EBeat::Collect },
-			{ TEXT("nightglide"), EBeat::NightGlide },
-			{ TEXT("night"), EBeat::Night },
-			{ TEXT("glider"), EBeat::Glider },
-			{ TEXT("delivery"), EBeat::Delivery },
-			{ TEXT("daycamp"), EBeat::DayCamp },
-			{ TEXT("dawnglide"), EBeat::DawnGlide },
-			{ TEXT("shrine"), EBeat::Shrine },
-			{ TEXT("stress"), EBeat::Stress },
-			{ TEXT("ease"), EBeat::Ease },
-		};
 	}
 
 	const TArray<FRow>& Rows()
@@ -155,11 +115,19 @@ namespace HomeWorldPlaytestBeats
 		{
 			return static_cast<int32>(EBeat::Night);
 		}
-		for (const FKey& Entry : GKeys)
+		for (const FRow& Row : Rows())
 		{
-			if (Key.Contains(Entry.Key))
+			if (!Row.Word)
 			{
-				return static_cast<int32>(Entry.Beat);
+				continue;
+			}
+			FString Word(Row.Word);
+			Word.ToLowerInline();
+			Word.ReplaceInline(TEXT("_"), TEXT(""));
+			Word.ReplaceInline(TEXT(" "), TEXT(""));
+			if (Key.Equals(Word, ESearchCase::CaseSensitive))
+			{
+				return static_cast<int32>(Row.Beat);
 			}
 		}
 		return 0;

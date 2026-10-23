@@ -141,22 +141,23 @@ bool FPlaytestBeatTableWordsTest::RunTest(const FString& Parameters)
 		TestEqual(*FString::Printf(TEXT("SkipStep %d"), E.Id), SkipStep(E.Id), E.Skip);
 		TestEqual(*FString::Printf(TEXT("ReadyAfterStep %d"), E.Id), ReadyAfterStep(E.Id), E.ReadyAfter);
 	}
-	// The matcher order main has always used: herb collection is herbs, night glide is not night.
+	// Folded exact match against a printed word. "night glide" is nightglide.
+	// A shorter alias is unknown. 24ee221a still returns the other beat's id.
 	struct FAlias { const TCHAR* Text; int32 Id; };
 	const FAlias Aliases[] = {
 		{ TEXT(""), 9 },
-		{ TEXT("herb collection"), 2 },
-		{ TEXT("Garden"), 2 },
-		{ TEXT("hot spring"), 11 },
-		{ TEXT("partner"), 3 },
-		{ TEXT("gift"), 3 },
-		{ TEXT("tea"), 4 },
-		{ TEXT("counter"), 5 },
-		{ TEXT("mix"), 5 },
-		{ TEXT("grace"), 6 },
-		{ TEXT("pond"), 7 },
-		{ TEXT("bed"), 8 },
-		{ TEXT("wisp"), 10 },
+		{ TEXT("herb collection"), 0 },
+		{ TEXT("Garden"), 0 },
+		{ TEXT("hot spring"), 0 },
+		{ TEXT("partner"), 0 },
+		{ TEXT("gift"), 0 },
+		{ TEXT("tea"), 0 },
+		{ TEXT("counter"), 0 },
+		{ TEXT("mix"), 0 },
+		{ TEXT("grace"), 0 },
+		{ TEXT("pond"), 0 },
+		{ TEXT("bed"), 0 },
+		{ TEXT("wisp"), 0 },
 		{ TEXT("night glide"), 16 },
 		{ TEXT("night_glide"), 16 },
 		{ TEXT("day camp"), 14 },
@@ -171,6 +172,39 @@ bool FPlaytestBeatTableWordsTest::RunTest(const FString& Parameters)
 	TestEqual(TEXT("StandoffCm unknown"), StandoffCm(0), 260.f);
 	TestEqual(TEXT("ListText"), ListText(), FString(TEXT(
 		"spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect, heal, glider, delivery, daycamp, dawnglide, nightglide, stealth, ease, shrine, stress")));
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FPlaytestBeatExactMatchTest,
+	"HomeWorld.Playtest.BeatTable.ExactMatch",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FPlaytestBeatExactMatchTest::RunTest(const FString& Parameters)
+{
+	using namespace HomeWorldPlaytestBeats;
+	(void)Parameters;
+
+	// 24ee221a: grace 6 (dog), partner 3 (backpack), mix 5 (station), spring 11 (heal).
+	TestEqual(TEXT("grace"), FromText(TEXT("grace")), 0);
+	TestEqual(TEXT("partner"), FromText(TEXT("partner")), 0);
+	TestEqual(TEXT("mix"), FromText(TEXT("mix")), 0);
+	TestEqual(TEXT("spring"), FromText(TEXT("spring")), 0);
+
+	TArray<FString> Words;
+	ListText().ParseIntoArray(Words, TEXT(", "), true);
+	TestTrue(TEXT("list prints beats"), Words.Num() > 0);
+	for (const FString& Word : Words)
+	{
+		const int32 Id = FromText(Word);
+		const FRow* Row = RowFor(Id);
+		if (!TestNotNull(*FString::Printf(TEXT("list word '%s' has a row"), *Word), Row))
+		{
+			continue;
+		}
+		TestEqual(*FString::Printf(TEXT("list word '%s' is its own stop"), *Word), FString(Row->Word), Word);
+		TestEqual(*FString::Printf(TEXT("list word '%s' id"), *Word), Id, static_cast<int32>(Row->Beat));
+	}
 	return true;
 }
 
