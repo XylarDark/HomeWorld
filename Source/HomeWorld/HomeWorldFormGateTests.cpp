@@ -7,6 +7,7 @@
 #include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "HomeWorldCharacter.h"
+#include "HomeWorldTestWorld.h"
 #include "HomeWorldTimeOfDaySubsystem.h"
 #include "Misc/ScopeExit.h"
 
@@ -40,65 +41,10 @@
  * designer would check by hand after an agent change, not the boolean arithmetic.
  */
 
-namespace HomeWorldFormTest
-{
-	/**
-	 * A character in a real world, because the form sync reads the TimeOfDay subsystem.
-	 *
-	 * A NewObject'd character has no world, so CanEnterSpiritForm still works (it reads only
-	 * its own members) but ApplyFormForPhase and AreDayBodyAbilitiesAllowed both return their
-	 * no-world defaults. Testing those defaults would test a branch no player ever hits.
-	 */
-	static AHomeWorldCharacter* SpawnCharacter(UWorld* World)
-	{
-		if (!World || !GEngine)
-		{
-			return nullptr;
-		}
-		FActorSpawnParameters Params;
-		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		return World->SpawnActor<AHomeWorldCharacter>(Params);
-	}
-
-	/** A world plus its time-of-day subsystem, torn down together. */
-	struct FScopedWorld
-	{
-		UWorld* World = nullptr;
-		UHomeWorldTimeOfDaySubsystem* TimeOfDay = nullptr;
-
-		explicit FScopedWorld(const TCHAR* What)
-		{
-			World = UWorld::CreateWorld(EWorldType::Game, false);
-			if (World)
-			{
-				TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
-			}
-		}
-
-		~FScopedWorld()
-		{
-			if (World)
-			{
-				World->DestroyWorld(false);
-				World = nullptr;
-				TimeOfDay = nullptr;
-			}
-		}
-
-		bool Ok(class FAutomationTestBase* Test) const
-		{
-			if (!Test->TestNotNull(TEXT("test world"), World))
-			{
-				return false;
-			}
-			if (!Test->TestNotNull(TEXT("time of day subsystem"), TimeOfDay))
-			{
-				return false;
-			}
-			return true;
-		}
-	};
-}
+// The world + character fixture is HomeWorldTestWorld (shared). A character in a real
+// world, because the form sync reads the TimeOfDay subsystem: a NewObject'd character has
+// no world, so ApplyFormForPhase and AreDayBodyAbilitiesAllowed would return their no-world
+// defaults, a branch no player ever hits.
 
 /**
  * THE P0 LAW. Night without the named gates must stay FORM_BODY.
@@ -113,7 +59,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FNightWithoutGatesStaysBodyTest::RunTest(const FString& Parameters)
 {
-	HomeWorldFormTest::FScopedWorld Scope(TEXT("M9 night-without-gates"));
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("M9 night-without-gates"));
 	if (!Scope.Ok(this))
 	{
 		AddError(TEXT("cannot reach the form path without a world and a TimeOfDay subsystem"));
@@ -121,7 +67,7 @@ bool FNightWithoutGatesStaysBodyTest::RunTest(const FString& Parameters)
 	}
 
 	Scope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Night);
-	AHomeWorldCharacter* Character = HomeWorldFormTest::SpawnCharacter(Scope.World);
+	AHomeWorldCharacter* Character = HomeWorldTestWorld::SpawnCharacter(Scope.World);
 	if (!TestNotNull(TEXT("character"), Character))
 	{
 		return false;
@@ -166,14 +112,14 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FDayVerbsOffAtNightTest::RunTest(const FString& Parameters)
 {
-	HomeWorldFormTest::FScopedWorld Scope(TEXT("M9 day-verbs"));
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("M9 day-verbs"));
 	if (!Scope.Ok(this))
 	{
 		return false;
 	}
 
 	Scope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Day);
-	AHomeWorldCharacter* Character = HomeWorldFormTest::SpawnCharacter(Scope.World);
+	AHomeWorldCharacter* Character = HomeWorldTestWorld::SpawnCharacter(Scope.World);
 	if (!TestNotNull(TEXT("character"), Character))
 	{
 		return false;
@@ -211,14 +157,14 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FBedAtNightGrantsSpiritTest::RunTest(const FString& Parameters)
 {
-	HomeWorldFormTest::FScopedWorld Scope(TEXT("M11 night bed"));
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("M11 night bed"));
 	if (!Scope.Ok(this))
 	{
 		return false;
 	}
 
 	Scope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Night);
-	AHomeWorldCharacter* Character = HomeWorldFormTest::SpawnCharacter(Scope.World);
+	AHomeWorldCharacter* Character = HomeWorldTestWorld::SpawnCharacter(Scope.World);
 	if (!TestNotNull(TEXT("character"), Character))
 	{
 		return false;
@@ -242,14 +188,14 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FDayBedStaysBodyTest::RunTest(const FString& Parameters)
 {
-	HomeWorldFormTest::FScopedWorld Scope(TEXT("M11 day bed"));
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("M11 day bed"));
 	if (!Scope.Ok(this))
 	{
 		return false;
 	}
 
 	Scope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Day);
-	AHomeWorldCharacter* Character = HomeWorldFormTest::SpawnCharacter(Scope.World);
+	AHomeWorldCharacter* Character = HomeWorldTestWorld::SpawnCharacter(Scope.World);
 	if (!TestNotNull(TEXT("character"), Character))
 	{
 		return false;
@@ -276,14 +222,14 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FDawnKeepsSpiritAndStartsSicknessTest::RunTest(const FString& Parameters)
 {
-	HomeWorldFormTest::FScopedWorld Scope(TEXT("M9 dawn-keeps-spirit"));
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("M9 dawn-keeps-spirit"));
 	if (!Scope.Ok(this))
 	{
 		return false;
 	}
 
 	Scope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Night);
-	AHomeWorldCharacter* Character = HomeWorldFormTest::SpawnCharacter(Scope.World);
+	AHomeWorldCharacter* Character = HomeWorldTestWorld::SpawnCharacter(Scope.World);
 	if (!TestNotNull(TEXT("character"), Character))
 	{
 		return false;
@@ -325,14 +271,14 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FSpiritSicknessBedAndFifthStackTest::RunTest(const FString& Parameters)
 {
-	HomeWorldFormTest::FScopedWorld Scope(TEXT("sickness bed and fifth"));
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("sickness bed and fifth"));
 	if (!Scope.Ok(this))
 	{
 		return false;
 	}
 
 	Scope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Night);
-	AHomeWorldCharacter* Character = HomeWorldFormTest::SpawnCharacter(Scope.World);
+	AHomeWorldCharacter* Character = HomeWorldTestWorld::SpawnCharacter(Scope.World);
 	if (!TestNotNull(TEXT("character"), Character))
 	{
 		return false;
@@ -361,7 +307,7 @@ bool FSpiritSicknessBedAndFifthStackTest::RunTest(const FString& Parameters)
 	TestTrue(TEXT("the late-wake minute ends"),
 		FMath::IsNearlyEqual(Character->GetSpiritSicknessMoveScale(), 1.f));
 
-	AHomeWorldCharacter* StillOut = HomeWorldFormTest::SpawnCharacter(Scope.World);
+	AHomeWorldCharacter* StillOut = HomeWorldTestWorld::SpawnCharacter(Scope.World);
 	if (!TestNotNull(TEXT("still out"), StillOut))
 	{
 		return false;
@@ -395,14 +341,14 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FChildDawnRuleOnceTest::RunTest(const FString& Parameters)
 {
-	HomeWorldFormTest::FScopedWorld Scope(TEXT("child dawn rule"));
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("child dawn rule"));
 	if (!Scope.Ok(this))
 	{
 		return false;
 	}
 
 	Scope.TimeOfDay->SetPhase(EHomeWorldTimeOfDayPhase::Day);
-	AHomeWorldCharacter* Character = HomeWorldFormTest::SpawnCharacter(Scope.World);
+	AHomeWorldCharacter* Character = HomeWorldTestWorld::SpawnCharacter(Scope.World);
 	if (!TestNotNull(TEXT("character"), Character))
 	{
 		return false;
@@ -411,7 +357,7 @@ bool FChildDawnRuleOnceTest::RunTest(const FString& Parameters)
 	TestTrue(TEXT("the child says it once"), Character->TryTellChildDawnRule());
 	TestFalse(TEXT("the child does not repeat it"), Character->TryTellChildDawnRule());
 
-	AHomeWorldCharacter* AlreadyOut = HomeWorldFormTest::SpawnCharacter(Scope.World);
+	AHomeWorldCharacter* AlreadyOut = HomeWorldTestWorld::SpawnCharacter(Scope.World);
 	if (!TestNotNull(TEXT("already out"), AlreadyOut))
 	{
 		return false;

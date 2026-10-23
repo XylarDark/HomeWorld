@@ -22,7 +22,9 @@
  * with the one that forgot to tear down. That failure mode is only diagnosable if there is
  * exactly one place where teardown can be forgotten, so there is exactly one place where
  * teardown is written. This header was extracted from HomeWorldCampNightTests.cpp and
- * HomeWorldDayGateTests.cpp, which had grown byte-equivalent copies of it.
+ * HomeWorldDayGateTests.cpp, which had grown byte-equivalent copies of it. The party,
+ * home-loop, form-gate and conversion tests use it too (HomeWorld.TestWorld.OneFixture
+ * fails if a *Tests.cpp creates its own world again).
  *
  * WHY THIS IS A GAME WORLD AND NOT PIE
  *
@@ -97,6 +99,27 @@ namespace HomeWorldTestWorld
 		FActorSpawnParameters Params;
 		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		return World->SpawnActor<AHomeWorldCharacter>(Params);
+	}
+
+	/**
+	 * One tagged prop for the resolver: a bare AActor carrying Tag at Location.
+	 * A beat test is this spawn, a character, and one ResolveOpeningTarget call.
+	 * With the character's zero control rotation, a prop on +X is the one it looks at.
+	 */
+	static AActor* SpawnTagged(UWorld* World, const FVector& Location, FName Tag)
+	{
+		if (!World)
+		{
+			return nullptr;
+		}
+		FActorSpawnParameters Params;
+		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		AActor* Prop = World->SpawnActor<AActor>(AActor::StaticClass(), Location, FRotator::ZeroRotator, Params);
+		if (Prop)
+		{
+			Prop->Tags.Add(Tag);
+		}
+		return Prop;
 	}
 }
 

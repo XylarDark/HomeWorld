@@ -7,6 +7,16 @@
 #include "HomeWorldInventoryTypes.h"
 #include "HomeWorldSaveGame.generated.h"
 
+/** Item 5: one system's slice of the save, an opaque byte blob only that system reads. */
+USTRUCT()
+struct FHomeWorldSaveSlice
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	TArray<uint8> Bytes;
+};
+
 /**
  * Save game data for role persistence (Day 15) and spirit roster (Day 21).
  * Serializes family roles by spawn index and spirit IDs; used by UHomeWorldSaveGameSubsystem.
@@ -17,6 +27,14 @@ class HOMEWORLD_API UHomeWorldSaveGame : public USaveGame
 	GENERATED_BODY()
 
 public:
+	/**
+	 * Item 5: the save proper. Fixed key (HomeWorldSaveSlices::Key) to one system's blob.
+	 * Empty in a save written before slices; such a save is read once from the flat Saved*
+	 * fields below, which new saves leave at their defaults. A later bite deletes them.
+	 */
+	UPROPERTY(VisibleAnywhere, Category = "Save")
+	TMap<FName, FHomeWorldSaveSlice> Slices;
+
 	/** Saved family roles by spawn index (EHomeWorldFamilyRole as byte). */
 	UPROPERTY(VisibleAnywhere, Category = "Save")
 	TArray<uint8> SavedRoleBySpawnIndex;

@@ -6,6 +6,8 @@
 #include "EngineUtils.h"
 #include "GameFramework/Actor.h"
 #include "HomeWorldSaveGame.h"
+#include "Serialization/MemoryReader.h"
+#include "Serialization/MemoryWriter.h"
 
 void UHomeWorldFamilySubsystem::SetRoleForIndex(int32 SpawnIndex, EHomeWorldFamilyRole Role)
 {
@@ -53,6 +55,41 @@ void UHomeWorldFamilySubsystem::DeserializeFromSaveGame(const UHomeWorldSaveGame
 	}
 	bPartnerOut = In->bSavedPartnerOut;
 	bChildOut = In->bSavedChildOut;
+}
+
+void UHomeWorldFamilySubsystem::WriteSaveSlice(TArray<uint8>& OutBytes) const
+{
+	OutBytes.Reset();
+	FMemoryWriter Ar(OutBytes);
+	TArray<uint8> Roles;
+	for (EHomeWorldFamilyRole R : RoleBySpawnIndex)
+	{
+		Roles.Add(static_cast<uint8>(R));
+	}
+	bool bPartner = bPartnerOut;
+	bool bChild = bChildOut;
+	Ar << Roles << bPartner << bChild;
+}
+
+bool UHomeWorldFamilySubsystem::ReadSaveSlice(const TArray<uint8>& InBytes)
+{
+	FMemoryReader Ar(InBytes);
+	TArray<uint8> Roles;
+	bool bPartner = false;
+	bool bChild = false;
+	Ar << Roles << bPartner << bChild;
+	if (Ar.IsError())
+	{
+		return false;
+	}
+	RoleBySpawnIndex.Reset();
+	for (uint8 B : Roles)
+	{
+		RoleBySpawnIndex.Add(static_cast<EHomeWorldFamilyRole>(B));
+	}
+	bPartnerOut = bPartner;
+	bChildOut = bChild;
+	return true;
 }
 
 EHomeWorldPartySetup UHomeWorldFamilySubsystem::GetPartySetup() const

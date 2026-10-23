@@ -39,6 +39,12 @@ public:
 	/** Restore spirit roster from SaveGame (replaces current in-memory state). */
 	void DeserializeFromSaveGame(const class UHomeWorldSaveGame* In);
 
+	/** Item 5: write the roster into this system's save slice. */
+	void WriteSaveSlice(TArray<uint8>& OutBytes) const;
+
+	/** Item 5: restore from this system's save slice. False (and no change) if the bytes do not read. */
+	bool ReadSaveSlice(const TArray<uint8>& InBytes);
+
 private:
 	UPROPERTY()
 	TArray<FName> SpiritIds;
