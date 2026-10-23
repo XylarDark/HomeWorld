@@ -2,6 +2,9 @@
 
 #include "HomeWorldSpiritRosterSubsystem.h"
 #include "HomeWorldSaveGame.h"
+#include "HomeWorldSaveSlices.h"
+#include "Serialization/MemoryReader.h"
+#include "Serialization/MemoryWriter.h"
 
 void UHomeWorldSpiritRosterSubsystem::AddSpirit(FName SpiritId)
 {
@@ -42,4 +45,25 @@ void UHomeWorldSpiritRosterSubsystem::DeserializeFromSaveGame(const UHomeWorldSa
 {
 	if (!In) return;
 	SpiritIds = In->SavedSpiritIds;
+}
+
+void UHomeWorldSpiritRosterSubsystem::WriteSaveSlice(TArray<uint8>& OutBytes) const
+{
+	OutBytes.Reset();
+	FMemoryWriter Ar(OutBytes);
+	TArray<FName> Ids = SpiritIds;
+	HomeWorldSaveSlices::SerializeNames(Ar, Ids);
+}
+
+bool UHomeWorldSpiritRosterSubsystem::ReadSaveSlice(const TArray<uint8>& InBytes)
+{
+	FMemoryReader Ar(InBytes);
+	TArray<FName> Ids;
+	HomeWorldSaveSlices::SerializeNames(Ar, Ids);
+	if (Ar.IsError())
+	{
+		return false;
+	}
+	SpiritIds = MoveTemp(Ids);
+	return true;
 }

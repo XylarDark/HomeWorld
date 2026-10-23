@@ -84,6 +84,12 @@ public:
 	/** Restore role-by-index from SaveGame (replaces current in-memory state). */
 	void DeserializeFromSaveGame(const class UHomeWorldSaveGame* In);
 
+	/** Item 5: write roles and the party record into this system's save slice. */
+	void WriteSaveSlice(TArray<uint8>& OutBytes) const;
+
+	/** Item 5: restore from this system's save slice. False (and no change) if the bytes do not read. */
+	bool ReadSaveSlice(const TArray<uint8>& InBytes);
+
 	/**
 	 * Party record from Docs/41_COMPANION_PARTY_DESIGN.md. Roles stay roles.
 	 * The four setups are derived from the two flags. Missing flags are solo.

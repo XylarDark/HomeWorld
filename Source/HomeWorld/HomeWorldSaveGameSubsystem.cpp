@@ -2,122 +2,19 @@
 
 #include "HomeWorldSaveGameSubsystem.h"
 #include "HomeWorldPlayWorld.h"
-#include "HomeWorldBeastTameComponent.h"
 #include "HomeWorldCharacter.h"
 #include "HomeWorldFamilySubsystem.h"
 #include "HomeWorldSpiritStealthComponent.h"
 #include "HomeWorldInventorySubsystem.h"
-#include "HomeWorldNurtureComponent.h"
 #include "HomeWorldSaveGame.h"
-#include "HomeWorldPlayerState.h"
-#include "HomeWorldSpiritHealComponent.h"
+#include "HomeWorldSaveSlices.h"
 #include "HomeWorldSpiritRosterSubsystem.h"
 #include "HomeWorldTimeOfDaySubsystem.h"
-#include "EngineUtils.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
 
 const TCHAR* UHomeWorldSaveGameSubsystem::DefaultSlotName = TEXT("HomeWorldSave");
-
-void UHomeWorldSaveGameSubsystem::CaptureNPSessionState(UHomeWorldSaveGame* SaveGame, UWorld* World)
-{
-	if (!SaveGame || !World)
-	{
-		return;
-	}
-
-	UGameInstance* GI = World->GetGameInstance();
-	if (UHomeWorldInventorySubsystem* Inv = GI ? GI->GetSubsystem<UHomeWorldInventorySubsystem>() : nullptr)
-	{
-		Inv->CopySlotsTo(SaveGame->SavedInventorySlots);
-	}
-
-	SaveGame->SavedBeastTameState = 0;
-	SaveGame->SavedSpiritHealIds.Reset();
-	SaveGame->SavedSpiritHealStates.Reset();
-	SaveGame->bSavedN1Nurtured = false;
-	SaveGame->bSavedN2Nurtured = false;
-
-	for (TActorIterator<AActor> It(World); It; ++It)
-	{
-		AActor* Actor = *It;
-		if (!Actor)
-		{
-			continue;
-		}
-		if (UHomeWorldBeastTameComponent* Tame = Actor->FindComponentByClass<UHomeWorldBeastTameComponent>())
-		{
-			SaveGame->SavedBeastTameState = static_cast<uint8>(Tame->GetTameState());
-		}
-		if (UHomeWorldSpiritHealComponent* Heal = Actor->FindComponentByClass<UHomeWorldSpiritHealComponent>())
-		{
-			SaveGame->SavedSpiritHealIds.Add(Heal->GetSpiritId());
-			SaveGame->SavedSpiritHealStates.Add(static_cast<uint8>(Heal->GetHealState()));
-		}
-		if (UHomeWorldNurtureComponent* Nurture = Actor->FindComponentByClass<UHomeWorldNurtureComponent>())
-		{
-			if (Nurture->GetTargetId() == EHomeWorldNurtureTargetId::N1_Crop)
-			{
-				SaveGame->bSavedN1Nurtured = Nurture->GetIsNurtured();
-			}
-			else if (Nurture->GetTargetId() == EHomeWorldNurtureTargetId::N2_Stored)
-			{
-				SaveGame->bSavedN2Nurtured = Nurture->GetIsNurtured();
-			}
-		}
-	}
-}
-
-void UHomeWorldSaveGameSubsystem::ApplyNPSessionState(const UHomeWorldSaveGame* SaveGame, UWorld* World)
-{
-	if (!SaveGame || !World)
-	{
-		return;
-	}
-
-	UGameInstance* GI = World->GetGameInstance();
-	if (UHomeWorldInventorySubsystem* Inv = GI ? GI->GetSubsystem<UHomeWorldInventorySubsystem>() : nullptr)
-	{
-		if (SaveGame->SavedInventorySlots.Num() == HomeWorldInventory::SlotCount)
-		{
-			Inv->RestoreSlotsFrom(SaveGame->SavedInventorySlots);
-		}
-	}
-
-	for (TActorIterator<AActor> It(World); It; ++It)
-	{
-		AActor* Actor = *It;
-		if (!Actor)
-		{
-			continue;
-		}
-		if (UHomeWorldBeastTameComponent* Tame = Actor->FindComponentByClass<UHomeWorldBeastTameComponent>())
-		{
-			Tame->ApplyPersistedState(static_cast<EHomeWorldBeastTameState>(SaveGame->SavedBeastTameState));
-		}
-		if (UHomeWorldSpiritHealComponent* Heal = Actor->FindComponentByClass<UHomeWorldSpiritHealComponent>())
-		{
-			const FName Id = Heal->GetSpiritId();
-			const int32 Idx = SaveGame->SavedSpiritHealIds.IndexOfByKey(Id);
-			if (SaveGame->SavedSpiritHealStates.IsValidIndex(Idx))
-			{
-				Heal->ApplyPersistedState(static_cast<EHomeWorldSpiritHealState>(SaveGame->SavedSpiritHealStates[Idx]));
-			}
-		}
-		if (UHomeWorldNurtureComponent* Nurture = Actor->FindComponentByClass<UHomeWorldNurtureComponent>())
-		{
-			if (Nurture->GetTargetId() == EHomeWorldNurtureTargetId::N1_Crop)
-			{
-				Nurture->ApplyPersistedNurtured(SaveGame->bSavedN1Nurtured);
-			}
-			else if (Nurture->GetTargetId() == EHomeWorldNurtureTargetId::N2_Stored)
-			{
-				Nurture->ApplyPersistedNurtured(SaveGame->bSavedN2Nurtured);
-			}
-		}
-	}
-}
 
 bool UHomeWorldSaveGameSubsystem::PersistDawnSnapshot()
 {
@@ -153,39 +50,16 @@ bool UHomeWorldSaveGameSubsystem::SaveGameToSlot(const FString& SlotName, int32 
 		return false;
 	}
 
-	if (UHomeWorldFamilySubsystem* Family = GI->GetSubsystem<UHomeWorldFamilySubsystem>())
-	{
-		Family->SerializeToSaveGame(SaveGame);
-	}
-	if (UHomeWorldSpiritRosterSubsystem* Spirits = GI->GetSubsystem<UHomeWorldSpiritRosterSubsystem>())
-	{
-		Spirits->SerializeToSaveGame(SaveGame);
-	}
-
-	UWorld* World = GI->GetWorld();
-	if (World)
-	{
-		if (UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>())
-		{
-			SaveGame->SavedTimeOfDayPhase = static_cast<uint8>(TimeOfDay->GetCurrentPhase());
-		}
-		if (APlayerController* PC = World->GetFirstPlayerController())
-		{
-			if (AHomeWorldPlayerState* PS = PC->GetPlayerState<AHomeWorldPlayerState>())
-			{
-				SaveGame->SavedSpiritualPowerCollected = PS->GetSpiritualPowerCollected();
-				SaveGame->bSavedHasDayRestorationBuff = PS->GetHasDayRestorationBuff();
-				SaveGame->SavedLoveLevel = PS->GetLoveLevel();
-			}
-		}
-		CaptureNPSessionState(SaveGame, World);
-	}
+	HomeWorldSaveSlices::CaptureToSave(SaveGame, GI, GI->GetWorld());
 
 	bool bSaved = UGameplayStatics::SaveGameToSlot(SaveGame, Slot, UserIndex);
 	if (bSaved)
 	{
-		UE_LOG(LogTemp, Log, TEXT("HomeWorld: Save completed to slot '%s' (roles=%d, spirits=%d, phase=%d, spiritualPower=%d, dayBuff=%d, loveLevel=%d)"),
-			*Slot, SaveGame->SavedRoleBySpawnIndex.Num(), SaveGame->SavedSpiritIds.Num(), SaveGame->SavedTimeOfDayPhase, SaveGame->SavedSpiritualPowerCollected, SaveGame->bSavedHasDayRestorationBuff ? 1 : 0, SaveGame->SavedLoveLevel);
+		const UHomeWorldFamilySubsystem* Family = GI->GetSubsystem<UHomeWorldFamilySubsystem>();
+		const UHomeWorldSpiritRosterSubsystem* Spirits = GI->GetSubsystem<UHomeWorldSpiritRosterSubsystem>();
+		UE_LOG(LogTemp, Log, TEXT("HomeWorld: Save completed to slot '%s' (roles=%d, spirits=%d, phase=%d)"),
+			*Slot, Family ? Family->GetMemberCount() : 0, Spirits ? Spirits->GetSpiritCount() : 0,
+			static_cast<int32>(HomeWorldSaveSlices::GetSavedPhase(SaveGame)));
 	}
 	else
 	{
@@ -212,61 +86,44 @@ bool UHomeWorldSaveGameSubsystem::LoadGameFromSlot(const FString& SlotName, int3
 		return false;
 	}
 
+	// Read the pawn before anything is restored, as the old order did: the load forces below
+	// depend on the rescue and the form the player is in now, not on what the save says.
+	UWorld* World = GI->GetWorld();
+	bool bRescueDone = false;
+	bool bSpirit = false;
+	if (World)
+	{
+		if (APlayerController* PC = World->GetFirstPlayerController())
+		{
+			if (AHomeWorldCharacter* Character = Cast<AHomeWorldCharacter>(PC->GetPawn()))
+			{
+				bSpirit = Character->GetIsSpiritForm();
+				if (const UHomeWorldSpiritStealthComponent* Stealth = Character->FindComponentByClass<UHomeWorldSpiritStealthComponent>())
+				{
+					bRescueDone = Stealth->IsCaptiveFreed();
+				}
+			}
+		}
+	}
+
+	HomeWorldSaveSlices::ApplyFromSave(SaveGame, GI, World);
+
+	const uint8 SavedPhase = HomeWorldSaveSlices::GetSavedPhase(SaveGame);
 	int32 RolesRestored = 0;
 	int32 SpiritsRestored = 0;
 	if (UHomeWorldFamilySubsystem* Family = GI->GetSubsystem<UHomeWorldFamilySubsystem>())
 	{
-		Family->DeserializeFromSaveGame(SaveGame);
 		RolesRestored = Family->GetMemberCount();
-		bool bRescueDone = false;
-		bool bSpirit = false;
-		if (UWorld* World = GI->GetWorld())
-		{
-			if (APlayerController* PC = World->GetFirstPlayerController())
-			{
-				if (AHomeWorldCharacter* Character = Cast<AHomeWorldCharacter>(PC->GetPawn()))
-				{
-					bSpirit = Character->GetIsSpiritForm();
-					if (const UHomeWorldSpiritStealthComponent* Stealth = Character->FindComponentByClass<UHomeWorldSpiritStealthComponent>())
-					{
-						bRescueDone = Stealth->IsCaptiveFreed();
-					}
-				}
-			}
-		}
-		const bool bNight = SaveGame->SavedTimeOfDayPhase == static_cast<uint8>(EHomeWorldTimeOfDayPhase::Night);
-		Family->ApplyLoadForces(bRescueDone, bNight || bSpirit, GI->GetWorld());
+		const bool bNight = SavedPhase == static_cast<uint8>(EHomeWorldTimeOfDayPhase::Night);
+		Family->ApplyLoadForces(bRescueDone, bNight || bSpirit, World);
 	}
-	if (UHomeWorldSpiritRosterSubsystem* Spirits = GI->GetSubsystem<UHomeWorldSpiritRosterSubsystem>())
+	if (const UHomeWorldSpiritRosterSubsystem* Spirits = GI->GetSubsystem<UHomeWorldSpiritRosterSubsystem>())
 	{
-		Spirits->DeserializeFromSaveGame(SaveGame);
 		SpiritsRestored = Spirits->GetSpiritCount();
 	}
 
-	UWorld* World = GI->GetWorld();
-	if (World)
-	{
-		if (UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>())
-		{
-			const EHomeWorldTimeOfDayPhase Phase = static_cast<EHomeWorldTimeOfDayPhase>(SaveGame->SavedTimeOfDayPhase);
-			TimeOfDay->SetPhase(Phase);
-			UE_LOG(LogTemp, Log, TEXT("HomeWorld: TimeOfDay phase restored to %d"), static_cast<int32>(Phase));
-		}
-		if (APlayerController* PC = World->GetFirstPlayerController())
-		{
-			if (AHomeWorldPlayerState* PS = PC->GetPlayerState<AHomeWorldPlayerState>())
-			{
-				PS->SetSpiritualPowerCollected(SaveGame->SavedSpiritualPowerCollected);
-				PS->SetDayRestorationBuff(SaveGame->bSavedHasDayRestorationBuff);
-				PS->SetLoveLevel(SaveGame->SavedLoveLevel);
-				UE_LOG(LogTemp, Log, TEXT("HomeWorld: Spiritual power=%d, day buff=%d, loveLevel=%d restored"), SaveGame->SavedSpiritualPowerCollected, SaveGame->bSavedHasDayRestorationBuff ? 1 : 0, SaveGame->SavedLoveLevel);
-			}
-		}
-		ApplyNPSessionState(SaveGame, World);
-	}
-
-	UE_LOG(LogTemp, Log, TEXT("HomeWorld: Load completed from slot '%s' (roles=%d, spirits=%d, phase=%d, spiritualPower=%d, dayBuff=%d, loveLevel=%d)"),
-		*Slot, RolesRestored, SpiritsRestored, SaveGame->SavedTimeOfDayPhase, SaveGame->SavedSpiritualPowerCollected, SaveGame->bSavedHasDayRestorationBuff ? 1 : 0, SaveGame->SavedLoveLevel);
+	UE_LOG(LogTemp, Log, TEXT("HomeWorld: Load completed from slot '%s' (roles=%d, spirits=%d, phase=%d)"),
+		*Slot, RolesRestored, SpiritsRestored, static_cast<int32>(SavedPhase));
 	return true;
 }
 
