@@ -30,6 +30,8 @@ class HOMEWORLD_API UHomeWorldHomeLoopSubsystem : public UWorldSubsystem
 	GENERATED_BODY()
 
 public:
+	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+
 	/** The six stations, in design order. No timers. */
 	void GetStationIds(TArray<EHomeWorldHomeStation>& OutIds) const;
 

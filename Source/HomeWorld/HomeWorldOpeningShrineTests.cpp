@@ -9,6 +9,7 @@
 #include "EngineUtils.h"
 #include "HomeWorldCampActor.h"
 #include "HomeWorldEasePad.h"
+#include "HomeWorldHomeLoopSubsystem.h"
 #include "HomeWorldSpiritLitVolume.h"
 #include "HomeWorldSpiritStealthComponent.h"
 #include "HomeWorldTestWorld.h"
@@ -322,6 +323,66 @@ bool FOpeningShrineMissingTest::RunTest(const FString& Parameters)
 	Character->SetActorLocation(Shrine->GetActorLocation() + FVector(100.f, 0.f, 0.f));
 	TestFalse(TEXT("a missing guard refuses the shrine"), Character->TryOpeningShrineInFront());
 	TestFalse(TEXT("the partner does not walk"), Character->IsPartnerWalkingHome());
+	return true;
+}
+
+/**
+ * Moss is what puts each guard to sleep (UL2 3A). A finished ladder with an empty
+ * chest is refused: the guard stays awake and the chest stays at 0. With one moss
+ * the same ladder spends it and the guard sleeps.
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FOpeningGuardPadNeedsMossTest,
+	"HomeWorld.Opening.GuardPadNeedsMoss",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FOpeningGuardPadNeedsMossTest::RunTest(const FString& Parameters)
+{
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("opening guard pad needs moss"));
+	if (!Scope.Ok(this))
+	{
+		return false;
+	}
+	AHomeWorldCharacter* Character = MakeSpirit(this, Scope);
+	UHomeWorldHomeLoopSubsystem* Home = Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>();
+	if (!Character || !TestNotNull(TEXT("home"), Home))
+	{
+		return false;
+	}
+	TestEqual(TEXT("a new world's kitchen chest starts with 6 moss"), Home->GetChestCount(HomeWorldKitchen::Moss), 6);
+	while (Home->TrySpendChestItem(HomeWorldKitchen::Moss, 1))
+	{
+	}
+	TestEqual(TEXT("the chest is empty"), Home->GetChestCount(HomeWorldKitchen::Moss), 0);
+
+	AHomeWorldCampActor* Dry = SpawnGuard(Scope.World, FVector(400.f, 0.f, 0.f));
+	AHomeWorldEasePad* DryPad = SpawnPad(Scope.World, FVector(400.f, 80.f, 0.f), 0);
+	if (!TestNotNull(TEXT("guard"), Dry) || !TestNotNull(TEXT("pad"), DryPad))
+	{
+		return false;
+	}
+	for (int32 Step = 0; Step < 3; ++Step)
+	{
+		TestTrue(TEXT("a ladder step matches"), Character->TryCommitOpeningGuardPad(DryPad, PadSteps[Step]));
+	}
+	TestFalse(TEXT("a finished ladder with no moss is refused"), Character->TryCommitOpeningGuardPad(DryPad, PadSteps[3]));
+	TestFalse(TEXT("a failed moss spend keeps the guard awake"), GuardAsleep(Character, 0));
+	TestEqual(TEXT("a failed moss spend leaves the chest at 0"), Home->GetChestCount(HomeWorldKitchen::Moss), 0);
+
+	TestTrue(TEXT("one moss goes in the chest"), Home->TryAddChestItem(HomeWorldKitchen::Moss, 1));
+	AHomeWorldCampActor* Wet = SpawnGuard(Scope.World, FVector(560.f, 0.f, 0.f));
+	AHomeWorldEasePad* WetPad = SpawnPad(Scope.World, FVector(560.f, 80.f, 0.f), 1);
+	if (!TestNotNull(TEXT("second guard"), Wet) || !TestNotNull(TEXT("second pad"), WetPad))
+	{
+		return false;
+	}
+	for (const EHomeWorldStrokeStep Step : PadSteps)
+	{
+		TestTrue(TEXT("a ladder step matches"), Character->TryCommitOpeningGuardPad(WetPad, Step));
+	}
+	TestTrue(TEXT("a successful moss spend sleeps the guard"), GuardAsleep(Character, 1));
+	TestEqual(TEXT("the spend subtracts one moss"), Home->GetChestCount(HomeWorldKitchen::Moss), 0);
+	TestFalse(TEXT("the first guard is still awake"), GuardAsleep(Character, 0));
 	return true;
 }
 

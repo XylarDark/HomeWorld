@@ -2640,12 +2640,13 @@ bool AHomeWorldCharacter::TryCommitOpeningGuardPad(AHomeWorldEasePad* Pad, EHome
 	}
 	if (Pad->IsLadderComplete())
 	{
-		if (UWorld* World = GetWorld())
+		// Moss puts the guard to sleep (UL2 3A). No moss, no sleep: a failed spend
+		// leaves the guard awake and the chest untouched.
+		UWorld* World = GetWorld();
+		UHomeWorldHomeLoopSubsystem* Home = World ? World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
+		if (!Home || !Home->TrySpendChestItem(HomeWorldKitchen::Moss, 1))
 		{
-			if (UHomeWorldHomeLoopSubsystem* Home = World->GetSubsystem<UHomeWorldHomeLoopSubsystem>())
-			{
-				Home->TrySpendChestItem(HomeWorldKitchen::Moss, 1);
-			}
+			return false;
 		}
 		ApplyOpeningGuardSleep(Pad);
 	}

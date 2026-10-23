@@ -839,6 +839,14 @@ bool UHomeWorldHomeLoopSubsystem::HarvestPlot(int32 PlotIndex)
 	return true;
 }
 
+void UHomeWorldHomeLoopSubsystem::Initialize(FSubsystemCollectionBase& Collection)
+{
+	Super::Initialize(Collection);
+	// Placeholder until wisp gathering exists: nothing in play calls TryGatherGraceMoss
+	// yet, so the kitchen chest starts with 6 moss, enough for the guard pads (UL2 3A).
+	Chest.FindOrAdd(HomeWorldKitchen::Moss) = 6;
+}
+
 int32 UHomeWorldHomeLoopSubsystem::GetChestCount(FName ItemId) const
 {
 	const int32* Count = Chest.Find(ItemId);
