@@ -1,11 +1,13 @@
 # 46 — NOV20 upgrade plan
 
-**Status:** Filed 2026-10-22. Recommendations are marked. None are picked.
+**Status:** Filed 2026-10-22. Updated 2026-10-23 on `fix/fromtext-exact`. Questions 1, 2, 3, 5, 6, and 7 are unpicked. Question 4 is not edited on this branch.
 **Owner:** This file. The review it sorts is `Docs/handoffs/research/EXIT_VISION_MARKET_TECH_V1.md`.
 **Queue:** `Docs/qa/TUTORIAL_PLAYTEST_QUEUE.md`. A dated row there wins over a sentence here.
 **This session:** These two files only. Source, Content, the research README, and the canon map were not edited. Nothing was committed.
 
 The played pass for every NOV20 item is `/Game/HomeWorld/Maps/SizeTest/L_SizeTest`. A green host run does not fill a queue table.
+
+2026-10-23: the beat table is in `HomeWorldPlaytestBeats`, and `FromText` matches a printed word exactly (`f68332d9`). The named and tagged registry is in source. The per-frame proximity scan and the verb-owned reach checks stay open through the glider play. `lamplight` and `night` in `placement_constants.json` are the same numbers as `candle` (1900 K, 900/700 cd). Those numbers stay. The art bible and the room plan are not edited on this branch.
 
 ## Buckets
 
@@ -38,8 +40,8 @@ The played pass for every NOV20 item is `/Game/HomeWorld/Maps/SizeTest/L_SizeTes
 Tonight's stack is on main: the interact resolver, placement constants, quest facts, the bonk camera fix, and the bonk arc clearance. Do not redo it. Do not start the character split on `fix/bonk-arc-clearance`.
 
 - **Keep, and play before any new prop.** The resolver and the screen-center look frame (`Docs/context/PLAY_TASKS.md` S1 and S3, armory defect D2 in `Docs/handoffs/SESSION_HANDOFF_MODULARITY.md`). Bonk camera and bonk arc clearance (S4). Placement constants (S5) and the `opening_los` flag (S7). Quest facts already in `DebugFastForwardOpening` and `Content/Python/quest_test_manifest.py` (play task 3, done). Do not add a home-loop stop to the opening chain. The moss chest spend and the stress numbers stay.
-- **Reorder behind the glider play.** The remaining S1 verb collapse: bed, hot spring, fish, and the per-prop branches in `FindOpeningProximityTarget`, as listed in the modularity handoff. The actor registry (S2). They serve later placed props. They do not fix the armory hover. The frame does. Finish them before the first new placed prop (field nodes or guards). `Docs/handoffs/research/UE_GAMEPLAY_SYSTEMS.md` says a new mechanic is data on the target, and it says not to batch-migrate the existing `Try*` list.
-- **Drop from NOV20.** A fast-forward beat-table extraction. Stops through `shrine` already exist (`Docs/COMMANDS_AND_LOG_TAGS.md`). Reopen when a stop past `shrine` is required. Further `HomeWorldTestWorld` work: the fixture exists and its header says it is not PIE (`Source/HomeWorld/HomeWorldTestWorld.h`). Reopen when a third copy of a fixture appears. Save slices: `UHomeWorldSaveGame` still stores an older loop (roles, six-slot inventory, tame, nurture, love level), and the November done-when is one uninterrupted play. Reopen when a dated row must survive a reload. Named light presets (S6) beyond the candle eye-check. Reopen at homestead dress if a second preset is actually needed.
+- **Reorder behind the glider play.** The remaining S1 verb collapse: bed, hot spring, fish, and the per-prop branches in `FindOpeningProximityTarget`, as listed in the modularity handoff. Named and tagged finds already use the registry. The per-frame proximity scan does not. Finish that scan before the first new placed prop (field nodes or guards). `Docs/handoffs/research/UE_GAMEPLAY_SYSTEMS.md` says a new mechanic is data on the target, and it says not to batch-migrate the existing `Try*` list.
+- **Frozen.** The beat table exists, and exact word match is `f68332d9`. Further beat-table work stays parked. Further `HomeWorldTestWorld` work: the fixture exists and its header says it is not PIE (`Source/HomeWorld/HomeWorldTestWorld.h`). Reopen when a third copy of a fixture appears. Save slices: `UHomeWorldSaveGame` still stores an older loop (roles, six-slot inventory, tame, nurture, love level), and the November done-when is one uninterrupted play. Reopen when a dated row must survive a reload. Named light presets (S6) beyond the candle eye-check. Reopen at homestead dress if a second preset is actually needed.
 
 ## Order
 
