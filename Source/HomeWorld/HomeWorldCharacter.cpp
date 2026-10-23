@@ -479,7 +479,10 @@ void AHomeWorldCharacter::BeginBonkReturn(const FVector& Target, const FVector& 
 		Land.Y += Step.Y;
 		Land = HomeWorldBonk::LandingOnPad(Land, PadOrigin, PadExtent, Half);
 	}
-	BonkArc = HomeWorldBonk::MakeArc(GetActorLocation(), Land, PadOrigin, PadExtent, Half, Radius);
+	const FVector From = GetActorLocation();
+	const HomeWorldBonk::FClearance Clearance = HomeWorldBonk::MeasureClearance(
+		World, From, Land, Half, Radius, this);
+	BonkArc = HomeWorldBonk::MakeArc(From, Land, PadOrigin, PadExtent, Half, Radius, &Clearance);
 	BonkElapsed = 0.f;
 	bOpeningBonkReturning = true;
 	Move->StopMovementImmediately();
@@ -510,6 +513,8 @@ void AHomeWorldCharacter::TickBonkReturn(float DeltaSeconds)
 	BonkElapsed += FMath::Max(DeltaSeconds, 0.f);
 	const float Duration = FMath::Max(BonkArc.DurationSec, 0.05f);
 	const float T = FMath::Clamp(BonkElapsed / Duration, 0.f, 1.f);
+	// Sweep stays off. The arc already cleared the blockers, and a blocking
+	// move would stop the body in the wall.
 	SetActorLocation(HomeWorldBonk::PointOnArc(BonkArc, T), false, nullptr, ETeleportType::TeleportPhysics);
 	Move->Velocity = FVector::ZeroVector;
 	ConsumeMovementInputVector();
