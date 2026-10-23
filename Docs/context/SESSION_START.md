@@ -72,3 +72,16 @@ After the clarifier names the work, name one room and open that card: Look `Docs
 ## Session close
 
 The close order is `UserHarness/docs/human-use/route-context.md`. This file wins on the close order. It also wins on mode, the read list, and the clarifier. No tutorial is on offer yet. Offer `Docs/qa/HUMAN_TUTORIAL.md` only once it is committed and `Content/Python/human_tutorial.py --check` exits 0. Until then, step 3 names the next manual step in one line. Do not wait on a UserHarness SHA. An unrelated second task: alert and stop. A second task Luke names is the yes.
+
+## Effort and chat protocol (Lead lock Effort protocol v2: A, 2026-10-23)
+
+Main rule: how much reasoning a step gets depends on what a wrong answer would cost, not on how hard the step looks.
+
+Levels: Low = the fast default model at its default effort and default context size. High = a thinking model at high effort.
+
+6. Each bite gets one new chat. Fixes, reruns and rebuilds on that branch continue in the same chat.
+7. Each packet names five things: (1) the base commit, (2) the worktree, (3) its setup, including the UnrealMCP plugin copy, (4) the file and line ranges to open, and (5) a done-when line, for example 213/0 plus the DLL time.
+8. The chat opens only the line ranges it's given and never reads a big file whole. HomeWorldCharacter.cpp runs past line 7,238.
+9. These run at low: builds, suites, reruns, cherry-picks, copies and greps.
+10. These run at high: new Source, fail-before tests, header or UPROPERTY changes, and debugging a fail. A fail-before prompt names the fixture and the check that must fail.
+11. A failed step stops the chain, as guardrail 4 already requires. If the failed step ran at low, Conductor reposts the list with that step rerun at high, in the same chat, as a new queued step. If it ran at high and fails twice, it stops for Lead.
