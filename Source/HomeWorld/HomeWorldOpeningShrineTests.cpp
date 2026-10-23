@@ -9,9 +9,11 @@
 #include "EngineUtils.h"
 #include "HomeWorldCampActor.h"
 #include "HomeWorldEasePad.h"
+#include "HomeWorldHomeLoopSubsystem.h"
 #include "HomeWorldSpiritLitVolume.h"
 #include "HomeWorldSpiritStealthComponent.h"
 #include "HomeWorldTestWorld.h"
+#include "HAL/IConsoleManager.h"
 
 namespace
 {
@@ -322,6 +324,140 @@ bool FOpeningShrineMissingTest::RunTest(const FString& Parameters)
 	Character->SetActorLocation(Shrine->GetActorLocation() + FVector(100.f, 0.f, 0.f));
 	TestFalse(TEXT("a missing guard refuses the shrine"), Character->TryOpeningShrineInFront());
 	TestFalse(TEXT("the partner does not walk"), Character->IsPartnerWalkingHome());
+	return true;
+}
+
+/**
+ * Moss is what puts each guard to sleep (UL2 3A). A finished ladder with an empty
+ * chest is refused: the guard stays awake and the chest stays at 0. With one moss
+ * the same ladder spends it and the guard sleeps.
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FOpeningGuardPadNeedsMossTest,
+	"HomeWorld.Opening.GuardPadNeedsMoss",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FOpeningGuardPadNeedsMossTest::RunTest(const FString& Parameters)
+{
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("opening guard pad needs moss"));
+	if (!Scope.Ok(this))
+	{
+		return false;
+	}
+	AHomeWorldCharacter* Character = MakeSpirit(this, Scope);
+	UHomeWorldHomeLoopSubsystem* Home = Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>();
+	if (!Character || !TestNotNull(TEXT("home"), Home))
+	{
+		return false;
+	}
+	TestEqual(TEXT("a new world's kitchen chest starts with 6 moss"), Home->GetChestCount(HomeWorldKitchen::Moss), 6);
+	while (Home->TrySpendChestItem(HomeWorldKitchen::Moss, 1))
+	{
+	}
+	TestEqual(TEXT("the chest is empty"), Home->GetChestCount(HomeWorldKitchen::Moss), 0);
+
+	AHomeWorldCampActor* Dry = SpawnGuard(Scope.World, FVector(400.f, 0.f, 0.f));
+	AHomeWorldEasePad* DryPad = SpawnPad(Scope.World, FVector(400.f, 80.f, 0.f), 0);
+	if (!TestNotNull(TEXT("guard"), Dry) || !TestNotNull(TEXT("pad"), DryPad))
+	{
+		return false;
+	}
+	for (int32 Step = 0; Step < 3; ++Step)
+	{
+		TestTrue(TEXT("a ladder step matches"), Character->TryCommitOpeningGuardPad(DryPad, PadSteps[Step]));
+	}
+	TestFalse(TEXT("a finished ladder with no moss is refused"), Character->TryCommitOpeningGuardPad(DryPad, PadSteps[3]));
+	TestFalse(TEXT("a failed moss spend keeps the guard awake"), GuardAsleep(Character, 0));
+	TestEqual(TEXT("a failed moss spend leaves the chest at 0"), Home->GetChestCount(HomeWorldKitchen::Moss), 0);
+
+	TestTrue(TEXT("one moss goes in the chest"), Home->TryAddChestItem(HomeWorldKitchen::Moss, 1));
+	AHomeWorldCampActor* Wet = SpawnGuard(Scope.World, FVector(560.f, 0.f, 0.f));
+	AHomeWorldEasePad* WetPad = SpawnPad(Scope.World, FVector(560.f, 80.f, 0.f), 1);
+	if (!TestNotNull(TEXT("second guard"), Wet) || !TestNotNull(TEXT("second pad"), WetPad))
+	{
+		return false;
+	}
+	for (const EHomeWorldStrokeStep Step : PadSteps)
+	{
+		TestTrue(TEXT("a ladder step matches"), Character->TryCommitOpeningGuardPad(WetPad, Step));
+	}
+	TestTrue(TEXT("a successful moss spend sleeps the guard"), GuardAsleep(Character, 1));
+	TestEqual(TEXT("the spend subtracts one moss"), Home->GetChestCount(HomeWorldKitchen::Moss), 0);
+	TestFalse(TEXT("the first guard is still awake"), GuardAsleep(Character, 0));
+	return true;
+}
+
+// hw.Moss.Debug (HomeWorld.cpp, dev builds) logs what this returns; the console command only resolves the PIE world and pawn.
+FString HomeWorldMossDebugRun(UWorld* World, AHomeWorldCharacter* Char, const TArray<FString>& Args);
+
+/**
+ * 5A evidence: the dev command reads and drives the real moss path. Count 6, pad 0 spends exactly one
+ * and sleeps guard 0, drain empties the chest, then pad 1 is refused and guard 1 stays awake.
+ */
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FMossDebugCommandTest,
+	"HomeWorld.Moss.DebugCommand",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FMossDebugCommandTest::RunTest(const FString& Parameters)
+{
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("moss debug command"));
+	if (!Scope.Ok(this))
+	{
+		return false;
+	}
+	AHomeWorldCharacter* Character = MakeSpirit(this, Scope);
+	UHomeWorldHomeLoopSubsystem* Home = Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>();
+	if (!Character || !TestNotNull(TEXT("home"), Home))
+	{
+		return false;
+	}
+	TestNotNull(TEXT("hw.Moss.Debug is registered"), IConsoleManager::Get().FindConsoleObject(TEXT("hw.Moss.Debug")));
+	AHomeWorldCampActor* GuardA = SpawnGuard(Scope.World, FVector(400.f, 0.f, 0.f));
+	AHomeWorldCampActor* GuardB = SpawnGuard(Scope.World, FVector(560.f, 0.f, 0.f));
+	AHomeWorldEasePad* PadA = SpawnPad(Scope.World, FVector(400.f, 80.f, 0.f), 0);
+	AHomeWorldEasePad* PadB = SpawnPad(Scope.World, FVector(560.f, 80.f, 0.f), 1);
+	if (!TestNotNull(TEXT("guard 0"), GuardA) || !TestNotNull(TEXT("guard 1"), GuardB)
+		|| !TestNotNull(TEXT("pad 0"), PadA) || !TestNotNull(TEXT("pad 1"), PadB))
+	{
+		return false;
+	}
+	auto Run = [&](const TCHAR* Sub, const TCHAR* Arg = nullptr)
+	{
+		TArray<FString> Args;
+		Args.Add(Sub);
+		if (Arg)
+		{
+			Args.Add(Arg);
+		}
+		const FString Line = HomeWorldMossDebugRun(Scope.World, Character, Args);
+		AddInfo(FString::Printf(TEXT("HWMOSS: %s"), *Line));
+		return Line;
+	};
+
+	TestTrue(TEXT("count reads 6"), Run(TEXT("count")).Contains(TEXT("\"moss\":6")));
+	TestEqual(TEXT("the chest holds 6"), Home->GetChestCount(HomeWorldKitchen::Moss), 6);
+
+	const FString Pad0 = Run(TEXT("pad"), TEXT("0"));
+	TestTrue(TEXT("pad 0 spends exactly one (6 to 5)"), Pad0.Contains(TEXT("\"moss_before\":6,\"moss_after\":5")));
+	TestTrue(TEXT("pad 0 commits"), Pad0.Contains(TEXT("\"commit\":true")));
+	TestTrue(TEXT("pad 0 reports guard 0 asleep"), Pad0.Contains(TEXT("\"guard\":0,\"tracked\":true,\"eased\":true,\"asleep\":true")));
+	TestEqual(TEXT("the chest holds 5"), Home->GetChestCount(HomeWorldKitchen::Moss), 5);
+	TestTrue(TEXT("guard 0 sleeps"), GuardAsleep(Character, 0));
+
+	const FString Drain = Run(TEXT("drain"));
+	TestTrue(TEXT("drain spends the other 5 and leaves 0"), Drain.Contains(TEXT("\"spent\":5,\"moss\":0")));
+	TestEqual(TEXT("the chest is empty"), Home->GetChestCount(HomeWorldKitchen::Moss), 0);
+
+	const FString Pad1 = Run(TEXT("pad"), TEXT("1"));
+	TestTrue(TEXT("pad 1 with no moss is refused"), Pad1.Contains(TEXT("\"commit\":false")));
+	TestTrue(TEXT("the refused pad leaves the chest at 0"), Pad1.Contains(TEXT("\"moss_before\":0,\"moss_after\":0")));
+	TestTrue(TEXT("pad 1 reports guard 1 awake"), Pad1.Contains(TEXT("\"guard\":1,\"tracked\":true,\"eased\":false,\"asleep\":false")));
+	TestEqual(TEXT("the chest is still empty"), Home->GetChestCount(HomeWorldKitchen::Moss), 0);
+	TestFalse(TEXT("guard 1 stays awake"), GuardAsleep(Character, 1));
+
+	TestTrue(TEXT("guard 1 reads awake"), Run(TEXT("guard"), TEXT("1")).Contains(TEXT("\"asleep\":false")));
+	TestTrue(TEXT("guard 0 still reads asleep"), Run(TEXT("guard"), TEXT("0")).Contains(TEXT("\"asleep\":true")));
 	return true;
 }
 

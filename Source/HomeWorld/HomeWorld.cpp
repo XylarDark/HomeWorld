@@ -21,6 +21,8 @@
 #include "HomeWorldSpiritShieldAbility.h"
 #include "HomeWorldTimeOfDaySubsystem.h"
 #include "HomeWorldPlayWorld.h"
+#include "HomeWorldHomeLoopSubsystem.h"
+#include "HomeWorldEasePad.h"
 #include "HomeWorldCraftSubsystem.h"
 #include "HomeWorldCraftTypes.h"
 #include "HomeWorldCombatDreamTypes.h"
@@ -1498,6 +1500,117 @@ void CmdPlantSlot(const TArray<FString>& Args)
 	}
 }
 
+#if !UE_BUILD_SHIPPING
+/**
+ * 5A evidence (dev only): hw.Moss.Debug. Each call logs ONE "HWMOSS: {...}" line and returns its payload.
+ * Real game paths only: the chest is read and spent through UHomeWorldHomeLoopSubsystem, and a pad is
+ * finished one offered step at a time through TryCommitOpeningGuardPad, so the moss check is never skipped.
+ * Not static: HomeWorldOpeningShrineTests.cpp declares it extern and tests it on a host world.
+ */
+FString HomeWorldMossDebugRun(UWorld* World, AHomeWorldCharacter* Char, const TArray<FString>& Args)
+{
+	const FString Sub = Args.Num() > 0 ? Args[0].ToLower() : FString(TEXT("count"));
+	const int32 Index = Args.Num() > 1 ? FCString::Atoi(*Args[1]) : 0;
+	UHomeWorldHomeLoopSubsystem* Home = World ? World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
+	UHomeWorldSpiritStealthComponent* Stealth = Char ? Char->FindComponentByClass<UHomeWorldSpiritStealthComponent>() : nullptr;
+	auto Bool = [](bool b) { return b ? TEXT("true") : TEXT("false"); };
+	auto GuardJson = [&](int32 Ordinal)
+	{
+		bool bEased = false;
+		bool bAsleep = false;
+		const bool bTracked = Stealth && Stealth->GetCampActorState(EHomeWorldCampRole::Guard, Ordinal, bEased, bAsleep);
+		return FString::Printf(TEXT("\"guard\":%d,\"tracked\":%s,\"eased\":%s,\"asleep\":%s"), Ordinal, Bool(bTracked), Bool(bEased), Bool(bAsleep));
+	};
+	FString Line;
+	if (!Home || !Char)
+	{
+		Line = FString::Printf(TEXT("{\"cmd\":\"%s\",\"error\":\"%s\"}"), *Sub, !Home ? TEXT("no home loop subsystem") : TEXT("no player character"));
+	}
+	else if (Sub == TEXT("count"))
+	{
+		Line = FString::Printf(TEXT("{\"cmd\":\"count\",\"moss\":%d}"), Home->GetChestCount(HomeWorldKitchen::Moss));
+	}
+	else if (Sub == TEXT("drain"))
+	{
+		const int32 Before = Home->GetChestCount(HomeWorldKitchen::Moss);
+		int32 Spent = 0;
+		while (Home->TrySpendChestItem(HomeWorldKitchen::Moss, 1))
+		{
+			++Spent;
+		}
+		Line = FString::Printf(TEXT("{\"cmd\":\"drain\",\"moss_before\":%d,\"spent\":%d,\"moss\":%d}"), Before, Spent, Home->GetChestCount(HomeWorldKitchen::Moss));
+	}
+	else if (Sub == TEXT("guard"))
+	{
+		Line = FString::Printf(TEXT("{\"cmd\":\"guard\",%s}"), *GuardJson(Index));
+	}
+	else if (Sub == TEXT("pad"))
+	{
+		AHomeWorldEasePad* Pad = nullptr;
+		for (TActorIterator<AHomeWorldEasePad> It(World); It; ++It)
+		{
+			if (It->ActorHasTag(FName(TEXT("NODE_OPENING_EASE"))) && It->GetGuardOrdinal() == Index)
+			{
+				Pad = *It;
+				break;
+			}
+		}
+		if (!Pad)
+		{
+			Line = FString::Printf(TEXT("{\"cmd\":\"pad\",\"pad\":%d,\"error\":\"no NODE_OPENING_EASE pad bound to guard %d (hw.Playtest.FastForward ease spawns them)\"}"), Index, Index);
+		}
+		else
+		{
+			const int32 MossBefore = Home->GetChestCount(HomeWorldKitchen::Moss);
+			const int32 StepsBefore = Pad->GetCompletedSteps();
+			bool bCommit = false;
+			int32 Calls = 0;
+			// The stroke input path plays the pad's offered step; do the same until the ladder is done.
+			while (!Pad->IsLadderComplete() && Calls < 4)
+			{
+				++Calls;
+				bCommit = Char->TryCommitOpeningGuardPad(Pad, Pad->GetOfferedStep());
+				if (!bCommit)
+				{
+					break;
+				}
+			}
+			Line = FString::Printf(
+				TEXT("{\"cmd\":\"pad\",\"pad\":%d,\"moss_before\":%d,\"moss_after\":%d,\"steps_before\":%d,\"steps_after\":%d,\"calls\":%d,\"commit\":%s,\"pad_slept\":%s,\"spirit\":%s,%s}"),
+				Index, MossBefore, Home->GetChestCount(HomeWorldKitchen::Moss), StepsBefore, Pad->GetCompletedSteps(), Calls,
+				Bool(bCommit), Bool(Pad->HasSleptItsGuard()), Bool(Char->GetIsSpiritForm()), *GuardJson(Index));
+		}
+	}
+	else
+	{
+		Line = FString::Printf(TEXT("{\"cmd\":\"%s\",\"error\":\"usage: hw.Moss.Debug count | pad <i> | drain | guard <i>\"}"), *Sub);
+	}
+	UE_LOG(LogTemp, Log, TEXT("HWMOSS: %s"), *Line);
+	return Line;
+}
+
+namespace
+{
+	void CmdMossDebug(const TArray<FString>& Args)
+	{
+		UWorld* World = HomeWorldPlayWorld::Resolve();
+		if (!World)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Moss.Debug requires a play world (PIE or game)."));
+			return;
+		}
+		APlayerController* PC = World->GetFirstPlayerController();
+		AHomeWorldCharacter* Char = PC ? Cast<AHomeWorldCharacter>(PC->GetPawn()) : nullptr;
+		if (!Char)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HomeWorld: hw.Moss.Debug - no AHomeWorldCharacter pawn."));
+			return;
+		}
+		HomeWorldMossDebugRun(World, Char, Args);
+	}
+}
+#endif // !UE_BUILD_SHIPPING
+
 void FHomeWorldModule::StartupModule()
 {
 	IConsoleManager::Get().RegisterConsoleCommand(
@@ -1750,6 +1863,13 @@ void FHomeWorldModule::StartupModule()
 		TEXT("Playtest: run the opening beats for real, then stop ready to test one. <beat>: spirit, herbs, backpack, kettle, station, dog, fish, sleep, night, collect, heal; no beat = night, list = the names. Fresh PIE."),
 		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdPlaytestFastForward),
 		ECVF_Cheat);
+#if !UE_BUILD_SHIPPING
+	IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("hw.Moss.Debug"),
+		TEXT("5A evidence (dev): count | pad <i> | drain | guard <i>. Logs one HWMOSS: line. pad <i> finishes opening guard pad i through TryCommitOpeningGuardPad (the real moss check)."),
+		FConsoleCommandWithArgsDelegate::CreateStatic(&CmdMossDebug),
+		ECVF_Cheat);
+#endif
 	IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("hw.Plant.Slot"),
 		TEXT("T0 #3 NODE_PLANT_SLOT: spend RES_HERB -> day plant given herb on N1 slot (TOD_DAY FORM_BODY). Not nurture/PROXY. Same slot identity for #12."),

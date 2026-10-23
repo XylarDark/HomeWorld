@@ -18,6 +18,14 @@ namespace
 	{
 		return Character ? Character->FindComponentByClass<UHomeWorldStressComponent>() : nullptr;
 	}
+
+	/** The chest starts with a placeholder seed of moss; these tests count from an empty chest. */
+	void DrainMoss(UHomeWorldHomeLoopSubsystem* Home)
+	{
+		while (Home && Home->TrySpendChestItem(HomeWorldKitchen::Moss, 1))
+		{
+		}
+	}
 }
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FStressHitTest, "HomeWorld.Stress.Hit",
@@ -96,6 +104,7 @@ bool FStressGraceMealTest::RunTest(const FString& Parameters)
 		return false;
 	}
 	Stress->SetPoints(40);
+	DrainMoss(Home);
 	TestTrue(TEXT("the chest holds one moss"), Home->TryAddChestItem(HomeWorldKitchen::Moss, 1));
 	TestTrue(TEXT("the meal is served"), Home->ServeGraceMossMeal(Character));
 	TestEqual(TEXT("a Grace-moss meal subtracts 30"), Stress->GetPoints(), 10);
@@ -185,6 +194,7 @@ bool FStressMossGatherTest::RunTest(const FString& Parameters)
 	Tree->SetSource(TEXT("tree"));
 	Rock->SetSource(TEXT("rock"));
 	Wrath->SetSource(TEXT("tree"));
+	DrainMoss(Home);
 	TestTrue(TEXT("a Grace wisp gathers a tree"), Home->TryGatherGraceMoss(Tree, EHomeWorldVirtuePole::Grace));
 	TestTrue(TEXT("a Grace wisp gathers a rock"), Home->TryGatherGraceMoss(Rock, EHomeWorldVirtuePole::Grace));
 	TestFalse(TEXT("a gathered tuft is spent"), Home->TryGatherGraceMoss(Tree, EHomeWorldVirtuePole::Grace));
@@ -205,6 +215,7 @@ bool FStressPadSpendTest::RunTest(const FString& Parameters)
 	{
 		return false;
 	}
+	DrainMoss(Home);
 	Home->TryAddChestItem(HomeWorldKitchen::Moss, 1);
 	FActorSpawnParameters Params;
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
