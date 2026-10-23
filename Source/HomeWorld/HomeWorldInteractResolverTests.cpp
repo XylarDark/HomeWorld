@@ -12,22 +12,6 @@
 
 namespace
 {
-	AActor* SpawnTagged(UWorld* World, const FVector& Location, FName Tag)
-	{
-		if (!World)
-		{
-			return nullptr;
-		}
-		FActorSpawnParameters Params;
-		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		AActor* Prop = World->SpawnActor<AActor>(AActor::StaticClass(), Location, FRotator::ZeroRotator, Params);
-		if (Prop)
-		{
-			Prop->Tags.Add(Tag);
-		}
-		return Prop;
-	}
-
 	bool RunVerb(FAutomationTestBase* Test, HomeWorldInteract::EVerb Verb)
 	{
 		const HomeWorldInteract::FSpec* Spec = HomeWorldInteract::SpecFor(Verb);
@@ -48,7 +32,7 @@ namespace
 		const bool bSizeTest = Spec->Chain != HomeWorldInteract::EChain::World;
 		Character->SetInteractChainForTest(bSizeTest);
 		HomeWorldInteract::ArmProbe(Verb);
-		AActor* Prop = SpawnTagged(Scope.World, FVector(120.f, 0.f, 0.f), HomeWorldInteract::ProbeTag(Verb));
+		AActor* Prop = HomeWorldTestWorld::SpawnTagged(Scope.World, FVector(120.f, 0.f, 0.f), HomeWorldInteract::ProbeTag(Verb));
 		if (!Test->TestNotNull(TEXT("tagged prop"), Prop))
 		{
 			HomeWorldInteract::ClearProbe();

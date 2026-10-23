@@ -7,6 +7,7 @@
 #include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "HomeWorldGameMode.h"
+#include "HomeWorldTestWorld.h"
 #include "HomeWorldTimeOfDaySubsystem.h"
 #include "Misc/ScopeExit.h"
 
@@ -219,22 +220,15 @@ bool FConversionCounterResetsAtDawnTest::RunTest(const FString& Parameters)
 		return false;
 	}
 
-	UWorld* World = UWorld::CreateWorld(EWorldType::Game, false);
+	// The shared fixture destroys the world whatever happens, including on an early return below.
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("conversion dawn reset"));
+	UWorld* World = Scope.World;
 	if (!TestNotNull(TEXT("test world"), World))
 	{
 		return false;
 	}
 
-	// Destroy the world whatever happens, including on an early return below.
-	ON_SCOPE_EXIT
-	{
-		if (World)
-		{
-			World->DestroyWorld(false);
-		}
-	};
-
-	UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>();
+	UHomeWorldTimeOfDaySubsystem* TimeOfDay = Scope.TimeOfDay;
 	if (!TestNotNull(TEXT("time of day subsystem"), TimeOfDay))
 	{
 		AddError(TEXT("no TimeOfDay subsystem - the reset path cannot be reached"));

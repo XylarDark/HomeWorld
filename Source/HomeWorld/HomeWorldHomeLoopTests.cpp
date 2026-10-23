@@ -11,34 +11,13 @@
 #include "HomeWorldInventorySubsystem.h"
 #include "HomeWorldInventoryTypes.h"
 #include "HomeWorldQuestLog.h"
+#include "HomeWorldTestWorld.h"
 #include "HomeWorldTimeOfDaySubsystem.h"
 
 /**
  * Docs/42_HOME_LOOP_DESIGN.md section 15. One shot per bite.
  * Tea, quest, cloud-wisp, fertilizer, and nurture tests stay on their own files.
  */
-
-namespace HomeWorldHomeLoopTest
-{
-	struct FScopedWorld
-	{
-		UWorld* World = nullptr;
-
-		FScopedWorld()
-		{
-			World = UWorld::CreateWorld(EWorldType::Game, false);
-		}
-
-		~FScopedWorld()
-		{
-			if (World)
-			{
-				World->DestroyWorld(false);
-				World = nullptr;
-			}
-		}
-	};
-}
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 	FHomeLoopStationIdsTest,
@@ -47,7 +26,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FHomeLoopStationIdsTest::RunTest(const FString& Parameters)
 {
-	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("home loop"));
 	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
 		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
 	if (!TestNotNull(TEXT("world"), Scope.World) || !TestNotNull(TEXT("home loop"), Loop))
@@ -88,7 +67,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FHomeLoopKettleStillBrewsTest::RunTest(const FString& Parameters)
 {
-	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("home loop"));
 	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
 		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
 	if (!TestNotNull(TEXT("world"), Scope.World) || !TestNotNull(TEXT("home loop"), Loop))
@@ -170,7 +149,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FHomeLoopKettlePrepCookTest::RunTest(const FString& Parameters)
 {
-	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("home loop"));
 	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
 		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
 	if (!TestNotNull(TEXT("home loop"), Loop))
@@ -205,7 +184,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FHomeLoopMistimeServesTest::RunTest(const FString& Parameters)
 {
-	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("home loop"));
 	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
 		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
 	if (!TestNotNull(TEXT("home loop"), Loop))
@@ -234,7 +213,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FHomeLoopPrepCarriesTest::RunTest(const FString& Parameters)
 {
-	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("home loop"));
 	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
 		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
 	UHomeWorldTimeOfDaySubsystem* TimeOfDay = Scope.World
@@ -268,7 +247,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FHomeLoopOpeningSprintUntouchedTest::RunTest(const FString& Parameters)
 {
-	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("home loop"));
 	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
 		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
 	UHomeWorldTimeOfDaySubsystem* TimeOfDay = Scope.World
@@ -316,7 +295,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FHomeLoopTutorialStationsInertTest::RunTest(const FString& Parameters)
 {
-	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("home loop"));
 	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
 		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
 	if (!TestNotNull(TEXT("home loop"), Loop))
@@ -348,7 +327,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FHomeLoopDiscardSpendsTest::RunTest(const FString& Parameters)
 {
-	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("home loop"));
 	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
 		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
 	if (!TestNotNull(TEXT("home loop"), Loop))
@@ -399,7 +378,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FHomeLoopArmedBuffDawnTest::RunTest(const FString& Parameters)
 {
-	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("home loop"));
 	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
 		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
 	if (!TestNotNull(TEXT("home loop"), Loop))
@@ -437,7 +416,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FHomeLoopArmedBuffDuskTest::RunTest(const FString& Parameters)
 {
-	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("home loop"));
 	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
 		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
 	if (!TestNotNull(TEXT("home loop"), Loop))
@@ -466,7 +445,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FHomeLoopArmedBuffClearsTest::RunTest(const FString& Parameters)
 {
-	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("home loop"));
 	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
 		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
 	if (!TestNotNull(TEXT("home loop"), Loop))
@@ -494,7 +473,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FHomeLoopArmedBuffReplacesTest::RunTest(const FString& Parameters)
 {
-	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("home loop"));
 	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
 		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
 	if (!TestNotNull(TEXT("home loop"), Loop))
@@ -530,7 +509,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FHomeLoopOpeningBrewSkipsSlotTest::RunTest(const FString& Parameters)
 {
-	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("home loop"));
 	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
 		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
 	UHomeWorldTimeOfDaySubsystem* TimeOfDay = Scope.World
@@ -564,7 +543,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FHomeLoopWispStationAssignTest::RunTest(const FString& Parameters)
 {
-	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("home loop"));
 	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
 		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
 	if (!TestNotNull(TEXT("home loop"), Loop))
@@ -599,7 +578,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FHomeLoopWispLeavesCloudWispsTest::RunTest(const FString& Parameters)
 {
-	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("home loop"));
 	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
 		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
 	if (!TestNotNull(TEXT("home loop"), Loop))
@@ -636,7 +615,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FHomeLoopDustCapBaselineTest::RunTest(const FString& Parameters)
 {
-	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("home loop"));
 	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
 		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
 	if (!TestNotNull(TEXT("home loop"), Loop))
@@ -668,7 +647,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FHomeLoopCleanFactorScalesBuffTest::RunTest(const FString& Parameters)
 {
-	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("home loop"));
 	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
 		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
 	if (!TestNotNull(TEXT("home loop"), Loop))
@@ -698,7 +677,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FHomeLoopDustWithoutMealTest::RunTest(const FString& Parameters)
 {
-	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("home loop"));
 	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
 		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
 	if (!TestNotNull(TEXT("home loop"), Loop))
@@ -719,7 +698,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FHomeLoopCleanClearsOneTest::RunTest(const FString& Parameters)
 {
-	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("home loop"));
 	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
 		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
 	if (!TestNotNull(TEXT("home loop"), Loop))
@@ -763,7 +742,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FHomeLoopPlotHarvestChestTest::RunTest(const FString& Parameters)
 {
-	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("home loop"));
 	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
 		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
 	UHomeWorldInventorySubsystem* Inventory = Scope.World
@@ -806,7 +785,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FHomeLoopKettleSpendsChestHerbTest::RunTest(const FString& Parameters)
 {
-	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("home loop"));
 	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
 		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
 	UHomeWorldInventorySubsystem* Inventory = Scope.World
@@ -874,7 +853,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FHomeLoopGreensHerbSyncTest::RunTest(const FString& Parameters)
 {
-	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("home loop"));
 	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
 		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
 	if (!TestNotNull(TEXT("home loop"), Loop))
@@ -937,7 +916,7 @@ bool FHomeLoopGreensHerbOffOpeningTest::RunTest(const FString& Parameters)
 	TestTrue(TEXT("the opening kettle step is unchanged"), bKettle);
 	TestFalse(TEXT("opening steps gained no greens step"), bGreens);
 
-	HomeWorldHomeLoopTest::FScopedWorld Scope;
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("home loop"));
 	UHomeWorldHomeLoopSubsystem* Loop = Scope.World
 		? Scope.World->GetSubsystem<UHomeWorldHomeLoopSubsystem>() : nullptr;
 	if (!TestNotNull(TEXT("home loop"), Loop))

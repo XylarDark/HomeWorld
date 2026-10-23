@@ -13,6 +13,7 @@
 #include "HomeWorldGameMode.h"
 #include "HomeWorldOpeningWalker.h"
 #include "HomeWorldSaveGame.h"
+#include "HomeWorldTestWorld.h"
 #include "HomeWorldTimeOfDaySubsystem.h"
 
 /**
@@ -37,29 +38,6 @@ namespace HomeWorldPartyTest
 		GameInstance->Init();
 		return GameInstance->GetSubsystem<UHomeWorldFamilySubsystem>();
 	}
-
-	struct FScopedWorld
-	{
-		UWorld* World = nullptr;
-
-		FScopedWorld()
-		{
-			World = UWorld::CreateWorld(EWorldType::Game, false);
-		}
-
-		~FScopedWorld()
-		{
-			if (World)
-			{
-				if (UHomeWorldTimeOfDaySubsystem* TimeOfDay = World->GetSubsystem<UHomeWorldTimeOfDaySubsystem>())
-				{
-					TimeOfDay->RestoreDefaultPhaseOverride();
-				}
-				World->DestroyWorld(false);
-				World = nullptr;
-			}
-		}
-	};
 }
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(
@@ -161,7 +139,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 bool FPartyLoadSendsHomeTest::RunTest(const FString& Parameters)
 {
 	UHomeWorldFamilySubsystem* Family = HomeWorldPartyTest::MakeFamily();
-	HomeWorldPartyTest::FScopedWorld Scope;
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("party"));
 	if (!TestNotNull(TEXT("family subsystem"), Family) || !TestNotNull(TEXT("world"), Scope.World))
 	{
 		return false;
@@ -210,7 +188,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 bool FPartyOutingClearTest::RunTest(const FString& Parameters)
 {
 	UHomeWorldFamilySubsystem* Family = HomeWorldPartyTest::MakeFamily();
-	HomeWorldPartyTest::FScopedWorld Scope;
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("party"));
 	if (!TestNotNull(TEXT("family subsystem"), Family) || !TestNotNull(TEXT("world"), Scope.World))
 	{
 		return false;
@@ -266,7 +244,7 @@ bool FPartyNightTeleportTest::RunTest(const FString& Parameters)
 	{
 		return false;
 	}
-	HomeWorldPartyTest::FScopedWorld Scope;
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("party"));
 	UGameInstance* GameInstance = NewObject<UGameInstance>(GEngine);
 	if (!TestNotNull(TEXT("world"), Scope.World) || !TestNotNull(TEXT("game instance"), GameInstance))
 	{
@@ -327,7 +305,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 bool FPartyFollowLeashTest::RunTest(const FString& Parameters)
 {
 	UHomeWorldFamilySubsystem* Family = HomeWorldPartyTest::MakeFamily();
-	HomeWorldPartyTest::FScopedWorld Scope;
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("party"));
 	if (!TestNotNull(TEXT("family"), Family) || !TestNotNull(TEXT("world"), Scope.World))
 	{
 		return false;
@@ -394,7 +372,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 bool FPartyHomeInteractTest::RunTest(const FString& Parameters)
 {
 	UHomeWorldFamilySubsystem* Family = HomeWorldPartyTest::MakeFamily();
-	HomeWorldPartyTest::FScopedWorld Scope;
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("party"));
 	if (!TestNotNull(TEXT("family"), Family) || !TestNotNull(TEXT("world"), Scope.World))
 	{
 		return false;
