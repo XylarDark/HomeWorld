@@ -386,6 +386,14 @@ void AHomeWorldCharacter::Tick(float DeltaTime)
 	}
 }
 
+namespace
+{
+	// Bonk landing (Lead 1A, 2026-10-22): C1, just outside the cottage door on L_SizeTest.
+	// On the door line (x -1090..-810), through the porch rail gap (x -1150..-750 at y -780),
+	// clear of the roof (south edge y -360) and the porch slab (y -810). Scan: q2/scan_c1.md.
+	const FVector GBonkLandingC1(-950.f, -1000.f, 45102.f);
+}
+
 void AHomeWorldCharacter::UpdateOpeningBonk()
 {
 	UWorld* World = GetWorld();
@@ -435,7 +443,8 @@ void AHomeWorldCharacter::UpdateOpeningBonk()
 	{
 		return;
 	}
-	BeginBonkReturn(OpeningBonkSafe, Origin, Extent);
+	// Fly to the fixed C1 landing rather than the last spot stood on the pad.
+	BeginBonkReturn(GBonkLandingC1, Origin, Extent);
 }
 
 void AHomeWorldCharacter::BeginBonkReturn(const FVector& Target, const FVector& PadOrigin, const FVector& PadExtent)
