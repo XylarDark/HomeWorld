@@ -783,4 +783,57 @@ bool FCampActorsAreDiscoveredTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FLegacyGuardLatchClearsTest,
+	"HomeWorld.T0.M14.LegacyGuardLatchClears",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FLegacyGuardLatchClearsTest::RunTest(const FString& Parameters)
+{
+	using HomeWorldCampNightTest::FScopedSpirit;
+	using HomeWorldCampNightTest::MakeCamp;
+	using HomeWorldCampNightTest::MakeSpirit;
+
+	HomeWorldTestWorld::FScopedWorld Scope(TEXT("M14 legacy guard latch woke"));
+	if (!Scope.Ok(this))
+	{
+		return false;
+	}
+	MakeCamp(this, Scope.World);
+	FScopedSpirit Fixture = MakeSpirit(this, Scope);
+	if (!Fixture.Ok(this))
+	{
+		return false;
+	}
+	UHomeWorldSpiritStealthComponent* Stealth = Fixture.Stealth;
+
+	TestTrue(TEXT("avoid sets the legacy guard latch"), Stealth->TryAvoidNodeGuard());
+	TestEqual(TEXT("legacy guard avoided count is one"), Stealth->GetGuardsAvoidedThisSession(), 1);
+	Stealth->TryEaseCampActor(EHomeWorldCampRole::Guard, 0);
+	Stealth->NotifyCampActorWoke(EHomeWorldCampRole::Guard, 0);
+	TestEqual(TEXT("waking guard zero clears the legacy avoid count"),
+		Stealth->GetGuardsAvoidedThisSession(), 0);
+	TestEqual(TEXT("waking guard zero clears calmed count"), Stealth->GetCalmedActorCount(), 0);
+
+	HomeWorldTestWorld::FScopedWorld Scope2(TEXT("M14 legacy guard latch kill"));
+	if (!Scope2.Ok(this))
+	{
+		return false;
+	}
+	MakeCamp(this, Scope2.World);
+	FScopedSpirit Fixture2 = MakeSpirit(this, Scope2);
+	if (!Fixture2.Ok(this))
+	{
+		return false;
+	}
+	UHomeWorldSpiritStealthComponent* Stealth2 = Fixture2.Stealth;
+
+	Stealth2->TryEaseCampActor(EHomeWorldCampRole::Guard, 0);
+	Stealth2->NotifyCampActorKilled(EHomeWorldCampRole::Guard, 0);
+	TestEqual(TEXT("killing guard zero clears the legacy avoid count"),
+		Stealth2->GetGuardsAvoidedThisSession(), 0);
+
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS

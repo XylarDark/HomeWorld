@@ -663,6 +663,10 @@ void UHomeWorldSpiritStealthComponent::NotifyCampActorWoke(EHomeWorldCampRole Ro
 		UE_LOG(LogHomeWorld, Log,
 			TEXT("CAMP: %s %d WOKE - freedom gate closed (eased=%d; keeping them sleeping can fail)"),
 			HomeWorldCampNight::GetRoleLogName(Role), Ordinal, State->bEased ? 1 : 0);
+		if (Role == EHomeWorldCampRole::Guard && Ordinal == 0)
+		{
+			GuardsAvoidedCount = 0;
+		}
 	}
 }
 
@@ -675,6 +679,10 @@ void UHomeWorldSpiritStealthComponent::NotifyCampActorKilled(EHomeWorldCampRole 
 		UE_LOG(LogHomeWorld, Log,
 			TEXT("CAMP: %s %d KILLED - anti-case, a dead actor is not a calmed one"),
 			HomeWorldCampNight::GetRoleLogName(Role), Ordinal);
+		if (Role == EHomeWorldCampRole::Guard && Ordinal == 0)
+		{
+			GuardsAvoidedCount = 0;
+		}
 	}
 }
 
@@ -687,6 +695,10 @@ void UHomeWorldSpiritStealthComponent::NotifyCampActorConverted(EHomeWorldCampRo
 		UE_LOG(LogHomeWorld, Log,
 			TEXT("CAMP: %s %d CONVERTED - anti-case, conversion is what happens to foes you defeat; it is not care"),
 			HomeWorldCampNight::GetRoleLogName(Role), Ordinal);
+		if (Role == EHomeWorldCampRole::Guard && Ordinal == 0)
+		{
+			GuardsAvoidedCount = 0;
+		}
 	}
 }
 
