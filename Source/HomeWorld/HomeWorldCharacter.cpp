@@ -2,6 +2,7 @@
 
 #include "HomeWorldCharacter.h"
 #include "HomeWorldInteractResolver.h"
+#include "HomeWorldOpeningHover.h"
 #include "HomeWorldOpeningRegistry.h"
 #include "HomeWorldPlaytestBeats.h"
 #include "HomeWorldPlacementConstants.h"
@@ -2942,46 +2943,96 @@ AActor* AHomeWorldCharacter::PickOpeningLookTarget(AActor* Perch, const TArray<F
 	return Best;
 }
 
+namespace HomeWorldOpeningHover
+{
+	static bool bCenterLookForTest = false;
+
+	void SetCenterLookForTest(bool bEnable)
+	{
+		bCenterLookForTest = bEnable;
+	}
+
+	bool UseCenterLookForTest()
+	{
+		return bCenterLookForTest;
+	}
+
+	AActor* PickFrom(AHomeWorldCharacter* Character, TFunctionRef<void(TFunctionRef<void(AActor*)>)> ForEach)
+	{
+		if (!Character)
+		{
+			return nullptr;
+		}
+		UWorld* World = Character->GetWorld();
+		if (!World)
+		{
+			Character->OpeningLookPerch = nullptr;
+			return nullptr;
+		}
+		TArray<FOpeningLookCandidate> Candidates;
+		ForEach([&Candidates, Character](AActor* Actor)
+		{
+			if (!Actor || Actor == Character || Actor->ActorHasTag(FName(TEXT("NPC_CHILD"))))
+			{
+				return;
+			}
+			if (!HomeWorldInteract::IsProximityExtra(Actor) && !AHomeWorldCharacter::ActorHasInteractableComponent(Actor))
+			{
+				return;
+			}
+			const float DistCm = FVector::Dist2D(Character->GetActorLocation(), Actor->GetActorLocation());
+			if (!AHomeWorldCharacter::IsOpeningInteractInReach(DistCm))
+			{
+				return;
+			}
+			if (!Character->HasOpeningLineOfSight(Actor))
+			{
+				return;
+			}
+			float LookSq = 0.f;
+			if (!Character->OpeningLookDistSq(Actor, LookSq))
+			{
+				return;
+			}
+			Candidates.Add({Actor, LookSq});
+		});
+		Character->OpeningLookPerch = AHomeWorldCharacter::PickOpeningLookTarget(Character->OpeningLookPerch.Get(), Candidates);
+		return Character->OpeningLookPerch.Get();
+	}
+
+	AActor* PickByWorldScan(AHomeWorldCharacter* Character)
+	{
+		UWorld* World = Character ? Character->GetWorld() : nullptr;
+		if (!World)
+		{
+			return PickFrom(Character, [](TFunctionRef<void(AActor*)>) {});
+		}
+		return PickFrom(Character, [World](TFunctionRef<void(AActor*)> Fn)
+		{
+			for (TActorIterator<AActor> It(World); It; ++It)
+			{
+				Fn(*It);
+			}
+		});
+	}
+
+	AActor* PickByRegistry(AHomeWorldCharacter* Character)
+	{
+		UWorld* World = Character ? Character->GetWorld() : nullptr;
+		if (!World)
+		{
+			return PickFrom(Character, [](TFunctionRef<void(AActor*)>) {});
+		}
+		return PickFrom(Character, [World](TFunctionRef<void(AActor*)> Fn)
+		{
+			HomeWorldOpeningRegistry::Visit(World, Fn);
+		});
+	}
+}
+
 AActor* AHomeWorldCharacter::FindOpeningProximityTarget()
 {
-	UWorld* World = GetWorld();
-	if (!World)
-	{
-		OpeningLookPerch = nullptr;
-		return nullptr;
-	}
-	const FVector From = GetActorLocation();
-	TArray<FOpeningLookCandidate> Candidates;
-	for (TActorIterator<AActor> It(World); It; ++It)
-	{
-		AActor* Actor = *It;
-		if (!Actor || Actor == this || Actor->ActorHasTag(FName(TEXT("NPC_CHILD"))))
-		{
-			continue;
-		}
-		if (!HomeWorldInteract::IsProximityExtra(Actor) && !ActorHasInteractableComponent(Actor))
-		{
-			continue;
-		}
-		const float DistCm = FVector::Dist2D(From, Actor->GetActorLocation());
-		if (!IsOpeningInteractInReach(DistCm))
-		{
-			continue;
-		}
-		// A wall between the body and the prop hides the prompt and refuses the press.
-		if (!HasOpeningLineOfSight(Actor))
-		{
-			continue;
-		}
-		float LookSq = 0.f;
-		if (!OpeningLookDistSq(Actor, LookSq))
-		{
-			continue;
-		}
-		Candidates.Add({Actor, LookSq});
-	}
-	OpeningLookPerch = PickOpeningLookTarget(OpeningLookPerch, Candidates);
-	return OpeningLookPerch;
+	return HomeWorldOpeningHover::PickByRegistry(this);
 }
 
 bool AHomeWorldCharacter::HasOpeningLineOfSight(const AActor* Target) const
@@ -3031,6 +3082,29 @@ bool AHomeWorldCharacter::HasOpeningLineOfSight(const AActor* Target) const
 
 bool AHomeWorldCharacter::OpeningLookDistSq(const AActor* Target, float& OutDistSq) const
 {
+	if (HomeWorldOpeningHover::UseCenterLookForTest())
+	{
+		if (!Target)
+		{
+			return false;
+		}
+		FVector LookForward = GetControlRotation().Vector();
+		LookForward.Z = 0.f;
+		if (!LookForward.Normalize())
+		{
+			LookForward = GetActorForwardVector();
+			LookForward.Z = 0.f;
+			LookForward.Normalize();
+		}
+		FVector BodyToTarget = Target->GetActorLocation() - GetActorLocation();
+		BodyToTarget.Z = 0.f;
+		if (LookForward.IsNearlyZero() || !IsInFrontOfBody(LookForward, BodyToTarget))
+		{
+			return false;
+		}
+		OutDistSq = 0.f;
+		return true;
+	}
 	const APlayerController* PC = Cast<APlayerController>(GetController());
 	if (!PC || !Target || !FollowCamera)
 	{

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Templates/Function.h"
 
 class AActor;
 class UWorld;
@@ -14,6 +15,7 @@ class UWorld;
 namespace HomeWorldOpeningRegistry
 {
 	void Bind(UWorld* World);
+	void Visit(UWorld* World, TFunctionRef<void(AActor*)> Fn);
 	AActor* FindNamed(UWorld* World, const TCHAR* Name, bool bExact);
 	AActor* FindTagged(UWorld* World, const TCHAR* Tag, const TCHAR* AltTag);
 }

@@ -100,6 +100,22 @@ namespace HomeWorldOpeningRegistry
 		return *FindStore(World);
 	}
 
+	void Visit(UWorld* World, TFunctionRef<void(AActor*)> Fn)
+	{
+		if (!World)
+		{
+			return;
+		}
+		const FStore& Store = Ensure(World);
+		for (const TWeakObjectPtr<AActor>& Weak : Store.Actors)
+		{
+			if (AActor* Actor = Weak.Get())
+			{
+				Fn(Actor);
+			}
+		}
+	}
+
 	AActor* FindNamed(UWorld* World, const TCHAR* Name, bool bExact)
 	{
 		if (!World || !Name)

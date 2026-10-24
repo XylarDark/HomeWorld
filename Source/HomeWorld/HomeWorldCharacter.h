@@ -12,6 +12,7 @@
 #include "HomeWorldTimeOfDaySubsystem.h"
 #include "HomeWorldOpeningSupply.h"
 #include "HomeWorldBonkArc.h"
+#include "HomeWorldOpeningHover.h"
 
 /** Where a family member stands. One place, not a dialogue tree. */
 UENUM(BlueprintType)
@@ -63,6 +64,7 @@ class HOMEWORLD_API AHomeWorldCharacter : public ACharacter, public IAbilitySyst
 	GENERATED_BODY()
 
 public:
+	friend AActor* HomeWorldOpeningHover::PickFrom(AHomeWorldCharacter* Character, TFunctionRef<void(TFunctionRef<void(AActor*)>)> ForEach);
 	AHomeWorldCharacter(const FObjectInitializer& ObjectInitializer);
 
 	/** Half-extent of the aim box around screen center, in normalized screen space. The drawn frame uses this. */
