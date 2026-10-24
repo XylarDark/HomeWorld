@@ -2938,6 +2938,7 @@ AActor* AHomeWorldCharacter::PickOpeningLookTarget(AActor* Perch, const TArray<F
 
 namespace HomeWorldOpeningHover
 {
+#if WITH_DEV_AUTOMATION_TESTS
 	static bool bCenterLookForTest = false;
 
 	void SetCenterLookForTest(bool bEnable)
@@ -2949,6 +2950,7 @@ namespace HomeWorldOpeningHover
 	{
 		return bCenterLookForTest;
 	}
+#endif
 
 	AActor* PickFrom(AHomeWorldCharacter* Character, TFunctionRef<void(TFunctionRef<void(AActor*)>)> ForEach)
 	{
@@ -3075,6 +3077,7 @@ bool AHomeWorldCharacter::HasOpeningLineOfSight(const AActor* Target) const
 
 bool AHomeWorldCharacter::OpeningLookDistSq(const AActor* Target, float& OutDistSq) const
 {
+#if WITH_DEV_AUTOMATION_TESTS
 	if (HomeWorldOpeningHover::UseCenterLookForTest())
 	{
 		if (!Target)
@@ -3098,6 +3101,7 @@ bool AHomeWorldCharacter::OpeningLookDistSq(const AActor* Target, float& OutDist
 		OutDistSq = 0.f;
 		return true;
 	}
+#endif
 	const APlayerController* PC = Cast<APlayerController>(GetController());
 	if (!PC || !Target || !FollowCamera)
 	{

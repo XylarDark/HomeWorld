@@ -62,7 +62,9 @@ bool FOpeningHoverParityTest::RunTest(const FString& Parameters)
 	AActor* Child = SpawnNamed(Scope.World, FVector(80.f, 0.f, 0.f), TEXT("NPC_ChildProp"), FName(TEXT("NPC_CHILD")));
 	AActor* Far = SpawnNamed(Scope.World, FVector(400.f, 0.f, 0.f), TEXT("SM_FarArmor"), FName(TEXT("NODE_ARMOR_TABLE")));
 	AActor* Table = SpawnNamed(Scope.World, FVector(150.f, 0.f, 0.f), TEXT("SM_Size_ArmorTable"), FName(TEXT("NODE_ARMOR_TABLE")));
-	if (!TestNotNull(TEXT("child"), Child) || !TestNotNull(TEXT("far table"), Far) || !TestNotNull(TEXT("armory table"), Table))
+	AActor* Second = SpawnNamed(Scope.World, FVector(200.f, 0.f, 0.f), TEXT("SM_Size_Kettle"), FName(TEXT("NODE_KETTLE")));
+	if (!TestNotNull(TEXT("child"), Child) || !TestNotNull(TEXT("far table"), Far)
+		|| !TestNotNull(TEXT("armory table"), Table) || !TestNotNull(TEXT("second candidate"), Second))
 	{
 		return false;
 	}
@@ -70,10 +72,22 @@ bool FOpeningHoverParityTest::RunTest(const FString& Parameters)
 	const FCenterLookScope Look;
 	AActor* OldPick = HomeWorldOpeningHover::PickByWorldScan(Character);
 	AActor* NewPick = HomeWorldOpeningHover::PickByRegistry(Character);
-	TestEqual(*FString::Printf(TEXT("old and new hover target (old %s new %s)"), *GetNameSafe(OldPick), *GetNameSafe(NewPick)), NewPick, OldPick);
-	TestEqual(*FString::Printf(TEXT("glider armory table (pick %s)"), *GetNameSafe(NewPick)), NewPick, Table);
+	TestEqual(*FString::Printf(TEXT("competing hover target (old %s new %s)"), *GetNameSafe(OldPick), *GetNameSafe(NewPick)), NewPick, OldPick);
+	TestTrue(TEXT("the shared pick is one of the two in-reach candidates"), NewPick == Table || NewPick == Second);
 	TestTrue(TEXT("child is not the hover"), NewPick != Child);
 	TestTrue(TEXT("far table is not the hover"), NewPick != Far);
+
+	Table->SetActorLocation(FVector(500.f, 0.f, 0.f));
+	Second->SetActorLocation(FVector(520.f, 0.f, 0.f));
+	AActor* Late = SpawnNamed(Scope.World, FVector(120.f, 0.f, 0.f), TEXT("SM_LateStation"), FName(TEXT("NODE_CONSUMABLE_STATION")));
+	if (!TestNotNull(TEXT("late spawn"), Late))
+	{
+		return false;
+	}
+	AActor* OldLate = HomeWorldOpeningHover::PickByWorldScan(Character);
+	AActor* NewLate = HomeWorldOpeningHover::PickByRegistry(Character);
+	TestEqual(*FString::Printf(TEXT("late spawn seen by both (old %s new %s)"), *GetNameSafe(OldLate), *GetNameSafe(NewLate)), NewLate, OldLate);
+	TestEqual(TEXT("both paths pick the actor spawned after the first pick"), NewLate, Late);
 	return true;
 }
 
