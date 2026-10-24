@@ -842,8 +842,8 @@ bool UHomeWorldHomeLoopSubsystem::HarvestPlot(int32 PlotIndex)
 void UHomeWorldHomeLoopSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
-	// Placeholder until wisp gathering exists: nothing in play calls TryGatherGraceMoss
-	// yet, so the kitchen chest starts with 6 moss, enough for the guard pads (UL2 3A).
+	// Lead 2026-10-23. The November chest starts with 6 moss, two per guard (UL2 3A).
+	// A miss does not spend. Moss gather stays off this month.
 	Chest.FindOrAdd(HomeWorldKitchen::Moss) = 6;
 }
 
