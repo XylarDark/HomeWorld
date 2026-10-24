@@ -2,6 +2,7 @@
 
 #include "HomeWorldCharacter.h"
 #include "HomeWorldInteractResolver.h"
+#include "HomeWorldOpeningFish.h"
 #include "HomeWorldOpeningHover.h"
 #include "HomeWorldOpeningRegistry.h"
 #include "HomeWorldPlaytestBeats.h"
@@ -2387,15 +2388,7 @@ bool AHomeWorldCharacter::TryOpeningFish()
 	{
 		return false;
 	}
-	AActor* Pond = nullptr;
-	for (TActorIterator<AActor> It(World); It; ++It)
-	{
-		if (It->GetActorNameOrLabel() == TEXT("Water_Pond"))
-		{
-			Pond = *It;
-			break;
-		}
-	}
+	AActor* Pond = HomeWorldOpeningFish::FindPond(World);
 	if (!Pond)
 	{
 		return false;
