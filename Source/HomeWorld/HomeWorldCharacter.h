@@ -979,14 +979,13 @@ protected:
 	void UpdateSizeTestWalk();
 	void UpdateSizeTestWisp(float DeltaTime);
 	void UpdateOpeningBonk();
-	/** Fly the body back onto the pad. The landing is inset from the rim. A clear
-	 *  corridor crests CrestCm above the landing. A blocker lifts the cruise, then
-	 *  the path drops onto that same landing. A new bonk calls this; it does not
-	 *  add a path. */
-	void BeginBonkReturn(const FVector& Target, const FVector& PadOrigin, const FVector& PadExtent);
+	/** Fly the body onto the pad edge nearest the hit, set in from the rim.
+	 *  A clear shot is the normal arc. No clearance pops straight up, then plays
+	 *  that same arc from the air. A new bonk does not replace one in flight. */
+	void BeginBonkReturn(const FVector& PadOrigin, const FVector& PadExtent);
 	// HomeWorld.Opening.BonkReentry calls the return and reads the arc mid-flight.
 	friend class FBonkReentryTest;
-	// HomeWorld.Opening.BonkClearance reads the raised arc mid-flight.
+	// HomeWorld.Opening.BonkClearance reads the pop and the arc mid-flight.
 	friend class FBonkClearanceTest;
 	void TickBonkReturn(float DeltaSeconds);
 	bool IsBonkReturning() const { return bOpeningBonkReturning; }
@@ -1048,6 +1047,11 @@ protected:
 	bool bOpeningBonkReturning = false;
 	HomeWorldBonk::FArc BonkArc;
 	float BonkElapsed = 0.f;
+	// Set only when the shot to the landing has no clearance. The pop plays first.
+	bool bBonkPop = false;
+	FVector BonkPopFrom = FVector::ZeroVector;
+	FVector BonkPopTo = FVector::ZeroVector;
+	float BonkPopDuration = 0.f;
 	bool bOpeningNightSpirit = false;
 	bool bOpeningWispCollect = false;
 	UPROPERTY(Transient)

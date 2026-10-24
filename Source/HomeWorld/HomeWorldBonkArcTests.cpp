@@ -131,7 +131,6 @@ bool FBonkReentryTest::RunTest(const FString& Parameters)
 	const FVector PadOrigin(0.f, 0.f, 45000.f);
 	const FVector PadExtent(5000.f, 7000.f, 50.f);
 	const FVector From(-8000.f, 0.f, 44700.f);
-	const FVector FirstTarget(-5000.f, 0.f, 45140.f);
 	const FVector SecondTarget(5000.f, 1200.f, 45140.f);
 	const float Half = Character->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 	const FVector SecondExpected = HomeWorldBonk::LandingOnPad(SecondTarget, PadOrigin, PadExtent, Half);
@@ -141,7 +140,7 @@ bool FBonkReentryTest::RunTest(const FString& Parameters)
 	{
 		return false;
 	}
-	Character->BeginBonkReturn(FirstTarget, PadOrigin, PadExtent);
+	Character->BeginBonkReturn(PadOrigin, PadExtent);
 	if (!TestTrue(TEXT("the return started"), Character->IsBonkReturning()))
 	{
 		return false;
@@ -159,7 +158,7 @@ bool FBonkReentryTest::RunTest(const FString& Parameters)
 	TestTrue(TEXT("the flight left the start"), !Mid.Equals(From, 1.f));
 	TestTrue(TEXT("the return is still in the air"), Character->IsBonkReturning());
 
-	Character->BeginBonkReturn(SecondTarget, PadOrigin, PadExtent);
+	Character->BeginBonkReturn(PadOrigin, PadExtent);
 	TestEqual(TEXT("the landing stayed on the first target"), Character->BonkArc.Land, Arc.Land, 0.1f);
 	TestEqual(TEXT("the climb stayed on the first arc"), Character->BonkArc.Approach, Arc.Approach, 0.1f);
 	TestEqual(TEXT("the clock did not restart"), Character->BonkElapsed, Elapsed);
@@ -215,7 +214,7 @@ bool FBonkReentryTest::RunTest(const FString& Parameters)
 		const bool bWindBefore = Glider->IsWindColumnAwake();
 		const bool bBullBefore = Glider->IsBullPathAwake();
 
-		Glider->BeginBonkReturn(FirstTarget, PadOrigin, PadExtent);
+		Glider->BeginBonkReturn(PadOrigin, PadExtent);
 		if (!TestTrue(TEXT("the descent bonk return started"), Glider->IsBonkReturning()))
 		{
 			return false;
@@ -374,60 +373,6 @@ namespace
 		Block.Top = Origin.Z + Extent.Z;
 		return Block;
 	}
-
-	bool SegmentClearsBlock(
-		const FVector& A,
-		const FVector& B,
-		const FBonkBlock& Block,
-		float Half,
-		float Radius,
-		float Margin,
-		bool& bCrossed)
-	{
-		const int32 Steps = FMath::Max(FMath::CeilToInt(FVector::Dist(A, B) / 25.f), 1);
-		for (int32 Step = 0; Step <= Steps; ++Step)
-		{
-			const FVector Point = FMath::Lerp(A, B, static_cast<float>(Step) / static_cast<float>(Steps));
-			const float Dx = FMath::Max(FMath::Abs(Point.X - Block.Center.X) - Block.Extent.X, 0.f);
-			const float Dy = FMath::Max(FMath::Abs(Point.Y - Block.Center.Y) - Block.Extent.Y, 0.f);
-			if (Dx * Dx + Dy * Dy > Radius * Radius)
-			{
-				continue;
-			}
-			bCrossed = true;
-			if (Point.Z - Half < Block.Top + Margin - 1.5f)
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-
-	bool ArcClearsBlock(
-		const HomeWorldBonk::FArc& Arc,
-		const FBonkBlock& Block,
-		float Half,
-		float Radius,
-		float Margin,
-		bool& bCrossed)
-	{
-		bCrossed = false;
-		if (!SegmentClearsBlock(Arc.From, Arc.Approach, Block, Half, Radius, Margin, bCrossed))
-		{
-			return false;
-		}
-		if (Arc.bDrop
-			&& !SegmentClearsBlock(Arc.Approach, Arc.Drop, Block, Half, Radius, Margin, bCrossed))
-		{
-			return false;
-		}
-		const FVector Drop = Arc.bDrop ? Arc.Drop : Arc.Approach;
-		if (!SegmentClearsBlock(Drop, Arc.Land, Block, Half, Radius, Margin, bCrossed))
-		{
-			return false;
-		}
-		return true;
-	}
 }
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(
@@ -454,32 +399,16 @@ bool FBonkClearanceTest::RunTest(const FString& Parameters)
 	const FVector From(-6000.f, 0.f, 80.f);
 	const FVector Target(0.f, 0.f, 200.f);
 	const FVector Expected = HomeWorldBonk::LandingOnPad(Target, PadOrigin, PadExtent, Half);
-	const float Margin = HomeWorldBonk::ClearanceMarginCm;
 
 	const HomeWorldBonk::FClearance Empty = HomeWorldBonk::MeasureClearance(
 		Scope.World, From, Expected, Half, Radius, nullptr);
 	const HomeWorldBonk::FArc Plain = HomeWorldBonk::MakeArc(
 		From, Target, PadOrigin, PadExtent, Half, Radius);
-	const HomeWorldBonk::FArc Same = HomeWorldBonk::MakeArc(
-		From, Target, PadOrigin, PadExtent, Half, Radius, &Empty);
-	TestFalse(TEXT("an empty corridor does not raise the arc"), Empty.bRaised);
-	TestEqual(TEXT("a clear corridor keeps the crest point"), Same.Approach, Plain.Approach, 0.1f);
-	TestEqual(TEXT("a clear corridor keeps the landing"), Same.Land, Expected, 0.1f);
-	TestFalse(TEXT("a clear corridor does not drop steeply"), Same.bDrop);
+	TestFalse(TEXT("an empty corridor does not raise the sweep"), Empty.bRaised);
+	TestFalse(TEXT("a clear corridor keeps the normal arc"), Plain.bDrop);
+	TestEqual(TEXT("a clear corridor keeps the landing"), Plain.Land, Expected, 0.1f);
 	TestTrue(TEXT("the clear apex stays at the crest"),
-		FMath::IsNearlyEqual(Same.Approach.Z, Same.Land.Z + HomeWorldBonk::CrestCm, 0.1f));
-
-	HomeWorldBonk::FClearance Low;
-	Low.bRaised = true;
-	Low.ApexZ = Expected.Z;
-	Low.ApproachT = 0.25f;
-	Low.DropT = 0.75f;
-	const HomeWorldBonk::FArc Held = HomeWorldBonk::MakeArc(
-		From, Target, PadOrigin, PadExtent, Half, Radius, &Low);
-	TestTrue(TEXT("a short blocker cannot pull the apex under the crest"),
-		Held.Approach.Z >= Held.Land.Z + HomeWorldBonk::CrestCm - 0.1f
-		&& Held.Drop.Z >= Held.Land.Z + HomeWorldBonk::CrestCm - 0.1f);
-	TestEqual(TEXT("holding the crest still lands on the target"), Held.Land, Expected, 0.01f);
+		FMath::IsNearlyEqual(Plain.Approach.Z, Plain.Land.Z + HomeWorldBonk::CrestCm, 0.1f));
 
 	UStaticMesh* Cube = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Cube.Cube"));
 	if (!TestNotNull(TEXT("cube"), Cube))
@@ -512,30 +441,11 @@ bool FBonkClearanceTest::RunTest(const FString& Parameters)
 	{
 		return false;
 	}
-	const HomeWorldBonk::FArc Arc = HomeWorldBonk::MakeArc(
-		From, Target, PadOrigin, PadExtent, Half, Radius, &Clearance);
-	TestTrue(TEXT("the raised arc drops after the cruise"), Arc.bDrop);
-	TestEqual(TEXT("the endpoint is the pad target"), Arc.Land, Expected, 0.01f);
-	TestTrue(TEXT("the path ends on the landing"),
-		HomeWorldBonk::PointOnArc(Arc, 1.f).Equals(Expected, 0.1f));
-	TestTrue(TEXT("the path starts at the launch"),
-		HomeWorldBonk::PointOnArc(Arc, 0.f).Equals(From, 0.1f));
-	TestTrue(TEXT("the apex is not below the crest"),
-		Arc.Approach.Z >= Arc.Land.Z + HomeWorldBonk::CrestCm - 0.1f
-		&& Arc.Drop.Z >= Arc.Land.Z + HomeWorldBonk::CrestCm - 0.1f);
-	TestTrue(TEXT("the apex clears the taller block"),
-		Arc.Approach.Z >= Kettle.Top + Margin + Half - 1.f);
-	TestTrue(TEXT("the cruise holds that apex"),
-		FMath::IsNearlyEqual(Arc.Drop.Z, Arc.Approach.Z, 0.1f));
-
-	bool bWallCrossed = false;
-	bool bKettleCrossed = false;
-	TestTrue(TEXT("the capsule bottom clears the wall"),
-		ArcClearsBlock(Arc, Wall, Half, Radius, Margin, bWallCrossed));
-	TestTrue(TEXT("the arc crosses the wall"), bWallCrossed);
-	TestTrue(TEXT("the capsule bottom clears the kettle"),
-		ArcClearsBlock(Arc, Kettle, Half, Radius, Margin, bKettleCrossed));
-	TestTrue(TEXT("the arc crosses the kettle"), bKettleCrossed);
+	const HomeWorldBonk::FArc Normal = HomeWorldBonk::MakeArc(
+		From, Target, PadOrigin, PadExtent, Half, Radius);
+	TestFalse(TEXT("a blocker does not turn the normal arc into a cruise"), Normal.bDrop);
+	TestTrue(TEXT("the normal arc still crests at the cap"),
+		FMath::IsNearlyEqual(Normal.Approach.Z, Normal.Land.Z + HomeWorldBonk::CrestCm, 0.1f));
 
 	AHomeWorldCharacter* Character = HomeWorldTestWorld::SpawnCharacter(Scope.World);
 	if (!TestNotNull(TEXT("character"), Character) || !Character->GetCapsuleComponent())
@@ -543,31 +453,59 @@ bool FBonkClearanceTest::RunTest(const FString& Parameters)
 		return false;
 	}
 	Character->SetActorLocation(From, false, nullptr, ETeleportType::TeleportPhysics);
-	Character->BeginBonkReturn(Target, PadOrigin, PadExtent);
-	if (!TestTrue(TEXT("the return started"), Character->IsBonkReturning()))
+	Character->BeginBonkReturn(PadOrigin, PadExtent);
+	if (!TestTrue(TEXT("the clear rim return started"), Character->IsBonkReturning()))
 	{
 		return false;
 	}
 	const float BodyHalf = Character->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
-	const float BodyRadius = Character->GetCapsuleComponent()->GetScaledCapsuleRadius();
-	TestEqual(TEXT("the flight still lands on the pad target"), Character->BonkArc.Land, Expected, 0.1f);
-	TestTrue(TEXT("the flight arc is raised"), Character->BonkArc.bDrop);
-	TestTrue(TEXT("the flight apex is not below the crest"),
-		Character->BonkArc.Approach.Z >= Character->BonkArc.Land.Z + HomeWorldBonk::CrestCm - 0.1f);
+	const FVector Rim = HomeWorldBonk::NearestRimTarget(From, PadOrigin, PadExtent);
+	FVector NearLand = HomeWorldBonk::LandingOnPad(Rim, PadOrigin, PadExtent, BodyHalf);
+	NearLand.Z = PadOrigin.Z + FMath::Abs(PadExtent.Z) + BodyHalf;
+	TestEqual(TEXT("a clear rim shot lands on the near edge"), Character->BonkArc.Land, NearLand, 0.1f);
+	TestFalse(TEXT("a clear rim shot does not pop"), Character->bBonkPop);
+	TestFalse(TEXT("a clear rim shot keeps the normal arc"), Character->BonkArc.bDrop);
+	TestTrue(TEXT("the near landing is west of the inland blocks"),
+		Character->BonkArc.Land.X < Wall.Center.X && Character->BonkArc.Land.X < Kettle.Center.X);
 
-	bool bBodyWall = false;
-	bool bBodyKettle = false;
-	TestTrue(TEXT("the body clears the wall"),
-		ArcClearsBlock(Character->BonkArc, Wall, BodyHalf, BodyRadius, Margin, bBodyWall) && bBodyWall);
-	TestTrue(TEXT("the body clears the kettle on the way down"),
-		ArcClearsBlock(Character->BonkArc, Kettle, BodyHalf, BodyRadius, Margin, bBodyKettle) && bBodyKettle);
-
-	const float Partial = Character->BonkArc.DurationSec * 0.7f;
-	Character->TickBonkReturn(Partial);
-	const float T = FMath::Clamp(Partial / FMath::Max(Character->BonkArc.DurationSec, 0.05f), 0.f, 1.f);
-	TestEqual(TEXT("the flight follows the clearance arc"),
-		Character->GetActorLocation(), HomeWorldBonk::PointOnArc(Character->BonkArc, T), 1.f);
-	TestTrue(TEXT("the return is still in the air"), Character->IsBonkReturning());
+	const FBonkBlock RimBlock = SpawnBonkBlock(
+		Scope.World, Cube, FVector(-5200.f, 0.f, 300.f), FVector(4.f, 4.f, 8.f));
+	if (!TestNotNull(TEXT("rim block"), RimBlock.Actor))
+	{
+		return false;
+	}
+	AHomeWorldCharacter* Blocked = HomeWorldTestWorld::SpawnCharacter(Scope.World);
+	if (!TestNotNull(TEXT("blocked character"), Blocked) || !Blocked->GetCapsuleComponent())
+	{
+		return false;
+	}
+	Blocked->SetActorLocation(From, false, nullptr, ETeleportType::TeleportPhysics);
+	const float BlockedHalf = Blocked->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	const float BlockedRadius = Blocked->GetCapsuleComponent()->GetScaledCapsuleRadius();
+	FVector BlockedLand = HomeWorldBonk::LandingOnPad(
+		HomeWorldBonk::NearestRimTarget(From, PadOrigin, PadExtent), PadOrigin, PadExtent, BlockedHalf);
+	BlockedLand.Z = PadOrigin.Z + FMath::Abs(PadExtent.Z) + BlockedHalf;
+	const HomeWorldBonk::FClearance RimClearance = HomeWorldBonk::MeasureClearance(
+		Scope.World, From, BlockedLand, BlockedHalf, BlockedRadius, Blocked);
+	if (!TestTrue(TEXT("the rim block closes the shot"), RimClearance.bRaised))
+	{
+		return false;
+	}
+	Blocked->BeginBonkReturn(PadOrigin, PadExtent);
+	if (!TestTrue(TEXT("the blocked return started"), Blocked->IsBonkReturning()))
+	{
+		return false;
+	}
+	TestTrue(TEXT("no clearance adds the pop"), Blocked->bBonkPop);
+	TestFalse(TEXT("the flight after the pop is the normal arc"), Blocked->BonkArc.bDrop);
+	TestEqual(TEXT("the normal arc starts at the top of the pop"), Blocked->BonkArc.From, Blocked->BonkPopTo, 0.1f);
+	TestEqual(TEXT("the blocked flight still lands on the near edge"), Blocked->BonkArc.Land, BlockedLand, 0.1f);
+	Blocked->TickBonkReturn(Blocked->BonkPopDuration);
+	TestFalse(TEXT("the pop finishes before the arc"), Blocked->bBonkPop);
+	TestEqual(TEXT("the pop ends in the air"), Blocked->GetActorLocation(), Blocked->BonkPopTo, 1.f);
+	Blocked->TickBonkReturn(Blocked->BonkArc.DurationSec + 0.1f);
+	TestEqual(TEXT("the normal arc then lands"), Blocked->GetActorLocation(), Blocked->BonkArc.Land, 1.f);
+	TestFalse(TEXT("the blocked return has finished"), Blocked->IsBonkReturning());
 	return true;
 }
 

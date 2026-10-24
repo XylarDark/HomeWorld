@@ -392,131 +392,6 @@ void AHomeWorldCharacter::Tick(float DeltaTime)
 
 namespace
 {
-	// Bonk landing (Lead 1A, 2026-10-22): C1, just outside the cottage door on L_SizeTest.
-	// On the door line (x -1090..-810), through the porch rail gap (x -1150..-750 at y -780),
-	// clear of the roof (south edge y -360) and the porch slab (y -810). Scan: q2/scan_c1.md.
-	const FVector GBonkLandingC1(-950.f, -1000.f, 45102.f);
-}
-
-// Route math for the bonk return. External linkage so HomeWorld.Opening.BonkRoute can sample the
-// same path the body flies, without a header change; the test declares these four signatures.
-namespace HomeWorldBonkRoute
-{
-	FVector Waypoint(const HomeWorldBonk::FArc& Arc);
-	int32 LegAt(const HomeWorldBonk::FArc& Arc, const FVector& Location);
-	HomeWorldBonk::FArc MakeRoute(
-		const FVector& From,
-		const FVector& Land,
-		const FVector& PadOrigin,
-		const FVector& PadExtent,
-		float BodyHalfHeightCm,
-		float BodyRadiusCm,
-		const HomeWorldBonk::FClearance* Clearance);
-	FVector PointOnRoute(const HomeWorldBonk::FArc& Arc, float T);
-}
-
-namespace HomeWorldBonkRoute
-{
-	// +X return (Lead C1 fix v3): leg 1 is the usual climb beside the east rim, aimed at this
-	// waypoint at the arc height; leg 2 runs straight west along the landing's y (-1000 for C1),
-	// south of the cabin's south wall (y -820). A -X launch keeps the single arc.
-	static constexpr float WaypointX = 4000.f;
-	// At or west of the waypoint and this close to the leg-2 line, the body is on leg 2.
-	static constexpr float LegSlackCm = 5.f;
-
-	static bool IsTwoLeg(const HomeWorldBonk::FArc& Arc)
-	{
-		return Arc.From.X > 0.f && Arc.Land.X < WaypointX - LegSlackCm;
-	}
-
-	FVector Waypoint(const HomeWorldBonk::FArc& Arc)
-	{
-		if (!IsTwoLeg(Arc))
-		{
-			return Arc.Approach;
-		}
-		return FVector(WaypointX, Arc.Land.Y, Arc.Approach.Z);
-	}
-
-	// 0 = single arc, 1 = climb to the waypoint, 2 = the straight run along the landing's y.
-	// Read from the position each tick, so the return keeps no extra state.
-	int32 LegAt(const HomeWorldBonk::FArc& Arc, const FVector& Location)
-	{
-		if (!IsTwoLeg(Arc))
-		{
-			return 0;
-		}
-		const bool bPastWaypoint = Location.X <= WaypointX + LegSlackCm;
-		const bool bOnLine = FMath::Abs(Location.Y - Arc.Land.Y) <= LegSlackCm;
-		return (bPastWaypoint && bOnLine) ? 2 : 1;
-	}
-
-	HomeWorldBonk::FArc MakeRoute(
-		const FVector& From,
-		const FVector& Land,
-		const FVector& PadOrigin,
-		const FVector& PadExtent,
-		float BodyHalfHeightCm,
-		float BodyRadiusCm,
-		const HomeWorldBonk::FClearance* Clearance)
-	{
-		HomeWorldBonk::FArc Arc = HomeWorldBonk::MakeArc(
-			From, Land, PadOrigin, PadExtent, BodyHalfHeightCm, BodyRadiusCm, Clearance);
-		if (!IsTwoLeg(Arc))
-		{
-			return Arc;
-		}
-		// Leg 1: the same climb MakeArc builds off the rim, aimed at the waypoint at standing
-		// height, so it crests at the arc height before it crosses over the pad.
-		const FVector WaypointStand(WaypointX, Arc.Land.Y, Arc.Land.Z);
-		const HomeWorldBonk::FArc Climb = HomeWorldBonk::MakeArc(
-			From, WaypointStand, PadOrigin, PadExtent, BodyHalfHeightCm, BodyRadiusCm);
-		Arc.Approach = Climb.Approach;
-		const FVector Turn = Waypoint(Arc);
-		const float LenA = FVector::Dist(Arc.From, Arc.Approach);
-		const float LenB = FVector::Dist(Arc.Approach, Turn);
-		const float LenC = FVector::Dist(Turn, Arc.Land);
-		const float Total = LenA + LenB + LenC;
-		Arc.Split = (Total > 1.f) ? FMath::Clamp(LenA / Total, 0.05f, 0.95f) : 0.5f;
-		Arc.DurationSec = FMath::Clamp(
-			(Total > 1.f) ? (Total / HomeWorldBonk::SpeedCmPerSec) : HomeWorldBonk::MinDurationSec,
-			HomeWorldBonk::MinDurationSec,
-			HomeWorldBonk::MaxDurationSec);
-		return Arc;
-	}
-
-	FVector PointOnRoute(const HomeWorldBonk::FArc& Arc, float T)
-	{
-		if (!IsTwoLeg(Arc))
-		{
-			return HomeWorldBonk::PointOnArc(Arc, T);
-		}
-		const FVector Turn = Waypoint(Arc);
-		const float LenA = FVector::Dist(Arc.From, Arc.Approach);
-		const float LenB = FVector::Dist(Arc.Approach, Turn);
-		const float LenC = FVector::Dist(Turn, Arc.Land);
-		const float Total = LenA + LenB + LenC;
-		if (Total <= 1.f)
-		{
-			return Arc.Land;
-		}
-		float Along = FMath::Clamp(T, 0.f, 1.f) * Total;
-		if (Along <= LenA)
-		{
-			return FMath::Lerp(Arc.From, Arc.Approach, (LenA > KINDA_SMALL_NUMBER) ? Along / LenA : 1.f);
-		}
-		Along -= LenA;
-		if (Along <= LenB)
-		{
-			return FMath::Lerp(Arc.Approach, Turn, (LenB > KINDA_SMALL_NUMBER) ? Along / LenB : 1.f);
-		}
-		Along -= LenB;
-		return FMath::Lerp(Turn, Arc.Land, (LenC > KINDA_SMALL_NUMBER) ? FMath::Clamp(Along / LenC, 0.f, 1.f) : 1.f);
-	}
-}
-
-namespace
-{
 	// Turn the controller to the horizontal travel direction (yaw only; pitch and roll stay), so
 	// the CameraBoom, which follows the control rotation, trails behind the body on the flight line.
 	void FaceBonkTravel(APawn* Pawn, const FVector& Travel)
@@ -582,11 +457,11 @@ void AHomeWorldCharacter::UpdateOpeningBonk()
 	{
 		return;
 	}
-	// Fly to the fixed C1 landing rather than the last spot stood on the pad.
-	BeginBonkReturn(GBonkLandingC1, Origin, Extent);
+	// Fly to the pad edge nearest this fall, set in from the rim.
+	BeginBonkReturn(Origin, Extent);
 }
 
-void AHomeWorldCharacter::BeginBonkReturn(const FVector& Target, const FVector& PadOrigin, const FVector& PadExtent)
+void AHomeWorldCharacter::BeginBonkReturn(const FVector& PadOrigin, const FVector& PadExtent)
 {
 	// Already in flight. A second call would rebuild the arc and zero the clock.
 	if (bOpeningBonkReturning)
@@ -602,36 +477,34 @@ void AHomeWorldCharacter::BeginBonkReturn(const FVector& Target, const FVector& 
 	}
 	const float Half = Capsule->GetScaledCapsuleHalfHeight();
 	const float Radius = Capsule->GetScaledCapsuleRadius();
-	FVector Land = HomeWorldBonk::LandingOnPad(Target, PadOrigin, PadExtent, Half);
-	FCollisionQueryParams Params(NAME_None, false, this);
-	for (int32 Try = 0; Try < 6; ++Try)
-	{
-		FHitResult Hit;
-		const bool bHit = World->LineTraceSingleByChannel(
-			Hit,
-			FVector(Land.X, Land.Y, Land.Z + 300.f),
-			FVector(Land.X, Land.Y, Land.Z - 400.f),
-			ECC_Visibility,
-			Params);
-		if (!bHit || Hit.ImpactPoint.Z <= Land.Z - Half + 80.f)
-		{
-			break;
-		}
-		const FVector Step = (PadOrigin - Land).GetSafeNormal2D() * 200.f;
-		if (Step.IsNearlyZero())
-		{
-			break;
-		}
-		Land.X += Step.X;
-		Land.Y += Step.Y;
-		Land = HomeWorldBonk::LandingOnPad(Land, PadOrigin, PadExtent, Half);
-	}
 	const FVector From = GetActorLocation();
+	const FVector Rim = HomeWorldBonk::NearestRimTarget(From, PadOrigin, PadExtent);
+	FVector Land = HomeWorldBonk::LandingOnPad(Rim, PadOrigin, PadExtent, Half);
+	const float PadTop = PadOrigin.Z + FMath::Max(FMath::Abs(PadExtent.Z), 0.f);
+	Land.Z = PadTop + FMath::Max(Half, 0.f);
 	const HomeWorldBonk::FClearance Clearance = HomeWorldBonk::MeasureClearance(
 		World, From, Land, Half, Radius, this);
-	// +X flies the two-leg route into C1. A -X launch keeps one arc, raised when the corridor is blocked.
-	BonkArc = HomeWorldBonkRoute::MakeRoute(From, Land, PadOrigin, PadExtent, Half, Radius, &Clearance);
+	// The normal arc is the flight. No clearance adds one pop in front of it.
+	bBonkPop = Clearance.bRaised && Clearance.ApexZ > From.Z + 1.f;
 	BonkElapsed = 0.f;
+	if (bBonkPop)
+	{
+		BonkPopFrom = From;
+		BonkPopTo = FVector(From.X, From.Y, Clearance.ApexZ);
+		const float Rise = FMath::Max(BonkPopTo.Z - BonkPopFrom.Z, 0.f);
+		BonkPopDuration = FMath::Clamp(
+			Rise / HomeWorldBonk::SpeedCmPerSec,
+			HomeWorldBonk::MinDurationSec,
+			HomeWorldBonk::MaxDurationSec);
+		BonkArc = HomeWorldBonk::MakeArc(BonkPopTo, Land, PadOrigin, PadExtent, Half, Radius);
+	}
+	else
+	{
+		BonkPopFrom = From;
+		BonkPopTo = From;
+		BonkPopDuration = 0.f;
+		BonkArc = HomeWorldBonk::MakeArc(From, Land, PadOrigin, PadExtent, Half, Radius);
+	}
 	bOpeningBonkReturning = true;
 	Move->StopMovementImmediately();
 	Move->Velocity = FVector::ZeroVector;
@@ -642,8 +515,9 @@ void AHomeWorldCharacter::BeginBonkReturn(const FVector& Target, const FVector& 
 		PC->SetIgnoreMoveInput(true);
 	}
 	EndPartyOuting(World, EHomeWorldPartyAbsence::Bonk);
-	UE_LOG(LogTemp, Log, TEXT("opening_bonk: return to (%.0f, %.0f, %.0f) arch %.0f"),
-		BonkArc.Land.X, BonkArc.Land.Y, BonkArc.Land.Z, BonkArc.Approach.Z - BonkArc.Land.Z);
+	UE_LOG(LogTemp, Log, TEXT("opening_bonk: return to (%.0f, %.0f, %.0f) arch %.0f pop %d"),
+		BonkArc.Land.X, BonkArc.Land.Y, BonkArc.Land.Z,
+		BonkArc.Approach.Z - BonkArc.Land.Z, bBonkPop ? 1 : 0);
 }
 
 void AHomeWorldCharacter::TickBonkReturn(float DeltaSeconds)
@@ -658,19 +532,40 @@ void AHomeWorldCharacter::TickBonkReturn(float DeltaSeconds)
 		}
 		return;
 	}
-	BonkElapsed += FMath::Max(DeltaSeconds, 0.f);
+	float TimeLeft = FMath::Max(DeltaSeconds, 0.f);
+	if (bBonkPop)
+	{
+		const float PopDur = FMath::Max(BonkPopDuration, 0.05f);
+		const float Need = FMath::Max(PopDur - BonkElapsed, 0.f);
+		const float Use = FMath::Min(TimeLeft, Need);
+		BonkElapsed += Use;
+		TimeLeft -= Use;
+		const float PopT = FMath::Clamp(BonkElapsed / PopDur, 0.f, 1.f);
+		const FVector PopPrev = GetActorLocation();
+		const FVector PopNext = FMath::Lerp(BonkPopFrom, BonkPopTo, PopT);
+		SetActorLocation(PopNext, false, nullptr, ETeleportType::TeleportPhysics);
+		FaceBonkTravel(this, PopNext - PopPrev);
+		Move->Velocity = FVector::ZeroVector;
+		ConsumeMovementInputVector();
+		if (PopT < 1.f)
+		{
+			return;
+		}
+		bBonkPop = false;
+		BonkElapsed = 0.f;
+		SetActorLocation(BonkPopTo, false, nullptr, ETeleportType::TeleportPhysics);
+		if (TimeLeft <= KINDA_SMALL_NUMBER)
+		{
+			return;
+		}
+	}
+	BonkElapsed += TimeLeft;
 	const float Duration = FMath::Max(BonkArc.DurationSec, 0.05f);
 	const float T = FMath::Clamp(BonkElapsed / Duration, 0.f, 1.f);
 	const FVector Prev = GetActorLocation();
-	FVector Next = HomeWorldBonkRoute::PointOnRoute(BonkArc, T);
-	FVector Travel = Next - Prev;
-	// The leg comes from where the body is; on leg 2 it holds the landing's y and faces west.
+	const FVector Next = HomeWorldBonk::PointOnArc(BonkArc, T);
+	const FVector Travel = Next - Prev;
 	// Sweep stays off. A blocking move would stop the body in the wall.
-	if (HomeWorldBonkRoute::LegAt(BonkArc, Next) == 2)
-	{
-		Next.Y = BonkArc.Land.Y;
-		Travel = BonkArc.Land - HomeWorldBonkRoute::Waypoint(BonkArc);
-	}
 	SetActorLocation(Next, false, nullptr, ETeleportType::TeleportPhysics);
 	// For the whole flight the camera trails the body. After landing the yaw is left as it is.
 	FaceBonkTravel(this, Travel);

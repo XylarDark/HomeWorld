@@ -7,11 +7,9 @@
 class AActor;
 class UWorld;
 
-// The return flight shared by every bonk. Callers pass the last safe point and
-// the pad. The landing is inset from the rim. A clear corridor climbs beside
-// the pad, at a capped slope, and crests CrestCm above the landing. A blocker
-// on the way home lifts the cruise so the capsule bottom clears its top, then
-// the path drops onto that same landing.
+// The return flight shared by every bonk. The landing is the pad edge nearest
+// the body, set in from the rim. A clear shot uses the normal arc. No
+// clearance pops the body straight up, then plays that same arc from the air.
 namespace HomeWorldBonk
 {
 	// How far inside the pad the body is set down, in cm. A narrower pad uses
@@ -94,6 +92,32 @@ namespace HomeWorldBonk
 		return Land;
 	}
 
+	// The closest point on the pad footprint. LandingOnPad then sets it in from the rim.
+	inline FVector NearestRimTarget(const FVector& From, const FVector& PadOrigin, const FVector& PadExtent)
+	{
+		const float HalfX = FMath::Max(FMath::Abs(PadExtent.X), 0.f);
+		const float HalfY = FMath::Max(FMath::Abs(PadExtent.Y), 0.f);
+		FVector Target = From;
+		if (HalfX <= KINDA_SMALL_NUMBER)
+		{
+			Target.X = PadOrigin.X;
+		}
+		else
+		{
+			Target.X = FMath::Clamp(From.X, PadOrigin.X - HalfX, PadOrigin.X + HalfX);
+		}
+		if (HalfY <= KINDA_SMALL_NUMBER)
+		{
+			Target.Y = PadOrigin.Y;
+		}
+		else
+		{
+			Target.Y = FMath::Clamp(From.Y, PadOrigin.Y - HalfY, PadOrigin.Y + HalfY);
+		}
+		Target.Z = PadOrigin.Z + FMath::Max(FMath::Abs(PadExtent.Z), 0.f);
+		return Target;
+	}
+
 	inline FVector SegmentEnterPoint(const FVector& From, const FVector& Land, const FVector& PadOrigin, const FVector& PadExtent)
 	{
 		const FVector Delta = Land - From;
@@ -136,8 +160,8 @@ namespace HomeWorldBonk
 		return FMath::Lerp(From, Land, FMath::Clamp(T0, 0.f, 1.f));
 	}
 
-	// Capsule sweep from launch to landing. Ignores the pawn. A clear corridor
-	// leaves bRaised false so MakeArc keeps the crest-150 swoop.
+	// Capsule sweep from the hit to the landing. Ignores the pawn. A clear shot
+	// leaves bRaised false. No clearance is the pop in front of the normal arc.
 	FClearance MeasureClearance(
 		UWorld* World,
 		const FVector& From,
@@ -152,48 +176,12 @@ namespace HomeWorldBonk
 		const FVector& PadOrigin,
 		const FVector& PadExtent,
 		float BodyHalfHeightCm,
-		float BodyRadiusCm,
-		const FClearance* Clearance = nullptr)
+		float BodyRadiusCm)
 	{
 		FArc Arc;
 		Arc.From = From;
 		Arc.bDrop = false;
 		Arc.Land = LandingOnPad(Target, PadOrigin, PadExtent, BodyHalfHeightCm);
-
-		// The sweep found a blocker. Cruise at the clearance height from before
-		// the first overlap until after the last, then drop onto the landing.
-		// The clear-corridor slope cap does not apply: the shape has to clear.
-		if (Clearance && Clearance->bRaised)
-		{
-			const float ApexZ = FMath::Max(Arc.Land.Z + CrestCm, Clearance->ApexZ);
-			const float T0 = FMath::Clamp(Clearance->ApproachT, 0.f, 1.f);
-			const float T1 = FMath::Clamp(FMath::Max(Clearance->DropT, T0), 0.f, 1.f);
-			Arc.Approach = FMath::Lerp(Arc.From, Arc.Land, T0);
-			Arc.Approach.Z = ApexZ;
-			Arc.Drop = FMath::Lerp(Arc.From, Arc.Land, T1);
-			Arc.Drop.Z = ApexZ;
-			Arc.bDrop = true;
-
-			const float LenA = FVector::Dist(Arc.From, Arc.Approach);
-			const float LenB = FVector::Dist(Arc.Approach, Arc.Drop);
-			const float LenC = FVector::Dist(Arc.Drop, Arc.Land);
-			const float Total = LenA + LenB + LenC;
-			if (Total > 1.f)
-			{
-				Arc.Split = FMath::Clamp(LenA / Total, 0.02f, 0.90f);
-				Arc.DropSplit = FMath::Clamp((LenA + LenB) / Total, Arc.Split, 0.98f);
-			}
-			else
-			{
-				Arc.Split = 0.34f;
-				Arc.DropSplit = 0.67f;
-			}
-			Arc.DurationSec = FMath::Clamp(
-				(Total > 1.f) ? (Total / SpeedCmPerSec) : MinDurationSec,
-				MinDurationSec,
-				MaxDurationSec);
-			return Arc;
-		}
 
 		const float HalfX = FMath::Max(FMath::Abs(PadExtent.X), 0.f);
 		const float HalfY = FMath::Max(FMath::Abs(PadExtent.Y), 0.f);
