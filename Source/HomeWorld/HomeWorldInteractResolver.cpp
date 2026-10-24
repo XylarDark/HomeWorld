@@ -271,6 +271,36 @@ namespace HomeWorldInteract
 		return 280.f;
 	}
 
+	bool Admits(AHomeWorldCharacter* Character, EVerb Verb, const AActor* Target, bool bPathUsesLook)
+	{
+		if (!Character || !Target)
+		{
+			return false;
+		}
+		const FSpec* Spec = SpecFor(Verb);
+		if (!Spec)
+		{
+			return false;
+		}
+		if (FVector::Dist2D(Character->GetActorLocation(), Target->GetActorLocation()) > Spec->ReachCm)
+		{
+			return false;
+		}
+		if (Spec->bWall && !Character->HasOpeningLineOfSight(Target))
+		{
+			return false;
+		}
+		if (bPathUsesLook && Spec->bLook)
+		{
+			float LookSq = 0.f;
+			if (!Character->OpeningLookDistSq(Target, LookSq))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
 	bool Resolve(AHomeWorldCharacter* Character)
 	{
 		GResolved = EVerb::Count;

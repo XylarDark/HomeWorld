@@ -995,8 +995,7 @@ bool AHomeWorldCharacter::TryOpeningBedInFront()
 	{
 		if (AActor* Named = FindOpeningNamed(World, TEXT("SM_Size_Bed"), true))
 		{
-			if (FVector::Dist2D(GetActorLocation(), Named->GetActorLocation()) <= HomeWorldInteract::ReachCm(HomeWorldInteract::EVerb::OpeningBed)
-				&& HasOpeningLineOfSight(Named))
+			if (HomeWorldInteract::Admits(this, HomeWorldInteract::EVerb::OpeningBed, Named, false))
 			{
 				Bed = Named;
 			}
@@ -1192,8 +1191,7 @@ bool AHomeWorldCharacter::TryOpeningHotSpringHealInFront()
 	{
 		Spring = FindOpeningNamed(World, TEXT("Water_HotSpring"), false);
 	}
-	if (!Spring || FVector::Dist2D(GetActorLocation(), Spring->GetActorLocation()) > HomeWorldInteract::ReachCm(HomeWorldInteract::EVerb::OpeningHotSpring)
-		|| !HasOpeningLineOfSight(Spring))
+	if (!Spring || !HomeWorldInteract::Admits(this, HomeWorldInteract::EVerb::OpeningHotSpring, Spring, false))
 	{
 		return false;
 	}

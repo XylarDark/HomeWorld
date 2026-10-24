@@ -110,6 +110,12 @@ namespace HomeWorldInteract
 	const FSpec* SpecFor(EVerb Verb);
 	float ReachCm(EVerb Verb);
 
+	/**
+	 * Flat reach and optional wall from the verb row. Look runs only when the caller says
+	 * this path uses look (the bed fallback passes false even though the row has bLook).
+	 */
+	bool Admits(AHomeWorldCharacter* Character, EVerb Verb, const AActor* Target, bool bPathUsesLook);
+
 	/** Run the chain for this level. The first verb that handles the press wins. */
 	bool Resolve(AHomeWorldCharacter* Character);
 

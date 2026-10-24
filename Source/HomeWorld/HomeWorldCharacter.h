@@ -47,6 +47,14 @@ class AHomeWorldEasePad;
 class AHomeWorldParadoxToy;
 class UTextRenderComponent;
 
+class AHomeWorldCharacter;
+
+namespace HomeWorldInteract
+{
+	enum class EVerb : uint8;
+	bool Admits(AHomeWorldCharacter* Character, EVerb Verb, const AActor* Target, bool bPathUsesLook);
+}
+
 /** One in-reach actor and how far its screen point sits from the look point, in NDC squared. */
 struct FOpeningLookCandidate
 {
@@ -65,6 +73,11 @@ class HOMEWORLD_API AHomeWorldCharacter : public ACharacter, public IAbilitySyst
 
 public:
 	friend AActor* HomeWorldOpeningHover::PickFrom(AHomeWorldCharacter* Character, TFunctionRef<void(TFunctionRef<void(AActor*)>)> ForEach);
+	friend bool HomeWorldInteract::Admits(
+		AHomeWorldCharacter* Character,
+		HomeWorldInteract::EVerb Verb,
+		const AActor* Target,
+		bool bPathUsesLook);
 	AHomeWorldCharacter(const FObjectInitializer& ObjectInitializer);
 
 	/** Half-extent of the aim box around screen center, in normalized screen space. The drawn frame uses this. */
@@ -988,6 +1001,7 @@ protected:
 	friend class FBonkReentryTest;
 	// HomeWorld.Opening.BonkClearance reads the raised arc mid-flight.
 	friend class FBonkClearanceTest;
+	friend struct FOpeningReachFlagParityAccess;
 	void TickBonkReturn(float DeltaSeconds);
 	bool IsBonkReturning() const { return bOpeningBonkReturning; }
 	void ClearPartyOnAbsenceVolumes();
