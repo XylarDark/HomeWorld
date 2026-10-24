@@ -34,7 +34,7 @@ HomeWorld is **semi-polygon with detail on top**.
 - The fit check is `VisionBoard/KeyArt/homestead_dusk_baseline.jpg`. Locked 2026-10-11. Use it only after the developer has written the design. Masses are rugged and chunky. Facets are the size in that picture. A smooth blob fails. A crystal-cut outline fails. It is not the source of a new design.
 - Surface life sits on those facets: wood grain, moss clumps, flower clusters, crystal faces, leather straps.
 - Most of the frame is scenery ahead of the player.
-- The player is 2 m and is not from this planet. The cottage is the drawn home, 9 m by 11 m, walls 5 m. The bear and the bull match that wall, 5 m at the shoulder. Pines are 5 m, 7 m, and 9 m. The giant is many times the cottage. Camp guards stay people. The meters are `Docs/art/SCALE.md`.
+- The player is 2 m and is not from this planet. The cottage is the walked plan in `Docs/art/SCALE.md`: 26 m by 23 m, walls 5 m. The bear and the bull match that wall, 5 m at the shoulder. Pines are 5 m, 7 m, and 9 m. The giant is many times the cottage. Camp guards stay people.
 - Planetoid read: close horizon, ground can feel like it bends away, thin air, deep zenith, readable constellations at night.
 
 If a change makes the facets disappear, it is the wrong kind of beauty.
@@ -57,7 +57,7 @@ Dusk on the floating-island hub. This picture is the basis.
 - Shrine crystal with a moth.
 - Giant cropped moss-bear with brow shelves and eyes that look.
 - Warm sun left, cool forest right, thin air, planetoid moon.
-- The cottage is the home. Room plan 9 m wide by 11 m deep. Covered porch 9 m by 2 m. Interior follows the drawn rooms. Wall height 5 m, so a third-person camera can sit above a 2 m player. Each bedroom is its own room: at least 70 sq ft and 7 ft on every side. This layout is the first cottage. Later kits may be modular. The bear’s shoulder matches this wall height. Modules: `Docs/art/SCALE.md`.
+- The cottage is the home. Meters are the walked plan in `Docs/art/SCALE.md` and `Docs/level/L_SizeTest_ROOM_PLAN.md`. Wall height 5 m, so a third-person camera can sit above a 2 m player. Each bedroom is its own room. This layout is the first cottage. Later kits may be modular. The bear’s shoulder matches this wall height. The foot measurements below are the earlier drawing.
 
 Doors. Every leaf is a 4 ft clear opening. It swings into its own room and lies flat against the nearest side wall. The swing arc is empty. No leaf swings into the hall.
 

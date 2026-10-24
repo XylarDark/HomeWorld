@@ -1,6 +1,6 @@
 # 45 - Future stress and virtue design
 
-**Status:** FUTURE — Lead picks 2026-10-21, `SV 1A 2A 3A 4A 5A 6A 7A 8A 9A 10A 11A 12A`. Not in the vertical slice. Does not change current build order, MVP scope, or any other design file until a build stage opens.
+**Status:** FUTURE — Lead picks 2026-10-21, `SV 1A 2A 3A 4A 5A 6A 7A 8A 9A 10A 11A 12A`. Not in the vertical slice. Does not change current build order, MVP scope, or any other design file until a build stage opens. Spec added 2026-10-23: the first bonus after the 20 November play is a Grace-moss meal that makes the next craft last longer. That bonus is not in the November slice. No code in that spec.
 **Origin:** Lead chat, 2026-10-21. Picks scribed the same day from the interview at `C:\dev\stress-virtue-interview.md`.
 **When to use:** Before any stress meter, virtue-juice item, moss resource, sin debuff, or all-seven reward. Read this file before proposing slice changes "for stress later."
 
@@ -12,7 +12,7 @@ This round writes `Docs/45_STRESS_VIRTUE_FUTURE_DESIGN.md` and that pointer row 
 
 ## 1. Status and slice boundary
 
-The vertical slice and the home loop stay as they are. Nothing here authorizes a stress meter, a moss node, or a sin flip in the current queue.
+The vertical slice and the home loop stay as they are. Nothing here authorizes a stress meter, a moss gather node, or a sin flip in the current queue. The chest of 6 and the pad spend are already in the slice. Section 8 records them and does not extend them.
 
 The seven pairs already have names in [VisionBoard/Core/VISION.md](../VisionBoard/Core/VISION.md) and `EHomeWorldVirtuePole`: Greed/Generosity, Gluttony/Abstinence, Sloth/Productivity, Wrath/Grace, Pride/Humility, Envy/Fulfillment, Lust/Love. Each axis reads -1 sin, 0 neutral, +1 virtue. A paradox is both poles of one axis drawn as one mark. Canon has no separate names for the seven paradoxes.
 
@@ -60,21 +60,25 @@ Moss becomes a crafting ingredient that helps ease stress. Stress builds on the 
 - Swap stays the herb verb the virtue bible already has. The cap uses that verb on the player's Wrath/Grace axis. It does not add a second flip verb.
 - All-seven rewards, including paradox skills, would be a skill tree. They stay direction.
 
+Amended 2026-10-23. The November slice does keep a kitchen chest of 6 `ITEM_MOSS`, and a finished pad spends 1 to sleep its guard. A miss does not spend. Gather nodes, the stress meter, the flip in play, and the craft-duration bonus stay off that slice. Section 8 is the correction. The bullets above stay as the 2026-10-21 reading.
+
 ## 4. Still unnamed
 
 - The stress cap, the amount a hit or a bonk adds, the amount a missed home tend adds, the fixed amount a Grace-moss meal removes, the smaller amount bed sleep removes, and how far the cap resets after Swap.
 - How a moss node looks, and which wisp gathers it.
 - Names for the seven paradoxes. A paradox remains both poles of one axis on one mark.
 - What Swap does when the player's Wrath/Grace axis is empty, or already Wrath.
+- The multiplier that makes the next craft last longer. Lead names that one number when the build gate in section 8 opens. This file does not invent it. The test amounts already in the stress component (missed day, meal, bed, reset) are not locks and are not named here.
 
 ## 5. Staged path after the slice
 
-No calendar dates. Each stage needs the prior stage's proof plus a Lead gate. The gate is what may amend the GDD, `03_SYSTEMS_MVP.md`, `DO_NOT.md`, the virtue bible, and Doc 42.
+No new calendar dates. The 20 November play is the queue's existing deadline, and it is the gate out of stage 0. Each stage needs the prior stage's proof plus a Lead gate. The gate is what may amend the GDD, `03_SYSTEMS_MVP.md`, `DO_NOT.md`, the virtue bible, and Doc 42.
 
 | Stage | Goal | Must exist first |
 |---|---|---|
-| **0 — Slice** | The current queue. No stress meter, no `ITEM_MOSS`, no virtue-juice item. | MVP canon unchanged. |
-| **1 — Wrath/Grace at home** | Player stress only. A healed wisp infuses a material at a home station. Virtue juice is that infusion. `ITEM_MOSS` is chest stock gathered by a wisp. A hit, a bonk, or a Day without a home tend raises stress. A Grace-moss meal lowers it by the named fixed amount. Bed sleep lowers it a little. At the cap, Swap flips Grace to Wrath and stress resets partway. The sin shows a rune and changes an interaction. The ease pad, the guards, the meal-buff slot, and creature poles stay as they are. | Stage 0. The unnamed numbers in section 4 named by Lead. A visible stress read. |
+| **0 — Slice** | The queue through 20 November. The kitchen chest starts with 6 `ITEM_MOSS`. A finished ease-pad ladder spends 1, and that spend is what puts the guard to sleep. A miss does not spend. No stress meter, no Grace-to-Wrath flip in play, no craft-duration bonus. No dated row is graded on stress. | The 20 November play. |
+| **1a — Grace craft** | The first code after that play. A Grace-moss meal still lowers stress by the amount the component already subtracts. It also marks the next craft with the Grace rune and makes that craft's effect last longer than the same craft without the meal. The player sees the rune on the craft. They do not see a stress meter. | Stage 0 played. Lead names the multiplier in section 4. |
+| **1 — Wrath/Grace at home** | Player stress only. A healed wisp infuses a material at a home station. Virtue juice is that infusion. `ITEM_MOSS` is chest stock gathered by a wisp. A hit, a bonk, or a Day without a home tend raises stress. A Grace-moss meal lowers it by the named fixed amount. Bed sleep lowers it a little. At the cap, Swap flips Grace to Wrath and stress resets partway. The sin shows a rune and changes an interaction. The ease pad, the guards, the meal-buff slot, and creature poles stay as they are. | Stage 1a. The remaining unnamed numbers in section 4 named by Lead. A visible stress read. |
 | **2 — The rest of the set** | The other six axes, all-seven virtues, all-seven sins, and all-seven paradoxes. Direction only until a later gate. No skill tree in this file. | Stage 1 played. Paradox names if a gate asks for them. |
 
 ## 6. Lead answers
@@ -102,3 +106,36 @@ Answered 2026-10-21. All recommended.
 - An ease-pad change, a guard change, or a bonk-try change.
 - A skill tree, or a build of the all-seven rewards.
 - The numbers and names in section 4.
+- Code for the Grace-craft bonus, until the 20 November play has been played.
+
+## 8. Grace craft, after the slice
+
+Lead, 2026-10-23. This section is the spec. It does not authorize code, a stress meter, or a change to any dated November row. The build gate is the 20 November play in [Docs/qa/TUTORIAL_PLAYTEST_QUEUE.md](qa/TUTORIAL_PLAYTEST_QUEUE.md). The GDD, `03_SYSTEMS_MVP.md`, `DO_NOT.md`, the virtue bible, and Doc 42 stay as they are until that gate opens.
+
+### What the slice already does
+
+The kitchen chest starts with 6 `ITEM_MOSS`. A finished ease-pad ladder spends 1, and the guard sleeps only when that spend succeeds. A miss does not spend. Bed sleep, a late paradox miss, and a missed dawn already call the stress component. Nothing in play calls the hit amount or the Grace-to-Wrath flip. There is no meter. No November row is graded on a stress number.
+
+A moss serve already lowers stress, then arms the one day buff. Those stay two reads. The duration bonus is a third read. It does not rewrite the buff slot. Doc 42 still holds: that buff does not change the stroke, the bonk, or spirit sickness.
+
+### The first bonus
+
+After the gate, a Grace-moss meal still lowers stress by whatever the component already subtracts. It also marks the next craft with the Grace rune and makes that craft's effect last longer than the same craft without the meal. The player sees the rune on the craft. They do not see a stress meter.
+
+The opening kettle is not that craft. The first duration is the day sprint from the home-loop stamina meal. The rune is on that serve, not a new widget. The longer time is that sprint. One fixed multiplier, named by Lead at the gate. This section does not choose it.
+
+The camp pad, the guards, the stroke, the bonk, and any downward stat stay unchanged. The meal slot stays one slot.
+
+The later code sits beside the armed buff, not inside it. Serving the Grace-moss meal sets a one-shot flag. The next stamina serve reads it, scales the sprint, shows the Grace rune, and clears the flag. A host test keeps today's sprint when the flag is clear, expects the longer sprint and the rune when the flag was set, expects the stress drop, and expects an ease pad's result to stay the same. That bite does not hook the cap flip or the hit into play.
+
+### Later, not in that bite
+
+Written here so the chase has an owner. Not built with the first bonus.
+
+1. The cottage and the family are the stress picture. An unmade bed, a cold table, a spirit that drifts. The number stays in the log until that picture exists.
+2. A wisp finishing a home job counts as a day's tend, beside the meal and the bed. Skipping it shows on the spirit. It is not a third clock.
+3. The second forest's stroke is the give. Generosity shortens the craft. Greed snatches a late one. The field shows both edges before either opens.
+4. A paradox is both poles, stronger, and they interfere. The player meets Grace, then Wrath, then both.
+5. The lair key is gathered in pieces from the field and the forests.
+
+The house is the sheet: the rune on the meal, the coat, and the wisp. No skill tree. No second meter.

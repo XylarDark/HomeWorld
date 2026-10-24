@@ -1,6 +1,6 @@
 # Cabin room plan
 
-Kept 2026-10-11 after a walk. Greybox blocks for the size-test home. `Content/Python/scene_placement.py` refuses to save unless a 42 cm body can enter, cross the rooms, and leave. The 9 by 11 m card in `Docs/art/SCALE.md` stays the art lock for a later mesh. This page is the layout you walk.
+Kept 2026-10-11 after a walk. Greybox blocks for the size-test home. `Content/Python/scene_placement.py` refuses to save unless a 42 cm body can enter, cross the rooms, and leave. The walked plan is 26 m by 23 m in `Docs/art/SCALE.md`. The 9 by 11 m card is the earlier art lock. This page is the layout you walk.
 
 ## What the comfortable plans have in common
 
@@ -50,6 +50,8 @@ Bedroom doors open off the living room. There is no corridor.
 This body is 84 cm wide and 2 m tall, so a 91 cm door is the width of the body. Openings here are about twice the body. Rooms are larger than the human plans by roughly the same margin, which is what keeps a 2 m person from feeling shut inside a house rated for someone 1.7 m tall.
 
 ## Footprint
+
+Earlier one-story walk, kept for comparison. The shell to build is the 26 m by 23 m plan above. Do not dress to these meters.
 
 The cottage actor is at (−8 m, 0). Local +X is east and +Y is north. The shell is 17.5 m wide and 17 m deep, including a 4 m porch. It runs from local (−6.5, −6.8) to (11.0, 10.2). Walls are 5 m high and 30 cm thick. The pad is the floor. There is no door leaf. Posts mark the porch lip and stay off the entry.
 

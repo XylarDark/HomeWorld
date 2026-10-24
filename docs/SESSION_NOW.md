@@ -2,6 +2,10 @@
 
 The live continuity block. A new chat reads this file, not the history. Append the next block here. When this file grows past a few screens, move the older blocks to `docs/history/SESSION_LOG.md`.
 
+## 2026-10-23 Moss and stress picks
+
+Lead: the kitchen chest starts with 6 moss. Stress calls stay, and no November row is graded on a stress number. The ease sentence is the 9 November row in `Docs/qa/TUTORIAL_PLAYTEST_QUEUE.md`. Cottage meters in the art bible and the room plan point at `Docs/art/SCALE.md`.
+
 ## 2026-10-22 Playtest handoff
 
 Playtest continues in a new chat from [`SESSION_HANDOFF_PLAYTEST_GLIDER.md`](handoffs/SESSION_HANDOFF_PLAYTEST_GLIDER.md). `dawnglide` is set up: glider crafted from the dawn chest, player 180 cm from `GP_GlideStart`, launch not yet played. The 26 Oct glider row is open on the armory table (D2). The cottage light is still too bright (D1). Another agent owns the source and the placers, so a playtest chat edits neither.

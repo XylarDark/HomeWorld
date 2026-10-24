@@ -55,7 +55,7 @@ Better than greybox on this path means the ten masters on meshes already in the 
 | Nov 4 | Day camp | Walking into the clearing takes the partner and sends the player home in body, by day, with or without the nodes filled. |
 | Nov 5 | Night glide | After sleep, the spirit glide reaches that camp. Travel only. |
 | Nov 6 | Stealth | Three guards. Sightlines read from outside the clearing. Spirit stealth reaches each one. |
-| Nov 9 | Ease | Each guard plays the wind-up. Spend the point or a bonk try, or wait and risk the shove home. A wrong shape misses. All three can sleep. |
+| Nov 9 | Ease | Each guard plays the wind-up. Spend the point or a bonk try, or wait and risk the shove home. A wrong shape misses. All three can sleep. The kitchen chest starts with 6 moss. A finished ladder spends 1, and that spend is what puts the guard to sleep. A miss does not spend. Stress is not this row. |
 | Nov 10 | Rescue | Freeing the partner requires those three sleeps. The shrine brings the player home. The partner walks. A missing guard cannot complete it. |
 | Nov 11 | Rescue run | One play: landing, nodes or not, eject, sleep, night glide, stealth, ease, shrine. |
 | Nov 12 | Homestead dress | Cottage and yard use `M_WoodCabin`, `M_StylizedGrass`, `M_PathStone`, `M_WoodWild`, and `M_FoliageCard` on meshes already in the project. Sky and a day/night light read. |

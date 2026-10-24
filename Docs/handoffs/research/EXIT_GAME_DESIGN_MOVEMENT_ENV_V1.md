@@ -284,3 +284,11 @@ grep -nE 'ready:false.{0,40}closed_fail' artifacts/EXIT_GAME_DESIGN_MOVEMENT_ENV
 ---
 
 *End EXIT. Conductor: ACCEPT → schedule GD-MOVENV-CANON then GD-MOVENV-POINTER. Do not open movement Implement or CAP.*
+
+## Lookup 2026-10-23 — bonk home when props block the shot
+
+Ask: how a successful bonk sends the player to the homestead without flying through props.
+Already covered, not fetched again: eject-home is a scripted cartoon degrade; the player ends at home and does not die; the movement bible stays locked. No new external source.
+
+- **CANDIDATE.** One landing a little in from the island edge nearest the hit. The normal bonk is the default. The existing capsule sweep is the clearance check. Clearance uses that one bonk and nothing else. No clearance adds one step in front of the same bonk: the hitter pops the player up, rises, and then the normal bonk fires from the air to that landing. The special path is not a different flight. Where the body stops on the homestead is not the goal.
+- **PARK.** Routing around zone props, a physics knock, and grading a cottage-door centimeter pin. A prop that still blocks the air path is a level move of that landing.
