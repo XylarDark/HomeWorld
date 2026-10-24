@@ -1,68 +1,44 @@
-# Handoff: playtest, glider and the dawn glide
+# Handoff: playtest queue, glider row
 
-Written 2026-10-22 at the end of a playtest session that also carried source changes. The modularity pass is a separate handoff: [`SESSION_HANDOFF_MODULARITY.md`](SESSION_HANDOFF_MODULARITY.md). Another agent owns that work, so a playtest chat must not edit `Source/` or `Content/Python/`.
+Written 2026-10-24. Start the next chat from this file and the newest block in `docs/SESSION_NOW.md`. The pass lives in `Docs/qa/TUTORIAL_PLAYTEST_QUEUE.md`: read the Now line, then `## The glider`. Do not open vision, the asset queue, or either critical path. Do not copy the Now table into this file.
 
-## Where the playtest stands
+Play one pass. Fill its result. Stop.
 
-The order is the Now table in `Docs/qa/TUTORIAL_PLAYTEST_QUEUE.md`. Do not restate it here; read the Now line.
+## This pass
 
-- 22 Oct Night: in.
-- 23 Oct Heal: in. One press starts one wisp; three presses healed three.
-- 26 Oct `glider`: **open**. The craft at the armory table is the blocker.
-- 27/29 Oct glide start and field landing: the `dawnglide` stop is built and set up, but the launch has not been played by a human yet. The meadow and the landing are not placed, so a glide that ends with no destination is expected.
+The next dated row is 26 Oct, `glider`. `Saved/opening_beat.txt` is already `glider`. Legal words are the `hw.Playtest.FastForward` row in `Docs/COMMANDS_AND_LOG_TAGS.md`. A word that `list` does not print is not a new command.
 
-## Last known session state
+`hw.Playtest.FastForward glider` runs the earlier opening beats, then stops at the stocked armory before the craft. The note in `HomeWorldPlaytestBeats.cpp` is `E at the armory: craft the glider`, 220 cm from the actor tagged `NODE_ARMOR_TABLE`.
 
-- Editor was running (PID 26300 at handoff), MCP answering on 55557.
-- PIE was live at the `dawnglide` stop: glider crafted from the dawn chest, player at `V(X=1430.60, Y=60.86, Z=45100.00)`, 180 cm from `GP_GlideStart`, note "the launch is yours". **No launch was logged** before the session was interrupted.
-- The other agent may have built since; a build taskkills the editor, so treat the above as last known, not current.
-
-## Verified today, with the evidence
-
-| Thing | Evidence |
-|---|---|
-| Pond step no longer strands the body in the zipline prop | `playtest_ff: 8 fish` (was `8 fish failed`) |
-| The fast-forward reaches the armory stop | `playtest_ff: ready for glider ... dist 220` |
-| Wall rule stops interaction through walls and windows | Lead: kettle refused through both the wall and the window. Pass. |
-| Kettle sits on the 100 cm counter | `scene_placement: saved top 45000.0` after the seat was derived from `cabin_shell.BOXES` |
-| Candle lights applied to the map | same save line; preset 1900 K, 900/700 cd, 2000 cm radius |
-
-## Open, and not to be assumed
-
-- **D1 cottage light is still too bright** at the candle preset. Lead has called it too bright twice at two different presets, so do not halve it again on instinct.
-- **D2 armory table has no hover and no press.** Owned by the modularity handoff. The glider row cannot pass until it does.
-- **The bonk rewrite is unverified by a human.** It is now one rise-cross-land flight. The old code teleported and then re-triggered in a loop; the log showed `opening_bonk: thrown back to the island` eight times in three seconds. Expected now: exactly one `opening_bonk: return to ...` then `opening_bonk: landed`.
-- **The beat-stop gaze rule is unverified.** Every stop now aims at its target's bounds instead of a level gaze. The armory table hover is its test.
-
-## Running a stop
-
-1. End PIE if it is running. `Content/Python/d19_end_pie.py` writes the result to `Saved/d19_probe.txt`; read `pie=False` there to confirm.
-2. The beat word is the first line of `Saved/opening_beat.txt`. Current value: `dawnglide`. Legal words are the `hw.Playtest.FastForward` row in `Docs/COMMANDS_AND_LOG_TAGS.md`.
-3. Launch the editor with `Content/Python/start_editor.py --timeout 600`, then push `start_opening_beat.py` through MCP. Running `scene_placement.py` directly does nothing; its entry point is `apply_homestead_scene.py`.
-
-Expected log for `dawnglide`:
+Expected log:
 
 ```
-playtest_ff: 8 fish
-opening_glider: crafted (wood 0, silk 0, metal 0)
-playtest_ff: ready for dawnglide - the launch is yours
-playtest_ff: you are at V(...), target GP_GlideStart, dist 180
+playtest_ff: ready for glider - E at the armory: craft the glider
 ```
 
-`8 fish failed` aborts the whole sequence and strands the player at the pond. That is the failure to watch for, not a cosmetic miss.
+plus the stand line at about 220 cm. `playtest_ff: 8 fish failed` aborts the sequence at the pond and never reaches the armory.
 
-## Coordination
+Lead plays the hover and the E. Write the three result fields in `## The glider`. A green host test does not fill that table. `HomeWorld.Opening.GliderCraft` already passed on 2026-10-21 and is not this pass.
 
-- Another agent owns `Source/HomeWorld/HomeWorldCharacter.cpp/.h`, `Content/Python/scene_placement.py`, and the shared-systems rows S1-S7 in `Docs/context/PLAY_TASKS.md`. Do not edit those files from a playtest chat.
-- Any build moves the binary. Results recorded before a build must be re-checked before they count as passing.
-- Nothing is committed: the map, seven `MI_Greybox_*` material instances (dirtied by the placer's paint step), the two Python placers, `HomeWorldCharacter.cpp/.h`, `HomeWorldOpeningReveal.cpp`, the HUD and two test files, several docs, and untracked `Content/Python/start_opening_beat.py`.
-- Never `git reset --hard`, and do not commit a `.uasset` or `.umap` without the Lead's yes.
-- `.\Tools\Safe-Build.ps1` only, and it closes the editor. Ask when the editor is open.
+## Machine, checked 2026-10-24
 
-## What a pass needs
+- `main` at `7c6c9201`, clean, one commit ahead of `origin/main`. That commit is docs only. Do not push.
+- No other worktree. No `UnrealEditor` process.
+- Desktop `Binaries/Win64/UnrealEditor-HomeWorld.dll` is still 2026-10-23 13:58 (3,463,680 bytes). It does not contain `f68332d9` (exact fast-forward words, 18:40), `efeb6754` / `14b087be` / `2881d283` (hover and fish registry, 20:08–21:01), or `b5e90720` (bonk lands on the nearest pad edge, 23:41).
+- A spare-worktree build of `584e98e3` already passed: Build.bat Succeeded, 221 tests, 217 passed, 4 warnings, 0 failed. That worktree is gone, so this desktop DLL is not that binary. `7c6c9201` adds no game code on top of `584e98e3`.
 
-For `dawnglide`: the launch happens with the glider built, and the flight travels. A landing is not expected yet.
+Build once with `.\Tools\Safe-Build.ps1` from the repo root before PIE, so the play is of current main. The editor is closed, so the script's editor close has nothing to kill. If an editor is open when the next chat starts, stop and hand the close to Lead. One build. Do not build again in the same reply.
 
-For the bonk: fall off the pad, see one continuous flight home, stay landed, and the log shows one `return to` and one `landed`.
+## Open beside this pass
 
-For the glider row: the craft at the armory table and the descent refusing before it. Both blocked on D2 as of this handoff.
+- **Armory hover and press are not play-confirmed.** The aim frame is screen center (`GetOpeningLookCenterNdcY` returns 0, `e7dce3aa`). That line is inside the 13:58 DLL. The hover scan after it is not. The glider row is the human check: the frame on the table, then E. The same on-screen fail twice stops the reply. Say what was not in the binary.
+- **Cottage light is still too bright** at the candle preset. Lead has called it too bright twice. Do not halve it. It is not this pass.
+- **The bonk landing in `b5e90720` is not play-confirmed.** The 2026-10-18 bonk pass is an older flight. Fast-forward runs that flight on the way to the armory. One `opening_bonk: return to` and one `opening_bonk: landed` is the log to expect. A loop of throws is the old failure.
+- **Dawn glide is a later row.** The 2026-10-22 session had a crafted glider 180 cm from `GP_GlideStart` and no human launch. That PIE is gone. Do not play `dawnglide` in this chat.
+
+## Do not
+
+- Do not edit `Source/` or `Content/Python/` from this playtest chat.
+- Do not commit a `.uasset` or `.umap`. Never `git reset --hard`.
+- Do not replay Night, Heal, or any passed midday row.
+- The meadow, the nodes, and the clearing are not on the map. Delivery, day camp, and the later stops wait.

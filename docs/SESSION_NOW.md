@@ -2,6 +2,10 @@
 
 The live continuity block. A new chat reads this file, not the history. Append the next block here. When this file grows past a few screens, move the older blocks to `docs/history/SESSION_LOG.md`.
 
+## 2026-10-24 Playtest queue handoff
+
+Next chat plays one row and stops. Start from [`SESSION_HANDOFF_PLAYTEST_GLIDER.md`](handoffs/SESSION_HANDOFF_PLAYTEST_GLIDER.md). The Now line in `Docs/qa/TUTORIAL_PLAYTEST_QUEUE.md` is the pass: 26 Oct `glider`. `Saved/opening_beat.txt` is `glider`. The desktop DLL is still the 2026-10-23 13:58 build; the editor is not running. Build once, then Lead plays the armory press.
+
 ## 2026-10-24 Clean tree on main
 
 Lead's order of 23 Oct 11:41 PM ET is done: `main` is `origin/main`, the tree is clean, and `main` is the only branch. Main now holds the bonk fix (`b5e90720`, lands on the nearest pad edge, with a pop when blocked), Lead's editor-saved `L_SizeTest.umap` and `MI_Greybox_*` files (`8231915e`, one commit, revert it to undo), and the chest moss comment (`584e98e3`). Build and tests on `584e98e3`, run in a spare worktree: Build.bat Succeeded, 221 tests, 217 passed, 4 with warnings, 0 failed. The glider handoff below still applies. The editor open on the desktop is on the older build, so Lead restarts it on main before the 26 Oct glider play. Taste is not scored. The two guard-latch and Resolve-reach pull requests (#335, #336) were closed unmerged, and their diffs are in `/workspace/q2/parked/`.
